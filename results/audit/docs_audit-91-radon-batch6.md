@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/layer_model.py:7464fad8e9703b76b6582a641fb80c5a93c4bbf87b5d2aad191e610eafe64dd2
-  - protocol/code_metrics_baseline.json:f167ac60814c57eb6437d46e3a7b83239b1b7494a6c55948ff67930fef0b4737
+  - protocol/code_metrics_baseline.json:c56599cf154a72feabd24c1e1535a8d9a299fb917313054636fb3434ff70cdd2
 ---
+> 重审（2026-11-09）：材料清单模块拆分 + json_doc 统一（规模基线重冻）
+
 > 重审（2026-11-09）：材料清单对象（nf-sbom/1：显式范围 + 摘要折叠 + 篡改必红）
 
 > 重审（2026-11-09）：变异探针扩到五判据（15 变异体 / 11 合法变体）

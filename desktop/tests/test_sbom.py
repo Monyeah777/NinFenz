@@ -12,8 +12,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "desktop" / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
-from core import sbom as sb  # noqa: E402
 import sbom as sbom_script  # noqa: E402
+from core import sbom as sb  # noqa: E402
 
 
 class SbomTest(unittest.TestCase):
@@ -49,9 +49,8 @@ class SbomTest(unittest.TestCase):
         self.assertTrue(sb.verify(bad_count, ROOT), "count 篡改必须报")
 
     def test_empty_root_fails_closed(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            with self.assertRaises(ValueError) as ctx:
-                sb.collect(tmp)
+        with tempfile.TemporaryDirectory() as tmp, self.assertRaises(ValueError) as ctx:
+            sb.collect(tmp)
         self.assertIn("修复指引", str(ctx.exception))
 
 

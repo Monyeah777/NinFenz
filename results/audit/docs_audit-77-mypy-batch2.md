@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
-  - protocol/code_metrics_baseline.json:f167ac60814c57eb6437d46e3a7b83239b1b7494a6c55948ff67930fef0b4737
+  - protocol/code_metrics_baseline.json:c56599cf154a72feabd24c1e1535a8d9a299fb917313054636fb3434ff70cdd2
 ---
+> 重审（2026-11-09）：材料清单模块拆分 + json_doc 统一（规模基线重冻）
+
 > 重审（2026-11-09）：材料清单对象（nf-sbom/1：显式范围 + 摘要折叠 + 篡改必红）
 
 > 重审（2026-11-09）：变异探针扩到五判据（15 变异体 / 11 合法变体）

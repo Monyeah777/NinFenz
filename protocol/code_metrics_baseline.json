@@ -1631,7 +1631,7 @@
       "max_fn_lines": 42
     },
     "scripts/judge_mutation_probe.py": {
-      "lines": 247,
+      "lines": 249,
       "max_fn_cc": 8,
       "max_fn_lines": 55
     },
@@ -1731,9 +1731,9 @@
       "max_fn_lines": 30
     },
     "scripts/sbom.py": {
-      "lines": 83,
-      "max_fn_cc": 8,
-      "max_fn_lines": 38
+      "lines": 101,
+      "max_fn_cc": 9,
+      "max_fn_lines": 41
     },
     "scripts/self_audit_probe.py": {
       "lines": 85,

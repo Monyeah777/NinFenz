@@ -36,6 +36,21 @@ def render(doc: dict[str, Any]) -> str:
     return json.dumps(doc, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
 
 
+def _check(root: Path) -> int:
+    """与已提交清单比对 → 退出码（0 一致 / 1 不一致或缺件）。"""
+    dest = ROOT / OUT_REL
+    if not dest.is_file():
+        print("缺 " + OUT_REL + "（先跑 --write）", file=sys.stderr)
+        return 1
+    committed = _core("json_doc").load(dest, dict, what=OUT_REL)
+    issues = _core("sbom").verify(committed, root)
+    if issues:
+        print("；".join(issues[:3]), file=sys.stderr)
+        return 1
+    print("OK 材料清单与现场一致")
+    return 0
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="sbom",
                                  description="材料清单：按显式范围列出输入文件与摘要")
@@ -58,6 +73,8 @@ def main(argv=None) -> int:
               + doc["digest"][:16] + "）")
         return 0
     if args.check:
+        return _check(root)
+    if False:
         dest = ROOT / OUT_REL
         if not dest.is_file():
             print("缺 " + OUT_REL + "（先跑 --write）", file=sys.stderr)

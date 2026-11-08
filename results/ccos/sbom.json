@@ -1,7 +1,7 @@
 {
-  "bytes": 11957825,
+  "bytes": 11957821,
   "count": 561,
-  "digest": "6341f3c3d9ceae4847cec4da1dd92e3a667176f9af40eeeb3927cf477a2aa968",
+  "digest": "c5c13da01a72c78b78d9604447bfe1fb12c2d97ff3ad073eeacfd5a1fe814317",
   "materials": [
     {
       "bytes": 102,
@@ -1879,9 +1879,9 @@
       "sha256": "ad799cbfbf1dd69859ff21963885ebf1d5fed56ca67fdd1c2b9e2052ce3b8003"
     },
     {
-      "bytes": 263,
+      "bytes": 257,
       "path": "protocol/approvals/protocol__conformance_report.json",
-      "sha256": "b73956dce044786486ed4b106e15db91e352e87c342c02af9434f60217d10aea"
+      "sha256": "2607bc56dd7d114b3c788f0d803faace92b873cf24d493ee846f4cd8cf1523c7"
     },
     {
       "bytes": 16375,
@@ -1934,9 +1934,9 @@
       "sha256": "5545028d82662ee8f4f4051bdc14876b0357f0d9548963f3836f6f8f6d417285"
     },
     {
-      "bytes": 42085,
+      "bytes": 42086,
       "path": "protocol/code_metrics_baseline.json",
-      "sha256": "f167ac60814c57eb6437d46e3a7b83239b1b7494a6c55948ff67930fef0b4737"
+      "sha256": "c56599cf154a72feabd24c1e1535a8d9a299fb917313054636fb3434ff70cdd2"
     },
     {
       "bytes": 87117,
@@ -2066,7 +2066,7 @@
     {
       "bytes": 27560,
       "path": "protocol/generated/receipt_chain.json",
-      "sha256": "e1fa641c09966bf58cd61814495fd3e57881e6658a4c39a996f94a48237fade0"
+      "sha256": "5e6fd792fea0958a0ad62e88a4e7a61fb33fcb0ded53b65dab14fabeea7017db"
     },
     {
       "bytes": 918,
@@ -2286,7 +2286,7 @@
     {
       "bytes": 79590,
       "path": "protocol/RECEIPTS.json",
-      "sha256": "a0f592ef80fa8c35623ee62af3e070a76b49c7ea36c89f262e762a9af24c2e24"
+      "sha256": "63a6932f3063bea92bd22a0dc02d8571342839e551a8e92a4d2a566e492ad12d"
     },
     {
       "bytes": 7923,
@@ -2419,9 +2419,9 @@
       "sha256": "aad2a9338005f35f70468172c634cc8b27f3485e582b219172f871329bfeb669"
     },
     {
-      "bytes": 13686,
+      "bytes": 13119,
       "path": "protocol/verification_report.json",
-      "sha256": "5264e7b5424db2d91d500b825f6176d6d92d6cd95bf2498a0c27c271baef0ec2"
+      "sha256": "5537f0a374f9c999e476427b769a54ba8e6bc106c9cdbefeaa99179532b8cba2"
     },
     {
       "bytes": 4160,
@@ -2714,9 +2714,9 @@
       "sha256": "613429c5ed0e3484107fb0f07edebd114d8b1ffedc30c690b1462a450e59b2fd"
     },
     {
-      "bytes": 2880,
+      "bytes": 3448,
       "path": "scripts/sbom.py",
-      "sha256": "e71a2c5de33d9a03a1008ecd3f785fdcb66c61ef491bcfd6bf61333ae924f847"
+      "sha256": "ee539446f870d70c4a10317eddc2ce6a819c6b52b4b0bb57a5190a40cbf586fc"
     },
     {
       "bytes": 3184,
