@@ -1076,7 +1076,7 @@
       "max_fn_lines": 78
     },
     "desktop/src/core/repo_face.py": {
-      "lines": 128,
+      "lines": 138,
       "max_fn_cc": 13,
       "max_fn_lines": 33
     },
@@ -1536,7 +1536,7 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 9024,
+      "lines": 9016,
       "max_fn_cc": 106,
       "max_fn_lines": 319
     },

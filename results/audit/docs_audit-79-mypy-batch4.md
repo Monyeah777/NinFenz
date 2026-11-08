@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:66c0419a71440173d67087494eac8697daa03e942524d948b2296f49af8770cf
   - desktop/src/core/asset_contract.py:8e2fbc3954c771d6c2eb78d9cf47dcf22612b63b9b16929bd9013792f803f9a2
-  - protocol/code_metrics_baseline.json:2275e0c4172bf800d7487b010c413b3c4576cd0a32fe39764f7ef478ea37e48b
+  - protocol/code_metrics_baseline.json:50a15431e9c5a97102edfa0caf7ea44a8ed79f0dd30490005b69b7a3929dbe59
 ---
+> 重审（2026-11-08）：task-35c：git status 收敛到 repo_face.untracked_paths
+
 > 重审（2026-11-08）：task-35 投影少算防护
 
 > 重审（2026-11-08）：verify_report 基准日 UTC 化修复
