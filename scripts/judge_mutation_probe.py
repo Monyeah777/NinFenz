@@ -43,8 +43,10 @@ def vocab_cases() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     mp, _br = _core()
     packs = [mp.load_pack(str(ROOT), pid) for pid in
              [p["id"] for p in mp.list_packs(str(ROOT))]]
-    registry = json.loads((ROOT / "protocol" / "criteria" / "registry.json")
-                          .read_text(encoding="utf-8"))
+    from core import json_doc  # 局部导入：形状校验统一走 json_doc
+
+    registry = json_doc.load(ROOT / "protocol" / "criteria" / "registry.json", dict,
+                             what="protocol/criteria/registry.json")
     legal = [
         {"name": "原样", "packs": packs, "registry": registry},
         {"name": "词表顺序打乱", "packs": packs,

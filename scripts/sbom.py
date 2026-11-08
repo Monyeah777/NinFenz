@@ -62,7 +62,8 @@ def main(argv=None) -> int:
         if not dest.is_file():
             print("缺 " + OUT_REL + "（先跑 --write）", file=sys.stderr)
             return 1
-        issues = _core("sbom").verify(json.loads(dest.read_text(encoding="utf-8")), root)
+        committed = _core("json_doc").load(dest, dict, what=OUT_REL)
+        issues = _core("sbom").verify(committed, root)
         if issues:
             print("；".join(issues[:3]), file=sys.stderr)
             return 1

@@ -364,9 +364,13 @@
     },
     {
       "id": "code_metrics",
-      "issues": 0,
+      "issues": 3,
       "name": "代码规模/复杂度上限（棘轮冻结）",
-      "sample": [],
+      "sample": [
+        "scripts/judge_mutation_probe.py 模块行数 249 > 冻结值 247（修复指引：拆分该模块/函数；确需上调须评审后重冻基线 python scripts/code_metrics.py --write）",
+        "scripts/sbom.py 模块行数 84 > 冻结值 83（修复指引：拆分该模块/函数；确需上调须评审后重冻基线 python scripts/code_metrics.py --write）",
+        "scripts/sbom.py 最长函数行数 39 > 冻结值 38（修复指引：拆分该模块/函数；确需上调须评审后重冻基线 python scripts/code_metrics.py --write）"
+      ],
       "source": "code_metrics.scan",
       "stats": {
         "baseline": 365,
@@ -375,7 +379,7 @@
         "max_fn_lines": 443,
         "max_lines": 9860
       },
-      "status": "pass",
+      "status": "fail",
       "warns": 0
     },
     {
@@ -431,8 +435,8 @@
       "stats": {
         "cycles": 0,
         "metrics_drift": 0,
-        "metrics_missing": 1,
-        "metrics_recorded": 288,
+        "metrics_missing": 0,
+        "metrics_recorded": 289,
         "modules": 289,
         "registered_cycles": 0,
         "registered_sdp": 9,
@@ -538,12 +542,12 @@
       "warns": 0
     }
   ],
-  "root_digest": "0bef8ac40e7159374cfa0fd8ee3422cfbeaccf9e0415c956f20398ad82cdb2b1",
+  "root_digest": "ad2334bba016edc4c3dc2d392e5113c4aea9648ba4a3235c0c4f1ec47b9ca7e9",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
-    "fail": 0,
-    "pass": 29,
+    "fail": 1,
+    "pass": 28,
     "warn": 2
   }
 }
