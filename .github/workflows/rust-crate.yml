@@ -3,8 +3,9 @@ name: rust-crate
 #
 # 为什么单独一条（2026-11-08 盲区收口）：旧 `rust-parity.yml` 退役后，主 crate 不再被任何
 # workflow 构建/测试（`cross-lang.yml` 只 build `engine/rust/canonical` 的 parity crate）。
-# 主 crate 里 249 条单测含多条「与 Python 真源逐字节对账」的 oracle（depth_scan / asset_contract /
-# pack_combo / output_forms…），没有 CI 面等于这些 oracle 只在作者机器上跑过。
+# 主 crate 的整批单测（数量随测试演进而变，不在此钉死）含多条「与 Python 真源逐字节对账」
+# 的 oracle（depth_scan / asset_contract / pack_combo / output_forms…）——没有 CI 面等于
+# 这些 oracle 只在作者机器上跑过。
 #
 # 口径：与旧 rust-parity 的 cargo-test 同档（`--release`，与对拍/门禁的优化档一致）；
 # 依赖 Cargo.lock，用 `--locked` 防依赖漂移；失败时上传日志供诊断（不写仓库）。
@@ -42,7 +43,7 @@ jobs:
         run: |
           rustc --version
           cargo --version
-      - name: 主 crate 单测（release 档：249 条 oracle 与对拍同口径）
+      - name: 主 crate 单测（release 档：与对拍同口径）
         shell: bash        # windows runner 默认 pwsh：`set -o pipefail`/tee 是 bash 语法
         run: |
           set -o pipefail
