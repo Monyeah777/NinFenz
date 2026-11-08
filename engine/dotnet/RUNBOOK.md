@@ -45,6 +45,13 @@ python -c "import sys;sys.path.insert(0,'desktop/src');from core import engine_l
 
 ## 2. 真源变了怎么办（**一条命令**）
 
+> **CI 跑批前提（2026-11-08 实测）**：`net-probes` 的金标快照 ref 必须在**公开历史里**。
+> 旧默认 `v2.11.0` 已随历史重写不存在；现默认 `aa259d76`（`CorpusStamp.Baseline` 对应的导出提交）
+> 目前**只在作者本地对象库里**——公开仓 `git archive` 会报 `not a valid object name`。
+> 跑 CI 批前二选一：① 作者把该提交推上来（如 `git push origin aa259d76:refs/tags/nf-snap-golden`
+> 并把 `vars.NF_SNAP_REF` 指向该 tag）；② 用 `run-rebaseline.ps1` 把金标前移到当前 HEAD 后重推。
+> 手动 `workflow_dispatch` 时用 `snap_ref` 输入显式指定可用的 ref（缺省值失效会在快照步骤 fail-fast）。
+
 **第一百二十二片起：复基线已工具化** —— `run-rebaseline.ps1`：
 
 ```bash
