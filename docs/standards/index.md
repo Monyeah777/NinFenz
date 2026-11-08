@@ -1004,7 +1004,7 @@
 - MAVLink 无人系统协议 · MAVLink 社区 · 层 iface · 可达 是（200 · 2026-09-24） · 扩展点 custom-message, message-id-range · 绑定 主锚 0 / 辅锚 0 · https://mavlink.io/en/
 
 ### `mcp`
-- Model Context Protocol · Anthropic/MCP · 层 iface · 可达 是（200 · 2026-09-24） · 扩展点 server-capability, extension-method · 绑定 主锚 14 / 辅锚 0 · https://modelcontextprotocol.io/specification/2025-06-18
+- Model Context Protocol · Anthropic/MCP · 层 iface · 可达 是（200 · 2026-11-08） · 扩展点 server-capability, extension-method · 绑定 主锚 14 / 辅锚 0 · https://modelcontextprotocol.io/specification/2026-07-28
 
 ### `modbus`
 - Modbus 通信 · Modbus Organization · 层 iface · 可达 是（200 · 2026-09-24） · 扩展点 function-code-extension, exception-code · 绑定 主锚 0 / 辅锚 0 · https://modbus.org/

@@ -15,7 +15,7 @@ subjects:
   - verify.sh:b294a23cb14943c29141d8b76e8d6a316e5c28fcf1da8ec148b48384aececa72
   - scripts/nf.py:6a2a931b373487d2aac503b295a2db3cfa579eb46ae8856b41f5d3401da7ca37
   - docs/lsp.md:db91bbfed27d7e14eb63c72e58ad8e009ce44a2b6563c15982b644ec358eca39
-  - docs/mcp.md:c4fa52d36097253e197304e6bf6e0512bc2708077fb8ef34865653fc764caa78
+  - docs/mcp.md:068377b363b3ebd22eafd1a614452114f4303fe17e1354beff0ae15fbb098f93
   - docs/decision-layer.md:cefef53f4a418ccbd7cc1f96a31850454685bcc4d959cabddceea94e1a9c30de
   - protocol/driver.json:d20ddbce281515b7c89ca02f10352bdd2f31e9c6ab80a472a9badb067807e093
   - integrations/site/integration.json:cbc540aa46fe44b061668c4ee1f07314ddb2568c8f04749b7f050479cc22ec75
@@ -26,6 +26,8 @@ subjects:
   - skills/ninfenz/references/commands.md:b62d73dfef22553dfc05c371e6725670b29201ae973e30fc7edca2bc3261b0bd
 
 ---
+> 重审（2026-11-08）：refreeze.sh（统一冻结入口）
+
 > 重审（2026-11-02）：refreeze.sh（统一冻结入口）
 
 > 重审（2026-10-30）：2026-10-30: 1.1.2 版本面与发布事实同步；README 与机器事实更新，重审对象摘要变更。

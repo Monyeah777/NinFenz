@@ -492,18 +492,18 @@
       "sample": [],
       "source": "standards_coverage.scan",
       "stats": {
-        "asserted": 16,
-        "bound": 82,
+        "asserted": 18,
+        "bound": 83,
         "catalogued": 376,
-        "claims": 16,
-        "consumable": 16,
+        "claims": 18,
+        "consumable": 18,
         "domain_bound": 72,
         "not_domain_bound": 304,
         "states": {
           "asserted": 0,
-          "bound": 66,
-          "catalogued": 294,
-          "consumable": 16
+          "bound": 65,
+          "catalogued": 293,
+          "consumable": 18
         }
       },
       "status": "pass",
@@ -653,7 +653,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "8e6015697d38ddd5dcb931ce11512e2ca27f9b5afa0871bf04495f4fc05b3158",
+  "root_digest": "4fb7f725cda8c5d46ba1a544f2fab8c35ba388e1840a83186cfb510d22c7e919",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

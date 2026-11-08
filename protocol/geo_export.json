@@ -5598,11 +5598,11 @@
       "http_status": 200,
       "id": "mcp",
       "layer": "iface",
-      "probe_date": "2026-09-24",
+      "probe_date": "2026-11-08",
       "reachable": true,
-      "sha256_sample": "401fd812a16bce2316e9959042651a83ee7c5c2f99637402b5511e58b8b19d53",
+      "sha256_sample": "2865d6f28373166018eb6eb1f50fa723663e1e1f6f9d1839470e80b28a5681aa",
       "title": "Model Context Protocol",
-      "url": "https://modelcontextprotocol.io/specification/2025-06-18"
+      "url": "https://modelcontextprotocol.io/specification/2026-07-28"
     },
     {
       "body": "Modbus Organization",

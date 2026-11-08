@@ -23,10 +23,12 @@ subjects:
   - docs/interop.md:f884a0533ed89aae8c83a2a44da491afb334c083dc05051158ac3a91e88e4f5c
   - docs/text-hygiene.md:36edf35f60bc669192443a8c16a4bcdc7c22408270fff5ea15308a16a756f986
   - docs/endpoint.md:4da6d07f9d0ed0a7166c028b1a4070a370f2edc9e70e700cce03c3d38b4e930f
-  - docs/mcp.md:c4fa52d36097253e197304e6bf6e0512bc2708077fb8ef34865653fc764caa78
+  - docs/mcp.md:068377b363b3ebd22eafd1a614452114f4303fe17e1354beff0ae15fbb098f93
   - llms.txt:10f7dfc4559dd18ed9c14e05dc270b41e1407232e3ce590035cad523408477a5
 
 ---
+> 重审（2026-11-08）：refreeze.sh（统一冻结入口）
+
 > 重审（2026-11-07）：RFC 3161 时间戳证据与双语入口重绑
 
 > 重审（2026-11-07）：refreeze CID

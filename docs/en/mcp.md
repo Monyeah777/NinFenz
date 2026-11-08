@@ -1,5 +1,5 @@
 # NinFenz MCP access (`nf serve` · plan 40 v2.7 Wave A S1-E3 / X2)
-> 最后更新：2026-10-18 (last updated)
+> 最后更新：2026-11-08 (last updated)
 
 > **Status**: the public documentation landed with base layer v2.7; **the E3 protocol-level load test passed on 2026-09-08** (a direct stdio JSON-RPC frame-sequence test of all five methods came back green — see the record at the end of this document; it fixed two P06 pipeline gaps — a missing closing ``` / a missing techdoc declaration). 41 Wave C C7 (2026-09-08) opened read-only tools/prompts (local stdio smoke test passed; see docs/41_波C_C7_实测记录.md). **Host-class clients (GUI loading such as Claude Desktop) still need user-side backfill** — the README's MCP claims stay as they are (the S13 gate opens per the docs_external-validation-v2.7.md rules), and "promotion" is filled in after the backfill.
 
@@ -97,6 +97,22 @@ From 41 Wave C C7 onward, an agent can also call read-only retrieval tools: `pip
 | Write-path tools (not implemented) | ❌ | unknown tool → `-32602`; unknown method → `-32601` (the read-only security layer refuses writes by construction) |
 
 Standard error codes: `-32700` parse error / `-32600` invalid request / `-32601` method not found / `-32602` invalid params / `-32603` internal error; version-negotiation error `-32022` (`data.supported` / `data.requested`).
+
+## Standard evidence
+
+- `mcp`: the declared profile is **stdio transport + dual-era**, serving modern `2026-07-28`
+  (`server/discover` and per-request `_meta` version) and legacy `2025-11-25`
+  (`initialize` handshake) in one runtime. Unsupported versions fail with `-32022`.
+- `jsonrpc`: requests, successful responses and error responses follow the JSON-RPC 2.0
+  envelope. Notifications produce no response; method/param errors use `-32601` / `-32602`,
+  internal failures use `-32603`, and malformed JSON returns `-32700` without terminating the session.
+- Negative cases include an invalid `jsonrpc` version, non-structured `params`, unknown
+  methods/tools/URIs, non-finite values, oversized frames and hostile input.
+- Consumable entry points are Python `nf serve` and .NET `nf-dotnet serve`; the read-only
+  tool/prompt surface and cross-language behavior are checked continuously.
+
+This evidence does not claim streamable HTTP / SSE transport, GUI-host compatibility or
+third-party MCP certification.
 
 ## E3 measured record (2026-09-08 · protocol-level load test passed)
 

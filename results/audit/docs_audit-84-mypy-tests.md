@@ -13,7 +13,7 @@ subjects:
   - desktop/tests/test_rust_fastlane.py:3415546ec6ef97dacdb7d8a17596c9815a5ee3912b5db6f948b73075b69216f2
   - desktop/tests/test_quant_domain_package.py:e11700ea8f52a9d2a3c39838923f9264a099aa0997ce5e6890a9a96e65bc1709
   - desktop/tests/test_mcp_write_freedom.py:a2afa8cf6e1d6c2ccb2cde5f57b796d0b8722908be632e227b2a8dc76fe9cf2e
-  - desktop/tests/test_mcp_runtime.py:cf53f00460f76e3eabb0a45842f584878e12d7d402fe613dcc355c5f62a25457
+  - desktop/tests/test_mcp_runtime.py:649c31b1dc6472190af0f67d596e0ed4e9f6c822c46b9dd77580914b2d7fe2ce
   - desktop/tests/test_live_doc_counts.py:8d522b35f224f733bcac561a57376699a75dd3593e945475fc77319673d458d0
   - desktop/tests/test_layer_model.py:8cea98de879a4bdf795f95afff9c8fa9a7675ebac227018b7b7694a158bfd69c
   - desktop/tests/test_knowledge_sig.py:634a727aab5fa9e119835be2e9a2c60dbe36054b66b8d955e0856db048fc9b34
@@ -34,6 +34,8 @@ subjects:
   - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
   - desktop/tests/test_nf_cli.py:3f44b1e1a186e38ecdfe065d867f6d9eaccd996e0e7eca26acfc6366f853ccb6
 ---
+> 重审（2026-11-08）：refreeze.sh（统一冻结入口）
+
 > 重审（2026-10-28）：json-face 去重复（结构断言）+ 成功面切片 + 权重重测
 
 > 重审（2026-10-28）：parity 机器面 8→24 片（只改粒度）+ 权重重测
