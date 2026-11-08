@@ -22,9 +22,14 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(ROOT / "desktop" / "src"))
-from core import atomic_write  # noqa: E402
-from core import json_doc  # noqa: E402
+def _core(name: str):
+    """按需导入 desktop/src 下的 core 模块（局部导入：模块级只留纯逻辑，避开 E402）。"""
+    src = str(ROOT / "desktop" / "src")
+    if src not in sys.path:
+        sys.path.insert(0, src)
+    import importlib
+
+    return importlib.import_module("core." + name)
 
 LEDGER_REL = "protocol/closure/ledger.json"
 OUT_REL = "results/ccos/evidence_graph.json"
@@ -34,7 +39,7 @@ GUIDE = "修复指引："
 
 def build(root: Path = ROOT) -> dict[str, Any]:
     """台账 → 二部图统计（纯读）。"""
-    ledger = json_doc.load(root / LEDGER_REL, dict, what=LEDGER_REL)
+    ledger = _core("json_doc").load(root / LEDGER_REL, dict, what=LEDGER_REL)
     entries = ledger.get("entries") or []
     if not entries:
         raise ValueError("闭包台账为空（" + GUIDE + "确认 " + LEDGER_REL + "）")
@@ -80,7 +85,7 @@ def main(argv=None) -> int:
     if args.write:
         dest = ROOT / OUT_REL
         dest.parent.mkdir(parents=True, exist_ok=True)
-        atomic_write.write_text(dest, render(doc))
+        _core("atomic_write").write_text(dest, render(doc))
         print("OK 已写入 " + OUT_REL + "（陈述 " + str(doc["claims"]) + " · H "
               + str(doc["h_dangling_ratio"]) + "）")
         return 0
@@ -89,7 +94,7 @@ def main(argv=None) -> int:
         if not path.is_file():
             print("缺 " + OUT_REL + "（" + GUIDE + "跑 --write）", file=sys.stderr)
             return 1
-        if render(json_doc.load(path, dict, what=OUT_REL)) != render(doc):
+        if render(_core("json_doc").load(path, dict, what=OUT_REL)) != render(doc):
             print("探针结果与重算不一致（" + GUIDE + "重跑 --write）", file=sys.stderr)
             return 1
         print("OK 证据图与重算一致")

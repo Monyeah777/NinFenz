@@ -30,8 +30,10 @@ subjects:
   - desktop/src/core/daemon.py:75940f32b3068a5bc7a83b288bb9302e76a948eca0baa76e1e62f02243c8b498
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:8947074f9d736c86221a52b05bc5366bce93edaade98997d92b17956206d9c47
+  - protocol/code_metrics_baseline.json:df5bb9e23303ab53e77c1fb467a0efc9991f1ceda6b9b38dc1020d8f3b383180
 ---
+> 重审（2026-11-08）：证据图探针导入收口
+
 > 重审（2026-11-08）：证据图探针（陈述⇄证据二部图，H=悬挂比）
 
 > 重审（2026-11-08）：分组报告模块（先分组再汇总；n<2 不能谈方差）

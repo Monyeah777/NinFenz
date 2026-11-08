@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:8947074f9d736c86221a52b05bc5366bce93edaade98997d92b17956206d9c47
+  - protocol/code_metrics_baseline.json:df5bb9e23303ab53e77c1fb467a0efc9991f1ceda6b9b38dc1020d8f3b383180
 ---
+> 重审（2026-11-08）：证据图探针导入收口
+
 > 重审（2026-11-08）：证据图探针（陈述⇄证据二部图，H=悬挂比）
 
 > 重审（2026-11-08）：分组报告模块（先分组再汇总；n<2 不能谈方差）

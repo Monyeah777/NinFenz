@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
-  - protocol/code_metrics_baseline.json:8947074f9d736c86221a52b05bc5366bce93edaade98997d92b17956206d9c47
+  - protocol/code_metrics_baseline.json:df5bb9e23303ab53e77c1fb467a0efc9991f1ceda6b9b38dc1020d8f3b383180
 ---
+> 重审（2026-11-08）：证据图探针导入收口
+
 > 重审（2026-11-08）：证据图探针（陈述⇄证据二部图，H=悬挂比）
 
 > 重审（2026-11-08）：分组报告模块（先分组再汇总；n<2 不能谈方差）

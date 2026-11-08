@@ -23,7 +23,7 @@ class EvidenceGraphTest(unittest.TestCase):
         self.assertEqual("nf-evidence-graph/1", doc["schema"])
         self.assertGreaterEqual(doc["claims"], 20)
         self.assertEqual([], doc["dangling"],
-                         "这些陈述没有任何证据边（说了但没证）：%s" % doc["dangling"])
+                         f"这些陈述没有任何证据边（说了但没证）：{doc['dangling']}")
         self.assertEqual(0.0, doc["h_dangling_ratio"])
 
     def test_probe_is_not_vacuous(self):

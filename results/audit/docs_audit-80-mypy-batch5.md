@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:22e24633e87e95453d0c2cf4a595d0496bae5d7331c1fc644d5b1555e4925a41
-  - protocol/code_metrics_baseline.json:8947074f9d736c86221a52b05bc5366bce93edaade98997d92b17956206d9c47
+  - protocol/code_metrics_baseline.json:df5bb9e23303ab53e77c1fb467a0efc9991f1ceda6b9b38dc1020d8f3b383180
 ---
+> 重审（2026-11-08）：证据图探针导入收口
+
 > 重审（2026-11-08）：证据图探针（陈述⇄证据二部图，H=悬挂比）
 
 > 重审（2026-11-08）：分组报告模块（先分组再汇总；n<2 不能谈方差）

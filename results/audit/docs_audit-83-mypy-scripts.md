@@ -14,8 +14,10 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:8a175983abdfa40f1bf0dd59dc55bd12f4db6e330c0ef64db3c789c48435e82b
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:8947074f9d736c86221a52b05bc5366bce93edaade98997d92b17956206d9c47
+  - protocol/code_metrics_baseline.json:df5bb9e23303ab53e77c1fb467a0efc9991f1ceda6b9b38dc1020d8f3b383180
 ---
+> 重审（2026-11-08）：证据图探针导入收口
+
 > 重审（2026-11-08）：证据图探针（陈述⇄证据二部图，H=悬挂比）
 
 > 重审（2026-11-08）：分组报告模块（先分组再汇总；n<2 不能谈方差）
