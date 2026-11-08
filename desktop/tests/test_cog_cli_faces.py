@@ -150,6 +150,16 @@ class CogFacesTest(unittest.TestCase):
         data = payload(run(["cog", "calibrate", "--pairs", str(pairs), "--json"]))
         self.assertEqual("nf-calibration/1", data["schema"])
         self.assertIn("ece", data)
+        # --threshold 分支（第 120 轮补）：trigger 块必须随 --json 输出，且计数自洽
+        trig = payload(run(["cog", "calibrate", "--pairs", str(pairs),
+                            "--threshold", "0.6", "--json"]))
+        self.assertEqual("nf-calibration/1", trig["schema"])
+        block = trig.get("trigger")
+        self.assertIsInstance(block, dict, "给了 --threshold 却没带 trigger 块")
+        self.assertEqual("nf-calibration-trigger/1", block["schema"])
+        counts = block["counts"]
+        self.assertEqual(counts["trigger"] + counts["skip"], 2, "样本只有 2 条")
+        self.assertEqual(len(block["triggered"]) + len(block["skipped"]), 2)
 
     def test_job_faces(self):
         self.assertEqual(0, run(["cog", "job", "create", "--ledger", str(self.ledger),
