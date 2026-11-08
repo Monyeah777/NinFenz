@@ -83,8 +83,26 @@ _WRITE_NAMES = ("write", "refresh", "freeze", "sync", "record", "rewrite")
 _SCAN_DEF = re.compile(r"^def scan\(", re.M)
 #: 自述正则：允许文件头是**注释行与空行**的任意组合（实测有件在 coding 行后空一行再起 docstring，
 #: 早版要求注释紧贴 docstring，把这类件误判成「无自述」）
-_DOC = re.compile(r'\A(?:[ \t]*(?:#[^\n]*)?\r?\n)*[ \t]*"""([\s\S]*?)"""')
-_DOC2 = re.compile(r"\A(?:[ \t]*(?:#[^\n]*)?\r?\n)*[ \t]*'''([\s\S]*?)'''")
+def _leading_docstring(text: str) -> str:
+    """文件头自述（允许注释行/空行在前；两种三引号都认）。
+
+    为什么不用正则（2026-11-09）：原正则被 CodeQL 判为 py/redos（外层重复套可空字符类，
+    长注释行有回溯风险）；改手写扫描：逐行跳过注释/空行，复杂度线性、行为逐条等价。
+    """
+    lines = text.splitlines()
+    i = 0
+    while i < len(lines):
+        stripped = lines[i].strip()
+        if stripped and not stripped.startswith("#"):
+            break
+        i += 1
+    rest = "\n".join(lines[i:]).lstrip(" \t")
+    for quote in ('"""', "'''"):
+        if rest.startswith(quote):
+            end = rest.find(quote, len(quote))
+            if end != -1:
+                return rest[len(quote):end]
+    return ""
 #: 自述动词 → 角色（仅用于 `auto` 命中的核内件；解析不出即 `support`）
 _VERB = (
     ("prod", re.compile(r"生成|装配|渲染|导出|构建|组合|衍生|排版|编排|装载|打包")),
@@ -197,8 +215,7 @@ def _self_line_uncached(root: str, rel: str) -> str:
     if text is None:  # 可吞：读不到=无自述可推，① 覆盖判据另报缺口
         return ""
     if rel.endswith(".py"):
-        m = _DOC.search(text) or _DOC2.search(text)
-        for line in (m.group(1).splitlines() if m else []):
+        for line in _leading_docstring(text).splitlines():
             if line.strip():
                 return line.strip()
         return ""

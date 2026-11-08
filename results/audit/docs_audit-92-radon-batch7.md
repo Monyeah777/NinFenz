@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/json_schema.py:f3a4a6a14de5104e217af8b154505f9ca46fd6133081188209add78143e2b23e
-  - protocol/code_metrics_baseline.json:4f32330e2a00ed7f90163e6879c5c177e429ac1c6d49fe675c83299c63fbef62
+  - protocol/code_metrics_baseline.json:0b1ed1aefe39a7ac0367d229789b6caa52d2ed5ee7fd9c1925ca194639c386fa
 ---
+> 重审（2026-11-09）：CodeQL 两处告警修复（ReDoS/URL 子串）
+
 > 重审（2026-11-09）：session-persist 预算 Windows 放宽
 
 > 重审（2026-11-08）：payload 未暂存 warn

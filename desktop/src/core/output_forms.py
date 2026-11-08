@@ -33,6 +33,7 @@ import re
 # 只解析本仓自持产出面；DTD/ENTITY 已在 _xml_guard 前置拒绝
 import xml.etree.ElementTree as ET  # nosec B405 -- self-authored artifacts only
 from pathlib import Path
+from urllib.parse import urlsplit
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
 from core import json_doc
 
@@ -206,8 +207,12 @@ def detect(root: str, rel: str) -> Tuple[str, str]:
     if ext == ".json":
         data, _ = _read_json(path)
         if isinstance(data, dict):
-            sch = str(data.get("$schema") or "")
-            if "json-schema.org" in sch:
+            sch = str(data.get("$schema") or "").strip()
+            # 2026-11-09（CodeQL py/incomplete-url-substring-sanitization）：原来用
+            # `"json-schema.org" in sch` 会被 `https://evil/json-schema.org` 之类字符串骗过；
+            # 判**主机名**（含子域），不判子串。
+            host = urlsplit(sch).hostname or ""
+            if host == "json-schema.org" or host.endswith(".json-schema.org"):
                 form = "json-schema"
             kind = str(data.get("kind") or "")
             if kind.startswith("nf-domain-spec"):
