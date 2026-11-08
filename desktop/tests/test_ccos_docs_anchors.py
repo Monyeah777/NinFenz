@@ -25,7 +25,7 @@ PREFIXED = re.compile(r"(?<![\w/.-])((?:" + _DIRS_PATTERN + r")/[\w./-]+\*?)")
 def _prefixed(text: str) -> list[str]:
     out = []
     for raw in PREFIXED.findall(text):
-        rel = raw.strip().rstrip(".,;:)")
+        rel = raw.strip().rstrip(".,;:)").rstrip("/")
         if not rel or len(rel) > 120 or ".." in rel:
             continue
         if any(ch in rel for ch in "<>*$"):
@@ -33,6 +33,20 @@ def _prefixed(text: str) -> list[str]:
         out.append(rel)
     return out
 
+
+def _ignored(rel: str) -> bool:
+    """构建产物/被忽略路径不算仓库文件（干净快照里必然不存在）。"""
+    import shutil
+    import subprocess
+    git = shutil.which("git")
+    if not git:
+        return False
+    try:
+        proc = subprocess.run([git, "-C", str(ROOT), "check-ignore", "-q", rel],
+                              timeout=15, check=False)
+    except (OSError, subprocess.SubprocessError):
+        return False
+    return proc.returncode == 0
 
 def _exists(rel: str) -> bool:
     return (ROOT / rel).exists() or (ROOT / "desktop" / "src" / rel).exists()
@@ -43,7 +57,7 @@ class DocsAnchorTest(unittest.TestCase):
         docs = sorted(DOCS.glob("*.md"))
         self.assertGreaterEqual(len(docs), 10, "docs/ccos 文档数异常少")
         bad = [p.name for p in docs
-               if not any(_exists(rel) for rel in _prefixed(
+               if not any(_exists(rel) and not _ignored(rel) for rel in _prefixed(
                    p.read_text(encoding="utf-8", errors="replace")))]
         self.assertEqual([], bad, f"这些文档没有任何可核的仓库路径：{bad}")
 
@@ -52,7 +66,7 @@ class DocsAnchorTest(unittest.TestCase):
         for path in sorted(DOCS.glob("*.md")):
             text = path.read_text(encoding="utf-8", errors="replace")
             for rel in _prefixed(text):
-                if not _exists(rel):
+                if not _exists(rel) and not _ignored(rel):
                     broken.append(f"{path.name} → {rel}")
         self.assertEqual([], broken[:10], f"文档里指向了不存在的路径：{broken[:10]}")
 
