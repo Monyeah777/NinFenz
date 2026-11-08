@@ -80,9 +80,35 @@ class ApplyTest(unittest.TestCase):
     def test_each_operator_applies(self):
         for op_id, payload in PAYLOADS.items():
             state = ct.new()
-            new_state, out = ct.apply(state, op_id, payload)
+            # 终态算子（stop / abstain）必须带授权；其余算子空授权即可
+            new_state, out = ct.apply(state, op_id, payload, authority="tester")
             self.assertEqual(1, len(new_state["records"]), op_id)
             self.assertEqual(op_id, out["record"]["op"])
+
+    def test_terminal_ops_require_authority(self):
+        """同构判据 #6（授权层）：终态算子必须记「谁授权」，且授权方要在允许词表内。
+
+        不可逆转移（stop / abstain）没有授权就等于「没人负责」；
+        有授权也要能核对——这是契约侧 `approval.approved_by` 的认知侧对偶。
+        """
+        state = ct.new()
+        with self.assertRaises(ValueError) as ctx:
+            ct.apply(state, "stop", PAYLOADS["stop"])
+        self.assertIn("authority", str(ctx.exception))
+        self.assertIn("修复指引", str(ctx.exception))
+        _state2, out = ct.apply(state, "stop", PAYLOADS["stop"], authority="tester")
+        rec = out["record"]
+        self.assertEqual("tester", rec["authority"])
+        self.assertEqual([], ct.authority_issues(rec, {"tester"}))
+
+    def test_authority_check_can_be_killed(self):
+        """变异测试：三处改坏都必须报——去掉授权 / 授权方不在词表 / 记录不是对象。"""
+        _state, out = ct.apply(ct.new(), "stop", PAYLOADS["stop"], authority="tester")
+        rec = dict(out["record"])
+        self.assertEqual([], ct.authority_issues(rec, {"tester"}))
+        self.assertTrue(ct.authority_issues(dict(rec, authority=""), {"tester"}))
+        self.assertTrue(ct.authority_issues(dict(rec, authority="ghost"), {"tester"}))
+        self.assertTrue(ct.authority_issues("not-a-record", {"tester"}))
 
     def test_ritual_observe_is_rejected_on_third(self):
         state = ct.new()
@@ -102,14 +128,14 @@ class ApplyTest(unittest.TestCase):
 
     def test_stop_terminates_control(self):
         state = ct.new()
-        state, _ = ct.apply(state, "stop", PAYLOADS["stop"])
+        state, _ = ct.apply(state, "stop", PAYLOADS["stop"], authority="tester")
         self.assertEqual("stopped", state["status"])
         with self.assertRaises(ValueError):
             ct.apply(state, "observe", {"observation": "x", "reading": 1})
 
     def test_stop_terminates_session_steps(self):
         bundle = se.begin("问题 A")
-        bundle = se.control(bundle, "stop", PAYLOADS["stop"])
+        bundle = se.control(bundle, "stop", PAYLOADS["stop"], authority="tester")
         with self.assertRaises(ValueError) as ctx:
             se.step(bundle, "decomposition",
                     {"kind": "subquestions_added", "subquestions": ["a", "b"]})
@@ -138,12 +164,12 @@ class ApplyTest(unittest.TestCase):
             ct.apply(state, "abstain", bad)
         self.assertIn("修复指引", str(ctx.exception))
         good = dict(bad, searched="results/ccos/watermark_ecc_probe.json 全 10 组")
-        state2, _ = ct.apply(ct.new(), "abstain", good)
+        state2, _ = ct.apply(ct.new(), "abstain", good, authority="tester")
         self.assertEqual("results/ccos/watermark_ecc_probe.json 全 10 组",
                          state2["abstained"][-1]["searched"])
     def test_abstain_marks_status(self):
         state = ct.new()
-        state, _ = ct.apply(state, "abstain", PAYLOADS["abstain"])
+        state, _ = ct.apply(state, "abstain", PAYLOADS["abstain"], authority="tester")
         self.assertEqual("abstained", state["status"])
         self.assertEqual(1, len(state["abstained"]))
 

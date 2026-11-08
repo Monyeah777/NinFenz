@@ -120,10 +120,39 @@ def _apply_effect(state: dict[str, Any], op_id: str, payload: dict[str, Any],
     return effect
 
 
+#: 终态算子：不可逆（停/弃权之后只能开新会话），所以必须记录「谁授权」
+TERMINAL_OPS = ("stop", "abstain")
+
+
+def authority_issues(record: Any, allowed: set[str] | frozenset[str]) -> list[str]:
+    """核对一条控制记录的授权（同构判据 #6 的可复用核）。
+
+    为什么单独成函数（第 88 轮）：判据要能被变异打死——只有把「授权核对」抽出来，
+    才可能用一条「假装有授权」的记录证明它真的会红。三条：终态算子必须有授权、
+    授权必须在允许词表内、空串等于没有授权。
+    """
+    issues: list[str] = []
+    if not isinstance(record, dict):
+        return ["记录不是对象（" + GUIDE + "用 apply 的产出）"]
+    op_id = str(record.get("op") or "")
+    authority = str(record.get("authority") or "")
+    if op_id in TERMINAL_OPS and not authority:
+        issues.append("终态算子 " + op_id + " 缺授权（" + GUIDE
+                      + "不可逆转移必须记 authority）")
+    if authority and allowed and authority not in set(allowed):
+        issues.append("授权方不在允许词表：" + authority + "（" + GUIDE
+                      + "先加进允许列表或换有权限的授权方）")
+    return issues
+
+
 def apply(control: dict[str, Any], op_id: str, payload: dict[str, Any],
           discourse: dict[str, Any] | None = None,
-          trigger: str = "") -> tuple[dict[str, Any], dict[str, Any]]:
-    """执行一次算子请求 → (新控制面, 输出)。失败抛 ValueError（带修复指引）。"""
+          trigger: str = "", authority: str = "") -> tuple[dict[str, Any], dict[str, Any]]:
+    """执行一次算子请求 → (新控制面, 输出)。失败抛 ValueError（带修复指引）。
+
+    authority：谁授权了这次状态变更（终态算子必填；其余可空）。它只被**记录并纳入 digest**，
+    不参与放行判定——放行由调用方策略决定，本模块不越权。
+    """
     issues = op.validate_request(op_id, payload)
     if issues:
         raise ValueError("算子请求不合法：" + "；".join(issues[:3]))
@@ -139,8 +168,12 @@ def apply(control: dict[str, Any], op_id: str, payload: dict[str, Any],
     new_control = json_doc.loads(json.dumps(control))
     new_discourse = json_doc.loads(json.dumps(discourse)) if discourse is not None else None
     effect = _apply_effect(new_control, op_id, payload, new_discourse)
+    if op_id in TERMINAL_OPS and not str(authority or "").strip():
+        raise ValueError("终态算子 " + op_id + " 必须给 authority（" + GUIDE
+                         + "不可逆转移要记明谁授权：apply(..., authority=\"<谁>\")）")
     record = {"seq": len(new_control["records"]) + 1, "op": op_id,
               "trigger": trigger or "manual",
+              "authority": str(authority or ""),
               "witness": payload, "witness_digest": digest_of(payload),
               "effect": effect,
               "prev": (new_control["records"][-1]["digest"]

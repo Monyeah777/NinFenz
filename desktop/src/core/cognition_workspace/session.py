@@ -44,11 +44,16 @@ def step(bundle: dict[str, Any], move_id: str, delta: dict[str, Any]) -> dict[st
 
 
 def control(bundle: dict[str, Any], op_id: str, payload: dict[str, Any],
-            trigger: str = "") -> dict[str, Any]:
-    """执行一个元算子（过程控制），返回新 bundle。"""
+            trigger: str = "", authority: str = "") -> dict[str, Any]:
+    """执行一个元算子（过程控制），返回新 bundle。
+
+    authority 透传给控制面：终态算子（stop / abstain）必填，其余可空；
+    它只被记录并纳入记录 digest，不参与放行判定。
+    """
     control_state = _control_of(bundle)
     new_control, out = ct.apply(control_state, op_id, payload,
-                                discourse=bundle["state"], trigger=trigger)
+                                discourse=bundle["state"], trigger=trigger,
+                                authority=authority)
     new_bundle = dict(bundle)
     new_bundle["control"] = new_control
     if out.get("discourse") is not None:

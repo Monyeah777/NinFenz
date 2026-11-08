@@ -67,7 +67,7 @@
     "test_cognition": 0.2,
     "test_cognition_bridge": 2.1,
     "test_cognition_claims": 1.6,
-    "test_cognition_control": 1.8,
+    "test_cognition_control": 1.6,
     "test_cognition_plan": 1.0,
     "test_cognition_workspace": 2.3,
     "test_commit_msg": 0.1,
@@ -1096,13 +1096,15 @@
     "test_cognition_control.ApplyTest.test_abstain_marks_status": 0.0,
     "test_cognition_control.ApplyTest.test_abstain_requires_search_boundary": 0.0,
     "test_cognition_control.ApplyTest.test_allocate_changes_budget": 0.0,
+    "test_cognition_control.ApplyTest.test_authority_check_can_be_killed": 0.0,
     "test_cognition_control.ApplyTest.test_each_operator_applies": 0.0,
     "test_cognition_control.ApplyTest.test_ritual_observe_is_rejected_on_third": 0.0,
     "test_cognition_control.ApplyTest.test_stop_terminates_control": 0.0,
     "test_cognition_control.ApplyTest.test_stop_terminates_session_steps": 0.0,
+    "test_cognition_control.ApplyTest.test_terminal_ops_require_authority": 0.0,
     "test_cognition_control.ApplyTest.test_varied_observe_is_allowed": 0.0,
-    "test_cognition_control.CliTest.test_control_round_trip": 1.2,
-    "test_cognition_control.CliTest.test_ops_listing": 0.4,
+    "test_cognition_control.CliTest.test_control_round_trip": 1.06,
+    "test_cognition_control.CliTest.test_ops_listing": 0.35,
     "test_cognition_control.OperatorTableTest.test_eleven_operators": 0.0,
     "test_cognition_control.OperatorTableTest.test_empty_witness_is_rejected": 0.0,
     "test_cognition_control.OperatorTableTest.test_every_operator_accepts_its_payload": 0.0,
@@ -4512,5 +4514,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1812.8
+  "total_s": 1812.6
 }

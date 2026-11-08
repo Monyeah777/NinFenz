@@ -185,7 +185,7 @@
       ]
     },
     {
-      "count": 6,
+      "count": 7,
       "has_negative": true,
       "id": "cognition_control",
       "module": "desktop.tests.test_cognition_control",
@@ -194,6 +194,7 @@
         "test_empty_witness_is_rejected",
         "test_plane_violation_is_rejected",
         "test_noop_effects_are_rejected",
+        "test_authority_check_can_be_killed",
         "test_ritual_observe_is_rejected_on_third",
         "test_tampered_effect_is_detected"
       ]
