@@ -147,6 +147,27 @@ def apply_obligation(bundle: dict[str, Any], obligation_doc: dict[str, Any]) -> 
     return new_bundle
 
 
+def obligation_record_issues(record: dict[str, Any], obligation_doc: dict[str, Any],
+                             ) -> list[str]:
+    """核对「回灌记录」与「回灌消息」是否逐项对应（同构判据 #3 的可复用核）。
+
+    为什么抽成函数（第 74 轮）：判据要能被变异打死——只有把核对逻辑单独拿出来，
+    才可能用一条「故意改坏」的记录证明它真的会红。三条：来源标记、失败集同序相等、证人可复算。
+    """
+    issues: list[str] = []
+    if not isinstance(record, dict):
+        return ["记录不是对象（" + GUIDE + "用 apply_obligation 的产出）"]
+    if str(record.get("trigger") or "") != "bridge-obligation":
+        issues.append("来源标记不是 bridge-obligation（" + GUIDE + "回灌必须写明来自桥）")
+    want = list(obligation_doc.get("failed") or []) + list(obligation_doc.get("unknown") or [])
+    got = list((record.get("witness") or {}).get("evidence") or [])
+    if [str(x) for x in got] != [str(x) for x in want]:
+        issues.append("失败集与回灌消息不一致（" + GUIDE + "两侧必须逐项同序）")
+    if str(record.get("witness_digest") or "") != digest_of(record.get("witness") or {}):
+        issues.append("证人 digest 不可复算（" + GUIDE + "记录被改过）")
+    return issues
+
+
 def append_commitment(bundle: dict[str, Any], commitment: dict[str, Any]) -> dict[str, Any]:
     """把 commitment 挂到会话上（只追加，prev 链）。"""
     chain = list(bundle.get("commitments") or [])

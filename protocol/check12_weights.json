@@ -65,7 +65,7 @@
     "test_code_metrics": 1.2,
     "test_cog_cli_faces": 16.3,
     "test_cognition": 0.2,
-    "test_cognition_bridge": 2.2,
+    "test_cognition_bridge": 2.1,
     "test_cognition_claims": 1.6,
     "test_cognition_control": 1.8,
     "test_cognition_plan": 1.0,
@@ -1042,11 +1042,12 @@
     "test_cognition_bridge.BridgeWireFormatTest.test_commitment_field_set_is_frozen": 0.0,
     "test_cognition_bridge.BridgeWireFormatTest.test_envelope_guard_can_be_killed": 0.0,
     "test_cognition_bridge.BridgeWireFormatTest.test_obligation_field_set_is_frozen": 0.0,
+    "test_cognition_bridge.BridgeWireFormatTest.test_observation_correspondence_can_be_killed": 0.0,
     "test_cognition_bridge.BridgeWireFormatTest.test_observation_layer_correspondence": 0.0,
     "test_cognition_bridge.ChainTest.test_append_and_replay_chain": 0.0,
     "test_cognition_bridge.ChainTest.test_append_rejects_broken_prev": 0.0,
     "test_cognition_bridge.ChainTest.test_chain_detects_tamper": 0.0,
-    "test_cognition_bridge.CliTest.test_bridge_round_trip": 2.02,
+    "test_cognition_bridge.CliTest.test_bridge_round_trip": 1.93,
     "test_cognition_bridge.ClosedLoopTest.test_fail_then_revise_then_pass": 0.0,
     "test_cognition_bridge.CommitmentTest.test_claim_without_digest_rejected": 0.0,
     "test_cognition_bridge.CommitmentTest.test_commitment_binds_three_digests": 0.0,
@@ -4495,5 +4496,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1808.1
+  "total_s": 1808.0
 }

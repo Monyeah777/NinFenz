@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:101cd11b581a7cf23d9e6916009a21fbe4d3e36ec56729ab708283934d38b14e
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:ecc6d167bb1e2d9e502a8300c57bfa65316afa7f161fa4113c971f861b634b41
+  - protocol/check12_weights.json:00c3c6df6ff8cbe2f5c7dbd733bac0b42a2fea7f65e0512946fd8c8f90f0ea94
   - protocol/coupling_baseline.json:49bc59e10c4d3fdcf966709392e4a7f8511a2432a69eb5d496e74d643fa42960
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-09）：观测同构判据 #3 变异测试（改来源/改序/改证人必红）
+
 > 重审（2026-11-09）：桥信封守卫变异测试（第三类信封必须被抓）
 
 > 重审（2026-11-09）：判据 #4 变异测试：词表核对接出独立函数，故意改坏必红

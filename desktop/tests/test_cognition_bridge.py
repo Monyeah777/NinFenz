@@ -244,6 +244,22 @@ class BridgeWireFormatTest(unittest.TestCase):
         self.assertEqual({"nf-bridge-commitment/1", "nf-bridge-obligation/1"}, found,
                          f"桥的信封类型变了：{sorted(found)}（加通道要显式评审）")
 
+    def test_observation_correspondence_can_be_killed(self):
+        """变异测试：改动回灌记录的三处任一——来源标记 / 失败集 / 证人——都必须报出来。"""
+        cc = {"verdict": "invalid", "subject": "s", "detail": "d"}
+        claim = {"schema": "nf-cog-claim/1", "claim": "x", "digest": "b" * 64,
+                 "obligations": [], "criteria": []}
+        bundle = self._bundle()
+        ob = br.obligation(br.commit(bundle, claim, cc), cc, failed=["A", "B"])
+        rec = (br.apply_obligation(bundle, ob).get("control") or {})["records"][-1]
+        self.assertEqual([], br.obligation_record_issues(rec, ob))
+        bad_trigger = dict(rec, trigger="manual")
+        self.assertTrue(br.obligation_record_issues(bad_trigger, ob))
+        bad_order = dict(rec, witness={"anomaly": rec["witness"]["anomaly"],
+                                       "evidence": ["B", "A"]})
+        self.assertTrue(br.obligation_record_issues(bad_order, ob), "顺序不同也要红")
+        bad_digest = dict(rec, witness_digest="0" * 64)
+        self.assertTrue(br.obligation_record_issues(bad_digest, ob))
 
     def test_envelope_guard_can_be_killed(self):
         """变异测试：源码里出现第三类信封时，守卫必须抓到（不是只会说「两类」）。"""
@@ -312,6 +328,7 @@ class BridgeWireFormatTest(unittest.TestCase):
         ob = br.obligation(comm, cc, failed=["BER 超标", "缺少盲评"], unknown=["未提供成本"])
         after = br.apply_obligation(bundle, ob)
         rec = (after.get("control") or {}).get("records", [])[-1]
+        self.assertEqual([], br.obligation_record_issues(rec, ob))
         self.assertEqual("bridge-obligation", rec["trigger"], "来源必须写明是桥回灌")
         self.assertEqual(list(ob["failed"]) + list(ob["unknown"]),
                          list(rec["witness"]["evidence"]),
