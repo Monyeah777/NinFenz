@@ -33,8 +33,8 @@
 
 ## 治理同步（现状）
 
-- verify.sh v2.22：默认锁 L0-L2，clone 即绿零前置；check12 = desktop core/tests unittest 全量 + 全量 py_compile（端壳文件已不在树，compile 面随退役收窄）。
-- CI：ci-verify.yml（push main 触发 verify.sh）；e2e-desktop.yml（headless core 直驱，无需 GUI）；release-gate.yml（v* tag 即跑 verify+基线+覆盖率）。
+- verify.sh v2.30：默认锁 L0-L2，clone 即绿零前置；check12 = desktop core/tests unittest 全量 + 全量 py_compile（端壳文件已不在树，compile 面随退役收窄）。
+- CI（2026-11-08 现状）：**required** = `static-checks-42`（ci-verify.yml）与 `gate`（分支保护）；另有 coverage.yml（core ≥80%）、sast.yml / lint.yml / dependency-audit.yml / scorecard.yml（静态与供应链面）、cross-lang.yml（跨语言矩阵）、cross-platform.yml（Win/Linux/macOS 三平台 verify --full）、rust-crate.yml（Rust 主 crate + PyO3；ubuntu+windows）、dotnet-build.yml（.NET 引擎；ubuntu+windows）、e2e-desktop.yml（headless core 直驱，无需 GUI）、release-gate.yml（v* tag 即跑 verify+基线+覆盖率）；辅助：linux-parity-refresh.yml（周检跨平台漂移）、ci-health.yml（schedule 静默红看门狗）、net-probes.yml（手动跑批，需金标快照 ref，见 task-34）。
 
 ## 纪律（退役后）
 
