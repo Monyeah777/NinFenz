@@ -43,7 +43,7 @@
     "test_category_registry": 0.8,
     "test_ccos_abi_docs": 0.6,
     "test_ccos_chain": 0.4,
-    "test_ccos_docs_anchors": 0.8,
+    "test_ccos_docs_anchors": 0.7,
     "test_ccv3_adapter": 0.2,
     "test_changelog_gen": 1.3,
     "test_check12_budget": 6.2,
@@ -806,7 +806,7 @@
     "test_ccos_chain._Base.test_chain_missing_object_raises": 0.0,
     "test_ccos_chain._Base.test_chain_ok_and_digests_flow": 0.01,
     "test_ccos_chain._Base.test_chain_with_hmac": 0.01,
-    "test_ccos_docs_anchors.DocsAnchorTest.test_each_doc_has_a_real_repo_path": 0.61,
+    "test_ccos_docs_anchors.DocsAnchorTest.test_each_doc_has_a_real_repo_path": 0.57,
     "test_ccos_docs_anchors.DocsAnchorTest.test_prefixed_paths_actually_exist": 0.01,
     "test_ccv3_adapter.TestMapIRToCCV3.test_asset_entry_present": 0.0,
     "test_ccv3_adapter.TestMapIRToCCV3.test_character_book_excludes_engine_anchors": 0.0,
@@ -4471,5 +4471,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1599.8
+  "total_s": 1599.7
 }

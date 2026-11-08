@@ -34,10 +34,17 @@ def _prefixed(text: str) -> list[str]:
     return out
 
 
+#: 已知生成物前缀（git 不可用时也要能判：快照/归档环境里可能没有可用的 git）
+GENERATED_PREFIXES = ("engine/dotnet/dist", "packaging/npm/payload", "site/dist",
+                      "node_modules", "dist", ".worktrees")
+
+
 def _ignored(rel: str) -> bool:
     """构建产物/被忽略路径不算仓库文件（干净快照里必然不存在）。"""
     import shutil
     import subprocess
+    if any(rel == p or rel.startswith(p + "/") for p in GENERATED_PREFIXES):
+        return True
     git = shutil.which("git")
     if not git:
         return False
