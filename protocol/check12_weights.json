@@ -212,7 +212,7 @@
     "test_mcp_write_freedom": 3.3,
     "test_md_tables": 0.2,
     "test_meta_cockpit": 2.2,
-    "test_method_pack": 0.9,
+    "test_method_pack": 1.5,
     "test_missing_sentinel": 0.2,
     "test_modeling": 0.6,
     "test_module_lifecycle": 0.2,
@@ -2745,12 +2745,13 @@
     "test_mcp_write_freedom.McpToolsDoNotTouchTheRepoTest.test_write_interceptor_has_teeth": 0.0,
     "test_md_tables.MarkdownTableTest.test_mutation_is_caught": 0.0,
     "test_md_tables.MarkdownTableTest.test_repo_tables_are_consistent": 0.03,
-    "test_method_pack.CliTest.test_packs_list": 0.36,
-    "test_method_pack.CliTest.test_plan_with_pack_out_file": 0.36,
+    "test_method_pack.CliTest.test_packs_list": 0.56,
+    "test_method_pack.CliTest.test_plan_with_pack_out_file": 0.6,
     "test_method_pack.ComposeTest.test_compose_keeps_kind_order_stable": 0.0,
     "test_method_pack.ComposeTest.test_compose_requires_packs": 0.0,
     "test_method_pack.ComposeTest.test_compose_unions_and_dedupes": 0.0,
     "test_method_pack.ComposeTest.test_unknown_pack_id_is_rejected_with_guide": 0.0,
+    "test_method_pack.PackContentTest.test_all_five_packs_compose_without_conflict": 0.02,
     "test_method_pack.PackContentTest.test_evaluation_design_pack_has_pre_registration_and_controls": 0.0,
     "test_method_pack.PackContentTest.test_evidence_audit_pack_contains_claim_card": 0.0,
     "test_method_pack.PackContentTest.test_metacognition_pack_has_calibration_standard": 0.0,
@@ -2759,7 +2760,7 @@
     "test_method_pack.PackContentTest.test_unknown_claim_kind_is_rejected_with_guide": 0.0,
     "test_method_pack.PackContentTest.test_watermarking_pack_covers_attack_surface": 0.0,
     "test_method_pack.PackShapeTest.test_duplicate_move_id_is_rejected": 0.0,
-    "test_method_pack.PackShapeTest.test_every_registered_pack_validates": 0.0,
+    "test_method_pack.PackShapeTest.test_every_registered_pack_validates": 0.01,
     "test_method_pack.PackShapeTest.test_index_lists_registered_packs": 0.0,
     "test_method_pack.PackShapeTest.test_pack_requires_core_fields": 0.0,
     "test_method_pack.PackShapeTest.test_unknown_maps_to_is_rejected": 0.0,
@@ -4416,5 +4417,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1536.5
+  "total_s": 1537.1
 }

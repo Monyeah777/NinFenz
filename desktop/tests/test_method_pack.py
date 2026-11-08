@@ -121,6 +121,27 @@ class PackContentTest(unittest.TestCase):
             self.assertTrue(hit, "动作 " + move_id + " 在 " + rel + " 里没有锚点（"
                             + "/".join(tokens) + "）")
 
+
+    def test_all_five_packs_compose_without_conflict(self):
+        """五个域一起组合：证据类目并集、常见错法去重、动作不重复 id、序稳定。"""
+        ids = [p["id"] for p in method_pack.list_packs(str(ROOT))]
+        self.assertEqual(5, len(ids), ids)
+        composed = method_pack.compose([method_pack.load_pack(str(ROOT), p) for p in ids])
+        kinds = [st["claim_kind"] for st in composed["evidence_standards"]]
+        self.assertEqual(len(kinds), len(set(kinds)), "证据类目应去重：" + str(kinds))
+        self.assertGreaterEqual(len(kinds), 12)
+        self.assertEqual(len(composed["common_failures"]),
+                         len(set(composed["common_failures"])))
+        move_ids = [m["id"] for m in composed["expert_moves"]]
+        self.assertEqual(len(move_ids), len(set(move_ids)))
+        # 组合语义是「按传入包序并集」（不排序），所以只断言：同一输入序可复现、
+        # 逆序时集合相同（内容不丢），而**不**要求字节相同。
+        same = method_pack.compose([method_pack.load_pack(str(ROOT), p) for p in ids])
+        self.assertEqual([m["id"] for m in same["expert_moves"]], move_ids)
+        rev = method_pack.compose([method_pack.load_pack(str(ROOT), p) for p in reversed(ids)])
+        self.assertEqual(set(move_ids), {m["id"] for m in rev["expert_moves"]},
+                         "逆序组合不得丢动作")
+
     def test_metacognition_pack_has_calibration_standard(self):
         pack = method_pack.load_pack(str(ROOT), "metacognition")
         std = method_pack.obligations(pack, "calibration")
