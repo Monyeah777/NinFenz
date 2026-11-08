@@ -75,11 +75,11 @@
   ],
   "examples": [
     {
-      "case": "core/cognition_workspace/bridge.py 的 commitment 绑定 cog_digest / claim_digest / cc_digest 三方摘要",
+      "case": "desktop/src/core/cognition_workspace/bridge.py 的 commitment 绑定 cog_digest / claim_digest / cc_digest 三方摘要",
       "why": "这是「承诺落证 + 版本钉定」在双核里的形态：两侧状态一旦变化，承诺即失效"
     },
     {
-      "case": "core/approval.py 的 allowed_approvers 限定批准人，且对象改动即失效",
+      "case": "desktop/src/core/approval.py 的 allowed_approvers 限定批准人，且对象改动即失效",
       "why": "这是「角色分离 + 版本钉定」的组合：批准绑对象摘要，换内容须重新批准"
     }
   ],

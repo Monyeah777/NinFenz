@@ -245,6 +245,26 @@ class PackContentTest(unittest.TestCase):
         self.assertEqual(["ghost-kind"],
                          method_pack.vocabulary_mismatches(packs, extra)["unused"])
 
+    def test_examples_cite_existing_files(self):
+        """包里的 example 引用的路径必须真实存在（防「例子里的文件早就改名了」）。
+
+        依据（第 107 轮）：九域 10 处路径引用里有 7 处写成 `core/x.py`（少了 `desktop/src/` 前缀）——
+        不影响阅读，但**复制粘贴会失败**，而且改名后没人发现。本判据要求引用写全并真实存在。
+        """
+        import re
+        pat = re.compile(r"[A-Za-z0-9_./-]+\.(?:py|json|md|mjs|sh)")
+        missing = []
+        total = 0
+        for pid in PACK_IDS:
+            pack = method_pack.load_pack(str(ROOT), pid)
+            for ex in pack.get("examples") or []:
+                for tok in pat.findall(str(ex.get("case") or "")):
+                    total += 1
+                    if not (ROOT / tok).is_file():
+                        missing.append(pid + " → " + tok)
+        self.assertGreaterEqual(total, 8, "例子里的路径引用太少（判据可能已失效）")
+        self.assertEqual([], missing, f"例子引用了不存在的路径：{missing}")
+
     def test_doc_counts_match_packs(self):
         """文档写的「N 个域 / N 个专家动作 / N 个证据类目」必须等于实际（防口径漂移）。"""
         import re

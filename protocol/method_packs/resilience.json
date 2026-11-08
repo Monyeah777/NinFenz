@@ -75,7 +75,7 @@
   ],
   "examples": [
     {
-      "case": "core/purity_scan.py 用变异注入验证自己的捕获力（改了代码必须红）",
+      "case": "desktop/src/core/purity_scan.py 用变异注入验证自己的捕获力（改了代码必须红）",
       "why": "这是「故障演练」在静态门禁上的形态：不是相信它会拦，而是注入后验证它确实拦"
     },
     {

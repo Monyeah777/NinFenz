@@ -80,7 +80,7 @@
       "why": "这是「版本钉定 + 缺失口径先定」在真实协议里的形态：协议先冻结，采集再发生"
     },
     {
-      "case": "分组报告 core/grouped_report.py 对 n=1 的组返回 sd=None（而不是 0），并在 note 里写明「只报总体会掩盖子群差异」",
+      "case": "分组报告 desktop/src/core/grouped_report.py 对 n=1 的组返回 sd=None（而不是 0），并在 note 里写明「只报总体会掩盖子群差异」",
       "why": "这是「缺失语义」在度量层的落地：不假装有方差，也不把未知当零"
     }
   ],

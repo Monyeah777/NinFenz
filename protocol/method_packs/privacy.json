@@ -99,11 +99,11 @@
   ],
   "examples": [
     {
-      "case": "core/mcp_ingress.py 的 consent 与 max_args_bytes：调用方必须声明同意，参数体积有上限",
+      "case": "desktop/src/core/mcp_ingress.py 的 consent 与 max_args_bytes：调用方必须声明同意，参数体积有上限",
       "why": "这是「同意可核 + 最小化」在入口处的形态：不声明同意直接拒"
     },
     {
-      "case": "core/allowlist_expiry.py 的 expired() 与 core/evidence.py 的吊销记录",
+      "case": "desktop/src/core/allowlist_expiry.py 的 expired() 与 desktop/src/core/evidence.py 的吊销记录",
       "why": "这是「留存期限 + 删除可证」的机制来源：到期失效与吊销留痕都可核"
     }
   ],
