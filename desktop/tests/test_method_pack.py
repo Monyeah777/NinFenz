@@ -20,7 +20,8 @@ sys.path.insert(0, str(ROOT / "desktop" / "src"))
 from core import cognition_plan, method_pack  # noqa: E402
 
 NF = (sys.executable, str(ROOT / "scripts" / "nf.py"))
-PACK_IDS = ("watermarking", "evidence-audit", "metacognition", "evaluation-design")
+PACK_IDS = ("watermarking", "evidence-audit", "metacognition",
+            "evaluation-design", "prompt-injection-defense")
 
 
 class PackShapeTest(unittest.TestCase):
@@ -83,6 +84,18 @@ class PackContentTest(unittest.TestCase):
         kinds = {st["claim_kind"] for st in pack["evidence_standards"]}
         self.assertEqual({"efficacy", "cost", "reliability"}, kinds)
         self.assertTrue(any("合成" in f for f in pack["common_failures"]))
+
+    def test_prompt_injection_pack_has_plane_separation_and_receipts(self):
+        pack = method_pack.load_pack(str(ROOT), "prompt-injection-defense")
+        ids = {m["id"] for m in pack["expert_moves"]}
+        for need in ("pi.plane_separation", "pi.allowlist_surface", "pi.consent_gate",
+                     "pi.receipt_audit", "pi.redteam_cases"):
+            self.assertIn(need, ids, "注入防御包缺关键动作：" + need)
+        kinds = {st["claim_kind"] for st in pack["evidence_standards"]}
+        self.assertEqual({"defense-efficacy", "audit-trail", "least-privilege"}, kinds)
+        # 例子里必须点名真实接线件，不能只说概念
+        text = " ".join(str(x.get("case") or "") for x in pack["examples"])
+        self.assertIn("mcp_ingress", text)
 
     def test_metacognition_pack_has_calibration_standard(self):
         pack = method_pack.load_pack(str(ROOT), "metacognition")

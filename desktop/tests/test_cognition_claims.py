@@ -172,6 +172,17 @@ class CheckClaimTest(unittest.TestCase):
             self.assertFalse(checked["ready"], kind)
             self.assertTrue(checked["missing"], kind)
 
+    def test_prompt_injection_pack_compiles_security_kinds(self):
+        """注入防御包接主张编译：三类安全主张都要能编出义务，且缺证据时点名。"""
+        from core.cognition_workspace import claims as cl
+        for kind in ("defense-efficacy", "audit-trail", "least-privilege"):
+            doc = cl.compile_claim(str(ROOT), "主张 " + kind, kind, ["prompt-injection-defense"])
+            stds = [st for b in doc["obligations"] for st in b["standards"]]
+            self.assertTrue(stds, kind)
+            checked = cl.check_claim(doc, {})
+            self.assertFalse(checked["ready"], kind)
+            self.assertTrue(checked["missing"], kind)
+
 class CliTest(unittest.TestCase):
     def test_criteria_listing(self):
         proc = subprocess.run([*NF, "cog", "criteria", "--json"], capture_output=True,

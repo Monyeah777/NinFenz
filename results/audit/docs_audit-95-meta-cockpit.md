@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:42a01f7ceab9016cc6b55d71c8b9c56a6bac34f01a68dc46302e8c1f58184124
   - tui/_surface.py:f708147a385a47d8cb9d34ea340c172bd9ac40a3e545d15ca4956f0ec5496b5d
-  - protocol/check12_weights.json:2df990290ca9093a180eebae9847c8f5a2c4014475a613e40eb400468e857f44
+  - protocol/check12_weights.json:e8bf4dc6c57316a113b2126b656820e2a55f3e7c4d095a8217e9b62f9667d3b4
   - protocol/coupling_baseline.json:30db6552f03e0d085322db1e651220d827289eebfe537897ad847305dfb5bbb6
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-08）：新增方法包 prompt-injection-defense（注入防御域）
+
 > 重审（2026-11-08）：方法包引用还清 k.standard 原子债；A4 判据改为合成死码
 
 > 重审（2026-11-08）：评测设计包接主张编译（efficacy/cost/reliability 三态）

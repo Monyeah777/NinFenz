@@ -21,6 +21,11 @@
       "id": "evaluation-design",
       "version": "1.0.0",
       "path": "protocol/method_packs/evaluation-design.json"
+    },
+    {
+      "id": "prompt-injection-defense",
+      "version": "1.0.0",
+      "path": "protocol/method_packs/prompt-injection-defense.json"
     }
   ]
 }
