@@ -122,6 +122,8 @@ python scripts/verify_tests.py --affected           # 跑受影响模块
 
 **纪律**：`--affected` 只用于本地修复回路；「可发布」的结论必须来自上面的全量五步。
 
+供应链对象（材料清单 / 验证器摘要 / 结论绑定）见 [supply-chain-v0.md](supply-chain-v0.md)。
+
 ## 判据（可证）
 
 ```bash
