@@ -1225,6 +1225,11 @@
       "max_fn_cc": 3,
       "max_fn_lines": 12
     },
+    "desktop/src/core/sbom.py": {
+      "lines": 91,
+      "max_fn_cc": 15,
+      "max_fn_lines": 26
+    },
     "desktop/src/core/schema_lint.py": {
       "lines": 464,
       "max_fn_cc": 46,
@@ -1724,6 +1729,11 @@
       "lines": 236,
       "max_fn_cc": 12,
       "max_fn_lines": 30
+    },
+    "scripts/sbom.py": {
+      "lines": 83,
+      "max_fn_cc": 8,
+      "max_fn_lines": 38
     },
     "scripts/self_audit_probe.py": {
       "lines": 85,

@@ -3,10 +3,10 @@
     "app": 1461,
     "entry": 26,
     "floor": 5,
-    "prod": 1056,
-    "projection": 159,
-    "support": 437,
-    "verify": 1031
+    "prod": 1057,
+    "projection": 160,
+    "support": 438,
+    "verify": 1032
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -6935,6 +6935,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "材料清单（SBOM 式，`nf-sbom/1`）：把「这次交付由哪些输入构成」变成可核的摘要表。",
+      "path": "desktop/src/core/sbom.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "43 A1 —— 协议层 IDL 校验器（自实现 JSON-schema 子集 + 全量件扫描）。",
       "path": "desktop/src/core/schema_lint.py",
       "role": "verify",
@@ -9235,6 +9241,12 @@
     {
       "function": "SAST 计数棘轮（`scripts/sast_check.py`）回归测试 —— 安全/供应链面。",
       "path": "desktop/tests/test_sast_baseline.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "材料清单判据（SBOM 式）：清单可重算、可核、篡改必红。",
+      "path": "desktop/tests/test_sbom.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -12564,17 +12576,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "b809169a3add1ffad385c757b3515ddc95753339dc642a3b9a06542a1c4d959e",
+  "root_digest": "1dbf2fd54db9d0febdbbf0a7c1482c9457d0660b1ee20a9db6a740f1f4d649a1",
   "rule_counts": {
     "R-app": 1461,
-    "R-catch": 290,
+    "R-catch": 291,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 139,
+    "R-projection": 140,
     "R-support": 119,
-    "R-verify": 905,
-    "auto:R-core": 286
+    "R-verify": 906,
+    "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
 }
