@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:aee122e4fe97430db84a69b6d0c7c1d8d519acbec656566cfc9818ccd0cedece
+  - protocol/code_metrics_baseline.json:6b12ffef4199dfa9d4c26c48eb96d6fee0ee211cbc56cc5be78d68a9c3854147
 ---
+> 重审（2026-11-08）：session watch nested release root fix
+
 > 重审（2026-11-08）：DSSE v1 CI closure: docs reachability, stdio pinning, weights
 
 > 重审（2026-11-08）：DSSE v1 integration closure

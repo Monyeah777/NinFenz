@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:4929a1fe7b789ed86d8978f6c49ccf120ecc7a44e741f3e38dc79c8f1aa0b23d
-  - protocol/code_metrics_baseline.json:aee122e4fe97430db84a69b6d0c7c1d8d519acbec656566cfc9818ccd0cedece
+  - protocol/code_metrics_baseline.json:6b12ffef4199dfa9d4c26c48eb96d6fee0ee211cbc56cc5be78d68a9c3854147
 ---
+> 重审（2026-11-08）：session watch nested release root fix
+
 > 重审（2026-11-08）：DSSE v1 CI closure: docs reachability, stdio pinning, weights
 
 > 重审（2026-11-08）：DSSE v1 integration closure

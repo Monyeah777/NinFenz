@@ -87,12 +87,18 @@ def release() -> None:
     只有栈空（= 本模块最外层会话结束）时才真正注销监听并清缓存。
     """
     global _WATCHER
+    from core import conformance_scan as _csc
+    from core import daemon as _dm
     from core import response_cache as _rc
     if not _STACK:
         return                                   # 本会话没装过 → 什么都不该拆
     _mine, outer = _STACK.pop()
     if outer is not None:
-        _install(None, outer)                    # 恢复外层（守护）那件，不碰它的缓存
+        # 临时会话的常驻层可能绑定另一个 root；先整批作废，再恢复外层 watcher。
+        # 不能走 `_install(None, outer)`：该路径会用 root=None 重建常驻层，既无意义，
+        # 也会把临时语料残影留到外层会话。
+        _csc.clear_resident()
+        _dm.set_watcher(outer)
         _WATCHER = outer
         return
     _install(None, None)
