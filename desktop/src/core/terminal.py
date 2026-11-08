@@ -109,7 +109,10 @@ CONFIRM_VERBS = (("asset", "add"), ("asset", "rm"), ("asset", "deprecate"),
 #:   `nf shell --session` 上是**读/仓外受控**（shell 那条另有「必须绝对路径且不得落仓库内」的
 #:   硬闸），只有 `nf assemble` 的这两条会**写你自己命名的文件**（可仓库相对 ⇒ 粘贴面能落仓）。
 CONFIRM_FLAG_PAIRS = (("interop", "--all"),
-                       ("assemble", "--trace"), ("assemble", "--session"))
+                       ("assemble", "--trace"), ("assemble", "--session"),
+                       # 2026-11-08：cog claim --sheet 写「证据作业单」文件（与 --out 同型
+                       # 的落点），必须过确认闸；同旗标在 claim-check 上是读作业单，故用组合表
+                       ("cog", "--sheet"))
 #: 会话内不直接执行：长驻/递归/需独占终端的动词 → 给指引
 BLOCKED_IN_SHELL = {
     "shell": "终端内不再开终端（避免递归会话）：请另开一个终端窗口运行 nf shell。",

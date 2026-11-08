@@ -9,7 +9,7 @@
 
 KIND = 'nf-terminal-surface'
 SCHEMA = 'nf-terminal-surface/1'
-DIGEST = 'sha256:90330d8d6d0168a5f70915e866552fbbf6900df115371ea9748894b48987df45'
+DIGEST = 'sha256:9cb3774387116fbb7b339e32a578c99d5b06770ce444a2f213669241fba4d74c'
 SOURCE = {'module': 'desktop/src/core/terminal.py',
  'tables': ['ZONES',
             'FAMILIES',
@@ -732,7 +732,10 @@ GATES = {'flags': ['--write',
            ['preset', 'save'],
            ['preset', 'rm'],
            ['preset', 'import']],
- 'pairs': [['interop', '--all'], ['assemble', '--trace'], ['assemble', '--session']]}
+ 'pairs': [['interop', '--all'],
+           ['assemble', '--trace'],
+           ['assemble', '--session'],
+           ['cog', '--sheet']]}
 
 BLOCKED = {'lsp': 'lsp 是常驻 stdio 服务（等编辑器发 Content-Length 帧，会占住当前终端）：请由编辑器/IDE 直接拉起（nf lsp），本终端可继续用只读命令面。',
  'serve': 'serve 是长驻 MCP 服务（会占住当前终端）：请另开终端运行 nf serve <快照.json>，本终端可继续用只读命令面。',
