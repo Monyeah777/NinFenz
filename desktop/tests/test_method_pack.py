@@ -25,6 +25,31 @@ PACK_IDS = ("watermarking", "evidence-audit", "metacognition",
             "resilience", "handoff", "privacy")
 
 
+
+
+
+
+def pack_doc_issues(text: str, packs: list) -> list[str]:
+    """方法包文档数字判据的**纯函数核**（第 109 轮抽出，供变异测试喂坏文本）。
+
+    规则：文档里的「N 个域 / N 个专家动作 / N 个证据类目」必须等于实际数据。
+    """
+    import re
+
+    moves = sum(len(p["expert_moves"]) for p in packs)
+    kinds = sum(len(p["evidence_standards"]) for p in packs)
+    claims = {"个域": len(packs), "个专家动作": moves, "个证据类目": kinds}
+    issues: list[str] = []
+    for label, actual in claims.items():
+        found = re.findall(r"(\d+)\s*" + label, text)
+        if not found:
+            issues.append("文档里没写「" + label + "」")
+            continue
+        for value in found:
+            if int(value) != actual:
+                issues.append("文档写 " + value + " " + label + "，实际 " + str(actual))
+    return issues
+
 class PackShapeTest(unittest.TestCase):
     def test_index_lists_registered_packs(self):
         packs = method_pack.list_packs(str(ROOT))
@@ -245,6 +270,16 @@ class PackContentTest(unittest.TestCase):
         self.assertEqual(["ghost-kind"],
                          method_pack.vocabulary_mismatches(packs, extra)["unused"])
 
+    def test_pack_doc_count_judge_can_be_killed(self):
+        """变异测试（第 109 轮）：方法包文档的数字写错必须被纯函数核报出来。"""
+        packs = [method_pack.load_pack(str(ROOT), pid) for pid in PACK_IDS]
+        moves = sum(len(p["expert_moves"]) for p in packs)
+        kinds = sum(len(p["evidence_standards"]) for p in packs)
+        good = f"**{len(packs)} 个域 / {moves} 个专家动作 / {kinds} 个证据类目**"
+        self.assertEqual([], pack_doc_issues(good, packs))
+        wrong = f"**{len(packs) - 1} 个域 / {moves} 个专家动作 / {kinds} 个证据类目**"
+        self.assertTrue(pack_doc_issues(wrong, packs))
+
     def test_examples_cite_existing_files(self):
         """包里的 example 引用的路径必须真实存在（防「例子里的文件早就改名了」）。
 
@@ -272,6 +307,7 @@ class PackContentTest(unittest.TestCase):
         packs = [method_pack.load_pack(str(ROOT), pid) for pid in PACK_IDS]
         moves = sum(len(p["expert_moves"]) for p in packs)
         kinds = sum(len(p["evidence_standards"]) for p in packs)
+        self.assertEqual([], pack_doc_issues(doc, packs))
         claims = {
             "个域": len(packs),
             "个专家动作": moves,

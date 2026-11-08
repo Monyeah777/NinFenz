@@ -54,6 +54,22 @@ def _has_test(module_name: str, test_name: str) -> bool:
                for name in dir(mod) if name.endswith("Test"))
 
 
+def doc_number_issues(text: str, covered_n: int, gates_n: int) -> list[str]:
+    """文档数字判据的**纯函数核**：层数与闸门数必须能与数据件对上（第 109 轮抽出）。
+
+    为什么要抽：原来的判据硬编码在 `assertIn` 里，无法用「故意写错的文档」证明它会红。
+    抽成纯函数后，变异测试可以喂坏文本进来。
+    """
+    issues: list[str] = []
+    want_cov = f"**{covered_n} 层全覆盖**"
+    if want_cov not in text:
+        issues.append("文档缺「" + want_cov + "」（改矩阵后须同步文档）")
+    want_gates = f"`precheck` {gates_n} 门"
+    if want_gates not in text:
+        issues.append("文档缺「" + want_gates + "」（改闸门名单后须同步文档）")
+    return issues
+
+
 class IsomorphismMatrixTest(unittest.TestCase):
     def test_fixture_schema_and_shape(self):
         self.assertEqual("nf-isomorphism-matrix/1", MATRIX["schema"])
@@ -114,10 +130,28 @@ class IsomorphismMatrixTest(unittest.TestCase):
 
         doc = (Path(__file__).resolve().parents[2] / "docs" / "ccos"
                / "dual-core-invariants.md").read_text(encoding="utf-8")
-        self.assertIn(f"**{len(COVERED)} 层全覆盖**", doc,
-                      "文档的层数与矩阵数据不符（改矩阵后须同步文档）")
-        self.assertIn(f"`precheck` {len(precheck_gates.GATES)} 门", doc,
-                      "文档的闸门数与 precheck 名单不符")
+        self.assertEqual([], doc_number_issues(doc, len(COVERED),
+                                               len(precheck_gates.GATES)))
+
+    def test_doc_number_judge_can_be_killed(self):
+        """变异测试（第 109 轮）：把文档里的数字写错，纯函数核必须报出来。
+
+        这是「文档判据」第一次有变异测试——此前只有内容判据有。
+        """
+        import sys
+
+        sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts"))
+        import precheck_gates
+
+        gates = len(precheck_gates.GATES)
+        good = f"状态：**{len(COVERED)} 层全覆盖**；`precheck` {gates} 门"
+        self.assertEqual([], doc_number_issues(good, len(COVERED), gates))
+        wrong_layers = f"状态：**{len(COVERED) - 1} 层全覆盖**；`precheck` {gates} 门"
+        self.assertTrue(doc_number_issues(wrong_layers, len(COVERED), gates))
+        wrong_gates = f"状态：**{len(COVERED)} 层全覆盖**；`precheck` {gates - 1} 门"
+        self.assertTrue(doc_number_issues(wrong_gates, len(COVERED), gates))
+        empty = "状态：待补"
+        self.assertEqual(2, len(doc_number_issues(empty, len(COVERED), gates)))
 
     def test_matrix_does_not_claim_overlap(self):
         self.assertEqual(set(), set(COVERED) & set(MISSING), "同一层不能既覆盖又缺失")
