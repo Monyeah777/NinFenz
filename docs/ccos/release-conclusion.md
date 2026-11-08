@@ -132,6 +132,9 @@ python -m unittest desktop.tests.test_release_conclusion    # 62 项全绿
 python scripts/release_conclusion.py
 ```
 
+**与 `scripts/precheck.py` 的分工**：precheck 是「高频横向面」的 4 分钟快车道（覆盖 20/378 个测试模块），
+用于提交前自查；它**不能**替代本件的全量结论——发布判定仍只认上面的五步。
+
 ## 绿结论台账（发布结论的取证记录）
 
 每次 `--snapshot` 的绿结论绑定一个 SHA 与一次墙钟；下表只记「8 片 rc=0 + `checks_only_rc=0` + `head_moved=false`」的结论，
