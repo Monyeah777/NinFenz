@@ -18,7 +18,12 @@ import precheck as pc  # noqa: E402
 class PrecheckTest(unittest.TestCase):
     def test_every_listed_module_exists(self):
         self.assertGreaterEqual(len(pc.GATES), 10, "快车道闸门太少（判据可能失效）")
-            # 支持「模块」与「模块.类.方法」两种写法：按段回退找到真实文件            parts = module.split(".")            found = any((ROOT / "/".join(parts[:i])).with_suffix(".py").is_file()                        for i in range(len(parts), 0, -1))            self.assertTrue(found, "名单里的模块不存在：" + module)
+        for _gate_id, module in list(pc.GATES) + list(pc.SLOW_GATES):
+            # 支持「模块」与「模块.类.方法」两种写法：按段回退找到真实文件
+            parts = module.split(".")
+            found = any((ROOT / "/".join(parts[:i])).with_suffix(".py").is_file()
+                        for i in range(len(parts), 0, -1))
+            self.assertTrue(found, "名单里的模块不存在：" + module)
 
     def test_gate_ids_are_unique(self):
         ids = [g for g, _m in list(pc.GATES) + list(pc.SLOW_GATES)]
