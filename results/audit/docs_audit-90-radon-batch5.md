@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
-  - protocol/code_metrics_baseline.json:f556db58e3555cdff57689a9daa1cc0355658ea8d23aefe73ed3c350cbdc0be1
+  - protocol/code_metrics_baseline.json:9f2f126ef137e1664b04bf9e364965303bc40ec84565cfd5fcc40a5d5745df45
 ---
+> 重审（2026-11-08）：DSSE v1 integration closure
+
 > 重审（2026-11-08）：DSSE v1 合并最新 main 后重审：保留主干与 DSSE 变更，按合并后字节重绑。
 
 > 重审（2026-11-08）：payload 未暂存 warn

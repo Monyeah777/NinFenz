@@ -180,14 +180,16 @@ def cli_commands(root: str = ".") -> set:
     别名也算命令面（2026-10-01 修）：`add_parser("shell", aliases=["terminal"])` 的 `nf terminal`
     是 argparse 真能跑的；只认主名会把文档里的别名误判成「不是 CLI 子命令」。
     """
-    nf_path = os.path.join(root, "scripts", "nf.py")
-    if not os.path.exists(nf_path):
-        return set()
-    with open(nf_path, encoding="utf-8") as fh:
-        nf_src = fh.read()
-    cmds = set(re.findall(r'sub\.add_parser\(\s*"([a-z0-9-]+)"', nf_src))
-    for group in re.findall(r"aliases\s*=\s*\[([^\]]*)\]", nf_src):
-        cmds.update(re.findall(r'"([a-z0-9-]+)"', group))
+    cmds: set = set()
+    for rel in ("scripts/nf.py", "scripts/nf_dsse.py"):
+        path = os.path.join(root, rel)
+        if not os.path.exists(path):
+            continue
+        with open(path, encoding="utf-8") as fh:
+            src = fh.read()
+        cmds.update(re.findall(r'sub\.add_parser\(\s*"([a-z0-9-]+)"', src))
+        for group in re.findall(r"aliases\s*=\s*\[([^\]]*)\]", src):
+            cmds.update(re.findall(r'"([a-z0-9-]+)"', group))
     return cmds
 
 

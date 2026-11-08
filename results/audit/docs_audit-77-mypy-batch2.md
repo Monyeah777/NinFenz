@@ -7,9 +7,11 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
-  - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
-  - protocol/code_metrics_baseline.json:f556db58e3555cdff57689a9daa1cc0355658ea8d23aefe73ed3c350cbdc0be1
+  - desktop/src/core/prose_lint.py:b6bb293ebf079e9acbcfbd1c541b690128dd4e35bf088e37c09a573f39b87a13
+  - protocol/code_metrics_baseline.json:9f2f126ef137e1664b04bf9e364965303bc40ec84565cfd5fcc40a5d5745df45
 ---
+> 重审（2026-11-08）：DSSE v1 integration closure
+
 > 重审（2026-11-08）：DSSE v1 合并最新 main 后重审：保留主干与 DSSE 变更，按合并后字节重绑。
 
 > 重审（2026-11-08）：payload 未暂存 warn

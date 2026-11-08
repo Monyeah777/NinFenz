@@ -991,7 +991,7 @@
       "max_fn_lines": 29
     },
     "desktop/src/core/prose_lint.py": {
-      "lines": 234,
+      "lines": 236,
       "max_fn_cc": 19,
       "max_fn_lines": 60
     },
@@ -1276,7 +1276,7 @@
       "max_fn_lines": 39
     },
     "desktop/src/core/terminal.py": {
-      "lines": 2418,
+      "lines": 2419,
       "max_fn_cc": 37,
       "max_fn_lines": 89
     },

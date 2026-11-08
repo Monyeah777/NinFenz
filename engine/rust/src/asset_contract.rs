@@ -2596,87 +2596,41 @@ l2
     fn asset_code_real_declarations_match_truth_source() {
         let root = ac_repo_root();
         let cases: &[(&str, &[&str], &str)] = &[
-            (
-                r#"{"deny_calls": ["eval", "exec", "__import__", "os.system", "pickle.loads", "marshal.loads"], "id": "asset-contract", "lang": "python", "path": "desktop/src/core/asset_contract.py", "tests": ["desktop/tests/test_asset_contract.py"]}"#,
-                &[],
-                r#"{"files": 1}"#,
-            ),
-            (
-                r#"{"deny_calls": ["eval", "exec", "__import__", "os.system"], "id": "json-schema-leaf", "lang": "python", "path": "desktop/src/core/json_schema.py", "tests": ["desktop/tests/test_output_forms.py"]}"#,
-                &[],
-                r#"{"files": 1}"#,
-            ),
-            (
-                r#"{"deny_calls": ["eval", "exec", "__import__", "os.system"], "id": "content-face-leaf", "lang": "python", "path": "desktop/src/core/content_face.py", "tests": ["desktop/tests/test_content_face.py"]}"#,
-                &[],
-                r#"{"files": 1}"#,
-            ),
-            (
-                r#"{"deny_calls": ["eval", "exec", "__import__", "os.system", "pickle.loads", "marshal.loads"], "id": "role-model", "lang": "python", "path": "desktop/src/core/role_model.py", "tests": ["desktop/tests/test_role_model.py"]}"#,
-                &[],
-                r#"{"files": 1}"#,
-            ),
-            (
-                concat!(
-                    r#"{"forbid_regex": [{"name": ""#,
-                    "un",
-                    "safe",
-                    r#"", "pattern": "\\b"#,
-                    "un",
-                    "safe",
-                    r#"\\b", "why": "第二实现线是**只读判据**；"#,
-                    "un",
-                    "safe",
-                    r#" 会把它变成可写面"}], "glob": "engine/rust/src/**/*.rs", "id": "engine-rust-structural", "lang": "rust", "note": "E2 结构契约（非 AST）：只判禁用式与计数棘轮；完整语法树不在本层范围（ADR-0005 划范围）", "regex_limits": [{"max": 1, "name": "extern-c", "pattern": "extern\\s+\"C\"", "why": "FFI 面只许只减不增（实测 1 处）"}]}"#
-                ),
-                &[],
-                concat!(
-                    r#"{"files": 86, "forbid:"#,
-                    "un",
-                    "safe",
-                    r#"": 0, "limit:extern-c": 1}"#
-                ),
-            ),
-            (
-                concat!(
-                    r#"{"forbid_regex": [{"name": ""#,
-                    "un",
-                    "safe",
-                    r#"", "pattern": "\\b"#,
-                    "un",
-                    "safe",
-                    r#"\\b", "why": "第二实现线是只读判据"}, {"name": "DllImport", "pattern": "\\bDllImport\\b", "why": "P/Invoke 面须走显式声明与评审"}, {"name": "extern", "pattern": "\\bextern\\b", "why": "外部符号直接绑定会绕过只读边界"}], "glob": "engine/dotnet/**/*.cs", "id": "engine-dotnet-structural", "lang": "cs", "note": "同上（实测三类各 0 处，故按零容忍声明）"}"#
-                ),
-                &[],
-                concat!(
-                    r#"{"files": 109, "forbid:DllImport": 0, "forbid:extern": 0, "forbid:"#,
-                    "un",
-                    "safe",
-                    r#"": 0}"#
-                ),
-            ),
-            (
-                concat!(
-                    r#"{"glob": "engine/rust/ffi/src/**/*.rs", "id": "engine-rust-ffi", "lang": "rust", "note": "F3 治理面（VULN-02，**WARN 起步、不 FAIL**）：FFI 出口必然 "#,
-                    "un",
-                    "safe",
-                    r#"（C ABI 本质），故不套用「禁 "#,
-                    "un",
-                    "safe",
-                    r#"」的只读契约；改判三条可证治理规则——"#,
-                    "un",
-                    "safe",
-                    r##" 前 3 行内须有 SAFETY: 注释 / from_raw_parts 前须挡空指针 / #[no_mangle] 导出面不得 panic。存量清零后把规则迁进 forbid_regex 或新判据升 FAIL", "warn_rules": {"export_no_panic": {"forbid": ["panic!", ".unwrap(", ".expect(", "assert!"], "pattern": "#\\[no_mangle\\]", "skip_after": "#[cfg(test)]"}, "null_guard_before": {"guard": "is_null", "pattern": "from_raw_parts", "skip_after": "#[cfg(test)]", "within": 20}, ""##,
-                    "un",
-                    "safe",
-                    r#"_safety_comment": {"marker": "SAFETY:", "pattern": "\\b"#,
-                    "un",
-                    "safe",
-                    r##"\\b", "skip_after": "#[cfg(test)]", "within": 3}}}"##
-                ),
-                &[],
-                r#"{"files": 1}"#,
-            ),
+        (
+            r#"{"deny_calls": ["eval", "exec", "__import__", "os.system", "pickle.loads", "marshal.loads"], "id": "asset-contract", "lang": "python", "path": "desktop/src/core/asset_contract.py", "tests": ["desktop/tests/test_asset_contract.py"]}"#,
+            &[],
+            r#"{"files": 1}"#
+        ),
+        (
+            r#"{"deny_calls": ["eval", "exec", "__import__", "os.system"], "id": "json-schema-leaf", "lang": "python", "path": "desktop/src/core/json_schema.py", "tests": ["desktop/tests/test_output_forms.py"]}"#,
+            &[],
+            r#"{"files": 1}"#
+        ),
+        (
+            r#"{"deny_calls": ["eval", "exec", "__import__", "os.system"], "id": "content-face-leaf", "lang": "python", "path": "desktop/src/core/content_face.py", "tests": ["desktop/tests/test_content_face.py"]}"#,
+            &[],
+            r#"{"files": 1}"#
+        ),
+        (
+            r#"{"deny_calls": ["eval", "exec", "__import__", "os.system", "pickle.loads", "marshal.loads"], "id": "role-model", "lang": "python", "path": "desktop/src/core/role_model.py", "tests": ["desktop/tests/test_role_model.py"]}"#,
+            &[],
+            r#"{"files": 1}"#
+        ),
+        (
+            concat!(r#"{"forbid_regex": [{"name": ""#, "un", "safe", r#"", "pattern": "\\b"#, "un", "safe", r#"\\b", "why": "第二实现线是**只读判据**；"#, "un", "safe", r#" 会把它变成可写面"}], "glob": "engine/rust/src/**/*.rs", "id": "engine-rust-structural", "lang": "rust", "note": "E2 结构契约（非 AST）：只判禁用式与计数棘轮；完整语法树不在本层范围（ADR-0005 划范围）", "regex_limits": [{"max": 1, "name": "extern-c", "pattern": "extern\\s+\"C\"", "why": "FFI 面只许只减不增（实测 1 处）"}]}"#),
+            &[],
+            concat!(r#"{"files": 86, "forbid:"#, "un", "safe", r#"": 0, "limit:extern-c": 1}"#)
+        ),
+        (
+            concat!(r#"{"forbid_regex": [{"name": ""#, "un", "safe", r#"", "pattern": "\\b"#, "un", "safe", r#"\\b", "why": "第二实现线是只读判据"}, {"name": "DllImport", "pattern": "\\bDllImport\\b", "why": "P/Invoke 面须走显式声明与评审"}, {"name": "extern", "pattern": "\\bextern\\b", "why": "外部符号直接绑定会绕过只读边界"}], "glob": "engine/dotnet/**/*.cs", "id": "engine-dotnet-structural", "lang": "cs", "note": "同上（实测三类各 0 处，故按零容忍声明）"}"#),
+            &[],
+            concat!(r#"{"files": 110, "forbid:DllImport": 0, "forbid:extern": 0, "forbid:"#, "un", "safe", r#"": 0}"#)
+        ),
+        (
+            concat!(r#"{"glob": "engine/rust/ffi/src/**/*.rs", "id": "engine-rust-ffi", "lang": "rust", "note": "F3 治理面（VULN-02，**WARN 起步、不 FAIL**）：FFI 出口必然 "#, "un", "safe", r#"（C ABI 本质），故不套用「禁 "#, "un", "safe", r#"」的只读契约；改判三条可证治理规则——"#, "un", "safe", r##" 前 3 行内须有 SAFETY: 注释 / from_raw_parts 前须挡空指针 / #[no_mangle] 导出面不得 panic。存量清零后把规则迁进 forbid_regex 或新判据升 FAIL", "warn_rules": {"export_no_panic": {"forbid": ["panic!", ".unwrap(", ".expect(", "assert!"], "pattern": "#\\[no_mangle\\]", "skip_after": "#[cfg(test)]"}, "null_guard_before": {"guard": "is_null", "pattern": "from_raw_parts", "skip_after": "#[cfg(test)]", "within": 20}, ""##, "un", "safe", r#"_safety_comment": {"marker": "SAFETY:", "pattern": "\\b"#, "un", "safe", r##"\\b", "skip_after": "#[cfg(test)]", "within": 3}}}"##),
+            &[],
+            r#"{"files": 1}"#
+        ),
         ];
         for (spec_s, want_issues, want_stats) in cases {
             let spec: Json = crate::jsonread::convert(
@@ -2684,24 +2638,14 @@ l2
             )
             .unwrap();
             let (issues, stats) = check_code(&root, &spec);
-            assert_eq!(
-                ac_norm(&issues),
-                ac_norm(
-                    &want_issues
-                        .iter()
-                        .map(|s| s.to_string())
-                        .collect::<Vec<_>>()
-                ),
-                "代码面 issues 不一致"
-            );
+            assert_eq!(ac_norm(&issues),
+                       ac_norm(&want_issues.iter().map(|s| s.to_string()).collect::<Vec<_>>()),
+                       "代码面 issues 不一致");
             let want: Json = crate::jsonread::convert(
                 &serde_json::from_str::<serde_json::Value>(want_stats).unwrap(),
             )
             .unwrap();
-            assert!(
-                crate::jsonread::json_eq(&stats, &want),
-                "代码面 stats 不一致"
-            );
+            assert!(crate::jsonread::json_eq(&stats, &want), "代码面 stats 不一致");
         }
     }
 
@@ -2709,26 +2653,26 @@ l2
     fn asset_script_real_declarations_match_truth_source() {
         let root = ac_repo_root();
         let cases: &[(&str, &[&str], &str)] = &[
-            (
-                r#"{"id": "cards", "inputs": ["verify.sh"], "lang": "python", "outputs": ["docs/verification-cards.md"], "path": "scripts/build_verification_cards.py"}"#,
-                &[],
-                r#"{"files": 1, "inputs": 1, "outputs": 1}"#,
-            ),
-            (
-                r#"{"id": "geo-export", "inputs": ["protocol/standards_catalog.json", "protocol/standards_binding.json"], "lang": "python", "outputs": ["docs/standards/index.md", "docs/standards/answer-cards.md", "protocol/geo_export.json", "docs/standards/layer-data.md", "docs/standards/layer-eng.md", "docs/standards/layer-form.md", "docs/standards/layer-gov.md", "docs/standards/layer-iface.md"], "path": "scripts/geo_export.py"}"#,
-                &[],
-                r#"{"files": 1, "inputs": 2, "outputs": 8}"#,
-            ),
-            (
-                r#"{"id": "external-links", "inputs": ["README.md", "README.en.md", "llms.txt", "docs/agent/AGENT_START.md", "docs/agent/ROUTES.md", "docs/verification-cards.md"], "lang": "python", "outputs": ["results/external-links-report.json"], "path": "scripts/check_external_links.py"}"#,
-                &[],
-                r#"{"files": 1, "inputs": 6, "outputs": 1}"#,
-            ),
-            (
-                r#"{"id": "quality-all", "inputs": ["verify.sh"], "lang": "bash", "outputs": [], "path": "scripts/quality_all.sh"}"#,
-                &[],
-                r#"{"files": 1, "inputs": 1, "outputs": 0}"#,
-            ),
+        (
+            r#"{"id": "cards", "inputs": ["verify.sh"], "lang": "python", "outputs": ["docs/verification-cards.md"], "path": "scripts/build_verification_cards.py"}"#,
+            &[],
+            r#"{"files": 1, "inputs": 1, "outputs": 1}"#
+        ),
+        (
+            r#"{"id": "geo-export", "inputs": ["protocol/standards_catalog.json", "protocol/standards_binding.json"], "lang": "python", "outputs": ["docs/standards/index.md", "docs/standards/answer-cards.md", "protocol/geo_export.json", "docs/standards/layer-data.md", "docs/standards/layer-eng.md", "docs/standards/layer-form.md", "docs/standards/layer-gov.md", "docs/standards/layer-iface.md"], "path": "scripts/geo_export.py"}"#,
+            &[],
+            r#"{"files": 1, "inputs": 2, "outputs": 8}"#
+        ),
+        (
+            r#"{"id": "external-links", "inputs": ["README.md", "README.en.md", "llms.txt", "docs/agent/AGENT_START.md", "docs/agent/ROUTES.md", "docs/verification-cards.md"], "lang": "python", "outputs": ["results/external-links-report.json"], "path": "scripts/check_external_links.py"}"#,
+            &[],
+            r#"{"files": 1, "inputs": 6, "outputs": 1}"#
+        ),
+        (
+            r#"{"id": "quality-all", "inputs": ["verify.sh"], "lang": "bash", "outputs": [], "path": "scripts/quality_all.sh"}"#,
+            &[],
+            r#"{"files": 1, "inputs": 1, "outputs": 0}"#
+        ),
         ];
         for (spec_s, want_issues, want_stats) in cases {
             let spec: Json = crate::jsonread::convert(
@@ -2741,10 +2685,7 @@ l2
                 &serde_json::from_str::<serde_json::Value>(want_stats).unwrap(),
             )
             .unwrap();
-            assert!(
-                crate::jsonread::json_eq(&stats, &want),
-                "脚本面 stats 不一致"
-            );
+            assert!(crate::jsonread::json_eq(&stats, &want), "脚本面 stats 不一致");
         }
     }
 
@@ -2758,11 +2699,13 @@ l2
                 _ => Vec::new(),
             }
         };
-        let cases: &[(&str, &[&str], &str)] = &[(
+        let cases: &[(&str, &[&str], &str)] = &[
+        (
             r#"{"feeds": [{"input": "docs/verification-cards.md", "output": "docs/verification-cards.md"}], "from": "cards", "id": "cards-to-external-links", "to": "external-links"}"#,
             &[],
-            r#"{"matched": 1}"#,
-        )];
+            r#"{"matched": 1}"#
+        ),
+        ];
         for (chain_s, want_issues, want_stats) in cases {
             let chain: Json = crate::jsonread::convert(
                 &serde_json::from_str::<serde_json::Value>(chain_s).unwrap(),
@@ -2785,15 +2728,11 @@ l2
         assert_eq!(ac_norm(&issues), &[] as &[&str], "聚合 issues 不一致");
         assert_eq!(warns, &[] as &[&str], "聚合 warns 不一致");
         let want: Json = crate::jsonread::convert(
-            &serde_json::from_str::<serde_json::Value>(r#"{"chains": 1, "code": 7, "data": 10, "files": 1258, "index": 1, "no_schema": 206, "script": 4}"#).unwrap(),
+            &serde_json::from_str::<serde_json::Value>(r#"{"chains": 1, "code": 7, "data": 10, "files": 1259, "index": 1, "no_schema": 206, "script": 4}"#).unwrap(),
         )
         .unwrap();
-        assert!(
-            crate::jsonread::json_eq(&stats, &want),
-            "聚合 stats 不一致\n  实得 {}\n  期望 {}",
-            stats.dumps(),
-            want.dumps()
-        );
+        assert!(crate::jsonread::json_eq(&stats, &want),
+                "聚合 stats 不一致\n  实得 {}\n  期望 {}", stats.dumps(), want.dumps());
     }
     // <<< GENERATED
     // >>> GENERATED by tools/gen_asset_contract_faces.py（勿手改；重跑生成器覆盖本段）

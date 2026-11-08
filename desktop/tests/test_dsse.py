@@ -150,7 +150,8 @@ class CLITest(unittest.TestCase):
     def _run(self, *args):
         return subprocess.run(  # nosec B603 - argv list, fixed local CLI
             [sys.executable, str(ROOT / "scripts" / "nf.py"), *args],
-            cwd=str(ROOT), capture_output=True, text=True, timeout=60,
+            cwd=str(ROOT), capture_output=True, text=True, encoding="utf-8",
+            timeout=60,
             env={**dict(os.environ), "PYTHONUTF8": "1",
                  "PYTHONIOENCODING": "utf-8"})
 

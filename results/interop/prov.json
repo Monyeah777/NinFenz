@@ -156,7 +156,7 @@
     {
       "@id": "nf:file/protocol/asset_contracts.json",
       "@type": "prov:Entity",
-      "nf:sha256": "4a789c8d6a084e3ad8b67d6d835646daed00c587e1502afffcf59700f4444222"
+      "nf:sha256": "b803bea0af7fe9f212da40181bd78b81c08091633e396a450f85633194c859af"
     },
     {
       "@id": "nf:file/protocol/asset_line_baseline.json",
@@ -171,7 +171,7 @@
     {
       "@id": "nf:file/protocol/code_metrics_baseline.json",
       "@type": "prov:Entity",
-      "nf:sha256": "f556db58e3555cdff57689a9daa1cc0355658ea8d23aefe73ed3c350cbdc0be1"
+      "nf:sha256": "9f2f126ef137e1664b04bf9e364965303bc40ec84565cfd5fcc40a5d5745df45"
     },
     {
       "@id": "nf:file/protocol/community_asset_ledger.json",

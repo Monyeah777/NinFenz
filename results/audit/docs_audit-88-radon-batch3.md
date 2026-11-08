@@ -6,9 +6,11 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/terminal.py:f07b761f94e3e04a2437bbe88b5d9e646f0a247d26c985486b287153bcae4570
-  - protocol/code_metrics_baseline.json:f556db58e3555cdff57689a9daa1cc0355658ea8d23aefe73ed3c350cbdc0be1
+  - desktop/src/core/terminal.py:53f262e1c60deec8e01086083d22a2e71cfbb4e8e9af18834600fedc6cd860f8
+  - protocol/code_metrics_baseline.json:9f2f126ef137e1664b04bf9e364965303bc40ec84565cfd5fcc40a5d5745df45
 ---
+> 重审（2026-11-08）：DSSE v1 integration closure
+
 > 重审（2026-11-08）：DSSE v1 合并最新 main 后重审：保留主干与 DSSE 变更，按合并后字节重绑。
 
 > 重审（2026-11-08）：payload 未暂存 warn
