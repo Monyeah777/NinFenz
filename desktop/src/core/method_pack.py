@@ -203,3 +203,36 @@ def compose(packs: list[dict[str, Any]]) -> dict[str, Any]:
             "expert_moves": moves,
             "evidence_standards": [by_kind[k] for k in order],
             "common_failures": failures}
+
+
+CHECKLIST_SCHEMA = "nf-method-checklist/1"
+
+
+def checklist(pack: dict[str, Any]) -> dict[str, Any]:
+    """把一个方法包变成**可执行清单**：每个动作一条，附「为什么」与该类证据要求。
+
+    为什么要这层（第 68 轮）：方法包此前只有两份用法——列出来看、编进主张义务；
+    都不回答「现在这一步该做什么」。清单把包从「文档」变成「可照着做的东西」，
+    仍然不评分、不排序，只按包内顺序输出。
+    """
+    bad = validate_pack(pack)
+    if bad:
+        raise ValueError("方法包不合法：" + "；".join(bad[:2]))
+    moves = list(pack.get("expert_moves") or [])
+    stds = list(pack.get("evidence_standards") or [])
+    items = []
+    for mv in moves:
+        items.append({
+            "step": len(items) + 1,
+            "move": str(mv.get("id")),
+            "do": str(mv.get("name")),
+            "why": str(mv.get("why")),
+            "kind": str(mv.get("kind") or "advisory"),
+        })
+    return {"schema": CHECKLIST_SCHEMA, "pack": str(pack.get("id")),
+            "domain": str(pack.get("domain") or ""),
+            "items": items,
+            "evidence_standards": [
+                {"claim_kind": str(st.get("claim_kind")),
+                 "required": list(st.get("required") or [])} for st in stds],
+            "note": "按包内顺序；不评分不排序。每条动作要求的是「做一次并留证」，不是打卡"}

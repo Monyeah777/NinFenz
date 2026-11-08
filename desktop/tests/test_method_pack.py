@@ -219,6 +219,27 @@ class PackContentTest(unittest.TestCase):
                 self.assertTrue(any(t in text for t in tokens),
                                 mid + " 在 " + rel + " 里找不到锚点（" + "/".join(tokens) + "）")
 
+    def test_checklist_projection_covers_all_moves(self):
+        """清单投影：每域动作一条、按包内顺序、证据标准齐带（不评分不排序）。"""
+        for pid in PACK_IDS:
+            pack = method_pack.load_pack(str(ROOT), pid)
+            doc = method_pack.checklist(pack)
+            self.assertEqual("nf-method-checklist/1", doc["schema"], pid)
+            self.assertEqual(len(pack["expert_moves"]), len(doc["items"]), pid)
+            self.assertEqual([str(m["id"]) for m in pack["expert_moves"]],
+                             [it["move"] for it in doc["items"]], pid + " 顺序须与包一致")
+            self.assertEqual([str(st["claim_kind"])
+                              for st in pack["evidence_standards"]],
+                             [st["claim_kind"] for st in doc["evidence_standards"]], pid)
+            for it in doc["items"]:
+                self.assertTrue(it["why"].strip(), pid + " 动作缺 why")
+            self.assertIn("不评分", doc["note"])
+
+    def test_checklist_rejects_broken_pack(self):
+        with self.assertRaises(ValueError) as ctx:
+            method_pack.checklist({"schema": "nf-method-pack/1"})
+        self.assertIn("修复指引", str(ctx.exception))
+
     def test_claim_kinds_come_from_single_vocabulary(self):
         """同构判据 #4（语义层）：方法包的 claim_kind 必须来自 criteria registry 的单一词表。
 

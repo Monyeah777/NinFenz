@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:f29b9d0265c6fdbdb009af507bf40878a8a0fc74449bf6615d68dd6e5f86e327
+  - protocol/code_metrics_baseline.json:4f928ff7608e581db9af5835df58d68f8fb51416d7bde8544bed1f3d98f1709e
 ---
+> 重审（2026-11-09）：方法包可执行化：checklist 投影 + nf cognition --pack-checklist
+
 > 重审（2026-11-09）：precheck 覆盖边界（20/378）写进脚本与发布文档
 
 > 重审（2026-11-08）：precheck 18 闸门（补 cognition_control / isomorphism）

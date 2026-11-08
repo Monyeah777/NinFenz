@@ -30,8 +30,10 @@ subjects:
   - desktop/src/core/daemon.py:75940f32b3068a5bc7a83b288bb9302e76a948eca0baa76e1e62f02243c8b498
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:f29b9d0265c6fdbdb009af507bf40878a8a0fc74449bf6615d68dd6e5f86e327
+  - protocol/code_metrics_baseline.json:4f928ff7608e581db9af5835df58d68f8fb51416d7bde8544bed1f3d98f1709e
 ---
+> 重审（2026-11-09）：方法包可执行化：checklist 投影 + nf cognition --pack-checklist
+
 > 重审（2026-11-09）：precheck 覆盖边界（20/378）写进脚本与发布文档
 
 > 重审（2026-11-08）：precheck 18 闸门（补 cognition_control / isomorphism）

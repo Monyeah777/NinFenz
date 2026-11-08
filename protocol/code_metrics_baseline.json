@@ -826,7 +826,7 @@
       "max_fn_lines": 17
     },
     "desktop/src/core/method_pack.py": {
-      "lines": 205,
+      "lines": 238,
       "max_fn_cc": 35,
       "max_fn_lines": 59
     },
@@ -1621,7 +1621,7 @@
       "max_fn_lines": 26
     },
     "scripts/nf.py": {
-      "lines": 9841,
+      "lines": 9859,
       "max_fn_cc": 132,
       "max_fn_lines": 442
     },

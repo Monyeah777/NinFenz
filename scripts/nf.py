@@ -1553,6 +1553,8 @@ def _add_parser_validation(sub):
                      help="领域方法包（可重复）：把专家动作+证据标准并入研究计划")
     cog.add_argument("--packs-list", dest="packs_list", action="store_true",
                      help="列出领域方法包（怎么写专家动作/证据标准）")
+    cog.add_argument("--pack-checklist", metavar="ID", default=None,
+                     help="把方法包展开为可执行清单（每动作一条 + 证据要求）")
     cog.add_argument("--out", default="", help="计划落点（缺省=只打印）")
     cog.add_argument("--json", action="store_true", help="输出结构化 JSON")
     stv = sub.add_parser("st-validate",
@@ -6386,6 +6388,22 @@ def _cmd_cognition(args):
 
     from core import cognition as cg
     from core import cognition_plan as cp
+    if getattr(args, "pack_checklist", None):
+        from core import method_pack as mpk
+        try:
+            doc = mpk.checklist(mpk.load_pack(ROOT, str(args.pack_checklist)))
+        except ValueError as exc:
+            print(str(exc), file=sys.stderr)
+            return 2
+        if args.json:
+            print(_json.dumps(doc, ensure_ascii=False, indent=2, sort_keys=True))
+            return 0
+        print("== 方法包清单：" + doc["pack"] + "（" + doc["domain"] + "）==")
+        for it in doc["items"]:
+            print("  " + str(it["step"]) + ". " + it["do"] + " —— " + it["why"])
+        for st in doc["evidence_standards"]:
+            print("  证据（" + st["claim_kind"] + "）：" + " / ".join(st["required"]))
+        return 0
     if getattr(args, "packs_list", False):
         from core import method_pack as mpk
         packs = mpk.list_packs(ROOT)

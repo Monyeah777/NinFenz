@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:bc114898836f914212cec64e0b22c7d3f93b8681557d82f845a200a85683b0cc
   - desktop/src/core/asset_contract.py:8e2fbc3954c771d6c2eb78d9cf47dcf22612b63b9b16929bd9013792f803f9a2
-  - protocol/code_metrics_baseline.json:f29b9d0265c6fdbdb009af507bf40878a8a0fc74449bf6615d68dd6e5f86e327
+  - protocol/code_metrics_baseline.json:4f928ff7608e581db9af5835df58d68f8fb51416d7bde8544bed1f3d98f1709e
 ---
+> 重审（2026-11-09）：方法包可执行化：checklist 投影 + nf cognition --pack-checklist
+
 > 重审（2026-11-09）：precheck 覆盖边界（20/378）写进脚本与发布文档
 
 > 重审（2026-11-08）：precheck 18 闸门（补 cognition_control / isomorphism）

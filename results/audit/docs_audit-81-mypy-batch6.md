@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:f29b9d0265c6fdbdb009af507bf40878a8a0fc74449bf6615d68dd6e5f86e327
+  - protocol/code_metrics_baseline.json:4f928ff7608e581db9af5835df58d68f8fb51416d7bde8544bed1f3d98f1709e
 ---
+> 重审（2026-11-09）：方法包可执行化：checklist 投影 + nf cognition --pack-checklist
+
 > 重审（2026-11-09）：precheck 覆盖边界（20/378）写进脚本与发布文档
 
 > 重审（2026-11-08）：precheck 18 闸门（补 cognition_control / isomorphism）

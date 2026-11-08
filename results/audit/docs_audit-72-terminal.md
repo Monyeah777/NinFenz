@@ -7,7 +7,7 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:9a86928171c71f4a2d3d324508fdafccb60fd7cc8423d52197185214a40ea30f
-  - scripts/nf.py:952471bb69cdbaf18ebcc11c4b925fe021bcae57e368be75b8baea8a054db4fe
+  - scripts/nf.py:101cd11b581a7cf23d9e6916009a21fbe4d3e36ec56729ab708283934d38b14e
   - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
   - scripts/nf:406c221f9f16fb6e318e230b0b0120e3a6d3c9231d57f66285e0e4615e18ca91
   - scripts/nf.cmd:d1e7ea3a9e99c0822102884cddafe1cdf3893d9b75d19abebe7a8d2a8abeec5a
@@ -19,6 +19,8 @@ subjects:
   - protocol/CONFORMANCE.md:006b56748b6daaf2419be40a65247d90efd6291e87ccd61c6527ed1526b6b4e4
 
 ---
+> 重审（2026-11-09）：方法包可执行化：checklist 投影 + nf cognition --pack-checklist
+
 > 重审（2026-11-08）：快照20 红修复：--pairs 入闸/json_doc/分组表接入探针/耦合重算
 
 > 重审（2026-11-08）：口头置信触发策略（触发器非证据）+ CLI --threshold

@@ -16,15 +16,17 @@ subjects:
   - desktop/tests/test_meta_cockpit.py:cc2dc4f52729b35f400ca92aa367e685780f9f6735224e7fc0b7550b85f52662
   - desktop/tests/test_cli_error_framing.py:788460878349a907eadc21c74a1a689c9cdfe81888f5490c5a935b34fc121c8a
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
-  - scripts/nf.py:952471bb69cdbaf18ebcc11c4b925fe021bcae57e368be75b8baea8a054db4fe
+  - scripts/nf.py:101cd11b581a7cf23d9e6916009a21fbe4d3e36ec56729ab708283934d38b14e
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:5305eeff7ab077c30380a9bce410e7c1a39a0604668008460ddda09cc5bb052c
+  - protocol/check12_weights.json:8ee11b2052d8a97205a1cc5faa54517d7014a5707e156ad682ae9a74fdf977b1
   - protocol/coupling_baseline.json:49bc59e10c4d3fdcf966709392e4a7f8511a2432a69eb5d496e74d643fa42960
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-09）：方法包可执行化：checklist 投影 + nf cognition --pack-checklist
+
 > 重审（2026-11-09）：第八个域 handoff（协作交接）：可接续帧/承诺落证/角色分离/分歧留档/第三方复验/版本钉定
 
 > 重审（2026-11-09）：第七个域 resilience（韧性工程）：6 动作 3 证据类，锚点落既有隔离/变异/回滚面

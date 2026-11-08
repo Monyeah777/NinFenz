@@ -13,9 +13,11 @@ subjects:
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
   - docs/release.md:a878a24b8631d965e30d0bc865c9f88b71049f5a73025cf2984f5bd5cbca5dbb
-  - scripts/nf.py:952471bb69cdbaf18ebcc11c4b925fe021bcae57e368be75b8baea8a054db4fe
+  - scripts/nf.py:101cd11b581a7cf23d9e6916009a21fbe4d3e36ec56729ab708283934d38b14e
 
 ---
+> 重审（2026-11-09）：方法包可执行化：checklist 投影 + nf cognition --pack-checklist
+
 > 重审（2026-11-08）：快照20 红修复：--pairs 入闸/json_doc/分组表接入探针/耦合重算
 
 > 重审（2026-11-08）：口头置信触发策略（触发器非证据）+ CLI --threshold
