@@ -221,7 +221,7 @@
       "max_fn_lines": 41
     },
     "desktop/src/core/cognition_plan.py": {
-      "lines": 212,
+      "lines": 211,
       "max_fn_cc": 18,
       "max_fn_lines": 68
     },

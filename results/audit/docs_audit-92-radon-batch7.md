@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/json_schema.py:f3a4a6a14de5104e217af8b154505f9ca46fd6133081188209add78143e2b23e
-  - protocol/code_metrics_baseline.json:76daf872070e73d5221daa21bbc77227f9b797129f4a1df1b31f69ee0884dd0a
+  - protocol/code_metrics_baseline.json:eac5441671a680d58cd4bbae3259de89474dc23bab9ef117bf504a281cb0cf3e
 ---
+> 重审（2026-11-08）：风格收口（F401/W291）
+
 > 重审（2026-11-08）：快照20 红修复：--pairs 入闸/json_doc/分组表接入探针/耦合重算
 
 > 重审（2026-11-08）：证据图探针导入收口

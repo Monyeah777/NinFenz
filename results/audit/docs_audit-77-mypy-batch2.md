@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
-  - protocol/code_metrics_baseline.json:76daf872070e73d5221daa21bbc77227f9b797129f4a1df1b31f69ee0884dd0a
+  - protocol/code_metrics_baseline.json:eac5441671a680d58cd4bbae3259de89474dc23bab9ef117bf504a281cb0cf3e
 ---
+> 重审（2026-11-08）：风格收口（F401/W291）
+
 > 重审（2026-11-08）：快照20 红修复：--pairs 入闸/json_doc/分组表接入探针/耦合重算
 
 > 重审（2026-11-08）：证据图探针导入收口

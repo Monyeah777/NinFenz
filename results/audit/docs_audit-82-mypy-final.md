@@ -30,8 +30,10 @@ subjects:
   - desktop/src/core/daemon.py:75940f32b3068a5bc7a83b288bb9302e76a948eca0baa76e1e62f02243c8b498
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:76daf872070e73d5221daa21bbc77227f9b797129f4a1df1b31f69ee0884dd0a
+  - protocol/code_metrics_baseline.json:eac5441671a680d58cd4bbae3259de89474dc23bab9ef117bf504a281cb0cf3e
 ---
+> 重审（2026-11-08）：风格收口（F401/W291）
+
 > 重审（2026-11-08）：快照20 红修复：--pairs 入闸/json_doc/分组表接入探针/耦合重算
 
 > 重审（2026-11-08）：证据图探针导入收口
