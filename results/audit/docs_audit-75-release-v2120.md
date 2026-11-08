@@ -13,9 +13,11 @@ subjects:
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
   - docs/release.md:a878a24b8631d965e30d0bc865c9f88b71049f5a73025cf2984f5bd5cbca5dbb
-  - scripts/nf.py:1164d7be98286a3849a70cc878f95e046b0cbe23ad0121655d99789c4de3c8d8
+  - scripts/nf.py:c0e0f0ccc8bfc7a8ff311d8c5e52281b5ad89dd629a30e141d0a7b59e41dc4e4
 
 ---
+> 重审（2026-11-08）：task-35：nf.py 注释修正（nosec/理由）
+
 > 重审（2026-11-08）：task-35 投影少算防护
 
 > 重审（2026-11-07）：合并基线补齐：向量生成器 subject 字段 + 脚本原子写/stdio + 命令树拆组
