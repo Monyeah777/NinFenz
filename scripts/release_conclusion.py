@@ -140,6 +140,14 @@ def snapshot_base(root: Path, override: str = "") -> Path:
     return path if path.is_absolute() else (root / path)
 
 
+def snapshot_space_issue(free_bytes: int, need_mb: int) -> str:
+    """快照落点可用空间不足 → 说明（够了返回空串）；``-1``=探针失败，交由创建期报错。"""
+    if 0 <= free_bytes < need_mb * 1024 * 1024:
+        return (f"快照落点空间不足（可用 {free_bytes // 1048576} MB，需 ≥{need_mb} MB）"
+                f"（{GUIDE}用 --snapshot-dir 指到空间充足的卷，或先清理旧快照/缓存）")
+    return ""
+
+
 def _snapshot_free_bytes(path: Path) -> int:
     """落点所在卷的可用字节；量不出来就返回 -1（不阻断，只告警）。"""
     probe = path
@@ -206,17 +214,18 @@ def _snapshot_prune(base: Path, keep_wt: str = "") -> list[str]:
     return stale
 
 
-def _snapshot_create(head: str, base: Path, need_mb: int = 400) -> tuple[str, str]:
+def _snapshot_create(head: str, base: Path, need_mb: int = 1200) -> tuple[str, str]:
     """在临时目录建 HEAD 的 detached worktree → (路径, 错误说明)。
 
     为什么要快照（2026-11-06 实测）：本仓常有并发 agent 会话，它们会在我跑 36 分钟门禁的
     时候提交、改文件、甚至改门禁脚本自己——8 片于是落在不同状态上，红绿都不可信。
     快照把结论**钉在一个 SHA** 上：证明「这个提交的内容是绿的」，与工作区完全解耦。
     """
-    free = _snapshot_free_bytes(base)
-    if 0 <= free < need_mb * 1024 * 1024:
-        return "", (f"快照落点空间不足（{base} 可用 {free // 1048576} MB，需 ≥{need_mb} MB）"
-                    f"（{GUIDE}用 --snapshot-dir 指到空间充足的卷，或先清理旧快照）")
+    need_mb = 1200          # 实测：快照 worktree + 8 片临时件要 >1 GB；84 MB 剩余曾把一次 50 分钟
+    # 门禁打成 ENOSPC（2026-11-06），400 MB 的旧阈值挡不住。宁可提前拒绝，也不浪费一次全量跑。
+    issue = snapshot_space_issue(_snapshot_free_bytes(base), need_mb)
+    if issue:
+        return "", issue
     base.mkdir(parents=True, exist_ok=True)
     run_dir = Path(tempfile.mkdtemp(prefix=snapshot_dir_name(head) + "-", dir=str(base)))
     path = str(run_dir / "wt")
