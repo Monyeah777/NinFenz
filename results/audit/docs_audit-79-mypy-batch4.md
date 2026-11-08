@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:bc114898836f914212cec64e0b22c7d3f93b8681557d82f845a200a85683b0cc
   - desktop/src/core/asset_contract.py:8e2fbc3954c771d6c2eb78d9cf47dcf22612b63b9b16929bd9013792f803f9a2
-  - protocol/code_metrics_baseline.json:0cbea091f2563f8bac1feb60028a3934942ebe8572e6b09d6013f4c6cd4e29bc
+  - protocol/code_metrics_baseline.json:f643149eead1b2d9761164706ee0a08f6c741e0ee326b5962ac93bc30d4406e7
 ---
+> 重审（2026-11-08）：口头置信触发策略（触发器非证据）+ CLI --threshold
+
 > 重审（2026-11-08）：cog calibrate CLI（可靠性表出口）
 
 > 重审（2026-11-08）：校准模块风格收口

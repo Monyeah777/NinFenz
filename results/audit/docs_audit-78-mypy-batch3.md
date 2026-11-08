@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:0cbea091f2563f8bac1feb60028a3934942ebe8572e6b09d6013f4c6cd4e29bc
+  - protocol/code_metrics_baseline.json:f643149eead1b2d9761164706ee0a08f6c741e0ee326b5962ac93bc30d4406e7
 ---
+> 重审（2026-11-08）：口头置信触发策略（触发器非证据）+ CLI --threshold
+
 > 重审（2026-11-08）：cog calibrate CLI（可靠性表出口）
 
 > 重审（2026-11-08）：校准模块风格收口

@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:22e24633e87e95453d0c2cf4a595d0496bae5d7331c1fc644d5b1555e4925a41
-  - protocol/code_metrics_baseline.json:0cbea091f2563f8bac1feb60028a3934942ebe8572e6b09d6013f4c6cd4e29bc
+  - protocol/code_metrics_baseline.json:f643149eead1b2d9761164706ee0a08f6c741e0ee326b5962ac93bc30d4406e7
 ---
+> 重审（2026-11-08）：口头置信触发策略（触发器非证据）+ CLI --threshold
+
 > 重审（2026-11-08）：cog calibrate CLI（可靠性表出口）
 
 > 重审（2026-11-08）：校准模块风格收口

@@ -371,9 +371,9 @@
       "stats": {
         "baseline": 354,
         "files": 354,
-        "max_fn_cc": 130,
-        "max_fn_lines": 435,
-        "max_lines": 9832
+        "max_fn_cc": 132,
+        "max_fn_lines": 442,
+        "max_lines": 9841
       },
       "status": "pass",
       "warns": 0
@@ -538,7 +538,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "c90762f63de947f9bb390469b46ade22afe92bfc4bea9758cbc0985966084ddb",
+  "root_digest": "b01cb89461d812d54876acdcf766fa649d432a87739928b811f9895a59fc0e03",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

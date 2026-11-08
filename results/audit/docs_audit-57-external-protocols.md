@@ -16,7 +16,7 @@ subjects:
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
   - desktop/src/core/purity_scan.py:bc114898836f914212cec64e0b22c7d3f93b8681557d82f845a200a85683b0cc
-  - scripts/nf.py:18770ec7049778822cbc99eb9a3a6a756d6f2227d83b3695f196ff3017d39f5a
+  - scripts/nf.py:8a175983abdfa40f1bf0dd59dc55bd12f4db6e330c0ef64db3c789c48435e82b
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - scripts/check_interop_schemas.py:f9c1add0ee80fb23a3913e32482027e9a4049c5ce70cb35b2b1be4afa075d091
   - results/interop-schema-validation.md:e2546c6407416b61912ac351d14d20c171167e36be4d4d3461f6c2fceb56c0c9
@@ -27,6 +27,8 @@ subjects:
   - llms.txt:ba9f46f80fae844c614bebf52a8d392606ee59114f51a09696b20c43d695d350
 
 ---
+> 重审（2026-11-08）：口头置信触发策略（触发器非证据）+ CLI --threshold
+
 > 重审（2026-11-08）：calibrate 文案收口
 
 > 重审（2026-11-08）：cog calibrate CLI（可靠性表出口）

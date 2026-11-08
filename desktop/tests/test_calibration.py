@@ -58,6 +58,22 @@ class CalibrationTest(unittest.TestCase):
         self.assertEqual(2, doc["n"])
         self.assertIn("不是质量分", doc["note"])
 
+    def test_trigger_policy_is_a_trigger_not_evidence(self):
+        """口头置信 ≤ 阈值 → 触发复核；它只作触发器（返回里明确写「不算证据」）。"""
+        res = cal.trigger_policy([0.2, 0.6, 0.9], 0.6)
+        self.assertEqual("nf-calibration-trigger/1", res["schema"])
+        self.assertEqual([0, 1], res["triggered"], "≤ 阈值的都要触发（含等号）")
+        self.assertEqual([2], res["skipped"])
+        self.assertEqual({"trigger": 2, "skip": 1}, res["counts"])
+        self.assertIn("不算证据", res["note"])
+
+    def test_trigger_policy_rejects_bad_threshold_and_empty(self):
+        with self.assertRaises(ValueError) as ctx:
+            cal.trigger_policy([0.5], 1.5)
+        self.assertIn("修复指引", str(ctx.exception))
+        with self.assertRaises(ValueError):
+            cal.trigger_policy([], 0.5)
+
 
 if __name__ == "__main__":
     unittest.main()

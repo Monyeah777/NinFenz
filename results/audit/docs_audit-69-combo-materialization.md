@@ -7,10 +7,12 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - scripts/nf.py:18770ec7049778822cbc99eb9a3a6a756d6f2227d83b3695f196ff3017d39f5a
+  - scripts/nf.py:8a175983abdfa40f1bf0dd59dc55bd12f4db6e330c0ef64db3c789c48435e82b
   - docs/combos.md:4d25fe6d366687213df7090badd52b815bdf07f774df856e598d7cf8a1d130de
 
 ---
+> 重审（2026-11-08）：口头置信触发策略（触发器非证据）+ CLI --threshold
+
 > 重审（2026-11-08）：calibrate 文案收口
 
 > 重审（2026-11-08）：cog calibrate CLI（可靠性表出口）

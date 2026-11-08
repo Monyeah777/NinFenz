@@ -79,3 +79,30 @@ def reliability(confidences: Sequence[float], correct: Sequence[float],
     return {"schema": SCHEMA, "n": len(confidences), "n_bins": int(n_bins),
             "bins": rows, "ece": ece(confidences, correct, n_bins),
             "note": "ECE 是偏离度不是质量分；报告里必须与分箱表一起给，不能只报一个数"}
+
+
+TRIGGER_SCHEMA = "nf-calibration-trigger/1"
+
+
+def trigger_policy(confidences: Sequence[float], threshold: float = 0.6) -> dict[str, Any]:
+    """口头置信 → 触发决策（**触发器，不是证据**）。
+
+    依据（筛选台账 #3）：口头置信可以作为「触发自检」的信号，但它本身不能进证据面。
+    本函数只做一件确定的事：置信 <= 阈值 → 该条触发复核；否则跳过。返回逐条决策与计数，
+    不评分、不替调用方决定复核什么。
+    """
+    if not 0.0 <= float(threshold) <= 1.0:
+        raise ValueError("阈值越界：" + str(threshold) + "（" + GUIDE + "取 [0,1]）")
+    if not confidences:
+        raise ValueError("样本为空（" + GUIDE + "至少给一条 confidence）")
+    triggered: list[int] = []
+    skipped: list[int] = []
+    for i, c in enumerate(confidences):
+        if not 0.0 <= float(c) <= 1.0:
+            raise ValueError("第 " + str(i) + " 条置信度越界：" + str(c)
+                             + "（" + GUIDE + "置信度必须在 [0,1]）")
+        (triggered if float(c) <= float(threshold) else skipped).append(i)
+    return {"schema": TRIGGER_SCHEMA, "threshold": float(threshold),
+            "triggered": triggered, "skipped": skipped,
+            "counts": {"trigger": len(triggered), "skip": len(skipped)},
+            "note": "口头置信只作触发器：触发复核 ≠ 已证伪，也不算证据"}

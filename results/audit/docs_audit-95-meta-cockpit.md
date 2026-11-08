@@ -16,15 +16,17 @@ subjects:
   - desktop/tests/test_meta_cockpit.py:cc2dc4f52729b35f400ca92aa367e685780f9f6735224e7fc0b7550b85f52662
   - desktop/tests/test_cli_error_framing.py:788460878349a907eadc21c74a1a689c9cdfe81888f5490c5a935b34fc121c8a
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
-  - scripts/nf.py:18770ec7049778822cbc99eb9a3a6a756d6f2227d83b3695f196ff3017d39f5a
+  - scripts/nf.py:8a175983abdfa40f1bf0dd59dc55bd12f4db6e330c0ef64db3c789c48435e82b
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:cec2d8b1492508f50b9c59dd312f3118ce811208c4957d3d98606faab65f36a0
+  - protocol/check12_weights.json:c6b418c812150a71ccc9d1c310016d351d161a44c2421f9371e1ea3d8d550322
   - protocol/coupling_baseline.json:1c4c6520d7c0e52328888d5d1dc601daab41f14ab9a8df40c95e32e3ef6ef4d6
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-08）：口头置信触发策略（触发器非证据）+ CLI --threshold
+
 > 重审（2026-11-08）：calibrate 文案收口
 
 > 重审（2026-11-08）：cog calibrate CLI（可靠性表出口）
