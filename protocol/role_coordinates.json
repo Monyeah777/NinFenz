@@ -4,9 +4,9 @@
     "entry": 26,
     "floor": 5,
     "prod": 1056,
-    "projection": 158,
-    "support": 433,
-    "verify": 1027
+    "projection": 159,
+    "support": 434,
+    "verify": 1029
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7079,6 +7079,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "验证器版本（自省层的对象）：**判定工具的摘要**，不是日期也不是 commit。",
+      "path": "desktop/src/core/verifier_version.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "**并行跑 `nf verify` 的各条 check**：把「整批」从串行 ≈19 s 压到并行 ≈6.5 s。",
       "path": "desktop/src/core/verify_checks.py",
       "role": "prod",
@@ -9505,6 +9511,12 @@
     {
       "function": "",
       "path": "desktop/tests/test_verifier_props.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "自省层判据：发布结论必须绑定「产出它的验证器摘要」。",
+      "path": "desktop/tests/test_verifier_version.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -12540,17 +12552,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "978d0a9caa25bb8ec07eed5228de422ee383820768039c618fabe0a36df58051",
+  "root_digest": "67bee2a42750c660d5d8374fdf0690f9ce66498ff68f5a1e7f5078a284a558f6",
   "rule_counts": {
     "R-app": 1460,
-    "R-catch": 286,
+    "R-catch": 287,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 138,
+    "R-projection": 139,
     "R-support": 119,
-    "R-verify": 902,
-    "auto:R-core": 285
+    "R-verify": 903,
+    "auto:R-core": 286
   },
   "schema": "nf-role-coordinates/1"
 }

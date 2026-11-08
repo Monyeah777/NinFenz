@@ -1390,6 +1390,11 @@
       "max_fn_cc": 3,
       "max_fn_lines": 9
     },
+    "desktop/src/core/verifier_version.py": {
+      "lines": 62,
+      "max_fn_cc": 4,
+      "max_fn_lines": 15
+    },
     "desktop/src/core/verify_checks.py": {
       "lines": 105,
       "max_fn_cc": 8,
@@ -1718,6 +1723,11 @@
     "scripts/sast_check.py": {
       "lines": 236,
       "max_fn_cc": 12,
+      "max_fn_lines": 30
+    },
+    "scripts/self_audit_probe.py": {
+      "lines": 85,
+      "max_fn_cc": 6,
       "max_fn_lines": 30
     },
     "scripts/serve_decision_model.py": {

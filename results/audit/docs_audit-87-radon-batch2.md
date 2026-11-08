@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:b703e2a5de0759dfb4676b4e9fc1f140b816af7b5b99e97e6cf08ba552d53beb
+  - protocol/code_metrics_baseline.json:e6a86eea58d6c512ef4a287ffe4b791987d6a7fdee405863718cc8938c4f5b01
 ---
+> 重审（2026-11-09）：自省层对象：验证器摘要（判定面脚本内容摘要）+ 探针 + 判据
+
 > 重审（2026-11-09）：资源层记账起点：证据判定附 cost_ms（只记耗时，不参与判定）
 
 > 重审（2026-11-09）：探针结果新鲜度：--check + 判据（结果陈旧即红）

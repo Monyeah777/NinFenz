@@ -97,7 +97,7 @@ class IsomorphismMatrixTest(unittest.TestCase):
             self.assertTrue(why.strip(), layer + " 缺判据但没写原因")
         self.assertEqual(9, len(COVERED) + len(MISSING),
                          "九层必须恰好九项（多一层少一层都要改本判据）")
-        self.assertEqual(8, len(COVERED), "覆盖数与矩阵数据不符，需显式更新（第 94 轮起为 8）")
+        self.assertEqual(9, len(COVERED), "覆盖数与矩阵数据不符，需显式更新（第 96 轮起为 9）")
 
     def test_missing_reasons_name_a_concrete_object(self):
         """missing 理由不能是「暂时没做」——必须点名一个具体字段/对象（反引号 token）。"""

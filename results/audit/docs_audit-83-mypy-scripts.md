@@ -14,8 +14,10 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:f10e73e068c8920700f32819212dd63862cab626d0a171ddd1c616f7e261b00f
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:b703e2a5de0759dfb4676b4e9fc1f140b816af7b5b99e97e6cf08ba552d53beb
+  - protocol/code_metrics_baseline.json:e6a86eea58d6c512ef4a287ffe4b791987d6a7fdee405863718cc8938c4f5b01
 ---
+> 重审（2026-11-09）：自省层对象：验证器摘要（判定面脚本内容摘要）+ 探针 + 判据
+
 > 重审（2026-11-09）：资源层记账起点：证据判定附 cost_ms（只记耗时，不参与判定）
 
 > 重审（2026-11-09）：快照25 两处红：--pack-checklist 进编码闸 + 矩阵判据支持裸模块名

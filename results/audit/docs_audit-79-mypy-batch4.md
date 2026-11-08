@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:bc114898836f914212cec64e0b22c7d3f93b8681557d82f845a200a85683b0cc
   - desktop/src/core/asset_contract.py:8e2fbc3954c771d6c2eb78d9cf47dcf22612b63b9b16929bd9013792f803f9a2
-  - protocol/code_metrics_baseline.json:b703e2a5de0759dfb4676b4e9fc1f140b816af7b5b99e97e6cf08ba552d53beb
+  - protocol/code_metrics_baseline.json:e6a86eea58d6c512ef4a287ffe4b791987d6a7fdee405863718cc8938c4f5b01
 ---
+> 重审（2026-11-09）：自省层对象：验证器摘要（判定面脚本内容摘要）+ 探针 + 判据
+
 > 重审（2026-11-09）：资源层记账起点：证据判定附 cost_ms（只记耗时，不参与判定）
 
 > 重审（2026-11-09）：探针结果新鲜度：--check + 判据（结果陈旧即红）

@@ -65,12 +65,15 @@
       "how": "反例必须带可复算证人（file + case），给 root 时还核对文件真在场",
       "kill_module": "desktop.tests.test_cognition_workspace",
       "kill_test": "test_counterexample_witness_file_must_exist"
-    }
-  ],
-  "missing": [
+    },
     {
       "layer": "自省",
-      "why": "ADR 有 `falsifier` 但也无 `version_chain`（旧版验新版缺对象）"
+      "module": "desktop.tests.test_verifier_version",
+      "test": "test_committed_self_audit_is_fresh",
+      "how": "结论绑定产出它的验证器摘要（判定面脚本内容摘要），摘要陈旧即红",
+      "kill_module": "desktop.tests.test_verifier_version",
+      "kill_test": "test_digest_changes_when_a_judge_file_changes"
     }
-  ]
+  ],
+  "missing": []
 }

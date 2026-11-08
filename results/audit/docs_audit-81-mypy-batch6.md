@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:b703e2a5de0759dfb4676b4e9fc1f140b816af7b5b99e97e6cf08ba552d53beb
+  - protocol/code_metrics_baseline.json:e6a86eea58d6c512ef4a287ffe4b791987d6a7fdee405863718cc8938c4f5b01
 ---
+> 重审（2026-11-09）：自省层对象：验证器摘要（判定面脚本内容摘要）+ 探针 + 判据
+
 > 重审（2026-11-09）：资源层记账起点：证据判定附 cost_ms（只记耗时，不参与判定）
 
 > 重审（2026-11-09）：探针结果新鲜度：--check + 判据（结果陈旧即红）

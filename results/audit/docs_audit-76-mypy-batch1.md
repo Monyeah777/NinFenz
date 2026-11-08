@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/io_types.py:09296daf865db85bda582fb646cece708c51f97e190a9e91c0eecd07252475f7
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
   - desktop/src/core/knowledge.py:d0b678c0f1176ce6f16a33b6f6d42a16b663099b4346306fae1ea547305e316b
-  - protocol/code_metrics_baseline.json:b703e2a5de0759dfb4676b4e9fc1f140b816af7b5b99e97e6cf08ba552d53beb
+  - protocol/code_metrics_baseline.json:e6a86eea58d6c512ef4a287ffe4b791987d6a7fdee405863718cc8938c4f5b01
 ---
+> 重审（2026-11-09）：自省层对象：验证器摘要（判定面脚本内容摘要）+ 探针 + 判据
+
 > 重审（2026-11-09）：资源层记账起点：证据判定附 cost_ms（只记耗时，不参与判定）
 
 > 重审（2026-11-09）：探针结果新鲜度：--check + 判据（结果陈旧即红）
