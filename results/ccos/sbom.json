@@ -1,7 +1,7 @@
 {
-  "bytes": 11957821,
+  "bytes": 11958208,
   "count": 561,
-  "digest": "c5c13da01a72c78b78d9604447bfe1fb12c2d97ff3ad073eeacfd5a1fe814317",
+  "digest": "fbb1c02ffc9ea825392dcc690cb79e01f58ed072169c0197dae37567ccfc943e",
   "materials": [
     {
       "bytes": 102,
@@ -1881,7 +1881,7 @@
     {
       "bytes": 257,
       "path": "protocol/approvals/protocol__conformance_report.json",
-      "sha256": "2607bc56dd7d114b3c788f0d803faace92b873cf24d493ee846f4cd8cf1523c7"
+      "sha256": "c1459bd5bdf976e15f2b0621e874735b5281e7b3e60cd0c68526e0302d9d22b2"
     },
     {
       "bytes": 16375,
@@ -1924,9 +1924,9 @@
       "sha256": "c2402950e34e3ff9bd0f09171c8bee821bf0f57c33f32d0dbc4bb4b3e6157914"
     },
     {
-      "bytes": 359528,
+      "bytes": 359629,
       "path": "protocol/check12_weights.json",
-      "sha256": "f5f7599d1b773237323440588a90fe232cf1557d867bc09d62b7a7b60056042c"
+      "sha256": "0181c2e1e36026e419c01de8183246ace256ef5b3060a37d7a1d872a1b4d7be1"
     },
     {
       "bytes": 16170,
@@ -1936,7 +1936,7 @@
     {
       "bytes": 42086,
       "path": "protocol/code_metrics_baseline.json",
-      "sha256": "c56599cf154a72feabd24c1e1535a8d9a299fb917313054636fb3434ff70cdd2"
+      "sha256": "e19115e4c82c6d44a42d0c1e9bd7e4af3d87d06c04d45b89d1f82800e83c678d"
     },
     {
       "bytes": 87117,
@@ -2066,7 +2066,7 @@
     {
       "bytes": 27560,
       "path": "protocol/generated/receipt_chain.json",
-      "sha256": "5e6fd792fea0958a0ad62e88a4e7a61fb33fcb0ded53b65dab14fabeea7017db"
+      "sha256": "42b36c402fb786ebe765a44b3ab8c23ded6e4777dc2829f5885d269cb5d9f3e1"
     },
     {
       "bytes": 918,
@@ -2286,7 +2286,7 @@
     {
       "bytes": 79590,
       "path": "protocol/RECEIPTS.json",
-      "sha256": "63a6932f3063bea92bd22a0dc02d8571342839e551a8e92a4d2a566e492ad12d"
+      "sha256": "1ef9c845744924e8f903aac557a8fab5915f528d74c1419c94bd648f2be98bb9"
     },
     {
       "bytes": 7923,
@@ -2694,9 +2694,9 @@
       "sha256": "51732ee527c918a6ee2effe4236fb3702ceb474ebed4856ea6aa2ee0c059e5d2"
     },
     {
-      "bytes": 52050,
+      "bytes": 52336,
       "path": "scripts/release_conclusion.py",
-      "sha256": "9424712b382d431681f8d1e48fe06a362042166ee644d4af48067ce304f2f13f"
+      "sha256": "481528e0ad5b193ee28e5848e6bd7f39503476ec8daebcd281ef8e7ca32aa999"
     },
     {
       "bytes": 6211,
