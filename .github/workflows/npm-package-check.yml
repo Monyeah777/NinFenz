@@ -2,21 +2,17 @@ name: npm-package-check
 # npm 打包契约的 PR 面（2026-11-08 盲区收口）：
 # payload stage + verify-package 此前只在 npm-publish（v1.* tag / 手动 dispatch）时跑——
 # PR 改到 packaging/npm 或 site 数字时，要到发版才暴露（#209 删掉 README 体积口径行就是靠事后
-# 手工 stage 才发现的）。本 workflow 在相关 PR/主推送上跑「stage → verify」，
+# 手工 stage 才发现的）。本 workflow 在 PR/主推送/手动时跑「stage → verify → 冒烟 → pack → tarball」，
 # 并断言 stage 不产生**受跟踪文件**改动（即 README 体积行/站点数字与 payload 清单一致）。
 # 只读、无发布、不需要 secrets；与 npm-publish 的「payload 暂存 + 发布前自检」同口径。
+#
+# 触发面（2026-11-08 第二轮扩）：**不再按 paths 限制**。payload 是「运行时/协议树」，
+# 任何受跟踪文件改动都可能改变 tree_sha256 / 件数 / 体积，进而让 README 体积行与站点数字漂；
+# 只盯 packaging/npm|site 会漏掉普通 PR 引起的漂移。整条 job 实测 ~12 s，全 PR 跑得起。
 on:
   pull_request:
-    paths:
-      - 'packaging/npm/**'
-      - 'site/**'
-      - '.github/workflows/npm-package-check.yml'
   push:
     branches: [main]
-    paths:
-      - 'packaging/npm/**'
-      - 'site/**'
-      - '.github/workflows/npm-package-check.yml'
   workflow_dispatch:
 
 concurrency:
