@@ -98,7 +98,7 @@ AI による組立：
 | ライブラリ | `03_管线库/` · `04_模块库/` · `05_资产库/` |
 | コミュニティ | `community/README.md` · `community/模板制作指令包.md` |
 | AI | `docs/agent/AGENT_START.md` · `docs/agent/AI_ROUTING.md` · `docs/meta/DEEP_DIVE.md` |
-| ツール | `docs/mcp.md` · `docs/terminal.md` · `docs/layers.md` · `docs/release.md` · `scripts/nf.py` · `tui/nf.py` · `verify.sh` |
+| ツール | `docs/mcp.md` · `docs/terminal.md` · `docs/dsse.md` · `docs/layers.md` · `docs/release.md` · `scripts/nf.py` · `tui/nf.py` · `verify.sh` |
 | 接続面 | `integrations/README.md`（MCP / LSP / CLI / TUI / 図書館 / Skill / npm / Rust / .NET / A2A） |
 | 書庫 | `library/INDEX.md` · `docs/agent/ROUTES.md` |
 
