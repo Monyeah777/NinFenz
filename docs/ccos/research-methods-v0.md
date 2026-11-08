@@ -3,6 +3,11 @@
 > **状态**：已实装（2026-11-07）· `protocol/research_methods.json`（方法库）+
 > `core/cognition_plan.py`（计划器）+ `nf cognition --plan <主题>`
 
+## 相关文档
+
+- 领域方法包（八个域的动作与证据标准）：[method-packs-v0.md](method-packs-v0.md)
+- 双核同构判据矩阵（5 覆盖 / 4 缺失）：[isomorphism-matrix.md](isomorphism-matrix.md)
+
 ## 解决什么
 
 认知核此前只有两个门禁：行话术语表（`glossary`）与执行分档（`runbook/playbook`）。
