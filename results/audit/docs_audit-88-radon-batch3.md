@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:f07b761f94e3e04a2437bbe88b5d9e646f0a247d26c985486b287153bcae4570
-  - protocol/code_metrics_baseline.json:2275e0c4172bf800d7487b010c413b3c4576cd0a32fe39764f7ef478ea37e48b
+  - protocol/code_metrics_baseline.json:50a15431e9c5a97102edfa0caf7ea44a8ed79f0dd30490005b69b7a3929dbe59
 ---
+> 重审（2026-11-08）：task-35c：git status 收敛到 repo_face.untracked_paths
+
 > 重审（2026-11-08）：task-35 投影少算防护
 
 > 重审（2026-11-08）：verify_report 基准日 UTC 化修复

@@ -7181,16 +7181,8 @@ def _shell_baseline() -> str:
 
 def _untracked_files() -> list[str]:
     """git 追踪面之外的未跟踪文件（``?? `` 行）——投影按 git ls-files 生成，未跟踪会让它少算。"""
-    import subprocess  # nosec B404 - 只读 git status；argv 列表、无 shell
-    try:
-        proc = subprocess.run(["git", "status", "--porcelain"], cwd=ROOT,
-                              capture_output=True, text=True, encoding="utf-8",
-                              errors="replace", timeout=60)
-    except (OSError, subprocess.SubprocessError):  # git 不在/失败 ⇒ 当没有未跟踪文件（不阻断写盘）
-        return []
-    if proc.returncode != 0:
-        return []
-    return [ln[3:] for ln in proc.stdout.splitlines() if ln.startswith("?? ")]
+    from core import repo_face
+    return repo_face.untracked_paths(ROOT)
 
 
 def _cmd_layers(args) -> int:

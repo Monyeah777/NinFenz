@@ -50,6 +50,16 @@ def _git_paths(root: str, args: tuple[str, ...]) -> list[str]:
     return proc.stdout.decode("utf-8", "replace").split("\0")
 
 
+def untracked_paths(root: str) -> list[str]:
+    """git 追踪面之外的未跟踪文件（posix 相对路径；``git status --porcelain -z`` 的 ``?? `` 项）。
+
+    用途：投影（role_coordinates 等）按 ``git ls-files`` 追踪面生成，未跟踪文件会被少算；
+    调用方据此 warn「先 git add 再重跑」。git 不在场 / 调用失败 / 非 git 检出 → 空列表。
+    """
+    return [raw[3:] for raw in _git_paths(root, ("status", "--porcelain", "-z"))
+            if raw.startswith("?? ")]
+
+
 def ignored_paths(root: str) -> Set[str]:
     """根下**被 `.gitignore` 覆盖**的路径集（posix 相对、已去尾斜杠；目录覆盖其下全部）。
 
