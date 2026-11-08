@@ -7,10 +7,12 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - scripts/nf.py:1164d7be98286a3849a70cc878f95e046b0cbe23ad0121655d99789c4de3c8d8
+  - scripts/nf.py:c0e0f0ccc8bfc7a8ff311d8c5e52281b5ad89dd629a30e141d0a7b59e41dc4e4
   - docs/combos.md:4d25fe6d366687213df7090badd52b815bdf07f774df856e598d7cf8a1d130de
 
 ---
+> 重审（2026-11-08）：task-35：nf.py 注释修正（nosec/理由）
+
 > 重审（2026-11-08）：task-35 投影少算防护
 
 > 重审（2026-11-07）：合并基线补齐：向量生成器 subject 字段 + 脚本原子写/stdio + 命令树拆组
