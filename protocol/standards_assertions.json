@@ -612,6 +612,42 @@
           "symbol": "render_client_config"
         }
       ]
+    },
+    {
+      "id": "intoto-statement-v1-receipt-binding",
+      "standard": "in-toto",
+      "assertion": "NF 从协议层回执确定性派生 in-toto Statement v1：Statement 类型与 HTTPS predicateType、subject 顺序/名称/SHA-256 digest、predicate count/root/algorithm/scope 均与回执同源；subject 漂移、摘要、类型或 predicate 元数据不一致均 fail-closed。",
+      "tests": [
+        "desktop/tests/test_interop_export.py::InteropExportTest.test_intoto_statement_shape",
+        "desktop/tests/test_interop_export.py::InteropExportTest.test_intoto_statement_is_exactly_bound_to_receipts",
+        "desktop/tests/test_interop_export.py::InteropExportTest.test_render_is_byte_deterministic"
+      ],
+      "negative_tests": [
+        "desktop/tests/test_interop_export.py::InteropExportTest.test_intoto_checker_catches_header_subject_and_predicate_drift",
+        "desktop/tests/test_interop_export.py::InteropExportTest.test_mutation_bad_digest_captured"
+      ],
+      "checks": [
+        "check33"
+      ],
+      "assertion_ids": [],
+      "evidence": [
+        "desktop/src/core/interop_export.py",
+        "desktop/tests/test_interop_export.py",
+        "results/interop/intoto.json",
+        "engine/dotnet/src/Nf.Engine/Interop.cs",
+        "engine/dotnet/probes/interop_probe.py",
+        "docs/interop.md"
+      ],
+      "consumers": [
+        {
+          "path": "scripts/nf.py",
+          "symbol": "_cmd_interop"
+        },
+        {
+          "path": "engine/dotnet/tools/nf-dotnet/Program.cs",
+          "contains": "InteropCommand"
+        }
+      ]
     }
   ]
 }

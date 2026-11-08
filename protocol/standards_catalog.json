@@ -5924,7 +5924,7 @@
       "id": "in-toto",
       "body": "OpenSSF/CNCF",
       "title": "in-toto 供应链证明",
-      "url": "https://github.com/in-toto/attestation/blob/main/spec/README.md",
+      "url": "https://github.com/in-toto/attestation/blob/main/spec/v1/statement.md",
       "ext_points": [
         "predicate-type",
         "statement-subject"
@@ -5936,9 +5936,9 @@
       "evidence": {
         "reachable": true,
         "http_status": 200,
-        "title": "attestation/spec/README.md at main · in-toto/attestation · GitHub",
-        "sha256_sample": "f2116f587012a9c6a9ec52394e4ad7d3f068b3519bb60f99ccf11582d0b8f831",
-        "probe_date": "2026-09-24",
+        "title": "attestation/spec/v1/statement.md at main · in-toto/attestation · GitHub",
+        "sha256_sample": "f1dfd75ff6bfa7005ba4065eed106f077b95feacf921da63dbb3988f003a7095",
+        "probe_date": "2026-11-08",
         "probe_method": "本机 GET（32KB 取样 / 单条超时 20s）",
         "error": ""
       }

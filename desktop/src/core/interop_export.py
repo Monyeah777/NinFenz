@@ -863,7 +863,7 @@ def _check_asyncapi(aa: dict, reg: dict, ext: dict, issues: List[str]) -> None:
 
 
 def _check_intoto(st: dict, rec: dict, issues: List[str]) -> None:
-    """in-toto 派生面：subject 与回执一致、digest 合规、Statement 类型头在位。"""
+    """in-toto 派生面：Statement 头、subject/digest 与 predicate 均与回执同源。"""
     want_subjects = {str(e.get("path")) for e in (_arr(rec.get("entries")))}
     got_subjects = {s.get("name") for s in _arr(st.get("subject"))}
     if got_subjects != want_subjects:
@@ -877,6 +877,19 @@ def _check_intoto(st: dict, rec: dict, issues: List[str]) -> None:
                           "（修复指引：回执 digest 须 64 位小写十六进制）" % s.get("name"))
     if st.get("_type") != "https://in-toto.io/Statement/v1":
         issues.append("in-toto Statement 类型头不合法（修复指引：_type 须为 Statement/v1）")
+    predicate_type = str(st.get("predicateType") or "")
+    if not re.fullmatch(r"https://[^\s]+", predicate_type):
+        issues.append("in-toto predicateType 须为 HTTPS URI")
+    predicate = st.get("predicate")
+    if not isinstance(predicate, dict):
+        issues.append("in-toto predicate 必须是对象")
+        return
+    if predicate.get("count") != len(_arr(st.get("subject"))):
+        issues.append("in-toto predicate.count 与 subject 数不一致")
+    if predicate.get("root") != rec.get("root"):
+        issues.append("in-toto predicate.root 与协议层回执不一致")
+    if predicate.get("algorithm") != rec.get("algorithm"):
+        issues.append("in-toto predicate.algorithm 与协议层回执不一致")
 
 
 def _check_sbom(sb: dict, issues: List[str]) -> None:
