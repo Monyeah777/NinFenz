@@ -245,5 +245,19 @@ class ProtocolSelfCountTest(unittest.TestCase):
         self.assertIn("a.json:count=2", bad[0])
 
 
+#: npm README 的「体积口径行」：**故意钉数字**，由 packaging/npm/tools/stage-payload.mjs 在
+#: stage 时自动同步（SIZE_RE 匹配即改写），verify-package.mjs 在发布前判存在；漂移由生成器兜住。
+#: 该行是发布面契约，不是「活文档钉运行时计数」——删掉会让 npm 发布/打包自检报红（2026-11-08 踩过）。
+NPM_VOLUME_RE = re.compile(r"当前体积：\*\*\d+ 件 · 解包 [\d.]+ MB\*\*")
+
+
+class NpmReadmeVolumeLineTest(unittest.TestCase):
+    def test_volume_line_present(self):
+        text = (ROOT / "packaging" / "npm" / "README.md").read_text(encoding="utf-8")
+        self.assertRegex(text, NPM_VOLUME_RE,
+                         "packaging/npm/README.md 缺体积口径行（stage-payload 会 WARN、"
+                         "verify-package 判红；补回「当前体积：**N 件 · 解包 X MB**」）")
+
+
 if __name__ == "__main__":
     unittest.main()

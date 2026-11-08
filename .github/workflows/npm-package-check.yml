@@ -1,0 +1,69 @@
+name: npm-package-check
+# npm 打包契约的 PR 面（2026-11-08 盲区收口）：
+# payload stage + verify-package 此前只在 npm-publish（v1.* tag / 手动 dispatch）时跑——
+# PR 改到 packaging/npm 或 site 数字时，要到发版才暴露（#209 删掉 README 体积口径行就是靠事后
+# 手工 stage 才发现的）。本 workflow 在 PR/主推送/手动时跑「stage → verify → 冒烟 → pack → tarball」，
+# 并断言 stage 不产生**受跟踪文件**改动（即 README 体积行/站点数字与 payload 清单一致）。
+# 只读、无发布、不需要 secrets；与 npm-publish 的「payload 暂存 + 发布前自检」同口径。
+#
+# 触发面（2026-11-08 第二轮扩）：**不再按 paths 限制**。payload 是「运行时/协议树」，
+# 任何受跟踪文件改动都可能改变 tree_sha256 / 件数 / 体积，进而让 README 体积行与站点数字漂；
+# 只盯 packaging/npm|site 会漏掉普通 PR 引起的漂移。整条 job 实测 ~12 s，全 PR 跑得起。
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  npm-package-check:
+    name: npm-package-check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          persist-credentials: false
+      - name: 工具链就绪（node：runner 预装）
+        run: |
+          node --version
+          npm --version
+      - name: payload 暂存 + 发布前自检（与 npm-publish 同口径）
+        working-directory: packaging/npm
+        run: |
+          set -euo pipefail
+          npm run stage
+          npm run verify
+      - name: 包内冒烟（node --test，与 npm-publish 同口径）
+        working-directory: packaging/npm
+        run: node --test test/smoke.test.mjs
+      - name: 打包干跑 + tarball 与清单逐字节核对（A3 最后一跳）
+        working-directory: packaging/npm
+        run: |
+          set -euo pipefail
+          npm pack --dry-run
+          node tools/verify-tarball.mjs
+      - name: 站点数字 ↔ payload 清单对账（sync-numbers --check 口径）
+        # stage 只同步 packaging README；site/** 的 npm 件数/体积由 sync-numbers.mjs 与
+        # payload 清单对账（CI 此前没有 payload → 该对账被跳过）。本步在 payload 在场时真跑。
+        run: node site/tools/sync-numbers.mjs
+      - name: stage 后工作树必须无受跟踪改动（数字/清单与生成器一致）
+        run: |
+          set -euo pipefail
+          if ! git diff --quiet; then
+            echo "::error::stage 改动了受跟踪文件（README 体积行/站点数字与 payload 清单不一致）"
+            git diff --stat
+            echo "::error::修复：本地 cd packaging/npm && npm run stage，复核后提交改动"
+            exit 1
+          fi
+          echo "工作树干净：stage 未改动受跟踪文件"
+      - name: 冒烟（CLI --version 可执行）
+        working-directory: packaging/npm
+        run: node bin/nf.mjs --version

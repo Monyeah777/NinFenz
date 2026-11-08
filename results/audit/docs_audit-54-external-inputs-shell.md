@@ -6,11 +6,13 @@ scope: 机制借鉴类外部输入的筛选与逐条仓内实证（STRATEGY §3.
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - CONTRIBUTING.md:36d2f8e435f09ceaf0e36e19334ccbab998976ca30f39898241f39024206190d
+  - CONTRIBUTING.md:4d19e5deea7151e49e5048fb27e6d20ebfdaeb0775dca1e34688a4d5441bb27c
   - skills/ninfenz/SKILL.md:5ef5858a08e6fd76a7cdee201938e0140e05257a7759a3ab27c05f9339109197
   - library/INDEX.md:ac0bcadbfd9019931e8e8a2f2739dd6603c73fe5b32950b8c80a2eb007c5761b
 
 ---
+> 重审（2026-11-08）：CONTRIBUTING 补打包面纪律
+
 > 重审（2026-11-08）：task-35 投影少算防护
 
 > 重审（2026-10-24）：2026-10-24 投稿写面收口：Gitee 改为作者白名单，加入日配额与跨平台空目录占位，重绑投影响应文件

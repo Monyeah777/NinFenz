@@ -8,10 +8,12 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
-  - protocol/code_metrics_baseline.json:27a045888ea0fa50e25f7fcaa9571041c6efc16672e4c54e10dc09732893ad1d
+  - protocol/code_metrics_baseline.json:f556db58e3555cdff57689a9daa1cc0355658ea8d23aefe73ed3c350cbdc0be1
 ---
-> 重审（2026-11-08）：DSSE v1 代码规模/耦合基线最终重冻后重审：仅吸收新模块与薄 CLI 适配器行数，不改变行为判据。
+> 重审（2026-11-08）：DSSE v1 合并最新 main 后重审：保留主干与 DSSE 变更，按合并后字节重绑。
 
+> 重审（2026-11-08）：payload 未暂存 warn
+> 重审（2026-11-08）：DSSE v1 代码规模/耦合基线最终重冻后重审：仅吸收新模块与薄 CLI 适配器行数，不改变行为判据。
 > 重审（2026-11-08）：DSSE v1 签名信封新增后重审：PAE、双 Base64 字母表、HMAC 多签名、阈值与篡改负例进入常驻判据；Python/.NET 交叉验签接入 CI。
 
 > 重审（2026-11-08）：活树模式 ENOSPC 前置检查
