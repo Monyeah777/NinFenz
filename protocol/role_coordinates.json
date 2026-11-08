@@ -6,7 +6,7 @@
     "prod": 1056,
     "projection": 156,
     "support": 428,
-    "verify": 1023
+    "verify": 1024
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8411,6 +8411,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "判据的时钟纯度：测试里读「此刻」必须登记理由（防跨日假红）。",
+      "path": "desktop/tests/test_judge_clock_purity.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "**指认判据必须在场**：代码与文档里点名 `test_x.py` / `test_x.test_y` 时，被判据要真的存在。",
       "path": "desktop/tests/test_judge_references.py",
       "role": "verify",
@@ -12516,7 +12522,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "2ccc4f01299f9bece8a9d11637b731b94006e604b6101aa8999fc68c82d8259c",
+  "root_digest": "f035dd883bfb3cce017aa2bcbb08c3075d86f8bec13eb7c796be91ccaadbc294",
   "rule_counts": {
     "R-app": 1459,
     "R-catch": 281,
@@ -12525,7 +12531,7 @@
     "R-prod": 944,
     "R-projection": 136,
     "R-support": 119,
-    "R-verify": 898,
+    "R-verify": 899,
     "auto:R-core": 285
   },
   "schema": "nf-role-coordinates/1"

@@ -182,6 +182,7 @@
     "test_jcs_spec_gap": 0.2,
     "test_job_ledger": 0.2,
     "test_json_shape_contracts": 0.9,
+    "test_judge_clock_purity": 0.3,
     "test_judge_references": 0.7,
     "test_judgement_coverage": 7.4,
     "test_key_naming": 0.3,
@@ -2286,6 +2287,9 @@
     "test_json_shape_contracts.JsonDocHelperTest.test_loads_tolerates_bom_and_rejects_bad_json": 0.0,
     "test_json_shape_contracts.UnguardedRatchetTest.test_scanner_catches_a_mutation": 0.0,
     "test_json_shape_contracts.UnguardedRatchetTest.test_unguarded_sites_do_not_grow": 0.7,
+    "test_judge_clock_purity.JudgeClockPurityTest.test_allowlist_has_no_stale_entries": 0.06,
+    "test_judge_clock_purity.JudgeClockPurityTest.test_allowlist_reasons_are_specific": 0.0,
+    "test_judge_clock_purity.JudgeClockPurityTest.test_every_clock_reader_is_registered": 0.06,
     "test_judge_references.JudgeReferenceTest.test_code_side_judge_references_resolve": 0.17,
     "test_judge_references.JudgeReferenceTest.test_doc_side_judge_references_resolve": 0.35,
     "test_judge_references.JudgeReferenceTest.test_exemptions_are_not_stale": 0.04,
@@ -4486,5 +4490,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1769.0
+  "total_s": 1769.3
 }
