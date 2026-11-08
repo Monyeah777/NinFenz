@@ -654,6 +654,17 @@ def main(argv=None) -> int:
         print(f"  [WARN] 脏树放行（{len(dirty)} 处变更）——结果可能含中间态假红",
               file=sys.stderr)
 
+    # 活树模式同样要防 ENOSPC：分片把临时件写在仓库同盘；剩几百 MB 时跑到一半才 ENOSPC，
+    # 白花 30–50 分钟（2026-11-06 实测：84 MB 剩余）。快照模式由 _snapshot_create 检查。
+    live_space = snapshot_space_issue(_snapshot_free_bytes(ROOT), 800)
+    if live_space:
+        payload = {"schema": "nf-release-conclusion/1", "ok": False,
+                   "note": "活树模式空间不足，先清理再跑：" + live_space,
+                   "head": head, "wall": 0.0}
+        print(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True)
+              if args.json else f"  ✗ {live_space}")
+        return 4
+
     t0 = time.perf_counter()
     if not args.json:
         print("[1/5] 供应链核对（站点数字 + 根投影）…", flush=True)
