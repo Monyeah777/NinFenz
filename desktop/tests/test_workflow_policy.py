@@ -122,8 +122,11 @@ class CiReferenceReachabilityTest(unittest.TestCase):
         return [(p.name, p) for p in wfs] + [("verify.sh", ROOT / "verify.sh")]
 
     def _nf_subcommands(self) -> set:
-        src = (ROOT / "scripts" / "nf.py").read_text(encoding="utf-8")
-        return set(re.findall(r'add_parser\(\s*"([a-z0-9-]+)"', src))
+        known = set()
+        for name in ("nf.py", "nf_dsse.py"):
+            src = (ROOT / "scripts" / name).read_text(encoding="utf-8")
+            known.update(re.findall(r'add_parser\(\s*"([a-z0-9-]+)"', src))
+        return known
 
     def test_referenced_paths_exist(self):
         missing = []

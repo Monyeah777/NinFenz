@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/json_schema.py:f3a4a6a14de5104e217af8b154505f9ca46fd6133081188209add78143e2b23e
-  - protocol/code_metrics_baseline.json:6b12ffef4199dfa9d4c26c48eb96d6fee0ee211cbc56cc5be78d68a9c3854147
+  - protocol/code_metrics_baseline.json:d32838535b68fd97e90bfdca30b5b49a4f369f8b3fc703847407ea1067f0299d
 ---
+> 重审（2026-11-08）：DSSE workflow command-face and algorithm result closure
+
 > 重审（2026-11-08）：session watch nested release root fix
 
 > 重审（2026-11-08）：DSSE v1 CI closure: docs reachability, stdio pinning, weights

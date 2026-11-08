@@ -84,6 +84,7 @@ def run(args) -> int:
             atomic_write.write_bytes(args.out, verified.payload)
         result = {
             "kind": "dsse-verify", "schema": "dsse-envelope/1", "ok": True,
+            "algorithm": dsse.HMAC_SHA256,
             "payloadType": verified.payload_type,
             "accepted_keyids": list(verified.accepted_keyids),
             "threshold": args.threshold,
