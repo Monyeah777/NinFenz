@@ -132,6 +132,26 @@ python -m unittest desktop.tests.test_release_conclusion    # 62 项全绿
 python scripts/release_conclusion.py
 ```
 
+## 绿结论台账（发布结论的取证记录）
+
+每次 `--snapshot` 的绿结论绑定一个 SHA 与一次墙钟；下表只记「8 片 rc=0 + `checks_only_rc=0` + `head_moved=false`」的结论，
+来自本地 `gate-close*.log`（不入库）。
+
+| 序 | HEAD | 墙钟 |
+|---|---|---|
+| 1 | `8330a373` | 2870 s |
+| 2 | `34f657c5` | 2804 s |
+| 3 | `a5c99710` | 2658 s |
+| 4 | `228253c2` | 2918 s |
+| 5 | `89f499a2` | 2755 s |
+| 6 | `7bca052e` | 3051 s |
+| 7 | `654ad9bc` | 3894 s |
+| 8 | `6fd9e3ce` | 3215 s |
+| 9 | `cd0ac722` | 3656 s |
+
+红结论同样有记录（例如 `3bffa75f` 两片红：文档计数漂移 + 生成物被误判为死链；`e39ae062` 五处横向门禁失配）——
+红不是失败，是判据在干活。
+
 ## 边界
 
 - **分区 ≠ 并发**：`--shards` 决定切几片（每片独立进程），`--jobs` 决定同时几片。发布结论用缺省。
