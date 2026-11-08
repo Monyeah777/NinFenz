@@ -59,13 +59,13 @@ jobs:
         if: always()
         run: |
           set +e
-          python -m bandit -r tui packaging -f json -o .sast-extra-bandit.json
-          python -m ruff check --select S tui packaging --output-format json > .sast-extra-ruff.json
+          python -m bandit -r tui packaging -f json -o sast-extra-bandit.json
+          python -m ruff check --select S tui packaging --output-format json > sast-extra-ruff.json
           python - <<'PY'
           import json
           import pathlib
           for name in ("bandit", "ruff"):
-              p = pathlib.Path(".sast-extra-%s.json" % name)
+              p = pathlib.Path("sast-extra-%s.json" % name)
               if not p.is_file():
                   continue
               try:
@@ -87,6 +87,6 @@ jobs:
             .artifacts/
             *.log
             .sast-counts.json
-            .sast-extra-bandit.json
-            .sast-extra-ruff.json
+            sast-extra-bandit.json
+            sast-extra-ruff.json
           if-no-files-found: ignore
