@@ -126,8 +126,11 @@ class ResponseCacheTest(unittest.TestCase):
             if not ok:
                 self.skipTest("本机装不上监听（平台不支持）")
             sw.release()
+            from core import conformance_scan as csc
             self.assertIs(dm._WATCHER, outer,
                           "嵌套会话收尾必须恢复外层监听（不得拆掉守护的）")
+            self.assertFalse(csc.resident_active(),
+                             "嵌套会话收尾必须先清掉临时常驻层")
         finally:
             while sw._STACK:
                 sw.release()

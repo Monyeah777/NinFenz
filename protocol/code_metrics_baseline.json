@@ -1196,9 +1196,9 @@
       "max_fn_lines": 25
     },
     "desktop/src/core/session_watch.py": {
-      "lines": 143,
+      "lines": 149,
       "max_fn_cc": 4,
-      "max_fn_lines": 26
+      "max_fn_lines": 32
     },
     "desktop/src/core/shell_ledger.py": {
       "lines": 120,

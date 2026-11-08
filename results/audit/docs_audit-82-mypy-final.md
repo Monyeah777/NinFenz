@@ -30,8 +30,10 @@ subjects:
   - desktop/src/core/daemon.py:75940f32b3068a5bc7a83b288bb9302e76a948eca0baa76e1e62f02243c8b498
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:c569853af5400d2aa94cf04ffadaa8907a91062d14ba91544fefa49fdcc2bc20
+  - protocol/code_metrics_baseline.json:8eca62b3f1f7f1157638a1fd27f01aeac922c5fe20bfd7e0c6f4f37b34eb6534
 ---
+> 重审（2026-11-08）：session watch nested release root fix
+
 > 重审（2026-11-08）：SLSA Source Track 合并最新 main 后重审：实时控制快照、Source Level 0 诚实声明与 CI 接线按合并后字节重绑。
 
 > 重审（2026-11-08）：payload 未暂存 warn

@@ -14,8 +14,10 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:83a75a4fac82461d56b03147eff04b420b8aad0ed6db9fef6e695717dcf7b6a2
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:c569853af5400d2aa94cf04ffadaa8907a91062d14ba91544fefa49fdcc2bc20
+  - protocol/code_metrics_baseline.json:8eca62b3f1f7f1157638a1fd27f01aeac922c5fe20bfd7e0c6f4f37b34eb6534
 ---
+> 重审（2026-11-08）：session watch nested release root fix
+
 > 重审（2026-11-08）：SLSA Source Track 合并最新 main 后重审：实时控制快照、Source Level 0 诚实声明与 CI 接线按合并后字节重绑。
 
 > 重审（2026-11-08）：payload 未暂存 warn
