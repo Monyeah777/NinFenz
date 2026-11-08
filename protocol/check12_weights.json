@@ -65,7 +65,7 @@
     "test_code_metrics": 1.2,
     "test_cog_cli_faces": 16.3,
     "test_cognition": 0.2,
-    "test_cognition_bridge": 2.2,
+    "test_cognition_bridge": 2.0,
     "test_cognition_claims": 1.6,
     "test_cognition_control": 1.8,
     "test_cognition_plan": 1.0,
@@ -1035,6 +1035,7 @@
     "test_cognition.TestNegatives.test_term_absent_from_source_is_fail": 0.01,
     "test_cognition.TestNegatives.test_term_absent_from_used_in_is_fail": 0.0,
     "test_cognition.TestRealRepo.test_scan_clean": 0.01,
+    "test_cognition_bridge.BridgeWireFormatTest.test_bridge_exposes_only_two_envelopes": 0.0,
     "test_cognition_bridge.BridgeWireFormatTest.test_cc_result_from_verify_never_fabricates_timestamp": 0.0,
     "test_cognition_bridge.BridgeWireFormatTest.test_commitment_binds_timestamp_reference": 0.0,
     "test_cognition_bridge.BridgeWireFormatTest.test_commitment_field_set_is_frozen": 0.0,
@@ -1043,7 +1044,7 @@
     "test_cognition_bridge.ChainTest.test_append_and_replay_chain": 0.0,
     "test_cognition_bridge.ChainTest.test_append_rejects_broken_prev": 0.0,
     "test_cognition_bridge.ChainTest.test_chain_detects_tamper": 0.0,
-    "test_cognition_bridge.CliTest.test_bridge_round_trip": 2.03,
+    "test_cognition_bridge.CliTest.test_bridge_round_trip": 1.88,
     "test_cognition_bridge.ClosedLoopTest.test_fail_then_revise_then_pass": 0.0,
     "test_cognition_bridge.CommitmentTest.test_claim_without_digest_rejected": 0.0,
     "test_cognition_bridge.CommitmentTest.test_commitment_binds_three_digests": 0.0,
@@ -4478,5 +4479,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1600.1
+  "total_s": 1599.9
 }

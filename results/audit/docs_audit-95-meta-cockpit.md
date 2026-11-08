@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:952471bb69cdbaf18ebcc11c4b925fe021bcae57e368be75b8baea8a054db4fe
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:7316c3d096271a78abdde4b737b4568697009bcf99546658bdfe970a9fd5c263
+  - protocol/check12_weights.json:c90adbd2b4640ae22c1a6b5b84c7fdb121e4b072832f97e117cff3a30be3975d
   - protocol/coupling_baseline.json:49bc59e10c4d3fdcf966709392e4a7f8511a2432a69eb5d496e74d643fa42960
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-08）：反模式守卫：桥只允许两类信封
+
 > 重审（2026-11-08）：同构矩阵：缺失理由必须点名具体对象（新判据）
 
 > 重审（2026-11-08）：九双生层同构矩阵（覆盖项必须有真实测试）

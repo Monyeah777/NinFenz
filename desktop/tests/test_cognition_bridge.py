@@ -224,6 +224,21 @@ class BridgeWireFormatTest(unittest.TestCase):
         # 用会话 API 建合法 bundle（discourse schema 由它保证）
         return se.begin("线格式守卫")
 
+
+    def test_bridge_exposes_only_two_envelopes(self):
+        """反模式守卫：桥只允许两类信封（commitment / obligation）。
+
+        设计纪律「桥不许加第六类消息，每加一类耦合面翻倍」——把它落成可红判据：
+        扫 `bridge.py` 源码里的 schema 字面量，只允许 `nf-bridge-commitment/1` 与
+        `nf-bridge-obligation/1`。新增第三类信封 → 本判据红，必须先显式评审。
+        """
+        import re
+        from pathlib import Path
+        src = Path(br.__file__).read_text(encoding="utf-8")
+        found = {m.strip(chr(34)) for m in re.findall(r'"nf-bridge-[a-z-]+/\d+"', src)}
+        self.assertEqual({"nf-bridge-commitment/1", "nf-bridge-obligation/1"}, found,
+                         f"桥的信封类型变了：{sorted(found)}（加通道要显式评审）")
+
     def test_commitment_field_set_is_frozen(self):
         claim = {"schema": "nf-cog-claim/1", "claim": "x", "digest": "b" * 64,
                  "obligations": [], "criteria": []}
