@@ -856,7 +856,7 @@
       "max_fn_lines": 7
     },
     "desktop/src/core/output_forms.py": {
-      "lines": 1503,
+      "lines": 1508,
       "max_fn_cc": 29,
       "max_fn_lines": 71
     },
@@ -1136,8 +1136,8 @@
       "max_fn_lines": 56
     },
     "desktop/src/core/role_model.py": {
-      "lines": 461,
-      "max_fn_cc": 19,
+      "lines": 478,
+      "max_fn_cc": 17,
       "max_fn_lines": 35
     },
     "desktop/src/core/round_drill.py": {

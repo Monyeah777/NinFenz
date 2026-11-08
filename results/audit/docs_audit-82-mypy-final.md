@@ -13,7 +13,7 @@ subjects:
   - desktop/src/core/market_analyzer.py:eb5edffc55470b5f4aa8e6151ab7bffded36a45ce3ecc69fcdc54de59071cbdf
   - desktop/src/core/protocol_golden.py:b37b80ee8691fd76ed2df41f5006285c92914449bdfd6a2210164c7bc1f3e353
   - desktop/src/core/knowledge_sig.py:06409878244907e1135846a71aae76e5d66303534a7e611b8870a1edd307c35e
-  - desktop/src/core/output_forms.py:3688d30b158493f56801ef84f6f0e60eff2cc670c7ebcf750ffd403599d1b68a
+  - desktop/src/core/output_forms.py:247645942b14dfac6642cf11bf66453ef12acb5f7fc4363d306dd860fe17bdf5
   - desktop/src/core/pipeline_loader.py:0efbfa0c0e0f8ae5817a79aed429da24504632a97679727ae9d947bf59dc7104
   - desktop/src/core/community_inventory.py:939924e6f37e0d17143d3e15c196882bd40fb98ddd22fb83479200487f3137f0
   - desktop/src/core/retriever.py:97409e06af9b66d2b30bfde8a660d90b661c008bfe002b0b0712b824c7f6c9c4
@@ -30,8 +30,10 @@ subjects:
   - desktop/src/core/daemon.py:75940f32b3068a5bc7a83b288bb9302e76a948eca0baa76e1e62f02243c8b498
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:4f32330e2a00ed7f90163e6879c5c177e429ac1c6d49fe675c83299c63fbef62
+  - protocol/code_metrics_baseline.json:0b1ed1aefe39a7ac0367d229789b6caa52d2ed5ee7fd9c1925ca194639c386fa
 ---
+> 重审（2026-11-09）：CodeQL 两处告警修复（ReDoS/URL 子串）
+
 > 重审（2026-11-09）：session-persist 预算 Windows 放宽
 
 > 重审（2026-11-08）：payload 未暂存 warn
