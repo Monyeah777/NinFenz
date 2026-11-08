@@ -88,6 +88,7 @@ def live_docs() -> list:
                 or (rel.startswith("scripts/") and rel.endswith(".sh"))
                 or (rel.startswith("scripts/") and "." not in Path(rel).name)
                 or (rel.startswith(".github/workflows/") and rel.endswith(".yml"))
+                or (rel.endswith(".md") and rel.startswith(("engine/", "packaging/", "tools/")))
                 or rel.startswith("skills/")):
             out.append(rel)
     return out
