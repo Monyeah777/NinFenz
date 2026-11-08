@@ -45,8 +45,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 
-ENTRY_DOCS = ("README.md", "README.en.md", "CONTRIBUTING.md", "docs/agent/AGENT_START.md", "docs/ag"
-    "ent/AI_ROUTING.md",
+ENTRY_DOCS = ("README.md", "README.en.md", "CONTRIBUTING.md", "AGENTS.md", "STRATEGY.md",
+              "docs/agent/AGENT_START.md", "docs/agent/AI_ROUTING.md",
               "docs/meta/DEEP_DIVE.md",
  "docs/meta/ROADMAP.md",
  "SECURITY.md",
