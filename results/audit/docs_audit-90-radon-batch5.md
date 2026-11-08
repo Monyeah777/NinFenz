@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
-  - protocol/code_metrics_baseline.json:655d24f98cc40527e49a8124ed94245ab7759288647925b39e1ffe7ad62c1c5c
+  - protocol/code_metrics_baseline.json:270f595135aed18173c3729ca6667281ee5c37f245ba819dba668a862984fbf6
 ---
+> 重审（2026-11-08）：快照墙钟上限（--max-wall-s，超时判红留证）
+
 > 重审（2026-11-08）：Ingress 启动自检（四道闸探针，非空转判据）
 
 > 重审（2026-11-08）：锁拒绝的集成判据（退出码 2 + 指引）+ 锁目录 env 钩子

@@ -41,6 +41,8 @@ ROOT = Path(__file__).resolve().parent.parent
 #:   并发多片会在守护端口/临时目录/计时判据上互相干扰（实测 8 片并发有假红）。
 DEFAULT_SHARDS = 8
 DEFAULT_JOBS = 1
+#: 快照模式外层等内层的缺省墙钟上限（秒）：防内层挂死后外层无限等。
+DEFAULT_MAX_WALL_S = 5400.0
 GUIDE = "修复指引："
 
 def _core(name: str):
@@ -699,7 +701,8 @@ def _run_in_snapshot_body(args, head: str) -> int:
         quoted = " ".join(f'"{a}"' for a in inner)
         launcher = ['bash', '-c',
                     f'{quoted} > "{log_path}" 2>&1; echo "NFGATE_EXIT=$?"']
-        proc = _run(launcher, 7200, cwd=path, env=env)
+        wall_cap = float(getattr(args, "max_wall_s", DEFAULT_MAX_WALL_S) or DEFAULT_MAX_WALL_S)
+        proc = _run(launcher, wall_cap, cwd=path, env=env)
         out = _read_text(log_path)
         err_meta = proc.get("out") or ""
         inner_rc = None
@@ -719,7 +722,14 @@ def _run_in_snapshot_body(args, head: str) -> int:
         else:
             sys.stdout.write(out)
         if inner_rc is None:
-            return 3 if proc.get("code") is None else int(proc.get("code"))
+            if proc.get("code") is None:
+                # 墙钟上限到了：内层被回收。留证（日志路径 + 上限值），不假装「跑了但没结果」。
+                print("  ✗ 快照墙钟超限 " + str(int(wall_cap)) + " s：内层已回收；"
+                      "日志留在 " + log_path + "（" + GUIDE
+                      + "拆小 --shards 重跑，或确认机器无并发占用后加 --max-wall-s 放宽）",
+                      file=sys.stderr, flush=True)
+                return 3
+            return int(proc.get("code"))
         return inner_rc
     finally:
         if getattr(args, "keep_snapshot", False):
@@ -749,6 +759,8 @@ def main(argv=None) -> int:
     ap.add_argument("--dry-run", action="store_true", help="只打印计划，不执行")
     ap.add_argument("--only-preflight", action="store_true",
                     help="只跑前置面（脏树 / payload / 供应链），不跑 checks-only 与分片")
+    ap.add_argument("--max-wall-s", type=float, default=DEFAULT_MAX_WALL_S,
+                    help="快照模式外层等内层的墙钟上限（缺省 5400 s；超时判红并留证，防止挂死）")
     ap.add_argument("--lock-wait", type=float, default=0.0,
                     help="拿不到快照锁时最多等多少秒（缺省 0=立刻失败；>0 排队等）")
     ap.add_argument("--force-lock", action="store_true",

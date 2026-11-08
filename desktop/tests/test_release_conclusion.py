@@ -84,6 +84,19 @@ class TestPureLogic(unittest.TestCase):
             self.assertTrue(ok, why)
 
 
+
+    def test_max_wall_cap_is_declared_and_used(self):
+        """墙钟上限：常量 5400 s 且在 CLI/内层等待处都用到（防挂死无限等）。"""
+        gate = self.gate
+        self.assertEqual(5400.0, float(gate.DEFAULT_MAX_WALL_S))
+        src = SCRIPT.read_text(encoding="utf-8")
+        self.assertIn("--max-wall-s", src)
+        self.assertIn("wall_cap = float(getattr(args, \"max_wall_s\"", src)
+        self.assertIn("快照墙钟超限", src)
+        help_text = subprocess.run([str(sys.executable), str(SCRIPT), "--help"],
+                                   capture_output=True, text=True, encoding="utf-8",
+                                   errors="replace").stdout
+        self.assertIn("--max-wall-s", help_text)
     def test_locked_run_exits_2_with_guidance(self):
         """集成：锁被占用时 --snapshot 必须退出码 2 并给 pid/HEAD/指引（不静默继续）。"""
         import tempfile
