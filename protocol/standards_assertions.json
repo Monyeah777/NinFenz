@@ -499,6 +499,77 @@
           "contains": "int TelemetryCommand()"
         }
       ]
+    },
+    {
+      "id": "mcp-dual-era-stdio-profile",
+      "standard": "mcp",
+      "assertion": "NF MCP stdio 服务同时支持 modern 2026-07-28（server/discover + 请求级 _meta 版本）与 legacy 2025-11-25（initialize 握手）；版本声明只认规范命名空间键，不支持版本 fail-closed 为 -32022，工具/提示面保持只读。",
+      "tests": [
+        "desktop/tests/test_mcp_runtime.py::TestMcpRuntime.test_stdio_dual_era_end_to_end",
+        "desktop/tests/test_mcp_runtime.py::TestMcpRuntime.test_discover_modern_must",
+        "desktop/tests/test_mcp_runtime.py::VersionDeclarationKeyTest.test_only_the_namespaced_key_declares_a_version",
+        "desktop/tests/test_mcp_live_e2e.py::McpLiveFaceTest.test_tools_list_is_the_frozen_read_only_surface"
+      ],
+      "negative_tests": [
+        "desktop/tests/test_mcp_runtime.py::TestMcpRuntime.test_unsupported_version_request_error_32022",
+        "desktop/tests/test_mcp_live_e2e.py::McpLiveFaceTest.test_adversarial_frames_refused_without_leak_and_session_survives"
+      ],
+      "checks": [
+        "check33"
+      ],
+      "assertion_ids": [],
+      "evidence": [
+        "desktop/src/core/mcp_runtime.py",
+        "desktop/tests/test_mcp_runtime.py",
+        "desktop/tests/test_mcp_live_e2e.py",
+        "docs/mcp.md",
+        "engine/dotnet/src/Nf.Engine/McpServer.cs"
+      ],
+      "consumers": [
+        {
+          "path": "scripts/nf.py",
+          "symbol": "_cmd_serve"
+        },
+        {
+          "path": "engine/dotnet/tools/nf-dotnet/Program.cs",
+          "contains": "McpServer.ServeStdio"
+        }
+      ]
+    },
+    {
+      "id": "jsonrpc-20-stdio-envelope",
+      "standard": "jsonrpc",
+      "assertion": "MCP 与 LSP 共用 JSON-RPC 2.0 envelope：成功响应只含 jsonrpc/id/result，错误响应只含 jsonrpc/id/error；通知静默，标准方法/参数错误码一致，坏 JSON 为 -32700 且长驻会话继续。",
+      "tests": [
+        "desktop/tests/test_mcp_runtime.py::JsonRpcEnvelopeProfileTest.test_success_and_error_envelopes_have_only_standard_members",
+        "desktop/tests/test_mcp_runtime.py::JsonRpcEnvelopeProfileTest.test_standard_error_codes_and_notification_silence",
+        "desktop/tests/test_two_faces_jsonrpc.py::TwoFacesJsonRpcParityTest.test_unknown_request_is_method_not_found_on_both_faces"
+      ],
+      "negative_tests": [
+        "desktop/tests/test_mcp_runtime.py::TestMcpRuntime.test_serve_stdio_parse_error_recovered",
+        "desktop/tests/test_mcp_runtime.py::TestMcpRuntime.test_oversized_inbound_message_is_rejected_and_session_survives",
+        "desktop/tests/test_two_faces_jsonrpc.py::TwoFacesJsonRpcParityTest.test_harness_detects_a_violating_server"
+      ],
+      "checks": [
+        "check33"
+      ],
+      "assertion_ids": [],
+      "evidence": [
+        "desktop/src/core/mcp_runtime.py",
+        "desktop/src/core/lsp.py",
+        "desktop/tests/test_mcp_runtime.py",
+        "desktop/tests/test_two_faces_jsonrpc.py"
+      ],
+      "consumers": [
+        {
+          "path": "scripts/nf.py",
+          "symbol": "_cmd_serve"
+        },
+        {
+          "path": "scripts/nf.py",
+          "contains": "core.lsp"
+        }
+      ]
     }
   ]
 }

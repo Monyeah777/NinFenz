@@ -83,7 +83,7 @@
       "id": "mcp",
       "body": "Anthropic/MCP",
       "title": "Model Context Protocol",
-      "url": "https://modelcontextprotocol.io/specification/2025-06-18",
+      "url": "https://modelcontextprotocol.io/specification/2026-07-28",
       "ext_points": [
         "server-capability",
         "extension-method"
@@ -96,8 +96,8 @@
         "reachable": true,
         "http_status": 200,
         "title": "Specification - Model Context Protocol",
-        "sha256_sample": "401fd812a16bce2316e9959042651a83ee7c5c2f99637402b5511e58b8b19d53",
-        "probe_date": "2026-09-24",
+        "sha256_sample": "2865d6f28373166018eb6eb1f50fa723663e1e1f6f9d1839470e80b28a5681aa",
+        "probe_date": "2026-11-08",
         "probe_method": "本机 GET（32KB 取样 / 单条超时 20s）",
         "error": ""
       }

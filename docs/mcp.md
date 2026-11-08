@@ -1,5 +1,5 @@
 # NinFenz MCP 接入（`nf serve` · 40 总纲 v2.7 波A S1-E3 / X2）
-> 最后更新：2026-10-18
+> 最后更新：2026-11-08
 
 > **状态**：公开化文档已随基础层 v2.7 落地；**E3 协议级装载实测已于 2026-09-08 通过**（stdio JSON-RPC 帧序列直测五方法全绿，见文末记录；修复 P06 管线两缺口——缺闭合 ``` / 缺 techdoc 声明）。41 波C C7（2026-09-08）开放只读 tools/prompts（本机 stdio 冒烟通过，见 docs/41_波C_C7_实测记录.md）。**宿主类客户端（Claude Desktop 等 GUI 装载）仍建议用户侧补录**——README 对 MCP 的宣告维持现状（S13 门按 docs_external-validation-v2.7.md 规则开），回填后补「转正」。
 
@@ -98,6 +98,21 @@ stdio 服务随调用进程生命周期运行（`Ctrl+C` 结束）。也可用 `
 | 写路径工具（未实现） | ❌ | 未知工具 → `-32602`；未知方法 → `-32601`（只读安全层天然拒写） |
 
 标准错误码：`-32700` 解析错误 / `-32600` 非法请求 / `-32601` 方法不存在 / `-32602` 参数非法 / `-32603` 内部错误；版本协商错误 `-32022`（`data.supported` / `data.requested`）。
+
+## 标准证据面
+
+- `mcp`：声明范围为 **stdio transport + dual-era**，即 modern `2026-07-28`
+  （`server/discover`、每请求 `_meta` 版本）与 legacy `2025-11-25`
+  （`initialize` 握手）同时可服务；不支持版本必须回 `-32022`。
+- `jsonrpc`：请求/成功响应/错误响应遵守 JSON-RPC 2.0 envelope；通知无应答位，
+  本地方法与参数错误使用 `-32601` / `-32602`，内部异常使用 `-32603`，
+  非法 JSON 恢复为 `-32700` 且不终止会话。
+- 负例：非法 `jsonrpc` 版本、非结构化 `params`、未知方法、未知工具/uri、
+  非有限数、超限单帧和敌意输入均 fail-closed。
+- 可消费入口：Python `nf serve` 与 .NET `nf-dotnet serve`；只读工具/提示面和
+  Python↔.NET 行为由双实现对账面持续核验。
+
+该证据面不声明 streamable HTTP / SSE transport、GUI 宿主兼容或第三方 MCP 认证。
 
 ## E3 实测记录（2026-09-08 · 协议级装载实测通过）
 

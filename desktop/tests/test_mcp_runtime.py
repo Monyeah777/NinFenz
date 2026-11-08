@@ -711,6 +711,38 @@ class VersionDeclarationKeyTest(unittest.TestCase):
         self.assertNotIn("error", good)
 
 
+class JsonRpcEnvelopeProfileTest(unittest.TestCase):
+    def setUp(self):
+        self.srv = McpRuntime({"mcp": {"name": "jsonrpc-profile",
+                                       "version": "0", "resources": []}})
+
+    def test_success_and_error_envelopes_have_only_standard_members(self):
+        ok = self.srv.handle(_req("ok", "ping"))
+        self.assertEqual({"jsonrpc", "id", "result"}, set(ok))
+        self.assertEqual("2.0", ok["jsonrpc"])
+        self.assertEqual("ok", ok["id"])
+
+        missing = self.srv.handle(_req(2, "no/such"))
+        self.assertEqual({"jsonrpc", "id", "error"}, set(missing))
+        self.assertEqual({"code", "message"}, set(missing["error"]))
+        self.assertEqual(-32601, missing["error"]["code"])
+
+    def test_standard_error_codes_and_notification_silence(self):
+        cases = [
+            ({"jsonrpc": "1.0", "id": 3, "method": "ping"}, -32600),
+            (_req(4, "no/such"), -32601),
+            (_req(5, "ping", [1]), -32602),
+        ]
+        for request, code in cases:
+            with self.subTest(code=code):
+                reply = self.srv.handle(request)
+                self.assertEqual(code, reply["error"]["code"])
+                self.assertEqual("2.0", reply["jsonrpc"])
+                self.assertIn("id", reply)
+        self.assertIsNone(self.srv.handle(
+            {"jsonrpc": "2.0", "method": "notifications/initialized"}))
+
+
 class PromptGetInteropTest(unittest.TestCase):
     """`prompts/get` 必须接受**协议自带的空 `arguments`**（否则一部分客户端取不到模板）。
 
