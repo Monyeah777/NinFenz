@@ -1,0 +1,60 @@
+name: npm-package-check
+# npm 打包契约的 PR 面（2026-11-08 盲区收口）：
+# payload stage + verify-package 此前只在 npm-publish（v1.* tag / 手动 dispatch）时跑——
+# PR 改到 packaging/npm 或 site 数字时，要到发版才暴露（#209 删掉 README 体积口径行就是靠事后
+# 手工 stage 才发现的）。本 workflow 在相关 PR/主推送上跑「stage → verify」，
+# 并断言 stage 不产生**受跟踪文件**改动（即 README 体积行/站点数字与 payload 清单一致）。
+# 只读、无发布、不需要 secrets；与 npm-publish 的「payload 暂存 + 发布前自检」同口径。
+on:
+  pull_request:
+    paths:
+      - 'packaging/npm/**'
+      - 'site/**'
+      - '.github/workflows/npm-package-check.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'packaging/npm/**'
+      - 'site/**'
+      - '.github/workflows/npm-package-check.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  npm-package-check:
+    name: npm-package-check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          persist-credentials: false
+      - name: 工具链就绪（node：runner 预装）
+        run: |
+          node --version
+          npm --version
+      - name: payload 暂存 + 发布前自检（与 npm-publish 同口径）
+        working-directory: packaging/npm
+        run: |
+          set -euo pipefail
+          npm run stage
+          npm run verify
+      - name: stage 后工作树必须无受跟踪改动（数字/清单与生成器一致）
+        run: |
+          set -euo pipefail
+          if ! git diff --quiet; then
+            echo "::error::stage 改动了受跟踪文件（README 体积行/站点数字与 payload 清单不一致）"
+            git diff --stat
+            echo "::error::修复：本地 cd packaging/npm && npm run stage，复核后提交改动"
+            exit 1
+          fi
+          echo "工作树干净：stage 未改动受跟踪文件"
+      - name: 冒烟（CLI --version 可执行）
+        working-directory: packaging/npm
+        run: node bin/nf.mjs --version

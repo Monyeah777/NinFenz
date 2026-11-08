@@ -15,10 +15,12 @@ subjects:
   - desktop/src/core/quality_baseline.py:7c1f06bc581a2400b1248df63e07a98dfffba2b92ca8070a71082abcc317d1e4
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - docs/terminal.md:b08d721ed527baa92d4cdf56f73aa4972c1314159c3213ed38a95911c2b7f71b
-  - docs/L3_FROZEN.md:db0926a50da62d2d9b338ee0ef3944ae80ff75117495776189f2cfd42bfad5c1
+  - docs/L3_FROZEN.md:4700604e4516f83efec798ffd1ebda108ccc8f8a0baeab9e194d7ef2d07e22ff
   - protocol/CONFORMANCE.md:006b56748b6daaf2419be40a65247d90efd6291e87ccd61c6527ed1526b6b4e4
 
 ---
+> 重审（2026-11-08）：新增 npm-package-check workflow
+
 > 重审（2026-11-08）：L3_FROZEN 现状同步（verify v2.30 + 当前 CI 清单）
 
 > 重审（2026-11-08）：task-35c：git status 收敛到 repo_face.untracked_paths
