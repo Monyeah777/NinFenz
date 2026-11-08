@@ -78,6 +78,7 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="gate_probe",
                                  description="门禁负向用例探针（命名代理，只出比率与清单）")
     ap.add_argument("--write", action="store_true")
+    ap.add_argument("--check", action="store_true", help="与已提交结果比对（防陈旧）")
     ap.add_argument("--json", action="store_true")
     args = ap.parse_args(argv)
     doc = build()
@@ -89,6 +90,16 @@ def main(argv=None) -> int:
         atomic_write.write_text(dest, render(doc))
         print("OK 已写入 " + OUT_REL + "（闸门 " + str(doc["gates"]) + " · 有拒绝型 "
               + str(doc["gates_with_negative"]) + " · 比率 " + str(doc["ratio"]) + "）")
+        return 0
+    if args.check:
+        dest = ROOT / OUT_REL
+        if not dest.is_file():
+            print("缺 " + OUT_REL + "（先跑 --write）", file=sys.stderr)
+            return 1
+        if dest.read_text(encoding="utf-8") != render(doc):
+            print("结果已陈旧（闸门或命名变了）——重跑 --write", file=sys.stderr)
+            return 1
+        print("OK 结果与重算一致")
         return 0
     if args.json:
         print(render(doc), end="")

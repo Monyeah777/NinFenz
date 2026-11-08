@@ -37,5 +37,14 @@ class GateProbeTest(unittest.TestCase):
         self.assertEqual(["test_bad_input_is_rejected"], hit)
 
 
+    def test_committed_result_is_fresh(self):
+        """已提交结果必须与重算一致（闸门或命名变了却忘刷新即红）。"""
+        import json
+        path = ROOT / "results" / "ccos" / "gate_negative_tests.json"
+        self.assertTrue(path.is_file(), "缺结果件：先跑 scripts/gate_probe.py --write")
+        committed = json.loads(path.read_text(encoding="utf-8"))
+        self.assertEqual(gp.build(), committed, "结果已陈旧，重跑 --write")
+
+
 if __name__ == "__main__":
     unittest.main()

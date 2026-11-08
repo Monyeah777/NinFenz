@@ -42,6 +42,15 @@ class JudgeMutationTest(unittest.TestCase):
                                                                          "unused": []}]
         self.assertEqual(len(broken), len(ok), "有变异体没被杀死")
 
+    def test_committed_result_is_fresh(self):
+        """已提交结果必须与重算一致（判据或变异体变了却忘刷新即红）。"""
+        import json
+        path = ROOT / "results" / "ccos" / "judge_mutation.json"
+        self.assertTrue(path.is_file(),
+                        "缺结果件：先跑 scripts/judge_mutation_probe.py --write")
+        committed = json.loads(path.read_text(encoding="utf-8"))
+        self.assertEqual(jm.build(), committed, "结果已陈旧，重跑 --write")
+
 
 if __name__ == "__main__":
     unittest.main()

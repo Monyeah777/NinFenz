@@ -131,6 +131,7 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="judge_mutation_probe",
                                  description="门禁变异探针：对两条判据量杀死率与误报率（只报数）")
     ap.add_argument("--write", action="store_true")
+    ap.add_argument("--check", action="store_true", help="与已提交结果比对（防陈旧）")
     ap.add_argument("--json", action="store_true")
     args = ap.parse_args(argv)
     try:
@@ -146,6 +147,16 @@ def main(argv=None) -> int:
         atomic_write.write_text(dest, render(doc))
         print("OK 已写入 " + OUT_REL + "（判据 " + str(doc["judges"]) + " · 杀死率 "
               + str(doc["kill_rate"]) + " · 误报率 " + str(doc["false_positive_rate"]) + "）")
+        return 0
+    if args.check:
+        dest = ROOT / OUT_REL
+        if not dest.is_file():
+            print("缺 " + OUT_REL + "（先跑 --write）", file=sys.stderr)
+            return 1
+        if dest.read_text(encoding="utf-8") != render(doc):
+            print("结果已陈旧（判据/变异体变了）——重跑 --write", file=sys.stderr)
+            return 1
+        print("OK 结果与重算一致")
         return 0
     if args.json:
         print(render(doc), end="")
