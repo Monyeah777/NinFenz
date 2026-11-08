@@ -208,6 +208,7 @@
     "test_mcp_manifest": 0.4,
     "test_mcp_packaging": 0.3,
     "test_mcp_read_budget": 1.2,
+    "test_mcp_redteam": 0.2,
     "test_mcp_runtime": 2.6,
     "test_mcp_trust_meta": 0.8,
     "test_mcp_write_freedom": 3.3,
@@ -2677,6 +2678,9 @@
     "test_mcp_read_budget.McpReadBudgetTest.test_repeat_calls_do_not_amplify": 0.0,
     "test_mcp_read_budget.McpReadBudgetTest.test_scan_tools_stay_within_the_known_ceiling": 0.02,
     "test_mcp_read_budget.McpReadBudgetTest.test_snapshot_read_does_not_build_repo_index": 0.0,
+    "test_mcp_redteam.RedteamTest.test_case_set_shape": 0.0,
+    "test_mcp_redteam.RedteamTest.test_every_case_matches_its_declared_gate": 0.0,
+    "test_mcp_redteam.RedteamTest.test_injection_text_in_args_does_not_change_the_tool": 0.0,
     "test_mcp_runtime.DeclaredSurfaceVsHandlersTest.test_declared_prompts_match_runtime": 0.0,
     "test_mcp_runtime.DeclaredSurfaceVsHandlersTest.test_declared_tools_match_handlers": 0.0,
     "test_mcp_runtime.DeclaredSurfaceVsHandlersTest.test_every_declared_tool_is_reachable": 0.51,
@@ -4432,5 +4436,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1546.5
+  "total_s": 1546.7
 }

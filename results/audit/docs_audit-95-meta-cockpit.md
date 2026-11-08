@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:de9d91eb9bfd08926dc7dc9b8ac4134b560996733efd71a478c8820b4f9a161b
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:faaeeeb539d963ebca6b2cfd9bc66b97f77959e28b887b46362d80874e895060
+  - protocol/check12_weights.json:cc74083a905e16493f065afacfe8a7724ead1f1dd6cc9eea09b2239f696507da
   - protocol/coupling_baseline.json:1c4c6520d7c0e52328888d5d1dc601daab41f14ab9a8df40c95e32e3ef6ef4d6
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-08）：MCP 红队用例集（8 条，逐条核闸门）
+
 > 重审（2026-11-08）：文档锚点判据（docs/ccos 每篇必须指到真实实现）
 
 > 重审（2026-11-08）：所有方法包动作：锚点或显式概念声明（判据）

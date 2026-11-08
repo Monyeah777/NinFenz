@@ -177,8 +177,8 @@ class PackContentTest(unittest.TestCase):
             "pi.receipt_audit": ("desktop/src/core/mcp_ingress.py", ("record_call",)),
             "pi.least_privilege": ("desktop/src/core/mcp_ingress.py", ("max_args",)),
             "pi.output_side_check": ("desktop/src/core/mcp_runtime.py", ("schema_check",)),
-            # 红队用例集的「实现」就是那组真跑用例本身（没有单一运行时锚点）
-            "pi.redteam_cases": ("desktop/tests/test_mcp_ingress.py", ("consent",)),
+            # 红队用例集已落成数据 + 逐条判据（第 40 轮）
+            "pi.redteam_cases": ("protocol/redteam/mcp_injection_cases.json", ("RT-01",)),
         }
         #: 纯概念动作（本仓还没有对应实现）→ 理由。为空表示「全都该有锚点」。
         CONCEPTUAL = {"pi.plane_separation": "结构性保证（argv-only/无 shell），不是单一代码点"}

@@ -5,8 +5,8 @@
     "floor": 5,
     "prod": 1055,
     "projection": 154,
-    "support": 424,
-    "verify": 1017
+    "support": 425,
+    "verify": 1018
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8561,6 +8561,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "MCP Ingress 红队用例判据：把「数据冒充指令」写成可重跑用例，逐条核闸门。",
+      "path": "desktop/tests/test_mcp_redteam.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "MCP Server 运行时单测（v2.5.0 Wave5 C1：快照 → stdio JSON-RPC 服务）。",
       "path": "desktop/tests/test_mcp_runtime.py",
       "role": "verify",
@@ -12474,16 +12480,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "9bfaf1059179bb3174bec242a6baa01c04071a6d360b360ac3ef4ba734a6a12a",
+  "root_digest": "4bf8150e17f866628647c6a712e6be4990ed1372f7c42cc973e649165da02100",
   "rule_counts": {
     "R-app": 1458,
-    "R-catch": 277,
+    "R-catch": 278,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 135,
     "R-support": 119,
-    "R-verify": 892,
+    "R-verify": 893,
     "auto:R-core": 283
   },
   "schema": "nf-role-coordinates/1"
