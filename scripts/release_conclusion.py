@@ -197,18 +197,30 @@ def lock_release(base: Path, *, pid: int | None = None) -> None:
 
 
 def _pid_alive(pid: int) -> bool:
-    """进程是否还活着（Windows: tasklist；POSIX: os.kill(pid, 0)）。"""
+    """进程是否还活着（Windows: tasklist 绝对路径；POSIX: os.kill(pid, 0)）。
+
+    一律走 core 的受控进程原子（argv 列表 / 无 shell / 超时即回收）——脚本面不自己起
+    subprocess（SAST S603/S607 与 purity R6 都盯这条），这也是本件 `_run` 的既有口径。
+    """
     if pid <= 0:
         return False
-    try:
-        if os.name == "nt":
-            out = subprocess.run(["tasklist", "/FI", "PID eq " + str(pid), "/NH"],
-                                 capture_output=True, text=True, timeout=15, check=False)
-            return str(pid) in (out.stdout or "")
-        os.kill(pid, 0)
-        return True
-    except (OSError, subprocess.SubprocessError):
+    if os.name != "nt":
+        try:
+            os.kill(pid, 0)
+            return True
+        except OSError:
+            return False
+    src = str(ROOT / "desktop" / "src")
+    if src not in sys.path:
+        sys.path.insert(0, src)
+    from core.atoms import proc as proc_atom  # 局部导入：模块级只留纯逻辑
+
+    exe = shutil.which("tasklist")
+    if not exe:
         return False
+    got = proc_atom.run_capture([exe, "/FI", "PID eq " + str(pid), "/NH"], timeout=15)
+    return str(pid) in str(got.get("out") or "")
+
 
 def snapshot_dir_name(head: str) -> str:
     """快照目录名：带 HEAD 短哈希，冲突可辨（纯函数）。"""
@@ -218,7 +230,6 @@ def snapshot_dir_name(head: str) -> str:
 #: 快照默认落点：仓库同盘的 .worktrees/（已被 .gitignore 忽略）。为什么不放 $TEMP：
 #: 2026-11-06 实测 C 盘 100% 满（剩余 84 MB），tempfile.mkdtemp 直接把整次门禁打成 ENOSPC。
 SNAP_BASE_DEFAULT = ".worktrees/gate-snap"
-
 
 def snapshot_base(root: Path, override: str = "") -> Path:
     """快照基目录（纯函数）：显式覆盖优先，否则落在仓库同盘。"""

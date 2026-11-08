@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:2f60dc7f62208e55e35b7cb43561b06f0482979170c277b6bb5c1219879e27ca
+  - protocol/code_metrics_baseline.json:b807908632297b878b3dcddd4c32ac8482a39dae6a2ad2b99ba9e50c8a6c287a
 ---
+> 重审（2026-11-08）：锁存活探测走受控进程原子（S603/S607 收口）
+
 > 重审（2026-11-08）：--sheet 入确认闸（(cog, --sheet)）
 
 > 重审（2026-11-08）：快照锁 + sink 登记（lock 自清）

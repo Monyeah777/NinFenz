@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:2f60dc7f62208e55e35b7cb43561b06f0482979170c277b6bb5c1219879e27ca
+  - protocol/code_metrics_baseline.json:b807908632297b878b3dcddd4c32ac8482a39dae6a2ad2b99ba9e50c8a6c287a
 ---
+> 重审（2026-11-08）：锁存活探测走受控进程原子（S603/S607 收口）
+
 > 重审（2026-11-08）：--sheet 入确认闸（(cog, --sheet)）
 
 > 重审（2026-11-08）：快照锁 + sink 登记（lock 自清）

@@ -14,8 +14,10 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:d059d432155606c97d3ae035d1fe390a1793fc368621c24295e1af07b1a13fea
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:2f60dc7f62208e55e35b7cb43561b06f0482979170c277b6bb5c1219879e27ca
+  - protocol/code_metrics_baseline.json:b807908632297b878b3dcddd4c32ac8482a39dae6a2ad2b99ba9e50c8a6c287a
 ---
+> 重审（2026-11-08）：锁存活探测走受控进程原子（S603/S607 收口）
+
 > 重审（2026-11-08）：--sheet 入确认闸（(cog, --sheet)）
 
 > 重审（2026-11-08）：快照锁 + sink 登记（lock 自清）

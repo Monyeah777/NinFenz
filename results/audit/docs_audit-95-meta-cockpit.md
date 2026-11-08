@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:d059d432155606c97d3ae035d1fe390a1793fc368621c24295e1af07b1a13fea
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:8de41103ce9be7878851794bb0c001ac14b2cb7182bfff1483b21157d2fb83af
+  - protocol/check12_weights.json:37e6ce9044bdca03a86c2fa7271045445edfbcb74165909ad24c572fd510db53
   - protocol/coupling_baseline.json:1c4c6520d7c0e52328888d5d1dc601daab41f14ab9a8df40c95e32e3ef6ef4d6
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-08）：锁存活探测走受控进程原子（S603/S607 收口）
+
 > 重审（2026-11-08）：--sheet 入确认闸（(cog, --sheet)）
 
 > 重审（2026-11-08）：快照锁 + sink 登记（lock 自清）

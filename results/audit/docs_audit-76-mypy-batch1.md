@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/io_types.py:09296daf865db85bda582fb646cece708c51f97e190a9e91c0eecd07252475f7
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
   - desktop/src/core/knowledge.py:d0b678c0f1176ce6f16a33b6f6d42a16b663099b4346306fae1ea547305e316b
-  - protocol/code_metrics_baseline.json:2f60dc7f62208e55e35b7cb43561b06f0482979170c277b6bb5c1219879e27ca
+  - protocol/code_metrics_baseline.json:b807908632297b878b3dcddd4c32ac8482a39dae6a2ad2b99ba9e50c8a6c287a
 ---
+> 重审（2026-11-08）：锁存活探测走受控进程原子（S603/S607 收口）
+
 > 重审（2026-11-08）：--sheet 入确认闸（(cog, --sheet)）
 
 > 重审（2026-11-08）：快照锁 + sink 登记（lock 自清）
