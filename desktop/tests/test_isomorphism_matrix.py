@@ -105,6 +105,20 @@ class IsomorphismMatrixTest(unittest.TestCase):
             self.assertRegex(why, r"`[A-Za-z0-9_.:/\-]+`",
                              layer + " 的缺失理由没有点名具体对象：" + why)
 
+    def test_doc_numbers_match_matrix_and_gates(self):
+        """文档里的「N 层全覆盖 / precheck N 门」必须等于实际（防口径漂移）。"""
+        import sys
+
+        sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts"))
+        import precheck_gates
+
+        doc = (Path(__file__).resolve().parents[2] / "docs" / "ccos"
+               / "dual-core-invariants.md").read_text(encoding="utf-8")
+        self.assertIn(f"**{len(COVERED)} 层全覆盖**", doc,
+                      "文档的层数与矩阵数据不符（改矩阵后须同步文档）")
+        self.assertIn(f"`precheck` {len(precheck_gates.GATES)} 门", doc,
+                      "文档的闸门数与 precheck 名单不符")
+
     def test_matrix_does_not_claim_overlap(self):
         self.assertEqual(set(), set(COVERED) & set(MISSING), "同一层不能既覆盖又缺失")
 
