@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:f10e73e068c8920700f32819212dd63862cab626d0a171ddd1c616f7e261b00f
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:47a3deeab1175d0c7c18b2d4bfb5c0bd52035d8ced0987e26acc3e3cf81fc038
+  - protocol/check12_weights.json:30de0027a8fa47f37f803359a2d87b9eb7607f5a74a25a85201393babdedcd80
   - protocol/coupling_baseline.json:e3f2b7ae1a2682e14125922dccdee5ff2ede5f2fea2f27de2263242d765608fe
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-09）：发布结论记录验证器摘要（自省层闭环）
+
 > 重审（2026-11-09）：耦合面重算（288 模块）
 
 > 重审（2026-11-09）：自省层对象：验证器摘要（判定面脚本内容摘要）+ 探针 + 判据

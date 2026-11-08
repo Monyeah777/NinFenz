@@ -1000,8 +1000,15 @@ def main(argv=None) -> int:
     summary = aggregate(results)
     head_end = (_run(["git", "rev-parse", "HEAD"], 60).get("out") or "").strip()
     moved = head_move_guard(head, head_end) or drift
+    # 自省层（第 97 轮）：结论同时记录**产出它的验证器摘要**（判定面脚本内容摘要）。
+    # 工具改了而结论没重跑，摘要就对不上——这让「这份结论是谁判的」可核。
+    try:
+        verifier = _core("verifier_version").digest(ROOT)["verifier_digest"]
+    except ValueError:
+        verifier = ""
     payload = {"schema": "nf-release-conclusion/1",
                "ok": summary["ok"] and checks_rc == 0 and not moved,
+               "verifier_digest": verifier,
                "head_start": head, "head_end": head_end, "head_moved": bool(moved),
                "supply_chain": supply, "freshness": fresh, "ratchets": ratchets,
                "checks_only_rc": checks_rc,

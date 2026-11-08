@@ -537,6 +537,19 @@ class TestSnapshotIsolationPaths(unittest.TestCase):
         self.assertEqual(run_dir, os.path.dirname(log))
         self.assertTrue(log.endswith("gate.log"))
 
+    def test_payload_includes_verifier_digest(self):
+        """自省层（第 97 轮）：结论必须记录产出它的验证器摘要（判定面脚本摘要）。"""
+        import sys
+        from pathlib import Path
+        sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "desktop" / "src"))
+        from core import verifier_version as vv
+
+        src = (Path(__file__).resolve().parents[2] / "scripts" / "release_conclusion.py"
+               ).read_text(encoding="utf-8")
+        self.assertIn('"verifier_digest": verifier', src,
+                      "结论 payload 必须带 verifier_digest 字段")
+        self.assertEqual(64, len(vv.digest(str(Path(__file__).resolve().parents[2]))
+                                ["verifier_digest"]))
 
 if __name__ == "__main__":
     unittest.main()
