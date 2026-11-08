@@ -136,6 +136,11 @@
       "ce": 0,
       "i": 0.0
     },
+    "calibration": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
     "calibration_state": {
       "ca": 1,
       "ce": 0,
@@ -213,7 +218,7 @@
     },
     "cognition_plan": {
       "ca": 0,
-      "ce": 1,
+      "ce": 2,
       "i": 1.0
     },
     "commit_title_guard": {
@@ -541,6 +546,11 @@
       "ce": 0,
       "i": 0.0
     },
+    "grouped_report": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
     "handover": {
       "ca": 1,
       "ce": 3,
@@ -657,9 +667,9 @@
       "i": 1.0
     },
     "json_doc": {
-      "ca": 88,
+      "ca": 89,
       "ce": 1,
-      "i": 0.0112
+      "i": 0.0111
     },
     "json_schema": {
       "ca": 5,

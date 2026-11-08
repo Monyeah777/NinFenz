@@ -3,6 +3,28 @@
     "closed": 23,
     "debt": 1
   },
+  "by_status_degree": {
+    "group_key": "status",
+    "groups": {
+      "closed": {
+        "mean": 3.043478,
+        "n": 23,
+        "sd": 0.208514
+      },
+      "debt": {
+        "mean": 2.0,
+        "n": 1,
+        "sd": null
+      }
+    },
+    "metric": "degree",
+    "note": "overall 只作对照；结论必须按组给（只报总体会掩盖子群差异）",
+    "overall": {
+      "mean": 3.0,
+      "n": 24
+    },
+    "schema": "nf-grouped-report/1"
+  },
   "claims": 24,
   "dangling": [],
   "detail": [

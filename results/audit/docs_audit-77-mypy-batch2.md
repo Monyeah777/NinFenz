@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
-  - protocol/code_metrics_baseline.json:df5bb9e23303ab53e77c1fb467a0efc9991f1ceda6b9b38dc1020d8f3b383180
+  - protocol/code_metrics_baseline.json:76daf872070e73d5221daa21bbc77227f9b797129f4a1df1b31f69ee0884dd0a
 ---
+> 重审（2026-11-08）：快照20 红修复：--pairs 入闸/json_doc/分组表接入探针/耦合重算
+
 > 重审（2026-11-08）：证据图探针导入收口
 
 > 重审（2026-11-08）：证据图探针（陈述⇄证据二部图，H=悬挂比）

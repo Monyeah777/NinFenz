@@ -59,7 +59,13 @@ def build(root: Path = ROOT) -> dict[str, Any]:
             dangling.append(eid)
     total = len(claims)
     h = round(len(dangling) / total, 6)
+    from core import grouped_report  # 局部导入：分组表复用已有度量件（不新写统计）
+
+    by_status_degree = grouped_report.summarize(
+        [{"status": str(c["status"]), "degree": c["degree"]} for c in claims],
+        "status", "degree")
     return {"schema": SCHEMA, "claims": total, "evidence_nodes": len(evidence_nodes),
+            "by_status_degree": by_status_degree, 
             "dangling": dangling, "h_dangling_ratio": h,
             "by_status": {s: sum(1 for c in claims if c["status"] == s)
                           for s in sorted({str(c["status"]) for c in claims})},

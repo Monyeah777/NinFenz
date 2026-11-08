@@ -6828,7 +6828,7 @@ _PATH_FLAG_DESTS = ("out", "dest", "build_dest", "save_path", "store", "trace", 
                     "compile",
                     # 认知工作台 / 桥 / 作业 / Ingress（2026-11-08 新增面）
                     "claim_file", "cc_result", "commitment", "obligation", "delta",
-                    "receipt", "job_id", "ledger", "ingress_policy", "evidence")
+                    "receipt", "job_id", "ledger", "ingress_policy", "evidence", "pairs")
 
 
 def _path_writing_issue(args) -> str:
@@ -6885,9 +6885,9 @@ _UTF8_TEXT_DESTS = ("a", "action", "artifact", "b", "baseline", "check", "check_
                     "injections", "journal", "responses", "experiment", "ballots", "bundle",
                     # 认知/桥/作业面读进来的文本件（2026-11-08）
                     "claim_file", "cc_result", "commitment", "obligation", "delta",
-                    "receipt", "ingress_policy", "evidence",
+                    "receipt", "ingress_policy", "evidence", "pairs",
                     "delta_json", "payload_json", "payload", "witness", "kt_keys",
-                    "research_topic", "sheet")
+                    "research_topic", "sheet", "pairs")
 
 
 def _utf8_text_issue(args) -> str:

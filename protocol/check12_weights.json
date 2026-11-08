@@ -117,7 +117,7 @@
     "test_evidence": 1.8,
     "test_evidence_batch": 1.4,
     "test_evidence_forms_parity": 1.1,
-    "test_evidence_graph": 0.3,
+    "test_evidence_graph": 0.2,
     "test_evidence_vectors": 3.8,
     "test_execution_drill": 0.2,
     "test_explain_coverage": 0.2,
@@ -4466,5 +4466,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1509.3
+  "total_s": 1509.2
 }

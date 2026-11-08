@@ -221,7 +221,7 @@
       "max_fn_lines": 41
     },
     "desktop/src/core/cognition_plan.py": {
-      "lines": 210,
+      "lines": 212,
       "max_fn_cc": 18,
       "max_fn_lines": 68
     },
@@ -1556,9 +1556,9 @@
       "max_fn_lines": 47
     },
     "scripts/evidence_graph_probe.py": {
-      "lines": 110,
+      "lines": 116,
       "max_fn_cc": 9,
-      "max_fn_lines": 30
+      "max_fn_lines": 34
     },
     "scripts/evidence_vectors.py": {
       "lines": 431,
@@ -1681,7 +1681,7 @@
       "max_fn_lines": 39
     },
     "scripts/release_conclusion.py": {
-      "lines": 1040,
+      "lines": 1041,
       "max_fn_cc": 60,
       "max_fn_lines": 230
     },

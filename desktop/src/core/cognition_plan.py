@@ -83,7 +83,9 @@ def load_methods(root: str) -> dict[str, Any]:
     path = Path(root) / METHODS_REL
     if not path.is_file():
         raise ValueError("方法论库不存在（" + GUIDE + "先恢复 " + METHODS_REL + "）")
-    doc = json.loads(path.read_text(encoding="utf-8"))
+    from core import json_doc  # 局部导入：形状校验统一走 json_doc
+
+    doc = json_doc.load(path, dict, what=str(path))
     issues = validate_methods(doc)
     if issues:
         raise ValueError("方法论库不合法：" + "；".join(issues[:3]))

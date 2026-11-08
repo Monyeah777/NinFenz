@@ -782,7 +782,8 @@ def status_snapshot(base: Path) -> dict[str, Any]:
         doc = None
         if "{" in text:
             try:
-                doc = json.loads(text[text.index("{"):])
+                doc = _core("json_doc").loads(text[text.index("{"):], dict,
+                                             what="内层结论日志")
             except ValueError:   # 半截 JSON（内层正在写）：先不给结论
                 doc = None
         latest = {"run": run.name, "log_bytes": len(text.encode("utf-8")),

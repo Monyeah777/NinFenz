@@ -431,8 +431,8 @@
       "stats": {
         "cycles": 0,
         "metrics_drift": 0,
-        "metrics_missing": 2,
-        "metrics_recorded": 285,
+        "metrics_missing": 0,
+        "metrics_recorded": 287,
         "modules": 287,
         "registered_cycles": 0,
         "registered_sdp": 9,
@@ -538,7 +538,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "fb8d5482048c1e51df912a23a70dcc30977815012ebcb9fa7be3b159cc85e02f",
+  "root_digest": "b6434d7357ed96fc1f466cf6e5c7fe5d1818473fc390c2023e32309f7343665b",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
