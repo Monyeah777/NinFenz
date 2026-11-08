@@ -58,6 +58,14 @@ def dirty_guard(lines: list[str], allow_dirty: bool) -> str:
             "在改到一半的树上跑分片会产生与输入无关的假红；确需跑加 --allow-dirty）")
 
 
+def payload_skip_hint(manifest: dict | None) -> str:
+    """payload 未暂存 → 说明（打包交付线自检会静默 skip）；已暂存返回空串。"""
+    if manifest is None:
+        return ("npm payload 未暂存：packaging 交付线自检（test_npm_package 的 smoke / "
+                "verify-package）会 skip；要覆盖请先 cd packaging/npm && npm run stage")
+    return ""
+
+
 def payload_drift_guard(manifest: dict | None, head: str) -> str:
     """npm payload 与 HEAD 的耦合闸门 → 拒绝原因（空串 = 放行）。
 
@@ -653,6 +661,10 @@ def main(argv=None) -> int:
     if dirty:
         print(f"  [WARN] 脏树放行（{len(dirty)} 处变更）——结果可能含中间态假红",
               file=sys.stderr)
+
+    skip_hint = payload_skip_hint(manifest)
+    if skip_hint:
+        print(f"  [WARN] {skip_hint}", file=sys.stderr)
 
     # 活树模式同样要防 ENOSPC：分片把临时件写在仓库同盘；剩几百 MB 时跑到一半才 ENOSPC，
     # 白花 30–50 分钟（2026-11-06 实测：84 MB 剩余）。快照模式由 _snapshot_create 检查。
