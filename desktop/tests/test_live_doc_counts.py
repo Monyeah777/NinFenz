@@ -10,6 +10,9 @@
 `scripts/gates_all.sh` 的横幅停在 `check1-36 PASS=59`（当时真源已 v2.30 / check1-40 / PASS=70），
 而它既不是文档（不在原扫描面）也不是 CI 跑的脚本，于是长期无判据。同一类漂移在**脚本横幅**里
 与在文档里一样会误导读者，故并入本判据；`skills/**` 一并收入（**agent 第一跳的文案**——与
+
+2026-11-08 再扩：`.github/workflows/*.yml` 一并收入——**只查 `PASS=` / `check1-` 两类计数**
+（CI 注释里的运行时计数同属活文案），流程描述里的普通数字不查。
 `test_nf_cli` 的旗标可达判据把 skills 纳入同一理由：写错了没有人会替他改）；`.py` 暂不收
 （`--help` 里的占位示例、探针的运行时输出格式会造假红，宁少勿滥）；`scripts/` 下**无扩展名**的可执行
 启停器一并收入（2026-10-04 补：`scripts/nf` 是 208 行的 POSIX 启动器，属人对/agent 读的活文案，
@@ -83,12 +86,19 @@ def live_docs() -> list:
                 or (rel.startswith("docs/") and rel.endswith(".md"))
                 or (rel.startswith("scripts/") and rel.endswith(".sh"))
                 or (rel.startswith("scripts/") and "." not in Path(rel).name)
+                or (rel.startswith(".github/workflows/") and rel.endswith(".yml"))
                 or rel.startswith("skills/")):
             out.append(rel)
     return out
 
 
 class LiveDocCountTest(unittest.TestCase):
+    def test_workflows_are_in_scope(self):
+        """扫描面覆盖 .github/workflows/*.yml（CI 注释的 check/PASS 计数同属活文案）。"""
+        rels = live_docs()
+        self.assertTrue(any(r.startswith(".github/workflows/") and r.endswith(".yml")
+                            for r in rels), "workflow 注释未进活文档计数扫描面")
+
     def test_live_docs_do_not_pin_runtime_counts(self):
         bad = []
         for rel in live_docs():
