@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-08",
   "approved_by": "Monyeah777",
-  "note": "refreeze.sh",
+  "note": "MCP dual-era standard evidence",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "f44fe0891b315dec0b7d2e7f47ef8fa7eabb44c88ce0426f0fae728dbef72edb"
+  "subject_digest": "fcc1f16f41de8f08be59c88f0f1bf566b68180c37525a581c0c464a713f3c56e"
 }
