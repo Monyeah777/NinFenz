@@ -29,10 +29,10 @@ COVERED = {
 
 #: 层 → 为什么现在写不出可红判据（缺的是对象，不是文案）
 MISSING = {
-    "授权": "K5 capability 只有工具级雏形，没有「授权即证据」的信封对象可做两侧核对",
-    "对抗": "counterexample move 有语义校验，但没有「反例能被 cc 复算成 fail witness」的对象",
-    "资源": "认知预算与验证预算两本账都未落状态，无法比对",
-    "自省": "自举（旧版验新版）尚无版本链对象；ADR falsifier 只覆盖部分",
+    "授权": "契约侧已有 `approval.subject_digest` 绑定（改动即失效），但认知侧 control_record 无「谁授权」字段",
+    "对抗": "`counterexample` move 有语义校验，但缺 `witness_ref` 引用对象（反例无法被 cc 复算）",
+    "资源": "认知侧 `discourse.budget` 账实相符已守，验证侧只有 `perf_budget` 阈值、无逐次记账",
+    "自省": "ADR 有 `falsifier` 但也无 `version_chain`（旧版验新版缺对象）",
 }
 
 
@@ -58,6 +58,14 @@ class IsomorphismMatrixTest(unittest.TestCase):
         self.assertEqual(9, len(COVERED) + len(MISSING),
                          "九层必须恰好九项（多一层少一层都要改本判据）")
         self.assertEqual(5, len(COVERED), "覆盖数与设计稿不符，需显式更新矩阵")
+
+
+    def test_missing_reasons_name_a_concrete_object(self):
+        """missing 理由不能是「暂时没做」——必须点名一个具体字段/对象（反引号 token）。"""
+        import re
+        for layer, why in MISSING.items():
+            self.assertRegex(why, r"`[A-Za-z0-9_.:/\\-]+`",
+                             layer + " 的缺失理由没有点名具体对象：" + why)
 
     def test_matrix_does_not_claim_overlap(self):
         self.assertEqual(set(), set(COVERED) & set(MISSING), "同一层不能既覆盖又缺失")
