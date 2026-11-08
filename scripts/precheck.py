@@ -34,6 +34,10 @@ GATES = (
     ("claims", "desktop.tests.test_cognition_claims"),
     ("bridge", "desktop.tests.test_cognition_bridge"),
     ("eval_harness", "desktop.tests.test_eval_harness"),
+    ("calibration", "desktop.tests.test_calibration"),
+    ("grouped_report", "desktop.tests.test_grouped_report"),
+    ("evidence_graph", "desktop.tests.test_evidence_graph"),
+    ("atom_catalog", "desktop.tests.test_atom_catalog"),
 )
 #: 慢但值得（--full 才跑）：CLI 面与纯度扫描约 2–3 分钟
 SLOW_GATES = (

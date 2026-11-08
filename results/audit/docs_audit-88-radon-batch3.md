@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:9a86928171c71f4a2d3d324508fdafccb60fd7cc8423d52197185214a40ea30f
-  - protocol/code_metrics_baseline.json:a1c7f8381a838076f5188990f52d7ca387667ae7c9825225bf7b2992a9cf7c6a
+  - protocol/code_metrics_baseline.json:9e9b7cab8469892a6da48845cb0a4bc81dc3e87cd17f7d2b8d72ffd974d50b68
 ---
+> 重审（2026-11-08）：precheck 快车道扩到 16 闸门（补 calibration/grouped/evidence_graph/atom_catalog）
+
 > 重审（2026-11-08）：提交前自查快车道（precheck：按名单跑既有横向门禁）
 
 > 重审（2026-11-08）：风格收口（F401/W291）

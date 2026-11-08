@@ -265,7 +265,7 @@
     "test_plugin_wasm_host": 0.3,
     "test_policy_snapshot": 0.1,
     "test_postmortem": 0.2,
-    "test_precheck": 66.2,
+    "test_precheck": 91.3,
     "test_preset_cli": 3.3,
     "test_probe_manifest_wiring": 0.1,
     "test_prose_lint": 0.2,
@@ -3367,7 +3367,7 @@
     "test_postmortem.TestRealRepo.test_scan_clean": 0.01,
     "test_precheck.PrecheckTest.test_every_listed_module_exists": 0.0,
     "test_precheck.PrecheckTest.test_gate_ids_are_unique": 0.0,
-    "test_precheck.PrecheckTest.test_script_runs_and_reports_schema": 66.07,
+    "test_precheck.PrecheckTest.test_script_runs_and_reports_schema": 91.1,
     "test_preset_cli.PresetCliTest.test_export_import_and_rm": 1.52,
     "test_preset_cli.PresetCliTest.test_full_roundtrip": 1.12,
     "test_preset_cli.PresetCliTest.test_missing_preset_and_bad_import_give_guidance": 0.56,
@@ -4470,5 +4470,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1575.4
+  "total_s": 1600.5
 }

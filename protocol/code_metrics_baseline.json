@@ -1671,7 +1671,7 @@
       "max_fn_lines": 12
     },
     "scripts/precheck.py": {
-      "lines": 102,
+      "lines": 106,
       "max_fn_cc": 7,
       "max_fn_lines": 13
     },
