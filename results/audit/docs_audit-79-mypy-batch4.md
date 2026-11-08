@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:bc114898836f914212cec64e0b22c7d3f93b8681557d82f845a200a85683b0cc
   - desktop/src/core/asset_contract.py:8e2fbc3954c771d6c2eb78d9cf47dcf22612b63b9b16929bd9013792f803f9a2
-  - protocol/code_metrics_baseline.json:9e9b7cab8469892a6da48845cb0a4bc81dc3e87cd17f7d2b8d72ffd974d50b68
+  - protocol/code_metrics_baseline.json:b60be0fe6bd7c91008acce94e5e3216dd3940cf793eb5b4d92a50a306ea15f2f
 ---
+> 重审（2026-11-08）：precheck 18 闸门（补 cognition_control / isomorphism）
+
 > 重审（2026-11-08）：precheck 快车道扩到 16 闸门（补 calibration/grouped/evidence_graph/atom_catalog）
 
 > 重审（2026-11-08）：提交前自查快车道（precheck：按名单跑既有横向门禁）

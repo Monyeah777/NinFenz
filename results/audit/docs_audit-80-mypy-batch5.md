@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:22e24633e87e95453d0c2cf4a595d0496bae5d7331c1fc644d5b1555e4925a41
-  - protocol/code_metrics_baseline.json:9e9b7cab8469892a6da48845cb0a4bc81dc3e87cd17f7d2b8d72ffd974d50b68
+  - protocol/code_metrics_baseline.json:b60be0fe6bd7c91008acce94e5e3216dd3940cf793eb5b4d92a50a306ea15f2f
 ---
+> 重审（2026-11-08）：precheck 18 闸门（补 cognition_control / isomorphism）
+
 > 重审（2026-11-08）：precheck 快车道扩到 16 闸门（补 calibration/grouped/evidence_graph/atom_catalog）
 
 > 重审（2026-11-08）：提交前自查快车道（precheck：按名单跑既有横向门禁）
