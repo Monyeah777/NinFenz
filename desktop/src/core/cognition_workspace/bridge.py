@@ -58,12 +58,17 @@ def commit(bundle: dict[str, Any], claim_doc: dict[str, Any], cc_result: dict[st
     verdict = _cc_verdict(cc_result)
     if verdict not in VERDICT_PASS + VERDICT_FAIL:
         raise ValueError("未知契约核判定：" + verdict + "（" + GUIDE + "见 VERDICT_PASS/FAIL）")
+    # 同构判据 #1（第 49 轮）：commitment 绑定契约侧的外部时点引用（如 TSA token digest）。
+    # 两侧若指向不同 token，本字段不同 → 同构判据可判定；缺时点则留空串（字段集保持恒定）。
+    ts_digest = str(cc_result.get("ts_digest") or "")
     payload = {"schema": COMMIT_SCHEMA, "bridge_version": BRIDGE_VERSION,
                "cog_digest": str(state["digest"]),
                "claim_digest": str(claim_doc["digest"]),
                "cc_digest": digest_of({"verdict": verdict, "subject": cc_result.get("subject"),
-                                       "detail": cc_result.get("detail")}),
+                                       "detail": cc_result.get("detail"),
+                                       "ts_digest": ts_digest}),
                "cc_verdict": verdict,
+               "ts_digest": ts_digest,
                "roles": list(roles or ["local-trusted"]),
                "prev": str((bundle.get("commitments") or [{}])[-1].get("digest") or "")}
     payload["digest"] = digest_of(payload)
@@ -88,11 +93,15 @@ def verify_commitment(commitment: Any, bundle: dict[str, Any], claim_doc: dict[s
         res["issues"].append("主张 digest 不匹配——commitment 之后 claim 变了")
     verdict = _cc_verdict(cc_result)
     expected = digest_of({"verdict": verdict, "subject": cc_result.get("subject"),
-                          "detail": cc_result.get("detail")})
+                          "detail": cc_result.get("detail"),
+                          "ts_digest": str(commitment.get("ts_digest") or "")})
     if str(commitment.get("cc_digest")) != expected:
         res["issues"].append("契约侧 digest 不匹配——cc 结果变了")
     if str(commitment.get("cc_verdict")) != verdict:
         res["issues"].append("commitment 记录的判定与当前 cc 结果不同")
+    ts_now = str(cc_result.get("ts_digest") or "")
+    if str(commitment.get("ts_digest") or "") != ts_now:
+        res["issues"].append("时点引用不匹配——两侧没有指向同一 token")
     res["ok"] = not res["issues"]
     return res
 
@@ -187,11 +196,16 @@ def cc_result_from_verify(verify_doc: dict[str, Any]) -> dict[str, Any]:
     if verdict not in VERIFY_WORDS:
         raise ValueError("未知证据判定：" + verdict
                          + "（" + GUIDE + "四词判定：ok/revoked/expired/invalid）")
+    # 时点引用（同构判据 #1 的契约侧来源）：verify 输出若带时间戳 token 摘要，就带进 cc 结果；
+    # 没有就留空串——**不伪造时点**。字段恒定，便于 bridge 侧按「两侧是否指向同一 token」判定。
+    detail = {"root": verify_doc.get("root"), "level": verify_doc.get("level"),
+              "count": verify_doc.get("count"),
+              "issues": list(verify_doc.get("issues") or [])}
+    ts = verify_doc.get("ts_digest") or verify_doc.get("timestamp_digest") or ""
     return {"verdict": verdict,
             "subject": str(verify_doc.get("head") or verify_doc.get("root") or ""),
-            "detail": {"root": verify_doc.get("root"), "level": verify_doc.get("level"),
-                       "count": verify_doc.get("count"),
-                       "issues": list(verify_doc.get("issues") or [])}}
+            "ts_digest": str(ts),
+            "detail": detail}
 
 
 def commit_from_verify(bundle: dict[str, Any], claim_doc: dict[str, Any],

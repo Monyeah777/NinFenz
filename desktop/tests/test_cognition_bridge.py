@@ -214,8 +214,9 @@ class BridgeWireFormatTest(unittest.TestCase):
     新增字段必须同时改本判据（逼一次显式评审），而不是悄悄加。
     """
 
+    #: ts_digest = 同构判据 #1 的载体（两侧须指向同一外部时点引用；缺时点为空串，字段集恒定）
     COMMIT_FIELDS = {"schema", "bridge_version", "cog_digest", "claim_digest",
-                     "cc_digest", "cc_verdict", "roles", "prev", "digest"}
+                     "cc_digest", "cc_verdict", "ts_digest", "roles", "prev", "digest"}
     OBLIGATION_FIELDS = {"schema", "commitment_digest", "cc_verdict", "failed",
                          "unknown", "next_actions", "digest"}
 
@@ -230,6 +231,44 @@ class BridgeWireFormatTest(unittest.TestCase):
         comm = br.commit(self._bundle(), claim, cc)
         self.assertEqual(self.COMMIT_FIELDS, set(comm),
                          "commitment 字段集变了：加字段请同步本判据并说明为什么需要跨核")
+
+
+    def test_commitment_binds_timestamp_reference(self):
+        """同构判据 #1：commitment 绑定契约侧时点引用；改它即 digest 不符（能红）。
+
+        这一条是「九双生层」里时相层的第一个可执行判据：两侧要指向**同一** token，
+        而不是各自「有时相」。
+        """
+        claim = {"schema": "nf-cog-claim/1", "claim": "x", "digest": "b" * 64,
+                 "obligations": [], "criteria": []}
+        token = "c" * 64
+        cc = {"verdict": "ok", "subject": "s", "detail": "d", "ts_digest": token}
+        comm = br.commit(self._bundle(), claim, cc)
+        self.assertEqual(token, comm["ts_digest"])
+        self.assertEqual({"ok": True, "issues": []},
+                         {k: v for k, v in br.verify_commitment(
+                             comm, self._bundle(), claim, cc).items()
+                          if k in ("ok", "issues")})
+        # 篡改时点引用 → digest 不符
+        tampered = dict(comm)
+        tampered["ts_digest"] = "d" * 64
+        self.assertFalse(br.verify_commitment(tampered, self._bundle(), claim, cc)["ok"])
+        # 缺时点：字段仍在但为空串（字段集恒定，便于守卫钉死）
+        comm2 = br.commit(self._bundle(), claim, {"verdict": "ok", "subject": "s",
+                                                  "detail": "d"})
+        self.assertEqual("", comm2["ts_digest"])
+        self.assertTrue(br.verify_commitment(comm2, self._bundle(), claim,
+                                             {"verdict": "ok", "subject": "s",
+                                              "detail": "d"})["ok"])
+
+
+    def test_cc_result_from_verify_never_fabricates_timestamp(self):
+        """时点引用只能来自证据，不能凭空造：verify 输出没带时间戳 → ts_digest 为空串。"""
+        cc = br.cc_result_from_verify({"verdict": "ok", "head": "h" * 64,
+                                       "root": "r" * 64, "level": 5, "count": 3})
+        self.assertEqual("", cc["ts_digest"])
+        cc2 = br.cc_result_from_verify({"verdict": "ok", "ts_digest": "c" * 64})
+        self.assertEqual("c" * 64, cc2["ts_digest"])
 
     def test_obligation_field_set_is_frozen(self):
         claim = {"schema": "nf-cog-claim/1", "claim": "x", "digest": "b" * 64,
