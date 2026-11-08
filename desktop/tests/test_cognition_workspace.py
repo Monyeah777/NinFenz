@@ -35,7 +35,9 @@ GOOD_DELTAS = {
     "thought_experiment": {"kind": "hypothesis_proposed", "hypothesis": "换域可扛 q70",
                            "expected_observation": "BER<0.1"},
     "counterexample": {"kind": "counterexample_found", "claim": "块网格能同步",
-                       "case": "0.9x 后同步分 81/128", "breaks": True},
+                       "case": "0.9x 后同步分 81/128", "breaks": True,
+                       "witness": {"file": "results/ccos/watermark_ecc_probe.json",
+                                   "case": "screenshot_blur_0.3"}},
     "analogy": {"kind": "mapping_added", "source": "纠错码", "target": "水印",
                 "preserved": ["冗余换可靠"], "broken": ["噪声模型不同"]},
     "perspective_shift": {"kind": "stakeholder_added", "perspective": "验证方",
@@ -78,8 +80,18 @@ class ContractTest(unittest.TestCase):
         self.assertTrue(any("只换词" in i for i in issues), issues)
 
     def test_counterexample_must_break(self):
-        bad = {"kind": "counterexample_found", "claim": "x", "case": "y", "breaks": False}
+        bad = {"kind": "counterexample_found", "claim": "x", "case": "y", "breaks": False,
+               "witness": {"file": "f.json", "case": "c"}}
         self.assertTrue(any("breaks" in i for i in mv.validate_delta("counterexample", bad)))
+
+    def test_counterexample_needs_replayable_witness(self):
+        """对抗层（第 93 轮）：反例必须带可复算证人（文件 + 用例 id），否则只是叙述。"""
+        base = {"kind": "counterexample_found", "claim": "x", "case": "y", "breaks": True}
+        self.assertTrue(any("witness" in i for i in mv.validate_delta("counterexample", base)))
+        no_case = dict(base, witness={"file": "f.json"})
+        self.assertTrue(any("case" in i for i in mv.validate_delta("counterexample", no_case)))
+        ok = dict(base, witness={"file": "results/ccos/x.json", "case": "c-01"})
+        self.assertEqual([], mv.validate_delta("counterexample", ok))
 
     def test_boundary_must_be_near_miss(self):
         bad = {"kind": "boundary_added", "case": "x", "near_miss": False}

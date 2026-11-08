@@ -17,7 +17,8 @@ DELTA_KINDS: dict[str, tuple[str, ...]] = {
     "concept_clarified": ("concept", "distinctions"),
     "tension_added": ("between", "statement"),
     "hypothesis_proposed": ("hypothesis", "expected_observation"),
-    "counterexample_found": ("claim", "case", "breaks"),
+    # witness（第 93 轮，对抗层）：反例必须是**可复算的证人**（文件 + 用例 id），否则只是叙述
+    "counterexample_found": ("claim", "case", "breaks", "witness"),
     "mapping_added": ("source", "target", "preserved", "broken"),
     "stakeholder_added": ("perspective", "obligations"),
     "provenance_added": ("origin", "lineage"),
@@ -148,6 +149,21 @@ def _digest(obj: Any) -> str:
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()
 
 
+def _witness_shape_issues(witness: Any) -> list[str]:
+    """反例证人的**形状**判据：必须是 {file, case} 两键（第 93 轮，对抗层）。
+
+    只判形状、不判文件存在：本模块是纯语义层不做 IO；文件是否真存在由带仓库根的一侧核对。
+    """
+    if not isinstance(witness, dict):
+        return ["反例缺 witness 证人（修复指引："
+                + "给 {file: 相对路径, case: 用例 id}）"]
+    issues: list[str] = []
+    for key in ("file", "case"):
+        if not str(witness.get(key) or "").strip():
+            issues.append("witness 缺 " + key + "（修复指引：证人是文件 + 用例 id）")
+    return issues
+
+
 def validate_delta(move_id: str, delta: Any) -> list[str]:
     """校验一个 move 的 frame_delta → 问题列表（空 = 合法）。"""
     issues: list[str] = []
@@ -175,6 +191,7 @@ def validate_delta(move_id: str, delta: Any) -> list[str]:
     elif kind == "counterexample_found":
         if delta["breaks"] is not True:
             issues.append("breaks 必须为 true——例子不违反主张就不算反例")
+        issues.extend(_witness_shape_issues(delta.get("witness")))
     elif kind == "boundary_added":
         if delta["near_miss"] is not True:
             issues.append("near_miss 必须为 true——离边界很远的例子不算边界案例")
