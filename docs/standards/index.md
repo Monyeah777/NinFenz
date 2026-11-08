@@ -491,7 +491,7 @@
 - FinOps 框架 · FinOps Foundation · 层 eng · 可达 是（200 · 2026-09-24） · 扩展点 capability-extension, maturity-level · 绑定 主锚 0 / 辅锚 0 · https://www.finops.org/framework/
 
 ### `in-toto`
-- in-toto 供应链证明 · OpenSSF/CNCF · 层 eng · 可达 是（200 · 2026-09-24） · 扩展点 predicate-type, statement-subject · 绑定 主锚 0 / 辅锚 0 · https://github.com/in-toto/attestation/blob/main/spec/README.md
+- in-toto 供应链证明 · OpenSSF/CNCF · 层 eng · 可达 是（200 · 2026-11-08） · 扩展点 predicate-type, statement-subject · 绑定 主锚 0 / 辅锚 0 · https://github.com/in-toto/attestation/blob/main/spec/v1/statement.md
 
 ### `iso-iec-25010`
 - SQuaRE 质量模型 · ISO/IEC · 层 eng · 可达 否（403 · 2026-09-24） · 扩展点 characteristic-extension · 绑定 主锚 0 / 辅锚 0 · https://www.iso.org/standard/78176.html
