@@ -6,7 +6,7 @@
     "prod": 1056,
     "projection": 156,
     "support": 428,
-    "verify": 1022
+    "verify": 1023
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8387,6 +8387,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "九双生层同构判据**矩阵**：只允许「有测试点名」的层被算作已覆盖。",
+      "path": "desktop/tests/test_isomorphism_matrix.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "P-C1：canonical JSON 面的**规范-实现分歧**判据（RFC 8785 vs 仓库口径）。",
       "path": "desktop/tests/test_jcs_spec_gap.py",
       "role": "verify",
@@ -12510,7 +12516,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "04ebe553d71dc25a6dbe30a0484a22e7e3842359462712e2bdade2d3d20b9f44",
+  "root_digest": "0e66ea439b0f39e829b906708334aae4e2b1e273f3878c1f2d6da90681f295af",
   "rule_counts": {
     "R-app": 1458,
     "R-catch": 281,
@@ -12519,7 +12525,7 @@
     "R-prod": 944,
     "R-projection": 136,
     "R-support": 119,
-    "R-verify": 897,
+    "R-verify": 898,
     "auto:R-core": 285
   },
   "schema": "nf-role-coordinates/1"
