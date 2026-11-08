@@ -170,5 +170,46 @@ class WalkRepoPathsMutationTest(unittest.TestCase):
             self.assertNotIn(".git", rels, "链接工作树的 .git 指针文件进了仓库件面")
 
 
+class UntrackedPathsTest(unittest.TestCase):
+    """untracked_paths：只报 git **未跟踪**件（?? 项）；跟踪件 / 忽略件 / 非 git 目录不报。
+
+    为什么单测（2026-11-08）：`nf layers --write` 的「未跟踪文件会少算投影」warn 依赖它；
+    判据要有区分度——同一夹具必须同时造出 tracked / untracked / ignored 三类。
+    """
+
+    def setUp(self):
+        exe = shutil.which("git")
+        if not exe:
+            self.skipTest("环境无 git：untracked_paths 的语义依赖 git")
+        self._git = exe
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.root = Path(tmp.name)
+        self._run("init", "-q")
+        self._run("config", "user.email", "t@example.invalid")
+        self._run("config", "user.name", "t")
+        (self.root / ".gitignore").write_text("ignored.txt\n", encoding="utf-8")
+        (self.root / "tracked.txt").write_text("t\n", encoding="utf-8")
+        self._run("add", ".gitignore", "tracked.txt")
+        self._run("commit", "-q", "-m", "init")
+        (self.root / "new.txt").write_text("n\n", encoding="utf-8")
+        (self.root / "ignored.txt").write_text("i\n", encoding="utf-8")
+
+    def _run(self, *args):
+        return subprocess.run([self._git, *args], cwd=str(self.root),
+                              capture_output=True, text=True, encoding="utf-8",
+                              errors="replace")
+
+    def test_reports_untracked_only(self):
+        got = paths.untracked_paths(str(self.root))
+        self.assertIn("new.txt", got)
+        self.assertNotIn("tracked.txt", got)
+        self.assertNotIn("ignored.txt", got)
+
+    def test_non_git_dir_is_empty(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            self.assertEqual([], paths.untracked_paths(tmp))
+
+
 if __name__ == "__main__":
     unittest.main()
