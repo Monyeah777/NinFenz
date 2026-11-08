@@ -29,7 +29,8 @@ COVERED = {
 
 #: 层 → 为什么现在写不出可红判据（缺的是对象，不是文案）
 MISSING = {
-    "授权": "契约侧已有 `approval.subject_digest` 绑定（改动即失效），但认知侧 control_record 无「谁授权」字段",
+    "授权": "契约侧已有 `approval.subject_digest` 绑定（改动即失效），"
+           "但认知侧 control_record 无「谁授权」字段",
     "对抗": "`counterexample` move 有语义校验，但缺 `witness_ref` 引用对象（反例无法被 cc 复算）",
     "资源": "认知侧 `discourse.budget` 账实相符已守，验证侧只有 `perf_budget` 阈值、无逐次记账",
     "自省": "ADR 有 `falsifier` 但也无 `version_chain`（旧版验新版缺对象）",
@@ -62,7 +63,6 @@ class IsomorphismMatrixTest(unittest.TestCase):
 
     def test_missing_reasons_name_a_concrete_object(self):
         """missing 理由不能是「暂时没做」——必须点名一个具体字段/对象（反引号 token）。"""
-        import re
         for layer, why in MISSING.items():
             self.assertRegex(why, r"`[A-Za-z0-9_.:/\\-]+`",
                              layer + " 的缺失理由没有点名具体对象：" + why)
