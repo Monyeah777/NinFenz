@@ -221,7 +221,8 @@ class PackContentTest(unittest.TestCase):
                 kind = str(std["claim_kind"])
                 used.add(kind)
                 self.assertIn(kind, vocab, "包 " + pid + " 用了未登记词：" + kind)
-        self.assertEqual(sorted(vocab - used), [], "词表里有没人用的死词：%s" % sorted(vocab - used))
+        self.assertEqual(sorted(vocab - used), [],
+                         f"词表里有没人用的死词：{sorted(vocab - used)}")
     def test_metacognition_pack_has_calibration_standard(self):
         pack = method_pack.load_pack(str(ROOT), "metacognition")
         std = method_pack.obligations(pack, "calibration")
