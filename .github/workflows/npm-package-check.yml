@@ -45,6 +45,15 @@ jobs:
           set -euo pipefail
           npm run stage
           npm run verify
+      - name: 包内冒烟（node --test，与 npm-publish 同口径）
+        working-directory: packaging/npm
+        run: node --test test/smoke.test.mjs
+      - name: 打包干跑 + tarball 与清单逐字节核对（A3 最后一跳）
+        working-directory: packaging/npm
+        run: |
+          set -euo pipefail
+          npm pack --dry-run
+          node tools/verify-tarball.mjs
       - name: stage 后工作树必须无受跟踪改动（数字/清单与生成器一致）
         run: |
           set -euo pipefail
