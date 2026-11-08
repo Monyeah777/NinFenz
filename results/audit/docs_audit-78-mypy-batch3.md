@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:f643149eead1b2d9761164706ee0a08f6c741e0ee326b5962ac93bc30d4406e7
+  - protocol/code_metrics_baseline.json:6527da9c73d585f6ec16b83e126ca5a1ae5b173c4177d9fbeba32301b45a9cd1
 ---
+> 重审（2026-11-08）：分组报告模块（先分组再汇总；n<2 不能谈方差）
+
 > 重审（2026-11-08）：口头置信触发策略（触发器非证据）+ CLI --threshold
 
 > 重审（2026-11-08）：cog calibrate CLI（可靠性表出口）

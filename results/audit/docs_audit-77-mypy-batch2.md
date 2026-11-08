@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
-  - protocol/code_metrics_baseline.json:f643149eead1b2d9761164706ee0a08f6c741e0ee326b5962ac93bc30d4406e7
+  - protocol/code_metrics_baseline.json:6527da9c73d585f6ec16b83e126ca5a1ae5b173c4177d9fbeba32301b45a9cd1
 ---
+> 重审（2026-11-08）：分组报告模块（先分组再汇总；n<2 不能谈方差）
+
 > 重审（2026-11-08）：口头置信触发策略（触发器非证据）+ CLI --threshold
 
 > 重审（2026-11-08）：cog calibrate CLI（可靠性表出口）

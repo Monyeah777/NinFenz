@@ -550,6 +550,11 @@
       "max_fn_cc": 6,
       "max_fn_lines": 16
     },
+    "desktop/src/core/grouped_report.py": {
+      "lines": 83,
+      "max_fn_cc": 10,
+      "max_fn_lines": 29
+    },
     "desktop/src/core/handover.py": {
       "lines": 88,
       "max_fn_cc": 11,

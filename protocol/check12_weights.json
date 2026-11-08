@@ -150,6 +150,7 @@
     "test_grain_units": 0.2,
     "test_graph_health": 0.1,
     "test_grounding": 0.1,
+    "test_grouped_report": 0.2,
     "test_handover": 0.2,
     "test_host_projection": 0.1,
     "test_hotspot_profile": 0.6,
@@ -1961,6 +1962,12 @@
     "test_grounding.VerifyAnchorsTest.test_all_anchored": 0.0,
     "test_grounding.VerifyAnchorsTest.test_blank_facts_are_ignored": 0.0,
     "test_grounding.VerifyAnchorsTest.test_unanchored_is_reported_not_dropped": 0.0,
+    "test_grouped_report.GroupedReportTest.test_bad_input_fails_closed": 0.0,
+    "test_grouped_report.GroupedReportTest.test_clean_report_has_no_issues": 0.0,
+    "test_grouped_report.GroupedReportTest.test_group_means_and_sd": 0.0,
+    "test_grouped_report.GroupedReportTest.test_missing_groups_is_flagged": 0.0,
+    "test_grouped_report.GroupedReportTest.test_single_sample_group_is_flagged": 0.0,
+    "test_grouped_report.GroupedReportTest.test_table_matches_structured_values": 0.0,
     "test_handover.TestNegatives.test_bad_status_is_fail": 0.01,
     "test_handover.TestNegatives.test_empty_pending_is_fail": 0.0,
     "test_handover.TestNegatives.test_missing_section_is_fail": 0.0,
@@ -4450,5 +4457,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1506.9
+  "total_s": 1507.1
 }

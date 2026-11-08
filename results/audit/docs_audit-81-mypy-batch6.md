@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:f643149eead1b2d9761164706ee0a08f6c741e0ee326b5962ac93bc30d4406e7
+  - protocol/code_metrics_baseline.json:6527da9c73d585f6ec16b83e126ca5a1ae5b173c4177d9fbeba32301b45a9cd1
 ---
+> 重审（2026-11-08）：分组报告模块（先分组再汇总；n<2 不能谈方差）
+
 > 重审（2026-11-08）：口头置信触发策略（触发器非证据）+ CLI --threshold
 
 > 重审（2026-11-08）：cog calibrate CLI（可靠性表出口）

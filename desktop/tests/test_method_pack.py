@@ -169,7 +169,7 @@ class PackContentTest(unittest.TestCase):
             "ev.blind_partition": ("desktop/src/core/eval_harness.py", ("blind_review",)),
             "ev.negative_control": ("desktop/src/core/eval_harness.py", ("negative_control",)),
             "ev.synthetic_guard": ("desktop/src/core/eval_harness.py", ("synthetic",)),
-            "ev.effect_and_variance": ("desktop/src/core/eval_harness.py", ("dimensions",)),
+            "ev.effect_and_variance": ("desktop/src/core/grouped_report.py", ("sd",)),
             "ev.cost_accounting": ("desktop/src/core/eval_harness.py", ("cost_accounting",)),
             "ev.replicate": ("scripts/eval_run.py", ("--check",)),
             "pi.allowlist_surface": ("desktop/src/core/mcp_ingress.py", ("allow",)),

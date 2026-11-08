@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:f643149eead1b2d9761164706ee0a08f6c741e0ee326b5962ac93bc30d4406e7
+  - protocol/code_metrics_baseline.json:6527da9c73d585f6ec16b83e126ca5a1ae5b173c4177d9fbeba32301b45a9cd1
 ---
+> 重审（2026-11-08）：分组报告模块（先分组再汇总；n<2 不能谈方差）
+
 > 重审（2026-11-08）：口头置信触发策略（触发器非证据）+ CLI --threshold
 
 > 重审（2026-11-08）：cog calibrate CLI（可靠性表出口）
