@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-11-10",
   "approved_by": "Monyeah777",
-  "note": "合并后二轮收口：perf_budget 入口改只读、watch 轮询放宽、生成物重算",
+  "note": "perf_budget 预算调整后回执重算",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "b7da9597d65049a188a629e092439512511653642286efc4ce21b4f4301abbf8"

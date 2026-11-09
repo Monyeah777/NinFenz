@@ -281,7 +281,7 @@
     {
       "@id": "nf:file/protocol/perf_budget.json",
       "@type": "prov:Entity",
-      "nf:sha256": "e4d3a4cfb1a68a78ff5e138d4df760adad9175ffe8ee158e223c5beb9d58acff"
+      "nf:sha256": "e58b6ee431c11309a9ec1bea89a00d85b3bcbd69b67d5c3f10572f801f941a57"
     },
     {
       "@id": "nf:file/protocol/pipeline_advisory.json",

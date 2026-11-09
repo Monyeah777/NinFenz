@@ -1,7 +1,7 @@
 {
-  "bytes": 12013213,
+  "bytes": 12013162,
   "count": 569,
-  "digest": "6c52c2ec3e2f7544699e873896f68d0e957f0324e5ba1c33438f4530086bb33e",
+  "digest": "726dd305afaeca55920900517a2697805f493c608d95062d800f9cd0f9742509",
   "materials": [
     {
       "bytes": 102,
@@ -1899,9 +1899,9 @@
       "sha256": "ad799cbfbf1dd69859ff21963885ebf1d5fed56ca67fdd1c2b9e2052ce3b8003"
     },
     {
-      "bytes": 335,
+      "bytes": 284,
       "path": "protocol/approvals/protocol__conformance_report.json",
-      "sha256": "df2b98ef33fe4be9a29b34913fdd27d99c80b1e21937e1f85d06903d9f561a45"
+      "sha256": "424d40aa71cedddc64f92b964d9895cdf150cac95497a04826339416572ef9bf"
     },
     {
       "bytes": 16375,
@@ -2086,7 +2086,7 @@
     {
       "bytes": 27560,
       "path": "protocol/generated/receipt_chain.json",
-      "sha256": "4d7f1ebf939bca47ed2f821542cf70c6efe7c52b34095ba4188deed6dcf6dbf8"
+      "sha256": "dd872796d95178e232b1fdeccaaf271d710401bb6e8de02f775b4596d9e978f0"
     },
     {
       "bytes": 918,
@@ -2311,7 +2311,7 @@
     {
       "bytes": 79590,
       "path": "protocol/RECEIPTS.json",
-      "sha256": "e032ddeff5826f7e7e343bb97542d238f3a81da0e8478bc7b8898d2414e6d2a7"
+      "sha256": "cd5f14207852ba0e6153c17d3960f99a7488b2774a2265d7f8bb05b3e80a26eb"
     },
     {
       "bytes": 7923,
