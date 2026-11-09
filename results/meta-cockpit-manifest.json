@@ -1,10 +1,15 @@
 {
-  "schema": "nf-meta-runtime-manifest/1",
-  "version": "1.0",
-  "machine_digest": "59357b7056a68bfbd64cdd85333aadfb95c34fdf06f1216563cee56f5e01ce5c",
-  "runtime_digest": "59357b7056a68bfbd64cdd85333aadfb95c34fdf06f1216563cee56f5e01ce5c",
-  "task_profile_digest": "0ddb101eb028a0f631a40d8efbc687cd3951528f6fc3f95ff4c4fbd98ed989c1",
   "atom_contracts_digest": "f6a79934733595db4ac7dcec4db6f17ebd9f39f8d557eca5f8aea79aca8428e1",
+  "capabilities": {
+    "deterministic_replay": true,
+    "fail_closed": true,
+    "offline": true,
+    "offline_blind_ab": true,
+    "role_aware_retrieval": true,
+    "secret_guard": true,
+    "task_native_handoff": true
+  },
+  "digest": "79ded2453fa7442c21c16c93f4dd8e7f0157681efca04df28c8cb5b1fccef977",
   "file_digests": {
     "ATOM_MENU.md": "d02816fa60b25da4b5f92d0b34d4ffaf1a13b35144903ab82d7b00dd3d2bff24",
     "COCKPIT_PROTOCOL.md": "7f60c1b72fb511840e20466abf863a5cb2d4ee8c1e509a5cf8fcb75b61edf1f8",
@@ -13,12 +18,14 @@
     "__init__.py": "f31cbadd59e3f25aab850122bbcc4ad5adcf5a65596a38c4996f264a38427fd7",
     "abstention.py": "87ad854a1a05e854b9e10b8c76b5f1343b797b97fc1146ab5a21ae98d9b0efcb",
     "atom_algebra.py": "57adf9bd9a69d930f674dc606ce013769c202c7387a065c471bfa3ac8b4a9e4f",
+    "atom_catalog.py": "517010d354be5729f475ee5b6b7187cf017d16c77967642c858e2061b86b0748",
     "atom_contracts.json": "f6a79934733595db4ac7dcec4db6f17ebd9f39f8d557eca5f8aea79aca8428e1",
     "atom_planner.py": "48273adc948da70920cfe399947359c433e63dbbd5eaa28bb1d29a7c7ad38848",
     "atomic_io.py": "50d9cbc71e4233cf79414fa87a00272b28dc70e8a4440460110ecec3175ed10c",
     "build_atom_menu.py": "1bedd2efd340114f91442a41b6319f7a9e7f962996d49f656a132e45988dbf95",
     "calibration_ledger.py": "757bf3665acec8d9a246c1dff5a38b50ee2e8860762ccb1bc1ba5d2792155cae",
     "calibration_store.py": "e77130d3e410a9dbe249890b59387df993d67b7646c75752074dd5796dfd7306",
+    "candidate_health.py": "de612e7c2d622ac4fa9883afbe208229d9e0ceddb31b43c48f8890435cdc79ed",
     "chain_horizontal.py": "5baf3f5b50da7765849cd8787854c3ca5985f17c087f5d245831aa549c69a481",
     "chain_knowledge.py": "cde63a15729ab361dc72cbdb4ccce8c1083dcb0950a375105c8cd317728d9d53",
     "chain_vertical.py": "388744e7c25817449e9e54d181281b639898e5fc3a421b145bc47f6818828cf1",
@@ -103,25 +110,20 @@
     "thought_contract.py": "1c6ce9550c864d48c50992a922b437623a5785a286342d1e41195212f80ce072",
     "value_kind_policy.json": "b5fd118d42235a61fd4994fafe19bc7c7fad71fccf97751a91502f85fe943cd1"
   },
-  "limits": {
-    "context_units": 8000,
-    "references_partition": 1000,
-    "method_history": 8,
-    "search_expansions": 2000,
-    "search_generated": 10000,
-    "calibration_store_bytes": 1048576,
-    "journal_bytes": 8388608
-  },
-  "capabilities": {
-    "offline": true,
-    "deterministic_replay": true,
-    "fail_closed": true,
-    "task_native_handoff": true,
-    "role_aware_retrieval": true,
-    "offline_blind_ab": true,
-    "secret_guard": true
-  },
   "human_review": "PENDING",
+  "limits": {
+    "calibration_store_bytes": 1048576,
+    "context_units": 8000,
+    "journal_bytes": 8388608,
+    "method_history": 8,
+    "references_partition": 1000,
+    "search_expansions": 2000,
+    "search_generated": 10000
+  },
+  "machine_digest": "fbfffe2921753fd57d6a8652931de3d68f28d2b79fe532eb0e53b66c656e8b38",
   "no_scoring": true,
-  "digest": "c9469a7f54041e7c041e353a768bad98054b72bcb4775639f7463754b985abfc"
+  "runtime_digest": "fbfffe2921753fd57d6a8652931de3d68f28d2b79fe532eb0e53b66c656e8b38",
+  "schema": "nf-meta-runtime-manifest/1",
+  "task_profile_digest": "0ddb101eb028a0f631a40d8efbc687cd3951528f6fc3f95ff4c4fbd98ed989c1",
+  "version": "1.0"
 }

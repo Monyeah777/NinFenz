@@ -1,0 +1,42 @@
+{
+  "schema": "nf-eval-protocol/1",
+  "version": "1.0.0",
+  "registered_at": "2026-11-08",
+  "frozen_before_run": true,
+  "note": "预注册评测协议：先冻结再跑（防事后挑指标）。只计数、不打分；思考质量只能来自外部盲评（本仓内部永不产出 pass）。",
+  "question": "带菜单/方法包/工作台的认知流程，是否比自由推理更会「改变问题框架」，且不把思路变窄？",
+  "conditions": [
+    {"id": "free", "name": "自由推理", "description": "无结构，直接答；作为基线", "structure_tax": "none"},
+    {"id": "menu", "name": "仅菜单", "description": "给 15 元动作 + 33 原子清单，但不要求使用", "structure_tax": "menu-only"},
+    {"id": "hybrid", "name": "菜单+方法包", "description": "菜单 + 领域方法包（专家动作与证据标准）", "structure_tax": "menu+pack"},
+    {"id": "workspace", "name": "完整工作台", "description": "菜单+方法包+话语状态记录+重放", "structure_tax": "full"}
+  ],
+  "tasks": [
+    {"id": "T1", "name": "水印鲁棒性主张", "prompt_kind": "claim-under-uncertainty"},
+    {"id": "T2", "name": "证据链为何失败", "prompt_kind": "debug-evidence"},
+    {"id": "T3", "name": "该不该上桥", "prompt_kind": "architecture-decision"},
+    {"id": "T4", "name": "评测怎么设计才不算自嗨", "prompt_kind": "meta-evaluation"}
+  ],
+  "samples_per_task": 3,
+  "dimensions": [
+    {"id": "frame_change", "name": "框架变化数", "kind": "count", "how": "问题重述/假设悬置/张力新增的次数（按记录计数）"},
+    {"id": "assumption_explicit", "name": "假设显式化", "kind": "count", "how": "被显式写出的假设条数"},
+    {"id": "counterexample_quality", "name": "反例质量", "kind": "blind-rank", "how": "外部盲评：该反例是否真的违反主张（不通过=无效，计 0）"},
+    {"id": "coherence", "name": "融贯", "kind": "blind-rank", "how": "外部盲评：主张与证据是否互相矛盾（矛盾计数）"},
+    {"id": "depth", "name": "深度", "kind": "blind-rank", "how": "外部盲评：是否触及机制层而非现象层（层级别计数）"},
+    {"id": "deliverable", "name": "可交付性", "kind": "count", "how": "能否产出门禁/证据可检的交付物（是=1）"},
+    {"id": "table_external_mechanisms", "name": "表外新机制数", "kind": "count", "how": "**反窄化**指标：产出中不在给定菜单/方法包表内的机制数；越低说明被菜单窄化"}
+  ],
+  "analysis_plan": {
+    "unit": "task × sample",
+    "pairing": "同 task/sample 下各 condition 配对比较",
+    "statistic": "计数差（condition - free）与中位数；不给 p 值、不做显著性宣称",
+    "exclusions": "不允许事后剔除样本；如需剔除必须在 results 里写原因并保留原始记录",
+    "reporting": "思考质量（盲评）与交付质量（门禁）分两份报告，不得合并成单一结论"
+  },
+  "prohibitions": [
+    "不打分、不排序、不给总评",
+    "不在本仓内部产出盲评 pass（只能引用外部评审件）",
+    "不在跑完后再改协议（改了就是新协议 + 新版本号）"
+  ]
+}

@@ -86,9 +86,13 @@ class BuildTest(unittest.TestCase):
         两者合起来仍然覆盖「同树同根 + 跨进程同根」。
         """
         committed = json_doc.load(ROOT / vr.REPORT_REL, dict, what=vr.REPORT_REL)
-        live = vr.build(str(ROOT))
+        # 用提交件记录的基准日重算：否则跨午夜/隔天重跑必然「差一天」而假红
+        # （2026-11-08→09 实测：快照恰好跨日，live 的 built_for_date 变成次日）。
+        # 判据不放松：同树 + 同基准日 → 必须同根；「提交件是否新鲜」由另测负责。
+        today = committed.get("built_for_date")
+        live = vr.build(str(ROOT), today=vr._dt.date.fromisoformat(today) if today else None)
         self.assertEqual(committed["root_digest"], live["root_digest"],
-                         "同一棵树两次构建必须同根（否则报告不可核验）")
+                         "同一棵树、同一基准日两次构建必须同根（否则报告不可核验）")
 
     def test_items_cover_declared_specs(self):
         r = repo_report()

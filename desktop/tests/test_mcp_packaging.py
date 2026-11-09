@@ -5,8 +5,8 @@
 ② 声明的 tools/prompts 必须与 `mcp_runtime` 运行时面**逐名一致**（多一个少一个即 FAIL）；
 ③ `docs/mcp.md` 的「上架材料」节必须逐项复述真源（否则人读面会与机读面分叉）。
 """
-import json
 import builtins
+import json
 import re
 import sys
 import unittest
@@ -226,6 +226,7 @@ class McpPackageFingerprintTest(unittest.TestCase):
 
     def test_tools_hash_drift_is_detected(self):
         import tempfile
+
         from core import mcp_package
 
         root = Path(__file__).resolve().parents[2]

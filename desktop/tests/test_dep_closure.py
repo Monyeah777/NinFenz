@@ -1,6 +1,8 @@
 """dep_closure 单测。"""
-import sys, unittest
+import sys
+import unittest
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 from core import dep_closure as D  # noqa: E402
 

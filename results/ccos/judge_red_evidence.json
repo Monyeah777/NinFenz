@@ -1,0 +1,1582 @@
+{
+  "entries": [
+    {
+      "module": "test_absence_guard.py",
+      "source": "none"
+    },
+    {
+      "module": "test_agent_rules_adapter.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_ai_domain_closure.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_allowlist_expiry.py",
+      "source": "none"
+    },
+    {
+      "module": "test_anchor_align.py",
+      "source": "none"
+    },
+    {
+      "module": "test_approval_naming.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_architecture_layers.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_artifact_manifest.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_as_of.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_assemble_build.py",
+      "source": "none"
+    },
+    {
+      "module": "test_assertions.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_asset_contract.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_asset_contract_cache.py",
+      "source": "none"
+    },
+    {
+      "module": "test_asset_contract_faces.py",
+      "source": "none"
+    },
+    {
+      "module": "test_asset_contract_ffi_warn.py",
+      "source": "none"
+    },
+    {
+      "module": "test_asset_density.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_asset_ledger.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_asset_ledger_projection.py",
+      "source": "none"
+    },
+    {
+      "module": "test_asset_line_baseline.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_asset_provenance.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_ast_missing.py",
+      "source": "none"
+    },
+    {
+      "module": "test_atom_catalog.py",
+      "source": "negative_case"
+    },
+    {
+      "module": "test_atom_composition.py",
+      "source": "none"
+    },
+    {
+      "module": "test_atomic_write.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_atomic_write_boundaries.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_atoms.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_attest.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_audit.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_audit_rebind.py",
+      "source": "none"
+    },
+    {
+      "module": "test_autofix.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_bilingual_entry.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_boundaries.py",
+      "source": "none"
+    },
+    {
+      "module": "test_bridge_real.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_cache_bounds.py",
+      "source": "none"
+    },
+    {
+      "module": "test_calibration.py",
+      "source": "negative_case"
+    },
+    {
+      "module": "test_calibration_state.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_canonical_parity.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_capability_battery.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_capability_inventory.py",
+      "source": "none"
+    },
+    {
+      "module": "test_case_schema.py",
+      "source": "none"
+    },
+    {
+      "module": "test_category_registry.py",
+      "source": "none"
+    },
+    {
+      "module": "test_ccos_abi_docs.py",
+      "source": "none"
+    },
+    {
+      "module": "test_ccos_chain.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_ccos_docs_anchors.py",
+      "source": "none"
+    },
+    {
+      "module": "test_ccv3_adapter.py",
+      "source": "none"
+    },
+    {
+      "module": "test_changelog_gen.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_check12_budget.py",
+      "source": "none"
+    },
+    {
+      "module": "test_check30_bump.py",
+      "source": "none"
+    },
+    {
+      "module": "test_check_compile.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_check_merge_equivalence.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_check_policy.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_check_text_to_intent.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_ci_diagnostics.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_ci_supply_chain.py",
+      "source": "none"
+    },
+    {
+      "module": "test_ci_visibility.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_claim_labels.py",
+      "source": "none"
+    },
+    {
+      "module": "test_cli_determinism.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_cli_error_framing.py",
+      "source": "negative_case"
+    },
+    {
+      "module": "test_cli_harness_equivalence.py",
+      "source": "none"
+    },
+    {
+      "module": "test_cli_json_face.py",
+      "source": "none"
+    },
+    {
+      "module": "test_cli_trust_meta.py",
+      "source": "none"
+    },
+    {
+      "module": "test_closure.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_closure_scan.py",
+      "source": "none"
+    },
+    {
+      "module": "test_code_metrics.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_cog_cli_faces.py",
+      "source": "none"
+    },
+    {
+      "module": "test_cognition.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_cognition_bridge.py",
+      "source": "negative_case"
+    },
+    {
+      "module": "test_cognition_claims.py",
+      "source": "negative_case"
+    },
+    {
+      "module": "test_cognition_control.py",
+      "source": "negative_case"
+    },
+    {
+      "module": "test_cognition_plan.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_cognition_workspace.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_commit_msg.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_commit_title_guard.py",
+      "source": "none"
+    },
+    {
+      "module": "test_community_inventory.py",
+      "source": "none"
+    },
+    {
+      "module": "test_composer.py",
+      "source": "none"
+    },
+    {
+      "module": "test_concept_graph_gate.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_conformance_run.py",
+      "source": "none"
+    },
+    {
+      "module": "test_conformance_scan.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_content_face.py",
+      "source": "none"
+    },
+    {
+      "module": "test_contract_pin.py",
+      "source": "none"
+    },
+    {
+      "module": "test_core.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_core_atomic_writes.py",
+      "source": "negative_case"
+    },
+    {
+      "module": "test_core_judge_map.py",
+      "source": "none"
+    },
+    {
+      "module": "test_cot_exposure.py",
+      "source": "none"
+    },
+    {
+      "module": "test_coupling_metrics.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_cross_lang_matrix.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_cross_lang_verify.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_daemon.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_daemon_limits.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_daemon_parity.py",
+      "source": "none"
+    },
+    {
+      "module": "test_dead_code.py",
+      "source": "negative_case"
+    },
+    {
+      "module": "test_decision_layer.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_decisions.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_declined_ledger.py",
+      "source": "none"
+    },
+    {
+      "module": "test_delete_evidence.py",
+      "source": "none"
+    },
+    {
+      "module": "test_dep_closure.py",
+      "source": "none"
+    },
+    {
+      "module": "test_dirty_tree.py",
+      "source": "none"
+    },
+    {
+      "module": "test_disk_cache.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_disk_cache_bounds.py",
+      "source": "none"
+    },
+    {
+      "module": "test_doc_examples.py",
+      "source": "none"
+    },
+    {
+      "module": "test_doc_hygiene.py",
+      "source": "none"
+    },
+    {
+      "module": "test_doc_reachability.py",
+      "source": "none"
+    },
+    {
+      "module": "test_doc_routing.py",
+      "source": "none"
+    },
+    {
+      "module": "test_doc_truth.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_docs_cite_probe_numbers.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_domain_pack.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_domain_pack_render.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_dotnet_aot.py",
+      "source": "none"
+    },
+    {
+      "module": "test_drill_fidelity.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_ed25519.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_effect_rows.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_engine_ffi_binding.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_engine_loader.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_engine_registry.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_error_codes.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_eval_collapse.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_eval_harness.py",
+      "source": "negative_case"
+    },
+    {
+      "module": "test_evidence.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_evidence_batch.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_evidence_forms_parity.py",
+      "source": "none"
+    },
+    {
+      "module": "test_evidence_graph.py",
+      "source": "negative_case"
+    },
+    {
+      "module": "test_evidence_vectors.py",
+      "source": "none"
+    },
+    {
+      "module": "test_execution_drill.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_explain_coverage.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_export_manifest_gates.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_export_schema.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_exporter.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_extension_impact.py",
+      "source": "none"
+    },
+    {
+      "module": "test_external_metadata.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_extreme_hardening.py",
+      "source": "none"
+    },
+    {
+      "module": "test_face_coverage.py",
+      "source": "none"
+    },
+    {
+      "module": "test_feature_lifecycle.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_fence_health.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_fetch_guard.py",
+      "source": "none"
+    },
+    {
+      "module": "test_freshness_check.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_gap_review.py",
+      "source": "none"
+    },
+    {
+      "module": "test_gate_41_42.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_gate_cache.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_gate_check.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_gate_datalog.py",
+      "source": "none"
+    },
+    {
+      "module": "test_gate_engine_parity.py",
+      "source": "none"
+    },
+    {
+      "module": "test_gate_experts_manifest.py",
+      "source": "none"
+    },
+    {
+      "module": "test_gate_faces.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_gate_graph.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_gate_observe.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_gate_probe.py",
+      "source": "negative_case"
+    },
+    {
+      "module": "test_gate_router.py",
+      "source": "none"
+    },
+    {
+      "module": "test_gate_select.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_gate_verdict.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_gitee_diagnostics.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_governance_docs.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_governance_faces.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_grain_units.py",
+      "source": "none"
+    },
+    {
+      "module": "test_graph_health.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_grounding.py",
+      "source": "none"
+    },
+    {
+      "module": "test_grouped_report.py",
+      "source": "negative_case"
+    },
+    {
+      "module": "test_handover.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_host_projection.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_hotspot_profile.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_http_api.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_impact_check.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_import_adapter.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_import_injection.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_injection_budget.py",
+      "source": "none"
+    },
+    {
+      "module": "test_injection_ledger.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_instruction_evidence.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_instruction_step_audit.py",
+      "source": "none"
+    },
+    {
+      "module": "test_intake_bots_hardening.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_intake_gate.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_intake_quota.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_intake_surface.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_integrations.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_interop.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_interop_export.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_interop_schema_tool.py",
+      "source": "none"
+    },
+    {
+      "module": "test_interop_thirdparty_kit.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_invalid_corpus.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_invariants.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_io_types.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_ir.py",
+      "source": "none"
+    },
+    {
+      "module": "test_iso8601.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_isolation_patterns.py",
+      "source": "none"
+    },
+    {
+      "module": "test_isomorphism_matrix.py",
+      "source": "negative_case"
+    },
+    {
+      "module": "test_jcs_spec_gap.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_job_ledger.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_json_shape_contracts.py",
+      "source": "negative_case"
+    },
+    {
+      "module": "test_judge_clock_purity.py",
+      "source": "negative_case"
+    },
+    {
+      "module": "test_judge_mutation_probe.py",
+      "source": "negative_case"
+    },
+    {
+      "module": "test_judge_red_evidence.py",
+      "source": "none"
+    },
+    {
+      "module": "test_judge_references.py",
+      "source": "none"
+    },
+    {
+      "module": "test_judgement_coverage.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_key_naming.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_key_transparency.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_knowledge.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_knowledge_sig.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_label_carrier.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_label_ir.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_label_sidecar.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_label_watermark.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_launcher.py",
+      "source": "none"
+    },
+    {
+      "module": "test_layer_model.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_lazy_yaml.py",
+      "source": "none"
+    },
+    {
+      "module": "test_leak_surface.py",
+      "source": "none"
+    },
+    {
+      "module": "test_ledger_tables.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_library.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_license_gate.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_live_doc_counts.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_load_state.py",
+      "source": "none"
+    },
+    {
+      "module": "test_locales.py",
+      "source": "none"
+    },
+    {
+      "module": "test_lsp.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_lsp_guard.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_lsp_hardening.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_lsp_transcript.py",
+      "source": "none"
+    },
+    {
+      "module": "test_market_analyzer.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_mcp_adapter.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_mcp_ingress.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_mcp_live_e2e.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_mcp_manifest.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_mcp_packaging.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_mcp_read_budget.py",
+      "source": "none"
+    },
+    {
+      "module": "test_mcp_redteam.py",
+      "source": "none"
+    },
+    {
+      "module": "test_mcp_runtime.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_mcp_trust_meta.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_mcp_write_freedom.py",
+      "source": "none"
+    },
+    {
+      "module": "test_md_tables.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_meta_cockpit.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_method_pack.py",
+      "source": "negative_case"
+    },
+    {
+      "module": "test_missing_sentinel.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_modeling.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_module_lifecycle.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_module_namespace.py",
+      "source": "none"
+    },
+    {
+      "module": "test_mvu_adapter.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_net_coverage.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_new_faces.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_nf_cli.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_nf_language.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_nf_tui.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_nfal.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_nfal_cli.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_nfal_rules.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_npm_package.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_numeric_grounding.py",
+      "source": "none"
+    },
+    {
+      "module": "test_official_core.py",
+      "source": "none"
+    },
+    {
+      "module": "test_orchestrate_cli.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_orchestration.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_orphan_scan.py",
+      "source": "none"
+    },
+    {
+      "module": "test_output_envelope.py",
+      "source": "none"
+    },
+    {
+      "module": "test_output_forms.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_output_path_escape.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_p6_evaluations.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_pack_combo.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_pack_runnable_runs.py",
+      "source": "none"
+    },
+    {
+      "module": "test_package_index.py",
+      "source": "none"
+    },
+    {
+      "module": "test_path_flag_ratchet.py",
+      "source": "none"
+    },
+    {
+      "module": "test_path_moved.py",
+      "source": "none"
+    },
+    {
+      "module": "test_path_trigger.py",
+      "source": "none"
+    },
+    {
+      "module": "test_paths.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_payload_consumer.py",
+      "source": "none"
+    },
+    {
+      "module": "test_payload_evidence.py",
+      "source": "none"
+    },
+    {
+      "module": "test_payload_harvest_forms.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_payload_registry.py",
+      "source": "none"
+    },
+    {
+      "module": "test_payload_typing.py",
+      "source": "none"
+    },
+    {
+      "module": "test_perf_budget.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_pipeline.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_pipeline_loader.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_pipeline_scaffold.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_pipelinerun.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_pkg_cli.py",
+      "source": "none"
+    },
+    {
+      "module": "test_plan_token.py",
+      "source": "none"
+    },
+    {
+      "module": "test_plog.py",
+      "source": "none"
+    },
+    {
+      "module": "test_plugin_component.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_plugin_gate.py",
+      "source": "none"
+    },
+    {
+      "module": "test_plugin_manifest.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_plugin_wasm_host.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_policy_snapshot.py",
+      "source": "none"
+    },
+    {
+      "module": "test_postmortem.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_precheck.py",
+      "source": "none"
+    },
+    {
+      "module": "test_preset_cli.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_probe_manifest_wiring.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_prose_lint.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_protocol_golden.py",
+      "source": "none"
+    },
+    {
+      "module": "test_protocol_projection.py",
+      "source": "none"
+    },
+    {
+      "module": "test_protocol_wizard.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_publish_boundary.py",
+      "source": "none"
+    },
+    {
+      "module": "test_purity_scan.py",
+      "source": "negative_case"
+    },
+    {
+      "module": "test_quality_45.py",
+      "source": "none"
+    },
+    {
+      "module": "test_quality_baseline.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_quality_depth_scan.py",
+      "source": "none"
+    },
+    {
+      "module": "test_quality_gate.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_quant_domain_package.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_quant_metrics.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_rating_gate.py",
+      "source": "none"
+    },
+    {
+      "module": "test_reader_verify.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_redos_patterns.py",
+      "source": "none"
+    },
+    {
+      "module": "test_registry_loader.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_registry_sync.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_regression_score.py",
+      "source": "none"
+    },
+    {
+      "module": "test_related_of.py",
+      "source": "none"
+    },
+    {
+      "module": "test_release_conclusion.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_release_gate.py",
+      "source": "none"
+    },
+    {
+      "module": "test_repeat_safety.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_repo_face.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_repo_stats.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_repo_trust.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_report_meta.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_requirement_coverage.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_residual_registry.py",
+      "source": "none"
+    },
+    {
+      "module": "test_response_cache_replay.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_retriever.py",
+      "source": "none"
+    },
+    {
+      "module": "test_retry_semantics.py",
+      "source": "none"
+    },
+    {
+      "module": "test_revocations.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_rewrite_tool.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_role_model.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_round_drill.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_round_header.py",
+      "source": "none"
+    },
+    {
+      "module": "test_ruff_syntax.py",
+      "source": "none"
+    },
+    {
+      "module": "test_rule_conflict.py",
+      "source": "none"
+    },
+    {
+      "module": "test_rules_render.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_runtime_shape_contracts.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_rust_engine.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_rust_fastlane.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_rust_module_wiring.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_rust_pyext.py",
+      "source": "none"
+    },
+    {
+      "module": "test_sast_baseline.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_sbom.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_scale_receipts.py",
+      "source": "none"
+    },
+    {
+      "module": "test_schema_lint.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_schema_pins.py",
+      "source": "none"
+    },
+    {
+      "module": "test_schema_reference.py",
+      "source": "none"
+    },
+    {
+      "module": "test_scratch.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_script_orphans.py",
+      "source": "none"
+    },
+    {
+      "module": "test_sealed_crosscheck.py",
+      "source": "none"
+    },
+    {
+      "module": "test_seed_from_repo.py",
+      "source": "none"
+    },
+    {
+      "module": "test_selfcontained_rebuild.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_semantic_conflict.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_semantics.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_sensitive_ignore.py",
+      "source": "none"
+    },
+    {
+      "module": "test_serve_decision_success.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_serve_default.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_serve_hardening.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_session_watch.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_shell_ledger.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_shell_parity.py",
+      "source": "none"
+    },
+    {
+      "module": "test_silent_skip_reasons.py",
+      "source": "negative_case"
+    },
+    {
+      "module": "test_since_tags.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_site_face.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_skill_adapter.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_skill_contract.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_st_validator.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_state_front.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_stdio_encoding.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_steelman.py",
+      "source": "none"
+    },
+    {
+      "module": "test_strict_schema.py",
+      "source": "none"
+    },
+    {
+      "module": "test_style_dna.py",
+      "source": "none"
+    },
+    {
+      "module": "test_style_ratchet.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_subcheck_cache.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_suite_isolation.py",
+      "source": "none"
+    },
+    {
+      "module": "test_suite_wiring.py",
+      "source": "none"
+    },
+    {
+      "module": "test_telemetry_semconv.py",
+      "source": "none"
+    },
+    {
+      "module": "test_terminal.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_text_hygiene.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_timestamp.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_tool_face.py",
+      "source": "none"
+    },
+    {
+      "module": "test_trace_drill.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_transparency_log.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_trust_anchor.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_trust_boundary.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_two_faces_jsonrpc.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_unknown_policy.py",
+      "source": "none"
+    },
+    {
+      "module": "test_value_replay.py",
+      "source": "none"
+    },
+    {
+      "module": "test_variants.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_verification_cards.py",
+      "source": "none"
+    },
+    {
+      "module": "test_verifier_props.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_verifier_status.py",
+      "source": "none"
+    },
+    {
+      "module": "test_verifier_version.py",
+      "source": "none"
+    },
+    {
+      "module": "test_verify_guard.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_verify_parallel_checks.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_verify_report.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_verify_tests_selection.py",
+      "source": "none"
+    },
+    {
+      "module": "test_version_map.py",
+      "source": "none"
+    },
+    {
+      "module": "test_version_matrix.py",
+      "source": "none"
+    },
+    {
+      "module": "test_watch.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_watermark_bench.py",
+      "source": "none"
+    },
+    {
+      "module": "test_watermark_dct_probe.py",
+      "source": "none"
+    },
+    {
+      "module": "test_watermark_ecc_probe.py",
+      "source": "none"
+    },
+    {
+      "module": "test_watermark_geometry_probe.py",
+      "source": "none"
+    },
+    {
+      "module": "test_watermark_sync_probe.py",
+      "source": "none"
+    },
+    {
+      "module": "test_workflow_hardening.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_workflow_policy.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_world_model.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_world_slots.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_write_flag_gate.py",
+      "source": "negative_case"
+    },
+    {
+      "module": "test_yaml_recheck.py",
+      "source": "naming"
+    }
+  ],
+  "modules": 393,
+  "note": "hard = negative_case + mutation；naming 只是代理指标",
+  "schema": "nf-judge-red-evidence/1",
+  "suspect": 152,
+  "with_evidence": 100,
+  "without_evidence": 141
+}

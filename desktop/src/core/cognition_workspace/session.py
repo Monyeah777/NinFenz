@@ -1,0 +1,97 @@
+"""会话门面：begin / step / close / status，把 discourse + moves + records 串起来。
+
+设计纪律：
+- step 必须带 frame_delta，且经过 moves.validate_delta（语义判据，不只看格式）；
+- 每步返回 (records, state)，两者都可落盘；replay 用 records 就能复算出 state；
+- 不写墙钟：需要时间就由调用方传 at（缺省不写）。
+"""
+from __future__ import annotations
+
+from typing import Any
+
+from core.cognition_workspace import control as ct
+from core.cognition_workspace import discourse as dc
+from core.cognition_workspace import moves as mv
+from core.cognition_workspace import records as rc
+
+SCHEMA = "nf-cog-session/1"
+GUIDE = "修复指引："
+
+
+def begin(problem: str, steps_max: int = 24) -> dict[str, Any]:
+    state = dc.new(problem, steps_max=steps_max)
+    return {"schema": SCHEMA, "state": state, "records": rc.new_records(state),
+            "control": ct.new()}
+
+
+def _control_of(bundle: dict[str, Any]) -> dict[str, Any]:
+    return bundle.get("control") or ct.new()
+
+
+def step(bundle: dict[str, Any], move_id: str, delta: dict[str, Any],
+         root: str = "") -> dict[str, Any]:
+    """执行一步（bundle = {state, records, control}），返回新 bundle。
+
+    root：给仓库根时，反例证人要做**文件存在性核对**（第 103 轮）。
+    生产路径（CLI/桥）应传 root——否则「证人指着一个不存在的文件」也能过。
+    """
+    control = _control_of(bundle)
+    if control["status"] != "running":
+        raise ValueError("控制面已 " + control["status"]
+                         + "——stop/abstain 之后不能再加动作（修复指引：新开会话）")
+    problems = mv.validate_delta(move_id, delta, root=root)
+    if problems:
+        raise ValueError("动作不合法：" + "；".join(problems[:3]))
+    new_records, new_state = rc.append(bundle["records"], bundle["state"],
+                                       move_id, delta)
+    return {"schema": SCHEMA, "state": new_state, "records": new_records,
+            "control": control}
+
+
+def control(bundle: dict[str, Any], op_id: str, payload: dict[str, Any],
+            trigger: str = "", authority: str = "") -> dict[str, Any]:
+    """执行一个元算子（过程控制），返回新 bundle。
+
+    authority 透传给控制面：终态算子（stop / abstain）必填，其余可空；
+    它只被记录并纳入记录 digest，不参与放行判定。
+    """
+    control_state = _control_of(bundle)
+    new_control, out = ct.apply(control_state, op_id, payload,
+                                discourse=bundle["state"], trigger=trigger,
+                                authority=authority)
+    new_bundle = dict(bundle)
+    new_bundle["control"] = new_control
+    if out.get("discourse") is not None:
+        new_bundle["state"] = out["discourse"]
+    return new_bundle
+
+
+def triggers(bundle: dict[str, Any]) -> list[dict[str, Any]]:
+    return ct.triggers(bundle["state"], _control_of(bundle))
+
+
+
+def close(bundle: dict[str, Any], verdict: str = "") -> dict[str, Any]:
+    state = dc.close(bundle["state"], verdict=verdict)
+    return {"schema": SCHEMA, "state": state, "records": bundle["records"],
+            "control": _control_of(bundle)}
+
+
+def status(bundle: dict[str, Any]) -> dict[str, Any]:
+    return dc.summary(bundle["state"])
+
+
+def replay(bundle: dict[str, Any]) -> dict[str, Any]:
+    """重放记录链；有控制面时一并校验控制面（两套 trace 都过才算 ok）。"""
+    base = rc.replay(bundle["records"])
+    if not base["ok"]:
+        return base
+    control_check = ct.replay(_control_of(bundle), bundle.get("state"))
+    if not control_check["ok"]:
+        return {"ok": False, "state": None,
+                "issues": ["控制面重放失败：" + i for i in control_check["issues"]]}
+    return base
+
+
+def diff(a: dict[str, Any], b: dict[str, Any]) -> dict[str, Any]:
+    return rc.diff(a.get("records") or {}, b.get("records") or {})

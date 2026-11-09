@@ -1,0 +1,45 @@
+{
+  "harness": {
+    "blocked_reason": "synthetic run 不能进比较结论（修复指引：演练数据只验 harness，不当证据）",
+    "fixture_digest": "20c85d01853c25bbd401cd059312c7cf512d0b6bac3139997c03366df0fe32a4",
+    "synthetic_blocked": true
+  },
+  "measurement": {
+    "status": "not-run",
+    "why": "真实测量需外部盲评；本仓不代跑（作者纪律：外部实测由作者显式触发）"
+  },
+  "ok": true,
+  "protocol": {
+    "conditions": [
+      "free",
+      "menu",
+      "hybrid",
+      "workspace"
+    ],
+    "dimensions": [
+      "frame_change",
+      "assumption_explicit",
+      "counterexample_quality",
+      "coherence",
+      "depth",
+      "deliverable",
+      "table_external_mechanisms"
+    ],
+    "frozen_before_run": true,
+    "prohibitions": [
+      "不打分、不排序、不给总评",
+      "不在本仓内部产出盲评 pass（只能引用外部评审件）",
+      "不在跑完后再改协议（改了就是新协议 + 新版本号）"
+    ],
+    "registered_at": "2026-11-08",
+    "samples_per_task": 3,
+    "tasks": [
+      "T1",
+      "T2",
+      "T3",
+      "T4"
+    ],
+    "version": "1.0.0"
+  },
+  "schema": "nf-eval-protocol-report/1"
+}

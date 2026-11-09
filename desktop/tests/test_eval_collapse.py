@@ -1,5 +1,7 @@
-import sys, unittest
+import sys
+import unittest
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 from core import eval_collapse as E  # noqa: E402
 

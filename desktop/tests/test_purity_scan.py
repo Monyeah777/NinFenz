@@ -310,7 +310,10 @@ class PurityScanTest(unittest.TestCase):
         # 2026-11-06 再 +1（21 → 22）：并发会话把快照临时目录移到盘根独立目录
         #   （.nf-gate-tmp），新增一处同键清理（release_conclusion.py:shutil.rmtree，
         #   理由同上：落点由本模块自己拼、只删自己刚建的 run 目录）
-        self.assertLessEqual(stats.get("sinks", 0), 22)
+        # 2026-11-08 再 +1（22 -> 23）：快照互斥锁的自清 lock.unlink()——只删自己写的
+        #   .worktrees/gate-snap/.snapshot.lock（落点单源、删前核对 pid），理由已登记
+        #   SINK_ALLOW["release_conclusion.py:unlink"]。用于并发会话互清 worktree 的实测问题。
+        self.assertLessEqual(stats.get("sinks", 0), 23)
 
 
 class SinkRegistryTest(unittest.TestCase):

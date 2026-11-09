@@ -100,6 +100,8 @@ HARD_ALLOW = {
 }
 #: R5 软导入登记（第三方可选依赖：必须 try/except ImportError 守卫 + 写明理由）
 SOFT_IMPORTS = {
+    "numpy": "水印鲁棒性基准（watermark_bench）里按像素构造噪声/亮度攻击；"
+        "软导入 + 缺依赖给修复指引，基准以外不依赖",
     "PIL": "标注水印层（label_watermark）读写 PNG 位图；软导入 + 缺依赖给修复指引，"
         "文本载体那条路保持纯标准库",
     "jsonschema": "IDL 标准实现交叉验证（可选对照；缺依赖则跳过该面）",
@@ -145,6 +147,10 @@ METHOD_SINKS = {
 }
 #: R6 已登记放行（键 = "<文件基名>:<调用名>"；放行须可审计）
 SINK_ALLOW = {
+    "release_conclusion.py:unlink":
+        "快照互斥锁的**自清**：只删 .worktrees/gate-snap/.snapshot.lock 这一个自己写的锁文件，"
+        "落点由 snapshot_base 单源决定（仓内 .worktrees，不是外部可控路径），且删除前先核对"
+        "锁里的 pid == 本进程（不误删别人接管的锁）；用于并发会话互清 worktree 的实测问题",
     "rust_engine.py:unlink":
         "常驻 worker 状态文件（<NF_HOME>/rust_worker.json）的**自清**：落点由 "
         "core.storage.default_home 单源决定（用户态，不接收外部路径参数），删的是本模块上一轮"

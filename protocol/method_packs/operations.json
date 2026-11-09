@@ -1,0 +1,117 @@
+{
+  "schema": "nf-method-pack/1",
+  "id": "operations",
+  "version": "1.0.0",
+  "domain": "operations/reliability",
+  "note": "运维可观测性域：把「这套东西出问题时我能不能知道、知道了能不能判断」拆成可核项——目标与预算、健康信号可分辨、告警可行动、复盘不追责、面板与判据同源、燃尽可见。锚点为本仓既有 budget/health/postmortem/metrics 机制；不引外部 SRE 数字。",
+  "expert_moves": [
+    {
+      "id": "op.slo",
+      "name": "目标与预算：先写清「什么算正常」，再谈监控",
+      "why": "没有目标的监控只能报「有数字」，无法回答「现在算不算坏」；预算是目标的量化面。",
+      "maps_to": [
+        "k.quantify",
+        "k.criterion",
+        "e.verify"
+      ]
+    },
+    {
+      "id": "op.health_signal",
+      "name": "健康信号可分辨：能区分「坏」与「忙」",
+      "why": "把繁忙当故障会引发误报，把故障当繁忙会漏报；判别面必须显式写出来。",
+      "maps_to": [
+        "k.represent",
+        "m.compare",
+        "e.audit"
+      ]
+    },
+    {
+      "id": "op.alert_actionable",
+      "name": "告警可行动：每条告警都对应一个下一步动作",
+      "why": "不可行动的告警只能训练人忽略告警；这条是告警质量的第一判据。",
+      "maps_to": [
+        "k.standard",
+        "e.falsify",
+        "m.check"
+      ]
+    },
+    {
+      "id": "op.burn",
+      "name": "燃尽可见：预算是怎么被消耗的要能画出来",
+      "why": "只有「还剩多少」没有「为什么耗掉」，无法在耗尽前做决定。",
+      "maps_to": [
+        "k.quantify",
+        "m.trace",
+        "e.calibrate"
+      ]
+    },
+    {
+      "id": "op.review_blameless",
+      "name": "复盘不带责：写清机制缺口，不写「谁不小心」",
+      "why": "带责复盘会让人隐藏信息；机制描述才能被下一个人复核与修补。",
+      "maps_to": [
+        "e.adjudicate",
+        "k.represent",
+        "m.observe"
+      ]
+    },
+    {
+      "id": "op.panel_same_source",
+      "name": "面板与判据同源：图上的数与判据读的是同一份数据",
+      "why": "面板手搓一份数据，等于制造第二真相；两处迟早对不上。",
+      "maps_to": [
+        "k.relate",
+        "e.verify",
+        "m.detect"
+      ]
+    }
+  ],
+  "evidence_standards": [
+    {
+      "claim_kind": "slo",
+      "required": [
+        "目标（含口径与阈值）与其依据",
+        "未达标时的处置"
+      ]
+    },
+    {
+      "claim_kind": "error-budget",
+      "required": [
+        "预算总额与消耗记录（可复算）",
+        "燃尽到阈值时的动作"
+      ]
+    },
+    {
+      "claim_kind": "incident-review",
+      "required": [
+        "时间线（含检测与响应时点）",
+        "机制缺口与其修补项（不点名个人）"
+      ]
+    }
+  ],
+  "common_failures": [
+    "只有指标没有目标，红绿全凭感觉",
+    "把「请求变多」当故障，告警天天响",
+    "告警没有下一步动作，值班只负责关掉它",
+    "预算只有余额没有消耗曲线，无法提前决定",
+    "复盘写成「谁没看住」，下次照旧发生",
+    "面板自己算一遍数，与判据的读数不一致"
+  ],
+  "examples": [
+    {
+      "case": "desktop/src/core/perf_budget.py 的 budget/p95：性能预算与分位数口径同处一个对象",
+      "why": "这是「目标与预算」的形态：阈值与口径一起定义，避免各说各的"
+    },
+    {
+      "case": "desktop/src/core/postmortem.py 的 cause 字段：复盘填机制与成因，而非人名",
+      "why": "这是「复盘不带责」的形态：结构上就没有「责任人」这一格"
+    }
+  ],
+  "criteria_refs": [
+    "craft:coherence",
+    "standard:evidence-bundle-v0"
+  ],
+  "runnable": [
+    "python scripts/perf_budget.py --list"
+  ]
+}

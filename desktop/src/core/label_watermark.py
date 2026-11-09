@@ -241,6 +241,49 @@ def extract(data: bytes) -> dict[str, Any]:
     return res
 
 
+def extract_with_bits(data: bytes) -> dict[str, Any]:
+    """带误码统计的读回：给基准用（BER 是鲁棒性的唯一可同口径指标）。
+
+    返回 {ok, payload, confidence, offset, ber, agree_bits, frame_bits, issues}。
+    ber = 与「按最佳偏移读出的帧」逐位比较后的不同位占比（帧长由读出的长度字段决定）；
+    读不出帧时 ber 记 None（不是 1.0——「没有帧」与「帧全错」是两回事，不能混）。
+    """
+    res: dict[str, Any] = {"ok": False, "payload": b"", "confidence": 0.0,
+                           "offset": None, "ber": None, "agree_bits": 0,
+                           "frame_bits": 0, "issues": []}
+    try:
+        img = _load_rgb(data)
+    except ValueError as exc:
+        res["issues"].append(str(exc))
+        return res
+    px = img.load()
+    width, height = img.size
+    best = (None, 0.0, None, 0, 0)
+    for oy in range(TILE):
+        for ox in range(TILE):
+            length = _probe_prefix(px, width, height, ox, oy)
+            if length is None:
+                continue
+            nbits = (len(MAGIC) + 2 + length + 4) * 8
+            frame, conf = _read_frame_at(px, width, height, ox, oy, nbits)
+            if frame is None:
+                continue
+            payload = _unpack(frame)
+            if payload is not None and conf > best[1]:
+                # 逐位比较：读出的帧 vs 用同一 payload 重建的帧
+                want = _frame(payload)
+                diff = sum(bin(a ^ b).count("1") for a, b in zip(frame, want, strict=True))
+                best = (payload, conf, (ox, oy), diff, len(want) * 8)
+    if best[0] is None:
+        res["issues"].append("读不回转录帧（修复指引：有损变换/缩放会毁掉低位；见鲁棒性基准）")
+        return res
+    payload, conf, offset, diff, total = best
+    res.update({"ok": True, "payload": payload, "confidence": round(conf, 4),
+                "offset": offset, "agree_bits": total - diff, "frame_bits": total,
+                "ber": round(diff / total, 6) if total else None})
+    return res
+
+
 def _frame_for_ir(ir: dict[str, Any]) -> bytes:
     """IR → 水印帧：只写关键面（schema/standard/object 摘要/条目名），不写整份 IR。"""
     import json as _json

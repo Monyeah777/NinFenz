@@ -1,0 +1,118 @@
+{
+  "schema": "nf-method-pack/1",
+  "id": "privacy",
+  "version": "1.0.0",
+  "domain": "privacy/data-protection",
+  "note": "隐私工程域：把「这套东西处理个人数据时守不守规矩」拆成可核项——最小化、目的限定、留存期限、同意、去标识、删除可证、最小权限。来源为隐私工程通识与本仓既有 ingress/吊销/到期机制；不引未读法规条款。",
+  "expert_moves": [
+    {
+      "id": "pr.minimization",
+      "name": "数据最小化：只收当前目的必需的字段，多收一个要说明理由",
+      "why": "多收的字段不会自动消失，却会在泄露时全部暴露；最小化是唯一在事前有效的措施。",
+      "maps_to": [
+        "k.criterion",
+        "e.audit",
+        "c.select"
+      ]
+    },
+    {
+      "id": "pr.purpose",
+      "name": "目的限定：每个字段绑定用途，用途外使用须重新授权",
+      "why": "没有用途绑定的数据会被「顺手」用于下一个需求，事后无法追溯是否越界。",
+      "maps_to": [
+        "k.define",
+        "m.trace",
+        "e.adjudicate"
+      ]
+    },
+    {
+      "id": "pr.retention",
+      "name": "留存期限：为每类数据定到期时间，到期即删或匿名化",
+      "why": "无期限的数据等于永久风险；到期机制把「以后再说」变成「到期必做」。",
+      "maps_to": [
+        "k.quantify",
+        "m.check",
+        "e.calibrate"
+      ]
+    },
+    {
+      "id": "pr.consent",
+      "name": "同意可核：记录谁同意了什么、何时、可撤回",
+      "why": "「用户同意过」若不可核，等于没有同意；撤回路径缺失则同意不成立。",
+      "maps_to": [
+        "k.standard",
+        "e.verify",
+        "m.observe"
+      ]
+    },
+    {
+      "id": "pr.deidentify",
+      "name": "去标识：直接标识符移除并声明残余可再识别风险",
+      "why": "去除姓名不等于匿名；残余风险要写出来，否则是给假保证。",
+      "maps_to": [
+        "k.represent",
+        "e.audit",
+        "m.compare"
+      ]
+    },
+    {
+      "id": "pr.deletion_proof",
+      "name": "删除可证：删除动作留证（吊销/回执），并能核对确实不可再取",
+      "why": "「已经删了」是最难验证的承诺；没有吊销记录与核对，删除只是声明。",
+      "maps_to": [
+        "e.falsify",
+        "e.verify",
+        "m.trace"
+      ]
+    }
+  ],
+  "evidence_standards": [
+    {
+      "claim_kind": "data-minimization",
+      "required": [
+        "字段清单与各字段的用途绑定",
+        "非必需字段的收集理由（没有则为空并说明）"
+      ]
+    },
+    {
+      "claim_kind": "retention",
+      "required": [
+        "每类数据的留存期限与到期动作",
+        "到期后的核对方式（删/匿名化）"
+      ]
+    },
+    {
+      "claim_kind": "consent",
+      "required": [
+        "同意记录（主体 / 范围 / 时点 / 撤回路径）",
+        "撤回后的处理说明"
+      ]
+    }
+  ],
+  "common_failures": [
+    "收集「以后可能有用」的字段，没有用途绑定",
+    "数据没有留存期限，永久在库",
+    "同意只在界面上说一次，没有可核记录",
+    "去标识后仍保留可再识别的组合键，却宣称匿名",
+    "删除只删主表，缓存/备份/日志仍在",
+    "权限按「方便排查」放宽，最小权限名存实亡"
+  ],
+  "examples": [
+    {
+      "case": "desktop/src/core/mcp_ingress.py 的 consent 与 max_args_bytes：调用方必须声明同意，参数体积有上限",
+      "why": "这是「同意可核 + 最小化」在入口处的形态：不声明同意直接拒"
+    },
+    {
+      "case": "desktop/src/core/allowlist_expiry.py 的 expired() 与 desktop/src/core/evidence.py 的吊销记录",
+      "why": "这是「留存期限 + 删除可证」的机制来源：到期失效与吊销留痕都可核"
+    }
+  ],
+  "criteria_refs": [
+    "craft:coherence",
+    "standard:evidence-bundle-v0"
+  ],
+  "runnable": [
+    "nf doctor",
+    "nf evidence verify"
+  ]
+}

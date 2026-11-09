@@ -6,6 +6,11 @@
       "ce": 0,
       "i": 0.0
     },
+    "adr": {
+      "ca": 0,
+      "ce": 1,
+      "i": 1.0
+    },
     "agent_rules_adapter": {
       "ca": 1,
       "ce": 3,
@@ -116,12 +121,22 @@
       "ce": 3,
       "i": 1.0
     },
+    "boot_check": {
+      "ca": 0,
+      "ce": 1,
+      "i": 1.0
+    },
     "boundaries": {
       "ca": 0,
       "ce": 0,
       "i": 0.0
     },
     "build_isolation": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
+    "calibration": {
       "ca": 0,
       "ce": 0,
       "i": 0.0
@@ -181,6 +196,11 @@
       "ce": 1,
       "i": 1.0
     },
+    "closure": {
+      "ca": 0,
+      "ce": 1,
+      "i": 1.0
+    },
     "closure_scan": {
       "ca": 1,
       "ce": 1,
@@ -195,6 +215,11 @@
       "ca": 1,
       "ce": 1,
       "i": 0.5
+    },
+    "cognition_plan": {
+      "ca": 0,
+      "ce": 2,
+      "i": 1.0
     },
     "commit_title_guard": {
       "ca": 1,
@@ -347,7 +372,7 @@
       "i": 1.0
     },
     "ed25519": {
-      "ca": 2,
+      "ca": 3,
       "ce": 0,
       "i": 0.0
     },
@@ -383,8 +408,8 @@
     },
     "eval_harness": {
       "ca": 1,
-      "ce": 1,
-      "i": 0.5
+      "ce": 2,
+      "i": 0.6667
     },
     "evidence": {
       "ca": 1,
@@ -521,6 +546,11 @@
       "ce": 0,
       "i": 0.0
     },
+    "grouped_report": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
     "handover": {
       "ca": 1,
       "ce": 3,
@@ -627,14 +657,19 @@
       "i": 0.0
     },
     "iso8601": {
-      "ca": 4,
+      "ca": 3,
       "ce": 0,
       "i": 0.0
     },
-    "json_doc": {
-      "ca": 82,
+    "job_ledger": {
+      "ca": 0,
       "ce": 1,
-      "i": 0.012
+      "i": 1.0
+    },
+    "json_doc": {
+      "ca": 89,
+      "ce": 1,
+      "i": 0.0111
     },
     "json_schema": {
       "ca": 5,
@@ -650,6 +685,11 @@
       "ca": 0,
       "ce": 0,
       "i": 0.0
+    },
+    "key_transparency": {
+      "ca": 0,
+      "ce": 1,
+      "i": 1.0
     },
     "knowledge": {
       "ca": 2,
@@ -756,6 +796,16 @@
       "ce": 2,
       "i": 0.6667
     },
+    "mcp_ingress": {
+      "ca": 0,
+      "ce": 1,
+      "i": 1.0
+    },
+    "mcp_manifest": {
+      "ca": 1,
+      "ce": 1,
+      "i": 0.5
+    },
     "mcp_package": {
       "ca": 1,
       "ce": 2,
@@ -770,6 +820,11 @@
       "ca": 2,
       "ce": 0,
       "i": 0.0
+    },
+    "method_pack": {
+      "ca": 2,
+      "ce": 1,
+      "i": 0.3333
     },
     "missing_sentinel": {
       "ca": 1,
@@ -1037,9 +1092,9 @@
       "i": 1.0
     },
     "receipts": {
-      "ca": 4,
+      "ca": 5,
       "ce": 3,
-      "i": 0.4286
+      "i": 0.375
     },
     "redos_scan": {
       "ca": 1,
@@ -1162,6 +1217,11 @@
       "i": 1.0
     },
     "rust_pyext": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
+    "sbom": {
       "ca": 0,
       "ce": 0,
       "i": 0.0
@@ -1331,6 +1391,11 @@
       "ce": 0,
       "i": 0.0
     },
+    "verifier_version": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
     "verify_checks": {
       "ca": 0,
       "ce": 1,
@@ -1400,10 +1465,6 @@
     [
       "import_graph",
       "disk_cache"
-    ],
-    [
-      "library",
-      "receipts"
     ],
     [
       "mcp_runtime",

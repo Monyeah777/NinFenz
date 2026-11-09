@@ -1555,7 +1555,13 @@ def selftest(root: Path | None = None, python: str | None = None) -> tuple:
             ["shell", "--surface", "--json"])
         assert res.code == 0, "nf shell --surface --json 退出码 %s：%s" % (
             res.code, (res.err or res.out or "").strip()[-200:])
-        payload = json.loads(res.out)
+        try:
+            payload = json.loads(res.out)
+        except ValueError as exc:
+            raise RuntimeError("子进程输出不是合法 JSON：%s（修复指引：确认 nf 版本一致）"
+                               % str(exc)[:80]) from exc
+        if not isinstance(payload, dict):
+            raise RuntimeError("子进程输出顶层不是对象（修复指引：确认 nf --json 契约）")
         assert payload.get("schema") == _surface.SCHEMA, \
             "投影 schema 不一致：%s" % payload.get("schema")
         live = str(payload.get("digest") or "")

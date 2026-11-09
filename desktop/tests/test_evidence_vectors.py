@@ -66,9 +66,9 @@ class TestExpectedVerdicts(unittest.TestCase):
         key = base64.b64decode(vec["key_b64"]) if vec.get("key_b64") else None
         try:
             return evidence.verify_any(str(self._materialize(vec)), key=key,
-                                   revocations=vec.get("revocations"),
-                                   at=vec.get("at", ""),
-                                   anchor=vec.get("anchor"))
+                                       revocations=vec.get("revocations"),
+                                       at=vec.get("at", ""),
+                                       anchor=vec.get("anchor"))
         except ValueError:
             return {"verdict": "usage_error", "issues": ["不是证据包"]}
 

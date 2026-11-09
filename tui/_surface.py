@@ -9,7 +9,7 @@
 
 KIND = 'nf-terminal-surface'
 SCHEMA = 'nf-terminal-surface/1'
-DIGEST = 'sha256:fa5ef7d84d12e31bf8c0c9e776e4f415b509a955fb137cb6c49142a59828f2cb'
+DIGEST = 'sha256:9cb3774387116fbb7b339e32a578c99d5b06770ce444a2f213669241fba4d74c'
 SOURCE = {'module': 'desktop/src/core/terminal.py',
  'tables': ['ZONES',
             'FAMILIES',
@@ -30,6 +30,7 @@ COMMANDS = ['approve',
  'check',
  'cockpit',
  'cockpit-ab',
+ 'cog',
  'cognition',
  'combine',
  'completion',
@@ -537,7 +538,8 @@ FAMILIES = [{'id': 'start',
                'evidence',
                'label',
                'design',
-               'locales']},
+               'locales',
+               'cog']},
  {'id': 'integrate',
   'name': '服务与集成',
   'summary': 'MCP 服务面、编辑器面、跑分台、端点契约、互操作导出、指令档路由、事件背书、状态前置、世界模型、模块工具面',
@@ -730,7 +732,10 @@ GATES = {'flags': ['--write',
            ['preset', 'save'],
            ['preset', 'rm'],
            ['preset', 'import']],
- 'pairs': [['interop', '--all'], ['assemble', '--trace'], ['assemble', '--session']]}
+ 'pairs': [['interop', '--all'],
+           ['assemble', '--trace'],
+           ['assemble', '--session'],
+           ['cog', '--sheet']]}
 
 BLOCKED = {'lsp': 'lsp 是常驻 stdio 服务（等编辑器发 Content-Length 帧，会占住当前终端）：请由编辑器/IDE 直接拉起（nf lsp），本终端可继续用只读命令面。',
  'serve': 'serve 是长驻 MCP 服务（会占住当前终端）：请另开终端运行 nf serve <快照.json>，本终端可继续用只读命令面。',

@@ -1,0 +1,85 @@
+# 判据族谱 v0（谁在检查什么，以及它们怎么失效）
+
+状态：**8 族**（截至 2026-11-09）。写新判据前请过一遍 [judge-design-questions.md](judge-design-questions.md)（十一问速查）。每族的「失效方式」是本页最要紧的一栏——
+判据的价值不在于它现在全绿，而在于它红的时候你信不信、绿的时候它有没有可能骗你。
+
+## 一、内容判据（对不对）
+
+| 项 | 内容 |
+|---|---|
+| 检查对象 | 数据结构与函数的语义：承诺摘要、回灌对应、证人形状、两本账、词表 |
+| 形式 | 纯函数返回 `issues` 列表；非空即红 |
+| 失效方式 | 函数只被测试调用（→ 见第五族「接线」）；输入约束太松导致永远为空 |
+| 证据 | `test_cognition_bridge`、`test_cognition_control`、`test_cognition_workspace`、`test_method_pack` |
+
+## 二、结构判据（会不会长歪）
+
+| 项 | 内容 |
+|---|---|
+| 检查对象 | 系统形状：桥只允许两类信封、方法包必须反射到真实测试、单一词表、路径旗标覆盖 |
+| 形式 | 反射查证 + 名单核对 + 棘轮 |
+| 失效方式 | 名单被无限扩充（棘轮变成垃圾桶）；反射查证只认名字不认语义 |
+| 证据 | `test_c2_envelopes`、`test_isomorphism_matrix`、`test_path_flag_ratchet` |
+
+## 三、引用面判据（说的东西存不存在）
+
+| 项 | 内容 |
+|---|---|
+| 检查对象 | 一切「引用」：方法包例子里的路径、`criteria_refs`、`maps_to`、文档相对链接、文档里的仓库路径；反向也查——脚本是否被任何可执行面引用 |
+| 形式 | 抽取 token → 解析（含文档所在目录）→ 必须存在；另加「至少 N 条」防判据失效 |
+| 失效方式 | 示例性文件名（`f1.json`）被误判；抽取正则漏一种写法 |
+| 证据 | `desktop/tests/test_method_pack.py`、`desktop/tests/test_ccos_docs_anchors.py`、`desktop/tests/test_script_orphans.py` |
+| 真红记录 | 例子路径 7 处缺前缀；`criteria_refs` 5 包悬空（含自造的 `standard:ISO27001`）；后两条首查即绿 |
+| 口径教训 | 宽正则（只查扩展名）曾有 118 条假红、判据不可用；收窄成「必须带根前缀」后 59 条全真 |
+| 池子边界 | 反向判据（「有没有东西指向它」）要先定清「什么算指向」：把 `docs/` 计入池，写一篇清单文档就能让孤儿判据空转；把脚本自身计入池，每个脚本的 usage 行都会自我满足 |
+
+## 四、文档数字判据（写下来的数对不对）
+
+| 项 | 内容 |
+|---|---|
+| 检查对象 | 文档里的「N 个域 / N 层 / N 门 / N 项」必须能从数据件重算 |
+| 形式 | 纯函数核 `doc_number_issues` / `pack_doc_issues`，各带变异测试 |
+| 失效方式 | 只覆盖「能机器重算」的数字；规范类计数（如「7 个系统调用」）刻意不判 |
+| 证据 | `test_doc_numbers_match_matrix_and_gates`、`test_doc_counts_match_packs`、`test_ccos_abi_docs` |
+
+## 五、接线判据（判据有没有被调用）
+
+| 项 | 内容 |
+|---|---|
+| 检查对象 | 生产路径是否真的调用判据：证人核对、授权核对、两本账核对、结论绑定两摘要 |
+| 形式 | 端到端真跑（CLI/桥），断言「坏输入必须被拒」，而不只是函数返回非空 |
+| 失效方式 | 判据写了但生产路径传空参（第 103 轮就是这样：只有测试传 root） |
+| 证据 | `test_cog_cli_faces`、`test_release_conclusion`、bundle 的 witness 端到端 |
+
+## 六、元判据（判据本身可不可信）
+
+| 项 | 内容 |
+|---|---|
+| 检查对象 | 判据的杀伤力与新鲜度：变异探针（5 判据 / 15 变异体）、负向用例覆盖率（0.84）、验证器摘要 |
+| 形式 | 变异体必须全杀、合法变体零误报；摘要陈旧即红 |
+| 失效方式 | 样本太小（15 个变异体不证明普遍有效）；代理指标漏判（`verifier_version` 有变异判据但测试名不含关键词） |
+| 证据 | `scripts/judge_mutation_probe.py`、`scripts/gate_probe.py`、`scripts/self_audit_probe.py`、`desktop/tests/test_judge_mutation_probe.py` |
+
+## 七、棘轮判据（已知缺口不许变大）
+
+| 项 | 内容 |
+|---|---|
+| 检查对象 | 一时修不了的缺口：路径旗标覆盖、静态扫描基线、规模上限 |
+| 形式 | 冻结表 + 「新增即红」+「修好须删条目」 |
+| 失效方式 | 冻结表变成永久豁免名单；条目只增不删 |
+| 证据 | `desktop/tests/test_path_flag_ratchet.py`、`scripts/sast_check.py --baseline`、`scripts/code_metrics.py` |
+| 新增（第 153–166 轮） | 红证据比例棘轮（`desktop/tests/test_judge_red_evidence.py`）、core 引用面棘轮（`desktop/tests/test_core_judge_map.py`）——两者都按**比例**而非绝对数冻结，因为绝对数会惩罚「新增测试」 |
+
+## 八、执行面判据（声明的东西真能跑吗）
+
+| 项 | 内容 |
+|---|---|
+| 检查对象 | 包里声明的可跑入口、文档里声明的命令 |
+| 形式 | 逐条真跑（退出码 0 或 2 合规）+ 与数据件绑定（入口列必须含包 `runnable` 首条命令） |
+| 失效方式 | 命令存在但永远失败；入口需要参数而判据只看能否启动（弱口径） |
+| 证据 | `desktop/tests/test_pack_runnable_runs.py`、`test_method_pack.py` 的入口/用法绑定判据 |
+
+## 怎么读这张表
+
+看到某类红时先问：它属于哪一族？再问：这族的失效方式是否正好在本例中发生？
+**判据红不是目的，判据说得清自己可能怎么骗人才是目的。**

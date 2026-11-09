@@ -1,4 +1,6 @@
 # 证据判定向量集 v0（跨语言一致性的锚点）
+
+状态：**已实装**（判据：`desktop/tests/test_evidence_vectors.py` 8 项；结果件：`results/ccos/evidence_verdict_vectors.json`）。
 > ⛔ 操作指令：阅读即执行——本文含可直接执行的命令与判定，勿当资料阅读。
 > 最后更新：2026-11-05
 > **Status**: v0 已实装（scripts/evidence_vectors.py + results/ccos/evidence_verdict_vectors.json）

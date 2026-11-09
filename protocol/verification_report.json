@@ -21,7 +21,7 @@
           "hits": 0
         },
         "import_residue": [],
-        "imports": 12,
+        "imports": 24,
         "layers": {
           "asset_levels": 5,
           "crosscut": 6,
@@ -31,7 +31,7 @@
           "tiers": 4
         },
         "raises": 141,
-        "sinks": 22
+        "sinks": 23
       },
       "status": "pass",
       "warns": 0
@@ -299,7 +299,7 @@
       "stats": {
         "contracts": 27,
         "passed": 27,
-        "root": "45cc0d2632fe04c9d0e6663b9c4297313755501e2b00d4297a51ca864cbdf3bb",
+        "root": "4f9d2e8b5287ad1fd2e899cef783fd779a374b520abdc684355475c31e37d3c9",
         "verdict": "conformant"
       },
       "status": "pass",
@@ -369,11 +369,11 @@
       "sample": [],
       "source": "code_metrics.scan",
       "stats": {
-        "baseline": 334,
-        "files": 334,
-        "max_fn_cc": 106,
-        "max_fn_lines": 319,
-        "max_lines": 9016
+        "baseline": 368,
+        "files": 368,
+        "max_fn_cc": 132,
+        "max_fn_lines": 443,
+        "max_lines": 9863
       },
       "status": "pass",
       "warns": 0
@@ -387,8 +387,8 @@
       "stats": {
         "budget_ms": 1500.0,
         "n": 65536,
-        "patterns": 260,
-        "probed": 260
+        "patterns": 259,
+        "probed": 259
       },
       "status": "pass",
       "warns": 0
@@ -432,11 +432,11 @@
         "cycles": 0,
         "metrics_drift": 0,
         "metrics_missing": 0,
-        "metrics_recorded": 276,
-        "modules": 276,
+        "metrics_recorded": 289,
+        "modules": 289,
         "registered_cycles": 0,
-        "registered_sdp": 10,
-        "sdp": 10
+        "registered_sdp": 9,
+        "sdp": 9
       },
       "status": "pass",
       "warns": 0
@@ -526,9 +526,9 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4065,
-        "kernel": 2044,
-        "kernel_no_self": 309,
+        "files": 4203,
+        "kernel": 2102,
+        "kernel_no_self": 308,
         "rules": 9,
         "uncovered": 0,
         "verify_writers": 10,
@@ -538,7 +538,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "cbfa68401a02e9df2c3bc53cffede71b0af3e0b975eb6ffc5f10fb88a8050d7d",
+  "root_digest": "d56957605bda0a65bd7229584017a3d3e6f3cac96fb44f8905c2c9c891765fad",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

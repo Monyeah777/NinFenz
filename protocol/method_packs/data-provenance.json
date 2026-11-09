@@ -1,0 +1,120 @@
+{
+  "schema": "nf-method-pack/1",
+  "id": "data-provenance",
+  "version": "1.0.0",
+  "domain": "data-governance/provenance",
+  "note": "数据溯源域：把「这份数据能不能拿来下结论」拆成可核项——说明书、字段溯源、缺失口径、许可边界、版本钉定、泄漏检查。来源为 Datasheets for Datasets（Gebru 等，摘要级已读）与 Model Cards（Mitchell 等，摘要级已读）+ 本仓实测口径；不引未读数字。",
+  "expert_moves": [
+    {
+      "id": "pv.datasheet",
+      "name": "先写数据说明书：动机、构成、采集过程、推荐用途、已知限制",
+      "why": "没有采集过程的记录，就无法判断「这个数字是在什么条件下得到的」；说明书是后续一切复核的地基。",
+      "maps_to": [
+        "k.represent",
+        "e.audit",
+        "m.observe"
+      ]
+    },
+    {
+      "id": "pv.field_lineage",
+      "name": "字段级溯源：每个字段能追到来源与转换（谁产生、经过什么变换）",
+      "why": "字段一旦来源不明，它的误差就无法归因；字段级溯源让「这个数是算的还是抄的」可查。",
+      "maps_to": [
+        "k.relate",
+        "m.trace",
+        "e.verify"
+      ]
+    },
+    {
+      "id": "pv.missing_semantics",
+      "name": "缺失值口径先定：缺 = 未知 / 缺 = 零 / 缺 = 不适用",
+      "why": "缺失当零会把「没测」变成「测到零」，是假数据最常见的来源；口径必须先写进协议。",
+      "maps_to": [
+        "k.criterion",
+        "k.define",
+        "m.detect"
+      ]
+    },
+    {
+      "id": "pv.license_gate",
+      "name": "许可与再分发边界：数据能不能进仓、能不能对外，逐条钉住",
+      "why": "许可证不明的数据一旦入仓，后续所有产物都带着法律风险；边界要在采集前判定。",
+      "maps_to": [
+        "k.standard",
+        "e.adjudicate",
+        "c.select"
+      ]
+    },
+    {
+      "id": "pv.version_pin",
+      "name": "版本钉定：数据快照按 digest/commit 钉住，不跟着上游漂",
+      "why": "数据上游变了而结论没变，等于结论不可复现；钉版本是复现性的前提。",
+      "maps_to": [
+        "k.quantify",
+        "m.check",
+        "e.calibrate"
+      ]
+    },
+    {
+      "id": "pv.leakage_audit",
+      "name": "泄漏检查：训练/调试用的数据不得出现在评测面",
+      "why": "泄漏会让评测分数虚高，而且是最难事后发现的一类错误；必须在协议层禁止。",
+      "maps_to": [
+        "e.falsify",
+        "e.audit",
+        "m.compare"
+      ]
+    }
+  ],
+  "evidence_standards": [
+    {
+      "claim_kind": "data-fit",
+      "required": [
+        "数据说明书（动机/构成/采集过程/限制）的路径与摘要",
+        "字段级溯源表（字段 → 来源 → 转换）",
+        "缺失值与排除规则的口径（写进协议的时间点）"
+      ]
+    },
+    {
+      "claim_kind": "license",
+      "required": [
+        "数据的许可标识与再分发边界",
+        "入仓/外发决策记录（谁批准、依据哪条许可）"
+      ]
+    },
+    {
+      "claim_kind": "non-leakage",
+      "required": [
+        "评测面与调试面的数据清单（互不重叠）",
+        "泄漏检查的方法与结果（含未发现时的检查范围）"
+      ]
+    }
+  ],
+  "common_failures": [
+    "缺失当零处理（没测变成测到 0）",
+    "字段来源不明，只有「某处导出的 CSV」",
+    "数据上游悄悄更新，结论还按旧版本报",
+    "训练/调试数据混进评测面，分数虚高且事后难查",
+    "许可证没核对就入仓，后续产物全带风险",
+    "说明书只写「公开数据集」，没写采集过程与限制"
+  ],
+  "examples": [
+    {
+      "case": "评测协议 protocol/eval/protocol.json 把「不许追加/删改协议」写进 prohibitions，并用采集检查单（eval_run --checklist）把每格锁成 planned",
+      "why": "这是「版本钉定 + 缺失口径先定」在真实协议里的形态：协议先冻结，采集再发生"
+    },
+    {
+      "case": "分组报告 desktop/src/core/grouped_report.py 对 n=1 的组返回 sd=None（而不是 0），并在 note 里写明「只报总体会掩盖子群差异」",
+      "why": "这是「缺失语义」在度量层的落地：不假装有方差，也不把未知当零"
+    }
+  ],
+  "criteria_refs": [
+    "craft:coherence",
+    "craft:evidence_sufficiency",
+    "standard:GB45438-2025"
+  ],
+  "runnable": [
+    "nf asset ledger",
+    "nf asset verify"
+  ]
+}

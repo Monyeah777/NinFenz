@@ -1,0 +1,118 @@
+{
+  "schema": "nf-doc-ledger/1",
+  "note": "16 份架构文档台账：状态 + 归属裁决 + 仓内落点。仓内实现只按 current 执行；冲突未裁前以 ADR 为准（见 protocol/adr/registry.json）。文档原件在仓外（作者提供），此处只登记裁决与锚点。",
+  "docs": [
+    {
+      "name": "CCOS-双核架构-v1",
+      "status": "current",
+      "topic": "architecture-core",
+      "adr": "ADR-001",
+      "note": "双核平级、三层动作表、共享底座、唯一桥对象；取代核心架构的重定义部分"
+    },
+    {
+      "name": "CCOS-核心架构-v1",
+      "status": "superseded",
+      "superseded_by": "CCOS-双核架构-v1",
+      "topic": "architecture-core",
+      "note": "「NF 降为可插拔后端」作废；L0 工作台形态被双核收为附录"
+    },
+    {
+      "name": "CCOS-内核与系统方案",
+      "status": "current",
+      "topic": "kernel",
+      "adr": "ADR-002",
+      "note": "K1–K8、ABI 双轨、四网关、MCP 兼容头；与网关文档合并"
+    },
+    {
+      "name": "CCOS-认知工作台-深度重构计划-v1",
+      "status": "current",
+      "topic": "cognition-core",
+      "adr": "ADR-001",
+      "note": "实施附录：L0/L1/L2/L3 四层、15 moves、依赖方向"
+    },
+    {
+      "name": "NF-任务书-认知原子语法-v1",
+      "status": "current",
+      "topic": "atom-grammar-object",
+      "adr": "ADR-001",
+      "note": "原子 v2 元数据、A1–A5/B1–B5/C1–C5；依赖 reasoning/ 的项受 ADR-004 约束"
+    },
+    {
+      "name": "NF-元算子与原子双层设计-v1",
+      "status": "current",
+      "topic": "atom-grammar-meta",
+      "adr": "ADR-001",
+      "note": "对象/元两平面、11 算子、双记账、hybrid 顺序"
+    },
+    {
+      "name": "NF-盲区审计协议-v1",
+      "status": "evidence",
+      "topic": "audit-method",
+      "adr": "ADR-003",
+      "note": "唯一自带判据的文档；作为全方案验收模板"
+    },
+    {
+      "name": "CCOS-中立裁判路线",
+      "status": "current",
+      "topic": "strategy",
+      "adr": "ADR-003",
+      "note": "Verify-first 三件套、写入做驱动、Go/No-Go"
+    },
+    {
+      "name": "NF-CCOS-整合方案",
+      "status": "superseded",
+      "superseded_by": "NF-CCOS-整合方案(1)",
+      "topic": "integration",
+      "note": "被 (1) 版扩充"
+    },
+    {
+      "name": "NF-CCOS-整合方案(1)",
+      "status": "current",
+      "topic": "integration",
+      "adr": "ADR-002",
+      "note": "总纲：+Connector/网关/扩展层/OS 语义；ABI 矛盾由 ADR-002 裁"
+    },
+    {
+      "name": "CCOS-OS语义补全",
+      "status": "draft",
+      "topic": "kernel",
+      "adr": "ADR-002",
+      "note": "K1–K8 缺口清单；实测无显式调度器，判未建"
+    },
+    {
+      "name": "CCOS-分层扩充",
+      "status": "current",
+      "topic": "layering",
+      "adr": "ADR-003",
+      "note": "L0–L5 现状表 + 状态词表；三平台逐字节验收未达成"
+    },
+    {
+      "name": "CCOS-架构愿景",
+      "status": "draft",
+      "topic": "vision",
+      "adr": "ADR-002",
+      "note": "六层 + 7 调用 + 6 保证；ABI 定稿以 ADR-002 为准"
+    },
+    {
+      "name": "CCOS-扩展层全解",
+      "status": "draft",
+      "topic": "extensions",
+      "adr": "ADR-003",
+      "note": "18 支撑层；多租户 v0 不做"
+    },
+    {
+      "name": "CCOS-网关与路由",
+      "status": "current",
+      "topic": "gateway",
+      "adr": "ADR-003",
+      "note": "四网关、五维路由、fail-closed；与内核方案合并"
+    },
+    {
+      "name": "CCOS-连接器-MCP增强",
+      "status": "current",
+      "topic": "connector",
+      "adr": "ADR-003",
+      "note": "MCP 兼容头 + Tool Manifest；Connector 记为 L4 内组件"
+    }
+  ]
+}

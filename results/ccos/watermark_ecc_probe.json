@@ -1,0 +1,225 @@
+{
+  "conclusion": "若 any_survives_screenshot=false：加大强度/降频/放大块都救不回拍屏，边界成立（破坏性变换）；否则须复核可见性代价",
+  "configs": 10,
+  "payload": "NFECC1",
+  "repeat": 8,
+  "rows": [
+    {
+      "block": 8,
+      "blur": {
+        "0.3": {
+          "ber": 0.4375,
+          "ok": false
+        },
+        "0.6": {
+          "ber": 0.5,
+          "ok": false
+        },
+        "1.0": {
+          "ber": 0.5,
+          "ok": false
+        }
+      },
+      "clean_ok": true,
+      "delta": 24.0,
+      "freq": 0,
+      "psnr_db": 34.33
+    },
+    {
+      "block": 8,
+      "blur": {
+        "0.3": {
+          "ber": 0.4375,
+          "ok": false
+        },
+        "0.6": {
+          "ber": 0.4875,
+          "ok": false
+        },
+        "1.0": {
+          "ber": 0.4125,
+          "ok": false
+        }
+      },
+      "clean_ok": true,
+      "delta": 32.0,
+      "freq": 0,
+      "psnr_db": 33.17
+    },
+    {
+      "block": 8,
+      "blur": {
+        "0.3": {
+          "ber": 0.4,
+          "ok": false
+        },
+        "0.6": {
+          "ber": 0.4625,
+          "ok": false
+        },
+        "1.0": {
+          "ber": 0.4625,
+          "ok": false
+        }
+      },
+      "clean_ok": true,
+      "delta": 40.0,
+      "freq": 0,
+      "psnr_db": 32.13
+    },
+    {
+      "block": 8,
+      "blur": {
+        "0.3": {
+          "ber": 0.4625,
+          "ok": false
+        },
+        "0.6": {
+          "ber": 0.5125,
+          "ok": false
+        },
+        "1.0": {
+          "ber": 0.45,
+          "ok": false
+        }
+      },
+      "clean_ok": true,
+      "delta": 48.0,
+      "freq": 0,
+      "psnr_db": 31.2
+    },
+    {
+      "block": 16,
+      "blur": {
+        "0.3": {
+          "ber": 0.5375,
+          "ok": false
+        },
+        "0.6": {
+          "ber": 0.525,
+          "ok": false
+        },
+        "1.0": {
+          "ber": 0.5375,
+          "ok": false
+        }
+      },
+      "clean_ok": true,
+      "delta": 24.0,
+      "freq": 0,
+      "psnr_db": 39.24
+    },
+    {
+      "block": 16,
+      "blur": {
+        "0.3": {
+          "ber": 0.55,
+          "ok": false
+        },
+        "0.6": {
+          "ber": 0.5375,
+          "ok": false
+        },
+        "1.0": {
+          "ber": 0.55,
+          "ok": false
+        }
+      },
+      "clean_ok": true,
+      "delta": 32.0,
+      "freq": 0,
+      "psnr_db": 38.35
+    },
+    {
+      "block": 16,
+      "blur": {
+        "0.3": {
+          "ber": 0.525,
+          "ok": false
+        },
+        "0.6": {
+          "ber": 0.5125,
+          "ok": false
+        },
+        "1.0": {
+          "ber": 0.55,
+          "ok": false
+        }
+      },
+      "clean_ok": true,
+      "delta": 40.0,
+      "freq": 0,
+      "psnr_db": 37.52
+    },
+    {
+      "block": 8,
+      "blur": {
+        "0.3": {
+          "ber": 0.3875,
+          "ok": false
+        },
+        "0.6": {
+          "ber": 0.4875,
+          "ok": false
+        },
+        "1.0": {
+          "ber": 0.4375,
+          "ok": false
+        }
+      },
+      "clean_ok": true,
+      "delta": 32.0,
+      "freq": 1,
+      "psnr_db": 33.35
+    },
+    {
+      "block": 8,
+      "blur": {
+        "0.3": {
+          "ber": 0.425,
+          "ok": false
+        },
+        "0.6": {
+          "ber": 0.45,
+          "ok": false
+        },
+        "1.0": {
+          "ber": 0.45,
+          "ok": false
+        }
+      },
+      "clean_ok": true,
+      "delta": 40.0,
+      "freq": 1,
+      "psnr_db": 32.31
+    },
+    {
+      "block": 8,
+      "blur": {
+        "0.3": {
+          "ber": 0.4375,
+          "ok": false
+        },
+        "0.6": {
+          "ber": 0.45,
+          "ok": false
+        },
+        "1.0": {
+          "ber": 0.4125,
+          "ok": false
+        }
+      },
+      "clean_ok": true,
+      "delta": 48.0,
+      "freq": 1,
+      "psnr_db": 31.39
+    }
+  ],
+  "schema": "nf-watermark-ecc-probe/1",
+  "seed": 20261108,
+  "size": 256,
+  "verdict": {
+    "any_survives_screenshot": false,
+    "survivors": []
+  }
+}

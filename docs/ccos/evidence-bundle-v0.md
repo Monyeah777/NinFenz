@@ -1,4 +1,6 @@
 # 证据包 v0（evidence bundle）
+
+状态：**已实装**（判据：`desktop/tests/test_evidence_vectors.py` 8 项 + `desktop/tests/test_evidence.py` 66 项；CLI：`nf evidence pack/verify`）。
 > ⛔ 操作指令：阅读即执行——本文含可直接执行的命令与判定，勿当资料阅读。
 > 最后更新：2026-11-04
 > **Status**: v0 已实装（pack / verify / bench · 三种可验形态）· **上位**: docs/ccos/abi-v0.md §4 cc_verify
@@ -133,7 +135,7 @@ SOURCE_DATE_EPOCH=1700000000 python scripts/nf.py evidence pack 01_核心协议.
 cmp /tmp/e1.zip /tmp/e2.zip
 
 # 4) 单测（四词判定各自可达 + 三形态 + 夹带成员 + 基准）
-python -m unittest desktop.tests.test_evidence             # 65 项全绿（含零依赖复验器一致性）
+python -m unittest desktop.tests.test_evidence             # 66 项全绿（含零依赖复验器一致性与成本记账）
 ```
 
 ## 攻击矩阵基准 v0（防「看起来能验」）

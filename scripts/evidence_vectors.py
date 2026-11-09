@@ -94,11 +94,10 @@ def _build(tmp: str, targets: list, key: bytes | None = None, anchor=None,
 def _base_fixture(tmp: str) -> None:
     d = Path(tmp) / "d"
     d.mkdir(parents=True, exist_ok=True)
-    # 写成**字节**（不用 write_text）：Windows 的文本模式会把 \n 翻成 \r\n，
-    # 于是同一仓库在不同平台生成的证据包字节不同，向量「提交件==重算」跨平台必红。
     for name, body in (("a.md", "# A\n\n甲\n"), ("b.md", "# B\n\n乙\n"),
                        ("c.md", "# C\n\n丙\n")):
-        atomic_write.write_bytes(str(d / name), body.encode("utf-8"))
+        # 字节写入：文本模式在 Windows 会改写 \n，同一份证据包跨平台字节不同（合并自 main）
+        atomic_write.write_bytes(d / name, body.encode("utf-8"))
 
 
 def _case(cid: str, desc: str, verdict: str, *, bundle: bytes | None = None,
@@ -242,7 +241,9 @@ def _zip_with_duplicate(members: dict, dup_name: str) -> bytes:
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_STORED) as zf:
         for name in sorted(members):
             zi = zipfile.ZipInfo(name, date_time=evidence._ZIP_EPOCH)
-            zi.create_system = 0          # 跨平台 zip 字节确定性（同 evidence._zip_bytes）
+            # 跨平台确定性：default create_system 在 Windows=0 / Linux=3，会让同一份 zip
+            # 字节不同、向量摘要漂移（2026-11-10 Linux CI 实测）。固定 0。
+            zi.create_system = 0
             zf.writestr(zi, members[name])
         zi = zipfile.ZipInfo(dup_name, date_time=evidence._ZIP_EPOCH)
         zi.create_system = 0
@@ -310,10 +311,9 @@ def _receipts_vectors(tmp: str) -> list:
 
 def _envelope(path: str, data: bytes, key: bytes | None = None) -> dict:
     """造 nf-attest/1 信封（digest_only 或 hmac-sha256 级）。"""
-    text = data.decode("utf-8")
+    text = data.decode("utf-8", "replace")
     base = {"schema": "nf-attest/1",
-            "subject": {"path": path,
-                        "sha256": hashlib.sha256(data).hexdigest(),
+            "subject": {"path": path, "sha256": hashlib.sha256(data).hexdigest(),
                         "bytes": len(data),
                         "line_count": len(text.replace("\r\n", "\n").splitlines())},
             "producer": "vectors", "issued_at": PIN}

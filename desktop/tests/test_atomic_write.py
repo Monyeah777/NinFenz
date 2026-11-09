@@ -3,8 +3,8 @@
 动机（重复调用安全）：仓库把原子写惯用法写在 `disk_cache`/`daemon` 里，而**已发布产物**
 的写入口此前是裸 `open(path, "w")`——并发写同一件时读者可能读到半截内容。
 """
-import os
 import json
+import os
 import subprocess
 import sys
 import tempfile

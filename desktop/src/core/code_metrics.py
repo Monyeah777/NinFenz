@@ -74,7 +74,8 @@ def measure(root: str = ".") -> Dict[str, Dict[str, Any]]:
     r = Path(root)
     out: Dict[str, Dict[str, Any]] = {}
     for d in SCAN_DIRS:
-        for p in sorted((r / d).glob("*.py")):
+        # 按 posix 字符串排序（Windows 的 Path 比较大小写不敏感，Linux 敏感 → 顺序会不同）
+        for p in sorted((r / d).glob("*.py"), key=lambda q: q.as_posix()):
             rel = p.relative_to(r).as_posix()
             out[rel] = metrics_of(str(p))
     return out

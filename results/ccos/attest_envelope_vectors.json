@@ -5,11 +5,13 @@
     {
       "desc": "digest_only 级信封",
       "envelope": {
-        "envelope_digest": "91ccec899e5dda1e5d49195ebdab4decd6389f077c5a6f4aaa326e91136c22c3",
+        "envelope_digest": "ae24916b194166fe5f1008a1ddc6f950cf1902329cafd316433d4854b42c045e",
         "issued_at": "2026-01-01T00:00:00Z",
         "producer": "vectors",
         "schema": "nf-attest/1",
         "subject": {
+          "bytes": 6,
+          "line_count": 1,
           "path": "d/a.md",
           "sha256": "726af096302174eaf76affe47f4db81dfebdeae58fbb9d8a320c75ad75651959"
         }
@@ -25,15 +27,17 @@
     {
       "desc": "hmac-sha256 级信封",
       "envelope": {
-        "envelope_digest": "91ccec899e5dda1e5d49195ebdab4decd6389f077c5a6f4aaa326e91136c22c3",
+        "envelope_digest": "ae24916b194166fe5f1008a1ddc6f950cf1902329cafd316433d4854b42c045e",
         "issued_at": "2026-01-01T00:00:00Z",
         "producer": "vectors",
         "schema": "nf-attest/1",
         "signature": {
-          "mac": "6020c710b40845121277d24ce0b2ca0e04d82041393240c63080a6856f31621e",
+          "mac": "dc7d4cfdbaeeeb89fba88066a1b527ad56a7b7512f370a0e73584d10d52aaab6",
           "scheme": "hmac-sha256"
         },
         "subject": {
+          "bytes": 6,
+          "line_count": 1,
           "path": "d/a.md",
           "sha256": "726af096302174eaf76affe47f4db81dfebdeae58fbb9d8a320c75ad75651959"
         }
@@ -49,11 +53,13 @@
     {
       "desc": "主体摘要被改",
       "envelope": {
-        "envelope_digest": "91ccec899e5dda1e5d49195ebdab4decd6389f077c5a6f4aaa326e91136c22c3",
+        "envelope_digest": "ae24916b194166fe5f1008a1ddc6f950cf1902329cafd316433d4854b42c045e",
         "issued_at": "2026-01-01T00:00:00Z",
         "producer": "vectors",
         "schema": "nf-attest/1",
         "subject": {
+          "bytes": 6,
+          "line_count": 1,
           "path": "d/a.md",
           "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
         }

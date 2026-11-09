@@ -31,6 +31,7 @@ import sys
 import tempfile
 import time
 from pathlib import Path
+from typing import Any
 
 ROOT = Path(__file__).resolve().parent.parent
 #: **分区数**与**并发数**是两件事（2026-11-04 实测教训）：
@@ -41,7 +42,18 @@ ROOT = Path(__file__).resolve().parent.parent
 #:   并发多片会在守护端口/临时目录/计时判据上互相干扰（实测 8 片并发有假红）。
 DEFAULT_SHARDS = 8
 DEFAULT_JOBS = 1
+#: 快照模式外层等内层的缺省墙钟上限（秒）：防内层挂死后外层无限等。
+DEFAULT_MAX_WALL_S = 5400.0
 GUIDE = "修复指引："
+
+def _core(name: str):
+    """按需导入 desktop/src 下的 core 模块（局部导入：模块级只留纯逻辑，避开 E402）。"""
+    src = str(ROOT / "desktop" / "src")
+    if src not in sys.path:
+        sys.path.insert(0, src)
+    import importlib
+
+    return importlib.import_module("core." + name)
 
 
 def porcelain_lines(text: str) -> list[str]:
@@ -56,14 +68,6 @@ def dirty_guard(lines: list[str], allow_dirty: bool) -> str:
     sample = "；".join(ln.strip() for ln in lines[:5])
     return (f"工作树不干净（{len(lines)} 处变更：{sample}）（{GUIDE}先提交或收干净再跑——"
             "在改到一半的树上跑分片会产生与输入无关的假红；确需跑加 --allow-dirty）")
-
-
-def payload_skip_hint(manifest: dict | None) -> str:
-    """payload 未暂存 → 说明（打包交付线自检会静默 skip）；已暂存返回空串。"""
-    if manifest is None:
-        return ("npm payload 未暂存：packaging 交付线自检（test_npm_package 的 smoke / "
-                "verify-package）会 skip；要覆盖请先 cd packaging/npm && npm run stage")
-    return ""
 
 
 def payload_drift_guard(manifest: dict | None, head: str) -> str:
@@ -131,6 +135,132 @@ def strip_snapshot_flag(argv: list[str]) -> list[str]:
     return [a for a in argv if a not in SNAPSHOT_STRIP]
 
 
+
+
+#: 快照互斥锁（2026-11-08 实测教训：本仓与其它工作区同时跑三份全量快照，
+#: CPU 争抢把 45 分钟拉成 65+ 分钟，且两个外层进程会互相清理对方的 worktree）。
+LOCK_NAME = ".snapshot.lock"
+LOCK_MAX_AGE_S = 3 * 3600.0
+
+
+
+def _read_lock_meta(lock: Path) -> dict | None:
+    """读锁元数据 → dict 或 None（坏件/缺件返回 None，由调用方按「可抢」处理）。"""
+    if not lock.is_file():
+        return None
+    try:
+        doc = _core("json_doc").load(lock, dict, what=str(lock))
+    except (OSError, ValueError):   # 半截/坏件锁 = 不可信 → 当作没有锁（可抢）
+        return None
+    return doc if isinstance(doc, dict) else None
+
+
+def lock_should_reclaim(meta: dict | None, pid_alive: bool, age_s: float,
+                        max_age_s: float = LOCK_MAX_AGE_S) -> str:
+    """锁是否可抢 → 空串=不可抢 / 非空=可抢的理由（纯函数，便于判据）。
+
+    口径（fail-closed）：
+    ① 没有元数据（空/坏件）→ 可抢（残留锁不该永久挡住发布）；
+    ② 持有进程已死 → 可抢；
+    ③ 持有进程活着且未超龄 → **不可抢**（宁可让调用方等，也不并发跑两份）；
+    ④ 超龄（默认 3 小时）→ 可抢（真挂死的进程不该锁死整条线）。
+    """
+    if not isinstance(meta, dict) or not meta:
+        return "锁内容为空或坏件"
+    if not pid_alive:
+        return "持有进程已不在（pid=" + str(meta.get("pid")) + "）"
+    if age_s >= max_age_s:
+        return "锁已超龄 " + str(round(age_s / 60.0)) + " 分钟（上限 " \
+               + str(round(max_age_s / 60.0)) + " 分钟）"
+    return ""
+
+
+def lock_acquire(base: Path, head: str, *, pid: int | None = None,
+                 now: float | None = None, force: bool = False) -> tuple[bool, str]:
+    """拿快照锁 → (是否拿到, 提示)。返回 False 时调用方**不得**继续跑快照。"""
+    import time as _time
+    lock = Path(base) / LOCK_NAME
+    pid = os.getpid() if pid is None else int(pid)
+    now = _time.time() if now is None else float(now)
+    meta = None
+    if lock.is_file():
+        meta = _read_lock_meta(lock)
+    if meta and not force:
+        holder = int(meta.get("pid") or 0)
+        age = max(0.0, now - float(meta.get("started_at") or 0.0))
+        why = lock_should_reclaim(meta, _pid_alive(holder), age)
+        if not why:
+            return False, ("另一份全量快照正在跑（pid " + str(holder) + " · HEAD "
+                           + str(meta.get("head"))[:12] + " · 已 "
+                           + str(round(age / 60.0)) + " 分钟）；"
+                           + GUIDE + "等它结束，或确认其进程已死后重试，或加 --force-lock")
+        print("  [snapshot] 接管陈旧锁：" + why, file=sys.stderr, flush=True)
+    base.mkdir(parents=True, exist_ok=True)
+    _core("atomic_write").write_text(
+        lock, json.dumps({"pid": pid, "head": str(head), "started_at": now},
+                         ensure_ascii=False, sort_keys=True))
+    return True, ""
+
+
+def lock_release(base: Path, *, pid: int | None = None) -> None:
+    """释放锁（只删自己的锁：别的进程接管后不误删）。"""
+    lock = Path(base) / LOCK_NAME
+    pid = os.getpid() if pid is None else int(pid)
+    meta = _read_lock_meta(lock)
+    if isinstance(meta, dict) and int(meta.get("pid") or 0) == pid:
+        try:
+            lock.unlink()   # 只删自己的锁；删不掉说明已被别人接管
+        except OSError:     # 权限/竞态：锁已在别处处理，静默降级不阻断
+            return
+
+
+
+
+def lock_acquire_wait(base: Path, head: str, *, pid: int | None = None,
+                      wait_s: float = 0.0, poll_s: float = 5.0,
+                      force: bool = False) -> tuple[bool, str]:
+    """拿锁（可等待）→ (是否拿到, 提示)。
+
+    为什么不只是「拿不到就退出」：并发会话里**等待**比报错更省人力（尤其夜里排队跑）；
+    等待期间每 poll_s 复查一次，被抢断/超龄就立刻接管，不会无限等一份死锁。
+    wait_s<=0 → 只试一次（与 lock_acquire 等价）。
+    """
+    import time as _time
+
+    deadline = _time.time() + max(0.0, float(wait_s))
+    while True:
+        ok, why = lock_acquire(base, head, pid=pid, force=force)
+        if ok or _time.time() >= deadline:
+            return ok, why
+        print("  [snapshot] 等待快照锁：" + why, file=sys.stderr, flush=True)
+        _time.sleep(max(0.5, float(poll_s)))
+
+def _pid_alive(pid: int) -> bool:
+    """进程是否还活着（Windows: tasklist 绝对路径；POSIX: os.kill(pid, 0)）。
+
+    一律走 core 的受控进程原子（argv 列表 / 无 shell / 超时即回收）——脚本面不自己起
+    subprocess（SAST S603/S607 与 purity R6 都盯这条），这也是本件 `_run` 的既有口径。
+    """
+    if pid <= 0:
+        return False
+    if os.name != "nt":
+        try:
+            os.kill(pid, 0)
+            return True
+        except OSError:   # 非 Windows 存活探测：OSError = 进程不存在（按死处理）
+            return False
+    src = str(ROOT / "desktop" / "src")
+    if src not in sys.path:
+        sys.path.insert(0, src)
+    from core.atoms import proc as proc_atom  # 局部导入：模块级只留纯逻辑
+
+    exe = shutil.which("tasklist")
+    if not exe:
+        return False
+    got = proc_atom.run_capture([exe, "/FI", "PID eq " + str(pid), "/NH"], timeout=15)
+    return str(pid) in str(got.get("out") or "")
+
+
 def snapshot_dir_name(head: str) -> str:
     """快照目录名：带 HEAD 短哈希，冲突可辨（纯函数）。"""
     return f"nf-gate-snap-{str(head)[:12]}"
@@ -140,20 +270,11 @@ def snapshot_dir_name(head: str) -> str:
 #: 2026-11-06 实测 C 盘 100% 满（剩余 84 MB），tempfile.mkdtemp 直接把整次门禁打成 ENOSPC。
 SNAP_BASE_DEFAULT = ".worktrees/gate-snap"
 
-
 def snapshot_base(root: Path, override: str = "") -> Path:
     """快照基目录（纯函数）：显式覆盖优先，否则落在仓库同盘。"""
     raw = (override or "").strip() or SNAP_BASE_DEFAULT
     path = Path(raw)
     return path if path.is_absolute() else (root / path)
-
-
-def snapshot_space_issue(free_bytes: int, need_mb: int) -> str:
-    """快照落点可用空间不足 → 说明（够了返回空串）；``-1``=探针失败，交由创建期报错。"""
-    if 0 <= free_bytes < need_mb * 1024 * 1024:
-        return (f"快照落点空间不足（可用 {free_bytes // 1048576} MB，需 ≥{need_mb} MB）"
-                f"（{GUIDE}用 --snapshot-dir 指到空间充足的卷，或先清理旧快照/缓存）")
-    return ""
 
 
 def _snapshot_free_bytes(path: Path) -> int:
@@ -229,11 +350,12 @@ def _snapshot_create(head: str, base: Path, need_mb: int = 1200) -> tuple[str, s
     时候提交、改文件、甚至改门禁脚本自己——8 片于是落在不同状态上，红绿都不可信。
     快照把结论**钉在一个 SHA** 上：证明「这个提交的内容是绿的」，与工作区完全解耦。
     """
-    need_mb = 1200          # 实测：快照 worktree + 8 片临时件要 >1 GB；84 MB 剩余曾把一次 50 分钟
-    # 门禁打成 ENOSPC（2026-11-06），400 MB 的旧阈值挡不住。宁可提前拒绝，也不浪费一次全量跑。
-    issue = snapshot_space_issue(_snapshot_free_bytes(base), need_mb)
-    if issue:
-        return "", issue
+    # 需求 1200 MB（合并自 main）：实测一次「副本落地 + 8 片并发」要 >1 GB，
+    # 84 MB 余量撑不到 50 分钟；宁可在起跑前拒绝，也不浪费一次全量。
+    free = _snapshot_free_bytes(base)
+    if 0 <= free < need_mb * 1024 * 1024:
+        return "", (f"快照落点空间不足（{base} 可用 {free // 1048576} MB，需 ≥{need_mb} MB）"
+                    f"（{GUIDE}用 --snapshot-dir 指到空间充足的卷，或先清理旧快照）")
     base.mkdir(parents=True, exist_ok=True)
     run_dir = Path(tempfile.mkdtemp(prefix=snapshot_dir_name(head) + "-", dir=str(base)))
     path = str(run_dir / "wt")
@@ -512,7 +634,29 @@ def snapshot_log_path(path: str) -> str:
 
 
 def _run_in_snapshot(args, head: str) -> int:
-    """外层：建快照 → 在快照里跑一遍本件（不带 --snapshot）→ 回报 → 清理。
+    """外层入口：**先拿互斥锁**再建快照，结束后无论成败都释放。
+
+    为什么加锁（2026-11-08 实测）：本仓与其它工作区同时跑三份全量快照，
+    CPU 争抢把 45 分钟拉到 65+ 分钟，且两份外层会互相清理对方 worktree。
+    锁是 fail-closed 的：拿不到就不跑，宁可让调用方等。
+    """
+    base = snapshot_base(ROOT, getattr(args, "snapshot_dir", "") or "")
+    # 测试/CI 可把锁落到独立目录（避免测试与真跑抢同一把锁）
+    lock_base = Path(os.environ.get("NF_SNAPSHOT_LOCK_DIR") or base)
+    ok, why = lock_acquire_wait(lock_base, head,
+                                wait_s=float(getattr(args, "lock_wait", 0.0) or 0.0),
+                                force=bool(getattr(args, "force_lock", False)))
+    if not ok:
+        print("  ✗ " + why, file=sys.stderr)
+        return 2
+    try:
+        return _run_in_snapshot_body(args, head)
+    finally:
+        lock_release(lock_base)
+
+
+def _run_in_snapshot_body(args, head: str) -> int:
+    """外层主体：建快照 → 在快照里跑一遍本件（不带 --snapshot）→ 回报 → 清理。
 
     内层是**独立进程**：它的 ROOT 就是快照目录，所以 payload 对账 / 新鲜度 / 分片天然
     都作用在快照上，无需把 cwd 透传到每个 helper。结论因此绑定**一个 SHA**。
@@ -560,7 +704,8 @@ def _run_in_snapshot(args, head: str) -> int:
         quoted = " ".join(f'"{a}"' for a in inner)
         launcher = ['bash', '-c',
                     f'{quoted} > "{log_path}" 2>&1; echo "NFGATE_EXIT=$?"']
-        proc = _run(launcher, 7200, cwd=path, env=env)
+        wall_cap = float(getattr(args, "max_wall_s", DEFAULT_MAX_WALL_S) or DEFAULT_MAX_WALL_S)
+        proc = _run(launcher, wall_cap, cwd=path, env=env)
         out = _read_text(log_path)
         err_meta = proc.get("out") or ""
         inner_rc = None
@@ -580,7 +725,14 @@ def _run_in_snapshot(args, head: str) -> int:
         else:
             sys.stdout.write(out)
         if inner_rc is None:
-            return 3 if proc.get("code") is None else int(proc.get("code"))
+            if proc.get("code") is None:
+                # 墙钟上限到了：内层被回收。留证（日志路径 + 上限值），不假装「跑了但没结果」。
+                print("  ✗ 快照墙钟超限 " + str(int(wall_cap)) + " s：内层已回收；"
+                      "日志留在 " + log_path + "（" + GUIDE
+                      + "拆小 --shards 重跑，或确认机器无并发占用后加 --max-wall-s 放宽）",
+                      file=sys.stderr, flush=True)
+                return 3
+            return int(proc.get("code"))
         return inner_rc
     finally:
         if getattr(args, "keep_snapshot", False):
@@ -588,6 +740,94 @@ def _run_in_snapshot(args, head: str) -> int:
         else:
             _snapshot_remove(path)
         _snapshot_remove_tmp(path)
+
+
+
+
+def status_snapshot(base: Path) -> dict[str, Any]:
+    """快照现场体检 → {lock, runs, latest}（纯读，不改任何状态）。
+
+    为什么（第 43 轮）：并发会话多的时候，「现在有没有人在跑、哪一份、跑到哪了」要靠翻目录猜。
+    把它做成一个命令，结论状态就不再靠记忆。
+    """
+    base = Path(base)
+    runs_all = [p for p in base.glob("nf-gate-snap-*") if p.is_dir()] if base.is_dir() else []
+    # 按 mtime 新→旧：最新建的那份才是「当前这份」
+    runs = sorted(runs_all, key=lambda p: p.stat().st_mtime, reverse=True)
+    lock_path = base / LOCK_NAME
+    lock_info: dict[str, Any] | None = None
+    if lock_path.is_file():
+        meta = _read_lock_meta(lock_path)
+        if meta:
+            import time as _time
+            age = max(0.0, _time.time() - float(meta.get("started_at") or 0.0))
+            lock_info = {"pid": int(meta.get("pid") or 0), "head": str(meta.get("head") or ""),
+                         "age_s": round(age, 1),
+                         "alive": _pid_alive(int(meta.get("pid") or 0))}
+    latest = None
+    head_short = str((lock_info or {}).get("head") or "")[:12]
+    if head_short:
+        matched = [r for r in runs if head_short in r.name]
+        runs = matched + [r for r in runs if r not in matched]
+        preferred = matched[0] if matched else None
+    else:
+        preferred = None
+    for run in runs:
+        log = run / "gate.log"
+        text = ""
+        if log.is_file():
+            try:
+                text = log.read_text(encoding="utf-8", errors="replace")
+            except OSError:   # 日志读不动：按「还没内容」处理，不阻断体检
+                text = ""
+        head_line = next((ln for ln in text.splitlines() if "[snapshot] HEAD" in ln), "")[:120]
+        doc = None
+        if "{" in text:
+            try:
+                doc = _core("json_doc").loads(text[text.index("{"):], dict,
+                                             what="内层结论日志")
+            except ValueError:   # 半截 JSON（内层正在写）：先不给结论
+                doc = None
+        latest = {"run": run.name, "log_bytes": len(text.encode("utf-8")),
+                  "banner": head_line,
+                  "conclusion": None if doc is None else {
+                      "ok": doc.get("ok"), "checks_only_rc": doc.get("checks_only_rc"),
+                      "wall_s": doc.get("wall_s"),
+                      "failed_shards": [f.get("shard") for f in (doc.get("failed") or [])],
+                      "head": str(doc.get("head_start") or "")[:12],
+                      "moved": doc.get("head_moved")}}
+        if preferred is not None and run == preferred:
+            break            # 与锁同 HEAD 的那份才是「当前这份」
+        if latest["log_bytes"] > 0:
+            break            # 否则取第一份有内容的
+    return {"schema": "nf-snapshot-status/1", "base": str(base),
+            "runs": [p.name for p in runs], "lock": lock_info, "latest": latest,
+            "running": bool(lock_info and lock_info.get("alive"))}
+
+def _digests() -> dict:
+    """结论要绑的两份摘要（第 97 / 114 轮）：验证器与材料。取不到时留空串。"""
+    try:
+        verifier = _core("verifier_version").digest(ROOT)["verifier_digest"]
+    except ValueError:
+        verifier = ""
+    try:
+        materials = _core("sbom").collect(ROOT)["digest"]
+    except ValueError:
+        materials = ""
+    return {"verifier_digest": verifier, "materials_digest": materials}
+
+
+def _write_out(args, payload: dict) -> None:
+    """`--out` 落盘（第 124 轮）：拿到该文件的人可用 verifier_status 复核。"""
+    dest = str(getattr(args, "out", "") or "")
+    if not dest:
+        return
+    path = Path(dest)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    _core("atomic_write").write_text(
+        path, json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n")
+    if not getattr(args, "json", False):
+        print("结论已写入：" + str(path))
 
 
 def main(argv=None) -> int:
@@ -610,8 +850,23 @@ def main(argv=None) -> int:
     ap.add_argument("--dry-run", action="store_true", help="只打印计划，不执行")
     ap.add_argument("--only-preflight", action="store_true",
                     help="只跑前置面（脏树 / payload / 供应链），不跑 checks-only 与分片")
+    ap.add_argument("--max-wall-s", type=float, default=DEFAULT_MAX_WALL_S,
+                    help="快照模式外层等内层的墙钟上限（缺省 5400 s；超时判红并留证，防止挂死）")
+    ap.add_argument("--lock-wait", type=float, default=0.0,
+                    help="拿不到快照锁时最多等多少秒（缺省 0=立刻失败；>0 排队等）")
+    ap.add_argument("--force-lock", action="store_true",
+                    help="接管仍在跑的快照锁（确认另一进程已死/卡死时才用）")
+    ap.add_argument("--status", action="store_true",
+                    help="只看快照现场（锁持有者/运行目录/最近一次结论），不跑门禁")
     ap.add_argument("--json", action="store_true", help="机读汇总")
+    ap.add_argument("--out", default="",
+                    help="把结论 JSON 存到该路径（供 verifier_status 复核）")
     args = ap.parse_args(argv)
+    if args.status:
+        base = snapshot_base(ROOT, getattr(args, "snapshot_dir", "") or "")
+        doc = status_snapshot(base)
+        print(json.dumps(doc, ensure_ascii=False, indent=2, sort_keys=True))
+        return 0
 
     shards = max(1, min(int(args.shards), 32))
     concurrency = max(1, min(int(args.jobs), shards))
@@ -661,21 +916,6 @@ def main(argv=None) -> int:
     if dirty:
         print(f"  [WARN] 脏树放行（{len(dirty)} 处变更）——结果可能含中间态假红",
               file=sys.stderr)
-
-    skip_hint = payload_skip_hint(manifest)
-    if skip_hint:
-        print(f"  [WARN] {skip_hint}", file=sys.stderr)
-
-    # 活树模式同样要防 ENOSPC：分片把临时件写在仓库同盘；剩几百 MB 时跑到一半才 ENOSPC，
-    # 白花 30–50 分钟（2026-11-06 实测：84 MB 剩余）。快照模式由 _snapshot_create 检查。
-    live_space = snapshot_space_issue(_snapshot_free_bytes(ROOT), 800)
-    if live_space:
-        payload = {"schema": "nf-release-conclusion/1", "ok": False,
-                   "note": "活树模式空间不足，先清理再跑：" + live_space,
-                   "head": head, "wall": 0.0}
-        print(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True)
-              if args.json else f"  ✗ {live_space}")
-        return 4
 
     t0 = time.perf_counter()
     if not args.json:
@@ -730,8 +970,9 @@ def main(argv=None) -> int:
     if args.only_preflight:
         payload = {"schema": "nf-release-conclusion/1", "ok": True, "only_preflight": True,
                    "supply_chain": supply, "freshness": fresh,
-                   "ratchets": ratchets, "issues": [],
+                   "ratchets": ratchets, "issues": [], **_digests(),
                    "wall": 0.0}
+        _write_out(args, payload)
         print(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True)
               if args.json else "  => 前置面全过（脏树 / payload / 供应链）")
         return 0
@@ -790,14 +1031,22 @@ def main(argv=None) -> int:
     summary = aggregate(results)
     head_end = (_run(["git", "rev-parse", "HEAD"], 60).get("out") or "").strip()
     moved = head_move_guard(head, head_end) or drift
+    # 自省层（第 97 轮）：结论同时记录**产出它的验证器摘要**（判定面脚本内容摘要）。
+    # 工具改了而结论没重跑，摘要就对不上——这让「这份结论是谁判的」可核。
+    dig = _digests()
+    verifier = dig["verifier_digest"]
+    materials = dig["materials_digest"]
     payload = {"schema": "nf-release-conclusion/1",
                "ok": summary["ok"] and checks_rc == 0 and not moved,
+               "verifier_digest": verifier,
+               "materials_digest": materials,
                "head_start": head, "head_end": head_end, "head_moved": bool(moved),
                "supply_chain": supply, "freshness": fresh, "ratchets": ratchets,
                "checks_only_rc": checks_rc,
                "shards": sorted(results, key=lambda r: r["shard"]),
                "failed": summary["failed"], "shard_wall_s": summary["wall"],
                "wall_s": round(time.perf_counter() - t0, 1)}
+    _write_out(args, payload)
     if args.json:
         print(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True))
     else:

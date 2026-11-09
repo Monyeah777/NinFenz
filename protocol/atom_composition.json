@@ -1,0 +1,32 @@
+{
+  "schema": "nf-atom-composition/1",
+  "note": "原子组合关系（v2 派生用覆盖层）：v1 meta_atoms.json 的 composed_of 全空，但不许改 v1（旧 digest 必须不变），所以组合关系以本文件为准并在派生 v2 时合并。每条必须给 why（为什么是这个组合）。",
+  "compositions": [
+    {"id": "i.compose", "composed_of": ["k.partition", "k.relate", "i.merge"],
+     "why": "组合 = 先拆件、再建立件间关系、最后合并成整体"},
+    {"id": "i.hierarchy", "composed_of": ["k.partition", "k.classify", "i.compose"],
+     "why": "层级 = 分层切分 + 归类 + 自底向上组合"},
+    {"id": "i.cluster", "composed_of": ["k.partition", "m.compare", "i.merge"],
+     "why": "聚类 = 切分候选 + 两两比较相似度 + 合并同簇"},
+    {"id": "i.reconcile", "composed_of": ["m.compare", "e.adjudicate", "i.merge"],
+     "why": "调解 = 找出差异 + 裁决谁对 + 合并成一致版本"},
+    {"id": "i.transfer", "composed_of": ["k.abstract", "k.instantiate", "k.relate"],
+     "why": "迁移 = 抽象出结构 + 在新域实例化 + 建立对应关系"},
+    {"id": "e.adjudicate", "composed_of": ["e.verify", "e.falsify", "k.criterion"],
+     "why": "裁决 = 验一方 + 试图证伪另一方 + 按判据取舍"},
+    {"id": "e.benchmark", "composed_of": ["m.observe", "m.check", "e.verify"],
+     "why": "基准 = 观测读数 + 对照检查 + 复验结论"},
+    {"id": "e.calibrate", "composed_of": ["m.estimate", "e.verify", "m.compare"],
+     "why": "校准 = 先估计 + 拿实测复验 + 比较偏差"},
+    {"id": "c.sequence", "composed_of": ["c.select", "c.allocate"],
+     "why": "排序 = 选出当前项 + 分配先后资源"},
+    {"id": "c.allocate", "composed_of": ["c.select", "m.estimate"],
+     "why": "分配 = 选出对象 + 估计所需份额"},
+    {"id": "c.stop", "composed_of": ["m.detect", "c.switch"],
+     "why": "停止 = 检测到该收手 + 切到终止态"},
+    {"id": "m.trace", "composed_of": ["m.observe", "m.check"],
+     "why": "追踪 = 连续观测 + 逐步核对"},
+    {"id": "k.instantiate", "composed_of": ["k.define", "k.classify"],
+     "why": "实例化 = 定义类型 + 归入类别后生成具体项"}
+  ]
+}

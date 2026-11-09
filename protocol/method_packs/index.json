@@ -1,0 +1,61 @@
+{
+  "schema": "nf-method-pack-index/1",
+  "note": "方法包索引：每包 = 一个专业领域的专家动作 + 证据标准 + 常见错误 + 范例。包是数据，新增包不改代码（判据见 desktop/tests/test_method_pack.py）。",
+  "packs": [
+    {
+      "id": "watermarking",
+      "version": "1.0.0",
+      "path": "protocol/method_packs/watermarking.json"
+    },
+    {
+      "id": "evidence-audit",
+      "version": "1.0.0",
+      "path": "protocol/method_packs/evidence-audit.json"
+    },
+    {
+      "id": "metacognition",
+      "version": "1.0.0",
+      "path": "protocol/method_packs/metacognition.json"
+    },
+    {
+      "id": "evaluation-design",
+      "version": "1.0.0",
+      "path": "protocol/method_packs/evaluation-design.json"
+    },
+    {
+      "id": "prompt-injection-defense",
+      "version": "1.0.0",
+      "path": "protocol/method_packs/prompt-injection-defense.json"
+    },
+    {
+      "id": "data-provenance",
+      "version": "1.0.0",
+      "path": "protocol/method_packs/data-provenance.json"
+    },
+    {
+      "id": "resilience",
+      "version": "1.0.0",
+      "path": "protocol/method_packs/resilience.json"
+    },
+    {
+      "id": "handoff",
+      "version": "1.0.0",
+      "path": "protocol/method_packs/handoff.json"
+    },
+    {
+      "id": "privacy",
+      "version": "1.0.0",
+      "path": "protocol/method_packs/privacy.json"
+    },
+    {
+      "id": "supply-chain",
+      "version": "1.0.0",
+      "path": "protocol/method_packs/supply-chain.json"
+    },
+    {
+      "id": "operations",
+      "version": "1.0.0",
+      "path": "protocol/method_packs/operations.json"
+    }
+  ]
+}

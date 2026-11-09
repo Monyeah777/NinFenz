@@ -48,6 +48,13 @@
       "name": "nf_pyengine",
       "scope": "optional",
       "type": "library"
+    },
+    {
+      "bom-ref": "opt:numpy",
+      "description": "软依赖（可选，须守卫）：水印鲁棒性基准（watermark_bench）里按像素构造噪声/亮度攻击；软导入 + 缺依赖给修复指引，基准以外不依赖",
+      "name": "numpy",
+      "scope": "optional",
+      "type": "library"
     }
   ],
   "metadata": {
@@ -73,7 +80,7 @@
         "value": "与 SPDX 面同源；timestamp 取仓内声明日期最大值（非墙钟）。"
       }
     ],
-    "timestamp": "2026-11-09T00:00:00Z",
+    "timestamp": "2026-11-10T00:00:00Z",
     "tools": [
       {
         "name": "nf interop --kind cyclonedx",

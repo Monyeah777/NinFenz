@@ -28,6 +28,7 @@ sys.path.insert(0, str(ROOT / "desktop" / "src"))
 
 from core import mcp_runtime as mrt  # noqa: E402
 from core import repo_face as _repo_face  # noqa: E402
+
 #: 写 sink（**精确名**；`open` 另按 mode 实参判，见 `_write_sinks`）
 SINK_NAMES = {"write_text", "write_bytes", "atomic_write", "replace", "remove", "unlink",
               "rmtree", "mkdir", "makedirs", "rename", "save_module", "save_asset",

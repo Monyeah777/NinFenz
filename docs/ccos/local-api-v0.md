@@ -1,4 +1,6 @@
 # 本地 HTTP 面 v0（local api）
+
+状态：**已实装**（CLI：`nf serve`；端点契约见 `nf evidence` 面）。
 > ⛔ 操作指令：阅读即执行——本文含可直接执行的命令与判定，勿当资料阅读。
 > 最后更新：2026-11-04
 > **Status**: v0 已实装（nf serve --http）· **上位**: docs/ccos/abi-v0.md §4 cc_verify / §2 cc_check

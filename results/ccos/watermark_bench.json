@@ -1,0 +1,145 @@
+{
+  "attacks": [
+    {
+      "ber": 0.0,
+      "bytes": 197107,
+      "desc": "无损重存（PNG）",
+      "id": "lossless_resave",
+      "ok": true,
+      "payload_exact": true
+    },
+    {
+      "ber": 0.0,
+      "bytes": 159078,
+      "desc": "裁剪 10%（中心）",
+      "id": "crop_10",
+      "ok": true,
+      "payload_exact": true
+    },
+    {
+      "ber": 0.0,
+      "bytes": 110915,
+      "desc": "裁剪 25%（中心）",
+      "id": "crop_25",
+      "ok": true,
+      "payload_exact": true
+    },
+    {
+      "ber": 0.0,
+      "bytes": 49353,
+      "desc": "裁剪 50%（中心）",
+      "id": "crop_50",
+      "ok": true,
+      "payload_exact": true
+    },
+    {
+      "ber": null,
+      "bytes": 46355,
+      "desc": "缩放 0.5×",
+      "id": "scale_0.5",
+      "ok": false,
+      "payload_exact": false
+    },
+    {
+      "ber": null,
+      "bytes": 110110,
+      "desc": "缩放 0.75×",
+      "id": "scale_0.75",
+      "ok": false,
+      "payload_exact": false
+    },
+    {
+      "ber": null,
+      "bytes": 434154,
+      "desc": "放大 1.5×",
+      "id": "scale_1.5",
+      "ok": false,
+      "payload_exact": false
+    },
+    {
+      "ber": null,
+      "bytes": 725666,
+      "desc": "放大 2×",
+      "id": "scale_2",
+      "ok": false,
+      "payload_exact": false
+    },
+    {
+      "ber": null,
+      "bytes": 196484,
+      "desc": "JPEG q=95 重编码",
+      "id": "jpeg_95",
+      "ok": false,
+      "payload_exact": false
+    },
+    {
+      "ber": null,
+      "bytes": 196578,
+      "desc": "JPEG q=85 重编码",
+      "id": "jpeg_85",
+      "ok": false,
+      "payload_exact": false
+    },
+    {
+      "ber": null,
+      "bytes": 196855,
+      "desc": "JPEG q=70 重编码",
+      "id": "jpeg_70",
+      "ok": false,
+      "payload_exact": false
+    },
+    {
+      "ber": null,
+      "bytes": 196990,
+      "desc": "JPEG q=50 重编码",
+      "id": "jpeg_50",
+      "ok": false,
+      "payload_exact": false
+    },
+    {
+      "ber": null,
+      "bytes": 197174,
+      "desc": "高斯噪声 σ=1",
+      "id": "noise_1",
+      "ok": false,
+      "payload_exact": false
+    },
+    {
+      "ber": null,
+      "bytes": 197035,
+      "desc": "高斯噪声 σ=3",
+      "id": "noise_3",
+      "ok": false,
+      "payload_exact": false
+    },
+    {
+      "ber": null,
+      "bytes": 194239,
+      "desc": "亮度 ×1.05",
+      "id": "bright_1.05",
+      "ok": false,
+      "payload_exact": false
+    },
+    {
+      "ber": null,
+      "bytes": 131370,
+      "desc": "模拟拍屏（0.9× + blur + q=80）",
+      "id": "screenshot_sim",
+      "ok": false,
+      "payload_exact": false
+    }
+  ],
+  "baseline": {
+    "ber": 0.0,
+    "ok": true
+  },
+  "frame_bits": 480,
+  "note": "BER=None 表示读不出帧（与「帧全错」不同）；payload_exact 才是可交付判定",
+  "payload_bytes": 49,
+  "redundancy": 100,
+  "schema": "nf-watermark-bench/1",
+  "seed": 20261108,
+  "size": 256,
+  "tile": 24,
+  "watermark": "png-lsb"
+}

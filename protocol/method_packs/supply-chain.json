@@ -1,0 +1,117 @@
+{
+  "schema": "nf-method-pack/1",
+  "id": "supply-chain",
+  "version": "1.0.0",
+  "domain": "security/supply-chain",
+  "note": "供应链安全域：把「交付物与它的输入之间有没有可核的关系」拆成可核项——版本钉定、材料产物对应、可复现构建、发布件校验、静态扫描基线、溯源记录。来源为本仓 packaging/release 机制与 SLSA/in-toto 的机制借鉴；不引未读数字。",
+  "expert_moves": [
+    {
+      "id": "sc.pin_inputs",
+      "name": "版本钉定：依赖与构建工具的版本必须写死，不跟 latest 走",
+      "why": "「latest」意味着每次构建可能不同的输入；钉定是复现性的前提。",
+      "maps_to": [
+        "k.quantify",
+        "m.check",
+        "e.verify"
+      ]
+    },
+    {
+      "id": "sc.materials_products",
+      "name": "材料→产物摘要：每次产出都记下用了哪些输入、生成了什么",
+      "why": "没有材料摘要，就无法回答「这个包是用哪棵树构建的」；摘要本身就是证据。",
+      "maps_to": [
+        "k.relate",
+        "m.trace",
+        "e.audit"
+      ]
+    },
+    {
+      "id": "sc.reproducible_build",
+      "name": "可复现构建：同样的输入与工具，产出同样的字节",
+      "why": "不可复现的构建无法被第三方验证，签名也只能证明「谁签的」，不能证明「签的是什么」。",
+      "maps_to": [
+        "e.verify",
+        "e.calibrate",
+        "m.compare"
+      ]
+    },
+    {
+      "id": "sc.verify_artifacts",
+      "name": "发布件校验：对最终 tarball/包做结构、摘要与内容核对",
+      "why": "构建过程中间件与最终发布件可能不同；校验必须落在最终交付物上。",
+      "maps_to": [
+        "e.verify",
+        "k.criterion",
+        "m.detect"
+      ]
+    },
+    {
+      "id": "sc.static_scan",
+      "name": "静态扫描基线：已知风险清单 + 冻结基线，只许减少",
+      "why": "扫描结果没有基线就无法判断「变好还是变坏」；基线让趋势可核。",
+      "maps_to": [
+        "k.standard",
+        "m.check",
+        "e.falsify"
+      ]
+    },
+    {
+      "id": "sc.provenance_record",
+      "name": "溯源记录：把供应链信息写进发布结论，可被外部复核",
+      "why": "溯源只存在构建日志里等于没有；必须随结论一起交付。",
+      "maps_to": [
+        "k.represent",
+        "m.trace",
+        "e.adjudicate"
+      ]
+    }
+  ],
+  "evidence_standards": [
+    {
+      "claim_kind": "pinning",
+      "required": [
+        "依赖与工具版本清单（含 lock/manifest 位置）",
+        "未钉定的例外与理由"
+      ]
+    },
+    {
+      "claim_kind": "reproducibility",
+      "required": [
+        "两次独立构建的产物摘要比对",
+        "不一致时的差异定位方法"
+      ]
+    },
+    {
+      "claim_kind": "provenance",
+      "required": [
+        "材料摘要（输入）与产物摘要在同一记录中",
+        "该记录可被外部独立复核的路径"
+      ]
+    }
+  ],
+  "common_failures": [
+    "依赖用 ^ 或 latest，构建结果随时间漂移",
+    "只签产物不签材料，无法回答「用什么构建的」",
+    "可复现性只在作者机器上验证过",
+    "发布件与测试件不是同一份，校验打在错的字节上",
+    "静态扫描没有基线，红绿全凭印象",
+    "溯源写在构建日志里，交付时没有随附"
+  ],
+  "examples": [
+    {
+      "case": "packaging/npm/tools/stage-payload.mjs 生成 payload-manifest（运行时生成，不入库）（含件数与摘要）——材料与产物的对应记录",
+      "why": "这是「材料→产物摘要」在发布流水里的形态：manifest 本身就是可核的溯源件"
+    },
+    {
+      "case": "scripts/sast_check.py 的 baseline 冻结：静态扫描只许减少不准新增",
+      "why": "这是「静态扫描基线」的形态：判据有基线才能判变好还是变坏"
+    }
+  ],
+  "criteria_refs": [
+    "craft:coherence",
+    "standard:evidence-bundle-v0"
+  ],
+  "runnable": [
+    "python scripts/sbom.py --check"
+  ]
+}

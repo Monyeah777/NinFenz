@@ -1,0 +1,129 @@
+{
+  "attacks": [
+    {
+      "aligned": false,
+      "desc": "缩放 0.85×",
+      "id": "scale_0.85",
+      "ok": false,
+      "payload_exact": false,
+      "recovered_offset": [
+        6,
+        14
+      ],
+      "recovered_scale": 1.25,
+      "sync_max": 128,
+      "sync_score": 83
+    },
+    {
+      "aligned": false,
+      "desc": "缩放 0.9×",
+      "id": "scale_0.9",
+      "ok": false,
+      "payload_exact": false,
+      "recovered_offset": [
+        11,
+        1
+      ],
+      "recovered_scale": 1.0,
+      "sync_max": 128,
+      "sync_score": 81
+    },
+    {
+      "aligned": false,
+      "desc": "放大 1.1×",
+      "id": "scale_1.1",
+      "ok": false,
+      "payload_exact": false,
+      "recovered_offset": [
+        7,
+        8
+      ],
+      "recovered_scale": 1.05,
+      "sync_max": 128,
+      "sync_score": 84
+    },
+    {
+      "aligned": true,
+      "desc": "放大 1.25×",
+      "id": "scale_1.25",
+      "ok": true,
+      "payload_exact": true,
+      "recovered_offset": [
+        0,
+        0
+      ],
+      "recovered_scale": 1.25,
+      "sync_max": 128,
+      "sync_score": 128
+    },
+    {
+      "aligned": false,
+      "desc": "裁剪 10%",
+      "id": "crop_10",
+      "ok": false,
+      "payload_exact": false,
+      "recovered_offset": [
+        14,
+        8
+      ],
+      "recovered_scale": 1.25,
+      "sync_max": 128,
+      "sync_score": 88
+    },
+    {
+      "aligned": true,
+      "desc": "JPEG q=70（对照）",
+      "id": "jpeg_70",
+      "ok": true,
+      "payload_exact": true,
+      "recovered_offset": [
+        0,
+        0
+      ],
+      "recovered_scale": 1.0,
+      "sync_max": 128,
+      "sync_score": 127
+    },
+    {
+      "aligned": false,
+      "desc": "模拟拍屏",
+      "id": "screenshot_sim",
+      "ok": false,
+      "payload_exact": false,
+      "recovered_offset": [
+        6,
+        11
+      ],
+      "recovered_scale": 0.95,
+      "sync_max": 128,
+      "sync_score": 82
+    }
+  ],
+  "clean": {
+    "ok": true,
+    "psnr_db": 29.91,
+    "sync_max": 128,
+    "sync_score": 128
+  },
+  "conclusion": {
+    "clean": "同步字与 payload 均可读回（对齐 128/128）",
+    "downscale_and_crop": "非整数重采样/裁剪后对齐分封顶 ~64–69%（81–88/128），固定 8×8 块网格无法回收——需换**内容同步**（SIFT/特征点）或**频谱模板**（周期峰），调网格分辨率无效",
+    "jpeg70": "JPEG 不破坏块网格，同步照常（127/128）",
+    "next": "v1 同步层应走特征点/频谱模板；本探针的价值是给出「网格同步不够」的可复算证据",
+    "upscale_1.25": "整数比放大可对齐（128/128）"
+  },
+  "delta": 24.0,
+  "info": {
+    "blocks": 1024,
+    "delta": 24.0,
+    "payload_bits": 88,
+    "repeat": 8,
+    "sync_bits": 32
+  },
+  "payload": "NFSYNC1",
+  "repeat": 8,
+  "schema": "nf-watermark-sync-probe/1",
+  "seed": 20261108,
+  "size": 256,
+  "sync_word": "0xa5c35a3c"
+}
