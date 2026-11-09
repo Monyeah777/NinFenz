@@ -316,7 +316,7 @@
     {
       "@id": "nf:file/protocol/sast_baseline.json",
       "@type": "prov:Entity",
-      "nf:sha256": "57405495b726cdf4148a0102be8b19f09df95ef6d5af499e2c877e948272d2bf"
+      "nf:sha256": "ff715f63471d7b6f74a3c86abe1c6f0671bcb77546b7eeb9594dbb6ec0321590"
     },
     {
       "@id": "nf:file/protocol/schema/asset.schema.json",
