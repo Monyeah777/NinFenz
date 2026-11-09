@@ -6,12 +6,14 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/terminal.py:f07b761f94e3e04a2437bbe88b5d9e646f0a247d26c985486b287153bcae4570
+  - desktop/src/core/terminal.py:69c2d9ced679e439c6ca440fc949d02f70dc067debdd9b520f96a2e4de156833
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:8eca62b3f1f7f1157638a1fd27f01aeac922c5fe20bfd7e0c6f4f37b34eb6534
+  - protocol/code_metrics_baseline.json:a5f60b2b9bb6747c6641c84832741750dd23b0dbc8a060d33ab621dfc14d8ab6
 ---
+> 重审（2026-11-09）：merge latest main for SLSA source profile
+
 > 重审（2026-11-08）：session watch nested release root fix
 
 > 重审（2026-11-08）：SLSA Source Track 合并最新 main 后重审：实时控制快照、Source Level 0 诚实声明与 CI 接线按合并后字节重绑。

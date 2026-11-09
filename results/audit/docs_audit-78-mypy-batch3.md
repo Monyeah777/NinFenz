@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:8eca62b3f1f7f1157638a1fd27f01aeac922c5fe20bfd7e0c6f4f37b34eb6534
+  - protocol/code_metrics_baseline.json:a5f60b2b9bb6747c6641c84832741750dd23b0dbc8a060d33ab621dfc14d8ab6
 ---
+> 重审（2026-11-09）：merge latest main for SLSA source profile
+
 > 重审（2026-11-08）：session watch nested release root fix
 
 > 重审（2026-11-08）：SLSA Source Track 合并最新 main 后重审：实时控制快照、Source Level 0 诚实声明与 CI 接线按合并后字节重绑。

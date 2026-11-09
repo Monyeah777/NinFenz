@@ -180,14 +180,14 @@ jobs:
           set -euo pipefail
           echo "static-checks=${NEEDS_STATIC}"
           echo "unit-tests=${NEEDS_UNIT}"
-            echo "source-controls=${NEEDS_SOURCE}"
+          echo "source-controls=${NEEDS_SOURCE}"
           test "${NEEDS_STATIC}" = "success" || { echo "::error::static-checks 未成功（${NEEDS_STATIC}）"; exit 1; }
           test "${NEEDS_UNIT}" = "success" || { echo "::error::unit-tests 未成功（${NEEDS_UNIT}）"; exit 1; }
-            test "${NEEDS_SOURCE}" = "success" || { echo "::error::source-controls 未成功（${NEEDS_SOURCE}）"; exit 1; }
+          test "${NEEDS_SOURCE}" = "success" || { echo "::error::source-controls 未成功（${NEEDS_SOURCE}）"; exit 1; }
         env:
           NEEDS_STATIC: ${{ needs.static-checks.result }}
           NEEDS_UNIT: ${{ needs.unit-tests.result }}
-            NEEDS_SOURCE: ${{ needs.source-controls.result }}
+          NEEDS_SOURCE: ${{ needs.source-controls.result }}
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
         with:
           persist-credentials: false

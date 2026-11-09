@@ -26,8 +26,10 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:8eca62b3f1f7f1157638a1fd27f01aeac922c5fe20bfd7e0c6f4f37b34eb6534
+  - protocol/code_metrics_baseline.json:a5f60b2b9bb6747c6641c84832741750dd23b0dbc8a060d33ab621dfc14d8ab6
 ---
+> 重审（2026-11-09）：merge latest main for SLSA source profile
+
 > 重审（2026-11-08）：session watch nested release root fix
 
 > 重审（2026-11-08）：SLSA Source Track 合并最新 main 后重审：实时控制快照、Source Level 0 诚实声明与 CI 接线按合并后字节重绑。
