@@ -1,7 +1,10 @@
 # 吊销分发件 v0（`nf-revocation-feed/1`）
+
+状态：**已实装**（CLI：`nf evidence verify` 的四词判定含 `revoked`）。
 > ⛔ 操作指令：阅读即执行——本文含可直接执行的命令与判定，勿当资料阅读。
 > 最后更新：2026-11-06
 > **Status**: v0 已实装（`core/revocations.py` + `nf evidence revocations`）· 仍是**拉取式**分发
+> **实现位置**：`desktop/src/core/revocations.py` · 判据 `desktop/tests/test_revocations.py`
 
 ## 解决什么（威胁模型 G2 的可落地部分）
 
@@ -116,6 +119,8 @@ nf evidence revocations trust show --trust trust.json --check-pub <ORG_PUB_HEX>
 - 未被根覆盖的公钥 → 判 invalid 并给修复指引。
 
 残留（诚实写）：根公钥怎么分发到验证方仍靠带外渠道（邮件/公告/配对指纹）；本仓不建 PKI，也不假装有。
+
+**分叉面**：钉根方案判不了「两个验证方看到不同密钥集」——已另做密钥透明目录（版本化根 + 只追加日志 + 包含证明 + 分叉见证），见 [key-transparency-v0.md](key-transparency-v0.md)。
 
 ## 判定（可证）
 

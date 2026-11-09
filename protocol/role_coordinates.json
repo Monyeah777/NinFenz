@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1456,
+    "app": 1465,
     "entry": 26,
     "floor": 5,
-    "prod": 1053,
-    "projection": 144,
-    "support": 394,
-    "verify": 986
+    "prod": 1057,
+    "projection": 163,
+    "support": 446,
+    "verify": 1040
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -5687,6 +5687,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "架构裁决记录（nf-adr/1）+ 文档台账（nf-doc-ledger/1）：把「裁决」做成可校验数据。",
+      "path": "desktop/src/core/adr.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "登记条目带有效期（机制借鉴 openmake audit-gate.cjs:31-47）。",
       "path": "desktop/src/core/allowlist_expiry.py",
       "role": "prod",
@@ -5795,6 +5801,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "启动自检与安全模式（K8 最小实现）：坏配置**拒绝启动**，不带病运行。",
+      "path": "desktop/src/core/boot_check.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "边界登记：边界 → 协议代码文件 + 协议文档（机制借鉴 OpenAgentCore AGENTS 的「边界→协议代码+文档」表）。",
       "path": "desktop/src/core/boundaries.py",
       "role": "prod",
@@ -5804,6 +5816,12 @@
       "function": "构建隔离体检（SLSA L3 —— Build isolation）：构建入口不联网 / 基座按 digest 钉 / 工具链定版。",
       "path": "desktop/src/core/build_isolation.py",
       "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "校准度量（元认知监控的**可算半边**）：置信度分箱 → 每箱的样本数与命中率 → ECE。",
+      "path": "desktop/src/core/calibration.py",
+      "role": "prod",
       "rule": "auto:R-core"
     },
     {
@@ -5861,6 +5879,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "闭包台账（nf-closure/1）：把「声称完成」变成「可核对的断言 → 判据 → 反例」。",
+      "path": "desktop/src/core/closure.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "44 追加 · 契约事件闭包扫描（元工具·只报告不设闸）。",
       "path": "desktop/src/core/closure_scan.py",
       "role": "verify",
@@ -5875,6 +5899,12 @@
     {
       "function": "认知族门禁：行话术语表（glossary）+ 执行面分档（runbook / playbook）。",
       "path": "desktop/src/core/cognition.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "认知核 · 研究层 v0：把「深入钻研」拆成**切片 → 检索词 → 方法论路径 → 证据台账**。",
+      "path": "desktop/src/core/cognition_plan.py",
       "role": "verify",
       "rule": "auto:R-core"
     },
@@ -6073,12 +6103,6 @@
     {
       "function": "评测口径折叠 + 防静默回归（机制借鉴 stashbase evals/README.md:31-36）。",
       "path": "desktop/src/core/eval_collapse.py",
-      "role": "prod",
-      "rule": "auto:R-core"
-    },
-    {
-      "function": "评测标准模板：用例真源 + 显式触发 + 成本/时点标注 + 结果回写（机制借鉴 pj-nx evals / 311 eval.yml）。",
-      "path": "desktop/src/core/eval_harness.py",
       "role": "prod",
       "rule": "auto:R-core"
     },
@@ -6323,6 +6347,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "作业账本（nf-job/1 + nf-job-ledger/1）：K1 作业模型 + K4 事件总线最小实现。",
+      "path": "desktop/src/core/job_ledger.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "JSON 文档读取（单一实现）：契约 / 真源读取点统一在这里校**顶层类型**。",
       "path": "desktop/src/core/json_doc.py",
       "role": "prod",
@@ -6344,6 +6374,12 @@
       "function": "资产键命名规范机检（资产密度面 · 顶层化目标 GAP-5）。",
       "path": "desktop/src/core/key_naming.py",
       "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "密钥透明目录 v0（nf-key-transparency/1）：补「这把公钥属于谁」的最后一环。",
+      "path": "desktop/src/core/key_transparency.py",
+      "role": "prod",
       "rule": "auto:R-core"
     },
     {
@@ -6455,6 +6491,18 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "Ingress 网关（最小实现）：认证 / 白名单 / 限流 / 同意 / 证据，一次调用全过一遍。",
+      "path": "desktop/src/core/mcp_ingress.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "CCOS Tool Manifest（nf-tool-manifest/1）：给 MCP 的 tools/list 加契约与证据，不破坏兼容。",
+      "path": "desktop/src/core/mcp_manifest.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "B 线包装声明门禁（内容质检 MCP 包）：工具面 / 类目 / 红线可机检。",
       "path": "desktop/src/core/mcp_package.py",
       "role": "verify",
@@ -6463,6 +6511,12 @@
     {
       "function": "MCP Server 运行时（v2.5.0 Wave5 C1：快照烧成服务——静态 mcp.json → stdio JSON-RPC）。",
       "path": "desktop/src/core/mcp_runtime.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "方法包（Method Pack）v0：把「专业领域的专家动作 + 证据标准」做成可校验、可组合的数据。",
+      "path": "desktop/src/core/method_pack.py",
       "role": "prod",
       "rule": "auto:R-core"
     },
@@ -6881,6 +6935,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "材料清单（SBOM 式，`nf-sbom/1`）：把「这次交付由哪些输入构成」变成可核的摘要表。",
+      "path": "desktop/src/core/sbom.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "43 A1 —— 协议层 IDL 校验器（自实现 JSON-schema 子集 + 全量件扫描）。",
       "path": "desktop/src/core/schema_lint.py",
       "role": "verify",
@@ -7022,6 +7082,12 @@
       "function": "验证器三性质探针（机制借鉴 vivera lib/chunk-schema.mjs:28-49）。",
       "path": "desktop/src/core/verifier_props.py",
       "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "验证器版本（自省层的对象）：**判定工具的摘要**，不是日期也不是 commit。",
+      "path": "desktop/src/core/verifier_version.py",
+      "role": "verify",
       "rule": "auto:R-core"
     },
     {
@@ -7259,6 +7325,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "九双生层同构判据矩阵（单源）。covered 每条必须有判定测试 + 变异测试（都能被反射查证）；missing 必须点名缺的对象。",
+      "path": "desktop/tests/fixtures/isomorphism_matrix.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "客户端帧序列 → 服务端应答（端到端金标；根路径折成 nf-repo-root，today 固定）",
       "path": "desktop/tests/fixtures/lsp/session.json",
       "role": "verify",
@@ -7303,6 +7375,12 @@
     {
       "function": "批准记录命名（审计 W7：protocol/approvals/*.json.json 双扩展名）。",
       "path": "desktop/tests/test_approval_naming.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "架构分层判据（P0）：依赖方向 + ADR/台账单一真源。",
+      "path": "desktop/tests/test_architecture_layers.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -7391,6 +7469,18 @@
       "rule": "R-verify"
     },
     {
+      "function": "原子目录 v2 + 不变量 A1–A5 + 候选健康 B1–B5 判据（P4）。",
+      "path": "desktop/tests/test_atom_catalog.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "原子组合覆盖层判据（闭包 D-02）：v1 不许改，组合关系走覆盖层，且 A1 必须有内容。",
+      "path": "desktop/tests/test_atom_composition.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "原子写（`core/atomic_write.py`）回归测试：读者不见半截、失败不留残、LF 落盘。",
       "path": "desktop/tests/test_atomic_write.py",
       "role": "verify",
@@ -7445,8 +7535,20 @@
       "rule": "R-verify"
     },
     {
+      "function": "桥接真实证据包判据（对应闭包台账 D-03）：闭环输入必须是真 nf evidence verify 输出。",
+      "path": "desktop/tests/test_bridge_real.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "常驻缓存**必须有界**（稳态毫秒级响应的隐含前提：长驻守护不能随会话增长而吃内存）。",
       "path": "desktop/tests/test_cache_bounds.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "校准度量判据：把「口头置信是否可信」变成可算的可靠性表（只计数，不评分）。",
+      "path": "desktop/tests/test_calibration.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -7465,6 +7567,12 @@
     {
       "function": "吸收项契约电池回归：契约真源 ↔ 磁盘模块 ↔ 真实调用 三方一致。",
       "path": "desktop/tests/test_capability_battery.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "能力清单判据：静态接口面可复算、可查、改了就红（第 139 轮）。",
+      "path": "desktop/tests/test_capability_inventory.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -7489,6 +7597,12 @@
     {
       "function": "CCOS 一条链复现单测（cc_check → [cc_label] → cc_attest → cc_verify → cc_replay）。",
       "path": "desktop/tests/test_ccos_chain.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/ccos/*.md 的**代码锚点**判据：文档必须能指到真实实现，不能只讲概念。",
+      "path": "desktop/tests/test_ccos_docs_anchors.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -7565,6 +7679,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "CLI JSON 输出确定性：同一命令跑两次必须**逐字节相同**。",
+      "path": "desktop/tests/test_cli_determinism.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "CLI 错误框定判据：失败必须是**干净错误 + 修复指引**（错误即微型文档）。",
       "path": "desktop/tests/test_cli_error_framing.py",
       "role": "verify",
@@ -7589,6 +7709,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "闭包台账判据（P7）：断言必须指向**真实在场**的判据，债务必须写明。",
+      "path": "desktop/tests/test_closure.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "44 追加 · 契约事件闭包扫描单测（元工具只报告不设闸 + 确定性）。",
       "path": "desktop/tests/test_closure_scan.py",
       "role": "verify",
@@ -7601,8 +7727,44 @@
       "rule": "R-verify"
     },
     {
+      "function": "cog 机器面真跑覆盖（每张 --json 面都点名，防「跳过=没人管」）。",
+      "path": "desktop/tests/test_cog_cli_faces.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "认知族（术语表 / 执行分档）正式与否定用例。",
       "path": "desktop/tests/test_cognition.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "双核桥判据（P5）：唯一共享对象 + 双向闭环 + fail-closed。",
+      "path": "desktop/tests/test_cognition_bridge.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "判据注册表 + 主张编译判据（P3 剩余）。",
+      "path": "desktop/tests/test_cognition_claims.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "元算子判据（P2）：11 算子 + 触发引擎 + 双 trace + 反仪式化。",
+      "path": "desktop/tests/test_cognition_control.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "认知核 · 研究层判据：切片/检索词/方法论路径必须**成体系且可证伪**，不是随便列几个词。",
+      "path": "desktop/tests/test_cognition_plan.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "认知工作台 L0 判据：话语状态 + 15 元动作 + 只追加记录 + 重放 + 依赖方向。",
+      "path": "desktop/tests/test_cognition_workspace.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -7669,6 +7831,12 @@
     {
       "function": "在仓产物的写入口必须走 `atomic_write`（半截件不留）——**模块级机械普查**。",
       "path": "desktop/tests/test_core_atomic_writes.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "core 引用面判据：未引用模块数只减不增（第 159 轮）。",
+      "path": "desktop/tests/test_core_judge_map.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -7799,6 +7967,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "文档里引用的探针数字必须与结果件一致（第 133 轮）。",
+      "path": "desktop/tests/test_docs_cite_probe_numbers.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "域包工厂 + 域功能引擎单测：口径公式 / 夹具确定性 / 生成器幂等 / 唯一性守卫 /",
       "path": "desktop/tests/test_domain_pack.py",
       "role": "verify",
@@ -7865,7 +8039,7 @@
       "rule": "R-verify"
     },
     {
-      "function": "",
+      "function": "预注册评测判据（D-05）：协议先冻结、只计数、演练数据不得当证据。",
       "path": "desktop/tests/test_eval_harness.py",
       "role": "verify",
       "rule": "R-verify"
@@ -7885,6 +8059,12 @@
     {
       "function": "证据面双实现 parity 收口：receipts / attest 两形态 + 仓外单文件复验。",
       "path": "desktop/tests/test_evidence_forms_parity.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "证据图探针判据：H 必须可算、口径写死、且对「没收口的陈述」会变红。",
+      "path": "desktop/tests/test_evidence_graph.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8033,6 +8213,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "门禁负向用例探针判据：比率可算、命名代理不空转、清单与数据一致。",
+      "path": "desktop/tests/test_gate_probe.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "core.gate_router 回归：策略 S 路由 + 三条硬纪律 + 变异自证。",
       "path": "desktop/tests/test_gate_router.py",
       "role": "verify",
@@ -8083,6 +8269,12 @@
     {
       "function": "锚点回验（core.grounding）单测：归一/转述容忍/未锚定不丢件。",
       "path": "desktop/tests/test_grounding.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "分组报告判据：先分组再汇总；单样本组不能谈方差；只报总体要被判据拦下。",
+      "path": "desktop/tests/test_grouped_report.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8243,14 +8435,44 @@
       "rule": "R-verify"
     },
     {
+      "function": "九双生层同构判据**矩阵**：只允许「有测试点名」的层被算作已覆盖。",
+      "path": "desktop/tests/test_isomorphism_matrix.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "P-C1：canonical JSON 面的**规范-实现分歧**判据（RFC 8785 vs 仓库口径）。",
       "path": "desktop/tests/test_jcs_spec_gap.py",
       "role": "verify",
       "rule": "R-verify"
     },
     {
+      "function": "作业账本判据（K1+K4）与启动自检判据（K8）。",
+      "path": "desktop/tests/test_job_ledger.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "JSON 顶层形状契约（审计 N11：132 个 json.load/loads 站点无类型校验）。",
       "path": "desktop/tests/test_json_shape_contracts.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "判据的时钟纯度：测试里读「此刻」必须登记理由（防跨日假红）。",
+      "path": "desktop/tests/test_judge_clock_purity.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "门禁变异探针判据：杀死率/误报率可算、两条判据各自有变异体、口径自洽。",
+      "path": "desktop/tests/test_judge_mutation_probe.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "红证据登记判据：可复算、可核、棘轮只减不增（第 153 轮）。",
+      "path": "desktop/tests/test_judge_red_evidence.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8269,6 +8491,12 @@
     {
       "function": "资产键命名规范机检（`core/key_naming.py`）回归测试 —— 资产密度面 GAP-5。",
       "path": "desktop/tests/test_key_naming.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "密钥透明目录判据：能证「这一版自洽」，也能证「两份目录分叉」。",
+      "path": "desktop/tests/test_key_transparency.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8329,6 +8557,12 @@
     {
       "function": "公开面泄漏门禁：仓库文本产物不得含**机器绝对路径**或**凭据形状**。",
       "path": "desktop/tests/test_leak_surface.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "台账表格自洽判据：序号连续、红绿不混（第 198 轮）。",
+      "path": "desktop/tests/test_ledger_tables.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8399,8 +8633,20 @@
       "rule": "R-verify"
     },
     {
+      "function": "Ingress 网关判据（P6）：认证/白名单/限流/同意/记账五件，全部 fail-closed。",
+      "path": "desktop/tests/test_mcp_ingress.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "MCP 上架面·**真进程**端到端（默认实时仓库面 `nf serve` ↔ 越权/注入拒出面）。",
       "path": "desktop/tests/test_mcp_live_e2e.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "MCP 兼容头判据（P6）：对外说 MCP，对内走 CCOS——增强字段不许破坏兼容，且必须有牙。",
+      "path": "desktop/tests/test_mcp_manifest.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8413,6 +8659,12 @@
     {
       "function": "MCP 工具面的**读取面预算**（稳态计数判据，不测墙钟）。",
       "path": "desktop/tests/test_mcp_read_budget.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "MCP Ingress 红队用例判据：把「数据冒充指令」写成可重跑用例，逐条核闸门。",
+      "path": "desktop/tests/test_mcp_redteam.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8443,6 +8695,12 @@
     {
       "function": "Meta-cognitive cockpit integration contracts.",
       "path": "desktop/tests/test_meta_cockpit.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "方法包判据：领域专业性必须是**可校验的数据**，不是文档里的形容词。",
+      "path": "desktop/tests/test_method_pack.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8591,8 +8849,20 @@
       "rule": "R-verify"
     },
     {
+      "function": "包的可跑入口必须真能跑（第 160 轮）：把「声明」推进到「可执行验证」。",
+      "path": "desktop/tests/test_pack_runnable_runs.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "包管理器核心解析面（core/package_index.py）回归测试 —— 按品类取件 / 解析 / 检索。",
       "path": "desktop/tests/test_package_index.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "路径类旗标的覆盖棘轮：新旗标必须有测试真跑，旧缺口冻结在案。",
+      "path": "desktop/tests/test_path_flag_ratchet.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8725,6 +8995,12 @@
     {
       "function": "复盘（postmortem）正式与否定用例。",
       "path": "desktop/tests/test_postmortem.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "提交前自查（fast lane）判据：名单不得腐烂、红要能红、不新增检查。",
+      "path": "desktop/tests/test_precheck.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -9011,6 +9287,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "材料清单判据（SBOM 式）：清单可重算、可核、篡改必红。",
+      "path": "desktop/tests/test_sbom.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "回执单根与图书馆的**规模回归**（补「只在 2 件上跑过」的缺口）。",
       "path": "desktop/tests/test_scale_receipts.py",
       "role": "verify",
@@ -9037,6 +9319,12 @@
     {
       "function": "scratch 裁决点的边界契约（TDD）：每条都对应一个真实事故或一条防御性边界。",
       "path": "desktop/tests/test_scratch.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "脚本孤儿棘轮：不许新增「没有任何入口指向」的脚本（第 141 轮）。",
+      "path": "desktop/tests/test_script_orphans.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -9293,6 +9581,18 @@
       "rule": "R-verify"
     },
     {
+      "function": "结论可复用性查询判据：current / stale / unknown 三态都要判得出来。",
+      "path": "desktop/tests/test_verifier_status.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "自省层判据：发布结论必须绑定「产出它的验证器摘要」。",
+      "path": "desktop/tests/test_verifier_version.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "Concurrent local verify runs must not share ignored build state.",
       "path": "desktop/tests/test_verify_guard.py",
       "role": "verify",
@@ -9331,6 +9631,36 @@
     {
       "function": "目录监听 + 守护响应缓存单测（毫秒级执行层的「**不重算**」判据）。",
       "path": "desktop/tests/test_watch.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "水印鲁棒性基准判据：边界必须**实测**，不是形容词。",
+      "path": "desktop/tests/test_watermark_bench.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "DCT 水印探针判据：**把探针结论也锁住**（否则下次调参就会悄悄漂）。",
+      "path": "desktop/tests/test_watermark_dct_probe.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "拍屏水印第五轮探针判据：把「加大强度也救不回」写成可复算边界。",
+      "path": "desktop/tests/test_watermark_ecc_probe.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "几何提示同步判据：用「标签里记录的尺寸」替代频谱模板做几何同步。",
+      "path": "desktop/tests/test_watermark_geometry_probe.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "同步层探针判据：把「网格同步能做什么、不能做什么」锁成断言。",
+      "path": "desktop/tests/test_watermark_sync_probe.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -11807,6 +12137,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "原子组合关系（v2 派生用覆盖层）：v1 meta_atoms.json 的 composed_of 全空，但不许改 v1（旧 digest 必须不变），所以组合关系以本文件为准并在派生 v2 时合并。每条必须给 why（为什么是这个组合）。",
+      "path": "protocol/atom_composition.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "审计协议（机制借鉴 Audit Report + Acceptance/Sign-off + Baseline 三件）。**裁决事项**：审计报告的内容是「某时刻查到了什么」＝时点事实＝说明件（保持 `results/audit/**` 属说明件不动）；而审计报告**该怎么写、结论必须绑什么**＝约束＝规范件（本件）。冲突用分层消解，不动既有判据。",
       "path": "protocol/audit.json",
       "role": "verify",
@@ -11869,6 +12205,12 @@
     {
       "function": "被否决候选留档（机制借鉴 awesome-jev rejected.jsonl；消费方 core/declined_ledger.py）。每条须有 candidate/reason/date——「看过但不吸收」也留档，防反复重审。",
       "path": "protocol/declined.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "16 份架构文档台账：状态 + 归属裁决 + 仓内落点。仓内实现只按 current 执行；冲突未裁前以 ADR 为准（见 protocol/adr/registry.json）。文档原件在仓外（作者提供），此处只登记裁决与锚点。",
+      "path": "protocol/docs_ledger.json",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -12049,6 +12391,12 @@
     {
       "function": "需求/规范条款登记（机制借鉴 poppyseed spec.ts:114-148；消费方 core/requirement_coverage.py）。无判据的 MUST/SHOULD 必须登记 plan（显式缺席可审计）。",
       "path": "protocol/requirements.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "认知核的研究层真源：方法论库（怎么钻）+ 切片模板（钻哪些面）。切片检索词由 core/cognition_plan.py 按主题生成，方法论只提供路径与判据，不写结论。",
+      "path": "protocol/research_methods.json",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -12276,17 +12624,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "27782e6c8d4b4ef2497c4557e52040bd3b18a96a856c16e6d0ab2cf882ff04f6",
+  "root_digest": "0615d6849d28db6edface68bbb5c0e292363a5ee4493ef3d9ab45e13f12d8b04",
   "rule_counts": {
-    "R-app": 1456,
-    "R-catch": 244,
+    "R-app": 1465,
+    "R-catch": 295,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 125,
+    "R-projection": 143,
     "R-support": 123,
-    "R-verify": 867,
-    "auto:R-core": 274
+    "R-verify": 914,
+    "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
 }

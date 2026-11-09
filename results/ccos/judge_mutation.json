@@ -1,0 +1,66 @@
+{
+  "detail": [
+    {
+      "broken": 3,
+      "broken_caught": [
+        "删一个词",
+        "加一个死词",
+        "包侧把词改错一个字母"
+      ],
+      "judge": "vocabulary_mismatches",
+      "legal": 3,
+      "legal_flagged": []
+    },
+    {
+      "broken": 3,
+      "broken_caught": [
+        "改来源标记",
+        "失败集换序",
+        "改证人 digest"
+      ],
+      "judge": "obligation_record_issues",
+      "legal": 2,
+      "legal_flagged": []
+    },
+    {
+      "broken": 3,
+      "broken_caught": [
+        "不是对象",
+        "缺 case",
+        "case 空串"
+      ],
+      "judge": "_witness_shape_issues",
+      "legal": 2,
+      "legal_flagged": []
+    },
+    {
+      "broken": 3,
+      "broken_caught": [
+        "终态缺授权",
+        "授权方不在词表",
+        "记录不是对象"
+      ],
+      "judge": "authority_issues",
+      "legal": 2,
+      "legal_flagged": []
+    },
+    {
+      "broken": 3,
+      "broken_caught": [
+        "缺 cost",
+        "混记 total",
+        "负数"
+      ],
+      "judge": "resource_accounting_issues",
+      "legal": 2,
+      "legal_flagged": []
+    }
+  ],
+  "false_positive_rate": 0.0,
+  "judges": 5,
+  "kill_rate": 1.0,
+  "legal_variants": 11,
+  "mutants": 15,
+  "note": "只报数不设阈值；阈值与放行由负责人决定",
+  "schema": "nf-judge-mutation/1"
+}

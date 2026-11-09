@@ -1,0 +1,137 @@
+{
+  "schema": "nf-method-pack/1",
+  "id": "evaluation-design",
+  "version": "1.0.0",
+  "domain": "research-method/evaluation-design",
+  "note": "评测与实验设计域：把「跑一遍看结果」升级成「可被第三方复算的测量」。来源为实验设计常识（对照/盲评/预注册/效应量/成本核算）与本仓冻结协议 protocol/eval/protocol.json 的落地口径；不引入外部未核实数字。",
+  "expert_moves": [
+    {
+      "id": "ev.pre_register",
+      "name": "先冻协议再跑：条件、任务、样本数、维度、判定口径",
+      "why": "冻结后改口径就是自证；协议必须先于数据存在，否则任何差异都可以事后解释。",
+      "maps_to": [
+        "k.standard",
+        "e.verify",
+        "m.check"
+      ],
+      "frame_delta_hint": {
+        "kind": "question_restated",
+        "note": "把「效果好不好」改写为「在预注册口径下，哪一维出现多大差异」"
+      }
+    },
+    {
+      "id": "ev.blind_partition",
+      "name": "盲评分区：评审者看不到条件标签，样本随机化",
+      "why": "评分者一旦知道分组，期望效应会污染结果；盲法是把评审者偏移从测量里剔除的最便宜手段。",
+      "maps_to": [
+        "e.adjudicate",
+        "k.partition"
+      ],
+      "frame_delta_hint": {
+        "kind": "assumption_added",
+        "note": "假设「评分者会受标签影响」，于是必须把它变成设计约束"
+      }
+    },
+    {
+      "id": "ev.negative_control",
+      "name": "负对照：已知无效的条件必须显示无效",
+      "why": "没有负对照，测出差异也无法排除「任何条件都会赢」；负对照失败说明测的是噪声或流程偏差。",
+      "maps_to": [
+        "m.compare",
+        "e.falsify"
+      ]
+    },
+    {
+      "id": "ev.synthetic_guard",
+      "name": "合成数据隔离：占位/模拟结果不得计入证据",
+      "why": "演示性产物一旦和实测数据同表出现，就会被读者当成能力证据；必须在结构上分开（字段/目录/信封）。",
+      "maps_to": [
+        "e.audit",
+        "e.falsify",
+        "k.classify"
+      ]
+    },
+    {
+      "id": "ev.effect_and_variance",
+      "name": "报效应量与方差，不只报均值；样本量按最小可测效应定",
+      "why": "只报均值无法区分真实差异与抽样波动；样本量拍脑袋时，「通过」往往只是运气。",
+      "maps_to": [
+        "m.estimate",
+        "e.calibrate",
+        "k.quantify"
+      ]
+    },
+    {
+      "id": "ev.cost_accounting",
+      "name": "测量成本核算：时延、费用、人工一并入表",
+      "why": "忽略成本会选出「指标好看但不可持续」的方案；成本本身也是决策维度。",
+      "maps_to": [
+        "e.benchmark",
+        "k.quantify",
+        "c.allocate"
+      ]
+    },
+    {
+      "id": "ev.replicate",
+      "name": "可复现性：同输入同结果，或给出确定性的随机种子",
+      "why": "不可复现的测量无法用于判定；确定性种子让「复算」成为判据而不是口头承诺。",
+      "maps_to": [
+        "m.check",
+        "e.verify"
+      ]
+    }
+  ],
+  "evidence_standards": [
+    {
+      "claim_kind": "efficacy",
+      "required": [
+        "预注册协议（条件/任务/样本数/维度/判定口径）的路径与摘要",
+        "每个条件的样本量、均值与方差（或逐样本明细）",
+        "负对照结果（且与预期一致）",
+        "盲评设置说明（谁不知道什么）"
+      ]
+    },
+    {
+      "claim_kind": "cost",
+      "required": [
+        "单样本时延与总墙钟时间",
+        "外部依赖成本（费用/人工/额度）核算口径",
+        "成本随规模变化的采样点（至少两点）"
+      ]
+    },
+    {
+      "claim_kind": "reliability",
+      "required": [
+        "重跑次数与结果一致性（含随机种子）",
+        "失败样本的处理口径（剔除规则须先于数据冻结）"
+      ]
+    }
+  ],
+  "common_failures": [
+    "把合成/演示数据与实测数据放在同一张表里，读者无法分辨",
+    "只跑一次就宣布差异显著（无方差、无重复）",
+    "没有负对照，任何条件都能「取胜」",
+    "盲评形同虚设：评审者能看到分组目录名或文件时间戳",
+    "事后改判定口径（口径变更没有记录与重跑）",
+    "只报指标不报成本，选出的方案无法持续运行"
+  ],
+  "examples": [
+    {
+      "case": "本仓 protocol/eval/protocol.json：4 条件 × 4 任务 × 3 样本、7 维度全部预注册，synthetic 运行明确不可计入证据（闭包台账 D-06 的真实测量债由此而来）",
+      "why": "这是「先冻协议、合成与实测分离」的正面样本；债务被显式记为 debt 而不是藏起来"
+    },
+    {
+      "case": "水印四轮探针把「拍屏失败」写成负结论并锁进判据（C-18），而不是继续调参直到出一个好看的数",
+      "why": "负结果同样是合格测量；把边界写成判据比反复微调更有信息量"
+    }
+  ],
+  "criteria_refs": [
+    "craft:coherence",
+    "craft:evidence_sufficiency",
+    "standard:GB45438-2025"
+  ],
+  "runnable": [
+    "nf stats",
+    "nf bench run"
+  ]
+}

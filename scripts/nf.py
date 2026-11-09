@@ -166,6 +166,10 @@ def _add_parser_base(sub):
                           "+ POST /api/check；纯读、无客户端可控路径）")
     srv.add_argument("--port", type=int, default=8765,
                      help="--http 的端口（缺省 8765；0 = 由内核分配）")
+    srv.add_argument("--ingress-policy", dest="ingress_policy", default="",
+                     help="Ingress 策略 JSON（nf-ingress-policy/1：token 白名单/"
+                          "工具白名单/限流/同意）；"
+                          "缺省 = 不过闸（本机直连）")
 
     dsn = sub.add_parser("design",
                          help="决策辅助工具族（v2.6-A：可选装载——钢人论证工作单）",
@@ -370,122 +374,623 @@ def _add_parser_catalog(sub):
     # ---- v2.8.0 波B S4：管线脚手架 ----
 
 
-def _add_parser_production(sub):
-    pln = sub.add_parser("pipeline",
-                         help="管线脚手架（v2.8 波B S4：pipeline new——自 P00 骨架派生新管线）",
- description="管线脚手架（v2.8 波B S4：pipeline new——自 P00 骨架派生新管线）")
-    psub = pln.add_subparsers(dest="pipeline_cmd", required=True)
-    p_new = psub.add_parser("new",
- help="派生新管线：复制模板 → 改 id/name/领域标签（登记 02 / 填层名挂载按 README 三步）",
- description="派生新管线：复制模板 → 改 id/name/领域标签（登记 02 / 填层名挂载按 README 三步）")
-    p_dry = psub.add_parser("dryrun",
-                            help="管线抽象执行（不调模型跑一遍声明 → 执行图；hard 缺陷 + advisory "
-                                "分列）",
-                            description="管线抽象执行（内部差距：静态 check 只能答『声明自洽吗』，"
-                                "答不了『跑得通吗』）")
-    p_dry.add_argument("--pipeline", default="", help="管线 md 路径（缺省 + --all 时全仓扫）")
-    p_dry.add_argument("--all", action="store_true", help="全仓管线扫一遍并汇总")
-    p_dry.add_argument("--json", action="store_true", help="输出执行图 JSON")
-    p_dry.add_argument("--write-advisory", action="store_true",
-                       help="配合 --all：把 advisory 分类台账写入 protocol/pipeline_advisory.json")
-    p_new.add_argument("--id", required=True, help="新管线 id（如 P07）")
-    p_new.add_argument("--name", required=True, help="新管线显示名（如 演示领域管线）")
-    p_new.add_argument("--from", dest="template", default=None,
-                       help="模板管线 md（缺省 = 03_管线库/P00_通用文档生成管线.md）")
-    p_new.add_argument("--domain", default="",
-                       help="领域标签（如 悬疑 → tags 追加「悬疑领域」）")
-    p_new.add_argument("--dest", default="",
-                       help="输出 md 路径（缺省 = 03_管线库/<id>_<name>.md 官方管线位）")
 
-    # ---- v2.8.0 波B S5：模块生命周期 ----
-    mds = sub.add_parser("module",
-                         help="模块生命周期（v2.8 波B S5：status 位 + deprecate/restore + 引用门禁 "
-                             "verify）",
- description="模块生命周期（v2.8 波B S5：status 位 + deprecate/restore + 引用门禁 verify）")
-    msub = mds.add_subparsers(dest="module_cmd", required=True)
-    m_ls = msub.add_parser("ls",
- help="浏览模块状态（--status 过滤；缺省全量）",
- description="浏览模块状态（--status 过滤；缺省全量）")
-    m_ls.add_argument("--status", default="", choices=("active", "deprecated", "retired"))
-    m_ls.add_argument("--root", default=ROOT, help="扫描根（缺省 = 仓库根）")
-    m_ls.add_argument("--json", action="store_true",
-                      help="输出结构化 JSON（模块状态清单）")
-    m_st = msub.add_parser("status",
- help="查看单个模块文件状态位",
- description="查看单个模块文件状态位")
-    m_st.add_argument("file", help="模块 md 路径（如 community/<包>/modules/Mxx_….md）")
-    m_dp = msub.add_parser("deprecate",
- help="状态流转 → deprecated（写文件元信息行状态位）",
- description="状态流转 → deprecated（写文件元信息行状态位）")
-    m_dp.add_argument("file", help="模块 md 路径")
-    m_dp.add_argument("--reason", default="", help="弃用原因（写入状态位）")
-    m_rs = msub.add_parser("restore",
- help="状态流转 → active（deprecated/retired 回退）",
- description="状态流转 → active（deprecated/retired 回退）")
-    m_rs.add_argument("file", help="模块 md 路径")
-    m_vf = msub.add_parser("verify",
- help="引用门禁扫描（与 verify.sh check24 同语义）",
- description="引用门禁扫描（与 verify.sh check24 同语义）")
-    m_sg = msub.add_parser("signature",
-                           help="模块边界签名基线（边界写一次；漂移即 FAIL 直到重签）",
-                           description="模块边界签名基线（机制借鉴 Pipelex signature_for：边界冻结"
-                               "、实现可替）")
-    m_sg.add_argument("--write", action="store_true",
-                      help="重新冻结边界基线（评审后显式重签）")
-    m_sg.add_argument("--json", action="store_true", help="输出结构化 JSON")
-    m_ty = msub.add_parser("types",
-                           help="I/O 类型面（io_types）：覆盖率 + 可证不匹配；--write 补标",
-                           description="I/O 类型面（机制借鉴 Pipelex typed concepts，01 §7 V1 字段"
-                               "级新增）")
-    m_ty.add_argument("--write", action="store_true",
-                      help="给全部有机读契约的模块补 io_types（确定性推导，未命中写 untyped）")
-    m_ty.add_argument("--json", action="store_true", help="输出结构化 JSON")
-    m_ty.add_argument("--harvest", action="store_true",
-                      help="从模块正文事件契约收割载荷字段（并入 event_registry）")
-    m_ty.add_argument("--backlog", action="store_true",
-                      help="生成/校验类型积压台账（不可推断的 untyped 显式化）")
-    m_ct = msub.add_parser("contract",
-                           help="L0 → L1 机读块 retro-fit（从人读引用块/正文投影，不编造）",
-                           description="L0 → L1 机读块 retro-fit（机制借鉴 Pipelex：机读块 = 人读契"
-                               "约的结构化投影）")
-    m_ct.add_argument("--write", action="store_true", help="写入机读块（幂等；已有机读块则跳过）")
-    m_ct.add_argument("--json", action="store_true", help="输出结构化 JSON")
-    m_vf.add_argument("--root", default=ROOT, help="扫描根（缺省 = 仓库根）")
+def _add_parser_cog(sub):
+    """认知工作台 L0：begin / step / replay / diff / moves / status。"""
+    cog = sub.add_parser("cog", help="认知工作台（话语状态 + 15 元动作 + 重放）",
+                         description="nf cog：L0 认知工作台。每步必须带 frame_delta"
+                                     "（框架变化见证），否则判失败；记录只追加，可重放复算。")
+    csub = cog.add_subparsers(dest="cog_cmd")
+    cb = csub.add_parser("begin", help="开一个会话（问题陈述必填）",
+                         description="开新会话：生成 discourse 状态与空记录链。")
+    cb.add_argument("--problem", required=True, help="问题陈述（一句能被反驳的话）")
+    cb.add_argument("--steps-max", dest="steps_max", type=int, default=24,
+                    help="步数上限（默认 24）")
+    cb.add_argument("--out", required=True, help="会话文件（bundle：state + records）")
+    cb.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    cs = csub.add_parser("step", help="执行一个元动作（必须带 frame_delta）",
+                         description="执行一步：校验动作契约与 frame_delta 语义，"
+                                     "写记录并推进状态。")
+    cs.add_argument("--bundle", required=True, help="会话文件")
+    cs.add_argument("--move", required=True, help="元动作 id（见 nf cog moves）")
+    cs.add_argument("--delta", default="", help="frame_delta JSON 文件")
+    cs.add_argument("--delta-json", dest="delta_json", default="",
+                    help="frame_delta 内联 JSON（与 --delta 二选一）")
+    cs.add_argument("--out", default="", help="写回会话文件（缺省=只打印）")
+    cs.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    cr = csub.add_parser("replay", help="从记录重放复算状态",
+                         description="重放：逐步重建状态并校验每步 state_digest。")
+    cr.add_argument("--bundle", required=True, help="会话文件")
+    cr.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    cd = csub.add_parser("diff", help="两次会话的动作序列差异",
+                         description="对比两次会话的元动作序列（只列事实差异）。")
+    cd.add_argument("--a", required=True, help="会话 A")
+    cd.add_argument("--b", required=True, help="会话 B")
+    cd.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    cm = csub.add_parser("moves", help="列出 15 个元动作及其契约",
+                         description="列出元动作：when / 允许的 frame_delta / 失败模式。")
+    cm.add_argument("--id", dest="move_id", default="", help="只看一个动作")
+    cm.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    ct = csub.add_parser("status", help="看会话摘要（只计数）",
+                         description="摘要：动作数/假设数/张力数/未答问题数/digest。")
+    ct.add_argument("--bundle", required=True, help="会话文件")
+    ct.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    jsub = csub.add_parser("job", help="作业账本（K1 六态作业 + K4 事件流）",
+                           description="作业：created→queued→running→succeeded|failed|"
+                                       "canceled|timeout；事件只追加、可重放、终态后不可追加。")
+    jcmd = jsub.add_subparsers(dest="job_cmd")
+    jc = jcmd.add_parser("create", help="建作业（created）",
+                          description="建作业（created）：写 job{id,kind,"
+                                      "contract_digest,inputs_digest} 并追加事件。")
+    jc.add_argument("--ledger", required=True, help="账本文件")
+    jc.add_argument("--id", dest="job_id", required=True, help="作业 id")
+    jc.add_argument("--kind", required=True, help="作业类型（check/label/evidence-verify…）")
+    jc.add_argument("--contract", default="", help="契约 digest（可选）")
+    jc.add_argument("--inputs", default="", help="输入 digest（可选）")
+    jc.add_argument("--out", default="", help="写回账本")
+    jc.add_argument("--json", action="store_true")
+    jt = jcmd.add_parser("transition", help="状态迁移",
+                          description="状态迁移：created→queued→running→终态；"
+                                      "非法迁移与终态后追加一律拒。")
+    jt.add_argument("--ledger", required=True, help="账本文件")
+    jt.add_argument("--id", dest="job_id", required=True, help="作业 id")
+    jt.add_argument("--to", required=True, help="目标状态")
+    jt.add_argument("--witness", default="", help="见证 JSON 文件（可选）")
+    jt.add_argument("--out", default="", help="写回账本")
+    jt.add_argument("--json", action="store_true")
+    jr = jcmd.add_parser("receipt", help="把调用回执挂到作业",
+                          description="把调用回执挂到作业：终态后拒绝，回执 digest 进事件链。")
+    jr.add_argument("--ledger", required=True, help="账本文件")
+    jr.add_argument("--id", dest="job_id", required=True, help="作业 id")
+    jr.add_argument("--receipt", required=True, help="回执文件")
+    jr.add_argument("--out", default="", help="写回账本")
+    jr.add_argument("--json", action="store_true")
+    js = jcmd.add_parser("show", help="看作业摘要与 digest",
+                          description="看作业摘要：状态/事件数/回执数/job_digest"
+                                      "（用于与证据、commitment 绑定）。")
+    js.add_argument("--ledger", required=True, help="账本文件")
+    js.add_argument("--id", dest="job_id", default="", help="只看一个作业")
+    js.add_argument("--json", action="store_true")
+    jv = jcmd.add_parser("verify", help="从事件链重放校验",
+                          description="从事件链重放校验：seq/prev/digest/迁移合法性，"
+                                      "任一不符即 invalid。")
+    jv.add_argument("--ledger", required=True, help="账本文件")
+    jv.add_argument("--json", action="store_true")
+    bcommit = csub.add_parser("bridge-commit", help="生成 commitment（双核唯一共享对象）",
+                              description="commitment{cog_digest, cc_digest, claim_digest}："
+                                          "两侧各自用 digest 认可同一版；不解则 fail-closed。")
+    bcommit.add_argument("--bundle", required=True, help="会话文件")
+    bcommit.add_argument("--claim-file", dest="claim_file", required=True, help="主张文件")
+    bcommit.add_argument("--cc-result", dest="cc_result", required=True,
+                         help="契约核结果 JSON（nf evidence verify --json）")
+    bcommit.add_argument("--out", default="", help="写 commitment（缺省=只打印）")
+    bcommit.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    bob = csub.add_parser("bridge-obligation", help="把 cc 失败项编成回灌消息（x_obligation）",
+                          description="回灌：failed/unknown 列表 + next_actions"
+                                      "（detect/request_context）。")
+    bob.add_argument("--commitment", required=True, help="commitment 文件")
+    bob.add_argument("--cc-result", dest="cc_result", required=True, help="契约核结果 JSON")
+    bob.add_argument("--failed", default="", help="逗号分隔的失败项")
+    bob.add_argument("--unknown", default="", help="逗号分隔的未知项")
+    bob.add_argument("--out", default="", help="写回灌消息")
+    bob.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    bap = csub.add_parser("bridge-apply", help="把回灌消息落到认知侧（控制面 detect）",
+                          description="落灌：只改控制面（真副作用），discourse 不动（三层分离）。")
+    bap.add_argument("--bundle", required=True, help="会话文件")
+    bap.add_argument("--obligation", required=True, help="回灌消息文件")
+    bap.add_argument("--commitment", default="", help="同时追加 commitment 到链上")
+    bap.add_argument("--out", default="", help="写回会话文件")
+    bap.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    bver = csub.add_parser("bridge-verify", help="核对 commitment 与两侧当前状态",
+                           description="校验：commitment 自身 + cog/claim/cc "
+                                       "三个 digest 是否仍一致。")
+    bver.add_argument("--bundle", required=True, help="会话文件")
+    bver.add_argument("--claim-file", dest="claim_file", required=True, help="主张文件")
+    bver.add_argument("--cc-result", dest="cc_result", required=True, help="契约核结果 JSON")
+    bver.add_argument("--commitment", required=True, help="commitment 文件")
+    bver.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    co = csub.add_parser("ops", help="列出 11 个元算子及其 witness 要求",
+                         description="元算子：只改过程（策略/预算/中止/焦点），不改内容。")
+    co.add_argument("--id", dest="op_id", default="", help="只看一个算子")
+    co.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    cc = csub.add_parser("control", help="执行一个元算子（必须带 witness）",
+                         description="元算子只改过程面；witness 缺失/越界写内容/仪式化全部拒绝。")
+    cc.add_argument("--bundle", required=True, help="会话文件")
+    cc.add_argument("--op", dest="op_id", required=True, help="算子 id（见 nf cog ops）")
+    cc.add_argument("--payload", default="", help="witness JSON 文件")
+    cc.add_argument("--payload-json", dest="payload_json", default="",
+                    help="witness 内联 JSON（与 --payload 二选一）")
+    cc.add_argument("--trigger", default="", help="触发来源（manual/loop/budget_low…）")
+    cc.add_argument("--out", default="", help="写回会话文件")
+    cc.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    ccr = csub.add_parser("criteria", help="列出判据注册表（craft/standard/review）",
+                          description="判据三层：craft 可计算 / standard 可机检 / review 外部盲评；"
+                                      "不出聚合分，缺 witness 只能 unknown。")
+    ccr.add_argument("--layer", default="", help="只看一层（craft/standard/review）")
+    ccr.add_argument("--id", dest="criterion_id", default="", help="只看一条判据")
+    ccr.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    ccal = csub.add_parser("calibrate", help="校准度量：置信分箱 / ECE / 可靠性表（只计数不评分）",
+                           description="输入 JSON：pairs=[{confidence:0.8, correct:1}, …]；"
+                                       "输出 nf-calibration/1 可靠性表。")
+    ccal.add_argument("--pairs", required=True, help="样本文件（pairs: [{confidence, correct}]）")
+    ccal.add_argument("--bins", type=int, default=10, help="分箱数（缺省 10）")
+    ccal.add_argument("--threshold", type=float, default=None,
+                      help="口头置信触发阈值：置信 <= 阈值的条目判「触发复核」（触发器不是证据）")
+    ccal.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    ccl = csub.add_parser("claim", help="把主张编译成证据义务清单",
+                          description="主张 → 义务清单：方法包给「什么算证据」，判据给「怎么判」。")
+    ccl.add_argument("--claim", required=True, help="主张原文（一句能被反驳的话）")
+    ccl.add_argument("--kind", dest="claim_kind", required=True,
+                     help="主张类型（如 robustness/capacity/closure）")
+    ccl.add_argument("--pack", dest="packs", action="append", default=[],
+                     help="方法包 id（可重复，至少一个）")
+    ccl.add_argument("--criterion", dest="criteria", action="append", default=[],
+                     help="判据 id（可重复；缺省按 applies_to 自动选）")
+    ccl.add_argument("--role", default="local-trusted", help="主张角色（默认 local-trusted）")
+    ccl.add_argument("--out", default="", help="写主张文件（缺省=只打印）")
+    ccl.add_argument("--sheet", default="",
+                     help="同时写证据作业单（每个 required 一条空槽，status=unknown）")
+    ccl.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    cch = csub.add_parser("claim-check", help="按义务清单核对证据（三态，不评分）",
+                          description="核对：satisfied / missing / unknown；unknown 不算 pass。")
+    cch.add_argument("--claim-file", dest="claim_file", required=True, help="主张文件")
+    cch.add_argument("--evidence", default="", help="证据清单 JSON（键=义务项）")
+    cch.add_argument("--sheet", default="",
+                     help="证据作业单 JSON（nf-cog-claim-sheet/1；填完直接验收，免手抄）")
+    cch.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    cg = csub.add_parser("triggers", help="看当前状态触发了哪些算子（确定性谓词）",
+                         description="触发引擎：无进展/回环/冲突/预算/校准漂移/缺上下文。")
+    cg.add_argument("--bundle", required=True, help="会话文件")
+    cg.add_argument("--json", action="store_true", help="输出结构化 JSON")
 
-    # ---- v2.8.0 波B S7：一键演示世界 ----
-    dm = sub.add_parser("demo",
-                        help="一键演示世界（v2.8 波B S7：P04 轻混全链 → CCV3 导出）",
- description="一键演示世界（v2.8 波B S7：P04 轻混全链 → CCV3 导出）")
-    dm.add_argument("--dest", default="", help="导出目录（缺省 = 系统临时目录并打印路径）")
-    # ---- v2.8.0 波C C1/C2/C5：知识签名 / 版本差异 / 修复指引（41 规划）----
-    sg = sub.add_parser("sig",
-                        help="协议知识签名（41 波C C1：01-36 文档/管线/模块 → 结构化签名，知识指纹"
-                            "）",
- description="协议知识签名（41 波C C1：01-36 文档/管线/模块 → 结构化签名，知识指纹）")
-    sg.add_argument("target", nargs="*", default=None,
-                    help="目标 md 或目录；缺省 = 全量 01-36 编号方案文档")
-    sg.add_argument("--json", action="store_true", help="输出完整 canonical JSON 记录")
-    sg.add_argument("--verify", action="store_true",
-                    help="check25 同语义：两遍生成一致性校验（可复现门禁）")
-    at = sub.add_parser("attest",
-                        help="内容 attestation（三级信任：digest_only / hmac-sha256 / sigstore 外挂"
-                            "锚）",
-                        description="内容 attestation（内部差距：知识签名只自证可复现，无对外可验证"
-                            "的篡改证据）。"
-                                    "签发时间戳取墙钟（`issued_at`），可用 `SOURCE_DATE_EPOCH`（可"
-                                        "复现构建惯例）"
-                                    "钉成固定值——机器面据此逐字节可复现。")
-    at.add_argument("target", nargs="?", default="",
-                    help="目标 md（缺省 = 01/02/06/07 四件集合）")
-    at.add_argument("--out", default="", help="写出 attestation JSON 的路径（缺省 = 不写盘）")
-    at.add_argument("--issuer", default="", help="签发方标识（写入 producer.issuer）")
-    at.add_argument("--key-file", default="",
-                    help="HMAC 密钥文件 → 签发/校验 hmac-sha256 级 attestation")
-    at.add_argument("--verify", default="",
-                    help="校验既有 attestation JSON（缺省 = 生成模式）")
-    at.add_argument("--selfcheck", action="store_true",
-                    help="体检「外部验签」机制：独立子进程验签 + 篡改必红（check42 的用户侧入口）")
-    at.add_argument("--json", action="store_true", help="输出结构化 JSON")
+
+def _cmd_cog(args) -> int:
+    """认知工作台命令实现。"""
+    import json as _json
+
+    from core import atomic_write
+    from core.cognition_workspace import moves as cg_moves
+    from core.cognition_workspace import operators as cg_ops
+    from core.cognition_workspace import session as cg_session
+
+    def _read(path):
+        try:
+            with open(_rel_out(path), encoding="utf-8") as handle:
+                return _json.load(handle)
+        except (OSError, ValueError) as exc:
+            raise ValueError("会话文件不可读：" + str(exc)
+                             + "（修复指引：用 nf cog begin 生成）") from exc
+
+    def _write(path, bundle):
+        atomic_write.write_text(_rel_out(path),
+                                _json.dumps(bundle, ensure_ascii=False, indent=2,
+                                            sort_keys=True) + chr(10))
+
+    sub = getattr(args, "cog_cmd", None)
+    if not sub:
+        print("用法：nf cog begin|step|replay|diff|moves|status ...", file=sys.stderr)
+        return 2
+    if sub == "moves":
+        items = ([cg_moves.describe(args.move_id)] if args.move_id
+                 else [cg_moves.describe(m) for m in cg_moves.MOVE_IDS])
+        if args.json:
+            print(_json.dumps({"kind": "cog-moves", "items": items},
+                              ensure_ascii=False, indent=2, sort_keys=True))
+            return 0
+        print("== nf cog moves（" + str(len(items)) + " 个元动作）==")
+        for item in items:
+            print("  " + item["id"] + "：" + item["name"])
+            print("    何时：" + item["when"])
+            print("    frame_delta：" + "、".join(item["delta_kinds"]))
+            print("    失败模式：" + item["failure_mode"])
+        return 0
+    if sub == "job":
+        try:
+            from core import boot_check as cg_boot
+            from core import job_ledger as cg_job
+            boot = cg_boot.check(ROOT)
+            blocked = cg_boot.safe_mode_write_gate(boot)
+            if blocked and getattr(args, "job_cmd", "") in ("create", "transition", "receipt"):
+                raise ValueError(blocked[0] + "（修复指引：修好关键件后重跑）")
+            if not getattr(args, "job_cmd", ""):
+                print("用法：nf cog job create|transition|receipt|show|verify …",
+                      file=sys.stderr)
+                return 2
+            ledger_path = _rel_out(args.ledger)
+            ledger = (json_doc.load(ledger_path, dict, what=args.ledger)
+                      if os.path.isfile(ledger_path) else cg_job.new_ledger())
+            if args.job_cmd == "create":
+                ledger = cg_job.create(ledger, args.job_id, args.kind,
+                                       contract_digest=args.contract,
+                                       inputs_digest=args.inputs)
+            elif args.job_cmd == "transition":
+                witness = {}
+                if args.witness:
+                    with open(_rel_out(args.witness), encoding="utf-8") as handle:
+                        witness = _json.load(handle)
+                ledger = cg_job.transition(ledger, args.job_id, args.to, witness=witness)
+            elif args.job_cmd == "receipt":
+                with open(_rel_out(args.receipt), encoding="utf-8") as handle:
+                    receipt = _json.load(handle)
+                ledger = cg_job.attach_receipt(ledger, args.job_id, receipt)
+            elif args.job_cmd == "verify":
+                res = cg_job.replay(ledger)
+                if args.json:
+                    print(_json.dumps({"kind": "cog-job-verify", "ok": res["ok"],
+                                       "issues": res["issues"]},
+                                      ensure_ascii=False, indent=2, sort_keys=True))
+                else:
+                    print("== nf cog job verify ==")
+                    print("  判定：" + ("ok" if res["ok"] else "invalid"))
+                    for issue in res["issues"]:
+                        print("  [FAIL] " + issue, file=sys.stderr)
+                return 0 if res["ok"] else 1
+            elif args.job_cmd == "show":
+                ids = [args.job_id] if args.job_id else sorted(ledger.get("jobs") or {})
+                items = []
+                for job_id in ids:
+                    job = (ledger.get("jobs") or {})[job_id]
+                    items.append({"id": job_id, "kind": job["kind"],
+                                  "state": job["state"],
+                                  "events": len(job["events"]),
+                                  "receipts": len(job["receipts"]),
+                                  "digest": cg_job.job_digest(ledger, job_id)})
+                if args.json:
+                    print(_json.dumps({"kind": "cog-job-show", "items": items},
+                                      ensure_ascii=False, indent=2, sort_keys=True))
+                else:
+                    print("== nf cog job show（" + str(len(items)) + " 个）==")
+                    for item in items:
+                        print("  " + item["id"] + " [" + item["state"] + "] "
+                              + item["kind"] + " · events " + str(item["events"])
+                              + " / receipts " + str(item["receipts"]))
+                        print("    digest：" + item["digest"][:16])
+                return 0
+            else:
+                print("未知子命令：" + str(args.job_cmd), file=sys.stderr)
+                return 2
+            if args.out:
+                atomic_write.write_text(_rel_out(args.out),
+                                        _json.dumps(ledger, ensure_ascii=False, indent=2,
+                                                    sort_keys=True) + chr(10))
+            if args.json:
+                print(_json.dumps(ledger, ensure_ascii=False, indent=2, sort_keys=True))
+            else:
+                print("== nf cog job " + args.job_cmd + " ==")
+                job = (ledger.get("jobs") or {}).get(args.job_id) or {}
+                print("  作业：" + str(args.job_id) + " · 状态：" + str(job.get("state")))
+                print("  启动自检：" + boot["mode"])
+                if args.out:
+                    print("  已写入：" + _rel_display(_rel_out(args.out)))
+            return 0
+        except (OSError, ValueError) as exc:
+            return _machine_fail(args, str(exc), 4)
+    if sub.startswith("bridge-"):
+        try:
+            from core.cognition_workspace import bridge as cg_bridge
+            bundle = _read(args.bundle) if getattr(args, "bundle", "") else None
+            if sub == "bridge-commit":
+                claim = _read(args.claim_file)
+                cc = _read(args.cc_result)
+                commitment = cg_bridge.commit(bundle, claim, cc)
+                if args.out:
+                    atomic_write.write_text(_rel_out(args.out),
+                                            _json.dumps(commitment, ensure_ascii=False,
+                                                        indent=2, sort_keys=True) + chr(10))
+                if args.json:
+                    print(_json.dumps(commitment, ensure_ascii=False, indent=2,
+                                      sort_keys=True))
+                else:
+                    print("== nf cog bridge-commit ==")
+                    print("  判定：" + commitment["cc_verdict"]
+                          + " · commitment " + commitment["digest"][:16])
+                    if args.out:
+                        print("  已写入：" + _rel_display(_rel_out(args.out)))
+                return 0
+            if sub == "bridge-obligation":
+                commitment = _read(args.commitment)
+                cc = _read(args.cc_result)
+                ob = cg_bridge.obligation(
+                    commitment, cc,
+                    failed=[x for x in str(args.failed).split(",") if x],
+                    unknown=[x for x in str(args.unknown).split(",") if x])
+                if args.out:
+                    atomic_write.write_text(_rel_out(args.out),
+                                            _json.dumps(ob, ensure_ascii=False,
+                                                        indent=2, sort_keys=True) + chr(10))
+                if args.json:
+                    print(_json.dumps(ob, ensure_ascii=False, indent=2, sort_keys=True))
+                else:
+                    print("== nf cog bridge-obligation ==")
+                    print("  判定：" + ob["cc_verdict"] + " · 失败项 " + str(ob["failed"]))
+                    print("  下一步：" + "、".join(a["op"] for a in ob["next_actions"]))
+                return 0
+            if sub == "bridge-apply":
+                ob = _read(args.obligation)
+                new_bundle = cg_bridge.apply_obligation(bundle, ob)
+                if args.commitment:
+                    new_bundle = cg_bridge.append_commitment(
+                        new_bundle, _read(args.commitment))
+                if args.out:
+                    _write(args.out, new_bundle)
+                if args.json:
+                    print(_json.dumps(new_bundle["control"], ensure_ascii=False,
+                                      indent=2, sort_keys=True))
+                else:
+                    print("== nf cog bridge-apply ==")
+                    print("  控制面记录：" + str(len(new_bundle["control"]["records"])))
+                    print("  discourse 未改：" + str(new_bundle["state"]["digest"]
+                                                  == bundle["state"]["digest"]))
+                return 0
+            if sub == "bridge-verify":
+                commitment = _read(args.commitment)
+                claim = _read(args.claim_file)
+                cc = _read(args.cc_result)
+                res = cg_bridge.verify_commitment(commitment, bundle, claim, cc)
+                if args.json:
+                    print(_json.dumps({"kind": "cog-bridge-verify", **res},
+                                      ensure_ascii=False, indent=2, sort_keys=True))
+                else:
+                    print("== nf cog bridge-verify ==")
+                    print("  一致：" + ("是" if res["ok"] else "否"))
+                    for issue in res["issues"]:
+                        print("  [FAIL] " + issue, file=sys.stderr)
+                return 0 if res["ok"] else 1
+        except (OSError, ValueError) as exc:
+            return _machine_fail(args, str(exc), 4)
+    if sub == "criteria":
+        try:
+            from core.cognition_workspace import criteria as cg_criteria
+            if args.criterion_id:
+                items = [cg_criteria.get(ROOT, args.criterion_id)]
+            else:
+                items = cg_criteria.list_criteria(ROOT, args.layer)
+        except ValueError as exc:
+            return _machine_fail(args, str(exc), 4)
+        if args.json:
+            print(_json.dumps({"kind": "cog-criteria", "items": items},
+                              ensure_ascii=False, indent=2, sort_keys=True))
+            return 0
+        print("== nf cog criteria（" + str(len(items)) + " 条）==")
+        for item in items:
+            print("  [" + item["layer"] + "] " + item["id"] + "：" + item["name"])
+            print("    how：" + item["how"])
+            print("    witness：" + "、".join(item["witness"]))
+        return 0
+    if sub == "calibrate":
+        try:
+            from core import calibration as cg_cal
+            doc = _read(args.pairs)
+            pairs = doc.get("pairs") if isinstance(doc, dict) else doc
+            conf = [float(x.get("confidence")) for x in pairs]
+            ok = [float(1 if x.get("correct") else 0) for x in pairs]
+            res = cg_cal.reliability(conf, ok, int(args.bins))
+            if getattr(args, "threshold", None) is not None:
+                res["trigger"] = cg_cal.trigger_policy(conf, float(args.threshold))
+        except (AttributeError, KeyError, TypeError, ValueError) as exc:
+            return _machine_fail(args, "校准输入不合法：" + str(exc), 4)
+        if args.json:
+            print(_json.dumps(res, ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print("== nf cog calibrate ==")
+            print("  样本：" + str(res["n"]) + " · 分箱：" + str(res["n_bins"])
+                  + " · ECE：" + str(res["ece"]))
+            print("  " + res["note"])
+            trig = res.get("trigger")
+            if isinstance(trig, dict):
+                print("  触发复核：" + str(trig["counts"]["trigger"]) + " / "
+                      + str(trig["counts"]["trigger"] + trig["counts"]["skip"])
+                      + "（阈值 " + str(trig["threshold"]) + "）· " + trig["note"])
+        return 0
+    if sub == "claim":
+        try:
+            from core.cognition_workspace import claims as cg_claims
+            doc = cg_claims.compile_claim(ROOT, args.claim, args.claim_kind,
+                                          list(args.packs), list(args.criteria),
+                                          role=args.role)
+        except ValueError as exc:
+            return _machine_fail(args, str(exc), 4)
+        if args.out:
+            atomic_write.write_text(_rel_out(args.out),
+                                    _json.dumps(doc, ensure_ascii=False, indent=2,
+                                                sort_keys=True) + chr(10))
+        if args.sheet:
+            sheet = cg_claims.claim_sheet(doc)
+            atomic_write.write_text(_rel_out(args.sheet),
+                                    _json.dumps(sheet, ensure_ascii=False, indent=2,
+                                                sort_keys=True) + chr(10))
+        if args.json:
+            print(_json.dumps(doc, ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print("== nf cog claim ==")
+            print("  主张：" + doc["claim"])
+            print("  类型：" + doc["claim_kind"] + " · 包：" + "、".join(doc["packs"]))
+            total = sum(len(std["required"]) for block in doc["obligations"]
+                        for std in block["standards"])
+            print("  义务项：" + str(total) + " 项")
+            for block in doc["obligations"]:
+                for std in block["standards"]:
+                    for need in std["required"]:
+                        print("    - " + need)
+            print("  判据：" + "、".join(c["id"] for c in doc["criteria"]))
+            if args.out:
+                print("  已写入：" + _rel_display(_rel_out(args.out)))
+        return 0
+    if sub == "claim-check":
+        try:
+            from core.cognition_workspace import claims as cg_claims
+            doc = _read(args.claim_file)
+            if args.sheet:
+                sheet = _read(args.sheet)
+                evidence = cg_claims.evidence_from_sheet(sheet)
+            elif args.evidence:
+                with open(_rel_out(args.evidence), encoding="utf-8") as handle:
+                    evidence = _json.load(handle)
+            else:
+                return _machine_fail(args, "缺证据：给 --evidence 或 --sheet（修复指引："
+                                            "作业单用 nf cog claim --sheet 生成）", 4)
+            res = cg_claims.check_claim(doc, evidence)
+        except (OSError, ValueError) as exc:
+            return _machine_fail(args, str(exc), 4)
+        if args.json:
+            print(_json.dumps(res, ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print("== nf cog claim-check ==")
+            print("  就绪：" + ("是" if res["ready"] else "否")
+                  + " · 共 " + str(res["total"]) + " 项")
+            print("  已满足：" + str(len(res["satisfied"])))
+            print("  缺项：" + str(res["missing"]))
+            print("  未知：" + str(res["unknown"]) + "（unknown 不算 pass）")
+        return 0 if res["ready"] else 1
+    if sub == "ops":
+        items = ([cg_ops.describe(args.op_id)] if args.op_id
+                 else [cg_ops.describe(o) for o in cg_ops.OPERATOR_IDS])
+        if args.json:
+            print(_json.dumps({"kind": "cog-ops", "items": items},
+                              ensure_ascii=False, indent=2, sort_keys=True))
+            return 0
+        print("== nf cog ops（" + str(len(items)) + " 个元算子）==")
+        for item in items:
+            print("  " + item["id"] + "：" + item["name"])
+            print("    witness：" + "、".join(item["witness"]))
+            print("    失败模式：" + item["failure_mode"])
+        return 0
+    if sub == "control":
+        try:
+            bundle = _read(args.bundle)
+            if args.payload and args.payload_json:
+                raise ValueError("--payload 与 --payload-json 只能给一个（修复指引：二选一）")
+            if args.payload:
+                with open(_rel_out(args.payload), encoding="utf-8") as handle:
+                    payload = _json.load(handle)
+            elif args.payload_json:
+                payload = _json.loads(args.payload_json)
+            else:
+                raise ValueError("缺 witness（修复指引：--payload 或 --payload-json）")
+            bundle = cg_session.control(bundle, args.op_id, payload,
+                                        trigger=args.trigger)
+        except (OSError, ValueError) as exc:
+            return _machine_fail(args, str(exc), 4)
+        if args.out:
+            _write(args.out, bundle)
+        if args.json:
+            print(_json.dumps(bundle["control"], ensure_ascii=False, indent=2,
+                              sort_keys=True))
+        else:
+            print("== nf cog control ==")
+            print("  算子：" + args.op_id + " · 控制面状态：" + bundle["control"]["status"])
+            print("  记录数：" + str(len(bundle["control"]["records"])))
+            if args.out:
+                print("  已写入：" + _rel_display(_rel_out(args.out)))
+        return 0
+    if sub == "triggers":
+        try:
+            items = cg_session.triggers(_read(args.bundle))
+        except (OSError, ValueError) as exc:
+            return _machine_fail(args, str(exc), 4)
+        if args.json:
+            print(_json.dumps({"kind": "cog-triggers", "items": items},
+                              ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print("== nf cog triggers ==")
+            if not items:
+                print("  暂无触发（无进展/回环/冲突/预算/校准漂移都不成立）")
+            for item in items:
+                print("  " + item["trigger"] + " → " + item["op"] + "：" + item["why"])
+        return 0
+    if sub == "begin":
+        try:
+            bundle = cg_session.begin(args.problem, steps_max=args.steps_max)
+        except ValueError as exc:
+            return _machine_fail(args, str(exc), 4)
+        _write(args.out, bundle)
+        if args.json:
+            print(_json.dumps(bundle["state"], ensure_ascii=False, indent=2,
+                              sort_keys=True))
+        else:
+            print("== nf cog begin ==")
+            print("  会话：" + bundle["state"]["session_id"])
+            print("  问题：" + args.problem)
+            print("  已写入：" + _rel_display(_rel_out(args.out)))
+        return 0
+    if sub == "step":
+        try:
+            bundle = _read(args.bundle)
+            if args.delta and args.delta_json:
+                raise ValueError("--delta 与 --delta-json 只能给一个（修复指引：二选一）")
+            if args.delta:
+                with open(_rel_out(args.delta), encoding="utf-8") as handle:
+                    delta = _json.load(handle)
+            elif args.delta_json:
+                delta = _json.loads(args.delta_json)
+            else:
+                raise ValueError("缺 frame_delta（修复指引：--delta 或 --delta-json）")
+            # 传 root：凭证人（counterexample witness）要核对文件真的在场
+            bundle = cg_session.step(bundle, args.move, delta, root=str(ROOT))
+        except (OSError, ValueError) as exc:
+            return _machine_fail(args, str(exc), 4)
+        if args.out:
+            _write(args.out, bundle)
+        if args.json:
+            print(_json.dumps(bundle["state"], ensure_ascii=False, indent=2,
+                              sort_keys=True))
+        else:
+            summary = cg_session.status(bundle)
+            print("== nf cog step ==")
+            print("  动作：" + args.move + " · 已用 " + str(summary["moves_used"])
+                  + "/" + str(summary["steps_max"]) + " 步")
+            print("  状态 digest：" + summary["digest"][:16])
+            if args.out:
+                print("  已写入：" + _rel_display(_rel_out(args.out)))
+        return 0
+    if sub == "replay":
+        try:
+            res = cg_session.replay(_read(args.bundle))
+        except (OSError, ValueError) as exc:
+            return _machine_fail(args, str(exc), 4)
+        if args.json:
+            print(_json.dumps({"kind": "cog-replay", "ok": res["ok"],
+                               "issues": res["issues"],
+                               "digest": (res["state"] or {}).get("digest")},
+                              ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print("== nf cog replay ==")
+            print("  判定：" + ("ok" if res["ok"] else "invalid"))
+            for issue in res["issues"]:
+                print("  [FAIL] " + issue, file=sys.stderr)
+        return 0 if res["ok"] else 1
+    if sub == "diff":
+        try:
+            res = cg_session.diff(_read(args.a), _read(args.b))
+        except (OSError, ValueError) as exc:
+            return _machine_fail(args, str(exc), 4)
+        if args.json:
+            print(_json.dumps(res, ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print("== nf cog diff ==")
+            print("  动作序列相同：" + ("是" if res["same_sequence"] else "否"))
+            print("  仅 A 有：" + str(res["only_in_a"]))
+            print("  仅 B 有：" + str(res["only_in_b"]))
+        return 0
+    if sub == "status":
+        try:
+            summary = cg_session.status(_read(args.bundle))
+        except (OSError, ValueError) as exc:
+            return _machine_fail(args, str(exc), 4)
+        if args.json:
+            print(_json.dumps(summary, ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print("== nf cog status ==")
+            for key in ("session_id", "status", "moves_used", "steps_max",
+                        "assumptions", "tensions", "open_questions", "digest"):
+                print("  " + key + "：" + str(summary[key]))
+        return 0
+    print("未知子命令：" + str(sub), file=sys.stderr)
+    return 2
+
+
+def _add_parser_evidence_face(sub):
+    """label / evidence / check / resolve 族的参数面（拆分只为把单函数压回 300 行内）。"""
     lab = sub.add_parser("label",
                         help="标注 IR：形状声明与校验（cc_label 的声明层）",
                         description="标注 IR v0：只声明「该有哪些标识」并校验形状/档位；"
@@ -637,7 +1142,38 @@ def _add_parser_production(sub):
     ets_verify.add_argument("--ca-file", required=True, help="TSA 根证书 PEM（信任锚）")
     ets_verify.add_argument("--untrusted", default="", help="中间证书 PEM")
     ets_verify.add_argument("--json", action="store_true", help="输出结构化 JSON")
-    _add_parser_evidence_extra(esub)
+    evba = esub.add_parser("batch",
+                           help="批量复验：目录里的证据包逐件判，任何一件非 ok 即整体失败",
+                           description="批量复验：目标给目录（取 *.zip / *.json，按名排序）或单个"
+                                       "证据包。判定词表与单件完全一致；整体退出码 0 只代表"
+                                       "「每一件都 ok」。")
+    evba.add_argument("batch_target", metavar="TARGET",
+                      help="目录（取其中 *.zip 与 *.json）或单个证据包")
+    evba.add_argument("--key-file", default="", help="校验 hmac 级信封所需的同一密钥")
+    evba.add_argument("--revocations", default="", help="外部吊销件 JSON（同 verify）")
+    evba.add_argument("--at", default="", help="判定时点（UTC 秒级；缺省 = 现在）")
+    evba.add_argument("--root", default="", help="单 JSON 形态的成员根目录")
+    evba.add_argument("--anchor", default="", help="外部锚点 JSON（同 verify）")
+    evba.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    evb = esub.add_parser("bench", help="证据复验器攻击矩阵基准（38 条已知攻击，逐条比对判定）",
+                          description="攻击矩阵基准：对金丝雀证据包施加已知攻击/退化，逐条断言"
+                                      "「期望判定 vs 实际判定」。任何一条不达期望即 exit 1——"
+                                      "抓不到篡改的校验器就是摆设，本基准把这句话变成数字。")
+    evb.add_argument("--out", default="", help="把 Markdown 报告写到该路径（缺省 = 只打印）")
+    evb.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    evb.add_argument("--quiet", action="store_true", help="只输出结论行")
+    evr = esub.add_parser("replay", help="复现轨迹：把证据推导过程摊成逐步可核的 trace",
+                          description="复现轨迹（cc_replay）：成员「字节→摘要→叶→证明折叠」"
+                                      "逐算，另给链节与信封摘要；每步带规则名与输入/输出摘要，"
+                                      "trace 不含时间戳（同输入两次逐字节一致，可 diff）。")
+    evr.add_argument("evidence_bundle", nargs="?", default="", metavar="TARGET",
+                     help="证据源：证据包 .zip / 解包目录 / 回执或信封 JSON")
+    evr.add_argument("--entry", default="", help="只看单个成员（相对路径；缺省 = 全量）")
+    evr.add_argument("--kind", default="", choices=("",) + evidence_kinds(),
+                     help="显式指定形态（缺省 = 自动判）")
+    evr.add_argument("--root", default="", help="单 JSON 形态的成员根目录")
+    evr.add_argument("--key-file", default="", help="验 hmac 信封所需密钥")
+    evr.add_argument("--json", action="store_true", help="输出结构化 JSON")
     ck = sub.add_parser("check", help="单对象策略体检（cc_check：对象 × 策略 → verdict）",
                         description="单对象策略体检（内部差距：仓内判定全是仓库级，缺「单对象 × "
                                     "单策略」入口）。策略是 nf-check-policy/1 的封闭词表 JSON；"
@@ -660,6 +1196,125 @@ def _add_parser_production(sub):
                                     "不用空数组冒充「查过没问题」）。")
     rv.add_argument("object", help="对象路径（仓库相对或绝对）")
     rv.add_argument("--json", action="store_true", help="输出结构化 JSON")
+def _add_parser_production(sub):
+    pln = sub.add_parser("pipeline",
+                         help="管线脚手架（v2.8 波B S4：pipeline new——自 P00 骨架派生新管线）",
+ description="管线脚手架（v2.8 波B S4：pipeline new——自 P00 骨架派生新管线）")
+    psub = pln.add_subparsers(dest="pipeline_cmd", required=True)
+    p_new = psub.add_parser("new",
+ help="派生新管线：复制模板 → 改 id/name/领域标签（登记 02 / 填层名挂载按 README 三步）",
+ description="派生新管线：复制模板 → 改 id/name/领域标签（登记 02 / 填层名挂载按 README 三步）")
+    p_dry = psub.add_parser("dryrun",
+                            help="管线抽象执行（不调模型跑一遍声明 → 执行图；hard 缺陷 + advisory "
+                                "分列）",
+                            description="管线抽象执行（内部差距：静态 check 只能答『声明自洽吗』，"
+                                "答不了『跑得通吗』）")
+    p_dry.add_argument("--pipeline", default="", help="管线 md 路径（缺省 + --all 时全仓扫）")
+    p_dry.add_argument("--all", action="store_true", help="全仓管线扫一遍并汇总")
+    p_dry.add_argument("--json", action="store_true", help="输出执行图 JSON")
+    p_dry.add_argument("--write-advisory", action="store_true",
+                       help="配合 --all：把 advisory 分类台账写入 protocol/pipeline_advisory.json")
+    p_new.add_argument("--id", required=True, help="新管线 id（如 P07）")
+    p_new.add_argument("--name", required=True, help="新管线显示名（如 演示领域管线）")
+    p_new.add_argument("--from", dest="template", default=None,
+                       help="模板管线 md（缺省 = 03_管线库/P00_通用文档生成管线.md）")
+    p_new.add_argument("--domain", default="",
+                       help="领域标签（如 悬疑 → tags 追加「悬疑领域」）")
+    p_new.add_argument("--dest", default="",
+                       help="输出 md 路径（缺省 = 03_管线库/<id>_<name>.md 官方管线位）")
+
+    # ---- v2.8.0 波B S5：模块生命周期 ----
+    mds = sub.add_parser("module",
+                         help="模块生命周期（v2.8 波B S5：status 位 + deprecate/restore + 引用门禁 "
+                             "verify）",
+ description="模块生命周期（v2.8 波B S5：status 位 + deprecate/restore + 引用门禁 verify）")
+    msub = mds.add_subparsers(dest="module_cmd", required=True)
+    m_ls = msub.add_parser("ls",
+ help="浏览模块状态（--status 过滤；缺省全量）",
+ description="浏览模块状态（--status 过滤；缺省全量）")
+    m_ls.add_argument("--status", default="", choices=("active", "deprecated", "retired"))
+    m_ls.add_argument("--root", default=ROOT, help="扫描根（缺省 = 仓库根）")
+    m_ls.add_argument("--json", action="store_true",
+                      help="输出结构化 JSON（模块状态清单）")
+    m_st = msub.add_parser("status",
+ help="查看单个模块文件状态位",
+ description="查看单个模块文件状态位")
+    m_st.add_argument("file", help="模块 md 路径（如 community/<包>/modules/Mxx_….md）")
+    m_dp = msub.add_parser("deprecate",
+ help="状态流转 → deprecated（写文件元信息行状态位）",
+ description="状态流转 → deprecated（写文件元信息行状态位）")
+    m_dp.add_argument("file", help="模块 md 路径")
+    m_dp.add_argument("--reason", default="", help="弃用原因（写入状态位）")
+    m_rs = msub.add_parser("restore",
+ help="状态流转 → active（deprecated/retired 回退）",
+ description="状态流转 → active（deprecated/retired 回退）")
+    m_rs.add_argument("file", help="模块 md 路径")
+    m_vf = msub.add_parser("verify",
+ help="引用门禁扫描（与 verify.sh check24 同语义）",
+ description="引用门禁扫描（与 verify.sh check24 同语义）")
+    m_sg = msub.add_parser("signature",
+                           help="模块边界签名基线（边界写一次；漂移即 FAIL 直到重签）",
+                           description="模块边界签名基线（机制借鉴 Pipelex signature_for：边界冻结"
+                               "、实现可替）")
+    m_sg.add_argument("--write", action="store_true",
+                      help="重新冻结边界基线（评审后显式重签）")
+    m_sg.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    m_ty = msub.add_parser("types",
+                           help="I/O 类型面（io_types）：覆盖率 + 可证不匹配；--write 补标",
+                           description="I/O 类型面（机制借鉴 Pipelex typed concepts，01 §7 V1 字段"
+                               "级新增）")
+    m_ty.add_argument("--write", action="store_true",
+                      help="给全部有机读契约的模块补 io_types（确定性推导，未命中写 untyped）")
+    m_ty.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    m_ty.add_argument("--harvest", action="store_true",
+                      help="从模块正文事件契约收割载荷字段（并入 event_registry）")
+    m_ty.add_argument("--backlog", action="store_true",
+                      help="生成/校验类型积压台账（不可推断的 untyped 显式化）")
+    m_ct = msub.add_parser("contract",
+                           help="L0 → L1 机读块 retro-fit（从人读引用块/正文投影，不编造）",
+                           description="L0 → L1 机读块 retro-fit（机制借鉴 Pipelex：机读块 = 人读契"
+                               "约的结构化投影）")
+    m_ct.add_argument("--write", action="store_true", help="写入机读块（幂等；已有机读块则跳过）")
+    m_ct.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    m_vf.add_argument("--root", default=ROOT, help="扫描根（缺省 = 仓库根）")
+
+    # ---- v2.8.0 波B S7：一键演示世界 ----
+    dm = sub.add_parser("demo",
+                        help="一键演示世界（v2.8 波B S7：P04 轻混全链 → CCV3 导出）",
+ description="一键演示世界（v2.8 波B S7：P04 轻混全链 → CCV3 导出）")
+    dm.add_argument("--dest", default="", help="导出目录（缺省 = 系统临时目录并打印路径）")
+    # ---- v2.8.0 波C C1/C2/C5：知识签名 / 版本差异 / 修复指引（41 规划）----
+    sg = sub.add_parser("sig",
+                        help="协议知识签名（41 波C C1：01-36 文档/管线/模块 → 结构化签名，知识指纹"
+                            "）",
+ description="协议知识签名（41 波C C1：01-36 文档/管线/模块 → 结构化签名，知识指纹）")
+    sg.add_argument("target", nargs="*", default=None,
+                    help="目标 md 或目录；缺省 = 全量 01-36 编号方案文档")
+    sg.add_argument("--json", action="store_true", help="输出完整 canonical JSON 记录")
+    sg.add_argument("--verify", action="store_true",
+                    help="check25 同语义：两遍生成一致性校验（可复现门禁）")
+    at = sub.add_parser("attest",
+                        help="内容 attestation（三级信任：digest_only / hmac-sha256 / sigstore 外挂"
+                            "锚）",
+                        description="内容 attestation（内部差距：知识签名只自证可复现，无对外可验证"
+                            "的篡改证据）。"
+                                    "签发时间戳取墙钟（`issued_at`），可用 `SOURCE_DATE_EPOCH`（可"
+                                        "复现构建惯例）"
+                                    "钉成固定值——机器面据此逐字节可复现。")
+    at.add_argument("target", nargs="?", default="",
+                    help="目标 md（缺省 = 01/02/06/07 四件集合）")
+    at.add_argument("--out", default="", help="写出 attestation JSON 的路径（缺省 = 不写盘）")
+    at.add_argument("--issuer", default="", help="签发方标识（写入 producer.issuer）")
+    at.add_argument("--key-file", default="",
+                    help="HMAC 密钥文件 → 签发/校验 hmac-sha256 级 attestation")
+    at.add_argument("--verify", default="",
+                    help="校验既有 attestation JSON（缺省 = 生成模式）")
+    at.add_argument("--selfcheck", action="store_true",
+                    help="体检「外部验签」机制：独立子进程验签 + 篡改必红（check42 的用户侧入口）")
+    at.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    _add_parser_cog(sub)
+    _add_parser_evidence_face(sub)
+
 
 
 def _portable_out(path: str) -> str:
@@ -763,6 +1418,27 @@ def _add_parser_revocations(esub):
     rvts_show.add_argument("--check-pub", default="", help="现场核对一把公钥（64 hex）")
     rvts_show.add_argument("--at", default="", help="核对时点（UTC 秒级；缺省=现在）")
     rvts_show.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    ktb = rvts.add_parser("kt-build", help="造一版密钥透明目录（可接在旧版后）",
+                          description="密钥透明目录：版本化根 + 只追加日志 + 包含证明 + 分叉检测。")
+    ktb.add_argument("kt_keys", metavar="KEYS.json", help="key_id → 公钥 hex 的 JSON 对象")
+    ktb.add_argument("--prev", default="", help="上一版目录（接链；首版省略）")
+    ktb.add_argument("--out", default="", help="输出目录（缺省=只打印）")
+    ktb.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    ktv = rvts.add_parser("kt-verify", help="校验目录自洽（链/根/版本）",
+                          description="校验：schema、keys 形状、log 链、重算根与最新 log 根一致。")
+    ktv.add_argument("kt_doc", metavar="DIR.json", help="密钥透明目录")
+    ktv.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    ktl = rvts.add_parser("kt-lookup", help="单键查找 + 包含证明",
+                          description="查找 key_id 并给出可离线验证的包含证明。")
+    ktl.add_argument("kt_doc", metavar="DIR.json", help="密钥透明目录")
+    ktl.add_argument("--id", dest="kt_key_id", required=True, help="要查的 key_id")
+    ktl.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    kts = rvts.add_parser("kt-split", help="两份目录的分叉检测（谁都不是谁的合法延伸）",
+                          description="分叉检测：同版本不同根 / 新版本链上缺旧根"
+                                      " → 报 split 并给 witness。")
+    kts.add_argument("--a", required=True, help="目录 A")
+    kts.add_argument("--b", required=True, help="目录 B")
+    kts.add_argument("--json", action="store_true", help="输出结构化 JSON")
     rvm = rvsub.add_parser("merge", help="多份 feed → 合并成 nf-revocation/1 表",
                            description="合并：按 seq 排序、逐份验签验链、取并集；任何一份不过则整次失败。"
                                        "输出是普通表，可给 nf evidence verify --revocations 用。")
@@ -771,41 +1447,6 @@ def _add_parser_revocations(esub):
     rvm.add_argument("--at", default="", help="新鲜度判定时点（UTC 秒级；缺省 = 现在）")
     rvm.add_argument("--out", default="", help="输出合并表（缺省=只打印）")
     rvm.add_argument("--json", action="store_true", help="输出结构化 JSON")
-
-def _add_parser_evidence_extra(esub):
-    """evidence 的批量/bench/replay 子命令注册（从 _add_parser_production 拆出，保 300 行判据）。"""
-    evba = esub.add_parser("batch",
-                           help="批量复验：目录里的证据包逐件判，任何一件非 ok 即整体失败",
-                           description="批量复验：目标给目录（取 *.zip / *.json，按名排序）或单个"
-                                       "证据包。判定词表与单件完全一致；整体退出码 0 只代表"
-                                       "「每一件都 ok」。")
-    evba.add_argument("batch_target", metavar="TARGET",
-                      help="目录（取其中 *.zip 与 *.json）或单个证据包")
-    evba.add_argument("--key-file", default="", help="校验 hmac 级信封所需的同一密钥")
-    evba.add_argument("--revocations", default="", help="外部吊销件 JSON（同 verify）")
-    evba.add_argument("--at", default="", help="判定时点（UTC 秒级；缺省 = 现在）")
-    evba.add_argument("--root", default="", help="单 JSON 形态的成员根目录")
-    evba.add_argument("--anchor", default="", help="外部锚点 JSON（同 verify）")
-    evba.add_argument("--json", action="store_true", help="输出结构化 JSON")
-    evb = esub.add_parser("bench", help="证据复验器攻击矩阵基准（38 条已知攻击，逐条比对判定）",
-                          description="攻击矩阵基准：对金丝雀证据包施加已知攻击/退化，逐条断言"
-                                      "「期望判定 vs 实际判定」。任何一条不达期望即 exit 1——"
-                                      "抓不到篡改的校验器就是摆设，本基准把这句话变成数字。")
-    evb.add_argument("--out", default="", help="把 Markdown 报告写到该路径（缺省 = 只打印）")
-    evb.add_argument("--json", action="store_true", help="输出结构化 JSON")
-    evb.add_argument("--quiet", action="store_true", help="只输出结论行")
-    evr = esub.add_parser("replay", help="复现轨迹：把证据推导过程摊成逐步可核的 trace",
-                          description="复现轨迹（cc_replay）：成员「字节→摘要→叶→证明折叠」"
-                                      "逐算，另给链节与信封摘要；每步带规则名与输入/输出摘要，"
-                                      "trace 不含时间戳（同输入两次逐字节一致，可 diff）。")
-    evr.add_argument("evidence_bundle", nargs="?", default="", metavar="TARGET",
-                     help="证据源：证据包 .zip / 解包目录 / 回执或信封 JSON")
-    evr.add_argument("--entry", default="", help="只看单个成员（相对路径；缺省 = 全量）")
-    evr.add_argument("--kind", default="", choices=("",) + evidence_kinds(),
-                     help="显式指定形态（缺省 = 自动判）")
-    evr.add_argument("--root", default="", help="单 JSON 形态的成员根目录")
-    evr.add_argument("--key-file", default="", help="验 hmac 信封所需密钥")
-    evr.add_argument("--json", action="store_true", help="输出结构化 JSON")
 
 def _add_parser_validation(sub):
     sc = sub.add_parser("score",
@@ -900,6 +1541,22 @@ def _add_parser_validation(sub):
                          description="认知族（机制借鉴 Glossary + SOP/Runbook/Playbook 分档）")
     cog.add_argument("part", nargs="?", default="", choices=["", "glossary", "modes"],
                      help="只看一件（缺省 = 全跑）")
+    cog.add_argument("--plan", dest="research_topic", default="", metavar="TOPIC",
+                     help="研究计划：主题 → 切片 + 检索词 + 方法论路径 + 证据台账（深度钻研用）")
+    cog.add_argument("--depth", type=int, default=2, choices=(1, 2, 3),
+                     help="计划深度：1=快扫三片 / 2=标准五片 / 3=全七片")
+    cog.add_argument("--methods", default="",
+                     help="只用这些方法（逗号分隔，如 M1,M3,M4）")
+    cog.add_argument("--list-methods", dest="list_methods", action="store_true",
+                     help="列出方法论库（怎么钻）")
+    cog.add_argument("--pack", dest="packs", action="append", default=[],
+                     metavar="PACK_ID",
+                     help="领域方法包（可重复）：把专家动作+证据标准并入研究计划")
+    cog.add_argument("--packs-list", dest="packs_list", action="store_true",
+                     help="列出领域方法包（怎么写专家动作/证据标准）")
+    cog.add_argument("--pack-checklist", metavar="ID", default=None,
+                     help="把方法包展开为可执行清单（每动作一条 + 证据要求）")
+    cog.add_argument("--out", default="", help="计划落点（缺省=只打印）")
     cog.add_argument("--json", action="store_true", help="输出结构化 JSON")
     stv = sub.add_parser("st-validate",
                          help="ST 制卡校验器原型（卡 / 世界书 / MVU 变量 → 报告；A-S3）",
@@ -2183,6 +2840,27 @@ def _cmd_render(args) -> int:
     return 0
 
 
+def _ingress_from(args):
+    """--ingress-policy → Ingress 实例；策略不合规就拒绝启动（网关宁可不服务，不带病放行）。"""
+    rel = str(getattr(args, "ingress_policy", "") or "")
+    if not rel:
+        return None
+    from core import json_doc as _jd
+    from core import mcp_ingress as _ing
+    doc = _jd.load(_rel_out(rel), dict, what=rel)
+    issues = _ing.validate_policy(doc)
+    if issues:
+        raise SystemExit("Ingress 策略不合法：" + "；".join(issues[:3])
+                         + "（修复指引：按 nf-ingress-policy/1 修策略后重试）")
+    side_effects = {str(k): str(v) for k, v in (doc.get("side_effects") or {}).items()}
+    probe = _ing.selfcheck(doc, side_effects)
+    if probe:
+        raise SystemExit("Ingress 启动自检未过：" + "；".join(probe[:3])
+                         + "（修复指引：策略声明与实际拦截不一致，修好再启动）")
+    side_effects = {str(k): str(v) for k, v in (doc.get("side_effects") or {}).items()}
+    return _ing.Ingress(doc, side_effects=side_effects)
+
+
 def _cmd_serve(args) -> int:
     """nf serve [mcp.json]：stdio JSON-RPC 服务（C1，MCP client 拉起）。
 
@@ -2219,7 +2897,9 @@ def _cmd_serve(args) -> int:
     # 参数 ⇄ inputSchema 校验器**在此注入**（依赖倒置：mcp_runtime 是稳定侧，不反向依赖
     # 校验器；见其 __init__ docstring）——上架通道因此逐条执行 tools/list 里那份声明。
     from core import json_schema
-    return McpRuntime(snapshot, schema_check=json_schema.json_schema_check).serve_stdio()
+    ingress = _ingress_from(args)
+    return McpRuntime(snapshot, schema_check=json_schema.json_schema_check,
+                      ingress=ingress).serve_stdio()
 
 
 def _cmd_design(args) -> int:
@@ -3754,7 +4434,89 @@ def _revocations_trust(args):
                 for issue in got["issues"]:
                     print(f"  [FAIL] {issue}", file=sys.stderr)
         return 0
-    print("用法：nf evidence revocations trust grant|show ...", file=sys.stderr)
+    if sub.startswith("kt-"):
+        return _revocations_kt(args, sub)
+    print("用法：nf evidence revocations trust grant|show|kt-build|kt-verify|kt-lookup|kt-split",
+          file=sys.stderr)
+    return 2
+
+
+def _revocations_kt(args, sub):
+    """密钥透明目录：build / verify / lookup / split。"""
+    import json as _json
+
+    from core import atomic_write, json_doc
+    from core import key_transparency as kt
+    if sub == "kt-build":
+        try:
+            keys = json_doc.load(_rel_out(args.kt_keys), dict, what=args.kt_keys)
+            prev = (json_doc.load(_rel_out(args.prev), dict, what=args.prev)
+                    if args.prev else None)
+            doc = kt.build(keys, prev=prev)
+        except (OSError, ValueError) as exc:
+            return _machine_fail(args, str(exc), 4)
+        if args.out:
+            atomic_write.write_text(_rel_out(args.out),
+                                    _json.dumps(doc, ensure_ascii=False, indent=2,
+                                                sort_keys=True) + chr(10))
+        if args.json:
+            print(_json.dumps(doc, ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print("== nf evidence revocations trust kt-build（v" + str(doc["version"]) + "）==")
+            print("  根：" + doc["root"][:32] + " · 键 " + str(len(doc["keys"])) + " 个")
+            if args.out:
+                print("  已写入：" + _rel_display(_rel_out(args.out)))
+        return 0
+    if sub == "kt-verify":
+        try:
+            doc = json_doc.load(_rel_out(args.kt_doc), dict, what=args.kt_doc)
+        except (OSError, ValueError) as exc:
+            return _machine_fail(args, "目录不可读：" + str(exc), 4)
+        res = kt.verify(doc)
+        if args.json:
+            print(_json.dumps(res, ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print("== nf evidence revocations trust kt-verify ==")
+            print("  判定：" + res["verdict"] + " · 版本 " + str(res["version"])
+                  + " · 根 " + (res["root"][:32] or "—"))
+            for issue in res["issues"]:
+                print("  [FAIL] " + issue, file=sys.stderr)
+            for warn in res["warnings"]:
+                print("  [WARN] " + warn, file=sys.stderr)
+        return 0 if res["ok"] else 1
+    if sub == "kt-lookup":
+        try:
+            doc = json_doc.load(_rel_out(args.kt_doc), dict, what=args.kt_doc)
+        except (OSError, ValueError) as exc:
+            return _machine_fail(args, "目录不可读：" + str(exc), 4)
+        res = kt.lookup(doc, args.kt_key_id)
+        if res["ok"]:
+            res["inclusion_ok"] = kt.verify_inclusion(res)
+        if args.json:
+            print(_json.dumps(res, ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print("== nf evidence revocations trust kt-lookup（" + args.kt_key_id + "）==")
+            if res["ok"]:
+                print("  公钥：" + res["pub"])
+                print("  包含证明：" + ("可离线验证" if res.get("inclusion_ok") else "验证失败"))
+            for issue in res["issues"]:
+                print("  [FAIL] " + issue, file=sys.stderr)
+        return 0 if res["ok"] else 1
+    if sub == "kt-split":
+        try:
+            a = json_doc.load(_rel_out(args.a), dict, what=args.a)
+            b = json_doc.load(_rel_out(args.b), dict, what=args.b)
+        except (OSError, ValueError) as exc:
+            return _machine_fail(args, "目录不可读：" + str(exc), 4)
+        res = kt.split_witness(a, b)
+        if args.json:
+            print(_json.dumps(res, ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print("== nf evidence revocations trust kt-split ==")
+            print("  分叉：" + ("是" if res["split"] else "否"))
+            if res["split"]:
+                print("  提示：" + res.get("note", ""))
+        return 1 if res["split"] else 0
     return 2
 
 
@@ -5622,10 +6384,98 @@ def _cmd_st_validate(args):
 
 
 def _cmd_cognition(args):
-    """nf cognition：行话术语表 / 执行分档（认证 + 逐条逐字核对）。"""
+    """nf cognition：行话术语表 / 执行分档 / **研究计划**（切片 + 检索词 + 方法论路径）。"""
     import json as _json
 
     from core import cognition as cg
+    from core import cognition_plan as cp
+    if getattr(args, "pack_checklist", None):
+        from core import method_pack as mpk
+        try:
+            doc = mpk.checklist(mpk.load_pack(ROOT, str(args.pack_checklist)))
+        except ValueError as exc:
+            print(str(exc), file=sys.stderr)
+            return 2
+        if args.json:
+            print(_json.dumps(doc, ensure_ascii=False, indent=2, sort_keys=True))
+            return 0
+        print("== 方法包清单：" + doc["pack"] + "（" + doc["domain"] + "）==")
+        for it in doc["items"]:
+            print("  " + str(it["step"]) + ". " + it["do"] + " —— " + it["why"])
+        for st in doc["evidence_standards"]:
+            print("  证据（" + st["claim_kind"] + "）：" + " / ".join(st["required"]))
+        if doc.get("runnable"):
+            # 第 144 轮：清单给出「这个域怎么跑」，包不再是纯描述。
+            print("  可跑入口：" + " │ ".join(doc["runnable"]))
+        return 0
+    if getattr(args, "packs_list", False):
+        from core import method_pack as mpk
+        packs = mpk.list_packs(ROOT)
+        if args.json:
+            print(_json.dumps({"kind": "method-packs", "packs": packs},
+                              ensure_ascii=False, indent=2, sort_keys=True))
+            return 0
+        print(f"== nf cognition --packs-list（{len(packs)} 个领域方法包）==")
+        for p in packs:
+            try:
+                full = mpk.load_pack(ROOT, p["id"])
+            except ValueError as exc:
+                print(f"  ✗ {p['id']}：{exc}", file=sys.stderr)
+                continue
+            print(f"  {p['id']} v{p['version']} · {full['domain']}")
+            print(f"      专家动作 {len(full['expert_moves'])} · "
+                  f"证据标准 {len(full['evidence_standards'])}")
+        return 0
+    if getattr(args, "list_methods", False):
+        lib = cp.load_methods(ROOT)
+        print(f"== nf cognition --list-methods（{len(lib['methods'])} 条方法论）==")
+        for m in lib["methods"]:
+            print(f"  {m['id']} · {m['title']}")
+            print(f"      何时用：{m['when']}")
+            print(f"      产出：{m['output']}")
+        return 0
+    if getattr(args, "research_topic", ""):
+        try:
+            methods = ([x.strip() for x in args.methods.split(",") if x.strip()]
+                       if args.methods else None)
+            doc = cp.plan(args.research_topic, depth=args.depth, methods=methods, root=ROOT,
+                          pack_ids=list(getattr(args, "packs", []) or []))
+        except (OSError, ValueError) as exc:
+            return _machine_fail(args, str(exc), 1)
+        if args.out:
+            from core import atomic_write
+            atomic_write.write_text(_rel_out(args.out),
+                                    _json.dumps(doc, ensure_ascii=False, indent=2,
+                                                sort_keys=True) + chr(10))
+        if args.json:
+            print(_json.dumps(doc, ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print(f"== nf cognition --plan（{doc['topic']} · depth {doc['depth']}）==")
+            print(f"  切片 {len(doc['slices'])} · 方法论路径 {len(doc['paths'])}")
+            for sl in doc["slices"]:
+                print(f"\n  [{sl['id']}] {sl['title']}（方法 {','.join(sl['methods'])}）")
+                print(f"    问题：{sl['question']}")
+                print(f"    检索词 zh：{' ｜ '.join(sl['terms']['zh'])}")
+                print(f"    检索词 en：{' ｜ '.join(sl['terms']['en'])}")
+                print(f"    操作股：{' ｜ '.join(sl['terms']['ops'])}")
+                print(f"    要交出的证据：{'；'.join(sl['evidence_owed'])}")
+                print(f"    证伪：{sl['falsifier']}")
+            print("\n  方法论路径：")
+            for pa in doc["paths"]:
+                print(f"    {pa['order']}. {pa['method']} {pa['title']}")
+            if doc.get("domain"):
+                print("\n  领域方法包：" + " + ".join(doc["domain"]["packs"]))
+                for mv in doc["domain"]["expert_moves"]:
+                    maps = ",".join(mv["maps_to"])
+                    print(f"    · {mv['id']} {mv['name']}（{mv['from']}）→ {maps}")
+                for st in doc["domain"]["evidence_standards"]:
+                    print(f"    证据标准[{st['claim_kind']}]：{'；'.join(st['required'][:3])}…")
+                print("    常见错法：" + "；".join(doc["domain"]["common_failures"][:2]))
+            print("\n  台账规则：" + doc["ledger"]["rule"])
+            if args.out:
+                print(f"  已写入：{_rel_display(_rel_out(args.out))}")
+        return 0
+
     part = getattr(args, "part", "") or ""
     fns = {"glossary": cg.verify_glossary, "modes": cg.verify_modes}
     picked = [k for k in fns if not part or k == part]
@@ -5997,7 +6847,10 @@ _PATH_FLAG_DESTS = ("out", "dest", "build_dest", "save_path", "store", "trace", 
                     "experiment", "ballots", "bundle",
                     "policy", "revocations", "anchor", "items", "table", "prev",
                     "label_object", "ir", "sidecar", "decision",
-                    "compile")
+                    "compile",
+                    # 认知工作台 / 桥 / 作业 / Ingress（2026-11-08 新增面）
+                    "claim_file", "cc_result", "commitment", "obligation", "delta",
+                    "receipt", "job_id", "ledger", "ingress_policy", "evidence", "pairs")
 
 
 def _path_writing_issue(args) -> str:
@@ -6051,7 +6904,12 @@ _UTF8_TEXT_DESTS = ("a", "action", "artifact", "b", "baseline", "check", "check_
                     "snapshot",
                     "source", "ssh_allowed_signers", "state", "state_path", "subject",
                     "target", "template", "tier", "trace", "verify",
-                    "injections", "journal", "responses", "experiment", "ballots", "bundle")
+                    "injections", "journal", "responses", "experiment", "ballots", "bundle",
+                    # 认知/桥/作业面读进来的文本件（2026-11-08）
+                    "claim_file", "cc_result", "commitment", "obligation", "delta",
+                    "receipt", "ingress_policy", "evidence", "pairs",
+                    "delta_json", "payload_json", "payload", "witness", "kt_keys",
+                    "research_topic", "sheet", "pairs", "pack_checklist")
 
 
 def _utf8_text_issue(args) -> str:
@@ -7179,12 +8037,6 @@ def _shell_baseline() -> str:
                                                 qb.EXPECTED_PASS)
 
 
-def _untracked_files() -> list[str]:
-    """git 追踪面之外的未跟踪文件（``?? `` 行）——投影按 git ls-files 生成，未跟踪会让它少算。"""
-    from core import repo_face
-    return repo_face.untracked_paths(ROOT)
-
-
 def _cmd_layers(args) -> int:
     """nf layers：抽象阶梯（真源 protocol/LAYERS.json 的投影 + 体检）。"""
     import json
@@ -7196,18 +8048,12 @@ def _cmd_layers(args) -> int:
             rel = lm.write_region(ROOT)
         except ValueError as exc:
             return _machine_fail(args, str(exc), 1)
-        untracked = _untracked_files()
         if args.json:
             print(json.dumps({"kind": "layers-write", "ok": True, "refreshed": rel,
-                              "untracked": untracked[:20],
-                              "note": "生成区真源 protocol/LAYERS.json；untracked 非空时投影"
-                                      "可能少算——先 git add 再重跑"},
+                              "note": "生成区真源 protocol/LAYERS.json"},
                              ensure_ascii=False, indent=2, sort_keys=True))
             return 0
         print("  ✓ 生成区已刷新：%s（真源 protocol/LAYERS.json）" % rel)
-        if untracked:
-            print(f"  [warn] 检测到 {len(untracked)} 个未跟踪文件：投影按 git 追踪面生成，"
-                  f"可能少算；先 git add 再重跑 nf layers --write（例：{untracked[0][:60]}）")
         return 0
 
     doc = lm.load(ROOT)
@@ -8771,6 +9617,7 @@ _COMMAND_HANDLERS = {
     "postmortem": _cmd_postmortem,
     "audit": _cmd_audit,
     "cognition": _cmd_cognition,
+    "cog": _cmd_cog,
     "st-validate": _cmd_st_validate,
     "state-front": _cmd_state_front,
     "diff": _cmd_diff,

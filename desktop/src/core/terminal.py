@@ -109,7 +109,10 @@ CONFIRM_VERBS = (("asset", "add"), ("asset", "rm"), ("asset", "deprecate"),
 #:   `nf shell --session` 上是**读/仓外受控**（shell 那条另有「必须绝对路径且不得落仓库内」的
 #:   硬闸），只有 `nf assemble` 的这两条会**写你自己命名的文件**（可仓库相对 ⇒ 粘贴面能落仓）。
 CONFIRM_FLAG_PAIRS = (("interop", "--all"),
-                       ("assemble", "--trace"), ("assemble", "--session"))
+                       ("assemble", "--trace"), ("assemble", "--session"),
+                       # 2026-11-08：cog claim --sheet 写「证据作业单」文件（与 --out 同型
+                       # 的落点），必须过确认闸；同旗标在 claim-check 上是读作业单，故用组合表
+                       ("cog", "--sheet"))
 #: 会话内不直接执行：长驻/递归/需独占终端的动词 → 给指引
 BLOCKED_IN_SHELL = {
     "shell": "终端内不再开终端（避免递归会话）：请另开一个终端窗口运行 nf shell。",
@@ -321,7 +324,8 @@ FAMILIES: tuple[dict[str, Any], ...] = (
          "语言面（本地化与责任方）",
      "commands": ("decisions", "audit", "attest", "receipts", "handover",
                   "postmortem", "decide", "model", "review", "workloop",
-                  "approve", "transparency", "evidence", "label", "design", "locales")},
+                  "approve", "transparency", "evidence", "label", "design", "locales",
+                  "cog")},
     {"id": "integrate", "name": "服务与集成",
      "summary": "MCP 服务面、编辑器面、跑分台、端点契约、互操作导出、指令档路由、事件背书、状态前置"
          "、世界模型、模块工具面",
@@ -1217,11 +1221,7 @@ TERMINAL_BASELINE: tuple[dict[str, Any], ...] = (
      "argv": ("shell", "--session", BASELINE_TMP + "/shell_session.json",
               "--no-history", "--no-banner"),
      "stdin": "/set width=120\nquit\n",
-     "expect": "width = 120", "expect_file": BASELINE_TMP + "/shell_session.json",
-     # 2026-11-09 实测（cross-platform Windows CI）：本行 3 次取最小仍 **422.5 ms** > 默认 300 ms
-     # → Windows 假红（该行要落 session json + 读回，慢盘/AV 下 IO 成本高；Linux 实测 ~30 ms）。
-     # 行级预算放宽到 900 ms，仍能拦「数量级回归」（>3× 会红）。
-     "max_ms": 900},
+     "expect": "width = 120", "expect_file": BASELINE_TMP + "/shell_session.json"},
     {"id": "menu-family-crosslink", "name": "菜单↔能力族互标",
      "argv": ("shell", "--exec", "/menu", "--no-banner"), "expect": "未在此列的族"},
     {"id": "form-dry-run", "name": "写盘表单（dry-run 只组装不执行）",

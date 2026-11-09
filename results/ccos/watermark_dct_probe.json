@@ -1,0 +1,178 @@
+{
+  "conclusion": "绝对量化 QIM 扛 q≥85、不扛 q≤70；关系嵌入（系数幅值比较）扛 q≥70，代价是 PSNR 从 ~41 降到 ~35 dB——鲁棒性来自**相对关系**而非绝对量化，与论文里 SVD 奇异值稳定的思路一致",
+  "methods": [
+    {
+      "attacks": [
+        {
+          "ber": 0.0,
+          "desc": "JPEG q=95",
+          "id": "jpeg_95",
+          "ok": true,
+          "payload_exact": true
+        },
+        {
+          "ber": 0.0,
+          "desc": "JPEG q=85",
+          "id": "jpeg_85",
+          "ok": true,
+          "payload_exact": true
+        },
+        {
+          "ber": 0.486111,
+          "desc": "JPEG q=70",
+          "id": "jpeg_70",
+          "ok": false,
+          "payload_exact": false
+        },
+        {
+          "ber": 0.486111,
+          "desc": "JPEG q=50",
+          "id": "jpeg_50",
+          "ok": false,
+          "payload_exact": false
+        },
+        {
+          "ber": 0.0,
+          "desc": "高斯噪声 σ=1",
+          "id": "noise_1",
+          "ok": true,
+          "payload_exact": true
+        },
+        {
+          "ber": 0.513889,
+          "desc": "缩放 0.9×",
+          "id": "scale_0.9",
+          "ok": false,
+          "payload_exact": false
+        },
+        {
+          "ber": 0.486111,
+          "desc": "模拟拍屏",
+          "id": "screenshot_sim",
+          "ok": false,
+          "payload_exact": false
+        }
+      ],
+      "clean": {
+        "ok": true,
+        "payload_exact": true,
+        "psnr_db": 41.24
+      },
+      "info": {
+        "assigned": 576,
+        "bits": 72,
+        "blocks": 1024,
+        "method": "qim",
+        "positions": [
+          [
+            4,
+            5
+          ],
+          [
+            5,
+            4
+          ]
+        ],
+        "repeat": 8,
+        "step": 48.0
+      },
+      "method": "qim"
+    },
+    {
+      "attacks": [
+        {
+          "ber": 0.0,
+          "desc": "JPEG q=95",
+          "id": "jpeg_95",
+          "ok": true,
+          "payload_exact": true
+        },
+        {
+          "ber": 0.0,
+          "desc": "JPEG q=85",
+          "id": "jpeg_85",
+          "ok": true,
+          "payload_exact": true
+        },
+        {
+          "ber": 0.0,
+          "desc": "JPEG q=70",
+          "id": "jpeg_70",
+          "ok": true,
+          "payload_exact": true
+        },
+        {
+          "ber": 0.0,
+          "desc": "JPEG q=50",
+          "id": "jpeg_50",
+          "ok": true,
+          "payload_exact": true
+        },
+        {
+          "ber": 0.0,
+          "desc": "高斯噪声 σ=1",
+          "id": "noise_1",
+          "ok": true,
+          "payload_exact": true
+        },
+        {
+          "ber": 0.444444,
+          "desc": "缩放 0.9×",
+          "id": "scale_0.9",
+          "ok": false,
+          "payload_exact": false
+        },
+        {
+          "ber": 0.513889,
+          "desc": "模拟拍屏",
+          "id": "screenshot_sim",
+          "ok": false,
+          "payload_exact": false
+        }
+      ],
+      "clean": {
+        "ok": true,
+        "payload_exact": true,
+        "psnr_db": 34.87
+      },
+      "info": {
+        "assigned": 576,
+        "bits": 72,
+        "blocks": 1024,
+        "method": "rel",
+        "positions": [
+          [
+            4,
+            5
+          ],
+          [
+            5,
+            4
+          ]
+        ],
+        "repeat": 8,
+        "step": 24.0
+      },
+      "method": "rel"
+    }
+  ],
+  "payload": "NFKT1",
+  "repeat": 8,
+  "schema": "nf-watermark-dct-probe/1",
+  "seed": 20261108,
+  "size": 256,
+  "verdicts": {
+    "qim": {
+      "jpeg_50_ok": false,
+      "jpeg_70_ok": false,
+      "noise_1_ok": true,
+      "psnr_db": 41.24
+    },
+    "rel": {
+      "jpeg_50_ok": true,
+      "jpeg_70_ok": true,
+      "noise_1_ok": true,
+      "psnr_db": 34.87
+    }
+  }
+}

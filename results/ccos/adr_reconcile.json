@@ -1,0 +1,130 @@
+{
+  "adrs": [
+    {
+      "id": "ADR-001",
+      "status": "current",
+      "topic": "architecture-core"
+    },
+    {
+      "id": "ADR-002",
+      "status": "current",
+      "topic": "abi"
+    },
+    {
+      "id": "ADR-003",
+      "status": "current",
+      "topic": "docs"
+    },
+    {
+      "id": "ADR-004",
+      "status": "current",
+      "topic": "reasoning-face"
+    }
+  ],
+  "counts": {
+    "adrs": 4,
+    "current_docs": 10,
+    "docs": 16
+  },
+  "docs": [
+    {
+      "adr": "ADR-001",
+      "name": "CCOS-双核架构-v1",
+      "status": "current",
+      "superseded_by": null
+    },
+    {
+      "adr": null,
+      "name": "CCOS-核心架构-v1",
+      "status": "superseded",
+      "superseded_by": "CCOS-双核架构-v1"
+    },
+    {
+      "adr": "ADR-002",
+      "name": "CCOS-内核与系统方案",
+      "status": "current",
+      "superseded_by": null
+    },
+    {
+      "adr": "ADR-001",
+      "name": "CCOS-认知工作台-深度重构计划-v1",
+      "status": "current",
+      "superseded_by": null
+    },
+    {
+      "adr": "ADR-001",
+      "name": "NF-任务书-认知原子语法-v1",
+      "status": "current",
+      "superseded_by": null
+    },
+    {
+      "adr": "ADR-001",
+      "name": "NF-元算子与原子双层设计-v1",
+      "status": "current",
+      "superseded_by": null
+    },
+    {
+      "adr": "ADR-003",
+      "name": "NF-盲区审计协议-v1",
+      "status": "evidence",
+      "superseded_by": null
+    },
+    {
+      "adr": "ADR-003",
+      "name": "CCOS-中立裁判路线",
+      "status": "current",
+      "superseded_by": null
+    },
+    {
+      "adr": null,
+      "name": "NF-CCOS-整合方案",
+      "status": "superseded",
+      "superseded_by": "NF-CCOS-整合方案(1)"
+    },
+    {
+      "adr": "ADR-002",
+      "name": "NF-CCOS-整合方案(1)",
+      "status": "current",
+      "superseded_by": null
+    },
+    {
+      "adr": "ADR-002",
+      "name": "CCOS-OS语义补全",
+      "status": "draft",
+      "superseded_by": null
+    },
+    {
+      "adr": "ADR-003",
+      "name": "CCOS-分层扩充",
+      "status": "current",
+      "superseded_by": null
+    },
+    {
+      "adr": "ADR-002",
+      "name": "CCOS-架构愿景",
+      "status": "draft",
+      "superseded_by": null
+    },
+    {
+      "adr": "ADR-003",
+      "name": "CCOS-扩展层全解",
+      "status": "draft",
+      "superseded_by": null
+    },
+    {
+      "adr": "ADR-003",
+      "name": "CCOS-网关与路由",
+      "status": "current",
+      "superseded_by": null
+    },
+    {
+      "adr": "ADR-003",
+      "name": "CCOS-连接器-MCP增强",
+      "status": "current",
+      "superseded_by": null
+    }
+  ],
+  "findings": [],
+  "ok": true,
+  "schema": "nf-adr-report/1"
+}

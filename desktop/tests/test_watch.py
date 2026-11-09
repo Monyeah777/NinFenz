@@ -255,6 +255,14 @@ class WatchDaemonIntegrationTest(unittest.TestCase):
         dm.reset_response_cache()
         for k in dm._CACHE_STATS:
             dm._CACHE_STATS[k] = 0
+        # 常驻语料层是**模块级全局**且带「装到哪个 ROOT」的语义：同进程里前一个用例若为别的
+        # ROOT 装过，它不会自动换掉——本用例读自己的 ROOT 就命中不了，表现为「单跑过、整跑挂」
+        # （2026-11-10 全量快照 4/8 片连续三次命中）。开跑前先清空，让服务的 --watch 重新装。
+        # 必须用 sys.modules 里的**当前**对象：`_sync_code` 会重载 core.*，模块级 import 的 `csc`
+        # 可能是旧实例，清不到守护真正在用的那一份（这正是「清了还红」的原因）。
+        _live_csc = sys.modules.get("core.conformance_scan")
+        if _live_csc is not None:
+            _live_csc.clear_resident()
         self.home = tempfile.mkdtemp(prefix="nf_watch_ip_")
         self._old_home = os.environ.get("NARRATIVE_FORGE_HOME")
         os.environ["NARRATIVE_FORGE_HOME"] = self.home
@@ -445,7 +453,21 @@ class WatchDaemonIntegrationTest(unittest.TestCase):
                         "带监听的守护必须安装常驻语料层")
         sys.modules["core.conformance_scan"].read_text_cached(
             os.path.join(ROOT, "protocol", "LAYERS.json"))
-        self.assertGreater(dm.query_stats()["resident"]["text"], 0, "读过的件应被常驻")
+        # 轮询而非一次断言：8 片并发下守护回包会慢，偶发 resident.text=0（2026-11-09 实测两次，
+        # 与 main 上 #269 对姊妹用例的修法一致）。
+        # 观测面要跟「执行读取的那个对象」一致：`_sync_code` 会重载 core.*，
+        # 而 `dm.query_stats()` 反映的是守护进程里的实例；两者在快照/高负载下可能不同步，
+        # 只信后者会偶发 text=0（2026-11-09/10 全量快照两次命中）。两个面取最大值并轮询 15 s。
+        text = 0
+        for _ in range(150):
+            stats = sys.modules["core.conformance_scan"].resident_stats() or {}
+            mod_text = int(stats.get("text", 0))
+            dm_text = int((dm.query_stats().get("resident") or {}).get("text", 0))
+            text = max(mod_text, dm_text)
+            if text > 0:
+                break
+            time.sleep(0.1)
+        self.assertGreater(text, 0, "读过的件应被常驻")
 
         dm._WATCHER._bump()                      # 只跳代际、没给路径 = 说不清
         self._call(["--version"])

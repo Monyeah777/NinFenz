@@ -1,6 +1,7 @@
 # 可信时间戳 v0（RFC 3161 · G3 的可落地半边）
 
 > **状态**：已实装（2026-11-07）· 依赖 `openssl`（`ts` 子命令）与 `curl`（申请阶段）
+> **实现位置**：`desktop/src/core/timestamp.py` · 判据 `desktop/tests/test_timestamp.py`
 
 ## 解决什么
 

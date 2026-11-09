@@ -70,10 +70,14 @@ const DOMAIN_TERMS: [&str; 28] = [
 const HARD_ALLOW: [&str; 1] = ["yaml"];
 
 /// 真源 `SOFT_IMPORTS`：第三方可选依赖（须 try/except ImportError 守卫）。值只用于消息。
-const SOFT_IMPORTS: [(&str, &str); 5] = [
+const SOFT_IMPORTS: [(&str, &str); 6] = [
+    (
+        "numpy",
+        "水印鲁棒性基准（watermark_bench）里按像素构造噪声/亮度攻击；软导入 + 缺依赖给修复指引",
+    ),
     (
         "PIL",
-        "标注水印层（label_watermark）读写 PNG 位图；软导入 + 缺依赖给修复指引，文本载体保持纯标准库",
+        "标注水印层（label_watermark）读写 PNG 位图；软导入 + 缺依赖给修复指引",
     ),
     (
         "jsonschema",
@@ -130,8 +134,11 @@ const METHOD_SINKS: [(&str, &str); 1] = [(
 /// 真源 `SINK_ALLOW`（键 = `<文件基名>:<调用名>`；放行须可审计）。值不参与判据，只作留档。
 /// 顺序与真源 `purity_scan.SINK_ALLOW` 逐条同序（2026-10-19：补 `scratch.py` 的两条豁免，
 /// 该模块是 2026-10-19 新增的临时区单一裁决点，Python 侧已登记「探针自清 / 整目录回收」）。
-const SINK_ALLOW: [(&str, &str); 15] = [
+const SINK_ALLOW: [(&str, &str); 16] = [
     ("rust_engine.py:unlink", ""),
+    // 快照互斥锁自清：只删 .worktrees/gate-snap/.snapshot.lock（本模块自己写的锁），
+    // 落点由 snapshot_base 单源决定、删前核对 pid/年龄；与真源 `purity_scan.SINK_ALLOW` 同步。
+    ("release_conclusion.py:unlink", ""),
     ("release_conclusion.py:shutil.rmtree", ""),
     ("regression_score.py:__import__", ""),
     ("e2e_desktop_headless.py:shutil.rmtree", ""),

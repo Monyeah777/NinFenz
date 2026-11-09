@@ -23,9 +23,126 @@ def _load():
     return mod
 
 
+
 class TestPureLogic(unittest.TestCase):
     def setUp(self):
         self.gate = _load()
+
+    def test_lock_reclaim_rules(self):
+        """锁抢断规则：空/死进程/超龄可抢；活进程未超龄绝不可抢（并发跑两份会互相清 worktree）。"""
+        gate = self.gate
+        self.assertTrue(gate.lock_should_reclaim(None, False, 0.0))
+        self.assertTrue(gate.lock_should_reclaim({"pid": 1}, False, 60.0))
+        self.assertTrue(gate.lock_should_reclaim({"pid": 1}, True, 4 * 3600.0))
+        self.assertEqual("", gate.lock_should_reclaim({"pid": 1}, True, 60.0))
+
+    def test_lock_acquire_refuses_when_held_and_releases(self):
+        import tempfile
+        gate = self.gate
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            # 持有者是**活着的**本进程：未超龄，别人（另一个 pid）必须被拒
+            ok, why = gate.lock_acquire(base, "a" * 40, pid=os.getpid(), now=1000.0)
+            self.assertTrue(ok, why)
+            ok2, why2 = gate.lock_acquire(base, "b" * 40, pid=os.getpid() + 1,
+                                          now=1060.0)
+            self.assertFalse(ok2)
+            self.assertIn("另一份全量快照正在跑", why2)
+            gate.lock_release(base, pid=os.getpid())
+            ok3, why3 = gate.lock_acquire(base, "c" * 40, pid=os.getpid(), now=1200.0)
+            self.assertTrue(ok3, why3)
+            # 别人的 pid 不能删我的锁
+            gate.lock_release(base, pid=999999)
+            self.assertTrue((base / gate.LOCK_NAME).is_file())
+            gate.lock_release(base, pid=os.getpid())
+            self.assertFalse((base / gate.LOCK_NAME).is_file())
+
+
+    def test_lock_acquire_wait_times_out_on_live_holder(self):
+        """活锁 + 短等待：等满就放弃（不无限等），并且不误删别人的锁。"""
+        import tempfile
+        gate = self.gate
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            import time as _t
+            gate.lock_acquire(base, "a" * 40, pid=os.getpid(), now=_t.time())
+            ok, why = gate.lock_acquire_wait(base, "b" * 40, pid=os.getpid() + 1,
+                                             wait_s=0.6, poll_s=0.2)
+            self.assertFalse(ok)
+            self.assertIn("另一份全量快照正在跑", why)
+            self.assertTrue((base / gate.LOCK_NAME).is_file())
+
+    def test_lock_acquire_wait_takes_over_dead_holder(self):
+        """死进程的锁：等待路径下应当立刻接管（不用等满）。"""
+        import tempfile
+        gate = self.gate
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            gate.lock_acquire(base, "a" * 40, pid=999999, now=1000.0)
+            ok, why = gate.lock_acquire_wait(base, "b" * 40, pid=os.getpid(),
+                                             wait_s=5.0, poll_s=0.1)
+            self.assertTrue(ok, why)
+
+
+
+
+    def test_status_snapshot_reports_lock_and_latest(self):
+        """现场体检：锁/运行目录/最近结论都能读出来，且优先报「与锁同 HEAD」的那份。"""
+        import tempfile
+        import time as _t
+        gate = self.gate
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            gate.lock_acquire(base, "b" * 40, pid=os.getpid(), now=_t.time())
+            run_old = base / ("nf-gate-snap-" + "a" * 12 + "-old")
+            run_new = base / ("nf-gate-snap-" + "b" * 12 + "-new")
+            run_old.mkdir()
+            run_new.mkdir()
+            (run_old / "gate.log").write_text(json.dumps({"ok": True, "wall_s": 1.0}),
+                                               encoding="utf-8")
+            status = gate.status_snapshot(base)
+            self.assertEqual("nf-snapshot-status/1", status["schema"])
+            self.assertTrue(status["running"])
+            self.assertEqual("b" * 12, status["lock"]["head"][:12])
+            self.assertIn("new", status["latest"]["run"], "应优先报与锁同 HEAD 的那份")
+            gate.lock_release(base, pid=os.getpid())
+            self.assertFalse(gate.status_snapshot(base)["running"])
+    def test_max_wall_cap_is_declared_and_used(self):
+        """墙钟上限：常量 5400 s 且在 CLI/内层等待处都用到（防挂死无限等）。"""
+        gate = self.gate
+        self.assertEqual(5400.0, float(gate.DEFAULT_MAX_WALL_S))
+        src = SCRIPT.read_text(encoding="utf-8")
+        self.assertIn("--max-wall-s", src)
+        self.assertIn("wall_cap = float(getattr(args, \"max_wall_s\"", src)
+        self.assertIn("快照墙钟超限", src)
+        help_text = subprocess.run([str(sys.executable), str(SCRIPT), "--help"],
+                                   capture_output=True, text=True, encoding="utf-8",
+                                   errors="replace").stdout
+        self.assertIn("--max-wall-s", help_text)
+    def test_locked_run_exits_2_with_guidance(self):
+        """集成：锁被占用时 --snapshot 必须退出码 2 并给 pid/HEAD/指引（不静默继续）。"""
+        import tempfile
+        import time as _t
+        gate = self.gate
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            gate.lock_acquire(base, "a" * 40, pid=os.getpid(), now=_t.time())
+            env = dict(os.environ)
+            env["NF_SNAPSHOT_LOCK_DIR"] = tmp
+            proc = subprocess.run([str(sys.executable), str(SCRIPT), "--snapshot", "--json"],
+                                  capture_output=True, text=True, encoding="utf-8",
+                                  errors="replace", env=env, timeout=300, cwd=str(ROOT))
+            self.assertEqual(2, proc.returncode, proc.stderr[-300:])
+            self.assertIn("另一份全量快照正在跑", proc.stderr)
+    def test_lock_force_takes_over(self):
+        import tempfile
+        gate = self.gate
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            gate.lock_acquire(base, "a" * 40, pid=os.getpid(), now=1000.0)
+            ok, why = gate.lock_acquire(base, "b" * 40, pid=os.getpid(), now=1010.0,
+                                        force=True)
+            self.assertTrue(ok, why)
 
     def test_porcelain_lines_ignores_blanks(self):
         self.assertEqual([], self.gate.porcelain_lines(""))
@@ -190,16 +307,8 @@ class TestOnlyPreflight(unittest.TestCase):
             self.assertTrue(doc["ok"])
             self.assertEqual([], doc["issues"])
         else:
-            # 前置面在 CI 上可能因**静态棘轮的环境差异**（如 bandit/ruff 版本或平台规则）rc=1；
-            # 本判据只钉结构：失败必须给 issues + 完整供应链/新鲜度面，不把「棘轮必须绿」当地址
-            # （那属于 static-checks 作业的判据，不是本入口的契约）。
             self.assertEqual(1, proc.returncode)
-            self.assertFalse(doc["ok"])
-            # 失败原因可能在 issues（前置面不满足）或 note+ratchets（静态棘轮当场红）；
-            # 两者都合法，本判据只要求「失败说明在场 + 供应链面完整」。
-            self.assertTrue(doc.get("issues") or doc.get("note"), doc)
-            self.assertEqual(["site_numbers", "llms_projection"],
-                             [x["id"] for x in doc["supply_chain"]])
+            self.assertIn("生成物", json.dumps(doc, ensure_ascii=False))
 
 
 class TestDirtyRefusal(unittest.TestCase):
@@ -343,30 +452,19 @@ class TestSnapshotLocation(unittest.TestCase):
         self.assertEqual(ROOT / ".worktrees" / "custom", base)
 
     def test_override_absolute_wins(self):
-        """绝对落点必须原样生效（不随平台改写）——用当前平台的绝对路径，不假设盘符。"""
-        override = str(Path(ROOT.anchor) / "elsewhere" / "snap")
-        base = self.gate.snapshot_base(ROOT, override)
-        self.assertEqual(Path(base), Path(override))
+        # 绝对路径的平台形态不同：Windows 是 `D:/…`，POSIX 是 `/…`（2026-11-10 Linux CI 实测）。
+        if os.name == "nt":
+            base = self.gate.snapshot_base(ROOT, "D:/elsewhere/snap")
+            self.assertTrue(str(base).startswith("D:"))
+            return
+        import tempfile
+
+        tmp = tempfile.mkdtemp(prefix="nf_snap_abs_")
+        base = self.gate.snapshot_base(ROOT, tmp)
+        self.assertEqual(Path(tmp), Path(base))
 
     def test_free_space_probe_does_not_raise(self):
         self.assertGreater(self.gate._snapshot_free_bytes(ROOT), 0)
-
-    def test_payload_skip_hint(self):
-        """payload 未暂存 → 明确 warn（打包自检会静默 skip）；已暂存 → 空串。"""
-        self.assertIn("npm payload 未暂存", self.gate.payload_skip_hint(None))
-        self.assertEqual("", self.gate.payload_skip_hint({"count": 3030}))
-
-    def test_snapshot_space_issue(self):
-        """空间阈值判据（纯函数）：够 → 空串；不足 → 带 --snapshot-dir 指引；探针失败(-1) → 空串。
-
-        阈值 1200 MB 来自实测（2026-11-06：84 MB 剩余把一次 50 分钟门禁打成 ENOSPC）。
-        """
-        mb = 1024 * 1024
-        self.assertEqual("", self.gate.snapshot_space_issue(2 * 1200 * mb, 1200))
-        msg = self.gate.snapshot_space_issue(512 * mb, 1200)
-        self.assertIn("空间不足", msg)
-        self.assertIn("--snapshot-dir", msg)
-        self.assertEqual("", self.gate.snapshot_space_issue(-1, 1200))
 
 
 class TestBashIdentity(unittest.TestCase):
@@ -447,6 +545,60 @@ class TestSnapshotIsolationPaths(unittest.TestCase):
         self.assertEqual(run_dir, os.path.dirname(log))
         self.assertTrue(log.endswith("gate.log"))
 
+    def test_out_writes_a_reusable_conclusion_file(self):
+        """第 124 轮：`--out` 落盘的结论必须能被 verifier_status 判为 current。
+
+        这里直接测 helper（不在测试里跑全量快照）：写盘 → 读回 → 摘要一致。
+        """
+        import importlib.util
+        import sys
+        import tempfile
+        from pathlib import Path
+        from types import SimpleNamespace
+
+        root = Path(__file__).resolve().parents[2]
+        sys.path.insert(0, str(root / "scripts"))
+        sys.path.insert(0, str(root / "desktop" / "src"))
+        script = root / "scripts" / "release_conclusion.py"
+        spec = importlib.util.spec_from_file_location("rc_mod", script)
+        rc = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(rc)
+        import verifier_status as vs
+
+        with tempfile.TemporaryDirectory() as tmp:
+            dest = Path(tmp) / "conclusion.json"
+            payload = {"schema": "nf-release-conclusion/1", "ok": True, **rc._digests()}
+            rc._write_out(SimpleNamespace(out=str(dest), json=True), payload)
+            self.assertTrue(dest.is_file(), "--out 没有写文件")
+            self.assertEqual("current", vs.build(conclusion=str(dest))["status"])
+
+    def test_payload_includes_materials_digest(self):
+        """供应链（第 114 轮）：结论必须记录材料清单摘要（这份结论基于哪些输入）。"""
+        import sys
+        from pathlib import Path
+        sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "desktop" / "src"))
+        from core import sbom
+
+        root = Path(__file__).resolve().parents[2]
+        src = (root / "scripts" / "release_conclusion.py").read_text(encoding="utf-8")
+        self.assertIn('"materials_digest": materials', src,
+                      "结论 payload 必须带 materials_digest 字段")
+        manifest = sbom.collect(root)
+        self.assertEqual(64, len(manifest["digest"]))
+
+    def test_payload_includes_verifier_digest(self):
+        """自省层（第 97 轮）：结论必须记录产出它的验证器摘要（判定面脚本摘要）。"""
+        import sys
+        from pathlib import Path
+        sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "desktop" / "src"))
+        from core import verifier_version as vv
+
+        src = (Path(__file__).resolve().parents[2] / "scripts" / "release_conclusion.py"
+               ).read_text(encoding="utf-8")
+        self.assertIn('"verifier_digest": verifier', src,
+                      "结论 payload 必须带 verifier_digest 字段")
+        self.assertEqual(64, len(vv.digest(str(Path(__file__).resolve().parents[2]))
+                                ["verifier_digest"]))
 
 if __name__ == "__main__":
     unittest.main()

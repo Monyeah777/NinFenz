@@ -6,8 +6,8 @@ scope: 作者指令「删除 NF 中的 GUI，且为 NF 构建一个终端（CLI 
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/terminal.py:69c2d9ced679e439c6ca440fc949d02f70dc067debdd9b520f96a2e4de156833
-  - scripts/nf.py:83a75a4fac82461d56b03147eff04b420b8aad0ed6db9fef6e695717dcf7b6a2
+  - desktop/src/core/terminal.py:9a86928171c71f4a2d3d324508fdafccb60fd7cc8423d52197185214a40ea30f
+  - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
   - scripts/nf:406c221f9f16fb6e318e230b0b0120e3a6d3c9231d57f66285e0e4615e18ca91
   - scripts/nf.cmd:d1e7ea3a9e99c0822102884cddafe1cdf3893d9b75d19abebe7a8d2a8abeec5a
@@ -19,27 +19,59 @@ subjects:
   - protocol/CONFORMANCE.md:006b56748b6daaf2419be40a65247d90efd6291e87ccd61c6527ed1526b6b4e4
 
 ---
-> 重审（2026-11-09）：L3 门禁事实
+> 重审（2026-11-09）：冻结链
 
-> 重审（2026-11-09）：L3 actions 版本
+> 重审（2026-11-09）：方法包声明可跑入口 runnable，清单与文档共用（含入口存在性判据）
 
-> 重审（2026-11-09）：恢复 CodeQL 扫描
+> 重审（2026-11-09）：证人核对接入生产路径：session.step(root=) + CLI 传 ROOT
 
-> 重审（2026-11-09）：session-persist 预算 Windows 放宽
+> 重审（2026-11-09）：快照25 两处红：--pack-checklist 进编码闸 + 矩阵判据支持裸模块名
 
-> 重审（2026-11-08）：L3 记录分支保护事实
+> 重审（2026-11-09）：方法包可执行化：checklist 投影 + nf cognition --pack-checklist
 
-> 重审（2026-11-08）：新增 npm-package-check workflow
+> 重审（2026-11-08）：快照20 红修复：--pairs 入闸/json_doc/分组表接入探针/耦合重算
 
-> 重审（2026-11-08）：L3_FROZEN 现状同步（verify v2.30 + 当前 CI 清单）
+> 重审（2026-11-08）：口头置信触发策略（触发器非证据）+ CLI --threshold
 
-> 重审（2026-11-08）：task-35c：git status 收敛到 repo_face.untracked_paths
+> 重审（2026-11-08）：calibrate 文案收口
 
-> 重审（2026-11-08）：task-35：nf.py 注释修正（nosec/理由）
+> 重审（2026-11-08）：cog calibrate CLI（可靠性表出口）
 
-> 重审（2026-11-08）：task-35 投影少算防护
+> 重审（2026-11-08）：Ingress 启动自检（四道闸探针，非空转判据）
 
-> 重审（2026-11-07）：合并基线补齐：向量生成器 subject 字段 + 脚本原子写/stdio + 命令树拆组
+> 重审（2026-11-08）：快照锁：json_doc/atomic_write/sink 登记/文档计数/编码闸门
+
+> 重审（2026-11-08）：--sheet 入确认闸（(cog, --sheet)）
+
+> 重审（2026-11-08）：claim-check 直吃作业单（免手抄 evidence）
+
+> 重审（2026-11-08）：主张→证据作业单（每个 required 一条 unknown 槽）
+
+> 重审（2026-11-08）：快照红修复：job 描述/面信封/权重/耦合面
+
+> 重审（2026-11-08）：全量门禁收口：json_doc/atomic_write/面判别键/dead-code/静默跳过/路径旗标/ingress 接线
+
+> 重审（2026-11-08）：terminal 族登记 cog + 终端投影刷新 + CRLF 归一
+
+> 重审（2026-11-08）：K1 作业账本 + K4 事件流 + K8 启动自检（P6 第二件）
+
+> 重审（2026-11-08）：双核桥（commitment + 回灌 + 闭环）
+
+> 重审（2026-11-08）：判据注册表 + 主张编译（证据义务清单/三态核对）
+
+> 重审（2026-11-08）：元算子层（11 ops + 触发引擎 + 双 trace + 反仪式化）
+
+> 重审（2026-11-08）：认知工作台 L0（discourse/15 moves/records/replay + nf cog）
+
+> 重审（2026-11-08）：密钥透明目录 v0（版本根/追加链/包含证明/分叉见证）
+
+> 重审（2026-11-07）：方法包 v0 收尾（风格/度量重冻）
+
+> 重审（2026-11-07）：方法包 v0（3 个领域包 + 组合 + 研究计划接线）
+
+> 重审（2026-11-07）：认知核研究层：方法库 + 切片计划器 + CLI（切片检索词/方法论路径/证据台账）
+
+> 重审（2026-11-07）：命令树拆分（production 321→117 行 + 新组 evidence_face 207 行）
 
 > 重审（2026-11-07）：门禁修：silent-skip 理由 / 两个文本参数登记 / --mode 复核
 

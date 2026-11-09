@@ -1,0 +1,268 @@
+{
+  "atoms": [
+    {
+      "composed_of": [],
+      "id": "k.represent",
+      "name": "表征",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "k.partition",
+      "name": "划分",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "k.relate",
+      "name": "关联",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "k.abstract",
+      "name": "抽象",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "k.define",
+      "name": "定义",
+      "status": "active"
+    },
+    {
+      "composed_of": [
+        "k.define",
+        "k.classify"
+      ],
+      "id": "k.instantiate",
+      "name": "实例化",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "k.classify",
+      "name": "分类",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "k.quantify",
+      "name": "量化",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "k.criterion",
+      "name": "判据设定",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "k.standard",
+      "name": "标准选择",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "m.observe",
+      "name": "观察",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "m.compare",
+      "name": "比较",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "m.check",
+      "name": "核验",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "m.estimate",
+      "name": "置信估计",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "m.detect",
+      "name": "异常检测",
+      "status": "active"
+    },
+    {
+      "composed_of": [
+        "m.observe",
+        "m.check"
+      ],
+      "id": "m.trace",
+      "name": "溯源",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "c.select",
+      "name": "选择",
+      "status": "active"
+    },
+    {
+      "composed_of": [
+        "c.select",
+        "c.allocate"
+      ],
+      "id": "c.sequence",
+      "name": "排序",
+      "status": "active"
+    },
+    {
+      "composed_of": [
+        "c.select",
+        "m.estimate"
+      ],
+      "id": "c.allocate",
+      "name": "分配",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "c.switch",
+      "name": "切换",
+      "status": "active"
+    },
+    {
+      "composed_of": [
+        "m.detect",
+        "c.switch"
+      ],
+      "id": "c.stop",
+      "name": "停止/继续",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "e.verify",
+      "name": "验证",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "e.falsify",
+      "name": "证伪",
+      "status": "active"
+    },
+    {
+      "composed_of": [
+        "e.verify",
+        "e.falsify",
+        "k.criterion"
+      ],
+      "id": "e.adjudicate",
+      "name": "裁决",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "e.audit",
+      "name": "审计",
+      "status": "active"
+    },
+    {
+      "composed_of": [
+        "m.estimate",
+        "e.verify",
+        "m.compare"
+      ],
+      "id": "e.calibrate",
+      "name": "校准",
+      "status": "active"
+    },
+    {
+      "composed_of": [
+        "m.observe",
+        "m.check",
+        "e.verify"
+      ],
+      "id": "e.benchmark",
+      "name": "基准对照",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "i.merge",
+      "name": "合并",
+      "status": "active"
+    },
+    {
+      "composed_of": [
+        "m.compare",
+        "e.adjudicate",
+        "i.merge"
+      ],
+      "id": "i.reconcile",
+      "name": "冲突消解",
+      "status": "active"
+    },
+    {
+      "composed_of": [
+        "k.partition",
+        "m.compare",
+        "i.merge"
+      ],
+      "id": "i.cluster",
+      "name": "聚类",
+      "status": "active"
+    },
+    {
+      "composed_of": [
+        "k.partition",
+        "k.classify",
+        "i.compose"
+      ],
+      "id": "i.hierarchy",
+      "name": "层级化",
+      "status": "active"
+    },
+    {
+      "composed_of": [
+        "k.partition",
+        "k.relate",
+        "i.merge"
+      ],
+      "id": "i.compose",
+      "name": "组合",
+      "status": "active"
+    },
+    {
+      "composed_of": [
+        "k.abstract",
+        "k.instantiate",
+        "k.relate"
+      ],
+      "id": "i.transfer",
+      "name": "迁移",
+      "status": "active"
+    }
+  ],
+  "catalog": {
+    "atom_debt": 0,
+    "count": 33,
+    "pack_references": 23,
+    "schema": "nf/atom-catalog/2"
+  },
+  "invariants": {
+    "counts": {
+      "atoms": 33,
+      "composed_of_nonempty": 13,
+      "dead": 0,
+      "violations": 0
+    },
+    "ok": true,
+    "schema": "nf/atom-invariants/1",
+    "violations": [],
+    "warnings": []
+  },
+  "schema": "nf-atom-invariants-report/1"
+}

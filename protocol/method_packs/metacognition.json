@@ -1,0 +1,109 @@
+{
+  "schema": "nf-method-pack/1",
+  "id": "metacognition",
+  "version": "1.0.0",
+  "domain": "cognition/metacognition",
+  "note": "机制来源：LLM 元认知综述 arXiv 2607.11881（读正文分类段）：元认知知识（陈述/程序/条件）× 监控 × 控制；度量=敏感度(sensitivity)与校准(calibration)。本包把这些抽象为专家动作与证据标准，**不引入内部质量分**。",
+  "expert_moves": [
+    {
+      "id": "MC-1",
+      "name": "区分知道/会做/何时用",
+      "maps_to": [
+        "k.classify",
+        "k.criterion"
+      ],
+      "why": "陈述性知识（是什么）、程序性知识（怎么做）、条件性知识（何时/为何用）三者缺一，都会在边界处崩",
+      "frame_delta_hint": {
+        "kind": "question_restated"
+      }
+    },
+    {
+      "id": "MC-2",
+      "name": "监控-控制分离记账",
+      "maps_to": [
+        "m.observe",
+        "c.select"
+      ],
+      "why": "监控产出判断（不确定性/进度），控制执行选择（继续/换/停）；混在一起就无法定位错在判断还是执行",
+      "frame_delta_hint": {
+        "kind": "tension_added",
+        "note": "监控信号 vs 控制动作"
+      }
+    },
+    {
+      "id": "MC-3",
+      "name": "校准而非自信",
+      "maps_to": [
+        "e.calibrate",
+        "k.quantify"
+      ],
+      "why": "要的是「置信度能否区分对错」（校准/敏感度），不是「说得更肯定」",
+      "frame_delta_hint": {
+        "kind": "evidence_standard"
+      }
+    },
+    {
+      "id": "MC-4",
+      "name": "策略选择留痕",
+      "maps_to": [
+        "c.select",
+        "c.switch",
+        "m.trace"
+      ],
+      "why": "为什么用这条方法、何时换、何时停，都必须有可回放的触发记录；否则「元认知」不可审",
+      "frame_delta_hint": {
+        "kind": "commitment_formed"
+      }
+    },
+    {
+      "id": "MC-5",
+      "name": "负迁移检测",
+      "maps_to": [
+        "m.detect",
+        "e.falsify"
+      ],
+      "why": "复用旧经验后变差（negative transfer）必须能被检出；只记录「用了」不算证据",
+      "frame_delta_hint": {
+        "kind": "hypothesis_proposed"
+      }
+    }
+  ],
+  "evidence_standards": [
+    {
+      "claim_kind": "calibration",
+      "required": [
+        "置信度与正确率的对应表（分箱）",
+        "基线（无该机制时）",
+        "样本量与重复次数"
+      ]
+    },
+    {
+      "claim_kind": "control_effect",
+      "required": [
+        "触发条件（确定性谓词）",
+        "动作前后状态快照",
+        "witness（副作用证据）"
+      ]
+    }
+  ],
+  "common_failures": [
+    "把「我验证过」当验证（表演性元认知）",
+    "每轮例行 observe/estimate（仪式化）",
+    "用结构完整度冒充思考质量",
+    "把内部自评分当质量结论"
+  ],
+  "examples": [
+    {
+      "case": "本仓元算子设计（11 算子 + 双 trace）",
+      "why": "要求每个算子有副作用与 witness，无副作用拒绝——正是「拒绝表演性元认知」的可执行化"
+    }
+  ],
+  "criteria_refs": [
+    "craft:falsifiability",
+    "review:blind-review-protocol"
+  ],
+  "runnable": [
+    "nf cog calibrate",
+    "nf cog triggers"
+  ]
+}

@@ -3,7 +3,7 @@
   "comment": "派生面非真源；created = max(仓内声明日期: score_baseline / provenance / approvals)（保确定性，非墙钟）。",
   "creationInfo": {
     "comment": "由纯度扫描登记面（HARD_ALLOW / SOFT_IMPORTS）实时派生；created = 仓内声明日期最大值（非墙钟，保确定性）",
-    "created": "2026-11-09T00:00:00Z",
+    "created": "2026-11-10T00:00:00Z",
     "creators": [
       "Tool: nf interop --kind sbom"
     ]
@@ -86,6 +86,13 @@
       "downloadLocation": "NOASSERTION",
       "licenseConcluded": "NOASSERTION",
       "name": "nf_pyengine"
+    },
+    {
+      "SPDXID": "SPDXRef-Optional-numpy",
+      "comment": "软依赖（可选，须 try/except 守卫）：水印鲁棒性基准（watermark_bench）里按像素构造噪声/亮度攻击；软导入 + 缺依赖给修复指引，基准以外不依赖",
+      "downloadLocation": "NOASSERTION",
+      "licenseConcluded": "NOASSERTION",
+      "name": "numpy"
     }
   ],
   "relationships": [
@@ -123,6 +130,11 @@
       "relatedSpdxElement": "SPDXRef-Package-ninfenz",
       "relationshipType": "OPTIONAL_DEPENDENCY_OF",
       "spdxElementId": "SPDXRef-Optional-nf_pyengine"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-ninfenz",
+      "relationshipType": "OPTIONAL_DEPENDENCY_OF",
+      "spdxElementId": "SPDXRef-Optional-numpy"
     }
   ],
   "spdxVersion": "SPDX-2.3"

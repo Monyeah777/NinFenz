@@ -1,0 +1,60 @@
+{
+  "schema": "nf-adr/1",
+  "note": "架构裁决记录（机器可校验的数据，不是散文）：每条裁决必须能被仓库实测或本台账证据支撑；取代关系构成有向图，必须无环；同一主题至多一条 current。",
+  "adrs": [
+    {
+      "id": "ADR-001",
+      "title": "双核裁决：平级内核 + 唯一共享对象 commitment",
+      "status": "current",
+      "topic": "architecture-core",
+      "decision": "契约核（cc_* 七调用 + K1–K8）与认知核（discourse/15 moves/33 原子/11 算子/方法包）平级；两侧不读对方内部状态，只交换 commitment{cog_digest, claim_digest, cc_digest}。核心架构 v1 的「NF 降为可插拔后端」作废。",
+      "supersedes": ["CCOS-核心架构-v1（重定义 CCOS 部分）"],
+      "evidence": [
+        "desktop/src/core/cognition_workspace/bridge.py",
+        "desktop/tests/test_cognition_bridge.py",
+        "desktop/tests/test_cognition_workspace.py"
+      ],
+      "falsifier": "若认知核必须 import 契约核才能跑通，或桥之外出现第二个共享状态对象，则本裁决被证伪"
+    },
+    {
+      "id": "ADR-002",
+      "title": "ABI 冻结纪律：cc_* = v1 冻结，新增 = experimental",
+      "status": "current",
+      "topic": "abi",
+      "decision": "cc_* 七调用（已实现 + 55 向量）冻结为 v1，只增不改；破坏性变更走 v2 + 适配层。新增 cog_* 一律 v0-experimental，直到 schema 文件 + 错误码 + 幂等声明 + 校验测试齐备才可标 frozen。",
+      "supersedes": ["整合方案(1) L128「ABI v0.1 待定稿」与 L225「v1 冻结」并存的自相矛盾"],
+      "evidence": [
+        "docs/ccos/abi-v0.md",
+        "results/ccos/evidence_verdict_vectors.json",
+        "clients/go/nfverify"
+      ],
+      "falsifier": "若出现未出 schema 却被标 frozen 的调用，或 v1 调用被破坏性修改且无适配层，则本裁决被违反"
+    },
+    {
+      "id": "ADR-003",
+      "title": "单一真源：16 份架构文档入台账，仓内只认 current",
+      "status": "current",
+      "topic": "docs",
+      "decision": "16 份外部架构文档登记到 protocol/docs_ledger.json：每份有且只有一个状态（current/superseded/draft/evidence）；superseded 必须指向在场的 current；同一 topic 至多一条 current。仓内实现只按 current 裁决执行，冲突未裁前以 ADR 为准。",
+      "supersedes": [],
+      "evidence": [
+        "protocol/docs_ledger.json",
+        "scripts/adr_check.py"
+      ],
+      "falsifier": "若台账里出现两条同 topic 的 current，或 superseded 指向不存在的文档，则本裁决被违反"
+    },
+    {
+      "id": "ADR-004",
+      "title": "推理面（reasoning/）当前为 dormant",
+      "status": "current",
+      "topic": "reasoning-face",
+      "decision": "推理面代码只在未合并分支 origin/reasoning-plane-2026-11-03，HEAD 内 desktop/src/core/meta_cockpit/reasoning/ 不存在。故当前状态 = dormant（能力存在但不在默认路径）。任务书/元算子中依赖 reasoning/ 的项在合并前不得声明完成。",
+      "supersedes": [],
+      "evidence": [
+        "desktop/src/core/meta_cockpit（无 reasoning/ 目录）",
+        "git branch: origin/reasoning-plane-2026-11-03"
+      ],
+      "falsifier": "若 reasoning/ 出现在 HEAD 且默认 CLI 路径可达，则本裁决应改为 active 并补「默认路径可达」判据"
+    }
+  ]
+}

@@ -7,7 +7,7 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
-  - scripts/nf.py:83a75a4fac82461d56b03147eff04b420b8aad0ed6db9fef6e695717dcf7b6a2
+  - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - desktop/src/core/repo_stats.py:3bc955c22bef31d7b93313b4fe2694934c048e8ee84b9ef81c0e9805c7982a87
   - desktop/src/core/quality_baseline.py:7c1f06bc581a2400b1248df63e07a98dfffba2b92ca8070a71082abcc317d1e4
   - scripts/interop_thirdparty_kit.py:803def645cab2f98a6ef27eed82a8463dcc4ed908b7885c9944158771d3d8900
@@ -20,13 +20,53 @@ subjects:
   - results/interop-thirdparty-status.md:e57c95980dd8b36bf137d23db0cf3c93ba8aee5221d2d26f2a6c782c30df0469
 
 ---
-> 重审（2026-11-08）：task-35c：git status 收敛到 repo_face.untracked_paths
+> 重审（2026-11-09）：方法包声明可跑入口 runnable，清单与文档共用（含入口存在性判据）
 
-> 重审（2026-11-08）：task-35：nf.py 注释修正（nosec/理由）
+> 重审（2026-11-09）：证人核对接入生产路径：session.step(root=) + CLI 传 ROOT
 
-> 重审（2026-11-08）：task-35 投影少算防护
+> 重审（2026-11-09）：快照25 两处红：--pack-checklist 进编码闸 + 矩阵判据支持裸模块名
 
-> 重审（2026-11-07）：合并基线补齐：向量生成器 subject 字段 + 脚本原子写/stdio + 命令树拆组
+> 重审（2026-11-09）：方法包可执行化：checklist 投影 + nf cognition --pack-checklist
+
+> 重审（2026-11-08）：快照20 红修复：--pairs 入闸/json_doc/分组表接入探针/耦合重算
+
+> 重审（2026-11-08）：口头置信触发策略（触发器非证据）+ CLI --threshold
+
+> 重审（2026-11-08）：calibrate 文案收口
+
+> 重审（2026-11-08）：cog calibrate CLI（可靠性表出口）
+
+> 重审（2026-11-08）：Ingress 启动自检（四道闸探针，非空转判据）
+
+> 重审（2026-11-08）：快照锁：json_doc/atomic_write/sink 登记/文档计数/编码闸门
+
+> 重审（2026-11-08）：claim-check 直吃作业单（免手抄 evidence）
+
+> 重审（2026-11-08）：主张→证据作业单（每个 required 一条 unknown 槽）
+
+> 重审（2026-11-08）：快照红修复：job 描述/面信封/权重/耦合面
+
+> 重审（2026-11-08）：全量门禁收口：json_doc/atomic_write/面判别键/dead-code/静默跳过/路径旗标/ingress 接线
+
+> 重审（2026-11-08）：K1 作业账本 + K4 事件流 + K8 启动自检（P6 第二件）
+
+> 重审（2026-11-08）：双核桥（commitment + 回灌 + 闭环）
+
+> 重审（2026-11-08）：判据注册表 + 主张编译（证据义务清单/三态核对）
+
+> 重审（2026-11-08）：元算子层（11 ops + 触发引擎 + 双 trace + 反仪式化）
+
+> 重审（2026-11-08）：认知工作台 L0（discourse/15 moves/records/replay + nf cog）
+
+> 重审（2026-11-08）：密钥透明目录 v0（版本根/追加链/包含证明/分叉见证）
+
+> 重审（2026-11-07）：方法包 v0 收尾（风格/度量重冻）
+
+> 重审（2026-11-07）：方法包 v0（3 个领域包 + 组合 + 研究计划接线）
+
+> 重审（2026-11-07）：认知核研究层：方法库 + 切片计划器 + CLI（切片检索词/方法论路径/证据台账）
+
+> 重审（2026-11-07）：命令树拆分（production 321→117 行 + 新组 evidence_face 207 行）
 
 > 重审（2026-11-07）：门禁修：silent-skip 理由 / 两个文本参数登记 / --mode 复核
 

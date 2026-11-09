@@ -16,9 +16,7 @@ subjects:
   - .github/workflows/external-links.yml:9f27d9e7bd3ca0c00345fdf6927b6f337a22243599412fb0ee3af35fed39f2bc
 
 ---
-> 重审（2026-11-09）：tee pipefail 门禁
-
-> 重审（2026-11-09）：actions 大版本升级
+> 重审（2026-11-09）：冻结链
 
 > 重审（2026-10-29）：恢复分支全量验证：接线 meta-cockpit 公共模块、清理零引用、修复 ReDoS/CLI 闸门/公开文档路径后重绑；既有结论不变
 
