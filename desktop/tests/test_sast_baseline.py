@@ -152,5 +152,14 @@ class RealRepoTest(unittest.TestCase):
         self.assertTrue(all("==" in l for l in pins), "SAST 工具须固定版本：%s" % pins)
 
 
+    def test_scan_targets_cover_terminal_and_packaging(self):
+        """扫描面必须覆盖 tui/ 与 packaging/（2026-11-09 task-40 扩面；勿被改回去）。"""
+        src = (ROOT / "scripts" / "sast_check.py").read_text(encoding="utf-8")
+        line = next((ln for ln in src.splitlines() if ln.startswith("SCAN_TARGETS =")), "")
+        self.assertIn('"tui"', line, "SAST 扫描面丢了 tui/（终端主入口）")
+        self.assertIn('"packaging"', line,
+                      "SAST 扫描面丢了 packaging/（含对公网 hf-space server.py）")
+
+
 if __name__ == "__main__":
     unittest.main()

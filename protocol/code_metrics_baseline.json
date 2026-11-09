@@ -1631,7 +1631,7 @@
       "max_fn_lines": 21
     },
     "scripts/style_check.py": {
-      "lines": 180,
+      "lines": 183,
       "max_fn_cc": 19,
       "max_fn_lines": 36
     },
