@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:bc114898836f914212cec64e0b22c7d3f93b8681557d82f845a200a85683b0cc
   - desktop/src/core/asset_contract.py:8e2fbc3954c771d6c2eb78d9cf47dcf22612b63b9b16929bd9013792f803f9a2
-  - protocol/code_metrics_baseline.json:4ac2c54c464f7401067c34baf97984a8d3d64a1fb582e76871bbea82c7a12f90
+  - protocol/code_metrics_baseline.json:3116d8b3f7360f7c3516f859c3ee842a70b545535a7260803d859f1e635e359a
 ---
+> 重审（2026-11-09）：能力清单（静态 AST 扫描 scripts/*，可查而非猜）
+
 > 重审（2026-11-09）：结论可落盘 --out（配合 verifier_status 复核）
 
 > 重审（2026-11-09）：发布结论记录材料清单摘要（供应链闭环）

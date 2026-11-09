@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:4ac2c54c464f7401067c34baf97984a8d3d64a1fb582e76871bbea82c7a12f90
+  - protocol/code_metrics_baseline.json:3116d8b3f7360f7c3516f859c3ee842a70b545535a7260803d859f1e635e359a
 ---
+> 重审（2026-11-09）：能力清单（静态 AST 扫描 scripts/*，可查而非猜）
+
 > 重审（2026-11-09）：结论可落盘 --out（配合 verifier_status 复核）
 
 > 重审（2026-11-09）：发布结论记录材料清单摘要（供应链闭环）

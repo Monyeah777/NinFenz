@@ -39,6 +39,7 @@
     "test_calibration_state": 0.2,
     "test_canonical_parity": 0.2,
     "test_capability_battery": 0.2,
+    "test_capability_inventory": 0.9,
     "test_case_schema": 0.2,
     "test_category_registry": 0.8,
     "test_ccos_abi_docs": 0.6,
@@ -788,6 +789,10 @@
     "test_capability_battery.CapabilityBatteryTest.test_contracts_shape": 0.0,
     "test_capability_battery.CapabilityBatteryTest.test_every_contract_module_and_entry_exists": 0.0,
     "test_capability_battery.CapabilityBatteryTest.test_missing_root_is_fail_closed": 0.0,
+    "test_capability_inventory.CapabilityInventoryTest.test_collect_is_deterministic_and_covers_all_scripts": 0.53,
+    "test_capability_inventory.CapabilityInventoryTest.test_committed_inventory_is_fresh": 0.26,
+    "test_capability_inventory.CapabilityInventoryTest.test_inventory_lists_known_flags": 0.0,
+    "test_capability_inventory.CapabilityInventoryTest.test_scan_is_static": 0.0,
     "test_case_schema.Test.test_all_four_required": 0.0,
     "test_case_schema.Test.test_complete_case_ok": 0.0,
     "test_category_registry.CoverageTest.test_covered_by_distinguishes_facet_from_gap": 0.54,
@@ -4581,5 +4586,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1870.0
+  "total_s": 1870.9
 }

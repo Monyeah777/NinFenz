@@ -1490,6 +1490,11 @@
       "max_fn_cc": 7,
       "max_fn_lines": 18
     },
+    "scripts/capability_inventory.py": {
+      "lines": 133,
+      "max_fn_cc": 13,
+      "max_fn_lines": 35
+    },
     "scripts/ccos_chain.py": {
       "lines": 175,
       "max_fn_cc": 26,

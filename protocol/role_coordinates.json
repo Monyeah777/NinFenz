@@ -4,9 +4,9 @@
     "entry": 26,
     "floor": 5,
     "prod": 1057,
-    "projection": 160,
-    "support": 439,
-    "verify": 1034
+    "projection": 161,
+    "support": 440,
+    "verify": 1035
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7571,6 +7571,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "能力清单判据：静态接口面可复算、可查、改了就红（第 139 轮）。",
+      "path": "desktop/tests/test_capability_inventory.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "",
       "path": "desktop/tests/test_case_schema.py",
       "role": "verify",
@@ -12588,16 +12594,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "8c31c1cb68fc663a423f0f1bbc05c029ba2a09b153da023c1f2fe793bad52c85",
+  "root_digest": "fb924cce85d5c8deebd70059037d8c7279a9a605307bc9f1ce747eb2e8764dce",
   "rule_counts": {
     "R-app": 1463,
-    "R-catch": 292,
+    "R-catch": 293,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 140,
+    "R-projection": 141,
     "R-support": 119,
-    "R-verify": 908,
+    "R-verify": 909,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

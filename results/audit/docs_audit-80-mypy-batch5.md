@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:22e24633e87e95453d0c2cf4a595d0496bae5d7331c1fc644d5b1555e4925a41
-  - protocol/code_metrics_baseline.json:4ac2c54c464f7401067c34baf97984a8d3d64a1fb582e76871bbea82c7a12f90
+  - protocol/code_metrics_baseline.json:3116d8b3f7360f7c3516f859c3ee842a70b545535a7260803d859f1e635e359a
 ---
+> 重审（2026-11-09）：能力清单（静态 AST 扫描 scripts/*，可查而非猜）
+
 > 重审（2026-11-09）：结论可落盘 --out（配合 verifier_status 复核）
 
 > 重审（2026-11-09）：发布结论记录材料清单摘要（供应链闭环）

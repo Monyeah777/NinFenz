@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:5ad37816b44f2950cc5bd48a2a59e55fd87e074a7ad779839d540fda66440743
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:342f4fe1f8dca8b8626dc16c590752c1135f498368c5df0ca15e3aadf42b6f43
+  - protocol/check12_weights.json:0c54b078cc3a18aeef5c88e5929f5b13fa7b9c11b1bbe85b782eafa6885b256e
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-09）：能力清单（静态 AST 扫描 scripts/*，可查而非猜）
+
 > 重审（2026-11-09）：方法包补「可跑入口」列 + 入口命令存在性判据
 
 > 重审（2026-11-09）：文档引用的探针数字判据（判据数/变异体数/覆盖率绑定结果件）

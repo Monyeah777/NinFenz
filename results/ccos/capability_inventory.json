@@ -1,0 +1,1213 @@
+{
+  "digest": "0331c9d8d0ea035dd81ed2d7820236445d6a50072efdbfda6b2e65c00cd53c45",
+  "entries": [
+    {
+      "doc": "其余 ABI 调用的判定向量：cc_label（IR 校验）→ 期望结论（跨语言可复核）。",
+      "flags": [
+        "--check",
+        "--write"
+      ],
+      "path": "scripts/abi_call_vectors.py",
+      "subcommands": []
+    },
+    {
+      "doc": "架构裁决与文档台账门禁：ADR 可校验、台账单一真源、与仓库现实对账。",
+      "flags": [
+        "--check",
+        "--json",
+        "--write"
+      ],
+      "path": "scripts/adr_check.py",
+      "subcommands": []
+    },
+    {
+      "doc": "概念前置闭包求值（只读 · 确定性 · 零网络 · 不改仓库任何文件）。",
+      "flags": [
+        "--asset",
+        "--branch",
+        "--check",
+        "--gaps",
+        "--json",
+        "--limit",
+        "--list",
+        "--loaded",
+        "--order",
+        "--ready-list",
+        "--target"
+      ],
+      "path": "scripts/ai_domain_closure.py",
+      "subcommands": []
+    },
+    {
+      "doc": "双向锚定对齐报告（只读）：标准目录利用率（反向）+ 词汇交叉候选（正向）。",
+      "flags": [
+        "--bootstrap",
+        "--depth",
+        "--find",
+        "--json",
+        "--layer",
+        "--limit",
+        "--packs",
+        "--shallow",
+        "--unbound"
+      ],
+      "path": "scripts/anchor_align.py",
+      "subcommands": []
+    },
+    {
+      "doc": "原子不变量 A1–A5 与候选健康 B1–B5 的可复算出口。",
+      "flags": [
+        "--broken",
+        "--budget",
+        "--candidates",
+        "--check",
+        "--json",
+        "--write"
+      ],
+      "path": "scripts/atom_invariants.py",
+      "subcommands": []
+    },
+    {
+      "doc": "LSP 会话转写夹具：把一次**真实客户端帧序列**的往返固化成金标（fixtures）。",
+      "flags": [
+        "--check",
+        "--write"
+      ],
+      "path": "scripts/build_lsp_transcript.py",
+      "subcommands": []
+    },
+    {
+      "doc": "验证卡册生成器（`docs/verification-cards.md` 的**可复现**投影）。",
+      "flags": [
+        "--check",
+        "--write"
+      ],
+      "path": "scripts/build_verification_cards.py",
+      "subcommands": []
+    },
+    {
+      "doc": "吸收项能力面（生产入口）：列出 / 自检 吸收项契约电池。",
+      "flags": [
+        "--check",
+        "--json",
+        "--root"
+      ],
+      "path": "scripts/capabilities.py",
+      "subcommands": []
+    },
+    {
+      "doc": "能力清单（`nf-capability-inventory/1`）：静态扫描脚本，列出每个脚本能做什么。",
+      "flags": [
+        "--check",
+        "--json",
+        "--write"
+      ],
+      "path": "scripts/capability_inventory.py",
+      "subcommands": []
+    },
+    {
+      "doc": "CCOS 一条链复现：cc_check → [cc_label] → cc_attest → cc_verify → cc_replay。",
+      "flags": [
+        "--json",
+        "--key-file",
+        "--root",
+        "--target"
+      ],
+      "path": "scripts/ccos_chain.py",
+      "subcommands": []
+    },
+    {
+      "doc": "check37 · 知识层门禁（双源知识：权威分层 / 查询有序 / 时效 / 消化可追溯 / 认知裁剪）。",
+      "flags": [],
+      "path": "scripts/check37_knowledge.py",
+      "subcommands": []
+    },
+    {
+      "doc": "外部链接巡检（**非门禁** · 可选联网 · 只读）。",
+      "flags": [
+        "--backoff",
+        "--breaker",
+        "--fetch",
+        "--json",
+        "--limit",
+        "--max-seconds",
+        "--retries",
+        "--root",
+        "--skip",
+        "--timeout",
+        "--write"
+      ],
+      "path": "scripts/check_external_links.py",
+      "subcommands": []
+    },
+    {
+      "doc": "互操作导出面的**外部权威校验**（非门禁 · 可选联网 · 只读）。",
+      "flags": [
+        "--fetch",
+        "--json",
+        "--root",
+        "--write"
+      ],
+      "path": "scripts/check_interop_schemas.py",
+      "subcommands": []
+    },
+    {
+      "doc": "cc_check 判定向量集：策略 + 对象字节 → 期望 verdict（跨语言可复核）。",
+      "flags": [
+        "--check",
+        "--json",
+        "--write"
+      ],
+      "path": "scripts/check_vectors.py",
+      "subcommands": []
+    },
+    {
+      "doc": "闭包审计：核对每条断言引用的判据是否真实在场，并统计 closed / debt。",
+      "flags": [
+        "--check",
+        "--json",
+        "--write"
+      ],
+      "path": "scripts/closure_audit.py",
+      "subcommands": []
+    },
+    {
+      "doc": "代码规模/复杂度上限（CLI）：棘轮式冻结 + 只增不减校验。",
+      "flags": [
+        "--json",
+        "--write"
+      ],
+      "path": "scripts/code_metrics.py",
+      "subcommands": []
+    },
+    {
+      "doc": "提交信息机检（Conventional Commits · 纯标准库）。",
+      "flags": [],
+      "path": "scripts/commit_msg_check.py",
+      "subcommands": []
+    },
+    {
+      "doc": "模块级耦合度量 + 存量债棘轮（Martin 包度量 / SDP）。",
+      "flags": [
+        "--json",
+        "--write"
+      ],
+      "path": "scripts/coupling_metrics.py",
+      "subcommands": []
+    },
+    {
+      "doc": "跨语言契约对拍器（W-10 / P-C0 走通件；P-C1 起真契约向量）。",
+      "flags": [
+        "--coverage",
+        "--digest",
+        "--json",
+        "--manifest",
+        "--require-full",
+        "--self-test",
+        "--versions"
+      ],
+      "path": "scripts/cross_lang_verify.py",
+      "subcommands": []
+    },
+    {
+      "doc": "P6-07 / P6-08 整改件：溯源图（W3C PROV）与数据质量（ISO 8000 / FAIR）。",
+      "flags": [
+        "--json",
+        "--self-test"
+      ],
+      "path": "scripts/data_quality.py",
+      "subcommands": []
+    },
+    {
+      "doc": "演练保真度（CLI）：把两套 drill 的结果量化成数字并判达标。",
+      "flags": [
+        "--json",
+        "--write"
+      ],
+      "path": "scripts/drill_fidelity.py",
+      "subcommands": []
+    },
+    {
+      "doc": "宁封子桌面端到端 headless 冒烟断言（C7 · T3-1 端到端测试入 CI，缺口⑩闭环）。",
+      "flags": [],
+      "path": "scripts/e2e_desktop_headless.py",
+      "subcommands": []
+    },
+    {
+      "doc": "引擎 provider 状态（只读）：有哪些引擎实现 / 语言与工具链 / 本机能否装载。",
+      "flags": [
+        "--abi",
+        "--check",
+        "--json"
+      ],
+      "path": "scripts/engine_status.py",
+      "subcommands": []
+    },
+    {
+      "doc": "预注册评测出口：冻结协议 + harness 演练（**不伪造测量**）。",
+      "flags": [
+        "--check",
+        "--checklist",
+        "--json",
+        "--validate",
+        "--write"
+      ],
+      "path": "scripts/eval_run.py",
+      "subcommands": []
+    },
+    {
+      "doc": "证据图探针（E1 的可算形态）：把闭包台账读成**陈述 ⇄ 证据**二部图，算悬挂陈述比 H。",
+      "flags": [
+        "--check",
+        "--write"
+      ],
+      "path": "scripts/evidence_graph_probe.py",
+      "subcommands": []
+    },
+    {
+      "doc": "证据判定向量集：把「输入 → 期望判定」固化成**跨语言可复核**的单一产物。",
+      "flags": [
+        "--check",
+        "--json",
+        "--write"
+      ],
+      "path": "scripts/evidence_vectors.py",
+      "subcommands": []
+    },
+    {
+      "doc": "FDE 打样 · 可跑样例（check38 子扫描 4）。",
+      "flags": [
+        "--check",
+        "--root",
+        "--run"
+      ],
+      "path": "scripts/fde_sample_run.py",
+      "subcommands": []
+    },
+    {
+      "doc": "生成物新鲜度前置检查：**提交件 == 实时重算**（秒级，别等分片 25 分钟才发现）。",
+      "flags": [
+        "--json",
+        "--only",
+        "--quiet"
+      ],
+      "path": "scripts/freshness_check.py",
+      "subcommands": []
+    },
+    {
+      "doc": "门禁读面台账 CLI（W-03 的消费者面，只读）。",
+      "flags": [
+        "--all",
+        "--check",
+        "--derive",
+        "--json",
+        "--manifest",
+        "--no-cache",
+        "--observe",
+        "--observed",
+        "--observed-hook",
+        "--plan-only",
+        "--route",
+        "--route-datalog",
+        "--select",
+        "--static-faces",
+        "--verdicts",
+        "--workers"
+      ],
+      "path": "scripts/gate.py",
+      "subcommands": []
+    },
+    {
+      "doc": "门禁负向用例探针：量「每个闸门里有没有至少一条拒绝型测试」。",
+      "flags": [
+        "--check",
+        "--json",
+        "--write"
+      ],
+      "path": "scripts/gate_probe.py",
+      "subcommands": []
+    },
+    {
+      "doc": "生成 THIRD-PARTY-NOTICES.md：把 CI/开发工具链依赖的真实许可证汇总成一份声明。",
+      "flags": [
+        "--write"
+      ],
+      "path": "scripts/gen_third_party_notices.py",
+      "subcommands": []
+    },
+    {
+      "doc": "标准目录 · GEO 出口生成器（check38 子扫描 3）。",
+      "flags": [
+        "--check",
+        "--root",
+        "--write"
+      ],
+      "path": "scripts/geo_export.py",
+      "subcommands": []
+    },
+    {
+      "doc": "热面剖析取数（P5-09）：cProfile 确定性取数 + py-spy 采样 + hyperfine 基准。",
+      "flags": [
+        "--arg",
+        "--benchmark",
+        "--json",
+        "--out",
+        "--run-target",
+        "--runs",
+        "--sample",
+        "--seconds",
+        "--self-test",
+        "--target",
+        "--top"
+      ],
+      "path": "scripts/hotspot_profile.py",
+      "subcommands": []
+    },
+    {
+      "doc": "规范入口指令的实测记录（CLI）：声明 → 真跑 → 落证据 → 判新鲜度。",
+      "flags": [
+        "--list",
+        "--only",
+        "--record"
+      ],
+      "path": "scripts/instruction_evidence.py",
+      "subcommands": []
+    },
+    {
+      "doc": "NF Interop Layer 演示服务（P-I0）：stdlib Content-Length 分帧上的 JSON-RPC 2.0 echo 方法面。",
+      "flags": [
+        "--http",
+        "--lines"
+      ],
+      "path": "scripts/interop.py",
+      "subcommands": []
+    },
+    {
+      "doc": "互操作性「从他证」通道套件（check38 子扫描 2）。",
+      "flags": [
+        "--check",
+        "--dry-run",
+        "--emit",
+        "--record",
+        "--root"
+      ],
+      "path": "scripts/interop_thirdparty_kit.py",
+      "subcommands": []
+    },
+    {
+      "doc": "canonical JSON 面（P-C1）：--rule nf（仓库口径）/ --rule jcs（RFC 8785 JCS）。",
+      "flags": [
+        "--file",
+        "--rule"
+      ],
+      "path": "scripts/jcs.py",
+      "subcommands": []
+    },
+    {
+      "doc": "门禁变异探针 v0：对**两条判据**做最小变异实验，量「杀死率」与「误报率」。",
+      "flags": [
+        "--check",
+        "--json",
+        "--write"
+      ],
+      "path": "scripts/judge_mutation_probe.py",
+      "subcommands": []
+    },
+    {
+      "doc": "生成/校验 CCOS Tool Manifest（nf-tool-manifest/1）：从真实 nf 命令面派生。",
+      "flags": [
+        "--check",
+        "--json",
+        "--write"
+      ],
+      "path": "scripts/mcp_manifest.py",
+      "subcommands": []
+    },
+    {
+      "doc": "NinFenz 全链管道 CLI（v2.1.0 B2：retrieve→compose→gate→export 单命令）。",
+      "flags": [
+        "--a",
+        "--ab",
+        "--adapter",
+        "--all",
+        "--allow-protected-dest",
+        "--anchor",
+        "--answer",
+        "--apply",
+        "--artifact",
+        "--as",
+        "--assets",
+        "--at",
+        "--b",
+        "--backlog",
+        "--baseline",
+        "--batch",
+        "--bins",
+        "--build",
+        "--bundle",
+        "--by",
+        "--ca-file",
+        "--cached",
+        "--case",
+        "--category",
+        "--cc-result",
+        "--certify",
+        "--check",
+        "--check-pub",
+        "--check-trace",
+        "--claim",
+        "--claim-file",
+        "--close",
+        "--color",
+        "--commands",
+        "--commitment",
+        "--compile",
+        "--complete",
+        "--context",
+        "--contract",
+        "--criterion",
+        "--date",
+        "--decider",
+        "--decision",
+        "--deep",
+        "--delta",
+        "--delta-json",
+        "--depth",
+        "--dest",
+        "--doc-semantics",
+        "--domain",
+        "--dry-run",
+        "--endpoint",
+        "--engine",
+        "--entry",
+        "--evidence",
+        "--exceptions",
+        "--exec",
+        "--expires-at",
+        "--export",
+        "--face",
+        "--failed",
+        "--fast",
+        "--file",
+        "--fix",
+        "--fmt",
+        "--force",
+        "--force-export",
+        "--form",
+        "--freeze",
+        "--from",
+        "--gate",
+        "--harvest",
+        "--history",
+        "--http",
+        "--id",
+        "--idle",
+        "--ingress-policy",
+        "--inputs",
+        "--intent-from-text",
+        "--ir",
+        "--issuer",
+        "--items",
+        "--jobs",
+        "--json",
+        "--key",
+        "--key-file",
+        "--kind",
+        "--kinds",
+        "--label",
+        "--layer",
+        "--ledger",
+        "--level",
+        "--limit",
+        "--list",
+        "--list-methods",
+        "--list-rules",
+        "--map",
+        "--memo",
+        "--methods",
+        "--mode",
+        "--model",
+        "--module",
+        "--modules",
+        "--move",
+        "--name",
+        "--no-banner",
+        "--no-commits",
+        "--no-history",
+        "--no-include-refs",
+        "--no-render",
+        "--no-start",
+        "--note",
+        "--object",
+        "--obligation",
+        "--only",
+        "--op",
+        "--otlp",
+        "--out",
+        "--out-prefix",
+        "--outcome",
+        "--pack",
+        "--pack-checklist",
+        "--package",
+        "--packs",
+        "--packs-list",
+        "--pager",
+        "--pairs",
+        "--payload",
+        "--payload-json",
+        "--pipeline",
+        "--pkg",
+        "--plan",
+        "--policy",
+        "--policy-digest",
+        "--port",
+        "--prev",
+        "--print-config",
+        "--problem",
+        "--producer",
+        "--prose",
+        "--quads",
+        "--query",
+        "--questions",
+        "--quiet",
+        "--quints",
+        "--reason",
+        "--receipt",
+        "--refresh",
+        "--register",
+        "--registry",
+        "--require-fresh-revocations",
+        "--require-trust",
+        "--revocations",
+        "--role",
+        "--root",
+        "--rounds",
+        "--run",
+        "--run-tests",
+        "--runs",
+        "--save",
+        "--scheme",
+        "--scope",
+        "--search",
+        "--seed",
+        "--selfcheck",
+        "--seq",
+        "--session",
+        "--sexts",
+        "--sheet",
+        "--shell",
+        "--sidecar",
+        "--source",
+        "--spec",
+        "--ssh-allowed-signers",
+        "--ssh-identity",
+        "--ssh-key",
+        "--state",
+        "--state-text",
+        "--status",
+        "--status-uri",
+        "--steps-max",
+        "--store",
+        "--strict",
+        "--subject-pub",
+        "--surface",
+        "--surface-write",
+        "--table",
+        "--target",
+        "--threshold",
+        "--tier",
+        "--time-ca",
+        "--time-record",
+        "--time-untrusted",
+        "--timeout",
+        "--to",
+        "--tolerance",
+        "--top",
+        "--trace",
+        "--trigger",
+        "--triples",
+        "--trust",
+        "--trust-repo",
+        "--ttl",
+        "--unknown",
+        "--untrusted",
+        "--url",
+        "--variant-add",
+        "--variant-remove",
+        "--verify",
+        "--version",
+        "--walk",
+        "--watch",
+        "--width",
+        "--witness",
+        "--write",
+        "--write-advisory",
+        "--write-baseline",
+        "--yes"
+      ],
+      "path": "scripts/nf.py",
+      "subcommands": [
+        "add",
+        "apply",
+        "approve",
+        "assemble",
+        "assertions",
+        "asset",
+        "attest",
+        "audit",
+        "baseline",
+        "batch",
+        "begin",
+        "bench",
+        "breadth",
+        "bridge-apply",
+        "bridge-commit",
+        "bridge-obligation",
+        "bridge-verify",
+        "build",
+        "calibrate",
+        "changelog",
+        "check",
+        "claim",
+        "claim-check",
+        "cog",
+        "cognition",
+        "combine",
+        "compare",
+        "completion",
+        "conformance",
+        "contract",
+        "control",
+        "create",
+        "criteria",
+        "daemon",
+        "decide",
+        "decisions",
+        "demo",
+        "density",
+        "deprecate",
+        "design",
+        "diff",
+        "doctor",
+        "domain",
+        "driver",
+        "dryrun",
+        "embed",
+        "endpoint",
+        "events",
+        "evidence",
+        "exec",
+        "explain",
+        "export",
+        "extract",
+        "for",
+        "frequency",
+        "grant",
+        "handover",
+        "help",
+        "impact",
+        "import",
+        "interop",
+        "inventory",
+        "ir",
+        "job",
+        "knowledge",
+        "kt-build",
+        "kt-lookup",
+        "kt-split",
+        "kt-verify",
+        "label",
+        "layers",
+        "ledger",
+        "library",
+        "license",
+        "lint",
+        "list",
+        "locales",
+        "ls",
+        "lsp",
+        "market",
+        "materialize",
+        "merge",
+        "meter",
+        "model",
+        "module",
+        "moves",
+        "new",
+        "nfal",
+        "ops",
+        "order",
+        "output",
+        "pack",
+        "patterns",
+        "pipeline",
+        "plan",
+        "postmortem",
+        "preset",
+        "promote",
+        "pubkey",
+        "read",
+        "rebind",
+        "receipt",
+        "receipts",
+        "register",
+        "reindex",
+        "related",
+        "release",
+        "rename",
+        "render",
+        "replay",
+        "report",
+        "resolve",
+        "restore",
+        "review",
+        "revocations",
+        "rfc",
+        "rm",
+        "run",
+        "save",
+        "score",
+        "search",
+        "serve",
+        "shell",
+        "shell-init",
+        "shells",
+        "show",
+        "sig",
+        "sign",
+        "signature",
+        "spec",
+        "specs",
+        "st-validate",
+        "stamp",
+        "start",
+        "state-front",
+        "stats",
+        "status",
+        "steelman",
+        "step",
+        "stop",
+        "supersede",
+        "telemetry",
+        "thickness",
+        "timestamp",
+        "toolface",
+        "transform",
+        "transition",
+        "transparency",
+        "triggers",
+        "trust",
+        "types",
+        "usage",
+        "validate",
+        "verify",
+        "visible",
+        "who-refers",
+        "workloop",
+        "worldmodel",
+        "write"
+      ]
+    },
+    {
+      "doc": "NF 守护快路客户端（**纯 stdlib**，`python -S` 可跑）——Windows 默认路径的毫秒级入口。",
+      "flags": [],
+      "path": "scripts/nf_client.py",
+      "subcommands": []
+    },
+    {
+      "doc": "NF 馆藏**读者侧独立验证器**（纯标准库，不 import NF 的任何模块）。",
+      "flags": [
+        "--anchor",
+        "--at",
+        "--entry",
+        "--entry-file",
+        "--evidence",
+        "--json",
+        "--key-file",
+        "--kind",
+        "--policy-digest",
+        "--receipts",
+        "--revocations",
+        "--root",
+        "--ssh-allowed-signers",
+        "--ssh-identity"
+      ],
+      "path": "scripts/nf_verify.py",
+      "subcommands": []
+    },
+    {
+      "doc": "NFA-L/R 规则层 CLI：读 JSON 规则文档 → 定点推导（只读）。",
+      "flags": [
+        "--backend",
+        "--file",
+        "--fuel",
+        "--json"
+      ],
+      "path": "scripts/nfal_rules.py",
+      "subcommands": []
+    },
+    {
+      "doc": "编排面命令行入口：能力目录 / 计划编译 / 机检（core.orchestration 的 agent 入口）。",
+      "flags": [
+        "--catalog",
+        "--check",
+        "--plan",
+        "--root"
+      ],
+      "path": "scripts/orchestrate.py",
+      "subcommands": []
+    },
+    {
+      "doc": "性能预算（CLI）：声明 → 实测 N 次 → 落证据 → 判新鲜度与预算。",
+      "flags": [
+        "--list",
+        "--only",
+        "--record"
+      ],
+      "path": "scripts/perf_budget.py",
+      "subcommands": []
+    },
+    {
+      "doc": "NF 包管理器面（只读）：定义库品类的枚举 / 取件 / 检索。",
+      "flags": [
+        "--json"
+      ],
+      "path": "scripts/pkg.py",
+      "subcommands": []
+    },
+    {
+      "doc": "微内核插件宿主（P5-01…P5-06）——**只在适配器侧**（§18.3 红线：core/ 不得依赖 wasmtime）。",
+      "flags": [
+        "--in",
+        "--json",
+        "--manifest",
+        "--method",
+        "--require-plugin",
+        "--self-test"
+      ],
+      "path": "scripts/plugin_host.py",
+      "subcommands": []
+    },
+    {
+      "doc": "晋升门取数入口（P5-10）：真测量 → 第三部分仲裁 → 三判据判定。",
+      "flags": [
+        "--json",
+        "--repeat",
+        "--require-promoted",
+        "--size"
+      ],
+      "path": "scripts/plugin_promote.py",
+      "subcommands": []
+    },
+    {
+      "doc": "微内核插件的 Python **参考实现**（回退面 + 字节等价的对照物）。",
+      "flags": [
+        "--method"
+      ],
+      "path": "scripts/plugin_reference.py",
+      "subcommands": []
+    },
+    {
+      "doc": "提交前自查（快车道）：把「新增一个 core 模块 / 一个 CLI 面 / 一处解析」最容易踩的横向门禁",
+      "flags": [
+        "--full",
+        "--json"
+      ],
+      "path": "scripts/precheck.py",
+      "subcommands": []
+    },
+    {
+      "doc": "precheck 闸门名单（**数据件**，逻辑在 `precheck.py`）。",
+      "flags": [],
+      "path": "scripts/precheck_gates.py",
+      "subcommands": []
+    },
+    {
+      "doc": "决策层候选模型的**拉取与启动脚手架**（非门禁 · 默认只打印，不擅自下载）。",
+      "flags": [
+        "--candidate",
+        "--dir",
+        "--list",
+        "--root",
+        "--run",
+        "--serve",
+        "--yes"
+      ],
+      "path": "scripts/pull_decision_model.py",
+      "subcommands": []
+    },
+    {
+      "doc": "自包含装配样本的重嵌工具（编码漂移修复 · 幂等 · 纯标准库）。",
+      "flags": [
+        "--check",
+        "--pipeline",
+        "--root",
+        "--write"
+      ],
+      "path": "scripts/rebuild_selfcontained_sample.py",
+      "subcommands": []
+    },
+    {
+      "doc": "发布结论一键复跑（release conclusion）：干净树 → checks-only → N 分片 → 汇总。",
+      "flags": [
+        "--allow-dirty",
+        "--dry-run",
+        "--force-lock",
+        "--jobs",
+        "--json",
+        "--keep-snapshot",
+        "--lock-wait",
+        "--max-wall-s",
+        "--only-preflight",
+        "--out",
+        "--shards",
+        "--skip-checks",
+        "--snapshot",
+        "--snapshot-dir",
+        "--status"
+      ],
+      "path": "scripts/release_conclusion.py",
+      "subcommands": []
+    },
+    {
+      "doc": "机械文本改写（**默认干跑**）：先给「文件:行号 + 改前 → 改后」对照表，人核后再 --write。",
+      "flags": [
+        "--check",
+        "--find",
+        "--include",
+        "--max-hits",
+        "--replace",
+        "--root",
+        "--write"
+      ],
+      "path": "scripts/rewrite_text.py",
+      "subcommands": []
+    },
+    {
+      "doc": "P6-04 / P6-06 / P6-11 整改件：威胁模型、收益度量取数、评估可复算。",
+      "flags": [
+        "--check",
+        "--json",
+        "--records",
+        "--self-test",
+        "--snapshot",
+        "--timings",
+        "--write"
+      ],
+      "path": "scripts/risk_baseline.py",
+      "subcommands": []
+    },
+    {
+      "doc": "SAST 基线闸门（安全/供应链面 · ISO 25010 安全性）：bandit + ruff-S 的**只增不减**计数棘轮。",
+      "flags": [
+        "--json",
+        "--write"
+      ],
+      "path": "scripts/sast_check.py",
+      "subcommands": []
+    },
+    {
+      "doc": "材料清单生成器（`nf-sbom/1`）：`--write` 落 `results/ccos/sbom.json`，`--check` 与重算比对。",
+      "flags": [
+        "--check",
+        "--json",
+        "--root",
+        "--write"
+      ],
+      "path": "scripts/sbom.py",
+      "subcommands": []
+    },
+    {
+      "doc": "自省探针：把「当前验证器摘要」记进结果件，供判据核对（自省层对象）。",
+      "flags": [
+        "--check",
+        "--json",
+        "--write"
+      ],
+      "path": "scripts/self_audit_probe.py",
+      "subcommands": []
+    },
+    {
+      "doc": "决策层本地服务（把 Laya 系模型包成 NF 的 `systemone-http` 契约）。",
+      "flags": [
+        "--allow-non-loopback",
+        "--device",
+        "--host",
+        "--model-dir",
+        "--port"
+      ],
+      "path": "scripts/serve_decision_model.py",
+      "subcommands": []
+    },
+    {
+      "doc": "P6-05 / P6-09 / P6-10 整改件：标准面映射与场景集（**可机检**）。",
+      "flags": [
+        "--json",
+        "--self-test"
+      ],
+      "path": "scripts/standards_map.py",
+      "subcommands": []
+    },
+    {
+      "doc": "风格/静态检查棘轮（审计 Z2：把只跑 4 条 select 的 lint 扩成独立风格门）。",
+      "flags": [
+        "--json",
+        "--write"
+      ],
+      "path": "scripts/style_check.py",
+      "subcommands": []
+    },
+    {
+      "doc": "Synchronize the repository-root llms-full.txt with its site source.",
+      "flags": [
+        "--check",
+        "--write"
+      ],
+      "path": "scripts/sync_llms.py",
+      "subcommands": []
+    },
+    {
+      "doc": "结论可复用性查询（自省层的用法出口）：这份结论还是「当前验证器」判的吗？",
+      "flags": [
+        "--conclusion",
+        "--digest",
+        "--json"
+      ],
+      "path": "scripts/verifier_status.py",
+      "subcommands": []
+    },
+    {
+      "doc": "门禁判定缓存：输入摘要 → 判定摘要（**只加速，不替代判定**）。",
+      "flags": [
+        "--get",
+        "--key",
+        "--mode",
+        "--pass",
+        "--put",
+        "--warn"
+      ],
+      "path": "scripts/verify_cache.py",
+      "subcommands": []
+    },
+    {
+      "doc": "**开发快车道**：按改动跑增量 check（薄适配层；判据真源在 core.gate_*）。",
+      "flags": [
+        "--all",
+        "--base",
+        "--faces",
+        "--json",
+        "--no-cache",
+        "--plan-only",
+        "--strict",
+        "--workers"
+      ],
+      "path": "scripts/verify_fast.py",
+      "subcommands": []
+    },
+    {
+      "doc": "**并行跑测试套件**（L-D）：按模块切分、多进程执行、汇总成 unittest 同形结论。",
+      "flags": [
+        "--exclusive",
+        "--json",
+        "--serial",
+        "--timeout"
+      ],
+      "path": "scripts/verify_parallel.py",
+      "subcommands": []
+    },
+    {
+      "doc": "门禁机器可读报告（CLI）：`protocol/verification_report.json`。",
+      "flags": [
+        "--check",
+        "--fresh",
+        "--json",
+        "--write"
+      ],
+      "path": "scripts/verify_report.py",
+      "subcommands": []
+    },
+    {
+      "doc": "跑 verify.sh（自动解析 POSIX shell）——「一键复现」的跨平台入口。",
+      "flags": [],
+      "path": "scripts/verify_run.py",
+      "subcommands": []
+    },
+    {
+      "doc": "check12 的测试执行器：**按测试粒度分片并行**（只改执行方式，不改任何判据）。",
+      "flags": [
+        "--affected",
+        "--jobs",
+        "--json",
+        "--list",
+        "--plan",
+        "--run-shard",
+        "--shard",
+        "--write-weights"
+      ],
+      "path": "scripts/verify_tests.py",
+      "subcommands": []
+    },
+    {
+      "doc": "水印鲁棒性基准：把「抗/不抗」从形容词变成 BER 表（攻击矩阵 × 误码率）。",
+      "flags": [
+        "--check",
+        "--md",
+        "--write"
+      ],
+      "path": "scripts/watermark_bench.py",
+      "subcommands": []
+    },
+    {
+      "doc": "DCT-QIM 水印可行性探针：单图验证「频域嵌入能否扛 JPEG」，给 v1 立项判据。",
+      "flags": [
+        "--check",
+        "--md",
+        "--write"
+      ],
+      "path": "scripts/watermark_dct_probe.py",
+      "subcommands": []
+    },
+    {
+      "doc": "拍屏水印第五轮探针：更强 delta + 低频系数对 + 块尺寸扫描，摸清模糊边界。",
+      "flags": [
+        "--check",
+        "--md",
+        "--write"
+      ],
+      "path": "scripts/watermark_ecc_probe.py",
+      "subcommands": []
+    },
+    {
+      "doc": "几何提示同步探针：用「标签里记录的原始尺寸」替代频谱模板做几何同步。",
+      "flags": [
+        "--check",
+        "--md",
+        "--write"
+      ],
+      "path": "scripts/watermark_geometry_probe.py",
+      "subcommands": []
+    },
+    {
+      "doc": "水印 v1 同步层探针：几何攻击下靠「同步字 + 网格搜索」把位对齐找回来。",
+      "flags": [
+        "--check",
+        "--md",
+        "--write"
+      ],
+      "path": "scripts/watermark_sync_probe.py",
+      "subcommands": []
+    },
+    {
+      "doc": "工作流供应链策略机检（CLI）：`python scripts/workflow_policy.py [--json]`。",
+      "flags": [
+        "--json"
+      ],
+      "path": "scripts/workflow_policy.py",
+      "subcommands": []
+    }
+  ],
+  "flags": 518,
+  "note": "静态接口面（docs/flags/subcommands），不含缺省行为语义",
+  "schema": "nf-capability-inventory/1",
+  "scripts": 76
+}

@@ -14,8 +14,10 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:5ad37816b44f2950cc5bd48a2a59e55fd87e074a7ad779839d540fda66440743
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:4ac2c54c464f7401067c34baf97984a8d3d64a1fb582e76871bbea82c7a12f90
+  - protocol/code_metrics_baseline.json:3116d8b3f7360f7c3516f859c3ee842a70b545535a7260803d859f1e635e359a
 ---
+> 重审（2026-11-09）：能力清单（静态 AST 扫描 scripts/*，可查而非猜）
+
 > 重审（2026-11-09）：结论可落盘 --out（配合 verifier_status 复核）
 
 > 重审（2026-11-09）：发布结论记录材料清单摘要（供应链闭环）
