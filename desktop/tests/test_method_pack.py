@@ -444,6 +444,29 @@ class PackContentTest(unittest.TestCase):
         self.assertGreaterEqual(total, 8, "例子里的路径引用太少（判据可能已失效）")
         self.assertEqual([], missing, f"例子引用了不存在的路径：{missing}")
 
+    def test_usage_section_matches_commands(self):
+        """「N 种用法」的 N 与列举条数一致，且每条列出的命令真实存在（第 166 轮）。
+
+        由来：第 144/160 轮实现先落地，文档晚两轮才从「三种」改成「四种」——
+        这种滞后没有任何判据会抓。本判据把「章节标题的数字」与「条数 + 命令存在性」绑定。
+        """
+        import re
+
+        doc = (ROOT / "docs" / "ccos" / "method-packs-v0.md").read_text(encoding="utf-8")
+        match = re.search(r"## ([一二三四五六七八九十]+)种用法", doc)
+        self.assertIsNotNone(match, "没找到「N 种用法」章节（判据可能已失效）")
+        numerals = {"一": 1, "二": 2, "三": 3, "四": 4, "五": 5, "六": 6}
+        claimed = numerals[str(match.group(1))]
+        start = doc.index(match.group(0))
+        end = doc.find("\n## ", start + 1)
+        section = doc[start:end if end > 0 else len(doc)]
+        items = re.findall(r"^\d+\. ", section, re.MULTILINE)
+        self.assertEqual(claimed, len(items),
+                         "「%s种用法」与列举条数 %d 不一致" % (match.group(1), len(items)))
+        nf_src = (ROOT / "scripts" / "nf.py").read_text(encoding="utf-8")
+        for sub in re.findall(r"`nf ([a-z0-9-]+)", section):
+            self.assertIn(f'add_parser("{sub}"', nf_src, "用法里提到的 nf " + sub + " 不存在")
+
     def test_doc_counts_match_packs(self):
         """文档写的「N 个域 / N 个专家动作 / N 个证据类目」必须等于实际（防口径漂移）。"""
         import re

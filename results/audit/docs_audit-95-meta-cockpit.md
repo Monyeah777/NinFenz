@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:75cebacfbdd44045a77beda03d33bd33d92881edea70c670a406b6cdb2cfb20a
+  - protocol/check12_weights.json:f180d6f0d45044e1dce5d40c48b2b72e1194b146faffe09e60de0a90cfe4609d
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-09）：方法包文档「N 种用法」与列举条数/命令存在性绑定判据
+
 > 重审（2026-11-09）：包可跑入口真跑判据（11 域 14 命令，退出码 0/2 合规）
 
 > 重审（2026-11-09）：红证据棘轮改比例口径（绝对数会惩罚新增测试）
