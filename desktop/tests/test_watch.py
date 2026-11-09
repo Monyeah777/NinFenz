@@ -445,7 +445,15 @@ class WatchDaemonIntegrationTest(unittest.TestCase):
                         "带监听的守护必须安装常驻语料层")
         sys.modules["core.conformance_scan"].read_text_cached(
             os.path.join(ROOT, "protocol", "LAYERS.json"))
-        self.assertGreater(dm.query_stats()["resident"]["text"], 0, "读过的件应被常驻")
+        # 轮询而非一次断言：8 片并发下守护回包会慢，偶发 resident.text=0（2026-11-09 实测两次，
+        # 与 main 上 #269 对姊妹用例的修法一致）。
+        text = 0
+        for _ in range(50):
+            text = int((dm.query_stats().get("resident") or {}).get("text", 0))
+            if text > 0:
+                break
+            time.sleep(0.1)
+        self.assertGreater(text, 0, "读过的件应被常驻")
 
         dm._WATCHER._bump()                      # 只跳代际、没给路径 = 说不清
         self._call(["--version"])
