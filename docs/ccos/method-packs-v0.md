@@ -23,13 +23,15 @@
 | `supply-chain` | 交付物从哪来（钉定/可复现/溯源） | 6 | pinning / reproducibility / provenance | `python scripts/sbom.py --check` |
 | `operations` | 坏了能不能知道（目标/信号/告警） | 6 | slo / error-budget / incident-review | `python scripts/perf_budget.py`（缺省即校验） |
 
-## 三种用法
+## 四种用法
 
 1. **看**：`nf cognition --packs-list` 列出域与摘要；
-2. **照着做**：`nf cognition --pack-checklist handoff` 把包展开成逐步清单（每动作一条 + 该域证据要求）；
-3. **编进主张**：`nf cog claim --pack <ID>` 让主张带上该域的证据义务（缺证据即未就绪）。
+2. **照着做**：`nf cognition --pack-checklist handoff` 把包展开成逐步清单（每动作一条 + 该域证据要求 + **可跑入口**）；
+3. **编进主张**：`nf cog claim --pack <ID>` 让主张带上该域的证据义务（缺证据即未就绪）；
+4. **跑起来**：清单末尾给出的 `可跑入口` 是这个域**真能执行的检查**（第 144 轮起进入包数据，
+   第 160 轮起有判据逐条真跑：退出码 0 或 2 才算合格）。
 
-三种用法都不评分、不排序；排序只按包内顺序。
+四种用法都不评分、不排序；排序只按包内顺序。
 
 ## 纪律
 
@@ -41,5 +43,5 @@
 
 ## 边界
 
-- 八个域不等于「完整方法论」：它们只覆盖本仓真正实践过的方向，未实践的域不应先写包。
+- 十一个域不等于「完整方法论」：它们只覆盖本仓真正实践过的方向，未实践的域不应先写包。
 - 每个动作的 `why` 是可错的断言，不是权威引文；有反例时改包，不要改判据去迁就包。
