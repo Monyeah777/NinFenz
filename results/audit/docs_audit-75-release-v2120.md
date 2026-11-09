@@ -13,9 +13,11 @@ subjects:
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
   - docs/release.md:a878a24b8631d965e30d0bc865c9f88b71049f5a73025cf2984f5bd5cbca5dbb
-  - scripts/nf.py:b999234defffe9e06670a6acd3af9c5b519d021a66e5a9e65d19d7de0d1a8932
+  - scripts/nf.py:869bab4dff472c51503c71770c1871cb4dab32a3c3d0977da69ce6a0ea963d9e
 
 ---
+> 重审（2026-11-09）：Foundation repair: 重绑发布束重构后的审计对象摘要
+
 > 重审（2026-11-09）：foundation repair: canonical product metadata, dual licensing, and release bundle
 
 > 重审（2026-11-08）：task-35c：git status 收敛到 repo_face.untracked_paths

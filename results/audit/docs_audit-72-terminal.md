@@ -7,7 +7,7 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:3e21a47d54d5130acaf33545a501902cad27f1b3b657df826a13975fecd8d3b5
-  - scripts/nf.py:b999234defffe9e06670a6acd3af9c5b519d021a66e5a9e65d19d7de0d1a8932
+  - scripts/nf.py:869bab4dff472c51503c71770c1871cb4dab32a3c3d0977da69ce6a0ea963d9e
   - desktop/tests/test_terminal.py:f9cfbefb0a5ee8b0486a03b2386061caa23d27367299685c3b382dfdecb52352
   - scripts/nf:406c221f9f16fb6e318e230b0b0120e3a6d3c9231d57f66285e0e4615e18ca91
   - scripts/nf.cmd:d1e7ea3a9e99c0822102884cddafe1cdf3893d9b75d19abebe7a8d2a8abeec5a
@@ -19,6 +19,8 @@ subjects:
   - protocol/CONFORMANCE.md:006b56748b6daaf2419be40a65247d90efd6291e87ccd61c6527ed1526b6b4e4
 
 ---
+> 重审（2026-11-09）：Foundation repair: 重绑发布束重构后的审计对象摘要
+
 > 重审（2026-11-09）：foundation repair: canonical product metadata, dual licensing, and release bundle
 > 重审（2026-11-09）：L3 门禁事实
 

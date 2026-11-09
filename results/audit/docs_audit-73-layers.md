@@ -11,7 +11,7 @@ subjects:
   - desktop/tests/test_layer_model.py:8cea98de879a4bdf795f95afff9c8fa9a7675ebac227018b7b7694a158bfd69c
   - desktop/src/core/purity_scan.py:c422df3c3bebf36c2dd446ae1e8942930eea57c432b48341f3fd1fff733da433
   - desktop/tests/test_purity_scan.py:8f534c3cb5f4a85df538a551bf610dc4c09aae4cb28dd28aa4fe6a66a5f5c4d7
-  - scripts/nf.py:b999234defffe9e06670a6acd3af9c5b519d021a66e5a9e65d19d7de0d1a8932
+  - scripts/nf.py:869bab4dff472c51503c71770c1871cb4dab32a3c3d0977da69ce6a0ea963d9e
   - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
   - docs/layers.md:be79f2699cee390f03d54d6d0428daee6964674dcbb5d0e6967bfbb150395450
   - docs/L3_FROZEN.md:bde03a07d62aa37d5315d8b294d5fdfb24628c7a8556c1d3ff46848bc3d92186
@@ -23,6 +23,8 @@ subjects:
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
 
 ---
+> 重审（2026-11-09）：Foundation repair: 重绑发布束重构后的审计对象摘要
+
 > 重审（2026-11-09）：foundation repair: canonical product metadata, dual licensing, dual VEX, release bundle
 
 > 重审（2026-11-09）：foundation repair: canonical product metadata, dual licensing, and release bundle

@@ -16,7 +16,7 @@ subjects:
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
   - desktop/src/core/purity_scan.py:c422df3c3bebf36c2dd446ae1e8942930eea57c432b48341f3fd1fff733da433
-  - scripts/nf.py:b999234defffe9e06670a6acd3af9c5b519d021a66e5a9e65d19d7de0d1a8932
+  - scripts/nf.py:869bab4dff472c51503c71770c1871cb4dab32a3c3d0977da69ce6a0ea963d9e
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - scripts/check_interop_schemas.py:f9c1add0ee80fb23a3913e32482027e9a4049c5ce70cb35b2b1be4afa075d091
   - results/interop-schema-validation.md:e2546c6407416b61912ac351d14d20c171167e36be4d4d3461f6c2fceb56c0c9
@@ -27,6 +27,8 @@ subjects:
   - llms.txt:53f88cb2246f954036fb5577506ac883ba2394cf5b8937194a9155b831671f2c
 
 ---
+> 重审（2026-11-09）：Foundation repair: 重绑发布束重构后的审计对象摘要
+
 > 重审（2026-11-09）：foundation repair: canonical product metadata, dual licensing, dual VEX, release bundle
 
 > 重审（2026-11-09）：foundation repair: canonical product metadata, dual licensing, and release bundle

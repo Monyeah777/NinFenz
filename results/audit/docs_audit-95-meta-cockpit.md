@@ -16,7 +16,7 @@ subjects:
   - desktop/tests/test_meta_cockpit.py:cc2dc4f52729b35f400ca92aa367e685780f9f6735224e7fc0b7550b85f52662
   - desktop/tests/test_cli_error_framing.py:4c186dc60b5e58bfe6c0400242051e14a8995bc7dad5399d68a85d8881d0e133
   - desktop/tests/test_nf_cli.py:c44a5c57d5c4247a6c58d5e85d4e7adf2c95f7969d5d599e2b9643fe495c7b17
-  - scripts/nf.py:b999234defffe9e06670a6acd3af9c5b519d021a66e5a9e65d19d7de0d1a8932
+  - scripts/nf.py:869bab4dff472c51503c71770c1871cb4dab32a3c3d0977da69ce6a0ea963d9e
   - tui/_surface.py:8db432e006d08b717d507deb8839e02e0db1ccacc3e4962a712045ccfd2a30bf
   - protocol/check12_weights.json:ebc79bdcd0f386f5b56c85e505c06c34f29f016cf22cbb552741f7b43cd79116
   - protocol/coupling_baseline.json:1f29a9433769051eda1d8dcdbb38c14c55e284c2b9e63a822326de94db3b9c56
@@ -25,6 +25,8 @@ subjects:
   - results/meta-cockpit-manifest.json:7b1231392bea0bc51ed14d73fac3c73c185209c1233e7727e554d5b899031af2
 
 ---
+> 重审（2026-11-09）：Foundation repair: 重绑发布束重构后的审计对象摘要
+
 > 重审（2026-11-09）：foundation repair: canonical product metadata, dual licensing, and release bundle
 
 > 重审（2026-11-09）：session-persist 预算 Windows 放宽
