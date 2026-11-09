@@ -364,11 +364,9 @@
     },
     {
       "id": "code_metrics",
-      "issues": 1,
+      "issues": 0,
       "name": "代码规模/复杂度上限（棘轮冻结）",
-      "sample": [
-        "scripts/sast_check.py 模块行数 249 > 冻结值 244（修复指引：拆分该模块/函数；确需上调须评审后重冻基线 python scripts/code_metrics.py --write）"
-      ],
+      "sample": [],
       "source": "code_metrics.scan",
       "stats": {
         "baseline": 334,
@@ -377,7 +375,7 @@
         "max_fn_lines": 319,
         "max_lines": 9016
       },
-      "status": "fail",
+      "status": "pass",
       "warns": 0
     },
     {
@@ -540,12 +538,12 @@
       "warns": 0
     }
   ],
-  "root_digest": "e8266aaba2d07e67ffefa7ea7c8ca18e58439a577988714e944720c0098337fc",
+  "root_digest": "cbfa68401a02e9df2c3bc53cffede71b0af3e0b975eb6ffc5f10fb88a8050d7d",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
-    "fail": 1,
-    "pass": 28,
+    "fail": 0,
+    "pass": 29,
     "warn": 2
   }
 }

@@ -7,7 +7,7 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/layer_model.py:7464fad8e9703b76b6582a641fb80c5a93c4bbf87b5d2aad191e610eafe64dd2
-  - protocol/code_metrics_baseline.json:c2dbeef7bafeaf33be6fc99f1fae1bced6f17c4d8db8e20b2a920bc4b971c25a
+  - protocol/code_metrics_baseline.json:2284d60eb2a4922e91eec6b77eec8753cb974904e44e2ca0b68c423ba9a9b40f
 ---
 > 重审（2026-11-09）：style_check 行数
 
