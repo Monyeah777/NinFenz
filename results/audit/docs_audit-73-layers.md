@@ -14,7 +14,7 @@ subjects:
   - scripts/nf.py:b999234defffe9e06670a6acd3af9c5b519d021a66e5a9e65d19d7de0d1a8932
   - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
   - docs/layers.md:be79f2699cee390f03d54d6d0428daee6964674dcbb5d0e6967bfbb150395450
-  - docs/L3_FROZEN.md:c025e4dfcaec8b956ebd54313163e7e01c7bafaeb910478d9feab7fc98014ebc
+  - docs/L3_FROZEN.md:bde03a07d62aa37d5315d8b294d5fdfb24628c7a8556c1d3ff46848bc3d92186
   - protocol/assertions.json:5a0bb383eabf678a9f660ae6d771f0be51cce5397a40a73f0d0d93457e4f1cba
   - protocol/data_contracts.json:6ca6174c77d41ad354b90e637c404bedfbe5d8ad0ce6400bb26f2ac7e5f19eb0
   - protocol/normative.json:c1bbc14c92cea6bd66ff6cb54fdcf91bf3072f66adee7027f1d3f42e70fe1825
@@ -26,6 +26,7 @@ subjects:
 > 重审（2026-11-09）：foundation repair: canonical product metadata, dual licensing, dual VEX, release bundle
 
 > 重审（2026-11-09）：foundation repair: canonical product metadata, dual licensing, and release bundle
+> 重审（2026-11-09）：L3 门禁事实
 
 > 重审（2026-11-09）：L3 actions 版本
 

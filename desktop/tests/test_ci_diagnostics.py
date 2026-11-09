@@ -178,5 +178,70 @@ class TeePipefailTest(unittest.TestCase):
             f"含 | tee 的步骤未启用 pipefail（退出码会被 tee 吞）：{bad}")
 
 
+class GateAlwaysRunsTest(unittest.TestCase):
+    """gate 不得因依赖失败而被「跳过」（2026-11-09 实测 #251）。
+
+    GitHub 对 required check 的 skipped 视为通过：gate 若 `needs: [static-checks, unit-tests]`
+    且没有 `if: always()`，unit-tests 有分片红时 gate 被跳过 ⇒ auto-merge 照样合并。
+    """
+
+    def test_gate_is_always_run_and_checks_dependencies(self):
+        import re
+        text = (WF / "ci-verify.yml").read_text(encoding="utf-8")
+        m = re.search(r"(?ms)^  gate:\n(.*?)(?=^  [a-z0-9-]+:\n|\Z)", text)
+        self.assertIsNotNone(m, "ci-verify.yml 找不到 gate job")
+        block = m.group(1)
+        self.assertIn("if: always()", block, "gate 未声明 if: always()（会被跳过）")
+        self.assertIn("needs.static-checks.result", block, "gate 未校验 static-checks 结果")
+        self.assertIn("needs.unit-tests.result", block, "gate 未校验 unit-tests 结果")
+
+
+class ParityKeyCompareTest(unittest.TestCase):
+    """linux-parity-refresh 的 posix SAST 漂移判定必须逐键比对（2026-11-09）。
+
+    只比总数会漏「一规则 +1、另一规则 -1」的键级漂移（总数相等 → 漂移告警绿着放行）。
+    """
+
+    def test_parity_compares_keys_not_only_totals(self):
+        text = (WF / "linux-parity-refresh.yml").read_text(encoding="utf-8")
+        self.assertIn("键级漂移", text, "parity 漂移判定未做键级比对")
+        self.assertIn("set(c) - set(b)", text, "parity 漂移判定缺少 extra 键集合")
+        self.assertNotIn("got != want", text, "parity 仍在用总数比较（会漏键级漂移）")
+
+
+class HiddenArtifactPathTest(unittest.TestCase):
+    """artifact 的 path 不得指向隐藏**文件**（2026-11-09 #247/#248 实测）。
+
+    actions/upload-artifact v4+ 默认 `include-hidden-files=false`：path 里以 `.` 开头
+    的**文件**会被静默丢弃（sast-counts.json / sast-extra-*.json 曾整年没进 artifact）。
+    隐藏**目录**（如 `.nf-logs/`）不受影响，故只查 basename 以点开头的纯文件路径。
+    """
+
+    def test_no_artifact_path_is_a_hidden_file(self):
+        import re
+        bad = {}
+        for p in sorted(WF.glob("*.yml")):
+            text = p.read_text(encoding="utf-8")
+            for block in re.split(r"(?m)^ {6}- ", text):
+                if "upload-artifact" not in block:
+                    continue
+                if "include-hidden-files: true" in block:
+                    continue
+                pat = r"(?ms)^\s+path: \|\n(.*?)(?=^\s+[a-z-]+:|\Z)"
+                m = re.search(pat, block)
+                if not m:
+                    continue
+                for line in m.group(1).splitlines():
+                    item = line.strip()
+                    if not item or item.startswith("#"):
+                        continue
+                    name = item.rstrip("/").split("/")[-1]
+                    if name.startswith(".") and not item.endswith("/"):
+                        bad.setdefault(p.name, []).append(item)
+        self.assertEqual(
+            {}, bad,
+            f"artifact path 指向隐藏文件（会被 upload-artifact 静默丢弃）：{bad}")
+
+
 if __name__ == "__main__":
     unittest.main()
