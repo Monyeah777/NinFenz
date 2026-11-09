@@ -1,7 +1,7 @@
 {
-  "bytes": 11972765,
+  "bytes": 11972799,
   "count": 564,
-  "digest": "e50af217d06bc5521e909c08fbe621302c27b4015557fef5f253d8adad276f4e",
+  "digest": "a392191488bc190cafdc7b794bee1effd249e9d0711edd7c76ccefa65a4e752c",
   "materials": [
     {
       "bytes": 102,
@@ -1854,9 +1854,9 @@
       "sha256": "393d118f5a9cf5ecc39458ee5f4aed3aa7fbc37e459440aef90111e6f7ae1087"
     },
     {
-      "bytes": 11509,
+      "bytes": 11538,
       "path": "docs/ccos/release-conclusion.md",
-      "sha256": "888f6613b2c76a648c088acac732cf2f65b342bd4e2c5866431c8a1597ff54bd"
+      "sha256": "c4331926bf8f1d30ca3f1281d8790dc1ee073e7e01e835c041e40e84ec65c9fa"
     },
     {
       "bytes": 3550,
@@ -1889,9 +1889,9 @@
       "sha256": "ad799cbfbf1dd69859ff21963885ebf1d5fed56ca67fdd1c2b9e2052ce3b8003"
     },
     {
-      "bytes": 251,
+      "bytes": 256,
       "path": "protocol/approvals/protocol__conformance_report.json",
-      "sha256": "b180fe47e511525cc63fe16c42dc2536e79c9a1209c1a633cead650fa6bc0270"
+      "sha256": "2ab759d48c2fe1e27083181e703ccf5d1b237b6db57cf562baf6efb208ce83db"
     },
     {
       "bytes": 16375,
