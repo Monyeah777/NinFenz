@@ -258,7 +258,11 @@ class WatchDaemonIntegrationTest(unittest.TestCase):
         # 常驻语料层是**模块级全局**且带「装到哪个 ROOT」的语义：同进程里前一个用例若为别的
         # ROOT 装过，它不会自动换掉——本用例读自己的 ROOT 就命中不了，表现为「单跑过、整跑挂」
         # （2026-11-10 全量快照 4/8 片连续三次命中）。开跑前先清空，让服务的 --watch 重新装。
-        csc.clear_resident()
+        # 必须用 sys.modules 里的**当前**对象：`_sync_code` 会重载 core.*，模块级 import 的 `csc`
+        # 可能是旧实例，清不到守护真正在用的那一份（这正是「清了还红」的原因）。
+        _live_csc = sys.modules.get("core.conformance_scan")
+        if _live_csc is not None:
+            _live_csc.clear_resident()
         self.home = tempfile.mkdtemp(prefix="nf_watch_ip_")
         self._old_home = os.environ.get("NARRATIVE_FORGE_HOME")
         os.environ["NARRATIVE_FORGE_HOME"] = self.home
