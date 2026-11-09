@@ -117,8 +117,9 @@ python scripts/verify_tests.py --affected           # 跑受影响模块
 用 100 秒换 36 分钟。
 
 **并发**：快照跑之前先拿 `.worktrees/gate-snap/.snapshot.lock`（互斥，含 pid/HEAD/时间）；
-拿不到就拒绝（或 `--lock-wait N` 排队等）——实测三份全量并发会把 45 分钟拉成 65+ 分钟，
-且两份外层会互相清对方 worktree。锁的自清 `unlink` 已登记 `purity_scan.SINK_ALLOW`。
+拿不到就拒绝（或 `--lock-wait N` 排队等）——单份全量在并发机器上实测 **55–75 分钟**
+（第 32 次 72 分钟；负载来自同机其他会话与本仓自身的全量判据）；三份并发会显著更长
+（早期实测 65+ 分钟，近期未复测）；且两份外层会互相清对方 worktree。锁的自清 `unlink` 已登记 `purity_scan.SINK_ALLOW`。
 
 **纪律**：`--affected` 只用于本地修复回路；「可发布」的结论必须来自上面的全量五步。
 
