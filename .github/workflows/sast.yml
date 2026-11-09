@@ -52,31 +52,6 @@ jobs:
           PY
           python scripts/sast_check.py 2>&1 | tee sast.log
 
-      - name: 扩展面可见性（tui/ + packaging/；非阻塞，仅留档）
-        # 2026-11-09 审计（task-40）：棘轮 SCAN_TARGETS 只有 desktop/src/scripts/.github/scripts，
-        # 而 tui/（终端入口）与 packaging/（含对公网 hf-space server.py）完全没进 SAST 面。
-        # 扩棘轮需按平台重测基线（本地只有 nt 段），暂先做**非阻塞可见性**：跑一遍、把 JSON 留 artifact，
-        # 让后续扩展有真实数据可 review（不改 baseline、不会红）。
-        if: always()
-        run: |
-          set +e
-          python -m bandit -r tui packaging -f json -o sast-extra-bandit.json
-          python -m ruff check --select S tui packaging --output-format json > sast-extra-ruff.json
-          python - <<'PY'
-          import json
-          import pathlib
-          for name in ("bandit", "ruff"):
-              p = pathlib.Path("sast-extra-%s.json" % name)
-              if not p.is_file():
-                  continue
-              try:
-                  doc = json.loads(p.read_text(encoding="utf-8"))
-              except ValueError:
-                  print("%s 扩展面输出不可解析（留档跳过）" % name)
-                  continue
-              rows = doc.get("results", []) if isinstance(doc, dict) else doc
-              print("%s 扩展面命中 %d 条（非阻塞；JSON 见 artifact）" % (name, len(rows)))
-          PY
       - name: 失败诊断产物（Z5：本 run 的日志/报告；无则跳过）
         # Z5（2026-10-10 审计 §11j N8）：失败时要有**可下载**的诊断物，而不是只留滚动日志。
         if: always()
@@ -88,6 +63,4 @@ jobs:
             .artifacts/
             *.log
             sast-counts.json
-            sast-extra-bandit.json
-            sast-extra-ruff.json
           if-no-files-found: ignore
