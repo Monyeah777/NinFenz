@@ -1,8 +1,7 @@
 """门禁的**机器可读出口**：把全部核心判据聚合成一份 JSON（`protocol/verification_report.json`）。
 
 为什么需要（顶层化目标 · 静态可核验）：门禁此前只有人读文本，机器消费方拿不到结构化结论，
-无法自动回答
-「哪些判据在场 / 各报几条 / 声明基线与实测是否一致 / 这份报告是否对应当前树」。
+无法自动回答「哪些判据在场 / 各报几条 / 声明基线与实测是否一致 / 这份报告是否对应当前树」。
 
 设计口径：
 - **判据来源 = 门禁自身用的那些 scanner**（不另造一套）：逐条调 core 扫描器，任何一条
@@ -67,6 +66,7 @@ SPECS: Tuple[Tuple[str, str, str, str, str], ...] = (
     ("judgement_coverage", "判据接线覆盖（暴露 scan() 的判据必须有消费者或例外登记）",
      "judgement_coverage", "scan", "scan"),
     ("asvs", "OWASP ASVS 5.0 L2 作用域证据矩阵", "asvs_policy", "scan", "scan"),
+    ("ssdf", "NIST SSDF v1.1 作用域证据与漏洞响应闭环", "ssdf_policy", "scan", "scan"),
     ("workflow_policy", "工作流供应链策略（SHA 钉死 + 显式最小权限）",
      "workflow_policy", "scan", "scan"),
     ("asset_contract",

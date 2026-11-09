@@ -1,5 +1,26 @@
 {
   "schema": "nf-vuln-disposition/1",
-  "reviewed_at": "2026-10-27",
+  "reviewed_at": "2026-10-29",
+  "claims_no_vulnerabilities": false,
+  "intake_channels": [
+    "GitHub Security Advisories",
+    "Dependabot alerts and pull requests",
+    "CodeQL and SAST findings",
+    "Maintainer manual review of upstream advisories"
+  ],
+  "severity_sla_days": {
+    "critical": 1,
+    "high": 7,
+    "medium": 30,
+    "low": 90
+  },
+  "root_cause_review": {
+    "reviewed_at": "2026-10-29",
+    "cadence": "Before every release and whenever a finding or credible upstream advisory is added.",
+    "statement": "No vulnerability findings are recorded in the current ledger; this empty result is not evidence that no vulnerabilities exist.",
+    "patterns": [],
+    "sdlc_actions": [],
+    "regression_tests": []
+  },
   "findings": []
 }

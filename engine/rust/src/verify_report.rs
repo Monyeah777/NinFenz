@@ -39,7 +39,7 @@ impl Spec {
 }
 
 /// 真源 `SPECS` 逐字（次序即报告 items 的次序）。
-pub const SPECS: [Spec; 31] = [
+pub const SPECS: [Spec; 33] = [
     Spec {
         id: "purity",
         name: "架构纯度体检（R1-R7 + 分层阶梯 L1-L4）",
@@ -206,6 +206,18 @@ pub const SPECS: [Spec; 31] = [
         id: "judgement_coverage",
         name: "判据接线覆盖（暴露 scan() 的判据必须有消费者或例外登记）",
         module: "judgement_coverage",
+        entry: "scan",
+    },
+    Spec {
+        id: "asvs",
+        name: "OWASP ASVS 5.0 L2 作用域证据矩阵",
+        module: "asvs_policy",
+        entry: "scan",
+    },
+    Spec {
+        id: "ssdf",
+        name: "NIST SSDF v1.1 作用域证据与漏洞响应闭环",
+        module: "ssdf_policy",
         entry: "scan",
     },
     Spec {
@@ -755,15 +767,17 @@ mod tests {
 
     #[test]
     fn spec_table_matches_the_truth_source_shape() {
-        assert_eq!(SPECS.len(), 31);
+        assert_eq!(SPECS.len(), 33);
         assert_eq!(SPECS[0].id, "purity");
         assert_eq!(SPECS[1].source(), "schema_lint.scan");
         assert_eq!(SPECS[5].id, "rating");
         assert_eq!(SPECS[6].id, "rating_decided");
         assert_eq!(SPECS[6].source(), "rating_gate.decided");
-        assert_eq!(SPECS[29].id, "asset_contract");
-        assert_eq!(SPECS[30].id, "role_coordinates");
-        assert_eq!(SPECS[30].source(), "role_model.scan");
+        assert_eq!(SPECS[29].id, "asvs");
+        assert_eq!(SPECS[30].id, "ssdf");
+        assert_eq!(SPECS[31].id, "asset_contract");
+        assert_eq!(SPECS[32].id, "role_coordinates");
+        assert_eq!(SPECS[32].source(), "role_model.scan");
     }
 
     #[test]

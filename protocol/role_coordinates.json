@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1459,
+    "app": 1460,
     "entry": 26,
     "floor": 5,
     "prod": 1062,
     "projection": 149,
-    "support": 425,
-    "verify": 1000
+    "support": 427,
+    "verify": 1003
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -6983,6 +6983,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "Fail-closed validator for the task-level NIST SSDF v1.1 evidence matrix.",
+      "path": "desktop/src/core/ssdf_policy.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "ST 制卡质量规范门禁（验收层规范的**数据化**：M/S/R → fail/warn/info）。",
       "path": "desktop/src/core/st_quality.py",
       "role": "verify",
@@ -9253,6 +9259,12 @@
     {
       "function": "",
       "path": "desktop/tests/test_skill_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "NIST SSDF v1.1 scoped evidence and vulnerability-response regression tests.",
+      "path": "desktop/tests/test_ssdf_policy.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -12359,6 +12371,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "Validate the scoped NIST SSDF v1.1 evidence matrix and RV response ledger.",
+      "path": "scripts/ssdf_policy.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "Validate OSPS, S2C2F, package-source, and supplier evidence.",
       "path": "scripts/supply_chain_policy.py",
       "role": "verify",
@@ -12414,17 +12432,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "cfdaea1bc44cd92c3023c3aa297468fe7b52d613c71b0f4a5cd7a00bc43e0da4",
+  "root_digest": "e02307ed2943807fa3b6b5ffc83a8928e853b1eb32d9838c6097f8e8d4a09dce",
   "rule_counts": {
-    "R-app": 1459,
-    "R-catch": 262,
+    "R-app": 1460,
+    "R-catch": 263,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 129,
-    "R-support": 136,
-    "R-verify": 879,
-    "auto:R-core": 286
+    "R-support": 137,
+    "R-verify": 881,
+    "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
 }

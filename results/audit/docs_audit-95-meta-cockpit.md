@@ -19,12 +19,14 @@ subjects:
   - scripts/nf.py:869bab4dff472c51503c71770c1871cb4dab32a3c3d0977da69ce6a0ea963d9e
   - tui/_surface.py:8db432e006d08b717d507deb8839e02e0db1ccacc3e4962a712045ccfd2a30bf
   - protocol/check12_weights.json:8c90fd2fc8d55950f0f0a61befa16bd785ece0e0ddfd992bd4f42f53a5acbe14
-  - protocol/coupling_baseline.json:3e6a9a6a08a2e9fd3d83eb344bd794409b945cc9e8d222390583fe90179333c6
+  - protocol/coupling_baseline.json:bc468a0027523bc101ff3bbdc06967ad4866587ed6575f4208509cc6d66148a6
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:7b1231392bea0bc51ed14d73fac3c73c185209c1233e7727e554d5b899031af2
 
 ---
+> 重审（2026-11-09）：SSDF v1.1: 迁移到当前唯一真源架构后重绑
+
 > 重审（2026-11-09）：ASVS closure: 重构 ASVS/daemon/security 门禁后重绑摘要
 
 > 重审（2026-11-09）：ASVS residual closure: 合入唯一真源后重绑审计对象摘要

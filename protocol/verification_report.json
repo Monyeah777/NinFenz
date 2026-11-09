@@ -1,10 +1,10 @@
 {
   "built_for_date": "2026-11-09",
   "declared": {
-    "coverage_note": "判据级抽查面 32 条，各对应 verify.sh 的一道或多道门禁；≠ 声明 check 总数 42（两者不可互替）",
+    "coverage_note": "判据级抽查面 33 条，各对应 verify.sh 的一道或多道门禁；≠ 声明 check 总数 42（两者不可互替）",
     "expected_checks": 42,
     "expected_pass": 76,
-    "report_items": 32,
+    "report_items": 33,
     "verify_version": "v2.30"
   },
   "items": [
@@ -297,7 +297,7 @@
       "stats": {
         "contracts": 27,
         "passed": 27,
-        "root": "ed025a43614faa4472b1414d946da67073fc6e7654d4225b0d2b89488afaabec",
+        "root": "1c9623c6baabefe7e9d9f5849b2a95ff5d43d39fe10c27083fa23a9adcf84593",
         "verdict": "conformant"
       },
       "status": "pass",
@@ -368,7 +368,7 @@
       "source": "code_metrics.scan",
       "stats": {
         "baseline": 354,
-        "files": 354,
+        "files": 356,
         "max_fn_cc": 106,
         "max_fn_lines": 319,
         "max_lines": 9016
@@ -430,8 +430,8 @@
         "cycles": 0,
         "metrics_drift": 0,
         "metrics_missing": 0,
-        "metrics_recorded": 288,
-        "modules": 288,
+        "metrics_recorded": 289,
+        "modules": 289,
         "registered_cycles": 0,
         "registered_sdp": 11,
         "sdp": 11
@@ -476,10 +476,10 @@
       "sample": [],
       "source": "judgement_coverage.scan",
       "stats": {
-        "consumed": 68,
+        "consumed": 69,
         "exceptions": 2,
         "orphans": 2,
-        "scanners": 70
+        "scanners": 71
       },
       "status": "pass",
       "warns": 0
@@ -593,6 +593,35 @@
       "warns": 0
     },
     {
+      "id": "ssdf",
+      "issues": 0,
+      "name": "NIST SSDF v1.1 作用域证据与漏洞响应闭环",
+      "sample": [],
+      "source": "ssdf_policy.scan",
+      "stats": {
+        "advisories": {
+          "claims_no_vulnerabilities": false,
+          "findings": 0,
+          "root_cause_reviewed_at": "2026-10-29",
+          "unresolved": 0,
+          "vex_statements": 0
+        },
+        "certified": false,
+        "practices": 19,
+        "statuses": {
+          "enforced": 11,
+          "external-manual": 8
+        },
+        "task_statuses": {
+          "enforced": 30,
+          "external-manual": 12
+        },
+        "tasks": 42
+      },
+      "status": "pass",
+      "warns": 0
+    },
+    {
       "id": "workflow_policy",
       "issues": 0,
       "name": "工作流供应链策略（SHA 钉死 + 显式最小权限）",
@@ -632,8 +661,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4127,
-        "kernel": 2067,
+        "files": 4133,
+        "kernel": 2070,
         "kernel_no_self": 309,
         "rules": 9,
         "uncovered": 0,
@@ -644,12 +673,12 @@
       "warns": 0
     }
   ],
-  "root_digest": "ddf96b95942f3d066845a9df07da76daff59dcf610520abbfb6f2bdb01aed6be",
+  "root_digest": "df6dd16b2e7dfba4dabc9bc3177105c1a7e42603a378a26c84ab6ad81d63ec3d",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
     "fail": 0,
-    "pass": 31,
+    "pass": 32,
     "warn": 1
   }
 }
