@@ -22,7 +22,7 @@ import io
 import json
 import os
 import shutil
-import subprocess
+import subprocess  # nosec B404 - fixed tool names resolved through shutil.which
 import sys
 import tarfile
 import uuid
@@ -74,8 +74,11 @@ def read_json(path: Path) -> dict[str, Any]:
 
 
 def git(*args: str) -> str:
-    proc = subprocess.run(
-        ["git", *args],
+    git_bin = shutil.which("git")
+    if not git_bin:
+        raise ReleaseError("缺 git：无法读取发布来源身份")
+    proc = subprocess.run(  # noqa: S603  # nosec B603
+        [git_bin, *args],
         cwd=REPO_ROOT,
         check=False,
         capture_output=True,
@@ -112,7 +115,7 @@ def stage_payload(dirty_allowed: bool) -> None:
     args = [node, str(PACKAGE_ROOT / "tools" / "stage-payload.mjs"), "--quiet"]
     if dirty_allowed:
         args.append("--allow-dirty")
-    proc = subprocess.run(
+    proc = subprocess.run(  # noqa: S603  # nosec B603
         args,
         cwd=PACKAGE_ROOT,
         check=False,
