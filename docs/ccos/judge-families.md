@@ -25,12 +25,13 @@
 
 | 项 | 内容 |
 |---|---|
-| 检查对象 | 一切「引用」：方法包例子里的路径、`criteria_refs`、文档相对链接、文档里的仓库路径 |
+| 检查对象 | 一切「引用」：方法包例子里的路径、`criteria_refs`、`maps_to`、文档相对链接、文档里的仓库路径；反向也查——脚本是否被任何可执行面引用 |
 | 形式 | 抽取 token → 解析（含文档所在目录）→ 必须存在；另加「至少 N 条」防判据失效 |
 | 失效方式 | 示例性文件名（`f1.json`）被误判；抽取正则漏一种写法 |
-| 证据 | `desktop/tests/test_method_pack.py`（例子路径 / `criteria_refs` / `maps_to`）、`desktop/tests/test_ccos_docs_anchors.py`（根前缀路径 / 相对链接） |
+| 证据 | `desktop/tests/test_method_pack.py`、`desktop/tests/test_ccos_docs_anchors.py`、`desktop/tests/test_script_orphans.py` |
 | 真红记录 | 例子路径 7 处缺前缀；`criteria_refs` 5 包悬空（含自造的 `standard:ISO27001`）；后两条首查即绿 |
 | 口径教训 | 宽正则（只查扩展名）曾有 118 条假红、判据不可用；收窄成「必须带根前缀」后 59 条全真 |
+| 池子边界 | 反向判据（「有没有东西指向它」）要先定清「什么算指向」：把 `docs/` 计入池，写一篇清单文档就能让孤儿判据空转；把脚本自身计入池，每个脚本的 usage 行都会自我满足 |
 
 ## 四、文档数字判据（写下来的数对不对）
 
