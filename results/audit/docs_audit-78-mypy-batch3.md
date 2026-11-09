@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:f2e6ff877bf55e5620f25d62778aa3267ac64c968a34c0d407e23ba7cd603239
+  - protocol/code_metrics_baseline.json:548a9c6220edda25620d4df5b98e8108372a6c826f9986844aeae955d65fa4aa
 ---
+> 重审（2026-11-10）：冻结链
+
 > 重审（2026-11-09）：冻结链
 
 > 重审（2026-11-09）：core 引用面映射（355 模块 / 未引用 34，棘轮只减不增）

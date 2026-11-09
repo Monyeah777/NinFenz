@@ -211,7 +211,7 @@
       "max_fn_lines": 30
     },
     "desktop/src/core/code_metrics.py": {
-      "lines": 146,
+      "lines": 147,
       "max_fn_cc": 12,
       "max_fn_lines": 33
     },
@@ -1226,7 +1226,7 @@
       "max_fn_lines": 12
     },
     "desktop/src/core/sbom.py": {
-      "lines": 91,
+      "lines": 93,
       "max_fn_cc": 15,
       "max_fn_lines": 26
     },

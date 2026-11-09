@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:9a86928171c71f4a2d3d324508fdafccb60fd7cc8423d52197185214a40ea30f
-  - protocol/code_metrics_baseline.json:f2e6ff877bf55e5620f25d62778aa3267ac64c968a34c0d407e23ba7cd603239
+  - protocol/code_metrics_baseline.json:548a9c6220edda25620d4df5b98e8108372a6c826f9986844aeae955d65fa4aa
 ---
+> 重审（2026-11-10）：冻结链
+
 > 重审（2026-11-09）：冻结链
 
 > 重审（2026-11-09）：core 引用面映射（355 模块 / 未引用 34，棘轮只减不增）

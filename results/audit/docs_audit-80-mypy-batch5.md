@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:22e24633e87e95453d0c2cf4a595d0496bae5d7331c1fc644d5b1555e4925a41
-  - protocol/code_metrics_baseline.json:f2e6ff877bf55e5620f25d62778aa3267ac64c968a34c0d407e23ba7cd603239
+  - protocol/code_metrics_baseline.json:548a9c6220edda25620d4df5b98e8108372a6c826f9986844aeae955d65fa4aa
 ---
+> 重审（2026-11-10）：冻结链
+
 > 重审（2026-11-09）：冻结链
 
 > 重审（2026-11-09）：core 引用面映射（355 模块 / 未引用 34，棘轮只减不增）

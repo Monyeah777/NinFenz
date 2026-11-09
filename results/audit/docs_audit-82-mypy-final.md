@@ -30,8 +30,10 @@ subjects:
   - desktop/src/core/daemon.py:75940f32b3068a5bc7a83b288bb9302e76a948eca0baa76e1e62f02243c8b498
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:f2e6ff877bf55e5620f25d62778aa3267ac64c968a34c0d407e23ba7cd603239
+  - protocol/code_metrics_baseline.json:548a9c6220edda25620d4df5b98e8108372a6c826f9986844aeae955d65fa4aa
 ---
+> 重审（2026-11-10）：冻结链
+
 > 重审（2026-11-09）：冻结链
 
 > 重审（2026-11-09）：core 引用面映射（355 模块 / 未引用 34，棘轮只减不增）

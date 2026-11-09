@@ -31,7 +31,9 @@ def _files(root: Path) -> list[Path]:
     out: set[Path] = set()
     for pattern in SCOPES:
         out.update(p for p in root.glob(pattern) if p.is_file())
-    return sorted(out)
+    # 按 posix 字符串排序：Path 比较在 Windows 上大小写不敏感、Linux 上敏感，
+    # 同一棵树的条目顺序会不同，清单摘要在两岸对不上（2026-11-10 CI 实测）。
+    return sorted(out, key=lambda q: q.as_posix())
 
 
 def _digest(rows: list[dict[str, Any]]) -> str:

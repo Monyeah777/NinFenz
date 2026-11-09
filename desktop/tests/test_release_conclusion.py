@@ -452,8 +452,16 @@ class TestSnapshotLocation(unittest.TestCase):
         self.assertEqual(ROOT / ".worktrees" / "custom", base)
 
     def test_override_absolute_wins(self):
-        base = self.gate.snapshot_base(ROOT, "D:/elsewhere/snap")
-        self.assertTrue(str(base).startswith("D:"))
+        # 绝对路径的平台形态不同：Windows 是 `D:/…`，POSIX 是 `/…`（2026-11-10 Linux CI 实测）。
+        if os.name == "nt":
+            base = self.gate.snapshot_base(ROOT, "D:/elsewhere/snap")
+            self.assertTrue(str(base).startswith("D:"))
+            return
+        import tempfile
+
+        tmp = tempfile.mkdtemp(prefix="nf_snap_abs_")
+        base = self.gate.snapshot_base(ROOT, tmp)
+        self.assertEqual(Path(tmp), Path(base))
 
     def test_free_space_probe_does_not_raise(self):
         self.assertGreater(self.gate._snapshot_free_bytes(ROOT), 0)
