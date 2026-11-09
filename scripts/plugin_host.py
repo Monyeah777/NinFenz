@@ -51,10 +51,11 @@ FUEL_MARKERS = ("all fuel consumed", "out of fuel", "fuel has been consumed")
 #: 不约束宿主管道与巨大输出；这两条必须由宿主自己兜住。
 MAX_PLUGIN_INPUT_BYTES = 8 << 20
 MAX_PLUGIN_OUTPUT_BYTES = 8 << 20
+#: 插件声明的墙钟上限缺失时使用的默认预算；安全控制清单必须与此常量逐值一致。
+DEFAULT_WALL_TIMEOUT_MS = 30_000
 #: Component Model 走 WAVE argv，受操作系统单条命令行上限约束；按最坏 4 字符/字节预算。
 MAX_COMPONENT_ARGV_CHARS = 30_000
 MAX_COMPONENT_INPUT_BYTES = (MAX_COMPONENT_ARGV_CHARS - 2) // 4
-DEFAULT_WALL_TIMEOUT_MS = 30_000
 
 
 def resolve_wasmtime():

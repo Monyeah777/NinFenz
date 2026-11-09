@@ -1,0 +1,185 @@
+{
+  "count": 4,
+  "schema": "nf-abi-call-vectors/1",
+  "vectors": [
+    {
+      "decl": {
+        "code": [
+          {
+            "glob": "code/**/*.py",
+            "id": "C1"
+          }
+        ],
+        "data": [
+          {
+            "id": "D1",
+            "path": "d/a.md"
+          },
+          {
+            "glob": "d/*.md",
+            "id": "D2"
+          }
+        ],
+        "index": [
+          {
+            "glob": "docs/*.md",
+            "id": "I1"
+          }
+        ],
+        "schema": "nf-asset-contracts/1",
+        "script": []
+      },
+      "desc": "代码件被 C1 认领",
+      "expected": {
+        "closure_closed": true,
+        "ids": [
+          "C1"
+        ],
+        "unclaimed": false
+      },
+      "files": [
+        "d/a.md",
+        "d/b.txt",
+        "code/x.py",
+        "code/sub/y.py",
+        "docs/readme.md"
+      ],
+      "id": "claimed_code",
+      "object": "code/sub/y.py"
+    },
+    {
+      "decl": {
+        "code": [
+          {
+            "glob": "code/**/*.py",
+            "id": "C1"
+          }
+        ],
+        "data": [
+          {
+            "id": "D1",
+            "path": "d/a.md"
+          },
+          {
+            "glob": "d/*.md",
+            "id": "D2"
+          }
+        ],
+        "index": [
+          {
+            "glob": "docs/*.md",
+            "id": "I1"
+          }
+        ],
+        "schema": "nf-asset-contracts/1",
+        "script": []
+      },
+      "desc": "数据件同时命中 D1 与 D2",
+      "expected": {
+        "closure_closed": true,
+        "ids": [
+          "D1",
+          "D2"
+        ],
+        "unclaimed": false
+      },
+      "files": [
+        "d/a.md",
+        "d/b.txt",
+        "code/x.py",
+        "code/sub/y.py",
+        "docs/readme.md"
+      ],
+      "id": "claimed_data",
+      "object": "d/a.md"
+    },
+    {
+      "decl": {
+        "code": [
+          {
+            "glob": "code/**/*.py",
+            "id": "C1"
+          }
+        ],
+        "data": [
+          {
+            "id": "D1",
+            "path": "d/a.md"
+          },
+          {
+            "glob": "d/*.md",
+            "id": "D2"
+          }
+        ],
+        "index": [
+          {
+            "glob": "docs/*.md",
+            "id": "I1"
+          }
+        ],
+        "schema": "nf-asset-contracts/1",
+        "script": []
+      },
+      "desc": "未被任何契约认领（closure_closed=false）",
+      "expected": {
+        "closure_closed": false,
+        "ids": [],
+        "unclaimed": true
+      },
+      "files": [
+        "d/a.md",
+        "d/b.txt",
+        "code/x.py",
+        "code/sub/y.py",
+        "docs/readme.md"
+      ],
+      "id": "unclaimed",
+      "object": "d/b.txt"
+    },
+    {
+      "decl": {
+        "code": [
+          {
+            "glob": "code/**/*.py",
+            "id": "C1"
+          }
+        ],
+        "data": [
+          {
+            "id": "D1",
+            "path": "d/a.md"
+          },
+          {
+            "glob": "d/*.md",
+            "id": "D2"
+          }
+        ],
+        "index": [
+          {
+            "glob": "docs/*.md",
+            "id": "I1"
+          }
+        ],
+        "schema": "nf-asset-contracts/1",
+        "script": []
+      },
+      "desc": "文档被 I1 认领",
+      "expected": {
+        "closure_closed": true,
+        "ids": [
+          "I1"
+        ],
+        "unclaimed": false
+      },
+      "files": [
+        "d/a.md",
+        "d/b.txt",
+        "code/x.py",
+        "code/sub/y.py",
+        "docs/readme.md"
+      ],
+      "id": "claimed_index",
+      "object": "docs/readme.md"
+    }
+  ]
+}

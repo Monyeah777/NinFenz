@@ -67,10 +67,14 @@ const DOMAIN_TERMS: [&str; 28] = [
 ];
 
 /// 真源 `HARD_ALLOW`：登记的第三方硬依赖（允许直接 import）。
-const HARD_ALLOW: [&str; 2] = ["yaml", "scripts"];
+const HARD_ALLOW: [&str; 1] = ["yaml"];
 
 /// 真源 `SOFT_IMPORTS`：第三方可选依赖（须 try/except ImportError 守卫）。值只用于消息。
-const SOFT_IMPORTS: [(&str, &str); 6] = [
+const SOFT_IMPORTS: [(&str, &str); 5] = [
+    (
+        "PIL",
+        "标注水印层（label_watermark）读写 PNG 位图；软导入 + 缺依赖给修复指引，文本载体保持纯标准库",
+    ),
     (
         "jsonschema",
         "IDL 标准实现交叉验证（可选对照；缺依赖则跳过该面）",
@@ -80,16 +84,8 @@ const SOFT_IMPORTS: [(&str, &str); 6] = [
         "CCV3 卡面占位图写入（缺依赖须给明确修复指引，不得裸 ImportError）",
     ),
     (
-        "cyclonedx",
-        "SBOM 官方 schema 验证（固定 requirements-sbom.txt）",
-    ),
-    (
-        "rdflib",
-        "SPDX JSON-LD 展开验证（固定 requirements-sbom.txt）",
-    ),
-    (
         "nf_pyengine",
-        "PyO3 扩展（engine/rust/pyo3 构建）为可选进程内原语加速；缺扩展时 rust_pyext 回退 hashlib/repr，不把 Rust 工具链变成运行前提",
+        "PyO3 扩展为可选进程内原语加速；缺扩展时 rust_pyext 回退 hashlib/repr",
     ),
     (
         "laya",
@@ -135,8 +131,8 @@ const METHOD_SINKS: [(&str, &str); 1] = [(
 /// 顺序与真源 `purity_scan.SINK_ALLOW` 逐条同序（2026-10-19：补 `scratch.py` 的两条豁免，
 /// 该模块是 2026-10-19 新增的临时区单一裁决点，Python 侧已登记「探针自清 / 整目录回收」）。
 const SINK_ALLOW: [(&str, &str); 15] = [
-    ("verify_tests.py:unlink", ""),
     ("rust_engine.py:unlink", ""),
+    ("release_conclusion.py:shutil.rmtree", ""),
     ("regression_score.py:__import__", ""),
     ("e2e_desktop_headless.py:shutil.rmtree", ""),
     ("storage.py:shutil.rmtree", ""),

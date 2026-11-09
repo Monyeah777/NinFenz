@@ -33,7 +33,7 @@ EXTERNAL_SUITES = {
     "packaging/npm/test/smoke.test.mjs":
         "由 desktop/tests/test_npm_package.py 常驻执行（node --test）",
     "engine/dotnet/src/Nf.Engine/SelfTest.cs":
-        ".NET 线自带工作流（net-engine.yml）与 engine/dotnet/RUNBOOK.md 流程",
+        "由 net-probes.yml（workflow_dispatch 手动跑批）与 engine/dotnet/RUNBOOK.md 流程执行",
 }
 #: 塌缩下限（本仓当前 180+；低于此值说明判据面失效）
 MIN_DISCOVERED = 150

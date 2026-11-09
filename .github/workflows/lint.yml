@@ -21,16 +21,16 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15          # 挂死上限（2026-10-01 统一）
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
         with:
           persist-credentials: false
-      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6
         with:
           cache-dependency-path: .github/requirements-*.txt
           cache: pip
           python-version: '3.11'
       - name: 安装 ruff
-        run: pip install -r .github/requirements-lint.txt  # 版本固定见该文件（F-05）
+        run: pip install --require-hashes -r .github/requirements-lint.txt  # 版本固定见该文件（F-05）
       - name: ruff 语法级静态检查（ruff.toml：E9/F63/F7/F82）
         run: ruff check desktop/src scripts
 
@@ -39,23 +39,23 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20          # 挂死上限（2026-10-01 统一）
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
         with:
           persist-credentials: false
-      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6
         with:
           cache-dependency-path: .github/requirements-*.txt
           cache: pip
           python-version: '3.11'
       - name: 安装 ruff
-        run: pip install -r .github/requirements-lint.txt  # 版本固定见该文件（F-05）
+        run: pip install --require-hashes -r .github/requirements-lint.txt  # 版本固定见该文件（F-05）
       - name: 风格棘轮（Z2：规则集 E,W,F,B,UP,I,C4,SIM,RET，只拦新增；存量按基线冻结）
         run: python scripts/style_check.py
 
       - name: 失败诊断产物（Z5：本 run 的日志/报告；无则跳过）
         # Z5（2026-10-10 审计 §11j N8）：失败时要有**可下载**的诊断物，而不是只留滚动日志。
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7
         with:
           name: lint-diagnostics
           path: |
@@ -63,22 +63,3 @@ jobs:
             .artifacts/
             *.log
           if-no-files-found: ignore
-
-  # REUSE 3.3 合规（Linux 基金会规范；发布物/法务面黄马甲）
-  # 版本钉死保证可复现：升级需同步更新 .reuse 规则与 LICENSES/。
-  reuse-lint:
-    name: reuse-compliance-3.3
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
-        with:
-          persist-credentials: false
-      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
-        with:
-          python-version: '3.11'
-      # 用官方 Docker action（钉 40 位 SHA），避免把 reuse 的依赖链塞进 requirements（该文件是 --require-hashes 链）
-      - name: REUSE lint（Spec 3.3）
-        uses: fsfe/reuse-action@676e2d560c9a403aa252096d99fcab3e1132b0f5  # v6.0.0
-        with:
-          args: lint

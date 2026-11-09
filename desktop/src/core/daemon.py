@@ -111,7 +111,6 @@ SOCKET_TIMEOUT = 30.0
 #: 帧接收超时（秒）：未认证连接最多占住串行 accept 这么久，随后即断开。
 HANDSHAKE_TIMEOUT = 5.0
 STATE_NAME = "daemon.json"
-LOG_NAME = "daemon.log"
 _STATE_WRITE_LOCK = threading.Lock()
 #: bash 快路模板（`nf daemon shell-init bash` 原样输出，供 `eval "$(…)"` 装进交互 shell）。
 #: 关键点：**全部用 bash 内建**（/dev/tcp + printf + read -N），因此 `nf …` 是当前 shell 里的
@@ -137,8 +136,9 @@ def state_path() -> Path:
 
 
 def log_path() -> Path:
-    """守护诊断日志：与状态同目录，仅属主可写。"""
-    return state_path().with_name(LOG_NAME)
+    """守护后台 stderr 的稳定落点；目录与文件只允许当前用户访问。"""
+    from core import storage
+    return Path(storage.default_home()) / "daemon.log"
 
 
 def read_state() -> Optional[Dict[str, Any]]:
@@ -195,7 +195,6 @@ def reset_process_caches() -> None:
 
     只在守护进程里逐请求调用——让热进程与「新起进程」看到同一份仓库事实。
     """
-    atoms.woken(clear=True)          # 激活面逐请求重新观测（累计值会跨请求串味）
     try:
         from core import pack_combo
         pack_combo.cache_clear()
@@ -528,17 +527,6 @@ def cache_stats() -> Dict[str, Any]:
             "resident": _csc.resident_stats()}
 
 
-def reset_cache_stats() -> None:
-    """清零响应缓存**观测计数**（不改缓存内容）。
-
-    为什么需要（2026-10-29 实测）：`test_watch` 的「同代际第二跑必须命中」用绝对值断言
-    `hits == 1`，而计数是**进程累计**语义——全量跑里前面的用例已用过响应缓存，起点不是 0，
-    于是全量跑假红、单模块跑必绿。用例要测"这次多了几次"就必须先清零。
-    """
-    for _k in list(_CACHE_STATS):
-        _CACHE_STATS[_k] = 0
-
-
 def reset_response_cache() -> None:
     """清空响应缓存（监听件报溢出/不可用时调用——宁可全废，不可错答）。"""
     _rc.clear()
@@ -682,9 +670,8 @@ def _internal_error_frame(exc: BaseException) -> bytes:
     口径与 `nf` 的内层错误面同源：一句「内部错误 + 修复指引」，不吐 traceback；`NF_DEBUG=1`
     时调用方改为上抛（排障），本函数不自行决定是否吞掉。
     """
-    _security_event("daemon.internal_error", error_type=type(exc).__name__)
-    return ("  ✗ 守护内部错误（修复指引：重跑同一条命令；若仍复现，请带着稳定事件类型提 issue"
-            "——该异常已被单条请求隔离，守护未退出）\n").encode()
+    return ("  ✗ 守护内部错误：%s（修复指引：重跑同一条命令；若仍复现，请带着这条消息提 issue"
+            "——该异常已被单条请求隔离，守护未退出）\n" % exc).encode("utf-8")
 
 
 def _handle_conn(conn: socket.socket, token: str, root: Path) -> bool:
@@ -697,12 +684,10 @@ def _handle_conn(conn: socket.socket, token: str, root: Path) -> bool:
     try:
         req = _parse_request(_LineReader(conn))
     except (ValueError, OSError, UnicodeDecodeError) as exc:
-        _security_event("daemon.request_rejected", reason=type(exc).__name__)
         send_framed(conn, 2, b"", ("请求不可读：%s\n" % exc).encode("utf-8"))
         return False
     conn.settimeout(SOCKET_TIMEOUT)
     if req.get("proto") != PROTO:
-        _security_event("daemon.request_rejected", reason="protocol_mismatch")
         send_framed(conn, 2, b"", "proto 不符\n".encode())
         return False
     # D1（2026-10-22 安全审计）：令牌是**唯一信任边界**，比较必须常量时间。
@@ -721,7 +706,6 @@ def _handle_conn(conn: socket.socket, token: str, root: Path) -> bool:
     op = req.get("op")
     if op is not None:
         if not isinstance(op, str):
-            _security_event("daemon.request_rejected", reason="op_type")
             send_framed(conn, 2, b"", "op 必须是字符串\n".encode())
             return False
         if op == "shutdown":
@@ -732,18 +716,15 @@ def _handle_conn(conn: socket.socket, token: str, root: Path) -> bool:
             payload = json.dumps(cache_stats(), ensure_ascii=False).encode("utf-8")
             send_framed(conn, 0, payload, b"")
             return False
-        _security_event("daemon.request_rejected", reason="unknown_op")
         send_framed(conn, 2, b"", "未知 op（允许 shutdown / stats）\n".encode())
         return False
     argv = req.get("argv")
     if not isinstance(argv, list) or not all(isinstance(a, str) for a in argv):
-        _security_event("daemon.request_rejected", reason="argv_type")
         send_framed(conn, 2, b"", "argv 必须是字符串列表\n".encode("utf-8"))
         return False
     try:
         cwd = _validated_cwd(root, req.get("cwd"))
     except ValueError as exc:
-        _security_event("daemon.request_rejected", reason="cwd_invalid")
         send_framed(conn, 2, b"", f"请求不可读：{exc}\n".encode())
         return False
     from core import disk_cache as _dc
@@ -777,12 +758,12 @@ def _serve_conn(conn: socket.socket, token: str, root: Path) -> bool:
     try:
         return _handle_conn(conn, token, root)
     except OSError as exc:
-        _security_event("daemon.connection_error", error_type=type(exc).__name__)
+        print("  [warn] 连接中断（守护继续）：%s" % exc, file=sys.stderr)
         return False
     except Exception as exc:                       # noqa: BLE001 - 最后一道隔离网
         if os.environ.get("NF_DEBUG"):
             raise                                  # 排障：显式要求时透出堆栈
-        _security_event("daemon.connection_error", error_type=type(exc).__name__)
+        print("  [warn] 单条连接失败（守护继续）：%s" % exc, file=sys.stderr)
         return False
 
 
@@ -861,7 +842,6 @@ def serve_forever(root: Path, idle_timeout: float = 0.0, ready: Optional[Any] = 
         reset_response_cache()
         clear_state()
         srv.close()
-        _security_event("daemon.stopped")
     return 0
 
 
@@ -898,7 +878,9 @@ def ping(doc: Optional[Dict[str, Any]] = None, timeout: float = 2.0) -> bool:
 
 
 def start(root: Path, idle_timeout: float = float(os.environ.get(
-            "NF_DAEMON_IDLE", DEFAULT_IDLE_TIMEOUT)),
+              "NF_DAEMON_IDLE", DEFAULT_IDLE_TIMEOUT)),
+          max_lifetime: float = float(os.environ.get(
+              "NF_DAEMON_MAX_LIFETIME", DEFAULT_MAX_LIFETIME)),
           wait: float = 30.0,
           watch: bool = False) -> Tuple[bool, str]:
     """拉起守护（后台子进程）→ (是否成功, 说明)。已在跑则直接返回 True。"""
@@ -910,7 +892,8 @@ def start(root: Path, idle_timeout: float = float(os.environ.get(
     env["PYTHONPATH"] = str(Path(root) / "desktop" / "src") + os.pathsep \
         + env.get("PYTHONPATH", "")
     args = [sys.executable, "-m", "core.daemon", "--serve",
-            "--root", str(root), "--idle", str(int(idle_timeout))]
+            "--root", str(root), "--idle", str(int(idle_timeout)),
+            "--max-lifetime", str(int(max_lifetime))]
     if watch:
         args.append("--watch")
     log = log_path()
@@ -984,16 +967,16 @@ def main(argv: Optional[List[str]] = None) -> int:
                                  description="NF 执行层常驻守护（内部入口）")
     ap.add_argument("--serve", action="store_true", help="前台跑守护循环（供 start 拉起）")
     ap.add_argument("--root", default=str(Path(__file__).resolve().parents[3]))
-    ap.add_argument("--idle", type=float, default=float(os.environ.get("NF_DAEMON_IDLE", 3600.0)),
+    ap.add_argument("--idle", type=float, default=float(os.environ.get(
+                        "NF_DAEMON_IDLE", DEFAULT_IDLE_TIMEOUT)),
                     help="空闲多少秒后自动退出（0=不退出）")
+    ap.add_argument("--max-lifetime", type=float, default=float(os.environ.get(
+                        "NF_DAEMON_MAX_LIFETIME", DEFAULT_MAX_LIFETIME)),
+                    help="进程绝对最大寿命（秒；0=显式关闭）")
     ap.add_argument("--force", action="store_true",
                     help="已有守护在运行时仍另起一个（会顶掉先起者的状态登记，默认拒绝）")
     ap.add_argument("--watch", action="store_true",
                     help="启用目录监听 + 只读命令响应缓存（树没变即整条复用；不可用自动降级）")
-    ap.add_argument("--max-lifetime", type=float,
-                    default=float(os.environ.get("NF_DAEMON_MAX_LIFETIME",
-                                                 DEFAULT_MAX_LIFETIME)),
-                    help="绝对最大寿命秒数（0=不限制）")
     args = ap.parse_args(argv)
     if not args.serve:
         ap.print_help()

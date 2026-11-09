@@ -1,0 +1,3 @@
+type: fix
+surface: ccos
+note: 载体 v0 硬化（task-21）——embed 增对象绑定（content_digest = 去掉本件 AIGC 块后的内容摘要，不符 fail-closed），拒绝空壳/仅签名 PNG（IHDR 首/IEND 尾/至少两块），畸形 AIGC iTXt 块 fail-closed（不再静默跳过重复插块），--out 不得等于源文件，输入 64 MiB 上限；nf label ir 位置参数 dest 改 label_object（吃二进制，修「唯一支持格式 PNG 无法按文档生成 IR」断链）。文档/注释 9 处旧句清理（abi-v0:18/249/275、threat-model、label-ir-v0、label_ir、label_sidecar、ccos_chain）；ccos_chain MISSING 闭集保持不变（链未接 label 环是事实）。新增 6 条负例（IR 指异物/空壳/--out==src/畸形 AIGC/深嵌套不崩/CLI ir 吃二进制）。code_metrics 小幅重冻（327 件）；style 9921=基线。判据：100 项相关测试 OK（carrier 17 + chain/abi/CLI），bench 38/38 不回归，checks-only FAIL=0，conformance 27/27，freshness 4/4。

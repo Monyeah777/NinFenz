@@ -19,6 +19,7 @@
 import argparse
 import os
 import sys
+from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 # argparse 的每个**内建** help 串都要过一次 `gettext.translation`（本机实测：建一次命令面 **432 次
@@ -37,43 +38,11 @@ if hasattr(sys.stderr, "reconfigure"):
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "desktop", "src"))
-from core import interp_diet  # noqa: E402 - 紧接路径设定；`-S` 下补回 site-packages（见其 docstring）
+from core import cli_bridge, interp_diet, json_doc  # noqa: E402 - 承重件在 desktop/src
+
 interp_diet.restore()
 
-
-class _LazyModule:
-    """按需导入的模块代理（`json_doc.load(...)` 首次调用才真 import）。
-
-    为什么：`core.json_doc` 连带 `atomic_write` → pathlib/tempfile/hashlib/shutil，实测导入
-    累计 ≈19 ms。而 `--version`、`--help`、**参数错误面**（argparse 早退）根本用不到它——
-    错误扫描类用例每次都在白付这 19 ms。代理后顶层零成本，首次真用才付（且只付一次）。
-    代理只转发属性访问；不做 `is module` 之类断言（本仓无此用法，测试守着）。
-    """
-
-    __slots__ = ("_name", "_mod")
-
-    def __init__(self, name: str) -> None:
-        object.__setattr__(self, "_name", name)
-        object.__setattr__(self, "_mod", None)
-
-    def _load(self):
-        mod = object.__getattribute__(self, "_mod")
-        if mod is None:
-            import importlib
-            mod = importlib.import_module(object.__getattribute__(self, "_name"))
-            object.__setattr__(self, "_mod", mod)
-        return mod
-
-    def __getattr__(self, item: str):
-        return getattr(self._load(), item)
-
-    def __repr__(self) -> str:                                   # pragma: no cover - 诊断
-        return f"<lazy module {object.__getattribute__(self, '_name')}>"
-
-
-json_doc = _LazyModule("core.json_doc")   # 承重件在 desktop/src，脚本须能独立运行
-
-NF_CLI_VERSION = "1.1.0"
+NF_CLI_VERSION = "1.0.5"
 NF_CLI_EPILOG = (
     "入门：\n"
     "  nf shell              # 交互终端（能力菜单 + 命令直通；端壳退役后的人机入口）\n"
@@ -102,27 +71,7 @@ def _build_parser() -> argparse.ArgumentParser:
     return _PARSER_CACHE
 
 
-def _make_parser() -> argparse.ArgumentParser:
-    """真正构建 argparse 命令面（**只在缓存未命中时调用一次**——见 `_build_parser`）。"""
-    p = argparse.ArgumentParser(
-        prog="nf", description=(
-            "NinFenz 全链管道（B2：retrieve→compose→gate→export）。"
-            "分层引导（40 总纲 v2.8 波B S7）：作者五分钟上手 = run / demo / pipeline new；"
-            "开发者与仓库治理工具族 = asset / module / register / market / spec / render / serve / "
-            "design / audit / who-refers / impact / rename / import——README「五分钟快速开始」"
-            "含逐条示例。"),
-        epilog=NF_CLI_EPILOG,
-    )
-    p.add_argument("--version", action="version",
-                   version="nf %s" % NF_CLI_VERSION,
-                   help="显示版本号后退出")
-    p.add_argument("--engine", dest="engine", default=None,
-                   choices=("python", "rust", "auto"),
-                   help="判据引擎：python（真源，缺省）/ rust（engine/rust 只读快线，需 nf-rs 二进制"
-                        "在场，否则回退 python）/ auto（二进制在场且已逐字节对账的面走 rust，其余 "
-                        "python）。NF_ENGINE 环境变量可作缺省。")
-    sub = p.add_subparsers(dest="cmd", required=False)
-
+def _add_parser_base(sub):
     st = sub.add_parser("stats",
  help="自述数字实算与生成（README/README.en/llms.txt 的 marker 区）",
                         description="出口自动化：README/README.en/llms.txt 的数字由产物实算生成，禁"
@@ -212,6 +161,11 @@ def _make_parser() -> argparse.ArgumentParser:
     srv.add_argument("snapshot", nargs="?", default=None,
                      help="mcp.json 快照路径（如 nf run --fmt mcp 产物）；"
                           "缺省 = 实时仓库面（无需先产快照，默认路径直起）")
+    srv.add_argument("--http", action="store_true",
+                     help="改起**本地 HTTP 面**（127.0.0.1，GET /api/health + POST /api/verify "
+                          "+ POST /api/check；纯读、无客户端可控路径）")
+    srv.add_argument("--port", type=int, default=8765,
+                     help="--http 的端口（缺省 8765；0 = 由内核分配）")
 
     dsn = sub.add_parser("design",
                          help="决策辅助工具族（v2.6-A：可选装载——钢人论证工作单）",
@@ -300,6 +254,9 @@ def _make_parser() -> argparse.ArgumentParser:
                       help="Store 工作区目录（缺省=临时）")
 
     # nf asset：资产供应链台账（40 总纲 v2.7 波 A S2——add/verify/inventory/ls/rm/deprecate/restore）
+
+
+def _add_parser_catalog(sub):
     ast = sub.add_parser("asset",
                          help="资产供应链台账（S2：add 入库 / verify 闭合 / inventory 盘点 / ls 浏"
                              "览 / rm 摘除 / deprecate·restore 流转）",
@@ -411,6 +368,9 @@ def _make_parser() -> argparse.ArgumentParser:
                          help="provenance.json 路径（如 05_资产库/provenance.json）")
         _sp.add_argument("--key", required=True, help="溯源键")
     # ---- v2.8.0 波B S4：管线脚手架 ----
+
+
+def _add_parser_production(sub):
     pln = sub.add_parser("pipeline",
                          help="管线脚手架（v2.8 波B S4：pipeline new——自 P00 骨架派生新管线）",
  description="管线脚手架（v2.8 波B S4：pipeline new——自 P00 骨架派生新管线）")
@@ -526,6 +486,328 @@ def _make_parser() -> argparse.ArgumentParser:
     at.add_argument("--selfcheck", action="store_true",
                     help="体检「外部验签」机制：独立子进程验签 + 篡改必红（check42 的用户侧入口）")
     at.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    lab = sub.add_parser("label",
+                        help="标注 IR：形状声明与校验（cc_label 的声明层）",
+                        description="标注 IR v0：只声明「该有哪些标识」并校验形状/档位；"
+                                    "载体写入走 nf label embed（PNG iTXt / JPEG APP15）。"
+                                    "规则表按 GB 45438 分类，v0 映射待按标准原文复核。")
+    lsub = lab.add_subparsers(dest="label_cmd")
+    lir = lsub.add_parser("ir", help="由对象 + 声明项组装 nf-label/1 IR",
+                          description="组装 IR：对象摘要 + 显式/隐式声明项 → nf-label/1。"
+                                      "纯数据、无时间戳（同输入逐字节一致）。")
+    lir.add_argument("label_object", metavar="OBJECT",
+                     help="对象文件路径（仓相对或绝对；可以是二进制——载体支持 PNG/JPEG）")
+    lir.add_argument("--level", default="minimal", choices=("minimal", "full"),
+                     help="档位：minimal=显式文字+隐式元数据；full=再要语音/显式元数据/水印")
+    lir.add_argument("--contract", default="", help="关联契约 id（写进 IR，便于溯源）")
+    lir.add_argument("--items", default="", help="声明项 JSON（数组；缺省=空，靠校验面暴露缺项）")
+    lir.add_argument("--producer", default="", help="声明主体（写进 carrier.producer）")
+    lir.add_argument("--out", default="", help="输出文件（缺省=只打印，不落盘）")
+    lir.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    lva = lsub.add_parser("validate",
+                          help="校验 nf-label/1 IR（形状 + 档位 + 未证明提示）",
+                          description="校验 IR：schema/standard/object/声明项形状 + 档位必需项。"
+                                      "退出码：ok=0 / invalid=1 / 用法错=4。")
+    lva.add_argument("label_ir", metavar="IR.json", help="要校验的 nf-label/1 文件")
+    lva.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    lwr = lsub.add_parser("write",
+                          help="把 IR 写成对象旁的 sidecar（回退载体，embedded 恒 false）",
+                          description="sidecar 回退：写 <对象>.label.json，绑定对象摘要。"
+                                      "载体写入只有 PNG iTXt 与 JPEG APP15（nf label embed），"
+                                      "其它格式 embedded 恒 false。"
+                                      "只声明、不冒充已嵌入。")
+    lwr.add_argument("--object", dest="label_object", default="",
+                     help="被标注对象（仓相对或绝对；可以是二进制，如图片/音视频）")
+    lwr.add_argument("--ir", default="", help="已编好的 nf-label/1 IR JSON")
+    lwr.add_argument("--out", default="", help="旁车落点（缺省=<对象>.label.json）")
+    lwr.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    lrd = lsub.add_parser("read", help="读旁车并与对象摘要对账",
+                          description="读 sidecar：对象变了就判 invalid"
+                                      "（标签声明过期），不静默放过。")
+    lrd.add_argument("label_object", metavar="OBJECT",
+                     help="对象路径（仓相对或绝对；可以是二进制）")
+    lrd.add_argument("--sidecar", default="", help="旁车路径（缺省=<对象>.label.json）")
+    lrd.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    lls = lsub.add_parser("list", help="清点仓内全部旁车（只读）",
+                          description="清点 sidecar：给出 (旁车, 对象, embedded) 三元组。")
+    lls.add_argument("--root", default=".", help="扫描根（缺省=仓库根）")
+    lls.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    lemb = lsub.add_parser("embed",
+                           help="把 IR 写进载体（PNG iTXt / JPEG APP15；可证像素未变）",
+                           description="载体写入（PNG iTXt / JPEG APP15）：按 magic 选格式；"
+                                       "不改像素、不毁结构；"
+                                       "已存在则替换（幂等）。其它格式请用 sidecar 回退。")
+    lemb.add_argument("--object", dest="label_object", default="",
+                      help="源图（PNG/JPEG；可以是二进制）")
+    lemb.add_argument("--ir", default="", help="已编好的 nf-label/1 IR JSON")
+    lemb.add_argument("--out", default="", help="写入落点（缺省=<对象>.labeled.png；不改输入）")
+    lemb.add_argument("--mode", default="text", choices=("text", "watermark"),
+                      help="写入面：text=容器文本块（PNG/JPEG/WebP/MP4/PDF）；"
+                           "watermark=PNG 像素 LSB 水印（删掉文本块也还在）")
+    lemb.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    lext = lsub.add_parser("extract",
+                           help="从载体读回 IR（PNG iTXt / JPEG APP15；与 sidecar 同形状）",
+                           description="载体读取：读 AIGC iTXt 块，校验 IR 形状；没有则 invalid。")
+    lext.add_argument("label_object", metavar="OBJECT", help="图片路径（PNG/JPEG；可以是二进制）")
+    lext.add_argument("--mode", default="auto", choices=("auto", "text", "watermark"),
+                      help="读取面：auto=先读文本块、没有再读水印；也可指定其一")
+    lext.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    ev = sub.add_parser("evidence",
+                        help="证据包：打包 / 第三方复验（cc_verify 的 CLI 面）",
+                        description="证据包（内部差距：attest/receipts/transparency 三件都在，但缺"
+                                    "「给外部人一个文件就能验」的自包含形态）。判定词表固定为 "
+                                    "ok/revoked/expired/invalid（见 docs/ccos/abi-v0.md §4）。")
+    esub = ev.add_subparsers(dest="evidence_cmd")
+    evp = esub.add_parser("pack", help="把目标文件打成自包含证据包（.zip）",
+                          description="打包：成员实体 + 回执/根/包含证明 + 信封（+ 可选链头、"
+                                      "吊销表、有效期）。打包本身确定性（固定时间戳 + 不压缩 + "
+                                      "成员名排序）；要**逐字节可复现**须钉 SOURCE_DATE_EPOCH"
+                                      "（同 nf attest 口径，否则 created_at 取墙钟）。")
+    evp.add_argument("targets", nargs="*", default=None,
+                     help="目标文件（仓相对路径；缺省 = 01/02/06/07 四件）")
+    evp.add_argument("--out", default="",
+                     help="输出 .zip 路径（缺省 = 系统临时目录的 nf-evidence.zip——不往仓库里"
+                          "落盘；相对路径相对仓库根，绝对路径按原样）")
+    evp.add_argument("--issuer", default="", help="签发方标识（写入信封 producer.issuer）")
+    evp.add_argument("--key-file", default="",
+                     help="HMAC 密钥文件 → hmac-sha256 级信封（不给 = digest_only）")
+    evp.add_argument("--expires-at", default="",
+                     help="有效期（UTC 秒级 YYYY-MM-DDTHH:MM:SSZ；缺省 = 不过期）")
+    evp.add_argument("--revocations", default="", help="吊销表 JSON 路径（随包分发）")
+    evp.add_argument("--anchor", default="",
+                     help="声明继承的外部锚点 JSON（{count, head}）——写进清单，复验方用同一份"
+                          "材料核对可证「不是被截断的更早版本」")
+    evp.add_argument("--decision", default="",
+                     help="决策证据块 JSON（可选）：{syscall,policy_digest,verdict,object_sha256}"
+                          "——绑定「这次判定过了哪条策略」，进签名信封摘要")
+    evp.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    evv = esub.add_parser("verify", help="第三方复验证据包（纯读；不需要仓库）",
+                          description="复验：结构→成员摘要→根→包含证明→链→信封→吊销→时效，"
+                                      "fail-closed。退出码：ok=0 / invalid=1 / revoked=2 / "
+                                      "expired=3 / 用法错=4。")
+    evv.add_argument("evidence_bundle", nargs="?", default="", metavar="TARGET",
+                     help="证据源：证据包 .zip / 解包目录 / nf-receipts/1 · nf-attest/1 的 JSON"
+                          "（形态按文档 schema 自动判，不看扩展名）")
+    evv.add_argument("--kind", default="", choices=("",) + evidence_kinds(),
+                     help="显式指定形态（缺省 = 自动判；判错即报错，不猜）")
+    evv.add_argument("--root", default="",
+                     help="单 JSON 形态的成员根目录（缺省 = 该 JSON 所在目录）")
+    evv.add_argument("--key-file", default="", help="校验 hmac 级信封所需的同一密钥")
+    evv.add_argument("--revocations", default="",
+                     help="外部吊销件 JSON：nf-revocation/1 表或签名 nf-revocation-feed/1"
+                          "（优先于包内嵌的那份；吃 feed 时会读其有效期）")
+    evv.add_argument("--at", default="", help="判定时点（UTC 秒级；缺省 = 现在）")
+    evv.add_argument("--require-fresh-revocations", action="store_true",
+                     help="要求吊销表新鲜：stale/unknown 判 invalid（缺省只 WARN，"
+                          "不改变四词判定；完全没有吊销来源时不算 unknown）")
+    evv.add_argument("--anchor", default="",
+                     help="外部锚点 JSON（{count, head}）：核对「不是被截断的更早版本」；"
+                          "不给则只在 warnings 里说明无法证明未截断（不提升强度）")
+    evv.add_argument("--policy-digest", dest="policy_digest", default="",
+                     help="期望策略摘要（64 hex）：与包内 decision.policy_digest 比对"
+                          "（不符判 invalid；包内无 decision 时只给 warning，不判死）")
+    evv.add_argument("--selfcheck", action="store_true",
+                     help="机制体检：PASS 必过 / 篡改必红 / 吊销必判 revoked / 过期必判 expired")
+    evv.add_argument("--time-record", dest="time_record", default="",
+                     help="nf-time-token/1 记录：用 TSA token 锚定该字节的存在时刻")
+    evv.add_argument("--time-ca", dest="time_ca", default="",
+                     help="时间戳信任锚（TSA 根证书 PEM）；给了 --time-record 时必须给")
+    evv.add_argument("--time-untrusted", dest="time_untrusted", default="",
+                     help="时间戳中间证书 PEM（链不全时给）")
+    evv.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    _add_parser_revocations(esub)
+    ets = esub.add_parser("timestamp",
+                          help="RFC 3161 可信时间戳：申请 / 离线校验（G3 半边）",
+                          description="时间戳：向 TSA 申请 token（绑定数据摘要），校验只需证书链、"
+                                      "不需联网。只证「该摘要在该时刻已存在」。")
+    etss = ets.add_subparsers(dest="timestamp_cmd")
+    ets_stamp = etss.add_parser("stamp", help="申请时间戳并落盘（需网络 + curl + openssl）",
+                                description="申请：ts -query 造请求 → curl POST 给 TSA → 落 "
+                                            ".tsq/.tsr/记录；给了 --ca-file 时立刻自检。")
+    ets_stamp.add_argument("timestamp_data", metavar="FILE", help="要盖时间戳的文件")
+    ets_stamp.add_argument("--url", default="", help="TSA 地址（缺省 digicert）")
+    ets_stamp.add_argument("--out-prefix", default="", help="落盘前缀（缺省同 FILE 名）")
+    ets_stamp.add_argument("--ca-file", default="", help="TSA 根证书 PEM（给了才自检）")
+    ets_stamp.add_argument("--untrusted", default="", help="中间证书 PEM")
+    ets_stamp.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    ets_verify = etss.add_parser("verify", help="离线校验时间戳（token 与请求成对）",
+                                 description="校验：签名链 + status=Granted + genTime 可解析。")
+    ets_verify.add_argument("timestamp_token", metavar="TOKEN", help="TSA 返回的 .tsr")
+    ets_verify.add_argument("--query", required=True, help="当初提交的 .tsq")
+    ets_verify.add_argument("--ca-file", required=True, help="TSA 根证书 PEM（信任锚）")
+    ets_verify.add_argument("--untrusted", default="", help="中间证书 PEM")
+    ets_verify.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    _add_parser_evidence_extra(esub)
+    ck = sub.add_parser("check", help="单对象策略体检（cc_check：对象 × 策略 → verdict）",
+                        description="单对象策略体检（内部差距：仓内判定全是仓库级，缺「单对象 × "
+                                    "单策略」入口）。策略是 nf-check-policy/1 的封闭词表 JSON；"
+                                    "判定 ok/invalid，warn 级只提示、不改判定。")
+    ck.add_argument("object", nargs="?", default="",
+                    help="体检对象（单个文件；目录请逐件跑）")
+    ck.add_argument("--policy", default="", help="策略 JSON 路径（仓库相对或绝对）")
+    ck.add_argument("--compile", default="", metavar="INTENT",
+                    help="把 nf-check-intent/1 意图编译成策略（法规意图 → 封闭词表规则）")
+    ck.add_argument("--intent-from-text", dest="intent_from_text", default="",
+                    metavar="REGULATION.txt",
+                    help="法规原文 → 意图**草稿**（规则抽取；覆盖/待补/不可表达/未覆盖四张账）")
+    ck.add_argument("--out", default="", help="编译/草稿的落点（缺省=只打印）")
+    ck.add_argument("--list-rules", action="store_true",
+                    help="列出可编译的意图规则与**明确不可表达**的规则（含缺什么能力）")
+    ck.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    rv = sub.add_parser("resolve", help="对象 → 契约集（cc_resolve：这个文件该守哪些契约）",
+                        description="契约解析（内部差距：既有 resolve 是「声明 → 文件」，缺反方向。"
+                                    "契约声明是 opt-in，未被认领时显式给 closure_closed=false，"
+                                    "不用空数组冒充「查过没问题」）。")
+    rv.add_argument("object", help="对象路径（仓库相对或绝对）")
+    rv.add_argument("--json", action="store_true", help="输出结构化 JSON")
+
+
+def _portable_out(path: str) -> str:
+    """机器面（--json）的落点展示：**不得出现机器绝对路径**。
+
+    仓内 → 仓库相对；仓外把家目录/临时目录换成占位符（读者拿这条路径也用不上作者机路径，
+    而直接抹掉又会让「产物在哪」变成无解——占位符两头都顾到）。
+    """
+    import tempfile
+    rel = _rel_display(path)
+    if not os.path.isabs(rel):
+        return rel
+    for base, token in ((tempfile.gettempdir(), "<tmp>"),
+                        (os.path.expanduser("~"), "<home>")):
+        try:
+            same = os.path.commonpath([os.path.abspath(base), os.path.abspath(path)])
+        except ValueError:      # 跨盘的 base 无共同前缀：跳过该占位符，继续试下一个
+            continue
+        if same == os.path.abspath(base):
+            return token + "/" + os.path.relpath(path, base).replace("\\", "/")
+    return "<外部>/" + os.path.basename(path)
+
+
+def evidence_kinds() -> tuple[str, ...]:
+    """证据形态词表（与 core.evidence.KINDS 同源——不在 CLI 再手抄一份）。"""
+    from core import evidence
+    return tuple(evidence.KINDS)
+
+
+def _add_parser_revocations(esub):
+    """吊销分发件子命令（sign / verify / merge）注册。
+
+    从 _add_parser_production 拆出：命令树仍单一构建入口，但单函数保持在 300 行判据内。
+    """
+    evr = esub.add_parser("revocations",
+                          help="吊销分发件：签名 / 校验 / 合并（nf-revocation-feed/1）",
+                          description="吊销表的分发信封：issuer + 单调 seq + 前序摘要 + hmac 签名。"
+                                      "校验不过即不可信（缺密钥不降级）；多份按序号链验完再取并集，"
+                                      "输出仍是 nf-revocation/1 表（可直接喂 --revocations）。")
+    rvsub = evr.add_subparsers(dest="revocations_cmd")
+    rvs = rvsub.add_parser("sign", help="把 nf-revocation/1 表包成签名 feed",
+                           description="签名：对「除 signature 外」的规范化字节求 hmac-sha256。"
+                                       "seq 单调递增；--prev 接上一份 feed（防回滚/分叉）。")
+    rvs.add_argument("--table", required=True, help="要签的 nf-revocation/1 表 JSON")
+    rvs.add_argument("--key-file", required=True,
+                     help="签名密钥文件：hmac 取非空内容；ed25519 取 32 字节种子")
+    rvs.add_argument("--scheme", default="", choices=("", "hmac-sha256", "ed25519"),
+                     help="签名方案（缺省 hmac-sha256；ed25519 是非对称——验证方只持公钥）")
+    rvs.add_argument("--issuer", default="", help="签发方标识（写进 feed）")
+    rvs.add_argument("--seq", type=int, default=1, help="单调递增序号（首份 1，之后 +1）")
+    rvs.add_argument("--prev", default="", help="上一份 feed JSON（接链；首份省略）")
+    rvs.add_argument("--expires-at", default="",
+                     help="有效期（UTC 秒级 YYYY-MM-DDTHH:MM:SSZ；进签名体，只记录不联网）")
+    rvs.add_argument("--ttl", type=int, default=None,
+                     help="有效期秒数（正整数 ≤31536000；有 --expires-at 时以它为准）")
+    rvs.add_argument("--status-uri", default="",
+                     help="分发指针（非空字符串；仅记录，本仓不联网去取）")
+    rvs.add_argument("--out", default="", help="输出 feed（缺省=只打印）")
+    rvs.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    rvp = rvsub.add_parser("pubkey",
+                           help="从 32 字节 ed25519 种子导出公钥（发布方给出、验证方保存）",
+                           description="导出公钥：种子留在发布方，公钥给验证方——"
+                                       "这就是「拿到验证能力不等于拿到伪造能力」。")
+    rvp.add_argument("revocations_seed", metavar="SEED",
+                     help="32 字节种子文件（字节原样读，别用会带换行的文本写入）")
+    rvp.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    rvv = rvsub.add_parser("verify", help="校验 feed（签名 + 序号 + 前序链）",
+                           description="校验：schema/seq/prev_digest/table 形状 + 签名（有则必过）+ 前序链。"
+                                       "退出码：ok=0 / invalid=1 / 用法错=4。")
+    rvv.add_argument("revocation_feed", metavar="FEED.json", help="feed 或裸 nf-revocation/1 表")
+    rvv.add_argument("--key-file", default="", help="校验签名所需密钥（缺密钥即 invalid，不降级）")
+    rvv.add_argument("--prev", default="", help="上一份 feed（核对序号与前序摘要）")
+    rvv.add_argument("--at", default="", help="新鲜度判定时点（UTC 秒级；缺省 = 现在）")
+    rvv.add_argument("--trust", dest="trust_manifest", default="",
+                     help="nf-revocation-trust/1 信任清单：ed25519 feed 的公钥必须被根覆盖")
+    rvv.add_argument("--require-trust", dest="require_trust", action="store_true",
+                     help="强制要求信任锚：没给 --trust 就判 invalid（缺锚不降级）")
+    rvv.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    rvt = rvsub.add_parser("trust",
+                           help="信任锚：给委派签名（grant）/ 看清单（show）",
+                           description="信任锚：根公钥钉在清单里，组织公钥必须由根签发委派才被承认。"
+                                       "委派有 scope（只 revocations）与失效期，链深上限 3。")
+    rvts = rvt.add_subparsers(dest="trust_cmd")
+    rvtg = rvts.add_parser("grant", help="签发一条委派并写进清单",
+                           description="用签发方种子对 (issuer, subject, scope, expires_at) 签名，"
+                                       "把委派条目追加进清单。")
+    rvtg.add_argument("revocations_seed", metavar="ISSUER_SEED",
+                      help="签发方 32 字节种子文件（根或已委派的中间方）")
+    rvtg.add_argument("--subject-pub", required=True,
+                      help="被委派方公钥（64 hex；用 revocations pubkey 导出）")
+    rvtg.add_argument("--expires-at", required=True, help="委派失效期（UTC 秒级）")
+    rvtg.add_argument("--trust", dest="trust_manifest", default="",
+                      help="清单文件（不存在则新建；存在则追加委派）")
+    rvtg.add_argument("--root", action="store_true",
+                      help="把签发方公钥同时登记为根（首次初始化清单用）")
+    rvtg.add_argument("--out", default="", help="输出清单（缺省=覆盖 --trust）")
+    rvtg.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    rvts_show = rvts.add_parser("show", help="看清单摘要（根数 / 委派数 / 可选锚定核对）",
+                                description="摘要：列出根与委派；给了 --check-pub 就现场锚定一次。")
+    rvts_show.add_argument("--trust", dest="trust_manifest", required=True, help="清单文件")
+    rvts_show.add_argument("--check-pub", default="", help="现场核对一把公钥（64 hex）")
+    rvts_show.add_argument("--at", default="", help="核对时点（UTC 秒级；缺省=现在）")
+    rvts_show.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    rvm = rvsub.add_parser("merge", help="多份 feed → 合并成 nf-revocation/1 表",
+                           description="合并：按 seq 排序、逐份验签验链、取并集；任何一份不过则整次失败。"
+                                       "输出是普通表，可给 nf evidence verify --revocations 用。")
+    rvm.add_argument("feeds", nargs="+", help="feed JSON（按任意顺序给，内部按 seq 排）")
+    rvm.add_argument("--key-file", default="", help="校验签名所需密钥")
+    rvm.add_argument("--at", default="", help="新鲜度判定时点（UTC 秒级；缺省 = 现在）")
+    rvm.add_argument("--out", default="", help="输出合并表（缺省=只打印）")
+    rvm.add_argument("--json", action="store_true", help="输出结构化 JSON")
+
+def _add_parser_evidence_extra(esub):
+    """evidence 的批量/bench/replay 子命令注册（从 _add_parser_production 拆出，保 300 行判据）。"""
+    evba = esub.add_parser("batch",
+                           help="批量复验：目录里的证据包逐件判，任何一件非 ok 即整体失败",
+                           description="批量复验：目标给目录（取 *.zip / *.json，按名排序）或单个"
+                                       "证据包。判定词表与单件完全一致；整体退出码 0 只代表"
+                                       "「每一件都 ok」。")
+    evba.add_argument("batch_target", metavar="TARGET",
+                      help="目录（取其中 *.zip 与 *.json）或单个证据包")
+    evba.add_argument("--key-file", default="", help="校验 hmac 级信封所需的同一密钥")
+    evba.add_argument("--revocations", default="", help="外部吊销件 JSON（同 verify）")
+    evba.add_argument("--at", default="", help="判定时点（UTC 秒级；缺省 = 现在）")
+    evba.add_argument("--root", default="", help="单 JSON 形态的成员根目录")
+    evba.add_argument("--anchor", default="", help="外部锚点 JSON（同 verify）")
+    evba.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    evb = esub.add_parser("bench", help="证据复验器攻击矩阵基准（38 条已知攻击，逐条比对判定）",
+                          description="攻击矩阵基准：对金丝雀证据包施加已知攻击/退化，逐条断言"
+                                      "「期望判定 vs 实际判定」。任何一条不达期望即 exit 1——"
+                                      "抓不到篡改的校验器就是摆设，本基准把这句话变成数字。")
+    evb.add_argument("--out", default="", help="把 Markdown 报告写到该路径（缺省 = 只打印）")
+    evb.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    evb.add_argument("--quiet", action="store_true", help="只输出结论行")
+    evr = esub.add_parser("replay", help="复现轨迹：把证据推导过程摊成逐步可核的 trace",
+                          description="复现轨迹（cc_replay）：成员「字节→摘要→叶→证明折叠」"
+                                      "逐算，另给链节与信封摘要；每步带规则名与输入/输出摘要，"
+                                      "trace 不含时间戳（同输入两次逐字节一致，可 diff）。")
+    evr.add_argument("evidence_bundle", nargs="?", default="", metavar="TARGET",
+                     help="证据源：证据包 .zip / 解包目录 / 回执或信封 JSON")
+    evr.add_argument("--entry", default="", help="只看单个成员（相对路径；缺省 = 全量）")
+    evr.add_argument("--kind", default="", choices=("",) + evidence_kinds(),
+                     help="显式指定形态（缺省 = 自动判）")
+    evr.add_argument("--root", default="", help="单 JSON 形态的成员根目录")
+    evr.add_argument("--key-file", default="", help="验 hmac 信封所需密钥")
+    evr.add_argument("--json", action="store_true", help="输出结构化 JSON")
+
+def _add_parser_validation(sub):
     sc = sub.add_parser("score",
                         help="基线相对回归评分（Codecov 式：当前 vs 基线，no silent worsening）",
                         description="基线相对回归评分（内部差距：现有门禁全为绝对门，无 delta/回归"
@@ -644,7 +926,9 @@ def _make_parser() -> argparse.ArgumentParser:
                                     "领域符号表来自 core/nf_language；--print-config 出编辑器配置）"
                                         "")
     lp.add_argument("--root", default="", help="仓库根（缺省 = 本仓库）")
-    from core.lsp_client import CLIENT_EDITORS as _lsp_editors   # 单一真相：lsp_client.render_client_config
+    from core.lsp_client import (
+        CLIENT_EDITORS as _lsp_editors,  # 单一真相：lsp_client.render_client_config
+    )
     lp.add_argument("--print-config", default="", choices=["", *_lsp_editors],
                     help="只打印目标编辑器的现成配置（不启动服务）")
     lc = sub.add_parser("license",
@@ -743,6 +1027,9 @@ def _make_parser() -> argparse.ArgumentParser:
         _p3.add_argument("--store", default="", metavar="NF_HOME",
                          help="预设库根（缺省 = NF_HOME，即 ~/.NinFenz 或 NARRATIVE_FORGE_HOME）")
         _p3.add_argument("--json", action="store_true", help="输出结构化 JSON")
+
+
+def _add_parser_integration(sub):
     bn = sub.add_parser("bench",
                         help="执行结果跑分台（对 agent 产物五维确定性评分；多跑可比对）",
                         description="执行结果跑分台（机制借鉴 ACP benchmark suite：外部实测的容器）")
@@ -966,6 +1253,9 @@ def _make_parser() -> argparse.ArgumentParser:
     rv.add_argument("--timeout", type=float, default=120.0, help="适配器超时秒")
     rv.add_argument("--write", default="", help="把审查报告写入路径（不得写 protocol/）")
     rv.add_argument("--json", action="store_true", help="输出结构化 JSON")
+
+
+def _add_parser_governance(sub):
     kn = sub.add_parser("knowledge",
                         help="双源知识层（权威分层 / 消化可追溯 / 查询有序 / 时效 / 可见性）",
                         description="双源知识层（机制借鉴一句式：编译时机按数据域选择）")
@@ -1075,10 +1365,12 @@ def _make_parser() -> argparse.ArgumentParser:
     for _p in (l_ls, l_sh, l_ri, l_vf, l_se, l_dp, l_rs, l_sp, l_at, l_rc):
         _p.add_argument("--json", action="store_true", help="输出结构化 JSON")
     df = sub.add_parser("diff",
-                        help="版本差异检测（41 波C C2：两份签名/文档 → 字段级差异 + 兼容判定）",
- description="版本差异检测（41 波C C2：两份签名/文档 → 字段级差异 + 兼容判定）")
-    df.add_argument("a", help="签名 A 的文档 md 路径")
-    df.add_argument("b", help="签名 B 的文档 md 路径")
+                        help="差异与契约历史（双文件字段级差异 / Git 历史演进时间线）",
+ description="差异与契约历史（双文件字段级差异 + 兼容判定；--history 从 Git 重建契约演进）")
+    df.add_argument("a", nargs="?", help="签名 A 的文档路径；--history 时收契约路径")
+    df.add_argument("b", nargs="?", help="签名 B 的文档路径")
+    df.add_argument("--history", type=int, metavar="N",
+                    help="从 Git 历史重建契约演进时间线（最多 N 次提交）")
     df.add_argument("--json", action="store_true", help="输出结构化差异 JSON")
     ex = sub.add_parser("explain",
                         help="check 修复指引（41 波C C5：缺什么/补什么/示例 三段式）",
@@ -1188,6 +1480,9 @@ def _make_parser() -> argparse.ArgumentParser:
     loc.add_argument("--json", action="store_true", help="机读输出（issues + stats）")
     loc.add_argument("--write", action="store_true",
                      help="重签文档译件的 source_sha256（写 protocol/locales.json）")
+
+
+def _add_parser_terminal(sub):
     tf = sub.add_parser("toolface",
                         help="模块工具面浏览（45：machine_contract.tool_face 可选建议层，AI 裁量不"
                             "入门禁）",
@@ -1356,6 +1651,35 @@ def _make_parser() -> argparse.ArgumentParser:
 
     # NFA-L（声明式 + 命令式混合）：guard 表达式 解析/检查/编译/求值。
     # 命令面实现收在 core.nfal_cli（此处只做入口，避免与 nf 命令面重复定义旗标）。
+
+
+def _make_parser() -> argparse.ArgumentParser:
+    """真正构建 argparse 命令面（**只在缓存未命中时调用一次**——见 `_build_parser`）。"""
+    p = argparse.ArgumentParser(
+        prog="nf", description=(
+            "NinFenz 全链管道（B2：retrieve→compose→gate→export）。"
+            "分层引导（40 总纲 v2.8 波B S7）：作者五分钟上手 = run / demo / pipeline new；"
+            "开发者与仓库治理工具族 = asset / module / register / market / spec / render / serve / "
+            "design / audit / who-refers / impact / rename / import——README「五分钟快速开始」"
+            "含逐条示例。"),
+        epilog=NF_CLI_EPILOG,
+    )
+    p.add_argument("--version", action="version",
+                   version="nf %s" % NF_CLI_VERSION,
+                   help="显示版本号后退出")
+    p.add_argument("--engine", dest="engine", default=None,
+                   choices=("python", "rust", "auto"),
+                   help="判据引擎：python（真源，缺省）/ rust（engine/rust 只读快线，需 nf-rs 二进制"
+                        "在场，否则回退 python）/ auto（二进制在场且已逐字节对账的面走 rust，其余 "
+                        "python）。NF_ENGINE 环境变量可作缺省。")
+    sub = cli_bridge.subparsers(p)
+    _add_parser_base(sub)
+    _add_parser_catalog(sub)
+    _add_parser_production(sub)
+    _add_parser_validation(sub)
+    _add_parser_integration(sub)
+    _add_parser_governance(sub)
+    _add_parser_terminal(sub)
     nfl = sub.add_parser("nfal",
                          help="NFA-L 装配语言：guard 表达式 解析/检查/编译/求值（声明层借 YAML/IDL"
                              "）",
@@ -1371,6 +1695,7 @@ def _seed_store(store):
     """装载官方核心 + 轻混组合包（等同 e2e 前置）。返回统计 dict。"""
     import glob
     from pathlib import Path
+
     from core.parser import parse_module
     stats = {"core": 0, "combo": 0}
     for f in sorted(glob.glob(os.path.join(ROOT, "04_模块库", "*", "*.md"))):
@@ -1462,10 +1787,10 @@ def _cmd_register(args) -> int:
 def _cmd_market(args) -> int:
     """nf market：依赖闭包 + 挂载冲突预检（B4 CLI 先行；信息查询，冲突不阻断）。"""
     import json
-    from core.market_analyzer import (conflicts, dependencies, grades_of_package,
-                                      list_market)
-    from core.registry_sync import check_registerable
+
+    from core.market_analyzer import conflicts, dependencies, grades_of_package, list_market
     from core.registry_loader import load_registry
+    from core.registry_sync import check_registerable
 
     reg_path = args.registry or os.path.join(ROOT, "desktop", "src", "core", "registry.json")
     doc_path = os.path.join(ROOT, "02_联动注册表.md")
@@ -1521,6 +1846,7 @@ def _cmd_market(args) -> int:
 
     # 加载各包 protocol.yaml 内容（data 供 dependencies/conflicts 用）
     import glob
+
     from core import lazy_yaml as _ly
     _yaml = _ly.module()
     if _yaml is None:
@@ -1572,9 +1898,9 @@ def _cmd_market(args) -> int:
 
 def _cmd_who_refers(args) -> int:
     """nf who-refers <module_id>：谁在 references 中引用了该模块（A2 反查）。"""
-    from core.retriever import referenced_by
-    from core.registry_loader import load_registry
     from core.impact_check import impact_of_change
+    from core.registry_loader import load_registry
+    from core.retriever import referenced_by
 
     # 口径统一（2026-10-01）：**标识符**输入一律 `strip()`（粘贴时常带看不见的尾随空格）。
     # 实测：`nf who-refers "M90 "` / `nf related "M90 "` / `nf impact "M90 "` 此前判「不在册」
@@ -1672,6 +1998,7 @@ def _cmd_rename(args) -> int:
         return 0
 
     import json as _json
+
     # 原子写 + LF（2026-09-30）：与 `nf register --apply` 同一对象（registry.json）；
     # 这处此前还是**裸写 + 平台默认行尾**（Windows 会落 CRLF，撞 check33 编码卫生）。
     # 读-改-写串行化（2026-10-01）：锁内**重读并重跑改名计划**（按 old→new 幂等）——
@@ -1700,7 +2027,8 @@ def _cmd_import(args) -> int:
     """
     import json
     from pathlib import Path
-    from core.import_adapter import parse_skill, parse_ccv3
+
+    from core.import_adapter import parse_ccv3, parse_skill
     from core.models import Module
 
     p = Path(args.file)
@@ -1821,6 +2149,7 @@ def _cmd_spec(args) -> int:
 def _cmd_render(args) -> int:
     """nf render <pkg_dir> --fmt：协议多出口渲染（A3：protocol.yaml → rules）。"""
     from pathlib import Path
+
     from core.rules_render import render_protocol
 
     pkg_dir = Path(args.pkg_dir)
@@ -1846,7 +2175,7 @@ def _cmd_render(args) -> int:
     dest = Path(args.dest) if args.dest else Path.cwd()
     dest.mkdir(parents=True, exist_ok=True)
     out_path = dest / out_name
-    from core import atomic_write          # 交付件：原子写（2026-10-01 全量普查补齐）
+    from core import atomic_write  # 交付件：原子写（2026-10-01 全量普查补齐）
     atomic_write.write_text(out_path, txt)
     pkg_basename = os.path.basename(args.pkg_dir.rstrip("/\\"))
     print(f"== nf render {pkg_basename} → {args.fmt} ==")
@@ -1863,7 +2192,11 @@ def _cmd_serve(args) -> int:
 
     transport 纪律：stdout 只写 MCP 消息（换行分隔 JSON-RPC）——初始化说明走 stderr。
     """
-    from core.mcp_runtime import load_snapshot, McpRuntime
+    from core.mcp_runtime import McpRuntime, load_snapshot
+
+    if getattr(args, "http", False):
+        from core import http_api
+        return http_api.serve("127.0.0.1", int(getattr(args, "port", 8765) or 0), ROOT)
 
     if args.snapshot:
         label = os.path.basename(args.snapshot)
@@ -1897,8 +2230,8 @@ def _cmd_design(args) -> int:
     steelman ls [--root]     → 列决策档案索引（已有 steelman.md）
     """
     from pathlib import Path
-    from core.steelman import (init_worksheet, check_worksheet,
-                               scan_steelman)
+
+    from core.steelman import check_worksheet, init_worksheet, scan_steelman
 
     if args.check_file:
         p = Path(args.check_file)
@@ -1957,7 +2290,8 @@ def _cmd_design_audit(args) -> int:
     audit ls [--root]       # 审计记录索引
     """
     from pathlib import Path
-    from core.audit import init_audit, check_audit, scan_audit
+
+    from core.audit import check_audit, init_audit, scan_audit
 
     if args.check_file:
         p = Path(args.check_file)
@@ -2003,6 +2337,7 @@ def _cmd_design_audit(args) -> int:
 def _cmd_asset(args) -> int:
     """nf asset：资产供应链台账族（40 总纲 S2）。纯信息命令缺省只读，写操作显式子命令。"""
     import json as _json
+
     from core import asset_ledger as al
 
     try:
@@ -2190,6 +2525,7 @@ def _asset_contract(args) -> int:
     越过 code_metrics 冻结的函数长上限（棘轮只增不减）。
     """
     import json as _json
+
     from core import asset_contract as ac
     if args.export:
         n = ac.write_export(args.root)
@@ -2227,8 +2563,9 @@ def _asset_contract(args) -> int:
 def _cmd_pipeline(args) -> int:
     """nf pipeline new：P00 骨架派生新管线（v2.8.0 波B S4）。"""
     if getattr(args, "pipeline_cmd", None) == "dryrun":
-        from core import pipelinerun as pr
         import json as _json
+
+        from core import pipelinerun as pr
         if args.all or not args.pipeline:
             if getattr(args, "write_advisory", False):
                 doc = pr.advisory_report(ROOT, write=True)
@@ -2275,7 +2612,7 @@ def _cmd_pipeline(args) -> int:
         for n in g["notes"][:6]:
             print("  [note] %s" % (n.get("detail") if isinstance(n, dict) else n))
         return 1 if g["issues"] else 0
-    from core.pipeline_scaffold import scaffold_pipeline, default_filename
+    from core.pipeline_scaffold import default_filename, scaffold_pipeline
     tmpl = args.template or os.path.join(ROOT, "03_管线库",
                                          "P00_通用文档生成管线.md")
     try:
@@ -2292,7 +2629,7 @@ def _cmd_pipeline(args) -> int:
         print("  ✗ 目标已存在，不覆盖：%s" % dest, file=sys.stderr)
         return 1
     os.makedirs(os.path.dirname(dest), exist_ok=True)
-    from core import atomic_write          # 派生管线（在仓件）：原子写
+    from core import atomic_write  # 派生管线（在仓件）：原子写
     atomic_write.write_text(dest, new_text)
     print("== nf pipeline new ==")
     print("  ✓ 派生管线落盘：%s" % dest)
@@ -2306,6 +2643,7 @@ def _cmd_pipeline(args) -> int:
 def _cmd_module(args) -> int:
     """nf module：模块生命周期（v2.8.0 波B S5）。ls/verify 只读；deprecate/restore 写文件状态位。"""
     import json as _json
+
     from core import module_lifecycle as ml
     try:
         if args.module_cmd == "contract":
@@ -2480,7 +2818,7 @@ def _cmd_module(args) -> int:
                                 reason=getattr(args, "reason", ""),
                                 module_file=fpath)
         if new_txt != txt:
-            from core import atomic_write      # 就地改模块头：原子写（半截件不留）
+            from core import atomic_write  # 就地改模块头：原子写（半截件不留）
             atomic_write.write_text(fpath, new_txt)
         print("== nf module %s ==" % args.module_cmd)
         print("  ✓ 状态流转：%s → %s（%s）" % (before, target, fpath))
@@ -2505,6 +2843,7 @@ def _cmd_demo(args) -> int:
     """nf demo：一键演示世界（v2.8.0 波B S7）——P04 轻混全链 → CCV3。"""
     import tempfile
     import time
+
     from core.pipeline import pipe
     from core.pipeline_loader import load_pipeline_file
     pipeline_path = os.path.join(ROOT, "community", "校园西幻轻混组合包",
@@ -2658,6 +2997,21 @@ def _portable_path(p: object) -> str:
         prefix = nb.rstrip("\\/") + os.sep
         if ns.startswith(prefix):
             return (repl + "/" + canon[len(base) + 1:]).replace("\\", "/")
+    # NF home（可被 NARRATIVE_FORGE_HOME 指到仓库外）：也必须可移植，否则机器面回吐本机绝对路径。
+    # 为什么（2026-11-06 快照门禁实测）：--snapshot 给内层独立 NF_HOME（<run>/home，在仓库树外），
+    # daemon status / preset 的 state_file/home 原样打印绝对路径，portable 判据在快照里假红。
+    try:
+        from core import storage as _storage
+        home_base = os.path.realpath(str(_storage.default_home()))
+    except Exception:                      # 环境异常时不放宽判据：退回原样
+        home_base = ""
+    if home_base:
+        ns, nb = os.path.normcase(canon), os.path.normcase(home_base)
+        if ns == nb:
+            return "<NF_HOME>"
+        prefix = nb.rstrip("\\/") + os.sep
+        if ns.startswith(prefix):
+            return ("<NF_HOME>/" + canon[len(home_base) + 1:]).replace("\\", "/")
     return s
 
 
@@ -2702,7 +3056,7 @@ def _machine_fail(args, msg: str, code: int = 1):
     """
     msg = _no_machine_paths(str(msg))
     if getattr(args, "json", False):
-        import json as _json          # 本模块的 json 一律在函数内局部导入（模块级未 import）
+        import json as _json  # 本模块的 json 一律在函数内局部导入（模块级未 import）
         print(_json.dumps({"ok": False, "error": msg, "exit": int(code)},
                           ensure_ascii=False, sort_keys=True))
     print("  ✗ %s" % msg, file=sys.stderr)
@@ -2843,6 +3197,7 @@ def _cmd_preset(args):
     + 本地缺失提示），真生产仍走 `nf run`。
     """
     import json as _json
+
     from core import preset_manager as pm
     from core.models import Preset
 
@@ -2976,8 +3331,9 @@ def _cmd_preset(args):
 
 def _cmd_sig(args):
     """nf sig：41 波C C1 —— 结构化签名（知识指纹）。"""
-    from core import knowledge_sig as ks
     import json as _json
+
+    from core import knowledge_sig as ks
     try:
         if args.verify:
             issues, stats = ks.verify_reproducible(ROOT)
@@ -3018,10 +3374,1000 @@ def _cmd_sig(args):
     except (OSError, ValueError) as exc:
         return _machine_fail(args, str(exc))
 
+def _label_embed(args):
+    """nf label embed：IR → 载体（PNG iTXt / JPEG APP15；不改输入，像素面摘要前后一致）。"""
+    import json as _json
+
+    from core import json_doc, label_carrier
+    obj = str(getattr(args, "label_object", "") or "")
+    if not obj or not getattr(args, "ir", ""):
+        return _machine_fail(args, "缺 --object / --ir（修复指引：nf label embed --object <图.png> "
+                                   "--ir <IR.json>；IR 用 nf label ir 生成）", 2)
+    src = obj if os.path.isabs(obj) else _rel_out(obj)
+    out = _rel_out(args.out) if args.out else src + ".labeled.png"
+    try:
+        ir = json_doc.load(_rel_out(args.ir), dict, what=args.ir)
+        if getattr(args, "mode", "text") == "watermark":
+            from core import atomic_write, label_watermark
+            with open(src, "rb") as fh:
+                raw = fh.read()
+            payload = label_watermark._frame_for_ir(ir)
+            wm_out, winfo = label_watermark.embed(raw, payload)
+            atomic_write.write_bytes(out, wm_out)
+            back = label_watermark.extract(wm_out)
+            info = {"src": src, "out": out, "format": "png", "carrier": "png-lsb-watermark",
+                    "keyword": "NFWM1", "replaced": False, **winfo,
+                    "readback_ok": bool(back["ok"]),
+                    "readback_confidence": back["confidence"],
+                    "pixel_digest": label_carrier.pixel_digest(wm_out)}
+            if not back["ok"]:
+                return _machine_fail(args, "水印写完后读不回来（内部不一致，已中止）", 1)
+        else:
+            info = label_carrier.embed_file(src, ir, out)
+    except (OSError, ValueError) as exc:
+        return _machine_fail(args, str(exc), 2)
+    if args.json:
+        print(_json.dumps({"kind": "label-embed", "ok": True, **_rel_display_keys(info)},
+                          ensure_ascii=False, indent=2, sort_keys=True))
+    else:
+        print(f"== nf label embed（{_rel_display(src)} → {_rel_display(out)}）==")
+        fmt = info.get("format", "?")
+        carrier = info.get("carrier") or fmt
+        print(f"  载体：{carrier} · keyword={info['keyword']} · 已替换={info['replaced']}")
+        if carrier == "png-lsb-watermark":
+            print(f"  冗余：{info['redundancy']} 块 × {info['bits_per_tile']} bit")
+            print(f"  回读自检：ok={info['readback_ok']} · 置信度 {info['readback_confidence']}")
+            print("  只承诺：删掉文本块仍可读回摘要帧、扛裁剪与重存；"
+                  "不承诺抗 JPEG/缩放/截屏")
+        else:
+            print(f"  像素面：{info['pixel_digest'][:16]}（写入前后一致）")
+            print("  只承诺：能读回、不改像素、块 CRC 合法；抗转码/水印不在本件")
+    return 0
+
+
+def _label_extract(args):
+    """nf label extract：PNG iTXt → IR（判定词表与 sidecar 对齐）。"""
+    import json as _json
+
+    from core import label_carrier
+    obj = str(getattr(args, "label_object", "") or "")
+    src = obj if os.path.isabs(obj) else _rel_out(obj)
+    try:
+        with open(src, "rb") as fh:
+            raw = fh.read()
+    except OSError as exc:
+        return _machine_fail(args, f"读不到对象：{exc}", 2)
+    res = label_carrier.read(raw)
+    res["object"] = _rel_display(src)
+    if (not res.get("ok")) and getattr(args, "mode", "auto") != "text":
+        from core import label_watermark
+        wm_res = label_watermark.extract(raw)
+        if wm_res["ok"]:
+            res = {"ok": True, "verdict": "ok", "label": None, "object": _rel_display(src),
+                   "source": "watermark",
+                   "watermark_payload": wm_res["payload"].decode("utf-8", "replace"),
+                   "confidence": wm_res["confidence"], "issues": [],
+                   "warnings": ["水印层只带 IR 的摘要帧（版本/标准/对象摘要前缀/条目名），"
+                                "不是整份 IR；整份 IR 用文本载体或 sidecar"]}
+        else:
+            res["watermark"] = {"ok": False, "issues": wm_res["issues"]}
+    if args.json:
+        print(_json.dumps(res, ensure_ascii=False, indent=2, sort_keys=True))
+    else:
+        print(f"== nf label extract（{_rel_display(src)}）==")
+        origin = res.get("source") or res.get("carrier") or "text"
+        print(f"  判定：{res['verdict']} · 来源：{origin}")
+        for issue in res["issues"]:
+            print(f"  [FAIL] {issue}", file=sys.stderr)
+        if res["verdict"] == "ok" and res.get("source") == "watermark":
+            print(f"  水印帧：{res['watermark_payload']}")
+            print(f"  置信度：{res['confidence']}")
+            for warn in res["warnings"]:
+                print(f"  [WARN] {warn}", file=sys.stderr)
+        elif res["verdict"] == "ok":
+            label = res["label"] or {}
+            print(f"  标注：{label.get('standard')} · 档位 {label.get('level')}")
+    return 0 if res["verdict"] == "ok" else 1
+
+
+def _rel_display_keys(info):
+    """把路径类字段换成仓内显示形态（JSON 面用）。"""
+    out = {}
+    for key, value in info.items():
+        out[key] = _rel_display(value) if key in ("src", "out") else value
+    return out
+
+
+def _cmd_label(args):
+    """nf label：标注 IR 的派发（声明层 + sidecar + PNG 载体；载体写入走 embed）。"""
+    sub = getattr(args, "label_cmd", "") or ""
+    if sub == "ir":
+        return _label_ir(args)
+    if sub == "validate":
+        return _label_validate(args)
+    if sub == "write":
+        return _label_write(args)
+    if sub == "read":
+        return _label_read(args)
+    if sub == "list":
+        return _label_list(args)
+    if sub == "embed":
+        return _label_embed(args)
+    if sub == "extract":
+        return _label_extract(args)
+    print("用法：nf label ir ｜ validate ｜ write --object/--ir ｜ read ｜ list"
+          "（各自 --help 看逐条）", file=sys.stderr)
+    return 2
+
+
+def _label_write(args):
+    """nf label write：IR → 对象旁 sidecar（绑定对象摘要；embedded 恒 false）。"""
+    import json as _json
+
+    from core import json_doc, label_sidecar
+    obj = str(getattr(args, "label_object", "") or "")
+    if not obj or not getattr(args, "ir", ""):
+        return _machine_fail(args, "缺 --object / --ir（修复指引：nf label write --object <对象> "
+                                   "--ir <IR.json>；IR 用 nf label ir 生成）", 2)
+    src = obj if os.path.isabs(obj) else _rel_out(obj)
+    try:
+        ir = json_doc.load(_rel_out(args.ir), dict, what=args.ir)
+        dest, info = label_sidecar.write(src, ir, out=_rel_out(args.out) if args.out else "")
+    except (OSError, ValueError) as exc:
+        return _machine_fail(args, str(exc), 2)
+    if args.json:
+        print(_json.dumps({"kind": "label-write", "ok": True, "sidecar": _rel_display(dest),
+                           "object": _rel_display(src), "digest": info["digest"],
+                           "embedded": info["embedded"]},
+                          ensure_ascii=False, indent=2, sort_keys=True))
+    else:
+        print(f"== nf label write（{_rel_display(src)}）==")
+        print(f"  旁车：{_rel_display(dest)} · 绑定摘要 {info['digest'][:16]}")
+        print("  embedded=false：sidecar 不是嵌入——这只声明「该带哪些标识」，不冒充已嵌入")
+    return 0
+
+
+def _label_read(args):
+    """nf label read：读 sidecar 并与对象摘要对账。"""
+    import json as _json
+
+    from core import label_sidecar
+    obj = str(getattr(args, "label_object", "") or "")
+    src = obj if os.path.isabs(obj) else _rel_out(obj)
+    path = _rel_out(args.sidecar) if getattr(args, "sidecar", "") else ""
+    res = label_sidecar.read(src, path=path)
+    if args.json:
+        print(_json.dumps(res, ensure_ascii=False, indent=2, sort_keys=True))
+    else:
+        print(f"== nf label read（{_rel_display(src)}）==")
+        print(f"  判定：{res['verdict']} · embedded={res['embedded']}")
+        for issue in res["issues"]:
+            print(f"  [FAIL] {issue}", file=sys.stderr)
+        if res["verdict"] == "ok":
+            label = res["label"] or {}
+            print(f"  标注：{label.get('standard')} · 档位 {label.get('level')} · "
+                  f"显式 {len(label.get('explicit') or [])} / "
+                  f"隐式 {len(label.get('implicit') or [])}")
+    return 0 if res["verdict"] == "ok" else 1
+
+
+def _label_list(args):
+    """nf label list：清点仓内旁车（只读）。"""
+    import json as _json
+
+    from core import label_sidecar
+    root = _rel_out(args.root) if getattr(args, "root", "") else str(ROOT)
+    rows = label_sidecar.discover(root)
+    if args.json:
+        print(_json.dumps({"kind": "label-list", "count": len(rows),
+                           "rows": [{"sidecar": s, "object": o, "embedded": e}
+                                    for s, o, e in rows]},
+                          ensure_ascii=False, indent=2, sort_keys=True))
+    else:
+        print(f"== nf label list（{len(rows)} 份旁车）==")
+        for sidecar, obj, embedded in rows:
+            print(f"  {obj}  ←  {sidecar}  embedded={embedded}")
+        if not rows:
+            print("  （仓内暂无旁车：标注声明还没落到旁车文件）")
+    return 0
+
+def _label_ir(args):
+    """nf label ir：组装 nf-label/1 IR（纯数据；给了 --out 才落盘，走 atomic_write）。"""
+    import hashlib
+    import json as _json
+
+    from core import atomic_write, label_ir
+    obj = str(args.label_object)
+    src = _rel_out(obj) if not os.path.isabs(obj) else obj
+    if not os.path.isfile(src):
+        return _machine_fail(args, f"对象不是文件：{src}（修复指引：先 ls 定位；目录请逐个列出）",
+                             2)
+    try:
+        with open(src, "rb") as fh:
+            digest = hashlib.sha256(fh.read()).hexdigest()
+        items = (json_doc.load(_rel_out(args.items), list, what=args.items)
+                 if getattr(args, "items", "") else [])
+        doc = label_ir.build(_rel_display(src), digest, contract=args.contract,
+                             level=args.level, items=items, producer=args.producer)
+    except (OSError, ValueError) as exc:
+        return _machine_fail(args, str(exc), 4)
+    text = _json.dumps(doc, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
+    out = ""
+    if getattr(args, "out", ""):
+        out = _rel_out(args.out)
+        parent = os.path.dirname(out)
+        if parent:
+            os.makedirs(parent, exist_ok=True)
+        atomic_write.write_text(out, text)
+    if args.json:
+        print(text, end="")
+    else:
+        print(f"== nf label ir（{doc['object']['path']} · {doc['level']}）==")
+        print(f"  显式 {len(doc['explicit'])} 项 · 隐式 {len(doc['implicit'])} 项 · "
+              f"digest {digest[:16]}")
+        if out:
+            print(f"  已写入：{_rel_display(out)}")
+        print("  注意：本件只声明「该有哪些标识」，不证明载体里写入了任何东西")
+    return 0
+
+
+def _label_validate(args):
+    """nf label validate：校验 IR（形状 + 档位必需项 + 未证明提示）。"""
+    import json as _json
+
+    from core import json_doc, label_ir
+    raw_path = str(args.label_ir)
+    path = raw_path if os.path.isabs(raw_path) else _rel_out(raw_path)
+    try:
+        doc = json_doc.load(path, dict, what=str(args.label_ir))
+        res = label_ir.validate(doc)
+    except (OSError, ValueError) as exc:
+        return _machine_fail(args, str(exc), 4)
+    if args.json:
+        print(_json.dumps(res, ensure_ascii=False, indent=2, sort_keys=True))
+    else:
+        print(f"== nf label validate（{_rel_display(path)}）==")
+        print(f"  判定：{res['verdict']} · 档位：{res['level']} · "
+              f"已满足 {len(res['applied'])} 条 · 缺 {len(res['missing'])} 条")
+        for i in res["issues"]:
+            print(f"  [FAIL] {i}", file=sys.stderr)
+        for w in res["warnings"]:
+            print(f"  [WARN] {w}", file=sys.stderr)
+        if res["verdict"] == "ok":
+            print("  ✓ 声明形状与档位齐备（**不等于**载体里真的带标识）")
+    return 0 if res["verdict"] == "ok" else 1
+
+
+def _cmd_revocations(args):
+    """nf evidence revocations：吊销分发件的签名 / 校验 / 合并。"""
+    sub = getattr(args, "revocations_cmd", "") or ""
+    if sub == "sign":
+        return _revocations_sign(args)
+    if sub == "trust":
+        return _revocations_trust(args)
+    if sub == "pubkey":
+        return _revocations_pubkey(args)
+    if sub == "verify":
+        return _revocations_verify(args)
+    if sub == "merge":
+        return _revocations_merge(args)
+    print("用法：nf evidence revocations sign --table <表.json> --key-file <k> ｜ "
+          "verify <feed.json> ｜ merge <feed…>（各自 --help 看逐条）", file=sys.stderr)
+    return 2
+
+
+def _revocations_load(args, path: str) -> dict:
+    """读一个 JSON 对象（带指引的失败）。"""
+    from core import json_doc
+    raw = path if os.path.isabs(path) else _rel_out(path)
+    return json_doc.load(raw, dict, what=path)
+
+
+def _revocations_write(args, doc: dict, out: str) -> str:
+    """落盘（给了 --out 才写；走 atomic_write，别留半截件）。"""
+    import json as _json
+
+    from core import atomic_write
+    text = _json.dumps(doc, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
+    if not out:
+        return ""
+    dest = _rel_out(out)
+    parent = os.path.dirname(dest)
+    if parent:
+        os.makedirs(parent, exist_ok=True)
+    atomic_write.write_text(dest, text)
+    return _rel_display(dest)
+
+
+def _revocations_trust(args):
+    """nf evidence revocations trust：签发委派 / 看清单。"""
+    import json as _json
+
+    from core import json_doc, trust_anchor
+    sub = str(getattr(args, "trust_cmd", "") or "")
+    if sub == "grant":
+        manifest_path = _rel_out(args.trust_manifest) if args.trust_manifest else ""
+        manifest = {"schema": trust_anchor.SCHEMA, "roots": [], "delegations": []}
+        if manifest_path and os.path.isfile(manifest_path):
+            try:
+                manifest = json_doc.load(manifest_path, dict, what=manifest_path)
+            except (OSError, ValueError) as exc:
+                return _machine_fail(args, f"信任清单不可读：{exc}", 4)
+        try:
+            with open(_rel_out(args.revocations_seed), "rb") as fh:
+                seed = fh.read()
+            item, err = trust_anchor.make_delegation(
+                seed, bytes.fromhex(args.subject_pub), args.expires_at)
+        except (OSError, ValueError) as exc:
+            return _machine_fail(args, str(exc), 4)
+        if err:
+            return _machine_fail(args, err, 4)
+        manifest.setdefault("delegations", []).append(item)
+        if args.root:
+            from core import ed25519
+            pub = ed25519.public_key(seed).hex()
+            roots = manifest.setdefault("roots", [])
+            if not any(str(r.get("pub")) == pub for r in roots):
+                roots.append({"id": f"root-{len(roots) + 1}", "pub": pub})
+        out = _rel_out(args.out) if args.out else (manifest_path or "revocation-trust.json")
+        from core import atomic_write
+        atomic_write.write_text(out, _json.dumps(manifest, ensure_ascii=False, indent=2,
+                                                 sort_keys=True) + chr(10))
+        if args.json:
+            print(_json.dumps({"kind": "revocations-trust-grant", "ok": True, "out": out,
+                               "delegation": item, "roots": len(manifest.get("roots") or []),
+                               "delegations": len(manifest.get("delegations") or [])},
+                              ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print(f"== nf evidence revocations trust grant（{out}）==")
+            print(f"  委派：{item['issuer'][:16]}… → {item['subject'][:16]}…"
+                  f" · scope={item['scope']} · 至 {item['expires_at']}")
+            print(f"  清单现有：根 {len(manifest.get('roots') or [])} · "
+                  f"委派 {len(manifest.get('delegations') or [])}")
+        return 0
+    if sub == "show":
+        path = _rel_out(args.trust_manifest)
+        try:
+            manifest = json_doc.load(path, dict, what=path)
+        except (OSError, ValueError) as exc:
+            return _machine_fail(args, f"信任清单不可读：{exc}", 4)
+        res = {"schema": str(manifest.get("schema") or ""),
+               "roots": manifest.get("roots") or [],
+               "delegations": len(manifest.get("delegations") or [])}
+        if args.check_pub:
+            try:
+                got = trust_anchor.anchor(manifest, bytes.fromhex(args.check_pub), args.at)
+            except ValueError as exc:
+                return _machine_fail(args, f"公钥格式不对：{exc}", 4)
+            res["anchor"] = got
+        if args.json:
+            print(_json.dumps(res, ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print(f"== nf evidence revocations trust show（{path}）==")
+            print(f"  schema：{res['schema'] or '缺失'} · 根 {len(res['roots'])} · "
+                  f"委派 {res['delegations']}")
+            for root in res["roots"]:
+                print(f"  root：{root.get('id')} · {str(root.get('pub'))[:24]}…")
+            if "anchor" in res:
+                got = res["anchor"]
+                print(f"  核对：{'锚定到 ' + got['root'] if got['ok'] else '未通过'}")
+                for issue in got["issues"]:
+                    print(f"  [FAIL] {issue}", file=sys.stderr)
+        return 0
+    print("用法：nf evidence revocations trust grant|show ...", file=sys.stderr)
+    return 2
+
+
+def _revocations_pubkey(args):
+    """从 32 字节 ed25519 种子导出公钥（种子不出发布方）。"""
+    import json as _json
+
+    from core import ed25519
+    path = _rel_out(args.revocations_seed)
+    try:
+        with open(path, "rb") as fh:
+            seed = fh.read()
+    except OSError as exc:
+        return _machine_fail(args, f"读不到种子文件：{exc}", 4)
+    try:
+        pub = ed25519.public_key(seed)
+    except ValueError as exc:
+        return _machine_fail(args, str(exc), 4)
+    if args.json:
+        print(_json.dumps({"kind": "revocations-pubkey", "pubkey": pub.hex(),
+                           "scheme": "ed25519"}, ensure_ascii=False, indent=2,
+                          sort_keys=True))
+    else:
+        print(f"== nf evidence revocations pubkey（{_rel_display(path)}）==")
+        print(f"  公钥（hex，32 字节）：{pub.hex()}")
+        print("  把这段公钥交给验证方；种子留在发布方，别随 feed 分发")
+    return 0
+
+
+def _revocations_sign(args):
+    """签名：nf-revocation/1 表 → 签名 feed。"""
+    import json as _json
+
+    from core import attest
+    from core import revocations as rv
+    try:
+        table = _revocations_load(args, args.table)
+        prev = _revocations_load(args, args.prev) if args.prev else None
+        scheme_arg = args.scheme or rv.ALG
+        if scheme_arg == rv.ALG_ED25519:
+            # 32 字节种子是**原始值**：不能 strip（任意字节都可能出现在种子末尾）
+            with open(_rel_out(args.key_file), "rb") as fh:
+                key = fh.read()
+        else:
+            key = attest.read_key_file(_rel_out(args.key_file))
+        scheme = args.scheme or rv.ALG
+        feed = rv.sign(table, key, issuer=args.issuer, seq=args.seq, prev=prev,
+                       expires_at=args.expires_at, ttl=args.ttl, status_uri=args.status_uri,
+                       scheme=scheme)
+    except (OSError, ValueError) as exc:
+        return _machine_fail(args, str(exc), 4)
+    shown = _revocations_write(args, feed, args.out)
+    if args.json:
+        print(_json.dumps({"kind": "revocations-sign", "out": shown,
+                           "feed": {k: v for k, v in feed.items() if k != "table"},
+                           "count": len((feed.get("table") or {}).get("revoked") or [])},
+                          ensure_ascii=False, indent=2, sort_keys=True))
+    else:
+        print(f"== nf evidence revocations sign（seq={feed['seq']}）==")
+        rows = len((feed.get("table") or {}).get("revoked") or [])
+        issuer = feed["issuer"] or "（未填）"
+        print(f"  issuer：{issuer} · 条目 {rows} · 摘要 {rv.digest(feed)[:16]}")
+        if shown:
+            print(f"  已写入：{shown}")
+    return 0
+
+
+def _revocations_verify(args):
+    """校验 feed（签名 + 序号 + 前序链）。"""
+    import json as _json
+
+    from core import attest
+    from core import revocations as rv
+    try:
+        doc = _revocations_load(args, args.revocation_feed)
+        prev = _revocations_load(args, args.prev) if args.prev else None
+        key = None
+        if args.key_file:
+            sig = doc.get("signature") if isinstance(doc, dict) else None
+            alg = str((sig or {}).get("alg") or "") if isinstance(sig, dict) else ""
+            if alg == rv.ALG_ED25519:
+                # ed25519 公钥是**32 字节原始值**：不能 strip（末尾字节可能是空白）
+                with open(_rel_out(args.key_file), "rb") as fh:
+                    key = fh.read()
+            else:
+                key = attest.read_key_file(_rel_out(args.key_file))
+        trust = (json_doc.load(_rel_out(args.trust_manifest), dict,
+                               what=args.trust_manifest)
+                 if getattr(args, "trust_manifest", "") else None)
+        res = rv.verify(doc, key=key, prev=prev, at=args.at, trust=trust,
+                        require_trust=bool(getattr(args, "require_trust", False)))
+    except (OSError, ValueError) as exc:
+        return _machine_fail(args, str(exc), 4)
+    if args.json:
+        print(_json.dumps(res, ensure_ascii=False, indent=2, sort_keys=True))
+    else:
+        print(f"== nf evidence revocations verify（{args.revocation_feed}）==")
+        print(f"  判定：{res['verdict']} · 序号 {res['seq']} · 条目 {res['count']} · "
+              f"签名 {'有' if res['signed'] else '无'} · 摘要 {res['digest'][:16]}")
+        fresh = res.get("freshness") or {}
+        state = fresh.get("state") or "unknown"
+        exp = fresh.get("expires_at") or "未给"
+        print(f"  新鲜度：{state}（basis={fresh.get('basis') or 'none'}，到期 {exp}）")
+        for i in res["issues"]:
+            print(f"  [FAIL] {i}", file=sys.stderr)
+        for w in res["warnings"]:
+            print(f"  [WARN] {w}", file=sys.stderr)
+    return 0 if res["verdict"] == "ok" else 1
+
+
+def _revocations_merge(args):
+    """多份 feed → 合并表（任何一份不过则整次失败）。"""
+    import json as _json
+
+    from core import attest
+    from core import revocations as rv
+    try:
+        feeds = [_revocations_load(args, p) for p in args.feeds]
+        key = attest.read_key_file(_rel_out(args.key_file)) if args.key_file else None
+        res = rv.merge(feeds, key=key, at=args.at)
+    except (OSError, ValueError) as exc:
+        return _machine_fail(args, str(exc), 4)
+    shown = _revocations_write(args, res["table"], args.out) if res["ok"] else ""
+    if args.json:
+        print(_json.dumps({"kind": "revocations-merge", "out": shown,
+                           "ok": res["ok"], "verdict": res["verdict"],
+                           "feeds": res["feeds"], "count": res["count"],
+                           "issues": res["issues"], "warnings": res["warnings"],
+                           "freshness": res["freshness"],
+                           "table": res["table"] if res["ok"] else None},
+                          ensure_ascii=False, indent=2, sort_keys=True))
+    else:
+        print(f"== nf evidence revocations merge（{res['feeds']} 份）==")
+        print(f"  判定：{res['verdict']} · 合并后条目 {res['count']}")
+        fresh = res.get("freshness") or {}
+        print(f"  新鲜度：{fresh.get('state') or 'unknown'}"
+              f"（{len(fresh.get('parts') or [])} 份取最严）")
+        for i in res["issues"]:
+            print(f"  [FAIL] {i}", file=sys.stderr)
+        if shown:
+            print(f"  已写入：{shown}")
+    return 0 if res["ok"] else 1
+
+
+def _evidence_timestamp(args):
+    """nf evidence timestamp：申请（stamp）/ 离线校验（verify）时间戳。"""
+    import json as _json
+
+    from core import timestamp as ts
+    sub = str(getattr(args, "timestamp_cmd", "") or "")
+    if sub == "stamp":
+        return _timestamp_stamp(args, ts, _json)
+    if sub == "verify":
+        return _timestamp_verify(args, ts, _json)
+    print("用法：nf evidence timestamp stamp <FILE> [--url TSA --ca-file CA] "
+          "｜ verify <TOKEN> --query Q --ca-file CA", file=sys.stderr)
+    return 2
+
+
+def _timestamp_stamp(args, ts, _json):
+    data = _rel_out(args.timestamp_data)
+    prefix = _rel_out(args.out_prefix) if args.out_prefix else data
+    if not os.path.isfile(data):
+        return _machine_fail(args, f"文件不存在：{data}（修复指引：给一个真实文件）", 4)
+    query, err = ts.make_query(data, out=prefix + ".tsq")
+    if err:
+        return _machine_fail(args, err, 4)
+    token, err = ts.submit(query, url=args.url, out=prefix + ".tsr")
+    if err:
+        return _machine_fail(args, err, 4)
+    with open(data, "rb") as fh:
+        sha = ts.subject_digest(fh.read())
+    doc, err = ts.record(data, token, query, sha,
+                         _rel_out(args.ca_file) if args.ca_file else token, out=prefix + ".json")
+    checked = None
+    if args.ca_file:
+        checked = ts.verify(token, query, ca_file=_rel_out(args.ca_file),
+                            untrusted=_rel_out(args.untrusted) if args.untrusted else "")
+        if not checked["ok"]:
+            return _machine_fail(args, "；".join(checked["issues"]), 1)
+    if args.json:
+        print(_json.dumps({"kind": "timestamp-stamp", "ok": True, "record": prefix + ".json",
+                           "query": query, "token": token,
+                           "gen_time": (checked or {}).get("gen_time", ""),
+                           "subject_sha256": sha},
+                          ensure_ascii=False, indent=2, sort_keys=True))
+    else:
+        print(f"== nf evidence timestamp stamp（{os.path.basename(data)}）==")
+        print(f"  请求：{query} · token：{token} · 记录：{prefix}.json")
+        print(f"  被证摘要：{sha[:24]}")
+        if checked:
+            print(f"  自检：{checked['verdict']} · genTime {checked['gen_time']}")
+        else:
+            print("  自检：跳过（没给 --ca-file，无法判断 token 是谁签的）")
+    return 0
+
+
+def _timestamp_verify(args, ts, _json):
+    res = ts.verify(_rel_out(args.timestamp_token), _rel_out(args.query),
+                    ca_file=_rel_out(args.ca_file) if args.ca_file else "",
+                    untrusted=_rel_out(args.untrusted) if args.untrusted else "")
+    if args.json:
+        print(_json.dumps(res, ensure_ascii=False, indent=2, sort_keys=True))
+    else:
+        print(f"== nf evidence timestamp verify（{args.timestamp_token}）==")
+        print(f"  判定：{res['verdict']} · genTime {res['gen_time'] or '-'} · "
+              f"serial {res['serial'] or '-'}")
+        for issue in res["issues"]:
+            print(f"  [FAIL] {issue}", file=sys.stderr)
+        for warn in res["warnings"]:
+            print(f"  [WARN] {warn}", file=sys.stderr)
+    return 0 if res["ok"] else 1
+
+
+def _evidence_batch(args):
+    """nf evidence batch：目录逐件复验 → 汇总（任何一件非 ok 即整体失败）。"""
+    import json as _json
+
+    from core import attest, json_doc
+    from core import evidence as ev
+
+    target = str(getattr(args, "batch_target", "") or "")
+    try:
+        key = attest.read_key_file(_rel_out(args.key_file)) if args.key_file else None
+        rev = (json_doc.load(_rel_out(args.revocations), dict, what=args.revocations)
+               if args.revocations else None)
+        anc = (json_doc.load(_rel_out(args.anchor), dict, what=args.anchor)
+               if args.anchor else None)
+        res = ev.verify_batch(_rel_out(target), key=key, revocations=rev,
+                              at=args.at, root=_rel_out(args.root) if args.root else "",
+                              anchor=anc)
+    except (OSError, ValueError) as exc:
+        return _machine_fail(args, str(exc), 2)
+    if args.json:
+        print(_json.dumps(res, ensure_ascii=False, indent=2, sort_keys=True))
+    else:
+        print(f"== nf evidence batch（{res['total']} 件）==")
+        for row in res["rows"]:
+            mark = "✓" if row["verdict"] == "ok" else "✗"
+            print(f"  {mark} {row['path']} · {row['verdict']} · 级 {row['level'] or '-'}")
+            for issue in row["issues"]:
+                print(f"      [FAIL] {issue}")
+        counts = " · ".join(f"{k} {v}" for k, v in res["counts"].items())
+        print(f"  汇总：{counts}（失败 {res['failures']}）")
+        print("  整体判定只看「是不是每一件都 ok」，不做平均")
+    return 0 if res["ok"] else 1
+
+
+def _cmd_evidence(args):
+    """nf evidence：证据包打包 / 第三方复验（cc_verify 的 CLI 面）的派发。"""
+    sub = getattr(args, "evidence_cmd", "") or ""
+    if not sub:
+        print("用法：nf evidence pack <文件…> --out <包.zip>｜nf evidence verify <包.zip>"
+              "（各自 --help 看逐条）", file=sys.stderr)
+        return 2
+    if sub == "timestamp":
+        return _evidence_timestamp(args)
+    if sub == "batch":
+        return _evidence_batch(args)
+    if sub == "verify":
+        return _evidence_verify(args)
+    if sub == "bench":
+        return _evidence_bench(args)
+    if sub == "replay":
+        return _evidence_replay(args)
+    if sub == "revocations":
+        return _cmd_revocations(args)
+    return _evidence_pack(args)
+
+
+def _evidence_verify(args):
+    """nf evidence verify：第三方复验（纯读；--selfcheck 是机制体检）。
+
+    判定词表（ok/revoked/expired/invalid）与退出码是稳定面，见 docs/ccos/abi-v0.md。
+    不写盘、不改仓库：payload 只解到进程私有临时目录，出作用域即销毁。
+    """
+    import json as _json
+
+    from core import attest, evidence, json_doc
+    if getattr(args, "selfcheck", False):
+        ok, issues, stats = evidence.selfcheck()
+        if args.json:
+            print(_json.dumps({"kind": "evidence-selfcheck", "ok": ok,
+                               "issues": issues, "stats": stats},
+                              ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print("== nf evidence verify --selfcheck（复验机制体检）==")
+            for i in issues:
+                print(f"  [FAIL] {i}", file=sys.stderr)
+            if ok:
+                print("  ✓ PASS 必过 · 篡改必红 · 吊销必判 revoked · 过期必判 expired"
+                      "（确定性打包：两次逐字节一致）")
+        return 0 if ok else 1
+    target = getattr(args, "evidence_bundle", "") or ""
+    if not target:
+        return _machine_fail(args, "缺证据包路径（修复指引：请给 <包.zip> 或解包目录；"
+                                   "只想体检复验机制用 --selfcheck）", 2)
+    try:
+        key = attest.read_key_file(_rel_out(args.key_file)) if args.key_file else None
+        rev = (json_doc.load(_rel_out(args.revocations), dict, what=args.revocations)
+               if args.revocations else None)
+        path = _rel_out(target) if not os.path.isabs(target) else target
+        root = _rel_out(args.root) if args.root else ""
+        anc = (json_doc.load(_rel_out(args.anchor), dict, what=args.anchor)
+               if getattr(args, "anchor", "") else None)
+        time_record = None
+        if getattr(args, "time_record", ""):
+            time_record = json_doc.load(_rel_out(args.time_record), dict,
+                                        what=args.time_record)
+            time_record["_dir"] = os.path.dirname(os.path.abspath(_rel_out(args.time_record)))
+            if not getattr(args, "time_ca", ""):
+                return _machine_fail(args, "给了 --time-record 就必须给 --time-ca（信任锚）"
+                                           "（修复指引：TSA 根证书 PEM）", 4)
+        res = evidence.verify_any(path, key=key, revocations=rev, at=args.at,
+                                  root=root, kind=args.kind, anchor=anc,
+                                  expected_policy_digest=getattr(args, "policy_digest", ""),
+                                  require_fresh_revocations=bool(args.require_fresh_revocations),
+                                  time_record=time_record,
+                                  time_ca=_rel_out(args.time_ca) if args.time_ca else "",
+                                  time_untrusted=(_rel_out(args.time_untrusted)
+                                                  if args.time_untrusted else ""))
+    except (OSError, ValueError) as exc:
+        return _machine_fail(args, str(exc), 4)
+    if args.json:
+        print(_json.dumps(res, ensure_ascii=False, indent=2, sort_keys=True))
+    else:
+        print(f"== nf evidence verify（{target}）==")
+        print(f"  判定：{res['verdict']} · 证据强度：{res['level']} · "
+              f"成员 {res['count']} 件 · 根 {res['root'][:16]}")
+        print(f"  吊销新鲜度：{res.get('revocations_fresh') or 'unknown'}"
+              f"（basis={res.get('revocations_basis') or 'none'}，"
+              f"来源={res.get('revocations_source') or 'none'}）")
+        for i in res["issues"]:
+            print(f"  [FAIL] {i}", file=sys.stderr)
+        for w in res.get("warnings") or []:
+            print(f"  [WARN] {w}", file=sys.stderr)
+        if res.get("anchor_verified"):
+            print("  锚点：已核对（不是被截断的更早版本）")
+        if res["verdict"] == "ok":
+            print("  ✓ 证据成立（注意：成立 = 成员未改、证明到根、信封自洽；"
+                  "不等于内容质量或内容真实）")
+    return evidence.EXIT_CODES.get(str(res["verdict"]), 1)
+
+
+def _cmd_resolve(args):
+    """nf resolve：对象 → 契约集（cc_resolve：这个文件该守哪些契约）。"""
+    import json as _json
+
+    from core import asset_contract
+    target = _rel_out(args.object)
+    try:
+        rel = os.path.relpath(target, ROOT)
+    except ValueError:            # 跨盘时 relpath 无解：按原样交给契约面（必然未认领）
+        rel = target
+    try:
+        res = asset_contract.contracts_for_path(ROOT, rel)
+    except (OSError, ValueError) as exc:
+        return _machine_fail(args, str(exc), 2)
+    if args.json:
+        print(_json.dumps(res, ensure_ascii=False, indent=2, sort_keys=True))
+    else:
+        print(f"== nf resolve（{res['object']}）==")
+        if not res["contracts"]:
+            print("  未被任何契约认领（closure_closed=false）——注意：这不是「查过没问题」，")
+            print("  而是「契约声明里没有覆盖它」（声明面是 opt-in）")
+        for c in res["contracts"]:
+            name = c['id'] or '(未命名)'
+            print(f"  · [{c['face']}] {name} · 管 {c['files']} 件 · 摘要 {c['digest'][:16]}")
+        print(f"  契约集闭合：{'是' if res['closure_closed'] else '否'}")
+    return 0 if res["closure_closed"] else 1
+
+def _evidence_replay(args):
+    """nf evidence replay：把证据推导过程摊成确定性 trace（纯读、可 diff）。"""
+    import json as _json
+
+    from core import attest, evidence
+    target = getattr(args, "evidence_bundle", "") or ""
+    if not target:
+        return _machine_fail(args, "缺证据源（修复指引：请给证据包 .zip / 解包目录 / "
+                                   "回执或信封 JSON）", 2)
+    try:
+        key = attest.read_key_file(_rel_out(args.key_file)) if args.key_file else None
+        res = evidence.replay(_rel_out(target), entry=args.entry, key=key,
+                              root=_rel_out(args.root) if args.root else "",
+                              kind=args.kind)
+    except (OSError, ValueError) as exc:
+        return _machine_fail(args, str(exc), 4)
+    if args.json:
+        print(_json.dumps(res, ensure_ascii=False, indent=2, sort_keys=True))
+    else:
+        print(f"== nf evidence replay（{res['kind']} · {len(res['entries'])} 段轨迹）==")
+        for e in res["entries"]:
+            print(f"  {e['path']}  →  叶 {e['leaf'][:16]}…")
+            for s in e["steps"]:
+                print(f"    {s['step']:>2}. {s['rule']:<18} {s['output'][:32]}")
+        if res.get("root"):
+            print(f"  根：记录 {res['root'][:16]}… / 实测 "
+                  f"{res.get('recomputed_root', '')[:16]}…")
+        for i in res["issues"]:
+            print(f"  [FAIL] {i}", file=sys.stderr)
+        print(f"  轨迹自洽：{'是' if res['ok'] else '否'}")
+    return 0 if res["ok"] else 1
+
+
+def _check_intent_from_text(args):
+    """nf check --intent-from-text：法规原文 → 意图草稿（规则抽取，不是法律理解）。"""
+    import json as _json
+
+    from core import atomic_write, check_text_to_intent
+    path = _rel_out(args.intent_from_text)
+    try:
+        with open(path, "rb") as fh:
+            raw = fh.read()
+        text = raw.decode("utf-8")
+    except OSError as exc:
+        return _machine_fail(args, f"读不到法规文本：{exc}", 4)
+    except UnicodeDecodeError as exc:
+        return _machine_fail(args, f"法规文本不是 UTF-8：{exc}（修复指引：先转成 UTF-8 再跑）", 4)
+    try:
+        doc = check_text_to_intent.draft(text, source=_rel_display(path))
+    except ValueError as exc:
+        return _machine_fail(args, str(exc), 1)
+    if args.out:
+        atomic_write.write_text(_rel_out(args.out),
+                                _json.dumps(doc, ensure_ascii=False, indent=2,
+                                            sort_keys=True) + chr(10))
+    if args.json:
+        print(_json.dumps(doc, ensure_ascii=False, indent=2, sort_keys=True))
+    else:
+        print(f"== nf check --intent-from-text（{_rel_display(path)}）==")
+        print(f"  条文 {doc['source']['clauses']} · 可编译 {len(doc['intent']['requirements'])}"
+              f" · 待补参数 {len(doc['pending'])} · 不可表达 {len(doc['unsupported'])}"
+              f" · 未覆盖 {len(doc['uncovered'])}")
+        for c in doc["covered"]:
+            missing = ",".join(c["missing_params"])
+            mark = f"（待补 {missing}）" if c["needs_human"] else ""
+            print(f"  · {c['clause']} → {c['rule']}（置信 {c['confidence']}）{mark}")
+        for u in doc["unsupported"]:
+            print(f"  ✗ {u['clause']} 需要能力：{u['needs']}")
+        for u in doc["uncovered"]:
+            print(f"  ? {u['clause']}：{u['why']}")
+        print("  这是草稿：参数不全的条目要人工补齐，不可表达/未覆盖项要人工裁决")
+        if args.out:
+            print(f"  已写入：{_rel_display(_rel_out(args.out))}")
+    return 0
+
+
+def _cmd_check(args):
+    """nf check：单对象策略体检 + 意图编译器（cc_check 的判定面与编译面）。"""
+    import json as _json
+
+    from core import check_compile, check_policy
+    if getattr(args, "list_rules", False):
+        table = check_compile.rules_table()
+        if args.json:
+            print(_json.dumps(table, ensure_ascii=False, indent=2, sort_keys=True))
+            return 0
+        print("== 可编译的意图规则 ==")
+        for row in table["compilable"]:
+            extra = "（可选：" + ", ".join(row["optional"]) + "）" if row["optional"] else ""
+            print(f"  {row['rule']:<20} {row['why']}{extra}")
+        print("== 明确不可表达（会进 unsupported，不会静默丢弃）==")
+        for row in table["unsupported"]:
+            print(f"  {row['rule']:<20} {row['why']} → 需要：{row['needs']}")
+        return 0
+    if getattr(args, "intent_from_text", ""):
+        return _check_intent_from_text(args)
+    if getattr(args, "compile", ""):
+        return _check_compile(args)
+    if not args.object or not args.policy:
+        return _machine_fail(args, "用法：nf check <对象> --policy <策略.json> ｜ "
+                                   "nf check --compile <意图.json> [--out 策略.json] ｜ "
+                                   "nf check --list-rules（修复指引：三选一，别空跑）", 2)
+    try:
+        policy = check_policy.load(_rel_out(args.policy))
+        res = check_policy.check(_rel_out(args.object), policy)
+    except (OSError, ValueError) as exc:
+        return _machine_fail(args, str(exc), 2)
+    if args.json:
+        print(_json.dumps(res, ensure_ascii=False, indent=2, sort_keys=True))
+    else:
+        title = res["policy_id"] or "未命名策略"
+        print(f"== nf check（{title} · 策略 {res['policy_digest'][:16]}）==")
+        for f in res["findings"]:
+            mark = "✓" if f["ok"] else ("✗" if f["severity"] == "fail" else "!")
+            print(f"  {mark} {f['rule']:<24} {f['detail']}")
+            if not f["ok"]:
+                print(f"    → {f['fix']}")
+        print(f"  判定：{res['verdict']}（fail {res['failed']} · warn {res['warned']}）")
+    return 0 if res["verdict"] == "ok" else 1
+
+def _check_compile(args):
+    """nf check --compile：意图 → 策略（编不出来就说清楚为什么，不静默丢要求）。"""
+    import json as _json
+
+    from core import atomic_write, check_compile, check_policy, json_doc
+    path = _rel_out(args.compile)
+    try:
+        intent = json_doc.load(path, dict, what=args.compile)
+        res = check_compile.compile_intent(intent)
+    except (OSError, ValueError) as exc:
+        return _machine_fail(args, str(exc), 2)
+    if not res["ok"]:
+        if args.json:
+            print(_json.dumps({"kind": "check-compile", "ok": False,
+                               "issues": res["issues"]},
+                              ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            for issue in res["issues"]:
+                print(f"  [FAIL] {issue}", file=sys.stderr)
+        return 2
+    policy = res["policy"]
+    issues = check_policy.validate(policy)
+    if issues:
+        # 编译器自己产出的策略过不了判定器的形状校验 = 编译器 bug，必须当场红
+        return _machine_fail(args, "内部错误：编译产物不合法：" + "；".join(issues[:3]), 1)
+    shown = ""
+    if args.out:
+        dest = _rel_out(args.out)
+        parent = os.path.dirname(dest)
+        if parent:
+            os.makedirs(parent, exist_ok=True)
+        text = _json.dumps(policy, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
+        atomic_write.write_text(dest, text)
+        shown = _rel_display(dest)
+    if args.json:
+        print(_json.dumps({"kind": "check-compile", "ok": True, "out": shown,
+                           "policy": policy, "coverage": res["coverage"],
+                           "unsupported": res["unsupported"]},
+                          ensure_ascii=False, indent=2, sort_keys=True))
+    else:
+        cov = res["coverage"]
+        print(f"== nf check --compile（{policy.get('policy_id') or '未命名'}）==")
+        print(f"  要求 {cov['requirements']} 条 · 编译 {cov['compiled']} 条 · "
+              f"不可表达 {cov['unsupported']} 条 · 完整 {cov['complete']}")
+        for row in res["unsupported"]:
+            print(f"  [UNSUPPORTED] {row['rule']}：{row['why']}（需要：{row['needs']}）",
+                  file=sys.stderr)
+        print(f"  策略规则 {len(policy['rules'])} 条 · 摘要 "
+              f"{check_policy.policy_digest(policy)[:16]}")
+        if shown:
+            print(f"  已写入：{shown} → 用 nf check <对象> --policy {shown} 判定")
+    return 0 if res["coverage"]["complete"] else 3
+
+
+def _evidence_pack(args):
+    """nf evidence pack：把目标文件打成自包含证据包（缺省 = 01/02/06/07 四件）。"""
+    import json as _json
+
+    from core import attest, evidence, json_doc
+    targets = list(getattr(args, "targets", None) or attest.DEFAULT_SUBJECTS)
+    try:
+        rels = [_rel_to_root(t) for t in targets]
+        key = attest.read_key_file(_rel_out(args.key_file)) if args.key_file else None
+        rev = (json_doc.load(_rel_out(args.revocations), dict, what=args.revocations)
+               if args.revocations else None)
+        anc = (json_doc.load(_rel_out(args.anchor), dict, what=args.anchor)
+               if getattr(args, "anchor", "") else None)
+        dec = (json_doc.load(_rel_out(args.decision), dict, what=args.decision)
+               if getattr(args, "decision", "") else None)
+        out = _rel_out(args.out) if args.out else evidence.default_out()
+        dest, info = evidence.write(ROOT, out, rels, issuer=args.issuer,
+                                    key=key, expires_at=args.expires_at, revocations=rev,
+                                    anchor=anc, decision=dec)
+    except (OSError, ValueError) as exc:
+        return _machine_fail(args, str(exc))
+    if args.json:
+        print(_json.dumps({"kind": "evidence-pack", "out": _portable_out(dest),
+                           "info": dict(info, out=_portable_out(dest))},
+                          ensure_ascii=False, indent=2, sort_keys=True))
+    else:
+        shown = _rel_display(dest)
+        print(f"== nf evidence pack（{info['count']} 件）==")
+        print(f"  包：{shown} · 强度：{info['level']} · 根：{info['root'][:16]} · "
+              f"链头：{info['head'][:16]}")
+        print(f"  复验：nf evidence verify {shown}")
+    return 0
+
+
+def _evidence_bench(args):
+    """nf evidence bench：攻击矩阵基准（38 条已知攻击，逐条比对期望判定）。"""
+    import json as _json
+
+    from core import evidence
+    res = evidence.bench()
+    if getattr(args, "out", ""):
+        from core import atomic_write
+        dest = _rel_out(args.out)
+        parent = os.path.dirname(dest)
+        if parent:
+            os.makedirs(parent, exist_ok=True)
+        atomic_write.write_text(dest, evidence.bench_markdown(res))
+    if args.json:
+        print(_json.dumps(res, ensure_ascii=False, indent=2, sort_keys=True))
+        return 0 if res["ok"] else 1
+    if not getattr(args, "quiet", False):
+        print("== nf evidence bench（攻击矩阵 v0）==")
+        for i, r in enumerate(res["cases"], 1):
+            mark = "✓" if r["ok"] else "✗"
+            print(f"  {mark} {i:>2}. {r['id']:<22} 期望={r['expected']:<8} "
+                  f"实际={r['actual']:<8} {r['desc']}")
+        if getattr(args, "out", ""):
+            print(f"  报告：{args.out}")
+    print(f"用例 {res['total']} · 通过 {res['passed']} · 失败 {res['failed']} · "
+          f"结论 {'PASS' if res['ok'] else 'FAIL'}")
+    return 0 if res["ok"] else 1
+
+
 def _cmd_attest(args):
     """nf attest：内容 attestation 生成/校验（三级信任；缺锚一律拒绝）。"""
-    from core import attest
     import json as _json
+
+    from core import attest
     if getattr(args, "selfcheck", False):
         # 机制体检（2026-10-17）：check42 是门禁侧入口，这一面是**用户侧**入口——
         # 让「验签方 ≠ 签名方」这条结论随时可复跑，而不必等全量门禁。
@@ -3108,7 +4454,7 @@ def _cmd_attest(args):
                     args, "--out 落点是目录：%s（修复指引：给**文件**路径，如 "
                           "attest.json）" % args.out, 1)
             os.makedirs(os.path.dirname(os.path.abspath(out_path)), exist_ok=True)
-            from core import atomic_write      # 信封交付件：原子写
+            from core import atomic_write  # 信封交付件：原子写
             atomic_write.write_text(out_path, _json.dumps(
                 payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n")
         if args.json:
@@ -3141,8 +4487,9 @@ def _cmd_attest(args):
 
 def _cmd_lint(args):
     """nf lint：机械检查/修复（与 doc_hygiene / prose_lint 同源判据）。"""
-    from core import autofix
     import json as _json
+
+    from core import autofix
     if getattr(args, "kinds", False):
         from core import doc_hygiene as dh
         warns = dh.kind_rules(ROOT)
@@ -3220,8 +4567,9 @@ def _cmd_lint(args):
 
 def _cmd_conformance(args):
     """nf conformance：一致性报告工件（全部契约 → Merkle 根 + verdict）。"""
-    from core import conformance_report as cr
     import json as _json
+
+    from core import conformance_report as cr
     if args.write:
         doc = cr.run(ROOT)
         rel = cr.write(ROOT, doc=doc)
@@ -3249,8 +4597,9 @@ def _cmd_conformance(args):
 
 def _cmd_driver(args):
     """nf driver：指令档机器面路由解析/自检。"""
-    from core import driver
     import json as _json
+
+    from core import driver
     issues, warns, stats = driver.scan(ROOT)
     if args.workflow:
         r = driver.resolve(ROOT, args.workflow)
@@ -3294,9 +4643,10 @@ def _cmd_driver(args):
 
 def _cmd_rfc(args):
     """nf rfc：协议件 RFC 索引与 supersede 链自检。"""
-    from core import rfc as rf
-    from pathlib import Path
     import json as _json
+    from pathlib import Path
+
+    from core import rfc as rf
     issues, warns, stats = rf.scan(ROOT)
     idx = rf.index(ROOT)
     if args.json:
@@ -3320,9 +4670,10 @@ def _cmd_rfc(args):
 
 def _cmd_patterns(args):
     """nf patterns：实践包（ls/show/for/verify/reindex）。"""
-    from core import patterns as pt
-    from pathlib import Path
     import json as _json
+    from pathlib import Path
+
+    from core import patterns as pt
     sub = getattr(args, "patterns_cmd", None) or "ls"
     want_json = bool(getattr(args, "json", False))
     if sub == "ls":
@@ -3409,9 +4760,10 @@ def _cmd_patterns(args):
 
 def _cmd_bench(args):
     """nf bench：执行结果跑分（run / compare / report）。"""
-    from core import bench
-    from pathlib import Path
     import json as _json
+    from pathlib import Path
+
+    from core import bench
     sub = getattr(args, "bench_cmd", None) or "run"
     if sub == "run":
         case_arg = args.case
@@ -3509,8 +4861,9 @@ def _cmd_bench(args):
 
 def _cmd_endpoint(args):
     """nf endpoint：服务端点契约自检（proposed）。"""
-    from core import endpoint
     import json as _json
+
+    from core import endpoint
     issues, warns, stats = endpoint.scan(ROOT)
     doc = endpoint.load(ROOT)
     if args.json:
@@ -3561,7 +4914,7 @@ def _cmd_interop(args):
                 print("  ✓ 导出面一致（%s）" % ie.summary(stats))
         return 1 if issues else 0
     if args.all:
-        from core import atomic_write      # 入仓面原子落盘（见下）
+        from core import atomic_write  # 入仓面原子落盘（见下）
         # 落点同样按**仓库根**解析（缺省就是仓内 `results/interop`；给了相对路径时不再跟 cwd 跑）
         out_dir = (_rel_out(args.out) if args.out
                    else os.path.join(ROOT, "results", "interop"))
@@ -3617,8 +4970,9 @@ def _cmd_interop(args):
 
 def _cmd_review(args):
     """nf review：缺口逐行审查（模型判 + 证据复核）。"""
-    from core import gap_review as gr
     import json as _json
+
+    from core import gap_review as gr
     scope = tuple(s for s in (args.scope or "").split(",") if s)
     # 拼错的 --scope **不许静默成空表**（那读起来像「这一类没缺口」）：fail-closed + 可枚举面。
     bad = gr.unknown_classes(scope)
@@ -3654,7 +5008,7 @@ def _cmd_review(args):
             return 2
         dest = os.path.join(ROOT, args.write)
         os.makedirs(os.path.dirname(dest), exist_ok=True)
-        from core import atomic_write          # 审查报告：原子写
+        from core import atomic_write  # 审查报告：原子写
         atomic_write.write_text(dest, _json.dumps(
             doc, ensure_ascii=False, indent=2, sort_keys=True) + "\n")
         print("  报告已写入：%s" % args.write)
@@ -3663,8 +5017,9 @@ def _cmd_review(args):
 
 def _cmd_workloop(args):
     """nf workloop：决策模型挑活 → 工单（只落内部档案）→ 收口记档。"""
-    from core import workloop as wl
     import json as _json
+
+    from core import workloop as wl
     if args.close:
         rel = wl.close(ROOT, args.close, args.outcome or "landed", args.gate or "unknown",
                        args.note)
@@ -3700,8 +5055,9 @@ def _cmd_workloop(args):
 
 def _cmd_decide(args):
     """nf decide：决策层统一入口（stub 走门禁口径；外部适配器为非门禁任务）。"""
-    from core import decision_layer as dl
     import json as _json
+
+    from core import decision_layer as dl
     # 形状闸门（2026-09-30 同族扫）：`--state <目录>` / `--questions <非 JSON>` 此前直接落
     # `open`/`json.load` 抛异常 ⇒ 冒到 CLI 兜底报「内部错误 + [Errno 13]」或裸解析错（无指引）。
     if args.state:
@@ -3884,8 +5240,8 @@ def _cmd_combine(args):
 
 def _cmd_domain(args):
     """nf domain：域包工厂（build / verify / specs）。"""
-    import json as _json
     import glob as _glob
+    import json as _json
 
     from core import domain_pack as dp
 
@@ -3959,7 +5315,7 @@ def _cmd_domain(args):
             # 建议跑 NF_DEBUG 看堆栈，指向了错误的排查方向）。load_spec 的 ValueError
             # 自带修复指引，这里原样透出即可（与 library 生命周期命令同一口径）。
             return _machine_fail(args, str(exc), 1)
-        from core import output_forms as of           # 渲染器由调用方注入（工厂不再反向依赖产出面）
+        from core import output_forms as of  # 渲染器由调用方注入（工厂不再反向依赖产出面）
         out = dp.build(ROOT, spec, write=args.write, render=not args.no_render,
                        renderer=of.render_outputs)
         if args.json:
@@ -4149,9 +5505,10 @@ def _cmd_transparency(args):
 
 def _cmd_state_front(args):
     """nf state-front：条件先行排布（确定性；不调模型）。"""
-    from core import state_front as sf
     import json as _json
     from pathlib import Path as _Path
+
+    from core import state_front as sf
     p = args.path if os.path.isabs(args.path) else os.path.join(ROOT, args.path)
     if not os.path.isfile(p):
         # 修复前：裸 OSError（还带**绝对路径**）直接回显——既无指引又漏本机路径。
@@ -4191,7 +5548,7 @@ def _cmd_state_front(args):
     if args.out:
         op = args.out if os.path.isabs(args.out) else os.path.join(ROOT, args.out)
         _Path(op).parent.mkdir(parents=True, exist_ok=True)
-        from core import atomic_write          # 重排产物：原子写
+        from core import atomic_write  # 重排产物：原子写
         atomic_write.write_text(op, out)
     if args.json:
         print(_json.dumps({"kind": "state-front", "mode": args.mode,
@@ -4208,9 +5565,10 @@ def _cmd_state_front(args):
 
 def _cmd_st_validate(args):
     """nf st-validate：ST 制卡校验器原型（A-S3）。"""
-    from core import st_validator as sv
-    from pathlib import Path
     import json as _json
+    from pathlib import Path
+
+    from core import st_validator as sv
     sp = args.path if os.path.isabs(args.path) else os.path.join(ROOT, args.path)
     if not os.path.isfile(sp):
         return _machine_fail(
@@ -4240,7 +5598,7 @@ def _cmd_st_validate(args):
                       "st-report.md）" % args.out, 1)
         try:
             Path(outp).parent.mkdir(parents=True, exist_ok=True)
-            from core import atomic_write      # 校验报告：原子写
+            from core import atomic_write  # 校验报告：原子写
             atomic_write.write_text(outp, md)
         except OSError as exc:
             return _machine_fail(args, "写报告失败：%s（修复指引：给可写文件路径）"
@@ -4265,8 +5623,9 @@ def _cmd_st_validate(args):
 
 def _cmd_cognition(args):
     """nf cognition：行话术语表 / 执行分档（认证 + 逐条逐字核对）。"""
-    from core import cognition as cg
     import json as _json
+
+    from core import cognition as cg
     part = getattr(args, "part", "") or ""
     fns = {"glossary": cg.verify_glossary, "modes": cg.verify_modes}
     picked = [k for k in fns if not part or k == part]
@@ -4295,8 +5654,9 @@ def _cmd_cognition(args):
 
 def _cmd_audit(args):
     """nf audit：审计/验收（列表 / 单件机检 / 全量机检）。"""
-    from core import audit as au
     import json as _json
+
+    from core import audit as au
     sub = getattr(args, "audit_cmd", None) or "ls"
     want_json = bool(getattr(args, "json", False))
     if sub == "rebind":
@@ -4369,8 +5729,9 @@ def _cmd_audit(args):
 
 def _cmd_postmortem(args):
     """nf postmortem：复盘（列表 / 单件机检 / 全量机检）。"""
-    from core import postmortem as pm
     import json as _json
+
+    from core import postmortem as pm
     sub = getattr(args, "postmortem_cmd", None) or "ls"
     want_json = bool(getattr(args, "json", False))
     if sub == "check":
@@ -4437,8 +5798,9 @@ def _cmd_postmortem(args):
 
 def _cmd_handover(args):
     """nf handover：接力协议（列表 / 单件机检 / 全量机检）。"""
-    from core import handover as ho
     import json as _json
+
+    from core import handover as ho
     sub = getattr(args, "handover_cmd", None) or "ls"
     want_json = bool(getattr(args, "json", False))
     if sub == "check":
@@ -4494,8 +5856,9 @@ def _cmd_handover(args):
 
 def _cmd_decisions(args):
     """nf decisions：决策记录（列表 / 单条 / 机检 / 投影重建）。"""
-    from core import decisions as dc
     import json as _json
+
+    from core import decisions as dc
     sub = getattr(args, "decisions_cmd", None) or "ls"
     want_json = bool(getattr(args, "json", False))
     if sub == "reindex":
@@ -4561,8 +5924,9 @@ def _cmd_decisions(args):
 
 def _cmd_model(args):
     """nf model：内容建模三件（词表 / 规范说明件 / 数据契约）。"""
-    from core import modeling as M
     import json as _json
+
+    from core import modeling as M
     part = getattr(args, "part", "") or ""
     fns = {"vocab": M.verify_vocabularies,
            "normative": M.verify_normative,
@@ -4594,8 +5958,9 @@ def _cmd_model(args):
 
 def _cmd_assertions(args):
     """nf assertions：跑数据化断言表（封闭 kind 集，不引第三方）。"""
-    from core import assertions as at
     import json as _json
+
+    from core import assertions as at
     results, issues = at.run(ROOT)
     cap_stats = at.capability_report(ROOT)[1]
     if args.json:
@@ -4627,7 +5992,12 @@ _PATH_FLAG_DESTS = ("out", "dest", "build_dest", "save_path", "store", "trace", 
                     "state", "state_path", "key_file", "ssh_key", "ssh_allowed_signers",
                     "registry", "root", "case", "exceptions", "check_file", "check_md",
                     "artifact", "verify", "ledger", "history", "template", "dst", "script_file",
-                    "baseline", "pipeline", "questions")
+                    "baseline", "pipeline", "questions", "prompt_file", "injections", "journal",
+                    "handoff_out", "manifest_out", "context_dir", "responses",
+                    "experiment", "ballots", "bundle",
+                    "policy", "revocations", "anchor", "items", "table", "prev",
+                    "label_object", "ir", "sidecar", "decision",
+                    "compile")
 
 
 def _path_writing_issue(args) -> str:
@@ -4641,7 +6011,10 @@ def _path_writing_issue(args) -> str:
     from core import paths as _p
     for dest in _PATH_FLAG_DESTS:
         val = getattr(args, dest, "")
-        if not isinstance(val, str) or not val.strip() or os.path.isabs(val):
+        if not isinstance(val, (str, os.PathLike)):
+            continue
+        val = os.fspath(val)
+        if not val.strip() or os.path.isabs(val):
             continue
         try:
             _p.validate_path(ROOT, val)
@@ -4661,13 +6034,24 @@ def _path_writing_issue(args) -> str:
 #: 为什么不再手写名单：二批普查抓到 5 处漏网，根因就是「同一概念换了个参数名（`path` / `paths`）
 #: 就漏出闸门」——所以改成**枚举为准**，并由 `test_cli_error_framing.PathFlagCoverageTest`
 #: 的对账判据保证「枚举到的文本类参数都在这里，或写明为什么豁免」。
-_UTF8_BINARY_EXEMPT = {"key_file": "HMAC 密钥是字节", "ssh_key": "SSH 私钥是字节"}
+_UTF8_BINARY_EXEMPT = {"key_file": "HMAC 密钥是字节", "ssh_key": "SSH 私钥是字节",
+                       "label_object": "被标注对象可以是任意字节（图片/音视频）",
+                       "evidence_bundle": "证据包是 zip（二进制容器）",
+                       "revocations_seed": "ed25519 种子是 32 字节原始值（不能按 UTF-8 读）",
+                       "timestamp_data": "被盖时间戳的对象可以是任意字节（证据包是 zip）"}
 _UTF8_TEXT_DESTS = ("a", "action", "artifact", "b", "baseline", "check", "check_file",
+                    "batch_target", "intent_from_text", "trust_manifest",
+                    "items", "label_ir", "ir", "sidecar", "table", "prev", "decision",
+                    "revocation_feed", "feeds",
+                    "compile",
+                    "anchor", "issuer", "object", "policy", "revocations", "targets",
                     "check_md", "entry", "exceptions", "face", "file", "history", "key", "ledger",
                     "mode", "name", "package", "path", "paths", "pipeline", "pkg",
-                    "questions", "registry", "root", "runs", "script_file", "snapshot",
+                    "prompt_file", "questions", "registry", "root", "runs", "script_file",
+                    "snapshot",
                     "source", "ssh_allowed_signers", "state", "state_path", "subject",
-                    "target", "template", "tier", "trace", "verify")
+                    "target", "template", "tier", "trace", "verify",
+                    "injections", "journal", "responses", "experiment", "ballots", "bundle")
 
 
 def _utf8_text_issue(args) -> str:
@@ -4684,7 +6068,10 @@ def _utf8_text_issue(args) -> str:
         # 位置参数可以是**列表**（`nf lint a.md b.md` 的 `target` 是 `nargs="*"`）——两条形态都判。
         values = raw if isinstance(raw, (list, tuple)) else [raw]
         for val in values:
-            if not isinstance(val, str) or not val.strip():
+            if not isinstance(val, (str, os.PathLike)):
+                continue
+            val = os.fspath(val)
+            if not val.strip():
                 continue
             path = val if os.path.isabs(val) else os.path.join(ROOT, val)
             if not os.path.isfile(path):
@@ -4744,8 +6131,9 @@ def _rel_out(path):
 
 def _cmd_knowledge(args):
     """nf knowledge：双源知识层（状态 / 顺序 / 巡检 / 消化记录）。"""
-    from core import knowledge as kn
     import json as _json
+
+    from core import knowledge as kn
     sub = getattr(args, "knowledge_cmd", None) or "status"
     want_json = bool(getattr(args, "json", False))
     if sub == "order":
@@ -4961,8 +6349,9 @@ def _load_runs(path):
 
 def _cmd_receipts(args):
     """nf receipts：协议层回执单根（生成 / 校验 / 单条验证）。"""
-    from core import receipts as rc
     import json as _json
+
+    from core import receipts as rc
     path = os.path.join(ROOT, rc.PROTOCOL_RECEIPTS_REL)
     if args.write:
         rel = rc.write_scope(ROOT, scope=args.scope)
@@ -5025,8 +6414,9 @@ def _cmd_receipts(args):
 
 def _cmd_events(args):
     """nf events：全仓事件背书核对。"""
-    from core import registry_cross as rx
     import json as _json
+
+    from core import registry_cross as rx
     issues, warns, stats = rx.scan(ROOT)
     if args.json:
         print(_json.dumps({"kind": "events", "issues": issues, "warns": warns,
@@ -5048,8 +6438,9 @@ def _cmd_events(args):
 
 def _cmd_approve(args):
     """nf approve：内容绑定批准记录（生成 / 校验）。"""
-    from core import approval
     import json as _json
+
+    from core import approval
     if args.list:
         rows = approval.list_records(ROOT)
         if args.json:
@@ -5097,8 +6488,9 @@ def _cmd_approve(args):
 
 def _cmd_library(args):
     """nf library：云端图书馆机器面（真源 = 条目 frontmatter）。"""
-    from core import library as lib
     import json as _json
+
+    from core import library as lib
     sub = getattr(args, "library_cmd", None) or "ls"
     if sub == "ls":
         rows = lib.entries(ROOT)
@@ -5263,8 +6655,8 @@ def _cmd_library(args):
                 print("  ✓ 每条回执折叠到根，且根与实时重算一致")
         return 1 if issues else 0
     if sub == "attest":
-        from core import library as nflib2
         from core import attest as _att
+        from core import library as nflib2
         try:
             key = _att.read_key_file(_rel_out(args.key_file)) if args.key_file else None
             out = nflib2.set_attestation(
@@ -5294,8 +6686,9 @@ def _cmd_library(args):
 
 def _cmd_telemetry(args):
     """nf telemetry：trace 记录 → OTel GenAI semconv 属性 / OTLP 形状。"""
-    from core import telemetry_semconv as ts
     import json as _json
+
+    from core import telemetry_semconv as ts
     tp = args.trace if os.path.isabs(args.trace) else os.path.join(ROOT, args.trace)
     if not os.path.isfile(tp):
         print("  ✗ 目标不存在：%s（修复指引：给出在场 trace JSON 路径——单条记录或 "
@@ -5324,8 +6717,9 @@ def _cmd_telemetry(args):
 
 def _cmd_license(args):
     """nf license：图书馆许可证门（登记行 + 内联声明双源）。"""
-    from core import license_gate as lg
     import json as _json
+
+    from core import license_gate as lg
     issues, stats = lg.scan(ROOT)
     if args.json:
         print(_json.dumps({"kind": "license", "issues": issues, "stats": stats},
@@ -5359,9 +6753,10 @@ def _cmd_lsp(args):
 
 def _cmd_score(args):
     """nf score：基线相对回归评分（绝对门之上的 no-silent-worsening 面）。"""
-    from core import regression_score as rs
-    from datetime import datetime, timezone
     import json as _json
+    from datetime import datetime, timezone
+
+    from core import regression_score as rs
     try:
         cur = rs.evaluate(ROOT)
         # 形状闸门（2026-09-30 同族扫）：`--baseline <目录>` 此前落到 load_baseline 抛裸
@@ -5436,42 +6831,9 @@ def _cmd_score(args):
 
 
 def _cmd_diff(args):
-    """nf diff：41 波C C2 —— 结构化差异 + 兼容判定。"""
-    from core import knowledge_sig as ks
-    import json as _json
-    try:
-        # 形状闸门（2026-09-30）：`nf diff <目录> <目录>` 此前落到读盘抛
-        # `[Errno 13] Permission denied: '<作者机绝对路径>'`，无指引（`_rel_to_root` 只判在场）。
-        for side, val in (("a", args.a), ("b", args.b)):
-            sp = val if os.path.isabs(val) else os.path.join(ROOT, val)
-            if not os.path.isfile(sp):
-                return _machine_fail(
-                    args, "签名目标不是文件：%s=%s（修复指引：`nf diff a b` 各收**一份文件**"
-                          "（01-36 文档 / 管线 / 模块 md，已挂签名的件）；缺省签名面用 "
-                          "`nf sig`）" % (side, val))
-        ra = _rel_to_root(args.a)
-        rb = _rel_to_root(args.b)
-        diff = ks.diff_signatures(ks.build_signature(ra, ROOT),
-                                 ks.build_signature(rb, ROOT))
-        if args.json:
-            print(_json.dumps({"kind": "diff", **diff},
-                              ensure_ascii=False, indent=2, sort_keys=True))
-        else:
-            print("== nf diff ==")
-            print("  %s  →  %s" % (diff["from"], diff["to"]))
-            if not diff["changes"]:
-                print("  无字段差异（两份签名一致）")
-            for c in diff["changes"]:
-                print("  [%s] %s  %r → %r" % (c["kind"], c["field"], c["from"], c["to"]))
-            print("  判定：%s" % diff["verdict"])
-            impact = diff.get("impact", "editorial")
-            label = {"bump": "结构性（须 bump + 迁移记录）",
-                     "additive": "字段级新增（V1 只增不删）",
-                     "editorial": "措辞/编辑（无契约影响）"}.get(impact, impact)
-            print("  影响度：%s（%s）" % (impact, label))
-        return 0
-    except (OSError, ValueError) as exc:
-        return _machine_fail(args, str(exc))
+    """nf diff：结构化差异、兼容判定与契约演进时间线。"""
+    from core import contract_history
+    return contract_history.run(args, ROOT)
 
 def _cmd_explain(args):
     """nf explain：41 波C C5 —— check 修复指引（缺什么/补什么/示例）。"""
@@ -5493,9 +6855,10 @@ def _cmd_related(args):
     """nf related：41 波C C4 —— 图书馆 See-Also 人读引用链（含模块级依赖图）。"""
     import json as _json
     import re as _re
-    from core.market_analyzer import related_of
+
     from core import module_lifecycle as ml
     from core.impact_check import impact_of_change
+    from core.market_analyzer import related_of
     from core.registry_loader import load_registry
     reg_path = args.registry or os.path.join(ROOT, "desktop", "src", "core", "registry.json")
     # 口径统一（2026-10-01）：目标不在册时**不得**回 rc=0「关联条目：—」——那是**错的事实**
@@ -5642,6 +7005,7 @@ def _cmd_doctor(args):
 
     try:
         import json as _j
+
         from jsonschema import Draft202012Validator
         for f in sorted(os.listdir(os.path.join(ROOT, "protocol", "schema"))):
             if f.endswith(".json"):
@@ -5815,6 +7179,12 @@ def _shell_baseline() -> str:
                                                 qb.EXPECTED_PASS)
 
 
+def _untracked_files() -> list[str]:
+    """git 追踪面之外的未跟踪文件（``?? `` 行）——投影按 git ls-files 生成，未跟踪会让它少算。"""
+    from core import repo_face
+    return repo_face.untracked_paths(ROOT)
+
+
 def _cmd_layers(args) -> int:
     """nf layers：抽象阶梯（真源 protocol/LAYERS.json 的投影 + 体检）。"""
     import json
@@ -5826,12 +7196,18 @@ def _cmd_layers(args) -> int:
             rel = lm.write_region(ROOT)
         except ValueError as exc:
             return _machine_fail(args, str(exc), 1)
+        untracked = _untracked_files()
         if args.json:
             print(json.dumps({"kind": "layers-write", "ok": True, "refreshed": rel,
-                              "note": "生成区真源 protocol/LAYERS.json"},
+                              "untracked": untracked[:20],
+                              "note": "生成区真源 protocol/LAYERS.json；untracked 非空时投影"
+                                      "可能少算——先 git add 再重跑"},
                              ensure_ascii=False, indent=2, sort_keys=True))
             return 0
         print("  ✓ 生成区已刷新：%s（真源 protocol/LAYERS.json）" % rel)
+        if untracked:
+            print(f"  [warn] 检测到 {len(untracked)} 个未跟踪文件：投影按 git 追踪面生成，"
+                  f"可能少算；先 git add 再重跑 nf layers --write（例：{untracked[0][:60]}）")
         return 0
 
     doc = lm.load(ROOT)
@@ -5884,7 +7260,8 @@ def _cmd_layers(args) -> int:
 
 def _cmd_shell(args) -> int:
     """nf shell（别名 nf terminal）：终端交互入口（端壳退役后的人机面）。"""
-    from core import session_watch as _sw, terminal as term   # 会话缓存包装（见 core.session_watch）
+    from core import session_watch as _sw  # 会话缓存包装（见 core.session_watch）
+    from core import terminal as term
 
     index = _shell_command_index()
 
@@ -6405,7 +7782,7 @@ def _cmd_assemble(args):
             parent = os.path.dirname(os.path.abspath(args.save_path))
             if parent:
                 os.makedirs(parent, exist_ok=True)
-            from core import atomic_write      # 需求档案：原子写
+            from core import atomic_write  # 需求档案：原子写
             atomic_write.write_text(args.save_path, text)
         except OSError as exc:
             return _machine_fail(args, "写需求档案失败：%s（修复指引：给可写文件路径）"
@@ -6454,7 +7831,7 @@ def _cmd_assemble(args):
             os.makedirs(dest, exist_ok=True)
             text, bstats = ab.build(ROOT, req_text, plan_)
             out_path = os.path.join(dest, "完整版_%s.md" % (plan_["package"] or "自定义世界"))
-            from core import atomic_write      # 组装成品：原子写
+            from core import atomic_write  # 组装成品：原子写
             atomic_write.write_text(out_path, text)
         except OSError as exc:
             print("  ✗ 组装落盘失败：%s（修复指引：给可写目录）" % exc, file=sys.stderr)
@@ -6569,6 +7946,7 @@ def _release_freeze(args):
     """
     import shlex
     import subprocess  # nosec B404 —— argv 列表直调，无 shell
+
     from core import release_gate as rg
 
     by = (getattr(args, "by", None) or "").strip()
@@ -6612,6 +7990,7 @@ def _release_freeze(args):
 def _cmd_locales(args):
     """nf locales：语言面自检；--write 重签文档译件的源件摘要。"""
     import json as _json
+
     from core import locales as lc
 
     if getattr(args, "write", False):
@@ -6637,6 +8016,7 @@ def _cmd_locales(args):
 def _cmd_changelog(args):
     """nf changelog：从变更条目 + 约定式提交生成版本节（默认预览；--write 落盘并归档）。"""
     import json as _json
+
     from core import changelog_gen as cg
     from core import release_gate as rg
 
@@ -6686,6 +8066,7 @@ def _cmd_release(args):
         print(_json.dumps(man, ensure_ascii=False, indent=2, sort_keys=True))
         return 1 if man["issues"] else 0
     import subprocess  # nosec B404/B603/B607 —— 调用 ssh-keygen/git/hf（argv 列表、无 shell、路径经 which 解析）
+
     from core import posix_shell as psh
     from core import quality_baseline as qb
 
@@ -6804,7 +8185,7 @@ def _session_load(path):
 def _session_write(path, requirement, answers):
     import json as _json
     try:
-        from core import atomic_write          # 会话状态：原子写（同 terminal 的 session 落盘）
+        from core import atomic_write  # 会话状态：原子写（同 terminal 的 session 落盘）
         atomic_write.write_text(path, _json.dumps(
             {"requirement": requirement, "answers": list(answers)},
             ensure_ascii=False, indent=2) + "\n")
@@ -6818,6 +8199,7 @@ def _session_write(path, requirement, answers):
 def _cmd_toolface(args):
     """nf toolface：浏览模块工具面（machine_contract.tool_face）。"""
     import json as _json
+
     from core import tool_face as tf
 
     issues, stats = tf.scan(ROOT)
@@ -7029,11 +8411,7 @@ def _cmd_verify(args) -> int:
         _os.environ[_rt.ENV_TRUST] = "1"
     try:
         verdicts = ge.run_checks(
-            ge.ROOT, only, memo, use_cache=bool(getattr(args, "cached", False)),
-            # 并行判据（2026-10-28）：heredoc 类 check 在**子进程**里跑（互不串 stdout，
-            # 也天然零共享状态），exact 类仍串行进程内。实测 32.4 → 9.5 s（3.4×）。
-            # 默认关：`NF_GATE_PARALLEL=1` 打开（C2 阶段会随门禁默认值一起放开）。
-            parallel=_os.environ.get("NF_GATE_PARALLEL") == "1")
+            ge.ROOT, only, memo, use_cache=bool(getattr(args, "cached", False)))
     finally:
         if _saved_trust is None:
             _os.environ.pop(_rt.ENV_TRUST, None)
@@ -7090,6 +8468,7 @@ def _cmd_daemon(args) -> int:
     import json as _json
     import time as _time
     from pathlib import Path
+
     from core import daemon as dm
 
     sub = args.daemon_cmd
@@ -7241,7 +8620,8 @@ def _cmd_daemon(args) -> int:
 
 def _cmd_stats(args) -> int:
     """自述数字实算（出口自动化 · check38 子扫描 1）。"""
-    import json as _json          # 本文件按需局部导入（见其余 _cmd_* 的同一习惯）
+    import json as _json  # 本文件按需局部导入（见其余 _cmd_* 的同一习惯）
+
     from core import repo_stats as rs
 
     if args.write:
@@ -7270,10 +8650,19 @@ def _cmd_stats(args) -> int:
     return 1 if issues else 0
 
 
+def _resolve_bridge_paths(args):
+    """Resolve bridged `Path` arguments against the repository root."""
+    for dest in _PATH_FLAG_DESTS:
+        value = getattr(args, dest, None)
+        if isinstance(value, os.PathLike) and not os.path.isabs(os.fspath(value)):
+            setattr(args, dest, Path(ROOT) / value)
+    return args
+
+
 def _cmd_nfal(args) -> int:
-    """nf nfal：透传到 core.nfal_cli（guard 表达式的解析/检查/编译/求值）。"""
-    from core import nfal_cli
-    return nfal_cli.main(list(getattr(args, "nfal_args", []) or []))
+    """Dispatch optional command families kept outside the main CLI body."""
+    _resolve_bridge_paths(args)
+    return cli_bridge.run(args)
 
 
 def _rust_engine_argv(args) -> Optional[list]:
@@ -7323,6 +8712,80 @@ def _try_rust_face(args) -> Optional[int]:
     sys.stdout.buffer.write(out)
     sys.stdout.buffer.flush()
     return 0
+
+
+_COMMAND_HANDLERS = {
+    "shell": _cmd_shell, "terminal": _cmd_shell,
+    "layers": _cmd_layers,
+    "verify": _cmd_verify,
+    "daemon": _cmd_daemon,
+    "help": _cmd_help,
+    "stats": _cmd_stats,
+    "doctor": _cmd_doctor,
+    "completion": _cmd_completion,
+    "assemble": _cmd_assemble,
+    "preset": _cmd_preset,
+    "release": _cmd_release,
+    "changelog": _cmd_changelog,
+    "locales": _cmd_locales,
+    "toolface": _cmd_toolface,
+    "worldmodel": _cmd_worldmodel,
+    "register": _cmd_register,
+    "asset": _cmd_asset,
+    "pipeline": _cmd_pipeline,
+    "module": _cmd_module,
+    "sig": _cmd_sig,
+    "attest": _cmd_attest,
+    "evidence": _cmd_evidence,
+    "label": _cmd_label,
+    "check": _cmd_check,
+    "resolve": _cmd_resolve,
+    "score": _cmd_score,
+    "lint": _cmd_lint,
+    "lsp": _cmd_lsp,
+    "license": _cmd_license,
+    "telemetry": _cmd_telemetry,
+    "library": _cmd_library,
+    "conformance": _cmd_conformance,
+    "approve": _cmd_approve,
+    "events": _cmd_events,
+    "receipts": _cmd_receipts,
+    "driver": _cmd_driver,
+    "rfc": _cmd_rfc,
+    "patterns": _cmd_patterns,
+    "bench": _cmd_bench,
+    "endpoint": _cmd_endpoint,
+    "interop": _cmd_interop,
+    "transparency": _cmd_transparency,
+    "output": _cmd_output,
+    "domain": _cmd_domain,
+    "combine": _cmd_combine,
+    "decide": _cmd_decide,
+    "workloop": _cmd_workloop,
+    "review": _cmd_review,
+    "knowledge": _cmd_knowledge,
+    "assertions": _cmd_assertions,
+    "model": _cmd_model,
+    "decisions": _cmd_decisions,
+    "handover": _cmd_handover,
+    "postmortem": _cmd_postmortem,
+    "audit": _cmd_audit,
+    "cognition": _cmd_cognition,
+    "st-validate": _cmd_st_validate,
+    "state-front": _cmd_state_front,
+    "diff": _cmd_diff,
+    "related": _cmd_related,
+    "explain": _cmd_explain,
+    "demo": _cmd_demo,
+    "market": _cmd_market,
+    "who-refers": _cmd_who_refers,
+    "impact": _cmd_impact,
+    "rename": _cmd_rename,
+    "import": _cmd_import,
+    "spec": _cmd_spec,
+    "render": _cmd_render,
+    "serve": _cmd_serve,
+}
 
 
 def main(argv=None) -> int:
@@ -7389,138 +8852,9 @@ def main(argv=None) -> int:
     _rust_rc = _try_rust_face(args)
     if _rust_rc is not None:
         return _rust_rc
-    if args.cmd in ("shell", "terminal"):
-        return _cmd_shell(args)
-    if args.cmd == "layers":
-        return _cmd_layers(args)
-    if args.cmd == "verify":
-        return _cmd_verify(args)
-    if args.cmd == "daemon":
-        return _cmd_daemon(args)
-    if args.cmd == "help":
-        return _cmd_help(args)
-    if args.cmd == "stats":
-        return _cmd_stats(args)
-    if args.cmd == "doctor":
-        return _cmd_doctor(args)
-    if args.cmd == "completion":
-        return _cmd_completion(args)
-    if args.cmd == "assemble":
-        return _cmd_assemble(args)
-    if args.cmd == "preset":
-        return _cmd_preset(args)
-    if args.cmd == "release":
-        return _cmd_release(args)
-    if args.cmd == "changelog":
-        return _cmd_changelog(args)
-    if args.cmd == "locales":
-        return _cmd_locales(args)
-    if args.cmd == "toolface":
-        return _cmd_toolface(args)
-    if args.cmd == "worldmodel":
-        return _cmd_worldmodel(args)
-    if args.cmd == "register":
-        return _cmd_register(args)
-    if args.cmd == "asset":
-        return _cmd_asset(args)
-    if args.cmd == "pipeline":
-        return _cmd_pipeline(args)
-    if args.cmd == "module":
-        return _cmd_module(args)
-    if args.cmd == "sig":
-        return _cmd_sig(args)
-    if args.cmd == "attest":
-        return _cmd_attest(args)
-    if args.cmd == "score":
-        return _cmd_score(args)
-    if args.cmd == "lint":
-        return _cmd_lint(args)
-    if args.cmd == "lsp":
-        return _cmd_lsp(args)
-    if args.cmd == "license":
-        return _cmd_license(args)
-    if args.cmd == "telemetry":
-        return _cmd_telemetry(args)
-    if args.cmd == "library":
-        return _cmd_library(args)
-    if args.cmd == "conformance":
-        return _cmd_conformance(args)
-    if args.cmd == "approve":
-        return _cmd_approve(args)
-    if args.cmd == "events":
-        return _cmd_events(args)
-    if args.cmd == "receipts":
-        return _cmd_receipts(args)
-    if args.cmd == "driver":
-        return _cmd_driver(args)
-    if args.cmd == "rfc":
-        return _cmd_rfc(args)
-    if args.cmd == "patterns":
-        return _cmd_patterns(args)
-    if args.cmd == "bench":
-        return _cmd_bench(args)
-    if args.cmd == "endpoint":
-        return _cmd_endpoint(args)
-    if args.cmd == "interop":
-        return _cmd_interop(args)
-    if args.cmd == "transparency":
-        return _cmd_transparency(args)
-    if args.cmd == "output":
-        return _cmd_output(args)
-    if args.cmd == "domain":
-        return _cmd_domain(args)
-    if args.cmd == "combine":
-        return _cmd_combine(args)
-    if args.cmd == "decide":
-        return _cmd_decide(args)
-    if args.cmd == "workloop":
-        return _cmd_workloop(args)
-    if args.cmd == "review":
-        return _cmd_review(args)
-    if args.cmd == "knowledge":
-        return _cmd_knowledge(args)
-    if args.cmd == "assertions":
-        return _cmd_assertions(args)
-    if args.cmd == "model":
-        return _cmd_model(args)
-    if args.cmd == "decisions":
-        return _cmd_decisions(args)
-    if args.cmd == "handover":
-        return _cmd_handover(args)
-    if args.cmd == "postmortem":
-        return _cmd_postmortem(args)
-    if args.cmd == "audit":
-        return _cmd_audit(args)
-    if args.cmd == "cognition":
-        return _cmd_cognition(args)
-    if args.cmd == "st-validate":
-        return _cmd_st_validate(args)
-    if args.cmd == "state-front":
-        return _cmd_state_front(args)
-    if args.cmd == "diff":
-        return _cmd_diff(args)
-    if args.cmd == "related":
-        return _cmd_related(args)
-    if args.cmd == "explain":
-        return _cmd_explain(args)
-    if args.cmd == "demo":
-        return _cmd_demo(args)
-    if args.cmd == "market":
-        return _cmd_market(args)
-    if args.cmd == "who-refers":
-        return _cmd_who_refers(args)
-    if args.cmd == "impact":
-        return _cmd_impact(args)
-    if args.cmd == "rename":
-        return _cmd_rename(args)
-    if args.cmd == "import":
-        return _cmd_import(args)
-    if args.cmd == "spec":
-        return _cmd_spec(args)
-    if args.cmd == "render":
-        return _cmd_render(args)
-    if args.cmd == "serve":
-        return _cmd_serve(args)
+    handler = _COMMAND_HANDLERS.get(args.cmd)
+    if handler is not None:
+        return handler(args)
     if args.cmd == "design":
         if args.design_cmd == "audit":
             # 注意：这里必须指向 **design audit** 实现（1226 段）——此前与 `nf audit`
@@ -7528,19 +8862,19 @@ def main(argv=None) -> int:
             # （实测输出「== nf audit（26 件）==」），已重命名为 _cmd_design_audit 修正。
             return _cmd_design_audit(args)
         return _cmd_design(args)
-    if args.cmd == "nfal":
+    if args.cmd in ("nfal", "cockpit", "cockpit-ab"):
         return _cmd_nfal(args)
     if args.cmd != "run":
         _build_parser().print_help()
         return 2
 
-    from core.pipeline import pipe
-    from core.pipeline_loader import load_pipeline_file
-
     # --pipeline 收「管线 md 路径」**或**「在场管线编号」（极端渗透 D8 实证：此前只当路径，
     # 传最自然的编号 `--pipeline P01` 会报「管线解析失败：P01」——P01 明明是合法管线，
     # 属**错误归因**且无修复指引；`nf pipeline dryrun` 的同类参数则明写「管线 md 路径」）。
     import glob as _glob
+
+    from core.pipeline import pipe
+    from core.pipeline_loader import load_pipeline_file
     _pl_arg = str(args.pipeline)
     _pl_path = _pl_arg if os.path.isfile(_pl_arg) else ""
     _dirs = [os.path.join(ROOT, "03_管线库")] + sorted(

@@ -102,11 +102,40 @@ CANDIDATES = (
 )
 
 
+#: 快线源码目录（判「二进制是不是拿旧源码编的」）
+RUST_SRC = ROOT / "engine" / "rust" / "src"
+
+
+def _newest_rust_mtime() -> float:
+    """engine/rust/src 下最新 .rs 的 mtime（没有源码返回 0）。"""
+    latest = 0.0
+    if RUST_SRC.is_dir():
+        for path in RUST_SRC.rglob("*.rs"):
+            try:
+                latest = max(latest, path.stat().st_mtime)
+            except OSError:
+                continue
+    return latest
+
+
 def binary():
-    """快线可执行件（release 优先，其次 debug）；未构建返回 None。"""
+    """快线可执行件（release 优先，其次 debug）；未构建或**已过期**都返回 None。
+
+    过期判据（2026-11-06 实测）：bin 停在 11-04，仓库契约/放行表已推进到 11-06，于是四条
+    parity 判据红在「过期二进制」上——那不是代码回归。宁可 skip 并说明，也不拿旧编译产物
+    冒充判据；重新 cargo build --release 后自动恢复。
+    """
+    newest = _newest_rust_mtime()
     for rel in CANDIDATES:
         p = ROOT / rel
         if p.is_file():
+            try:
+                if newest and p.stat().st_mtime < newest:
+                    sys.stderr.write("  [SKIP] 快线二进制早于 engine/rust/src 最新源码："
+                                     "先 cargo build --release（避免拿旧产物冒充 parity）\n")
+                    return None
+            except OSError:
+                return None
             return p
     return None
 
@@ -584,6 +613,29 @@ class RustFastLaneParityTest(unittest.TestCase):
         self.assertEqual(want.replace(b"\r\n", b"\n"), got.replace(b"\r\n", b"\n"),
                          "verify-report 面与真源报告不等（聚合/摘要/渲染，含 root_digest）")
 
+    def test_rust_sink_allowlist_is_not_drifted(self):
+        """Rust 移植的 SINK_ALLOW 必须与真源 purity_scan.SINK_ALLOW **同键集**。
+
+        为什么单开一条（2026-11-06 实测）：我给真源加了
+        release_conclusion.py:shutil.rmtree（快照失败自清），Rust 侧那份移植清单没跟上，
+        于是 purity-clean 在快线上 rc=1、而真源 ok——四条 parity 判据一起红，排查一小时。
+        这条判据只读源码、不需要二进制，秒级把「加放行忘同步移植」钉死。
+        """
+        from core import purity_scan as ps
+
+        rust = (ROOT / "engine" / "rust" / "src" / "purity.rs").read_text(encoding="utf-8")
+        block = rust.split("const SINK_ALLOW:", 1)
+        self.assertEqual(2, len(block), "Rust 侧找不到 SINK_ALLOW 常量（判据面被缩小）")
+        body = block[1].split("];", 1)[0]
+        keys = set(re.findall(r'\("([^"]+)"', body))
+        want = set(ps.SINK_ALLOW)
+        self.assertEqual(sorted(want - keys), [],
+                         "真源有、Rust 移植缺（修复指引：把该键补进 engine/rust/src/purity.rs "
+                         "的 SINK_ALLOW，并 cargo build --release）")
+        self.assertEqual(sorted(keys - want), [],
+                         "Rust 移植多出真源没有的键（修复指引：删掉，或先在 "
+                         "purity_scan.SINK_ALLOW 登记理由）")
+
     def test_density_face_matches_python_document(self):
         """density 面：`stats` 与 `issues` 必须与 `nf asset density --json` **文档相等**。
 
@@ -645,6 +697,47 @@ class RustFastLaneParityTest(unittest.TestCase):
             self.assertEqual(0, proc2.returncode, proc2.stderr.decode("utf-8", "replace"))
             self.assertNotEqual(first, second, "改了语料输出却不变——这条对账是空转")
             self.assertEqual(python_bytes(tmp), second, "变异语料上两侧仍须逐字节一致")
+
+
+#: Rust 侧 allowlist 常量 → Python 真源对应表（键集必须相等；2026-11-09 实测缺口：Rust
+#: 的 SOFT_IMPORTS 漏了 PIL，导致 verify-report 的 purity 面误报 label_watermark，四条 parity
+#: 判据在「二进制在场」时全红——而 CI 从不构建二进制，所以从未暴露）。
+def _rust_allowlist_keys(src: str, const: str) -> set:
+    """从 Rust 源码里取一个 allowlist 常量的键集（不依赖编译）。
+
+    - `const HARD_ALLOW: [&str; N] = ["yaml"];` → {"yaml"}
+    - `const SOFT_IMPORTS: [(&str, &str); N] = [("PIL", "..."), ...];` → 每对的首字符串
+    - `const IMPORT_RESIDUE: [(&str, &str); 0] = [];` → set()
+    """
+    m = re.search(rf"const {re.escape(const)}[^=]*=\s*\[(.*?)\];", src, re.S)
+    if m is None:
+        raise AssertionError(f"Rust 源码里找不到常量 {const}")
+    body = m.group(1)
+    pairs = re.findall(r'\(\s*"([^"]+)"\s*,', body)
+    if pairs:
+        return set(pairs)
+    return set(re.findall(r'"([^"]+)"', body))
+
+
+class RustAllowlistParityTest(unittest.TestCase):
+    """Rust 移植的 purity allowlist 必须与 Python 真源同键集（源码级，秒级，无二进制）。"""
+
+    def test_purity_allowlists_are_not_drifted(self):
+        from core import purity_scan as ps
+        src = (ROOT / "engine" / "rust" / "src" / "purity.rs").read_text(encoding="utf-8")
+        for const, ref in (("HARD_ALLOW", ps.HARD_ALLOW),
+                           ("SOFT_IMPORTS", ps.SOFT_IMPORTS),
+                           ("IMPORT_RESIDUE", ps.IMPORT_RESIDUE)):
+            self.assertEqual(set(ref), _rust_allowlist_keys(src, const),
+                             f"Rust purity.rs 的 {const} 与真源 purity_scan.{const} 键集不一致"
+                             "（2026-11-09 实测：漏 PIL 会让 verify-report purity 面误报）")
+
+    def test_mutation_missing_key_is_caught(self):
+        """变异自证：Rust 里少一个键必须被抓到；键集相同时不误报。"""
+        src = ('const SOFT_IMPORTS: [(&str, &str); 1] = [\n'
+               '    ("PIL", "x"),\n];\n')
+        self.assertEqual({"PIL"}, _rust_allowlist_keys(src, "SOFT_IMPORTS"))
+        self.assertNotEqual({"PIL", "jsonschema"}, _rust_allowlist_keys(src, "SOFT_IMPORTS"))
 
 
 if __name__ == "__main__":

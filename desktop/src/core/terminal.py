@@ -298,17 +298,17 @@ FAMILIES: tuple[dict[str, Any], ...] = (
      "summary": "第一次进 NF：体检、一键演示、自述数字、抽象阶梯",
      "commands": ("doctor", "demo", "stats", "layers")},
     {"id": "forge", "name": "装配与生产",
-     "summary": "从需求到产物：装配计划、预设（管线+模块+资产包一次组装）、全链管道、渲染、协议件读"
-         "写、入库登记",
-     "commands": ("assemble", "preset", "run", "render", "spec", "register", "import")},
+     "summary": "从需求到产物：装配、全链管道、渲染、登记、元认知驾驶与离线盲评",
+     "commands": ("assemble", "preset", "run", "render", "spec", "register", "import",
+                  "cockpit", "cockpit-ab")},
     {"id": "shelf", "name": "资产与货架",
      "summary": "市场、资产台账、模块生命周期、管线派生、组合引擎、域包工厂、产出形态",
      "commands": ("market", "asset", "module", "pipeline", "combine", "domain",
-                  "output", "rename")},
+                  "output", "rename", "resolve")},
     {"id": "verify", "name": "质检与验证",
      "summary": "门禁单进程引擎、正文 lint、一致性报告、断言表、知识签名、评分、差异、解释、状态前置、"
          "发布体检与变更日志生成、许可证、遥测、装配语言 guard 检查/编译",
-     "commands": ("verify", "lint", "conformance", "assertions", "sig", "score", "diff",
+     "commands": ("verify", "check", "lint", "conformance", "assertions", "sig", "score", "diff",
                   "explain", "st-validate", "release", "changelog", "license", "telemetry",
                   "nfal")},
     {"id": "library", "name": "图书馆与知识",
@@ -317,10 +317,11 @@ FAMILIES: tuple[dict[str, Any], ...] = (
                   "related", "who-refers", "impact")},
     {"id": "govern", "name": "治理与决策",
      "summary": "决策记录（ADR）、审计、背书、回执、交接、复盘、决策层、评审、构建回路、批准、透明"
-         "日志、设计审计、语言面（本地化与责任方）",
+         "日志、证据包（打包/第三方复验）、标注 IR（声明与校验，不写载体）、设计审计、"
+         "语言面（本地化与责任方）",
      "commands": ("decisions", "audit", "attest", "receipts", "handover",
                   "postmortem", "decide", "model", "review", "workloop",
-                  "approve", "transparency", "design", "locales")},
+                  "approve", "transparency", "evidence", "label", "design", "locales")},
     {"id": "integrate", "name": "服务与集成",
      "summary": "MCP 服务面、编辑器面、跑分台、端点契约、互操作导出、指令档路由、事件背书、状态前置"
          "、世界模型、模块工具面",
@@ -1211,12 +1212,16 @@ TERMINAL_BASELINE: tuple[dict[str, Any], ...] = (
     {"id": "history-persist", "name": "历史落盘（交互态写文件）",
      "argv": ("shell", "--history", BASELINE_TMP + "/shell_history", "--no-banner"),
      "stdin": "nf --version\nquit\n",
-     "expect": "nf 1.1.0", "expect_file": BASELINE_TMP + "/shell_history"},
+     "expect": "nf 1.0.5", "expect_file": BASELINE_TMP + "/shell_history"},
     {"id": "session-persist", "name": "会话状态持久化（--session）",
      "argv": ("shell", "--session", BASELINE_TMP + "/shell_session.json",
               "--no-history", "--no-banner"),
      "stdin": "/set width=120\nquit\n",
-     "expect": "width = 120", "expect_file": BASELINE_TMP + "/shell_session.json"},
+     "expect": "width = 120", "expect_file": BASELINE_TMP + "/shell_session.json",
+     # 2026-11-09 实测（cross-platform Windows CI）：本行 3 次取最小仍 **422.5 ms** > 默认 300 ms
+     # → Windows 假红（该行要落 session json + 读回，慢盘/AV 下 IO 成本高；Linux 实测 ~30 ms）。
+     # 行级预算放宽到 900 ms，仍能拦「数量级回归」（>3× 会红）。
+     "max_ms": 900},
     {"id": "menu-family-crosslink", "name": "菜单↔能力族互标",
      "argv": ("shell", "--exec", "/menu", "--no-banner"), "expect": "未在此列的族"},
     {"id": "form-dry-run", "name": "写盘表单（dry-run 只组装不执行）",

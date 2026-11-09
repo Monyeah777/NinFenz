@@ -1,0 +1,3 @@
+type: fix
+surface: ccos
+note: JPEG 载体 P0 硬化 + 口径清理。①对象绑定：新增 jpeg_content_digest（= SOI + 去掉本件 AIGC APP15 后的段原样字节 + tail 的 sha256），embed 前强制 ir.object.digest 相等（修「用别文件的 IR 写进 JPEG 也被接受」）；②MAX_INPUT_BYTES 检查上移到 embed()（PNG/JPEG 共用）；③JPEG 结构闸要求 SOS 前存在 SOF（0xC0–0xCF 排除 C4/C8/CC），仅 SOI/SOS 的壳被拒；④_jpeg_split 改为返回 (marker,payload,raw_bytes)，其余段按原样字节保留（含 0xFF 填充），内容摘要/幂等不依赖重序列化；⑤embed_file/CLI 文案中性化。新增 4 条负例（异物 IR 拒/无 SOF 拒/幂等且扫描摘要不变/content_digest 去标签=原图），carrier 25→29。同批清理 9 处「只 PNG」旧句（abi-v0/threat-model/label-ir-v0/nf.py）。code_metrics 小幅重冻；style 9921=基线；判据：carrier+abi_docs+sidecar 49 项 OK、conformance 27/27、freshness 4/4。

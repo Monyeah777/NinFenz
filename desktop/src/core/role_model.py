@@ -37,7 +37,6 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from core import atomic_write
 from core import json_doc
-from . import scan_memo
 from core import repo_face
 
 DECL_REL = "protocol/LAYERS.json"
@@ -84,8 +83,26 @@ _WRITE_NAMES = ("write", "refresh", "freeze", "sync", "record", "rewrite")
 _SCAN_DEF = re.compile(r"^def scan\(", re.M)
 #: 自述正则：允许文件头是**注释行与空行**的任意组合（实测有件在 coding 行后空一行再起 docstring，
 #: 早版要求注释紧贴 docstring，把这类件误判成「无自述」）
-_DOC = re.compile(r'\A(?:[ \t]*(?:#[^\n]*)?\r?\n)*[ \t]*"""([\s\S]*?)"""')
-_DOC2 = re.compile(r"\A(?:[ \t]*(?:#[^\n]*)?\r?\n)*[ \t]*'''([\s\S]*?)'''")
+def _leading_docstring(text: str) -> str:
+    """文件头自述（允许注释行/空行在前；两种三引号都认）。
+
+    为什么不用正则（2026-11-09）：原正则被 CodeQL 判为 py/redos（外层重复套可空字符类，
+    长注释行有回溯风险）；改手写扫描：逐行跳过注释/空行，复杂度线性、行为逐条等价。
+    """
+    lines = text.splitlines()
+    i = 0
+    while i < len(lines):
+        stripped = lines[i].strip()
+        if stripped and not stripped.startswith("#"):
+            break
+        i += 1
+    rest = "\n".join(lines[i:]).lstrip(" \t")
+    for quote in ('"""', "'''"):
+        if rest.startswith(quote):
+            end = rest.find(quote, len(quote))
+            if end != -1:
+                return rest[len(quote):end]
+    return ""
 #: 自述动词 → 角色（仅用于 `auto` 命中的核内件；解析不出即 `support`）
 _VERB = (
     ("prod", re.compile(r"生成|装配|渲染|导出|构建|组合|衍生|排版|编排|装载|打包")),
@@ -154,20 +171,6 @@ def _rule_hits(roles: Dict[str, Any], files: List[str]) -> List[Dict[str, Any]]:
     return out
 
 
-def writes_disk_at(root: str, rel: str) -> bool:
-    """`writes_disk` 的**按文件缓存**版：同一次扫描里同一文件只解析一次 AST。
-
-    `verify_report` 的 ③/核内一致两条判据都会问同一批文件「是否自带写盘入口」，
-    旧写法每问一次就 `ast.parse` 一次（实测 role_model.scan 7.0 s 的主因）。
-    """
-    text = scan_memo.read_text(Path(root) / rel) or ""
-    if "atomic_write" not in text:
-        # 文本预筛：写入口判据要求函数体里**字面出现** `atomic_write.<...>(`，正文没有该子串
-        # 就不可能命中——直接 False，不触发 AST（全仓 ~700 个 py 逐个 parse 曾是 7 s 主因）。
-        return False
-    return bool(scan_memo.facts("writes_disk", Path(root) / rel, lambda: writes_disk(text)))
-
-
 def writes_disk(text: str) -> bool:
     """该件是否**真**带写盘入口：顶层 `def write/refresh/…` 体内调用 `atomic_write.*`。
 
@@ -212,8 +215,7 @@ def _self_line_uncached(root: str, rel: str) -> str:
     if text is None:  # 可吞：读不到=无自述可推，① 覆盖判据另报缺口
         return ""
     if rel.endswith(".py"):
-        m = _DOC.search(text) or _DOC2.search(text)
-        for line in (m.group(1).splitlines() if m else []):
+        for line in _leading_docstring(text).splitlines():
             if line.strip():
                 return line.strip()
         return ""
@@ -260,7 +262,7 @@ def _signal_role_uncached(root: str, rel: str) -> str:
         return "floor"
     if _SCAN_DEF.search(text):
         return "verify"          # 判据入口 = 只读面（自带写入口由写例外表逐条登记）
-    if writes_disk_at(root, rel):
+    if writes_disk(text):
         return "projection"
     doc = self_line(root, rel)
     for role, rx in _VERB:
@@ -433,7 +435,7 @@ def _kernel_issues(root: str, kernel: List[str], rules: List[Dict[str, Any]],
         if text is None:
             # 可吞：该件读不到 → 本判据跳过；「件不在场」另有 ① 覆盖判据兜着，不重复报。
             continue
-        if writes_disk_at(root, rel):
+        if writes_disk(text):
             writers.append(rel)
             if rel not in exc:
                 issues.append("③ verify 件自带写盘入口未登记：%s（修复指引：在 roles.write_exceptions "
@@ -474,7 +476,3 @@ def _scan_impl(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
              "kernel_no_self": sum(1 for r in kernel if not coords[r]["function"]),
              "verify_writers": len(writers), "write_exceptions": len(exc)}
     return issues, stats
-
-
-#: 公开入口自成扫描作用域（读面/AST/事实/stat 去重共享；退出即清）
-scan = scan_memo.scoped(scan)

@@ -1,0 +1,57 @@
+name: codeql
+# 代码扫描（2026-11-09 恢复）：仓库 CodeQL default setup 现为 **not-configured**——
+# 2026-10-26 之后的新代码不再被扫，code scanning 面板上的 20 条 open alerts 只是旧快照
+# （见 task-39）。本 workflow 用固定 SHA 的 codeql-action 恢复 python + js/ts 扫描，
+# 结果照常进 code scanning 面板；非 required（不阻塞合并，仅恢复可见性）。
+#
+# 口径与既有门禁不重叠：sast.yml 是 bandit/ruff-S 的**计数棘轮**（本地规则集、秒级）；
+# CodeQL 是数据流/污点分析（较慢、发现面不同），两者互补。
+on:
+  push:
+    branches: [main]
+  pull_request:
+    # 只在被扫代码真的变了才跑：dependabot 的 workflow/action 升级 PR 不触发（否则每个依赖
+    # PR 都烧 2–3 分钟两个分析；实测 2026-11-09 合并后 dependabot PR 队列里同时排了 4+ 个）。
+    paths:
+      - 'desktop/**'
+      - 'scripts/**'
+      - 'tui/**'
+      - 'site/**'
+      - '.github/scripts/**'
+  schedule:
+    - cron: '17 4 * * 2'      # 每周二 04:17 UTC（与其它 schedule 错开）
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# 权限最小化（Scorecard TokenPermissionsID）：顶层只读，写权限下放到 job。
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    name: analyze-${{ matrix.language }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      security-events: write      # 上传 SARIF 到 code scanning
+      actions: read
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [python, javascript-typescript]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
+        with:
+          persist-credentials: false
+      - name: 初始化 CodeQL（固定 SHA：github/codeql-action v3 → 9418214df1f2c4b8128c770156c409013b07d6b9）
+        uses: github/codeql-action/init@33d7b85da1a04171e211befe2c739303b9a4c066  # v4
+        with:
+          languages: ${{ matrix.language }}
+      - name: 分析并上传 SARIF
+        uses: github/codeql-action/analyze@33d7b85da1a04171e211befe2c739303b9a4c066  # v4
+        with:
+          category: /language:${{ matrix.language }}

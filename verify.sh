@@ -112,21 +112,20 @@ fi
 # 矩阵分片（CI，2026-10-18）：`--tests-only --shard i/n` 只跑测试的第 i/n 片；
 # `--checks-only` 只跑 42 条静态 check（测试交给矩阵）。两者由 CI 组合成一次完整门禁：
 # 静态 1 台 + 测试 n 台并行 ⇒ 全量墙钟从"一台机器的 ~600 s"降到"n 台各自 ~100 s"。
-NF_FAST=0; NF_BASE=''; NF_TIER='quick'; NF_CACHE="${NF_VERIFY_CACHE:-1}"; NF_PR_TIER=0
+NF_FAST=0; NF_BASE=''; NF_TIER='quick'; NF_CACHE="${NF_VERIFY_CACHE:-1}"
 NF_CHECKS_ONLY=0; NF_TESTS_ONLY=0; NF_SHARD=''
 while [ $# -gt 0 ]; do
   case "$1" in
     --fast) NF_FAST=1 ;;
     --full) NF_TIER='full' ;;
     --quick) NF_TIER='quick' ;;
-    --pr) NF_TIER='quick'; NF_PR_TIER=1 ;;
     --no-cache) NF_CACHE=0 ;;
     --checks-only) NF_CHECKS_ONLY=1 ;;
     --tests-only) NF_TESTS_ONLY=1 ;;
     --shard) shift; NF_SHARD="${1:-}"; [ -n "$NF_SHARD" ] || { echo '用法：--shard 需要形如 3/16 的取值' >&2; exit 2; } ;;
     --base) shift; NF_BASE="${1:-}"; [ -n "$NF_BASE" ] || { echo '用法：--base 需要一个提交引用' >&2; exit 2; } ;;
     *)
-      echo "未知参数：$1（用法：bash verify.sh [--full|--quick|--pr] [--fast] [--no-cache] [--base <ref>] [--checks-only] [--tests-only --shard i/n]）" >&2
+      echo "未知参数：$1（用法：bash verify.sh [--full|--quick] [--fast] [--no-cache] [--base <ref>] [--checks-only] [--tests-only --shard i/n]）" >&2
       exit 2 ;;
   esac
   shift
@@ -185,18 +184,13 @@ if [ "$NF_TESTS_ONLY" = "1" ]; then
   fi
   _UT_JOBS="${NF_TEST_JOBS:-}"
   if [ -z "$_UT_JOBS" ]; then
-    # 实测（2026-10-28，本机 20 核，冷跑全量）：
-    #   jobs=8 → 299–307 s；jobs=10 → **285 s**；jobs=12 → 293 s；jobs=16 → 417 s。
-    # 10 是当前拐点（再多会被进程/文件争用吃掉）。
-    _UT_JOBS="$("$PY3" -c 'import os; print(min(10, max(2, (os.cpu_count() or 2) - 1)))' 2>/dev/null || echo 4)"
+    _UT_JOBS="$("$PY3" -c 'import os; print(min(16, max(2, (os.cpu_count() or 2) - 1)))' 2>/dev/null || echo 4)"
   fi
   exec "$PY3" scripts/verify_tests.py --jobs "$_UT_JOBS"
 fi
-# checks-only 现在**单独成档**吃内容寻址缓存（mode=checks）：它的结论只覆盖 42 条静态 check，
-# 与 full/quick 档的结论不可互替，因此用独立 mode 隔离（缓存命中只回放**同一档**的绿）。
-_CACHE_MODE="$NF_TIER"
 if [ "$NF_CHECKS_ONLY" = "1" ]; then
-  _CACHE_MODE="checks"
+  # 只跑静态 check：结果**不进缓存**（半份门禁的"绿"不能当整份门禁用）。
+  NF_CACHE=0
 fi
 
 # ---- 测试与静态 check 重叠加速（2026-10-18）----
@@ -600,10 +594,7 @@ check12(){
       # 20 核开发机也不该被 4 片浪费；显式 NF_TEST_JOBS 一律优先。
       _UT_JOBS="${NF_TEST_JOBS:-}"
       if [ -z "$_UT_JOBS" ]; then
-        # 实测（2026-10-28，本机 20 核，冷跑全量）：
-    #   jobs=8 → 299–307 s；jobs=10 → **285 s**；jobs=12 → 293 s；jobs=16 → 417 s。
-    # 10 是当前拐点（再多会被进程/文件争用吃掉）。
-    _UT_JOBS="$("$PY3" -c 'import os; print(min(10, max(2, (os.cpu_count() or 2) - 1)))' 2>/dev/null || echo 4)"
+        _UT_JOBS="$("$PY3" -c 'import os; print(min(16, max(2, (os.cpu_count() or 2) - 1)))' 2>/dev/null || echo 4)"
       fi
       if [ "$NF_TIER" = "full" ]; then
         _ut_cmd=("$PY3" scripts/verify_tests.py --jobs "$_UT_JOBS")
@@ -3129,8 +3120,8 @@ PYEOF
 # 输入没变就回放上次摘要（秒级）。红判定**不缓存**（红是瞬态），--fast/--no-cache 一律重算。
 _CACHE_KEY=''
 if [ "$NF_FAST" -eq 0 ] && [ "$NF_CACHE" -eq 1 ] && [ -n "$PY3" ] && [ -f scripts/verify_cache.py ]; then
-  _CACHE_KEY="$("$PY3" scripts/verify_cache.py --mode "$_CACHE_MODE" --key 2>/dev/null || true)"
-  if [ -n "$_CACHE_KEY" ] && "$PY3" scripts/verify_cache.py --mode "$_CACHE_MODE" --get --key "$_CACHE_KEY" 2>/dev/null; then
+  _CACHE_KEY="$("$PY3" scripts/verify_cache.py --mode "$NF_TIER" --key 2>/dev/null || true)"
+  if [ -n "$_CACHE_KEY" ] && "$PY3" scripts/verify_cache.py --mode "$NF_TIER" --get --key "$_CACHE_KEY" 2>/dev/null; then
     echo '>>> 全部通过（缓存判定：输入未变；--no-cache 可强制重算） <<<'
     exit 0
   fi
@@ -3214,7 +3205,7 @@ if [ "$FAIL" -gt 0 ]; then
 else
   if [ "$NF_CACHE" -eq 1 ] && [ "$NF_FAST" -eq 0 ] && [ -n "$_CACHE_KEY" ] && [ -n "$PY3" ]; then
     # 只缓存绿判定（红是瞬态）；失败不打扰退出码。
-    "$PY3" scripts/verify_cache.py --mode "$_CACHE_MODE" --put --key "$_CACHE_KEY" \
+    "$PY3" scripts/verify_cache.py --mode "$NF_TIER" --put --key "$_CACHE_KEY" \
       --pass "$PASS" --warn "$WARN" >/dev/null 2>&1 || true
   fi
   echo '>>> 全部通过（WARN 仅提示非致命），变更可提交 <<<'

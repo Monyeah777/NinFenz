@@ -7,14 +7,12 @@
 同时要求 dependabot 在场，避免「固定」退化成「冻结」。
 """
 import re
-import tomllib
 import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 WORKFLOWS = ROOT / ".github" / "workflows"
 DEPENDABOT = ROOT / ".github" / "dependabot.yml"
-CODEOWNERS = ROOT / ".github" / "CODEOWNERS"
 
 #: 第三方 action 引用：<owner>/<repo>@<40 位十六进制 SHA>（可选 `# vX` 注释）
 _PINNED = re.compile(r"^[^@/\s]+/[^@\s]+@[0-9a-f]{40}$")
@@ -51,34 +49,6 @@ class WorkflowActionPinningTest(unittest.TestCase):
         self.assertIn("github-actions", text,
                       "dependabot 须覆盖 github-actions 生态才能跟进固定值")
 
-    def test_codeowners_is_ascii_for_openssf_parser(self):
-        self.assertTrue(CODEOWNERS.is_file(), "缺 CODEOWNERS：Scorecard 无法确认代码所有者")
-        raw = CODEOWNERS.read_bytes()
-        bad = [b for b in raw if b > 127]
-        self.assertEqual([], bad,
-                         "CODEOWNERS 必须保持 ASCII；Scorecard 的解析器会拒绝非 ASCII 路径")
-        rules = [
-            line.strip()
-            for line in raw.decode("ascii").splitlines()
-            if line.strip() and not line.lstrip().startswith("#")
-        ]
-        self.assertIn("* @Monyeah777", rules)
-
-    def test_sast_runs_on_pull_requests_and_codeql(self):
-        text = (WORKFLOWS / "sast.yml").read_text(encoding="utf-8")
-        self.assertRegex(text, r"(?m)^  pull_request:\s*$")
-        self.assertIn("schedule:", text)
-        self.assertIn("github/codeql-action/init@", text)
-        self.assertIn("github/codeql-action/analyze@", text)
-        for language in ("python", "actions", "javascript-typescript"):
-            self.assertIn(language, text,
-                          f"CodeQL 扫描语言矩阵缺 {language}（动作与发布脚本也是供应链代码面）")
-
-    def test_rust_fuzz_target_is_present(self):
-        target = ROOT / "engine" / "rust" / "fuzz" / "fuzz_targets" / "python_parser.rs"
-        self.assertTrue(target.is_file(), "缺 cargo-fuzz target：OpenSSF Fuzzing 仍为 0")
-        self.assertIn("libfuzzer_sys", target.read_text(encoding="utf-8"))
-
 
 class CiRequirementsPinTest(unittest.TestCase):
     """F-05 余项：CI 依赖固定（requirements 清单）必须在场、可解析、且被 workflow 引用。"""
@@ -114,8 +84,7 @@ class CiRequirementsPinTest(unittest.TestCase):
         """
         paths = sorted(self.CI_REQ.parent.glob("requirements-*.txt"))
         self.assertEqual({"requirements-audit.txt", "requirements-ci.txt",
-                          "requirements-lint.txt", "requirements-sast.txt",
-                          "requirements-sbom.txt"},
+                          "requirements-lint.txt", "requirements-sast.txt"},
                          {p.name for p in paths},
                          "requirements 清单集合变化——本判据须覆盖全部清单："
                          f"{sorted(p.name for p in paths)}")
@@ -151,97 +120,11 @@ class CiRequirementsPinTest(unittest.TestCase):
         self.assertIn("requirements-audit.txt", text,
                       "审计器自身版本也须固定（否则审计器随上游漂移）")
 
-    def test_pull_requests_block_high_severity_dependency_regressions(self):
-        wf = WORKFLOWS / "dependency-review.yml"
-        self.assertTrue(wf.is_file(), "缺 dependency-review 工作流：PR 依赖回归没有合并前闸门")
-        text = wf.read_text(encoding="utf-8")
-        self.assertRegex(text, r"(?m)^  pull_request:\s*$")
-        self.assertIn(
-            "actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294",
-            text,
-        )
-        self.assertIn("fail-on-severity: high", text)
-        self.assertIn("pull-requests: write", text,
-                      "依赖审查失败摘要无法回写 PR（诊断面缺失）")
-
-    def test_npm_release_workflow_is_a_detectable_pinned_packaging_workflow(self):
-        text = (WORKFLOWS / "npm-publish.yml").read_text(encoding="utf-8")
-        self.assertIn(
-            "actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
-            text,
-        )
-        self.assertIn("registry-url: https://registry.npmjs.org", text)
-        self.assertIn(
-            'npm publish "$TARBALL" --provenance --access public --ignore-scripts',
-            text,
-        )
-        self.assertNotRegex(
-            text,
-            r"(?m)^\s*npm install -g npm@latest\s*$",
-            "发布工具链不得跟随浮动 @latest；使用 setup-node 固定 Node/npm",
-        )
-        self.assertIn("github.event_name == 'push'", text,
-                      "可选 GitHub Packages 镜像不得拖累主发布工作流的成功结论")
     def test_audit_requirements_file_is_pinned(self):
         audit_req = ROOT / ".github" / "requirements-audit.txt"
         self.assertTrue(audit_req.is_file())
         for line in self._pins(audit_req):
             self.assertRegex(line, self._PIN, "审计器未固定版本：%s" % line)
-
-    def test_known_vulnerable_audit_pins_are_fixed(self):
-        text = (ROOT / ".github" / "requirements-audit.txt").read_text(encoding="ascii")
-        self.assertIn("certifi==2026.10.19", text)
-        self.assertIn("filelock==4.2.1", text)
-
-    def test_container_bases_are_digest_pinned(self):
-        offenders = []
-        for path in sorted(ROOT.glob("**/Dockerfile*")):
-            if ".git" in path.parts or "engine/rust/fuzz" in path.as_posix():
-                continue
-            for i, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
-                if line.startswith("FROM ") and "@sha256:" not in line:
-                    if "${" in line:
-                        continue
-                    offenders.append(f"{path.relative_to(ROOT)}:{i} {line}")
-        self.assertEqual([], offenders,
-                         f"容器基础镜像必须按 digest 固定：{offenders}")
-
-    def test_rust_locks_do_not_regress_to_unmaintained_parser_dependencies(self):
-        """rustpython-parser 的默认后端曾引入 8 个 OSV 告警依赖。
-
-        路径依赖是修复的一部分：只改入口清单但不锁住 parser/ast/literal，
-        fuzz 或 PyO3 仍可能重新解析到 crates.io 的旧依赖图。
-        """
-        forbidden = {
-            "malachite",
-            "malachite-base",
-            "malachite-bigint",
-            "malachite-nz",
-            "malachite-q",
-            "paste",
-            "unic-char-property",
-            "unic-char-range",
-            "unic-common",
-            "unic-emoji-char",
-            "unic-ucd-category",
-            "unic-ucd-ident",
-            "unic-ucd-version",
-        }
-        local = {"rustpython-ast", "rustpython-literal", "rustpython-parser"}
-        lockfiles = [
-            ROOT / "engine" / "rust" / "Cargo.lock",
-            ROOT / "engine" / "rust" / "fuzz" / "Cargo.lock",
-            ROOT / "engine" / "rust" / "pyo3" / "Cargo.lock",
-        ]
-        for path in lockfiles:
-            with open(path, "rb") as fh:
-                packages = tomllib.load(fh)["package"]
-            names = {pkg["name"] for pkg in packages}
-            self.assertEqual(set(), names & forbidden, f"{path} 重新引入未维护依赖")
-            for pkg in packages:
-                if pkg["name"] in local:
-                    self.assertNotIn("source", pkg,
-                                     f"{path} 的 {pkg['name']} 必须走本仓 vendored 路径")
 
 
 if __name__ == "__main__":

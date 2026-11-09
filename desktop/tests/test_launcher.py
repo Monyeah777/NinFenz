@@ -264,23 +264,22 @@ class AutostartTest(unittest.TestCase):
             path = os.path.join(bin_dir, name)
             with open(path, "w", encoding="utf-8", newline="\n") as fh:
                 fh.write(body)
-            os.chmod(path, 0o755)
+            # 测试夹具（临时 bin 里的 stub）：仅属主可执行即可；0o755 是 code scanning
+            # py/overly-permissive-file 的告警面，收紧到 0o700（语义不变：同一用户可跑）。
+            os.chmod(path, 0o700)
         env = dict(os.environ)
         env["NARRATIVE_FORGE_HOME"] = home
         env["PATH"] = bin_dir + os.pathsep + env.get("PATH", "")
         return env, log
 
-    def _stop(self, home, wait=10.0):
-        # `wait` 可下调：**明确不启守护**的用例（NF_AUTOSTART=0/false/no/off）永远等不到
-        # daemon.json，默认 10 s 的等待纯属浪费（实测该用例 4 次收尾共 40 s）。
-        _stop_daemon(home, wait=wait)          # 等状态文件出现再停（非阻塞拉起 ⇒ 收尾有竞态）
+    def _stop(self, home):
+        _stop_daemon(home)                     # 等状态文件出现再停（非阻塞拉起 ⇒ 收尾有竞态）
 
     def test_falsey_values_disable_autostart(self):
         """显式关：`0|false|no|off` 一律不许拉起守护（诊断/对照/测试要可复现）。"""
         for value in ("0", "false", "no", "off"):
             home = self._home()
-            # 本用例断言"不得拉起守护"⇒ 不存在 daemon.json 可等，收尾只给 0.3 s 宽限
-            self.addCleanup(self._stop, home, 0.3)
+            self.addCleanup(self._stop, home)
             p = self._run(home, "--version", autostart=value)
             self.assertEqual(0, p.returncode, p.stderr or p.stdout)
             self.assertIn("nf ", p.stdout)
@@ -310,19 +309,19 @@ class AutostartTest(unittest.TestCase):
     def test_default_engages_autostart_without_blocking_the_command(self):
         """**默认开且非阻塞**（2026-09-29 起）：首条命令不等守护，随后守护自己起来。
 
-        非阻塞怎么**确定性**地判：把 shim 的 `daemon start` 那一跑挂 5 s 睡眠——
-        阻塞式实现会让首条命令≥5 s，非阻塞式只有 ~0.3–0.6 s（差一个数量级，不是靠抖动判）。
+        非阻塞怎么**确定性**地判：把 shim 的 `daemon start` 那一跑挂 10 s 睡眠——
+        阻塞式实现会让首条命令≥10 s；非阻塞式在满负载全量下实测仍 <8 s，留出负载余量。
         """
         home = self._home()
         self.addCleanup(self._stop, home)
-        env, _log = self._sleepy_shim(home, sleep_seconds=5)
+        env, _log = self._sleepy_shim(home, sleep_seconds=10)
         env.pop("NF_AUTOSTART", None)                 # 不给开关 ⇒ 走默认
         t0 = time.time()
         p = self._run(home, "--version", env=env)
         elapsed = time.time() - t0
         self.assertEqual(0, p.returncode, p.stderr or p.stdout)
         self.assertIn("nf ", p.stdout)
-        self.assertLess(elapsed, 5.0,
+        self.assertLess(elapsed, 8.0,
                         "首条命令等了后台起守护（阻塞式实现）——必须非阻塞：%.1fs" % elapsed)
         deadline = time.time() + 40                      # 后台拉起是**稍后**发生，允许慢机
         while time.time() < deadline and not os.path.exists(os.path.join(home, "daemon.json")):
@@ -400,7 +399,9 @@ class InterpreterLaunchBudgetTest(unittest.TestCase):
             path = os.path.join(bin_dir, name)
             with open(path, "w", encoding="utf-8", newline="\n") as fh:
                 fh.write(stub if (stub_python3 and name == "python3") else body)
-            os.chmod(path, 0o755)
+            # 测试夹具（临时 bin 里的 stub）：仅属主可执行即可；0o755 是 code scanning
+            # py/overly-permissive-file 的告警面，收紧到 0o700（语义不变：同一用户可跑）。
+            os.chmod(path, 0o700)
         env = dict(os.environ)
         env["NARRATIVE_FORGE_HOME"] = self.home
         env["PATH"] = bin_dir + os.pathsep + env.get("PATH", "")
@@ -652,7 +653,9 @@ class InterpreterDietTest(unittest.TestCase):
             path = os.path.join(bin_dir, name)
             with open(path, "w", encoding="utf-8", newline="\n") as fh:
                 fh.write(body)
-            os.chmod(path, 0o755)
+            # 测试夹具（临时 bin 里的 stub）：仅属主可执行即可；0o755 是 code scanning
+            # py/overly-permissive-file 的告警面，收紧到 0o700（语义不变：同一用户可跑）。
+            os.chmod(path, 0o700)
         env = dict(os.environ)
         env["NARRATIVE_FORGE_HOME"] = home
         env["PATH"] = bin_dir + os.pathsep + env.get("PATH", "")

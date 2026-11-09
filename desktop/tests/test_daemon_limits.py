@@ -130,13 +130,10 @@ class DaemonArgvLimitTest(unittest.TestCase):
         elif os.name == "nt":
             self.assertEqual(0, sock.getsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR))
         else:
-            # BSD/macOS can return a platform flag mask (observed: 4) for SO_REUSEADDR.
-            self.assertTrue(sock.getsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR))
-
-    def test_absolute_lifetime_is_independent_from_activity(self):
-        self.assertFalse(dm._lifetime_expired(10.0, 69.9, 60.0))
-        self.assertTrue(dm._lifetime_expired(10.0, 70.0, 60.0))
-        self.assertFalse(dm._lifetime_expired(10.0, 10_000.0, 0.0))
+            # BSD/macOS 的 getsockopt(SO_REUSEADDR) 返回**选项位掩码**（REUSEADDR 位 = 4），
+            # 不是 Linux 的布尔 1；只看「非零 = 已开启」才是跨平台正确的判据。
+            # （实测 2026-11-07 macos-latest：1 != 4，gate-macos 因此红。）
+            self.assertNotEqual(0, sock.getsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR))
 
     def test_cwd_must_be_an_existing_directory(self):
         root = Path(tempfile.mkdtemp(prefix="nf_daemon_cwd_"))

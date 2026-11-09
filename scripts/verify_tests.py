@@ -37,20 +37,25 @@ ROOT = Path(__file__).resolve().parent.parent
 DESKTOP = ROOT / "desktop"
 TESTS = DESKTOP / "tests"
 WEIGHTS_REL = "protocol/check12_weights.json"
-#: 本地自测权重（gitignored，不入库）：每轮把实测耗时按 EWMA 合并，用于下一次切片均衡。
-LOCAL_WEIGHTS_REL = ".nf-cache/test_weights.json"
 SHARD_TIMEOUT_S = float(os.environ.get("NF_SHARD_TIMEOUT", "1800"))
 #: 负载敏感模块：并行段之后独占串行跑（全部用例照跑，只改调度）。见 main 内注释。
 SERIAL_MODULES = frozenset({
-    "test_atomic_write",       # 进程内给 atomic_write 打桩做失败注入（并发会串补丁）
-    "test_daemon",             # 进程内起守护 + 短超时窗口
-    "test_lsp",                # warm 复用是 TTL 时间窗口径（并发会把单次扫描拖到窗外）
-    "test_npm_package",        # 打包/口径：串行段内跑，避免与 payload 暂存竞争
-    "test_release_artifacts",  # 发布物面：同上
+    "test_atomic_write", "test_daemon",
+    # 2026-10-19 复核：串行段一度扩到 9 个模块，结果串行段本身成了 367 s 的新瓶颈（j24 实测
+    # 最大片 = 367 s）。逐条回看取证后发现：schema_lint / governance / quality_depth 那一族的
+    # 红，全部发生在**工作树不干净**的跑次上（报告/回执/一致性面被判过期），不是读写竞争。
+    # 因此收回，只留**真正进程内打桩 + 时间窗**的两族。
+    # test_lsp 的 warm 复用判据是时间窗口径（TTL 内只该扫一次签名）：并发把单次扫描拖到窗外
+    # 就会"合法地"多扫一次而被判红——属负载敏感，保留串行。
+    "test_lsp",
+    # 2026-10-22 补（gov/rust 复验实测，两次全量门禁各红一次）：
+    # - test_daemon_parity：分片 1 报 `_daemon()` 读帧 `TimeoutError: timed out`
+    #   （chunk5；并行段起守护 + 嵌套 `nf verify --json` 被拖到 300 s 外）；
+    # - test_watch：`nf verify --json` 同代际第二跑 cache hits=0，且两次输出里含
+    #   ms 级耗时字段（"…87 16" vs "…87 18"）——同一族「嵌套 nf 进程 × 并发」抖动。
+    # 两族都是时间/进程创建敏感，判据本身没问题；照既有机制进串行段（用例照跑不减）。
+    "test_daemon_parity", "test_watch",
 })
-# 退出串行段的取证（2026-10-27 本机）：test_daemon_parity（224 s）与 test_watch（62 s）
-# 都用真进程/真时钟对账、不依赖进程内打桩；留在串行段等于给门禁加一条 395 s 单线程地板。
-# 迁回并行池后用例逐条照跑、一条不减（收窄后串行段 188 → 113 条）。
 # test_governance_faces 也进串行段（2026-10-18 实测）：它扫全仓"模式命中"，16 片并发时
 # 别的分片正在写临时产物（如 results/ 中间态），扫到就会红——不是它写错，是"读全仓快照"的
 # 判据不能与"会短暂写全仓"的判据同时跑。并发段跑完再独占跑它，判据不变、确定性恢复。
@@ -100,6 +105,16 @@ def module_of(test_id: str) -> str:
 ALWAYS_MODULES = frozenset({
     "test_purity_scan", "test_style_ratchet", "test_dead_code",
     "test_suite_isolation", "test_check12_budget",
+    # 机器面三判据（2026-11-05 实测教训）：新脚本落地时，死代码/未校验读点/裸写 sink 这三类
+    # 只由下面三个模块判——它们不在常驻集时，--affected 快回路会「绿着」放过，直到 30 分钟的
+    # gate 才红。三者都很快（合计 ~10 s），必须常驻。
+    "test_json_shape_contracts", "test_core_atomic_writes", "test_silent_skip_reasons",
+    # 跨用例隔离的静态判据（打桩面必须运行时取模块）：0.5 s，钉的是「假绿/假红」那一类
+    "test_isolation_patterns",
+    # CLI 参数登记面（~100 s）：新增/改动 argparse 参数而漏登记 _UTF8_TEXT_DESTS /
+    # _PATH_FLAG_DESTS 时，只有这一组判据会红——2026-11-05/06 两次都是别人的提交漏登记，
+    # 我却在 36 分钟后的分片里才发现。100 s 换掉 36 分钟，值。
+    "test_cli_error_framing",
 })
 
 #: 明确**不进**常驻集：`test_npm_package` 判的是 payload 清单与 HEAD 一致——那只在
@@ -173,67 +188,100 @@ def _test_sources() -> dict:
     return out
 
 
-def affected_selection(ids: list) -> tuple:
-    """变更 → 受影响测试 id；非 core 变更**全量兜底**（宁慢勿漏）。"""
-    changed = changed_paths()
-    if not changed:
-        keep = [t for t in ids if module_of(t) in ALWAYS_MODULES]
-        return keep, f"干净树（只跑常驻集 {len(keep and {module_of(t) for t in keep})} 个模块）"
-    non_core = [p for p in changed if not p.startswith("desktop/src/core/")]
-    if non_core:
-        return list(ids), f"非 core 变更 {len(non_core)} 个 → 全量兜底"
-    changed_core = {Path(p).stem for p in changed if p.endswith(".py")}
-    closure = _core_reverse_closure(changed_core)
-    sources = _test_sources()
-    keep = []
+#: 「改了就全量兜底」的面：这些件一动，选片规则不再可信（宁慢勿漏）。
+#: 协议件、门禁本体、CI 配置、测试装配入口都在这——它们影响的是**判据本身**，不是某个模块。
+HARD_FALLBACK = (
+    "verify.sh",
+    "protocol/",
+    ".github/",
+    "desktop/tests/__init__.py",
+    "scripts/verify_tests.py",
+    "scripts/verify_report.py",
+    "scripts/release_conclusion.py",
+    "scripts/style_check.py",
+    "scripts/code_metrics.py",
+    "scripts/coupling_metrics.py",
+    "scripts/sast_check.py",
+    "desktop/src/core/atomic_write.py",
+)
+
+
+def _hard_fallback_hit(paths: list) -> str:
+    """命中硬兜底面 → 命中项（空串 = 没命中）。目录项按前缀比，文件项按全等比。"""
+    for p in paths:
+        for rule in HARD_FALLBACK:
+            if rule.endswith("/"):
+                if p.startswith(rule):
+                    return p
+            elif p == rule:
+                return p
+    return ""
+
+
+def select_affected(ids: list, changed: list, sources: dict) -> tuple:
+    """变更 → (受影响的测试 id, 人读理由)。**纯函数**（sources 由调用方给），便于单测。
+
+    为什么分四类（2026-11-05 实测教训）：旧规则「非 core 变更一律全量兜底」让 `--affected` 在
+    最常用的两种改动（改测试、改 CLI）上永远退化成全量——等于没有选片，改一条断言仍要跑 29 分钟。
+
+    规则与安全性：
+    - **HARD_FALLBACK** 面（协议/门禁本体/CI 装配）→ 全量兜底：这些件改的是判据本身，选片不可信；
+    - core 模块变更 → 反向 import 闭包（谁依赖它）；
+    - 测试文件自身变更 → 该模块的测试；
+    - 其余路径 → **文本引用闭包**：测试源码里出现该仓内相对路径才选中（只认完整路径，不认文件名）。
+    常驻集（ALWAYS_MODULES）永远在。**选片只用于本地修复回路，发布结论仍跑全量分片**。
+    """
+    paths = [str(p).replace("\\", "/") for p in (changed or [])]
+    always = frozenset(ALWAYS_MODULES)
+    if not paths:
+        keep = [t for t in ids if module_of(t) in always]
+        mods = len({module_of(t) for t in keep})
+        return keep, f"干净树（只跑常驻集 {mods} 个模块）"
+    hard = _hard_fallback_hit(paths)
+    if hard:
+        return list(ids), f"命中硬兜底面（{hard}）→ 全量"
+    keep: set = set()
+    classes = []
+    core_changed = {Path(p).stem for p in paths
+                    if p.startswith("desktop/src/core/") and p.endswith(".py")}
+    if core_changed:
+        closure = _core_reverse_closure(core_changed)
+        for tid in ids:
+            if _core_imports(sources.get(module_of(tid), "")) & closure:
+                keep.add(tid)
+        classes.append(f"core {len(core_changed)} 个 → 闭包 {len(closure)} 模块")
+    test_mods = {Path(p).stem for p in paths
+                 if p.startswith("desktop/tests/") and p.endswith(".py")
+                 and Path(p).name.startswith("test")}
+    if test_mods:
+        for tid in ids:
+            if module_of(tid) in test_mods:
+                keep.add(tid)
+        classes.append(f"测试件 {len(test_mods)} 个 → 对应模块")
+    others = [p for p in paths
+              if not p.startswith(("desktop/src/core/", "desktop/tests/"))]
+    if others:
+        # 文档面按**目录前缀**匹配：判据源码里引的是「docs/」这种目录，不会写全件路径；
+        # 只按全路径匹配会让「只改文档」这类最常见的改动**漏选**文档面判据（实测 0 命中）。
+        needles = [] if not others else [
+            p if not p.startswith("docs/") else "docs/" for p in others]
+        hit_mods = {mod for mod, src in sources.items()
+                    if any(nd in src for nd in needles)}
+        for tid in ids:
+            if module_of(tid) in hit_mods:
+                keep.add(tid)
+        classes.append(f"文本引用 {len(others)} 个 → {len(hit_mods)} 模块")
     for tid in ids:
-        mod = module_of(tid)
-        if mod in ALWAYS_MODULES or (_core_imports(sources.get(mod, "")) & closure):
-            keep.append(tid)
-    return keep, f"core 变更 {len(changed_core)} 个 → 反向依赖闭包 {len(closure)} 个模块"
+        if module_of(tid) in always:
+            keep.add(tid)
+    ordered = [t for t in ids if t in keep]
+    why = "；".join(classes) if classes else "无匹配类"
+    return ordered, f"{why}（+常驻集）→ {len(ordered)} 条"
 
 
-def _local_weights() -> dict:
-    """本地自测权重（若有）→ {"tests": {...}}。"""
-    from core import json_doc
-    p = ROOT / LOCAL_WEIGHTS_REL
-    if not p.is_file():
-        return {}
-    try:
-        doc = json_doc.load(p, dict, what=LOCAL_WEIGHTS_REL)
-    except ValueError:
-        # 可吞：自测权重坏件 = 无自测权重（回落冻结权重；只影响调度，不影响判定）。
-        return {}
-    return doc if isinstance(doc, dict) else {}
-
-
-def _merge_local_weights(alpha: float = 0.5) -> None:
-    """把本轮 `.nf-cache/dump/*.json` 实测耗时按 EWMA 合并进本地权重（调度优化，不参与判定）。"""
-    d = ROOT / ".nf-cache" / "dump"
-    if not d.is_dir():
-        return
-    merged = dict(_local_weights().get("tests") or {})
-    try:
-        for f in sorted(d.glob("chunk-*.json")):
-            try:
-                from core import json_doc as _jd
-                got = _jd.load(f, dict, what="dump 分片")
-            except ValueError:
-                # 可吞：单个 dump 坏件只少一个样本（EWMA 少更新一条），不影响判定。
-                continue
-            for tid, sec in (got or {}).items():
-                old = float(merged.get(tid, 0) or 0)
-                merged[tid] = round(alpha * float(sec) + (1 - alpha) * old, 3) if old                     else round(float(sec), 3)
-            f.unlink(missing_ok=True)
-        if merged:
-            from core import atomic_write
-            atomic_write.write_text(ROOT / LOCAL_WEIGHTS_REL,
-                                    json.dumps({"schema": "nf-local-weights/1",
-                                                "note": "自测权重（EWMA；仅本机调度用，不入库）",
-                                                "tests": merged}, ensure_ascii=False,
-                                               indent=2, sort_keys=True) + "\n")
-    except Exception:                     # noqa: BLE001 - 调度优化失败不影响判定
-        pass
+def affected_selection(ids: list) -> tuple:
+    """变更 → 受影响测试 id（IO 壳：读 git 变更与测试源码，交给纯函数 select_affected）。"""
+    return select_affected(ids, changed_paths(), _test_sources())
 
 
 def load_weights() -> dict:
@@ -310,47 +358,21 @@ def assign(ids: list, ws: dict, jobs: int) -> list:
     return bins
 
 
-def _retry_permission(fn, tries: int = 8, delay: float = 0.5):
-    """Windows 上临时文件可能被 AV/索引器短暂占用（PermissionError）→ 退避重试。
-
-    实测（2026-10-28）：16 片并发时偶发 `PermissionError(13, '另一个程序正在使用此文件')`，
-    整轮门禁被一条**假红**判死。重试只针对 PermissionError，其它异常照旧上抛。
-    """
-    import time as _t
-    last = None
-    for i in range(tries):
-        try:
-            return fn()
-        except PermissionError as exc:      # noqa: PERF203 - 退避重试是本函数的目的
-            last = exc
-            _t.sleep(delay * (i + 1))
-    raise last
-
-
-def _temporary_directory(prefix: str, ignore_cleanup_errors: bool = False):
-    return _retry_permission(lambda: tempfile.TemporaryDirectory(
-        prefix=prefix, ignore_cleanup_errors=ignore_cleanup_errors))
-
-
 def run_shard(ids: list, index: int, dump: str = "") -> dict:
     """跑一个分片（可选：把逐测试耗时写到 `dump` 路径，供权重实测用）。"""
     t0 = time.perf_counter()
-    with _temporary_directory("nf_shard_%d_" % index) as spec_dir:
+    with tempfile.TemporaryDirectory(prefix="nf_shard_%d_" % index) as spec_dir:
         spec = Path(spec_dir) / "tests.json"
         payload = {"tests": ids}
         if dump:
             payload["dump"] = dump
-        _retry_permission(lambda: atomic_write.write_text(spec, json.dumps(payload, ensure_ascii=False)))
-        with _temporary_directory("nf_shard_home_%d_" % index, ignore_cleanup_errors=True) as home:
+        atomic_write.write_text(spec, json.dumps(payload, ensure_ascii=False))
+        with tempfile.TemporaryDirectory(prefix="nf_shard_home_%d_" % index) as home:
             env = dict(os.environ, PYTHONUTF8="1", PYTHONIOENCODING="utf-8",
                        NARRATIVE_FORGE_HOME=home)
             env.setdefault("NF_DAEMON_IDLE", "30")
-            # 分片内判据并行：实测 33 → 9.8 s；parity/json-face/watch 共用。
-            # 可用 NF_GATE_PARALLEL=0 关闭。
-            env.setdefault("NF_GATE_PARALLEL", "1")
-            # 冷跑实测：外层 10 + 内层 2 约 243–271 s；外层 16 时内层降为 1。
-            env.setdefault("NF_GATE_PARALLEL_WORKERS", "2")
-            # 内层并发闸：总 spawn 上限 8；多分片时降低单分片线程数。
+            # 内层并发闸：分片越多，单分片内层线程越少；总 spawn 上限控制在 8 路。
+            # 实测 16 片 × 2 线程仍会拖长重测试，故分片模式把内层降到 1 路。
             _jobs_hint = int(os.environ.get("NF_TEST_JOBS") or 8)
             if _jobs_hint > 1:
                 _inner = max(1, min(6, 8 // max(1, _jobs_hint)))
@@ -491,8 +513,6 @@ def main(argv=None) -> int:
                     help="只打印 n 分片的分配计划并校验并集==全集（不跑测试）")
     ap.add_argument("--run-shard", default="", help=argparse.SUPPRESS)
     ap.add_argument("--json", action="store_true", help="输出结构化摘要")
-    ap.add_argument("--incremental", action="store_true",
-                    help="TISA：内容寻址增量（未变的测试模块跳过；默认关闭，NF_TISA=1 同义）")
     args = ap.parse_args(argv)
 
     if args.run_shard:
@@ -558,17 +578,20 @@ def main(argv=None) -> int:
             print("指定模块里没有测试：%s（修复指引：模块名形如 tests.test_xxx）"
                   % ", ".join(sorted(want)), file=sys.stderr)
             return 2
-    if args.list:
-        print(json.dumps({"tests": len(ids), "modules": len({module_of(t) for t in ids})},
-                         ensure_ascii=False))
-        return 0
-
+    selection = ""
     if args.affected and not args.write_weights:
-        ids, why = affected_selection(ids)
-        print("  受影响选择：%s → %d 条测试" % (why, len(ids)))
+        ids, selection = affected_selection(ids)
+        if not args.list:
+            print("  受影响选择：%s" % selection)
         if not ids:
             print("  受影响集为空（修复指引：用 --jobs 0 或 --full 档跑全量）", file=sys.stderr)
             return 2
+    if args.list:
+        payload = {"tests": len(ids), "modules": len({module_of(t) for t in ids})}
+        if selection:
+            payload["selection"] = selection
+        print(json.dumps(payload, ensure_ascii=False))
+        return 0
 
     if args.write_weights:
         t0 = time.perf_counter()
@@ -598,28 +621,9 @@ def main(argv=None) -> int:
                  time.perf_counter() - t0))
         return 0
 
-    # ---- TISA 增量（内容寻址）：未变的测试模块直接跳过 ----
-    all_ids = list(ids)
-    skip_ids = []
-    inc = bool(args.incremental or os.environ.get("NF_TISA") == "1")
-    if inc:
-        from scripts import tisa as _tisa          # noqa: WPS433 - 延迟导入：不用增量时零成本
-        skip_ids, ids, _keys = _tisa.plan(all_ids)
-        print("  TISA：跳过 %d 条（模块输入面未变）/ 需跑 %d 条"
-              % (len(skip_ids), len(ids)))
-        if not ids:
-            print("  TISA：全部命中缓存，无需执行（0 s）")
-            return 0
-
     jobs = args.jobs or int(os.environ.get("NF_TEST_JOBS") or 4)
     jobs = max(1, min(jobs, len(ids)))
     weights_doc = load_weights()
-    _local = _local_weights().get("tests") or {}
-    if _local:                              # 同机实测优先于冻结基线
-        weights_doc = dict(weights_doc)
-        _mt = dict(weights_doc.get("tests") or {})
-        _mt.update(_local)
-        weights_doc["tests"] = _mt
     ws = test_weights(ids, weights_doc.get("modules", {}), weights_doc.get("tests", {}))
 
     # 负载敏感模块走**独占串行段**（2026-10-18 实测）：test_atomic_write / test_daemon 的
@@ -640,8 +644,7 @@ def main(argv=None) -> int:
         # 均值 259 s / 最大 346 s）。这里把测试按权重切成约 4×jobs 个小片，由一个队列喂给
         # jobs 个 worker——谁先跑完谁领下一片，尾巴被摊平。切片**只改调度**：并集仍逐项等于
         # discover 全集（下面照旧校验），每片仍是独立进程 + 独立 NF_HOME。
-        chunks = chunk_items(parallel_ids, ws, pjobs,
-                                  factor=max(4, min(32, int(os.environ.get("NF_TEST_SLICES") or 12))))
+        chunks = chunk_items(parallel_ids, ws, pjobs, factor=4)
         flat = [t for c in chunks for t in c]
         if sorted(flat) != sorted(parallel_ids):
             print("工作队列切片与 discover 不一致（漏/重）：%d vs %d"
@@ -663,19 +666,7 @@ def main(argv=None) -> int:
                     # 队列已空 = 所有片都被领走，worker 正常退出，不吞任何失败信息。
                     break
                 try:
-                    dd = ROOT / ".nf-cache" / "dump"
-                    dd.mkdir(parents=True, exist_ok=True)
-                    r = run_shard(c, idx, dump=str(dd / ("chunk-%d.json" % idx)))
-                except PermissionError:
-                    # Windows 瞬时占用（另一进程正持有临时件/规格件）——重试一次再判失败。
-                    # 实测（2026-10-29 冷跑）：偶发 `PermissionError(13)` 让整片记 rc=1，
-                    # 而同一片单独重跑必绿；这是平台竞态，不是判据结论。
-                    time.sleep(0.5)
-                    try:
-                        r = run_shard(c, idx, dump=str(dd / ("chunk-%d.json" % idx)))
-                    except Exception as exc2:     # noqa: BLE001 —— 仍崩则如实记失败
-                        r = {"index": idx, "rc": 1, "out": "worker 异常（重试后）：%r" % (exc2,),
-                             "wall": 0.0, "tests": len(c)}
+                    r = run_shard(c, idx)
                 except Exception as exc:          # noqa: BLE001 —— worker 崩了要当分片失败，不是静默
                     r = {"index": idx, "rc": 1, "out": "worker 异常：%r\n%s" % (
                         exc, traceback.format_exc()),
@@ -683,17 +674,6 @@ def main(argv=None) -> int:
                 with lock:
                     results_box.append(r)
 
-        # ---- 串行段与主队列**并行**（L5，灰度 `NF_OVERLAP_SERIAL=1`）----
-        # 历史记录：2026-10-19/22 两次 red 都是"串行段与 16 片并发"时被拖到时间窗外/守护超时；
-        # 2026-10-27 收窄串行段（parity/watch 迁出）+ 并行度回到 8 后复测未再复现。
-        # 仍保留开关：默认关闭，打开即"串行段独立进程与主队列同时跑"，用例一条不减。
-        _serial_holder = {}
-        _serial_thread = None
-        if serial_ids and os.environ.get("NF_OVERLAP_SERIAL") == "1":
-            def _run_serial():
-                _serial_holder["r"] = run_shard(serial_ids, len(chunks))
-            _serial_thread = threading.Thread(target=_run_serial, daemon=True)
-            _serial_thread.start()
         threads = [threading.Thread(target=_worker, daemon=True) for _ in range(pjobs)]
         for th in threads:
             th.start()
@@ -701,13 +681,8 @@ def main(argv=None) -> int:
             th.join()
         results = sorted(results_box, key=lambda r: r["index"])
         if serial_ids:
-            if _serial_thread is not None:
-                _serial_thread.join()
-                results.append(_serial_holder["r"])
-            else:
-                results.append(run_shard(serial_ids, len(chunks)))
+            results.append(run_shard(serial_ids, len(chunks)))
     wall = time.perf_counter() - t0
-    _merge_local_weights()
     failed = [r for r in results if r["rc"] != 0]
 
     if args.json:
@@ -727,15 +702,6 @@ def main(argv=None) -> int:
     for r in failed:
         print("---- 分片%d 失败（rc=%d）末 40 行 ----" % (r["index"], r["rc"]), file=sys.stderr)
         print("\n".join((r["out"] or "").splitlines()[-40:]), file=sys.stderr)
-    # ---- TISA：成功才写缓存（失败即失效，绝不留假绿）----
-    if inc and not failed:
-        try:
-            from scripts import tisa as _tisa
-            _tisa.commit(ids, [], _keys)
-            print("  TISA：已写入缓存 %s（%d 个模块）" % (_tisa.CACHE_REL, len(_keys)))
-        except Exception as exc:                   # noqa: BLE001 - 缓存写失败不得影响判定
-            print("  TISA：缓存写入跳过（%r）" % (exc,), file=sys.stderr)
-
     return 1 if failed else 0
 
 

@@ -1,0 +1,235 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/schema/cockpit-handoff/1",
+  "title": "NF Cockpit Production Handoff",
+  "description": "No-score handoff from a live cognitive state to downstream production.",
+  "type": "object",
+  "required": ["schema", "goal", "state_digest", "sections",
+               "provenance", "gaps", "task_projection", "abstention"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {"const": "nf-cockpit-handoff/1"},
+    "goal": {"type": "string", "minLength": 1},
+    "state_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "sections": {
+      "type": "object",
+      "required": ["problem", "decomposition", "relations",
+                   "counterexamples", "synthesis", "resolutions",
+                   "evidence", "open_questions"],
+      "additionalProperties": false,
+      "properties": {
+        "problem": {"type": "string", "minLength": 1},
+        "decomposition": {"type": "array", "items": {"type": "string"}},
+        "relations": {"type": "array", "items": {"type": "string"}},
+        "counterexamples": {"type": "array", "items": {"type": "string"}},
+        "synthesis": {"type": "array", "items": {"type": "string"}},
+        "resolutions": {"type": "array", "items": {"type": "object"}},
+        "evidence": {"type": "array", "items": {"type": "string"}},
+        "open_questions": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["trace", "grounded_evidence", "unsupported_evidence",
+                   "scope_evidence", "source_registry_digest", "context_digest",
+                   "domain_index_digest", "evidence_excerpts",
+                   "unresolved_sources", "scope_only_sources",
+                   "graph_context"],
+      "additionalProperties": false,
+      "properties": {
+        "trace": {"type": "array", "items": {"type": "string"}},
+        "grounded_evidence": {"type": "array", "items": {"type": "string"}},
+        "unsupported_evidence": {"type": "array", "items": {"type": "string"}},
+        "scope_evidence": {"type": "array", "items": {"type": "string"}},
+        "source_registry_digest": {"type": "string",
+                                   "pattern": "^[0-9a-f]{64}$"},
+        "domain_index_digest": {"type": "string",
+                                "pattern": "^[0-9a-f]{64}$"},
+        "context_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "evidence_excerpts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["source", "role", "trust", "path", "line", "text", "truncated",
+                         "char_start", "char_end", "normalization", "matched_terms",
+                         "content_digest", "file_digest"],
+            "additionalProperties": false,
+            "properties": {
+              "source": {"type": "string", "minLength": 1},
+              "role": {"enum": ["content", "domain-content", "domain-output",
+                                "domain-scope", "external-content"]},
+              "trust": {"enum": ["local-trusted", "external-advisory",
+                                 "derived"]},
+              "path": {"type": "string", "minLength": 1},
+              "line": {"type": "integer", "minimum": 1},
+              "text": {"type": "string", "minLength": 1},
+              "truncated": {"type": "boolean"},
+              "char_start": {"type": "integer", "minimum": 0},
+              "char_end": {"type": "integer", "minimum": 1},
+              "normalization": {"const": "none"},
+              "matched_terms": {"type": "array", "uniqueItems": true,
+                                "items": {"type": "string"}},
+              "matched_roles": {"type": "array", "uniqueItems": true,
+                                "items": {"type": "string"}},
+              "content_digest": {"type": "string",
+                                 "pattern": "^[0-9a-f]{64}$"},
+              "file_digest": {"type": "string",
+                              "pattern": "^[0-9a-f]{64}$"}
+            }
+          }
+        },
+        "unresolved_sources": {"type": "array", "uniqueItems": true,
+                               "items": {"type": "string"}},
+        "scope_only_sources": {"type": "array", "uniqueItems": true,
+                               "items": {"type": "string"}},
+        "graph_context": {
+          "type": "object",
+          "required": ["matched_concepts", "nodes", "edges", "warnings"],
+          "additionalProperties": false,
+          "properties": {
+            "matched_concepts": {"type": "array", "uniqueItems": true,
+                                 "items": {"type": "string"}},
+            "nodes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["id", "concept", "layer", "source"],
+                "additionalProperties": false,
+                "properties": {
+                  "id": {"type": "string"},
+                  "concept": {"type": "string"},
+                  "layer": {"type": "string"},
+                  "source": {"type": "string"}
+                }
+              }
+            },
+            "edges": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["from", "to", "kind", "source"],
+                "additionalProperties": false,
+                "properties": {
+                  "from": {"type": "string"},
+                  "to": {"type": "string"},
+                  "kind": {"const": "domain-prerequisite"},
+                  "source": {"type": "string"}
+                }
+              }
+            },
+            "warnings": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["source", "kind", "cycle"],
+                "additionalProperties": false,
+                "properties": {
+                  "source": {"type": "string"},
+                  "kind": {"type": "string"},
+                  "cycle": {"type": "array", "items": {"type": "string"}}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "gaps": {"type": "array", "uniqueItems": true,
+             "items": {"type": "string"}},
+    "task_projection": {
+      "type": "object",
+      "required": ["schema", "primary", "modes", "sections", "gaps",
+                   "digest", "no_scoring"],
+      "additionalProperties": false,
+      "properties": {
+        "schema": {"const": "nf-task-handoff/1"},
+        "primary": {
+          "enum": ["compare", "diagnose", "design", "audit", "explain",
+                   "decide", "create", "general"]
+        },
+        "modes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": ["compare", "diagnose", "design", "audit", "explain",
+                     "decide", "create", "general"]
+          }
+        },
+        "sections": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["id", "title", "status", "source_keys", "values"],
+            "additionalProperties": false,
+            "properties": {
+              "id": {"type": "string", "minLength": 1},
+              "title": {"type": "string", "minLength": 1},
+              "status": {"enum": ["open", "closed"]},
+              "source_keys": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {"type": "string"}
+              },
+              "values": {"type": "object"}
+            }
+          }
+        },
+        "gaps": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string"}
+        },
+        "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "no_scoring": {"const": true}
+      }
+    },
+    "abstention": {
+      "type": "object",
+      "required": ["schema", "status", "termination", "repairable",
+                   "human_action_required", "repair_keys", "reasons",
+                   "semantic_verification", "no_scoring", "digest"],
+      "additionalProperties": false,
+      "properties": {
+        "schema": {"const": "nf-abstention/1"},
+        "status": {
+          "enum": ["none", "repair-required", "evidence-required",
+                   "review-required", "blocked", "deadline-exceeded",
+                   "budget-exhausted"]
+        },
+        "termination": {"type": "string", "minLength": 1},
+        "repairable": {"type": "boolean"},
+        "human_action_required": {"type": "boolean"},
+        "repair_keys": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string"}
+        },
+        "reasons": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["gap", "kind", "repair_keys"],
+            "additionalProperties": false,
+            "properties": {
+              "gap": {"type": "string", "minLength": 1},
+              "kind": {
+                "enum": ["task-facet", "coherence", "cognitive-need",
+                         "evidence", "review"]
+              },
+              "repair_keys": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {"type": "string"}
+              }
+            }
+          }
+        },
+        "semantic_verification": {"const": "pending-human-review"},
+        "no_scoring": {"const": true},
+        "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    }
+  }
+}

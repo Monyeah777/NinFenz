@@ -28,7 +28,7 @@ python -c "import sys;sys.path.insert(0,'desktop/src');from core import engine_l
 > 缺它时 ILC 报 `Platform linker not found`（ILCompiler 8.0.31）；`dotnet build` 本身零警告零错误。
 > 本机装 VS Build Tools（`VC.Tools.x86.x64` + `Windows11SDK.22621`）后 **publish 成功**：产出
 > `nf_engine_native.dll`（1.1 MB），`engine_loader.engine_abi(...)` → **1**（真 dlopen + 调 C ABI），
-> `python scripts/engine_status.py` 列出该候选库。产物落 engine/dotnet/dist/ 目录（该目录被 .gitignore 的 dist/ 规则忽略，**不入库**，故不存在于干净检出中——本行刻意不用反引号，避免被`test_doc_reachability` 当成必须存在的路径）。
+> `python scripts/engine_status.py` 列出该候选库。产物落 `engine/dotnet/dist/`（`.gitignore` 的 `dist/`，不入库）。
 > 本件是**独立的"原生出口壳"**，不改 `Nf.Engine` 主库的 **BCL-only** 依赖姿态（ADR-0005）。
 
 
@@ -44,6 +44,17 @@ python -c "import sys;sys.path.insert(0,'desktop/src');from core import engine_l
    `probes/bundle_integrity_probe.py`（**入库包**文档数字 = 实测）。
 
 ## 2. 真源变了怎么办（**一条命令**）
+
+> **CI 跑批前提（2026-11-08 实测）**：`net-probes` 的金标快照 ref 必须在**公开历史里**。
+> 旧默认 `v2.11.0` 已随历史重写不存在；现默认 `aa259d76`（`CorpusStamp.Baseline` 对应的导出提交）
+> 目前**只在作者本地对象库里**——公开仓 `git archive` 会报 `not a valid object name`。
+> 跑 CI 批前二选一：① 作者把该提交推上来（如 `git push origin aa259d76:refs/tags/nf-snap-golden`
+> 并把 `vars.NF_SNAP_REF` 指向该 tag）；② 用 `run-rebaseline.ps1` 把金标前移到当前 HEAD 后重推。
+> 手动 `workflow_dispatch` 时用 `snap_ref` 输入显式指定可用的 ref（缺省值失效会在快照步骤 fail-fast）。
+>
+> **2026-11-08 验证**：在作者机器上 `git push --dry-run origin aa259d76:refs/tags/nf-snap-golden`
+> 成功（输出 `* [new tag] aa259d76 -> nf-snap-golden`，提交对象在场、鉴权有效）——
+> 去掉 `--dry-run` 即完成路线①，无需额外准备；是否执行仍由作者裁决。
 
 **第一百二十二片起：复基线已工具化** —— `run-rebaseline.ps1`：
 
@@ -78,7 +89,7 @@ pwsh -NoProfile -File run-rebaseline.ps1 -Snap <新快照> -SnapName nf-snap-hN 
 `nf approve protocol/conformance_report.json --by <作者>` → `nf receipts --scope protocol --write` → `bash verify.sh`。
 
 CI 配方：**树外构建**（`cp -r engine/dotnet "$RUNNER_TEMP/build"`）+ **门跑工作树**（有 `.git` ⇒ 语义模式）。
-两条**已证伪**的变体（树内构建 / 导出快照当语料）写在 `.github/workflows/net-engine.yml` 的注释里，别再走。
+两条**已证伪**的变体（树内构建 / 导出快照当语料）见本仓 git 历史中的 `net-engine.yml`（该工作流已随 .NET 引擎线退役删除），别再走。
 
 ## 5. 纪律清单（每条都有实测出处）
 

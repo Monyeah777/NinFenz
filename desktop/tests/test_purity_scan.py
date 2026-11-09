@@ -303,10 +303,14 @@ class PurityScanTest(unittest.TestCase):
         self.assertEqual([i for i in issues if "危险 sink" in i], [],
                          "真仓库出现未登记 sink 即 FAIL")
         # 2026-10-19：16 → 20（scratch：写权限探针自清 + 上下文清理 + TTL 回收，各站点已登记理由）
-        # 2026-10-27：20 → 21（`scripts/verify_tests.py` 清理**本进程刚写**的 dump 分片：
-        # `.nf-cache/dump/chunk-<int>.json`，路径由固定前缀+自增片号拼成、不接收外部路径；
-        # 理由已登记 SINK_ALLOW["verify_tests.py:unlink"]，删失败也不影响判定）
-        self.assertLessEqual(stats.get("sinks", 0), 21)
+        # 2026-11-06：20 → 21（发布结论器 --snapshot 的**失败自清**：落点由 tempfile.mkdtemp
+        #   现建、只在 git worktree add 失败时删这个空壳；理由已登记
+        #   SINK_ALLOW["release_conclusion.py:shutil.rmtree"]——快照成功路径交给
+        #   git worktree remove --force，不走这条）
+        # 2026-11-06 再 +1（21 → 22）：并发会话把快照临时目录移到盘根独立目录
+        #   （.nf-gate-tmp），新增一处同键清理（release_conclusion.py:shutil.rmtree，
+        #   理由同上：落点由本模块自己拼、只删自己刚建的 run 目录）
+        self.assertLessEqual(stats.get("sinks", 0), 22)
 
 
 class SinkRegistryTest(unittest.TestCase):

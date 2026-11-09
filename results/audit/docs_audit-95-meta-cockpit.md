@@ -1,0 +1,204 @@
+---
+id: AUD-0047
+title: 元认知生产驾驶舱主仓融合
+date: 2026-10-30
+scope: 将元原子运行时、动态驾驶、事件溯源、上下文预算、A/B 与正式协议融合进主仓；并收口桥接 Path 参数根相对/类型闸门、包入口惰性加载、生成物原子写与 manifest 可复算；不调用外部模型，不伪造 HR-001。
+verdict: pass
+auditor: 本轮执行者
+subjects:
+  - desktop/src/core/cli_bridge.py:4247ed0e73dfc1ca319f6b9881f3b73a875b01ee6b24eda3d4fe861736cadad8
+  - desktop/src/core/meta_cockpit/__init__.py:f31cbadd59e3f25aab850122bbcc4ad5adcf5a65596a38c4996f264a38427fd7
+  - desktop/src/core/meta_cockpit/build_atom_menu.py:1bedd2efd340114f91442a41b6319f7a9e7f962996d49f656a132e45988dbf95
+  - desktop/src/core/meta_cockpit/runtime_executor.py:204a67ec93855257323887011395b0866ac8d5ae1c485362e89eb058ffe64bfb
+  - desktop/src/core/meta_cockpit/cockpit_service.py:18280c6966dd618a8b09daa058b461fa43f89e99f11c797ca884338ff5c13bbf
+  - desktop/src/core/meta_cockpit/cockpit_ab.py:6afcade08f2469aad4adc6f44e0e3d28a17712a85e3223f41b14c0020c2f88e7
+  - desktop/src/core/terminal.py:69c2d9ced679e439c6ca440fc949d02f70dc067debdd9b520f96a2e4de156833
+  - desktop/tests/test_meta_cockpit.py:cc2dc4f52729b35f400ca92aa367e685780f9f6735224e7fc0b7550b85f52662
+  - desktop/tests/test_cli_error_framing.py:4c186dc60b5e58bfe6c0400242051e14a8995bc7dad5399d68a85d8881d0e133
+  - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
+  - scripts/nf.py:83a75a4fac82461d56b03147eff04b420b8aad0ed6db9fef6e695717dcf7b6a2
+  - tui/_surface.py:8db432e006d08b717d507deb8839e02e0db1ccacc3e4962a712045ccfd2a30bf
+  - protocol/check12_weights.json:a0cda888c2d2a9613d457e27474500786a41e3031ee44929b509f49198ecea7e
+  - protocol/coupling_baseline.json:78e2cf2dedd184567f5522117fe449d51dcce824f3e12195daeff183867418db
+  - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
+  - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
+  - results/meta-cockpit-manifest.json:7b1231392bea0bc51ed14d73fac3c73c185209c1233e7727e554d5b899031af2
+
+---
+> 重审（2026-11-09）：session-persist 预算 Windows 放宽
+
+> 重审（2026-11-08）：task-35c：git status 收敛到 repo_face.untracked_paths
+
+> 重审（2026-11-08）：task-35：nf.py 注释修正（nosec/理由）
+
+> 重审（2026-11-08）：task-35 投影少算防护
+
+> 重审（2026-11-07）：合并基线补齐：向量生成器 subject 字段 + 脚本原子写/stdio + 命令树拆组
+
+> 重审（2026-11-07）：门禁修：silent-skip 理由 / 两个文本参数登记 / --mode 复核
+
+> 重审（2026-11-07）：Go 客户端补齐 cc_check/cc_label/cc_attest/cc_replay/cc_diff/cc_resolve（6 份向量集）
+
+> 重审（2026-11-07）：Go 客户端补 receipts/attest 两形态；向量集扩到 28 条（三形态）
+
+> 重审（2026-11-07）：cc_check 文本层：法规原文→意图草稿（规则抽取，四张账）
+
+> 重审（2026-11-07）：吊销公钥信任锚（钉根 + 有界委派 + 过期/scope/链深判据）
+
+> 重审（2026-11-07）：载体层：WebP/MP4/PDF 附加块 + PNG 像素水印（判据含 JPEG 不扛的期望行为）
+
+> 重审（2026-11-07）：RFC 3161 可信时间戳（timestamp 模块 + CLI + 证据复验时间锚）
+
+> 重审（2026-11-07）：快照落点纯函数化 + 3 条隔离判据（同盘/出树/日志）
+
+> 重审（2026-11-07）：revocations_seed 进二进制豁免 + 两份文档项数同步（62→65 / 34→43）
+
+> 重审（2026-11-07）：ed25519 吊销签名（非对称：验证方只持公钥）+ 回归判据
+
+> 重审（2026-11-07）：batch_target 登记修正（位置参数进文本面，不进旗标名单）
+
+> 重审（2026-11-07）：口径同步 3022 件 / 23.92 MB
+
+> 重审（2026-11-07）：nf evidence batch（目录逐件复验，整批不可用即失败）
+
+> 重审（2026-11-07）：instruction_evidence 临近过期提前 7 天 WARN + 重录 verify/release
+
+> 重审（2026-11-06）：快照模式：内层日志边跑边落盘 + 陈旧快照自动清理
+
+> 重审（2026-11-06）：机器面 NF_HOME 可移植（nf.py 变更）
+
+> 重审（2026-11-06）：bash 身份守卫（WSL 空输出不再冒充判据红）+ Windows 两坑入文档
+
+> 重审（2026-11-06）：CLI 命令树拆分 + 旗标字面读取（nf.py 变更）
+
+> 重审（2026-11-06）：Rust 侧 SINK_ALLOW 同步 + 陈旧二进制守卫 + 漂移判据
+
+> 重审（2026-11-06）：task-27 吊销新鲜度：revocations/evidence/nf.py 变更，重绑被审对象
+
+> 重审（2026-11-06）：快照落点改仓库同盘 + TEMP 重定向（防满盘 ENOSPC）
+
+> 重审（2026-11-06）：发布结论器加 --snapshot（HEAD 快照里跑，免疫并发改动）
+
+> 重审（2026-11-06）：JPEG 载体 P0 硬化（nf.py/CLI 文案变化）+ 口径清理，重绑被审对象
+
+> 重审（2026-11-06）：JPEG APP15 载体（扫描数据不变）+ 真 PNG 夹具判据
+
+> 重审（2026-11-06）：Q0-r2：evidence verify 增 --policy-digest 期望比对（nf.py 参数面变化），重绑被审对象
+
+> 重审（2026-11-06）：耦合面重冻（载体模块行数变化后 metrics 面漂移）
+
+> 重审（2026-11-06）：cc_label PNG iTXt 载体（可读回/不改像素/CRC 合法）
+
+> 重审（2026-11-06）：注册 --decision 参数进编码/路径闸门（其提交遗漏）
+
+> 重审（2026-11-05）：Q0 决策证据绑定：scripts/nf.py 增 --decision 入口、evidence/attest/nf_verify 增 decision 绑定，重绑被审对象摘要
+
+> 重审（2026-11-05）：M2：证据面双实现 parity（三形态+仓外单文件）与 CLI↔HTTP 同证据判据落地；重绑 check12 权重摘要
+
+> 重审（2026-11-05）：M1：ABI 错误面登记 + docs/ccos 一致性判据落地，重绑被审对象摘要
+
+> 重审（2026-11-05）：容器面加固：路径安全闸门 / 重名判死 / 解压上限（攻击矩阵 33→35）
+
+> 重审（2026-11-05）：cc_label sidecar 回退（nf-label-sidecar/1，绑定对象摘要）
+
+> 重审（2026-11-05）：隔离静态判据（打桩面）+ 三个机器判据进常驻集
+
+> 重审（2026-11-05）：证据判定向量集（跨语言一致性锚点）+ 文档
+
+> 重审（2026-11-05）：--compile 参数登记进编码/路径闸门
+
+> 重审（2026-11-05）：cc_check 编译面 v0：意图 → 封闭词表策略（不可表达逐条挂账）
+
+> 重审（2026-11-05）：权重实测后重冻（报告须最后写）
+
+> 重审（2026-11-05）：新鲜度步：修 UP031 + 前置测试改结构断言
+
+> 重审（2026-11-05）：受影响选片 v2（四类规则 + 文档目录前缀 + 硬兜底面）+ 纯函数判据
+
+> 重审（2026-11-05）：G2 吊销分发件（签名 feed：签发/校验/合并，防回滚）+ nf.py 导入块排序
+
+> 重审（2026-11-05）：label 声明层补登记（编码闸门/路径旗标）+ 删零引用函数
+
+> 重审（2026-11-05）：cc_label 声明层（nf-label/1 IR）+ 供应链核对进发布结论
+
+> 重审（2026-11-05）：G1 外部锚点：证据包可声明并可核对（防整链截断），双实现同口径 + 攻击矩阵 33 条
+
+> 重审（2026-11-04）：H1 修复：--trust-repo 环境变量不再泄漏（信任门不再被绕过）+ 新增回归判据
+
+> 重审（2026-11-04）：分片 1/8 抽检修复：编码闸门/路径旗标名单补全、删零引用常量与函数、耦合基线重冻
+
+> 重审（2026-11-04）：证据线 fail-closed 加固：chain 段必填 / 吊销表坏件判 invalid（攻击矩阵 25→29）
+
+> 重审（2026-11-04）：抽检第二个分片：原子写纪律（包/报告走 atomic_write，临时写例外登记）
+
+> 重审（2026-11-04）：check12 修复波：JSON 面登记 / json_doc 收敛 / Rust 回执去重同步 / 基准 JSON 纯净
+
+> 重审（2026-11-04）：本地 HTTP 面 v0（nf serve --http 三端点）落地 + 端点契约登记 local.*
+
+> 重审（2026-11-04）：cc_resolve（契约面反查）+ 一条链复现脚本落地
+
+> 重审（2026-11-04）：cc_replay 轨迹 + cc_check 单对象策略体检落地（新模块 check_policy）+ 回执去重
+
+> 重审（2026-11-04）：证据复验器扩三种形态 + 攻击矩阵基准（26 项校验路径与基准落地）
+
+> 重审（2026-11-04）：证据包缺省落点改到临时目录（不往仓库落盘）+ CCOS ABI v0 收口
+
+> 重审（2026-11-04）：CCOS ABI v0 + 证据包校验器落地（scripts/nf.py 与 core/terminal.py 摘要变更；并修复本分支既有漂移）
+
+> 重审（2026-10-30）：新增契约级 Git 演进时间线；结构化 Markdown YAML 字段与 JSON schema 差异纳入影响度
+
+> 重审（2026-10-30）：全仓审计口径复核：显式 legacy 清单、subjects 根内解析、Path 参数闸门、惰性导入与 manifest 可复算
+
+> 重审（2026-10-30）：桥接 Path 参数统一根相对与类型闸门；公共子模块惰性加载；生成菜单原子写；入仓 manifest 增加实时复算判据
+
+> 重审（2026-10-29）：CLI 命令树无损分组、meta-cockpit 接线与恢复分支全量验证后重绑；既有结论不变
+
+> 重审（2026-10-29）：恢复分支全量验证：纯度修复、零引用清理、public API 接线、ReDoS/CLI 闸门/文档路径与模板示例修复
+
+> 重审（2026-10-29）：恢复分支全量验证：接线 meta-cockpit 公共模块、清理零引用、修复 ReDoS/CLI 闸门/公开文档路径后重绑；既有结论不变
+
+
+# 元认知生产驾驶舱主仓融合审计
+
+> 日期：2026-10-30
+> 范围：`desktop/src/core/meta_cockpit/`、CLI 桥、终端命令族与自动化测试
+> Machine digest：`59357b7056a68bfbd64cdd85333aadfb95c34fdf06f1216563cee56f5e01ce5c`
+> Manifest digest：`c9469a7f54041e7c041e353a768bad98054b72bcb4775639f7463754b985abfc`
+
+## 结果
+
+- 33/33 原子执行器在场，14 个方法节点、10 节点内容管线与 5 节点元管线可加载执行。
+- 元管线好样本 PASS：5 节点、17 个原子轨迹全部 PASS。
+- 六类 fail-closed 突变均被抓：缺执行器、无效方法路由、预算耗尽、缺判据、未知任务类型、输出类型不匹配。
+- 动态驾驶验证：不同任务/注入产生不同 need 序列，状态完成且轨迹无 `score`。
+- 事件账本验证：提交后可加载、哈希链校验通过、确定性重放与当前状态一致。
+- A/B 验证：预注册、盲包、功效分析、强效应、重复 ballot 拒绝、bundle/store 往返均通过。
+- 发布清单验证：运行代码、契约、协议与正式说明纳入统一 digest；HR-001 保持 `PENDING`。
+- CLI 入口验证：`nf cockpit` 与 `nf cockpit-ab` 可发现、可帮助、可执行；终端能力族与生成投影同步。
+
+## 验证证据
+
+| 检查 | 结果 |
+|---|---|
+| `tests.test_meta_cockpit` | 11/11 PASS |
+| 最终受影响合并集 | 292/292 PASS |
+| 终端/TUI/代码度量/权重/文本卫生受影响集 | 233/233 PASS |
+| CLI/JSON 形状/耦合/模块命名受影响集 | 79/79 PASS |
+| Ruff | PASS |
+| 风格棘轮 | 10022 ≤ 基线 10032 |
+| 代码规模 | 310 文件；最大行数 7643；最长函数 1262；最大复杂度 116 |
+| 耦合 | 0 未登记环；258 模块；SDP 10/10 登记 |
+| 元管线运行 | `PENDING-REVIEW`，机器层 PASS |
+
+## 遗留边界
+
+- HR-001 必须由作者或指定复核人签字，本审计未生成 approve 记录。
+- 真实跨模型、多 seed A/B 未运行；不宣称已测得质量增量。
+- 语义真伪仍由人工复核兜底。
+- 工作区存在本次任务前已有的并发修改；本轮未执行 stash、reset、restore 或清理。
+
+## 设计偏差
+
+- 内部原型使用扁平模块导入与 `D:\\NinFenz` 绝对路径；主仓版本改为 `core.meta_cockpit` 包、相对导入和仓库根推导。
+- 内部一次性 spike 脚本未直接入库；高价值断言已转为主仓 unittest 契约。
+- `jsonschema` 作为可选标准实现使用；缺失时退回主仓确定性 JSON Schema 子集并 fail-closed。

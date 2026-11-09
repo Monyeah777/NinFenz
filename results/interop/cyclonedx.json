@@ -2,13 +2,6 @@
   "bomFormat": "CycloneDX",
   "components": [
     {
-      "bom-ref": "dep:scripts",
-      "description": "硬依赖（登记）：同仓脚本目录（verify_tests 复用 scripts/tisa.py 的增量器；非第三方依赖）",
-      "name": "scripts",
-      "scope": "required",
-      "type": "library"
-    },
-    {
       "bom-ref": "dep:yaml",
       "description": "硬依赖（登记）：PyYAML（仓库既有依赖；check16/28 同源解析，见 CONTRIBUTING §4.2 例外）",
       "name": "yaml",
@@ -18,6 +11,13 @@
       "version": "6.0.3"
     },
     {
+      "bom-ref": "opt:PIL",
+      "description": "软依赖（可选，须守卫）：标注水印层（label_watermark）读写 PNG 位图；软导入 + 缺依赖给修复指引，文本载体那条路保持纯标准库",
+      "name": "PIL",
+      "scope": "optional",
+      "type": "library"
+    },
+    {
       "bom-ref": "opt:PySide6",
       "description": "软依赖（可选，须守卫）：CCV3 卡面占位图写入（缺依赖须给明确修复指引，不得裸 ImportError）",
       "name": "PySide6",
@@ -25,13 +25,6 @@
       "scope": "optional",
       "type": "library",
       "version": "6.11.2"
-    },
-    {
-      "bom-ref": "opt:cyclonedx",
-      "description": "软依赖（可选，须守卫）：SBOM 官方 schema 验证（固定 requirements-sbom.txt）",
-      "name": "cyclonedx",
-      "scope": "optional",
-      "type": "library"
     },
     {
       "bom-ref": "opt:jsonschema",
@@ -55,13 +48,6 @@
       "name": "nf_pyengine",
       "scope": "optional",
       "type": "library"
-    },
-    {
-      "bom-ref": "opt:rdflib",
-      "description": "软依赖（可选，须守卫）：SPDX JSON-LD 展开验证（固定 requirements-sbom.txt）",
-      "name": "rdflib",
-      "scope": "optional",
-      "type": "library"
     }
   ],
   "metadata": {
@@ -70,7 +56,7 @@
       "licenses": [
         {
           "license": {
-            "id": "AGPL-3.0-only"
+            "id": "MIT"
           }
         }
       ],
@@ -87,7 +73,7 @@
         "value": "与 SPDX 面同源；timestamp 取仓内声明日期最大值（非墙钟）。"
       }
     ],
-    "timestamp": "2026-10-29T00:00:00Z",
+    "timestamp": "2026-11-09T00:00:00Z",
     "tools": [
       {
         "name": "nf interop --kind cyclonedx",

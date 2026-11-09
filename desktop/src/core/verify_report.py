@@ -15,10 +15,10 @@
 """
 from __future__ import annotations
 
+import datetime as _dt
 import hashlib
 import importlib
 import json
-from . import scan_memo
 import os
 import re
 from pathlib import Path
@@ -68,7 +68,6 @@ SPECS: Tuple[Tuple[str, str, str, str, str], ...] = (
      "judgement_coverage", "scan", "scan"),
     ("workflow_policy", "工作流供应链策略（actions 钉 40 位 SHA + 显式最小 permissions）", "workflo"
         "w_policy", "scan", "scan"),
-    ("asvs", "应用安全作用域证据（ASVS 5.0.0 L2，内部评估）", "asvs_policy", "scan", "scan"),
     ("asset_contract",
  "数字资产契约（数据/代码/脚本三面：格式+字段完整性+防篡改+AST 规范+脚本 I/O 对齐）",
      "asset_contract", "scan", "scan"),
@@ -89,7 +88,13 @@ def _norm(result: Any, form: str) -> Tuple[List[str], List[str], Dict[str, Any]]
     return list(result or []), [], {}
 
 
-def _call(spec: Tuple[str, str, str, str, str], root: str
+#: 涉时判据：它们的结论依赖「今天」。报告要能在**任意一天**重算出同一份字节，
+#: 所以 build/check 都允许把基准日注入进来（2026-11-07 实测：release 记录 30 天窗口
+#: 在午夜翻页，导致「内容没变、报告整份过期」——见 instruction_evidence 的提前量 WARN）。
+DATE_AWARE = frozenset({"instruction_evidence"})
+
+
+def _call(spec: tuple[str, str, str, str, str], root: str, today: Any = None
           ) -> Tuple[str, List[str], List[str], Dict[str, Any]]:
     """调一条判据 → (status, issues, warns, stats)；异常记账为 error（报告不吞错也不崩）。"""
     sid, _name, mod, entry, form = spec
@@ -105,6 +110,8 @@ def _call(spec: Tuple[str, str, str, str, str], root: str
             result = _r.verify(_r.load(root), root)
         elif entry == "check_strict":                       # repo_stats.check 需入口文件在场
             result = importlib.import_module("core.repo_stats").check(root)
+        elif mod in DATE_AWARE and today is not None:
+            result = getattr(m, entry)(root, today=today)   # 涉时判据：钉基准日
         else:
             result = getattr(m, entry)(root)
     except Exception as exc:                                # noqa: BLE001
@@ -153,39 +160,72 @@ def _portable(value: Any, root: str) -> Any:
     return value
 
 
-def build(root: str = ".") -> Dict[str, Any]:
+def build(root: str = ".", today: Any = None) -> dict[str, Any]:
     """跑全部判据 → 报告 dict（含声明/实测并排 + 稳定 digest）。
 
-    31 条判据共用一份「读面 + AST + 派生事实」缓存（`scan_memo`）：它们扫同一批文件，
-    各自重读重解析纯属浪费（实测 io.open 3.3 万次 / ast.walk 197 万次）。
+    参数 today 是涉时判据（DATE_AWARE）的基准日；缺省 = **UTC 今天**（见下）。
+    日期写进 built_for_date——否则「提交件 == 实时重算」在涉时判据上永远差一天。
+
+    为什么用 UTC 而不是本机日历：本报告是**跨平台复算**的（CI 跑 UTC、作者机常在东八区），
+    本机日历会让同一次提交在东八区/UTC 生成不同日期（实测 2026-11-07：本机 11-08 / CI 11-07），
+    「提交件 == 重算」在跨时区必红。UTC 是唯一跨机器一致的“今天”。
     """
-    scan_memo.begin()
+    if today is None:
+        today = _dt.datetime.now(_dt.UTC).date()
     items: List[Dict[str, Any]] = []
-    for sid, name, mod, entry, _form in SPECS:
-        status, issues, warns, stats = _call((sid, name, mod, entry, _form), root)
+    for spec in SPECS:
+        sid, name, mod, entry, _form = spec
+        status, issues, warns, stats = _call(spec, root, today)
         items.append({"id": sid, "name": name, "source": "%s.%s" % (mod, entry),
                       "status": status, "issues": len(issues), "warns": len(warns),
                       "stats": stats, "sample": [str(x)[:200] for x in issues[:3]]})
-    summary = {k: sum(1 for i in items if i["status"] == k)
-               for k in ("pass", "fail", "warn", "error")}
+    summary = {k: sum(1 for i in items if i["status"] == k) for k in ("pass",
+ "fail",
+ "warn",
+ "error")}
     declared = _declared(root)
-    # Z3（审计 §11ag F-04）：本报告是判据级抽查面，条数 ≠ verify 的 check 总数，差异写进声明面。
+    # Z3（审计 §11ag F-04）：本报告是**判据级抽查面**，条数不等于 verify 的 check 总数；
+    # 把「对外宣称 40 条」与「报告实际 N 条」的差写在声明面里，读者不能把两者当同一件事。
     declared["report_items"] = len(items)
     declared["coverage_note"] = ("判据级抽查面 %d 条，各对应 verify.sh 的一道或多道门禁；"
                                  "≠ 声明 check 总数 %s（两者不可互替）"
                                  % (len(items), declared.get("expected_checks")))
     body = _portable(
-        {"schema": SCHEMA, "items": items, "summary": summary, "declared": declared},
+        {"schema": SCHEMA, "items": items, "summary": summary, "declared": declared,
+         "built_for_date": today.isoformat() if hasattr(today, "isoformat") else str(today)},
         root,
     )
     digest_src = json.dumps(body, ensure_ascii=False, sort_keys=True).encode("utf-8")
     body["root_digest"] = hashlib.sha256(digest_src).hexdigest()
-    scan_memo.end()                     # 作用域收尾：清缓存，避免跨次 build 吃旧值
     return body
 
 
 def render(report: Dict[str, Any]) -> str:
     return json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
+
+
+#: 报告基准日超过这么多天就提示重跑（不 FAIL：内容仍可复算，只是「今天」该刷新）
+REPORT_STALE_WARN_DAYS = 30
+
+
+def _pinned_date(recorded: dict[str, Any]) -> Any:
+    """提交件里的基准日；缺失/坏件 → None（回落到本机今天，兼容老报告）。"""
+    raw = str((recorded or {}).get("built_for_date") or "")[:10]
+    if not raw:
+        return None
+    try:
+        return _dt.date.fromisoformat(raw)
+    except ValueError:
+        return None
+
+
+def report_age_days(recorded: dict[str, Any], today: Any = None) -> Any:
+    """提交件基准日距今多少天；没有基准日返回 None（纯函数，便于单测）。"""
+    pinned = _pinned_date(recorded)
+    if pinned is None:
+        return None
+    today = today or _dt.date.today()
+    return (today - pinned).days
 
 
 def write(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
@@ -208,20 +248,35 @@ def check(root: str = ".", live: Optional[Dict[str, Any]] = None
     仍是"提交件 vs 实时"逐字段比，只是把重算成本留给调用方决定。唯一的用法约束写在测试里：
     传入的 live 必须是同一棵树、同一进程内算出的（跨进程传旧报告即等于放松判据）。
     """
-    live = build(root) if live is None else live
     p = Path(root) / REPORT_REL
+    recorded: dict[str, Any] = {}
+    if p.is_file():
+        try:
+            recorded = json_doc.load(p, dict, what=REPORT_REL)
+        except ValueError:
+            recorded = {}
+    if live is None:
+        # 以**提交件的基准日**重算涉时判据：否则「同一提交」在午夜前后会得出两种结论，
+        # 看上去像报告过期，实际只是日历翻页（2026-11-07 实测）。
+        live = build(root, today=_pinned_date(recorded))
     if not p.is_file():
-        return (["缺 %s（修复指引：python scripts/verify_report.py --write）" % REPORT_REL], live)
-    try:
-        recorded = json_doc.load(p, dict, what=REPORT_REL)
-    except ValueError as exc:
-        return (["%s 不是合法 JSON：%s（修复指引：重跑 --write）" % (REPORT_REL, exc)], live)
+        return (["缺 %s（修复指引：python scripts/verify_report.py --write）"
+                 % REPORT_REL], live)
+    if not recorded:
+        return (["%s 不是合法 JSON（修复指引：重跑 --write）" % REPORT_REL], live)
     issues: List[str] = []
     if recorded.get("root_digest") != live["root_digest"]:
         issues.append("%s 与实时重算不一致（记录=%s 实测=%s）（修复指引：重跑 "
                       "python scripts/verify_report.py --write）"
                       % (REPORT_REL, str(recorded.get("root_digest"))[:12],
                          str(live["root_digest"])[:12]))
+    age = report_age_days(recorded)
+    if age is not None and age > REPORT_STALE_WARN_DAYS:
+        # 不是 FAIL：内容仍可与基准日重算一致；但基准日太旧意味着涉时判据的"今天"该刷新了
+        live.setdefault("declared", {})["report_age_days"] = age
+        live["declared"]["report_stale_hint"] = (
+            f"报告按 {recorded.get('built_for_date')} 算（已 {age} 天），涉时判据该重跑了"
+            "（修复指引：python scripts/verify_report.py --write）")
     if recorded.get("schema") != SCHEMA:
         issues.append("%s schema 不匹配（期望 %s）（修复指引：重跑 --write）"
                       % (REPORT_REL, SCHEMA))

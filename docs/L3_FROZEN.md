@@ -33,8 +33,11 @@
 
 ## 治理同步（现状）
 
-- verify.sh v2.22：默认锁 L0-L2，clone 即绿零前置；check12 = desktop core/tests unittest 全量 + 全量 py_compile（端壳文件已不在树，compile 面随退役收窄）。
-- CI：ci-verify.yml（push main 触发 verify.sh）；e2e-desktop.yml（headless core 直驱，无需 GUI）；release-gate.yml（v* tag 即跑 verify+基线+覆盖率）。
+- verify.sh v2.30：默认锁 L0-L2，clone 即绿零前置；check12 = desktop core/tests unittest 全量 + 全量 py_compile（端壳文件已不在树，compile 面随退役收窄）。
+- CI（2026-11-08 现状）：**required** = `static-checks-42`（ci-verify.yml）与 `gate`（分支保护）；另有 coverage.yml（core ≥80%）、sast.yml / lint.yml / dependency-audit.yml / scorecard.yml（静态与供应链面）、cross-lang.yml（跨语言矩阵）、cross-platform.yml（Win/Linux/macOS 三平台 verify --full）、rust-crate.yml（Rust 主 crate + PyO3；ubuntu+windows）、dotnet-build.yml（.NET 引擎；ubuntu+windows）、e2e-desktop.yml（headless core 直驱，无需 GUI）、release-gate.yml（v* tag 即跑 verify+基线+覆盖率）；辅助：linux-parity-refresh.yml（周检跨平台漂移）、ci-health.yml（schedule 静默红看门狗）、npm-package-check.yml（payload stage/verify 的 PR 面）、codeql.yml（代码扫描：python+js/ts，恢复 not-configured 后的可见性）、net-probes.yml（手动跑批，需金标快照 ref，见 task-34）。
+- 门禁完整性事实（2026-11-09 三处实测修复，均有源码守卫测试）：① 所有 `| tee` 步骤必须 `shell: bash`（GitHub 默认 `bash -e` 无 pipefail，退出码被 tee 吞 → SAST 门禁曾假绿）；② `gate` 必须 `if: always()` 并显式校验 `needs.*.result`（required check 的 skipped 视为通过，曾放行测试红）；③ `linux-parity-refresh` 的 posix SAST 漂移判定逐键比对（只比总数会漏「一规则 +1、另一规则 -1」）。
+- Actions 版本（2026-11-09 升级，node24 面）：`actions/checkout` **v7**（3d3c42e5…）、`actions/setup-python` **v6**（ece7cb06…）、`actions/upload-artifact` **v7**（cf430e03…）、`github/codeql-action` **v4**（33d7b85d…）——全部 pin SHA；升级前是 node20 版（被 runner 强制跑 Node 24，annotation 已警告）。
+- 分支保护事实（2026-11-08 API 核对 `/branches/main/protection`）：required checks = `static-checks-42` + `gate`（**strict**：分支须与 main 同步才算过）；`enforce_admins=true`（管理员同样受约束）；`required_linear_history=true`（禁 merge commit，只能 squash/rebase）；禁 force push / 删分支；必须解决会话（required_conversation_resolution）；`required_approving_review_count=0`（无强制评审，允许自动合并）。
 
 ## 纪律（退役后）
 

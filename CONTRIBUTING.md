@@ -101,6 +101,12 @@ python3 -m compileall -q desktop/src scripts
 - **core 零第三方依赖**（纯标准库）；确需引入第三方依赖先开 Issue 讨论。
 - 新增可测逻辑放 desktop/tests/，纳入 unittest 体系（check12）；暂不做端到端 / GUI 测试入 CI。
 - **批量文本改写用 `python scripts/rewrite_text.py`**（默认**干跑**：先出「文件:行号 + 改前 → 改后」对照表，`--write` 才落盘，命中数超 `--max-hits` 直接拒绝）。纪律：改盘一律走 `core.atomic_write`，且**不做无对照的全仓替换**——写盘前先看表（判据：`desktop/tests/test_rewrite_tool.py`）。
+- **冻结链/投影：新增或改名文件先 `git add`，再跑 `nf layers --write` 及后续重冻（verify_report/conformance/approve/receipts/audit）**。投影走 git 追踪面（`git ls-files`），未跟踪文件会被少算——提交后 CI 检出（tracked）重算即不一致（#168/#178/#182 三次同因，shard 12/17/19/26 红）。`nf layers --write` 现在会对未跟踪文件打 warn，但**不替用户 `git add`**。
+- **打包/站点面（packaging/、site/）**：每个 PR 都会跑 `npm-package-check`（payload stage → verify-package → 包内冒烟 → `npm pack --dry-run` → tarball 逐字节 → 站点数字↔payload 对账 → 断言 stage 不改受跟踪文件）。本地复现：`cd packaging/npm && npm run stage && npm run verify`；payload 未暂存时 `test_npm_package` 的两条自检会显式 skip（`release_conclusion` 现会 warn，提示先 stage）。
+  **数字同步（2026-11-08 实测）**：payload 含 docs/protocol，**任何文档或协议改动都可能让解包体积越过「N 件 / M MB」的两位小数边界**——`npm-package-check` 会在 PR 上判红并给出准确的新值；按提示跑 `cd packaging/npm && node tools/stage-payload.mjs --sync-readme` 与 `node site/tools/sync-numbers.mjs --write`，把 README/site/llms-full 的数字同步后一起提交（别手改数字）。
+  **本地 stage 过的 payload 会随 HEAD 过期**（2026-11-09 实测）：切分支/换 HEAD 后跑 `bash verify.sh --full`，
+  `test_npm_package.test_package_verifier_passes` 会因清单 `source_commit` ≠ HEAD 而红——这是 fail-closed 预期行为；
+  重新 `cd packaging/npm && npm run stage`（在目标 HEAD/干净树上）即恢复。CI 干净检出不受影响。
 
 ### 4.3 社区领域包（community/）
 - 遵循 R1（包间禁互引）/ R2（类别独占）/ R3（装配契约）；新模块走 02 §8.1 登记，跑 verify.sh check7–11。
@@ -162,20 +168,14 @@ python3 -m compileall -q desktop/src scripts
 - **Release 校验和**：发布资产随行 `sha256sum` 校验和文件（用户下载后可验完整性）。
 - **secret 扫描**：提交前自查常见 token 前缀（`ghp_` / `gho_` / `sk-` 等）；完整自动扫描入 ci-verify 为波 A 项（40 总纲 S8 全量，v2.7）。
 
-## 7. 贡献授权（CLA · 双授权必需）
+## 7. 贡献授权（inbound = outbound · DCO）
 
-> 依据：`STRATEGY.md §四`、`LICENSING.md §6`；双授权需要贡献者**明示授权**作者以商业/专有许可再许可。
+> 依据：2026-10-10 全仓审计 §11af（贡献者条款此前 DCO/CLA/inbound/outbound 全 0）。
 
-- **inbound = outbound（Z6 口径）**：你提交的贡献以**项目当前许可**（代码层 AGPL-3.0-only）发布；**商业再许可**不靠该口径，而由 CLA §2.3 单独明示授权。
-- **必须签署 CLA**：贡献者需签署 `CLA.md`（改编自 **Harmony Combined Contributor Agreement v1.0 · Option Five**）。
-  其 §2.3 原文：*"We may license the Contribution under any license, including copyleft, permissive,
-  **commercial, or proprietary** licenses."* —— 这是商业闭源再许可的**唯一**合法授权来源。
-  签署方式见 `CLA.md` 的 SUBMISSION_INSTRUCTIONS（CLA Assistant 机器人回复一句话即可）。
-- **DCO 不是授权工具**：DCO 只声明"我有权提交该作品"，其效果是把贡献按**项目当前许可**（AGPL）发布，
-  **不包含**商业再许可授权。本仓**不**用 DCO 承载商业授权（旧文案曾误写，2026-10-25 已纠正）。
-  仍建议 `git commit -s`（便于追溯作者与来源），但它是**补充**，不是替代 CLA 的授权。
-- **你保留版权**；CLA 是**许可**（非版权转让，本仓采用 License 版而非 Assignment 版）。
-- **实体贡献**：受雇期间产出需雇主签 Entity 版本（`CLA.md` 已含 Entity 条款）。
+- **inbound = outbound**：你提交到本仓库的任何贡献（代码 / 文档 / 协议补丁 / 社区包）均按本仓库的
+  **MIT 许可**（见 LICENSE）授权分发；你保留版权，**不额外要求 CLA**。
+- **DCO**：提交信息须带 `Signed-off-by: 真实姓名 <邮箱>`（`git commit -s`），表示你有权按上述
+  条款提交该内容。无法签署 DCO 的贡献，请先联系维护者（见 MAINTAINERS.md）。
 - **投稿（`library/` 与 `community/`）**：见 `library/INDEX.md` 的投稿须知（机读闸门真源 = `library/intake.json`）——投稿即声明原创
   或已获授权；这类内容的许可声明见 `LICENSES/LicenseRef-Community-Submission.txt`。
 - **不得提交专有/未授权内容**：引用第三方内容须注明来源与许可（2026-10-10 审计 X1 即此类事故，

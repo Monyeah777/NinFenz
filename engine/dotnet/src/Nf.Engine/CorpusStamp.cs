@@ -36,7 +36,7 @@ public static class CorpusStamp
 
     public static Result Check(string root) =>
         new(Fingerprint(root), Baseline, Fingerprint(root) == Baseline,
-            !RepoCache.IsWorkingTree(root));
+            !Directory.Exists(Path.Combine(root, ".git")));
 
     /// <summary>语料指纹（前 16 位十六进制）。</summary>
     public static string Fingerprint(string root)
