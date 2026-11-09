@@ -152,5 +152,27 @@ class RealRepoTest(unittest.TestCase):
         self.assertTrue(all("==" in l for l in pins), "SAST 工具须固定版本：%s" % pins)
 
 
+    def test_scan_targets_cover_terminal_and_packaging(self):
+        """扫描面必须覆盖 tui/ 与 packaging/（2026-11-09 task-40 扩面；勿被改回去）。"""
+        src = (ROOT / "scripts" / "sast_check.py").read_text(encoding="utf-8")
+        line = next((ln for ln in src.splitlines() if ln.startswith("SCAN_TARGETS =")), "")
+        self.assertIn('"tui"', line, "SAST 扫描面丢了 tui/（终端主入口）")
+        self.assertIn('"packaging"', line,
+                      "SAST 扫描面丢了 packaging/（含对公网 hf-space server.py）")
+
+
+    def test_generated_payload_is_excluded_from_scan(self):
+        """生成副本 `packaging/npm/payload/**` 必须排除（2026-11-09 #271 实测）。
+
+        它是 `stage-payload.mjs` 从仓库树生成的镜像（gitignored）。扫它会同一份代码双计数，
+        且基线随「本地是否 stage 过」漂移——nt 段确被本地 payload 污染过 35 个键。
+        """
+        src = (ROOT / "scripts" / "sast_check.py").read_text(encoding="utf-8")
+        self.assertIn('SCAN_EXCLUDE = ("packaging/npm/payload",)', src,
+                      "SAST 扫描未排除生成副本 payload")
+        self.assertIn('"-x", ",".join(SCAN_EXCLUDE)', src, "bandit 未使用 SCAN_EXCLUDE")
+        self.assertIn('"--exclude", ",".join(SCAN_EXCLUDE)', src, "ruff 未使用 SCAN_EXCLUDE")
+
+
 if __name__ == "__main__":
     unittest.main()

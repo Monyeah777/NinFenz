@@ -29,7 +29,14 @@ from core import json_doc  # noqa: E402 - 承重件在 desktop/src，脚本须�
 
 BASELINE_REL = "protocol/sast_baseline.json"
 SCHEMA = "nf-sast/1"
-SCAN_TARGETS = ("desktop/src", "scripts", ".github/scripts")
+#: 扫描面（2026-11-09 扩）：原只有 desktop/src+scripts+.github/scripts；tui/ 是终端主入口、
+#: packaging/ 含对公网 hf-space server.py（CodeQL critical 曾落在这里）与 npm 打包工具——都不在面内。
+#: 扩面后按两平台实测重冻基线（nt/posix 各自），并经 cross-platform 三平台验证（task-40）。
+SCAN_TARGETS = ("desktop/src", "scripts", ".github/scripts", "tui", "packaging")
+#: 扫描排除：`packaging/npm/payload/**` 是 `stage-payload.mjs` 生成的**构建副本**（gitignored，
+#: 内容=仓库树的镜像）。扫它会把同一份代码算两遍、并让基线随本地是否 stage 过而漂移
+#: （2026-11-09 实测：nt 基线曾被本地 payload 的 35 个键污染，CI 无 payload 时反被当成漂移）。
+SCAN_EXCLUDE = ("packaging/npm/payload",)
 #: 计数**按平台分段**：同一棵树在 Linux 与 Windows 上的命中面并不相同（实测 2026-09-29：Linux
 #: bandit 33 / ruff-S 75，Windows 32 / 74，差别在 `S603/S607` 一类子进程规则）。棘轮语义不变——
 #: 每个平台各自只许下降；缺本平台段即 FAIL（修复指引：在该平台跑 `--write` 落段）。
@@ -67,7 +74,7 @@ def _counts(rows: list, field: str) -> dict:
 def bandit_counts() -> tuple:
     """→ (counts, meta)：{(文件, 规则): n}；工具缺失 → ({}, {"error": ...})。"""
     code, out, err = _run([sys.executable, "-m", "bandit", "-r", *SCAN_TARGETS,
-                           "-f", "json", "-q"])
+                           "-x", ",".join(SCAN_EXCLUDE), "-f", "json", "-q"])
     if "No module named" in err or code in (124, 127):
         why = err.strip().splitlines()[-1] if (code == 124 and err.strip()) else "bandit 不在"
         return {}, {"error": "%s（修复指引：pip install -r .github/requirements-sast.txt）" % why}
@@ -84,6 +91,7 @@ def bandit_counts() -> tuple:
 def ruff_counts() -> tuple:
     """→ (counts, meta)：ruff `--select S` 的 {(文件, 规则): n}。"""
     code, out, err = _run([sys.executable, "-m", "ruff", "check", "--select", "S",
+                           "--exclude", ",".join(SCAN_EXCLUDE),
                            "--output-format", "json", *SCAN_TARGETS])
     if "No module named" in err or code in (124, 127):
         why = err.strip().splitlines()[-1] if (code == 124 and err.strip()) else "ruff 不在"
@@ -200,7 +208,12 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="SAST 基线闸门（bandit + ruff-S 计数棘轮）")
     ap.add_argument("--write", action="store_true", help="冻结当前计数为基线")
     ap.add_argument("--json", action="store_true", help="打印当前计数")
+    ap.add_argument("--platform", default="", choices=("", "nt", "posix"),
+                    help="覆盖「本平台段」选择（缺省=当前平台）；跨平台基线维护用")
     args = ap.parse_args(argv)
+    global PLATFORM
+    if args.platform:
+        PLATFORM = args.platform
 
     if args.write:
         issues, section = write()

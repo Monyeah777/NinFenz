@@ -163,11 +163,15 @@ def _portable(value: Any, root: str) -> Any:
 def build(root: str = ".", today: Any = None) -> dict[str, Any]:
     """跑全部判据 → 报告 dict（含声明/实测并排 + 稳定 digest）。
 
-    参数 today 是涉时判据（DATE_AWARE）的基准日；缺省 = 本机日历今天。写盘时把实际用的
-    日期记进 built_for_date——否则「提交件 == 实时重算」在涉时判据上永远差一天。
+    参数 today 是涉时判据（DATE_AWARE）的基准日；缺省 = **UTC 今天**（见下）。
+    日期写进 built_for_date——否则「提交件 == 实时重算」在涉时判据上永远差一天。
+
+    为什么用 UTC 而不是本机日历：本报告是**跨平台复算**的（CI 跑 UTC、作者机常在东八区），
+    本机日历会让同一次提交在东八区/UTC 生成不同日期（实测 2026-11-07：本机 11-08 / CI 11-07），
+    「提交件 == 重算」在跨时区必红。UTC 是唯一跨机器一致的“今天”。
     """
     if today is None:
-        today = _dt.date.today()
+        today = _dt.datetime.now(_dt.UTC).date()
     items: List[Dict[str, Any]] = []
     for spec in SPECS:
         sid, name, mod, entry, _form = spec

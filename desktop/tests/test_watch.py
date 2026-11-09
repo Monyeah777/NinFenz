@@ -97,16 +97,24 @@ class ResponseCacheTest(unittest.TestCase):
         """
         self.assertTrue(dm.cacheable(["verify"]), "nf verify 必须在准入表内")
         self.assertTrue(dm.cacheable(["verify", "--json"]), "机器面同样可缓存")
-        dm.set_watcher(_FakeWatcher(generation=11))
-        first = dm.execute(["verify", "--json"], Path(ROOT))     # 首跑（可能触发嵌套会话）
-        dm.set_watcher(_FakeWatcher(generation=11))              # 会话收尾后重新挂上同代际
-        second = dm.execute(["verify", "--json"], Path(ROOT))
-        self.assertEqual(first, second, "同树两次响应必须逐字段相同（纯函数前提）")
-        self.assertEqual(1, dm.cache_stats()["hits"], "同代际第二跑必须命中缓存")
-        dm.set_watcher(_FakeWatcher(generation=12))              # 树变了
-        third = dm.execute(["verify", "--json"], Path(ROOT))
-        self.assertEqual(first, third)
-        self.assertEqual(1, dm.cache_stats()["hits"], "树变了必须重算（不得回放旧判定）")
+        # 代码指纹钉住：并发分片会往共享工作树里写文件，真实指纹一变就会重载模块、清掉
+        # 响应缓存（2026-11-09 Windows 全量实测 「1 != 0」偶发）。本用例要验的是**缓存准入**
+        # 与代际失效，不是外部写盘；钉住后语义不变、与外部并发解耦。
+        real_fp = dm._code_fingerprint
+        dm._code_fingerprint = lambda root: ("pinned-for-cache-test",)
+        try:
+            dm.set_watcher(_FakeWatcher(generation=11))
+            first = dm.execute(["verify", "--json"], Path(ROOT))  # 首跑（可能触发嵌套会话）
+            dm.set_watcher(_FakeWatcher(generation=11))           # 会话收尾后重挂同代际
+            second = dm.execute(["verify", "--json"], Path(ROOT))
+            self.assertEqual(first, second, "同树两次响应必须逐字段相同（纯函数前提）")
+            self.assertEqual(1, dm.cache_stats()["hits"], "同代际第二跑必须命中缓存")
+            dm.set_watcher(_FakeWatcher(generation=12))           # 树变了
+            third = dm.execute(["verify", "--json"], Path(ROOT))
+            self.assertEqual(first, third)
+            self.assertEqual(1, dm.cache_stats()["hits"], "树变了必须重算（不得回放旧判定）")
+        finally:
+            dm._code_fingerprint = real_fp
 
     def test_nested_session_release_keeps_the_outer_watcher(self):
         """**嵌套会话收尾不得拆掉外层（守护）的监听**。
@@ -381,9 +389,19 @@ class WatchDaemonIntegrationTest(unittest.TestCase):
         本用例只关心「常驻层有没有被搬回来」，故在 `finally` 里把**模块身份与常驻层一起还原**。
         """
         self._call(["--version"])
+        # 观测面取**当前** sys.modules 的模块；query_stats 走守护、超时 2s——高负载下守护回包
+        # 可能慢于断言（2026-11-09 r84 shard6 实测偶发 resident.text=0），故轮询并重读。
+        path = os.path.join(ROOT, "protocol", "LAYERS.json")
+        text = 0
+        for _ in range(100):
+            sys.modules["core.conformance_scan"].read_text_cached(path)
+            st = dm.query_stats()
+            text = ((st or {}).get("resident") or {}).get("text", 0)
+            if text > 0:
+                break
+            time.sleep(0.05)
         csc_live = sys.modules["core.conformance_scan"]
-        csc_live.read_text_cached(os.path.join(ROOT, "protocol", "LAYERS.json"))
-        self.assertGreater(dm.query_stats()["resident"]["text"], 0)
+        self.assertGreater(text, 0, "常驻语料层未被填充（守护回包慢或观测面落在旧模块）")
         saved_mods = {k: v for k, v in list(sys.modules.items())
                       if k == "core" or k.startswith("core.")}
         real = dm._code_fingerprint

@@ -1,0 +1,170 @@
+name: ci-health
+# 定时面「静默红」看门狗（2026-11-08 盲区收口）：
+# 本仓已两次遇到「schedule workflow 天天红但没人看见」（net-probes 金标 tag 不存在、gitee-poll 缺 token）。
+# 本 workflow 每天检查**每个 schedule workflow 的最新一次运行**：只要最新是失败就列出并以 rc=1
+# 显式失败（不创建 issue、不写仓库，只让红在 Actions 面上可见）。
+#
+# 为什么取「最新一次」而不是「24h 窗口」：修复提交后的 24h 内旧失败仍在窗口里，会把看门狗
+# 自己弄红（2026-11-08 首跑实测：gitee-poll 修复前的失败被计入）。「最新一次」= 当前是否真坏。
+#
+# 只看 schedule：push/PR 失败本来就在 main 检查面里；`workflow_dispatch` 手动跑失败不计入（
+# 但会作为「某 workflow 的最新运行」被看到——若最新是 dispatch 成功，自然不报警）。
+#
+# 触发密度（2026-11-08 实测）：GitHub 对 schedule 有节流——gitee-poll 的 `*/10` 实际约 3–7 小时
+# 才跑一次（其间大量 skipped），ci-health 首日 05:00 UTC 的 cron 也延迟了 1h+。故本 workflow
+# 排 **每 6 小时一次**（4 个 cron）以提高「至少有一次被投递」的概率；需要即时结论请手动 dispatch。
+#
+# 另加 **push main** 触发（只读、~8s）：每次合并都会顺带体检一次，不依赖 cron 是否被投递/是否延迟。
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 5,11,17,23 * * *'   # 每 6 小时（UTC）：平台节流下多给几次投递机会
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  actions: read
+  contents: read
+  security-events: read      # 安全面快照：code-scanning（secret-scanning/dependabot
+                             # 的专用权限键在 GITHUB_TOKEN 上不被支持 → 快照打印 NA）
+
+jobs:
+  scheduled-red-audit:
+    name: scheduled-red-audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: schedule 面「最新一次是否失败」审计
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os, urllib.request
+          repo = os.environ["REPO"]
+          url = "https://api.github.com/repos/%s/actions/runs?event=schedule&per_page=100" % repo
+          req = urllib.request.Request(url, headers={
+              "Accept": "application/vnd.github+json",
+              "Authorization": "Bearer " + os.environ["GH_TOKEN"],
+          })
+          with urllib.request.urlopen(req, timeout=60) as resp:
+              doc = json.load(resp)
+          own = ".github/workflows/ci-health.yml"
+          latest = {}
+          for r in doc.get("workflow_runs", []):
+              if r.get("path") == own:
+                  continue      # 排除自身：否则一次 schedule 失败后永远在报上一次的自己（2026-11-09 实测）
+              key = r.get("workflow_id") or r.get("name")
+              prev = latest.get(key)
+              if prev is None or r.get("created_at", "") > prev.get("created_at", ""):
+                  latest[key] = r
+          pending = [r for r in latest.values() if r.get("status") != "completed"]
+          bad = sorted((r for r in latest.values()
+                        if r.get("status") == "completed"
+                        and r.get("conclusion") in ("failure", "timed_out")),
+                       key=lambda r: r.get("name") or "")
+          if pending:
+              print("（schedule 面：%d 个 workflow 的最新运行仍在进行，跳过待其完成）" % len(pending))
+          if not bad:
+              print("schedule 面：%d 个 workflow 的最新运行均非失败（其中 %d 个在跑，未计）"
+                    % (len(latest), len(pending)))
+              raise SystemExit(0)
+          print("::error::schedule workflow 的最新运行失败（当前该定时面是坏的）：")
+          for r in bad:
+              print(f"  - {r.get('name')} #{r.get('run_number')} {r.get('created_at')} "
+                    f"{r.get('html_url')}")
+          raise SystemExit(1)
+          PY
+      - name: main 分支「最新一次」全 workflow 审计（push/schedule；抓非 required 的静默红）
+        # 为什么（2026-11-08）：required 检查只有 static-checks-42 + gate；rust-crate/dotnet-build/
+        # npm-package-check 等都是**非 required**——红着也能被 auto-merge 合进 main（#196 的
+        # windows rust 首版就是这么进来的）。本步把 main 分支上每个 workflow 的最新 completed
+        # push/schedule 运行做一次汇总：只要有一条 failure/timed_out 就判红。
+        # 口径与限制：分页取最近 300 条 main 运行（长期不跑的 workflow 可能不在窗口内，此时不报而不是假绿）；
+        # 每个 workflow 取**最新一次**（按 created_at，含未完成）：若它还在跑（in_progress/queued）则记为
+        # pending 跳过——否则「上一次红、新一次正在跑」会造成瞬时假红（2026-11-09 实测：#231 红而 #232
+        # 的 cross-platform 正在跑时被报红，18m 后 #232 绿又自愈）。cancelled/skipped 不算失败。
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os, urllib.request
+          repo = os.environ["REPO"]
+          runs = []
+          for page in (1, 2, 3):     # 最多 300 条：繁忙日 >100 条时防止某个 workflow 滑出窗口而假绿
+              url = ("https://api.github.com/repos/%s/actions/runs"
+                     "?branch=main&per_page=100&page=%d" % (repo, page))
+              req = urllib.request.Request(url, headers={
+                  "Accept": "application/vnd.github+json",
+                  "Authorization": "Bearer " + os.environ["GH_TOKEN"],
+              })
+              with urllib.request.urlopen(req, timeout=60) as resp:
+                  page_runs = json.load(resp).get("workflow_runs", [])
+              runs.extend(page_runs)
+              if len(page_runs) < 100:
+                  break
+          own = ".github/workflows/ci-health.yml"
+          latest = {}
+          for r in runs:
+              if r.get("event") not in ("push", "schedule"):
+                  continue
+              if r.get("path") == own:
+                  continue      # 排除自身：否则一次失败后每次都会把上一次的自己在报（自指死循环）
+              key = r.get("workflow_id") or r.get("name")
+              prev = latest.get(key)
+              if prev is None or r.get("created_at", "") > prev.get("created_at", ""):
+                  latest[key] = r
+          pending = [r for r in latest.values() if r.get("status") != "completed"]
+          bad = sorted((r for r in latest.values()
+                        if r.get("status") == "completed"
+                        and r.get("conclusion") in ("failure", "timed_out")),
+                       key=lambda r: r.get("name") or "")
+          if pending:
+              print("（%d 个 workflow 的最新运行仍在进行，跳过待其完成）" % len(pending))
+          if not bad:
+              print("main 分支：%d 个 workflow 的最新 push/schedule 运行均非失败"
+                    "（其中 %d 个在跑，未计）" % (len(latest), len(pending)))
+              raise SystemExit(0)
+          print("::error::main 分支有 workflow 的最新 push/schedule 运行失败（含非 required 的静默红）：")
+          for r in bad:
+              print(f"  - {r.get('name')} #{r.get('run_number')} {r.get('created_at')} "
+                    f"(event={r.get('event')}) {r.get('html_url')}")
+          raise SystemExit(1)
+          PY
+      - name: 安全面快照（信息性，不判红）
+        # 2026-11-09：把 code-scanning / secret-scanning / dependabot 的 open 计数带进 CI 日志。
+        # 只读 + continue-on-error，不改变门禁结论；端点因 token 权限不可用时打印 NA，不判红。
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          python - <<'PY'
+          import json, os, urllib.request
+          repo = os.environ["REPO"]
+          endpoints = (
+              ("code-scanning", "code-scanning/alerts?state=open&per_page=100"),
+              ("secret-scanning", "secret-scanning/alerts?state=open&per_page=100"),
+              ("dependabot", "dependabot/alerts?state=open&per_page=100"),
+          )
+          for name, path in endpoints:
+              url = "https://api.github.com/repos/%s/%s" % (repo, path)
+              req = urllib.request.Request(url, headers={
+                  "Accept": "application/vnd.github+json",
+                  "Authorization": "Bearer " + os.environ["GH_TOKEN"],
+                  "User-Agent": "nf-ci-health"})
+              try:
+                  with urllib.request.urlopen(req, timeout=30) as resp:
+                      rows = json.load(resp)
+                  print("%s open alerts: %d" % (name, len(rows)))
+              except Exception as exc:      # 权限/端点不可用 → NA（不干扰门禁）
+                  print("%s open alerts: NA (%s)" % (name, type(exc).__name__))
+          PY
+

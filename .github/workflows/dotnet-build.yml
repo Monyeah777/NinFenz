@@ -1,0 +1,65 @@
+name: dotnet-build
+# .NET 引擎线（Nf.Engine + 两个 CLI）的**编译回归面**。
+#
+# 为什么要有它（2026-11-08 盲区收口）：net-engine.yml 已随「删旧按新」退役、net-probes 又改
+# 手动且被金标快照 ref 阻塞（task-34），engine/dotnet 的**编译面**目前没有常驻 CI——源码可能
+# 静默腐烂（编译错 / 依赖漂移）。本 workflow 只构建、不跑探针（不需要金标快照），成本低可常驻；
+# 判据跑批仍走 net-probes（手动，需金标 ref）。
+#
+# 铁律（沿用 RUNBOOK）：**树外构建**——复制到 $RUNNER_TEMP 再 build，树内 bin/obj 会让
+# text-hygiene 类判据假红（实测 BOM/CRLF 全来自构建产物）。
+#
+# 平台矩阵（2026-11-08 扩展）：`engine/dotnet` 是**跨平台**引擎（Windows/Linux 都要产），
+# 只 build ubuntu 会漏平台专属 API 回归；加 windows-latest（构建用 pwsh，Ubuntu runner 也有 pwsh）。
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  dotnet-build:
+    name: dotnet-build-${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
+        with:
+          persist-credentials: false
+      - name: 工具链就绪（.NET 8；只用 runner 预装，不引 setup-dotnet）
+        shell: pwsh
+        run: |
+          dotnet --list-sdks
+          dotnet --version
+          $sdks = (dotnet --list-sdks) -join "`n"
+          if ($sdks -notmatch '(?m)^8\.') { Write-Error "缺 .NET 8 SDK"; exit 1 }
+      - name: 树外构建引擎 + 两个 CLI（BCL-only，无需 NuGet 源）
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $build = Join-Path $env:RUNNER_TEMP 'nf-engine'
+          Copy-Item -Recurse -Force engine/dotnet $build
+          dotnet build (Join-Path $build 'src/Nf.Engine/Nf.Engine.csproj') -c Release --nologo 2>&1 | Tee-Object -FilePath dotnet-build.log
+          if ($LASTEXITCODE -ne 0) { throw 'Nf.Engine 构建失败' }
+          dotnet build (Join-Path $build 'tools/nf-dotnet/nf-dotnet.csproj') -c Release --nologo 2>&1 | Tee-Object -Append -FilePath dotnet-build.log
+          if ($LASTEXITCODE -ne 0) { throw 'nf-dotnet 构建失败' }
+          dotnet build (Join-Path $build 'tools/nfparity/nfparity.csproj') -c Release --nologo 2>&1 | Tee-Object -Append -FilePath dotnet-build.log
+          if ($LASTEXITCODE -ne 0) { throw 'nfparity 构建失败' }
+      - name: 失败诊断产物（构建日志；无则跳过）
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7
+        with:
+          name: dotnet-build-log-${{ matrix.os }}
+          path: dotnet-build.log
+          if-no-files-found: warn

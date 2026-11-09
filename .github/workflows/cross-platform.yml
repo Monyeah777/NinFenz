@@ -42,13 +42,13 @@ jobs:
       PYTHONUTF8: "1"
       PYTHONIOENCODING: utf-8
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
         with:
           persist-credentials: false
           # 2026-10-22：全量 verify.sh 含 p6_evaluations（依赖 git tag/全历史）；浅克隆必红。
           fetch-depth: 0
           fetch-tags: true
-      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6
         with:
           cache-dependency-path: .github/requirements-*.txt
           cache: pip
@@ -57,10 +57,24 @@ jobs:
         shell: bash
         run: |
           if [ "$RUNNER_OS" = "Linux" ]; then
-            sudo apt-get update
-            sudo apt-get install -y libegl1 libgl1 libxkbcommon0 libdbus-1-3
+            sudo apt-get -o Acquire::Retries=3 update
+            sudo apt-get -o Acquire::Retries=3 install -y libegl1 libgl1 libxkbcommon0 libdbus-1-3
           fi
-          python -m pip install -r .github/requirements-ci.txt
+          python -m pip install --require-hashes -r .github/requirements-ci.txt
+      - name: SAST 本平台基线（Windows 段；Linux 面归 sast workflow）
+        # 2026-11-09 盲区：protocol/sast_baseline.json 的 **nt 段**此前只在本地结论里被验证，
+        # CI 没有 Windows 面（Linux 有 sast.yml）。这里用同一套 pinned bandit/ruff 在 Windows 上
+        # 跑 sast_check，与 nt 段逐键比对——基线漂移/工具版本漂移都能被 CI 抓到。
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          set -o pipefail
+          python -m pip install --require-hashes -r .github/requirements-sast.txt \
+            -r .github/requirements-lint.txt
+          # 日志放 .nf-logs/（NF_VERIFY_TMP 面）：写仓库根会被 check33 编码卫生判 CRLF
+          # （Windows tee 产生 CRLF；实测 dispatch 红）。
+          mkdir -p .nf-logs
+          python scripts/sast_check.py 2>&1 | tee .nf-logs/sast-windows.log
       - name: 冷启动前置（干净 clone 缺的 4 项；缺任一项全量门禁必红）
         shell: bash
         run: |
@@ -83,7 +97,7 @@ jobs:
           bash verify.sh --full 2>&1 | tee verify.log
       - name: 上传门禁日志（三平台各留一份；失败时同样上传）
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7
         with:
           name: verify-log-${{ matrix.os }}
           path: |
@@ -102,7 +116,7 @@ jobs:
           python scripts/verify_report.py --check
       - name: 上传门禁报告（三平台各留一份·本 run 结论）
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7
         with:
           name: verification-report-${{ matrix.os }}
           path: .artifacts/verification-report.json

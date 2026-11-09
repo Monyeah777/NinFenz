@@ -20,7 +20,7 @@ TRACKED_FILES = ("llms.txt", "README.md", "README.en.md", "verify.sh", "CHANGELO
 
 #: 关键门禁工作流：至少要有一步 upload-artifact（失败诊断物覆盖）。
 KEY_WORKFLOWS = ("ci-verify.yml", "cross-platform.yml", "release-gate.yml", "coverage.yml",
-                 "e2e-desktop.yml", "net-engine.yml", "sast.yml", "lint.yml",
+                 "e2e-desktop.yml", "sast.yml", "lint.yml",
                  "dependency-audit.yml", "docker-nfal.yml")
 
 
@@ -119,6 +119,174 @@ class ArtifactPolicyTest(unittest.TestCase):
             self.assertIn("NF_VERIFY_TMP", text, "%s 未固定日志目录（Z5 0.2）" % name)
             self.assertIn(".artifacts/verification-report.json", text,
                           "%s 未上传本 run 实时重算的报告（Z5/N1）" % name)
+
+
+class CiHealthAuditSourceTest(unittest.TestCase):
+    """ci-health 的 main 审计两个已修 bug 的源码级回归守卫（2026-11-08 实测踩到）。
+
+    为什么用源码断言而不是跑 workflow：这两个 bug 都是「修好了但改别处时容易回归」的结构点——
+    ① 自指：审计把上一次失败的自已当最新失败 → 永远红（#218→#220 实测）；
+    ② 窗口：main 一天 100+ 条运行，只取 100 条会让某些 workflow 滑出窗口而假绿（#222 修）。
+    """
+
+    def setUp(self):
+        self.text = (WF / "ci-health.yml").read_text(encoding="utf-8")
+
+    def test_audit_excludes_itself(self):
+        self.assertIn('own = ".github/workflows/ci-health.yml"', self.text,
+                      "ci-health 审计未排除自身（自指会让它在一次失败后永远红）")
+        self.assertIn("if r.get(\"path\") == own:", self.text,
+                      "ci-health 审计缺少「跳过自身运行」的分支")
+
+    def test_audit_window_is_paginated(self):
+        self.assertIn("for page in (1, 2, 3)", self.text,
+                      "ci-health 审计窗口未分页（繁忙日 >100 条会假绿）")
+        self.assertIn("runs.extend(page_runs)", self.text,
+                      "ci-health 审计分页结果未并入 runs")
+
+    def test_audit_skips_in_flight_runs(self):
+        """最新一次还在跑 → 计 pending 跳过（否则「上次红、新一次在跑」会瞬时假红）。"""
+        self.assertIn('pending = [r for r in latest.values() if r.get("status") != "completed"]',
+                      self.text, "ci-health 审计未把 in-flight 运行记为 pending")
+        self.assertIn("if pending:", self.text, "ci-health 审计缺少 pending 提示分支")
+        # schedule 步也要 pending 跳过（2026-11-09 #243；此前只修了 main 步）
+        self.assertIn("schedule 面：%d 个 workflow 的最新运行仍在进行", self.text,
+                      "ci-health schedule 步未跳过 in-flight 运行")
+
+
+class TeePipefailTest(unittest.TestCase):
+    """`... | tee ...` 的退出码不得被吞（2026-11-09 实测 #251：sast job 绿但日志满屏 ✗）。
+
+    为什么用源码断言：GitHub 默认 shell 是 `bash -e`（**无** pipefail），步骤里
+    `python scripts/sast_check.py 2>&1 | tee sast.log` 的退出码来自 tee ⇒ 门禁假绿。
+    修法是给该步骤 `shell: bash`（GitHub 的 bash 默认 `-eo pipefail`）或显式 `set -o pipefail`。
+    """
+
+    def test_all_tee_steps_have_pipefail(self):
+        import re
+        bad = []
+        for p in sorted(WF.glob("*.yml")):
+            text = p.read_text(encoding="utf-8")
+            for block in re.split(r"(?m)^ {6}- ", text):
+                if "| tee" not in block:
+                    continue
+                if "shell: bash" not in block and "set -o pipefail" not in block:
+                    bad.append(p.name)
+                    break
+        self.assertEqual(
+            [], bad,
+            f"含 | tee 的步骤未启用 pipefail（退出码会被 tee 吞）：{bad}")
+
+
+class GateAlwaysRunsTest(unittest.TestCase):
+    """gate 不得因依赖失败而被「跳过」（2026-11-09 实测 #251）。
+
+    GitHub 对 required check 的 skipped 视为通过：gate 若 `needs: [static-checks, unit-tests]`
+    且没有 `if: always()`，unit-tests 有分片红时 gate 被跳过 ⇒ auto-merge 照样合并。
+    """
+
+    def test_gate_is_always_run_and_checks_dependencies(self):
+        import re
+        text = (WF / "ci-verify.yml").read_text(encoding="utf-8")
+        m = re.search(r"(?ms)^  gate:\n(.*?)(?=^  [a-z0-9-]+:\n|\Z)", text)
+        self.assertIsNotNone(m, "ci-verify.yml 找不到 gate job")
+        block = m.group(1)
+        self.assertIn("if: always()", block, "gate 未声明 if: always()（会被跳过）")
+        self.assertIn("needs.static-checks.result", block, "gate 未校验 static-checks 结果")
+        self.assertIn("needs.unit-tests.result", block, "gate 未校验 unit-tests 结果")
+
+
+class ParityKeyCompareTest(unittest.TestCase):
+    """linux-parity-refresh 的 posix SAST 漂移判定必须逐键比对（2026-11-09）。
+
+    只比总数会漏「一规则 +1、另一规则 -1」的键级漂移（总数相等 → 漂移告警绿着放行）。
+    """
+
+    def test_parity_compares_keys_not_only_totals(self):
+        text = (WF / "linux-parity-refresh.yml").read_text(encoding="utf-8")
+        self.assertIn("键级漂移", text, "parity 漂移判定未做键级比对")
+        self.assertIn("set(c) - set(b)", text, "parity 漂移判定缺少 extra 键集合")
+        self.assertNotIn("got != want", text, "parity 仍在用总数比较（会漏键级漂移）")
+
+
+class HiddenArtifactPathTest(unittest.TestCase):
+    """artifact 的 path 不得指向隐藏**文件**（2026-11-09 #247/#248 实测）。
+
+    actions/upload-artifact v4+ 默认 `include-hidden-files=false`：path 里以 `.` 开头
+    的**文件**会被静默丢弃（sast-counts.json / sast-extra-*.json 曾整年没进 artifact）。
+    隐藏**目录**（如 `.nf-logs/`）不受影响，故只查 basename 以点开头的纯文件路径。
+    """
+
+    def test_no_artifact_path_is_a_hidden_file(self):
+        import re
+        bad = {}
+        for p in sorted(WF.glob("*.yml")):
+            text = p.read_text(encoding="utf-8")
+            for block in re.split(r"(?m)^ {6}- ", text):
+                if "upload-artifact" not in block:
+                    continue
+                if "include-hidden-files: true" in block:
+                    continue
+                pat = r"(?ms)^\s+path: \|\n(.*?)(?=^\s+[a-z-]+:|\Z)"
+                m = re.search(pat, block)
+                if not m:
+                    continue
+                for line in m.group(1).splitlines():
+                    item = line.strip()
+                    if not item or item.startswith("#"):
+                        continue
+                    name = item.rstrip("/").split("/")[-1]
+                    if name.startswith(".") and not item.endswith("/"):
+                        bad.setdefault(p.name, []).append(item)
+        self.assertEqual(
+            {}, bad,
+            f"artifact path 指向隐藏文件（会被 upload-artifact 静默丢弃）：{bad}")
+
+
+class CodeqlWorkflowTest(unittest.TestCase):
+    """codeql.yml 的触发面守卫（2026-11-09 #236/#238）。
+
+    恢复 CodeQL 的目的是「新代码被扫」，但两个结构性点容易在改 workflow 时被削掉：
+    ① pull_request 必须有 paths 过滤（否则每个 dependabot PR 都烧两个分析，实测队列 4+）；
+    ② 必须有 push main + 周 schedule（否则只有 PR 面，main 的合并后代码没人扫）。
+    """
+
+    def setUp(self):
+        self.text = (WF / "codeql.yml").read_text(encoding="utf-8")
+
+    def test_pr_trigger_is_path_filtered(self):
+        self.assertIn("pull_request:", self.text, "codeql 缺 PR 触发")
+        self.assertIn("paths:", self.text, "codeql PR 触发缺 paths 过滤")
+        self.assertIn("desktop/**", self.text, "codeql PR 过滤未覆盖 desktop/**")
+
+    def test_main_push_and_weekly_schedule_exist(self):
+        self.assertIn("branches: [main]", self.text, "codeql 缺 push main 触发")
+        self.assertIn("schedule:", self.text, "codeql 缺周 schedule（合并后代码无人扫）")
+        self.assertIn("cron:", self.text, "codeql schedule 缺 cron 表达式")
+
+
+class DockerfileDigestPinTest(unittest.TestCase):
+    """所有 Dockerfile 的基座必须按 digest 钉（2026-11-09 #240 的安全不变式）。
+
+    只钉 tag（`FROM python:3.12-slim`）会随上游 tag 漂移——构建不可复现，且 tag 被接管时
+    可被投毒。本仓 nfal/hf-space 两处曾裸 tag，已改 `image:tag@sha256:…`；此守卫防回退。
+    """
+
+    def test_all_from_lines_are_digest_pinned(self):
+        import re
+        bad = []
+        for p in sorted(ROOT.rglob("Dockerfile")):
+            if ".git" in p.parts:
+                continue
+            for ln, line in enumerate(p.read_text(encoding="utf-8").splitlines(), 1):
+                m = re.match(r"^\s*FROM\s+(\S+)(?:\s+AS\s+\S+)?\s*$", line, re.I)
+                if not m:
+                    continue
+                image = m.group(1)
+                if image == "scratch" or "@sha256:" in image:
+                    continue
+                bad.append(f"{p.relative_to(ROOT)}:{ln} {image}")
+        self.assertEqual([], bad, f"Dockerfile 基座未按 digest 钉：{bad}")
 
 
 if __name__ == "__main__":

@@ -96,7 +96,8 @@ def _base_fixture(tmp: str) -> None:
     d.mkdir(parents=True, exist_ok=True)
     for name, body in (("a.md", "# A\n\n甲\n"), ("b.md", "# B\n\n乙\n"),
                        ("c.md", "# C\n\n丙\n")):
-        atomic_write.write_text(str(d / name), body)
+        # 字节写入：文本模式在 Windows 会改写 \n，同一份证据包跨平台字节不同（合并自 main）
+        atomic_write.write_bytes(d / name, body.encode("utf-8"))
 
 
 def _case(cid: str, desc: str, verdict: str, *, bundle: bytes | None = None,

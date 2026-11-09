@@ -9,7 +9,6 @@
 """
 from __future__ import annotations
 
-import html
 import json
 import os
 import subprocess
@@ -61,11 +60,16 @@ def run_mode(mode: str, text: str = '') -> dict:
             fh.write(body)
         args += ['lint', os.path.basename(tmp_path)]
     else:
-        args += mode.split() if mode != 'stats' else ['stats', '--check']
-        if mode == 'conformance':
-            args = [PY, str(NF_ROOT / 'scripts' / 'nf.py'), 'conformance']
-        elif mode == 'doctor':
-            args = [PY, str(NF_ROOT / 'scripts' / 'nf.py'), 'doctor']
+        # 显式分支到白名单子命令（**不再**用 mode.split() 拼 argv）：即使未来白名单
+        # 表被误改，这里也不会把外部字符串拼进参数列表（code scanning
+        # py/command-line-injection 的加固写法；语义与原来逐条相等）。
+        nf_py = [PY, str(NF_ROOT / 'scripts' / 'nf.py')]
+        if mode == 'stats':
+            args = nf_py + ['stats', '--check']
+        elif mode == 'conformance':
+            args = nf_py + ['conformance']
+        else:                                  # MODES 白名单里 needs_input=False 的只剩 doctor
+            args = nf_py + ['doctor']
     _caps(args)
     env = dict(os.environ)
     env['PYTHONUTF8'] = '1'
@@ -164,7 +168,7 @@ class Handler(BaseHTTPRequestHandler):
                 return
             payload = json.loads(self.rfile.read(n).decode('utf-8') or '{}')
             result = run_mode(str(payload.get('mode') or 'stats'), str(payload.get('text') or ''))
-        except Exception as exc:  # noqa: BLE001 - 任何解析失败都按用户输入问题回，不 500
+        except Exception as exc:  # 任何解析失败都按用户输入问题回，不 500
             result = {'ok': False, 'mode': '', 'exit': 2, 'seconds': 0.0, 'command': '',
                       'output': '请求不可解析：%s（修复指引：JSON 形如 {"mode":"stats","text":""}）' % exc}
         self._send(200, json.dumps(result, ensure_ascii=False).encode('utf-8'),

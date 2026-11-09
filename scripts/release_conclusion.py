@@ -343,13 +343,15 @@ def _snapshot_prune(base: Path, keep_wt: str = "") -> list[str]:
     return stale
 
 
-def _snapshot_create(head: str, base: Path, need_mb: int = 400) -> tuple[str, str]:
+def _snapshot_create(head: str, base: Path, need_mb: int = 1200) -> tuple[str, str]:
     """在临时目录建 HEAD 的 detached worktree → (路径, 错误说明)。
 
     为什么要快照（2026-11-06 实测）：本仓常有并发 agent 会话，它们会在我跑 36 分钟门禁的
     时候提交、改文件、甚至改门禁脚本自己——8 片于是落在不同状态上，红绿都不可信。
     快照把结论**钉在一个 SHA** 上：证明「这个提交的内容是绿的」，与工作区完全解耦。
     """
+    # 需求 1200 MB（合并自 main）：实测一次「副本落地 + 8 片并发」要 >1 GB，84 MB 余量撑不到 50 分钟；
+    # 宁可在起跑前拒绝，也不浪费一次全量。
     free = _snapshot_free_bytes(base)
     if 0 <= free < need_mb * 1024 * 1024:
         return "", (f"快照落点空间不足（{base} 可用 {free // 1048576} MB，需 ≥{need_mb} MB）"

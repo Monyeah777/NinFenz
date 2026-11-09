@@ -379,8 +379,11 @@ class AdditionalCarriersTest(unittest.TestCase):
     def test_webp_chunk_round_trip(self):
         import io as _io
 
-        import numpy as np
-        from PIL import Image
+        try:
+            import numpy as np
+            from PIL import Image
+        except ModuleNotFoundError as exc:
+            self.skipTest(f"环境缺可选图像依赖（{exc.name}）：WebP 往返需 Pillow+numpy")
         img = Image.fromarray(np.zeros((64, 64, 3), dtype=np.uint8), "RGB")
         buf = _io.BytesIO()
         img.save(buf, "WEBP", lossless=True)
