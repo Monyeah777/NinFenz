@@ -301,7 +301,6 @@ class PackContentTest(unittest.TestCase):
         第 137 轮把入口列补进文档后，必须保证它不会漂——命令写错、命令被删都会红。
         """
         import re
-        import subprocess
 
         doc = (ROOT / "docs" / "ccos" / "method-packs-v0.md").read_text(encoding="utf-8")
         rows = [ln for ln in doc.splitlines() if ln.startswith("| `")]
