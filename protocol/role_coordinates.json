@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1463,
+    "app": 1464,
     "entry": 26,
     "floor": 5,
     "prod": 1057,
     "projection": 161,
     "support": 440,
-    "verify": 1035
+    "verify": 1036
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9299,6 +9299,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "脚本孤儿棘轮：不许新增「没有任何入口指向」的脚本（第 141 轮）。",
+      "path": "desktop/tests/test_script_orphans.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "P-C5 判据：密封跑法（Dockerfile.crosscheck）与 CI 接线必须是**真钉住**的，不是摆样子。",
       "path": "desktop/tests/test_sealed_crosscheck.py",
       "role": "verify",
@@ -12594,16 +12600,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "fb924cce85d5c8deebd70059037d8c7279a9a605307bc9f1ce747eb2e8764dce",
+  "root_digest": "2663baa98fd202ccc0ed9de5f726f8b27b04c4942a281295c0f70e41d36bb606",
   "rule_counts": {
-    "R-app": 1463,
+    "R-app": 1464,
     "R-catch": 293,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 141,
     "R-support": 119,
-    "R-verify": 909,
+    "R-verify": 910,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

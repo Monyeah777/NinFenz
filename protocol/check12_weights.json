@@ -327,6 +327,7 @@
     "test_schema_pins": 0.1,
     "test_schema_reference": 0.4,
     "test_scratch": 0.3,
+    "test_script_orphans": 1.1,
     "test_sealed_crosscheck": 0.2,
     "test_seed_from_repo": 0.2,
     "test_selfcontained_rebuild": 0.2,
@@ -3979,6 +3980,10 @@
     "test_scratch.ScratchDirTest.test_new_dir_is_unique_and_exists": 0.01,
     "test_scratch.ScratchDirTest.test_scratch_dir_cleans_up_on_exception": 0.01,
     "test_scratch.ScratchDirTest.test_scratch_dir_cleans_up_on_success": 0.01,
+    "test_script_orphans.ScriptOrphanTest.test_frozen_list_is_not_stale": 0.32,
+    "test_script_orphans.ScriptOrphanTest.test_no_new_orphan_scripts": 0.32,
+    "test_script_orphans.ScriptOrphanTest.test_orphans_are_documented": 0.0,
+    "test_script_orphans.ScriptOrphanTest.test_scan_is_not_vacuous": 0.27,
     "test_sealed_crosscheck.DockerfileTest.test_arg_placeholders_are_all_defined": 0.0,
     "test_sealed_crosscheck.DockerfileTest.test_build_context_excludes_artifacts": 0.0,
     "test_sealed_crosscheck.DockerfileTest.test_does_not_duplicate_the_repository_gate": 0.0,
@@ -4586,5 +4591,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1870.9
+  "total_s": 1872.0
 }

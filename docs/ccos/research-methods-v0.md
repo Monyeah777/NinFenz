@@ -5,8 +5,10 @@
 
 ## 相关文档
 
-- 领域方法包（八个域的动作与证据标准）：[method-packs-v0.md](method-packs-v0.md)
-- 双核同构判据矩阵（5 覆盖 / 4 缺失）：[isomorphism-matrix.md](isomorphism-matrix.md)
+- 领域方法包（十一个域的动作、证据标准与可跑入口）：[method-packs-v0.md](method-packs-v0.md)
+- 双核同构判据矩阵（9 覆盖 / 0 缺失）：[isomorphism-matrix.md](isomorphism-matrix.md)
+- 判据族谱（七族检查对象与失效方式）：[judge-families.md](judge-families.md)
+- 一次性审计脚本清单：[one-shot-audits.md](one-shot-audits.md)
 
 ## 解决什么
 
