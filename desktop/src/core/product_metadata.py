@@ -513,7 +513,8 @@ def check(root: str | Path = ".") -> list[str]:
         if "GNU AFFERO GENERAL PUBLIC LICENSE" not in license_text:
             issues.append("根 LICENSE 不是 AGPL-3.0 文本")
     except OSError:
-        # 文件不可读由上方 is_file() / 缺失文件判据 fail-closed 报告；这里只避免二次读取把同一问题重复记账
+        # 不可读由上方 is_file() / 缺失判据 fail-closed 报告；
+        # 这里只避免二次读取把同一问题重复记账。
         pass
 
     issues.extend(drift(r))
