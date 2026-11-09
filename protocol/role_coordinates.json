@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 160,
     "support": 439,
-    "verify": 1033
+    "verify": 1034
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7955,6 +7955,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "文档里引用的探针数字必须与结果件一致（第 133 轮）。",
+      "path": "desktop/tests/test_docs_cite_probe_numbers.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "域包工厂 + 域功能引擎单测：口径公式 / 夹具确定性 / 生成器幂等 / 唯一性守卫 /",
       "path": "desktop/tests/test_domain_pack.py",
       "role": "verify",
@@ -12582,7 +12588,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "b6b54d89d69ff40e94e52c187eca77c9b97528f9a4eb2f4e76ddeea872c8c8bb",
+  "root_digest": "8c31c1cb68fc663a423f0f1bbc05c029ba2a09b153da023c1f2fe793bad52c85",
   "rule_counts": {
     "R-app": 1463,
     "R-catch": 292,
@@ -12591,7 +12597,7 @@
     "R-prod": 944,
     "R-projection": 140,
     "R-support": 119,
-    "R-verify": 907,
+    "R-verify": 908,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

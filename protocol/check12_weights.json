@@ -103,6 +103,7 @@
     "test_doc_reachability": 10.3,
     "test_doc_routing": 0.2,
     "test_doc_truth": 0.4,
+    "test_docs_cite_probe_numbers": 0.1,
     "test_domain_pack": 0.3,
     "test_domain_pack_render": 0.3,
     "test_dotnet_aot": 0.2,
@@ -1558,6 +1559,8 @@
     "test_doc_truth.TestServeEntryNeedsNoSnapshot.test_driver_binding_has_no_snapshot_requirement": 0.0,
     "test_doc_truth.TestSkillCommandFace.test_extraction_reuses_command_face_rule": 0.0,
     "test_doc_truth.TestSkillCommandFace.test_skill_commands_are_registered": 0.0,
+    "test_docs_cite_probe_numbers.ProbeNumberDocsTest.test_doc_numbers_match_results": 0.0,
+    "test_docs_cite_probe_numbers.ProbeNumberDocsTest.test_judge_can_be_killed": 0.0,
     "test_domain_pack.FactoryTest.test_build_dry_run_writes_nothing": 0.0,
     "test_domain_pack.FactoryTest.test_built_packs_match_generator": 0.0,
     "test_domain_pack.FactoryTest.test_identifier_uniqueness": 0.02,
@@ -4577,5 +4580,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1869.9
+  "total_s": 1870.0
 }
