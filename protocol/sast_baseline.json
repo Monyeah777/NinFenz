@@ -3,6 +3,8 @@
   "platforms": {
     "nt": {
       "bandit": {
+        ".github/scripts/gitee_ingest.py::B310": 1,
+        ".github/scripts/library_ingest.py::B310": 1,
         "desktop/src/core/daemon.py::B110": 8,
         "desktop/src/core/daemon.py::B404": 1,
         "desktop/src/core/daemon.py::B603": 1,
@@ -20,41 +22,6 @@
         "packaging/hf-space/server.py::B104": 1,
         "packaging/hf-space/server.py::B404": 1,
         "packaging/hf-space/server.py::B603": 1,
-        "packaging/npm/payload/desktop/scripts/seed_from_repo.py::B108": 1,
-        "packaging/npm/payload/desktop/src/core/daemon.py::B110": 8,
-        "packaging/npm/payload/desktop/src/core/daemon.py::B404": 1,
-        "packaging/npm/payload/desktop/src/core/daemon.py::B603": 1,
-        "packaging/npm/payload/desktop/src/core/gate_inproc.py::B102": 2,
-        "packaging/npm/payload/desktop/src/core/ingest_common.py::B404": 1,
-        "packaging/npm/payload/desktop/src/core/ingest_common.py::B603": 1,
-        "packaging/npm/payload/desktop/src/core/ingest_common.py::B607": 1,
-        "packaging/npm/payload/desktop/src/core/pack_combo.py::B311": 1,
-        "packaging/npm/payload/desktop/src/core/provenance_external.py::B404": 1,
-        "packaging/npm/payload/desktop/src/core/rust_engine.py::B110": 1,
-        "packaging/npm/payload/desktop/src/core/rust_engine.py::B404": 1,
-        "packaging/npm/payload/desktop/src/core/rust_engine.py::B603": 3,
-        "packaging/npm/payload/desktop/src/core/rust_engine.py::B607": 1,
-        "packaging/npm/payload/desktop/src/core/watch.py::B110": 1,
-        "packaging/npm/payload/scripts/check_external_links.py::B104": 1,
-        "packaging/npm/payload/scripts/instruction_evidence.py::B404": 1,
-        "packaging/npm/payload/scripts/instruction_evidence.py::B603": 1,
-        "packaging/npm/payload/scripts/nf.py::B404": 1,
-        "packaging/npm/payload/scripts/nf.py::B603": 5,
-        "packaging/npm/payload/scripts/perf_budget.py::B404": 1,
-        "packaging/npm/payload/scripts/perf_budget.py::B603": 1,
-        "packaging/npm/payload/scripts/sast_check.py::B404": 1,
-        "packaging/npm/payload/scripts/sast_check.py::B603": 1,
-        "packaging/npm/payload/scripts/style_check.py::B404": 1,
-        "packaging/npm/payload/scripts/style_check.py::B603": 1,
-        "packaging/npm/payload/scripts/verify_cache.py::B404": 1,
-        "packaging/npm/payload/scripts/verify_cache.py::B603": 1,
-        "packaging/npm/payload/scripts/verify_run.py::B404": 1,
-        "packaging/npm/payload/scripts/verify_tests.py::B404": 1,
-        "packaging/npm/payload/scripts/verify_tests.py::B603": 2,
-        "packaging/npm/payload/scripts/verify_tests.py::B607": 2,
-        "packaging/npm/payload/tui/nf.py::B101": 31,
-        "packaging/npm/payload/tui/nf.py::B404": 1,
-        "packaging/npm/payload/tui/nf.py::B603": 2,
         "scripts/check_external_links.py::B104": 1,
         "scripts/instruction_evidence.py::B404": 1,
         "scripts/instruction_evidence.py::B603": 1,
@@ -81,14 +48,14 @@
           "severities": [
             [
               "LOW",
-              158
+              80
             ],
             [
               "MEDIUM",
-              8
+              6
             ]
           ],
-          "total": 166
+          "total": 86
         },
         "ruff": {
           "total": 118
