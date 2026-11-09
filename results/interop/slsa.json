@@ -179,9 +179,6 @@
           "uri": "nf://repo/protocol/schema/asset.schema.json"
         },
         {
-          "uri": "nf://repo/protocol/schema/asset_contracts.schema.json"
-        },
-        {
           "uri": "nf://repo/protocol/schema/contract.schema.json"
         },
         {
@@ -221,7 +218,7 @@
         "id": "https://ninfenz.dev/builder/verify-sh"
       },
       "metadata": {
-        "invocationId": "22d7c7c6fed66f2f",
+        "invocationId": "c862e67b1b3242ce",
         "note": "本地门禁执行事实；**不构成 SLSA 等级声明**（无远程 builder）"
       }
     }
@@ -260,7 +257,7 @@
     },
     {
       "digest": {
-        "sha256": "ba9f46f80fae844c614bebf52a8d392606ee59114f51a09696b20c43d695d350"
+        "sha256": "53f88cb2246f954036fb5577506ac883ba2394cf5b8937194a9155b831671f2c"
       },
       "name": "llms.txt"
     },
@@ -332,7 +329,7 @@
     },
     {
       "digest": {
-        "sha256": "177763f62f6e4aa736f613f8478bf5ef3a5f978a75872baf9f7947b818bbb37b"
+        "sha256": "5ef1a8adf15fd1030e8846437ba93af1fb210d2b8a57540b4d2ee35a022a4e4a"
       },
       "name": "protocol/conformance_report.json"
     },
@@ -356,19 +353,19 @@
     },
     {
       "digest": {
-        "sha256": "ecbbaf257d30cde02fc07b79445db697d276275f11dbbbaae982462365a3d37b"
+        "sha256": "54c4a0aac037716270026397aba46b69897e1f89a09dad0737604cafc3148268"
       },
       "name": "protocol/role_coordinates.json"
     },
     {
       "digest": {
-        "sha256": "45ea7f4c7fa4c006b11a323c64b67ee1cf639d790807e67340d4ed2c5d3c1fff"
+        "sha256": "9d65db374221c26f8c093f8522ac5ddcf59b2029711726203287d713bc147498"
       },
       "name": "protocol/code_metrics_baseline.json"
     },
     {
       "digest": {
-        "sha256": "4122c9813e63525faa204ed22771d80c04be2600b4b0112446dec1527e2d8910"
+        "sha256": "3e6a9a6a08a2e9fd3d83eb344bd794409b945cc9e8d222390583fe90179333c6"
       },
       "name": "protocol/coupling_baseline.json"
     },
@@ -380,13 +377,13 @@
     },
     {
       "digest": {
-        "sha256": "935562e73e3c465f81d45f1c65a4a446919a56ee4c23092f603751e791fe2cd3"
+        "sha256": "e59b380d55c1bc6c8008ae616204b4ec29fe5488110539efaceb21dbf2fe7fa5"
       },
       "name": "protocol/instruction_evidence.json"
     },
     {
       "digest": {
-        "sha256": "bd408ead44d97cb6120a8c0207cd1cb7d5227297f17d50107933c7d03d45c6aa"
+        "sha256": "e4d3a4cfb1a68a78ff5e138d4df760adad9175ffe8ee158e223c5beb9d58acff"
       },
       "name": "protocol/perf_budget.json"
     },
@@ -398,7 +395,7 @@
     },
     {
       "digest": {
-        "sha256": "06ab8bd77c2733ac3804b1dc235d504dd2b6ab0a85220dbed00b2783948ce14a"
+        "sha256": "ff715f63471d7b6f74a3c86abe1c6f0671bcb77546b7eeb9594dbb6ec0321590"
       },
       "name": "protocol/sast_baseline.json"
     },
@@ -422,7 +419,7 @@
     },
     {
       "digest": {
-        "sha256": "6c5e58b522bdb7b7f363f89bf7bda218b04728e17ad62134eaf97d2dbd92d07e"
+        "sha256": "e1df435c08e07f32716d378dcce7f6fc04e9b86735c09a6635236fe463480584"
       },
       "name": "protocol/endpoint_contract.json"
     },
@@ -458,7 +455,7 @@
     },
     {
       "digest": {
-        "sha256": "6e6687965cd887cb5253fe811898746001d8f93719688803229205ad8fbb8cde"
+        "sha256": "f6db86aa2ef8bdc93f8a8d81c26bbef27b57bac7c7fd5450cbf748e5b4cb0429"
       },
       "name": "protocol/locales.json"
     },
@@ -506,7 +503,7 @@
     },
     {
       "digest": {
-        "sha256": "914c5dfe05763ecab52cea35cb72fd34026cd2522ca37fbebc0a86596a1d01eb"
+        "sha256": "cce69546ca42d2d5fb3785a22d51e8cd6c49229d8d2f35c4abb1d2b9ee0a91b3"
       },
       "name": "protocol/audit.json"
     },
@@ -530,7 +527,7 @@
     },
     {
       "digest": {
-        "sha256": "0c310bbf890681b77b2155f99235c9d592163104c7d6193a7b0578ed6dae2e42"
+        "sha256": "3ce52967a99ed99ab5265cbd08d18e5ae2fc4301ff015d62cb14dc9e968699bf"
       },
       "name": "protocol/mcp_package.json"
     },
@@ -557,12 +554,6 @@
         "sha256": "b1987e8a8f41deb886d26769382a4f129eee5e31b12f3ec9687bad7c8c31213f"
       },
       "name": "protocol/schema/asset.schema.json"
-    },
-    {
-      "digest": {
-        "sha256": "c9e39d009b8753805982b81ffb4b0f55fe94b009452fd42039dd97183e62ec7e"
-      },
-      "name": "protocol/schema/asset_contracts.schema.json"
     },
     {
       "digest": {

@@ -1,4 +1,5 @@
 {
+  "built_for_date": "2026-11-09",
   "declared": {
     "coverage_note": "判据级抽查面 32 条，各对应 verify.sh 的一道或多道门禁；≠ 声明 check 总数 42（两者不可互替）",
     "expected_checks": 42,
@@ -20,7 +21,7 @@
           "hits": 0
         },
         "import_residue": [],
-        "imports": 16,
+        "imports": 17,
         "layers": {
           "asset_levels": 5,
           "crosscut": 6,
@@ -29,8 +30,8 @@
           "surfaces": 4,
           "tiers": 4
         },
-        "raises": 103,
-        "sinks": 21
+        "raises": 175,
+        "sinks": 22
       },
       "status": "pass",
       "warns": 0
@@ -296,7 +297,7 @@
       "stats": {
         "contracts": 27,
         "passed": 27,
-        "root": "d26fd263c029a990e43aa9f4627ec56e10a0a263ad90d8e6293f3f568d34c566",
+        "root": "ed025a43614faa4472b1414d946da67073fc6e7654d4225b0d2b89488afaabec",
         "verdict": "conformant"
       },
       "status": "pass",
@@ -309,10 +310,10 @@
       "sample": [],
       "source": "audit.scan",
       "stats": {
-        "audits": 57,
-        "legacy": 27,
-        "subjects_ok": 285,
-        "with_header": 30
+        "audits": 59,
+        "legacy": 11,
+        "subjects_ok": 417,
+        "with_header": 48
       },
       "status": "warn",
       "warns": 1
@@ -366,11 +367,11 @@
       "sample": [],
       "source": "code_metrics.scan",
       "stats": {
-        "baseline": 330,
-        "files": 335,
-        "max_fn_cc": 116,
-        "max_fn_lines": 1263,
-        "max_lines": 7682
+        "baseline": 334,
+        "files": 354,
+        "max_fn_cc": 106,
+        "max_fn_lines": 319,
+        "max_lines": 9016
       },
       "status": "pass",
       "warns": 0
@@ -384,8 +385,8 @@
       "stats": {
         "budget_ms": 1500.0,
         "n": 65536,
-        "patterns": 234,
-        "probed": 234
+        "patterns": 265,
+        "probed": 265
       },
       "status": "pass",
       "warns": 0
@@ -429,8 +430,8 @@
         "cycles": 0,
         "metrics_drift": 0,
         "metrics_missing": 0,
-        "metrics_recorded": 266,
-        "modules": 266,
+        "metrics_recorded": 288,
+        "modules": 288,
         "registered_cycles": 0,
         "registered_sdp": 11,
         "sdp": 11
@@ -484,24 +485,9 @@
       "warns": 0
     },
     {
-      "id": "workflow_policy",
-      "issues": 0,
-      "name": "工作流供应链策略（actions 钉 40 位 SHA + 显式最小 permissions）",
-      "sample": [],
-      "source": "workflow_policy.scan",
-      "stats": {
-        "pinned_uses": 101,
-        "requirements_files": 5,
-        "with_explicit_permissions": 23,
-        "workflows": 23
-      },
-      "status": "pass",
-      "warns": 0
-    },
-    {
       "id": "asvs",
       "issues": 0,
-      "name": "应用安全作用域证据（ASVS 5.0.0 L2，内部评估）",
+      "name": "OWASP ASVS 5.0 L2 作用域证据矩阵",
       "sample": [],
       "source": "asvs_policy.scan",
       "stats": {
@@ -607,6 +593,21 @@
       "warns": 0
     },
     {
+      "id": "workflow_policy",
+      "issues": 0,
+      "name": "工作流供应链策略（SHA 钉死 + 显式最小权限）",
+      "sample": [],
+      "source": "workflow_policy.scan",
+      "stats": {
+        "pinned_uses": 87,
+        "requirements_files": 5,
+        "with_explicit_permissions": 24,
+        "workflows": 24
+      },
+      "status": "pass",
+      "warns": 0
+    },
+    {
       "id": "asset_contract",
       "issues": 0,
       "name": "数字资产契约（数据/代码/脚本三面：格式+字段完整性+防篡改+AST 规范+脚本 I/O 对齐）",
@@ -631,9 +632,9 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4094,
-        "kernel": 2189,
-        "kernel_no_self": 436,
+        "files": 4124,
+        "kernel": 2064,
+        "kernel_no_self": 309,
         "rules": 9,
         "uncovered": 0,
         "verify_writers": 10,
@@ -643,7 +644,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "8262409bd83307ac63de759547ee9e886fe05ade5c22000cdadc6b746e007807",
+  "root_digest": "18f7690220989f7cabcd10037227d7b20ad330feed6409cc4a2a06af725b373a",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

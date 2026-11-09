@@ -9,10 +9,12 @@ subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/retriever.py:97409e06af9b66d2b30bfde8a660d90b661c008bfe002b0b0712b824c7f6c9c4
   - desktop/tests/test_retriever.py:d47265d825ae4e602c478074ccfa1baf34d3b4a635a067125880e9f62723a854
-  - verify.sh:2f3ff458128e2ac56c7fd0de699011740286ccfd7b69f5ec666d8a755a7a88cc
+  - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
   - docs/domain-packs.md:4c9ee3987699c24f1d78910281b446287dceebb3a77632ef458a07ba618f62d0
 
 ---
+> 重审（2026-11-09）：ASVS residual closure: 合入唯一真源后重绑审计对象摘要
+
 > 重审（2026-10-29）：ASVS residual closure changed verify.sh shard cap and npm payload rename retry
 
 > 重审（2026-10-28）：默认并行度 10→14

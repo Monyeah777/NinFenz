@@ -11,9 +11,11 @@ subjects:
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - scripts/ai_domain_closure.py:431d764da2ef56538eb1c473fe4f45d5ffa8191450638036f147ae7d66a3ae73
   - library/intake.json:e74dda33084b749836de3f8dc3fa83c430b885feec1465b1a94e94aa886d37a8
-  - verify.sh:2f3ff458128e2ac56c7fd0de699011740286ccfd7b69f5ec666d8a755a7a88cc
+  - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
 
 ---
+> 重审（2026-11-09）：ASVS residual closure: 合入唯一真源后重绑审计对象摘要
+
 > 重审（2026-10-29）：ASVS residual closure changed verify.sh shard cap and npm payload rename retry
 
 > 重审（2026-10-28）：默认并行度 10→14

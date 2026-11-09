@@ -1,7 +1,6 @@
 """门禁的**机器可读出口**：把全部核心判据聚合成一份 JSON（`protocol/verification_report.json`）。
 
-为什么需要（顶层化目标 · 静态可核验）：门禁此前只有人读文本（`bash verify.sh` 的 PASS/WARN/FAIL
-计数），机器消费方（CI、外部审计、下游工具）拿不到结构化结论——无法自动回答
+为什么需要（顶层化目标 · 静态可核验）：门禁此前只有人读文本，机器消费方拿不到结构化结论——无法自动回答
 「哪些判据在场 / 各报几条 / 声明基线与实测是否一致 / 这份报告是否对应当前树」。
 
 设计口径：
@@ -66,8 +65,9 @@ SPECS: Tuple[Tuple[str, str, str, str, str], ...] = (
      "drill_fidelity", "scan", "scan"),
     ("judgement_coverage", "判据接线覆盖（暴露 scan() 的判据必须有消费者或例外登记）",
      "judgement_coverage", "scan", "scan"),
-    ("workflow_policy", "工作流供应链策略（actions 钉 40 位 SHA + 显式最小 permissions）", "workflo"
-        "w_policy", "scan", "scan"),
+    ("asvs", "OWASP ASVS 5.0 L2 作用域证据矩阵", "asvs_policy", "scan", "scan"),
+    ("workflow_policy", "工作流供应链策略（SHA 钉死 + 显式最小权限）",
+     "workflow_policy", "scan", "scan"),
     ("asset_contract",
  "数字资产契约（数据/代码/脚本三面：格式+字段完整性+防篡改+AST 规范+脚本 I/O 对齐）",
      "asset_contract", "scan", "scan"),

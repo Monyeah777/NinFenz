@@ -18,13 +18,17 @@ subjects:
   - desktop/tests/test_nf_cli.py:c44a5c57d5c4247a6c58d5e85d4e7adf2c95f7969d5d599e2b9643fe495c7b17
   - scripts/nf.py:869bab4dff472c51503c71770c1871cb4dab32a3c3d0977da69ce6a0ea963d9e
   - tui/_surface.py:8db432e006d08b717d507deb8839e02e0db1ccacc3e4962a712045ccfd2a30bf
-  - protocol/check12_weights.json:ebc79bdcd0f386f5b56c85e505c06c34f29f016cf22cbb552741f7b43cd79116
-  - protocol/coupling_baseline.json:1f29a9433769051eda1d8dcdbb38c14c55e284c2b9e63a822326de94db3b9c56
+  - protocol/check12_weights.json:8c90fd2fc8d55950f0f0a61befa16bd785ece0e0ddfd992bd4f42f53a5acbe14
+  - protocol/coupling_baseline.json:3e6a9a6a08a2e9fd3d83eb344bd794409b945cc9e8d222390583fe90179333c6
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:7b1231392bea0bc51ed14d73fac3c73c185209c1233e7727e554d5b899031af2
 
 ---
+> 重审（2026-11-09）：ASVS closure: 重构 ASVS/daemon/security 门禁后重绑摘要
+
+> 重审（2026-11-09）：ASVS residual closure: 合入唯一真源后重绑审计对象摘要
+
 > 重审（2026-11-09）：Foundation repair: 重绑发布束重构后的审计对象摘要
 
 > 重审（2026-11-09）：foundation repair: canonical product metadata, dual licensing, and release bundle

@@ -53,8 +53,8 @@
     },
     "asset_contract": {
       "ca": 1,
-      "ce": 7,
-      "i": 0.875
+      "ce": 6,
+      "i": 0.8571
     },
     "asset_density": {
       "ca": 2,
@@ -92,19 +92,29 @@
       "i": 0.0
     },
     "atomic_write": {
-      "ca": 51,
+      "ca": 56,
       "ce": 0,
       "i": 0.0
     },
     "attest": {
-      "ca": 5,
+      "ca": 7,
       "ce": 0,
       "i": 0.0
     },
     "audit": {
       "ca": 1,
-      "ce": 4,
-      "i": 0.8
+      "ce": 6,
+      "i": 0.8571
+    },
+    "audit_legacy": {
+      "ca": 1,
+      "ce": 1,
+      "i": 0.5
+    },
+    "audit_subject": {
+      "ca": 1,
+      "ce": 1,
+      "i": 0.5
     },
     "autofix": {
       "ca": 2,
@@ -156,10 +166,30 @@
       "ce": 1,
       "i": 0.5
     },
+    "check_compile": {
+      "ca": 1,
+      "ce": 0,
+      "i": 0.0
+    },
+    "check_policy": {
+      "ca": 1,
+      "ce": 1,
+      "i": 0.5
+    },
+    "check_text_to_intent": {
+      "ca": 0,
+      "ce": 1,
+      "i": 1.0
+    },
     "claim_labels": {
       "ca": 1,
       "ce": 0,
       "i": 0.0
+    },
+    "cli_bridge": {
+      "ca": 0,
+      "ce": 1,
+      "i": 1.0
     },
     "closure_scan": {
       "ca": 1,
@@ -168,7 +198,7 @@
     },
     "code_metrics": {
       "ca": 0,
-      "ce": 2,
+      "ce": 1,
       "i": 1.0
     },
     "cognition": {
@@ -203,7 +233,7 @@
     },
     "conformance_report": {
       "ca": 0,
-      "ce": 30,
+      "ce": 29,
       "i": 1.0
     },
     "conformance_run": {
@@ -221,7 +251,17 @@
       "ce": 0,
       "i": 0.0
     },
+    "contract_history": {
+      "ca": 0,
+      "ce": 3,
+      "i": 1.0
+    },
     "contract_pin": {
+      "ca": 1,
+      "ce": 0,
+      "i": 0.0
+    },
+    "contract_text": {
       "ca": 1,
       "ce": 0,
       "i": 0.0
@@ -238,8 +278,18 @@
     },
     "daemon": {
       "ca": 2,
-      "ce": 15,
-      "i": 0.8824
+      "ce": 14,
+      "i": 0.875
+    },
+    "daemon_limits": {
+      "ca": 1,
+      "ce": 0,
+      "i": 0.0
+    },
+    "daemon_runtime": {
+      "ca": 1,
+      "ce": 4,
+      "i": 0.8
     },
     "daemon_shell": {
       "ca": 1,
@@ -321,6 +371,11 @@
       "ce": 3,
       "i": 1.0
     },
+    "ed25519": {
+      "ca": 2,
+      "ce": 0,
+      "i": 0.0
+    },
     "effect_rows": {
       "ca": 1,
       "ce": 1,
@@ -355,6 +410,11 @@
       "ca": 1,
       "ce": 1,
       "i": 0.5
+    },
+    "evidence": {
+      "ca": 1,
+      "ce": 7,
+      "i": 0.875
     },
     "execution_drill": {
       "ca": 1,
@@ -501,6 +561,11 @@
       "ce": 0,
       "i": 0.0
     },
+    "http_api": {
+      "ca": 0,
+      "ce": 4,
+      "i": 1.0
+    },
     "impact_check": {
       "ca": 0,
       "ce": 1,
@@ -568,8 +633,8 @@
     },
     "interop_export": {
       "ca": 1,
-      "ce": 3,
-      "i": 0.75
+      "ce": 4,
+      "i": 0.8
     },
     "interp_diet": {
       "ca": 0,
@@ -592,14 +657,14 @@
       "i": 0.0
     },
     "iso8601": {
-      "ca": 3,
+      "ca": 4,
       "ce": 0,
       "i": 0.0
     },
     "json_doc": {
-      "ca": 77,
+      "ca": 84,
       "ce": 1,
-      "i": 0.0128
+      "i": 0.0118
     },
     "json_schema": {
       "ca": 5,
@@ -608,7 +673,7 @@
     },
     "judgement_coverage": {
       "ca": 0,
-      "ce": 2,
+      "ce": 1,
       "i": 1.0
     },
     "key_naming": {
@@ -622,6 +687,26 @@
       "i": 0.6
     },
     "knowledge_sig": {
+      "ca": 1,
+      "ce": 1,
+      "i": 0.5
+    },
+    "label_carrier": {
+      "ca": 0,
+      "ce": 3,
+      "i": 1.0
+    },
+    "label_ir": {
+      "ca": 2,
+      "ce": 0,
+      "i": 0.0
+    },
+    "label_sidecar": {
+      "ca": 0,
+      "ce": 3,
+      "i": 1.0
+    },
+    "label_watermark": {
       "ca": 0,
       "ce": 0,
       "i": 0.0
@@ -637,9 +722,9 @@
       "i": 0.0
     },
     "library": {
-      "ca": 7,
+      "ca": 8,
       "ce": 5,
-      "i": 0.4167
+      "i": 0.3846
     },
     "library_entries": {
       "ca": 6,
@@ -762,9 +847,9 @@
       "i": 0.7143
     },
     "nfal_cli": {
-      "ca": 0,
+      "ca": 1,
       "ce": 4,
-      "i": 1.0
+      "i": 0.8
     },
     "nfal_rules": {
       "ca": 2,
@@ -827,7 +912,7 @@
       "i": 0.0
     },
     "paths": {
-      "ca": 7,
+      "ca": 9,
       "ce": 0,
       "i": 0.0
     },
@@ -866,11 +951,6 @@
       "ce": 1,
       "i": 1.0
     },
-    "perf_counters": {
-      "ca": 0,
-      "ce": 0,
-      "i": 0.0
-    },
     "pipeline": {
       "ca": 0,
       "ce": 7,
@@ -897,6 +977,11 @@
       "i": 0.0
     },
     "plog": {
+      "ca": 1,
+      "ce": 1,
+      "i": 0.5
+    },
+    "plog_security": {
       "ca": 1,
       "ce": 0,
       "i": 0.0
@@ -930,6 +1015,11 @@
       "ca": 0,
       "ce": 3,
       "i": 1.0
+    },
+    "product_metadata": {
+      "ca": 5,
+      "ce": 2,
+      "i": 0.2857
     },
     "prose_lint": {
       "ca": 3,
@@ -987,14 +1077,14 @@
       "i": 1.0
     },
     "receipts": {
-      "ca": 3,
+      "ca": 4,
       "ce": 3,
-      "i": 0.5
+      "i": 0.4286
     },
     "redos_scan": {
       "ca": 1,
-      "ce": 1,
-      "i": 0.5
+      "ce": 0,
+      "i": 0.0
     },
     "registry_cross": {
       "ca": 1,
@@ -1071,6 +1161,11 @@
       "ce": 0,
       "i": 0.0
     },
+    "revocations": {
+      "ca": 1,
+      "ce": 4,
+      "i": 0.8
+    },
     "rfc": {
       "ca": 1,
       "ce": 1,
@@ -1078,8 +1173,8 @@
     },
     "role_model": {
       "ca": 1,
-      "ce": 4,
-      "i": 0.8
+      "ce": 3,
+      "i": 0.75
     },
     "round_drill": {
       "ca": 2,
@@ -1098,8 +1193,8 @@
     },
     "rules_render": {
       "ca": 0,
-      "ce": 0,
-      "i": 0.0
+      "ce": 1,
+      "i": 1.0
     },
     "rust_engine": {
       "ca": 0,
@@ -1108,11 +1203,6 @@
     },
     "rust_pyext": {
       "ca": 0,
-      "ce": 0,
-      "i": 0.0
-    },
-    "scan_memo": {
-      "ca": 8,
       "ce": 0,
       "i": 0.0
     },
@@ -1178,8 +1268,8 @@
     },
     "skill_adapter": {
       "ca": 1,
-      "ce": 2,
-      "i": 0.6667
+      "ce": 3,
+      "i": 0.75
     },
     "skill_contract": {
       "ca": 1,
@@ -1207,9 +1297,9 @@
       "i": 0.5
     },
     "storage": {
-      "ca": 9,
+      "ca": 10,
       "ce": 3,
-      "i": 0.25
+      "i": 0.2308
     },
     "strict_schema": {
       "ca": 1,
@@ -1233,13 +1323,18 @@
     },
     "terminal": {
       "ca": 1,
-      "ce": 4,
-      "i": 0.8
+      "ce": 5,
+      "i": 0.8333
     },
     "text_hygiene": {
       "ca": 0,
-      "ce": 3,
+      "ce": 2,
       "i": 1.0
+    },
+    "timestamp": {
+      "ca": 1,
+      "ce": 1,
+      "i": 0.5
     },
     "tool_face": {
       "ca": 1,
@@ -1252,9 +1347,14 @@
       "i": 1.0
     },
     "transparency_log": {
-      "ca": 1,
+      "ca": 2,
       "ce": 2,
-      "i": 0.6667
+      "i": 0.5
+    },
+    "trust_anchor": {
+      "ca": 1,
+      "ce": 1,
+      "i": 0.5
     },
     "trust_boundary": {
       "ca": 2,
@@ -1293,11 +1393,21 @@
     },
     "verify_report": {
       "ca": 0,
-      "ce": 5,
+      "ce": 4,
+      "i": 1.0
+    },
+    "vex": {
+      "ca": 0,
+      "ce": 1,
       "i": 1.0
     },
     "watch": {
       "ca": 2,
+      "ce": 0,
+      "i": 0.0
+    },
+    "web_pages": {
+      "ca": 1,
       "ce": 0,
       "i": 0.0
     },

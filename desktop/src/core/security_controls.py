@@ -89,18 +89,8 @@ def _timeout_constants(root: Path) -> dict[str, int]:
     }
 
 
-def scan(root: str | Path = ".") -> tuple[list[str], dict[str, Any]]:
-    root = Path(root)
+def _input_issues(root: Path, doc: dict[str, Any]) -> list[str]:
     issues: list[str] = []
-    try:
-        doc = _json(root / CONTROLS_REL)
-    except (OSError, ValueError) as exc:
-        return [f"{CONTROLS_REL}: unreadable or invalid: {exc}"], {}
-    if doc.get("schema") != SCHEMA:
-        issues.append(f"{CONTROLS_REL}: schema must be {SCHEMA}")
-    if not str(doc.get("reviewed_at") or "").strip():
-        issues.append(f"{CONTROLS_REL}: reviewed_at is required")
-
     input_validation = doc.get("input_validation")
     if not isinstance(input_validation, dict):
         issues.append(f"{CONTROLS_REL}: input_validation must be an object")
@@ -114,7 +104,11 @@ def scan(root: str | Path = ".") -> tuple[list[str], dict[str, Any]]:
             issues.append(f"{CONTROLS_REL}/input_validation: incomplete rule {row.get('id')!r}")
         elif not (root / str(row["evidence"])).exists():
             issues.append(f"{CONTROLS_REL}/input_validation/{row.get('id')}: evidence missing")
+    return issues
 
+
+def _file_issues(doc: dict[str, Any]) -> tuple[list[str], dict[str, Any]]:
+    issues: list[str] = []
     files = doc.get("file_handling")
     if not isinstance(files, dict):
         issues.append(f"{CONTROLS_REL}: file_handling must be an object")
@@ -124,7 +118,11 @@ def scan(root: str | Path = ".") -> tuple[list[str], dict[str, Any]]:
     if not files.get("processing_types"):
         issues.append(f"{CONTROLS_REL}: file_handling.processing_types is required")
     issues.extend(sections.file_handling_issues(files, str(CONTROLS_REL)))
+    return issues, files
 
+
+def _auth_crypto_issues(doc: dict[str, Any]) -> tuple[list[str], list[dict[str, Any]], list[str]]:
+    issues: list[str] = []
     auth = doc.get("authorization")
     if not isinstance(auth, dict) or auth.get("default") != "deny":
         issues.append(f"{CONTROLS_REL}: authorization default must be deny")
@@ -152,7 +150,11 @@ def scan(root: str | Path = ".") -> tuple[list[str], dict[str, Any]]:
             issues.append(f"{CONTROLS_REL}/cryptography: incomplete row {row.get('id')!r}")
     crypto_issues, declared_suites = sections.crypto_issues(crypto, str(CONTROLS_REL))
     issues.extend(crypto_issues)
+    return issues, crypto_rows, declared_suites
 
+
+def _communication_issues(doc: dict[str, Any]) -> tuple[list[str], list[dict[str, Any]]]:
+    issues: list[str] = []
     comms = _rows(doc, "communications")
     if not comms:
         issues.append(f"{CONTROLS_REL}: communications must be non-empty")
@@ -166,7 +168,11 @@ def scan(root: str | Path = ".") -> tuple[list[str], dict[str, Any]]:
                 f"{CONTROLS_REL}/communications/{row.get('id')}: "
                 "runtime external path is not reviewed"
             )
+    return issues, comms
 
+
+def _data_issues(doc: dict[str, Any]) -> tuple[list[str], list[dict[str, Any]]]:
+    issues: list[str] = []
     data = doc.get("data_protection")
     classes = _rows(data if isinstance(data, dict) else {}, "classes")
     if not classes:
@@ -175,7 +181,11 @@ def scan(root: str | Path = ".") -> tuple[list[str], dict[str, Any]]:
         if not _DATA_FIELDS.issubset(row) or not all(
                 str(row.get(key) or "").strip() for key in _DATA_FIELDS):
             issues.append(f"{CONTROLS_REL}/data_protection: incomplete class {row.get('id')!r}")
+    return issues, classes
 
+
+def _limit_issues(root: Path, doc: dict[str, Any]) -> tuple[list[str], dict[str, int], dict[str, int]]:
+    issues: list[str] = []
     try:
         actual_limits = _resource_constants(root)
         actual_timeouts = _timeout_constants(root)
@@ -196,7 +206,11 @@ def scan(root: str | Path = ".") -> tuple[list[str], dict[str, Any]]:
             issues.append(
                 f"{CONTROLS_REL}/resource_limits/{key}: declared timeout differs from code"
             )
+    return issues, declared_limits, declared_timeouts
 
+
+def _governance_issues(doc: dict[str, Any]) -> tuple[list[str], dict[str, Any]]:
+    issues: list[str] = []
     logging = doc.get("logging") if isinstance(doc.get("logging"), dict) else {}
     issues.extend(sections.logging_issues(logging, str(CONTROLS_REL)))
 
@@ -211,7 +225,11 @@ def scan(root: str | Path = ".") -> tuple[list[str], dict[str, Any]]:
         issues.append(f"{CONTROLS_REL}: SLSA claim must remain at evidenced Build L2")
     if int(release.get("reproducible_build_count") or 0) < 2:
         issues.append(f"{CONTROLS_REL}: at least two reproducible builds are required")
+    return issues, logging
 
+
+def _document_issues(root: Path) -> list[str]:
+    issues: list[str] = []
     doc_path = root / DOC_REL
     try:
         human = doc_path.read_text(encoding="utf-8")
@@ -224,6 +242,30 @@ def scan(root: str | Path = ".") -> tuple[list[str], dict[str, Any]]:
         ):
             if needle not in human:
                 issues.append(f"{DOC_REL}: missing section anchor {needle!r}")
+    return issues
+
+
+def scan(root: str | Path = ".") -> tuple[list[str], dict[str, Any]]:
+    root = Path(root)
+    try:
+        doc = _json(root / CONTROLS_REL)
+    except (OSError, ValueError) as exc:
+        return [f"{CONTROLS_REL}: unreadable or invalid: {exc}"], {}
+    issues: list[str] = []
+    if doc.get("schema") != SCHEMA:
+        issues.append(f"{CONTROLS_REL}: schema must be {SCHEMA}")
+    if not str(doc.get("reviewed_at") or "").strip():
+        issues.append(f"{CONTROLS_REL}: reviewed_at is required")
+    issues.extend(_input_issues(root, doc))
+    file_issues, files = _file_issues(doc)
+    auth_issues, crypto_rows, declared_suites = _auth_crypto_issues(doc)
+    comm_issues, comms = _communication_issues(doc)
+    data_issues, classes = _data_issues(doc)
+    limit_issues, declared_limits, declared_timeouts = _limit_issues(root, doc)
+    governance_issues, logging = _governance_issues(doc)
+    issues.extend(file_issues + auth_issues + comm_issues + data_issues + limit_issues)
+    issues.extend(governance_issues)
+    issues.extend(_document_issues(root))
 
     return issues, {
         "data_classes": len(classes),

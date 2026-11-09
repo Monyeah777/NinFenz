@@ -36,23 +36,13 @@ def _natural(ident: str) -> tuple[int, ...]:
     return tuple(int(part) for part in ident.removeprefix("V").split("."))
 
 
-def scan(root: str | Path = ".") -> tuple[list[str], dict[str, Any]]:
-    root = Path(root)
+def _check_standard(doc: dict[str, Any]) -> tuple[list[str], list[Any] | None]:
     issues: list[str] = []
-    from core import security_controls
-
-    control_issues, control_stats = security_controls.scan(root)
-    issues.extend(control_issues)
-    path = root / MATRIX_REL
-    try:
-        doc = _json(path)
-    except (OSError, ValueError):
-        return [f"{MATRIX_REL}: 不可读或非法（修复指引：恢复或重生成 ASVS 矩阵）"], {}
     if doc.get("schema") != SCHEMA:
         issues.append(f"{MATRIX_REL}: schema 不匹配")
     standard = doc.get("standard")
     if not isinstance(standard, dict):
-        return issues + [f"{MATRIX_REL}: 缺 standard 对象"], {}
+        return issues + [f"{MATRIX_REL}: 缺 standard 对象"], None
     if standard.get("version") != VERSION or standard.get("commit") != COMMIT:
         issues.append(f"{MATRIX_REL}: ASVS 版本或提交未固定在 5.0.0/{COMMIT}")
     scope = set(standard.get("scope") or [])
@@ -68,42 +58,74 @@ def scan(root: str | Path = ".") -> tuple[list[str], dict[str, Any]]:
         issues.append(f"{MATRIX_REL}: 不得声称第三方 ASVS 认证")
     entries = doc.get("requirements")
     if not isinstance(entries, list):
-        return issues + [f"{MATRIX_REL}: requirements 必须是数组"], {}
+        return issues + [f"{MATRIX_REL}: requirements 必须是数组"], None
     if len(entries) != EXPECTED_COUNT:
         issues.append(f"{MATRIX_REL}: 需求数量 {len(entries)} != {EXPECTED_COUNT}")
+    return issues, entries
+
+
+def _check_entry(root: Path, entry: Any) -> tuple[list[str], str, str]:
+    if not isinstance(entry, dict):
+        return [f"{MATRIX_REL}: requirement 必须是对象"], "", ""
+    issues: list[str] = []
+    ident = str(entry.get("id") or "")
+    if not _ID.match(ident):
+        issues.append(f"{MATRIX_REL}/{ident}: 非法 ASVS ID")
+    chapter = ident.split(".", 1)[0]
+    if chapter not in SCOPE:
+        issues.append(f"{MATRIX_REL}/{ident}: 章节不在作用域")
+    status = str(entry.get("status") or "")
+    if status not in STATUSES:
+        issues.append(f"{MATRIX_REL}/{ident}: 非法状态 {status!r}")
+    if not str(entry.get("verification") or "").strip():
+        issues.append(f"{MATRIX_REL}/{ident}: 缺 verification")
+    if status in {"partial", "not-applicable"} and not str(entry.get("gap") or "").strip():
+        issues.append(f"{MATRIX_REL}/{ident}: {status} 必须记录 gap")
+    evidence = entry.get("evidence")
+    if not isinstance(evidence, list) or not evidence:
+        issues.append(f"{MATRIX_REL}/{ident}: evidence 必须是非空数组")
+        return issues, ident, status
+    for item in evidence:
+        if not isinstance(item, str) or not item:
+            issues.append(f"{MATRIX_REL}/{ident}: evidence 项非法")
+        elif not item.startswith("external:") and not (root / item).exists():
+            issues.append(f"{MATRIX_REL}/{ident}: evidence 路径不存在：{item}")
+    return issues, ident, status
+
+
+def _tally(coverage: dict[str, dict[str, int]], chapter: str, status: str) -> None:
+    bucket = coverage.setdefault(chapter, {})
+    bucket[status] = bucket.get(status, 0) + 1
+
+
+def scan(root: str | Path = ".") -> tuple[list[str], dict[str, Any]]:
+    root = Path(root)
+    issues: list[str] = []
+    from core import security_controls
+
+    control_issues, control_stats = security_controls.scan(root)
+    issues.extend(control_issues)
+    path = root / MATRIX_REL
+    try:
+        doc = _json(path)
+    except (OSError, ValueError):
+        return [f"{MATRIX_REL}: 不可读或非法（修复指引：恢复或重生成 ASVS 矩阵）"], {}
+    standard_issues, entries = _check_standard(doc)
+    issues.extend(standard_issues)
+    if entries is None:
+        return issues, {}
     ids: list[str] = []
     statuses: dict[str, int] = {}
     coverage: dict[str, dict[str, int]] = {}
     for entry in entries:
-        if not isinstance(entry, dict):
-            issues.append(f"{MATRIX_REL}: requirement 必须是对象")
+        entry_issues, ident, status = _check_entry(root, entry)
+        issues.extend(entry_issues)
+        if not ident:
             continue
-        ident = str(entry.get("id") or "")
         ids.append(ident)
-        if not _ID.match(ident):
-            issues.append(f"{MATRIX_REL}/{ident}: 非法 ASVS ID")
         chapter = ident.split(".", 1)[0]
-        if chapter not in SCOPE:
-            issues.append(f"{MATRIX_REL}/{ident}: 章节不在作用域")
-        status = str(entry.get("status") or "")
         statuses[status] = statuses.get(status, 0) + 1
-        coverage.setdefault(chapter, {})
-        coverage[chapter][status] = coverage[chapter].get(status, 0) + 1
-        if status not in STATUSES:
-            issues.append(f"{MATRIX_REL}/{ident}: 非法状态 {status!r}")
-        if not str(entry.get("verification") or "").strip():
-            issues.append(f"{MATRIX_REL}/{ident}: 缺 verification")
-        if status in {"partial", "not-applicable"} and not str(entry.get("gap") or "").strip():
-            issues.append(f"{MATRIX_REL}/{ident}: {status} 必须记录 gap")
-        evidence = entry.get("evidence")
-        if not isinstance(evidence, list) or not evidence:
-            issues.append(f"{MATRIX_REL}/{ident}: evidence 必须是非空数组")
-            continue
-        for item in evidence:
-            if not isinstance(item, str) or not item:
-                issues.append(f"{MATRIX_REL}/{ident}: evidence 项非法")
-            elif not item.startswith("external:") and not (root / item).exists():
-                issues.append(f"{MATRIX_REL}/{ident}: evidence 路径不存在：{item}")
+        _tally(coverage, chapter, status)
     if len(ids) != len(set(ids)):
         issues.append(f"{MATRIX_REL}: 需求 ID 重复")
     ordered = sorted(ids, key=_natural)

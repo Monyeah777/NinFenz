@@ -39,63 +39,22 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-from . import atoms, crypto_policy, plog, security_audit
+from . import crypto_policy
+from .daemon_limits import MAX_ARGV_CHARS, MAX_ARGV_TOTAL, MAX_CWD_CHARS, MAX_REQUEST_BYTES
+from .daemon_limits import MAX_RESPONSE_BYTES, check_argv_size as _check_argv_size
+from .daemon_limits import configure_server_socket as _configure_server_socket
+from .daemon_runtime import configure_watcher, lifetime_expired as _lifetime_expired, log_path
+from .daemon_runtime import security_event as _security_event
 
 PROTO = 1
 #: 监听地址：**只允许回环**（与 scripts/serve_decision_model.py 同一条纪律；本模块不提供
 #: 「显式放行外网」的开关——守护进程能执行任意 nf 命令，绝不能出回环）。
 BIND_HOST = "127.0.0.1"
-#: 请求体上限（1 MiB）：一条命令的 argv 远小于此；设上限防「自称超长」的无界读。
-MAX_REQUEST_BYTES = 1 << 20
-#: 单次响应载荷上限（16 MiB，与 Rust worker 同口径）：防止客户端按伪造/失控长度分配内存。
-MAX_RESPONSE_BYTES = 16 << 20
-#: 单条 argv 上限（字符）：参数是「命令 + 选项 + 标识符」，不是正文载荷。
-MAX_ARGV_CHARS = 8192
-#: argv 合计上限（字符）：防「一条 1 MB 请求 → CLI 回吐 200 KB 用法」这类放大。
-MAX_ARGV_TOTAL = 65536
-#: 工作目录上限（字符）；cwd 只是定位参数，不应成为超长内存/路径解析载荷。
-MAX_CWD_CHARS = 32768
 #: 默认空闲寿命（秒）；0 表示不启用空闲回收（绝对寿命仍独立生效）。
 DEFAULT_IDLE_TIMEOUT = 3600
 #: 绝对寿命（秒）：空闲计时会被请求续命，不能替代进程最大存活时间。
 DEFAULT_MAX_LIFETIME = 24 * 60 * 60
 
-_LOG = plog.get_logger(__name__)
-
-
-def _security_event(event: str, **fields: Any) -> None:
-    payload = plog.security_event(_LOG, event, actor="local-client", **fields)
-    security_audit.record(payload)
-
-
-def _lifetime_expired(started: float, now: float, max_lifetime: float) -> bool:
-    return max_lifetime > 0 and (now - started) >= max_lifetime
-
-
-def _configure_server_socket(sock: socket.socket) -> None:
-    """Windows 用独占绑定；SO_REUSEADDR 在该平台允许别的本机进程抢绑同一端口。"""
-    if os.name == "nt" and hasattr(socket, "SO_EXCLUSIVEADDRUSE"):
-        sock.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
-    elif os.name != "nt":
-        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-
-
-def _check_argv_size(argv) -> None:
-    """argv 体量上限 → 越界抛 ValueError（上层归「请求不可读」，exit 2）。
-
-    修复前实测：单条 **200 KB** 的 argv 会被照单执行——CLI 回吐 200 KB 的 argparse 用法，
-    请求体最大 1 MB 也兜不住这种放大。参数只该是命令/选项/标识符；正文请落盘后传路径。
-    """
-    if not isinstance(argv, list):
-        return
-    for a in argv:
-        if isinstance(a, str) and len(a) > MAX_ARGV_CHARS:
-            raise ValueError("单个参数超过上限 %d 字符（修复指引：正文/长文本先落盘，改传路径）"
-                             % MAX_ARGV_CHARS)
-    total = sum(len(a) for a in argv if isinstance(a, str))
-    if total > MAX_ARGV_TOTAL:
-        raise ValueError("参数合计超过上限 %d 字符（修复指引：减少参数，或改传文件路径）"
-                         % MAX_ARGV_TOTAL)
 #: 守护内**拒跑**的命令：长驻（`serve` / `shell` / `terminal` / `lsp`）与自指（`daemon`）。
 #:
 # : 为什么是这五个（2026-10-01 修）：此前只有 `serve` / `shell` / `daemon`，于是**别名与常驻面漏网**
@@ -133,12 +92,6 @@ def state_path() -> Path:
     """
     from core import storage
     return Path(storage.default_home()) / STATE_NAME
-
-
-def log_path() -> Path:
-    """守护后台 stderr 的稳定落点；目录与文件只允许当前用户访问。"""
-    from core import storage
-    return Path(storage.default_home()) / "daemon.log"
 
 
 def read_state() -> Optional[Dict[str, Any]]:
@@ -674,6 +627,24 @@ def _internal_error_frame(exc: BaseException) -> bytes:
             "——该异常已被单条请求隔离，守护未退出）\n" % exc).encode("utf-8")
 
 
+def _handle_control_op(conn: socket.socket, req: dict) -> Optional[bool]:
+    op = req.get("op")
+    if op is None:
+        return None
+    if not isinstance(op, str):
+        send_framed(conn, 2, b"", "op 必须是字符串\n".encode())
+        return False
+    if op == "shutdown":
+        send_framed(conn, 0, b"", b"")
+        return True
+    if op == "stats":
+        payload = json.dumps(cache_stats(), ensure_ascii=False).encode("utf-8")
+        send_framed(conn, 0, payload, b"")
+        return False
+    send_framed(conn, 2, b"", "未知 op（允许 shutdown / stats）\n".encode())
+    return False
+
+
 def _handle_conn(conn: socket.socket, token: str, root: Path) -> bool:
     """处理一条连接 → 是否请求关闭守护。
 
@@ -703,21 +674,9 @@ def _handle_conn(conn: socket.socket, token: str, root: Path) -> bool:
                                   "（修复指引：用 scripts/nf 启动器，或 nf daemon status）\n"
                                   .encode("utf-8"))
         return False
-    op = req.get("op")
-    if op is not None:
-        if not isinstance(op, str):
-            send_framed(conn, 2, b"", "op 必须是字符串\n".encode())
-            return False
-        if op == "shutdown":
-            send_framed(conn, 0, b"", b"")
-            return True
-        if op == "stats":
-            # 观测面必须**在守护进程内**取：缓存与监听件都是守护的进程状态，客户端看不到。
-            payload = json.dumps(cache_stats(), ensure_ascii=False).encode("utf-8")
-            send_framed(conn, 0, payload, b"")
-            return False
-        send_framed(conn, 2, b"", "未知 op（允许 shutdown / stats）\n".encode())
-        return False
+    control = _handle_control_op(conn, req)
+    if control is not None:
+        return control
     argv = req.get("argv")
     if not isinstance(argv, list) or not all(isinstance(a, str) for a in argv):
         send_framed(conn, 2, b"", "argv 必须是字符串列表\n".encode("utf-8"))
@@ -786,18 +745,7 @@ def serve_forever(root: Path, idle_timeout: float = 0.0, ready: Optional[Any] = 
     # 但有些命令的人读面默认带墙钟耗时，而两条路径的耗时必然不同 ⇒ 值必然分叉。
     # 故守护侧统一声明「不要不确定性面」，各命令按此关闭耗时字段（当前是 nf verify）。
     os.environ["NF_VERIFY_QUIET_TIME"] = "1"
-    global _WATCHER
-    watcher = None
-    if watch:
-        from core import watch as _watch
-        watcher = _watch.DirWatcher(root)
-        if watcher.start():
-            set_watcher(watcher)
-        else:
-            set_watcher(None)
-            watcher = None
-            print("目录监听不可用（平台未实现或打开失败）→ 不启用响应缓存，"
-                  "行为与常规守护一致", file=sys.stderr)
+    watcher = configure_watcher(root, watch, set_watcher)
     token = crypto_policy.new_token()
     lifetime_started = time.monotonic()
     _security_event("daemon.started", proto=PROTO, watch=bool(watch))

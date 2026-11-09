@@ -12,8 +12,8 @@ subjects:
   - desktop/src/core/module_lifecycle.py:7b84396342e77fea32e6b54cd78e296f1dddf925937b8331dbcdebeb4e9ad1d0
   - desktop/src/core/market_analyzer.py:eb5edffc55470b5f4aa8e6151ab7bffded36a45ce3ecc69fcdc54de59071cbdf
   - desktop/src/core/protocol_golden.py:b37b80ee8691fd76ed2df41f5006285c92914449bdfd6a2210164c7bc1f3e353
-  - desktop/src/core/knowledge_sig.py:2e1177ae8701b38cff3b26e92892b3cbef4a347a48b986dd8b1f95934f60323b
-  - desktop/src/core/output_forms.py:3688d30b158493f56801ef84f6f0e60eff2cc670c7ebcf750ffd403599d1b68a
+  - desktop/src/core/knowledge_sig.py:06409878244907e1135846a71aae76e5d66303534a7e611b8870a1edd307c35e
+  - desktop/src/core/output_forms.py:247645942b14dfac6642cf11bf66453ef12acb5f7fc4363d306dd860fe17bdf5
   - desktop/src/core/pipeline_loader.py:0efbfa0c0e0f8ae5817a79aed429da24504632a97679727ae9d947bf59dc7104
   - desktop/src/core/community_inventory.py:939924e6f37e0d17143d3e15c196882bd40fb98ddd22fb83479200487f3137f0
   - desktop/src/core/retriever.py:97409e06af9b66d2b30bfde8a660d90b661c008bfe002b0b0712b824c7f6c9c4
@@ -27,10 +27,13 @@ subjects:
   - desktop/src/core/import_graph.py:2ea0fe79cf12e2f9bdb6078af0a08287ae062fc0f4f3e6136e3b240c0d11123a
   - desktop/src/core/bench.py:5d7ef263ca30a9888f2c32f4db2253406dfdc510b52fbb19958a3afefe9cf574
   - desktop/src/core/import_adapter.py:0d062c6f28215b7d81eeb46e653fa4edcc7e8cb9f3e9178e73f2dff9f834bc35
-  - desktop/src/core/daemon.py:dfa01486610f1beed8122e8aae289774b80649a164c841c9a7faf3fef5370bc2
+  - desktop/src/core/daemon.py:306ec35cfeac93dca37273974a6b4fbce84d9e20092ec6bd58436c51805e55e5
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:45ea7f4c7fa4c006b11a323c64b67ee1cf639d790807e67340d4ed2c5d3c1fff
+  - protocol/code_metrics_baseline.json:9d65db374221c26f8c093f8522ac5ddcf59b2029711726203287d713bc147498
+---
+> 重审（2026-11-09）：ASVS closure: 重构 ASVS/daemon/security 门禁后重绑摘要
+
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -297,6 +300,8 @@ subjects:
 
 | 类 | 模块 | 修法 |
 |---
+> 重审（2026-11-09）：ASVS residual closure: 合入唯一真源后重绑审计对象摘要
+
 > 重审（2026-10-29）：治理：CI 日志落点隔离 + 两个测试修复
 > 重审（2026-10-29）：ASVS residual closure changed verify.sh shard cap and npm payload rename retry
 

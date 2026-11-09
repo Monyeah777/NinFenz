@@ -10,8 +10,7 @@
 
 设计红线（与计划 §18.3/§18.7 对齐）：
 
-- 本模块**不**在 core/ 里，也不被 core/ 依赖；core 侧只有纯判定（plugin_manifest / plugin_gate）。
-- 回退**永远不是静默的**：每次回退都带 machine-readable 的 reason 与人类可读的 detail。
+- 本模块**不**在 core/ 里；回退必须带 machine-readable reason 与 human-readable detail。
 - 宿主自己**不死**：任何插件侧异常都被收敛成返回值，进程继续。
 
 用法：
@@ -47,11 +46,10 @@ WIT_REL = "engine/wasm/ninfenz-plugin.wit"
 #: wasmtime 报告「燃料耗尽」时的 stderr 片段（实测措辞："wasm trap: all fuel consumed
 #: by WebAssembly"）。刻意不放裸词 "fuel"——那会把任何提到燃料的报错都误判成耗尽。
 FUEL_MARKERS = ("all fuel consumed", "out of fuel", "fuel has been consumed")
-#: 插件输入/输出硬上限（8 MiB，与 MCP 入站同口径）。燃料只约束 wasm 计算，
-#: 不约束宿主管道与巨大输出；这两条必须由宿主自己兜住。
+#: 插件输入/输出硬上限（8 MiB，与 MCP 入站同口径）。
 MAX_PLUGIN_INPUT_BYTES = 8 << 20
 MAX_PLUGIN_OUTPUT_BYTES = 8 << 20
-#: 插件声明的墙钟上限缺失时使用的默认预算；安全控制清单必须与此常量逐值一致。
+#: 声明的墙钟上限缺失时使用的默认预算。
 DEFAULT_WALL_TIMEOUT_MS = 30_000
 #: Component Model 走 WAVE argv，受操作系统单条命令行上限约束；按最坏 4 字符/字节预算。
 MAX_COMPONENT_ARGV_CHARS = 30_000

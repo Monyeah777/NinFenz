@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1447,
-    "entry": 27,
+    "app": 1459,
+    "entry": 26,
     "floor": 5,
-    "prod": 1047,
-    "projection": 133,
-    "support": 297,
-    "verify": 1137
+    "prod": 1059,
+    "projection": 149,
+    "support": 425,
+    "verify": 1000
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -5789,6 +5789,18 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "Explicit registry for audit records created before the audit protocol.",
+      "path": "desktop/src/core/audit_legacy.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "Validation for audit subject bindings.",
+      "path": "desktop/src/core/audit_subject.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "执行结果跑分台（机制借鉴 ACP `agent/benchmarks/suite`）。",
       "path": "desktop/src/core/bench.py",
       "role": "prod",
@@ -5837,8 +5849,26 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "单对象策略体检——cc_check 的 v0 实装：给定一个对象与一份策略，出可复算的 verdict。",
+      "path": "desktop/src/core/check_policy.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "法规文本 → 意图草稿 v0（cc_check 语义层的诚实半边）。",
+      "path": "desktop/src/core/check_text_to_intent.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "规格主张的认识论标签（机制借鉴 restless-core 规格条目认知标签）。",
       "path": "desktop/src/core/claim_labels.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "Thin CLI bridge for optional command families kept outside scripts/nf.py.",
+      "path": "desktop/src/core/cli_bridge.py",
       "role": "prod",
       "rule": "auto:R-core"
     },
@@ -5909,8 +5939,20 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "Reconstruct a contract-level timeline from Git history.",
+      "path": "desktop/src/core/contract_history.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "上游契约 pin + 逐字段对账 + 数量钉死（机制借鉴 OpenAgentCore upstream_contract_test）。",
       "path": "desktop/src/core/contract_pin.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "Structural field extraction for YAML-like contract blocks.",
+      "path": "desktop/src/core/contract_text.py",
       "role": "prod",
       "rule": "auto:R-core"
     },
@@ -6011,6 +6053,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "Ed25519（RFC 8032）纯标准库实现——为了让跨组织吊销不再共享对称密钥。",
+      "path": "desktop/src/core/ed25519.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "效应面（P-A2）：源码 → **效应行**（ast 可证），并给出规则层（P-A1）的同判定 구현。",
       "path": "desktop/src/core/effect_rows.py",
       "role": "verify",
@@ -6035,7 +6083,7 @@
       "rule": "auto:R-core"
     },
     {
-      "function": "错误码中央登记 + 抛出/呈现分离（机制借鉴 loomvault ErrorCode.java / iskills domain/errors.ts）。",
+      "function": "错误码中央登记 + 抛出/呈现分离（借鉴 loomvault/iskills）：码唯一、稳定、每条带 message+fix；",
       "path": "desktop/src/core/error_codes.py",
       "role": "prod",
       "rule": "auto:R-core"
@@ -6335,6 +6383,24 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "标注载体 v0：把 nf-label/1 真正**写进** PNG iTXt 块 / JPEG APP15 段。",
+      "path": "desktop/src/core/label_carrier.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "标注 IR v0（`cc_label` 的**形状层**）：只描述「该有哪些标识」；载体写入在 core/label_carrier。",
+      "path": "desktop/src/core/label_ir.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "标注**水印层** v0：把 nf-label/1 IR 的摘要**写进像素最低位**，并在读回时做多数表决。",
+      "path": "desktop/src/core/label_watermark.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "抽象阶梯（protocol/LAYERS.json）—— 真源唯一 + 生成投影 + 语义判据。",
       "path": "desktop/src/core/layer_model.py",
       "role": "verify",
@@ -6575,12 +6641,6 @@
       "rule": "auto:R-core"
     },
     {
-      "function": "结构性计数器：把「重复 I/O / 重复解析 / 重复 spawn」变成**可判据的数字**（而非毫秒）。",
-      "path": "desktop/src/core/perf_counters.py",
-      "role": "verify",
-      "rule": "auto:R-core"
-    },
-    {
       "function": "v2.8.0 波B S4：管线脚手架（`nf pipeline new` 库实现）。",
       "path": "desktop/src/core/pipeline_scaffold.py",
       "role": "prod",
@@ -6791,6 +6851,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "吊销分发件 v0（G2 的可落地部分）：签名 + 单调序号 + 前序链 + 合并。",
+      "path": "desktop/src/core/revocations.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "协议件 RFC 头 + supersede 链（机制借鉴 HMP 的 RFC 系列）。",
       "path": "desktop/src/core/rfc.py",
       "role": "verify",
@@ -6835,12 +6901,6 @@
     {
       "function": "PyO3 扩展（nf_pyengine）的进程内原语包装：sha256 / float_repr，含 stdlib 回退。",
       "path": "desktop/src/core/rust_pyext.py",
-      "role": "prod",
-      "rule": "auto:R-core"
-    },
-    {
-      "function": "一次扫描内的**共享读面 + 派生事实面**（`verify_report` 结构性去重的底座）。",
-      "path": "desktop/src/core/scan_memo.py",
       "role": "prod",
       "rule": "auto:R-core"
     },
@@ -6965,6 +7025,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "吊销公钥的**信任锚** v0：固定根 + 委派链（不用证书链，不引 X.509）。",
+      "path": "desktop/src/core/trust_anchor.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "信任边界守卫（注入面 / 越权调用面）——把 AGENTS.md 与 06 §12 的声明变成可复用判据。",
       "path": "desktop/src/core/trust_boundary.py",
       "role": "verify",
@@ -7007,8 +7073,20 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "OpenVEX 0.2.0 and CycloneDX 1.6 VEX projections from one disposition ledger.",
+      "path": "desktop/src/core/vex.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "目录变更监听（仅标准库）：给守护进程一个**「树没变」的可证信号**。",
       "path": "desktop/src/core/watch.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "本地工作台页面（/verify）：零构建、零 CDN、离线可用。",
+      "path": "desktop/src/core/web_pages.py",
       "role": "prod",
       "rule": "auto:R-core"
     },
@@ -7457,6 +7535,18 @@
       "rule": "R-verify"
     },
     {
+      "function": "CCOS ABI 文档一致性判据（文档 ↔ 实装 ↔ 判据三元对账）。",
+      "path": "desktop/tests/test_ccos_abi_docs.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "CCOS 一条链复现单测（cc_check → [cc_label] → cc_attest → cc_verify → cc_replay）。",
+      "path": "desktop/tests/test_ccos_chain.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "CCV3 映射层单测（v2.0.0 T1：IR→chara_card_v3 + world entries）。",
       "path": "desktop/tests/test_ccv3_adapter.py",
       "role": "verify",
@@ -7481,8 +7571,26 @@
       "rule": "R-verify"
     },
     {
+      "function": "策略编译器 v0（core/check_compile.py）判据：意图 → 封闭词表策略，并如实报告不可表达项。",
+      "path": "desktop/tests/test_check_compile.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "步骤5「合并同类项」等价性证明：参数化引擎 vs 旧判据（独立参照实现 + 变异夹具）。",
       "path": "desktop/tests/test_check_merge_equivalence.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "单对象策略体检（cc_check）单测——封闭词表、可复算 verdict、坏策略必须拒。",
+      "path": "desktop/tests/test_check_policy.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "法规文本 → 意图草稿判据：抽得准、抽不到的进待补、不可表达的进 unsupported、绝不静默丢。",
+      "path": "desktop/tests/test_check_text_to_intent.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -7525,12 +7633,6 @@
     {
       "function": "机器面**面判别键**门禁：每个 `--json` 面成功时都必须是自带类型的对象。",
       "path": "desktop/tests/test_cli_json_face.py",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "`cli_harness` 进程内 memo（L4）回归：**命中要真、写仓库必须失效**。",
-      "path": "desktop/tests/test_cli_memo.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -7781,6 +7883,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "Ed25519（RFC 8032）判据：黄金向量 + 确定性 + 篡改必拒 + 与独立实现交叉验证。",
+      "path": "desktop/tests/test_ed25519.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "core.effect_rows 回归：效应行识别 / 级别合并 / 规则层差分一致 / fail-closed。",
       "path": "desktop/tests/test_effect_rows.py",
       "role": "verify",
@@ -7819,6 +7927,30 @@
     {
       "function": "",
       "path": "desktop/tests/test_eval_harness.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "证据包（evidence bundle）单测——cc_verify 的四词判定与 fail-closed 面。",
+      "path": "desktop/tests/test_evidence.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "批量复验（core.evidence.verify_batch / nf evidence batch）判据。",
+      "path": "desktop/tests/test_evidence_batch.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "证据面双实现 parity 收口：receipts / attest 两形态 + 仓外单文件复验。",
+      "path": "desktop/tests/test_evidence_forms_parity.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "证据判定向量集（results/ccos/evidence_verdict_vectors.json）判据。",
+      "path": "desktop/tests/test_evidence_vectors.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -7897,6 +8029,12 @@
     {
       "function": "ASVS V5.2.2: file extension and content-type agreement regression tests.",
       "path": "desktop/tests/test_file_format.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "生成物新鲜度前置检查（scripts/freshness_check.py）判据。",
+      "path": "desktop/tests/test_freshness_check.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8033,6 +8171,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "本地 HTTP 面单测——起真服务（端口 0）打真请求，判安全边界与判定语义。",
+      "path": "desktop/tests/test_http_api.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "registry 变更影响面检查单测（v2.2.0 A4：impact_check 引用图闭合）。",
       "path": "desktop/tests/test_impact_check.py",
       "role": "verify",
@@ -8159,6 +8303,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "跨用例隔离的**静态**判据：不许把桩打在「模块导入时抓到的 core 模块」上。",
+      "path": "desktop/tests/test_isolation_patterns.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "P-C1：canonical JSON 面的**规范-实现分歧**判据（RFC 8785 vs 仓库口径）。",
       "path": "desktop/tests/test_jcs_spec_gap.py",
       "role": "verify",
@@ -8197,6 +8347,30 @@
     {
       "function": "v2.8.0 波C C1/C2 —— 知识签名 + 版本差异检测单测（41 规划，纯 unittest）。",
       "path": "desktop/tests/test_knowledge_sig.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "标注载体 v0（PNG iTXt）判据：只证三件事，缺一条就不算载体成立。",
+      "path": "desktop/tests/test_label_carrier.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "标注 IR v0（core/label_ir.py + nf label CLI）判据。",
+      "path": "desktop/tests/test_label_ir.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "标注 sidecar v0（core/label_sidecar.py + nf label write/read/list）判据。",
+      "path": "desktop/tests/test_label_sidecar.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "水印层判据：写进去能读回、扛裁剪与重存、**不**扛 JPEG（写成期望行为，不是缺陷）。",
+      "path": "desktop/tests/test_label_watermark.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8329,6 +8503,12 @@
     {
       "function": "Markdown 表格列数一致性（审计 W4：断链 2 / 表格列数不齐 11）。",
       "path": "desktop/tests/test_md_tables.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "Meta-cognitive cockpit integration contracts.",
+      "path": "desktop/tests/test_meta_cockpit.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8537,12 +8717,6 @@
       "rule": "R-verify"
     },
     {
-      "function": "结构计数器（`core/perf_counters.py` + `scripts/perf_counters.py`）回归测试。",
-      "path": "desktop/tests/test_perf_counters.py",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
       "function": "全链管道化单测（v2.1.0 B2：retrieve→compose→gate→export 单命令）。",
       "path": "desktop/tests/test_pipeline.py",
       "role": "verify",
@@ -8629,6 +8803,12 @@
     {
       "function": "`.NET` 加速线的 probe 清单接线判据：`probe_manifest.json` ⟷ `probes/*.py` 必须严格对齐。",
       "path": "desktop/tests/test_probe_manifest_wiring.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "Canonical product metadata must govern every duplicated release surface.",
+      "path": "desktop/tests/test_product_metadata.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8753,6 +8933,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "发布结论复跑器（scripts/release_conclusion.py）单测——纯函数判据 + dry-run 集成。",
+      "path": "desktop/tests/test_release_conclusion.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "发布编排（core/release_gate.py）回归：机读策略过 schema + 计划有序 + 计划快照 + 变异自证。",
       "path": "desktop/tests/test_release_gate.py",
       "role": "verify",
@@ -8815,6 +9001,12 @@
     {
       "function": "",
       "path": "desktop/tests/test_retry_semantics.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "吊销分发件 v0（core/revocations.py + nf evidence revocations CLI）判据。",
+      "path": "desktop/tests/test_revocations.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -9011,6 +9203,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "跨入口同证据（M2-T9）：同一对象 / 同一证据包经 CLI 与本地 HTTP 面必须得到同一判定。",
+      "path": "desktop/tests/test_shell_parity.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "静默跳过必须**成文理由**（`try/except: pass|continue` 逐站点）。",
       "path": "desktop/tests/test_silent_skip_reasons.py",
       "role": "verify",
@@ -9131,6 +9329,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "RFC 3161 可信时间戳（G3 的可落地半边）判据：本地 TSA 全链路 + 篡改/错锚必拒。",
+      "path": "desktop/tests/test_timestamp.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "45 · tool_face 扫描器单测。",
       "path": "desktop/tests/test_tool_face.py",
       "role": "verify",
@@ -9145,6 +9349,12 @@
     {
       "function": "透明日志（哈希链）单测：链自洽 + 改一处即断链 + 边界声明 + 生成物一致性。",
       "path": "desktop/tests/test_transparency_log.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "信任锚判据：根 → 委派链 → 吊销 feed 的公钥归属。",
+      "path": "desktop/tests/test_trust_anchor.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -9205,6 +9415,12 @@
     {
       "function": "门禁机器可读报告（`core/verify_report.py`）回归测试 —— 静态可核验面。",
       "path": "desktop/tests/test_verify_report.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "受影响测试选片（verify_tests.select_affected）判据：**纯函数**，不打桩也不跑全量。",
+      "path": "desktop/tests/test_verify_tests_selection.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -10577,30 +10793,6 @@
       "rule": "R-verify"
     },
     {
-      "function": "This file is automatically @generated by Cargo.",
-      "path": "engine/rust/fuzz/Cargo.lock",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/fuzz/Cargo.toml",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/fuzz/corpus/python_parser/seed.py",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "![no_main]",
-      "path": "engine/rust/fuzz/fuzz_targets/python_parser.rs",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
       "function": "",
       "path": "engine/rust/pyo3/.gitignore",
       "role": "verify",
@@ -11591,948 +11783,6 @@
       "rule": "R-verify"
     },
     {
-      "function": "RustPython parser vendor provenance",
-      "path": "engine/rust/vendor/README.md",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-ast/.cargo-ok",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-ast/.cargo_vcs_info.json",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "THIS FILE IS AUTOMATICALLY GENERATED BY CARGO",
-      "path": "engine/rust/vendor/rustpython-ast/Cargo.toml",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-ast/Cargo.toml.orig",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-ast/Python.asdl",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-ast/asdl.py",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "Generate Rust code from an ASDL description.",
-      "path": "engine/rust/vendor/rustpython-ast/asdl_rs.py",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "[derive(Clone, Debug, PartialEq, Eq, Hash)]",
-      "path": "engine/rust/vendor/rustpython-ast/src/builtin.rs",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "[inline]",
-      "path": "engine/rust/vendor/rustpython-ast/src/fold.rs",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "[cfg(feature = \"all-nodes-with-ranges\")]",
-      "path": "engine/rust/vendor/rustpython-ast/src/gen/fold.rs",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "[derive(Clone, Debug, PartialEq, is_macro::Is)]",
-      "path": "engine/rust/vendor/rustpython-ast/src/gen/generic.rs",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "[cfg(feature = \"all-nodes-with-ranges\")]",
-      "path": "engine/rust/vendor/rustpython-ast/src/gen/located.rs",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "[cfg(feature = \"all-nodes-with-ranges\")]",
-      "path": "engine/rust/vendor/rustpython-ast/src/gen/ranged.rs",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "[allow(unused_variables)]",
-      "path": "engine/rust/vendor/rustpython-ast/src/gen/visitor.rs",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "![allow(clippy::derive_partial_eq_without_eq)]",
-      "path": "engine/rust/vendor/rustpython-ast/src/generic.rs",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-ast/src/impls.rs",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "[cfg(feature = \"unparse\")]",
-      "path": "engine/rust/vendor/rustpython-ast/src/lib.rs",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "![allow(clippy::derive_partial_eq_without_eq)]",
-      "path": "engine/rust/vendor/rustpython-ast/src/located.rs",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "[non_exhaustive]",
-      "path": "engine/rust/vendor/rustpython-ast/src/optimizer.rs",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-ast/src/ranged.rs",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-ast/src/source_locator.rs",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "[repr(transparent)]",
-      "path": "engine/rust/vendor/rustpython-ast/src/unparse.rs",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-literal/.cargo-ok",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-literal/.cargo_vcs_info.json",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "THIS FILE IS AUTOMATICALLY GENERATED BY CARGO",
-      "path": "engine/rust/vendor/rustpython-literal/Cargo.toml",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-literal/Cargo.toml.orig",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-literal/src/char.rs",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "[derive(Debug, PartialEq, Eq, Copy, Clone, Hash, is_macro::Is)]",
-      "path": "engine/rust/vendor/rustpython-literal/src/escape.rs",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "[test]",
-      "path": "engine/rust/vendor/rustpython-literal/src/float.rs",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "[derive(Debug, PartialEq, Eq, Clone, Copy, is_macro::Is, Hash)]",
-      "path": "engine/rust/vendor/rustpython-literal/src/format.rs",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-literal/src/lib.rs",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/.cargo-ok",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/.cargo_vcs_info.json",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "THIS FILE IS AUTOMATICALLY GENERATED BY CARGO",
-      "path": "engine/rust/vendor/rustpython-parser/Cargo.toml",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/Cargo.toml.orig",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "RustPython/parser",
-      "path": "engine/rust/vendor/rustpython-parser/README.md",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "[cfg(feature = \"lalrpop\")]",
-      "path": "engine/rust/vendor/rustpython-parser/build.rs",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "[cfg(test)]",
-      "path": "engine/rust/vendor/rustpython-parser/src/context.rs",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "[allow(clippy::skip_while_next)]",
-      "path": "engine/rust/vendor/rustpython-parser/src/function.rs",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/gen/parse.rs",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "[derive(Clone, Copy, PartialEq, Debug, Default)]",
-      "path": "engine/rust/vendor/rustpython-parser/src/lexer.rs",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "![doc(html_logo_url = \"https://raw.githubusercontent.com/RustPython/RustPython/main/logo.png\")]",
-      "path": "engine/rust/vendor/rustpython-parser/src/lib.rs",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "[cfg(feature = \"full-lexer\")]",
-      "path": "engine/rust/vendor/rustpython-parser/src/parser.rs",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "[inline]",
-      "path": "engine/rust/vendor/rustpython-parser/src/python.lalrpop",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "[allow(unused_extern_crates)]",
-      "path": "engine/rust/vendor/rustpython-parser/src/python.rs",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__context__tests__ann_assign_name.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__context__tests__assign_attribute.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__context__tests__assign_for.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__context__tests__assign_list.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__context__tests__assign_list_comp.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__context__tests__assign_name.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__context__tests__assign_named_expr.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__context__tests__assign_set_comp.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__context__tests__assign_starred.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__context__tests__assign_subscript.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__context__tests__assign_tuple.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__context__tests__assign_with.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__context__tests__aug_assign_attribute.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__context__tests__aug_assign_name.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__context__tests__aug_assign_subscript.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__context__tests__del_attribute.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__context__tests__del_name.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__context__tests__del_subscript.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__function__tests__function_kw_only_args.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__function__tests__function_kw_only_args_with_defaults.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__function__tests__function_no_args.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__function__tests__function_pos_and_kw_only_args.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__function__tests__function_pos_and_kw_only_args_with_defaults.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__function__tests__function_pos_and_kw_only_args_with_defaults_and_varargs.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__function__tests__function_pos_and_kw_only_args_with_defaults_and_varargs_and_kwargs.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__function__tests__function_pos_args.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__function__tests__function_pos_args_with_defaults.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__function__tests__lambda_kw_only_args.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__function__tests__lambda_kw_only_args_with_defaults.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__function__tests__lambda_no_args.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__function__tests__lambda_pos_and_kw_only_args.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__function__tests__lambda_pos_args.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__function__tests__lambda_pos_args_with_defaults.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__parser__tests__dict_unpacking.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__parser__tests__generator_expression_argument.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__parser__tests__match.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__parser__tests__match_as_identifier.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__parser__tests__parse_bool_op_and.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__parser__tests__parse_bool_op_or.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__parser__tests__parse_class.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__parser__tests__parse_class_generic_types.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__parser__tests__parse_dict_comprehension.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__parser__tests__parse_double_list_comprehension.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__parser__tests__parse_empty.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__parser__tests__parse_f_string.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__parser__tests__parse_function_definition.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__parser__tests__parse_generator_comprehension.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__parser__tests__parse_if_elif_else.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__parser__tests__parse_if_else_generator_comprehension.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__parser__tests__parse_kwargs.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__parser__tests__parse_lambda.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__parser__tests__parse_list_comprehension.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__parser__tests__parse_named_expression_generator_comprehension.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__parser__tests__parse_print_2.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__parser__tests__parse_print_hello.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__parser__tests__parse_string.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__parser__tests__parse_tuples.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__parser__tests__parse_type_declaration.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__parser__tests__patma.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__parser__tests__slice.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__parser__tests__star_index.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__parser__tests__try.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__parser__tests__try_star.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__parser__tests__type_as_identifier.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__parser__tests__variadic_generics.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__parser__tests__with_statement.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__string__tests__backspace_alias.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__string__tests__bell_alias.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__string__tests__carriage_return_alias.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__string__tests__character_tabulation_with_justification_alias.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__string__tests__delete_alias.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__string__tests__double_quoted_byte.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__string__tests__escape_alias.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__string__tests__escape_char_in_byte_literal.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__string__tests__escape_octet.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__string__tests__form_feed_alias.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__string__tests__fstring_escaped_character.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__string__tests__fstring_escaped_newline.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__string__tests__fstring_line_continuation.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__string__tests__fstring_parse_self_documenting_base.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__string__tests__fstring_parse_self_documenting_base_more.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__string__tests__fstring_parse_self_documenting_format.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__string__tests__fstring_unescaped_newline.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__string__tests__hts_alias.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__string__tests__parse_empty_fstring.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__string__tests__parse_f_string_concat_1.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__string__tests__parse_f_string_concat_2.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__string__tests__parse_f_string_concat_3.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__string__tests__parse_fstring.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__string__tests__parse_fstring_equals.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__string__tests__parse_fstring_escaped_brackets.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__string__tests__parse_fstring_nested_spec.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__string__tests__parse_fstring_not_equals.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__string__tests__parse_fstring_not_nested_spec.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__string__tests__parse_fstring_self_doc_prec_space.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__string__tests__parse_fstring_self_doc_trailing_space.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__string__tests__parse_fstring_yield_expr.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__string__tests__parse_string_concat.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__string__tests__parse_string_triple_quotes_with_kind.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__string__tests__parse_u_f_string_concat_1.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__string__tests__parse_u_f_string_concat_2.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__string__tests__parse_u_string_concat_1.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__string__tests__parse_u_string_concat_2.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__string__tests__raw_byte_literal_1.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__string__tests__raw_byte_literal_2.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__string__tests__raw_fstring.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__string__tests__single_quoted_byte.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "",
-      "path": "engine/rust/vendor/rustpython-parser/src/snapshots/rustpython_parser__string__tests__triple_quoted_raw_fstring.snap",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "[inline]",
-      "path": "engine/rust/vendor/rustpython-parser/src/soft_keywords.rs",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "[inline]",
-      "path": "engine/rust/vendor/rustpython-parser/src/string.rs",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "[derive(Clone, Debug, PartialEq, is_macro::Is)]",
-      "path": "engine/rust/vendor/rustpython-parser/src/token.rs",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
       "function": "engine/wasm/ · 微内核插件面（计划第五部分 P5）",
       "path": "engine/wasm/README.md",
       "role": "verify",
@@ -12749,13 +11999,13 @@
       "rule": "R-verify"
     },
     {
-      "function": "服务端点契约（机制借鉴 microsoft/ai-chat-protocol 的 API 规格）：把**已实现**的 NF 能力声明成 HTTP 面，供未来的装配服务实现。status=proposed —— 服务本体尚未实现，本文件只固定契约形状；每个端点的 maps_to 必须指向**当下真实存在**的 CLI 子命令或 MCP 工具（否则门禁判 FAIL，防止契约指向空气）。",
+      "function": "服务端点契约（机制借鉴 microsoft/ai-chat-protocol 的 API 规格）：把**已实现**的 NF 能力声明成 HTTP 面，供未来的装配服务实现。status=proposed —— 服务本体尚未实现，本文件只固定契约形状；每个端点的 maps_to 必须指向**当下真实存在**的 CLI 子命令或 MCP 工具（否则门禁判 FAIL，防止契约指向空气）。。其中 local.* 三端点已实装（nf serve --http，只绑回环），其余仍 status=proposed。",
       "path": "protocol/endpoint_contract.json",
       "role": "verify",
       "rule": "R-verify"
     },
     {
-      "function": "错误码中央登记（机制借鉴 loomvault error/ErrorCode.java + iskills domain/errors.ts）。抛出侧只给 code+params，文案由呈现层查表注入；消费方 core/error_codes.py。空表期间不得以此为由跳过登记——条目按实际错误面在重构波次迁移。",
+      "function": "错误码中央登记（机制借鉴 loomvault error/ErrorCode.java + iskills domain/errors.ts）。抛出侧只给 code+params，文案由呈现层查表注入；消费方 core/error_codes.py。词法两类：大写码（NF_*）与 ABI 码 cc.<syscall>.<reason>（docs/ccos/abi-v0.md）。2026-11-05 起登记 CCOS ABI v0 错误面。",
       "path": "protocol/error_codes.json",
       "role": "verify",
       "rule": "R-verify"
@@ -12887,12 +12137,6 @@
       "rule": "R-verify"
     },
     {
-      "function": "结构计数器基线：只许减少（重复劳动棘轮）。跨平台稳定，替代毫秒判据。",
-      "path": "protocol/perf_counters.json",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
       "function": "管线抽象执行的 advisory（同层顺序 / 跨包依赖 / 跨包事件）——不判死，但需分类可见；类别计数下降即缺口收敛。",
       "path": "protocol/pipeline_advisory.json",
       "role": "verify",
@@ -12901,6 +12145,12 @@
     {
       "function": "复盘协议（机制借鉴 SRE postmortem：无指责 + 根因 + 行动项）。要解决的是「同一个坑踩两次」——教训若不落成机制，就只是一段回忆。硬约束：**根因必须指向机制而非人**；**每条行动项必须可指派且可验（带判据）**；**未复盘不得关闭**（closed 须已被协议回执锚定）。",
       "path": "protocol/postmortem.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-product-metadata/1",
+      "path": "protocol/product_metadata.json",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -13049,12 +12299,6 @@
       "rule": "R-verify"
     },
     {
-      "function": "Validate the scoped OWASP ASVS 5.0.0 Level 2 evidence matrix.",
-      "path": "scripts/asvs_policy.py",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
       "function": "check37 · 知识层门禁（双源知识：权威分层 / 查询有序 / 时效 / 消化可追溯 / 认知裁剪）。",
       "path": "scripts/check37_knowledge.py",
       "role": "verify",
@@ -13069,6 +12313,12 @@
     {
       "function": "互操作导出面的**外部权威校验**（非门禁 · 可选联网 · 只读）。",
       "path": "scripts/check_interop_schemas.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "cc_check 判定向量集：策略 + 对象字节 → 期望 verdict（跨语言可复核）。",
+      "path": "scripts/check_vectors.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -13146,17 +12396,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "0d060eac0d59423a577cf033017c3e00e115f6d73c47854c277247ce5c7a5da0",
+  "root_digest": "64d26a7207a5bb5cd858ec4c17a63d72a8e6a87b7fca34d6bc5222833965b986",
   "rule_counts": {
-    "R-app": 1447,
-    "R-catch": 130,
-    "R-entry": 27,
+    "R-app": 1459,
+    "R-catch": 262,
+    "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 118,
-    "R-support": 141,
-    "R-verify": 1017,
-    "auto:R-core": 264
+    "R-projection": 129,
+    "R-support": 136,
+    "R-verify": 879,
+    "auto:R-core": 283
   },
   "schema": "nf-role-coordinates/1"
 }
