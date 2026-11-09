@@ -41,6 +41,7 @@ jobs:
           pip install --require-hashes -r .github/requirements-sast.txt
           pip install --require-hashes -r .github/requirements-lint.txt
       - name: SAST 计数棘轮（新增/上升即红）
+        shell: bash
         run: |
           python scripts/sast_check.py --json > sast-counts.json || true
           python - <<'PY'

@@ -34,6 +34,7 @@ jobs:
         run: python scripts/check_external_links.py
 
       - name: Fetch mode (network; failures turn this job red; 日志落盘)
+        shell: bash
         run: |
           set -o pipefail
           mkdir -p .artifacts
