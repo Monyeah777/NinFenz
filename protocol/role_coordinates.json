@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 160,
     "support": 439,
-    "verify": 1032
+    "verify": 1033
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8825,6 +8825,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "路径类旗标的覆盖棘轮：新旗标必须有测试真跑，旧缺口冻结在案。",
+      "path": "desktop/tests/test_path_flag_ratchet.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "",
       "path": "desktop/tests/test_path_moved.py",
       "role": "verify",
@@ -12576,7 +12582,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "c51aefa822ac50c6c8438d64af908fe743d2b486bdef869c5f20f0a1c4e2a473",
+  "root_digest": "943c54978bfa52c49a52d4dd4eb421ba350f09fd8715c1131b33a53daf90e372",
   "rule_counts": {
     "R-app": 1462,
     "R-catch": 292,
@@ -12585,7 +12591,7 @@
     "R-prod": 944,
     "R-projection": 140,
     "R-support": 119,
-    "R-verify": 906,
+    "R-verify": 907,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
