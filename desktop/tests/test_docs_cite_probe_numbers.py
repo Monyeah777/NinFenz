@@ -25,15 +25,15 @@ def probe_number_issues(text: str, mutation: dict, gates: dict) -> list:
         issues.append("文档没写「N 判据 / N 变异体」（修复指引：按固定措辞写，便于机械核对）")
     for judges, mutants in found:
         if (int(judges), int(mutants)) != want:
-            issues.append("文档写 %s 判据 / %s 变异体，实际 %d / %d"
-                          % (judges, mutants, want[0], want[1]))
-    want_ratio = "%.2f" % float(gates["ratio"])
+            issues.append(f"文档写 {judges} 判据 / {mutants} 变异体，"
+                          f"实际 {want[0]} / {want[1]}")
+    want_ratio = f"{float(gates['ratio']):.2f}"
     found_ratio = re.findall(r"覆盖率（([0-9.]+)）", text)
     if not found_ratio:
         issues.append("文档没写「覆盖率（N）」（修复指引：按固定措辞写）")
     for ratio in found_ratio:
         if ratio != want_ratio:
-            issues.append("文档写覆盖率 %s，实际 %s" % (ratio, want_ratio))
+            issues.append(f"文档写覆盖率 {ratio}，实际 {want_ratio}")
     return issues
 
 
@@ -50,8 +50,9 @@ class ProbeNumberDocsTest(unittest.TestCase):
         """变异自证：把文档数字改错，纯函数核必须报出来。"""
         mutation = json.loads(MUTATION.read_text(encoding="utf-8"))
         gates = json.loads(GATES.read_text(encoding="utf-8"))
-        good = "变异探针（%d 判据 / %d 变异体）、覆盖率（%s）" % (
-            mutation["judges"], mutation["mutants"], "%.2f" % gates["ratio"])
+        ratio_txt = f"{float(gates['ratio']):.2f}"
+        good = (f"变异探针（{mutation['judges']} 判据 / {mutation['mutants']} 变异体）"
+                f"、覆盖率（{ratio_txt}）")
         self.assertEqual([], probe_number_issues(good, mutation, gates))
         bad = good.replace(" 判据", " 条判据").replace("覆盖率（0", "覆盖率（9")
         self.assertTrue(probe_number_issues(bad, mutation, gates))
