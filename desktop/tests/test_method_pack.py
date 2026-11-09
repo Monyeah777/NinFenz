@@ -462,7 +462,7 @@ class PackContentTest(unittest.TestCase):
         section = doc[start:end if end > 0 else len(doc)]
         items = re.findall(r"^\d+\. ", section, re.MULTILINE)
         self.assertEqual(claimed, len(items),
-                         "「%s种用法」与列举条数 %d 不一致" % (match.group(1), len(items)))
+                         f"「{match.group(1)}种用法」与列举条数 {len(items)} 不一致")
         nf_src = (ROOT / "scripts" / "nf.py").read_text(encoding="utf-8")
         for sub in re.findall(r"`nf ([a-z0-9-]+)", section):
             self.assertIn(f'add_parser("{sub}"', nf_src, "用法里提到的 nf " + sub + " 不存在")
