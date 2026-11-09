@@ -10,7 +10,7 @@ subjects:
   - desktop/src/core/quant_metrics.py:ae2bd5a5b71531ee4cf4abe920f75a939a30a5bea105efa7aed011cc92369ce3
   - desktop/src/core/quality_depth_scan.py:563059e8a929bbbba16d5d15a9c77d1f362f9518351860b5ca0682aeb07a23f9
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
-  - scripts/nf.py:83a75a4fac82461d56b03147eff04b420b8aad0ed6db9fef6e695717dcf7b6a2
+  - scripts/nf.py:869bab4dff472c51503c71770c1871cb4dab32a3c3d0977da69ce6a0ea963d9e
   - protocol/output_forms.json:d14609f5bec0b9a65e2bd67919aa77e415faa5eb03a525f219832b1603a7924d
   - community/量化金融域包/outputs/INDEX.json:cfe9272a362e138f9cb6d15615176cbb348716336d31b372bf411645f74a7bb6
   - community/AI系统域包/outputs/INDEX.json:95103926c6736571fb38e5c95f8234b76dddf26ee286270e3bdbdf3fd4c33a99
@@ -19,6 +19,8 @@ subjects:
   - desktop/tests/test_quant_metrics.py:4f8b0d358f6b132f98cf355e75e33917e700f33033421085197fe56edd02f0c4
 
 ---
+> 重审（2026-11-09）：SPDX 3 AI profile: 合入唯一真源与许可单一来源后重绑
+
 > 重审（2026-11-09）：merge latest main for SPDX 3 AI profile
 
 > 重审（2026-11-08）：SPDX 3.0.1 AI Profile interop upgrade

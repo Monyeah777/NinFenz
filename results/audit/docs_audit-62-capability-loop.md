@@ -7,14 +7,18 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/workloop.py:3ee94f2c11939abba5507741c6b9b4dae8e8cab77c3bda38419678e31e097056
-  - desktop/src/core/interop_export.py:98c8d218b97d6901bd23e5cac752b66af53963e9caf7ada3dbdaaf147ff7961e
-  - scripts/nf.py:83a75a4fac82461d56b03147eff04b420b8aad0ed6db9fef6e695717dcf7b6a2
+  - desktop/src/core/interop_export.py:000a868c12b1ef308023d26e4771da72209a6f04c792383de988a497712071ed
+  - scripts/nf.py:869bab4dff472c51503c71770c1871cb4dab32a3c3d0977da69ce6a0ea963d9e
   - scripts/check_interop_schemas.py:30ac5951577c7e807438cedb2ca0607124d2a600dea19b9215d5664a44b74af4
   - docs/interop.md:c3fc34b60476a896dd5e8b0c63b6356cc77cf2234cba27ac06bb9d96d6b2790f
   - desktop/tests/test_interop_export.py:6695371f7b181a7d9da92641d97bf4b00cacf27bdfb05baeb2e533067475a8cc
   - desktop/tests/test_decision_layer.py:551419122f09c1b77f73e7724919f67698bd6d939c3d556d9c8ef98274a76257
 
 ---
+> 重审（2026-11-09）：SPDX 3 AI profile: 许可参数与复杂度收口后重绑
+
+> 重审（2026-11-09）：SPDX 3 AI profile: 合入唯一真源与许可单一来源后重绑
+
 > 重审（2026-11-08）：SPDX 3.0.1 AI Profile interop upgrade
 
 > 重审（2026-11-08）：task-35c：git status 收敛到 repo_face.untracked_paths

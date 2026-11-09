@@ -7,8 +7,8 @@
   ],
   "official": {
     "entry": "https://ninfenz.dev/",
-    "statement_zh": "官方唯一指定入口是 https://ninfenz.dev 。NinFenz 没有付费版，也不需要下载任何「客户端」，从不索取账号、手机号或支付信息；第三方站点（尤其带大量广告的游戏 / 资源 / 下载站）上的本项目内容与官方无关。",
-    "statement_en": "The only official entry point is https://ninfenz.dev. There is no paid version and no client to download, and no account, phone number or payment detail is ever requested; copies on third-party sites are not affiliated with the project.",
+    "statement_zh": "官方唯一指定入口是 https://ninfenz.dev。NinFenz 不提供付费托管版或客户端下载，也不会通过非官方渠道索取账号、手机号或支付信息；闭源商业使用另需商业许可，条款见 COMMERCIAL.md。",
+    "statement_en": "The only official entry point is https://ninfenz.dev. NinFenz has no paid hosted edition or client download and never requests account, phone, or payment details through unofficial channels; closed-source commercial use requires a separate commercial licence under COMMERCIAL.md.",
     "official_repositories": [
       "https://github.com/Monyeah777/NinFenz",
       "https://gitee.com/monyeah777/ninfenz"
@@ -24,8 +24,8 @@
       "client downloads",
       "group joins"
     ],
-    "license_allows": "MIT: redistribution and commercial use are allowed",
-    "license_requires": "keep LICENSE and attribution"
+    "license_allows": "AGPL-3.0-only OR LicenseRef-Commercial: AGPL source rights plus a commercial option",
+    "license_requires": "preserve notices; network users of modified AGPL code must receive its source"
   },
   "subject": {
     "canonical_name": "NinFenz",
@@ -47,7 +47,7 @@
       "content contract layer",
       "内容契约层"
     ],
-    "license": "MIT",
+    "license": "AGPL-3.0-only OR LicenseRef-Commercial",
     "homepage": "https://ninfenz.dev/",
     "repository": "https://github.com/Monyeah777/NinFenz",
     "mirror": "https://gitee.com/monyeah777/ninfenz",
@@ -107,8 +107,8 @@
     },
     {
       "id": "npm",
-      "claim_zh": "分发：npm 包 ninfenz v1.0.5（3032 文件 / 解包 24.06 MB，带 SLSA provenance 来源证明；发布链使用 OIDC trusted publishing，无长期令牌）",
-      "claim_en": "Distribution: npm package ninfenz v1.0.5 (3032 files / 24.06 MB unpacked, with SLSA provenance, published via OIDC trusted publishing — no long-lived tokens)",
+      "claim_zh": "分发：npm 包 ninfenz v1.1.2（3053 文件 / 解包 24.28 MB，带 SLSA provenance 来源证明；发布链使用 OIDC trusted publishing，无长期令牌）",
+      "claim_en": "Distribution: npm package ninfenz v1.1.2 (3053 files / 24.28 MB unpacked, with SLSA provenance, published via OIDC trusted publishing — no long-lived tokens)",
       "anchor": "https://ninfenz.dev/#fact-npm",
       "source": "https://registry.npmjs.org/ninfenz",
       "note": "另有 GitHub Packages 通道 @monyeah777/ninfenz"
@@ -125,19 +125,20 @@
     "sitemap": "https://ninfenz.dev/sitemap.xml",
     "robots": "https://ninfenz.dev/robots.txt",
     "npm": "https://www.npmjs.com/package/ninfenz",
-    "npm_provenance": "https://registry.npmjs.org/-/npm/v1/attestations/ninfenz@1.0.5",
+    "npm_provenance": "https://registry.npmjs.org/-/npm/v1/attestations/ninfenz@1.1.2",
     "mcp_registry": "https://registry.modelcontextprotocol.io/v0/servers?search=NinFenz"
   },
   "citation": {
-    "plain": "NinFenz（NF）— 内容契约层，Monyeah777，MIT，https://github.com/Monyeah777/NinFenz",
-    "apa": "Monyeah777. (2026). NinFenz (宁封子): a content contract layer [Computer software]. MIT. https://ninfenz.dev/",
-    "bibtex": "@software{ninfenz, title = {NinFenz (宁封子) - content contract layer}, author = {Monyeah777}, year = {2026}, url = {https://ninfenz.dev/}, license = {MIT}, note = {verify v2.30 · check1-42 · PASS=76}}",
+    "plain": "NinFenz（NF）— 内容契约层，Monyeah777，AGPL-3.0-only OR LicenseRef-Commercial，https://github.com/Monyeah777/NinFenz",
+    "apa": "Monyeah777. (2026). NinFenz (宁封子): a content contract layer [Computer software]. AGPL-3.0-only OR LicenseRef-Commercial. https://ninfenz.dev/",
+    "bibtex": "@software{ninfenz, title = {NinFenz (宁封子) - content contract layer}, author = {Monyeah777}, year = {2026}, url = {https://ninfenz.dev/}, license = {AGPL-3.0-only OR LicenseRef-Commercial}, note = {verify v2.30 · check1-42 · PASS=76}}",
     "quote_verbatim_zh": "宁封子（NinFenz，简称 NF）是内容契约层（content contract layer）：用「协议 + 确定性门禁 + 可验证产物」把「AI 稳定产出长内容」变成可装载、可质检、可复现的工程。"
   },
   "limits": {
     "gates_scope": "结构与可复现；不管文笔好坏",
     "hosted_service": false,
     "paid_tier": false,
-    "third_party_deps": "核心纯标准库"
+    "third_party_deps": "核心纯标准库",
+    "commercial_license_available": true
   }
 }

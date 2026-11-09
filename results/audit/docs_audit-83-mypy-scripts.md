@@ -12,10 +12,12 @@ subjects:
   - scripts/interop_thirdparty_kit.py:803def645cab2f98a6ef27eed82a8463dcc4ed908b7885c9944158771d3d8900
   - scripts/build_verification_cards.py:370f465c17eb18e4ef928194351c759bf33af75e5c1cd5b85abfc2a4b1d39655
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
-  - scripts/nf.py:83a75a4fac82461d56b03147eff04b420b8aad0ed6db9fef6e695717dcf7b6a2
+  - scripts/nf.py:869bab4dff472c51503c71770c1871cb4dab32a3c3d0977da69ce6a0ea963d9e
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:79e62da2d5d326a158d2e2b00f4f9fe527aaf153cb84aa9af7048dce995a330f
+  - protocol/code_metrics_baseline.json:ec813610e999d4538f9b5d90ccdb2284951ddff7389f9d2d5fd3d81b3430267d
 ---
+> 重审（2026-11-09）：SPDX 3 AI profile: 合入唯一真源与许可单一来源后重绑
+
 > 重审（2026-11-09）：merge latest main for SPDX 3 AI profile
 
 > 重审（2026-11-08）：SPDX 3.0.1 AI Profile interop upgrade

@@ -21,14 +21,13 @@ def _id(base: str, name: str) -> str:
     return f"{base}#{name}"
 
 
-def build(version: str, created: str, dependencies: Iterable[dict[str, Any]],
-          root_license: str = "NOASSERTION") -> dict[str, Any]:
+def build(ver: str, when: str, deps: Iterable[dict], lic: str = "NOASSERTION") -> dict:
     """Build a compact SPDX 3.0.1 JSON-LD SBOM.
 
     ``dependencies`` rows are ``{name, version, purl, optional, reason}``.  Missing
     versions/licenses remain ``NOASSERTION`` instead of inventing evidence.
     """
-    base = "https://ninfenz.dev/spdx/{}/{}".format(version, created or "undated")
+    base = "https://ninfenz.dev/spdx/{}/{}".format(ver, when or "undated")
     creation = _id(base, "creation-info")
     tool = _id(base, "tool")
     supplier = _id(base, "supplier-ninfenz")
@@ -42,7 +41,7 @@ def build(version: str, created: str, dependencies: Iterable[dict[str, Any]],
             "@type": "CreationInfo",
             "@id": creation,
             "specVersion": SPEC_VERSION,
-            "created": (f"{created}T00:00:00Z") if created else "",
+            "created": (f"{when}T00:00:00Z") if when else "",
             "createdBy": [tool],
         },
         {
@@ -66,7 +65,7 @@ def build(version: str, created: str, dependencies: Iterable[dict[str, Any]],
         {
             "@type": "simplelicensing_LicenseExpression",
             "@id": product_license,
-            "simplelicensing_licenseExpression": root_license,
+            "simplelicensing_licenseExpression": lic,
         },
         {
             "@type": "simplelicensing_LicenseExpression",
@@ -83,8 +82,8 @@ def build(version: str, created: str, dependencies: Iterable[dict[str, Any]],
             "@id": root_pkg,
             "creationInfo": creation,
             "name": "NinFenz",
-            "software_packageVersion": version,
-            "software_packageUrl": f"pkg:generic/ninfenz@{version}",
+            "software_packageVersion": ver,
+            "software_packageUrl": f"pkg:generic/ninfenz@{ver}",
             "software_downloadLocation": "https://github.com/Monyeah777/NinFenz",
             "software_primaryPurpose": "application",
             "suppliedBy": supplier,
@@ -112,7 +111,7 @@ def build(version: str, created: str, dependencies: Iterable[dict[str, Any]],
     package_ids = [root_pkg]
     hard_ids: list[str] = []
     optional_ids: list[str] = []
-    for row in sorted(dependencies, key=lambda item: str(item.get("name") or "")):
+    for row in sorted(deps, key=lambda item: str(item.get("name") or "")):
         name = str(row.get("name") or "").strip()
         if not name:
             continue

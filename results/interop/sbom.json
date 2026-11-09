@@ -29,9 +29,9 @@
       "name": "Upstream Python projects"
     },
     {
-      "@id": "https://ninfenz.dev/spdx/v2.30/2026-11-09#license-mit",
+      "@id": "https://ninfenz.dev/spdx/v2.30/2026-11-09#license-product",
       "@type": "simplelicensing_LicenseExpression",
-      "simplelicensing_licenseExpression": "MIT"
+      "simplelicensing_licenseExpression": "AGPL-3.0-only"
     },
     {
       "@id": "https://ninfenz.dev/spdx/v2.30/2026-11-09#license-cc0",
@@ -98,6 +98,18 @@
       "suppliedBy": "https://ninfenz.dev/spdx/v2.30/2026-11-09#supplier-upstream"
     },
     {
+      "@id": "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-cyclonedx",
+      "@type": "software_Package",
+      "comment": "软依赖（可选，须 try/except 守卫）：发布束 CycloneDX 1.6 schema 验证（仅发布工具链；缺依赖 fail-closed）",
+      "creationInfo": "https://ninfenz.dev/spdx/v2.30/2026-11-09#creation-info",
+      "name": "cyclonedx",
+      "software_downloadLocation": "NOASSERTION",
+      "software_packageUrl": "pkg:pypi/cyclonedx",
+      "software_packageVersion": "NOASSERTION",
+      "software_primaryPurpose": "library",
+      "suppliedBy": "https://ninfenz.dev/spdx/v2.30/2026-11-09#supplier-upstream"
+    },
+    {
       "@id": "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-jsonschema",
       "@type": "software_Package",
       "comment": "软依赖（可选，须 try/except 守卫）：IDL 标准实现交叉验证（可选对照；缺依赖则跳过该面）",
@@ -112,7 +124,7 @@
     {
       "@id": "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-laya",
       "@type": "software_Package",
-      "comment": "软依赖（可选，须 try/except 守卫）：决策层本地服务（scripts/serve_decision_model.py）的模型运行时；软导入 + 缺依赖给修复指引",
+      "comment": "软依赖（可选，须 try/except 守卫）：决策层本地模型服务运行时；软导入，缺依赖时给修复指引",
       "creationInfo": "https://ninfenz.dev/spdx/v2.30/2026-11-09#creation-info",
       "name": "laya",
       "software_downloadLocation": "NOASSERTION",
@@ -124,11 +136,23 @@
     {
       "@id": "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-nf-pyengine",
       "@type": "software_Package",
-      "comment": "软依赖（可选，须 try/except 守卫）：PyO3 扩展（engine/rust/pyo3 构建）为可选进程内原语加速；缺扩展时 rust_pyext 回退 hashlib/repr，不把 Rust 工具链变成运行前提",
+      "comment": "软依赖（可选，须 try/except 守卫）：可选 PyO3 加速；缺扩展时 rust_pyext 回退纯 Python 原语，不将 Rust 设为运行前提",
       "creationInfo": "https://ninfenz.dev/spdx/v2.30/2026-11-09#creation-info",
       "name": "nf_pyengine",
       "software_downloadLocation": "NOASSERTION",
       "software_packageUrl": "pkg:pypi/nf_pyengine",
+      "software_packageVersion": "NOASSERTION",
+      "software_primaryPurpose": "library",
+      "suppliedBy": "https://ninfenz.dev/spdx/v2.30/2026-11-09#supplier-upstream"
+    },
+    {
+      "@id": "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-rdflib",
+      "@type": "software_Package",
+      "comment": "软依赖（可选，须 try/except 守卫）：SPDX 3 JSON-LD 展开验证（仅发布工具链；缺依赖 fail-closed）",
+      "creationInfo": "https://ninfenz.dev/spdx/v2.30/2026-11-09#creation-info",
+      "name": "rdflib",
+      "software_downloadLocation": "NOASSERTION",
+      "software_packageUrl": "pkg:pypi/rdflib",
       "software_packageVersion": "NOASSERTION",
       "software_primaryPurpose": "library",
       "suppliedBy": "https://ninfenz.dev/spdx/v2.30/2026-11-09#supplier-upstream"
@@ -182,7 +206,7 @@
       "from": "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-ninfenz",
       "relationshipType": "hasOptionalDependency",
       "to": [
-        "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-jsonschema"
+        "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-cyclonedx"
       ]
     },
     {
@@ -192,7 +216,7 @@
       "from": "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-ninfenz",
       "relationshipType": "hasOptionalDependency",
       "to": [
-        "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-laya"
+        "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-jsonschema"
       ]
     },
     {
@@ -202,7 +226,27 @@
       "from": "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-ninfenz",
       "relationshipType": "hasOptionalDependency",
       "to": [
+        "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-laya"
+      ]
+    },
+    {
+      "@id": "https://ninfenz.dev/spdx/v2.30/2026-11-09#optional-dependency-6",
+      "@type": "LifecycleScopedRelationship",
+      "creationInfo": "https://ninfenz.dev/spdx/v2.30/2026-11-09#creation-info",
+      "from": "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-ninfenz",
+      "relationshipType": "hasOptionalDependency",
+      "to": [
         "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-nf-pyengine"
+      ]
+    },
+    {
+      "@id": "https://ninfenz.dev/spdx/v2.30/2026-11-09#optional-dependency-7",
+      "@type": "LifecycleScopedRelationship",
+      "creationInfo": "https://ninfenz.dev/spdx/v2.30/2026-11-09#creation-info",
+      "from": "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-ninfenz",
+      "relationshipType": "hasOptionalDependency",
+      "to": [
+        "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-rdflib"
       ]
     },
     {
@@ -212,7 +256,7 @@
       "from": "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-ninfenz",
       "relationshipType": "hasDeclaredLicense",
       "to": [
-        "https://ninfenz.dev/spdx/v2.30/2026-11-09#license-mit"
+        "https://ninfenz.dev/spdx/v2.30/2026-11-09#license-product"
       ]
     },
     {
@@ -222,7 +266,7 @@
       "from": "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-ninfenz",
       "relationshipType": "hasConcludedLicense",
       "to": [
-        "https://ninfenz.dev/spdx/v2.30/2026-11-09#license-mit"
+        "https://ninfenz.dev/spdx/v2.30/2026-11-09#license-product"
       ]
     },
     {
@@ -269,7 +313,7 @@
       "@id": "https://ninfenz.dev/spdx/v2.30/2026-11-09#license-hasDeclaredLicense-4",
       "@type": "Relationship",
       "creationInfo": "https://ninfenz.dev/spdx/v2.30/2026-11-09#creation-info",
-      "from": "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-jsonschema",
+      "from": "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-cyclonedx",
       "relationshipType": "hasDeclaredLicense",
       "to": [
         "https://ninfenz.dev/spdx/v2.30/2026-11-09#license-noassertion"
@@ -279,7 +323,7 @@
       "@id": "https://ninfenz.dev/spdx/v2.30/2026-11-09#license-hasConcludedLicense-4",
       "@type": "Relationship",
       "creationInfo": "https://ninfenz.dev/spdx/v2.30/2026-11-09#creation-info",
-      "from": "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-jsonschema",
+      "from": "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-cyclonedx",
       "relationshipType": "hasConcludedLicense",
       "to": [
         "https://ninfenz.dev/spdx/v2.30/2026-11-09#license-noassertion"
@@ -289,7 +333,7 @@
       "@id": "https://ninfenz.dev/spdx/v2.30/2026-11-09#license-hasDeclaredLicense-5",
       "@type": "Relationship",
       "creationInfo": "https://ninfenz.dev/spdx/v2.30/2026-11-09#creation-info",
-      "from": "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-laya",
+      "from": "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-jsonschema",
       "relationshipType": "hasDeclaredLicense",
       "to": [
         "https://ninfenz.dev/spdx/v2.30/2026-11-09#license-noassertion"
@@ -299,7 +343,7 @@
       "@id": "https://ninfenz.dev/spdx/v2.30/2026-11-09#license-hasConcludedLicense-5",
       "@type": "Relationship",
       "creationInfo": "https://ninfenz.dev/spdx/v2.30/2026-11-09#creation-info",
-      "from": "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-laya",
+      "from": "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-jsonschema",
       "relationshipType": "hasConcludedLicense",
       "to": [
         "https://ninfenz.dev/spdx/v2.30/2026-11-09#license-noassertion"
@@ -309,7 +353,7 @@
       "@id": "https://ninfenz.dev/spdx/v2.30/2026-11-09#license-hasDeclaredLicense-6",
       "@type": "Relationship",
       "creationInfo": "https://ninfenz.dev/spdx/v2.30/2026-11-09#creation-info",
-      "from": "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-nf-pyengine",
+      "from": "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-laya",
       "relationshipType": "hasDeclaredLicense",
       "to": [
         "https://ninfenz.dev/spdx/v2.30/2026-11-09#license-noassertion"
@@ -319,7 +363,7 @@
       "@id": "https://ninfenz.dev/spdx/v2.30/2026-11-09#license-hasConcludedLicense-6",
       "@type": "Relationship",
       "creationInfo": "https://ninfenz.dev/spdx/v2.30/2026-11-09#creation-info",
-      "from": "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-nf-pyengine",
+      "from": "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-laya",
       "relationshipType": "hasConcludedLicense",
       "to": [
         "https://ninfenz.dev/spdx/v2.30/2026-11-09#license-noassertion"
@@ -329,7 +373,7 @@
       "@id": "https://ninfenz.dev/spdx/v2.30/2026-11-09#license-hasDeclaredLicense-7",
       "@type": "Relationship",
       "creationInfo": "https://ninfenz.dev/spdx/v2.30/2026-11-09#creation-info",
-      "from": "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-yaml",
+      "from": "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-nf-pyengine",
       "relationshipType": "hasDeclaredLicense",
       "to": [
         "https://ninfenz.dev/spdx/v2.30/2026-11-09#license-noassertion"
@@ -337,6 +381,46 @@
     },
     {
       "@id": "https://ninfenz.dev/spdx/v2.30/2026-11-09#license-hasConcludedLicense-7",
+      "@type": "Relationship",
+      "creationInfo": "https://ninfenz.dev/spdx/v2.30/2026-11-09#creation-info",
+      "from": "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-nf-pyengine",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "https://ninfenz.dev/spdx/v2.30/2026-11-09#license-noassertion"
+      ]
+    },
+    {
+      "@id": "https://ninfenz.dev/spdx/v2.30/2026-11-09#license-hasDeclaredLicense-8",
+      "@type": "Relationship",
+      "creationInfo": "https://ninfenz.dev/spdx/v2.30/2026-11-09#creation-info",
+      "from": "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-rdflib",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "https://ninfenz.dev/spdx/v2.30/2026-11-09#license-noassertion"
+      ]
+    },
+    {
+      "@id": "https://ninfenz.dev/spdx/v2.30/2026-11-09#license-hasConcludedLicense-8",
+      "@type": "Relationship",
+      "creationInfo": "https://ninfenz.dev/spdx/v2.30/2026-11-09#creation-info",
+      "from": "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-rdflib",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "https://ninfenz.dev/spdx/v2.30/2026-11-09#license-noassertion"
+      ]
+    },
+    {
+      "@id": "https://ninfenz.dev/spdx/v2.30/2026-11-09#license-hasDeclaredLicense-9",
+      "@type": "Relationship",
+      "creationInfo": "https://ninfenz.dev/spdx/v2.30/2026-11-09#creation-info",
+      "from": "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-yaml",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "https://ninfenz.dev/spdx/v2.30/2026-11-09#license-noassertion"
+      ]
+    },
+    {
+      "@id": "https://ninfenz.dev/spdx/v2.30/2026-11-09#license-hasConcludedLicense-9",
       "@type": "Relationship",
       "creationInfo": "https://ninfenz.dev/spdx/v2.30/2026-11-09#creation-info",
       "from": "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-yaml",
@@ -364,9 +448,11 @@
         "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-ninfenz",
         "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-pil",
         "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-pyside6",
+        "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-cyclonedx",
         "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-jsonschema",
         "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-laya",
         "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-nf-pyengine",
+        "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-rdflib",
         "https://ninfenz.dev/spdx/v2.30/2026-11-09#pkg-yaml"
       ],
       "name": "ninfenz-spdx3-ai-profile",

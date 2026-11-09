@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:79e62da2d5d326a158d2e2b00f4f9fe527aaf153cb84aa9af7048dce995a330f
+  - protocol/code_metrics_baseline.json:ec813610e999d4538f9b5d90ccdb2284951ddff7389f9d2d5fd3d81b3430267d
 ---
+> 重审（2026-11-09）：SPDX 3 AI profile: 合入唯一真源与许可单一来源后重绑
+
 > 重审（2026-11-09）：merge latest main for SPDX 3 AI profile
 
 > 重审（2026-11-08）：SPDX 3.0.1 AI Profile interop upgrade

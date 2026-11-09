@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:79e62da2d5d326a158d2e2b00f4f9fe527aaf153cb84aa9af7048dce995a330f
+  - protocol/code_metrics_baseline.json:ec813610e999d4538f9b5d90ccdb2284951ddff7389f9d2d5fd3d81b3430267d
 ---
+> 重审（2026-11-09）：SPDX 3 AI profile: 合入唯一真源与许可单一来源后重绑
+
 > 重审（2026-11-09）：merge latest main for SPDX 3 AI profile
 
 > 重审（2026-11-08）：SPDX 3.0.1 AI Profile interop upgrade

@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-09",
   "approved_by": "Monyeah777",
-  "note": "merge latest main for SPDX 3 AI profile",
+  "note": "",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "a192af0e972459cbc08a858aa5428ed7c772d209e1d6d070f58f3231d510c817"
+  "subject_digest": "2d5a16f662b4afaeffc2793daebb0986a5f275754b06d65207b23d83d0363708"
 }

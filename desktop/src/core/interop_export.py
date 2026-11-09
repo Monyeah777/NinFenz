@@ -345,12 +345,8 @@ def sbom_doc(root: str = ".") -> Dict[str, Any]:
                      "purl": "pkg:pypi/%s%s" % (proj, ("@%s" % ver) if ver else ""),
                      "optional": True,
                      "reason": "软依赖（可选，须 try/except 守卫）：%s" % why})
-    return spdx3.build(
-        nf_version,
-        _declared_max_date(root),
-        deps,
-        root_license=product_metadata.license_id(root),
-    )
+    return spdx3.build(nf_version, _declared_max_date(root), deps,
+                       product_metadata.license_id(root))
 
 
 def slsa_provenance(root: str = ".") -> Dict[str, Any]:

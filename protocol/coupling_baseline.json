@@ -603,8 +603,8 @@
     },
     "interop_export": {
       "ca": 1,
-      "ce": 4,
-      "i": 0.8
+      "ce": 5,
+      "i": 0.8333
     },
     "interp_diet": {
       "ca": 0,

@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:4929a1fe7b789ed86d8978f6c49ccf120ecc7a44e741f3e38dc79c8f1aa0b23d
-  - protocol/code_metrics_baseline.json:79e62da2d5d326a158d2e2b00f4f9fe527aaf153cb84aa9af7048dce995a330f
+  - protocol/code_metrics_baseline.json:ec813610e999d4538f9b5d90ccdb2284951ddff7389f9d2d5fd3d81b3430267d
 ---
+> 重审（2026-11-09）：SPDX 3 AI profile: 合入唯一真源与许可单一来源后重绑
+
 > 重审（2026-11-09）：merge latest main for SPDX 3 AI profile
 
 > 重审（2026-11-08）：SPDX 3.0.1 AI Profile interop upgrade

@@ -9,7 +9,7 @@ subjects:
   - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
   - desktop/src/core/transparency_log.py:8aba0254fcf72230452600d5cb0305b5d5320cd3e95d8ed57ebe54a5d0ae46a1
   - desktop/src/core/rating_gate.py:468759e5d971fbe9319ab86e84d95031c13bc3df2c44dbffac0af3fcb071f74e
-  - desktop/src/core/interop_export.py:98c8d218b97d6901bd23e5cac752b66af53963e9caf7ada3dbdaaf147ff7961e
+  - desktop/src/core/interop_export.py:000a868c12b1ef308023d26e4771da72209a6f04c792383de988a497712071ed
   - desktop/src/core/ccv3_adapter.py:ec9bfacffcb0dd6a73f88652a7273d631e40c4efd8cecfb00a5f0be831a511ad
   - desktop/src/core/export_schema.py:9052dc891be0c70ceb5b42544eceeceeeb4dee8c4f107b1ec660913cf922ad3d
   - desktop/src/core/mcp_runtime.py:4929a1fe7b789ed86d8978f6c49ccf120ecc7a44e741f3e38dc79c8f1aa0b23d
@@ -22,6 +22,10 @@ subjects:
   - results/interop-schema-validation.md:d55761af677c8c6301aeb6cf8f5eae4579cb558d9b0adc0dfb54e5a471ef89ae
 
 ---
+> 重审（2026-11-09）：SPDX 3 AI profile: 许可参数与复杂度收口后重绑
+
+> 重审（2026-11-09）：SPDX 3 AI profile: 合入唯一真源与许可单一来源后重绑
+
 > 重审（2026-11-08）：SPDX 3.0.1 AI Profile interop upgrade
 
 > 重审（2026-10-29）：恢复分支全量验证：接线 meta-cockpit 公共模块、清理零引用、修复 ReDoS/CLI 闸门/公开文档路径后重绑；既有结论不变

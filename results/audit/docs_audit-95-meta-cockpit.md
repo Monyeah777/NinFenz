@@ -12,19 +12,21 @@ subjects:
   - desktop/src/core/meta_cockpit/runtime_executor.py:204a67ec93855257323887011395b0866ac8d5ae1c485362e89eb058ffe64bfb
   - desktop/src/core/meta_cockpit/cockpit_service.py:18280c6966dd618a8b09daa058b461fa43f89e99f11c797ca884338ff5c13bbf
   - desktop/src/core/meta_cockpit/cockpit_ab.py:6afcade08f2469aad4adc6f44e0e3d28a17712a85e3223f41b14c0020c2f88e7
-  - desktop/src/core/terminal.py:69c2d9ced679e439c6ca440fc949d02f70dc067debdd9b520f96a2e4de156833
+  - desktop/src/core/terminal.py:3e21a47d54d5130acaf33545a501902cad27f1b3b657df826a13975fecd8d3b5
   - desktop/tests/test_meta_cockpit.py:cc2dc4f52729b35f400ca92aa367e685780f9f6735224e7fc0b7550b85f52662
   - desktop/tests/test_cli_error_framing.py:4c186dc60b5e58bfe6c0400242051e14a8995bc7dad5399d68a85d8881d0e133
-  - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
-  - scripts/nf.py:83a75a4fac82461d56b03147eff04b420b8aad0ed6db9fef6e695717dcf7b6a2
+  - desktop/tests/test_nf_cli.py:c44a5c57d5c4247a6c58d5e85d4e7adf2c95f7969d5d599e2b9643fe495c7b17
+  - scripts/nf.py:869bab4dff472c51503c71770c1871cb4dab32a3c3d0977da69ce6a0ea963d9e
   - tui/_surface.py:8db432e006d08b717d507deb8839e02e0db1ccacc3e4962a712045ccfd2a30bf
   - protocol/check12_weights.json:ca51dbfd955646fe8cce014db5a632fbc4468492dbcd7e6d64eca7d9c1ac8324
-  - protocol/coupling_baseline.json:10df87e6c038d322492329f86e549d08d998dbe2bdc31e4d2217da996040aa2c
+  - protocol/coupling_baseline.json:4039a9bec1701013259e1441b2e6ea14b13891cd7f09dc976db10db4b2b21d11
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:7b1231392bea0bc51ed14d73fac3c73c185209c1233e7727e554d5b899031af2
 
 ---
+> 重审（2026-11-09）：SPDX 3 AI profile: 合入唯一真源与许可单一来源后重绑
+
 > 重审（2026-11-09）：merge latest main for SPDX 3 AI profile
 
 > 重审（2026-11-08）：SPDX 3.0.1 AI Profile interop upgrade
