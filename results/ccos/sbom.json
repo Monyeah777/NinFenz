@@ -1,7 +1,7 @@
 {
-  "bytes": 11993126,
+  "bytes": 11993479,
   "count": 568,
-  "digest": "1a926587d34b14b7081cb906ed6c7a7d855dd46b5e77de8985e7745f7abd71aa",
+  "digest": "1c158dc91653f35819245ae1a06bf6d474bdc49157cb54a420e03f1e6a145485",
   "materials": [
     {
       "bytes": 102,
@@ -1879,9 +1879,9 @@
       "sha256": "494608cac7037b2e30cc9cfd3c60dfa751ff2e734b7c0327915279fc1587bf74"
     },
     {
-      "bytes": 2352,
+      "bytes": 2708,
       "path": "docs/ccos/supply-chain-v0.md",
-      "sha256": "a3932c0dce38d118ff2a47aabca9f9683e682ed514eddb195eb0847cc2236bc0"
+      "sha256": "a61e37be56120d08cfdb4a170c5fc106eddb8b6496960da92417a3519a64d209"
     },
     {
       "bytes": 8224,
@@ -1899,9 +1899,9 @@
       "sha256": "ad799cbfbf1dd69859ff21963885ebf1d5fed56ca67fdd1c2b9e2052ce3b8003"
     },
     {
-      "bytes": 254,
+      "bytes": 251,
       "path": "protocol/approvals/protocol__conformance_report.json",
-      "sha256": "1a41ec1a6a0846e224956c9675607f0bd0b408a5a421c0a96b509ba21e34ebc7"
+      "sha256": "805c57f3afb95198db7b7258d69e40e5bfcdf234bc24bc877693dcf0946a2b0c"
     },
     {
       "bytes": 16375,
