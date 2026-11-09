@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/json_schema.py:f3a4a6a14de5104e217af8b154505f9ca46fd6133081188209add78143e2b23e
-  - protocol/code_metrics_baseline.json:5ff42744a42b48fbf43f0325b0a2b42e73707c978ca80176fa4594a392eadb20
+  - protocol/code_metrics_baseline.json:79e62da2d5d326a158d2e2b00f4f9fe527aaf153cb84aa9af7048dce995a330f
 ---
+> 重审（2026-11-09）：merge latest main for SPDX 3 AI profile
+
 > 重审（2026-11-08）：SPDX 3.0.1 AI Profile interop upgrade
 
 > 重审（2026-11-08）：payload 未暂存 warn

@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
-  - protocol/code_metrics_baseline.json:5ff42744a42b48fbf43f0325b0a2b42e73707c978ca80176fa4594a392eadb20
+  - protocol/code_metrics_baseline.json:79e62da2d5d326a158d2e2b00f4f9fe527aaf153cb84aa9af7048dce995a330f
 ---
+> 重审（2026-11-09）：merge latest main for SPDX 3 AI profile
+
 > 重审（2026-11-08）：SPDX 3.0.1 AI Profile interop upgrade
 
 > 重审（2026-11-08）：payload 未暂存 warn

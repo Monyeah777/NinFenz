@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:5ff42744a42b48fbf43f0325b0a2b42e73707c978ca80176fa4594a392eadb20
+  - protocol/code_metrics_baseline.json:79e62da2d5d326a158d2e2b00f4f9fe527aaf153cb84aa9af7048dce995a330f
 ---
+> 重审（2026-11-09）：merge latest main for SPDX 3 AI profile
+
 > 重审（2026-11-08）：SPDX 3.0.1 AI Profile interop upgrade
 
 > 重审（2026-11-08）：payload 未暂存 warn
