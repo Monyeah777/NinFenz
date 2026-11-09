@@ -386,9 +386,19 @@ class WatchDaemonIntegrationTest(unittest.TestCase):
         本用例只关心「常驻层有没有被搬回来」，故在 `finally` 里把**模块身份与常驻层一起还原**。
         """
         self._call(["--version"])
+        # 观测面取**当前** sys.modules 的模块；query_stats 走守护、超时 2s——高负载下守护回包
+        # 可能慢于断言（2026-11-09 r84 shard6 实测偶发 resident.text=0），故轮询并重读。
+        path = os.path.join(ROOT, "protocol", "LAYERS.json")
+        text = 0
+        for _ in range(100):
+            sys.modules["core.conformance_scan"].read_text_cached(path)
+            st = dm.query_stats()
+            text = ((st or {}).get("resident") or {}).get("text", 0)
+            if text > 0:
+                break
+            time.sleep(0.05)
         csc_live = sys.modules["core.conformance_scan"]
-        csc_live.read_text_cached(os.path.join(ROOT, "protocol", "LAYERS.json"))
-        self.assertGreater(dm.query_stats()["resident"]["text"], 0)
+        self.assertGreater(text, 0, "常驻语料层未被填充（守护回包慢或观测面落在旧模块）")
         saved_mods = {k: v for k, v in list(sys.modules.items())
                       if k == "core" or k.startswith("core.")}
         real = dm._code_fingerprint
