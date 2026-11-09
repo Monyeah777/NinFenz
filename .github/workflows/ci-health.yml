@@ -29,7 +29,9 @@ concurrency:
 permissions:
   actions: read
   contents: read
-  security-events: read      # 安全面快照（code-scanning 计数）只读
+  security-events: read          # 安全面快照：code-scanning
+  secret-scanning-alerts: read   # 安全面快照：secret-scanning
+  dependabot-alerts: read        # 安全面快照：dependabot
 
 jobs:
   scheduled-red-audit:
