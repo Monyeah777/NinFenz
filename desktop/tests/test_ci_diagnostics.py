@@ -196,5 +196,18 @@ class GateAlwaysRunsTest(unittest.TestCase):
         self.assertIn("needs.unit-tests.result", block, "gate 未校验 unit-tests 结果")
 
 
+class ParityKeyCompareTest(unittest.TestCase):
+    """linux-parity-refresh 的 posix SAST 漂移判定必须逐键比对（2026-11-09）。
+
+    只比总数会漏「一规则 +1、另一规则 -1」的键级漂移（总数相等 → 漂移告警绿着放行）。
+    """
+
+    def test_parity_compares_keys_not_only_totals(self):
+        text = (WF / "linux-parity-refresh.yml").read_text(encoding="utf-8")
+        self.assertIn("键级漂移", text, "parity 漂移判定未做键级比对")
+        self.assertIn("set(c) - set(b)", text, "parity 漂移判定缺少 extra 键集合")
+        self.assertNotIn("got != want", text, "parity 仍在用总数比较（会漏键级漂移）")
+
+
 if __name__ == "__main__":
     unittest.main()
