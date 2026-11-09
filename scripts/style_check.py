@@ -28,7 +28,10 @@ from core import json_doc  # noqa: E402 - 承重件在 desktop/src，脚本须�
 BASELINE_REL = "protocol/style_baseline.json"
 SCHEMA = "nf-style/1"
 #: 扫描面：与 sast_check 同口径，外加 tools 面（风格债不区分交付与测试）。
-SCAN_TARGETS = ("desktop/src", "desktop/tests", "scripts", "tui", ".github/scripts")
+# 2026-11-09 扩面：packaging/（含对公网 hf-space server.py 与 npm 工具）此前不在风格面，
+# 实测有 23 条存量命中（多为长行/格式化），已 review 后随基线冻结；新增命中照旧拦。
+SCAN_TARGETS = ("desktop/src", "desktop/tests", "scripts", "tui", ".github/scripts",
+                "packaging")
 #: 规则集 = 审计 Z2 的建议集 + RUF100（未使用的 noqa）。
 #: RUF100 专门解决审计点名的「400 条 noqa 全部不生效」：只跑窄 select 时，noqa 里那些码
 #: 从不被检查，于是 noqa 变成装饰。加上它，未使用的 noqa 立刻可见（存量按基线冻结）。
