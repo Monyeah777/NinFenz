@@ -34,10 +34,10 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-from core import attest, json_doc
+from core import attest, json_doc, product_metadata
 
 SHELL_VERSION = "1.0.0"
-
+CLI_VERSION = product_metadata.load(Path(__file__).resolve().parents[3])["version"]
 #: 会话提示符（单行、无颜色——重定向到文件时逐字节可读）
 PROMPT = "nf> "
 #: 退出词（大小写不敏感）
@@ -1212,7 +1212,7 @@ TERMINAL_BASELINE: tuple[dict[str, Any], ...] = (
     {"id": "history-persist", "name": "历史落盘（交互态写文件）",
      "argv": ("shell", "--history", BASELINE_TMP + "/shell_history", "--no-banner"),
      "stdin": "nf --version\nquit\n",
-     "expect": "nf 1.0.5", "expect_file": BASELINE_TMP + "/shell_history"},
+     "expect": f"nf {CLI_VERSION}", "expect_file": BASELINE_TMP + "/shell_history"},
     {"id": "session-persist", "name": "会话状态持久化（--session）",
      "argv": ("shell", "--session", BASELINE_TMP + "/shell_session.json",
               "--no-history", "--no-banner"),
@@ -1355,7 +1355,7 @@ def portable_rows(results) -> list:
     return out
 
 
-def render_baseline(results, stats, width=None, color: bool = False) -> str:  # noqa: ARG001 - 调用契约：nf.py/test 按 width= 传入
+def render_baseline(results, stats, width=None, color: bool = False) -> str:
     """渲染基线逐行结果（人读）：一行一项能力 + 判定 + 证据命令。"""
     lines = [style("== 顶尖 CLI 基线（%d 项 · 逐条可复跑）==" % stats["rows"], "head", color),
              "  通过 %d/%d · 总耗时 %s ms · 最慢 %s ms（每行有延迟预算，超时即判效率退化）"

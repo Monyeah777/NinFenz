@@ -16,8 +16,8 @@
       "SPDXID": "SPDXRef-Package-ninfenz",
       "copyrightText": "NOASSERTION",
       "downloadLocation": "NOASSERTION",
-      "licenseConcluded": "MIT",
-      "licenseDeclared": "MIT",
+      "licenseConcluded": "AGPL-3.0-only",
+      "licenseDeclared": "AGPL-3.0-only",
       "name": "NinFenz",
       "versionInfo": "v2.30"
     },
@@ -59,6 +59,13 @@
       "versionInfo": "6.11.2"
     },
     {
+      "SPDXID": "SPDXRef-Optional-cyclonedx",
+      "comment": "软依赖（可选，须 try/except 守卫）：发布束 CycloneDX 1.6 schema 验证（仅发布工具链；缺依赖 fail-closed）",
+      "downloadLocation": "NOASSERTION",
+      "licenseConcluded": "NOASSERTION",
+      "name": "cyclonedx"
+    },
+    {
       "SPDXID": "SPDXRef-Optional-jsonschema",
       "comment": "软依赖（可选，须 try/except 守卫）：IDL 标准实现交叉验证（可选对照；缺依赖则跳过该面）",
       "downloadLocation": "NOASSERTION",
@@ -75,17 +82,24 @@
     },
     {
       "SPDXID": "SPDXRef-Optional-laya",
-      "comment": "软依赖（可选，须 try/except 守卫）：决策层本地服务（scripts/serve_decision_model.py）的模型运行时；软导入 + 缺依赖给修复指引",
+      "comment": "软依赖（可选，须 try/except 守卫）：决策层本地模型服务运行时；软导入，缺依赖时给修复指引",
       "downloadLocation": "NOASSERTION",
       "licenseConcluded": "NOASSERTION",
       "name": "laya"
     },
     {
       "SPDXID": "SPDXRef-Optional-nf_pyengine",
-      "comment": "软依赖（可选，须 try/except 守卫）：PyO3 扩展（engine/rust/pyo3 构建）为可选进程内原语加速；缺扩展时 rust_pyext 回退 hashlib/repr，不把 Rust 工具链变成运行前提",
+      "comment": "软依赖（可选，须 try/except 守卫）：可选 PyO3 加速；缺扩展时 rust_pyext 回退纯 Python 原语，不将 Rust 设为运行前提",
       "downloadLocation": "NOASSERTION",
       "licenseConcluded": "NOASSERTION",
       "name": "nf_pyengine"
+    },
+    {
+      "SPDXID": "SPDXRef-Optional-rdflib",
+      "comment": "软依赖（可选，须 try/except 守卫）：SPDX 3 JSON-LD 展开验证（仅发布工具链；缺依赖 fail-closed）",
+      "downloadLocation": "NOASSERTION",
+      "licenseConcluded": "NOASSERTION",
+      "name": "rdflib"
     }
   ],
   "relationships": [
@@ -112,6 +126,11 @@
     {
       "relatedSpdxElement": "SPDXRef-Package-ninfenz",
       "relationshipType": "OPTIONAL_DEPENDENCY_OF",
+      "spdxElementId": "SPDXRef-Optional-cyclonedx"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-ninfenz",
+      "relationshipType": "OPTIONAL_DEPENDENCY_OF",
       "spdxElementId": "SPDXRef-Optional-jsonschema"
     },
     {
@@ -123,6 +142,11 @@
       "relatedSpdxElement": "SPDXRef-Package-ninfenz",
       "relationshipType": "OPTIONAL_DEPENDENCY_OF",
       "spdxElementId": "SPDXRef-Optional-nf_pyengine"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-ninfenz",
+      "relationshipType": "OPTIONAL_DEPENDENCY_OF",
+      "spdxElementId": "SPDXRef-Optional-rdflib"
     }
   ],
   "spdxVersion": "SPDX-2.3"

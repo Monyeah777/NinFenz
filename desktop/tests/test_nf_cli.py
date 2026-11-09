@@ -22,13 +22,13 @@ from pathlib import Path
 
 
 def _cli_version() -> str:
-    """从单一真源读 CLI 版本，避免每次发版都要改测试。"""
-    import re as _re
+    """从产品身份 JSON 读版本，测试不复制产品版本。"""
+    import json as _json
     from pathlib import Path as _Path
 
-    txt = (_Path(__file__).resolve().parents[2] / "scripts" / "nf.py").read_text(encoding="utf-8")
-    m = _re.search(r'^NF_CLI_VERSION = "([^"]+)"', txt, _re.M)
-    return m.group(1) if m else "?"
+    path = (_Path(__file__).resolve().parents[2]
+            / "protocol" / "product_metadata.json")
+    return _json.loads(path.read_text(encoding="utf-8"))["version"]
 
 
 CLI_VERSION = _cli_version()

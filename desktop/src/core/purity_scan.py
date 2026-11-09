@@ -100,14 +100,14 @@ HARD_ALLOW = {
 }
 #: R5 软导入登记（第三方可选依赖：必须 try/except ImportError 守卫 + 写明理由）
 SOFT_IMPORTS = {
+    "cyclonedx": "发布束 CycloneDX 1.6 schema 验证（仅发布工具链；缺依赖 fail-closed）",
     "PIL": "标注水印层（label_watermark）读写 PNG 位图；软导入 + 缺依赖给修复指引，"
         "文本载体那条路保持纯标准库",
     "jsonschema": "IDL 标准实现交叉验证（可选对照；缺依赖则跳过该面）",
+    "rdflib": "SPDX 3 JSON-LD 展开验证（仅发布工具链；缺依赖 fail-closed）",
     "PySide6": "CCV3 卡面占位图写入（缺依赖须给明确修复指引，不得裸 ImportError）",
-    "nf_pyengine": "PyO3 扩展（engine/rust/pyo3 构建）为可选进程内原语加速；"
-        "缺扩展时 rust_pyext 回退 hashlib/repr，不把 Rust 工具链变成运行前提",
-    "laya": "决策层本地服务（scripts/serve_decision_model.py）的模型运行时；软导入 + 缺依赖给修复指"
-        "引",
+    "nf_pyengine": "可选 PyO3 加速；缺扩展时 rust_pyext 回退纯 Python 原语，不将 Rust 设为运行前提",
+    "laya": "决策层本地模型服务运行时；软导入，缺依赖时给修复指引",
 }
 #: R5 存量残留（**WARN 挂账**：确有理由保留的存量违规须带裁决/文档指针；不判死但不得隐身）。
 #: 本扫描按**文件系统**取件 ⇒ 未入库的本地副本同样会被扫到。2026-09-20：唯一一项残留经作者裁决

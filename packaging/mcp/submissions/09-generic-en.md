@@ -9,7 +9,7 @@ Repo: https://github.com/Monyeah777/NinFenz
 Site: https://ninfenz.dev/
 Category: content-creation
 Tags: mcp, content-contract, spec-driven, verification, knowledge-base, python, llm
-License: MIT
+License: AGPL-3.0-only OR LicenseRef-Commercial
 ```
 
 ## 传输配置（stdio）—— 只填 Stdio，另两种留空

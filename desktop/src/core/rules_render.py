@@ -19,6 +19,8 @@ from typing import Any, Callable, Dict, List
 
 import yaml
 
+from . import product_metadata
+
 
 def _load_protocol(pkg_dir: str) -> Dict[str, Any]:
     with open(os.path.join(pkg_dir, "protocol.yaml"), encoding="utf-8") as f:
@@ -54,9 +56,7 @@ def _render_agents(data: Dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def _render_claude(data: Dict[str, Any]) -> str:
-    """CLAUDE.md 变体（同 agents 内容）。"""
-    return _render_agents(data)
+_render_claude = _render_agents
 
 
 def _render_skill(data: Dict[str, Any]) -> str:
@@ -67,8 +67,7 @@ def _render_skill(data: Dict[str, Any]) -> str:
         "---\n"
         f"name: {pkg.get('id', 'protocol').lower()}\n"
         f"description: {name}（{pkg.get('pipeline', '')}）协议声明\n"
-        # 同 skill_adapter：许可与仓库 LICENSE 对齐（外部实测 2026-10-02 修）
-        "license: MIT\n"
+        f"license: {product_metadata.content_license()}\n"
         "---\n")
     body = [f"# {name}", "", "## 协议声明", ""]
     body.append(f"- 管线：{pkg.get('pipeline', '')}")

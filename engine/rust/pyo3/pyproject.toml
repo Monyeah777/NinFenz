@@ -10,7 +10,7 @@ name = "ninfenz-pyengine"
 version = "0.1.0"
 description = "NF Python 扩展（PyO3）：同进程绑定的第二形态"
 requires-python = ">=3.9"
-license = { text = "MIT" }
+license = { text = "AGPL-3.0-only" }
 
 [tool.maturin]
 module-name = "nf_pyengine"
