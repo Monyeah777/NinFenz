@@ -71,11 +71,23 @@ jobs:
           import json
           cur = json.load(open("sast-posix.json", encoding="utf-8"))
           base = json.load(open("protocol/sast_baseline.json", encoding="utf-8"))["platforms"]["posix"]
-          got = (sum(cur["bandit"].values()), sum(cur["ruff"].values()))
-          want = (sum(base["bandit"].values()), sum(base["ruff"].values()))
-          print("posix SAST：实测", got, "基线", want)
-          if got != want:
-              print("::error::posix SAST 计数与基线不一致（工具版本/平台漂移）")
+          # 2026-11-09 修：只比「总数」会漏掉「一规则 +1、另一规则 -1」的键级漂移
+          # （总数相等 → 漂移检测绿着放行）。改为逐键比对：新增/缺失/计数变化都判红。
+          bad = []
+          for tool in ("bandit", "ruff"):
+              c = cur.get(tool) or {}
+              b = base.get(tool) or {}
+              extra = sorted(set(c) - set(b))
+              missing = sorted(set(b) - set(c))
+              changed = sorted((k, int(b[k]), int(c[k])) for k in set(b) & set(c)
+                               if int(b[k]) != int(c[k]))
+              if extra or missing or changed:
+                  print("::error::posix SAST [%s] 键级漂移：extra=%s missing=%s changed=%s"
+                        % (tool, extra[:5], missing[:5], changed[:5]))
+                  bad.append(tool)
+          print("posix SAST 键级计数：bandit %d 键 / ruff %d 键"
+                % (len(cur.get("bandit") or {}), len(cur.get("ruff") or {})))
+          if bad:
               raise SystemExit(1)
           PY
           exit "$rc"
