@@ -3,7 +3,7 @@ name = "nf-plugin-sha256-component"
 version = "0.1.0"
 edition = "2021"
 description = "NF 微内核参考插件（Component Model 形态：WIT 类型接口 + Canonical ABI）"
-license = "MIT"
+license = "AGPL-3.0-only"
 
 # 组件形态与 CLI 形态并存，边界不同：
 #   CLI 形态（../sha256）：靠 WASI preview1 的 stdin/stdout 搬运，能用 wasmtime 的

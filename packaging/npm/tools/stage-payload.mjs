@@ -62,14 +62,30 @@ function keep(rel) {
 function sha256(buf) { return crypto.createHash('sha256').update(buf).digest('hex'); }
 
 function cliVersion() {
-  const text = fs.readFileSync(path.join(REPO_ROOT, 'scripts', 'nf.py'), 'utf8');
-  const m = text.match(/^NF_CLI_VERSION\s*=\s*"([^"]+)"/m);
-  return m ? m[1] : null;
+  const file = path.join(REPO_ROOT, 'protocol', 'product_metadata.json');
+  if (!fs.existsSync(file)) return null;
+  const product = JSON.parse(fs.readFileSync(file, 'utf8'));
+  return typeof product.version === 'string' ? product.version : null;
 }
 
 function sourceCommit() {
   const r = spawnSync('git', ['rev-parse', 'HEAD'], { cwd: REPO_ROOT, encoding: 'utf8' });
   return r.status === 0 ? String(r.stdout).trim() : 'unknown';
+}
+
+function sourceDateEpoch() {
+  const raw = String(process.env.SOURCE_DATE_EPOCH || '').trim();
+  if (raw) {
+    if (!/^\d+$/.test(raw)) throw new Error('SOURCE_DATE_EPOCH 必须是非负整数');
+    return Number(raw);
+  }
+  const r = spawnSync('git', ['show', '-s', '--format=%ct', 'HEAD'],
+    { cwd: REPO_ROOT, encoding: 'utf8' });
+  const value = r.status === 0 ? String(r.stdout).trim() : '';
+  if (!/^\d+$/.test(value)) {
+    throw new Error('无法从 SOURCE_DATE_EPOCH 或 HEAD 取得可复现构建时间');
+  }
+  return Number(value);
 }
 
 //: 工作树是否有**未提交的受跟踪改动**（A1）。null = 判不了（无 git）——不据此拒绝。
@@ -81,10 +97,10 @@ function worktreeDirty() {
 }
 
 const cli = cliVersion();
-if (!cli) throw new Error('取不到 scripts/nf.py 的 NF_CLI_VERSION（修复指引：确认文件在场且格式未变）');
+if (!cli) throw new Error('取不到 protocol/product_metadata.json 的 version（产品身份唯一真源）');
 if (cli !== pkg.version) {
-  throw new Error('版本口径不一致：package.json=' + pkg.version + ' vs NF_CLI_VERSION=' + cli
-    + '（修复指引：发版时两处必须同值——npm 版本即 CLI 版本）');
+  throw new Error('版本口径不一致：package.json=' + pkg.version + ' vs product_metadata=' + cli
+    + '（修复指引：python scripts/product_metadata.py --write）');
 }
 
 const dirty = worktreeDirty();
@@ -123,6 +139,7 @@ entries.sort(function (a, b) { return a.path < b.path ? -1 : (a.path > b.path ? 
 const h = crypto.createHash('sha256');
 for (const e of entries) h.update(e.path + '\u0000' + e.sha256 + '\n');
 const tree = h.digest('hex');
+const sourceEpoch = sourceDateEpoch();
 
 const manifest = {
   schema: 'nf-npm-payload/1',
@@ -130,7 +147,8 @@ const manifest = {
   cli_version: cli,
   source_commit: sourceCommit(),
   worktree_dirty: dirty === true,
-  generated_at: new Date().toISOString(),
+  source_date_epoch: sourceEpoch,
+  generated_at: new Date(sourceEpoch * 1000).toISOString(),
   count: count,
   total_bytes: total,
   tree_sha256: tree,

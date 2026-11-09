@@ -1,7 +1,7 @@
 ---
 name: ninfenz
 description: Use NinFenz to assemble long-form content from protocol modules, browse assets and packages, run the nf CLI/MCP, and verify outputs. Use for NinFenz tasks; not for generic writing or unrelated repositories.
-license: MIT
+license: CC-BY-4.0
 ---
 
 # NinFenz 用户技能

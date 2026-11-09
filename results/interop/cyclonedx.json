@@ -27,6 +27,13 @@
       "version": "6.11.2"
     },
     {
+      "bom-ref": "opt:cyclonedx",
+      "description": "软依赖（可选，须守卫）：发布束 CycloneDX 1.6 schema 验证（仅发布工具链；缺依赖 fail-closed）",
+      "name": "cyclonedx",
+      "scope": "optional",
+      "type": "library"
+    },
+    {
       "bom-ref": "opt:jsonschema",
       "description": "软依赖（可选，须守卫）：IDL 标准实现交叉验证（可选对照；缺依赖则跳过该面）",
       "name": "jsonschema",
@@ -37,15 +44,22 @@
     },
     {
       "bom-ref": "opt:laya",
-      "description": "软依赖（可选，须守卫）：决策层本地服务（scripts/serve_decision_model.py）的模型运行时；软导入 + 缺依赖给修复指引",
+      "description": "软依赖（可选，须守卫）：决策层本地模型服务运行时；软导入，缺依赖时给修复指引",
       "name": "laya",
       "scope": "optional",
       "type": "library"
     },
     {
       "bom-ref": "opt:nf_pyengine",
-      "description": "软依赖（可选，须守卫）：PyO3 扩展（engine/rust/pyo3 构建）为可选进程内原语加速；缺扩展时 rust_pyext 回退 hashlib/repr，不把 Rust 工具链变成运行前提",
+      "description": "软依赖（可选，须守卫）：可选 PyO3 加速；缺扩展时 rust_pyext 回退纯 Python 原语，不将 Rust 设为运行前提",
       "name": "nf_pyengine",
+      "scope": "optional",
+      "type": "library"
+    },
+    {
+      "bom-ref": "opt:rdflib",
+      "description": "软依赖（可选，须守卫）：SPDX 3 JSON-LD 展开验证（仅发布工具链；缺依赖 fail-closed）",
+      "name": "rdflib",
       "scope": "optional",
       "type": "library"
     }
@@ -56,7 +70,7 @@
       "licenses": [
         {
           "license": {
-            "id": "MIT"
+            "id": "AGPL-3.0-only"
           }
         }
       ],

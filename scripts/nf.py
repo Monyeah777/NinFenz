@@ -40,11 +40,11 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "desktop", "src"))
 import nf_dsse  # noqa: E402 - 同目录 CLI 适配器
-from core import cli_bridge, interp_diet, json_doc  # noqa: E402 - 承重件在 desktop/src
+from core import cli_bridge, interp_diet, json_doc, product_metadata  # noqa: E402
 
 interp_diet.restore()
 
-NF_CLI_VERSION = "1.0.5"
+NF_CLI_VERSION = product_metadata.load(ROOT)["version"]
 NF_CLI_EPILOG = (
     "入门：\n"
     "  nf shell              # 交互终端（能力菜单 + 命令直通；端壳退役后的人机入口）\n"
@@ -2893,7 +2893,7 @@ def _rel_to_root(target):
     （写盘侧）却是仓根语义——同一份路径口径两套实现。实测：从非仓根 cwd 跑，`attest` / `sig`
     / `diff` 三条收路径的命令都会错判。
     """
-    # noqa 见下：失败路径统一走 `_machine_fail`（机器面不为空）
+
     t = os.path.abspath(target if os.path.isabs(target) else os.path.join(ROOT, target))
     if not os.path.exists(t):
         # 错误即微型文档（全命令面扫 2026-09-30）：此前只有一句「目标不存在」，
@@ -6229,7 +6229,7 @@ def _cmd_knowledge(args):
             import datetime as _dt
             src = args.src.strip()
             dst = args.dst.strip().replace("\\", "/")
-            at = args.at.strip() or _dt.date.today().isoformat()  # noqa: DTZ011 - 本地日历日期是有意语义（UTC 会在跨零点给出错误「今天」）
+            at = args.at.strip() or _dt.date.today().isoformat()
             if not os.path.isfile(os.path.join(ROOT, dst)):
                 print("  ✗ 产物不存在：%s（记录的 to 必须是仓库内真实件）" % dst,
                       file=sys.stderr)
@@ -7364,7 +7364,7 @@ def _cmd_shell(args) -> int:
         try:
             from core import paths as _paths
             full = _paths.validate_path(ROOT, target)
-        except Exception as exc:                         # noqa: BLE001 - 落点不合法即用法错误
+        except Exception as exc:
             return _machine_fail(args, "生成件落点不合法：%s" % exc, 2)
         text = term.render_surface_module(payload)
         parent = os.path.dirname(full)
@@ -7983,7 +7983,7 @@ def _release_freeze(args):
         if "approve" in argv:
             argv = argv + ["--by", by] + (["--note", note] if note else [])
         print("== 冻结链 [%d/%d] %s ==" % (i, len(chains), " ".join(argv[2:])))
-        rc = subprocess.run(argv, cwd=ROOT).returncode  # noqa: S603  # nosec B603/B607 —— argv 列表、绝对解释器（无 shell、无注入面）
+        rc = subprocess.run(argv, cwd=ROOT).returncode  # nosec B603/B607 —— argv 列表、绝对解释器（无 shell、无注入面）
         if rc != 0:
             print("  ✗ 冻结链第 %d 步失败（rc=%d）——按序停，后继步骤不执行" % (i,
  rc),
@@ -8089,7 +8089,7 @@ def _cmd_release(args):
     # P3（2026-10-18）：发布前必须走 **full 档**（默认档是 quick：静态 + 受影响测试，
     # 只给开发回路用）；--no-cache 保证发布体检是**真跑**而不是回放旧判定。
     argv = [psh.posix_shell(), "verify.sh", "--full", "--no-cache"]  # nosec B404/B603/B607
-    rc = subprocess.run(argv, cwd=ROOT).returncode
+    rc = subprocess.run(argv, cwd=ROOT).returncode  # noqa: S603  # nosec B603/B607
     gate_fail = bool(issues) or rc != 0
     if not gate_fail:
         from core import asset_ledger_projection as alp

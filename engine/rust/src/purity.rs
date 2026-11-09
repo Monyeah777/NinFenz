@@ -70,7 +70,11 @@ const DOMAIN_TERMS: [&str; 28] = [
 const HARD_ALLOW: [&str; 1] = ["yaml"];
 
 /// 真源 `SOFT_IMPORTS`：第三方可选依赖（须 try/except ImportError 守卫）。值只用于消息。
-const SOFT_IMPORTS: [(&str, &str); 5] = [
+const SOFT_IMPORTS: [(&str, &str); 7] = [
+    (
+        "cyclonedx",
+        "发布束 CycloneDX 1.6 schema 验证（仅发布工具链；缺依赖 fail-closed）",
+    ),
     (
         "PIL",
         "标注水印层（label_watermark）读写 PNG 位图；软导入 + 缺依赖给修复指引，文本载体保持纯标准库",
@@ -86,6 +90,10 @@ const SOFT_IMPORTS: [(&str, &str); 5] = [
     (
         "nf_pyengine",
         "PyO3 扩展为可选进程内原语加速；缺扩展时 rust_pyext 回退 hashlib/repr",
+    ),
+    (
+        "rdflib",
+        "SPDX 3 JSON-LD 展开验证（仅发布工具链；缺依赖 fail-closed）",
     ),
     (
         "laya",
