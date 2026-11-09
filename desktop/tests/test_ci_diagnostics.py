@@ -178,5 +178,23 @@ class TeePipefailTest(unittest.TestCase):
             f"含 | tee 的步骤未启用 pipefail（退出码会被 tee 吞）：{bad}")
 
 
+class GateAlwaysRunsTest(unittest.TestCase):
+    """gate 不得因依赖失败而被「跳过」（2026-11-09 实测 #251）。
+
+    GitHub 对 required check 的 skipped 视为通过：gate 若 `needs: [static-checks, unit-tests]`
+    且没有 `if: always()`，unit-tests 有分片红时 gate 被跳过 ⇒ auto-merge 照样合并。
+    """
+
+    def test_gate_is_always_run_and_checks_dependencies(self):
+        import re
+        text = (WF / "ci-verify.yml").read_text(encoding="utf-8")
+        m = re.search(r"(?ms)^  gate:\n(.*?)(?=^  [a-z0-9-]+:\n|\Z)", text)
+        self.assertIsNotNone(m, "ci-verify.yml 找不到 gate job")
+        block = m.group(1)
+        self.assertIn("if: always()", block, "gate 未声明 if: always()（会被跳过）")
+        self.assertIn("needs.static-checks.result", block, "gate 未校验 static-checks 结果")
+        self.assertIn("needs.unit-tests.result", block, "gate 未校验 unit-tests 结果")
+
+
 if __name__ == "__main__":
     unittest.main()

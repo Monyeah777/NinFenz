@@ -167,9 +167,24 @@ jobs:
   gate:
     name: gate
     needs: [static-checks, unit-tests]
+    # 2026-11-09 实测（#251）：unit-tests 有分片失败时 gate 会被**跳过**，而 GitHub 对
+    # required check 的「skipped」视为通过 ⇒ auto-merge 在测试红的情况下照样合并。
+    # 修：gate 永远跑（if: always()），并把依赖的 result 显式判红。
+    if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
+      - name: 依赖结论汇总（failed/cancelled/skipped 都算红）
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "static-checks=${NEEDS_STATIC}"
+          echo "unit-tests=${NEEDS_UNIT}"
+          test "${NEEDS_STATIC}" = "success" || { echo "::error::static-checks 未成功（${NEEDS_STATIC}）"; exit 1; }
+          test "${NEEDS_UNIT}" = "success" || { echo "::error::unit-tests 未成功（${NEEDS_UNIT}）"; exit 1; }
+        env:
+          NEEDS_STATIC: ${{ needs.static-checks.result }}
+          NEEDS_UNIT: ${{ needs.unit-tests.result }}
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
         with:
           persist-credentials: false
