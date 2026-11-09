@@ -1,7 +1,7 @@
 {
-  "bytes": 11979132,
+  "bytes": 11979128,
   "count": 565,
-  "digest": "bc7e0345af7dd52d80a364c9efd138420a9d5a558e088e8cb5687438cd6ace64",
+  "digest": "75a83915156a65d4f5dc0c6c08885858cf60eed601923f359fc6d587a9aa4102",
   "materials": [
     {
       "bytes": 102,
@@ -1889,9 +1889,9 @@
       "sha256": "ad799cbfbf1dd69859ff21963885ebf1d5fed56ca67fdd1c2b9e2052ce3b8003"
     },
     {
-      "bytes": 257,
+      "bytes": 251,
       "path": "protocol/approvals/protocol__conformance_report.json",
-      "sha256": "c633e714501eb8729457d73f9e1e5a437c6bfb1800798c4ccbad358a39659177"
+      "sha256": "4a17f859b01583d3c633f1a7da88e9dd15f03ed7d5bd3662011a1822a6b29960"
     },
     {
       "bytes": 16375,
@@ -2489,9 +2489,9 @@
       "sha256": "0d2148d0b5334ac32a05641d6344953ab4dd377c44863d386f0b5076c71466f9"
     },
     {
-      "bytes": 5103,
+      "bytes": 5105,
       "path": "scripts/capability_inventory.py",
-      "sha256": "a4a9a336e5421b07f308674eeb82db276686fccc1d6f66defe92679c9bc807c9"
+      "sha256": "74b832c7c7658bd48c7ff75b322c78f646b040a1c32ece620c304f8c90a13013"
     },
     {
       "bytes": 8684,

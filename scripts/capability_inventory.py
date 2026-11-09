@@ -45,9 +45,9 @@ def _scan_source(path: Path) -> dict[str, Any]:
         name = getattr(func, "attr", "")
         if name == "add_argument" and node.args:
             first = node.args[0]
-            if isinstance(first, ast.Constant) and isinstance(first.value, str):
-                if first.value.startswith("--"):
-                    flags.append(first.value)
+            if (isinstance(first, ast.Constant) and isinstance(first.value, str)
+                    and first.value.startswith("--")):
+                flags.append(first.value)
         elif name == "add_parser" and node.args:
             first = node.args[0]
             if isinstance(first, ast.Constant) and isinstance(first.value, str):
