@@ -6,11 +6,13 @@ scope: 机制借鉴类外部输入的筛选与逐条仓内实证（STRATEGY §3.
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - CONTRIBUTING.md:a2bb3d25caed472602554a46f9eab6825fcb864abe76a1cb45031116805a36f1
+  - CONTRIBUTING.md:9cc0ec213d27f79e4fa50de927f2c74112d6c6585ea0100858b6413f38c255b3
   - skills/ninfenz/SKILL.md:5ef5858a08e6fd76a7cdee201938e0140e05257a7759a3ab27c05f9339109197
   - library/INDEX.md:ac0bcadbfd9019931e8e8a2f2739dd6603c73fe5b32950b8c80a2eb007c5761b
 
 ---
+> 重审（2026-11-09）：CONTRIBUTING 冻结链
+
 > 重审（2026-11-09）：CONTRIBUTING 补本地 payload 过期说明
 
 > 重审（2026-11-08）：CONTRIBUTING 补 payload 数字同步
