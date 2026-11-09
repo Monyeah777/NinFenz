@@ -9,47 +9,76 @@
       "id": "ev.pre_register",
       "name": "先冻协议再跑：条件、任务、样本数、维度、判定口径",
       "why": "冻结后改口径就是自证；协议必须先于数据存在，否则任何差异都可以事后解释。",
-      "maps_to": ["k.standard", "e.verify", "m.check"],
-      "frame_delta_hint": {"kind": "question_restated",
-                           "note": "把「效果好不好」改写为「在预注册口径下，哪一维出现多大差异」"}
+      "maps_to": [
+        "k.standard",
+        "e.verify",
+        "m.check"
+      ],
+      "frame_delta_hint": {
+        "kind": "question_restated",
+        "note": "把「效果好不好」改写为「在预注册口径下，哪一维出现多大差异」"
+      }
     },
     {
       "id": "ev.blind_partition",
       "name": "盲评分区：评审者看不到条件标签，样本随机化",
       "why": "评分者一旦知道分组，期望效应会污染结果；盲法是把评审者偏移从测量里剔除的最便宜手段。",
-      "maps_to": ["e.adjudicate", "k.partition"],
-      "frame_delta_hint": {"kind": "assumption_added",
-                           "note": "假设「评分者会受标签影响」，于是必须把它变成设计约束"}
+      "maps_to": [
+        "e.adjudicate",
+        "k.partition"
+      ],
+      "frame_delta_hint": {
+        "kind": "assumption_added",
+        "note": "假设「评分者会受标签影响」，于是必须把它变成设计约束"
+      }
     },
     {
       "id": "ev.negative_control",
       "name": "负对照：已知无效的条件必须显示无效",
       "why": "没有负对照，测出差异也无法排除「任何条件都会赢」；负对照失败说明测的是噪声或流程偏差。",
-      "maps_to": ["m.compare", "e.falsify"]
+      "maps_to": [
+        "m.compare",
+        "e.falsify"
+      ]
     },
     {
       "id": "ev.synthetic_guard",
       "name": "合成数据隔离：占位/模拟结果不得计入证据",
       "why": "演示性产物一旦和实测数据同表出现，就会被读者当成能力证据；必须在结构上分开（字段/目录/信封）。",
-      "maps_to": ["e.audit", "e.falsify", "k.classify"]
+      "maps_to": [
+        "e.audit",
+        "e.falsify",
+        "k.classify"
+      ]
     },
     {
       "id": "ev.effect_and_variance",
       "name": "报效应量与方差，不只报均值；样本量按最小可测效应定",
       "why": "只报均值无法区分真实差异与抽样波动；样本量拍脑袋时，「通过」往往只是运气。",
-      "maps_to": ["m.estimate", "e.calibrate", "k.quantify"]
+      "maps_to": [
+        "m.estimate",
+        "e.calibrate",
+        "k.quantify"
+      ]
     },
     {
       "id": "ev.cost_accounting",
       "name": "测量成本核算：时延、费用、人工一并入表",
       "why": "忽略成本会选出「指标好看但不可持续」的方案；成本本身也是决策维度。",
-      "maps_to": ["e.benchmark", "k.quantify", "c.allocate"]
+      "maps_to": [
+        "e.benchmark",
+        "k.quantify",
+        "c.allocate"
+      ]
     },
     {
       "id": "ev.replicate",
       "name": "可复现性：同输入同结果，或给出确定性的随机种子",
       "why": "不可复现的测量无法用于判定；确定性种子让「复算」成为判据而不是口头承诺。",
-      "maps_to": ["m.check", "e.verify"]
+      "maps_to": [
+        "m.check",
+        "e.verify"
+      ]
     }
   ],
   "evidence_standards": [
@@ -96,5 +125,9 @@
       "why": "负结果同样是合格测量；把边界写成判据比反复微调更有信息量"
     }
   ],
-  "criteria_refs": ["craft:evidence_sufficiency", "craft:coherence", "standard:GB45438-2025"]
+  "criteria_refs": [
+    "craft:coherence",
+    "craft:evidence_sufficiency",
+    "standard:GB45438-2025"
+  ]
 }

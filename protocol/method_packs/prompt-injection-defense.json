@@ -9,45 +9,75 @@
       "id": "pi.plane_separation",
       "name": "指令/数据平面分离：外部内容只作数据，不进入指令位",
       "why": "注入的本质是让数据冒充指令；只要两者在结构上同平面，任何过滤器都只是概率防线。",
-      "maps_to": ["k.partition", "k.represent", "c.switch"],
-      "frame_delta_hint": {"kind": "question_restated",
-                           "note": "把「如何过滤注入」改写为「哪些东西根本不该有资格当指令」"}
+      "maps_to": [
+        "k.partition",
+        "k.represent",
+        "c.switch"
+      ],
+      "frame_delta_hint": {
+        "kind": "question_restated",
+        "note": "把「如何过滤注入」改写为「哪些东西根本不该有资格当指令」"
+      }
     },
     {
       "id": "pi.allowlist_surface",
       "name": "工具面白名单：只暴露点名的工具，参数按字节上限截断",
       "why": "未登记的工具就是未审的攻击面；参数不设上限时，超长输入本身就能改行为。",
-      "maps_to": ["c.select", "c.stop", "k.standard"]
+      "maps_to": [
+        "c.select",
+        "c.stop",
+        "k.standard"
+      ]
     },
     {
       "id": "pi.consent_gate",
       "name": "人工同意门：破坏性动作必须由人确认，不静默执行",
       "why": "把不可逆动作的最终决定权留给人，是注入成功时的最后一道止损。",
-      "maps_to": ["c.stop", "e.adjudicate", "m.check"]
+      "maps_to": [
+        "c.stop",
+        "e.adjudicate",
+        "m.check"
+      ]
     },
     {
       "id": "pi.receipt_audit",
       "name": "调用回执：每次外部调用留可重放的 receipt（谁/何工具/参数摘要/结果）",
       "why": "没有回执就无法事后判定「谁在什么输入下做了什么」；审计能力本身会抑制注入收益。",
-      "maps_to": ["m.trace", "e.audit", "k.quantify"]
+      "maps_to": [
+        "m.trace",
+        "e.audit",
+        "k.quantify"
+      ]
     },
     {
       "id": "pi.least_privilege",
       "name": "最小权限：按调用点给最小工具集与最小参数面",
       "why": "权限越大，注入成功一次的损失越大；限制面比提高检测率更可控。",
-      "maps_to": ["c.allocate", "c.select", "k.criterion"]
+      "maps_to": [
+        "c.allocate",
+        "c.select",
+        "k.criterion"
+      ]
     },
     {
       "id": "pi.redteam_cases",
       "name": "红队用例集：把见过的注入写成可重跑用例（含失败即红的判据）",
       "why": "只修个案不会减少下一例；把攻击写成用例才能让防御随用例增长。",
-      "maps_to": ["e.falsify", "e.verify", "m.compare"]
+      "maps_to": [
+        "e.falsify",
+        "e.verify",
+        "m.compare"
+      ]
     },
     {
       "id": "pi.output_side_check",
       "name": "输出侧校验：模型产出的动作在执行前按 schema 与允许集复核",
       "why": "输入侧过滤必然漏；输出侧复核是不依赖「猜攻击者」的兜底。",
-      "maps_to": ["e.verify", "k.classify", "m.detect"]
+      "maps_to": [
+        "e.verify",
+        "k.classify",
+        "m.detect"
+      ]
     }
   ],
   "evidence_standards": [
@@ -94,5 +124,9 @@
       "why": "注入若能进 shell，任何白名单都形同虚设；argv-only 是结构性的，不靠过滤器"
     }
   ],
-  "criteria_refs": ["craft:evidence_sufficiency", "craft:coherence", "standard:GB45438-2025"]
+  "criteria_refs": [
+    "craft:coherence",
+    "craft:evidence_sufficiency",
+    "standard:GB45438-2025"
+  ]
 }

@@ -109,6 +109,6 @@
   ],
   "criteria_refs": [
     "craft:coherence",
-    "standard:ISO27001"
+    "standard:evidence-bundle-v0"
   ]
 }

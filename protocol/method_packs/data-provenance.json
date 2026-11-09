@@ -9,37 +9,61 @@
       "id": "pv.datasheet",
       "name": "先写数据说明书：动机、构成、采集过程、推荐用途、已知限制",
       "why": "没有采集过程的记录，就无法判断「这个数字是在什么条件下得到的」；说明书是后续一切复核的地基。",
-      "maps_to": ["k.represent", "e.audit", "m.observe"]
+      "maps_to": [
+        "k.represent",
+        "e.audit",
+        "m.observe"
+      ]
     },
     {
       "id": "pv.field_lineage",
       "name": "字段级溯源：每个字段能追到来源与转换（谁产生、经过什么变换）",
       "why": "字段一旦来源不明，它的误差就无法归因；字段级溯源让「这个数是算的还是抄的」可查。",
-      "maps_to": ["k.relate", "m.trace", "e.verify"]
+      "maps_to": [
+        "k.relate",
+        "m.trace",
+        "e.verify"
+      ]
     },
     {
       "id": "pv.missing_semantics",
       "name": "缺失值口径先定：缺 = 未知 / 缺 = 零 / 缺 = 不适用",
       "why": "缺失当零会把「没测」变成「测到零」，是假数据最常见的来源；口径必须先写进协议。",
-      "maps_to": ["k.criterion", "k.define", "m.detect"]
+      "maps_to": [
+        "k.criterion",
+        "k.define",
+        "m.detect"
+      ]
     },
     {
       "id": "pv.license_gate",
       "name": "许可与再分发边界：数据能不能进仓、能不能对外，逐条钉住",
       "why": "许可证不明的数据一旦入仓，后续所有产物都带着法律风险；边界要在采集前判定。",
-      "maps_to": ["k.standard", "e.adjudicate", "c.select"]
+      "maps_to": [
+        "k.standard",
+        "e.adjudicate",
+        "c.select"
+      ]
     },
     {
       "id": "pv.version_pin",
       "name": "版本钉定：数据快照按 digest/commit 钉住，不跟着上游漂",
       "why": "数据上游变了而结论没变，等于结论不可复现；钉版本是复现性的前提。",
-      "maps_to": ["k.quantify", "m.check", "e.calibrate"]
+      "maps_to": [
+        "k.quantify",
+        "m.check",
+        "e.calibrate"
+      ]
     },
     {
       "id": "pv.leakage_audit",
       "name": "泄漏检查：训练/调试用的数据不得出现在评测面",
       "why": "泄漏会让评测分数虚高，而且是最难事后发现的一类错误；必须在协议层禁止。",
-      "maps_to": ["e.falsify", "e.audit", "m.compare"]
+      "maps_to": [
+        "e.falsify",
+        "e.audit",
+        "m.compare"
+      ]
     }
   ],
   "evidence_standards": [
@@ -84,5 +108,9 @@
       "why": "这是「缺失语义」在度量层的落地：不假装有方差，也不把未知当零"
     }
   ],
-  "criteria_refs": ["craft:evidence_sufficiency", "craft:coherence", "standard:GB45438-2025"]
+  "criteria_refs": [
+    "craft:coherence",
+    "craft:evidence_sufficiency",
+    "standard:GB45438-2025"
+  ]
 }

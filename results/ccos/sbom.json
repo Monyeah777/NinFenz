@@ -1,7 +1,7 @@
 {
-  "bytes": 11966434,
+  "bytes": 11967614,
   "count": 563,
-  "digest": "7334d3936e853d8c9cf515b1fd5e3f2f9f57a42160eb346b0d0b0583d214f701",
+  "digest": "498c77cb5ed455a684a38d51b450706847e8f2bbe70a63c973486a5d364dd1f1",
   "materials": [
     {
       "bytes": 102,
@@ -1884,9 +1884,9 @@
       "sha256": "ad799cbfbf1dd69859ff21963885ebf1d5fed56ca67fdd1c2b9e2052ce3b8003"
     },
     {
-      "bytes": 251,
+      "bytes": 256,
       "path": "protocol/approvals/protocol__conformance_report.json",
-      "sha256": "35ce3f718342d232459e143c59a23f7e1a86630075a65e83c20dbbe41f89fafc"
+      "sha256": "c4499ae80e0bd7c09844f8a18d5331c40366e65a161ec08ab527c9768d63ca07"
     },
     {
       "bytes": 16375,
@@ -1929,9 +1929,9 @@
       "sha256": "c2402950e34e3ff9bd0f09171c8bee821bf0f57c33f32d0dbc4bb4b3e6157914"
     },
     {
-      "bytes": 360033,
+      "bytes": 360116,
       "path": "protocol/check12_weights.json",
-      "sha256": "052fe3c3d6db5f7bac3e265e001f770f0f92a0f2a0e80838d7a3c7667e34de25"
+      "sha256": "72c4250320aa439ba2752791b53a6c762b8a0fb2ab89855bc28f7de4150e7fcf"
     },
     {
       "bytes": 16170,
@@ -2194,14 +2194,14 @@
       "sha256": "db80976e922b08cc9becac78512326ec49ee02795a6274ae20c84c9ad3d00887"
     },
     {
-      "bytes": 4332,
+      "bytes": 4540,
       "path": "protocol/method_packs/data-provenance.json",
-      "sha256": "0ec20684766e1bd644b8e64a925dc289faa0a0058aa3abf1c9fde9eaf13bfca0"
+      "sha256": "7863c8563265e4b58112c778f8d60482e6fecc43e1a5c6b19856cc08d7b21c38"
     },
     {
-      "bytes": 5036,
+      "bytes": 5246,
       "path": "protocol/method_packs/evaluation-design.json",
-      "sha256": "fc684aa2efb5d172691afa09979ae924786c3a76a418515c682cefee11b5f8b3"
+      "sha256": "cd8cdf57fd2f0dea5af235445ad43779cd8d802a9b4453a9ac66eca219b32d2b"
     },
     {
       "bytes": 3046,
@@ -2209,9 +2209,9 @@
       "sha256": "d03cb857b03cc4536045e96829817dd1a53d370562fc98afc2686ba3a8cd90f0"
     },
     {
-      "bytes": 3719,
+      "bytes": 3937,
       "path": "protocol/method_packs/handoff.json",
-      "sha256": "eea4832413a3b16dfbec1968631e8a40408740c3184a1378d9bd977178871c83"
+      "sha256": "1b21e795ee3f4f6c6395e2711273c92ea0d5d7ee46ca290a7d86674749ef0027"
     },
     {
       "bytes": 1633,
@@ -2224,29 +2224,29 @@
       "sha256": "00f800acf8e090553ef6edcd12efbe5dedd9b1182b5b0039cf87719eaf4aa381"
     },
     {
-      "bytes": 3883,
+      "bytes": 3893,
       "path": "protocol/method_packs/operations.json",
-      "sha256": "05ea0fa0434cb1c1db5ec9b3b299a7edf599788ef638dc61bb24163323f66350"
+      "sha256": "8f0181cfdb25c92ad15d1fd5b5165b635149ad2ae41f5dbf5c7332ac5a0fdf22"
     },
     {
-      "bytes": 4024,
+      "bytes": 4034,
       "path": "protocol/method_packs/privacy.json",
-      "sha256": "0c714713b15ad6cb54f22ea124f7cef5aab7744b9129ee3a95a6a0299e3be0c2"
+      "sha256": "c85b082f6f81c4213214bee0eae99cf906166a158bfd1de5ae757dc53e89c493"
     },
     {
-      "bytes": 4917,
+      "bytes": 5154,
       "path": "protocol/method_packs/prompt-injection-defense.json",
-      "sha256": "655cbb368981e6ce8a587ae701442b81e2cec70f64073cf96c6642ca04c5dcee"
+      "sha256": "09b140ab5fa31c833146cb759d196b156801425813fd810476e1ad9b9822f5a6"
     },
     {
-      "bytes": 3803,
+      "bytes": 3992,
       "path": "protocol/method_packs/resilience.json",
-      "sha256": "7d679d46e173cb2cdb22d2b3e5d2f358cac1138db2982b304ccd19f14be24d55"
+      "sha256": "14a9ead63c761248121252ab64f326794d1f691efd20916362119ccbb94e1827"
     },
     {
-      "bytes": 4079,
+      "bytes": 4089,
       "path": "protocol/method_packs/supply-chain.json",
-      "sha256": "1a1b1162c1dc649a4bf0c7a4e57ba29d114e5238d3d7dfa6b68524833b948ac5"
+      "sha256": "0764b4454396274064a4e27aec69e76d588f14fc362e097c9c52040a3112e940"
     },
     {
       "bytes": 4040,

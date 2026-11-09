@@ -9,37 +9,61 @@
       "id": "co.resumable_frame",
       "name": "交接先给可接续帧：当前结论、未决项、下一步、不许改的约束",
       "why": "长文档不是交接；能被下一个人直接接着干的才是帧，其余是背景噪音。",
-      "maps_to": ["k.define", "m.trace", "c.select"]
+      "maps_to": [
+        "k.define",
+        "m.trace",
+        "c.select"
+      ]
     },
     {
       "id": "co.commitment_record",
       "name": "承诺落证：谁对什么、以什么强度、在什么时点负责",
       "why": "没有落证的承诺在交接时会退化成「我记得他说过」。",
-      "maps_to": ["k.standard", "e.audit", "m.observe"]
+      "maps_to": [
+        "k.standard",
+        "e.audit",
+        "m.observe"
+      ]
     },
     {
       "id": "co.role_separation",
       "name": "角色分离：批准、执行、复核不由同一人闭环",
       "why": "自批自干自检的系统在单点故障上没有任何缓冲。",
-      "maps_to": ["k.criterion", "e.adjudicate", "m.compare"]
+      "maps_to": [
+        "k.criterion",
+        "e.adjudicate",
+        "m.compare"
+      ]
     },
     {
       "id": "co.disagreement_log",
       "name": "分歧留档：反方意见与未采纳理由必须可追",
       "why": "只留结论会把「有人反对过」这个信息抹掉，后人会重踩同一个坑。",
-      "maps_to": ["k.represent", "e.falsify", "m.detect"]
+      "maps_to": [
+        "k.represent",
+        "e.falsify",
+        "m.detect"
+      ]
     },
     {
       "id": "co.external_verify",
       "name": "第三方复验：结论必须能被不共享上下文的人独立重算",
       "why": "只有参与者能复验的结论，本质上是自证。",
-      "maps_to": ["e.verify", "e.calibrate", "m.check"]
+      "maps_to": [
+        "e.verify",
+        "e.calibrate",
+        "m.check"
+      ]
     },
     {
       "id": "co.version_pin",
       "name": "版本钉定：交接件绑定确切 SHA / digest，不跟最新走",
       "why": "「你看最新版」会让交接变成一次不可复现的会话。",
-      "maps_to": ["k.quantify", "m.compare", "e.verify"]
+      "maps_to": [
+        "k.quantify",
+        "m.compare",
+        "e.verify"
+      ]
     }
   ],
   "evidence_standards": [
@@ -83,5 +107,9 @@
       "why": "这是「角色分离 + 版本钉定」的组合：批准绑对象摘要，换内容须重新批准"
     }
   ],
-  "criteria_refs": ["craft:coherence", "craft:evidence_sufficiency", "standard:ISO27001"]
+  "criteria_refs": [
+    "craft:coherence",
+    "craft:evidence_sufficiency",
+    "standard:evidence-bundle-v0"
+  ]
 }

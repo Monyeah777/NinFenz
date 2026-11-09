@@ -294,6 +294,27 @@ class PackContentTest(unittest.TestCase):
         wrong = f"**{len(packs) - 1} 个域 / {moves} 个专家动作 / {kinds} 个证据类目**"
         self.assertTrue(pack_doc_issues(wrong, packs))
 
+    def test_criteria_refs_exist_in_registry(self):
+        """包的 `criteria_refs` 必须全部是 registry 里登记过的 id（第 125 轮）。
+
+        发现过程：11 个包里有 5 个引用 `standard:ISO27001` / `craft:reproducibility`，
+        而 registry 里根本没有这两个 id——**悬空引用**。它们不影响任何测试，
+        因为没人核对；但读者点进去会找不到依据。
+        """
+        reg = json.loads((ROOT / "protocol" / "criteria" / "registry.json")
+                         .read_text(encoding="utf-8"))
+        ids = {item["id"] for items in reg["layers"].values() for item in items}
+        self.assertGreaterEqual(len(ids), 5, "registry 太小（判据可能已失效）")
+        dangling = []
+        for pid in PACK_IDS:
+            pack = method_pack.load_pack(str(ROOT), pid)
+            for ref in pack.get("criteria_refs") or []:
+                if ref not in ids:
+                    dangling.append(pid + " → " + ref)
+        self.assertEqual([], sorted(dangling),
+                         "包的 criteria_refs 引用了 registry 里不存在的 id："
+                         + ", ".join(sorted(dangling)))
+
     def test_examples_cite_existing_files(self):
         """包里的 example 引用的路径必须真实存在（防「例子里的文件早就改名了」）。
 

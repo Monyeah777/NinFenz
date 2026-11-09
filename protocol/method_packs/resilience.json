@@ -9,37 +9,61 @@
       "id": "rs.blast_radius",
       "name": "变更前先划爆炸半径：谁会被波及、波及后能不能恢复",
       "why": "不知道影响面的变更只能靠运气；半径先划清，才谈得上「可回滚」。",
-      "maps_to": ["k.criterion", "e.audit", "c.select"]
+      "maps_to": [
+        "k.criterion",
+        "e.audit",
+        "c.select"
+      ]
     },
     {
       "id": "rs.chaos_drill",
       "name": "故障演练：主动注入已知失效，确认判据真的会红",
       "why": "没红过的判据等于没判据；演练是把「以为会拦」变成「确实拦了」。",
-      "maps_to": ["e.falsify", "m.detect", "e.verify"]
+      "maps_to": [
+        "e.falsify",
+        "m.detect",
+        "e.verify"
+      ]
     },
     {
       "id": "rs.rollback_path",
       "name": "每个写动作先写回滚路径（逆动作或补偿事务）",
       "why": "没有逆动作的写入是单向门；单向门必须显式声明，不能假装可撤。",
-      "maps_to": ["k.quantify", "m.trace", "e.adjudicate"]
+      "maps_to": [
+        "k.quantify",
+        "m.trace",
+        "e.adjudicate"
+      ]
     },
     {
       "id": "rs.fail_closed",
       "name": "失败默认关闭：不确定时不放行，且必须说出缺什么",
       "why": "「不确定就放行」是绝大多数事故的共同因子；关闭默认值要有明确缺口说明。",
-      "maps_to": ["k.standard", "e.audit", "m.observe"]
+      "maps_to": [
+        "k.standard",
+        "e.audit",
+        "m.observe"
+      ]
     },
     {
       "id": "rs.degradation",
       "name": "降级而非崩溃：先保住可判定性，再谈性能",
       "why": "崩溃会同时丢失结论与证据；降级至少保住「现在不能判」这个事实。",
-      "maps_to": ["k.represent", "m.compare", "e.calibrate"]
+      "maps_to": [
+        "k.represent",
+        "m.compare",
+        "e.calibrate"
+      ]
     },
     {
       "id": "rs.postmortem",
       "name": "复盘时间线：按时间顺序记事件、根因与修复，缺口显式登记",
       "why": "没有时间线的复盘会把「顺序问题」误判成「随机故障」。",
-      "maps_to": ["m.trace", "e.audit", "k.relate"]
+      "maps_to": [
+        "m.trace",
+        "e.audit",
+        "k.relate"
+      ]
     }
   ],
   "evidence_standards": [
@@ -83,5 +107,8 @@
       "why": "这是「失败关闭 + 可复现」的结合：说它错，得给得出复现件"
     }
   ],
-  "criteria_refs": ["craft:evidence_sufficiency", "craft:reproducibility", "standard:ISO27001"]
+  "criteria_refs": [
+    "craft:evidence_sufficiency",
+    "standard:evidence-bundle-v0"
+  ]
 }
