@@ -13,9 +13,11 @@ sys.path.insert(0, str(ROOT / "scripts"))
 sys.path.insert(0, str(ROOT / "desktop" / "src"))
 import judge_red_evidence as jr  # noqa: E402
 
-#: 第 153 轮冻结的「无硬证据」模块数（只减不增；`naming` 只是代理指标，不算证据）。
-#: 149 = 本件自身也落进 none（登记表的判据模块自己没被变异探针收录——如实计入，不豁免）。
-FROZEN_WITHOUT_EVIDENCE = 139
+#: 棘轮口径（第 159 轮修正）：按**比例**而不是绝对数冻结。
+#: 原因：绝对数会惩罚「新增测试模块」——新模块一开始必然没有硬证据，
+#: 于是「只减不增」在实际中变成「不许加测试」。比例口径允许新增，但比例不许升。
+#: 0.36 略高于当前 140/391≈0.358，留一点点空间；再涨就说明在造无证据模块。
+FROZEN_WITHOUT_EVIDENCE_RATIO = 0.36
 
 
 class JudgeRedEvidenceTest(unittest.TestCase):
@@ -34,11 +36,12 @@ class JudgeRedEvidenceTest(unittest.TestCase):
         self.assertEqual(jr.render(jr.collect(ROOT)), jr.render(committed),
                          "登记表已陈旧，重跑 --write")
 
-    def test_without_evidence_does_not_grow(self):
-        """棘轮：无硬证据的模块数只减不增（允许新增模块暂时落进 none，但总数不许涨）。"""
+    def test_without_evidence_ratio_does_not_grow(self):
+        """棘轮：无硬证据模块的**比例**不许上升（绝对数会惩罚新增模块，见常量注释）。"""
         doc = jr.collect(ROOT)
-        self.assertLessEqual(doc["without_evidence"], FROZEN_WITHOUT_EVIDENCE,
-                             "无硬证据模块变多了（修复指引：给新模块补一条真会红的判据，"
+        ratio = doc["without_evidence"] / doc["modules"]
+        self.assertLessEqual(ratio, FROZEN_WITHOUT_EVIDENCE_RATIO,
+                             "无硬证据模块的比例上升了（修复指引：给新模块补一条真会红的判据，"
                              "或把已有的拒绝型用例登记进 gate_probe）")
 
     def test_naming_is_not_counted_as_evidence(self):

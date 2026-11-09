@@ -189,7 +189,7 @@
     "test_json_shape_contracts": 0.9,
     "test_judge_clock_purity": 0.3,
     "test_judge_mutation_probe": 0.2,
-    "test_judge_red_evidence": 0.6,
+    "test_judge_red_evidence": 0.9,
     "test_judge_references": 0.7,
     "test_judgement_coverage": 7.4,
     "test_key_naming": 0.3,
@@ -2367,10 +2367,10 @@
     "test_judge_mutation_probe.JudgeMutationTest.test_committed_result_is_fresh": 0.01,
     "test_judge_mutation_probe.JudgeMutationTest.test_probe_is_not_vacuous": 0.01,
     "test_judge_mutation_probe.JudgeMutationTest.test_rates_are_computable": 0.02,
-    "test_judge_red_evidence.JudgeRedEvidenceTest.test_collect_is_deterministic": 0.18,
-    "test_judge_red_evidence.JudgeRedEvidenceTest.test_committed_registry_is_fresh": 0.09,
-    "test_judge_red_evidence.JudgeRedEvidenceTest.test_naming_is_not_counted_as_evidence": 0.09,
-    "test_judge_red_evidence.JudgeRedEvidenceTest.test_without_evidence_does_not_grow": 0.09,
+    "test_judge_red_evidence.JudgeRedEvidenceTest.test_collect_is_deterministic": 0.27,
+    "test_judge_red_evidence.JudgeRedEvidenceTest.test_committed_registry_is_fresh": 0.15,
+    "test_judge_red_evidence.JudgeRedEvidenceTest.test_naming_is_not_counted_as_evidence": 0.15,
+    "test_judge_red_evidence.JudgeRedEvidenceTest.test_without_evidence_ratio_does_not_grow": 0.12,
     "test_judge_references.JudgeReferenceTest.test_code_side_judge_references_resolve": 0.17,
     "test_judge_references.JudgeReferenceTest.test_doc_side_judge_references_resolve": 0.35,
     "test_judge_references.JudgeReferenceTest.test_exemptions_are_not_stale": 0.04,
@@ -4605,5 +4605,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1874.0
+  "total_s": 1874.3
 }
