@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/io_types.py:09296daf865db85bda582fb646cece708c51f97e190a9e91c0eecd07252475f7
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
   - desktop/src/core/knowledge.py:d0b678c0f1176ce6f16a33b6f6d42a16b663099b4346306fae1ea547305e316b
-  - protocol/code_metrics_baseline.json:dd757a6a9c8375e3f0b2db17d1bb8c7ecf5721da85763c12b21c3f7d5042c2ae
+  - protocol/code_metrics_baseline.json:a189e9aed151dd2b9ff52c034139b7427402bd180d1212f9a774a960b5bc89fe
 ---
+> 重审（2026-11-09）：in-toto ledger: 合入唯一真源与最新主干后重绑
+
 > 重审（2026-11-09）：merge latest main for in-toto statement profile
 
 > 重审（2026-11-08）：合并 origin/main 最新 Rust CI 与 ENOSPC 前置检查后重审：保留双方重审理由，按合并后字节重算审计摘要。

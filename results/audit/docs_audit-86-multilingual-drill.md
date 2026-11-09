@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:dd757a6a9c8375e3f0b2db17d1bb8c7ecf5721da85763c12b21c3f7d5042c2ae
+  - protocol/code_metrics_baseline.json:a189e9aed151dd2b9ff52c034139b7427402bd180d1212f9a774a960b5bc89fe
 ---
+> 重审（2026-11-09）：in-toto ledger: 合入唯一真源与最新主干后重绑
+
 > 重审（2026-11-09）：merge latest main for in-toto statement profile
 
 > 重审（2026-11-08）：合并 origin/main 最新 Rust CI 与 ENOSPC 前置检查后重审：保留双方重审理由，按合并后字节重算审计摘要。

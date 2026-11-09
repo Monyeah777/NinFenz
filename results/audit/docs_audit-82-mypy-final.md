@@ -30,8 +30,10 @@ subjects:
   - desktop/src/core/daemon.py:75940f32b3068a5bc7a83b288bb9302e76a948eca0baa76e1e62f02243c8b498
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:dd757a6a9c8375e3f0b2db17d1bb8c7ecf5721da85763c12b21c3f7d5042c2ae
+  - protocol/code_metrics_baseline.json:a189e9aed151dd2b9ff52c034139b7427402bd180d1212f9a774a960b5bc89fe
 ---
+> 重审（2026-11-09）：in-toto ledger: 合入唯一真源与最新主干后重绑
+
 > 重审（2026-11-09）：merge latest main for in-toto statement profile
 
 > 重审（2026-11-08）：合并 origin/main 最新 Rust CI 与 ENOSPC 前置检查后重审：保留双方重审理由，按合并后字节重算审计摘要。

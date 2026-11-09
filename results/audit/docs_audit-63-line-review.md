@@ -10,12 +10,16 @@ subjects:
   - desktop/src/core/payload_harvest.py:514c493d341863b245b7dddb0bde8ee87ca969fe4407c9f2834a726bb92d1a76
   - protocol/data_contracts.json:6ca6174c77d41ad354b90e637c404bedfbe5d8ad0ce6400bb26f2ac7e5f19eb0
   - protocol/assertions.json:5a0bb383eabf678a9f660ae6d771f0be51cce5397a40a73f0d0d93457e4f1cba
-  - desktop/src/core/interop_export.py:e6a40e4bf776bbcdfc080fa112db1974646daf2157a72034abdca01700d25940
+  - desktop/src/core/interop_export.py:4b0f04d6acaa12e857a4d1d73aeb8a0b8b686c8d8cfbb9567898ea5e7d8386ae
   - desktop/src/core/text_hygiene.py:99b38bfbb8656ad653689c4cba93679970a78183019fd5f02e2380d87ec99ff3
   - desktop/src/core/workloop.py:3ee94f2c11939abba5507741c6b9b4dae8e8cab77c3bda38419678e31e097056
   - scripts/serve_decision_model.py:bbb36dff0e3816c2253150b7de6ab619877c3c78269a644c4c966083df15afee
-  - scripts/nf.py:83a75a4fac82461d56b03147eff04b420b8aad0ed6db9fef6e695717dcf7b6a2
+  - scripts/nf.py:869bab4dff472c51503c71770c1871cb4dab32a3c3d0977da69ce6a0ea963d9e
 ---
+> 重审（2026-11-09）：in-toto ledger: SPDX 许可改为唯一真源后重绑
+
+> 重审（2026-11-09）：in-toto ledger: 合入唯一真源与最新主干后重绑
+
 > 重审（2026-11-08）：in-toto Statement v1 绑定判据收紧后重审：Python/.NET 双重校验 subject 顺序与摘要、predicate 元数据同源；导出字节未变，旧审计摘要按新门禁重绑。
 
 > 重审（2026-11-08）：task-35c：git status 收敛到 repo_face.untracked_paths

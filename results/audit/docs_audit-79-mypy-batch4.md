@@ -7,10 +7,12 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
-  - desktop/src/core/purity_scan.py:66c0419a71440173d67087494eac8697daa03e942524d948b2296f49af8770cf
+  - desktop/src/core/purity_scan.py:c422df3c3bebf36c2dd446ae1e8942930eea57c432b48341f3fd1fff733da433
   - desktop/src/core/asset_contract.py:8e2fbc3954c771d6c2eb78d9cf47dcf22612b63b9b16929bd9013792f803f9a2
-  - protocol/code_metrics_baseline.json:dd757a6a9c8375e3f0b2db17d1bb8c7ecf5721da85763c12b21c3f7d5042c2ae
+  - protocol/code_metrics_baseline.json:a189e9aed151dd2b9ff52c034139b7427402bd180d1212f9a774a960b5bc89fe
 ---
+> 重审（2026-11-09）：in-toto ledger: 合入唯一真源与最新主干后重绑
+
 > 重审（2026-11-09）：merge latest main for in-toto statement profile
 
 > 重审（2026-11-08）：合并 origin/main 最新 Rust CI 与 ENOSPC 前置检查后重审：保留双方重审理由，按合并后字节重算审计摘要。

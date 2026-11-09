@@ -7,14 +7,18 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/workloop.py:3ee94f2c11939abba5507741c6b9b4dae8e8cab77c3bda38419678e31e097056
-  - desktop/src/core/interop_export.py:e6a40e4bf776bbcdfc080fa112db1974646daf2157a72034abdca01700d25940
-  - scripts/nf.py:83a75a4fac82461d56b03147eff04b420b8aad0ed6db9fef6e695717dcf7b6a2
+  - desktop/src/core/interop_export.py:4b0f04d6acaa12e857a4d1d73aeb8a0b8b686c8d8cfbb9567898ea5e7d8386ae
+  - scripts/nf.py:869bab4dff472c51503c71770c1871cb4dab32a3c3d0977da69ce6a0ea963d9e
   - scripts/check_interop_schemas.py:da1b1c628de26f1f8979e9e1c3cf325781fe6a23f4401d0bed2c8db19f8059f6
   - docs/interop.md:13dfeab39e852a4d3b86c359cc725de14d5e36750d7d6b90998e47d2a6650064
   - desktop/tests/test_interop_export.py:b8ec76f28a8a65a5817d26aa64e23766413c91a01f2e111498de4e1a8a484bda
   - desktop/tests/test_decision_layer.py:551419122f09c1b77f73e7724919f67698bd6d939c3d556d9c8ef98274a76257
 
 ---
+> 重审（2026-11-09）：in-toto ledger: SPDX 许可改为唯一真源后重绑
+
+> 重审（2026-11-09）：in-toto ledger: 合入唯一真源与最新主干后重绑
+
 > 重审（2026-11-08）：外部 schema 校验工具修复 bytes→UTF-8 解码后重审：导出面与远端 schema 均先严格解码再解析；新增离线负例防回归。
 
 > 重审（2026-11-08）：in-toto Statement v1 绑定判据收紧后重审：Python/.NET 双重校验 subject 顺序与摘要、predicate 元数据同源；导出字节未变，旧审计摘要按新门禁重绑。

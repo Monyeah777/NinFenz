@@ -9,7 +9,7 @@ subjects:
   - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
   - desktop/src/core/transparency_log.py:8aba0254fcf72230452600d5cb0305b5d5320cd3e95d8ed57ebe54a5d0ae46a1
   - desktop/src/core/rating_gate.py:468759e5d971fbe9319ab86e84d95031c13bc3df2c44dbffac0af3fcb071f74e
-  - desktop/src/core/interop_export.py:e6a40e4bf776bbcdfc080fa112db1974646daf2157a72034abdca01700d25940
+  - desktop/src/core/interop_export.py:4b0f04d6acaa12e857a4d1d73aeb8a0b8b686c8d8cfbb9567898ea5e7d8386ae
   - desktop/src/core/ccv3_adapter.py:ec9bfacffcb0dd6a73f88652a7273d631e40c4efd8cecfb00a5f0be831a511ad
   - desktop/src/core/export_schema.py:9052dc891be0c70ceb5b42544eceeceeeb4dee8c4f107b1ec660913cf922ad3d
   - desktop/src/core/mcp_runtime.py:4929a1fe7b789ed86d8978f6c49ccf120ecc7a44e741f3e38dc79c8f1aa0b23d
@@ -22,6 +22,8 @@ subjects:
   - results/interop-schema-validation.md:018bd1d1831c51cdde3de9e99f5c81f1a5a4a03686d142f288cd663699632972
 
 ---
+> 重审（2026-11-09）：in-toto ledger: SPDX 许可改为唯一真源后重绑
+
 > 重审（2026-11-08）：外部 schema 校验工具修复 bytes→UTF-8 解码后重审：导出面与远端 schema 均先严格解码再解析；新增离线负例防回归。
 
 > 重审（2026-11-08）：in-toto Statement v1 绑定判据收紧后重审：Python/.NET 双重校验 subject 顺序与摘要、predicate 元数据同源；导出字节未变，旧审计摘要按新门禁重绑。
