@@ -6,9 +6,11 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/terminal.py:69c2d9ced679e439c6ca440fc949d02f70dc067debdd9b520f96a2e4de156833
-  - protocol/code_metrics_baseline.json:a5f60b2b9bb6747c6641c84832741750dd23b0dbc8a060d33ab621dfc14d8ab6
+  - desktop/src/core/terminal.py:3e21a47d54d5130acaf33545a501902cad27f1b3b657df826a13975fecd8d3b5
+  - protocol/code_metrics_baseline.json:b980d29da8b25896062b90d09356b812181ca83e8bdc8efc3886deaafc0f52c3
 ---
+> 重审（2026-11-09）：SLSA source track: 合入唯一真源与最新主干后重绑
+
 > 重审（2026-11-09）：merge latest main for SLSA source profile
 
 > 重审（2026-11-08）：session watch nested release root fix

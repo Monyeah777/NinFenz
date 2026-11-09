@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-09",
   "approved_by": "Monyeah777",
-  "note": "merge latest main for SLSA source profile",
+  "note": "",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "ec5017a9ae7494f5604265b64c243ecd32485bbd01efa987389d8e86f3c881c3"
+  "subject_digest": "5ef1a8adf15fd1030e8846437ba93af1fb210d2b8a57540b4d2ee35a022a4e4a"
 }

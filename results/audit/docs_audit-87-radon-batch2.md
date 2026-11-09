@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:a5f60b2b9bb6747c6641c84832741750dd23b0dbc8a060d33ab621dfc14d8ab6
+  - protocol/code_metrics_baseline.json:b980d29da8b25896062b90d09356b812181ca83e8bdc8efc3886deaafc0f52c3
 ---
+> 重审（2026-11-09）：SLSA source track: 合入唯一真源与最新主干后重绑
+
 > 重审（2026-11-09）：merge latest main for SLSA source profile
 
 > 重审（2026-11-08）：session watch nested release root fix

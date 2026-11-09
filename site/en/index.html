@@ -4,17 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>NinFenz · a content contract layer for AI long-form output</title>
-<meta name="description" content="NinFenz (NF) is a content contract layer: a protocol plus deterministic gates plus verifiable artifacts, so AI long-form output can be loaded, checked and reproduced. Domain-neutral, model-agnostic. check1-42 gates, PASS=76, Merkle inclusion proofs, MIT, offline.">
+<meta name="description" content="NinFenz (NF) is a content contract layer: a protocol plus deterministic gates plus verifiable artifacts, so AI long-form output can be loaded, checked and reproduced. Domain-neutral, model-agnostic. check1-42 gates, PASS=76, Merkle inclusion proofs, AGPL-3.0-only / Commercial, offline.">
 <link rel="canonical" href="https://ninfenz.dev/en/">
 <link rel="alternate" hreflang="zh-CN" href="https://ninfenz.dev/">
 <link rel="alternate" hreflang="en" href="https://ninfenz.dev/en/">
 <link rel="alternate" hreflang="x-default" href="https://ninfenz.dev/">
 <link rel="describedby" href="llms.txt" type="text/plain" title="llms.txt">
 <link rel="alternate" href="llms-full.txt" type="text/plain" title="llms-full.txt (single complete file)">
-<link rel="license" href="https://opensource.org/license/mit">
+<link rel="license" href="https://github.com/Monyeah777/NinFenz/blob/main/LICENSING.md">
 <meta property="og:type" content="website">
 <meta property="og:title" content="NinFenz · content contract layer">
-<meta property="og:description" content="Protocol + deterministic gates + verifiable artifacts. Not a model, not a prompt set, not a vendor SDK. MIT, offline.">
+<meta property="og:description" content="Protocol + deterministic gates + verifiable artifacts. Not a model, not a prompt set, not a vendor SDK. AGPL-3.0-only / Commercial, offline.">
 <meta property="og:url" content="https://ninfenz.dev/en/">
 <meta property="og:image" content="https://ninfenz.dev/assets/og.png">
 <meta name="twitter:card" content="summary_large_image">
@@ -34,16 +34,16 @@
       ],
       "applicationCategory": "DeveloperApplication",
       "operatingSystem": "Windows, macOS, Linux",
-      "license": "https://opensource.org/license/mit",
+      "license": "https://github.com/Monyeah777/NinFenz/blob/main/LICENSING.md",
       "codeRepository": "https://github.com/Monyeah777/NinFenz",
       "sameAs": [
         "https://github.com/Monyeah777/NinFenz",
         "https://gitee.com/monyeah777/ninfenz"
       ],
       "programmingLanguage": "Python",
-      "softwareVersion": "1.0.5",
+      "softwareVersion": "1.1.2",
       "description": "A content contract layer: a protocol plus deterministic gates plus verifiable artifacts, so AI long-form output can be loaded, checked and reproduced. Domain-neutral and model-agnostic. Not a model, not a prompt-template collection, not a vendor SDK.",
-      "disambiguatingDescription": "The only official entry point is https://ninfenz.dev; there is no paid version and no client download; copies on third-party sites are not affiliated with the project.",
+      "disambiguatingDescription": "The only official entry point is https://ninfenz.dev; there is no paid hosted version and no client download; copies on third-party sites are not affiliated with the project.",
       "offers": {
         "@type": "Offer",
         "price": "0",
@@ -148,7 +148,7 @@
           "name": "What is the licence and cost?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "MIT. No paid tier and no hosted service."
+            "text": "AGPL-3.0-only / Commercial. No paid hosted tier and no hosted service."
           }
         }
       ]
@@ -166,8 +166,8 @@
 
 <h1>A content contract layer for AI long-form output</h1>
 <p class="lede sub">NinFenz (NF) turns "AI produces long-form content reliably" into engineering you can <strong>load, verify and reproduce</strong>. The protocol is <strong>domain-neutral and model-agnostic</strong>; narrative is only the first official domain pack.</p>
-<p class="not">Not a model · not a prompt-template collection · not a vendor SDK · MIT · runs offline</p>
-<p class="warn">⚠️ The only official entry point: <strong>https://ninfenz.dev</strong> — NinFenz has no paid version and no "client" to download; copies on third-party sites are not affiliated with the project (<a href="#official">how to tell</a>).</p>
+<p class="not">Not a model · not a prompt-template collection · not a vendor SDK · AGPL-3.0-only / Commercial · runs offline</p>
+<p class="warn">⚠️ The only official entry point: <strong>https://ninfenz.dev</strong> — NinFenz has no paid hosted version and no "client" to download; copies on third-party sites are not affiliated with the project (<a href="#official">how to tell</a>).</p>
 
 <h2>Three entry paths (pick by who you are)</h2>
 <div class="card">
@@ -191,7 +191,7 @@
 <li id="fact-verifiable">Verifiable artifacts: <strong>Merkle inclusion proofs (RFC 6962)</strong> plus optional hmac / ssh-sig / sigstore-keyless anchors; <strong>missing verifier = fail closed</strong>.</li>
 <li id="fact-mcp">Interop: read-only MCP surface (<code>nf serve</code>), dual-era 2026-07-28 / 2025-11-25; listed in the <strong>official MCP Registry</strong> (<code>io.github.Monyeah777/ninfenz</code>).</li>
 <li id="fact-terminal">Terminal: <code>python tui/nf.py</code> - a full-screen TUI in the pure standard library.</li>
-<li id="fact-npm">Distribution: npm package <strong>ninfenz v1.0.5</strong> (3033 files / 24.07 MB unpacked, with SLSA provenance) - repositories on GitHub / Gitee, site at <strong>ninfenz.dev</strong>.</li>
+<li id="fact-npm">Distribution: npm package <strong>ninfenz v1.1.2</strong> (3054 files / 24.28 MB unpacked, with SLSA provenance) - repositories on GitHub / Gitee, site at <strong>ninfenz.dev</strong>.</li>
 </ul>
 <p class="src">The same facts, machine-readable: <a href="facts.json">/facts.json</a> (each claim carries its source and an on-page anchor) · standards catalogue export: <a href="https://raw.githubusercontent.com/Monyeah777/NinFenz/main/protocol/geo_export.json">protocol/geo_export.json</a> (370 entries with reachability and probe date).</p>
 
@@ -207,7 +207,7 @@ python tui/nf.py
 
 # agent bootstrap (read-only by default; --full adds all gates)
 curl -fsSL https://ninfenz.dev/run.sh | sh</code></pre>
-<p class="src">Requires Python >= 3.11 (standard library only, no pip dependencies) and Node >= 18.17 (only for the no-clone npm path). The npm package is published (<code>ninfenz</code> v1.0.5, released with provenance): <code>npx -y ninfenz doctor</code> (read-only checks) and <code>npx -y ninfenz tui</code> (full-screen terminal) work with no clone. If your npm points at a regional mirror that has not synced it yet, add <code>--registry https://registry.npmjs.org</code> or retry later. Mirror for mainland China: <a href="https://gitee.com/monyeah777/ninfenz">gitee.com/monyeah777/ninfenz</a>.</p>
+<p class="src">Requires Python >= 3.11 (standard library only, no pip dependencies) and Node >= 18.17 (only for the no-clone npm path). The npm package is published (<code>ninfenz</code> v1.1.2, released with provenance): <code>npx -y ninfenz doctor</code> (read-only checks) and <code>npx -y ninfenz tui</code> (full-screen terminal) work with no clone. If your npm points at a regional mirror that has not synced it yet, add <code>--registry https://registry.npmjs.org</code> or retry later. Mirror for mainland China: <a href="https://gitee.com/monyeah777/ninfenz">gitee.com/monyeah777/ninfenz</a>.</p>
 
 <h2>See it running</h2>
 <p class="sub">Terminal TUI (standard library only, offline; 9-second demo):</p>
@@ -228,7 +228,7 @@ curl -fsSL https://ninfenz.dev/run.sh | sh</code></pre>
 <h2 id="official">Official entry and how to spot copies</h2>
 <div class="card warnbox">
 <p><strong>⚠️ The only official entry point is <a href="https://ninfenz.dev/">https://ninfenz.dev</a></strong></p>
-<p>NinFenz <strong>has no paid version</strong> and <strong>no "client" to download</strong>, and never asks for an account, a phone number or payment details. If you meet this project on a third-party site — especially ad-heavy game / resource / download sites — <strong>do not enter any information and do not download anything there</strong>: those sites are not affiliated with the project and their files are not part of it.</p>
+<p>NinFenz <strong>has no paid hosted version</strong> and <strong>no "client" to download</strong>, and never asks for an account, a phone number or payment details. If you meet this project on a third-party site — especially ad-heavy game / resource / download sites — <strong>do not enter any information and do not download anything there</strong>: those sites are not affiliated with the project and their files are not part of it.</p>
 </div>
 <table>
 <tr><th>What you see</th><th>Verdict</th></tr>
@@ -238,9 +238,9 @@ curl -fsSL https://ninfenz.dev/run.sh | sh</code></pre>
 <tr><td>npm: <code>ninfenz</code> on npmjs.com, or <code>@monyeah777/ninfenz</code> on GitHub Packages</td><td>✅ official form (npx launcher)</td></tr>
 <tr><td>Any <code>.exe</code> / <code>.apk</code> / installer / downloader / cracked build / membership key</td><td>❌ not this project</td></tr>
 <tr><td>Project content hosted on a resource, file-sharing or "booster" site</td><td>❌ unauthorised copy, not affiliated</td></tr>
-<tr><td>Anything asking for payment, top-ups, group joins, forms or QR scans</td><td>❌ not this project (NF never charges and has no support desk)</td></tr>
+<tr><td>Anything asking for payment, top-ups, group joins, forms or QR scans</td><td>❌ not this project (NF takes no payment through unofficial channels; commercial terms are documented in COMMERCIAL.md)</td></tr>
 </table>
-<p class="src">Released under MIT: redistribution and commercial use are welcome, but you <strong>must keep the LICENSE and attribution</strong>; a copy with the attribution stripped does not meet the licence. To check whether something is genuine, compare it against this page and the canonical repository.</p>
+<p class="src">Released under AGPL-3.0-only / Commercial: redistribution and commercial use are welcome, but you <strong>must keep the LICENSE and attribution</strong>; a copy with the attribution stripped does not meet the licence. To check whether something is genuine, compare it against this page and the canonical repository.</p>
 
 <h2 id="faq">FAQ</h2>
 <h3>What is NinFenz?</h3>
@@ -258,26 +258,26 @@ curl -fsSL https://ninfenz.dev/run.sh | sh</code></pre>
 <h3>How do I fetch it from mainland China?</h3>
 <p>Use the Gitee mirror <a href="https://gitee.com/monyeah777/ninfenz">gitee.com/monyeah777/ninfenz</a>, or the machine surfaces on this site - hosted on Cloudflare, directly reachable (<code>*.workers.dev</code> is not; the custom domain is).</p>
 <h3>Licence and cost?</h3>
-<p>MIT, no paid tier, no hosted service.</p>
+<p>AGPL-3.0-only / Commercial, no paid hosted tier, no hosted service.</p>
 
 <h2>How to cite</h2>
 <pre><code>NinFenz (NF) - a content contract layer. A protocol plus deterministic gates plus verifiable artifacts, so AI long-form output can be loaded, checked and reproduced.
 
-Plain: NinFenz (NF) - content contract layer, Monyeah777, MIT, https://github.com/Monyeah777/NinFenz
-APA: Monyeah777. (2026). NinFenz (宁封子): a content contract layer [Computer software]. MIT. https://ninfenz.dev/
+Plain: NinFenz (NF) - content contract layer, Monyeah777, AGPL-3.0-only / Commercial, https://github.com/Monyeah777/NinFenz
+APA: Monyeah777. (2026). NinFenz (宁封子): a content contract layer [Computer software]. AGPL-3.0-only / Commercial. https://ninfenz.dev/
 BibTeX:
 @software{ninfenz,
   title = {NinFenz (宁封子) - content contract layer},
   author = {Monyeah777},
   year = {2026},
   url = {https://ninfenz.dev/},
-  license = {MIT}
+  license = {AGPL-3.0-only OR LicenseRef-Commercial}
 }</code></pre>
 <p class="src">Machine-readable citation metadata: CITATION.cff at the repository root · all three forms also in <a href="llms-full.txt">/llms-full.txt</a>, section 8. Cite the canonical site or repository, keep the definition sentence verbatim, and cite <a href="facts.json">/facts.json</a> for numbers instead of copying them (they move).</p>
 
 <footer>
-<p class="warn">⚠️ The only official entry point: https://ninfenz.dev — no paid version, no client download; copies on third-party sites are not affiliated with the project.</p>
-<p><span class="badge">MIT</span><span class="badge">offline</span><span class="badge">zero third-party deps</span><span class="badge">model-agnostic</span></p>
+<p class="warn">⚠️ The only official entry point: https://ninfenz.dev — no paid hosted version, no client download; copies on third-party sites are not affiliated with the project.</p>
+<p><span class="badge">AGPL-3.0-only / Commercial</span><span class="badge">offline</span><span class="badge">zero third-party deps</span><span class="badge">model-agnostic</span></p>
 <p>Repository: <a href="https://github.com/Monyeah777/NinFenz">github.com/Monyeah777/NinFenz</a> · mirror: <a href="https://gitee.com/monyeah777/ninfenz">Gitee</a> · machine surfaces: <a href="../llms.txt">/llms.txt</a> · <a href="../llms-full.txt">/llms-full.txt</a> · <a href="../facts.json">/facts.json</a> · <a href="../nf.txt">/nf.txt</a> · <a href="../agent.txt">/agent.txt</a> · <a href="../sitemap.xml">sitemap</a></p>
 </footer>
 </div>

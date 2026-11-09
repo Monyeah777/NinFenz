@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:a5f60b2b9bb6747c6641c84832741750dd23b0dbc8a060d33ab621dfc14d8ab6
+  - protocol/code_metrics_baseline.json:b980d29da8b25896062b90d09356b812181ca83e8bdc8efc3886deaafc0f52c3
 ---
+> 重审（2026-11-09）：SLSA source track: 合入唯一真源与最新主干后重绑
+
 > 重审（2026-11-09）：merge latest main for SLSA source profile
 
 > 重审（2026-11-08）：session watch nested release root fix

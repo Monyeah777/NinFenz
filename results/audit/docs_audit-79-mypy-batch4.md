@@ -7,10 +7,12 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
-  - desktop/src/core/purity_scan.py:66c0419a71440173d67087494eac8697daa03e942524d948b2296f49af8770cf
+  - desktop/src/core/purity_scan.py:c422df3c3bebf36c2dd446ae1e8942930eea57c432b48341f3fd1fff733da433
   - desktop/src/core/asset_contract.py:8e2fbc3954c771d6c2eb78d9cf47dcf22612b63b9b16929bd9013792f803f9a2
-  - protocol/code_metrics_baseline.json:a5f60b2b9bb6747c6641c84832741750dd23b0dbc8a060d33ab621dfc14d8ab6
+  - protocol/code_metrics_baseline.json:b980d29da8b25896062b90d09356b812181ca83e8bdc8efc3886deaafc0f52c3
 ---
+> 重审（2026-11-09）：SLSA source track: 合入唯一真源与最新主干后重绑
+
 > 重审（2026-11-09）：merge latest main for SLSA source profile
 
 > 重审（2026-11-08）：session watch nested release root fix
