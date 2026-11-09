@@ -6,7 +6,7 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - CHANGELOG.md:24e2f6f22cf7ab3c92b5ab6baa31bdd47e280bd7c56031309d8a213c017a39fc
+  - CHANGELOG.md:c33b70610b8e51f9d40a5f3e55f9400944d117bb5fdf9e2d0ee8f71dff81acf7
   - docs/meta/VERSION-MATRIX.md:014144331c6e2715f4d4e441c69055e636d0194a1133d004904423bd23d2077a
   - README.md:d61e2a9471653cc9fc4d6d5e1f1876d1e1a96b947a98949a9cf1a83dc80c523f
   - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
@@ -16,6 +16,8 @@ subjects:
   - scripts/nf.py:83a75a4fac82461d56b03147eff04b420b8aad0ed6db9fef6e695717dcf7b6a2
 
 ---
+> 重审（2026-11-09）：changelog CI
+
 > 重审（2026-11-08）：task-35c：git status 收敛到 repo_face.untracked_paths
 
 > 重审（2026-11-08）：task-35：nf.py 注释修正（nosec/理由）

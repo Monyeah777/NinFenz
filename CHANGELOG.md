@@ -1,8 +1,9 @@
 # Changelog
 
-## [未发布] - 2026-10-21 · 职能坐标（ADR-0006）+ 项目改名：NarrativeForge → NinFenz（宁封子）+ 全仓审计 V3 修复波
+## [未发布] - 2026-11-09 · 职能坐标（ADR-0006）+ 项目改名：NarrativeForge → NinFenz（宁封子）+ 全仓审计 V3 修复波
 
 > 日期为该「未发布」节的**最新一次改动**日期（审计 W9：此前停在 2026-10-06，早于 HEAD）。
+- **CI 门禁完整性三修 + 安全扫描面扩展（2026-11-09）**：① 所有 `| tee` 步骤显式启用 pipefail——此前默认 shell 无 pipefail，**SAST 计数棘轮在 CI 上一直假绿**（exit code 被 tee 吞，实测新增命中被绿着放行）；② `gate` 改为 `if: always()` 并显式校验 `needs.*.result`——required check 的 `skipped` 被 GitHub 视为通过，曾在 unit-tests 分片红时放行 auto-merge；③ `linux-parity-refresh` 的 posix SAST 漂移判定改**逐键比对**（只比总数会漏「一规则 +1、另一规则 -1」）。扫描面同步扩展：SAST 棘轮覆盖 `tui/` 与 `packaging/`（含对公网 hf-space 入口）、风格棘轮覆盖 `packaging/`（清 F401/无效 noqa，21 条存量 review 后入基线）、hf-space 镜像补 CI 构建面、CodeQL 恢复（python + js/ts，PR 路径过滤、push main、周 schedule，pin SHA）。验收：sast/风格棘轮与 parity 键级比对均有源码级守卫；r69 全量结论 8/8 分片 rc=0。
 - **元认知生产驾驶舱主仓融合（2026-10-29）**：新增 `core.meta_cockpit` 运行时，33 个原子执行器、14 个方法节点、10 节点内容管线与 5 节点元管线进入主仓；接入 `nf cockpit` / `nf cockpit-ab`、事件溯源重放、上下文预算、角色化证据、结构化交接及离线盲评。驾驶舱保持无内部评分，HR-001 仍为 `PENDING`，真实跨模型 A/B 未运行。验收：驾驶舱契约 11/11、最终受影响合并集 292/292。
 - **全仓一致性与可执行性修复（2026-10-21）**：CLI 版本在 `scripts/nf.py`、npm、MCP、`pyproject.toml`、HF Space 与 .NET doctor 六面统一为 `1.0.5`；站点和上手文档的质量凭证、doctor 计数、npm 件数/体积全部改接运行时真源；修复公开文档失效相对链接与把不存在的本地计划写成开工前置的问题；恢复 `CHANGELOG.md` 中被压成一字一行的 1362 行段落，并新增跨语言版本、公开数字、本地链接与行密度回归判据。
 - **门禁矩阵化（2026-10-18）**：CI 全量门禁拆成「静态 1 台 + 测试 **32 台并行**」——`verify.sh` 新增 `--checks-only` / `--tests-only --shard i/n`，`ci-verify.yml` 改为 `static-checks` + `unit-tests`（matrix 32 片）+ `gate`（needs 两者，任一片红即整条红）三个作业；32 片的分配与本地分片用**同一套权重/LPT**，`--plan 32` 可在本地校验「并集 == discover 全集」。动机：实测同机并行收益在 16 片后饱和（8 片 502 s / 16 片 396 s），跨机器没有争用才是"全量 1 分钟"的唯一实现路径。契约测试 `test_ci_visibility` 同步改为：CI 必须恰好一次 `--checks-only` + 一次 `--tests-only --shard ${{ matrix.shard }}/N`，且 N ≥ 16 且矩阵真的声明到 N-1。
