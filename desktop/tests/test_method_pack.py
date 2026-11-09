@@ -294,6 +294,26 @@ class PackContentTest(unittest.TestCase):
         wrong = f"**{len(packs) - 1} 个域 / {moves} 个专家动作 / {kinds} 个证据类目**"
         self.assertTrue(pack_doc_issues(wrong, packs))
 
+    def test_maps_to_uses_known_actions(self):
+        """包里的 `maps_to` 必须引用 method_pack.KNOWN_ACTIONS 里登记的动作（第 128 轮）。
+
+        这是引用面判据族第三条（前两条：examples 路径、criteria_refs）。
+        当前 25 个被引用的动作 id 全部合法；但此前**没有任何判据**保证它们合法——
+        写错一个字母（`e.verfy`）不会有任何测试变红，只会让「这个动作映射到哪里」静默失效。
+        """
+        unknown = []
+        used = set()
+        for pid in PACK_IDS:
+            pack = method_pack.load_pack(str(ROOT), pid)
+            for move in pack["expert_moves"]:
+                for target in move.get("maps_to") or []:
+                    used.add(target)
+                    if target not in method_pack.KNOWN_ACTIONS:
+                        unknown.append(pid + "·" + move["id"] + " → " + target)
+        self.assertGreaterEqual(len(used), 20, "maps_to 引用太少（判据可能已失效）")
+        self.assertEqual([], sorted(unknown),
+                         "这些 maps_to 指向未登记的动作 id：" + ", ".join(sorted(unknown)))
+
     def test_criteria_refs_exist_in_registry(self):
         """包的 `criteria_refs` 必须全部是 registry 里登记过的 id（第 125 轮）。
 
