@@ -1,5 +1,5 @@
 {
-  "digest": "0331c9d8d0ea035dd81ed2d7820236445d6a50072efdbfda6b2e65c00cd53c45",
+  "digest": "3a912d24fe29a8952fb770d98e050cc60c55f0b09f9d412ea141da3cfde21c9b",
   "entries": [
     {
       "doc": "其余 ABI 调用的判定向量：cc_label（IR 校验）→ 期望结论（跨语言可复核）。",
@@ -411,6 +411,16 @@
         "--write"
       ],
       "path": "scripts/judge_mutation_probe.py",
+      "subcommands": []
+    },
+    {
+      "doc": "判据红证据登记（`nf-judge-red-evidence/1`）：每个测试模块「被证明过能红吗」。",
+      "flags": [
+        "--check",
+        "--json",
+        "--write"
+      ],
+      "path": "scripts/judge_red_evidence.py",
       "subcommands": []
     },
     {
@@ -1206,8 +1216,8 @@
       "subcommands": []
     }
   ],
-  "flags": 518,
+  "flags": 521,
   "note": "静态接口面（docs/flags/subcommands），不含缺省行为语义",
   "schema": "nf-capability-inventory/1",
-  "scripts": 76
+  "scripts": 77
 }

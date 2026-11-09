@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/json_schema.py:f3a4a6a14de5104e217af8b154505f9ca46fd6133081188209add78143e2b23e
-  - protocol/code_metrics_baseline.json:c7973f7d3095ad94d3aa7be5ecdadc266ef28c878895ae817ef2d27af39dd1d8
+  - protocol/code_metrics_baseline.json:255c750517a1f6f99e7f3293c2d3fd1bf7149cd27efb4f92b5c21c2e057fb842
 ---
+> 重审（2026-11-09）：红证据登记（硬证据 20 / 疑似 221 / 无 149，棘轮只减不增）
+
 > 重审（2026-11-09）：方法包声明可跑入口 runnable，清单与文档共用（含入口存在性判据）
 
 > 重审（2026-11-09）：能力清单（静态 AST 扫描 scripts/*，可查而非猜）

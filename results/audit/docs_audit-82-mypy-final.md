@@ -30,8 +30,10 @@ subjects:
   - desktop/src/core/daemon.py:75940f32b3068a5bc7a83b288bb9302e76a948eca0baa76e1e62f02243c8b498
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:c7973f7d3095ad94d3aa7be5ecdadc266ef28c878895ae817ef2d27af39dd1d8
+  - protocol/code_metrics_baseline.json:255c750517a1f6f99e7f3293c2d3fd1bf7149cd27efb4f92b5c21c2e057fb842
 ---
+> 重审（2026-11-09）：红证据登记（硬证据 20 / 疑似 221 / 无 149，棘轮只减不增）
+
 > 重审（2026-11-09）：方法包声明可跑入口 runnable，清单与文档共用（含入口存在性判据）
 
 > 重审（2026-11-09）：能力清单（静态 AST 扫描 scripts/*，可查而非猜）

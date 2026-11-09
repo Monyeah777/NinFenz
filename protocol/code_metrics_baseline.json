@@ -1640,6 +1640,11 @@
       "max_fn_cc": 8,
       "max_fn_lines": 55
     },
+    "scripts/judge_red_evidence.py": {
+      "lines": 137,
+      "max_fn_cc": 7,
+      "max_fn_lines": 39
+    },
     "scripts/mcp_manifest.py": {
       "lines": 137,
       "max_fn_cc": 7,

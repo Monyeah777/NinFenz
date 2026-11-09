@@ -1,7 +1,7 @@
 {
-  "bytes": 11986180,
-  "count": 567,
-  "digest": "30cfb73df6abbc1b33ed649617e64a209e61befec786a177dcaba164351db5c7",
+  "bytes": 11992502,
+  "count": 568,
+  "digest": "5523d5038ebfa85ca2ecb9b72569ead87dc601b833d62e1b4601ff315e9218cf",
   "materials": [
     {
       "bytes": 102,
@@ -1899,9 +1899,9 @@
       "sha256": "ad799cbfbf1dd69859ff21963885ebf1d5fed56ca67fdd1c2b9e2052ce3b8003"
     },
     {
-      "bytes": 256,
+      "bytes": 254,
       "path": "protocol/approvals/protocol__conformance_report.json",
-      "sha256": "9e37df6078a611a251d34e013d64049317a4fd330402ea8d14a04824493c0219"
+      "sha256": "e913340008bd09fe745768d6477b16ab1ae12d1eaee235703f8a5b6c0152a520"
     },
     {
       "bytes": 16375,
@@ -1944,9 +1944,9 @@
       "sha256": "c2402950e34e3ff9bd0f09171c8bee821bf0f57c33f32d0dbc4bb4b3e6157914"
     },
     {
-      "bytes": 361771,
+      "bytes": 362177,
       "path": "protocol/check12_weights.json",
-      "sha256": "4482c53db1d028fe76d078ee5b7cd76a45bf50d01fbb9663b19f149585580812"
+      "sha256": "54d4f1b013a99d2a5b97d6235ec4fde8fe341304e02136b8c2658b7955b1287a"
     },
     {
       "bytes": 16170,
@@ -1954,9 +1954,9 @@
       "sha256": "5545028d82662ee8f4f4051bdc14876b0357f0d9548963f3836f6f8f6d417285"
     },
     {
-      "bytes": 42202,
+      "bytes": 42315,
       "path": "protocol/code_metrics_baseline.json",
-      "sha256": "c7973f7d3095ad94d3aa7be5ecdadc266ef28c878895ae817ef2d27af39dd1d8"
+      "sha256": "255c750517a1f6f99e7f3293c2d3fd1bf7149cd27efb4f92b5c21c2e057fb842"
     },
     {
       "bytes": 87117,
@@ -1971,7 +1971,7 @@
     {
       "bytes": 7260,
       "path": "protocol/conformance_report.json",
-      "sha256": "b626d2520ceccafcbc16afec000034580a066583ab3dcdb3f56ae1f40f8d19e1"
+      "sha256": "eed3eaa6625cc99f1828e47832ad11aba0723fbbfddc70c9626d00e8e519b9af"
     },
     {
       "bytes": 22174,
@@ -2086,7 +2086,7 @@
     {
       "bytes": 27560,
       "path": "protocol/generated/receipt_chain.json",
-      "sha256": "62d8b09c2847c7e1bb4edded1ee4c2da0c69dfaecba37b008d425ec28ba95de7"
+      "sha256": "4565be2c7772fa7689f580b446c22d7d941bf6d3cbc4970556e23a29baf7f160"
     },
     {
       "bytes": 918,
@@ -2311,7 +2311,7 @@
     {
       "bytes": 79590,
       "path": "protocol/RECEIPTS.json",
-      "sha256": "691cd01d60c787452e266d7467e650d9a93aef98e434837ddea978384587bc18"
+      "sha256": "a98a1dcc315966bf181360d9d62e615478e4505cacdcd42d19c1c0a705119237"
     },
     {
       "bytes": 7923,
@@ -2344,9 +2344,9 @@
       "sha256": "87de7ac68f9846b333323efecdbb7555adf24215ae8145d573fe8d0688b8e86d"
     },
     {
-      "bytes": 455776,
+      "bytes": 456001,
       "path": "protocol/role_coordinates.json",
-      "sha256": "c855865b5a4575e00201698fbe64d52e016d6703142d93affc7e1e8420b3cc4d"
+      "sha256": "8eccfe8a6433ac1c2ac0a42fc9423566a7128268a7588f3ff29ce1a6ffa30f89"
     },
     {
       "bytes": 8060,
@@ -2446,7 +2446,7 @@
     {
       "bytes": 13119,
       "path": "protocol/verification_report.json",
-      "sha256": "f688e57fb8428cb66970b0e4e6ba20b7080c701a528b99c8f014abd67f489035"
+      "sha256": "5d93a4853362b54683065a885a8e82bbca3a13f9d4877bb0eccc8a22866dd81a"
     },
     {
       "bytes": 4160,
@@ -2647,6 +2647,11 @@
       "bytes": 12207,
       "path": "scripts/judge_mutation_probe.py",
       "sha256": "9c84ea790fbae8777428761e005d28d5b79d079e1b197ac761b8c44860ae70ed"
+    },
+    {
+      "bytes": 5580,
+      "path": "scripts/judge_red_evidence.py",
+      "sha256": "04e332e6a4063d8bc9c6c324300d68c29908b28baa2b041a88da219cd0704f66"
     },
     {
       "bytes": 6532,

@@ -4,9 +4,9 @@
     "entry": 26,
     "floor": 5,
     "prod": 1057,
-    "projection": 161,
-    "support": 440,
-    "verify": 1036
+    "projection": 162,
+    "support": 441,
+    "verify": 1037
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8465,6 +8465,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "红证据登记判据：可复算、可核、棘轮只减不增（第 153 轮）。",
+      "path": "desktop/tests/test_judge_red_evidence.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "**指认判据必须在场**：代码与文档里点名 `test_x.py` / `test_x.test_y` 时，被判据要真的存在。",
       "path": "desktop/tests/test_judge_references.py",
       "role": "verify",
@@ -12600,16 +12606,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "d2b7e9eb9f600cf881e106345f8d79e4b3e5b13c22fc23abdbc6611c93e3bdc9",
+  "root_digest": "f2e46b8778961277b32a4694b501f0fe5d21e0b3c98d783045f80e9a918c5589",
   "rule_counts": {
     "R-app": 1465,
-    "R-catch": 293,
+    "R-catch": 294,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 141,
+    "R-projection": 142,
     "R-support": 119,
-    "R-verify": 910,
+    "R-verify": 911,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
