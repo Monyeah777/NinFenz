@@ -128,7 +128,9 @@
     "detectability",
     "drill",
     "efficacy",
+    "error-budget",
     "handoff",
+    "incident-review",
     "least-privilege",
     "license",
     "non-leakage",
@@ -140,6 +142,7 @@
     "retention",
     "robustness",
     "separation",
+    "slo",
     "verification"
   ],
   "claim_kinds_note": "领域主张词表（单一真源）：方法包 evidence_standards.claim_kind 只能取这里的值；新增词必须先登记，否则 test_method_pack 判红。"

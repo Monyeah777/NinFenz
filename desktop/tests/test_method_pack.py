@@ -22,7 +22,7 @@ from core import cognition_plan, method_pack  # noqa: E402
 NF = (sys.executable, str(ROOT / "scripts" / "nf.py"))
 PACK_IDS = ("watermarking", "evidence-audit", "metacognition",
             "evaluation-design", "prompt-injection-defense", "data-provenance",
-            "resilience", "handoff", "privacy", "supply-chain")
+            "resilience", "handoff", "privacy", "supply-chain", "operations")
 
 
 
@@ -242,6 +242,13 @@ class PackContentTest(unittest.TestCase):
             "sc.verify_artifacts": ("packaging/npm/tools/verify-tarball.mjs", ("tarball",)),
             "sc.static_scan": ("scripts/sast_check.py", ("baseline",)),
             "sc.provenance_record": ("scripts/release_conclusion.py", ("supply_chain",)),
+            # 运维可观测性域（第 122 轮）：锚点落预算 / 复盘 / 指标面
+            "op.slo": ("desktop/src/core/perf_budget.py", ("budget",)),
+            "op.health_signal": ("desktop/src/core/fence_health.py", ("fence",)),
+            "op.alert_actionable": ("desktop/src/core/injection_budget.py", ("budget",)),
+            "op.burn": ("desktop/src/core/perf_budget.py", ("p95",)),
+            "op.review_blameless": ("desktop/src/core/postmortem.py", ("cause",)),
+            "op.panel_same_source": ("desktop/src/core/domain_metrics.py", ("metrics",)),
         }
         #: 纯概念动作（本仓还没有对应实现）→ 理由。为空表示「全都该有锚点」。
         CONCEPTUAL = {"pi.plane_separation": "结构性保证（argv-only/无 shell），不是单一代码点"}

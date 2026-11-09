@@ -1,13 +1,13 @@
-# 领域方法包 v0（十个域）
+# 领域方法包 v0（十一个域）
 
-状态：**10 个域 / 59 个专家动作 / 28 个证据类目**（截至 2026-11-09，以 `protocol/method_packs/index.json` 为唯一真源）。
+状态：**11 个域 / 65 个专家动作 / 31 个证据类目**（截至 2026-11-09，以 `protocol/method_packs/index.json` 为唯一真源）。
 
 ## 它是什么
 
 方法包把「某个专业领域里，专家实际会做哪几件事」写成可核结构：每个动作带 `id` / `name` / `why` / `maps_to`，
 每类主张带 `claim_kind` 与「必须给出什么证据」。包不是清单模板，也不是评分表——它只描述动作与证据要求。
 
-## 十个域
+## 十一个域
 
 | 域 | 方向 | 动作数 | 证据类目 |
 |---|---|---|---|
@@ -21,6 +21,7 @@
 | `handoff` | 换人能不能接（帧/承诺/分离） | 6 | handoff / commitment / separation |
 | `privacy` | 守不守规矩（最小化/留存/同意） | 6 | data-minimization / retention / consent |
 | `supply-chain` | 交付物从哪来（钉定/可复现/溯源） | 6 | pinning / reproducibility / provenance |
+| `operations` | 坏了能不能知道（目标/信号/告警） | 6 | slo / error-budget / incident-review |
 
 ## 三种用法
 

@@ -51,6 +51,11 @@
       "id": "supply-chain",
       "version": "1.0.0",
       "path": "protocol/method_packs/supply-chain.json"
+    },
+    {
+      "id": "operations",
+      "version": "1.0.0",
+      "path": "protocol/method_packs/operations.json"
     }
   ]
 }
