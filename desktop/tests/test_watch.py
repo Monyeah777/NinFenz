@@ -97,16 +97,24 @@ class ResponseCacheTest(unittest.TestCase):
         """
         self.assertTrue(dm.cacheable(["verify"]), "nf verify 必须在准入表内")
         self.assertTrue(dm.cacheable(["verify", "--json"]), "机器面同样可缓存")
-        dm.set_watcher(_FakeWatcher(generation=11))
-        first = dm.execute(["verify", "--json"], Path(ROOT))     # 首跑（可能触发嵌套会话）
-        dm.set_watcher(_FakeWatcher(generation=11))              # 会话收尾后重新挂上同代际
-        second = dm.execute(["verify", "--json"], Path(ROOT))
-        self.assertEqual(first, second, "同树两次响应必须逐字段相同（纯函数前提）")
-        self.assertEqual(1, dm.cache_stats()["hits"], "同代际第二跑必须命中缓存")
-        dm.set_watcher(_FakeWatcher(generation=12))              # 树变了
-        third = dm.execute(["verify", "--json"], Path(ROOT))
-        self.assertEqual(first, third)
-        self.assertEqual(1, dm.cache_stats()["hits"], "树变了必须重算（不得回放旧判定）")
+        # 代码指纹钉住：并发分片会往共享工作树里写文件，真实指纹一变就会重载模块、清掉
+        # 响应缓存（2026-11-09 Windows 全量实测 「1 != 0」偶发）。本用例要验的是**缓存准入**
+        # 与代际失效，不是外部写盘；钉住后语义不变、与外部并发解耦。
+        real_fp = dm._code_fingerprint
+        dm._code_fingerprint = lambda root: ("pinned-for-cache-test",)
+        try:
+            dm.set_watcher(_FakeWatcher(generation=11))
+            first = dm.execute(["verify", "--json"], Path(ROOT))  # 首跑（可能触发嵌套会话）
+            dm.set_watcher(_FakeWatcher(generation=11))           # 会话收尾后重挂同代际
+            second = dm.execute(["verify", "--json"], Path(ROOT))
+            self.assertEqual(first, second, "同树两次响应必须逐字段相同（纯函数前提）")
+            self.assertEqual(1, dm.cache_stats()["hits"], "同代际第二跑必须命中缓存")
+            dm.set_watcher(_FakeWatcher(generation=12))           # 树变了
+            third = dm.execute(["verify", "--json"], Path(ROOT))
+            self.assertEqual(first, third)
+            self.assertEqual(1, dm.cache_stats()["hits"], "树变了必须重算（不得回放旧判定）")
+        finally:
+            dm._code_fingerprint = real_fp
 
     def test_nested_session_release_keeps_the_outer_watcher(self):
         """**嵌套会话收尾不得拆掉外层（守护）的监听**。
