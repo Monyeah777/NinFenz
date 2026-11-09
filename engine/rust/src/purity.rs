@@ -70,7 +70,11 @@ const DOMAIN_TERMS: [&str; 28] = [
 const HARD_ALLOW: [&str; 1] = ["yaml"];
 
 /// 真源 `SOFT_IMPORTS`：第三方可选依赖（须 try/except ImportError 守卫）。值只用于消息。
-const SOFT_IMPORTS: [(&str, &str); 4] = [
+const SOFT_IMPORTS: [(&str, &str); 5] = [
+    (
+        "PIL",
+        "标注水印层（label_watermark）读写 PNG 位图；软导入 + 缺依赖给修复指引，文本载体保持纯标准库",
+    ),
     (
         "jsonschema",
         "IDL 标准实现交叉验证（可选对照；缺依赖则跳过该面）",

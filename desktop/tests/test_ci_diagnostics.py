@@ -144,6 +144,104 @@ class CiHealthAuditSourceTest(unittest.TestCase):
         self.assertIn("runs.extend(page_runs)", self.text,
                       "ci-health 审计分页结果未并入 runs")
 
+    def test_audit_skips_in_flight_runs(self):
+        """最新一次还在跑 → 计 pending 跳过（否则「上次红、新一次在跑」会瞬时假红）。"""
+        self.assertIn('pending = [r for r in latest.values() if r.get("status") != "completed"]',
+                      self.text, "ci-health 审计未把 in-flight 运行记为 pending")
+        self.assertIn("if pending:", self.text, "ci-health 审计缺少 pending 提示分支")
+        # schedule 步也要 pending 跳过（2026-11-09 #243；此前只修了 main 步）
+        self.assertIn("schedule 面：%d 个 workflow 的最新运行仍在进行", self.text,
+                      "ci-health schedule 步未跳过 in-flight 运行")
+
+
+class TeePipefailTest(unittest.TestCase):
+    """`... | tee ...` 的退出码不得被吞（2026-11-09 实测 #251：sast job 绿但日志满屏 ✗）。
+
+    为什么用源码断言：GitHub 默认 shell 是 `bash -e`（**无** pipefail），步骤里
+    `python scripts/sast_check.py 2>&1 | tee sast.log` 的退出码来自 tee ⇒ 门禁假绿。
+    修法是给该步骤 `shell: bash`（GitHub 的 bash 默认 `-eo pipefail`）或显式 `set -o pipefail`。
+    """
+
+    def test_all_tee_steps_have_pipefail(self):
+        import re
+        bad = []
+        for p in sorted(WF.glob("*.yml")):
+            text = p.read_text(encoding="utf-8")
+            for block in re.split(r"(?m)^ {6}- ", text):
+                if "| tee" not in block:
+                    continue
+                if "shell: bash" not in block and "set -o pipefail" not in block:
+                    bad.append(p.name)
+                    break
+        self.assertEqual(
+            [], bad,
+            f"含 | tee 的步骤未启用 pipefail（退出码会被 tee 吞）：{bad}")
+
+
+class GateAlwaysRunsTest(unittest.TestCase):
+    """gate 不得因依赖失败而被「跳过」（2026-11-09 实测 #251）。
+
+    GitHub 对 required check 的 skipped 视为通过：gate 若 `needs: [static-checks, unit-tests]`
+    且没有 `if: always()`，unit-tests 有分片红时 gate 被跳过 ⇒ auto-merge 照样合并。
+    """
+
+    def test_gate_is_always_run_and_checks_dependencies(self):
+        import re
+        text = (WF / "ci-verify.yml").read_text(encoding="utf-8")
+        m = re.search(r"(?ms)^  gate:\n(.*?)(?=^  [a-z0-9-]+:\n|\Z)", text)
+        self.assertIsNotNone(m, "ci-verify.yml 找不到 gate job")
+        block = m.group(1)
+        self.assertIn("if: always()", block, "gate 未声明 if: always()（会被跳过）")
+        self.assertIn("needs.static-checks.result", block, "gate 未校验 static-checks 结果")
+        self.assertIn("needs.unit-tests.result", block, "gate 未校验 unit-tests 结果")
+
+
+class ParityKeyCompareTest(unittest.TestCase):
+    """linux-parity-refresh 的 posix SAST 漂移判定必须逐键比对（2026-11-09）。
+
+    只比总数会漏「一规则 +1、另一规则 -1」的键级漂移（总数相等 → 漂移告警绿着放行）。
+    """
+
+    def test_parity_compares_keys_not_only_totals(self):
+        text = (WF / "linux-parity-refresh.yml").read_text(encoding="utf-8")
+        self.assertIn("键级漂移", text, "parity 漂移判定未做键级比对")
+        self.assertIn("set(c) - set(b)", text, "parity 漂移判定缺少 extra 键集合")
+        self.assertNotIn("got != want", text, "parity 仍在用总数比较（会漏键级漂移）")
+
+
+class HiddenArtifactPathTest(unittest.TestCase):
+    """artifact 的 path 不得指向隐藏**文件**（2026-11-09 #247/#248 实测）。
+
+    actions/upload-artifact v4+ 默认 `include-hidden-files=false`：path 里以 `.` 开头
+    的**文件**会被静默丢弃（sast-counts.json / sast-extra-*.json 曾整年没进 artifact）。
+    隐藏**目录**（如 `.nf-logs/`）不受影响，故只查 basename 以点开头的纯文件路径。
+    """
+
+    def test_no_artifact_path_is_a_hidden_file(self):
+        import re
+        bad = {}
+        for p in sorted(WF.glob("*.yml")):
+            text = p.read_text(encoding="utf-8")
+            for block in re.split(r"(?m)^ {6}- ", text):
+                if "upload-artifact" not in block:
+                    continue
+                if "include-hidden-files: true" in block:
+                    continue
+                pat = r"(?ms)^\s+path: \|\n(.*?)(?=^\s+[a-z-]+:|\Z)"
+                m = re.search(pat, block)
+                if not m:
+                    continue
+                for line in m.group(1).splitlines():
+                    item = line.strip()
+                    if not item or item.startswith("#"):
+                        continue
+                    name = item.rstrip("/").split("/")[-1]
+                    if name.startswith(".") and not item.endswith("/"):
+                        bad.setdefault(p.name, []).append(item)
+        self.assertEqual(
+            {}, bad,
+            f"artifact path 指向隐藏文件（会被 upload-artifact 静默丢弃）：{bad}")
+
 
 if __name__ == "__main__":
     unittest.main()

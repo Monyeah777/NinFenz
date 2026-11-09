@@ -6,7 +6,7 @@ scope: 作者指令「删除 NF 中的 GUI，且为 NF 构建一个终端（CLI 
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/terminal.py:f07b761f94e3e04a2437bbe88b5d9e646f0a247d26c985486b287153bcae4570
+  - desktop/src/core/terminal.py:69c2d9ced679e439c6ca440fc949d02f70dc067debdd9b520f96a2e4de156833
   - scripts/nf.py:83a75a4fac82461d56b03147eff04b420b8aad0ed6db9fef6e695717dcf7b6a2
   - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
   - scripts/nf:406c221f9f16fb6e318e230b0b0120e3a6d3c9231d57f66285e0e4615e18ca91
@@ -15,10 +15,18 @@ subjects:
   - desktop/src/core/quality_baseline.py:7c1f06bc581a2400b1248df63e07a98dfffba2b92ca8070a71082abcc317d1e4
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - docs/terminal.md:b08d721ed527baa92d4cdf56f73aa4972c1314159c3213ed38a95911c2b7f71b
-  - docs/L3_FROZEN.md:c0719d46ba91dd9790d3d494709b01531f41700f76c291968b4a76b6bc4f96d4
+  - docs/L3_FROZEN.md:bde03a07d62aa37d5315d8b294d5fdfb24628c7a8556c1d3ff46848bc3d92186
   - protocol/CONFORMANCE.md:006b56748b6daaf2419be40a65247d90efd6291e87ccd61c6527ed1526b6b4e4
 
 ---
+> 重审（2026-11-09）：L3 门禁事实
+
+> 重审（2026-11-09）：L3 actions 版本
+
+> 重审（2026-11-09）：恢复 CodeQL 扫描
+
+> 重审（2026-11-09）：session-persist 预算 Windows 放宽
+
 > 重审（2026-11-08）：L3 记录分支保护事实
 
 > 重审（2026-11-08）：新增 npm-package-check workflow
