@@ -9,19 +9,19 @@
 
 ## 十一个域
 
-| 域 | 方向 | 动作数 | 证据类目 |
-|---|---|---|---|
-| `watermarking` | 内容可追溯（水印/鲁棒性/容量） | 5 | robustness / capacity / detectability |
-| `evidence-audit` | 证据充分性与闭合 | 5 | closure / verification |
-| `metacognition` | 想得对不对（校准/控制） | 5 | calibration / control_effect |
-| `evaluation-design` | 测得出吗（效应/成本/可靠性） | 7 | efficacy / cost / reliability |
-| `prompt-injection-defense` | 输入可信吗（防御/审计/最小权限） | 7 | defense-efficacy / audit-trail / least-privilege |
-| `data-provenance` | 数据能不能用（说明书/字段/许可） | 6 | data-fit / license / non-leakage |
-| `resilience` | 坏了会怎样（半径/演练/回滚） | 6 | blast-radius / drill / recoverability |
-| `handoff` | 换人能不能接（帧/承诺/分离） | 6 | handoff / commitment / separation |
-| `privacy` | 守不守规矩（最小化/留存/同意） | 6 | data-minimization / retention / consent |
-| `supply-chain` | 交付物从哪来（钉定/可复现/溯源） | 6 | pinning / reproducibility / provenance |
-| `operations` | 坏了能不能知道（目标/信号/告警） | 6 | slo / error-budget / incident-review |
+| 域 | 方向 | 动作数 | 证据类目 | 可跑入口 |
+|---|---|---|---|---|
+| `watermarking` | 内容可追溯（水印/鲁棒性/容量） | 5 | robustness / capacity / detectability | `nf sig` / `nf attest` |
+| `evidence-audit` | 证据充分性与闭合 | 5 | closure / verification | `nf evidence verify` |
+| `metacognition` | 想得对不对（校准/控制） | 5 | calibration / control_effect | `nf cog calibrate --pairs … --json` |
+| `evaluation-design` | 测得出吗（效应/成本/可靠性） | 7 | efficacy / cost / reliability | `nf stats` / `nf bench run` |
+| `prompt-injection-defense` | 输入可信吗（防御/审计/最小权限） | 7 | defense-efficacy / audit-trail / least-privilege | `nf check`（红队 cases） |
+| `data-provenance` | 数据能不能用（说明书/字段/许可） | 6 | data-fit / license / non-leakage | `nf asset ledger` / `nf asset verify` |
+| `resilience` | 坏了会怎样（半径/演练/回滚） | 6 | blast-radius / drill / recoverability | `nf doctor` / `nf audit` |
+| `handoff` | 换人能不能接（帧/承诺/分离） | 6 | handoff / commitment / separation | `nf cog replay` |
+| `privacy` | 守不守规矩（最小化/留存/同意） | 6 | data-minimization / retention / consent | `nf doctor` / `nf evidence verify` |
+| `supply-chain` | 交付物从哪来（钉定/可复现/溯源） | 6 | pinning / reproducibility / provenance | `python scripts/sbom.py --check` |
+| `operations` | 坏了能不能知道（目标/信号/告警） | 6 | slo / error-budget / incident-review | `python scripts/perf_budget.py --list` |
 
 ## 三种用法
 

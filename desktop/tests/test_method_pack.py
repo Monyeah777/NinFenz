@@ -294,6 +294,33 @@ class PackContentTest(unittest.TestCase):
         wrong = f"**{len(packs) - 1} 个域 / {moves} 个专家动作 / {kinds} 个证据类目**"
         self.assertTrue(pack_doc_issues(wrong, packs))
 
+    def test_entry_commands_exist(self):
+        """文档「可跑入口」列里的命令必须真实存在（第 137 轮）。
+
+        为什么：包的 `examples` 只说「机制在哪实现」，没说「这个域怎么跑」。
+        第 137 轮把入口列补进文档后，必须保证它不会漂——命令写错、命令被删都会红。
+        """
+        import re
+        import subprocess
+
+        doc = (ROOT / "docs" / "ccos" / "method-packs-v0.md").read_text(encoding="utf-8")
+        rows = [ln for ln in doc.splitlines() if ln.startswith("| `")]
+        self.assertGreaterEqual(len(rows), len(PACK_IDS), "表格行数少于包数（判据可能已失效）")
+        nf_src = (ROOT / "scripts" / "nf.py").read_text(encoding="utf-8")
+        bad = []
+        for row in rows:
+            cells = [c.strip() for c in row.strip("|").split("|")]
+            entry = cells[-1] if cells else ""
+            for cmd in re.findall(r"`nf ([a-z0-9-]+)", entry):
+                if f'add_parser("{cmd}"' not in nf_src and f'"{cmd}"' not in nf_src:
+                    bad.append(cells[0] + " → nf " + cmd)
+            for script in re.findall(r"`python (scripts/[A-Za-z0-9_.-]+\.py)", entry):
+                if not (ROOT / script).is_file():
+                    bad.append(cells[0] + " → " + script)
+            if "nf " not in entry and "python " not in entry:
+                bad.append(cells[0] + " → 入口列没有可跑命令")
+        self.assertEqual([], bad, "这些入口命令不存在：" + ", ".join(bad))
+
     def test_maps_to_uses_known_actions(self):
         """包里的 `maps_to` 必须引用 method_pack.KNOWN_ACTIONS 里登记的动作（第 128 轮）。
 
