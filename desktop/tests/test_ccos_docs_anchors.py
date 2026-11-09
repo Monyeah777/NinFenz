@@ -77,6 +77,29 @@ class DocsAnchorTest(unittest.TestCase):
                     broken.append(f"{path.name} → {rel}")
         self.assertEqual([], broken[:10], f"文档里指向了不存在的路径：{broken[:10]}")
 
+    def test_relative_markdown_links_resolve(self):
+        """文档之间的相对链接必须指向真实文件（第 126 轮）。
+
+        发现过程：`docs/ccos` 有 14 条相对链接，全部有效——**但没有任何判据保证它们继续有效**。
+        链接断了不会让任何测试变红，只会让读者点进 404。
+        """
+        import re
+
+        link = re.compile(r"\[[^\]]*\]\(([^)#]+)(?:#[^)]*)?\)")
+        broken = []
+        total = 0
+        for path in sorted(DOCS.glob("*.md")):
+            text = path.read_text(encoding="utf-8", errors="replace")
+            for target in link.findall(text):
+                target = target.strip()
+                if target.startswith(("http://", "https://", "mailto:")):
+                    continue
+                total += 1
+                if not (path.parent / target).exists():
+                    broken.append(f"{path.name} → {target}")
+        self.assertGreaterEqual(total, 8, "相对链接太少（判据可能已失效）")
+        self.assertEqual([], broken, f"这些相对链接指向不存在的文件：{broken}")
+
 
 if __name__ == "__main__":
     unittest.main()
