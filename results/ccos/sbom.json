@@ -1,7 +1,7 @@
 {
-  "bytes": 11992524,
+  "bytes": 11993126,
   "count": 568,
-  "digest": "7131c4465d79a47e379d655bb3ca179a2d1e127808ce1b4bcaa76855edf5d36c",
+  "digest": "1a926587d34b14b7081cb906ed6c7a7d855dd46b5e77de8985e7745f7abd71aa",
   "materials": [
     {
       "bytes": 102,
@@ -1899,9 +1899,9 @@
       "sha256": "ad799cbfbf1dd69859ff21963885ebf1d5fed56ca67fdd1c2b9e2052ce3b8003"
     },
     {
-      "bytes": 251,
+      "bytes": 254,
       "path": "protocol/approvals/protocol__conformance_report.json",
-      "sha256": "55b5c5c35dac5fe4d21ba823f8d6cb10b4250d9c5559c0bbf0a3d04d81df868b"
+      "sha256": "1a41ec1a6a0846e224956c9675607f0bd0b408a5a421c0a96b509ba21e34ebc7"
     },
     {
       "bytes": 16375,
@@ -1946,7 +1946,7 @@
     {
       "bytes": 362177,
       "path": "protocol/check12_weights.json",
-      "sha256": "54d4f1b013a99d2a5b97d6235ec4fde8fe341304e02136b8c2658b7955b1287a"
+      "sha256": "ddecd38681cd536cbd0f6bacffbaed3155e6f3c31cc40b8f4bfb43bd0f24f9a5"
     },
     {
       "bytes": 16170,
@@ -1956,7 +1956,7 @@
     {
       "bytes": 42315,
       "path": "protocol/code_metrics_baseline.json",
-      "sha256": "b20ec61266543a9d6902682dbbfb18e2b0eca3b5b8a31e4629fb43d6dc5df4c3"
+      "sha256": "72a90af2352ff1c466b571c6462eb50408e77d04b4a3322172e238655bcffcb1"
     },
     {
       "bytes": 87117,
@@ -2086,7 +2086,7 @@
     {
       "bytes": 27560,
       "path": "protocol/generated/receipt_chain.json",
-      "sha256": "d49d5b094a73bf99a4f401d3720ce67490ac47f0dbe4765d0045b16cf49096fb"
+      "sha256": "9db996c8e199334421a3bc0c500c48d7234a994628484b324847c46b4f17e81d"
     },
     {
       "bytes": 918,
@@ -2311,7 +2311,7 @@
     {
       "bytes": 79590,
       "path": "protocol/RECEIPTS.json",
-      "sha256": "77ff9d1edee79fa5acec7b4569d7fa0d2143384f1dc130ca2ab79be5dd3b77f6"
+      "sha256": "d9be8a0dd38da3b9194a9dfeabc536b7d6efdd6ab3e4923887a05a0bed7f5e5d"
     },
     {
       "bytes": 7923,
@@ -2649,9 +2649,9 @@
       "sha256": "9c84ea790fbae8777428761e005d28d5b79d079e1b197ac761b8c44860ae70ed"
     },
     {
-      "bytes": 5605,
+      "bytes": 6204,
       "path": "scripts/judge_red_evidence.py",
-      "sha256": "241802197066c56db8d68e133d15e597f263050fd13f3242b7375be2970056d8"
+      "sha256": "f810af8b779f0c44b77b43e5cedb657147da8b8fae413e38e6af7f61e8fc2fd7"
     },
     {
       "bytes": 6532,

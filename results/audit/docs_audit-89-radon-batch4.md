@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
-  - protocol/code_metrics_baseline.json:b20ec61266543a9d6902682dbbfb18e2b0eca3b5b8a31e4629fb43d6dc5df4c3
+  - protocol/code_metrics_baseline.json:72a90af2352ff1c466b571c6462eb50408e77d04b4a3322172e238655bcffcb1
 ---
+> 重审（2026-11-09）：红证据加 negative_assertion 档（assertRaises）：硬证据 20→99，无 149→139
+
 > 重审（2026-11-09）：红证据脚本行宽收口
 
 > 重审（2026-11-09）：红证据登记（硬证据 20 / 疑似 221 / 无 149，棘轮只减不增）

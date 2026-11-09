@@ -8,6 +8,7 @@
 |---|---|
 | `negative_case` | 在 `results/ccos/gate_negative_tests.json` 里被记为有拒绝型用例（硬证据） |
 | `mutation` | 被变异探针收录的判据所在模块（硬证据，显式名单） |
+| `negative_assertion` | 测试里断言了「必须拒绝」（`assertRaises`）——中等硬证据 |
 | `naming` | 测试名含否定关键词——**代理指标，只算 suspect，不算证据** |
 | `none` | 以上都没有 |
 
@@ -34,6 +35,9 @@ SCHEMA = "nf-judge-red-evidence/1"
 #: 被变异探针收录的判据 → 其测试模块（显式名单：改这里要同步探针）
 MUTATION_MODULES = ("test_judge_mutation_probe.py", "test_gate_probe.py")
 
+#: 否定型断言的写法（中等硬证据：明确断言了「必须拒绝」）
+NEGATIVE_ASSERTIONS = ("assertRaises", "assertRaisesRegex")
+
 #: 否定型测试名的关键词（代理指标，不计入硬证据）
 NEGATIVE_KEYS = ("kill", "mutation", "reject", "rejects", "fail", "fails", "invalid",
                  "tamper", "detect", "detects", "wrong", "broken", "bad",
@@ -51,6 +55,11 @@ def _gate_modules(root: Path) -> set:
         if row.get("has_negative") and str(row.get("module") or ""):
             names.add(str(row["module"]).split(".")[-1] + ".py")
     return names
+
+
+def _has_negative_assertion(path: Path) -> bool:
+    text = path.read_text(encoding="utf-8", errors="replace")
+    return any(token in text for token in NEGATIVE_ASSERTIONS)
 
 
 def _has_negative_name(path: Path) -> bool:
@@ -73,6 +82,9 @@ def collect(root: str | Path = ".") -> dict[str, Any]:
             hard += 1
         elif name in MUTATION_MODULES:
             entries.append({"module": name, "source": "mutation"})
+            hard += 1
+        elif _has_negative_assertion(base / "desktop" / "tests" / name):
+            entries.append({"module": name, "source": "negative_assertion"})
             hard += 1
         elif _has_negative_name(base / "desktop" / "tests" / name):
             entries.append({"module": name, "source": "naming"})

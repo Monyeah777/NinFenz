@@ -10,7 +10,7 @@
     },
     {
       "module": "test_ai_domain_closure.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_allowlist_expiry.py",
@@ -22,7 +22,7 @@
     },
     {
       "module": "test_approval_naming.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_architecture_layers.py",
@@ -30,7 +30,7 @@
     },
     {
       "module": "test_artifact_manifest.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_as_of.py",
@@ -42,11 +42,11 @@
     },
     {
       "module": "test_assertions.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_asset_contract.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_asset_contract_cache.py",
@@ -62,11 +62,11 @@
     },
     {
       "module": "test_asset_density.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_asset_ledger.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_asset_ledger_projection.py",
@@ -94,19 +94,19 @@
     },
     {
       "module": "test_atomic_write.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_atomic_write_boundaries.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_atoms.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_attest.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_audit.py",
@@ -130,7 +130,7 @@
     },
     {
       "module": "test_bridge_real.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_cache_bounds.py",
@@ -146,7 +146,7 @@
     },
     {
       "module": "test_canonical_parity.py",
-      "source": "none"
+      "source": "negative_assertion"
     },
     {
       "module": "test_capability_battery.py",
@@ -170,7 +170,7 @@
     },
     {
       "module": "test_ccos_chain.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_ccos_docs_anchors.py",
@@ -182,7 +182,7 @@
     },
     {
       "module": "test_changelog_gen.py",
-      "source": "none"
+      "source": "negative_assertion"
     },
     {
       "module": "test_check12_budget.py",
@@ -202,11 +202,11 @@
     },
     {
       "module": "test_check_policy.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_check_text_to_intent.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_ci_diagnostics.py",
@@ -278,11 +278,11 @@
     },
     {
       "module": "test_cognition_plan.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_cognition_workspace.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_commit_msg.py",
@@ -322,7 +322,7 @@
     },
     {
       "module": "test_core.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_core_atomic_writes.py",
@@ -338,7 +338,7 @@
     },
     {
       "module": "test_cross_lang_matrix.py",
-      "source": "none"
+      "source": "negative_assertion"
     },
     {
       "module": "test_cross_lang_verify.py",
@@ -350,7 +350,7 @@
     },
     {
       "module": "test_daemon_limits.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_daemon_parity.py",
@@ -362,7 +362,7 @@
     },
     {
       "module": "test_decision_layer.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_decisions.py",
@@ -418,11 +418,11 @@
     },
     {
       "module": "test_domain_pack.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_domain_pack_render.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_dotnet_aot.py",
@@ -434,7 +434,7 @@
     },
     {
       "module": "test_ed25519.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_effect_rows.py",
@@ -454,7 +454,7 @@
     },
     {
       "module": "test_error_codes.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_eval_collapse.py",
@@ -466,11 +466,11 @@
     },
     {
       "module": "test_evidence.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_evidence_batch.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_evidence_forms_parity.py",
@@ -502,7 +502,7 @@
     },
     {
       "module": "test_exporter.py",
-      "source": "none"
+      "source": "negative_assertion"
     },
     {
       "module": "test_extension_impact.py",
@@ -594,7 +594,7 @@
     },
     {
       "module": "test_gitee_diagnostics.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_governance_docs.py",
@@ -626,23 +626,23 @@
     },
     {
       "module": "test_host_projection.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_hotspot_profile.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_http_api.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_impact_check.py",
-      "source": "none"
+      "source": "negative_assertion"
     },
     {
       "module": "test_import_adapter.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_import_injection.py",
@@ -654,7 +654,7 @@
     },
     {
       "module": "test_injection_ledger.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_instruction_evidence.py",
@@ -666,7 +666,7 @@
     },
     {
       "module": "test_intake_bots_hardening.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_intake_gate.py",
@@ -702,11 +702,11 @@
     },
     {
       "module": "test_invalid_corpus.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_invariants.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_io_types.py",
@@ -734,7 +734,7 @@
     },
     {
       "module": "test_job_ledger.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_json_shape_contracts.py",
@@ -766,7 +766,7 @@
     },
     {
       "module": "test_key_transparency.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_knowledge.py",
@@ -774,23 +774,23 @@
     },
     {
       "module": "test_knowledge_sig.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_label_carrier.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_label_ir.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_label_sidecar.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_label_watermark.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_launcher.py",
@@ -810,7 +810,7 @@
     },
     {
       "module": "test_library.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_license_gate.py",
@@ -830,7 +830,7 @@
     },
     {
       "module": "test_lsp.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_lsp_guard.py",
@@ -878,7 +878,7 @@
     },
     {
       "module": "test_mcp_runtime.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_mcp_trust_meta.py",
@@ -894,7 +894,7 @@
     },
     {
       "module": "test_meta_cockpit.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_method_pack.py",
@@ -910,7 +910,7 @@
     },
     {
       "module": "test_module_lifecycle.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_module_namespace.py",
@@ -918,7 +918,7 @@
     },
     {
       "module": "test_mvu_adapter.py",
-      "source": "none"
+      "source": "negative_assertion"
     },
     {
       "module": "test_net_coverage.py",
@@ -938,11 +938,11 @@
     },
     {
       "module": "test_nf_tui.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_nfal.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_nfal_cli.py",
@@ -986,7 +986,7 @@
     },
     {
       "module": "test_output_path_escape.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_p6_evaluations.py",
@@ -1014,7 +1014,7 @@
     },
     {
       "module": "test_paths.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_payload_consumer.py",
@@ -1046,15 +1046,15 @@
     },
     {
       "module": "test_pipeline_loader.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_pipeline_scaffold.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_pipelinerun.py",
-      "source": "none"
+      "source": "negative_assertion"
     },
     {
       "module": "test_pkg_cli.py",
@@ -1082,7 +1082,7 @@
     },
     {
       "module": "test_plugin_wasm_host.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_policy_snapshot.py",
@@ -1118,7 +1118,7 @@
     },
     {
       "module": "test_protocol_wizard.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_publish_boundary.py",
@@ -1146,11 +1146,11 @@
     },
     {
       "module": "test_quant_domain_package.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_quant_metrics.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_rating_gate.py",
@@ -1166,7 +1166,7 @@
     },
     {
       "module": "test_registry_loader.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_registry_sync.py",
@@ -1190,7 +1190,7 @@
     },
     {
       "module": "test_repeat_safety.py",
-      "source": "none"
+      "source": "negative_assertion"
     },
     {
       "module": "test_repo_face.py",
@@ -1202,7 +1202,7 @@
     },
     {
       "module": "test_repo_trust.py",
-      "source": "none"
+      "source": "negative_assertion"
     },
     {
       "module": "test_report_meta.py",
@@ -1218,7 +1218,7 @@
     },
     {
       "module": "test_response_cache_replay.py",
-      "source": "none"
+      "source": "negative_assertion"
     },
     {
       "module": "test_retriever.py",
@@ -1230,7 +1230,7 @@
     },
     {
       "module": "test_revocations.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_rewrite_tool.py",
@@ -1258,15 +1258,15 @@
     },
     {
       "module": "test_rules_render.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_runtime_shape_contracts.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_rust_engine.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_rust_fastlane.py",
@@ -1286,7 +1286,7 @@
     },
     {
       "module": "test_sbom.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_scale_receipts.py",
@@ -1306,7 +1306,7 @@
     },
     {
       "module": "test_scratch.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_script_orphans.py",
@@ -1346,7 +1346,7 @@
     },
     {
       "module": "test_serve_hardening.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_session_watch.py",
@@ -1410,7 +1410,7 @@
     },
     {
       "module": "test_subcheck_cache.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_suite_isolation.py",
@@ -1426,7 +1426,7 @@
     },
     {
       "module": "test_terminal.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_text_hygiene.py",
@@ -1454,7 +1454,7 @@
     },
     {
       "module": "test_trust_boundary.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_two_faces_jsonrpc.py",
@@ -1546,7 +1546,7 @@
     },
     {
       "module": "test_world_model.py",
-      "source": "naming"
+      "source": "negative_assertion"
     },
     {
       "module": "test_world_slots.py",
@@ -1564,7 +1564,7 @@
   "modules": 390,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
-  "suspect": 221,
-  "with_evidence": 20,
-  "without_evidence": 149
+  "suspect": 152,
+  "with_evidence": 99,
+  "without_evidence": 139
 }

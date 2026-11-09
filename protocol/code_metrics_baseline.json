@@ -1641,7 +1641,7 @@
       "max_fn_lines": 55
     },
     "scripts/judge_red_evidence.py": {
-      "lines": 138,
+      "lines": 150,
       "max_fn_cc": 7,
       "max_fn_lines": 39
     },

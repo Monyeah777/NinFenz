@@ -15,7 +15,7 @@ import judge_red_evidence as jr  # noqa: E402
 
 #: 第 153 轮冻结的「无硬证据」模块数（只减不增；`naming` 只是代理指标，不算证据）。
 #: 149 = 本件自身也落进 none（登记表的判据模块自己没被变异探针收录——如实计入，不豁免）。
-FROZEN_WITHOUT_EVIDENCE = 149
+FROZEN_WITHOUT_EVIDENCE = 139
 
 
 class JudgeRedEvidenceTest(unittest.TestCase):
@@ -45,7 +45,8 @@ class JudgeRedEvidenceTest(unittest.TestCase):
         """口径自证：`naming` 档的模块不得出现在硬证据计数里。"""
         doc = jr.collect(ROOT)
         naming = [e for e in doc["entries"] if e["source"] == "naming"]
-        hard = [e for e in doc["entries"] if e["source"] in ("negative_case", "mutation")]
+        hard = [e for e in doc["entries"]
+                if e["source"] in ("negative_case", "mutation", "negative_assertion")]
         self.assertEqual(doc["with_evidence"], len(hard))
         self.assertEqual(doc["suspect"], len(naming))
         self.assertTrue(naming, "一个 naming 都没有（关键词口径可能失效）")

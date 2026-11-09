@@ -30,8 +30,10 @@ subjects:
   - desktop/src/core/daemon.py:75940f32b3068a5bc7a83b288bb9302e76a948eca0baa76e1e62f02243c8b498
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:b20ec61266543a9d6902682dbbfb18e2b0eca3b5b8a31e4629fb43d6dc5df4c3
+  - protocol/code_metrics_baseline.json:72a90af2352ff1c466b571c6462eb50408e77d04b4a3322172e238655bcffcb1
 ---
+> 重审（2026-11-09）：红证据加 negative_assertion 档（assertRaises）：硬证据 20→99，无 149→139
+
 > 重审（2026-11-09）：红证据脚本行宽收口
 
 > 重审（2026-11-09）：红证据登记（硬证据 20 / 疑似 221 / 无 149，棘轮只减不增）
