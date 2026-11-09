@@ -43,7 +43,8 @@ NEGATIVE_KEYS = ("kill", "mutation", "reject", "rejects", "fail", "fails", "inva
 def _gate_modules(root: Path) -> set:
     path = root / GATES_REL
     if not path.is_file():
-        raise ValueError("缺 " + GATES_REL + "（修复指引：先跑 python scripts/gate_probe.py --write）")
+        raise ValueError("缺 " + GATES_REL
+                         + "（修复指引：先跑 python scripts/gate_probe.py --write）")
     doc = json.loads(path.read_text(encoding="utf-8"))
     names = set()
     for row in doc.get("rows") or []:
