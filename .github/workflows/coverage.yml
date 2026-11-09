@@ -41,6 +41,7 @@ jobs:
         env:
           NF_COVERAGE: "1"
           NF_TEST_JOBS: "4"
+        shell: bash
         run: |
           set -o pipefail
           rc=0
