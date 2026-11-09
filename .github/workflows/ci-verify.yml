@@ -68,6 +68,7 @@ jobs:
         env:
           # Z5（审计 0.2）：固定日志目录 + verify.sh 退出不清理 ⇒ 失败日志可下载。
           NF_VERIFY_TMP: .nf-logs
+        shell: bash
         run: |
           # P3（2026-10-18）：CI 是发布闸门 → 显式 --checks-only（默认档 quick 是开发回路）；
           # --no-cache 保证每次真跑、不复用本地判定缓存（半份门禁的绿不进缓存）。
@@ -135,6 +136,7 @@ jobs:
           # 分片的**完整**输出只有设这个变量才落盘（verify_tests.py: NF_SHARD_LOG_DIR）；
           # 不设的话 FAIL 行既不进 job 日志也不进工件，等于没有诊断。
           NF_SHARD_LOG_DIR: .nf-logs
+        shell: bash
         run: |
           # 每片只跑自己的 1/32（同一套权重 + 同一套 LPT ⇒ 32 片并集 == discover 全集）。
           # 2026-10-21：此前失败时日志被 tee 吞进工件、job 日志里看不到**失败用例名**，
