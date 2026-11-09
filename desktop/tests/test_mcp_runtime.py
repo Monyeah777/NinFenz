@@ -11,8 +11,8 @@
 """
 from __future__ import annotations
 
-import json
 import io
+import json
 import sys
 import tempfile
 import unittest
@@ -22,15 +22,23 @@ from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
-from core.exporter import export  # noqa: E402
-from core.ir import IRDocument, IRLayer, IRModule  # noqa: E402
 from core import mcp_runtime as mrt  # noqa: E402
 from core import repo_index
-from core.mcp_runtime import (INVALID_PARAMS, INVALID_REQUEST,  # noqa: E402
-                              McpRuntime, encode_message, is_single_line_message,
-                              load_snapshot, template_matches, uri_template_issue,
-                              MAX_MESSAGE_BYTES,
-                              _repo_resource_metas, _repo_resource_templates)
+from core.exporter import export  # noqa: E402
+from core.ir import IRDocument, IRLayer, IRModule  # noqa: E402
+from core.mcp_runtime import (  # noqa: E402
+    INVALID_PARAMS,
+    INVALID_REQUEST,
+    MAX_MESSAGE_BYTES,
+    McpRuntime,
+    _repo_resource_metas,
+    _repo_resource_templates,
+    encode_message,
+    is_single_line_message,
+    load_snapshot,
+    template_matches,
+    uri_template_issue,
+)
 
 
 def _techdoc_snapshot() -> dict:
