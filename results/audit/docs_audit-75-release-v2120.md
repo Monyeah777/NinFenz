@@ -6,16 +6,18 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - CHANGELOG.md:24e2f6f22cf7ab3c92b5ab6baa31bdd47e280bd7c56031309d8a213c017a39fc
+  - CHANGELOG.md:c33b70610b8e51f9d40a5f3e55f9400944d117bb5fdf9e2d0ee8f71dff81acf7
   - docs/meta/VERSION-MATRIX.md:014144331c6e2715f4d4e441c69055e636d0194a1133d004904423bd23d2077a
-  - README.md:bfaecb08ccfe6ead2dbe551de8a985178fc0860463612fa7cec624ba6f1ae89e
+  - README.md:015adc67d6ef61cd4a95ea9a0d436aa9157f80b197e0ca31b4805c1f699c4b34
   - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
   - docs/release.md:a878a24b8631d965e30d0bc865c9f88b71049f5a73025cf2984f5bd5cbca5dbb
-  - scripts/nf.py:239b09099db899e182142845a802bfd713c6371972c869b09e0a4b4a065b007a
+  - scripts/nf.py:5725cb2904c3fa1bfcb48c46b6404387dada20e97f91f3f0fd500f9000fd37a1
 
 ---
+> 重审（2026-11-09）：DSSE ledger: 合入唯一真源与最新主干后重绑
+
 > 重审（2026-11-08）：DSSE v1 CI closure: docs reachability, stdio pinning, weights
 
 > 重审（2026-11-08）：DSSE v1 最终重绑：CLI 适配器拆分、purity/路径/编码闸门与 Python/.NET 交叉签验接入后，按最终字节重算审计摘要。

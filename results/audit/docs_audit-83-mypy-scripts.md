@@ -12,10 +12,12 @@ subjects:
   - scripts/interop_thirdparty_kit.py:803def645cab2f98a6ef27eed82a8463dcc4ed908b7885c9944158771d3d8900
   - scripts/build_verification_cards.py:370f465c17eb18e4ef928194351c759bf33af75e5c1cd5b85abfc2a4b1d39655
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
-  - scripts/nf.py:239b09099db899e182142845a802bfd713c6371972c869b09e0a4b4a065b007a
+  - scripts/nf.py:5725cb2904c3fa1bfcb48c46b6404387dada20e97f91f3f0fd500f9000fd37a1
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:395519d9a20015bd1cc1c99fc48ccdd32438b90475066894fabc62a7cea0e7fa
+  - protocol/code_metrics_baseline.json:0552a0a50f17eb417c99953deb21223925418d15ab0c7e1af6703cfcc188e4e0
 ---
+> 重审（2026-11-09）：DSSE ledger: 合入唯一真源与最新主干后重绑
+
 > 重审（2026-11-09）：merge latest main for DSSE standard profile
 
 > 重审（2026-11-08）：DSSE workflow command-face and algorithm result closure

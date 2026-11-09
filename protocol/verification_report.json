@@ -21,7 +21,7 @@
           "hits": 0
         },
         "import_residue": [],
-        "imports": 12,
+        "imports": 17,
         "layers": {
           "asset_levels": 5,
           "crosscut": 6,
@@ -30,7 +30,7 @@
           "surfaces": 4,
           "tiers": 4
         },
-        "raises": 167,
+        "raises": 194,
         "sinks": 22
       },
       "status": "pass",
@@ -299,7 +299,7 @@
       "stats": {
         "contracts": 27,
         "passed": 27,
-        "root": "9a768f71b121ce2efd88cf9801314b6cca308bf64f9b26a2513eb5887ab4201f",
+        "root": "9fa14db6f96be8594319be77af620dc51fe67a994373e8ec8225d89637d15c34",
         "verdict": "conformant"
       },
       "status": "pass",
@@ -370,7 +370,7 @@
       "source": "code_metrics.scan",
       "stats": {
         "baseline": 336,
-        "files": 336,
+        "files": 345,
         "max_fn_cc": 106,
         "max_fn_lines": 319,
         "max_lines": 9023
@@ -387,8 +387,8 @@
       "stats": {
         "budget_ms": 1500.0,
         "n": 65536,
-        "patterns": 262,
-        "probed": 262
+        "patterns": 264,
+        "probed": 264
       },
       "status": "pass",
       "warns": 0
@@ -432,8 +432,8 @@
         "cycles": 0,
         "metrics_drift": 0,
         "metrics_missing": 0,
-        "metrics_recorded": 277,
-        "modules": 277,
+        "metrics_recorded": 279,
+        "modules": 279,
         "registered_cycles": 0,
         "registered_sdp": 10,
         "sdp": 10
@@ -493,10 +493,10 @@
       "sample": [],
       "source": "workflow_policy.scan",
       "stats": {
-        "pinned_uses": 68,
-        "requirements_files": 4,
-        "with_explicit_permissions": 22,
-        "workflows": 22
+        "pinned_uses": 87,
+        "requirements_files": 5,
+        "with_explicit_permissions": 24,
+        "workflows": 24
       },
       "status": "pass",
       "warns": 0
@@ -526,8 +526,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4072,
-        "kernel": 2048,
+        "files": 4113,
+        "kernel": 2055,
         "kernel_no_self": 310,
         "rules": 9,
         "uncovered": 0,
@@ -538,7 +538,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "7bd2423ca008c584f307831c1602464d412bdfc2bf24694a49463e76356b9c56",
+  "root_digest": "11eb7d20e014086a811ce86ef5ac1c87eac9be3b872ba20d23d02aadec8ce32d",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

@@ -12,19 +12,21 @@ subjects:
   - desktop/src/core/meta_cockpit/runtime_executor.py:204a67ec93855257323887011395b0866ac8d5ae1c485362e89eb058ffe64bfb
   - desktop/src/core/meta_cockpit/cockpit_service.py:18280c6966dd618a8b09daa058b461fa43f89e99f11c797ca884338ff5c13bbf
   - desktop/src/core/meta_cockpit/cockpit_ab.py:6afcade08f2469aad4adc6f44e0e3d28a17712a85e3223f41b14c0020c2f88e7
-  - desktop/src/core/terminal.py:c07984876196ce97109b490d1ca299f658913efee7f321f8da6a32fbb015a765
+  - desktop/src/core/terminal.py:bca3e0d3a6c3b01d5974dc0dd45798d867b74986eb11ef2dc0bf0df67713362b
   - desktop/tests/test_meta_cockpit.py:cc2dc4f52729b35f400ca92aa367e685780f9f6735224e7fc0b7550b85f52662
   - desktop/tests/test_cli_error_framing.py:96b4ea24e8eb68e590b641a21089a510a821f8185cb9dc1cf98d9257e525fde9
-  - desktop/tests/test_nf_cli.py:c8eba2a0040083954cfc6847a1ab2e34ae1d2981a23155847feff34bd98f477c
-  - scripts/nf.py:239b09099db899e182142845a802bfd713c6371972c869b09e0a4b4a065b007a
+  - desktop/tests/test_nf_cli.py:d08127228e3156d2621448ab11b0c34ea7ccc436e053011ecea744a6b845d656
+  - scripts/nf.py:5725cb2904c3fa1bfcb48c46b6404387dada20e97f91f3f0fd500f9000fd37a1
   - tui/_surface.py:0a2f80a836ddd0bf5835c0bc60e89252b626d54567cf1f517f9bc41e071e3c0a
-  - protocol/check12_weights.json:e841eb6bac928f79359d17bc6f00247a4e12e890ab10f81cf5e963e865fee87a
-  - protocol/coupling_baseline.json:00b095ae74ce9b40e13ecec43854554d18a821d77b6792d2eca5dd6ca1eb91b6
+  - protocol/check12_weights.json:18d9f4606cf1c204527521be19ab74766fe34cb093a6f3b971be2effb1038cc5
+  - protocol/coupling_baseline.json:4a2df57fe867d215ced781667ac8115aed6791259d438078267f7ec719f9a2d6
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:7b1231392bea0bc51ed14d73fac3c73c185209c1233e7727e554d5b899031af2
 
 ---
+> 重审（2026-11-09）：DSSE ledger: 合入唯一真源与最新主干后重绑
+
 > 重审（2026-11-09）：merge latest main for DSSE standard profile
 
 > 重审（2026-11-08）：DSSE v1 CI closure: docs reachability, stdio pinning, weights

@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:b6bb293ebf079e9acbcfbd1c541b690128dd4e35bf088e37c09a573f39b87a13
-  - protocol/code_metrics_baseline.json:395519d9a20015bd1cc1c99fc48ccdd32438b90475066894fabc62a7cea0e7fa
+  - protocol/code_metrics_baseline.json:0552a0a50f17eb417c99953deb21223925418d15ab0c7e1af6703cfcc188e4e0
 ---
+> 重审（2026-11-09）：DSSE ledger: 合入唯一真源与最新主干后重绑
+
 > 重审（2026-11-09）：merge latest main for DSSE standard profile
 
 > 重审（2026-11-08）：DSSE workflow command-face and algorithm result closure

@@ -8,7 +8,7 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/concept_graph.py:cc629a762576347a6065da4be34ff6c6902ec4ee7299663119abbc153bd50211
   - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
-  - README.en.md:a89999256525640016690bf56b2d95f952595e46661db50a23a6f9ce3acceae5
+  - README.en.md:f31e24df7abced19c1a1d0bf4dc236069005153e159143afca12bd757c9aad40
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - community/量化金融域包/assets/DATA_CONTRACT.md:3815cd420ce535b571149a1ca0725b2d5c1757660e83d0edd8ed1d5c14ed2af1
   - community/量化金融域包/assets/STRATEGY_SPECS.md:9174638b5caf2d5d8586b80d07ed9aeca5d221e16f01ec19ce0e4c0f50859e65
@@ -16,6 +16,8 @@ subjects:
   - .github/workflows/external-links.yml:9f27d9e7bd3ca0c00345fdf6927b6f337a22243599412fb0ee3af35fed39f2bc
 
 ---
+> 重审（2026-11-09）：DSSE ledger: 合入唯一真源与最新主干后重绑
+
 > 重审（2026-11-09）：merge latest main for DSSE standard profile
 
 > 重审（2026-11-08）：DSSE v1 CI closure: docs reachability, stdio pinning, weights

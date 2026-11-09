@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1457,
+    "app": 1458,
     "entry": 26,
     "floor": 5,
-    "prod": 1054,
-    "projection": 144,
-    "support": 396,
-    "verify": 989
+    "prod": 1055,
+    "projection": 149,
+    "support": 424,
+    "verify": 995
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7037,6 +7037,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "OpenVEX 0.2.0 and CycloneDX 1.6 VEX projections from one disposition ledger.",
+      "path": "desktop/src/core/vex.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "目录变更监听（仅标准库）：给守护进程一个**「树没变」的可证信号**。",
       "path": "desktop/src/core/watch.py",
       "role": "prod",
@@ -8753,6 +8759,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "Canonical product metadata must govern every duplicated release surface.",
+      "path": "desktop/tests/test_product_metadata.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "正文级 lint 单测（AI 味机械特征；只报告不阻断）。",
       "path": "desktop/tests/test_prose_lint.py",
       "role": "verify",
@@ -8863,6 +8875,12 @@
     {
       "function": "v2.8.0 波C C4 —— 图书馆 See-Also related_of 单测（41 规划人读关联层）。",
       "path": "desktop/tests/test_related_of.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "Reproducible npm release artifacts and SBOM release-gate tests.",
+      "path": "desktop/tests/test_release_artifacts.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -9211,6 +9229,18 @@
     {
       "function": "测试套件**接线**门禁：不许有「写好了却没人跑」的套件。",
       "path": "desktop/tests/test_suite_wiring.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "OSPS L3 evidence and fail-closed VEX/readiness negative tests.",
+      "path": "desktop/tests/test_supply_chain_l3.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "OSPS/S2C2F evidence and attestation workflow regression tests.",
+      "path": "desktop/tests/test_supply_chain_standards.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -12065,6 +12095,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "nf-product-metadata/1",
+      "path": "protocol/product_metadata.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "nf-release-policy/1",
       "path": "protocol/release_policy.json",
       "role": "verify",
@@ -12251,6 +12287,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "Validate OSPS, S2C2F, package-source, and supplier evidence.",
+      "path": "scripts/supply_chain_policy.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "门禁判定缓存：输入摘要 → 判定摘要（**只加速，不替代判定**）。",
       "path": "scripts/verify_cache.py",
       "role": "verify",
@@ -12300,17 +12342,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "d11f9e4adc4fb9b97000c0aa08ee373bdad1e164265a8505e00b9af900164cca",
+  "root_digest": "f4975a6da355258fc0e8921ef3f0fc470e2c51fc2308b9f1b51fda00e6b3382e",
   "rule_counts": {
-    "R-app": 1457,
-    "R-catch": 246,
+    "R-app": 1458,
+    "R-catch": 263,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 125,
-    "R-support": 123,
-    "R-verify": 870,
-    "auto:R-core": 275
+    "R-projection": 129,
+    "R-support": 134,
+    "R-verify": 876,
+    "auto:R-core": 277
   },
   "schema": "nf-role-coordinates/1"
 }

@@ -31,9 +31,11 @@ subjects:
   - desktop/tests/test_cli_json_face.py:d0a8bf023d6d01772f4fcb5c03feb9c613b7644c0027d2ba2ba38c82bcf616a6
   - desktop/tests/test_ccv3_adapter.py:bf7e200b3c8df8d56dd811d2baab6a5d4961d4a043aa98bdfa2b4e95640bf7db
   - desktop/tests/test_ai_domain_closure.py:f9ec87c5c53daa811f443ec207fe6190c48039f24228c8d7af1b9873d6805bba
-  - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
-  - desktop/tests/test_nf_cli.py:c8eba2a0040083954cfc6847a1ab2e34ae1d2981a23155847feff34bd98f477c
+  - desktop/tests/test_terminal.py:f9cfbefb0a5ee8b0486a03b2386061caa23d27367299685c3b382dfdecb52352
+  - desktop/tests/test_nf_cli.py:d08127228e3156d2621448ab11b0c34ea7ccc436e053011ecea744a6b845d656
 ---
+> 重审（2026-11-09）：DSSE ledger: 合入唯一真源与最新主干后重绑
+
 > 重审（2026-11-09）：Rust 快线修 built_for_date + PIL allowlist + CI parity 步
 
 > 重审（2026-11-08）：恢复 npm README 体积口径行 + 加判据

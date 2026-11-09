@@ -7,10 +7,12 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
-  - desktop/src/core/purity_scan.py:66c0419a71440173d67087494eac8697daa03e942524d948b2296f49af8770cf
+  - desktop/src/core/purity_scan.py:c422df3c3bebf36c2dd446ae1e8942930eea57c432b48341f3fd1fff733da433
   - desktop/src/core/asset_contract.py:8e2fbc3954c771d6c2eb78d9cf47dcf22612b63b9b16929bd9013792f803f9a2
-  - protocol/code_metrics_baseline.json:395519d9a20015bd1cc1c99fc48ccdd32438b90475066894fabc62a7cea0e7fa
+  - protocol/code_metrics_baseline.json:0552a0a50f17eb417c99953deb21223925418d15ab0c7e1af6703cfcc188e4e0
 ---
+> 重审（2026-11-09）：DSSE ledger: 合入唯一真源与最新主干后重绑
+
 > 重审（2026-11-09）：merge latest main for DSSE standard profile
 
 > 重审（2026-11-08）：DSSE workflow command-face and algorithm result closure
