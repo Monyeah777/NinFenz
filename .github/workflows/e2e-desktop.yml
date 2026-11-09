@@ -3,7 +3,11 @@ name: e2e-desktop
 # 直驱 desktop core 真实链路（装载官方 13 件 + T2-2 组合包 M91/M92 + P04 轻混装配流管线
 # → 按层装配 → check_assembly → generate_document → 产物断言），无需 GUI、无需 Android 生成物。
 # 独立 workflow：桌面断言失败不牵连其它 workflow（原 Android 构建流已随 L3 端壳线退役移出）。
+#
+# PR 面（2026-11-09 补）：job 实测 9–10 s（headless、无 GUI），PR 面完全跑得起；此前只在 main
+# push 跑，桌面链路的回归要等合并后才发现。仍非 required（不阻塞合并）。
 on:
+  pull_request:
   push:
     branches: [main]
   workflow_dispatch:
@@ -19,13 +23,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30          # 挂死上限（2026-10-01 统一）
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
         with:
           persist-credentials: false
-      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6
         with:
           python-version: '3.11'
       - name: 桌面端到端 headless 冒烟断言（T3-1 缺口⑩闭环）
+        shell: bash
         run: |
           set -o pipefail
           python3 scripts/e2e_desktop_headless.py 2>&1 | tee e2e-desktop.log
@@ -33,7 +38,7 @@ jobs:
       - name: 失败诊断产物（Z5：本 run 的日志/报告；无则跳过）
         # Z5（2026-10-10 审计 §11j N8）：失败时要有**可下载**的诊断物，而不是只留滚动日志。
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7
         with:
           name: e2e-desktop-diagnostics
           path: |

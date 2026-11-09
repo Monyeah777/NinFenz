@@ -14,7 +14,7 @@ subjects:
   - scripts/nf.py:83a75a4fac82461d56b03147eff04b420b8aad0ed6db9fef6e695717dcf7b6a2
   - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
   - docs/layers.md:be79f2699cee390f03d54d6d0428daee6964674dcbb5d0e6967bfbb150395450
-  - docs/L3_FROZEN.md:c0719d46ba91dd9790d3d494709b01531f41700f76c291968b4a76b6bc4f96d4
+  - docs/L3_FROZEN.md:bde03a07d62aa37d5315d8b294d5fdfb24628c7a8556c1d3ff46848bc3d92186
   - protocol/assertions.json:5a0bb383eabf678a9f660ae6d771f0be51cce5397a40a73f0d0d93457e4f1cba
   - protocol/data_contracts.json:6ca6174c77d41ad354b90e637c404bedfbe5d8ad0ce6400bb26f2ac7e5f19eb0
   - protocol/normative.json:c1bbc14c92cea6bd66ff6cb54fdcf91bf3072f66adee7027f1d3f42e70fe1825
@@ -23,6 +23,12 @@ subjects:
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
 
 ---
+> 重审（2026-11-09）：L3 门禁事实
+
+> 重审（2026-11-09）：L3 actions 版本
+
+> 重审（2026-11-09）：恢复 CodeQL 扫描
+
 > 重审（2026-11-08）：L3 记录分支保护事实
 
 > 重审（2026-11-08）：新增 npm-package-check workflow

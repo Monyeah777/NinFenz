@@ -604,6 +604,32 @@ fn declared(root: &Path) -> Json {
     ])
 }
 
+/// 真源 `build` 的基准日：**UTC 今天**（YYYY-MM-DD）。
+///
+/// 为什么用 UTC 而非本机日历：报告是跨平台复算的（CI 跑 UTC、作者机常在东八区）；
+/// 本机日历会让同一提交在不同时区生成不同 `built_for_date`，「提交件 == 实时重算」必红
+/// （真源 `verify_report.build` 的注释有 2026-11-07 实测）。这里用 SystemTime→天数→
+/// 公历（Howard Hinnant 算法），不引 chrono/time 依赖。
+fn today_utc_iso() -> String {
+    let secs = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|d| d.as_secs())
+        .unwrap_or(0);
+    let z = (secs / 86400) as i64 + 719468;
+    let era = if z >= 0 { z } else { z - 146096 } / 146097;
+    let doe = z - era * 146097;
+    let yoe = (doe - doe / 1460 + doe / 36524 - doe / 146096) / 365;
+    let mut y = yoe + era * 400;
+    let doy = doe - (365 * yoe + yoe / 4 - yoe / 100);
+    let mp = (5 * doy + 2) / 153;
+    let d = doy - (153 * mp + 2) / 5 + 1;
+    let m = if mp < 10 { mp + 3 } else { mp - 9 };
+    if m <= 2 {
+        y += 1;
+    }
+    format!("{:04}-{:02}-{:02}", y, m, d)
+}
+
 /// 真源 `build`：跑全部判据 → 报告 dict（含声明/实测并排 + 稳定 digest）。
 pub fn build(root: &Path, supplied: &HashMap<String, Supplied>) -> Json {
     let mut items: Vec<Json> = Vec::new();
@@ -646,6 +672,7 @@ pub fn build(root: &Path, supplied: &HashMap<String, Supplied>) -> Json {
         ("items".to_string(), Json::Array(items)),
         ("summary".to_string(), summary),
         ("declared".to_string(), declared(root)),
+        ("built_for_date".to_string(), Json::Str(today_utc_iso())),
     ]);
     let digest_src = body.dumps_default();
     let digest = merkle::hex(&merkle::sha256(digest_src.as_bytes()));
