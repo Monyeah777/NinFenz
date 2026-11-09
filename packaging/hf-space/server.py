@@ -9,7 +9,6 @@
 """
 from __future__ import annotations
 
-import html
 import json
 import os
 import subprocess
@@ -169,7 +168,7 @@ class Handler(BaseHTTPRequestHandler):
                 return
             payload = json.loads(self.rfile.read(n).decode('utf-8') or '{}')
             result = run_mode(str(payload.get('mode') or 'stats'), str(payload.get('text') or ''))
-        except Exception as exc:  # noqa: BLE001 - 任何解析失败都按用户输入问题回，不 500
+        except Exception as exc:  # 任何解析失败都按用户输入问题回，不 500
             result = {'ok': False, 'mode': '', 'exit': 2, 'seconds': 0.0, 'command': '',
                       'output': '请求不可解析：%s（修复指引：JSON 形如 {"mode":"stats","text":""}）' % exc}
         self._send(200, json.dumps(result, ensure_ascii=False).encode('utf-8'),
