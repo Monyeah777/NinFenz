@@ -21,7 +21,7 @@
 | `handoff` | 换人能不能接（帧/承诺/分离） | 6 | handoff / commitment / separation | `nf cog replay` |
 | `privacy` | 守不守规矩（最小化/留存/同意） | 6 | data-minimization / retention / consent | `nf doctor` / `nf evidence verify` |
 | `supply-chain` | 交付物从哪来（钉定/可复现/溯源） | 6 | pinning / reproducibility / provenance | `python scripts/sbom.py --check` |
-| `operations` | 坏了能不能知道（目标/信号/告警） | 6 | slo / error-budget / incident-review | `python scripts/perf_budget.py`（缺省即校验） |
+| `operations` | 坏了能不能知道（目标/信号/告警） | 6 | slo / error-budget / incident-review | `python scripts/perf_budget.py --list`（只读列举；缺省模式会实测，8 片并发下会假红） |
 
 ## 四种用法
 

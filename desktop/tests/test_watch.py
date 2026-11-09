@@ -448,7 +448,7 @@ class WatchDaemonIntegrationTest(unittest.TestCase):
         # 轮询而非一次断言：8 片并发下守护回包会慢，偶发 resident.text=0（2026-11-09 实测两次，
         # 与 main 上 #269 对姊妹用例的修法一致）。
         text = 0
-        for _ in range(50):
+        for _ in range(150):              # 最多 15 s：8 片并发下守护回包可能慢到数秒
             text = int((dm.query_stats().get("resident") or {}).get("text", 0))
             if text > 0:
                 break
