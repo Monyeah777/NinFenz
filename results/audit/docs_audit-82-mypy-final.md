@@ -30,8 +30,10 @@ subjects:
   - desktop/src/core/daemon.py:75940f32b3068a5bc7a83b288bb9302e76a948eca0baa76e1e62f02243c8b498
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:c2dbeef7bafeaf33be6fc99f1fae1bced6f17c4d8db8e20b2a920bc4b971c25a
+  - protocol/code_metrics_baseline.json:2284d60eb2a4922e91eec6b77eec8753cb974904e44e2ca0b68c423ba9a9b40f
 ---
+> 重审（2026-11-09）：Windows SAST（重建）
+
 > 重审（2026-11-09）：style_check 行数
 
 > 重审（2026-11-09）：sast_check 行数
