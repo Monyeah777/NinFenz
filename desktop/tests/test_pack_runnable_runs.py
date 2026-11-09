@@ -59,7 +59,7 @@ class PackRunnableRunsTest(unittest.TestCase):
             if not (proc.stdout or proc.stderr):
                 bad.append(command + " → 没有任何输出")
             if elapsed > 60:
-                bad.append(command + " → 太慢（%.1fs）" % elapsed)
+                bad.append(command + f" → 太慢（{elapsed:.1f}s）")
         self.assertEqual([], bad, "这些可跑入口跑不起来：" + "; ".join(bad))
 
 
