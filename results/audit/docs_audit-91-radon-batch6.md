@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/layer_model.py:7464fad8e9703b76b6582a641fb80c5a93c4bbf87b5d2aad191e610eafe64dd2
-  - protocol/code_metrics_baseline.json:9d65db374221c26f8c093f8522ac5ddcf59b2029711726203287d713bc147498
+  - protocol/code_metrics_baseline.json:c2dbeef7bafeaf33be6fc99f1fae1bced6f17c4d8db8e20b2a920bc4b971c25a
 ---
+> 重审（2026-11-09）：style_check 行数
+
 > 重审（2026-11-09）：sast_check 行数
 
 > 重审（2026-11-09）：CodeQL 两处告警修复（ReDoS/URL 子串）
