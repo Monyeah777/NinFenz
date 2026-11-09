@@ -255,6 +255,10 @@ class WatchDaemonIntegrationTest(unittest.TestCase):
         dm.reset_response_cache()
         for k in dm._CACHE_STATS:
             dm._CACHE_STATS[k] = 0
+        # 常驻语料层是**模块级全局**且带「装到哪个 ROOT」的语义：同进程里前一个用例若为别的
+        # ROOT 装过，它不会自动换掉——本用例读自己的 ROOT 就命中不了，表现为「单跑过、整跑挂」
+        # （2026-11-10 全量快照 4/8 片连续三次命中）。开跑前先清空，让服务的 --watch 重新装。
+        csc.clear_resident()
         self.home = tempfile.mkdtemp(prefix="nf_watch_ip_")
         self._old_home = os.environ.get("NARRATIVE_FORGE_HOME")
         os.environ["NARRATIVE_FORGE_HOME"] = self.home
