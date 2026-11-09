@@ -773,8 +773,8 @@ mod tests {
         assert_eq!(SPECS[5].id, "rating");
         assert_eq!(SPECS[6].id, "rating_decided");
         assert_eq!(SPECS[6].source(), "rating_gate.decided");
-        assert_eq!(SPECS[29].id, "asvs");
-        assert_eq!(SPECS[30].id, "ssdf");
+        assert_eq!(SPECS[28].id, "asvs");
+        assert_eq!(SPECS[29].id, "ssdf");
         assert_eq!(SPECS[31].id, "asset_contract");
         assert_eq!(SPECS[32].id, "role_coordinates");
         assert_eq!(SPECS[32].source(), "role_model.scan");
