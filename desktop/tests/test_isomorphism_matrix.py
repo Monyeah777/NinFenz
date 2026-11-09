@@ -121,6 +121,22 @@ class IsomorphismMatrixTest(unittest.TestCase):
             self.assertRegex(why, r"`[A-Za-z0-9_.:/\-]+`",
                              layer + " 的缺失理由没有点名具体对象：" + why)
 
+    def test_doc_table_names_every_kill_test(self):
+        """矩阵文档的表格必须点名每一层的变异测试（第 146 轮：消灭第二真源）。
+
+        数据源是 fixture 的 `kill_test`；文档若漏写某层的变异测试，读者就看不到
+        「这层能被改坏打死」的证据。与第 145 轮「文档入口列 ↔ 包 runnable」同类（一致性绑定）。
+        """
+        doc = (Path(__file__).resolve().parents[2] / "docs" / "ccos"
+               / "isomorphism-matrix.md").read_text(encoding="utf-8")
+        missing = []
+        for row in MATRIX["covered"]:
+            test = str(row.get("kill_test") or "")
+            if test and test not in doc:
+                missing.append(str(row.get("layer")) + " → " + test)
+        self.assertGreaterEqual(len(MATRIX["covered"]), 9, "覆盖数异常（判据可能已失效）")
+        self.assertEqual([], missing, "矩阵文档没点名这些变异测试：" + "; ".join(missing))
+
     def test_doc_numbers_match_matrix_and_gates(self):
         """文档里的「N 层全覆盖 / precheck N 门」必须等于实际（防口径漂移）。"""
         import sys
