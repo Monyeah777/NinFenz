@@ -134,6 +134,10 @@ python -m unittest desktop.tests.test_release_conclusion    # 65 项全绿
 python scripts/release_conclusion.py
 ```
 
+**预算线（第 161 轮实测后定）**：`verify_tests` 逐测试权重合计 ≤ **2000 s** 视为健康——
+当前 1788 s（4210 条权重，前 10 模块占 61%）；最慢的 `test_precheck`（134 s）是「判据跑判据」的递归成本，
+若逼近预算应先拆它。快照墙钟 55–75 分钟随机器负载浮动；**快照运行期间避免跑全量判据**（会争 CPU，实测可拉长 10 分钟以上）。
+
 **与 `scripts/precheck.py` 的分工**：precheck 是「高频横向面」的 4 分钟快车道（覆盖 20/378 个测试模块），
 用于提交前自查；它**不能**替代本件的全量结论——发布判定仍只认上面的五步。
 
