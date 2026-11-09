@@ -3,7 +3,7 @@ name = "nf-rs"
 version = "0.1.0"
 edition = "2021"
 description = "NF 只读快线（Rust）—— 与 Python 真源逐字节对账"
-license = "MIT"
+license = "AGPL-3.0-only"
 
 # C ABI 共享库出口（2026-10-10）：给 core/engine_loader.py 一个可 dlopen 的 cdylib，
 # 暴露 ABI 版本号；与 bin（src/main.rs 只读快线）互不影响。符号名见 src/lib.rs 与 Python 侧 ABI_SYMBOL。

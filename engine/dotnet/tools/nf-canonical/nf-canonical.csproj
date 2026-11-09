@@ -22,7 +22,7 @@
     <RootNamespace>Nf.Canonical</RootNamespace>
     <Version>0.1.0</Version>
     <Description>RFC 8785 (JCS) canonical JSON —— 独立 C# 实现（跨语言契约对拍的第三实现）</Description>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageLicenseExpression>AGPL-3.0-only</PackageLicenseExpression>
   </PropertyGroup>
 
 </Project>

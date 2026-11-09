@@ -1,0 +1,49 @@
+{
+  "schema": "nf-product-metadata/1",
+  "name": "NinFenz",
+  "version": "1.1.2",
+  "description": "Content contract layer for AI long-form output: plain-markdown protocol, deterministic gates, verifiable artifacts. Offline, AGPL-3.0-only (or commercial), stdlib-only core.",
+  "npm_description": "AI output assurance: versioned content contracts, deterministic release gates, rule-level evidence and audit-ready reports. Offline CLI and MCP; AGPL-3.0-only or commercial.",
+  "repository": "https://github.com/Monyeah777/NinFenz",
+  "homepage": "https://ninfenz.dev/",
+  "author": "Monyeah777",
+  "license_expression": "AGPL-3.0-only OR LicenseRef-Commercial",
+  "npm_license": "AGPL-3.0-only",
+  "content_license": "CC-BY-4.0",
+  "historical_code_license": "MIT",
+  "license_file": "LICENSE",
+  "licensing_file": "LICENSING.md",
+  "commercial_file": "COMMERCIAL.md",
+  "license_url": "https://github.com/Monyeah777/NinFenz/blob/main/LICENSING.md",
+  "release_line": "1.1",
+  "ccos_abi": "v0",
+  "paid_hosted_tier": false,
+  "commercial_license_available": true,
+  "release_bundle_required": true,
+  "release_bundle": {
+    "workflow": ".github/workflows/npm-publish.yml",
+    "gate_workflow": ".github/workflows/release-gate.yml",
+    "npm_workflow": ".github/workflows/npm-publish.yml",
+    "builder": "packaging/npm/tools/build_release.py",
+    "sbom_validator": "scripts/validate_sboms.py",
+    "vex_generator": "scripts/generate_vex.py",
+    "vsa_builder": "scripts/build_vsa.py",
+    "supply_chain_policy": "scripts/supply_chain_policy.py",
+    "required_artifacts": [
+      "*.tgz",
+      "*.cdx.json",
+      "*.spdx3.json",
+      "*.openvex.json",
+      "*.cdx-vex.json",
+      "*.payload-manifest.json",
+      "SHA256SUMS",
+      "release-metadata.json"
+    ]
+  },
+  "distribution_names": {
+    "python": "ninfenz",
+    "npm": "ninfenz",
+    "github_packages": "@monyeah777/ninfenz",
+    "mcp": "io.github.Monyeah777/ninfenz"
+  }
+}

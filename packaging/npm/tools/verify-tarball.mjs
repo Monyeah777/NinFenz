@@ -41,11 +41,15 @@ const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'nf-tarball-'));
 let tarball = '';
 if (idx >= 0 && args[idx + 1]) {
-  tarball = path.resolve(args[idx + 1]);
-  if (!fs.existsSync(tarball)) {
-    console.error('\u2717 指定的 tarball 不在场：' + tarball);
+  const requested = path.resolve(args[idx + 1]);
+  if (!fs.existsSync(requested)) {
+    console.error('\u2717 指定的 tarball 不在场：' + requested);
     process.exit(2);
   }
+  // 在 tmp 内解包：既保留 GNU tar/bsdtar 的相对路径兼容性，也让显式路径
+  // （CI 的 .artifacts/release/*.tgz）不再依赖 tarball 位于临时目录。
+  tarball = path.join(tmp, path.basename(requested));
+  fs.copyFileSync(requested, tarball);
 } else {
   // Windows 上 npm 是 .cmd 垫片：必须经 shell 才能 spawn（Node 对 .cmd 直接 spawn 返 EINVAL）。
   // 传**单个命令串**而不是「shell:true + 参数数组」，避开 DEP0190（参数不转义的告警）。
