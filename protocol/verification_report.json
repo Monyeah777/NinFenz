@@ -387,8 +387,8 @@
       "stats": {
         "budget_ms": 1500.0,
         "n": 65536,
-        "patterns": 261,
-        "probed": 261
+        "patterns": 259,
+        "probed": 259
       },
       "status": "pass",
       "warns": 0
@@ -493,10 +493,10 @@
       "sample": [],
       "source": "workflow_policy.scan",
       "stats": {
-        "pinned_uses": 64,
+        "pinned_uses": 68,
         "requirements_files": 4,
-        "with_explicit_permissions": 18,
-        "workflows": 18
+        "with_explicit_permissions": 22,
+        "workflows": 22
       },
       "status": "pass",
       "warns": 0
@@ -526,7 +526,7 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4199,
+        "files": 4203,
         "kernel": 2102,
         "kernel_no_self": 308,
         "rules": 9,
@@ -538,7 +538,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "5c30f1f0183c056886db0aa95f2c8f50b37a1a6e0337cc0cc0bb581759382d67",
+  "root_digest": "d56957605bda0a65bd7229584017a3d3e6f3cac96fb44f8905c2c9c891765fad",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

@@ -117,6 +117,10 @@ class DocsAnchorTest(unittest.TestCase):
             text = path.read_text(encoding="utf-8", errors="replace")
             for tok in sorted(set(pat.findall(text))):
                 total += 1
+                # 被忽略的生成物（如 packaging/npm/payload/）在干净快照里必然不存在，
+                # 与 `_ignored` 口径保持一致——否则快照/独立 worktree 里会假红。
+                if _ignored(tok):
+                    continue
                 if not (ROOT / tok).is_file():
                     missing.append(f"{path.name} → {tok}")
         self.assertGreaterEqual(total, 40, "文档里的仓库路径太少（判据可能已失效）")

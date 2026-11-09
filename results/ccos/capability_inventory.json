@@ -1,5 +1,5 @@
 {
-  "digest": "0b3de61ec6a3aed60f6911025d7991c49472218911a6f1e76cd2e636164fe9ef",
+  "digest": "5211c71cff68c0c3dc6715860df36ae4717a048f50337c52b09b65c4d945b5ec",
   "entries": [
     {
       "doc": "其余 ABI 调用的判定向量：cc_label（IR 校验）→ 期望结论（跨语言可复核）。",
@@ -1021,6 +1021,7 @@
       "doc": "SAST 基线闸门（安全/供应链面 · ISO 25010 安全性）：bandit + ruff-S 的**只增不减**计数棘轮。",
       "flags": [
         "--json",
+        "--platform",
         "--write"
       ],
       "path": "scripts/sast_check.py",
@@ -1226,7 +1227,7 @@
       "subcommands": []
     }
   ],
-  "flags": 524,
+  "flags": 525,
   "note": "静态接口面（docs/flags/subcommands），不含缺省行为语义",
   "schema": "nf-capability-inventory/1",
   "scripts": 78

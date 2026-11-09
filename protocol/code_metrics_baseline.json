@@ -416,7 +416,7 @@
       "max_fn_lines": 70
     },
     "desktop/src/core/evidence.py": {
-      "lines": 1888,
+      "lines": 1891,
       "max_fn_cc": 25,
       "max_fn_lines": 161
     },
@@ -911,7 +911,7 @@
       "max_fn_lines": 7
     },
     "desktop/src/core/output_forms.py": {
-      "lines": 1503,
+      "lines": 1508,
       "max_fn_cc": 29,
       "max_fn_lines": 71
     },
@@ -1131,7 +1131,7 @@
       "max_fn_lines": 78
     },
     "desktop/src/core/repo_face.py": {
-      "lines": 128,
+      "lines": 138,
       "max_fn_cc": 13,
       "max_fn_lines": 33
     },
@@ -1191,8 +1191,8 @@
       "max_fn_lines": 56
     },
     "desktop/src/core/role_model.py": {
-      "lines": 461,
-      "max_fn_cc": 19,
+      "lines": 478,
+      "max_fn_cc": 17,
       "max_fn_lines": 35
     },
     "desktop/src/core/round_drill.py": {
@@ -1406,7 +1406,7 @@
       "max_fn_lines": 43
     },
     "desktop/src/core/verify_report.py": {
-      "lines": 289,
+      "lines": 293,
       "max_fn_cc": 10,
       "max_fn_lines": 41
     },
@@ -1451,7 +1451,7 @@
       "max_fn_lines": 14
     },
     "scripts/abi_call_vectors.py": {
-      "lines": 258,
+      "lines": 259,
       "max_fn_cc": 5,
       "max_fn_lines": 40
     },
@@ -1581,7 +1581,7 @@
       "max_fn_lines": 34
     },
     "scripts/evidence_vectors.py": {
-      "lines": 431,
+      "lines": 432,
       "max_fn_cc": 9,
       "max_fn_lines": 79
     },
@@ -1726,7 +1726,7 @@
       "max_fn_lines": 39
     },
     "scripts/release_conclusion.py": {
-      "lines": 1078,
+      "lines": 1080,
       "max_fn_cc": 60,
       "max_fn_lines": 241
     },
@@ -1741,9 +1741,9 @@
       "max_fn_lines": 53
     },
     "scripts/sast_check.py": {
-      "lines": 236,
+      "lines": 249,
       "max_fn_cc": 12,
-      "max_fn_lines": 30
+      "max_fn_lines": 35
     },
     "scripts/sbom.py": {
       "lines": 101,
@@ -1766,7 +1766,7 @@
       "max_fn_lines": 21
     },
     "scripts/style_check.py": {
-      "lines": 180,
+      "lines": 183,
       "max_fn_cc": 19,
       "max_fn_lines": 36
     },

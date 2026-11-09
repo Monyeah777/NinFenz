@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:9e2be2917b0de5b43bbc06192dac1ac2bddadfbd62c96936d4c4fa84b7bd9853
+  - protocol/code_metrics_baseline.json:f2e6ff877bf55e5620f25d62778aa3267ac64c968a34c0d407e23ba7cd603239
 ---
+> 重审（2026-11-09）：冻结链
+
 > 重审（2026-11-09）：core 引用面映射（355 模块 / 未引用 34，棘轮只减不增）
 
 > 重审（2026-11-09）：红证据加 negative_assertion 档（assertRaises）：硬证据 20→99，无 149→139
