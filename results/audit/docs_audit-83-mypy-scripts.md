@@ -14,8 +14,14 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:869bab4dff472c51503c71770c1871cb4dab32a3c3d0977da69ce6a0ea963d9e
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:9d65db374221c26f8c093f8522ac5ddcf59b2029711726203287d713bc147498
+  - protocol/code_metrics_baseline.json:e711ead331e9b28ccf6e3a21ab5c376776d57a54b05dbe0bcf4ae8676f79ec99
 ---
+> 重审（2026-11-09）：ASVS closure: 代码度量基线重冻后重绑
+
+> 重审（2026-11-09）：ASVS closure: 最新主干风格规则自动修复后重绑
+
+> 重审（2026-11-09）：ASVS closure: 合入最新主干与风格扩面后重绑
+
 > 重审（2026-11-09）：Foundation repair: 重绑发布束重构后的审计对象摘要
 
 > 重审（2026-11-09）：foundation repair: canonical product metadata, dual licensing, and release bundle

@@ -27,11 +27,17 @@ subjects:
   - desktop/src/core/import_graph.py:2ea0fe79cf12e2f9bdb6078af0a08287ae062fc0f4f3e6136e3b240c0d11123a
   - desktop/src/core/bench.py:5d7ef263ca30a9888f2c32f4db2253406dfdc510b52fbb19958a3afefe9cf574
   - desktop/src/core/import_adapter.py:0d062c6f28215b7d81eeb46e653fa4edcc7e8cb9f3e9178e73f2dff9f834bc35
-  - desktop/src/core/daemon.py:306ec35cfeac93dca37273974a6b4fbce84d9e20092ec6bd58436c51805e55e5
+  - desktop/src/core/daemon.py:bbc7ea6f854ece8804783c79924e6987363871e3639d7d1e968721e1575c97fa
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:9d65db374221c26f8c093f8522ac5ddcf59b2029711726203287d713bc147498
+  - protocol/code_metrics_baseline.json:e711ead331e9b28ccf6e3a21ab5c376776d57a54b05dbe0bcf4ae8676f79ec99
 ---
+> 重审（2026-11-09）：ASVS closure: 代码度量基线重冻后重绑
+
+> 重审（2026-11-09）：ASVS closure: 最新主干风格规则自动修复后重绑
+
+> 重审（2026-11-09）：ASVS closure: 合入最新主干与风格扩面后重绑
+
 > 重审（2026-11-09）：ASVS closure: 重构 ASVS/daemon/security 门禁后重绑摘要
 
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑

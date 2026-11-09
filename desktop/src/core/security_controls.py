@@ -184,7 +184,9 @@ def _data_issues(doc: dict[str, Any]) -> tuple[list[str], list[dict[str, Any]]]:
     return issues, classes
 
 
-def _limit_issues(root: Path, doc: dict[str, Any]) -> tuple[list[str], dict[str, int], dict[str, int]]:
+def _limit_issues(
+        root: Path, doc: dict[str, Any]
+) -> tuple[list[str], dict[str, int], dict[str, int]]:
     issues: list[str] = []
     try:
         actual_limits = _resource_constants(root)

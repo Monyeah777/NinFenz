@@ -10,7 +10,8 @@ from __future__ import annotations
 import logging
 import sys
 import time
-from .plog_security import sanitize, security_event
+
+from .plog_security import sanitize, security_event  # noqa: F401 - compatibility re-export
 
 _CONFIGURED = False
 

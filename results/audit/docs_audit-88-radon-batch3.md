@@ -7,8 +7,14 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:3e21a47d54d5130acaf33545a501902cad27f1b3b657df826a13975fecd8d3b5
-  - protocol/code_metrics_baseline.json:9d65db374221c26f8c093f8522ac5ddcf59b2029711726203287d713bc147498
+  - protocol/code_metrics_baseline.json:e711ead331e9b28ccf6e3a21ab5c376776d57a54b05dbe0bcf4ae8676f79ec99
 ---
+> 重审（2026-11-09）：ASVS closure: 代码度量基线重冻后重绑
+
+> 重审（2026-11-09）：ASVS closure: 最新主干风格规则自动修复后重绑
+
+> 重审（2026-11-09）：ASVS closure: 合入最新主干与风格扩面后重绑
+
 > 重审（2026-11-09）：foundation repair: canonical product metadata, dual licensing, and release bundle
 
 > 重审（2026-11-09）：sast_check 行数

@@ -7,8 +7,12 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/json_schema.py:f3a4a6a14de5104e217af8b154505f9ca46fd6133081188209add78143e2b23e
-  - protocol/code_metrics_baseline.json:c2dbeef7bafeaf33be6fc99f1fae1bced6f17c4d8db8e20b2a920bc4b971c25a
+  - protocol/code_metrics_baseline.json:e711ead331e9b28ccf6e3a21ab5c376776d57a54b05dbe0bcf4ae8676f79ec99
 ---
+> 重审（2026-11-09）：ASVS closure: 代码度量基线重冻后重绑
+
+> 重审（2026-11-09）：ASVS closure: 最新主干风格规则自动修复后重绑
+
 > 重审（2026-11-09）：style_check 行数
 
 > 重审（2026-11-09）：sast_check 行数

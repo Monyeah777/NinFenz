@@ -3,7 +3,7 @@
     "app": 1459,
     "entry": 26,
     "floor": 5,
-    "prod": 1059,
+    "prod": 1062,
     "projection": 149,
     "support": 425,
     "verify": 1000
@@ -5975,6 +5975,18 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "Bounded daemon transport inputs and local-socket hardening.",
+      "path": "desktop/src/core/daemon_limits.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "Daemon lifecycle policy: security events, lifetime, and log placement.",
+      "path": "desktop/src/core/daemon_runtime.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "NF 守护的 bash 快路模板（`nf daemon shell-init bash` 原样输出）。",
       "path": "desktop/src/core/daemon_shell.py",
       "role": "prod",
@@ -6661,6 +6673,12 @@
     {
       "function": "v2.8.0 波C D4：可观测性 —— logging 级别体系（41 规划 D 组杂务）。",
       "path": "desktop/src/core/plog.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "Sanitization and structured security-event logging.",
+      "path": "desktop/src/core/plog_security.py",
       "role": "prod",
       "rule": "auto:R-core"
     },
@@ -12396,7 +12414,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "64d26a7207a5bb5cd858ec4c17a63d72a8e6a87b7fca34d6bc5222833965b986",
+  "root_digest": "cfdaea1bc44cd92c3023c3aa297468fe7b52d613c71b0f4a5cd7a00bc43e0da4",
   "rule_counts": {
     "R-app": 1459,
     "R-catch": 262,
@@ -12406,7 +12424,7 @@
     "R-projection": 129,
     "R-support": 136,
     "R-verify": 879,
-    "auto:R-core": 283
+    "auto:R-core": 286
   },
   "schema": "nf-role-coordinates/1"
 }

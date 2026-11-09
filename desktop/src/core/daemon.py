@@ -37,13 +37,20 @@ import sys
 import threading
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Tuple
 
 from . import crypto_policy
-from .daemon_limits import MAX_ARGV_CHARS, MAX_ARGV_TOTAL, MAX_CWD_CHARS, MAX_REQUEST_BYTES
-from .daemon_limits import MAX_RESPONSE_BYTES, check_argv_size as _check_argv_size
+from .daemon_limits import (
+    MAX_ARGV_CHARS,  # noqa: F401 - compatibility export for daemon-limit consumers
+    MAX_ARGV_TOTAL,  # noqa: F401 - compatibility export for daemon-limit consumers
+    MAX_CWD_CHARS,
+    MAX_REQUEST_BYTES,
+    MAX_RESPONSE_BYTES,
+)
+from .daemon_limits import check_argv_size as _check_argv_size
 from .daemon_limits import configure_server_socket as _configure_server_socket
-from .daemon_runtime import configure_watcher, lifetime_expired as _lifetime_expired, log_path
+from .daemon_runtime import configure_watcher, log_path
+from .daemon_runtime import lifetime_expired as _lifetime_expired
 from .daemon_runtime import security_event as _security_event
 
 PROTO = 1
@@ -94,7 +101,7 @@ def state_path() -> Path:
     return Path(storage.default_home()) / STATE_NAME
 
 
-def read_state() -> Optional[Dict[str, Any]]:
+def read_state() -> Dict[str, Any] | None:
     """读守护状态；文件缺失/不可解析/版本不符 → None（一律按「没有守护」处理）。"""
     from core import atomic_write
     try:
@@ -295,14 +302,18 @@ def _parse_request(reader: "_LineReader") -> Dict[str, Any]:
     if head.startswith("NFREQ"):
         parts = head.split()
         if len(parts) != 3 or parts[1] != str(PROTO):
-            raise ValueError("NFREQ 头格式错（期望 `NFREQ %d <token>`）" % PROTO)
+            raise ValueError(f"NFREQ 头格式错（期望 `NFREQ {PROTO} <token>`）")
         cwd = _decode_frame(reader.readline(), "NFREQ cwd")
         try:
             n = int(_decode_frame(reader.readline(), "NFREQ 条数").strip() or "0")
         except ValueError as exc:
-            raise ValueError("NFREQ argv 条数不可解析：%s" % exc) from exc
+            raise ValueError(
+                f"NFREQ argv 条数不可解析：{exc}（修复指引：检查客户端帧协议）"
+            ) from exc
         if n < 0 or n > 4096:
-            raise ValueError("NFREQ argv 条数越界：%d" % n)
+            raise ValueError(
+                f"NFREQ argv 条数越界：{n}（修复指引：减少参数并重试）"
+            )
         argv = [_decode_frame(reader.readline(), "NFREQ argv") for _ in range(n)]
         _check_argv_size(argv)
         return {"proto": PROTO, "token": parts[2], "cwd": cwd, "argv": argv}
@@ -363,7 +374,7 @@ def read_framed(sock: socket.socket) -> Tuple[int, bytes, bytes]:
     return code, out, err
 
 
-def run_request(doc: Dict[str, Any], argv: List[str], cwd: Optional[str] = None,
+def run_request(doc: Dict[str, Any], argv: List[str], cwd: str | None = None,
                 timeout: float = SOCKET_TIMEOUT) -> Tuple[int, bytes, bytes]:
     """客户端：把一条命令交给守护执行 → (exit, stdout 字节, stderr 字节)。
 
@@ -372,7 +383,7 @@ def run_request(doc: Dict[str, Any], argv: List[str], cwd: Optional[str] = None,
     req = json.dumps({"proto": PROTO, "token": doc["token"], "argv": [str(a) for a in argv],
                       "cwd": cwd or os.getcwd()}, ensure_ascii=False).encode("utf-8") + b"\n"
     if len(req) > MAX_REQUEST_BYTES:
-        raise ValueError("请求超过上限 %d 字节" % MAX_REQUEST_BYTES)
+        raise ValueError(f"请求超过上限 {MAX_REQUEST_BYTES} 字节")
     with socket.create_connection((BIND_HOST, int(doc["port"])), timeout=timeout) as sock:
         sock.settimeout(timeout)
         sock.sendall(req)
@@ -394,7 +405,7 @@ def _cli_module(root: Path):
 #: CLI 模块缓存（含源码指纹）：守护最怕「代码改了还在跑旧逻辑」——见 `_sync_code`。
 _CLI_CACHE: Dict[str, Any] = {}
 #: `start()` 拉起的子进程句柄（回收它，避免解释器退出时的 ResourceWarning）。
-_CHILD: Optional[Any] = None
+_CHILD: Any | None = None
 
 #: 响应缓存（**只在守护进程内、只在树没变时**复用整条命令的 stdout/stderr/退出码）。
 #: 判据与账本在 `core.response_cache`（会话 `session_watch` 与守护共用同一套 ⇒ 只有一种说法）。
@@ -402,7 +413,7 @@ from core import response_cache as _rc  # noqa: E402 - 与下面的常量一组�
 
 _CACHE_STATS = _rc.STATS
 #: 当前监听件（`serve_forever(watch=True)` 装；单测可注入假件）。
-_WATCHER: Optional[Any] = None
+_WATCHER: Any | None = None
 #: `_WATCHER` 的**唯一写入口**（2026-10-10 审计 N8，P2）：此前 `session_watch._install` 直接写
 #: `daemon._WATCHER`——跨模块可变全局没有所有权，谁都能改、没人能断言。现在写只走 `set_watcher`
 #: （进程内 mutex 保证换手原子）；读仍无锁（CPython 引用读写原子，换手期间读到旧/新都是完整
@@ -410,7 +421,7 @@ _WATCHER: Optional[Any] = None
 _WATCH_LOCK = threading.Lock()
 
 
-def set_watcher(watcher: Optional[Any]) -> None:
+def set_watcher(watcher: Any | None) -> None:
     """登记/注销本进程的树代际来源（**唯一写入口**）。"""
     global _WATCHER
     with _WATCH_LOCK:
@@ -421,11 +432,10 @@ RESIDENT_ENV_OFF = "NF_NO_RESIDENT"
 
 # 兼容转发面：测试读 dm.CACHEABLE_COMMANDS / dm._WRITE_FLAG_PREFIXES；cacheable 本模块自用。
 # 真源已迁 core.response_cache（准入表 + 闸门旗标前缀），此处只做对外再导出。
-from core.response_cache import (CACHEABLE_COMMANDS, _WRITE_FLAG_PREFIXES,  # noqa: F401
-                                 cacheable)
+from core.response_cache import _WRITE_FLAG_PREFIXES, CACHEABLE_COMMANDS, cacheable  # noqa: F401
 
 
-def _watch_generation() -> Optional[int]:
+def _watch_generation() -> int | None:
     """当前「树代际」；**None ＝ 不可用**（没有监听件 / 不健康）→ 一律不缓存、不命中。"""
     w = _WATCHER
     if w is None or not getattr(w, "healthy", False):
@@ -500,7 +510,8 @@ def _code_fingerprint(root: Path) -> Tuple:
                         continue
                     st = ent.stat()
                     rows.append((rel + "/" + ent.name, st.st_mtime_ns, st.st_size))
-        except OSError:  # 尽力而为：跳过不可读/不可解析项；该类缺口由对应门禁另行报出（见 AUD-0016）
+        except OSError:
+            # 尽力而为：不可读取项由对应门禁另行报出（见 AUD-0016）。
             continue
     rows.sort()
     return tuple(rows)
@@ -539,7 +550,7 @@ def _sync_code(root: Path) -> None:
     _CLI_CACHE["fp"] = fp
     if saved is not None:
         try:
-            from core import conformance_scan as _csc_new       # 重新导入 → 新模块对象
+            from core import conformance_scan as _csc_new  # 重新导入 → 新模块对象
             _csc_new.adopt_resident(saved)
         except Exception:                                    # noqa: BLE001 - 搬不回去就下次重读
             pass
@@ -553,12 +564,12 @@ def _load_cli(root: Path):
     return mod
 
 
-def execute(argv: List[str], root: Path, cwd: Optional[str] = None
+def execute(argv: List[str], root: Path, cwd: str | None = None
             ) -> Tuple[int, bytes, bytes]:
     """在**本进程内**执行一条 nf 命令，并把 stdout/stderr 原样抓成字节。"""
     if argv and str(argv[0]) in REFUSED_COMMANDS:
-        msg = ("守护进程内拒跑长驻/嵌套命令 `nf %s`"
-               "（修复指引：在普通终端里直接跑；守护只承载一次性命令）\n" % argv[0])
+        msg = (f"守护进程内拒跑长驻/嵌套命令 `nf {argv[0]}`"
+               "（修复指引：在普通终端里直接跑；守护只承载一次性命令）\n")
         return 2, b"", msg.encode("utf-8")
     if cwd is not None:
         cwd = _validated_cwd(root, cwd)
@@ -623,11 +634,11 @@ def _internal_error_frame(exc: BaseException) -> bytes:
     口径与 `nf` 的内层错误面同源：一句「内部错误 + 修复指引」，不吐 traceback；`NF_DEBUG=1`
     时调用方改为上抛（排障），本函数不自行决定是否吞掉。
     """
-    return ("  ✗ 守护内部错误：%s（修复指引：重跑同一条命令；若仍复现，请带着这条消息提 issue"
-            "——该异常已被单条请求隔离，守护未退出）\n" % exc).encode("utf-8")
+    return (f"  ✗ 守护内部错误：{exc}（修复指引：重跑同一条命令；若仍复现，请带着这条消息提 issue"
+            "——该异常已被单条请求隔离，守护未退出）\n").encode()
 
 
-def _handle_control_op(conn: socket.socket, req: dict) -> Optional[bool]:
+def _handle_control_op(conn: socket.socket, req: dict) -> bool | None:
     op = req.get("op")
     if op is None:
         return None
@@ -655,7 +666,7 @@ def _handle_conn(conn: socket.socket, token: str, root: Path) -> bool:
     try:
         req = _parse_request(_LineReader(conn))
     except (ValueError, OSError, UnicodeDecodeError) as exc:
-        send_framed(conn, 2, b"", ("请求不可读：%s\n" % exc).encode("utf-8"))
+        send_framed(conn, 2, b"", (f"请求不可读：{exc}\n").encode())
         return False
     conn.settimeout(SOCKET_TIMEOUT)
     if req.get("proto") != PROTO:
@@ -672,14 +683,14 @@ def _handle_conn(conn: socket.socket, token: str, root: Path) -> bool:
         # 回环不是信任边界：无令牌（或令牌不符）一律拒绝执行
         send_framed(conn, 2, b"", "令牌缺失或不符：拒绝执行"
                                   "（修复指引：用 scripts/nf 启动器，或 nf daemon status）\n"
-                                  .encode("utf-8"))
+                                  .encode())
         return False
     control = _handle_control_op(conn, req)
     if control is not None:
         return control
     argv = req.get("argv")
     if not isinstance(argv, list) or not all(isinstance(a, str) for a in argv):
-        send_framed(conn, 2, b"", "argv 必须是字符串列表\n".encode("utf-8"))
+        send_framed(conn, 2, b"", "argv 必须是字符串列表\n".encode())
         return False
     try:
         cwd = _validated_cwd(root, req.get("cwd"))
@@ -717,16 +728,16 @@ def _serve_conn(conn: socket.socket, token: str, root: Path) -> bool:
     try:
         return _handle_conn(conn, token, root)
     except OSError as exc:
-        print("  [warn] 连接中断（守护继续）：%s" % exc, file=sys.stderr)
+        print(f"  [warn] 连接中断（守护继续）：{exc}", file=sys.stderr)
         return False
     except Exception as exc:                       # noqa: BLE001 - 最后一道隔离网
         if os.environ.get("NF_DEBUG"):
             raise                                  # 排障：显式要求时透出堆栈
-        print("  [warn] 单条连接失败（守护继续）：%s" % exc, file=sys.stderr)
+        print(f"  [warn] 单条连接失败（守护继续）：{exc}", file=sys.stderr)
         return False
 
 
-def serve_forever(root: Path, idle_timeout: float = 0.0, ready: Optional[Any] = None,
+def serve_forever(root: Path, idle_timeout: float = 0.0, ready: Any | None = None,
                   force: bool = False, watch: bool = False,
                   max_lifetime: float = 0.0) -> int:
     """守护主循环（单线程串行）：直到 shutdown / 空闲或绝对寿命到期 / 被中断。
@@ -793,8 +804,8 @@ def serve_forever(root: Path, idle_timeout: float = 0.0, ready: Optional[Any] = 
     return 0
 
 
-def query_stats(doc: Optional[Dict[str, Any]] = None,
-                timeout: float = 2.0) -> Optional[Dict[str, Any]]:
+def query_stats(doc: Dict[str, Any] | None = None,
+                timeout: float = 2.0) -> Dict[str, Any] | None:
     """问守护要它的响应缓存/监听状态（**必须在守护进程内取**，见 `_handle_conn` 的 stats op）。"""
     doc = doc or read_state()
     if not doc:
@@ -813,7 +824,7 @@ def query_stats(doc: Optional[Dict[str, Any]] = None,
         return None
 
 
-def ping(doc: Optional[Dict[str, Any]] = None, timeout: float = 2.0) -> bool:
+def ping(doc: Dict[str, Any] | None = None, timeout: float = 2.0) -> bool:
     """守护是否在线（带令牌发一次 `--version`）。"""
     doc = doc or read_state()
     if not doc:
@@ -894,11 +905,13 @@ def stop(timeout: float = 8.0) -> Tuple[bool, str]:
         # 登记在、端口却拒连 = 守护早已不在（登记过期）。这不是「停不下来」，而是「没有守护」：
         # 如实报这一条并清除过期登记，才能让下一次 stop 得到确定的答案。
         clear_state()
-        return False, "没有守护在运行（状态登记已过期：%s:%s 拒连，已清除）" \
-            % (BIND_HOST, doc["port"])
+        return (
+            False,
+            f"没有守护在运行（状态登记已过期：{BIND_HOST}:{doc['port']} 拒连，已清除）",
+        )
     except Exception as exc:                             # noqa: BLE001
         clear_state()
-        return False, "守护未响应（已标记停用）：%s" % exc
+        return False, f"守护未响应（已标记停用）：{exc}"
     deadline = time.time() + timeout
     while time.time() < deadline:
         if not ping(doc, timeout=0.5):
@@ -908,7 +921,7 @@ def stop(timeout: float = 8.0) -> Tuple[bool, str]:
     return False, "守护仍在运行"
 
 
-def main(argv: Optional[List[str]] = None) -> int:
+def main(argv: List[str] | None = None) -> int:
     """`python -m core.daemon --serve --root <repo> [--idle S]`（内部入口）。"""
     import argparse
     ap = argparse.ArgumentParser(prog="core.daemon",

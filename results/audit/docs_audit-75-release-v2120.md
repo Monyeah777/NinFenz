@@ -6,7 +6,7 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - CHANGELOG.md:24e2f6f22cf7ab3c92b5ab6baa31bdd47e280bd7c56031309d8a213c017a39fc
+  - CHANGELOG.md:c33b70610b8e51f9d40a5f3e55f9400944d117bb5fdf9e2d0ee8f71dff81acf7
   - docs/meta/VERSION-MATRIX.md:014144331c6e2715f4d4e441c69055e636d0194a1133d004904423bd23d2077a
   - README.md:cf4c181f48da143e1c59d9fb44e4be8ee6c42dd802d12b6a66dc5116eebe16c7
   - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
@@ -16,6 +16,8 @@ subjects:
   - scripts/nf.py:869bab4dff472c51503c71770c1871cb4dab32a3c3d0977da69ce6a0ea963d9e
 
 ---
+> 重审（2026-11-09）：ASVS closure: 合入最新主干与风格扩面后重绑
+
 > 重审（2026-11-09）：Foundation repair: 重绑发布束重构后的审计对象摘要
 
 > 重审（2026-11-09）：foundation repair: canonical product metadata, dual licensing, and release bundle

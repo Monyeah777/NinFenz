@@ -35,10 +35,9 @@ import hashlib
 import json
 import re
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Tuple
 
-from core import atomic_write, json_doc
-from core import receipts
+from core import atomic_write, json_doc, receipts
 
 SCHEMA = "nf-conformance/1"
 REPORT_REL = "protocol/conformance_report.json"
@@ -284,10 +283,11 @@ def _c_public_surface(root: str) -> Tuple[bool, str]:
                 continue
             try:
                 text = p.read_text(encoding="utf-8")
-            except (OSError, UnicodeDecodeError):  # 尽力而为：跳过不可读/不可解析项；该类缺口由对应门禁另行报出（见 AUD-0016）
+            except (OSError, UnicodeDecodeError):
+                # 尽力而为：不可读项由对应门禁另行报出（见 AUD-0016）。
                 continue
             if _ABS_PATH.search(text):
-                bad.append("%s 含绝对路径" % p.relative_to(r).as_posix())
+                bad.append(f"{p.relative_to(r).as_posix()} 含绝对路径")
     ok = not bad
     return (ok, "公开导出面零泄漏" if ok else "; ".join(bad[:2]))
 
@@ -341,7 +341,7 @@ def _run_impl(root: str = ".") -> Dict[str, Any]:
         try:
             ok, detail = fn(root)
         except Exception as exc:                      # 契约自身异常 = 不通过
-            ok, detail = False, "契约执行异常：%s" % exc
+            ok, detail = False, f"契约执行异常：{exc}"
         payload = json.dumps({"id": cid, "ok": bool(ok), "detail": detail},
                              sort_keys=True, ensure_ascii=False,
                              separators=(",", ":")).encode("utf-8")
@@ -360,7 +360,7 @@ def _run_impl(root: str = ".") -> Dict[str, Any]:
 
 
 def write(root: str = ".", rel: str = REPORT_REL,
-          doc: Optional[Dict[str, Any]] = None) -> str:
+          doc: Dict[str, Any] | None = None) -> str:
     """把实时报告写入盘（`doc` 可由调用方传入，避免为了「写」再跑一遍全量契约）。"""
     doc = run(root) if doc is None else doc
     p = Path(root) / rel
@@ -369,7 +369,7 @@ def write(root: str = ".", rel: str = REPORT_REL,
 
 
 def verify_committed(root: str = ".", rel: str = REPORT_REL,
-                     live: Optional[Dict[str, Any]] = None) -> Tuple[List[str], Dict[str, Any]]:
+                     live: Dict[str, Any] | None = None) -> Tuple[List[str], Dict[str, Any]]:
     """在盘报告 == 实时重算？（防「报告是旧的/被改过」）
 
     效率（实测）：调用方常要先拿到实时报告再比对，于是全套契约（purity / schema_lint /
@@ -378,19 +378,24 @@ def verify_committed(root: str = ".", rel: str = REPORT_REL,
     """
     p = Path(root) / rel
     if not p.is_file():
-        return ["缺一致性报告 %s（修复指引：nf conformance --write）" % rel], {}
+        return [f"缺一致性报告 {rel}（修复指引：nf conformance --write）"], {}
     try:
-        committed = json_doc.load(p, dict, what="一致性报告 %s" % rel)
+        committed = json_doc.load(p, dict, what=f"一致性报告 {rel}")
     except ValueError as exc:
-        return ["报告 JSON 不可解析：%s" % exc], {}
+        return [f"报告 JSON 不可解析：{exc}"], {}
     live = run(root) if live is None else live
     issues: List[str] = []
     if committed.get("root") != live.get("root"):
-        issues.append("报告过期或被改：root 记录=%s 实测=%s（修复指引：nf conformance --write）"
-                      % (str(committed.get("root"))[:16], str(live.get("root"))[:16]))
+        recorded = str(committed.get("root"))[:16]
+        actual = str(live.get("root"))[:16]
+        issues.append(
+            f"报告过期或被改：root 记录={recorded} 实测={actual}"
+            "（修复指引：nf conformance --write）"
+        )
     if committed.get("verdict") != live.get("verdict"):
-        issues.append("verdict 不一致：记录=%s 实测=%s"
-                      % (committed.get("verdict"), live.get("verdict")))
+        issues.append(
+            f"verdict 不一致：记录={committed.get('verdict')} 实测={live.get('verdict')}"
+        )
     stats = {"contracts": live["total"], "passed": live["passed"],
              "verdict": live["verdict"], "root": live["root"]}
     return issues, stats

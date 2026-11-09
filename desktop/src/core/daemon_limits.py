@@ -26,12 +26,12 @@ def check_argv_size(argv) -> None:
     for arg in argv:
         if isinstance(arg, str) and len(arg) > MAX_ARGV_CHARS:
             raise ValueError(
-                "单个参数超过上限 %d 字符（修复指引：正文/长文本先落盘，改传路径）"
-                % MAX_ARGV_CHARS
+                f"单个参数超过上限 {MAX_ARGV_CHARS} 字符"
+                "（修复指引：正文/长文本先落盘，改传路径）"
             )
     total = sum(len(arg) for arg in argv if isinstance(arg, str))
     if total > MAX_ARGV_TOTAL:
         raise ValueError(
-            "参数合计超过上限 %d 字符（修复指引：减少参数，或改传文件路径）"
-            % MAX_ARGV_TOTAL
+            f"参数合计超过上限 {MAX_ARGV_TOTAL} 字符"
+            "（修复指引：减少参数，或改传文件路径）"
         )

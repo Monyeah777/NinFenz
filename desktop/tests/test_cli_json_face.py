@@ -90,7 +90,7 @@ class JsonFaceStaticTest(unittest.TestCase):
     def test_dict_faces_carry_a_discriminant(self):
         bad = sorted({"%s:%d" % (fn, ln) for ln, fn, ok in dict_literal_faces(self.src)
                       if not ok and fn not in STATIC_EXEMPT_FUNCS})
-        self.assertEqual([], bad, "机器面字典缺面判别键（kind/schema）：%s" % bad[:12])
+        self.assertEqual([], bad, f"机器面字典缺面判别键（kind/schema）：{bad[:12]}")
 
 
 _CACHE: dict = {}
@@ -142,18 +142,18 @@ class JsonFaceDynamicTest(unittest.TestCase):
         missing = []
         for path, data in sorted(runs.items()):
             if data is None:
-                missing.append("%s（stdout 非 JSON）" % path)
+                missing.append(f"{path}（stdout 非 JSON）")
                 continue
             top = path.split()[0]
             if top in EXEMPT:
                 keys = set(data) if isinstance(data, dict) else set()
                 if not (keys & EXEMPT[top]):
-                    missing.append("%s（豁免面缺自证键）" % path)
+                    missing.append(f"{path}（豁免面缺自证键）")
                 continue
             if not isinstance(data, dict) or not ({"kind", "schema"} & set(data)):
-                missing.append("%s（%s）" % (path, type(data).__name__))
+                missing.append(f"{path}（{type(data).__name__}）")
         self.assertGreater(len(runs), 8, "分片内可跑面不足（%d）——判据形同虚设" % len(runs))
-        self.assertEqual([], missing, "缺少面判别键的 --json 面：%s" % missing)
+        self.assertEqual([], missing, f"缺少面判别键的 --json 面：{missing}")
         if index == 0:
             # 豁免面集合与实测一致（全量口径）：用面清单（便宜）判，不再为它跑全量探针。
             tops = {r["path"].split()[0] for r in _face_rows()}
@@ -320,7 +320,7 @@ class JsonFaceCanonicalArgsTest(unittest.TestCase):
                 bad.append("%s（rc=%d，stdout 非 JSON）" % (name, p.returncode))
                 continue
             if not isinstance(data, dict):
-                bad.append("%s（顶层非对象）" % name)
+                bad.append(f"{name}（顶层非对象）")
                 continue
             # 本判据管「**成功时**自带类型」（见模块头）。rc≠0 有两种合规形态：面判据**部分
             # 命中**仍回面载荷（如 audit check 已带 kind 但发现失效）→ 判别键照收；否则须是
@@ -332,7 +332,7 @@ class JsonFaceCanonicalArgsTest(unittest.TestCase):
             bad.append("%s（rc=%d，%s）" % (
                 name, p.returncode,
                 "缺面判别键" if p.returncode == 0 else "既非面载荷也非失败信封"))
-        self.assertEqual([], bad, "需参面缺面判别键：%s" % bad)
+        self.assertEqual([], bad, f"需参面缺面判别键：{bad}")
 
     def test_every_json_face_has_a_destination(self):
         """覆盖点名：每张声明 --json 的面要么无参可跑、要么在 CANON、要么在 SKIP 有理由。
@@ -345,10 +345,10 @@ class JsonFaceCanonicalArgsTest(unittest.TestCase):
         faces = {r["path"] for r in rows}
         known = set(CANON) | set(SKIP)
         orph = sorted(faces - (set(runs) | known))
-        self.assertEqual([], orph, "既不在 CANON 也不在 SKIP 的 --json 面（无处安放）：%s" % orph)
+        self.assertEqual([], orph, f"既不在 CANON 也不在 SKIP 的 --json 面（无处安放）：{orph}")
         self.assertTrue(SKIP, "跳过面必须逐条写理由（防悄悄不跑）")
         stale = sorted(known - faces)
-        self.assertEqual([], stale, "CANON/SKIP 里列了不存在（或已改名）的面：%s" % stale)
+        self.assertEqual([], stale, f"CANON/SKIP 里列了不存在（或已改名）的面：{stale}")
 
     # ── 分片版（2026-10-19）：把同一条判据按面切成 4 份，让分片器能并行它 ──
     # 判据本身不变：仍是「每张面要么无参可跑、要么被 CANON/SKIP 点名」，只是不再由一条
@@ -366,12 +366,12 @@ class JsonFaceCanonicalArgsTest(unittest.TestCase):
         runs = _probe_faces(index, total)[1]
         orph = sorted(p for p in paths if p not in (set(runs) | known))
         self.assertEqual([], orph,
-                         "既不在 CANON 也不在 SKIP 的 --json 面（无处安放）：%s" % orph)
+                         f"既不在 CANON 也不在 SKIP 的 --json 面（无处安放）：{orph}")
         if index == 0:
             all_faces = {r["path"] for r in rows}
             self.assertTrue(SKIP, "跳过面必须逐条写理由（防悄悄不跑）")
             stale = sorted(known - all_faces)
-            self.assertEqual([], stale, "CANON/SKIP 里列了不存在（或已改名）的面：%s" % stale)
+            self.assertEqual([], stale, f"CANON/SKIP 里列了不存在（或已改名）的面：{stale}")
 
     def test_every_json_face_has_a_destination_chunk0(self):
         self._assert_face_slice(0)
@@ -402,13 +402,13 @@ class JsonFaceCanonicalArgsTest(unittest.TestCase):
                 continue
             p = tests_dir / m.group(1)
             if not p.is_file():
-                bad.append("%s → 覆盖件不存在：%s" % (face, m.group(1)))
+                bad.append(f"{face} → 覆盖件不存在：{m.group(1)}")
                 continue
             text = p.read_text(encoding="utf-8", errors="replace")
             token = face.split()[-1] if " " in face else face      # 如 library deprecate → deprecate
             if token not in text:
-                bad.append("%s → %s 里没有 `%s`" % (face, m.group(1), token))
-        self.assertEqual([], bad, "SKIP 理由里的覆盖声明与证据不符：%s" % bad)
+                bad.append(f"{face} → {m.group(1)} 里没有 `{token}`")
+        self.assertEqual([], bad, f"SKIP 理由里的覆盖声明与证据不符：{bad}")
 
 
 #: 本机绝对路径形状（隐私 + 换机不可解释）。口径同 `_no_machine_paths` / `_c_public_surface`
@@ -441,11 +441,9 @@ class JsonFaceNoMachinePathTest(unittest.TestCase):
             for pat in pats:
                 m = pat.search(out)
                 if m:
-                    bad.append("%s → …%s…"
-                               % (name, out[max(0, m.start() - 20):m.end() + 20]
+                    bad.append("{} → …{}…".format(name, out[max(0, m.start() - 20):m.end() + 20]
                                   .replace("\n", " ")))
-        self.assertEqual([], bad, "机器面回吐本机绝对路径（改走仓库相对 / `_portable_path`）：%s"
-                         % bad[:6])
+        self.assertEqual([], bad, f"机器面回吐本机绝对路径（改走仓库相对 / `_portable_path`）：{bad[:6]}")
 
 
 if __name__ == "__main__":

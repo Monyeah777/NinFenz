@@ -85,6 +85,16 @@
       "max_fn_cc": 6,
       "max_fn_lines": 15
     },
+    "desktop/src/core/asvs_policy.py": {
+      "lines": 148,
+      "max_fn_cc": 19,
+      "max_fn_lines": 48
+    },
+    "desktop/src/core/asvs_residual.py": {
+      "lines": 83,
+      "max_fn_cc": 9,
+      "max_fn_lines": 45
+    },
     "desktop/src/core/atomic_write.py": {
       "lines": 283,
       "max_fn_cc": 8,
@@ -226,9 +236,9 @@
       "max_fn_lines": 43
     },
     "desktop/src/core/conformance_report.py": {
-      "lines": 396,
+      "lines": 401,
       "max_fn_cc": 8,
-      "max_fn_lines": 26
+      "max_fn_lines": 31
     },
     "desktop/src/core/conformance_run.py": {
       "lines": 29,
@@ -265,10 +275,25 @@
       "max_fn_cc": 15,
       "max_fn_lines": 37
     },
+    "desktop/src/core/crypto_policy.py": {
+      "lines": 125,
+      "max_fn_cc": 4,
+      "max_fn_lines": 15
+    },
     "desktop/src/core/daemon.py": {
-      "lines": 944,
-      "max_fn_cc": 16,
-      "max_fn_lines": 70
+      "lines": 951,
+      "max_fn_cc": 14,
+      "max_fn_lines": 65
+    },
+    "desktop/src/core/daemon_limits.py": {
+      "lines": 37,
+      "max_fn_cc": 6,
+      "max_fn_lines": 16
+    },
+    "desktop/src/core/daemon_runtime.py": {
+      "lines": 44,
+      "max_fn_cc": 3,
+      "max_fn_lines": 16
     },
     "desktop/src/core/daemon_shell.py": {
       "lines": 58,
@@ -434,6 +459,11 @@
       "lines": 26,
       "max_fn_cc": 8,
       "max_fn_lines": 15
+    },
+    "desktop/src/core/file_format.py": {
+      "lines": 173,
+      "max_fn_cc": 6,
+      "max_fn_lines": 23
     },
     "desktop/src/core/gap_review.py": {
       "lines": 260,
@@ -606,7 +636,7 @@
       "max_fn_lines": 33
     },
     "desktop/src/core/interop_export.py": {
-      "lines": 1106,
+      "lines": 1104,
       "max_fn_cc": 23,
       "max_fn_lines": 96
     },
@@ -646,9 +676,9 @@
       "max_fn_lines": 32
     },
     "desktop/src/core/judgement_coverage.py": {
-      "lines": 116,
+      "lines": 120,
       "max_fn_cc": 11,
-      "max_fn_lines": 34
+      "max_fn_lines": 36
     },
     "desktop/src/core/key_naming.py": {
       "lines": 98,
@@ -951,9 +981,14 @@
       "max_fn_lines": 13
     },
     "desktop/src/core/plog.py": {
-      "lines": 28,
+      "lines": 29,
       "max_fn_cc": 2,
       "max_fn_lines": 11
+    },
+    "desktop/src/core/plog_security.py": {
+      "lines": 31,
+      "max_fn_cc": 1,
+      "max_fn_lines": 8
     },
     "desktop/src/core/plugin_gate.py": {
       "lines": 105,
@@ -984,6 +1019,11 @@
       "lines": 107,
       "max_fn_cc": 7,
       "max_fn_lines": 29
+    },
+    "desktop/src/core/product_metadata.py": {
+      "lines": 558,
+      "max_fn_cc": 20,
+      "max_fn_lines": 111
     },
     "desktop/src/core/prose_lint.py": {
       "lines": 234,
@@ -1081,7 +1121,7 @@
       "max_fn_lines": 33
     },
     "desktop/src/core/repo_index.py": {
-      "lines": 538,
+      "lines": 537,
       "max_fn_cc": 17,
       "max_fn_lines": 39
     },
@@ -1156,9 +1196,9 @@
       "max_fn_lines": 12
     },
     "desktop/src/core/rules_render.py": {
-      "lines": 92,
+      "lines": 91,
       "max_fn_cc": 6,
-      "max_fn_lines": 15
+      "max_fn_lines": 14
     },
     "desktop/src/core/rust_engine.py": {
       "lines": 381,
@@ -1184,6 +1224,21 @@
       "lines": 231,
       "max_fn_cc": 9,
       "max_fn_lines": 37
+    },
+    "desktop/src/core/security_audit.py": {
+      "lines": 249,
+      "max_fn_cc": 11,
+      "max_fn_lines": 37
+    },
+    "desktop/src/core/security_controls.py": {
+      "lines": 291,
+      "max_fn_cc": 15,
+      "max_fn_lines": 39
+    },
+    "desktop/src/core/security_controls_sections.py": {
+      "lines": 66,
+      "max_fn_cc": 11,
+      "max_fn_lines": 22
     },
     "desktop/src/core/semantic_conflict.py": {
       "lines": 118,
@@ -1218,7 +1273,7 @@
     "desktop/src/core/skill_adapter.py": {
       "lines": 82,
       "max_fn_cc": 8,
-      "max_fn_lines": 31
+      "max_fn_lines": 30
     },
     "desktop/src/core/skill_contract.py": {
       "lines": 21,
@@ -1341,9 +1396,14 @@
       "max_fn_lines": 43
     },
     "desktop/src/core/verify_report.py": {
-      "lines": 293,
+      "lines": 294,
       "max_fn_cc": 10,
       "max_fn_lines": 41
+    },
+    "desktop/src/core/vex.py": {
+      "lines": 461,
+      "max_fn_cc": 24,
+      "max_fn_lines": 43
     },
     "desktop/src/core/watch.py": {
       "lines": 348,
@@ -1409,6 +1469,11 @@
       "lines": 134,
       "max_fn_cc": 8,
       "max_fn_lines": 26
+    },
+    "scripts/build_vsa.py": {
+      "lines": 169,
+      "max_fn_cc": 19,
+      "max_fn_lines": 53
     },
     "scripts/capabilities.py": {
       "lines": 43,
@@ -1505,6 +1570,16 @@
       "max_fn_cc": 11,
       "max_fn_lines": 63
     },
+    "scripts/generate_asvs_matrix.py": {
+      "lines": 495,
+      "max_fn_cc": 12,
+      "max_fn_lines": 75
+    },
+    "scripts/generate_vex.py": {
+      "lines": 122,
+      "max_fn_cc": 11,
+      "max_fn_lines": 52
+    },
     "scripts/geo_export.py": {
       "lines": 227,
       "max_fn_cc": 25,
@@ -1585,6 +1660,11 @@
       "max_fn_cc": 2,
       "max_fn_lines": 12
     },
+    "scripts/product_metadata.py": {
+      "lines": 52,
+      "max_fn_cc": 8,
+      "max_fn_lines": 30
+    },
     "scripts/pull_decision_model.py": {
       "lines": 165,
       "max_fn_cc": 24,
@@ -1620,6 +1700,11 @@
       "max_fn_cc": 19,
       "max_fn_lines": 29
     },
+    "scripts/slsa_l3_readiness.py": {
+      "lines": 82,
+      "max_fn_cc": 15,
+      "max_fn_lines": 35
+    },
     "scripts/standards_map.py": {
       "lines": 197,
       "max_fn_cc": 13,
@@ -1630,10 +1715,25 @@
       "max_fn_cc": 19,
       "max_fn_lines": 36
     },
+    "scripts/supply_chain_policy.py": {
+      "lines": 393,
+      "max_fn_cc": 21,
+      "max_fn_lines": 54
+    },
     "scripts/sync_llms.py": {
       "lines": 59,
       "max_fn_cc": 5,
       "max_fn_lines": 29
+    },
+    "scripts/validate_cyclonedx_vex.py": {
+      "lines": 54,
+      "max_fn_cc": 5,
+      "max_fn_lines": 17
+    },
+    "scripts/validate_sboms.py": {
+      "lines": 185,
+      "max_fn_cc": 16,
+      "max_fn_lines": 35
     },
     "scripts/verify_cache.py": {
       "lines": 156,

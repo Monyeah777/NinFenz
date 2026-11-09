@@ -49,10 +49,12 @@ def consumers_of(name: str, root: str = ".") -> List[str]:
     """
     r = Path(root)
     out: List[str] = []
-    call_re = re.compile(r"\b%s\s*\.\s*\w+\s*\(" % re.escape(name))
-    import_re = re.compile(r"from\s+core(?:\.%s)?\s+import\b[^\n]*\b%s\b"
-                           % (re.escape(name), re.escape(name)))
-    quoted_re = re.compile(r"[\"']%s[\"']" % re.escape(name))
+    escaped = re.escape(name)
+    call_re = re.compile(rf"\b{escaped}\s*\.\s*\w+\s*\(")
+    import_re = re.compile(
+        rf"from\s+core(?:\.{escaped})?\s+import\b[^\n]*\b{escaped}\b"
+    )
+    quoted_re = re.compile(rf"[\"']{escaped}[\"']")
     registry_files = ("desktop/src/core/verify_report.py",
                       "desktop/src/core/quality_depth_scan.py")
     for rel in CONSUMERS:
@@ -70,22 +72,23 @@ def consumers_of(name: str, root: str = ".") -> List[str]:
             continue
         text = p.read_text(encoding="utf-8", errors="replace")
         if call_re.search(text) or import_re.search(text):
-            out.append("%s/%s" % (CORE_DIR, p.name))
+            out.append(f"{CORE_DIR}/{p.name}")
     return sorted(set(out))
 
 
 def declaration(root: str = ".") -> Tuple[Dict[str, Any], List[str]]:
     p = Path(root) / DECL_REL
     if not p.is_file():
-        return {}, ["缺判据例外声明 %s（修复指引：新建并在 exceptions 写明未接线判据与理由）"
-                    % DECL_REL]
+        return {}, [
+            f"缺判据例外声明 {DECL_REL}"
+            "（修复指引：新建并在 exceptions 写明未接线判据与理由）"
+        ]
     try:
         doc = json_doc.load(p, dict, what=DECL_REL)
     except ValueError as exc:
-        return {}, ["%s 不是合法 JSON：%s（修复指引：修好 JSON 语法）" % (DECL_REL, exc)]
+        return {}, [f"{DECL_REL} 不是合法 JSON：{exc}（修复指引：修好 JSON 语法）"]
     if doc.get("schema") != SCHEMA:
-        return {}, ["%s schema 不匹配（期望 %s）（修复指引：改为声明件当前形态）"
-                    % (DECL_REL, SCHEMA)]
+        return {}, [f"{DECL_REL} schema 不匹配（期望 {SCHEMA}）（修复指引：改为声明件当前形态）"]
     return doc, []
 
 
@@ -103,14 +106,15 @@ def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
         if not who:
             orphans.append(name)
             if name not in exc:
-                issues.append("判据未接线：core/%s.py 暴露 scan() 却没有任何消费者（修复指引："
+                issues.append(f"判据未接线：core/{name}.py 暴露 scan() 却没有任何消费者（修复指引："
                               "接进 verify.sh / nf.py / verify_report 判据表 / 其它 core 模块，"
-                              "或删除该死判据；确属设计用途须在 %s 的 exceptions 写明理由）"
-                              % (name, DECL_REL))
+                              "或删除该死判据；确属设计用途须在 "
+                              f"{DECL_REL} 的 exceptions 写明理由）")
         elif name in exc:
-            warns.append("例外已失效：core/%s.py 已被消费（%s）（修复指引：从 %s 的 exceptions 移除"
-                "）"
-                         % (name, who[0], DECL_REL))
+            warns.append(
+                f"例外已失效：core/{name}.py 已被消费（{who[0]}）"
+                f"（修复指引：从 {DECL_REL} 的 exceptions 移除）"
+            )
     stats = {"scanners": len(cands), "consumed": len(cands) - len(orphans),
              "exceptions": len(exc), "orphans": len(orphans)}
     return issues, warns, stats
