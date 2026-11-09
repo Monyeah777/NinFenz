@@ -29,6 +29,8 @@ concurrency:
 permissions:
   actions: read
   contents: read
+  security-events: read      # 安全面快照：code-scanning（secret-scanning/dependabot
+                             # 的专用权限键在 GITHUB_TOKEN 上不被支持 → 快照打印 NA）
 
 jobs:
   scheduled-red-audit:
@@ -136,3 +138,33 @@ jobs:
                     f"(event={r.get('event')}) {r.get('html_url')}")
           raise SystemExit(1)
           PY
+      - name: 安全面快照（信息性，不判红）
+        # 2026-11-09：把 code-scanning / secret-scanning / dependabot 的 open 计数带进 CI 日志。
+        # 只读 + continue-on-error，不改变门禁结论；端点因 token 权限不可用时打印 NA，不判红。
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          python - <<'PY'
+          import json, os, urllib.request
+          repo = os.environ["REPO"]
+          endpoints = (
+              ("code-scanning", "code-scanning/alerts?state=open&per_page=100"),
+              ("secret-scanning", "secret-scanning/alerts?state=open&per_page=100"),
+              ("dependabot", "dependabot/alerts?state=open&per_page=100"),
+          )
+          for name, path in endpoints:
+              url = "https://api.github.com/repos/%s/%s" % (repo, path)
+              req = urllib.request.Request(url, headers={
+                  "Accept": "application/vnd.github+json",
+                  "Authorization": "Bearer " + os.environ["GH_TOKEN"],
+                  "User-Agent": "nf-ci-health"})
+              try:
+                  with urllib.request.urlopen(req, timeout=30) as resp:
+                      rows = json.load(resp)
+                  print("%s open alerts: %d" % (name, len(rows)))
+              except Exception as exc:      # 权限/端点不可用 → NA（不干扰门禁）
+                  print("%s open alerts: NA (%s)" % (name, type(exc).__name__))
+          PY
+
