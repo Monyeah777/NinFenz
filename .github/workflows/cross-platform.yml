@@ -71,7 +71,10 @@ jobs:
           set -o pipefail
           python -m pip install --require-hashes -r .github/requirements-sast.txt \
             -r .github/requirements-lint.txt
-          python scripts/sast_check.py 2>&1 | tee sast-windows.log
+          # 日志放 .nf-logs/（NF_VERIFY_TMP 面）：写仓库根会被 check33 编码卫生判 CRLF
+          # （Windows tee 产生 CRLF；实测 dispatch 红）。
+          mkdir -p .nf-logs
+          python scripts/sast_check.py 2>&1 | tee .nf-logs/sast-windows.log
       - name: 冷启动前置（干净 clone 缺的 4 项；缺任一项全量门禁必红）
         shell: bash
         run: |
@@ -99,7 +102,6 @@ jobs:
           name: verify-log-${{ matrix.os }}
           path: |
             verify.log
-            sast-windows.log
             .nf-logs/
           if-no-files-found: warn
           include-hidden-files: true
