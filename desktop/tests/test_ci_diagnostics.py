@@ -154,5 +154,29 @@ class CiHealthAuditSourceTest(unittest.TestCase):
                       "ci-health schedule 步未跳过 in-flight 运行")
 
 
+class TeePipefailTest(unittest.TestCase):
+    """`... | tee ...` 的退出码不得被吞（2026-11-09 实测 #251：sast job 绿但日志满屏 ✗）。
+
+    为什么用源码断言：GitHub 默认 shell 是 `bash -e`（**无** pipefail），步骤里
+    `python scripts/sast_check.py 2>&1 | tee sast.log` 的退出码来自 tee ⇒ 门禁假绿。
+    修法是给该步骤 `shell: bash`（GitHub 的 bash 默认 `-eo pipefail`）或显式 `set -o pipefail`。
+    """
+
+    def test_all_tee_steps_have_pipefail(self):
+        import re
+        bad = []
+        for p in sorted(WF.glob("*.yml")):
+            text = p.read_text(encoding="utf-8")
+            for block in re.split(r"(?m)^ {6}- ", text):
+                if "| tee" not in block:
+                    continue
+                if "shell: bash" not in block and "set -o pipefail" not in block:
+                    bad.append(p.name)
+                    break
+        self.assertEqual(
+            [], bad,
+            f"含 | tee 的步骤未启用 pipefail（退出码会被 tee 吞）：{bad}")
+
+
 if __name__ == "__main__":
     unittest.main()

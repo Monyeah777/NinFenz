@@ -35,6 +35,7 @@ jobs:
       - name: 发布前体检（verify + 基线自描述一致；日志落盘供失败诊断）
         env:
           NF_VERIFY_TMP: .nf-logs
+        shell: bash
         run: |
           set -o pipefail
           python3 scripts/nf.py release 2>&1 | tee release-gate.log

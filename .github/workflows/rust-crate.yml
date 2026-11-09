@@ -64,6 +64,7 @@ jobs:
         # 依赖已从 0.22 升到 0.29（修 dependabot high OOB / Sync bound 告警），必须让 CI
         # 真正编译一次，否则「升级」只停在 Cargo.toml。python3-dev 提供 pyo3 构建所需头。
         if: runner.os == 'Linux'
+        shell: bash
         run: |
           sudo apt-get -o Acquire::Retries=3 update
           sudo apt-get -o Acquire::Retries=3 install -y python3-dev

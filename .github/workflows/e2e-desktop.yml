@@ -30,6 +30,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: 桌面端到端 headless 冒烟断言（T3-1 缺口⑩闭环）
+        shell: bash
         run: |
           set -o pipefail
           python3 scripts/e2e_desktop_headless.py 2>&1 | tee e2e-desktop.log
