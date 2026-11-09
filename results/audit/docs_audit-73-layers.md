@@ -14,7 +14,7 @@ subjects:
   - scripts/nf.py:83a75a4fac82461d56b03147eff04b420b8aad0ed6db9fef6e695717dcf7b6a2
   - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
   - docs/layers.md:be79f2699cee390f03d54d6d0428daee6964674dcbb5d0e6967bfbb150395450
-  - docs/L3_FROZEN.md:b5bfec44853aa88b4816e47b83fdf1b9f793a7d2170e3ba555d6ca760593fe50
+  - docs/L3_FROZEN.md:c025e4dfcaec8b956ebd54313163e7e01c7bafaeb910478d9feab7fc98014ebc
   - protocol/assertions.json:5a0bb383eabf678a9f660ae6d771f0be51cce5397a40a73f0d0d93457e4f1cba
   - protocol/data_contracts.json:6ca6174c77d41ad354b90e637c404bedfbe5d8ad0ce6400bb26f2ac7e5f19eb0
   - protocol/normative.json:c1bbc14c92cea6bd66ff6cb54fdcf91bf3072f66adee7027f1d3f42e70fe1825
@@ -23,6 +23,8 @@ subjects:
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
 
 ---
+> 重审（2026-11-09）：L3 actions 版本
+
 > 重审（2026-11-09）：恢复 CodeQL 扫描
 
 > 重审（2026-11-08）：L3 记录分支保护事实

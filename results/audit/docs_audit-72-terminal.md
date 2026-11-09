@@ -15,10 +15,12 @@ subjects:
   - desktop/src/core/quality_baseline.py:7c1f06bc581a2400b1248df63e07a98dfffba2b92ca8070a71082abcc317d1e4
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - docs/terminal.md:b08d721ed527baa92d4cdf56f73aa4972c1314159c3213ed38a95911c2b7f71b
-  - docs/L3_FROZEN.md:b5bfec44853aa88b4816e47b83fdf1b9f793a7d2170e3ba555d6ca760593fe50
+  - docs/L3_FROZEN.md:c025e4dfcaec8b956ebd54313163e7e01c7bafaeb910478d9feab7fc98014ebc
   - protocol/CONFORMANCE.md:006b56748b6daaf2419be40a65247d90efd6291e87ccd61c6527ed1526b6b4e4
 
 ---
+> 重审（2026-11-09）：L3 actions 版本
+
 > 重审（2026-11-09）：恢复 CodeQL 扫描
 
 > 重审（2026-11-09）：session-persist 预算 Windows 放宽

@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-11-09",
   "approved_by": "Monyeah777",
-  "note": "sast-counts 文件名",
+  "note": "L3 记录 actions 版本",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "ae6d2de6f37f027a4b04140e768c41b838a8fce0744cb9c1e6ba6d7af6831619"
