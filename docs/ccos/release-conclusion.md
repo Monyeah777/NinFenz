@@ -128,7 +128,7 @@ python scripts/verify_tests.py --affected           # 跑受影响模块
 
 ```bash
 # 纯函数判据（脏树闸门 / 分片汇总 / 计划生成）+ dry-run 集成
-python -m unittest desktop.tests.test_release_conclusion    # 64 项全绿
+python -m unittest desktop.tests.test_release_conclusion    # 65 项全绿
 
 # 真跑（干净树上）：checks-only + 8 片顺序跑（墙钟随机器变，不在此钉数字）
 python scripts/release_conclusion.py

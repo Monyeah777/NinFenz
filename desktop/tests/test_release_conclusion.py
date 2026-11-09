@@ -551,7 +551,8 @@ class TestSnapshotIsolationPaths(unittest.TestCase):
         root = Path(__file__).resolve().parents[2]
         sys.path.insert(0, str(root / "scripts"))
         sys.path.insert(0, str(root / "desktop" / "src"))
-        spec = importlib.util.spec_from_file_location("rc_mod", root / "scripts" / "release_conclusion.py")
+        script = root / "scripts" / "release_conclusion.py"
+        spec = importlib.util.spec_from_file_location("rc_mod", script)
         rc = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(rc)
         import verifier_status as vs
