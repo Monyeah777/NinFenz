@@ -82,3 +82,16 @@ CLI 上的幽灵证人一直能过；把 `session.step(root=)` 接上后才真�
 - 判据变异探针：`scripts/judge_mutation_probe.py`
 - 负向用例覆盖：`scripts/gate_probe.py`
 - 红证据登记：`scripts/judge_red_evidence.py`
+
+## 怎么查这些数（都可复现）
+
+```bash
+python scripts/judge_red_evidence.py            # 红证据三档计数（硬/疑似/无）
+python scripts/capability_inventory.py          # 每个脚本的旗标与子命令（静态 AST）
+python scripts/core_judge_map.py                # core 模块被测试按名提到的比例
+python scripts/judge_mutation_probe.py          # 变异体杀死率 / 合法变体误报率
+python scripts/gate_probe.py                    # 哪些闸门缺拒绝型用例
+python -m unittest desktop.tests.test_ledger_tables   # 台账表内自洽
+```
+
+每个脚本都有 `--check`（与已提交结果比对）与 `--write`（重算落盘）；`--check` 为红即说明结果件陈旧。
