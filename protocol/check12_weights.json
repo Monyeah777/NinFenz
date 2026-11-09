@@ -224,7 +224,7 @@
     "test_mcp_write_freedom": 3.3,
     "test_md_tables": 0.2,
     "test_meta_cockpit": 2.2,
-    "test_method_pack": 1.2,
+    "test_method_pack": 1.3,
     "test_missing_sentinel": 0.2,
     "test_modeling": 0.6,
     "test_module_lifecycle": 0.2,
@@ -2868,8 +2868,8 @@
     "test_mcp_write_freedom.McpToolsDoNotTouchTheRepoTest.test_write_interceptor_has_teeth": 0.0,
     "test_md_tables.MarkdownTableTest.test_mutation_is_caught": 0.0,
     "test_md_tables.MarkdownTableTest.test_repo_tables_are_consistent": 0.03,
-    "test_method_pack.CliTest.test_packs_list": 0.42,
-    "test_method_pack.CliTest.test_plan_with_pack_out_file": 0.41,
+    "test_method_pack.CliTest.test_packs_list": 0.43,
+    "test_method_pack.CliTest.test_plan_with_pack_out_file": 0.43,
     "test_method_pack.ComposeTest.test_compose_keeps_kind_order_stable": 0.0,
     "test_method_pack.ComposeTest.test_compose_requires_packs": 0.0,
     "test_method_pack.ComposeTest.test_compose_unions_and_dedupes": 0.0,
@@ -2879,12 +2879,13 @@
     "test_method_pack.PackContentTest.test_checklist_projection_covers_all_moves": 0.01,
     "test_method_pack.PackContentTest.test_checklist_rejects_broken_pack": 0.0,
     "test_method_pack.PackContentTest.test_claim_kinds_come_from_single_vocabulary": 0.01,
-    "test_method_pack.PackContentTest.test_criteria_refs_exist_in_registry": 0.01,
+    "test_method_pack.PackContentTest.test_criteria_refs_exist_in_registry": 0.02,
     "test_method_pack.PackContentTest.test_doc_counts_match_packs": 0.01,
+    "test_method_pack.PackContentTest.test_doc_entry_column_matches_pack_runnable": 0.01,
     "test_method_pack.PackContentTest.test_entry_commands_exist": 0.0,
     "test_method_pack.PackContentTest.test_evaluation_design_pack_has_pre_registration_and_controls": 0.0,
     "test_method_pack.PackContentTest.test_every_pack_declares_a_runnable_entry": 0.01,
-    "test_method_pack.PackContentTest.test_every_pack_move_has_code_anchor_or_declared_conceptual": 0.02,
+    "test_method_pack.PackContentTest.test_every_pack_move_has_code_anchor_or_declared_conceptual": 0.03,
     "test_method_pack.PackContentTest.test_evidence_audit_pack_contains_claim_card": 0.0,
     "test_method_pack.PackContentTest.test_examples_cite_existing_files": 0.01,
     "test_method_pack.PackContentTest.test_maps_to_uses_known_actions": 0.01,
@@ -4593,5 +4594,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1872.1
+  "total_s": 1872.2
 }

@@ -327,6 +327,36 @@ class PackContentTest(unittest.TestCase):
         self.assertIn("runnable", doc)
         self.assertTrue(doc["runnable"], "清单没带可跑入口")
 
+    def test_doc_entry_column_matches_pack_runnable(self):
+        """文档入口列必须与包的 `runnable` 一致（第 145 轮：消灭第二真源）。
+
+        第 137 轮把入口写进文档表格，第 144 轮又写进包 JSON——两处若各自维护必然漂。
+        本判据要求：文档表格里该域那一行的入口列，必须提到该包 `runnable` 的第一条命令。
+        """
+        doc = (ROOT / "docs" / "ccos" / "method-packs-v0.md").read_text(encoding="utf-8")
+        rows = {}
+        for line in doc.splitlines():
+            if not line.startswith("| `"):
+                continue
+            cells = [c.strip() for c in line.strip("|").split("|")]
+            rows[cells[0].strip("`")] = cells[-1]
+        bad = []
+        for pid in PACK_IDS:
+            pack = method_pack.load_pack(str(ROOT), pid)
+            runnable = [str(x) for x in (pack.get("runnable") or [])]
+            if not runnable:
+                bad.append(pid + " → 包没有 runnable")
+                continue
+            cell = rows.get(pid)
+            if cell is None:
+                bad.append(pid + " → 文档表格缺该域行")
+                continue
+            first = runnable[0].split()
+            needle = " ".join(first[:2])
+            if needle not in cell:
+                bad.append(pid + " → 文档写「" + cell[:24] + "」未含「" + needle + "」")
+        self.assertEqual([], bad, "文档入口列与包 runnable 不一致：" + "; ".join(bad))
+
     def test_entry_commands_exist(self):
         """文档「可跑入口」列里的命令必须真实存在（第 137 轮）。
 
