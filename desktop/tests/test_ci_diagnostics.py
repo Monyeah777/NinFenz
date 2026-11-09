@@ -243,5 +243,27 @@ class HiddenArtifactPathTest(unittest.TestCase):
             f"artifact path 指向隐藏文件（会被 upload-artifact 静默丢弃）：{bad}")
 
 
+class CodeqlWorkflowTest(unittest.TestCase):
+    """codeql.yml 的触发面守卫（2026-11-09 #236/#238）。
+
+    恢复 CodeQL 的目的是「新代码被扫」，但两个结构性点容易在改 workflow 时被削掉：
+    ① pull_request 必须有 paths 过滤（否则每个 dependabot PR 都烧两个分析，实测队列 4+）；
+    ② 必须有 push main + 周 schedule（否则只有 PR 面，main 的合并后代码没人扫）。
+    """
+
+    def setUp(self):
+        self.text = (WF / "codeql.yml").read_text(encoding="utf-8")
+
+    def test_pr_trigger_is_path_filtered(self):
+        self.assertIn("pull_request:", self.text, "codeql 缺 PR 触发")
+        self.assertIn("paths:", self.text, "codeql PR 触发缺 paths 过滤")
+        self.assertIn("desktop/**", self.text, "codeql PR 过滤未覆盖 desktop/**")
+
+    def test_main_push_and_weekly_schedule_exist(self):
+        self.assertIn("branches: [main]", self.text, "codeql 缺 push main 触发")
+        self.assertIn("schedule:", self.text, "codeql 缺周 schedule（合并后代码无人扫）")
+        self.assertIn("cron:", self.text, "codeql schedule 缺 cron 表达式")
+
+
 if __name__ == "__main__":
     unittest.main()
