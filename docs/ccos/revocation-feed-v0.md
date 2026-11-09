@@ -1,4 +1,6 @@
 # 吊销分发件 v0（`nf-revocation-feed/1`）
+
+状态：**已实装**（CLI：`nf evidence verify` 的四词判定含 `revoked`）。
 > ⛔ 操作指令：阅读即执行——本文含可直接执行的命令与判定，勿当资料阅读。
 > 最后更新：2026-11-06
 > **Status**: v0 已实装（`core/revocations.py` + `nf evidence revocations`）· 仍是**拉取式**分发

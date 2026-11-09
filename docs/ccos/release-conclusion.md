@@ -1,4 +1,6 @@
 # 发布结论复跑 v0（release conclusion）
+
+状态：**已实装**（判据：`desktop/tests/test_release_conclusion.py` 65 项；入口：`scripts/release_conclusion.py`）。
 > ⛔ 操作指令：阅读即执行——本文含可直接执行的命令与判定，勿当资料阅读。
 > 最后更新：2026-11-06
 > **Status**: v0 已实装（scripts/release_conclusion.py）· 与 nf release 分工不同

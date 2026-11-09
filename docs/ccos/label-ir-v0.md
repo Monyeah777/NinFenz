@@ -1,4 +1,6 @@
 # 标注 IR v0（`cc_label` 的声明层）
+
+状态：**已实装**（CLI：`nf label`；判据见 `desktop/tests/test_label_ir.py`）。
 > ⛔ 操作指令：阅读即执行——本文含可直接执行的命令与判定，勿当资料阅读。
 > 最后更新：2026-11-05
 > **Status**: v0 已实装**声明层**（`core/label_ir.py` + `nf label ir|validate`）+ **载体层

@@ -1,4 +1,6 @@
 # 单对象策略体检 v0（check policy）
+
+状态：**已实装**（判据：`desktop/tests/test_check_policy.py` 19 项；CLI：`nf check --policy`）。
 > ⛔ 操作指令：阅读即执行——本文含可直接执行的命令与判定，勿当资料阅读。
 > 最后更新：2026-11-04
 > **Status**: v0 已实装（nf check）· **上位**: docs/ccos/abi-v0.md §2 cc_check
