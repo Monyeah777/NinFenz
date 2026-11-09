@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 442,
-    "verify": 1038
+    "verify": 1039
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8843,6 +8843,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "包的可跑入口必须真能跑（第 160 轮）：把「声明」推进到「可执行验证」。",
+      "path": "desktop/tests/test_pack_runnable_runs.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "包管理器核心解析面（core/package_index.py）回归测试 —— 按品类取件 / 解析 / 检索。",
       "path": "desktop/tests/test_package_index.py",
       "role": "verify",
@@ -12612,7 +12618,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "e3f9e8b8459637425b20e4e84cf3621b3f44b5367895b732815250327de24d0b",
+  "root_digest": "1c5331c44fbaddf0677f488ec2292404a43ce2c5694c9ce34f89050a1a56b25f",
   "rule_counts": {
     "R-app": 1465,
     "R-catch": 295,
@@ -12621,7 +12627,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 119,
-    "R-verify": 912,
+    "R-verify": 913,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

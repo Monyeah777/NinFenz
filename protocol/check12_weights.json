@@ -251,6 +251,7 @@
     "test_output_path_escape": 0.8,
     "test_p6_evaluations": 29.8,
     "test_pack_combo": 3.2,
+    "test_pack_runnable_runs": 22.9,
     "test_package_index": 0.3,
     "test_path_flag_ratchet": 0.3,
     "test_path_moved": 0.2,
@@ -3303,6 +3304,8 @@
     "test_pack_combo.PackDirEnumerationTest.test_matches_legacy_enumeration": 0.02,
     "test_pack_combo.ProfileInputFaceTest.test_outside_face_change_does_not_rekey_and_inside_does": 0.01,
     "test_pack_combo.ProfileInputFaceTest.test_reads_stay_inside_declared_face": 0.11,
+    "test_pack_runnable_runs.PackRunnableRunsTest.test_commands_are_discoverable": 0.0,
+    "test_pack_runnable_runs.PackRunnableRunsTest.test_every_entry_runs": 22.72,
     "test_package_index.FailClosedTest.test_temp_root_resolution_and_under_filter": 0.01,
     "test_package_index.FailClosedTest.test_unknown_category_returns_empty": 0.0,
     "test_package_index.ItemIdTest.test_id_rules": 0.0,
@@ -4605,5 +4608,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1874.3
+  "total_s": 1897.2
 }
