@@ -100,6 +100,24 @@ class DocsAnchorTest(unittest.TestCase):
         self.assertGreaterEqual(total, 8, "相对链接太少（判据可能已失效）")
         self.assertEqual([], broken, f"这些相对链接指向不存在的文件：{broken}")
 
+    def test_root_prefixed_paths_exist(self):
+        """文档里以 desktop/ scripts/ protocol/ 等开头的路径必须真实存在（第 129 轮）。
 
-if __name__ == "__main__":
-    unittest.main()
+        比 `test_prefixed_paths_actually_exist` 更严：那条允许省略 `desktop/src/` 前缀，
+        本条形如 `scripts/foo.py` / `protocol/bar.json` 的写法必须逐字命中真实文件。
+        当前 59 处全部命中——这是引用面判据族的第四条。
+        """
+        import re
+
+        pat = re.compile(r"(?:desktop|scripts|protocol|packaging|site|docs)/"
+                         r"[A-Za-z0-9_./-]+\.(?:py|json|md|mjs|sh)")
+        total = 0
+        missing = []
+        for path in sorted(DOCS.glob("*.md")):
+            text = path.read_text(encoding="utf-8", errors="replace")
+            for tok in sorted(set(pat.findall(text))):
+                total += 1
+                if not (ROOT / tok).is_file():
+                    missing.append(f"{path.name} → {tok}")
+        self.assertGreaterEqual(total, 40, "文档里的仓库路径太少（判据可能已失效）")
+        self.assertEqual([], missing, f"这些文档路径不存在：{missing}")
