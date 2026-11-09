@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:0b1ed1aefe39a7ac0367d229789b6caa52d2ed5ee7fd9c1925ca194639c386fa
+  - protocol/code_metrics_baseline.json:9d65db374221c26f8c093f8522ac5ddcf59b2029711726203287d713bc147498
 ---
+> 重审（2026-11-09）：sast_check 行数
+
 > 重审（2026-11-09）：CodeQL 两处告警修复（ReDoS/URL 子串）
 
 > 重审（2026-11-09）：session-persist 预算 Windows 放宽
