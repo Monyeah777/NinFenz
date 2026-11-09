@@ -12,7 +12,7 @@ subjects:
   - desktop/src/core/meta_cockpit/runtime_executor.py:204a67ec93855257323887011395b0866ac8d5ae1c485362e89eb058ffe64bfb
   - desktop/src/core/meta_cockpit/cockpit_service.py:18280c6966dd618a8b09daa058b461fa43f89e99f11c797ca884338ff5c13bbf
   - desktop/src/core/meta_cockpit/cockpit_ab.py:6afcade08f2469aad4adc6f44e0e3d28a17712a85e3223f41b14c0020c2f88e7
-  - desktop/src/core/terminal.py:53f262e1c60deec8e01086083d22a2e71cfbb4e8e9af18834600fedc6cd860f8
+  - desktop/src/core/terminal.py:c07984876196ce97109b490d1ca299f658913efee7f321f8da6a32fbb015a765
   - desktop/tests/test_meta_cockpit.py:cc2dc4f52729b35f400ca92aa367e685780f9f6735224e7fc0b7550b85f52662
   - desktop/tests/test_cli_error_framing.py:96b4ea24e8eb68e590b641a21089a510a821f8185cb9dc1cf98d9257e525fde9
   - desktop/tests/test_nf_cli.py:c8eba2a0040083954cfc6847a1ab2e34ae1d2981a23155847feff34bd98f477c
@@ -25,6 +25,8 @@ subjects:
   - results/meta-cockpit-manifest.json:7b1231392bea0bc51ed14d73fac3c73c185209c1233e7727e554d5b899031af2
 
 ---
+> 重审（2026-11-09）：merge latest main for DSSE standard profile
+
 > 重审（2026-11-08）：DSSE v1 CI closure: docs reachability, stdio pinning, weights
 
 > 重审（2026-11-08）：DSSE v1 integration closure

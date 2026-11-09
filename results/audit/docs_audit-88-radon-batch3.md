@@ -6,9 +6,11 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/terminal.py:53f262e1c60deec8e01086083d22a2e71cfbb4e8e9af18834600fedc6cd860f8
-  - protocol/code_metrics_baseline.json:d32838535b68fd97e90bfdca30b5b49a4f369f8b3fc703847407ea1067f0299d
+  - desktop/src/core/terminal.py:c07984876196ce97109b490d1ca299f658913efee7f321f8da6a32fbb015a765
+  - protocol/code_metrics_baseline.json:395519d9a20015bd1cc1c99fc48ccdd32438b90475066894fabc62a7cea0e7fa
 ---
+> 重审（2026-11-09）：merge latest main for DSSE standard profile
+
 > 重审（2026-11-08）：DSSE workflow command-face and algorithm result closure
 
 > 重审（2026-11-08）：session watch nested release root fix

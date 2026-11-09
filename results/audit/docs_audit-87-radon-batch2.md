@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:d32838535b68fd97e90bfdca30b5b49a4f369f8b3fc703847407ea1067f0299d
+  - protocol/code_metrics_baseline.json:395519d9a20015bd1cc1c99fc48ccdd32438b90475066894fabc62a7cea0e7fa
 ---
+> 重审（2026-11-09）：merge latest main for DSSE standard profile
+
 > 重审（2026-11-08）：DSSE workflow command-face and algorithm result closure
 
 > 重审（2026-11-08）：session watch nested release root fix

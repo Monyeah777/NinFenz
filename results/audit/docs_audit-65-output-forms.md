@@ -6,7 +6,7 @@ scope: 作者指令「两个域包产出几乎都是文本…产出没有功能�
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/output_forms.py:3688d30b158493f56801ef84f6f0e60eff2cc670c7ebcf750ffd403599d1b68a
+  - desktop/src/core/output_forms.py:247645942b14dfac6642cf11bf66453ef12acb5f7fc4363d306dd860fe17bdf5
   - desktop/src/core/quant_metrics.py:ae2bd5a5b71531ee4cf4abe920f75a939a30a5bea105efa7aed011cc92369ce3
   - desktop/src/core/quality_depth_scan.py:563059e8a929bbbba16d5d15a9c77d1f362f9518351860b5ca0682aeb07a23f9
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
@@ -19,6 +19,8 @@ subjects:
   - desktop/tests/test_quant_metrics.py:4f8b0d358f6b132f98cf355e75e33917e700f33033421085197fe56edd02f0c4
 
 ---
+> 重审（2026-11-09）：merge latest main for DSSE standard profile
+
 > 重审（2026-11-08）：DSSE v1 最终重绑：CLI 适配器拆分、purity/路径/编码闸门与 Python/.NET 交叉签验接入后，按最终字节重算审计摘要。
 
 > 重审（2026-11-08）：DSSE v1 签名信封新增后重审：PAE、双 Base64 字母表、HMAC 多签名、阈值与篡改负例进入常驻判据；Python/.NET 交叉验签接入 CI。

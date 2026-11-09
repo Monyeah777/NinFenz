@@ -8,7 +8,7 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/domain_metrics.py:ac9a77beba7ac4641be155ea0aba29253cd5f98eb0921d28635062c308f421d5
-  - desktop/src/core/output_forms.py:3688d30b158493f56801ef84f6f0e60eff2cc670c7ebcf750ffd403599d1b68a
+  - desktop/src/core/output_forms.py:247645942b14dfac6642cf11bf66453ef12acb5f7fc4363d306dd860fe17bdf5
   - desktop/src/core/quality_depth_scan.py:563059e8a929bbbba16d5d15a9c77d1f362f9518351860b5ca0682aeb07a23f9
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - scripts/nf.py:239b09099db899e182142845a802bfd713c6371972c869b09e0a4b4a065b007a
@@ -18,6 +18,8 @@ subjects:
   - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
 
 ---
+> 重审（2026-11-09）：merge latest main for DSSE standard profile
+
 > 重审（2026-11-08）：DSSE v1 最终重绑：CLI 适配器拆分、purity/路径/编码闸门与 Python/.NET 交叉签验接入后，按最终字节重算审计摘要。
 
 > 重审（2026-11-08）：DSSE v1 签名信封新增后重审：PAE、双 Base64 字母表、HMAC 多签名、阈值与篡改负例进入常驻判据；Python/.NET 交叉验签接入 CI。

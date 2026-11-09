@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
-  - protocol/code_metrics_baseline.json:d32838535b68fd97e90bfdca30b5b49a4f369f8b3fc703847407ea1067f0299d
+  - protocol/code_metrics_baseline.json:395519d9a20015bd1cc1c99fc48ccdd32438b90475066894fabc62a7cea0e7fa
 ---
+> 重审（2026-11-09）：merge latest main for DSSE standard profile
+
 > 重审（2026-11-08）：DSSE workflow command-face and algorithm result closure
 
 > 重审（2026-11-08）：session watch nested release root fix

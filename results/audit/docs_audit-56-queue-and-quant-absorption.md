@@ -13,9 +13,11 @@ subjects:
   - community/量化金融域包/assets/DATA_CONTRACT.md:3815cd420ce535b571149a1ca0725b2d5c1757660e83d0edd8ed1d5c14ed2af1
   - community/量化金融域包/assets/STRATEGY_SPECS.md:9174638b5caf2d5d8586b80d07ed9aeca5d221e16f01ec19ce0e4c0f50859e65
   - community/量化金融域包/assets/QUANT_GRAPH.md:331d63943effe51462440c41832202df3b8e6bb2553734472947ac77927e094c
-  - .github/workflows/external-links.yml:e1a67faaeac1712bb77c9c36bf7133e68b6e705e8c4e296b40024825939f261b
+  - .github/workflows/external-links.yml:9f27d9e7bd3ca0c00345fdf6927b6f337a22243599412fb0ee3af35fed39f2bc
 
 ---
+> 重审（2026-11-09）：merge latest main for DSSE standard profile
+
 > 重审（2026-11-08）：DSSE v1 CI closure: docs reachability, stdio pinning, weights
 
 > 重审（2026-10-29）：恢复分支全量验证：接线 meta-cockpit 公共模块、清理零引用、修复 ReDoS/CLI 闸门/公开文档路径后重绑；既有结论不变
