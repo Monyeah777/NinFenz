@@ -815,7 +815,7 @@
     "test_ccos_chain._Base.test_chain_missing_object_raises": 0.0,
     "test_ccos_chain._Base.test_chain_ok_and_digests_flow": 0.01,
     "test_ccos_chain._Base.test_chain_with_hmac": 0.01,
-    "test_ccos_docs_anchors.DocsAnchorTest.test_each_doc_has_a_real_repo_path": 0.82,
+    "test_ccos_docs_anchors.DocsAnchorTest.test_each_doc_has_a_real_repo_path": 0.84,
     "test_ccos_docs_anchors.DocsAnchorTest.test_prefixed_paths_actually_exist": 0.01,
     "test_ccos_docs_anchors.DocsAnchorTest.test_relative_markdown_links_resolve": 0.0,
     "test_ccv3_adapter.TestMapIRToCCV3.test_asset_entry_present": 0.0,

@@ -1,6 +1,6 @@
 {
   "counts": {
-    "app": 1462,
+    "app": 1463,
     "entry": 26,
     "floor": 5,
     "prod": 1057,
@@ -12582,9 +12582,9 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "943c54978bfa52c49a52d4dd4eb421ba350f09fd8715c1131b33a53daf90e372",
+  "root_digest": "b6b54d89d69ff40e94e52c187eca77c9b97528f9a4eb2f4e76ddeea872c8c8bb",
   "rule_counts": {
-    "R-app": 1462,
+    "R-app": 1463,
     "R-catch": 292,
     "R-entry": 26,
     "R-floor": 5,

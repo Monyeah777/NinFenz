@@ -28,7 +28,8 @@
 | 对抗 | 反例必带可复算证人（`file` + `case`） | 指向不存在的文件必须红 |
 | 自省 | 结论绑定**验证器摘要**（判定面脚本内容摘要） | 改判定脚本字节，摘要必变 |
 
-逐层的判定位置与详细说明见 [isomorphism-matrix.md](isomorphism-matrix.md)。
+逐层的判定位置与详细说明见 [isomorphism-matrix.md](isomorphism-matrix.md)；
+判据本身分几族、每族怎么失效，见 [judge-families.md](judge-families.md)。
 
 ## 自省闭环（第九层为什么特殊）
 
