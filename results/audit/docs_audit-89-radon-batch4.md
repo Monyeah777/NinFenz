@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/interop_export.py:d0c0d3eb20bf879619088706306c4a8051dde34af6dadab2e2817fee9a575b0e
-  - protocol/code_metrics_baseline.json:9d65db374221c26f8c093f8522ac5ddcf59b2029711726203287d713bc147498
+  - protocol/code_metrics_baseline.json:c2dbeef7bafeaf33be6fc99f1fae1bced6f17c4d8db8e20b2a920bc4b971c25a
 ---
+> 重审（2026-11-09）：Foundation repair: 合入 main 风格棘轮扩面后重绑
+
 > 重审（2026-11-09）：foundation repair: canonical product metadata, dual licensing, and release bundle
 
 > 重审（2026-11-09）：sast_check 行数
