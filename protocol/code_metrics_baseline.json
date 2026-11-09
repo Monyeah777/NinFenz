@@ -1611,7 +1611,7 @@
       "max_fn_lines": 53
     },
     "scripts/sast_check.py": {
-      "lines": 244,
+      "lines": 249,
       "max_fn_cc": 12,
       "max_fn_lines": 35
     },

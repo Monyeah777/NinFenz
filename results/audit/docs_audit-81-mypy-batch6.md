@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:c2dbeef7bafeaf33be6fc99f1fae1bced6f17c4d8db8e20b2a920bc4b971c25a
+  - protocol/code_metrics_baseline.json:2284d60eb2a4922e91eec6b77eec8753cb974904e44e2ca0b68c423ba9a9b40f
 ---
+> 重审（2026-11-09）：Windows SAST（重建）
+
 > 重审（2026-11-09）：style_check 行数
 
 > 重审（2026-11-09）：sast_check 行数
