@@ -1,7 +1,7 @@
 {
-  "bytes": 11972033,
+  "bytes": 11972331,
   "count": 564,
-  "digest": "931d7cabd1b7a4646f3ff66534c42429b7860ebec4756944bb6f2a89cef1c08f",
+  "digest": "0e0c1d34fbe5ff701da4212618076f2e57b7489a7dd7dba7c8345e327defdd3f",
   "materials": [
     {
       "bytes": 102,
@@ -1829,9 +1829,9 @@
       "sha256": "1ecd4b0aca8aae6eb3445d3b34649bc1a6a445d817d19f5f24564a006e9d9f73"
     },
     {
-      "bytes": 4082,
+      "bytes": 4380,
       "path": "docs/ccos/judge-families.md",
-      "sha256": "f9b80f5248f61c535ef446979793dc2863b358dad215d81d58ad480a2c6d4303"
+      "sha256": "17f963b709c12af1d1202d8750d6d0c5b2d7e29744a2a7dccf251e243167a5de"
     },
     {
       "bytes": 3542,
@@ -1891,7 +1891,7 @@
     {
       "bytes": 257,
       "path": "protocol/approvals/protocol__conformance_report.json",
-      "sha256": "c06cef272f17076c67f1e905ef38f959e7df1a1344197f28069349a6f7360ede"
+      "sha256": "68a177e6f9a5b08cb3cb334532955dafd6acf4114cf86319ad0c2fd61baaea82"
     },
     {
       "bytes": 16375,

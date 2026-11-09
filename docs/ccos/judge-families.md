@@ -28,7 +28,9 @@
 | 检查对象 | 一切「引用」：方法包例子里的路径、`criteria_refs`、文档相对链接、文档里的仓库路径 |
 | 形式 | 抽取 token → 解析（含文档所在目录）→ 必须存在；另加「至少 N 条」防判据失效 |
 | 失效方式 | 示例性文件名（`f1.json`）被误判；抽取正则漏一种写法 |
-| 证据 | `test_examples_cite_existing_files`、`test_criteria_refs_exist_in_registry`、`test_relative_markdown_links_resolve`、`test_ccos_docs_anchors` |
+| 证据 | `desktop/tests/test_method_pack.py`（例子路径 / `criteria_refs` / `maps_to`）、`desktop/tests/test_ccos_docs_anchors.py`（根前缀路径 / 相对链接） |
+| 真红记录 | 例子路径 7 处缺前缀；`criteria_refs` 5 包悬空（含自造的 `standard:ISO27001`）；后两条首查即绿 |
+| 口径教训 | 宽正则（只查扩展名）曾有 118 条假红、判据不可用；收窄成「必须带根前缀」后 59 条全真 |
 
 ## 四、文档数字判据（写下来的数对不对）
 
