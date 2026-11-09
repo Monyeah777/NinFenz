@@ -64,8 +64,21 @@ CLI 上的幽灵证人一直能过；把 `session.step(root=)` 接上后才真�
 新判据提交前自问十一问；答不上第 2、3、4 问说明**口径没想清**，答不上第 5、6 问说明**效力没验证**，
 答不上第 9、10 问说明**边界没划清**，答不上第 11 问说明**只查了半个面**。十一问都答得上，判据才算落地。
 
+## 第五问的硬约束：比例棘轮（第 194 / 198 轮）
+
+「它红过吗」在本仓不是建议，而是**有代价的约束**：
+
+- `results/ccos/judge_red_evidence.json` 统计每个测试模块的**硬证据**（gate 拒绝型用例 / 变异探针收录 / `assertRaises`）；
+- 判据 `desktop/tests/test_judge_red_evidence.py` 要求「无硬证据模块的**比例**」不超过 0.36；
+- 于是**新增一个不带证据的判据模块，就会顶破这条线**；
+- 反过来：新判据若自带一条 `assertRaises`（证明它会拒绝坏输入），比例不升，正常通过。
+
+第 198 轮的 `desktop/tests/test_ledger_tables.py` 就是照此写成的——它带着「解析器拒绝畸形输入」的变异自证进来。
+**门槛不是「别加判据」，而是「带着它会红的证据加」。**
+
 ## 相关
 
-- 七族的检查对象与失效方式：[judge-families.md](judge-families.md)
+- 八族的检查对象与失效方式：[judge-families.md](judge-families.md)
 - 判据变异探针：`scripts/judge_mutation_probe.py`
 - 负向用例覆盖：`scripts/gate_probe.py`
+- 红证据登记：`scripts/judge_red_evidence.py`
