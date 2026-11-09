@@ -29,6 +29,7 @@ concurrency:
 permissions:
   actions: read
   contents: read
+  security-events: read      # 安全面快照（code-scanning 计数）只读
 
 jobs:
   scheduled-red-audit:
@@ -136,3 +137,24 @@ jobs:
                     f"(event={r.get('event')}) {r.get('html_url')}")
           raise SystemExit(1)
           PY
+      - name: 安全面快照（信息性，不判红）
+        # 2026-11-09：把「code-scanning open 数」带进 CI 日志——此前只靠人工查询，
+        # 长期不看就不知道安全债务在涨。只读 + continue-on-error，不改变任何门禁结论。
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          python - <<'PY'
+          import json, os, urllib.request
+          repo = os.environ["REPO"]
+          url = "https://api.github.com/repos/%s/code-scanning/alerts?state=open&per_page=100" % repo
+          req = urllib.request.Request(url, headers={
+              "Accept": "application/vnd.github+json",
+              "Authorization": "Bearer " + os.environ["GH_TOKEN"],
+              "User-Agent": "nf-ci-health"})
+          with urllib.request.urlopen(req, timeout=30) as resp:
+              rows = json.load(resp)
+          print("code-scanning open alerts: %d" % len(rows))
+          PY
+
