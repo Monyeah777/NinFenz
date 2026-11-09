@@ -1,7 +1,7 @@
 {
-  "bytes": 12012805,
+  "bytes": 12012912,
   "count": 569,
-  "digest": "58651eb046bacb87c1d7cee2eb593d2e6b0e30a1d57cc628e555acda40ede9de",
+  "digest": "30f5c975ac51b35bb6b2a67f3b88eca7704d543d05e59ecb94b8acad245e6169",
   "materials": [
     {
       "bytes": 102,
@@ -1899,9 +1899,9 @@
       "sha256": "ad799cbfbf1dd69859ff21963885ebf1d5fed56ca67fdd1c2b9e2052ce3b8003"
     },
     {
-      "bytes": 254,
+      "bytes": 269,
       "path": "protocol/approvals/protocol__conformance_report.json",
-      "sha256": "1f792e51763f94daeaa9e572812209b2df4382bfcb958a05584bfb180d08a348"
+      "sha256": "51c4543b181b5dc5fe5f43cad480ecfba5c53f46343b7c5c5f6748071830c858"
     },
     {
       "bytes": 16375,
@@ -2429,9 +2429,9 @@
       "sha256": "1a542591cf38382ae3301cf5ac67c80a6a4d2fdcfd7c56fab27eccbbad0ca791"
     },
     {
-      "bytes": 82490,
+      "bytes": 82582,
       "path": "protocol/style_baseline.json",
-      "sha256": "133706bd0ad6aa1dad537f7e7684f117597df6b61f8e04c1f1e013361c9bfc98"
+      "sha256": "658281b5d536cce350589fb981eef26f5e1e314259f3e2fcbb9b455ed1d272ca"
     },
     {
       "bytes": 548,
@@ -2736,7 +2736,7 @@
     {
       "bytes": 53432,
       "path": "scripts/release_conclusion.py",
-      "sha256": "83de188f3e2107f8be96ddff045033ad6bf2da3fa4d019faa48d445b5babc852"
+      "sha256": "44a364d7fdc44b340a9d035b0923bafcf3d141d3ad3deca7ac8fc378285aa487"
     },
     {
       "bytes": 6211,

@@ -13,7 +13,7 @@ subjects:
   - desktop/tests/test_rust_fastlane.py:61df59a08593288dac89154f50dcd385fec1bcc5352b067cf4fdd683736dc40b
   - desktop/tests/test_quant_domain_package.py:e11700ea8f52a9d2a3c39838923f9264a099aa0997ce5e6890a9a96e65bc1709
   - desktop/tests/test_mcp_write_freedom.py:5afa888397a4acce5adbe92e0f06509decc48b98cc5e744eab080faa81834472
-  - desktop/tests/test_mcp_runtime.py:cf53f00460f76e3eabb0a45842f584878e12d7d402fe613dcc355c5f62a25457
+  - desktop/tests/test_mcp_runtime.py:c0893a7c83e651f60042a9a10f388f1285bacc669b89656b2f340091bd89fdf0
   - desktop/tests/test_live_doc_counts.py:5559c486dcf34b148038202e1c1cb58107385444764ed7050fefb0ee1e53985d
   - desktop/tests/test_layer_model.py:8cea98de879a4bdf795f95afff9c8fa9a7675ebac227018b7b7694a158bfd69c
   - desktop/tests/test_knowledge_sig.py:4705091a139b4fc4da9a61bc816e30eeec3221688f3d923e43afc3b11609c17e
@@ -34,6 +34,8 @@ subjects:
   - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
 ---
+> 重审（2026-11-09）：合并后重算生成物
+
 > 重审（2026-11-09）：冻结链
 
 > 重审（2026-11-08）：cog calibrate CLI（可靠性表出口）
