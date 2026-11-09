@@ -7,11 +7,13 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - .github/PULL_REQUEST_TEMPLATE.md:ee28953acf26601c4c36568dc99f705a86319b9c7622f019fee541d907621aff
-  - CONTRIBUTING.md:a2bb3d25caed472602554a46f9eab6825fcb864abe76a1cb45031116805a36f1
+  - CONTRIBUTING.md:9cc0ec213d27f79e4fa50de927f2c74112d6c6585ea0100858b6413f38c255b3
   - desktop/src/core/asset_density.py:aa60651ad8269e7db09a709570ae69192f39ee95cfd6bd1d4f652696b3d26c56
   - desktop/src/core/asset_line_baseline.py:b9630078b3569553be70d89734068c11329d7a35083efc846a1349ccf9bc61d1
 
 ---
+> 重审（2026-11-09）：CONTRIBUTING 冻结链
+
 > 重审（2026-11-09）：CONTRIBUTING 补本地 payload 过期说明
 
 > 重审（2026-11-08）：CONTRIBUTING 补 payload 数字同步
