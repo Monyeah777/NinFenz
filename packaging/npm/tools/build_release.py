@@ -77,7 +77,7 @@ def git(*args: str) -> str:
     git_bin = shutil.which("git")
     if not git_bin:
         raise ReleaseError("缺 git：无法读取发布来源身份")
-    proc = subprocess.run(  # noqa: S603  # nosec B603
+    proc = subprocess.run(  # noqa: S603, RUF100  # nosec B603
         [git_bin, *args],
         cwd=REPO_ROOT,
         check=False,
@@ -115,7 +115,7 @@ def stage_payload(dirty_allowed: bool) -> None:
     args = [node, str(PACKAGE_ROOT / "tools" / "stage-payload.mjs"), "--quiet"]
     if dirty_allowed:
         args.append("--allow-dirty")
-    proc = subprocess.run(  # noqa: S603  # nosec B603
+    proc = subprocess.run(  # noqa: S603, RUF100  # nosec B603
         args,
         cwd=PACKAGE_ROOT,
         check=False,
