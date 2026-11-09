@@ -82,7 +82,7 @@
       "i": 0.0
     },
     "atomic_write": {
-      "ca": 54,
+      "ca": 55,
       "ce": 0,
       "i": 0.0
     },
@@ -603,8 +603,8 @@
     },
     "interop_export": {
       "ca": 1,
-      "ce": 3,
-      "i": 0.75
+      "ce": 4,
+      "i": 0.8
     },
     "interp_diet": {
       "ca": 0,
@@ -632,9 +632,9 @@
       "i": 0.0
     },
     "json_doc": {
-      "ca": 82,
+      "ca": 83,
       "ce": 1,
-      "i": 0.012
+      "i": 0.0119
     },
     "json_schema": {
       "ca": 5,
@@ -981,6 +981,11 @@
       "ce": 3,
       "i": 1.0
     },
+    "product_metadata": {
+      "ca": 5,
+      "ce": 2,
+      "i": 0.2857
+    },
     "prose_lint": {
       "ca": 3,
       "ce": 1,
@@ -1153,8 +1158,8 @@
     },
     "rules_render": {
       "ca": 0,
-      "ce": 0,
-      "i": 0.0
+      "ce": 1,
+      "i": 1.0
     },
     "rust_engine": {
       "ca": 0,
@@ -1213,8 +1218,8 @@
     },
     "skill_adapter": {
       "ca": 1,
-      "ce": 2,
-      "i": 0.6667
+      "ce": 3,
+      "i": 0.75
     },
     "skill_contract": {
       "ca": 1,
@@ -1268,8 +1273,8 @@
     },
     "terminal": {
       "ca": 1,
-      "ce": 4,
-      "i": 0.8
+      "ce": 5,
+      "i": 0.8333
     },
     "text_hygiene": {
       "ca": 0,
@@ -1339,6 +1344,11 @@
     "verify_report": {
       "ca": 0,
       "ce": 4,
+      "i": 1.0
+    },
+    "vex": {
+      "ca": 0,
+      "ce": 1,
       "i": 1.0
     },
     "watch": {

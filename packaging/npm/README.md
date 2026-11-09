@@ -1,7 +1,8 @@
 # ninfenz · npm 一键包
 
 **NinFenz（NF）是内容契约层（content contract layer）**：把「AI 稳定产出长内容」变成可装载、可质检、可复现的工程。协议域中立、模型无关；叙事只是官方第一个域包。
-**不是**模型、**不是**提示词模板集、**不是**某厂商 SDK。MIT。
+**不是**模型、**不是**提示词模板集、**不是**某厂商 SDK。
+当前版本采用 `AGPL-3.0-only OR LicenseRef-Commercial`：开源使用走 AGPL，闭源商业使用可另取商业许可。
 
 本包是 NF 的**一键入口**：零安装脚本、零网络请求、零遥测；首次运行把随包 payload 解到缓存目录（带 sha256 清单校验），然后原样把参数转发给 NF CLI。
 
@@ -61,7 +62,7 @@ Python 探测顺序：`NINFENZ_PYTHON` → `py -3`（Windows）→ `python3` →
 > **自证门禁的正确方式**：payload 是**运行时 / 协议树**（不含 `.github/`、`results/`、`.git`）。`install --dest` 得到的是可用工作树（CLI / TUI / MCP 正常），**要跑完整 check 门禁请 git clone 后 `bash verify.sh`（check 数以 `nf stats` 生成区为准）**——`verify.sh` 依赖上述仓库件，这是设计而非缺陷。
 - 清单 `payload/payload-manifest.json`：逐文件 sha256 + 聚合 `tree_sha256`
 
-当前体积：**3030 件 · 解包 24.05 MB**（tarball 远小于此；域名包与标准目录占主要体积）。
+当前体积：**3051 件 · 解包 24.26 MB**（tarball 远小于此；域名包与标准目录占主要体积）。
 
 ## 供应链纪律（为什么可以放心 npx）
 
@@ -89,13 +90,13 @@ Python 探测顺序：`NINFENZ_PYTHON` → `py -3`（Windows）→ `python3` →
 - 国内镜像：https://gitee.com/monyeah777/ninfenz
 - 机器入口 `llms.txt`：https://raw.githubusercontent.com/Monyeah777/NinFenz/main/llms.txt
 - MCP 接入：https://raw.githubusercontent.com/Monyeah777/NinFenz/main/docs/mcp.md
-- 许可：MIT（见包内 `LICENSE`）
+- 许可：`AGPL-3.0-only OR LicenseRef-Commercial`（见包内 `LICENSE` 与仓库 `LICENSING.md`）
 
 ## 维护者：发布流程
 
 ```bash
 cd packaging/npm
-npm run stage     # 暂存 payload（含版本口径闸门：package.json 版本 == NF_CLI_VERSION）
+npm run stage     # 暂存 payload（含版本口径闸门：package.json 版本 == product_metadata.json）
 npm run verify    # 发布前自检（安装脚本/payload 校验/元数据/预算）
 npm test          # 冒烟测试（清单自洽 + 快路径 + 真跑 doctor）
 npm pack --dry-run

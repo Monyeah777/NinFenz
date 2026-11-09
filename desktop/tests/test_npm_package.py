@@ -31,6 +31,13 @@ MANIFEST = PKG / "payload" / "payload-manifest.json"
 MIN_CASES = 4
 
 
+def _rivet_dir():
+    """Return the in-repo scratch root, creating it when absent in a clean worktree."""
+    path = ROOT / ".rivet"
+    path.mkdir(exist_ok=True)
+    return str(path)
+
+
 #: 网络 / 埋点原语（**静态**可真伪：包若哪天需要联网，这条会先红，逼人改承诺或改做法）
 NET_PAT = re.compile(
     r"\bfetch\b|XMLHttpRequest|sendBeacon"
@@ -98,7 +105,7 @@ class NpmPackageGateTest(unittest.TestCase):
         而它是 README 列出的第二条用户路径，也是「把 payload 变成可用工作树」的唯一入口。
         """
         node = _node_or_skip(self)
-        with tempfile.TemporaryDirectory(dir=str(ROOT / ".rivet")) as tmp:
+        with tempfile.TemporaryDirectory(dir=_rivet_dir()) as tmp:
             dest = Path(tmp) / "nf"
             proc = subprocess.run([node,
  str(PKG / "bin" / "nf.mjs"),
@@ -152,7 +159,7 @@ class NpmPackageGateTest(unittest.TestCase):
         实测 e2e 与 npm 物化都写成功；缓存目录因此指到仓库内，不依赖沙箱策略）。
         """
         node = _node_or_skip(self)
-        with tempfile.TemporaryDirectory(dir=str(ROOT / ".rivet")) as cache:
+        with tempfile.TemporaryDirectory(dir=_rivet_dir()) as cache:
             env = dict(os.environ, NINFENZ_CACHE=cache)
             proc = subprocess.run([node, str(PKG / "bin" / "nf.mjs"), "doctor"],
                                   cwd=tempfile.gettempdir(),

@@ -95,6 +95,8 @@ class ResponseCacheTest(unittest.TestCase):
         是用户会反复跑的命令；响应缓存是它唯一的毫秒级路径（树未变时实测 **~0.1 s**）。
         这里同时守住：① 准入表内有 `verify`；② 同代际第二跑命中并逐字段等价；③ 代际一变必须重算。
         """
+        if not BASH:
+            self.skipTest("无 POSIX shell：nf verify 的 check39 按设计失败，失败响应不入缓存")
         self.assertTrue(dm.cacheable(["verify"]), "nf verify 必须在准入表内")
         self.assertTrue(dm.cacheable(["verify", "--json"]), "机器面同样可缓存")
         dm.set_watcher(_FakeWatcher(generation=11))

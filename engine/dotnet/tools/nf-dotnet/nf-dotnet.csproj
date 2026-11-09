@@ -21,7 +21,7 @@
     <Authors>NinFenz</Authors>
     <Description>NF .NET 工业引擎 CLI（只读判据面：回执/透明链/组合证书/断言表/决策门禁/馆藏门/建模三件 + 性能基线）</Description>
     <PackageTags>ninfenz;verification;read-only</PackageTags>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageLicenseExpression>AGPL-3.0-only</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
   <ItemGroup>

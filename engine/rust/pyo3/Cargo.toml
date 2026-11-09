@@ -3,7 +3,7 @@ name = "nf-pyengine"
 version = "0.1.0"
 edition = "2021"
 description = "NF Python 扩展（PyO3）：同进程绑定的第二形态（P5-07.1/07.2）"
-license = "MIT"
+license = "AGPL-3.0-only"
 
 [dependencies]
 pyo3 = { version = "0.29", features = ["extension-module"] }
