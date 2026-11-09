@@ -265,5 +265,29 @@ class CodeqlWorkflowTest(unittest.TestCase):
         self.assertIn("cron:", self.text, "codeql schedule 缺 cron 表达式")
 
 
+class DockerfileDigestPinTest(unittest.TestCase):
+    """所有 Dockerfile 的基座必须按 digest 钉（2026-11-09 #240 的安全不变式）。
+
+    只钉 tag（`FROM python:3.12-slim`）会随上游 tag 漂移——构建不可复现，且 tag 被接管时
+    可被投毒。本仓 nfal/hf-space 两处曾裸 tag，已改 `image:tag@sha256:…`；此守卫防回退。
+    """
+
+    def test_all_from_lines_are_digest_pinned(self):
+        import re
+        bad = []
+        for p in sorted(ROOT.rglob("Dockerfile")):
+            if ".git" in p.parts:
+                continue
+            for ln, line in enumerate(p.read_text(encoding="utf-8").splitlines(), 1):
+                m = re.match(r"^\s*FROM\s+(\S+)(?:\s+AS\s+\S+)?\s*$", line, re.I)
+                if not m:
+                    continue
+                image = m.group(1)
+                if image == "scratch" or "@sha256:" in image:
+                    continue
+                bad.append(f"{p.relative_to(ROOT)}:{ln} {image}")
+        self.assertEqual([], bad, f"Dockerfile 基座未按 digest 钉：{bad}")
+
+
 if __name__ == "__main__":
     unittest.main()
