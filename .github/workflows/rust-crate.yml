@@ -3,8 +3,9 @@ name: rust-crate
 #
 # 为什么单独一条（2026-11-08 盲区收口）：旧 `rust-parity.yml` 退役后，主 crate 不再被任何
 # workflow 构建/测试（`cross-lang.yml` 只 build `engine/rust/canonical` 的 parity crate）。
-# 主 crate 里 249 条单测含多条「与 Python 真源逐字节对账」的 oracle（depth_scan / asset_contract /
-# pack_combo / output_forms…），没有 CI 面等于这些 oracle 只在作者机器上跑过。
+# 主 crate 的整批单测（数量随测试演进而变，不在此钉死）含多条「与 Python 真源逐字节对账」
+# 的 oracle（depth_scan / asset_contract / pack_combo / output_forms…）——没有 CI 面等于
+# 这些 oracle 只在作者机器上跑过。
 #
 # 口径：与旧 rust-parity 的 cargo-test 同档（`--release`，与对拍/门禁的优化档一致）；
 # 依赖 Cargo.lock，用 `--locked` 防依赖漂移；失败时上传日志供诊断（不写仓库）。
@@ -35,31 +36,43 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest]
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
         with:
           persist-credentials: false
       - name: 工具链就绪（rust：runner 预装；只记录版本，不联网更新）
         run: |
           rustc --version
           cargo --version
-      - name: 主 crate 单测（release 档：249 条 oracle 与对拍同口径）
+      - name: 主 crate 单测（release 档：与对拍同口径）
         shell: bash        # windows runner 默认 pwsh：`set -o pipefail`/tee 是 bash 语法
         run: |
           set -o pipefail
           cargo test --release --locked --manifest-path engine/rust/Cargo.toml 2>&1 | tee rust-crate-test.log
+      - name: 构建 nf-rs bin + 跑 Python 侧快线 parity 判据（2026-11-09 补）
+        # 盲区：此前 CI 从不构建 nf-rs bin（只跑 cargo test / canonical），而 python 侧
+        # test_rust_engine/test_rust_fastlane 在二进制不在场时显式 skip ⇒「快线 = Python 真源」
+        # 从未在 CI 真跑过（实测漂移：verify-report 缺 built_for_date、purity 漏 PIL allowlist）。
+        # 本步构建 bin 后跑 34 条 parity 判据（含 conformance run / contracts / score / verify-report
+        # 四面对账），把「二进制在场才跑」的面真正接进常驻 CI。
+        if: runner.os == 'Linux'
+        run: |
+          set -euo pipefail
+          cargo build --release --locked --manifest-path engine/rust/Cargo.toml
+          python3 -m unittest desktop.tests.test_rust_engine desktop.tests.test_rust_fastlane desktop.tests.test_rust_pyext
       - name: PyO3 扩展构建（可选进程内原语面；此前不在任何 CI 面）
         # 2026-11-08：engine/rust/pyo3 是 cdylib（nf_pyengine），主 crate 测试不覆盖它；
         # 依赖已从 0.22 升到 0.29（修 dependabot high OOB / Sync bound 告警），必须让 CI
         # 真正编译一次，否则「升级」只停在 Cargo.toml。python3-dev 提供 pyo3 构建所需头。
         if: runner.os == 'Linux'
+        shell: bash
         run: |
-          sudo apt-get update
-          sudo apt-get install -y python3-dev
+          sudo apt-get -o Acquire::Retries=3 update
+          sudo apt-get -o Acquire::Retries=3 install -y python3-dev
           set -o pipefail
           cargo build --release --locked --manifest-path engine/rust/pyo3/Cargo.toml 2>&1 | tee pyo3-build.log
       - name: 失败诊断产物（本 run 日志；无则跳过）
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7
         with:
           name: rust-crate-test-log-${{ matrix.os }}
           path: |

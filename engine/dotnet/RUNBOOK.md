@@ -51,6 +51,10 @@ python -c "import sys;sys.path.insert(0,'desktop/src');from core import engine_l
 > 跑 CI 批前二选一：① 作者把该提交推上来（如 `git push origin aa259d76:refs/tags/nf-snap-golden`
 > 并把 `vars.NF_SNAP_REF` 指向该 tag）；② 用 `run-rebaseline.ps1` 把金标前移到当前 HEAD 后重推。
 > 手动 `workflow_dispatch` 时用 `snap_ref` 输入显式指定可用的 ref（缺省值失效会在快照步骤 fail-fast）。
+>
+> **2026-11-08 验证**：在作者机器上 `git push --dry-run origin aa259d76:refs/tags/nf-snap-golden`
+> 成功（输出 `* [new tag] aa259d76 -> nf-snap-golden`，提交对象在场、鉴权有效）——
+> 去掉 `--dry-run` 即完成路线①，无需额外准备；是否执行仍由作者裁决。
 
 **第一百二十二片起：复基线已工具化** —— `run-rebaseline.ps1`：
 

@@ -7,11 +7,17 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - .github/PULL_REQUEST_TEMPLATE.md:ee28953acf26601c4c36568dc99f705a86319b9c7622f019fee541d907621aff
-  - CONTRIBUTING.md:36d2f8e435f09ceaf0e36e19334ccbab998976ca30f39898241f39024206190d
+  - CONTRIBUTING.md:a2bb3d25caed472602554a46f9eab6825fcb864abe76a1cb45031116805a36f1
   - desktop/src/core/asset_density.py:aa60651ad8269e7db09a709570ae69192f39ee95cfd6bd1d4f652696b3d26c56
   - desktop/src/core/asset_line_baseline.py:b9630078b3569553be70d89734068c11329d7a35083efc846a1349ccf9bc61d1
 
 ---
+> 重审（2026-11-09）：CONTRIBUTING 补本地 payload 过期说明
+
+> 重审（2026-11-08）：CONTRIBUTING 补 payload 数字同步
+
+> 重审（2026-11-08）：CONTRIBUTING 补打包面纪律
+
 > 重审（2026-11-08）：task-35 投影少算防护
 
 > 重审（2026-10-23）：I/O/内存/IPC 审计整改：RepoIndex、缓存新鲜度、ISO/信任/协议防护

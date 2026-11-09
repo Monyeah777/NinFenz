@@ -40,15 +40,19 @@
 | 机制 | 载体 | 判据 |
 |---|---|---|
 | 危险 sink 面（动态执行/反序列化/递归删除） | `desktop/src/core/purity_scan.py` | check27 R6（放行须登记理由） |
-| 明文密钥扫描 | `ci-verify.yml` | 命中即红 |
-| 依赖固定 + 版本审计 | `.github/requirements-*.txt` + `dependency-audit.yml` | 每周 + push |
-| action 固定到 commit SHA | 全部 workflow | 回归测试 `test_ci_supply_chain.py` |
+| 明文密钥扫描 | `ci-verify.yml` + 入库通道脱敏（前 4 字符）+ GitHub secret scanning | 命中即红；入库拒收并把疑似密钥**脱敏**后再评论 |
+| 依赖固定 + 版本审计 | `.github/requirements-{ci,lint,sast,audit}.txt` + `dependency-audit.yml` | 四份固定集全审：每周 + push + requirements 改动 PR |
+| 依赖漏洞告警 | GitHub Dependabot alerts（含 Cargo/npm） | 当前 open=0（2026-11-09 核查） |
+| action 固定到 commit SHA | 全部 workflow（checkout v7 / setup-python v6 / upload-artifact v7 / codeql-action v4，node24 面） | 回归测试 `test_ci_supply_chain.py`；pins 与版本基线见 `docs/L3_FROZEN.md` |
+| 容器基座固定到 digest | `packaging/nfal/Dockerfile` + `packaging/hf-space/Dockerfile` | 三处 `FROM image@sha256:…`；升级=显式改 digest |
 | 入库通道的凭据与内容边界 | `.github/scripts/*_ingest.py` | 令牌不落盘、密钥形状拒收、正文/API 响应/分页均有硬上限 |
 | 本机 daemon IPC | `desktop/src/core/daemon.py` | Windows 独占端口、常量时间令牌、严格 UTF-8 JSON、请求/响应/内存硬上限 |
 | MCP 只读资源面 | `desktop/src/core/mcp_runtime.py` + `repo_index.py` | URI 白名单、realpath 包含性、拒绝符号链接越界、快照/资源/出站消息上限 |
 | 插件宿主 | `scripts/plugin_host.py` | wasmtime fuel/超时、无 fs/net/env、stdin/stdout/stderr 有界、argv 长度预算 |
 | 静态检查（含未定义名） | `nf release` → ruff | 本地 pre-push 即拦 |
 | SAST（SQL 拼接/弱随机/XXE/命令注入等） | `sast.yml` → `scripts/sast_check.py` | (工具,文件,规则) 计数棘轮：新增/上升即红 |
+| 代码扫描（数据流/污点） | `codeql.yml`（python + js/ts） | PR 路径过滤 / push main / 周 schedule；结果进 code scanning 面板（非 required） |
+| SAST 扩展面可见性 | `sast.yml` 的 tui/ + packaging/ 非阻塞扫描 | JSON 留 artifact（`sast-extra-*.json`）；扩棘轮待 task-40 |
 | 供应链评分 | `scorecard.yml` | OpenSSF Scorecard（结果可见） |
 | 执行目标仓库代码的信任门（H1） | `desktop/src/core/repo_trust.py` + `nf verify --trust-repo` | `tests/test_repo_trust.py`：外来仓库默认拒绝执行、无副作用 |
 

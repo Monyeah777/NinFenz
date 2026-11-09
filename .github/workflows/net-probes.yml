@@ -1,11 +1,11 @@
 name: net-probes
-# .NET 判据探针跑批（45 条 = 39 core + 6 long）的 CI 接线。
+# .NET 判据探针跑批（清单驱动；条数以 probes/probe_manifest.json 为准，不在此钉死）的 CI 接线。
 #
 # 为什么要有它（2026-10-19 只读侦查证实）：
 #   · `engine/dotnet/run-probes.ps1`（清单驱动的一键跑批，口径唯一出处 =
 #     probes/probe_manifest.json）在本仓是 **.NET 判据面唯一的批量执行方**（旧 `net-engine.yml`
 #     已随「删旧按新」退役，不再在仓）。
-#   · 45 条里有 2 条（artifact-equivalence / nuget-package-consumer）的参数带 **`{win}` /
+#   · 清单里 2 条（artifact-equivalence / nuget-package-consumer）的参数带 **`{win}` /
 #     `{linux}` 占位符**：它们要的是**两个 RID 的自包含交付形态目录**（dist/nf-dotnet-<rid>-fNN-*），
 #     不是 runner OS。故不是"windows 跑 win 子集、linux 跑 linux 子集"，而是**双平台都先产两个
 #     RID** 再跑同一套 core 档，平台差异只体现在「执行用哪个 RID 的 CLI」。
@@ -22,7 +22,7 @@ name: net-probes
 #     text-hygiene 类判据假红）；
 #   · **门跑导出快照、不拿活仓库当金标**：{snap}=aa259d7 导出；{other}=本次检出（做漂移归因）。
 #
-# 为什么 long 档（6 条重型：双门同判 / 规模 / 模糊 / 敌意输入 / 可复现构建 / 规模对照）不进 CI：
+# 为什么 long 档（重型探针：双门同判 / 规模 / 模糊 / 敌意输入 / 可复现构建 / 规模对照）不进 CI：
 # 跑批超时预算与墙钟（探针单条 timeout 默认 3600 s）。要跑全量用 workflow_dispatch 输入 tier=all。
 # 触发口径（2026-10-20 治理）：
 #   · **不再随 push/PR 触发** —— 本 workflow 依赖「金标语料快照」，而快照锚定的是一个
@@ -35,7 +35,7 @@ on:
   workflow_dispatch:
     inputs:
       tier:
-        description: '探针档位（core=39 条默认；all=45 条含重型）'
+        description: '探针档位（core=清单 core 档缺省；all=含重型档）'
         required: false
         default: core
         type: choice
@@ -72,7 +72,7 @@ jobs:
       # 改这里即可换基线（金标前移裁决后应指向新的基线 tag）。
       NF_SNAP_REF: ${{ github.event.inputs.snap_ref || vars.NF_SNAP_REF || 'aa259d76' }}
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
         with:
           persist-credentials: false
           # 金标快照要 `git archive aa259d7`：浅克隆（默认 depth=1）里没有这个祖先提交。
@@ -165,7 +165,7 @@ jobs:
               $tail = Get-Content $_.FullName -Tail 40 -ErrorAction SilentlyContinue
               ("### " + $_.Name) , ($tail -join "`n") | Out-File (Join-Path $art 'probe-tails.txt') -Encoding utf8 -Append
             }
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7
         if: failure()
         with:
           name: net-probes-diagnostics-${{ matrix.os }}

@@ -10,6 +10,10 @@
 `scripts/gates_all.sh` 的横幅停在 `check1-36 PASS=59`（当时真源已 v2.30 / check1-40 / PASS=70），
 而它既不是文档（不在原扫描面）也不是 CI 跑的脚本，于是长期无判据。同一类漂移在**脚本横幅**里
 与在文档里一样会误导读者，故并入本判据；`skills/**` 一并收入（**agent 第一跳的文案**——与
+
+2026-11-08 再扩：`.github/workflows/*.yml` 一并收入；计数模式除 `PASS=` / `check1-` 外，
+另查 `N 条单测/探针/用例`（workflow 注释里写死「249 条单测」「45 条探针」会随演进漂移；
+带「实测」等证据词的留痕行放行）。流程描述里的普通数字不查。
 `test_nf_cli` 的旗标可达判据把 skills 纳入同一理由：写错了没有人会替他改）；`.py` 暂不收
 （`--help` 里的占位示例、探针的运行时输出格式会造假红，宁少勿滥）；`scripts/` 下**无扩展名**的可执行
 启停器一并收入（2026-10-04 补：`scripts/nf` 是 208 行的 POSIX 启动器，属人对/agent 读的活文案，
@@ -41,8 +45,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 
-ENTRY_DOCS = ("README.md", "README.en.md", "CONTRIBUTING.md", "docs/agent/AGENT_START.md", "docs/ag"
-    "ent/AI_ROUTING.md",
+ENTRY_DOCS = ("README.md", "README.en.md", "CONTRIBUTING.md", "AGENTS.md", "STRATEGY.md",
+              "docs/agent/AGENT_START.md", "docs/agent/AI_ROUTING.md",
               "docs/meta/DEEP_DIVE.md",
  "docs/meta/ROADMAP.md",
  "SECURITY.md",
@@ -51,8 +55,8 @@ ENTRY_DOCS = ("README.md", "README.en.md", "CONTRIBUTING.md", "docs/agent/AGENT_
 EXEMPT = {"CHANGELOG.md", "docs/meta/VERSION-MATRIX.md", "docs/verification-cards.md"}
 EXEMPT_PREFIX = ("docs/examples/", "docs/reference/", "community/", "results/", "library/")
 
-COUNT = re.compile(r"PASS=\d+|check1-\d+")
-HISTORY = ("曾", "历史", "此前", "漂移", "旧", "当波", "当时", "本波", "2026-", "2025-")
+COUNT = re.compile(r"PASS=\d+|check1-\d+|\d+\s*条(?:单测|探针|用例)")
+HISTORY = ("曾", "历史", "此前", "漂移", "旧", "当波", "当时", "本波", "2026-", "2025-", "实测")
 _STATS_BLOCK = re.compile(r"<!-- nf:stats:begin -->.*?<!-- nf:stats:end -->", re.S)
 
 
@@ -83,12 +87,20 @@ def live_docs() -> list:
                 or (rel.startswith("docs/") and rel.endswith(".md"))
                 or (rel.startswith("scripts/") and rel.endswith(".sh"))
                 or (rel.startswith("scripts/") and "." not in Path(rel).name)
+                or (rel.startswith(".github/workflows/") and rel.endswith(".yml"))
+                or (rel.endswith(".md") and rel.startswith(("engine/", "packaging/", "tools/")))
                 or rel.startswith("skills/")):
             out.append(rel)
     return out
 
 
 class LiveDocCountTest(unittest.TestCase):
+    def test_workflows_are_in_scope(self):
+        """扫描面覆盖 .github/workflows/*.yml（CI 注释的 check/PASS 计数同属活文案）。"""
+        rels = live_docs()
+        self.assertTrue(any(r.startswith(".github/workflows/") and r.endswith(".yml")
+                            for r in rels), "workflow 注释未进活文档计数扫描面")
+
     def test_live_docs_do_not_pin_runtime_counts(self):
         bad = []
         for rel in live_docs():
@@ -105,6 +117,9 @@ class LiveDocCountTest(unittest.TestCase):
         self.assertFalse(pinned_counts("<!-- nf:stats:begin -->\ncheck1-39 · PASS=68\n"
                                        "<!-- nf:stats:end -->\n"))
         self.assertFalse(pinned_counts('--gate "PASS=<当次 verify 输出的 PASS 数>"'))
+        # 2026-11-08：`N 条单测/探针/用例` 也属运行时计数；带「实测」等证据词的留痕行放行。
+        self.assertTrue(pinned_counts("rust-crate：249 条单测全过。"))
+        self.assertFalse(pinned_counts("rust-crate：249 条单测（实测 head abc）全过。"))
 
 
 #: 总量口径的声明（近旁须有「全部/共/覆盖/总计/一共」——子集计数如「14 个声明了 --root 的
@@ -228,6 +243,20 @@ class ProtocolSelfCountTest(unittest.TestCase):
             bad = self_count_issues(Path(tmp))
         self.assertEqual(1, len(bad), "变异未被抓到：%s" % bad)
         self.assertIn("a.json:count=2", bad[0])
+
+
+#: npm README 的「体积口径行」：**故意钉数字**，由 packaging/npm/tools/stage-payload.mjs 在
+#: stage 时自动同步（SIZE_RE 匹配即改写），verify-package.mjs 在发布前判存在；漂移由生成器兜住。
+#: 该行是发布面契约，不是「活文档钉运行时计数」——删掉会让 npm 发布/打包自检报红（2026-11-08 踩过）。
+NPM_VOLUME_RE = re.compile(r"当前体积：\*\*\d+ 件 · 解包 [\d.]+ MB\*\*")
+
+
+class NpmReadmeVolumeLineTest(unittest.TestCase):
+    def test_volume_line_present(self):
+        text = (ROOT / "packaging" / "npm" / "README.md").read_text(encoding="utf-8")
+        self.assertRegex(text, NPM_VOLUME_RE,
+                         "packaging/npm/README.md 缺体积口径行（stage-payload 会 WARN、"
+                         "verify-package 判红；补回「当前体积：**N 件 · 解包 X MB**」）")
 
 
 if __name__ == "__main__":

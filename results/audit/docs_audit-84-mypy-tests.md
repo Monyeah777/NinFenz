@@ -10,11 +10,11 @@ subjects:
   - desktop/tests/test_verification_cards.py:f4486f2683676e0b9094eaad6a7a4d20c424c9e07bb101e3692a90b6d5828492
   - desktop/tests/test_serve_default.py:4a4d19c399ba06f70d8c7153a8d23dd29c3330466df1c0e86434b9500d00a65c
   - desktop/tests/test_selfcontained_rebuild.py:c1804902ab453ca60333c35b712b9e9a8a14aed34664aafe3b5ff184ad18ef20
-  - desktop/tests/test_rust_fastlane.py:ce2703a108483dd330de84f40137d190e2c930f90626dbdb908de3d9d9df2f99
+  - desktop/tests/test_rust_fastlane.py:61df59a08593288dac89154f50dcd385fec1bcc5352b067cf4fdd683736dc40b
   - desktop/tests/test_quant_domain_package.py:e11700ea8f52a9d2a3c39838923f9264a099aa0997ce5e6890a9a96e65bc1709
   - desktop/tests/test_mcp_write_freedom.py:a2afa8cf6e1d6c2ccb2cde5f57b796d0b8722908be632e227b2a8dc76fe9cf2e
   - desktop/tests/test_mcp_runtime.py:cf53f00460f76e3eabb0a45842f584878e12d7d402fe613dcc355c5f62a25457
-  - desktop/tests/test_live_doc_counts.py:8d522b35f224f733bcac561a57376699a75dd3593e945475fc77319673d458d0
+  - desktop/tests/test_live_doc_counts.py:5559c486dcf34b148038202e1c1cb58107385444764ed7050fefb0ee1e53985d
   - desktop/tests/test_layer_model.py:8cea98de879a4bdf795f95afff9c8fa9a7675ebac227018b7b7694a158bfd69c
   - desktop/tests/test_knowledge_sig.py:4705091a139b4fc4da9a61bc816e30eeec3221688f3d923e43afc3b11609c17e
   - desktop/tests/test_judgement_coverage.py:d63adb43b766905494859941818d5eb6c5fc5eb4f19d9f5353df7b0d869c9f24
@@ -34,6 +34,18 @@ subjects:
   - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
 ---
+> 重审（2026-11-09）：Rust 快线修 built_for_date + PIL allowlist + CI parity 步
+
+> 重审（2026-11-08）：恢复 npm README 体积口径行 + 加判据
+
+> 重审（2026-11-08）：活文档扫描扩到 engine/packaging/tools 子项目文档
+
+> 重审（2026-11-08）：活文档扫描面加 AGENTS/STRATEGY
+
+> 重审（2026-11-08）：计数模式扩 N 条单测/探针/用例
+
+> 重审（2026-11-08）：活文档计数扫描面扩到 workflows
+
 > 重审（2026-11-07）：门禁修：silent-skip 理由 / 两个文本参数登记 / --mode 复核
 
 > 重审（2026-11-07）：nf evidence batch（目录逐件复验，整批不可用即失败）
