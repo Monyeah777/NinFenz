@@ -699,5 +699,46 @@ class RustFastLaneParityTest(unittest.TestCase):
             self.assertEqual(python_bytes(tmp), second, "变异语料上两侧仍须逐字节一致")
 
 
+#: Rust 侧 allowlist 常量 → Python 真源对应表（键集必须相等；2026-11-09 实测缺口：Rust
+#: 的 SOFT_IMPORTS 漏了 PIL，导致 verify-report 的 purity 面误报 label_watermark，四条 parity
+#: 判据在「二进制在场」时全红——而 CI 从不构建二进制，所以从未暴露）。
+def _rust_allowlist_keys(src: str, const: str) -> set:
+    """从 Rust 源码里取一个 allowlist 常量的键集（不依赖编译）。
+
+    - `const HARD_ALLOW: [&str; N] = ["yaml"];` → {"yaml"}
+    - `const SOFT_IMPORTS: [(&str, &str); N] = [("PIL", "..."), ...];` → 每对的首字符串
+    - `const IMPORT_RESIDUE: [(&str, &str); 0] = [];` → set()
+    """
+    m = re.search(rf"const {re.escape(const)}[^=]*=\s*\[(.*?)\];", src, re.S)
+    if m is None:
+        raise AssertionError(f"Rust 源码里找不到常量 {const}")
+    body = m.group(1)
+    pairs = re.findall(r'\(\s*"([^"]+)"\s*,', body)
+    if pairs:
+        return set(pairs)
+    return set(re.findall(r'"([^"]+)"', body))
+
+
+class RustAllowlistParityTest(unittest.TestCase):
+    """Rust 移植的 purity allowlist 必须与 Python 真源同键集（源码级，秒级，无二进制）。"""
+
+    def test_purity_allowlists_are_not_drifted(self):
+        from core import purity_scan as ps
+        src = (ROOT / "engine" / "rust" / "src" / "purity.rs").read_text(encoding="utf-8")
+        for const, ref in (("HARD_ALLOW", ps.HARD_ALLOW),
+                           ("SOFT_IMPORTS", ps.SOFT_IMPORTS),
+                           ("IMPORT_RESIDUE", ps.IMPORT_RESIDUE)):
+            self.assertEqual(set(ref), _rust_allowlist_keys(src, const),
+                             f"Rust purity.rs 的 {const} 与真源 purity_scan.{const} 键集不一致"
+                             "（2026-11-09 实测：漏 PIL 会让 verify-report purity 面误报）")
+
+    def test_mutation_missing_key_is_caught(self):
+        """变异自证：Rust 里少一个键必须被抓到；键集相同时不误报。"""
+        src = ('const SOFT_IMPORTS: [(&str, &str); 1] = [\n'
+               '    ("PIL", "x"),\n];\n')
+        self.assertEqual({"PIL"}, _rust_allowlist_keys(src, "SOFT_IMPORTS"))
+        self.assertNotEqual({"PIL", "jsonschema"}, _rust_allowlist_keys(src, "SOFT_IMPORTS"))
+
+
 if __name__ == "__main__":
     unittest.main()

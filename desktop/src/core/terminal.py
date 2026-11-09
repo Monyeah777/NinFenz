@@ -1218,7 +1218,11 @@ TERMINAL_BASELINE: tuple[dict[str, Any], ...] = (
      "argv": ("shell", "--session", BASELINE_TMP + "/shell_session.json",
               "--no-history", "--no-banner"),
      "stdin": "/set width=120\nquit\n",
-     "expect": "width = 120", "expect_file": BASELINE_TMP + "/shell_session.json"},
+     "expect": "width = 120", "expect_file": BASELINE_TMP + "/shell_session.json",
+     # 2026-11-09 实测（cross-platform Windows CI）：本行 3 次取最小仍 **422.5 ms** > 默认 300 ms
+     # → Windows 假红（该行要落 session json + 读回，慢盘/AV 下 IO 成本高；Linux 实测 ~30 ms）。
+     # 行级预算放宽到 900 ms，仍能拦「数量级回归」（>3× 会红）。
+     "max_ms": 900},
     {"id": "menu-family-crosslink", "name": "菜单↔能力族互标",
      "argv": ("shell", "--exec", "/menu", "--no-banner"), "expect": "未在此列的族"},
     {"id": "form-dry-run", "name": "写盘表单（dry-run 只组装不执行）",

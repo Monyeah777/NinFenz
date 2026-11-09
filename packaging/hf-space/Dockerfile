@@ -7,7 +7,8 @@
 # npm 包同源同版本」），且不再要求构建上下文里存在本地产物。
 #
 # 发新版时：把 NF_VERSION 与 packaging/npm/package.json 的 version 同步；release 链已判两处一致性。
-FROM node:22-slim AS nfpayload
+# Scorecard PinnedDependenciesID（2026-11-09）：两级基座都按 digest 钉死（升级=显式改 digest）。
+FROM node:22-slim@sha256:5ec23b7c622b00547753bc6ffd78085dd868a68aeb41c8e0a1418f033e13d96d AS nfpayload
 ARG NF_VERSION=1.0.5
 WORKDIR /tmp/nf
 RUN npm pack "ninfenz@${NF_VERSION}" \
@@ -15,7 +16,7 @@ RUN npm pack "ninfenz@${NF_VERSION}" \
  && test -d package/payload \
  && mv package/payload /nf
 
-FROM python:3.12-slim
+FROM python:3.12-slim@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONUTF8=1 \

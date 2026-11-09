@@ -10,7 +10,7 @@ subjects:
   - desktop/tests/test_verification_cards.py:f4486f2683676e0b9094eaad6a7a4d20c424c9e07bb101e3692a90b6d5828492
   - desktop/tests/test_serve_default.py:4a4d19c399ba06f70d8c7153a8d23dd29c3330466df1c0e86434b9500d00a65c
   - desktop/tests/test_selfcontained_rebuild.py:c1804902ab453ca60333c35b712b9e9a8a14aed34664aafe3b5ff184ad18ef20
-  - desktop/tests/test_rust_fastlane.py:ce2703a108483dd330de84f40137d190e2c930f90626dbdb908de3d9d9df2f99
+  - desktop/tests/test_rust_fastlane.py:61df59a08593288dac89154f50dcd385fec1bcc5352b067cf4fdd683736dc40b
   - desktop/tests/test_quant_domain_package.py:e11700ea8f52a9d2a3c39838923f9264a099aa0997ce5e6890a9a96e65bc1709
   - desktop/tests/test_mcp_write_freedom.py:a2afa8cf6e1d6c2ccb2cde5f57b796d0b8722908be632e227b2a8dc76fe9cf2e
   - desktop/tests/test_mcp_runtime.py:cf53f00460f76e3eabb0a45842f584878e12d7d402fe613dcc355c5f62a25457
@@ -34,6 +34,8 @@ subjects:
   - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
   - desktop/tests/test_nf_cli.py:c8eba2a0040083954cfc6847a1ab2e34ae1d2981a23155847feff34bd98f477c
 ---
+> 重审（2026-11-09）：Rust 快线修 built_for_date + PIL allowlist + CI parity 步
+
 > 重审（2026-11-08）：恢复 npm README 体积口径行 + 加判据
 > 重审（2026-11-08）：DSSE v1 签名信封新增后重审：PAE、双 Base64 字母表、HMAC 多签名、阈值与篡改负例进入常驻判据；Python/.NET 交叉验签接入 CI。
 
