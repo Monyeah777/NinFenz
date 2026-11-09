@@ -241,8 +241,12 @@ def _zip_with_duplicate(members: dict, dup_name: str) -> bytes:
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_STORED) as zf:
         for name in sorted(members):
             zi = zipfile.ZipInfo(name, date_time=evidence._ZIP_EPOCH)
+            # 跨平台确定性：default create_system 在 Windows=0 / Linux=3，会让同一份 zip
+            # 字节不同、向量摘要漂移（2026-11-10 Linux CI 实测）。固定 0。
+            zi.create_system = 0
             zf.writestr(zi, members[name])
         zi = zipfile.ZipInfo(dup_name, date_time=evidence._ZIP_EPOCH)
+        zi.create_system = 0
         zf.writestr(zi, b"shadow")
     return buf.getvalue()
 

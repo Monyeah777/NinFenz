@@ -1,7 +1,7 @@
 {
-  "bytes": 12013511,
+  "bytes": 12013969,
   "count": 569,
-  "digest": "fab098ad218c1d780efc01b2083fc233b2f7b1768f585e063e034bc928fe5562",
+  "digest": "fbf9352f542b09d0c111240ebb88a035916db4ed7e8a53f7c32b2f19bcc321b5",
   "materials": [
     {
       "bytes": 102,
@@ -2444,9 +2444,9 @@
       "sha256": "aad2a9338005f35f70468172c634cc8b27f3485e582b219172f871329bfeb669"
     },
     {
-      "bytes": 13119,
+      "bytes": 13318,
       "path": "protocol/verification_report.json",
-      "sha256": "373652d7d79f8aeb001a4753bfbd32680d93d913469c913a086449b2fa9180e9"
+      "sha256": "31798615195b4380c3d14de0289b4290b4d39cbbac79dbb478104b4b4dd75d92"
     },
     {
       "bytes": 4160,
@@ -2589,9 +2589,9 @@
       "sha256": "90d125faa5c9283ef54bdeac529ee9180baee6918cc77617e397d8a9edefe8a6"
     },
     {
-      "bytes": 21421,
+      "bytes": 21680,
       "path": "scripts/evidence_vectors.py",
-      "sha256": "cd04730540d373b30343ab2c651900cbb432ba3ebe5cbc19633a0cd6c5e72922"
+      "sha256": "7be1ea5d211f4ba8726feae62c2fcf2f47586c65936258f1f036c09eeaab9356"
     },
     {
       "bytes": 14796,
