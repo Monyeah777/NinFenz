@@ -61,6 +61,17 @@ jobs:
             sudo apt-get -o Acquire::Retries=3 install -y libegl1 libgl1 libxkbcommon0 libdbus-1-3
           fi
           python -m pip install --require-hashes -r .github/requirements-ci.txt
+      - name: SAST 本平台基线（Windows 段；Linux 面归 sast workflow）
+        # 2026-11-09 盲区：protocol/sast_baseline.json 的 **nt 段**此前只在本地结论里被验证，
+        # CI 没有 Windows 面（Linux 有 sast.yml）。这里用同一套 pinned bandit/ruff 在 Windows 上
+        # 跑 sast_check，与 nt 段逐键比对——基线漂移/工具版本漂移都能被 CI 抓到。
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          set -o pipefail
+          python -m pip install --require-hashes -r .github/requirements-sast.txt \
+            -r .github/requirements-lint.txt
+          python scripts/sast_check.py 2>&1 | tee sast-windows.log
       - name: 冷启动前置（干净 clone 缺的 4 项；缺任一项全量门禁必红）
         shell: bash
         run: |
@@ -88,6 +99,7 @@ jobs:
           name: verify-log-${{ matrix.os }}
           path: |
             verify.log
+            sast-windows.log
             .nf-logs/
           if-no-files-found: warn
           include-hidden-files: true
