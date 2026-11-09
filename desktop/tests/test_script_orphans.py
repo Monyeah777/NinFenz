@@ -65,6 +65,21 @@ class ScriptOrphanTest(unittest.TestCase):
         missing = sorted(s for s in ORPHANS if s not in doc)
         self.assertEqual([], missing, "一次性审计清单没写这些脚本：" + ", ".join(missing))
 
+    def test_doc_lists_only_frozen_orphans(self):
+        """反方向：文档不能多列（第 184 轮）。
+
+        原判据只查「冻结集 ⊆ doc」，于是文档多写一个脚本也不会红。
+        多写意味着文档声称某脚本是「一次性审计」，而判据认为它有引用——两边对同一事实表述不同。
+        """
+        import re
+
+        doc = (ROOT / "docs" / "ccos" / "one-shot-audits.md").read_text(encoding="utf-8")
+        listed = set(re.findall(r"scripts/([A-Za-z0-9_]+)\.py", doc))
+        extra = sorted(listed - set(ORPHANS))
+        self.assertEqual([], extra,
+                         "文档多列了这些脚本（它们已有引用，不该在一次性审计清单里）："
+                         + ", ".join(extra))
+
     def test_scan_is_not_vacuous(self):
         self.assertGreaterEqual(len(list((ROOT / "scripts").glob("*.py"))), 70,
                                 "脚本太少（判据可能已失效）")

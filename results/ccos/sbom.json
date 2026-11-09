@@ -1,7 +1,7 @@
 {
-  "bytes": 12001324,
+  "bytes": 12001929,
   "count": 569,
-  "digest": "1cfd64b471812ecf527e884b0940ba40e93ddcf04f517e65eca88a066c4c59cc",
+  "digest": "21a5e077ec4c1c5c0ad54d1302a54d8b56da156e14ea75e063f85d0f2d5a4c0b",
   "materials": [
     {
       "bytes": 102,
@@ -1829,9 +1829,9 @@
       "sha256": "1ecd4b0aca8aae6eb3445d3b34649bc1a6a445d817d19f5f24564a006e9d9f73"
     },
     {
-      "bytes": 3261,
+      "bytes": 3859,
       "path": "docs/ccos/judge-design-questions.md",
-      "sha256": "80720749ee4cbb9361a8b45cdff3a42432f70cc8d0b4c693d4897299044554be"
+      "sha256": "d07de3f72f16951aaf787dd461174627b1e88af1caadce4a05dca6d7e680f2a9"
     },
     {
       "bytes": 5568,
@@ -1899,9 +1899,9 @@
       "sha256": "ad799cbfbf1dd69859ff21963885ebf1d5fed56ca67fdd1c2b9e2052ce3b8003"
     },
     {
-      "bytes": 306,
+      "bytes": 313,
       "path": "protocol/approvals/protocol__conformance_report.json",
-      "sha256": "c1954f8da8ae91380611afd1ff2d33fa34d822301255fa2e4942520725e8e133"
+      "sha256": "c2346601aa70291b1d34060504dc107025a5d27f065baa2ac3cac5fdeec14dac"
     },
     {
       "bytes": 16375,
