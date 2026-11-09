@@ -1,7 +1,7 @@
 {
-  "bytes": 12002760,
+  "bytes": 12003010,
   "count": 569,
-  "digest": "3107ba22a74dc7c9156f3b6ebca6b341b86ef9f98bd62cbba89b839196648d57",
+  "digest": "9240719f811937e414d223ec84494a678e34799ea73b4bb2b1b61fd2bddc00d2",
   "materials": [
     {
       "bytes": 102,
@@ -1829,14 +1829,14 @@
       "sha256": "1ecd4b0aca8aae6eb3445d3b34649bc1a6a445d817d19f5f24564a006e9d9f73"
     },
     {
-      "bytes": 3859,
+      "bytes": 3918,
       "path": "docs/ccos/judge-design-questions.md",
-      "sha256": "d07de3f72f16951aaf787dd461174627b1e88af1caadce4a05dca6d7e680f2a9"
+      "sha256": "3a6876be4597c92740b8abbde285ad596b339540cfbdc8f53f5eb1d5d5dddc5e"
     },
     {
-      "bytes": 5568,
+      "bytes": 5571,
       "path": "docs/ccos/judge-families.md",
-      "sha256": "151d5b17171faf98db4d7182956692ad6c352f8ff0a0b140b534d99b7474b597"
+      "sha256": "7ef4098d8db176a05b5629a51f835d20553ea92245a9e09c1edc3c6e2ddcc37f"
     },
     {
       "bytes": 3542,
@@ -1864,9 +1864,9 @@
       "sha256": "06cbbb34b66d8bf3ec7fdf16737543e5224abfb297137b82f8b5adc13e9b154f"
     },
     {
-      "bytes": 13145,
+      "bytes": 13326,
       "path": "docs/ccos/release-conclusion.md",
-      "sha256": "21764f6cd69fd25f5fa09c5c6ee9ae242029fe479db78981f6989b3cf9a4b0ae"
+      "sha256": "5e8fa4402aec3759bf92baf1b61a267b20debcc658cac0547bb7fdb7ce52bd29"
     },
     {
       "bytes": 3736,
@@ -1899,9 +1899,9 @@
       "sha256": "ad799cbfbf1dd69859ff21963885ebf1d5fed56ca67fdd1c2b9e2052ce3b8003"
     },
     {
-      "bytes": 290,
+      "bytes": 297,
       "path": "protocol/approvals/protocol__conformance_report.json",
-      "sha256": "a60694a0097ec3a50613deb0efcdf11a913f5d07e1a084f8fd4cc7c6ae0d6956"
+      "sha256": "f72eea46b87ee4bb07abd17193d0faceffd8cc2cc6eedbcc1b954680f0d0097f"
     },
     {
       "bytes": 16375,
