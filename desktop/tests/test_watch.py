@@ -452,7 +452,8 @@ class WatchDaemonIntegrationTest(unittest.TestCase):
         # 只信后者会偶发 text=0（2026-11-09/10 全量快照两次命中）。两个面取最大值并轮询 15 s。
         text = 0
         for _ in range(150):
-            mod_text = int((sys.modules["core.conformance_scan"].resident_stats() or {}).get("text", 0))
+            stats = sys.modules["core.conformance_scan"].resident_stats() or {}
+            mod_text = int(stats.get("text", 0))
             dm_text = int((dm.query_stats().get("resident") or {}).get("text", 0))
             text = max(mod_text, dm_text)
             if text > 0:
