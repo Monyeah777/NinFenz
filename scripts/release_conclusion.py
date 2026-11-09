@@ -802,6 +802,32 @@ def status_snapshot(base: Path) -> dict[str, Any]:
             "runs": [p.name for p in runs], "lock": lock_info, "latest": latest,
             "running": bool(lock_info and lock_info.get("alive"))}
 
+def _digests() -> dict:
+    """结论要绑的两份摘要（第 97 / 114 轮）：验证器与材料。取不到时留空串。"""
+    try:
+        verifier = _core("verifier_version").digest(ROOT)["verifier_digest"]
+    except ValueError:
+        verifier = ""
+    try:
+        materials = _core("sbom").collect(ROOT)["digest"]
+    except ValueError:
+        materials = ""
+    return {"verifier_digest": verifier, "materials_digest": materials}
+
+
+def _write_out(args, payload: dict) -> None:
+    """`--out` 落盘（第 124 轮）：拿到该文件的人可用 verifier_status 复核。"""
+    dest = str(getattr(args, "out", "") or "")
+    if not dest:
+        return
+    path = Path(dest)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    _core("atomic_write").write_text(
+        path, json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n")
+    if not getattr(args, "json", False):
+        print("结论已写入：" + str(path))
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="release_conclusion",
                                  description="发布结论一键复跑（干净树 → 供应链核对 → "
@@ -831,6 +857,8 @@ def main(argv=None) -> int:
     ap.add_argument("--status", action="store_true",
                     help="只看快照现场（锁持有者/运行目录/最近一次结论），不跑门禁")
     ap.add_argument("--json", action="store_true", help="机读汇总")
+    ap.add_argument("--out", default="",
+                    help="把结论 JSON 存到该路径（供 verifier_status 复核）")
     args = ap.parse_args(argv)
     if args.status:
         base = snapshot_base(ROOT, getattr(args, "snapshot_dir", "") or "")
@@ -940,8 +968,9 @@ def main(argv=None) -> int:
     if args.only_preflight:
         payload = {"schema": "nf-release-conclusion/1", "ok": True, "only_preflight": True,
                    "supply_chain": supply, "freshness": fresh,
-                   "ratchets": ratchets, "issues": [],
+                   "ratchets": ratchets, "issues": [], **_digests(),
                    "wall": 0.0}
+        _write_out(args, payload)
         print(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True)
               if args.json else "  => 前置面全过（脏树 / payload / 供应链）")
         return 0
@@ -1002,15 +1031,9 @@ def main(argv=None) -> int:
     moved = head_move_guard(head, head_end) or drift
     # 自省层（第 97 轮）：结论同时记录**产出它的验证器摘要**（判定面脚本内容摘要）。
     # 工具改了而结论没重跑，摘要就对不上——这让「这份结论是谁判的」可核。
-    try:
-        verifier = _core("verifier_version").digest(ROOT)["verifier_digest"]
-    except ValueError:
-        verifier = ""
-    # 供应链（第 114 轮）：结论同时记录**材料清单摘要**——「这份结论基于哪些输入」可核。
-    try:
-        materials = _core("sbom").collect(ROOT)["digest"]
-    except ValueError:
-        materials = ""
+    dig = _digests()
+    verifier = dig["verifier_digest"]
+    materials = dig["materials_digest"]
     payload = {"schema": "nf-release-conclusion/1",
                "ok": summary["ok"] and checks_rc == 0 and not moved,
                "verifier_digest": verifier,
@@ -1021,6 +1044,7 @@ def main(argv=None) -> int:
                "shards": sorted(results, key=lambda r: r["shard"]),
                "failed": summary["failed"], "shard_wall_s": summary["wall"],
                "wall_s": round(time.perf_counter() - t0, 1)}
+    _write_out(args, payload)
     if args.json:
         print(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True))
     else:

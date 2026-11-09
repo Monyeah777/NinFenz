@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:22e24633e87e95453d0c2cf4a595d0496bae5d7331c1fc644d5b1555e4925a41
-  - protocol/code_metrics_baseline.json:e19115e4c82c6d44a42d0c1e9bd7e4af3d87d06c04d45b89d1f82800e83c678d
+  - protocol/code_metrics_baseline.json:4ac2c54c464f7401067c34baf97984a8d3d64a1fb582e76871bbea82c7a12f90
 ---
+> 重审（2026-11-09）：结论可落盘 --out（配合 verifier_status 复核）
+
 > 重审（2026-11-09）：发布结论记录材料清单摘要（供应链闭环）
 
 > 重审（2026-11-09）：材料清单模块拆分 + json_doc 统一（规模基线重冻）

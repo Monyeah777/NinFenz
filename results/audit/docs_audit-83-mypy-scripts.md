@@ -14,8 +14,10 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:5ad37816b44f2950cc5bd48a2a59e55fd87e074a7ad779839d540fda66440743
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:e19115e4c82c6d44a42d0c1e9bd7e4af3d87d06c04d45b89d1f82800e83c678d
+  - protocol/code_metrics_baseline.json:4ac2c54c464f7401067c34baf97984a8d3d64a1fb582e76871bbea82c7a12f90
 ---
+> 重审（2026-11-09）：结论可落盘 --out（配合 verifier_status 复核）
+
 > 重审（2026-11-09）：发布结论记录材料清单摘要（供应链闭环）
 
 > 重审（2026-11-09）：材料清单模块拆分 + json_doc 统一（规模基线重冻）

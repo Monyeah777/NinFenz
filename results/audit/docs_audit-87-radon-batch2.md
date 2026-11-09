@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:e19115e4c82c6d44a42d0c1e9bd7e4af3d87d06c04d45b89d1f82800e83c678d
+  - protocol/code_metrics_baseline.json:4ac2c54c464f7401067c34baf97984a8d3d64a1fb582e76871bbea82c7a12f90
 ---
+> 重审（2026-11-09）：结论可落盘 --out（配合 verifier_status 复核）
+
 > 重审（2026-11-09）：发布结论记录材料清单摘要（供应链闭环）
 
 > 重审（2026-11-09）：材料清单模块拆分 + json_doc 统一（规模基线重冻）

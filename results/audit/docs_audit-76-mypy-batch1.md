@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/io_types.py:09296daf865db85bda582fb646cece708c51f97e190a9e91c0eecd07252475f7
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
   - desktop/src/core/knowledge.py:d0b678c0f1176ce6f16a33b6f6d42a16b663099b4346306fae1ea547305e316b
-  - protocol/code_metrics_baseline.json:e19115e4c82c6d44a42d0c1e9bd7e4af3d87d06c04d45b89d1f82800e83c678d
+  - protocol/code_metrics_baseline.json:4ac2c54c464f7401067c34baf97984a8d3d64a1fb582e76871bbea82c7a12f90
 ---
+> 重审（2026-11-09）：结论可落盘 --out（配合 verifier_status 复核）
+
 > 重审（2026-11-09）：发布结论记录材料清单摘要（供应链闭环）
 
 > 重审（2026-11-09）：材料清单模块拆分 + json_doc 统一（规模基线重冻）

@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:9a86928171c71f4a2d3d324508fdafccb60fd7cc8423d52197185214a40ea30f
-  - protocol/code_metrics_baseline.json:e19115e4c82c6d44a42d0c1e9bd7e4af3d87d06c04d45b89d1f82800e83c678d
+  - protocol/code_metrics_baseline.json:4ac2c54c464f7401067c34baf97984a8d3d64a1fb582e76871bbea82c7a12f90
 ---
+> 重审（2026-11-09）：结论可落盘 --out（配合 verifier_status 复核）
+
 > 重审（2026-11-09）：发布结论记录材料清单摘要（供应链闭环）
 
 > 重审（2026-11-09）：材料清单模块拆分 + json_doc 统一（规模基线重冻）

@@ -537,6 +537,32 @@ class TestSnapshotIsolationPaths(unittest.TestCase):
         self.assertEqual(run_dir, os.path.dirname(log))
         self.assertTrue(log.endswith("gate.log"))
 
+    def test_out_writes_a_reusable_conclusion_file(self):
+        """第 124 轮：`--out` 落盘的结论必须能被 verifier_status 判为 current。
+
+        这里直接测 helper（不在测试里跑全量快照）：写盘 → 读回 → 摘要一致。
+        """
+        import importlib.util
+        import sys
+        import tempfile
+        from pathlib import Path
+        from types import SimpleNamespace
+
+        root = Path(__file__).resolve().parents[2]
+        sys.path.insert(0, str(root / "scripts"))
+        sys.path.insert(0, str(root / "desktop" / "src"))
+        spec = importlib.util.spec_from_file_location("rc_mod", root / "scripts" / "release_conclusion.py")
+        rc = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(rc)
+        import verifier_status as vs
+
+        with tempfile.TemporaryDirectory() as tmp:
+            dest = Path(tmp) / "conclusion.json"
+            payload = {"schema": "nf-release-conclusion/1", "ok": True, **rc._digests()}
+            rc._write_out(SimpleNamespace(out=str(dest), json=True), payload)
+            self.assertTrue(dest.is_file(), "--out 没有写文件")
+            self.assertEqual("current", vs.build(conclusion=str(dest))["status"])
+
     def test_payload_includes_materials_digest(self):
         """供应链（第 114 轮）：结论必须记录材料清单摘要（这份结论基于哪些输入）。"""
         import sys
