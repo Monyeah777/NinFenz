@@ -8,14 +8,18 @@ auditor: 本轮执行者
 subjects:
   - CHANGELOG.md:24e2f6f22cf7ab3c92b5ab6baa31bdd47e280bd7c56031309d8a213c017a39fc
   - docs/meta/VERSION-MATRIX.md:014144331c6e2715f4d4e441c69055e636d0194a1133d004904423bd23d2077a
-  - README.md:d61e2a9471653cc9fc4d6d5e1f1876d1e1a96b947a98949a9cf1a83dc80c523f
+  - README.md:cf4c181f48da143e1c59d9fb44e4be8ee6c42dd802d12b6a66dc5116eebe16c7
   - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
   - docs/release.md:a878a24b8631d965e30d0bc865c9f88b71049f5a73025cf2984f5bd5cbca5dbb
-  - scripts/nf.py:83a75a4fac82461d56b03147eff04b420b8aad0ed6db9fef6e695717dcf7b6a2
+  - scripts/nf.py:869bab4dff472c51503c71770c1871cb4dab32a3c3d0977da69ce6a0ea963d9e
 
 ---
+> 重审（2026-11-09）：Foundation repair: 重绑发布束重构后的审计对象摘要
+
+> 重审（2026-11-09）：foundation repair: canonical product metadata, dual licensing, and release bundle
+
 > 重审（2026-11-08）：task-35c：git status 收敛到 repo_face.untracked_paths
 
 > 重审（2026-11-08）：task-35：nf.py 注释修正（nosec/理由）

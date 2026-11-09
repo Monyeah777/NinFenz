@@ -6,9 +6,11 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
+  - desktop/src/core/interop_export.py:d0c0d3eb20bf879619088706306c4a8051dde34af6dadab2e2817fee9a575b0e
   - protocol/code_metrics_baseline.json:9d65db374221c26f8c093f8522ac5ddcf59b2029711726203287d713bc147498
 ---
+> 重审（2026-11-09）：foundation repair: canonical product metadata, dual licensing, and release bundle
+
 > 重审（2026-11-09）：sast_check 行数
 
 > 重审（2026-11-09）：CodeQL 两处告警修复（ReDoS/URL 子串）

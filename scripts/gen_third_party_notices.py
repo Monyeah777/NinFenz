@@ -120,7 +120,8 @@ def main(argv=None) -> int:
         "（Python stdlib + Node 标准库）。",
         "- **本文所列**：仓库**门禁与开发工具链**依赖（用于跑 `verify.sh` 与 CI 检查，"
         "不随产品分发）。",
-        "- 各组件按其自身许可证分发；本仓代码/文档为 MIT（见 `LICENSE`）。",
+        "- 各组件按其自身许可证分发；本仓代码为 `AGPL-3.0-only OR "
+        "LicenseRef-Commercial`，协议/文档为 `CC-BY-4.0`（见 `LICENSING.md`）。",
         "- 投稿/社区内容的版权与再分发条款见 "
         "`LICENSES/LicenseRef-Community-Submission.txt` 与 `REUSE.toml`。",
         "",
@@ -138,7 +139,6 @@ def main(argv=None) -> int:
         "",
         "- **PySide6**（若安装 `[dev]` 全量 extras）：LGPL-3.0。仅用于桌面/终端相关测试，",
         "  不随 npm 包或 CLI 分发；再分发其二进制需遵守 LGPL（提供源码获取方式与替换自由）。",
-        "- 其余均为宽松许可（MIT / Apache-2.0 / BSD / PSF），与 MIT 主许可兼容。",
         "",
         "## 更新方式",
         "",

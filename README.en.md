@@ -60,7 +60,7 @@ Keybindings follow the mainstream terminal conventions: `Tab` switches panes, `�
 path arguments pass repository-containment checks, writes require typing `yes`, and API keys are read from the environment and masked. A single-file executable is shipped alongside.
 Details: `tui/README.md`.
 
-> MIT License · original open source · please cite the source when deriving/referencing
+> AGPL-3.0-only OR LicenseRef-Commercial · original code for open collaboration, with a separate commercial option · please cite the source when deriving/referencing
 
 **In one sentence**: NF is a **content contract layer** — it defines the protocols, quality gates and asset standards for "AI reliably produces long-form content"; narrative is only the first official domain package, while the protocol itself is domain-neutral and model-agnostic.
 
@@ -117,7 +117,7 @@ AI assembly:
 - **Which models are supported?** Model-agnostic: any text-capable AI can assemble and load the protocols; nothing is bound to a vendor or a connection protocol.
 - **Does it need network access?** No. The repository is markdown source; `bash verify.sh` is local-only and runs offline.
 - **How is output judged?** Only by the internal chain: the verify gate (statically checkable) + the five-axis depth review + real drills. External praise is not used as quality evidence.
-- **How do I cite it?** MIT license; please credit the source — machine-readable metadata lives in `CITATION.cff` at the repository root.
+- **How do I cite it?** The current product uses `AGPL-3.0-only OR LicenseRef-Commercial`; please credit the source — machine-readable metadata lives in `CITATION.cff` at the repository root.
 - **Export & compliance?** Cryptography uses only the standard library plus external `ssh-keygen` (no home-grown algorithms); the export-control reading is in `docs/EXPORT.md`.
 
 ## Capabilities and assets
@@ -145,7 +145,7 @@ AI assembly:
 
 ## Versions
 
-Install **`ninfenz` 1.0.5** today — published to both npm and GitHub Packages:
+Install **`ninfenz` 1.1.2** today — published to both npm and GitHub Packages:
 
 ```bash
 npm i -g ninfenz@latest   # install or upgrade
@@ -158,7 +158,7 @@ Three independent version lines ship from the same repository:
 | Line | Current | What it governs |
 |---|---|---|
 | **Content & protocol** | **v0.93** | Templates, domain packs, specs — *what* can be generated |
-| **Command-line tool** | **1.0.5** | the `nf` command / npm package / MCP server — *how* you use it |
+| **Command-line tool** | **1.1.2** | the `nf` command / npm package / MCP server — *how* you use it |
 | **Quality gate** | see `nf stats` | self-check status — *whether* something broke |
 
 Last three content releases, described by **what they add**:
@@ -170,6 +170,6 @@ Last three content releases, described by **what they add**:
 | v0.82 | 2026-09-09 | 45-point quality depth plus foundation layer A |
 
 Release rules (since 2026-10-20): the content line uses `v0.xx` — small updates fold into the current release, a modest breakthrough adds **0.01**, an innovation adds **0.1**; the CLI line
-is versioned independently as `1.0.x`; every release updates `CHANGELOG.md`, and tags are placed
+is versioned independently as `1.1.x`; every release updates `CHANGELOG.md`, and tags are placed
 on the commit that **carries the feature**.
 

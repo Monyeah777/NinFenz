@@ -113,7 +113,7 @@ PAGE = '''<!doctype html>
  code{color:var(--acc)}
 </style></head><body><div class="wrap">
 <h1>NinFenz · Contract Gate</h1>
-<p class="sub">在浏览器里跑 <b>真实</b> 的 NF 只读门禁：粘贴一段内容 → 看逐条判据结论。本地/离线同源，MIT。</p>
+<p class="sub">在浏览器里跑 <b>真实</b> 的 NF 只读门禁：粘贴一段内容 → 看逐条判据结论。本地/离线同源，AGPL-3.0-only OR LicenseRef-Commercial。</p>
 <div class="row"><select id="mode"></select><button id="go">运行</button><span class="meta" id="hint"></span></div>
 <textarea id="text" placeholder="粘贴要体检的 markdown（仅 lint 模式使用）"></textarea>
 <div class="meta" id="meta">就绪</div>
