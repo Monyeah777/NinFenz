@@ -31,9 +31,11 @@ subjects:
   - desktop/tests/test_cli_json_face.py:edbbed0acb44ab9d9fe28c5de9a88af50cf63b1c1b173a873c976b9bc6367a7e
   - desktop/tests/test_ccv3_adapter.py:bf7e200b3c8df8d56dd811d2baab6a5d4961d4a043aa98bdfa2b4e95640bf7db
   - desktop/tests/test_ai_domain_closure.py:f9ec87c5c53daa811f443ec207fe6190c48039f24228c8d7af1b9873d6805bba
-  - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
-  - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
+  - desktop/tests/test_terminal.py:f9cfbefb0a5ee8b0486a03b2386061caa23d27367299685c3b382dfdecb52352
+  - desktop/tests/test_nf_cli.py:c44a5c57d5c4247a6c58d5e85d4e7adf2c95f7969d5d599e2b9643fe495c7b17
 ---
+> 重审（2026-11-09）：foundation repair: canonical product metadata, dual licensing, and release bundle
+
 > 重审（2026-11-09）：Rust 快线修 built_for_date + PIL allowlist + CI parity 步
 
 > 重审（2026-11-08）：恢复 npm README 体积口径行 + 加判据

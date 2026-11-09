@@ -18,7 +18,7 @@ public static class Interop
     public const string EventsRel = "protocol/event_registry.json";
     public const string ExternalEventsRel = "protocol/external_events.json";
     public const string ReceiptsRel = "protocol/RECEIPTS.json";
-    public const string LicenseName = "MIT";
+    public const string LicenseName = "AGPL-3.0-only";
 
     /// <summary>12 种导出形状（键序 = 真源 <c>KINDS</c> 的声明序，<c>--list</c> 逐行按此序）。</summary>
     public static readonly (string Id, string Label)[] Kinds =

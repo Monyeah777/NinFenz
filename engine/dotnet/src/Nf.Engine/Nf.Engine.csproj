@@ -31,6 +31,6 @@
     <Version>1.0.0</Version>
     <PackageDescription>NF 判据面引擎（只读复算：组合证书 T4 / 回执 / 透明链 / 建模三件 / 决策层 / 馆藏门 / 编码卫生 …；零 NuGet 依赖，BCL-only）</PackageDescription>
     <PackageTags>ninfenz;verification;read-only;engine</PackageTags>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageLicenseExpression>AGPL-3.0-only</PackageLicenseExpression>
   </PropertyGroup>
 </Project>

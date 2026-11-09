@@ -21,7 +21,8 @@ def _id(base: str, name: str) -> str:
     return f"{base}#{name}"
 
 
-def build(version: str, created: str, dependencies: Iterable[dict[str, Any]]) -> dict[str, Any]:
+def build(version: str, created: str, dependencies: Iterable[dict[str, Any]],
+          root_license: str = "NOASSERTION") -> dict[str, Any]:
     """Build a compact SPDX 3.0.1 JSON-LD SBOM.
 
     ``dependencies`` rows are ``{name, version, purl, optional, reason}``.  Missing
@@ -33,7 +34,7 @@ def build(version: str, created: str, dependencies: Iterable[dict[str, Any]]) ->
     supplier = _id(base, "supplier-ninfenz")
     upstream = _id(base, "supplier-upstream")
     root_pkg = _id(base, "pkg-ninfenz")
-    mit = _id(base, "license-mit")
+    product_license = _id(base, "license-product")
     cc0 = _id(base, "license-cc0")
     no_assert = _id(base, "license-noassertion")
     graph: list[dict[str, Any]] = [
@@ -64,8 +65,8 @@ def build(version: str, created: str, dependencies: Iterable[dict[str, Any]]) ->
         },
         {
             "@type": "simplelicensing_LicenseExpression",
-            "@id": mit,
-            "simplelicensing_licenseExpression": "MIT",
+            "@id": product_license,
+            "simplelicensing_licenseExpression": root_license,
         },
         {
             "@type": "simplelicensing_LicenseExpression",
@@ -151,7 +152,7 @@ def build(version: str, created: str, dependencies: Iterable[dict[str, Any]]) ->
             "to": [dep_id],
         })
     for index, package_id in enumerate(package_ids, 1):
-        license_id = mit if package_id == root_pkg else no_assert
+        license_id = product_license if package_id == root_pkg else no_assert
         for kind in ("hasDeclaredLicense", "hasConcludedLicense"):
             relations.append({
                 "@type": "Relationship",

@@ -30,10 +30,10 @@ scope 约定：`protocol`（01–07）/ `desktop` / `scripts` / `community` / `c
 ## 2. 分支策略：单主干 + 版本锚点
 
 - 主干 main 为唯一长期分支，改动直接推 main（大改动可短命分支合并后删除）。
-- **版本锚点**：发布即打 annotated tag（内容线 `v0.xx` / CLI 线 `v1.0.x`），tag 为版本真相源（I5），禁止在已发布 tag 上回写。
+- **版本锚点**：发布即打 annotated tag（内容线 `v0.xx` / CLI 线 `v1.1.x`），tag 为版本真相源（I5），禁止在已发布 tag 上回写。
 - 开工前工作树须干净（当前版本锚点 = 最新 annotated tag，见 §2）。
 
-### 2.1 编号体系映射表（四套口径 · 唯一真源）
+### 2.1 编号体系映射表（三套口径 · 唯一真源）
 
 仓库同时存在四套编号，混用即口径崩塌（2026-10-10 审计 P1-6）。机检 = `desktop/tests/test_version_map.py`：
 下表每一行的「唯一真源」都逐项断言，漂移即红。
@@ -42,7 +42,7 @@ scope 约定：`protocol`（01–07）/ `desktop` / `scripts` / `community` / `c
 |---|---|---|---|
 | 协议 / 内容 v0.xx | 协议件与内容资产版本 | CHANGELOG.md 最新**已发布**节 «## [0.xx]»、docs/meta/VERSION-MATRIX.md 末行 | 发布收口：归档未发布节 + 补 VERSION-MATRIX 行；release_gate 取 CHANGELOG 的 release_line |
 | 门禁 verify vA.B | verify.sh 的判据集版本 | protocol/repo_stats.json（verify_version / verify_checks / baseline_pass）= core.quality_baseline 期望值 = llms.txt 质量凭证串 | scripts/bump_verify.sh 换标；判据集变即升 A.B |
-| CLI / npm / MCP 1.0.x | 启动器与 npm 包版本 | scripts/nf.py 的 NF_CLI_VERSION = packaging/npm/package.json = packaging/mcp/server.json（version 与 packages[0].version） | 发 npm 版时三处同改（stage-payload / test_mcp_packaging / site sync-numbers 均判死） |
+| CLI / npm / MCP 1.1.x | 启动器与 npm 包版本 | `protocol/product_metadata.json`；CLI 运行时直接加载，npm/MCP/站点等机器面由 `scripts/product_metadata.py --write` 生成 | 只改产品元数据并运行生成器；任何手工版本漂移由 `test_product_metadata` 判死 |
 
 站点面（site/**）的 npm 版本 / 件数 / 体积必须与第三行一致，由 site/tools/sync-numbers.mjs 判死；
 CITATION.cff 刻意不钉版本号（见其文件头），不在断言面内。
@@ -61,7 +61,7 @@ CITATION.cff 刻意不钉版本号（见其文件头），不在断言面内。
 
 1. **tag 必须打在"带该功能的那次提交"上**——不能打在后续的 `chore:`/`ci:` 收尾提交上。
 2. **tag 注释必须写清"这一版加了什么功能"**（一两句人话，不写内部字段名）；空注释或只写版本号视为不合规。
-3. **CLI 线 tag（`v1.0.x`）与 npm 包版本严格同号**：`v1.0.4` ⟺ `package.json` 1.0.4。内容线（`v0.xx`）与 CLI 线各自独立，互不牵连。
+3. **CLI 线 tag（`v1.1.x`）与 npm 包版本严格同号**：`v1.1.2` ⟺ `package.json` 1.1.2。内容线（`v0.xx`）与 CLI 线各自独立，互不牵连。
 
 发布流程（缺一步就不算发版）：
 
@@ -136,7 +136,7 @@ python3 -m compileall -q desktop/src scripts
 **⑤ 发布（README 双源声明 + 版本行同步 + 发布纪律）**
 - 包 README 装载手册声明登记指针——「登记三要件见 02 §8.3，组合登记见 02 §8.4」（对齐既有两包形态）；根 README 开箱即玩社区预设段与 07 §3 索引同步增补（双源声明一致，I5）。
 - 版本行同步：schema_version / registry_schema_version 等字段级改动走 01 §7 V1（只增不删）/ V2（结构性变更 bump + 迁移记录）规则。
-- 发布纪律：tag（内容线 v0.xx / CLI v1.0.x）为版本真相源（I5）、禁止在已发布 tag 上回写（§2）；发布条目同步 CHANGELOG 与 ROADMAP。
+- 发布纪律：tag（内容线 v0.xx / CLI v1.1.x）为版本真相源（I5）、禁止在已发布 tag 上回写（§2）；发布条目同步 CHANGELOG 与 ROADMAP。
 
 ### 4.5 方案文档纪律（NN_ 方案模板必填两段，v2.2.0 B1/B2 起）
 新增/修订方案文档（`NN_<版本>_<主题>方案.md`）**必含**以下两段，位置在「核心」段之后：
@@ -168,14 +168,15 @@ python3 -m compileall -q desktop/src scripts
 - **Release 校验和**：发布资产随行 `sha256sum` 校验和文件（用户下载后可验完整性）。
 - **secret 扫描**：提交前自查常见 token 前缀（`ghp_` / `gho_` / `sk-` 等）；完整自动扫描入 ci-verify 为波 A 项（40 总纲 S8 全量，v2.7）。
 
-## 7. 贡献授权（inbound = outbound · DCO）
+## 7. 贡献授权（inbound = outbound · CLA）
 
-> 依据：2026-10-10 全仓审计 §11af（贡献者条款此前 DCO/CLA/inbound/outbound 全 0）。
+> 依据：`LICENSING.md` 双许可结构。AGPL 与商业许可并行分发要求贡献者明示授权再许可。
 
 - **inbound = outbound**：你提交到本仓库的任何贡献（代码 / 文档 / 协议补丁 / 社区包）均按本仓库的
-  **MIT 许可**（见 LICENSE）授权分发；你保留版权，**不额外要求 CLA**。
-- **DCO**：提交信息须带 `Signed-off-by: 真实姓名 <邮箱>`（`git commit -s`），表示你有权按上述
-  条款提交该内容。无法签署 DCO 的贡献，请先联系维护者（见 MAINTAINERS.md）。
+  `AGPL-3.0-only OR LicenseRef-Commercial` 分层条款授权分发；你保留版权。
+- **CLA**：首次代码/协议贡献须按 `CLA.md` 签署；这是项目在 AGPL 之外提供商业许可所需的最小授权。
+- **DCO 同时保留**：提交信息须带 `Signed-off-by: 真实姓名 <邮箱>`（`git commit -s`），
+  表示你有权提交该内容。无法签署 CLA/DCO 的贡献，请先联系维护者（见 MAINTAINERS.md）。
 - **投稿（`library/` 与 `community/`）**：见 `library/INDEX.md` 的投稿须知（机读闸门真源 = `library/intake.json`）——投稿即声明原创
   或已获授权；这类内容的许可声明见 `LICENSES/LicenseRef-Community-Submission.txt`。
 - **不得提交专有/未授权内容**：引用第三方内容须注明来源与许可（2026-10-10 审计 X1 即此类事故，

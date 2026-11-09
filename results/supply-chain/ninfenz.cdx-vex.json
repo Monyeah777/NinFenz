@@ -1,0 +1,38 @@
+{
+  "$schema": "https://cyclonedx.org/schema/bom-1.6.schema.json",
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:npm/ninfenz@1.1.2",
+      "name": "ninfenz",
+      "purl": "pkg:npm/ninfenz@1.1.2",
+      "type": "application",
+      "version": "1.1.2"
+    }
+  ],
+  "metadata": {
+    "authors": [
+      {
+        "name": "NinFenz maintainers"
+      }
+    ],
+    "component": {
+      "bom-ref": "pkg:npm/ninfenz@1.1.2",
+      "name": "ninfenz",
+      "purl": "pkg:npm/ninfenz@1.1.2",
+      "type": "application",
+      "version": "1.1.2"
+    },
+    "timestamp": "2026-10-27T00:00:00Z",
+    "tools": [
+      {
+        "name": "NinFenz core.vex",
+        "version": "1"
+      }
+    ]
+  },
+  "serialNumber": "urn:uuid:323eedd5-ffaf-57bf-8997-03b90277bbaa",
+  "specVersion": "1.6",
+  "version": 1,
+  "vulnerabilities": []
+}

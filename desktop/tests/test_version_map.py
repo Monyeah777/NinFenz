@@ -4,7 +4,8 @@
 三套口径（见 CONTRIBUTING §2.1）：
 1. 协议 / 内容 vX.Y.Z —— CHANGELOG 最新已发布节 == VERSION-MATRIX 末行；
 2. 门禁 verify vA.B —— protocol/repo_stats.json == quality_baseline 期望值 == llms.txt 质量凭证串；
-3. CLI / npm / MCP 1.0.x —— NF_CLI_VERSION == npm package.json == MCP server.json（两处）。
+3. CLI / npm / MCP 1.1.x —— protocol/product_metadata.json 是唯一版本真源；
+   CLI 运行时加载它，其余发布面由 scripts/product_metadata.py --write 生成并逐字段反校验。
 
 （第四套「冻结目录」= 原 golden master 快照，2026-10-11 作者裁决退役并删除；本件反向断言
 映射表**不得**再留该口径，防它悄悄回到文档里。）
@@ -28,39 +29,37 @@ class CliNpmMcpVersionTest(unittest.TestCase):
     """第三套口径：启动器 / npm / MCP 三处同版本。"""
 
     def test_three_faces_agree(self):
-        text = (ROOT / "scripts" / "nf.py").read_text(encoding="utf-8")
-        m = re.search(r'^NF_CLI_VERSION = "([^"]+)"', text, re.M)
-        self.assertIsNotNone(m, "scripts/nf.py 里找不到 NF_CLI_VERSION")
-        cli = m.group(1)
+        cli = json.loads((ROOT / "protocol" / "product_metadata.json")
+                         .read_text(encoding="utf-8"))["version"]
         npm = json.loads((ROOT / "packaging" / "npm" / "package.json")
                          .read_text(encoding="utf-8"))["version"]
         srv = json.loads((ROOT / "packaging" / "mcp" / "server.json")
                          .read_text(encoding="utf-8"))
-        self.assertEqual(cli, npm, "NF_CLI_VERSION != npm package.json version")
-        self.assertEqual(cli, srv.get("version"), "NF_CLI_VERSION != server.json.version")
+        self.assertEqual(cli, npm, "product_metadata != npm package.json version")
+        self.assertEqual(cli, srv.get("version"), "product_metadata != server.json.version")
         pkg0 = (srv.get("packages") or [{}])[0]
         self.assertEqual(cli, pkg0.get("version"),
-                         "NF_CLI_VERSION != server.json packages[0].version")
+                         "product_metadata != server.json packages[0].version")
 
         pyproject = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
         self.assertEqual(cli, pyproject["project"]["version"],
-                         "NF_CLI_VERSION != pyproject.toml [project].version")
+                         "product_metadata != pyproject.toml [project].version")
 
         hf = (ROOT / "packaging" / "hf-space" / "Dockerfile").read_text(encoding="utf-8")
         m = re.search(r"^ARG NF_VERSION=(\d+\.\d+\.\d+)$", hf, re.M)
         self.assertIsNotNone(m, "HF Space Dockerfile 缺可解析的 NF_VERSION 默认值")
-        self.assertEqual(cli, m.group(1), "NF_CLI_VERSION != HF Space NF_VERSION")
+        self.assertEqual(cli, m.group(1), "product_metadata != HF Space NF_VERSION")
 
         dotnet = (ROOT / "engine" / "dotnet" / "tools" / "nf-dotnet" / "Program.cs").read_text(
             encoding="utf-8")
         m = re.search(r'const string NfCliVersion = "([^"]+)"', dotnet)
         self.assertIsNotNone(m, ".NET CLI 缺可解析的 NfCliVersion")
-        self.assertEqual(cli, m.group(1), "NF_CLI_VERSION != .NET doctor 版本")
+        self.assertEqual(cli, m.group(1), "product_metadata != .NET doctor 版本")
 
         declaration = json.loads((ROOT / "protocol" / "mcp_package.json")
                                  .read_text(encoding="utf-8"))
         self.assertEqual(cli, declaration.get("version"),
-                         "NF_CLI_VERSION != protocol/mcp_package.json version")
+                         "product_metadata != protocol/mcp_package.json version")
 
 
 class GateVersionTest(unittest.TestCase):

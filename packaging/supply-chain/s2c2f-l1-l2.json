@@ -1,0 +1,106 @@
+{
+  "schema": "nf-s2c2f-evidence/1",
+  "standard": {
+    "name": "OpenSSF Secure Supply Chain Consumption Framework",
+    "repository": "https://github.com/ossf/S2C2F",
+    "commit": "d0f0a7fbbc6cc6cb6a248cbc9e98c3d8cf3b189a",
+    "reviewed_at": "2026-10-26",
+    "scope": ["L1", "L2"]
+  },
+  "requirements": [
+    {
+      "id": "ING-1",
+      "level": "L1",
+      "status": "enforced",
+      "verification": "Dependencies enter through npm, PyPI, crates.io, and GitHub Actions under the source policy.",
+      "evidence": ["packaging/supply-chain/package-sources.json", "scripts/supply_chain_policy.py"]
+    },
+    {
+      "id": "ING-2",
+      "level": "L1",
+      "status": "partial",
+      "verification": "Exact locks and CI caches reduce upstream outages, but this single-repository project does not operate an enterprise binary repository manager.",
+      "gap": "A public OSS project cannot require every consumer to use an organization-controlled artifact proxy.",
+      "evidence": ["packaging/supply-chain/package-sources.json", "engine/rust/Cargo.lock", ".github/requirements-ci.txt"]
+    },
+    {
+      "id": "SCA-1",
+      "level": "L1",
+      "status": "enforced",
+      "verification": "PR dependency review blocks high severity regressions; pip-audit and cargo audit run on schedules and pushes.",
+      "evidence": [".github/workflows/dependency-review.yml", ".github/workflows/dependency-audit.yml"]
+    },
+    {
+      "id": "SCA-2",
+      "level": "L1",
+      "status": "enforced",
+      "verification": "Every approved runtime/build supplier has an SPDX license and an explicit approval decision in the supplier register.",
+      "evidence": ["packaging/supply-chain/suppliers.json", "scripts/supply_chain_policy.py"]
+    },
+    {
+      "id": "SCA-3",
+      "level": "L2",
+      "status": "partial",
+      "verification": "Dependabot maintenance signals and release-age review reduce end-of-life exposure; no universal multi-ecosystem EOL database is authoritative.",
+      "gap": "EOL status requires reviewer judgment at dependency-update time.",
+      "evidence": [".github/dependabot.yml", "docs/supply-chain-security.md"]
+    },
+    {
+      "id": "INV-1",
+      "level": "L1",
+      "status": "enforced",
+      "verification": "The release builder emits CycloneDX 1.6 and SPDX 3.0 SBOMs plus deterministic payload inventory.",
+      "evidence": ["packaging/npm/tools/build_release.py", "scripts/validate_sboms.py"]
+    },
+    {
+      "id": "INV-2",
+      "level": "L2",
+      "status": "enforced",
+      "verification": "The incident-response runbook covers supplier compromise, advisory triage, deny-list actions, consumer notification, and artifact revocation.",
+      "evidence": ["docs/supply-chain-security.md", "SECURITY.md"]
+    },
+    {
+      "id": "UPD-1",
+      "level": "L1",
+      "status": "enforced",
+      "verification": "SECURITY documents severity thresholds and the requirement to ship fixed versions.",
+      "evidence": ["SECURITY.md", "CONTRIBUTING.md"]
+    },
+    {
+      "id": "UPD-2",
+      "level": "L2",
+      "status": "enforced",
+      "verification": "Dependabot tracks GitHub Actions, pip, npm, cargo, and container inputs weekly.",
+      "evidence": [".github/dependabot.yml"]
+    },
+    {
+      "id": "UPD-3",
+      "level": "L2",
+      "status": "not-applicable",
+      "verification": "The S2C2F prerequisite requiring two-person PR review is unavailable in the current single-maintainer repository.",
+      "gap": "Dependency review still runs on every PR, but the specified two-person display prerequisite is unmet.",
+      "evidence": [".github/workflows/dependency-review.yml", "MAINTAINERS.md"]
+    },
+    {
+      "id": "AUD-2",
+      "level": "L2",
+      "status": "enforced",
+      "verification": "Approved source hosts are declared, lock files are required, npm lifecycle scripts are prohibited, and CI dependencies use pinned requirement files.",
+      "evidence": ["packaging/supply-chain/package-sources.json", "packaging/npm/tools/verify-package.mjs", ".github/requirements-ci.txt"]
+    },
+    {
+      "id": "AUD-3",
+      "level": "L2",
+      "status": "enforced",
+      "verification": "Release checksums, payload tree digests, lock files, and OIDC attestations bind consumed and produced artifacts to immutable identities.",
+      "evidence": ["packaging/npm/tools/build_release.py", ".github/workflows/npm-publish.yml"]
+    },
+    {
+      "id": "ENF-1",
+      "level": "L2",
+      "status": "enforced",
+      "verification": "Package sources are HTTPS-only, exact registries are configured, npm install scripts are blocked, and lock/version pinning is tested.",
+      "evidence": ["packaging/supply-chain/package-sources.json", "packaging/npm/tools/verify-package.mjs", "desktop/tests/test_supply_chain_standards.py"]
+    }
+  ]
+}

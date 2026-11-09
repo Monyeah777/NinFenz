@@ -20,7 +20,7 @@ import os
 import re
 from typing import Any, Dict, List, Tuple
 
-from core import json_doc, spdx3
+from core import json_doc, product_metadata, spdx3
 
 
 #: 依赖名别名（纯度登记的 import 名 → PyPI 项目名）：SBOM 的 purl/versionInfo 要用后者。
@@ -73,9 +73,6 @@ CONTRACT_REL = "protocol/endpoint_contract.json"
 EVENTS_REL = "protocol/event_registry.json"
 EXTERNAL_EVENTS_REL = "protocol/external_events.json"
 RECEIPTS_REL = "protocol/RECEIPTS.json"
-
-#: NF 项目自身的许可结论（与 LICENSE 同源）
-LICENSE_NAME = "MIT"
 
 #: SBOM `created` 的派生源（N=非墙钟）：从仓内**已声明日期**取最大值——
 #: 目的有二：① SPDX 2.3 的 `creationInfo.created` 是必填（外部 meta-schema 实测会 FAIL）；
@@ -348,7 +345,12 @@ def sbom_doc(root: str = ".") -> Dict[str, Any]:
                      "purl": "pkg:pypi/%s%s" % (proj, ("@%s" % ver) if ver else ""),
                      "optional": True,
                      "reason": "软依赖（可选，须 try/except 守卫）：%s" % why})
-    return spdx3.build(nf_version, _declared_max_date(root), deps)
+    return spdx3.build(
+        nf_version,
+        _declared_max_date(root),
+        deps,
+        root_license=product_metadata.license_id(root),
+    )
 
 
 def slsa_provenance(root: str = ".") -> Dict[str, Any]:
@@ -527,7 +529,7 @@ def cyclonedx_doc(root: str = ".") -> Dict[str, Any]:
             "component": {"type": "application", "bom-ref": "pkg:nf/ninfenz@%s"
                           % _nf_version(root),
                           "name": "NinFenz",
-                          "licenses": [{"license": {"id": LICENSE_NAME}}]},
+                          "licenses": [{"license": {"id": product_metadata.license_id(root)}}]},
             "tools": [{"vendor": "NinFenz", "name": "nf interop --kind cyclonedx",
                        "version": "1.0.0"}],
             # CycloneDX 根级 additionalProperties=false（官方 meta-schema 实测拦下自定义键）
