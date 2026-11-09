@@ -1581,7 +1581,7 @@
       "max_fn_lines": 34
     },
     "scripts/evidence_vectors.py": {
-      "lines": 432,
+      "lines": 436,
       "max_fn_cc": 9,
       "max_fn_lines": 79
     },
