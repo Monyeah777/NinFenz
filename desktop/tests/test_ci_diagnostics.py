@@ -209,5 +209,39 @@ class ParityKeyCompareTest(unittest.TestCase):
         self.assertNotIn("got != want", text, "parity 仍在用总数比较（会漏键级漂移）")
 
 
+class HiddenArtifactPathTest(unittest.TestCase):
+    """artifact 的 path 不得指向隐藏**文件**（2026-11-09 #247/#248 实测）。
+
+    actions/upload-artifact v4+ 默认 `include-hidden-files=false`：path 里以 `.` 开头
+    的**文件**会被静默丢弃（sast-counts.json / sast-extra-*.json 曾整年没进 artifact）。
+    隐藏**目录**（如 `.nf-logs/`）不受影响，故只查 basename 以点开头的纯文件路径。
+    """
+
+    def test_no_artifact_path_is_a_hidden_file(self):
+        import re
+        bad = {}
+        for p in sorted(WF.glob("*.yml")):
+            text = p.read_text(encoding="utf-8")
+            for block in re.split(r"(?m)^ {6}- ", text):
+                if "upload-artifact" not in block:
+                    continue
+                if "include-hidden-files: true" in block:
+                    continue
+                pat = r"(?ms)^\s+path: \|\n(.*?)(?=^\s+[a-z-]+:|\Z)"
+                m = re.search(pat, block)
+                if not m:
+                    continue
+                for line in m.group(1).splitlines():
+                    item = line.strip()
+                    if not item or item.startswith("#"):
+                        continue
+                    name = item.rstrip("/").split("/")[-1]
+                    if name.startswith(".") and not item.endswith("/"):
+                        bad.setdefault(p.name, []).append(item)
+        self.assertEqual(
+            {}, bad,
+            f"artifact path 指向隐藏文件（会被 upload-artifact 静默丢弃）：{bad}")
+
+
 if __name__ == "__main__":
     unittest.main()
