@@ -1,7 +1,7 @@
 {
-  "bytes": 11993479,
-  "count": 568,
-  "digest": "1c158dc91653f35819245ae1a06bf6d474bdc49157cb54a420e03f1e6a145485",
+  "bytes": 11998287,
+  "count": 569,
+  "digest": "ef59d83869833f4cdf227e6a8b72589871c0bf50da9410e757d27b191e9c76e5",
   "materials": [
     {
       "bytes": 102,
@@ -1899,9 +1899,9 @@
       "sha256": "ad799cbfbf1dd69859ff21963885ebf1d5fed56ca67fdd1c2b9e2052ce3b8003"
     },
     {
-      "bytes": 251,
+      "bytes": 256,
       "path": "protocol/approvals/protocol__conformance_report.json",
-      "sha256": "805c57f3afb95198db7b7258d69e40e5bfcdf234bc24bc877693dcf0946a2b0c"
+      "sha256": "5d0a92c4295bef7c63ae1fe90ccf2da30bcc8a24cd06a73580e0909636ec5cb8"
     },
     {
       "bytes": 16375,
@@ -1944,9 +1944,9 @@
       "sha256": "c2402950e34e3ff9bd0f09171c8bee821bf0f57c33f32d0dbc4bb4b3e6157914"
     },
     {
-      "bytes": 362177,
+      "bytes": 362536,
       "path": "protocol/check12_weights.json",
-      "sha256": "ddecd38681cd536cbd0f6bacffbaed3155e6f3c31cc40b8f4bfb43bd0f24f9a5"
+      "sha256": "eec5a2e3dc4ba27dbe4088d468fd6aab52d774a84f9c0aef4c0ea44bf2e9fe9e"
     },
     {
       "bytes": 16170,
@@ -1954,9 +1954,9 @@
       "sha256": "5545028d82662ee8f4f4051bdc14876b0357f0d9548963f3836f6f8f6d417285"
     },
     {
-      "bytes": 42315,
+      "bytes": 42424,
       "path": "protocol/code_metrics_baseline.json",
-      "sha256": "72a90af2352ff1c466b571c6462eb50408e77d04b4a3322172e238655bcffcb1"
+      "sha256": "9e2be2917b0de5b43bbc06192dac1ac2bddadfbd62c96936d4c4fa84b7bd9853"
     },
     {
       "bytes": 87117,
@@ -1971,7 +1971,7 @@
     {
       "bytes": 7260,
       "path": "protocol/conformance_report.json",
-      "sha256": "eed3eaa6625cc99f1828e47832ad11aba0723fbbfddc70c9626d00e8e519b9af"
+      "sha256": "b7da9597d65049a188a629e092439512511653642286efc4ce21b4f4301abbf8"
     },
     {
       "bytes": 22174,
@@ -2086,7 +2086,7 @@
     {
       "bytes": 27560,
       "path": "protocol/generated/receipt_chain.json",
-      "sha256": "9db996c8e199334421a3bc0c500c48d7234a994628484b324847c46b4f17e81d"
+      "sha256": "e0bc12dd9c4ef94bd5bb0c9ca9a2d264a13366fd74a000e0f686d613b06a6abb"
     },
     {
       "bytes": 918,
@@ -2311,7 +2311,7 @@
     {
       "bytes": 79590,
       "path": "protocol/RECEIPTS.json",
-      "sha256": "d9be8a0dd38da3b9194a9dfeabc536b7d6efdd6ab3e4923887a05a0bed7f5e5d"
+      "sha256": "51d914ef97f0d14286501dab06d654b8c178759fde9665cb3f3b497b3c50cd61"
     },
     {
       "bytes": 7923,
@@ -2344,9 +2344,9 @@
       "sha256": "87de7ac68f9846b333323efecdbb7555adf24215ae8145d573fe8d0688b8e86d"
     },
     {
-      "bytes": 456001,
+      "bytes": 456212,
       "path": "protocol/role_coordinates.json",
-      "sha256": "8eccfe8a6433ac1c2ac0a42fc9423566a7128268a7588f3ff29ce1a6ffa30f89"
+      "sha256": "b878cdc0224db7a0e4558f209c0ca122aa1756027eef99015aaad0e9797b2f74"
     },
     {
       "bytes": 8060,
@@ -2446,7 +2446,7 @@
     {
       "bytes": 13119,
       "path": "protocol/verification_report.json",
-      "sha256": "5d93a4853362b54683065a885a8e82bbca3a13f9d4877bb0eccc8a22866dd81a"
+      "sha256": "49c5381fcdae030edda32a8f128d18abfcbedae2579b5115b6697b480534beec"
     },
     {
       "bytes": 4160,
@@ -2542,6 +2542,11 @@
       "bytes": 7708,
       "path": "scripts/commit_msg_check.py",
       "sha256": "51224f3874e0417283f38b3ed18e793cd8a0773fd6e706bb5452bcf6d711cfee"
+    },
+    {
+      "bytes": 4124,
+      "path": "scripts/core_judge_map.py",
+      "sha256": "0ce8f0a6f7edbd82629f6ba3ceaa6d39bcd58c02bade7ec5dfcac9fc33678827"
     },
     {
       "bytes": 2122,

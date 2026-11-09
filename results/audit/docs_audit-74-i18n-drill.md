@@ -26,8 +26,10 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:72a90af2352ff1c466b571c6462eb50408e77d04b4a3322172e238655bcffcb1
+  - protocol/code_metrics_baseline.json:9e2be2917b0de5b43bbc06192dac1ac2bddadfbd62c96936d4c4fa84b7bd9853
 ---
+> 重审（2026-11-09）：core 引用面映射（355 模块 / 未引用 34，棘轮只减不增）
+
 > 重审（2026-11-09）：红证据加 negative_assertion 档（assertRaises）：硬证据 20→99，无 149→139
 
 > 重审（2026-11-09）：红证据脚本行宽收口

@@ -4,9 +4,9 @@
     "entry": 26,
     "floor": 5,
     "prod": 1057,
-    "projection": 162,
-    "support": 441,
-    "verify": 1037
+    "projection": 163,
+    "support": 442,
+    "verify": 1038
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7835,6 +7835,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "core 引用面判据：未引用模块数只减不增（第 159 轮）。",
+      "path": "desktop/tests/test_core_judge_map.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "思维链/对话转写暴露门禁：仓库文本面不得残留**过程性叙述**或**对话稿**（作者指令「思维链暴露删掉」）。",
       "path": "desktop/tests/test_cot_exposure.py",
       "role": "verify",
@@ -12606,16 +12612,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "f2e46b8778961277b32a4694b501f0fe5d21e0b3c98d783045f80e9a918c5589",
+  "root_digest": "e3f9e8b8459637425b20e4e84cf3621b3f44b5367895b732815250327de24d0b",
   "rule_counts": {
     "R-app": 1465,
-    "R-catch": 294,
+    "R-catch": 295,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 142,
+    "R-projection": 143,
     "R-support": 119,
-    "R-verify": 911,
+    "R-verify": 912,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

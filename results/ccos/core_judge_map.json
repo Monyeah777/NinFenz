@@ -1,0 +1,1429 @@
+{
+  "entries": [
+    {
+      "module": "absence_guard",
+      "referenced": true
+    },
+    {
+      "module": "abstention",
+      "referenced": false
+    },
+    {
+      "module": "adr",
+      "referenced": true
+    },
+    {
+      "module": "agent_rules_adapter",
+      "referenced": true
+    },
+    {
+      "module": "allowlist_expiry",
+      "referenced": true
+    },
+    {
+      "module": "anchor_align",
+      "referenced": true
+    },
+    {
+      "module": "approval",
+      "referenced": true
+    },
+    {
+      "module": "artifact_manifest",
+      "referenced": true
+    },
+    {
+      "module": "as_of",
+      "referenced": true
+    },
+    {
+      "module": "assemble_build",
+      "referenced": true
+    },
+    {
+      "module": "assemble_plan",
+      "referenced": true
+    },
+    {
+      "module": "assertions",
+      "referenced": true
+    },
+    {
+      "module": "asset_contract",
+      "referenced": true
+    },
+    {
+      "module": "asset_density",
+      "referenced": true
+    },
+    {
+      "module": "asset_ledger",
+      "referenced": true
+    },
+    {
+      "module": "asset_ledger_projection",
+      "referenced": true
+    },
+    {
+      "module": "asset_line_baseline",
+      "referenced": true
+    },
+    {
+      "module": "ast_missing",
+      "referenced": true
+    },
+    {
+      "module": "atom_algebra",
+      "referenced": false
+    },
+    {
+      "module": "atom_catalog",
+      "referenced": true
+    },
+    {
+      "module": "atom_planner",
+      "referenced": false
+    },
+    {
+      "module": "atomic_io",
+      "referenced": false
+    },
+    {
+      "module": "atomic_write",
+      "referenced": true
+    },
+    {
+      "module": "attest",
+      "referenced": true
+    },
+    {
+      "module": "audit",
+      "referenced": true
+    },
+    {
+      "module": "audit_legacy",
+      "referenced": false
+    },
+    {
+      "module": "audit_subject",
+      "referenced": true
+    },
+    {
+      "module": "autofix",
+      "referenced": true
+    },
+    {
+      "module": "bench",
+      "referenced": true
+    },
+    {
+      "module": "boot_check",
+      "referenced": true
+    },
+    {
+      "module": "boundaries",
+      "referenced": true
+    },
+    {
+      "module": "bridge",
+      "referenced": true
+    },
+    {
+      "module": "build_atom_menu",
+      "referenced": true
+    },
+    {
+      "module": "build_isolation",
+      "referenced": true
+    },
+    {
+      "module": "calibration",
+      "referenced": true
+    },
+    {
+      "module": "calibration_ledger",
+      "referenced": true
+    },
+    {
+      "module": "calibration_state",
+      "referenced": true
+    },
+    {
+      "module": "calibration_store",
+      "referenced": false
+    },
+    {
+      "module": "candidate_health",
+      "referenced": true
+    },
+    {
+      "module": "capability_battery",
+      "referenced": true
+    },
+    {
+      "module": "case_schema",
+      "referenced": true
+    },
+    {
+      "module": "category_registry",
+      "referenced": true
+    },
+    {
+      "module": "ccv3_adapter",
+      "referenced": true
+    },
+    {
+      "module": "chain_horizontal",
+      "referenced": false
+    },
+    {
+      "module": "chain_knowledge",
+      "referenced": false
+    },
+    {
+      "module": "chain_vertical",
+      "referenced": false
+    },
+    {
+      "module": "changelog_gen",
+      "referenced": true
+    },
+    {
+      "module": "check_compile",
+      "referenced": true
+    },
+    {
+      "module": "check_policy",
+      "referenced": true
+    },
+    {
+      "module": "check_text_to_intent",
+      "referenced": true
+    },
+    {
+      "module": "claim_labels",
+      "referenced": true
+    },
+    {
+      "module": "claims",
+      "referenced": true
+    },
+    {
+      "module": "cli_bridge",
+      "referenced": true
+    },
+    {
+      "module": "closure",
+      "referenced": true
+    },
+    {
+      "module": "closure_scan",
+      "referenced": true
+    },
+    {
+      "module": "cockpit_ab",
+      "referenced": true
+    },
+    {
+      "module": "cockpit_ab_bundle",
+      "referenced": true
+    },
+    {
+      "module": "cockpit_ab_store",
+      "referenced": true
+    },
+    {
+      "module": "cockpit_handoff",
+      "referenced": false
+    },
+    {
+      "module": "cockpit_service",
+      "referenced": true
+    },
+    {
+      "module": "code",
+      "referenced": true
+    },
+    {
+      "module": "code_metrics",
+      "referenced": true
+    },
+    {
+      "module": "cognition",
+      "referenced": true
+    },
+    {
+      "module": "cognition_plan",
+      "referenced": true
+    },
+    {
+      "module": "cognitive_cockpit",
+      "referenced": true
+    },
+    {
+      "module": "coherence",
+      "referenced": true
+    },
+    {
+      "module": "commit_title_guard",
+      "referenced": true
+    },
+    {
+      "module": "community_inventory",
+      "referenced": true
+    },
+    {
+      "module": "comparison_fixture",
+      "referenced": false
+    },
+    {
+      "module": "composer",
+      "referenced": true
+    },
+    {
+      "module": "concept_graph",
+      "referenced": true
+    },
+    {
+      "module": "conformance_decl",
+      "referenced": true
+    },
+    {
+      "module": "conformance_report",
+      "referenced": true
+    },
+    {
+      "module": "conformance_run",
+      "referenced": true
+    },
+    {
+      "module": "conformance_scan",
+      "referenced": true
+    },
+    {
+      "module": "constrained_choice",
+      "referenced": true
+    },
+    {
+      "module": "constrained_loop",
+      "referenced": true
+    },
+    {
+      "module": "content_face",
+      "referenced": true
+    },
+    {
+      "module": "context_pack",
+      "referenced": false
+    },
+    {
+      "module": "contract_history",
+      "referenced": true
+    },
+    {
+      "module": "contract_pin",
+      "referenced": true
+    },
+    {
+      "module": "contract_text",
+      "referenced": false
+    },
+    {
+      "module": "control",
+      "referenced": true
+    },
+    {
+      "module": "coupling_metrics",
+      "referenced": true
+    },
+    {
+      "module": "criteria",
+      "referenced": true
+    },
+    {
+      "module": "criteria_lexicon",
+      "referenced": false
+    },
+    {
+      "module": "daemon",
+      "referenced": true
+    },
+    {
+      "module": "daemon_shell",
+      "referenced": false
+    },
+    {
+      "module": "decision_layer",
+      "referenced": true
+    },
+    {
+      "module": "decisions",
+      "referenced": true
+    },
+    {
+      "module": "declined_ledger",
+      "referenced": true
+    },
+    {
+      "module": "delete_evidence",
+      "referenced": true
+    },
+    {
+      "module": "dep_closure",
+      "referenced": true
+    },
+    {
+      "module": "dirty_tree",
+      "referenced": true
+    },
+    {
+      "module": "discourse",
+      "referenced": true
+    },
+    {
+      "module": "disk_cache",
+      "referenced": true
+    },
+    {
+      "module": "doc_family",
+      "referenced": true
+    },
+    {
+      "module": "doc_hygiene",
+      "referenced": true
+    },
+    {
+      "module": "doc_routing",
+      "referenced": true
+    },
+    {
+      "module": "domain_metrics",
+      "referenced": true
+    },
+    {
+      "module": "domain_neutral",
+      "referenced": false
+    },
+    {
+      "module": "domain_pack",
+      "referenced": true
+    },
+    {
+      "module": "domain_sources",
+      "referenced": false
+    },
+    {
+      "module": "drill_fidelity",
+      "referenced": true
+    },
+    {
+      "module": "driver",
+      "referenced": true
+    },
+    {
+      "module": "ed25519",
+      "referenced": true
+    },
+    {
+      "module": "effect_rows",
+      "referenced": true
+    },
+    {
+      "module": "endpoint",
+      "referenced": true
+    },
+    {
+      "module": "engine_loader",
+      "referenced": true
+    },
+    {
+      "module": "engine_registry",
+      "referenced": true
+    },
+    {
+      "module": "epistemic_agenda",
+      "referenced": true
+    },
+    {
+      "module": "error_codes",
+      "referenced": true
+    },
+    {
+      "module": "eval_collapse",
+      "referenced": true
+    },
+    {
+      "module": "eval_harness",
+      "referenced": true
+    },
+    {
+      "module": "evidence",
+      "referenced": true
+    },
+    {
+      "module": "evidence_roles",
+      "referenced": false
+    },
+    {
+      "module": "execution_drill",
+      "referenced": true
+    },
+    {
+      "module": "export_schema",
+      "referenced": true
+    },
+    {
+      "module": "exporter",
+      "referenced": true
+    },
+    {
+      "module": "face_coverage",
+      "referenced": true
+    },
+    {
+      "module": "face_key",
+      "referenced": true
+    },
+    {
+      "module": "feature_lifecycle",
+      "referenced": true
+    },
+    {
+      "module": "fence_health",
+      "referenced": true
+    },
+    {
+      "module": "fetch_guard",
+      "referenced": true
+    },
+    {
+      "module": "file_lock",
+      "referenced": false
+    },
+    {
+      "module": "file_model_adapter",
+      "referenced": false
+    },
+    {
+      "module": "fs",
+      "referenced": true
+    },
+    {
+      "module": "gap_review",
+      "referenced": true
+    },
+    {
+      "module": "gate_cache",
+      "referenced": true
+    },
+    {
+      "module": "gate_check",
+      "referenced": true
+    },
+    {
+      "module": "gate_datalog",
+      "referenced": true
+    },
+    {
+      "module": "gate_engine",
+      "referenced": true
+    },
+    {
+      "module": "gate_faces",
+      "referenced": true
+    },
+    {
+      "module": "gate_graph",
+      "referenced": true
+    },
+    {
+      "module": "gate_inproc",
+      "referenced": true
+    },
+    {
+      "module": "gate_labels",
+      "referenced": true
+    },
+    {
+      "module": "gate_native",
+      "referenced": false
+    },
+    {
+      "module": "gate_observe",
+      "referenced": true
+    },
+    {
+      "module": "gate_router",
+      "referenced": true
+    },
+    {
+      "module": "gate_select",
+      "referenced": true
+    },
+    {
+      "module": "gate_verdict",
+      "referenced": true
+    },
+    {
+      "module": "generator",
+      "referenced": true
+    },
+    {
+      "module": "grain_units",
+      "referenced": true
+    },
+    {
+      "module": "graph_health",
+      "referenced": true
+    },
+    {
+      "module": "grounding",
+      "referenced": true
+    },
+    {
+      "module": "grouped_report",
+      "referenced": true
+    },
+    {
+      "module": "handover",
+      "referenced": true
+    },
+    {
+      "module": "hash",
+      "referenced": true
+    },
+    {
+      "module": "host_projection",
+      "referenced": true
+    },
+    {
+      "module": "http_api",
+      "referenced": true
+    },
+    {
+      "module": "impact_check",
+      "referenced": true
+    },
+    {
+      "module": "import_adapter",
+      "referenced": true
+    },
+    {
+      "module": "import_graph",
+      "referenced": true
+    },
+    {
+      "module": "ingest_common",
+      "referenced": true
+    },
+    {
+      "module": "injection_budget",
+      "referenced": true
+    },
+    {
+      "module": "injection_ledger",
+      "referenced": true
+    },
+    {
+      "module": "instruction_evidence",
+      "referenced": true
+    },
+    {
+      "module": "instruction_step_audit",
+      "referenced": true
+    },
+    {
+      "module": "intake",
+      "referenced": true
+    },
+    {
+      "module": "intake_quota",
+      "referenced": true
+    },
+    {
+      "module": "intake_surface",
+      "referenced": true
+    },
+    {
+      "module": "integrations",
+      "referenced": true
+    },
+    {
+      "module": "interop",
+      "referenced": true
+    },
+    {
+      "module": "interop_export",
+      "referenced": true
+    },
+    {
+      "module": "interp_diet",
+      "referenced": true
+    },
+    {
+      "module": "invariants",
+      "referenced": true
+    },
+    {
+      "module": "io_types",
+      "referenced": true
+    },
+    {
+      "module": "ir",
+      "referenced": true
+    },
+    {
+      "module": "iso8601",
+      "referenced": true
+    },
+    {
+      "module": "job_ledger",
+      "referenced": true
+    },
+    {
+      "module": "json_asset",
+      "referenced": true
+    },
+    {
+      "module": "json_doc",
+      "referenced": true
+    },
+    {
+      "module": "json_schema",
+      "referenced": true
+    },
+    {
+      "module": "judgement_coverage",
+      "referenced": true
+    },
+    {
+      "module": "key_naming",
+      "referenced": true
+    },
+    {
+      "module": "key_transparency",
+      "referenced": true
+    },
+    {
+      "module": "knowledge",
+      "referenced": true
+    },
+    {
+      "module": "knowledge_sig",
+      "referenced": true
+    },
+    {
+      "module": "label_carrier",
+      "referenced": true
+    },
+    {
+      "module": "label_ir",
+      "referenced": true
+    },
+    {
+      "module": "label_sidecar",
+      "referenced": true
+    },
+    {
+      "module": "label_watermark",
+      "referenced": true
+    },
+    {
+      "module": "layer_model",
+      "referenced": true
+    },
+    {
+      "module": "lazy_yaml",
+      "referenced": true
+    },
+    {
+      "module": "library",
+      "referenced": true
+    },
+    {
+      "module": "library_entries",
+      "referenced": true
+    },
+    {
+      "module": "license_gate",
+      "referenced": true
+    },
+    {
+      "module": "live_protocol",
+      "referenced": true
+    },
+    {
+      "module": "live_selector",
+      "referenced": false
+    },
+    {
+      "module": "load_state",
+      "referenced": true
+    },
+    {
+      "module": "locales",
+      "referenced": true
+    },
+    {
+      "module": "lsp",
+      "referenced": true
+    },
+    {
+      "module": "lsp_client",
+      "referenced": true
+    },
+    {
+      "module": "lsp_doc",
+      "referenced": true
+    },
+    {
+      "module": "lsp_framing",
+      "referenced": true
+    },
+    {
+      "module": "lsp_params",
+      "referenced": false
+    },
+    {
+      "module": "machine_contract",
+      "referenced": true
+    },
+    {
+      "module": "market_analyzer",
+      "referenced": true
+    },
+    {
+      "module": "mcp_adapter",
+      "referenced": true
+    },
+    {
+      "module": "mcp_context",
+      "referenced": false
+    },
+    {
+      "module": "mcp_ingress",
+      "referenced": true
+    },
+    {
+      "module": "mcp_manifest",
+      "referenced": true
+    },
+    {
+      "module": "mcp_package",
+      "referenced": true
+    },
+    {
+      "module": "mcp_runtime",
+      "referenced": true
+    },
+    {
+      "module": "md_blocks",
+      "referenced": true
+    },
+    {
+      "module": "meta_atom_runtime",
+      "referenced": true
+    },
+    {
+      "module": "meta_runtime_manifest",
+      "referenced": true
+    },
+    {
+      "module": "metacognitive_control",
+      "referenced": false
+    },
+    {
+      "module": "method_memory",
+      "referenced": false
+    },
+    {
+      "module": "method_pack",
+      "referenced": true
+    },
+    {
+      "module": "missing_sentinel",
+      "referenced": true
+    },
+    {
+      "module": "modeling",
+      "referenced": true
+    },
+    {
+      "module": "models",
+      "referenced": true
+    },
+    {
+      "module": "module_lifecycle",
+      "referenced": true
+    },
+    {
+      "module": "module_signature",
+      "referenced": true
+    },
+    {
+      "module": "moves",
+      "referenced": true
+    },
+    {
+      "module": "mvu_adapter",
+      "referenced": true
+    },
+    {
+      "module": "nf_ab_cli",
+      "referenced": true
+    },
+    {
+      "module": "nf_cockpit_cli",
+      "referenced": true
+    },
+    {
+      "module": "nf_expr",
+      "referenced": true
+    },
+    {
+      "module": "nf_language",
+      "referenced": true
+    },
+    {
+      "module": "nf_metacognition",
+      "referenced": false
+    },
+    {
+      "module": "nfal",
+      "referenced": true
+    },
+    {
+      "module": "nfal_cli",
+      "referenced": true
+    },
+    {
+      "module": "nfal_rules",
+      "referenced": true
+    },
+    {
+      "module": "numeric_grounding",
+      "referenced": true
+    },
+    {
+      "module": "official_core",
+      "referenced": true
+    },
+    {
+      "module": "operators",
+      "referenced": true
+    },
+    {
+      "module": "orchestration",
+      "referenced": true
+    },
+    {
+      "module": "orphan_scan",
+      "referenced": true
+    },
+    {
+      "module": "output_envelope",
+      "referenced": true
+    },
+    {
+      "module": "output_forms",
+      "referenced": true
+    },
+    {
+      "module": "pack_combo",
+      "referenced": true
+    },
+    {
+      "module": "package_index",
+      "referenced": true
+    },
+    {
+      "module": "parser",
+      "referenced": true
+    },
+    {
+      "module": "path_moved",
+      "referenced": true
+    },
+    {
+      "module": "path_trigger",
+      "referenced": true
+    },
+    {
+      "module": "paths",
+      "referenced": true
+    },
+    {
+      "module": "patterns",
+      "referenced": true
+    },
+    {
+      "module": "payload_consumer",
+      "referenced": true
+    },
+    {
+      "module": "payload_evidence",
+      "referenced": true
+    },
+    {
+      "module": "payload_harvest",
+      "referenced": true
+    },
+    {
+      "module": "payload_registry",
+      "referenced": true
+    },
+    {
+      "module": "payload_typing",
+      "referenced": true
+    },
+    {
+      "module": "perf_budget",
+      "referenced": true
+    },
+    {
+      "module": "pipeline",
+      "referenced": true
+    },
+    {
+      "module": "pipeline_loader",
+      "referenced": true
+    },
+    {
+      "module": "pipeline_scaffold",
+      "referenced": true
+    },
+    {
+      "module": "pipelinerun",
+      "referenced": true
+    },
+    {
+      "module": "plan_compiler",
+      "referenced": false
+    },
+    {
+      "module": "plan_token",
+      "referenced": true
+    },
+    {
+      "module": "plog",
+      "referenced": true
+    },
+    {
+      "module": "plugin_gate",
+      "referenced": true
+    },
+    {
+      "module": "plugin_manifest",
+      "referenced": true
+    },
+    {
+      "module": "policy_snapshot",
+      "referenced": true
+    },
+    {
+      "module": "posix_shell",
+      "referenced": true
+    },
+    {
+      "module": "postmortem",
+      "referenced": true
+    },
+    {
+      "module": "preset_manager",
+      "referenced": true
+    },
+    {
+      "module": "proc",
+      "referenced": true
+    },
+    {
+      "module": "prose_lint",
+      "referenced": true
+    },
+    {
+      "module": "protocol_golden",
+      "referenced": true
+    },
+    {
+      "module": "protocol_projection",
+      "referenced": true
+    },
+    {
+      "module": "protocol_wizard",
+      "referenced": true
+    },
+    {
+      "module": "provenance_external",
+      "referenced": true
+    },
+    {
+      "module": "purity_scan",
+      "referenced": true
+    },
+    {
+      "module": "quality_baseline",
+      "referenced": true
+    },
+    {
+      "module": "quality_depth_scan",
+      "referenced": true
+    },
+    {
+      "module": "quality_gate",
+      "referenced": true
+    },
+    {
+      "module": "quant_metrics",
+      "referenced": true
+    },
+    {
+      "module": "rating_gate",
+      "referenced": true
+    },
+    {
+      "module": "receipts",
+      "referenced": true
+    },
+    {
+      "module": "records",
+      "referenced": true
+    },
+    {
+      "module": "redos_scan",
+      "referenced": true
+    },
+    {
+      "module": "registry_cross",
+      "referenced": true
+    },
+    {
+      "module": "registry_loader",
+      "referenced": true
+    },
+    {
+      "module": "registry_sync",
+      "referenced": true
+    },
+    {
+      "module": "regression_score",
+      "referenced": true
+    },
+    {
+      "module": "release_gate",
+      "referenced": true
+    },
+    {
+      "module": "repo_context",
+      "referenced": false
+    },
+    {
+      "module": "repo_face",
+      "referenced": true
+    },
+    {
+      "module": "repo_index",
+      "referenced": true
+    },
+    {
+      "module": "repo_stats",
+      "referenced": true
+    },
+    {
+      "module": "repo_trust",
+      "referenced": true
+    },
+    {
+      "module": "report_meta",
+      "referenced": true
+    },
+    {
+      "module": "requirement_coverage",
+      "referenced": true
+    },
+    {
+      "module": "residual_registry",
+      "referenced": true
+    },
+    {
+      "module": "response_cache",
+      "referenced": true
+    },
+    {
+      "module": "retriever",
+      "referenced": true
+    },
+    {
+      "module": "retry_semantics",
+      "referenced": true
+    },
+    {
+      "module": "revocations",
+      "referenced": true
+    },
+    {
+      "module": "rfc",
+      "referenced": true
+    },
+    {
+      "module": "role_model",
+      "referenced": true
+    },
+    {
+      "module": "round_drill",
+      "referenced": true
+    },
+    {
+      "module": "round_header",
+      "referenced": true
+    },
+    {
+      "module": "rule_conflict",
+      "referenced": true
+    },
+    {
+      "module": "rules_render",
+      "referenced": true
+    },
+    {
+      "module": "runtime_executor",
+      "referenced": true
+    },
+    {
+      "module": "rust_engine",
+      "referenced": true
+    },
+    {
+      "module": "rust_pyext",
+      "referenced": true
+    },
+    {
+      "module": "sbom",
+      "referenced": true
+    },
+    {
+      "module": "schema_compat",
+      "referenced": true
+    },
+    {
+      "module": "schema_lint",
+      "referenced": true
+    },
+    {
+      "module": "schema_pins",
+      "referenced": true
+    },
+    {
+      "module": "scratch",
+      "referenced": true
+    },
+    {
+      "module": "secret_guard",
+      "referenced": true
+    },
+    {
+      "module": "semantic_conflict",
+      "referenced": true
+    },
+    {
+      "module": "semantics",
+      "referenced": true
+    },
+    {
+      "module": "session",
+      "referenced": true
+    },
+    {
+      "module": "session_journal",
+      "referenced": true
+    },
+    {
+      "module": "session_watch",
+      "referenced": true
+    },
+    {
+      "module": "sets",
+      "referenced": true
+    },
+    {
+      "module": "shell_ledger",
+      "referenced": true
+    },
+    {
+      "module": "silent_skip",
+      "referenced": true
+    },
+    {
+      "module": "since_tags",
+      "referenced": true
+    },
+    {
+      "module": "skill_adapter",
+      "referenced": true
+    },
+    {
+      "module": "skill_contract",
+      "referenced": true
+    },
+    {
+      "module": "source_excerpts",
+      "referenced": false
+    },
+    {
+      "module": "st_quality",
+      "referenced": true
+    },
+    {
+      "module": "st_validator",
+      "referenced": true
+    },
+    {
+      "module": "state_front",
+      "referenced": true
+    },
+    {
+      "module": "steelman",
+      "referenced": true
+    },
+    {
+      "module": "storage",
+      "referenced": true
+    },
+    {
+      "module": "strict_schema",
+      "referenced": true
+    },
+    {
+      "module": "struct",
+      "referenced": true
+    },
+    {
+      "module": "style_dna",
+      "referenced": true
+    },
+    {
+      "module": "subcheck_cache",
+      "referenced": true
+    },
+    {
+      "module": "task_handoff",
+      "referenced": false
+    },
+    {
+      "module": "task_profile",
+      "referenced": false
+    },
+    {
+      "module": "telemetry_semconv",
+      "referenced": true
+    },
+    {
+      "module": "terminal",
+      "referenced": true
+    },
+    {
+      "module": "text",
+      "referenced": true
+    },
+    {
+      "module": "text_hygiene",
+      "referenced": true
+    },
+    {
+      "module": "thought_contract",
+      "referenced": false
+    },
+    {
+      "module": "timestamp",
+      "referenced": true
+    },
+    {
+      "module": "tool_face",
+      "referenced": true
+    },
+    {
+      "module": "trace_drill",
+      "referenced": true
+    },
+    {
+      "module": "transparency_log",
+      "referenced": true
+    },
+    {
+      "module": "trust_anchor",
+      "referenced": true
+    },
+    {
+      "module": "trust_boundary",
+      "referenced": true
+    },
+    {
+      "module": "unknown_policy",
+      "referenced": true
+    },
+    {
+      "module": "validator",
+      "referenced": true
+    },
+    {
+      "module": "value_replay",
+      "referenced": true
+    },
+    {
+      "module": "variants",
+      "referenced": true
+    },
+    {
+      "module": "verifier_props",
+      "referenced": true
+    },
+    {
+      "module": "verifier_version",
+      "referenced": true
+    },
+    {
+      "module": "verify_checks",
+      "referenced": true
+    },
+    {
+      "module": "verify_report",
+      "referenced": true
+    },
+    {
+      "module": "watch",
+      "referenced": true
+    },
+    {
+      "module": "web_pages",
+      "referenced": false
+    },
+    {
+      "module": "workflow_hardening",
+      "referenced": true
+    },
+    {
+      "module": "workflow_policy",
+      "referenced": true
+    },
+    {
+      "module": "workloop",
+      "referenced": true
+    },
+    {
+      "module": "world_model",
+      "referenced": true
+    },
+    {
+      "module": "world_slots",
+      "referenced": true
+    },
+    {
+      "module": "yaml_recheck",
+      "referenced": true
+    }
+  ],
+  "modules": 355,
+  "note": "粗粒度名字匹配（代理指标），不做导入图分析",
+  "referenced": 321,
+  "schema": "nf-core-judge-map/1",
+  "unreferenced": 34
+}

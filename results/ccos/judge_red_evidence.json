@@ -329,6 +329,10 @@
       "source": "negative_case"
     },
     {
+      "module": "test_core_judge_map.py",
+      "source": "none"
+    },
+    {
       "module": "test_cot_exposure.py",
       "source": "none"
     },
@@ -1561,10 +1565,10 @@
       "source": "naming"
     }
   ],
-  "modules": 390,
+  "modules": 391,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
   "suspect": 152,
   "with_evidence": 99,
-  "without_evidence": 139
+  "without_evidence": 140
 }

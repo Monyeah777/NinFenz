@@ -1,5 +1,5 @@
 {
-  "digest": "3a912d24fe29a8952fb770d98e050cc60c55f0b09f9d412ea141da3cfde21c9b",
+  "digest": "0b3de61ec6a3aed60f6911025d7991c49472218911a6f1e76cd2e636164fe9ef",
   "entries": [
     {
       "doc": "其余 ABI 调用的判定向量：cc_label（IR 校验）→ 期望结论（跨语言可复核）。",
@@ -184,6 +184,16 @@
       "doc": "提交信息机检（Conventional Commits · 纯标准库）。",
       "flags": [],
       "path": "scripts/commit_msg_check.py",
+      "subcommands": []
+    },
+    {
+      "doc": "core 模块 → 测试引用面（`nf-core-judge-map/1`）：哪些核心模块没有被任何测试提到。",
+      "flags": [
+        "--check",
+        "--json",
+        "--write"
+      ],
+      "path": "scripts/core_judge_map.py",
       "subcommands": []
     },
     {
@@ -1216,8 +1226,8 @@
       "subcommands": []
     }
   ],
-  "flags": 521,
+  "flags": 524,
   "note": "静态接口面（docs/flags/subcommands），不含缺省行为语义",
   "schema": "nf-capability-inventory/1",
-  "scripts": 77
+  "scripts": 78
 }

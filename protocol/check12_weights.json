@@ -83,6 +83,7 @@
     "test_contract_pin": 0.1,
     "test_core": 0.4,
     "test_core_atomic_writes": 0.3,
+    "test_core_judge_map": 1.2,
     "test_cot_exposure": 2.6,
     "test_coupling_metrics": 1.7,
     "test_cross_lang_matrix": 4.8,
@@ -1316,6 +1317,10 @@
     "test_core_atomic_writes.CoreAtomicWriteTest.test_scanner_is_not_vacuous": 0.05,
     "test_core_atomic_writes.CoreAtomicWriteTest.test_script_allowlist_is_exact": 0.0,
     "test_core_atomic_writes.CoreAtomicWriteTest.test_script_and_bot_faces_use_atomic_write_too": 0.02,
+    "test_core_judge_map.CoreJudgeMapTest.test_collect_is_deterministic": 0.43,
+    "test_core_judge_map.CoreJudgeMapTest.test_committed_map_is_fresh": 0.21,
+    "test_core_judge_map.CoreJudgeMapTest.test_metric_is_name_level_and_says_so": 0.2,
+    "test_core_judge_map.CoreJudgeMapTest.test_unreferenced_does_not_grow": 0.21,
     "test_cot_exposure.CotExposureTest.test_repo_has_no_chain_of_thought_or_transcript": 1.58,
     "test_cot_exposure.CotRuleTest.test_real_leaks_are_flagged": 0.0,
     "test_cot_exposure.CotRuleTest.test_scan_surface_covers_generated_graphs_and_shell_entries": 0.84,
@@ -4600,5 +4605,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1872.8
+  "total_s": 1874.0
 }

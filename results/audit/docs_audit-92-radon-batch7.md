@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/json_schema.py:f3a4a6a14de5104e217af8b154505f9ca46fd6133081188209add78143e2b23e
-  - protocol/code_metrics_baseline.json:72a90af2352ff1c466b571c6462eb50408e77d04b4a3322172e238655bcffcb1
+  - protocol/code_metrics_baseline.json:9e2be2917b0de5b43bbc06192dac1ac2bddadfbd62c96936d4c4fa84b7bd9853
 ---
+> 重审（2026-11-09）：core 引用面映射（355 模块 / 未引用 34，棘轮只减不增）
+
 > 重审（2026-11-09）：红证据加 negative_assertion 档（assertRaises）：硬证据 20→99，无 149→139
 
 > 重审（2026-11-09）：红证据脚本行宽收口

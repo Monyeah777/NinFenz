@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-09",
   "approved_by": "Monyeah777",
-  "note": "边界",
+  "note": "core 映射",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "eed3eaa6625cc99f1828e47832ad11aba0723fbbfddc70c9626d00e8e519b9af"
+  "subject_digest": "b7da9597d65049a188a629e092439512511653642286efc4ce21b4f4301abbf8"
 }

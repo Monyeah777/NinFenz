@@ -1535,6 +1535,11 @@
       "max_fn_cc": 9,
       "max_fn_lines": 33
     },
+    "scripts/core_judge_map.py": {
+      "lines": 102,
+      "max_fn_cc": 7,
+      "max_fn_lines": 39
+    },
     "scripts/coupling_metrics.py": {
       "lines": 55,
       "max_fn_cc": 7,
