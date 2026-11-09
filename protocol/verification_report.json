@@ -443,20 +443,16 @@
     },
     {
       "id": "perf_budget",
-      "issues": 8,
+      "issues": 0,
       "name": "性能预算（中位耗时 ≤ 预算 + 记录新鲜）",
-      "sample": [
-        "性能记录过期 nf_score：31 天 > 上限 30 天（修复指引：python scripts/perf_budget.py --record --only nf_score）",
-        "性能记录过期 verify_report：31 天 > 上限 30 天（修复指引：python scripts/perf_budget.py --record --only verify_report）",
-        "性能记录过期 coupling：31 天 > 上限 30 天（修复指引：python scripts/perf_budget.py --record --only coupling）"
-      ],
+      "sample": [],
       "source": "perf_budget.scan",
       "stats": {
         "declared": 8,
         "over_budget": 0,
         "recorded": 8
       },
-      "status": "fail",
+      "status": "pass",
       "warns": 0
     },
     {
@@ -542,12 +538,12 @@
       "warns": 0
     }
   ],
-  "root_digest": "d5f93c91cef239a72561631e568cbef332a02a64abd52ff162244bd4a5b3222d",
+  "root_digest": "d56957605bda0a65bd7229584017a3d3e6f3cac96fb44f8905c2c9c891765fad",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
-    "fail": 1,
-    "pass": 28,
+    "fail": 0,
+    "pass": 29,
     "warn": 2
   }
 }

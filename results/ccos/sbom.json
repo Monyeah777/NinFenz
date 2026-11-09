@@ -1,7 +1,7 @@
 {
-  "bytes": 12013472,
+  "bytes": 12013213,
   "count": 569,
-  "digest": "4e15902ee5c61a3743cdce4389816d5ba87cdd06b02a98402c7fa9de924a8343",
+  "digest": "6c52c2ec3e2f7544699e873896f68d0e957f0324e5ba1c33438f4530086bb33e",
   "materials": [
     {
       "bytes": 102,
@@ -2294,9 +2294,9 @@
       "sha256": "07f71ba289c4396ba69fba1b3e82dfb1a7be9e67028e9840551a9357e36cc125"
     },
     {
-      "bytes": 6258,
+      "bytes": 6432,
       "path": "protocol/perf_budget.json",
-      "sha256": "e4d3a4cfb1a68a78ff5e138d4df760adad9175ffe8ee158e223c5beb9d58acff"
+      "sha256": "e58b6ee431c11309a9ec1bea89a00d85b3bcbd69b67d5c3f10572f801f941a57"
     },
     {
       "bytes": 210758,
@@ -2444,9 +2444,9 @@
       "sha256": "aad2a9338005f35f70468172c634cc8b27f3485e582b219172f871329bfeb669"
     },
     {
-      "bytes": 13552,
+      "bytes": 13119,
       "path": "protocol/verification_report.json",
-      "sha256": "abe985ee03fc275e36182ea1c834b019e8ea81b895e0bdd4930bb9d7c8574136"
+      "sha256": "373652d7d79f8aeb001a4753bfbd32680d93d913469c913a086449b2fa9180e9"
     },
     {
       "bytes": 4160,
