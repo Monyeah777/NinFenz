@@ -29,9 +29,8 @@ concurrency:
 permissions:
   actions: read
   contents: read
-  security-events: read          # 安全面快照：code-scanning
-  secret-scanning-alerts: read   # 安全面快照：secret-scanning
-  dependabot-alerts: read        # 安全面快照：dependabot
+  security-events: read      # 安全面快照：code-scanning（secret-scanning/dependabot
+                             # 的专用权限键在 GITHUB_TOKEN 上不被支持 → 快照打印 NA）
 
 jobs:
   scheduled-red-audit:
