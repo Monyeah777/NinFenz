@@ -813,6 +813,10 @@
       "source": "none"
     },
     {
+      "module": "test_ledger_tables.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_library.py",
       "source": "negative_assertion"
     },
@@ -1569,10 +1573,10 @@
       "source": "naming"
     }
   ],
-  "modules": 392,
+  "modules": 393,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
   "suspect": 152,
-  "with_evidence": 99,
+  "with_evidence": 100,
   "without_evidence": 141
 }

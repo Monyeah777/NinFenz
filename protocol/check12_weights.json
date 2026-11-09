@@ -204,6 +204,7 @@
     "test_layer_model": 11.2,
     "test_lazy_yaml": 0.2,
     "test_leak_surface": 1.7,
+    "test_ledger_tables": 0.2,
     "test_library": 0.9,
     "test_license_gate": 0.5,
     "test_live_doc_counts": 5.0,
@@ -2572,6 +2573,9 @@
     "test_leak_surface.PublicSurfaceLeakTest.test_no_secret_shapes": 0.56,
     "test_leak_surface.PublicSurfaceLeakTest.test_patterns_have_catch_power": 0.0,
     "test_leak_surface.PublicSurfaceLeakTest.test_scan_face_is_not_collapsed": 0.0,
+    "test_ledger_tables.LedgerTablesTest.test_green_numbering_is_contiguous": 0.0,
+    "test_ledger_tables.LedgerTablesTest.test_parser_rejects_malformed_input": 0.0,
+    "test_ledger_tables.LedgerTablesTest.test_red_heads_do_not_appear_in_green": 0.0,
     "test_library.AttestationFailClosedTest.test_unreadable_entry_is_reported_not_swallowed": 0.05,
     "test_library.LibraryWriteErrorFramingTest.test_supersede_self_reference_is_a_clean_error": 0.17,
     "test_library.LibraryWriteErrorFramingTest.test_unknown_entry_is_a_clean_error": 0.36,
@@ -4609,5 +4613,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1899.8
+  "total_s": 1900.0
 }

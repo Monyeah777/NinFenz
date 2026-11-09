@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 442,
-    "verify": 1039
+    "verify": 1040
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8561,6 +8561,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "台账表格自洽判据：序号连续、红绿不混（第 198 轮）。",
+      "path": "desktop/tests/test_ledger_tables.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "云端图书馆机器面单测（frontmatter 真源 / 投影一致 / 生命周期 / 检索）。",
       "path": "desktop/tests/test_library.py",
       "role": "verify",
@@ -12618,7 +12624,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "1c5331c44fbaddf0677f488ec2292404a43ce2c5694c9ce34f89050a1a56b25f",
+  "root_digest": "701a3bae80c4315f31c0b01763f9779b440f8453239fd09e37c84f8b14d56439",
   "rule_counts": {
     "R-app": 1465,
     "R-catch": 295,
@@ -12627,7 +12633,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 119,
-    "R-verify": 913,
+    "R-verify": 914,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
