@@ -447,9 +447,14 @@ class WatchDaemonIntegrationTest(unittest.TestCase):
             os.path.join(ROOT, "protocol", "LAYERS.json"))
         # 轮询而非一次断言：8 片并发下守护回包会慢，偶发 resident.text=0（2026-11-09 实测两次，
         # 与 main 上 #269 对姊妹用例的修法一致）。
+        # 观测面要跟「执行读取的那个对象」一致：`_sync_code` 会重载 core.*，
+        # 而 `dm.query_stats()` 反映的是守护进程里的实例；两者在快照/高负载下可能不同步，
+        # 只信后者会偶发 text=0（2026-11-09/10 全量快照两次命中）。两个面取最大值并轮询 15 s。
         text = 0
-        for _ in range(150):              # 最多 15 s：8 片并发下守护回包可能慢到数秒
-            text = int((dm.query_stats().get("resident") or {}).get("text", 0))
+        for _ in range(150):
+            mod_text = int((sys.modules["core.conformance_scan"].resident_stats() or {}).get("text", 0))
+            dm_text = int((dm.query_stats().get("resident") or {}).get("text", 0))
+            text = max(mod_text, dm_text)
             if text > 0:
                 break
             time.sleep(0.1)
