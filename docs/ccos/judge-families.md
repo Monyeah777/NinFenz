@@ -1,6 +1,6 @@
 # 判据族谱 v0（谁在检查什么，以及它们怎么失效）
 
-状态：**7 族**（截至 2026-11-09）。写新判据前请过一遍 [judge-design-questions.md](judge-design-questions.md)（十问速查）。每族的「失效方式」是本页最要紧的一栏——
+状态：**8 族**（截至 2026-11-09）。写新判据前请过一遍 [judge-design-questions.md](judge-design-questions.md)（十问速查）。每族的「失效方式」是本页最要紧的一栏——
 判据的价值不在于它现在全绿，而在于它红的时候你信不信、绿的时候它有没有可能骗你。
 
 ## 一、内容判据（对不对）
@@ -67,7 +67,17 @@
 | 检查对象 | 一时修不了的缺口：路径旗标覆盖、静态扫描基线、规模上限 |
 | 形式 | 冻结表 + 「新增即红」+「修好须删条目」 |
 | 失效方式 | 冻结表变成永久豁免名单；条目只增不删 |
-| 证据 | `test_path_flag_ratchet`、`sast_check.py --baseline`、`code_metrics.py` |
+| 证据 | `desktop/tests/test_path_flag_ratchet.py`、`scripts/sast_check.py --baseline`、`scripts/code_metrics.py` |
+| 新增（第 153–166 轮） | 红证据比例棘轮（`desktop/tests/test_judge_red_evidence.py`）、core 引用面棘轮（`desktop/tests/test_core_judge_map.py`）——两者都按**比例**而非绝对数冻结，因为绝对数会惩罚「新增测试」 |
+
+## 八、执行面判据（声明的东西真能跑吗）
+
+| 项 | 内容 |
+|---|---|
+| 检查对象 | 包里声明的可跑入口、文档里声明的命令 |
+| 形式 | 逐条真跑（退出码 0 或 2 合规）+ 与数据件绑定（入口列必须含包 `runnable` 首条命令） |
+| 失效方式 | 命令存在但永远失败；入口需要参数而判据只看能否启动（弱口径） |
+| 证据 | `desktop/tests/test_pack_runnable_runs.py`、`test_method_pack.py` 的入口/用法绑定判据 |
 
 ## 怎么读这张表
 
