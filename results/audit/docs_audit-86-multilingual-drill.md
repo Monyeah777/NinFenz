@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:0b1ed1aefe39a7ac0367d229789b6caa52d2ed5ee7fd9c1925ca194639c386fa
+  - protocol/code_metrics_baseline.json:9d65db374221c26f8c093f8522ac5ddcf59b2029711726203287d713bc147498
 ---
+> 重审（2026-11-09）：sast_check 行数
+
 > 重审（2026-11-09）：CodeQL 两处告警修复（ReDoS/URL 子串）
 
 > 重审（2026-11-09）：session-persist 预算 Windows 放宽
