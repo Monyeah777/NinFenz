@@ -294,6 +294,39 @@ class PackContentTest(unittest.TestCase):
         wrong = f"**{len(packs) - 1} 个域 / {moves} 个专家动作 / {kinds} 个证据类目**"
         self.assertTrue(pack_doc_issues(wrong, packs))
 
+    def test_every_pack_declares_a_runnable_entry(self):
+        """每个包都要声明可跑入口，且入口真实存在（第 144 轮）。
+
+        为什么：包的 `examples` 只说机制在哪实现；`runnable` 说这个域**怎么跑**。
+        清单（`nf cognition --pack-checklist`）与文档表格都从这里取，改错一个命令即红。
+        """
+        nf_src = (ROOT / "scripts" / "nf.py").read_text(encoding="utf-8")
+        bad = []
+        for pid in PACK_IDS:
+            pack = method_pack.load_pack(str(ROOT), pid)
+            runnable = pack.get("runnable") or []
+            if not runnable:
+                bad.append(pid + " → 没声明 runnable")
+                continue
+            for cmd in runnable:
+                cmd = str(cmd)
+                if cmd.startswith("nf "):
+                    sub = cmd.split()[1]
+                    if f'add_parser("{sub}"' not in nf_src:
+                        bad.append(pid + " → nf " + sub + " 不存在")
+                elif cmd.startswith("python "):
+                    path = cmd.split()[1]
+                    if not (ROOT / path).is_file():
+                        bad.append(pid + " → " + path + " 不存在")
+                else:
+                    bad.append(pid + " → 无法识别的入口：" + cmd)
+        self.assertEqual([], bad, "可跑入口有问题：" + "; ".join(bad))
+
+    def test_checklist_exposes_runnable(self):
+        doc = method_pack.checklist(method_pack.load_pack(str(ROOT), "operations"))
+        self.assertIn("runnable", doc)
+        self.assertTrue(doc["runnable"], "清单没带可跑入口")
+
     def test_entry_commands_exist(self):
         """文档「可跑入口」列里的命令必须真实存在（第 137 轮）。
 

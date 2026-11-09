@@ -6404,6 +6404,9 @@ def _cmd_cognition(args):
             print("  " + str(it["step"]) + ". " + it["do"] + " —— " + it["why"])
         for st in doc["evidence_standards"]:
             print("  证据（" + st["claim_kind"] + "）：" + " / ".join(st["required"]))
+        if doc.get("runnable"):
+            # 第 144 轮：清单给出「这个域怎么跑」，包不再是纯描述。
+            print("  可跑入口：" + " │ ".join(doc["runnable"]))
         return 0
     if getattr(args, "packs_list", False):
         from core import method_pack as mpk

@@ -112,5 +112,9 @@
     "craft:coherence",
     "craft:evidence_sufficiency",
     "standard:GB45438-2025"
+  ],
+  "runnable": [
+    "nf asset ledger",
+    "nf asset verify"
   ]
 }

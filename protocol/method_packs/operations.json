@@ -110,5 +110,8 @@
   "criteria_refs": [
     "craft:coherence",
     "standard:evidence-bundle-v0"
+  ],
+  "runnable": [
+    "python scripts/perf_budget.py"
   ]
 }

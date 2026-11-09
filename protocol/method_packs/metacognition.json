@@ -101,5 +101,9 @@
   "criteria_refs": [
     "craft:falsifiability",
     "review:blind-review-protocol"
+  ],
+  "runnable": [
+    "nf cog calibrate",
+    "nf cog triggers"
   ]
 }

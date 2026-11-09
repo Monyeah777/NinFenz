@@ -110,5 +110,9 @@
   "criteria_refs": [
     "craft:evidence_sufficiency",
     "standard:evidence-bundle-v0"
+  ],
+  "runnable": [
+    "nf doctor",
+    "nf audit"
   ]
 }

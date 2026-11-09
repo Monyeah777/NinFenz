@@ -111,5 +111,8 @@
     "craft:coherence",
     "craft:evidence_sufficiency",
     "standard:evidence-bundle-v0"
+  ],
+  "runnable": [
+    "nf cog replay"
   ]
 }

@@ -229,9 +229,12 @@ def checklist(pack: dict[str, Any]) -> dict[str, Any]:
             "why": str(mv.get("why")),
             "kind": str(mv.get("kind") or "advisory"),
         })
+    # 第 144 轮：清单带上「这个域怎么跑」（可跑入口），把包与命令接起来。
+    runnable = [str(x) for x in (pack.get("runnable") or []) if str(x).strip()]
     return {"schema": CHECKLIST_SCHEMA, "pack": str(pack.get("id")),
             "domain": str(pack.get("domain") or ""),
             "items": items,
+            "runnable": runnable,
             "evidence_standards": [
                 {"claim_kind": str(st.get("claim_kind")),
                  "required": list(st.get("required") or [])} for st in stds],

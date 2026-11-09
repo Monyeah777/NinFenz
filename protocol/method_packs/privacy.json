@@ -110,5 +110,9 @@
   "criteria_refs": [
     "craft:coherence",
     "standard:evidence-bundle-v0"
+  ],
+  "runnable": [
+    "nf doctor",
+    "nf evidence verify"
   ]
 }
