@@ -56,6 +56,7 @@
     "test_ci_diagnostics": 0.2,
     "test_ci_supply_chain": 0.2,
     "test_ci_visibility": 0.2,
+    "test_citation_contract": 0.2,
     "test_claim_labels": 0.2,
     "test_cli_determinism": 1.7,
     "test_cli_error_framing": 147.9,
@@ -942,6 +943,11 @@
     "test_ci_visibility.GateVisibilityTest.test_every_workflow_verify_invocation_declares_its_tier": 0.0,
     "test_ci_visibility.GateVisibilityTest.test_gate_workflow_runs_full_verify_not_a_subset": 0.0,
     "test_ci_visibility.GateVisibilityTest.test_gate_workflow_triggers_on_push_to_main": 0.0,
+    "test_citation_contract.CitationContractTest.test_citation_matches_contract": 0.02,
+    "test_citation_contract.CitationContractTest.test_contract_catches_broken_citation": 0.01,
+    "test_citation_contract.CitationContractTest.test_person_not_entity": 0.0,
+    "test_citation_contract.CitationContractTest.test_version_policy_is_documented": 0.0,
+    "test_citation_contract.CitationContractTest.test_zenodo_double_source": 0.0,
     "test_claim_labels.Test.test_core_contract_needs_evidence": 0.0,
     "test_claim_labels.Test.test_hypothesis_ok": 0.0,
     "test_claim_labels.Test.test_label_vocab": 0.0,
@@ -4696,5 +4702,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1818.4
+  "total_s": 1818.6
 }
