@@ -1,7 +1,7 @@
 {
-  "bytes": 12054128,
+  "bytes": 12054039,
   "count": 572,
-  "digest": "dd3b9b658748b349387a1ccb0819990b8209de3a6817a76076f680245ae0b32a",
+  "digest": "27202159bbf9040ef67dc61b6af55efedff68383c3e32d3d0d8985c0af6fe12b",
   "materials": [
     {
       "bytes": 102,
@@ -1914,9 +1914,9 @@
       "sha256": "ad799cbfbf1dd69859ff21963885ebf1d5fed56ca67fdd1c2b9e2052ce3b8003"
     },
     {
-      "bytes": 422,
+      "bytes": 333,
       "path": "protocol/approvals/protocol__conformance_report.json",
-      "sha256": "3905ea4eb26374a9b8912edb2537326ed8e5c5a18a5d30502d78c526d3508d30"
+      "sha256": "9ba6b53bb572eb5b997313133fee44c6ccbf54c309fc257687b8fd4ced36bf30"
     },
     {
       "bytes": 16375,
