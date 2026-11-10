@@ -131,5 +131,10 @@
   ],
   "runnable": [
     "nf check"
-  ]
+  ],
+  "judges": {
+    "defense-efficacy": "desktop/tests/test_check_policy.py",
+    "audit-trail": "desktop/tests/test_audit_rebind.py",
+    "least-privilege": "desktop/tests/test_purity_scan.py"
+  }
 }

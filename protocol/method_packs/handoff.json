@@ -114,5 +114,10 @@
   ],
   "runnable": [
     "nf cog replay"
-  ]
+  ],
+  "judges": {
+    "handoff": "desktop/tests/test_cognition_bridge.py",
+    "commitment": "desktop/tests/test_cognition_bridge.py",
+    "separation": "desktop/tests/test_cognition_control.py"
+  }
 }
