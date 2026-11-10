@@ -1,24 +1,49 @@
 # 代码所有者（CODEOWNERS）
 #
-# 本项目为单人维护：全仓默认归维护者，故 `*` 一条即可生效。
-# 下列敏感面**显式列出**（CODEOWNERS 取最后一条匹配），便于将来增加第二位 reviewer 时
-# 只需改这几行，而不用重新判断哪些面承重。
+# 本项目为单人维护：全仓默认归维护者，故 `*` 一条即生效。
+# 下列敏感面**显式列出**（GitHub 取**最后一条匹配**），用途有二：
+#   1) 将来增加第二位 reviewer 时，只需改这几行，不用重新判断哪些面承重；
+#   2) 判据（desktop/tests/test_codeowners_contract.py）把这些承重面钉成契约——
+#      少列一个面即红，写死一个不存在的路径也红。
 #
-# 判据（谁承重）：改这些面会波及全部下游或供应链——协议件、门禁本体、方向文件、
-# 机器契约真源、核心库、CI 与入库通道。
+# 承重口径（改即波及全部下游 / 供应链 / 录入面）：协议件 · 机器契约真源 · 门禁本体与判据 ·
+# 核心库 · 方向与治理件 · CI 与入库通道 · 投稿面 · 分发与站点面。
+#
+# 语法：以 / 开头 = 锚定仓库根；以 / 结尾 = 该目录及全部子路径；一条规则取最后匹配。
 
-*                        @Monyeah777
+*                                 @Monyeah777
 
 # —— 协议与机器契约（改即波及全部下游）——
-/01_核心协议.md           @Monyeah777
-/02_联动注册表.md         @Monyeah777
-/protocol/               @Monyeah777
+/01_核心协议.md                   @Monyeah777
+/02_联动注册表.md                 @Monyeah777
+/06_Agent执行协议.md              @Monyeah777
+/07_官方核心出厂与社区预设导航.md @Monyeah777
+/protocol/                        @Monyeah777
 
-# —— 门禁与方向（质量法官本体）——
-/verify.sh               @Monyeah777
-/STRATEGY.md             @Monyeah777
+# —— 门禁本体与判据（质量法官）——
+/verify.sh                        @Monyeah777
+/scripts/                         @Monyeah777
+/desktop/tests/                   @Monyeah777
 
-# —— 核心库与投稿/供应链面 ——
-/desktop/src/core/       @Monyeah777
-/library/intake.json     @Monyeah777
-/.github/                @Monyeah777
+# —— 方向与治理件 ——
+/STRATEGY.md                      @Monyeah777
+/AGENTS.md                        @Monyeah777
+/CONTRIBUTING.md                  @Monyeah777
+/SECURITY.md                      @Monyeah777
+/CODE_OF_CONDUCT.md               @Monyeah777
+/MAINTAINERS.md                   @Monyeah777
+/LICENSE                          @Monyeah777
+/REUSE.toml                       @Monyeah777
+/CITATION.cff                     @Monyeah777
+/.zenodo.json                     @Monyeah777
+/THIRD-PARTY-NOTICES.md           @Monyeah777
+
+# —— 核心库 · CI 与入库通道 · 投稿面 ——
+/desktop/src/core/                @Monyeah777
+/.github/                         @Monyeah777
+/library/                         @Monyeah777
+/community/                       @Monyeah777
+
+# —— 分发与站点面 ——
+/packaging/                       @Monyeah777
+/site/                            @Monyeah777
