@@ -2,6 +2,13 @@
 # tag 可移动，`@v4` 名义不变而实际代码可被替换，等于把 CI 执行权交给上游标签。
 # 固定到 SHA 后行为与当日 `@v4` 逐字一致（SHA 取自 tags API 的当时解析值），
 # 由本文件负责把固定值**自动跟进**——固定不等于冻结。
+#
+# 覆盖纪律（2026-11-11 补齐）：**仓库里每一处版本固定都要有跟进面**——
+# github-actions（workflow 固定值）· pip（.github 固定集 + pyproject extras 镜像）·
+# npm（对外发布包的 devDependencies）· cargo（Rust 引擎各 crate 的 Cargo.lock）·
+# docker（镜像基座 digest）。少一面 = 固定退化成冻结上游安全修复。
+# 判据：desktop/tests/test_dependabot_contract.py（生态覆盖 / 目录在场 / 分组策略 /
+# 变异自证——删一面、写死不存在目录、把 major 混进分组都会红）。
 version: 2
 updates:
   # ① CI 里的 action 固定值跟进（固定到 SHA 后更必须有自动跟进，否则等于冻结上游安全修复）。
@@ -21,8 +28,8 @@ updates:
         update-types:
           - minor
           - patch
-  # ② CI 工具链版本固定（requirements-*.txt）同样要能跟进，
-  #    否则固定会退化成冻结上游安全修复。
+
+  # ② CI 工具链版本固定（requirements-*.txt）同样要能跟进。
   - package-ecosystem: pip
     directory: /.github
     schedule:
@@ -38,8 +45,27 @@ updates:
         update-types:
           - minor
           - patch
-  # ③ 已发布 npm 包的依赖面（packaging/npm/package.json）——此前**无覆盖**：
-  #    仓库对外发布 ninfenz 包，其 devDependencies 却从不被跟进（工业级供应链要求全覆盖）。
+
+  # ③ pyproject.toml 的 optional-dependencies 是 ② 的镜像（含 "==" 固定值）——
+  #    只覆盖 /.github 会让镜像面永远落后；两处都由 dependabot 跟进（版本真源仍是 ②）。
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "ci"
+    labels:
+      - dependencies
+    groups:
+      pyproject-minor-patch:
+        applies-to: version-updates
+        update-types:
+          - minor
+          - patch
+
+  # ④ 已发布 npm 包的依赖面（packaging/npm/package.json）——此前无覆盖：
+  #    仓库对外发布 ninfenz 包，其 devDependencies 却从不被跟进。
   - package-ecosystem: npm
     directory: /packaging/npm
     schedule:
@@ -55,3 +81,86 @@ updates:
         update-types:
           - minor
           - patch
+
+  # ⑤ Rust 引擎各 crate（各自有 Cargo.lock；std-only 的 wasm 插件无依赖，不需要跟进面）。
+  - package-ecosystem: cargo
+    directory: /engine/rust
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "ci"
+    labels:
+      - dependencies
+    groups:
+      cargo-rust-minor-patch:
+        applies-to: version-updates
+        update-types:
+          - minor
+          - patch
+  - package-ecosystem: cargo
+    directory: /engine/rust/canonical
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "ci"
+    labels:
+      - dependencies
+  - package-ecosystem: cargo
+    directory: /engine/rust/ffi
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "ci"
+    labels:
+      - dependencies
+  - package-ecosystem: cargo
+    directory: /engine/rust/pyo3
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "ci"
+    labels:
+      - dependencies
+  - package-ecosystem: cargo
+    directory: /engine/wasm/sha256-component
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "ci"
+    labels:
+      - dependencies
+
+  # ⑥ 容器基座（digest 固定）——升级=显式改 digest，必须有跟进面发现上游安全更新。
+  #    注：Dockerfile.crosscheck 非默认文件名，dependabot 不识别；其基座改动随本面人工复核。
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "ci"
+    labels:
+      - dependencies
+  - package-ecosystem: docker
+    directory: /packaging/nfal
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "ci"
+    labels:
+      - dependencies
+  - package-ecosystem: docker
+    directory: /packaging/hf-space
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "ci"
+    labels:
+      - dependencies

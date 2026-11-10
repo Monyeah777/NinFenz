@@ -405,6 +405,10 @@
       "source": "none"
     },
     {
+      "module": "test_dependabot_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_dirty_tree.py",
       "source": "none"
     },
@@ -1641,10 +1645,10 @@
       "source": "negative_assertion"
     }
   ],
-  "modules": 410,
+  "modules": 411,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
   "suspect": 154,
-  "with_evidence": 115,
+  "with_evidence": 116,
   "without_evidence": 141
 }
