@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1066
+    "verify": 1067
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8627,6 +8627,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "library-ingest 契约判据：入库机器人是「带写权限 + 公开输入」面，口径必须显式（2026-11-11）。",
+      "path": "desktop/tests/test_library_ingest_workflow_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "许可链契约判据：LICENSE 是唯一真源，其余四处只允许指向它（2026-11-11）。",
       "path": "desktop/tests/test_license_chain.py",
       "role": "verify",
@@ -12780,7 +12786,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "1fca6d2031dd5196e2bbf4c7788df768238fc7271c7d32f682c02a5102b7e81f",
+  "root_digest": "722161bfa8e05e9ba969c5436224f2964517636da676da22d775ecbb0e7616af",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12789,7 +12795,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 940,
+    "R-verify": 941,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

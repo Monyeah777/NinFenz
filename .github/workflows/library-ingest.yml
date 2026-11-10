@@ -24,6 +24,9 @@ jobs:
       issues: write
     timeout-minutes: 20          # 挂死上限（2026-10-01 统一）
     steps:
+      # 注意：本 workflow **刻意保留 checkout 的凭据注入**（不关闭）——脚本靠它执行
+      # `git push origin HEAD:main`（令牌不从 env 拼 URL，避免进日志）。照抄其他 workflow
+      # 的「关闭凭据」写法会让入库推送 401；此差异由 test_library_ingest_workflow_contract 守住。
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
       - name: 自动入库（解析 → 编号 → 写文件 → 更新 INDEX → 推送 → 回评）
         env:
@@ -49,3 +52,4 @@ jobs:
             .artifacts/
             *.log
           if-no-files-found: ignore
+          retention-days: 7    # 排障工件，7 天回收
