@@ -1,7 +1,7 @@
 {
-  "approved_at": "2026-11-10",
+  "approved_at": "2026-11-11",
   "approved_by": "Monyeah777",
-  "note": "支持入口申诉复核主体与维护者表同源（外部第三方/未复核），判据 7 项含变异自证。",
+  "note": ".zenodo.json 许可与 LICENSE/REUSE/pyproject/CITATION 四源一致（MIT），删除失效文件引用；判据 test_zenodo_contract 4 项含变异自证。",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "5f057290d1d28051bc0dc492a15cc4533485ae5d788db80889beda4caeea76f5"
