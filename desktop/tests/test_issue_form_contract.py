@@ -39,7 +39,8 @@ def load_form(path: Path = FORM) -> dict:
     return doc
 
 
-def form_issues(doc: dict) -> list:
+def form_issues(doc: dict, required_ids: tuple = REQUIRED_IDS,
+                min_checklist: int = MIN_CHECKLIST) -> list:
     """表单契约问题列表（纯函数，便于变异自证）。"""
     issues = []
     for key in ("name", "description", "body"):
@@ -84,12 +85,12 @@ def form_issues(doc: dict) -> list:
                 issues.append(f"{eid} 下拉至少要有 2 个选项")
         if kind == "checkboxes":
             opts = attrs.get("options") or []
-            if len(opts) < MIN_CHECKLIST:
-                issues.append(f"{eid} 自检清单少于 {MIN_CHECKLIST} 项（{len(opts)}）")
+            if len(opts) < min_checklist:
+                issues.append(f"{eid} 自检清单少于 {min_checklist} 项（{len(opts)}）")
             for opt in opts:
                 if not isinstance(opt, dict) or not str(opt.get("label") or "").strip():
                     issues.append(f"{eid} 清单项缺 label")
-    missing = [f for f in REQUIRED_IDS if f not in ids]
+    missing = [f for f in required_ids if f not in ids]
     if missing:
         issues.append("缺核心字段：" + ", ".join(missing))
     return issues
@@ -122,6 +123,59 @@ class BugReportFormTest(unittest.TestCase):
         self.assertTrue(form_issues(bad3), "缺 label 必须报")
         with self.assertRaises(ValueError):
             load_form(ROOT / "no_such_form.yml")
+
+#: 功能请求表单：B1 五问（谁消费 / 怎么验证 / 非目标 / 协议关系 / 失败定义）缺一即红
+FEAT_FORM = ROOT / ".github" / "ISSUE_TEMPLATE" / "feature_request.yml"
+FEAT_REQUIRED_IDS = (
+    "background", "capability", "usage", "consumers", "verification",
+    "non-goals", "impact", "protocol-layer", "compat", "acceptance",
+    "failure", "alternatives", "contribution", "checklist",
+)
+INTAKE = ROOT / "library" / "intake.json"
+
+
+def code_surface_line() -> str:
+    """由投稿面声明件算出「代码层（a · b · c）」这一行的逐字期望值（单一真源）。"""
+    import json
+
+    sub = json.loads(INTAKE.read_text(encoding="utf-8")).get("submission") or {}
+    prefix = str(sub.get("code_surface_prefix") or "")
+    surfaces = [str(x) for x in (sub.get("code_surfaces") or [])]
+    if not (prefix and surfaces):
+        raise ValueError("intake.json 缺 code_surface_prefix / code_surfaces")
+    return f"{prefix}（{' · '.join(surfaces)}）"
+
+
+class FeatureRequestFormTest(unittest.TestCase):
+    def setUp(self):
+        self.doc = load_form(FEAT_FORM)
+
+    def test_form_matches_contract(self):
+        self.assertEqual([], form_issues(self.doc, FEAT_REQUIRED_IDS, min_checklist=3),
+                         "功能请求模板不满足契约")
+
+    def test_b1_five_questions_are_collectable(self):
+        """B1 五问必须在表单里各有一栏（否则评审只能靠追问补全）。"""
+        ids = {b.get("id") for b in self.doc["body"] if b.get("id")}
+        for need in ("consumers", "verification", "non-goals", "protocol-layer", "failure"):
+            self.assertIn(need, ids, "B1 缺栏位：" + need)
+
+    def test_code_surface_line_matches_intake_declaration(self):
+        """代码面清单不得手写副本——必须与 library/intake.json 逐字一致。"""
+        text = FEAT_FORM.read_text(encoding="utf-8")
+        self.assertIn(code_surface_line(), text, "代码面清单与声明件不一致")
+
+    def test_contract_catches_broken_feature_forms(self):
+        import copy
+
+        bad = copy.deepcopy(self.doc)
+        bad["body"] = [b for b in bad["body"] if b.get("id") != "consumers"]
+        self.assertTrue(form_issues(bad), "删掉「谁消费」必须报")
+        bad2 = copy.deepcopy(self.doc)
+        for item in bad2["body"]:
+            if item.get("id") == "checklist":
+                item["attributes"]["options"] = item["attributes"]["options"][:1]
+        self.assertTrue(form_issues(bad2), "自检清单不足必须报")
 
 
 if __name__ == "__main__":

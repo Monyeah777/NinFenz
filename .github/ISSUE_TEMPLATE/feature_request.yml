@@ -1,28 +1,66 @@
 name: ✨ 功能请求
-description: 提出新功能或改进建议（说明消费方与验收口径，便于判断成熟度）
+description: 提出新功能或改进建议（按 B1 五问说明消费方、验证方式、非目标与失败定义）
 title: '[FEAT] '
 labels:
   - enhancement
 body:
+  - type: markdown
+    attributes:
+      value: |
+        **这个表单就是本仓的「B1 五问」**（见 [CONTRIBUTING.md](https://github.com/Monyeah777/NinFenz/blob/main/CONTRIBUTING.md) §4.5）：谁消费 / 怎么验证被消费 / 非目标边界 / 与现存协议关系 / 失败定义。
+        五问答不全的提案**不会进入方案**——不是流程洁癖，是 C-a 教训：答不出「谁消费」的能力最后都烂在仓库里。
+
+        提交前：① 先搜 Issues 与 [ROADMAP.md](https://github.com/Monyeah777/NinFenz/blob/main/docs/meta/ROADMAP.md)，确认不在既有计划里；② **一条只提一个能力**；③ 先写「问题」再写「解法」——只写解法通常说明问题还没想清。
   - type: textarea
     id: background
     attributes:
-      label: 需求背景
-      description: 想解决什么问题 / 什么场景下需要
+      label: 需求背景（问题是什么）
+      description: 现在遇到什么具体问题？**当前怎么绕行**？绕行的代价是什么？（先讲问题，不要一上来讲解法）
+      placeholder: |
+        现在要做 X 时，只能手动 A→B→C，一次 20 分钟，且容易漏 B。
     validations:
       required: true
   - type: textarea
     id: capability
     attributes:
-      label: 期望能力
-      description: 具体描述期望的行为或产出
+      label: 期望能力（解法是什么）
+      description: 具体描述期望的行为或产出；能给 CLI/协议形态就先给形态。
+      placeholder: 例：nf evidence verify 支持 --explain 逐条说明判定依据。
+    validations:
+      required: true
+  - type: textarea
+    id: usage
+    attributes:
+      label: 使用示例
+      description: 期望怎么被调用/看到（命令、参数、输出、文档段落），越具体越容易评。
+      render: text
+      placeholder: |
+        $ python scripts/nf.py evidence verify --explain --bundle out/b.zip
+        ok  bundle  (3 条判据：签名 / 撤销 / 时间窗)
     validations:
       required: true
   - type: textarea
     id: consumers
     attributes:
-      label: 谁消费
-      description: 具体消费方（模块 / CLI / verify check / 文档 / 外部产物格式）；不接受「将来可能有用」（CONTRIBUTING §4.5 B1 五问之一）
+      label: 谁消费（B1 ①）
+      description: 具体消费方（模块 / CLI / verify check / 文档 / 外部产物格式）。**不接受「将来可能有用」**——这一栏是立项硬门槛。
+      placeholder: 消费方：nf CLI（scripts/nf.py）+ verify check35 判据面；
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: 怎么验证被消费（B1 ②）
+      description: 验证动作 + 时机：跑哪条命令、看哪个输出、由哪条判据守住。要能独立跑、有可观察结果。
+      placeholder: 判据：desktop/tests/test_xxx.py 断言 --explain 输出含三条判据名；CI 每次跑。
+    validations:
+      required: true
+  - type: textarea
+    id: non-goals
+    attributes:
+      label: 非目标边界（B1 ③）
+      description: 明确**不做**什么（对照冻结面与 ROADMAP 条件池），一句话边界声明；不写会被当成范围无限。
+      placeholder: 本提案不做：不引入新的证据格式版本；不覆盖离线验签。
     validations:
       required: true
   - type: dropdown
@@ -37,17 +75,95 @@ body:
         - 工程治理（docs/meta/ROADMAP.md / CHANGELOG / CONTRIBUTING / .github / verify.sh）
     validations:
       required: true
-  - type: textarea
-    id: alternatives
+  - type: dropdown
+    id: protocol-layer
     attributes:
-      label: 替代方案 / 反方（可选）
-      description: 你考虑过的其它做法、以及不做的代价（CONTRIBUTING §4.5 的钢人论证口径）
+      label: 与现存协议的关系（B1 ④）
+      description: 涉及哪一层、是否需要登记或 schema 变更；不确定就选「不确定（请评审帮判）」。
+      options:
+        - 不涉及协议层（纯代码/文档/工程治理）
+        - 涉及 01–07 数据/契约层（需评审判 V1 只增 / V2 结构性变更）
+        - 涉及 02 登记 / registry 投影
+        - 涉及 08 / 09 方案层（需新方案文档）
+        - 不确定（请评审帮判）
     validations:
-      required: false
+      required: true
+  - type: dropdown
+    id: compat
+    attributes:
+      label: 兼容性影响
+      description: 本仓对已发布契约按「只增不删 / 结构性变更需迁移记录」处理，先声明能省一轮。
+      options:
+        - 不涉及兼容性（新增能力，旧行为不变）
+        - 兼容新增（默认关闭 / 向后兼容）
+        - 破坏性变更（需迁移说明与版本 bump）
+        - 不确定（请评审帮判）
+    validations:
+      required: true
   - type: textarea
     id: acceptance
     attributes:
-      label: 验收设想（可选）
-      description: 怎样算完成（可核的判据优先于主观描述）
+      label: 可核验收判据（B1 ②）
+      description: 怎样算完成——**可核判据优先于主观描述**（命令 + 期望输出 / 新判据 / 门禁项）。
+      placeholder: 完成 = 新增判据 test_xxx 绿 + verify check35 绿 + 文档状态行更新。
+    validations:
+      required: true
+  - type: textarea
+    id: failure
+    attributes:
+      label: 失败定义 / RED 判据（B1 ⑤）
+      description: 什么算验收不通过？（哪种情况一出现就应判红）——写不出 RED 的提案通常也无法验收。
+      placeholder: 若 --explain 对任何 bundle 都输出成功，或输出不含判据名，即判红。
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 替代方案与不做的代价
+      description: 你考虑过的其它做法（含「什么都不做」），以及各自的代价；这一栏是钢人论证，别跳过。
+      placeholder: 方案 B：在文档里加说明（成本低，但无法被门禁守住）；不做的代价：每季度都要人肉复核一次。
+    validations:
+      required: true
+  - type: dropdown
+    id: scale
+    attributes:
+      label: 预估规模（可选）
+      description: 影响评审排期，不确定就不选。
+      options:
+        - 小（单文件 / 单判据）
+        - 中（多文件 / 需迁移或重算生成物）
+        - 大（跨层 / 需正式方案文档）
+        - 未知（等评审评估）
     validations:
       required: false
+  - type: dropdown
+    id: contribution
+    attributes:
+      label: 你能提供什么
+      description: 直接决定这条提案的推进速度，请如实选。
+      options:
+        - 我可以提 PR（含判据）
+        - 我可以帮测试 / 给真实场景
+        - 我可以提供数据或样例
+        - 仅提建议（不投入实现）
+    validations:
+      required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: 补充（可选）
+      description: 相关 Issue / PR / 方案号、之前的讨论结论、外部参考实现。
+    validations:
+      required: false
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: 提交前自检
+      description: 三项都勾才提交——它们对应本仓「提案不烂尾」的三条纪律。
+      options:
+        - label: 我已搜过 Issues 与 ROADMAP，确认不在既有计划里
+          required: true
+        - label: 我的「谁消费」是具体消费方，不是「将来可能有用」
+          required: true
+        - label: 我接受「答不出消费方即不立项」的裁量
+          required: true
