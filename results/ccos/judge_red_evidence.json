@@ -1489,6 +1489,10 @@
       "source": "naming"
     },
     {
+      "module": "test_third_party_notices_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_timestamp.py",
       "source": "naming"
     },
@@ -1621,10 +1625,10 @@
       "source": "negative_assertion"
     }
   ],
-  "modules": 405,
+  "modules": 406,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
   "suspect": 154,
-  "with_evidence": 110,
+  "with_evidence": 111,
   "without_evidence": 141
 }
