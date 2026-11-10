@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1048
+    "verify": 1049
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9371,6 +9371,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "安全策略契约判据：报告通道必须「分类清楚、模板可给、时限与披露可判」（2026-11-10）。",
+      "path": "desktop/tests/test_security_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "路径可达门禁：`desktop/scripts/seed_from_repo.py` 必须**自定位到本仓根**。",
       "path": "desktop/tests/test_seed_from_repo.py",
       "role": "verify",
@@ -12672,7 +12678,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "4b1903356554d320e0000ee8f8c0bc103eca275b689cd2a6e80c0a703f98405a",
+  "root_digest": "512f6202035fd1d27252b924416958d75d4b102fdb9e03261f2a05afd56220ec",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12681,7 +12687,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 922,
+    "R-verify": 923,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
