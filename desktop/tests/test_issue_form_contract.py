@@ -177,6 +177,88 @@ class FeatureRequestFormTest(unittest.TestCase):
                 item["attributes"]["options"] = item["attributes"]["options"][:1]
         self.assertTrue(form_issues(bad2), "自检清单不足必须报")
 
+CONFIG = ROOT / ".github" / "ISSUE_TEMPLATE" / "config.yml"
+SECURITY_ADVISORY = "/security/advisories/new"
+BLOB_PREFIX = "https://github.com/Monyeah777/NinFenz/blob/main/"
+
+
+def config_issues(doc: dict) -> list:
+    """议题入口配置的问题列表（纯函数，便于变异自证）。"""
+    issues = []
+    if doc.get("blank_issues_enabled") is not False:
+        issues.append("blank_issues_enabled 必须为 false（结构化表单之外不留空白口子）")
+    links = doc.get("contact_links")
+    if not isinstance(links, list) or len(links) < 2:
+        return issues + ["contact_links 至少 2 条（安全 + 支持）"]
+    if len(links) > 6:
+        issues.append(f"contact_links 过多（{len(links)} > 6），选择页会失去焦点")
+    urls = []
+    for i, link in enumerate(links):
+        if not isinstance(link, dict):
+            issues.append(f"contact_links[{i}] 必须是映射")
+            continue
+        for key in ("name", "url", "about"):
+            if not str(link.get(key) or "").strip():
+                issues.append(f"contact_links[{i}] 缺 {key}")
+        url = str(link.get("url") or "")
+        if not url.startswith("https://"):
+            issues.append(f"contact_links[{i}] url 必须是 https：{url!r}")
+        urls.append(url)
+    if len(urls) != len(set(urls)):
+        issues.append("contact_links 的 url 有重复")
+    if not any(SECURITY_ADVISORY in u for u in urls):
+        issues.append("缺少私密安全报告直达链接（/security/advisories/new）")
+    for u in urls:
+        if u.startswith(BLOB_PREFIX):
+            rel = u[len(BLOB_PREFIX):].split("#")[0]
+            if not (ROOT / rel).is_file():
+                issues.append(f"contact_link 指向的仓内文档不存在：{rel}")
+    return issues
+
+
+def load_config() -> dict:
+    try:
+        import yaml
+    except ModuleNotFoundError as exc:
+        raise ValueError(f"缺 PyYAML，无法校验入口配置：{exc}") from exc
+    try:
+        doc = yaml.safe_load(CONFIG.read_text(encoding="utf-8"))
+    except (OSError, yaml.YAMLError) as exc:
+        raise ValueError(f"入口配置不可读/不可解析：{exc}") from exc
+    if not isinstance(doc, dict):
+        raise ValueError("入口配置根节点必须是映射")
+    return doc
+
+
+class IssueTemplateConfigTest(unittest.TestCase):
+    def setUp(self):
+        self.doc = load_config()
+
+    def test_config_matches_contract(self):
+        self.assertEqual([], config_issues(self.doc), "议题入口配置不满足契约")
+
+    def test_security_channel_is_reachable(self):
+        urls = [str(x.get("url")) for x in self.doc["contact_links"]]
+        self.assertTrue(any(SECURITY_ADVISORY in u for u in urls),
+                        "安全问题必须有私密直达入口")
+
+    def test_contract_catches_broken_configs(self):
+        import copy
+
+        bad = copy.deepcopy(self.doc)
+        bad["blank_issues_enabled"] = True
+        self.assertTrue(config_issues(bad), "空白 Issue 放开必须报")
+        bad2 = copy.deepcopy(self.doc)
+        bad2["contact_links"] = [link for link in bad2["contact_links"]
+                                 if SECURITY_ADVISORY not in str(link.get("url"))]
+        self.assertTrue(config_issues(bad2), "缺安全直达必须报")
+        bad3 = copy.deepcopy(self.doc)
+        bad3["contact_links"].append({"name": "x", "url": BLOB_PREFIX + "docs/nope.md",
+                                      "about": "y"})
+        self.assertTrue(config_issues(bad3), "悬空文档链接必须报")
+        with self.assertRaises(ValueError):
+            load_form(ROOT / "no_such_config.yml")
+
 
 if __name__ == "__main__":
     unittest.main()

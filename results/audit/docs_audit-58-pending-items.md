@@ -17,11 +17,13 @@ subjects:
   - desktop/src/core/library.py:e5a867a775bbab717c882250187578b7d057c51a233c334190e5179f903918bf
   - scripts/check_interop_schemas.py:f9c1add0ee80fb23a3913e32482027e9a4049c5ce70cb35b2b1be4afa075d091
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - library/intake.json:e74dda33084b749836de3f8dc3fa83c430b885feec1465b1a94e94aa886d37a8
+  - library/intake.json:b8c31d480e9afdb71e923d526934fa759b9affd3814069d084fbd083a835d2cd
   - docs/external-validation-assets/E1_ccv3_sample_lightmix_P04_chara.json:a91f402cdf59faaab6808b64b00c1874cb7cc6c8df4d44fbb5379be7736b8edb
   - results/interop-schema-validation.md:e2546c6407416b61912ac351d14d20c171167e36be4d4d3461f6c2fceb56c0c9
 
 ---
+> 重审（2026-11-10）：config.yml 入投稿面声明
+
 > 重审（2026-11-08）：Ingress 网关（认证/白名单/限流/同意/回执）
 
 > 重审（2026-10-29）：恢复分支全量验证：接线 meta-cockpit 公共模块、清理零引用、修复 ReDoS/CLI 闸门/公开文档路径后重绑；既有结论不变

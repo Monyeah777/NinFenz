@@ -1,0 +1,21 @@
+# 议题入口配置（GitHub Issue Forms 选择页）
+#
+# 纪律（NF）：空白 Issue 关闭——每条议题都走结构化表单，评审才能一次拿到
+# 「复现 + 环境」或「B1 五问」；安全与治理类入口不进公开 Issue，直达私密通道。
+# 判据：desktop/tests/test_issue_form_contract.py（config 段）逐条核：
+#   blank 关闭 / 每个 contact_link 三字段齐全 / url 为 https 且唯一 /
+#   安全直达 /security/advisories/new / 指向仓库内文档的链接其文件必须真实存在。
+blank_issues_enabled: false
+contact_links:
+  - name: 🔒 私密安全报告（漏洞 / 越权 / 凭据泄露）
+    url: https://github.com/Monyeah777/NinFenz/security/advisories/new
+    about: 不要开公开 Issue——公开即视为已泄露。走 GitHub Security Advisories 私密通道，范围与响应约定见 SECURITY.md。
+  - name: 🆘 使用问题 / 先看支持说明
+    url: https://github.com/Monyeah777/NinFenz/blob/main/SUPPORT.md
+    about: 上手、命令不确定、协议结构、举报与申诉通道都先看这里；能自助解决的别开 Issue。
+  - name: 📥 投稿须知（内容入库 / 领域包 / 资产）
+    url: https://github.com/Monyeah777/NinFenz/blob/main/CONTRIBUTING.md
+    about: 投稿前必读：B1 五问、登记三要件、许可与授权链；投稿表单在「新建 Issue」里选对应模板。
+  - name: 🧭 路线与版本（决定要不要提需求）
+    url: https://github.com/Monyeah777/NinFenz/blob/main/docs/meta/ROADMAP.md
+    about: 先确认不在既有计划里——「已在路线图」的功能请求会被直接指回这里。
