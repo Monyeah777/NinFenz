@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1065
+    "verify": 1066
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9431,6 +9431,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "scorecard 契约判据：评分工作流须最小权限、发布语义固定、工件保留、摘要可追溯（2026-11-11）。",
+      "path": "desktop/tests/test_scorecard_workflow_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "scratch 裁决点的边界契约（TDD）：每条都对应一个真实事故或一条防御性边界。",
       "path": "desktop/tests/test_scratch.py",
       "role": "verify",
@@ -12774,7 +12780,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "f0f4de00a145d03da48b940fe1d058c48e5271359c712e1b4bb6467930e352fb",
+  "root_digest": "1fca6d2031dd5196e2bbf4c7788df768238fc7271c7d32f682c02a5102b7e81f",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12783,7 +12789,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 939,
+    "R-verify": 940,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

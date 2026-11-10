@@ -349,6 +349,7 @@
     "test_schema_lint": 1.1,
     "test_schema_pins": 0.1,
     "test_schema_reference": 0.4,
+    "test_scorecard_workflow_contract": 0.2,
     "test_scratch": 0.3,
     "test_script_orphans": 1.1,
     "test_sealed_crosscheck": 0.2,
@@ -4124,6 +4125,10 @@
     "test_schema_pins.Test.test_validate_and_covers": 0.0,
     "test_schema_reference.SchemaReferenceTest.test_representative_instance_matches_reference": 0.03,
     "test_schema_reference.SchemaReferenceTest.test_schema_files_valid_draft2020": 0.05,
+    "test_scorecard_workflow_contract.ScorecardWorkflowContractTest.test_codeql_action_version_matches_codeql_workflow": 0.03,
+    "test_scorecard_workflow_contract.ScorecardWorkflowContractTest.test_contract_catches_broken_workflow": 0.0,
+    "test_scorecard_workflow_contract.ScorecardWorkflowContractTest.test_publish_semantics": 0.0,
+    "test_scorecard_workflow_contract.ScorecardWorkflowContractTest.test_workflow_matches_contract": 0.0,
     "test_scratch.GcTest.test_gc_refuses_root_without_marker": 0.01,
     "test_scratch.GcTest.test_gc_removes_only_stale_prefixed_dirs": 0.01,
     "test_scratch.GcTest.test_gc_skips_keep_txt_and_deletes_hex_dir": 0.01,
@@ -4777,5 +4782,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1824.0
+  "total_s": 1824.2
 }
