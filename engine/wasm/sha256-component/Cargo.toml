@@ -12,7 +12,7 @@ license = "MIT"
 #                         无需适配器；但能力面走 WASI preview2，隔离开关需另一套。
 # 两条都留：一个管「能力与计量」，一个管「类型与 ABI」，正好对应 P5-02/03 与 P5-05/06。
 [dependencies]
-wit-bindgen = "0.30"
+wit-bindgen = "0.63"
 
 [lib]
 # rlib 让 cargo test 有宿主侧测试目标（cdylib 单独时单元测试无处挂）；
