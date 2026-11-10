@@ -1117,6 +1117,10 @@
       "source": "naming"
     },
     {
+      "module": "test_pr_template_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_precheck.py",
       "source": "none"
     },
@@ -1585,10 +1589,10 @@
       "source": "naming"
     }
   ],
-  "modules": 396,
+  "modules": 397,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
   "suspect": 154,
-  "with_evidence": 101,
+  "with_evidence": 102,
   "without_evidence": 141
 }
