@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:639ab31d80a4402ca6e4c3b307e0b2270fe888cd56930b63344e8e6a7960dabe
+  - protocol/check12_weights.json:fd8750bfc4b9f2c78aba54283230dc0c3fde37295b702f6338632a3a8cd2c930
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-10）：CODE_OF_CONDUCT 顶尖化：通道分工（行为举报受理归属在本件、SECURITY 只界定漏洞）、四档处置（可跳档）、7 天确认 / 14 天申诉 / 30 天复核目标、利益冲突回避与外部第三方复核、报复与恶意举报独立违规；新增 test_coc_contract（4 项，含删段/删时限/悬空链接变异自证）。本轮为机械重绑。
+
 > 重审（2026-11-10）：SUPPORT 入口面顶尖化（含调研补强：私密直达 URL / 状态位承诺 / 复现三件套 / Markdown 相对链接可解析判据）；新增 test_support_contract 6 项，含配置放开、悬空路径、悬空链接变异自证。本轮为机械重绑。
 
 > 重审（2026-11-10）：SUPPORT 入口面顶尖化：先自查 → 去哪问（五类通道 ⇄ config.yml/表单/声明件）→ 提 Issue 前自检四项（与 bug_report checklist 同源）→ 怎么问（最小复现/一次一件）→ 之后会发生什么（不静默丢弃）→ 支持边界；新增 test_support_contract（4 项，含配置放开与悬空路径变异自证）。本轮为机械重绑。

@@ -64,6 +64,7 @@
     "test_cli_trust_meta": 0.8,
     "test_closure": 12.1,
     "test_closure_scan": 0.4,
+    "test_coc_contract": 0.1,
     "test_code_metrics": 1.2,
     "test_cog_cli_faces": 16.1,
     "test_cognition": 0.2,
@@ -1032,6 +1033,10 @@
     "test_closure.ScriptTest.test_report_is_reproducible": 0.69,
     "test_closure_scan.ClosureScanTest.test_orphan_side_reporting": 0.13,
     "test_closure_scan.ClosureScanTest.test_repo_scan_deterministic": 0.1,
+    "test_coc_contract.CodeOfConductContractTest.test_channel_links_resolve": 0.0,
+    "test_coc_contract.CodeOfConductContractTest.test_channel_separation_declared": 0.0,
+    "test_coc_contract.CodeOfConductContractTest.test_coc_matches_contract": 0.0,
+    "test_coc_contract.CodeOfConductContractTest.test_contract_catches_broken_coc": 0.01,
     "test_code_metrics.BaselineFileTest.test_committed_baseline_is_valid_json_with_core_entries": 0.0,
     "test_code_metrics.BaselineFileTest.test_write_records_all_scanned_files": 0.01,
     "test_code_metrics.MetricsTest.test_lines_and_complexity_measured": 0.0,
@@ -4675,5 +4680,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1817.8
+  "total_s": 1817.9
 }

@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1047
+    "verify": 1048
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7721,6 +7721,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "行为准则契约判据：违规处置必须「通道清楚、档位可判、申诉有门」（2026-11-10）。",
+      "path": "desktop/tests/test_coc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "代码规模/复杂度上限（`core/code_metrics.py`）回归测试 —— 架构纯度面 GAP-4。",
       "path": "desktop/tests/test_code_metrics.py",
       "role": "verify",
@@ -12666,7 +12672,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "eb6d0e067f0ded1fc7cf9ed9c49068f16db6464be60e1ff3bf03ab859a44efaa",
+  "root_digest": "4b1903356554d320e0000ee8f8c0bc103eca275b689cd2a6e80c0a703f98405a",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12675,7 +12681,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 921,
+    "R-verify": 922,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
