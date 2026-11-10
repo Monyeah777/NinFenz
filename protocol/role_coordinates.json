@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1062
+    "verify": 1063
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9227,6 +9227,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "release-gate 契约判据：发布闸门须最小权限、永不取消、fail-closed、有覆盖门槛（2026-11-11）。",
+      "path": "desktop/tests/test_release_gate_workflow_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "重复写命令的二次调用安全（agent 密集调用会重发同一写命令）。",
       "path": "desktop/tests/test_repeat_safety.py",
       "role": "verify",
@@ -12756,7 +12762,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "7d0ecfee71047a4480bf81e9de926e6b7422595ef2d42aaf55337909033c9072",
+  "root_digest": "a9e317421a6c8f21eea8ef052ce7c1354259942a3036eab01255cc96058c497e",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12765,7 +12771,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 936,
+    "R-verify": 937,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

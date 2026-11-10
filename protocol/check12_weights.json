@@ -315,6 +315,7 @@
     "test_related_of": 0.2,
     "test_release_conclusion": 41.3,
     "test_release_gate": 0.5,
+    "test_release_gate_workflow_contract": 0.2,
     "test_repeat_safety": 0.2,
     "test_repo_face": 1.1,
     "test_repo_stats": 0.5,
@@ -3864,6 +3865,10 @@
     "test_release_gate.PlanTest.test_plan_covers_freeze_chain_in_order": 0.01,
     "test_release_gate.PlanTest.test_plan_matches_golden_snapshot": 0.01,
     "test_release_gate.PolicyJsonTest.test_policy_json_is_schema_clean": 0.0,
+    "test_release_gate_workflow_contract.ReleaseGateWorkflowContractTest.test_contract_catches_broken_workflow": 0.02,
+    "test_release_gate_workflow_contract.ReleaseGateWorkflowContractTest.test_never_cancelled": 0.0,
+    "test_release_gate_workflow_contract.ReleaseGateWorkflowContractTest.test_sources_exist": 0.0,
+    "test_release_gate_workflow_contract.ReleaseGateWorkflowContractTest.test_workflow_matches_contract": 0.0,
     "test_repeat_safety.RepeatSafetyTest.test_asset_duplicate_key_is_refused": 0.01,
     "test_repeat_safety.RepeatSafetyTest.test_library_lifecycle_is_idempotent": 0.01,
     "test_repeat_safety.RepeatSafetyTest.test_module_status_transition_is_idempotent": 0.0,
@@ -4762,5 +4767,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1823.4
+  "total_s": 1823.6
 }
