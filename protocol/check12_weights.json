@@ -68,6 +68,7 @@
     "test_closure_scan": 0.4,
     "test_coc_contract": 0.1,
     "test_code_metrics": 1.2,
+    "test_codeowners_contract": 0.4,
     "test_cog_cli_faces": 16.1,
     "test_cognition": 0.2,
     "test_cognition_bridge": 2.2,
@@ -1066,6 +1067,11 @@
     "test_code_metrics.RatchetTest.test_new_file_within_limits_passes": 0.01,
     "test_code_metrics.RatchetTest.test_shrink_is_allowed": 0.01,
     "test_code_metrics.RealRepoTest.test_real_repo_has_no_over_limit_file": 1.04,
+    "test_codeowners_contract.CodeownersContractTest.test_codeowners_matches_contract": 0.06,
+    "test_codeowners_contract.CodeownersContractTest.test_contract_catches_broken_codeowners": 0.1,
+    "test_codeowners_contract.CodeownersContractTest.test_critical_surfaces_are_explicit": 0.05,
+    "test_codeowners_contract.CodeownersContractTest.test_no_dead_rules": 0.06,
+    "test_codeowners_contract.CodeownersContractTest.test_owner_matches_maintainers": 0.04,
     "test_cog_cli_faces.CogFacesTest.test_begin_face": 0.8,
     "test_cog_cli_faces.CogFacesTest.test_bridge_apply_face": 1.55,
     "test_cog_cli_faces.CogFacesTest.test_bridge_commit_face": 0.76,
@@ -4734,5 +4740,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1822.1
+  "total_s": 1822.5
 }

@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1057
+    "verify": 1058
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7745,6 +7745,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "CODEOWNERS 契约判据：承重面必须显式归人、规则不得空转、owner 与维护者表同源（2026-11-11）。",
+      "path": "desktop/tests/test_codeowners_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "cog 机器面真跑覆盖（每张 --json 面都点名，防「跳过=没人管」）。",
       "path": "desktop/tests/test_cog_cli_faces.py",
       "role": "verify",
@@ -12726,7 +12732,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "b0029f1dd41e1a9c7c49c7bfb7f26b0a833100e9d388da09b608e07a85db9a20",
+  "root_digest": "df5ab8c42ce478dab1835593c1c363189e579f42c08a79e927da14490015dd62",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12735,7 +12741,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 931,
+    "R-verify": 932,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
