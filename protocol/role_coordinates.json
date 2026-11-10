@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1059
+    "verify": 1060
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7673,6 +7673,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "ci-verify 契约判据：主门禁工作流的权限/固定/超时/并发/矩阵/失败汇总口径（2026-11-11）。",
+      "path": "desktop/tests/test_ci_verify_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "门禁可见性回归测试 —— 「门禁本身有没有门禁」里**看得见**的那一半。",
       "path": "desktop/tests/test_ci_visibility.py",
       "role": "verify",
@@ -12738,7 +12744,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "91686bd99636f98953fe3f902fe0b09d3d45f102dae926d823fbdc9e7d3d6b05",
+  "root_digest": "f77ef647c0e1d971ac6033558068cc1c65fae996b3c258bafe159bc52164f07f",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12747,7 +12753,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 933,
+    "R-verify": 934,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
