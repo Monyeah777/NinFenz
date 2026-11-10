@@ -221,6 +221,10 @@
       "source": "none"
     },
     {
+      "module": "test_ci_verify_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_ci_visibility.py",
       "source": "naming"
     },
@@ -1645,10 +1649,10 @@
       "source": "negative_assertion"
     }
   ],
-  "modules": 411,
+  "modules": 412,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
   "suspect": 154,
-  "with_evidence": 116,
+  "with_evidence": 117,
   "without_evidence": 141
 }
