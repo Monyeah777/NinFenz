@@ -216,6 +216,7 @@
     "test_library": 0.9,
     "test_license_chain": 0.2,
     "test_license_gate": 0.5,
+    "test_lint_workflow_contract": 0.2,
     "test_live_doc_counts": 5.0,
     "test_load_state": 0.1,
     "test_locales": 0.2,
@@ -2689,6 +2690,11 @@
     "test_license_gate.TestLicenseGate.test_missing_license_column_value_is_fail": 0.0,
     "test_license_gate.TestLicenseGate.test_real_repo_declared_rows_pass": 0.0,
     "test_license_gate.TestLicenseGate.test_unknown_license_is_fail": 0.0,
+    "test_lint_workflow_contract.LintWorkflowContractTest.test_contract_catches_broken_workflow": 0.02,
+    "test_lint_workflow_contract.LintWorkflowContractTest.test_required_check_names_are_stable": 0.0,
+    "test_lint_workflow_contract.LintWorkflowContractTest.test_ruff_select_is_reconciled": 0.0,
+    "test_lint_workflow_contract.LintWorkflowContractTest.test_syntax_scope_is_subset_of_style_scan": 0.0,
+    "test_lint_workflow_contract.LintWorkflowContractTest.test_workflow_matches_contract": 0.0,
     "test_live_doc_counts.LiveDocCountTest.test_live_docs_do_not_pin_runtime_counts": 0.06,
     "test_live_doc_counts.LiveDocCountTest.test_predicate_catches_the_mutation": 0.0,
     "test_live_doc_counts.LiveTotalCountTest.test_predicate_catches_the_mutation": 0.0,
@@ -4756,5 +4762,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1823.2
+  "total_s": 1823.4
 }
