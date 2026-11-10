@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1067
+    "verify": 1068
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7967,6 +7967,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "dependency-audit 契约判据：四份固定集必须全审、fail-closed、审计日志可下载（2026-11-11）。",
+      "path": "desktop/tests/test_dependency_audit_workflow_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "",
       "path": "desktop/tests/test_dirty_tree.py",
       "role": "verify",
@@ -12786,7 +12792,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "722161bfa8e05e9ba969c5436224f2964517636da676da22d775ecbb0e7616af",
+  "root_digest": "00464fa78abe2bfeee5e87ebc6d2f853a57d77259c3bbd52e842889b9152e504",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12795,7 +12801,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 941,
+    "R-verify": 942,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

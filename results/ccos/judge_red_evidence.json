@@ -417,6 +417,10 @@
       "source": "negative_assertion"
     },
     {
+      "module": "test_dependency_audit_workflow_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_dirty_tree.py",
       "source": "none"
     },
@@ -1677,10 +1681,10 @@
       "source": "negative_assertion"
     }
   ],
-  "modules": 419,
+  "modules": 420,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
   "suspect": 154,
-  "with_evidence": 124,
+  "with_evidence": 125,
   "without_evidence": 141
 }
