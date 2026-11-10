@@ -5,6 +5,8 @@ name: scorecard
 # 不满足「静态可复现」）；本仓自身的门禁仍是唯一判据来源。
 # 已就绪的信号：固定 action SHA（Pinned-Dependencies）、token 最小权限（Token-Permissions）、
 # 无危险工作流（Dangerous-Workflow）、SECURITY.md（Security-Policy）、依赖更新工具（Dependabot）。
+# 工作流口径（权限/固定/发布语义/工件保留/摘要可追溯）由
+# desktop/tests/test_scorecard_workflow_contract.py 判据守住。
 on:
   branch_protection_rule:
   schedule:
@@ -35,11 +37,8 @@ jobs:
           persist-credentials: false
       - name: 跑 OpenSSF Scorecard
         uses: ossf/scorecard-action@fa7117db83c52d787ae5a89f350999701505d78e  # v2.5.0
-        # ① v2.4.0 的镜像在 gcr.io（拉取被「需开 billing」拒绝，实测 2026-09-29 run #1）：
-        #    v2.4.1 起迁到 ghcr.io ⇒ 换 v2.4.3。
-        # ② 钉的必须是**提交** SHA：`git/ref/tags/v2.4.3` 给的是**注解 tag 对象**的 SHA
-        #    （99c09fe9…），平台侧 workflow 校验会判 imposter commit（实测 run #2）——
-        #    故此处钉 tag 解引用后的提交 4eaacf05…。
+        # 钉的必须是**提交** SHA（tag 解引用后的 commit）：注解 tag 对象的 SHA 会被平台判
+        # imposter commit（2026-09-29 run #2 实测）。升级时按 tags API 解引用来换，不要用 tag 名。
         with:
           results_file: results.sarif
           results_format: sarif
@@ -51,7 +50,7 @@ jobs:
           path: results.sarif
           retention-days: 5
       - name: 上传到代码扫描（Security 页可见）
-        uses: github/codeql-action/upload-sarif@33d7b85da1a04171e211befe2c739303b9a4c066  # v3
+        uses: github/codeql-action/upload-sarif@33d7b85da1a04171e211befe2c739303b9a4c066  # v4
         with:
           sarif_file: results.sarif
 
