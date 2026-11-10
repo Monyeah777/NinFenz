@@ -53,7 +53,7 @@ LICENSE_MAP = {
 }
 #: 非宽松许可提示词；命中即进「注意项」自动点名
 COPYLEFT_HINTS = ("LGPL", "GPL", "AGPL", "MPL", "EPL", "CDDL")
-SPDX_EXPR = re.compile(r"^[A-Za-z0-9.+\-() ]+(?:\s(?:AND|OR|WITH)\s[A-Za-z0-9.+\-() ]+)*$")
+SPDX_TOKEN = re.compile(r"^[A-Za-z0-9.+\-]+$")  # 单 token；避免嵌套量词触发 ReDoS（CodeQL 实测）
 
 
 def lock_digest() -> str:
@@ -101,16 +101,34 @@ def _squash(text: str) -> str:
     return " ".join((text or "").split())
 
 
+def _spdx_expr(expr: str) -> bool:
+    """SPDX 表达式判定（token 级，不用嵌套量词正则——CodeQL 实测有 ReDoS）。"""
+    tokens = _squash(expr).replace("(", " ").replace(")", " ").split()
+    if not tokens or len(tokens) > 40:
+        return False
+    expect_id = True
+    for tok in tokens:
+        if expect_id:
+            if tok in ("AND", "OR", "WITH") or not SPDX_TOKEN.match(tok):
+                return False
+            expect_id = False
+        else:
+            if tok not in ("AND", "OR", "WITH"):
+                return False
+            expect_id = True
+    return not expect_id
+
+
 def resolve_license(meta: dict) -> str:
     """许可解析：license_expression → license → OSI classifier（无歧义才映射 SPDX）。"""
     expr = _squash(meta.get("license_expression") or "")
-    if expr and SPDX_EXPR.match(expr):
+    if _spdx_expr(expr):
         return expr
     lic = _squash(meta.get("license") or "")
     if lic in LICENSE_MAP:
         return LICENSE_MAP[lic]
     # PyPI 的 license 字段可能是整篇许可全文（实测 pip-api 即如此）——短且像 SPDX 才原样收
-    if lic and len(lic) <= 80 and SPDX_EXPR.match(lic):
+    if lic and len(lic) <= 80 and _spdx_expr(lic):
         return lic
     for c in meta.get("classifiers") or []:
         m = re.match(r"License :: OSI Approved :: (.+)$", c)
