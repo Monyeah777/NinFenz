@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:5e9834ef54b4ffef9d67e7fc56c45db764c7f4893b72863290eff02691f9142c
+  - protocol/check12_weights.json:fd6e46740d828eb152694aa93ba28915eaed9b43a7c0ba9788c5a75553367b0c
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-10）：SUPPORT 口径回归修复：申诉复核主体改指 MAINTAINERS 的回避路径（涉 Owner 由外部第三方，无第三方记「未复核」），去掉「未参与原处置的维护者」这一单人仓不存在的角色；判据 test_support_contract 扩到 7 项（新增复核主体同源 + 变异自证）。本轮为机械重绑。
+
 > 重审（2026-11-10）：MAINTAINERS 维护者文档顶尖化：执行主体真源（Owner 具名 + 职责与不可代行面 + 安全/行为双经办）、单维护者三条硬约束（涉己外部第三方回避 / 可复核性代替双人复核 / 90 天失能只读预案）、晋升四硬条件、响应与 SLA 边界；新增 test_maintainers_contract（4 项，含删 Owner/删回避/删天数/悬空链接变异自证）。本轮为机械重绑。
 
 > 重审（2026-11-10）：SECURITY 安全策略顶尖化：通道分工（漏洞→本件 / 行为→COC / 使用→SUPPORT，互不代收）、六项报告模板、7 天确认 + 90 天协调披露、CVE/致谢/无赏金边界、修掉两处悬空引用（tests/test_repo_trust.py、core/gate_inproc.py）；新增 test_security_contract（4 项，含删段/删时限/悬空链接变异自证）。本轮为机械重绑。
