@@ -49,6 +49,7 @@ jobs:
       - name: 对四份固定依赖集做 CVE 审计（命中即红；输出落盘供失败诊断）
         run: |
           set -euo pipefail
+          set -o pipefail   # 显式写法：test_ci_diagnostics 的 tee 守卫按此字面检查（与上句语义重复，但契约要求）
           # 审计输出 tee 到工件：失败时"哪个包/哪条漏洞"必须可下载，而不是只在滚动日志里。
           python -m pip_audit --progress-spinner off \
             -r .github/requirements-ci.txt \
