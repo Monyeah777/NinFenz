@@ -26,8 +26,12 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:bf844a5156d111459462784989f5e7efea48ec5e51fa1957356be7fa8afc59e1
+  - protocol/code_metrics_baseline.json:2cd4c4175b226d758a9fb1a06376e875c36aaa9bdbdd1b1170f6f8b210b63d1a
 ---
+> 重审（2026-11-11）：THIRD-PARTY-NOTICES 顶尖化（连带生成器 fail-closed + 修复指引）：notices 重生成 44 组件真实 SPDX 清单（锁摘要新鲜度锚）、生成器失败不写盘；payload 体积 24.70→24.71 MB 同源同步；新增 test_third_party_notices_contract 6 项。本轮为机械重绑。
+
+> 重审（2026-11-11）：THIRD-PARTY-NOTICES 顶尖化（连带生成器修复）：生成器改为 fail-closed（查询失败不写盘、返回 2）；notices 从「44 行中 34 行查询失败占位」重生成为 44 个组件的真实 SPDX 清单（pin 真源 + 锁摘要新鲜度锚 + 归属声明/分发边界/零依赖可证/双许可表态/人工核对段）；新增 test_third_party_notices_contract（6 项，含 fail-closed 打桩与变异自证）。本轮为机械重绑。
+
 > 重审（2026-11-10）：度量基线重冻后重绑
 
 > 重审（2026-11-10）：论文台账系统化 + 方法包深度判据
