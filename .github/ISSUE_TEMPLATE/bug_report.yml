@@ -1,5 +1,5 @@
 name: 🐛 缺陷上报
-description: 提交缺陷帮助改进 NinFenz（含最小复现与环境，便于直接复跑）
+description: 提交缺陷帮助改进 NinFenz（最小复现 + 环境快照 + 影响面，便于直接复跑）
 title: '[BUG] '
 labels:
   - bug
@@ -7,13 +7,21 @@ body:
   - type: markdown
     attributes:
       value: |
-        > ⚠️ **安全问题（漏洞 / 越权 / 凭据泄露）不要开公开 Issue**：请走 [SECURITY.md](../../SECURITY.md) 的私密通道（仓库页 → Security → Report a vulnerability）。公开 Issue 会触发云端代收站自动入库。
+        > ⚠️ **安全问题（漏洞 / 越权 / 凭据泄露）不要开公开 Issue**：请走 [SECURITY.md](https://github.com/Monyeah777/NinFenz/blob/main/SECURITY.md) 的私密通道（仓库页 → Security → Report a vulnerability）。公开 Issue 会触发云端代收站自动入库。
+
+        **提交前请先做三件事**（能省掉一轮往返）：
+
+        1. 在 Issues 里搜关键词，并在 [CHANGELOG.md](https://github.com/Monyeah777/NinFenz/blob/main/CHANGELOG.md) 里看是否已修；
+        2. **一条 Issue 只报一个缺陷**（多个现象请分开报，便于分别定位与关闭）；
+        3. 尽量把复现压到**最小**：一条命令 / 20 行以内片段，能复跑比描述详细更重要。
+
+        不确定是不是缺陷？先按「一般」等级报，评审会改判——**不要因为不确定就不报**。
   - type: textarea
     id: what-happened
     attributes:
-      label: 缺陷描述
-      description: 发生了什么？期望什么？实际什么？
-      placeholder: 一句话说清现象；细节留给下面的字段。
+      label: 缺陷一句话
+      description: 用一句话说清「什么操作导致什么错误结果」。细节留给下面的字段。
+      placeholder: 例：nf evidence verify 对合法的 bundle 返回 revoked（期望 ok）。
     validations:
       required: true
   - type: dropdown
@@ -31,29 +39,95 @@ body:
     id: reproduce-stability
     attributes:
       label: 复现稳定性
+      description: 偶发也要报——偶发问题请在下文写近似比例与出现条件（负载 / 并发 / 时区 / 平台）。
       options:
         - 每次必现
         - 偶发（请在下文写近似比例）
         - 只出现过一次
     validations:
       required: true
+  - type: dropdown
+    id: regression
+    attributes:
+      label: 是否回归（旧版本可用吗）
+      description: 回归问题优先定位；不确定就选「未验证」，不要猜。
+      options:
+        - 未验证（没在旧版本上试过）
+        - 是回归（旧版本可用，新版本坏了）
+        - 一直如此（旧版本也一样）
+        - 首次出现，但不确定是否回归
+    validations:
+      required: true
   - type: textarea
     id: steps
     attributes:
       label: 复现步骤
-      description: 一条命令 + 期望 + 实得（最小可复现片段，不要贴整仓；SSCCE 口径）
+      description: 编号步骤 + 实际命令；能给最小片段就不要贴整仓（SSCCE 口径）。涉及随机性请写明种子。
       placeholder: |
-        1. python scripts/nf.py ...
-        2. 期望：…  实得：…
+        1. git clone … && cd NinFenz
+        2. python scripts/nf.py evidence verify --bundle out/b.zip
+        3. 观察到：verdict=revoked（期望 ok）
+      render: text
     validations:
       required: true
-  - type: input
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期望行为
+      description: 你预期应该发生什么（依据：文档 / 判据 / 同仓其他命令的一致性）。
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: 实际行为
+      description: 实际发生了什么（报错原文、错误码、错误产物路径）；与期望的差异越具体越好。
+      render: text
+    validations:
+      required: true
+  - type: dropdown
     id: form
     attributes:
       label: 形态
       description: |-
         - 形态：CLI（scripts/nf.py）｜协议内容（模块/管线/资产/community 包）｜文档/质量门禁（verify.sh）｜其他（桌面 GUI 端壳已于 2026-09-09 退役移出）
-      placeholder: CLI（scripts/nf.py）
+      options:
+        - CLI（scripts/nf.py）
+        - 协议内容（模块 / 管线 / 资产 / community 包）
+        - 文档 / 质量门禁（verify.sh）
+        - 其他（请在下文说明）
+    validations:
+      required: true
+  - type: dropdown
+    id: reproducibility-impact
+    attributes:
+      label: 可复现性影响（产物摘要面）
+      description: 同一输入重复生成时，产物是否变化——本仓把「同输入同产物」当硬约束，所以这一项会直接影响定级。
+      options:
+        - 未知（还没验证）
+        - 无影响（同输入重复生成，产物摘要一致）
+        - 有影响（同一输入两次生成，摘要不同）
+        - 不适用（不涉及产物生成）
+    validations:
+      required: true
+  - type: input
+    id: check-id
+    attributes:
+      label: 相关判据 / 门禁（可选）
+      description: 若与某条 check 相关，填 check 号（如 check12），便于定位；不确定留空。
+      placeholder: check35
+    validations:
+      required: false
+  - type: dropdown
+    id: install
+    attributes:
+      label: 安装 / 获取方式
+      description: 不同安装方式跑的是不同快照，定位时先分清。
+      options:
+        - git clone（源码树）
+        - pip 安装
+        - npx ninfenz（npm 包）
+        - 其他（请在下文说明）
     validations:
       required: true
   - type: input
@@ -64,46 +138,71 @@ body:
     validations:
       required: true
   - type: input
-    id: version
-    attributes:
-      label: 版本（verify 基线 / tag）
-      description: 跑 nf --version 与 nf doctor 后贴回
-      placeholder: nf 1.0.5 · verify v2.30 · tag v1.0.5
-    validations:
-      required: true
-  - type: input
     id: python-version
     attributes:
       label: Python 版本（要求 ≥3.11）
       placeholder: Python 3.11.9
     validations:
       required: true
+  - type: input
+    id: version
+    attributes:
+      label: 版本（CLI / verify 基线 / tag）
+      description: 跑 nf --version 与 nf doctor 后贴回；三者不一致时以实际运行的为准并注明。
+      placeholder: nf 1.0.5 · verify v2.30 · tag v1.0.5
+    validations:
+      required: true
   - type: textarea
     id: doctor
     attributes:
-      label: nf doctor 输出
+      label: nf doctor 输出（环境快照）
+      description: 粘贴 nf doctor 的完整输出；它比手填环境更能复现问题。
+      render: text
+    validations:
+      required: false
+  - type: textarea
+    id: minimal-repro
+    attributes:
+      label: 最小复现片段（可选）
+      description: 20 行以内的脚本或命令序列；有它通常能省掉一轮往返。
+      placeholder: |
+        import ...; ...
       render: text
     validations:
       required: false
   - type: textarea
     id: logs
     attributes:
-      label: 日志
-      description: CLI 侧附终端报错输出；协议/内容问题附相关文件路径与 check 输出。**粘贴前先脱敏**：token / 密钥 / 私密路径一律替换为 ***——出现在公开 Issue 的凭据按已泄露处理（SECURITY.md §四）
+      label: 日志 / 报错（可选）
+      description: CLI 侧附终端输出；协议/内容问题附相关文件路径与 check 输出。**粘贴前先脱敏**：token / 密钥 / 私密路径一律替换为 ***——出现在公开 Issue 的凭据按已泄露处理（SECURITY.md §四）。
       render: text
     validations:
       required: false
   - type: upload
     id: screenshots
     attributes:
-      label: 截图 / 相关文件
-      description: 拖入截图或日志文件（可选）
+      label: 截图 / 相关文件（可选）
+      description: 拖入截图或日志文件；同样先脱敏。
     validations:
       required: false
   - type: textarea
     id: extra
     attributes:
-      label: 补充
-      description: 其他上下文（可选）
+      label: 补充（可选）
+      description: 其他上下文：尝试过的绕行办法、相关 Issue / PR、怀疑的改动面。
     validations:
       required: false
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: 提交前自检
+      description: 四项都勾选后才提交——它们分别挡住最常见的四类无效 Issue。
+      options:
+        - label: 我已搜索过已有 Issue 与 CHANGELOG，确认不是重复
+          required: true
+        - label: 这**不是**安全问题（安全问题走 SECURITY.md 私密通道）
+          required: true
+        - label: 日志与附件已脱敏（无 token / 密钥 / 私密路径）
+          required: true
+        - label: 本条只报一个缺陷，复现步骤能被他人独立复跑
+          required: true
