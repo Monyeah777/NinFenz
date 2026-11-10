@@ -1273,6 +1273,10 @@
       "source": "none"
     },
     {
+      "module": "test_reuse_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_revocations.py",
       "source": "negative_assertion"
     },
@@ -1617,10 +1621,10 @@
       "source": "negative_assertion"
     }
   ],
-  "modules": 404,
+  "modules": 405,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
   "suspect": 154,
-  "with_evidence": 109,
+  "with_evidence": 110,
   "without_evidence": 141
 }

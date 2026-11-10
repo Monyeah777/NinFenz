@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1052
+    "verify": 1053
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9251,6 +9251,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "REUSE 契约判据：许可声明须结构合法、覆盖完整、override 不空转、许可文本双向闭合（2026-11-10）。",
+      "path": "desktop/tests/test_reuse_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "吊销分发件 v0（core/revocations.py + nf evidence revocations CLI）判据。",
       "path": "desktop/tests/test_revocations.py",
       "role": "verify",
@@ -12696,7 +12702,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "8a4865dcbb34e405fe32caf68fedb8652c8c3f3aba517432b2f8ed51bab241ad",
+  "root_digest": "7e376da0db8b068d3cbddd1f6be902c694e216dddb8f5a6d5d43d2809eb85ca6",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12705,7 +12711,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 926,
+    "R-verify": 927,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
