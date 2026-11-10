@@ -32,7 +32,7 @@
 
 ## Python 项目环境（按需启用）
 
-- 处理 Python 项目前，先用 `/python status` 检查 Python、uv、Git 是否已安装。若缺失，天枢会在 bash 命令未找到时自动附加安装指引，桌面端也会在顶部显示环境缺失横幅。
+- 处理 Python 项目前，先用 `/python status` 检查 Python、uv、Git 是否已安装。若缺失，天枢会在 bash 命令未找到时自动附加安装指引。
 - 遇到 Python 项目（含 `pyproject.toml` / `requirements.txt`）需要初始化依赖时，优先建议 `/python setup`；若已安装 uv，用 `uv sync` 或 `uv venv && uv pip install` 替代系统 pip，避免污染全局环境。没有 uv 时，再使用 `python -m venv` + pip 的标准流程。
 
 ## Project-Specific Rules
