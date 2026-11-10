@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-11-10",
   "approved_by": "Monyeah777",
-  "note": "体积口径同步：payload 24.69 MB / 3109 件，README 与站点数字同源改写。",
+  "note": "支持入口面与表单/入口配置同构：自检四项 ⇄ bug_report checklist，通道表 ⇄ config.yml；判据 test_support_contract 6 项含变异自证。",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "5f057290d1d28051bc0dc492a15cc4533485ae5d788db80889beda4caeea76f5"
