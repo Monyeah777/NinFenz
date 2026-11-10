@@ -98,6 +98,9 @@ python3 -m compileall -q desktop/src scripts
 - 新增方案文档（08→09→…）须同步 README L32 协议链与 ROADMAP §1 总览表，不在多处重复维护任务清单。
 
 ### 4.2 代码层（desktop/ scripts/）
+
+> **代码面清单真源 = `library/intake.json` 的 `submission.code_surfaces`**（`scripts/` · `desktop/` · `tui/` · `engine/` · `integrations/` · `site/`）；本节只展开 `desktop/` 与 `scripts/` 的细则，其余面共用 §3 的验证门槛与 §5 的录入面纪律。
+
 - **core 零第三方依赖**（纯标准库）；确需引入第三方依赖先开 Issue 讨论。
 - 新增可测逻辑放 desktop/tests/，纳入 unittest 体系（check12）；暂不做端到端 / GUI 测试入 CI。
 - **批量文本改写用 `python scripts/rewrite_text.py`**（默认**干跑**：先出「文件:行号 + 改前 → 改后」对照表，`--write` 才落盘，命中数超 `--max-hits` 直接拒绝）。纪律：改盘一律走 `core.atomic_write`，且**不做无对照的全仓替换**——写盘前先看表（判据：`desktop/tests/test_rewrite_tool.py`）。
@@ -126,7 +129,7 @@ python3 -m compileall -q desktop/src scripts
 - 方案文档引用：结构性协议改动须可溯方案文档（README L32 协议链）与登记真相源 02，不在多处重复维护任务清单（§4.1）。
 
 **③ PR 评审（reviewer 判据）**
-- 使用 .github/PULL_REQUEST_TEMPLATE.md，勾选「社区包」改动域 + 门禁自检清单（§5）。
+- 使用 `.github/PULL_REQUEST_TEMPLATE.md`，勾选「社区领域包」改动域 + 门禁自检清单（§5.2 / §5.5）。
 - **协议层 reviewer 判据 = 02 §8.1–8.4 登记规则 + check 全绿**：整包登记对照 §8.3 登记三要件、组合登记对照 §8.4 登记判定四规则；**`bash verify.sh` 全绿（WARN 0 / FAIL 0）为合并前提**——当前 check 数与 PASS 基线以 `quality_baseline.EXPECTED_*` 与 `nf stats --check` 的生成区为准，**本文件不钉运行时计数**（钉死会漂，2026-09-30 实测此处曾落后到 check1-36/PASS=59）。
 - 评审范围含题材/资产合规：模块遵循 R1（包间禁互引）/ R2（类别独占）/ R3（装配契约）；资产 EXT 闭合 + 溯源索引在册（§4.3）。
 
@@ -157,10 +160,50 @@ python3 -m compileall -q desktop/src scripts
 
 **推荐段（可选，非门禁——v2.6-A 钢人论证 / M_AUDIT 协议设计审计）**：重大方向性决策（域包立项 / 协议设计前置 / 线体取舍 / 发布节奏）可选用协议设计审计工作单理清支持/反对/盲区——`nf design audit init "<问题>" --target T --mode {steelman,blindspot,full}` 生成，`--check` 结构自检（verdict 三态/论据与清单边界/meta 在场），`ls` 列审计索引。full 模式含盲区双问（Q1 低置信度 / Q2 遗漏）——反幻觉与反思维惯性；`nf design steelman` 为其钢人子集兼容入口。**措辞为推荐非必做**：默认缺席、按需装载，不强制任何决策走审计（「也许有人需要而有人不需要」）；审计产物（audit.md）是过程档案，与方案文档（产物）互补，可回溯决策依据。
 
-## 5. Issue / PR 规范
-- **缺陷上报**：使用 .github/ISSUE_TEMPLATE/bug_report.yml（结构化表单；环境信息按字段填写）。
-- **功能请求**：使用 .github/ISSUE_TEMPLATE/feature_request.yml（结构化表单）。
-- **PR**：使用 .github/PULL_REQUEST_TEMPLATE.md，勾选改动域（协议层 / 代码层 / 社区包）+ 门禁自检清单（verify.sh 全绿 / unittest 用例 / py_compile 通过）。
+## 5. Issue / PR 规范（录入面 = 结构化模板，纪律 = 一次一件事）
+
+> **口径不手抄：机读面由判据守住**——表单与入口配置 = `desktop/tests/test_issue_form_contract.py`；
+> PR 模板 = `desktop/tests/test_pr_template_contract.py`；投稿面 ⇄ 声明件 = `desktop/tests/test_intake_surface.py`。
+> 任一条红 = 本文与模板口径已分叉：按判据输出改文档或改模板，不要在别处再写第三份。
+
+### 5.1 入口分流（空白 Issue 已关，没有绕过通道）
+
+`.github/ISSUE_TEMPLATE/config.yml` 已声明 `blank_issues_enabled: false`：**所有议题必须走结构化表单**——
+空白入口被关掉，评审要的「能复跑的最小字段」只能由表单保证。选择页的四条分流：
+
+| 你的问题 | 走哪里 | 为什么不走公开 Issue |
+|---|---|---|
+| 漏洞 / 越权 / 凭据泄露 | `SECURITY.md` 的私密通道（GitHub Security Advisories） | 公开即视为已泄露；范围与响应约定见该件 |
+| 使用问题 / 命令不确定 | 先看 `SUPPORT.md`，能自助解决的别开 Issue | 省一轮往返 |
+| 内容 / 领域包投稿 | 按 §4.4 五步 + 投稿表单；机读闸门真源 = `library/intake.json` | 通道模式（白名单 / 暂停）以声明件为准 |
+| 功能请求 | 先看 `docs/meta/ROADMAP.md` 的路线与版本 | 「已在路线图」的请求会被指回该件 |
+
+### 5.2 改动域（四类，与 PR 模板逐字同构）
+
+协议层（01–07 / 08 / 09 方案）｜代码层（scripts/ · desktop/ · tui/ · engine/ · integrations/ · site/）｜社区领域包 `community/`｜工程治理（`docs/meta/ROADMAP.md` / `CHANGELOG.md` / `CONTRIBUTING.md` / `.github/` / `verify.sh`）。
+
+**代码面清单唯一真源 = `library/intake.json` 的 `submission.code_surfaces`**：本行与 PR 模板都只是它的投影，
+任何一方另写一份即算漂移（`test_intake_surface` 与 `test_pr_template_contract` 同时判）。
+
+### 5.3 三个模板，各守一段（缺一即评审靠追问）
+
+- **缺陷** `.github/ISSUE_TEMPLATE/bug_report.yml`：期望/实际分离、是否回归、可复现性影响、安装方式 + 4 项必勾自检（挡重复 / 挡安全外泄 / 挡未脱敏 / 挡多缺陷混报）。
+- **功能请求** `.github/ISSUE_TEMPLATE/feature_request.yml`：B1 五问逐栏（谁消费 / 怎么验证 / 非目标 / 协议关系 / 失败定义），代码面清单从声明件现算。
+- **PR** `.github/PULL_REQUEST_TEMPLATE.md`：改动域勾选、「问题 → 做法 → 影响面」、可核验收（命令 + 期望输出 + 守住本次改动的判据）、门禁自检、`Closes #N` · `Refs #N` 与「本 PR 只做一件事」声明。
+
+### 5.4 一次一件事（Issue 与 PR 同规）
+
+- **一条 Issue 只报一个缺陷 / 一个能力**：多现象分开报，便于分别定位与关闭——混报会让「修好没」无法判定。
+- **一个 PR 只做一件事**：模板首段即此声明；混装改动（顺手重构、顺手改文档）会被要求拆 PR——回滚与归因才成立。
+- **关联写法**：`Closes #N` 合并即关（只关真正修好的那一件）；`Refs #N` 只引用不关单（背景 / 后续 / 相关但未修）。
+
+### 5.5 提 PR 前自检（可核，不是「我跑过了」）
+
+- [ ] `bash verify.sh` 全绿（0 FAIL）；WARN 逐条说明为什么可接受
+- [ ] 本次改动**有判据守住**：判据文件写进 PR 描述，并写清「它在什么输入下变红」——写不出来 = 先补判据
+- [ ] 改动里反引号中的仓内路径逐个可解析（悬空引用 = 评审点不开）
+- [ ] 生成物已重算：冻结链顺序见 §4.2，`freshness_check` 4/4
+- [ ] 敏感面零外泄：日志 / 截图先脱敏，密钥形状内容一律不贴（§6）
 
 ## 6. 安全章程（40 总纲 S8，2026-09-06）
 - **密钥零落盘**：不提交/不 cat/不 read `.env`、`credentials.*`、`*token*`、`*secret*` 等文件；发现即警告并中止（项目硬性闸门）。
