@@ -1353,6 +1353,10 @@
       "source": "none"
     },
     {
+      "module": "test_security_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_seed_from_repo.py",
       "source": "none"
     },
@@ -1601,10 +1605,10 @@
       "source": "naming"
     }
   ],
-  "modules": 400,
+  "modules": 401,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
   "suspect": 154,
-  "with_evidence": 105,
+  "with_evidence": 106,
   "without_evidence": 141
 }
