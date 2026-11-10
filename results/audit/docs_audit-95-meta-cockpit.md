@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:1f4e67ad25a6cc182e8afce0cb2414f2e071f3235f9113ad0e6536ea674628b6
+  - protocol/check12_weights.json:00ff12b1ca5fd68e83dc59e3a5148be1f639d3c901ebceef19b7d8f0a6adab2c
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-11）：library-ingest 契约化：issues 触发仅 opened、写权限仅 contents+issues、标题守卫、编号并发串行且不可取消、正文强制走 API（E2BIG 事故口径）、checkout 凭据保留显式说明（push 依赖，与其它 workflow 相反）、诊断工件保留 7 天；新增 test_library_ingest_workflow_contract（5 项含六类变异自证）。本轮为机械重绑。
+
 > 重审（2026-11-11）：scorecard 契约化：顶层 read-all + analysis 权限（security-events/id-token/contents/actions 各只读或仅需）、评分不可取消、四类触发面、publish_results=true 与 sarif 格式、SARIF/摘要工件保留期、摘要可追溯字段（run_id/commit/sha256/empty_results_are_not_clean）；清理过期 v2.4.3 叙述与 upload-sarif 的 v3/v4 注释错位；新增 test_scorecard_workflow_contract（4 项含六类变异自证 + 与 codeql.yml 同 SHA 交叉对账）。本轮为机械重绑。
 
 > 重审（2026-11-11）：codeql 契约化：PR 路径过滤补 packaging/**（含公网 hf-space server.py 与 js/ts 工具链）、init/analyze 必须同 SHA（删过期 v3 SHA 注释）、SARIF category 按语言区分；新增 test_codeql_workflow_contract（4 项含六类变异自证）。本轮为机械重绑。
