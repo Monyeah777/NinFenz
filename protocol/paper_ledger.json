@@ -1,0 +1,537 @@
+{
+  "schema": "nf-paper-ledger/1",
+  "note": "论文筛选台账：每篇必备处置与理由；adopted 必须有仓内落点与证据面（逐条核存在性）。来源为本仓内部档案 paper-screening，只记已读到的机制，不引二手数字。",
+  "count": 34,
+  "counts": {
+    "adopted": 22,
+    "deferred": 7,
+    "rejected": 1,
+    "not-applicable": 4
+  },
+  "entries": [
+    {
+      "id": "P01",
+      "title": "1. Metacognition in LLMs: Foundations, Progress, and Opportunities",
+      "section": "一、元认知 / 方法论层（对应方案 P2 元算子、P3 方法包、P7 评价）",
+      "source": "https://ar5iv.labs.arxiv.org/html/2607.11881 （arXiv 2607.11881）",
+      "read_level": "**正文分类段已读**（taxonomy 段原文摘录），其余未读",
+      "mechanism": "元认知 = **监控（monitoring）× 控制（control）** 双环；元认知知识三分：**陈述性**（是什么）/**程序性**（怎么做）/**条件性**（何时/为何用）；度量 = 敏感度（sensitivity）与**校准（calibration）**，不是「说得更肯定」",
+      "disposition": "adopted",
+      "reason": "元认知=监控×控制双环；本仓把监控产出（estimate/detect）与控制执行（switch/stop/allocate）分开记账",
+      "targets": [
+        "protocol/method_packs/metacognition.json"
+      ],
+      "evidence": [
+        "desktop/tests/test_method_pack.py"
+      ]
+    },
+    {
+      "id": "P02",
+      "title": "2. Decoupling Metacognition from Cognition: A Framework for Quantifying Metacognitive Ability in LLMs",
+      "section": "一、元认知 / 方法论层（对应方案 P2 元算子、P3 方法包、P7 评价）",
+      "source": "https://ojs.aaai.org/index.php/AAAI/article/view/34723 （AAAI）",
+      "read_level": "**仅标题/摘要页**（未取全文）",
+      "mechanism": "把「元认知能力」从「任务正确率」里**解耦**再分别度量——避免用任务分数冒充元认知",
+      "disposition": "adopted",
+      "reason": "元认知能力应从认知能力里解耦计量——本仓用校准/敏感度而非「说得更肯定」",
+      "targets": [
+        "protocol/method_packs/metacognition.json"
+      ],
+      "evidence": [
+        "docs/ccos/method-packs-v0.md"
+      ]
+    },
+    {
+      "id": "P03",
+      "title": "3. Verbalized Confidence Triggers Self-Verification（arXiv 2506.03723）",
+      "section": "一、元认知 / 方法论层（对应方案 P2 元算子、P3 方法包、P7 评价）",
+      "source": "https://export.arxiv.org/abs/2506.03723v1",
+      "read_level": "**仅标题/摘要**",
+      "mechanism": "模型**口头置信**可作为「触发自检」的信号（无需显式推理监督）",
+      "disposition": "adopted",
+      "reason": "口头置信度可触发自校验——本仓把「自证」落成判据族（红证据/变异探针）",
+      "targets": [
+        "scripts/judge_red_evidence.py"
+      ],
+      "evidence": [
+        "docs/ccos/judge-design-questions.md"
+      ]
+    },
+    {
+      "id": "P04",
+      "title": "4. IETF Key Transparency Protocol（draft-keytrans-mcmillion-protocol）",
+      "section": "二、信任 / 透明日志（对应方案 §2.4 挂账项：吊销公钥信任锚 v2、透明日志）",
+      "source": "https://datatracker.ietf.org/doc/html/draft-keytrans-mcmillion-protocol",
+      "read_level": "**正文关键段已读**（combined tree / inclusion & consistency proofs / monitoring / abridged proofs）",
+      "mechanism": "**前缀树（可搜索）+ 日志树（可证追加）** 组合；每次前缀树变更的根进日志树 → 同时支持**包含证明**与**一致性证明**；用户只需保存极小的「位置→版本」状态即可**监控**；无历史状态者可依赖**审计者**做 abridged proof",
+      "disposition": "adopted",
+      "reason": "Key Transparency 的透明日志+证明链——本仓落为撤销/透明日志对象与回执链",
+      "targets": [
+        "docs/ccos/key-transparency-v0.md",
+        "protocol/generated/receipt_chain.json"
+      ],
+      "evidence": [
+        "desktop/tests/test_evidence.py"
+      ]
+    },
+    {
+      "id": "P05",
+      "title": "5. Enabling Live Video Provenance and Authenticity: A C2PA-Based System with TPM-Based Security（Zenodo 19844238）",
+      "section": "二、信任 / 透明日志（对应方案 §2.4 挂账项：吊销公钥信任锚 v2、透明日志）",
+      "source": "https://zenodo.org/records/19844238",
+      "read_level": "**仅标题/摘要**",
+      "mechanism": "**硬件根（TPM）承载签名密钥** + C2PA 清单，解决「私钥在软件里可被拷走」",
+      "disposition": "deferred",
+      "reason": "C2PA+TPM 视频溯源需硬件与视频面；本仓只有标注 IR/证据包，视频面不做",
+      "targets": [],
+      "evidence": [
+        "docs/ccos/label-ir-v0.md"
+      ]
+    },
+    {
+      "id": "P06",
+      "title": "6. Robust DCT-Domain Watermarking against Screen-Shooting using Improved SIFT and Adaptive Embedding with CRC+BCH Error Protection（Telkom University, 2025）",
+      "section": "三、水印鲁棒性（对应 cc_label 鲁棒水印 v1 与鲁棒性基准）",
+      "source": "https://openlibrarypublications.telkomuniversity.ac.id/index.php/engineering/article/view/29118",
+      "read_level": "**仅标题 + 检索摘要**（PDF 正文未取，页面只给 view 壳）",
+      "mechanism": "未提取（仅标题/摘要）",
+      "disposition": "adopted",
+      "reason": "DCT 域抗拍屏 + SIFT 对齐 + CRC+BCH 纠错——本仓水印基准按 BER 实测攻击矩阵",
+      "targets": [
+        "desktop/src/core/label_watermark.py",
+        "results/ccos/watermark_bench.json"
+      ],
+      "evidence": [
+        "desktop/tests/test_watermark_bench.py"
+      ]
+    },
+    {
+      "id": "P07",
+      "title": "7. Exploring DWT–SVD–DCT feature parameters for robust multiple watermarking against JPEG and JPEG2000 compression（ScienceDirect S0045790614002146）- 读的程度：**仅标题/摘要**",
+      "section": "三、水印鲁棒性（对应 cc_label 鲁棒水印 v1 与鲁棒性基准）",
+      "source": "",
+      "read_level": "未记",
+      "mechanism": "小波+SVD+DCT 混合域；SVD 的奇异值对扰动相对稳定，可作嵌入载体",
+      "disposition": "adopted",
+      "reason": "DWT-SVD-DCT 多特征参数抗 JPEG/JPEG2000——本仓基准含压缩攻击项",
+      "targets": [
+        "desktop/src/core/label_watermark.py"
+      ],
+      "evidence": [
+        "desktop/tests/test_label_carrier.py"
+      ]
+    },
+    {
+      "id": "P08",
+      "title": "8. Harnessing Machine Learning for Watermarking: A Survey on Robustness and Stealth in Image Protection（IEEE 10959670）",
+      "section": "三、水印鲁棒性（对应 cc_label 鲁棒水印 v1 与鲁棒性基准）",
+      "source": "https://ieeexplore.ieee.org/abstract/document/10959670",
+      "read_level": "**仅标题/摘要**",
+      "mechanism": "鲁棒性与**隐蔽性（stealth）**的权衡分类，可作为攻击矩阵的维度来源",
+      "disposition": "deferred",
+      "reason": "ML 水印综述：无单一可移植机制，仅作方案对照",
+      "targets": [],
+      "evidence": [
+        "docs/ccos/label-ir-v0.md"
+      ]
+    },
+    {
+      "id": "P09",
+      "title": "9. 本仓自证：水印鲁棒性基准（2026-11-08 已落地，非论文）",
+      "section": "三、水印鲁棒性（对应 cc_label 鲁棒水印 v1 与鲁棒性基准）",
+      "source": "",
+      "read_level": "未记",
+      "mechanism": "未提取（仅标题/摘要）",
+      "disposition": "not-applicable",
+      "reason": "本仓自证条目（非论文），作为基准落地记录保留",
+      "targets": [],
+      "evidence": [
+        "results/ccos/watermark_bench.json"
+      ]
+    },
+    {
+      "id": "P10",
+      "title": "10. OWASP Top 10 for LLM Applications — LLM01: Prompt Injection（2025）",
+      "section": "六、第 26–29 轮新增两域的文献筛选（2026-11-08 补记）",
+      "source": "https://genai.owasp.org/llmrisk/llm01-prompt-injection/",
+      "read_level": "**抓取失败**——页面正文由脚本渲染，fetch 只拿到模板与样式（52 KB 里 0 段正文）。",
+      "mechanism": "未提取（仅标题/摘要）",
+      "disposition": "adopted",
+      "reason": "OWASP LLM01 提示注入——本仓落为注入防御方法包与策略检查",
+      "targets": [
+        "protocol/method_packs/prompt-injection-defense.json"
+      ],
+      "evidence": [
+        "docs/ccos/check-policy-v0.md"
+      ]
+    },
+    {
+      "id": "P11",
+      "title": "11. Improving Reproducibility in Machine Learning Research（NeurIPS 2019 复现性计划报告）",
+      "section": "六、第 26–29 轮新增两域的文献筛选（2026-11-08 补记）",
+      "source": "https://arxiv.org/abs/2003.12206 （Pineau 等，2020-03 首次提交 / 2020-12 修订）",
+      "read_level": "**摘要已读**（全文未读）",
+      "mechanism": "复现性需要**结构化的提交清单**（代码/数据/超参/随机性/实验协议），而不是「跑一遍」口头承诺。",
+      "disposition": "adopted",
+      "reason": "复现性：环境钉定+结果可重算——本仓发布结论绑定 SHA 与材料摘要",
+      "targets": [
+        "scripts/release_conclusion.py",
+        "docs/ccos/release-conclusion.md"
+      ],
+      "evidence": [
+        "desktop/tests/test_release_conclusion.py"
+      ]
+    },
+    {
+      "id": "P12",
+      "title": "12. Datasheets for Datasets（Gebru 等，2018/2021 v8）",
+      "section": "六、第 26–29 轮新增两域的文献筛选（2026-11-08 补记）",
+      "source": "https://arxiv.org/abs/1803.09010",
+      "read_level": "**摘要已读**",
+      "mechanism": "数据/基准也要有「说明书」（动机、构成、采集过程、推荐用途、限制）。",
+      "disposition": "adopted",
+      "reason": "Datasheets：数据面须有来源/用途/限制——本仓以材料清单+证据包承载",
+      "targets": [
+        "desktop/src/core/sbom.py",
+        "docs/ccos/supply-chain-v0.md"
+      ],
+      "evidence": [
+        "desktop/tests/test_sbom.py"
+      ]
+    },
+    {
+      "id": "P13",
+      "title": "13. Model Cards for Model Reporting（Mitchell 等，2018/2019 v2）",
+      "section": "六、第 26–29 轮新增两域的文献筛选（2026-11-08 补记）",
+      "source": "https://arxiv.org/abs/1810.03993",
+      "read_level": "**摘要已读**",
+      "mechanism": "按**条件分组**报告性能（不同人群/条件），避免只报单一总体数字。",
+      "disposition": "adopted",
+      "reason": "Model Cards：能力/边界/适用面声明——本仓以证据包与威胁模型承载",
+      "targets": [
+        "docs/ccos/evidence-bundle-v0.md",
+        "docs/ccos/threat-model.md"
+      ],
+      "evidence": [
+        "desktop/tests/test_evidence_vectors.py"
+      ]
+    },
+    {
+      "id": "P14",
+      "title": "14. 误引剔除（保留作为筛选纪律的证据）",
+      "section": "六、第 26–29 轮新增两域的文献筛选（2026-11-08 补记）",
+      "source": "",
+      "read_level": "未记",
+      "mechanism": "未提取（仅标题/摘要）",
+      "disposition": "rejected",
+      "reason": "该候选经核对为误引，剔除并保留为筛选纪律的证据",
+      "targets": [],
+      "evidence": []
+    },
+    {
+      "id": "P15",
+      "title": "1. Judging the Judges: Evaluating Alignment and Vulnerabilities in LLMs-as-Judges",
+      "section": "七、判据质量与变异测试（2026-11-09 补，对应本轮 76–80 的探针线）",
+      "source": "https://aclanthology.org/2025.gem-1.33/ （GEM² 2025, pp.404–430）",
+      "read_level": "**元数据 + 摘要位置已读**（未取全文正文）",
+      "mechanism": "裁判本身要被评估——对齐度与脆弱性都要量，不能假定「裁判通过」等于「被评对象没问题」",
+      "disposition": "adopted",
+      "reason": "LLM-as-judge 的对齐与脆弱性——本仓判据质量用变异探针度量而非人评",
+      "targets": [
+        "scripts/judge_mutation_probe.py"
+      ],
+      "evidence": [
+        "docs/ccos/judge-families.md"
+      ]
+    },
+    {
+      "id": "P16",
+      "title": "2. Safer or Luckier? LLMs as Safety Evaluators Are Not Robust to Artifacts",
+      "section": "七、判据质量与变异测试（2026-11-09 补，对应本轮 76–80 的探针线）",
+      "source": "https://aclanthology.org/2025.acl-long.970/",
+      "read_level": "**仅标题**",
+      "mechanism": "评估结论对「表面工件」（格式、顺序、措辞）敏感，换个写法结论会变",
+      "disposition": "adopted",
+      "reason": "安全评估对伪影不鲁棒——本仓要求判据对「合法变体」零误报",
+      "targets": [
+        "scripts/judge_mutation_probe.py"
+      ],
+      "evidence": [
+        "docs/ccos/judge-design-questions.md"
+      ]
+    },
+    {
+      "id": "P17",
+      "title": "3. Mutation Testing in Practice: Insights from Open-Source Software Developers",
+      "section": "七、判据质量与变异测试（2026-11-09 补，对应本轮 76–80 的探针线）",
+      "source": "https://biblioteca.sistedes.es/entities/abstract/df6e5a8d-bc1c-4d54-80c5-b54ca000b06a",
+      "read_level": "**仅标题/摘要条目**",
+      "mechanism": "变异得分在实践中被当作**测试套件有效性**的代理指标，但要配合误报与成本看",
+      "disposition": "adopted",
+      "reason": "变异测试实践——本仓 5 判据/15 变异体常驻探针",
+      "targets": [
+        "scripts/judge_mutation_probe.py"
+      ],
+      "evidence": [
+        "desktop/tests/test_judge_mutation_probe.py"
+      ]
+    },
+    {
+      "id": "P18",
+      "title": "4. The Silent Judge: Unacknowledged Shortcut Bias in LLM-as-a-Judge",
+      "section": "七、判据质量与变异测试（2026-11-09 补，对应本轮 76–80 的探针线）",
+      "source": "https://neurips.cc/virtual/2025/loc/san-diego/125264",
+      "read_level": "**仅标题**",
+      "mechanism": "裁判可能靠捷径（表面特征）达成一致，而不真正检查内容",
+      "disposition": "adopted",
+      "reason": "判据捷径偏差——本仓「第十一问」要求双向断言",
+      "targets": [
+        "docs/ccos/judge-design-questions.md"
+      ],
+      "evidence": [
+        "docs/ccos/judge-design-questions.md"
+      ]
+    },
+    {
+      "id": "P19",
+      "title": "1. An Empirical Study on Reproducible Packaging in Open-Source Ecosystems",
+      "section": "九、供应链与可复现（2026-11-09 补，对应第 111–116 轮的 supply-chain 域与 nf-sbom/1）",
+      "source": "https://ieeexplore.ieee.org/abstract/document/11029905",
+      "read_level": "**仅标题**（检索命中，未取全文）",
+      "mechanism": "把「可复现打包」当成**可经验测量的对象**（而不是口号）——同一源码两次打包比较产物",
+      "disposition": "adopted",
+      "reason": "可复现打包的实证——本仓材料清单/验证器摘要/结论绑定",
+      "targets": [
+        "scripts/sbom.py"
+      ],
+      "evidence": [
+        "desktop/tests/test_sbom.py"
+      ]
+    },
+    {
+      "id": "P20",
+      "title": "2. Provenance Gates: SLSA-Aware Release Controls for Kubernetes and ECR Software Supply Chains",
+      "section": "九、供应链与可复现（2026-11-09 补，对应第 111–116 轮的 supply-chain 域与 nf-sbom/1）",
+      "source": "https://zenodo.org/records/21902593",
+      "read_level": "**仅标题/摘要条目**",
+      "mechanism": "把溯源等级做成**发布门禁**（等级不满足即拒绝发布），而不是事后附加的报告",
+      "disposition": "adopted",
+      "reason": "SLSA 感知的溯源闸门——本仓供应链对象含构建隔离与 provenance 检查",
+      "targets": [
+        "docs/ccos/supply-chain-v0.md",
+        "scripts/self_audit_probe.py"
+      ],
+      "evidence": [
+        "desktop/tests/test_audit_rebind.py"
+      ]
+    },
+    {
+      "id": "P21",
+      "title": "3. ALOHA: A(IBoM) tooL generatOr for Hugging fAce（EASE 2025）",
+      "section": "九、供应链与可复现（2026-11-09 补，对应第 111–116 轮的 supply-chain 域与 nf-sbom/1）",
+      "source": "https://dlnext.acm.org/doi/10.1145/3756681.3756998",
+      "read_level": "**仅标题**",
+      "mechanism": "为模型/数据集生成 AI-BOM（物料清单），把「用了哪些模型与数据」显式化",
+      "disposition": "deferred",
+      "reason": "ALOHA 面向 HuggingFace 模型卡与 IBOM；本仓材料面是仓库文件而非模型权重",
+      "targets": [],
+      "evidence": [
+        "docs/ccos/supply-chain-v0.md"
+      ]
+    },
+    {
+      "id": "P22",
+      "title": "4. AI SBOM Initiative（OWASP GenAI）",
+      "section": "九、供应链与可复现（2026-11-09 补，对应第 111–116 轮的 supply-chain 域与 nf-sbom/1）",
+      "source": "https://genai.owasp.org/initiatives/ai-sbom-initiative/",
+      "read_level": "**仅标题**",
+      "mechanism": "把 SBOM 的字段集按「AI 组件」重新组织（模型/数据/工具/提示模板）",
+      "disposition": "adopted",
+      "reason": "AI SBOM 倡议：模型/数据/工具三元清单——本仓材料清单按显式范围收口",
+      "targets": [
+        "docs/ccos/supply-chain-v0.md"
+      ],
+      "evidence": [
+        "desktop/tests/test_sbom.py"
+      ]
+    },
+    {
+      "id": "P23",
+      "title": "1. Calibration Is Not Verification: Falsifiability-Aware Conformal Routing for Mixture-of-Agents",
+      "section": "十、判据可信性与校准（2026-11-09 补，对应第 108–130 轮的判据族谱与变异探针）",
+      "source": "https://export.arxiv.org/pdf/2609.25959",
+      "read_level": "**仅标题**",
+      "mechanism": "把「模型自称的置信」与「可证伪的核对」明确分开——校准好不等于验证过",
+      "disposition": "adopted",
+      "reason": "校准不等于验证——本仓判据须可证伪（红证据/变异体）",
+      "targets": [
+        "docs/ccos/judge-design-questions.md"
+      ],
+      "evidence": [
+        "scripts/judge_red_evidence.py"
+      ]
+    },
+    {
+      "id": "P24",
+      "title": "2. LLMs instead of Human Judges? A Large Scale Empirical Study across 20 NLP Evaluation Tasks（ACL 2025 short）",
+      "section": "十、判据可信性与校准（2026-11-09 补，对应第 108–130 轮的判据族谱与变异探针）",
+      "source": "https://aclanthology.org/2025-acl-short.20/",
+      "read_level": "**仅标题**",
+      "mechanism": "判据替代人工时，必须报告**在哪些任务上与人工不一致**，而不是只报平均一致性",
+      "disposition": "deferred",
+      "reason": "LLM 替代人评的大规模实证：本仓不引二手数字，暂无自有数据",
+      "targets": [],
+      "evidence": [
+        "docs/ccos/judge-families.md"
+      ]
+    },
+    {
+      "id": "P25",
+      "title": "3. Who Judges the Judge? LLM Jury-on-Demand",
+      "section": "十、判据可信性与校准（2026-11-09 补，对应第 108–130 轮的判据族谱与变异探针）",
+      "source": "https://export.arxiv.org/pdf/2512.01786",
+      "read_level": "**仅标题**",
+      "mechanism": "用多个判据投票来提高单判据的可靠性；但要求判据**独立**，否则投票无意义",
+      "disposition": "deferred",
+      "reason": "Jury-on-demand 多评委聚合：本仓无多评委面",
+      "targets": [],
+      "evidence": [
+        "docs/ccos/judge-families.md"
+      ]
+    },
+    {
+      "id": "P26",
+      "title": "1. Empirical Study on Machine Learning Testing Based on Mutation Testing",
+      "section": "十一、变异测试与判据有效性（2026-11-09 补，对应第 149 轮「判据能不能红」的盘点）",
+      "source": "https://dl.acm.org/doi/full/10.1145/3730436.3730535",
+      "read_level": "**仅标题**",
+      "mechanism": "把「测试有没有效」变成**变异体被杀死比例**，而不是「测试数量」",
+      "disposition": "adopted",
+      "reason": "ML 测试的变异实证——本仓变异探针结论（杀死率 1.0）",
+      "targets": [
+        "scripts/judge_mutation_probe.py"
+      ],
+      "evidence": [
+        "desktop/tests/test_judge_mutation_probe.py"
+      ]
+    },
+    {
+      "id": "P27",
+      "title": "2. Do LLMs Generate Useful Test Oracles?（ASE 2025）",
+      "section": "十一、变异测试与判据有效性（2026-11-09 补，对应第 149 轮「判据能不能红」的盘点）",
+      "source": "https://dl.acm.org/doi/10.1109/ASE63991.2025.00031",
+      "read_level": "**仅标题**",
+      "mechanism": "区分「能跑」与「判定正确」——**测试预言（oracle）质量**才是关键，不是测试能否通过",
+      "disposition": "deferred",
+      "reason": "LLM 生成测试神谕：本仓判据是确定性断言，不依赖生成式神谕",
+      "targets": [],
+      "evidence": [
+        "docs/ccos/judge-design-questions.md"
+      ]
+    },
+    {
+      "id": "P28",
+      "title": "3. 本仓自证（非论文，作为对照）",
+      "section": "十一、变异测试与判据有效性（2026-11-09 补，对应第 149 轮「判据能不能红」的盘点）",
+      "source": "",
+      "read_level": "未记",
+      "mechanism": "未提取（仅标题/摘要）",
+      "disposition": "not-applicable",
+      "reason": "本仓自证条目（非论文），作为对照组保留",
+      "targets": [],
+      "evidence": [
+        "results/ccos/judge_mutation.json"
+      ]
+    },
+    {
+      "id": "P29",
+      "title": "1. CND: Detecting Functionally Irrelevant Code Changes for Improving Regression Testing",
+      "section": "十二、测试规模与不稳定测试（2026-11-09 补，对应第 161 轮的时长预算与第 162 轮的快照节奏）",
+      "source": "https://ieeexplore.ieee.org/abstract/document/11108378",
+      "read_level": "**仅标题**",
+      "mechanism": "识别「不改变功能的改动」，从而**跳过与之无关的测试**，压缩回归时间",
+      "disposition": "deferred",
+      "reason": "功能无关变更检测（CND）：本仓暂以「改动必带判据」纪律替代自动检测",
+      "targets": [],
+      "evidence": [
+        "docs/ccos/judge-design-questions.md"
+      ]
+    },
+    {
+      "id": "P30",
+      "title": "2. Systemic Flakiness: An Empirical Analysis of Co-Occurring Flaky Test Failures",
+      "section": "十二、测试规模与不稳定测试（2026-11-09 补，对应第 161 轮的时长预算与第 162 轮的快照节奏）",
+      "source": "https://acm-stag.literatumonline.com/doi/10.1145/3756681.3756945",
+      "read_level": "**仅标题**",
+      "mechanism": "不稳定测试常常**成组出现**（共享状态/时序），单条隔离修不掉",
+      "disposition": "adopted",
+      "reason": "系统级不稳定测试的实证——本仓把假红按「负载/时序/跨平台」三档归因并修观测面",
+      "targets": [
+        "desktop/tests/test_watch.py"
+      ],
+      "evidence": [
+        "docs/ccos/judge-families.md"
+      ]
+    },
+    {
+      "id": "P31",
+      "title": "本仓判断（对照）",
+      "section": "十二、测试规模与不稳定测试（2026-11-09 补，对应第 161 轮的时长预算与第 162 轮的快照节奏）",
+      "source": "",
+      "read_level": "未记",
+      "mechanism": "未提取（仅标题/摘要）",
+      "disposition": "not-applicable",
+      "reason": "本仓判断条目（非论文）",
+      "targets": [],
+      "evidence": [
+        "docs/ccos/judge-families.md"
+      ]
+    },
+    {
+      "id": "P32",
+      "title": "1. METAMON: Finding Inconsistencies between Program Documentation and Behavior using Metamorphic LLM Queries",
+      "section": "十三、文档与代码的一致性（2026-11-09 补，对应第 125/129/145/166 轮的引用面与绑定判据）",
+      "source": "https://browse-export.arxiv.org/abs/2502.02794",
+      "read_level": "**仅标题/摘要条目**",
+      "mechanism": "用**变形查询**（metamorphic）探测「文档说 A，代码做 B」——不依赖文档格式，依赖行为对比",
+      "disposition": "adopted",
+      "reason": "程序与文档不一致检测——本仓文档路径/数字判据族",
+      "targets": [
+        "desktop/tests/test_ccos_docs_anchors.py"
+      ],
+      "evidence": [
+        "desktop/tests/test_docs_cite_probe_numbers.py"
+      ]
+    },
+    {
+      "id": "P33",
+      "title": "2. Identifying Multi-parameter Constraint Errors in Python Data Science Library API Documentation（PACMSE）",
+      "section": "十三、文档与代码的一致性（2026-11-09 补，对应第 125/129/145/166 轮的引用面与绑定判据）",
+      "source": "https://dlnext.acm.org/doi/10.1145/3728945",
+      "read_level": "**仅标题**",
+      "mechanism": "把「参数约束」从文档里抽出来，与实现逐一核对",
+      "disposition": "adopted",
+      "reason": "多参数约束错误识别——本仓容量/规模棘轮与参数一致性判据",
+      "targets": [
+        "desktop/tests/test_path_flag_ratchet.py"
+      ],
+      "evidence": [
+        "protocol/code_metrics_baseline.json"
+      ]
+    },
+    {
+      "id": "P34",
+      "title": "本仓判断（对照）",
+      "section": "十三、文档与代码的一致性（2026-11-09 补，对应第 125/129/145/166 轮的引用面与绑定判据）",
+      "source": "",
+      "read_level": "未记",
+      "mechanism": "未提取（仅标题/摘要）",
+      "disposition": "not-applicable",
+      "reason": "本仓判断条目（非论文）",
+      "targets": [],
+      "evidence": [
+        "docs/ccos/judge-design-questions.md"
+      ]
+    }
+  ]
+}
