@@ -24,7 +24,7 @@ REQUIRED_SECTIONS = ("先自查", "去哪问", "提 Issue 前自检", "之后会
 #: 入口面必备要素（缺一说不上「支持入口」）
 REQUIRED_MARKERS = (
     "空白 Issue 已关", "SECURITY.md", "私密通道", "结构化表单",
-    "脱敏", "不静默丢弃", "不承诺响应时限",
+    "脱敏", "不静默丢弃", "不承诺响应时限", "MAINTAINERS.md", "外部第三方",
 )
 #: 自检四项的纪律关键词（与缺陷表单 checklist 的四条一一对应）
 CHECK_TOPICS = ("重复", "安全", "脱敏", "缺陷")
@@ -197,6 +197,13 @@ class SupportContractTest(unittest.TestCase):
         self.assertGreaterEqual(len(relative), 2, "支持入口应以相对链接指向仓内文档")
         self.assertEqual([], dangling_links(self.text), "支持入口有悬空的 Markdown 链接")
 
+    def test_appeal_reviewer_matches_maintainers(self):
+        """申诉的复核主体必须与维护者表同源——单人仓不存在「另一位维护者」。"""
+        self.assertIn("MAINTAINERS.md", self.text, "申诉段未指向维护者表")
+        self.assertIn("外部第三方", self.text, "涉己复核缺第三方路径")
+        maintainers = (ROOT / "MAINTAINERS.md").read_text(encoding="utf-8")
+        self.assertIn("外部第三方", maintainers, "维护者表未定义外部第三方复核路径")
+
     def test_self_check_matches_bug_form(self):
         """自检四项必须与缺陷表单的 checklist 同源（表单改了、文档不改 → 红）。"""
         labels = bug_checklist_labels()
@@ -222,6 +229,9 @@ class SupportContractTest(unittest.TestCase):
         bad_link = self.text + "\n[示例](docs/nope.md)\n"
         self.assertTrue(any("Markdown" in i for i in support_issues(bad_link)),
                         "悬空 Markdown 链接必须报")
+        no_reviewer = self.text.replace("外部第三方", "另行通知")
+        self.assertTrue(any("外部第三方" in i for i in support_issues(no_reviewer)),
+                        "删掉涉己复核路径必须报")
         cfg = load_yaml(CONFIG)
         cfg["blank_issues_enabled"] = True
         self.assertTrue(any("blank_issues_enabled" in i for i in support_issues(self.text, cfg)),

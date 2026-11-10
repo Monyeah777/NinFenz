@@ -17,7 +17,7 @@
 | 缺陷 | `.github/ISSUE_TEMPLATE/bug_report.yml` | 结构化表单；环境 / 复现 / 期望 / 实际按栏填 |
 | 功能请求 | `.github/ISSUE_TEMPLATE/feature_request.yml` | B1 五问逐栏；先看 `docs/meta/ROADMAP.md` 的路线与版本 |
 | 安全漏洞 / 越权 / 凭据泄露 | [SECURITY.md](SECURITY.md) 的私密通道（GitHub Security Advisories） | **不要开公开 Issue**——公开即视为已泄露 |
-| 行为准则举报 / 申诉 | 同一私密通道（见 [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)） | 保密处理；申诉 14 天内一次，由未参与原处置的维护者复核 |
+| 行为准则举报 / 申诉 | 同一私密通道（见 [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)） | 保密处理；申诉 14 天内一次，复核主体与回避路径见 [MAINTAINERS.md](MAINTAINERS.md)（涉 Owner 由**外部第三方**；无第三方记「未复核」） |
 | 内容 / 领域包投稿 | 投稿表单 + `CONTRIBUTING.md` §4.4；闸门真源 = `library/intake.json` | 仅作者本人自投；通道模式以声明件为准 |
 
 > 空白 Issue 已关：上表之外的问题没有「随便开一个空 Issue」的口子——选择页的四条分流入口就是入口面。
