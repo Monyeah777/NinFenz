@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[2]
 #: 第 141 轮已知无引用的脚本（历史一次性审计，理由见 docs/ccos/one-shot-audits.md）
 ORPHANS = frozenset({
     "abi_call_vectors", "adr_check", "atom_invariants",
-    "engine_status", "plugin_promote", "gen_third_party_notices",
+    "engine_status", "plugin_promote",
 })
 
 
