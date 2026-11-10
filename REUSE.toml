@@ -1,6 +1,13 @@
 # REUSE 3.x 声明（2026-10-10 全仓审计 §11af：此前 REUSE 0/3490，无 LICENSES/）。
-# 口径：代码/文档/协议面 = 本仓 MIT；library/ 与 community/ 的第三方投稿 = 投稿人版权，
-# 按 LICENSES/LicenseRef-Community-Submission.txt 的投稿条款在本仓库原样再分发。
+# 结构（三级，从上到下优先级升高）：
+#   1) 聚合声明覆盖全仓 = 本仓 MIT（代码 / 文档 / 协议文本 / 工具链）；
+#   2) 投稿面 override = 投稿条款 LicenseRef-Community-Submission：覆盖 library 投稿条目 +
+#      anchors 签名件 + community 域包；条款文本见 LICENSES/LicenseRef-Community-Submission.txt。
+#      口径：**投稿面文件无论投稿人是作者本人自投还是第三方投稿**都按投稿条款再分发
+#      （本仓当前为作者自投，投稿闸门 author_only 见 library/intake.json）；
+#   3) 许可文本自身（LICENSES/*.txt）不作 copyright 声明——它们不是受声明约束的内容。
+# 纪律：新增一种许可 = 本件加一条 annotation + LICENSES/ 放文本 + 判据自动跟随（不手写第三份清单）。
+# 判据：desktop/tests/test_reuse_contract.py（TOML 结构 / 聚合覆盖 / override 不空转 / 许可双向闭合）。
 version = 1
 SPDX-PackageName = "NinFenz"
 SPDX-PackageSupplier = "Monyeah777"
@@ -13,7 +20,13 @@ SPDX-FileCopyrightText = "2026 Monyeah777"
 SPDX-License-Identifier = "MIT"
 
 [[annotations]]
-path = ["library/NF-*.md", "library/anchors/**", "community/**"]
+path = ["library/NF-*.md", "library/anchors/**"]
 precedence = "override"
-SPDX-FileCopyrightText = "投稿人（见文件头 author / sources）"
+SPDX-FileCopyrightText = "投稿人（作者自投，见文件头 author）"
+SPDX-License-Identifier = "LicenseRef-Community-Submission"
+
+[[annotations]]
+path = ["community/**"]
+precedence = "override"
+SPDX-FileCopyrightText = "投稿人 / 域包作者（见包内 protocol.yaml）"
 SPDX-License-Identifier = "LicenseRef-Community-Submission"

@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-11-11",
   "approved_by": "Monyeah777",
-  "note": "CITATION 引用元数据：person 作者 + 不钉版本策略 + 与 .zenodo.json 双源一致；判据 test_citation_contract 5 项含变异自证。",
+  "note": "REUSE 三级许可声明：全仓 MIT 聚合 + 投稿面 override（library/community 两条）+ 许可文本双向闭合；判据 test_reuse_contract 5 项含变异自证。",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "5f057290d1d28051bc0dc492a15cc4533485ae5d788db80889beda4caeea76f5"

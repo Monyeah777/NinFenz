@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:7c1622437dbd482e5a97bac4962ae19d19c170080555b6a4b5f55077b60fc5b1
+  - protocol/check12_weights.json:b4f4e31fabf6acbfc81afd1b631ae281d0308b8eb4cc68ff4ef5f0fb9ab41b44
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-11）：REUSE.toml 顶尖化：三级许可声明结构（全仓 MIT 聚合 + 投稿面 override 拆为 library 与 community 两条）+ 投稿面口径注释（作者自投/第三方投稿同按投稿条款）+ 许可文本自身不声明；新增 test_reuse_contract（5 项：TOML 结构/聚合许可与 LICENSE 一致/override 不空转/许可文本双向闭合/变异自证）。本轮为机械重绑。
+
 > 重审（2026-11-11）：CITATION.cff 顶尖化：作者从 entity 的 name 改为 person（family-names），避免被当机构；补「不钉 version/date-released」策略注释与两源并存说明；与 .zenodo.json 的 title/license/作者双源一致；新增 test_citation_contract（5 项：schema 必填/无未知键 + person 判定 + 双源一致 + 版本策略 + 变异自证）。本轮为机械重绑。
 
 > 重审（2026-11-11）：.zenodo.json 修复：许可从 AGPL-3.0-only（与 LICENSE/REUSE/pyproject/CITATION 的 MIT 矛盾）改回 MIT，删除三个不存在文件的引用（LICENSING.md/COMMERCIAL.md/TRADEMARK.md）与失效的「v1.1.0 许可分层」段；新增 test_zenodo_contract（4 项，许可四源一致 + 双源 title/creators + 失效引用 + 变异自证）。本轮为机械重绑。
