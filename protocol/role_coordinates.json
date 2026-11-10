@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1054
+    "verify": 1055
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8597,6 +8597,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "许可链契约判据：LICENSE 是唯一真源，其余四处只允许指向它（2026-11-11）。",
+      "path": "desktop/tests/test_license_chain.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "图书馆入库许可证门单测（登记行合表 + 内联声明双源）。",
       "path": "desktop/tests/test_license_gate.py",
       "role": "verify",
@@ -12708,7 +12714,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "d01e61047997d532538f5a0c145149e3fdecb44c409e6b4d8f8887f135c2cfbd",
+  "root_digest": "48a1fcdd60898fe6f980268598769191ae929f979aa5a1925aca3ba1569135b2",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12717,7 +12723,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 928,
+    "R-verify": 929,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
