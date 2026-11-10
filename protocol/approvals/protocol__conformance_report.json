@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-10",
   "approved_by": "Monyeah777",
-  "note": "report pinned date",
+  "note": "merge 后再批准",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "b7da9597d65049a188a629e092439512511653642286efc4ce21b4f4301abbf8"
+  "subject_digest": "5f057290d1d28051bc0dc492a15cc4533485ae5d788db80889beda4caeea76f5"
 }

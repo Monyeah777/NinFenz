@@ -8,8 +8,12 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
-  - protocol/code_metrics_baseline.json:3bf3a34bf609802f2afd4655a01eeabc17434855b5247b6e0ec82324b9af88e8
+  - protocol/code_metrics_baseline.json:bf844a5156d111459462784989f5e7efea48ec5e51fa1957356be7fa8afc59e1
 ---
+> 重审（2026-11-10）：度量基线重冻后重绑
+
+> 重审（2026-11-10）：论文台账系统化 + 方法包深度判据
+
 > 重审（2026-11-10）：冻结链
 
 > 重审（2026-11-09）：冻结链

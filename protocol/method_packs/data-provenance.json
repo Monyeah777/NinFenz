@@ -116,5 +116,10 @@
   "runnable": [
     "nf asset ledger",
     "nf asset verify"
-  ]
+  ],
+  "judges": {
+    "data-fit": "desktop/tests/test_evidence.py",
+    "license": "desktop/tests/test_sbom.py",
+    "non-leakage": "desktop/tests/test_purity_scan.py"
+  }
 }

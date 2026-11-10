@@ -7,8 +7,12 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/json_schema.py:f3a4a6a14de5104e217af8b154505f9ca46fd6133081188209add78143e2b23e
-  - protocol/code_metrics_baseline.json:3bf3a34bf609802f2afd4655a01eeabc17434855b5247b6e0ec82324b9af88e8
+  - protocol/code_metrics_baseline.json:bf844a5156d111459462784989f5e7efea48ec5e51fa1957356be7fa8afc59e1
 ---
+> 重审（2026-11-10）：度量基线重冻后重绑
+
+> 重审（2026-11-10）：论文台账系统化 + 方法包深度判据
+
 > 重审（2026-11-10）：冻结链
 
 > 重审（2026-11-09）：冻结链

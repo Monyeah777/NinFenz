@@ -105,5 +105,9 @@
   "runnable": [
     "nf cog calibrate",
     "nf cog triggers"
-  ]
+  ],
+  "judges": {
+    "calibration": "desktop/tests/test_cognition_claims.py",
+    "control_effect": "desktop/tests/test_cognition_control.py"
+  }
 }
