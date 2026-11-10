@@ -3,6 +3,7 @@ name: ci-verify
 # clone 即绿、零前置；无 sync、无 android 依赖，L3 端壳已冻结移出）。
 # 绿 = FAIL=0 且 PASS 等于基线（`protocol/repo_stats.json` 是基线真源）；任一 FAIL → exit 1 → CI 红
 # （发布铁律 ROADMAP §8.4 门禁）。此处**不钉**具体计数与脚本版本——钉死就会随每次波次过期，
+# 本文件的权限/固定/超时/并发/矩阵/失败汇总口径由 desktop/tests/test_ci_verify_contract.py 判据守住。
 # 而一份写着过期数字的 workflow 头，正是「本机绿、云端红」最难被发现的伪装。
 #
 # P3+矩阵（2026-10-18）：全量门禁拆成 **静态 1 台 + 测试 32 台并行**。
@@ -18,6 +19,7 @@ on:
   # D2（2026-10-10 审计 P1）：主门禁此前只跑 push:main —— 未合并 PR 不过 verify.sh。
   # 加 pull_request（默认 opened/synchronize/reopened）。
   pull_request:
+    branches: [main]   # 只对目标 main 的 PR 跑（其余分支不消耗 runner；分支保护只允许 main 合入）
   workflow_dispatch:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -88,6 +90,7 @@ jobs:
             verify-checks.log
             .nf-logs/
           if-no-files-found: warn
+          retention-days: 7    # 工件只用于本 PR 排障；7 天后自动回收（存储卫生）
   unit-tests:
     name: unit-tests-${{ matrix.shard }}-of-32
     runs-on: ubuntu-latest
@@ -164,6 +167,7 @@ jobs:
             verify-tests.log
             .nf-logs/
           if-no-files-found: warn
+          retention-days: 7    # 同上：排障工件，7 天回收
   gate:
     name: gate
     needs: [static-checks, unit-tests]
@@ -219,3 +223,4 @@ jobs:
           name: verification-report
           path: .artifacts/verification-report.json
           if-no-files-found: warn
+          retention-days: 7    # 同上：排障工件，7 天回收

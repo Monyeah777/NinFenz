@@ -56,6 +56,7 @@
     "test_check_text_to_intent": 0.9,
     "test_ci_diagnostics": 0.2,
     "test_ci_supply_chain": 0.2,
+    "test_ci_verify_contract": 0.2,
     "test_ci_visibility": 0.2,
     "test_citation_contract": 0.2,
     "test_claim_labels": 0.2,
@@ -949,6 +950,10 @@
     "test_ci_supply_chain.CiRequirementsPinTest.test_workflows_install_from_requirements_not_bare_versions": 0.0,
     "test_ci_supply_chain.WorkflowActionPinningTest.test_every_action_is_pinned_to_commit_sha": 0.0,
     "test_ci_supply_chain.WorkflowActionPinningTest.test_pins_are_kept_fresh_by_dependabot": 0.0,
+    "test_ci_verify_contract.CiVerifyContractTest.test_contract_catches_broken_workflow": 0.03,
+    "test_ci_verify_contract.CiVerifyContractTest.test_gate_is_fail_closed": 0.01,
+    "test_ci_verify_contract.CiVerifyContractTest.test_shard_matrix_is_complete": 0.01,
+    "test_ci_verify_contract.CiVerifyContractTest.test_workflow_matches_contract": 0.01,
     "test_ci_visibility.GateVisibilityTest.test_badge_covers_the_workflow_that_runs_the_gate": 0.0,
     "test_ci_visibility.GateVisibilityTest.test_entries_carry_ci_badge_pointing_at_real_workflow": 0.0,
     "test_ci_visibility.GateVisibilityTest.test_every_workflow_verify_invocation_declares_its_tier": 0.0,
@@ -4745,5 +4750,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1822.8
+  "total_s": 1823.0
 }
