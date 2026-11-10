@@ -26,8 +26,11 @@ def reuse_license_gaps(root: Path = ROOT) -> list:
             ids.add(v)
     gaps = []
     for i in sorted(ids):
-        if not (root / "LICENSES" / (i + ".txt")).is_file() and \
-                not (root / "LICENSE").is_file():
+        text_file = root / "LICENSES" / (i + ".txt")
+        # 只有「根 LICENSE 即该许可文本」这一种等价情形可豁免；其余必须有 LICENSES/<id>.txt。
+        # 旧写法「or not (root / "LICENSE").is_file()」恒真 ⇒ 判据永远不红（2026-11-10 实测）。
+        backed_by_root = i == "MIT" and (root / "LICENSE").is_file()
+        if not text_file.is_file() and not backed_by_root:
             gaps.append(i)
     return gaps
 
