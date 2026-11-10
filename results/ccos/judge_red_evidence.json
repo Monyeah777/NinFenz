@@ -253,6 +253,10 @@
       "source": "none"
     },
     {
+      "module": "test_coc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_code_metrics.py",
       "source": "naming"
     },
@@ -1597,10 +1601,10 @@
       "source": "naming"
     }
   ],
-  "modules": 399,
+  "modules": 400,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
   "suspect": 154,
-  "with_evidence": 104,
+  "with_evidence": 105,
   "without_evidence": 141
 }
