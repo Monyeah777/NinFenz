@@ -6,11 +6,13 @@ scope: 机制借鉴类外部输入的筛选与逐条仓内实证（STRATEGY §3.
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - CONTRIBUTING.md:9cc0ec213d27f79e4fa50de927f2c74112d6c6585ea0100858b6413f38c255b3
+  - CONTRIBUTING.md:0f9720dfcb4da5549fca35470ead646d76ba1dbcc084e0712259d8cf4cfbb4d7
   - skills/ninfenz/SKILL.md:5ef5858a08e6fd76a7cdee201938e0140e05257a7759a3ab27c05f9339109197
   - library/INDEX.md:ac0bcadbfd9019931e8e8a2f2739dd6603c73fe5b32950b8c80a2eb007c5761b
 
 ---
+> 重审（2026-11-10）：CONTRIBUTING 入口面顶尖化：§5 重写为「入口分流（空白 Issue 已关 + 四条分流 ⇄ config.yml）/ 改动域四类（代码面清单照抄 library/intake.json 声明）/ 三个模板各自守什么 / 一次一件事 / 提 PR 前自检」；新增 test_contributing_contract（5 项，含配置放开与悬空路径变异自证）；§4.2 补代码面清单真源注记。本轮为机械重绑。
+
 > 重审（2026-11-09）：CONTRIBUTING 冻结链
 
 > 重审（2026-11-09）：CONTRIBUTING 补本地 payload 过期说明

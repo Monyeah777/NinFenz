@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1045
+    "verify": 1046
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7823,6 +7823,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "CONTRIBUTING 入口面契约判据：文档不得与「结构化表单 + 声明件」分叉（2026-11-10）。",
+      "path": "desktop/tests/test_contributing_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "宁封子桌面工具 · 核心逻辑层单元测试（unittest，无 GUI 依赖）。",
       "path": "desktop/tests/test_core.py",
       "role": "verify",
@@ -12654,7 +12660,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "9974262d60f4242723229ec847f7894215f1c81db98f7e0df6e6c7f00a7294bf",
+  "root_digest": "0e70efd4b30e551ad6a44b2f53e1ea60bc4dcf53bde22e369378ad204f57a359",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12663,7 +12669,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 919,
+    "R-verify": 920,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

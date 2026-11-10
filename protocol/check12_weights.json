@@ -81,6 +81,7 @@
     "test_conformance_scan": 28.5,
     "test_content_face": 0.3,
     "test_contract_pin": 0.1,
+    "test_contributing_contract": 0.2,
     "test_core": 0.4,
     "test_core_atomic_writes": 0.3,
     "test_core_judge_map": 1.2,
@@ -1275,6 +1276,11 @@
     "test_content_face.FrameAndPayloadParityTest.test_payload_digest_matches_on_real_files": 0.0,
     "test_contract_pin.Test.test_count_and_field_drift": 0.0,
     "test_contract_pin.Test.test_pin_and_verify": 0.0,
+    "test_contributing_contract.ContributingContractTest.test_backtick_paths_resolve": 0.03,
+    "test_contributing_contract.ContributingContractTest.test_code_surface_line_matches_intake_declaration": 0.0,
+    "test_contributing_contract.ContributingContractTest.test_contract_catches_broken_docs": 0.01,
+    "test_contributing_contract.ContributingContractTest.test_doc_matches_contract": 0.0,
+    "test_contributing_contract.ContributingContractTest.test_entry_split_matches_config": 0.0,
     "test_core.ModelTypeGuardTest.test_module_from_json_rejects_wrong_types": 0.0,
     "test_core.ModelTypeGuardTest.test_pipeline_from_json_rejects_bad_layers": 0.0,
     "test_core.TestGenerator.test_collect_asset_keys_dedup": 0.0,
@@ -4662,5 +4668,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1817.4
+  "total_s": 1817.6
 }
