@@ -1,12 +1,16 @@
 name: release-gate
-# 45 · 打 tag 强制闸：v* 标签推送即跑发布前体检（verify + 基线自描述 + 覆盖率），
+# 45 · 打 tag 强制闸：v* 标签推送即跑发布前体检（verify + 基线自描述 + e2e + 覆盖率），
 # 任一 FAIL → CI 红 → Releases/发布动作受阻（把 nf release check 从“命令”升为“强制”）。
+# 本文件口径（最小权限 / 永不取消 / fail-closed / 覆盖门槛 / 证据保留期）由
+# desktop/tests/test_release_gate_workflow_contract.py 判据守住。
 on:
   push:
     tags: ['v*']
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  # 发布体检**永不取消**：同一 tag 被强制重推时，取消在跑的体检等于把一次发布验证
+  # 变成「没跑过」；宁可排队，也不让发布闸门出现被取消的绿。（与普通 CI 的取消策略相反。）
+  cancel-in-progress: false
 
 permissions:
   contents: read
@@ -39,8 +43,11 @@ jobs:
         run: |
           set -o pipefail
           python3 scripts/nf.py release 2>&1 | tee release-gate.log
-      - name: 端到端显式步（与 nf release 内嵌同源；失败即红，便于定位）
-        run: python3 scripts/e2e_desktop_headless.py
+      - name: 端到端显式步（与 nf release 内嵌同源；失败即红，日志落盘供诊断）
+        shell: bash
+        run: |
+          set -o pipefail
+          python3 scripts/e2e_desktop_headless.py 2>&1 | tee e2e.log
       - name: 覆盖率门槛（core ≥80）
         run: |
           coverage run --source=desktop/src/core -m unittest discover -s desktop/tests
@@ -57,3 +64,4 @@ jobs:
             .artifacts/
             *.log
           if-no-files-found: ignore
+          retention-days: 30   # 发布证据：保留 30 天（长于普通 CI 排障工件的 7 天）

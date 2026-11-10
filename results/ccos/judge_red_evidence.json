@@ -1257,6 +1257,10 @@
       "source": "none"
     },
     {
+      "module": "test_release_gate_workflow_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_repeat_safety.py",
       "source": "negative_assertion"
     },
@@ -1657,10 +1661,10 @@
       "source": "negative_assertion"
     }
   ],
-  "modules": 414,
+  "modules": 415,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
   "suspect": 154,
-  "with_evidence": 119,
+  "with_evidence": 120,
   "without_evidence": 141
 }
