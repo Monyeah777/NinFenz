@@ -184,6 +184,7 @@
     "test_iso8601": 0.2,
     "test_isolation_patterns": 0.7,
     "test_isomorphism_matrix": 0.2,
+    "test_issue_form_contract": 0.2,
     "test_jcs_spec_gap": 0.2,
     "test_job_ledger": 0.2,
     "test_json_shape_contracts": 0.9,
@@ -2338,6 +2339,9 @@
     "test_isomorphism_matrix.IsomorphismMatrixTest.test_missing_layers_carry_a_reason": 0.0,
     "test_isomorphism_matrix.IsomorphismMatrixTest.test_missing_reasons_name_a_concrete_object": 0.0,
     "test_isomorphism_matrix.IsomorphismMatrixTest.test_reflective_check_can_be_killed": 0.0,
+    "test_issue_form_contract.BugReportFormTest.test_contract_catches_broken_forms": 0.03,
+    "test_issue_form_contract.BugReportFormTest.test_form_matches_contract": 0.01,
+    "test_issue_form_contract.BugReportFormTest.test_security_redirect_present": 0.01,
     "test_jcs_spec_gap.JcsSpecGapTest.test_ascii_case_agrees": 0.0,
     "test_jcs_spec_gap.JcsSpecGapTest.test_astral_key_order_differs_from_spec": 0.0,
     "test_jcs_spec_gap.JcsSpecGapTest.test_exponent_leading_zero_differs_from_spec": 0.0,
@@ -4646,5 +4650,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1817.0
+  "total_s": 1817.2
 }
