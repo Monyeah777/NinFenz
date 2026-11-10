@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1051
+    "verify": 1052
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7673,6 +7673,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "CITATION.cff 契约判据：引用元数据须 schema 合法、作者是真自然人、与存档双源一致（2026-11-10）。",
+      "path": "desktop/tests/test_citation_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "",
       "path": "desktop/tests/test_claim_labels.py",
       "role": "verify",
@@ -12690,7 +12696,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "2b4d0388f63fdad70c42f4fda84408a9852f94aecb8f13ef5702a3848a9e689b",
+  "root_digest": "8a4865dcbb34e405fe32caf68fedb8652c8c3f3aba517432b2f8ed51bab241ad",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12699,7 +12705,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 925,
+    "R-verify": 926,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

@@ -1,5 +1,12 @@
-# GitHub「Cite this repository」与生成式引擎的机读引用元数据。
-# 纪律：本件不钉版本号（版本真源在 README 版本块 / VERSION-MATRIX），也不进协议回执面（固定清单）。
+# GitHub「Cite this repository」与生成式引擎的机读引用元数据（Citation File Format 1.2.0）。
+# 纪律：
+#   1) 本文件不设 version / date-released——版本真源在 README 版本块 / docs/meta/VERSION-MATRIX.md。
+#      钉死版本号会让默认分支的引用元数据在每次发版后失真，并诱发与 .zenodo.json 的版本漂移；
+#      引用应指向 Concept DOI / 仓库默认分支（永远解析到最新版）。
+#   2) 本仓两源并存（本件 + .zenodo.json）：Zenodo 在存在 .zenodo.json 时不读 CFF，
+#      因此 title / license / 作者必须逐字一致——由 desktop/tests/test_citation_contract.py 与
+#      test_zenodo_contract.py 双向守。
+#   3) 本件不进协议回执面（固定清单）。
 cff-version: 1.2.0
 message: "If you use NinFenz (NF) in your work, please cite it as below."
 title: "NinFenz (NF) — 内容契约层 / content contract layer"
@@ -10,7 +17,7 @@ abstract: >-
 type: software
 license: MIT
 authors:
-  - name: "Monyeah777"
+  - family-names: "Monyeah777"
     alias: "NinFenz"
     website: "https://github.com/Monyeah777"
 repository-code: "https://github.com/Monyeah777/NinFenz"
