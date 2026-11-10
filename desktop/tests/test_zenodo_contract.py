@@ -125,8 +125,12 @@ def zenodo_issues(doc: dict, root: Path = ROOT) -> list:
     cit_title = str(citation.get("title") or "").strip()
     if cit_title and cit_title != str(doc.get("title") or "").strip():
         issues.append("title 与 CITATION.cff 不一致（双源漂移）")
-    cit_names = {str((a or {}).get("name") or "").strip()
-                 for a in (citation.get("authors") or [])}
+    cit_names = set()
+    for author in citation.get("authors") or []:
+        author = author or {}
+        name = str(author.get("family-names") or author.get("name") or "").strip()
+        if name:
+            cit_names.add(name)
     zen_names = {str((c or {}).get("name") or "").strip() for c in creators}
     if cit_names and not zen_names.issubset(cit_names):
         issues.append("creators 与 CITATION.cff authors 不一致")
