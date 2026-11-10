@@ -1607,12 +1607,16 @@
     {
       "module": "test_yaml_recheck.py",
       "source": "naming"
+    },
+    {
+      "module": "test_zenodo_contract.py",
+      "source": "negative_assertion"
     }
   ],
-  "modules": 402,
+  "modules": 403,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
   "suspect": 154,
-  "with_evidence": 107,
+  "with_evidence": 108,
   "without_evidence": 141
 }

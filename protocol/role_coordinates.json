@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1050
+    "verify": 1051
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9755,6 +9755,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "Zenodo 元数据契约判据：存档记录不得与仓库许可 / 引用件分叉（2026-11-10）。",
+      "path": "desktop/tests/test_zenodo_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "",
       "path": "engine/dotnet/Directory.Build.props",
       "role": "verify",
@@ -12684,7 +12690,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "5929b63754f554ab6439a49488695e68bb797ab95c32e1be1cf73193030a3ddb",
+  "root_digest": "2b4d0388f63fdad70c42f4fda84408a9852f94aecb8f13ef5702a3848a9e689b",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12693,7 +12699,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 924,
+    "R-verify": 925,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

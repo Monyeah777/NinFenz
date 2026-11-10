@@ -1,5 +1,5 @@
 {
-  "measured_at": "2026-11-10",
+  "measured_at": "2026-11-11",
   "modules": {
     "test_absence_guard": 0.2,
     "test_agent_rules_adapter": 0.2,
@@ -402,7 +402,8 @@
     "test_world_model": 0.5,
     "test_world_slots": 0.1,
     "test_write_flag_gate": 4.4,
-    "test_yaml_recheck": 0.2
+    "test_yaml_recheck": 0.2,
+    "test_zenodo_contract": 0.2
   },
   "note": "check12 墙钟基线（--write-weights 实测；P0 棘轮与分片均衡共用）",
   "schema": "nf-check12-weights/1",
@@ -4689,7 +4690,11 @@
     "test_write_flag_gate.WriteFlagGateTest.test_no_ungated_writer_flag": 0.0,
     "test_write_flag_gate.WriteFlagGateTest.test_scanner_is_not_vacuous": 0.0,
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
-    "test_yaml_recheck.Test.test_valid": 0.0
+    "test_yaml_recheck.Test.test_valid": 0.0,
+    "test_zenodo_contract.ZenodoContractTest.test_contract_catches_broken_zenodo": 0.04,
+    "test_zenodo_contract.ZenodoContractTest.test_license_is_single_sourced": 0.0,
+    "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
+    "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1818.2
+  "total_s": 1818.4
 }
