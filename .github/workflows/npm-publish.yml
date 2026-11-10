@@ -36,7 +36,7 @@ jobs:
           V=$(node -p "require('./packaging/npm/package.json').version")
           TAG="${{ github.ref_name }}"
           if [ "$TAG" != "v$V" ]; then
-            echo "::error::tag=$TAG 与 npm 包版本 v$V 不一致（本仓 tag 走 v2.x 协议线、包走 1.0.x）——请用 v$V 打 tag，或先 bump 包版本"
+            echo "::error::tag=$TAG 与 npm 包版本 v$V 不一致（内容线 tag 走 v0.xx、CLI 线 tag 走 v1.0.x）——请用 v$V 打 tag，或先 bump 包版本"
             exit 1
           fi
           echo "tag=$TAG 与包版本 v$V 一致"
@@ -101,6 +101,17 @@ jobs:
             npm publish --provenance --access public
           fi
           rm -f .npmrc
+      - name: 失败诊断产物（Z5：npmjs 发布面同样要留证据；失败也可下载）
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7
+        with:
+          name: npm-publish-npmjs-diagnostics
+          path: |
+            .nf-logs/
+            .artifacts/
+            *.log
+          if-no-files-found: ignore
+          retention-days: 30   # 发布证据：保留 30 天
 
   publish-github-packages:
     name: npm-publish-github-packages
@@ -120,6 +131,15 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
         with:
           persist-credentials: false
+      - name: tag 与包版本一致性（与 npmjs 作业同口径：两条通道不许版本错位）
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          V=$(node -p "require('./packaging/npm/package.json').version")
+          TAG="$${{ github.ref_name }}"
+          if [ "$TAG" != "v$V" ]; then
+            echo "::error::tag=$TAG 与 npm 包版本 v$V 不一致——请用 v$V 打 tag，或先 bump 包版本"
+            exit 1
+          fi
       - name: payload 暂存 + 发布前自检（先按 npmjs 口径自证，再改名）
         working-directory: packaging/npm
         run: |
@@ -155,3 +175,4 @@ jobs:
             .artifacts/
             *.log
           if-no-files-found: ignore
+          retention-days: 30   # 发布证据：保留 30 天
