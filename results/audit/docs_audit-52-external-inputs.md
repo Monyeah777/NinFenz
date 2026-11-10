@@ -6,12 +6,14 @@ scope: 机制借鉴类外部输入的筛选与逐条仓内实证（STRATEGY §3.
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - .github/PULL_REQUEST_TEMPLATE.md:ee28953acf26601c4c36568dc99f705a86319b9c7622f019fee541d907621aff
+  - .github/PULL_REQUEST_TEMPLATE.md:db180228f1b4c29177b8bc27ccdbca028f58f8c046ff24c66268c30db5454829
   - CONTRIBUTING.md:9cc0ec213d27f79e4fa50de927f2c74112d6c6585ea0100858b6413f38c255b3
   - desktop/src/core/asset_density.py:aa60651ad8269e7db09a709570ae69192f39ee95cfd6bd1d4f652696b3d26c56
   - desktop/src/core/asset_line_baseline.py:b9630078b3569553be70d89734068c11329d7a35083efc846a1349ccf9bc61d1
 
 ---
+> 重审（2026-11-10）：PR 模板与两个 Issue 表单同构化（改动域/问题→做法→影响面/可核验收命令+期望/门禁自检四项/Closes-Refs+只做一件事声明）；新增 test_pr_template_contract（4 项，含删段与悬空路径变异自证）；本轮为机械重绑，不主张新的语义审计。
+
 > 重审（2026-11-09）：CONTRIBUTING 冻结链
 
 > 重审（2026-11-09）：CONTRIBUTING 补本地 payload 过期说明

@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1044
+    "verify": 1045
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9017,6 +9017,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "PR 模板契约判据：模板必须让评审**独立复跑**（2026-11-10）。",
+      "path": "desktop/tests/test_pr_template_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "提交前自查（fast lane）判据：名单不得腐烂、红要能红、不新增检查。",
       "path": "desktop/tests/test_precheck.py",
       "role": "verify",
@@ -12648,7 +12654,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "cca2facaec87b69d37b97c3ac9d6d68708b3c643e49d4b695b637a263ecdbe6e",
+  "root_digest": "9974262d60f4242723229ec847f7894215f1c81db98f7e0df6e6c7f00a7294bf",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12657,7 +12663,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 918,
+    "R-verify": 919,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
