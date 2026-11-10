@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1049
+    "verify": 1050
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8639,6 +8639,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "维护者契约判据：执行主体必须「具名、有职责、涉己回避、失能有预案」（2026-11-10）。",
+      "path": "desktop/tests/test_maintainers_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "市场协议分析库测试（v2.1.0-B4：依赖闭包 + 挂载冲突，verify check15 ②③ 同构）。",
       "path": "desktop/tests/test_market_analyzer.py",
       "role": "verify",
@@ -12678,7 +12684,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "512f6202035fd1d27252b924416958d75d4b102fdb9e03261f2a05afd56220ec",
+  "root_digest": "5929b63754f554ab6439a49488695e68bb797ab95c32e1be1cf73193030a3ddb",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12687,7 +12693,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 923,
+    "R-verify": 924,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
