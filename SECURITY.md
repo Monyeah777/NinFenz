@@ -71,7 +71,7 @@
 | 静态检查（含未定义名） | `nf release` → ruff | 本地 pre-push 即拦 |
 | SAST（SQL 拼接/弱随机/XXE/命令注入等） | `sast.yml` → `scripts/sast_check.py` | (工具,文件,规则) 计数棘轮：新增/上升即红 |
 | 代码扫描（数据流/污点） | `codeql.yml`（python + js/ts） | PR 路径过滤 / push main / 周 schedule；结果进 code scanning 面板（非 required） |
-| SAST 扩展面可见性 | `sast.yml` 的 tui/ + packaging/ 非阻塞扫描 | JSON 留 artifact（`sast-extra-*.json`）；扩棘轮待 task-40 |
+| SAST 扫描面（含 tui / packaging） | `scripts/sast_check.py` 的 `SCAN_TARGETS` | 已并入**同一计数棘轮**（按 nt / posix 平台分段，缺段即红）；`sast.yml` 上传 `sast-counts.json` 与日志（保留 7 天） |
 | 供应链评分 | `scorecard.yml` | OpenSSF Scorecard（结果可见） |
 | 执行目标仓库代码的信任门（H1） | `desktop/src/core/repo_trust.py` + `nf verify --trust-repo` | `desktop/tests/test_repo_trust.py`：外来仓库默认拒绝执行、无副作用 |
 
