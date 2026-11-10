@@ -733,6 +733,10 @@
       "source": "negative_case"
     },
     {
+      "module": "test_issue_form_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_jcs_spec_gap.py",
       "source": "naming"
     },
@@ -1581,10 +1585,10 @@
       "source": "naming"
     }
   ],
-  "modules": 395,
+  "modules": 396,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
   "suspect": 154,
-  "with_evidence": 100,
+  "with_evidence": 101,
   "without_evidence": 141
 }

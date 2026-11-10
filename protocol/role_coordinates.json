@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 447,
-    "verify": 1043
+    "verify": 1044
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8441,6 +8441,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "Issue 表单契约判据：缺陷模板必须覆盖「能复跑」的最小字段集（2026-11-10）。",
+      "path": "desktop/tests/test_issue_form_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "P-C1：canonical JSON 面的**规范-实现分歧**判据（RFC 8785 vs 仓库口径）。",
       "path": "desktop/tests/test_jcs_spec_gap.py",
       "role": "verify",
@@ -12642,7 +12648,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "8fd26841db8123072870d1900327eacd084e6f1a8de587f3b197a79d78b88df0",
+  "root_digest": "275645a58353fc3d7f5b96a7634e9fe26b610150bf085c9792fcd25aaa630484",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12651,7 +12657,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 123,
-    "R-verify": 917,
+    "R-verify": 918,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
