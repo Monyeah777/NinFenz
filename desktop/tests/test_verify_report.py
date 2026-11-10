@@ -30,10 +30,20 @@ _REPORT_CACHE: dict = {}
 
 
 def repo_report(root=None):
-    """真仓报告（进程内缓存）；`root` 省略即本仓。"""
+    """真仓报告（进程内缓存）；`root` 省略即本仓。
+
+    必须按**提交件记录的基准日**构建：判据是「同一棵树 + 同一基准日 → 同根」。
+    用默认的「今天」构建，报告会在跨午夜/隔天后与提交件差一天而假红
+    （2026-11-10 CI 实测：shard 5 连续红，根因就是这里缓存了「今天」版本）。
+    """
     key = str(root or ROOT)
     if key not in _REPORT_CACHE:
-        _REPORT_CACHE[key] = vr.build(key)
+        recorded = {}
+        try:
+            recorded = json_doc.load(Path(key) / vr.REPORT_REL, dict, what=vr.REPORT_REL)
+        except (OSError, ValueError):
+            recorded = {}
+        _REPORT_CACHE[key] = vr.build(key, today=vr._pinned_date(recorded))
     return _REPORT_CACHE[key]
 
 
