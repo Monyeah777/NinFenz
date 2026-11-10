@@ -3,6 +3,7 @@
   "modules": {
     "test_absence_guard": 0.2,
     "test_agent_rules_adapter": 0.2,
+    "test_agents_contract": 0.1,
     "test_ai_domain_closure": 0.2,
     "test_allowlist_expiry": 0.2,
     "test_anchor_align": 0.3,
@@ -422,6 +423,10 @@
     "test_agent_rules_adapter.TestAgentsAdapter.test_claude_format_exports_claude_md": 0.0,
     "test_agent_rules_adapter.TestAgentsAdapter.test_narrative_rejected_no_file": 0.0,
     "test_agent_rules_adapter.TestAgentsAdapter.test_project_rules_exports_agents_md": 0.0,
+    "test_agents_contract.AgentsContractTest.test_agents_matches_contract": 0.0,
+    "test_agents_contract.AgentsContractTest.test_contract_catches_broken_agents": 0.0,
+    "test_agents_contract.AgentsContractTest.test_facts_match_repo": 0.0,
+    "test_agents_contract.AgentsContractTest.test_references_resolve": 0.0,
     "test_ai_domain_closure.AliasTest.test_alias_closure_equals_key_closure": 0.0,
     "test_ai_domain_closure.AliasTest.test_alias_is_case_and_whitespace_insensitive": 0.0,
     "test_ai_domain_closure.AliasTest.test_alias_resolves_to_entry_key": 0.0,
@@ -4723,5 +4728,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1821.8
+  "total_s": 1821.9
 }

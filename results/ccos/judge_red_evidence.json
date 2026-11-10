@@ -9,6 +9,10 @@
       "source": "naming"
     },
     {
+      "module": "test_agents_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_ai_domain_closure.py",
       "source": "negative_assertion"
     },
@@ -1629,10 +1633,10 @@
       "source": "negative_assertion"
     }
   ],
-  "modules": 407,
+  "modules": 408,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
   "suspect": 154,
-  "with_evidence": 112,
+  "with_evidence": 113,
   "without_evidence": 141
 }

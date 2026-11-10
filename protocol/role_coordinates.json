@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1055
+    "verify": 1056
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7355,6 +7355,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "AGENTS.md 契约判据：开工前必读链第一跳必须「路径可解析、事实与仓库一致」（2026-11-11）。",
+      "path": "desktop/tests/test_agents_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "AI 系统域 · 概念前置闭包求值单测（域包战例回归 + 负例注入）。",
       "path": "desktop/tests/test_ai_domain_closure.py",
       "role": "verify",
@@ -12714,7 +12720,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "48a1fcdd60898fe6f980268598769191ae929f979aa5a1925aca3ba1569135b2",
+  "root_digest": "08c4c792dccb8c69da553acae3b178025ac7922fce45667276f4b2b428cdb53d",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12723,7 +12729,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 929,
+    "R-verify": 930,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
