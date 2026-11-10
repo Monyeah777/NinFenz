@@ -217,6 +217,7 @@
     "test_lsp_guard": 0.2,
     "test_lsp_hardening": 0.2,
     "test_lsp_transcript": 0.7,
+    "test_maintainers_contract": 0.1,
     "test_market_analyzer": 0.6,
     "test_mcp_adapter": 0.2,
     "test_mcp_ingress": 1.7,
@@ -2747,6 +2748,10 @@
     "test_lsp_transcript.TestLspSessionTranscript.test_generator_recompute_equals_on_disk_fixture": 0.3,
     "test_lsp_transcript.TestLspSessionTranscript.test_lifecycle_and_dollar_edges_are_pinned": 0.0,
     "test_lsp_transcript.TestLspSessionTranscript.test_live_run_round_trips_through_client_frames": 0.29,
+    "test_maintainers_contract.MaintainersContractTest.test_contract_catches_broken_maintainers": 0.01,
+    "test_maintainers_contract.MaintainersContractTest.test_execution_subject_is_single_sourced": 0.0,
+    "test_maintainers_contract.MaintainersContractTest.test_links_resolve": 0.0,
+    "test_maintainers_contract.MaintainersContractTest.test_maintainers_matches_contract": 0.0,
     "test_market_analyzer.ConflictsTest.test_conflict_detected_when_intersection": 0.0,
     "test_market_analyzer.ConflictsTest.test_lightmix_no_conflict_with_sources": 0.0,
     "test_market_analyzer.DependenciesTest.test_cycle_detected": 0.0,
@@ -4685,5 +4690,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1818.1
+  "total_s": 1818.2
 }
