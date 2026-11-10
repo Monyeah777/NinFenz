@@ -364,6 +364,7 @@
     "test_subcheck_cache": 0.3,
     "test_suite_isolation": 0.2,
     "test_suite_wiring": 0.8,
+    "test_support_contract": 0.2,
     "test_telemetry_semconv": 0.1,
     "test_terminal": 9.4,
     "test_text_hygiene": 8.1,
@@ -4229,6 +4230,12 @@
     "test_suite_wiring.SuiteWiringRuleTest.test_predicate_flags_unwired_and_spares_wired": 0.0,
     "test_suite_wiring.SuiteWiringTest.test_external_registry_is_not_stale": 0.35,
     "test_suite_wiring.SuiteWiringTest.test_no_suite_is_left_unwired": 0.35,
+    "test_support_contract.SupportContractTest.test_backtick_paths_resolve": 0.0,
+    "test_support_contract.SupportContractTest.test_contract_catches_broken_support": 0.03,
+    "test_support_contract.SupportContractTest.test_markdown_links_resolve": 0.0,
+    "test_support_contract.SupportContractTest.test_private_channel_is_direct": 0.0,
+    "test_support_contract.SupportContractTest.test_self_check_matches_bug_form": 0.01,
+    "test_support_contract.SupportContractTest.test_support_matches_contract": 0.0,
     "test_telemetry_semconv.StrictOtlpIdsTest.test_ids_are_fixed_length_hex": 0.0,
     "test_telemetry_semconv.StrictOtlpIdsTest.test_status_is_tristate": 0.0,
     "test_telemetry_semconv.TestTelemetrySemconv.test_attributes_carry_semconv_names": 0.0,
@@ -4668,5 +4675,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1817.6
+  "total_s": 1817.8
 }
