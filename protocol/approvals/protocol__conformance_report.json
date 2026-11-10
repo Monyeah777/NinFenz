@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-11-11",
   "approved_by": "Monyeah777",
-  "note": "release-gate 发布闸门 fail-closed（永不取消 / coverage≥80 / 证据 30 天）；判据 4 项含变异自证。",
+  "note": "npm-publish 双通道契约（最小权限 / 永不取消 / 版本对齐 / 幂等 / 证据 30 天）；判据 4 项含变异自证。",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "5f057290d1d28051bc0dc492a15cc4533485ae5d788db80889beda4caeea76f5"

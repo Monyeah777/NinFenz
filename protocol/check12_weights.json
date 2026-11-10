@@ -253,6 +253,7 @@
     "test_nfal_cli": 0.3,
     "test_nfal_rules": 0.2,
     "test_npm_package": 22.1,
+    "test_npm_publish_workflow_contract": 0.2,
     "test_numeric_grounding": 0.1,
     "test_official_core": 0.2,
     "test_orchestrate_cli": 0.8,
@@ -3260,6 +3261,10 @@
     "test_npm_package.PublishingProvenanceGateTest.test_stager_guards_dirty_tree_and_readme": 0.0,
     "test_npm_package.PublishingProvenanceGateTest.test_tarball_matches_payload_manifest": 8.03,
     "test_npm_package.PublishingProvenanceGateTest.test_verifier_checks_head_freshness": 0.0,
+    "test_npm_publish_workflow_contract.NpmPublishWorkflowContractTest.test_contract_catches_broken_workflow": 0.03,
+    "test_npm_publish_workflow_contract.NpmPublishWorkflowContractTest.test_permissions_are_minimal_per_job": 0.01,
+    "test_npm_publish_workflow_contract.NpmPublishWorkflowContractTest.test_sources_exist": 0.01,
+    "test_npm_publish_workflow_contract.NpmPublishWorkflowContractTest.test_workflow_matches_contract": 0.01,
     "test_numeric_grounding.Test.test_grounded": 0.0,
     "test_numeric_grounding.Test.test_ungrounded_flagged": 0.0,
     "test_official_core.OfficialCoreTest.test_missing_m90_would_be_caught": 0.0,
@@ -4767,5 +4772,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1823.6
+  "total_s": 1823.8
 }
