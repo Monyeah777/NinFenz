@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1064
+    "verify": 1065
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7757,6 +7757,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "codeql 契约判据：最小权限、同版本固定、路径过滤、双语言矩阵、SARIF 不互覆（2026-11-11）。",
+      "path": "desktop/tests/test_codeql_workflow_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "cog 机器面真跑覆盖（每张 --json 面都点名，防「跳过=没人管」）。",
       "path": "desktop/tests/test_cog_cli_faces.py",
       "role": "verify",
@@ -12768,7 +12774,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "29b0b942a7739f4f0c33ff1adc1d6f784560106b6137c2539b0a68035a040708",
+  "root_digest": "f0f4de00a145d03da48b940fe1d058c48e5271359c712e1b4bb6467930e352fb",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12777,7 +12783,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 938,
+    "R-verify": 939,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

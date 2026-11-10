@@ -70,6 +70,7 @@
     "test_coc_contract": 0.1,
     "test_code_metrics": 1.2,
     "test_codeowners_contract": 0.4,
+    "test_codeql_workflow_contract": 0.2,
     "test_cog_cli_faces": 16.1,
     "test_cognition": 0.2,
     "test_cognition_bridge": 2.2,
@@ -1082,6 +1083,10 @@
     "test_codeowners_contract.CodeownersContractTest.test_critical_surfaces_are_explicit": 0.05,
     "test_codeowners_contract.CodeownersContractTest.test_no_dead_rules": 0.06,
     "test_codeowners_contract.CodeownersContractTest.test_owner_matches_maintainers": 0.04,
+    "test_codeql_workflow_contract.CodeqlWorkflowContractTest.test_actions_are_same_pinned_version": 0.02,
+    "test_codeql_workflow_contract.CodeqlWorkflowContractTest.test_contract_catches_broken_workflow": 0.0,
+    "test_codeql_workflow_contract.CodeqlWorkflowContractTest.test_pr_paths_cover_public_surfaces": 0.0,
+    "test_codeql_workflow_contract.CodeqlWorkflowContractTest.test_workflow_matches_contract": 0.0,
     "test_cog_cli_faces.CogFacesTest.test_begin_face": 0.8,
     "test_cog_cli_faces.CogFacesTest.test_bridge_apply_face": 1.55,
     "test_cog_cli_faces.CogFacesTest.test_bridge_commit_face": 0.76,
@@ -4772,5 +4777,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1823.8
+  "total_s": 1824.0
 }
