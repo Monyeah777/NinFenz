@@ -113,5 +113,10 @@
   ],
   "runnable": [
     "python scripts/sbom.py --check"
-  ]
+  ],
+  "judges": {
+    "pinning": "desktop/tests/test_ci_supply_chain.py",
+    "reproducibility": "desktop/tests/test_sbom.py",
+    "provenance": "desktop/tests/test_sbom.py"
+  }
 }

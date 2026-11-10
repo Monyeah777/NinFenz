@@ -13,8 +13,12 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:22e24633e87e95453d0c2cf4a595d0496bae5d7331c1fc644d5b1555e4925a41
-  - protocol/code_metrics_baseline.json:3bf3a34bf609802f2afd4655a01eeabc17434855b5247b6e0ec82324b9af88e8
+  - protocol/code_metrics_baseline.json:bf844a5156d111459462784989f5e7efea48ec5e51fa1957356be7fa8afc59e1
 ---
+> 重审（2026-11-10）：度量基线重冻后重绑
+
+> 重审（2026-11-10）：论文台账系统化 + 方法包深度判据
+
 > 重审（2026-11-10）：冻结链
 
 > 重审（2026-11-09）：冻结链

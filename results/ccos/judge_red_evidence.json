@@ -1005,12 +1005,20 @@
       "source": "naming"
     },
     {
+      "module": "test_pack_depth.py",
+      "source": "naming"
+    },
+    {
       "module": "test_pack_runnable_runs.py",
       "source": "none"
     },
     {
       "module": "test_package_index.py",
       "source": "none"
+    },
+    {
+      "module": "test_paper_ledger.py",
+      "source": "naming"
     },
     {
       "module": "test_path_flag_ratchet.py",
@@ -1573,10 +1581,10 @@
       "source": "naming"
     }
   ],
-  "modules": 393,
+  "modules": 395,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
-  "suspect": 152,
+  "suspect": 154,
   "with_evidence": 100,
   "without_evidence": 141
 }

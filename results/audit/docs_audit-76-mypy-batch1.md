@@ -9,8 +9,12 @@ subjects:
   - desktop/src/core/io_types.py:09296daf865db85bda582fb646cece708c51f97e190a9e91c0eecd07252475f7
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
   - desktop/src/core/knowledge.py:d0b678c0f1176ce6f16a33b6f6d42a16b663099b4346306fae1ea547305e316b
-  - protocol/code_metrics_baseline.json:3bf3a34bf609802f2afd4655a01eeabc17434855b5247b6e0ec82324b9af88e8
+  - protocol/code_metrics_baseline.json:bf844a5156d111459462784989f5e7efea48ec5e51fa1957356be7fa8afc59e1
 ---
+> 重审（2026-11-10）：度量基线重冻后重绑
+
+> 重审（2026-11-10）：论文台账系统化 + 方法包深度判据
+
 > 重审（2026-11-10）：冻结链
 
 > 重审（2026-11-09）：冻结链

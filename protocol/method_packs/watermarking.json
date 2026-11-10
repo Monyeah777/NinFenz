@@ -120,5 +120,10 @@
   "runnable": [
     "nf sig",
     "nf attest"
-  ]
+  ],
+  "judges": {
+    "robustness": "desktop/tests/test_watermark_bench.py",
+    "capacity": "desktop/tests/test_label_carrier.py",
+    "detectability": "desktop/tests/test_watermark_dct_probe.py"
+  }
 }

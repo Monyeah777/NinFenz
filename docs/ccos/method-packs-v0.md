@@ -23,6 +23,21 @@
 | `supply-chain` | 交付物从哪来（钉定/可复现/溯源） | 6 | pinning / reproducibility / provenance | `python scripts/sbom.py --check` |
 | `operations` | 坏了能不能知道（目标/信号/告警） | 6 | slo / error-budget / incident-review | `python scripts/perf_budget.py --list`（只读列举；缺省模式会实测，8 片并发下会假红） |
 
+## 深度：每个证据类目都有判据在看（2026-11-10）
+
+「11 域 / 65 动作 / 31 类目」只证明清单够宽。**深度**在这里是可核的：
+每个 `claim_kind` 必须在包的 `judges` 里指向一个**真实存在**的判据模块。
+
+已落地的类目→判据映射（节选，全量见各包 `judges` 字段）：
+
+- `watermarking`：robustness → watermark_bench 判据；capacity → label_carrier 判据；detectability → dct_probe 判据；
+- `supply-chain`：pinning → ci_supply_chain 判据；reproducibility / provenance → sbom 判据；
+- `evidence-audit`：closure → evidence_vectors 判据；verification → evidence 判据；
+- `prompt-injection-defense`：defense-efficacy → check_policy 判据；audit-trail → audit_rebind 判据；least-privilege → purity_scan 判据。
+
+当前覆盖：**11/11 域、31/31 证据类目都有判据面**（判据：`desktop/tests/test_pack_depth.py`，4 项，含三种坏件的变异自证）。
+规模下限写进同一判据：每域 ≥5 动作、≥2 证据类目、≥3 常见失败、≥1 可跑入口——防止用空壳包凑域数。
+
 ## 四种用法
 
 1. **看**：`nf cognition --packs-list` 列出域与摘要；

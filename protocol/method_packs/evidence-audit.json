@@ -103,5 +103,9 @@
   ],
   "runnable": [
     "nf evidence verify"
-  ]
+  ],
+  "judges": {
+    "closure": "desktop/tests/test_evidence_vectors.py",
+    "verification": "desktop/tests/test_evidence.py"
+  }
 }

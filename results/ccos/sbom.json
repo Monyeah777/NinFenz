@@ -1,7 +1,7 @@
 {
-  "bytes": 12013781,
-  "count": 569,
-  "digest": "458ba29e93bd3c3ac517f5219046772ee2c1f095b50f12d3b48f22e7e60edda7",
+  "bytes": 12051297,
+  "count": 572,
+  "digest": "3b19a38daaf326cfaafd7917092298a2d366400cfae235bd76a6be3fb4f4808b",
   "materials": [
     {
       "bytes": 102,
@@ -1854,9 +1854,9 @@
       "sha256": "a2d0a5e330c2ce760fec005b66b1a20631e66b4f5d9f5464df6610587e8c5c28"
     },
     {
-      "bytes": 3614,
+      "bytes": 4749,
       "path": "docs/ccos/method-packs-v0.md",
-      "sha256": "295e4f9dbc7d3fa6767e2d4c7fa9adce0edee0b96d9a05c5a811acfaf07313d2"
+      "sha256": "22865b91bbda4f76ccd37027c73a1b3711c032502bc099e4824fe82d0d62e7bc"
     },
     {
       "bytes": 1261,
@@ -1864,14 +1864,19 @@
       "sha256": "06cbbb34b66d8bf3ec7fdf16737543e5224abfb297137b82f8b5adc13e9b154f"
     },
     {
+      "bytes": 1881,
+      "path": "docs/ccos/paper-adoption-v0.md",
+      "sha256": "aab816fe4dd4816865a77f77bda1424339596f95e7305e19a0c4cf7a13256723"
+    },
+    {
       "bytes": 13537,
       "path": "docs/ccos/release-conclusion.md",
       "sha256": "8af68e9e0c617bd5606092f43080014982e48398eb35751592da4d1a1e8e0cd1"
     },
     {
-      "bytes": 3847,
+      "bytes": 3945,
       "path": "docs/ccos/research-methods-v0.md",
-      "sha256": "214e398a2bc074e1184306e91b9adf3e032f3d87853182839fea0e141f2ee013"
+      "sha256": "5c3be9449cf3b5d2c40e2eead4b194757cdebbe2d1319a4566fb902daf9653b8"
     },
     {
       "bytes": 10455,
@@ -1901,7 +1906,7 @@
     {
       "bytes": 79590,
       "path": "protocol/RECEIPTS.json",
-      "sha256": "f6195e17e0fa851d808485064fad98c4750a0655197ac479e29e824bf2453b02"
+      "sha256": "2878baace2e7c835c3f5c506c328893b79c645b4570d3bbef47f9aa10f958abf"
     },
     {
       "bytes": 3468,
@@ -1911,7 +1916,7 @@
     {
       "bytes": 263,
       "path": "protocol/approvals/protocol__conformance_report.json",
-      "sha256": "5452f3be13992c250db46c63ddb99b9e9672365114afd92f4e0ec3986d8e391a"
+      "sha256": "f8b868bbb7d86f093ec850531a7f35b09545ed7dcfc8d69f0e545ad7019f184d"
     },
     {
       "bytes": 16375,
@@ -1954,9 +1959,9 @@
       "sha256": "c2402950e34e3ff9bd0f09171c8bee821bf0f57c33f32d0dbc4bb4b3e6157914"
     },
     {
-      "bytes": 365237,
+      "bytes": 366036,
       "path": "protocol/check12_weights.json",
-      "sha256": "43acc9bc96905f40b0de92393fa28816001a008de1c09f5fbbc792019cd3fbf5"
+      "sha256": "6934e78887a6d53ac20c31c334fb78f256370913063ba46bad08533b838e0100"
     },
     {
       "bytes": 16170,
@@ -1964,9 +1969,9 @@
       "sha256": "5545028d82662ee8f4f4051bdc14876b0357f0d9548963f3836f6f8f6d417285"
     },
     {
-      "bytes": 42424,
+      "bytes": 42532,
       "path": "protocol/code_metrics_baseline.json",
-      "sha256": "3bf3a34bf609802f2afd4655a01eeabc17434855b5247b6e0ec82324b9af88e8"
+      "sha256": "bf844a5156d111459462784989f5e7efea48ec5e51fa1957356be7fa8afc59e1"
     },
     {
       "bytes": 87117,
@@ -1981,7 +1986,7 @@
     {
       "bytes": 7260,
       "path": "protocol/conformance_report.json",
-      "sha256": "b7da9597d65049a188a629e092439512511653642286efc4ce21b4f4301abbf8"
+      "sha256": "5f057290d1d28051bc0dc492a15cc4533485ae5d788db80889beda4caeea76f5"
     },
     {
       "bytes": 22174,
@@ -2096,7 +2101,7 @@
     {
       "bytes": 27560,
       "path": "protocol/generated/receipt_chain.json",
-      "sha256": "d26339f7754818f0a85b0eb405aae893a5b6a119838614d74c7c6b6cdfb24c99"
+      "sha256": "f106dc770dccbb46eb211373a5fe3a4dcaf4179abd98d840a7d46262ec33e2a2"
     },
     {
       "bytes": 918,
@@ -2214,24 +2219,24 @@
       "sha256": "db80976e922b08cc9becac78512326ec49ee02795a6274ae20c84c9ad3d00887"
     },
     {
-      "bytes": 4606,
+      "bytes": 4775,
       "path": "protocol/method_packs/data-provenance.json",
-      "sha256": "ec16615847c1c32263864d6ec9f4977bf5c028e133e9f4f13277de435db1ef6d"
+      "sha256": "7ab06924ad7cd1b62b252354fce986f19809f4a11c189f7bdd056247df5af6c3"
     },
     {
-      "bytes": 5302,
+      "bytes": 5479,
       "path": "protocol/method_packs/evaluation-design.json",
-      "sha256": "7fd5f1f697794ade4d185e73a5621b130e58af09d74f9cd1ac6764346395f111"
+      "sha256": "a23061254707ad34ced6104cd677c197795a704ad5cf109eae91b3888984f1e6"
     },
     {
-      "bytes": 3092,
+      "bytes": 3221,
       "path": "protocol/method_packs/evidence-audit.json",
-      "sha256": "1884190112eb904e7ccfc7e4cdcd2d3656ceab39da244fc997c3f9b3a1c65442"
+      "sha256": "857f9354ab835a8c676eba115fe1a2f33d12f4853f51854be738d1082a8a9214"
     },
     {
-      "bytes": 3978,
+      "bytes": 4174,
       "path": "protocol/method_packs/handoff.json",
-      "sha256": "d004fd2c74a66076bfa8d0958fd21c7cb3d1435898fa6d0a3e04896a667d2d55"
+      "sha256": "abf32b8492d5de9e5d5406c5a78d6931e39f4859dee47fb851bb1b73019c8c27"
     },
     {
       "bytes": 1633,
@@ -2239,39 +2244,39 @@
       "sha256": "5b3795eeda171f37cf5c1bb41db7b73906f90c53845efc56d8c321d70ec526b8"
     },
     {
-      "bytes": 3300,
+      "bytes": 3444,
       "path": "protocol/method_packs/metacognition.json",
-      "sha256": "d3816eb9f36b94705752464fa175109c4c3f96aa7274b90e1cb2ba37c6564711"
+      "sha256": "298b51eaa27610a5e1f0ef1e84dec26a1b71a5aae22079c19b633899bf3192a8"
     },
     {
-      "bytes": 3957,
+      "bytes": 4134,
       "path": "protocol/method_packs/operations.json",
-      "sha256": "34262b76e462ede19d4528c29a8fb9e708ad87a7b75ab149e950d169b1bba4f9"
+      "sha256": "2fa149e345caa6fe11201ddadc16b3d7d44fdea8e901a9de717523f71c36b77d"
     },
     {
-      "bytes": 4097,
+      "bytes": 4281,
       "path": "protocol/method_packs/privacy.json",
-      "sha256": "27308c04a82fc21293cb4a3040cfab87067e0f293ac8520ea7b179ce90184a74"
+      "sha256": "daa92086945b6f4a89d35d5d4df4d0eb59c1c8a81b5822d07178355952aef37e"
     },
     {
-      "bytes": 5190,
+      "bytes": 5387,
       "path": "protocol/method_packs/prompt-injection-defense.json",
-      "sha256": "1bb5e364acb90bc2aa9b00764909da233b2dc8fb903e0875675ed1665e52cc62"
+      "sha256": "6c69a68a66977f903753baf2bd9feefe0fe5738a13c6bfd9a42bb8236395136f"
     },
     {
-      "bytes": 4045,
+      "bytes": 4222,
       "path": "protocol/method_packs/resilience.json",
-      "sha256": "6a6a8293007b9da91e7cf640da99c6ea0cdb22c0887233d698af7a878b5f8e4d"
+      "sha256": "d0497b6a81873cfe18a3e5b14a7656f1405e9ffcc04b478ba4063d65a2c2571a"
     },
     {
-      "bytes": 4147,
+      "bytes": 4322,
       "path": "protocol/method_packs/supply-chain.json",
-      "sha256": "74b6ace1ac145d15e87d1990967dabe01ee56538311d5629b30cfafca01a1e52"
+      "sha256": "e38ffb221c747acb4386ad1ee2b90e1527fd1cb49abdb849b4b77b49ff2e3548"
     },
     {
-      "bytes": 4091,
+      "bytes": 4289,
       "path": "protocol/method_packs/watermarking.json",
-      "sha256": "977ed9c42ccc4dbb9e6cbe718d2d7bed6f52b3bdde375f7464febde17461c9a2"
+      "sha256": "bd0d48151fb2fc9be216d20280e43293384e0dff86c8a607dfcd43342a63e4d9"
     },
     {
       "bytes": 54934,
@@ -2292,6 +2297,11 @@
       "bytes": 17210,
       "path": "protocol/output_forms_baseline.json",
       "sha256": "f6884cf76f0c680221f4bf7d7ef5165d95d0bacbde933d6572a319a710a42242"
+    },
+    {
+      "bytes": 25901,
+      "path": "protocol/paper_ledger.json",
+      "sha256": "91e848a7b497664af5f6f8d2554c40e7bce791c45ffb187428807471fec53733"
     },
     {
       "bytes": 254,
@@ -2344,9 +2354,9 @@
       "sha256": "87de7ac68f9846b333323efecdbb7555adf24215ae8145d573fe8d0688b8e86d"
     },
     {
-      "bytes": 456666,
+      "bytes": 457463,
       "path": "protocol/role_coordinates.json",
-      "sha256": "038ba6f9ae2ad900f79ea54dacccaf5ac1ccad455ed802a973e919abe67d2de1"
+      "sha256": "afb12a3280de3e9a9739653b723cf8bd35a75ddf61c8f27b2ce6f39b2ff3cd8a"
     },
     {
       "bytes": 9391,
@@ -2446,7 +2456,7 @@
     {
       "bytes": 13119,
       "path": "protocol/verification_report.json",
-      "sha256": "93a0e485f8523404592f0cb25cacc0d103772f0b11c1a813336d0b9d2a4ac5fe"
+      "sha256": "0e9c7ae13e7887c922f31bdd909a24852abb06691b086c26cb6004d38d809c35"
     },
     {
       "bytes": 4160,
@@ -2687,6 +2697,11 @@
       "bytes": 3453,
       "path": "scripts/orchestrate.py",
       "sha256": "141d5076832ff2876a0ac6ff0623b6f16b27859ef4d433e14fa5cf777919a5ef"
+    },
+    {
+      "bytes": 4874,
+      "path": "scripts/paper_ledger.py",
+      "sha256": "c81f907d064669c014b69bd695f74227c6262f4f05c2b16028178aa86e4bfbe1"
     },
     {
       "bytes": 5356,

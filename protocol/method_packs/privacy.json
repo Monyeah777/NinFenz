@@ -114,5 +114,10 @@
   "runnable": [
     "nf doctor",
     "nf evidence verify"
-  ]
+  ],
+  "judges": {
+    "data-minimization": "desktop/tests/test_purity_scan.py",
+    "retention": "desktop/tests/test_evidence.py",
+    "consent": "desktop/tests/test_check_policy.py"
+  }
 }

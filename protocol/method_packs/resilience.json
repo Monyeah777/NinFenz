@@ -114,5 +114,10 @@
   "runnable": [
     "nf doctor",
     "nf audit"
-  ]
+  ],
+  "judges": {
+    "blast-radius": "desktop/tests/test_paths.py",
+    "drill": "desktop/tests/test_execution_drill.py",
+    "recoverability": "desktop/tests/test_daemon.py"
+  }
 }

@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1465,
+    "app": 1466,
     "entry": 26,
     "floor": 5,
     "prod": 1057,
     "projection": 163,
-    "support": 446,
-    "verify": 1040
+    "support": 447,
+    "verify": 1043
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8849,6 +8849,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "方法包深度判据：每个证据类目都必须有真实判据面（第 2026-11-10 批）。",
+      "path": "desktop/tests/test_pack_depth.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "包的可跑入口必须真能跑（第 160 轮）：把「声明」推进到「可执行验证」。",
       "path": "desktop/tests/test_pack_runnable_runs.py",
       "role": "verify",
@@ -8857,6 +8863,12 @@
     {
       "function": "包管理器核心解析面（core/package_index.py）回归测试 —— 按品类取件 / 解析 / 检索。",
       "path": "desktop/tests/test_package_index.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "论文台账判据（第 2026-11-10 批）：处置完整、落点可核、计数自洽。",
+      "path": "desktop/tests/test_paper_ledger.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -12359,6 +12371,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "论文筛选台账：每篇必备处置与理由；adopted 必须有仓内落点与证据面（逐条核存在性）。来源为本仓内部档案 paper-screening，只记已读到的机制，不引二手数字。",
+      "path": "protocol/paper_ledger.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "路径迁移映射 old→new（机制借鉴 eunomia-bpf docs/MOVED.md；消费方 core/path_moved.py）。library/llms.txt/site 等直链面改路径时必须登记，防外部引用断裂。",
       "path": "protocol/path_moved.json",
       "role": "verify",
@@ -12624,16 +12642,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "0615d6849d28db6edface68bbb5c0e292363a5ee4493ef3d9ab45e13f12d8b04",
+  "root_digest": "8fd26841db8123072870d1900327eacd084e6f1a8de587f3b197a79d78b88df0",
   "rule_counts": {
-    "R-app": 1465,
-    "R-catch": 295,
+    "R-app": 1466,
+    "R-catch": 296,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 123,
-    "R-verify": 914,
+    "R-verify": 917,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

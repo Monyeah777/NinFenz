@@ -1,5 +1,5 @@
 {
-  "digest": "5211c71cff68c0c3dc6715860df36ae4717a048f50337c52b09b65c4d945b5ec",
+  "digest": "ece22f2bfd914a2b75534bde1e36905a43773bc867c9fb73502a4ce19fdb2929",
   "entries": [
     {
       "doc": "其余 ABI 调用的判定向量：cc_label（IR 校验）→ 期望结论（跨语言可复核）。",
@@ -878,6 +878,17 @@
       "subcommands": []
     },
     {
+      "doc": "论文筛选台账（nf-paper-ledger/1）：--write 重写规范形，--check 核存在性与计数。",
+      "flags": [
+        "--check",
+        "--json",
+        "--stats",
+        "--write"
+      ],
+      "path": "scripts/paper_ledger.py",
+      "subcommands": []
+    },
+    {
       "doc": "性能预算（CLI）：声明 → 实测 N 次 → 落证据 → 判新鲜度与预算。",
       "flags": [
         "--list",
@@ -1227,8 +1238,8 @@
       "subcommands": []
     }
   ],
-  "flags": 525,
+  "flags": 529,
   "note": "静态接口面（docs/flags/subcommands），不含缺省行为语义",
   "schema": "nf-capability-inventory/1",
-  "scripts": 78
+  "scripts": 79
 }

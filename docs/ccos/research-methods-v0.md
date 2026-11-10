@@ -10,6 +10,7 @@
 - 判据族谱（八族检查对象与失效方式）：[judge-families.md](judge-families.md)
 - 判据设计十一问（写新判据前过一遍）：[judge-design-questions.md](judge-design-questions.md)
 - 一次性审计脚本清单：[one-shot-audits.md](one-shot-audits.md)
+- 论文筛选台账（34 篇的处置与落点）：[paper-adoption-v0.md](paper-adoption-v0.md)
 
 ## 解决什么
 

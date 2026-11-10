@@ -133,5 +133,10 @@
   "runnable": [
     "nf stats",
     "nf bench run"
-  ]
+  ],
+  "judges": {
+    "efficacy": "desktop/tests/test_release_conclusion.py",
+    "cost": "desktop/tests/test_perf_budget.py",
+    "reliability": "desktop/tests/test_watch.py"
+  }
 }
