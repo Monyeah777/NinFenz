@@ -102,6 +102,7 @@
     "test_declined_ledger": 0.1,
     "test_delete_evidence": 0.2,
     "test_dep_closure": 0.2,
+    "test_dependabot_contract": 0.3,
     "test_dirty_tree": 0.2,
     "test_disk_cache": 0.4,
     "test_disk_cache_bounds": 0.2,
@@ -1548,6 +1549,10 @@
     "test_dep_closure.Test.test_allowed_closure_is_clean": 0.0,
     "test_dep_closure.Test.test_offender_is_transitive": 0.0,
     "test_dep_closure.Test.test_transitive_closure": 0.0,
+    "test_dependabot_contract.DependabotContractTest.test_all_pinned_surfaces_are_covered": 0.07,
+    "test_dependabot_contract.DependabotContractTest.test_config_matches_contract": 0.05,
+    "test_dependabot_contract.DependabotContractTest.test_contract_catches_broken_config": 0.05,
+    "test_dependabot_contract.DependabotContractTest.test_groups_never_swallow_major": 0.01,
     "test_dirty_tree.Test.test_missing_head": 0.0,
     "test_dirty_tree.Test.test_validate": 0.0,
     "test_disk_cache.CacheRootC1Test.test_default_root_is_user_level_not_in_repo": 0.02,
@@ -4740,5 +4745,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1822.5
+  "total_s": 1822.8
 }

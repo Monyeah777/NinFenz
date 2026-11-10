@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1058
+    "verify": 1059
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7949,6 +7949,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "Dependabot 契约判据：仓库里每一处版本固定都必须有跟进面（2026-11-11）。",
+      "path": "desktop/tests/test_dependabot_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "",
       "path": "desktop/tests/test_dirty_tree.py",
       "role": "verify",
@@ -12732,7 +12738,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "df5ab8c42ce478dab1835593c1c363189e579f42c08a79e927da14490015dd62",
+  "root_digest": "91686bd99636f98953fe3f902fe0b09d3d45f102dae926d823fbdc9e7d3d6b05",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12741,7 +12747,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 932,
+    "R-verify": 933,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

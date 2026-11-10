@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:506464836e48a43138ed3f61b50d19e6deea92ae7daf489906725113d1aae16d
+  - protocol/check12_weights.json:488129121418345e14b06de7b8f2e08d2fc6867e9c728991b398f527713043cc
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-11）：dependabot 覆盖补齐：新增 pyproject extras 镜像（pip /）、Rust 引擎 5 个 crate（含 wasm 组件的 wit-bindgen）、容器 digest 3 处 docker 面；分组纪律（major 不分组）与 license/标签/前缀纳入契约；新增 test_dependabot_contract（4 项，含删面/非法节奏/不存在目录/major 入组/重复面变异自证）。本轮为机械重绑。
+
 > 重审（2026-11-11）：CODEOWNERS 顶尖化：承重面显式归人（协议件/门禁本体/判据/治理件/核心库/CI/投稿面/分发站点）、catch-all 置首、owner 与 MAINTAINERS 同源；新增 test_codeowners_contract（5 项：死规则/承重面覆盖/owner 同源/顺序/变异自证）。本轮为机械重绑。
 
 > 重审（2026-11-11）：STRATEGY 可核化：新增 test_strategy_contract（5 项：五段/政策内核/五维在场 + 内部链四载体在场 + 发布边界事实（根层无方案文档、agent 入口在场）+ 引用可解析 + 变异自证）。STRATEGY 本体零改动（作者政策面），本轮只做可核化。
