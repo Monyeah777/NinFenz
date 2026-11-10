@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1061
+    "verify": 1062
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8633,6 +8633,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "lint 契约判据：required check 名稳定、棘轮 fail-closed、规则集与 ruff.toml 同源（2026-11-11）。",
+      "path": "desktop/tests/test_lint_workflow_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "活文档不得钉运行时计数（check 数 / PASS 数）——「内外口径统一」的可核判据。",
       "path": "desktop/tests/test_live_doc_counts.py",
       "role": "verify",
@@ -12750,7 +12756,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "eabe11c01cab8de1076b0d4970d0692f80c05640796737f5e91427cc4a73a809",
+  "root_digest": "7d0ecfee71047a4480bf81e9de926e6b7422595ef2d42aaf55337909033c9072",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12759,7 +12765,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 935,
+    "R-verify": 936,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

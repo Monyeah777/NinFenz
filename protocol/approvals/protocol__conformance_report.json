@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-11-11",
   "approved_by": "Monyeah777",
-  "note": "sast 工作流契约（fail-closed 棘轮 / 触发限 main / 工件保留）+ SECURITY 扫描面口径同源；判据 5 项含变异自证。",
+  "note": "lint 工作流契约（required 名稳定 / fail-closed 棘轮 / 与 ruff.toml+style_check 同源）+ 小硬化；判据 5 项含变异自证。",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "5f057290d1d28051bc0dc492a15cc4533485ae5d788db80889beda4caeea76f5"
