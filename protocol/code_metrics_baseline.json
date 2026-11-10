@@ -1680,6 +1680,11 @@
       "max_fn_cc": 11,
       "max_fn_lines": 30
     },
+    "scripts/paper_ledger.py": {
+      "lines": 124,
+      "max_fn_cc": 25,
+      "max_fn_lines": 43
+    },
     "scripts/perf_budget.py": {
       "lines": 128,
       "max_fn_cc": 23,

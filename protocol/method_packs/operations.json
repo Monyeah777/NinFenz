@@ -113,5 +113,10 @@
   ],
   "runnable": [
     "python scripts/perf_budget.py --list"
-  ]
+  ],
+  "judges": {
+    "slo": "desktop/tests/test_perf_budget.py",
+    "error-budget": "desktop/tests/test_perf_budget.py",
+    "incident-review": "desktop/tests/test_audit.py"
+  }
 }
