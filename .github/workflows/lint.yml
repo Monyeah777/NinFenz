@@ -4,8 +4,9 @@ name: lint
 on:
   push:
     branches: [main]
-  # D2 同源（2026-10-10 审计）：风格门也要管未合并 PR。
+  # D2 同源（2026-10-10 审计）：风格门也要管未合并 PR；限目标 main（其余分支不消耗 runner）。
   pull_request:
+    branches: [main]
   workflow_dispatch:
 
 concurrency:
@@ -31,8 +32,8 @@ jobs:
           python-version: '3.11'
       - name: 安装 ruff
         run: pip install --require-hashes -r .github/requirements-lint.txt  # 版本固定见该文件（F-05）
-      - name: ruff 语法级静态检查（ruff.toml：E9/F63/F7/F82）
-        run: ruff check desktop/src scripts
+      - name: ruff 语法级静态检查（ruff.toml：E9/F63/F7/F82；github 输出=行内注释）
+        run: ruff check --output-format=github desktop/src scripts
 
   style-ratchet:
     name: ruff-style-ratchet
@@ -49,6 +50,9 @@ jobs:
           python-version: '3.11'
       - name: 安装 ruff
         run: pip install --require-hashes -r .github/requirements-lint.txt  # 版本固定见该文件（F-05）
+      - name: 风格计数快照（诊断用；**判定**由下一步棘轮执行，此处吞错只为留存计数）
+        run: |
+          python scripts/style_check.py --json > style-counts.json || true
       - name: 风格棘轮（Z2：规则集 E,W,F,B,UP,I,C4,SIM,RET，只拦新增；存量按基线冻结）
         run: python scripts/style_check.py
 
@@ -62,4 +66,6 @@ jobs:
             .nf-logs/
             .artifacts/
             *.log
+            style-counts.json
           if-no-files-found: ignore
+          retention-days: 7    # 排障工件，7 天回收（存储卫生）
