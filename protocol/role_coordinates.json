@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1056
+    "verify": 1057
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9527,6 +9527,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "STRATEGY 契约判据：方向层文件必须「条款可核、内部链在场、发布边界与仓库一致」（2026-11-11）。",
+      "path": "desktop/tests/test_strategy_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "",
       "path": "desktop/tests/test_strict_schema.py",
       "role": "verify",
@@ -12720,7 +12726,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "08c4c792dccb8c69da553acae3b178025ac7922fce45667276f4b2b428cdb53d",
+  "root_digest": "b0029f1dd41e1a9c7c49c7bfb7f26b0a833100e9d388da09b608e07a85db9a20",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12729,7 +12735,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 930,
+    "R-verify": 931,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
