@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1046
+    "verify": 1047
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9521,6 +9521,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "SUPPORT 契约判据：支持入口不得与表单 / 入口配置 / 声明件分叉（2026-11-10）。",
+      "path": "desktop/tests/test_support_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "遥测 semconv 映射单测（不改 trace 格式；只对齐属性命名与 OTLP 形状）。",
       "path": "desktop/tests/test_telemetry_semconv.py",
       "role": "verify",
@@ -12660,7 +12666,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "0e70efd4b30e551ad6a44b2f53e1ea60bc4dcf53bde22e369378ad204f57a359",
+  "root_digest": "eb6d0e067f0ded1fc7cf9ed9c49068f16db6464be60e1ff3bf03ab859a44efaa",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12669,7 +12675,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 920,
+    "R-verify": 921,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
