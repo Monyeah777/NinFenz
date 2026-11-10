@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-11-11",
   "approved_by": "Monyeah777",
-  "note": "AGENTS.md 可核化：退役事实修正 + 引用/事实对账判据 test_agents_contract 4 项。",
+  "note": "STRATEGY 可核化：内部链四载体 + 发布边界事实 + 引用可解析；判据 test_strategy_contract 5 项含变异自证；本体零改动。",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "5f057290d1d28051bc0dc492a15cc4533485ae5d788db80889beda4caeea76f5"
