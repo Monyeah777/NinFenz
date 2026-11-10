@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1060
+    "verify": 1061
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9371,6 +9371,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "sast 工作流契约判据：最小权限、固定工具、fail-closed 棘轮、面与脚本同源（2026-11-11）。",
+      "path": "desktop/tests/test_sast_workflow_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "材料清单判据（SBOM 式）：清单可重算、可核、篡改必红。",
       "path": "desktop/tests/test_sbom.py",
       "role": "verify",
@@ -12744,7 +12750,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "f77ef647c0e1d971ac6033558068cc1c65fae996b3c258bafe159bc52164f07f",
+  "root_digest": "eabe11c01cab8de1076b0d4970d0692f80c05640796737f5e91427cc4a73a809",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12753,7 +12759,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 934,
+    "R-verify": 935,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:e5173f964c2c56781c635a0ce5141b0d71133aca5d1e4c90d5c2cd56b4816c81
+  - protocol/check12_weights.json:bd76738fa1d136b72f680a3d70a9d7d26296d34975bb4c5b6b7e9e89a79d0861
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-11）：sast 工作流契约化：最小权限/并发取消/触发限 main/超时/工具 --require-hashes 固定/棘轮 fail-closed（禁 || true）/工件 always + 保留 7 天；SECURITY.md 的 SAST 行改为与脚本 SCAN_TARGETS 同源（去掉不存在的 sast-extra 与非阻塞声明）；新增 test_sast_workflow_contract（5 项，含写权限/PR 不设限/|| true/无保留期/扫描面缺 tui/基线缺平台段变异自证）。本轮为机械重绑。
+
 > 重审（2026-11-11）：ci-verify 主门禁契约化：顶层最小权限/并发取消/触发面限 main/每作业超时/32 片矩阵连续性/gate 对 needs 显式判红/工件 always 上传与 7 天保留；新增强化项（pull_request 限 main、工件 retention 7 天）；新增 test_ci_verify_contract（4 项，含写权限/去超时/gate 非 always/矩阵缺片/工件无保留期变异自证）。本轮为机械重绑。
 
 > 重审（2026-11-11）：dependabot 覆盖补齐：新增 pyproject extras 镜像（pip /）、Rust 引擎 5 个 crate（含 wasm 组件的 wit-bindgen）、容器 digest 3 处 docker 面；分组纪律（major 不分组）与 license/标签/前缀纳入契约；新增 test_dependabot_contract（4 项，含删面/非法节奏/不存在目录/major 入组/重复面变异自证）。本轮为机械重绑。

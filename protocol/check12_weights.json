@@ -339,6 +339,7 @@
     "test_rust_module_wiring": 5.3,
     "test_rust_pyext": 0.2,
     "test_sast_baseline": 6.2,
+    "test_sast_workflow_contract": 0.2,
     "test_sbom": 1.0,
     "test_scale_receipts": 2.0,
     "test_schema_lint": 1.1,
@@ -4060,6 +4061,11 @@
     "test_sast_baseline.RealRepoTest.test_baseline_committed_and_wellformed": 0.0,
     "test_sast_baseline.RealRepoTest.test_platform_section_is_what_scan_uses": 0.0,
     "test_sast_baseline.RealRepoTest.test_requirements_sast_is_pinned": 0.0,
+    "test_sast_workflow_contract.SastWorkflowContractTest.test_baseline_has_both_platforms": 0.02,
+    "test_sast_workflow_contract.SastWorkflowContractTest.test_contract_catches_broken_workflow": 0.0,
+    "test_sast_workflow_contract.SastWorkflowContractTest.test_scan_face_matches_script": 0.0,
+    "test_sast_workflow_contract.SastWorkflowContractTest.test_security_claim_is_current": 0.0,
+    "test_sast_workflow_contract.SastWorkflowContractTest.test_workflow_matches_contract": 0.0,
     "test_sbom.SbomTest.test_collect_is_deterministic": 0.21,
     "test_sbom.SbomTest.test_committed_manifest_is_fresh": 0.21,
     "test_sbom.SbomTest.test_empty_root_fails_closed": 0.0,
@@ -4750,5 +4756,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1823.0
+  "total_s": 1823.2
 }

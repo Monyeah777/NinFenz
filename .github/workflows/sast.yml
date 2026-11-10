@@ -5,12 +5,16 @@ name: sast
 # 而 SQL 拼接、弱随机、XXE、不含超时的请求等 AI 代码高频缺陷不在其中。本 job 跑
 # bandit + ruff `--select S`，并按 (工具,文件,规则) **计数棘轮**判：
 # 计数上升或出现新 (文件,规则) → 红；计数下降 → 提示重冻（债务只许减）。
+# 扫描面 = scripts/sast_check.py 的 SCAN_TARGETS（含 tui/ 与 packaging/，已并入同一棘轮），
+# 基线按 nt / posix 平台分段各自只许下降（缺段即红）。
+# 工作流口径由 desktop/tests/test_sast_workflow_contract.py 判据守住。
 #
 # PR 面（2026-11-09 补）：此前只在 main push 跑——PR 引入的新 SAST 违规要到**合并后**才暴露。
 # 本 job 实测 31–40 s（固定版本工具 + 棘轮），PR 面完全跑得起；仍非 required（不阻塞），
 # 但让安全违规在评审时就可见。
 on:
   pull_request:
+    branches: [main]   # 只对目标 main 的 PR 跑（其余分支不消耗 runner）
   push:
     branches: [main]
   workflow_dispatch:
@@ -64,3 +68,4 @@ jobs:
             *.log
             sast-counts.json
           if-no-files-found: ignore
+          retention-days: 7    # 排障工件，7 天回收（存储卫生）
