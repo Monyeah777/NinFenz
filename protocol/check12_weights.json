@@ -3499,7 +3499,7 @@
     "test_pipeline_loader.PipelineGuardTest.test_text_size_limit": 0.0,
     "test_pipeline_loader.PipelineGuardTest.test_tree_depth_limit": 0.0,
     "test_pipeline_loader.PipelineLoaderTest.test_bad_content_returns_none": 0.0,
-    "test_pipeline_loader.PipelineLoaderTest.test_discover_pipelines": 0.04,
+    "test_pipeline_loader.PipelineLoaderTest.test_discover_pipelines": 0.02,
     "test_pipeline_loader.PipelineLoaderTest.test_fallback_subset_parser": 0.0,
     "test_pipeline_loader.PipelineLoaderTest.test_fallback_used_when_yaml_missing": 0.0,
     "test_pipeline_loader.PipelineLoaderTest.test_load_all_repo_pipelines": 0.1,
