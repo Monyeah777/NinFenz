@@ -1,5 +1,5 @@
 {
-  "built_for_date": "2026-11-09",
+  "built_for_date": "2026-11-10",
   "declared": {
     "coverage_note": "判据级抽查面 31 条，各对应 verify.sh 的一道或多道门禁；≠ 声明 check 总数 42（两者不可互替）",
     "expected_checks": 42,
@@ -299,7 +299,7 @@
       "stats": {
         "contracts": 27,
         "passed": 27,
-        "root": "4f9d2e8b5287ad1fd2e899cef783fd779a374b520abdc684355475c31e37d3c9",
+        "root": "b2ef9b0b9bc4a0699b485e3ae49cd35e311e05b167d55f1158b9d494365615ef",
         "verdict": "conformant"
       },
       "status": "pass",
@@ -369,8 +369,8 @@
       "sample": [],
       "source": "code_metrics.scan",
       "stats": {
-        "baseline": 368,
-        "files": 368,
+        "baseline": 369,
+        "files": 369,
         "max_fn_cc": 132,
         "max_fn_lines": 443,
         "max_lines": 9863
@@ -526,8 +526,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4203,
-        "kernel": 2102,
+        "files": 4208,
+        "kernel": 2105,
         "kernel_no_self": 308,
         "rules": 9,
         "uncovered": 0,
@@ -538,7 +538,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "d56957605bda0a65bd7229584017a3d3e6f3cac96fb44f8905c2c9c891765fad",
+  "root_digest": "6bbf485c3c271e761820d2ff4bbb073cede49af0f96c272340cb4400d5d45c14",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
