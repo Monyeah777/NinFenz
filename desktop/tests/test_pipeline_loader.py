@@ -59,7 +59,15 @@ class PipelineLoaderTest(unittest.TestCase):
 
     def test_fallback_used_when_yaml_missing(self):
         import sys
+
+        from core import lazy_yaml
+
         saved = sys.modules.get("yaml", None)
+        # 关键：lazy_yaml 会把「导入失败」缓存成 (_TRIED=True, _YAML=None)。
+        # 只还原 sys.modules 不还原缓存，会让**同进程后续用例**永久看到「缺 PyYAML」
+        # （2026-11-11 实测：分片 12 的 world_model / quant 域包因此 setUpClass 报
+        # ClosureError；分片权重一变就复现——属测试隔离缺陷，不是产品缺陷）。
+        saved_state = (lazy_yaml._TRIED, lazy_yaml._YAML)
         sys.modules["yaml"] = None  # force ImportError inside loader
         try:
             md = ("# 管线 P99\n```yaml\nPipeline:\n  id: P99\n"
@@ -74,6 +82,7 @@ class PipelineLoaderTest(unittest.TestCase):
                 sys.modules.pop("yaml", None)
             else:
                 sys.modules["yaml"] = saved
+            lazy_yaml._TRIED, lazy_yaml._YAML = saved_state
 
     def test_parse_edges(self):
         self.assertIsNone(pl.parse_pipeline_md("no fence here"))

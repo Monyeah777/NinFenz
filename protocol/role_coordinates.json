@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1063
+    "verify": 1064
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8855,6 +8855,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "npm-publish 契约判据：两条发布通道须最小权限、版本对齐、幂等、证据留存（2026-11-11）。",
+      "path": "desktop/tests/test_npm_publish_workflow_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "",
       "path": "desktop/tests/test_numeric_grounding.py",
       "role": "verify",
@@ -12762,7 +12768,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "a9e317421a6c8f21eea8ef052ce7c1354259942a3036eab01255cc96058c497e",
+  "root_digest": "29b0b942a7739f4f0c33ff1adc1d6f784560106b6137c2539b0a68035a040708",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12771,7 +12777,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 937,
+    "R-verify": 938,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
