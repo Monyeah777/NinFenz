@@ -258,6 +258,7 @@
     "test_module_namespace": 2.2,
     "test_mvu_adapter": 0.7,
     "test_net_coverage": 0.1,
+    "test_net_probes_workflow_contract": 0.2,
     "test_new_faces": 1.1,
     "test_nf_cli": 13.9,
     "test_nf_language": 0.6,
@@ -3133,6 +3134,10 @@
     "test_net_coverage.NetCoverageAdjudicationTest.test_missing_truth_pointer_is_fail": 0.0,
     "test_net_coverage.NetCoverageAdjudicationTest.test_real_readme_is_consistent_with_truth_source": 0.0,
     "test_net_coverage.NetCoverageAdjudicationTest.test_stale_denominator_is_fail": 0.0,
+    "test_net_probes_workflow_contract.NetProbesWorkflowContractTest.test_contract_catches_broken_workflow": 0.01,
+    "test_net_probes_workflow_contract.NetProbesWorkflowContractTest.test_manual_only_and_non_blocking": 0.0,
+    "test_net_probes_workflow_contract.NetProbesWorkflowContractTest.test_snapshot_and_dual_rid": 0.0,
+    "test_net_probes_workflow_contract.NetProbesWorkflowContractTest.test_workflow_matches_contract": 0.0,
     "test_new_faces.TestAdvisoryReport.test_report_and_verify_roundtrip": 0.37,
     "test_new_faces.TestAdvisoryReport.test_verify_detects_missing_file": 0.0,
     "test_new_faces.TestFieldType.test_harvest_doc_picks_event_and_payload": 0.0,
@@ -4856,5 +4861,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1827.1
+  "total_s": 1827.3
 }

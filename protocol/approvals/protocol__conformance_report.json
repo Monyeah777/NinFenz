@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-11-11",
   "approved_by": "Monyeah777",
-  "note": "external-links 契约（非门禁 / 硬预算 / 工件只走副本）。",
+  "note": "net-probes 契约（仅手动 / 诊断信号 / 金标 fail-fast / 双 RID）。",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "5f057290d1d28051bc0dc492a15cc4533485ae5d788db80889beda4caeea76f5"
