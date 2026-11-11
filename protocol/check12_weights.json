@@ -11,6 +11,7 @@
     "test_allstar_config_contract": 0.5,
     "test_allstar_dangerous_workflow_contract": 1.0,
     "test_allstar_outside_contract": 0.3,
+    "test_allstar_security_contract": 0.5,
     "test_anchor_align": 0.3,
     "test_approval_naming": 0.2,
     "test_architecture_layers": 0.2,
@@ -521,6 +522,10 @@
     "test_allstar_outside_contract.AllstarOutsideContractTest.test_exemptions_are_org_only": 0.0,
     "test_allstar_outside_contract.AllstarOutsideContractTest.test_governance_single_subject": 0.0,
     "test_allstar_outside_contract.AllstarOutsideContractTest.test_permission_switches_are_strictly_false": 0.0,
+    "test_allstar_security_contract.AllstarSecurityContractTest.test_config_matches_contract": 0.1,
+    "test_allstar_security_contract.AllstarSecurityContractTest.test_content_quality_is_out_of_scope": 0.05,
+    "test_allstar_security_contract.AllstarSecurityContractTest.test_contract_catches_broken_config": 0.06,
+    "test_allstar_security_contract.AllstarSecurityContractTest.test_pass_condition_is_present": 0.05,
     "test_anchor_align.BootstrapTest.test_bootstrap_empty_term": 0.0,
     "test_anchor_align.BootstrapTest.test_bootstrap_expands_from_seed": 0.04,
     "test_anchor_align.BootstrapTest.test_depends_is_closed_and_inverse": 0.01,
@@ -4908,5 +4913,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1833.8
+  "total_s": 1834.3
 }
