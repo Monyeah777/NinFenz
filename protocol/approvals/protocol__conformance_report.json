@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-11-11",
   "approved_by": "Monyeah777",
-  "note": "dotnet-build 契约（树外构建 / SDK 守卫 / fail-closed）。",
+  "note": "ci-health 契约（只读 / 最新一次口径 / 分页 / 快照不判红）。",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "5f057290d1d28051bc0dc492a15cc4533485ae5d788db80889beda4caeea76f5"
