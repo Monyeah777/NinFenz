@@ -1,4 +1,28 @@
+# Allstar Dangerous Workflow 策略配置。生效前提与诚实边界见 .allstar/allstar.yaml：
+# 仓库级只读 action 与 branchList；optConfig.optOutStrategy 属组织级（仓库级静默忽略），
+# 保留只为与组织级模板逐字对齐。
+#
+# 本策略**委托 OpenSSF Scorecard 的 Dangerous-Workflow 检查**执行（上游
+# pkg/policies/workflow/workflow.go 直接调用 checks.DangerousWorkflow），检测面只有两类：
+#   1) 不可信代码 checkout：pull_request_target / workflow_run 触发的 workflow 里，
+#      actions/checkout 的 with.ref 引用 github.event.pull_request / github.event.workflow_run；
+#   2) 脚本注入：run: 里的表达式（${{ ... }}）含攻击者可控上下文——issue.title / issue.body /
+#      pull_request.title / pull_request.body / comment.body / review.body / head_commit.message /
+#      github.head_ref / pull_request.head.ref …，以及 tojson(github) / tojson(github.event)
+#      把整个上下文序列化进脚本。
+# 本仓现状（2026-11-11 按上述两条规则全量扫描 22 个受跟踪 workflow）：0 命中；唯一由 webhook
+# 触发、且接收攻击者输入的是 library-ingest.yml（issues 触发），它把 issue.title 等只经 env:
+# 间接传入、未内联进 run 脚本（GitHub 推荐的注入缓解写法）。判据把这个「零命中」钉住：往 run 里
+# 内联不可信表达式、或改出 pull_request_target + 不可信 checkout，都会红——不只依赖本文件那一行
+# action: issue。
+#
+# branchList 刻意留空 = 扫描**全部**分支。上游语义：留空则由 Scorecard 拉取全部分支；一旦在本
+# 文件或组织级写了任何一条，扫描面就变成「只有列出的分支」（仓库级是**追加**、不是替换）。本仓
+# 不写 branchList 是为保持最强覆盖；判据禁止把它改成 default 或其它收窄写法。
+#
+# Allstar 无法表达的部分（别以为本文件覆盖了）：Dangerous-Workflow 规则集由 Scorecard 硬编码
+# 检测面决定，配置里不能增删规则或加自定义模式；「谁可以推送」属 branch_protection 策略；
+# 工作流钉 SHA / 最小权限 / timeout-minutes 属 test_workflow_policy 判据面。
 optConfig:
   optOutStrategy: true
 action: issue
-
