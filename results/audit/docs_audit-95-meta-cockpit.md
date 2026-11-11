@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:6fea4c4ed80b12ad5216c1c36501d5612c9625ab950a1dc673291449219cc195
+  - protocol/check12_weights.json:70b4b03be27db0ed2bd7e23ca3da4d5318e1bc005195ef811cc37a876bbcf30c
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-11）：docker-nfal 契约化：只 build 不推送（禁 docker push/login/secrets/REGISTRY）、push 与 PR 的 paths 同一锚点、两作业各自恰一个诊断工件（修复 nfal 工件错放进 hf-space 作业的真问题）、工件保留 7 天、Dockerfile FROM 必须 @sha256（纯函数对账）；新增 test_docker_nfal_workflow_contract（5 项含五类变异自证）。本轮为机械重绑。
+
 > 重审（2026-11-11）：e2e-desktop 契约化：无 GUI 不变量（禁 PySide6/QT_QPA_PLATFORM/pyside6/xvfb）、PR 全量触发（禁 paths）、python3 调 scripts/e2e_desktop_headless.py + pipefail + tee、禁兜底假绿、工件 always + 保留 7 天、与 release-gate 同脚本交叉对账；新增 test_e2e_desktop_workflow_contract（4 项含五类变异自证）。本轮为机械重绑。
 
 > 重审（2026-11-11）：coverage 契约化：覆盖率门槛 --fail-under=80 与 --include=desktop/src/core/* 与 release-gate 交叉对账、NF_COVERAGE=1 + verify_tests --jobs + coverage combine、pipefail + exit rc fail-closed、冷启动 3 目录、诊断工件 always + 保留 7 天；新增 test_coverage_workflow_contract（4 项含五类变异自证）。本轮为机械重绑。
