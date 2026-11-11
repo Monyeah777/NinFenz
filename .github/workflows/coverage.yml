@@ -62,3 +62,4 @@ jobs:
             *.log
           if-no-files-found: ignore
           include-hidden-files: true
+          retention-days: 7    # 覆盖率排障工件，7 天回收
