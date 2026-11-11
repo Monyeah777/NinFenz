@@ -246,7 +246,7 @@
     {
       "@id": "nf:file/protocol/instruction_evidence.json",
       "@type": "prov:Entity",
-      "nf:sha256": "e59b380d55c1bc6c8008ae616204b4ec29fe5488110539efaceb21dbf2fe7fa5"
+      "nf:sha256": "321c7c2e23badef278c8b2a7c2c8f04309c947a011823b6ba617c295fcdd51d4"
     },
     {
       "@id": "nf:file/protocol/knowledge_sources.json",
@@ -311,7 +311,7 @@
     {
       "@id": "nf:file/protocol/role_coordinates.json",
       "@type": "prov:Entity",
-      "nf:sha256": "078a3c2b5e51a520e86832052f674c61bba081cb40d5bf9595c9dba1e0e0677a"
+      "nf:sha256": "2b3bca73d207050aba3b2a32b9f4eb1a265d72773cb2cfd659342161d89b6333"
     },
     {
       "@id": "nf:file/protocol/sast_baseline.json",

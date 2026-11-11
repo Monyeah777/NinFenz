@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:111e6ad19c6130e3736de27e05dcd80e716e58c56e72f12daf0153c55c3a0435
+  - protocol/check12_weights.json:675c1dd25f148d596956d6b10cbb9870ea4de2db598a8fb444ce12a9302568fa
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-11）：linux-parity-refresh 契约化：只读不变量（禁 contents: write / git push / git commit）、dispatch+周 schedule、漂移判定双 diff 非空 + 键级 SAST 比对、证据件（sast-posix/vectors.diff/projections.diff）always 上传且保留 7 天；新增 test_linux_parity_refresh_workflow_contract（4 项含五类变异自证）。本轮为机械重绑。
+
 > 重审（2026-11-11）：dependency-audit 契约化：四份固定集全审（ci/lint/sast/audit）、审计器 --require-hashes、fail-closed（禁兜底假绿）、审计输出 tee 落盘并进工件（保留 7 天）、PR 路径面与周 schedule；新增 test_dependency_audit_workflow_contract（4 项含五类变异自证 + 固定集在场/ASCII 对账）。本轮为机械重绑。
 
 > 重审（2026-11-11）：library-ingest 契约化：issues 触发仅 opened、写权限仅 contents+issues、标题守卫、编号并发串行且不可取消、正文强制走 API（E2BIG 事故口径）、checkout 凭据保留显式说明（push 依赖，与其它 workflow 相反）、诊断工件保留 7 天；新增 test_library_ingest_workflow_contract（5 项含六类变异自证）。本轮为机械重绑。

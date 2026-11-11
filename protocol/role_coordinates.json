@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1068
+    "verify": 1069
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8657,6 +8657,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "linux-parity-refresh 契约判据：跨平台漂移刷新器必须「只读、证据可下载、漂移判红」（2026-11-11）。",
+      "path": "desktop/tests/test_linux_parity_refresh_workflow_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "活文档不得钉运行时计数（check 数 / PASS 数）——「内外口径统一」的可核判据。",
       "path": "desktop/tests/test_live_doc_counts.py",
       "role": "verify",
@@ -12792,7 +12798,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "00464fa78abe2bfeee5e87ebc6d2f853a57d77259c3bbd52e842889b9152e504",
+  "root_digest": "f9ed2657bc08fabe44e2ff784ab8cf590b367248e8f972f4620fac9e321aee1d",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12801,7 +12807,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 942,
+    "R-verify": 943,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
