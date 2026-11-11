@@ -1433,6 +1433,10 @@
       "source": "none"
     },
     {
+      "module": "test_routes_contract.py",
+      "source": "naming"
+    },
+    {
       "module": "test_ruff_syntax.py",
       "source": "none"
     },
@@ -1777,10 +1781,10 @@
       "source": "negative_assertion"
     }
   ],
-  "modules": 444,
+  "modules": 445,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
-  "suspect": 159,
+  "suspect": 160,
   "with_evidence": 144,
   "without_evidence": 141
 }
