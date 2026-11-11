@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1085
+    "verify": 1086
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7373,6 +7373,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "Allstar 策略配置契约判据：六件可被真实加载、不静默、且不冒充平台启用（2026-11-11）。",
+      "path": "desktop/tests/test_allstar_config_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "双向锚定对齐面（core/anchor_align.py）回归测试 —— 反向利用率 / 正向词汇交叉。",
       "path": "desktop/tests/test_anchor_align.py",
       "role": "verify",
@@ -12894,7 +12900,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "39b9eaac0cbac91057767f509bbdd6feb75cdb5d239ef605760142a51d1bffa8",
+  "root_digest": "35d3c27c683888bfd7f16965bdfe70bd7b1efd838cd18696cb3f5ae5698474d6",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12903,7 +12909,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 959,
+    "R-verify": 960,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
