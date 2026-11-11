@@ -16,7 +16,8 @@ from pathlib import Path
 if str(Path(__file__).resolve().parent.parent / "src") not in sys.path:
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
-from core import text_hygiene as th  # noqa: E402
+from core import repo_face as rf  # noqa: E402
+from core import text_hygiene as th
 
 ROOT = str(Path(__file__).resolve().parents[2])
 GA = "* text=auto eol=lf\n"
@@ -217,29 +218,64 @@ def dense_line_runs(text, threshold=20):
     return runs
 
 
+def _tracked_files():
+    """git 追踪面（判据自证用：扫描面必须是它的子集）。"""
+    import subprocess
+    proc = subprocess.run(["git", "-C", ROOT, "ls-files", "-z"], capture_output=True,
+                          text=True, encoding="utf-8", errors="replace", timeout=180)
+    return {rel for rel in proc.stdout.split(chr(0)) if rel}
+
+
+def managed_markdown_paths(root: str = ROOT):
+    """受治理 markdown 面 = **单点扫描面**（core.repo_face.walk_repo_paths：静态跳过名 +
+    .gitignore 覆盖面），排除 community/。
+
+    历史缺陷（本件修复，2026-11-11）：此前这里自持一份 Path(ROOT).rglob("*.md") + 内联排除表
+    （且漏了 .worktrees）——本机实测扫到 66547 件 / 13.6s，其中 64386 件来自 .rivet /
+    .worktrees 未跟踪快照；与 core 侧「扫描面单点定义」的纪律相悖。改用单点面后 370 件 / 0.8s。
+    """
+    base = Path(root)
+    for path in rf.walk_repo_paths(str(root)):
+        rel = Path(path).relative_to(base).as_posix()
+        if rel.endswith(".md") and rel.split("/", 1)[0] != "community":
+            yield Path(path)
+
+
+
 class MarkdownLineDensityTest(unittest.TestCase):
     """Markdown 不得被压成「一字一行」——格式坏了，链接/版本判据仍可能假绿。"""
 
     def test_managed_markdown_has_no_character_per_line_corruption(self):
         bad = []
-        seen = 0
-        for p in Path(ROOT).rglob("*.md"):
-            rel = p.relative_to(ROOT)
-            if any(part in {".git", ".rivet", "node_modules", "payload", "__pycache__"}
-                   for part in rel.parts):
-                continue
-            if rel.parts and rel.parts[0] == "community":
-                continue
-            seen += 1
+        rels = []
+        for p in managed_markdown_paths():
+            rels.append(p.relative_to(ROOT).as_posix())
+        self.assertGreaterEqual(len(rels), 100, "Markdown 扫描面塌缩")
+        tracked = _tracked_files()
+        untracked = [rel for rel in rels if rel not in tracked]
+        self.assertEqual([], untracked[:5],
+                         "扫描面混入非仓库件（应走 core.repo_face 单点扫描面）")
+        for rel in rels:
             try:
-                text = p.read_text(encoding="utf-8")
+                text = (Path(ROOT) / rel).read_text(encoding="utf-8")
             except (OSError, UnicodeError):
                 continue
             for start, size in dense_line_runs(text):
-                bad.append(f"{rel.as_posix()}:{start}（连续 {size} 行）")
-        self.assertGreaterEqual(seen, 100, "Markdown 扫描面塌缩")
+                bad.append(f"{rel}:{start}（连续 {size} 行）")
         self.assertEqual([], bad[:10],
                          "Markdown 被压成一字一行（修复指引：按原文恢复段落，勿逐字换行）")
+
+    def test_markdown_scan_surface_is_the_single_point(self):
+        """自证：扫描面 = 单点定义（core.repo_face），跳过快照/缓存目录，且只收仓库件。"""
+        with tempfile.TemporaryDirectory() as tmp:
+            for rel in ("docs/a.md", ".rivet/snap/b.md", ".worktrees/w/c.md",
+                        "__pycache__/d.md", "community/e.md"):
+                path = Path(tmp) / rel
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text("# x\n", encoding="utf-8")
+            got = sorted(p.relative_to(tmp).as_posix() for p in managed_markdown_paths(tmp))
+            self.assertEqual(["docs/a.md"], got, "单点扫描面排除规则失效")
+
 
     def test_line_density_predicate_catches_the_mutation(self):
         corrupted = "-\n \n*\n*\n" + "\n".join("数字资产") + "\n正常段落。\n"
