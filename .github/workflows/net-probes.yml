@@ -171,3 +171,4 @@ jobs:
           name: net-probes-diagnostics-${{ matrix.os }}
           path: .artifacts/
           if-no-files-found: warn
+          retention-days: 7    # 探针失败证据，7 天回收

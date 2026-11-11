@@ -1029,6 +1029,10 @@
       "source": "naming"
     },
     {
+      "module": "test_net_probes_workflow_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_new_faces.py",
       "source": "naming"
     },
@@ -1729,10 +1733,10 @@
       "source": "negative_assertion"
     }
   ],
-  "modules": 432,
+  "modules": 433,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
   "suspect": 154,
-  "with_evidence": 137,
+  "with_evidence": 138,
   "without_evidence": 141
 }

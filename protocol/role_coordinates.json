@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1080
+    "verify": 1081
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8885,6 +8885,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "net-probes 契约判据：仅手动、失败不产假红、金标 fail-fast、双 RID 真交付（2026-11-11）。",
+      "path": "desktop/tests/test_net_probes_workflow_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "本轮新增面的分支覆盖测试（registry_cross / payload_harvest / machine_contract /",
       "path": "desktop/tests/test_new_faces.py",
       "role": "verify",
@@ -12864,7 +12870,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "13ac03589717ae5800ea2ebd1ae325c489e3b100c02ec174892087f55c5f07c3",
+  "root_digest": "3753796955a1a96e62f54144b22aa6aca37496184c92757a9144e4a24ea08f45",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12873,7 +12879,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 954,
+    "R-verify": 955,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
