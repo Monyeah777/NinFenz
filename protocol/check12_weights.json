@@ -55,6 +55,7 @@
     "test_check_policy": 0.2,
     "test_check_text_to_intent": 0.9,
     "test_ci_diagnostics": 0.2,
+    "test_ci_health_workflow_contract": 0.2,
     "test_ci_supply_chain": 0.2,
     "test_ci_verify_contract": 0.2,
     "test_ci_visibility": 0.2,
@@ -961,6 +962,10 @@
     "test_ci_diagnostics.ArtifactPolicyTest.test_key_workflows_have_an_artifact_step": 0.0,
     "test_ci_diagnostics.ArtifactPolicyTest.test_mutation_is_caught": 0.0,
     "test_ci_diagnostics.ArtifactPolicyTest.test_no_workflow_uploads_tracked_files": 0.0,
+    "test_ci_health_workflow_contract.CiHealthWorkflowContractTest.test_contract_catches_broken_workflow": 0.03,
+    "test_ci_health_workflow_contract.CiHealthWorkflowContractTest.test_latest_run_semantics": 0.0,
+    "test_ci_health_workflow_contract.CiHealthWorkflowContractTest.test_read_only_watchdog": 0.0,
+    "test_ci_health_workflow_contract.CiHealthWorkflowContractTest.test_workflow_matches_contract": 0.0,
     "test_ci_supply_chain.CiRequirementsPinTest.test_audit_requirements_file_is_pinned": 0.0,
     "test_ci_supply_chain.CiRequirementsPinTest.test_dependency_audit_job_exists_and_targets_the_pins": 0.0,
     "test_ci_supply_chain.CiRequirementsPinTest.test_requirements_files_are_ascii_only": 0.0,
@@ -4846,5 +4851,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1826.6
+  "total_s": 1826.8
 }

@@ -47,16 +47,23 @@ jobs:
           python - <<'PY'
           import json, os, urllib.request
           repo = os.environ["REPO"]
-          url = "https://api.github.com/repos/%s/actions/runs?event=schedule&per_page=100" % repo
-          req = urllib.request.Request(url, headers={
-              "Accept": "application/vnd.github+json",
-              "Authorization": "Bearer " + os.environ["GH_TOKEN"],
-          })
-          with urllib.request.urlopen(req, timeout=60) as resp:
-              doc = json.load(resp)
+          # 分页取最近 200 条 schedule 运行：只取一页时，长期不跑的 workflow 可能滑出窗口而假绿。
+          runs = []
+          for page in (1, 2):
+              url = ("https://api.github.com/repos/%s/actions/runs"
+                     "?event=schedule&per_page=100&page=%d" % (repo, page))
+              req = urllib.request.Request(url, headers={
+                  "Accept": "application/vnd.github+json",
+                  "Authorization": "Bearer " + os.environ["GH_TOKEN"],
+              })
+              with urllib.request.urlopen(req, timeout=60) as resp:
+                  page_runs = json.load(resp).get("workflow_runs", [])
+              runs.extend(page_runs)
+              if len(page_runs) < 100:
+                  break
           own = ".github/workflows/ci-health.yml"
           latest = {}
-          for r in doc.get("workflow_runs", []):
+          for r in runs:
               if r.get("path") == own:
                   continue      # 排除自身：否则一次 schedule 失败后永远在报上一次的自己（2026-11-09 实测）
               key = r.get("workflow_id") or r.get("name")
