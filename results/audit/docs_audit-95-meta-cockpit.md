@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:6998c559393e57b57ceb9b1e737073cc375957ca7addc788d86f09ac5b80f0a9
+  - protocol/check12_weights.json:e67b298b064d7a3092ace32b3155b1e9ec49cc76acc9e1dc47f15527c92f6b0e
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-11）：external-links 契约化：非门禁定位（禁 push/PR 触发、独立并发组、禁调 verify.sh）、离线扫描步永远绿 + 联网步 fail-closed（禁兜底写法、pipefail、tee 落盘）、联网硬预算 --max-seconds 600（防慢站点拖到 job 超时）、报告只传 .artifacts/ 本 run 副本（禁受跟踪路径）、工件保留 7 天；新增 test_external_links_workflow_contract（4 项含五类变异自证）。本轮为机械重绑。
+
 > 重审（2026-11-11）：ci-health 看门狗契约化：只读（禁 checkout / 写仓库）、权限恰为三 read、4 次/天 schedule + push main + dispatch、最新一次口径（排除自身 / cancelled/skipped 不算失败 / pending 跳过）、schedule 面补分页（长期不跑的 workflow 会滑出窗口假绿）、失败必须 ::error + exit 1、安全面快照 continue-on-error 与 NA 兜底；新增 test_ci_health_workflow_contract（4 项含五类变异自证）。本轮为机械重绑。
 
 > 重审（2026-11-11）：dotnet-build 契约化：树外构建铁律（RUNNER_TEMP + Copy-Item engine/dotnet，树内不留 bin/obj）、.NET 8 主版本守卫、三处 build 都检查  + =Stop、两平台矩阵 fail-fast false、三个 csproj 在场对账、只读、工件含 matrix.os 与日志且保留 7 天；新增 test_dotnet_build_workflow_contract（4 项含五类变异自证）。本轮为机械重绑。
