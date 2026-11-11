@@ -957,6 +957,10 @@
       "source": "naming"
     },
     {
+      "module": "test_llms_contract.py",
+      "source": "naming"
+    },
+    {
       "module": "test_load_state.py",
       "source": "none"
     },
@@ -1781,10 +1785,10 @@
       "source": "negative_assertion"
     }
   ],
-  "modules": 445,
+  "modules": 446,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
-  "suspect": 160,
+  "suspect": 161,
   "with_evidence": 144,
   "without_evidence": 141
 }

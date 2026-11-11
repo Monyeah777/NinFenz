@@ -131,7 +131,7 @@
     {
       "@id": "nf:file/llms.txt",
       "@type": "prov:Entity",
-      "nf:sha256": "ba9f46f80fae844c614bebf52a8d392606ee59114f51a09696b20c43d695d350"
+      "nf:sha256": "c3ac70c0c70310c37c07c79195339503f768c4900c71dca0252fa0813126f34d"
     },
     {
       "@id": "nf:file/postmortems/PO-9000-示例-复盘模板.md",
@@ -311,7 +311,7 @@
     {
       "@id": "nf:file/protocol/role_coordinates.json",
       "@type": "prov:Entity",
-      "nf:sha256": "8a241e12da726b48df02ad3049c746cb52567a380a3c604c63f83b59662b5346"
+      "nf:sha256": "261529dd295477bd2ff233c79cc57cd63cea8bc9604c33601d76d38cd35d5b66"
     },
     {
       "@id": "nf:file/protocol/sast_baseline.json",
