@@ -93,6 +93,7 @@
     "test_core_judge_map": 1.2,
     "test_cot_exposure": 2.6,
     "test_coupling_metrics": 1.7,
+    "test_coverage_workflow_contract": 0.2,
     "test_cross_lang_matrix": 4.8,
     "test_cross_lang_verify": 1.6,
     "test_cross_platform_workflow_contract": 0.2,
@@ -1400,6 +1401,10 @@
     "test_coupling_metrics.RatchetTest.test_registered_cycle_passes": 0.01,
     "test_coupling_metrics.RatchetTest.test_unregistered_cycle_fails": 0.0,
     "test_coupling_metrics.RealRepoTest.test_baseline_committed_and_scan_clean": 0.49,
+    "test_coverage_workflow_contract.CoverageWorkflowContractTest.test_contract_catches_broken_workflow": 0.0,
+    "test_coverage_workflow_contract.CoverageWorkflowContractTest.test_fail_closed": 0.0,
+    "test_coverage_workflow_contract.CoverageWorkflowContractTest.test_threshold_matches_release_gate": 0.0,
+    "test_coverage_workflow_contract.CoverageWorkflowContractTest.test_workflow_matches_contract": 0.0,
     "test_cross_lang_matrix.CSharpJcsBinaryTest.test_csharp_impl_matches_every_vector": 0.82,
     "test_cross_lang_matrix.EdgeFixtureParityTest.test_edge_fixtures_are_byte_identical_across_implementations": 0.28,
     "test_cross_lang_matrix.ExeSubstitutionTest.test_verify_runs_the_resolved_exe": 0.0,
@@ -4815,5 +4820,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1825.4
+  "total_s": 1825.6
 }

@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:b70a9a58719a3988d240672b96274c98c9ba934a7344bec96def4b4e911f5f01
+  - protocol/check12_weights.json:2b8da35d41b273cf92bd9768601c3878db167b7bc1e9764a533852ec24187600
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-11）：coverage 契约化：覆盖率门槛 --fail-under=80 与 --include=desktop/src/core/* 与 release-gate 交叉对账、NF_COVERAGE=1 + verify_tests --jobs + coverage combine、pipefail + exit rc fail-closed、冷启动 3 目录、诊断工件 always + 保留 7 天；新增 test_coverage_workflow_contract（4 项含五类变异自证）。本轮为机械重绑。
+
 > 重审（2026-11-11）：cross-platform 三平台依赖口径修复：非 Windows 平台此前只装 requirements-ci，而 --full 的 check12 与 ci-verify unit-tests 同套测试（需要 ruff/bandit）→ style/sast 棘轮 fail-closed 长期红；现三平台统一安装 ci/lint/sast 三份固定集，Windows SAST 步骤只跑基线。判据新增三份固定集必装 + 缺件变异自证。本轮为机械重绑。
 
 > 重审（2026-11-11）：cross-platform 契约化：修复 **报告新鲜度 fail-open**（原顺序 --write → --check，写入后 check 永远通过；改为先 check 再 write，并把顺序钉进判据）、三平台矩阵 fail-fast false、显式 --full 档位、Windows SAST nt 段、冷启动前置 3 目录、Linux 库 RUNNER_OS 守卫、两工件保留 7 天、checkout fetch-depth/tags；新增 test_cross_platform_workflow_contract（4 项含五类变异自证）。本轮为机械重绑。
