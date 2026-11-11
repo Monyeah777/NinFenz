@@ -63,3 +63,4 @@ jobs:
           name: dotnet-build-log-${{ matrix.os }}
           path: dotnet-build.log
           if-no-files-found: warn
+          retention-days: 7    # 排障工件，7 天回收
