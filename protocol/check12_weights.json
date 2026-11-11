@@ -340,6 +340,7 @@
     "test_repo_trust": 2.2,
     "test_report_meta": 0.2,
     "test_requirement_coverage": 0.1,
+    "test_requirements_ci_contract": 0.2,
     "test_residual_registry": 0.1,
     "test_response_cache_replay": 0.1,
     "test_retriever": 1.0,
@@ -4008,6 +4009,10 @@
     "test_requirement_coverage.Test.test_orphan_check": 0.0,
     "test_requirement_coverage.Test.test_uncovered_must_is_reported": 0.0,
     "test_requirement_coverage.Test.test_uncovered_without_plan_fails": 0.0,
+    "test_requirements_ci_contract.RequirementsCiContractTest.test_contract_catches_broken_file": 0.0,
+    "test_requirements_ci_contract.RequirementsCiContractTest.test_direct_pins_mirror_pyproject": 0.0,
+    "test_requirements_ci_contract.RequirementsCiContractTest.test_every_pin_has_hashes": 0.0,
+    "test_requirements_ci_contract.RequirementsCiContractTest.test_file_matches_contract": 0.0,
     "test_residual_registry.Test.test_missing_fields": 0.0,
     "test_residual_registry.Test.test_validate_and_match": 0.0,
     "test_response_cache_replay.WrapRunnerReplayTest.test_help_text_survives_systemexit": 0.0,
@@ -4869,5 +4874,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1827.7
+  "total_s": 1827.9
 }

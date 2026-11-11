@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1083
+    "verify": 1084
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9377,6 +9377,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "requirements-ci 契约判据：哈希完备、直钉镜像、可复现生成命令、ASCII（2026-11-11）。",
+      "path": "desktop/tests/test_requirements_ci_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "",
       "path": "desktop/tests/test_residual_registry.py",
       "role": "verify",
@@ -12882,7 +12888,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "5cb157186db1ac07335a4d35487f7617c6152002e905ed8a88443a36210a2cab",
+  "root_digest": "6330df2f25837564454f6f41dd9b4b1202a14da047ceec1b56c4de8e129a085a",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12891,7 +12897,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 957,
+    "R-verify": 958,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
