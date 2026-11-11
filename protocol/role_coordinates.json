@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1088
+    "verify": 1089
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7373,6 +7373,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "Allstar Binary Artifacts 契约判据：配置白名单为空 + 全仓零二进制工件（2026-11-11）。",
+      "path": "desktop/tests/test_allstar_binary_artifacts_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "Allstar Branch Protection 契约判据：镜像平台现状 / required 检查真存在 / 形状自洽（2026-11-11）。",
       "path": "desktop/tests/test_allstar_branch_protection_contract.py",
       "role": "verify",
@@ -12912,7 +12918,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "f84911ed74062419efd7d7bba20a9de9f1b6a06adeef9e24e10f12341486cfc6",
+  "root_digest": "002253adc7439059d591fe63b22607592bdb7889ed16939d7300f7c48a35894a",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12921,7 +12927,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 962,
+    "R-verify": 963,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
