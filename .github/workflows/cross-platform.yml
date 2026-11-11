@@ -7,7 +7,8 @@ name: cross-platform
 # 环境里证明「可复现」。
 #
 # 口径：三平台跑**同一套**全量门禁（bash verify.sh --full）+ 同一套机器可读报告新鲜度校验；
-# 依赖走固定清单（.github/requirements-ci.txt），平台专属系统库只在 Linux 装。
+# 依赖走**三份固定清单**（requirements-ci/lint/sast——与 ci-verify 的 unit-tests 同口径），
+# 平台专属系统库只在 Linux 装。
 #
 # 档位（2026-10-19 修）：此前这里只是裸跑 `bash verify.sh`——而 verify.sh 自 P3 分层起
 # **默认档已是 quick**（42 条静态 check + 受影响测试），只有 `--full` 才是发布结论
@@ -53,7 +54,10 @@ jobs:
           cache-dependency-path: .github/requirements-*.txt
           cache: pip
           python-version: '3.11'
-      - name: 安装测试依赖（固定清单；Linux 另装 EGL 系统库）
+      - name: 安装测试依赖（三份固定集；Linux 另装 EGL 系统库）
+        # 2026-11-11 修：此前非 Windows 平台只装 requirements-ci，而 --full 的 check12 与
+        # ci-verify 的 unit-tests 是同一套测试（test_release_conclusion 等需要 ruff/bandit）——
+        # 缺工具会让 style/sast 棘轮 fail-closed，ubuntu/macOS 因此长期红。三平台必须同口径。
         shell: bash
         run: |
           if [ "$RUNNER_OS" = "Linux" ]; then
@@ -61,6 +65,8 @@ jobs:
             sudo apt-get -o Acquire::Retries=3 install -y libegl1 libgl1 libxkbcommon0 libdbus-1-3
           fi
           python -m pip install --require-hashes -r .github/requirements-ci.txt
+          python -m pip install --require-hashes -r .github/requirements-lint.txt \
+            -r .github/requirements-sast.txt
       - name: SAST 本平台基线（Windows 段；Linux 面归 sast workflow）
         # 2026-11-09 盲区：protocol/sast_baseline.json 的 **nt 段**此前只在本地结论里被验证，
         # CI 没有 Windows 面（Linux 有 sast.yml）。这里用同一套 pinned bandit/ruff 在 Windows 上
@@ -69,8 +75,7 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          python -m pip install --require-hashes -r .github/requirements-sast.txt \
-            -r .github/requirements-lint.txt
+          # 工具已在上一步三平台统一安装（三份固定集），这里只跑本平台基线。
           # 日志放 .nf-logs/（NF_VERIFY_TMP 面）：写仓库根会被 check33 编码卫生判 CRLF
           # （Windows tee 产生 CRLF；实测 dispatch 红）。
           mkdir -p .nf-logs

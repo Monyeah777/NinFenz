@@ -97,8 +97,11 @@ def workflow_issues(doc: dict) -> list:
         issues.append("必须显式 bash verify.sh --full（裸跑 = silent quick）")
     if "RUNNER_OS" not in text:
         issues.append("Linux 专属系统库安装必须以 RUNNER_OS 守卫")
-    if "requirements-ci.txt" not in text or "--require-hashes" not in text:
+    if "--require-hashes" not in text:
         issues.append("依赖必须走固定清单 + --require-hashes")
+    for name in ("requirements-ci.txt", "requirements-lint.txt", "requirements-sast.txt"):
+        if name not in text:
+            issues.append(f"三平台同口径需要安装固定集：{name}")
     if "sast-windows.log" not in text:
         issues.append("缺 Windows 侧 SAST 基线步骤（nt 段需要 CI 面）")
     if "set -o pipefail" not in text:
@@ -186,6 +189,15 @@ class CrossPlatformWorkflowContractTest(unittest.TestCase):
                 (step.get("with") or {}).pop("retention-days", None)
         self.assertTrue(any("retention" in i for i in workflow_issues(no_days)),
                         "无保留期必须报")
+        no_sast = copy.deepcopy(self.doc)
+        for step in no_sast["jobs"]["gate"]["steps"]:
+            run = str(step.get("run") or "")
+            if "requirements-sast.txt" in run:
+                step["run"] = run.replace(
+                    "-r .github/requirements-lint.txt \\",
+                    "").replace("-r .github/requirements-sast.txt", "")
+        self.assertTrue(any("固定集" in i for i in workflow_issues(no_sast)),
+                        "缺 lint/sast 固定集必须报")
         with self.assertRaises(ValueError):
             load_workflow(ROOT / ".github" / "no_such_cross_platform.yml")
 
