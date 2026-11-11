@@ -369,6 +369,10 @@
       "source": "naming"
     },
     {
+      "module": "test_coverage_workflow_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_cross_lang_matrix.py",
       "source": "negative_assertion"
     },
@@ -1697,10 +1701,10 @@
       "source": "negative_assertion"
     }
   ],
-  "modules": 424,
+  "modules": 425,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
   "suspect": 154,
-  "with_evidence": 129,
+  "with_evidence": 130,
   "without_evidence": 141
 }

@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1072
+    "verify": 1073
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7895,6 +7895,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "coverage 契约判据：门槛口径与 release-gate 一致、fail-closed、工件可下载（2026-11-11）。",
+      "path": "desktop/tests/test_coverage_workflow_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "P-C1/P-C3 跨语言实现矩阵的**常驻**判据（三实现真跑同一批契约向量）。",
       "path": "desktop/tests/test_cross_lang_matrix.py",
       "role": "verify",
@@ -12816,7 +12822,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "ea897dc9a8c1e74d25413bd0857c363634208fdac5c7a34425fa6287d17996a3",
+  "root_digest": "89a12765e28ec4520f94ce31dab7d174b2488030ab71bc27a44713dc7a0b3b89",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12825,7 +12831,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 946,
+    "R-verify": 947,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
