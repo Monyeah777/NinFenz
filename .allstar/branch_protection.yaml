@@ -1,4 +1,41 @@
+# Allstar Branch Protection 策略配置。生效前提与诚实边界见 .allstar/allstar.yaml：
+# 仓库级只读 action 与本文件的覆盖字段；optConfig.optOutStrategy 属组织级（仓库级静默忽略），
+# 保留只为与组织级模板逐字对齐。
+#
+# 本文件的取值不是新政策，而是 main 分支**现有**保护设置的机器可读镜像（2026-11-11 用
+# GET /repos/Monyeah777/NinFenz/branches/main/protection 逐字段核对）：
+#   required_status_checks: strict=true, contexts=[static-checks-42, gate]
+#   required_approving_review_count=0（PR 必需、0 人批准）, dismiss_stale_reviews=true
+#   enforce_admins=true, allow_force_pushes=false, required_signatures=false
+# 平台状态才是真源：本文件只是镜像 + 漂移判据；改平台设置必须同步改这里，反之亦然。
+# 判据：desktop/tests/test_allstar_branch_protection_contract.py（镜像值 / required 检查
+# 必须真存在于受跟踪 workflow 作业名 / 形状与自洽 / 平台独有缺口写明 / 变异自证）。
+#
+# 与 AGENTS.md「只能 PR + Squash，不许合并提交」的对应：
+#   requireApproval + approvalCount=0 → PR 必需、不强制批准（单主体仓现状）；
+#   blockForce / dismissStale / enforceOnAdmins / requireUpToDateBranch 对应平台字段。
+# Allstar 分支策略**无法表达**、只能平台侧维护的保护项（本文件写不到，别以为覆盖了）：
+#   required_linear_history（squash 专属 / 禁合并提交）、required_conversation_resolution、
+#   allow_deletions=false、require_last_push_approval。
+#
+# 为什么逐字段写死而不吃默认：Allstar 组织级默认是 requireApproval=true、approvalCount=1、
+# dismissStale=true、blockForce=true、requireUpToDateBranch=true；与本仓现状（0 人批准）
+# 不同——仓库级不写覆盖就会继承组织默认，将来真跑起来就会长期误报。
+# requireStatusChecks 省略 appID 是刻意的：上游 makeSCLookupTable 为每个 context 同时登记
+# 「任意 App」与「指定 appID」两种键，省略 appID 即可匹配平台侧由 GitHub Actions 设置的检查
+# （平台侧 app_id=15368），不必把易变的外部 App ID 写进仓库。
 optConfig:
   optOutStrategy: true
 action: issue
-
+enforceDefault: true
+requireApproval: true
+requireCodeOwnerReviews: false
+approvalCount: 0
+dismissStale: true
+blockForce: true
+requireUpToDateBranch: true
+requireStatusChecks:
+  - context: static-checks-42
+  - context: gate
+enforceOnAdmins: true
+requireSignedCommits: false

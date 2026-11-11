@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1086
+    "verify": 1087
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7373,6 +7373,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "Allstar Branch Protection 契约判据：镜像平台现状 / required 检查真存在 / 形状自洽（2026-11-11）。",
+      "path": "desktop/tests/test_allstar_branch_protection_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "Allstar 策略配置契约判据：六件可被真实加载、不静默、且不冒充平台启用（2026-11-11）。",
       "path": "desktop/tests/test_allstar_config_contract.py",
       "role": "verify",
@@ -12900,7 +12906,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "35d3c27c683888bfd7f16965bdfe70bd7b1efd838cd18696cb3f5ae5698474d6",
+  "root_digest": "dc3c08b780f02e4657b624b55ab4f900716c810584b87d444d3c306e68f9ede9",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12909,7 +12915,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 960,
+    "R-verify": 961,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
