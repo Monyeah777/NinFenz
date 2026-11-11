@@ -38,7 +38,9 @@ jobs:
         run: |
           set -o pipefail
           mkdir -p .artifacts
-          python scripts/check_external_links.py --fetch --json \
+          # --max-seconds 600：给巡检硬预算（job 上限 15 min），超预算的链接标 skipped——
+          # 没有预算时慢站点会把整条 job 拖到超时而红（红的原因还看不到是哪条链接）。
+          python scripts/check_external_links.py --fetch --json --max-seconds 600 \
             --write results/external-links-report.json 2>&1 | tee .artifacts/external-links.log
           cp results/external-links-report.json .artifacts/external-links-report.json
 
@@ -52,3 +54,4 @@ jobs:
             .artifacts/external-links-report.json
             .artifacts/external-links.log
           if-no-files-found: warn
+          retention-days: 7    #  Weekly 巡检报告，7 天回收
