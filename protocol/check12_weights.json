@@ -95,6 +95,7 @@
     "test_coupling_metrics": 1.7,
     "test_cross_lang_matrix": 4.8,
     "test_cross_lang_verify": 1.6,
+    "test_cross_platform_workflow_contract": 0.2,
     "test_daemon": 23.0,
     "test_daemon_limits": 0.3,
     "test_daemon_parity": 173.6,
@@ -1419,6 +1420,10 @@
     "test_cross_lang_verify.ManifestShapeTest.test_covered_vector_ids_are_stable": 0.0,
     "test_cross_lang_verify.ManifestShapeTest.test_every_manifest_is_wellformed": 0.0,
     "test_cross_lang_verify.RealVectorTest.test_repo_vector_arbitrates": 1.43,
+    "test_cross_platform_workflow_contract.CrossPlatformWorkflowContractTest.test_check_precedes_write": 0.0,
+    "test_cross_platform_workflow_contract.CrossPlatformWorkflowContractTest.test_contract_catches_broken_workflow": 0.0,
+    "test_cross_platform_workflow_contract.CrossPlatformWorkflowContractTest.test_three_os_matrix": 0.0,
+    "test_cross_platform_workflow_contract.CrossPlatformWorkflowContractTest.test_workflow_matches_contract": 0.0,
     "test_daemon.DaemonFreshnessTest.test_content_keyed_caches_are_kept": 0.04,
     "test_daemon.DaemonFreshnessTest.test_path_keyed_caches_are_cleared_per_request": 0.39,
     "test_daemon.DaemonFreshnessTest.test_source_fingerprint_triggers_reload": 0.01,
@@ -4810,5 +4815,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1825.2
+  "total_s": 1825.4
 }

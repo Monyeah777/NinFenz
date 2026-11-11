@@ -377,6 +377,10 @@
       "source": "naming"
     },
     {
+      "module": "test_cross_platform_workflow_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_daemon.py",
       "source": "naming"
     },
@@ -1693,10 +1697,10 @@
       "source": "negative_assertion"
     }
   ],
-  "modules": 423,
+  "modules": 424,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
   "suspect": 154,
-  "with_evidence": 128,
+  "with_evidence": 129,
   "without_evidence": 141
 }

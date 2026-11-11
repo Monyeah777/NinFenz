@@ -84,9 +84,7 @@ jobs:
           #   .gitee/ISSUE_TEMPLATE → check32 红；engine/dotnet/dist 与 obj → asset_contract 计数不符；
           #   wasm 产物 → test_plugin_wasm_host 红；canonical/target → 并发测试报「工具越权写」。
           mkdir -p .gitee/ISSUE_TEMPLATE engine/dotnet/dist engine/rust/canonical/target
-          if [ "$RUNNER_OS" = "Linux" ] || [ "$RUNNER_OS" = "Windows" ] || [ "$RUNNER_OS" = "macOS" ]; then
-            echo "前置目录已建"
-          fi
+          echo "前置目录已建"
       - name: 全量门禁（三平台同口径：bash verify.sh --full；日志落盘供失败诊断）
         shell: bash
         env:
@@ -105,15 +103,19 @@ jobs:
             .nf-logs/
           if-no-files-found: warn
           include-hidden-files: true
+          retention-days: 7    # 三平台排障工件，7 天回收
       - name: 门禁机器可读报告（本 run 实时重算 → 工件；**绝不**上传受跟踪的陈旧报告）
         # N1（审计 P2）：同 ci-verify —— 失败时上传的必须是本 run 现算的结论。
         if: always()
         shell: bash
         run: |
           mkdir -p .artifacts
+          # 顺序必须是 **先 check 再 write**：先判「已落盘报告 == 实时重算」（真闸门），
+          # 再落盘供工件使用。反过来的话 --write 会把磁盘报告改成刚算出的结果，
+          # --check 就永远通过（fail-open，2026-11-11 修）。
+          python scripts/verify_report.py --check
           python scripts/verify_report.py --write
           python scripts/verify_report.py --json > .artifacts/verification-report.json || true
-          python scripts/verify_report.py --check
       - name: 上传门禁报告（三平台各留一份·本 run 结论）
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7
@@ -121,3 +123,4 @@ jobs:
           name: verification-report-${{ matrix.os }}
           path: .artifacts/verification-report.json
           if-no-files-found: warn
+          retention-days: 7    # 三平台报告工件，7 天回收

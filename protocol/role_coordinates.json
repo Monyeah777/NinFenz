@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1071
+    "verify": 1072
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7907,6 +7907,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "cross-platform 契约判据：同口径全量、先判后写、矩阵不掩盖、工件有限留存（2026-11-11）。",
+      "path": "desktop/tests/test_cross_platform_workflow_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "执行层常驻守护（core/daemon.py）单测：协议 / 令牌 / 拒绝面 / 等价性 / 新鲜度 / 相对加速。",
       "path": "desktop/tests/test_daemon.py",
       "role": "verify",
@@ -12810,7 +12816,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "399ff634dee731daa06a1756d6ffda184fd81e8332b46ac39266a51b6a455abb",
+  "root_digest": "ea897dc9a8c1e74d25413bd0857c363634208fdac5c7a34425fa6287d17996a3",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12819,7 +12825,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 945,
+    "R-verify": 946,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
