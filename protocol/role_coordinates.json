@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1092
+    "verify": 1093
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9491,6 +9491,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/agent/ROUTES.md 契约判据：路由后缀必须指向真件，死指针与死命令零容忍（2026-11-11）。",
+      "path": "desktop/tests/test_routes_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "语法级静态检查**本地化**：CI 跑的那条 ruff 规则（E9/F63/F7/F82），本机也要跑。",
       "path": "desktop/tests/test_ruff_syntax.py",
       "role": "verify",
@@ -12936,7 +12942,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "3a944c91bcb6fc103542297f5165157c5f62cef3f95a23bc82a71140aa18a31c",
+  "root_digest": "805ed56b968d634a4c145f6b351952e34f5a54664647b5c8ca1749e3d264258d",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12945,7 +12951,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 966,
+    "R-verify": 967,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
