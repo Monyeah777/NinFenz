@@ -33,12 +33,12 @@ Issues = "https://github.com/Monyeah777/NinFenz/issues"
 
 [project.optional-dependencies]
 # 版本真源 = .github/requirements-*.txt（改这里也要同步那边；dependabot 两处都覆盖）。
-ci = ["pyyaml==6.0.3", "PySide6==6.11.2", "jsonschema==4.26.0", "coverage==7.16.1"]
-lint = ["ruff==0.16.8"]
+ci = ["pyyaml==6.0.3", "PySide6==6.12.0", "jsonschema==4.26.0", "coverage==7.17.2"]
+lint = ["ruff==0.17.4"]
 audit = ["pip-audit==2.10.1"]
 sast = ["bandit==1.9.4"]
 cockpit = ["jsonschema==4.26.0"]
 dev = [
-  "pyyaml==6.0.3", "PySide6==6.11.2", "jsonschema==4.26.0", "coverage==7.16.1",
-  "ruff==0.16.8", "bandit==1.9.4", "pip-audit==2.10.1",
+  "pyyaml==6.0.3", "PySide6==6.12.0", "jsonschema==4.26.0", "coverage==7.17.2",
+  "ruff==0.17.4", "bandit==1.9.4", "pip-audit==2.10.1",
 ]
