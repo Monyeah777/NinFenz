@@ -41,6 +41,10 @@
       "source": "negative_assertion"
     },
     {
+      "module": "test_allstar_security_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_anchor_align.py",
       "source": "none"
     },
@@ -1769,10 +1773,10 @@
       "source": "negative_assertion"
     }
   ],
-  "modules": 442,
+  "modules": 443,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
   "suspect": 158,
-  "with_evidence": 143,
+  "with_evidence": 144,
   "without_evidence": 141
 }

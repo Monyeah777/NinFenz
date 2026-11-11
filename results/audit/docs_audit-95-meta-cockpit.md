@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:74dcbcf5cf7c7c7fa976d7e24dc8520b63834e15a997a55f48bb4d01ca05ab4f
+  - protocol/check12_weights.json:d8e39e71f6740f65c64c88f466e00d96a9a24daff926500ef83f0f7380a15a2f
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-11）：allstar security 契约化：唯一通过条件对账 + 内容质量边界（L2 43/43 收官）
+
 > 重审（2026-11-11）：allstar outside 契约化：权限开关显式收紧 + 组织级豁免边界 + 执行主体单点
 
 > 重审（2026-11-11）：allstar binary_artifacts 契约化：Scorecard 判定镜像 + 全仓零二进制工件 + ignorePaths 白名单
