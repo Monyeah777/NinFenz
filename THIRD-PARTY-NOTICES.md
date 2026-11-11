@@ -1,7 +1,7 @@
 # 第三方组件声明（THIRD-PARTY NOTICES）
 
 本文件由 `scripts/gen_third_party_notices.py` 从 **PyPI 官方元数据**生成，**请勿手改**；
-版本真源 = `.github/requirements-*.txt` 的 pin（跨文件去重），机读对照面 = `results/ccos/sbom.json`，新鲜度锚 = 锁文件摘要 `sha256:aa25989a9dec5eab`。
+版本真源 = `.github/requirements-*.txt` 的 pin（跨文件去重），机读对照面 = `results/ccos/sbom.json`，新鲜度锚 = 锁文件摘要 `sha256:bbf25778a9208ece`。
 生成失败时脚本**不写盘**（fail-closed），不会把「查询失败」写进本文件。
 
 ## 归属声明（Attribution）

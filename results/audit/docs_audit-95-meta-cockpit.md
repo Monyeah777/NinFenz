@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:4555b9ba94b3f1ee7388c8b5e73eabdbfb00227988718db2c812cd0fb99c9640
+  - protocol/check12_weights.json:deb5277be70c6a0939a72a53ea54cc791f2d6eea515542edcd176a3e9f3d3270
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-11）：requirements-lint/sast/audit 三份固定集契约化（同族机械同步）：生成头改为仓库内可复现命令（--extra lint/sast/audit pyproject.toml；audit 保留 --allow-unsafe），hash 完备/自包含/ASCII/禁重复与 extras 纳入判据，并新增跨文件版本一致性对账（含 ci，cross-platform 同时装全部）；lock_digest 变化 → 重生成 THIRD-PARTY-NOTICES.md；新增 test_requirements_pins_contract（3 项含六类变异自证）。本轮为机械重绑。
+
 > 重审（2026-11-11）：requirements-ci 契约化：每钉版 hash 完备（sha256 64hex、无重复）、直钉与 pyproject ci extra 镜像一致、生成命令改为仓库内可复现（--extra ci pyproject.toml，去掉不存在的外部输入）、自包含（禁 -r/-c/-e）、ASCII/CRLF/结尾换行、禁重复/extras；编辑头部后 lock_digest 变化 → 用生成器重写 THIRD-PARTY-NOTICES.md（44 组件）并同步判据。新增 test_requirements_ci_contract（4 项含五类变异自证）。本轮为机械重绑。
 
 > 重审（2026-11-11）：gitee_ingest 脚本契约化：**推送顺序修为先 origin（真源）后 Gitee（镜像）**（原顺序会让镜像领先真源、下一次非快进永久卡死镜像），两处推送都加 pull --rebase 重试；幂等（来源：Gitee Issue #N 认账）、令牌仅从 env + secret=TOKEN 回显脱敏、API 响应有界、issue 分页上限、gitee 通道闸门/配额/超长/密钥/注入/frontmatter 闸门、原子写、36 进制编号；新增 test_gitee_ingest_script_contract（3 项含五类变异自证 + 幂等功能测试）。本轮为机械重绑。
