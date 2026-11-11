@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1079
+    "verify": 1080
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8207,6 +8207,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "external-links 契约判据：非门禁定位、离线面永远绿、联网面有硬预算、报告只走工件（2026-11-11）。",
+      "path": "desktop/tests/test_external_links_workflow_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "External metadata must stay machine-readable and version-coherent.",
       "path": "desktop/tests/test_external_metadata.py",
       "role": "verify",
@@ -12858,7 +12864,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "e6c59d82b169282c5e4c73af77747e88411daf10499c7f4ebc47b04683289591",
+  "root_digest": "13ac03589717ae5800ea2ebd1ae325c489e3b100c02ec174892087f55c5f07c3",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12867,7 +12873,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 953,
+    "R-verify": 954,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
