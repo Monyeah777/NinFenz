@@ -122,6 +122,7 @@
     "test_domain_pack": 0.3,
     "test_domain_pack_render": 0.3,
     "test_dotnet_aot": 0.2,
+    "test_dotnet_build_workflow_contract": 0.2,
     "test_drill_fidelity": 0.3,
     "test_e2e_desktop_workflow_contract": 0.2,
     "test_ed25519": 0.2,
@@ -1699,6 +1700,10 @@
     "test_dotnet_aot.AotEquivalenceTest.test_aot_matches_spec_on_every_conformance_vector": 0.0,
     "test_dotnet_aot.ArtifactShapeTest.test_aot_is_much_smaller_than_trimmed_self_contained": 0.0,
     "test_dotnet_aot.ArtifactShapeTest.test_gitignore_keeps_publish_output_out_of_the_repo": 0.0,
+    "test_dotnet_build_workflow_contract.DotnetBuildWorkflowContractTest.test_contract_catches_broken_workflow": 0.0,
+    "test_dotnet_build_workflow_contract.DotnetBuildWorkflowContractTest.test_csprojs_exist": 0.0,
+    "test_dotnet_build_workflow_contract.DotnetBuildWorkflowContractTest.test_out_of_tree_build": 0.0,
+    "test_dotnet_build_workflow_contract.DotnetBuildWorkflowContractTest.test_workflow_matches_contract": 0.0,
     "test_drill_fidelity.MeasureTest.test_fidelity_is_ratio_of_passed_cases": 0.01,
     "test_drill_fidelity.MeasureTest.test_round_mismatch_is_detected": 0.01,
     "test_drill_fidelity.MeasureTest.test_round_verdict_mapping": 0.01,
@@ -4841,5 +4846,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1826.4
+  "total_s": 1826.6
 }

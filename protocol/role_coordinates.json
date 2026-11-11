@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1077
+    "verify": 1078
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8069,6 +8069,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "dotnet-build 契约判据：树外构建、SDK 守卫、失败即红、证据可下载（2026-11-11）。",
+      "path": "desktop/tests/test_dotnet_build_workflow_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "演练保真度（`core/drill_fidelity.py`）回归测试 —— 动态可执行面。",
       "path": "desktop/tests/test_drill_fidelity.py",
       "role": "verify",
@@ -12846,7 +12852,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "47bb969bfbb29f5f2426f74112146a40758d44e4b46c4d64e8dc853b82f2cdef",
+  "root_digest": "01663959830bf67a52df398b69212d2daaac64f55034a0811c42cb77404a5870",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12855,7 +12861,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 951,
+    "R-verify": 952,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

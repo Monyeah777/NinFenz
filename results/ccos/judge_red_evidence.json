@@ -485,6 +485,10 @@
       "source": "none"
     },
     {
+      "module": "test_dotnet_build_workflow_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_drill_fidelity.py",
       "source": "naming"
     },
@@ -1717,10 +1721,10 @@
       "source": "negative_assertion"
     }
   ],
-  "modules": 429,
+  "modules": 430,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
   "suspect": 154,
-  "with_evidence": 134,
+  "with_evidence": 135,
   "without_evidence": 141
 }
