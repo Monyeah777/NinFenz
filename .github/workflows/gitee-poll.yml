@@ -6,6 +6,8 @@ name: gitee-poll
 #   → git 提交推双端（gitee 子令牌 + origin）→ Gitee Issue 回评双端链接 → 关闭
 # 依赖 Secrets：GITEE_TOKEN（Gitee 子令牌：issues 读写 + 仓库推送权限，作者在
 #   Gitee 设置生成——主令牌绝不共享，子令牌泄露可控）
+# 工作流口径（最小权限 / 共享写锁 / 无令牌 skip 不假红 / 凭据保留说明 / 工件保留期）由
+# desktop/tests/test_gitee_poll_workflow_contract.py 判据守住。
 on:
   schedule:
     - cron: '*/10 * * * *'
@@ -26,6 +28,9 @@ jobs:
       contents: write
     timeout-minutes: 20          # 挂死上限（2026-10-01 统一）：轮询入库卡住不许拖到下个周期
     steps:
+      # 注意：本 workflow **刻意保留 checkout 的凭据注入**（不关闭）——入库要 `git push`
+      # 到 origin（GitHub 端），凭据来自 checkout；Gitee 端另用 GITEE_TOKEN 子令牌。
+      # 照抄其它 workflow 的「关闭凭据」写法会让 GitHub 端推送 401。
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
         with:
           fetch-depth: 0
@@ -59,3 +64,4 @@ jobs:
             .artifacts/
             *.log
           if-no-files-found: ignore
+          retention-days: 7    # 轮询诊断：7 天回收（每 10 分钟一轮，工件不能无限堆积）
