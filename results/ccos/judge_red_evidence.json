@@ -637,6 +637,10 @@
       "source": "negative_assertion"
     },
     {
+      "module": "test_gitee_poll_workflow_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_governance_docs.py",
       "source": "naming"
     },
@@ -1685,10 +1689,10 @@
       "source": "negative_assertion"
     }
   ],
-  "modules": 421,
+  "modules": 422,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
   "suspect": 154,
-  "with_evidence": 126,
+  "with_evidence": 127,
   "without_evidence": 141
 }
