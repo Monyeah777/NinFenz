@@ -432,7 +432,7 @@
     "test_verify_parallel_checks": 2.1,
     "test_verify_report": 99.4,
     "test_verify_tests_selection": 0.2,
-    "test_version_map": 2.3,
+    "test_version_map": 2.4,
     "test_version_matrix": 0.1,
     "test_watch": 62.7,
     "test_watermark_bench": 2.1,
@@ -4810,14 +4810,15 @@
     "test_verify_tests_selection.TestSelection.test_hard_fallback_verify_sh_goes_full": 0.0,
     "test_verify_tests_selection.TestSelection.test_selection_is_deterministic": 0.0,
     "test_verify_tests_selection.TestSelection.test_windows_separators_are_normalized": 0.0,
-    "test_version_map.CliNpmMcpVersionTest.test_three_faces_agree": 0.0,
+    "test_version_map.CliNpmMcpVersionTest.test_three_faces_agree": 0.01,
     "test_version_map.ContentVersionTest.test_changelog_and_matrix_agree": 0.0,
     "test_version_map.GateVersionTest.test_repo_stats_matches_quality_baseline_and_llms": 0.0,
     "test_version_map.MappingTableTest.test_mapping_table_lists_the_living_families": 0.0,
     "test_version_map.MappingTableTest.test_retired_freeze_family_is_gone": 0.0,
     "test_version_map.PublicSurfaceBindingTest.test_instruction_prerequisites_are_publicly_reachable": 0.0,
-    "test_version_map.PublicSurfaceBindingTest.test_live_numeric_claims_match_runtime": 0.65,
-    "test_version_map.PublicSurfaceBindingTest.test_managed_markdown_local_links_resolve": 1.47,
+    "test_version_map.PublicSurfaceBindingTest.test_live_numeric_claims_match_runtime": 1.91,
+    "test_version_map.PublicSurfaceBindingTest.test_managed_markdown_is_git_tracked_surface": 0.06,
+    "test_version_map.PublicSurfaceBindingTest.test_managed_markdown_local_links_resolve": 0.15,
     "test_version_matrix.VersionMatrixTest.test_matrix_has_rows": 0.0,
     "test_version_matrix.VersionMatrixTest.test_rows_have_four_columns": 0.0,
     "test_version_matrix.VersionMatrixTest.test_scheme_files_exist": 0.0,
@@ -4943,5 +4944,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1842.1
+  "total_s": 1842.2
 }

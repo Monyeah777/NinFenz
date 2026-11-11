@@ -13,6 +13,7 @@ import json
 import re
 import subprocess
 import sys
+import tempfile
 import tomllib
 import unittest
 from pathlib import Path
@@ -124,18 +125,47 @@ _FENCED = re.compile(r"```.*?```|~~~.*?~~~", re.S)
 _INLINE_CODE = re.compile(r"`[^`\n]*`")
 
 
-def managed_markdown():
-    """公开/受治理的 Markdown 面；历史变更日志、社区内容和生成 payload 不计。"""
+#: 生成 / 快照目录：git 不可用时的回退扫描必须跳过（本地 .rivet / .worktrees 曾拖慢并污染扫描面）。
+SKIP_DIRS = (".git", ".rivet", ".worktrees", "node_modules", "payload", "__pycache__")
+
+
+def _tracked_markdown(root: Path = ROOT) -> list:
+    """受跟踪 markdown 相对路径；git 不可用（归档快照环境）才回退到跳过快照目录的扫描。"""
+    try:
+        proc = subprocess.run(["git", "-C", str(root), "ls-files", "-z", "*.md"],
+                              capture_output=True, text=True, encoding="utf-8",
+                              errors="replace", timeout=180)
+    except (OSError, subprocess.SubprocessError):
+        proc = None
+    if proc is None or proc.returncode != 0:
+        out = []
+        for path in root.rglob("*.md"):
+            rel = path.relative_to(root)
+            if any(part in SKIP_DIRS for part in rel.parts):
+                continue
+            out.append(rel.as_posix())
+        return out
+    return [rel for rel in proc.stdout.split(chr(0)) if rel]
+
+
+def managed_markdown(root: Path = ROOT, tracked: list = None):
+    """公开/受治理的 Markdown 面（取 **git 追踪面**）；历史变更日志、社区内容与生成 payload 不计。
+
+    历史缺陷（本件修复，2026-11-11）：原实现为 ROOT.rglob("*.md") + 事后过滤——本地 .rivet /
+    .worktrees 快照里的几千份 md 全都要走一遍（慢且不隔离），只在结果层被过滤掉；一旦出现新的
+    未跟踪目录（如 scratch/docs/…）就会混入扫描面。改为 git 追踪面后，扫描面 = 仓库真实内容。
+    """
     roots = {"docs", "results", "protocol", "packaging", "integrations"}
-    for p in ROOT.rglob("*.md"):
-        rel = p.relative_to(ROOT)
-        if any(part in {".git", ".rivet", "node_modules", "payload", "__pycache__"}
-               for part in rel.parts):
+    rels = _tracked_markdown(root) if tracked is None else list(tracked)
+    for rel in rels:
+        parts = rel.split("/")
+        if any(part in SKIP_DIRS for part in parts):
             continue
-        if rel.parts[0] in {"community", "CHANGELOG.md"}:
+        if parts[0] in {"community", "CHANGELOG.md"}:
             continue
-        if len(rel.parts) == 1 or rel.parts[0] in roots:
-            yield p
+        if len(parts) == 1 or parts[0] in roots:
+            yield root / rel
+
 
 
 def missing_local_links():
@@ -173,6 +203,24 @@ def missing_local_links():
 
 class PublicSurfaceBindingTest(unittest.TestCase):
     """公开入口的数字与链接必须能落到当前仓库事实。"""
+
+    def test_managed_markdown_is_git_tracked_surface(self):
+        """扫描面 = git 追踪面：未跟踪目录（本地快照 / scratch）不得混入，面不得塌缩。"""
+        self.assertGreaterEqual(sum(1 for _ in managed_markdown()), 200,
+                                "受治理 markdown 面塌缩（判据可能空转）")
+        tracked = ["docs/a.md", "README.md", "community/c.md", "CHANGELOG.md",
+                   "packaging/npm/payload/x.md", ".rivet/snap/docs/z.md"]
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            got = sorted(p.relative_to(root).as_posix()
+                         for p in managed_markdown(root, tracked))
+            self.assertEqual(["README.md", "docs/a.md"], got, "治理面 / 排除面判错")
+            (root / "scratch" / "docs").mkdir(parents=True)
+            (root / "scratch" / "docs" / "u.md").write_text("# u\n", encoding="utf-8")
+            got2 = sorted(p.relative_to(root).as_posix()
+                          for p in managed_markdown(root, ["docs/a.md"]))
+            self.assertEqual(["docs/a.md"], got2, "未跟踪目录混入扫描面")
+
 
     def test_managed_markdown_local_links_resolve(self):
         missing, checked = missing_local_links()
