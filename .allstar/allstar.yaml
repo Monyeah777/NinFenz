@@ -1,8 +1,35 @@
-# Repository policy configuration for self-hosted Allstar.
-# Committing this file records configuration readiness only; it is not proof
+# Allstar 应用配置（ossf/allstar）。本目录是**配置就绪声明**，不是启用证据：
+# Allstar 以 GitHub App 形态运行（官方 hosted app 已退役，只能自建 App 或以 Action / 常驻
+# daemon 方式运行）；仓库级 `.allstar/` 只在该仓库所属**组织**已运行 Allstar、且组织级
+# 允许 repo override 时才被读取。本仓是个人账号仓库，因此这里记录的是「纳入组织启用时
+# 期望的配置形状」：committing this file records configuration readiness only; it is not proof
 # that an Allstar runner or GitHub App has been enabled for the repository.
+#
+# 仓库级字段口径（上游 pkg/config/config.go：仓库级读 RepoConfig，组织级读 OrgConfig）：
+#   * 仓库级真正生效的是 issueLabel（以及 schedule）；
+#   * optConfig.optOutStrategy 属**组织级** OrgOptConfig，仓库级 RepoOptConfig 只有
+#     optIn/optOut——写在这里会被 Allstar 静默忽略，不能把本仓置为 enabled；
+#   * issueFooter 同属组织级字段，仓库级不读取；指向 SECURITY.md 的这段文案必须在组织的
+#     `.allstar/allstar.yaml` 里配置才生效（且与 operator 级 footer 是拼接、不是替换，
+#     只在新建 issue 时生效）。
+#   两处保留是为与组织级模板逐字对齐（迁移时照抄），不代表本文件已生效。
+#
+# label 前置条件：issueLabel 必须在仓库 Labels 里**预先存在**——Allstar 不自动建 label，
+# 只按标签检索自己建的 issue；标签缺失会让创建 issue 的 API 调用报错、该仓库本轮剩余策略
+# 不再执行，且已建 issue 也检索不到（每轮重复新建、永不自动关闭）。
+#
+# 覆盖边界：上游注册 10 个策略（actions / admin / binary_artifacts / branch_protection /
+# codeowners / dangerous_workflow / outside / scorecard / secret_scanning / security），
+# 本仓只维护其中 5 个（binary_artifacts / branch_protection / dangerous_workflow / outside /
+# security）；其余策略未配置 = 走默认 action log（不产生任何可见结果）。
+#
+# fail-open 事实（为什么必须有判据兜住）：Allstar 非严格解析（无 DisallowUnknownFields）——
+# 未知/拼错的键被静默忽略；已知键类型写错会让**整份文件被丢弃**、回落到默认值；YAML 语法错
+# 只记 warn 后继续。默认 action 是 log（只进操作者日志、不产生任何可见结果）。所以写错文件名 /
+# 键名 / 漏 action 都不会让任何测试红，等于「配置写了等于没写」。
+# 判据：desktop/tests/test_allstar_config_contract.py（六件齐备 / 有效键集 / action=issue /
+# 组织级模板逐字一致 / caveat 与 label 前置条件不被删 / 变异自证）。
 optConfig:
   optOutStrategy: true
 issueLabel: allstar
 issueFooter: Review this repository policy finding against SECURITY.md before changing configuration.
-
