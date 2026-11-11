@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1091
+    "verify": 1092
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8063,6 +8063,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "全仓相对链接契约判据：markdown 链接 / 图片 / HTML href / 锚点都必须指向真件（2026-11-11）。",
+      "path": "desktop/tests/test_doc_links_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "路径可达门禁：入口文档里的仓库相对路径与 `nf <子命令>` 必须真实可达。",
       "path": "desktop/tests/test_doc_reachability.py",
       "role": "verify",
@@ -12930,7 +12936,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "d06131483cf9a91ce4af17d01cc3a76723370f005449425bd9c19573b96d139d",
+  "root_digest": "3a944c91bcb6fc103542297f5165157c5f62cef3f95a23bc82a71140aa18a31c",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12939,7 +12945,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 965,
+    "R-verify": 966,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

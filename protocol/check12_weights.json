@@ -121,6 +121,7 @@
     "test_disk_cache_bounds": 0.2,
     "test_doc_examples": 3.5,
     "test_doc_hygiene": 0.7,
+    "test_doc_links_contract": 3.0,
     "test_doc_reachability": 10.3,
     "test_doc_routing": 0.2,
     "test_doc_truth": 0.4,
@@ -1681,6 +1682,11 @@
     "test_doc_hygiene.DocHygieneTest.test_stale_warns_and_fresh_silent": 0.09,
     "test_doc_hygiene.DocHygieneTest.test_text_sanity_flags_fence_and_mojibake": 0.01,
     "test_doc_hygiene.DocHygieneTest.test_text_sanity_real_repo_counts_are_explicit": 0.32,
+    "test_doc_links_contract.DocLinksContractTest.test_anchor_slugs_follow_github_rules": 0.57,
+    "test_doc_links_contract.DocLinksContractTest.test_code_spans_are_not_links": 0.53,
+    "test_doc_links_contract.DocLinksContractTest.test_contract_catches_broken_links": 0.56,
+    "test_doc_links_contract.DocLinksContractTest.test_html_hrefs_are_covered": 0.53,
+    "test_doc_links_contract.DocLinksContractTest.test_relative_links_resolve": 0.56,
     "test_doc_reachability.DocPathReachabilityTest.test_entry_docs_exist": 0.0,
     "test_doc_reachability.DocPathReachabilityTest.test_nf_subcommands_resolve": 0.02,
     "test_doc_reachability.DocPathReachabilityTest.test_relative_paths_resolve": 0.02,
@@ -4913,5 +4919,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1834.3
+  "total_s": 1837.3
 }

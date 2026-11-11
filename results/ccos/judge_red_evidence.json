@@ -481,6 +481,10 @@
       "source": "none"
     },
     {
+      "module": "test_doc_links_contract.py",
+      "source": "naming"
+    },
+    {
       "module": "test_doc_reachability.py",
       "source": "none"
     },
@@ -1773,10 +1777,10 @@
       "source": "negative_assertion"
     }
   ],
-  "modules": 443,
+  "modules": 444,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
-  "suspect": 158,
+  "suspect": 159,
   "with_evidence": 144,
   "without_evidence": 141
 }
