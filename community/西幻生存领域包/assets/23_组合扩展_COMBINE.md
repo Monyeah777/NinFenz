@@ -45,7 +45,7 @@
 组合技接口（技能系统，行5735-5750）：
 - **get_available_combos**（行5735）：遍历 combo_defs，检查玩家与队友技能是否满足 requires 条件，返回可用组合技列表——注册键行5783（external_data["get_available_combos"]）；
 - **execute_combo**（行5750）：按 id 查找组合技定义并执行，返回效果描述文本；
-- **战斗触发**（行5812）：战斗中通过 EXTERNAL_DATA["get_available_combos"](state, ally_skills) 检测可用组合，玩家可选择执行。
+- **战斗触发**（行5812）：战斗中通过 `EXTERNAL_DATA["get_available_combos"](state, ally_skills)` 检测可用组合，玩家可选择执行。
 
 ##### 23.1.3 流派协同
 
