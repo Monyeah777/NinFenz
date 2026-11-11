@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1087
+    "verify": 1088
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7385,6 +7385,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "Allstar Dangerous Workflow 契约判据：配置不静默 + 全仓危险工作流扫描零命中（2026-11-11）。",
+      "path": "desktop/tests/test_allstar_dangerous_workflow_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "双向锚定对齐面（core/anchor_align.py）回归测试 —— 反向利用率 / 正向词汇交叉。",
       "path": "desktop/tests/test_anchor_align.py",
       "role": "verify",
@@ -12906,7 +12912,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "dc3c08b780f02e4657b624b55ab4f900716c810584b87d444d3c306e68f9ede9",
+  "root_digest": "f84911ed74062419efd7d7bba20a9de9f1b6a06adeef9e24e10f12341486cfc6",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12915,7 +12921,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 961,
+    "R-verify": 962,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
