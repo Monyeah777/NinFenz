@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:a37894af534c746a8a09832a66864f1c82e3a84c2b0def18df0e8a0987929c31
+  - protocol/check12_weights.json:323f86a5d2bc7b87266cd109689e2785a45fd7ebd052d7380f024bf5f8768bd1
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-11）：gitee_ingest 脚本契约化：**推送顺序修为先 origin（真源）后 Gitee（镜像）**（原顺序会让镜像领先真源、下一次非快进永久卡死镜像），两处推送都加 pull --rebase 重试；幂等（来源：Gitee Issue #N 认账）、令牌仅从 env + secret=TOKEN 回显脱敏、API 响应有界、issue 分页上限、gitee 通道闸门/配额/超长/密钥/注入/frontmatter 闸门、原子写、36 进制编号；新增 test_gitee_ingest_script_contract（3 项含五类变异自证 + 幂等功能测试）。本轮为机械重绑。
+
 > 重审（2026-11-11）：library_ingest 脚本契约化：标准库+core 白名单、正文真源优先级（文件>env>API）、超长/密钥形状/空壳/frontmatter 形状/白名单/配额六道拒收闸门、注入记档、36 进制编号、原子写、日志脱敏、禁执行面；新增推送韧性（push 失败 pull --rebase 重试一次，仍失败在 Issue 留可执行提示——workflow 仅 issues:opened 触发，静默丢失不可接受）；新增 test_library_ingest_script_contract（3 项含五类变异自证 + 真源优先级功能测试）。本轮为机械重绑。
 
 > 重审（2026-11-11）：net-probes 契约化（workflow 家族收官）：仅手动触发（禁 schedule/push/PR，历史重写后金标缺失只会每周假红）、金标未前移期间 continue-on-error=true（诊断信号，须写明理由）、快照 ref 参数化 + git archive + Python tarfile 解包 + 不可用 fail-fast、树外构建、双 RID 交付形态、跑批 7 个占位符全解析、探针清单在场、失败证据工件（failure-only）保留 7 天；新增 test_net_probes_workflow_contract（4 项含五类变异自证）。本轮为机械重绑。

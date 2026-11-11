@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1082
+    "verify": 1083
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8345,6 +8345,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "gitee_ingest 脚本契约判据：先真源后镜像、幂等、令牌不外泄、有界、屏障齐全（2026-11-11）。",
+      "path": "desktop/tests/test_gitee_ingest_script_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "gitee-poll 契约判据：共享写锁、无令牌不假红、凭据保留显式、工件有限留存（2026-11-11）。",
       "path": "desktop/tests/test_gitee_poll_workflow_contract.py",
       "role": "verify",
@@ -12876,7 +12882,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "4a3372ab7f48a9ae6651e90ec91d4c22fe466b5ea356cb9dc49f7360b94457da",
+  "root_digest": "5cb157186db1ac07335a4d35487f7617c6152002e905ed8a88443a36210a2cab",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12885,7 +12891,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 956,
+    "R-verify": 957,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

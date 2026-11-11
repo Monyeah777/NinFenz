@@ -444,11 +444,24 @@ def process(issue):
     git('commit',
  '-m',
  f'lib(Y12): Gitee 云端代收 {nfid} 自动入库（Gitee Issue #{number}，投稿人 {author}）')
+    # 推送顺序（2026-11-11 修）：**先 origin（真源/CI 检出面）再 Gitee（镜像面）**。
+    # 反过来的风险：镜像先领先 → 真源落后；下一次 Gitee 推送必然非快进 → 镜像**永久卡死**
+    # （此后每轮都失败，且已入库的条目在真源里找不到）。
+    try:
+        git('push', 'origin', 'HEAD:main')
+    except RuntimeError as first:
+        print(f'  首次推送 origin 失败（{first}）——pull --rebase 后重试一次')
+        git('pull', '--rebase', 'origin', 'main')
+        git('push', 'origin', 'HEAD:main')
     # Gitee push：子令牌**只作本次 push 的 URL 参数**——不写 .git/config（失败也不残留，
     # CWE-522），参数与 git 回显全程经 _redact 脱敏（CWE-532）。
-    git('push', f'https://{GITEE_OWNER}:{TOKEN}@gitee.com/{GITEE_OWNER}/{GITEE_REPO}.git',
-        'HEAD:main')
-    git('push', 'origin', 'HEAD:main')
+    gitee_url = f'https://{GITEE_OWNER}:{TOKEN}@gitee.com/{GITEE_OWNER}/{GITEE_REPO}.git'
+    try:
+        git('push', gitee_url, 'HEAD:main')
+    except RuntimeError as first:
+        print(f'  镜像（Gitee）推送失败（{first}）——pull --rebase 镜像后重试一次')
+        git('pull', '--rebase', gitee_url, 'main')
+        git('push', gitee_url, 'HEAD:main')
 
     reply = (
         f'✅ **云端代收成功——已入库 {nfid}**《{title}》\n\n'
