@@ -1357,6 +1357,10 @@
       "source": "naming"
     },
     {
+      "module": "test_requirements_ci_contract.py",
+      "source": "naming"
+    },
+    {
       "module": "test_residual_registry.py",
       "source": "none"
     },
@@ -1741,10 +1745,10 @@
       "source": "negative_assertion"
     }
   ],
-  "modules": 435,
+  "modules": 436,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
-  "suspect": 156,
+  "suspect": 157,
   "with_evidence": 138,
   "without_evidence": 141
 }
