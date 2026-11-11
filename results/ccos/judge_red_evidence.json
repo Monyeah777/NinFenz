@@ -1493,6 +1493,10 @@
       "source": "none"
     },
     {
+      "module": "test_scan_surface_contract.py",
+      "source": "none"
+    },
+    {
       "module": "test_schema_lint.py",
       "source": "naming"
     },
@@ -1785,10 +1789,10 @@
       "source": "negative_assertion"
     }
   ],
-  "modules": 446,
+  "modules": 447,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
   "suspect": 161,
   "with_evidence": 144,
-  "without_evidence": 141
+  "without_evidence": 142
 }

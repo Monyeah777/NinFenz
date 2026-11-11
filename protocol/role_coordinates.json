@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1094
+    "verify": 1095
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9581,6 +9581,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "扫描面契约判据：判据不得自持「仓库根递归扫描面」（2026-11-11，L4 元判据）。",
+      "path": "desktop/tests/test_scan_surface_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "43 A1 —— 协议层 IDL schema 校验器单测（自实现 JSON-schema 子集 + 全量件扫描）。",
       "path": "desktop/tests/test_schema_lint.py",
       "role": "verify",
@@ -12948,7 +12954,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "3c7a7d3e7d50137e63c8b7972ea63dfda9e7254b9b03a3385fc9cbc09fa6f697",
+  "root_digest": "91935da6b5eb5310c9103c5afb77ba9a4a6203e6f3d42dfb02265068e0e1e0b5",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12957,7 +12963,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 968,
+    "R-verify": 969,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

@@ -374,6 +374,7 @@
     "test_sast_workflow_contract": 0.2,
     "test_sbom": 1.0,
     "test_scale_receipts": 2.0,
+    "test_scan_surface_contract": 1.8,
     "test_schema_lint": 1.1,
     "test_schema_pins": 0.1,
     "test_schema_reference": 0.4,
@@ -4259,6 +4260,9 @@
     "test_scale_receipts.TestProofScale.test_proofs_fold_to_root_for_many_sizes": 0.01,
     "test_scale_receipts.TestProofScale.test_receipts_write_is_idempotent": 0.01,
     "test_scale_receipts.TestProofScale.test_single_leaf_and_empty": 0.0,
+    "test_scan_surface_contract.ScanSurfaceContractTest.test_contract_catches_self_held_root_scan": 0.01,
+    "test_scan_surface_contract.ScanSurfaceContractTest.test_no_judgment_scans_repo_root_recursively": 1.5,
+    "test_scan_surface_contract.ScanSurfaceContractTest.test_scan_surface_is_not_collapsed": 0.05,
     "test_schema_lint.DirectEnumerationTest.test_faces_match_legacy_enumeration": 0.09,
     "test_schema_lint.DocLintCacheTest.test_content_keyed_and_path_independent": 0.03,
     "test_schema_lint.DocLintCacheTest.test_module_docs_match_reference": 0.15,
@@ -4945,5 +4949,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1844.2
+  "total_s": 1846.0
 }
