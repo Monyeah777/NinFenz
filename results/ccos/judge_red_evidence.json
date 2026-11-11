@@ -461,6 +461,10 @@
       "source": "naming"
     },
     {
+      "module": "test_docker_nfal_workflow_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_docs_cite_probe_numbers.py",
       "source": "naming"
     },
@@ -1705,10 +1709,10 @@
       "source": "negative_assertion"
     }
   ],
-  "modules": 426,
+  "modules": 427,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
   "suspect": 154,
-  "with_evidence": 131,
+  "with_evidence": 132,
   "without_evidence": 141
 }
