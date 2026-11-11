@@ -60,7 +60,7 @@
     "test_check_merge_equivalence": 5.2,
     "test_check_policy": 0.2,
     "test_check_text_to_intent": 0.9,
-    "test_ci_diagnostics": 0.2,
+    "test_ci_diagnostics": 0.3,
     "test_ci_health_workflow_contract": 0.2,
     "test_ci_supply_chain": 0.2,
     "test_ci_verify_contract": 0.2,
@@ -1006,6 +1006,18 @@
     "test_ci_diagnostics.ArtifactPolicyTest.test_key_workflows_have_an_artifact_step": 0.0,
     "test_ci_diagnostics.ArtifactPolicyTest.test_mutation_is_caught": 0.0,
     "test_ci_diagnostics.ArtifactPolicyTest.test_no_workflow_uploads_tracked_files": 0.0,
+    "test_ci_diagnostics.CiHealthAuditSourceTest.test_audit_excludes_itself": 0.0,
+    "test_ci_diagnostics.CiHealthAuditSourceTest.test_audit_skips_in_flight_runs": 0.0,
+    "test_ci_diagnostics.CiHealthAuditSourceTest.test_audit_window_is_paginated": 0.0,
+    "test_ci_diagnostics.CodeqlWorkflowTest.test_main_push_and_weekly_schedule_exist": 0.0,
+    "test_ci_diagnostics.CodeqlWorkflowTest.test_pr_trigger_is_path_filtered": 0.0,
+    "test_ci_diagnostics.DockerfileDigestPinTest.test_all_from_lines_are_digest_pinned": 0.1,
+    "test_ci_diagnostics.DockerfileDigestPinTest.test_contract_catches_unpinned_and_empty_surface": 0.01,
+    "test_ci_diagnostics.DockerfileDigestPinTest.test_untracked_snapshots_do_not_pollute": 0.01,
+    "test_ci_diagnostics.GateAlwaysRunsTest.test_gate_is_always_run_and_checks_dependencies": 0.0,
+    "test_ci_diagnostics.HiddenArtifactPathTest.test_no_artifact_path_is_a_hidden_file": 0.0,
+    "test_ci_diagnostics.ParityKeyCompareTest.test_parity_compares_keys_not_only_totals": 0.0,
+    "test_ci_diagnostics.TeePipefailTest.test_all_tee_steps_have_pipefail": 0.0,
     "test_ci_health_workflow_contract.CiHealthWorkflowContractTest.test_contract_catches_broken_workflow": 0.03,
     "test_ci_health_workflow_contract.CiHealthWorkflowContractTest.test_latest_run_semantics": 0.0,
     "test_ci_health_workflow_contract.CiHealthWorkflowContractTest.test_read_only_watchdog": 0.0,
@@ -4931,5 +4943,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1842.0
+  "total_s": 1842.1
 }
