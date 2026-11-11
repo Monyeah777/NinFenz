@@ -96,6 +96,7 @@
     "test_coverage_workflow_contract": 0.2,
     "test_cross_lang_matrix": 4.8,
     "test_cross_lang_verify": 1.6,
+    "test_cross_lang_workflow_contract": 0.2,
     "test_cross_platform_workflow_contract": 0.2,
     "test_daemon": 23.0,
     "test_daemon_limits": 0.3,
@@ -1427,6 +1428,10 @@
     "test_cross_lang_verify.ManifestShapeTest.test_covered_vector_ids_are_stable": 0.0,
     "test_cross_lang_verify.ManifestShapeTest.test_every_manifest_is_wellformed": 0.0,
     "test_cross_lang_verify.RealVectorTest.test_repo_vector_arbitrates": 1.43,
+    "test_cross_lang_workflow_contract.CrossLangWorkflowContractTest.test_contract_catches_broken_workflow": 0.01,
+    "test_cross_lang_workflow_contract.CrossLangWorkflowContractTest.test_full_mode_and_byte_level_digest": 0.0,
+    "test_cross_lang_workflow_contract.CrossLangWorkflowContractTest.test_read_only_and_single_baseline_gate": 0.0,
+    "test_cross_lang_workflow_contract.CrossLangWorkflowContractTest.test_workflow_matches_contract": 0.0,
     "test_cross_platform_workflow_contract.CrossPlatformWorkflowContractTest.test_check_precedes_write": 0.01,
     "test_cross_platform_workflow_contract.CrossPlatformWorkflowContractTest.test_contract_catches_broken_workflow": 0.0,
     "test_cross_platform_workflow_contract.CrossPlatformWorkflowContractTest.test_three_os_matrix": 0.0,
@@ -4831,5 +4836,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1826.0
+  "total_s": 1826.2
 }

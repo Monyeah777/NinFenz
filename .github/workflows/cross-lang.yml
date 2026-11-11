@@ -69,3 +69,4 @@ jobs:
         with:
           name: cross-lang-report
           path: cross-lang-report.json
+          retention-days: 7    # 退化证据，7 天回收

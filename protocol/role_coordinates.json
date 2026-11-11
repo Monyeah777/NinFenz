@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1075
+    "verify": 1076
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7913,6 +7913,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "cross-lang 契约判据：跨语言对拍须「full 模式、只读、三实现齐、退化留证」（2026-11-11）。",
+      "path": "desktop/tests/test_cross_lang_workflow_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "cross-platform 契约判据：同口径全量、先判后写、矩阵不掩盖、工件有限留存（2026-11-11）。",
       "path": "desktop/tests/test_cross_platform_workflow_contract.py",
       "role": "verify",
@@ -12834,7 +12840,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "cfde0816a8ecd27b7f011b84e8673e17ad8a303c2df73fdad749e052d923bd19",
+  "root_digest": "94d8ac22e373f9ecb3635d15242dd0f8a7a562e81fb12a02281d0b76470b67aa",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12843,7 +12849,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 949,
+    "R-verify": 950,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
