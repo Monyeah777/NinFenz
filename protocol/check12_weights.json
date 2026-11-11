@@ -121,6 +121,7 @@
     "test_domain_pack_render": 0.3,
     "test_dotnet_aot": 0.2,
     "test_drill_fidelity": 0.3,
+    "test_e2e_desktop_workflow_contract": 0.2,
     "test_ed25519": 0.2,
     "test_effect_rows": 1.2,
     "test_engine_ffi_binding": 0.2,
@@ -1704,6 +1705,10 @@
     "test_drill_fidelity.ScanTest.test_imperfect_fidelity_fails": 0.01,
     "test_drill_fidelity.ScanTest.test_no_fixtures_fails_with_guidance": 0.0,
     "test_drill_fidelity.ScanTest.test_perfect_fidelity_passes": 0.01,
+    "test_e2e_desktop_workflow_contract.E2eDesktopWorkflowContractTest.test_contract_catches_broken_workflow": 0.0,
+    "test_e2e_desktop_workflow_contract.E2eDesktopWorkflowContractTest.test_headless_no_gui_dependency": 0.0,
+    "test_e2e_desktop_workflow_contract.E2eDesktopWorkflowContractTest.test_same_script_as_release_gate": 0.0,
+    "test_e2e_desktop_workflow_contract.E2eDesktopWorkflowContractTest.test_workflow_matches_contract": 0.0,
     "test_ed25519.CrossImplementationTest.test_our_signature_verifies_in_reference": 0.03,
     "test_ed25519.CrossImplementationTest.test_reference_signature_verifies_here": 0.0,
     "test_ed25519.Rfc8032GoldenTest.test_test1_public_key": 0.0,
@@ -4820,5 +4825,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1825.6
+  "total_s": 1825.8
 }
