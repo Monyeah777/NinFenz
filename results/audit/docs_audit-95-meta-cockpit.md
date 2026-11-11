@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:e108cee5cb42bcf02a263f1801f5a4b82e89fb6a4c0579caff597170560e50aa
+  - protocol/check12_weights.json:df23c0476e8fc1fe058119d300d3ba04b48f6dc63d7696e6e7f9cbd152ceeec3
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-11）：L4 判据质量：test_ci_diagnostics Dockerfile 扫描面改 git 追踪面（去本地快照假红）
+
 > 重审（2026-11-11）：llms.txt 判据修正：URL 正则反斜杠（CodeQL 高危正则漏检修复）
 
 > 重审（2026-11-11）：L3 收官：llms.txt 卡册生成器死指针 + conformance 计数漂移修复 + 机器入口契约判据

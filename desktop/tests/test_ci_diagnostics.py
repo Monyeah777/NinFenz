@@ -6,7 +6,10 @@
    受跟踪的 protocol/verification_report.json，红跑也会送出一份写着 fail=0 的「自证绿」产物。
 2. **关键门禁必须有失败时也可下载的产物**：日志目录 + 实时重算报告。
 """
+import os
 import re
+import subprocess
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -265,29 +268,108 @@ class CodeqlWorkflowTest(unittest.TestCase):
         self.assertIn("cron:", self.text, "codeql schedule 缺 cron 表达式")
 
 
-class DockerfileDigestPinTest(unittest.TestCase):
-    """所有 Dockerfile 的基座必须按 digest 钉（2026-11-09 #240 的安全不变式）。
+#: 生成/快照目录：git 不可用时的回退扫描必须跳过（本地 .rivet/.worktrees 曾造成假红）。
+SKIP_DIRS = (".git", ".rivet", ".worktrees", "node_modules", "__pycache__")
 
-    只钉 tag（`FROM python:3.12-slim`）会随上游 tag 漂移——构建不可复现，且 tag 被接管时
-    可被投毒。本仓 nfal/hf-space 两处曾裸 tag，已改 `image:tag@sha256:…`；此守卫防回退。
+
+def _tracked(root: Path = ROOT) -> list:
+    """git 追踪面（None = git 不可用，调用方回退到文件系统扫描）。"""
+    try:
+        proc = subprocess.run(["git", "-C", str(root), "ls-files", "-z"],
+                              capture_output=True, text=True, encoding="utf-8",
+                              errors="replace", timeout=180)
+    except (OSError, subprocess.SubprocessError):
+        return None
+    return [p for p in proc.stdout.split(chr(0)) if p]
+
+
+def dockerfiles(root: Path = ROOT, tracked: list = None) -> list:
+    """→ Dockerfile 相对路径；默认取 git 追踪面，git 不可用时回退（跳过快照目录）。"""
+    if tracked is None:
+        tracked = _tracked(root)
+    if tracked is not None:
+        return [p for p in tracked if p.rsplit("/", 1)[-1] == "Dockerfile"]
+    out = []
+    for dirpath, dirnames, filenames in os.walk(root):
+        dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS]
+        for name in filenames:
+            if name == "Dockerfile":
+                out.append(Path(dirpath, name).relative_to(root).as_posix())
+    return out
+
+
+def from_line_issues(rel: str, text: str) -> list:
+    """单个 Dockerfile 的 FROM 行问题（纯函数，便于变异自证）。"""
+    bad = []
+    for ln, line in enumerate(text.splitlines(), 1):
+        m = re.match(r"^\s*FROM\s+(\S+)(?:\s+AS\s+\S+)?\s*$", line, re.I)
+        if not m:
+            continue
+        image = m.group(1)
+        if image == "scratch" or "@sha256:" in image:
+            continue
+        bad.append(rel + ":" + str(ln) + " " + image)
+    return bad
+
+
+def dockerfile_issues(root: Path = ROOT, tracked: list = None) -> list:
+    """受跟踪 Dockerfile 的基座钉定问题列表；面过小（<2 件）按判据失效报（fail-closed）。"""
+    paths = dockerfiles(root, tracked)
+    issues = []
+    for rel in paths:
+        path = root / rel
+        if not path.is_file():
+            continue
+        issues.extend(from_line_issues(rel, path.read_text(encoding="utf-8", errors="replace")))
+    if len(paths) < 2:
+        issues.append("受跟踪 Dockerfile 少于 2 件（扫描面疑似失效）")
+    return issues
+
+
+class DockerfileDigestPinTest(unittest.TestCase):
+    """Dockerfile 基座必须按 digest 钉（#240 安全不变式），且扫描面必须是 **git 追踪面**。
+
+    历史缺陷（本件修复，2026-11-11）：扫描面原为 ROOT.rglob("Dockerfile")——本地未跟踪快照
+    （.rivet/ 与 .worktrees/ 的 bench 工作树）会把已修的裸 tag 重新扫出来，造成本机假红、CI 绿，
+    判据可信度被污染。改为 git 追踪面；git 不可用（归档快照环境）才回退到跳过快照目录的文件扫描。
     """
 
     def test_all_from_lines_are_digest_pinned(self):
-        import re
-        bad = []
-        for p in sorted(ROOT.rglob("Dockerfile")):
-            if ".git" in p.parts:
-                continue
-            for ln, line in enumerate(p.read_text(encoding="utf-8").splitlines(), 1):
-                m = re.match(r"^\s*FROM\s+(\S+)(?:\s+AS\s+\S+)?\s*$", line, re.I)
-                if not m:
-                    continue
-                image = m.group(1)
-                if image == "scratch" or "@sha256:" in image:
-                    continue
-                bad.append(f"{p.relative_to(ROOT)}:{ln} {image}")
-        self.assertEqual([], bad, f"Dockerfile 基座未按 digest 钉：{bad}")
+        self.assertGreaterEqual(len(dockerfiles()), 2, "受跟踪 Dockerfile 面过小（判据可能失效）")
+        self.assertEqual([], dockerfile_issues(), "Dockerfile 基座未按 digest 钉")
 
+    def test_untracked_snapshots_do_not_pollute(self):
+        """实证修复：未跟踪的本地快照目录不得进入扫描面（否则本机假红）。"""
+        pinned = "FROM python:3.12@sha256:" + "a" * 64 + "\n"
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / ".rivet" / "scratch").mkdir(parents=True)
+            (root / ".rivet" / "scratch" / "Dockerfile").write_text(
+                "FROM python:3.12-slim\n", encoding="utf-8")
+            for name in ("x", "y"):
+                (root / "packaging" / name).mkdir(parents=True)
+                (root / "packaging" / name / "Dockerfile").write_text(pinned, encoding="utf-8")
+            tracked = ["packaging/x/Dockerfile", "packaging/y/Dockerfile"]
+            self.assertEqual([], dockerfile_issues(root, tracked), "未跟踪快照不该被扫到")
+            scanned = dockerfiles(root, tracked)
+            self.assertEqual(tracked, scanned, "扫描面应当只含受跟踪件")
+            self.assertFalse(any(".rivet" in rel for rel in scanned), "快照目录混入扫描面")
+
+    def test_contract_catches_unpinned_and_empty_surface(self):
+        """变异自证：裸 tag 必报、scratch / digest / 多阶段 AS 不误报、扫描面过小必报。"""
+        bad = from_line_issues("a/Dockerfile", "FROM python:3.12-slim\n")
+        self.assertEqual(1, len(bad), bad)
+        ok = from_line_issues(
+            "a/Dockerfile",
+            "FROM scratch\nFROM node:22@sha256:" + "b" * 64 + " AS build\n")
+        self.assertEqual([], ok)
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "a").mkdir()
+            (root / "a" / "Dockerfile").write_text("FROM python:3.12-slim\n", encoding="utf-8")
+            self.assertTrue(any("python:3.12-slim" in i
+                                for i in dockerfile_issues(root, ["a/Dockerfile"])))
+            self.assertTrue(any("扫描面" in i for i in dockerfile_issues(root, [])))
 
 if __name__ == "__main__":
     unittest.main()
