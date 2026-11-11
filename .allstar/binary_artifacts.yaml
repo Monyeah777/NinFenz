@@ -1,4 +1,22 @@
+# Allstar Binary Artifacts 策略配置。生效前提与诚实边界见 .allstar/allstar.yaml：
+# 仓库级只读 action 与 ignorePaths；optConfig.optOutStrategy 属组织级（仓库级静默忽略），
+# 保留只为与组织级模板逐字对齐。
+#
+# 检测面：委托 OpenSSF Scorecard 的 Binary-Artifacts 检查（上游 pkg/policies/binary/binary.go
+# 直接调 checks.BinaryArtifacts）。判定 = 前 1024 字节 magic 命中可执行/打包格式（ELF、PE/MZ、
+# Mach-O、WASM、crx、rpm、ar 归档…），或文件扩展名属该集合且内容非文本（jar/whl/pyc/deb/dll…）。
+# 注意它**不**把图片/字体/普通压缩档当二进制工件（png/ico/woff/zip 不在集合内）——别把这条
+# 策略当成「仓库里不许有任何非文本文件」。
+#
+# ignorePaths 刻意留空：本仓 4254 个受跟踪文件按上述规则全量扫描 **0 命中**（2026-11-11）。
+# 仓库级 ignorePaths 是完整路径白名单（上游语义：必须是带目录的完整路径、不支持 glob），写一条
+# 就等于放行一个路径；在本仓零命中的前提下，任何 ignorePaths 条目都是凭空开洞。判据把「零命中
+# + 白名单为空」钉住：新增二进制（提交构建产物/编译中间件）会红。确需长期保留某个二进制时，
+# 必须在本文件写明理由、并把该路径加进判据的已审计白名单（当前为空），不能只改配置。
+#
+# Allstar 无法表达的部分（别以为本文件覆盖了）：ignorePaths 只能按完整路径精确放行，没有
+# glob 或按名模式（按名模式属组织级 ignoreFiles，仓库级没有该字段）；「产物不入库」的构建纪律
+# 属 .gitignore 与 CI 工件策略，不是本策略能强制的。
 optConfig:
   optOutStrategy: true
 action: issue
-
