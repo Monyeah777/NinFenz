@@ -46,3 +46,4 @@ jobs:
             .artifacts/
             *.log
           if-no-files-found: ignore
+          retention-days: 7    # 排障工件，7 天回收
