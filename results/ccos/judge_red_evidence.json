@@ -1029,6 +1029,10 @@
       "source": "naming"
     },
     {
+      "module": "test_npm_package_check_workflow_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_npm_publish_workflow_contract.py",
       "source": "negative_assertion"
     },
@@ -1689,10 +1693,10 @@
       "source": "negative_assertion"
     }
   ],
-  "modules": 422,
+  "modules": 423,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
   "suspect": 154,
-  "with_evidence": 127,
+  "with_evidence": 128,
   "without_evidence": 141
 }

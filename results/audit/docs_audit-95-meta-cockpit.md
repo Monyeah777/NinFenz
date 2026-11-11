@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:16fe43293e72b3b443aa471dd229633c9217d8253763d32c788b025c06aea041
+  - protocol/check12_weights.json:64e41714a35e80a315136f0c2fdeeec3f566e1758a8ef9788dbb2a0b40287d91
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-11）：npm-package-check 契约化：只读（禁 npm publish / 令牌 / secrets）、PR 全量触发（禁 paths）、stage→verify→冒烟→pack→tarball 同口径、站点数字对账、stage 后受跟踪改动必须为零（带修复指引）、stage 输出落盘并进工件（保留 7 天）；新增 test_npm_package_check_workflow_contract（5 项含五类变异自证）。本轮为机械重绑。
+
 > 重审（2026-11-11）：gitee-poll 契约化：跨端入库共用 library-write 写锁（与 library-ingest 交叉对账）、无 GITEE_TOKEN 时显式 skip 不假红（2026-11-07 实测 144 次/天教训）、checkout 凭据保留显式说明（origin 推送依赖）、子令牌只从 env 取且日志脱敏、双端推送/Gitee API v5 对账、诊断工件保留 7 天；新增 test_gitee_poll_workflow_contract（5 项含五类变异自证）。本轮为机械重绑。
 
 > 重审（2026-11-11）：linux-parity-refresh 契约化：只读不变量（禁 contents: write / git push / git commit）、dispatch+周 schedule、漂移判定双 diff 非空 + 键级 SAST 比对、证据件（sast-posix/vectors.diff/projections.diff）always 上传且保留 7 天；新增 test_linux_parity_refresh_workflow_contract（4 项含五类变异自证）。本轮为机械重绑。

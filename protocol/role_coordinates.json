@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1070
+    "verify": 1071
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8885,6 +8885,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "npm-package-check 契约判据：PR 面须只读、全量触发、数字对账、失败留证（2026-11-11）。",
+      "path": "desktop/tests/test_npm_package_check_workflow_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "npm-publish 契约判据：两条发布通道须最小权限、版本对齐、幂等、证据留存（2026-11-11）。",
       "path": "desktop/tests/test_npm_publish_workflow_contract.py",
       "role": "verify",
@@ -12804,7 +12810,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "e5600d345f5772f9df04dd48116820d8728ae31f7dedb1afbeb92e450cbc88b2",
+  "root_digest": "399ff634dee731daa06a1756d6ffda184fd81e8332b46ac39266a51b6a455abb",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12813,7 +12819,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 944,
+    "R-verify": 945,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
