@@ -21,6 +21,10 @@
       "source": "none"
     },
     {
+      "module": "test_allstar_binary_artifacts_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_allstar_branch_protection_contract.py",
       "source": "negative_assertion"
     },
@@ -1761,10 +1765,10 @@
       "source": "negative_assertion"
     }
   ],
-  "modules": 440,
+  "modules": 441,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
   "suspect": 158,
-  "with_evidence": 141,
+  "with_evidence": 142,
   "without_evidence": 141
 }
