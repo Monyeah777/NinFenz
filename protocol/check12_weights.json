@@ -348,6 +348,7 @@
     "test_rule_conflict": 0.1,
     "test_rules_render": 0.6,
     "test_runtime_shape_contracts": 0.8,
+    "test_rust_crate_workflow_contract": 0.2,
     "test_rust_engine": 8.2,
     "test_rust_fastlane": 34.3,
     "test_rust_module_wiring": 5.3,
@@ -4091,6 +4092,10 @@
     "test_runtime_shape_contracts.TraceDrillShapeTest.test_missing_source_is_diagnosed": 0.0,
     "test_runtime_shape_contracts.TraceDrillShapeTest.test_non_dict_trace_is_diagnosed": 0.0,
     "test_runtime_shape_contracts.WatcherOwnershipTest.test_only_daemon_assigns_watcher_global": 0.21,
+    "test_rust_crate_workflow_contract.RustCrateWorkflowContractTest.test_contract_catches_broken_workflow": 0.01,
+    "test_rust_crate_workflow_contract.RustCrateWorkflowContractTest.test_inputs_are_present_and_locked": 0.0,
+    "test_rust_crate_workflow_contract.RustCrateWorkflowContractTest.test_locked_and_two_platforms": 0.0,
+    "test_rust_crate_workflow_contract.RustCrateWorkflowContractTest.test_workflow_matches_contract": 0.0,
     "test_rust_engine.RustEngineClientTest.test_binary_discovery": 0.01,
     "test_rust_engine.RustEngineClientTest.test_conformance_run_parity": 5.32,
     "test_rust_engine.RustEngineClientTest.test_disabled_returns_none": 0.0,
@@ -4836,5 +4841,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1826.2
+  "total_s": 1826.4
 }
