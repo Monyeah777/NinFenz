@@ -168,6 +168,7 @@
     "test_gate_select": 0.2,
     "test_gate_verdict": 0.2,
     "test_gitee_diagnostics": 0.2,
+    "test_gitee_ingest_script_contract": 0.2,
     "test_gitee_poll_workflow_contract": 0.2,
     "test_governance_docs": 0.2,
     "test_governance_faces": 14.4,
@@ -2119,6 +2120,9 @@
     "test_gitee_diagnostics.GiteeDiagnosticsTest.test_missing_token_is_explicit": 0.0,
     "test_gitee_diagnostics.GiteeDiagnosticsTest.test_transport_error_is_network_category": 0.0,
     "test_gitee_diagnostics.GiteeDiagnosticsTest.test_unexpected_payload_shape_fails_closed": 0.0,
+    "test_gitee_ingest_script_contract.GiteeIngestScriptContractTest.test_already_processed_recognizes_source_marker": 0.06,
+    "test_gitee_ingest_script_contract.GiteeIngestScriptContractTest.test_contract_catches_broken_script": 0.0,
+    "test_gitee_ingest_script_contract.GiteeIngestScriptContractTest.test_script_matches_contract": 0.0,
     "test_gitee_poll_workflow_contract.GiteePollWorkflowContractTest.test_contract_catches_broken_workflow": 0.01,
     "test_gitee_poll_workflow_contract.GiteePollWorkflowContractTest.test_missing_token_skips_instead_of_failing": 0.0,
     "test_gitee_poll_workflow_contract.GiteePollWorkflowContractTest.test_script_keeps_token_and_redaction_discipline": 0.0,
@@ -4865,5 +4869,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1827.5
+  "total_s": 1827.7
 }
