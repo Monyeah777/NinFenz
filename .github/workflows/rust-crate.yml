@@ -79,3 +79,4 @@ jobs:
             rust-crate-test.log
             pyo3-build.log
           if-no-files-found: warn
+          retention-days: 7    # 排障工件，7 天回收
