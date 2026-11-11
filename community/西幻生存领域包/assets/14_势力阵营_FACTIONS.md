@@ -207,7 +207,7 @@
 **装载方式**：核心伪代码 load_external_data() 中调用 register_relationship_system(external_data) 完成注入。
 
 **每日推进时序**（联动@M11时间系统 advance_time）：
-1. EXTERNAL_DATA["daily_relation_update"](current_day)：关系衰减+波动+帮派活动。
+1. `EXTERNAL_DATA["daily_relation_update"](current_day)`：关系衰减+波动+帮派活动。
 2. 势力plots阶段推进（@M18混沌事件可引用）。
 3. 玩家交互/任务/间谍结果调用 modify_player_faction / modify_faction_strength / create_intelligence 等接口落地。
 
