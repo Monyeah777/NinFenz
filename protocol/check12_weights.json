@@ -6,6 +6,7 @@
     "test_agents_contract": 0.1,
     "test_ai_domain_closure": 0.2,
     "test_allowlist_expiry": 0.2,
+    "test_allstar_branch_protection_contract": 0.8,
     "test_allstar_config_contract": 0.5,
     "test_anchor_align": 0.3,
     "test_approval_naming": 0.2,
@@ -492,6 +493,11 @@
     "test_allowlist_expiry.Test.test_expired": 0.0,
     "test_allowlist_expiry.Test.test_unused": 0.0,
     "test_allowlist_expiry.Test.test_validate_requires_expires": 0.0,
+    "test_allstar_branch_protection_contract.AllstarBranchProtectionContractTest.test_config_mirrors_live_protection": 0.16,
+    "test_allstar_branch_protection_contract.AllstarBranchProtectionContractTest.test_contract_catches_broken_config": 0.12,
+    "test_allstar_branch_protection_contract.AllstarBranchProtectionContractTest.test_platform_only_gap_is_documented": 0.12,
+    "test_allstar_branch_protection_contract.AllstarBranchProtectionContractTest.test_required_checks_are_produced_by_tracked_workflows": 0.12,
+    "test_allstar_branch_protection_contract.AllstarBranchProtectionContractTest.test_shape_and_coherence": 0.12,
     "test_allstar_config_contract.AllstarConfigContractTest.test_contract_catches_broken_config": 0.08,
     "test_allstar_config_contract.AllstarConfigContractTest.test_effective_fields_are_present": 0.05,
     "test_allstar_config_contract.AllstarConfigContractTest.test_files_match_contract": 0.05,
@@ -4884,5 +4890,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1828.6
+  "total_s": 1829.4
 }

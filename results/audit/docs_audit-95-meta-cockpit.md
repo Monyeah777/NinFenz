@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:b05523e39c1324faaac29b00db9641ffb04e8734dd71dd4d291e52b5e6dd2b2f
+  - protocol/check12_weights.json:a72b2122c69d98f66648a38063a7f28d96b8298b6276d6066c525a58c6de969a
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-11）：allstar branch_protection 契约化：平台保护设置镜像 + required 检查作业名对账 + 平台独有缺口
+
 > 重审（2026-11-11）：allstar 根配置契约化：仓库级/组织级字段口径 + fail-open 边界 + label 前置条件判据
 
 > 重审（2026-11-11）：requirements-lint/sast/audit 三份固定集契约化（同族机械同步）：生成头改为仓库内可复现命令（--extra lint/sast/audit pyproject.toml；audit 保留 --allow-unsafe），hash 完备/自包含/ASCII/禁重复与 extras 纳入判据，并新增跨文件版本一致性对账（含 ci，cross-platform 同时装全部）；lock_digest 变化 → 重生成 THIRD-PARTY-NOTICES.md；新增 test_requirements_pins_contract（3 项含六类变异自证）。本轮为机械重绑。
