@@ -8,6 +8,7 @@
     "test_allowlist_expiry": 0.2,
     "test_allstar_branch_protection_contract": 0.8,
     "test_allstar_config_contract": 0.5,
+    "test_allstar_dangerous_workflow_contract": 1.0,
     "test_anchor_align": 0.3,
     "test_approval_naming": 0.2,
     "test_architecture_layers": 0.2,
@@ -503,6 +504,11 @@
     "test_allstar_config_contract.AllstarConfigContractTest.test_files_match_contract": 0.05,
     "test_allstar_config_contract.AllstarConfigContractTest.test_honest_boundary_is_retained": 0.05,
     "test_allstar_config_contract.AllstarConfigContractTest.test_policy_set_matches_upstream": 0.05,
+    "test_allstar_dangerous_workflow_contract.AllstarDangerousWorkflowContractTest.test_config_matches_contract": 0.15,
+    "test_allstar_dangerous_workflow_contract.AllstarDangerousWorkflowContractTest.test_contract_catches_broken_config": 0.12,
+    "test_allstar_dangerous_workflow_contract.AllstarDangerousWorkflowContractTest.test_privileged_triggers_are_audited": 0.27,
+    "test_allstar_dangerous_workflow_contract.AllstarDangerousWorkflowContractTest.test_scan_covers_all_branches": 0.11,
+    "test_allstar_dangerous_workflow_contract.AllstarDangerousWorkflowContractTest.test_tracked_workflows_have_no_dangerous_patterns": 0.16,
     "test_anchor_align.BootstrapTest.test_bootstrap_empty_term": 0.0,
     "test_anchor_align.BootstrapTest.test_bootstrap_expands_from_seed": 0.04,
     "test_anchor_align.BootstrapTest.test_depends_is_closed_and_inverse": 0.01,
@@ -4890,5 +4896,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1829.4
+  "total_s": 1830.4
 }
