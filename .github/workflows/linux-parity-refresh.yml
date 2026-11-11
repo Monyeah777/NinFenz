@@ -5,6 +5,8 @@ name: linux-parity-refresh
 # 不写仓库、不推送，只上传工件。
 # 2026-11-08 起：定时跑时若 `vectors.diff`/`projections.diff` 非空、或 posix SAST 计数
 # 与 `protocol/sast_baseline.json` 不符 → 红（此前只在人工跑时看输出，漂移没有 CI 告警）。
+# 只读契约（只许读 + 上传工件，不许 commit/push/写权限）由
+# desktop/tests/test_linux_parity_refresh_workflow_contract.py 判据守住。
 on:
   workflow_dispatch:
   schedule:
@@ -100,3 +102,4 @@ jobs:
             vectors.diff
             projections.diff
           if-no-files-found: warn
+          retention-days: 7    # 漂移证据：7 天回收（与普通排障工件同档）

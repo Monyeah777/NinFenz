@@ -877,6 +877,10 @@
       "source": "negative_assertion"
     },
     {
+      "module": "test_linux_parity_refresh_workflow_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_live_doc_counts.py",
       "source": "naming"
     },
@@ -1681,10 +1685,10 @@
       "source": "negative_assertion"
     }
   ],
-  "modules": 420,
+  "modules": 421,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
   "suspect": 154,
-  "with_evidence": 125,
+  "with_evidence": 126,
   "without_evidence": 141
 }
