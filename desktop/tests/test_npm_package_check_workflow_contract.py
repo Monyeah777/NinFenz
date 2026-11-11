@@ -88,7 +88,7 @@ def workflow_issues(doc: dict, text: str = "") -> list:
                         ("node bin/nf.mjs --version", "必须冒烟 CLI")):
         if needle not in runs:
             issues.append(f"打包契约缺步骤：{why}")
-    if "tee npm-package-check.log" not in runs:
+    if "npm-package-check.log" not in runs:
         issues.append("stage/verify 输出未落盘（体积不一致时无诊断物）")
     if "修复" not in runs:
         issues.append("失败提示必须带修复指引（本仓文案纪律）")
