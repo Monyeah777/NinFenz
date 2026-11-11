@@ -1389,6 +1389,10 @@
       "source": "negative_assertion"
     },
     {
+      "module": "test_rust_crate_workflow_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_rust_engine.py",
       "source": "negative_assertion"
     },
@@ -1713,10 +1717,10 @@
       "source": "negative_assertion"
     }
   ],
-  "modules": 428,
+  "modules": 429,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
   "suspect": 154,
-  "with_evidence": 133,
+  "with_evidence": 134,
   "without_evidence": 141
 }

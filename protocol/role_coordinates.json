@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1076
+    "verify": 1077
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9425,6 +9425,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "rust-crate 契约判据：锁文件锁定、两平台矩阵、Linux 专属面显式、失败留证（2026-11-11）。",
+      "path": "desktop/tests/test_rust_crate_workflow_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "Rust 只读快线客户端（core.rust_engine）的常驻回归。",
       "path": "desktop/tests/test_rust_engine.py",
       "role": "verify",
@@ -12840,7 +12846,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "94d8ac22e373f9ecb3635d15242dd0f8a7a562e81fb12a02281d0b76470b67aa",
+  "root_digest": "47bb969bfbb29f5f2426f74112146a40758d44e4b46c4d64e8dc853b82f2cdef",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12849,7 +12855,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 950,
+    "R-verify": 951,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
