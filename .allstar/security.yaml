@@ -1,4 +1,19 @@
+# Allstar SECURITY.md 策略配置。生效前提与诚实边界见 .allstar/allstar.yaml：
+# 仓库级只读 action；optConfig.optOutStrategy 属组织级（仓库级静默忽略），保留只为与组织级
+# 模板逐字对齐。
+#
+# 检测面（上游 pkg/policies/security/security.go）：该策略只问一个问题——GitHub 认为本仓是否
+# 有安全策略（GraphQL repository.isSecurityPolicyEnabled）。**不检查任何内容**：不看报告通道、
+# 不看模板、不看时限。本仓平台状态（2026-11-11 核对）：isSecurityPolicyEnabled=true、
+# securityPolicyUrl=https://github.com/Monyeah777/NinFenz/security/policy（SECURITY.md 在仓库
+# 根目录，GitHub 认）。所以本策略对本仓恒 pass，配置侧唯一有意义的就是 action: issue。
+#
+# 内容质量不归本策略管：报告通道分类、模板六项、确认/披露时限由 SECURITY.md 自身与
+# desktop/tests/test_security_contract.py 判据面负责——本文件写不出这些要求，也别拿「本策略
+# 已配置」当内容合格的证据。
+#
+# Allstar 无法表达的部分：SECURITY.md 的位置（根目录 / .github / docs 都被 GitHub 认）与内容
+# 结构都不是配置项；本策略也没有 fix 动作可用的默认内容（上游 TODO）。
 optConfig:
   optOutStrategy: true
 action: issue
-
