@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:cd07c7c107f2a66a17f0221e9fca20e05fd079ee43afa4b64887c3121018521a
+  - protocol/check12_weights.json:a37894af534c746a8a09832a66864f1c82e3a84c2b0def18df0e8a0987929c31
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-11）：library_ingest 脚本契约化：标准库+core 白名单、正文真源优先级（文件>env>API）、超长/密钥形状/空壳/frontmatter 形状/白名单/配额六道拒收闸门、注入记档、36 进制编号、原子写、日志脱敏、禁执行面；新增推送韧性（push 失败 pull --rebase 重试一次，仍失败在 Issue 留可执行提示——workflow 仅 issues:opened 触发，静默丢失不可接受）；新增 test_library_ingest_script_contract（3 项含五类变异自证 + 真源优先级功能测试）。本轮为机械重绑。
+
 > 重审（2026-11-11）：net-probes 契约化（workflow 家族收官）：仅手动触发（禁 schedule/push/PR，历史重写后金标缺失只会每周假红）、金标未前移期间 continue-on-error=true（诊断信号，须写明理由）、快照 ref 参数化 + git archive + Python tarfile 解包 + 不可用 fail-fast、树外构建、双 RID 交付形态、跑批 7 个占位符全解析、探针清单在场、失败证据工件（failure-only）保留 7 天；新增 test_net_probes_workflow_contract（4 项含五类变异自证）。本轮为机械重绑。
 
 > 重审（2026-11-11）：external-links 契约化：非门禁定位（禁 push/PR 触发、独立并发组、禁调 verify.sh）、离线扫描步永远绿 + 联网步 fail-closed（禁兜底写法、pipefail、tee 落盘）、联网硬预算 --max-seconds 600（防慢站点拖到 job 超时）、报告只传 .artifacts/ 本 run 副本（禁受跟踪路径）、工件保留 7 天；新增 test_external_links_workflow_contract（4 项含五类变异自证）。本轮为机械重绑。
