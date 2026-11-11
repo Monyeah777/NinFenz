@@ -1,4 +1,27 @@
+# Allstar Outside Collaborators 策略配置。生效前提与诚实边界见 .allstar/allstar.yaml：
+# 仓库级只读 action、pushAllowed、adminAllowed；optConfig.optOutStrategy 属组织级（仓库级静默
+# 忽略），保留只为与组织级模板逐字对齐。
+#
+# 检测面（上游 pkg/policies/outside/outside.go）：列出仓库协作者中 GitHub 认定为
+# affiliation=outside（组织成员之外的协作者）者，凡有 push / admin 权限且未被豁免表放行即判失败。
+# 两个开关都是「允许」语义，且**默认值朝宽松一侧**：
+#   PushAllowed 组织级默认 true（= 外部协作者可 push，策略对 push 面恒 pass）；
+#   AdminAllowed 组织级默认 false。
+# 所以这里必须显式写 pushAllowed: false —— 原 stub 只有 action: issue，等于吃默认 true，该策略对
+# 本仓 push 面是**静默 no-op**（这就是本轮修掉的真缺陷）。adminAllowed 也显式写死，与组织级默认
+# 解耦：组织级默认改动时本仓的意图不能跟着漂。
+#
+# 平台真源（2026-11-11 逐一核对）：owner 是**个人账号**（users/Monyeah777 type=User），仓库协作者
+# 只有 Monyeah777（direct，admin）；affiliation=outside 返回为空 → 平台侧外部协作者 0。个人账号
+# 仓库没有组织成员可对照，GitHub 对 affiliation=outside 恒返回空，故该策略在本仓**恒 pass**：
+# 本文件是配置就绪声明与迁移模板，不是本仓的实时防线——也正因如此，两个开关值必须由判据钉死，
+# 否则它永远不会红。
+#
+# Allstar 无法表达的部分：exemptions（user-repo 对）只在**组织级**定义（上游注释：必须让组织安全
+# 管理员一眼看到），仓库级写 exemptions 会被静默忽略；「谁可以成为协作者 / 组织成员」属 GitHub
+# 平台治理，不在本策略内。
 optConfig:
   optOutStrategy: true
 action: issue
-
+pushAllowed: false
+adminAllowed: false
