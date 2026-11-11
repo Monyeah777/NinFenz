@@ -24,9 +24,13 @@ from typing import Iterator, Set
 
 #: 与 `.gitignore` 无关也一律不进扫描面的**目录名**（VCS 元数据 / 工具缓存 / 依赖树）。
 SKIP_DIR_NAMES = frozenset({
-    ".git", ".rivet", "__pycache__", ".ruff_cache", ".mypy_cache",
+    ".git", ".rivet", ".worktrees", "__pycache__", ".ruff_cache", ".mypy_cache",
     ".pylint.d", ".pytest_cache", ".tox", ".venv", "venv", "node_modules",
 })
+# 说明（2026-11-11）：.worktrees = git worktree add 的本地产出（链接工作树）。它通常被
+# .gitignore 覆盖、走 .gitignore 面即可排除；但**非 git 场景**（归档快照 / 无 .git 的检出）下
+# .gitignore 面为空，若不在静态名里剪掉，整棵工作树会被当成仓库件——实测本机曾因此把受治理
+# markdown 面从 370 件放大到 66547 件。
 
 
 def _git_executable() -> str:

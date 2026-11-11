@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:a5fa3556995ced635256c68ebd5c7da3bb336eafb18221ebea94764c6cbca963
+  - protocol/code_metrics_baseline.json:603eca5fa943c130581f259610cb180f2c6171e2e96334c5a2c3eff1e9e5ab89
 ---
+> 重审（2026-11-11）：L4 判据质量：文字卫生 markdown 面收敛到 repo_face 单点扫描面（66547→370 件）+ .worktrees 静态剪枝
+
 > 重审（2026-11-11）：修复 CI 两处真红：①CodeQL 高优告警（generator 的 SPDX 表达式正则嵌套量词 ReDoS → 改 token 级判定）；②脚本孤儿棘轮（新判据 import 使 gen_third_party_notices 获得入口 → 从 ORPHANS 与一次性审计清单移除，清单 6→5）。本轮为机械重绑。
 
 > 重审（2026-11-11）：THIRD-PARTY-NOTICES 顶尖化（连带生成器 fail-closed + 修复指引）：notices 重生成 44 组件真实 SPDX 清单（锁摘要新鲜度锚）、生成器失败不写盘；payload 体积 24.70→24.71 MB 同源同步；新增 test_third_party_notices_contract 6 项。本轮为机械重绑。

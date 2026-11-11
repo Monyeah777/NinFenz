@@ -1131,7 +1131,7 @@
       "max_fn_lines": 78
     },
     "desktop/src/core/repo_face.py": {
-      "lines": 138,
+      "lines": 142,
       "max_fn_cc": 13,
       "max_fn_lines": 33
     },

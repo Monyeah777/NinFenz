@@ -14,8 +14,10 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:a5fa3556995ced635256c68ebd5c7da3bb336eafb18221ebea94764c6cbca963
+  - protocol/code_metrics_baseline.json:603eca5fa943c130581f259610cb180f2c6171e2e96334c5a2c3eff1e9e5ab89
 ---
+> 重审（2026-11-11）：L4 判据质量：文字卫生 markdown 面收敛到 repo_face 单点扫描面（66547→370 件）+ .worktrees 静态剪枝
+
 > 重审（2026-11-11）：修复 CI 两处真红：①CodeQL 高优告警（generator 的 SPDX 表达式正则嵌套量词 ReDoS → 改 token 级判定）；②脚本孤儿棘轮（新判据 import 使 gen_third_party_notices 获得入口 → 从 ORPHANS 与一次性审计清单移除，清单 6→5）。本轮为机械重绑。
 
 > 重审（2026-11-11）：THIRD-PARTY-NOTICES 顶尖化（连带生成器 fail-closed + 修复指引）：notices 重生成 44 组件真实 SPDX 清单（锁摘要新鲜度锚）、生成器失败不写盘；payload 体积 24.70→24.71 MB 同源同步；新增 test_third_party_notices_contract 6 项。本轮为机械重绑。
