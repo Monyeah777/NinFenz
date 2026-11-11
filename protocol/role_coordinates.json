@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1073
+    "verify": 1074
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8063,6 +8063,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "e2e-desktop 契约判据：无 GUI 依赖、PR 全量、失败即红、证据可下载（2026-11-11）。",
+      "path": "desktop/tests/test_e2e_desktop_workflow_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "Ed25519（RFC 8032）判据：黄金向量 + 确定性 + 篡改必拒 + 与独立实现交叉验证。",
       "path": "desktop/tests/test_ed25519.py",
       "role": "verify",
@@ -12822,7 +12828,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "89a12765e28ec4520f94ce31dab7d174b2488030ab71bc27a44713dc7a0b3b89",
+  "root_digest": "348a30d987f20b41e7133327e9a9f9242f3c4a166e6e6d0e734244c8a34da955",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12831,7 +12837,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 947,
+    "R-verify": 948,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
