@@ -897,6 +897,10 @@
       "source": "negative_assertion"
     },
     {
+      "module": "test_library_ingest_script_contract.py",
+      "source": "naming"
+    },
+    {
       "module": "test_library_ingest_workflow_contract.py",
       "source": "negative_assertion"
     },
@@ -1733,10 +1737,10 @@
       "source": "negative_assertion"
     }
   ],
-  "modules": 433,
+  "modules": 434,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
-  "suspect": 154,
+  "suspect": 155,
   "with_evidence": 138,
   "without_evidence": 141
 }

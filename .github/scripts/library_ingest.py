@@ -389,7 +389,21 @@ def main():
     git('config', 'user.email', 'nf-bot@users.noreply.github.com')
     git('add', fname, 'library/INDEX.md', 'library/ALIAS.md')
     git('commit', '-m', f'lib(Y12): 云端代收 {nfid} 自动入库（Issue #{N}，投稿人 {AUTHOR}）')
-    git('push', 'origin', 'HEAD:main')
+    # 推送韧性（2026-11-11）：本 workflow 只在 issues:opened 触发，脚本失败后**不会自动重跑**
+    # ⇒ 一次非快进（别的 run 刚推过）就会让投稿静默丢失。故：先直接推，失败则 rebase 重试一次；
+    # 仍失败时在 Issue 上留可执行提示（作者据此重开题或等作者处理），再让 job 红。
+    try:
+        git('push', 'origin', 'HEAD:main')
+    except RuntimeError as first:
+        print(f'首次推送失败（{first}）——尝试 pull --rebase 后重试一次')
+        git('pull', '--rebase', 'origin', 'main')
+        try:
+            git('push', 'origin', 'HEAD:main')
+        except RuntimeError as second:
+            comment('⚠️ 入库文件已生成，但**推送 main 失败**（本次未能提交）：'
+                    f'{second}\n\n修复指引：作者在本地 `git pull --rebase` 后手动提交该文件，'
+                    '或重开同一投稿 Issue（标题【NF投稿】）重试；如持续失败请检查仓库写入权限。')
+            raise
 
     # ---- 8. 回评 + 关闭 ----
     reply = (
