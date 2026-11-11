@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1078
+    "verify": 1079
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7667,6 +7667,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "ci-health 契约判据：静默红看门狗须「只读、最新一次口径、自引用排除、快照不判红」（2026-11-11）。",
+      "path": "desktop/tests/test_ci_health_workflow_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "CI 供应链固定回归测试 —— 2026-09-24 渗透发现 F-05 的「check 的 check」。",
       "path": "desktop/tests/test_ci_supply_chain.py",
       "role": "verify",
@@ -12852,7 +12858,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "01663959830bf67a52df398b69212d2daaac64f55034a0811c42cb77404a5870",
+  "root_digest": "e6c59d82b169282c5e4c73af77747e88411daf10499c7f4ebc47b04683289591",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12861,7 +12867,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 952,
+    "R-verify": 953,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
