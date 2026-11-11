@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1074
+    "verify": 1075
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8033,6 +8033,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docker-nfal 契约判据：不推注册表、基座 digest 固定、作业工件自证、冒烟必跑（2026-11-11）。",
+      "path": "desktop/tests/test_docker_nfal_workflow_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "文档里引用的探针数字必须与结果件一致（第 133 轮）。",
       "path": "desktop/tests/test_docs_cite_probe_numbers.py",
       "role": "verify",
@@ -12828,7 +12834,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "348a30d987f20b41e7133327e9a9f9242f3c4a166e6e6d0e734244c8a34da955",
+  "root_digest": "cfde0816a8ecd27b7f011b84e8673e17ad8a303c2df73fdad749e052d923bd19",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12837,7 +12843,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 948,
+    "R-verify": 949,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

@@ -116,6 +116,7 @@
     "test_doc_reachability": 10.3,
     "test_doc_routing": 0.2,
     "test_doc_truth": 0.4,
+    "test_docker_nfal_workflow_contract": 0.2,
     "test_docs_cite_probe_numbers": 0.1,
     "test_domain_pack": 0.3,
     "test_domain_pack_render": 0.3,
@@ -1660,6 +1661,11 @@
     "test_doc_truth.TestServeEntryNeedsNoSnapshot.test_driver_binding_has_no_snapshot_requirement": 0.0,
     "test_doc_truth.TestSkillCommandFace.test_extraction_reuses_command_face_rule": 0.0,
     "test_doc_truth.TestSkillCommandFace.test_skill_commands_are_registered": 0.0,
+    "test_docker_nfal_workflow_contract.DockerNfalWorkflowContractTest.test_build_only_no_registry": 0.0,
+    "test_docker_nfal_workflow_contract.DockerNfalWorkflowContractTest.test_contract_catches_broken_workflow": 0.0,
+    "test_docker_nfal_workflow_contract.DockerNfalWorkflowContractTest.test_dockerfile_bases_are_digest_pinned": 0.0,
+    "test_docker_nfal_workflow_contract.DockerNfalWorkflowContractTest.test_each_job_owns_its_artifact": 0.0,
+    "test_docker_nfal_workflow_contract.DockerNfalWorkflowContractTest.test_workflow_matches_contract": 0.0,
     "test_docs_cite_probe_numbers.ProbeNumberDocsTest.test_doc_numbers_match_results": 0.0,
     "test_docs_cite_probe_numbers.ProbeNumberDocsTest.test_judge_can_be_killed": 0.0,
     "test_domain_pack.FactoryTest.test_build_dry_run_writes_nothing": 0.0,
@@ -4825,5 +4831,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1825.8
+  "total_s": 1826.0
 }

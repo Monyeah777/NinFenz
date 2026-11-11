@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-11-11",
   "approved_by": "Monyeah777",
-  "note": "e2e-desktop 契约（无 GUI / PR 全量 / 失败即红 / 与 release-gate 同脚本）。",
+  "note": "docker-nfal 契约（不推送 / digest 固定 / 工件归属 / 冒烟）。",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "5f057290d1d28051bc0dc492a15cc4533485ae5d788db80889beda4caeea76f5"
