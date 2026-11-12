@@ -2,7 +2,9 @@
 
 > 本文是**格式规范**：真源 = `protocol/asset_contracts.json`，可移植 schema = `protocol/schema/asset_contracts.schema.json`，
 > 机检入口 = `python scripts/nf.py asset contract`（与 verify check40 同源）；读到即执行，勿当资料。
-> 最后更新：2026-10-14
+> 最后更新：2026-11-13
+
+> **复核（2026-11-13）**：四面口径与判据不变；补四处现状：① 声明表现状 **22 面条 + 1 链**（`data` 10 / `code` 7 / `script` 4 / `index` 1 / `chains` 1）；② CLI **六旗标**（`--root` / `--face` / `--export` / `--freeze` / `--run-tests` / `--json`）——其中 `--freeze` 是**显式棘轮**（按当前内容重冻 sha256）、`--run-tests` 显式开启才执行被声明代码；③ 资产面现状（`nf asset verify`）：**台账 103 · 托管 308 · 未托管 0 · 孤儿头 0**；④ 常驻判据 `test_asset_contract` **59 例**（+ 四面分面测试）。见「§现状对照」。
 
 ## 这份规范解决什么
 
@@ -34,6 +36,34 @@ python scripts/nf.py asset contract --root <你的目录> --json   # 机读结�
 ```
 
 被验目录需要 `protocol/asset_contracts.json`（声明）与 `protocol/data_contracts.json`（登记册：谁判 / 谁管 / 坏了怎么重建）。
+
+> 本仓库自验：`nf asset contract`（四面 + 链）与 verify **check40** 同源；分面调试用 `--face data|code|script|index`。
+
+## 现状对照（2026-11-13 · 以实跑为准）
+
+| 面 | 当时（本文快照） | 现行（读到本行时请重跑确认） |
+|---|---|---|
+| 四面 | data / code / script / index | **不变**（另有一条 `chains` 跨脚本链接声明） |
+| 声明条数 | 未计数 | **22 面条 + 1 链**：data 10 · code 7 · script 4 · index 1 · chains 1 |
+| CLI 旗标 | 未列全 | **六旗标**：`--root` / `--face` / `--export` / `--freeze` / `--run-tests` / `--json` |
+| 导出面 | frictionless 导出（④ 判漂移） | `protocol/generated/asset_contract.frictionless.json` 在场；`--export` 重生成 |
+| 同源判据 | check40 | **不变**（verify.sh 内 check40） |
+| 资产面 | 未涉 | `nf asset verify`：台账 **103** · 托管 **308** · 未托管 0 · 孤儿头 0 |
+| 常驻判据 | 未计 | `test_asset_contract` **59 例**（+ `test_asset_contract_faces` 等分面件） |
+
+> 本表只作「当时 → 现行」导航，不替代实跑；数字以 `nf asset contract --json` / `nf asset verify` 实读为准。
+
+## 复现与引用口径
+
+```bash
+python scripts/nf.py asset contract --json        # 四面 + 链（机读）
+python scripts/nf.py asset contract --face data   # 单面调试
+python scripts/nf.py asset verify                 # 台账/托管/孤儿头闭合
+python -m pytest desktop/tests/test_asset_contract.py -q   # 59 例常驻判据
+```
+
+- 引用本文时：「四面 + 声明即契约 + 指不出判据不许登记」= 长期口径；条数与资产面以实跑为准。
+- 棘轮纪律：`--freeze` 只在**有意变更**后显式执行（review 后重冻），不由扫描器自动写；`--run-tests` 默认关闭（门禁不执行被声明代码）。
 
 ## 纪律（都是实测换来的）
 

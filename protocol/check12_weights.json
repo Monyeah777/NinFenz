@@ -34,6 +34,7 @@
     "test_assertions_doc_contract": 0.2,
     "test_asset_contract": 3.3,
     "test_asset_contract_cache": 0.4,
+    "test_asset_contract_doc_contract": 7.9,
     "test_asset_contract_faces": 0.2,
     "test_asset_contract_ffi_warn": 2.5,
     "test_asset_density": 3.5,
@@ -787,6 +788,9 @@
     "test_asset_contract_cache.RepoFilesFreshnessTest.test_direct_resolve_sees_new_files": 0.12,
     "test_asset_contract_cache.RepoFilesFreshnessTest.test_memory_glob_matches_pathlib_face": 0.01,
     "test_asset_contract_cache.RepoFilesFreshnessTest.test_schema_document_cache_is_mtime_size_keyed": 0.0,
+    "test_asset_contract_doc_contract.AssetContractDocTest.test_asset_contract_matches_contract": 0.97,
+    "test_asset_contract_doc_contract.AssetContractDocTest.test_contract_catches_mutations": 6.78,
+    "test_asset_contract_doc_contract.AssetContractDocTest.test_counts_and_files_live": 0.0,
     "test_asset_contract_faces.AssetContractIntegralFacesTest.test_faces_and_scan_match_generated_expectations": 0.08,
     "test_asset_contract_ffi_warn.FfiContractWarnTest.test_injected_violations_are_warned_then_cleared": 0.13,
     "test_asset_contract_ffi_warn.FfiContractWarnTest.test_real_corpus_warn_face_is_clean": 2.19,
@@ -5311,5 +5315,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1870.4
+  "total_s": 1878.3
 }
