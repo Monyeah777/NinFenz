@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-12",
   "approved_by": "Monyeah777",
-  "note": "M06 契约补全后重签一致性报告",
+  "note": "M13 契约补全（outputs/payload 与 interaction_update 注册字段同集）后重签一致性报告",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "f52463abd27ff4074de8465948c61b22bbaac44c405588c0aca44f16de067b3e"
+  "subject_digest": "d1411fad2c63146085f29862a6edc3a01c2a5c4141d8a0fd96ffb2bde7e692c9"
 }
