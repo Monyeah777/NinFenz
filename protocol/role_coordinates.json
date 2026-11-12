@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1118
+    "verify": 1119
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8993,6 +8993,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "通用:M10 节拍推进模块契约：双事件载荷并集 == outputs，且 tick_day 发布面与订阅面对账。",
+      "path": "desktop/tests/test_module_m10_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "M12 模板检索库模块契约：零事件模块必须以 interfaces 补全联动面，且四源同源。",
       "path": "desktop/tests/test_module_m12_contract.py",
       "role": "verify",
@@ -13092,7 +13098,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "deae9b15bc4a6cfd641dfc27d2eb6877ec8cc6d5718d70b3053a92f516e8ff24",
+  "root_digest": "ebb8c5584375e3fa87ffd814ab5af88c867307423485e41e29f48e8ad0cd5363",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13101,7 +13107,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 992,
+    "R-verify": 993,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

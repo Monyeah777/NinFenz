@@ -276,6 +276,7 @@
     "test_module_m00_contract": 0.2,
     "test_module_m06_contract": 0.2,
     "test_module_m08_contract": 0.2,
+    "test_module_m10_contract": 0.2,
     "test_module_m12_contract": 0.2,
     "test_module_m13_contract": 0.2,
     "test_module_m20_contract": 0.2,
@@ -3257,6 +3258,10 @@
     "test_module_m08_contract.ModuleM08ContractTest.test_io_types_are_evidence_based": 0.0,
     "test_module_m08_contract.ModuleM08ContractTest.test_m08_matches_contract": 0.01,
     "test_module_m08_contract.ModuleM08ContractTest.test_machine_block_and_quote_are_same_source": 0.0,
+    "test_module_m10_contract.ModuleM10ContractTest.test_contract_catches_mutations": 0.05,
+    "test_module_m10_contract.ModuleM10ContractTest.test_io_types_are_evidence_based": 0.0,
+    "test_module_m10_contract.ModuleM10ContractTest.test_m10_matches_contract": 0.01,
+    "test_module_m10_contract.ModuleM10ContractTest.test_outputs_equal_payload_union": 0.0,
     "test_module_m12_contract.ModuleM12ContractTest.test_contract_catches_mutations": 0.03,
     "test_module_m12_contract.ModuleM12ContractTest.test_io_types_are_evidence_based": 0.0,
     "test_module_m12_contract.ModuleM12ContractTest.test_m12_matches_contract": 0.01,
@@ -5069,5 +5074,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1858.1
+  "total_s": 1858.3
 }
