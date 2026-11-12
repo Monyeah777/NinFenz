@@ -251,6 +251,7 @@
     "test_library_ingest_workflow_contract": 0.2,
     "test_library_nf1_contract": 0.2,
     "test_library_techdoc_contract": 0.2,
+    "test_library_worldcampus_contract": 0.2,
     "test_license_chain": 0.2,
     "test_license_gate": 0.5,
     "test_lint_workflow_contract": 0.2,
@@ -2921,6 +2922,10 @@
     "test_library_techdoc_contract.LibraryTechdocContractTest.test_contract_catches_mutations": 0.04,
     "test_library_techdoc_contract.LibraryTechdocContractTest.test_embedded_copies_are_byte_identical": 0.0,
     "test_library_techdoc_contract.LibraryTechdocContractTest.test_techdoc_matches_contract": 0.01,
+    "test_library_worldcampus_contract.LibraryWorldcampusContractTest.test_attestation_is_fresh": 0.0,
+    "test_library_worldcampus_contract.LibraryWorldcampusContractTest.test_contract_catches_mutations": 0.02,
+    "test_library_worldcampus_contract.LibraryWorldcampusContractTest.test_license_is_undeclared_not_defaulted": 0.0,
+    "test_library_worldcampus_contract.LibraryWorldcampusContractTest.test_worldcampus_matches_contract": 0.0,
     "test_license_chain.LicenseChainContractTest.test_chain_is_single_sourced": 0.02,
     "test_license_chain.LicenseChainContractTest.test_contract_catches_chain_drift": 0.0,
     "test_license_chain.LicenseChainContractTest.test_entry_docs_claim_mit": 0.0,
@@ -5162,5 +5167,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1862.8
+  "total_s": 1863.0
 }

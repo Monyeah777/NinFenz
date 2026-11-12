@@ -14,7 +14,7 @@
           "side": "right"
         },
         {
-          "hash": "107cf259827bc23f11a4baba995902c7a2dfce267f42d23e21cebdf632b277d6",
+          "hash": "4a6a95652cdd0d55fa478b1f7acfe78eca750e24a3cd56d767eddeb3cd5eeb01",
           "side": "right"
         }
       ]
@@ -31,16 +31,16 @@
           "side": "left"
         },
         {
-          "hash": "107cf259827bc23f11a4baba995902c7a2dfce267f42d23e21cebdf632b277d6",
+          "hash": "4a6a95652cdd0d55fa478b1f7acfe78eca750e24a3cd56d767eddeb3cd5eeb01",
           "side": "right"
         }
       ]
     },
     {
       "anchor": null,
-      "digest": "78637614c8519862cc9308603dd335c14d29bae0735bd906e42d37373dbb06a4",
+      "digest": "2fbae2af78a31c2aafd2ebbd2d6fbc41f9e1def22a9af0d9c128cb2bd01b90c9",
       "id": "NF-WORLDCAMPUS-Monyeah777-1",
-      "leaf": "107cf259827bc23f11a4baba995902c7a2dfce267f42d23e21cebdf632b277d6",
+      "leaf": "4a6a95652cdd0d55fa478b1f7acfe78eca750e24a3cd56d767eddeb3cd5eeb01",
       "path": "library/NF-WORLDCAMPUS-Monyeah777-1.md",
       "proof": [
         {
@@ -50,6 +50,6 @@
       ]
     }
   ],
-  "root": "73daba40b3c8974a219f965517efca7e4a0c41122fc7114aded27fce151c3737",
+  "root": "6afa7b1a02e044ea8b867ef03e110549d67aa5092c1ddb4f950d2a8ba64aff68",
   "schema": "nf-receipts/1"
 }
