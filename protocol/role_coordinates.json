@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1160
+    "verify": 1161
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7385,6 +7385,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/44_M2 契约：AI 通道内容规范必须「口径不变 + 三个基数活绑定 + 默认实时面 + 复现口径」。",
+      "path": "desktop/tests/test_ai_channel_spec_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "AI 系统域 · 概念前置闭包求值单测（域包战例回归 + 负例注入）。",
       "path": "desktop/tests/test_ai_domain_closure.py",
       "role": "verify",
@@ -13344,7 +13350,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "9ade3f808b87693a374ffa201440fda61fa6e14d4e75ca67d9842e6d71830ac3",
+  "root_digest": "2713d9877e0eb89169c04f6daf2e9da954385b8bb20d946a5268e49af12ef759",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13353,7 +13359,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1034,
+    "R-verify": 1035,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
