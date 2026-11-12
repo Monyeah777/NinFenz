@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1176
+    "verify": 1177
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8315,6 +8315,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/ccos/dual-core-invariants.md 契约：9 层与矩阵一致 + 判据/名单/门数活绑定。",
+      "path": "desktop/tests/test_dual_core_invariants_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "e2e-desktop 契约判据：无 GUI 依赖、PR 全量、失败即红、证据可下载（2026-11-11）。",
       "path": "desktop/tests/test_e2e_desktop_workflow_contract.py",
       "role": "verify",
@@ -13440,7 +13446,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "4f584098ab69f25a975c6b7f27302f157043856efce03f9fd2d83d1e92cdf67f",
+  "root_digest": "666d66e70fdae60e271f1105169be693c0e08ef683447847dffc8d3cdfb5aae3",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13449,7 +13455,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1050,
+    "R-verify": 1051,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
