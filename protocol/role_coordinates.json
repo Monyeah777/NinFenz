@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1131
+    "verify": 1132
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8051,6 +8051,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "decisions/INDEX 契约：生成区必须与实时重算逐字节一致，人读指引只能待在标记外。",
+      "path": "desktop/tests/test_decisions_index_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "",
       "path": "desktop/tests/test_declined_ledger.py",
       "role": "verify",
@@ -13170,7 +13176,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "48cdbcf84ea33259ce36c543b23074c8e060df087cfb6b7408d6529c9073ea58",
+  "root_digest": "4acc8f1bf19cbe20db75fad3fc979f10603b947163d5329a52f3262fd0dfd12f",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13179,7 +13185,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1005,
+    "R-verify": 1006,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
