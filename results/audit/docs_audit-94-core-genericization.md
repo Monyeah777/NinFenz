@@ -16,7 +16,7 @@ subjects:
   - 04_模块库/通用类/M00_数据槽总线.md:a7b8ecab2c1eac96120eb4aae811c1e5b15d2b4c215c2df52a5e6e1fc9118440
   - 04_模块库/通用类/M10_节拍推进.md:5ff248d5843585e5132ae3a6a51c3f600f35cad893c5f8ff55b96d17292f1647
   - 04_模块库/通用类/M23_可见性边界.md:52042fc2c60cbcae33136b3dd5d8829a0ee1b869243c22a338bedf56d60486e6
-  - 04_模块库/通用类/M24_规则组合.md:1e5429032ca392f703c8123da4c4d0877bca0b60e1ad4b73744245a0329bc494
+  - 04_模块库/通用类/M24_规则组合.md:d1e4419c5833caf95d62760fb22704afee2bcd71cd9191cdb2e53734351c422c
   - 04_模块库/通用类/M50_调度器.md:ddb590f6af181c677caccc39190a5a65b04751e9b0aec4bf5fb5ec27c6a9d524
   - 04_模块库/通用类/M80_输出质检门.md:b2dad838246b0f6287729131cd1aae464843691c1ede95bdcfb412a6eaf2cd48
   - 04_模块库/事件类/M06_流程状态机.md:926b752844c76852e748334522bd79b5fa90ff38bb83a197db1cfea5442e9edc
@@ -35,6 +35,8 @@ subjects:
   - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
 
 ---
+> 重审（2026-11-12）：M24 规则组合顶尖化（零事件+resolve 接口口径 / 不虚构 token 口径 / 依赖面与 02 §4 对账 / I4 配方表边界）+ 契约判据 test_module_m24_contract；权重增量重测、边界重冻结。本轮为机械重绑。
+
 > 重审（2026-11-12）：M23 可见性边界顶尖化（零事件+filter 接口口径 / 依赖面与 02 §4 对账 / 只读纪律 / Phase 2 迁移口径）+ 契约判据 test_module_m23_contract；权重增量重测、边界重冻结。本轮为机械重绑。
 
 > 重审（2026-11-12）：M10 节拍推进顶尖化（outputs 补全为双事件 payload 并集 / io_types 按规则重推 / tick_day 发布订阅对账 / 三形态与 I3·I4 边界）+ 契约判据 test_module_m10_contract；权重增量重测、边界重冻结。本轮为机械重绑。
