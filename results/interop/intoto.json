@@ -4,7 +4,7 @@
     "algorithm": "RFC6962-style sha256 domain-separated",
     "count": 66,
     "note": "派生自 protocol/RECEIPTS.json；inclusion proof 留在原回执单根内。",
-    "root": "59ee553b00bd8fb2eaa86e72d3f191ffcaf023bb7c82e528128c06f5d9154267",
+    "root": "38211f46b99e405b09e5d84b2311c8665d2d34feb80dec364f17c741f673d4eb",
     "scope": "protocol"
   },
   "predicateType": "https://ninfenz.dev/attestation/protocol-receipts/v1",
@@ -137,7 +137,7 @@
     },
     {
       "digest": {
-        "sha256": "a82b9caaf85384cc96962b7736c9ab0d8fd61abc6e01f979d40e8e37cee4c336"
+        "sha256": "37edb7e04f2ffb92282002563199b389a2d054ef66499be12b2d503628dd8637"
       },
       "name": "protocol/role_coordinates.json"
     },
@@ -395,7 +395,7 @@
     },
     {
       "digest": {
-        "sha256": "715d04a1ac00abee6b5714d7d4de8c29438ef320d83a77e765b39cee43f92834"
+        "sha256": "5a35cbdd4c5ebae3cf2abf57f67163141fbe342454656feeb56b8d69efc71e35"
       },
       "name": "decisions/ADR-9001-示例-证据必须可解析.md"
     },

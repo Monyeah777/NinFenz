@@ -107,9 +107,9 @@
       "sha256": "c9e39d009b8753805982b81ffb4b0f55fe94b009452fd42039dd97183e62ec7e"
     },
     {
-      "cid": "bafyreififookv6ctqtgjnfrlo43mtkynr7lbvpdoah4xtvaory345zgdgy",
+      "cid": "bafyreibx5w36atzp7ojcqiackyyztm4julifj33gjgn6ckznka3crxmgg4",
       "path": "protocol/role_coordinates.json",
-      "sha256": "a82b9caaf85384cc96962b7736c9ab0d8fd61abc6e01f979d40e8e37cee4c336"
+      "sha256": "37edb7e04f2ffb92282002563199b389a2d054ef66499be12b2d503628dd8637"
     },
     {
       "cid": "bafyreidah3ff7kkdyeyfqhzfsyimwgapfrqxdyxjmm2mliwd57y6tznlre",
@@ -322,9 +322,9 @@
       "sha256": "f60af54d3c08516141f0d928feaa1a09ddfefee122cdbfcb9b1fb73d02df56aa"
     },
     {
-      "cid": "bafyreidrluckdlaavpxgwvyu27kn5dbjiohpgigyhj36ozntttxeh6jigq",
+      "cid": "bafyreic2gxf52tc6xlr46kv7k73hcyyud67dijcumvx65nllrvu67ry6gu",
       "path": "decisions/ADR-9001-示例-证据必须可解析.md",
-      "sha256": "715d04a1ac00abee6b5714d7d4de8c29438ef320d83a77e765b39cee43f92834"
+      "sha256": "5a35cbdd4c5ebae3cf2abf57f67163141fbe342454656feeb56b8d69efc71e35"
     },
     {
       "cid": "bafyreieducrcybittqwv3jvnkrsnzueqtpx7jsdsyfufhlxonfrtpf4qxu",
