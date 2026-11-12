@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1150
+    "verify": 1151
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9299,6 +9299,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/42_M1_P06 契约：快照状态 + 覆盖真源接续 + 判据覆盖面如实 + 复现口径。",
+      "path": "desktop/tests/test_p06_drill_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "P6-04…P6-11 整改件判据：每条都必须会因为「缺一件」而变红，而不是永远为绿。",
       "path": "desktop/tests/test_p6_evaluations.py",
       "role": "verify",
@@ -13284,7 +13290,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "4964f92252a8c598419a7240e1a2aa6456965ab8b4cf743feb0e6b99f500b878",
+  "root_digest": "3d9b0cb68e7b04b365faeda785b5ea5e527b65d50cfddf90eb7feb70b1632c8e",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13293,7 +13299,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1024,
+    "R-verify": 1025,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
