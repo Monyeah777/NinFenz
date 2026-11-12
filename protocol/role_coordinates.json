@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1180
+    "verify": 1181
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8855,6 +8855,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/ccos/judge-design-questions.md 契约：11 问齐 + 比例棘轮活绑定 + 结果件新鲜。",
+      "path": "desktop/tests/test_judge_questions_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "红证据登记判据：可复算、可核、棘轮只减不增（第 153 轮）。",
       "path": "desktop/tests/test_judge_red_evidence.py",
       "role": "verify",
@@ -13464,7 +13470,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "ca62e5495f9db460c3cfd0abd583fe2f57d565e0dcc4895b82438efd1cec0427",
+  "root_digest": "e880d13a141bcb5c656def2b402ad5b92104a3593f7f2f84b998446e0816f010",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13473,7 +13479,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1054,
+    "R-verify": 1055,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

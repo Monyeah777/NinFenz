@@ -253,6 +253,7 @@
     "test_json_shape_contracts": 0.9,
     "test_judge_clock_purity": 0.3,
     "test_judge_mutation_probe": 0.2,
+    "test_judge_questions_doc_contract": 1.0,
     "test_judge_red_evidence": 0.9,
     "test_judge_references": 0.7,
     "test_judgement_coverage": 7.4,
@@ -2785,6 +2786,9 @@
     "test_judge_mutation_probe.JudgeMutationTest.test_committed_result_is_fresh": 0.01,
     "test_judge_mutation_probe.JudgeMutationTest.test_probe_is_not_vacuous": 0.01,
     "test_judge_mutation_probe.JudgeMutationTest.test_rates_are_computable": 0.02,
+    "test_judge_questions_doc_contract.JudgeDesignQuestionsDocTest.test_contract_catches_mutations": 0.58,
+    "test_judge_questions_doc_contract.JudgeDesignQuestionsDocTest.test_judge_questions_match_contract": 0.12,
+    "test_judge_questions_doc_contract.JudgeDesignQuestionsDocTest.test_registry_live": 0.11,
     "test_judge_red_evidence.JudgeRedEvidenceTest.test_collect_is_deterministic": 0.27,
     "test_judge_red_evidence.JudgeRedEvidenceTest.test_committed_registry_is_fresh": 0.15,
     "test_judge_red_evidence.JudgeRedEvidenceTest.test_naming_is_not_counted_as_evidence": 0.15,
@@ -5347,5 +5351,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1879.9
+  "total_s": 1880.9
 }
