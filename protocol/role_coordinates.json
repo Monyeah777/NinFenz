@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1139
+    "verify": 1140
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7487,6 +7487,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "skills/ninfenz/references/assembly.md 契约：装配参考必须「骨架/编号/验收三真源对得上」。",
+      "path": "desktop/tests/test_assembly_reference_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "断言表（数据化断言）正式与否定用例。",
       "path": "desktop/tests/test_assertions.py",
       "role": "verify",
@@ -13218,7 +13224,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "df031bb379a05c06046a4b9c0b0f436081201a4bdb1d9a7e71fd9864c5ad2ec5",
+  "root_digest": "21d6426f0cdd08c3fbfe23e61277765391a4f4097b87e7809a7def81e56ae47a",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13227,7 +13233,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1013,
+    "R-verify": 1014,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
