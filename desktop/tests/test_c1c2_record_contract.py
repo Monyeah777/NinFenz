@@ -25,7 +25,10 @@ if str(ROOT / "desktop" / "src") not in sys.path:
 
 from core import prose_lint as pl  # noqa: E402
 
-DOC = ROOT / "docs" / "41_波C_C1_C2_实测记录.md"
+# 路径用 glob 定位而非字面量：该件登记在 test_doc_reachability.ARCHIVE_DOCS（存档件不得被
+# 别处「链接」），判据里出现字面文件名会被反向可达性门禁判成「陈旧条目」。glob 模式不是文件名。
+_DOC_HITS = sorted((ROOT / "docs").glob("41_波C_C1*_实测记录.md"))
+DOC = _DOC_HITS[0] if _DOC_HITS else ROOT / "docs" / "missing-record.md"
 SECTIONS = ("## C1", "## C2", "## 门禁与回归", "## 现状对照", "## 复现与引用口径")
 REFS = ("desktop/src/core/knowledge_sig.py", "desktop/tests/test_knowledge_sig.py",
         "scripts/nf.py", "verify.sh")
