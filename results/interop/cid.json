@@ -37,9 +37,9 @@
       "sha256": "ac0bcadbfd9019931e8e8a2f2739dd6603c73fe5b32950b8c80a2eb007c5761b"
     },
     {
-      "cid": "bafyreidmvkjbly6u74mxusyc7374o7532u6waztwahnhbqeb4t3fwuufyq",
+      "cid": "bafyreicsarrg7vx5iwn3i2p4brfbjy6b5zxftbhab6t2rnhkrix7nitheu",
       "path": "library/ALIAS.md",
-      "sha256": "6caa9215e3d4ff197a4b02feffc77fbbd53d60667601da70c081e4f65b5285c4"
+      "sha256": "5204626fd6fd459bb469fc0c4a14e3c1ee6e5984e00fa7a8b4ea8a2ff6a26725"
     },
     {
       "cid": "bafyreibqlthxbcjto5mi363mysnxlngpn75nptoa7donzg7bvv53s5zebe",
@@ -107,14 +107,14 @@
       "sha256": "c9e39d009b8753805982b81ffb4b0f55fe94b009452fd42039dd97183e62ec7e"
     },
     {
-      "cid": "bafyreigyoeyakfu2tzi6t62jcz5f4pfojkfacqnjo3rmw67xgtrx5qb7nm",
+      "cid": "bafyreiawch5jfeq6hgk63xczxvt5vvrx4hjwbqalahs7acamjlewctdvey",
       "path": "protocol/role_coordinates.json",
-      "sha256": "d8713005169a9e51e9fb49167a5e3cae4a8a0141a976e2cb7bf734e37ec03f6b"
+      "sha256": "1611fa92921e3995eddc59bd67dad637e1d360c00b01e5f0080c4ac9614c7526"
     },
     {
-      "cid": "bafyreidah3ff7kkdyeyfqhzfsyimwgapfrqxdyxjmm2mliwd57y6tznlre",
+      "cid": "bafyreibupflczn2f65ormhe7lexdweiugvm3u2e3odcbfhrordk2u6f5ze",
       "path": "protocol/code_metrics_baseline.json",
-      "sha256": "603eca5fa943c130581f259610cb180f2c6171e2e96334c5a2c3eff1e9e5ab89"
+      "sha256": "3479562cb745f75d161c9f592e3b11143559ba689b70c4129e2e88d5aa78bdc9"
     },
     {
       "cid": "bafyreifxa7jgri55ffokvxuynttoqd6vzindwjgxlrqdqhq5f2f4e7i5je",

@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1133
+    "verify": 1134
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7403,6 +7403,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "library/ALIAS 契约：转译表必须「生成器实时重算一致 + 小写键唯一 + 双镜像直链正确 + 标题列在场」。",
+      "path": "desktop/tests/test_alias_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "",
       "path": "desktop/tests/test_allowlist_expiry.py",
       "role": "verify",
@@ -13182,7 +13188,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "3cd264ab0425e6916df8aa1612f38d377d80ad15d18c148ac0195881d9a2be0a",
+  "root_digest": "436137c897e77eac2c4ce24a43f21af7cebf261933437799cdaedd09114429f7",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13191,7 +13197,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1007,
+    "R-verify": 1008,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

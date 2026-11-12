@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:603eca5fa943c130581f259610cb180f2c6171e2e96334c5a2c3eff1e9e5ab89
+  - protocol/code_metrics_baseline.json:3479562cb745f75d161c9f592e3b11143559ba689b70c4129e2e88d5aa78bdc9
 ---
+> 重审（2026-11-12）：library/ALIAS 标题列 + 生成器 +1 行 → code_metrics 基线评审后重冻；契约判据 test_alias_contract。机械重绑。
+
 > 重审（2026-11-11）：L4 判据质量：文字卫生 markdown 面收敛到 repo_face 单点扫描面（66547→370 件）+ .worktrees 静态剪枝
 
 > 重审（2026-11-11）：修复 CI 两处真红：①CodeQL 高优告警（generator 的 SPDX 表达式正则嵌套量词 ReDoS → 改 token 级判定）；②脚本孤儿棘轮（新判据 import 使 gen_third_party_notices 获得入口 → 从 ORPHANS 与一次性审计清单移除，清单 6→5）。本轮为机械重绑。
