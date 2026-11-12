@@ -245,6 +245,7 @@
     "test_linux_parity_refresh_workflow_contract": 0.2,
     "test_live_doc_counts": 5.0,
     "test_llms_contract": 2.2,
+    "test_llms_install_contract": 3.0,
     "test_load_state": 0.1,
     "test_locales": 0.2,
     "test_lsp": 2.9,
@@ -2872,6 +2873,11 @@
     "test_llms_contract.LlmsContractTest.test_no_pinned_runtime_counts": 0.0,
     "test_llms_contract.LlmsContractTest.test_shape_and_generator_freshness": 1.85,
     "test_llms_contract.LlmsContractTest.test_task_router_table": 0.0,
+    "test_llms_install_contract.LlmsInstallContractTest.test_contract_catches_broken_install": 2.73,
+    "test_llms_install_contract.LlmsInstallContractTest.test_install_matches_contract": 0.0,
+    "test_llms_install_contract.LlmsInstallContractTest.test_mcp_face_is_same_source": 0.0,
+    "test_llms_install_contract.LlmsInstallContractTest.test_numeric_claims_match_runtime": 0.0,
+    "test_llms_install_contract.LlmsInstallContractTest.test_probe_frames_are_executable": 0.0,
     "test_load_state.Test.test_only_stale_blocks": 0.0,
     "test_locales.DocTreeTest.test_non_mirrored_path_is_caught": 0.01,
     "test_locales.DocTreeTest.test_stale_translation_is_caught": 0.01,
@@ -4974,5 +4980,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1847.4
+  "total_s": 1850.4
 }
