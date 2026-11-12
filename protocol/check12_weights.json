@@ -283,6 +283,7 @@
     "test_m5_closure_contract": 0.2,
     "test_maintainers_contract": 0.1,
     "test_market_analyzer": 0.6,
+    "test_master_closure_contract": 0.2,
     "test_mcp_adapter": 0.2,
     "test_mcp_ingress": 1.7,
     "test_mcp_live_e2e": 2.6,
@@ -3161,6 +3162,9 @@
     "test_market_analyzer.ListMarketTest.test_list_market_tier_filter": 0.0,
     "test_market_analyzer.ListMarketTest.test_package_grade_community_vs_experimental": 0.0,
     "test_market_analyzer.OfficialAnchorTest.test_official13_matches_verify": 0.0,
+    "test_master_closure_contract.MasterClosureContractTest.test_contract_catches_mutations": 0.03,
+    "test_master_closure_contract.MasterClosureContractTest.test_facts_live": 0.0,
+    "test_master_closure_contract.MasterClosureContractTest.test_master_matches_contract": 0.0,
     "test_mcp_adapter.TestMcpAdapter.test_extra_modules_included_in_resources": 0.01,
     "test_mcp_adapter.TestMcpAdapter.test_narrative_rejected_no_file": 0.0,
     "test_mcp_adapter.TestMcpAdapter.test_resource_carries_source_path_for_trust": 0.0,
@@ -5283,5 +5287,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1869.0
+  "total_s": 1869.2
 }
