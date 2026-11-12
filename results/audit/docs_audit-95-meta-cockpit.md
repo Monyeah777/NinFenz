@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:82ba4b5730fe9f3337ecda9dcc8f70518816fe1ad7ebad5e1bf97cfdb9c19bd2
+  - protocol/check12_weights.json:a926ad2e6bba2682ca918d65ec05aff929c445016cde2e99fea0bc398055b2e8
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-13）：判据族谱顶尖化（修失效引用 test_c2_envelopes→test_cognition_bridge / 探针数字活绑定 / 登记件重建 534·232·0.264）+ 契约判据 test_judge_families_doc_contract；权重增量重测。本轮为机械重绑。
+
 > 重审（2026-11-13）：判据设计十一问顶尖化（登记件陈旧→--write 重建 / 533 模块·硬 231·比例 0.2645 / 11 问齐 / 现状对照 / 复现）+ 契约判据 test_judge_questions_doc_contract；权重增量重测。本轮为机械重绑。
 
 > 重审（2026-11-13）：同构判据矩阵说明档顶尖化（修边界「5 条」旧措辞→9 层/9 条 / 矩阵 9 行 6 字段 / 11 例 / 现状对照 / 复现）+ 契约判据 test_isomorphism_doc_contract；权重增量重测。本轮为机械重绑。
