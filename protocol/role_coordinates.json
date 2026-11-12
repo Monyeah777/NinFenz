@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1151
+    "verify": 1152
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8975,6 +8975,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/42_M4 契约：历史普查必须「快照状态 + 清单规模现状 + 分类标准不变 + 复现口径」。",
+      "path": "desktop/tests/test_m4_census_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "维护者契约判据：执行主体必须「具名、有职责、涉己回避、失能有预案」（2026-11-10）。",
       "path": "desktop/tests/test_maintainers_contract.py",
       "role": "verify",
@@ -13290,7 +13296,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "3d9b0cb68e7b04b365faeda785b5ea5e527b65d50cfddf90eb7feb70b1632c8e",
+  "root_digest": "1c0d973bfa7c4b72bfa3e5933396164253f67c982400458cfc1ee671a90de448",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13299,7 +13305,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1025,
+    "R-verify": 1026,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

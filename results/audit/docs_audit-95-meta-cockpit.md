@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:6e6ac62838888361302fae5baa3652863c34719a7a0ab4383a11b2a18d6c1ba5
+  - protocol/check12_weights.json:dfee716946e2978e297157484764cce063884b578a296b426e0e53cd3fed6b40
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-13）：M4 文档分类普查顶尖化（快照横幅 / 清单规模 8→34·45 现状 / lint --kinds 分工 / 复现口径）+ 契约判据 test_m4_census_contract；权重增量重测。本轮为机械重绑。
+
 > 重审（2026-11-13）：P06 演练集顶尖化（快照横幅 / 44 覆盖真源接续 / 判据覆盖面如实 7 套与 p07_en 例外 / 复现口径）+ 契约判据 test_p06_drill_contract；权重增量重测。本轮为机械重绑。
 
 > 重审（2026-11-13）：P03 演练集顶尖化（快照横幅 / 8 例实跑复核 / 8 份夹具与 RULE_LAW 6 条现状 / FIELD-001 挂账 / 复现口径）+ 契约判据 test_drill_doc_contract；权重增量重测。本轮为机械重绑。
