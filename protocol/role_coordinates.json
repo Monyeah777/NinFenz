@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1167
+    "verify": 1168
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7493,6 +7493,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/agent/agent_组装指令包_v0.2 契约：装配指令包必须「与现行入口/门禁一致 + 无退役面指引」。",
+      "path": "desktop/tests/test_assembly_pack_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "skills/ninfenz/references/assembly.md 契约：装配参考必须「骨架/编号/验收三真源对得上」。",
       "path": "desktop/tests/test_assembly_reference_contract.py",
       "role": "verify",
@@ -13386,7 +13392,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "bf77e3790cbcc3c21d835dfbe8522a1bc7a3c33b6c1c6c7cc02267e6031c712d",
+  "root_digest": "95ce2c35ff5ef74d154ed2e90f5e87ddfd62cab6ba8f1c43a5c78f4a324ab985",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13395,7 +13401,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1041,
+    "R-verify": 1042,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
