@@ -3,6 +3,7 @@
   "modules": {
     "test_absence_guard": 0.2,
     "test_agent_rules_adapter": 0.2,
+    "test_agent_start_contract": 0.2,
     "test_agents_contract": 0.1,
     "test_ai_domain_closure": 0.2,
     "test_allowlist_expiry": 0.2,
@@ -461,6 +462,11 @@
     "test_agent_rules_adapter.TestAgentsAdapter.test_claude_format_exports_claude_md": 0.0,
     "test_agent_rules_adapter.TestAgentsAdapter.test_narrative_rejected_no_file": 0.0,
     "test_agent_rules_adapter.TestAgentsAdapter.test_project_rules_exports_agents_md": 0.0,
+    "test_agent_start_contract.AgentStartContractTest.test_contract_catches_broken_entry": 0.04,
+    "test_agent_start_contract.AgentStartContractTest.test_driver_override_is_same_source": 0.0,
+    "test_agent_start_contract.AgentStartContractTest.test_entry_matches_contract": 0.01,
+    "test_agent_start_contract.AgentStartContractTest.test_references_resolve": 0.0,
+    "test_agent_start_contract.AgentStartContractTest.test_required_links_are_reachable": 0.0,
     "test_agents_contract.AgentsContractTest.test_agents_matches_contract": 0.0,
     "test_agents_contract.AgentsContractTest.test_contract_catches_broken_agents": 0.0,
     "test_agents_contract.AgentsContractTest.test_facts_match_repo": 0.0,
@@ -4946,5 +4952,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1844.9
+  "total_s": 1845.1
 }
