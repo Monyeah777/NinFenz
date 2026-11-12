@@ -52,6 +52,7 @@
     "test_bridge_real": 2.6,
     "test_c1c2_record_contract": 0.2,
     "test_c7_record_contract": 0.2,
+    "test_c8_transport_contract": 0.2,
     "test_cache_bounds": 0.2,
     "test_calibration": 0.1,
     "test_calibration_state": 0.2,
@@ -958,6 +959,10 @@
     "test_c7_record_contract.C7RecordContractTest.test_e3_status_source_agrees": 0.0,
     "test_c7_record_contract.C7RecordContractTest.test_record_matches_contract": 0.0,
     "test_c7_record_contract.C7RecordContractTest.test_tool_face_is_live": 0.0,
+    "test_c8_transport_contract.C8TransportContractTest.test_contract_catches_mutations": 0.01,
+    "test_c8_transport_contract.C8TransportContractTest.test_local_http_face_exists": 0.0,
+    "test_c8_transport_contract.C8TransportContractTest.test_remote_transport_still_not_done": 0.0,
+    "test_c8_transport_contract.C8TransportContractTest.test_transport_record_matches_contract": 0.0,
     "test_cache_bounds.CacheBoundsTest.test_every_long_lived_cache_declares_a_positive_cap": 0.0,
     "test_cache_bounds.CacheBoundsTest.test_response_cache_evicts_at_its_cap": 0.0,
     "test_calibration.CalibrationTest.test_bad_input_fails_closed": 0.0,
@@ -5198,5 +5203,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1864.2
+  "total_s": 1864.4
 }

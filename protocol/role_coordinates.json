@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1144
+    "verify": 1145
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7649,6 +7649,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/41_波C_C8 transport 契约：原结论保留 + 现行能力面复评 + 远程/本地口径分离。",
+      "path": "desktop/tests/test_c8_transport_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "常驻缓存**必须有界**（稳态毫秒级响应的隐含前提：长驻守护不能随会话增长而吃内存）。",
       "path": "desktop/tests/test_cache_bounds.py",
       "role": "verify",
@@ -13248,7 +13254,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "4f8be1e3a1f4fe5db04235020edaa857e18174dd7f54dd8584f5da4f0c62fc9a",
+  "root_digest": "dd728f5f28acc1ce21bf5e29fdfebd0ec4f76b8f9e6df40d147f068f4e7e98bb",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13257,7 +13263,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1018,
+    "R-verify": 1019,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
