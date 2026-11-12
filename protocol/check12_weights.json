@@ -11,6 +11,7 @@
     "test_ai_channel_spec_contract": 0.5,
     "test_ai_domain_closure": 0.2,
     "test_ai_menu_contract": 0.3,
+    "test_ai_menu_fieldtest_contract": 0.2,
     "test_ai_routing_contract": 0.3,
     "test_alias_contract": 0.2,
     "test_allowlist_expiry": 0.2,
@@ -595,6 +596,9 @@
     "test_ai_menu_contract.AiMenuContractTest.test_facts_match_sources": 0.0,
     "test_ai_menu_contract.AiMenuContractTest.test_menu_matches_contract": 0.01,
     "test_ai_menu_contract.AiMenuContractTest.test_menu_rows_are_single_source": 0.0,
+    "test_ai_menu_fieldtest_contract.ImageMenuFieldtestContractTest.test_contract_catches_mutations": 0.0,
+    "test_ai_menu_fieldtest_contract.ImageMenuFieldtestContractTest.test_fieldtest_matches_contract": 0.0,
+    "test_ai_menu_fieldtest_contract.ImageMenuFieldtestContractTest.test_menu_version_and_backfill_live": 0.0,
     "test_ai_routing_contract.AiRoutingContractTest.test_contract_catches_broken_routing": 0.05,
     "test_ai_routing_contract.AiRoutingContractTest.test_driver_face_is_same_source": 0.0,
     "test_ai_routing_contract.AiRoutingContractTest.test_references_resolve": 0.0,
@@ -5299,5 +5303,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1869.8
+  "total_s": 1870.0
 }

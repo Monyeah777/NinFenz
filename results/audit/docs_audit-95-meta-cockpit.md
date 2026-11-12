@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:34fd1d5359df327bc877f5d3764ab98fca357eb8546d36a0027c1a25700f466c
+  - protocol/check12_weights.json:409cfc3b286804099d1d7ea519098574a5c3f367ebc4db534ee411d0d44a6c94
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-13）：Y5 外测作业书顶尖化（未执行/封存状态如实 + 菜单 v0.3 四处口径同步 + Y5 回填位）+ 契约判据 test_ai_menu_fieldtest_contract；权重增量重测。本轮为机械重绑。
+
 > 重审（2026-11-13）：装配指令包顶尖化（通道 A 桌面→CLI / R1–R8 / 八段最低要求 / 12 工具 / 复核位）+ 契约判据 test_assembly_pack_contract；权重增量重测。本轮为机械重绑。
 
 > 重审（2026-11-13）：L3_FROZEN 端壳退役真相源顶尖化（最后复核 / 退役+保留双侧机检面 / CI 22 workflow 全量点名 / 复现口径）+ 契约判据 test_l3_frozen_contract；权重增量重测。本轮为机械重绑。
