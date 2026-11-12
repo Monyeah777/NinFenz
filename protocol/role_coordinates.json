@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1178
+    "verify": 1179
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8411,6 +8411,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/ccos/evidence-vectors-v0.md 契约：28 条结构/分布/覆盖表与数据一致 + 围栏合法。",
+      "path": "desktop/tests/test_evidence_vectors_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "42 M1 + 44 扩展 —— 执行失范捕获器单测（多管线演练集 P01-P06/P90 + 变异自检/捕获率验收）。",
       "path": "desktop/tests/test_execution_drill.py",
       "role": "verify",
@@ -13452,7 +13458,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "cffacb7dde91e3ed195d517af18c13a431cd36f01610ad5cf38fbf394f44d4af",
+  "root_digest": "32d6c7b56f01190fc2526bb2927ea580ab941f2a7dd1081a683d9f64e16763a8",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13461,7 +13467,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1052,
+    "R-verify": 1053,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
