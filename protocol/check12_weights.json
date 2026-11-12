@@ -246,6 +246,7 @@
     "test_leak_surface": 1.7,
     "test_ledger_tables": 0.2,
     "test_library": 0.9,
+    "test_library_index_contract": 0.2,
     "test_library_ingest_script_contract": 0.2,
     "test_library_ingest_workflow_contract": 0.2,
     "test_license_chain": 0.2,
@@ -2898,6 +2899,10 @@
     "test_library.TestValidationNegative.test_receipts_carry_anchor_and_root_stable": 0.02,
     "test_library.TestValidationNegative.test_superseded_requires_target": 0.0,
     "test_library.TestValidationNegative.test_superseded_target_must_exist": 0.0,
+    "test_library_index_contract.LibraryIndexContractTest.test_contract_catches_mutations": 0.02,
+    "test_library_index_contract.LibraryIndexContractTest.test_generated_regions_equal_render": 0.0,
+    "test_library_index_contract.LibraryIndexContractTest.test_guide_matches_intake": 0.0,
+    "test_library_index_contract.LibraryIndexContractTest.test_library_index_matches_contract": 0.0,
     "test_library_ingest_script_contract.LibraryIngestScriptContractTest.test_contract_catches_broken_script": 0.0,
     "test_library_ingest_script_contract.LibraryIngestScriptContractTest.test_resolve_body_file_beats_env": 0.05,
     "test_library_ingest_script_contract.LibraryIngestScriptContractTest.test_script_matches_contract": 0.0,
@@ -5147,5 +5152,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1862.2
+  "total_s": 1862.4
 }
