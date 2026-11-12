@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1124
+    "verify": 1125
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -10049,6 +10049,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "05_资产库/用户自定义 README 契约：登记面必须「键清单 ⇄ schema 速览 ⇄ 资产文件 ⇄ 台账」四源一致。",
+      "path": "desktop/tests/test_user_assets_readme_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "",
       "path": "desktop/tests/test_value_replay.py",
       "role": "verify",
@@ -13128,7 +13134,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "6b3f163ecbf6466a45405d185e221dff4b9de903eb12a0b645dbbfae6a576ca0",
+  "root_digest": "72c79b112d762e26df1ca8a899ed9962cbc02e9e98cab46a41efa4c1f889f505",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13137,7 +13143,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 998,
+    "R-verify": 999,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
