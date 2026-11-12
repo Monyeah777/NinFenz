@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1109
+    "verify": 1110
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9233,6 +9233,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "P90 结构装配管线契约：技术文档实例必须「techdoc 结构可解析、九层挂载与 02 §7.1 同源」。",
+      "path": "desktop/tests/test_pipeline_p90_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "40 总纲 v2.8 波B S4 —— nf pipeline new 派生脚手架单测（纯 unittest，L2 core 零依赖）。",
       "path": "desktop/tests/test_pipeline_scaffold.py",
       "role": "verify",
@@ -13038,7 +13044,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "f0b4c3ee750b39eae3caf32e1d51a6273bc3736b6728c29784d4cb0650ea81fa",
+  "root_digest": "784e678fa5d4f97901b77eada66200bbdd3d038eb7bf9a5770aef63dd8e9b7ce",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13047,7 +13053,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 983,
+    "R-verify": 984,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

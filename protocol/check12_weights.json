@@ -316,6 +316,7 @@
     "test_pipeline_loader": 0.3,
     "test_pipeline_p00_contract": 0.3,
     "test_pipeline_p01_contract": 0.3,
+    "test_pipeline_p90_contract": 0.2,
     "test_pipeline_scaffold": 0.2,
     "test_pipelinerun": 0.5,
     "test_pkg_cli": 1.9,
@@ -3722,6 +3723,9 @@
     "test_pipeline_p01_contract.PipelineP01ContractTest.test_contract_catches_mutations": 0.05,
     "test_pipeline_p01_contract.PipelineP01ContractTest.test_mounts_are_three_way_consistent": 0.0,
     "test_pipeline_p01_contract.PipelineP01ContractTest.test_p01_matches_contract": 0.0,
+    "test_pipeline_p90_contract.PipelineP90ContractTest.test_contract_catches_mutations": 0.05,
+    "test_pipeline_p90_contract.PipelineP90ContractTest.test_mounts_match_registry_section_7": 0.0,
+    "test_pipeline_p90_contract.PipelineP90ContractTest.test_p90_matches_contract": 0.0,
     "test_pipeline_scaffold.ScaffoldPipelineTest.test_bad_id_raises": 0.0,
     "test_pipeline_scaffold.ScaffoldPipelineTest.test_default_filename": 0.0,
     "test_pipeline_scaffold.ScaffoldPipelineTest.test_default_filename_never_carries_separators": 0.0,
@@ -5028,5 +5032,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1856.2
+  "total_s": 1856.4
 }
