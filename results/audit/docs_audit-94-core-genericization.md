@@ -22,7 +22,7 @@ subjects:
   - 04_模块库/事件类/M06_流程状态机.md:926b752844c76852e748334522bd79b5fa90ff38bb83a197db1cfea5442e9edc
   - 04_模块库/事件类/M12_模板检索库.md:542679405444e17a41ddd5ed333022be359a1abc3a3311c1af014fe58ca34fed
   - 04_模块库/事件类/M13_实体交互.md:ceb1e8726acff0cd3951f544e2b9db9b045e72f8b9f8af905c31594ec843f368
-  - 04_模块库/事件类/M20_知识条目库.md:6178afdd65522494ba7fd9fe060d5b220269c0b4e893ec50ac631f4d0685e924
+  - 04_模块库/事件类/M20_知识条目库.md:cbbaf05a888bc6c7a95714f178dc9ffb9a6ecbb07deadf0738f7b7a284ce489e
   - 04_模块库/事件类/M22_事件编排.md:b9b9d9728621912f954a67ae5d5ce80dc5ee7ec7945441a6b602b37fbfc9ad1a
   - 04_模块库/世界类/M08_环境状态.md:3327f91dd0fb83336c45f0b939a3bde9f58ab3630383d5306f646ffc2dfd8a7d
   - 04_模块库/技术文档类/M90_结构装配.md:7ed8a8435be582e59aa070a10d5d6a6b234dfc127a0613507bd5842bf5a876a4
@@ -35,6 +35,8 @@ subjects:
   - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
 
 ---
+> 重审（2026-11-12）：M20 知识条目库顶尖化（零事件+query 接口口径 / 双挂载 P70 active + P00 available 同源 / I3·I4 边界 / query 只读）+ 契约判据 test_module_m20_contract；权重增量重测、边界重冻结。本轮为机械重绑。
+
 > 重审（2026-11-12）：M13 实体交互顶尖化（outputs/payload 补全为 interaction_update 注册字段全集 / 三形态 / I3·I4 边界 / M12 search 接口引用）+ 契约判据 test_module_m13_contract；权重增量重测、边界重冻结。本轮为机械重绑。
 
 > 重审（2026-11-12）：M12 模板检索库顶尖化（零事件模块 interfaces 补全 search / 三形态口径 / I3·I4 只读边界）+ 契约判据 test_module_m12_contract；check12 权重增量重测、模块边界按新契约重冻结。本轮为机械重绑。
