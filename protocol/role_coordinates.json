@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1172
+    "verify": 1173
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7643,6 +7643,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/attest.md 契约：内容 attestation 文档必须「三级语义 + 六旗标 + 库签名边界 + 现状活绑定」。",
+      "path": "desktop/tests/test_attest_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "审计/验收（audit）正式与否定用例。",
       "path": "desktop/tests/test_audit.py",
       "role": "verify",
@@ -13416,7 +13422,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "7447e66c7c1dff81f5a023cdb7d8bbd6af220fa3feed0d26a58cd8b2592471bc",
+  "root_digest": "d840421a7572394881d306b8196b468c1cffe7dd4999dd95773cbedb92f5e556",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13425,7 +13431,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1046,
+    "R-verify": 1047,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

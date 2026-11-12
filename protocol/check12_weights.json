@@ -51,6 +51,7 @@
     "test_atomic_write_boundaries": 0.7,
     "test_atoms": 0.8,
     "test_attest": 0.4,
+    "test_attest_doc_contract": 0.2,
     "test_audit": 0.3,
     "test_audit_rebind": 0.2,
     "test_autofix": 0.2,
@@ -949,6 +950,9 @@
     "test_attest.TestAttest.test_signing_timeout_raises_with_guidance": 0.07,
     "test_attest.TestAttest.test_sigstore_fail_closed": 0.04,
     "test_attest.TestAttest.test_unknown_scheme_rejected": 0.0,
+    "test_attest_doc_contract.AttestDocContractTest.test_attest_matches_contract": 0.0,
+    "test_attest_doc_contract.AttestDocContractTest.test_contract_catches_mutations": 0.02,
+    "test_attest_doc_contract.AttestDocContractTest.test_levels_and_flags_live": 0.0,
     "test_audit.TestNegatives.test_acceptance_without_date_is_fail": 0.01,
     "test_audit.TestNegatives.test_bad_verdict_is_fail": 0.0,
     "test_audit.TestNegatives.test_legacy_is_warn_not_fail": 0.0,
@@ -5315,5 +5319,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1878.3
+  "total_s": 1878.5
 }
