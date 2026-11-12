@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:80487d984ee94a67b27240e2bc529b281cf9c463e00e0cd578122c6ce984bb24
+  - protocol/check12_weights.json:6c161202297abd31b15ce5469c1f4529ce3c04f62bf3baa2bd65ac0e57c7da2a
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-12）：05_资产库/用户自定义 README 顶尖化（读法/机检 + 键清单/schema 速览与资产文件对账 + nf-asset 头/台账三方 + 校验面）+ 契约判据 test_user_assets_readme_contract；权重增量重测。本轮为机械重绑。
+
 > 重审（2026-11-12）：05_资产库 README 顶尖化（读法/机检段 + 五接口清单同源 01 §3 + provenance/asset_keys/用户自定义三源覆盖 + 单层货架硬规 + §6 引用映射口径）+ 契约判据 test_asset_library_readme_contract；权重增量重测。本轮为机械重绑。
 
 > 重审（2026-11-12）：M80 输出质检门顶尖化（唯一输出闸 / gate_action 单源 / 8 段判定记录 / 零事件固定节点豁免理由 / 硬门不可关）+ 契约判据 test_module_m80_contract；权重增量重测、边界重冻结。本轮为机械重绑。
