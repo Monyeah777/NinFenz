@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1097
+    "verify": 1098
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7373,6 +7373,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "ai-menu 菜单契约：一贴就发菜单的 B1 总闸门必须「菜单单源、事实同源、失败即停」。",
+      "path": "desktop/tests/test_ai_menu_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "AI_ROUTING 路由契约：入口第二跳必须「档位可自测、通道有落点、override 同源、失败即停」。",
       "path": "desktop/tests/test_ai_routing_contract.py",
       "role": "verify",
@@ -12966,7 +12972,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "d7b1d267ceb06f70167782996cd4cb117343f085b4cceaeb638135e31e1392b1",
+  "root_digest": "d053bf9ccca8e5c08c3960feca1ff0ba53f6adb3dbc39fe36d8eefbefb7252cc",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12975,7 +12981,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 971,
+    "R-verify": 972,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
