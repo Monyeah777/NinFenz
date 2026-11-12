@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1127
+    "verify": 1128
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9989,6 +9989,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "TECH_TEMPLATES 资产契约：章节骨架模板必须「schema ⇄ 键清单 ⇄ 条目 ⇄ 台账」四源一致。",
+      "path": "desktop/tests/test_tech_templates_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "遥测 semconv 映射单测（不改 trace 格式；只对齐属性命名与 OTLP 形状）。",
       "path": "desktop/tests/test_telemetry_semconv.py",
       "role": "verify",
@@ -13146,7 +13152,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "a13d9df1bc116ee05636fab7f03f75105a6bdfe87d05aff98a7ded5489cc6c33",
+  "root_digest": "a5f2e1e1573583b56a16ba6a33eb20d5201926f9e41972d02e02f33c0878a9b9",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13155,7 +13161,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1001,
+    "R-verify": 1002,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
