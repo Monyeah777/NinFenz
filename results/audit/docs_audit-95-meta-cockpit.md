@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:c72c0adfbbdef705f65ac1c940ae6f5bc1cca2df2980388ee8a6f47765d22508
+  - protocol/check12_weights.json:bc61c246d217f0d6a8bc69a6369a6aecff87faa99d180eb0022ce10e3762d1ae
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-12）：ROUTES 云端导购顶尖化（入口链馆线落点 / 镜像路径可核 / 决策流 A-H / 出库前自检 / fail-closed）+ 契约判据补结构决策流与前缀分支；check12 权重增量实测。本轮为机械重绑。
+
 > 重审（2026-11-12）：AI_ROUTING 入口路由顶尖化（三档自测证据 / 档位⇄落点⇄验收 / driver.json 同源 / fail-closed）+ 契约判据 test_ai_routing_contract；check12 权重增量实测。本轮为机械重绑。
 
 > 重审（2026-11-12）：AGENT_START 入口顶尖化（七段分流 / DRIVER OVERRIDE 同源 / 三档可执行 / 失败即停）+ 契约判据 test_agent_start_contract（含变异自证）；check12 权重按增量实测更新。本轮为机械重绑。
