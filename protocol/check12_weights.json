@@ -175,6 +175,7 @@
     "test_eval_harness": 0.4,
     "test_evidence": 6.3,
     "test_evidence_batch": 1.4,
+    "test_evidence_bundle_doc_contract": 0.2,
     "test_evidence_forms_parity": 1.1,
     "test_evidence_graph": 0.1,
     "test_evidence_vectors": 3.8,
@@ -2142,6 +2143,9 @@
     "test_evidence_batch.VerifyBatchTest.test_one_bad_makes_whole_batch_fail": 0.01,
     "test_evidence_batch.VerifyBatchTest.test_rows_carry_verdict_and_root": 0.01,
     "test_evidence_batch.VerifyBatchTest.test_single_file_target_works": 0.01,
+    "test_evidence_bundle_doc_contract.EvidenceBundleDocTest.test_bundle_matches_contract": 0.0,
+    "test_evidence_bundle_doc_contract.EvidenceBundleDocTest.test_contract_catches_mutations": 0.02,
+    "test_evidence_bundle_doc_contract.EvidenceBundleDocTest.test_numbers_live": 0.0,
     "test_evidence_forms_parity.TestAttestFormParity.test_attest_form_verdict_level_agree": 0.23,
     "test_evidence_forms_parity.TestOutOfRepoStandalone.test_copied_verifier_outside_repo_agrees": 0.45,
     "test_evidence_forms_parity.TestReceiptsFormParity.test_receipts_form_verdict_level_root_agree": 0.21,
@@ -5335,5 +5339,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1879.3
+  "total_s": 1879.5
 }

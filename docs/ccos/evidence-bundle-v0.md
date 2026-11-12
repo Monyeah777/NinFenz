@@ -2,8 +2,11 @@
 
 状态：**已实装**（判据：`desktop/tests/test_evidence_vectors.py` 8 项 + `desktop/tests/test_evidence.py` 66 项；CLI：`nf evidence pack/verify`）。
 > ⛔ 操作指令：阅读即执行——本文含可直接执行的命令与判定，勿当资料阅读。
-> 最后更新：2026-11-04
+> 最后更新：2026-11-13
 > **Status**: v0 已实装（pack / verify / bench · 三种可验形态）· **上位**: docs/ccos/abi-v0.md §4 cc_verify
+> **复核（2026-11-13）**：判定顺序、fail-closed 三条严格口径、三形态、两套实现同判——**逐项复核不变**；修两处**跨段数字失同步**：① 三形态表「上面 10 条全判」→ **13 条**（判定表实为 1–13 含 8b）；② 攻击矩阵小节「25 种」→ **38 条**（与 `nf evidence bench` 实跑 38/38 PASS 一致）。
+> 现状判据数：`test_evidence` **66 项**；`test_evidence_vectors` **8 项**。
+> 跨语言向量集 **28 条**（18 包 + 4 回执 + 6 信封）；见「§现状对照」。
 
 ## 是什么
 
@@ -73,7 +76,7 @@ hmac-sha256 / ssh-sig / sigstore-keyless。
 
 | 形态 | 输入 | 判什么 | level |
 |---|---|---|---|
-| bundle | nf evidence pack 的 .zip / 解包目录 | 上面 10 条全判 | 取通过的最强信封档 |
+| bundle | nf evidence pack 的 .zip / 解包目录 | 上面 **13 条**全判 | 取通过的最强信封档 |
 | receipts | nf-receipts/1（nf receipts --scope protocol 产出） | 成员摘要 → 叶 → 根 → 每条包含证明 | receipts_only |
 | attest | nf-attest/1 或 nf-attest-set/1（nf attest 产出） | 每份信封自洽 + 指向真实成员 | 取通过的最强档 |
 
@@ -140,13 +143,39 @@ python -m unittest desktop.tests.test_evidence             # 66 项全绿（含�
 
 ## 攻击矩阵基准 v0（防「看起来能验」）
 
-对同一份金丝雀证据包施加 25 种已知攻击/退化，逐条断言「期望判定 vs 实际判定」：
+对同一份金丝雀证据包施加 **38 条**已知攻击/退化，逐条断言「期望判定 vs 实际判定」：
 改字节、截断、等长替换、删成员、夹带成员、改清单摘要/根/叶、删清单条目、翻/截包含证明、
 改链头、换条目顺序、删信封、改信封主体摘要、改 hmac、缺密钥、错密钥、改包版本、非包输入、
 吊销命中、过期，以及**良性重排**（必须仍然 ok）。
 
 它是自测基准，不是安全证明：证明「这些已知攻击都判得出来」，**不**证明「所有攻击都判得出来」。
 不可抵赖与可信时间戳仍需第三方见证——这条边界写进包内 boundary 字段，也写进报告页脚。
+
+## 现状对照（2026-11-13 · 以实跑为准）
+
+| 面 | 本文声明 | 复核结果（读到本行时请重跑） |
+|---|---|---|
+| 判定顺序 | 1–13 条（含 8b） | **不变**（fail-closed；三形态 bundle 全判 13 条） |
+| 攻击矩阵 | 38 条（`nf evidence bench`） | **38 条实跑 38/38 PASS**（`evidence.py` 内 `_bench_run` 恰 38 用例） |
+| 向量集 | 28 条（18 包 + 4 回执 + 6 信封） | **28 条**（`results/ccos/evidence_verdict_vectors.json`） |
+| 常驻判据 | `test_evidence` 66 项 + `test_evidence_vectors` 8 项 | **66 + 8**（本表与标题一致） |
+| 两套实现 | core/evidence.py ↔ scripts/nf_verify.py 同判 | **不变**（`TestStandaloneParity` 用同一批夹具，含 67 件回执） |
+| 容器安全 | 第 13 条（双点段/盘符/重名/上限） | **不变** |
+| 时间面 | 只有自签 issued_at | **不变**（无 TSA/RFC3161；time-token 为独立可选面，见 time-token-v0.md） |
+
+> 本表只作「当时 → 现行」导航，不替代实跑。
+
+## 复现与引用口径
+
+```bash
+python scripts/nf.py evidence bench                     # 38 条攻击矩阵（任意不达期望即 exit 1）
+python scripts/nf.py evidence verify --selfcheck        # 四词判定各自可达
+python -m pytest desktop/tests/test_evidence_vectors.py -q   # 8 项（向量集）
+python -m pytest desktop/tests/test_evidence.py -q      # 66 项（含双实现同判）
+```
+
+- 引用本文时：判定顺序 + fail-closed + 「不可抵赖/可信时间不在承诺面」= 长期口径；条数以命令实读为准。
+- 失真定义：任一段数字与实跑不符即本文失真（本轮已修「10 条」「25 种」两处跨段失同步）。
 
 ## 与既有验证器的关系（两套独立实现，判据必须一致）
 

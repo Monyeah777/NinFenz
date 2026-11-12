@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1177
+    "verify": 1178
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8387,6 +8387,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/ccos/evidence-bundle-v0.md 契约：判定顺序/矩阵/向量/判据数与实现一致。",
+      "path": "desktop/tests/test_evidence_bundle_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "证据面双实现 parity 收口：receipts / attest 两形态 + 仓外单文件复验。",
       "path": "desktop/tests/test_evidence_forms_parity.py",
       "role": "verify",
@@ -13446,7 +13452,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "666d66e70fdae60e271f1105169be693c0e08ef683447847dffc8d3cdfb5aae3",
+  "root_digest": "cffacb7dde91e3ed195d517af18c13a431cd36f01610ad5cf38fbf394f44d4af",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13455,7 +13461,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1051,
+    "R-verify": 1052,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
