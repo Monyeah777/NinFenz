@@ -1,6 +1,10 @@
 # 供应链对象 v0（材料清单 + 验证器摘要 + 结论绑定）
 
 状态：**已实装**（`core/sbom.py`、`core/verifier_version.py`、`scripts/self_audit_probe.py`、`scripts/sbom.py`）。
+> **最后更新：2026-11-13（复核）**：三摘要口径与「不做签名/不覆盖被测内容/非全仓清单」边界**逐项复核不变**；
+> 现状数字：材料清单 **`count` 572 == `materials` 572**（`scripts/sbom.py --check` 绿）；`verifier_digest` 覆盖
+> **`JUDGE_FILES` 10 个判定面脚本**；`verifier_status` 当前 **`current`**（来源 `results/ccos/self_audit.json`），
+> 三态 `current/stale/unknown`（`stale` 退出码 1）。见「§现状对照」。
 
 ## 这份文档解决什么
 
@@ -40,6 +44,31 @@ python scripts/verifier_status.py --conclusion F.json  # 查任意一份结论�
 
 三态：`current`（可引用）/ `stale`（验证器已变，必须重跑）/ `unknown`（没有可比对的摘要）。
 `stale` 退出码 1，可直接当脚本里的 gate。
+
+## 现状对照（2026-11-13 · 以实跑为准）
+
+| 面 | 本文声明 | 复核结果（读到本行时请重跑） |
+|---|---|---|
+| 三摘要 | head / verifier_digest / materials_digest | **不变**（互咬合：改树全变、改脚本验证器变、改输入材料变） |
+| 材料清单 | 显式范围，非全仓 | **`count` 572 / `materials` 572**（`--check` 绿） |
+| 验证器摘要 | 判定面脚本 10 个 | **`verifier_version.JUDGE_FILES` 恰 10 项** |
+| 结论可复用性 | current / stale / unknown | **三态在文**；`stale` 退出码 1（可当 gate） |
+| 当前状态 | — | **`current`**（来源 `results/ccos/self_audit.json`） |
+| 实现件 | core/sbom + verifier_version + self_audit_probe + sbom | **四件全在** |
+| 边界 | 不做签名 / 不覆盖被测内容 / 非全仓 / results 不入清单 / 跨机不可比 | **五条全在** |
+
+> 本表只作「当时 → 现行」导航，不替代实跑。
+
+## 复现与引用口径
+
+```bash
+python scripts/sbom.py --check            # 材料清单 == 现场（材料/摘要/count 任一不符即红）
+python scripts/verifier_status.py         # 三态（stale 退出码 1，可直接当 gate）
+python -m pytest desktop/tests/test_sbom.py desktop/tests/test_verifier_status.py -q
+```
+
+- 引用本文时：「三个摘要都是自我摘要，不做签名」= 长期口径；材料清单只覆盖显式范围，`results/` 属产出不入清单。
+- 若 `sbom --check` 红：按提示重跑 `--write` 并 review 差异（材料增删应有明确原因）。
 
 ## 边界（必须写清）
 
