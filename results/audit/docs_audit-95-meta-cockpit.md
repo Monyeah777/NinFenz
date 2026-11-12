@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:c04ebc5895cd666a37e242c6bd7f3a7f3e6c13bf74c7c7004cf8f33ffdea969d
+  - protocol/check12_weights.json:485d5b52ab9da882488e5aa0cd0ca9f2b8929d50ab098543c50e6134978ec4b8
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-13）：威胁模型文档顶尖化（修两处与 G4 自相矛盾：无水印/不做水印 → 五格式载体+PNG LSB 水印现状 / A1–A9·G1–G6 活绑定 / 现状对照 / 复现）+ 契约判据 test_threat_model_doc_contract；权重增量重测。本轮为机械重绑。
+
 > 重审（2026-11-13）：研究层 v0 文档顶尖化（8 方法/7 切片/depth 映射/16 例活绑定 / 现状对照 / 复现）+ 契约判据 test_research_methods_doc_contract；权重增量重测。本轮为机械重绑。
 
 > 重审（2026-11-13）：发布结论文档顶尖化（修两处陈旧数字：1882.7s/4833 条权重·25 门/540 模块 / 五步与快照语义活绑定 / 复现）+ 契约判据 test_release_conclusion_doc_contract；权重增量重测。本轮为机械重绑。
