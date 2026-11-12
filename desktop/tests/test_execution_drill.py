@@ -16,7 +16,7 @@ FIXTURES = [FIX_DIR / n
             for n in ("p01_drill_cases.json", "p02_drill_cases.json",
                       "p03_drill_cases.json", "p04_drill_cases.json",
                       "p05_drill_cases.json", "p06_drill_cases.json",
-                      "p90_drill_cases.json")]
+                      "p07_en_drill_cases.json", "p90_drill_cases.json")]
 
 
 class ExecutionDrillTest(unittest.TestCase):
@@ -30,11 +30,13 @@ class ExecutionDrillTest(unittest.TestCase):
                 yield data, case
 
     def _hits(self, data, case):
+        # lexicon：多语集（p07_en）由 fixture 声明判定词表；缺省仍中文内置词表。
         return drill.run_case(case, data["real_ids"],
                               data.get("semantics") or {},
                               data.get("source_text", ""),
                               data.get("other_ids") or [],
-                              data.get("asset_keys") or [])
+                              data.get("asset_keys") or [],
+                              data.get("lexicon") or {})
 
     def test_deviation_capture_all(self):
         """失范样本须全部被硬断言捕获（无漏报）。"""

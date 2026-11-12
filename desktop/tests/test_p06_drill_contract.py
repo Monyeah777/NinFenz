@@ -2,16 +2,16 @@
 """docs/42_M1_P06 契约：快照状态 + 覆盖真源接续 + 判据覆盖面如实 + 复现口径。
 
 为什么必须有：本文是「P06 第 2 份」演练记录，写「测试参数化覆盖 P03+P06 两套」——但 44 drill 波
-已把演练集扩到 **8 集**，覆盖真源是 docs/44_M1_执行演练扩展.md；而 test_execution_drill 实际
-参数化 **7 套**（p01–p06 + p90），**p07_en 英文词表集不在该单测内**（用例路径未接 fixture
-lexicon，由 engine/Rust 快线与 protocol/drill_fidelity.json 覆盖）。这里必须如实标注，不虚称
-「8 套全在单测」。本轮补快照横幅、现状对照、复现口径，并把覆盖事实立成机检断言。
+已把演练集扩到 **8 集**，覆盖真源是 docs/44_M1_执行演练扩展.md；而 test_execution_drill 现
+参数化 **8 套**（p01–p06 + p07_en + p90；2026-11-13 起含 p07_en，_hits 接 fixture lexicon，
+此前「7 套 + p07_en 例外」的旧口径已消除）。本轮补快照横幅、现状对照、复现口径，并把覆盖
+事实立成机检断言。
 
 范围：只判本文与夹具/测试/44 真源自洽（不改历史数值）。同族判据：
 test_execution_drill.py / test_drill_doc_contract.py（P03 同类）/
 test_doc_reachability.py（ARCHIVE_DOCS，故 glob 定位）。
 契约：标题 + 快照横幅、五段按序、P06 夹具 8 例、演练夹具 8 份、
-test_execution_drill 的 FIXTURES 实为 7 套且正文写「7 套」、p07_en 不在单测的如实标注、
+test_execution_drill 的 FIXTURES 实为 8 套且正文写「8 套」（含 p07_en）、
 RULE_LAW 6 条、44 覆盖真源在场、FIELD-001 挂账、复现命令在。
 """
 import json
@@ -84,12 +84,12 @@ def p06_issues(text: str) -> list:
     if "8 集" not in text and "8 条管线" not in text:
         issues.append("未写演练集已扩到 8 集")
     covered = _fixture_count()
-    if covered != 7:
+    if covered != 8:
         issues.append(f"test_execution_drill 夹具清单已变（{covered}）：现状对照需复核")
-    if "7 套" not in text:
-        issues.append("未写 test_execution_drill 实际参数化 7 套")
-    if "不在该单测内" not in text:
-        issues.append("未如实标注 p07_en 不在该单测内")
+    if "8 套" not in text:
+        issues.append("未写 test_execution_drill 实际参数化 8 套")
+    if "已纳入" not in text and "含 p07_en" not in text:
+        issues.append("未写 p07_en 已纳入该单测")
     if not P07.is_file():
         issues.append("缺 p07_en 夹具")
     if len(getattr(drill, "RULE_LAW", {})) != 6:
@@ -123,17 +123,17 @@ class P06DrillContractTest(unittest.TestCase):
     def test_coverage_facts_are_live(self):
         self.assertEqual(8, len(p06_cases()))
         self.assertEqual(8, len(list(FIXTURES.glob("*_drill_cases.json"))))
-        self.assertEqual(7, _fixture_count())
+        self.assertEqual(8, _fixture_count())
         self.assertTrue(P07.is_file())
 
     def test_contract_catches_mutations(self):
-        """变异自证：去快照 / 例数漂移 / 虚称 8 套 / 缺真源 / 缺现状对照 / 缺复现命令。"""
+        """变异自证：去快照 / 例数漂移 / 套数回退 / 缺真源 / 缺现状对照 / 缺复现命令。"""
         no_banner = self.text.replace("> **状态：历史演练记录", "> **状态：现行", 1)
         self.assertTrue(any("历史演练记录" in i for i in p06_issues(no_banner)))
         wrong = self.text.replace("8 例全过", "9 例全过")
         self.assertTrue(any("8 例全过" in i for i in p06_issues(wrong)))
-        overclaim = self.text.replace("7 套", "8 套")
-        self.assertTrue(any("7 套" in i for i in p06_issues(overclaim)))
+        overclaim = self.text.replace("8 套", "7 套")
+        self.assertTrue(any("8 套" in i for i in p06_issues(overclaim)))
         no_src = self.text.replace("docs/44_M1_执行演练扩展.md", "覆盖文档")
         self.assertTrue(any("44" in i for i in p06_issues(no_src)))
         no_sec = self.text.replace("## 现状对照（2026-11-13 · 以实跑为准）", "## 表格")

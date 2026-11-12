@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1159
+    "verify": 1160
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8987,6 +8987,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/44_M1 契约：8 集口径与夹具一致 + 测试参数化 8/8 + 保真面现状 + 复现口径。",
+      "path": "desktop/tests/test_m1_drill_coverage_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "docs/42_M2 契约：回合状态头 v1 规范必须与 round_header.LAWS / 06 §11 双源一致 + 硬断言现状 6 条。",
       "path": "desktop/tests/test_m2_round_header_contract.py",
       "role": "verify",
@@ -13338,7 +13344,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "431b4d3a7401a1e200040f22a9a83e989b1a2e207fec56dcdee8cd6a98b2a3ab",
+  "root_digest": "9ade3f808b87693a374ffa201440fda61fa6e14d4e75ca67d9842e6d71830ac3",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13347,7 +13353,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1033,
+    "R-verify": 1034,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
