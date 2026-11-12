@@ -6,6 +6,7 @@
     "test_agent_start_contract": 0.2,
     "test_agents_contract": 0.1,
     "test_ai_domain_closure": 0.2,
+    "test_ai_routing_contract": 0.3,
     "test_allowlist_expiry": 0.2,
     "test_allstar_binary_artifacts_contract": 3.1,
     "test_allstar_branch_protection_contract": 0.8,
@@ -503,6 +504,11 @@
     "test_ai_domain_closure.OrderingTest.test_declared_course_order_has_no_violation": 0.0,
     "test_ai_domain_closure.OrderingTest.test_declared_directory_order_does_violate": 0.0,
     "test_ai_domain_closure.OrderingTest.test_declared_guide_order_violation_is_the_eval_reliability_edge": 0.0,
+    "test_ai_routing_contract.AiRoutingContractTest.test_contract_catches_broken_routing": 0.05,
+    "test_ai_routing_contract.AiRoutingContractTest.test_driver_face_is_same_source": 0.0,
+    "test_ai_routing_contract.AiRoutingContractTest.test_references_resolve": 0.0,
+    "test_ai_routing_contract.AiRoutingContractTest.test_required_links_are_reachable": 0.0,
+    "test_ai_routing_contract.AiRoutingContractTest.test_routing_matches_contract": 0.01,
     "test_allowlist_expiry.Test.test_expired": 0.0,
     "test_allowlist_expiry.Test.test_unused": 0.0,
     "test_allowlist_expiry.Test.test_validate_requires_expires": 0.0,
@@ -4952,5 +4958,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1845.1
+  "total_s": 1845.4
 }
