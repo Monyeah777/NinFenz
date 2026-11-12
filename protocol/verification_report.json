@@ -228,7 +228,7 @@
       "source": "instruction_step_audit.scan",
       "stats": {
         "docs": 5,
-        "steps": 17
+        "steps": 22
       },
       "status": "pass",
       "warns": 0
@@ -524,8 +524,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4328,
-        "kernel": 2224,
+        "files": 4329,
+        "kernel": 2225,
         "kernel_no_self": 308,
         "rules": 9,
         "uncovered": 0,
@@ -536,7 +536,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "20cf232063b1a580c30b4dea7fcc55ad69734b748cac843f6d73ad9029f14170",
+  "root_digest": "bae2623510abceab92759e0632f908b63d23756c0e45c9d91a653fd39af2a344",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

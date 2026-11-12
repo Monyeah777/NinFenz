@@ -349,6 +349,7 @@
     "test_payload_consumer": 0.4,
     "test_payload_evidence": 0.3,
     "test_payload_harvest_forms": 1.1,
+    "test_payload_proposal_contract": 0.2,
     "test_payload_registry": 0.3,
     "test_payload_typing": 0.2,
     "test_perf_budget": 0.2,
@@ -3876,6 +3877,9 @@
     "test_payload_harvest_forms.BlockMappingFormTest.test_structural_keys_are_never_events": 0.0,
     "test_payload_harvest_forms.RepoHarvestCoverageTest.test_no_typed_payload_evidence_is_unreachable": 0.89,
     "test_payload_harvest_forms.RepoHarvestCoverageTest.test_the_detector_still_has_teeth": 0.01,
+    "test_payload_proposal_contract.PayloadProposalContractTest.test_contract_catches_mutations": 0.02,
+    "test_payload_proposal_contract.PayloadProposalContractTest.test_proposal_matches_contract": 0.0,
+    "test_payload_proposal_contract.PayloadProposalContractTest.test_registry_facts_live": 0.0,
     "test_payload_registry.PayloadRegistryTest.test_registry_dead_event_captured": 0.01,
     "test_payload_registry.PayloadRegistryTest.test_repo_registry_clean": 0.16,
     "test_payload_typing.PayloadTypingTest.test_proposal_deterministic": 0.02,
@@ -5275,5 +5279,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1868.6
+  "total_s": 1868.8
 }
