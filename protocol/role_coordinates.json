@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1113
+    "verify": 1114
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8993,6 +8993,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "M13 实体交互模块契约：outputs == payload == event_registry，且四源同源。",
+      "path": "desktop/tests/test_module_m13_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "编号命名空间 + 管线 id 避让判据（01 §1.6.11）——直接执行 verify.sh check14 的内嵌程序。",
       "path": "desktop/tests/test_module_namespace.py",
       "role": "verify",
@@ -13062,7 +13068,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "3169feee4333f66834864407d8626c21b1c80e0f1a5a6cdcbced8f3c1c51483d",
+  "root_digest": "bae7c55d6428d455208603feeb5ac03bae4799b3ae74f7916bf04e0efc9bbdcc",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13071,7 +13077,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 987,
+    "R-verify": 988,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
