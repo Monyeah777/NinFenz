@@ -7,7 +7,7 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - 01_核心协议.md:c41235b97816da38d3a061d85823e60ecc677339e26b261daad2da8551efaf50
-  - 02_联动注册表.md:686e91e8bbb6055f7dfeea8cd9beae064dc941d7b31263909cc159e58447e3ba
+  - 02_联动注册表.md:8c4c72367cc196034a7800f668be9e5e82daa1099ee84bd173c09cb1d337c200
   - 06_Agent执行协议.md:849503effd94f1d7da1d5aab2c9dc2bc6113bb3ea8de4f6fa18446695ba8fd52
   - 07_官方核心出厂与社区预设导航.md:c7c522fd4f0370674cc2c191855c2fe14849fba04f7a5d8b2c68b437d8c34233
   - 03_管线库/P00_通用文档生成管线.md:e3acba0c5111b7e67094c4d82d815cd941bd2ebf6b36d5b71f8574241c2e06a2
@@ -35,6 +35,8 @@ subjects:
   - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
 
 ---
+> 重审（2026-11-12）：02 联动注册表顶尖化（读法段 + 节→机检映射 / 7 处标题空行 / 两处跨文件引用精度 / §7 源文切片去 § 形态 / 日期同步）+ 契约判据 test_registry_doc_contract；check12 权重增量实测。本轮为机械重绑。
+
 > 重审（2026-11-12）：01 核心协议顶尖化（读法段 / 机检映射 / 编号桥 / 引用精度）；RFC Date 与最后更新同步为 2026-11-12。本轮为机械重绑。
 
 > 重审（2026-11-12）：01 核心协议顶尖化（读法段 + 节→机检映射表 / 编号桥 / §引用精度 / 末尾分隔线 / 空行收口）+ 契约判据 test_core_protocol_contract；check12 权重增量实测。本轮为机械重绑。

@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1104
+    "verify": 1105
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9407,6 +9407,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "02 联动注册表契约：注册真相源必须「文档 ↔ 机读投影同源、引用可解析、格式可渲染」。",
+      "path": "desktop/tests/test_registry_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "联动注册表机读加载器（T1.2）单元测试。",
       "path": "desktop/tests/test_registry_loader.py",
       "role": "verify",
@@ -13008,7 +13014,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "1354da0d813b2b170d0a4896de319885a9bc26ea1fc7a188af7fbeaf47d06714",
+  "root_digest": "255a003939373979fe7cab5a45d794297ae91661971e10295666c3fcb67089ba",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13017,7 +13023,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 978,
+    "R-verify": 979,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

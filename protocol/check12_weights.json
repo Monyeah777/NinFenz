@@ -345,6 +345,7 @@
     "test_readme_en_contract": 0.3,
     "test_readme_ja_contract": 0.4,
     "test_redos_patterns": 2.0,
+    "test_registry_doc_contract": 0.3,
     "test_registry_loader": 0.2,
     "test_registry_sync": 0.2,
     "test_regression_score": 12.8,
@@ -3950,6 +3951,10 @@
     "test_redos_patterns.RepoTest.test_citation_patterns_are_single_source": 0.0,
     "test_redos_patterns.RepoTest.test_repo_regexes_are_linear": 1.06,
     "test_redos_patterns.ShapeTest.test_refined_nesting_heuristic": 0.0,
+    "test_registry_doc_contract.RegistryDocContractTest.test_contract_catches_mutations": 0.03,
+    "test_registry_doc_contract.RegistryDocContractTest.test_projection_is_same_source": 0.01,
+    "test_registry_doc_contract.RegistryDocContractTest.test_registry_doc_matches_contract": 0.0,
+    "test_registry_doc_contract.RegistryDocContractTest.test_sections_and_checks_resolve": 0.0,
     "test_registry_loader.TestAssetGet.test_authorized_package_reads_real_asset": 0.0,
     "test_registry_loader.TestAssetGet.test_empty_args_returns_none": 0.0,
     "test_registry_loader.TestAssetGet.test_empty_whitelist_rejects_all": 0.0,
@@ -5005,5 +5010,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1854.8
+  "total_s": 1855.1
 }
