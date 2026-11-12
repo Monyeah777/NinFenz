@@ -6,7 +6,7 @@ scope: 作者指令「把管线/模块/资产牵扯到叙述的全部删除，�
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - 01_核心协议.md:73f550896c9fa3185be72139adfed1277bf193bad7a363fab207d7bc3cdf0969
+  - 01_核心协议.md:c41235b97816da38d3a061d85823e60ecc677339e26b261daad2da8551efaf50
   - 02_联动注册表.md:686e91e8bbb6055f7dfeea8cd9beae064dc941d7b31263909cc159e58447e3ba
   - 06_Agent执行协议.md:849503effd94f1d7da1d5aab2c9dc2bc6113bb3ea8de4f6fa18446695ba8fd52
   - 07_官方核心出厂与社区预设导航.md:c7c522fd4f0370674cc2c191855c2fe14849fba04f7a5d8b2c68b437d8c34233
@@ -35,6 +35,10 @@ subjects:
   - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
 
 ---
+> 重审（2026-11-12）：01 核心协议顶尖化（读法段 / 机检映射 / 编号桥 / 引用精度）；RFC Date 与最后更新同步为 2026-11-12。本轮为机械重绑。
+
+> 重审（2026-11-12）：01 核心协议顶尖化（读法段 + 节→机检映射表 / 编号桥 / §引用精度 / 末尾分隔线 / 空行收口）+ 契约判据 test_core_protocol_contract；check12 权重增量实测。本轮为机械重绑。
+
 > 重审（2026-10-24）：CI 并发锁、Gitee 诊断与 ADR-0008 改变 verify/脚本字节；重审理由：相应测试与冻结链已同步
 
 > 重审（2026-10-23）：OTLP ID 判据与合作一致性稳定性修正：traceId/spanId 定长 hex，缺失真源诊断去 OS errno

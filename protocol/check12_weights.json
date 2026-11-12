@@ -101,6 +101,7 @@
     "test_core": 0.4,
     "test_core_atomic_writes": 0.3,
     "test_core_judge_map": 1.2,
+    "test_core_protocol_contract": 0.3,
     "test_cot_exposure": 2.6,
     "test_coupling_metrics": 1.7,
     "test_coverage_workflow_contract": 0.2,
@@ -1476,6 +1477,10 @@
     "test_core_judge_map.CoreJudgeMapTest.test_committed_map_is_fresh": 0.21,
     "test_core_judge_map.CoreJudgeMapTest.test_metric_is_name_level_and_says_so": 0.2,
     "test_core_judge_map.CoreJudgeMapTest.test_unreferenced_does_not_grow": 0.21,
+    "test_core_protocol_contract.CoreProtocolContractTest.test_contract_catches_mutations": 0.01,
+    "test_core_protocol_contract.CoreProtocolContractTest.test_core_protocol_matches_contract": 0.0,
+    "test_core_protocol_contract.CoreProtocolContractTest.test_section_refs_and_checks_resolve": 0.0,
+    "test_core_protocol_contract.CoreProtocolContractTest.test_sections_and_migrations_in_order": 0.0,
     "test_cot_exposure.CotExposureTest.test_repo_has_no_chain_of_thought_or_transcript": 1.58,
     "test_cot_exposure.CotRuleTest.test_real_leaks_are_flagged": 0.0,
     "test_cot_exposure.CotRuleTest.test_scan_surface_covers_generated_graphs_and_shell_entries": 0.84,
@@ -5000,5 +5005,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1854.5
+  "total_s": 1854.8
 }

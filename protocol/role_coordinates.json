@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1103
+    "verify": 1104
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7943,6 +7943,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "01 核心协议契约：协议根必须「节号可寻址、机检映射同源、引用零悬空」。",
+      "path": "desktop/tests/test_core_protocol_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "思维链/对话转写暴露门禁：仓库文本面不得残留**过程性叙述**或**对话稿**（作者指令「思维链暴露删掉」）。",
       "path": "desktop/tests/test_cot_exposure.py",
       "role": "verify",
@@ -13002,7 +13008,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "53df7fa247797ae4bcb061b3cd631ab3e3ff06554c6755a21f3486e31afb56f3",
+  "root_digest": "1354da0d813b2b170d0a4896de319885a9bc26ea1fc7a188af7fbeaf47d06714",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13011,7 +13017,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 977,
+    "R-verify": 978,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
