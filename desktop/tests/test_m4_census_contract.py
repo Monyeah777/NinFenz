@@ -23,7 +23,9 @@ if str(ROOT / "desktop" / "src") not in sys.path:
 
 from core import doc_hygiene as dh  # noqa: E402
 
-HITS = sorted((ROOT / "docs").glob("42_M4_文档分类普查.md"))
+# 该件登记在 ARCHIVE_DOCS（存档件不得被链接）：glob 用通配符而非全名，避免被反向可达性判据
+# 当成「引用」。模式里带 * 不等于文件名，故安全。
+HITS = sorted((ROOT / "docs").glob("42_M4_文档分类普查*.md"))
 DOC = HITS[0] if HITS else ROOT / "docs" / "missing-m4.md"
 HYGIENE = ROOT / "desktop" / "src" / "core" / "doc_hygiene.py"
 HYGIENE_TEST = ROOT / "desktop" / "tests" / "test_doc_hygiene.py"

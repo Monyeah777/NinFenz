@@ -434,6 +434,7 @@
     "test_security_contract": 0.2,
     "test_seed_from_repo": 0.2,
     "test_selfcontained_rebuild": 0.2,
+    "test_selftest_spec_contract": 0.2,
     "test_semantic_conflict": 0.2,
     "test_semantics": 0.1,
     "test_sensitive_ignore": 0.4,
@@ -4587,6 +4588,9 @@
     "test_seed_from_repo.SeedFromRepoReachabilityTest.test_self_locates_to_this_repo_root": 0.0,
     "test_selfcontained_rebuild.SelfContainedRebuildTest.test_drift_detected_then_repaired_and_idempotent": 0.01,
     "test_selfcontained_rebuild.SelfContainedRebuildTest.test_real_artifacts_are_clean": 0.01,
+    "test_selftest_spec_contract.SelfTestSpecContractTest.test_contract_catches_mutations": 0.01,
+    "test_selftest_spec_contract.SelfTestSpecContractTest.test_rules_and_cases_live": 0.0,
+    "test_selftest_spec_contract.SelfTestSpecContractTest.test_spec_matches_contract": 0.0,
     "test_semantic_conflict.SemanticConflictTest.test_dangling_subscribe_is_issue": 0.01,
     "test_semantic_conflict.SemanticConflictTest.test_mount_and_category_drift_detected": 0.0,
     "test_semantic_conflict.SemanticConflictTest.test_publisher_resolves_issue": 0.0,
@@ -5234,5 +5238,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1865.9
+  "total_s": 1866.1
 }

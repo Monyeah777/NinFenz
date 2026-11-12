@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1152
+    "verify": 1153
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9941,6 +9941,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/42_M1_协议可执行性自测规范 契约：口径不变 + 规则集 6 条 + 覆盖/单测现状 + 复现口径。",
+      "path": "desktop/tests/test_selftest_spec_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "v2.8.0 波C C3 —— 语义矛盾扫描单测（41 规划，techdoc 链 testcase 驱动）。",
       "path": "desktop/tests/test_semantic_conflict.py",
       "role": "verify",
@@ -13296,7 +13302,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "1c0d973bfa7c4b72bfa3e5933396164253f67c982400458cfc1ee671a90de448",
+  "root_digest": "069cbde8ae6c6bb25fc7b62d5c18d7ce9a97c8a2ce544bb88c397244d57fabca",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13305,7 +13311,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1026,
+    "R-verify": 1027,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
