@@ -441,6 +441,7 @@
     "test_suite_isolation": 0.2,
     "test_suite_wiring": 0.8,
     "test_support_contract": 0.2,
+    "test_tech_rules_contract": 0.3,
     "test_telemetry_semconv": 0.1,
     "test_terminal": 9.4,
     "test_text_hygiene": 10.1,
@@ -4652,6 +4653,10 @@
     "test_support_contract.SupportContractTest.test_private_channel_is_direct": 0.0,
     "test_support_contract.SupportContractTest.test_self_check_matches_bug_form": 0.01,
     "test_support_contract.SupportContractTest.test_support_matches_contract": 0.0,
+    "test_tech_rules_contract.TechRulesContractTest.test_contract_catches_mutations": 0.0,
+    "test_tech_rules_contract.TechRulesContractTest.test_entries_cover_four_rule_types": 0.0,
+    "test_tech_rules_contract.TechRulesContractTest.test_header_and_ledger_agree": 0.0,
+    "test_tech_rules_contract.TechRulesContractTest.test_tech_rules_matches_contract": 0.0,
     "test_telemetry_semconv.StrictOtlpIdsTest.test_ids_are_fixed_length_hex": 0.0,
     "test_telemetry_semconv.StrictOtlpIdsTest.test_status_is_tristate": 0.0,
     "test_telemetry_semconv.TestTelemetrySemconv.test_attributes_carry_semconv_names": 0.0,
@@ -5107,5 +5112,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1860.3
+  "total_s": 1860.6
 }
