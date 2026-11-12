@@ -22,6 +22,7 @@
     "test_allstar_outside_contract": 0.3,
     "test_allstar_security_contract": 0.5,
     "test_anchor_align": 0.3,
+    "test_approval_contract": 0.2,
     "test_approval_naming": 0.3,
     "test_architecture_layers": 0.2,
     "test_artifact_manifest": 0.2,
@@ -652,6 +653,9 @@
     "test_anchor_align.RealRepoTest.test_report_has_header": 0.01,
     "test_anchor_align.RealRepoTest.test_stats_internally_consistent": 0.01,
     "test_anchor_align.RealRepoTest.test_unbound_partition_by_layer": 0.03,
+    "test_approval_contract.ApprovalDocContractTest.test_approval_matches_contract": 0.0,
+    "test_approval_contract.ApprovalDocContractTest.test_contract_catches_mutations": 0.01,
+    "test_approval_contract.ApprovalDocContractTest.test_records_and_chain_live": 0.0,
     "test_approval_naming.ApprovalNamingTest.test_json_subject_gets_single_extension": 0.01,
     "test_approval_naming.ApprovalNamingTest.test_non_json_subject_keeps_rule": 0.01,
     "test_approval_naming.ApprovalNamingTest.test_repo_has_no_double_extension_approvals": 0.0,
@@ -5303,5 +5307,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1870.0
+  "total_s": 1870.2
 }
