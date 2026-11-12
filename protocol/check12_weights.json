@@ -273,6 +273,7 @@
     "test_missing_sentinel": 0.2,
     "test_modeling": 0.6,
     "test_module_lifecycle": 0.2,
+    "test_module_m08_contract": 0.2,
     "test_module_namespace": 2.2,
     "test_mvu_adapter": 0.7,
     "test_navigation_doc_contract": 0.2,
@@ -3237,6 +3238,10 @@
     "test_module_lifecycle.StatusRoundTripTest.test_no_meta_line_raises": 0.0,
     "test_module_lifecycle.VerifyGateTest.test_deprecated_referenced_by_active_is_issue": 0.01,
     "test_module_lifecycle.VerifyGateTest.test_deprecated_standalone_passes": 0.01,
+    "test_module_m08_contract.ModuleM08ContractTest.test_contract_catches_mutations": 0.04,
+    "test_module_m08_contract.ModuleM08ContractTest.test_io_types_are_evidence_based": 0.0,
+    "test_module_m08_contract.ModuleM08ContractTest.test_m08_matches_contract": 0.01,
+    "test_module_m08_contract.ModuleM08ContractTest.test_machine_block_and_quote_are_same_source": 0.0,
     "test_module_namespace.Check14BareIdAmbiguityGate.test_bare_reference_shadowed_by_core_is_caught": 0.17,
     "test_module_namespace.Check14BareIdAmbiguityGate.test_clean_tree_with_unique_bare_stems_passes": 0.17,
     "test_module_namespace.Check14BareIdAmbiguityGate.test_duplicate_bare_stem_inside_one_package_is_caught": 0.16,
@@ -5032,5 +5037,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1856.4
+  "total_s": 1856.6
 }

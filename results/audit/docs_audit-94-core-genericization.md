@@ -24,7 +24,7 @@ subjects:
   - 04_模块库/事件类/M13_实体交互.md:9fa11d50e132082e55522cd56a3f7f3e84403f24ab6ee90f84a3805af6868d64
   - 04_模块库/事件类/M20_知识条目库.md:6178afdd65522494ba7fd9fe060d5b220269c0b4e893ec50ac631f4d0685e924
   - 04_模块库/事件类/M22_事件编排.md:b9b9d9728621912f954a67ae5d5ce80dc5ee7ec7945441a6b602b37fbfc9ad1a
-  - 04_模块库/世界类/M08_环境状态.md:eb27707703c93a787150a8f32ecb0d5a2a273d56a8e93d2b4789def281c5fb81
+  - 04_模块库/世界类/M08_环境状态.md:3327f91dd0fb83336c45f0b939a3bde9f58ab3630383d5306f646ffc2dfd8a7d
   - 04_模块库/技术文档类/M90_结构装配.md:7ed8a8435be582e59aa070a10d5d6a6b234dfc127a0613507bd5842bf5a876a4
   - 05_资产库/README.md:7f8d241a8e6ce0f2b65a8e37b7708fa260044aec78b44f1efa986f7b57bf49bb
   - 05_资产库/provenance.json:293d3d3dfd1bf25e0fdeaa32e4b14cc817ed974b4209fda45619c65a1473ab93
@@ -35,6 +35,8 @@ subjects:
   - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
 
 ---
+> 重审（2026-11-12）：M08 环境状态模块顶尖化（三形态口径 / I3·I4 边界 / 机读投影口径 / 事件名在册）+ 契约判据 test_module_m08_contract；check12 权重增量实测。本轮为机械重绑。
+
 > 重审（2026-11-12）：P90 结构装配管线顶尖化（读法/机检 + 02 §7.1 同源）+ 去叙述词；本轮为机械重绑。
 
 > 重审（2026-11-12）：P90 结构装配管线顶尖化（读法/机检段 + 02 §7.1 同源判据 + 空行收口）+ 契约判据 test_pipeline_p90_contract；check12 权重增量实测。本轮为机械重绑。
