@@ -438,6 +438,7 @@
     "test_site_face": 1.0,
     "test_skill_adapter": 0.2,
     "test_skill_contract": 0.1,
+    "test_skill_md_contract": 0.2,
     "test_st_validator": 0.1,
     "test_state_front": 0.1,
     "test_stdio_encoding": 0.5,
@@ -4615,6 +4616,10 @@
     "test_skill_adapter.TestSkillAdapter.test_techdoc_export_produces_skill_md": 0.0,
     "test_skill_contract.Test.test_clean_text": 0.0,
     "test_skill_contract.Test.test_grant_detected": 0.0,
+    "test_skill_md_contract.SkillMdContractTest.test_contract_catches_mutations": 0.0,
+    "test_skill_md_contract.SkillMdContractTest.test_contract_count_is_live": 0.0,
+    "test_skill_md_contract.SkillMdContractTest.test_references_and_agent_config_exist": 0.0,
+    "test_skill_md_contract.SkillMdContractTest.test_skill_md_matches_contract": 0.0,
     "test_st_validator.TestCard.test_v1_flat_needs_six_fields": 0.0,
     "test_st_validator.TestCard.test_v2_clean_passes": 0.0,
     "test_st_validator.TestCard.test_v2_wrong_spec_version_is_fail": 0.0,
@@ -5167,5 +5172,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1863.0
+  "total_s": 1863.2
 }

@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1138
+    "verify": 1139
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9965,6 +9965,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "skills/ninfenz/SKILL.md 契约：外部 agent 装载面必须「命令面真实 + 契约数不漂移 + 红线在场」。",
+      "path": "desktop/tests/test_skill_md_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "ST 制卡校验器原型（A-S3）单测：**自造 fixture**（非真实卡，仅验证判据）。",
       "path": "desktop/tests/test_st_validator.py",
       "role": "verify",
@@ -13212,7 +13218,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "a245979426788cef5e2365b37873cadd62ccaccb9a98b271ee7e75adf08bbe89",
+  "root_digest": "df031bb379a05c06046a4b9c0b0f436081201a4bdb1d9a7e71fd9864c5ad2ec5",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13221,7 +13227,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1012,
+    "R-verify": 1013,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
