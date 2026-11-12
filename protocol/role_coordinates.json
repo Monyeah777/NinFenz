@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1096
+    "verify": 1097
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8021,6 +8021,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "DEEP_DIVE 理解层契约：心智模型必须「自足、可核、能自检」。",
+      "path": "desktop/tests/test_deep_dive_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "",
       "path": "desktop/tests/test_delete_evidence.py",
       "role": "verify",
@@ -12960,7 +12966,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "8579fcaf5340a0aa4be8006c010ff345e0f2bc48f33e860933b965b2abbbe2ec",
+  "root_digest": "d7b1d267ceb06f70167782996cd4cb117343f085b4cceaeb638135e31e1392b1",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12969,7 +12975,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 970,
+    "R-verify": 971,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

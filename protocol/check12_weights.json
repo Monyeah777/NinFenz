@@ -114,6 +114,7 @@
     "test_decision_layer": 0.5,
     "test_decisions": 0.8,
     "test_declined_ledger": 0.1,
+    "test_deep_dive_contract": 0.3,
     "test_delete_evidence": 0.2,
     "test_dep_closure": 0.2,
     "test_dependabot_contract": 0.4,
@@ -1657,6 +1658,11 @@
     "test_decisions.TestRealRepo.test_scan_clean": 0.02,
     "test_declined_ledger.Test.test_missing_reason": 0.0,
     "test_declined_ledger.Test.test_validate_and_query": 0.0,
+    "test_deep_dive_contract.DeepDiveContractTest.test_contract_catches_broken_understanding": 0.06,
+    "test_deep_dive_contract.DeepDiveContractTest.test_deep_dive_matches_contract": 0.01,
+    "test_deep_dive_contract.DeepDiveContractTest.test_invariants_match_protocol_source": 0.0,
+    "test_deep_dive_contract.DeepDiveContractTest.test_references_resolve": 0.01,
+    "test_deep_dive_contract.DeepDiveContractTest.test_ten_questions_are_mapped": 0.0,
     "test_delete_evidence.Test.test_kind_and_ref_required": 0.0,
     "test_delete_evidence.Test.test_ok_and_blame": 0.0,
     "test_dep_closure.Test.test_allowed_closure_is_clean": 0.0,
@@ -4961,5 +4967,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1846.3
+  "total_s": 1846.6
 }
