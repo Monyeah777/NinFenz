@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1119
+    "verify": 1120
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9023,6 +9023,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "M23 可见性边界模块契约：零事件 + cognition.filter 接口面，且依赖面与 02 §4 对账。",
+      "path": "desktop/tests/test_module_m23_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "M90 结构装配模块契约：机读块 ⇄ §2 Module 声明 ⇄ registry/02 ⇄ P90 管线 四源同源。",
       "path": "desktop/tests/test_module_m90_contract.py",
       "role": "verify",
@@ -13098,7 +13104,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "ebb8c5584375e3fa87ffd814ab5af88c867307423485e41e29f48e8ad0cd5363",
+  "root_digest": "0f940a689c9e56aa695d9da9e7b7ca00e385298642a81716b1da132248e2d15e",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13107,7 +13113,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 993,
+    "R-verify": 994,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
