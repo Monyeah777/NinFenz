@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1179
+    "verify": 1180
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8807,6 +8807,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/ccos/isomorphism-matrix.md 契约：矩阵说明档必须与矩阵数据件逐行一致 + 层数措辞正确。",
+      "path": "desktop/tests/test_isomorphism_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "九双生层同构判据**矩阵**：只允许「有测试点名」的层被算作已覆盖。",
       "path": "desktop/tests/test_isomorphism_matrix.py",
       "role": "verify",
@@ -13458,7 +13464,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "32d6c7b56f01190fc2526bb2927ea580ab941f2a7dd1081a683d9f64e16763a8",
+  "root_digest": "ca62e5495f9db460c3cfd0abd583fe2f57d565e0dcc4895b82438efd1cec0427",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13467,7 +13473,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1053,
+    "R-verify": 1054,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

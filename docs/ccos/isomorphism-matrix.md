@@ -1,6 +1,7 @@
 # 同构判据矩阵 v0（九双生层）
 
-状态：**9 覆盖 / 0 缺失**（截至 2026-11-09，以 `desktop/tests/fixtures/isomorphism_matrix.json` 为唯一数据源）。
+状态：**9 覆盖 / 0 缺失**（截至 2026-11-13 复核，以 `desktop/tests/fixtures/isomorphism_matrix.json` 为唯一数据源）。
+> **最后更新：2026-11-13（复核）**：9 层判定形式与变异测试口径不变；补四处现状：① 矩阵 `covered` **9 行 / missing 0 行**（每行 6 字段：layer/module/test/how/kill_module/kill_test）；② 常驻判据 `test_isomorphism_matrix` **11 例**；③ 自省层判据在 **`precheck` 23 门**的 `verifier_version` 门（改写判定脚本即需重算摘要）；④ **修正文末边界旧措辞**：原文写「5 条…5 个层」，实为 **9 层 / 9 条判据**。见「§现状对照」。
 
 本件是**判定细节**；九层的整体结论与自省闭环见 [dual-core-invariants.md](dual-core-invariants.md)。
 
@@ -35,14 +36,33 @@
 九层都已覆盖。**注意**：覆盖 ≠ 完备——每层只证明「同一证据可核」，不证明双核整体一致；
 新增层或替换判定方法时，必须先在这里显式登记（矩阵测试会拒绝未登记的层）。
 
+## 现状对照（2026-11-13 · 以实跑为准）
+
+| 面 | 本文声明 | 复核结果（读到本行时请重跑） |
+|---|---|---|
+| 覆盖数 | 9 覆盖 / 0 缺失 | **矩阵 covered 9 / missing 0** |
+| 每行字段 | layer/module/test/how/kill_module/kill_test | **6 字段齐**（矩阵测试逐字段校验） |
+| 层名 | 时相/身份/观测/语义/负空间/授权/资源/对抗/自省 | **一致**（与 dual-core 九层表同源） |
+| 常驻判据 | 矩阵+逐层变异 | `test_isomorphism_matrix` **11 例** |
+| 自省门 | 「摘要陈旧即红」 | **`precheck` 23 门的 `verifier_version` 门**（判定面脚本改即红） |
+| 互链 | 指向 dual-core-invariants.md | **不变**（本件=判定细节；总档=结论与闭环） |
+
+> 本表只作「当时 → 现行」导航，不替代实跑。
+
 ## 怎么跑
 
-`python -m unittest desktop.tests.test_isomorphism_matrix`
+复核命令：`python -m pytest desktop/tests/test_isomorphism_matrix.py -q`（**11 例**）；总档复核：`python -m pytest desktop/tests/test_dual_core_invariants_contract.py -q`。
 
 矩阵是数据 + 反射校验：测试改名/删除会红，覆盖数变化必须显式改矩阵。
 
+## 复现与引用口径
+
+- 数据真源：`desktop/tests/fixtures/isomorphism_matrix.json`（`covered` 9 行 / `missing` 0 行）；层名/测试名以实读为准，**不手改生成区**。
+- 判据分工：本件给**判定细节**（每层判什么、放哪里、怎么被打死）；`dual-core-invariants.md` 给**整体结论 + 自省闭环**。
+- 失真定义：本文任何「N 条判据 / N 个层 / 覆盖数」与数据件不符即失真（本轮已修 5→9）。
+
 ## 边界
 
-- 覆盖不等于完备：5 条判据只说明这 5 个层有「同一证据」可核，不说明双核整体一致。
+- 覆盖不等于完备：**9 条判据只说明这 9 个层**有「同一证据」可核，不说明双核整体一致。
 - 判据不产生新真源：全部读既有产物（commitment / registry / control 记录）。
 - 同构判据不能替代真实测量：它证明的是「结构对得上」，不是「结论对」。
