@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:118ce75b89e229fa862e872c381a87f12a2b68cb0197e33629fa8441852474da
+  - protocol/check12_weights.json:2f9c68c41daf07d5da1760dc08e23eaed74e674ae3d7b2d049135569972128d3
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-12）：README.en English 入口镜像顶尖化（六步验收 / FAQ 三类 / ROUTES / 版本真源 / 最后更新与旧宣言收口）+ 契约判据 test_readme_en_contract；check12 权重增量实测。本轮为机械重绑。
+
 > 重审（2026-11-12）：README canonical 入口顶尖化（五节结构 / 快速开始六步带验收 / FAQ 三类高频问题 / 版本与 npm+pyproject 同源 / 命令与旗标真实 / stats 区外零计数）+ 契约判据 test_readme_contract；check12 权重增量实测。本轮为机械重绑。
 
 > 重审（2026-11-12）：llms-full 完整单文件顶尖化（12 工具面补全 / WARN 期望修正 / fail-closed 边界 / 安装说明书指针 / Node engines 与 npm 真源对齐）+ 契约判据 test_llms_full_contract；check12 权重增量实测。本轮为机械重绑。
