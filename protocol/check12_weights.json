@@ -260,6 +260,7 @@
     "test_judgement_coverage": 7.4,
     "test_key_naming": 0.3,
     "test_key_transparency": 1.6,
+    "test_key_transparency_doc_contract": 0.2,
     "test_knowledge": 0.7,
     "test_knowledge_sig": 0.2,
     "test_l3_frozen_contract": 0.2,
@@ -2836,6 +2837,9 @@
     "test_key_transparency.InclusionTest.test_lookup_returns_verifiable_proof": 0.0,
     "test_key_transparency.InclusionTest.test_proof_fails_on_wrong_pubkey": 0.0,
     "test_key_transparency.InclusionTest.test_unknown_key_is_rejected_with_guide": 0.0,
+    "test_key_transparency_doc_contract.KeyTransparencyDocTest.test_contract_catches_mutations": 0.01,
+    "test_key_transparency_doc_contract.KeyTransparencyDocTest.test_kt_live": 0.0,
+    "test_key_transparency_doc_contract.KeyTransparencyDocTest.test_kt_matches_contract": 0.0,
     "test_knowledge.TestClearance.test_public_cannot_see_internal": 0.0,
     "test_knowledge.TestClearance.test_resolve_order_filters_by_clearance": 0.01,
     "test_knowledge.TestClearance.test_restricted_sees_all": 0.0,
@@ -5355,5 +5359,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1881.1
+  "total_s": 1881.3
 }

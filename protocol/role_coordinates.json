@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1182
+    "verify": 1183
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8897,6 +8897,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/ccos/key-transparency-v0.md 契约：四子命令真实存在 + 形状/边界活绑定。",
+      "path": "desktop/tests/test_key_transparency_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "双源知识层（knowledge）正式与否定用例：声明 / 顺序 / 溯源 / 巡检。",
       "path": "desktop/tests/test_knowledge.py",
       "role": "verify",
@@ -13476,7 +13482,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "ab8f5b4a8620cae4d3c6125f05aea0461bd7b044bf8f05e3db45636bcc07dd3f",
+  "root_digest": "2b73a54ff054fb0e3329348019a25e10cb7952be750c88d8f6a6ec6409b92c76",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13485,7 +13491,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1056,
+    "R-verify": 1057,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
