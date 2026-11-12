@@ -26,6 +26,7 @@
     "test_artifact_manifest": 0.2,
     "test_as_of": 0.2,
     "test_assemble_build": 1.3,
+    "test_assembly_pack_contract": 0.2,
     "test_assembly_reference_contract": 0.2,
     "test_assertions": 0.8,
     "test_asset_contract": 3.3,
@@ -685,6 +686,9 @@
     "test_assemble_build.DestGuardTest.test_protected_prefixes_come_from_layers_declaration": 0.0,
     "test_assemble_build.DestGuardTest.test_true_source_faces_are_refused": 0.01,
     "test_assemble_build.YamlOptionalDependencyTest.test_missing_yaml_degrades_instead_of_crashing": 0.01,
+    "test_assembly_pack_contract.AssemblyPackContractTest.test_cli_and_driver_live": 0.0,
+    "test_assembly_pack_contract.AssemblyPackContractTest.test_contract_catches_mutations": 0.01,
+    "test_assembly_pack_contract.AssemblyPackContractTest.test_pack_matches_contract": 0.0,
     "test_assembly_reference_contract.AssemblyReferenceContractTest.test_assembly_reference_matches_contract": 0.0,
     "test_assembly_reference_contract.AssemblyReferenceContractTest.test_contract_catches_mutations": 0.02,
     "test_assembly_reference_contract.AssemblyReferenceContractTest.test_numbering_channels_both_present": 0.0,
@@ -5295,5 +5299,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1869.6
+  "total_s": 1869.8
 }
