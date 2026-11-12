@@ -67,12 +67,13 @@ NF 是内容契约层——定义“AI 稳定产出长内容”的协议、质�
 
 **不是什么**：不是模型、不是提示词模板集、不是某厂商 SDK——协议本体域中立、模型无关；MCP 只是可对接的连接协议之一。
 
-`bash verify.sh`（当前基线见下方生成区「质量凭证」行） · `python scripts/nf.py --version`
+`bash verify.sh`（当前基线见下方生成区「质量凭证」行；快检 `bash verify.sh --checks-only` 只跑静态 check） · `python scripts/nf.py --version`
 
 ## ⚡ 如果你是 AI / Agent
 
 - 这是什么：规范驱动的文档工厂，装模块/管线/资产 → 校验 → 输出。
-- 入口链：`docs/agent/AGENT_START.md`（开工）→ `docs/agent/AI_ROUTING.md`（选线）→ `docs/meta/DEEP_DIVE.md`（懂得深）。
+- 入口链：`docs/agent/AGENT_START.md`（开工）→ `docs/agent/AI_ROUTING.md`（选线）→ `docs/meta/DEEP_DIVE.md`（懂得深）；云端取件 / 按编号召回 / 投稿引导走 `docs/agent/ROUTES.md`。
+- 装好再干活：`npx -y ninfenz doctor`（体检 17/17）→ `nf serve`（只读 MCP）；完整「安装 → 自检 → 接入」见仓库根安装说明书（`llms-install`，随仓库分发）。
 - 机器凭证：`bash verify.sh`（当前基线见下方生成区的「质量凭证」行，由 `nf stats --write` 写入）；机器入口清单见 `llms.txt`；语言面见 `README.en.md` · `README.ja.md`（三面的机读事实与语言切换行由 check34 的语言面扫描断言一致；注册表 = `protocol/locales.json`）。
 - 要懂 NF 为什么这样设计：读 [docs/meta/DEEP_DIVE.md](docs/meta/DEEP_DIVE.md)。
 
@@ -84,8 +85,10 @@ NF 是内容契约层——定义“AI 稳定产出长内容”的协议、质�
 2. `python scripts/nf.py shell`（交互终端：端壳退役后的人机入口，见 `docs/terminal.md`）
 3. `python scripts/nf.py demo`
 4. `python scripts/nf.py --help`
-5. `python scripts/nf.py doctor`
+5. `python scripts/nf.py doctor`（体检 17/17 通过）
 6. `python scripts/nf.py completion bash`
+
+每步验收：`bash verify.sh` 末行 `PASS=` 等于基线且 `FAIL=0`；`nf doctor` 与其余命令退出码 0 即该步通过。Windows 下 `bash verify.sh` 用 Git Bash 执行；只想快检静态面用 `bash verify.sh --checks-only`（不跑测试）。
 
 > **安全边界（`nf verify` 会执行目标仓库自带的门禁脚本）**：`nf verify` 的引擎会在**本进程内**
 > 执行当前仓库 `verify.sh` 里的内嵌 Python（CWE-94 执行面）。故只有**当前运行代码所在的
@@ -112,6 +115,9 @@ AI 装配：
 - **产出怎么判合格？** 判据只来自内部链：verify 门禁（静态可核）+ 五维纵深自评 + 真实战例；外部评价不作为质量背书。
 - **怎么引用？** MIT 许可；引用请注明来源，机读元数据见仓库根引用文件（`CITATION.cff`）。
 - **出口与合规？** 密码学只走标准库 + 外部 `ssh-keygen`（不自制算法）；出口管制读法见 `docs/EXPORT.md`。
+- **怎么装？** 零安装：`npx -y ninfenz --version`（npm 包名 `ninfenz`，无付费版）；要改协议/跑全量门禁再 clone：`git clone` 后 `python scripts/nf.py doctor` → `bash verify.sh`。
+- **环境要求？** Python ≥ 3.11（核心纯标准库，无 pip 依赖）；Node ≥ 18.17 仅 npm 入口需要；Windows 下 `bash verify.sh` 用 Git Bash。
+- **怎么接 MCP？** `nf serve` 起只读 stdio 服务，客户端声明 `mcpServers` 为 `{ "ninfenz": { "command": "npx", "args": ["-y", "ninfenz", "serve"] } }`；能力面 12 工具 + 1 prompt（`assemble_guide`）。
 
 ## 能力与资产
 
@@ -163,6 +169,8 @@ nf stats                 # 看门禁与仓库状态
 | v0.93 | 2026-10-05 | 知识层检索、终端形态、数字资产契约（资产可跨项目复用） |
 | v0.92 | 2026-09-10 | 世界状态模型：确定性抽象状态 + 槽位（同一输入必得同一输出） |
 | v0.82 | 2026-09-09 | 质量纵深 45 项 + 基础层 A 组收口 |
+
+版本真源：CLI 线 = `pyproject.toml`（与 npm 包元数据对账）；质量基线 = `protocol/repo_stats.json`（`nf stats --check` 断言）。
 
 发版规则（2026-10-20 起）：内容线用 `v0.xx` —— **小更新直接并进当前版**、稍有突破 **+0.01**、创新突破 **+0.1**；CLI 线 `1.0.x` 独立编号；
 每次发版同步写 `CHANGELOG.md`，tag 只打在**带功能的那次提交**上。
