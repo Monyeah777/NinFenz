@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1169
+    "verify": 1170
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7469,6 +7469,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/approval.md 契约：内容绑定批准文档必须「字段/命令/冻链位置与实现一致 + 现状活绑定」。",
+      "path": "desktop/tests/test_approval_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "批准记录命名（审计 W7：protocol/approvals/*.json.json 双扩展名）。",
       "path": "desktop/tests/test_approval_naming.py",
       "role": "verify",
@@ -13398,7 +13404,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "8980a2929aed4dff7e2bb45d2a637083377068002ce8e38ed6a73125953de8e6",
+  "root_digest": "542668999ae2c106c9c800f0fe5efa6a4370f6b50d42692fa5abc753952e2cf3",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13407,7 +13413,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1043,
+    "R-verify": 1044,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
