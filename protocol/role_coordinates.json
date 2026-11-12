@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1155
+    "verify": 1156
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7559,6 +7559,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/42_M4 资产评估报告契约：快照状态 + 现状活绑定 + 结论口径不变 + 复现口径。",
+      "path": "desktop/tests/test_asset_report_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "",
       "path": "desktop/tests/test_ast_missing.py",
       "role": "verify",
@@ -13314,7 +13320,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "b1dfde4043a00338d3ebf407d358b070e8bd205dc1768cf5d6896120d5b95d99",
+  "root_digest": "77c20189eccd0a8ba21b0e65053b477eec8ec204f79e50f3b0aba411e98d8317",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13323,7 +13329,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1029,
+    "R-verify": 1030,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
