@@ -314,6 +314,7 @@
     "test_perf_budget": 0.2,
     "test_pipeline": 1.8,
     "test_pipeline_loader": 0.3,
+    "test_pipeline_p00_contract": 0.3,
     "test_pipeline_scaffold": 0.2,
     "test_pipelinerun": 0.5,
     "test_pkg_cli": 1.9,
@@ -3714,6 +3715,9 @@
     "test_pipeline_loader.PipelineLoaderTest.test_load_official_p90_and_community_p03": 0.0,
     "test_pipeline_loader.PipelineLoaderTest.test_missing_file_returns_none": 0.0,
     "test_pipeline_loader.PipelineLoaderTest.test_parse_edges": 0.0,
+    "test_pipeline_p00_contract.PipelineP00ContractTest.test_contract_catches_mutations": 0.05,
+    "test_pipeline_p00_contract.PipelineP00ContractTest.test_nine_layers_match_registry": 0.0,
+    "test_pipeline_p00_contract.PipelineP00ContractTest.test_p00_matches_contract": 0.0,
     "test_pipeline_scaffold.ScaffoldPipelineTest.test_bad_id_raises": 0.0,
     "test_pipeline_scaffold.ScaffoldPipelineTest.test_default_filename": 0.0,
     "test_pipeline_scaffold.ScaffoldPipelineTest.test_default_filename_never_carries_separators": 0.0,
@@ -5020,5 +5024,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1855.6
+  "total_s": 1855.9
 }
