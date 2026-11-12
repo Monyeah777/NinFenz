@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1123
+    "verify": 1124
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7511,6 +7511,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "05_资产库 README 契约：资产层总索引必须「五接口同源、台账可核、货架单层、引用不另立」。",
+      "path": "desktop/tests/test_asset_library_readme_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "社区资产行数基线单测（可重签工件：漂移检测 + 新增包未登记 + 缺包只 WARN + 重签幂等）。",
       "path": "desktop/tests/test_asset_line_baseline.py",
       "role": "verify",
@@ -13122,7 +13128,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "b6f3b1b21963e996e3207363a759845f9110b3c539b2feadf2f7cf1745b808c5",
+  "root_digest": "6b3f163ecbf6466a45405d185e221dff4b9de903eb12a0b645dbbfae6a576ca0",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13131,7 +13137,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 997,
+    "R-verify": 998,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
