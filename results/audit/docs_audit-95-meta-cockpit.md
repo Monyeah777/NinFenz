@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:703881c00b4e12e4bf21141c8543223477edd73305fa42f44175f1a3b9db8138
+  - protocol/check12_weights.json:adf131bba7a2d00784f7efd0c0047db473431a3f546f47da06c92e80b7646cfa
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-12）：P01 标准管线顶尖化（读法/机检段 + 三处同源判据 + 空行收口）+ 修 P70 optional 与 02/registry 三处漂移；契约判据 test_pipeline_p01_contract；check12 权重增量实测。本轮为机械重绑。
+
 > 重审（2026-11-12）：P00 管线骨架顶尖化（读法/机检段 + 运行规则空行 + 派生后验收出口）+ 契约判据 test_pipeline_p00_contract；check12 权重增量实测。本轮为机械重绑。
 
 > 重审（2026-11-12）：07 出厂与预设导航顶尖化（读法段 + 节→机检映射 / 7 处标题空行 / AGENT_START 七段描述同源 / 机制段余量 M99 / §7 九项机检映射 + 状态列口径 / 日期同步）+ 契约判据 test_navigation_doc_contract；check12 权重增量实测。本轮为机械重绑。
