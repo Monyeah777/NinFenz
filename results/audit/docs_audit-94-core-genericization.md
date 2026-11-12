@@ -25,7 +25,7 @@ subjects:
   - 04_模块库/事件类/M20_知识条目库.md:cbbaf05a888bc6c7a95714f178dc9ffb9a6ecbb07deadf0738f7b7a284ce489e
   - 04_模块库/事件类/M22_事件编排.md:747a7dccdaf506b55ab457c08359f722a7775b1aca8821d92e9afe3e123a11f2
   - 04_模块库/世界类/M08_环境状态.md:3327f91dd0fb83336c45f0b939a3bde9f58ab3630383d5306f646ffc2dfd8a7d
-  - 04_模块库/技术文档类/M90_结构装配.md:7ed8a8435be582e59aa070a10d5d6a6b234dfc127a0613507bd5842bf5a876a4
+  - 04_模块库/技术文档类/M90_结构装配.md:8e044fc382f526d15cb972fef07b25c358dc3b46e89bb3e659c9a95059de3750
   - 05_资产库/README.md:7f8d241a8e6ce0f2b65a8e37b7708fa260044aec78b44f1efa986f7b57bf49bb
   - 05_资产库/provenance.json:293d3d3dfd1bf25e0fdeaa32e4b14cc817ed974b4209fda45619c65a1473ab93
   - 05_资产库/用户自定义/README.md:03068b5931dba4a0ae92020f9eddcb058bba27a852b0cf9ea015413607374dbf
@@ -35,6 +35,10 @@ subjects:
   - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
 
 ---
+> 重审（2026-11-12）：M90 结构装配顶尖化（四形态 / 双声明同源 / P90 八层挂载对账 / fail-closed）+ 去叙述词；机械重绑。
+
+> 重审（2026-11-12）：M90 结构装配顶尖化（四形态口径 / 机读块 ⇄ §2 Module 同源 / P90 八层挂载对账 / fail-closed 边界）+ 契约判据 test_module_m90_contract；权重增量重测、边界重冻结。本轮为机械重绑。
+
 > 重审（2026-11-12）：M22 事件编排顶尖化（outputs/payload 补全为 narrative_event 注册字段全集 / 七订阅在册 / inputs 空显式声明 / I3·I4 边界）+ 契约判据 test_module_m22_contract；权重增量重测、边界重冻结。本轮为机械重绑。
 
 > 重审（2026-11-12）：M20 知识条目库顶尖化（零事件+query 接口口径 / 双挂载 P70 active + P00 available 同源 / I3·I4 边界 / query 只读）+ 契约判据 test_module_m20_contract；权重增量重测、边界重冻结。本轮为机械重绑。

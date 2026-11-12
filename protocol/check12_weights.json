@@ -279,6 +279,7 @@
     "test_module_m13_contract": 0.2,
     "test_module_m20_contract": 0.2,
     "test_module_m22_contract": 0.2,
+    "test_module_m90_contract": 0.3,
     "test_module_namespace": 2.2,
     "test_mvu_adapter": 0.7,
     "test_navigation_doc_contract": 0.2,
@@ -3264,6 +3265,10 @@
     "test_module_m22_contract.ModuleM22ContractTest.test_contract_catches_mutations": 0.05,
     "test_module_m22_contract.ModuleM22ContractTest.test_m22_matches_contract": 0.01,
     "test_module_m22_contract.ModuleM22ContractTest.test_outputs_match_event_payload_and_registry": 0.0,
+    "test_module_m90_contract.ModuleM90ContractTest.test_contract_catches_mutations": 0.06,
+    "test_module_m90_contract.ModuleM90ContractTest.test_m90_matches_contract": 0.01,
+    "test_module_m90_contract.ModuleM90ContractTest.test_machine_block_and_module_decl_are_same_source": 0.0,
+    "test_module_m90_contract.ModuleM90ContractTest.test_p90_mounts_cover_eight_layers": 0.0,
     "test_module_namespace.Check14BareIdAmbiguityGate.test_bare_reference_shadowed_by_core_is_caught": 0.17,
     "test_module_namespace.Check14BareIdAmbiguityGate.test_clean_tree_with_unique_bare_stems_passes": 0.17,
     "test_module_namespace.Check14BareIdAmbiguityGate.test_duplicate_bare_stem_inside_one_package_is_caught": 0.16,
@@ -5059,5 +5064,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1857.6
+  "total_s": 1857.9
 }
