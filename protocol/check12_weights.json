@@ -434,6 +434,7 @@
     "test_requirement_coverage": 0.1,
     "test_requirements_ci_contract": 0.2,
     "test_requirements_pins_contract": 0.2,
+    "test_research_methods_doc_contract": 0.2,
     "test_residual_registry": 0.1,
     "test_response_cache_replay": 0.1,
     "test_retriever": 1.0,
@@ -4472,6 +4473,9 @@
     "test_requirements_pins_contract.RequirementsPinsContractTest.test_contract_catches_broken_files": 0.0,
     "test_requirements_pins_contract.RequirementsPinsContractTest.test_cross_file_versions_agree": 0.0,
     "test_requirements_pins_contract.RequirementsPinsContractTest.test_files_match_contract": 0.0,
+    "test_research_methods_doc_contract.ResearchMethodsDocTest.test_contract_catches_mutations": 0.01,
+    "test_research_methods_doc_contract.ResearchMethodsDocTest.test_method_data_live": 0.0,
+    "test_research_methods_doc_contract.ResearchMethodsDocTest.test_research_matches_contract": 0.0,
     "test_residual_registry.Test.test_missing_fields": 0.0,
     "test_residual_registry.Test.test_validate_and_match": 0.0,
     "test_response_cache_replay.WrapRunnerReplayTest.test_help_text_survives_systemexit": 0.0,
@@ -5383,5 +5387,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1882.9
+  "total_s": 1883.1
 }
