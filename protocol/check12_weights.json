@@ -284,6 +284,7 @@
     "test_module_m23_contract": 0.2,
     "test_module_m24_contract": 0.3,
     "test_module_m50_contract": 0.4,
+    "test_module_m80_contract": 0.3,
     "test_module_m90_contract": 0.3,
     "test_module_namespace": 2.2,
     "test_mvu_adapter": 0.7,
@@ -3288,6 +3289,10 @@
     "test_module_m50_contract.ModuleM50ContractTest.test_global_scheduler_is_not_layer_mounted": 0.01,
     "test_module_m50_contract.ModuleM50ContractTest.test_m50_matches_contract": 0.02,
     "test_module_m50_contract.ModuleM50ContractTest.test_world_model_paths_are_registered": 0.0,
+    "test_module_m80_contract.ModuleM80ContractTest.test_contract_catches_mutations": 0.04,
+    "test_module_m80_contract.ModuleM80ContractTest.test_gate_action_is_single_source": 0.0,
+    "test_module_m80_contract.ModuleM80ContractTest.test_m80_matches_contract": 0.01,
+    "test_module_m80_contract.ModuleM80ContractTest.test_unique_gate_and_zero_event_waiver": 0.0,
     "test_module_m90_contract.ModuleM90ContractTest.test_contract_catches_mutations": 0.06,
     "test_module_m90_contract.ModuleM90ContractTest.test_m90_matches_contract": 0.01,
     "test_module_m90_contract.ModuleM90ContractTest.test_machine_block_and_module_decl_are_same_source": 0.0,
@@ -5087,5 +5092,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1859.2
+  "total_s": 1859.5
 }

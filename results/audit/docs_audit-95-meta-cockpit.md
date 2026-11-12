@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:07d159ab13506dd63008490b5f7ebe3dc210a5c0b37e1ce9c78dfc59ba5c429c
+  - protocol/check12_weights.json:8a2e2ff46e6528f1f5abef4eda0fe9a1c93128cce9217ba4a201f7660cfced11
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-12）：M80 输出质检门顶尖化（唯一输出闸 / gate_action 单源 / 8 段判定记录 / 零事件固定节点豁免理由 / 硬门不可关）+ 契约判据 test_module_m80_contract；权重增量重测、边界重冻结。本轮为机械重绑。
+
 > 重审（2026-11-12）：M50 调度器顶尖化（world_model writes 改回 world_slots 在册冻结路径 / 全局调度器 layer·mounts 约定 / 三形态与机读投影口径）+ 契约判据 test_module_m50_contract；权重增量重测、边界重冻结。本轮为机械重绑。
 
 > 重审（2026-11-12）：M24 规则组合顶尖化（零事件+resolve 接口口径 / 不虚构 token 口径 / 依赖面与 02 §4 对账 / I4 配方表边界）+ 契约判据 test_module_m24_contract；权重增量重测、边界重冻结。本轮为机械重绑。

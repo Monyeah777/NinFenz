@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1122
+    "verify": 1123
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9041,6 +9041,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "M80 输出质检门模块契约：唯一输出闸 + 声明式 gate_action + 零事件固定节点豁免理由。",
+      "path": "desktop/tests/test_module_m80_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "M90 结构装配模块契约：机读块 ⇄ §2 Module 声明 ⇄ registry/02 ⇄ P90 管线 四源同源。",
       "path": "desktop/tests/test_module_m90_contract.py",
       "role": "verify",
@@ -13116,7 +13122,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "e3d393d7e4e79af11648ce232a9a77305e92ac549e3fe7e55252fa586315cc3f",
+  "root_digest": "b6f3b1b21963e996e3207363a759845f9110b3c539b2feadf2f7cf1745b808c5",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13125,7 +13131,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 996,
+    "R-verify": 997,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
