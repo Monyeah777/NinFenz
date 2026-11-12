@@ -273,6 +273,7 @@
     "test_missing_sentinel": 0.2,
     "test_modeling": 0.6,
     "test_module_lifecycle": 0.2,
+    "test_module_m06_contract": 0.2,
     "test_module_m08_contract": 0.2,
     "test_module_namespace": 2.2,
     "test_mvu_adapter": 0.7,
@@ -3238,6 +3239,10 @@
     "test_module_lifecycle.StatusRoundTripTest.test_no_meta_line_raises": 0.0,
     "test_module_lifecycle.VerifyGateTest.test_deprecated_referenced_by_active_is_issue": 0.01,
     "test_module_lifecycle.VerifyGateTest.test_deprecated_standalone_passes": 0.01,
+    "test_module_m06_contract.ModuleM06ContractTest.test_contract_catches_mutations": 0.03,
+    "test_module_m06_contract.ModuleM06ContractTest.test_io_types_are_evidence_based": 0.0,
+    "test_module_m06_contract.ModuleM06ContractTest.test_m06_matches_contract": 0.01,
+    "test_module_m06_contract.ModuleM06ContractTest.test_outputs_match_event_payload_and_registry": 0.0,
     "test_module_m08_contract.ModuleM08ContractTest.test_contract_catches_mutations": 0.04,
     "test_module_m08_contract.ModuleM08ContractTest.test_io_types_are_evidence_based": 0.0,
     "test_module_m08_contract.ModuleM08ContractTest.test_m08_matches_contract": 0.01,
@@ -5037,5 +5042,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1856.6
+  "total_s": 1856.8
 }
