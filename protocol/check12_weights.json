@@ -82,6 +82,7 @@
     "test_check_compile": 0.1,
     "test_check_merge_equivalence": 5.2,
     "test_check_policy": 0.2,
+    "test_check_policy_doc_contract": 0.2,
     "test_check_text_to_intent": 0.9,
     "test_ci_diagnostics": 0.3,
     "test_ci_health_workflow_contract": 0.2,
@@ -1153,6 +1154,9 @@
     "test_check_policy.TestValidate.test_missing_fix": 0.0,
     "test_check_policy.TestValidate.test_unknown_kind": 0.0,
     "test_check_policy.TestValidate.test_valid_policy_passes": 0.0,
+    "test_check_policy_doc_contract.CheckPolicyDocContractTest.test_contract_catches_mutations": 0.02,
+    "test_check_policy_doc_contract.CheckPolicyDocContractTest.test_kinds_flags_cases_live": 0.0,
+    "test_check_policy_doc_contract.CheckPolicyDocContractTest.test_policy_matches_contract": 0.0,
     "test_check_text_to_intent.CliTest.test_cli_rejects_non_utf8": 0.39,
     "test_check_text_to_intent.CliTest.test_cli_writes_draft": 0.39,
     "test_check_text_to_intent.ExtractionTest.test_draft_compiles_into_policy": 0.0,
@@ -5327,5 +5331,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1878.9
+  "total_s": 1879.1
 }

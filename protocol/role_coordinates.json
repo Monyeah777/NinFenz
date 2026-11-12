@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1175
+    "verify": 1176
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7829,6 +7829,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/ccos/check-policy-v0.md 契约：单对象策略规范必须「5 类封闭词表/形状/CLI 五入口与实现一致」。",
+      "path": "desktop/tests/test_check_policy_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "法规文本 → 意图草稿判据：抽得准、抽不到的进待补、不可表达的进 unsupported、绝不静默丢。",
       "path": "desktop/tests/test_check_text_to_intent.py",
       "role": "verify",
@@ -13434,7 +13440,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "a72c54e3c18f976909fd522b279dde45909aceb7399d8de18b7a0edad96597e7",
+  "root_digest": "4f584098ab69f25a975c6b7f27302f157043856efce03f9fd2d83d1e92cdf67f",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13443,7 +13449,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1049,
+    "R-verify": 1050,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
