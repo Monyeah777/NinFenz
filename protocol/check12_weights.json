@@ -486,6 +486,7 @@
     "test_verify_tests_selection": 0.2,
     "test_version_map": 2.4,
     "test_version_matrix": 0.1,
+    "test_w2_c3c4_record_contract": 0.3,
     "test_watch": 62.7,
     "test_watermark_bench": 2.1,
     "test_watermark_dct_probe": 1.0,
@@ -5086,6 +5087,10 @@
     "test_version_matrix.VersionMatrixTest.test_matrix_has_rows": 0.0,
     "test_version_matrix.VersionMatrixTest.test_rows_have_four_columns": 0.0,
     "test_version_matrix.VersionMatrixTest.test_scheme_files_exist": 0.0,
+    "test_w2_c3c4_record_contract.W2RecordContractTest.test_contract_catches_mutations": 0.1,
+    "test_w2_c3c4_record_contract.W2RecordContractTest.test_repairs_still_in_place": 0.0,
+    "test_w2_c3c4_record_contract.W2RecordContractTest.test_scan_surface_is_live": 0.02,
+    "test_w2_c3c4_record_contract.W2RecordContractTest.test_w2_record_matches_contract": 0.02,
     "test_watch.DirWatcherTest.test_detects_create_modify_and_delete": 0.12,
     "test_watch.DirWatcherTest.test_git_only_change_does_not_bump_the_generation": 0.03,
     "test_watch.DirWatcherTest.test_internal_archive_and_bytecode_churn_do_not_bump_the_generation": 0.08,
@@ -5208,5 +5213,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1864.6
+  "total_s": 1864.9
 }
