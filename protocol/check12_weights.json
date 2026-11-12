@@ -509,6 +509,7 @@
     "test_text_hygiene": 10.1,
     "test_third_party_notices_contract": 0.2,
     "test_threat_model_doc_contract": 0.2,
+    "test_time_token_doc_contract": 0.2,
     "test_timestamp": 1.9,
     "test_tool_face": 0.3,
     "test_trace_drill": 3.3,
@@ -5105,6 +5106,9 @@
     "test_threat_model_doc_contract.ThreatModelDocTest.test_contract_catches_mutations": 0.0,
     "test_threat_model_doc_contract.ThreatModelDocTest.test_implementation_faces_live": 0.0,
     "test_threat_model_doc_contract.ThreatModelDocTest.test_threat_model_matches_contract": 0.0,
+    "test_time_token_doc_contract.TimeTokenDocTest.test_contract_catches_mutations": 0.01,
+    "test_time_token_doc_contract.TimeTokenDocTest.test_implementation_live": 0.0,
+    "test_time_token_doc_contract.TimeTokenDocTest.test_time_token_matches_contract": 0.0,
     "test_timestamp.EvidenceTimeAnchorTest.test_no_token_means_clock_based_marking": 0.3,
     "test_timestamp.EvidenceTimeAnchorTest.test_record_contains_expected_fields": 0.17,
     "test_timestamp.EvidenceTimeAnchorTest.test_token_on_other_bundle_is_invalid": 0.21,
@@ -5399,5 +5403,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1883.7
+  "total_s": 1883.9
 }
