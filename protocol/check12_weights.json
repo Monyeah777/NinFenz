@@ -417,6 +417,7 @@
     "test_rewrite_tool": 0.8,
     "test_role_model": 6.9,
     "test_round_drill": 0.2,
+    "test_round_drill_doc_contract": 0.2,
     "test_round_header": 0.2,
     "test_routes_contract": 3.9,
     "test_ruff_syntax": 0.9,
@@ -4444,6 +4445,9 @@
     "test_round_drill.RoundDrillTest.test_missing_citation_captured": 0.0,
     "test_round_drill.RoundDrillTest.test_missing_progress_captured": 0.0,
     "test_round_drill.RoundDrillTest.test_turn_gap_is_warn_not_fail": 0.0,
+    "test_round_drill_doc_contract.RoundDrillDocContractTest.test_contract_catches_mutations": 0.02,
+    "test_round_drill_doc_contract.RoundDrillDocContractTest.test_fixtures_and_rules_live": 0.0,
+    "test_round_drill_doc_contract.RoundDrillDocContractTest.test_round_drill_doc_matches_contract": 0.0,
     "test_round_header.RoundHeaderTest.test_interrupt_replay_identity": 0.0,
     "test_round_header.RoundHeaderTest.test_laws_levels_cover_three_tiers": 0.0,
     "test_round_header.RoundHeaderTest.test_make_header_deterministic_and_complete": 0.0,
@@ -5271,5 +5275,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1868.4
+  "total_s": 1868.6
 }

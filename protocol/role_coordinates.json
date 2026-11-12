@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1161
+    "verify": 1162
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9839,6 +9839,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/45_M2 契约：回合级 drill 规范必须「判据不变 + 样本集/测试现状 + 轨迹回读口径 + 复现命令」。",
+      "path": "desktop/tests/test_round_drill_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "42 M2 —— 回合状态头 + 判级器 + 中断重入单测。",
       "path": "desktop/tests/test_round_header.py",
       "role": "verify",
@@ -13350,7 +13356,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "2713d9877e0eb89169c04f6daf2e9da954385b8bb20d946a5268e49af12ef759",
+  "root_digest": "9da98d6602d16d41512b4b7b1e18df1556d34ea4efbd12355ef7a0c0a4cd0a26",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13359,7 +13365,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1035,
+    "R-verify": 1036,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
