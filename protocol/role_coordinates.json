@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1190
+    "verify": 1191
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -10373,6 +10373,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/ccos/threat-model.md 契约：A1–A9/G1–G6 齐 + 载体面与 G4 自洽 + 不承诺不矛盾。",
+      "path": "desktop/tests/test_threat_model_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "RFC 3161 可信时间戳（G3 的可落地半边）判据：本地 TSA 全链路 + 篡改/错锚必拒。",
       "path": "desktop/tests/test_timestamp.py",
       "role": "verify",
@@ -13524,7 +13530,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "b023422107beabd308a2f50aa9326e9386dcbc7dad69cdcd69806d676c2eae95",
+  "root_digest": "6ef770a445b49337fdeaf12432f6b5bba080ec7dbd5d6485ff2315d94b3183af",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13533,7 +13539,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1064,
+    "R-verify": 1065,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
