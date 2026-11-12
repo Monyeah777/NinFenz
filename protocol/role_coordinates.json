@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1156
+    "verify": 1157
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9689,6 +9689,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/42_M5_Release-checklist 契约：路径现行 + 自动化入口 + 退役项如实 + 复现口径。",
+      "path": "desktop/tests/test_release_checklist_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "发布结论复跑器（scripts/release_conclusion.py）单测——纯函数判据 + dry-run 集成。",
       "path": "desktop/tests/test_release_conclusion.py",
       "role": "verify",
@@ -13320,7 +13326,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "77c20189eccd0a8ba21b0e65053b477eec8ec204f79e50f3b0aba411e98d8317",
+  "root_digest": "1203872090a2c8e4cd3c4d23f8e5005c1dbfa703e8803392f3403ee11550659a",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13329,7 +13335,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1030,
+    "R-verify": 1031,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
