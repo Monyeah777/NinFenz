@@ -247,6 +247,7 @@
     "test_key_transparency": 1.6,
     "test_knowledge": 0.7,
     "test_knowledge_sig": 0.2,
+    "test_l3_frozen_contract": 0.2,
     "test_label_carrier": 8.1,
     "test_label_ir": 1.5,
     "test_label_sidecar": 3.2,
@@ -2815,6 +2816,9 @@
     "test_knowledge_sig.SignTest.test_diff_reports_changes_and_verdict": 0.0,
     "test_knowledge_sig.SignTest.test_signature_reproducible": 0.0,
     "test_knowledge_sig.SignTest.test_verify_reproducible_passes": 0.0,
+    "test_l3_frozen_contract.L3FrozenContractTest.test_contract_catches_mutations": 0.03,
+    "test_l3_frozen_contract.L3FrozenContractTest.test_l3_matches_contract": 0.0,
+    "test_l3_frozen_contract.L3FrozenContractTest.test_retired_absent_and_kept_present": 0.0,
     "test_label_carrier.AdditionalCarriersTest.test_mp4_box_round_trip": 0.0,
     "test_label_carrier.AdditionalCarriersTest.test_pdf_trailer_round_trip": 0.0,
     "test_label_carrier.AdditionalCarriersTest.test_unlabeled_containers_are_invalid": 0.0,
@@ -5291,5 +5295,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1869.4
+  "total_s": 1869.6
 }
