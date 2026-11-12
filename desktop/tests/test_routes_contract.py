@@ -173,6 +173,64 @@ def route_issues(text: str, root: Path = ROOT, mcp_text: str = None,
     return (path_issues(text, root) + url_issues(text, root)
             + surface_issues(text, root, mcp_text, cli_ok) + crossref_issues(text, root))
 
+#: 九段结构（缺一段即某一类接待动作断链）
+REQUIRED_SECTIONS = ("## 〇、什么时候用本文件", "## 一、镜像前缀", "## 二、功能后缀路由表",
+                     "## 三、机器面优先", "## 四、接待菜单", "## 五、接待决策流",
+                     "## 六、出库前自检", "## 七、停止条件", "## 八、行动铁律")
+#: 导购红线与实测边界（少一条就有人踩）
+REQUIRED_MARKERS = ("馆线", "换镜像 = 只换前缀", "405/401", "严禁编造",
+                    "不得声称「已入库」", "library_submission.md", "NF投稿.md",
+                    "B2", "机器面优先", "出库前自检", "停止条件")
+#: 接待决策流 A-H（少一行就是一类需求没人接）
+DECISION_ROWS = tuple("| " + ch + ". " for ch in "ABCDEFGH")
+#: raw 基底（喂 AI 的两种镜像形态，host / 大小写 / 分支须一致）
+RAW_BASES = ("https://raw.githubusercontent.com/Monyeah777/NinFenz/main/",
+             "https://gitee.com/monyeah777/ninfenz/raw/main/")
+
+
+def iron_rule_count(text: str) -> int:
+    """「行动铁律」段里的编号条目数。"""
+    if "## 八、行动铁律" not in text:
+        return 0
+    body = text.split("## 八、行动铁律", 1)[1]
+    return sum(1 for ln in body.splitlines()
+               if "." in ln.strip() and ln.strip().split(".", 1)[0].isdigit())
+
+
+def structure_issues(text: str) -> list:
+    """九段结构 / 红线要素 / 决策流逐行 / 五条菜单 / 十二条铁律（纯函数，便于变异）。"""
+    issues = []
+    for section in REQUIRED_SECTIONS:
+        if section not in text:
+            issues.append("缺段落：" + section)
+    for marker in REQUIRED_MARKERS:
+        if marker not in text:
+            issues.append("缺要素：" + marker)
+    for row in DECISION_ROWS:
+        if row not in text:
+            issues.append("接待决策流缺行：" + row.strip())
+    for mark in ("①", "②", "③", "④", "⑤"):
+        if mark not in text:
+            issues.append("接待菜单缺项：" + mark)
+    if iron_rule_count(text) < 12:
+        issues.append("行动铁律不足 12 条")
+    return issues
+
+
+def prefix_issues(text: str) -> list:
+    """raw 基底 / 分支 / 仓库名大小写一致性（纯函数，便于变异）。"""
+    issues = []
+    for base in RAW_BASES:
+        if base not in text:
+            issues.append("缺 raw 基底：" + base)
+    if "master/" in text:
+        issues.append("镜像前缀用了 master/（本仓默认分支应为 main/）")
+    if "gitee.com/Monyeah777/NinFenz" in text or "gitee.com/Monyeah777/ninfenz" in text:
+        issues.append("Gitee 仓库名大小写混用（应为 monyeah777/ninfenz）")
+    if "github.com/monyeah777/ninfenz" in text:
+        issues.append("GitHub 仓库名小写（应为 Monyeah777/NinFenz）")
+    return issues
+
 
 class RoutesContractTest(unittest.TestCase):
     def setUp(self):
@@ -225,6 +283,25 @@ class RoutesContractTest(unittest.TestCase):
             good = ("按 " + TICK + "docs/paste_card.md" + TICK + " 的 B2 协议卡创作；"
                     "见 " + TICK + "library/INDEX.md" + TICK + "（📚 图书馆段）")
             self.assertEqual([], crossref_issues(good, root))
+
+    def test_structure_and_decision_flow(self):
+        self.assertEqual([], structure_issues(self.text), "ROUTES 结构 / 决策流不完整")
+
+    def test_prefix_branch_and_case(self):
+        self.assertEqual([], prefix_issues(self.text), "镜像前缀分支 / 大小写不一致")
+
+    def test_structure_predicate_catches_mutations(self):
+        """变异自证：分支漂移 / 大小写混搭 / 删红线 / 决策流缺行必须报。"""
+        tick = chr(96)
+        self.assertTrue(any("master" in i
+                            for i in prefix_issues(self.text.replace("/main/", "/master/"))))
+        mixed = self.text + "\n镜像：" + tick
+        mixed += "https://gitee.com/Monyeah777/NinFenz/raw/main/README.md" + tick + "\n"
+        self.assertTrue(any("大小写" in i for i in prefix_issues(mixed)))
+        no_redline = self.text.replace("严禁编造", "尽量准确")
+        self.assertTrue(any("严禁编造" in i for i in structure_issues(no_redline)))
+        no_row = self.text.replace("| H. ", "| H  ")
+        self.assertTrue(any("接待决策流缺行" in i for i in structure_issues(no_row)))
 
 
 if __name__ == "__main__":
