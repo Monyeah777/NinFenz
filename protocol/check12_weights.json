@@ -119,6 +119,7 @@
     "test_dead_code": 54.6,
     "test_decision_layer": 0.5,
     "test_decisions": 0.8,
+    "test_decisions_index_contract": 0.2,
     "test_declined_ledger": 0.1,
     "test_deep_dive_contract": 0.3,
     "test_delete_evidence": 0.2,
@@ -1714,6 +1715,10 @@
     "test_decisions.TestRealRepo.test_analysis_is_deterministic": 0.04,
     "test_decisions.TestRealRepo.test_external_runner_boundary_is_decided": 0.01,
     "test_decisions.TestRealRepo.test_scan_clean": 0.02,
+    "test_decisions_index_contract.DecisionsIndexContractTest.test_contract_catches_mutations": 0.03,
+    "test_decisions_index_contract.DecisionsIndexContractTest.test_generated_block_equals_live_projection": 0.01,
+    "test_decisions_index_contract.DecisionsIndexContractTest.test_index_matches_contract": 0.01,
+    "test_decisions_index_contract.DecisionsIndexContractTest.test_rows_match_frontmatter": 0.0,
     "test_declined_ledger.Test.test_missing_reason": 0.0,
     "test_declined_ledger.Test.test_validate_and_query": 0.0,
     "test_deep_dive_contract.DeepDiveContractTest.test_contract_catches_broken_understanding": 0.06,
@@ -5132,5 +5137,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1861.6
+  "total_s": 1861.8
 }

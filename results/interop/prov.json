@@ -111,7 +111,7 @@
     {
       "@id": "nf:file/decisions/INDEX.md",
       "@type": "prov:Entity",
-      "nf:sha256": "55c242222fa3e82ded6cbff46ab3430cb54c4a26108f187af4e67dfe75bbcc8e"
+      "nf:sha256": "3f369895c3dd5946d82753691343d42c8a0db2e1bc118b5f478522730c5ed003"
     },
     {
       "@id": "nf:file/desktop/src/core/registry.json",
@@ -311,7 +311,7 @@
     {
       "@id": "nf:file/protocol/role_coordinates.json",
       "@type": "prov:Entity",
-      "nf:sha256": "37edb7e04f2ffb92282002563199b389a2d054ef66499be12b2d503628dd8637"
+      "nf:sha256": "f6c410ec4b4bdd98f3b773e13fc8fef73817ac8c2a24d20ab750c0d81d8e2bb5"
     },
     {
       "@id": "nf:file/protocol/sast_baseline.json",
