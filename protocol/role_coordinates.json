@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1162
+    "verify": 1163
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9431,6 +9431,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/45_M3 契约：已确认事实 + registry 现状活绑定 + 开放项如实 + 复现口径。",
+      "path": "desktop/tests/test_payload_proposal_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "45 · 载荷注册表单测（自校验 + 防死注册）。",
       "path": "desktop/tests/test_payload_registry.py",
       "role": "verify",
@@ -13356,7 +13362,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "9da98d6602d16d41512b4b7b1e18df1556d34ea4efbd12355ef7a0c0a4cd0a26",
+  "root_digest": "7b417d74abaa645b2b8bcc8ba7978152898ed3f6cfd9bb0544413528e1b63060",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13365,7 +13371,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1036,
+    "R-verify": 1037,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
