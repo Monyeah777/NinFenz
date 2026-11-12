@@ -101,7 +101,7 @@
     {
       "@id": "nf:file/decisions/ADR-9000-示例-决策格式模板.md",
       "@type": "prov:Entity",
-      "nf:sha256": "f71574dd81858e9713fdb4f5f6911adc84eb1f868a148446fce5f0d708f7a5d3"
+      "nf:sha256": "f60af54d3c08516141f0d928feaa1a09ddfefee122cdbfcb9b1fb73d02df56aa"
     },
     {
       "@id": "nf:file/decisions/ADR-9001-示例-证据必须可解析.md",
@@ -311,7 +311,7 @@
     {
       "@id": "nf:file/protocol/role_coordinates.json",
       "@type": "prov:Entity",
-      "nf:sha256": "30e5d49a6b10f6f53e916e3a5e1f6885079771dbb4c858a6406e899831788364"
+      "nf:sha256": "a82b9caaf85384cc96962b7736c9ab0d8fd61abc6e01f979d40e8e37cee4c336"
     },
     {
       "@id": "nf:file/protocol/sast_baseline.json",
