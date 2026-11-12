@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1094
+    "verify": 1095
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7355,6 +7355,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "AGENT_START 入口契约：装配师第一跳须「分流可执行、路径可达、工具面同源、失败即停」。",
+      "path": "desktop/tests/test_agent_start_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "AGENTS.md 契约判据：开工前必读链第一跳必须「路径可解析、事实与仓库一致」（2026-11-11）。",
       "path": "desktop/tests/test_agents_contract.py",
       "role": "verify",
@@ -12948,7 +12954,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "3c7a7d3e7d50137e63c8b7972ea63dfda9e7254b9b03a3385fc9cbc09fa6f697",
+  "root_digest": "c269915330acc6aaa327524576d7f0a362d76a9db0e784bb02a03b8f21c8a6b3",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12957,7 +12963,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 968,
+    "R-verify": 969,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
