@@ -50,6 +50,7 @@
     "test_bilingual_entry": 0.2,
     "test_boundaries": 0.2,
     "test_bridge_real": 2.6,
+    "test_c1c2_record_contract": 0.2,
     "test_cache_bounds": 0.2,
     "test_calibration": 0.1,
     "test_calibration_state": 0.2,
@@ -948,6 +949,10 @@
     "test_bridge_real.RealVerifyTest.test_pack_verify_ok": 0.7,
     "test_bridge_real.RealVerifyTest.test_tampered_bundle_produces_obligation": 1.04,
     "test_bridge_real.RealVerifyTest.test_unknown_verdict_word_is_rejected": 0.0,
+    "test_c1c2_record_contract.C1C2RecordContractTest.test_archived_citations_absent_from_root": 0.0,
+    "test_c1c2_record_contract.C1C2RecordContractTest.test_contract_catches_mutations": 0.03,
+    "test_c1c2_record_contract.C1C2RecordContractTest.test_record_matches_contract": 0.01,
+    "test_c1c2_record_contract.C1C2RecordContractTest.test_signature_count_matches_root": 0.0,
     "test_cache_bounds.CacheBoundsTest.test_every_long_lived_cache_declares_a_positive_cap": 0.0,
     "test_cache_bounds.CacheBoundsTest.test_response_cache_evicts_at_its_cap": 0.0,
     "test_calibration.CalibrationTest.test_bad_input_fails_closed": 0.0,
@@ -5188,5 +5193,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1863.8
+  "total_s": 1864.0
 }

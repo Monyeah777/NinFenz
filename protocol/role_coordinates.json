@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1142
+    "verify": 1143
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7637,6 +7637,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/41_波C_C1_C2 实测记录 契约：快照状态 + 现状对照 + 复现口径 + 引用件在场。",
+      "path": "desktop/tests/test_c1c2_record_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "常驻缓存**必须有界**（稳态毫秒级响应的隐含前提：长驻守护不能随会话增长而吃内存）。",
       "path": "desktop/tests/test_cache_bounds.py",
       "role": "verify",
@@ -13236,7 +13242,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "4e7fd45aee987aee0fd860554feb061f2a2c57ce06070e01de782af81524c85c",
+  "root_digest": "b9cbafdf728d37949d8cb526c37b5f989aa1f80d7c1dda8751424f22b8d75545",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13245,7 +13251,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1016,
+    "R-verify": 1017,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
