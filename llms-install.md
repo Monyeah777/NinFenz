@@ -16,7 +16,7 @@ NinFenz（宁封子，简称 NF）是**内容契约层**：用「协议 + 确定
 | 需要 | 说明 |
 |---|---|
 | Python ≥ 3.11 | **仅标准库**，零第三方依赖（不需要 pip install） |
-| Node ≥ 20 | 仅在使用 npm 包入口（`npx -y ninfenz`）时需要 |
+| Node ≥ 18.17 | 仅在使用 npm 包入口（`npx -y ninfenz`）时需要（engines 真源 `packaging/npm/package.json`） |
 | git | 仅克隆路线需要 |
 | Git Bash（Windows） | 仅 `bash verify.sh` 全量门禁需要；日常自检不需要 |
 
