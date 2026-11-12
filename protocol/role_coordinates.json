@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1105
+    "verify": 1106
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8249,6 +8249,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "06 Agent 执行协议契约：运行时协议必须「节号可寻址、判据件在场、校验词同源」。",
+      "path": "desktop/tests/test_execution_protocol_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "`nf explain <check>` 的**全覆盖**判据（门禁红了要能拿到指引）。",
       "path": "desktop/tests/test_explain_coverage.py",
       "role": "verify",
@@ -13014,7 +13020,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "255a003939373979fe7cab5a45d794297ae91661971e10295666c3fcb67089ba",
+  "root_digest": "b5571175eaab72c0b79da04a5ac75ab766f205e288cef91942d0bdc05345564f",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13023,7 +13029,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 979,
+    "R-verify": 980,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
