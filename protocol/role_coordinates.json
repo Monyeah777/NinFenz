@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1110
+    "verify": 1111
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8975,6 +8975,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "M08 环境状态模块契约：模块文档必须「机读块 ⇄ 引用块 ⇄ 注册表 ⇄ 事件注册表」同源。",
+      "path": "desktop/tests/test_module_m08_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "编号命名空间 + 管线 id 避让判据（01 §1.6.11）——直接执行 verify.sh check14 的内嵌程序。",
       "path": "desktop/tests/test_module_namespace.py",
       "role": "verify",
@@ -13044,7 +13050,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "784e678fa5d4f97901b77eada66200bbdd3d038eb7bf9a5770aef63dd8e9b7ce",
+  "root_digest": "ad42a60b00512fdb4e7111d5af5ba2203345db957e60784f77da5b7d2b90d347",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13053,7 +13059,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 984,
+    "R-verify": 985,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
