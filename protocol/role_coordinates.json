@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1157
+    "verify": 1158
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8999,6 +8999,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/42_M5_工程收口 契约：收口记录必须「快照状态 + 交付物现状 + bench 边界澄清 + 复现口径」。",
+      "path": "desktop/tests/test_m5_closure_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "维护者契约判据：执行主体必须「具名、有职责、涉己回避、失能有预案」（2026-11-10）。",
       "path": "desktop/tests/test_maintainers_contract.py",
       "role": "verify",
@@ -13326,7 +13332,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "1203872090a2c8e4cd3c4d23f8e5005c1dbfa703e8803392f3403ee11550659a",
+  "root_digest": "af9bfd1bfa8215c60c9a221ac8308b27e2465b60e49c7198a2dbd2c79350d49f",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13335,7 +13341,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1031,
+    "R-verify": 1032,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
