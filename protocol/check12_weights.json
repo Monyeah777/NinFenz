@@ -275,6 +275,7 @@
     "test_lsp_guard": 0.2,
     "test_lsp_hardening": 0.2,
     "test_lsp_transcript": 0.7,
+    "test_m1_drill_coverage_contract": 0.2,
     "test_m2_round_header_contract": 0.3,
     "test_m3_purity_contract": 0.2,
     "test_m4_census_contract": 0.2,
@@ -3117,6 +3118,9 @@
     "test_lsp_transcript.TestLspSessionTranscript.test_generator_recompute_equals_on_disk_fixture": 0.3,
     "test_lsp_transcript.TestLspSessionTranscript.test_lifecycle_and_dollar_edges_are_pinned": 0.0,
     "test_lsp_transcript.TestLspSessionTranscript.test_live_run_round_trips_through_client_frames": 0.29,
+    "test_m1_drill_coverage_contract.M1DrillCoverageContractTest.test_contract_catches_mutations": 0.01,
+    "test_m1_drill_coverage_contract.M1DrillCoverageContractTest.test_fixtures_and_parameterization_live": 0.0,
+    "test_m1_drill_coverage_contract.M1DrillCoverageContractTest.test_m1_matches_contract": 0.0,
     "test_m2_round_header_contract.M2RoundHeaderContractTest.test_contract_catches_mutations": 0.0,
     "test_m2_round_header_contract.M2RoundHeaderContractTest.test_laws_source_matches_doc": 0.0,
     "test_m2_round_header_contract.M2RoundHeaderContractTest.test_m2_matches_contract": 0.0,
@@ -5263,5 +5267,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1867.7
+  "total_s": 1867.9
 }
