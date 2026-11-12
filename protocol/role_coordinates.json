@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1168
+    "verify": 1169
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7403,6 +7403,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/ai-menu-fieldtest-v1 契约：执行状态如实 + 与菜单 v0.3 口径同步 + 回填位在。",
+      "path": "desktop/tests/test_ai_menu_fieldtest_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "AI_ROUTING 路由契约：入口第二跳必须「档位可自测、通道有落点、override 同源、失败即停」。",
       "path": "desktop/tests/test_ai_routing_contract.py",
       "role": "verify",
@@ -13392,7 +13398,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "95ce2c35ff5ef74d154ed2e90f5e87ddfd62cab6ba8f1c43a5c78f4a324ab985",
+  "root_digest": "8980a2929aed4dff7e2bb45d2a637083377068002ce8e38ed6a73125953de8e6",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13401,7 +13407,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1042,
+    "R-verify": 1043,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
