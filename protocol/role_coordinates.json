@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1145
+    "verify": 1146
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7655,6 +7655,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/41_波C_C9_回合装载指针_v0 契约：v0 指针规格必须「标明已被 v1 接续 + 样例装配数与真源一致」。",
+      "path": "desktop/tests/test_c9_pointer_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "常驻缓存**必须有界**（稳态毫秒级响应的隐含前提：长驻守护不能随会话增长而吃内存）。",
       "path": "desktop/tests/test_cache_bounds.py",
       "role": "verify",
@@ -13254,7 +13260,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "dd728f5f28acc1ce21bf5e29fdfebd0ec4f76b8f9e6df40d147f068f4e7e98bb",
+  "root_digest": "dff5df98f441aeee3344d51ac7c530e5e0fd24618d65d1cf36b5ddf9433dcff4",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13263,7 +13269,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1019,
+    "R-verify": 1020,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
