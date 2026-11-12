@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1187
+    "verify": 1188
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9521,6 +9521,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/ccos/paper-adoption-v0.md 契约：论文台账文档必须「34 篇/四档计数/落点存在与实现一致」。",
+      "path": "desktop/tests/test_paper_adoption_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "论文台账判据（第 2026-11-10 批）：处置完整、落点可核、计数自洽。",
       "path": "desktop/tests/test_paper_ledger.py",
       "role": "verify",
@@ -13506,7 +13512,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "dbf9a486af6703ee62174d0dfe78823bc1977ec98ffcc556a876d2d86fe1435b",
+  "root_digest": "6bd6024e322b658e9d8b3e73271b3731ba10d8490ef7c441649e62682d231f17",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13515,7 +13521,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1061,
+    "R-verify": 1062,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
