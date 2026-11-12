@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1149
+    "verify": 1150
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8231,6 +8231,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/42_M1_P03 演练集契约：历史演练记录必须「快照状态 + 演练结果/机制现状 + 复现口径」。",
+      "path": "desktop/tests/test_drill_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "演练保真度（`core/drill_fidelity.py`）回归测试 —— 动态可执行面。",
       "path": "desktop/tests/test_drill_fidelity.py",
       "role": "verify",
@@ -13278,7 +13284,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "efd3bdf322d4b7981c28a69b3ec7926792b241ddc29ef16290c19bcc9c6310a7",
+  "root_digest": "4964f92252a8c598419a7240e1a2aa6456965ab8b4cf743feb0e6b99f500b878",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13287,7 +13293,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1023,
+    "R-verify": 1024,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
