@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1129
+    "verify": 1130
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7355,6 +7355,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "ADR-9000 模板契约：公开面决策格式模板必须「机读合法 + 写法指引齐全 + INDEX 投影一致」。",
+      "path": "desktop/tests/test_adr_9000_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "AGENTS/CLAUDE 出口适配器单测（v2.1.0 A1：techdoc+project_rules → AGENTS.md）。",
       "path": "desktop/tests/test_agent_rules_adapter.py",
       "role": "verify",
@@ -13158,7 +13164,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "5736ea2bea5f74d9171ffd9b16759729e5f5b63ffd4f6bacc386b0d7777870f1",
+  "root_digest": "843527946b9d331cb49cead26e3619541e4dc10d651c1268b70d30113ea7a706",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13167,7 +13173,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1003,
+    "R-verify": 1004,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
