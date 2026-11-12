@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1141
+    "verify": 1142
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9557,6 +9557,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "skills/ninfenz/references/quickstart.md 契约：安装/自检/不克隆路径必须「可执行 + 真件在场」。",
+      "path": "desktop/tests/test_quickstart_reference_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "内容分级门单测（挂账收口）：词表真源 = 声明件；缺字段/越词表即 FAIL。",
       "path": "desktop/tests/test_rating_gate.py",
       "role": "verify",
@@ -13230,7 +13236,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "85bc92f441941da88699b7cfe6f4e7bb131976202efdc852f9b18570e7f47d50",
+  "root_digest": "4e7fd45aee987aee0fd860554feb061f2a2c57ce06070e01de782af81524c85c",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13239,7 +13245,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1015,
+    "R-verify": 1016,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
