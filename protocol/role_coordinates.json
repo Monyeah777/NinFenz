@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1117
+    "verify": 1118
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8975,6 +8975,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "M00 数据槽总线模块契约：纯内部基座豁免 + 冻结槽位面必须与 world_slots.json 同源。",
+      "path": "desktop/tests/test_module_m00_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "M06 流程状态机模块契约：机读块 ⇄ 引用块 ⇄ 注册表 ⇄ 事件注册表 必须同源。",
       "path": "desktop/tests/test_module_m06_contract.py",
       "role": "verify",
@@ -13086,7 +13092,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "65c1eb05e86a70b9038dc0c223e6bae31d71f2da34f1e4e1287d331179401512",
+  "root_digest": "deae9b15bc4a6cfd641dfc27d2eb6877ec8cc6d5718d70b3053a92f516e8ff24",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13095,7 +13101,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 991,
+    "R-verify": 992,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
