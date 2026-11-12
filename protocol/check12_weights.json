@@ -327,6 +327,7 @@
     "test_output_envelope": 0.1,
     "test_output_forms": 11.5,
     "test_output_path_escape": 0.8,
+    "test_p06_drill_contract": 0.2,
     "test_p6_evaluations": 29.8,
     "test_pack_combo": 3.2,
     "test_pack_depth": 0.1,
@@ -3731,6 +3732,9 @@
     "test_output_path_escape.DeclaredPathEscapeTest.test_legit_declared_path_still_renders": 0.05,
     "test_output_path_escape.DeclaredPathEscapeTest.test_pkg_rel_rejects_escape_forms_and_keeps_legit_ones": 0.0,
     "test_output_path_escape.DeclaredPathEscapeTest.test_traversing_declared_path_is_refused_before_writing": 0.05,
+    "test_p06_drill_contract.P06DrillContractTest.test_contract_catches_mutations": 0.0,
+    "test_p06_drill_contract.P06DrillContractTest.test_coverage_facts_are_live": 0.0,
+    "test_p06_drill_contract.P06DrillContractTest.test_p06_doc_matches_contract": 0.0,
     "test_p6_evaluations.ProvenanceAndDataQualityTest.test_missing_source_turns_red": 0.0,
     "test_p6_evaluations.ProvenanceAndDataQualityTest.test_prov_three_ways_are_present_and_consistent": 0.0,
     "test_p6_evaluations.ProvenanceAndDataQualityTest.test_real_repo_satisfies_both": 0.01,
@@ -5226,5 +5230,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1865.5
+  "total_s": 1865.7
 }
