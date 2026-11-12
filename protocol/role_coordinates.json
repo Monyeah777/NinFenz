@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1120
+    "verify": 1121
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9029,6 +9029,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "M24 规则组合模块契约：零事件 + resolve 接口面，依赖面与 02 §4 对账，且不虚构输出 token。",
+      "path": "desktop/tests/test_module_m24_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "M90 结构装配模块契约：机读块 ⇄ §2 Module 声明 ⇄ registry/02 ⇄ P90 管线 四源同源。",
       "path": "desktop/tests/test_module_m90_contract.py",
       "role": "verify",
@@ -13104,7 +13110,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "0f940a689c9e56aa695d9da9e7b7ca00e385298642a81716b1da132248e2d15e",
+  "root_digest": "240b60f8187b9e48fa22710971625c8600598a8d0d11c684d1702fb814ae044d",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13113,7 +13119,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 994,
+    "R-verify": 995,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
