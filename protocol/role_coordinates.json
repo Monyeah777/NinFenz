@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1154
+    "verify": 1155
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8981,6 +8981,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/42_M3 契约：规则族现状 R1–R8 + 载体在场 + 文案差异如实 + 复现口径。",
+      "path": "desktop/tests/test_m3_purity_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "docs/42_M4 契约：历史普查必须「快照状态 + 清单规模现状 + 分类标准不变 + 复现口径」。",
       "path": "desktop/tests/test_m4_census_contract.py",
       "role": "verify",
@@ -13308,7 +13314,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "798bd9d0e5bb05e26068fab1c9e5d3838a39fc0b020596b300b0745c11b883f6",
+  "root_digest": "b1dfde4043a00338d3ebf407d358b070e8bd205dc1768cf5d6896120d5b95d99",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13317,7 +13323,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1028,
+    "R-verify": 1029,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
