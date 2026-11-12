@@ -96,7 +96,7 @@
     {
       "@id": "nf:file/decisions/ADR-0000-决策记录外置到私有仓.md",
       "@type": "prov:Entity",
-      "nf:sha256": "353480fa44af3cd855767cf46f7c0c0da13460afc145a3ae4856909acf78afc2"
+      "nf:sha256": "495abb8719ff267c3e3be4f8f93dabd1936bac1bd17bfc438e5de040a0d7de9c"
     },
     {
       "@id": "nf:file/decisions/ADR-9000-示例-决策格式模板.md",
@@ -311,7 +311,7 @@
     {
       "@id": "nf:file/protocol/role_coordinates.json",
       "@type": "prov:Entity",
-      "nf:sha256": "d5bf41ec85c08c0cbd39cffcc1ab54424da32ba775bba4ad778d489d6b64d94d"
+      "nf:sha256": "30e5d49a6b10f6f53e916e3a5e1f6885079771dbb4c858a6406e899831788364"
     },
     {
       "@id": "nf:file/protocol/sast_baseline.json",

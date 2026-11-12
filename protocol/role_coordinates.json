@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1128
+    "verify": 1129
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7349,6 +7349,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "ADR-0000 决策记录契约：meta 决策的每一条声明都必须可机器核验。",
+      "path": "desktop/tests/test_adr_0000_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "AGENTS/CLAUDE 出口适配器单测（v2.1.0 A1：techdoc+project_rules → AGENTS.md）。",
       "path": "desktop/tests/test_agent_rules_adapter.py",
       "role": "verify",
@@ -13152,7 +13158,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "a5f2e1e1573583b56a16ba6a33eb20d5201926f9e41972d02e02f33c0878a9b9",
+  "root_digest": "5736ea2bea5f74d9171ffd9b16759729e5f5b63ffd4f6bacc386b0d7777870f1",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13161,7 +13167,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1002,
+    "R-verify": 1003,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

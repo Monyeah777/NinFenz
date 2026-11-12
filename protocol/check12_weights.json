@@ -2,6 +2,7 @@
   "measured_at": "2026-11-12",
   "modules": {
     "test_absence_guard": 0.2,
+    "test_adr_0000_contract": 0.3,
     "test_agent_rules_adapter": 0.2,
     "test_agent_start_contract": 0.2,
     "test_agents_contract": 0.1,
@@ -491,6 +492,10 @@
     "test_absence_guard.Test.test_claims_listed": 0.0,
     "test_absence_guard.Test.test_english_absence_is_flagged": 0.0,
     "test_absence_guard.Test.test_negation_is_not_flagged": 0.0,
+    "test_adr_0000_contract.Adr0000ContractTest.test_adr_0000_matches_contract": 0.01,
+    "test_adr_0000_contract.Adr0000ContractTest.test_contract_catches_mutations": 0.03,
+    "test_adr_0000_contract.Adr0000ContractTest.test_evidence_items_resolve": 0.0,
+    "test_adr_0000_contract.Adr0000ContractTest.test_public_face_claims_are_true": 0.0,
     "test_agent_rules_adapter.TestAgentsAdapter.test_capability_techdoc_rejected_toward_skill": 0.0,
     "test_agent_rules_adapter.TestAgentsAdapter.test_claude_format_exports_claude_md": 0.0,
     "test_agent_rules_adapter.TestAgentsAdapter.test_narrative_rejected_no_file": 0.0,
@@ -5117,5 +5122,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1860.9
+  "total_s": 1861.2
 }
