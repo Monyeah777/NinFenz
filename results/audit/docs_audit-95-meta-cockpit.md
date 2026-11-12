@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:23ec8dccad7807753b0f25c91d52f2fd68497bae4826b9c48302cabc084d6131
+  - protocol/check12_weights.json:bff57221a880ce8eebe509f75c0ecbe81dbc1729242c65d5fb4f4e801f2a7721
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-12）：decisions/README 顶尖化（读法/判据入口段 + 路由工具占位路径 + 白名单与 payload/ERRATA 事实对账）+ 契约判据 test_decisions_readme_contract；权重增量重测。本轮为机械重绑。
+
 > 重审（2026-11-12）：decisions/INDEX 顶尖化（标记外补读法/修复指引 + 生成区等价契约）+ 契约判据 test_decisions_index_contract；权重增量重测。本轮为机械重绑。
 
 > 重审（2026-11-12）：ADR-9001 证据纪律顶尖化（允许三类/禁止六项与 decisions.py 逐条对齐 + 示例表正反例 + 修错证 check35→check33）+ 契约判据 test_adr_9001_contract；权重增量重测。本轮为机械重绑。

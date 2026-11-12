@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1132
+    "verify": 1133
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8057,6 +8057,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "decisions/README 契约：公开面政策说明必须「白名单 ⇄ 判据 ⇄ 事实」三面对齐。",
+      "path": "desktop/tests/test_decisions_readme_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "",
       "path": "desktop/tests/test_declined_ledger.py",
       "role": "verify",
@@ -13176,7 +13182,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "4acc8f1bf19cbe20db75fad3fc979f10603b947163d5329a52f3262fd0dfd12f",
+  "root_digest": "3cd264ab0425e6916df8aa1612f38d377d80ad15d18c148ac0195881d9a2be0a",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13185,7 +13191,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1006,
+    "R-verify": 1007,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
