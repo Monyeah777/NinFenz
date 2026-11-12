@@ -435,6 +435,7 @@
     "test_strategy_contract": 0.2,
     "test_strict_schema": 0.2,
     "test_style_dna": 0.1,
+    "test_style_dna_contract": 0.3,
     "test_style_ratchet": 1.3,
     "test_subcheck_cache": 0.3,
     "test_suite_isolation": 0.2,
@@ -4609,6 +4610,10 @@
     "test_strict_schema.Test.test_unknown_key_path": 0.0,
     "test_style_dna.Test.test_applies_to_required": 0.0,
     "test_style_dna.Test.test_for_path": 0.0,
+    "test_style_dna_contract.StyleDnaContractTest.test_contract_catches_mutations": 0.0,
+    "test_style_dna_contract.StyleDnaContractTest.test_header_and_ledger_agree": 0.0,
+    "test_style_dna_contract.StyleDnaContractTest.test_schema_matches_key_registry": 0.0,
+    "test_style_dna_contract.StyleDnaContractTest.test_style_dna_matches_contract": 0.0,
     "test_style_ratchet.BaselineShapeTest.test_baseline_shape": 0.0,
     "test_style_ratchet.CompareTest.test_count_down_is_warn_only": 0.0,
     "test_style_ratchet.CompareTest.test_count_up_is_fail": 0.0,
@@ -5102,5 +5107,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1860.0
+  "total_s": 1860.3
 }
