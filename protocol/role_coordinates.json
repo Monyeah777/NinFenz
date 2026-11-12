@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1148
+    "verify": 1149
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -10265,6 +10265,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/41_波C_W5 契约：历史 lint/日志记录必须「快照状态 + D4 接线现状 + D3/D4 分工 + 复现口径」。",
+      "path": "desktop/tests/test_w5_record_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "目录监听 + 守护响应缓存单测（毫秒级执行层的「**不重算**」判据）。",
       "path": "desktop/tests/test_watch.py",
       "role": "verify",
@@ -13272,7 +13278,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "78d6498cf1b061d743297bc233246538ff9e43eb5f034ac768a50d97ff6480e7",
+  "root_digest": "efd3bdf322d4b7981c28a69b3ec7926792b241ddc29ef16290c19bcc9c6310a7",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13281,7 +13287,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1022,
+    "R-verify": 1023,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
