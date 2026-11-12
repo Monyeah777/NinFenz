@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1106
+    "verify": 1107
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8987,6 +8987,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "07 出厂与预设导航契约：导航面必须「节号可寻址、清单同源、验收项有机检映射」。",
+      "path": "desktop/tests/test_navigation_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "引擎线（engine/dotnet/）的 verify.sh 覆盖率口径必须与真源自洽（防分母陈旧）。",
       "path": "desktop/tests/test_net_coverage.py",
       "role": "verify",
@@ -13020,7 +13026,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "b5571175eaab72c0b79da04a5ac75ab766f205e288cef91942d0bdc05345564f",
+  "root_digest": "b8a7a3324d1161a748195e5ff6efdd67cde84b4932af00578c1be5b6d7b13520",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13029,7 +13035,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 980,
+    "R-verify": 981,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

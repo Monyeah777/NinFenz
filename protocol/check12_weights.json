@@ -275,6 +275,7 @@
     "test_module_lifecycle": 0.2,
     "test_module_namespace": 2.2,
     "test_mvu_adapter": 0.7,
+    "test_navigation_doc_contract": 0.2,
     "test_net_coverage": 0.1,
     "test_net_probes_workflow_contract": 0.2,
     "test_new_faces": 1.1,
@@ -3252,6 +3253,10 @@
     "test_mvu_adapter.TestMvuAdapter.test_registry_has_mvu_and_unknown_fmt_mentions_it": 0.0,
     "test_mvu_adapter.TestMvuAdapter.test_type_map_applied": 0.06,
     "test_mvu_adapter.TestMvuAdapter.test_variable_name_conflict_is_reported": 0.05,
+    "test_navigation_doc_contract.NavigationDocContractTest.test_contract_catches_mutations": 0.02,
+    "test_navigation_doc_contract.NavigationDocContractTest.test_navigation_matches_contract": 0.0,
+    "test_navigation_doc_contract.NavigationDocContractTest.test_official_core_list_is_same_source": 0.0,
+    "test_navigation_doc_contract.NavigationDocContractTest.test_preset_manuals_and_checks_resolve": 0.0,
     "test_net_coverage.NetCoverageAdjudicationTest.test_missing_truth_pointer_is_fail": 0.0,
     "test_net_coverage.NetCoverageAdjudicationTest.test_real_readme_is_consistent_with_truth_source": 0.0,
     "test_net_coverage.NetCoverageAdjudicationTest.test_stale_denominator_is_fail": 0.0,
@@ -5015,5 +5020,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1855.4
+  "total_s": 1855.6
 }
