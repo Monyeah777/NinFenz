@@ -2,7 +2,8 @@
 
 状态：**已实装**（CLI：`nf label`；判据见 `desktop/tests/test_label_ir.py`）。
 > ⛔ 操作指令：阅读即执行——本文含可直接执行的命令与判定，勿当资料阅读。
-> 最后更新：2026-11-05
+> 最后更新：2026-11-13
+> **复核（2026-11-13）**：声明层/回退层/载体层口径**复核不变**；修两处**文档内部矛盾与重复**：① 文末「边界」原写「MP4/PDF/WebP 等格式没有实测，一律走 sidecar 回退」——与上方载体节（三格式已实装且有判据）**直接矛盾**，已改正；② 出现**两个同名「## 与 cc_label 的关系」小节**（一为承诺表、一为 partial 状态），已把前者改名为「## 载体承诺（三件能自证的事）」并保留后者。现状数字：test_label_ir **16 项**、test_label_carrier **33 项**、水印探针 4 份结果件齐。见「§现状对照」。
 > **Status**: v0 已实装**声明层**（`core/label_ir.py` + `nf label ir|validate`）+ **载体层
 > （`core/label_carrier.py`：PNG iTXt / JPEG APP15 / WebP NFLA / MP4 free 盒 / PDF 尾部注释；
 > `core/label_watermark.py`：PNG 像素水印）**（`nf label embed|extract`）
@@ -157,7 +158,7 @@ nf label extract 产出/海报.wm.png                                          #
 数据：`results/ccos/watermark_geometry_probe.json`，判据 `test_watermark_geometry_probe.py` 8 项（含负结果锁死）。
 水印帧只带 IR 的摘要帧（版本/标准/对象摘要前缀/条目名/条数），不是整份 IR。
 
-## 与 `cc_label` 的关系
+## 载体承诺（三件能自证的事）
 
 `nf label embed` 按 magic 选载体：**PNG → `iTXt` 块**（keyword = `AIGC`，UTF-8）、
 **JPEG → `APP15` 段**（`AIGC\0` + JSON）。`nf label extract` 读回。纯标准库实现，
@@ -175,8 +176,9 @@ nf label embed --object 产出/照片.jpg  --ir 产出/照片.label.json   # JPE
 nf label extract 产出/海报.png.labeled.png
 ```
 
-**边界**：这是**可见文本载体**（任何人都能剥掉 iTXt 块或 APP15 段），不是水印——抗裁剪/抗转码/
-抗截屏都不承诺；MP4/PDF/WebP 等格式没有实测，一律走 `nf label write` 的 sidecar 回退，不宣称已嵌入。
+**边界**：文本载体是**可见/可剥**的（iTXt 块、APP15 段、WebP `NFLA` 块、MP4 `free` 盒、PDF 尾注释都可被删）；
+PNG 像素水印**扛不住** JPEG/缩放/拍屏（见上方实测表）。**已实装格式** = PNG / JPEG / WebP / MP4 / PDF（各有判据；
+后三者是**尾部可忽略块**，承诺比图片弱）；**其余格式**才走 `nf label write` 的 sidecar 回退并 `embedded=false`。
 真仓图标（多 IDAT / 辅助块）与真 JPEG 的往返各有判据；JPEG 另有一条「Pillow 在场时解码后像素一致」的
 附加判据（环境无 Pillow 则跳过，不冒充已验）。
 
@@ -185,6 +187,33 @@ nf label extract 产出/海报.png.labeled.png
 `cc_label(obj, contract)` 要返回 `{label: {contract, standard, fields, carrier, embedded}}`。v0 做实两块：
 **声明层**（IR 形状与齐备度）+ **sidecar 回退**（把声明落到对象旁并与摘要绑定）；`embedded` **恒为
 false**，无法证「对象里真的带标识」。因此 ABI 里 `cc_label` 记为 `partial`，不升级为 `implemented`。
+
+## 现状对照（2026-11-13 · 以实跑为准）
+
+| 面 | 本文声明 | 复核结果（读到本行时请重跑） |
+|---|---|---|
+| 声明层 | `core/label_ir.py` + `nf label ir/validate` | **不变**（`test_label_ir` 16 项） |
+| sidecar 回退 | `nf-label-sidecar/1`，`embedded` 恒 false | **不变**（`test_label_sidecar`） |
+| 载体 | PNG / JPEG / WebP / MP4 / PDF | **五格式已实装**（`test_label_carrier` **33 项**；后三者=尾部可忽略块） |
+| 像素水印 | PNG LSB（24×24×多数表决） | **不变**；16 条攻击矩阵见 `results/ccos/watermark_bench.json`（`test_watermark_bench` 10 项） |
+| v1 探针 | DCT 两机制 / 同步层 / 几何提示 | **四份结果件齐**（bench / dct_probe / sync_probe / geometry_probe，各带判据） |
+| ABI 状态 | `cc_label` = partial | **不变**（`embedded=false` 恒真时不得升级） |
+| 文档内部一致 | 两个同名小节 + 边界自相矛盾 | **2026-11-13 已修**（见复核位） |
+
+> 本表只作「当时 → 现行」导航，不替代实跑。
+
+## 复现与引用口径
+
+```bash
+python -m pytest desktop/tests/test_label_ir.py desktop/tests/test_label_carrier.py -q   # 16 + 33 项
+python scripts/watermark_bench.py --check        # 16 条攻击矩阵结果件新鲜
+python scripts/watermark_dct_probe.py --check    # v1 DCT 探针（负结果也锁住）
+python scripts/watermark_sync_probe.py --check   # 同步层探针（固定网格不够）
+python scripts/watermark_geometry_probe.py --check  # 几何提示（正+负结果）
+```
+
+- 引用本文时：「声明层可证 / 载体只证读回+不改媒体字节+结构合法 / `embedded` 不冒充」= 长期口径。
+- 载体边界以本页承诺表为准：**已实装 ≠ 抗剥**；删除载体块/段是任何人都能做到的。
 
 ## 复核
 
