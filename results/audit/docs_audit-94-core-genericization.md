@@ -29,12 +29,14 @@ subjects:
   - 05_资产库/README.md:2288451b33be5959789f7072a2089acc5b78e92902d4b105e354b0057a281d8f
   - 05_资产库/provenance.json:293d3d3dfd1bf25e0fdeaa32e4b14cc817ed974b4209fda45619c65a1473ab93
   - 05_资产库/用户自定义/README.md:72b90b606c14015a1ec5c6ba2ad47e80ed0ff5ca28de567934974cfa220e3662
-  - 05_资产库/用户自定义/STYLE_DNA.md:b7ebed51132f13d4f42d6b3e8b6c425a653e947531e5952d65aa49df8e0a4381
+  - 05_资产库/用户自定义/STYLE_DNA.md:08d9414ecf85bddc9b5825651c582c726508294aef2fd3cd6fcfcc0edf872d79
   - protocol/asset_keys.json:59d9fcfb03e4da3c21c1b23bc83c2c0518c6e0c94147b3a6aa3915700e2bd33f
   - desktop/src/core/registry.json:cdcb852579785d8817451398021e55441e635a857e0acd3557af9a86b030e7ca
   - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
 
 ---
+> 重审（2026-11-12）：STYLE_DNA 资产顶尖化（读法/机检 + 三式配置纪律 + 示例档语义 + Phase 1/2 标识符口径 + 不越界阈值声明）+ 契约判据 test_style_dna_contract；权重增量重测。本轮为机械重绑。
+
 > 重审（2026-11-12）：05_资产库/用户自定义 README 顶尖化（读法/机检 + 键清单/schema 速览与资产文件对账 + nf-asset 头/台账三方 + 校验面）+ 契约判据 test_user_assets_readme_contract；权重增量重测。本轮为机械重绑。
 
 > 重审（2026-11-12）：05_资产库 README 顶尖化（读法/机检段 + 五接口清单同源 01 §3 + provenance/asset_keys/用户自定义三源覆盖 + 单层货架硬规 + §6 引用映射口径）+ 契约判据 test_asset_library_readme_contract；权重增量重测。本轮为机械重绑。
