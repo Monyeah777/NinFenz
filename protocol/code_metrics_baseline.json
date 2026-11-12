@@ -736,7 +736,7 @@
       "max_fn_lines": 24
     },
     "desktop/src/core/library.py": {
-      "lines": 504,
+      "lines": 505,
       "max_fn_cc": 48,
       "max_fn_lines": 94
     },
