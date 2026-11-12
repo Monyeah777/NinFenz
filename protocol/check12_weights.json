@@ -244,7 +244,7 @@
     "test_lint_workflow_contract": 0.2,
     "test_linux_parity_refresh_workflow_contract": 0.2,
     "test_live_doc_counts": 5.0,
-    "test_llms_contract": 1.7,
+    "test_llms_contract": 2.2,
     "test_load_state": 0.1,
     "test_locales": 0.2,
     "test_lsp": 2.9,
@@ -2865,11 +2865,13 @@
     "test_live_doc_counts.ProtocolSelfCountTest.test_mutation_lying_count_is_caught": 0.01,
     "test_live_doc_counts.ProtocolSelfCountTest.test_named_counts_are_not_stale": 0.03,
     "test_live_doc_counts.ProtocolSelfCountTest.test_self_counts_match_their_collections": 0.05,
-    "test_llms_contract.LlmsContractTest.test_check_citations_are_accurate": 0.0,
+    "test_llms_contract.LlmsContractTest.test_check_citations_are_accurate": 0.01,
     "test_llms_contract.LlmsContractTest.test_contract_catches_broken_llms": 0.05,
+    "test_llms_contract.LlmsContractTest.test_entry_coverage_complete": 0.0,
     "test_llms_contract.LlmsContractTest.test_links_and_paths_resolve": 0.06,
     "test_llms_contract.LlmsContractTest.test_no_pinned_runtime_counts": 0.0,
-    "test_llms_contract.LlmsContractTest.test_shape_and_generator_freshness": 1.46,
+    "test_llms_contract.LlmsContractTest.test_shape_and_generator_freshness": 1.85,
+    "test_llms_contract.LlmsContractTest.test_task_router_table": 0.0,
     "test_load_state.Test.test_only_stale_blocks": 0.0,
     "test_locales.DocTreeTest.test_non_mirrored_path_is_caught": 0.01,
     "test_locales.DocTreeTest.test_stale_translation_is_caught": 0.01,
@@ -4972,5 +4974,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1846.9
+  "total_s": 1847.4
 }

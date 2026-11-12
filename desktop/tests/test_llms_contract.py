@@ -173,6 +173,57 @@ def stats_check_ok(root: Path = ROOT) -> bool:
     return proc.returncode == 0
 
 
+#: agent 第一跳面清单（都必须在本文件里有入口；缺一件 = 机器入口不完整）
+REQUIRED_ENTRIES = (
+    "docs/quickstart.md", "docs/agent/AGENT_START.md", "docs/agent/AI_ROUTING.md",
+    "docs/agent/ROUTES.md", "docs/ai-menu.md", "docs/meta/DEEP_DIVE.md",
+    "docs/agent/agent_组装指令包_v0.2.md", "docs/mcp.md", "docs/nfal.md",
+    "docs/domain-packs.md", "docs/verification-cards.md", "docs/terminal.md",
+    "docs/asset_contract.md", "docs/locales.md", "docs/release.md",
+    "01_核心协议.md", "02_联动注册表.md", "06_Agent执行协议.md",
+    "07_官方核心出厂与社区预设导航.md", "STRATEGY.md",
+    "protocol/WORLD_MODEL.md", "protocol/LAYERS.json", "protocol/driver.json",
+    "protocol/CONFORMANCE.md", "library/INDEX.md", "library/ALIAS.md",
+    "community/README.md", "README.md", "README.en.md", "README.ja.md",
+    "LICENSE", "CITATION.cff", "SECURITY.md", "CONTRIBUTING.md",
+)
+#: 「按任务选入口」表必须覆盖的任务类（少一类 = 有人找不到第一跳）
+ROUTING_GOALS = ("装配", "选线", "取件", "菜单", "理解", "扩展", "查模块")
+
+
+def section_body(text: str, heading: str) -> str:
+    """取某小节正文（到下一个二级标题为止；缺标题返回空串）。"""
+    if heading not in text:
+        return ""
+    return text.split(heading, 1)[1].split("\n## ", 1)[0]
+
+
+def routing_rows(text: str) -> list:
+    """「按任务选入口」表的数据行（去掉表头与分隔行）。"""
+    body = section_body(text, "## 按任务选入口（最短路径）")
+    rows = []
+    for line in body.splitlines():
+        s = line.strip()
+        if s.startswith("|") and "---" not in s and "你要做什么" not in s:
+            rows.append(s)
+    return rows
+
+
+def routing_issues(text: str) -> list:
+    """机器入口完整性：第一跳面齐全 + 选入口表覆盖七类任务（纯函数，便于变异）。"""
+    issues = []
+    for rel in REQUIRED_ENTRIES:
+        if rel not in text:
+            issues.append("机器入口清单缺件：" + rel)
+    rows = routing_rows(text)
+    if len(rows) < 7:
+        issues.append(f"按任务选入口少于 7 行（实测 {len(rows)} 行）")
+    for goal in ROUTING_GOALS:
+        if goal not in text:
+            issues.append("选入口缺任务类：" + goal)
+    return issues
+
+
 def llms_issues(text: str, root: Path = ROOT, verify_text: str = None) -> list:
     return (url_issues(text, root) + path_issues(text, root)
             + citation_issues(text, verify_text) + live_count_issues(text)
@@ -223,6 +274,18 @@ class LlmsContractTest(unittest.TestCase):
                  + STATS_END + "\n- 正常正文\n")
         self.assertEqual([], live_count_issues(stats))
         self.assertTrue(any("H1" in i for i in shape_issues("# 别的标题\n")))
+        no_entry = self.text.replace("docs/nfal.md", "docs/nfal-gone.md")
+        self.assertTrue(any("缺件" in i for i in routing_issues(no_entry)))
+        no_table = self.text.replace("## 按任务选入口（最短路径）", "## 其他", 1)
+        self.assertTrue(any("少于 7 行" in i for i in routing_issues(no_table)))
+
+    def test_entry_coverage_complete(self):
+        self.assertEqual([], routing_issues(self.text), "机器入口不完整")
+
+    def test_task_router_table(self):
+        self.assertGreaterEqual(len(routing_rows(self.text)), 7, "选入口表行数不足")
+        self.assertIn("## 按任务选入口（最短路径）", self.text)
+
 
 
 if __name__ == "__main__":

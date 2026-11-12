@@ -24,9 +24,11 @@ subjects:
   - docs/text-hygiene.md:36edf35f60bc669192443a8c16a4bcdc7c22408270fff5ea15308a16a756f986
   - docs/endpoint.md:eb3956a35b7df0eec0e79bd4d76070b5616cd3191f454b428fc66ea88f1448d0
   - docs/mcp.md:c4fa52d36097253e197304e6bf6e0512bc2708077fb8ef34865653fc764caa78
-  - llms.txt:c3ac70c0c70310c37c07c79195339503f768c4900c71dca0252fa0813126f34d
+  - llms.txt:edb84bfad0f724673bdee4aa2eea0f0c4a6bd7ea10db9476af860cf4b72198ff
 
 ---
+> 重审（2026-11-12）：llms.txt 机器入口清单顶尖化（按任务选入口七行 / 入口面覆盖 34 件 / 补 WORLD_MODEL·LAYERS·NFA-L·域包协议 / 事实描述同源 / fail-closed）+ 契约判据补入口覆盖；check12 权重增量实测。本轮为机械重绑。
+
 > 重审（2026-11-11）：L3 收官：llms.txt 卡册生成器死指针 + conformance 计数漂移修复 + 机器入口契约判据
 
 > 重审（2026-11-09）：方法包声明可跑入口 runnable，清单与文档共用（含入口存在性判据）
