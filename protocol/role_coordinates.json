@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1158
+    "verify": 1159
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8147,6 +8147,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/42_M5_设计自查清单契约：六问必须「口径不变 + 每问有判据映射 + 证据命令可跑」。",
+      "path": "desktop/tests/test_design_checklist_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "",
       "path": "desktop/tests/test_dirty_tree.py",
       "role": "verify",
@@ -13332,7 +13338,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "af9bfd1bfa8215c60c9a221ac8308b27e2465b60e49c7198a2dbd2c79350d49f",
+  "root_digest": "431b4d3a7401a1e200040f22a9a83e989b1a2e207fec56dcdee8cd6a98b2a3ab",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13341,7 +13347,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1032,
+    "R-verify": 1033,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
