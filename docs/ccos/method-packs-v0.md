@@ -1,6 +1,7 @@
 # 领域方法包 v0（十一个域）
 
-状态：**11 个域 / 65 个专家动作 / 31 个证据类目**（截至 2026-11-09，以 `protocol/method_packs/index.json` 为唯一真源）。
+状态：**11 个域 / 65 个专家动作 / 31 个证据类目**（2026-11-13 复核，以 `protocol/method_packs/index.json` 为唯一真源）。
+> **最后更新：2026-11-13（复核）**：清单规模与深度口径**逐项复核一致**——11 域（index 11 条）、65 动作（各包 `expert_moves` 合计）、31 类目（`evidence_standards` 的 `claim_kind` 去重）；**`judges` 映射恰 31 条（每类目一条，11/11 域全覆盖）**；判据 `test_pack_depth` **4 项**、`test_method_pack` **37 项**；CLI `nf cognition --packs-list` / `--pack-checklist` / `nf cog claim --pack` 均在册。见「§现状对照」。
 
 ## 它是什么
 
@@ -55,6 +56,32 @@
 - **词表单一**：所有 `claim_kind` 必须来自 `protocol/criteria/registry.json` 的 `claim_kinds`，
   新增词先登记，否则判据红（新域不会静默绕过）。
 - **包不等于判据**：包说明「该做什么」，判据说明「做了没有」。两者缺一，方法就会退化成口号。
+
+## 现状对照（2026-11-13 · 以实跑为准）
+
+| 面 | 本文声明 | 复核结果（读到本行时请重跑） |
+|---|---|---|
+| 域数 | 11 | **index.packs = 11** |
+| 动作数 | 65 | **各包 `expert_moves` 合计 = 65**（每包 5–7） |
+| 证据类目 | 31 | **`evidence_standards` 词表去重 = 31** |
+| 类目→判据 | 31/31 有判据面 | **`judges` 合计恰 31 条**（每类目一条，无缺无多） |
+| 规模下限 | 每域 ≥5 动作 / ≥2 类目 / ≥3 失败 / ≥1 入口 | **不变**（同判据锁死） |
+| 常驻判据 | 「4 项，含三种坏件变异」 | **`test_pack_depth` 4 项**；另有 `test_method_pack` **37 项** |
+| CLI 用法 | 四种用法 | **均在册**：`--packs-list` / `--pack-checklist` / `nf cog claim --pack` / 入口真跑 |
+| 词表真源 | `protocol/criteria/registry.json` | **不变**（新增 `claim_kind` 先登记） |
+
+> 本表只作「当时 → 现行」导航，不替代实跑。
+
+## 复现与引用口径
+
+```bash
+nf cognition --packs-list                       # 11 域 + 摘要
+nf cognition --pack-checklist handoff           # 单域展开（动作 + 证据要求 + 可跑入口）
+python -m pytest desktop/tests/test_pack_depth.py desktop/tests/test_method_pack.py -q  # 4 + 37 项
+```
+
+- 引用本文时：「包说明该做什么、判据说明做了没有」= 长期口径；数字以 index 与各包实读为准。
+- 深度判据：每个 `claim_kind` 必须指向真实存在的判据模块；新增类目须同时给 `judges`，否则判据红。
 
 ## 边界
 
