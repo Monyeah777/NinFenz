@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1188
+    "verify": 1189
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9875,6 +9875,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/ccos/release-conclusion.md 契约：发布结论文档必须「五步/快照语义/预算与分工数字活绑定」。",
+      "path": "desktop/tests/test_release_conclusion_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "发布编排（core/release_gate.py）回归：机读策略过 schema + 计划有序 + 计划快照 + 变异自证。",
       "path": "desktop/tests/test_release_gate.py",
       "role": "verify",
@@ -13512,7 +13518,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "6bd6024e322b658e9d8b3e73271b3731ba10d8490ef7c441649e62682d231f17",
+  "root_digest": "8ea4afc165b1ddffcdd92ac0d1b29db8f6d2a2822de01da0fdf5aceb11a42016",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13521,7 +13527,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1062,
+    "R-verify": 1063,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
