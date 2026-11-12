@@ -290,6 +290,7 @@
     "test_llms_full_contract": 3.0,
     "test_llms_install_contract": 3.0,
     "test_load_state": 0.1,
+    "test_local_api_doc_contract": 0.3,
     "test_locales": 0.2,
     "test_lsp": 2.9,
     "test_lsp_guard": 0.2,
@@ -3113,6 +3114,9 @@
     "test_llms_install_contract.LlmsInstallContractTest.test_numeric_claims_match_runtime": 0.0,
     "test_llms_install_contract.LlmsInstallContractTest.test_probe_frames_are_executable": 0.0,
     "test_load_state.Test.test_only_stale_blocks": 0.0,
+    "test_local_api_doc_contract.LocalApiDocTest.test_api_facts_live": 0.0,
+    "test_local_api_doc_contract.LocalApiDocTest.test_contract_catches_mutations": 0.02,
+    "test_local_api_doc_contract.LocalApiDocTest.test_local_api_matches_contract": 0.0,
     "test_locales.DocTreeTest.test_non_mirrored_path_is_caught": 0.01,
     "test_locales.DocTreeTest.test_stale_translation_is_caught": 0.01,
     "test_locales.DocTreeTest.test_stamp_signs_and_clears": 0.01,
@@ -5363,5 +5367,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1881.5
+  "total_s": 1881.8
 }
