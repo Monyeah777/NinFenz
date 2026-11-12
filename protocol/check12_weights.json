@@ -274,6 +274,7 @@
     "test_lsp_hardening": 0.2,
     "test_lsp_transcript": 0.7,
     "test_m2_round_header_contract": 0.3,
+    "test_m3_purity_contract": 0.2,
     "test_m4_census_contract": 0.2,
     "test_maintainers_contract": 0.1,
     "test_market_analyzer": 0.6,
@@ -3110,6 +3111,9 @@
     "test_m2_round_header_contract.M2RoundHeaderContractTest.test_laws_source_matches_doc": 0.0,
     "test_m2_round_header_contract.M2RoundHeaderContractTest.test_m2_matches_contract": 0.0,
     "test_m2_round_header_contract.M2RoundHeaderContractTest.test_unittest_entrypoint_runs": 0.14,
+    "test_m3_purity_contract.M3PurityContractTest.test_contract_catches_mutations": 0.01,
+    "test_m3_purity_contract.M3PurityContractTest.test_m3_matches_contract": 0.0,
+    "test_m3_purity_contract.M3PurityContractTest.test_rules_and_carriers_live": 0.0,
     "test_m4_census_contract.M4CensusContractTest.test_contract_catches_mutations": 0.0,
     "test_m4_census_contract.M4CensusContractTest.test_list_sizes_are_live": 0.0,
     "test_m4_census_contract.M4CensusContractTest.test_m4_matches_contract": 0.0,
@@ -5243,5 +5247,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1866.4
+  "total_s": 1866.6
 }
