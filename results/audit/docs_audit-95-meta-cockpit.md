@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:8294aab40577ab9b4c913550f95348a56bc03eed013181b8bdc89f224013b91a
+  - protocol/check12_weights.json:883000ac091e17a1f95d6d1b146da9eb077960189ceee17197e42402b0db8988
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-12）：llms-full 完整单文件顶尖化（12 工具面补全 / WARN 期望修正 / fail-closed 边界 / 安装说明书指针 / Node engines 与 npm 真源对齐）+ 契约判据 test_llms_full_contract；check12 权重增量实测。本轮为机械重绑。
+
 > 重审（2026-11-12）：llms-install 安装面顶尖化（三条安装路线 / MCP 能力面与 mcp_package 同源 / 双时代协议常量同源 / 运行数字与 repo_stats+实时 doctor 对账 / 探针四帧修正 / fail-closed）+ 契约判据 test_llms_install_contract；check12 权重增量实测。本轮为机械重绑。
 
 > 重审（2026-11-12）：llms.txt 机器入口清单顶尖化（按任务选入口七行 / 入口面覆盖 34 件 / 补 WORLD_MODEL·LAYERS·NFA-L·域包协议 / 事实描述同源 / fail-closed）+ 契约判据补入口覆盖；check12 权重增量实测。本轮为机械重绑。

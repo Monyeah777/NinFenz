@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1099
+    "verify": 1100
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8807,6 +8807,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "llms-full 完整单文件契约：一站读全的内容必须「同源、同步、可判」。",
+      "path": "desktop/tests/test_llms_full_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "llms-install 安装面契约：装好这件事必须「可判、同源、失败即停」。",
       "path": "desktop/tests/test_llms_install_contract.py",
       "role": "verify",
@@ -12978,7 +12984,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "3b077fadeef48ddb3ab51029f365d3fe411b5536495c2e437f14af6022caf26b",
+  "root_digest": "3b09cef5a1ee2dc805f9ddee7b0c1665535ffb04343ce57b150fafcf5fa85213",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12987,7 +12993,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 973,
+    "R-verify": 974,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
