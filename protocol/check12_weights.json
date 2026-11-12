@@ -55,6 +55,7 @@
     "test_audit": 0.3,
     "test_audit_rebind": 0.2,
     "test_autofix": 0.2,
+    "test_bench_doc_contract": 0.2,
     "test_bilingual_entry": 0.2,
     "test_boundaries": 0.2,
     "test_bridge_real": 2.6,
@@ -972,6 +973,9 @@
     "test_autofix.TestAutofix.test_fix_file_applies_and_then_clean": 0.01,
     "test_autofix.TestAutofix.test_fix_file_dry_run_does_not_write": 0.0,
     "test_autofix.TestAutofix.test_lint_rules_detects_missing_final_newline": 0.0,
+    "test_bench_doc_contract.BenchDocContractTest.test_bench_matches_contract": 0.0,
+    "test_bench_doc_contract.BenchDocContractTest.test_contract_catches_mutations": 0.02,
+    "test_bench_doc_contract.BenchDocContractTest.test_weights_cases_flags_live": 0.0,
     "test_bilingual_entry.BilingualEntryTest.test_both_entries_carry_version": 0.0,
     "test_bilingual_entry.BilingualEntryTest.test_both_entries_exist": 0.0,
     "test_bilingual_entry.BilingualEntryTest.test_english_entry_covers_chinese_doc_references": 0.0,
@@ -5319,5 +5323,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1878.5
+  "total_s": 1878.7
 }
