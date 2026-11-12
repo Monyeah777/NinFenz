@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:aec97d5618ab7302605bba4213842559040d8fd2554d8781ddd0c00435a8d96b
+  - protocol/check12_weights.json:9de590f00a84f1d0774d4c84bed520ebecbf0fc9f7fa41a61c60eb9d2f05b36a
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-13）：45 执行遥测规范顶尖化（phase 四值含 build / 字段按 phase 子集 / records 形态 / semconv 载体与 E3 待办 / 复现口径）+ 契约判据 test_telemetry_doc_contract；权重增量重测。本轮为机械重绑。
+
 > 重审（2026-11-13）：45 M3 载荷提案顶尖化（registry 443/438 现状活绑定 / 开放项如实 untyped 待办 / 复现口径）+ 契约判据 test_payload_proposal_contract；权重增量重测。本轮为机械重绑。
 
 > 重审（2026-11-13）：45 M2 回合级 drill 规范顶尖化（样本 5→6 含 selfrun / 测试 6 例 / --check-trace 回读口径 / 复现命令）+ 契约判据 test_round_drill_doc_contract；权重增量重测。本轮为机械重绑。
