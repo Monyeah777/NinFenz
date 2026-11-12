@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1181
+    "verify": 1182
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8849,6 +8849,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/ccos/judge-families.md 契约：判据族谱必须「8 族齐 + 族证据真实存在 + 探针数字活绑定」。",
+      "path": "desktop/tests/test_judge_families_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "门禁变异探针判据：杀死率/误报率可算、两条判据各自有变异体、口径自洽。",
       "path": "desktop/tests/test_judge_mutation_probe.py",
       "role": "verify",
@@ -13470,7 +13476,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "e880d13a141bcb5c656def2b402ad5b92104a3593f7f2f84b998446e0816f010",
+  "root_digest": "ab8f5b4a8620cae4d3c6125f05aea0461bd7b044bf8f05e3db45636bcc07dd3f",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13479,7 +13485,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1055,
+    "R-verify": 1056,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

@@ -1005,6 +1005,10 @@
       "source": "negative_case"
     },
     {
+      "module": "test_judge_families_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_judge_mutation_probe.py",
       "source": "negative_case"
     },
@@ -2133,10 +2137,10 @@
       "source": "negative_assertion"
     }
   ],
-  "modules": 533,
+  "modules": 534,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
   "suspect": 161,
-  "with_evidence": 231,
+  "with_evidence": 232,
   "without_evidence": 141
 }

@@ -74,9 +74,9 @@ def judge_issues(text: str) -> list:
     ratio = reg["without_evidence"] / reg["modules"]
     if ratio > RATIO_LIMIT:
         issues.append(f"无硬证据比例越线：{ratio:.3f} > {RATIO_LIMIT}")
-    if "0.2645" not in text:
-        issues.append("未写实测比例 0.2645")
-    for label in ("533", "231", "161", "141"):
+    if "0.264" not in text:
+        issues.append("未写实测比例 0.264")
+    for label in ("534", "232", "161", "141"):
         if label not in text:
             issues.append(f"现状数字缺要素：{label}")
     fresh = jr.render(jr.collect(ROOT)) == jr.render(reg)
@@ -110,8 +110,8 @@ class JudgeDesignQuestionsDocTest(unittest.TestCase):
 
     def test_registry_live(self):
         reg = registry()
-        self.assertEqual(533, reg["modules"])
-        self.assertEqual(231, reg["with_evidence"])
+        self.assertEqual(534, reg["modules"])
+        self.assertEqual(232, reg["with_evidence"])
         self.assertEqual(161, reg["suspect"])
         self.assertEqual(141, reg["without_evidence"])
         self.assertLessEqual(reg["without_evidence"] / reg["modules"], RATIO_LIMIT)
@@ -123,8 +123,8 @@ class JudgeDesignQuestionsDocTest(unittest.TestCase):
         self.assertTrue(any("十一" in i for i in judge_issues(no_q)))
         no_ratio = self.text.replace("0.36", "0.40")
         self.assertTrue(any("0.36" in i for i in judge_issues(no_ratio)))
-        old_n = self.text.replace("533", "500")
-        self.assertTrue(any("533" in i for i in judge_issues(old_n)))
+        old_n = self.text.replace("534", "500")
+        self.assertTrue(any("534" in i for i in judge_issues(old_n)))
         no_script = self.text.replace("gate_probe.py", "某探针")
         self.assertTrue(any("gate_probe.py" in i for i in judge_issues(no_script)))
         no_cmd = self.text.replace("python scripts/judge_red_evidence.py --check", "跑检查")
