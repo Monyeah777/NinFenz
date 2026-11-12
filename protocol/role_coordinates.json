@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1135
+    "verify": 1136
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8831,6 +8831,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "library/NF-1 契约：馆藏条目必须「frontmatter 十字段合法 + 投影一致 + 回执新鲜 + 诚实缺口声明」。",
+      "path": "desktop/tests/test_library_nf1_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "许可链契约判据：LICENSE 是唯一真源，其余四处只允许指向它（2026-11-11）。",
       "path": "desktop/tests/test_license_chain.py",
       "role": "verify",
@@ -13194,7 +13200,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "e83e210f6354ca09a14a2a58441c124980754e412ce6692f3dd74f21d2da3236",
+  "root_digest": "7b69fc29914d3cc1c569021f7e969eedbd3f7dec213d1a9ba4246cac31ac199b",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13203,7 +13209,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1009,
+    "R-verify": 1010,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
