@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1115
+    "verify": 1116
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9005,6 +9005,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "M22 事件编排模块契约：outputs == payload == narrative_event 全集，且订阅面全部在册。",
+      "path": "desktop/tests/test_module_m22_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "编号命名空间 + 管线 id 避让判据（01 §1.6.11）——直接执行 verify.sh check14 的内嵌程序。",
       "path": "desktop/tests/test_module_namespace.py",
       "role": "verify",
@@ -13074,7 +13080,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "8b0fd1f5c1b7a4c28593988433c31abf9d028c089c236c27f0567e6fd4a0df5a",
+  "root_digest": "8b755414fca2726c2eb09a132937161126f8c250c6bd75384831d49b757605de",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13083,7 +13089,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 989,
+    "R-verify": 990,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

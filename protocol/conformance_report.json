@@ -58,8 +58,8 @@
     },
     {
       "description": "I/O 类型面（可证不匹配）",
-      "detail": "可证不匹配 0 · 类型覆盖 26.9%（305/1134 字段）",
-      "digest": "ea1e1f222095fe8c4a22010b50afad193eef86d252a0e008ad4ade70474b5a89",
+      "detail": "可证不匹配 0 · 类型覆盖 26.9%（306/1138 字段）",
+      "digest": "68ad74df49aacd57014fb983dde14ba8e7a602230bd8817489a8792af7c6df5a",
       "id": "io-types",
       "ok": true
     },
@@ -191,7 +191,7 @@
     }
   ],
   "passed": 27,
-  "root": "679faca1c1ab7d9cd22f64956c3ea5119a1990c1fe8ce73977f076f3238de04c",
+  "root": "63d782dc55e0ffa306627f09e6fc135c89918bfa1e385155c2f4e635e61fca14",
   "schema": "nf-conformance/1",
   "total": 27,
   "verdict": "conformant"
