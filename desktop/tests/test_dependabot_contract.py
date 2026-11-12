@@ -158,6 +158,7 @@ class DependabotContractTest(unittest.TestCase):
     def test_all_pinned_surfaces_are_covered(self):
         """仓库里真实存在的版本固定面（actions/pip/npm/cargo/docker）必须全覆盖。"""
         want = set(expected_surfaces())
+        self.assertGreaterEqual(len(want), 4, "版本固定面塌缩（判据会空转）")
         got = {(str(u.get("package-ecosystem")), str(u.get("directory")))
                for u in (self.doc.get("updates") or [])}
         self.assertEqual(set(), want - got, f"缺跟进面：{sorted(want - got)}")
