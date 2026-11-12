@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1112
+    "verify": 1113
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8987,6 +8987,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "M12 模板检索库模块契约：零事件模块必须以 interfaces 补全联动面，且四源同源。",
+      "path": "desktop/tests/test_module_m12_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "编号命名空间 + 管线 id 避让判据（01 §1.6.11）——直接执行 verify.sh check14 的内嵌程序。",
       "path": "desktop/tests/test_module_namespace.py",
       "role": "verify",
@@ -13056,7 +13062,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "c1d4cf5b1eba8e739023e76f5b2e796256dc8d582dac2e9bbd9eb3ade3f80f32",
+  "root_digest": "3169feee4333f66834864407d8626c21b1c80e0f1a5a6cdcbced8f3c1c51483d",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13065,7 +13071,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 986,
+    "R-verify": 987,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
