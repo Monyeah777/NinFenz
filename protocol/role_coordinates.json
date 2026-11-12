@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1121
+    "verify": 1122
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9035,6 +9035,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "M50 调度器模块契约：全局调度器（layer=调度器/mounts 空）+ world_model 槽面必须全在册。",
+      "path": "desktop/tests/test_module_m50_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "M90 结构装配模块契约：机读块 ⇄ §2 Module 声明 ⇄ registry/02 ⇄ P90 管线 四源同源。",
       "path": "desktop/tests/test_module_m90_contract.py",
       "role": "verify",
@@ -13110,7 +13116,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "240b60f8187b9e48fa22710971625c8600598a8d0d11c684d1702fb814ae044d",
+  "root_digest": "e3d393d7e4e79af11648ce232a9a77305e92ac549e3fe7e55252fa586315cc3f",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13119,7 +13125,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 995,
+    "R-verify": 996,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
