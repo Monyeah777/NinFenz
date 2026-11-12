@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1164
+    "verify": 1165
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9035,6 +9035,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/45_质量纵深收口总档契约：总档必须「结构/挂账口径不变 + 五维数字现状 + 版本口径 + 复现」。",
+      "path": "desktop/tests/test_master_closure_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "MCP server 定义导出单测（v2.1.0 A2：techdoc IR → MCP 资源型 server 定义）。",
       "path": "desktop/tests/test_mcp_adapter.py",
       "role": "verify",
@@ -13368,7 +13374,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "73fee68dcb191e89f10f3095e5af499f8e96b9c67f1e5e53afc77baa49292a0d",
+  "root_digest": "bfde86eb35ba06b1aa705f2fd4dc21620da2f7f2444ac9b56f488c23ffc86af7",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13377,7 +13383,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1038,
+    "R-verify": 1039,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
