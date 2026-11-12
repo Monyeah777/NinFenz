@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1100
+    "verify": 1101
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9377,6 +9377,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "README 入口契约：canonical 人读入口必须「结构稳、事实同源、照做能跑通」。",
+      "path": "desktop/tests/test_readme_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "正则失控回溯（ReDoS）回归 —— 2026-10-10 全仓审计 Y3。",
       "path": "desktop/tests/test_redos_patterns.py",
       "role": "verify",
@@ -12984,7 +12990,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "3b09cef5a1ee2dc805f9ddee7b0c1665535ffb04343ce57b150fafcf5fa85213",
+  "root_digest": "f8b59748a685385414fdb3831a3b82e83007ccb5a81e0f0a908f3f073cd2b963",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12993,7 +12999,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 974,
+    "R-verify": 975,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
