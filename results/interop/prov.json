@@ -126,7 +126,7 @@
     {
       "@id": "nf:file/library/INDEX.md",
       "@type": "prov:Entity",
-      "nf:sha256": "ac0bcadbfd9019931e8e8a2f2739dd6603c73fe5b32950b8c80a2eb007c5761b"
+      "nf:sha256": "040f26673966549783290e6e2a3dd201cc15a7370176e3293321c38517155d3e"
     },
     {
       "@id": "nf:file/llms.txt",
@@ -311,7 +311,7 @@
     {
       "@id": "nf:file/protocol/role_coordinates.json",
       "@type": "prov:Entity",
-      "nf:sha256": "1611fa92921e3995eddc59bd67dad637e1d360c00b01e5f0080c4ac9614c7526"
+      "nf:sha256": "0f4bd74c60d24ed9efff07e57ed781e37393e6af6e68fd3213ccbe9ff1763a84"
     },
     {
       "@id": "nf:file/protocol/sast_baseline.json",
