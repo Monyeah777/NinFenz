@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1095
+    "verify": 1096
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7373,6 +7373,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "AI_ROUTING 路由契约：入口第二跳必须「档位可自测、通道有落点、override 同源、失败即停」。",
+      "path": "desktop/tests/test_ai_routing_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "",
       "path": "desktop/tests/test_allowlist_expiry.py",
       "role": "verify",
@@ -12954,7 +12960,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "c269915330acc6aaa327524576d7f0a362d76a9db0e784bb02a03b8f21c8a6b3",
+  "root_digest": "8579fcaf5340a0aa4be8006c010ff345e0f2bc48f33e860933b965b2abbbe2ec",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -12963,7 +12969,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 969,
+    "R-verify": 970,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
