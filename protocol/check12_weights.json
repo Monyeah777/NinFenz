@@ -31,6 +31,7 @@
     "test_assembly_pack_contract": 0.2,
     "test_assembly_reference_contract": 0.2,
     "test_assertions": 0.8,
+    "test_assertions_doc_contract": 0.2,
     "test_asset_contract": 3.3,
     "test_asset_contract_cache": 0.4,
     "test_asset_contract_faces": 0.2,
@@ -722,6 +723,9 @@
     "test_assertions.TestCapabilityFace.test_real_repo_capabilities_cover_every_check": 0.0,
     "test_assertions.TestCapabilityFace.test_table_without_capability_face_stays_backward_compatible": 0.0,
     "test_assertions.TestCapabilityFace.test_uncovered_check_is_a_hole": 0.0,
+    "test_assertions_doc_contract.AssertionsDocContractTest.test_assertions_matches_contract": 0.0,
+    "test_assertions_doc_contract.AssertionsDocContractTest.test_contract_catches_mutations": 0.02,
+    "test_assertions_doc_contract.AssertionsDocContractTest.test_data_and_runner_live": 0.0,
     "test_asset_contract.CodeFaceTest.test_branch_reassign_no_false_positive": 0.01,
     "test_asset_contract.CodeFaceTest.test_default_arg_none_detected": 0.0,
     "test_asset_contract.CodeFaceTest.test_deny_call": 0.0,
@@ -5307,5 +5311,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1870.2
+  "total_s": 1870.4
 }
