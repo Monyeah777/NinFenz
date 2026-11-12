@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1185
+    "verify": 1186
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9239,6 +9239,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/ccos/method-packs-v0.md 契约：11 域/65 动作/31 类目 + judges 全覆盖 + CLI 用法活绑定。",
+      "path": "desktop/tests/test_method_packs_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "",
       "path": "desktop/tests/test_missing_sentinel.py",
       "role": "verify",
@@ -13494,7 +13500,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "5bb4c54fd51bb8f2c912103c3fd1df0b6fc7bc6bcb66069107b14949b3fc8589",
+  "root_digest": "ae0595428b6f161128693fe508aaa93c0f8dabd9dc6cec768d56a78ecd1475df",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13503,7 +13509,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1059,
+    "R-verify": 1060,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
