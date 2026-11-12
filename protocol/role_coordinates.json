@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1173
+    "verify": 1174
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7667,6 +7667,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/bench.md 契约：执行结果跑分台文档必须「五维权重/用例/旗标与实现一致 + 端壳边界 + 复现」。",
+      "path": "desktop/tests/test_bench_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "双语入口（README.md / README.en.md）机读事实一致性测试。",
       "path": "desktop/tests/test_bilingual_entry.py",
       "role": "verify",
@@ -13422,7 +13428,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "d840421a7572394881d306b8196b468c1cffe7dd4999dd95773cbedb92f5e556",
+  "root_digest": "ba7ae22ae6a123808cfbc7842cc129dc646ebb5dd61a04a70c40a21a9626fadd",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13431,7 +13437,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1047,
+    "R-verify": 1048,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
