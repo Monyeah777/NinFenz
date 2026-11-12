@@ -152,6 +152,7 @@
     "test_evidence_graph": 0.1,
     "test_evidence_vectors": 3.8,
     "test_execution_drill": 0.2,
+    "test_execution_protocol_contract": 0.3,
     "test_explain_coverage": 0.2,
     "test_export_manifest_gates": 0.2,
     "test_export_schema": 0.2,
@@ -2009,6 +2010,10 @@
     "test_execution_drill.RealCorpusRegressionTest.test_path_token_keeps_no_citation_guard": 0.0,
     "test_execution_drill.ReverseCheckTest.test_p03_known_false_positive_lines_are_gone": 0.0,
     "test_execution_drill.ReverseCheckTest.test_p03_real_corpus_has_no_false_positive": 0.0,
+    "test_execution_protocol_contract.ExecutionProtocolContractTest.test_contract_catches_mutations": 0.02,
+    "test_execution_protocol_contract.ExecutionProtocolContractTest.test_cross_doc_tokens_are_same_source": 0.0,
+    "test_execution_protocol_contract.ExecutionProtocolContractTest.test_execution_protocol_matches_contract": 0.0,
+    "test_execution_protocol_contract.ExecutionProtocolContractTest.test_sections_and_checks_resolve": 0.0,
     "test_explain_coverage.ExplainCoverageTest.test_every_check_has_guidance": 0.02,
     "test_explain_coverage.ExplainCoverageTest.test_fail_path_points_to_explain": 0.0,
     "test_explain_coverage.ExplainCoverageTest.test_guide_table_has_no_extra_numbers": 0.0,
@@ -5010,5 +5015,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1855.1
+  "total_s": 1855.4
 }
