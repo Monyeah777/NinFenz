@@ -22,10 +22,12 @@ subjects:
   - integrations/site/strings.json:4d19bc7e32eb8bb9f7d368261c8bf464c02837ff828cbce364da4da229c4e59c
   - integrations/lsp/integration.json:2a0a752a3138db7bfd0d7c1c912c375f98e1eaf3fe783744ecb61a4d28e2a41e
   - integrations/lsp/strings.json:880d4cfd99a9c5ffe7c342af52f312f108d8c2e3455119dc538b77743fcb194b
-  - skills/ninfenz/SKILL.md:5ef5858a08e6fd76a7cdee201938e0140e05257a7759a3ab27c05f9339109197
+  - skills/ninfenz/SKILL.md:2f90bbd4140f48232849deb4db8fd56f5264c600baa6e1102f8df590284e478f
   - skills/ninfenz/references/commands.md:b62d73dfef22553dfc05c371e6725670b29201ae973e30fc7edca2bc3261b0bd
 
 ---
+> 重审（2026-11-12）：SKILL.md 顶尖化（契约数 16→27 修正 / 常见失败模式 / 维护者校验段）+ 契约判据 test_skill_md_contract；权重增量重测。本轮为机械重绑。
+
 > 重审（2026-11-09）：方法包声明可跑入口 runnable，清单与文档共用（含入口存在性判据）
 
 > 重审（2026-11-09）：证人核对接入生产路径：session.step(root=) + CLI 传 ROOT
