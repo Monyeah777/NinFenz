@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1174
+    "verify": 1175
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7769,6 +7769,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/ccos/abi-v0.md 契约：CCOS ABI 文档必须「7 调用形状/状态与登记面一致 + 数字活绑定」。",
+      "path": "desktop/tests/test_ccos_abi_v0_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "CCOS 一条链复现单测（cc_check → [cc_label] → cc_attest → cc_verify → cc_replay）。",
       "path": "desktop/tests/test_ccos_chain.py",
       "role": "verify",
@@ -13428,7 +13434,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "ba7ae22ae6a123808cfbc7842cc129dc646ebb5dd61a04a70c40a21a9626fadd",
+  "root_digest": "a72c54e3c18f976909fd522b279dde45909aceb7399d8de18b7a0edad96597e7",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13437,7 +13443,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1048,
+    "R-verify": 1049,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
