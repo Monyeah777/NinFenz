@@ -392,6 +392,7 @@
     "test_registry_sync": 0.2,
     "test_regression_score": 12.8,
     "test_related_of": 0.2,
+    "test_release_checklist_contract": 0.2,
     "test_release_conclusion": 41.3,
     "test_release_gate": 0.5,
     "test_release_gate_workflow_contract": 0.2,
@@ -4215,6 +4216,9 @@
     "test_related_of.RelatedOfTest.test_module_owners": 0.0,
     "test_related_of.RelatedOfTest.test_package_see_also_refs": 0.0,
     "test_related_of.RelatedOfTest.test_unknown_target": 0.0,
+    "test_release_checklist_contract.ReleaseChecklistContractTest.test_checklist_matches_contract": 0.0,
+    "test_release_checklist_contract.ReleaseChecklistContractTest.test_contract_catches_mutations": 0.01,
+    "test_release_checklist_contract.ReleaseChecklistContractTest.test_paths_and_cli_live": 0.0,
     "test_release_conclusion.TestBashIdentity.test_empty_probe_is_rejected": 0.02,
     "test_release_conclusion.TestBashIdentity.test_git_bash_flavours_pass": 0.0,
     "test_release_conclusion.TestBashIdentity.test_wsl_is_rejected_with_guidance": 0.0,
@@ -5251,5 +5255,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1867.1
+  "total_s": 1867.3
 }
