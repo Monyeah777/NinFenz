@@ -283,7 +283,7 @@
       "source": "receipts.verify_wrapped",
       "stats": {
         "entries": 3,
-        "root": "7e7dd27125466daccf988a580a99a0882705e117cebacae783a400183c95f145"
+        "root": "73daba40b3c8974a219f965517efca7e4a0c41122fc7114aded27fce151c3737"
       },
       "status": "pass",
       "warns": 0
@@ -524,8 +524,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4302,
-        "kernel": 2198,
+        "files": 4303,
+        "kernel": 2199,
         "kernel_no_self": 308,
         "rules": 9,
         "uncovered": 0,
@@ -536,7 +536,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "e7b0a2f5eb04544b73871a55b1e010f58ff3f5d2e37c0cc9b785fb938c318730",
+  "root_digest": "57d8deb62cecdfd6d4ddaa9b651ff19095a3786af19763e3af135968a6b4fee1",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

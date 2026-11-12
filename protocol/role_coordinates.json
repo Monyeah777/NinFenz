@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1136
+    "verify": 1137
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8837,6 +8837,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "library/NF-TECHDOC 契约：自包含装配样本必须「内嵌逐字一致 + 回执新鲜 + 投影一致 + 缺口头声明」。",
+      "path": "desktop/tests/test_library_techdoc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "许可链契约判据：LICENSE 是唯一真源，其余四处只允许指向它（2026-11-11）。",
       "path": "desktop/tests/test_license_chain.py",
       "role": "verify",
@@ -13200,7 +13206,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "7b69fc29914d3cc1c569021f7e969eedbd3f7dec213d1a9ba4246cac31ac199b",
+  "root_digest": "7a72d757423a19b93c932c550ccd9739c30511b1049ac22559607a0d8505f50f",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13209,7 +13215,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1010,
+    "R-verify": 1011,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
