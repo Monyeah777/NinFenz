@@ -149,6 +149,7 @@
     "test_domain_pack_render": 0.3,
     "test_dotnet_aot": 0.2,
     "test_dotnet_build_workflow_contract": 0.2,
+    "test_drill_doc_contract": 0.2,
     "test_drill_fidelity": 0.3,
     "test_e2e_desktop_workflow_contract": 0.2,
     "test_ed25519": 0.2,
@@ -1901,6 +1902,9 @@
     "test_dotnet_build_workflow_contract.DotnetBuildWorkflowContractTest.test_csprojs_exist": 0.0,
     "test_dotnet_build_workflow_contract.DotnetBuildWorkflowContractTest.test_out_of_tree_build": 0.0,
     "test_dotnet_build_workflow_contract.DotnetBuildWorkflowContractTest.test_workflow_matches_contract": 0.0,
+    "test_drill_doc_contract.DrillDocContractTest.test_contract_catches_mutations": 0.0,
+    "test_drill_doc_contract.DrillDocContractTest.test_drill_doc_matches_contract": 0.0,
+    "test_drill_doc_contract.DrillDocContractTest.test_fixture_and_mapping_are_live": 0.0,
     "test_drill_fidelity.MeasureTest.test_fidelity_is_ratio_of_passed_cases": 0.01,
     "test_drill_fidelity.MeasureTest.test_round_mismatch_is_detected": 0.01,
     "test_drill_fidelity.MeasureTest.test_round_verdict_mapping": 0.01,
@@ -5222,5 +5226,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1865.3
+  "total_s": 1865.5
 }
