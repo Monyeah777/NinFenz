@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1107
+    "verify": 1108
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9221,6 +9221,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "P00 管线骨架契约：元管线必须「声明可解析、九槽稳定、派生实例在场、机检可指」。",
+      "path": "desktop/tests/test_pipeline_p00_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "40 总纲 v2.8 波B S4 —— nf pipeline new 派生脚手架单测（纯 unittest，L2 core 零依赖）。",
       "path": "desktop/tests/test_pipeline_scaffold.py",
       "role": "verify",
@@ -13026,7 +13032,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "b8a7a3324d1161a748195e5ff6efdd67cde84b4932af00578c1be5b6d7b13520",
+  "root_digest": "16013f0c79bcb34a91e58e2dfbff391923f438d700f01035958336ea7f06e28c",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13035,7 +13041,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 981,
+    "R-verify": 982,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
