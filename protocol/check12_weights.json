@@ -249,6 +249,7 @@
     "test_library_index_contract": 0.2,
     "test_library_ingest_script_contract": 0.2,
     "test_library_ingest_workflow_contract": 0.2,
+    "test_library_nf1_contract": 0.2,
     "test_license_chain": 0.2,
     "test_license_gate": 0.5,
     "test_lint_workflow_contract": 0.2,
@@ -2911,6 +2912,10 @@
     "test_library_ingest_workflow_contract.LibraryIngestWorkflowContractTest.test_issue_body_is_not_passed_via_env": 0.0,
     "test_library_ingest_workflow_contract.LibraryIngestWorkflowContractTest.test_script_keeps_api_body_quota_and_allowlist": 0.0,
     "test_library_ingest_workflow_contract.LibraryIngestWorkflowContractTest.test_workflow_matches_contract": 0.0,
+    "test_library_nf1_contract.LibraryNf1ContractTest.test_attestation_is_fresh": 0.0,
+    "test_library_nf1_contract.LibraryNf1ContractTest.test_contract_catches_mutations": 0.01,
+    "test_library_nf1_contract.LibraryNf1ContractTest.test_frontmatter_and_projection_agree": 0.0,
+    "test_library_nf1_contract.LibraryNf1ContractTest.test_nf1_matches_contract": 0.0,
     "test_license_chain.LicenseChainContractTest.test_chain_is_single_sourced": 0.02,
     "test_license_chain.LicenseChainContractTest.test_contract_catches_chain_drift": 0.0,
     "test_license_chain.LicenseChainContractTest.test_entry_docs_claim_mit": 0.0,
@@ -5152,5 +5157,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1862.4
+  "total_s": 1862.6
 }
