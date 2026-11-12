@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-12",
   "approved_by": "Monyeah777",
-  "note": "M13 契约补全（outputs/payload 与 interaction_update 注册字段同集）后重签一致性报告",
+  "note": "M22 契约补全（outputs/payload 与 narrative_event 注册字段同集）后重签一致性报告",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "d1411fad2c63146085f29862a6edc3a01c2a5c4141d8a0fd96ffb2bde7e692c9"
+  "subject_digest": "308d6820a74091004757f37191d70ec05259c24ee7c45e26b22b46366db8232b"
 }
