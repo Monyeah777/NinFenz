@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1186
+    "verify": 1187
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9443,6 +9443,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/ccos/one-shot-audits.md 契约：文档表必须与孤儿棘轮冻结集合逐项一致（且脚本在场）。",
+      "path": "desktop/tests/test_one_shot_audits_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "scripts/orchestrate.py（编排面 CLI 入口）回归：目录 / 计划编译 / 机检 / 退出码。",
       "path": "desktop/tests/test_orchestrate_cli.py",
       "role": "verify",
@@ -13500,7 +13506,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "ae0595428b6f161128693fe508aaa93c0f8dabd9dc6cec768d56a78ecd1475df",
+  "root_digest": "dbf9a486af6703ee62174d0dfe78823bc1977ec98ffcc556a876d2d86fe1435b",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13509,7 +13515,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1060,
+    "R-verify": 1061,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

@@ -351,6 +351,7 @@
     "test_npm_publish_workflow_contract": 0.2,
     "test_numeric_grounding": 0.1,
     "test_official_core": 0.2,
+    "test_one_shot_audits_doc_contract": 0.5,
     "test_orchestrate_cli": 0.8,
     "test_orchestration": 0.4,
     "test_orphan_scan": 0.1,
@@ -3767,6 +3768,9 @@
     "test_official_core.OfficialCoreTest.test_single_source_matches_registry_truth": 0.0,
     "test_official_core.OfficialCoreTest.test_three_consumers_are_identical_and_include_m90": 0.0,
     "test_official_core.OfficialCoreTest.test_verify_sh_lists_match_single_source": 0.0,
+    "test_one_shot_audits_doc_contract.OneShotAuditsDocTest.test_audits_match_contract": 0.05,
+    "test_one_shot_audits_doc_contract.OneShotAuditsDocTest.test_contract_catches_mutations": 0.18,
+    "test_one_shot_audits_doc_contract.OneShotAuditsDocTest.test_doc_table_matches_frozen_list": 0.05,
     "test_orchestrate_cli.OrchestrateCliTest.test_bad_plan_exits_nonzero": 0.11,
     "test_orchestrate_cli.OrchestrateCliTest.test_catalog_is_valid_json_with_plan_guide": 0.11,
     "test_orchestrate_cli.OrchestrateCliTest.test_check_passes_on_real_repo": 0.12,
@@ -5371,5 +5375,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1882.0
+  "total_s": 1882.5
 }
