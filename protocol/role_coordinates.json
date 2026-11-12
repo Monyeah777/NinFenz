@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1165
+    "verify": 1166
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8375,6 +8375,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/EXPORT.md 契约：出口管制声明必须「署名声明与仓库密码学事实一致 + 机检面 + 复现口径」。",
+      "path": "desktop/tests/test_export_statement_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "导出层 exporter 单测（v2.0.0 T2：格式注册表 + CCV3 JSON/PNG 封装）。",
       "path": "desktop/tests/test_exporter.py",
       "role": "verify",
@@ -13374,7 +13380,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "bfde86eb35ba06b1aa705f2fd4dc21620da2f7f2444ac9b56f488c23ffc86af7",
+  "root_digest": "897b068bfc3b1d720a62c748bfaddab67b42d56110bf58ced7c82bf73abdbf23",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13383,7 +13389,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1039,
+    "R-verify": 1040,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
