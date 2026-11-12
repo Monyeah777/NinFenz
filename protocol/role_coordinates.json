@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1153
+    "verify": 1154
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8975,6 +8975,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/42_M2 契约：回合状态头 v1 规范必须与 round_header.LAWS / 06 §11 双源一致 + 硬断言现状 6 条。",
+      "path": "desktop/tests/test_m2_round_header_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "docs/42_M4 契约：历史普查必须「快照状态 + 清单规模现状 + 分类标准不变 + 复现口径」。",
       "path": "desktop/tests/test_m4_census_contract.py",
       "role": "verify",
@@ -13302,7 +13308,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "069cbde8ae6c6bb25fc7b62d5c18d7ce9a97c8a2ce544bb88c397244d57fabca",
+  "root_digest": "798bd9d0e5bb05e26068fab1c9e5d3838a39fc0b020596b300b0745c11b883f6",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13311,7 +13317,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1027,
+    "R-verify": 1028,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
