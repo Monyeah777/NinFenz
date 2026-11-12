@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1147
+    "verify": 1148
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -10259,6 +10259,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/41_波C_W3 契约：历史实测记录必须「快照状态 + C8/C9 接续指引 + 交付件在场 + 复现口径」。",
+      "path": "desktop/tests/test_w3_record_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "目录监听 + 守护响应缓存单测（毫秒级执行层的「**不重算**」判据）。",
       "path": "desktop/tests/test_watch.py",
       "role": "verify",
@@ -13266,7 +13272,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "5398ddf8acad3aa7e5be678df10e11b84820302403306cfe0252796358ed23d5",
+  "root_digest": "78d6498cf1b061d743297bc233246538ff9e43eb5f034ac768a50d97ff6480e7",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13275,7 +13281,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1021,
+    "R-verify": 1022,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
