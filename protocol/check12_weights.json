@@ -1,5 +1,5 @@
 {
-  "measured_at": "2026-11-12",
+  "measured_at": "2026-11-13",
   "modules": {
     "test_absence_guard": 0.2,
     "test_adr_0000_contract": 0.3,
@@ -94,6 +94,7 @@
     "test_cognition_control": 1.8,
     "test_cognition_plan": 1.0,
     "test_cognition_workspace": 2.3,
+    "test_commands_reference_contract": 0.2,
     "test_commit_msg": 0.1,
     "test_commit_title_guard": 0.1,
     "test_community_inventory": 1.7,
@@ -1398,6 +1399,10 @@
     "test_cognition_workspace.StateTest.test_closed_session_rejects_step": 0.0,
     "test_cognition_workspace.StateTest.test_new_state_validates_and_digest_stable": 0.0,
     "test_cognition_workspace.StateTest.test_step_changes_digest_and_counts": 0.0,
+    "test_commands_reference_contract.CommandsReferenceContractTest.test_all_commands_registered": 0.0,
+    "test_commands_reference_contract.CommandsReferenceContractTest.test_commands_reference_matches_contract": 0.0,
+    "test_commands_reference_contract.CommandsReferenceContractTest.test_conformance_count_is_live": 0.0,
+    "test_commands_reference_contract.CommandsReferenceContractTest.test_contract_catches_mutations": 0.02,
     "test_commit_msg.CommitMsgCheckTest.test_automation_commits_pass": 0.0,
     "test_commit_msg.CommitMsgCheckTest.test_bypass_forms_pass": 0.0,
     "test_commit_msg.CommitMsgCheckTest.test_invalid_forms_caught": 0.0,
@@ -5177,5 +5182,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1863.4
+  "total_s": 1863.6
 }

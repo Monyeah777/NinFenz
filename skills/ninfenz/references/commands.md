@@ -2,6 +2,9 @@
 
 统一入口：`python scripts/nf.py`。可用 `python scripts/nf.py help <cmd>` 查看任意子命令。
 
+> 本文命令面由技能判据守护（`test_doc_truth.TestSkillCommandFace`：skills/** 里当命令写的 nf 子命令必须在 CLI 注册表）；参数以 `--help` 实跑为准，示例里的路径/编号替换成你自己的。
+> 退出码：`0` 成功 / `1` 运行或校验失败 / `2` 用法错误——另有两条**语义化 exit 2**（非「用法错误」）：`assemble --check` 遇无法解析需求「未执行验收」、trace 回读缺 `--rounds`「未执行漂移断言」（见 `assembly.md`）。
+
 ## 装配与运行
 
 ```bash
@@ -77,8 +80,6 @@ python scripts/nf.py worldmodel --run --state state.json
 bash verify.sh
 ```
 
-## 补全
-
 ## 图书馆（library）
 
 ```bash
@@ -93,7 +94,9 @@ python scripts/nf.py library verify --ssh-allowed-signers allowed_signers --ssh-
 python scripts/nf_verify.py --entry NF-1 --ssh-allowed-signers allowed_signers   # 读者侧独立验证（纯标准库）
 python scripts/nf.py library receipts --write # 全馆 Merkle 根 + 逐条 inclusion proof
 python scripts/nf.py library receipts --entry NF-1   # 读者侧：只验一条
-python scripts/nf.py library deprecate NF-1 / restore NF-1 / supersede NF-1 NF-2
+python scripts/nf.py library deprecate NF-1   # 生命周期 → deprecated（不再推荐、仍可读）
+python scripts/nf.py library restore NF-1     # → active
+python scripts/nf.py library supersede NF-1 NF-2   # 旧 NF-1 被新 NF-2 取代（entry by 顺序）
 ```
 
 ## 抽象执行与治理
@@ -110,7 +113,7 @@ python scripts/nf.py module types --backlog  # 类型积压台账（--write 重�
 python scripts/nf.py events                  # 全仓事件背书（订阅必有发布方）
 python scripts/nf.py receipts --write        # 协议层回执单根（01–07/schema/baseline）
 python scripts/nf.py pipeline dryrun --all --write-advisory   # advisory 分类台账
-python scripts/nf.py conformance             # 16 契约 → Merkle 根 + verdict（--write 归档）
+python scripts/nf.py conformance             # 27 契约 → Merkle 根 + verdict（--write 归档；条数以实跑为准）
 python scripts/nf.py approve <路径> --by <人> --note "…"  # 内容绑定批准
 python scripts/nf.py approve --verify
 ```
@@ -157,4 +160,4 @@ python scripts/nf.py completion zsh >> ~/.zshrc
 python scripts/nf.py completion fish > ~/.config/fish/completions/nf.fish
 ```
 
-退出码约定：`0` 成功，`1` 运行/校验失败，`2` 用法错误。
+退出码约定：`0` 成功，`1` 运行/校验失败，`2` 用法错误；语义化 exit 2 两条见文首（`assemble --check` / `--check-trace`）。

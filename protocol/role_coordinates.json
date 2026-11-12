@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1140
+    "verify": 1141
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7901,6 +7901,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "skills/ninfenz/references/commands.md 契约：命令全在册 + 契约数不漂移 + 退出码语义对得上。",
+      "path": "desktop/tests/test_commands_reference_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "提交信息机检单测（CONTRIBUTING §1 判据化 · 含\"不打断自动化\"回归）。",
       "path": "desktop/tests/test_commit_msg.py",
       "role": "verify",
@@ -13224,7 +13230,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "21d6426f0cdd08c3fbfe23e61277765391a4f4097b87e7809a7def81e56ae47a",
+  "root_digest": "85bc92f441941da88699b7cfe6f4e7bb131976202efdc852f9b18570e7f47d50",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13233,7 +13239,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1014,
+    "R-verify": 1015,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

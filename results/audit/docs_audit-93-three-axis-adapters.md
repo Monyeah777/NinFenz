@@ -23,9 +23,11 @@ subjects:
   - integrations/lsp/integration.json:2a0a752a3138db7bfd0d7c1c912c375f98e1eaf3fe783744ecb61a4d28e2a41e
   - integrations/lsp/strings.json:880d4cfd99a9c5ffe7c342af52f312f108d8c2e3455119dc538b77743fcb194b
   - skills/ninfenz/SKILL.md:2f90bbd4140f48232849deb4db8fd56f5264c600baa6e1102f8df590284e478f
-  - skills/ninfenz/references/commands.md:b62d73dfef22553dfc05c371e6725670b29201ae973e30fc7edca2bc3261b0bd
+  - skills/ninfenz/references/commands.md:ac8a602f9854fc103b44ae79a5f7b1b4a7e36cf0a4b4075b7e8eb693dad76602
 
 ---
+> 重审（2026-11-13）：commands 参考顶尖化（契约数 16→27 / 去重空段 / library 生命周期分行 / exit2 口径）+ 契约判据 test_commands_reference_contract；权重增量重测。本轮为机械重绑。
+
 > 重审（2026-11-12）：SKILL.md 顶尖化（契约数 16→27 修正 / 常见失败模式 / 维护者校验段）+ 契约判据 test_skill_md_contract；权重增量重测。本轮为机械重绑。
 
 > 重审（2026-11-09）：方法包声明可跑入口 runnable，清单与文档共用（含入口存在性判据）
