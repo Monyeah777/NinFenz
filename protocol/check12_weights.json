@@ -29,6 +29,7 @@
     "test_asset_density": 3.5,
     "test_asset_ledger": 1.2,
     "test_asset_ledger_projection": 0.8,
+    "test_asset_library_readme_contract": 0.3,
     "test_asset_line_baseline": 0.3,
     "test_asset_provenance": 0.2,
     "test_ast_missing": 0.2,
@@ -748,6 +749,10 @@
     "test_asset_ledger.VerifyLedgerTest.test_orphan_header_is_issue": 0.01,
     "test_asset_ledger_projection.AssetLedgerProjectionTest.test_each_entry_has_key_package_file_line": 0.14,
     "test_asset_ledger_projection.AssetLedgerProjectionTest.test_repo_ledger_clean_and_deterministic": 0.5,
+    "test_asset_library_readme_contract.AssetLibraryReadmeContractTest.test_contract_catches_mutations": 0.02,
+    "test_asset_library_readme_contract.AssetLibraryReadmeContractTest.test_five_interfaces_match_protocol_truth": 0.0,
+    "test_asset_library_readme_contract.AssetLibraryReadmeContractTest.test_ledger_covers_official_assets": 0.0,
+    "test_asset_library_readme_contract.AssetLibraryReadmeContractTest.test_readme_matches_contract": 0.0,
     "test_asset_line_baseline.AssetLineBaselineTest.test_absent_package_warns_not_fails": 0.01,
     "test_asset_line_baseline.AssetLineBaselineTest.test_line_drift_and_unregistered_package": 0.02,
     "test_asset_line_baseline.AssetLineBaselineTest.test_missing_baseline_is_fail_with_resign_hint": 0.0,
@@ -5092,5 +5097,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1859.5
+  "total_s": 1859.8
 }
