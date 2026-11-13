@@ -549,6 +549,7 @@
     "test_terminal": 9.4,
     "test_terminal_doc_contract": 9.6,
     "test_text_hygiene": 10.1,
+    "test_text_hygiene_doc_contract": 15.9,
     "test_third_party_notices_contract": 0.2,
     "test_threat_model_doc_contract": 0.2,
     "test_time_token_doc_contract": 0.2,
@@ -5266,6 +5267,9 @@
     "test_text_hygiene.TextHygieneTest.test_repo_package_versions_are_semver": 2.3,
     "test_text_hygiene.TextHygieneTest.test_semver_lexemes": 0.0,
     "test_text_hygiene.TextHygieneTest.test_version_source_scans_packages": 0.1,
+    "test_text_hygiene_doc_contract.TextHygieneDocTest.test_contract_catches_mutations": 11.3,
+    "test_text_hygiene_doc_contract.TextHygieneDocTest.test_hygiene_matches_contract": 2.2,
+    "test_text_hygiene_doc_contract.TextHygieneDocTest.test_scan_live": 2.17,
     "test_third_party_notices_contract.ThirdPartyNoticesContractTest.test_contract_catches_broken_notices": 0.01,
     "test_third_party_notices_contract.ThirdPartyNoticesContractTest.test_freshness_digest": 0.0,
     "test_third_party_notices_contract.ThirdPartyNoticesContractTest.test_generator_fails_closed": 0.0,
@@ -5575,5 +5579,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1916.8
+  "total_s": 1932.7
 }

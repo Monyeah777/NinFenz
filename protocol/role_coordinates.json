@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1237
+    "verify": 1238
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -10631,6 +10631,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/text-hygiene.md 契约：文本卫生文档必须「5 条规则 / 4399 文本 / 1240 JSON / 269070 键」自洽。",
+      "path": "desktop/tests/test_text_hygiene_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "第三方声明契约判据：notices 须与锁文件双向一致、许可可机读、生成器 fail-closed（2026-11-10）。",
       "path": "desktop/tests/test_third_party_notices_contract.py",
       "role": "verify",
@@ -13806,7 +13812,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "2e0fc08fdd4a537941ff4e233b422247681249d15f1ce5c5e89e99e450037f4e",
+  "root_digest": "37a5a36116d8e54ed8a5a9fcc19776a14f5e5ed52c8e23219263a8facca2782e",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13815,7 +13821,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1111,
+    "R-verify": 1112,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

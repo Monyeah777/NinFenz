@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:448507702d6f8ef605cd61cf52a01f4a8ccd07afa3ba8888efc15366026b3151
+  - protocol/check12_weights.json:f24a151f78c0c7bafd4ce6b60f15c61b1e4890ae03f7c94d9a48609cd7b55450
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:fa00a7fd014857af56e11f38ced1b7d888be053befaadb10b3dd494d27884316
   - docs/meta-cockpit/功能解析.md:de20c2340d19d541bcfde53f222a3acf22a6e440d8fb3dcf51a37aedf53c0c25
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-13）：文本卫生文档顶尖化（补漏记的第 5 条 SemVer 规则 / 4399 文本·1240 JSON·269070 键·111 版本 + 现状对照 / 复现）+ 契约判据 test_text_hygiene_doc_contract。
+
 > 重审（2026-11-13）：终端入口文档顶尖化（77 命令/203 索引/8 族/9 区/13 表单/42 斜杠词/4 阻塞/24 确认动词/139 例 + 现状对照 / 复现）+ 契约判据 test_terminal_doc_contract；权重增量重测。
 
 > 重审（2026-11-13）：层切片页补本层机构分布（前三机构及条数，读自 catalog body 字段），重生成五页；判据断言每页机构分布与真源相等；iface 页现显示 IETF 15 / W3C 7 / OASIS 5。
