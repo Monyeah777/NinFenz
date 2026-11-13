@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1257
+    "verify": 1258
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9455,6 +9455,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "submissions/03-mcp-so.md 契约：字段值与材料包同源；对外文案不钉运行时计数；平台侧不冒充判据。",
+      "path": "desktop/tests/test_mcpso_submission_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "Markdown 表格列数一致性（审计 W4：断链 2 / 表格列数不齐 11）。",
       "path": "desktop/tests/test_md_tables.py",
       "role": "verify",
@@ -13926,7 +13932,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "df197b2aa56b69f96eb78498bb94e68943598be4008b98dffff8c39148e64052",
+  "root_digest": "6c3725d18ab6aef5138a79c2dba4360994df5d5e066f9064e397059e8c3caee7",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13935,7 +13941,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1131,
+    "R-verify": 1132,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
