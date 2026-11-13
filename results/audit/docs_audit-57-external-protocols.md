@@ -21,12 +21,14 @@ subjects:
   - scripts/check_interop_schemas.py:f9c1add0ee80fb23a3913e32482027e9a4049c5ce70cb35b2b1be4afa075d091
   - results/interop-schema-validation.md:e2546c6407416b61912ac351d14d20c171167e36be4d4d3461f6c2fceb56c0c9
   - docs/interop.md:9512d9614028f8deae79e874d840e50937c3e13c4fda301394e3286a9d54b23f
-  - docs/text-hygiene.md:36edf35f60bc669192443a8c16a4bcdc7c22408270fff5ea15308a16a756f986
+  - docs/text-hygiene.md:5acf8a8a65384d7441b776341c42e9f75063ffc2e4e9ec5f50519c827ffe9a81
   - docs/endpoint.md:918c27e8f27b7479e173d57c4d0b2fac2664ff6b33d5f181000448ff1a344d10
   - docs/mcp.md:c96f080bc2cf26d409960597f8580bf8d4a65618554a22f12f36e3e03759316a
   - llms.txt:edb84bfad0f724673bdee4aa2eea0f0c4a6bd7ea10db9476af860cf4b72198ff
 
 ---
+> 重审（2026-11-13）：文本卫生文档顶尖化（补漏记的第 5 条 SemVer 规则 / 4399 文本·1240 JSON·269070 键·111 版本 + 现状对照 / 复现）+ 契约判据 test_text_hygiene_doc_contract。
+
 > 重审（2026-11-13）：MCP 接入文档顶尖化（能力表工具 7→12 全列 / 1 prompt / dual-era / 8MiB / 现状对照 / 复现；en·ja 译件同步后重签）+ 契约判据 test_mcp_doc_contract；权重增量重测。本轮为机械重绑。
 
 > 重审（2026-11-13）：互操作总览顶尖化（12 种类/入仓 12 面/外部校验逐面 14 行 6-7-1 / 现状对照 / 复现）+ 契约判据 test_interop_doc_contract；权重增量重测。本轮为机械重绑。
