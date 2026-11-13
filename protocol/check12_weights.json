@@ -287,6 +287,7 @@
     "test_label_watermark": 2.1,
     "test_launcher": 119.4,
     "test_layer_model": 11.2,
+    "test_layers_doc_contract": 0.2,
     "test_lazy_yaml": 0.2,
     "test_leak_surface": 1.7,
     "test_ledger_tables": 0.2,
@@ -3082,6 +3083,9 @@
     "test_layer_model.LayerScanTest.test_tier_faces_match_reference": 1.22,
     "test_layer_model.RenderTest.test_render_is_deterministic_and_covers_faces": 0.0,
     "test_layer_model.RenderTest.test_write_region_is_idempotent_and_lf": 0.15,
+    "test_layers_doc_contract.LayersDocTest.test_contract_catches_mutations": 0.0,
+    "test_layers_doc_contract.LayersDocTest.test_layers_matches_contract": 0.0,
+    "test_layers_doc_contract.LayersDocTest.test_truth_live": 0.0,
     "test_lazy_yaml.YamlFallbackNoticeTest.test_missing_yaml_warns_exactly_once": 0.0,
     "test_lazy_yaml.YamlFallbackNoticeTest.test_present_yaml_is_silent": 0.04,
     "test_lazy_yaml.YamlFallbackNoticeTest.test_quiet_switch_silences_the_notice": 0.0,
@@ -5467,5 +5471,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1888.3
+  "total_s": 1888.5
 }

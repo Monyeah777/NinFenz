@@ -1,8 +1,11 @@
 # NF 抽象阶梯（layers）
-
-> 最后更新：2026-09-26
-
 > ⛔ 操作指令：本文含可直接执行的命令与判定，读到即执行；勿当资料阅读。
+
+> 最后更新：2026-11-13
+> **复核（2026-11-13）**：四阶 / 入口面四件 / 纵切 / 五条纪律**复核不变**；补可核现状（真源 `protocol/LAYERS.json`）：
+> 抽象轴 **4 阶**（contract / asset / engine / export）· 资产子级 **5** · 入口面 **4** · 验证纵切件 **6** ·
+> 派生豁免 **7** · 退役登记 **2** · 角色 **6** · 判据规则 **L1–L10（10 条）**；判据族 `test_layer_model` **27 例** +
+> `test_architecture_layers` **19 例**。生成区仍由 `nf layers --write` 渲染（禁止手改）；本轮只动**生成区外**的说明与新增「§现状对照」「§复现与引用口径」。
 
 ## 这份文件解决什么
 
@@ -79,6 +82,31 @@ python scripts/nf.py layers --write    # 刷新本文件的生成区（改真源
 
 > 本区由 `nf layers --write` 渲染，禁止手改；真源 = `protocol/LAYERS.json`。
 <!-- nf:layers:end -->
+
+## 现状对照（2026-11-13 · 以真源实读为准）
+
+| 面 | 现值 | 复核方式 |
+|---|---|---|
+| 抽象轴 | **4 阶**（contract / asset / engine / export） | `protocol/LAYERS.json: tiers` |
+| 资产子级 | **5**（声明/内容/数据/知识/本体） | `asset_levels` |
+| 入口面 | **4**（人机 / AI 装配线 / MCP / 图书馆取件） | `surfaces` |
+| 验证纵切件 | **6**（verify / conformance / audit / receipts / attest / provenance） | `crosscut.components` |
+| 派生豁免 | **7** 件 | `derived` |
+| 退役登记 | **2** 条 | `retirement` |
+| 判据规则 | **L1–L10（10 条）** | `rules` |
+| 常驻判据 | 27 + 19 例 | `test_layer_model` / `test_architecture_layers` |
+
+> 生成区（`<!-- nf:layers:begin -->` 到 `end`）由真源渲染，**不一致即 L10 FAIL**；本表是生成区外的可核索引。
+
+## 复现与引用口径
+
+```bash
+python scripts/nf.py layers --verify   # 阶梯体检（与 verify check27 同源，退出码即门禁）
+python scripts/nf.py layers --json     # 逐阶真源面 / 接口面 / 判据
+python -m pytest desktop/tests/test_layer_model.py desktop/tests/test_architecture_layers.py -q
+```
+
+- 引用本文时：「依赖只许向下、跨阶只依接口面、入口不是真源」= 长期口径；改真源后必须 `layers --write` 重渲生成区。
 
 ## 五条纪律（判据见 `desktop/src/core/layer_model.py` 的 L1–L10）
 

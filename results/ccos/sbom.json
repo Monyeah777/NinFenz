@@ -1,7 +1,7 @@
 {
-  "bytes": 12217174,
+  "bytes": 12217700,
   "count": 572,
-  "digest": "bfd779d2c1ac44bcdbfefc70d2dbdd78edadaa93a6df051ff6bb232625fd72ed",
+  "digest": "7a3c8d730d4b993e23510f87b1b53fb97761f8688e2390b424349dc6c79d1a8f",
   "materials": [
     {
       "bytes": 102,
@@ -1906,7 +1906,7 @@
     {
       "bytes": 79590,
       "path": "protocol/RECEIPTS.json",
-      "sha256": "8882a329cd5f561ace3bd08f68520df4878d0959b9e4817f766a7f5898065e25"
+      "sha256": "b4a78ab9ac0a4ff831781ef27906b5e238658b7c74f11c70238b51c328176c61"
     },
     {
       "bytes": 3468,
@@ -1959,9 +1959,9 @@
       "sha256": "c2402950e34e3ff9bd0f09171c8bee821bf0f57c33f32d0dbc4bb4b3e6157914"
     },
     {
-      "bytes": 436281,
+      "bytes": 436548,
       "path": "protocol/check12_weights.json",
-      "sha256": "81d92fe019cbaa09a718fddd35d14ff1f049472e8e3be8d8fac77a1d5605bf30"
+      "sha256": "4b23f9a35c6170397622240ea4b2d02c94784f791a16bdb9b47ec4f9d2aadd1b"
     },
     {
       "bytes": 16170,
@@ -2101,7 +2101,7 @@
     {
       "bytes": 27560,
       "path": "protocol/generated/receipt_chain.json",
-      "sha256": "8d111217296dfdb53766908a8e7869d9efcb85f034ab064a74ad7c8e0436a230"
+      "sha256": "3771946559734fcb8990704ce5caa38d1f8c9fdfd83c8804d179872f7004eaa5"
     },
     {
       "bytes": 918,
@@ -2211,7 +2211,7 @@
     {
       "bytes": 3202,
       "path": "protocol/locales.json",
-      "sha256": "f6db86aa2ef8bdc93f8a8d81c26bbef27b57bac7c7fd5450cbf748e5b4cb0429"
+      "sha256": "ce589f49d9c93f295f0d4e07fd495b7ef6a0478272eb6192aa633abb29f923fb"
     },
     {
       "bytes": 2442,
@@ -2354,9 +2354,9 @@
       "sha256": "87de7ac68f9846b333323efecdbb7555adf24215ae8145d573fe8d0688b8e86d"
     },
     {
-      "bytes": 501014,
+      "bytes": 501273,
       "path": "protocol/role_coordinates.json",
-      "sha256": "6d95e2301056a3442f4162008d1216013e2ba1baf14d3cbf9d55dbc9195a7bb5"
+      "sha256": "0bf78b17928563431d79cdb3f6038c35128b823e5ae0c4e47a5e7439efff229f"
     },
     {
       "bytes": 9391,
@@ -2456,7 +2456,7 @@
     {
       "bytes": 13030,
       "path": "protocol/verification_report.json",
-      "sha256": "5cb60de2772b583382599fdba2d29c8c6afebf3002aa6bac340b3ffb778bdfaa"
+      "sha256": "73313454dfc26f6f9fe389fecca5d703be6bcfd3193b156b7f62fb2d8333ec6b"
     },
     {
       "bytes": 4160,

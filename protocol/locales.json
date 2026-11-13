@@ -83,11 +83,11 @@
       "translations": {
         "en": {
           "path": "docs/en/layers.md",
-          "source_sha256": "be79f2699cee390f03d54d6d0428daee6964674dcbb5d0e6967bfbb150395450"
+          "source_sha256": "7b849fb07769ba6df5ca888a9de5323417b47a07ef54ec2c1c801673a7fbd7c0"
         },
         "ja": {
           "path": "docs/ja/layers.md",
-          "source_sha256": "be79f2699cee390f03d54d6d0428daee6964674dcbb5d0e6967bfbb150395450"
+          "source_sha256": "7b849fb07769ba6df5ca888a9de5323417b47a07ef54ec2c1c801673a7fbd7c0"
         }
       }
     },
