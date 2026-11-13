@@ -561,6 +561,7 @@
     "test_silent_skip_reasons": 2.5,
     "test_since_tags": 0.1,
     "test_single_source_truth_pattern_doc_contract": 3.0,
+    "test_site_assets_readme_doc_contract": 0.2,
     "test_site_face": 1.0,
     "test_site_readme_doc_contract": 2.0,
     "test_skill_adapter": 0.2,
@@ -5144,6 +5145,9 @@
     "test_single_source_truth_pattern_doc_contract.SingleSourceTruthTest.test_contract_catches_mutations": 0.01,
     "test_single_source_truth_pattern_doc_contract.SingleSourceTruthTest.test_pattern_matches_contract": 0.0,
     "test_single_source_truth_pattern_doc_contract.SingleSourceTruthTest.test_projections_recompute_clean": 2.8,
+    "test_site_assets_readme_doc_contract.SiteAssetsReadmeTest.test_asset_bytes_match_text": 0.0,
+    "test_site_assets_readme_doc_contract.SiteAssetsReadmeTest.test_contract_catches_mutations": 0.0,
+    "test_site_assets_readme_doc_contract.SiteAssetsReadmeTest.test_readme_matches_contract": 0.0,
     "test_site_face.TestSiteFactsBindToRepoTruth.test_core_fact_matches_repo_stats": 0.0,
     "test_site_face.TestSiteFactsBindToRepoTruth.test_every_fact_anchored_and_sourced": 0.0,
     "test_site_face.TestSiteFactsBindToRepoTruth.test_generated_from_sources_exist": 0.0,
@@ -5788,5 +5792,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2046.5
+  "total_s": 2046.7
 }

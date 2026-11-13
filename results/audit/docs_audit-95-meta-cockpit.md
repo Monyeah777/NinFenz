@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:8db7bde9c11d55f7fbeb63c47a2c0b0323782af2634782372a018bb5fd9104df
+  - protocol/check12_weights.json:0eab7f986ed9821adf381aecb3ad022a2f2dbc4a86c23b068cfc7f9ec3413959
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:fa00a7fd014857af56e11f38ced1b7d888be053befaadb10b3dd494d27884316
   - docs/meta-cockpit/功能解析.md:de20c2340d19d541bcfde53f222a3acf22a6e440d8fb3dcf51a37aedf53c0c25
   - results/meta-cockpit-manifest.json:60c0e100798e49d393557ae5066c02d7e057ec27f386ee1a36ca3fc7740150ba
 
 ---
+> 重审（2026-11-14）：site/assets/README 顶尖化：补 §现状对照（三件素材字节/尺寸/来源 + 字体无 webfont）+ §复现口径 + 复核位；**实测生成器可复现性**：重跑 34501 B vs 入库 34487 B 字节不同 → 如实登记为债（一条命令可收，但改公开视觉，留作者决定）；新增判据 test_site_assets_readme_doc_contract（字节/尺寸与实盘比对 + 债务在文）。
+
 > 重审（2026-11-14）：site/README 顶尖化：**收掉 npm 口径漂移**（sync-numbers --write 把 24.74 MB 同步为清单真源 25.21 MB，改写 5 个站点面 + 根 llms-full.txt 投影）+ 补 §现状对照（4 页/6 机器面/5+1 工具/42 项离线/16 项 worker/npm 口径真源）+ 复现口径 + 复核位；新增判据 test_site_readme_doc_contract（npm 口径与 payload 清单现场比对）。
 
 > 重审（2026-11-14）：site/DEPLOY-search-submit 顶尖化：修陈旧数字（33+ 离线/28 联网 → 实测 42 项离线，联网项数不再钉）；补 §11 现状对照（7 类通道/indexnow.json 4 URL+4 引擎/密钥文件/42 项/.assetsignore 9 条）+ §12 复现口径 + 复核位；新增判据 test_search_submit_doc_contract（不声称已收录）。
