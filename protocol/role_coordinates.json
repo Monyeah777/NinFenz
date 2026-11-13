@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1231
+    "verify": 1232
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -10211,6 +10211,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/rfc.md 契约：RFC 头文档必须「4 件在册 / 全 Active / 3+1 类别 / 无链 / 4 值词表」与实现一致。",
+      "path": "desktop/tests/test_rfc_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "职能坐标（`core/role_model` · ADR-0006）回归 —— 三条可判定性 + 变异自证。",
       "path": "desktop/tests/test_role_model.py",
       "role": "verify",
@@ -13770,7 +13776,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "2ff8327f5946dfed180924a0f495034d4b0bc61b4a2fa110af1fbec060354819",
+  "root_digest": "827a3e3a06a73aeec8ac71b525651d09dfb03bb9219674f97bce1a7bb0633a49",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13779,7 +13785,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1105,
+    "R-verify": 1106,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

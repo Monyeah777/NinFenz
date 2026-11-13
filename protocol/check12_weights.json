@@ -479,6 +479,7 @@
     "test_revocation_feed_doc_contract": 0.2,
     "test_revocations": 1.8,
     "test_rewrite_tool": 0.8,
+    "test_rfc_doc_contract": 0.3,
     "test_role_model": 6.9,
     "test_round_drill": 0.2,
     "test_round_drill_doc_contract": 0.2,
@@ -4683,6 +4684,9 @@
     "test_rewrite_tool.RewriteTextTest.test_dry_run_prints_table_and_changes_nothing": 0.1,
     "test_rewrite_tool.RewriteTextTest.test_undecodable_file_is_skipped_not_corrupted": 0.11,
     "test_rewrite_tool.RewriteTextTest.test_write_touches_only_matching_files": 0.2,
+    "test_rfc_doc_contract.RfcDocTest.test_contract_catches_mutations": 0.02,
+    "test_rfc_doc_contract.RfcDocTest.test_rfc_live": 0.0,
+    "test_rfc_doc_contract.RfcDocTest.test_rfc_matches_contract": 0.01,
     "test_role_model.CoverageTest.test_all_files_get_a_coordinate": 0.19,
     "test_role_model.CoverageTest.test_core_py_without_self_is_fail": 0.19,
     "test_role_model.CoverageTest.test_coverage_gap_is_fail": 0.18,
@@ -5551,5 +5555,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1905.3
+  "total_s": 1905.6
 }
