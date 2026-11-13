@@ -1,15 +1,15 @@
 {
   "schema": "nf-meta-runtime-manifest/1",
   "version": "1.0",
-  "machine_digest": "bda8f86eada3f61b014998cc2fd29ca54d322879e6068f3dc0c418ddf8080930",
-  "runtime_digest": "bda8f86eada3f61b014998cc2fd29ca54d322879e6068f3dc0c418ddf8080930",
+  "machine_digest": "58e208bf37460b0294a5234aad38c29e050c367ca676a87f76af4e20c9f8c45a",
+  "runtime_digest": "58e208bf37460b0294a5234aad38c29e050c367ca676a87f76af4e20c9f8c45a",
   "task_profile_digest": "0ddb101eb028a0f631a40d8efbc687cd3951528f6fc3f95ff4c4fbd98ed989c1",
   "atom_contracts_digest": "f6a79934733595db4ac7dcec4db6f17ebd9f39f8d557eca5f8aea79aca8428e1",
   "file_digests": {
     "ATOM_MENU.md": "d62af4a27892010fd857ac3cb0b255f2204fca45a3c89ccad1de5ee5aeccf640",
     "COCKPIT_PROTOCOL.md": "24f12fbaa02a0095f7231f102c36f17bdde56ffce38440d575c4f2c35757ce25",
     "COCKPIT_RELEASE_NOTES.md": "65b0749a3d54b96d105be09014196d56e6b9bfd6b4607205cc89652c6df0b0a1",
-    "DIFFERENTIATION.md": "5d9b90cd34f340d36aaa0b0438ded87717bfe135af53d77180369520fca3a882",
+    "DIFFERENTIATION.md": "1677a7fb0d08a09807a43eb46b25d81d5a5568d10944f8034a02c31f576d14de",
     "__init__.py": "f31cbadd59e3f25aab850122bbcc4ad5adcf5a65596a38c4996f264a38427fd7",
     "abstention.py": "87ad854a1a05e854b9e10b8c76b5f1343b797b97fc1146ab5a21ae98d9b0efcb",
     "atom_algebra.py": "57adf9bd9a69d930f674dc606ce013769c202c7387a065c471bfa3ac8b4a9e4f",
@@ -125,5 +125,5 @@
   },
   "human_review": "PENDING",
   "no_scoring": true,
-  "digest": "8e0eaf43b486d1c4770cd1e96ead85e7f60a30aad42d69e06954ef3ed03bbbc4"
+  "digest": "bd0df917fdd8ec944b0b8f0a3f4f354887397d7741ca90d3cb1d042e537a64ed"
 }
