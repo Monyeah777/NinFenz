@@ -1,18 +1,41 @@
 # 互操作性 · 他证通道（第三方可自跑）
 
-> 本页由 `python scripts/interop_thirdparty_kit.py --emit` 生成，禁止手改。
-> 定位：这些卡片是给**第三方**跑的，不冒充「本仓已他证」。回填表：`results/interop-thirdparty-status.md`。
+> 本页由 python scripts/interop_thirdparty_kit.py --emit 生成，禁止手改。
+> 定位：这些卡片是给**第三方**跑的，不冒充「本仓已他证」。回填表：results/interop-thirdparty-status.md。
 
 ## 两种证据，别混（分层）
 
-- **上游判据校验（已有）**：`scripts/check_interop_schemas.py --fetch` 用上游官方 meta-schema 校导出面 → `results/interop-schema-validation.md`。
+- **上游判据校验（已有）**：scripts/check_interop_schemas.py --fetch 用上游官方 meta-schema 校导出面 → results/interop-schema-validation.md。
 - **他证（本页）**：对端消费或官方验证器由第三方在其环境跑，结果回填状态表。未回填 = 未他证。
 
 ## 回填纪律
 
-1. 六字段齐备才算一条他证：`tool_version` · `run_by` · `run_at` · `output_sha256` · `verdict` · `note`。
-2. `output_sha256` 必须是被跑对象或输出的 sha256（不可用「看起来通过」代替）。
-3. 标 `not-applicable` 的面**不计入他证通过数**，只说明为何不适用。
+1. 六字段齐备才算一条他证：tool_version · run_by · run_at · output_sha256 · verdict · note。
+2. output_sha256 必须是被跑对象或输出的 sha256（不可用「看起来通过」代替）。
+3. 标 not-applicable 的面**不计入他证通过数**，只说明为何不适用。
+4. **自跑 ≠ 他证**：run_by 写「执行者（本机 …）」的行是**本仓自跑**（可作防回归证据），不满足「第三方环境跑过」；他证要求 run_by 为**外部方**。状态表里的 PASS 只能按「自测口径」引用，不得折算成他证通过数。
+
+## 面谱（14 面 · 按证据强度分档）
+
+| 种类 | 面数 | 面 | 含义 |
+|---|---|---|---|
+| peer-consumption | 2 | `mcp` / `ccv3` | 对端消费（真跑即可判） |
+| official-cli | 5 | `openapi` / `asyncapi` / `sbom` / `cyclonedx` / `cid` | 官方验证器/工具链（退出码即判） |
+| shape-only | 4 | `slsa` / `intoto` / `vc` / `prov` | 官方无机器 schema，只判形状 |
+| not-applicable | 3 | `a2a` / `c2pa` / `decisions` | 本仓无对应载体/端点，判据另立 |
+
+> 分档意义：official-cli 面**可以**被第三方用一条命令验；shape-only 面即使第三方跑也只能确认「形状与该官方定义一致」；not-applicable 面**不该**出现在他证通过数里。
+
+## 现状对照（2026-11-13 · 生成期静态事实）
+
+| 面 | 现值 | 复核方式 |
+|---|---|---|
+| 卡片数 | **14** | 本页 ### 计数 |
+| 导出面 | **12**（results/interop/*.json，含 a2a，不含 mcp） | ls 该目录 |
+| 上游判据 | results/interop-schema-validation.md | 该文件在盘且无未解 no-schema |
+| 状态表 | results/interop-thirdparty-status.md（14 行，六字段） | --check 校字段与 sha 形状 |
+
+> 本表随生成器版本冻结；「回填状态」是活件，**以状态表实读为准**。
 
 ## 他证卡
 

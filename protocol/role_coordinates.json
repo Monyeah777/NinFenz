@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1206
+    "verify": 1207
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8837,6 +8837,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/interop-thirdparty.md 契约：他证通道说明页必须「面谱分档/自跑≠他证/状态表对账一致」。",
+      "path": "desktop/tests/test_interop_thirdparty_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "他证通道（`scripts/interop_thirdparty_kit.py`）的输入形状与可达性判据。",
       "path": "desktop/tests/test_interop_thirdparty_kit.py",
       "role": "verify",
@@ -13620,7 +13626,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "709682cbd412ec7b00f73d23403f8e8a9aed7c6a842f53b1f576bdc6dd117af1",
+  "root_digest": "293279fc290e2df508ab971d0aacdbd23d4b43fb35974094e40897063f30bfc6",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13629,7 +13635,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1080,
+    "R-verify": 1081,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

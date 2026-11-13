@@ -9,13 +9,17 @@ subjects:
   - scripts/rebuild_selfcontained_sample.py:51732ee527c918a6ee2effe4236fb3702ceb474ebed4856ea6aa2ee0c059e5d2
   - scripts/fde_sample_run.py:ae1e644b7ab0b61e430d6224ef4495e4371cba86e520d99c8d532cfb9370568d
   - scripts/serve_decision_model.py:bbb36dff0e3816c2253150b7de6ab619877c3c78269a644c4c966083df15afee
-  - scripts/interop_thirdparty_kit.py:803def645cab2f98a6ef27eed82a8463dcc4ed908b7885c9944158771d3d8900
+  - scripts/interop_thirdparty_kit.py:4f967d3f29cd31deb79f1b97fdee5f59ae74fde0d378ced571d2896af2d275dc
   - scripts/build_verification_cards.py:370f465c17eb18e4ef928194351c759bf33af75e5c1cd5b85abfc2a4b1d39655
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:3479562cb745f75d161c9f592e3b11143559ba689b70c4129e2e88d5aa78bdc9
+  - protocol/code_metrics_baseline.json:6bf5087e381d484d64bc5474ebcabcb4174f3f2dc892f26080076075f41ee671
 ---
+> 重审（2026-11-13）：他证通道说明页顶尖化：code_metrics 基线重签（生成器新增面谱/自跑口径文案，模块 513 行·最长函数 55，为有据增长）。
+
+> 重审（2026-11-13）：他证通道说明页顶尖化（补「自跑≠他证」第 4 条 + 面谱 2-5-4-3 分档 + 现状对照；改生成器 render_doc 后重出说明页，不重跑 --emit 以保护回填表）+ 契约判据 test_interop_thirdparty_doc_contract；权重增量重测。本轮为机械重绑。
+
 > 重审（2026-11-13）：FDE 交付物样本顶尖化（修同页 4≠5：四道门→五道门 G1–G4+G5，改生成器后 --run 重生成；manifest sha 同步）+ 契约判据 test_fde_deliverable_doc_contract；权重增量重测。本轮为机械重绑。
 
 > 重审（2026-11-12）：library/ALIAS 标题列 + 生成器 +1 行 → code_metrics 基线评审后重冻；契约判据 test_alias_contract。机械重绑。
