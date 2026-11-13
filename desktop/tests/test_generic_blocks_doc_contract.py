@@ -127,6 +127,11 @@ class GenericBlocksTest(unittest.TestCase):
         self.assertEqual(["-y", "ninfenz", "serve"], json_args(self.en))
         self.assertEqual(["-y", "ninfenz", "serve"], json_args(self.zh))
 
+    def test_pair_cross_reference(self):
+        """中英两份必须互指（各自点名对方文件名），否则读者不知道还有另一版。"""
+        self.assertIn("10-generic-zh.md", self.en)
+        self.assertIn("09-generic-en.md", self.zh)
+
     def test_contract_catches_mutations(self):
         """变异自证：传输段分叉 / args 改错 / 缺中文字段 / 缺平台标注。"""
         drift = self.zh.replace("Streamable HTTP 与 SSE 未提供", "也支持 HTTP")
