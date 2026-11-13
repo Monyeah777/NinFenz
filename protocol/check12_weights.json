@@ -229,6 +229,7 @@
     "test_gate_router": 0.2,
     "test_gate_select": 0.2,
     "test_gate_verdict": 0.2,
+    "test_generic_blocks_doc_contract": 0.2,
     "test_gitee_diagnostics": 0.2,
     "test_gitee_ingest_script_contract": 0.2,
     "test_gitee_poll_workflow_contract": 0.2,
@@ -2528,6 +2529,9 @@
     "test_gate_verdict.SafetyTest.test_failed_verdict_is_cached_as_is": 0.01,
     "test_gate_verdict.SafetyTest.test_tag_is_per_node": 0.0,
     "test_gate_verdict.SafetyTest.test_tag_sanitizes_separators": 0.0,
+    "test_generic_blocks_doc_contract.GenericBlocksTest.test_contract_catches_mutations": 0.0,
+    "test_generic_blocks_doc_contract.GenericBlocksTest.test_generic_blocks_match_contract": 0.0,
+    "test_generic_blocks_doc_contract.GenericBlocksTest.test_transport_and_args_live": 0.0,
     "test_gitee_diagnostics.GiteeDiagnosticsTest.test_http_error_is_raised_with_redacted_diagnostic": 0.0,
     "test_gitee_diagnostics.GiteeDiagnosticsTest.test_http_failures_have_stable_categories": 0.0,
     "test_gitee_diagnostics.GiteeDiagnosticsTest.test_intake_path_symbol_is_imported": 0.0,
@@ -5692,5 +5696,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2010.4
+  "total_s": 2010.6
 }
