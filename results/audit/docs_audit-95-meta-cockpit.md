@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:768b27da1c0eca91e7bdb5b5f1b7dd67d44feeff6f0f6c761864c9f8a660792a
+  - protocol/check12_weights.json:019f2fd936249890633bf2575aade5997be8062f45485108516fef2457648afd
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:fa00a7fd014857af56e11f38ced1b7d888be053befaadb10b3dd494d27884316
   - docs/meta-cockpit/功能解析.md:de20c2340d19d541bcfde53f222a3acf22a6e440d8fb3dcf51a37aedf53c0c25
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-13）：标准主索引顶尖化：生成器补索引页「口径与复现」段（生成物纪律/行字段/锚点/其它面/投影）并把两段文案提为模块常量；重生成后索引 +8 行；代码度量重冻（geo_export 253 行）；新增契约判据 test_standards_index_doc_contract。
+
 > 重审（2026-11-13）：标准答题卡（生成物）顶尖化：生成器补「口径与复现」段（生成物纪律/计数来源/可达性/投影定位）后重新生成；新增契约判据 test_answer_cards_doc_contract（含 geo_export --check 新鲜度实跑）；权重增量重测。本轮为机械重绑。
 
 > 重审（2026-11-13）：ST 制卡清单顶尖化（修 W1 级别 S→M 与真源一致 / 29 条 M6 S17 R6 / 自动面 1 / 待定 3 / st-validate 原型 + 现状对照 / 复现）+ 契约判据 test_st_quality_checklist_doc_contract；权重增量重测。本轮为机械重绑。

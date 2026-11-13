@@ -527,6 +527,7 @@
     "test_skill_md_contract": 0.2,
     "test_st_quality_checklist_doc_contract": 0.3,
     "test_st_validator": 0.1,
+    "test_standards_index_doc_contract": 0.4,
     "test_state_front": 0.1,
     "test_stdio_encoding": 0.5,
     "test_steelman": 0.2,
@@ -4994,6 +4995,9 @@
     "test_st_validator.TestMvu.test_initial_mismatch_is_fail": 0.0,
     "test_st_validator.TestWorldbook.test_comma_key_and_duplicate_are_warn": 0.0,
     "test_st_validator.TestWorldbook.test_missing_entries_is_fail": 0.0,
+    "test_standards_index_doc_contract.StandardsIndexDocTest.test_contract_catches_mutations": 0.02,
+    "test_standards_index_doc_contract.StandardsIndexDocTest.test_freshness": 0.23,
+    "test_standards_index_doc_contract.StandardsIndexDocTest.test_index_matches_contract": 0.0,
     "test_state_front.TestStateFront.test_ab_differs_only_by_position": 0.0,
     "test_state_front.TestStateFront.test_block_is_deterministic_and_cites_digest": 0.0,
     "test_state_front.TestStateFront.test_check_order_front_pass_back_fail": 0.0,
@@ -5563,5 +5567,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1906.3
+  "total_s": 1906.7
 }
