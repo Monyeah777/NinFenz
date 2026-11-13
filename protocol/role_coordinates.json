@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1275
+    "verify": 1276
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -10073,6 +10073,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "postmortems/README.md 契约：三个内部治理目录的公开面政策必须同构、白名单可机检。",
+      "path": "desktop/tests/test_postmortems_readme_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "PR 模板契约判据：模板必须让评审**独立复跑**（2026-11-10）。",
       "path": "desktop/tests/test_pr_template_contract.py",
       "role": "verify",
@@ -14034,7 +14040,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "31ff4b186cb4de95edd1afb73a5fd7d73c0dcd9f05abc62a9d4912444117f4e8",
+  "root_digest": "b8dc328734236a371a7f0cf387f0cc509bdc9b28c08a6b52d400fb278d9f5813",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -14043,7 +14049,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1149,
+    "R-verify": 1150,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
