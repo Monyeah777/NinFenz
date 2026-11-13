@@ -153,6 +153,7 @@
     "test_dep_closure": 0.2,
     "test_dependabot_contract": 0.4,
     "test_dependency_audit_workflow_contract": 0.2,
+    "test_dependency_direction_pattern_doc_contract": 0.2,
     "test_design_checklist_contract": 0.2,
     "test_differentiation_doc_contract": 0.2,
     "test_dirty_tree": 0.2,
@@ -1964,6 +1965,10 @@
     "test_dependency_audit_workflow_contract.DependencyAuditWorkflowContractTest.test_contract_catches_broken_workflow": 0.0,
     "test_dependency_audit_workflow_contract.DependencyAuditWorkflowContractTest.test_requirements_inputs_exist_and_are_ascii": 0.0,
     "test_dependency_audit_workflow_contract.DependencyAuditWorkflowContractTest.test_workflow_matches_contract": 0.0,
+    "test_dependency_direction_pattern_doc_contract.DependencyDirectionPatternTest.test_contract_catches_mutations": 0.01,
+    "test_dependency_direction_pattern_doc_contract.DependencyDirectionPatternTest.test_coupling_baseline_live": 0.0,
+    "test_dependency_direction_pattern_doc_contract.DependencyDirectionPatternTest.test_pattern_matches_contract": 0.0,
+    "test_dependency_direction_pattern_doc_contract.DependencyDirectionPatternTest.test_patterns_verify_passes": 0.01,
     "test_design_checklist_contract.DesignChecklistContractTest.test_contract_catches_mutations": 0.02,
     "test_design_checklist_contract.DesignChecklistContractTest.test_design_list_matches_contract": 0.0,
     "test_design_checklist_contract.DesignChecklistContractTest.test_mappings_are_live": 0.0,
@@ -5714,5 +5719,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2014.2
+  "total_s": 2014.4
 }
