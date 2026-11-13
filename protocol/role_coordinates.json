@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1197
+    "verify": 1198
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8309,6 +8309,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/domain-packs.md 契约：域包文档必须「100 包/1200 细分/标准目录/绑定/空壳台账与真源一致」。",
+      "path": "desktop/tests/test_domain_packs_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "P5-08 判据：NativeAOT 产物必须**与 Python/规范逐字节等价**，且不依赖 .NET 运行时。",
       "path": "desktop/tests/test_dotnet_aot.py",
       "role": "verify",
@@ -13566,7 +13572,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "05f6a876a8541bd3698a661f1421ce5fc1b3ab0c40de15c0e3a10a9f886edb2b",
+  "root_digest": "4e4998691ee2301c302120eab97ac86805e7ce72f167c37f77397dd23970f072",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13575,7 +13581,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1071,
+    "R-verify": 1072,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

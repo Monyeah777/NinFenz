@@ -12,12 +12,14 @@ subjects:
   - desktop/src/core/quality_depth_scan.py:563059e8a929bbbba16d5d15a9c77d1f362f9518351860b5ca0682aeb07a23f9
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
-  - docs/domain-packs.md:4c9ee3987699c24f1d78910281b446287dceebb3a77632ef458a07ba618f62d0
+  - docs/domain-packs.md:f90ff233965ee1bb5a872dd833b79e200bfc1825db9c81f651ceca760d83d8b6
   - docs/output-forms.md:98716fc96333cdd1d8e012e307fb3911ead53888672c37a012761f3d41a8db4e
   - desktop/tests/test_domain_pack.py:e7ee496bdc2c0a78ead6baca16b252e776ceeab798c9965fa0b765fbb8c59410
   - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
 
 ---
+> 重审（2026-11-13）：域包文档顶尖化（修可达 332/不可达 38/绑定 1200 记录 2400 锚位 + 空壳 73·36·2628 + specs 可见性说明 / 现状对照 / 复现）+ 契约判据 test_domain_packs_doc_contract；权重增量重测。本轮为机械重绑。
+
 > 重审（2026-11-09）：冻结链
 
 > 重审（2026-11-09）：方法包声明可跑入口 runnable，清单与文档共用（含入口存在性判据）

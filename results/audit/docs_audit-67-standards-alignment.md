@@ -8,9 +8,11 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/asset_density.py:aa60651ad8269e7db09a709570ae69192f39ee95cfd6bd1d4f652696b3d26c56
-  - docs/domain-packs.md:4c9ee3987699c24f1d78910281b446287dceebb3a77632ef458a07ba618f62d0
+  - docs/domain-packs.md:f90ff233965ee1bb5a872dd833b79e200bfc1825db9c81f651ceca760d83d8b6
   - protocol/data_contracts.json:6ca6174c77d41ad354b90e637c404bedfbe5d8ad0ce6400bb26f2ac7e5f19eb0
 ---
+> 重审（2026-11-13）：域包文档顶尖化（修可达 332/不可达 38/绑定 1200 记录 2400 锚位 + 空壳 73·36·2628 + specs 可见性说明 / 现状对照 / 复现）+ 契约判据 test_domain_packs_doc_contract；权重增量重测。本轮为机械重绑。
+
 > 重审（2026-10-23）：I/O/内存/IPC 审计整改：RepoIndex、缓存新鲜度、ISO/信任/协议防护
 
 > 重审（2026-10-18）：工具名归一：6 个旧名 -> _list/_search/_read；旧名 alias；官方 tdqs 4.9 两次
