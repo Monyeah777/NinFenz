@@ -373,6 +373,7 @@
     "test_nf_tui": 0.6,
     "test_nfal": 0.2,
     "test_nfal_cli": 0.3,
+    "test_nfal_doc_contract": 0.4,
     "test_nfal_rules": 0.2,
     "test_npm_package": 22.1,
     "test_npm_package_check_workflow_contract": 0.2,
@@ -3850,6 +3851,9 @@
     "test_nfal_cli.TestNfalCli.test_help": 0.01,
     "test_nfal_cli.TestNfalCli.test_parse_ok_and_error": 0.01,
     "test_nfal_cli.TestNfalCli.test_schema_check": 0.01,
+    "test_nfal_doc_contract.NfalDocTest.test_contract_catches_mutations": 0.15,
+    "test_nfal_doc_contract.NfalDocTest.test_nfal_matches_contract": 0.03,
+    "test_nfal_doc_contract.NfalDocTest.test_pipeline_migration_live": 0.03,
     "test_nfal_rules.BackendDifferentialTest.test_backends_agree_on_cycles_and_guards": 0.0,
     "test_nfal_rules.BackendDifferentialTest.test_backends_agree_on_random_corpus": 0.01,
     "test_nfal_rules.BackendDifferentialTest.test_dag_backend_agrees_and_reports_graph": 0.0,
@@ -5519,5 +5523,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1893.1
+  "total_s": 1893.5
 }
