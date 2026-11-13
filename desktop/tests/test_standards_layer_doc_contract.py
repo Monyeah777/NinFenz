@@ -69,8 +69,13 @@ def facts() -> dict:
         top = sorted(rows, key=lambda s: -(
             (counts.get(s["id"]) or {}).get("main", 0)
             + (counts.get(s["id"]) or {}).get("support", 0)))[:3]
+        dead = sorted((s for s in rows
+                       if not (s.get("evidence") or {}).get("reachable")),
+                      key=lambda s: str(s.get("id")))
         stat[layer] = {"ok": ok, "total": len(rows),
-                       "top": [s["id"] for s in top]}
+                       "top": [s["id"] for s in top],
+                       "dead": [(s["id"], str((s.get("evidence") or {}).get("http_status")))
+                                for s in dead]}
     cov = c["coverage"]
     return {"by_layer": {k: [s["id"] for s in v] for k, v in by_layer.items()},
             "stat": stat, "coverage": cov, "standards": len(c["standards"])}
@@ -119,6 +124,15 @@ def layer_issues(text: str) -> list:
         got = re.findall(r"([a-z0-9][a-z0-9._-]*)(?=（)", bind_lines[0]) if bind_lines else []
         if got != st["top"]:
             issues.append(f"分层页绑定前三不符：layer-{layer}.md")
+        dead_lines = [ln for ln in side_text.splitlines()
+                      if ln.startswith("- 本层不可达：")]
+        if st["dead"]:
+            want = "- 本层不可达：" + " · ".join(
+                f"{i}（HTTP {http}）" for i, http in st["dead"])
+            if not dead_lines or want not in dead_lines[0]:
+                issues.append(f"分层页不可达清单不符：layer-{layer}.md")
+        elif not dead_lines or "无（该层全部本机可达）" not in dead_lines[0]:
+            issues.append(f"分层页应声明无不可达：layer-{layer}.md")
     own = "- 本层含义：" + MEANINGS["data"]
     if own not in text:
         issues.append("本页缺本层含义（data）")

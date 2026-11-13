@@ -12,6 +12,7 @@
 - 本层含义：接口/协议与互操作（传输、API、身份与消息协议）
 - 本层可达：76/84（不可达 8）
 - 本层绑定最多：onnx（主锚 46 / 辅锚 0） · cncf-cloudevents（主锚 5 / 辅锚 14） · oci-image（主锚 19 / 辅锚 0）
+- 本层不可达：adsb（HTTP 404） · autosar-ap（HTTP 0） · autosar-someip（HTTP 0） · ipmi（HTTP 403） · iso15118（HTTP 403） · iso20022（HTTP 403） · sepa-iso20022（HTTP 403） · sunspec（HTTP 403）
 - 生成物：`python scripts/geo_export.py --write` 重写本页；`--check` 比对生成物与真源，不一致即红。手改必红。
 - 切片口径：本页只收 `layer` 等于该层的标准，锚点与主索引 `index.md` 逐字一致。
 - 行字段：名称 · 机构 · 层 · 可达（HTTP · 探针日期） · 扩展点 · 绑定（主锚/辅锚） · 规范 URL。
