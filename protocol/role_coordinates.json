@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1219
+    "verify": 1220
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -10673,6 +10673,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/meta/VERSION-MATRIX.md 契约：版本矩阵必须「行数/状态口径/双源/基线不手写」自洽。",
+      "path": "desktop/tests/test_version_matrix_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "docs/41_波C_W2_C3_C4 契约：快照状态 + 三处修复现状 + 扫描面活绑定 + 复现口径。",
       "path": "desktop/tests/test_w2_c3c4_record_contract.py",
       "role": "verify",
@@ -13698,7 +13704,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "6cb35f1fca89638b22a9bd599b4b39f75a8a7a6b82de99ecfc78b4e93f1ae067",
+  "root_digest": "bb29e938aa4edf5d09bf3af137eb29aa66a822632a0f879dd9f927ef1f57b6e6",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13707,7 +13713,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1093,
+    "R-verify": 1094,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

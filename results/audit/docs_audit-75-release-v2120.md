@@ -7,7 +7,7 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - CHANGELOG.md:c33b70610b8e51f9d40a5f3e55f9400944d117bb5fdf9e2d0ee8f71dff81acf7
-  - docs/meta/VERSION-MATRIX.md:014144331c6e2715f4d4e441c69055e636d0194a1133d004904423bd23d2077a
+  - docs/meta/VERSION-MATRIX.md:1df4ec534da93d4a685bb5b4f605a8bec00788ca84763e458de7b5fd47d9ebde
   - README.md:16f85b2302bf066c85740daad2d90589e074499bbdb40a56c55d334329e54cfc
   - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
@@ -16,6 +16,8 @@ subjects:
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
 
 ---
+> 重审（2026-11-13）：版本矩阵文档顶尖化（修 v0.92 ⏳→✅ 与 CHANGELOG 一致 / 29 行 / 基线 repo_stats / 3 例 + 现状对照 / 复现）+ 契约判据 test_version_matrix_doc_contract；权重增量重测。本轮为机械重绑。
+
 > 重审（2026-11-12）：README canonical 入口顶尖化（五节结构 / 快速开始六步带验收 / FAQ 三类高频问题 / 版本与 npm+pyproject 同源 / 命令与旗标真实 / stats 区外零计数）+ 契约判据 test_readme_contract；check12 权重增量实测。本轮为机械重绑。
 
 > 重审（2026-11-09）：冻结链

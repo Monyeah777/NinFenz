@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:38ec4ae54cafa2ba4b8f977569141447677a00aa1d7c755d926f74014bfae97d
+  - protocol/check12_weights.json:d010c7b5e0cb15b1bca564c7ebf6f65870e137c7b240bc2dcfbbc1b04aed51e5
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:fa00a7fd014857af56e11f38ced1b7d888be053befaadb10b3dd494d27884316
   - docs/meta-cockpit/功能解析.md:de20c2340d19d541bcfde53f222a3acf22a6e440d8fb3dcf51a37aedf53c0c25
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-13）：版本矩阵文档顶尖化（修 v0.92 ⏳→✅ 与 CHANGELOG 一致 / 29 行 / 基线 repo_stats / 3 例 + 现状对照 / 复现）+ 契约判据 test_version_matrix_doc_contract；权重增量重测。本轮为机械重绑。
+
 > 重审（2026-11-13）：元层路标文档顶尖化（版本三处一致 / 基线不手写 / check39 端壳零回潮 + 现状对照 / 复现）+ 契约判据 test_meta_roadmap_doc_contract；权重增量重测。本轮为机械重绑。
 
 > 重审（2026-11-13）：元驾驶舱功能解析顶尖化（33 原子前缀分布/M0–M4/10·5 节点/3·5 约束/13 例；并把「14 方法节点」标为待澄清）+ 契约判据 test_meta_cockpit_analysis_doc_contract；权重增量重测。本轮为机械重绑。
