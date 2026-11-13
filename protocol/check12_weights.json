@@ -240,6 +240,7 @@
     "test_grounding": 0.1,
     "test_grouped_report": 0.2,
     "test_handover": 0.2,
+    "test_handover_template_doc_contract": 9.5,
     "test_host_projection": 0.1,
     "test_hotspot_profile": 0.6,
     "test_http_api": 9.1,
@@ -2587,6 +2588,9 @@
     "test_handover.TestNegatives.test_pending_without_judgement_is_fail": 0.0,
     "test_handover.TestNegatives.test_unresolvable_ref_is_fail": 0.0,
     "test_handover.TestRealRepo.test_scan_clean": 0.01,
+    "test_handover_template_doc_contract.HandoverTemplateDocTest.test_contract_catches_mutations": 6.64,
+    "test_handover_template_doc_contract.HandoverTemplateDocTest.test_protocol_and_cli_live": 1.34,
+    "test_handover_template_doc_contract.HandoverTemplateDocTest.test_template_matches_contract": 1.33,
     "test_host_projection.Test.test_parity_and_allowlist": 0.0,
     "test_host_projection.Test.test_placeholder_residue": 0.0,
     "test_host_projection.Test.test_render_and_marker_guard": 0.0,
@@ -5635,5 +5639,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1971.8
+  "total_s": 1981.3
 }
