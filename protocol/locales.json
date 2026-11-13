@@ -44,11 +44,11 @@
       "translations": {
         "en": {
           "path": "docs/en/locales.md",
-          "source_sha256": "cf3a21039dad98832b3cd92ead92adaa6559b38bd9c96006fea87f0af81a6dc7"
+          "source_sha256": "49d614fa22cbeacff6166c292b6785566ea07b505556e2d842dfeb515127277a"
         },
         "ja": {
           "path": "docs/ja/locales.md",
-          "source_sha256": "cf3a21039dad98832b3cd92ead92adaa6559b38bd9c96006fea87f0af81a6dc7"
+          "source_sha256": "49d614fa22cbeacff6166c292b6785566ea07b505556e2d842dfeb515127277a"
         }
       }
     },

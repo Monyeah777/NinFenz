@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1212
+    "verify": 1213
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9197,6 +9197,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/locales.md 契约：语言面声明必须「3 语/12 译件/6 指南/责任方与注册表一致」。",
+      "path": "desktop/tests/test_locales_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "LSP 服务器单测（分帧 / 能力 / 诊断定位 / 领域智能 / 编辑 / 退出语义 / 配置生成）。",
       "path": "desktop/tests/test_lsp.py",
       "role": "verify",
@@ -13656,7 +13662,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "63560b523552570f68414eac67d402a087cd8c038b49c2f63c4e8a3c8c233b44",
+  "root_digest": "c87e0a2faf1425a4628097a0b6c5caddd562e1b8172a2235fdeb599f301b7e08",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13665,7 +13671,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1086,
+    "R-verify": 1087,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
