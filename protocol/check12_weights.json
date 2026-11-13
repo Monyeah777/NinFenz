@@ -228,6 +228,7 @@
     "test_gitee_diagnostics": 0.2,
     "test_gitee_ingest_script_contract": 0.2,
     "test_gitee_poll_workflow_contract": 0.2,
+    "test_glama_doc_contract": 0.2,
     "test_governance_docs": 0.2,
     "test_governance_faces": 14.4,
     "test_grain_units": 0.2,
@@ -2511,6 +2512,9 @@
     "test_gitee_poll_workflow_contract.GiteePollWorkflowContractTest.test_script_keeps_token_and_redaction_discipline": 0.0,
     "test_gitee_poll_workflow_contract.GiteePollWorkflowContractTest.test_shared_write_lock_with_library_ingest": 0.0,
     "test_gitee_poll_workflow_contract.GiteePollWorkflowContractTest.test_workflow_matches_contract": 0.0,
+    "test_glama_doc_contract.GlamaDocTest.test_contract_catches_mutations": 0.0,
+    "test_glama_doc_contract.GlamaDocTest.test_glama_matches_contract": 0.0,
+    "test_glama_doc_contract.GlamaDocTest.test_repo_side_facts_live": 0.0,
     "test_governance_docs.GovernanceDocsTest.test_code_of_conduct_has_enforcement_and_appeal": 0.0,
     "test_governance_docs.GovernanceDocsTest.test_contributing_declares_inbound_outbound": 0.0,
     "test_governance_docs.GovernanceDocsTest.test_gap_checker_catches_mutation": 0.0,
@@ -5600,5 +5604,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1966.3
+  "total_s": 1966.5
 }

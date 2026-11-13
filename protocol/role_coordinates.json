@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1243
+    "verify": 1244
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8705,6 +8705,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "GLAMA.md 契约：上架教程必须「仓库侧证件可核 / 平台侧状态不冒充判据」。",
+      "path": "desktop/tests/test_glama_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "社区与内容治理件判据（审计 Z6：治理件在场且**承担语义**，不是占位文件）。",
       "path": "desktop/tests/test_governance_docs.py",
       "role": "verify",
@@ -13842,7 +13848,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "1bfa04629c0566122436aa5272ccb9126b32e9fe046201b93008b1e3ed550dbb",
+  "root_digest": "34c70bf1751db10d1fecd45120f90699daeab75396d8b3d9471e496ea97e8236",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13851,7 +13857,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1117,
+    "R-verify": 1118,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
