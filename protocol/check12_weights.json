@@ -426,6 +426,7 @@
     "test_path_trigger": 0.2,
     "test_paths": 0.2,
     "test_patterns_doc_contract": 0.2,
+    "test_patterns_index_doc_contract": 2.9,
     "test_payload_consumer": 0.4,
     "test_payload_evidence": 0.3,
     "test_payload_harvest_forms": 1.1,
@@ -4224,6 +4225,10 @@
     "test_patterns_doc_contract.PatternsDocTest.test_contract_catches_mutations": 0.04,
     "test_patterns_doc_contract.PatternsDocTest.test_patterns_matches_contract": 0.01,
     "test_patterns_doc_contract.PatternsDocTest.test_registry_live": 0.01,
+    "test_patterns_index_doc_contract.PatternsIndexTest.test_contract_catches_mutations": 0.01,
+    "test_patterns_index_doc_contract.PatternsIndexTest.test_index_matches_contract": 0.0,
+    "test_patterns_index_doc_contract.PatternsIndexTest.test_patterns_verify_passes": 1.39,
+    "test_patterns_index_doc_contract.PatternsIndexTest.test_reindex_is_idempotent": 1.36,
     "test_payload_consumer.PayloadConsumerTest.test_scan_deterministic": 0.2,
     "test_payload_evidence.PayloadEvidenceTest.test_repo_scan_deterministic_and_nonempty": 0.13,
     "test_payload_harvest_forms.BlockMappingFormTest.test_block_mapping_resolves_event_and_types": 0.0,
@@ -5705,5 +5710,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2011.1
+  "total_s": 2014.0
 }

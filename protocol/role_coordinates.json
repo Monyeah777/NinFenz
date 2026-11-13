@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1265
+    "verify": 1266
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9893,6 +9893,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "patterns/INDEX.md 契约：整页生成物必须与 `nf patterns reindex` 幂等、计数与真源一致。",
+      "path": "desktop/tests/test_patterns_index_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "45 #5 · payload-consumer 雏形单测（确定性 + 消费映射）。",
       "path": "desktop/tests/test_payload_consumer.py",
       "role": "verify",
@@ -13974,7 +13980,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "d2b5e7d2a82a6cbc16cc770c41d7d7c214b8527ce7672ed9080328c7769396d6",
+  "root_digest": "3a1fed4764f72ffb9c272f82249677f6fbf7900f231282245d91b72c345c1e0f",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13983,7 +13989,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1139,
+    "R-verify": 1140,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
