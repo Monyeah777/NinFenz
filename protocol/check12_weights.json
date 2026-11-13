@@ -340,6 +340,7 @@
     "test_meta_cockpit": 2.2,
     "test_meta_cockpit_analysis_doc_contract": 0.3,
     "test_meta_cockpit_doc_contract": 0.2,
+    "test_meta_roadmap_doc_contract": 0.2,
     "test_method_pack": 3.9,
     "test_method_packs_doc_contract": 0.2,
     "test_missing_sentinel": 0.2,
@@ -3517,6 +3518,9 @@
     "test_meta_cockpit_doc_contract.MetaCockpitDocTest.test_assets_live": 0.0,
     "test_meta_cockpit_doc_contract.MetaCockpitDocTest.test_cockpit_matches_contract": 0.0,
     "test_meta_cockpit_doc_contract.MetaCockpitDocTest.test_contract_catches_mutations": 0.0,
+    "test_meta_roadmap_doc_contract.RoadmapDocTest.test_contract_catches_mutations": 0.01,
+    "test_meta_roadmap_doc_contract.RoadmapDocTest.test_roadmap_matches_contract": 0.0,
+    "test_meta_roadmap_doc_contract.RoadmapDocTest.test_versions_live": 0.0,
     "test_method_pack.CliTest.test_packs_list": 1.77,
     "test_method_pack.CliTest.test_plan_with_pack_out_file": 1.67,
     "test_method_pack.ComposeTest.test_compose_keeps_kind_order_stable": 0.0,
@@ -5499,5 +5503,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1890.3
+  "total_s": 1890.5
 }
