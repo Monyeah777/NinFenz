@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1204
+    "verify": 1205
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8543,6 +8543,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/fde-sample/run.md 契约：照做步骤必须「命令原文/期望输出/退出码与脚本实跑一致」。",
+      "path": "desktop/tests/test_fde_run_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "docs/fde-sample/README.md 契约：五门数字/证据件/命令必须与证据实读一致。",
       "path": "desktop/tests/test_fde_sample_doc_contract.py",
       "role": "verify",
@@ -13608,7 +13614,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "8bfe22e7df1535e85ba71671b62c0b899e0bb087a2f68e19866dc9b092c65961",
+  "root_digest": "e987865a99eeeafb515fd5b906f777869ff75f4e3d546d88474ce3608ed52442",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13617,7 +13623,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1078,
+    "R-verify": 1079,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
