@@ -311,7 +311,7 @@
     {
       "@id": "nf:file/protocol/role_coordinates.json",
       "@type": "prov:Entity",
-      "nf:sha256": "7aa277b59d428452042e175243599ed30dfc765ce2e3dec11d618ea19f36b61e"
+      "nf:sha256": "6d1d2378eb9f59afa045e1afc44676f63891b8afce28f32f53ee96489a5ee9a4"
     },
     {
       "@id": "nf:file/protocol/sast_baseline.json",
