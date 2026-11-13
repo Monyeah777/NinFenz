@@ -1,7 +1,7 @@
 {
-  "bytes": 12231269,
+  "bytes": 12232548,
   "count": 572,
-  "digest": "0ac23a013b91654f4ba5553091f0e6ca5c38513a870ecdd21e77ff3dba6d9cf7",
+  "digest": "168d11a1b23818b9b535eca08ea35997f3c36672ca0976e5affa600cbc879cf5",
   "materials": [
     {
       "bytes": 102,
@@ -1906,7 +1906,7 @@
     {
       "bytes": 79590,
       "path": "protocol/RECEIPTS.json",
-      "sha256": "540e3a7ac129bb951d559268347c1ae20828577820d2da0afb78981060d4611b"
+      "sha256": "9b0e9a047ebe874fcd0ae332bd22e0fb2cb396188f35f00d3206c8f7c1de96f4"
     },
     {
       "bytes": 3468,
@@ -1959,9 +1959,9 @@
       "sha256": "c2402950e34e3ff9bd0f09171c8bee821bf0f57c33f32d0dbc4bb4b3e6157914"
     },
     {
-      "bytes": 443440,
+      "bytes": 443767,
       "path": "protocol/check12_weights.json",
-      "sha256": "768b27da1c0eca91e7bdb5b5f1b7dd67d44feeff6f0f6c761864c9f8a660792a"
+      "sha256": "019f2fd936249890633bf2575aade5997be8062f45485108516fef2457648afd"
     },
     {
       "bytes": 16170,
@@ -1971,7 +1971,7 @@
     {
       "bytes": 42532,
       "path": "protocol/code_metrics_baseline.json",
-      "sha256": "623f7d3395009244ba3de67929f0e83ccf140fcf59b832de51f6da8cc1d2e790"
+      "sha256": "342b36545e8dc38e5bec410d077630172dbe4a57c7114a453782fd50035846cf"
     },
     {
       "bytes": 87117,
@@ -2101,7 +2101,7 @@
     {
       "bytes": 27560,
       "path": "protocol/generated/receipt_chain.json",
-      "sha256": "e6659e51011ec776d48a86aa225c5d2f5f4bb7b3de6600d3e88bb821ac94afeb"
+      "sha256": "ff33b9d59e97272a7731d5f23a50c1db9885d6d85d6fbc4cca36fca67b409b14"
     },
     {
       "bytes": 918,
@@ -2354,9 +2354,9 @@
       "sha256": "87de7ac68f9846b333323efecdbb7555adf24215ae8145d573fe8d0688b8e86d"
     },
     {
-      "bytes": 507214,
+      "bytes": 507456,
       "path": "protocol/role_coordinates.json",
-      "sha256": "4772816d09a161896a14a8b06763c00e21f3c89b47b891d194bb7afd2fd26926"
+      "sha256": "cb7d87a6963104451d3da8667ff437c61e64e66e6c400fcbe6a371cbbbcd1c1c"
     },
     {
       "bytes": 9391,
@@ -2456,7 +2456,7 @@
     {
       "bytes": 13030,
       "path": "protocol/verification_report.json",
-      "sha256": "8dee30d6c50c9cfdd872ab4c1ca7a8ee1115461b8934cb7d4d5491fc12ddf79b"
+      "sha256": "099c3ff4b4f8eec93bddc1533ae304e2946e36bc78df3c81c46efcfc436e494c"
     },
     {
       "bytes": 4160,
@@ -2629,9 +2629,9 @@
       "sha256": "8ff3de388b0b91fbd326e1852dd2601c9edcb4e4420c0f9979f368fb3c45b4e2"
     },
     {
-      "bytes": 11937,
+      "bytes": 12647,
       "path": "scripts/geo_export.py",
-      "sha256": "10a72c48301cd73cbedd399ca53e722231bee7a1ab3eda2eee6cc72b13d8653d"
+      "sha256": "d80253f617bad2e19dc7ceaf0916d4ecd8dd9387c5cf6fe6621ee71d1a78d5c5"
     },
     {
       "bytes": 18212,

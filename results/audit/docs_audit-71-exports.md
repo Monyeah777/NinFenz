@@ -11,7 +11,7 @@ subjects:
   - desktop/src/core/repo_stats.py:3bc955c22bef31d7b93313b4fe2694934c048e8ee84b9ef81c0e9805c7982a87
   - desktop/src/core/quality_baseline.py:7c1f06bc581a2400b1248df63e07a98dfffba2b92ca8070a71082abcc317d1e4
   - scripts/interop_thirdparty_kit.py:4f967d3f29cd31deb79f1b97fdee5f59ae74fde0d378ced571d2896af2d275dc
-  - scripts/geo_export.py:10a72c48301cd73cbedd399ca53e722231bee7a1ab3eda2eee6cc72b13d8653d
+  - scripts/geo_export.py:d80253f617bad2e19dc7ceaf0916d4ecd8dd9387c5cf6fe6621ee71d1a78d5c5
   - scripts/fde_sample_run.py:ae1e644b7ab0b61e430d6224ef4495e4371cba86e520d99c8d532cfb9370568d
   - protocol/CONFORMANCE.md:006b56748b6daaf2419be40a65247d90efd6291e87ccd61c6527ed1526b6b4e4
   - docs/fde-stack.md:96c074dffcbcc513fbf3bec79d5b895ac9cfec543430f21805eb5d2370b43bca
@@ -20,6 +20,8 @@ subjects:
   - results/interop-thirdparty-status.md:e57c95980dd8b36bf137d23db0cf3c93ba8aee5221d2d26f2a6c782c30df0469
 
 ---
+> 重审（2026-11-13）：标准主索引顶尖化：生成器补索引页「口径与复现」段（生成物纪律/行字段/锚点/其它面/投影）并把两段文案提为模块常量；重生成后索引 +8 行；代码度量重冻（geo_export 253 行）；新增契约判据 test_standards_index_doc_contract。
+
 > 重审（2026-11-13）：标准答题卡（生成物）顶尖化：生成器补「口径与复现」段（生成物纪律/计数来源/可达性/投影定位）后重新生成；新增契约判据 test_answer_cards_doc_contract（含 geo_export --check 新鲜度实跑）；权重增量重测。本轮为机械重绑。
 
 > 重审（2026-11-13）：他证通道说明页顶尖化（补「自跑≠他证」第 4 条 + 面谱 2-5-4-3 分档 + 现状对照；改生成器 render_doc 后重出说明页，不重跑 --emit 以保护回填表）+ 契约判据 test_interop_thirdparty_doc_contract；权重增量重测。本轮为机械重绑。

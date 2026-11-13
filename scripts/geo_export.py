@@ -36,6 +36,31 @@ HEAD = ("> 本页由 `python scripts/geo_export.py --write` 生成，禁止手�
         "真源：`protocol/standards_catalog.json` + `protocol/standards_binding.json`。")
 
 
+_HOWTO_INDEX = [
+    "## 口径与复现", "",
+    "- 生成物：`python scripts/geo_export.py --write` 重写本页；"
+    "`--check` 比对生成物与真源，不一致即红。手改必红。",
+    "- 每行字段：名称 · 机构 · 层 · 可达（HTTP · 探针日期） · 扩展点 · "
+    "绑定（主锚/辅锚） · 规范 URL。",
+    "- 锚点：每条标准一个稳定锚 `#<id>`（例如 `#onnx`），可直接被生成式引擎引用。",
+    "- 其它面：按层切片见 `layer-<layer>.md`；按问题形态聚合见 `answer-cards.md`。",
+    "- 数据/代码/脚本三面一致性由 check40 判；本页只是**投影**，不是第二份事实。",
+    "",
+]
+_HOWTO_CARDS = [
+    "## 口径与复现", "",
+    "- 生成物：`python scripts/geo_export.py --write` 重写本页；"
+    "`--check` 是新鲜度判据"
+    "（生成物与真源不一致即红）。**手改必红**。",
+    "- 计数口径：覆盖数取自 `protocol/standards_catalog.json`"
+    "（`standards / reachable / unreachable / bodies / depends_edges`）；"
+    "绑定数取自 `protocol/standards_binding.json`（总量 + 主锚/辅锚）。",
+    "- 可达性 = 本机探针实测（探针日期逐条写在主索引行内）；不可达条目照实披露。",
+    "- 数据/代码/脚本三面一致性由 check40 判；本页只是**投影**，不是第二份事实。",
+    "",
+]
+
+
 def _load(root: str) -> Tuple[List[Dict[str, Any]], Dict[str, Any], Dict[str, Dict[str, int]]]:
     cat = json_doc.load(os.path.join(root, CATALOG_REL), dict, what=CATALOG_REL)
     bind = json_doc.load(os.path.join(root, BINDING_REL), dict, what=BINDING_REL)
@@ -88,6 +113,7 @@ def build(root: str) -> Dict[str, str]:
 
     idx = _head("标准目录 · 可引用索引（GEO 出口）", coverage,
                 "每条标准一个稳定锚：`#<id>`（如 `%s#onnx`）。" % INDEX_REL)
+    idx += _HOWTO_INDEX
     for s in ordered:
         idx += ["### `%s`" % s["id"], _line(s, counts), ""]
     outs[INDEX_REL] = "\n".join(idx).rstrip() + "\n"
@@ -103,17 +129,7 @@ def build(root: str) -> Dict[str, str]:
     # 可引用卡（按问题形态聚合）
     cards = _head("标准目录 · 可引用卡（按问题形态）", coverage,
                   "每张卡回答一类问题，可直接被生成式引擎引用；数据源同主索引。")
-    cards += [
-        "## 口径与复现", "",
-        "- 生成物：`python scripts/geo_export.py --write` 重写本页；`--check` 是新鲜度判据"
-        "（生成物与真源不一致即红）。**手改必红**。",
-        "- 计数口径：覆盖数取自 `protocol/standards_catalog.json`"
-        "（`standards / reachable / unreachable / bodies / depends_edges`）；"
-        "绑定数取自 `protocol/standards_binding.json`（总量 + 主锚/辅锚）。",
-        "- 可达性 = 本机探针实测（探针日期逐条写在主索引行内）；不可达条目照实披露。",
-        "- 数据/代码/脚本三面一致性由 check40 判；本页只是**投影**，不是第二份事实。",
-        "",
-    ]
+    cards += _HOWTO_CARDS
     top_ext = sorted(standards,
  key=lambda s: (-len(s.get("ext_points") or []),
  str(s.get("id"))))[:20]

@@ -10,8 +10,12 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:623f7d3395009244ba3de67929f0e83ccf140fcf59b832de51f6da8cc1d2e790
+  - protocol/code_metrics_baseline.json:342b36545e8dc38e5bec410d077630172dbe4a57c7114a453782fd50035846cf
 ---
+> 重审（2026-11-13）：代码度量微调重冻：geo_export.py 254 行（恢复答案卡措辞后 +1）
+
+> 重审（2026-11-13）：标准主索引顶尖化：生成器补索引页「口径与复现」段（生成物纪律/行字段/锚点/其它面/投影）并把两段文案提为模块常量；重生成后索引 +8 行；代码度量重冻（geo_export 253 行）；新增契约判据 test_standards_index_doc_contract。
+
 > 重审（2026-11-13）：重冻代码度量基线（geo_export.py 238 行 / build() 82 行：新增「口径与复现」段所需；确需上调，评审后重冻）
 
 > 重审（2026-11-13）：他证通道说明页顶尖化：code_metrics 基线重签（生成器新增面谱/自跑口径文案，模块 513 行·最长函数 55，为有据增长）。
