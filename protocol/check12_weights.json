@@ -138,6 +138,7 @@
     "test_daemon_parity": 173.6,
     "test_dead_code": 54.6,
     "test_decision_layer": 0.5,
+    "test_decision_layer_doc_contract": 0.2,
     "test_decisions": 0.8,
     "test_decisions_index_contract": 0.2,
     "test_decisions_readme_contract": 0.2,
@@ -1812,6 +1813,9 @@
     "test_decision_layer.WorkloopTest.test_plan_abstains_when_adapter_unavailable": 0.03,
     "test_decision_layer.WorkloopTest.test_plan_is_deterministic_and_brief_has_acceptance": 0.08,
     "test_decision_layer.WorkloopTest.test_repo_loop_is_clean": 0.12,
+    "test_decision_layer_doc_contract.DecisionLayerDocTest.test_contract_catches_mutations": 0.01,
+    "test_decision_layer_doc_contract.DecisionLayerDocTest.test_data_live": 0.0,
+    "test_decision_layer_doc_contract.DecisionLayerDocTest.test_decision_doc_matches_contract": 0.0,
     "test_decisions.ErrataTest.test_real_repo_errata_is_clean": 0.01,
     "test_decisions.ErrataTest.test_stale_erratum_is_fail": 0.01,
     "test_decisions.ErrataTest.test_unknown_adr_is_fail": 0.01,
@@ -5411,5 +5415,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1884.3
+  "total_s": 1884.5
 }

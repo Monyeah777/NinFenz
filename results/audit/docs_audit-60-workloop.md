@@ -12,9 +12,11 @@ subjects:
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - desktop/tests/test_decision_layer.py:551419122f09c1b77f73e7724919f67698bd6d939c3d556d9c8ef98274a76257
-  - docs/decision-layer.md:cefef53f4a418ccbd7cc1f96a31850454685bcc4d959cabddceea94e1a9c30de
+  - docs/decision-layer.md:cd3a254de738ece7c8f07db36904c74484e4622c58f688a3973c8998b441628c
 
 ---
+> 重审（2026-11-13）：决策层文档顶尖化（修三处计数陈旧 101/1142/1244 + 补 openai-json 适配器 / 三原语三候选活绑定 / 现状对照 / 复现）+ 契约判据 test_decision_layer_doc_contract；权重增量重测。本轮为机械重绑。
+
 > 重审（2026-11-09）：方法包声明可跑入口 runnable，清单与文档共用（含入口存在性判据）
 
 > 重审（2026-11-09）：证人核对接入生产路径：session.step(root=) + CLI 传 ROOT
