@@ -172,6 +172,7 @@
     "test_e2e_desktop_workflow_contract": 0.2,
     "test_ed25519": 0.2,
     "test_effect_rows": 1.2,
+    "test_endpoint_doc_contract": 0.2,
     "test_engine_ffi_binding": 0.2,
     "test_engine_loader": 0.2,
     "test_engine_registry": 2.2,
@@ -2048,6 +2049,9 @@
     "test_effect_rows.RowsTest.test_level_takes_strictest": 0.0,
     "test_effect_rows.RowsTest.test_method_face_is_fs_probe": 0.0,
     "test_effect_rows.RowsTest.test_unparseable_is_fail_closed": 0.0,
+    "test_endpoint_doc_contract.EndpointDocTest.test_contract_catches_mutations": 0.01,
+    "test_endpoint_doc_contract.EndpointDocTest.test_contract_live": 0.0,
+    "test_endpoint_doc_contract.EndpointDocTest.test_endpoint_matches_contract": 0.0,
     "test_engine_ffi_binding.CAbiTest.test_invalid_out_buffer_is_refused_by_the_library": 0.0,
     "test_engine_ffi_binding.CAbiTest.test_null_input_is_refused_not_crashed": 0.0,
     "test_engine_ffi_binding.CAbiTest.test_reverse_round_trip": 0.0,
@@ -5423,5 +5427,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1885.1
+  "total_s": 1885.3
 }
