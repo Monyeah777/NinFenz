@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1198
+    "verify": 1199
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8339,6 +8339,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/driver.md 契约：指令档路由文档必须「工作流/指令档/工具绑定/判据语义与实现一致」。",
+      "path": "desktop/tests/test_driver_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "docs/ccos/dual-core-invariants.md 契约：9 层与矩阵一致 + 判据/名单/门数活绑定。",
       "path": "desktop/tests/test_dual_core_invariants_contract.py",
       "role": "verify",
@@ -13572,7 +13578,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "4e4998691ee2301c302120eab97ac86805e7ce72f167c37f77397dd23970f072",
+  "root_digest": "fec0d4d5f8b8337c93c02f017b4bb5441edc618924cd0cbb5d642d06253f1002",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13581,7 +13587,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1072,
+    "R-verify": 1073,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
