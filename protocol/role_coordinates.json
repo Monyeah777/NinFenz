@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1241
+    "verify": 1242
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -10163,6 +10163,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/需求收敛模板.md 契约：收敛模板必须「8 字段 / 3+2 子命令 / 0 份工作单」与实读一致。",
+      "path": "desktop/tests/test_requirement_template_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "requirements-ci 契约判据：哈希完备、直钉镜像、可复现生成命令、ASCII（2026-11-11）。",
       "path": "desktop/tests/test_requirements_ci_contract.py",
       "role": "verify",
@@ -13830,7 +13836,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "c2b85cb2b65157125240f25b7d4d9f7b5008640a7ab448b5a967ddf2d44d7e32",
+  "root_digest": "b2331bf5171cb473439368e4241eee5121daee3efa2b6f7cd5eb8f40809eb239",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13839,7 +13845,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1115,
+    "R-verify": 1116,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

@@ -1,8 +1,8 @@
 {
-  "approved_at": "2026-11-12",
+  "approved_at": "2026-11-14",
   "approved_by": "Monyeah777",
-  "note": "M10 契约补全（outputs/双事件 payload 并集一致）后重签一致性报告",
+  "note": "需求收敛模板顶尖化：doc-kinds 写法 WARN 3→2（reference 型补齐清单式写法），conformance 重算后重批准",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "84b0bc73e309926ebc1f63249c8bfca062de30e7093139f819a6b2eae9110c37"
+  "subject_digest": "aa2903db6d2af0866c6d7367661df78ca2ec70f36c3807e59386c61e37e0956e"
 }
