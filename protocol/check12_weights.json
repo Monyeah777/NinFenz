@@ -601,6 +601,7 @@
     "test_transparency_log": 0.2,
     "test_trust_anchor": 1.5,
     "test_trust_boundary": 0.7,
+    "test_tui_readme_doc_contract": 3.6,
     "test_two_faces_jsonrpc": 0.2,
     "test_unknown_policy": 0.1,
     "test_user_assets_readme_contract": 0.2,
@@ -5552,6 +5553,10 @@
     "test_trust_boundary.UntrustedSourceTest.test_envelope_keeps_boundary_and_payload": 0.0,
     "test_trust_boundary.UntrustedSourceTest.test_repo_owned_files_are_trusted": 0.0,
     "test_trust_boundary.UntrustedSourceTest.test_untrusted_prefixes": 0.0,
+    "test_tui_readme_doc_contract.TuiReadmeTest.test_contract_catches_mutations": 0.5,
+    "test_tui_readme_doc_contract.TuiReadmeTest.test_readme_matches_contract": 0.13,
+    "test_tui_readme_doc_contract.TuiReadmeTest.test_selftest_passes": 2.74,
+    "test_tui_readme_doc_contract.TuiReadmeTest.test_surface_is_generated": 0.0,
     "test_two_faces_jsonrpc.TwoFacesJsonRpcParityTest.test_bad_params_is_invalid_params_on_both_faces": 0.0,
     "test_two_faces_jsonrpc.TwoFacesJsonRpcParityTest.test_harness_detects_a_violating_server": 0.0,
     "test_two_faces_jsonrpc.TwoFacesJsonRpcParityTest.test_notifications_are_silent_on_both_faces": 0.0,
@@ -5792,5 +5797,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2046.7
+  "total_s": 2050.3
 }
