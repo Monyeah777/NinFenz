@@ -26,8 +26,10 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:b0d96f13d39a34e7871ac515125cbf9c23a8d7e46c3570e3cca45637c00f5e77
+  - protocol/code_metrics_baseline.json:a19a47dde4810a3d24ae94d98980854391263325de4e54c1d4365e471121007a
 ---
+> 重审（2026-11-13）：层切片页补「本层含义」：生成器加 LAYER_NOTES + _layer_body 助手，重生成五页（data/eng/form/gov/iface 各一句层定义）；修一处字符串被拆成两行的排版 bug；code_metrics 重冻（geo_export 282 行）。
+
 > 重审（2026-11-13）：标准层切片页顶尖化：生成器补「怎么读本页」段（切片口径/行字段/互指/投影）并重生成五个层页；code_metrics 重冻（geo_export 267 行）；新增契约判据 test_standards_layer_doc_contract（data 层为锚，另验五层同构）。
 
 > 重审（2026-11-13）：代码度量微调重冻：geo_export.py 254 行（恢复答案卡措辞后 +1）

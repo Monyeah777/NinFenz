@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:142a9157504702fa03498494dc452ae2fbb8cfbfcce836992b1d59d1078755e4
-  - protocol/code_metrics_baseline.json:b0d96f13d39a34e7871ac515125cbf9c23a8d7e46c3570e3cca45637c00f5e77
+  - protocol/code_metrics_baseline.json:a19a47dde4810a3d24ae94d98980854391263325de4e54c1d4365e471121007a
 ---
+> 重审（2026-11-13）：层切片页补「本层含义」：生成器加 LAYER_NOTES + _layer_body 助手，重生成五页（data/eng/form/gov/iface 各一句层定义）；修一处字符串被拆成两行的排版 bug；code_metrics 重冻（geo_export 282 行）。
+
 > 重审（2026-11-13）：标准层切片页顶尖化：生成器补「怎么读本页」段（切片口径/行字段/互指/投影）并重生成五个层页；code_metrics 重冻（geo_export 267 行）；新增契约判据 test_standards_layer_doc_contract（data 层为锚，另验五层同构）。
 
 > 重审（2026-11-13）：代码度量微调重冻：geo_export.py 254 行（恢复答案卡措辞后 +1）
