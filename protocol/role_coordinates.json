@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1258
+    "verify": 1259
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8735,6 +8735,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "submissions/04-glama.md 契约：仓库侧证件可核、平台侧状态不冒充判据。",
+      "path": "desktop/tests/test_glama_submission_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "clients/go/README.md 契约：Go 侧第二实现文档必须「七调向量 55 / 7 子命令 / 前提写清」。",
       "path": "desktop/tests/test_go_client_doc_contract.py",
       "role": "verify",
@@ -13932,7 +13938,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "6c3725d18ab6aef5138a79c2dba4360994df5d5e066f9064e397059e8c3caee7",
+  "root_digest": "09e660751dc0eb7917c75b2a65b452c902dc9d2017ef5bc7abfc5a4334eab847",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13941,7 +13947,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1132,
+    "R-verify": 1133,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

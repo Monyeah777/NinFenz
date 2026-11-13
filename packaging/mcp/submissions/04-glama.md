@@ -28,3 +28,22 @@
 | `desktop/src/core/mcp_runtime.py` | 12 个工具的 TDQS 定义面：title + 四项 annotations + 逐字段 outputSchema |
 
 这些文件必须在 GitHub 默认分支上 Glama 才会构建；本地工作区不会被读取。
+
+
+---
+
+## 口径分流（2026-11-14 复核补：与 `GLAMA.md` 同源）
+
+| 面 | 现值 | 复核方式 |
+|---|---|---|
+| 名称 / 仓库 / 站点 / 安装 | 见上（与材料包同源） | 本目录 10 份提交件共用值 |
+| 工具面 | **12 只读工具 + 1 prompt**（`assemble_guide`），无写路径 | `desktop/src/core/mcp_runtime.py` |
+| 双协议 | modern `2026-07-28` + legacy `2025-11-25` | 同上 |
+| `glama.json` | maintainers = `Monyeah777`（Claim 时读取） | 该文件实读 |
+| Dockerfile | 基座按 `@sha256` 钉版 · 非 root · `CMD ["python","scripts/nf.py","serve"]` · 运行期零 pip | `Dockerfile` |
+| 图标 | `packaging/mcp/assets/icon-400.png`，**真实 400×400 PNG** | 读 IHDR（见 `assets/README.md`） |
+| **平台侧状态** | **平台侧未验**：是否已有条目、Claim 是否成功、Glama 的 Quality/TDQS 分、构建是否通过 | 只能在浏览器核对 |
+
+- **分流口径**：仓库侧「证件齐全」≠ 平台侧「已认领 / 已评分 / 构建通过」——两者必须分开说（详见 `GLAMA.md` 的「仓库侧可核 / 平台侧不可核」表）。
+- **不钉运行时计数**：本件描述不带 check/PASS/单测条数；对外文案里的快照数字等于过期承诺。
+- Claim 需要仓库属主 GitHub 账号；`glama.json` 的 maintainers 与账号必须一致，否则 Claim 不会通过。
