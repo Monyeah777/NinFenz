@@ -343,7 +343,7 @@
     "test_mcp_write_freedom": 3.3,
     "test_md_tables": 0.3,
     "test_meta_archive_sample_doc_contract": 2.0,
-    "test_meta_cockpit": 2.2,
+    "test_meta_cockpit": 4.6,
     "test_meta_cockpit_analysis_doc_contract": 0.3,
     "test_meta_cockpit_doc_contract": 0.2,
     "test_meta_roadmap_doc_contract": 0.2,
@@ -3557,6 +3557,20 @@
     "test_meta_archive_sample_doc_contract.MetaArchiveSampleTest.test_contract_catches_mutations": 0.0,
     "test_meta_archive_sample_doc_contract.MetaArchiveSampleTest.test_current_renderer_uses_single_quotes": 1.78,
     "test_meta_archive_sample_doc_contract.MetaArchiveSampleTest.test_sample_matches_contract": 0.0,
+    "test_meta_cockpit.CockpitABTest.test_blind_preregistration_power_and_analysis": 0.01,
+    "test_meta_cockpit.CockpitABTest.test_content_addressed_store_roundtrip": 0.06,
+    "test_meta_cockpit.CognitiveCockpitTest.test_constrained_choice_and_thought_patch_are_closed_surfaces": 0.01,
+    "test_meta_cockpit.CognitiveCockpitTest.test_dynamic_method_sequences_react_to_context": 0.0,
+    "test_meta_cockpit.CognitiveCockpitTest.test_production_handoff_has_no_internal_scoring": 0.38,
+    "test_meta_cockpit.CognitiveCockpitTest.test_session_journal_replays_exactly": 1.48,
+    "test_meta_cockpit.MainCliTest.test_nf_cockpit_and_ab_are_wired": 0.03,
+    "test_meta_cockpit.MetaAtomRuntimeTest.test_meta_runtime_fails_closed": 0.0,
+    "test_meta_cockpit.MetaAtomRuntimeTest.test_registry_and_meta_pipeline_are_complete": 0.0,
+    "test_meta_cockpit.ReleaseAndSafetyTest.test_atom_menu_documents_how_to_read_it": 0.0,
+    "test_meta_cockpit.ReleaseAndSafetyTest.test_generated_atom_menu_matches_its_renderer": 0.0,
+    "test_meta_cockpit.ReleaseAndSafetyTest.test_manifest_binds_runtime_and_limits": 0.12,
+    "test_meta_cockpit.ReleaseAndSafetyTest.test_public_submodules_are_lazy_and_load_on_demand": 1.14,
+    "test_meta_cockpit.ReleaseAndSafetyTest.test_secret_guard_redacts_without_echoing_value": 0.0,
     "test_meta_cockpit_analysis_doc_contract.CockpitAnalysisDocTest.test_analysis_matches_contract": 0.0,
     "test_meta_cockpit_analysis_doc_contract.CockpitAnalysisDocTest.test_contract_catches_mutations": 0.0,
     "test_meta_cockpit_analysis_doc_contract.CockpitAnalysisDocTest.test_facts_live": 0.0,
@@ -5609,5 +5623,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1966.7
+  "total_s": 1969.1
 }
