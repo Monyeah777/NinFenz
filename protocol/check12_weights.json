@@ -153,6 +153,7 @@
     "test_dependabot_contract": 0.4,
     "test_dependency_audit_workflow_contract": 0.2,
     "test_design_checklist_contract": 0.2,
+    "test_differentiation_doc_contract": 0.2,
     "test_dirty_tree": 0.2,
     "test_disk_cache": 0.4,
     "test_disk_cache_bounds": 0.2,
@@ -1944,6 +1945,9 @@
     "test_design_checklist_contract.DesignChecklistContractTest.test_contract_catches_mutations": 0.02,
     "test_design_checklist_contract.DesignChecklistContractTest.test_design_list_matches_contract": 0.0,
     "test_design_checklist_contract.DesignChecklistContractTest.test_mappings_are_live": 0.0,
+    "test_differentiation_doc_contract.DifferentiationDocTest.test_carriers_live": 0.0,
+    "test_differentiation_doc_contract.DifferentiationDocTest.test_contract_catches_mutations": 0.0,
+    "test_differentiation_doc_contract.DifferentiationDocTest.test_differentiation_matches_contract": 0.0,
     "test_dirty_tree.Test.test_missing_head": 0.0,
     "test_dirty_tree.Test.test_validate": 0.0,
     "test_disk_cache.CacheRootC1Test.test_default_root_is_user_level_not_in_repo": 0.02,
@@ -5631,5 +5635,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1971.6
+  "total_s": 1971.8
 }
