@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1208
+    "verify": 1209
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8873,6 +8873,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/io_types.md 契约：I/O 类型面文档必须「9 值词表/覆盖率/判定原则与实现实读一致」。",
+      "path": "desktop/tests/test_io_types_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "IR 内容归一化层单测（v1.2.0 协议中转站 v2，2.0 E0-①）。",
       "path": "desktop/tests/test_ir.py",
       "role": "verify",
@@ -13632,7 +13638,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "86421c511ebe18d4cc1255b5435a61624f1c03e12a372ce88a0a2ad121d89bbe",
+  "root_digest": "b78bbb780dfbddd7ba5de01e8fa704105e591cd7f1afcc117a18facd31467cbd",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13641,7 +13647,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1082,
+    "R-verify": 1083,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
