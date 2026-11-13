@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:9a86928171c71f4a2d3d324508fdafccb60fd7cc8423d52197185214a40ea30f
-  - protocol/code_metrics_baseline.json:6bf5087e381d484d64bc5474ebcabcb4174f3f2dc892f26080076075f41ee671
+  - protocol/code_metrics_baseline.json:623f7d3395009244ba3de67929f0e83ccf140fcf59b832de51f6da8cc1d2e790
 ---
+> 重审（2026-11-13）：重冻代码度量基线（geo_export.py 238 行 / build() 82 行：新增「口径与复现」段所需；确需上调，评审后重冻）
+
 > 重审（2026-11-13）：他证通道说明页顶尖化：code_metrics 基线重签（生成器新增面谱/自跑口径文案，模块 513 行·最长函数 55，为有据增长）。
 
 > 重审（2026-11-12）：library/ALIAS 标题列 + 生成器 +1 行 → code_metrics 基线评审后重冻；契约判据 test_alias_contract。机械重绑。

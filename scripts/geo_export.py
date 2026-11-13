@@ -103,6 +103,17 @@ def build(root: str) -> Dict[str, str]:
     # 可引用卡（按问题形态聚合）
     cards = _head("标准目录 · 可引用卡（按问题形态）", coverage,
                   "每张卡回答一类问题，可直接被生成式引擎引用；数据源同主索引。")
+    cards += [
+        "## 口径与复现", "",
+        "- 生成物：`python scripts/geo_export.py --write` 重写本页；`--check` 是新鲜度判据"
+        "（生成物与真源不一致即红）。**手改必红**。",
+        "- 计数口径：覆盖数取自 `protocol/standards_catalog.json`"
+        "（`standards / reachable / unreachable / bodies / depends_edges`）；"
+        "绑定数取自 `protocol/standards_binding.json`（总量 + 主锚/辅锚）。",
+        "- 可达性 = 本机探针实测（探针日期逐条写在主索引行内）；不可达条目照实披露。",
+        "- 数据/代码/脚本三面一致性由 check40 判；本页只是**投影**，不是第二份事实。",
+        "",
+    ]
     top_ext = sorted(standards,
  key=lambda s: (-len(s.get("ext_points") or []),
  str(s.get("id"))))[:20]

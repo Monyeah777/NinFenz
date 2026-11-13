@@ -11,11 +11,15 @@ subjects:
   - scripts/serve_decision_model.py:bbb36dff0e3816c2253150b7de6ab619877c3c78269a644c4c966083df15afee
   - scripts/interop_thirdparty_kit.py:4f967d3f29cd31deb79f1b97fdee5f59ae74fde0d378ced571d2896af2d275dc
   - scripts/build_verification_cards.py:370f465c17eb18e4ef928194351c759bf33af75e5c1cd5b85abfc2a4b1d39655
-  - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
+  - scripts/geo_export.py:10a72c48301cd73cbedd399ca53e722231bee7a1ab3eda2eee6cc72b13d8653d
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:6bf5087e381d484d64bc5474ebcabcb4174f3f2dc892f26080076075f41ee671
+  - protocol/code_metrics_baseline.json:623f7d3395009244ba3de67929f0e83ccf140fcf59b832de51f6da8cc1d2e790
 ---
+> 重审（2026-11-13）：重冻代码度量基线（geo_export.py 238 行 / build() 82 行：新增「口径与复现」段所需；确需上调，评审后重冻）
+
+> 重审（2026-11-13）：标准答题卡（生成物）顶尖化：生成器补「口径与复现」段（生成物纪律/计数来源/可达性/投影定位）后重新生成；新增契约判据 test_answer_cards_doc_contract（含 geo_export --check 新鲜度实跑）；权重增量重测。本轮为机械重绑。
+
 > 重审（2026-11-13）：他证通道说明页顶尖化：code_metrics 基线重签（生成器新增面谱/自跑口径文案，模块 513 行·最长函数 55，为有据增长）。
 
 > 重审（2026-11-13）：他证通道说明页顶尖化（补「自跑≠他证」第 4 条 + 面谱 2-5-4-3 分档 + 现状对照；改生成器 render_doc 后重出说明页，不重跑 --emit 以保护回填表）+ 契约判据 test_interop_thirdparty_doc_contract；权重增量重测。本轮为机械重绑。

@@ -7,6 +7,13 @@
 - 可达性是**本机实测**（探针日期见每条），不可达条目照实标注、不假装可达。
 - 每张卡回答一类问题，可直接被生成式引擎引用；数据源同主索引。
 
+## 口径与复现
+
+- 生成物：`python scripts/geo_export.py --write` 重写本页；`--check` 是新鲜度判据（生成物与真源不一致即红）。**手改必红**。
+- 计数口径：覆盖数取自 `protocol/standards_catalog.json`（`standards / reachable / unreachable / bodies / depends_edges`）；绑定数取自 `protocol/standards_binding.json`（总量 + 主锚/辅锚）。
+- 可达性 = 本机探针实测（探针日期逐条写在主索引行内）；不可达条目照实披露。
+- 数据/代码/脚本三面一致性由 check40 判；本页只是**投影**，不是第二份事实。
+
 ## 卡 1 · 哪些标准提供扩展点？
 
 全 **370** 条标准均声明扩展点（`ext_points`），扩展点最多的 20 条：
