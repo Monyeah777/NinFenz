@@ -242,6 +242,7 @@
     "test_handover": 0.2,
     "test_handover_template_doc_contract": 9.5,
     "test_handovers_readme_doc_contract": 8.1,
+    "test_hf_space_readme_doc_contract": 10.0,
     "test_host_projection": 0.1,
     "test_hotspot_profile": 0.6,
     "test_http_api": 9.1,
@@ -2596,6 +2597,9 @@
     "test_handovers_readme_doc_contract.HandoversReadmeTest.test_contract_catches_mutations": 5.32,
     "test_handovers_readme_doc_contract.HandoversReadmeTest.test_protocol_live": 1.31,
     "test_handovers_readme_doc_contract.HandoversReadmeTest.test_readme_matches_contract": 1.31,
+    "test_hf_space_readme_doc_contract.HfSpaceReadmeTest.test_contract_catches_mutations": 6.51,
+    "test_hf_space_readme_doc_contract.HfSpaceReadmeTest.test_readme_matches_contract": 1.64,
+    "test_hf_space_readme_doc_contract.HfSpaceReadmeTest.test_space_facts_live": 1.62,
     "test_host_projection.Test.test_parity_and_allowlist": 0.0,
     "test_host_projection.Test.test_placeholder_residue": 0.0,
     "test_host_projection.Test.test_render_and_marker_guard": 0.0,
@@ -5647,5 +5651,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1990.8
+  "total_s": 2000.8
 }

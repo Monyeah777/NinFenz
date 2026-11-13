@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1251
+    "verify": 1252
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8789,6 +8789,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "packaging/hf-space/README.md 契约：Space 说明必须「模式 / 限额 / 端口 / 前提 / doctor」自洽。",
+      "path": "desktop/tests/test_hf_space_readme_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "",
       "path": "desktop/tests/test_host_projection.py",
       "role": "verify",
@@ -13890,7 +13896,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "48d1042ac149f762e9d19cb25897b907b3d27edf3d397397ad0d4b66c83d8d1f",
+  "root_digest": "f305cab15497c110ee3729a38817a308e10aa22f29c435a1845b3df3c93eb54a",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13899,7 +13905,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1125,
+    "R-verify": 1126,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
