@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1205
+    "verify": 1206
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8555,6 +8555,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/fde-stack.md 契约：栈位契约必须「载体引用真实存在 + 五条达标线 + 互操作面清点一致」。",
+      "path": "desktop/tests/test_fde_stack_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "",
       "path": "desktop/tests/test_feature_lifecycle.py",
       "role": "verify",
@@ -13614,7 +13620,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "e987865a99eeeafb515fd5b906f777869ff75f4e3d546d88474ce3608ed52442",
+  "root_digest": "709682cbd412ec7b00f73d23403f8e8a9aed7c6a842f53b1f576bdc6dd117af1",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13623,7 +13629,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1079,
+    "R-verify": 1080,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

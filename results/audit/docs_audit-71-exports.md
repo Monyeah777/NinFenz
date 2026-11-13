@@ -14,12 +14,14 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/fde_sample_run.py:ae1e644b7ab0b61e430d6224ef4495e4371cba86e520d99c8d532cfb9370568d
   - protocol/CONFORMANCE.md:006b56748b6daaf2419be40a65247d90efd6291e87ccd61c6527ed1526b6b4e4
-  - docs/fde-stack.md:79633a484dcf01cd92c03deac96d7b59f85489c1aa0ec4ad5489768d2702da8a
+  - docs/fde-stack.md:96c074dffcbcc513fbf3bec79d5b895ac9cfec543430f21805eb5d2370b43bca
   - docs/fde-sample/README.md:ac3da5b467b4963681af3ded98c65a184577883e90f215b9e852aaca104294c4
   - docs/interop-thirdparty.md:637dff4598a4b8ff21f81090c20b625269cea49903d396a3fc2968f2f1e1f2fc
   - results/interop-thirdparty-status.md:e57c95980dd8b36bf137d23db0cf3c93ba8aee5221d2d26f2a6c782c30df0469
 
 ---
+> 重审（2026-11-13）：FDE 栈位文档顶尖化（修 mcp.json 失效引用 → 运行期产物 + 12 件互操作面清点 + 370/1200 + 五条达标线 + 现状对照 / 复现）+ 契约判据 test_fde_stack_doc_contract；权重增量重测。本轮为机械重绑。
+
 > 重审（2026-11-13）：FDE 交付物样本顶尖化（修同页 4≠5：四道门→五道门 G1–G4+G5，改生成器后 --run 重生成；manifest sha 同步）+ 契约判据 test_fde_deliverable_doc_contract；权重增量重测。本轮为机械重绑。
 
 > 重审（2026-11-13）：FDE 样例说明顶尖化（补 6/2/48/47/4/370 机读现状 + check32 注册点 + 现状对照 / 复现）+ 契约判据 test_fde_sample_doc_contract；权重增量重测。本轮为机械重绑。

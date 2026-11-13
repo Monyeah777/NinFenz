@@ -2,6 +2,10 @@
 
 > 用途：给做客户交付的前向工程师（FDE）与客户侧技术决策人一份**可判定的位置说明**——NF 不是模型、不是端壳、不是垂直应用，而是**中间那层契约与证据**。
 > 纪律：本文只写结果与状态；每条达标线都给可跑命令或可复算判据。
+> **最后更新：2026-11-13（复核）**：栈位/边界/五条达标线/非目标**复核不变**；修一处**失效引用**：
+> 原文把传输面的载体写成 `results/interop/mcp.json`，但该文件**不在仓内**——MCP 面是**运行期产物**
+> （`nf run --fmt mcp --dest <out>` 现做），仓里提交的是 `results/interop/` 下 **12 件**真实面
+> （含 `a2a.json`，不含 `mcp.json`）。见「§现状对照」。
 
 ## 一、栈位
 
@@ -22,8 +26,8 @@
 
 | 契约 | 形态 | 载体 |
 |---|---|---|
-| 传输/工具面 | MCP（`server/discover` + 四类列表）、A2A Agent Card | `results/interop/mcp.json` / `a2a.json`；他证通道 `docs/interop-thirdparty.md` |
-| 内容与格式面 | OpenAPI / AsyncAPI / SBOM / CycloneDX / in-toto / SLSA / PROV / VC | `results/interop/*.json`（12 面）+ 上游判据校验 `results/interop-schema-validation.md` |
+| 传输/工具面 | MCP（`server/discover` + 四类列表）、A2A Agent Card | A2A：`results/interop/a2a.json`；MCP：**运行期产物**（`nf run --fmt mcp --dest <out>` 现做，不入仓）；他证通道 `docs/interop-thirdparty.md` |
+| 内容与格式面 | OpenAPI / AsyncAPI / SBOM / CycloneDX / in-toto / SLSA / PROV / VC / A2A / C2PA / decisions / cid | `results/interop/*.json`（**12 面**）+ 上游判据校验 `results/interop-schema-validation.md` |
 | 标准锚面 | 370 条可扩展标准（含扩展点）与 1200 条绑定 | `protocol/standards_catalog.json` · `standards_binding.json` · GEO 出口 `docs/standards/index.md` |
 
 **对上（交付侧）——NF 向 FDE 承诺什么**
@@ -43,6 +47,31 @@
 3. **可复现**：同一输入两次产出除时间戳外一致；判据 = 样例 `--run` 两次比对 + `--check` 逐字节比对证据。
 4. **零编造**：文档里的数字与状态全部来自产物实算；判据 = `nf stats --check` + `geo_export.py --check` 双绿。
 5. **白盒**：判据、证据、口径均可读可复算（不依赖读代码即可验证）；判据 = 每条数字/结论都能回指 `protocol/repo_stats.json`、`RECEIPTS.json` 或 `docs/standards/*`。
+
+## 现状对照（2026-11-13 · 以实跑为准）
+
+| 面 | 本文声明 | 复核结果（读到本行时请重跑） |
+|---|---|---|
+| 栈位 | 上/中/下三层 + 「换下层不换中层」 | **不变** |
+| 传输面载体 | 原写 `results/interop/mcp.json` | **失效引用已修**：仓内无该文件；MCP 是运行期产物，A2A 已提交 |
+| 互操作面 | 「12 面」 | **12 件**（a2a / asyncapi / c2pa / cid / cyclonedx / decisions / intoto / openapi / prov / sbom / slsa / vc） |
+| 标准锚面 | 370 条标准 + 1200 条绑定 | **370 / 1200**（`standards_catalog.standards` / `standards_binding.bindings_total`） |
+| 装载入口 | `llms.txt` + `docs/agent/AGENT_START.md` | **两件均在** |
+| 门禁 | 单入口 `bash verify.sh`；数不写死 | **不变**（当前值看 `nf stats --check` 生成区；基线 `quality_baseline.py`） |
+| 达标线 | 五条（可装载/可质检/可复现/零编造/白盒） | **五条全在**；判据命令在文 |
+
+> 本表只作「当时 → 现行」导航，不替代实跑。
+
+## 复现与引用口径
+
+```bash
+python scripts/nf.py stats --check     # 自述数字 = 实算（含入口一致性）
+python scripts/geo_export.py --check   # 标准锚面 = 生成物（370 条）
+python scripts/fde_sample_run.py --check   # 交付样例证据未腐烂
+```
+
+- 引用本文时：「换模型/换协议/换引擎，中层契约与判据不变」= 长期口径。
+- 互操作面清单以 `ls results/interop/*.json` 实读为准；MCP 快照按需现做，不要当成仓内件引用。
 
 ## 四、与其它出口的关系
 
