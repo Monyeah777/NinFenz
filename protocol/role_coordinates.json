@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1271
+    "verify": 1272
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -10655,6 +10655,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "patterns/single-source-truth/PATTERN.md 契约：五个投影件都在、标记与重算判据真实成立。",
+      "path": "desktop/tests/test_single_source_truth_pattern_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "站点面（对外文档门户）常驻判据。",
       "path": "desktop/tests/test_site_face.py",
       "role": "verify",
@@ -14010,7 +14016,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "2273ca8240eb4d0507ef652e5223cd3364f014128d857c006e50d78163c74f94",
+  "root_digest": "f0ef158837e78528d3bf0ded14b37c0a0e08160f8fe7b371bb277b4e14cad19f",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -14019,7 +14025,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1145,
+    "R-verify": 1146,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
