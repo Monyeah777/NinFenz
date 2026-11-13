@@ -442,6 +442,7 @@
     "test_quality_gate": 0.2,
     "test_quant_domain_package": 0.6,
     "test_quant_metrics": 0.1,
+    "test_quickstart_doc_contract": 0.2,
     "test_quickstart_reference_contract": 0.2,
     "test_rating_gate": 0.2,
     "test_reader_verify": 1.2,
@@ -4379,6 +4380,9 @@
     "test_quant_metrics.ReportTest.test_charts_are_generated_from_data": 0.0,
     "test_quant_metrics.ReportTest.test_load_rejects_bad_input": 0.0,
     "test_quant_metrics.ReportTest.test_report_is_deterministic_and_disclosed": 0.0,
+    "test_quickstart_doc_contract.QuickstartDocTest.test_contract_catches_mutations": 0.01,
+    "test_quickstart_doc_contract.QuickstartDocTest.test_doc_and_script_aligned": 0.0,
+    "test_quickstart_doc_contract.QuickstartDocTest.test_quickstart_matches_contract": 0.0,
     "test_quickstart_reference_contract.QuickstartReferenceContractTest.test_commands_registered": 0.0,
     "test_quickstart_reference_contract.QuickstartReferenceContractTest.test_contract_catches_mutations": 0.02,
     "test_quickstart_reference_contract.QuickstartReferenceContractTest.test_install_paths_exist": 0.0,
@@ -5539,5 +5543,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1895.3
+  "total_s": 1895.5
 }
