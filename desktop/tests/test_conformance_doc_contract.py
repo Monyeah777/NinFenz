@@ -64,8 +64,22 @@ def conformance_issues(text: str) -> list:
     if "27/27 conformant" not in text:
         issues.append("未写 27/27 conformant")
     root = str(rep.get("root") or "")
-    if root and root[:16] not in text:
-        issues.append(f"正文缺现场 root 前缀：{root[:16]}")
+    # root 是内容寻址摘要，任何文档改动都会让它变——**要求本文不钉死它**：
+    # 若出现当前 root 前缀则允许；若出现的是过时 root，则必须在带留痕词的同一行里（历史留痕）。
+    if root and root[:16] in text:
+        pass
+    else:
+        stale = [ln for ln in text.splitlines()
+                 if len(ln) > 0 and any(ch in ln for ch in "0123456789abcdef")
+                 and "root" in ln and "不在本文钉死" not in ln
+                 and not any(w in ln for w in ("留痕", "当时", "历史", "实读"))
+                 and "不钉" not in ln]
+        if stale:
+            issues.append("正文钉了 root 但既非当前值也无留痕词")
+        pinned_rule = ("不在本文钉死" not in text and
+                       "以 `protocol/conformance_report.json` 实读为准" not in text)
+        if pinned_rule:
+            issues.append("未说明 root 以报告实读为准（不许钉死）")
     verify = VERIFY.read_text(encoding="utf-8")
     if "check42" not in verify:
         issues.append("verify.sh 未到 check42")
@@ -118,8 +132,9 @@ class ConformanceDocTest(unittest.TestCase):
         """变异自证：契约数回退 / root 缺失 / 门禁规模回退 / 缺冻结链 / 缺命令。"""
         old_n = self.text.replace("27 条", "10 条")
         self.assertTrue(any("27 条" in i for i in conformance_issues(old_n)))
-        no_root = self.text.replace("c94a8576675b749e", "deadbeef")
-        self.assertTrue(any("root" in i for i in conformance_issues(no_root)))
+        no_rule = self.text.replace("不在本文钉死", "已钉死").replace(
+            "以 `protocol/conformance_report.json` 实读为准", "")
+        self.assertTrue(any("root" in i for i in conformance_issues(no_rule)))
         old_v = self.text.replace("check1-42", "check1-35")
         self.assertTrue(any("check1-42" in i for i in conformance_issues(old_v)))
         no_chain = self.text.replace("DEFAULT_FREEZE_CHAIN", "某链")
