@@ -543,6 +543,7 @@
     "test_scratch": 0.3,
     "test_script_orphans": 1.1,
     "test_sealed_crosscheck": 0.2,
+    "test_search_submit_doc_contract": 0.3,
     "test_security_contract": 0.2,
     "test_seed_from_repo": 0.2,
     "test_selfcontained_rebuild": 0.2,
@@ -5068,6 +5069,9 @@
     "test_sealed_crosscheck.PipelineWiringTest.test_local_fallback_face_exists": 0.0,
     "test_sealed_crosscheck.PipelineWiringTest.test_workflow_does_not_rerun_the_repository_gate": 0.0,
     "test_sealed_crosscheck.PipelineWiringTest.test_workflow_triggers_on_push_to_main": 0.0,
+    "test_search_submit_doc_contract.SearchSubmitDocTest.test_contract_catches_mutations": 0.0,
+    "test_search_submit_doc_contract.SearchSubmitDocTest.test_doc_matches_contract": 0.0,
+    "test_search_submit_doc_contract.SearchSubmitDocTest.test_offline_check_reports_42": 0.07,
     "test_security_contract.SecurityPolicyContractTest.test_channels_are_mutually_declared": 0.0,
     "test_security_contract.SecurityPolicyContractTest.test_contract_catches_broken_policy": 0.01,
     "test_security_contract.SecurityPolicyContractTest.test_links_resolve": 0.0,
@@ -5779,5 +5783,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2044.2
+  "total_s": 2044.5
 }

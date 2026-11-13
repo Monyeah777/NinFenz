@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1281
+    "verify": 1282
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -10595,6 +10595,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "site/DEPLOY-search-submit.md 契约：通道清单 / IndexNow 配置 / 判据项数必须可核。",
+      "path": "desktop/tests/test_search_submit_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "安全策略契约判据：报告通道必须「分类清楚、模板可给、时限与披露可判」（2026-11-10）。",
       "path": "desktop/tests/test_security_contract.py",
       "role": "verify",
@@ -14070,7 +14076,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "8f5150e6832b69d0ed50daa6b32ed7c604dd7c7fe4ca0c816693f41e66f5bfb4",
+  "root_digest": "b15123db3cbcd3446061ea4c5335ea60941c22a69a75dc20d44e9b06d0ae6cdd",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -14079,7 +14085,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1155,
+    "R-verify": 1156,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
