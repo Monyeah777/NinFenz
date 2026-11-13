@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1278
+    "verify": 1279
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -11099,6 +11099,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "protocol/WORLD_MODEL.md 契约：schema 形状 / 硬门语义 / 运行器 API 必须与实现一致。",
+      "path": "desktop/tests/test_world_model_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "world_slots 注册表扫描器单测。",
       "path": "desktop/tests/test_world_slots.py",
       "role": "verify",
@@ -14052,7 +14058,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "ea46dd10d404ad51819d2b5dfb7718f1e0b8603d2396d508355a4a20738e0883",
+  "root_digest": "e88896d07cc1f752b17e80be944a43a1cc8db74e455da4c7814e354e4fefe4f7",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -14061,7 +14067,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1152,
+    "R-verify": 1153,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

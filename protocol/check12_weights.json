@@ -627,6 +627,7 @@
     "test_workflow_policy": 0.2,
     "test_worktree_vs_index_pattern_doc_contract": 10.6,
     "test_world_model": 0.5,
+    "test_world_model_doc_contract": 1.9,
     "test_world_slots": 0.1,
     "test_write_flag_gate": 4.4,
     "test_yaml_recheck": 0.2,
@@ -5750,6 +5751,10 @@
     "test_world_model.WorldModelTest.test_slot_registry_unknown_slot_fails": 0.0,
     "test_world_model.WorldModelTest.test_unreachable_phase_fails": 0.0,
     "test_world_model.WorldModelTest.test_valid_minimal_contract": 0.0,
+    "test_world_model_doc_contract.WorldModelDocTest.test_contract_catches_mutations": 0.01,
+    "test_world_model_doc_contract.WorldModelDocTest.test_doc_matches_contract": 0.0,
+    "test_world_model_doc_contract.WorldModelDocTest.test_run_produces_digest": 1.53,
+    "test_world_model_doc_contract.WorldModelDocTest.test_scan_live": 0.14,
     "test_world_slots.WorldSlotsTest.test_bad_kind_fails": 0.0,
     "test_world_slots.WorldSlotsTest.test_item_kind_only_array_fails": 0.0,
     "test_world_slots.WorldSlotsTest.test_missing_owner_fails": 0.0,
@@ -5766,5 +5771,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2041.7
+  "total_s": 2043.6
 }
