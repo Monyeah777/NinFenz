@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:8534f6fd95247db0538ee53e6b91c1e298cfbbe4880075cffd6e0c1982e82da5
+  - protocol/check12_weights.json:7825e8260ee8e6428ce0099bf4a22e65712b34a23cf33813c521fefa86bb492a
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:fa00a7fd014857af56e11f38ced1b7d888be053befaadb10b3dd494d27884316
   - docs/meta-cockpit/功能解析.md:de20c2340d19d541bcfde53f222a3acf22a6e440d8fb3dcf51a37aedf53c0c25
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-14）：Go 客户端 README 顶尖化：补七调向量 55（28/6/7/3/1/6/4 与 results/ccos 逐文件对账）、7 子命令、Go ≥1.24 前提与「本机未装 Go → go test 本轮未跑」诚实标注；新增判据 test_go_client_doc_contract。
+
 > 重审（2026-11-14）：STRATEGY 增「§六 五维载体（可核索引）」（只做导航不改口径：每维的机检载体/留证位置/复核命令），并扩展 test_strategy_contract 判据（五维载体逐行 + 留证位置在场 + 索引口径）。
 
 > 重审（2026-11-14）：GLAMA 上架教程顶尖化：补「仓库侧可核 / 平台侧不可核」现状对照（Dockerfile 钉版+非 root+CMD serve+零 pip、glama.json maintainers、版本一致、12 工具+1 prompt）+ 复现口径；新增判据 test_glama_doc_contract。
