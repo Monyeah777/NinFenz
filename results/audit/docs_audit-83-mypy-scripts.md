@@ -11,11 +11,13 @@ subjects:
   - scripts/serve_decision_model.py:bbb36dff0e3816c2253150b7de6ab619877c3c78269a644c4c966083df15afee
   - scripts/interop_thirdparty_kit.py:4f967d3f29cd31deb79f1b97fdee5f59ae74fde0d378ced571d2896af2d275dc
   - scripts/build_verification_cards.py:370f465c17eb18e4ef928194351c759bf33af75e5c1cd5b85abfc2a4b1d39655
-  - scripts/geo_export.py:385d4a7fdcbb2611486f23baf8908e389e3e0eb3564321e01062f250a611d92d
+  - scripts/geo_export.py:f0ab3784503e8b3413d0b5a5ec019baf2bd86ac3451b9b514f0cf7932858b9bc
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:a19a47dde4810a3d24ae94d98980854391263325de4e54c1d4365e471121007a
+  - protocol/code_metrics_baseline.json:1459398ed3e13fc8992160531bf2495d8f61496c784fb32e37d4a1807f335101
 ---
+> 重审（2026-11-13）：层切片页补本层统计：生成器 _layer_body 增「本层可达 X/Y」与「绑定最多前三」（按主锚+辅锚排序，读自 binding packs），重生成五页；判据同步断言每个层页的统计与前三；code_metrics 重冻（geo_export 295 行）。
+
 > 重审（2026-11-13）：层切片页补「本层含义」：生成器加 LAYER_NOTES + _layer_body 助手，重生成五页（data/eng/form/gov/iface 各一句层定义）；修一处字符串被拆成两行的排版 bug；code_metrics 重冻（geo_export 282 行）。
 
 > 重审（2026-11-13）：标准层切片页顶尖化：生成器补「怎么读本页」段（切片口径/行字段/互指/投影）并重生成五个层页；code_metrics 重冻（geo_export 267 行）；新增契约判据 test_standards_layer_doc_contract（data 层为锚，另验五层同构）。

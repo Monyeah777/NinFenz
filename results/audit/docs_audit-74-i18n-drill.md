@@ -26,8 +26,10 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:a19a47dde4810a3d24ae94d98980854391263325de4e54c1d4365e471121007a
+  - protocol/code_metrics_baseline.json:1459398ed3e13fc8992160531bf2495d8f61496c784fb32e37d4a1807f335101
 ---
+> 重审（2026-11-13）：层切片页补本层统计：生成器 _layer_body 增「本层可达 X/Y」与「绑定最多前三」（按主锚+辅锚排序，读自 binding packs），重生成五页；判据同步断言每个层页的统计与前三；code_metrics 重冻（geo_export 295 行）。
+
 > 重审（2026-11-13）：层切片页补「本层含义」：生成器加 LAYER_NOTES + _layer_body 助手，重生成五页（data/eng/form/gov/iface 各一句层定义）；修一处字符串被拆成两行的排版 bug；code_metrics 重冻（geo_export 282 行）。
 
 > 重审（2026-11-13）：标准层切片页顶尖化：生成器补「怎么读本页」段（切片口径/行字段/互指/投影）并重生成五个层页；code_metrics 重冻（geo_export 267 行）；新增契约判据 test_standards_layer_doc_contract（data 层为锚，另验五层同构）。
