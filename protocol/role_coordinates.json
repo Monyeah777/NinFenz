@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1260
+    "verify": 1261
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9539,6 +9539,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "submissions/06-modelscope.md 契约：中文表单字段同源 / 仅 stdio / 平台侧不冒充判据。",
+      "path": "desktop/tests/test_modelscope_submission_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "40 总纲 v2.8 波B S5 —— 模块生命周期单测（status 位 + deprecate/restore + 引用门禁）。",
       "path": "desktop/tests/test_module_lifecycle.py",
       "role": "verify",
@@ -13944,7 +13950,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "79de0eff11ee769d3ecd44f33108af6e2876f0a3a6f9b97c9368ea090bbae4d4",
+  "root_digest": "0ed41c139a26deadada12d90ae699b3d0f5a2ca1bbe885faf3e1350e28ba5bd5",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13953,7 +13959,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1134,
+    "R-verify": 1135,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
