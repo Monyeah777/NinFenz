@@ -162,6 +162,7 @@
     "test_docs_cite_probe_numbers": 0.1,
     "test_domain_pack": 0.3,
     "test_domain_pack_render": 0.3,
+    "test_domain_packs_doc_contract": 0.3,
     "test_dotnet_aot": 0.2,
     "test_dotnet_build_workflow_contract": 0.2,
     "test_drill_doc_contract": 0.2,
@@ -1986,6 +1987,9 @@
     "test_domain_pack_render.SyntheticSpecRenderingTest.test_renderers_produce_structured_markdown": 0.06,
     "test_domain_pack_render.SyntheticSpecRenderingTest.test_standard_binding_surface_is_reachable": 0.01,
     "test_domain_pack_render.SyntheticSpecRenderingTest.test_synthetic_spec_is_structurally_valid": 0.0,
+    "test_domain_packs_doc_contract.DomainPacksDocTest.test_contract_catches_mutations": 0.04,
+    "test_domain_packs_doc_contract.DomainPacksDocTest.test_data_live": 0.01,
+    "test_domain_packs_doc_contract.DomainPacksDocTest.test_domain_packs_matches_contract": 0.01,
     "test_dotnet_aot.AotEquivalenceTest.test_aot_and_jit_are_byte_identical": 0.0,
     "test_dotnet_aot.AotEquivalenceTest.test_aot_matches_spec_on_every_conformance_vector": 0.0,
     "test_dotnet_aot.ArtifactShapeTest.test_aot_is_much_smaller_than_trimmed_self_contained": 0.0,
@@ -5415,5 +5419,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1884.5
+  "total_s": 1884.8
 }
