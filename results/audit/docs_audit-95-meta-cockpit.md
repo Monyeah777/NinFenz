@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:383f26f896c3d8c3ae3fe5ee2a5e0ce393968d6ba5076d654c5fdf739c3c6b75
+  - protocol/check12_weights.json:569f23eb22a29f50ba1c50c4cdf394b654875b20edeebde81d1f65756d72ef0c
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:fa00a7fd014857af56e11f38ced1b7d888be053befaadb10b3dd494d27884316
   - docs/meta-cockpit/功能解析.md:de20c2340d19d541bcfde53f222a3acf22a6e440d8fb3dcf51a37aedf53c0c25
-  - results/meta-cockpit-manifest.json:ec352c0c1ad9628f8febcb867114c71e8063915a99f41fe669ffc319462ce020
+  - results/meta-cockpit-manifest.json:8ae03b3e1c85d45531553c6903715281ac1a03e239b62863f765ae7308c47f1d
 
 ---
+> 重审（2026-11-14）：COCKPIT_PROTOCOL 顶尖化：补「给人看≠给模型指令」分隔 + §现状对照（3 原子/8 轮/1 次重规划/deadline/36000+8000 预算/33 原子/fail-closed/盲评四值）+ 复现口径；新增判据 test_cockpit_protocol_doc_contract；manifest 已重算。
+
 > 重审（2026-11-14）：ATOM_MENU 顶尖化：菜单生成器增「怎么读这一页」（字段/选择纪律/执行器关系/分组口径），重生成 33 原子菜单并同步 meta-cockpit-manifest 摘要；test_meta_cockpit 增读法判据。
 
 > 重审（2026-11-14）：Go 客户端 README 顶尖化：补七调向量 55（28/6/7/3/1/6/4 与 results/ccos 逐文件对账）、7 子命令、Go ≥1.24 前提与「本机未装 Go → go test 本轮未跑」诚实标注；新增判据 test_go_client_doc_contract。
