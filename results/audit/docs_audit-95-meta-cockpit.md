@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:13ff36aa210436a60e958ca1997652a80ee7d5ae270aae272118fbf9fec1ebcd
+  - protocol/check12_weights.json:3018f08b51b269ed779196b9108ada2ee2a6369e673d48918243802126c9db13
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:fa00a7fd014857af56e11f38ced1b7d888be053befaadb10b3dd494d27884316
   - docs/meta-cockpit/功能解析.md:de20c2340d19d541bcfde53f222a3acf22a6e440d8fb3dcf51a37aedf53c0c25
   - results/meta-cockpit-manifest.json:60c0e100798e49d393557ae5066c02d7e057ec27f386ee1a36ca3fc7740150ba
 
 ---
+> 重审（2026-11-14）：patterns/README 顶尖化：补 §现状对照（7 包全 active / 2 值词表 / 6 必填键 / 可证性 / INDEX 整页生成幂等 / verify 机检）+ §新增/审阅四步 + 复现口径；新增判据 test_patterns_readme_doc_contract（README ↔ core/patterns 常量活绑定）。
+
 > 重审（2026-11-14）：patterns/INDEX 顶尖化：把「现状对照（实践包/规则总数/状态分布/包 id）+ 复现口径」做成**生成内容**（renderer 实时算），页头改为「整页生成物」声明 + 最后更新；新增判据 test_patterns_index_doc_contract（reindex 幂等逐字节、计数与真源一致）。
 
 > 重审（2026-11-14）：npm README 顶尖化：修生成口径漂移（体积 24.74 → 25.19 MB，由 stage --sync-readme 自动同步）+ 补 §现状对照/复现口径（版本/engines/bin/files/无 install 脚本/provenance/本机限制）+ 判据 test_npm_readme_doc_contract。
