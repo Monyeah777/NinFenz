@@ -18,13 +18,17 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:87e0b7b24900ebdf1b5927c49d4946e933dfae0d88b1e99c45c2111b3926fc24
+  - protocol/check12_weights.json:45b45dd6dbb49df38cb69a7f99ee7ad71566a326d725b9413d0f991a6cff772c
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:fa00a7fd014857af56e11f38ced1b7d888be053befaadb10b3dd494d27884316
   - docs/meta-cockpit/功能解析.md:de20c2340d19d541bcfde53f222a3acf22a6e440d8fb3dcf51a37aedf53c0c25
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-13）：P03 样本冻结约束固化：新增 freeze 判据 test_full_sample_p03_doc_contract（sha256/非空白行/5 条裁定），样本字节已还原；权重增量重测。
+
+> 重审（2026-11-13）：完整版样本（P03）顶尖化：补可核锚（层 9 / 槽位 27 / token 71 / 事件 18 / hard 0 / advisory 11 / 去重 23（官方 20+包内 3）/ assets 23 内容 / NF-1 在场）+ 现状对照 + 复现口径；「默认装配 24」计法不吻合实读，标注为待澄清（不改历史句）。
+
 > 重审（2026-11-13）：验证卡册顶尖化：散文去掉钉死的 40 条/check1-40/PASS=70（生成区早已 42/76，属真漂移），改为指向生成区；新增判据 test_verification_cards_doc_contract（生成区与 verify.sh 一致 + 散文禁钉数）。
 
 > 重审（2026-11-13）：文本卫生文档顶尖化（补漏记的第 5 条 SemVer 规则 / 4399 文本·1240 JSON·269070 键·111 版本 + 现状对照 / 复现）+ 契约判据 test_text_hygiene_doc_contract。

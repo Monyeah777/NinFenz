@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1239
+    "verify": 1240
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8591,6 +8591,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/完整版样本_西幻生存流P03.md 契约：冻结证据件——字节不许变（它是保真度裁定的语料）。",
+      "path": "desktop/tests/test_full_sample_p03_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "缺口逐行审查（gap_review）单测：候选筛法可复现 + 确定性证据复核 + stub 双轨纪律。",
       "path": "desktop/tests/test_gap_review.py",
       "role": "verify",
@@ -13818,7 +13824,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "4ccf2b4cf1f7f4135db55a3da52895132d751e4cb3a87aff6235d4cfeb9e7a5a",
+  "root_digest": "771a3a179aeb18c372bfb771e10189fe46ec9970a73b918fb0be0fb78b78cd4c",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13827,7 +13833,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1113,
+    "R-verify": 1114,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
