@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1249
+    "verify": 1250
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8783,6 +8783,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "handovers/README.md 契约：三个内部治理目录的公开面政策必须同构、白名单可机检。",
+      "path": "desktop/tests/test_handovers_readme_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "",
       "path": "desktop/tests/test_host_projection.py",
       "role": "verify",
@@ -13878,7 +13884,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "4b06e0f7cd2f8fe061b1e197a45a3ef7b0827b71354612a1995307d98af00c00",
+  "root_digest": "7a57c72c88dc497a9c270da806de988f91f0c19c393362ac3208a217b32c5b31",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13887,7 +13893,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1123,
+    "R-verify": 1124,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
