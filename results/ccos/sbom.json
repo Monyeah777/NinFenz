@@ -1,7 +1,7 @@
 {
-  "bytes": 12240525,
+  "bytes": 12240613,
   "count": 572,
-  "digest": "ab33d5b2df5b9eb961fc1e82b1b4f86955208a82db7efd0f8c6b7def7bc80fd3",
+  "digest": "7b214529ff009874e7e8c3be5135c5a435cc6dec9447ab7fd5cecd3937f97dad",
   "materials": [
     {
       "bytes": 102,
@@ -1906,7 +1906,7 @@
     {
       "bytes": 79590,
       "path": "protocol/RECEIPTS.json",
-      "sha256": "44eef21df577642194e940df01a7d21b848dc4e5fec715a83e938b3f7302247c"
+      "sha256": "226a8192b7a1763fab53655ab3f3b874ee825b2e9cbb37e0e321269a0845696d"
     },
     {
       "bytes": 3468,
@@ -1959,9 +1959,9 @@
       "sha256": "c2402950e34e3ff9bd0f09171c8bee821bf0f57c33f32d0dbc4bb4b3e6157914"
     },
     {
-      "bytes": 446702,
+      "bytes": 446790,
       "path": "protocol/check12_weights.json",
-      "sha256": "f2ae5ec432e1fac0aaad405eb3d91592f8d24fe9a5f4050cc6de67115760fcdc"
+      "sha256": "8534f6fd95247db0538ee53e6b91c1e298cfbbe4880075cffd6e0c1982e82da5"
     },
     {
       "bytes": 16170,
@@ -2101,7 +2101,7 @@
     {
       "bytes": 27560,
       "path": "protocol/generated/receipt_chain.json",
-      "sha256": "56a2478390b1e5ec561664a8a10c1d9ca131ae80ddbf1dfd2c727eb337c53e6e"
+      "sha256": "4727c227eb7d1300f6542c6f24ac91b5185ec2fda21d08fe7c8214a58b94416a"
     },
     {
       "bytes": 918,

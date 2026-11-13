@@ -5056,6 +5056,7 @@
     "test_steelman.TestSteelmanScan.test_scan_empty_dir": 0.0,
     "test_steelman.TestSteelmanScan.test_scan_finds_md_files_with_frontmatter": 0.0,
     "test_strategy_contract.StrategyContractTest.test_contract_catches_broken_strategy": 0.01,
+    "test_strategy_contract.StrategyContractTest.test_dimension_carriers_indexed": 0.0,
     "test_strategy_contract.StrategyContractTest.test_internal_chain_carriers_exist": 0.0,
     "test_strategy_contract.StrategyContractTest.test_publish_boundary_matches_repo": 0.0,
     "test_strategy_contract.StrategyContractTest.test_references_resolve": 0.0,
