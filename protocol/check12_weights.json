@@ -98,6 +98,7 @@
     "test_cli_harness_equivalence": 1.1,
     "test_cli_json_face": 132.9,
     "test_cli_trust_meta": 0.8,
+    "test_cline_submission_doc_contract": 0.2,
     "test_closure": 12.1,
     "test_closure_scan": 0.4,
     "test_coc_contract": 0.1,
@@ -1378,6 +1379,9 @@
     "test_cli_trust_meta.CliTrustMetaTest.test_in_repo_practice_pack_is_not_marked": 0.34,
     "test_cli_trust_meta.CliTrustMetaTest.test_library_show_json_carries_meta": 0.17,
     "test_cli_trust_meta.CliTrustMetaTest.test_library_show_marks_external_content": 0.17,
+    "test_cline_submission_doc_contract.ClineSubmissionTest.test_cline_submission_matches_contract": 0.0,
+    "test_cline_submission_doc_contract.ClineSubmissionTest.test_contract_catches_mutations": 0.0,
+    "test_cline_submission_doc_contract.ClineSubmissionTest.test_icon_live": 0.0,
     "test_closure.LedgerTest.test_every_closed_entry_has_criteria": 0.62,
     "test_closure.LedgerTest.test_every_debt_entry_has_reason": 0.61,
     "test_closure.LedgerTest.test_ledger_has_entries": 0.61,
@@ -5667,5 +5671,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2009.2
+  "total_s": 2009.4
 }

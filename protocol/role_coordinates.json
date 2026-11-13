@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1256
+    "verify": 1257
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7925,6 +7925,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "submissions/02-cline-marketplace.md 契约：审核四要点 + 不钉运行时计数 + 平台侧未验。",
+      "path": "desktop/tests/test_cline_submission_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "闭包台账判据（P7）：断言必须指向**真实在场**的判据，债务必须写明。",
       "path": "desktop/tests/test_closure.py",
       "role": "verify",
@@ -13920,7 +13926,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "9cf77367d44f8aed575ff36e0397cbc25395291f7e00180e9f80400f88542c9f",
+  "root_digest": "df197b2aa56b69f96eb78498bb94e68943598be4008b98dffff8c39148e64052",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13929,7 +13935,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1130,
+    "R-verify": 1131,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

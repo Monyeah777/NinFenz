@@ -1,7 +1,7 @@
 {
-  "bytes": 12249871,
+  "bytes": 12250463,
   "count": 572,
-  "digest": "2f6cc6daec406268047b74af728b4ac612cee7fa17cceffb3ffb6597a87214ba",
+  "digest": "c837102a05f185f525e7d3e697c5070ffb2c3beea090a25613d5af4ddbde3ada",
   "materials": [
     {
       "bytes": 102,
@@ -1906,7 +1906,7 @@
     {
       "bytes": 79590,
       "path": "protocol/RECEIPTS.json",
-      "sha256": "ff50af46a9a845cb3716659917af0e4decd0d0946e4563fb88425befb95125ac"
+      "sha256": "25e7ed5a9c1e99295c9bdf5db33e79ca3db5e9e40557a469f667bd84bff3898f"
     },
     {
       "bytes": 3468,
@@ -1959,9 +1959,9 @@
       "sha256": "c2402950e34e3ff9bd0f09171c8bee821bf0f57c33f32d0dbc4bb4b3e6157914"
     },
     {
-      "bytes": 452071,
+      "bytes": 452405,
       "path": "protocol/check12_weights.json",
-      "sha256": "6a1fbb02b573ff2158804be89c8c2bf86382873834025ff191935cc92e02711b"
+      "sha256": "8ebb934221d30520160d8712112c22419267e24ce50b5f931c6afbd415ee2412"
     },
     {
       "bytes": 16170,
@@ -2101,7 +2101,7 @@
     {
       "bytes": 27560,
       "path": "protocol/generated/receipt_chain.json",
-      "sha256": "997459ec8bbda55aaaa69e4a42d9ca79b8156659623222170f2782b7aa0378b8"
+      "sha256": "0cf205f4c4cb8002d31dce7c651c138faa361167a753f0ed68b87e4d21887d4d"
     },
     {
       "bytes": 918,
@@ -2354,9 +2354,9 @@
       "sha256": "87de7ac68f9846b333323efecdbb7555adf24215ae8145d573fe8d0688b8e86d"
     },
     {
-      "bytes": 512942,
+      "bytes": 513200,
       "path": "protocol/role_coordinates.json",
-      "sha256": "8094f52846dc536b50e5aee5346b33160d0a74340caf7a90edae1280b2718865"
+      "sha256": "f20193fd5de6548d03227eb10731dcccd99efe0411b3f7c2408808666c3a29a8"
     },
     {
       "bytes": 9391,
@@ -2456,7 +2456,7 @@
     {
       "bytes": 13030,
       "path": "protocol/verification_report.json",
-      "sha256": "d9295f3100c519ba7609806c0a2c0570e865e0cf59eab2f1d810a3a5fd119780"
+      "sha256": "db1f54b7a4cae1653083481206a543226fd01e6fc3230ef163f8b1f933782183"
     },
     {
       "bytes": 4160,
