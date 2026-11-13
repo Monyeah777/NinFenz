@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:4f85e43bfe307a2c1f3f8214c6aee9bf0020e1f5bec102d9d605acf916466a09
+  - protocol/check12_weights.json:d685d57933ef4a207a6b34ddf1fad36c24c870b441d0f13f315105944eca64ac
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:fa00a7fd014857af56e11f38ced1b7d888be053befaadb10b3dd494d27884316
   - docs/meta-cockpit/功能解析.md:de20c2340d19d541bcfde53f222a3acf22a6e440d8fb3dcf51a37aedf53c0c25
   - results/meta-cockpit-manifest.json:60c0e100798e49d393557ae5066c02d7e057ec27f386ee1a36ca3fc7740150ba
 
 ---
+> 重审（2026-11-14）：fail-closed-verification PATTERN 顶尖化：**校正示例与实测不符处**（原文称缺 allowed_signers 报 exit 1；实测 NF-1 未挂锚时为 exit 0 + 显式标注「真实性未验」），明确 fail-closed = 该验而验不了；补 §现状对照（check33 / 三级信任 / 缺锚与超时行为）与复现口径；新增判据 test_fail_closed_pattern_doc_contract（示例输出与实测比对）。
+
 > 重审（2026-11-14）：error-message-guidance PATTERN 顶尖化：补 §现状对照（R4 载体 / check27 接线 / applies_to 两目标 / evidence 可解析 / 命中数不钉）+ §复现口径（verify --only 27）；新增判据 test_error_message_guidance_pattern_doc_contract（R4 与 check27 双向在场 + checkN evidence 解析）。
 
 > 重审（2026-11-14）：dependency-direction PATTERN 顶尖化：补 §现状对照（适用面 290+79 / 度量 289 模块·环 0·SDP 违例 9 已登记 9 / 基线只许收敛 + **不钉当前 Ca/I** 口径）+ §复现口径；新增判据 test_dependency_direction_pattern_doc_contract（frontmatter 6 键/3 规则/applies_to 与 evidence 可证/verify 零缺口）。
