@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:2ca6e26fa9e592b4531b3a0192c4fd9b855a442274b176ba56e47d828ce76089
+  - protocol/check12_weights.json:1c624f125e438a65a865efdb9c5f75b7659b15ae64897b7e7b52ee0a26888885
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:fa00a7fd014857af56e11f38ced1b7d888be053befaadb10b3dd494d27884316
   - docs/meta-cockpit/功能解析.md:de20c2340d19d541bcfde53f222a3acf22a6e440d8fb3dcf51a37aedf53c0c25
   - results/meta-cockpit-manifest.json:60c0e100798e49d393557ae5066c02d7e057ec27f386ee1a36ca3fc7740150ba
 
 ---
+> 重审（2026-11-14）：轻量目录件 08 顶尖化：补字段自检（与 07 对偶、平台侧未验、不钉计数、无审核 SLA）+ 判据扩展（08 侧断言：自检段/指向 07/字段块逐行相等/入口不同）。
+
 > 重审（2026-11-14）：轻量目录提交件 07 顶尖化：补字段自检 8 行 + 「短表单族（07/08/09/10）字段正文必须逐字一致」纪律；新增判据 test_short_form_submission_doc_contract（07 与 08 的字段块逐行相等 + 邮箱泄漏检查）。
 
 > 重审（2026-11-14）：ModelScope 提交件 06 顶尖化：补字段自检 8 行（含**仅 stdio**、中文口径同义不同文提醒、平台侧未验、不钉计数）+ 带 JSON 校验的 stdio 配置检查；新增判据 test_modelscope_submission_doc_contract（含邮箱泄漏检查）。
