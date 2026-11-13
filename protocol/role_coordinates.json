@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1268
+    "verify": 1269
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8441,6 +8441,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "patterns/error-message-guidance/PATTERN.md 契约：R4 规则、check27 接线、不钉命中数。",
+      "path": "desktop/tests/test_error_message_guidance_pattern_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "",
       "path": "desktop/tests/test_eval_collapse.py",
       "role": "verify",
@@ -13992,7 +13998,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "e280f4486359d3a7fcec2fe7d1ab5925d3548983dd43707acae264f17cd42f2d",
+  "root_digest": "59d4e87802e1532afca9994e33ee424805e76d7cfcbfb00631b8ecf9602b7897",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -14001,7 +14007,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1142,
+    "R-verify": 1143,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
