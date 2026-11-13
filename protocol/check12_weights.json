@@ -449,6 +449,7 @@
     "test_readme_contract": 0.4,
     "test_readme_en_contract": 0.3,
     "test_readme_ja_contract": 0.4,
+    "test_receipts_doc_contract": 0.2,
     "test_redos_patterns": 2.0,
     "test_registry_doc_contract": 0.3,
     "test_registry_loader": 0.2,
@@ -4415,6 +4416,9 @@
     "test_readme_ja_contract.ReadmeJaContractTest.test_readme_ja_matches_contract": 0.01,
     "test_readme_ja_contract.ReadmeJaContractTest.test_sections_and_stats_region": 0.0,
     "test_readme_ja_contract.ReadmeJaContractTest.test_versions_match_npm": 0.0,
+    "test_receipts_doc_contract.ReceiptsDocTest.test_artifacts_live": 0.0,
+    "test_receipts_doc_contract.ReceiptsDocTest.test_contract_catches_mutations": 0.01,
+    "test_receipts_doc_contract.ReceiptsDocTest.test_receipts_matches_contract": 0.0,
     "test_redos_patterns.ProbeTest.test_probe_catches_quadratic": 0.82,
     "test_redos_patterns.ProbeTest.test_probe_passes_linear": 0.01,
     "test_redos_patterns.RepoTest.test_citation_patterns_are_single_source": 0.0,
@@ -5543,5 +5547,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1895.5
+  "total_s": 1895.7
 }

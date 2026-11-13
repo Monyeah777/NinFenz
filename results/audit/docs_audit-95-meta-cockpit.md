@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:d6e6774e677d192b7f8e82a17b592be799b0b77b2769850caf290e65c9bbcbcd
+  - protocol/check12_weights.json:b5c4aff74656265448579d04aa035423a71549d49d4c7caaaa5268a694ef582c
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:fa00a7fd014857af56e11f38ced1b7d888be053befaadb10b3dd494d27884316
   - docs/meta-cockpit/功能解析.md:de20c2340d19d541bcfde53f222a3acf22a6e440d8fb3dcf51a37aedf53c0c25
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-13）：回执文档顶尖化（3 条馆藏/66 件协议/66 节链/算法三式/验证器三项 + 现状对照 / 复现）+ 契约判据 test_receipts_doc_contract；权重增量重测。本轮为机械重绑。
+
 > 重审（2026-11-13）：五分钟入口文档顶尖化（修 Python ≥3.10→≥3.11 真漂移 / 6 步与脚本 slug 对齐 / 300s / check39 + 现状对照 / 复现）+ 契约判据 test_quickstart_doc_contract；权重增量重测。本轮为机械重绑。
 
 > 重审（2026-11-13）：管线抽象执行文档顶尖化（114 管线/282 模块/13 基座/hard 0/advisory 1142 三分解/2 子命令 + 现状对照 / 复现）+ 契约判据 test_pipelinerun_doc_contract；权重增量重测。本轮为机械重绑。

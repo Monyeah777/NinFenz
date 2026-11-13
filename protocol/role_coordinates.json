@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1229
+    "verify": 1230
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -10031,6 +10031,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/receipts.md 契约：回执文档必须「3 条馆藏 / 66 件协议 / 66 节链 / 算法三式」与实读一致。",
+      "path": "desktop/tests/test_receipts_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "正则失控回溯（ReDoS）回归 —— 2026-10-10 全仓审计 Y3。",
       "path": "desktop/tests/test_redos_patterns.py",
       "role": "verify",
@@ -13758,7 +13764,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "60eb3d934fe0ddecbbb0898753adbb1e55e6dfd5a354a26eb9b02c60cd340a01",
+  "root_digest": "74d8d0378138a8962d7339bbc5c51f5ea91ce75581efd369b5b76dd7fdb6bbbe",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13767,7 +13773,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1103,
+    "R-verify": 1104,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
