@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1216
+    "verify": 1217
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9365,6 +9365,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "驾驶舱说明契约：33 原子/10 节点/5 节点/六类义务必须与资产一致。",
+      "path": "desktop/tests/test_meta_cockpit_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "方法包判据：领域专业性必须是**可校验的数据**，不是文档里的形容词。",
       "path": "desktop/tests/test_method_pack.py",
       "role": "verify",
@@ -13680,7 +13686,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "c8875b5c4c219ba0382fbc0d2c9829cc9850ad6cb3461f036b47a1e16d8172b4",
+  "root_digest": "2ef43ee22b031b17c4b94954b72757ca9460a434de80e6218d13209970cd28d6",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13689,7 +13695,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1090,
+    "R-verify": 1091,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
