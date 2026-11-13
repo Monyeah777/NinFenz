@@ -26,8 +26,10 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:3479562cb745f75d161c9f592e3b11143559ba689b70c4129e2e88d5aa78bdc9
+  - protocol/code_metrics_baseline.json:6bf5087e381d484d64bc5474ebcabcb4174f3f2dc892f26080076075f41ee671
 ---
+> 重审（2026-11-13）：他证通道说明页顶尖化：code_metrics 基线重签（生成器新增面谱/自跑口径文案，模块 513 行·最长函数 55，为有据增长）。
+
 > 重审（2026-11-13）：45 M2 回合级 drill 规范顶尖化（样本 5→6 含 selfrun / 测试 6 例 / --check-trace 回读口径 / 复现命令）+ 契约判据 test_round_drill_doc_contract；权重增量重测。本轮为机械重绑。
 
 > 重审（2026-11-13）：44 M1 演练覆盖真源顶尖化（8 集口径与实现统一：_hits 接 lexicon + p07_en 纳入测试 / 现状对照 / 复现口径；P06 记录同步 8 套）+ 契约判据 test_m1_drill_coverage_contract；权重增量重测。本轮为机械重绑。

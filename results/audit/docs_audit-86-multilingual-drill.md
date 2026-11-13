@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:142a9157504702fa03498494dc452ae2fbb8cfbfcce836992b1d59d1078755e4
-  - protocol/code_metrics_baseline.json:3479562cb745f75d161c9f592e3b11143559ba689b70c4129e2e88d5aa78bdc9
+  - protocol/code_metrics_baseline.json:6bf5087e381d484d64bc5474ebcabcb4174f3f2dc892f26080076075f41ee671
 ---
+> 重审（2026-11-13）：他证通道说明页顶尖化：code_metrics 基线重签（生成器新增面谱/自跑口径文案，模块 513 行·最长函数 55，为有据增长）。
+
 > 重审（2026-11-13）：44 M1 演练覆盖真源顶尖化（8 集口径与实现统一：_hits 接 lexicon + p07_en 纳入测试 / 现状对照 / 复现口径；P06 记录同步 8 套）+ 契约判据 test_m1_drill_coverage_contract；权重增量重测。本轮为机械重绑。
 
 > 重审（2026-11-12）：library/ALIAS 标题列 + 生成器 +1 行 → code_metrics 基线评审后重冻；契约判据 test_alias_contract。机械重绑。

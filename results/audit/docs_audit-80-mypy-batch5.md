@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:22e24633e87e95453d0c2cf4a595d0496bae5d7331c1fc644d5b1555e4925a41
-  - protocol/code_metrics_baseline.json:3479562cb745f75d161c9f592e3b11143559ba689b70c4129e2e88d5aa78bdc9
+  - protocol/code_metrics_baseline.json:6bf5087e381d484d64bc5474ebcabcb4174f3f2dc892f26080076075f41ee671
 ---
+> 重审（2026-11-13）：他证通道说明页顶尖化：code_metrics 基线重签（生成器新增面谱/自跑口径文案，模块 513 行·最长函数 55，为有据增长）。
+
 > 重审（2026-11-12）：library/ALIAS 标题列 + 生成器 +1 行 → code_metrics 基线评审后重冻；契约判据 test_alias_contract。机械重绑。
 
 > 重审（2026-11-11）：L4 判据质量：文字卫生 markdown 面收敛到 repo_face 单点扫描面（66547→370 件）+ .worktrees 静态剪枝

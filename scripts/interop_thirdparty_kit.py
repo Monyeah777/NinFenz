@@ -284,28 +284,65 @@ def _card(f: Dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def render_doc() -> str:
-    """说明页全文（唯一真相 = 本函数；`docs/interop-thirdparty.md` 是它的逐字投影）。
+def _kind_count(kind: str) -> int:
+    return sum(1 for f in FACES if f["kind"] == kind)
 
-    独立成函数的原因：投影必须**可对账**。状态表是「第三方回填」的活件（`emit` 会重置它，
+
+def _kind_faces(kind: str) -> str:
+    return " / ".join("`" + f["id"] + "`" for f in FACES if f["kind"] == kind)
+
+
+def render_doc() -> str:
+    """说明页全文（唯一真相 = 本函数；docs/interop-thirdparty.md 是它的逐字投影）。
+
+    独立成函数的原因：投影必须**可对账**。状态表是「第三方回填」的活件（emit 会重置它，
     故不能在真仓重跑），而说明页是纯派生件——抽出来才能让常驻判据逐字节核它，
     否则卡片改了而说明页没重出，门禁看不出来。
     """
     doc = ["# 互操作性 · 他证通道（第三方可自跑）", "",
-           "> 本页由 `python scripts/interop_thirdparty_kit.py --emit` 生成，禁止手改。",
-           "> 定位：这些卡片是给**第三方**跑的，不冒充「本仓已他证」。回填表：`%s`。" % STATUS_REL,
+           "> 本页由 python scripts/interop_thirdparty_kit.py --emit 生成，禁止手改。",
+           "> 定位：这些卡片是给**第三方**跑的，不冒充「本仓已他证」。回填表：%s。" % STATUS_REL,
            "",
            "## 两种证据，别混（分层）", "",
-           "- **上游判据校验（已有）**：`scripts/check_interop_schemas.py --fetch` 用上游官方 meta-"
-               "schema 校导出面 → `results/interop-schema-validation.md`。",
-           "- **他证（本页）**：对端消费或官方验证器由第三方在其环境跑，结果回填状态表。未回填 = 未"
-               "他证。",
+           "- **上游判据校验（已有）**：scripts/check_interop_schemas.py --fetch 用上游官方 "
+               "meta-schema 校导出面 → results/interop-schema-validation.md。",
+           "- **他证（本页）**：对端消费或官方验证器由第三方在其环境跑，结果回填状态表。"
+               "未回填 = 未他证。",
            "",
            "## 回填纪律", "",
-           "1. 六字段齐备才算一条他证：`tool_version` · `run_by` · `run_at` · `output_sha256` · `ve"
-               "rdict` · `note`。",
-           "2. `output_sha256` 必须是被跑对象或输出的 sha256（不可用「看起来通过」代替）。",
-           "3. 标 `not-applicable` 的面**不计入他证通过数**，只说明为何不适用。",
+           "1. 六字段齐备才算一条他证：tool_version · run_by · run_at · output_sha256 · "
+               "verdict · note。",
+           "2. output_sha256 必须是被跑对象或输出的 sha256（不可用「看起来通过」代替）。",
+           "3. 标 not-applicable 的面**不计入他证通过数**，只说明为何不适用。",
+           "4. **自跑 ≠ 他证**：run_by 写「执行者（本机 …）」的行是**本仓自跑**"
+               "（可作防回归证据），不满足「第三方环境跑过」；他证要求 run_by 为"
+               "**外部方**。状态表里的 PASS 只能按「自测口径」引用，不得折算成他证通过数。",
+           "",
+           "## 面谱（" + str(len(FACES)) + " 面 · 按证据强度分档）", "",
+           "| 种类 | 面数 | 面 | 含义 |",
+           "|---|---|---|---|",
+           "| peer-consumption | " + str(_kind_count("peer-consumption")) + " | "
+               + _kind_faces("peer-consumption") + " | 对端消费（真跑即可判） |",
+           "| official-cli | " + str(_kind_count("official-cli")) + " | "
+               + _kind_faces("official-cli") + " | 官方验证器/工具链（退出码即判） |",
+           "| shape-only | " + str(_kind_count("shape-only")) + " | "
+               + _kind_faces("shape-only") + " | 官方无机器 schema，只判形状 |",
+           "| not-applicable | " + str(_kind_count("not-applicable")) + " | "
+               + _kind_faces("not-applicable") + " | 本仓无对应载体/端点，判据另立 |",
+           "",
+           "> 分档意义：official-cli 面**可以**被第三方用一条命令验；shape-only 面"
+               "即使第三方跑也只能确认「形状与该官方定义一致」；not-applicable 面"
+               "**不该**出现在他证通过数里。",
+           "",
+           "## 现状对照（2026-11-13 · 生成期静态事实）", "",
+           "| 面 | 现值 | 复核方式 |",
+           "|---|---|---|",
+           "| 卡片数 | **" + str(len(FACES)) + "** | 本页 ### 计数 |",
+           "| 导出面 | **12**（results/interop/*.json，含 a2a，不含 mcp） | ls 该目录 |",
+           "| 上游判据 | results/interop-schema-validation.md | 该文件在盘且无未解 no-schema |",
+           "| 状态表 | " + STATUS_REL + "（14 行，六字段） | --check 校字段与 sha 形状 |",
+           "",
+           "> 本表随生成器版本冻结；「回填状态」是活件，**以状态表实读为准**。",
            "",
            "## 他证卡", ""]
     doc += [_card(f) for f in FACES]

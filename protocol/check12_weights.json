@@ -250,6 +250,7 @@
     "test_interop": 1.7,
     "test_interop_export": 2.8,
     "test_interop_schema_tool": 0.3,
+    "test_interop_thirdparty_doc_contract": 0.3,
     "test_interop_thirdparty_kit": 0.8,
     "test_invalid_corpus": 0.2,
     "test_invariants": 0.2,
@@ -2740,6 +2741,9 @@
     "test_interop_schema_tool.InteropSchemaToolTest.test_remote_body_is_capped": 0.0,
     "test_interop_schema_tool.InteropSchemaToolTest.test_schema_table_covers_all_faces": 0.0,
     "test_interop_schema_tool.InteropSchemaToolTest.test_validation_report_exists_and_records_statuses": 0.0,
+    "test_interop_thirdparty_doc_contract.InteropThirdpartyDocTest.test_contract_catches_mutations": 0.0,
+    "test_interop_thirdparty_doc_contract.InteropThirdpartyDocTest.test_doc_matches_contract": 0.0,
+    "test_interop_thirdparty_doc_contract.InteropThirdpartyDocTest.test_status_and_faces_live": 0.0,
     "test_interop_thirdparty_kit.DocProjectionTest.test_doc_equals_render": 0.0,
     "test_interop_thirdparty_kit.DocProjectionTest.test_render_is_derived_not_hardcoded": 0.0,
     "test_interop_thirdparty_kit.ThirdPartyKitTest.test_emit_into_a_fresh_root_creates_both_artifacts": 0.22,
@@ -5451,5 +5455,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1886.9
+  "total_s": 1887.2
 }
