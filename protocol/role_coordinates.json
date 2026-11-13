@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1285
+    "verify": 1286
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -10895,6 +10895,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "THIRD-PARTY-NOTICES.md 可复现性：入库件必须**逐字节等于生成器输出**（在线时才判）。",
+      "path": "desktop/tests/test_third_party_notices_reproducible.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "docs/ccos/threat-model.md 契约：A1–A9/G1–G6 齐 + 载体面与 G4 自洽 + 不承诺不矛盾。",
       "path": "desktop/tests/test_threat_model_doc_contract.py",
       "role": "verify",
@@ -14094,7 +14100,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "7b3abb3ab732eb24fc1febb1bac102c486d8e2378ff733fcaaff60251d7d7a52",
+  "root_digest": "a5ebd1b32a1950400a2b0b97959d6b3f59c77ffefa6e23e031fe006b445e5dba",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -14103,7 +14109,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1159,
+    "R-verify": 1160,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

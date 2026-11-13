@@ -593,6 +593,7 @@
     "test_text_hygiene": 10.1,
     "test_text_hygiene_doc_contract": 15.9,
     "test_third_party_notices_contract": 0.2,
+    "test_third_party_notices_reproducible": 67.5,
     "test_threat_model_doc_contract": 0.2,
     "test_time_token_doc_contract": 0.2,
     "test_timestamp": 1.9,
@@ -5475,6 +5476,8 @@
     "test_third_party_notices_contract.ThirdPartyNoticesContractTest.test_licenses_machine_readable": 0.0,
     "test_third_party_notices_contract.ThirdPartyNoticesContractTest.test_notices_matches_contract": 0.0,
     "test_third_party_notices_contract.ThirdPartyNoticesContractTest.test_pins_two_way": 0.0,
+    "test_third_party_notices_reproducible.NoticesReproducibleTest.test_generator_documents_fail_closed": 0.0,
+    "test_third_party_notices_reproducible.NoticesReproducibleTest.test_regenerating_is_byte_identical": 67.35,
     "test_threat_model_doc_contract.ThreatModelDocTest.test_contract_catches_mutations": 0.0,
     "test_threat_model_doc_contract.ThreatModelDocTest.test_implementation_faces_live": 0.0,
     "test_threat_model_doc_contract.ThreatModelDocTest.test_threat_model_matches_contract": 0.0,
@@ -5797,5 +5800,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2050.3
+  "total_s": 2117.8
 }
