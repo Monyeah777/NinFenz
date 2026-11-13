@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1233
+    "verify": 1234
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7469,6 +7469,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "标准答题卡契约：生成物必须「口径段齐 / 4 张卡 / 计数与真源一致 / --check 新鲜」。",
+      "path": "desktop/tests/test_answer_cards_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "docs/approval.md 契约：内容绑定批准文档必须「字段/命令/冻链位置与实现一致 + 现状活绑定」。",
       "path": "desktop/tests/test_approval_contract.py",
       "role": "verify",
@@ -13782,7 +13788,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "9024869ccb937e9533dc53253d81a6a3b9fbc86b03daddae2c8233780cf01392",
+  "root_digest": "98e7139fc845f31318108d78a3c9e5d90d11f9b4ff532c829fe7a97d7ac84e4c",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13791,7 +13797,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1107,
+    "R-verify": 1108,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

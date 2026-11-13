@@ -22,6 +22,7 @@
     "test_allstar_outside_contract": 0.3,
     "test_allstar_security_contract": 0.5,
     "test_anchor_align": 0.3,
+    "test_answer_cards_doc_contract": 0.4,
     "test_approval_contract": 0.2,
     "test_approval_naming": 0.3,
     "test_architecture_layers": 0.2,
@@ -716,6 +717,9 @@
     "test_anchor_align.RealRepoTest.test_report_has_header": 0.01,
     "test_anchor_align.RealRepoTest.test_stats_internally_consistent": 0.01,
     "test_anchor_align.RealRepoTest.test_unbound_partition_by_layer": 0.03,
+    "test_answer_cards_doc_contract.AnswerCardsDocTest.test_cards_match_contract": 0.01,
+    "test_answer_cards_doc_contract.AnswerCardsDocTest.test_contract_catches_mutations": 0.03,
+    "test_answer_cards_doc_contract.AnswerCardsDocTest.test_freshness": 0.22,
     "test_approval_contract.ApprovalDocContractTest.test_approval_matches_contract": 0.0,
     "test_approval_contract.ApprovalDocContractTest.test_contract_catches_mutations": 0.01,
     "test_approval_contract.ApprovalDocContractTest.test_records_and_chain_live": 0.0,
@@ -5559,5 +5563,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1905.9
+  "total_s": 1906.3
 }
