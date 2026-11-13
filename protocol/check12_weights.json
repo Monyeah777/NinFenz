@@ -184,6 +184,7 @@
     "test_engine_loader": 0.2,
     "test_engine_registry": 2.2,
     "test_error_codes": 0.2,
+    "test_error_message_guidance_pattern_doc_contract": 0.2,
     "test_eval_collapse": 0.1,
     "test_eval_harness": 0.4,
     "test_evidence": 6.3,
@@ -2168,6 +2169,10 @@
     "test_error_codes.Test.test_duplicate_and_bad_lexis": 0.0,
     "test_error_codes.Test.test_unknown_code_raises": 0.0,
     "test_error_codes.Test.test_validate_and_lookup": 0.0,
+    "test_error_message_guidance_pattern_doc_contract.ErrorMessageGuidancePatternTest.test_contract_catches_mutations": 0.01,
+    "test_error_message_guidance_pattern_doc_contract.ErrorMessageGuidancePatternTest.test_pattern_matches_contract": 0.0,
+    "test_error_message_guidance_pattern_doc_contract.ErrorMessageGuidancePatternTest.test_patterns_verify_passes": 0.01,
+    "test_error_message_guidance_pattern_doc_contract.ErrorMessageGuidancePatternTest.test_r4_and_check27_live": 0.0,
     "test_eval_collapse.Test.test_collapsed_mean_not_global": 0.0,
     "test_eval_collapse.Test.test_empty": 0.0,
     "test_eval_collapse.Test.test_regression_guard": 0.0,
@@ -5719,5 +5724,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2014.4
+  "total_s": 2014.6
 }
