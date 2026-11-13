@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1230
+    "verify": 1231
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -10091,6 +10091,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/release.md 契约：发布策略声明件必须「11 步计划/3 步冻结链/3 版本面/4 工件」与策略件一致。",
+      "path": "desktop/tests/test_release_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "发布编排（core/release_gate.py）回归：机读策略过 schema + 计划有序 + 计划快照 + 变异自证。",
       "path": "desktop/tests/test_release_gate.py",
       "role": "verify",
@@ -13764,7 +13770,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "74d8d0378138a8962d7339bbc5c51f5ea91ce75581efd369b5b76dd7fdb6bbbe",
+  "root_digest": "2ff8327f5946dfed180924a0f495034d4b0bc61b4a2fa110af1fbec060354819",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13773,7 +13779,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1104,
+    "R-verify": 1105,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
