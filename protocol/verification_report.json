@@ -1,5 +1,5 @@
 {
-  "built_for_date": "2026-11-12",
+  "built_for_date": "2026-11-13",
   "declared": {
     "coverage_note": "判据级抽查面 31 条，各对应 verify.sh 的一道或多道门禁；≠ 声明 check 总数 42（两者不可互替）",
     "expected_checks": 42,
@@ -524,8 +524,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4361,
-        "kernel": 2257,
+        "files": 4362,
+        "kernel": 2258,
         "kernel_no_self": 308,
         "rules": 9,
         "uncovered": 0,
@@ -536,7 +536,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "c454f6f2c42aea508985e23f14afdfa9b5c5ccb04a87794620f5b3a04769d6bf",
+  "root_digest": "256494e6afb9d4ae769af27bde43367d60d209df1e69c9c44a096c81ee3f5f6f",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

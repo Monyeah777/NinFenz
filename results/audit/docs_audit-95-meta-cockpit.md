@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:ea7b4d5b2654c0840c290c3900a0282615c98e9ccae12b556ce91d8542a3014a
+  - protocol/check12_weights.json:6761aa9ffd1a84df5649b7189ffc73e912938e8d75b72757c63702903af4ed87
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-13）：一致性报告文档顶尖化（契约 10→27 条 / 门禁 35→check1-42 / 现场 27-27 root / 冻结链三环 / 现状对照 / 复现）+ 契约判据 test_conformance_doc_contract；权重增量重测。本轮为机械重绑。
+
 > 重审（2026-11-13）：组合引擎文档顶尖化（修 107→111 包/C(111,2)=6105/证书 18/产物化 5 / 五不变量活绑定 / 现状对照 / 复现）+ 契约判据 test_combos_doc_contract；权重增量重测。本轮为机械重绑。
 
 > 重审（2026-11-13）：可信时间戳 v0 文档顶尖化（两子命令/落盘三件/time-record 接入/五判定/信任锚不预置/1MiB 活绑定 / 现状对照 / 复现）+ 契约判据 test_time_token_doc_contract；权重增量重测。本轮为机械重绑。
