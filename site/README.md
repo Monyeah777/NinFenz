@@ -3,6 +3,10 @@
 > **线上地址**：https://ninfenz.dev （Cloudflare Workers + 自定义域；切源：node site/tools/set-origin.mjs <base> --write）
 
 纯静态、**零外部依赖**（无 CDN、无 webfont、无遥测）；双语 /（zh-CN）与 /en/。
+>
+> **复核（2026-11-14）**：三层目标形态、文件清单与发布检查**复核不变**；
+> 本轮补「§现状对照」「§复现与引用口径」，并**用 `sync-numbers --write` 收掉 npm 口径漂移**
+> （站点写 24.74 MB，payload 清单为 25.21 MB——站点是投影，清单才是真源）。
 
 ## 三层目标形态
 
@@ -59,7 +63,34 @@
 
 ## 已知状态（诚实面）
 
-- **npm 包已发布**：ninfenz v1.0.5（npmjs.com；3109 文件 / 24.74 MB 解包，带 SLSA provenance
+- **npm 包已发布**：ninfenz v1.0.5（npmjs.com；3109 文件 / 25.21 MB 解包，带 SLSA provenance
   来源证明）。发布通道 = .github/workflows/npm-publish.yml（tag 或手动 dispatch）；GitHub Packages 通道为
   @monyeah777/ninfenz。国内镜像（npmmirror）同步有延迟，站内已注明可用 --registry 绕开。
 - **workers.dev 域名**：已关闭（wrangler.jsonc 的 workers_dev: false）。大陆对该域 DNS 污染，别把它当入口。
+
+
+## 现状对照（2026-11-14 · 以 `site/` 实盘与站点工具实跑为准）
+
+| 面 | 当前口径 | 复核方式 |
+|---|---|---|
+| 页面 | **4 页**：`index.html` / `en/index.html` / `use/index.html` / `en/use/index.html`（双语各 2） | `ls site` |
+| 机器面 | **6 个**：`llms.txt` / `llms-full.txt` / `nf.txt` / `agent.txt` / `facts.json` / `run.sh` | sitemap 与 robots 均不含它们（给 AI/agent 直取，不参与搜索排名） |
+| 站点工具 | **5 个 .mjs + 1 个 .py**：`set-origin` / `sync-numbers` / `site-check` / `worker-check` / `indexnow` / `make-demo-gif.py` | `ls site/tools` |
+| 离线判据 | `site-check --offline` **42 项** | 本机实跑 |
+| worker 判据 | `worker-check` **16 项**（www→裸域 301；其余透传 `env.ASSETS`） | 本机实跑 |
+| 数字真源 | `sync-numbers`：质量凭证 + 规模 8 数 + **npm 件数/体积**（口径真源 = `packaging/npm/payload/payload-manifest.json`） | 本机实跑 |
+| 资产 | `assets/site.css` · `demo.gif`（9 秒 TUI 演示，由 `make-demo-gif.py` 生成）· `og.png` | `ls site/assets` |
+
+**本轮同步**：npm 口径由「3109 件 / 24.74 MB」自动改写为「**3109 件 / 25.21 MB**」（`sync-numbers --write`；payload 清单是唯一口径真源，站点只是投影）。同时把根 `llms-full.txt` 按 site 投影同步（判据权威仍是 `scripts/sync_llms.py`）。
+
+**不钉的东西**：npm 体积随每次提交变——站点这行由 `sync-numbers --write` 维护，**发布前必须跑**；人工勿手抄。
+
+## 复现与引用口径
+
+```bash
+node site/tools/sync-numbers.mjs             # 数字 vs 真源（漂移 exit 1；发布前必跑）
+node site/tools/sync-numbers.mjs --write     # 自动改站点侧口径（含 npm 件数/体积）
+node site/tools/site-check.mjs --offline     # 42 项离线判据
+python -m http.server 8080 --directory site  # 本地预览
+```
+
