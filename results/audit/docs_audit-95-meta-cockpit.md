@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:6d0fe7d5691cf460ebf52c86d9f152e06c981107d910ae56437315c5bc66f3a7
+  - protocol/check12_weights.json:842ae5c2bdaaf8ab113f58a39f1e20443119fa2c044839ececcfc2e683a148e5
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:fa00a7fd014857af56e11f38ced1b7d888be053befaadb10b3dd494d27884316
   - docs/meta-cockpit/功能解析.md:de20c2340d19d541bcfde53f222a3acf22a6e440d8fb3dcf51a37aedf53c0c25
   - results/meta-cockpit-manifest.json:60c0e100798e49d393557ae5066c02d7e057ec27f386ee1a36ca3fc7740150ba
 
 ---
+> 重审（2026-11-14）：解开 164 号阻塞件：本机网络恢复，`gen_third_party_notices.py --write` 实跑成功（44 组件）且**工作区零差异**（入库件 == 生成器输出）；新增判据 test_third_party_notices_reproducible（在线重生成逐字节比对，离线 skip）。
+
 > 重审（2026-11-14）：tui/README 顶尖化（清单最后一件）：补 §现状对照（34 动作/9 区/77 命令/13 表单/闸门 14-24-4/自检 6 条/退出码 6 类/渲染 30 行）+ §复现口径（selftest/--list-actions/surface-write）+ 复核位；明确「投影数字不当作承诺」；新增判据 test_tui_readme_doc_contract（selftest 实跑 + 动作数实读比对）。
 
 > 重审（2026-11-14）：site/assets/README 顶尖化：补 §现状对照（三件素材字节/尺寸/来源 + 字体无 webfont）+ §复现口径 + 复核位；**实测生成器可复现性**：重跑 34501 B vs 入库 34487 B 字节不同 → 如实登记为债（一条命令可收，但改公开视觉，留作者决定）；新增判据 test_site_assets_readme_doc_contract（字节/尺寸与实盘比对 + 债务在文）。
