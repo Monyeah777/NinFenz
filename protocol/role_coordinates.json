@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1254
+    "verify": 1255
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9365,6 +9365,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "packaging/mcp/assets/README.md 契约：图标真实像素 / 替换流程 / 来源声明边界必须写清。",
+      "path": "desktop/tests/test_mcp_assets_readme_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "packaging/mcp/DIRECTORIES.md 契约：仓库侧证件可核 / 平台侧状态不冒充判据。",
       "path": "desktop/tests/test_mcp_directories_doc_contract.py",
       "role": "verify",
@@ -13908,7 +13914,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "5d8327774c34816c48c629c57a799226f14526e54218decd9e9e22e4bb284265",
+  "root_digest": "ca9a4e18657784e07d7020b99bfe9d33fdd9d347322fa670bf66a61b22f56d8d",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13917,7 +13923,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1128,
+    "R-verify": 1129,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
