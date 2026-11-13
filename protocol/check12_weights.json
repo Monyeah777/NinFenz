@@ -207,6 +207,7 @@
     "test_external_validation_assets_doc_contract": 0.3,
     "test_extreme_hardening": 1.3,
     "test_face_coverage": 0.1,
+    "test_fail_closed_pattern_doc_contract": 0.3,
     "test_fde_brief_doc_contract": 0.2,
     "test_fde_deliverable_doc_contract": 0.3,
     "test_fde_run_doc_contract": 0.3,
@@ -2382,6 +2383,10 @@
     "test_extreme_hardening.TrustBoundaryTest.test_index_generated_block_states_discipline": 0.0,
     "test_extreme_hardening.TrustBoundaryTest.test_llms_entry_states_discipline": 0.0,
     "test_face_coverage.Test.test_uncovered_and_orphan": 0.0,
+    "test_fail_closed_pattern_doc_contract.FailClosedPatternTest.test_check33_live": 0.0,
+    "test_fail_closed_pattern_doc_contract.FailClosedPatternTest.test_contract_catches_mutations": 0.01,
+    "test_fail_closed_pattern_doc_contract.FailClosedPatternTest.test_example_output_matches_live": 0.13,
+    "test_fail_closed_pattern_doc_contract.FailClosedPatternTest.test_pattern_matches_contract": 0.0,
     "test_fde_brief_doc_contract.FdeBriefTest.test_brief_matches_contract": 0.0,
     "test_fde_brief_doc_contract.FdeBriefTest.test_contract_catches_mutations": 0.0,
     "test_fde_brief_doc_contract.FdeBriefTest.test_targets_live": 0.0,
@@ -5724,5 +5729,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2014.6
+  "total_s": 2014.9
 }

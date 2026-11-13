@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1269
+    "verify": 1270
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8579,6 +8579,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "patterns/fail-closed-verification/PATTERN.md 契约：示例必须与实测一致、check33 接线在场。",
+      "path": "desktop/tests/test_fail_closed_pattern_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "docs/fde-sample/brief.md 契约：brief 的「诉求 → 可判定项」映射必须每条落点真实可复核。",
       "path": "desktop/tests/test_fde_brief_doc_contract.py",
       "role": "verify",
@@ -13998,7 +14004,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "59d4e87802e1532afca9994e33ee424805e76d7cfcbfb00631b8ecf9602b7897",
+  "root_digest": "763845ab29c34e88bfce758bda7ee1ffca4a2b7ca685757031cb34b64a096431",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -14007,7 +14013,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1143,
+    "R-verify": 1144,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
