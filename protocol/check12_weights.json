@@ -541,6 +541,7 @@
     "test_session_watch": 0.4,
     "test_shell_ledger": 0.9,
     "test_shell_parity": 1.2,
+    "test_short_form_submission_doc_contract": 0.2,
     "test_silent_skip_reasons": 2.5,
     "test_since_tags": 0.1,
     "test_site_face": 1.0,
@@ -5053,6 +5054,9 @@
     "test_shell_ledger.TierDeclarationTest.test_tier_mismatch_feeds_the_ratchet": 0.01,
     "test_shell_parity.TestCrossEntryParity.test_check_cli_and_http_agree": 0.41,
     "test_shell_parity.TestCrossEntryParity.test_evidence_cli_and_http_agree": 0.43,
+    "test_short_form_submission_doc_contract.ShortFormSubmissionTest.test_contract_catches_mutations": 0.0,
+    "test_short_form_submission_doc_contract.ShortFormSubmissionTest.test_peer_field_block_identical": 0.0,
+    "test_short_form_submission_doc_contract.ShortFormSubmissionTest.test_short_form_matches_contract": 0.0,
     "test_silent_skip_reasons.SilentSkipReasonTest.test_empty_return_predicate_catches_the_mutation": 0.0,
     "test_silent_skip_reasons.SilentSkipReasonTest.test_every_silent_skip_carries_a_reason": 1.26,
     "test_silent_skip_reasons.SilentSkipReasonTest.test_no_bare_empty_return_swallows_an_exception": 1.09,
@@ -5687,5 +5691,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2010.2
+  "total_s": 2010.4
 }

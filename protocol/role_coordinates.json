@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1261
+    "verify": 1262
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -10583,6 +10583,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "submissions/07-mcpservers-org.md 契约：短表单族字段正文必须逐字一致（07/08 现成两份）。",
+      "path": "desktop/tests/test_short_form_submission_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "静默跳过必须**成文理由**（`try/except: pass|continue` 逐站点）。",
       "path": "desktop/tests/test_silent_skip_reasons.py",
       "role": "verify",
@@ -13950,7 +13956,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "0ed41c139a26deadada12d90ae699b3d0f5a2ca1bbe885faf3e1350e28ba5bd5",
+  "root_digest": "7f90810dceb499a70fb380432a91a58ffdd010c78a54b0b0abd27ece34426d66",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13959,7 +13965,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1135,
+    "R-verify": 1136,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
