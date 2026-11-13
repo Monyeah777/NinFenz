@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1218
+    "verify": 1219
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9377,6 +9377,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/meta/ROADMAP.md 契约：路标文档必须「版本三处一致 / 基线不手写 / check39 在门禁」。",
+      "path": "desktop/tests/test_meta_roadmap_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "方法包判据：领域专业性必须是**可校验的数据**，不是文档里的形容词。",
       "path": "desktop/tests/test_method_pack.py",
       "role": "verify",
@@ -13692,7 +13698,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "9836d0e83e9596c6d6f0087c6f257314b150d556df02a67a2c35fe26fc36e584",
+  "root_digest": "6cb35f1fca89638b22a9bd599b4b39f75a8a7a6b82de99ecfc78b4e93f1ae067",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13701,7 +13707,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1092,
+    "R-verify": 1093,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
