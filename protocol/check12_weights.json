@@ -386,6 +386,7 @@
     "test_orphan_scan": 0.1,
     "test_output_envelope": 0.1,
     "test_output_forms": 11.5,
+    "test_output_forms_doc_contract": 0.3,
     "test_output_path_escape": 0.8,
     "test_p06_drill_contract": 0.2,
     "test_p6_evaluations": 29.8,
@@ -3980,6 +3981,9 @@
     "test_output_forms.RenderAndRecomputeTest.test_meter_ratio_bounds": 0.06,
     "test_output_forms.RenderAndRecomputeTest.test_quant_engine_claim_covers_all_engines": 0.0,
     "test_output_forms.RenderAndRecomputeTest.test_repo_render_is_idempotent": 0.76,
+    "test_output_forms_doc_contract.OutputFormsDocTest.test_contract_catches_mutations": 0.07,
+    "test_output_forms_doc_contract.OutputFormsDocTest.test_data_live": 0.01,
+    "test_output_forms_doc_contract.OutputFormsDocTest.test_forms_matches_contract": 0.01,
     "test_output_path_escape.DeclaredPathEscapeTest.test_absolute_and_drive_and_ads_forms_are_refused": 0.35,
     "test_output_path_escape.DeclaredPathEscapeTest.test_cross_package_declared_path_is_refused": 0.05,
     "test_output_path_escape.DeclaredPathEscapeTest.test_index_verify_reports_escape_as_issue_instead_of_reading_outside": 0.09,
@@ -5523,5 +5527,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1893.5
+  "total_s": 1893.8
 }
