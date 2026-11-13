@@ -23,6 +23,13 @@ BT = chr(96)
 DOC = ROOT / "docs" / "standards" / "layer-data.md"
 CATALOG = ROOT / "protocol" / "standards_catalog.json"
 LAYERS = ("data", "eng", "form", "gov", "iface")
+MEANINGS = {
+    "data": "数据/格式/模式与交换表示",
+    "eng": "工程方法与过程约定",
+    "form": "呈现与文档形态",
+    "gov": "治理/合规/风险与制度框架",
+    "iface": "接口/协议与互操作",
+}
 ENTRY = re.compile("^### " + BT + "([a-z0-9][a-z0-9._-]*)" + BT + "$")
 BLOCK = "## 怎么读本页"
 
@@ -77,6 +84,12 @@ def layer_issues(text: str) -> list:
         side_text = side.read_text(encoding="utf-8")
         if BLOCK not in side_text:
             issues.append(f"分层页不同构：layer-{layer}.md 缺读法段")
+        want = "- 本层含义：" + MEANINGS[layer]
+        if want not in side_text:
+            issues.append(f"分层页缺本层含义：layer-{layer}.md")
+    own = "- 本层含义：" + MEANINGS["data"]
+    if own not in text:
+        issues.append("本页缺本层含义（data）")
     return issues
 
 

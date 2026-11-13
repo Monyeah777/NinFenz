@@ -47,13 +47,22 @@ _HOWTO_INDEX = [
     "- 数据/代码/脚本三面一致性由 check40 判；本页只是**投影**，不是第二份事实。",
     "",
 ]
+LAYER_NOTES = {
+    "data": "数据/格式/模式与交换表示（文件格式、schema 语言、数据模型与语义词汇）",
+    "eng": "工程方法与过程约定（架构建模、构建交付、可观测性与协作约定）",
+    "form": "呈现与文档形态（标记语言、排版、图示与文档结构）",
+    "gov": "治理/合规/风险与制度框架（法规、审计准则、安全与隐私框架）",
+    "iface": "接口/协议与互操作（传输、API、身份与消息协议）",
+}
+
+
 _HOWTO_LAYER = [
     "## 怎么读本页", "",
     "- 生成物：`python scripts/geo_export.py --write` 重写本页；"
     "`--check` 比对生成物与真源，不一致即红。手改必红。",
     "- 切片口径：本页只收 `layer` 等于该层的标准，锚点与主索引 `index.md` 逐字一致。",
-    "- 行字段：名称 · 机构 · 层 · 可达（HTTP · 探针日期） · 扩展点 ·",
-    "绑定（主锚/辅锚） · 规范 URL。",
+    "- 行字段：名称 · 机构 · 层 · 可达（HTTP · 探针日期） · 扩展点 ·"
+    " 绑定（主锚/辅锚） · 规范 URL。",
     "- 互指：全量见 `index.md`；按问题形态聚合见 `answer-cards.md`；"
     "三面一致性由 check40 判，本页只是**投影**。",
     "",
@@ -119,6 +128,13 @@ def _head(title: str, coverage: Dict[str, Any], extra: str = "") -> List[str]:
     return lines
 
 
+def _layer_body(layer, rows, coverage):
+    head = _head("标准目录 · 层 %s（%d 条）" % (layer, len(rows)), coverage,
+                 "本页为 `%s` 的按层切片，锚点与主索引一致。" % INDEX_REL)
+    note = "- 本层含义：" + LAYER_NOTES[layer]
+    return head + _HOWTO_LAYER[:2] + [note] + _HOWTO_LAYER[2:]
+
+
 def build(root: str) -> Dict[str, str]:
     standards, coverage, counts = _load(root)
     ordered = sorted(standards, key=lambda s: (str(s.get("layer") or ""), str(s.get("id") or "")))
@@ -133,8 +149,7 @@ def build(root: str) -> Dict[str, str]:
 
     for layer in LAYERS:
         rows = [s for s in ordered if str(s.get("layer") or "") == layer]
-        body = _head("标准目录 · 层 %s（%d 条）" % (layer, len(rows)), coverage,
-                     "本页为 `%s` 的按层切片，锚点与主索引一致。" % INDEX_REL) + _HOWTO_LAYER
+        body = _layer_body(layer, rows, coverage)
         for s in rows:
             body += ["### `%s`" % s["id"], _line(s, counts), ""]
         outs["docs/standards/layer-%s.md" % layer] = "\n".join(body).rstrip() + "\n"
