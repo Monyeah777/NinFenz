@@ -23,8 +23,8 @@
     },
     {
       "description": "文档四型覆盖",
-      "detail": "四型全覆盖 · 写法 WARN 3",
-      "digest": "06a3777455680c0dcf5acf6a618c67e7e41114744719b8ded1c29a350bc1b154",
+      "detail": "四型全覆盖 · 写法 WARN 2",
+      "digest": "55d790c1f5838303b1a23ce03af2a26ac0786b7f66e6ac8b90d4edfffc879180",
       "id": "doc-kinds",
       "ok": true
     },
@@ -191,7 +191,7 @@
     }
   ],
   "passed": 27,
-  "root": "c94a8576675b749ecd5c7746b423edefb748b55910194d28023ab58109fe84ee",
+  "root": "3393227d6bb195ce984a5321f2d1697cfe26cd10ffce42fb48ec69bcad4fe22c",
   "schema": "nf-conformance/1",
   "total": 27,
   "verdict": "conformant"

@@ -1,5 +1,5 @@
 {
-  "measured_at": "2026-11-13",
+  "measured_at": "2026-11-14",
   "modules": {
     "test_absence_guard": 0.2,
     "test_adr_0000_contract": 0.3,
@@ -471,6 +471,7 @@
     "test_repo_trust": 2.2,
     "test_report_meta": 0.2,
     "test_requirement_coverage": 0.1,
+    "test_requirement_template_doc_contract": 16.3,
     "test_requirements_ci_contract": 0.2,
     "test_requirements_pins_contract": 0.2,
     "test_research_methods_doc_contract": 0.2,
@@ -4634,6 +4635,9 @@
     "test_requirement_coverage.Test.test_orphan_check": 0.0,
     "test_requirement_coverage.Test.test_uncovered_must_is_reported": 0.0,
     "test_requirement_coverage.Test.test_uncovered_without_plan_fails": 0.0,
+    "test_requirement_template_doc_contract.RequirementTemplateDocTest.test_contract_catches_mutations": 10.73,
+    "test_requirement_template_doc_contract.RequirementTemplateDocTest.test_inventory_live": 2.7,
+    "test_requirement_template_doc_contract.RequirementTemplateDocTest.test_template_matches_contract": 2.66,
     "test_requirements_ci_contract.RequirementsCiContractTest.test_contract_catches_broken_file": 0.0,
     "test_requirements_ci_contract.RequirementsCiContractTest.test_direct_pins_mirror_pyproject": 0.0,
     "test_requirements_ci_contract.RequirementsCiContractTest.test_every_pin_has_hashes": 0.0,
@@ -5591,5 +5595,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1941.6
+  "total_s": 1957.9
 }
