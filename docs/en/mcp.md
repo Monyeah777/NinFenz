@@ -1,5 +1,5 @@
 # NinFenz MCP access (`nf serve` · plan 40 v2.7 Wave A S1-E3 / X2)
-> 最后更新：2026-10-18 (last updated)
+> Last updated: 2026-11-13
 
 > **Status**: the public documentation landed with base layer v2.7; **the E3 protocol-level load test passed on 2026-09-08** (a direct stdio JSON-RPC frame-sequence test of all five methods came back green — see the record at the end of this document; it fixed two P06 pipeline gaps — a missing closing ``` / a missing techdoc declaration). 41 Wave C C7 (2026-09-08) opened read-only tools/prompts (local stdio smoke test passed; see docs/41_波C_C7_实测记录.md). **Host-class clients (GUI loading such as Claude Desktop) still need user-side backfill** — the README's MCP claims stay as they are (the S13 gate opens per the docs_external-validation-v2.7.md rules), and "promotion" is filled in after the backfill.
 
@@ -90,13 +90,35 @@ From 41 Wave C C7 onward, an agent can also call read-only retrieval tools: `pip
 | `resources/list` | ✅ | pure metadata of snapshot-registered resources (no text field) |
 | `resources/templates/list` | ✅ | RFC 6570 level-1 subset resource templates (library / pattern / module / pipeline / asset); full coverage of real resource uris is asserted by check33 |
 | `resources/read` | ✅ | allowlisted uri → `contents[].text`; unknown uri → `-32602` |
-| `tools/list` / `tools/call` (read-only · retrieval surface) | ✅ | 41 Wave C C7: library_search / registry_search / pipeline_list / spec_list (inputSchema really exists; all read-only) |
-| `tools/list` / `tools/call` (read-only · content channel) | ✅ | 44: module_read / pipeline_read / asset_read — returns the substantive body of modules/pipelines/assets (not just metadata) |
+| `tools/list` / `tools/call` (read-only · retrieval surface, **7 tools**) | ✅ | `pipeline_list` / `spec_list` / `registry_search` / `library_search` / `pattern_list` / `asset_list` / `knowledge_order_read` (last three added after 2026-10; inputSchema really exists; all read-only) |
+| `tools/list` / `tools/call` (read-only · content channel, **5 tools**) | ✅ | `library_read` / `pattern_read` / `module_read` / `pipeline_read` / `asset_read` — returns the substantive body (not just metadata) |
 | Tool annotations on `tools/list` | ✅ | all 12 tools declare `readOnlyHint` / `destructiveHint: false` / `idempotentHint` / `openWorldHint: false` (since 2026-10-18) — read-only is no longer prose only: an MCP client may **auto-approve** read-only calls instead of prompting for each one |
 | `prompts/list` / `prompts/get` | ✅ | 41 Wave C C7: assemble_guide loading-guide template (read-only) |
 | Write-path tools (not implemented) | ❌ | unknown tool → `-32602`; unknown method → `-32601` (the read-only security layer refuses writes by construction) |
 
 Standard error codes: `-32700` parse error / `-32600` invalid request / `-32601` method not found / `-32602` invalid params / `-32603` internal error; version-negotiation error `-32022` (`data.supported` / `data.requested`).
+
+## Status check (2026-11-13 · read from `mcp_runtime`)
+
+| Surface | Current value | How to re-check |
+|---|---|---|
+| Read-only tools | **12** (retrieval 7 + content channel 5) | `mcp_runtime.TOOL_DEFS` |
+| Loading-guide prompt | **1** (`assemble_guide`) | `PROMPT_DEFS` |
+| Protocol versions | **dual-era**: modern `2026-07-28` + legacy `2025-11-25` | frame tests / `server/discover` |
+| Inbound limit | **8 MiB per message** (over limit -> `-32600`, discard to end of line) | frame-discipline criteria |
+| Read allowlist | `resources/read` only registered uris; unknown -> `-32602` | smoke test + check33 |
+| Write path | **not implemented** (unknown tool -> `-32602` / unknown method -> `-32601`) | last row of capability table |
+
+> Index only; tool names come from `TOOL_DEFS` as the single source of truth.
+
+## Reproduction and citation
+
+```bash
+python scripts/nf.py serve --help    # entry and flags (snapshot / live repo surface / --http)
+python -m pytest desktop/tests/test_mcp_runtime.py -q   # protocol frames / tool surface / error codes
+```
+
+- Rule of thumb: "read-only + allowlist + dual-era versions" is the long-term rule; `TOOL_DEFS` is the only source of truth for tool names.
 
 ## E3 measured record (2026-09-08 · protocol-level load test passed)
 
