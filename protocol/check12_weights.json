@@ -277,6 +277,7 @@
     "test_key_transparency": 1.6,
     "test_key_transparency_doc_contract": 0.2,
     "test_knowledge": 0.7,
+    "test_knowledge_doc_contract": 0.2,
     "test_knowledge_sig": 0.2,
     "test_l3_frozen_contract": 0.2,
     "test_label_carrier": 8.1,
@@ -2946,6 +2947,9 @@
     "test_knowledge.TestUsage.test_unknown_source_key_is_fail": 0.01,
     "test_knowledge.TestUsage.test_write_usage_is_canonical": 0.02,
     "test_knowledge.TestWorkflow.test_write_log_roundtrip_and_promote": 0.02,
+    "test_knowledge_doc_contract.KnowledgeDocTest.test_contract_catches_mutations": 0.0,
+    "test_knowledge_doc_contract.KnowledgeDocTest.test_knowledge_matches_contract": 0.0,
+    "test_knowledge_doc_contract.KnowledgeDocTest.test_sources_live": 0.0,
     "test_knowledge_sig.SignTest.test_build_signature_fields": 0.0,
     "test_knowledge_sig.SignTest.test_diff_breaking_on_id_change": 0.0,
     "test_knowledge_sig.SignTest.test_diff_reports_changes_and_verdict": 0.0,
@@ -5463,5 +5467,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1888.1
+  "total_s": 1888.3
 }
