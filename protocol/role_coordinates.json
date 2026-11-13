@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1223
+    "verify": 1224
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9575,6 +9575,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/nfal.md 契约：NFA-L 文档必须「5 子命令/6 函数/6 码/110 条迁移」与实现一致。",
+      "path": "desktop/tests/test_nfal_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "core.nfal_rules 回归：定点推导 / guard / fuel 溢出 fail-closed / 确定性。",
       "path": "desktop/tests/test_nfal_rules.py",
       "role": "verify",
@@ -13722,7 +13728,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "696711ab62915133cc3fb3663654bdea0bda265a25a0ede7cc1a6b883f10288a",
+  "root_digest": "dd2009ea3ef1241262e1a65cce8d7fdee4e1986888400166f96932b3aaa62ee4",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13731,7 +13737,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1097,
+    "R-verify": 1098,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
