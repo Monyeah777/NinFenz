@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1279
+    "verify": 1280
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8237,6 +8237,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "protocol/demo_signers/README.md 契约：允许清单 / 锚状态 / 两条命令结论必须与实跑一致。",
+      "path": "desktop/tests/test_demo_signers_readme_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "dep_closure 单测。",
       "path": "desktop/tests/test_dep_closure.py",
       "role": "verify",
@@ -14058,7 +14064,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "e88896d07cc1f752b17e80be944a43a1cc8db74e455da4c7814e354e4fefe4f7",
+  "root_digest": "05bc744067b3bc5f025a00cdc7e7777f52b148086eff7a5ec2a6b90289da1a1e",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -14067,7 +14073,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1153,
+    "R-verify": 1154,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
