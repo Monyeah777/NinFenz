@@ -93,14 +93,15 @@ def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
             warns.append("%s 缺 evidence（可证性弱：无法回溯规则来源）" % d)
         for item in ev:
             s = item.strip()
-            if _CHECK.match(s) or s.startswith("docs/") or s.startswith("desktop/") \
-                    or s.startswith("protocol/") or s.startswith("library/"):
-                if _CHECK.match(s):
-                    continue
-                if not (Path(root) / s).exists():
-                    warns.append("%s 的 evidence 指向不存在的件：%s" % (d, s))
-            elif not s:
+            if not s:
                 warns.append("%s 的 evidence 有空项" % d)
+                continue
+            if _CHECK.match(s):
+                continue
+            # 任何带 / 的引用都按路径校验（此前只认 docs/ desktop/ protocol/ library/ 四个前缀，
+            # 其它前缀（如 handovers/）的悬空引用会被静默放过——实测抓到一个）。
+            if "/" in s and not (Path(root) / s).exists():
+                warns.append("%s 的 evidence 指向不存在的件：%s" % (d, s))
     stats = {"patterns": len(rows), "ids": sorted(seen)}
     return issues, warns, stats
 
