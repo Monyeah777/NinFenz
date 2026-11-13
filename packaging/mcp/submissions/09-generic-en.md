@@ -52,3 +52,23 @@ License: MIT
 | 协议版本 | modern `2026-07-28` + legacy `2025-11-25`（双版本并存） |
 | 工具数 / prompts | 12 个只读工具 + 1 个 prompt（`assemble_guide`）；`additionalProperties: false`，参数不合即 `-32602` |
 | 是否只读 | 是（无写路径） |
+
+
+---
+
+## 自检（与材料包同源 · 2026-11-14 复核补）
+
+| 面 | 现值 | 复核方式 |
+|---|---|---|
+| 字段 | Name / Tagline / Description / Install / Repo / Site / Category / Tags / License **九项齐全** | 上方 `text` 块 |
+| 工具面 | **12 只读工具 + 1 prompt**（`assemble_guide`），无写路径 | `desktop/src/core/mcp_runtime.py` |
+| 协议 | modern `2026-07-28` + legacy `2025-11-25` | 同上 |
+| 传输 | **仅 stdio**（Streamable HTTP / SSE 未提供，表单留空） | `nf serve` 入口 |
+| 依赖 | 零第三方（Python 标准库） | `pyproject.toml` 的 `dependencies` 为空 |
+| 许可 | MIT | `LICENSE` |
+| 中英对偶 | 本件与 `10-generic-zh.md` **传输段逐字相同**、字段块同义不同文 | 判据 `test_generic_blocks_doc_contract` |
+| 平台侧 | **平台侧未验**：任何未列出目录站的字段名/限制都以该站为准 | 无法从仓库证明 |
+
+- **通用块的用途**：任何未单独列出的目录站，直接整段粘上方 `text` 块；需要 `mcpServers` JSON 的站，粘「完整配置」块。
+- **不钉运行时计数**：本件文案不带 check/PASS/单测条数——对外文案里的快照数字等于过期承诺。
+- 中英两份**同义不同文**：改字段值必须两边一起改（`10-generic-zh.md` 是中文版）。
