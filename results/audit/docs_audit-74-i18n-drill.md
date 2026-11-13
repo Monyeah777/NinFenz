@@ -6,7 +6,7 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——对应 62
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - protocol/locales.json:0abbb1a4b5594ada54ddee0f8ed6fce1cc490060779a259e0e5b3099f92fc103
+  - protocol/locales.json:d3730e1d4f8d736d9742713cbeaee96c7d9cc4b241b8c5524405c218c90de25c
   - docs/locales.md:49d614fa22cbeacff6166c292b6785566ea07b505556e2d842dfeb515127277a
   - docs/en/locales.md:7190d1a17094cccd0be4a780230e5777e61694eb5b7f0003c9c3370d1d9ce3c1
   - docs/ja/locales.md:a2e563172139d5fb7549acd1aca06463f6f5add713ab84aea713ac06af1be86d
@@ -28,6 +28,8 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
   - protocol/code_metrics_baseline.json:6bf5087e381d484d64bc5474ebcabcb4174f3f2dc892f26080076075f41ee671
 ---
+> 重审（2026-11-13）：发布策略声明件顶尖化（11 步 ID 全列/冻结链 3/版本面 3/工件 4/锚 3 段 + 现状对照 / 复现；en·ja 译件同步后重签）+ 契约判据 test_release_doc_contract；权重增量重测。本轮为机械重绑。
+
 > 重审（2026-11-13）：LSP 接入文档顶尖化（11 能力/16 方法/8MiB/utf-16/77 例 + 现状对照 / 复现；en·ja 译件同步后重签）+ 契约判据 test_lsp_doc_contract；权重增量重测。本轮为机械重绑。
 
 > 重审（2026-11-13）：MCP 接入文档顶尖化（能力表工具 7→12 全列 / 1 prompt / dual-era / 8MiB / 现状对照 / 复现；en·ja 译件同步后重签）+ 契约判据 test_mcp_doc_contract；权重增量重测。本轮为机械重绑。

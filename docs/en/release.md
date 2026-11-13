@@ -1,6 +1,10 @@
 # Release orchestration (release)
 > ⛔ Operating instruction: this file is the **human-readable projection** of the release policy. The machine source is `protocol/release_policy.json` (validated against `protocol/schema/release.schema.json`); the machine-checked preflight is check38's `release_gate` sub-scan. Read it and run it.
-> 最后更新：2026-10-11 (last updated)
+> Last updated: 2026-11-13
+> **Review (2026-11-13)**: freeze-chain order, three version faces, Golden Master retirement and boundaries are **unchanged**;
+> added verifiable status (read from `nf release --plan --json` and the policy file): plan **11 steps**
+> (pre-1/pre-2 · gate-1/gate-2 · changes-1 · freeze-1/freeze-2/freeze-3 · ver-1 · audit-1 · tag-1) · freeze chain **3 steps** ·
+> version faces **3** · required artifacts **4** · policy anchor sections **3**. See "§Status check".
 
 ## What this solves
 
@@ -51,6 +55,30 @@ python scripts/nf.py changelog --version X.Y.Z --date YYYY-MM-DD --write  # inse
 ```
 
 Rules and rationale: `changes/README.md`; the judge is check38's `release_gate` sub-scan.
+
+## Status check (2026-11-13 · read from `nf release --plan --json` and the policy file)
+
+| Surface | Current value | How to re-check |
+|---|---|---|
+| Plan steps | **11** (pre-1 / pre-2 / gate-1 / gate-2 / changes-1 / freeze-1 / freeze-2 / freeze-3 / ver-1 / audit-1 / tag-1) | `nf release --plan --json` |
+| Freeze chain | **3 steps**: conformance → approve → receipts (order must not be swapped) | `protocol/release_policy.json: freeze_chain` |
+| Version faces | **3**: CHANGELOG / VERSION-MATRIX / README version block | same file, `version_faces` |
+| Required artifacts | **4**: conformance_report / RECEIPTS / approvals / results/audit | same file, `required_artifacts` |
+| Policy anchors | **3 sections** (human doc must carry all three; checked by `release_gate`) | check38 `release_gate` sub-scan |
+| `git tag` | **human-executed** (never automated) | Boundaries section |
+
+> Index only; step order comes from `--plan --json` (PASS expectations are not written here).
+
+## Reproduction and citation
+
+```bash
+python scripts/nf.py release --plan --json    # machine-readable plan (11 steps: command / output / judge)
+python scripts/nf.py release --plan           # human-readable plan
+python scripts/nf.py release                  # pre-release health check (verify + coverage + e2e + report freshness)
+```
+
+- Rule of thumb: "freeze-chain order must not be swapped; receipts run last after content changes" is the long-term rule.
+- `--apply` only calls existing commands in order; tagging is always done by a human (irreversible).
 
 ## Boundaries (not claimed)
 
