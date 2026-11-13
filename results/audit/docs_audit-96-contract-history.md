@@ -12,9 +12,11 @@ subjects:
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - desktop/tests/test_knowledge_sig.py:4705091a139b4fc4da9a61bc816e30eeec3221688f3d923e43afc3b11609c17e
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
-  - docs/迁移指南-基于nf-sig-diff.md:64b4299bfdec7b663feef412ea16b8b5768c54036754fae066d1c81c3fdbfc5d
+  - docs/迁移指南-基于nf-sig-diff.md:02115fdf6e19c01142bc8f2561613ca421318db755769dedbd11498b6149c7b8
   - changes/unreleased/20261030-contract-history.md:4aa6c0df999193ab102115105c450ddae136dfa32c47d07fdebfe271f1059398
 ---
+> 重审（2026-11-13）：迁移指南顶尖化（签名文档 4 / 历史面 15（4 根+2 protocol+9 schema）/ 影响度 3 值 / 命令三形态 + 现状对照 / 复现）+ 契约判据 test_migration_guide_doc_contract。
+
 > 重审（2026-11-09）：方法包声明可跑入口 runnable，清单与文档共用（含入口存在性判据）
 
 > 重审（2026-11-09）：证人核对接入生产路径：session.step(root=) + CLI 传 ROOT
