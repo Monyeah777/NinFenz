@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1282
+    "verify": 1283
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -10709,6 +10709,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "site/README.md 契约：站点总览的「页数 / 机器面 / 工具 / 判据项数 / npm 口径」必须可核。",
+      "path": "desktop/tests/test_site_readme_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "SKILL 出口适配器单测（v2.0.x 插件：techdoc IR → SKILL.md，产物矩阵第二行）。",
       "path": "desktop/tests/test_skill_adapter.py",
       "role": "verify",
@@ -14076,7 +14082,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "b15123db3cbcd3446061ea4c5335ea60941c22a69a75dc20d44e9b06d0ae6cdd",
+  "root_digest": "93030be3183d2ab5fd2bad8cbadfb030a5286048d72777d23d095fd3feb76cc6",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -14085,7 +14091,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1156,
+    "R-verify": 1157,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
