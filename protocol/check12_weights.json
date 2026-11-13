@@ -346,6 +346,7 @@
     "test_meta_roadmap_doc_contract": 0.2,
     "test_method_pack": 3.9,
     "test_method_packs_doc_contract": 0.2,
+    "test_migration_guide_doc_contract": 8.4,
     "test_missing_sentinel": 0.2,
     "test_modeling": 0.6,
     "test_modeling_doc_contract": 0.2,
@@ -3591,6 +3592,9 @@
     "test_method_packs_doc_contract.MethodPacksDocTest.test_contract_catches_mutations": 0.02,
     "test_method_packs_doc_contract.MethodPacksDocTest.test_pack_data_live": 0.0,
     "test_method_packs_doc_contract.MethodPacksDocTest.test_packs_match_contract": 0.01,
+    "test_migration_guide_doc_contract.MigrationGuideDocTest.test_contract_catches_mutations": 5.44,
+    "test_migration_guide_doc_contract.MigrationGuideDocTest.test_faces_live": 1.36,
+    "test_migration_guide_doc_contract.MigrationGuideDocTest.test_guide_matches_contract": 1.35,
     "test_missing_sentinel.Test.test_missing_is_explicit": 0.0,
     "test_missing_sentinel.Test.test_present_value": 0.0,
     "test_missing_sentinel.Test.test_reject_missing": 0.0,
@@ -5587,5 +5591,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1933.2
+  "total_s": 1941.6
 }
