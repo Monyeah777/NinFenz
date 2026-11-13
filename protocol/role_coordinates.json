@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1280
+    "verify": 1281
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8267,6 +8267,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "site/DEPLOY-cloudflare-workers.md 契约：wrangler 关键键 / 站点工具 / 三条自检命令必须可核。",
+      "path": "desktop/tests/test_deploy_cloudflare_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "docs/42_M5_设计自查清单契约：六问必须「口径不变 + 每问有判据映射 + 证据命令可跑」。",
       "path": "desktop/tests/test_design_checklist_contract.py",
       "role": "verify",
@@ -14064,7 +14070,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "05bc744067b3bc5f025a00cdc7e7777f52b148086eff7a5ec2a6b90289da1a1e",
+  "root_digest": "8f5150e6832b69d0ed50daa6b32ed7c604dd7c7fe4ca0c816693f41e66f5bfb4",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -14073,7 +14079,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1154,
+    "R-verify": 1155,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:ff2789a86dcb26a3bb2a816d5873a32842ebcc05cbc54e0683c0ca909eed5baf
+  - protocol/check12_weights.json:ff1e6e26047323216ec28ff00512215356bcd3dc8271839ff66b9cfa16cc7a8d
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:fa00a7fd014857af56e11f38ced1b7d888be053befaadb10b3dd494d27884316
   - docs/meta-cockpit/功能解析.md:de20c2340d19d541bcfde53f222a3acf22a6e440d8fb3dcf51a37aedf53c0c25
   - results/meta-cockpit-manifest.json:60c0e100798e49d393557ae5066c02d7e057ec27f386ee1a36ca3fc7740150ba
 
 ---
+> 重审（2026-11-14）：site/DEPLOY-cloudflare-workers 顶尖化：补 §现状对照（wrangler 九键/五个站点工具/42 项离线判据/16 项 worker 判据/CI 两步）+ §复现口径 + 复核位；**如实登记实测漂移**（sync-numbers 红：站点 npm 体积 24.74 vs 清单 25.21 MB，跨域手写数字待下一轮随 site/README 收）；新增判据 test_deploy_cloudflare_doc_contract。
+
 > 重审（2026-11-14）：demo_signers README 顶尖化：校正过强口径（原文称「端到端复现验证」，实测 NF-1 未挂锚 → exit 0 + 真实性未验），补 §现状对照（允许清单 1 条/锚状态/两命令结论/私钥位置/生产口径）+ 复现口径 + 复核位；新增判据 test_demo_signers_readme_doc_contract（allowed_signers 四列格式 + 禁止过强断言 + nf_verify 实跑）。
 
 > 重审（2026-11-14）：WORLD_MODEL 顶尖化：补 §现状对照（scan 实读 模块1/变量4/相位5/不变式5/checks3/slots4-10 · check32 硬门 · 校验器四函数 + 运行器七方法 · CLI 四形态 · 判据 20+ 例）+ 复现口径 + 复核位；明确「扫描基线不钉死」与「契约自洽不等于质量好」边界；新增判据 test_world_model_doc_contract（含 nf worldmodel --run 实跑 digest）。

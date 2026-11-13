@@ -1,6 +1,10 @@
 # Cloudflare Workers 部署（NinFenz 静态站）
 
 > **当前工期（2026-10-06）**：域名 **ninfenz.dev** 已注册并挂上自定义域（大陆裸网直连可达），
+>
+> **复核（2026-11-14）**：面板字段与高级设置**复核不变**（与 Cloudflare 现行 Workers Builds 文档一致）；
+> 本轮补「§十一 现状对照」「§十二 复现与引用口径」，把「`wrangler.jsonc` 关键键 / 五个站点工具 / 三条自检命令 / CI 接线」写清；
+> 并**如实登记一处实测漂移**：`sync-numbers.mjs` 当前红（站点 npm 体积 24.74 vs 清单 25.21 MB）。
 > 站内 canonical / hreflang / og:url / JSON-LD @id / sitemap / robots / llms.txt **已全部指向该地址**（自洽）。
 > 买下 `ninfenz.dev` 后切回：`node site/tools/set-origin.mjs https://ninfenz.dev --write && npx wrangler deploy`。
 
@@ -175,3 +179,32 @@ node site/tools/site-check.mjs              # 联网判据（部署后）：状�
 CI 里已接 `sync-numbers.mjs` 与 `site-check.mjs --offline` 两步（.github/workflows/ci-verify.yml），
 所以站点数字或机器面漂移会与仓库门禁一起红。
 
+
+---
+
+## 十一、现状对照（2026-11-14 · 以 `wrangler.jsonc` / `site/tools/*.mjs` 实读为准）
+
+| 面 | 当前口径 | 复核方式 |
+|---|---|---|
+| `wrangler.jsonc` 关键键 | `name=ninfenz` · `main=site/worker.js` · `assets.directory=./site` · `assets.binding=ASSETS` · `html_handling=auto-trailing-slash` · `not_found_handling=404-page` · `run_worker_first=true` · `workers_dev=false` · `compatibility_date=2026-10-06` | 该文件 |
+| 站点工具 | **5 个**：`sync-numbers.mjs`（数字对齐）· `site-check.mjs`（离线/联网 42 项）· `worker-check.mjs`（16 项 worker 行为）· `set-origin.mjs`（换基址）· `indexnow.mjs`（提交搜索引擎） | `ls site/tools` |
+| 离线判据 | `site-check --offline` **42 项全过**（origin 自洽 / 机器面在场 / `_headers` 覆盖 / robots / 无旧基址） | 本机实跑 |
+| worker 判据 | `worker-check` **16 项全过**（www→裸域 301 保留路径与查询 · 其余透传 `env.ASSETS`） | 本机实跑 |
+| 数字同步 | `sync-numbers.mjs` 比对 13 个面 + 规模 8 数；**漂移即 exit 1** | 本机实跑 |
+| CI 接线 | `.github/workflows/ci-verify.yml` 跑 `sync-numbers` + `site-check --offline` 两步 | 工作流文件 |
+
+### 本轮实测发现（未修，登记为债）
+
+`node site/tools/sync-numbers.mjs` 当前 **exit 1**：站点仍写「npm 体积 **24.74 MB**」，而 payload 清单实为 **25.21 MB**——这是**跨仓漂移**（npm 包体积随每次提交变），站点侧是手写静态面不会自动跟随。
+处理口径：各面数字（verify/check/PASS/规模 8 数）可由 `--write` 自动同步；**npm 体积这类跨域数字需人工改**，属站点发布前把关项，登记为债在下一轮随 `site/README.md` 一并收掉。
+
+## 十二、复现与引用口径
+
+```bash
+node site/tools/sync-numbers.mjs            # 站点数字 vs 真源（漂移 exit 1；发布前必跑）
+node site/tools/site-check.mjs --offline    # 42 项离线判据（无需网络）
+node site/tools/worker-check.mjs            # 16 项 worker 行为判据（www 301 / ASSETS 透传）
+```
+
+- 引用本页时：「assets-only 静态站」是**早期形态**；现行是「静态资产 + 轻量 Worker（仅 www 301）」，见 §八。
+- 改 `wrangler.jsonc` 的 `run_worker_first` 必须同时确认 `assets.binding` 在场（否则 `env.ASSETS` 为 undefined，全站崩——§八已记录该实测）。
