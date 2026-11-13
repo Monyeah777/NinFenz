@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:2f2745339b38a1e6b90fca99f7c2537eab410241880fe288f3cd7549533196b6
+  - protocol/check12_weights.json:08e550727b54e2ce0055a1cd2e1edc7efe49d87ed0bf1f8c41fcf80a06a60974
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-13）：端点点契约文档顶尖化 + 权重增量重测 + 层位刷新后的机械重绑（最终轮次）。
+
 > 重审（2026-11-13）：指令档路由文档顶尖化（修判据过度陈述「逐名一致」→子集校验 / 3 工作流·3 指令档·8 工具·1 提示活绑定 / 现状对照 / 复现）+ 契约判据 test_driver_doc_contract；权重增量重测。本轮为机械重绑。
 
 > 重审（2026-11-13）：域包文档顶尖化（修可达 332/不可达 38/绑定 1200 记录 2400 锚位 + 空壳 73·36·2628 + specs 可见性说明 / 现状对照 / 复现）+ 契约判据 test_domain_packs_doc_contract；权重增量重测。本轮为机械重绑。

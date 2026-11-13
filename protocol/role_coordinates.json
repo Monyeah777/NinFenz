@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1199
+    "verify": 1200
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8369,6 +8369,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/endpoint.md 契约：服务端点契约文档必须「端点计数/conventions/幂等例外/SSE 与契约实读一致」。",
+      "path": "desktop/tests/test_endpoint_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "P5-07 绑定层判据：C ABI（ctypes）与 PyO3（扩展模块）两条路径都要**真装载、真调用**。",
       "path": "desktop/tests/test_engine_ffi_binding.py",
       "role": "verify",
@@ -13578,7 +13584,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "fec0d4d5f8b8337c93c02f017b4bb5441edc618924cd0cbb5d642d06253f1002",
+  "root_digest": "fa707199941f9b251975f35d8c2d48e17c56f553942cd9978a782abae4850098",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13587,7 +13593,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1073,
+    "R-verify": 1074,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
