@@ -145,7 +145,14 @@ def _layer_body(layer, rows, coverage, counts):
         c = counts.get(s["id"]) or {}
         parts.append(f"{s['id']}（主锚 {c.get('main', 0)} / 辅锚 {c.get('support', 0)}）")
     binds = "- 本层绑定最多：" + " · ".join(parts)
-    return head + _HOWTO_LAYER[:2] + [note, stat, binds] + _HOWTO_LAYER[2:]
+    dead = [s for s in rows if not (s.get("evidence") or {}).get("reachable")]
+    if dead:
+        items = [f"{s['id']}（HTTP {((s.get('evidence') or {}).get('http_status'))}）"
+                 for s in dead]
+        dead_line = "- 本层不可达：" + " · ".join(items)
+    else:
+        dead_line = "- 本层不可达：无（该层全部本机可达）"
+    return head + _HOWTO_LAYER[:2] + [note, stat, binds, dead_line] + _HOWTO_LAYER[2:]
 
 
 def build(root: str) -> Dict[str, str]:
