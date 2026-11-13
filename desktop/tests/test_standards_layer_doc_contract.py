@@ -44,13 +44,36 @@ def load_text(path: Path = DOC) -> str:
     return text
 
 
+def _counts() -> dict:
+    b = json.loads((ROOT / "protocol" / "standards_binding.json").read_text(encoding="utf-8"))
+    counts = {}
+    for pack in b.get("packs") or []:
+        for item in pack.get("bindings") or []:
+            main = str(item.get("standard") or "")
+            sup = str(item.get("support_standard") or "")
+            if main:
+                counts.setdefault(main, {"main": 0, "support": 0})["main"] += 1
+            if sup:
+                counts.setdefault(sup, {"main": 0, "support": 0})["support"] += 1
+    return counts
+
+
 def facts() -> dict:
     c = json.loads(CATALOG.read_text(encoding="utf-8"))
-    by_layer = {layer: [s["id"] for s in c["standards"] if s.get("layer") == layer]
+    counts = _counts()
+    by_layer = {layer: [s for s in c["standards"] if s.get("layer") == layer]
                 for layer in LAYERS}
+    stat = {}
+    for layer, rows in by_layer.items():
+        ok = sum(1 for s in rows if (s.get("evidence") or {}).get("reachable"))
+        top = sorted(rows, key=lambda s: -(
+            (counts.get(s["id"]) or {}).get("main", 0)
+            + (counts.get(s["id"]) or {}).get("support", 0)))[:3]
+        stat[layer] = {"ok": ok, "total": len(rows),
+                       "top": [s["id"] for s in top]}
     cov = c["coverage"]
-    return {"by_layer": by_layer, "coverage": cov,
-            "standards": len(c["standards"])}
+    return {"by_layer": {k: [s["id"] for s in v] for k, v in by_layer.items()},
+            "stat": stat, "coverage": cov, "standards": len(c["standards"])}
 
 
 def layer_issues(text: str) -> list:
@@ -87,6 +110,15 @@ def layer_issues(text: str) -> list:
         want = "- 本层含义：" + MEANINGS[layer]
         if want not in side_text:
             issues.append(f"分层页缺本层含义：layer-{layer}.md")
+        st = f["stat"][layer]
+        line = f"- 本层可达：{st['ok']}/{st['total']}（不可达 {st['total'] - st['ok']}）"
+        if line not in side_text:
+            issues.append(f"分层页可达统计不符：layer-{layer}.md")
+        bind_lines = [ln for ln in side_text.splitlines()
+                      if ln.startswith("- 本层绑定最多：")]
+        got = re.findall(r"([a-z0-9][a-z0-9._-]*)(?=（)", bind_lines[0]) if bind_lines else []
+        if got != st["top"]:
+            issues.append(f"分层页绑定前三不符：layer-{layer}.md")
     own = "- 本层含义：" + MEANINGS["data"]
     if own not in text:
         issues.append("本页缺本层含义（data）")

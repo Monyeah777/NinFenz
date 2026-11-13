@@ -128,11 +128,24 @@ def _head(title: str, coverage: Dict[str, Any], extra: str = "") -> List[str]:
     return lines
 
 
-def _layer_body(layer, rows, coverage):
+def _layer_body(layer, rows, coverage, counts):
     head = _head("标准目录 · 层 %s（%d 条）" % (layer, len(rows)), coverage,
                  "本页为 `%s` 的按层切片，锚点与主索引一致。" % INDEX_REL)
     note = "- 本层含义：" + LAYER_NOTES[layer]
-    return head + _HOWTO_LAYER[:2] + [note] + _HOWTO_LAYER[2:]
+    ok = sum(1 for s in rows if (s.get("evidence") or {}).get("reachable"))
+    stat = f"- 本层可达：{ok}/{len(rows)}（不可达 {len(rows) - ok}）"
+
+    def weight(s):
+        c = counts.get(s["id"]) or {}
+        return -(c.get("main", 0) + c.get("support", 0))
+
+    top = sorted(rows, key=weight)[:3]
+    parts = []
+    for s in top:
+        c = counts.get(s["id"]) or {}
+        parts.append(f"{s['id']}（主锚 {c.get('main', 0)} / 辅锚 {c.get('support', 0)}）")
+    binds = "- 本层绑定最多：" + " · ".join(parts)
+    return head + _HOWTO_LAYER[:2] + [note, stat, binds] + _HOWTO_LAYER[2:]
 
 
 def build(root: str) -> Dict[str, str]:
@@ -149,7 +162,7 @@ def build(root: str) -> Dict[str, str]:
 
     for layer in LAYERS:
         rows = [s for s in ordered if str(s.get("layer") or "") == layer]
-        body = _layer_body(layer, rows, coverage)
+        body = _layer_body(layer, rows, coverage, counts)
         for s in rows:
             body += ["### `%s`" % s["id"], _line(s, counts), ""]
         outs["docs/standards/layer-%s.md" % layer] = "\n".join(body).rstrip() + "\n"
