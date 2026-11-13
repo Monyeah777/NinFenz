@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/layer_model.py:7464fad8e9703b76b6582a641fb80c5a93c4bbf87b5d2aad191e610eafe64dd2
-  - protocol/code_metrics_baseline.json:342b36545e8dc38e5bec410d077630172dbe4a57c7114a453782fd50035846cf
+  - protocol/code_metrics_baseline.json:b0d96f13d39a34e7871ac515125cbf9c23a8d7e46c3570e3cca45637c00f5e77
 ---
+> 重审（2026-11-13）：标准层切片页顶尖化：生成器补「怎么读本页」段（切片口径/行字段/互指/投影）并重生成五个层页；code_metrics 重冻（geo_export 267 行）；新增契约判据 test_standards_layer_doc_contract（data 层为锚，另验五层同构）。
+
 > 重审（2026-11-13）：代码度量微调重冻：geo_export.py 254 行（恢复答案卡措辞后 +1）
 
 > 重审（2026-11-13）：标准主索引顶尖化：生成器补索引页「口径与复现」段（生成物纪律/行字段/锚点/其它面/投影）并把两段文案提为模块常量；重生成后索引 +8 行；代码度量重冻（geo_export 253 行）；新增契约判据 test_standards_index_doc_contract。

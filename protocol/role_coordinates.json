@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1235
+    "verify": 1236
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -10505,6 +10505,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/standards/layer-data.md 契约：层切片页必须「148 条 / 切片口径 / 五层同构 / --check 新鲜」。",
+      "path": "desktop/tests/test_standards_layer_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "条件先行排布（state_front）单测：幂等 / 排布判据 / A-B 差异仅在位置。",
       "path": "desktop/tests/test_state_front.py",
       "role": "verify",
@@ -13794,7 +13800,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "3ced417b05cc7f6478b24bcb0e8bb341e08deeba85130c69d7775284fb0c841e",
+  "root_digest": "d31a53050493d8b84705cdfca855dfc6f3fcf1b0e1e9cc9f83f694be972fe5ff",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13803,7 +13809,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1109,
+    "R-verify": 1110,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
