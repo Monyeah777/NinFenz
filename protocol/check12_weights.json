@@ -321,6 +321,7 @@
     "test_m3_purity_contract": 0.2,
     "test_m4_census_contract": 0.2,
     "test_m5_closure_contract": 0.2,
+    "test_machine_contract_doc_contract": 0.4,
     "test_maintainers_contract": 0.1,
     "test_market_analyzer": 0.6,
     "test_master_closure_contract": 0.2,
@@ -3312,6 +3313,9 @@
     "test_m5_closure_contract.ClosureRecordContractTest.test_closure_matches_contract": 0.0,
     "test_m5_closure_contract.ClosureRecordContractTest.test_contract_catches_mutations": 0.02,
     "test_m5_closure_contract.ClosureRecordContractTest.test_deliverables_and_bench_live": 0.0,
+    "test_machine_contract_doc_contract.MachineContractDocTest.test_contract_catches_mutations": 0.16,
+    "test_machine_contract_doc_contract.MachineContractDocTest.test_machine_contract_matches": 0.02,
+    "test_machine_contract_doc_contract.MachineContractDocTest.test_scan_live": 0.03,
     "test_maintainers_contract.MaintainersContractTest.test_contract_catches_broken_maintainers": 0.01,
     "test_maintainers_contract.MaintainersContractTest.test_execution_subject_is_single_sourced": 0.0,
     "test_maintainers_contract.MaintainersContractTest.test_links_resolve": 0.0,
@@ -5487,5 +5491,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1889.4
+  "total_s": 1889.8
 }
