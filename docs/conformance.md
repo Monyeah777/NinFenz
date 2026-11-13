@@ -54,6 +54,6 @@ python -m pytest desktop/tests/test_conformance_run.py desktop/tests/test_confor
 
 ## 边界
 
-- 本工件**不等于** `verify.sh` 全量门禁（后者 **check1-42**、含动态与内容面）；这里是"一次跑完、
+- 本工件**不等于** `verify.sh` 全量门禁（后者 check1-4x，2026-11-13 实测 check1-42；含动态与内容面）；这里是"一次跑完、
   可归档的第二维护者视角"，刻意只收**离线可复算**的契约，避免重复跑与循环依赖。
 - `verdict != conformant` 时不得宣称本波可提交。
