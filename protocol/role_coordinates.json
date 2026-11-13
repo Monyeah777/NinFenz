@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1227
+    "verify": 1228
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9833,6 +9833,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/pipelinerun.md 契约：管线抽象执行文档必须「114 管线/282 模块/hard 0/advisory 1142」一致。",
+      "path": "desktop/tests/test_pipelinerun_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "包管理器面 CLI（scripts/pkg.py）回归测试 —— 品类枚举 / 取件 / 检索（机器面）。",
       "path": "desktop/tests/test_pkg_cli.py",
       "role": "verify",
@@ -13746,7 +13752,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "60363614fda44b0eb0aee1b7afacf2ae9db7e2e32228ca5bf3b8463a16e3ff31",
+  "root_digest": "41f2a0c36d9280673374035c5c0431e43d97c4df18c21c0f702e9ed3a19ca3ce",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13755,7 +13761,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1101,
+    "R-verify": 1102,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
