@@ -96,11 +96,11 @@
       "translations": {
         "en": {
           "path": "docs/en/lsp.md",
-          "source_sha256": "db91bbfed27d7e14eb63c72e58ad8e009ce44a2b6563c15982b644ec358eca39"
+          "source_sha256": "e2745c7c2fe8c0a7df28d1e74d8f6300f7bfd7b54dfff529ded94e74e20a7069"
         },
         "ja": {
           "path": "docs/ja/lsp.md",
-          "source_sha256": "db91bbfed27d7e14eb63c72e58ad8e009ce44a2b6563c15982b644ec358eca39"
+          "source_sha256": "e2745c7c2fe8c0a7df28d1e74d8f6300f7bfd7b54dfff529ded94e74e20a7069"
         }
       }
     }

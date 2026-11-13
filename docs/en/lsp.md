@@ -1,5 +1,5 @@
 # Editor integration (LSP)
-> 最后更新：2026-10-07 (last updated)
+> Last updated: 2026-11-13
 
 ## What this is
 
@@ -72,6 +72,29 @@ language-servers = ["nf-lsp"]
 command = "python"
 args = ["<absolute-repo-path>/scripts/nf.py", "lsp"]
 ```
+
+## Status check (2026-11-13 · read from the implementation)
+
+| Surface | Current value | How to re-check |
+|---|---|---|
+| Capabilities | **11** (sync / diagnostics / code action / completion / hover / definition / outline / workspace symbol / folding / references / position encoding) | capability table + `core/lsp.py` |
+| Protocol methods | **16** `M_*` constants (incl. initialize/initialized/shutdown/exit and 4 did*) | dir(lsp) filtered by M_ |
+| Framing | Content-Length over stdio | `lsp_framing.py` |
+| Inbound limit | **8 MiB per message** (over/negative/no newline -> `-32700`, keep serving) | same as MCP surface |
+| Position encoding | fixed utf-16 | server capabilities |
+| Writing | server never writes files (edits go through codeAction) | boundaries section |
+| Tests | `test_lsp` 60 + guard 4 + hardening 7 + transcript 6 = **77 cases** | pytest |
+
+> Index only; methods/capabilities come from `core/lsp.py`. 
+
+## Reproduction and citation
+
+```bash
+python scripts/nf.py lsp --print-config neovim   # config rendered by the renderer (emacs / helix alike)
+python -m pytest desktop/tests/test_lsp.py desktop/tests/test_lsp_hardening.py -q   # capabilities/framing/hardening
+```
+
+- Rule of thumb: "diagnostics share the `nf lint` source, server never writes, ambiguity fails closed" is the long-term rule.
 
 ## Self-test (no editor required)
 

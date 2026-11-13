@@ -1,6 +1,6 @@
 # 编辑器接入（LSP）
 > ⛔ 操作指令：阅读即执行——本文含可直接执行的配置与判定，勿当资料阅读。
-> 最后更新：2026-10-07
+> 最后更新：2026-11-13
 
 ## 是什么
 
@@ -68,6 +68,30 @@ language-servers = ["nf-lsp"]
 command = "python"
 args = ["<仓库绝对路径>/scripts/nf.py", "lsp"]
 ```
+
+## 现状对照（2026-11-13 · 以实现实读为准）
+
+| 面 | 现值 | 复核方式 |
+|---|---|---|
+| 能力 | **11 条**（同步 / 诊断 / 修复 / 补全 / 悬停 / 跳定义 / 大纲 / 工作区符号 / 折叠 / 引用 / 位置编码） | 本页「能力表」逐行 + `core/lsp.py` |
+| 协议方法 | `M_*` 常量 **16 个**（含 initialize/initialized/shutdown/exit 与 4 个 did*） | `dir(lsp)` 过滤 `M_` |
+| 分帧 | `Content-Length`（stdio） | `lsp_framing.py` |
+| 入站上限 | **8 MiB / 条消息**（超限/负值/表头无换行 → `-32700`，继续服务） | 同 MCP 面 |
+| 位置编码 | 固定 `utf-16` | 服务端能力表 |
+| 写盘 | **不自行写盘**（编辑只经 `codeAction` 交客户端） | 边界小节 |
+| 判据 | `test_lsp` 60 + `test_lsp_guard` 4 + `test_lsp_hardening` 7 + `test_lsp_transcript` 6 = **77 例** | pytest |
+
+> 本表只作「当时 → 现行」导航；方法与能力以 `core/lsp.py` 实读为准。
+
+## 复现与引用口径
+
+```bash
+python scripts/nf.py lsp --print-config neovim   # 配置由渲染器产出（emacs / helix 同理）
+python -m pytest desktop/tests/test_lsp.py desktop/tests/test_lsp_hardening.py -q   # 能力/分帧/硬化
+```
+
+- 引用本文时：「诊断与 `nf lint` 同源 + 不自行写盘 + 歧义失败关闭」= 长期口径。
+- 配置不要手抄：`--print-config` 是唯一真相，编辑器块只是它的输出。
 
 ## 自测（无需编辑器）
 

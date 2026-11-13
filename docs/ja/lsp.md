@@ -1,5 +1,5 @@
 # エディタ接続（LSP）
-> 最后更新：2026-10-07 (last updated)
+> 最終更新：2026-11-13
 
 ## これは何か
 
@@ -69,6 +69,29 @@ language-servers = ["nf-lsp"]
 command = "python"
 args = ["<リポジトリ絶対パス>/scripts/nf.py", "lsp"]
 ```
+
+## 現状対照（2026-11-13 · 実装からの実読）
+
+| 面 | 現値 | 再確認方法 |
+|---|---|---|
+| 能力 | **11 条**（同期 / 診断 / 修復 / 補完 / ホバー / 定義ジャンプ / アウトライン / ワークスペース記号 / 折り畳み / 参照 / 位置エンコーディング） | 能力表 + `core/lsp.py` |
+| プロトコルメソッド | **16 個** の `M_*` 定数 | dir(lsp) を M_ で絞る |
+| フレーミング | stdio 上の Content-Length | `lsp_framing.py` |
+| 入站上限 | **8 MiB / メッセージ**（超過/負値/改行なし → `-32700`、服务継続） | MCP 面と同じ |
+| 位置エンコーディング | utf-16 固定 | サーバ能力 |
+| 書き込み | サーバは書き込まない（編集は codeAction 経由） | 境界節 |
+| 判定 | `test_lsp` 60 + guard 4 + hardening 7 + transcript 6 = **77 例** | pytest |
+
+> 索引のみ。メソッド/能力は `core/lsp.py` の実読が真。
+
+## 再現と引用の口径
+
+```bash
+python scripts/nf.py lsp --print-config neovim   # 設定はレンダラの出力（emacs / helix も同様）
+python -m pytest desktop/tests/test_lsp.py desktop/tests/test_lsp_hardening.py -q   # 能力/フレーム/硬化
+```
+
+- 引用時の口径：「診断は nf lint と同源、サーバは書き込まない、曖昧は失敗側に倒す」が長期口径。
 
 ## 自己テスト（エディタ不要）
 
