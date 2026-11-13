@@ -6,12 +6,12 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——对应 62
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - protocol/locales.json:2d22e8c7196a4baa29c01b242e1c22b12eb4e113d0774b0ef1cc5ac8873384c7
+  - protocol/locales.json:6c3aaa756f5953eb6d8ea0d8a957820b5019319773d0108b624867d1279b9a49
   - docs/locales.md:49d614fa22cbeacff6166c292b6785566ea07b505556e2d842dfeb515127277a
   - docs/en/locales.md:7190d1a17094cccd0be4a780230e5777e61694eb5b7f0003c9c3370d1d9ce3c1
   - docs/ja/locales.md:a2e563172139d5fb7549acd1aca06463f6f5add713ab84aea713ac06af1be86d
-  - docs/en/mcp.md:0653be472bb4888c814d3fc3696e7d882b35c6e49b965cf09b84d41d34c8d6f0
-  - docs/ja/mcp.md:a7a248172cc0119e023b1ed7e5e2c254b3b3db3d357f76e7e6a322e41538ddf2
+  - docs/en/mcp.md:333b580565595c01dc8fea640a9c2114a295d076cbdbcabcae26462d4e59f3e2
+  - docs/ja/mcp.md:b3c1cf3a9ba549590951460b99f28e64b5f63bdc6087e4fa5510089d5047d81f
   - docs/en/terminal.md:b99ee9b83dd9bcc433b97408785e85b8f265d797eb144abc09c8e0bcae97d046
   - docs/ja/terminal.md:ae1b37be3309ff21f7bd2096b0295ee073e493ec7bb402c3672ef9f5a72d168e
   - docs/en/layers.md:71e9d99723c8c5c1c7bcd9e21e991f7dc932d3a528333e7bdafa3f5e718479ac
@@ -28,6 +28,8 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
   - protocol/code_metrics_baseline.json:6bf5087e381d484d64bc5474ebcabcb4174f3f2dc892f26080076075f41ee671
 ---
+> 重审（2026-11-13）：MCP 接入文档顶尖化（能力表工具 7→12 全列 / 1 prompt / dual-era / 8MiB / 现状对照 / 复现；en·ja 译件同步后重签）+ 契约判据 test_mcp_doc_contract；权重增量重测。本轮为机械重绑。
+
 > 重审（2026-11-13）：语言面文档顶尖化（修「五份指南」→6 份含 LSP / 12 译件 / 3 语全 entry+guides；en/ja 译件同步后重签）+ 契约判据 test_locales_doc_contract；权重增量重测。本轮为机械重绑。
 
 > 重审（2026-11-13）：抽象阶梯文档 + en/ja 译件同步（新增现状对照/复现小节）+ 语言面重签；机械重绑。

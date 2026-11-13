@@ -23,10 +23,12 @@ subjects:
   - docs/interop.md:9512d9614028f8deae79e874d840e50937c3e13c4fda301394e3286a9d54b23f
   - docs/text-hygiene.md:36edf35f60bc669192443a8c16a4bcdc7c22408270fff5ea15308a16a756f986
   - docs/endpoint.md:918c27e8f27b7479e173d57c4d0b2fac2664ff6b33d5f181000448ff1a344d10
-  - docs/mcp.md:c4fa52d36097253e197304e6bf6e0512bc2708077fb8ef34865653fc764caa78
+  - docs/mcp.md:c96f080bc2cf26d409960597f8580bf8d4a65618554a22f12f36e3e03759316a
   - llms.txt:edb84bfad0f724673bdee4aa2eea0f0c4a6bd7ea10db9476af860cf4b72198ff
 
 ---
+> 重审（2026-11-13）：MCP 接入文档顶尖化（能力表工具 7→12 全列 / 1 prompt / dual-era / 8MiB / 现状对照 / 复现；en·ja 译件同步后重签）+ 契约判据 test_mcp_doc_contract；权重增量重测。本轮为机械重绑。
+
 > 重审（2026-11-13）：互操作总览顶尖化（12 种类/入仓 12 面/外部校验逐面 14 行 6-7-1 / 现状对照 / 复现）+ 契约判据 test_interop_doc_contract；权重增量重测。本轮为机械重绑。
 
 > 重审（2026-11-13）：端点点契约文档顶尖化（补 11 端点/6 conventions/1 幂等例外/1 SSE 现状 + 边界不变 / 现状对照 / 复现）+ 契约判据 test_endpoint_doc_contract；权重增量重测。本轮为机械重绑。

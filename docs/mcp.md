@@ -1,5 +1,5 @@
 # NinFenz MCP 接入（`nf serve` · 40 总纲 v2.7 波A S1-E3 / X2）
-> 最后更新：2026-10-18
+> 最后更新：2026-11-13
 
 > **状态**：公开化文档已随基础层 v2.7 落地；**E3 协议级装载实测已于 2026-09-08 通过**（stdio JSON-RPC 帧序列直测五方法全绿，见文末记录；修复 P06 管线两缺口——缺闭合 ``` / 缺 techdoc 声明）。41 波C C7（2026-09-08）开放只读 tools/prompts（本机 stdio 冒烟通过，见 docs/41_波C_C7_实测记录.md）。**宿主类客户端（Claude Desktop 等 GUI 装载）仍建议用户侧补录**——README 对 MCP 的宣告维持现状（S13 门按 docs_external-validation-v2.7.md 规则开），回填后补「转正」。
 
@@ -90,14 +90,37 @@ stdio 服务随调用进程生命周期运行（`Ctrl+C` 结束）。也可用 `
 | `resources/list` | ✅ | 快照登记资源纯元数据（无 text 字段） |
 | `resources/templates/list` | ✅ | RFC 6570 一级子集资源模板（library / pattern / module / pipeline / asset 五条），真实资源 uri 全覆盖由 check33 断言 |
 | `resources/read` | ✅ | 白名单 uri → `contents[].text`；未知 uri → `-32602` |
-| `tools/list` / `tools/call`（只读 · 检索面） | ✅ | 41 波C C7：library_search / registry_search / pipeline_list / spec_list（inputSchema 真实存在，全只读） |
-| `tools/list` / `tools/call`（只读 · 内容通道） | ✅ | 44：module_read / pipeline_read / asset_read——返回模块/管线/资产正文实质内容（不只元数据） |
+| `tools/list` / `tools/call`（只读 · 检索面，**7 个**） | ✅ | `pipeline_list` / `spec_list` / `registry_search` / `library_search` / `pattern_list` / `asset_list` / `knowledge_order_read`（后三个为 2026-10 后补，inputSchema 真实存在，全只读） |
+| `tools/list` / `tools/call`（只读 · 内容通道，**5 个**） | ✅ | `library_read` / `pattern_read` / `module_read` / `pipeline_read` / `asset_read`——返回正文实质内容（不只元数据） |
 | `tools/list` 的工具注解 | ✅ | 12 个工具全部声明 `readOnlyHint` / `destructiveHint: false` / `idempotentHint` / `openWorldHint: false`（2026-10-18 起四项齐全）——「只读」不止写在散文里，MCP 客户端据此可**自动放行**只读调用，不必逐个弹窗 |
 | `tools/list` 的定义质量面 | ✅ | 每个工具都有 `title`、面向 agent 的 purpose/usage/behavior 描述、逐属性 `inputSchema` 说明、逐字段 `outputSchema`；`tools/call` 同时返回文本 `content` 与 `structuredContent` |
 | `prompts/list` / `prompts/get` | ✅ | 41 波C C7：assemble_guide 装载引导模板（只读） |
 | 写路径工具（未实现） | ❌ | 未知工具 → `-32602`；未知方法 → `-32601`（只读安全层天然拒写） |
 
 标准错误码：`-32700` 解析错误 / `-32600` 非法请求 / `-32601` 方法不存在 / `-32602` 参数非法 / `-32603` 内部错误；版本协商错误 `-32022`（`data.supported` / `data.requested`）。
+
+## 现状对照（2026-11-13 · 以 `mcp_runtime` 实读为准）
+
+| 面 | 现值 | 复核方式 |
+|---|---|---|
+| 只读工具 | **12 个**（检索面 7 + 内容通道 5） | `mcp_runtime.TOOL_DEFS` |
+| 装载引导 prompt | **1 个**（`assemble_guide`） | `PROMPT_DEFS` |
+| 协议版本 | **dual-era**：modern `2026-07-28` + legacy `2025-11-25` | 帧实测 / `server/discover` |
+| 入站上限 | **8 MiB / 条消息**（超限回 `-32600` 并丢弃到行尾） | 帧纪律判据 |
+| 读面白名单 | `resources/read` 仅快照/仓库登记 uri，未知 → `-32602` | 冒烟 + check33 |
+| 写路径 | **不实现**（未知工具 `-32602` / 未知方法 `-32601`） | 能力表末行 |
+
+> 本表只作「当时 → 现行」导航；工具清单以 `nf serve --help` 与 `TOOL_DEFS` 实读为准。
+
+## 复现与引用口径
+
+```bash
+python scripts/nf.py serve --help    # 入口与参数（快照 / 实时仓库面 / --http）
+python -m pytest desktop/tests/test_mcp_runtime.py -q   # 协议帧/工具面/错误码判据
+```
+
+- 引用本文时：「只读 + 白名单 + dual-era 版本」= 长期口径；工具名以 `TOOL_DEFS` 为唯一真源，正文表格只是投影。
+- 新增工具 = 改 `mcp_runtime` 后重跑判据与本表；不要在正文手维一份清单再对不上。
 
 ## E3 实测记录（2026-09-08 · 协议级装载实测通过）
 
