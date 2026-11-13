@@ -1,7 +1,7 @@
 {
-  "bytes": 12241163,
+  "bytes": 12243320,
   "count": 572,
-  "digest": "7d4b877fd4b8f4af1067728083ab7871d9a4d7bad2efb6b677561f3ce2d71bb5",
+  "digest": "e517ab69c3a6fb5391bcd46433a532f5750bfd7f32d8a3665049ee2bc2f8e1cd",
   "materials": [
     {
       "bytes": 102,
@@ -949,9 +949,9 @@
       "sha256": "50d9cbc71e4233cf79414fa87a00272b28dc70e8a4440460110ecec3175ed10c"
     },
     {
-      "bytes": 2425,
+      "bytes": 3273,
       "path": "desktop/src/core/meta_cockpit/build_atom_menu.py",
-      "sha256": "1bedd2efd340114f91442a41b6319f7a9e7f962996d49f656a132e45988dbf95"
+      "sha256": "3e4d8fe2c0ad594f97ae41dc754886bc757527dde035c01a2ca0aa491f785466"
     },
     {
       "bytes": 1166,
@@ -1959,9 +1959,9 @@
       "sha256": "c2402950e34e3ff9bd0f09171c8bee821bf0f57c33f32d0dbc4bb4b3e6157914"
     },
     {
-      "bytes": 447081,
+      "bytes": 448390,
       "path": "protocol/check12_weights.json",
-      "sha256": "7825e8260ee8e6428ce0099bf4a22e65712b34a23cf33813c521fefa86bb492a"
+      "sha256": "383f26f896c3d8c3ae3fe5ee2a5e0ce393968d6ba5076d654c5fdf739c3c6b75"
     },
     {
       "bytes": 16170,

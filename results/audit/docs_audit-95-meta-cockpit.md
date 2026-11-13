@@ -8,23 +8,25 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/cli_bridge.py:4247ed0e73dfc1ca319f6b9881f3b73a875b01ee6b24eda3d4fe861736cadad8
   - desktop/src/core/meta_cockpit/__init__.py:f31cbadd59e3f25aab850122bbcc4ad5adcf5a65596a38c4996f264a38427fd7
-  - desktop/src/core/meta_cockpit/build_atom_menu.py:1bedd2efd340114f91442a41b6319f7a9e7f962996d49f656a132e45988dbf95
+  - desktop/src/core/meta_cockpit/build_atom_menu.py:3e4d8fe2c0ad594f97ae41dc754886bc757527dde035c01a2ca0aa491f785466
   - desktop/src/core/meta_cockpit/runtime_executor.py:204a67ec93855257323887011395b0866ac8d5ae1c485362e89eb058ffe64bfb
   - desktop/src/core/meta_cockpit/cockpit_service.py:18280c6966dd618a8b09daa058b461fa43f89e99f11c797ca884338ff5c13bbf
   - desktop/src/core/meta_cockpit/cockpit_ab.py:6afcade08f2469aad4adc6f44e0e3d28a17712a85e3223f41b14c0020c2f88e7
   - desktop/src/core/terminal.py:9a86928171c71f4a2d3d324508fdafccb60fd7cc8423d52197185214a40ea30f
-  - desktop/tests/test_meta_cockpit.py:cc2dc4f52729b35f400ca92aa367e685780f9f6735224e7fc0b7550b85f52662
+  - desktop/tests/test_meta_cockpit.py:017e3a591004b1e3c1bf28e8938ae22754e39ea61ae369e4ddcca1a556214280
   - desktop/tests/test_cli_error_framing.py:788460878349a907eadc21c74a1a689c9cdfe81888f5490c5a935b34fc121c8a
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:7825e8260ee8e6428ce0099bf4a22e65712b34a23cf33813c521fefa86bb492a
+  - protocol/check12_weights.json:383f26f896c3d8c3ae3fe5ee2a5e0ce393968d6ba5076d654c5fdf739c3c6b75
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:fa00a7fd014857af56e11f38ced1b7d888be053befaadb10b3dd494d27884316
   - docs/meta-cockpit/功能解析.md:de20c2340d19d541bcfde53f222a3acf22a6e440d8fb3dcf51a37aedf53c0c25
-  - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
+  - results/meta-cockpit-manifest.json:ec352c0c1ad9628f8febcb867114c71e8063915a99f41fe669ffc319462ce020
 
 ---
+> 重审（2026-11-14）：ATOM_MENU 顶尖化：菜单生成器增「怎么读这一页」（字段/选择纪律/执行器关系/分组口径），重生成 33 原子菜单并同步 meta-cockpit-manifest 摘要；test_meta_cockpit 增读法判据。
+
 > 重审（2026-11-14）：Go 客户端 README 顶尖化：补七调向量 55（28/6/7/3/1/6/4 与 results/ccos 逐文件对账）、7 子命令、Go ≥1.24 前提与「本机未装 Go → go test 本轮未跑」诚实标注；新增判据 test_go_client_doc_contract。
 
 > 重审（2026-11-14）：STRATEGY 增「§六 五维载体（可核索引）」（只做导航不改口径：每维的机检载体/留证位置/复核命令），并扩展 test_strategy_contract 判据（五维载体逐行 + 留证位置在场 + 索引口径）。
