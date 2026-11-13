@@ -1611,7 +1611,7 @@
       "max_fn_lines": 85
     },
     "scripts/geo_export.py": {
-      "lines": 302,
+      "lines": 310,
       "max_fn_cc": 25,
       "max_fn_lines": 72
     },
