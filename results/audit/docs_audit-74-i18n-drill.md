@@ -6,7 +6,7 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——对应 62
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - protocol/locales.json:f6db86aa2ef8bdc93f8a8d81c26bbef27b57bac7c7fd5450cbf748e5b4cb0429
+  - protocol/locales.json:ce589f49d9c93f295f0d4e07fd495b7ef6a0478272eb6192aa633abb29f923fb
   - docs/locales.md:cf3a21039dad98832b3cd92ead92adaa6559b38bd9c96006fea87f0af81a6dc7
   - docs/en/locales.md:348a2b32a6f04cf830cb332b47b0b05f59265332c2fe37ec79ee63c0563168fa
   - docs/ja/locales.md:7f870e599fc00ab10c998eb115350b7ceda21655a2ebfcf870f6a2b8300e5f34
@@ -14,8 +14,8 @@ subjects:
   - docs/ja/mcp.md:a7a248172cc0119e023b1ed7e5e2c254b3b3db3d357f76e7e6a322e41538ddf2
   - docs/en/terminal.md:b99ee9b83dd9bcc433b97408785e85b8f265d797eb144abc09c8e0bcae97d046
   - docs/ja/terminal.md:ae1b37be3309ff21f7bd2096b0295ee073e493ec7bb402c3672ef9f5a72d168e
-  - docs/en/layers.md:f92b4dcea20068c253a2a7455d21fb63bbf3c9493e80f81cb6460d4e464d6c20
-  - docs/ja/layers.md:1f3edfbad694b98228bb720574a54267f7b3b544fbc89436179d77950fde3d57
+  - docs/en/layers.md:71e9d99723c8c5c1c7bcd9e21e991f7dc932d3a528333e7bdafa3f5e718479ac
+  - docs/ja/layers.md:ffd6d02dc518b893e5f9c1c2f60d4572d128b6c438c8261e9d58f2cb8717a086
   - docs/44_M1_执行演练扩展.md:142a9157504702fa03498494dc452ae2fbb8cfbfcce836992b1d59d1078755e4
   - docs/45_M2_回合级drill.md:90b57abcdee39848dfff6c8a46c9f9591dff1e1e6c60d5d90a08b66d789b859c
   - desktop/src/core/execution_drill.py:61337ffd5f93bca3cc2519e0f84c9f02f15d44c55ee74ed14acadc63538dd48b
@@ -28,6 +28,8 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
   - protocol/code_metrics_baseline.json:6bf5087e381d484d64bc5474ebcabcb4174f3f2dc892f26080076075f41ee671
 ---
+> 重审（2026-11-13）：抽象阶梯文档 + en/ja 译件同步（新增现状对照/复现小节）+ 语言面重签；机械重绑。
+
 > 重审（2026-11-13）：他证通道说明页顶尖化：code_metrics 基线重签（生成器新增面谱/自跑口径文案，模块 513 行·最长函数 55，为有据增长）。
 
 > 重审（2026-11-13）：45 M2 回合级 drill 规范顶尖化（样本 5→6 含 selfrun / 测试 6 例 / --check-trace 回读口径 / 复现命令）+ 契约判据 test_round_drill_doc_contract；权重增量重测。本轮为机械重绑。

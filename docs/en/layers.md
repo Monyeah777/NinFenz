@@ -1,6 +1,6 @@
 # NF abstraction ladder (layers)
 
-> 最后更新：2026-09-26 (last updated)
+> Last updated: 2026-11-13
 
 > ⛔ Operating instruction: this file contains commands and criteria you can run directly. Read it and run it; do not treat it as background reading.
 
@@ -79,6 +79,31 @@ Before changing anything, ask three questions; the answers are written in the ta
 
 > This region is rendered by `nf layers --write`; hand-editing is forbidden. Source of truth = `protocol/LAYERS.json`.
 <!-- nf:layers:end -->
+
+## Status check (2026-11-13 · read from the source of truth)
+
+| Surface | Current value | How to re-check |
+|---|---|---|
+| Abstraction axis | **4 rungs** (contract / asset / engine / export) | protocol/LAYERS.json: tiers |
+| Asset sublevels | **5** (declaration / content / data / knowledge / ontology) | asset_levels |
+| Entry surfaces | **4** (human / AI assembly line / MCP / library pickup) | surfaces |
+| Verification vertical components | **6** (verify / conformance / audit / receipts / attest / provenance) | crosscut.components |
+| Derived exemptions | **7** components | derived |
+| Retired registrations | **2** entries | retirement |
+| Rule set | **L1-L10 (10 rules)** | rules |
+| Standing tests | 27 + 19 cases | test_layer_model / test_architecture_layers |
+
+> The generated region (between the begin and end markers) is rendered from the source of truth; any mismatch fails L10. This table is the checkable index outside the generated region.
+
+## Reproduction and citation
+
+```bash
+python scripts/nf.py layers --verify   # ladder health check (same source as verify check27; exit code is the gate)
+python scripts/nf.py layers --json     # per-rung source surface / interface surface / criteria
+python -m pytest desktop/tests/test_layer_model.py desktop/tests/test_architecture_layers.py -q
+```
+
+- When citing this page: "dependencies point downward only, cross-rung links use interface surfaces only, entry points are never sources of truth" is the long-term rule; after changing the source of truth you must run layers --write to re-render the generated region.
 
 ## The five disciplines (criteria in L1–L10 of `desktop/src/core/layer_model.py`)
 
