@@ -1,10 +1,13 @@
 # NF 一致性声明（CONFORMANCE）
 > ⛔ 操作指令：本文件是**机检声明**——三段（声明 / 范围 / 排除）由 `nf conformance --declaration` 逐条断言；改数字改不动门禁（版本一律与真源比对）。
-> 最后更新：2026-09-25
+> 最后更新：2026-11-14（复核）
 
 > 性质：这是 NF 对「符合什么、管到哪、什么不管」的**显式声明**（机制借鉴 ACP 的 `CONFORMANCE.md`：
 > 声明 + scope 白名单 + **显式排除清单**）。它不替代 `nf conformance` 的**报告**，两者互补——
 > 报告说"跑过一遍的结论"，本声明说"范围与版本边界"。
+>
+> **复核（2026-11-14）**：三段（声明 / 范围 / 排除）与规范化摘要口径**复核不变**；本轮补「§现状对照」「§复现与引用口径」——把「三段各多少条、硬约束是什么、哪些数字不许钉」写清。
+> 本文三段由 `nf conformance` 的 **declaration** 子检查逐条断言（版本与真源比对、scope 逐路径存在、scope∩排除=∅）；改数字改不动门禁，正解是改真源或改 scope/排除清单。
 
 ## 声明
 
@@ -71,3 +74,26 @@
 **Merkle（RFC 6962 风格）**：叶 = `SHA-256(0x00 ‖ 载荷)`；节点 = `SHA-256(0x01 ‖ 左 ‖ 右)`；空集 → 无根；单叶 → 该叶。域分隔字节 `0x00` / `0x01` 是防「叶与节点」跨型碰撞的结构手段。
 
 **与 RFC 8785（JSON Canonicalization Scheme）的关系**：本口径**不是** JCS 实现，差异可判定——① 数值序列化：JCS 采用 ECMAScript 数值字面量规则，本仓沿用实现语言的 JSON 序列化；② 键排序：JCS 按 UTF-16 码元排序，本仓按码位排序（非 BMP 字符处可能不同）；③ 转义集规则另有规定。**故本仓摘要只声明「仓内可复现 + 读者侧可按本段复现」，不声明 JCS 兼容**；将来若需对外互操作（L3 导出面），须先做 JCS 对齐评估再改本声明，不得默认两者相等。
+
+## 现状对照（2026-11-14 · 以 declaration 子检查实读为准）
+
+| 面 | 当前口径 | 复核方式 |
+|---|---|---|
+| 声明行 | **5** 个版本面（protocol.yaml / registry / machine_contract / IDL 集 / 基线） | `nf conformance --json` 的 declaration detail |
+| 范围 | **19** 条 scope 白名单（逐条必须**真实存在**） | 同上 |
+| 排除 | **11** 条显式排除（每条带理由；`.rivet` 标「允许不存在」） | 同上 |
+| 硬约束 | **scope ∩ 排除 = ∅**（不许既在范围又排除） | `conformance_decl.scan` 的断言 |
+| 与报告的关系 | 本文**不替代**报告：报告说「跑过一遍的结论」，本文说「范围与版本边界」 | `docs/conformance.md` + 本页 |
+| 失败即冻结链阻断 | declaration 失败 → `nf conformance --write` 出 non-conformant → `approve` 拒批 → `receipts` 不推进 | `core/release_gate.DEFAULT_FREEZE_CHAIN` |
+
+**不钉运行时数字**：上表 5/19/11 是**当次实读**（`nf conformance --json`）；条数变化属正常演进，正文不把它们当承诺。版本表里的「基线 · `v2.30 · check1-42 · PASS=76`」是**真源比对项**（与 `quality_baseline.EXPECTED_*` 比对），可以钉、也必须钉。
+
+## 复现与引用口径
+
+```bash
+python scripts/nf.py conformance --json        # 含 declaration 子检查：版本 / scope / 排除 / 交集断言
+python -c "import sys;sys.path.insert(0,'desktop/src');from core import conformance_decl as cd;print(cd.scan('.'))"
+```
+
+- 引用本页时：「符合什么 / 管到哪 / 什么不管」= 三段；「跑过一遍的结论」请引报告（`protocol/conformance_report.json`），别引本文。
+- 新增 scope 路径：先确认真实存在、且不在排除清单里；改完跑 `nf conformance`（declaration 必须绿）。

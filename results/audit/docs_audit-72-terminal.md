@@ -16,9 +16,11 @@ subjects:
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - docs/terminal.md:5e3ac66ba65bb390425d1eef6ab251b5d763f443938e6bccfc9924f21d037d54
   - docs/L3_FROZEN.md:863a152271b1b969a3249194d1169628f4a4647a9bdd801473cfc9cb75c6643b
-  - protocol/CONFORMANCE.md:006b56748b6daaf2419be40a65247d90efd6291e87ccd61c6527ed1526b6b4e4
+  - protocol/CONFORMANCE.md:03721fb0fb16b3dbd8bd9dd7105a3bab74603cbe99579aa4c78f26f11d8b4444
 
 ---
+> 重审（2026-11-14）：CONFORMANCE 顶尖化：补「§现状对照」（声明 5 / scope 19 / 排除 11 / scope∩排除=∅ / 与报告互补 / 失败即冻结链阻断 / 不钉运行时条数但基线可比对）+「§复现与引用口径」；三段与规范化摘要口径未改。
+
 > 重审（2026-11-13）：终端入口文档顶尖化（77 命令/203 索引/8 族/9 区/13 表单/42 斜杠词/4 阻塞/24 确认动词/139 例 + 现状对照 / 复现；en·ja 译件同步后重签；⛔ 标识头归位修 doc_markers）+ 契约判据 test_terminal_doc_contract。
 
 > 重审（2026-11-13）：终端入口文档顶尖化（77 命令/203 索引/8 族/9 区/13 表单/42 斜杠词/4 阻塞/24 确认动词/139 例 + 现状对照 / 复现）+ 契约判据 test_terminal_doc_contract；权重增量重测。
