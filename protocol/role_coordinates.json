@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1259
+    "verify": 1260
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -10067,6 +10067,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "submissions/05-pulsemcp.md 契约：字段同源 / 邮箱纪律 / Cloudflare 提示 / 平台侧不冒充判据。",
+      "path": "desktop/tests/test_pulsemcp_submission_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "42 M3 —— 纯度体检 check27 单测（四规则 + 变异注入捕获力 = check 的 check）。",
       "path": "desktop/tests/test_purity_scan.py",
       "role": "verify",
@@ -13938,7 +13944,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "09e660751dc0eb7917c75b2a65b452c902dc9d2017ef5bc7abfc5a4334eab847",
+  "root_digest": "79de0eff11ee769d3ecd44f33108af6e2876f0a3a6f9b97c9368ea090bbae4d4",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13947,7 +13953,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1133,
+    "R-verify": 1134,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
