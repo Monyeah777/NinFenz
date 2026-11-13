@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1270
+    "verify": 1271
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -10079,6 +10079,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "patterns/predicate-single-source/PATTERN.md 契约：单一谓词仍被唯一实现、消费方走导入、不钉条数。",
+      "path": "desktop/tests/test_predicate_single_source_pattern_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "`nf preset` 面回归：退役端壳的预设语义接成 CLI 后，**真跑一遍全链**。",
       "path": "desktop/tests/test_preset_cli.py",
       "role": "verify",
@@ -14004,7 +14010,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "763845ab29c34e88bfce758bda7ee1ffca4a2b7ca685757031cb34b64a096431",
+  "root_digest": "2273ca8240eb4d0507ef652e5223cd3364f014128d857c006e50d78163c74f94",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -14013,7 +14019,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1144,
+    "R-verify": 1145,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
