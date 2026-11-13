@@ -6,14 +6,14 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——对应 62
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - protocol/locales.json:d3730e1d4f8d736d9742713cbeaee96c7d9cc4b241b8c5524405c218c90de25c
+  - protocol/locales.json:09475ad8d3ee21ac44b1d996e600785a0e2f5e1909349d6323f52e03a5345e24
   - docs/locales.md:49d614fa22cbeacff6166c292b6785566ea07b505556e2d842dfeb515127277a
   - docs/en/locales.md:7190d1a17094cccd0be4a780230e5777e61694eb5b7f0003c9c3370d1d9ce3c1
   - docs/ja/locales.md:a2e563172139d5fb7549acd1aca06463f6f5add713ab84aea713ac06af1be86d
   - docs/en/mcp.md:333b580565595c01dc8fea640a9c2114a295d076cbdbcabcae26462d4e59f3e2
   - docs/ja/mcp.md:b3c1cf3a9ba549590951460b99f28e64b5f63bdc6087e4fa5510089d5047d81f
-  - docs/en/terminal.md:b99ee9b83dd9bcc433b97408785e85b8f265d797eb144abc09c8e0bcae97d046
-  - docs/ja/terminal.md:ae1b37be3309ff21f7bd2096b0295ee073e493ec7bb402c3672ef9f5a72d168e
+  - docs/en/terminal.md:dccf094dbd07d13ae6a8860775cdafd50cd4a852ddb010b1011d397989cf7db8
+  - docs/ja/terminal.md:09a12eb66595a862b73dea4f0e14a4222a79a7827dc3c1032d9765f84b2f18ef
   - docs/en/layers.md:71e9d99723c8c5c1c7bcd9e21e991f7dc932d3a528333e7bdafa3f5e718479ac
   - docs/ja/layers.md:ffd6d02dc518b893e5f9c1c2f60d4572d128b6c438c8261e9d58f2cb8717a086
   - docs/44_M1_执行演练扩展.md:142a9157504702fa03498494dc452ae2fbb8cfbfcce836992b1d59d1078755e4
@@ -28,6 +28,8 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
   - protocol/code_metrics_baseline.json:c1cb690df910807d5da349601e5c2bb0193677fd68eb89397f63601e994696db
 ---
+> 重审（2026-11-13）：终端入口文档顶尖化（77 命令/203 索引/8 族/9 区/13 表单/42 斜杠词/4 阻塞/24 确认动词/139 例 + 现状对照 / 复现；en·ja 译件同步后重签；⛔ 标识头归位修 doc_markers）+ 契约判据 test_terminal_doc_contract。
+
 > 重审（2026-11-13）：代码度量重冻：geo_export.py 310 行（机构分布所需 +8）
 
 > 重审（2026-11-13）：层切片页补本层不可达清单：_layer_body 增死链逐条（id + HTTP），无死链则声明「该层全部本机可达」；重生成五页；判据断言每页清单与 catalog 逐条相等；code_metrics 重冻（geo_export 302 行）。

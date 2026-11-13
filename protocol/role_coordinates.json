@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1236
+    "verify": 1237
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -10619,6 +10619,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "终端文档契约：77 命令 / 8 族 / 203 索引 / 9 区 / 13 表单 / 139 例必须与实读一致。",
+      "path": "desktop/tests/test_terminal_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "编码卫生门禁单测（check33 新面：RFC 3629 / RFC 8259 §4 / UAX #15 / UTS #39）。",
       "path": "desktop/tests/test_text_hygiene.py",
       "role": "verify",
@@ -13800,7 +13806,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "d31a53050493d8b84705cdfca855dfc6f3fcf1b0e1e9cc9f83f694be972fe5ff",
+  "root_digest": "2e0fc08fdd4a537941ff4e233b422247681249d15f1ce5c5e89e99e450037f4e",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13809,7 +13815,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1110,
+    "R-verify": 1111,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
