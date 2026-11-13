@@ -202,6 +202,7 @@
     "test_export_statement_contract": 0.2,
     "test_exporter": 0.3,
     "test_extension_impact": 0.2,
+    "test_extension_policy_doc_contract": 1.8,
     "test_external_links_workflow_contract": 0.3,
     "test_external_metadata": 0.2,
     "test_external_validation_assets_doc_contract": 0.3,
@@ -2362,6 +2363,10 @@
     "test_extension_impact.ImpactTierTest.test_bump_docid": 0.0,
     "test_extension_impact.ImpactTierTest.test_bump_removal": 0.0,
     "test_extension_impact.ImpactTierTest.test_editorial": 0.0,
+    "test_extension_policy_doc_contract.ExtensionPolicyDocTest.test_check30_runs": 1.55,
+    "test_extension_policy_doc_contract.ExtensionPolicyDocTest.test_contract_catches_mutations": 0.0,
+    "test_extension_policy_doc_contract.ExtensionPolicyDocTest.test_impact_tiers_live": 0.0,
+    "test_extension_policy_doc_contract.ExtensionPolicyDocTest.test_policy_matches_contract": 0.0,
     "test_external_links_workflow_contract.ExternalLinksWorkflowContractTest.test_contract_catches_broken_workflow": 0.0,
     "test_external_links_workflow_contract.ExternalLinksWorkflowContractTest.test_network_face_has_budget_and_fails_closed": 0.0,
     "test_external_links_workflow_contract.ExternalLinksWorkflowContractTest.test_non_gate_positioning": 0.0,
@@ -5756,5 +5761,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2037.7
+  "total_s": 2039.5
 }
