@@ -109,6 +109,7 @@
     "test_cognition_control": 1.8,
     "test_cognition_plan": 1.0,
     "test_cognition_workspace": 2.3,
+    "test_combos_doc_contract": 0.2,
     "test_commands_reference_contract": 0.2,
     "test_commit_msg": 0.1,
     "test_commit_title_guard": 0.1,
@@ -1501,6 +1502,9 @@
     "test_cognition_workspace.StateTest.test_closed_session_rejects_step": 0.0,
     "test_cognition_workspace.StateTest.test_new_state_validates_and_digest_stable": 0.0,
     "test_cognition_workspace.StateTest.test_step_changes_digest_and_counts": 0.0,
+    "test_combos_doc_contract.CombosDocTest.test_combos_matches_contract": 0.01,
+    "test_combos_doc_contract.CombosDocTest.test_contract_catches_mutations": 0.03,
+    "test_combos_doc_contract.CombosDocTest.test_data_live": 0.01,
     "test_commands_reference_contract.CommandsReferenceContractTest.test_all_commands_registered": 0.0,
     "test_commands_reference_contract.CommandsReferenceContractTest.test_commands_reference_matches_contract": 0.0,
     "test_commands_reference_contract.CommandsReferenceContractTest.test_conformance_count_is_live": 0.0,
@@ -5403,5 +5407,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1883.9
+  "total_s": 1884.1
 }

@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1194
+    "verify": 1195
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7991,6 +7991,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/combos.md 契约：组合引擎文档必须「包数/广度/证书/产物化与实跑一致」。",
+      "path": "desktop/tests/test_combos_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "skills/ninfenz/references/commands.md 契约：命令全在册 + 契约数不漂移 + 退出码语义对得上。",
       "path": "desktop/tests/test_commands_reference_contract.py",
       "role": "verify",
@@ -13548,7 +13554,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "b7d570ae7a1c830b58e3816b25871547b6405b721eb2f034a14c480ab43c8c75",
+  "root_digest": "db3caf533f4bd360706b84131d84c1bf97937099a13b34b8715e4d7884eae0b9",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13557,7 +13563,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1068,
+    "R-verify": 1069,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
