@@ -401,6 +401,7 @@
     "test_npm_package": 22.1,
     "test_npm_package_check_workflow_contract": 0.2,
     "test_npm_publish_workflow_contract": 0.2,
+    "test_npm_readme_doc_contract": 0.2,
     "test_numeric_grounding": 0.1,
     "test_official_core": 0.2,
     "test_one_shot_audits_doc_contract": 0.5,
@@ -4010,6 +4011,9 @@
     "test_npm_publish_workflow_contract.NpmPublishWorkflowContractTest.test_permissions_are_minimal_per_job": 0.01,
     "test_npm_publish_workflow_contract.NpmPublishWorkflowContractTest.test_sources_exist": 0.01,
     "test_npm_publish_workflow_contract.NpmPublishWorkflowContractTest.test_workflow_matches_contract": 0.01,
+    "test_npm_readme_doc_contract.NpmReadmeTest.test_contract_catches_mutations": 0.01,
+    "test_npm_readme_doc_contract.NpmReadmeTest.test_npm_readme_matches_contract": 0.0,
+    "test_npm_readme_doc_contract.NpmReadmeTest.test_volume_line_is_generated": 0.0,
     "test_numeric_grounding.Test.test_grounded": 0.0,
     "test_numeric_grounding.Test.test_ungrounded_flagged": 0.0,
     "test_official_core.OfficialCoreTest.test_missing_m90_would_be_caught": 0.0,
@@ -5701,5 +5705,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2010.9
+  "total_s": 2011.1
 }
