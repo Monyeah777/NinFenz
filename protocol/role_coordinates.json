@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1195
+    "verify": 1196
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8033,6 +8033,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/conformance.md 契约：一致性报告文档必须「契约条数/现场 root/门禁规模与报告实读一致」。",
+      "path": "desktop/tests/test_conformance_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "",
       "path": "desktop/tests/test_conformance_run.py",
       "role": "verify",
@@ -13554,7 +13560,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "db3caf533f4bd360706b84131d84c1bf97937099a13b34b8715e4d7884eae0b9",
+  "root_digest": "bf881f6ba600284fd6aef0e34e2328b359f2d95a7ed9731c94b3ef4d081948a1",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13563,7 +13569,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1069,
+    "R-verify": 1070,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

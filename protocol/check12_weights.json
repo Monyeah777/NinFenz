@@ -116,6 +116,7 @@
     "test_community_inventory": 1.7,
     "test_composer": 0.3,
     "test_concept_graph_gate": 0.7,
+    "test_conformance_doc_contract": 0.2,
     "test_conformance_run": 0.1,
     "test_conformance_scan": 28.5,
     "test_content_face": 0.3,
@@ -1547,6 +1548,9 @@
     "test_concept_graph_gate.NeutralTest.test_shelf_without_graph_is_skipped": 0.01,
     "test_concept_graph_gate.RepoGraphTest.test_repo_scan_clean": 0.4,
     "test_concept_graph_gate.RepoGraphTest.test_scanner_and_evaluator_share_semantics": 0.0,
+    "test_conformance_doc_contract.ConformanceDocTest.test_conformance_doc_matches_contract": 0.0,
+    "test_conformance_doc_contract.ConformanceDocTest.test_contract_catches_mutations": 0.0,
+    "test_conformance_doc_contract.ConformanceDocTest.test_report_live": 0.0,
     "test_conformance_run.Test.test_missing_teardown": 0.0,
     "test_conformance_run.Test.test_plan_is_valid": 0.0,
     "test_conformance_scan.CodeScopeFaceTest.test_every_site_has_a_computable_scope": 0.24,
@@ -5407,5 +5411,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1884.1
+  "total_s": 1884.3
 }
