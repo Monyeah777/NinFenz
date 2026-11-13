@@ -553,3 +553,34 @@ policy 返回后再次核对实际 context units；若 adapter 返回的包比�
 在候选生成前写入 open_questions。注入内容进入 turn-commit observations，
 重放先注入再执行原子；恢复不会重复注入。
 loop 入口再次强制校验：正整数 turn、list[str]、单问题 ≤2000、总数 ≤64。
+
+---
+
+> **以下两段是给人看的口径索引与判据，不是给模型的回合指令**（模型只需读前文「输入 / 输出 / 硬规则」）。
+
+## 现状对照（2026-11-14 · 以 core 常量与 CLI 实读为准）
+
+| 面 | 现值 | 复核方式 |
+|---|---|---|
+| 单轮原子上限 | **3** | `context_pack` 与 `constrained_choice` 的 `max_atoms` |
+| 轮数上限 | **8**（默认 `max_turns`） | `cockpit_service` / `constrained_loop` 默认值 |
+| 自用重规划 | **1 次**（有界；发现审计缺口才插入冲突消解） | `nf_metacognition` 的 `replans < 1` |
+| 墙钟 deadline | **cooperative**：终止态 `deadline` / `deadline-exceeded` | `constrained_loop` 的 termination 词表 |
+| 选择风险 | `choice = null` 必须 `stop = true`；不得发明新原子 | `constrained_choice` 候选校验 |
+| 上下文预算 | 单会话默认 **36000** units；pack 上限 **8000** | `context_pack.UNIT_LIMIT` / service 参数 |
+| 原子规模 | **33** 原子（触发/产出/常配见 `ATOM_MENU.md`） | `meta_atoms.json` |
+| 凭据防护 | 递归检测，发现即 fail-closed，只报 JSON path 与 kind | `secret_guard.py` |
+| 离线盲评 | 只处理已录制输出；结论四值（guided-better / baseline-better / inconclusive / insufficient-evidence） | `cockpit_ab.py` |
+
+> 本表只作「当时 → 现行」导航；数字以 core 常量与 CLI 实读为准。
+
+## 复现与引用口径
+
+```text
+python scripts/nf.py cockpit --prompt "<目标>" --json          # 单入口（离线确定性 policy）
+python -m pytest desktop/tests/test_meta_cockpit.py -q         # 14 例：协议/循环/盲评/存储
+python -m core.meta_cockpit.build_atom_menu                    # 原子菜单重生（改原子表后）
+```
+
+- 引用本文时：「单轮只决定怎么想 + 硬规则 8 条 + fail-closed 边界」= 长期口径；
+- 本页的「现状对照」是**索引**：与 core 常量不一致时以代码为准，并回头修表。

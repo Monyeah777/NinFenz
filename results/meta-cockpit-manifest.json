@@ -1,13 +1,13 @@
 {
   "schema": "nf-meta-runtime-manifest/1",
   "version": "1.0",
-  "machine_digest": "9ab972e955c18a1b3b337cd38584bd04eee650f5ac29af9847719f9738dde748",
-  "runtime_digest": "9ab972e955c18a1b3b337cd38584bd04eee650f5ac29af9847719f9738dde748",
+  "machine_digest": "97f263c0e1e2d128dfe3f383551b3bc8377999f42302bb80866a14075c724e82",
+  "runtime_digest": "97f263c0e1e2d128dfe3f383551b3bc8377999f42302bb80866a14075c724e82",
   "task_profile_digest": "0ddb101eb028a0f631a40d8efbc687cd3951528f6fc3f95ff4c4fbd98ed989c1",
   "atom_contracts_digest": "f6a79934733595db4ac7dcec4db6f17ebd9f39f8d557eca5f8aea79aca8428e1",
   "file_digests": {
     "ATOM_MENU.md": "d62af4a27892010fd857ac3cb0b255f2204fca45a3c89ccad1de5ee5aeccf640",
-    "COCKPIT_PROTOCOL.md": "7f60c1b72fb511840e20466abf863a5cb2d4ee8c1e509a5cf8fcb75b61edf1f8",
+    "COCKPIT_PROTOCOL.md": "24f12fbaa02a0095f7231f102c36f17bdde56ffce38440d575c4f2c35757ce25",
     "COCKPIT_RELEASE_NOTES.md": "f8499f8dd5cc02671db6ea0b583d159e389eb11eb8f82ff5623f9f6bf93e86f3",
     "DIFFERENTIATION.md": "5d9b90cd34f340d36aaa0b0438ded87717bfe135af53d77180369520fca3a882",
     "__init__.py": "f31cbadd59e3f25aab850122bbcc4ad5adcf5a65596a38c4996f264a38427fd7",
@@ -125,5 +125,5 @@
   },
   "human_review": "PENDING",
   "no_scoring": true,
-  "digest": "345dbec17910e2d6edb9735afb6381d2ee8e8076417ec90cd8f7f8c8664680d9"
+  "digest": "27a3d03d3ff6d2dc55849942afe9ffd3a3e4f6b9185846c47286be91e42ddb33"
 }

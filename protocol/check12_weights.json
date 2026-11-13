@@ -101,6 +101,7 @@
     "test_closure": 12.1,
     "test_closure_scan": 0.4,
     "test_coc_contract": 0.1,
+    "test_cockpit_protocol_doc_contract": 1.3,
     "test_code_metrics": 1.2,
     "test_codeowners_contract": 0.4,
     "test_codeql_workflow_contract": 0.2,
@@ -1387,6 +1388,9 @@
     "test_coc_contract.CodeOfConductContractTest.test_channel_separation_declared": 0.0,
     "test_coc_contract.CodeOfConductContractTest.test_coc_matches_contract": 0.0,
     "test_coc_contract.CodeOfConductContractTest.test_contract_catches_broken_coc": 0.01,
+    "test_cockpit_protocol_doc_contract.CockpitProtocolDocTest.test_contract_catches_mutations": 0.0,
+    "test_cockpit_protocol_doc_contract.CockpitProtocolDocTest.test_limits_live": 0.0,
+    "test_cockpit_protocol_doc_contract.CockpitProtocolDocTest.test_protocol_matches_contract": 0.0,
     "test_code_metrics.BaselineFileTest.test_committed_baseline_is_valid_json_with_core_entries": 0.0,
     "test_code_metrics.BaselineFileTest.test_write_records_all_scanned_files": 0.01,
     "test_code_metrics.MetricsTest.test_lines_and_complexity_measured": 0.0,
@@ -5623,5 +5627,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1969.1
+  "total_s": 1970.4
 }
