@@ -2531,6 +2531,7 @@
     "test_gate_verdict.SafetyTest.test_tag_sanitizes_separators": 0.0,
     "test_generic_blocks_doc_contract.GenericBlocksTest.test_contract_catches_mutations": 0.0,
     "test_generic_blocks_doc_contract.GenericBlocksTest.test_generic_blocks_match_contract": 0.0,
+    "test_generic_blocks_doc_contract.GenericBlocksTest.test_pair_cross_reference": 0.0,
     "test_generic_blocks_doc_contract.GenericBlocksTest.test_transport_and_args_live": 0.0,
     "test_gitee_diagnostics.GiteeDiagnosticsTest.test_http_error_is_raised_with_redacted_diagnostic": 0.0,
     "test_gitee_diagnostics.GiteeDiagnosticsTest.test_http_failures_have_stable_categories": 0.0,

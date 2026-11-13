@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:c3afed185be846badb8ed50260904d091f2bb53e8e59abc2d5980806888eb823
+  - protocol/check12_weights.json:23ae580a475c8b27ebdfd72ca59c00cb9a19b13a84e3573f883ff5b9cd0e907d
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:fa00a7fd014857af56e11f38ced1b7d888be053befaadb10b3dd494d27884316
   - docs/meta-cockpit/功能解析.md:de20c2340d19d541bcfde53f222a3acf22a6e440d8fb3dcf51a37aedf53c0c25
   - results/meta-cockpit-manifest.json:60c0e100798e49d393557ae5066c02d7e057ec27f386ee1a36ca3fc7740150ba
 
 ---
+> 重审（2026-11-14）：通用中文块 10 顶尖化：补中文自检段（九字段/12+1/双协议/仅 stdio/零依赖/MIT/中英对偶/平台侧未验）+ 类目在中文站填「内容创作」不混用；判据扩展（中英互指）。
+
 > 重审（2026-11-14）：通用英文块 09 顶尖化：补§自检（九字段/12+1/双协议/仅 stdio/零依赖/MIT/与 10 中英对偶/平台侧未验/不钉计数）+ 新增判据 test_generic_blocks_doc_contract（09↔10 传输段逐字相等、两份 JSON args 可解析一致）。
 
 > 重审（2026-11-14）：轻量目录件 08 顶尖化：补字段自检（与 07 对偶、平台侧未验、不钉计数、无审核 SLA）+ 判据扩展（08 侧断言：自检段/指向 07/字段块逐行相等/入口不同）。
