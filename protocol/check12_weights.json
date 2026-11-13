@@ -401,6 +401,7 @@
     "test_path_moved": 0.2,
     "test_path_trigger": 0.2,
     "test_paths": 0.2,
+    "test_patterns_doc_contract": 0.2,
     "test_payload_consumer": 0.4,
     "test_payload_evidence": 0.3,
     "test_payload_harvest_forms": 1.1,
@@ -4094,6 +4095,9 @@
     "test_paths.ValidatePathTest.test_relative_inside_root_is_accepted": 0.0,
     "test_paths.ValidatePathTest.test_symlink_escape_is_rejected_when_creatable": 0.0,
     "test_paths.ValidatePathTest.test_windows_reserved_device_names_are_rejected": 0.01,
+    "test_patterns_doc_contract.PatternsDocTest.test_contract_catches_mutations": 0.04,
+    "test_patterns_doc_contract.PatternsDocTest.test_patterns_matches_contract": 0.01,
+    "test_patterns_doc_contract.PatternsDocTest.test_registry_live": 0.01,
     "test_payload_consumer.PayloadConsumerTest.test_scan_deterministic": 0.2,
     "test_payload_evidence.PayloadEvidenceTest.test_repo_scan_deterministic_and_nonempty": 0.13,
     "test_payload_harvest_forms.BlockMappingFormTest.test_block_mapping_resolves_event_and_types": 0.0,
@@ -5531,5 +5535,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1894.0
+  "total_s": 1894.2
 }
