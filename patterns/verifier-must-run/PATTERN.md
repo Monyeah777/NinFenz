@@ -51,3 +51,29 @@ cd desktop && python -m unittest tests.test_rust_fastlane -q  # 逐面 oracle + 
 - 与 `fail-closed-verification` 的区别：那条管「验证器**缺失**时不许降级成通过」；这条管
   「验证器**存在**却没被执行」——一个防放过坏东西，一个防没人检查。
 - 与 `single-source-truth` 的关系：面清单本身也要单源（多源取并是为了**取全**，不是为了各留一份）。
+
+
+---
+
+## 现状对照（2026-11-14 · 以接线表/判据实读为准）
+
+| 面 | 当前口径 | 复核方式 |
+|---|---|---|
+| 外部套件登记表 | `EXTERNAL_SUITES` **2 条**（npm 冒烟 → 由 `test_npm_package` 常驻执行；.NET SelfTest → 由 net-probes 工作流/RUNBOOK 执行） | `desktop/tests/test_suite_wiring.py` |
+| discover 下限 | `MIN_DISCOVERED = **150**`（低于即判塌缩，防「判据面失效」） | 同上常量 |
+| 面清单四源 | `_documented_faces` ∪ `_self_declared_subfaces` ∪ `_probed_faces` ∪ `_source_faces` | `desktop/tests/test_rust_fastlane.py` |
+| 接线判据 | `test_suite_wiring` **3 例**（未登记即红 / 登记已消失即红 / discover 下限） | `python -m pytest desktop/tests/test_suite_wiring.py` |
+| 变异自证 | 三条判据各自都有「喂未登记项必须判红」的变异用例 | 同上测试源码 |
+
+- **不钉数量**：本仓套件总数与面清单规模随提交变化，**以命令实读为准**；`MIN_DISCOVERED=150` 是**下限**而非当前值。
+- 「没跑过的判据不算判据」的落地形态：`EXTERNAL_SUITES` 登记「由谁跑」+ discover 面收录两条路，**两张表只许缩小**。
+
+## 复现与引用口径
+
+```bash
+python -m pytest desktop/tests/test_suite_wiring.py -q    # 3 例：接线 + 塌缩下限
+python -m pytest desktop/tests/test_rust_fastlane.py -q   # 逐面 oracle + 四源取并
+python -m pytest desktop/tests/test_npm_package.py -q     # npm 冒烟套件的常驻执行方
+```
+
+- 注意：`test_npm_package` 依赖**本机 payload 暂存**（`npm run stage`）；payload 落后于 HEAD 时会红——那是**执行前置**问题，不是判据本体失败。
