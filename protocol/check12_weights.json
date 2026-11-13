@@ -5056,6 +5056,7 @@
     "test_shell_parity.TestCrossEntryParity.test_evidence_cli_and_http_agree": 0.43,
     "test_short_form_submission_doc_contract.ShortFormSubmissionTest.test_contract_catches_mutations": 0.0,
     "test_short_form_submission_doc_contract.ShortFormSubmissionTest.test_peer_field_block_identical": 0.0,
+    "test_short_form_submission_doc_contract.ShortFormSubmissionTest.test_peer_file_has_self_check_and_same_block": 0.0,
     "test_short_form_submission_doc_contract.ShortFormSubmissionTest.test_short_form_matches_contract": 0.0,
     "test_silent_skip_reasons.SilentSkipReasonTest.test_empty_return_predicate_catches_the_mutation": 0.0,
     "test_silent_skip_reasons.SilentSkipReasonTest.test_every_silent_skip_carries_a_reason": 1.26,

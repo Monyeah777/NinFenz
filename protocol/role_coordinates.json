@@ -10583,7 +10583,7 @@
       "rule": "R-verify"
     },
     {
-      "function": "submissions/07-mcpservers-org.md 契约：短表单族字段正文必须逐字一致（07/08 现成两份）。",
+      "function": "submissions 短表单族契约：07/08 的字段正文必须逐字一致，且各自有自检段。",
       "path": "desktop/tests/test_short_form_submission_doc_contract.py",
       "role": "verify",
       "rule": "R-verify"
@@ -13956,7 +13956,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "7f90810dceb499a70fb380432a91a58ffdd010c78a54b0b0abd27ece34426d66",
+  "root_digest": "1e51eb8aa7eac5aebe0032a2ed1d81b9c0aba8f7347717c3f377bc53602bceee",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,

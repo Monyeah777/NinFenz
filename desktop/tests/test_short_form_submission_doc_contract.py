@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""submissions/07-mcpservers-org.md 契约：短表单族字段正文必须逐字一致（07/08 现成两份）。
+"""submissions 短表单族契约：07/08 的字段正文必须逐字一致，且各自有自检段。
 
 为什么必须有：07 与 08 是同一套字段、两个轻量目录。它们正文此前**逐字相同**，但没有任何判据——
 改一份忘另一份，就会有两个目录站拿到两套描述（且没人会比）。本轮在 07 补「§字段自检」，
@@ -50,8 +50,8 @@ def field_block(text: str) -> list:
 
 def short_form_issues(text: str) -> list:
     issues = []
-    if not text.startswith("# 07 · mcpservers.org"):
-        issues.append("缺标题「# 07 · mcpservers.org」")
+    if not text.startswith("# 07 · mcpservers.org") and not text.startswith("# 08 · mcpmarket.com"):
+        issues.append("缺标题（应为 07 · mcpservers.org 或 08 · mcpmarket.com）")
     if "## 字段自检" not in text:
         issues.append("缺「§字段自检」段")
     mine = field_block(text)
@@ -102,6 +102,16 @@ class ShortFormSubmissionTest(unittest.TestCase):
     def test_peer_field_block_identical(self):
         self.assertEqual(field_block(self.text),
                          field_block(PEER.read_text(encoding="utf-8")))
+
+    def test_peer_file_has_self_check_and_same_block(self):
+        """08 号件：有自检段、指向 07、字段块与 07 逐行相等、入口不同。"""
+        peer = PEER.read_text(encoding="utf-8")
+        self.assertIn("## 字段自检", peer)
+        for marker in ("平台侧未验", "短表单族对偶", "07-mcpservers-org.md"):
+            self.assertIn(marker, peer)
+        self.assertEqual(field_block(peer), field_block(self.text))
+        self.assertNotIn("mcpservers.org/submit", peer)
+        self.assertIn("mcpmarket.com", peer)
 
     def test_contract_catches_mutations(self):
         """变异自证：字段行被改 / 缺自检段 / 残留钉数 / 邮箱泄漏。"""
