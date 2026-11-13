@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:8ebb934221d30520160d8712112c22419267e24ce50b5f931c6afbd415ee2412
+  - protocol/check12_weights.json:2b6c3955d0c5beeff8723f33cae399c2273df514dc1964f060be20819365ba33
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:fa00a7fd014857af56e11f38ced1b7d888be053befaadb10b3dd494d27884316
   - docs/meta-cockpit/功能解析.md:de20c2340d19d541bcfde53f222a3acf22a6e440d8fb3dcf51a37aedf53c0c25
   - results/meta-cockpit-manifest.json:60c0e100798e49d393557ae5066c02d7e057ec27f386ee1a36ca3fc7740150ba
 
 ---
+> 重审（2026-11-14）：mcp.so 提交件 03 顶尖化：补「字段自检」8 行（名称/仓库/站点/安装/12+1 工具/零依赖/图标真 400×400/许可）+ 平台侧未验 + 不钉运行时计数 + 403 提示；新增判据 test_mcpso_submission_doc_contract。
+
 > 重审（2026-11-14）：Cline 提交件 02 顶尖化：改掉正文里钉死的「check1-40/PASS=72/约 2500 单测」（外部审核文案不该带会过期数字，改为以 nf stats 生成区为准）+ 补「审核要点自检」表（400×400 真像素/llms-install/12+1/双协议/平台侧未验/实测确认归作者）；新增判据 test_cline_submission_doc_contract。
 
 > 重审（2026-11-14）：MCP 提交件 01 号顶尖化：补「同源自检」表（展示名/仓库/站点/安装/工具面/零依赖 六项与材料包同源）+「10 份必须同批更新」纪律；新增跨文件判据 test_mcp_submissions_doc_contract（编号连续/共享值一致/图标引用）。

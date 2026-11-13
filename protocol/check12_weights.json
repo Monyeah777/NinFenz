@@ -353,6 +353,7 @@
     "test_mcp_submit_doc_contract": 0.2,
     "test_mcp_trust_meta": 0.8,
     "test_mcp_write_freedom": 3.3,
+    "test_mcpso_submission_doc_contract": 0.2,
     "test_md_tables": 0.3,
     "test_meta_archive_sample_doc_contract": 2.0,
     "test_meta_cockpit": 4.6,
@@ -3600,6 +3601,9 @@
     "test_mcp_write_freedom.McpHandlerWriteFreedomTest.test_sink_predicate_has_catch_power": 0.0,
     "test_mcp_write_freedom.McpToolsDoNotTouchTheRepoTest.test_tools_call_leaves_the_tree_untouched": 3.08,
     "test_mcp_write_freedom.McpToolsDoNotTouchTheRepoTest.test_write_interceptor_has_teeth": 0.0,
+    "test_mcpso_submission_doc_contract.McpSoSubmissionTest.test_contract_catches_mutations": 0.0,
+    "test_mcpso_submission_doc_contract.McpSoSubmissionTest.test_mcpso_matches_contract": 0.0,
+    "test_mcpso_submission_doc_contract.McpSoSubmissionTest.test_shared_values_live": 0.0,
     "test_md_tables.MarkdownTableTest.test_mutation_is_caught": 0.01,
     "test_md_tables.MarkdownTableTest.test_repo_tables_are_consistent": 0.04,
     "test_meta_archive_sample_doc_contract.MetaArchiveSampleTest.test_contract_catches_mutations": 0.0,
@@ -5671,5 +5675,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2009.4
+  "total_s": 2009.6
 }
