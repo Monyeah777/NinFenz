@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1244
+    "verify": 1245
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8711,6 +8711,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "clients/go/README.md 契约：Go 侧第二实现文档必须「七调向量 55 / 7 子命令 / 前提写清」。",
+      "path": "desktop/tests/test_go_client_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "社区与内容治理件判据（审计 Z6：治理件在场且**承担语义**，不是占位文件）。",
       "path": "desktop/tests/test_governance_docs.py",
       "role": "verify",
@@ -13848,7 +13854,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "34c70bf1751db10d1fecd45120f90699daeab75396d8b3d9471e496ea97e8236",
+  "root_digest": "8c6de62af1b883b9739d6e668207a7ac273db4a5a7a5d3f49023d1f902487532",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13857,7 +13863,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1118,
+    "R-verify": 1119,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

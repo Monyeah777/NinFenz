@@ -2,6 +2,8 @@
 
 CCOS 七个 ABI 调用的 **Go 侧第二实现**（判定面）。不 import 本仓任何 Python 代码，也不联网。
 
+> **复核（2026-11-14）**：七调覆盖面 / 三条边界 / 退出码口径**复核不变**；补可核现状，并把「构建与测试需要 Go 工具链」写成显式前提——本机**未装 Go**，故本轮只做静态对账（向量文件逐个数、CLI 子命令逐条核），**不声称已跑过 `go test`**。见「§现状对照」。
+
 ## 覆盖面
 
 | ABI 调用 | Go 侧状态 | 判据（跨语言向量） |
@@ -20,6 +22,24 @@ CCOS 七个 ABI 调用的 **Go 侧第二实现**（判定面）。不 import 本
   像素水印）是另一件工程，Go 侧**未移植**——要验载体请用 Python 侧 `nf label extract`。
 - `cc_diff` 只移植 **JSON 契约**那一路；Markdown 契约签名（knowledge_sig）未移植。
 - `cc_resolve` 用 `git ls-files` 取受跟踪件（与真源同口径）；无 git 时回退文件系统 glob。
+
+## 现状对照（2026-11-14 · 静态对账；Go 工具链本机缺位）
+
+| 面 | 现值 | 复核方式 |
+|---|---|---|
+| 七调向量总数 | **55** | `results/ccos/*_vectors.json` 逐文件 `len(vectors)` 相加 |
+| 证据 `cc_verify` | **28** | `evidence_verdict_vectors.json` |
+| 策略 `cc_check` | **6** | `check_verdict_vectors.json` |
+| 标注 `cc_label` | **7** | `label_verdict_vectors.json` |
+| 信封 `cc_attest` | **3** | `attest_envelope_vectors.json` |
+| 轨迹 `cc_replay` | **1** | `replay_trace_vectors.json` |
+| 差异 `cc_diff` | **6** | `diff_delta_vectors.json` |
+| 契约 `cc_resolve` | **4** | `resolve_contract_vectors.json` |
+| CLI 子命令 | **7**：`verify` / `check` / `label` / `attest` / `replay` / `diff` / `resolve` | `cmd/nfverify/main.go` 的分派 |
+| 工具链前提 | **Go ≥ 1.24**（`go.mod`）；本机**未装 Go** → `go test` **本轮未跑** | `go.mod` + 环境 |
+| 退出码 | `0 ok / 1 invalid / 2 revoked / 3 expired / 4 用法错` | 与仓内 Python 侧一致 |
+
+> 本表只作「当时 → 现行」导航；向量数以 JSON 实读为准，Go 侧行为须在装有 Go 的环境跑 `go test ./...` 才算实测。
 
 ## 判据（自证）
 
