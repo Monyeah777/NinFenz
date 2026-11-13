@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1220
+    "verify": 1221
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9359,6 +9359,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/meta/档案.md 契约：历史快照样例必须「来源/差异/非计划」三声明齐 + 正文仍可复现。",
+      "path": "desktop/tests/test_meta_archive_sample_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "Meta-cognitive cockpit integration contracts.",
       "path": "desktop/tests/test_meta_cockpit.py",
       "role": "verify",
@@ -13704,7 +13710,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "bb29e938aa4edf5d09bf3af137eb29aa66a822632a0f879dd9f927ef1f57b6e6",
+  "root_digest": "c6984fd86a046ea5376e5939565fc8cad8c5340ef77fd655e053bf48cd260c4c",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13713,7 +13719,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1094,
+    "R-verify": 1095,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

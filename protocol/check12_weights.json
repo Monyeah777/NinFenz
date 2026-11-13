@@ -337,6 +337,7 @@
     "test_mcp_trust_meta": 0.8,
     "test_mcp_write_freedom": 3.3,
     "test_md_tables": 0.3,
+    "test_meta_archive_sample_doc_contract": 2.0,
     "test_meta_cockpit": 2.2,
     "test_meta_cockpit_analysis_doc_contract": 0.3,
     "test_meta_cockpit_doc_contract": 0.2,
@@ -3513,6 +3514,9 @@
     "test_mcp_write_freedom.McpToolsDoNotTouchTheRepoTest.test_write_interceptor_has_teeth": 0.0,
     "test_md_tables.MarkdownTableTest.test_mutation_is_caught": 0.01,
     "test_md_tables.MarkdownTableTest.test_repo_tables_are_consistent": 0.04,
+    "test_meta_archive_sample_doc_contract.MetaArchiveSampleTest.test_contract_catches_mutations": 0.0,
+    "test_meta_archive_sample_doc_contract.MetaArchiveSampleTest.test_current_renderer_uses_single_quotes": 1.78,
+    "test_meta_archive_sample_doc_contract.MetaArchiveSampleTest.test_sample_matches_contract": 0.0,
     "test_meta_cockpit_analysis_doc_contract.CockpitAnalysisDocTest.test_analysis_matches_contract": 0.0,
     "test_meta_cockpit_analysis_doc_contract.CockpitAnalysisDocTest.test_contract_catches_mutations": 0.0,
     "test_meta_cockpit_analysis_doc_contract.CockpitAnalysisDocTest.test_facts_live": 0.0,
@@ -5507,5 +5511,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1890.7
+  "total_s": 1892.7
 }
