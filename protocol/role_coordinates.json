@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1238
+    "verify": 1239
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -10727,6 +10727,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/verification-cards.md 契约：卡册散文不得钉运行时计数，生成区必须与 verify.sh 一致。",
+      "path": "desktop/tests/test_verification_cards_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "",
       "path": "desktop/tests/test_verifier_props.py",
       "role": "verify",
@@ -13812,7 +13818,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "37a5a36116d8e54ed8a5a9fcc19776a14f5e5ed52c8e23219263a8facca2782e",
+  "root_digest": "4ccf2b4cf1f7f4135db55a3da52895132d751e4cb3a87aff6235d4cfeb9e7a5a",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13821,7 +13827,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1112,
+    "R-verify": 1113,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

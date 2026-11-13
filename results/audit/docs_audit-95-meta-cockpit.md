@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:f24a151f78c0c7bafd4ce6b60f15c61b1e4890ae03f7c94d9a48609cd7b55450
+  - protocol/check12_weights.json:87e0b7b24900ebdf1b5927c49d4946e933dfae0d88b1e99c45c2111b3926fc24
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:fa00a7fd014857af56e11f38ced1b7d888be053befaadb10b3dd494d27884316
   - docs/meta-cockpit/功能解析.md:de20c2340d19d541bcfde53f222a3acf22a6e440d8fb3dcf51a37aedf53c0c25
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-13）：验证卡册顶尖化：散文去掉钉死的 40 条/check1-40/PASS=70（生成区早已 42/76，属真漂移），改为指向生成区；新增判据 test_verification_cards_doc_contract（生成区与 verify.sh 一致 + 散文禁钉数）。
+
 > 重审（2026-11-13）：文本卫生文档顶尖化（补漏记的第 5 条 SemVer 规则 / 4399 文本·1240 JSON·269070 键·111 版本 + 现状对照 / 复现）+ 契约判据 test_text_hygiene_doc_contract。
 
 > 重审（2026-11-13）：终端入口文档顶尖化（77 命令/203 索引/8 族/9 区/13 表单/42 斜杠词/4 阻塞/24 确认动词/139 例 + 现状对照 / 复现）+ 契约判据 test_terminal_doc_contract；权重增量重测。
