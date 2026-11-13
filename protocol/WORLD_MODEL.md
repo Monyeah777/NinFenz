@@ -2,6 +2,8 @@
 
 > 定位：把 JEPA/H-JEPA 的机制思想收窄为 NF 可机检的协议字段，不给外部路线背书。
 > 版本：随 machine_contract 字段级新增（01 §7 V1，只增不删）。首战实例：M50 主循环。
+>
+> **复核（2026-11-14）**：schema 形状、机检语义、运行器与首战实例**复核不变**；本轮补「§现状对照」「§复现与引用口径」，并把扫描统计明确为**扫描器实读值**（不是需要维护的承诺）。
 
 ## 1. 一句话
 
@@ -113,3 +115,25 @@ CLI 入口：`nf worldmodel --run`；JSON 遥测出口：`nf worldmodel --run --
 - Hafner, D. et al. *Mastering Diverse Domains through World Models*, 2023. [arXiv:2301.04104](https://arxiv.org/abs/2301.04104)
 - Zbontar et al., *Barlow Twins: Self-Supervised Learning via Redundancy Reduction*, 2021. [arXiv:2103.03230](https://arxiv.org/abs/2103.03230)
 - Caron et al., *Emerging Properties in Self-Supervised Vision Transformers (DINO)*, 2021. [arXiv:2104.14294](https://arxiv.org/abs/2104.14294)
+
+## 现状对照（2026-11-14 · 以 world_model.scan / check32 / CLI 实读为准）
+
+| 面 | 当前口径 | 复核方式 |
+|---|---|---|
+| 扫描结果 | 模块 **1**（M50）· 变量 **4** · 相位 **5** · 不变式 **5** · checks **3** · slots **4** · 槽位注册 **10** | world_model.scan 的 stats |
+| 硬门接线 | **check32**（质量纵深汇总）常驻；nf verify --only 32 可单跑 | verify.sh |
+| 校验器 | core/world_model.py：validate_contract / advance_phase / trace_digest / scan + WorldModelRuntime（validate_state / advance / replay / *_concrete） | 该模块 API |
+| CLI | nf worldmodel（清单）· --walk（重放相位环）· --run（M50 实跑并打印 digest）· --state（具体 M00 状态绑定） | python scripts/nf.py worldmodel --help |
+| 判据 | test_world_model **20 例** · test_world_slots（槽位注册表） | 本地实跑 |
+
+**扫描基线不钉死**：上表数字是**当次实读**——新增 world_model 模块时数字会变，本文以命令为准；本文只固化「schema 形状 / 硬门语义 / 运行器 API」这些结构事实。
+
+## 复现与引用口径
+
+```bash
+python scripts/nf.py worldmodel --run                 # M50 实跑 5 步 + digest（同契约必同指纹）
+python scripts/nf.py worldmodel --json                # 结构化清单（模块/变量/相位/不变式/checks/slots）
+python -m pytest desktop/tests/test_world_model.py desktop/tests/test_world_slots.py -q
+```
+
+- 引用本页时：「抽象状态契约自洽」不等于「世界模型质量好」——质量仍由 42 五维与真实战例判定。
