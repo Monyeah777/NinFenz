@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1209
+    "verify": 1210
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8999,6 +8999,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/knowledge.md 契约：双源知识层文档必须「6 源分档/顺序全排列/巡检与台账实读一致」。",
+      "path": "desktop/tests/test_knowledge_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "v2.8.0 波C C1/C2 —— 知识签名 + 版本差异检测单测（41 规划，纯 unittest）。",
       "path": "desktop/tests/test_knowledge_sig.py",
       "role": "verify",
@@ -13638,7 +13644,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "b78bbb780dfbddd7ba5de01e8fa704105e591cd7f1afcc117a18facd31467cbd",
+  "root_digest": "9b294d62adea93870f6de10b1b7c4a8d336d1729fce10b1d4e3519faa2abdc96",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13647,7 +13653,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1083,
+    "R-verify": 1084,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:70fad1f8c0f1723d0f7685cc671ceeaf1397cff14ae57e1a00f2858a0ef27f7f
+  - protocol/check12_weights.json:81d92fe019cbaa09a718fddd35d14ff1f049472e8e3be8d8fac77a1d5605bf30
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-13）：双源知识层文档顶尖化（补 6 源·3+3 / 可见性 4+2 / order 6 / M23 / lint 绿 / usage total 0 / 35+10 例 + 现状对照 / 复现）+ 契约判据 test_knowledge_doc_contract；权重增量重测。本轮为机械重绑。
+
 > 重审（2026-11-13）：I/O 类型面文档顶尖化（补 9 值词表/248 模块/308-of-1141·27.0%/0 不匹配/write 幂等 + 现状对照 / 复现）+ 契约判据 test_io_types_doc_contract；权重增量重测。本轮为机械重绑。
 
 > 重审（2026-11-13）：互操作总览顶尖化（12 种类/入仓 12 面/外部校验逐面 14 行 6-7-1 / 现状对照 / 复现）+ 契约判据 test_interop_doc_contract；权重增量重测。本轮为机械重绑。
