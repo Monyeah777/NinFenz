@@ -167,6 +167,7 @@
     "test_dotnet_build_workflow_contract": 0.2,
     "test_drill_doc_contract": 0.2,
     "test_drill_fidelity": 0.3,
+    "test_driver_doc_contract": 0.3,
     "test_dual_core_invariants_contract": 0.2,
     "test_e2e_desktop_workflow_contract": 0.2,
     "test_ed25519": 0.2,
@@ -2019,6 +2020,9 @@
     "test_drill_fidelity.ScanTest.test_imperfect_fidelity_fails": 0.01,
     "test_drill_fidelity.ScanTest.test_no_fixtures_fails_with_guidance": 0.0,
     "test_drill_fidelity.ScanTest.test_perfect_fidelity_passes": 0.01,
+    "test_driver_doc_contract.DriverDocTest.test_contract_catches_mutations": 0.01,
+    "test_driver_doc_contract.DriverDocTest.test_data_live": 0.0,
+    "test_driver_doc_contract.DriverDocTest.test_driver_matches_contract": 0.0,
     "test_dual_core_invariants_contract.DualCoreInvariantsDocTest.test_contract_catches_mutations": 0.0,
     "test_dual_core_invariants_contract.DualCoreInvariantsDocTest.test_invariants_matches_contract": 0.0,
     "test_dual_core_invariants_contract.DualCoreInvariantsDocTest.test_matrix_and_precheck_live": 0.0,
@@ -5419,5 +5423,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1884.8
+  "total_s": 1885.1
 }
