@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:1fb05626c0c8ce7a1743205b62a331c5f885d896ad00a23297e9978db1ab4b64
+  - protocol/check12_weights.json:8465ecbda99c5c92fba1dd9dadc238001d9f5f434433bdc738eeef0ba8817424
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:fa00a7fd014857af56e11f38ced1b7d888be053befaadb10b3dd494d27884316
   - docs/meta-cockpit/功能解析.md:de20c2340d19d541bcfde53f222a3acf22a6e440d8fb3dcf51a37aedf53c0c25
   - results/meta-cockpit-manifest.json:60c0e100798e49d393557ae5066c02d7e057ec27f386ee1a36ca3fc7740150ba
 
 ---
+> 重审（2026-11-14）：接力模板顶尖化：补 §模板自检（五段/六必填/状态词表/未决项带判据/refs 可解析/公开面边界 + 三条只读命令），声明自检段不是第六段；新增判据 test_handover_template_doc_contract（模板↔protocol/handover.json↔CLI 三方对账）。
+
 > 重审（2026-11-14）：DIFFERENTIATION 顶尖化：补「§载体对照」把 46 条核心逐项对到真源（7 项有载体）并如实登记 5 项缺口（12 层反模式 / Ruff+Mypy 全覆盖 / C901 / Radon / 豁免白名单）；新增判据 test_differentiation_doc_contract；manifest 已重算。
 
 > 重审（2026-11-14）：COCKPIT_RELEASE_NOTES 顶尖化：补 §现状对照（33/14/10/5/8 逐值、PENDING 状态、machine digest 只指路）+ 把「12 层反模式审计」无代码载体标注为存疑；新增判据 test_cockpit_release_notes_doc_contract；manifest 已重算。

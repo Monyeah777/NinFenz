@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1248
+    "verify": 1249
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8777,6 +8777,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "handovers/HO-9000-示例-接力模板.md 契约：模板必须可机检、口径与协议件一致、公开面只留模板。",
+      "path": "desktop/tests/test_handover_template_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "",
       "path": "desktop/tests/test_host_projection.py",
       "role": "verify",
@@ -13872,7 +13878,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "f3605c1988c39578a978d0f86f14523b16ddaca4a0bb1ff7742f4a2d6a982a5f",
+  "root_digest": "4b06e0f7cd2f8fe061b1e197a45a3ef7b0827b71354612a1995307d98af00c00",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13881,7 +13887,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1122,
+    "R-verify": 1123,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
