@@ -17,7 +17,7 @@
 `handover` · `postmortem` · `audit` · `cognition` · `st-quality` · `mcp-package` ·
 `state-front` · `public-surface`。
 
-现场结论（2026-11-13 实跑）：**27/27 conformant**，`root = c94a8576675b749e`。
+现场结论：**27/27 conformant**（verdict 与契约数由报告实读断言）；`root` **不在本文钉死**——它是内容寻址摘要，任何文档改动都会让它变，**以 `protocol/conformance_report.json` 实读为准**。（2026-11-13 复核留痕：当时 root 前缀 `c94a8576`。）
 
 ## 怎么用
 
@@ -34,7 +34,7 @@ python scripts/nf.py conformance --write    # 归档当前报告（变更后必�
 | 面 | 当时（本文快照） | 现行（读到本行时请重跑确认） |
 |---|---|---|
 | 契约条数 | 10 条 | **27 条**（`contracts` 长度 27） |
-| 现场 verdict | 未写死 | **conformant 27/27**，root `c94a8576675b749e` |
+| 现场 verdict | 未写死 | **conformant 27/27**；root **不钉**（以报告实读为准） |
 | 报告结构 | id/ok/detail/digest + Merkle 根 + verdict | **不变**（另含 `passed`/`total`） |
 | 与 verify.sh 关系 | 「不等于全量门禁」（当时未记门禁条数） | **门禁已到 check1-42**（42 道）；本件仍是「可归档的第二维护者视角」，只收离线可复算契约 |
 | 冻结链 | 未提 | **conformance → approve → receipts**（`nf release --freeze` 消费） |
