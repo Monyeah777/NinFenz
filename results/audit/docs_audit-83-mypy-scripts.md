@@ -11,11 +11,15 @@ subjects:
   - scripts/serve_decision_model.py:bbb36dff0e3816c2253150b7de6ab619877c3c78269a644c4c966083df15afee
   - scripts/interop_thirdparty_kit.py:4f967d3f29cd31deb79f1b97fdee5f59ae74fde0d378ced571d2896af2d275dc
   - scripts/build_verification_cards.py:370f465c17eb18e4ef928194351c759bf33af75e5c1cd5b85abfc2a4b1d39655
-  - scripts/geo_export.py:954225d5ce80372b4322093002b18062c416bd7d97d88996d8e5829bc752cb62
+  - scripts/geo_export.py:7a4200761fb7d79f945a37b557882eb8de968081057068d26a7a144d11d1b527
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:3716468ea28c14d0009d4104317aad9fa89b5c3a51df18ea8569f816201fb692
+  - protocol/code_metrics_baseline.json:c1cb690df910807d5da349601e5c2bb0193677fd68eb89397f63601e994696db
 ---
+> 重审（2026-11-13）：代码度量重冻：geo_export.py 310 行（机构分布所需 +8）
+
+> 重审（2026-11-13）：层切片页补本层机构分布（前三机构及条数，读自 catalog body 字段），重生成五页；判据断言每页机构分布与真源相等；iface 页现显示 IETF 15 / W3C 7 / OASIS 5。
+
 > 重审（2026-11-13）：层切片页补本层不可达清单：_layer_body 增死链逐条（id + HTTP），无死链则声明「该层全部本机可达」；重生成五页；判据断言每页清单与 catalog 逐条相等；code_metrics 重冻（geo_export 302 行）。
 
 > 重审（2026-11-13）：层切片页补本层统计：生成器 _layer_body 增「本层可达 X/Y」与「绑定最多前三」（按主锚+辅锚排序，读自 binding packs），重生成五页；判据同步断言每个层页的统计与前三；code_metrics 重冻（geo_export 295 行）。

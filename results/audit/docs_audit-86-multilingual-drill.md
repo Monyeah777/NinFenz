@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:142a9157504702fa03498494dc452ae2fbb8cfbfcce836992b1d59d1078755e4
-  - protocol/code_metrics_baseline.json:3716468ea28c14d0009d4104317aad9fa89b5c3a51df18ea8569f816201fb692
+  - protocol/code_metrics_baseline.json:c1cb690df910807d5da349601e5c2bb0193677fd68eb89397f63601e994696db
 ---
+> 重审（2026-11-13）：代码度量重冻：geo_export.py 310 行（机构分布所需 +8）
+
 > 重审（2026-11-13）：层切片页补本层不可达清单：_layer_body 增死链逐条（id + HTTP），无死链则声明「该层全部本机可达」；重生成五页；判据断言每页清单与 catalog 逐条相等；code_metrics 重冻（geo_export 302 行）。
 
 > 重审（2026-11-13）：层切片页补本层统计：生成器 _layer_body 增「本层可达 X/Y」与「绑定最多前三」（按主锚+辅锚排序，读自 binding packs），重生成五页；判据同步断言每个层页的统计与前三；code_metrics 重冻（geo_export 295 行）。

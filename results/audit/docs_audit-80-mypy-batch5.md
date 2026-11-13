@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:22e24633e87e95453d0c2cf4a595d0496bae5d7331c1fc644d5b1555e4925a41
-  - protocol/code_metrics_baseline.json:3716468ea28c14d0009d4104317aad9fa89b5c3a51df18ea8569f816201fb692
+  - protocol/code_metrics_baseline.json:c1cb690df910807d5da349601e5c2bb0193677fd68eb89397f63601e994696db
 ---
+> 重审（2026-11-13）：代码度量重冻：geo_export.py 310 行（机构分布所需 +8）
+
 > 重审（2026-11-13）：层切片页补本层不可达清单：_layer_body 增死链逐条（id + HTTP），无死链则声明「该层全部本机可达」；重生成五页；判据断言每页清单与 catalog 逐条相等；code_metrics 重冻（geo_export 302 行）。
 
 > 重审（2026-11-13）：层切片页补本层统计：生成器 _layer_body 增「本层可达 X/Y」与「绑定最多前三」（按主锚+辅锚排序，读自 binding packs），重生成五页；判据同步断言每个层页的统计与前三；code_metrics 重冻（geo_export 295 行）。

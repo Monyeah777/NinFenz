@@ -152,7 +152,15 @@ def _layer_body(layer, rows, coverage, counts):
         dead_line = "- 本层不可达：" + " · ".join(items)
     else:
         dead_line = "- 本层不可达：无（该层全部本机可达）"
-    return head + _HOWTO_LAYER[:2] + [note, stat, binds, dead_line] + _HOWTO_LAYER[2:]
+    bodies = {}
+    for s in rows:
+        name = str(s.get("body") or "—")
+        bodies[name] = bodies.get(name, 0) + 1
+    top_bodies = sorted(bodies.items(), key=lambda kv: (-kv[1], kv[0]))[:3]
+    body_line = "- 本层机构分布：" + " · ".join(
+        f"{name} {n} 条" for name, n in top_bodies)
+    return head + _HOWTO_LAYER[:2] + [note, stat, binds, dead_line,
+                                      body_line] + _HOWTO_LAYER[2:]
 
 
 def build(root: str) -> Dict[str, str]:

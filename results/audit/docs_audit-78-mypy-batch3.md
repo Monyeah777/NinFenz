@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:3716468ea28c14d0009d4104317aad9fa89b5c3a51df18ea8569f816201fb692
+  - protocol/code_metrics_baseline.json:c1cb690df910807d5da349601e5c2bb0193677fd68eb89397f63601e994696db
 ---
+> 重审（2026-11-13）：代码度量重冻：geo_export.py 310 行（机构分布所需 +8）
+
 > 重审（2026-11-13）：层切片页补本层不可达清单：_layer_body 增死链逐条（id + HTTP），无死链则声明「该层全部本机可达」；重生成五页；判据断言每页清单与 catalog 逐条相等；code_metrics 重冻（geo_export 302 行）。
 
 > 重审（2026-11-13）：层切片页补本层统计：生成器 _layer_body 增「本层可达 X/Y」与「绑定最多前三」（按主锚+辅锚排序，读自 binding packs），重生成五页；判据同步断言每个层页的统计与前三；code_metrics 重冻（geo_export 295 行）。

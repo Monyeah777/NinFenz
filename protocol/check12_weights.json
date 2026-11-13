@@ -5000,7 +5000,7 @@
     "test_standards_index_doc_contract.StandardsIndexDocTest.test_freshness": 0.23,
     "test_standards_index_doc_contract.StandardsIndexDocTest.test_index_matches_contract": 0.0,
     "test_standards_layer_doc_contract.LayerPageDocTest.test_contract_catches_mutations": 0.04,
-    "test_standards_layer_doc_contract.LayerPageDocTest.test_freshness": 0.22,
+    "test_standards_layer_doc_contract.LayerPageDocTest.test_freshness": 0.21,
     "test_standards_layer_doc_contract.LayerPageDocTest.test_layer_matches_contract": 0.01,
     "test_state_front.TestStateFront.test_ab_differs_only_by_position": 0.0,
     "test_state_front.TestStateFront.test_block_is_deterministic_and_cites_digest": 0.0,

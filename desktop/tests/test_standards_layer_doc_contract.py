@@ -72,8 +72,14 @@ def facts() -> dict:
         dead = sorted((s for s in rows
                        if not (s.get("evidence") or {}).get("reachable")),
                       key=lambda s: str(s.get("id")))
+        bodies = {}
+        for s in rows:
+            name = str(s.get("body") or "—")
+            bodies[name] = bodies.get(name, 0) + 1
+        top_bodies = sorted(bodies.items(), key=lambda kv: (-kv[1], kv[0]))[:3]
         stat[layer] = {"ok": ok, "total": len(rows),
                        "top": [s["id"] for s in top],
+                       "bodies": top_bodies,
                        "dead": [(s["id"], str((s.get("evidence") or {}).get("http_status")))
                                 for s in dead]}
     cov = c["coverage"]
@@ -133,6 +139,12 @@ def layer_issues(text: str) -> list:
                 issues.append(f"分层页不可达清单不符：layer-{layer}.md")
         elif not dead_lines or "无（该层全部本机可达）" not in dead_lines[0]:
             issues.append(f"分层页应声明无不可达：layer-{layer}.md")
+        body_lines = [ln for ln in side_text.splitlines()
+                      if ln.startswith("- 本层机构分布：")]
+        want_body = "- 本层机构分布：" + " · ".join(
+            f"{name} {n} 条" for name, n in st["bodies"])
+        if not body_lines or body_lines[0] != want_body:
+            issues.append(f"分层页机构分布不符：layer-{layer}.md")
     own = "- 本层含义：" + MEANINGS["data"]
     if own not in text:
         issues.append("本页缺本层含义（data）")
