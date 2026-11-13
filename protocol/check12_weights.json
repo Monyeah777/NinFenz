@@ -203,6 +203,7 @@
     "test_fde_deliverable_doc_contract": 0.3,
     "test_fde_run_doc_contract": 0.3,
     "test_fde_sample_doc_contract": 0.2,
+    "test_fde_stack_doc_contract": 0.3,
     "test_feature_lifecycle": 0.2,
     "test_fence_health": 0.2,
     "test_fetch_guard": 0.1,
@@ -2303,6 +2304,9 @@
     "test_fde_sample_doc_contract.FdeSampleDocTest.test_contract_catches_mutations": 0.01,
     "test_fde_sample_doc_contract.FdeSampleDocTest.test_evidence_live": 0.0,
     "test_fde_sample_doc_contract.FdeSampleDocTest.test_fde_readme_matches_contract": 0.0,
+    "test_fde_stack_doc_contract.FdeStackDocTest.test_contract_catches_mutations": 0.05,
+    "test_fde_stack_doc_contract.FdeStackDocTest.test_faces_live": 0.01,
+    "test_fde_stack_doc_contract.FdeStackDocTest.test_stack_matches_contract": 0.01,
     "test_feature_lifecycle.Test.test_breaking_requires_new_identifier": 0.0,
     "test_feature_lifecycle.Test.test_full_window_ok": 0.0,
     "test_feature_lifecycle.Test.test_short_window_is_fail": 0.0,
@@ -5447,5 +5451,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1886.6
+  "total_s": 1886.9
 }
