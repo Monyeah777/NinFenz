@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1276
+    "verify": 1277
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8549,6 +8549,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "protocol/EXTENSION.md 契约：影响度三档 / 派生三问 / check30+check13 接线必须与实现一致。",
+      "path": "desktop/tests/test_extension_policy_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "external-links 契约判据：非门禁定位、离线面永远绿、联网面有硬预算、报告只走工件（2026-11-11）。",
       "path": "desktop/tests/test_external_links_workflow_contract.py",
       "role": "verify",
@@ -14040,7 +14046,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "b8dc328734236a371a7f0cf387f0cc509bdc9b28c08a6b52d400fb278d9f5813",
+  "root_digest": "56ea667684e62e9709daab2578e750ff1906f7ee692673efb2ee59f8c59c3818",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -14049,7 +14055,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1150,
+    "R-verify": 1151,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

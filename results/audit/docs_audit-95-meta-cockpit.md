@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:7a58fb1ee6c3c708a68061bfb6c54ec41f5d3a821509de195492e3366f4177d2
+  - protocol/check12_weights.json:6ddf0a8c723defa4af2fd2e39e555b1669ec75475927af28968222516c03aab1
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:fa00a7fd014857af56e11f38ced1b7d888be053befaadb10b3dd494d27884316
   - docs/meta-cockpit/功能解析.md:de20c2340d19d541bcfde53f222a3acf22a6e440d8fb3dcf51a37aedf53c0c25
   - results/meta-cockpit-manifest.json:60c0e100798e49d393557ae5066c02d7e057ec27f386ee1a36ca3fc7740150ba
 
 ---
+> 重审（2026-11-14）：EXTENSION 顶尖化：补 §现状对照（三档/派生三问/check30+check13 接线/域包装卸/回放 4 例/不钉运行时版本号）+ 复现口径 + 复核位；新增判据 test_extension_policy_doc_contract（实现里三档字符串 + check30 实跑）。
+
 > 重审（2026-11-14）：postmortems/README 顶尖化：与 decisions/handovers 同构补齐（本文件怎么读 / 目录白名单 / 为什么这么定 / 怎么验 + 复核位 + 三种白名单并列 + 项目符号机检提示）；新增判据 test_postmortems_readme_doc_contract（三目录 README 同构）。
 
 > 重审（2026-11-14）：复盘模板顶尖化：补 §现状对照（四段/六键/行动项带负责人+判据/无指责/公开面边界）+ 复现口径 + **机检提示**（check 把全文每条 - 行当行动项，故模板除行动项段外不用列表——本轮实测踩坑）+ ADR 全名引用修正；新增判据 test_postmortem_template_doc_contract。
