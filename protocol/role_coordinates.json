@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1202
+    "verify": 1203
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8531,6 +8531,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/fde-sample/brief.md 契约：brief 的「诉求 → 可判定项」映射必须每条落点真实可复核。",
+      "path": "desktop/tests/test_fde_brief_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "docs/fde-sample/README.md 契约：五门数字/证据件/命令必须与证据实读一致。",
       "path": "desktop/tests/test_fde_sample_doc_contract.py",
       "role": "verify",
@@ -13596,7 +13602,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "8e5f6b46f9cf930da791943c95fcf376c24bc941020bb2eb89103f07319b2039",
+  "root_digest": "f53d1f309b285e8ca11951b00e7a3d6d024dbff603ee8dae8a164564fcf2d6e6",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13605,7 +13611,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1076,
+    "R-verify": 1077,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
