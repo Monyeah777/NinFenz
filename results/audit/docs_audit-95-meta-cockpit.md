@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:50d5931e98534f2a899645a0a781208192b2d0fce03c42b6a1abea47205faacb
+  - protocol/check12_weights.json:2dbe7a044100dbd2452a29603ab39dd7a1d0f8893c3a899730bb13d3d3bddbe6
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:fa00a7fd014857af56e11f38ced1b7d888be053befaadb10b3dd494d27884316
   - docs/meta-cockpit/功能解析.md:de20c2340d19d541bcfde53f222a3acf22a6e440d8fb3dcf51a37aedf53c0c25
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-13）：实践包文档顶尖化（7 条全 active/6 必填键/2 值词表/INDEX 投影对账 + 现状对照 / 复现）+ 契约判据 test_patterns_doc_contract；权重增量重测。本轮为机械重绑。
+
 > 重审（2026-11-13）：冻结粘贴卡顶尖化（8 段/编号域/7 项/分片 2 段 + 现状对照；新增正文 sha256 防篡改锚，正文未改）+ 契约判据 test_paste_card_doc_contract；权重增量重测。本轮为机械重绑。
 
 > 重审（2026-11-13）：产出形态文档顶尖化（116 条/12 类别/六档状态分布/106 包/1050 件/机验率 0.7688/34 例 + 现状对照 / 复现）+ 契约判据 test_output_forms_doc_contract；权重增量重测。本轮为机械重绑。

@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1226
+    "verify": 1227
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9743,6 +9743,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/patterns.md 契约：实践包文档必须「7 条全 active/6 必填键/2 值词表」与注册表一致。",
+      "path": "desktop/tests/test_patterns_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "45 #5 · payload-consumer 雏形单测（确定性 + 消费映射）。",
       "path": "desktop/tests/test_payload_consumer.py",
       "role": "verify",
@@ -13740,7 +13746,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "1417c345df4698b48e592807aebd06b1f6172846bc5edaa8142f7369a47823a6",
+  "root_digest": "60363614fda44b0eb0aee1b7afacf2ae9db7e2e32228ca5bf3b8463a16e3ff31",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13749,7 +13755,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1100,
+    "R-verify": 1101,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
