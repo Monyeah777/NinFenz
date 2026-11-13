@@ -3,6 +3,7 @@
 > 状态：机器层验收通过，HR-001 待人工签字；外部模型实测冻结。
 > 当前 machine digest 由 `core.meta_cockpit.runtime_executor.machine_digest()` 输出。
 > 主仓审计：`results/audit/docs_audit-95-meta-cockpit.md`。
+> **复核（2026-11-14）**：能力清单与边界**复核不变**；补「§现状对照」把可核实数字钉到真源，并把原文一处**无代码载体**的表述标注为存疑（不删、不粉饰）。
 
 ## 可用入口
 
@@ -30,6 +31,22 @@ preregister / packets / analyze / save / verify / index / audit
 - 离线 blind paired A/B、power、预注册、固定 stopping rule；
 - content-addressed A/B bundle 与本地实验库；
 - 12 层 Agent 反模式审计与代码—文档契约。
+
+## 现状对照（2026-11-14 · 以资产/常量实读为准）
+
+| 面 | 现值 | 复核方式 |
+|---|---|---|
+| 方法论原子 | **33** | `meta_atoms.json` 的 `atoms` |
+| 方法节点 | **14** | `method_*.json` 文件数 |
+| 内容管线 | **10 节点** | `cognition_pipeline.json` |
+| 元管线 | **5 节点** | `cognition_meta_pipeline.json` |
+| 方法记忆回合 | **8** | `method_memory.MAX_HISTORY` |
+| 运行时身份 | `runtime_executor.machine_digest()` + `meta_runtime_manifest.build()` 的 `file_digests`（本文件同在其中） | 两个函数实读，**本文不钉摘要值**（钉值必与自身循环） |
+| 人工复核状态 | **PENDING**（运行器 `PENDING-REVIEW`） | `runtime_executor.review_status()` |
+| A/B 子命令 | **7 形态**：preregister / packets / analyze / save / verify / index / audit | `nf cockpit-ab --help` |
+| 存疑项 | 原文「**12 层 Agent 反模式审计**」在仓内**只有本文与 `DIFFERENTIATION.md` 提及**，未找到对应实现或判据（`st_quality` 是制卡质量门，不是 12 层反模式审计） | grep 全仓 + `st_quality.py` 实读 |
+
+> 本表只作「当时 → 现行」导航；数字以资产实读为准。存疑项**如实登记**，待作者裁决是补实现还是改表述。
 
 ## 当前边界
 

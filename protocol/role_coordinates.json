@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1246
+    "verify": 1247
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7949,6 +7949,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "COCKPIT_RELEASE_NOTES.md 契约：发布说明的可核数字与「存疑项」必须与资产一致。",
+      "path": "desktop/tests/test_cockpit_release_notes_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "代码规模/复杂度上限（`core/code_metrics.py`）回归测试 —— 架构纯度面 GAP-4。",
       "path": "desktop/tests/test_code_metrics.py",
       "role": "verify",
@@ -13860,7 +13866,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "061ecb1bf00fb405ca199d0fb7f48e3113f75293d037d523f03676e5da5b135e",
+  "root_digest": "270352bdb6a27badf9b7746d944a0867fd80d0f2b107de2dffbe766d8597b7d2",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13869,7 +13875,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1120,
+    "R-verify": 1121,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
