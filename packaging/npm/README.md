@@ -61,7 +61,7 @@ Python 探测顺序：`NINFENZ_PYTHON` → `py -3`（Windows）→ `python3` →
 > **自证门禁的正确方式**：payload 是**运行时 / 协议树**（不含 `.github/`、`results/`、`.git`）。`install --dest` 得到的是可用工作树（CLI / TUI / MCP 正常），**要跑全部门禁请 git clone 后 `bash verify.sh`**（判据法条数随版本变化，不在活文档里钉死）——`verify.sh` 依赖上述仓库件，这是设计而非缺陷。
 - 清单 `payload/payload-manifest.json`：逐文件 sha256 + 聚合 `tree_sha256`
 
-当前体积：**3109 件 · 解包 24.74 MB**（tarball 远小于此；域名包与标准目录占主要体积）。
+当前体积：**3109 件 · 解包 25.19 MB**（tarball 远小于此；域名包与标准目录占主要体积）。
 
 ## 供应链纪律（为什么可以放心 npx）
 
@@ -101,3 +101,34 @@ npm test          # 冒烟测试（清单自洽 + 快路径 + 真跑 doctor）
 npm pack --dry-run
 npm publish --provenance --access public   # 或走 .github/workflows/npm-publish.yml
 ```
+
+
+---
+
+> **复核（2026-11-14）**：入口面、供应链纪律与发布流程**复核不变**；本轮修正一处**生成口径漂移**（体积从 `3109 件 / 24.74 MB` 变为 `**3109 件 / 25.19 MB**`，由 `npm run stage -- --sync-readme` 自动同步），并补「§现状对照」「§复现与引用口径」。
+
+## 现状对照（2026-11-14 · 以 `package.json` / stager 实读为准）
+
+| 面 | 现值 | 复核方式 |
+|---|---|---|
+| 版本 | **1.0.5**（`package.json`，且必须与 `NF_CLI_VERSION` 一致——stager 会拦） | `npm run stage` 的「版本口径闸门」 |
+| Node 要求 | **>= 18.17** | `package.json` 的 `engines.node` |
+| bin 入口 | `nf` / `ninfenz` → `bin/nf.mjs` | `package.json` 的 `bin` |
+| 发布物 | `bin/` · `lib/` · `payload/` · `README.md` · `LICENSE` | `package.json` 的 `files` |
+| payload 规模 | **3109 件 · 解包 25.19 MB**（预算 14 MB × 3.5 ≈ 49 MB） | `npm run stage` 实读 |
+| 清单锚 | `payload/payload-manifest.json` 的 `tree_sha256` + 逐文件 sha256 + `source_commit` | 同上 |
+| 安装期脚本 | **没有** `preinstall/install/postinstall`（`npm run verify` 强制） | `package.json` 与 verifier |
+| 来源证明 | `publishConfig.provenance = true`（GitHub OIDC） | `package.json` |
+| 本机限制 | 本机**未装 Docker**、也不跑 `npm publish`；发布走 CI workflow | 环境实读 |
+
+## 复现与引用口径
+
+```bash
+cd packaging/npm
+npm run stage -- --sync-readme   # 暂存 payload 并同步本文件的「当前体积」口径（第 64 行）
+npm run verify                   # 发布前自检：安装脚本/payload 校验/元数据/预算
+npm test                         # 冒烟：清单自洽 + 快路径 + 真跑 doctor
+```
+
+- **体积数字不要手改**：它由 stager 生成并校验；手改必被 `npm run verify` 打回（修复指引就是 `--sync-readme`）。
+- payload 是**运行时/协议树**（不含 `.github/`、`results/`、`.git`），所以 `install --dest` 得到的工作树**不能**跑全部门禁——要跑 `verify.sh` 请 `git clone`。

@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:948919acea6557db2f9e04514b9b4a8ba8ed79903b13a47f3857229ea8bbd3e5
+  - protocol/check12_weights.json:dc2b2534fcd2094dc25c21820fd33c59f6782c41f043f474f4f8c5855549c830
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:fa00a7fd014857af56e11f38ced1b7d888be053befaadb10b3dd494d27884316
   - docs/meta-cockpit/功能解析.md:de20c2340d19d541bcfde53f222a3acf22a6e440d8fb3dcf51a37aedf53c0c25
   - results/meta-cockpit-manifest.json:60c0e100798e49d393557ae5066c02d7e057ec27f386ee1a36ca3fc7740150ba
 
 ---
+> 重审（2026-11-14）：npm README 顶尖化：修生成口径漂移（体积 24.74 → 25.19 MB，由 stage --sync-readme 自动同步）+ 补 §现状对照/复现口径（版本/engines/bin/files/无 install 脚本/provenance/本机限制）+ 判据 test_npm_readme_doc_contract。
+
 > 重审（2026-11-14）：nfal 容器 README 顶尖化：补 §现状对照（digest 钉版/零 pip/ENTRYPOINT/VOLUME/5 子命令/工作流 2 job/44 例/**本机无 Docker 如实标注**）+ 复现口径；新增判据 test_nfal_packaging_readme_doc_contract。
 
 > 重审（2026-11-14）：通用中文块 10 顶尖化：补中文自检段（九字段/12+1/双协议/仅 stdio/零依赖/MIT/中英对偶/平台侧未验）+ 类目在中文站填「内容创作」不混用；判据扩展（中英互指）。
