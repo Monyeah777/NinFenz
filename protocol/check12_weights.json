@@ -367,6 +367,7 @@
     "test_missing_sentinel": 0.2,
     "test_modeling": 0.6,
     "test_modeling_doc_contract": 0.2,
+    "test_modelscope_submission_doc_contract": 0.2,
     "test_module_lifecycle": 0.2,
     "test_module_m00_contract": 0.2,
     "test_module_m06_contract": 0.2,
@@ -3698,6 +3699,9 @@
     "test_modeling_doc_contract.ModelingDocTest.test_contract_catches_mutations": 0.0,
     "test_modeling_doc_contract.ModelingDocTest.test_data_live": 0.0,
     "test_modeling_doc_contract.ModelingDocTest.test_modeling_matches_contract": 0.0,
+    "test_modelscope_submission_doc_contract.ModelScopeSubmissionTest.test_contract_catches_mutations": 0.0,
+    "test_modelscope_submission_doc_contract.ModelScopeSubmissionTest.test_modelscope_matches_contract": 0.0,
+    "test_modelscope_submission_doc_contract.ModelScopeSubmissionTest.test_transport_config_live": 0.0,
     "test_module_lifecycle.StatusRoundTripTest.test_bad_status_raises": 0.0,
     "test_module_lifecycle.StatusRoundTripTest.test_default_status_active": 0.0,
     "test_module_lifecycle.StatusRoundTripTest.test_deprecate_then_restore": 0.0,
@@ -5683,5 +5687,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2010.0
+  "total_s": 2010.2
 }
