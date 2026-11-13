@@ -312,6 +312,7 @@
     "test_locales": 0.2,
     "test_locales_doc_contract": 0.2,
     "test_lsp": 2.9,
+    "test_lsp_doc_contract": 0.2,
     "test_lsp_guard": 0.2,
     "test_lsp_hardening": 0.2,
     "test_lsp_transcript": 0.7,
@@ -3275,6 +3276,9 @@
     "test_lsp.TestUriRoundTrip.test_percent_encoded_and_cjk_round_trip": 0.0,
     "test_lsp.TestUriRoundTrip.test_round_trip_with_spaces_and_cjk": 0.0,
     "test_lsp.TestUriRoundTrip.test_windows_drive_uri_to_path": 0.0,
+    "test_lsp_doc_contract.LspDocTest.test_contract_catches_mutations": 0.0,
+    "test_lsp_doc_contract.LspDocTest.test_impl_live": 0.0,
+    "test_lsp_doc_contract.LspDocTest.test_lsp_matches_contract": 0.0,
     "test_lsp_guard.TestLspGuardDiagnostics.test_bad_guard_yields_error_at_real_position": 0.02,
     "test_lsp_guard.TestLspGuardDiagnostics.test_clean_real_pipeline_has_no_error": 0.01,
     "test_lsp_guard.TestLspGuardDiagnostics.test_non_pipeline_doc_produces_no_guard_diag": 0.0,
@@ -5483,5 +5487,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1889.2
+  "total_s": 1889.4
 }

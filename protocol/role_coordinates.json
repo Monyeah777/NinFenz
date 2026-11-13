@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1214
+    "verify": 1215
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9209,6 +9209,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/lsp.md 契约：LSP 接入文档必须「11 能力/16 方法/8 MiB/utf-16/77 例与实现一致」。",
+      "path": "desktop/tests/test_lsp_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "NFA-L guard 诊断接入编辑器面（nf lsp）单测。",
       "path": "desktop/tests/test_lsp_guard.py",
       "role": "verify",
@@ -13668,7 +13674,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "161d51522fc1f1d74e416b008ad338488460ec6119eb9ee3f5b8601dcb7a0533",
+  "root_digest": "74cb73a4342e6cdd0decac44e441f50e528b4ad5cf39ec9dc194608f60678ad1",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13677,7 +13683,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1088,
+    "R-verify": 1089,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
