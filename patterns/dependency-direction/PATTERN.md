@@ -51,3 +51,29 @@ nf patterns for desktop/src/core/driver.py    # 反查某文件适用哪些 patt
 ## 相关
 
 - 与 `single-source-truth` 的区别：那条管**数据**只有一份真源；这条管**依赖**只沿更稳定的方向。
+
+
+---
+
+## 现状对照（2026-11-14 · 以 `coupling_metrics` 与 `nf patterns` 实读为准）
+
+| 面 | 当前口径 | 复核方式 |
+|---|---|---|
+| 适用面规模 | **290** 个 `desktop/src/core/*.py` + **79** 个 `scripts/*.py`（含匹配检查） | `glob` 计数 / `applies_to` 逐通配匹配 |
+| 度量结果 | 模块 **289** · 环 **0**（登记 0）· **SDP 违例 9（已登记 9）** | `python scripts/coupling_metrics.py` |
+| 基线 | `protocol/coupling_baseline.json`（存量债名单；**只许收敛**） | 该文件 + `--write` 才可更新 |
+| 机检 | `nf patterns verify`（格式 + `applies_to`/`evidence` 可证 + INDEX 投影一致） | 命令实跑 |
+
+- **本文不钉具体 Ca/I 数值**：那是随提交变化的运行时事实，**以 `coupling_metrics` 实读为准**；正文里的「实测（2026-10-03）」是历史留痕（Ca 5→6 / I 0.5→0.4545），不是当前值。
+- 「违例 9 / 登记 9」表示当前**没有新增违例**；新增一条即 FAIL——这才是本规则的可检面。
+
+## 复现与引用口径
+
+```bash
+python scripts/coupling_metrics.py            # 只读：当前 I / 环 / SDP 违例（vs 基线）
+python scripts/nf.py patterns verify          # 格式 + 可证性 + INDEX 投影
+python scripts/nf.py patterns for desktop/src/core/driver.py   # 反查适用 pattern
+```
+
+- 引用本 pattern 时：「新增消费者会压低被依赖方 I，从而可能造出 SDP 违例」是**机制断言**；数字以命令实读为准。
+- 改基线必须在评审后 `--write` 并在提交信息里写原因（只许收敛，不许为了让门禁变绿而放宽）。
