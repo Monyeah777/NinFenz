@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1217
+    "verify": 1218
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9365,6 +9365,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/meta-cockpit/功能解析.md 契约：功能拆解必须「33 原子/10·5 节点/3·5 约束与资产一致」。",
+      "path": "desktop/tests/test_meta_cockpit_analysis_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "驾驶舱说明契约：33 原子/10 节点/5 节点/六类义务必须与资产一致。",
       "path": "desktop/tests/test_meta_cockpit_doc_contract.py",
       "role": "verify",
@@ -13686,7 +13692,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "2ef43ee22b031b17c4b94954b72757ca9460a434de80e6218d13209970cd28d6",
+  "root_digest": "9836d0e83e9596c6d6f0087c6f257314b150d556df02a67a2c35fe26fc36e584",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13695,7 +13701,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1091,
+    "R-verify": 1092,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
