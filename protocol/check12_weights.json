@@ -348,6 +348,7 @@
     "test_mcp_read_budget": 1.2,
     "test_mcp_redteam": 0.2,
     "test_mcp_runtime": 28.0,
+    "test_mcp_submissions_doc_contract": 0.2,
     "test_mcp_submit_doc_contract": 0.2,
     "test_mcp_trust_meta": 0.8,
     "test_mcp_write_freedom": 3.3,
@@ -3579,6 +3580,9 @@
     "test_mcp_runtime.ToolSchemaEffectTest.test_check_detects_a_noop_property": 0.0,
     "test_mcp_runtime.ToolSchemaEffectTest.test_every_declared_property_changes_the_response": 6.18,
     "test_mcp_runtime.VersionDeclarationKeyTest.test_only_the_namespaced_key_declares_a_version": 0.86,
+    "test_mcp_submissions_doc_contract.McpSubmissionsTest.test_contract_catches_mutations": 0.01,
+    "test_mcp_submissions_doc_contract.McpSubmissionsTest.test_family_shape": 0.0,
+    "test_mcp_submissions_doc_contract.McpSubmissionsTest.test_submissions_are_consistent": 0.0,
     "test_mcp_submit_doc_contract.McpSubmitTest.test_contract_catches_mutations": 0.0,
     "test_mcp_submit_doc_contract.McpSubmitTest.test_submit_matches_contract": 0.0,
     "test_mcp_submit_doc_contract.McpSubmitTest.test_versions_live": 0.0,
@@ -5663,5 +5667,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2009.0
+  "total_s": 2009.2
 }
