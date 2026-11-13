@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:c1cb690df910807d5da349601e5c2bb0193677fd68eb89397f63601e994696db
+  - protocol/code_metrics_baseline.json:54913cd1a3e2c3f404584956b96623e517e85fe8531c55d3d129dd96a2085966
 ---
+> 重审（2026-11-14）：patterns/INDEX 顶尖化：现状对照/复现口径改为**生成内容**（renderer 实时算计数），页面整页生成物声明；模块增至 192 行属合法生成逻辑增长，code_metrics 基线重冻（--write）；新增判据 test_patterns_index_doc_contract（reindex 幂等逐字节）。
+
 > 重审（2026-11-13）：代码度量重冻：geo_export.py 310 行（机构分布所需 +8）
 
 > 重审（2026-11-13）：层切片页补本层不可达清单：_layer_body 增死链逐条（id + HTTP），无死链则声明「该层全部本机可达」；重生成五页；判据断言每页清单与 catalog 逐条相等；code_metrics 重冻（geo_export 302 行）。

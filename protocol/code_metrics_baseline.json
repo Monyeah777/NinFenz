@@ -946,7 +946,7 @@
       "max_fn_lines": 34
     },
     "desktop/src/core/patterns.py": {
-      "lines": 155,
+      "lines": 192,
       "max_fn_cc": 30,
       "max_fn_lines": 53
     },

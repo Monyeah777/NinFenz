@@ -26,8 +26,10 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:c1cb690df910807d5da349601e5c2bb0193677fd68eb89397f63601e994696db
+  - protocol/code_metrics_baseline.json:54913cd1a3e2c3f404584956b96623e517e85fe8531c55d3d129dd96a2085966
 ---
+> 重审（2026-11-14）：patterns/INDEX 顶尖化：现状对照/复现口径改为**生成内容**（renderer 实时算计数），页面整页生成物声明；模块增至 192 行属合法生成逻辑增长，code_metrics 基线重冻（--write）；新增判据 test_patterns_index_doc_contract（reindex 幂等逐字节）。
+
 > 重审（2026-11-13）：终端入口文档顶尖化（77 命令/203 索引/8 族/9 区/13 表单/42 斜杠词/4 阻塞/24 确认动词/139 例 + 现状对照 / 复现；en·ja 译件同步后重签；⛔ 标识头归位修 doc_markers）+ 契约判据 test_terminal_doc_contract。
 
 > 重审（2026-11-13）：代码度量重冻：geo_export.py 310 行（机构分布所需 +8）
