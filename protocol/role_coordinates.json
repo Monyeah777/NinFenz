@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1283
+    "verify": 1284
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -10703,6 +10703,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "site/assets/README.md 契约：素材来源/许可/字节/尺寸必须与实盘一致。",
+      "path": "desktop/tests/test_site_assets_readme_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "站点面（对外文档门户）常驻判据。",
       "path": "desktop/tests/test_site_face.py",
       "role": "verify",
@@ -14082,7 +14088,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "93030be3183d2ab5fd2bad8cbadfb030a5286048d72777d23d095fd3feb76cc6",
+  "root_digest": "00ceda0434909265577b801a9eab627cc2fed711a1f37a4b5256fa97f7058bfe",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -14091,7 +14097,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1157,
+    "R-verify": 1158,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
