@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1215
+    "verify": 1216
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9263,6 +9263,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "机读块 retro-fit 契约：作用域/L0/字段映射/幂等必须与实读一致。",
+      "path": "desktop/tests/test_machine_contract_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "维护者契约判据：执行主体必须「具名、有职责、涉己回避、失能有预案」（2026-11-10）。",
       "path": "desktop/tests/test_maintainers_contract.py",
       "role": "verify",
@@ -13674,7 +13680,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "74cb73a4342e6cdd0decac44e441f50e528b4ad5cf39ec9dc194608f60678ad1",
+  "root_digest": "c8875b5c4c219ba0382fbc0d2c9829cc9850ad6cb3461f036b47a1e16d8172b4",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13683,7 +13689,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1089,
+    "R-verify": 1090,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
