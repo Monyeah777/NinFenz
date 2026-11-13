@@ -248,6 +248,7 @@
     "test_intake_surface": 0.3,
     "test_integrations": 0.4,
     "test_interop": 1.7,
+    "test_interop_doc_contract": 0.2,
     "test_interop_export": 2.8,
     "test_interop_schema_tool": 0.3,
     "test_interop_thirdparty_doc_contract": 0.3,
@@ -2710,6 +2711,9 @@
     "test_interop.ThreeTransportsTest.test_same_result_across_transports": 0.55,
     "test_interop.WarmScanTest.test_registered_scanner_runs_in_process": 1.02,
     "test_interop.WarmScanTest.test_unregistered_scanner_is_refused": 0.0,
+    "test_interop_doc_contract.InteropDocTest.test_contract_catches_mutations": 0.0,
+    "test_interop_doc_contract.InteropDocTest.test_interop_matches_contract": 0.0,
+    "test_interop_doc_contract.InteropDocTest.test_kinds_and_validation_live": 0.0,
     "test_interop_export.InteropExportTest.test_a2a_card_projects_endpoints_and_declares_not_implemented": 0.0,
     "test_interop_export.InteropExportTest.test_asyncapi_covers_every_event_and_unique_ce_type": 0.01,
     "test_interop_export.InteropExportTest.test_cid_multiformats_vector": 0.01,
@@ -5455,5 +5459,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1887.2
+  "total_s": 1887.4
 }
