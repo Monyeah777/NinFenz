@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1201
+    "verify": 1202
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8531,6 +8531,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/fde-sample/README.md 契约：五门数字/证据件/命令必须与证据实读一致。",
+      "path": "desktop/tests/test_fde_sample_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "",
       "path": "desktop/tests/test_feature_lifecycle.py",
       "role": "verify",
@@ -13590,7 +13596,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "2da94d920f47f1716ee896c273b50c7f112f626f87a0978895907f6b2d5efddd",
+  "root_digest": "8e5f6b46f9cf930da791943c95fcf376c24bc941020bb2eb89103f07319b2039",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13599,7 +13605,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1075,
+    "R-verify": 1076,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

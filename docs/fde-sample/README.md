@@ -2,6 +2,9 @@
 
 > 定位：证明「NF 是 FDE 的 AI infra 中游标准」——一次完整交付从 **brief** 走到 **证据包**，全程本地、确定性、无网络。
 > 栈位说明见 [`../fde-stack.md`](../fde-stack.md)。本样例是那条契约的一次真实行走。
+> **最后更新：2026-11-13（复核）**：五道门与两条命令**复核不变**；补机读现状（`evidence/manifest.json`）：
+> 声明面 **6** · schema↔data 对 **2** · 概念图 **48 节点 / 拓扑序 47** · 证据强度 **external** · 装配链 **4 件** ·
+> 标准锚 **370** · `issues` 空；`--check` 绿（门 5 · 证据件 4）。见「§现状对照」。
 
 ## 一、样例对象
 
@@ -31,6 +34,31 @@ python scripts/fde_sample_run.py --check   # 逐字节比对证据与当前仓�
 | G5 | `nf stats --check` 与 `geo_export.py --check` 同时绿 | 交付所引用的数字与标准锚都是实算生成物 |
 
 **当前实跑结果**（`evidence/gates.txt`）：五门全 PASS——G3 的图规模 48 节点 / 拓扑序 47 / 证据强度 `external`；G5 覆盖 370 条标准锚。
+
+## 现状对照（2026-11-13 · 以证据件实读为准）
+
+| 面 | 本文声明 | 复核结果（读到本行时请重跑 `--check`） |
+|---|---|---|
+| G1 声明面 | 「全部在场且可解析」 | **声明面 6 · 缺失 0 · 不可解析 0**（`facts.declared_outputs=6`） |
+| G2 schema↔data | 「逐对通过」 | **2 对 · 不合规 0**（`facts.schema_pairs=2`） |
+| G3 概念图 | 48 节点 / 拓扑序 47 / external | **48 / 47 / external**（`facts.concept_nodes/topo_len/provenance_strength`） |
+| G4 装配链 | 四件在场 | **4 件 · 缺 0** |
+| G5 中游出口 | stats + geo 双绿、370 锚 | **问题 0 / 问题 0**；`facts.standards=370` |
+| 证据件 | `evidence/` 四件 | **4 件**（deliverable / gates / result / manifest；manifest 自身不计入 artifacts） |
+| 自检 | `--check` 防腐烂 | **绿**（门 5 · 证据件 4） |
+| 门禁位置 | 未写 | **check32 子扫描 `fde_sample`**（`verify.sh --checks-only` 内） |
+
+> 本表只作「当时 → 现行」导航，不替代 `--check` 实跑。
+
+## 复现与引用口径
+
+```bash
+python scripts/fde_sample_run.py --check   # 逐字节比对证据与当前仓库状态（0=一致）
+python scripts/fde_sample_run.py --run     # 重跑并落证据（幂等；改仓库状态后才需要）
+```
+
+- 引用本文时：「brief → 证据包全程本地确定性 + 五门可机检」= 长期口径；数字以 `evidence/manifest.json` 实读为准。
+- `--check` 失败即样例腐烂：先重跑 `--run`；若 `--run` 报门失败，按门名定位（G1 产出面 / G2 契约 / G3 图 / G4 装配链 / G5 自述与 GEO）。
 
 ## 四、复算与失败处置
 
