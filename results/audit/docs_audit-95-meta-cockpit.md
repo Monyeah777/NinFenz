@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:d855f73d3c86c15913b03e3026407059e4c129295fb965a3bf665cfc9b7b59a7
+  - protocol/check12_weights.json:ffee0e78fc9b500d5b15efe41d7aaeed11c3835f45956b84a06071493072cee3
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:fa00a7fd014857af56e11f38ced1b7d888be053befaadb10b3dd494d27884316
   - docs/meta-cockpit/功能解析.md:de20c2340d19d541bcfde53f222a3acf22a6e440d8fb3dcf51a37aedf53c0c25
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-14）：AGENTS.md 增「本仓高发误判」止损清单（生成物/冻结件、conformance 后重批准、译件三处同步、未跑完不许写全绿），并把该段纳入 test_agents_contract 判据（只增纪律不减纪律）。
+
 > 重审（2026-11-14）：需求收敛模板顶尖化（8 字段 / steelman 3 形态 / audit 2 形态 / 当前 0 份库存 / 首例阻塞 / reference 分类 + 现状对照 / 复现）+ 契约判据 test_requirement_template_doc_contract。
 
 > 重审（2026-11-13）：迁移指南顶尖化（签名文档 4 / 历史面 15（4 根+2 protocol+9 schema）/ 影响度 3 值 / 命令三形态 + 现状对照 / 复现）+ 契约判据 test_migration_guide_doc_contract。

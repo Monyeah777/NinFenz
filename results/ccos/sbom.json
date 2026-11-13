@@ -1,7 +1,7 @@
 {
-  "bytes": 12239372,
+  "bytes": 12239453,
   "count": 572,
-  "digest": "c8b1d1c027a9816d6fd594dd4dd9a8963b09f04bfe9dd173020ff7e48ea76f4e",
+  "digest": "6186689d1b00518e453b4ba85da1fdef32a2c33d561550b5c830a0a1492c7a5c",
   "materials": [
     {
       "bytes": 102,
@@ -1959,9 +1959,9 @@
       "sha256": "c2402950e34e3ff9bd0f09171c8bee821bf0f57c33f32d0dbc4bb4b3e6157914"
     },
     {
-      "bytes": 446054,
+      "bytes": 446135,
       "path": "protocol/check12_weights.json",
-      "sha256": "d855f73d3c86c15913b03e3026407059e4c129295fb965a3bf665cfc9b7b59a7"
+      "sha256": "ffee0e78fc9b500d5b15efe41d7aaeed11c3835f45956b84a06071493072cee3"
     },
     {
       "bytes": 16170,

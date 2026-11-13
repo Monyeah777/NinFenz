@@ -7,7 +7,7 @@
     "test_adr_9001_contract": 0.2,
     "test_agent_rules_adapter": 0.2,
     "test_agent_start_contract": 0.2,
-    "test_agents_contract": 0.1,
+    "test_agents_contract": 0.2,
     "test_ai_channel_spec_contract": 0.5,
     "test_ai_domain_closure": 0.2,
     "test_ai_menu_contract": 0.3,
@@ -629,6 +629,7 @@
     "test_agents_contract.AgentsContractTest.test_agents_matches_contract": 0.0,
     "test_agents_contract.AgentsContractTest.test_contract_catches_broken_agents": 0.0,
     "test_agents_contract.AgentsContractTest.test_facts_match_repo": 0.0,
+    "test_agents_contract.AgentsContractTest.test_lessons_section_present": 0.0,
     "test_agents_contract.AgentsContractTest.test_references_resolve": 0.0,
     "test_ai_channel_spec_contract.AIChannelSpecContractTest.test_contract_catches_mutations": 0.24,
     "test_ai_channel_spec_contract.AIChannelSpecContractTest.test_spec_matches_contract": 0.03,
@@ -5595,5 +5596,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1957.9
+  "total_s": 1958.0
 }
