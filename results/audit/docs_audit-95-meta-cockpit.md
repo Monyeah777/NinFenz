@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:019f2fd936249890633bf2575aade5997be8062f45485108516fef2457648afd
+  - protocol/check12_weights.json:f11fed046330ca160e8e3dd2bdb5196d4f5ccb9478731a613669b5207a4edf6e
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:fa00a7fd014857af56e11f38ced1b7d888be053befaadb10b3dd494d27884316
   - docs/meta-cockpit/功能解析.md:de20c2340d19d541bcfde53f222a3acf22a6e440d8fb3dcf51a37aedf53c0c25
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-13）：标准层切片页顶尖化：生成器补「怎么读本页」段（切片口径/行字段/互指/投影）并重生成五个层页；code_metrics 重冻（geo_export 267 行）；新增契约判据 test_standards_layer_doc_contract（data 层为锚，另验五层同构）。
+
 > 重审（2026-11-13）：标准主索引顶尖化：生成器补索引页「口径与复现」段（生成物纪律/行字段/锚点/其它面/投影）并把两段文案提为模块常量；重生成后索引 +8 行；代码度量重冻（geo_export 253 行）；新增契约判据 test_standards_index_doc_contract。
 
 > 重审（2026-11-13）：标准答题卡（生成物）顶尖化：生成器补「口径与复现」段（生成物纪律/计数来源/可达性/投影定位）后重新生成；新增契约判据 test_answer_cards_doc_contract（含 geo_export --check 新鲜度实跑）；权重增量重测。本轮为机械重绑。

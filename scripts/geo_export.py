@@ -47,6 +47,19 @@ _HOWTO_INDEX = [
     "- 数据/代码/脚本三面一致性由 check40 判；本页只是**投影**，不是第二份事实。",
     "",
 ]
+_HOWTO_LAYER = [
+    "## 怎么读本页", "",
+    "- 生成物：`python scripts/geo_export.py --write` 重写本页；"
+    "`--check` 比对生成物与真源，不一致即红。手改必红。",
+    "- 切片口径：本页只收 `layer` 等于该层的标准，锚点与主索引 `index.md` 逐字一致。",
+    "- 行字段：名称 · 机构 · 层 · 可达（HTTP · 探针日期） · 扩展点 ·",
+    "绑定（主锚/辅锚） · 规范 URL。",
+    "- 互指：全量见 `index.md`；按问题形态聚合见 `answer-cards.md`；"
+    "三面一致性由 check40 判，本页只是**投影**。",
+    "",
+]
+
+
 _HOWTO_CARDS = [
     "## 口径与复现", "",
     "- 生成物：`python scripts/geo_export.py --write` 重写本页；"
@@ -121,7 +134,7 @@ def build(root: str) -> Dict[str, str]:
     for layer in LAYERS:
         rows = [s for s in ordered if str(s.get("layer") or "") == layer]
         body = _head("标准目录 · 层 %s（%d 条）" % (layer, len(rows)), coverage,
-                     "本页为 `%s` 的按层切片，锚点与主索引一致。" % INDEX_REL)
+                     "本页为 `%s` 的按层切片，锚点与主索引一致。" % INDEX_REL) + _HOWTO_LAYER
         for s in rows:
             body += ["### `%s`" % s["id"], _line(s, counts), ""]
         outs["docs/standards/layer-%s.md" % layer] = "\n".join(body).rstrip() + "\n"
