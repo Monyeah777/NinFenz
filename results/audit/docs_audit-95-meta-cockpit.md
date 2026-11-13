@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:72bf92d70c1cc06e94d594608cc37038fd101c67cd5c6a92f6fd6ce6cb3833fd
+  - protocol/check12_weights.json:1faf4c9786a8a4049d9ff8601aaec6a01e1f86541cbe3ae2141398ef1cc0bad2
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:fa00a7fd014857af56e11f38ced1b7d888be053befaadb10b3dd494d27884316
   - docs/meta-cockpit/功能解析.md:de20c2340d19d541bcfde53f222a3acf22a6e440d8fb3dcf51a37aedf53c0c25
   - results/meta-cockpit-manifest.json:60c0e100798e49d393557ae5066c02d7e057ec27f386ee1a36ca3fc7740150ba
 
 ---
+> 重审（2026-11-14）：worktree-vs-index PATTERN 顶尖化：修两处悬空引用（evidence 的 handovers/HO-0002、不存在的 .rivet/scratch/crlf_scan.py）+ 补 §现状对照/复现口径；**同时修门**：patterns.scan 的 evidence 校验由「四个前缀」改为「任何带 / 的引用都按路径校验」（此前 handovers/ 悬空件被静默放过）；新增判据 test_worktree_vs_index_pattern_doc_contract。
+
 > 重审（2026-11-14）：verifier-must-run PATTERN 顶尖化：补 §现状对照（EXTERNAL_SUITES 2 条 + MIN_DISCOVERED 150 下限 + 四源面清单 + 3 例接线判据 + 变异自证）+ 复现口径（含 test_npm_package 的 payload 执行前置说明）；新增判据 test_verifier_must_run_pattern_doc_contract（登记套件目标在场、四源函数在场、接线判据实跑）。
 
 > 重审（2026-11-14）：single-source-truth PATTERN 顶尖化：补 §现状对照（五个投影件逐个 + 真源/生成方式 + 2 个生成标记 + 「两类工件两种锁」口径 + check34/35）+ 复现口径；新增判据 test_single_source_truth_pattern_doc_contract（五件在场、标记在、library/patterns verify 实跑零缺口）。

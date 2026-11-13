@@ -621,6 +621,7 @@
     "test_watermark_sync_probe": 54.7,
     "test_workflow_hardening": 0.2,
     "test_workflow_policy": 0.2,
+    "test_worktree_vs_index_pattern_doc_contract": 10.6,
     "test_world_model": 0.5,
     "test_world_slots": 0.1,
     "test_write_flag_gate": 4.4,
@@ -5707,6 +5708,10 @@
     "test_workflow_policy.WorkflowPolicyTest.test_pinned_uses_with_permissions_passes": 0.0,
     "test_workflow_policy.WorkflowPolicyTest.test_real_repo_workflows_are_all_pinned": 0.01,
     "test_workflow_policy.WorkflowPolicyTest.test_unpinned_requirement_is_rejected": 0.01,
+    "test_worktree_vs_index_pattern_doc_contract.WorktreeVsIndexTest.test_contract_catches_mutations": 0.01,
+    "test_worktree_vs_index_pattern_doc_contract.WorktreeVsIndexTest.test_evidence_validation_covers_custom_prefixes": 0.0,
+    "test_worktree_vs_index_pattern_doc_contract.WorktreeVsIndexTest.test_pattern_matches_contract": 0.0,
+    "test_worktree_vs_index_pattern_doc_contract.WorktreeVsIndexTest.test_text_hygiene_judge_passes": 10.4,
     "test_world_model.WorldModelTest.test_advance_concrete_state": 0.13,
     "test_world_model.WorldModelTest.test_array_item_kind_mismatch_fails": 0.0,
     "test_world_model.WorldModelTest.test_duplicate_phase_fails": 0.0,
@@ -5743,5 +5748,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2023.9
+  "total_s": 2034.5
 }

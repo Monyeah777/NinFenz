@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:54913cd1a3e2c3f404584956b96623e517e85fe8531c55d3d129dd96a2085966
+  - protocol/code_metrics_baseline.json:51604504ed69969c0c502eecea60736f7e02c4d931ba1f117bedd63fe84c60da
 ---
+> 重审（2026-11-14）：patterns evidence 校验加宽（任意前缀路径校验）使 patterns.py 增至 193 行：属门禁加固的合法增长，code_metrics 基线重冻。
+
 > 重审（2026-11-14）：patterns/INDEX 顶尖化：现状对照/复现口径改为**生成内容**（renderer 实时算计数），页面整页生成物声明；模块增至 192 行属合法生成逻辑增长，code_metrics 基线重冻（--write）；新增判据 test_patterns_index_doc_contract（reindex 幂等逐字节）。
 
 > 重审（2026-11-13）：代码度量重冻：geo_export.py 310 行（机构分布所需 +8）
