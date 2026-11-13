@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1253
+    "verify": 1254
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9419,6 +9419,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "packaging/mcp/SUBMIT.md 契约：三处版本同值 / 自检期望可跑 / 平台侧不冒充判据。",
+      "path": "desktop/tests/test_mcp_submit_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "MCP 面的**信任边界标注**（外来内容 = 数据）——把 06 §12 的声明接上消费通道。",
       "path": "desktop/tests/test_mcp_trust_meta.py",
       "role": "verify",
@@ -13902,7 +13908,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "408575e9249214f23945c5538dd201e73b6c6925840e8951152d0a059a457b88",
+  "root_digest": "5d8327774c34816c48c629c57a799226f14526e54218decd9e9e22e4bb284265",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13911,7 +13917,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1127,
+    "R-verify": 1128,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
