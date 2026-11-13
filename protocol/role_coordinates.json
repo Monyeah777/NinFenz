@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1255
+    "verify": 1256
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9425,6 +9425,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "packaging/mcp/submissions/ 契约：10 份逐字可粘件必须同源（改动不同批跟进即矛盾）。",
+      "path": "desktop/tests/test_mcp_submissions_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "packaging/mcp/SUBMIT.md 契约：三处版本同值 / 自检期望可跑 / 平台侧不冒充判据。",
       "path": "desktop/tests/test_mcp_submit_doc_contract.py",
       "role": "verify",
@@ -13914,7 +13920,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "ca9a4e18657784e07d7020b99bfe9d33fdd9d347322fa670bf66a61b22f56d8d",
+  "root_digest": "9cf77367d44f8aed575ff36e0397cbc25395291f7e00180e9f80400f88542c9f",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13923,7 +13929,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1129,
+    "R-verify": 1130,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
