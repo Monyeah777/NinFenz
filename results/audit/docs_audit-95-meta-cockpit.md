@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:e32afbabeda7374a663a877bd6bbe67c4dfdc5ce0eaf77490ffcf57ddb62f902
+  - protocol/check12_weights.json:f2ae5ec432e1fac0aaad405eb3d91592f8d24fe9a5f4050cc6de67115760fcdc
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:fa00a7fd014857af56e11f38ced1b7d888be053befaadb10b3dd494d27884316
   - docs/meta-cockpit/功能解析.md:de20c2340d19d541bcfde53f222a3acf22a6e440d8fb3dcf51a37aedf53c0c25
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-14）：GLAMA 上架教程顶尖化：补「仓库侧可核 / 平台侧不可核」现状对照（Dockerfile 钉版+非 root+CMD serve+零 pip、glama.json maintainers、版本一致、12 工具+1 prompt）+ 复现口径；新增判据 test_glama_doc_contract。
+
 > 重审（2026-11-14）：CHANGELOG 顶尖化：补三段说明（怎么产生 / 只追加不重写 / 现状 4+1 节），并把「节序从新到旧、日期单调不增、生成器 issues 空」写成判据 test_changelog_doc_contract。
 
 > 重审（2026-11-14）：AGENTS.md 增「本仓高发误判」止损清单（生成物/冻结件、conformance 后重批准、译件三处同步、未跑完不许写全绿），并把该段纳入 test_agents_contract 判据（只增纪律不减纪律）。
