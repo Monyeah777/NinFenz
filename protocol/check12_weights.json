@@ -257,6 +257,7 @@
     "test_intake_quota": 0.2,
     "test_intake_surface": 0.3,
     "test_integrations": 0.4,
+    "test_integrations_readme_doc_contract": 1.4,
     "test_interop": 1.7,
     "test_interop_doc_contract": 0.2,
     "test_interop_export": 2.8,
@@ -2771,6 +2772,9 @@
     "test_integrations.RealRepoTest.test_projection_matches_render": 0.01,
     "test_integrations.RealRepoTest.test_real_repo_has_no_issue": 0.04,
     "test_integrations.RealRepoTest.test_strings_present_for_every_integration": 0.04,
+    "test_integrations_readme_doc_contract.IntegrationsReadmeTest.test_contract_catches_mutations": 0.91,
+    "test_integrations_readme_doc_contract.IntegrationsReadmeTest.test_data_live": 0.04,
+    "test_integrations_readme_doc_contract.IntegrationsReadmeTest.test_readme_matches_contract": 0.21,
     "test_interop.DispatchTest.test_batch": 0.0,
     "test_interop.DispatchTest.test_handler_exception_is_internal_error": 0.0,
     "test_interop.DispatchTest.test_invalid_request_keeps_id": 0.0,
@@ -5643,5 +5647,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1989.4
+  "total_s": 1990.8
 }

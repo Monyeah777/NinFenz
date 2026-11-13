@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:87e435ac5e53c0dc02f550bbc86d6975d869d4bc7ee9687f7e51d70622095045
+  - protocol/check12_weights.json:98328a16505124a68ddbaf5ec71b465a58c509ba8c002ecc93c57fe45eb17921
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:fa00a7fd014857af56e11f38ced1b7d888be053befaadb10b3dd494d27884316
   - docs/meta-cockpit/功能解析.md:de20c2340d19d541bcfde53f222a3acf22a6e440d8fb3dcf51a37aedf53c0c25
   - results/meta-cockpit-manifest.json:60c0e100798e49d393557ae5066c02d7e057ec27f386ee1a36ca3fc7740150ba
 
 ---
+> 重审（2026-11-14）：接入面 README 顶尖化：补 §现状对照（14 面 / active 12·proposed 2 / 已用 kind 7 类 / 词表 kind 8·status 3·tier 2 / check38 子扫描）+ §复现口径（**没有 nf integrations 子命令**，走 check38 子扫描）；新增判据 test_integrations_readme_doc_contract。
+
 > 重审（2026-11-14）：handovers/README 顶尖化：补齐与 decisions/README 同构的政策说明（本文件怎么读 / 目录白名单 / 为什么这么定 / 三命令 / 私有仓路径 / 判据点名）+ 复核位；新增判据 test_handovers_readme_doc_contract。
 
 > 重审（2026-11-14）：接力模板顶尖化：补 §模板自检（五段/六必填/状态词表/未决项带判据/refs 可解析/公开面边界 + 三条只读命令），声明自检段不是第六段；新增判据 test_handover_template_doc_contract（模板↔protocol/handover.json↔CLI 三方对账）。
