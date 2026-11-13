@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1277
+    "verify": 1278
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -10133,6 +10133,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "protocol/README.md 契约：IDL 层说明的「schema 件数 / 白名单 / 扫描面 / check 接线」与实现一致。",
+      "path": "desktop/tests/test_protocol_readme_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "协议定义向导单测（v2.0.x-E2：ProtocolForm → protocol.yaml v2 生成 + self_check）。",
       "path": "desktop/tests/test_protocol_wizard.py",
       "role": "verify",
@@ -14046,7 +14052,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "56ea667684e62e9709daab2578e750ff1906f7ee692673efb2ee59f8c59c3818",
+  "root_digest": "ea46dd10d404ad51819d2b5dfb7718f1e0b8603d2396d508355a4a20738e0883",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -14055,7 +14061,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1151,
+    "R-verify": 1152,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
