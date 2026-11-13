@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1242
+    "verify": 1243
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7799,6 +7799,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "CHANGELOG.md 契约：历史只追加不重写；节序从新到旧、日期单调不增；生成器自检无 issue。",
+      "path": "desktop/tests/test_changelog_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "变更日志生成（`core/changelog_gen.py`）回归测试 —— 渲染确定 + 写面幂等 + 丢内容守卫。",
       "path": "desktop/tests/test_changelog_gen.py",
       "role": "verify",
@@ -13836,7 +13842,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "b2331bf5171cb473439368e4241eee5121daee3efa2b6f7cd5eb8f40809eb239",
+  "root_digest": "1bfa04629c0566122436aa5272ccb9126b32e9fe046201b93008b1e3ed550dbb",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13845,7 +13851,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1116,
+    "R-verify": 1117,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

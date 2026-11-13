@@ -6,7 +6,7 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - CHANGELOG.md:c33b70610b8e51f9d40a5f3e55f9400944d117bb5fdf9e2d0ee8f71dff81acf7
+  - CHANGELOG.md:95bebd2bb67e337dace03a85df842126322404006fe0ca44b1368eda6253ff6f
   - docs/meta/VERSION-MATRIX.md:1df4ec534da93d4a685bb5b4f605a8bec00788ca84763e458de7b5fd47d9ebde
   - README.md:16f85b2302bf066c85740daad2d90589e074499bbdb40a56c55d334329e54cfc
   - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
@@ -16,6 +16,8 @@ subjects:
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
 
 ---
+> 重审（2026-11-14）：CHANGELOG 顶尖化：补三段说明（怎么产生 / 只追加不重写 / 现状 4+1 节），并把「节序从新到旧、日期单调不增、生成器 issues 空」写成判据 test_changelog_doc_contract。
+
 > 重审（2026-11-13）：发布策略声明件顶尖化（11 步 ID 全列/冻结链 3/版本面 3/工件 4/锚 3 段 + 现状对照 / 复现；en·ja 译件同步后重签）+ 契约判据 test_release_doc_contract；权重增量重测。本轮为机械重绑。
 
 > 重审（2026-11-13）：版本矩阵文档顶尖化（修 v0.92 ⏳→✅ 与 CHANGELOG 一致 / 29 行 / 基线 repo_stats / 3 例 + 现状对照 / 复现）+ 契约判据 test_version_matrix_doc_contract；权重增量重测。本轮为机械重绑。
