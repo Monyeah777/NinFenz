@@ -426,3 +426,36 @@ conformance: 27/27
 - **AgentSkillsHub**：公开仓库 + README，表单填 Development 分类和维护者邮箱，人工审核。
 
 三份材料都已经在上面的复制块里；剩下的是浏览器登录和点提交。
+
+---
+
+> **复核（2026-11-14）**：三站教程、命令与材料包**复核不变**；补「§现状对照」把「仓库侧可核」与「平台侧未验」分开，并把自检区的期望值（MCP 测试 / conformance 27/27）逐项对到可跑的判据。
+
+## 现状对照（2026-11-14 · 仓库侧可核 / 平台侧未验）
+
+| 面 | 现值 | 复核方式 |
+|---|---|---|
+| 三处版本同值 | `packaging/npm/package.json` · `server.json` 顶层 · `server.json` 的 `packages[0].version` 均为 **1.0.5** | 三文件实读比对 |
+| npm 归属 | `mcpName = io.github.Monyeah777/ninfenz`（等于 `server.json` 的 `name`） | `packaging/npm/package.json` |
+| server.json schema | `static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json` | 该文件 `$schema` |
+| 工具面 | **12 只读工具 + 1 prompt**（`assemble_guide`），无写路径 | `desktop/src/core/mcp_runtime.py` |
+| 自检期望 | `test_mcp_packaging` + `test_mcp_runtime` 全绿；`nf conformance` **27/27** | 本地实跑 |
+| 官方 Registry 当前记录 | **平台侧未验**：Registry 是 preview、可能重置；本文不钉「已上架某版本」 | 需联网查 `?search=NinFenz` |
+| 两个第三方目录收录状态 | **平台侧未验**（Awesome PR / AgentSkillsHub 均需人工审核） | 需浏览器复核 |
+
+> 本表只作「当时 → 现行」导航；仓库侧以文件与实跑为准，平台侧状态**不进本仓判据**。
+
+## 复现与引用口径
+
+```bash
+python -m pytest desktop/tests/test_mcp_packaging.py desktop/tests/test_mcp_runtime.py -q
+python scripts/nf.py conformance                      # 期望 verdict conformant 27/27
+python -c "import json;a=json.load(open('packaging/npm/package.json',encoding='utf-8'));b=json.load(open('packaging/mcp/server.json',encoding='utf-8'));print(a['version'],b['version'],[p['version'] for p in b['packages']],a['mcpName'])"
+```
+
+```bash
+curl -s "https://registry.modelcontextprotocol.io/v0.1/servers?search=NinFenz"   # 平台侧：需联网
+```
+
+- 引用本文时：「仓库侧三处同值 + 自检绿」是**可离线复核**的；「Registry 已收录某版本」必须联网当下查。
+- 1.8「发布新版本」仍是唯一正确路径：三处版本一起改 → 发 npm → 重新 publish（只改一处必踩 `missing mcpName`）。

@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:7c35c662c0107acafdd735d0e3952bfb1af0cd5b9d5340ee4cea8193fe038d6b
+  - protocol/check12_weights.json:f48b67300716724475dfff0996cf8563946655eab1f91870e35f866bf87a338f
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:fa00a7fd014857af56e11f38ced1b7d888be053befaadb10b3dd494d27884316
   - docs/meta-cockpit/功能解析.md:de20c2340d19d541bcfde53f222a3acf22a6e440d8fb3dcf51a37aedf53c0c25
   - results/meta-cockpit-manifest.json:60c0e100798e49d393557ae5066c02d7e057ec27f386ee1a36ca3fc7740150ba
 
 ---
+> 重审（2026-11-14）：MCP 投稿教程（SUBMIT）顶尖化：补「仓库侧可核 / 平台侧未验」现状对照（三处版本同值 1.0.5 / mcpName / schema 2025-12-11 / 12 工具+1 prompt / conformance 27/27）+ 复现口径；新增判据 test_mcp_submit_doc_contract。
+
 > 重审（2026-11-14）：MCP 目录投稿文档顶尖化：补「仓库侧可核 / 平台侧未验」现状对照（server.json 1.0.5+packages 一致 / npm mcpName / 图标 400·512 真实像素 / submissions 10 件 / llms-install.md）+ 复现口径；新增判据 test_mcp_directories_doc_contract。
 
 > 重审（2026-11-14）：HF Space README 顶尖化：补 §现状对照（4 模式 / 200 KB / 180 s / 零 pip / 两段 @sha256 钉版 / EXPOSE 7860 + CMD server.py / 缺树退出码 3 / doctor 实测 17/17）+ §复现口径；新增判据 test_hf_space_readme_doc_contract。
