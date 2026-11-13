@@ -1,6 +1,6 @@
 {
   "artifacts": {
-    "docs/fde-sample/evidence/deliverable.md": "caea053441f6567b3b4a16ba85abd530f0d2d26b0f89a62b8fb1ede097074b2b",
+    "docs/fde-sample/evidence/deliverable.md": "936aeaab6e72cc4d54b2c17ea92ab8f7ce1740937b35bd2f426c04c06d9e91ce",
     "docs/fde-sample/evidence/gates.txt": "b9cecf22c5ac8c7726a2f97677c85f2f0aaaa1b2ca84a2d1a9b76af459b1e28d",
     "docs/fde-sample/evidence/result.jsonl": "373677bb4748825005368c7f183f3a4aea067b1ccbbef191fa3207a11ec9c1fa"
   },
@@ -12,7 +12,7 @@
     "standards": 370,
     "topo_len": 47
   },
-  "generated_at": "2026-09-24 19:40 +0800",
+  "generated_at": "2026-11-13 13:21 +0800",
   "inputs": {
     "community/AI系统域包/assets/CONCEPT_GRAPH.md": "bd666baaf1bc9eccc0fbd319c37e922f2dc5abba09020003e74a1ec41c321894",
     "community/AI系统域包/outputs/CONCEPT_CLOSURE.json": "31aaaeb18b7bc8e6aa5d205f62c9e2fe932bf093ae0bdb699690cba5e9903fb4",

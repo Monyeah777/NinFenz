@@ -200,6 +200,7 @@
     "test_extreme_hardening": 1.3,
     "test_face_coverage": 0.1,
     "test_fde_brief_doc_contract": 0.2,
+    "test_fde_deliverable_doc_contract": 0.3,
     "test_fde_sample_doc_contract": 0.2,
     "test_feature_lifecycle": 0.2,
     "test_fence_health": 0.2,
@@ -2292,6 +2293,9 @@
     "test_fde_brief_doc_contract.FdeBriefTest.test_brief_matches_contract": 0.0,
     "test_fde_brief_doc_contract.FdeBriefTest.test_contract_catches_mutations": 0.0,
     "test_fde_brief_doc_contract.FdeBriefTest.test_targets_live": 0.0,
+    "test_fde_deliverable_doc_contract.FdeDeliverableTest.test_contract_catches_mutations": 0.0,
+    "test_fde_deliverable_doc_contract.FdeDeliverableTest.test_deliverable_matches_contract": 0.0,
+    "test_fde_deliverable_doc_contract.FdeDeliverableTest.test_manifest_sha_live": 0.0,
     "test_fde_sample_doc_contract.FdeSampleDocTest.test_contract_catches_mutations": 0.01,
     "test_fde_sample_doc_contract.FdeSampleDocTest.test_evidence_live": 0.0,
     "test_fde_sample_doc_contract.FdeSampleDocTest.test_fde_readme_matches_contract": 0.0,
@@ -5439,5 +5443,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1886.0
+  "total_s": 1886.3
 }

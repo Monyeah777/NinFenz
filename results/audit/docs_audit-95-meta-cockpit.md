@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:cfd649d0dfe6dd03950b232d229d8feb8b4ec6366414c702820c56eb039c75d8
+  - protocol/check12_weights.json:a8285d0e6a6d2a0455bbbff69952e8c2ce7fced47a088e227f320241db41ceb3
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-13）：FDE 交付物样本顶尖化（修同页 4≠5：四道门→五道门 G1–G4+G5，改生成器后 --run 重生成；manifest sha 同步）+ 契约判据 test_fde_deliverable_doc_contract；权重增量重测。本轮为机械重绑。
+
 > 重审（2026-11-13）：FDE brief 顶尖化（诉求→判定→落点逐条复核口径 / model_agnostic 字段路径 / brief 不进门禁 / 四门+G5 澄清 / 复现）+ 契约判据 test_fde_brief_doc_contract；权重增量重测。本轮为机械重绑。
 
 > 重审（2026-11-13）：FDE 样例说明顶尖化（补 6/2/48/47/4/370 机读现状 + check32 注册点 + 现状对照 / 复现）+ 契约判据 test_fde_sample_doc_contract；权重增量重测。本轮为机械重绑。
