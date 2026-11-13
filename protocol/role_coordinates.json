@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 163,
     "support": 448,
-    "verify": 1207
+    "verify": 1208
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8825,6 +8825,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/interop.md 契约：互操作总览必须「12 种类/入仓 12 面/外部校验 14 行与实现一致」。",
+      "path": "desktop/tests/test_interop_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "互操作导出面单测（OpenAPI 3.1 / AsyncAPI 3.0 / in-toto v1 / SPDX 2.3 / CloudEvents）。",
       "path": "desktop/tests/test_interop_export.py",
       "role": "verify",
@@ -13626,7 +13632,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "293279fc290e2df508ab971d0aacdbd23d4b43fb35974094e40897063f30bfc6",
+  "root_digest": "86421c511ebe18d4cc1255b5435a61624f1c03e12a372ce88a0a2ad121d89bbe",
   "rule_counts": {
     "R-app": 1466,
     "R-catch": 296,
@@ -13635,7 +13641,7 @@
     "R-prod": 944,
     "R-projection": 143,
     "R-support": 124,
-    "R-verify": 1081,
+    "R-verify": 1082,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
