@@ -310,6 +310,7 @@
     "test_load_state": 0.1,
     "test_local_api_doc_contract": 0.3,
     "test_locales": 0.2,
+    "test_locales_doc_contract": 0.2,
     "test_lsp": 2.9,
     "test_lsp_guard": 0.2,
     "test_lsp_hardening": 0.2,
@@ -3210,6 +3211,9 @@
     "test_locales.RegistryTest.test_missing_codeowner_is_caught": 0.01,
     "test_locales.RegistryTest.test_real_registry_is_declared": 0.0,
     "test_locales.RegistryTest.test_undeclared_docs_locale_file_is_caught": 0.01,
+    "test_locales_doc_contract.LocalesDocTest.test_contract_catches_mutations": 0.0,
+    "test_locales_doc_contract.LocalesDocTest.test_locales_matches_contract": 0.0,
+    "test_locales_doc_contract.LocalesDocTest.test_registry_live": 0.0,
     "test_lsp.TestCapabilities.test_declares_editor_surface": 0.0,
     "test_lsp.TestCapabilities.test_root_uri_adopted_only_within_launch_root": 0.0,
     "test_lsp.TestClientConfig.test_each_editor_config_names_repo_and_entry": 0.0,
@@ -5475,5 +5479,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 1888.7
+  "total_s": 1888.9
 }
