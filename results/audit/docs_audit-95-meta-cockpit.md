@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:4b23f9a35c6170397622240ea4b2d02c94784f791a16bdb9b47ec4f9d2aadd1b
+  - protocol/check12_weights.json:5580c1b8f1cb3d76b2fe75dbbaa39584f003ed67f3ae6de2e9069794d12e3628
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-13）：图书馆机器面文档顶尖化（补 3 件全 active / 分级 3-of-3 / 许可 2+1 / 词表 4 值 / verify 绿 + 现状对照 / 复现）+ 契约判据 test_library_doc_contract；权重增量重测。本轮为机械重绑。
+
 > 重审（2026-11-13）：抽象阶梯文档顶尖化（生成区外补现状对照：4 阶/5 子级/4 入口/6 纵切/7 派生/2 退役/10 规则/27+19 例 + 复现；生成区未手改）+ 契约判据 test_layers_doc_contract；权重增量重测。本轮为机械重绑。
 
 > 重审（2026-11-13）：双源知识层文档顶尖化（补 6 源·3+3 / 可见性 4+2 / order 6 / M23 / lint 绿 / usage total 0 / 35+10 例 + 现状对照 / 复现）+ 契约判据 test_knowledge_doc_contract；权重增量重测。本轮为机械重绑。
