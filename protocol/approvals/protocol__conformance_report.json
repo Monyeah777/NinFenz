@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-14",
   "approved_by": "Monyeah777",
-  "note": "NF-Final WP-0H（independence 报告重算后冻结）",
+  "note": "NF-Final WP-0A 产品发现/GTM/访谈计划（假设全 unverified，外部验证挂 OPEN）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "abab87ea3266b4bf17f2b3b2fb5ed882822bdc63bc6ee1bb568ad3af88502c32"
+  "subject_digest": "402525a31c0e6086e80db1991631f5555a9cd3ceafb6c590036a0e59f150d762"
 }
