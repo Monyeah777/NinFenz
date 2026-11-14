@@ -18,6 +18,7 @@ from pathlib import Path
 from core import json_doc, json_schema
 from core.trust import anchor as ta
 from core.trust import bundle as tb
+from core.trust import human_review as hrev
 from core.trust import signature as tsig
 from core.trust.canonical import digest_of, is_digest
 
@@ -116,7 +117,7 @@ def _missing_issues(codes: list) -> list:
 def verify(bundle: dict, policy: dict, root: str = ".", anchor: dict | None = None,
            anchor_verifiers: dict | None = None, head_signature: dict | None = None,
            registry: dict | None = None, material: dict | None = None,
-           now: str | None = None) -> dict:
+           now: str | None = None, human_review: dict | None = None) -> dict:
     """验证 claim bundle：返回 {"report","decision","exit_code"}（不打印、不退出）。
 
     head_signature 给了就核链头签名（nf-chain-head/1 + DSSE + registry）→ signature 事实；
@@ -189,11 +190,37 @@ def verify(bundle: dict, policy: dict, root: str = ".", anchor: dict | None = No
     else:
         checks.append({"id": "A1-head-signature", "ok": False,
                        "detail": "未提供链头签名；T1 及以上只报缺项，不冒充等级"})
+    review_state = hrev.STATE_PENDING
+    review_issues: list = []
+    if human_review is not None and registry and isinstance(material, dict):
+        try:
+            envelope_schema = json_doc.load(
+                Path(root) / "protocol/trust/dsse.schema.json", dict, what="dsse schema")
+        except (OSError, ValueError):
+            envelope_schema = None
+        reviewed = hrev.verify_review(human_review, "bundle", subject_digest, registry,
+                                      material, envelope_schema, now=now, root=root)
+        review_state = hrev.review_state(reviewed)
+        review_detail = f"human review state={review_state}"
+        if reviewed.get("reason"):
+            review_detail += f"（{reviewed.get('reason')}）"
+        checks.append({"id": "A4-human-review",
+                       "ok": review_state == hrev.STATE_APPROVED,
+                       "detail": review_detail})
+        if review_state in (hrev.STATE_REJECTED, hrev.STATE_ESCALATED, hrev.STATE_INVALID):
+            review_issues.append({"code": str(reviewed.get("reason") or "REVIEW-INVALID"),
+                                  "message": f"人类复核未通过（state={review_state}）",
+                                  "fix": "重走复核并签 approve，或不要附上被拒记录"})
+    else:
+        checks.append({"id": "A4-human-review", "ok": False,
+                       "detail": "human review state=PENDING"
+                                 "（未提供复核记录；PENDING 不等于通过）"})
     decision = decide(facts, required, policy_ok=policy_ok)
     decision["required"] = required
     issues = _missing_issues(decision["missing"])
     issues.extend(anchor_issues)
     issues.extend(signature_issues)
+    issues.extend(review_issues)
     if not hash_ok:
         issues.insert(0, {"code": "BUNDLE-INVALID",
                           "message": "bundle 自洽性校验失败（" +

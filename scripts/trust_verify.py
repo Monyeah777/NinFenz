@@ -27,6 +27,7 @@ from core.trust import anchor as ta  # noqa: E402
 from core.trust import context_lineage as tcl  # noqa: E402
 from core.trust import dsse  # noqa: E402
 from core.trust import entity as te  # noqa: E402
+from core.trust import human_review as hrev  # noqa: E402
 from core.trust import keys as tk  # noqa: E402
 from core.trust import model_card as tmc  # noqa: E402
 from core.trust import verify as tv  # noqa: E402
@@ -149,6 +150,12 @@ def main(argv=None) -> int:
                     help="只校验 context lineage（可配 --model-card 绑定）")
     ap.add_argument("--lineage-build", default="", help="构建模式：输出 lineage 文件路径")
     ap.add_argument("--contexts", default="", help="构建模式输入：[{role, content_b64}] JSON")
+    ap.add_argument("--human-review", default="", help="人类复核记录信封（nf-dsse/1）")
+    ap.add_argument("--review-gate", action="store_true",
+                    help="复核闸门：无记录时显式 PENDING exit2")
+    ap.add_argument("--subject-kind", default="bundle",
+                    help="复核绑定的对象类别")
+    ap.add_argument("--subject-digest", default="", help="复核绑定的对象摘要")
     ap.add_argument("--root", default=str(ROOT), help="仓库根（读冻结 schema 用）")
     ap.add_argument("--json", action="store_true", help="输出 nf-verify/1 报告 JSON")
     ap.add_argument("--out", default="", help="把报告写入文件（原子写）")
@@ -164,6 +171,33 @@ def main(argv=None) -> int:
     ap.add_argument("--witness-material", default="", help="witness hmac 材料 {id: hex}")
     ap.add_argument("--sth-material", default="", help="STH hmac 材料 {log_id: hex}")
     args = ap.parse_args(argv)
+    if args.review_gate or args.human_review:
+        if not args.human_review:
+            print("human review state: PENDING（未提供记录；PENDING 不等于通过）")
+            return tv.EXIT_UNDECIDABLE
+        if not args.subject_digest:
+            print("不可判定：复核模式需要 --subject-digest", file=sys.stderr)
+            return tv.EXIT_UNDECIDABLE
+        if not args.issuer_registry or not args.key_material or not args.now:
+            print("不可判定：复核模式需要 --issuer-registry/--key-material/--now",
+                  file=sys.stderr)
+            return tv.EXIT_UNDECIDABLE
+        try:
+            envelope = _load(args.human_review, "human review")
+            registry_doc = tk.load_registry(args.issuer_registry)
+            material_doc = json_doc.load(Path(args.key_material), dict, what="key material")
+        except (OSError, ValueError) as exc:
+            print(f"不可判定：{exc}", file=sys.stderr)
+            return tv.EXIT_UNDECIDABLE
+        result = hrev.verify_review(envelope, args.subject_kind, args.subject_digest,
+                                    registry_doc, material_doc, now=args.now,
+                                    root=args.root)
+        state = hrev.review_state(result)
+        print(f"human review state: {state}"
+              + (f"（{result.get('reason')}）" if result.get("reason") else ""))
+        if state == hrev.STATE_APPROVED:
+            return 0
+        return 1
     if args.lineage_build:
         if not args.model_card or not args.contexts:
             print("不可判定：--lineage-build 需要 --model-card 与 --contexts", file=sys.stderr)

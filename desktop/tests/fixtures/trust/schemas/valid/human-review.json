@@ -1,0 +1,13 @@
+{
+  "schema": "nf-human-review/1",
+  "subject_kind": "bundle",
+  "subject_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "decision": "approve",
+  "reviewer": {
+    "issuer_id": "nf:reviewer:alice",
+    "keyid": "nf:reviewer:alice:2026",
+    "kind": "human"
+  },
+  "rationale": "spot-checked evidence and reproduction steps",
+  "reviewed_at": "2026-11-14T00:00:00Z"
+}

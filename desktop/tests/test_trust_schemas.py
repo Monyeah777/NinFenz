@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Trust Fabric schema 门禁（WP-01/21/23/30/31/32）：12 件 IDL、正/反样例与变异自证。
+"""Trust Fabric schema 门禁（WP-01/21/23/30/31/32/33）：13 件 IDL、正/反样例与变异自证。
 
 判据（计划 §7.2 数据与协议 / §12.2 禁止项 / §14.3 DoD）：
-1. 12 件 trust schema 在 protocol/trust/，文件名、$id、数据版本名（nf-xxx/1）三者一致；
+1. 13 件 trust schema 在 protocol/trust/，文件名、$id、数据版本名（nf-xxx/1）三者一致；
 2. 每件有正样例（过）与反样例（拒），且反例失败原因命中预期（不是碰巧被拒）；
 3. 变异自证：弱化 additionalProperties / pattern / minItems 后，对应负例必须变绿
    —— 证明测试不是同义反复；
@@ -43,6 +43,7 @@ SCHEMAS = {
     "type-registry.schema.json": ("type-registry.json", "nf-type-registry/1"),
     "model-card.schema.json": ("model-card.json", "nf-model-card/1"),
     "context-lineage.schema.json": ("context-lineage.json", "nf-context-lineage/1"),
+    "human-review.schema.json": ("human-review.json", "nf-human-review/1"),
 }
 
 #: 反例文件 → (对应 schema, 期望错误片段)。片段取自 core.json_schema 的错误消息（固定文案）。
@@ -74,6 +75,8 @@ INVALID_CASES = {
     "model-card-bad-digest.json": ("model-card.schema.json", "不匹配 pattern"),
     "context-lineage-bad-head.json": ("context-lineage.schema.json", "不匹配 pattern"),
     "context-lineage-missing-prev.json": ("context-lineage.schema.json", "缺必填字段"),
+    "human-review-bad-decision.json": ("human-review.schema.json", "不在枚举内"),
+    "human-review-not-human.json": ("human-review.schema.json", "应为常量"),
 }
 
 try:  # 可选对照依赖（pyproject ci extra）；核心运行面不依赖它
@@ -109,15 +112,15 @@ def _walk(node, key):
 
 
 class TrustSchemaMetaTest(unittest.TestCase):
-    """12 件 schema 的元结构与计划不变量。"""
+    """13 件 schema 的元结构与计划不变量。"""
 
     @classmethod
     def setUpClass(cls):
         cls.docs = {name: _read(SCHEMA_DIR / name) for name in SCHEMAS}
 
-    def test_all_twelve_present_and_exact(self):
+    def test_all_thirteen_present_and_exact(self):
         on_disk = sorted(p.name for p in SCHEMA_DIR.glob("*.json"))
-        self.assertEqual(sorted(SCHEMAS), on_disk, "protocol/trust 的 schema 集合必须恰为 12 件")
+        self.assertEqual(sorted(SCHEMAS), on_disk, "protocol/trust 的 schema 集合必须恰为 13 件")
 
     def test_id_schema_and_versioned_name(self):
         for name, (_sample, versioned) in SCHEMAS.items():
@@ -198,6 +201,14 @@ class TrustSchemaMetaTest(unittest.TestCase):
         doc = self.docs["process.schema.json"]
         self.assertEqual(1, doc["properties"]["step"]["minimum"])
         self.assertIn("prev", doc["required"])
+
+    def test_human_review_invariants(self):
+        doc = self.docs["human-review.schema.json"]
+        self.assertEqual("human",
+                         doc["properties"]["reviewer"]["properties"]["kind"]["const"])
+        self.assertEqual(["approve", "reject", "escalate"],
+                         doc["properties"]["decision"]["enum"])
+        self.assertIn("rationale", doc["required"])
 
     def test_context_lineage_invariants(self):
         doc = self.docs["context-lineage.schema.json"]

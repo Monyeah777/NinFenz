@@ -5,8 +5,8 @@
     "floor": 5,
     "prod": 1057,
     "projection": 167,
-    "support": 477,
-    "verify": 1344
+    "support": 479,
+    "verify": 1348
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7421,6 +7421,18 @@
       "rule": "R-verify"
     },
     {
+      "function": "nf-human-review/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/human-review-bad-decision.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-human-review/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/human-review-not-human.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "nf-issuer-registry/1",
       "path": "desktop/tests/fixtures/trust/schemas/invalid/keys-bad-keyid.json",
       "role": "verify",
@@ -7537,6 +7549,12 @@
     {
       "function": "nf-entity/1",
       "path": "desktop/tests/fixtures/trust/schemas/valid/entity.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-human-review/1",
+      "path": "desktop/tests/fixtures/trust/schemas/valid/human-review.json",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -11237,6 +11255,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "trust.human_review 判据：签名人类复核 + PENDING≠通过 + registry 生命周期（FR-A4-05）。",
+      "path": "desktop/tests/test_trust_human_review.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "trust.keys 判据：issuer registry 结构/语义 + 生命周期解析 + 注册表口径验签。",
       "path": "desktop/tests/test_trust_keys.py",
       "role": "verify",
@@ -11255,7 +11279,7 @@
       "rule": "R-verify"
     },
     {
-      "function": "Trust Fabric schema 门禁（WP-01/21/23/30/31/32）：12 件 IDL、正/反样例与变异自证。",
+      "function": "Trust Fabric schema 门禁（WP-01/21/23/30/31/32/33）：13 件 IDL、正/反样例与变异自证。",
       "path": "desktop/tests/test_trust_schemas.py",
       "role": "verify",
       "rule": "R-verify"
@@ -14448,16 +14472,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "7e8365e6e26af89ff84d95f00b588c7369b824d642421b1ef34670891dc59319",
+  "root_digest": "f90ffec5c5ae109f2b1c3f1474b4568468ab600019e21374883df1676fa976bb",
   "rule_counts": {
     "R-app": 1468,
-    "R-catch": 325,
+    "R-catch": 327,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 147,
     "R-support": 124,
-    "R-verify": 1218,
+    "R-verify": 1222,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

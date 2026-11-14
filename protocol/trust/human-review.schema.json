@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/trust/human-review.schema.json",
+  "title": "nf-human-review/1 人类复核记录（FR-A4-05）",
+  "description": "人类复核必须是可独立验签的记录：reviewer.kind=human、decision=approve/reject/escalate、绑定被复核对象摘要。缺失记录 = PENDING，不得冒充通过。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "subject_kind", "subject_digest", "decision", "reviewer", "rationale", "reviewed_at"],
+  "properties": {
+    "schema": {"const": "nf-human-review/1"},
+    "subject_kind": {"enum": ["bundle", "claim", "card", "event", "evidence"]},
+    "subject_digest": {"$ref": "#/$defs/digest"},
+    "decision": {"enum": ["approve", "reject", "escalate"]},
+    "reviewer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["issuer_id", "keyid", "kind"],
+      "properties": {
+        "issuer_id": {"type": "string", "pattern": "^nf:[a-z0-9-]+:[a-z0-9-]+$", "maxLength": 96},
+        "keyid": {"type": "string", "pattern": "^nf:[a-z0-9-]+:[a-z0-9-]+:[a-z0-9-]+$", "maxLength": 128},
+        "kind": {"const": "human"}
+      }
+    },
+    "rationale": {"type": "string", "minLength": 1, "maxLength": 2000},
+    "reviewed_at": {"$ref": "#/$defs/timestamp"}
+  },
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "timestamp": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"}
+  }
+}

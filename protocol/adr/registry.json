@@ -146,7 +146,10 @@
         "desktop/tests/test_trust_model_card.py",
         "protocol/trust/context-lineage.schema.json",
         "desktop/src/core/trust/context_lineage.py",
-        "desktop/tests/test_trust_context_lineage.py"
+        "desktop/tests/test_trust_context_lineage.py",
+        "protocol/trust/human-review.schema.json",
+        "desktop/src/core/trust/human_review.py",
+        "desktop/tests/test_trust_human_review.py"
       ],
       "falsifier": "若未知 type/issuer/算法被默认放行且验证结论仍为通过，则本裁决失效。"
     },

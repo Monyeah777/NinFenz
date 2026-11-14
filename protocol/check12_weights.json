@@ -611,6 +611,7 @@
     "test_trust_entity": 0.2,
     "test_trust_gate45": 0.5,
     "test_trust_gate46": 0.3,
+    "test_trust_human_review": 0.2,
     "test_trust_keys": 0.4,
     "test_trust_model_card": 0.5,
     "test_trust_process": 0.2,
@@ -5688,6 +5689,20 @@
     "test_trust_gate46.MutationRedTest.test_weak_registry_lifecycle_is_caught": 0.0,
     "test_trust_gate46.MutationRedTest.test_weak_signature_binding_is_caught": 0.0,
     "test_trust_gate46.RealRepoTest.test_clean_and_deterministic": 0.0,
+    "test_trust_human_review.StatementTest.test_statement_rejections": 0.0,
+    "test_trust_human_review.StatementTest.test_statement_schema": 0.0,
+    "test_trust_human_review.VerifyIntegrationTest.test_approved_review_check": 0.0,
+    "test_trust_human_review.VerifyIntegrationTest.test_pending_is_not_pass": 0.01,
+    "test_trust_human_review.VerifyIntegrationTest.test_rejected_review_adds_issue": 0.0,
+    "test_trust_human_review.VerifyTest.test_approve_ok": 0.0,
+    "test_trust_human_review.VerifyTest.test_cli_review_mode": 0.0,
+    "test_trust_human_review.VerifyTest.test_lifecycle_fail_closed": 0.0,
+    "test_trust_human_review.VerifyTest.test_missing_review_is_pending": 0.0,
+    "test_trust_human_review.VerifyTest.test_mutation_shows_decision_check_is_semantic": 0.0,
+    "test_trust_human_review.VerifyTest.test_payload_type_tamper": 0.0,
+    "test_trust_human_review.VerifyTest.test_reject_and_escalate_are_not_approval": 0.0,
+    "test_trust_human_review.VerifyTest.test_reviewer_must_be_human": 0.0,
+    "test_trust_human_review.VerifyTest.test_subject_binding": 0.0,
     "test_trust_keys.CliRegistryTest.test_cli_valid_and_revoked": 0.15,
     "test_trust_keys.RegistrySchemaTest.test_rotation_chain_passes": 0.0,
     "test_trust_keys.RegistrySchemaTest.test_schema_const": 0.0,
@@ -6056,5 +6071,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2130.2
+  "total_s": 2130.4
 }
