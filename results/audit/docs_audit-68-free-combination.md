@@ -10,12 +10,14 @@ subjects:
   - desktop/src/core/quality_depth_scan.py:563059e8a929bbbba16d5d15a9c77d1f362f9518351860b5ca0682aeb07a23f9
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - scripts/nf.py:29e1170dab08764e3970d90d64b57495bbd74dd256ebe7744db688a66b77aace
-  - protocol/data_contracts.json:d645602695bd2fd02fa3db5739034d28ffd549d922806c40f93e3271b6a67c49
+  - protocol/data_contracts.json:0e883c67944fb1db6fe59f1d4bda86b60c39a9a0a4395a295b1e31449fa22e71
   - docs/combos.md:4f5b22bf353a07ff439e44596bd44bea74e7c95d8a811c8ddde17f42f8fbc45c
   - desktop/tests/test_pack_combo.py:38d6fbc122264bcd205e6d5cb8baac1a1a581f1cb8a43da2c12691e57314b0a6
   - community/校园西幻轻混组合包/protocol.yaml:093cc817ae089981b7cfe4aaf57ec7f5d2374455bb63fc8b7af06dc2d29a02a3
 
 ---
+> 重审（2026-11-14）：NF-Final G1 收口：新增 results/{G1_DOD.md,g1_dod.json}、test_g1_dod.py；assertions/data_contracts/check12/code_metrics 更新，被审对象变更后机械重绑
+
 > 重审（2026-11-14）：NF-Final WP-12：新增 core/context_packer.py、docs/context-packer.md、test_context_packer_contract.py；nf wiki context --role 接入；independence/code_metrics/check12 更新，被审对象变更后机械重绑
 
 > 重审（2026-11-14）：NF-Final WP-11：新增 core/spec_compiler.py、spec/intents/sample-document.json、docs/spec-compiler.md、test_spec_compiler_contract.py、nf spec compile；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑

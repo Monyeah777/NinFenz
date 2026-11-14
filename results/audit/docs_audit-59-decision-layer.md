@@ -9,7 +9,7 @@ subjects:
   - verify.sh:3391c203ca4c17a56e0177ce6292239570ff367ee7fce6d08f19777f5ca54c8e
   - protocol/decision_layer.json:9330d4057f07647d67f15daa6f37c84913834b7eed65f4e360bf5c7c413e5e06
   - protocol/normative.json:c1bbc14c92cea6bd66ff6cb54fdcf91bf3072f66adee7027f1d3f42e70fe1825
-  - protocol/data_contracts.json:d645602695bd2fd02fa3db5739034d28ffd549d922806c40f93e3271b6a67c49
+  - protocol/data_contracts.json:0e883c67944fb1db6fe59f1d4bda86b60c39a9a0a4395a295b1e31449fa22e71
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/receipts.py:b748915bb519aeeb1aa0f7d367df2eb7d4321b369b85905a7f918d8d55d96363
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
@@ -19,6 +19,8 @@ subjects:
   - docs/decision-layer.md:cd3a254de738ece7c8f07db36904c74484e4622c58f688a3973c8998b441628c
 
 ---
+> 重审（2026-11-14）：NF-Final G1 收口：新增 results/{G1_DOD.md,g1_dod.json}、test_g1_dod.py；assertions/data_contracts/check12/code_metrics 更新，被审对象变更后机械重绑
+
 > 重审（2026-11-14）：NF-Final WP-13：verify.sh 新增 check43/44（Wiki/Spec），quality_baseline 常数 49/PASS=89、CHECK_LABEL；README/CHANGELOG/VERSION-MATRIX/CONFORMANCE/verification-cards/llms/repo_stats/SELF_AUDIT/interop 重新生成
 
 > 重审（2026-11-14）：NF-Final WP-12：新增 core/context_packer.py、docs/context-packer.md、test_context_packer_contract.py；nf wiki context --role 接入；independence/code_metrics/check12 更新，被审对象变更后机械重绑

@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-14",
   "approved_by": "Monyeah777",
-  "note": "NF-Final G1 WP-13（能力索引覆盖 check43/44）",
+  "note": "NF-Final G1 QG1 收口（verdict pass-with-open-items，P0=0）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "8351e78dec93dccd7c6bf72df679bd5fd7384cc4539efec7d75c8a94b0d754fa"
+  "subject_digest": "98a43e9480f5c64095f156412d1b10749228ffbf91dd404f4d3ba577af189bb5"
 }

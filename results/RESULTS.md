@@ -24,6 +24,7 @@
 - [reverse/PEER_DIFF.md](reverse/PEER_DIFF.md)（§4A R5 同行差分：6 项对照、借/不造边界、3 条影响设计的决策 D-PD-01…03；机读 `reverse/peers.json`，判据 `test_reverse_peers.py`）
 - [reverse/INVARIANTS.md](reverse/INVARIANTS.md)（§4A R6 不变量：7 层 14 条，tested 6 / covered-by-existing 4 / unobservable 4（挂 G1/G2）；机读 `reverse/invariants.json`，判据+执行器 `test_reverse_invariants.py`）
 - [G0_DOD.md](G0_DOD.md)（G0 DoD 收口审计：§14.3 八条 + Gate 级判据；verdict=pass-with-open-items、P0 阻断=0；机读 `g0_dod.json`，判据 `test_g0_dod.py`）
+- [G1_DOD.md](G1_DOD.md)（G1 QG1 收口审计：§14.3 八条 + §11.2 WP-10…13 + QG1 + L3 packer 指标；verdict=pass-with-open-items、P0=0 → G2；机读 `g1_dod.json`，判据 `test_g1_dod.py`）
 - [../docs/wiki.md](../docs/wiki.md) · [../wiki/llms.txt](../wiki/llms.txt)（G1 WP-10 LLMWiki 编译器：133 页投影 + pages/index/graph/llms/MCP 三入口；`nf wiki build/check/get/search/related/context`，判据 `test_wiki_compiler_contract.py`）
 - [../docs/spec-compiler.md](../docs/spec-compiler.md) · [intents/sample-document.json](../spec/intents/sample-document.json)（G1 WP-11 Spec Compiler：intent→nf-spec/1→nf-task/1，确定性/拒绝未知/任务图无环；`nf spec compile`，判据 `test_spec_compiler_contract.py`）
 - [../docs/context-packer.md](../docs/context-packer.md)（G1 WP-12 Context Packer：角色隔离 author/reviewer/governance、预算硬上限、citations 100%、注入检出/清除；`nf wiki context --role`，判据 `test_context_packer_contract.py`）
