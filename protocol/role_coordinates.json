@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1483,
+    "app": 1485,
     "entry": 26,
     "floor": 5,
-    "prod": 1059,
+    "prod": 1060,
     "projection": 178,
-    "support": 500,
-    "verify": 1398
+    "support": 502,
+    "verify": 1402
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -5687,6 +5687,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "可访问性（`nf-a11y/1`）：WCAG 2.2 适用子集 + PAIR/HAX 人因 + 可用性测试模板。",
+      "path": "desktop/src/core/accessibility.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "架构裁决记录（nf-adr/1）+ 文档台账（nf-doc-ledger/1）：把「裁决」做成可校验数据。",
       "path": "desktop/src/core/adr.py",
       "role": "verify",
@@ -6253,6 +6259,12 @@
     {
       "function": "接力协议门禁（SBAR：情境 → 背景 → 评估 → 建议 + 未决项）。",
       "path": "desktop/src/core/handover.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "语言面判据（`nf-i18n/1`）：locale 覆盖 + 文档译件镜像 + 时区口径 + bidi/零宽控制字符闸门。",
+      "path": "desktop/src/core/i18n_checks.py",
       "role": "verify",
       "rule": "auto:R-core"
     },
@@ -7753,6 +7765,12 @@
     {
       "function": "nf-verify/1",
       "path": "desktop/tests/fixtures/trust/schemas/valid/verify.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "可访问性 + 本地化契约（NF-Final WP-0E，P1 盲区 BL-08/BL-09）。",
+      "path": "desktop/tests/test_a11y_i18n_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -14219,6 +14237,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "NF-Final §3A D10 机读登记（WP-0E）：可访问性（WCAG 2.2 适用子集）+ 人因（PAIR/HAX）+ 可用性测试模板。原则：CLI/TUI/文档面逐条对照，不声称 WCAG 合规/认证；不适用项必须写理由。判据 desktop/tests/test_a11y_i18n_contract.py。",
+      "path": "protocol/accessibility.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "NF-Final §3A D06 机读登记（WP-0F）：AI 面范围 + 影响评估 + 模型风险登记 + 监管映射 + 人类监督。原则：本仓是 AI 辅助的内容生产/装配系统，不是 AI 平台；**只做机制对照，不声称合规/认证**。判据 desktop/tests/test_ai_eval_contract.py。",
       "path": "protocol/ai_governance.json",
       "role": "verify",
@@ -14407,6 +14431,12 @@
     {
       "function": "交接协议（机制借鉴 SBAR/ISBAR：情境 → 背景 → 评估 → 建议 的结构化交接）。要解决的是「接手的人/agent 拿到一堆材料却不知道现在什么状态、下一步干什么」。判据硬约束：**空未决项 = 不合格交接**——没有未决就是没交接，只是总结。",
       "path": "protocol/handover.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "NF-Final §3A D11 机读登记（WP-0E）：语言面（zh/en/ja）+ 文档译件覆盖 + 时区/日历 + RTL/bidi 策略 + Unicode 控制字符闸门。真源 = protocol/locales.json（文件即真源 + source_sha256），本件只加策略与判据；不声称完整 i18n/RTL 支持。判据 desktop/tests/test_a11y_i18n_contract.py。",
+      "path": "protocol/i18n.json",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -14784,17 +14814,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "03230d65ebd750dd98285c726073207fddd1866c83b4237aef7a5f05e6b8a173",
+  "root_digest": "a62d4685cfa6fd80d7c22e33da93ab57270fae02ea37523963569de13859fd1b",
   "rule_counts": {
-    "R-app": 1483,
-    "R-catch": 347,
+    "R-app": 1485,
+    "R-catch": 349,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 157,
     "R-support": 124,
-    "R-verify": 1270,
-    "auto:R-core": 293
+    "R-verify": 1273,
+    "auto:R-core": 295
   },
   "schema": "nf-role-coordinates/1"
 }

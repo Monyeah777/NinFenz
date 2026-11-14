@@ -1,0 +1,48 @@
+{
+  "schema": "nf-i18n/1",
+  "note": "NF-Final §3A D11 机读登记（WP-0E）：语言面（zh/en/ja）+ 文档译件覆盖 + 时区/日历 + RTL/bidi 策略 + Unicode 控制字符闸门。真源 = protocol/locales.json（文件即真源 + source_sha256），本件只加策略与判据；不声称完整 i18n/RTL 支持。判据 desktop/tests/test_a11y_i18n_contract.py。",
+  "canonical": "zh",
+  "registry": "protocol/locales.json",
+  "locales": [
+    {"id": "zh", "entry": "README.md", "coverage": "entry+guides"},
+    {"id": "en", "entry": "README.en.md", "coverage": "entry+guides"},
+    {"id": "ja", "entry": "README.ja.md", "coverage": "entry+guides"}
+  ],
+  "docs_translations": {
+    "mirror_rule": "每个 docs/<lang>/<name>.md 必须有 zh 源件 docs/<name>.md，且登记 source_sha256；源件一改译件即过期（nf locales 判据）",
+    "min_doc_pairs": 6,
+    "evidence": "desktop/src/core/locales.py"
+  },
+  "timezone": {
+    "safety_timestamps": "UTC ISO-8601 秒级（Z 结尾）——安全时间只信 TSA/UTC，不信本机本地时间",
+    "display": "本地显示可由使用者按系统时区转换；仓内证据一律 UTC",
+    "tzdb": "依赖系统 tz 数据库；不捆绑 tzdata（避免时区表陈旧成为供应链面）",
+    "evidence": "desktop/src/core/iso8601.py"
+  },
+  "rtl": {
+    "current_rtl_locales": [],
+    "policy": "新增 RTL locale 前必须过 bidi 控制字符扫描（U+202A-202E / U+2066-2069 / U+200E-F）+ RTL 渲染测试；当前无 RTL locale，因此 RTL 渲染属 planned",
+    "banned_codepoints": ["U+202A", "U+202B", "U+202C", "U+202D", "U+202E",
+                          "U+2066", "U+2067", "U+2068", "U+2069", "U+200E", "U+200F"],
+    "evidence": "desktop/src/core/i18n_checks.py"
+  },
+  "unicode": {
+    "normalization": "标识符/比较前用 NFC（避免同形不同码点被当不同 id）",
+    "forbidden_controls": "bidi 控制字符 + 零宽字符（U+200B/U+200C/U+200D/U+FEFF）不得出现在语言面正文",
+    "scan_surfaces": ["docs/en/", "docs/ja/"],
+    "evidence": "desktop/src/core/i18n_checks.py"
+  },
+  "coverage_metrics": {
+    "locales_min": 3,
+    "doc_pairs_min": 6,
+    "entries_min": 3
+  },
+  "review": {
+    "owner": "@Monyeah777",
+    "cadence": "新增语言/译件/时区或 RTL 策略变更时",
+    "claims_boundary": [
+      "不声称完整 i18n/RTL 支持；当前无 RTL locale",
+      "外部语言服务（ISO 17100）未使用：译件为仓内维护，不冒充专业翻译"
+    ]
+  }
+}

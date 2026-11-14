@@ -688,6 +688,36 @@
       "message": "法务/开源治理登记缺失或版本名不符（WP-0C 判据依赖它）",
       "fix": "补/修 protocol/legal.json；再跑 python scripts/legal_audit.py",
       "evidence": "test_legal_contract / conformance::modeling"
+    },
+    {
+      "id": "a11y-registry",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "protocol/accessibility.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-a11y/1"
+      },
+      "message": "可访问性登记缺失或版本名不符（WP-0E 判据依赖它）",
+      "fix": "补/修 protocol/accessibility.json；再跑 desktop/tests/test_a11y_i18n_contract.py",
+      "evidence": "test_a11y_i18n_contract / conformance::modeling"
+    },
+    {
+      "id": "i18n-registry",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "protocol/i18n.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-i18n/1"
+      },
+      "message": "语言面登记缺失或版本名不符（WP-0E 判据依赖它）",
+      "fix": "补/修 protocol/i18n.json；再跑 desktop/tests/test_a11y_i18n_contract.py",
+      "evidence": "test_a11y_i18n_contract / conformance::modeling"
     }
   ]
 }

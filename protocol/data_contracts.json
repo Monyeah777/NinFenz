@@ -771,6 +771,32 @@
         "LEGAL.md",
         "GOVERNANCE.md"
       ]
+    },
+    {
+      "id": "a11y-registry",
+      "artifact": "protocol/accessibility.json",
+      "quality_rule": "assertion:a11y-registry",
+      "owner": "可访问性/人因（core/accessibility.py + test_a11y_i18n_contract）+ WP-0E",
+      "status": "active",
+      "freshness": "改 WCAG/人因/测试模板须同步 protocol/accessibility.json 与 A11Y.md/docs/a11y/A11Y_QA.md",
+      "consumers": [
+        "test_a11y_i18n_contract",
+        "A11Y.md",
+        "docs/a11y/A11Y_QA.md"
+      ]
+    },
+    {
+      "id": "i18n-registry",
+      "artifact": "protocol/i18n.json",
+      "quality_rule": "assertion:i18n-registry",
+      "owner": "语言面（core/i18n_checks.py + test_a11y_i18n_contract）+ WP-0E",
+      "status": "active",
+      "freshness": "改覆盖/时区/RTL 策略须同步 protocol/i18n.json 与 I18N.md/docs/i18n/I18N_QA.md；译件用 nf locales --write 重签",
+      "consumers": [
+        "test_a11y_i18n_contract",
+        "I18N.md",
+        "protocol/locales.json"
+      ]
     }
   ]
 }

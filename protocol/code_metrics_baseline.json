@@ -10,6 +10,11 @@
       "max_fn_cc": 8,
       "max_fn_lines": 19
     },
+    "desktop/src/core/accessibility.py": {
+      "lines": 139,
+      "max_fn_cc": 41,
+      "max_fn_lines": 67
+    },
     "desktop/src/core/adr.py": {
       "lines": 192,
       "max_fn_cc": 27,
@@ -579,6 +584,11 @@
       "lines": 267,
       "max_fn_cc": 8,
       "max_fn_lines": 28
+    },
+    "desktop/src/core/i18n_checks.py": {
+      "lines": 186,
+      "max_fn_cc": 53,
+      "max_fn_lines": 74
     },
     "desktop/src/core/impact_check.py": {
       "lines": 222,
