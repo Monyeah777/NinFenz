@@ -12,7 +12,7 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:142a9157504702fa03498494dc452ae2fbb8cfbfcce836992b1d59d1078755e4
-  - protocol/code_metrics_baseline.json:ab41b73ac8269cd95572cd14c627f11b6307c7e0256dfa5c7abc42fa6db9915d
+  - protocol/code_metrics_baseline.json:fc81583bba765d6c91645087f69635cd000eccfb5e5a29dda158e465569a61f5
 ---
 > 重审（2026-11-14）：WP-15 check45 接线与 G1 收口（机械重绑）
 

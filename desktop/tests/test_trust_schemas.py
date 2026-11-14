@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Trust Fabric schema 门禁（WP-01/21/23）：9 件 IDL、正/反样例与变异自证。
+"""Trust Fabric schema 门禁（WP-01/21/23/30）：10 件 IDL、正/反样例与变异自证。
 
 判据（计划 §7.2 数据与协议 / §12.2 禁止项 / §14.3 DoD）：
-1. 9 件 trust schema 在 protocol/trust/，文件名、$id、数据版本名（nf-xxx/1）三者一致；
+1. 10 件 trust schema 在 protocol/trust/，文件名、$id、数据版本名（nf-xxx/1）三者一致；
 2. 每件有正样例（过）与反样例（拒），且反例失败原因命中预期（不是碰巧被拒）；
 3. 变异自证：弱化 additionalProperties / pattern / minItems 后，对应负例必须变绿
    —— 证明测试不是同义反复；
@@ -40,6 +40,7 @@ SCHEMAS = {
     "verify.schema.json": ("verify.json", "nf-verify/1"),
     "keys.schema.json": ("keys.json", "nf-issuer-registry/1"),
     "chain-head.schema.json": ("chain-head.json", "nf-chain-head/1"),
+    "type-registry.schema.json": ("type-registry.json", "nf-type-registry/1"),
 }
 
 #: 反例文件 → (对应 schema, 期望错误片段)。片段取自 core.json_schema 的错误消息（固定文案）。
@@ -65,6 +66,8 @@ INVALID_CASES = {
     "keys-bad-time.json": ("keys.schema.json", "不匹配 pattern"),
     "chain-head-bad-kind.json": ("chain-head.schema.json", "不在枚举内"),
     "chain-head-bad-digest.json": ("chain-head.schema.json", "不匹配 pattern"),
+    "type-registry-empty-ref-kinds.json": ("type-registry.schema.json", "元素数 < 1"),
+    "type-registry-bad-ref-kind.json": ("type-registry.schema.json", "不在枚举内"),
 }
 
 try:  # 可选对照依赖（pyproject ci extra）；核心运行面不依赖它
@@ -100,15 +103,15 @@ def _walk(node, key):
 
 
 class TrustSchemaMetaTest(unittest.TestCase):
-    """9 件 schema 的元结构与计划不变量。"""
+    """10 件 schema 的元结构与计划不变量。"""
 
     @classmethod
     def setUpClass(cls):
         cls.docs = {name: _read(SCHEMA_DIR / name) for name in SCHEMAS}
 
-    def test_all_nine_present_and_exact(self):
+    def test_all_ten_present_and_exact(self):
         on_disk = sorted(p.name for p in SCHEMA_DIR.glob("*.json"))
-        self.assertEqual(sorted(SCHEMAS), on_disk, "protocol/trust 的 schema 集合必须恰为 9 件")
+        self.assertEqual(sorted(SCHEMAS), on_disk, "protocol/trust 的 schema 集合必须恰为 10 件")
 
     def test_id_schema_and_versioned_name(self):
         for name, (_sample, versioned) in SCHEMAS.items():
@@ -189,6 +192,14 @@ class TrustSchemaMetaTest(unittest.TestCase):
         doc = self.docs["process.schema.json"]
         self.assertEqual(1, doc["properties"]["step"]["minimum"])
         self.assertIn("prev", doc["required"])
+
+    def test_type_registry_invariants(self):
+        doc = self.docs["type-registry.schema.json"]
+        item = doc["$defs"]["type"]
+        self.assertEqual(["id", "allowed_issuer_kinds", "allowed_ref_kinds",
+                          "compose_with", "max_refs"], item["required"])
+        self.assertIs(False, item["additionalProperties"])
+        self.assertEqual(1, item["properties"]["allowed_issuer_kinds"]["minItems"])
 
     def test_chain_head_statement_invariants(self):
         doc = self.docs["chain-head.schema.json"]

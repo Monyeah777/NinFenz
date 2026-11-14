@@ -5,8 +5,8 @@
     "floor": 5,
     "prod": 1057,
     "projection": 167,
-    "support": 472,
-    "verify": 1332
+    "support": 473,
+    "verify": 1336
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7457,6 +7457,18 @@
       "rule": "R-verify"
     },
     {
+      "function": "nf-type-registry/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/type-registry-bad-ref-kind.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-type-registry/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/type-registry-empty-ref-kinds.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "nf-verify/1",
       "path": "desktop/tests/fixtures/trust/schemas/invalid/verify-issue-missing-fix.json",
       "role": "verify",
@@ -7513,6 +7525,12 @@
     {
       "function": "nf-process/1",
       "path": "desktop/tests/fixtures/trust/schemas/valid/process.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-type-registry/1",
+      "path": "desktop/tests/fixtures/trust/schemas/valid/type-registry.json",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -11189,7 +11207,7 @@
       "rule": "R-verify"
     },
     {
-      "function": "Trust Fabric schema 门禁（WP-01/21/23）：9 件 IDL、正/反样例与变异自证。",
+      "function": "Trust Fabric schema 门禁（WP-01/21/23/30）：10 件 IDL、正/反样例与变异自证。",
       "path": "desktop/tests/test_trust_schemas.py",
       "role": "verify",
       "rule": "R-verify"
@@ -11209,6 +11227,12 @@
     {
       "function": "docs/trust/THREAT_MODEL.md 契约：STRIDE/删除矩阵/边界/红队/风险全绑定。",
       "path": "desktop/tests/test_trust_threat_model_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "trust.entity 类型注册表 + 组合准入判据（G3；claim #18：未知 type/越权组合 fail-closed）。",
+      "path": "desktop/tests/test_trust_types.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -14376,16 +14400,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "95be8c7cd9b3f60a0a505919de80b889bae07faec3810eb449eda2a0539108e1",
+  "root_digest": "27fd12b51b3391adef3797311d04fbaac42cf03a462bfbe39ad489c17df93b40",
   "rule_counts": {
     "R-app": 1468,
-    "R-catch": 320,
+    "R-catch": 321,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 147,
     "R-support": 124,
-    "R-verify": 1206,
+    "R-verify": 1210,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

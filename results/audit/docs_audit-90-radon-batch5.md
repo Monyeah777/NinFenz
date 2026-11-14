@@ -7,7 +7,7 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
-  - protocol/code_metrics_baseline.json:ab41b73ac8269cd95572cd14c627f11b6307c7e0256dfa5c7abc42fa6db9915d
+  - protocol/code_metrics_baseline.json:fc81583bba765d6c91645087f69635cd000eccfb5e5a29dda158e465569a61f5
 ---
 > 重审（2026-11-14）：WP-15 check45 接线与 G1 收口（机械重绑）
 

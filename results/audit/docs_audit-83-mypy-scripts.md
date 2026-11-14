@@ -14,7 +14,7 @@ subjects:
   - scripts/geo_export.py:7a4200761fb7d79f945a37b557882eb8de968081057068d26a7a144d11d1b527
   - scripts/nf.py:ab7c78d75ad9482ab2d766353186a20cf5a9559c95b59b690c6dfb757cdf4513
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:ab41b73ac8269cd95572cd14c627f11b6307c7e0256dfa5c7abc42fa6db9915d
+  - protocol/code_metrics_baseline.json:fc81583bba765d6c91645087f69635cd000eccfb5e5a29dda158e465569a61f5
 ---
 > 重审（2026-11-14）：WP-15 check45 接线与 G1 收口（机械重绑）
 

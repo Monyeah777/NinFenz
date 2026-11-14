@@ -138,7 +138,9 @@
         "desktop/tests/test_trust_schemas.py",
         "protocol/trust/keys.schema.json",
         "desktop/src/core/trust/keys.py",
-        "desktop/tests/test_trust_keys.py"
+        "desktop/tests/test_trust_keys.py",
+        "protocol/trust/type-registry.schema.json",
+        "desktop/tests/test_trust_types.py"
       ],
       "falsifier": "若未知 type/issuer/算法被默认放行且验证结论仍为通过，则本裁决失效。"
     },
