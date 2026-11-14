@@ -2153,6 +2153,8 @@ def _add_parser_governance(sub):
     agr.add_argument("--role", default="author", help="context packer 角色")
     agr.add_argument("--json", action="store_true", help="机读输出")
     agr.add_argument("--report", action="store_true", help="写 results/adapter/adapter-report.json")
+    agr.add_argument("--assembly", action="store_true",
+                     help="跑 WP-21 装配运行时（spec→task→context→adapter→校验→gate→export 记录）")
 
     wkp = sub.add_parser("wiki",
                          help="LLMWiki 编译（投影：pages/index/graph/llms.txt/MCP）",
@@ -9671,6 +9673,22 @@ def _cmd_agent(args) -> int:
     if cmd == "run":
         from core import context_packer as cp
         from core import spec_compiler as sc
+        if getattr(args, "assembly", False):
+            from core import assembly_runtime as ar
+            record = ar.run(args.intent, args.adapter, ROOT, args.budget, args.role)
+            status = str((record.get("run") or {}).get("status"))
+            if getattr(args, "json", False):
+                print(ar.render(record), end="")
+            else:
+                print("== nf agent run --assembly（%s）==" % args.adapter)
+                print("  status=%s · pipeline=%s · steps=%d · checks=%d"
+                      % (status, record["assembly"].get("pipeline"),
+                         len((record.get("run") or {}).get("steps") or []),
+                         len((record.get("run") or {}).get("checks") or [])))
+                for item in (record.get("run") or {}).get("steps") or []:
+                    print("  %s %s %s" % ("✓" if item.get("ok") else "✗",
+                                          item.get("id"), item.get("detail")))
+            return 0 if status == "delivered" else 1
         try:
             intent = sc._load_intent_file(ROOT, args.intent)
             bundle = sc.compile_intent(intent, ROOT, args.intent)

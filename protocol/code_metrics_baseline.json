@@ -70,6 +70,11 @@
       "max_fn_cc": 18,
       "max_fn_lines": 50
     },
+    "desktop/src/core/assembly_runtime.py": {
+      "lines": 187,
+      "max_fn_cc": 18,
+      "max_fn_lines": 77
+    },
     "desktop/src/core/assertions.py": {
       "lines": 299,
       "max_fn_cc": 26,
@@ -1746,7 +1751,7 @@
       "max_fn_lines": 26
     },
     "scripts/nf.py": {
-      "lines": 10075,
+      "lines": 10093,
       "max_fn_cc": 132,
       "max_fn_lines": 443
     },

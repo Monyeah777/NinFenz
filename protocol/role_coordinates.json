@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1498,
+    "app": 1499,
     "entry": 26,
     "floor": 5,
     "prod": 1065,
-    "projection": 202,
-    "support": 509,
-    "verify": 1419
+    "projection": 203,
+    "support": 510,
+    "verify": 1420
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7997,6 +7997,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "WP-21 Assembly Runtime 判据（P00 黄金路径 core-only E2E）。",
+      "path": "desktop/tests/test_assembly_runtime_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "断言表（数据化断言）正式与否定用例。",
       "path": "desktop/tests/test_assertions.py",
       "role": "verify",
@@ -14946,17 +14952,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "4c777185871c9e015a1b6f68f0cf7f99ce7b8605c20d709b7ac41aec85be8c6c",
+  "root_digest": "e6007956f9ab39146c0bff4db64ff5210e648d5187a6a9080fe675f1097d3c68",
   "rule_counts": {
-    "R-app": 1498,
+    "R-app": 1499,
     "R-catch": 356,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 179,
+    "R-projection": 180,
     "R-support": 124,
-    "R-verify": 1290,
-    "auto:R-core": 302
+    "R-verify": 1291,
+    "auto:R-core": 303
   },
   "schema": "nf-role-coordinates/1"
 }

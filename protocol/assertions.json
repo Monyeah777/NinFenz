@@ -964,6 +964,21 @@
       "message": "Adapter parity 报告缺失或版本名不符（WP-20 判据依赖它）",
       "fix": "跑 nf agent run --report 重生成；再跑 test_agent_adapter_contract",
       "evidence": "test_agent_adapter_contract / conformance::modeling"
+    },
+    {
+      "id": "assembly-record",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "results/assembly/sample-document.assembly.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-assembly-run/1"
+      },
+      "message": "装配运行时记录缺失或版本名不符（WP-21 判据依赖它）",
+      "fix": "重跑 nf agent run --assembly 并用 assembly_runtime.write_record 写回；再跑 test_assembly_runtime_contract",
+      "evidence": "test_assembly_runtime_contract / conformance::modeling"
     }
   ]
 }
