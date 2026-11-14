@@ -314,6 +314,7 @@
     "test_lazy_yaml": 0.2,
     "test_leak_surface": 1.7,
     "test_ledger_tables": 0.2,
+    "test_legal_contract": 0.2,
     "test_library": 0.9,
     "test_library_doc_contract": 0.2,
     "test_library_index_contract": 0.2,
@@ -3297,6 +3298,15 @@
     "test_ledger_tables.LedgerTablesTest.test_green_numbering_is_contiguous": 0.0,
     "test_ledger_tables.LedgerTablesTest.test_parser_rejects_malformed_input": 0.0,
     "test_ledger_tables.LedgerTablesTest.test_red_heads_do_not_appear_in_green": 0.0,
+    "test_legal_contract.LegalContractTest.test_claims_boundary_and_no_overclaim": 0.0,
+    "test_legal_contract.LegalContractTest.test_contracts_templates": 0.0,
+    "test_legal_contract.LegalContractTest.test_docs_present_and_cross_consistent": 0.0,
+    "test_legal_contract.LegalContractTest.test_export_surface": 0.0,
+    "test_legal_contract.LegalContractTest.test_license_matches_repo_text": 0.0,
+    "test_legal_contract.LegalContractTest.test_mutations_red": 0.02,
+    "test_legal_contract.LegalContractTest.test_plan_deviation_recorded": 0.0,
+    "test_legal_contract.LegalContractTest.test_registry_valid_and_audit_clean": 0.01,
+    "test_legal_contract.LegalContractTest.test_third_party_notice_and_governance": 0.0,
     "test_library.AttestationFailClosedTest.test_unreadable_entry_is_reported_not_swallowed": 0.05,
     "test_library.LibraryWriteErrorFramingTest.test_supersede_self_reference_is_a_clean_error": 0.17,
     "test_library.LibraryWriteErrorFramingTest.test_unknown_entry_is_a_clean_error": 0.36,
@@ -6196,5 +6206,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2143.3
+  "total_s": 2143.5
 }

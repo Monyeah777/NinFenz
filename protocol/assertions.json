@@ -673,6 +673,21 @@
       "message": "评测效度协议缺失或版本名不符（WP-0F 判据依赖它）",
       "fix": "补/修 protocol/eval_validity.json；再跑 desktop/tests/test_ai_eval_contract.py",
       "evidence": "test_ai_eval_contract / conformance::modeling"
+    },
+    {
+      "id": "legal-registry",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "protocol/legal.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-legal/1"
+      },
+      "message": "法务/开源治理登记缺失或版本名不符（WP-0C 判据依赖它）",
+      "fix": "补/修 protocol/legal.json；再跑 python scripts/legal_audit.py",
+      "evidence": "test_legal_contract / conformance::modeling"
     }
   ]
 }

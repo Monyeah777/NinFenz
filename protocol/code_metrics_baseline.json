@@ -750,6 +750,11 @@
       "max_fn_cc": 10,
       "max_fn_lines": 24
     },
+    "desktop/src/core/legal.py": {
+      "lines": 224,
+      "max_fn_cc": 77,
+      "max_fn_lines": 101
+    },
     "desktop/src/core/library.py": {
       "lines": 505,
       "max_fn_cc": 48,
@@ -1679,6 +1684,11 @@
       "lines": 150,
       "max_fn_cc": 7,
       "max_fn_lines": 39
+    },
+    "scripts/legal_audit.py": {
+      "lines": 44,
+      "max_fn_cc": 5,
+      "max_fn_lines": 18
     },
     "scripts/mcp_manifest.py": {
       "lines": 137,

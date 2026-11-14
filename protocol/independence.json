@@ -42,6 +42,7 @@
       "eval_validity",
       "evidence",
       "key_transparency",
+      "legal",
       "ops",
       "policy_snapshot",
       "provenance_external",

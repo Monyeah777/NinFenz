@@ -25,6 +25,7 @@
 - [ops/drills.json](ops/drills.json)（运维演练报告：桌面演练 4 级 + 恢复闭环 + 披露口径 + 供应商退出就绪；判据 `test_ops_contract.py`，配套 `docs/security/INCIDENT_RESPONSE.md`/`docs/sre/`/`docs/legal/VENDORS.md`）
 - [docs/ai/AI_GOVERNANCE.md](../docs/ai/AI_GOVERNANCE.md) · [docs/eval/EVAL_PROTOCOL.md](../docs/eval/EVAL_PROTOCOL.md)（AI 影响评估/模型风险/监管映射 + 评测效度协议；真源 `protocol/{ai_governance,eval_validity}.json`，判据 `test_ai_eval_contract.py`）
 - [eval/interrater_sample.json](eval/interrater_sample.json)（inter-rater 样本：12 条双评；Cohen's kappa 由 `core.eval_validity.interrater` 现算）
+- [../LEGAL.md](../LEGAL.md) · [../GOVERNANCE.md](../GOVERNANCE.md) · [../docs/legal/](../docs/legal/)（法务/许可/出口 + 开源治理；真源 `protocol/legal.json`，审计入口 `scripts/legal_audit.py`，判据 `test_legal_contract.py`）
 
 ## 互操作导出面（入仓投影）
 

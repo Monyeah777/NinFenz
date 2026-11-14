@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1480,
+    "app": 1483,
     "entry": 26,
     "floor": 5,
     "prod": 1059,
     "projection": 178,
-    "support": 497,
-    "verify": 1395
+    "support": 500,
+    "verify": 1398
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -6431,6 +6431,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "法务/许可/IP/出口 + 开源治理登记（`nf-legal/1`）：把「用什么许可、怎么审计」做成可复算判据。",
+      "path": "desktop/src/core/legal.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "NF 云端图书馆（library/）机器面：frontmatter 真源 → INDEX/ALIAS 投影 + 检索索引。",
       "path": "desktop/src/core/library.py",
       "role": "verify",
@@ -9625,6 +9631,12 @@
     {
       "function": "台账表格自洽判据：序号连续、红绿不混（第 198 轮）。",
       "path": "desktop/tests/test_ledger_tables.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "法务/许可/出口 + 开源治理契约（NF-Final WP-0C，P1 盲区 BL-07/BL-10）。",
+      "path": "desktop/tests/test_legal_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -14435,6 +14447,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "NF-Final §15A.2 法务/许可/IP/出口 + 开源治理机读登记（WP-0C）：许可（SPDX/REUSE）、第三方 NOTICE、商标/署名、合同模板、出口/加密组件、OSS 治理（发布/废弃/评分卡）。判据 desktop/tests/test_legal_contract.py + scripts/legal_audit.py。纪律：不提供法律意见、不声称合规/认证。",
+      "path": "protocol/legal.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "语言面注册表：逐语言入口 + 责任方 + 覆盖面（entry = 只译入口；entry+guides = 入口 + docs 声明的文档译件）。文档译件须路径镜像并登记 source_sha256（源件一改即过期）。判据见 core/locales.py 与 check34。",
       "path": "protocol/locales.json",
       "role": "verify",
@@ -14766,17 +14784,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "ba05ada98587e142c553ec07b770cef607e3f64c0c6f4c76d8d1a6fe3b2f18dd",
+  "root_digest": "03230d65ebd750dd98285c726073207fddd1866c83b4237aef7a5f05e6b8a173",
   "rule_counts": {
-    "R-app": 1480,
-    "R-catch": 344,
+    "R-app": 1483,
+    "R-catch": 347,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 157,
     "R-support": 124,
-    "R-verify": 1268,
-    "auto:R-core": 292
+    "R-verify": 1270,
+    "auto:R-core": 293
   },
   "schema": "nf-role-coordinates/1"
 }
