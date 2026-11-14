@@ -5,8 +5,8 @@
     "floor": 5,
     "prod": 1057,
     "projection": 167,
-    "support": 465,
-    "verify": 1319
+    "support": 466,
+    "verify": 1320
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -11099,6 +11099,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "trust.dsse 判据：pae 向量逐条 + 信封签名/验签 + 篡改矩阵 + 算法白名单。",
+      "path": "desktop/tests/test_trust_dsse.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "trust.entity 判据：向量 entity 族逐条对齐 + 结构/准入 fail-closed + 变异自证。",
       "path": "desktop/tests/test_trust_entity.py",
       "role": "verify",
@@ -14298,16 +14304,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "659d98cc790e99edf9a74f7b208f2ec6bf7a2a7fc300c0fa01e36d1ceadb043b",
+  "root_digest": "44ee9dffc3a162813f09b82ae84590e7baf7451c3c51d34dd156bcd40d422801",
   "rule_counts": {
     "R-app": 1468,
-    "R-catch": 313,
+    "R-catch": 314,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 147,
     "R-support": 124,
-    "R-verify": 1193,
+    "R-verify": 1194,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

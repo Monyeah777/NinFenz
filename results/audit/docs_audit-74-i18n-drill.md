@@ -26,7 +26,7 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:c8235a9d8c6fd12038019a7e4d458d06de632e558a5f7ec86e20f5e6611d050e
+  - protocol/code_metrics_baseline.json:684f5754b7e7eda2e9a751bf76246d392f1ce0b43f952cdba6d617555edba840
 ---
 > 重审（2026-11-14）：WP-15 check45 接线与 G1 收口（机械重绑）
 

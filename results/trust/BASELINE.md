@@ -137,7 +137,8 @@
 - **WP-14 已完成（2026-11-14，骨架）**：`desktop/src/core/trust/verify.py`——`decide`（T0-T4 事实→等级→exit 0/1/2，与向量 level 族逐条一致）、`skeleton_facts`（hash 取真值，签名/TSA/STH/公共锚如实为 none）、`build_report`（nf-verify/1，结构不过 schema 即抛）；`scripts/trust_verify.py`（计划 §8.4 CI 入口：`--bundle/--policy/--json/--out`，缺参 exit 2 且带修复指引）。判据 `desktop/tests/test_trust_verify.py`（11 条：level 向量逐条、T0/T2/篡改/坏策略四场景退出码与报告、报告过冻结 schema、CLI 子进程 0/1/2 与确定性、--out 原子写）。
   - **CLI 命令面裁决**：本轮先落计划 §8.4 的 CI 入口（`scripts/trust_verify.py`）；`nf trust` 命令族（§8.1）涉及 check39 命令面策展与文档同步，留到 check45 接线后统一做，避免半接线命令面（记录于 §5.6）。
 - **WP-15 已完成（2026-11-14）**：check45 接入 `verify.sh`（版本 v2.31；`core.trust.gate.scan` 对冻结向量复算 bundle 守恒/单 claim/splice/prev 链/等级判定；变异夹具 `test_trust_gate45` 证明旧基线可红）。**G1 收口**：§13 自扫描 S0–S12 完成，产出 `results/trust/SELF_AUDIT.json` + `docs/trust/SELF_AUDIT.md`；P0=0、P1 全部有 owner（5 条 TODO + 1 条已修）、UNSUPPORTED=0；门禁 `--checks-only` PASS=77 / conformance 27/27 / freshness 4/4 / precheck 23/23 / style 棘轮收紧。`
-- **下一步（G2：签名与锚定 A3）**：WP-20 `trust/dsse.py` → WP-21 `trust/keys.py`（issuer registry/rotation/revocation 接线）→ WP-22 `trust/anchor.py` + `tsa_client`（T2 事实接线）→ WP-23 链头/卡/事件签名接口 → WP-25 check46 + 冻结。
+- **WP-20 已完成（2026-11-14）**：`desktop/src/core/trust/dsse.py`——PAE（字节长度口径，与 `pae` 族向量逐条一致）+ `nf-dsse/1` 信封（payloadType/payload(base64)/signatures[{keyid,sig,alg?}]）+ 签名/验签（算法白名单 hmac-sha256 / ed25519 / ecdsa-p256，后两者由调用方注入回调；trusted keyid 签名失败即 fail-closed；未知 keyid 不计通过；≥1 trusted-valid）。判据 `desktop/tests/test_trust_dsse.py` 21 例：向量一致 + 端到端签验 + 篡改矩阵 + 算法越界/不符 + 结构 schema 是唯一结构门。`
+- **下一步（G2：密钥与锚定 A3）**：WP-21 `trust/keys.py`（issuer registry / rotation / revocation 接线）→ WP-22 `trust/anchor.py` + `tsa_client`（T2 事实接线）→ WP-23 链头/卡/事件签名接口 → WP-25 check46 + 冻结。
 
 ## 8. 复跑命令
 

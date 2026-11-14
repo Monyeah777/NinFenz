@@ -1,5 +1,5 @@
 {
-  "digest": "b6d88e8be9f7cf61c5d1271a9612268665ba71de0cef5bc5055b592fff0a9c49",
+  "digest": "e4f5c65f1b9286517ade418b7aef9e95fdf0fc2e3fba4fbe41f9587934966a68",
   "entries": [
     {
       "doc": "其余 ABI 调用的判定向量：cc_label（IR 校验）→ 期望结论（跨语言可复核）。",
@@ -1122,7 +1122,10 @@
       "doc": "离线验证入口（cc_verify 骨架的 CI 面；计划 §8.4）。",
       "flags": [
         "--bundle",
+        "--envelope",
+        "--hmac-key-hex",
         "--json",
+        "--keyid",
         "--out",
         "--policy",
         "--root"
@@ -1270,7 +1273,7 @@
       "subcommands": []
     }
   ],
-  "flags": 540,
+  "flags": 543,
   "note": "静态接口面（docs/flags/subcommands），不含缺省行为语义",
   "schema": "nf-capability-inventory/1",
   "scripts": 82

@@ -9,7 +9,7 @@
 | 判据 | 结果 | 证据 |
 |---|---|---|
 | P0 = 0 | ✅ | `stop.p0 = 0`；S1/S2/S3/S7/S8/S10 全绿 |
-| P1 全部有 owner（或已修） | ✅ 5 条 TODO 有 owner + 1 条已修 | `stop.p1_open_with_owner = 5`；`findings` |
+| P1 全部有 owner（或已修） | ✅ 4 条 TODO 有 owner + 1 条已修 | `stop.p1_open_with_owner = 4`；`findings` |
 | UNSUPPORTED claims = 0 | ✅ | `stop.claims_unsupported = 0`；CLAIM_MATRIX 无 UNSUPPORTED |
 | 单 claim 验证 O(log n) | ✅ | `test_trust_bundle.py`（只读一条 claim + proof 长度 ≤ log n） |
 | 删除/重排矩阵 | ✅ | `test_trust_bundle.py` / `test_trust_process.py` 篡改矩阵 |
@@ -21,7 +21,7 @@
 
 | 维度 | 状态 | 判据 / 证据 |
 |---|---|---|
-| S0_requirements | amber | FR/NFR 已落地部分有代码+测试；5 条 TODO（删尾/DSSE/typed entity/model card/跨语言 parity）留 G2–G4，均有 owner |
+| S0_requirements | amber | FR/NFR 已落地部分有代码+测试；claim #16（DSSE/PAE）已随 WP-20 转 SUPPORTED；剩 4 条 TODO（删尾/typed entity/model card/跨语言 parity）留 G2–G4，均有 owner |
 | S1_code_holes | green | trust 路径 TODO/FIXME/NotImplemented/pass 命中 0 |
 | S2_judgement_holes | green | 裸 except 0；默认放行形状 0（本轮修掉 2 处 `policy_ok` 缺省 True，见 F-001） |
 | S3_crypto | green | 无 md5/sha1/random/time.time/datetime.now；摘要统一 SHA-256 |
@@ -41,13 +41,12 @@
 |---|---|---|---|---|---|
 | F-001 | S2_judgement_holes | P1 | fixed | gate.py 与 trust_vectors.py 的 level 判定用 `case.get("policy_ok", True)` 缺省放行 | 改显式布尔（缺失即拒）；`test_trust_gate45.py` |
 | F-002 | S0_requirements | P1 | open | claim #15 删尾检测 TODO（G2） | 链头签名 + RFC3161 锚；owner Monyeah777（维护者） |
-| F-003 | S0_requirements | P1 | open | claim #16 DSSE/PAE TODO（G2） | `trust/dsse.py` + issuer registry；owner 同上 |
-| F-004 | S0_requirements | P1 | open | claim #18 typed entity 组合面 TODO（G3） | 类型注册表 + 组合 admissibility；owner 同上 |
-| F-005 | S0_requirements | P1 | open | claim #19 model card 绑定 TODO（G3） | `nf-model-card/1` 与 AI 证据绑定；owner 同上 |
-| F-006 | S0_requirements | P1 | open | claim #21 跨语言 parity TODO（G4） | Go/.NET 独立 verifier 跑同一向量集；owner 同上 |
-| F-007 | S6_test_gaps | P2 | open | 属性测试/模糊测试未接 | G2 前补随机 bundle/链篡改不变量；owner 同上 |
-| F-008 | S12_unknown | P2 | open | 红队角色剩 4 个未跑 | 按轮次轮换并写入威胁模型；owner 同上 |
-| F-009 | S12_unknown | P2 | open | 跨语言 parity 未接 | G4 补独立 verifier；owner 同上 |
+| F-003 | S0_requirements | P1 | open | claim #18 typed entity 组合面 TODO（G3） | 类型注册表 + 组合 admissibility；owner 同上 |
+| F-004 | S0_requirements | P1 | open | claim #19 model card 绑定 TODO（G3） | `nf-model-card/1` 与 AI 证据绑定；owner 同上 |
+| F-005 | S0_requirements | P1 | open | claim #21 跨语言 parity TODO（G4） | Go/.NET 独立 verifier 跑同一向量集；owner 同上 |
+| F-006 | S6_test_gaps | P2 | open | 属性测试/模糊测试未接 | G2 前补随机 bundle/链篡改不变量；owner 同上 |
+| F-007 | S12_unknown | P2 | open | 红队角色剩 4 个未跑 | 按轮次轮换并写入威胁模型；owner 同上 |
+| F-008 | S12_unknown | P2 | open | 跨语言 parity 未接 | G4 补独立 verifier；owner 同上 |
 
 ## 本轮扫描命令（可复跑）
 
@@ -62,4 +61,5 @@ python -m pytest desktop/tests/test_trust_self_audit_contract.py -q
 ## 不改写的历史结论
 
 - 本报告不回溯改 G0 的 `results/trust/BASELINE.md` 判定；基线是**审计当时**的实读，后续状态以本报告与各阶段交接为准。
+- 本版按 G2/WP-20 更新：claim #16（DSSE/PAE）已转 SUPPORTED（`trust/dsse.py` + `test_trust_dsse.py`），对应 P1 从 5 条降为 4 条。
 - 「全量 bash verify.sh（3100+ 测试）」本轮未跑，如实记；静态面全量与受影响面全量分别取证（见上表与各 WP 记录）。CI 的 full 档是唯一发布结论口径。

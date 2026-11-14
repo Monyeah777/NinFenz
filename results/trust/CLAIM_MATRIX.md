@@ -22,7 +22,7 @@
 | 13 | 人类复核状态机（未签 = PENDING，不得冒充通过） | `runtime_executor.py:213` | `test_meta_cockpit.py` | — | PARTIAL（状态机在，记录未签名） |
 | 14 | 单 claim 可独立验证（claim 级、不读全包、O(log n)） | `desktop/src/core/trust/bundle.py` verify_claim | `test_trust_bundle.py`（只读一条 claim + proof 长度 ≤ log n） | T1（结构/哈希面；签名在 G2） | SUPPORTED |
 | 15 | 删尾并重算本地摘要可被检测（head 签名/TSA） | 计划 `trust/anchor.py`（未建） | — | T2 | TODO（G2） |
-| 16 | DSSE/PAE 签名信封（≥1 有效签名、keyid 可解析） | 计划 `trust/dsse.py`（未建） | — | T1 | TODO（G2） |
+| 16 | DSSE/PAE 签名信封（≥1 有效签名、keyid 可解析） | `desktop/src/core/trust/dsse.py`（PAE + nf-dsse/1；算法白名单 hmac-sha256 / ed25519 / ecdsa-p256，后两者可插拔回调）+ `desktop/tests/test_trust_dsse.py` | `pae` 族向量逐条一致；信封签/验 + 篡改矩阵（载荷/签名/keyid/算法越界/算法不符） | T1 | SUPPORTED（G2 WP-20；issuer 注册/轮换/吊销接线 = WP-21） |
 | 17 | 跨 bundle 拼接被拒（splice 防护） | `desktop/src/core/trust/bundle.py`（叶预像含 bundle_id/index） | `test_trust_bundle.py` cross-bundle splice 负例 | T1 | SUPPORTED |
 | 18 | 未知实体类型/越权组合 fail-closed（typed entity） | 计划 `trust/entity.py`（未建） | — | T1 | TODO（G3） |
 | 19 | 模型替换使旧 AI 证据失效（model card 绑定） | 计划 `core/ai_trust/`（未建） | — | — | TODO（G3） |

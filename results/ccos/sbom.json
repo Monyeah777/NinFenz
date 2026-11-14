@@ -1,7 +1,7 @@
 {
-  "bytes": 12391811,
-  "count": 589,
-  "digest": "76c2419a8c4118cab4371ae7834b9bcf7192cceab2ba7ab726aee932ebbd6a47",
+  "bytes": 12404530,
+  "count": 590,
+  "digest": "2644c057663fd2ca3287607812144f5294722a4f25a4d962486db96d6ee78969",
   "materials": [
     {
       "bytes": 102,
@@ -1724,6 +1724,11 @@
       "sha256": "89cec6742d7ffe7f75edb92728ed7ceb534278dceedff967426e4d4443eea398"
     },
     {
+      "bytes": 8682,
+      "path": "desktop/src/core/trust/dsse.py",
+      "sha256": "df73a75a9f9a809d9627fdd05a0ae8e7c7482ef76e902f6ef5066009a6ccc4b6"
+    },
+    {
       "bytes": 3464,
       "path": "desktop/src/core/trust/entity.py",
       "sha256": "122bbc6ce64593d2ea18e88577b405130251d1a2fc7d9b4c75947bd29d34bae8"
@@ -1941,12 +1946,12 @@
     {
       "bytes": 79590,
       "path": "protocol/RECEIPTS.json",
-      "sha256": "9fb26a6c0f4ce33099c60d842f9abde9ee59bbf6bd6859ff057e9f6cdb958da9"
+      "sha256": "b4b27d72fa740fbccef554daac6d4e4183811179b4f3c2bb55f7fae0c94b493b"
     },
     {
-      "bytes": 8588,
+      "bytes": 8674,
       "path": "protocol/adr/registry.json",
-      "sha256": "5346b63ebc1c2755dceb7052fade1da91bbabf0a78d15238a0f6f2a348be5d0a"
+      "sha256": "c20e6370a60d417d5d2c856859457d68ef1541434a34908c67167df4af61d833"
     },
     {
       "bytes": 317,
@@ -1994,9 +1999,9 @@
       "sha256": "c2402950e34e3ff9bd0f09171c8bee821bf0f57c33f32d0dbc4bb4b3e6157914"
     },
     {
-      "bytes": 474361,
+      "bytes": 475902,
       "path": "protocol/check12_weights.json",
-      "sha256": "0d8f4d8fecbdf6f870f9c912e1bf895cd4e68bfc4d50bacc3d86f5035869d5e7"
+      "sha256": "dd5f288a98e303bb779a3fb37c95ef31e537e35879d478c0ec736d5d115dd6ac"
     },
     {
       "bytes": 16170,
@@ -2004,9 +2009,9 @@
       "sha256": "5545028d82662ee8f4f4051bdc14876b0357f0d9548963f3836f6f8f6d417285"
     },
     {
-      "bytes": 42859,
+      "bytes": 42860,
       "path": "protocol/code_metrics_baseline.json",
-      "sha256": "c8235a9d8c6fd12038019a7e4d458d06de632e558a5f7ec86e20f5e6611d050e"
+      "sha256": "684f5754b7e7eda2e9a751bf76246d392f1ce0b43f952cdba6d617555edba840"
     },
     {
       "bytes": 87117,
@@ -2136,7 +2141,7 @@
     {
       "bytes": 27560,
       "path": "protocol/generated/receipt_chain.json",
-      "sha256": "14cc5df2fd9357d36089dc3e36a31dc5c6a4052255de5a395e35582bcc47b257"
+      "sha256": "b3d8ff5f095a35fec45e262dec2f8bbdeed46592c2773ab93a82239af526daad"
     },
     {
       "bytes": 918,
@@ -2389,9 +2394,9 @@
       "sha256": "87de7ac68f9846b333323efecdbb7555adf24215ae8145d573fe8d0688b8e86d"
     },
     {
-      "bytes": 527434,
+      "bytes": 527662,
       "path": "protocol/role_coordinates.json",
-      "sha256": "9a0341a13146cb3f10db71012f60f331e2cca171ee2af323e24683c5897d9cfb"
+      "sha256": "9b86e5250967b95c8001f322cbb91d0d6cedd32f1e8870ab927dce64ca6ca882"
     },
     {
       "bytes": 9391,
@@ -2474,9 +2479,9 @@
       "sha256": "1a542591cf38382ae3301cf5ac67c80a6a4d2fdcfd7c56fab27eccbbad0ca791"
     },
     {
-      "bytes": 82582,
+      "bytes": 82622,
       "path": "protocol/style_baseline.json",
-      "sha256": "b44ad4bde456a1157587013e14bca8ae7ed61a286f83bc34feb4e36ee697b291"
+      "sha256": "22656a8d7c4393acb9d4a2f943684ebdf9d67e3555302e0f6d768de3e7a9d056"
     },
     {
       "bytes": 548,
@@ -2526,7 +2531,7 @@
     {
       "bytes": 13104,
       "path": "protocol/verification_report.json",
-      "sha256": "662587d32abfe98fdbf0c6a1472591c52a7c67ef00e9fc3ad480910aafd228f0"
+      "sha256": "900672f89c28ac799a0ef900b8390ad4802c23ea5786c076f49ed09b64860f46"
     },
     {
       "bytes": 4160,
@@ -2869,9 +2874,9 @@
       "sha256": "1aeb2a920186cd0859668dd1467736f8e42bab8179473cded16590ba09a9d4c2"
     },
     {
-      "bytes": 12637,
+      "bytes": 13112,
       "path": "scripts/trust_self_audit.py",
-      "sha256": "42aef2d234068257bc0c866741d70036287ef765ca65b135a46531a8a38d7f7f"
+      "sha256": "1f27d790d9a9349a39c6fde5cbacd222400efb5af813411131ebcce3aec7c369"
     },
     {
       "bytes": 22410,
@@ -2879,9 +2884,9 @@
       "sha256": "aacf188610233408df88de23e5a8a6a5cd8398d2aff9cce1d7867f6feddfb23c"
     },
     {
-      "bytes": 2902,
+      "bytes": 4568,
       "path": "scripts/trust_verify.py",
-      "sha256": "7c8bf67b5caaa1418502cd8b1b791390a7977667e96b8f6efb7ae041f1856334"
+      "sha256": "fbda70c9ab5ae924bbf415eacc91919945fca2115b5d9fc55df2f279c8f4a2f4"
     },
     {
       "bytes": 3884,
