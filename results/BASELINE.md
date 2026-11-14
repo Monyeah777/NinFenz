@@ -6,6 +6,7 @@
 > 性质：结果/状态件（审计记录），不是规划件。审计对象 = **本机检出**，不是方案所基于的那次检出。
 > 更新（R3，2026-11-14）：WP-02/check49 收口 IN-01/IN-02（§5.5 与矩阵汇总已按实读更新；数字变化以复跑命令为准，见 §7）。
 > 更新（R5，2026-11-14）：WP-01 五件生产 schema（`nf-contract/1`、`nf-wiki-page/1`、`nf-spec/1`、`nf-task/1`、`nf-assembly/1`）落 `protocol/production/`，正/反样例与变异自证在 `test_schema_reference.py`；**只有契约层、仍无编译器/页面生成器**，故 PR-02/WK 系列状态不变（见 §5）。
+> 更新（R7，2026-11-14）：WP-0B 隐私/数据生命周期落地——`PRIVACY.md` + `docs/privacy/{DATA_MAP,DPIA,RETENTION}.md` + `docs/qa/PRIVACY_QA.md` + `protocol/privacy.json`（8 数据类/四级分类/四保留模式）+ `core/privacy_scan.py` + `test_privacy_contract.py`（8 例，含删除失败/PII 扫描/脱敏抽样/变异自证）；D05 由 None 重估为 Partial，BL-01 的 closure 条件（数据地图+DPIA+保留/删除测试通过）已满足。
 > 更新（R6，2026-11-14）：WP-03 生产威胁模型落地——`protocol/boundaries.json` 六条边界（代码件+文档件在场）、`docs/production/THREAT_MODEL.md`、`results/production/threat_vectors.json`（STRIDE 8 + 失败矩阵 8，状态词表 enforced/partial/planned/UNOBSERVABLE）；D04 仍为 Partial（ASVS/LLM 映射与 IR runbook 未建），不因威胁模型存在而上调。
 > 边界：本件是 `NF-Final` 方案的基线；`results/trust/BASELINE.md` 是 `NF-TrustFabric` 方案的基线。两份互不替代，数字各按各的复跑命令取用。
 
@@ -138,7 +139,7 @@ python -V; node -v; dotnet --list-sdks | head -1
 | D02 | 需求工程 | Partial | `01_核心协议.md` 415 行、`protocol/normative.json`、`nf-requirements/1`；无 RTM、无 ISO 25010 NFR 表 | **Partial 成立** | WP-01/0A |
 | D03 | 架构 | Partial | `docs/ccos/` 20 件、`decisions/` 3 件（含 2 件示例）；无质量属性场景/ATAM-lite、无 arc42 视图件 | **Partial 成立** | WP-02/04 |
 | D04 | 安全 | Partial | `SECURITY.md`、`docs/trust/THREAT_MODEL.md`（17 KB）、`docs/production/THREAT_MODEL.md` + `protocol/boundaries.json`（六边界/STRIDE/失败矩阵）、`results/production/threat_vectors.json`、`scripts/sast_check.py`、`core/trust_boundary.py`；仍无 ASVS/LLM Top10 映射、无 IR/披露 runbook | **Partial 成立**（威胁模型面补强，映射/IR 仍缺） | WP-0D |
-| D05 | 隐私 | None | 无数据地图/DPIA/LINDDUN/保留策略件；`core/delete_evidence.py` 是删除证据原语 | **None 成立** | WP-0B |
+| D05 | 隐私 | Partial | `PRIVACY.md`、`docs/privacy/{DATA_MAP,DPIA,RETENTION}.md`、`docs/qa/PRIVACY_QA.md`、`protocol/privacy.json`（8 类数据/四级分类/四保留模式/删除证据）、`core/privacy_scan.py` + `secret_guard`（PII/凭据扫描与脱敏）、`test_privacy_contract.py`；无跨境/委托处理与法律审核（本地优先不适用；不提供合规结论） | **重估为 Partial**（BL-01 数据地图+DPIA+保留/删除测试已过；法律审核不提供） | WP-0B ✅ |
 | D06 | AI 治理 | Partial | `core/trust/{model_card,human_review,entity}.py` + 8 件 schema；无 AI 影响评估/模型风险表/监管映射 | **Partial 成立** | WP-0F |
 | D07 | 数据治理 | Partial | `protocol/{data_contracts,asset_contracts,asset_keys}.json`、`core/data_quality.py`（`scripts/data_quality.py`）；无数据分类/所有权/血缘图 | **Partial 成立** | WP-0B |
 | D08 | 质量管理 | Partial | `verify.sh` 46 条 check、`core/quality_baseline.py`、`docs/st-quality-checklist.md`；无测试计划映射/配置项清单 | **Partial 成立** | §13A |

@@ -9,7 +9,7 @@ subjects:
   - verify.sh:18e2089ead65a11b4729ded516860cdf1d31cdb54a35935051249b40fbf7b53d
   - protocol/decision_layer.json:9330d4057f07647d67f15daa6f37c84913834b7eed65f4e360bf5c7c413e5e06
   - protocol/normative.json:c1bbc14c92cea6bd66ff6cb54fdcf91bf3072f66adee7027f1d3f42e70fe1825
-  - protocol/data_contracts.json:e7385f774e241ca953de84d26885b4bd3eb97da6be83c831f34f5751c3cbbdea
+  - protocol/data_contracts.json:10952c33d2b3f508bfc1e91519778984df1f30cac39f019ce7bdefd59b1121d2
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/receipts.py:b748915bb519aeeb1aa0f7d367df2eb7d4321b369b85905a7f918d8d55d96363
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
@@ -19,6 +19,10 @@ subjects:
   - docs/decision-layer.md:cd3a254de738ece7c8f07db36904c74484e4622c58f688a3973c8998b441628c
 
 ---
+> 重审（2026-11-14）：NF-Final WP-0B：assertion:privacy-registry 接线（protocol/assertions.json）与 data_contracts quality_rule 更新，被审对象变更后机械重绑
+
+> 重审（2026-11-14）：NF-Final WP-0B：新增 protocol/privacy.json（数据契约登记）、core/privacy_scan.py、PRIVACY.md 与 docs/privacy/*、docs/qa/PRIVACY_QA.md；code_metrics 376 件、check12 权重 +1.6s；被审对象变更后机械重绑
+
 > 重审（2026-11-14）：NF-Final WP-01：protocol/LAYERS.json（写例外登记）与 data_contracts.json（independence-report 契约）变更，被审对象变更后机械重绑
 
 > 重审（2026-11-14）：NF-Final WP-02 双平面边界 check49：verify.sh 新增 check49（段 D）+ quality_baseline v2.35（47 check / PASS=85），被审对象变更后机械重绑

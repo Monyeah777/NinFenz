@@ -466,6 +466,7 @@
     "test_precheck": 134.5,
     "test_predicate_single_source_pattern_doc_contract": 3.4,
     "test_preset_cli": 3.3,
+    "test_privacy_contract": 1.6,
     "test_probe_manifest_wiring": 0.1,
     "test_production_threat_vectors": 0.3,
     "test_prose_lint": 0.2,
@@ -4495,6 +4496,14 @@
     "test_preset_cli.PresetCliTest.test_export_import_and_rm": 1.52,
     "test_preset_cli.PresetCliTest.test_full_roundtrip": 1.12,
     "test_preset_cli.PresetCliTest.test_missing_preset_and_bad_import_give_guidance": 0.56,
+    "test_privacy_contract.PrivacyContractTest.test_declared_surfaces_clean": 1.29,
+    "test_privacy_contract.PrivacyContractTest.test_deletion_evidence_positive": 0.0,
+    "test_privacy_contract.PrivacyContractTest.test_deletion_failure_red": 0.0,
+    "test_privacy_contract.PrivacyContractTest.test_docs_consistent": 0.0,
+    "test_privacy_contract.PrivacyContractTest.test_mutation_self_proof": 0.01,
+    "test_privacy_contract.PrivacyContractTest.test_privacy_scan_fixture_and_redaction": 0.0,
+    "test_privacy_contract.PrivacyContractTest.test_registry_valid": 0.0,
+    "test_privacy_contract.PrivacyContractTest.test_retention_constraints": 0.05,
     "test_probe_manifest_wiring.ProbeManifestWiringTest.test_every_probe_file_is_registered_and_every_entry_has_a_file": 0.0,
     "test_probe_manifest_wiring.ProbeManifestWiringTest.test_non_probe_allowlist_is_not_stale": 0.0,
     "test_probe_manifest_wiring.ProbeManifestWiringTest.test_wiring_predicate_catches_the_mutations": 0.0,
@@ -6166,5 +6175,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2141.0
+  "total_s": 2142.6
 }

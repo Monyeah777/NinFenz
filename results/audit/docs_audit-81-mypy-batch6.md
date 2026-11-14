@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:47e66c38d7c91dd12975170882dd2410e287dddd24232419ecaf9bf5b7874de3
+  - protocol/code_metrics_baseline.json:defe66f802dd30d5f8e4657a92aaa8d8f4d52880f6dc2fbb98c8f307e690977a
 ---
+> 重审（2026-11-14）：NF-Final WP-0B：新增 protocol/privacy.json（数据契约登记）、core/privacy_scan.py、PRIVACY.md 与 docs/privacy/*、docs/qa/PRIVACY_QA.md；code_metrics 376 件、check12 权重 +1.6s；被审对象变更后机械重绑
+
 > 重审（2026-11-14）：NF-Final WP-02 双平面边界 check49：verify.sh 新增 check49（段 D）+ quality_baseline v2.35（47 check / PASS=85），被审对象变更后机械重绑
 
 > 重审（2026-11-14）：WP-15 check45 接线与 G1 收口（机械重绑）

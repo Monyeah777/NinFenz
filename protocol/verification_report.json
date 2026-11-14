@@ -298,7 +298,7 @@
       "stats": {
         "contracts": 27,
         "passed": 27,
-        "root": "f6c3d0a254559ab417796d1f87605c53ef5c3172d7d8d6186bfa635a6c2e4180",
+        "root": "3a6d39b73a179ba726c02719bce5d90f6493f232110c1eed57bde3c8babe7cee",
         "verdict": "conformant"
       },
       "status": "pass",
@@ -369,8 +369,8 @@
       "sample": [],
       "source": "code_metrics.scan",
       "stats": {
-        "baseline": 375,
-        "files": 375,
+        "baseline": 376,
+        "files": 376,
         "max_fn_cc": 132,
         "max_fn_lines": 443,
         "max_lines": 9888
@@ -387,8 +387,8 @@
       "stats": {
         "budget_ms": 1500.0,
         "n": 65536,
-        "patterns": 271,
-        "probed": 271
+        "patterns": 273,
+        "probed": 273
       },
       "status": "pass",
       "warns": 0
@@ -431,9 +431,9 @@
       "stats": {
         "cycles": 0,
         "metrics_drift": 2,
-        "metrics_missing": 1,
+        "metrics_missing": 2,
         "metrics_recorded": 289,
-        "modules": 290,
+        "modules": 291,
         "registered_cycles": 0,
         "registered_sdp": 9,
         "sdp": 9
@@ -526,8 +526,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4615,
-        "kernel": 2449,
+        "files": 4623,
+        "kernel": 2452,
         "kernel_no_self": 308,
         "rules": 9,
         "uncovered": 0,
@@ -547,15 +547,15 @@
         "dynamic_allow": 1,
         "forbidden_edges": 0,
         "governance": 9,
-        "modules": 295,
+        "modules": 296,
         "production": 31,
-        "shared": 25
+        "shared": 26
       },
       "status": "pass",
       "warns": 0
     }
   ],
-  "root_digest": "316a9870ff1aa5a189e2aabb2fc753ea2d7302e6dddf2d82d52f8004a16adb0a",
+  "root_digest": "a2d19c01ee02df857d52f2ab61b8fac6dda1aa96470c12f137f66d42f436c67b",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

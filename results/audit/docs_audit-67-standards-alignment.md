@@ -9,8 +9,12 @@ subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/asset_density.py:aa60651ad8269e7db09a709570ae69192f39ee95cfd6bd1d4f652696b3d26c56
   - docs/domain-packs.md:f90ff233965ee1bb5a872dd833b79e200bfc1825db9c81f651ceca760d83d8b6
-  - protocol/data_contracts.json:e7385f774e241ca953de84d26885b4bd3eb97da6be83c831f34f5751c3cbbdea
+  - protocol/data_contracts.json:10952c33d2b3f508bfc1e91519778984df1f30cac39f019ce7bdefd59b1121d2
 ---
+> 重审（2026-11-14）：NF-Final WP-0B：assertion:privacy-registry 接线（protocol/assertions.json）与 data_contracts quality_rule 更新，被审对象变更后机械重绑
+
+> 重审（2026-11-14）：NF-Final WP-0B：新增 protocol/privacy.json（数据契约登记）、core/privacy_scan.py、PRIVACY.md 与 docs/privacy/*、docs/qa/PRIVACY_QA.md；code_metrics 376 件、check12 权重 +1.6s；被审对象变更后机械重绑
+
 > 重审（2026-11-14）：NF-Final WP-01：protocol/LAYERS.json（写例外登记）与 data_contracts.json（independence-report 契约）变更，被审对象变更后机械重绑
 
 > 重审（2026-11-13）：域包文档顶尖化（修可达 332/不可达 38/绑定 1200 记录 2400 锚位 + 空壳 73·36·2628 + specs 可见性说明 / 现状对照 / 复现）+ 契约判据 test_domain_packs_doc_contract；权重增量重测。本轮为机械重绑。

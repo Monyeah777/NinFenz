@@ -8,14 +8,18 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/gap_review.py:7d1d600926e13b9936f2a7d30e8a8ca95e4bb3b2a73308f88cfb89b563055953
   - desktop/src/core/payload_harvest.py:514c493d341863b245b7dddb0bde8ee87ca969fe4407c9f2834a726bb92d1a76
-  - protocol/data_contracts.json:e7385f774e241ca953de84d26885b4bd3eb97da6be83c831f34f5751c3cbbdea
-  - protocol/assertions.json:81eebfd4dba473134301a7254d8b86e7f9d26ed9da1c1d3165aec54f47f2de25
+  - protocol/data_contracts.json:10952c33d2b3f508bfc1e91519778984df1f30cac39f019ce7bdefd59b1121d2
+  - protocol/assertions.json:e790d2fedf748162eb329c71c2c8978db8e4009dff38e16316b52bc3134eb495
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
   - desktop/src/core/text_hygiene.py:99b38bfbb8656ad653689c4cba93679970a78183019fd5f02e2380d87ec99ff3
   - desktop/src/core/workloop.py:3ee94f2c11939abba5507741c6b9b4dae8e8cab77c3bda38419678e31e097056
   - scripts/serve_decision_model.py:bbb36dff0e3816c2253150b7de6ab619877c3c78269a644c4c966083df15afee
   - scripts/nf.py:75ed1ad2dda5fb07dbd914a6ffedb836e5cf1298bf34b98be602644827ebc925
 ---
+> 重审（2026-11-14）：NF-Final WP-0B：assertion:privacy-registry 接线（protocol/assertions.json）与 data_contracts quality_rule 更新，被审对象变更后机械重绑
+
+> 重审（2026-11-14）：NF-Final WP-0B：新增 protocol/privacy.json（数据契约登记）、core/privacy_scan.py、PRIVACY.md 与 docs/privacy/*、docs/qa/PRIVACY_QA.md；code_metrics 376 件、check12 权重 +1.6s；被审对象变更后机械重绑
+
 > 重审（2026-11-14）：NF-Final WP-01：protocol/LAYERS.json（写例外登记）与 data_contracts.json（independence-report 契约）变更，被审对象变更后机械重绑
 
 > 重审（2026-11-14）：NF-Final WP-02 双平面边界 check49：verify.sh 新增 check49（段 D）+ quality_baseline v2.35（47 check / PASS=85），被审对象变更后机械重绑
