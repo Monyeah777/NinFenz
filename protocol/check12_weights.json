@@ -413,6 +413,7 @@
     "test_numeric_grounding": 0.1,
     "test_official_core": 0.2,
     "test_one_shot_audits_doc_contract": 0.5,
+    "test_ops_contract": 0.4,
     "test_orchestrate_cli": 0.8,
     "test_orchestration": 0.4,
     "test_orphan_scan": 0.1,
@@ -4116,6 +4117,16 @@
     "test_one_shot_audits_doc_contract.OneShotAuditsDocTest.test_audits_match_contract": 0.05,
     "test_one_shot_audits_doc_contract.OneShotAuditsDocTest.test_contract_catches_mutations": 0.18,
     "test_one_shot_audits_doc_contract.OneShotAuditsDocTest.test_doc_table_matches_frozen_list": 0.05,
+    "test_ops_contract.OpsContractTest.test_disclosure_drill": 0.0,
+    "test_ops_contract.OpsContractTest.test_docs_present_and_cross_consistent": 0.0,
+    "test_ops_contract.OpsContractTest.test_no_overclaim_in_new_docs": 0.0,
+    "test_ops_contract.OpsContractTest.test_recovery_drill_restores_and_tamper_proof": 0.0,
+    "test_ops_contract.OpsContractTest.test_registries_valid": 0.0,
+    "test_ops_contract.OpsContractTest.test_registry_mutations_red": 0.01,
+    "test_ops_contract.OpsContractTest.test_report_committed_and_complete": 0.0,
+    "test_ops_contract.OpsContractTest.test_report_drift_red": 0.01,
+    "test_ops_contract.OpsContractTest.test_tabletop_mapping_is_deterministic": 0.0,
+    "test_ops_contract.OpsContractTest.test_vendor_readiness": 0.0,
     "test_orchestrate_cli.OrchestrateCliTest.test_bad_plan_exits_nonzero": 0.11,
     "test_orchestrate_cli.OrchestrateCliTest.test_catalog_is_valid_json_with_plan_guide": 0.11,
     "test_orchestrate_cli.OrchestrateCliTest.test_check_passes_on_real_repo": 0.12,
@@ -6175,5 +6186,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2142.6
+  "total_s": 2143.0
 }

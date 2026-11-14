@@ -1,0 +1,237 @@
+{
+  "counts": {
+    "drills": 8,
+    "runbook_steps": 7,
+    "severities": 4,
+    "slo": 3,
+    "vendors": 6
+  },
+  "drills": [
+    {
+      "disclosure_required": true,
+      "id": "DR-01",
+      "kind": "tabletop",
+      "severity": "S0",
+      "status": "pass",
+      "steps": [
+        {
+          "id": "IR-01",
+          "status": "required"
+        },
+        {
+          "id": "IR-02",
+          "status": "required"
+        },
+        {
+          "id": "IR-03",
+          "status": "required"
+        },
+        {
+          "id": "IR-04",
+          "status": "required"
+        },
+        {
+          "id": "IR-05",
+          "status": "required"
+        },
+        {
+          "id": "IR-06",
+          "status": "required"
+        },
+        {
+          "id": "IR-07",
+          "status": "required"
+        }
+      ]
+    },
+    {
+      "disclosure_required": true,
+      "id": "DR-01",
+      "kind": "tabletop",
+      "severity": "S1",
+      "status": "pass",
+      "steps": [
+        {
+          "id": "IR-01",
+          "status": "required"
+        },
+        {
+          "id": "IR-02",
+          "status": "required"
+        },
+        {
+          "id": "IR-03",
+          "status": "required"
+        },
+        {
+          "id": "IR-04",
+          "status": "required"
+        },
+        {
+          "id": "IR-05",
+          "status": "required"
+        },
+        {
+          "id": "IR-06",
+          "status": "required"
+        },
+        {
+          "id": "IR-07",
+          "status": "required"
+        }
+      ]
+    },
+    {
+      "disclosure_required": false,
+      "id": "DR-01",
+      "kind": "tabletop",
+      "severity": "S2",
+      "status": "pass",
+      "steps": [
+        {
+          "id": "IR-01",
+          "status": "required"
+        },
+        {
+          "id": "IR-02",
+          "status": "required"
+        },
+        {
+          "id": "IR-03",
+          "status": "skipped"
+        },
+        {
+          "id": "IR-04",
+          "status": "required"
+        },
+        {
+          "id": "IR-05",
+          "status": "required"
+        },
+        {
+          "id": "IR-06",
+          "status": "required"
+        },
+        {
+          "id": "IR-07",
+          "status": "required"
+        }
+      ]
+    },
+    {
+      "disclosure_required": false,
+      "id": "DR-01",
+      "kind": "tabletop",
+      "severity": "S3",
+      "status": "pass",
+      "steps": [
+        {
+          "id": "IR-01",
+          "status": "required"
+        },
+        {
+          "id": "IR-02",
+          "status": "required"
+        },
+        {
+          "id": "IR-03",
+          "status": "skipped"
+        },
+        {
+          "id": "IR-04",
+          "status": "required"
+        },
+        {
+          "id": "IR-05",
+          "status": "required"
+        },
+        {
+          "id": "IR-06",
+          "status": "skipped"
+        },
+        {
+          "id": "IR-07",
+          "status": "required"
+        }
+      ]
+    },
+    {
+      "id": "DR-02",
+      "kind": "recovery",
+      "status": "pass",
+      "steps": [
+        {
+          "name": "备份",
+          "status": "pass"
+        },
+        {
+          "name": "篡改被检出",
+          "status": "pass"
+        },
+        {
+          "name": "从备份恢复后可验",
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "ack_days": 7,
+      "disclose_days": 90,
+      "id": "DR-03",
+      "kind": "disclosure",
+      "private_channel": true,
+      "severity": "S0",
+      "status": "pass"
+    },
+    {
+      "ack_days": 7,
+      "disclose_days": 90,
+      "id": "DR-03",
+      "kind": "disclosure",
+      "private_channel": true,
+      "severity": "S1",
+      "status": "pass"
+    },
+    {
+      "id": "DR-04",
+      "kind": "vendor-exit",
+      "replacement_drills": 1,
+      "status": "pass",
+      "vendors": [
+        {
+          "id": "V-01",
+          "issues": [],
+          "status": "pass"
+        },
+        {
+          "id": "V-02",
+          "issues": [],
+          "status": "pass"
+        },
+        {
+          "id": "V-03",
+          "issues": [],
+          "status": "pass"
+        },
+        {
+          "id": "V-04",
+          "issues": [],
+          "status": "pass"
+        },
+        {
+          "id": "V-05",
+          "issues": [],
+          "status": "pass"
+        },
+        {
+          "id": "V-06",
+          "issues": [],
+          "status": "pass"
+        }
+      ]
+    }
+  ],
+  "findings": [],
+  "ok": true,
+  "schema": "nf-ops-drills/1"
+}

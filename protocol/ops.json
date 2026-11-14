@@ -1,0 +1,88 @@
+{
+  "schema": "nf-ops/1",
+  "note": "NF-Final §15A.4 运维/事件/BCP 机读登记（WP-0D）：严重度分级 + 事件 runbook + 漏洞披露口径（以 SECURITY.md 为通道权威）+ SLO（本地优先工具的「正确/可复现/离线」目标，不承诺日历可用性）+ BCP/DR 资产与场景 + 演练清单。判据 desktop/tests/test_ops_contract.py 与机器演练报告 results/ops/drills.json。",
+  "severity_vocabulary": {
+    "S0": {
+      "definition": "密钥/证据泄露、越权、可伪造、可静默篡改",
+      "response": "立即隔离 + 取证 + 撤销/轮换密钥 + 阻断发布",
+      "disclosure": "必须（协调披露）"
+    },
+    "S1": {
+      "definition": "安全/信任判定错误、证据链断裂、默认放行",
+      "response": "阻断发布 + 最小修复 + 回归测试",
+      "disclosure": "必须"
+    },
+    "S2": {
+      "definition": "功能错误、契约不满足、不可复现",
+      "response": "常规修复；影响面进质量债",
+      "disclosure": "按需（涉及用户数据/信任时升级）"
+    },
+    "S3": {
+      "definition": "质量、性能、兼容、文档问题",
+      "response": "进质量债/文档修复",
+      "disclosure": "通常不需要"
+    }
+  },
+  "incident_runbook": {
+    "roles": ["报告人", "受理人（maintainer）", "修复人", "复核人（非唯一作者）"],
+    "steps": [
+      {"id": "IR-01", "name": "发现/受理", "action": "经 SECURITY.md 私密通道或门禁/CI 告警进入；记录时间线与事件编号", "evidence": "SECURITY.md"},
+      {"id": "IR-02", "name": "分级", "action": "按 severity_vocabulary 定 S0-S3；S0/S1 立即升级并阻断发布", "evidence": "protocol/ops.json"},
+      {"id": "IR-03", "name": "隔离", "action": "停止相关写盘/发布；撤销或轮换受影响凭据", "evidence": "CONTRIBUTING.md"},
+      {"id": "IR-04", "name": "取证", "action": "保全只读证据（digest/回执/日志），不覆盖现场", "evidence": "desktop/src/core/evidence.py"},
+      {"id": "IR-05", "name": "修复", "action": "最小修复 + 回归测试 + 冻结链按序重跑", "evidence": "verify.sh"},
+      {"id": "IR-06", "name": "披露", "action": "按 SECURITY.md 通道协调披露；修复优先于披露，不单方面公开", "evidence": "SECURITY.md"},
+      {"id": "IR-07", "name": "复盘", "action": "postmortem 记根因/行动项/owner，行动项进质量债", "evidence": "postmortems/"}
+    ]
+  },
+  "disclosure": {
+    "channel": "GitHub Security Advisories（私密）",
+    "policy_ref": "SECURITY.md",
+    "ack_within_days": 7,
+    "disclose_within_days": 90,
+    "logic_note": "天数是流程口径（确认/协调目标），不是修复 SLA；修复优先于披露，不单方面公开",
+    "cve": "GitHub（CNA）"
+  },
+  "slo": [
+    {"id": "SLO-01", "name": "门禁可复跑", "objective": "bash verify.sh --checks-only FAIL=0",
+     "measurement": "每次提交与 CI", "evidence": "verify.sh"},
+    {"id": "SLO-02", "name": "证据可复算", "objective": "在盘报告 == 实时重算（freshness 4/4）",
+     "measurement": "scripts/freshness_check.py", "evidence": "scripts/freshness_check.py"},
+    {"id": "SLO-03", "name": "离线可用", "objective": "核心路径不联网可跑；外部锚/网络动作显式可选",
+     "measurement": "离线语义与测试", "evidence": "desktop/src/core/trust/public_anchor.py"}
+  ],
+  "bcp": {
+    "assets": [
+      {"id": "A-01", "name": "真源与代码", "backup": "git 历史 + 远端镜像",
+       "rto": "一个工作会话内（逻辑，不承诺日历）", "rpo": "最后一次提交",
+       "restore": "git clone/fetch + 回执校验"},
+      {"id": "A-02", "name": "证据/回执", "backup": "git 历史 + 每阶段重算",
+       "rto": "同上", "rpo": "最后一次冻结",
+       "restore": "重跑冻结链（conformance → approve → receipts）"},
+      {"id": "A-03", "name": "密钥/信任材料", "backup": "用户离线备份（不入仓）",
+       "rto": "轮换后新证据", "rpo": "不适用（旧证据仍可验）",
+       "restore": "新 key 签新证据；旧证据按历史验证，不伪造旧 key"}
+    ],
+    "scenarios": [
+      {"id": "BCP-01", "trigger": "本机磁盘丢失/工作区损坏", "impact": "工作区与本地未提交面丢失",
+       "steps": ["git clone 恢复真源", "按序重跑冻结链", "bash verify.sh --checks-only"],
+       "expected": "FAIL=0 且 freshness 4/4", "drill": "recovery"},
+      {"id": "BCP-02", "trigger": "密钥丢失或泄露", "impact": "旧签名不可再用于新证据",
+       "steps": ["撤销/轮换密钥", "旧证据按历史验证", "新证据用新 key"],
+       "expected": "旧证据可验、新证据新 key；不伪造旧 key", "drill": "tabletop"},
+      {"id": "BCP-03", "trigger": "TSA/公共日志不可达", "impact": "T2/T4 外部锚不可得",
+       "steps": ["显式降级", "报告写缺项", "不冒充等级"],
+       "expected": "缺锚 exit 2 / 不声称 T3/T4", "drill": "tabletop"}
+    ]
+  },
+  "drills": [
+    {"id": "DR-01", "kind": "tabletop", "covers": ["S0", "S1", "S2", "S3"],
+     "runner": "core.ops.tabletop"},
+    {"id": "DR-02", "kind": "recovery", "covers": ["BCP-01"],
+     "runner": "core.ops.recovery_drill"},
+    {"id": "DR-03", "kind": "disclosure", "covers": ["S0", "S1"],
+     "runner": "core.ops.disclosure_drill"},
+    {"id": "DR-04", "kind": "vendor-exit", "covers": ["V-01", "V-02", "V-03", "V-04", "V-05", "V-06"],
+     "runner": "core.ops.vendor_readiness"}
+  ]
+}

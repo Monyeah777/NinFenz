@@ -900,6 +900,11 @@
       "max_fn_cc": 0,
       "max_fn_lines": 0
     },
+    "desktop/src/core/ops.py": {
+      "lines": 356,
+      "max_fn_cc": 73,
+      "max_fn_lines": 99
+    },
     "desktop/src/core/orchestration.py": {
       "lines": 451,
       "max_fn_cc": 16,
@@ -1689,6 +1694,11 @@
       "lines": 47,
       "max_fn_cc": 6,
       "max_fn_lines": 22
+    },
+    "scripts/ops_drill.py": {
+      "lines": 68,
+      "max_fn_cc": 14,
+      "max_fn_lines": 40
     },
     "scripts/orchestrate.py": {
       "lines": 78,

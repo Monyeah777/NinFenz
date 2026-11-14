@@ -36,15 +36,16 @@
       "official_core"
     ],
     "governance": [
-      "trust",
-      "evidence",
-      "revocations",
-      "transparency_log",
-      "key_transparency",
-      "provenance_external",
       "approval",
       "contract_history",
-      "policy_snapshot"
+      "evidence",
+      "key_transparency",
+      "ops",
+      "policy_snapshot",
+      "provenance_external",
+      "revocations",
+      "transparency_log",
+      "trust"
     ],
     "shared": [
       "anchor_align",

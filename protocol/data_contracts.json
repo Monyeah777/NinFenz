@@ -693,6 +693,45 @@
         "PRIVACY.md",
         "docs/privacy/DATA_MAP.md"
       ]
+    },
+    {
+      "id": "ops-registry",
+      "artifact": "protocol/ops.json",
+      "quality_rule": "assertion:ops-registry",
+      "owner": "运维/事件/BCP（core/ops.py + desktop/tests/test_ops_contract.py）+ WP-0D",
+      "status": "active",
+      "freshness": "改流程须同步 protocol/ops.json 与 docs/security、docs/sre；判据 test_ops_contract",
+      "consumers": [
+        "test_ops_contract",
+        "scripts/ops_drill.py",
+        "docs/security/INCIDENT_RESPONSE.md"
+      ]
+    },
+    {
+      "id": "vendors-registry",
+      "artifact": "protocol/vendors.json",
+      "quality_rule": "assertion:vendors-registry",
+      "owner": "供应商登记（core/ops.py + desktop/tests/test_ops_contract.py）+ WP-0D",
+      "status": "active",
+      "freshness": "改 vendor 须同步 protocol/vendors.json 与 docs/legal/VENDORS.md；判据 test_ops_contract",
+      "consumers": [
+        "test_ops_contract",
+        "scripts/ops_drill.py",
+        "docs/legal/VENDORS.md"
+      ]
+    },
+    {
+      "id": "ops-drills",
+      "artifact": "results/ops/drills.json",
+      "quality_rule": "assertion:ops-drills",
+      "owner": "演练报告（core/ops.py::write + scripts/ops_drill.py）",
+      "status": "active",
+      "freshness": "重算：python scripts/ops_drill.py --run；--check 断言在盘==实时重算",
+      "consumers": [
+        "check_ops_drills",
+        "scripts/ops_drill.py",
+        "test_ops_contract"
+      ]
     }
   ]
 }
