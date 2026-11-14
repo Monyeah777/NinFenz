@@ -5,8 +5,8 @@
     "floor": 5,
     "prod": 1057,
     "projection": 174,
-    "support": 489,
-    "verify": 1366
+    "support": 494,
+    "verify": 1386
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7343,6 +7343,126 @@
       "rule": "R-verify"
     },
     {
+      "function": "nf-assembly/1",
+      "path": "desktop/tests/fixtures/production/schemas/invalid/assembly-bad-pipeline.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-assembly/1",
+      "path": "desktop/tests/fixtures/production/schemas/invalid/assembly-missing-fallback.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-assembly/1",
+      "path": "desktop/tests/fixtures/production/schemas/invalid/assembly-step-bad-id.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-contract/1",
+      "path": "desktop/tests/fixtures/production/schemas/invalid/contract-bad-digest.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-contract/1",
+      "path": "desktop/tests/fixtures/production/schemas/invalid/contract-missing-acceptance.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-contract/1",
+      "path": "desktop/tests/fixtures/production/schemas/invalid/contract-unknown-field.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-spec/1",
+      "path": "desktop/tests/fixtures/production/schemas/invalid/spec-bad-kind.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-spec/1",
+      "path": "desktop/tests/fixtures/production/schemas/invalid/spec-missing-digest.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-spec/1",
+      "path": "desktop/tests/fixtures/production/schemas/invalid/spec-version-zero.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-task/1",
+      "path": "desktop/tests/fixtures/production/schemas/invalid/task-budget-zero-tokens.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-task/1",
+      "path": "desktop/tests/fixtures/production/schemas/invalid/task-slot-bad-id.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-task/1",
+      "path": "desktop/tests/fixtures/production/schemas/invalid/task-unknown-output-kind.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-wiki-page/1",
+      "path": "desktop/tests/fixtures/production/schemas/invalid/wiki-page-bad-type.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-wiki-page/1",
+      "path": "desktop/tests/fixtures/production/schemas/invalid/wiki-page-empty-citations.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-wiki-page/1",
+      "path": "desktop/tests/fixtures/production/schemas/invalid/wiki-page-unknown-relation.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-assembly/1",
+      "path": "desktop/tests/fixtures/production/schemas/valid/assembly.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-contract/1",
+      "path": "desktop/tests/fixtures/production/schemas/valid/contract.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-spec/1",
+      "path": "desktop/tests/fixtures/production/schemas/valid/spec.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-task/1",
+      "path": "desktop/tests/fixtures/production/schemas/valid/task.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-wiki-page/1",
+      "path": "desktop/tests/fixtures/production/schemas/valid/wiki-page.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "",
       "path": "desktop/tests/fixtures/release/plan.golden.json",
       "role": "verify",
@@ -14580,16 +14700,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "8cf01301fec1133aa52c92fa06b1f673cd8b6bc11647ad00125fe5b3a7f29c29",
+  "root_digest": "3a64523a6c74b50f36fa3153e6b489551a9f2aeb482847f49f3183f4a6960b32",
   "rule_counts": {
     "R-app": 1469,
-    "R-catch": 337,
+    "R-catch": 342,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 154,
     "R-support": 124,
-    "R-verify": 1239,
+    "R-verify": 1259,
     "auto:R-core": 288
   },
   "schema": "nf-role-coordinates/1"
