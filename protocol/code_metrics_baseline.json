@@ -840,6 +840,11 @@
       "max_fn_cc": 22,
       "max_fn_lines": 47
     },
+    "desktop/src/core/layer_reports.py": {
+      "lines": 195,
+      "max_fn_cc": 17,
+      "max_fn_lines": 49
+    },
     "desktop/src/core/lazy_yaml.py": {
       "lines": 82,
       "max_fn_cc": 10,

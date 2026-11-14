@@ -1325,6 +1325,51 @@
       "message": "关键词/扩展口登记缺失或版本名不符（WP-52 判据依赖它）",
       "fix": "补/修 protocol/keywords.json；再跑 test_keywords_contract / nf keywords check",
       "evidence": "test_keywords_contract / conformance::modeling"
+    },
+    {
+      "id": "wiki-report",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "results/wiki-report.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-wiki-report/1"
+      },
+      "message": "Wiki 报告缺失或版本名不符（§19.1 交付物）",
+      "fix": "重跑 layer_reports.write；再跑 test_layer_reports",
+      "evidence": "test_layer_reports / conformance::modeling"
+    },
+    {
+      "id": "spec-report",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "results/spec-report.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-spec-report/1"
+      },
+      "message": "Spec 报告缺失或版本名不符（§19.1 交付物）",
+      "fix": "重跑 layer_reports.write；再跑 test_layer_reports",
+      "evidence": "test_layer_reports / conformance::modeling"
+    },
+    {
+      "id": "qa-layers",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "results/qa/layers.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-qa-layers/1"
+      },
+      "message": "分层 QA 映射缺失或版本名不符（§19.1 交付物）",
+      "fix": "重跑 layer_reports.write；再跑 test_layer_reports",
+      "evidence": "test_layer_reports / conformance::modeling"
     }
   ]
 }

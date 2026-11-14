@@ -1,0 +1,309 @@
+{
+  "claims_boundary": [
+    "分层 QA 映射是内部证据索引，不是认证",
+    "partial 层保持 partial，不因收口消失"
+  ],
+  "layers": [
+    {
+      "evidence": [
+        "protocol/assertions.json",
+        "protocol/production/contract.schema.json"
+      ],
+      "layer": "L0",
+      "name": "真源/契约",
+      "next": "",
+      "owner": "",
+      "present": [
+        "protocol/assertions.json",
+        "protocol/production/contract.schema.json"
+      ],
+      "status": "covered"
+    },
+    {
+      "evidence": [
+        "results/wiki-report.json"
+      ],
+      "layer": "L1",
+      "name": "LLMWiki",
+      "next": "",
+      "owner": "",
+      "present": [
+        "results/wiki-report.json"
+      ],
+      "status": "covered"
+    },
+    {
+      "evidence": [
+        "results/spec-report.json"
+      ],
+      "layer": "L2",
+      "name": "Spec Compiler",
+      "next": "",
+      "owner": "",
+      "present": [
+        "results/spec-report.json"
+      ],
+      "status": "covered"
+    },
+    {
+      "evidence": [
+        "desktop/tests/test_context_packer_contract.py"
+      ],
+      "layer": "L3",
+      "name": "Context Packer",
+      "next": "补 context-report.json",
+      "owner": "maintainers",
+      "present": [
+        "desktop/tests/test_context_packer_contract.py"
+      ],
+      "status": "partial"
+    },
+    {
+      "evidence": [
+        "results/adapter/adapter-report.json"
+      ],
+      "layer": "L4",
+      "name": "Agent Adapter",
+      "next": "",
+      "owner": "",
+      "present": [
+        "results/adapter/adapter-report.json"
+      ],
+      "status": "covered"
+    },
+    {
+      "evidence": [
+        "results/assembly/sample-document.assembly.json"
+      ],
+      "layer": "L5",
+      "name": "Assembly Runtime",
+      "next": "",
+      "owner": "",
+      "present": [
+        "results/assembly/sample-document.assembly.json"
+      ],
+      "status": "covered"
+    },
+    {
+      "evidence": [
+        "results/output/output-report.json"
+      ],
+      "layer": "L6",
+      "name": "Output/Validation",
+      "next": "",
+      "owner": "",
+      "present": [
+        "results/output/output-report.json"
+      ],
+      "status": "covered"
+    },
+    {
+      "evidence": [
+        "results/delivery/delivery-report.json"
+      ],
+      "layer": "L7",
+      "name": "Delivery",
+      "next": "",
+      "owner": "",
+      "present": [
+        "results/delivery/delivery-report.json"
+      ],
+      "status": "covered"
+    },
+    {
+      "evidence": [
+        "results/governance/report.json",
+        "results/governance/audit.json"
+      ],
+      "layer": "L8",
+      "name": "Governance",
+      "next": "",
+      "owner": "",
+      "present": [
+        "results/governance/report.json",
+        "results/governance/audit.json"
+      ],
+      "status": "covered"
+    },
+    {
+      "evidence": [
+        "results/ai/model-card.json",
+        "results/ai/aibom.cdx.json"
+      ],
+      "layer": "L9",
+      "name": "AI 信任",
+      "next": "",
+      "owner": "",
+      "present": [
+        "results/ai/model-card.json",
+        "results/ai/aibom.cdx.json"
+      ],
+      "status": "covered"
+    },
+    {
+      "evidence": [
+        "docs/security/THREAT_MODEL.md",
+        "results/cq/scan.json"
+      ],
+      "layer": "L10",
+      "name": "安全/隐私",
+      "next": "威胁模型有；红队矩阵未做（S15 open）",
+      "owner": "security",
+      "present": [
+        "results/cq/scan.json"
+      ],
+      "status": "partial"
+    },
+    {
+      "evidence": [
+        "results/reverse/FAILURE_ARCHAEOLOGY.md",
+        "results/stability/report.json"
+      ],
+      "layer": "L11",
+      "name": "运维/恢复",
+      "next": "故障注入矩阵未系统化；长稳 soak 未做",
+      "owner": "operations",
+      "present": [
+        "results/reverse/FAILURE_ARCHAEOLOGY.md",
+        "results/stability/report.json"
+      ],
+      "status": "partial"
+    },
+    {
+      "evidence": [
+        "results/docs_claims_report.json"
+      ],
+      "layer": "L12",
+      "name": "文档/上手",
+      "next": "",
+      "owner": "",
+      "present": [
+        "results/docs_claims_report.json"
+      ],
+      "status": "covered"
+    },
+    {
+      "evidence": [
+        "results/interop",
+        "results/ai/aibom.cdx.json"
+      ],
+      "layer": "L13",
+      "name": "生态/标准",
+      "next": "补缺证据：['results/interop']",
+      "owner": "maintainers",
+      "present": [
+        "results/ai/aibom.cdx.json"
+      ],
+      "status": "partial"
+    },
+    {
+      "evidence": [
+        "docs/privacy",
+        "docs/legal",
+        "LEGAL.md"
+      ],
+      "layer": "L14",
+      "name": "隐私/法务",
+      "next": "补缺证据：['docs/privacy', 'docs/legal']",
+      "owner": "maintainers",
+      "present": [
+        "LEGAL.md"
+      ],
+      "status": "partial"
+    },
+    {
+      "evidence": [
+        "docs/sre"
+      ],
+      "layer": "L15",
+      "name": "可靠性/事件/BCP",
+      "next": "IR/BCP 演练记录未系统化",
+      "owner": "operations",
+      "present": [],
+      "status": "partial"
+    },
+    {
+      "evidence": [
+        "docs/a11y",
+        "docs/i18n"
+      ],
+      "layer": "L16",
+      "name": "可访问性/i18n/人因",
+      "next": "补缺证据：['docs/a11y', 'docs/i18n']",
+      "owner": "maintainers",
+      "present": [],
+      "status": "partial"
+    },
+    {
+      "evidence": [
+        "docs/product"
+      ],
+      "layer": "L17",
+      "name": "产品价值",
+      "next": "用户访谈/试点属外部 OPEN",
+      "owner": "product",
+      "present": [],
+      "status": "partial"
+    },
+    {
+      "evidence": [
+        "GOVERNANCE.md",
+        "CONTRIBUTING.md",
+        "SECURITY.md"
+      ],
+      "layer": "L18",
+      "name": "开源治理/社区",
+      "next": "",
+      "owner": "",
+      "present": [
+        "GOVERNANCE.md",
+        "CONTRIBUTING.md",
+        "SECURITY.md"
+      ],
+      "status": "covered"
+    },
+    {
+      "evidence": [
+        "docs/product/GTM.md",
+        "docs/legal/VENDOR_REGISTER.md"
+      ],
+      "layer": "L19",
+      "name": "商业/支持/供应商",
+      "next": "定价/SLA/供应商退出未外部验证",
+      "owner": "product",
+      "present": [
+        "docs/product/GTM.md"
+      ],
+      "status": "partial"
+    },
+    {
+      "evidence": [
+        "docs/assurance/ASSURANCE_CASE.md",
+        "protocol/raid.json"
+      ],
+      "layer": "L20",
+      "name": "伦理/保证/项目",
+      "next": "",
+      "owner": "",
+      "present": [
+        "docs/assurance/ASSURANCE_CASE.md",
+        "protocol/raid.json"
+      ],
+      "status": "covered"
+    }
+  ],
+  "note": "§13A.2 L0–L20 映射既有 QA 产物；未做的层如实 partial（不写成 covered）",
+  "schema": "nf-qa-layers/1",
+  "status_vocabulary": [
+    "covered",
+    "partial",
+    "gap",
+    "open"
+  ],
+  "summary": {
+    "covered": 12,
+    "gap": 0,
+    "open": 0,
+    "partial": 9
+  }
+}
