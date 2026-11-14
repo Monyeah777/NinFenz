@@ -1,0 +1,29 @@
+{
+  "schema": "nf-process/1",
+  "process_id": "proc-demo-001",
+  "step": 1,
+  "prev": "",
+  "actor": {
+    "id": "nf:agent:demo",
+    "kind": "agent"
+  },
+  "authorization": {
+    "kind": "human",
+    "digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    "note": "task approval"
+  },
+  "input_refs": [
+    {
+      "kind": "entity",
+      "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    }
+  ],
+  "output_refs": [
+    {
+      "kind": "entity",
+      "digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    }
+  ],
+  "state_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "type": "task-step"
+}

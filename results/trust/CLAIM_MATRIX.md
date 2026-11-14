@@ -28,6 +28,8 @@
 | 19 | 模型替换使旧 AI 证据失效（model card 绑定） | 计划 `core/ai_trust/`（未建） | — | — | TODO（G3） |
 | 20 | 报告给出等级 + 缺项 + issuer 状态（`nf-verify/1`） | 计划 `trust/verify.py`（未建） | — | — | TODO（G2） |
 | 21 | Python ↔ .NET（引擎线）逐字节 parity（trust 面） | 计划；.NET 引擎线未接 | — | — | TODO（G3/G4；本机无 SDK，见 BASELINE §7） |
+| 22 | trust 层 7 件 IDL 结构 fail-closed（未知字段/封闭词表/摘要/时间/base64 形状） | `protocol/trust/*.schema.json`（7 件） | `test_trust_schemas.py`（23 条：正/反样例 + 变异自证） | T0 | SUPPORTED |
+| 23 | schema 不依赖校验器未实现语义（无静默忽略） | `core.json_schema` 叶子件 + `test_trust_schemas.py` 的 unsupported 断言 | 同上 | — | SUPPORTED |
 
 **本轮判定**：`UNSUPPORTED` = 0（本轮抽检范围内）；`TODO` 11 条全部落在计划 G1–G4 的工作包内，不构成文档过度声明。计划 §13.3 的示例行「删尾可检测 / T2 / TODO」与本矩阵第 15 行同源。
 

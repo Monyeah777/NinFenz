@@ -5,8 +5,8 @@
     "floor": 5,
     "prod": 1057,
     "projection": 165,
-    "support": 448,
-    "verify": 1286
+    "support": 455,
+    "verify": 1309
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7343,6 +7343,138 @@
       "rule": "R-verify"
     },
     {
+      "function": "nf-anchor/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/anchor-empty.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-anchor/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/anchor-missing-token.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-anchor/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/anchor-unknown-kind.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-claim-bundle/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/claim-bundle-bad-side.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-claim-bundle/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/claim-bundle-missing-proofs.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-dsse/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/dsse-bad-payload.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-dsse/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/dsse-empty-signatures.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-entity/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/entity-bad-digest.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-entity/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/entity-unknown-field.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-trust-policy/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/policy-level-t5.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-trust-policy/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/policy-unknown-alg.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-process/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/process-prev-empty.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-process/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/process-step-zero.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-verify/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/verify-issue-missing-fix.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-verify/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/verify-no-scoring-false.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-anchor/1",
+      "path": "desktop/tests/fixtures/trust/schemas/valid/anchor.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-claim-bundle/1",
+      "path": "desktop/tests/fixtures/trust/schemas/valid/claim-bundle.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-dsse/1",
+      "path": "desktop/tests/fixtures/trust/schemas/valid/dsse.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-entity/1",
+      "path": "desktop/tests/fixtures/trust/schemas/valid/entity.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-trust-policy/1",
+      "path": "desktop/tests/fixtures/trust/schemas/valid/policy.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-process/1",
+      "path": "desktop/tests/fixtures/trust/schemas/valid/process.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-verify/1",
+      "path": "desktop/tests/fixtures/trust/schemas/valid/verify.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "absence_guard 单测。",
       "path": "desktop/tests/test_absence_guard.py",
       "role": "verify",
@@ -10949,6 +11081,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "Trust Fabric schema 门禁（WP-01）：7 件 IDL、正/反样例与变异自证。",
+      "path": "desktop/tests/test_trust_schemas.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "tui/README.md 契约：TUI 说明的「动作数 / 区数 / 闸门三表 / 自检 6 条 / 退出码」与实跑一致。",
       "path": "desktop/tests/test_tui_readme_doc_contract.py",
       "role": "verify",
@@ -14100,16 +14238,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "5c993bdd0696607976f0334a0d816ecfbbab1214dfbab5b9385b4feb69f29cca",
+  "root_digest": "5c53f6f47cb48805c3c51fe970c108660110f8266a4ff1063c488c70e399f7a6",
   "rule_counts": {
     "R-app": 1466,
-    "R-catch": 296,
+    "R-catch": 303,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 145,
     "R-support": 124,
-    "R-verify": 1160,
+    "R-verify": 1183,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

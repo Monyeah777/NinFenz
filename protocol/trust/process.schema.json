@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/trust/process.schema.json",
+  "title": "nf-process/1 流程步骤（FR-A2-01）",
+  "description": "流程步骤记录。prev = 上一步 digest（创世步用 64 个 0，不接受空串）；step 从 1 连续；type 合法性由类型注册表判定；actor/authorization 必填；未知字段拒绝。",
+  "type": "object",
+  "required": [
+    "schema",
+    "process_id",
+    "step",
+    "prev",
+    "actor",
+    "authorization",
+    "input_refs",
+    "output_refs",
+    "state_digest",
+    "type"
+  ],
+  "properties": {
+    "schema": {
+      "const": "nf-process/1"
+    },
+    "process_id": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+    },
+    "step": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "prev": {
+      "$ref": "#/$defs/digest",
+      "description": "上一步 digest；创世步 = 64 个 0"
+    },
+    "actor": {
+      "type": "object",
+      "required": [
+        "id",
+        "kind"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "human",
+            "agent",
+            "system"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "authorization": {
+      "type": "object",
+      "required": [
+        "kind",
+        "digest"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "human",
+            "policy",
+            "agent"
+          ]
+        },
+        "digest": {
+          "$ref": "#/$defs/digest"
+        },
+        "note": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "input_refs": {
+      "type": "array",
+      "maxItems": 1024,
+      "items": {
+        "$ref": "#/$defs/refItem"
+      }
+    },
+    "output_refs": {
+      "type": "array",
+      "maxItems": 1024,
+      "items": {
+        "$ref": "#/$defs/refItem"
+      }
+    },
+    "state_digest": {
+      "$ref": "#/$defs/digest"
+    },
+    "type": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "refItem": {
+      "type": "object",
+      "required": [
+        "kind",
+        "digest"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "digest": {
+          "$ref": "#/$defs/digest"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

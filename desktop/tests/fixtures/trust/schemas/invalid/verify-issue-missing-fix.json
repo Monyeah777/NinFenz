@@ -1,0 +1,37 @@
+{
+  "schema": "nf-verify/1",
+  "subject": {
+    "kind": "bundle",
+    "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "level": {
+    "required": "T2",
+    "achieved": "T1"
+  },
+  "checks": [
+    {
+      "id": "A1-inclusion",
+      "ok": true,
+      "detail": "2 条 proof 均折叠到 root"
+    },
+    {
+      "id": "A3-anchor",
+      "ok": false,
+      "detail": "缺 RFC3161 token"
+    }
+  ],
+  "issues": [
+    {
+      "code": "ANCHOR-MISSING",
+      "message": "未找到覆盖 target_digest 的 rfc3161 锚",
+      "example": "nf evidence timestamp stamp B.zip --ca-file root.pem"
+    }
+  ],
+  "trust_roots": {
+    "issuers": [
+      "nf:local"
+    ],
+    "tsa": []
+  },
+  "no_scoring": true
+}

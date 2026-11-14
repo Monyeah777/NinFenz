@@ -1,0 +1,168 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/trust/verify.schema.json",
+  "title": "nf-verify/1 验证报告（FR-V-01）",
+  "description": "统一验证报告：已达到/要求等级、逐项检查、缺项与修复指引、使用的信任根、no_scoring 恒真。issues 每条必须给出 code/message/fix（NFR-AUDIT-01）。",
+  "type": "object",
+  "required": [
+    "schema",
+    "subject",
+    "level",
+    "checks",
+    "issues",
+    "trust_roots",
+    "no_scoring"
+  ],
+  "properties": {
+    "schema": {
+      "const": "nf-verify/1"
+    },
+    "subject": {
+      "type": "object",
+      "required": [
+        "kind",
+        "digest"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "bundle",
+            "process",
+            "entity",
+            "card",
+            "journal"
+          ]
+        },
+        "digest": {
+          "$ref": "#/$defs/digest"
+        }
+      },
+      "additionalProperties": false
+    },
+    "level": {
+      "type": "object",
+      "required": [
+        "required",
+        "achieved"
+      ],
+      "properties": {
+        "required": {
+          "type": "string",
+          "enum": [
+            "T0",
+            "T1",
+            "T2",
+            "T3",
+            "T4"
+          ]
+        },
+        "achieved": {
+          "type": "string",
+          "enum": [
+            "none",
+            "T0",
+            "T1",
+            "T2",
+            "T3",
+            "T4"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "checks": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4096,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "ok",
+          "detail"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "ok": {
+            "type": "boolean"
+          },
+          "detail": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "issues": {
+      "type": "array",
+      "maxItems": 4096,
+      "items": {
+        "type": "object",
+        "required": [
+          "code",
+          "message",
+          "fix"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[A-Z][A-Z0-9-]*$"
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1
+          },
+          "fix": {
+            "type": "string",
+            "minLength": 1
+          },
+          "example": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "trust_roots": {
+      "type": "object",
+      "required": [
+        "issuers",
+        "tsa"
+      ],
+      "properties": {
+        "issuers": {
+          "type": "array",
+          "maxItems": 1024,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "tsa": {
+          "type": "array",
+          "maxItems": 1024,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "no_scoring": {
+      "const": true
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

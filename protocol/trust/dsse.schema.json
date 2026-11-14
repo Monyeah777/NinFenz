@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/trust/dsse.schema.json",
+  "title": "nf-dsse/1 签名信封（FR-A3-01）",
+  "description": "DSSE 风格信封：payloadType/payload/signatures。签名域按 PAE 计算；keyid 必须能在 issuer registry 解析（运行时判定）。至少 1 个签名；payload 与 sig 为严格 base64；未知字段拒绝。",
+  "type": "object",
+  "required": [
+    "schema",
+    "payloadType",
+    "payload",
+    "signatures"
+  ],
+  "properties": {
+    "schema": {
+      "const": "nf-dsse/1"
+    },
+    "payloadType": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9._/+:-]+$"
+    },
+    "payload": {
+      "$ref": "#/$defs/base64",
+      "maxLength": 8388608
+    },
+    "signatures": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "required": [
+          "keyid",
+          "sig"
+        ],
+        "properties": {
+          "keyid": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9._:/-]+$"
+          },
+          "sig": {
+            "$ref": "#/$defs/base64",
+            "maxLength": 4096
+          },
+          "alg": {
+            "type": "string",
+            "enum": [
+              "ed25519",
+              "ecdsa-p256",
+              "hmac-sha256"
+            ]
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "base64": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9+/]+={0,2}$",
+      "description": "base64 形状（字符集 + 至多 2 个填充）；严格解码由 runtime 判定"
+    }
+  }
+}
