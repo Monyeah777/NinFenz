@@ -56,6 +56,7 @@
     "test_atomic_write": 10.2,
     "test_atomic_write_boundaries": 0.7,
     "test_atoms": 0.8,
+    "test_attachment_contract": 0.2,
     "test_attest": 0.4,
     "test_attest_doc_contract": 0.2,
     "test_audit": 0.3,
@@ -1160,6 +1161,16 @@
     "test_atoms.TextAtomsTest.test_keyword_both_ways_silent_when_aligned_or_absent_on_both": 0.0,
     "test_atoms.TextAtomsTest.test_regex_absent_bad_pattern_raises_with_guidance": 0.0,
     "test_atoms.TextAtomsTest.test_regex_absent_returns_hits_with_line_numbers": 0.0,
+    "test_attachment_contract.AttachmentContractTest.test_independence_of_production": 0.01,
+    "test_attachment_contract.AttachmentContractTest.test_none_passes_without_evidence": 0.0,
+    "test_attachment_contract.AttachmentContractTest.test_observe_never_blocks": 0.0,
+    "test_attachment_contract.AttachmentContractTest.test_registry_mutations_red": 0.0,
+    "test_attachment_contract.AttachmentContractTest.test_registry_selfcheck": 0.0,
+    "test_attachment_contract.AttachmentContractTest.test_require_passes_with_t1": 0.0,
+    "test_attachment_contract.AttachmentContractTest.test_require_rejects_low_level": 0.0,
+    "test_attachment_contract.AttachmentContractTest.test_require_rejects_missing": 0.0,
+    "test_attachment_contract.AttachmentContractTest.test_require_rejects_unverified": 0.0,
+    "test_attachment_contract.AttachmentContractTest.test_unknown_mode_rejected": 0.0,
     "test_attest.TestAttest.test_bad_schema_rejected": 0.0,
     "test_attest.TestAttest.test_digest_only_roundtrip_then_drift": 0.0,
     "test_attest.TestAttest.test_empty_key_file_rejected": 0.0,
@@ -6385,5 +6396,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2178.9
+  "total_s": 2179.1
 }

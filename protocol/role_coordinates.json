@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1503,
+    "app": 1504,
     "entry": 26,
     "floor": 5,
-    "prod": 1066,
+    "prod": 1067,
     "projection": 212,
     "support": 511,
-    "verify": 1430
+    "verify": 1432
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -5795,6 +5795,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "治理附件模式（WP-32，G3）：none / observe / require + 生产独立性。",
+      "path": "desktop/src/core/attachment.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "内容外挂签名 / attestation（内部差距实证：knowledge_sig 只证明「两遍算得出一样」，",
       "path": "desktop/src/core/attest.py",
       "role": "verify",
@@ -8143,6 +8149,12 @@
     {
       "function": "原子层单测（门禁能力化重构 · 步骤1）：每个原子至少一正一反两例 + 纯度断言。",
       "path": "desktop/tests/test_atoms.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "WP-32 治理附件模式判据（none/observe/require + 生产独立性）。",
+      "path": "desktop/tests/test_attachment_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -14459,6 +14471,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "NF-Final G3 WP-32 治理附件模式机读件：none（治理不介入）/ observe（只记录不阻塞）/ require（缺证据即拒）。铁律：附件策略不得改变生产输出（独立性）；require 缺证据时不产出交付（exit 2），observe 只留观察记录不阻塞。判据 desktop/tests/test_attachment_contract.py。",
+      "path": "protocol/attachment.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "审计协议（机制借鉴 Audit Report + Acceptance/Sign-off + Baseline 三件）。**裁决事项**：审计报告的内容是「某时刻查到了什么」＝时点事实＝说明件（保持 `results/audit/**` 属说明件不动）；而审计报告**该怎么写、结论必须绑什么**＝约束＝规范件（本件）。冲突用分层消解，不动既有判据。",
       "path": "protocol/audit.json",
       "role": "verify",
@@ -15018,17 +15036,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "7e3eb474301441786d37a8b924d27974b91969fcda8994f6023fd71df195a89a",
+  "root_digest": "045a35d941cdc94cfb072c03a954bf247d01d764c5dc94684d880a2ca89c6aba",
   "rule_counts": {
-    "R-app": 1503,
+    "R-app": 1504,
     "R-catch": 356,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 188,
     "R-support": 124,
-    "R-verify": 1299,
-    "auto:R-core": 308
+    "R-verify": 1301,
+    "auto:R-core": 309
   },
   "schema": "nf-role-coordinates/1"
 }

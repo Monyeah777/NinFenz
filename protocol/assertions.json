@@ -1056,6 +1056,21 @@
       "message": "治理 verify 适配注册表缺失或版本名不符（WP-31 判据依赖它）",
       "fix": "补/修 protocol/governance_adapters.json；再跑 test_governance_adapters_contract",
       "evidence": "test_governance_adapters_contract / conformance::modeling"
+    },
+    {
+      "id": "attachment-registry",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "protocol/attachment.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-attachment/1"
+      },
+      "message": "附件模式登记缺失或版本名不符（WP-32 判据依赖它）",
+      "fix": "补/修 protocol/attachment.json；再跑 test_attachment_contract",
+      "evidence": "test_attachment_contract / conformance::modeling"
     }
   ]
 }

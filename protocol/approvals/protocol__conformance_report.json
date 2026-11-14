@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-15",
   "approved_by": "Monyeah777",
-  "note": "NF-Final G3 WP-31 治理 verify 适配",
+  "note": "NF-Final G3 WP-32 治理附件模式（none/observe/require + 独立性）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "4d07c8c60f791df49d09b097ed88151ddf515c0c78cb0c0c5e3dc00a29e26ba4"
+  "subject_digest": "66445b015ca6ad0d0bd0833f032af750552f9b6d5b15b3a19efda58cdc3a81ee"
 }
