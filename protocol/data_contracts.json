@@ -1259,6 +1259,18 @@
         "test_crosscheck_contract",
         "protocol/crosscheck.json"
       ]
+    },
+    {
+      "id": "keywords",
+      "artifact": "protocol/keywords.json",
+      "quality_rule": "assertion:keywords",
+      "owner": "关键词/扩展口（core/keywords.py + test_keywords_contract + nf keywords check）+ WP-52",
+      "status": "active",
+      "freshness": "标签/扩展口变化后重跑 check；OPEN 不得静默关闭、closed 必须有证据",
+      "consumers": [
+        "test_keywords_contract",
+        "docs/keywords.md"
+      ]
     }
   ]
 }

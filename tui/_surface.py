@@ -9,7 +9,7 @@
 
 KIND = 'nf-terminal-surface'
 SCHEMA = 'nf-terminal-surface/1'
-DIGEST = 'sha256:9767b5b8e5ed2aee980b93f27fc83a01eacf50868ce4c010f4e2f8cd5adb9d8f'
+DIGEST = 'sha256:66eea6c7d29de86e80b3ea9121e39d8eb0456603dae000c77ec525c717382bd2'
 SOURCE = {'module': 'desktop/src/core/terminal.py',
  'tables': ['ZONES',
             'FAMILIES',
@@ -54,6 +54,7 @@ COMMANDS = ['agent',
  'impact',
  'import',
  'interop',
+ 'keywords',
  'knowledge',
  'label',
  'layers',
@@ -522,7 +523,8 @@ FAMILIES = [{'id': 'start',
                'related',
                'who-refers',
                'impact',
-               'wiki']},
+               'wiki',
+               'keywords']},
  {'id': 'govern',
   'name': '治理与决策',
   'summary': '决策记录（ADR）、审计、背书、回执、交接、复盘、决策层、评审、构建回路、批准、透明日志、证据包（打包/第三方复验）、标注 '

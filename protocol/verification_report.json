@@ -1,10 +1,10 @@
 {
   "built_for_date": "2026-11-14",
   "declared": {
-    "check_label": "check1-44/45/46/47/48/49/50/51/52/53/54/55/56",
-    "coverage_note": "判据级抽查面 32 条，各对应 verify.sh 的一道或多道门禁；≠ 声明 check 总数 56（两者不可互替）",
-    "expected_checks": 56,
-    "expected_pass": 105,
+    "check_label": "check1-44/45/46/47/48/49/50/51/52/53/54/55/56/57",
+    "coverage_note": "判据级抽查面 32 条，各对应 verify.sh 的一道或多道门禁；≠ 声明 check 总数 57（两者不可互替）",
+    "expected_checks": 57,
+    "expected_pass": 107,
     "report_items": 32,
     "verify_version": "v2.35"
   },
@@ -241,7 +241,7 @@
       "sample": [],
       "source": "quality_baseline.scan",
       "stats": {
-        "checks": 56,
+        "checks": 57,
         "verify_version": "v2.35"
       },
       "status": "pass",
@@ -298,7 +298,7 @@
       "stats": {
         "contracts": 27,
         "passed": 27,
-        "root": "602568b8889dab2777dc2a31a564220e95c1f7fb519df70e89c046b279da45d2",
+        "root": "363ac2bb332fe42130c38233fcca0403cff9645539873a231fa6e6d1ddbecedd",
         "verdict": "conformant"
       },
       "status": "pass",
@@ -326,9 +326,9 @@
       "sample": [],
       "source": "repo_stats.check_strict",
       "stats": {
-        "baseline_checks": 56,
-        "baseline_pass": 105,
-        "check_label": "check1-44/45/46/47/48/49/50/51/52/53/54/55/56",
+        "baseline_checks": 57,
+        "baseline_pass": 107,
+        "check_label": "check1-44/45/46/47/48/49/50/51/52/53/54/55/56/57",
         "concept_graphs": 101,
         "core_modules": 13,
         "core_pipelines": [
@@ -356,7 +356,7 @@
         "standards_total": 370,
         "standards_unreachable": 38,
         "subdivisions_total": 1200,
-        "verify_checks": 56,
+        "verify_checks": 57,
         "verify_version": "2.35"
       },
       "status": "pass",
@@ -369,11 +369,11 @@
       "sample": [],
       "source": "code_metrics.scan",
       "stats": {
-        "baseline": 409,
-        "files": 409,
+        "baseline": 410,
+        "files": 410,
         "max_fn_cc": 132,
         "max_fn_lines": 443,
-        "max_lines": 10121
+        "max_lines": 10157
       },
       "status": "pass",
       "warns": 0
@@ -387,8 +387,8 @@
       "stats": {
         "budget_ms": 1500.0,
         "n": 65536,
-        "patterns": 274,
-        "probed": 274
+        "patterns": 275,
+        "probed": 275
       },
       "status": "pass",
       "warns": 0
@@ -431,9 +431,9 @@
       "stats": {
         "cycles": 0,
         "metrics_drift": 8,
-        "metrics_missing": 32,
+        "metrics_missing": 33,
         "metrics_recorded": 289,
-        "modules": 321,
+        "modules": 322,
         "registered_cycles": 0,
         "registered_sdp": 9,
         "sdp": 9
@@ -526,8 +526,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4816,
-        "kernel": 2528,
+        "files": 4820,
+        "kernel": 2531,
         "kernel_no_self": 308,
         "rules": 9,
         "uncovered": 0,
@@ -546,8 +546,8 @@
       "stats": {
         "dynamic_allow": 1,
         "forbidden_edges": 0,
-        "governance": 39,
-        "modules": 326,
+        "governance": 40,
+        "modules": 327,
         "production": 31,
         "shared": 26
       },
@@ -555,7 +555,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "7a94ddb361f78e43d154ef5df25c04ae9e16a37ed30ed9c5e9d6cea3079fa757",
+  "root_digest": "715c7ba54cfe4bd320abdc0b147f16fc80a38600ec74c2b55a342e660731d194",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

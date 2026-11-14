@@ -12,10 +12,12 @@ subjects:
   - scripts/interop_thirdparty_kit.py:4f967d3f29cd31deb79f1b97fdee5f59ae74fde0d378ced571d2896af2d275dc
   - scripts/build_verification_cards.py:370f465c17eb18e4ef928194351c759bf33af75e5c1cd5b85abfc2a4b1d39655
   - scripts/geo_export.py:7a4200761fb7d79f945a37b557882eb8de968081057068d26a7a144d11d1b527
-  - scripts/nf.py:3026aad56e562650ab4db01aa76e73694fd841998ab3d84050643a2dd9c0950e
+  - scripts/nf.py:4223fce17ca1a66a7e4818776492a1447fedde490c4b685b31cffad39a8a265a
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:f2c59d1654e84d50d38c09a32d937c8270acea79fee3494be8c40d8220995980
+  - protocol/code_metrics_baseline.json:512a188ef70cd54db1563518b61abdf3b7f29b6a31b444f4b027c9122c4ec4d9
 ---
+> 重审（2026-11-15）：NF-Final WP-52：新增 protocol/keywords.json、core/keywords.py、docs/keywords.md、test_keywords_contract.py、nf keywords check（命令 80/索引 215）；verify.sh check57 + quality_baseline 57 条/PASS=107；check12 预算 2185→2195（+1.4s CLI 烟测，容量调整）
+
 > 重审（2026-11-15）：NF-Final WP-51 收尾2：purity SINK_ALLOW 登记使 purity_scan.py 584→588 行，按失败提示评审后重冻 code_metrics 基线（容量调整，非放宽判据）
 
 > 重审（2026-11-15）：NF-Final WP-51：新增 protocol/crosscheck.json、core/crosscheck.py、results/crosscheck/report.json、test_crosscheck_contract.py；verify.sh check56 + quality_baseline 56 条/PASS=105；assembly_runtime 计划/轨迹对齐加固（D-05 修复驱动）

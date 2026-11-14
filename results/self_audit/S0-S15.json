@@ -79,7 +79,7 @@
       "status": "covered"
     },
     {
-      "detail": "判据模块 712 · 抽查项 32；覆盖率/全仓变异未测（QD-10）",
+      "detail": "判据模块 713 · 抽查项 32；覆盖率/全仓变异未测（QD-10）",
       "evidence": [
         "protocol/check12_weights.json",
         "desktop/tests"

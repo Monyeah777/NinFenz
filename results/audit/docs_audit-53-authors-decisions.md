@@ -11,9 +11,11 @@ subjects:
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - scripts/ai_domain_closure.py:583cb8ef79afe689df27a1b73885b314dda31e667c8f4f585c907828571356ad
   - library/intake.json:b8c31d480e9afdb71e923d526934fa759b9affd3814069d084fbd083a835d2cd
-  - verify.sh:005b189413ee9bbc1ebcff2a22c66b56cc4f2d5c4c2b708f4aa2bd333be1dfe6
+  - verify.sh:8428d8de7b60ea0a69a10b3635ee39a5fd948e9cc6373c80158da33d27cdd4c1
 
 ---
+> 重审（2026-11-15）：NF-Final WP-52：新增 protocol/keywords.json、core/keywords.py、docs/keywords.md、test_keywords_contract.py、nf keywords check（命令 80/索引 215）；verify.sh check57 + quality_baseline 57 条/PASS=107；check12 预算 2185→2195（+1.4s CLI 烟测，容量调整）
+
 > 重审（2026-11-15）：NF-Final WP-51：新增 protocol/crosscheck.json、core/crosscheck.py、results/crosscheck/report.json、test_crosscheck_contract.py；verify.sh check56 + quality_baseline 56 条/PASS=105；assembly_runtime 计划/轨迹对齐加固（D-05 修复驱动）
 
 > 重审（2026-11-15）：NF-Final WP-50：新增 protocol/self_scan.json、core/self_scan.py、results/self_audit/S0-S15.json、test_self_scan_contract.py；verify.sh check55 + quality_baseline 55 条/PASS=103；派生面重生成

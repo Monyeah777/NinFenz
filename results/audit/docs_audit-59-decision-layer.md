@@ -6,19 +6,21 @@ scope: 作者指令「拉取 jev 或 laya 这种模型作为决策层」——�
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - verify.sh:005b189413ee9bbc1ebcff2a22c66b56cc4f2d5c4c2b708f4aa2bd333be1dfe6
+  - verify.sh:8428d8de7b60ea0a69a10b3635ee39a5fd948e9cc6373c80158da33d27cdd4c1
   - protocol/decision_layer.json:9330d4057f07647d67f15daa6f37c84913834b7eed65f4e360bf5c7c413e5e06
   - protocol/normative.json:c1bbc14c92cea6bd66ff6cb54fdcf91bf3072f66adee7027f1d3f42e70fe1825
-  - protocol/data_contracts.json:c1bfc7a5770680feb21105200e55e78841b0a1a3372f303868eac25819c6bd34
+  - protocol/data_contracts.json:7c24a69c082662da7fb0fcbf3b3546744630923f779d7eac884328218831c9d9
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/receipts.py:b748915bb519aeeb1aa0f7d367df2eb7d4321b369b85905a7f918d8d55d96363
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - desktop/tests/test_decision_layer.py:551419122f09c1b77f73e7724919f67698bd6d939c3d556d9c8ef98274a76257
-  - scripts/nf.py:3026aad56e562650ab4db01aa76e73694fd841998ab3d84050643a2dd9c0950e
+  - scripts/nf.py:4223fce17ca1a66a7e4818776492a1447fedde490c4b685b31cffad39a8a265a
   - scripts/pull_decision_model.py:477a77f3a2d8b0ce6c9e5985a7fd12c4678f7a33fa496d23abb28ab884dc3df1
   - docs/decision-layer.md:cd3a254de738ece7c8f07db36904c74484e4622c58f688a3973c8998b441628c
 
 ---
+> 重审（2026-11-15）：NF-Final WP-52：新增 protocol/keywords.json、core/keywords.py、docs/keywords.md、test_keywords_contract.py、nf keywords check（命令 80/索引 215）；verify.sh check57 + quality_baseline 57 条/PASS=107；check12 预算 2185→2195（+1.4s CLI 烟测，容量调整）
+
 > 重审（2026-11-15）：NF-Final WP-51：新增 protocol/crosscheck.json、core/crosscheck.py、results/crosscheck/report.json、test_crosscheck_contract.py；verify.sh check56 + quality_baseline 56 条/PASS=105；assembly_runtime 计划/轨迹对齐加固（D-05 修复驱动）
 
 > 重审（2026-11-15）：NF-Final WP-50：新增 protocol/self_scan.json、core/self_scan.py、results/self_audit/S0-S15.json、test_self_scan_contract.py；verify.sh check55 + quality_baseline 55 条/PASS=103；派生面重生成

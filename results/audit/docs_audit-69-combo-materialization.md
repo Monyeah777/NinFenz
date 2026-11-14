@@ -7,10 +7,12 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - scripts/nf.py:3026aad56e562650ab4db01aa76e73694fd841998ab3d84050643a2dd9c0950e
+  - scripts/nf.py:4223fce17ca1a66a7e4818776492a1447fedde490c4b685b31cffad39a8a265a
   - docs/combos.md:4f5b22bf353a07ff439e44596bd44bea74e7c95d8a811c8ddde17f42f8fbc45c
 
 ---
+> 重审（2026-11-15）：NF-Final WP-52：新增 protocol/keywords.json、core/keywords.py、docs/keywords.md、test_keywords_contract.py、nf keywords check（命令 80/索引 215）；verify.sh check57 + quality_baseline 57 条/PASS=107；check12 预算 2185→2195（+1.4s CLI 烟测，容量调整）
+
 > 重审（2026-11-15）：NF-Final WP-23：新增 core/delivery.py、results/delivery/*（包+报告）、docs/delivery.md、test_delivery_contract.py；nf agent run --deliver/--sidecar；assertions/data_contracts/independence/code_metrics/check12 更新
 
 > 重审（2026-11-14）：NF-Final WP-21：新增 core/assembly_runtime.py、results/assembly/sample-document.assembly.json、docs/assembly-runtime.md、test_assembly_runtime_contract.py；nf agent run --assembly；assertions/data_contracts/independence/code_metrics/check12 更新

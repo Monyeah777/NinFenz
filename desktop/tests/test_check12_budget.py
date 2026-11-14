@@ -33,7 +33,9 @@ WEIGHTS_REL = "protocol/check12_weights.json"
 #: 2026-11-14（NF-Final G2 WP-21）：新增 `test_assembly_runtime_contract`（+1.5 s 固有解释器
 #: 启动 + E2E 记录复算，2176.3 s），预算 2175→2185。仍为容量调整非判据放宽；后续逼近须先
 #: 合并/优化测试模块（或缓存重算）再谈容量。
-BUDGET_S = 2185.0
+#: 2026-11-15（NF-Final G5 WP-52）：新增 `test_keywords_contract`（+1.4 s，含 `nf keywords check`
+#: 子进程烟测——命令面成本不可省），2185→2195；仍为容量调整，非判据放宽。
+BUDGET_S = 2195.0
 #: 单模块上限（秒）：超过说明该模块该被拆（或该被优化），不是"正常重"。
 MODULE_CAP_S = 300.0
 

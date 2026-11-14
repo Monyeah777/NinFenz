@@ -1,0 +1,69 @@
+{
+  "schema": "nf-keywords/1",
+  "note": "NF-Final G5 WP-52 关键词/扩展口登记（§17/§18）：标签表、关键词索引、中英对照、扩展/创新口（OPEN-*）状态与 owner/接口/证据。纪律：标签只能本表定义；OPEN-* 不得静默关闭（open 必须有 owner+interface；closed 必须有在场证据）；禁用词必须带 [HONESTY] 或否定语境；无孤儿标签（用到的标签必须在册）。判据 desktop/tests/test_keywords_contract.py + verify check57。",
+  "tags": [
+    {"id": "PR", "meaning": "生产/装配需求", "owner": "maintainers", "status": "active"},
+    {"id": "WK", "meaning": "LLMWiki/规范", "owner": "maintainers", "status": "active"},
+    {"id": "GV", "meaning": "治理（可选）", "owner": "maintainers", "status": "active"},
+    {"id": "AI", "meaning": "AI 信任面", "owner": "maintainers", "status": "active"},
+    {"id": "IN", "meaning": "独立性", "owner": "maintainers", "status": "active"},
+    {"id": "TAG", "meaning": "关键词/扩展", "owner": "maintainers", "status": "active"},
+    {"id": "SCHEMA", "meaning": "数据契约", "owner": "maintainers", "status": "active"},
+    {"id": "API", "meaning": "CLI/MCP/CI", "owner": "maintainers", "status": "active"},
+    {"id": "THREAT-*", "meaning": "威胁", "owner": "maintainers", "status": "active", "prefix": true},
+    {"id": "GATE", "meaning": "门禁", "owner": "maintainers", "status": "active"},
+    {"id": "ADR", "meaning": "决策", "owner": "maintainers", "status": "active"},
+    {"id": "EXT-*", "meaning": "扩展点", "owner": "maintainers", "status": "active", "prefix": true},
+    {"id": "OPEN-*", "meaning": "创新口", "owner": "maintainers", "status": "active", "prefix": true},
+    {"id": "HONESTY", "meaning": "声明边界", "owner": "maintainers", "status": "active"}
+  ],
+  "keyword_index": [
+    {"tag": "PR", "keywords": ["assembly", "pipeline", "delivery"], "owner": "maintainers", "status": "active"},
+    {"tag": "WK", "keywords": ["wiki", "spec", "context pack"], "owner": "maintainers", "status": "active"},
+    {"tag": "GV", "keywords": ["contract", "governance", "evidence"], "owner": "maintainers", "status": "active"},
+    {"tag": "AI", "keywords": ["model card", "lineage", "aibom"], "owner": "maintainers", "status": "active"},
+    {"tag": "IN", "keywords": ["independence", "boundary"], "owner": "maintainers", "status": "active"},
+    {"tag": "GATE", "keywords": ["gate", "ratchet", "freeze chain"], "owner": "maintainers", "status": "active"},
+    {"tag": "HONESTY", "keywords": ["claims", "OPEN", "no-certification"], "owner": "maintainers", "status": "active"}
+  ],
+  "synonyms": [
+    {"cn": "生产装配", "en": "assembly"},
+    {"cn": "规范", "en": "spec"},
+    {"cn": "契约", "en": "contract"},
+    {"cn": "治理", "en": "governance"},
+    {"cn": "证据", "en": "evidence"},
+    {"cn": "信任等级", "en": "trust level"},
+    {"cn": "不可抵赖", "en": "non-repudiation", "note": "T3+ 才可声称（[HONESTY] 约束）"}
+  ],
+  "extension_openings": [
+    {"id": "OPEN-ZK", "direction": "选择性披露", "interface": "EXT-10", "owner": "maintainers", "status": "open"},
+    {"id": "OPEN-PQ", "direction": "后量子", "interface": "EXT-01", "owner": "maintainers", "status": "open"},
+    {"id": "OPEN-FED", "direction": "跨组织联邦", "interface": "EXT-03/04", "owner": "maintainers", "status": "open"},
+    {"id": "OPEN-AIBOM", "direction": "AI BOM", "interface": "EXT-06", "owner": "maintainers", "status": "closed",
+     "evidence": ["results/ai/aibom.cdx.json", "protocol/aibom.json"]},
+    {"id": "OPEN-AGENT-AUTH", "direction": "Agent 授权", "interface": "entity/policy", "owner": "maintainers", "status": "open"},
+    {"id": "OPEN-HUMAN", "direction": "人类复核凭证", "interface": "nf-human-review/1", "owner": "maintainers", "status": "partial",
+     "evidence": ["protocol/trust/human-review.schema.json", "desktop/src/core/trust/human_review.py"]},
+    {"id": "OPEN-REG", "direction": "监管映射", "interface": "policy/docs", "owner": "product", "status": "open"},
+    {"id": "OPEN-REVOCATION", "direction": "撤销/状态", "interface": "EXT-04", "owner": "maintainers", "status": "partial",
+     "evidence": ["desktop/src/core/revocations.py"]},
+    {"id": "OPEN-WITNESS", "direction": "见证分裂/阈值", "interface": "EXT-03", "owner": "maintainers", "status": "open"},
+    {"id": "OPEN-PRIVACY", "direction": "可验证脱敏", "interface": "EXT-10", "owner": "maintainers", "status": "open"},
+    {"id": "OPEN-VERIFIER-WASM", "direction": "浏览器/边缘验证", "interface": "EXT-09", "owner": "maintainers", "status": "open"},
+    {"id": "OPEN-ARCHIVE", "direction": "WORM/归档", "interface": "EXT-08", "owner": "maintainers", "status": "open"}
+  ],
+  "forbidden_claims": ["已认证", "通过认证", "合规认证", "不可抵赖", "零缺陷", "0 缺陷"],
+  "honesty_marker": "[HONESTY]",
+  "negative_context": ["不", "非", "未", "no", "not", "never", "T3+ 才可声称"],
+  "scan_docs": ["README.md", "README.en.md", "README.ja.md", "docs/verification-cards.md",
+                "protocol/CONFORMANCE.md", "docs/keywords.md"],
+  "status_vocabulary": ["open", "partial", "closed"],
+  "rules": {
+    "tags_defined": "文档中用到的 [TAG] 必须在本表定义（前缀标签按前缀匹配）",
+    "open_not_silent": "OPEN-* 不得静默关闭：status=open 必须有 owner+interface；status=closed 必须有在场证据",
+    "honesty_marker": "禁用词出现时同段/同行必须有 [HONESTY] 或否定语境",
+    "orphan": "用到的标签未在册 = 孤儿标签，红"
+  },
+  "claims_boundary": ["关键词/扩展口登记是内部索引，不是认证或合规声明",
+                      "OPEN 项保持 OPEN，不因索引整理而关闭"]
+}

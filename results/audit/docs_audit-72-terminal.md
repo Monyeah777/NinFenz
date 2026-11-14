@@ -6,19 +6,21 @@ scope: 作者指令「删除 NF 中的 GUI，且为 NF 构建一个终端（CLI 
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/terminal.py:0f08f7bd30a2f033769ce2af9e758f291fd69bdcc784dc226763ad2d6007663c
-  - scripts/nf.py:3026aad56e562650ab4db01aa76e73694fd841998ab3d84050643a2dd9c0950e
+  - desktop/src/core/terminal.py:20ebd7e1faf1b6e321e58ae5efff7f2d0923d8cdf150bba816ab00dcd0a4f97a
+  - scripts/nf.py:4223fce17ca1a66a7e4818776492a1447fedde490c4b685b31cffad39a8a265a
   - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
   - scripts/nf:406c221f9f16fb6e318e230b0b0120e3a6d3c9231d57f66285e0e4615e18ca91
   - scripts/nf.cmd:d1e7ea3a9e99c0822102884cddafe1cdf3893d9b75d19abebe7a8d2a8abeec5a
-  - verify.sh:005b189413ee9bbc1ebcff2a22c66b56cc4f2d5c4c2b708f4aa2bd333be1dfe6
-  - desktop/src/core/quality_baseline.py:8b49089dc514405f41c8f2312820313cd3be5f337e08cb014acbd61046b8ed91
+  - verify.sh:8428d8de7b60ea0a69a10b3635ee39a5fd948e9cc6373c80158da33d27cdd4c1
+  - desktop/src/core/quality_baseline.py:2cce25f5f9433ec25fa44fa5680526ace4516067dbf3e112b289be42891a0161
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
-  - docs/terminal.md:69b41d4be9b9885f0f156b1aef30772c3d1a74224ec5db65001be5010872a06e
+  - docs/terminal.md:101145a53ef02a98a39a6657f640cecb8ce7e2a4b36de146693be0154f2fbf6d
   - docs/L3_FROZEN.md:863a152271b1b969a3249194d1169628f4a4647a9bdd801473cfc9cb75c6643b
-  - protocol/CONFORMANCE.md:c29b3c21409d047a3ae012beb20f8563848bb5851582076157f23ae2caec2832
+  - protocol/CONFORMANCE.md:617127a215fac4263deb4f0ce17b3e560ac64d2ce0184837ef83132b676aabba
 
 ---
+> 重审（2026-11-15）：NF-Final WP-52：新增 protocol/keywords.json、core/keywords.py、docs/keywords.md、test_keywords_contract.py、nf keywords check（命令 80/索引 215）；verify.sh check57 + quality_baseline 57 条/PASS=107；check12 预算 2185→2195（+1.4s CLI 烟测，容量调整）
+
 > 重审（2026-11-15）：NF-Final WP-51：新增 protocol/crosscheck.json、core/crosscheck.py、results/crosscheck/report.json、test_crosscheck_contract.py；verify.sh check56 + quality_baseline 56 条/PASS=105；assembly_runtime 计划/轨迹对齐加固（D-05 修复驱动）
 
 > 重审（2026-11-15）：NF-Final WP-50：新增 protocol/self_scan.json、core/self_scan.py、results/self_audit/S0-S15.json、test_self_scan_contract.py；verify.sh check55 + quality_baseline 55 条/PASS=103；派生面重生成

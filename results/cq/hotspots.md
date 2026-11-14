@@ -20,7 +20,7 @@
 | `desktop\src\core\pipelinerun.py` | `graph` | 59 | 85 |
 | `desktop\src\core\cq6_scorecard.py` | `_score_dimension` | 58 | 62 |
 | `desktop\src\core\i18n_checks.py` | `validate` | 58 | 113 |
+| `desktop\src\core\keywords.py` | `check` | 55 | 74 |
 | `desktop\src\core\domain_metrics.py` | `synthesize` | 54 | 382 |
 | `desktop\src\core\library.py` | `verify` | 51 | 67 |
 | `desktop\src\core\self_scan.py` | `probes` | 50 | 72 |
-| `desktop\src\core\ai_governance.py` | `validate` | 49 | 51 |

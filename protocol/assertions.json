@@ -87,7 +87,8 @@
       53,
       54,
       55,
-      56
+      56,
+      57
     ],
     "CAP_DETERMINISTIC": [
       25,
@@ -106,7 +107,8 @@
       53,
       54,
       55,
-      56
+      56,
+      57
     ],
     "CAP_TAMPER_EVIDENT": [
       23,
@@ -1308,6 +1310,21 @@
       "message": "跨实现/断网/删除矩阵报告缺失或版本名不符（WP-51 判据依赖它）",
       "fix": "重跑 crosscheck.write；再跑 test_crosscheck_contract",
       "evidence": "test_crosscheck_contract / conformance::modeling"
+    },
+    {
+      "id": "keywords",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "protocol/keywords.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-keywords/1"
+      },
+      "message": "关键词/扩展口登记缺失或版本名不符（WP-52 判据依赖它）",
+      "fix": "补/修 protocol/keywords.json；再跑 test_keywords_contract / nf keywords check",
+      "evidence": "test_keywords_contract / conformance::modeling"
     }
   ]
 }
