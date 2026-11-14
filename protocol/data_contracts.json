@@ -908,6 +908,18 @@
         "test_reverse_failures",
         "results/reverse/FAILURE_ARCHAEOLOGY.md"
       ]
+    },
+    {
+      "id": "reverse-peers",
+      "artifact": "results/reverse/peers.json",
+      "quality_rule": "assertion:reverse-peers",
+      "owner": "§4A 逆向 R5 同行差分（test_reverse_peers 判据）",
+      "status": "active",
+      "freshness": "同行机制/设计决策变化须重跑 R5；影响决策须落 G1/G3 并附本仓引用",
+      "consumers": [
+        "test_reverse_peers",
+        "results/reverse/PEER_DIFF.md"
+      ]
     }
   ]
 }
