@@ -17,6 +17,7 @@
 - [trust/SELF_AUDIT.json](trust/SELF_AUDIT.json) · [docs/trust/SELF_AUDIT.md](../docs/trust/SELF_AUDIT.md)（G1 收口自审计：S0–S12 维度 + P0/P1 分诊 + 门禁取证）
 - [BASELINE.md](BASELINE.md)（NF Final WP-00 基线审计：34 条 FR/NFR Claim–Evidence 矩阵 + check 编号对账 + 环境/门禁实读）
 - [reverse/INVENTORY.md](reverse/INVENTORY.md)（§4A R0 仓库考古：真源/生成物/草稿三表 + 入口 + 失败面初判）
+- [ADR_MAP.md](ADR_MAP.md)（方案 §16.2 裁决 → `nf-adr/1` 登记投影：12 条映射、`plan_ref` 一对一、实施状态与缺口 WP）
 
 ## 互操作导出面（入仓投影）
 
