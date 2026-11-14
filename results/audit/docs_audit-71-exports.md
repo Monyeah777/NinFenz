@@ -6,20 +6,24 @@ scope: 作者指令「自述数字自动化，互操作性从他证，标准目�
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
-  - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
-  - desktop/src/core/repo_stats.py:3bc955c22bef31d7b93313b4fe2694934c048e8ee84b9ef81c0e9805c7982a87
-  - desktop/src/core/quality_baseline.py:7c1f06bc581a2400b1248df63e07a98dfffba2b92ca8070a71082abcc317d1e4
+  - verify.sh:1bc8f18b9343d60399d26cae4b6be2044efc61fd749303a9c48472677b3b9d4d
+  - scripts/nf.py:f7aaad82e7a3476fdc4278c60c39698d639800ecdba9d8949bc91f9868144f8c
+  - desktop/src/core/repo_stats.py:d7fd457d3a1804c3e9ab266c8071ad9d8950d4b5eb0a782ce658a66e05e90f9c
+  - desktop/src/core/quality_baseline.py:21546ad12081e548b59aec5bea20b6f953ff73e5830efdacb95f904d27226fed
   - scripts/interop_thirdparty_kit.py:4f967d3f29cd31deb79f1b97fdee5f59ae74fde0d378ced571d2896af2d275dc
   - scripts/geo_export.py:7a4200761fb7d79f945a37b557882eb8de968081057068d26a7a144d11d1b527
   - scripts/fde_sample_run.py:ae1e644b7ab0b61e430d6224ef4495e4371cba86e520d99c8d532cfb9370568d
-  - protocol/CONFORMANCE.md:03721fb0fb16b3dbd8bd9dd7105a3bab74603cbe99579aa4c78f26f11d8b4444
+  - protocol/CONFORMANCE.md:e514b0124ff33e58e293e2e87593709eedd39e31ba98b195359480437c3e0877
   - docs/fde-stack.md:96c074dffcbcc513fbf3bec79d5b895ac9cfec543430f21805eb5d2370b43bca
   - docs/fde-sample/README.md:ac3da5b467b4963681af3ded98c65a184577883e90f215b9e852aaca104294c4
   - docs/interop-thirdparty.md:108fd4cddc6ef082b29270a8269b7a7153cbb53e6113fec73227e84fb9276271
   - results/interop-thirdparty-status.md:e57c95980dd8b36bf137d23db0cf3c93ba8aee5221d2d26f2a6c782c30df0469
 
 ---
+> 重审（2026-11-14）：WP-15 check45 接线与 G1 收口（机械重绑）
+
+> 重审（2026-11-14）：WP-11 trust bundle 入仓（机械重绑）
+
 > 重审（2026-11-14）：CONFORMANCE 顶尖化：补「§现状对照」（声明 5 / scope 19 / 排除 11 / scope∩排除=∅ / 与报告互补 / 失败即冻结链阻断 / 不钉运行时条数但基线可比对）+「§复现与引用口径」；三段与规范化摘要口径未改。
 
 > 重审（2026-11-13）：层切片页补本层机构分布（前三机构及条数，读自 catalog body 字段），重生成五页；判据断言每页机构分布与真源相等；iface 页现显示 IETF 15 / W3C 7 / OASIS 5。

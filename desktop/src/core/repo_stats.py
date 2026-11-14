@@ -116,6 +116,8 @@ def compute(root: str = ".") -> Tuple[Dict[str, Any], List[str]]:
         from core import quality_baseline as qb  # type: ignore
         stats["baseline_checks"] = int(getattr(qb, "EXPECTED_CHECKS", stats["verify_checks"]))
         stats["baseline_pass"] = int(getattr(qb, "EXPECTED_PASS", 0))
+        stats["check_label"] = str(getattr(qb, "CHECK_LABEL", None)
+                                     or ("check1-" + str(stats["baseline_checks"])))
     except Exception as exc:  # noqa: BLE001
         stats["baseline_checks"] = stats["verify_checks"]
         stats["baseline_pass"] = 0
@@ -143,10 +145,10 @@ def _zh(stats: Dict[str, Any]) -> str:
            stats["domain_packs"], stats["subdivisions_total"],
            stats["standards_total"], stats["standards_reachable"], stats["standards_unreachable"],
            stats["standards_bodies"], stats["standards_edges"], stats["standard_bindings"]),
-        "**质量凭证**：verify v%s · check1-%d · PASS=%d（`bash verify.sh` 单入口；期望基线取自 `qua"
+        "**质量凭证**：verify v%s · %s · PASS=%d（`bash verify.sh` 单入口；期望基线取自 `qua"
             "lity_baseline.EXPECTED_*`） · 馆藏 %d 件"
         % (stats["verify_version"],
- stats["baseline_checks"],
+ stats["check_label"],
  stats["baseline_pass"],
  stats["library_items"]),
         "",
@@ -171,10 +173,10 @@ def _en(stats: Dict[str, Any]) -> str:
            stats["domain_packs"], stats["subdivisions_total"],
            stats["standards_total"], stats["standards_reachable"], stats["standards_unreachable"],
            stats["standards_bodies"], stats["standards_edges"], stats["standard_bindings"]),
-        "**Quality evidence**: verify v%s · check1-%d · PASS=%d (`bash verify.sh`; expectations fro"
+        "**Quality evidence**: verify v%s · %s · PASS=%d (`bash verify.sh`; expectations fro"
             "m `quality_baseline.EXPECTED_*`) · library %d items"
         % (stats["verify_version"],
- stats["baseline_checks"],
+ stats["check_label"],
  stats["baseline_pass"],
  stats["library_items"]),
         "",
@@ -199,10 +201,10 @@ def _ja(stats: Dict[str, Any]) -> str:
            stats["domain_packs"], stats["subdivisions_total"],
            stats["standards_total"], stats["standards_reachable"], stats["standards_unreachable"],
            stats["standards_bodies"], stats["standards_edges"], stats["standard_bindings"]),
-        "**品質証憑**：verify v%s · check1-%d · PASS=%d（bash verify.sh の単一入口。期待基準は qual"
+        "**品質証憑**：verify v%s · %s · PASS=%d（bash verify.sh の単一入口。期待基準は qual"
             "ity_baseline.EXPECTED_*） · 所蔵 %d 件"
         % (stats["verify_version"],
- stats["baseline_checks"],
+ stats["check_label"],
  stats["baseline_pass"],
  stats["library_items"]),
         "",
@@ -217,9 +219,9 @@ def _ja(stats: Dict[str, Any]) -> str:
 def _llms(stats: Dict[str, Any]) -> str:
     return "\n".join([
         BEGIN,
-        "- 质量凭证（可静态实算）：verify v%s · check1-%d · PASS=%d（`bash verify.sh` 单入口；期望"
+        "- 质量凭证（可静态实算）：verify v%s · %s · PASS=%d（`bash verify.sh` 单入口；期望"
             "基线取自 `quality_baseline.EXPECTED_*`，本行由生成器写入）。"
-        % (stats["verify_version"], stats["baseline_checks"], stats["baseline_pass"]),
+        % (stats["verify_version"], stats["check_label"], stats["baseline_pass"]),
         "- 规模（实算真源 `protocol/repo_stats.json`）：%d 登记包 · %d 资产档 · %d 概念图 · 标准目"
             "录 %d 条（可达 %d） · 标准绑定 %d 条 · 馆藏 %d 件。"
         % (stats["registered_packs"], stats["pack_assets"], stats["concept_graphs"],

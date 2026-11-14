@@ -82,14 +82,16 @@
       25,
       31,
       40,
-      41
+      41,
+      45
     ],
     "CAP_TAMPER_EVIDENT": [
       23,
       25,
       31,
       40,
-      42
+      42,
+      45
     ],
     "CAP_LIFECYCLE_LEGAL": [
       17,
@@ -122,7 +124,8 @@
       32,
       33,
       35,
-      36
+      36,
+      45
     ]
   },
   "assertions": [
@@ -510,6 +513,21 @@
       "message": "回执单根不在位或 schema 未自证（provenance 机制缺前提）",
       "fix": "跑 nf receipts --scope protocol --write 重新生成回执单根，别手改",
       "evidence": "check42 / conformance::assertions"
+    },
+    {
+      "id": "trust-vectors-schema",
+      "severity": "fail",
+      "capability": "CAP_TAMPER_EVIDENT",
+      "kind": "json_value",
+      "params": {
+        "path": "results/trust/trust_vectors.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-trust-vectors/1"
+      },
+      "message": "trust 测试向量集不在位或 schema 未自证（check45 的判据前提缺失）",
+      "fix": "跑 python scripts/trust_vectors.py --write 重建向量集，别手改",
+      "evidence": "check45 / conformance::assertions"
     }
   ]
 }

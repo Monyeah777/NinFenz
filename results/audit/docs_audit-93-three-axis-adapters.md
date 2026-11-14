@@ -12,8 +12,8 @@ subjects:
   - desktop/tests/test_nf_language.py:59bd38b7c2e59fe09b70804a5837849f25ecc274b093efcf4674b5e2f7176644
   - desktop/tests/test_doc_truth.py:6c0584045a8edef8f000ea7cdd547a3fe15a32a696a026467599c11afea11685
   - desktop/tests/test_site_face.py:eed4013d8e598c7115300ab6442fa1d6dbb69e7cb4f28b3a15c2f03392c4fd72
-  - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
-  - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
+  - verify.sh:1bc8f18b9343d60399d26cae4b6be2044efc61fd749303a9c48472677b3b9d4d
+  - scripts/nf.py:f7aaad82e7a3476fdc4278c60c39698d639800ecdba9d8949bc91f9868144f8c
   - docs/lsp.md:e2745c7c2fe8c0a7df28d1e74d8f6300f7bfd7b54dfff529ded94e74e20a7069
   - docs/mcp.md:c96f080bc2cf26d409960597f8580bf8d4a65618554a22f12f36e3e03759316a
   - docs/decision-layer.md:cd3a254de738ece7c8f07db36904c74484e4622c58f688a3973c8998b441628c
@@ -26,6 +26,10 @@ subjects:
   - skills/ninfenz/references/commands.md:ac8a602f9854fc103b44ae79a5f7b1b4a7e36cf0a4b4075b7e8eb693dad76602
 
 ---
+> 重审（2026-11-14）：WP-15 check45 接线与 G1 收口（机械重绑）
+
+> 重审（2026-11-14）：WP-11 trust bundle 入仓（机械重绑）
+
 > 重审（2026-11-13）：LSP 接入文档顶尖化（11 能力/16 方法/8MiB/utf-16/77 例 + 现状对照 / 复现；en·ja 译件同步后重签）+ 契约判据 test_lsp_doc_contract；权重增量重测。本轮为机械重绑。
 
 > 重审（2026-11-13）：MCP 接入文档顶尖化（能力表工具 7→12 全列 / 1 prompt / dual-era / 8MiB / 现状对照 / 复现；en·ja 译件同步后重签）+ 契约判据 test_mcp_doc_contract；权重增量重测。本轮为机械重绑。

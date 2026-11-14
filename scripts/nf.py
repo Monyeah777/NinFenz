@@ -3863,6 +3863,10 @@ CHECK_GUIDE = {
     "42": "缺什么：provenance 校验不过（回执单根形状坏 / 独立子进程验签失败 / 篡改未被检出）。补什么"
           "：nf receipts --scope protocol --write 重建单根；确认 nf attest --key-file 与"
           " core.attest.verify 的口径一致；篡改必须被判否——否则这份证据是摆设。",
+    "45": "缺什么：trust 证据面漂移（bundle 守恒 / 单 claim / splice / prev 链 / 等级判定与冻结"
+          "向量不一致，或向量族缺失/不可读）。补什么：先修实现或向量，再跑"
+          " python scripts/trust_vectors.py --write；判定逻辑收口在 core.trust.gate.scan。"
+          "示例：删了向量族 → 重跑 --write；改坏 bundle leaf → 按 nf-claim-bundle/1 重算。",
 }
 
 def _cmd_preset(args):
@@ -9488,8 +9492,9 @@ def _cmd_stats(args) -> int:
  stats["standards_reachable"],
  stats["standards_unreachable"],
                  stats["standards_bodies"], stats["standards_edges"], stats["standard_bindings"]))
-        print("  质量凭证：verify check1-%d 常驻（脚本 v%s） · 馆藏 %d 件"
-              % (stats["verify_checks"], stats["verify_version"], stats["library_items"]))
+        label = stats.get("check_label") or ("check1-" + str(stats["verify_checks"]))
+        print(f"  质量凭证：verify {label} 常驻"
+              f"（脚本 v{stats['verify_version']}） · 馆藏 {stats['library_items']} 件")
         print("  模式：%s" % ("write（已重写生成区）" if args.write else "check（只校验）"))
         for i in issues:
             print("  [FAIL] %s" % i, file=sys.stderr)

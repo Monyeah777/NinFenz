@@ -114,8 +114,8 @@
     },
     {
       "description": "数据化断言表（形状类断言数据化）",
-      "detail": "断言 24 条（通过 24）· kind 封闭集 4 种",
-      "digest": "57d8fee97b2aa5b13ad7cfa62ce54b543a9bd803f97043e3b45e57a3266faa93",
+      "detail": "断言 25 条（通过 25）· kind 封闭集 4 种",
+      "digest": "5d762fa522d39317a3c6e1ba9b44e6483d82d150caf695fa417c3a4cb0ccd21a",
       "id": "assertions",
       "ok": true
     },
@@ -191,7 +191,7 @@
     }
   ],
   "passed": 27,
-  "root": "6ae04aa1a18d9cebc5f9d00cee68a2da66d91ad1a9e57500812729d2b48e1bec",
+  "root": "debdf1cd65e761db54af1223112a6646a6de8956d00c3f94aa1f565c66f0ca0d",
   "schema": "nf-conformance/1",
   "total": 27,
   "verdict": "conformant"

@@ -129,6 +129,8 @@ def _declared(root: str) -> Dict[str, Any]:
         from core import quality_baseline as qb
         out["expected_checks"] = getattr(qb, "EXPECTED_CHECKS", None)
         out["expected_pass"] = getattr(qb, "EXPECTED_PASS", None)
+        out["check_label"] = getattr(qb, "CHECK_LABEL", None) or (
+            "check1-" + str(out["expected_checks"]))
         out["verify_version"] = qb.scan(root)[1].get("verify_version")
     except Exception as exc:                                # noqa: BLE001
         out["error"] = "%s: %s" % (type(exc).__name__, exc)
@@ -286,8 +288,9 @@ def check(root: str = ".", live: Optional[Dict[str, Any]] = None
 def summary_line(report: Dict[str, Any]) -> str:
     s = report.get("summary") or {}
     d = report.get("declared") or {}
+    label = d.get("check_label") or ("check1-" + str(d.get("expected_checks")))
     return ("判据 %d 条：PASS %s · FAIL %s · WARN %s · ERROR %s；"
-            "声明 check1-%s / PASS=%s · verify %s（判据级抽查面，非 check 全量）"
+            "声明 %s / PASS=%s · verify %s（判据级抽查面，非 check 全量）"
             % (len(report.get("items") or []), s.get("pass"), s.get("fail"),
-               s.get("warn"), s.get("error"), d.get("expected_checks"),
+               s.get("warn"), s.get("error"), label,
                d.get("expected_pass"), d.get("verify_version")))

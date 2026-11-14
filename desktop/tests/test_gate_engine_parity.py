@@ -409,15 +409,15 @@ class AggregateGateCensusTest(unittest.TestCase):
     """模式普查：verify.sh 里 tail 压缩的全量清单（防止“这是个案例”被误读）。"""
 
     def test_tail_compression_sites(self):
-        """23 处 tail：20 处压 verdict（check23-42）+ 3 处贴日志尾部（check12×2/check18）。"""
+        """24 处 tail：21 处压 verdict（check23-42 + check45）+ 3 处贴日志尾部（12×2/18）。"""
         total = sum(1 for line in VERIFY_TEXT.splitlines() if "tail -" in line)
         dump, verdict = _tail_census(VERIFY_TEXT)
-        self.assertEqual(23, total)
+        self.assertEqual(24, total)
         self.assertEqual([12, 18], dump)
-        self.assertEqual(list(range(23, 43)), verdict)
+        self.assertEqual(list(range(23, 43)) + [45], verdict)
 
     def test_upgraded_gates_are_exactly_the_six(self):
-        """逐条透出口径当前覆盖 32/33/35/36/41/42；其余 14 处仍是模式存量。"""
+        """逐条透出口径当前覆盖 32/33/35/36/41/42（check45 用单行摘要口径）。"""
         self.assertEqual(list(UPGRADED_GATES), _upgraded_gates(VERIFY_TEXT))
 
     def test_summary_has_single_source(self):

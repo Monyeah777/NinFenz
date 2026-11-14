@@ -89,8 +89,9 @@ def live_versions(root: str = ".") -> Dict[str, str]:
     verify = verify_path.read_text(encoding="utf-8") if verify_path.is_file() else ""
     vm = re.search(r"# 版本 : (v[\d.]+)", verify)
     # 缺 verify.sh 的临时夹具：基线真源退化为常量（如实标注版本未知），不崩
-    out["基线"] = "%s · check1-%d · PASS=%d" % (
-        vm.group(1) if vm else "?", qb.EXPECTED_CHECKS, qb.EXPECTED_PASS)
+    label = str(getattr(qb, "CHECK_LABEL", None) or ("check1-" + str(qb.EXPECTED_CHECKS)))
+    out["基线"] = "%s · %s · PASS=%d" % (
+        vm.group(1) if vm else "?", label, qb.EXPECTED_PASS)
     return out
 
 

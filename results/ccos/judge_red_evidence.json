@@ -2421,6 +2421,10 @@
       "source": "negative_assertion"
     },
     {
+      "module": "test_trust_gate45.py",
+      "source": "naming"
+    },
+    {
       "module": "test_trust_process.py",
       "source": "negative_assertion"
     },
@@ -2589,10 +2593,10 @@
       "source": "negative_assertion"
     }
   ],
-  "modules": 647,
+  "modules": 648,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
-  "suspect": 166,
+  "suspect": 167,
   "with_evidence": 340,
   "without_evidence": 141
 }

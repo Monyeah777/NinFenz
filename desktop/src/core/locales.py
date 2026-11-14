@@ -113,7 +113,9 @@ def switcher(locales: List[Tuple[str, str]], current: str) -> str:
 def anchors() -> Tuple[str, ...]:
     """每面都必须出现的机读事实锚点（期望值取自 quality_baseline，不写字面量）。"""
     from core import quality_baseline as qb
-    return ("check1-%d" % qb.EXPECTED_CHECKS, "PASS=%d" % qb.EXPECTED_PASS,
+    label = str(getattr(qb, "CHECK_LABEL", None)
+                or ("check1-" + str(qb.EXPECTED_CHECKS)))
+    return (label, "PASS=%d" % qb.EXPECTED_PASS,
             "01_核心协议.md", "06_Agent执行协议.md", "llms.txt", "community/")
 
 

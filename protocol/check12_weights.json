@@ -606,6 +606,7 @@
     "test_trust_bundle": 1.0,
     "test_trust_canonical": 0.2,
     "test_trust_entity": 0.2,
+    "test_trust_gate45": 0.5,
     "test_trust_process": 0.2,
     "test_trust_schemas": 1.3,
     "test_trust_threat_model_doc_contract": 0.2,
@@ -5613,6 +5614,14 @@
     "test_trust_entity.SchemaLoadTest.test_missing_schema_root_raises_with_guidance": 0.0,
     "test_trust_entity.SchemaLoadTest.test_resolve_issuer_requires_exact_id": 0.0,
     "test_trust_entity.VectorParityTest.test_entity_vectors": 0.0,
+    "test_trust_gate45.MutationRedTest.test_missing_family_red": 0.05,
+    "test_trust_gate45.MutationRedTest.test_missing_vectors_file_red": 0.02,
+    "test_trust_gate45.MutationRedTest.test_splice_probe_is_live_mutation": 0.04,
+    "test_trust_gate45.MutationRedTest.test_tampered_level_exit_code_red": 0.04,
+    "test_trust_gate45.MutationRedTest.test_tampered_merkle_root_red": 0.04,
+    "test_trust_gate45.MutationRedTest.test_tampered_process_head_red": 0.04,
+    "test_trust_gate45.RealRepoTest.test_scan_is_clean_and_stats_nonzero": 0.0,
+    "test_trust_gate45.RealRepoTest.test_scan_is_deterministic": 0.01,
     "test_trust_process.ChainBuildTest.test_append_step_guards": 0.0,
     "test_trust_process.ChainBuildTest.test_built_chain_is_valid_and_schema_compliant": 0.0,
     "test_trust_process.ChainBuildTest.test_chain_head_raises_on_bad_chain": 0.0,
@@ -5920,5 +5929,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2122.4
+  "total_s": 2122.9
 }

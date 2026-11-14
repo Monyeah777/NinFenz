@@ -16,10 +16,14 @@ from typing import Any, Dict, List, Tuple
 
 _ROOT = Path(__file__).resolve().parents[3]
 
-#: 当前基线声明（verify 每次扩 check 时同步：check 数 + PASS 期望值）。
+#: 当前基线声明（verify 每次扩 check 时同步：check 清单 + PASS 期望值）。
 #: 本模块以 verify.sh 为单一真值做四处自洽断言，期望值集中在此，避免散落字面量。
-EXPECTED_CHECKS = 42
-EXPECTED_PASS = 76
+#: check 编号**显式清单**（2026-11-14 起）：为并行线预留空号（如 check43/44 留给其它线），
+#: 判据仍是「精确相等」——不弱化为范围包含。
+CHECK_NUMBERS = tuple(range(1, 43)) + (45,)
+EXPECTED_CHECKS = 43
+EXPECTED_PASS = 77
+CHECK_LABEL = "check1-42/45"
 
 
 def scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
@@ -37,15 +41,15 @@ def scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     n_checks = len(nums)
     if not ver:
         issues.append("verify.sh 缺版本头（vX.Y）")
-    if n_checks != EXPECTED_CHECKS or nums != list(range(1, EXPECTED_CHECKS + 1)):
-        issues.append("verify.sh check 函数数/编号异常：%s" % nums)
+    if nums != list(CHECK_NUMBERS):
+        issues.append("verify.sh check 函数数/编号异常：%s（期望 %s）"
+                      % (nums, list(CHECK_NUMBERS)))
 
     checks: List[Tuple[str, str, int]] = []
     readme = (r / "README.md").read_text(encoding="utf-8")
     checks.append(("README", "基线句",
                   1 if all(t in readme for t in (
-                      ver, "check1-%d" % EXPECTED_CHECKS,
-                      "PASS=%d" % EXPECTED_PASS))
+                      ver, CHECK_LABEL, "PASS=%d" % EXPECTED_PASS))
                    else 0))
     changelog = (r / "CHANGELOG.md").read_text(encoding="utf-8")
     head = changelog.split("\n## [2.8.0]", 1)[0]
@@ -56,6 +60,6 @@ def scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
                    matrix.count("PASS=%d" % EXPECTED_PASS)))
     for name, what, n in checks:
         if n < 1:
-            issues.append("%s 缺 %s 声明（预期含 v2.x/check1-%d/PASS=%d）"
-                          % (name, what, EXPECTED_CHECKS, EXPECTED_PASS))
+            issues.append("%s 缺 %s 声明（预期含 v2.x/%s/PASS=%d）"
+                          % (name, what, CHECK_LABEL, EXPECTED_PASS))
     return issues, {"verify_version": ver, "checks": n_checks}
