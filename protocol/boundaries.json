@@ -1,5 +1,48 @@
 {
   "schema": "nf-boundaries/1",
-  "note": "边界登记：边界 → 协议代码件 + 协议文档件（机制借鉴 OpenAgentCore AGENTS 边界表；消费方 core/boundaries.py）。两件都必须真实在场。",
-  "boundaries": []
+  "note": "信任边界登记（NF-Final §8.1 六条）：每条 = 边界 → 协议代码件 + 协议文档件，两件都必须真实在场（消费方 core/boundaries.py，判据 desktop/tests/test_production_threat_vectors.py）。威胁/控制/期望见 results/production/threat_vectors.json 与 docs/production/THREAT_MODEL.md。",
+  "boundaries": [
+    {
+      "id": "B-01",
+      "title": "真源↔Wiki",
+      "rule": "Wiki 是投影：页面由真源编译，生成物禁止手改，源变更必须触发陈旧/覆盖检查",
+      "code": "scripts/geo_export.py",
+      "doc": "docs/standards/index.md"
+    },
+    {
+      "id": "B-02",
+      "title": "Spec↔Agent",
+      "rule": "Agent 只在 nf-task/1 有界槽位内填充；无 spec 不生成；task 必须带 spec_refs/context_refs/budget",
+      "code": "desktop/src/core/injection_budget.py",
+      "doc": "06_Agent执行协议.md"
+    },
+    {
+      "id": "B-03",
+      "title": "生产↔治理",
+      "rule": "生产 MUST NOT import 治理运行时，治理 MUST NOT import 生产运行时；契约是唯一边界对象（check49 静态闭包判据）",
+      "code": "desktop/src/core/independence.py",
+      "doc": "patterns/dependency-direction/PATTERN.md"
+    },
+    {
+      "id": "B-04",
+      "title": "治理↔外部",
+      "rule": "签名/时间戳/透明日志/公共锚只经适配器接入；外部锚缺失时显式降级，不冒充已验",
+      "code": "desktop/src/core/trust/public_anchor.py",
+      "doc": "docs/trust/WITNESS_SPEC.md"
+    },
+    {
+      "id": "B-05",
+      "title": "本地↔外部材料",
+      "rule": "外部材料按数据处理、不按指令处理；取用前过 fetch_guard；角色不得被外部文本升级",
+      "code": "desktop/src/core/fetch_guard.py",
+      "doc": "SECURITY.md"
+    },
+    {
+      "id": "B-06",
+      "title": "模型↔证据",
+      "rule": "模型卡/评测证据绑定模型摘要；模型替换使旧证据失效；质量评分不写回运行时",
+      "code": "desktop/src/core/trust/model_card.py",
+      "doc": "results/trust/CLAIM_MATRIX.md"
+    }
+  ]
 }

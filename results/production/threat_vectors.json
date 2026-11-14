@@ -1,0 +1,218 @@
+{
+  "schema": "nf-threat-vectors/1",
+  "note": "NF-Final §8 威胁/失败向量（机器可校验）：STRIDE 8 行 + 关键失败矩阵 8 行，逐条绑定信任边界、控制点、期望与证据。状态词表：enforced=有代码+测试/门禁可证；partial=控制点存在但覆盖不完整（须写 planned_gate）；planned=未实现（须写 planned_gate，不冒充已防）；UNOBSERVABLE=不可静态观测（须写 reason）。判据：desktop/tests/test_production_threat_vectors.py。",
+  "plan_ref": {
+    "boundaries": "§8.1（六条信任边界，登记件 protocol/boundaries.json）",
+    "stride": "§8.2（每项必须有测试或 ACCEPTED-RISK）",
+    "failure_matrix": "§8.3（关键失败矩阵）"
+  },
+  "status_vocabulary": {
+    "enforced": "有代码控制点 + 至少一个测试/门禁证据",
+    "partial": "控制点部分在场；缺口用 planned_gate 指向阶段",
+    "planned": "未实现，禁止写成已防；用 planned_gate 指向阶段",
+    "UNOBSERVABLE": "不可静态观测，必须写 reason"
+  },
+  "boundaries": ["B-01", "B-02", "B-03", "B-04", "B-05", "B-06"],
+  "stride": [
+    {
+      "id": "NF-TH-01",
+      "category": "S",
+      "boundary": "B-04",
+      "threat": "伪造 issuer/Agent 身份",
+      "mitigation": "DSSE/PAE 信封 + issuer registry（keyid/alg 白名单、生命周期/吊销 fail-closed）+ typed entity 准入",
+      "evidence": [
+        "desktop/tests/test_trust_dsse.py",
+        "desktop/tests/test_trust_keys.py",
+        "desktop/tests/test_trust_entity.py"
+      ],
+      "status": "enforced"
+    },
+    {
+      "id": "NF-TH-02",
+      "category": "T",
+      "boundary": "B-01",
+      "threat": "改 Wiki/spec/事件内容",
+      "mitigation": "生成物禁止手改 + 生成器判据（标准索引/验证卡册已有；Wiki/spec 编译器待 G1）",
+      "evidence": [
+        "docs/standards/index.md",
+        "docs/verification-cards.md",
+        "scripts/geo_export.py"
+      ],
+      "status": "partial",
+      "planned_gate": "G1"
+    },
+    {
+      "id": "NF-TH-03",
+      "category": "T",
+      "boundary": "B-04",
+      "threat": "删尾事件并重算本地摘要",
+      "mitigation": "prev 链 + 链头摘要 + 外部锚/时间戳核验（锚缺失时显式不可判定）",
+      "evidence": [
+        "desktop/tests/test_trust_process.py",
+        "desktop/tests/test_evidence.py",
+        "desktop/tests/test_trust_anchor.py"
+      ],
+      "status": "enforced"
+    },
+    {
+      "id": "NF-TH-04",
+      "category": "R",
+      "boundary": "B-06",
+      "threat": "重放旧证据/旧模型卡",
+      "mitigation": "时效 + 吊销表 + 模型摘要绑定（模型替换 → 旧证据失效）",
+      "evidence": [
+        "desktop/tests/test_revocations.py",
+        "desktop/tests/test_timestamp.py",
+        "desktop/tests/test_trust_model_card.py"
+      ],
+      "status": "enforced"
+    },
+    {
+      "id": "NF-TH-05",
+      "category": "I",
+      "boundary": "B-05",
+      "threat": "证据/上下文泄露或被外部材料升级角色",
+      "mitigation": "外部材料按数据处理 + 参数边界 + 注入预算（context packer/角色隔离待 G1）",
+      "evidence": [
+        "desktop/tests/test_trust_boundary.py",
+        "desktop/tests/test_injection_budget.py"
+      ],
+      "status": "partial",
+      "planned_gate": "G1"
+    },
+    {
+      "id": "NF-TH-06",
+      "category": "D",
+      "boundary": "B-02",
+      "threat": "超大 Wiki/上下文导致资源耗尽",
+      "mitigation": "证据单件/整包上限 + 注入预算（Wiki/任务预算上限待 G1）",
+      "evidence": [
+        "desktop/tests/test_injection_budget.py",
+        "desktop/tests/test_evidence.py"
+      ],
+      "status": "partial",
+      "planned_gate": "G1"
+    },
+    {
+      "id": "NF-TH-07",
+      "category": "E",
+      "boundary": "B-03",
+      "threat": "类型/权限混淆与越权组合",
+      "mitigation": "类型注册表 + typed_admissibility + 组合准入（未知 type/越权组合 fail-closed）",
+      "evidence": [
+        "desktop/tests/test_trust_types.py",
+        "desktop/tests/test_trust_entity.py"
+      ],
+      "status": "enforced"
+    },
+    {
+      "id": "NF-TH-08",
+      "category": "S",
+      "boundary": "B-04",
+      "threat": "自签自验冒充外部锚",
+      "mitigation": "验签方 ≠ 签名方（独立进程）+ 等级只写报告缺项；cosign 不在场时按 WARN 记，不冒充已签",
+      "evidence": [
+        "verify.sh",
+        "desktop/tests/test_trust_verify.py",
+        "desktop/src/core/provenance_external.py"
+      ],
+      "status": "enforced"
+    }
+  ],
+  "failure_matrix": [
+    {
+      "id": "NF-FM-01",
+      "boundary": "B-01",
+      "attack": "手改 Wiki 页",
+      "expected": "重编译覆盖 + 生成物/新鲜度检查 FAIL",
+      "evidence": [
+        "docs/standards/index.md",
+        "scripts/geo_export.py",
+        "docs/verification-cards.md"
+      ],
+      "status": "partial",
+      "planned_gate": "G1"
+    },
+    {
+      "id": "NF-FM-02",
+      "boundary": "B-01",
+      "attack": "删除一个 spec/页",
+      "expected": "覆盖/链接检查 FAIL（Wiki 建后为 wiki check FAIL）",
+      "evidence": [
+        "docs/standards/index.md",
+        "scripts/geo_export.py"
+      ],
+      "status": "partial",
+      "planned_gate": "G1"
+    },
+    {
+      "id": "NF-FM-03",
+      "boundary": "B-02",
+      "attack": "Agent 编造引用",
+      "expected": "输出校验 FAIL（引用必须命中 wiki id/spec ref）",
+      "evidence": [
+        "protocol/production/task.schema.json",
+        "desktop/tests/test_schema_reference.py"
+      ],
+      "status": "planned",
+      "planned_gate": "G1"
+    },
+    {
+      "id": "NF-FM-04",
+      "boundary": "B-02",
+      "attack": "用错 spec/模块",
+      "expected": "spec 编译/装配 FAIL（未知/缺失 spec fail-closed）",
+      "evidence": [
+        "protocol/production/spec.schema.json",
+        "desktop/tests/test_schema_reference.py"
+      ],
+      "status": "planned",
+      "planned_gate": "G2"
+    },
+    {
+      "id": "NF-FM-05",
+      "boundary": "B-03",
+      "attack": "生产被治理阻塞",
+      "expected": "默认不阻塞；require 才阻断（双平面 import 边界静态可证）",
+      "evidence": [
+        "desktop/tests/test_independence.py",
+        "scripts/check_independence.py"
+      ],
+      "status": "enforced"
+    },
+    {
+      "id": "NF-FM-06",
+      "boundary": "B-03",
+      "attack": "治理验证 NF 外产物",
+      "expected": "通过（独立 bundle/policy 复算；缺外产物 fixture 的端到端测试）",
+      "evidence": [
+        "desktop/src/core/trust/verify.py",
+        "desktop/tests/test_trust_verify.py"
+      ],
+      "status": "partial",
+      "planned_gate": "G3"
+    },
+    {
+      "id": "NF-FM-07",
+      "boundary": "B-04",
+      "attack": "删尾事件并重算",
+      "expected": "锚/签名 FAIL",
+      "evidence": [
+        "desktop/tests/test_trust_process.py",
+        "desktop/tests/test_trust_anchor_evidence.py"
+      ],
+      "status": "enforced"
+    },
+    {
+      "id": "NF-FM-08",
+      "boundary": "B-04",
+      "attack": "撤销 issuer 后旧签名",
+      "expected": "验证失败/降级报告",
+      "evidence": [
+        "desktop/tests/test_revocations.py",
+        "desktop/tests/test_trust_keys.py"
+      ],
+      "status": "enforced"
+    }
+  ]
+}

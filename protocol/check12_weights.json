@@ -467,6 +467,7 @@
     "test_predicate_single_source_pattern_doc_contract": 3.4,
     "test_preset_cli": 3.3,
     "test_probe_manifest_wiring": 0.1,
+    "test_production_threat_vectors": 0.3,
     "test_prose_lint": 0.2,
     "test_protocol_golden": 1.2,
     "test_protocol_projection": 0.6,
@@ -4497,6 +4498,13 @@
     "test_probe_manifest_wiring.ProbeManifestWiringTest.test_every_probe_file_is_registered_and_every_entry_has_a_file": 0.0,
     "test_probe_manifest_wiring.ProbeManifestWiringTest.test_non_probe_allowlist_is_not_stale": 0.0,
     "test_probe_manifest_wiring.ProbeManifestWiringTest.test_wiring_predicate_catches_the_mutations": 0.0,
+    "test_production_threat_vectors.ProductionThreatModelTest.test_boundaries_registry": 0.0,
+    "test_production_threat_vectors.ProductionThreatModelTest.test_boundary_coverage": 0.0,
+    "test_production_threat_vectors.ProductionThreatModelTest.test_doc_and_vectors_cross_consistent": 0.0,
+    "test_production_threat_vectors.ProductionThreatModelTest.test_doc_structure": 0.0,
+    "test_production_threat_vectors.ProductionThreatModelTest.test_mutation_self_proof": 0.01,
+    "test_production_threat_vectors.ProductionThreatModelTest.test_no_overclaim": 0.0,
+    "test_production_threat_vectors.ProductionThreatModelTest.test_vectors": 0.0,
     "test_prose_lint.PunctMixPrecisionTest.test_fullwidth_punctuation_is_clean": 0.0,
     "test_prose_lint.PunctMixPrecisionTest.test_id_syntax_is_exempt": 0.0,
     "test_prose_lint.PunctMixPrecisionTest.test_inline_code_is_exempt": 0.0,
@@ -6158,5 +6166,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2140.7
+  "total_s": 2141.0
 }

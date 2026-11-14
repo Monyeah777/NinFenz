@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1469,
+    "app": 1470,
     "entry": 26,
     "floor": 5,
     "prod": 1057,
-    "projection": 174,
+    "projection": 175,
     "support": 494,
-    "verify": 1386
+    "verify": 1387
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -10535,6 +10535,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "生产平面威胁模型三面一致判据（NF-Final WP-03）。",
+      "path": "desktop/tests/test_production_threat_vectors.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "正文级 lint 单测（AI 味机械特征；只报告不阻断）。",
       "path": "desktop/tests/test_prose_lint.py",
       "role": "verify",
@@ -14207,7 +14213,7 @@
       "rule": "R-verify"
     },
     {
-      "function": "边界登记：边界 → 协议代码件 + 协议文档件（机制借鉴 OpenAgentCore AGENTS 边界表；消费方 core/boundaries.py）。两件都必须真实在场。",
+      "function": "信任边界登记（NF-Final §8.1 六条）：每条 = 边界 → 协议代码件 + 协议文档件，两件都必须真实在场（消费方 core/boundaries.py，判据 desktop/tests/test_production_threat_vectors.py）。威胁/控制/期望见 results/production/threat_vectors.json 与 docs/production/THREAT_MODEL.md。",
       "path": "protocol/boundaries.json",
       "role": "verify",
       "rule": "R-verify"
@@ -14700,16 +14706,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "3a64523a6c74b50f36fa3153e6b489551a9f2aeb482847f49f3183f4a6960b32",
+  "root_digest": "3effa28dcd9ce4d35247bd7a3fdc1bd77f326205fede9e67dce832f0a22565b4",
   "rule_counts": {
-    "R-app": 1469,
+    "R-app": 1470,
     "R-catch": 342,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 154,
+    "R-projection": 155,
     "R-support": 124,
-    "R-verify": 1259,
+    "R-verify": 1260,
     "auto:R-core": 288
   },
   "schema": "nf-role-coordinates/1"
