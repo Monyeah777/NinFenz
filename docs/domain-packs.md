@@ -129,7 +129,7 @@ ledger / advisory / 模块签名 / 回执 / conformance）→ `bash verify.sh` �
 ```bash
 python scripts/nf.py domain shells --json      # 空壳台账（hits / packs_with_shell / 逐包比对基线）
 python scripts/nf.py output verify            # 全量产出面机检（含 T4 复算）
-python -m pytest desktop/tests/test_domain_packs_contract.py -q   # 域包契约面
+python -m pytest desktop/tests/test_domain_packs_doc_contract.py -q   # 域包契约面
 ```
 
 - 引用本文时：「100 包 / 1200 细分 / 每包 16 件 / 10 面 ≥T2」= 结构口径；数字以 `protocol/domain_packs.json` 实读为准。

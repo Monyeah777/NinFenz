@@ -69,12 +69,17 @@ def assets_issues(text: str) -> list:
         issues.append("缺「只换一个会分叉」后果说明")
     if "struct.unpack" not in text:
         issues.append("缺像素实测命令")
-    proc = subprocess.run([sys.executable, "-m", "pytest",
-                           "desktop/tests/test_mcp_packaging.py", "-q"],
-                          cwd=str(ROOT), capture_output=True, text=True,
-                          encoding="utf-8", errors="replace", timeout=300, check=False)
-    if proc.returncode != 0:
-        issues.append("test_mcp_packaging 未通过（图标位判据）")
+    # 依赖面：test_mcp_packaging 需要本机 payload 暂存（gitignored 构建产物）。CI 的通用单测分片
+    # 不跑 npm-package-check，payload 不在场 ⇒ 子进程必红。这里按「依赖前置缺失」跳过子判据，
+    # 只保留本页自身可核项（不把环境缺失误判成 README 缺陷）。
+    manifest = ROOT / "packaging" / "npm" / "payload" / "payload-manifest.json"
+    if manifest.is_file():
+        proc = subprocess.run([sys.executable, "-m", "pytest",
+                               "desktop/tests/test_mcp_packaging.py", "-q"],
+                              cwd=str(ROOT), capture_output=True, text=True,
+                              encoding="utf-8", errors="replace", timeout=300, check=False)
+        if proc.returncode != 0:
+            issues.append("test_mcp_packaging 未通过（图标位判据）")
     if "TODO" in text:
         issues.append("含 TODO 占位")
     return issues

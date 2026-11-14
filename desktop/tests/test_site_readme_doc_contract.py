@@ -94,7 +94,9 @@ def doc_issues(text: str) -> list:
         if sizes and sizes != {want_mb}:
             issues.append(f"npm 体积与本页不一致：{sorted(sizes)} vs 清单 {want_mb}")
     else:
-        issues.append("payload 清单不在场（无法核对 npm 口径）")
+        # payload 是 gitignored 构建产物：CI 通用单测分片不跑 npm 暂存，此面按「前置缺失」跳过
+        # （口径比对真跑在 npm-package-check 工作流里），不把它误判成 README 缺陷。
+        pass
     if "TODO" in text:
         issues.append("含 TODO 占位")
     return issues
