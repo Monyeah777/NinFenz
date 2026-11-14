@@ -4,7 +4,7 @@
     "buildDefinition": {
       "buildType": "https://ninfenz.dev/buildtypes/local-gate/v1",
       "externalParameters": {
-        "declaredBaseline": "check1-47 PASS=85",
+        "declaredBaseline": "check1-49 PASS=89",
         "gate": "verify.sh",
         "gateVersion": "v2.35",
         "note": "参数取自仓内声明件（不引入新真源）"
@@ -218,7 +218,7 @@
         "id": "https://ninfenz.dev/builder/verify-sh"
       },
       "metadata": {
-        "invocationId": "87d1eead8ba4f490",
+        "invocationId": "7bdd8e3987448efc",
         "note": "本地门禁执行事实；**不构成 SLSA 等级声明**（无远程 builder）"
       }
     }
@@ -257,7 +257,7 @@
     },
     {
       "digest": {
-        "sha256": "5c2308118d135d4164148697574b8e88df8771b1fb484a10c6646af99c79e4b1"
+        "sha256": "54504cae3939df600c9059a358e9e93d036495b0b172868daef2bd9e06da704d"
       },
       "name": "llms.txt"
     },
@@ -389,7 +389,7 @@
     },
     {
       "digest": {
-        "sha256": "319f4569c130efe2971df96e6205c9521e9512fa7e828e92db1be8c25a55448f"
+        "sha256": "8c59edb08cee14dc6c02b1eb9690e63395e178a77329732ae9d15443f05df42e"
       },
       "name": "protocol/repo_stats.json"
     },
@@ -401,7 +401,7 @@
     },
     {
       "digest": {
-        "sha256": "b106affb01c8121848db824bcc9d52d5a41a90ea6419f4a35f4c6c1898e592f1"
+        "sha256": "f96beec1d99ba5a77c636467ba96ffa33797acccb8532d66f0d229d37cff98fd"
       },
       "name": "protocol/CONFORMANCE.md"
     },
@@ -443,7 +443,7 @@
     },
     {
       "digest": {
-        "sha256": "20f9fe3429bf63fc221ee51b9defb38743d5162b8008b1bd624df630aacc1a7e"
+        "sha256": "8a55f31d786725b28ecabfb433442db8433761e1a5afd2df312c5b700745f955"
       },
       "name": "protocol/assertions.json"
     },

@@ -8,6 +8,8 @@
 #        单 claim / splice / prev 链 / 等级判定；任一漂移即 FAIL；check48 = DoD 收口门禁（B4 验收：交付件/claim 状态/自审计/PASS 基线））。
 #        G0 扩展 check49 = 生产/治理双平面 import 边界（protocol/independence.json 三平面互斥 + 全部 core 模块
 #        静态导入闭包零跨界 + 动态导入白名单；报告 results/independence.json 须 == 实时重算）。
+#        G1 扩展 check43/44 = LLMWiki 完整性（覆盖/ID/关系/陈旧/三入口 + 生成物逐字节）与
+#        Spec 编译（intent→nf-spec/1→nf-task/1 确定性 + schema + 拒绝未知；WP-13）。
 #        46 吸收七面 check33：MCP dual-era 版本对齐（2026-07-28/2025-11-25 + server/discover）/
 #        内容外挂签名 attestation / 基线相对回归评分 / 机械修复 + LSP / 正文 lint / 图书馆许可证门 / 遥测 semconv
 #        图书馆面 check34：条目 frontmatter 真源（OKF 借鉴）/ INDEX·ALIAS 投影一致（I5）/ 生命周期 /
@@ -116,7 +118,7 @@ fi
 #   运行时 + 档位）；输入没变直接回放摘要（秒级）。--no-cache 或 NF_VERIFY_CACHE=0 关掉。
 # 任何其它参数 = 用法错误（exit 2），以免"看上去像传了子集其实仍在全量"这类静默误读。
 # 矩阵分片（CI，2026-10-18）：`--tests-only --shard i/n` 只跑测试的第 i/n 片；
-# `--checks-only` 只跑 47 条静态 check（测试交给矩阵）。两者由 CI 组合成一次完整门禁：
+# `--checks-only` 只跑 49 条静态 check（测试交给矩阵）。两者由 CI 组合成一次完整门禁：
 # 静态 1 台 + 测试 n 台并行 ⇒ 全量墙钟从"一台机器的 ~600 s"降到"n 台各自 ~100 s"。
 NF_FAST=0; NF_BASE=''; NF_TIER='quick'; NF_CACHE="${NF_VERIFY_CACHE:-1}"
 NF_CHECKS_ONLY=0; NF_TESTS_ONLY=0; NF_SHARD=''
@@ -3121,6 +3123,88 @@ PYEOF
   fi
 }
 
+check43(){
+  echo '== [43/段D] Wiki 完整性门禁（G1：覆盖/ID/关系/陈旧/三入口 + 生成物逐字节）=='
+  local err=0
+  if [ -n "$PY3" ]; then
+    if "$PY3" - <<'PYEOF' >"$NFL_TMP"/nf_check43.log 2>&1
+import os, sys
+from pathlib import Path
+sys.path.insert(0, os.path.join('desktop', 'src'))
+from core import wiki_compiler as wc
+issues = wc.check('.')
+for item in issues:
+    print('[FAIL] %s' % item)
+if not issues:
+    for rel, text in wc.render('.').items():
+        try:
+            on_disk = Path(rel).read_text(encoding='utf-8')
+        except OSError:
+            on_disk = ''
+        if on_disk != text:
+            issues.append('生成物与真源不一致：%s' % rel)
+            print('[FAIL] 生成物与真源不一致：%s' % rel)
+    pages, rest = wc.build('.')
+    print('Wiki 统计：页面=%s · 覆盖=%s' % (len(pages['pages']), rest['expected']))
+sys.exit(1 if issues else 0)
+PYEOF
+    then
+      ok 'Wiki 完整性全绿（check43：覆盖/ID/关系/陈旧/三入口）'
+    else
+      no "Wiki 完整性异常——$(tail -3 "$NFL_TMP"/nf_check43.log | tr '
+' ' ')"
+      err=1
+    fi
+  else
+    wn 'python3 不在 PATH（跳过 check43 Wiki 完整性门禁）'
+  fi
+  if [ "$err" -eq 0 ]; then ok 'Wiki 生成物与真源逐字节一致（check43：同输入同输出）'
+  fi
+  return "$err"
+}
+check44(){
+  echo '== [44/段D] Spec 编译门禁（G1：intent→spec→task 确定性 + schema + 拒绝未知）=='
+  local err=0
+  if [ -n "$PY3" ]; then
+    if "$PY3" - <<'PYEOF' >"$NFL_TMP"/nf_check44.log 2>&1
+import json, os, sys
+sys.path.insert(0, os.path.join('desktop', 'src'))
+from core import spec_compiler as sc
+issues = []
+sample = 'spec/intents/sample-document.json'
+intent = json.load(open(sample, encoding='utf-8'))
+bundle = sc.compile_intent(intent, '.', sample)
+again = sc.compile_intent(intent, '.', sample)
+if sc.render(bundle) != sc.render(again):
+    issues.append('同 intent 两次编译不是逐字节一致')
+issues += sc.validate_bundle(bundle, '.')
+bad = dict(intent)
+bad['kind'] = 'bogus'
+try:
+    sc.compile_intent(bad, '.')
+    issues.append('未知 kind 未被拒绝')
+except sc.SpecError:
+    pass
+for item in issues:
+    print('[FAIL] %s' % item)
+print('Spec 统计：spec=%s · tasks=%s · digest=%s…' % (
+    bundle['spec']['ref'], len(bundle['tasks']), bundle['spec']['digest'][:12]))
+sys.exit(1 if issues else 0)
+PYEOF
+    then
+      ok 'Spec 编译全绿（check44：确定性 + schema + 拒绝未知 kind）'
+    else
+      no "Spec 编译异常——$(tail -3 "$NFL_TMP"/nf_check44.log | tr '
+' ' ')"
+      err=1
+    fi
+  else
+    wn 'python3 不在 PATH（跳过 check44 Spec 编译门禁）'
+  fi
+  if [ "$err" -eq 0 ]; then ok 'Spec 编译产物与契约一致（check44：nf-spec/1 + nf-task/1）'
+  fi
+  return "$err"
+}
 check45(){
   echo '== [45/段D] Trust 证据面门禁（G1：bundle 守恒 + 单 claim + splice + prev 链 + 等级判定，对冻结向量复算）=='
   local err=0
@@ -3330,9 +3414,11 @@ check37
 check38
 check39
 check40
-echo '—— 段 D：供应链与 Trust 证据面（check41-42 + check45 G1 + check46 G2 + check47 G4 + check48 DoD + check49 G0 双平面边界）——'
+echo '—— 段 D：供应链与 Trust 证据面（check41-42 + check43/44 G1 Wiki-Spec + check45 G1 + check46 G2 + check47 G4 + check48 DoD + check49 G0 双平面边界）——'
 check41
 check42
+check43
+check44
 check45
 check46
 check47

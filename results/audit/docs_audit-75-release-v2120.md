@@ -6,9 +6,9 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - CHANGELOG.md:64a59ca733b7232e9c225eae597728c91a8be377476e4520270356733e4ad461
-  - docs/meta/VERSION-MATRIX.md:c3c9f4ae8aa0c98b266a76ab7d5c6e0f01bf428e26570091485659485acc8d30
-  - README.md:27a6bc7449be1bcd2b90772a71049f28bcd7bdbf639938980a503d2c9897c594
+  - CHANGELOG.md:ae3cd23842db863fba6ea54f8ec726067b783ca4661a4739fad4dc55bd6d4f94
+  - docs/meta/VERSION-MATRIX.md:1c2166a074b8c26456ee75a1522d1c5c2304ecaf5d9e8e2c19c4b054d6ad387b
+  - README.md:420ff186b6f6d14a53f6f4296a46e54b50cd32f6276073457eb5c66b09c979a4
   - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
@@ -16,6 +16,8 @@ subjects:
   - scripts/nf.py:29e1170dab08764e3970d90d64b57495bbd74dd256ebe7744db688a66b77aace
 
 ---
+> 重审（2026-11-14）：NF-Final WP-13：verify.sh 新增 check43/44（Wiki/Spec），quality_baseline 常数 49/PASS=89、CHECK_LABEL；README/CHANGELOG/VERSION-MATRIX/CONFORMANCE/verification-cards/llms/repo_stats/SELF_AUDIT/interop 重新生成
+
 > 重审（2026-11-14）：NF-Final WP-12：新增 core/context_packer.py、docs/context-packer.md、test_context_packer_contract.py；nf wiki context --role 接入；independence/code_metrics/check12 更新，被审对象变更后机械重绑
 
 > 重审（2026-11-14）：NF-Final WP-11：新增 core/spec_compiler.py、spec/intents/sample-document.json、docs/spec-compiler.md、test_spec_compiler_contract.py、nf spec compile；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑
