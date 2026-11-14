@@ -898,6 +898,21 @@
       "message": "G0 DoD 收口审计缺失或版本名不符（Gate 准入判据依赖它）",
       "fix": "补/修 results/g0_dod.json；再跑 test_g0_dod",
       "evidence": "test_g0_dod / conformance::modeling"
+    },
+    {
+      "id": "wiki-pages",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "wiki/pages.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-wiki-pages/1"
+      },
+      "message": "LLMWiki 页面生成物缺失或版本名不符（WP-10 判据依赖它）",
+      "fix": "python scripts/nf.py wiki build --write 重编译；再跑 test_wiki_compiler_contract",
+      "evidence": "test_wiki_compiler_contract / conformance::modeling"
     }
   ]
 }

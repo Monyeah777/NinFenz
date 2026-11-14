@@ -7,7 +7,7 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - verify.sh:18e2089ead65a11b4729ded516860cdf1d31cdb54a35935051249b40fbf7b53d
-  - scripts/nf.py:75ed1ad2dda5fb07dbd914a6ffedb836e5cf1298bf34b98be602644827ebc925
+  - scripts/nf.py:36fb06164b600c2f21400e7253294aa79f683d942f469032f1b5d2f9b9413c27
   - desktop/src/core/repo_stats.py:d7fd457d3a1804c3e9ab266c8071ad9d8950d4b5eb0a782ce658a66e05e90f9c
   - desktop/src/core/quality_baseline.py:ce4f156f61ee54bf18d7432c6875717d44b319da00b62fef3dca9d947da0203f
   - scripts/interop_thirdparty_kit.py:4f967d3f29cd31deb79f1b97fdee5f59ae74fde0d378ced571d2896af2d275dc
@@ -20,6 +20,8 @@ subjects:
   - results/interop-thirdparty-status.md:e57c95980dd8b36bf137d23db0cf3c93ba8aee5221d2d26f2a6c782c30df0469
 
 ---
+> 重审（2026-11-14）：NF-Final WP-10：新增 wiki/ 生成区、core/wiki_compiler.py、docs/wiki.md、test_wiki_compiler_contract.py、nf wiki CLI；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑
+
 > 重审（2026-11-14）：NF-Final WP-02 双平面边界 check49：verify.sh 新增 check49（段 D）+ quality_baseline v2.35（47 check / PASS=85），被审对象变更后机械重绑
 
 > 重审（2026-11-14）：WP-15 check45 接线与 G1 收口（机械重绑）

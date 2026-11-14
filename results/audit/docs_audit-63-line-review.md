@@ -8,14 +8,16 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/gap_review.py:7d1d600926e13b9936f2a7d30e8a8ca95e4bb3b2a73308f88cfb89b563055953
   - desktop/src/core/payload_harvest.py:514c493d341863b245b7dddb0bde8ee87ca969fe4407c9f2834a726bb92d1a76
-  - protocol/data_contracts.json:aebe99ffd0e6c31cdfe050a849e87a4b0e289e4c97efb11a1dbde3b7e12bca73
-  - protocol/assertions.json:b39482466d3feecacff60bb1f15567cdd3c1fca5122754f8e35cd807fc4ce400
+  - protocol/data_contracts.json:aa013aba22b6133067f2b07c772c73ec20df41818d201b2fc91dc1b0470a820f
+  - protocol/assertions.json:415003288940c0573467cbf4a63008deee32a34092b7e39ffe4020b7e3720ea7
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
   - desktop/src/core/text_hygiene.py:99b38bfbb8656ad653689c4cba93679970a78183019fd5f02e2380d87ec99ff3
   - desktop/src/core/workloop.py:3ee94f2c11939abba5507741c6b9b4dae8e8cab77c3bda38419678e31e097056
   - scripts/serve_decision_model.py:bbb36dff0e3816c2253150b7de6ab619877c3c78269a644c4c966083df15afee
-  - scripts/nf.py:75ed1ad2dda5fb07dbd914a6ffedb836e5cf1298bf34b98be602644827ebc925
+  - scripts/nf.py:36fb06164b600c2f21400e7253294aa79f683d942f469032f1b5d2f9b9413c27
 ---
+> 重审（2026-11-14）：NF-Final WP-10：新增 wiki/ 生成区、core/wiki_compiler.py、docs/wiki.md、test_wiki_compiler_contract.py、nf wiki CLI；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑
+
 > 重审（2026-11-14）：NF-Final G0 收口审计：新增 results/{G0_DOD.md,g0_dod.json}、test_g0_dod.py；assertions/data_contracts/check12 更新，被审对象变更后机械重绑
 
 > 重审（2026-11-14）：NF-Final R6 不变量：新增 results/reverse/{INVARIANTS.md,invariants.json}、test_reverse_invariants.py；assertions/data_contracts/check12 更新，被审对象变更后机械重绑

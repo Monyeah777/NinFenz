@@ -1,0 +1,936 @@
+{
+  "pages": [
+    {
+      "digest": "2288451b33be5959789f7072a2089acc5b78e92902d4b105e354b0057a281d8f",
+      "id": "wiki:asset:README.md",
+      "source": "05_资产库/README.md",
+      "summary": "README.md",
+      "type": "asset"
+    },
+    {
+      "digest": "293d3d3dfd1bf25e0fdeaa32e4b14cc817ed974b4209fda45619c65a1473ab93",
+      "id": "wiki:asset:provenance.json",
+      "source": "05_资产库/provenance.json",
+      "summary": "provenance.json",
+      "type": "asset"
+    },
+    {
+      "digest": "10c854e5fa8e0443c84ca605adcc5b8b22a56a2ba7d15e1574b045773045ad80",
+      "id": "wiki:asset:用户自定义",
+      "source": "05_资产库/用户自定义",
+      "summary": "用户自定义",
+      "type": "asset"
+    },
+    {
+      "digest": "df158c389e76c205a1dafd980142fea191742754f42e2e3a7a7503bd248b97e2",
+      "id": "wiki:domain:A01",
+      "source": "community/大语言模型域包/outputs/DOMAIN_SPEC.json",
+      "summary": "大语言模型（A · 模型与能力/authored）",
+      "type": "domain"
+    },
+    {
+      "digest": "138fbbdbe83238f10e14b02775636e3c8e0854e04afd8092f619a64537711016",
+      "id": "wiki:domain:A02",
+      "source": "community/多模态大模型域包/outputs/DOMAIN_SPEC.json",
+      "summary": "多模态大模型（A · 模型与能力/authored）",
+      "type": "domain"
+    },
+    {
+      "digest": "6a731dd2318f0810d68d1887965b6d3a010f8beebb4656615e80c0474f2ea2c6",
+      "id": "wiki:domain:A03",
+      "source": "community/视觉模型域包/outputs/DOMAIN_SPEC.json",
+      "summary": "视觉模型（A · 模型与能力/authored）",
+      "type": "domain"
+    },
+    {
+      "digest": "c2466af43145bdc520f25a5cab779ba217fa8cb0aa9a1bb591f7b59159f61330",
+      "id": "wiki:domain:A04",
+      "source": "community/语音识别与合成域包/outputs/DOMAIN_SPEC.json",
+      "summary": "语音识别与合成（A · 模型与能力/authored）",
+      "type": "domain"
+    },
+    {
+      "digest": "0b9954016e181023f9d6add0bd787539cc16ef9cfef30e34dc37fa3a49905d79",
+      "id": "wiki:domain:A05",
+      "source": "community/音频与音乐生成域包/outputs/DOMAIN_SPEC.json",
+      "summary": "音频与音乐生成（A · 模型与能力/authored）",
+      "type": "domain"
+    },
+    {
+      "digest": "ebac50a78f9021fc7bac9f870e0aa241cf2ffdc89f43b8d0291e39afc33b6f1c",
+      "id": "wiki:domain:A06",
+      "source": "community/视频生成与理解域包/outputs/DOMAIN_SPEC.json",
+      "summary": "视频生成与理解（A · 模型与能力/authored）",
+      "type": "domain"
+    },
+    {
+      "digest": "914fd69e649b1d7ffa1a53a6b5349fe2c4b13c58e4beb4f4baf937c3c190e4e4",
+      "id": "wiki:domain:A07",
+      "source": "community/图像生成与编辑域包/outputs/DOMAIN_SPEC.json",
+      "summary": "图像生成与编辑（A · 模型与能力/authored）",
+      "type": "domain"
+    },
+    {
+      "digest": "93e3b11ed05628e641139f618b000debcbf2481de5db4c887e2253e8b9b7a9e0",
+      "id": "wiki:domain:A08",
+      "source": "community/三维与世界模型域包/outputs/DOMAIN_SPEC.json",
+      "summary": "三维与世界模型（A · 模型与能力/authored）",
+      "type": "domain"
+    },
+    {
+      "digest": "3b69ba9c9de240cdd550e0046f7c773788425725f6bf27d3c793996291b1c1ba",
+      "id": "wiki:domain:A09",
+      "source": "community/代码大模型域包/outputs/DOMAIN_SPEC.json",
+      "summary": "代码大模型（A · 模型与能力/authored）",
+      "type": "domain"
+    },
+    {
+      "digest": "4c76439533a0ac340eb0a65526aa1c3091786bf0c8ab0bc4728c974ddaac9809",
+      "id": "wiki:domain:A10",
+      "source": "community/数学与形式化推理域包/outputs/DOMAIN_SPEC.json",
+      "summary": "数学与形式化推理（A · 模型与能力/authored）",
+      "type": "domain"
+    },
+    {
+      "digest": "d24865deb8d3f469af11347484b8bc081fbcb4e4f521b299e3a73047317db138",
+      "id": "wiki:domain:A11",
+      "source": "community/嵌入与检索表示域包/outputs/DOMAIN_SPEC.json",
+      "summary": "嵌入与检索表示（A · 模型与能力/authored）",
+      "type": "domain"
+    },
+    {
+      "digest": "fbedac90008d9efe2c043db841aacccdcc311f0e7864850f7838d0b0e427c477",
+      "id": "wiki:domain:A12",
+      "source": "community/强化学习与决策域包/outputs/DOMAIN_SPEC.json",
+      "summary": "强化学习与决策（A · 模型与能力/authored）",
+      "type": "domain"
+    },
+    {
+      "digest": "91c76b5b648aaa59f690b362adbf714bc9f388677a9017d848efc42636cc3e47",
+      "id": "wiki:domain:A13",
+      "source": "community/具身智能与机器人域包/outputs/DOMAIN_SPEC.json",
+      "summary": "具身智能与机器人（A · 模型与能力/authored）",
+      "type": "domain"
+    },
+    {
+      "digest": "e6bc68424a40c2864635218d49ef8179430fee0c1903bb8f713d0591b6d5ba56",
+      "id": "wiki:domain:A14",
+      "source": "community/端侧与边缘小模型域包/outputs/DOMAIN_SPEC.json",
+      "summary": "端侧与边缘小模型（A · 模型与能力/authored）",
+      "type": "domain"
+    },
+    {
+      "digest": "a3b70efb63cc8160317fddac4e71b1380e798dbdd7dba8f622244396927c8c02",
+      "id": "wiki:domain:B01",
+      "source": "community/文本生成与创作域包/outputs/DOMAIN_SPEC.json",
+      "summary": "文本生成与创作（B · 任务类型/authored）",
+      "type": "domain"
+    },
+    {
+      "digest": "d10467e004ff5bff8b97ea6a1c3f5f22a79d08b7784165f334c9690d01f79ee7",
+      "id": "wiki:domain:B02",
+      "source": "community/摘要与信息压缩域包/outputs/DOMAIN_SPEC.json",
+      "summary": "摘要与信息压缩（B · 任务类型/authored）",
+      "type": "domain"
+    },
+    {
+      "digest": "14169e394e3e36ed3fb50f0b4822e163a600e18373d3f5239e6289a3277cd4d6",
+      "id": "wiki:domain:B03",
+      "source": "community/机器翻译与本地化域包/outputs/DOMAIN_SPEC.json",
+      "summary": "机器翻译与本地化（B · 任务类型/authored）",
+      "type": "domain"
+    },
+    {
+      "digest": "085c91ec717820c9b66233d3932d919f9a236fdfd410c19f5bb40dfb3195b9fd",
+      "id": "wiki:domain:B04",
+      "source": "community/分类与情感分析域包/outputs/DOMAIN_SPEC.json",
+      "summary": "分类与情感分析（B · 任务类型/authored）",
+      "type": "domain"
+    },
+    {
+      "digest": "3c102203cf9c303681526a444ee7b8599657961324cffebe08aae72c089a6f4c",
+      "id": "wiki:domain:B05",
+      "source": "community/信息抽取与结构化域包/outputs/DOMAIN_SPEC.json",
+      "summary": "信息抽取与结构化（B · 任务类型/authored）",
+      "type": "domain"
+    },
+    {
+      "digest": "3aedc93f911ca1755c88247e58a192f85d4b1c071bfb18cbf30c861cadd25e01",
+      "id": "wiki:domain:B06",
+      "source": "community/知识问答与检索增强域包/outputs/DOMAIN_SPEC.json",
+      "summary": "知识问答与检索增强（B · 任务类型/authored）",
+      "type": "domain"
+    },
+    {
+      "digest": "9c50f8706943a768f5589b5e6cd48cd92f76bc4f16fa9b0cd26905cab1786273",
+      "id": "wiki:domain:B07",
+      "source": "community/多轮对话与角色扮演域包/outputs/DOMAIN_SPEC.json",
+      "summary": "多轮对话与角色扮演（B · 任务类型/authored）",
+      "type": "domain"
+    },
+    {
+      "digest": "86c0efc0f02592e919dd78b0ea55910625c59f81a14bba895c9e63905f03b44e",
+      "id": "wiki:domain:B08",
+      "source": "community/代码生成与补全域包/outputs/DOMAIN_SPEC.json",
+      "summary": "代码生成与补全（B · 任务类型/authored）",
+      "type": "domain"
+    },
+    {
+      "digest": "4382d078015e02d9953259c5a964a87ed2fb52378241e5c195c0ebb5e9454eb6",
+      "id": "wiki:domain:B09",
+      "source": "community/代码审查与缺陷检测域包/outputs/DOMAIN_SPEC.json",
+      "summary": "代码审查与缺陷检测（B · 任务类型/authored）",
+      "type": "domain"
+    },
+    {
+      "digest": "a2ec6312a46ceb10a9eb713bee6cd961d03f4499011e604748a07345a222f95a",
+      "id": "wiki:domain:B10",
+      "source": "community/测试与用例生成域包/outputs/DOMAIN_SPEC.json",
+      "summary": "测试与用例生成（B · 任务类型/authored）",
+      "type": "domain"
+    },
+    {
+      "digest": "f274ee29931f8bf4c95ca4f71ad48a29e6bfc6c98e3e26474c0d2bf78c55fcbe",
+      "id": "wiki:domain:B11",
+      "source": "community/数据分析与表格理解域包/outputs/DOMAIN_SPEC.json",
+      "summary": "数据分析与表格理解（B · 任务类型/authored）",
+      "type": "domain"
+    },
+    {
+      "digest": "7264e9e0761145e20922148f5ba3ab42c18ad043e2cc2e18d29140456232dbbc",
+      "id": "wiki:domain:B12",
+      "source": "community/文档解析与版面理解域包/outputs/DOMAIN_SPEC.json",
+      "summary": "文档解析与版面理解（B · 任务类型/authored）",
+      "type": "domain"
+    },
+    {
+      "digest": "56b08876cb92438ec4b0654b6fb15605cb2ca6a4c6c102dd5e5bc8efd690b584",
+      "id": "wiki:domain:B13",
+      "source": "community/语音转写与会议记录域包/outputs/DOMAIN_SPEC.json",
+      "summary": "语音转写与会议记录（B · 任务类型/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "5feb2a1609abfd28d9901759db405c5077cb2f7b5596f124890565685d1b5dd9",
+      "id": "wiki:domain:B14",
+      "source": "community/语音合成与配音域包/outputs/DOMAIN_SPEC.json",
+      "summary": "语音合成与配音（B · 任务类型/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "de491646bde26e838664a43e570c77d0b2a1770cbcdf8640358925591c33f6e6",
+      "id": "wiki:domain:B15",
+      "source": "community/图像生成与视觉设计域包/outputs/DOMAIN_SPEC.json",
+      "summary": "图像生成与视觉设计（B · 任务类型/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "5e6fe14ffa82b4ddcbfe9f4e0b6065f5b7987e96726363e1002da0b44b6116dc",
+      "id": "wiki:domain:B16",
+      "source": "community/视频生成与自动剪辑域包/outputs/DOMAIN_SPEC.json",
+      "summary": "视频生成与自动剪辑（B · 任务类型/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "a874eb55ae01f9889e39b4f06b1b1e9066d144c2e37be1d87cb7d1f2872c98ee",
+      "id": "wiki:domain:B17",
+      "source": "community/推荐排序与广告域包/outputs/DOMAIN_SPEC.json",
+      "summary": "推荐、排序与广告（B · 任务类型/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "dfbb0bcee1a95665f87d5afa6aef01a26d01af65597863884aa329cad68339c9",
+      "id": "wiki:domain:B18",
+      "source": "community/预测异常与风险域包/outputs/DOMAIN_SPEC.json",
+      "summary": "预测、异常与风险（B · 任务类型/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "c1e4a5bb316af3427fe1a1d34db2c743f3173b478815b27fd071aac2a8e498a1",
+      "id": "wiki:domain:C01",
+      "source": "community/数据采集与清洗域包/outputs/DOMAIN_SPEC.json",
+      "summary": "数据采集与清洗（C · AI 工程与运维/authored）",
+      "type": "domain"
+    },
+    {
+      "digest": "0dbb275e7b09105eef277391a06f628e4cd2041423e9631aa2e5afe2207af21d",
+      "id": "wiki:domain:C02",
+      "source": "community/数据标注与标注质量域包/outputs/DOMAIN_SPEC.json",
+      "summary": "数据标注与标注质量（C · AI 工程与运维/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "160a31d1346cab06a1759a0c30eca7a6d31c428dbae34e09e382cff5637cd64f",
+      "id": "wiki:domain:C03",
+      "source": "community/合成数据生成域包/outputs/DOMAIN_SPEC.json",
+      "summary": "合成数据生成（C · AI 工程与运维/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "a68778f70189458fbf8db49ff11c33590e8fb9635aec49f4abb12fdcc129835b",
+      "id": "wiki:domain:C04",
+      "source": "community/预训练与继续预训练域包/outputs/DOMAIN_SPEC.json",
+      "summary": "预训练与继续预训练（C · AI 工程与运维/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "6f8cbdd55efed3574f10bad0c0a81f34a70305aba58ca0af63d4297fc3bb5d0f",
+      "id": "wiki:domain:C05",
+      "source": "community/监督微调域包/outputs/DOMAIN_SPEC.json",
+      "summary": "监督微调（C · AI 工程与运维/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "eb4ac41c8d5c952f236881d2d6fd05072cd192d04398e233ad267a8f43407ccd",
+      "id": "wiki:domain:C06",
+      "source": "community/参数高效微调域包/outputs/DOMAIN_SPEC.json",
+      "summary": "参数高效微调（C · AI 工程与运维/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "15958f7af551e401d256df436c642f1b695c282f0ccde1bea1bc733061e8d4bd",
+      "id": "wiki:domain:C07",
+      "source": "community/对齐与偏好优化域包/outputs/DOMAIN_SPEC.json",
+      "summary": "对齐与偏好优化（C · AI 工程与运维/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "a535dcc50ea961932035ef52fa755a2efd8c9239a12a80b50a0c1846d8f5a5f4",
+      "id": "wiki:domain:C08",
+      "source": "community/评测基准与排行榜域包/outputs/DOMAIN_SPEC.json",
+      "summary": "评测、基准与排行榜（C · AI 工程与运维/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "f60ec425a3a33a6f3a9b8faa6092c341f26d601692a432c92b9c58926c9de759",
+      "id": "wiki:domain:C09",
+      "source": "community/红队越狱与安全测试域包/outputs/DOMAIN_SPEC.json",
+      "summary": "红队、越狱与安全测试（C · AI 工程与运维/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "e69d27cb13f4c06d5e0b1095c953870cd07505d4068d1ef8b12748219c62f9be",
+      "id": "wiki:domain:C10",
+      "source": "community/推理优化与加速域包/outputs/DOMAIN_SPEC.json",
+      "summary": "推理优化与加速（C · AI 工程与运维/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "1f66f4eb2da0090de039566f48ec98c854009b27d511f864e10f942bdf6bd760",
+      "id": "wiki:domain:C11",
+      "source": "community/推理服务与部署域包/outputs/DOMAIN_SPEC.json",
+      "summary": "推理服务与部署（C · AI 工程与运维/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "4627846b74b89020dff94147dafd20721e638c42bf07397257956b0be98462f7",
+      "id": "wiki:domain:C12",
+      "source": "community/上下文工程与长上下文域包/outputs/DOMAIN_SPEC.json",
+      "summary": "上下文工程与长上下文（C · AI 工程与运维/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "57d72676c8da58e0c3db9bd6a6bbbfbd111603d7bace8bfe6f4995f722a7d8af",
+      "id": "wiki:domain:C13",
+      "source": "community/提示工程与提示模板域包/outputs/DOMAIN_SPEC.json",
+      "summary": "提示工程与提示模板（C · AI 工程与运维/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "f523946b4a4cdb801ffff3685e828582c717b12d2ecfbc1d8936fe4e1af3e245",
+      "id": "wiki:domain:C14",
+      "source": "community/记忆体与个性化域包/outputs/DOMAIN_SPEC.json",
+      "summary": "记忆体与个性化（C · AI 工程与运维/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "0328810c4629bf5c48d612a0540d28ee9d160a147477ad6fc1b5e1e3d447cfe9",
+      "id": "wiki:domain:C15",
+      "source": "community/向量库与检索管线域包/outputs/DOMAIN_SPEC.json",
+      "summary": "向量库与检索管线（C · AI 工程与运维/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "02563090a814b550c15e47d21d6034373e6ee8dac4b488d019525cfdfed43c7a",
+      "id": "wiki:domain:C16",
+      "source": "community/智能体框架与工具调用域包/outputs/DOMAIN_SPEC.json",
+      "summary": "智能体框架与工具调用（C · AI 工程与运维/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "2b0b187a193bb490e491ab58162783746a4b3d5705be579aee5048a25c3b3b1c",
+      "id": "wiki:domain:C17",
+      "source": "community/多智能体协同域包/outputs/DOMAIN_SPEC.json",
+      "summary": "多智能体协同（C · AI 工程与运维/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "a18a0fb1ce12065fcc32024482a89b7f667a1c0b22d9f60ad8e547fee95230ea",
+      "id": "wiki:domain:C18",
+      "source": "community/可观测性成本与可靠性域包/outputs/DOMAIN_SPEC.json",
+      "summary": "可观测性、成本与可靠性（C · AI 工程与运维/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "deb9cbd95d9b6c53fc1ef2bbbee9b0e8029331ee43d09e79253720a6bebc53c2",
+      "id": "wiki:domain:D01",
+      "source": "community/AI医疗健康域包/outputs/DOMAIN_SPEC.json",
+      "summary": "AI+医疗健康（D · AI+行业/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "b03ba3085eae0dc6626e6f4c8033d99e25fce899e1fc5169c0d74e3123fd7757",
+      "id": "wiki:domain:D02",
+      "source": "community/AI制药与生物域包/outputs/DOMAIN_SPEC.json",
+      "summary": "AI+制药与生物（D · AI+行业/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "4ec76eaddf52d7c1e2096413afafe2787fa9961001ae44e08010c87834e6cbcb",
+      "id": "wiki:domain:D03",
+      "source": "community/AI法律与合规域包/outputs/DOMAIN_SPEC.json",
+      "summary": "AI+法律与合规（D · AI+行业/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "0a67f9d3fdd919208e8b4b9e7ee403478fb4d0b6f342367b5a4f6e467170e231",
+      "id": "wiki:domain:D04",
+      "source": "community/AI金融投研与风控域包/outputs/DOMAIN_SPEC.json",
+      "summary": "AI+金融投研与风控（D · AI+行业/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "4e0fdac15c6bf9b9efe081ac72bc14b647adc159a141758cd4437874c06b37c2",
+      "id": "wiki:domain:D05",
+      "source": "community/AI保险域包/outputs/DOMAIN_SPEC.json",
+      "summary": "AI+保险（D · AI+行业/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "c14370e9e207306754a917bc1d2a60f6cc59956dac91304f9fc96054026b00ea",
+      "id": "wiki:domain:D06",
+      "source": "community/AI教育域包/outputs/DOMAIN_SPEC.json",
+      "summary": "AI+教育（D · AI+行业/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "3ec73c8171577fca675ffe79cd4b035ae8af3b7c7a2fab25fc06fd9faa14a55d",
+      "id": "wiki:domain:D07",
+      "source": "community/AI政务与公共事务域包/outputs/DOMAIN_SPEC.json",
+      "summary": "AI+政务与公共事务（D · AI+行业/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "b8128bb6098253052d0efb8127ac5d79fc6828d3d0c4de607b1d8d3ef26c09c0",
+      "id": "wiki:domain:D08",
+      "source": "community/AI制造业域包/outputs/DOMAIN_SPEC.json",
+      "summary": "AI+制造业（D · AI+行业/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "20cb38bf56a1f6bb9395a7397c000b6e2da5d380bb88fa8bf01cf15082999801",
+      "id": "wiki:domain:D09",
+      "source": "community/AI能源与电力域包/outputs/DOMAIN_SPEC.json",
+      "summary": "AI+能源与电力（D · AI+行业/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "484440c83c15a21b4e7f8673ed40268edf97e9ba70fc04a715c46b6c9c716ea6",
+      "id": "wiki:domain:D10",
+      "source": "community/AI农业域包/outputs/DOMAIN_SPEC.json",
+      "summary": "AI+农业（D · AI+行业/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "fad816fc0508d765b0d4ee9c246c71dedbd2cfd364b8eafab19d9f424aafdf5f",
+      "id": "wiki:domain:D11",
+      "source": "community/零售与电商域包/outputs/DOMAIN_SPEC.json",
+      "summary": "零售与电商（D · AI+行业/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "ab3d0d03099b9e2eb8b4d55615c44096e6500de555c0564a2651b2f86fa8d03b",
+      "id": "wiki:domain:D12",
+      "source": "community/物流与供应链域包/outputs/DOMAIN_SPEC.json",
+      "summary": "物流与供应链（D · AI+行业/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "02ff431878dab7c417e68aa8c2e01e7e6f4a2e07be4f6e583957a85b6b0cc420",
+      "id": "wiki:domain:D13",
+      "source": "community/交通与出行域包/outputs/DOMAIN_SPEC.json",
+      "summary": "交通与出行（D · AI+行业/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "65eb943137989293ea3b88176ecb6bd2f44c2965ff6cd4701f6c572ac6ea29a4",
+      "id": "wiki:domain:D14",
+      "source": "community/AI人力资源与招聘域包/outputs/DOMAIN_SPEC.json",
+      "summary": "AI+人力资源与招聘（D · AI+行业/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "a01df611a650faa2590974725a43c4a558a139270c75fb040170e45570adac59",
+      "id": "wiki:domain:D15",
+      "source": "community/建筑与房地产域包/outputs/DOMAIN_SPEC.json",
+      "summary": "建筑与房地产（D · AI+行业/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "363f205e24dc451ab5178b438068e6bcfe8ff0c264cb87ce0bb9280af256fb3e",
+      "id": "wiki:domain:D16",
+      "source": "community/AI食品与餐饮域包/outputs/DOMAIN_SPEC.json",
+      "summary": "AI+食品与餐饮（D · AI+行业/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "4165bef28115da990a3a48acb6a03be1482d8a9f5021cf2dcaf2c2d645084487",
+      "id": "wiki:domain:D17",
+      "source": "community/传媒与新闻域包/outputs/DOMAIN_SPEC.json",
+      "summary": "传媒与新闻（D · AI+行业/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "22a94dcfff140773a3d2dbfacb722aa6ac9bf5a335e46c37295d9157cf47140b",
+      "id": "wiki:domain:D18",
+      "source": "community/游戏与互动娱乐域包/outputs/DOMAIN_SPEC.json",
+      "summary": "游戏与互动娱乐（D · AI+行业/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "9e372e98731aa8ece21fe95248c0e1c6cc85b8ddcf26cb92d2cce5166da3d669",
+      "id": "wiki:domain:D19",
+      "source": "community/文旅与酒店域包/outputs/DOMAIN_SPEC.json",
+      "summary": "文旅与酒店（D · AI+行业/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "878d5c69c9aef3e1aac7bdfb44b34538451371896b805bd2119e15b94c4c3840",
+      "id": "wiki:domain:D20",
+      "source": "community/科研与实验域包/outputs/DOMAIN_SPEC.json",
+      "summary": "科研与实验（D · AI+行业/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "2c7fdff747083533aa9ae5368eac9a111d076f0a376a90a04b7dc618a9c2136c",
+      "id": "wiki:domain:E01",
+      "source": "community/提示工程与指令设计域包/outputs/DOMAIN_SPEC.json",
+      "summary": "提示工程与指令设计（E · 人机与内容创作/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "a6cb9568866a2ff3ae546c88a0fbf5d0ed370f228238b5ed1472bb7ad9e972ee",
+      "id": "wiki:domain:E02",
+      "source": "community/角色扮演与角色卡域包/outputs/DOMAIN_SPEC.json",
+      "summary": "角色扮演与角色卡（E · 人机与内容创作/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "8e44f1b0f05674e9e0fdeae9e3f6f9d9db74569446d4ed548490ef0632b2229c",
+      "id": "wiki:domain:E03",
+      "source": "community/世界书与设定库域包/outputs/DOMAIN_SPEC.json",
+      "summary": "世界书与设定库（E · 人机与内容创作/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "bb5d37e22967f0b461a368ee491da30c767306120c6cb35a0fd66cf37ad3d784",
+      "id": "wiki:domain:E04",
+      "source": "community/长文本与小说创作域包/outputs/DOMAIN_SPEC.json",
+      "summary": "长文本与小说创作（E · 人机与内容创作/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "aed628c10b4a9aa412d37a69e006cdd952ed2a72c5a06223e028d02cd0c1112e",
+      "id": "wiki:domain:E05",
+      "source": "community/内容改写与风格迁移域包/outputs/DOMAIN_SPEC.json",
+      "summary": "内容改写与风格迁移（E · 人机与内容创作/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "5adb9e45f28cd9d849701bd343ad031d404f7585e44ec332ccaaa3ac87baca26",
+      "id": "wiki:domain:E06",
+      "source": "community/多语翻译与本地化域包/outputs/DOMAIN_SPEC.json",
+      "summary": "多语翻译与本地化（E · 人机与内容创作/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "ff4cd721fcaf097178da9439f645019249cd1bf6c1941ee7237010adb5e0b6d8",
+      "id": "wiki:domain:E07",
+      "source": "community/图像生成与视觉创作域包/outputs/DOMAIN_SPEC.json",
+      "summary": "图像生成与视觉创作（E · 人机与内容创作/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "7ce44a47d6f0442855a3693bdf7181a1b6b209616c6ff8722080fd260532fb75",
+      "id": "wiki:domain:E08",
+      "source": "community/视频生成与剪辑域包/outputs/DOMAIN_SPEC.json",
+      "summary": "视频生成与剪辑（E · 人机与内容创作/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "9bfbd20c645c8f026cfa9ad9562c22e1e7ea264d13daa3a6ffc5dd606fa59bb6",
+      "id": "wiki:domain:E09",
+      "source": "community/音频音乐与语音域包/outputs/DOMAIN_SPEC.json",
+      "summary": "音频音乐与语音（E · 人机与内容创作/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "e3f6fc3a6efd55c974b1f1248a3b639b62549638dca7921428c852c2e8967555",
+      "id": "wiki:domain:E10",
+      "source": "community/编辑校对与出版域包/outputs/DOMAIN_SPEC.json",
+      "summary": "编辑校对与出版（E · 人机与内容创作/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "dfff1d7c4f32a940cf5de8f9b8fc638628f8355727db1bd5679358166da6d318",
+      "id": "wiki:domain:E11",
+      "source": "community/知识管理与检索增强域包/outputs/DOMAIN_SPEC.json",
+      "summary": "知识管理与检索增强（E · 人机与内容创作/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "b48d1ceed3c9a0ee7721bff4acfeadbe6314df811979817ef0dea68fab367cbe",
+      "id": "wiki:domain:E12",
+      "source": "community/智能体与工作流编排域包/outputs/DOMAIN_SPEC.json",
+      "summary": "智能体与工作流编排（E · 人机与内容创作/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "315f240e1c194ce8487d2675c830511ebdf376fdbf8a53a69df1231f46a6da8b",
+      "id": "wiki:domain:E13",
+      "source": "community/代码与软件工程域包/outputs/DOMAIN_SPEC.json",
+      "summary": "代码与软件工程（E · 人机与内容创作/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "de525a22339d7ff16ceb08dea1d33dd16e381ceec4b7f7bf4d617eeb9186216a",
+      "id": "wiki:domain:E14",
+      "source": "community/数据分析与决策支持域包/outputs/DOMAIN_SPEC.json",
+      "summary": "数据分析与决策支持（E · 人机与内容创作/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "03b6e4f1d78ff219f040f629ae8afa948e5bb5059c19b4d44c681c615c4378e4",
+      "id": "wiki:domain:E15",
+      "source": "community/企业培训与组织学习域包/outputs/DOMAIN_SPEC.json",
+      "summary": "企业培训与组织学习（E · 人机与内容创作/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "f40e7532fd9260e22f72e2ecc9ff32dbd4cee5a79e143a9c9621d976eb678d98",
+      "id": "wiki:domain:E16",
+      "source": "community/个人助理与日常生活域包/outputs/DOMAIN_SPEC.json",
+      "summary": "个人助理与日常生活（E · 人机与内容创作/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "f28c7d41705168a66c8772ee4e1416a24e31de8d44fbc029d7b315f9260551cc",
+      "id": "wiki:domain:E17",
+      "source": "community/搜索与信息聚合域包/outputs/DOMAIN_SPEC.json",
+      "summary": "搜索与信息聚合（E · 人机与内容创作/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "12029dd3871401318e2a69d077228cf41be905edd6216bcb89bd070667c43071",
+      "id": "wiki:domain:E18",
+      "source": "community/对话与客服域包/outputs/DOMAIN_SPEC.json",
+      "summary": "对话与客服（E · 人机与内容创作/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "cd692c64ed4abff7d75c0dda87a391d33732ff7cf03fd96af4b61bcc8782d2f2",
+      "id": "wiki:domain:E19",
+      "source": "community/内容分发与社区运营域包/outputs/DOMAIN_SPEC.json",
+      "summary": "内容分发与社区运营（E · 人机与内容创作/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "4362353454ebe1ea3d031dc8da134442077d16e735205d506ce1801f1f7fae98",
+      "id": "wiki:domain:E20",
+      "source": "community/数字人与虚拟形象域包/outputs/DOMAIN_SPEC.json",
+      "summary": "数字人与虚拟形象（E · 人机与内容创作/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "e9b0c45454fc52414211f42862858f8244ba48635330a2e7888e94d20803d4da",
+      "id": "wiki:domain:F01",
+      "source": "community/安全与对齐域包/outputs/DOMAIN_SPEC.json",
+      "summary": "安全与对齐（F · 治理、安全与产业生态/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "4eceeccc04c660a3631f0596518df9d4fbb28d8aeed5eaf0e06aabce61f2ea7b",
+      "id": "wiki:domain:F02",
+      "source": "community/合规与监管域包/outputs/DOMAIN_SPEC.json",
+      "summary": "合规与监管（F · 治理、安全与产业生态/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "6068295802366d521297bbdf7c27596a17851aa7cd3269c818ba8fe76276f982",
+      "id": "wiki:domain:F03",
+      "source": "community/隐私与数据治理域包/outputs/DOMAIN_SPEC.json",
+      "summary": "隐私与数据治理（F · 治理、安全与产业生态/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "39c1c33192bbddeeb0991da0ef82f122445c021b7a2f56fda86455f4fd248ce0",
+      "id": "wiki:domain:F04",
+      "source": "community/版权与知识产权域包/outputs/DOMAIN_SPEC.json",
+      "summary": "版权与知识产权（F · 治理、安全与产业生态/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "0d01bc08cd7be17f4b51a7705f26a83d1cfc951073881d2bc5f1817e1a634184",
+      "id": "wiki:domain:F05",
+      "source": "community/评测与基准域包/outputs/DOMAIN_SPEC.json",
+      "summary": "评测与基准（F · 治理、安全与产业生态/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "400674c945b885667411148ad1db4961ea885a6039ab5e9df1616c542efd6d07",
+      "id": "wiki:domain:F06",
+      "source": "community/可解释性与审计域包/outputs/DOMAIN_SPEC.json",
+      "summary": "可解释性与审计（F · 治理、安全与产业生态/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "eff104c3a30e080505f473b8b55911015c22cebf50744bf25fb2485205dd8c65",
+      "id": "wiki:domain:F07",
+      "source": "community/模型运营与成本域包/outputs/DOMAIN_SPEC.json",
+      "summary": "模型运营与成本（F · 治理、安全与产业生态/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "adadb277b862a187021943a11ccbc6b7d63ca0a65448aaf956cfc7317f36a30e",
+      "id": "wiki:domain:F08",
+      "source": "community/平台与基础设施域包/outputs/DOMAIN_SPEC.json",
+      "summary": "平台与基础设施（F · 治理、安全与产业生态/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "295689df2e03349c732ec08a76cf1ca11bf54410a2338fce586c3bc92723d049",
+      "id": "wiki:domain:F09",
+      "source": "community/开源与开发者生态域包/outputs/DOMAIN_SPEC.json",
+      "summary": "开源与开发者生态（F · 治理、安全与产业生态/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "c79e0c2556ec4479d573f70cf4a32c1d2bd5beb488dbb16a047eed6612a492fe",
+      "id": "wiki:domain:F10",
+      "source": "community/产业与商业落地域包/outputs/DOMAIN_SPEC.json",
+      "summary": "产业与商业落地（F · 治理、安全与产业生态/derived）",
+      "type": "domain"
+    },
+    {
+      "digest": "cdcb852579785d8817451398021e55441e635a857e0acd3557af9a86b030e7ca",
+      "id": "wiki:module:M00",
+      "source": "desktop/src/core/registry.json",
+      "summary": "数据槽总线（通用 / 来源 核心）",
+      "type": "module"
+    },
+    {
+      "digest": "cdcb852579785d8817451398021e55441e635a857e0acd3557af9a86b030e7ca",
+      "id": "wiki:module:M06",
+      "source": "desktop/src/core/registry.json",
+      "summary": "流程状态机（事件 / 来源 共享）",
+      "type": "module"
+    },
+    {
+      "digest": "cdcb852579785d8817451398021e55441e635a857e0acd3557af9a86b030e7ca",
+      "id": "wiki:module:M08",
+      "source": "desktop/src/core/registry.json",
+      "summary": "环境状态（世界 / 来源 共享）",
+      "type": "module"
+    },
+    {
+      "digest": "cdcb852579785d8817451398021e55441e635a857e0acd3557af9a86b030e7ca",
+      "id": "wiki:module:M12",
+      "source": "desktop/src/core/registry.json",
+      "summary": "模板检索库（事件 / 来源 共享）",
+      "type": "module"
+    },
+    {
+      "digest": "cdcb852579785d8817451398021e55441e635a857e0acd3557af9a86b030e7ca",
+      "id": "wiki:module:M13",
+      "source": "desktop/src/core/registry.json",
+      "summary": "实体交互（事件 / 来源 共享）",
+      "type": "module"
+    },
+    {
+      "digest": "cdcb852579785d8817451398021e55441e635a857e0acd3557af9a86b030e7ca",
+      "id": "wiki:module:M20",
+      "source": "desktop/src/core/registry.json",
+      "summary": "知识条目库（事件 / 来源 共享）",
+      "type": "module"
+    },
+    {
+      "digest": "cdcb852579785d8817451398021e55441e635a857e0acd3557af9a86b030e7ca",
+      "id": "wiki:module:M23",
+      "source": "desktop/src/core/registry.json",
+      "summary": "可见性边界（通用 / 来源 核心）",
+      "type": "module"
+    },
+    {
+      "digest": "cdcb852579785d8817451398021e55441e635a857e0acd3557af9a86b030e7ca",
+      "id": "wiki:module:M24",
+      "source": "desktop/src/core/registry.json",
+      "summary": "规则组合（通用 / 来源 共享）",
+      "type": "module"
+    },
+    {
+      "digest": "cdcb852579785d8817451398021e55441e635a857e0acd3557af9a86b030e7ca",
+      "id": "wiki:module:M50",
+      "source": "desktop/src/core/registry.json",
+      "summary": "调度器（通用 / 来源 核心）",
+      "type": "module"
+    },
+    {
+      "digest": "cdcb852579785d8817451398021e55441e635a857e0acd3557af9a86b030e7ca",
+      "id": "wiki:module:M80",
+      "source": "desktop/src/core/registry.json",
+      "summary": "输出质检门（通用 / 来源 核心）",
+      "type": "module"
+    },
+    {
+      "digest": "cdcb852579785d8817451398021e55441e635a857e0acd3557af9a86b030e7ca",
+      "id": "wiki:module:M90",
+      "source": "desktop/src/core/registry.json",
+      "summary": "结构装配（技术文档 / 来源 核心（P90 实证样例））",
+      "type": "module"
+    },
+    {
+      "digest": "cdcb852579785d8817451398021e55441e635a857e0acd3557af9a86b030e7ca",
+      "id": "wiki:module:事件:M22",
+      "source": "desktop/src/core/registry.json",
+      "summary": "事件编排（事件 / 来源 核心）",
+      "type": "module"
+    },
+    {
+      "digest": "cdcb852579785d8817451398021e55441e635a857e0acd3557af9a86b030e7ca",
+      "id": "wiki:module:通用:M10",
+      "source": "desktop/src/core/registry.json",
+      "summary": "节拍推进（通用 / 来源 核心）",
+      "type": "module"
+    },
+    {
+      "digest": "d02ba569b21ca459a131df465522dc4410585b78dac0412eea16fb10578b348b",
+      "id": "wiki:pipeline:P00_通用文档生成管线",
+      "source": "03_管线库/P00_通用文档生成管线.md",
+      "summary": "P00_通用文档生成管线 管线",
+      "type": "pipeline"
+    },
+    {
+      "digest": "f8548e1c7179b63ab2ce573371e1831c983032be9c6b45214d0d62882b73d1a0",
+      "id": "wiki:pipeline:P01_标准管线",
+      "source": "03_管线库/P01_标准管线.md",
+      "summary": "P01_标准管线 管线",
+      "type": "pipeline"
+    },
+    {
+      "digest": "078451643906e9a8a7b16b172b5af8561762258689a3087d3dd82539c30d4090",
+      "id": "wiki:pipeline:P90_结构装配管线",
+      "source": "03_管线库/P90_结构装配管线.md",
+      "summary": "P90_结构装配管线 管线",
+      "type": "pipeline"
+    },
+    {
+      "digest": "d9009968db9e6adcfbb906fd4be3fa4b454ee294447d9827fa3cb2dd5bfb8e94",
+      "id": "wiki:protocol:production/assembly",
+      "source": "protocol/production/assembly.schema.json",
+      "summary": "assembly.schema.json 契约（https://ninfenz.dev/production/assembly.schema.json）",
+      "type": "protocol"
+    },
+    {
+      "digest": "d23994498a2b30c7e1b2afda0a79711461c8c9271f7abdbcf969f169c7ab320f",
+      "id": "wiki:protocol:production/contract",
+      "source": "protocol/production/contract.schema.json",
+      "summary": "contract.schema.json 契约（https://ninfenz.dev/production/contract.schema.json）",
+      "type": "protocol"
+    },
+    {
+      "digest": "a83a624bfdcdc2ebf1f955e42a1cf6805f6176deb67f74dfe8187b7080b275e3",
+      "id": "wiki:protocol:production/spec",
+      "source": "protocol/production/spec.schema.json",
+      "summary": "spec.schema.json 契约（https://ninfenz.dev/production/spec.schema.json）",
+      "type": "protocol"
+    },
+    {
+      "digest": "8bf3c167ed268a72daaf7539c8b53134648cea6c630a3c6a439c26e2f511aa36",
+      "id": "wiki:protocol:production/task",
+      "source": "protocol/production/task.schema.json",
+      "summary": "task.schema.json 契约（https://ninfenz.dev/production/task.schema.json）",
+      "type": "protocol"
+    },
+    {
+      "digest": "8f2d58801b8324519ce04f543cd3599b0c55c2c506be1eb07daee64f3dcc76b7",
+      "id": "wiki:protocol:production/wiki-page",
+      "source": "protocol/production/wiki-page.schema.json",
+      "summary": "wiki-page.schema.json 契约（https://ninfenz.dev/production/wiki-page.schema.json）",
+      "type": "protocol"
+    },
+    {
+      "digest": "b1987e8a8f41deb886d26769382a4f129eee5e31b12f3ec9687bad7c8c31213f",
+      "id": "wiki:protocol:schema/asset",
+      "source": "protocol/schema/asset.schema.json",
+      "summary": "asset.schema.json 契约（https://ninfenz.dev/schema/asset.schema.json）",
+      "type": "protocol"
+    },
+    {
+      "digest": "c9e39d009b8753805982b81ffb4b0f55fe94b009452fd42039dd97183e62ec7e",
+      "id": "wiki:protocol:schema/asset_contracts",
+      "source": "protocol/schema/asset_contracts.schema.json",
+      "summary": "asset_contracts.schema.json 契约（https://ninfenz.dev/schema/asset_contracts.schema.json）",
+      "type": "protocol"
+    },
+    {
+      "digest": "5a68d3969a99adaf15bbf69f4d8319b394ba70515b83c55a95e9f303d2b30872",
+      "id": "wiki:protocol:schema/contract",
+      "source": "protocol/schema/contract.schema.json",
+      "summary": "contract.schema.json 契约（https://ninfenz.dev/schema/contract.schema.json）",
+      "type": "protocol"
+    },
+    {
+      "digest": "11289408fd1b1dbd20f28ad34da72b4136a69a9df005440a513f18776e9eab91",
+      "id": "wiki:protocol:schema/integration",
+      "source": "protocol/schema/integration.schema.json",
+      "summary": "integration.schema.json 契约（https://ninfenz.dev/schema/integration.schema.json）",
+      "type": "protocol"
+    },
+    {
+      "digest": "c8394c0824e6591cf61c64b03d2f7c208e049648d5f768270a8c111c1036c52f",
+      "id": "wiki:protocol:schema/integration_strings",
+      "source": "protocol/schema/integration_strings.schema.json",
+      "summary": "integration_strings.schema.json 契约（https://ninfenz.dev/schema/integration_strings.schema.json）",
+      "type": "protocol"
+    },
+    {
+      "digest": "912b9c2b02d84015fac80032d2e101c3425a8e2161e5a29e03d9b91d917bed2a",
+      "id": "wiki:protocol:schema/module",
+      "source": "protocol/schema/module.schema.json",
+      "summary": "module.schema.json 契约（https://ninfenz.dev/schema/module.schema.json）",
+      "type": "protocol"
+    },
+    {
+      "digest": "104775cad9f18c31b55683eeb6adc7dd5b9e4a124baa9a1cca3c493343692834",
+      "id": "wiki:protocol:schema/pipeline",
+      "source": "protocol/schema/pipeline.schema.json",
+      "summary": "pipeline.schema.json 契约（https://ninfenz.dev/schema/pipeline.schema.json）",
+      "type": "protocol"
+    },
+    {
+      "digest": "94f38c06de72f3c633daa22f47f3ee85a39f859aaf83907e7a4331e9cd554035",
+      "id": "wiki:protocol:schema/protocol",
+      "source": "protocol/schema/protocol.schema.json",
+      "summary": "protocol.schema.json 契约（https://ninfenz.dev/schema/protocol.schema.json）",
+      "type": "protocol"
+    },
+    {
+      "digest": "3b43958fafb0d9e03506214d7c373fca641397c0636fb3e112d9a30ddb326bb6",
+      "id": "wiki:protocol:schema/release",
+      "source": "protocol/schema/release.schema.json",
+      "summary": "release.schema.json 契约（https://ninfenz.dev/schema/release.schema.json）",
+      "type": "protocol"
+    }
+  ],
+  "schema": "nf-wiki-index/1"
+}

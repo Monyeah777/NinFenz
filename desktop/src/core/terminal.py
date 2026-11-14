@@ -317,7 +317,7 @@ FAMILIES: tuple[dict[str, Any], ...] = (
     {"id": "library", "name": "图书馆与知识",
      "summary": "馆藏存取、双源知识、行话术语、实践包、协议件版本史、引用关系与影响面",
      "commands": ("library", "knowledge", "cognition", "patterns", "rfc",
-                  "related", "who-refers", "impact")},
+                  "related", "who-refers", "impact", "wiki")},
     {"id": "govern", "name": "治理与决策",
      "summary": "决策记录（ADR）、审计、背书、回执、交接、复盘、决策层、评审、构建回路、批准、透明"
          "日志、证据包（打包/第三方复验）、标注 IR（声明与校验，不写载体）、设计审计、"

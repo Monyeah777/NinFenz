@@ -2137,6 +2137,24 @@ def _add_parser_governance(sub):
     loc.add_argument("--json", action="store_true", help="机读输出（issues + stats）")
     loc.add_argument("--write", action="store_true",
                      help="重签文档译件的 source_sha256（写 protocol/locales.json）")
+    wkp = sub.add_parser("wiki",
+                         help="LLMWiki 编译（投影：pages/index/graph/llms.txt/MCP）",
+                         description="Wiki 由真源编译（禁手改/禁复制正文）；check 用真源 digest 判陈旧")
+    wsub = wkp.add_subparsers(dest="wiki_cmd", required=True)
+    wb = wsub.add_parser("build", help="编译（缺省只算；--write 落 wiki/）")
+    wb.add_argument("--write", action="store_true", help="落盘 wiki/pages.json 等 5 件")
+    wb.add_argument("--json", action="store_true", help="机读输出")
+    wchk = wsub.add_parser("check", help="完整性/覆盖/陈旧/关系/ID 自检")
+    wchk.add_argument("--json", action="store_true", help="机读输出")
+    wget = wsub.add_parser("get", help="按 id 取单页")
+    wget.add_argument("id")
+    wsr = wsub.add_parser("search", help="子串检索（id/type/summary）")
+    wsr.add_argument("q")
+    wrel = wsub.add_parser("related", help="邻居（出边+入边）")
+    wrel.add_argument("id")
+    wctx = wsub.add_parser("context", help="打包上下文（带 citations，受预算限制）")
+    wctx.add_argument("ids", nargs="+")
+    wctx.add_argument("--budget", type=int, default=1200)
 
 
 def _add_parser_terminal(sub):
@@ -9585,8 +9603,68 @@ def _try_rust_face(args) -> Optional[int]:
     return 0
 
 
+def _cmd_wiki(args) -> int:
+    """nf wiki：LLMWiki 编译/自检/取页/检索/邻居/上下文（投影，非第二真源）。"""
+    import json as _json
+
+    from core import wiki_compiler as wc
+    cmd = getattr(args, "wiki_cmd", None)
+    if cmd == "build":
+        if getattr(args, "write", False):
+            issues, stats = wc.write(".")
+        else:
+            pages_doc, rest = wc.build(".")
+            issues, stats = [], {"pages": len(pages_doc["pages"]),
+                                 "expected": rest["expected"]}
+            args._wiki_expected = rest["expected"]
+        doc = {"schema": "nf-wiki-build/1", "issues": issues, "stats": stats,
+               "written": bool(getattr(args, "write", False))}
+        if getattr(args, "json", False):
+            print(_json.dumps(doc, ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print("== nf wiki build ==")
+            print("  页面 %s · 文件 %s" % (stats.get("pages", "-"), stats.get("files", "-")))
+            for item in issues[:10]:
+                print("  ✗ %s" % item)
+        return 0 if not issues else 1
+    if cmd == "check":
+        issues = wc.check(".")
+        doc = {"schema": "nf-wiki-check/1", "issues": issues, "ok": not issues}
+        if getattr(args, "json", False):
+            print(_json.dumps(doc, ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print("== nf wiki check ==")
+            print("  ✓ 通过（pages/index/graph/llms/mcp 与真源一致）" if not issues
+                  else "  判据 %d 条未过" % len(issues))
+            for item in issues[:10]:
+                print("  ✗ %s" % item)
+        return 0 if not issues else 1
+    if cmd == "get":
+        page = wc.get(args.id)
+        if page is None:
+            print("✗ 未找到页面：%s" % args.id, file=sys.stderr)
+            return 2
+        print(_json.dumps(page, ensure_ascii=False, indent=2, sort_keys=True))
+        return 0
+    if cmd == "search":
+        rows = wc.search(args.q)
+        print(_json.dumps([{"id": p["id"], "type": p["type"], "summary": p["summary"]}
+                           for p in rows], ensure_ascii=False, indent=2))
+        return 0 if rows else 2
+    if cmd == "related":
+        print(_json.dumps(wc.related(args.id), ensure_ascii=False, indent=2, sort_keys=True))
+        return 0
+    if cmd == "context":
+        print(_json.dumps(wc.context(args.ids, args.budget), ensure_ascii=False, indent=2,
+                          sort_keys=True))
+        return 0
+    print("用法：nf wiki {build|check|get|search|related|context}", file=sys.stderr)
+    return 2
+
+
 _COMMAND_HANDLERS = {
     "shell": _cmd_shell, "terminal": _cmd_shell,
+    "wiki": _cmd_wiki,
     "layers": _cmd_layers,
     "verify": _cmd_verify,
     "daemon": _cmd_daemon,

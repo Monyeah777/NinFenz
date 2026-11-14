@@ -12,19 +12,25 @@ subjects:
   - desktop/src/core/meta_cockpit/runtime_executor.py:204a67ec93855257323887011395b0866ac8d5ae1c485362e89eb058ffe64bfb
   - desktop/src/core/meta_cockpit/cockpit_service.py:18280c6966dd618a8b09daa058b461fa43f89e99f11c797ca884338ff5c13bbf
   - desktop/src/core/meta_cockpit/cockpit_ab.py:6afcade08f2469aad4adc6f44e0e3d28a17712a85e3223f41b14c0020c2f88e7
-  - desktop/src/core/terminal.py:9a86928171c71f4a2d3d324508fdafccb60fd7cc8423d52197185214a40ea30f
+  - desktop/src/core/terminal.py:b40b5b318e040d601a80ddddfd0c6e4f4d3788a0f133c66d76c84b29eda60d4b
   - desktop/tests/test_meta_cockpit.py:017e3a591004b1e3c1bf28e8938ae22754e39ea61ae369e4ddcca1a556214280
   - desktop/tests/test_cli_error_framing.py:788460878349a907eadc21c74a1a689c9cdfe81888f5490c5a935b34fc121c8a
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
-  - scripts/nf.py:75ed1ad2dda5fb07dbd914a6ffedb836e5cf1298bf34b98be602644827ebc925
-  - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:a48f45e5a54a36ed2b7db2d590149775881af63672cd15f2b2bb9fbe05f682e2
+  - scripts/nf.py:36fb06164b600c2f21400e7253294aa79f683d942f469032f1b5d2f9b9413c27
+  - tui/_surface.py:2657310df6bd5f1582d3ee11c147f14faccaeee12935969a90379ee0bd09d42d
+  - protocol/check12_weights.json:43db60b91eaf90f7a825f5911320b5216a8c061e453319135b0a6a9e51517a7c
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:fa00a7fd014857af56e11f38ced1b7d888be053befaadb10b3dd494d27884316
   - docs/meta-cockpit/功能解析.md:de20c2340d19d541bcfde53f222a3acf22a6e440d8fb3dcf51a37aedf53c0c25
   - results/meta-cockpit-manifest.json:60c0e100798e49d393557ae5066c02d7e057ec27f386ee1a36ca3fc7740150ba
 
 ---
+> 重审（2026-11-14）：NF-Final WP-10 跟进 2：docs/terminal.md 命令/索引计数 78/210（新增 wiki 命令）+ test_terminal_doc_contract 常量同步；audit/conformance 重绑
+
+> 重审（2026-11-14）：NF-Final WP-10 跟进：nf wiki 命令接入终端面（FAMILIES/librar 族）+ 重生成 tui/_surface.py；assertions/data_contracts/independence/code_metrics/check12 已更新，终端真源变更后重绑
+
+> 重审（2026-11-14）：NF-Final WP-10：新增 wiki/ 生成区、core/wiki_compiler.py、docs/wiki.md、test_wiki_compiler_contract.py、nf wiki CLI；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑
+
 > 重审（2026-11-14）：NF-Final G0 收口审计：新增 results/{G0_DOD.md,g0_dod.json}、test_g0_dod.py；assertions/data_contracts/check12 更新，被审对象变更后机械重绑
 
 > 重审（2026-11-14）：NF-Final R6 不变量：新增 results/reverse/{INVARIANTS.md,invariants.json}、test_reverse_invariants.py；assertions/data_contracts/check12 更新，被审对象变更后机械重绑

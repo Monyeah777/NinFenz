@@ -1,0 +1,735 @@
+{
+  "edges": [
+    {
+      "from": "wiki:asset:README.md",
+      "kind": "references",
+      "to": "wiki:protocol:schema/asset_contracts"
+    },
+    {
+      "from": "wiki:asset:provenance.json",
+      "kind": "references",
+      "to": "wiki:protocol:schema/asset_contracts"
+    },
+    {
+      "from": "wiki:asset:用户自定义",
+      "kind": "references",
+      "to": "wiki:protocol:schema/asset_contracts"
+    },
+    {
+      "from": "wiki:domain:A01",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:A02",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:A03",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:A04",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:A05",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:A06",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:A07",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:A08",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:A09",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:A10",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:A11",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:A12",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:A13",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:A14",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:B01",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:B02",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:B03",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:B04",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:B05",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:B06",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:B07",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:B08",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:B09",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:B10",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:B11",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:B12",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:B13",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:B14",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:B15",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:B16",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:B17",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:B18",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:C01",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:C02",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:C03",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:C04",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:C05",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:C06",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:C07",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:C08",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:C09",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:C10",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:C11",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:C12",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:C13",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:C14",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:C15",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:C16",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:C17",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:C18",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:D01",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:D02",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:D03",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:D04",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:D05",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:D06",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:D07",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:D08",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:D09",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:D10",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:D11",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:D12",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:D13",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:D14",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:D15",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:D16",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:D17",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:D18",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:D19",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:D20",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:E01",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:E02",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:E03",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:E04",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:E05",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:E06",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:E07",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:E08",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:E09",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:E10",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:E11",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:E12",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:E13",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:E14",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:E15",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:E16",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:E17",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:E18",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:E19",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:E20",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:F01",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:F02",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:F03",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:F04",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:F05",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:F06",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:F07",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:F08",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:F09",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:domain:F10",
+      "kind": "references",
+      "to": "wiki:protocol:production/contract"
+    },
+    {
+      "from": "wiki:module:M00",
+      "kind": "implements",
+      "to": "wiki:protocol:schema/module"
+    },
+    {
+      "from": "wiki:module:M06",
+      "kind": "implements",
+      "to": "wiki:protocol:schema/module"
+    },
+    {
+      "from": "wiki:module:M08",
+      "kind": "implements",
+      "to": "wiki:protocol:schema/module"
+    },
+    {
+      "from": "wiki:module:M12",
+      "kind": "implements",
+      "to": "wiki:protocol:schema/module"
+    },
+    {
+      "from": "wiki:module:M13",
+      "kind": "implements",
+      "to": "wiki:protocol:schema/module"
+    },
+    {
+      "from": "wiki:module:M20",
+      "kind": "implements",
+      "to": "wiki:protocol:schema/module"
+    },
+    {
+      "from": "wiki:module:M23",
+      "kind": "implements",
+      "to": "wiki:protocol:schema/module"
+    },
+    {
+      "from": "wiki:module:M24",
+      "kind": "implements",
+      "to": "wiki:protocol:schema/module"
+    },
+    {
+      "from": "wiki:module:M50",
+      "kind": "implements",
+      "to": "wiki:protocol:schema/module"
+    },
+    {
+      "from": "wiki:module:M80",
+      "kind": "implements",
+      "to": "wiki:protocol:schema/module"
+    },
+    {
+      "from": "wiki:module:M90",
+      "kind": "implements",
+      "to": "wiki:protocol:schema/module"
+    },
+    {
+      "from": "wiki:module:事件:M22",
+      "kind": "implements",
+      "to": "wiki:protocol:schema/module"
+    },
+    {
+      "from": "wiki:module:通用:M10",
+      "kind": "implements",
+      "to": "wiki:protocol:schema/module"
+    },
+    {
+      "from": "wiki:pipeline:P00_通用文档生成管线",
+      "kind": "implements",
+      "to": "wiki:protocol:production/assembly"
+    },
+    {
+      "from": "wiki:pipeline:P01_标准管线",
+      "kind": "implements",
+      "to": "wiki:protocol:production/assembly"
+    },
+    {
+      "from": "wiki:pipeline:P90_结构装配管线",
+      "kind": "implements",
+      "to": "wiki:protocol:production/assembly"
+    }
+  ],
+  "nodes": [
+    "wiki:asset:README.md",
+    "wiki:asset:provenance.json",
+    "wiki:asset:用户自定义",
+    "wiki:domain:A01",
+    "wiki:domain:A02",
+    "wiki:domain:A03",
+    "wiki:domain:A04",
+    "wiki:domain:A05",
+    "wiki:domain:A06",
+    "wiki:domain:A07",
+    "wiki:domain:A08",
+    "wiki:domain:A09",
+    "wiki:domain:A10",
+    "wiki:domain:A11",
+    "wiki:domain:A12",
+    "wiki:domain:A13",
+    "wiki:domain:A14",
+    "wiki:domain:B01",
+    "wiki:domain:B02",
+    "wiki:domain:B03",
+    "wiki:domain:B04",
+    "wiki:domain:B05",
+    "wiki:domain:B06",
+    "wiki:domain:B07",
+    "wiki:domain:B08",
+    "wiki:domain:B09",
+    "wiki:domain:B10",
+    "wiki:domain:B11",
+    "wiki:domain:B12",
+    "wiki:domain:B13",
+    "wiki:domain:B14",
+    "wiki:domain:B15",
+    "wiki:domain:B16",
+    "wiki:domain:B17",
+    "wiki:domain:B18",
+    "wiki:domain:C01",
+    "wiki:domain:C02",
+    "wiki:domain:C03",
+    "wiki:domain:C04",
+    "wiki:domain:C05",
+    "wiki:domain:C06",
+    "wiki:domain:C07",
+    "wiki:domain:C08",
+    "wiki:domain:C09",
+    "wiki:domain:C10",
+    "wiki:domain:C11",
+    "wiki:domain:C12",
+    "wiki:domain:C13",
+    "wiki:domain:C14",
+    "wiki:domain:C15",
+    "wiki:domain:C16",
+    "wiki:domain:C17",
+    "wiki:domain:C18",
+    "wiki:domain:D01",
+    "wiki:domain:D02",
+    "wiki:domain:D03",
+    "wiki:domain:D04",
+    "wiki:domain:D05",
+    "wiki:domain:D06",
+    "wiki:domain:D07",
+    "wiki:domain:D08",
+    "wiki:domain:D09",
+    "wiki:domain:D10",
+    "wiki:domain:D11",
+    "wiki:domain:D12",
+    "wiki:domain:D13",
+    "wiki:domain:D14",
+    "wiki:domain:D15",
+    "wiki:domain:D16",
+    "wiki:domain:D17",
+    "wiki:domain:D18",
+    "wiki:domain:D19",
+    "wiki:domain:D20",
+    "wiki:domain:E01",
+    "wiki:domain:E02",
+    "wiki:domain:E03",
+    "wiki:domain:E04",
+    "wiki:domain:E05",
+    "wiki:domain:E06",
+    "wiki:domain:E07",
+    "wiki:domain:E08",
+    "wiki:domain:E09",
+    "wiki:domain:E10",
+    "wiki:domain:E11",
+    "wiki:domain:E12",
+    "wiki:domain:E13",
+    "wiki:domain:E14",
+    "wiki:domain:E15",
+    "wiki:domain:E16",
+    "wiki:domain:E17",
+    "wiki:domain:E18",
+    "wiki:domain:E19",
+    "wiki:domain:E20",
+    "wiki:domain:F01",
+    "wiki:domain:F02",
+    "wiki:domain:F03",
+    "wiki:domain:F04",
+    "wiki:domain:F05",
+    "wiki:domain:F06",
+    "wiki:domain:F07",
+    "wiki:domain:F08",
+    "wiki:domain:F09",
+    "wiki:domain:F10",
+    "wiki:module:M00",
+    "wiki:module:M06",
+    "wiki:module:M08",
+    "wiki:module:M12",
+    "wiki:module:M13",
+    "wiki:module:M20",
+    "wiki:module:M23",
+    "wiki:module:M24",
+    "wiki:module:M50",
+    "wiki:module:M80",
+    "wiki:module:M90",
+    "wiki:module:事件:M22",
+    "wiki:module:通用:M10",
+    "wiki:pipeline:P00_通用文档生成管线",
+    "wiki:pipeline:P01_标准管线",
+    "wiki:pipeline:P90_结构装配管线",
+    "wiki:protocol:production/assembly",
+    "wiki:protocol:production/contract",
+    "wiki:protocol:production/spec",
+    "wiki:protocol:production/task",
+    "wiki:protocol:production/wiki-page",
+    "wiki:protocol:schema/asset",
+    "wiki:protocol:schema/asset_contracts",
+    "wiki:protocol:schema/contract",
+    "wiki:protocol:schema/integration",
+    "wiki:protocol:schema/integration_strings",
+    "wiki:protocol:schema/module",
+    "wiki:protocol:schema/pipeline",
+    "wiki:protocol:schema/protocol",
+    "wiki:protocol:schema/release"
+  ],
+  "schema": "nf-wiki-graph/1"
+}

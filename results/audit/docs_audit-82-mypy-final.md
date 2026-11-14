@@ -30,8 +30,10 @@ subjects:
   - desktop/src/core/daemon.py:75940f32b3068a5bc7a83b288bb9302e76a948eca0baa76e1e62f02243c8b498
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:564ab0c9dc65b2fdbe959105024b317793d1f320d9de9431c83b12f092b634df
+  - protocol/code_metrics_baseline.json:9994facc420a054d386bc35cba797c9f71f2c75c05eede30bebf2490ffcb2525
 ---
+> 重审（2026-11-14）：NF-Final WP-10：新增 wiki/ 生成区、core/wiki_compiler.py、docs/wiki.md、test_wiki_compiler_contract.py、nf wiki CLI；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑
+
 > 重审（2026-11-14）：NF-Final WP-0A：新增 protocol/product.json、core/product.py、docs/product/{PRFAQ,GTM,INTERVIEWS}.md；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑
 
 > 重审（2026-11-14）：NF-Final WP-0H：新增 results/cq/*、core/cq_scan.py、scripts/cq_scan.py、docs/{CQ_REPORT,QUALITY_DEBT,REVIEW_CHECKLIST}.md；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑

@@ -53,7 +53,8 @@
       "provenance_external",
       "revocations",
       "transparency_log",
-      "trust"
+      "trust",
+      "wiki_compiler"
     ],
     "shared": [
       "anchor_align",

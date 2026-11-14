@@ -11,12 +11,14 @@ subjects:
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/storage.py:b64401314fd788fe0bae9676c21d61f162d704d3ac81e2f1d619b963149ab88c
   - desktop/src/core/gap_review.py:7d1d600926e13b9936f2a7d30e8a8ca95e4bb3b2a73308f88cfb89b563055953
-  - scripts/nf.py:75ed1ad2dda5fb07dbd914a6ffedb836e5cf1298bf34b98be602644827ebc925
+  - scripts/nf.py:36fb06164b600c2f21400e7253294aa79f683d942f469032f1b5d2f9b9413c27
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - scripts/check_interop_schemas.py:f9c1add0ee80fb23a3913e32482027e9a4049c5ce70cb35b2b1be4afa075d091
   - scripts/ai_domain_closure.py:583cb8ef79afe689df27a1b73885b314dda31e667c8f4f585c907828571356ad
 
 ---
+> 重审（2026-11-14）：NF-Final WP-10：新增 wiki/ 生成区、core/wiki_compiler.py、docs/wiki.md、test_wiki_compiler_contract.py、nf wiki CLI；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑
+
 > 重审（2026-11-14）：NF-Final WP-02 双平面边界 check49：verify.sh 新增 check49（段 D）+ quality_baseline v2.35（47 check / PASS=85），被审对象变更后机械重绑
 
 > 重审（2026-11-14）：WP-15 check45 接线与 G1 收口（机械重绑）

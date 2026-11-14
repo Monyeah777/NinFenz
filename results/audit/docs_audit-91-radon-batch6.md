@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/layer_model.py:7464fad8e9703b76b6582a641fb80c5a93c4bbf87b5d2aad191e610eafe64dd2
-  - protocol/code_metrics_baseline.json:564ab0c9dc65b2fdbe959105024b317793d1f320d9de9431c83b12f092b634df
+  - protocol/code_metrics_baseline.json:9994facc420a054d386bc35cba797c9f71f2c75c05eede30bebf2490ffcb2525
 ---
+> 重审（2026-11-14）：NF-Final WP-10：新增 wiki/ 生成区、core/wiki_compiler.py、docs/wiki.md、test_wiki_compiler_contract.py、nf wiki CLI；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑
+
 > 重审（2026-11-14）：NF-Final WP-0A：新增 protocol/product.json、core/product.py、docs/product/{PRFAQ,GTM,INTERVIEWS}.md；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑
 
 > 重审（2026-11-14）：NF-Final WP-0H：新增 results/cq/*、core/cq_scan.py、scripts/cq_scan.py、docs/{CQ_REPORT,QUALITY_DEBT,REVIEW_CHECKLIST}.md；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑

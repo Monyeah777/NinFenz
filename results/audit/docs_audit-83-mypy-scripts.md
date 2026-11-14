@@ -12,10 +12,12 @@ subjects:
   - scripts/interop_thirdparty_kit.py:4f967d3f29cd31deb79f1b97fdee5f59ae74fde0d378ced571d2896af2d275dc
   - scripts/build_verification_cards.py:370f465c17eb18e4ef928194351c759bf33af75e5c1cd5b85abfc2a4b1d39655
   - scripts/geo_export.py:7a4200761fb7d79f945a37b557882eb8de968081057068d26a7a144d11d1b527
-  - scripts/nf.py:75ed1ad2dda5fb07dbd914a6ffedb836e5cf1298bf34b98be602644827ebc925
+  - scripts/nf.py:36fb06164b600c2f21400e7253294aa79f683d942f469032f1b5d2f9b9413c27
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:564ab0c9dc65b2fdbe959105024b317793d1f320d9de9431c83b12f092b634df
+  - protocol/code_metrics_baseline.json:9994facc420a054d386bc35cba797c9f71f2c75c05eede30bebf2490ffcb2525
 ---
+> 重审（2026-11-14）：NF-Final WP-10：新增 wiki/ 生成区、core/wiki_compiler.py、docs/wiki.md、test_wiki_compiler_contract.py、nf wiki CLI；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑
+
 > 重审（2026-11-14）：NF-Final WP-0A：新增 protocol/product.json、core/product.py、docs/product/{PRFAQ,GTM,INTERVIEWS}.md；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑
 
 > 重审（2026-11-14）：NF-Final WP-0H：新增 results/cq/*、core/cq_scan.py、scripts/cq_scan.py、docs/{CQ_REPORT,QUALITY_DEBT,REVIEW_CHECKLIST}.md；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑
