@@ -137,6 +137,10 @@
       "referenced": true
     },
     {
+      "module": "bundle",
+      "referenced": true
+    },
+    {
       "module": "calibration",
       "referenced": true
     },
@@ -1429,9 +1433,9 @@
       "referenced": true
     }
   ],
-  "modules": 357,
+  "modules": 358,
   "note": "粗粒度名字匹配（代理指标），不做导入图分析",
-  "referenced": 327,
+  "referenced": 328,
   "schema": "nf-core-judge-map/1",
   "unreferenced": 30
 }
