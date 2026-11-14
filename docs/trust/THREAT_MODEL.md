@@ -7,7 +7,7 @@
 ## 这份文件管什么
 
 - 信任根 = **本机运行的这份代码 + 本机密钥材料**；不引入外部 CA / 在线吊销 / 公共日志作为默认信任根。
-- 当前可宣称的等级（计划 §7.3）：**T0 可离线复算**；**T1 部分**（HMAC / 外挂 Sigstore 级签名；DSSE 与 issuer registry 已落地，锚/见证未建）；**T2 部分**（RFC 3161 token 已实装且可离线验，但未自动锚到 trust 链头）；**T3 / T4 不提供**（无外部见证、无公共锚）。
+- 当前可宣称的等级（计划 §7.3）：**T0 可离线复算**；**T1 部分**（HMAC / 外挂 Sigstore 级签名；DSSE 与 issuer registry 已落地，锚/见证未建）；**T2 部分**（RFC 3161 token 可离线验且已按 nf-anchor 绑定 target_digest；链头自动签名/锚定未建 WP-23）；**T3 / T4 不提供**（无外部见证、无公共锚）。
 - 本文覆盖计划 §9.1（信任边界）/ §9.2（STRIDE）/ §9.3（删除·篡改矩阵）/ §9.4（密钥与信任根），并记录计划 §13.5 的两轮红队角色。
 
 ## 信任根与本机边界
@@ -35,7 +35,7 @@
 |---|---|---|---|---|---|
 | TH-01 | S | issuer 伪造 | `desktop/src/core/trust/dsse.py`（PAE + nf-dsse/1 信封）；`desktop/src/core/trust/keys.py`（nf-issuer-registry/1：keyid/alg 白名单 + 生命周期 + 轮换/吊销 fail-closed）；`desktop/src/core/trust_anchor.py`（钉根 + 有界委派）；`core/attest.py`（sign_hmac / verify_external）；`core/key_transparency.py`（consistency） | `test_trust_dsse.py`、`test_trust_keys.py`、`test_trust_anchor.py`、`test_attest.py`、`test_key_transparency.py` | T1 部分（DSSE + issuer registry 已落地；锚/见证未建） |
 | TH-02 | T | 删/改中间 step | `desktop/src/core/trust/process.py`（nf-process/1 prev 链）；`desktop/src/core/meta_cockpit/session_journal.py`（append_turn）（prev_digest）；`desktop/src/core/cognition_workspace/records.py`（append）（prev）；`desktop/src/core/transparency_log.py`（build / verify） | `test_trust_process.py`、`test_meta_cockpit.py`、`test_cognition_workspace.py`、`test_transparency_log.py` | T0 已有 |
-| TH-03 | T | 删尾 + 重算本地摘要 | `desktop/src/core/evidence.py`（check_anchor）（外部锚点核对/截断检测）；`desktop/src/core/timestamp.py`（verify）；链头自动签名+锚定未建 | `test_evidence.py`（test_anchor_truncation_is_caught）、`test_timestamp.py` | T1 部分（journal/process 链头未签名，G2） |
+| TH-03 | T | 删尾 + 重算本地摘要 | `desktop/src/core/evidence.py`（check_anchor）（外部锚点核对/截断检测）；`desktop/src/core/trust/anchor.py`（nf-anchor/1：target_digest 绑定 + RFC3161/STH/witness 核验 + 事实投影）；`core/timestamp.py`（离线验 token）；链头自动签名+锚定未建 | `test_evidence.py`（test_anchor_truncation_is_caught）、`test_timestamp.py`、`test_trust_anchor_evidence.py` | T2 部分（TSA 锚可离线验并绑摘要；链头自动签名/锚定 WP-23） |
 | TH-04 | R | 重放旧 bundle | `desktop/src/core/evidence.py`（时效/吊销/锚点）；`desktop/src/core/revocations.py`（table_of）；`desktop/src/core/timestamp.py`（record） | `test_evidence.py`、`test_revocations.py`、`test_timestamp.py` | T1 部分（默认本机时钟；挂 time-record 才是 T2 面） |
 | TH-05 | I | 证据泄露 | 证据只收摘要与仓相对路径；`desktop/src/core/meta_cockpit/secret_guard.py`（scan_text / redact）；CI 明文密钥扫描（`.github/workflows/ci-verify.yml`）；机器路径泄漏判据 | `test_meta_cockpit.py`（secret_guard）、`test_text_hygiene.py` | T0 已有（边界：调用方把正文打进 payload 仍可能泄露，见 R-04） |
 | TH-06 | D | 资源耗尽 | `desktop/src/core/evidence.py`（单件 16 MiB / 整包 96 MiB / 重名判死 / 路径安全）；`desktop/src/core/trust_boundary.py`（check_arguments）（参数上限）；`protocol/trust/*.schema.json`（maxItems） | `test_evidence.py`（test_oversized_member_is_invalid）、`test_trust_boundary.py`、`test_trust_schemas.py` | T0 已有 |
@@ -118,7 +118,7 @@
 ## 已知缺口（按阶段）
 
 - **OPEN-G1（已关闭，2026-11-14）**：claim 级 bundle（含 splice 负例）、nf-process/1 prev 链、cc_verify 骨架、check45 接线与 §13 自审计均已落地（证据：results/trust/SELF_AUDIT.json，P0=0）；后续缺口转 OPEN-G2。
-- **OPEN-G2**：DSSE 与 issuer registry 已完成（WP-20/21）；余下：链头签名与自动锚定（WP-22/23）、trust store 多根/类型权限合一、签名/TSA/STH 事实的运行时核验接线、keygen 与 0600 强制。
+- **OPEN-G2**：DSSE / issuer registry / 外部锚核验已完成（WP-20/21/22）；余下：链头自动签名与锚定（WP-23）、trust store 多根/类型权限合一、T3 witness 语句外部化（G4）、keygen 与 0600 强制。
 - **OPEN-G3**：类型注册表与组合 admissibility、model card、prompt/context lineage、签名人类复核。
 - **OPEN-G4**：外部见证（STH/witness）、公共锚（Sigstore/Rekor/公共 TSA）、独立 verifier parity。
 

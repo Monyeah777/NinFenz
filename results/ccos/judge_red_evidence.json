@@ -2405,6 +2405,10 @@
       "source": "naming"
     },
     {
+      "module": "test_trust_anchor_evidence.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_trust_boundary.py",
       "source": "negative_assertion"
     },
@@ -2605,10 +2609,10 @@
       "source": "negative_assertion"
     }
   ],
-  "modules": 651,
+  "modules": 652,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
   "suspect": 169,
-  "with_evidence": 341,
+  "with_evidence": 342,
   "without_evidence": 141
 }
