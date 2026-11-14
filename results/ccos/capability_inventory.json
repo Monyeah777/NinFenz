@@ -1,5 +1,5 @@
 {
-  "digest": "5a8d0474c23707d4cbb3e3620e5d31e07f4fe87a9f47f1ba3436cfeead067823",
+  "digest": "c60b69ae1eee43dec06c64c793b84e59dfce771703e8a4bf14efa99d3bd04a32",
   "entries": [
     {
       "doc": "其余 ABI 调用的判定向量：cc_label（IR 校验）→ 期望结论（跨语言可复核）。",
@@ -1126,6 +1126,7 @@
         "--anchor-build",
         "--anchor-target",
         "--bundle",
+        "--entities",
         "--envelope",
         "--git-repo",
         "--head-signature",
@@ -1142,6 +1143,7 @@
         "--tsa-ca",
         "--tsa-query",
         "--tsa-subject",
+        "--type-registry",
         "--witness-material"
       ],
       "path": "scripts/trust_verify.py",
@@ -1287,7 +1289,7 @@
       "subcommands": []
     }
   ],
-  "flags": 557,
+  "flags": 559,
   "note": "静态接口面（docs/flags/subcommands），不含缺省行为语义",
   "schema": "nf-capability-inventory/1",
   "scripts": 82

@@ -25,6 +25,7 @@ sys.path.insert(0, str(ROOT / "desktop" / "src"))
 from core import atomic_write, json_doc  # noqa: E402
 from core.trust import anchor as ta  # noqa: E402
 from core.trust import dsse  # noqa: E402
+from core.trust import entity as te  # noqa: E402
 from core.trust import keys as tk  # noqa: E402
 from core.trust import verify as tv  # noqa: E402
 
@@ -135,6 +136,8 @@ def main(argv=None) -> int:
     ap.add_argument("--key-material", default="", help="注册表口径的 key 材料（keyid → {hex}）")
     ap.add_argument("--now", default="",
                     help="注册表口径的判定时刻（UTC 秒级，必填；不隐式取墙钟）")
+    ap.add_argument("--entities", default="", help="类型化实体 JSON 数组（组合/准入模式）")
+    ap.add_argument("--type-registry", default="", help="nf-type-registry/1 类型注册表")
     ap.add_argument("--root", default=str(ROOT), help="仓库根（读冻结 schema 用）")
     ap.add_argument("--json", action="store_true", help="输出 nf-verify/1 报告 JSON")
     ap.add_argument("--out", default="", help="把报告写入文件（原子写）")
@@ -150,6 +153,36 @@ def main(argv=None) -> int:
     ap.add_argument("--witness-material", default="", help="witness hmac 材料 {id: hex}")
     ap.add_argument("--sth-material", default="", help="STH hmac 材料 {log_id: hex}")
     args = ap.parse_args(argv)
+    if args.entities:
+        if not args.type_registry or not args.policy or not args.issuer_registry:
+            print("不可判定：--entities 模式需要 --type-registry/--policy/--issuer-registry",
+                  file=sys.stderr)
+            return tv.EXIT_UNDECIDABLE
+        try:
+            entities = json_doc.load(Path(args.entities), list, what="entities")
+            type_registry = te.load_type_registry(args.type_registry)
+            policy_doc = _load(args.policy, "policy")
+            issuer_registry = tk.load_registry(args.issuer_registry)
+            entity_schema = te.load_schema(args.root)
+            type_schema = te.load_type_schema(args.root)
+            issues = []
+            for index, entity in enumerate(entities):
+                result = te.typed_admissibility(entity, type_registry, policy_doc,
+                                                issuer_registry, entity_schema,
+                                                type_schema)
+                if not result.get("admissible"):
+                    issues.append(f"entities[{index}]: {result.get('reason')}")
+            composed = te.composition_check(entities, type_registry, type_schema,
+                                            root=args.root)
+            issues.extend(f"{i['code']}: {i['message']}" for i in composed["issues"])
+        except (OSError, ValueError) as exc:
+            print(f"不可判定：{exc}", file=sys.stderr)
+            return tv.EXIT_UNDECIDABLE
+        for issue in issues:
+            print(f"invalid: {issue}")
+        if not issues:
+            print(f"valid typed entities: {len(entities)}（准入 + 组合均通过）")
+        return 0 if not issues else 1
     if args.anchor_build:
         anchors = json_doc.load(Path(args.anchor_anchors), list, what="anchors") \
             if args.anchor_anchors else []

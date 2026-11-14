@@ -1,0 +1,33 @@
+{
+  "schema": "nf-type-registry/1",
+  "types": [
+    {
+      "id": "claim",
+      "allowed_issuer_kinds": [
+        "human",
+        "service",
+        "ai-agent",
+        "institution"
+      ],
+      "allowed_ref_kinds": [
+        "nonsense"
+      ],
+      "compose_with": [
+        "evidence"
+      ],
+      "max_refs": 64
+    },
+    {
+      "id": "evidence",
+      "allowed_issuer_kinds": [
+        "service",
+        "institution"
+      ],
+      "allowed_ref_kinds": [
+        "artifact"
+      ],
+      "compose_with": [],
+      "max_refs": 16
+    }
+  ]
+}

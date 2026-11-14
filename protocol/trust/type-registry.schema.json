@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/trust/type-registry.schema.json",
+  "title": "nf-type-registry/1 类型注册表（ADR-009 准入注册表的类型面）",
+  "description": "实体类型的授权与组合规则：未知 type / 未授权 issuer / 越权组合 / 超量引用一律 fail-closed。类型图必须是 DAG（无自环/无环）。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "types"],
+  "properties": {
+    "schema": {"const": "nf-type-registry/1"},
+    "types": {
+      "type": "array", "minItems": 1, "maxItems": 256,
+      "items": {"$ref": "#/$defs/type"}
+    }
+  },
+  "$defs": {
+    "type": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "allowed_issuer_kinds", "allowed_ref_kinds", "compose_with", "max_refs"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$", "maxLength": 64},
+        "allowed_issuer_kinds": {
+          "type": "array", "minItems": 1, "maxItems": 4,
+          "items": {"enum": ["human", "service", "ai-agent", "institution"]}
+        },
+        "allowed_issuers": {
+          "type": "array", "maxItems": 1024,
+          "items": {"type": "string", "pattern": "^nf:[a-z0-9-]+:[a-z0-9-]+$", "maxLength": 96}
+        },
+        "allowed_ref_kinds": {
+          "type": "array", "minItems": 1, "maxItems": 8,
+          "items": {"enum": ["claim", "evidence", "process-step", "bundle", "card", "artifact"]}
+        },
+        "compose_with": {
+          "type": "array", "maxItems": 64,
+          "items": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$", "maxLength": 64}
+        },
+        "max_refs": {"type": "integer", "minimum": 0, "maximum": 1024}
+      }
+    }
+  }
+}
