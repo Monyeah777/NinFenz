@@ -31,6 +31,7 @@
 | 22 | trust 层 7 件 IDL 结构 fail-closed（未知字段/封闭词表/摘要/时间/base64 形状） | `protocol/trust/*.schema.json`（7 件） | `test_trust_schemas.py`（23 条：正/反样例 + 变异自证） | T0 | SUPPORTED |
 | 23 | schema 不依赖校验器未实现语义（无静默忽略） | `core.json_schema` 叶子件 + `test_trust_schemas.py` 的 unsupported 断言 | 同上 | — | SUPPORTED |
 | 24 | 威胁模型边界自洽：STRIDE 8 行 / 删除矩阵 8 行 / 边界 6 条 / 红队 2×5 均绑定现存控制点与判据；T0/T1 不写成 T3/T4 | `docs/trust/THREAT_MODEL.md` | `test_trust_threat_model_doc_contract.py`（3 条 + 7 项变异自证） | — | SUPPORTED |
+| 25 | trust 实现契约被测试向量锚定：提交件==重算、期望值可被独立实现复算、跨语言 JSON 自验 | `scripts/trust_vectors.py` + `results/trust/trust_vectors.json`（34 条 / 7 族） | `test_trust_vectors.py`（6 条 + 9 项变异自证） | — | SUPPORTED |
 
 **本轮判定**：`UNSUPPORTED` = 0（本轮抽检范围内）；`TODO` 11 条全部落在计划 G1–G4 的工作包内，不构成文档过度声明。计划 §13.3 的示例行「删尾可检测 / T2 / TODO」与本矩阵第 15 行同源。
 

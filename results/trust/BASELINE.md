@@ -100,7 +100,7 @@
 ## 5. 计划与实仓的偏差（G0 冻结前必须裁决）
 
 1. **ADR 落点**：计划写 `docs/adr/`；本仓政策是真实决策件进私有 Plan 仓（`decisions/ADR-0000-决策记录外置到私有仓.md`，pre-commit 阻断真实决策件），公开仓只留模板与登记（`decisions/` 模板 + `protocol/adr/registry.json`）。⇒ WP-04 改为「私有归档 + 公开登记投影」，不在公开仓新建 `docs/adr/`。
-2. **测试落点**：计划写 `tests/trust/vectors/`；本仓 check12 只 discover `desktop/tests`。⇒ 判据进 `desktop/tests/test_trust_*.py`，向量进 `desktop/tests/fixtures/trust/`（与既有 fixtures 同源）。
+2. **测试落点（WP-03 细化）**：判据进 `desktop/tests/test_trust_*.py`（check12 的 discover 面）；**跨语言向量集**落 `results/trust/trust_vectors.json`（生成件，`scripts/trust_vectors.py --write`，与 `results/ccos/*_vectors.json` 同族：第三方只读 JSON 自验）；手写 schema 样例仍留 `desktop/tests/fixtures/trust/`。计划原写 `tests/trust/vectors/`，按仓约定拆成这两处。
 3. **check 编号**：实仓现有 check1–42（`verify.sh` 末条 check42）；check43/44 在当前 HEAD 未被占用，但并行线存在撞号风险。⇒ G1 前先声明占用，且**只增不减**，不改既有 check 语义。
 4. **schema 落点（WP-01 已裁决）**：采用计划原路径 `protocol/trust/*.schema.json`（7 件）。理由：`protocol/schema/` 的元检（check28 / `schema_lint`）只允许 16 关键字子集，容不下计划不变量所需的 `$defs` / `oneOf` / `const` / `uniqueItems`（例如锚集合「四类之一且 ≥1」）；仓内已有**纯标准库**叶子校验器 `core.json_schema` 支持这些关键字，故 trust 层用完整 draft 2020-12 并由该叶子件判定。**不是两处并存**：`protocol/README.md` 已写明两层的校验器面与计数口径（trust 层不计入 `protocol/schema/` 件数、也不进 `LINT_INPUTS` 扫描面）。接入 check45 后由门禁接管；ADR 落点同 §5.1。
 5. **命名与既有语义**：计划新 schema（`nf-claim-bundle/1` 等）不得与既有 `nf-evidence/1`、`nf-time-token/1`、`nf-key-transparency/1`、`nf-revocation/1` 语义重叠；claim bundle 与 evidence bundle 的关系必须由 ADR 写死（包含、引用还是并列）。
@@ -128,7 +128,8 @@
 - **ENV-04** 计划 §12.1.4 引用的 `scripts/refreeze.sh` 在本机不存在（`ls scripts | grep refreeze` 为空）→ 实仓等价入口为 `python scripts/nf.py release --freeze --apply --by <批准人> --note <说明>`（三步：conformance → approve → receipts，见 §2.1 实测）。
 - **WP-01 已完成（2026-11-14）**：`protocol/trust/` 7 件 schema（entity / dsse / process / claim-bundle / anchor / policy / verify）+ 正/反样例 22 件 + 判据 `desktop/tests/test_trust_schemas.py`（23 条，含变异自证与标准实现对照）。
 - **WP-02 已完成（2026-11-14）**：`docs/trust/THREAT_MODEL.md`（STRIDE 8 行 / 删除·篡改 8 行 / 信任边界 6 条 / 红队 2 角色各 5 条 / ACCEPTED-RISK 4 条 / 已知缺口 OPEN-G1…G4）+ 判据 `desktop/tests/test_trust_threat_model_doc_contract.py`（3 条，含 7 项变异自证）。
-- **下一步（G0 余项）**：WP-03 测试向量 → WP-04 ADR（按 §5 的 6 条偏差裁决落点）。
+- **WP-03 已完成（2026-11-14）**：`scripts/trust_vectors.py` + `results/trust/trust_vectors.json`（schema `nf-trust-vectors/1`，**34 条 / 7 族**：canonical / domain / pae / merkle / process / entity / level）；判据 `desktop/tests/test_trust_vectors.py`（6 条：提交件==重算、独立实现复算全部期望值、9 项变异自证、实体向量对齐冻结 schema）。同时补清 `protocol/check12_weights.json` 对三个新测试模块的权重（`test_check12_budget` 从红转绿）。
+- **下一步（G0 最后一项）**：WP-04 ADR（私有归档 + `protocol/adr/registry.json` 公开登记投影）。
 
 ## 8. 复跑命令
 

@@ -1780,6 +1780,11 @@
       "max_fn_cc": 5,
       "max_fn_lines": 29
     },
+    "scripts/trust_vectors.py": {
+      "lines": 479,
+      "max_fn_cc": 7,
+      "max_fn_lines": 47
+    },
     "scripts/verifier_status.py": {
       "lines": 98,
       "max_fn_cc": 8,

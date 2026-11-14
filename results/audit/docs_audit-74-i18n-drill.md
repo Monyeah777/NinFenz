@@ -26,8 +26,10 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:51604504ed69969c0c502eecea60736f7e02c4d931ba1f117bedd63fe84c60da
+  - protocol/code_metrics_baseline.json:61a1328d90ea3374f578bf196ba46e3745d0139bea999b404cd88515bb486915
 ---
+> 重审（2026-11-14）：WP-03 测试向量与生成器入仓（机械重绑）
+
 > 重审（2026-11-14）：patterns evidence 校验加宽（任意前缀路径校验）使 patterns.py 增至 193 行：属门禁加固的合法增长，code_metrics 基线重冻。
 
 > 重审（2026-11-14）：patterns/INDEX 顶尖化：现状对照/复现口径改为**生成内容**（renderer 实时算计数），页面整页生成物声明；模块增至 192 行属合法生成逻辑增长，code_metrics 基线重冻（--write）；新增判据 test_patterns_index_doc_contract（reindex 幂等逐字节）。
