@@ -1114,6 +1114,18 @@
         "test_g3_dod",
         "results/G3_DOD.md"
       ]
+    },
+    {
+      "id": "ai-evidence",
+      "artifact": "protocol/ai_evidence.json",
+      "quality_rule": "assertion:ai-evidence",
+      "owner": "AI 证据链（core/ai_evidence.py + test_ai_evidence_contract）+ WP-40",
+      "status": "active",
+      "freshness": "模型卡/血缘/复核样例与 eval_validity 变化须重跑；committed==实时重算",
+      "consumers": [
+        "test_ai_evidence_contract",
+        "docs/ai-evidence.md"
+      ]
     }
   ]
 }

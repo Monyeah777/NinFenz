@@ -1,0 +1,26 @@
+{
+  "schema": "nf-ai-evidence/1",
+  "note": "NF-Final G4 WP-40 AI 证据链登记：模型卡（nf-model-card/1）/ 上下文血缘（nf-context-lineage/1）/ 人类复核（nf-human-review/1）三件绑定关系与拒收条件。纪律：AI 类交付必须有模型卡+预注册评测引用+血缘+人类复核 approve；缺一即 PENDING/拒收，不冒充通过。判据 desktop/tests/test_ai_evidence_contract.py。",
+  "artifacts": {
+    "model_card": {"schema": "nf-model-card/1", "rel": "results/ai/model-card.json",
+                   "schema_rel": "protocol/trust/model-card.schema.json",
+                   "required": ["model_id", "model_digest", "provider", "eval_protocol", "issued_at"],
+                   "eval_protocol_rule": "protocol_id=eval-validity 且 protocol_digest=sha256(protocol/eval_validity.json)；pre_registered/score_forbidden=true"},
+    "lineage": {"schema": "nf-context-lineage/1", "rel": "results/ai/lineage.json",
+                "schema_rel": "protocol/trust/context-lineage.schema.json",
+                "rule": "model_card_digest == card_digest(model_card)；segments prev/head/lineage_digest 连续可复算"},
+    "human_review": {"schema": "nf-human-review/1", "rel": "results/ai/human-review.json",
+                     "schema_rel": "protocol/trust/human-review.schema.json",
+                     "rule": "subject_kind=card；subject_digest==card_digest；decision=approve；reviewer.kind=human；reviewed_at ISO-8601"}
+  },
+  "binding": {
+    "card_to_lineage": "lineage.model_card_digest == model_card.card_digest（整卡规范摘要）",
+    "card_to_review": "review.subject_digest == model_card.card_digest 且 subject_kind=card",
+    "review_state_rule": "缺失= PENDING（不等于通过）；reject=拒收；escalate=升级待决；仅 approve 可交付"
+  },
+  "states": ["PENDING", "APPROVED", "REJECTED", "ESCALATED", "INVALID"],
+  "reject_codes": ["AI-CARD-MISSING", "AI-CARD-INVALID", "AI-EVAL-DIGEST-MISMATCH",
+                   "AI-LINEAGE-BROKEN", "AI-REVIEW-MISSING", "AI-REVIEW-NOT-APPROVED"],
+  "signed_envelope_note": "复核的 DSSE 信封验签由 check46/trust human_review 判据覆盖；本件判结构/绑定/状态，不重复造签名面",
+  "claims_boundary": ["本件只判 AI 证据链结构与绑定；模型能力/质量不作保证", "不声称任何外部模型/供应商合规"]
+}

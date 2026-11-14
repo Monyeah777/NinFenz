@@ -1,0 +1,14 @@
+{
+  "eval_protocol": {
+    "pre_registered": true,
+    "protocol_digest": "bf0b88dcd43a22f4fe8fc2616451d4d578def2e2ab9a472a937d3a188feac0c1",
+    "protocol_id": "eval-validity",
+    "score_forbidden": true
+  },
+  "issued_at": "2026-11-15T00:00:00Z",
+  "model_digest": "95287be99ef87143be951e7d1adf5e67a3a3d9329e59e871d0b1550cd2f13a59",
+  "model_id": "nf.sample.model",
+  "notes": "G4 WP-40 sample：用于证据链绑定判据，不代表真实模型能力",
+  "provider": "local-sample",
+  "schema": "nf-model-card/1"
+}

@@ -38,6 +38,7 @@
     "governance": [
       "accessibility",
       "agent_adapter",
+      "ai_evidence",
       "ai_governance",
       "approval",
       "assembly_runtime",
