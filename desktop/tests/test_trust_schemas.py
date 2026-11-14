@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Trust Fabric schema 门禁（WP-01）：7 件 IDL、正/反样例与变异自证。
+"""Trust Fabric schema 门禁（WP-01/21）：8 件 IDL、正/反样例与变异自证。
 
 判据（计划 §7.2 数据与协议 / §12.2 禁止项 / §14.3 DoD）：
-1. 7 件 trust schema 在 protocol/trust/，文件名、$id、数据版本名（nf-xxx/1）三者一致；
+1. 8 件 trust schema 在 protocol/trust/，文件名、$id、数据版本名（nf-xxx/1）三者一致；
 2. 每件有正样例（过）与反样例（拒），且反例失败原因命中预期（不是碰巧被拒）；
 3. 变异自证：弱化 additionalProperties / pattern / minItems 后，对应负例必须变绿
    —— 证明测试不是同义反复；
@@ -38,6 +38,7 @@ SCHEMAS = {
     "anchor.schema.json": ("anchor.json", "nf-anchor/1"),
     "policy.schema.json": ("policy.json", "nf-trust-policy/1"),
     "verify.schema.json": ("verify.json", "nf-verify/1"),
+    "keys.schema.json": ("keys.json", "nf-issuer-registry/1"),
 }
 
 #: 反例文件 → (对应 schema, 期望错误片段)。片段取自 core.json_schema 的错误消息（固定文案）。
@@ -57,6 +58,10 @@ INVALID_CASES = {
     "policy-level-t5.json": ("policy.schema.json", "不在枚举内"),
     "verify-no-scoring-false.json": ("verify.schema.json", "应为常量"),
     "verify-issue-missing-fix.json": ("verify.schema.json", "缺必填字段"),
+    "keys-bad-keyid.json": ("keys.schema.json", "不匹配 pattern"),
+    "keys-empty-keys.json": ("keys.schema.json", "元素数 < 1"),
+    "keys-unknown-status.json": ("keys.schema.json", "不在枚举内"),
+    "keys-bad-time.json": ("keys.schema.json", "不匹配 pattern"),
 }
 
 try:  # 可选对照依赖（pyproject ci extra）；核心运行面不依赖它
@@ -92,15 +97,15 @@ def _walk(node, key):
 
 
 class TrustSchemaMetaTest(unittest.TestCase):
-    """7 件 schema 的元结构与计划不变量。"""
+    """8 件 schema 的元结构与计划不变量。"""
 
     @classmethod
     def setUpClass(cls):
         cls.docs = {name: _read(SCHEMA_DIR / name) for name in SCHEMAS}
 
-    def test_all_seven_present_and_exact(self):
+    def test_all_eight_present_and_exact(self):
         on_disk = sorted(p.name for p in SCHEMA_DIR.glob("*.json"))
-        self.assertEqual(sorted(SCHEMAS), on_disk, "protocol/trust 的 schema 集合必须恰为 7 件")
+        self.assertEqual(sorted(SCHEMAS), on_disk, "protocol/trust 的 schema 集合必须恰为 8 件")
 
     def test_id_schema_and_versioned_name(self):
         for name, (_sample, versioned) in SCHEMAS.items():
@@ -181,6 +186,20 @@ class TrustSchemaMetaTest(unittest.TestCase):
         doc = self.docs["process.schema.json"]
         self.assertEqual(1, doc["properties"]["step"]["minimum"])
         self.assertIn("prev", doc["required"])
+
+    def test_keys_registry_minimum_invariants(self):
+        doc = self.docs["keys.schema.json"]
+        self.assertIn("issuers", doc["required"])
+        issuer = doc["$defs"]["issuer"]
+        self.assertEqual(["id", "kind", "keys"], issuer["required"])
+        self.assertEqual(1, issuer["properties"]["keys"]["minItems"])
+        key = doc["$defs"]["key"]
+        self.assertEqual(["keyid", "alg", "status", "not_before", "not_after"],
+                         key["required"])
+        self.assertEqual(["hmac-sha256", "ed25519", "ecdsa-p256"],
+                         key["properties"]["alg"]["enum"])
+        self.assertEqual(["active", "retired", "revoked"],
+                         key["properties"]["status"]["enum"])
 
 
 class TrustSchemaSamplesTest(unittest.TestCase):

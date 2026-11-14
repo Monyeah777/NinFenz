@@ -38,6 +38,8 @@
 | 29 | claim bundle 构建/整包验证：RFC 6962 根 + 逐叶 proof + 覆盖/唯一性，且产物过冻结 schema | `desktop/src/core/trust/bundle.py` | `test_trust_bundle.py`（19 条：merkle 向量逐条 + 篡改矩阵） | T0 | SUPPORTED |
 | 30 | 流程步骤前向绑定：step 摘要含全部字段 + prev/seq 连续，删/改/重排可检测（本地重算边界如实声明） | `desktop/src/core/trust/process.py` | `test_trust_process.py`（20 条：process 向量逐条 + 篡改矩阵 + 就地重算边界） | T0 | SUPPORTED |
 
-**本轮判定**：`UNSUPPORTED` = 0（本轮抽检范围内）；`TODO` 5 条（15/16/18/19/21）全部落在计划 G2–G4 的工作包内，不构成文档过度声明。计划 §13.3 的示例行「删尾可检测 / T2 / TODO」与本矩阵第 15 行同源。
+| 31 | issuer↔keyid↔alg 注册表 fail-closed（未知/未来/过期/吊销即拒；retired 仅历史验签且轮换可寻址） | `protocol/trust/keys.schema.json` + `desktop/src/core/trust/keys.py` | `test_trust_keys.py`（18 条：结构/语义矩阵 + 生命周期 + 注册表口径验签 + 轮换 + CLI） | T1 | SUPPORTED（G2 WP-21） |
+
+**本轮判定**：`UNSUPPORTED` = 0（本轮抽检范围内）；`TODO` 4 条（15/18/19/21）全部落在计划 G2–G4 的工作包内，不构成文档过度声明。计划 §13.3 的示例行「删尾可检测 / T2 / TODO」与本矩阵第 15 行同源。
 
 *维护纪律：新增 claim 必须同时补代码锚点与测试，再改状态；不得先写 SUPPORTED 后补测试。*

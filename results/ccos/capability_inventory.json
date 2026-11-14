@@ -1,5 +1,5 @@
 {
-  "digest": "e4f5c65f1b9286517ade418b7aef9e95fdf0fc2e3fba4fbe41f9587934966a68",
+  "digest": "6d5e15ea6990d85a810cbe13662ce29124ecef84650c4616b63344adf10b2a89",
   "entries": [
     {
       "doc": "其余 ABI 调用的判定向量：cc_label（IR 校验）→ 期望结论（跨语言可复核）。",
@@ -1124,8 +1124,11 @@
         "--bundle",
         "--envelope",
         "--hmac-key-hex",
+        "--issuer-registry",
         "--json",
+        "--key-material",
         "--keyid",
+        "--now",
         "--out",
         "--policy",
         "--root"
@@ -1273,7 +1276,7 @@
       "subcommands": []
     }
   ],
-  "flags": 543,
+  "flags": 546,
   "note": "静态接口面（docs/flags/subcommands），不含缺省行为语义",
   "schema": "nf-capability-inventory/1",
   "scripts": 82

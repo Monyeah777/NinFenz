@@ -1,0 +1,11 @@
+{
+  "schema": "nf-issuer-registry/1",
+  "issuers": [
+    {
+      "id": "nf:example:operator",
+      "kind": "service",
+      "display_name": "Example operator",
+      "keys": []
+    }
+  ]
+}

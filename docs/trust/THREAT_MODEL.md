@@ -7,7 +7,7 @@
 ## 这份文件管什么
 
 - 信任根 = **本机运行的这份代码 + 本机密钥材料**；不引入外部 CA / 在线吊销 / 公共日志作为默认信任根。
-- 当前可宣称的等级（计划 §7.3）：**T0 可离线复算**；**T1 部分**（HMAC / 外挂 Sigstore 级签名；DSSE 与统一 issuer registry 未建）；**T2 部分**（RFC 3161 token 已实装且可离线验，但未自动锚到 trust 链头）；**T3 / T4 不提供**（无外部见证、无公共锚）。
+- 当前可宣称的等级（计划 §7.3）：**T0 可离线复算**；**T1 部分**（HMAC / 外挂 Sigstore 级签名；DSSE 与 issuer registry 已落地，锚/见证未建）；**T2 部分**（RFC 3161 token 已实装且可离线验，但未自动锚到 trust 链头）；**T3 / T4 不提供**（无外部见证、无公共锚）。
 - 本文覆盖计划 §9.1（信任边界）/ §9.2（STRIDE）/ §9.3（删除·篡改矩阵）/ §9.4（密钥与信任根），并记录计划 §13.5 的两轮红队角色。
 
 ## 信任根与本机边界
@@ -33,7 +33,7 @@
 
 | 编号 | 类别 | 威胁 | 控制点 | 判据 | 状态 |
 |---|---|---|---|---|---|
-| TH-01 | S | issuer 伪造 | `desktop/src/core/trust/dsse.py`（PAE + nf-dsse/1 信封：keyid/算法白名单/≥1 trusted 有效签名）；`desktop/src/core/trust_anchor.py`（钉根 + 有界委派）；`core/attest.py`（sign_hmac / verify_external）；`core/key_transparency.py`（consistency） | `test_trust_dsse.py`、`test_trust_anchor.py`、`test_attest.py`、`test_key_transparency.py` | T1 部分（DSSE 信封已落地；统一 issuer registry/轮换/吊销未建，G2 WP-21） |
+| TH-01 | S | issuer 伪造 | `desktop/src/core/trust/dsse.py`（PAE + nf-dsse/1 信封）；`desktop/src/core/trust/keys.py`（nf-issuer-registry/1：keyid/alg 白名单 + 生命周期 + 轮换/吊销 fail-closed）；`desktop/src/core/trust_anchor.py`（钉根 + 有界委派）；`core/attest.py`（sign_hmac / verify_external）；`core/key_transparency.py`（consistency） | `test_trust_dsse.py`、`test_trust_keys.py`、`test_trust_anchor.py`、`test_attest.py`、`test_key_transparency.py` | T1 部分（DSSE + issuer registry 已落地；锚/见证未建） |
 | TH-02 | T | 删/改中间 step | `desktop/src/core/trust/process.py`（nf-process/1 prev 链）；`desktop/src/core/meta_cockpit/session_journal.py`（append_turn）（prev_digest）；`desktop/src/core/cognition_workspace/records.py`（append）（prev）；`desktop/src/core/transparency_log.py`（build / verify） | `test_trust_process.py`、`test_meta_cockpit.py`、`test_cognition_workspace.py`、`test_transparency_log.py` | T0 已有 |
 | TH-03 | T | 删尾 + 重算本地摘要 | `desktop/src/core/evidence.py`（check_anchor）（外部锚点核对/截断检测）；`desktop/src/core/timestamp.py`（verify）；链头自动签名+锚定未建 | `test_evidence.py`（test_anchor_truncation_is_caught）、`test_timestamp.py` | T1 部分（journal/process 链头未签名，G2） |
 | TH-04 | R | 重放旧 bundle | `desktop/src/core/evidence.py`（时效/吊销/锚点）；`desktop/src/core/revocations.py`（table_of）；`desktop/src/core/timestamp.py`（record） | `test_evidence.py`、`test_revocations.py`、`test_timestamp.py` | T1 部分（默认本机时钟；挂 time-record 才是 T2 面） |
@@ -71,9 +71,9 @@
 | 面 | 当前口径 | 缺口 |
 |---|---|---|
 | 私钥权限 | 纪律：0600 且不入仓；仓库内只有 demo 公钥（`protocol/demo_signers/`） | 无 keygen/权限强制校验（OPEN-G2） |
-| issuer registry | 组件已有：密钥透明目录（版本化根 + 追加链 + 包含证明 + 分叉见证）+ 钉根委派 + 吊销表/feed | 统一 issuer↔keyid↔alg↔类型权限的 registry 未建（OPEN-G2） |
+| issuer registry | `protocol/trust/keys.schema.json` + `desktop/src/core/trust/keys.py`（issuer↔keyid↔alg + 生命周期：未知/未来/过期/吊销即拒）；另有密钥透明目录 + 钉根委派 + 吊销表/feed | trust store（多根/类型权限合一）运行时判定未建（OPEN-G2） |
 | trust store | 策略 schema 已冻结 required_level / issuers / tsa_roots（`protocol/trust/policy.schema.json`） | 多根/过期/撤销的运行时判定未建（OPEN-G2） |
-| 轮换 | 约定新 keyid；旧签名有效期内可验并标注 key-rotation | 未实现（OPEN-G2） |
+| 轮换 | `keys.py`：retired + rotated_to 可寻址（旧 key 只验历史、新签用新 key）；信封回报 retired 列表 | 轮换自动化 / keygen 与 0600 强制（OPEN-G2） |
 
 ## 逐条性质：能证 / 不能证
 
@@ -118,7 +118,7 @@
 ## 已知缺口（按阶段）
 
 - **OPEN-G1（已关闭，2026-11-14）**：claim 级 bundle（含 splice 负例）、nf-process/1 prev 链、cc_verify 骨架、check45 接线与 §13 自审计均已落地（证据：results/trust/SELF_AUDIT.json，P0=0）；后续缺口转 OPEN-G2。
-- **OPEN-G2**：DSSE、链头签名与自动锚定、issuer registry / trust store / 轮换、签名/TSA/STH 事实的运行时核验（nf-verify 报告骨架已落地，事实接线在 G2）、keygen 与 0600 强制。
+- **OPEN-G2**：DSSE 与 issuer registry 已完成（WP-20/21）；余下：链头签名与自动锚定（WP-22/23）、trust store 多根/类型权限合一、签名/TSA/STH 事实的运行时核验接线、keygen 与 0600 强制。
 - **OPEN-G3**：类型注册表与组合 admissibility、model card、prompt/context lineage、签名人类复核。
 - **OPEN-G4**：外部见证（STH/witness）、公共锚（Sigstore/Rekor/公共 TSA）、独立 verifier parity。
 

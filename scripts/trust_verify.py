@@ -23,6 +23,7 @@ sys.path.insert(0, str(ROOT / "desktop" / "src"))
 
 from core import atomic_write, json_doc  # noqa: E402
 from core.trust import dsse  # noqa: E402
+from core.trust import keys as tk  # noqa: E402
 from core.trust import verify as tv  # noqa: E402
 
 
@@ -47,13 +48,38 @@ def _summary(report: dict) -> str:
 
 
 def _verify_envelope(args) -> int:
-    """只用 hmac-sha256 验 DSSE 信封（stdlib；其他算法需调用方注入 verifier，属库面用法）。"""
+    """信封模式：裸 hmac（--keyid/--hmac-key-hex）或注册表口径（--issuer-registry）。"""
+    try:
+        envelope = json_doc.load(Path(args.envelope), dict, what="DSSE 信封")
+    except (OSError, ValueError) as exc:
+        print(f"不可判定：{exc}", file=sys.stderr)
+        return tv.EXIT_UNDECIDABLE
+    if args.issuer_registry:
+        if not args.key_material or not args.now:
+            print("不可判定：注册表模式需要 --key-material 与 --now（UTC 秒级）",
+                  file=sys.stderr)
+            return tv.EXIT_UNDECIDABLE
+        try:
+            registry = tk.load_registry(args.issuer_registry)
+            material = json_doc.load(Path(args.key_material), dict, what="key material")
+            result = tk.verify_envelope(envelope, registry, material,
+                                        dsse.load_schema(args.root), now=args.now)
+        except (OSError, ValueError) as exc:
+            print(f"不可判定：{exc}", file=sys.stderr)
+            return tv.EXIT_UNDECIDABLE
+        if result["valid"]:
+            print(f"valid envelope: payloadType={result['payload_type']} "
+                  f"signers={','.join(result['signers'])} "
+                  f"issuers={','.join(sorted(set(result['issuers'].values())))}")
+            return 0
+        print(f"invalid envelope: {result['reason']}")
+        return 1
     if not args.keyid or not args.hmac_key_hex:
-        print("不可判定：信封模式需要 --keyid 与 --hmac-key-hex", file=sys.stderr)
+        print("不可判定：信封模式需要 --keyid 与 --hmac-key-hex（或 --issuer-registry）",
+              file=sys.stderr)
         return tv.EXIT_UNDECIDABLE
     try:
         key = bytes.fromhex(args.hmac_key_hex)
-        envelope = json_doc.load(Path(args.envelope), dict, what="DSSE 信封")
         keys = {args.keyid: {"alg": "hmac-sha256", "verify": dsse.hmac_verifier(key)}}
         result = dsse.verify_envelope(envelope, keys, dsse.load_schema(args.root))
     except (OSError, ValueError) as exc:
@@ -74,6 +100,10 @@ def main(argv=None) -> int:
     ap.add_argument("--envelope", default="", help="nf-dsse/1 信封 JSON（信封模式）")
     ap.add_argument("--keyid", default="", help="信封模式的 keyid")
     ap.add_argument("--hmac-key-hex", default="", help="信封模式的 HMAC key（hex）")
+    ap.add_argument("--issuer-registry", default="", help="注册表口径：nf-issuer-registry/1 JSON")
+    ap.add_argument("--key-material", default="", help="注册表口径的 key 材料（keyid → {hex}）")
+    ap.add_argument("--now", default="",
+                    help="注册表口径的判定时刻（UTC 秒级，必填；不隐式取墙钟）")
     ap.add_argument("--root", default=str(ROOT), help="仓库根（读冻结 schema 用）")
     ap.add_argument("--json", action="store_true", help="输出 nf-verify/1 报告 JSON")
     ap.add_argument("--out", default="", help="把报告写入文件（原子写）")

@@ -1,0 +1,19 @@
+{
+  "schema": "nf-issuer-registry/1",
+  "issuers": [
+    {
+      "id": "nf:example:operator",
+      "kind": "service",
+      "display_name": "Example operator",
+      "keys": [
+        {
+          "keyid": "nf:example:operator:2026",
+          "alg": "hmac-sha256",
+          "status": "active",
+          "not_before": "2026-01-01",
+          "not_after": "2027-01-01T00:00:00Z"
+        }
+      ]
+    }
+  ]
+}
