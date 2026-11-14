@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:142a9157504702fa03498494dc452ae2fbb8cfbfcce836992b1d59d1078755e4
-  - protocol/code_metrics_baseline.json:dddd6dd43632910237a9845ad0bdfd007d53f035ab5f994d3afade5feadd1c8f
+  - protocol/code_metrics_baseline.json:1b8472d3763f91814a250ba37d335b2b469e3444776f8d327f920afc75b718b0
 ---
+> 重审（2026-11-15）：NF-Final WP-50：新增 protocol/self_scan.json、core/self_scan.py、results/self_audit/S0-S15.json、test_self_scan_contract.py；verify.sh check55 + quality_baseline 55 条/PASS=103；派生面重生成
+
 > 重审（2026-11-15）：NF-Final WP-54：新增 protocol/cq6.json、core/cq6_scorecard.py、results/cq/{cq6_scorecard,cq6_baseline}.json、test_cq6_scorecard.py；verify.sh check54 + quality_baseline 54 条/PASS=101；docs CQ_REPORT CQ6 评分卡 + QUALITY_DEBT QD-09..11；派生面重生成
 
 > 重审（2026-11-15）：NF-Final WP-51：新增 protocol/stability.json、core/stability.py、results/stability/report.json、docs/stability.md、test_stability_contract.py；assertions/data_contracts/independence/code_metrics/check12 更新

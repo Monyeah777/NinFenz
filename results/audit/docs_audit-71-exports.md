@@ -6,20 +6,22 @@ scope: 作者指令「自述数字自动化，互操作性从他证，标准目�
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - verify.sh:2a5bb79af4df5680fd0fc5d5abd115c708c9b2a365740fa2cf8cb0503dabd335
+  - verify.sh:123a9946300ca8d21698a507195a24fd64d603cd5af9568a0aaa93654fe94d49
   - scripts/nf.py:3026aad56e562650ab4db01aa76e73694fd841998ab3d84050643a2dd9c0950e
   - desktop/src/core/repo_stats.py:d7fd457d3a1804c3e9ab266c8071ad9d8950d4b5eb0a782ce658a66e05e90f9c
-  - desktop/src/core/quality_baseline.py:3a983c6007c5c18493ab87a61a84a32e2df1e9ed5a9cb96bde2378567068d48b
+  - desktop/src/core/quality_baseline.py:a291750ecd238ccb753229d67ee1bc2a53c34c7b136f8495236f24b3611e080a
   - scripts/interop_thirdparty_kit.py:4f967d3f29cd31deb79f1b97fdee5f59ae74fde0d378ced571d2896af2d275dc
   - scripts/geo_export.py:7a4200761fb7d79f945a37b557882eb8de968081057068d26a7a144d11d1b527
   - scripts/fde_sample_run.py:ae1e644b7ab0b61e430d6224ef4495e4371cba86e520d99c8d532cfb9370568d
-  - protocol/CONFORMANCE.md:65b00d061ccce1060409a948d066007af5b360ce355542123e459a9fb931185e
+  - protocol/CONFORMANCE.md:586bc5a3bda8502bc9d339f1e4eeeccc7d54aa9440c089cc409db5c3b44d46f7
   - docs/fde-stack.md:96c074dffcbcc513fbf3bec79d5b895ac9cfec543430f21805eb5d2370b43bca
   - docs/fde-sample/README.md:ac3da5b467b4963681af3ded98c65a184577883e90f215b9e852aaca104294c4
   - docs/interop-thirdparty.md:108fd4cddc6ef082b29270a8269b7a7153cbb53e6113fec73227e84fb9276271
   - results/interop-thirdparty-status.md:e57c95980dd8b36bf137d23db0cf3c93ba8aee5221d2d26f2a6c782c30df0469
 
 ---
+> 重审（2026-11-15）：NF-Final WP-50：新增 protocol/self_scan.json、core/self_scan.py、results/self_audit/S0-S15.json、test_self_scan_contract.py；verify.sh check55 + quality_baseline 55 条/PASS=103；派生面重生成
+
 > 重审（2026-11-15）：NF-Final WP-54 收尾：check54 增补棘轮/基线两条真实断言（total ok 与 PASS=101 对齐）
 
 > 重审（2026-11-15）：NF-Final WP-54：新增 protocol/cq6.json、core/cq6_scorecard.py、results/cq/{cq6_scorecard,cq6_baseline}.json、test_cq6_scorecard.py；verify.sh check54 + quality_baseline 54 条/PASS=101；docs CQ_REPORT CQ6 评分卡 + QUALITY_DEBT QD-09..11；派生面重生成

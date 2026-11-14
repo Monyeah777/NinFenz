@@ -12,7 +12,7 @@ subjects:
   - desktop/tests/test_nf_language.py:59bd38b7c2e59fe09b70804a5837849f25ecc274b093efcf4674b5e2f7176644
   - desktop/tests/test_doc_truth.py:6c0584045a8edef8f000ea7cdd547a3fe15a32a696a026467599c11afea11685
   - desktop/tests/test_site_face.py:eed4013d8e598c7115300ab6442fa1d6dbb69e7cb4f28b3a15c2f03392c4fd72
-  - verify.sh:2a5bb79af4df5680fd0fc5d5abd115c708c9b2a365740fa2cf8cb0503dabd335
+  - verify.sh:123a9946300ca8d21698a507195a24fd64d603cd5af9568a0aaa93654fe94d49
   - scripts/nf.py:3026aad56e562650ab4db01aa76e73694fd841998ab3d84050643a2dd9c0950e
   - docs/lsp.md:e2745c7c2fe8c0a7df28d1e74d8f6300f7bfd7b54dfff529ded94e74e20a7069
   - docs/mcp.md:c96f080bc2cf26d409960597f8580bf8d4a65618554a22f12f36e3e03759316a
@@ -26,6 +26,8 @@ subjects:
   - skills/ninfenz/references/commands.md:ac8a602f9854fc103b44ae79a5f7b1b4a7e36cf0a4b4075b7e8eb693dad76602
 
 ---
+> 重审（2026-11-15）：NF-Final WP-50：新增 protocol/self_scan.json、core/self_scan.py、results/self_audit/S0-S15.json、test_self_scan_contract.py；verify.sh check55 + quality_baseline 55 条/PASS=103；派生面重生成
+
 > 重审（2026-11-15）：NF-Final WP-54 收尾：check54 增补棘轮/基线两条真实断言（total ok 与 PASS=101 对齐）
 
 > 重审（2026-11-15）：NF-Final WP-54：新增 protocol/cq6.json、core/cq6_scorecard.py、results/cq/{cq6_scorecard,cq6_baseline}.json、test_cq6_scorecard.py；verify.sh check54 + quality_baseline 54 条/PASS=101；docs CQ_REPORT CQ6 评分卡 + QUALITY_DEBT QD-09..11；派生面重生成

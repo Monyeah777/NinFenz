@@ -7,8 +7,8 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/concept_graph.py:cc629a762576347a6065da4be34ff6c6902ec4ee7299663119abbc153bd50211
-  - verify.sh:2a5bb79af4df5680fd0fc5d5abd115c708c9b2a365740fa2cf8cb0503dabd335
-  - README.en.md:acb2733e74c10bfcfcc53c96c2a24a7f5be4b7e89cf766842844a622afad5a53
+  - verify.sh:123a9946300ca8d21698a507195a24fd64d603cd5af9568a0aaa93654fe94d49
+  - README.en.md:a6776a43c072540301e81278c7c1a83e0c38785a49b2b96e722c4b5637fd93ce
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - community/量化金融域包/assets/DATA_CONTRACT.md:3815cd420ce535b571149a1ca0725b2d5c1757660e83d0edd8ed1d5c14ed2af1
   - community/量化金融域包/assets/STRATEGY_SPECS.md:9174638b5caf2d5d8586b80d07ed9aeca5d221e16f01ec19ce0e4c0f50859e65
@@ -16,6 +16,8 @@ subjects:
   - .github/workflows/external-links.yml:52c94a4c17a73d6fc40135019ea6ffb64dcc39f3ac9094d748e5ab09edd977a0
 
 ---
+> 重审（2026-11-15）：NF-Final WP-50：新增 protocol/self_scan.json、core/self_scan.py、results/self_audit/S0-S15.json、test_self_scan_contract.py；verify.sh check55 + quality_baseline 55 条/PASS=103；派生面重生成
+
 > 重审（2026-11-15）：NF-Final WP-54 收尾：check54 增补棘轮/基线两条真实断言（total ok 与 PASS=101 对齐）
 
 > 重审（2026-11-15）：NF-Final WP-54：新增 protocol/cq6.json、core/cq6_scorecard.py、results/cq/{cq6_scorecard,cq6_baseline}.json、test_cq6_scorecard.py；verify.sh check54 + quality_baseline 54 条/PASS=101；docs CQ_REPORT CQ6 评分卡 + QUALITY_DEBT QD-09..11；派生面重生成
