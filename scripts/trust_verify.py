@@ -139,6 +139,7 @@ def main(argv=None) -> int:
     ap.add_argument("--json", action="store_true", help="输出 nf-verify/1 报告 JSON")
     ap.add_argument("--out", default="", help="把报告写入文件（原子写）")
     ap.add_argument("--anchor", default="", help="nf-anchor/1 锚件（可选；给了才核 T2 事实）")
+    ap.add_argument("--head-signature", default="", help="链头签名信封（nf-dsse/1，可选）")
     ap.add_argument("--anchor-build", default="", help="构建模式：输出 nf-anchor/1 文件路径")
     ap.add_argument("--anchor-target", default="", help="构建模式的 target_digest")
     ap.add_argument("--anchor-anchors", default="", help="构建模式的 anchors JSON 数组文件")
@@ -170,8 +171,14 @@ def main(argv=None) -> int:
         bundle = _load(args.bundle, "bundle")
         policy = _load(args.policy, "policy")
         anchor_doc = _load(args.anchor, "anchor") if args.anchor else None
+        head = _load(args.head_signature, "head signature") if args.head_signature else None
+        registry_doc = tk.load_registry(args.issuer_registry) if args.issuer_registry else None
+        material_doc = (json_doc.load(Path(args.key_material), dict, what="key material")
+                        if args.key_material else None)
         result = tv.verify(bundle, policy, root=args.root, anchor=anchor_doc,
-                           anchor_verifiers=_anchor_verifiers(args) if anchor_doc else None)
+                           anchor_verifiers=_anchor_verifiers(args) if anchor_doc else None,
+                           head_signature=head, registry=registry_doc,
+                           material=material_doc, now=args.now or None)
     except (OSError, ValueError) as exc:
         print(f"不可判定：{exc}", file=sys.stderr)
         return tv.EXIT_UNDECIDABLE

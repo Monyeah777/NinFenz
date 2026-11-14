@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/trust/chain-head.schema.json",
+  "title": "nf-chain-head/1 链头/卡/事件签名语句",
+  "description": "签名的载荷（DSSE payload）冻结形状：subject_kind + subject_digest 绑定被签对象；未知字段/未知 kind 一律拒。签名信封本身走 nf-dsse/1。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "subject_kind", "subject_digest"],
+  "properties": {
+    "schema": {"const": "nf-chain-head/1"},
+    "subject_kind": {"enum": ["bundle", "process-chain", "card", "event"]},
+    "subject_digest": {"$ref": "#/$defs/digest"},
+    "issued_at": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    },
+    "note": {"type": "string", "minLength": 1, "maxLength": 200}
+  },
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

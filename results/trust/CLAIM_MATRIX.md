@@ -21,7 +21,7 @@
 | 12 | 预注册评测协议（禁 score / synthetic 不作证据） | `eval_harness.py:21-23` | `test_eval_harness.py` | — | SUPPORTED |
 | 13 | 人类复核状态机（未签 = PENDING，不得冒充通过） | `runtime_executor.py:213` | `test_meta_cockpit.py` | — | PARTIAL（状态机在，记录未签名） |
 | 14 | 单 claim 可独立验证（claim 级、不读全包、O(log n)） | `desktop/src/core/trust/bundle.py` verify_claim | `test_trust_bundle.py`（只读一条 claim + proof 长度 ≤ log n） | T1（结构/哈希面；签名在 G2） | SUPPORTED |
-| 15 | 删尾并重算本地摘要可被检测（head 签名/TSA） | `desktop/src/core/trust/anchor.py`（nf-anchor/1：target_digest 绑定 + RFC3161 token 离线验；链头签名接口 = WP-23） | `test_trust_anchor_evidence.py`（17 条：本地 openssl TSA 全链路 + witness 阈值 + STH + 篡改/错根/错摘要 + verify/CLI 接线） | T2 | PARTIAL（TSA 锚已接线验真；链头签名/自动锚定 WP-23） |
+| 15 | 删尾并重算本地摘要可被检测（head 签名/TSA） | `desktop/src/core/trust/anchor.py`（nf-anchor/1：target_digest 绑定 + RFC3161 token 离线验）+ `desktop/src/core/trust/signature.py`（nf-chain-head/1 链头签名，复用 DSSE + issuer registry） | `test_trust_anchor_evidence.py`（17 条）+ `test_trust_signature.py`（14 条，含真签名+真 TSA 端到端 T2） | T2 | SUPPORTED（WP-22/23） |
 | 16 | DSSE/PAE 签名信封（≥1 有效签名、keyid 可解析） | `desktop/src/core/trust/dsse.py`（PAE + nf-dsse/1；算法白名单 hmac-sha256 / ed25519 / ecdsa-p256，后两者可插拔回调）+ `desktop/tests/test_trust_dsse.py` | `pae` 族向量逐条一致；信封签/验 + 篡改矩阵（载荷/签名/keyid/算法越界/算法不符） | T1 | SUPPORTED（G2 WP-20；issuer 注册/轮换/吊销接线 = WP-21） |
 | 17 | 跨 bundle 拼接被拒（splice 防护） | `desktop/src/core/trust/bundle.py`（叶预像含 bundle_id/index） | `test_trust_bundle.py` cross-bundle splice 负例 | T1 | SUPPORTED |
 | 18 | 未知实体类型/越权组合 fail-closed（typed entity） | 计划 `trust/entity.py`（未建） | — | T1 | TODO（G3） |
@@ -39,8 +39,10 @@
 | 30 | 流程步骤前向绑定：step 摘要含全部字段 + prev/seq 连续，删/改/重排可检测（本地重算边界如实声明） | `desktop/src/core/trust/process.py` | `test_trust_process.py`（20 条：process 向量逐条 + 篡改矩阵 + 就地重算边界） | T0 | SUPPORTED |
 
 | 31 | issuer↔keyid↔alg 注册表 fail-closed（未知/未来/过期/吊销即拒；retired 仅历史验签且轮换可寻址） | `protocol/trust/keys.schema.json` + `desktop/src/core/trust/keys.py` | `test_trust_keys.py`（18 条：结构/语义矩阵 + 生命周期 + 注册表口径验签 + 轮换 + CLI） | T1 | SUPPORTED（G2 WP-21） |
-| 32 | 外部锚可离线验并投影为 T2/T3 事实（rfc3161/STH/witness/git-commit；错目标/错信任根/坏签名必 invalid，缺 verifier 记 none） | `protocol/trust/anchor.schema.json` + `desktop/src/core/trust/anchor.py` | `test_trust_anchor.py`（16 条：本地 TSA 全链路 + witness 阈值 + STH + 篡改/错根/错摘要 + verify 接线） | T2（TSA）/T3 部分（witness 语句为本仓约定） | SUPPORTED（G2 WP-22） |
+| 32 | 外部锚可离线验并投影为 T2/T3 事实（rfc3161/STH/witness/git-commit；错目标/错信任根/坏签名必 invalid，缺 verifier 记 none） | `protocol/trust/anchor.schema.json` + `desktop/src/core/trust/anchor.py` | `test_trust_anchor_evidence.py`（17 条：本地 TSA 全链路 + witness 阈值 + STH + 篡改/错根/错摘要 + verify 接线） | T2（TSA）/T3 部分（witness 语句为本仓约定） | SUPPORTED（G2 WP-22） |
 
-**本轮判定**：`UNSUPPORTED` = 0（本轮抽检范围内）；`TODO` 3 条（18/19/21）全部落在计划 G3–G4 的工作包内；claim #15 为 PARTIAL（TSA 锚已落地，链头签名 WP-23），不构成文档过度声明。计划 §13.3 的示例行「删尾可检测 / T2 / TODO」与本矩阵第 15 行同源。
+| 33 | 链头/卡/事件签名语句绑定（nf-chain-head/1；错 kind/digest 必拒；registry 吊销/过期则 T1 失守） | `protocol/trust/chain-head.schema.json` + `desktop/src/core/trust/signature.py` | `test_trust_signature.py`（14 条：语句绑定 + 生命周期 + 篡改 + 真签名+真 TSA 端到端 T2） | T1 | SUPPORTED（G2 WP-23） |
+
+**本轮判定**：`UNSUPPORTED` = 0（本轮抽检范围内）；`TODO` 3 条（18/19/21）全部落在计划 G3–G4 的工作包内；claim #15/#16/#32/#33 均已 SUPPORTED（WP-20/22/23），不构成文档过度声明。
 
 *维护纪律：新增 claim 必须同时补代码锚点与测试，再改状态；不得先写 SUPPORTED 后补测试。*

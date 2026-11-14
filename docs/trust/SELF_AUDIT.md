@@ -21,7 +21,7 @@
 
 | 维度 | 状态 | 判据 / 证据 |
 |---|---|---|
-| S0_requirements | amber | FR/NFR 已落地部分有代码+测试；claim #16（DSSE）WP-20 SUPPORTED、#15（删尾）WP-22 转 PARTIAL（TSA 锚已接线，链头签名 WP-23）；剩 3 条 TODO（typed entity/model card/跨语言 parity）留 G3–G4，均有 owner |
+| S0_requirements | amber | FR/NFR 已落地部分有代码+测试；claim #16（DSSE）WP-20 SUPPORTED、#15（删尾）WP-22/23 SUPPORTED（TSA 锚 + 链头签名）；剩 3 条 TODO（typed entity/model card/跨语言 parity）留 G3–G4，均有 owner |
 | S1_code_holes | green | trust 路径 TODO/FIXME/NotImplemented/pass 命中 0 |
 | S2_judgement_holes | green | 裸 except 0；默认放行形状 0（本轮修掉 2 处 `policy_ok` 缺省 True，见 F-001） |
 | S3_crypto | green | 无 md5/sha1/random/time.time/datetime.now；摘要统一 SHA-256 |
@@ -60,5 +60,5 @@ python -m pytest desktop/tests/test_trust_self_audit_contract.py -q
 ## 不改写的历史结论
 
 - 本报告不回溯改 G0 的 `results/trust/BASELINE.md` 判定；基线是**审计当时**的实读，后续状态以本报告与各阶段交接为准。
-- 本版按 G2 更新：claim #16（DSSE）SUPPORTED（WP-20）；claim #15（删尾）转 PARTIAL（WP-22：`trust/anchor.py` + `test_trust_anchor.py`，TSA 锚已接线，链头签名 WP-23）；P1 从 5→3 条。
+- 本版按 G2 更新：claim #16（DSSE）SUPPORTED（WP-20）；claim #15（删尾）SUPPORTED（WP-22/23：`trust/anchor.py` + `trust/signature.py`，TSA 锚 + 链头签名，端到端 T2 判据 `test_trust_signature.py`）；P1 从 5→3 条。
 - 「全量 bash verify.sh（3100+ 测试）」本轮未跑，如实记；静态面全量与受影响面全量分别取证（见上表与各 WP 记录）。CI 的 full 档是唯一发布结论口径。
