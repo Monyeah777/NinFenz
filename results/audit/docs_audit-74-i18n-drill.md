@@ -26,7 +26,7 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:f02723ab454e6ea1210c7cbb9d91b47b15e2fe6007aa75eeafbd553d6d29517c
+  - protocol/code_metrics_baseline.json:26dd9ecd222df4589a985e9059c76d04d7acc04ad1f759bd030f4fb43f6d7cfd
 ---
 > 重审（2026-11-14）：WP-11 trust bundle 入仓（机械重绑）
 

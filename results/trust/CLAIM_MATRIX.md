@@ -26,7 +26,7 @@
 | 17 | 跨 bundle 拼接被拒（splice 防护） | `desktop/src/core/trust/bundle.py`（叶预像含 bundle_id/index） | `test_trust_bundle.py` cross-bundle splice 负例 | T1 | SUPPORTED |
 | 18 | 未知实体类型/越权组合 fail-closed（typed entity） | 计划 `trust/entity.py`（未建） | — | T1 | TODO（G3） |
 | 19 | 模型替换使旧 AI 证据失效（model card 绑定） | 计划 `core/ai_trust/`（未建） | — | — | TODO（G3） |
-| 20 | 报告给出等级 + 缺项 + issuer 状态（`nf-verify/1`） | 计划 `trust/verify.py`（未建） | — | — | TODO（G2） |
+| 20 | 报告给出等级 + 缺项 + 修复指引 + 信任根（`nf-verify/1`） | `desktop/src/core/trust/verify.py` | `test_trust_verify.py`（11 条：level 向量 + 四场景退出码 + schema + CLI） | T0 骨架（签名/锚事实 G2） | SUPPORTED |
 | 21 | Python ↔ .NET（引擎线）逐字节 parity（trust 面） | 计划；.NET 引擎线未接 | — | — | TODO（G3/G4；本机无 SDK，见 BASELINE §7） |
 | 22 | trust 层 7 件 IDL 结构 fail-closed（未知字段/封闭词表/摘要/时间/base64 形状） | `protocol/trust/*.schema.json`（7 件） | `test_trust_schemas.py`（23 条：正/反样例 + 变异自证） | T0 | SUPPORTED |
 | 23 | schema 不依赖校验器未实现语义（无静默忽略） | `core.json_schema` 叶子件 + `test_trust_schemas.py` 的 unsupported 断言 | 同上 | — | SUPPORTED |
@@ -38,6 +38,6 @@
 | 29 | claim bundle 构建/整包验证：RFC 6962 根 + 逐叶 proof + 覆盖/唯一性，且产物过冻结 schema | `desktop/src/core/trust/bundle.py` | `test_trust_bundle.py`（19 条：merkle 向量逐条 + 篡改矩阵） | T0 | SUPPORTED |
 | 30 | 流程步骤前向绑定：step 摘要含全部字段 + prev/seq 连续，删/改/重排可检测（本地重算边界如实声明） | `desktop/src/core/trust/process.py` | `test_trust_process.py`（20 条：process 向量逐条 + 篡改矩阵 + 就地重算边界） | T0 | SUPPORTED |
 
-**本轮判定**：`UNSUPPORTED` = 0（本轮抽检范围内）；`TODO` 6 条（15/16/18/19/20/21）全部落在计划 G2–G4 的工作包内，不构成文档过度声明。计划 §13.3 的示例行「删尾可检测 / T2 / TODO」与本矩阵第 15 行同源。
+**本轮判定**：`UNSUPPORTED` = 0（本轮抽检范围内）；`TODO` 5 条（15/16/18/19/21）全部落在计划 G2–G4 的工作包内，不构成文档过度声明。计划 §13.3 的示例行「删尾可检测 / T2 / TODO」与本矩阵第 15 行同源。
 
 *维护纪律：新增 claim 必须同时补代码锚点与测试，再改状态；不得先写 SUPPORTED 后补测试。*

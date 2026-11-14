@@ -1397,6 +1397,10 @@
       "referenced": true
     },
     {
+      "module": "verify",
+      "referenced": true
+    },
+    {
       "module": "verify_checks",
       "referenced": true
     },
@@ -1437,9 +1441,9 @@
       "referenced": true
     }
   ],
-  "modules": 359,
+  "modules": 360,
   "note": "粗粒度名字匹配（代理指标），不做导入图分析",
-  "referenced": 329,
+  "referenced": 330,
   "schema": "nf-core-judge-map/1",
   "unreferenced": 30
 }

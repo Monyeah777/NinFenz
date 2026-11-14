@@ -40,7 +40,7 @@
 | TH-05 | I | 证据泄露 | 证据只收摘要与仓相对路径；`desktop/src/core/meta_cockpit/secret_guard.py`（scan_text / redact）；CI 明文密钥扫描（`.github/workflows/ci-verify.yml`）；机器路径泄漏判据 | `test_meta_cockpit.py`（secret_guard）、`test_text_hygiene.py` | T0 已有（边界：调用方把正文打进 payload 仍可能泄露，见 R-04） |
 | TH-06 | D | 资源耗尽 | `desktop/src/core/evidence.py`（单件 16 MiB / 整包 96 MiB / 重名判死 / 路径安全）；`desktop/src/core/trust_boundary.py`（check_arguments）（参数上限）；`protocol/trust/*.schema.json`（maxItems） | `test_evidence.py`（test_oversized_member_is_invalid）、`test_trust_boundary.py`、`test_trust_schemas.py` | T0 已有 |
 | TH-07 | E | 类型混淆 / 越权 | `protocol/trust/` 7 件 schema（未知字段/封闭词表）；`desktop/src/core/trust/entity.py`（issuer/type 准入）；`desktop/src/core/trust_boundary.py`（check_arguments）；组合检查与完整类型注册表未建 | `test_trust_schemas.py`、`test_trust_entity.py`、`test_trust_boundary.py` | T0 部分（结构 + 准入已实现；组合/注册表 OPEN-G3） |
-| TH-08 | S | 自签自验冒充外锚 | `desktop/src/core/attest.py`（verify_external）（外部进程验签，缺验证器 fail-closed）；check42（验签方 ≠ 签名方 + 篡改必红）；等级只写进报告（nf-verify/1 已冻结 schema，判定 G2） | `test_attest.py`、`verify.sh` check42 | T1 部分（cosign 不在场时按 WARN 记「仓库 provenance 缺签名外锚」，不冒充已签） |
+| TH-08 | S | 自签自验冒充外锚 | `desktop/src/core/attest.py`（verify_external）（外部进程验签，缺验证器 fail-closed）；check42（验签方 ≠ 签名方 + 篡改必红）；等级只写进报告（nf-verify/1 骨架已落地：T0 真值 + 其余缺项，判定表与 level 向量一致；签名/锚事实 G2） | `test_attest.py`、`test_trust_verify.py`、`verify.sh` check42 | T1 部分（cosign 不在场时按 WARN 记「仓库 provenance 缺签名外锚」，不冒充已签） |
 
 ## 删除 / 篡改矩阵（计划 §9.3，八行）
 
@@ -117,8 +117,8 @@
 
 ## 已知缺口（按阶段）
 
-- **OPEN-G1（进行中）**：claim 级 bundle（含 splice 负例）与 nf-process/1 prev 链已落地（`desktop/src/core/trust/bundle.py`、`process.py`）；剩余 `cc_verify` 骨架与 check45 收口。
-- **OPEN-G2**：DSSE、链头签名与自动锚定、issuer registry / trust store / 轮换、policy 判定与 nf-verify 报告、keygen 与 0600 强制。
+- **OPEN-G1（收口中）**：claim 级 bundle（含 splice 负例）、nf-process/1 prev 链与 cc_verify 骨架（含 nf-verify/1 报告）已落地；剩余 check45 接线与 G1 自审计。
+- **OPEN-G2**：DSSE、链头签名与自动锚定、issuer registry / trust store / 轮换、签名/TSA/STH 事实的运行时核验（nf-verify 报告骨架已落地，事实接线在 G2）、keygen 与 0600 强制。
 - **OPEN-G3**：类型注册表与组合 admissibility、model card、prompt/context lineage、签名人类复核。
 - **OPEN-G4**：外部见证（STH/witness）、公共锚（Sigstore/Rekor/公共 TSA）、独立 verifier parity。
 
