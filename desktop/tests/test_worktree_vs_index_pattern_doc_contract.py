@@ -12,7 +12,6 @@
 契约：6 必填键、3 规则、applies_to 四目标在场、**evidence 逐条真实存在**、五段正文、
 「门禁为准」口径、复现四命令（含 CRLF 实测一行）、不钉字节数、`text_hygiene` 实跑 rc=0。
 """
-import subprocess
 import sys
 import unittest
 from pathlib import Path

@@ -18,6 +18,12 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 
+def _live():
+    """payload 清单的活值（判据不钉死数字，变异自证用活值）。"""
+    man = json.loads((ROOT / "packaging" / "npm" / "payload" /
+                       "payload-manifest.json").read_text(encoding="utf-8"))
+    return str(man["count"]), "%.2f" % (man["total_bytes"] / 1048576)
+
 DOC = ROOT / "packaging" / "npm" / "README.md"
 PKG = ROOT / "packaging" / "npm" / "package.json"
 MANIFEST = ROOT / "packaging" / "npm" / "payload" / "payload-manifest.json"
@@ -97,7 +103,7 @@ class NpmReadmeTest(unittest.TestCase):
 
     def test_contract_catches_mutations(self):
         """变异自证：体积数字改错 / 缺复核位 / 缺 sync 口径 / 写安装脚本。"""
-        bad = self.text.replace("3109 件", "3000 件")
+        bad = self.text.replace(f"{_live()[0]} 件", "3000 件")
         self.assertTrue(any("件数" in i for i in npm_issues(bad)))
         no_rev = self.text.replace("复核（2026-11-14）", "复核")
         self.assertTrue(any("复核位" in i for i in npm_issues(no_rev)))

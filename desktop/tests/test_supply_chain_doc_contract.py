@@ -70,7 +70,7 @@ def supply_issues(text: str) -> list:
     if n_count != live_count():
         issues.append(f"材料条数已变（{n_count}）")
     if str(live_count()) not in text:
-        issues.append("未写材料清单 %d（应与 sbom 实读一致）" % live_count())
+        issues.append(f"未写材料清单 {live_count()}（应与 sbom 实读一致）")
     n_judge = len(verifier_version.JUDGE_FILES)
     if n_judge != 10:
         issues.append(f"JUDGE_FILES 已变（{n_judge}）")

@@ -24,7 +24,7 @@ def _budget() -> float:
     """预算真源 = test_check12_budget.BUDGET_S（避免两处各钉一个数）。"""
     import sys as _sys
     _sys.path.insert(0, str(ROOT / "desktop" / "tests"))
-    from test_check12_budget import BUDGET_S  # noqa: E402
+    from test_check12_budget import BUDGET_S
     return float(BUDGET_S)
 sys.path.insert(0, str(ROOT / "scripts"))
 

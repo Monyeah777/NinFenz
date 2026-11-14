@@ -78,8 +78,8 @@ def judge_issues(text: str) -> list:
     ratio = reg["without_evidence"] / reg["modules"]
     if ratio > RATIO_LIMIT:
         issues.append(f"无硬证据比例越线：{ratio:.3f} > {RATIO_LIMIT}")
-    if ("%.3f" % ratio) not in text:
-        issues.append("未写实测比例 %.3f" % ratio)
+    if f"{ratio:.3f}" not in text:
+        issues.append(f"未写实测比例 {ratio:.3f}")
     _r = registry()
     _labels = (str(_r["modules"]), str(_r["with_evidence"]),
                str(_r["suspect"]), str(_r["with_evidence"] - _r["suspect"]))

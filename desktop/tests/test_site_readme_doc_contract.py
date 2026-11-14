@@ -20,6 +20,12 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+
+def _live_mb():
+    """payload 清单体积活值（不钉死 25.xx）。"""
+    man = json.loads((ROOT / "packaging" / "npm" / "payload" /
+                       "payload-manifest.json").read_text(encoding="utf-8"))
+    return man["total_bytes"] / 1048576
 DOC = ROOT / "site" / "README.md"
 SITE = ROOT / "site"
 MANIFEST = ROOT / "packaging" / "npm" / "payload" / "payload-manifest.json"
@@ -124,7 +130,7 @@ class SiteReadmeTest(unittest.TestCase):
 
     def test_contract_catches_mutations(self):
         """变异自证：改坏 npm 体积 / 缺机器面 / 缺判据项数 / 缺手抄口径。"""
-        bad = self.text.replace("25.21 MB", "24.74 MB")
+        bad = self.text.replace(f"{_live_mb():.2f} MB", "24.74 MB")
         self.assertTrue(any("npm 体积" in i for i in doc_issues(bad)))
         no_machine = self.text.replace("facts.json", "数据")
         self.assertTrue(any("facts.json" in i or "机器面" in i for i in doc_issues(no_machine)))

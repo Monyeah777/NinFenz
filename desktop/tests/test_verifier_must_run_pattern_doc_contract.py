@@ -13,7 +13,6 @@ evidence 四件可解析、五段正文、`EXTERNAL_SUITES` 每条目标在场�
 四源函数在文、不钉总数口径、复现三命令、test_suite_wiring 实跑 rc=0。
 """
 import re
-import subprocess
 import sys
 import unittest
 from pathlib import Path
