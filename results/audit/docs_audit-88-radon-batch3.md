@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:b40b5b318e040d601a80ddddfd0c6e4f4d3788a0f133c66d76c84b29eda60d4b
-  - protocol/code_metrics_baseline.json:965e7a804976f6455d96d9684410967af2bc6c246abd8dacbdaebeed25787615
+  - protocol/code_metrics_baseline.json:8dcc76d49946f613b42cf64c6f723d84fe129ae167252ddf159e60f414bf55e2
 ---
+> 重审（2026-11-14）：NF-Final WP-12：新增 core/context_packer.py、docs/context-packer.md、test_context_packer_contract.py；nf wiki context --role 接入；independence/code_metrics/check12 更新，被审对象变更后机械重绑
+
 > 重审（2026-11-14）：NF-Final WP-11 收尾：code_metrics 基线重冻（spec_compiler 231 行/最长 59 行为新模块实测值）
 
 > 重审（2026-11-14）：NF-Final WP-11：新增 core/spec_compiler.py、spec/intents/sample-document.json、docs/spec-compiler.md、test_spec_compiler_contract.py、nf spec compile；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑

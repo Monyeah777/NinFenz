@@ -285,6 +285,11 @@
       "max_fn_cc": 5,
       "max_fn_lines": 12
     },
+    "desktop/src/core/context_packer.py": {
+      "lines": 207,
+      "max_fn_cc": 19,
+      "max_fn_lines": 56
+    },
     "desktop/src/core/contract_history.py": {
       "lines": 292,
       "max_fn_cc": 13,
@@ -1736,7 +1741,7 @@
       "max_fn_lines": 26
     },
     "scripts/nf.py": {
-      "lines": 9999,
+      "lines": 10015,
       "max_fn_cc": 132,
       "max_fn_lines": 443
     },

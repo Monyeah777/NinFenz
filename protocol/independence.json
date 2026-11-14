@@ -40,6 +40,7 @@
       "ai_governance",
       "approval",
       "assurance",
+      "context_packer",
       "contract_history",
       "cq_scan",
       "eval_validity",

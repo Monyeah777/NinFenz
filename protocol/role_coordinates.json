@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1496,
+    "app": 1497,
     "entry": 26,
     "floor": 5,
-    "prod": 1063,
+    "prod": 1064,
     "projection": 199,
     "support": 509,
-    "verify": 1416
+    "verify": 1417
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -5975,6 +5975,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "Context Packer（WP-12）：按角色/预算把 Wiki 页打包成带 citations 的上下文。",
+      "path": "desktop/src/core/context_packer.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "Reconstruct a contract-level timeline from Git history.",
       "path": "desktop/src/core/contract_history.py",
       "role": "prod",
@@ -8545,6 +8551,12 @@
     {
       "function": "`core/content_face.py`（叶子件）与 `conformance_scan` 的**口径逐位一致**回归。",
       "path": "desktop/tests/test_content_face.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "WP-12 Context Packer 判据（角色隔离/预算/引用/抗注入）。",
+      "path": "desktop/tests/test_context_packer_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -14916,17 +14928,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "e0588ce7078c17e94b88813c5cda232220a6ce3976c95262bc2936ede39ea0b3",
+  "root_digest": "0b1c87abf65c285e22bcd33fefbce16d7e314ae930c76b5338a34ecdd4120a9a",
   "rule_counts": {
-    "R-app": 1496,
+    "R-app": 1497,
     "R-catch": 356,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 176,
     "R-support": 124,
-    "R-verify": 1287,
-    "auto:R-core": 300
+    "R-verify": 1288,
+    "auto:R-core": 301
   },
   "schema": "nf-role-coordinates/1"
 }
