@@ -583,6 +583,21 @@
       "message": "DoD 收口的自审计机器件不在位或 schema 不符（check48 的判据前提缺失）",
       "fix": "跑 python scripts/trust_self_audit.py --write 重建自审计件",
       "evidence": "check48 / conformance::assertions"
+    },
+    {
+      "id": "privacy-registry",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "protocol/privacy.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-privacy/1"
+      },
+      "message": "隐私数据契约登记缺失或版本名不符（WP-0B 判据 test_privacy_contract 依赖它）",
+      "fix": "补/修 protocol/privacy.json 的 schema 字段；再跑 test_privacy_contract",
+      "evidence": "test_privacy_contract / conformance::modeling"
     }
   ]
 }

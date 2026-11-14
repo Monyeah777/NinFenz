@@ -680,6 +680,19 @@
         "scripts/check_independence.py",
         "results/RESULTS.md"
       ]
+    },
+    {
+      "id": "privacy-registry",
+      "artifact": "protocol/privacy.json",
+      "quality_rule": "assertion:privacy-registry",
+      "owner": "隐私/数据生命周期（core/privacy_scan.py + desktop/tests/test_privacy_contract.py）+ WP-0B",
+      "status": "active",
+      "freshness": "改数据类必须同步 protocol/privacy.json 与 docs/privacy/*；判据 test_privacy_contract 断言三面一致",
+      "consumers": [
+        "test_privacy_contract",
+        "PRIVACY.md",
+        "docs/privacy/DATA_MAP.md"
+      ]
     }
   ]
 }

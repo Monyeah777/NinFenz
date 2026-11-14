@@ -3,14 +3,14 @@
     "dynamic_allow": 1,
     "forbidden_edges": 0,
     "governance": 9,
-    "modules": 295,
+    "modules": 296,
     "planes": {
       "governance": 9,
       "production": 31,
-      "shared": 25
+      "shared": 26
     },
     "production": 31,
-    "shared": 25
+    "shared": 26
   },
   "findings": [],
   "ok": true,

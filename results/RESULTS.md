@@ -21,6 +21,7 @@
 - [independence.json](independence.json)（生产/治理双平面边界报告：`protocol/independence.json` 65 个模块归属 + 295 个 core 模块静态闭包零跨界，check49 判据件）
 - [production/threat_vectors.json](production/threat_vectors.json)（NF-Final §8 威胁向量：六条信任边界 + STRIDE 8 行 + 失败矩阵 8 行，逐条绑定控制点/证据/状态；判据 `test_production_threat_vectors.py`）
 - [docs/production/THREAT_MODEL.md](../docs/production/THREAT_MODEL.md)（生产平面威胁模型人读面：边界/STRIDE/失败矩阵 + 状态词表 + 不承诺边界）
+- [docs/qa/PRIVACY_QA.md](../docs/qa/PRIVACY_QA.md)（隐私 QA：数据地图/删除证据/PII 扫描/保留约束的判据与实测；配套 `PRIVACY.md` + `protocol/privacy.json`）
 
 ## 互操作导出面（入仓投影）
 

@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:75ed1ad2dda5fb07dbd914a6ffedb836e5cf1298bf34b98be602644827ebc925
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:5a48c837043a84cca0df7973f82fb1290a91e0e774cf657881d164ee3f5ad0c6
+  - protocol/check12_weights.json:cc282629f78bbdae888fbf3fddc32df7ac3d3584116f346ea31239344a2aa205
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:fa00a7fd014857af56e11f38ced1b7d888be053befaadb10b3dd494d27884316
   - docs/meta-cockpit/功能解析.md:de20c2340d19d541bcfde53f222a3acf22a6e440d8fb3dcf51a37aedf53c0c25
   - results/meta-cockpit-manifest.json:60c0e100798e49d393557ae5066c02d7e057ec27f386ee1a36ca3fc7740150ba
 
 ---
+> 重审（2026-11-14）：NF-Final WP-0B：新增 protocol/privacy.json（数据契约登记）、core/privacy_scan.py、PRIVACY.md 与 docs/privacy/*、docs/qa/PRIVACY_QA.md；code_metrics 376 件、check12 权重 +1.6s；被审对象变更后机械重绑
+
 > 重审（2026-11-14）：NF-Final WP-03：新增 protocol/boundaries.json 六边界、results/production/threat_vectors.json、docs/production/THREAT_MODEL.md；check12 权重新增 test_production_threat_vectors（总 2141.0s），被审对象变更后机械重绑
 
 > 重审（2026-11-14）：NF-Final WP-01：新增 protocol/production 五件 schema 与正反样例；check12 权重实测更新（test_schema_reference 0.4→1.5s，总量 2140.7s），被审对象变更后机械重绑

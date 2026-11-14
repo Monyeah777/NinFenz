@@ -1045,6 +1045,11 @@
       "max_fn_cc": 7,
       "max_fn_lines": 29
     },
+    "desktop/src/core/privacy_scan.py": {
+      "lines": 80,
+      "max_fn_cc": 11,
+      "max_fn_lines": 32
+    },
     "desktop/src/core/prose_lint.py": {
       "lines": 234,
       "max_fn_cc": 19,

@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1470,
+    "app": 1474,
     "entry": 26,
     "floor": 5,
-    "prod": 1057,
+    "prod": 1058,
     "projection": 175,
-    "support": 494,
-    "verify": 1387
+    "support": 495,
+    "verify": 1389
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -6731,6 +6731,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "PII 扫描/脱敏叶子件（纯标准库；不 import 任何 core 模块）。",
+      "path": "desktop/src/core/privacy_scan.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "正文级 lint（内部差距实证：NF 的风格门是 M80 的**档位 DNA 资产**——靠执行方自觉比对，",
       "path": "desktop/src/core/prose_lint.py",
       "role": "prod",
@@ -10525,6 +10531,12 @@
     {
       "function": "`nf preset` 面回归：退役端壳的预设语义接成 CLI 后，**真跑一遍全链**。",
       "path": "desktop/tests/test_preset_cli.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "隐私/数据生命周期契约（NF-Final WP-0B，P0 盲区 BL-01 的 closure 判据）。",
+      "path": "desktop/tests/test_privacy_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -14459,6 +14471,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "NF-Final §15A.1 隐私/数据生命周期机读登记（WP-0B）：数据类 → 分级/位置/含什么/存储与处理者/保留模式/删除方式与可复原证据。判据 desktop/tests/test_privacy_contract.py：路径在场、分级与保留词表、删除证据（复用 core.delete_evidence 的 kind 词表）、PII/凭据扫描面、restricted 不得入仓。人读面：PRIVACY.md + docs/privacy/{DATA_MAP,DPIA,RETENTION}.md。",
+      "path": "protocol/privacy.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "nf-release-policy/1",
       "path": "protocol/release_policy.json",
       "role": "verify",
@@ -14706,17 +14724,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "3effa28dcd9ce4d35247bd7a3fdc1bd77f326205fede9e67dce832f0a22565b4",
+  "root_digest": "4723164ba24ef658163e46a9ec23656728708b91ddea46dcb0c147a7b900d716",
   "rule_counts": {
-    "R-app": 1470,
-    "R-catch": 342,
+    "R-app": 1474,
+    "R-catch": 343,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 155,
     "R-support": 124,
-    "R-verify": 1260,
-    "auto:R-core": 288
+    "R-verify": 1262,
+    "auto:R-core": 289
   },
   "schema": "nf-role-coordinates/1"
 }
