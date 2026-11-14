@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-14",
   "approved_by": "Monyeah777",
-  "note": "NF-Final §4A R2 行为重建（11 流 + 3 状态机 + 失败语义）",
+  "note": "NF-Final §4A R3 耦合/重复实现（300 模块/540 边/0 环/9 SDP + 7 项裁定）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "9d55cc7f9d6ab7209f80b8289add5bab9825585e0e096525803632df0bb6d09a"
+  "subject_digest": "a0f90b48014fd298a076759a7a23a1b2193a283e8dc2463a1889346de07a4c8c"
 }

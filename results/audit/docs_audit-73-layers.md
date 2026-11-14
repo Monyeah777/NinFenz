@@ -15,14 +15,16 @@ subjects:
   - verify.sh:18e2089ead65a11b4729ded516860cdf1d31cdb54a35935051249b40fbf7b53d
   - docs/layers.md:7b849fb07769ba6df5ca888a9de5323417b47a07ef54ec2c1c801673a7fbd7c0
   - docs/L3_FROZEN.md:863a152271b1b969a3249194d1169628f4a4647a9bdd801473cfc9cb75c6643b
-  - protocol/assertions.json:c1d05937b85e7050323c076f5451afe1e8a68c0d9238365583d774dde4bb4d09
-  - protocol/data_contracts.json:f7dcc40776b126e93806c2ecea781d2c25e48c09f8225d06a3ac14b59dd57081
+  - protocol/assertions.json:46e55b06c0e532c12e73efb99957968c5f5f3a0a6411059148e9eb6cf47fe42c
+  - protocol/data_contracts.json:ae2362fb55b312383552c934c038c93d2a6011f79b1e2f5c6c876774f78cafc5
   - protocol/normative.json:c1bbc14c92cea6bd66ff6cb54fdcf91bf3072f66adee7027f1d3f42e70fe1825
   - protocol/glossary.json:0af6a0f3b1f128b30c0eb88a8db0d2c143461910a889737dfdf4e38e89f85ba7
   - desktop/src/core/receipts.py:b748915bb519aeeb1aa0f7d367df2eb7d4321b369b85905a7f918d8d55d96363
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
 
 ---
+> 重审（2026-11-14）：NF-Final R3 耦合/重复：新增 results/reverse/{COUPLING.md,coupling.json}、test_reverse_coupling.py；assertions/data_contracts/check12 权重与预算（2150→2175 容量调整）更新，被审对象变更后机械重绑
+
 > 重审（2026-11-14）：NF-Final R2 行为重建：新增 results/reverse/{BEHAVIOR.md,behavior.json}、test_reverse_behavior.py；assertions/data_contracts/check12 更新，被审对象变更后机械重绑
 
 > 重审（2026-11-14）：NF-Final R1 契约提取：新增 results/reverse/{CONTRACT_MAP.md,contracts.json}、test_reverse_contracts.py；assertions/data_contracts/check12 更新，被审对象变更后机械重绑

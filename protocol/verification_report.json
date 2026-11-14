@@ -298,7 +298,7 @@
       "stats": {
         "contracts": 27,
         "passed": 27,
-        "root": "fe9b52f4a32b16cd05c0067c09cbdc992f20c24b778a722b14e3dc7585f7b4da",
+        "root": "e64b703ac537f8f615a832e1175955c870a6eed4c72fedf8ed0aecd67ac4d4db",
         "verdict": "conformant"
       },
       "status": "pass",
@@ -526,8 +526,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4688,
-        "kernel": 2476,
+        "files": 4691,
+        "kernel": 2477,
         "kernel_no_self": 308,
         "rules": 9,
         "uncovered": 0,
@@ -555,7 +555,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "88215bbc9c7340281b18a052b6fb9afe530ad2deffeacfc2e194f6c1bf05e083",
+  "root_digest": "5a9f0aa867bd5b4dda607dbb47505cd48d4547b74b465fd1c58cac5c5269bd67",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

@@ -884,6 +884,18 @@
         "test_reverse_behavior",
         "results/reverse/BEHAVIOR.md"
       ]
+    },
+    {
+      "id": "reverse-coupling",
+      "artifact": "results/reverse/coupling.json",
+      "quality_rule": "assertion:reverse-coupling",
+      "owner": "§4A 逆向 R3 耦合/重复（test_reverse_coupling 实时重算判据）",
+      "status": "active",
+      "freshness": "模块图/依赖边/SDP 变化须重跑 R3（测试会实时重算比对）",
+      "consumers": [
+        "test_reverse_coupling",
+        "results/reverse/COUPLING.md"
+      ]
     }
   ]
 }

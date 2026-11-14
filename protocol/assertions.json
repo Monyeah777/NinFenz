@@ -823,6 +823,21 @@
       "message": "§4A R2 行为重建缺失或版本名不符（G0 逆向判据依赖它）",
       "fix": "补/修 results/reverse/behavior.json；再跑 test_reverse_behavior",
       "evidence": "test_reverse_behavior / conformance::modeling"
+    },
+    {
+      "id": "reverse-coupling",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "results/reverse/coupling.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-reverse-coupling/1"
+      },
+      "message": "§4A R3 耦合/重复实现件缺失或版本名不符（G0 逆向判据依赖它）",
+      "fix": "补/修 results/reverse/coupling.json；再跑 test_reverse_coupling",
+      "evidence": "test_reverse_coupling / conformance::modeling"
     }
   ]
 }
