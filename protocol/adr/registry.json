@@ -218,7 +218,186 @@
         "desktop/src/core/eval_harness.py",
         "docs/trust/THREAT_MODEL.md"
       ],
-      "falsifier": "若 nf-verify 报告写入评分字段、或 eval 分数进入运行时判定/对外等级，则本裁决失效。"
+      "falsifier": "若 nf-verify 报告写入评分字段、或 eval 分数进入运行时判定/对外等级，则本裁决失效。",
+      "plan_ref": "ADR-0008"
+    },
+    {
+      "id": "ADR-011",
+      "title": "生产/治理双平面独立：契约是唯一边界对象",
+      "status": "current",
+      "topic": "plane-independence",
+      "decision": "生产平面（LLMWiki/规范编译/上下文/Agent 适配/装配/输出/交付）与治理平面（契约生命周期/义务/证据/验证/锚/策略/报告）独立演进：生产 MUST NOT import 治理运行时，治理 MUST NOT import 生产运行时；两侧共享的只是契约 schema 与共享原语（事件/ID/canonical/存储），契约是唯一边界对象。治理默认不阻塞生产，仅在下游显式配置 require 时进入交付门。",
+      "supersedes": [],
+      "evidence": [
+        "protocol/trust/verify.schema.json",
+        "desktop/src/core/trust/verify.py",
+        "scripts/trust_verify.py",
+        "desktop/tests/test_trust_verify.py"
+      ],
+      "falsifier": "若生产模块顶层 import 治理实现、或治理侧 import 生产运行时才能完成验证、或未安装治理时生产无法完成一次交付，则本裁决被证伪。",
+      "plan_ref": "ADR-0001"
+    },
+    {
+      "id": "ADR-012",
+      "title": "LLMWiki 是投影，不是第二真源",
+      "status": "current",
+      "topic": "wiki-projection",
+      "decision": "Wiki 页/索引/图是投影：由真源（01–07、库目录、protocol/、域包 spec）编译生成，生成物禁止手改、也不承载第二真源；任何页面必须能回指 spec_ref 与来源 digest，源变更必须触发陈旧检查。既有 docs/standards/* 与 docs/verification-cards.md 的生成器纪律是本裁决的既有落点。",
+      "supersedes": [],
+      "evidence": [
+        "docs/standards/index.md",
+        "scripts/geo_export.py",
+        "docs/verification-cards.md",
+        "scripts/build_verification_cards.py"
+      ],
+      "falsifier": "若出现手改生成页、页面正文与真源重复且无 spec_ref、或源变更不触发陈旧判定，则本裁决被证伪。",
+      "plan_ref": "ADR-0002"
+    },
+    {
+      "id": "ADR-013",
+      "title": "规范驱动：无 spec 不生成，槽位有界",
+      "status": "current",
+      "topic": "spec-driven",
+      "decision": "生产必须先由 spec 编译出 nf-task/1 与 nf-assembly/1，Agent 只在有界槽位内填充；无 spec 不得自由生成整篇，输出必须过 contract/output 校验；未知/缺失/歧义 spec 一律 fail-closed 拒绝，不默认放行。",
+      "supersedes": [],
+      "evidence": [
+        "06_Agent执行协议.md",
+        "01_核心协议.md",
+        "desktop/src/core/machine_contract.py",
+        "protocol/normative.json"
+      ],
+      "falsifier": "若存在无 spec 的自由生成路径、槽位可越界写入、或输出绕过 contract/output 校验仍被接收，则本裁决被证伪。",
+      "plan_ref": "ADR-0003"
+    },
+    {
+      "id": "ADR-014",
+      "title": "Agent 是 adapter，不是架构中心",
+      "status": "current",
+      "topic": "agent-adapter",
+      "decision": "Agent 引擎是可替换填充器：通过 AgentAdapter 契约接入（能力/成本/时延/确定性声明），同一 spec 至少可被两个 adapter 执行；架构中心是契约与生产/装配平面，不是任何特定模型或 Agent 产品。",
+      "supersedes": [],
+      "evidence": [
+        "desktop/src/core/agent_rules_adapter.py",
+        "desktop/tests/test_agent_rules_adapter.py",
+        "desktop/src/core/driver.py",
+        "06_Agent执行协议.md"
+      ],
+      "falsifier": "若生产路径硬编码单一 Agent 产品、或 adapter 无法在不改 spec 的前提下替换，则本裁决被证伪。",
+      "plan_ref": "ADR-0004"
+    },
+    {
+      "id": "ADR-015",
+      "title": "治理基础设施复用成熟生态：签名/时间戳/透明日志不重造",
+      "status": "current",
+      "topic": "ecosystem-reuse",
+      "decision": "签名/时间戳/透明日志/证明格式复用 in-toto、Sigstore/Rekor、RFC 3161、DSSE/PAE 等成熟标准与实现，不自造密码学或日志基础设施；仓内只做契约、适配器与离线复算，缺失适配器时显式降级/不可判定，不伪装通过。",
+      "supersedes": [],
+      "evidence": [
+        "protocol/trust/dsse.schema.json",
+        "desktop/src/core/attest.py",
+        "desktop/src/core/timestamp.py",
+        "desktop/src/core/interop_export.py",
+        "results/interop/intoto.json"
+      ],
+      "falsifier": "若仓内自研签名/TSA/透明日志协议、或外部适配器缺失时仍声称对应等级达成，则本裁决失效。",
+      "plan_ref": "ADR-0005"
+    },
+    {
+      "id": "ADR-016",
+      "title": "策略复用 OPA/Cedar：不自造策略引擎",
+      "status": "current",
+      "topic": "policy-adapter",
+      "decision": "契约义务到策略的编译只做 OPA/Rego 与 Cedar 适配，不自造通用策略引擎或策略语言；策略输入输出以 nf-trust-policy/1 一类契约表达，策略判定结果可复算、可解释。",
+      "supersedes": [],
+      "evidence": [
+        "protocol/trust/policy.schema.json",
+        "protocol/trust/verify.schema.json",
+        "desktop/tests/test_trust_verify.py",
+        "docs/trust/THREAT_MODEL.md"
+      ],
+      "falsifier": "若仓内出现自研策略语言/引擎并要求下游采用、或策略判定不可离线复算，则本裁决失效。",
+      "plan_ref": "ADR-0006"
+    },
+    {
+      "id": "ADR-017",
+      "title": "AIBOM/模型卡对齐 CycloneDX/SPDX 等标准",
+      "status": "current",
+      "topic": "ai-bom-standard",
+      "decision": "AI BOM 与模型卡导出对齐 CycloneDX/SPDX 生态（复用已有 interop 导出面），不自造 BOM 格式；模型卡绑定模型/版本/provider/能力/限制/eval 引用，模型替换必须使旧证据失效。",
+      "supersedes": [],
+      "evidence": [
+        "results/interop/cyclonedx.json",
+        "results/interop/sbom.json",
+        "protocol/trust/model-card.schema.json",
+        "desktop/src/core/trust/model_card.py"
+      ],
+      "falsifier": "若 AI BOM 使用私有格式且无法被 CycloneDX/SPDX 工具消费、或模型替换后旧证据仍判有效，则本裁决失效。",
+      "plan_ref": "ADR-0007"
+    },
+    {
+      "id": "ADR-018",
+      "title": "治理附件模式 none/observe/require：默认不阻塞",
+      "status": "current",
+      "topic": "governance-attachment",
+      "decision": "治理以附件模式接入交付：none（不挂）、observe（只记录不阻断）、require（下游显式要求时才进入门）；默认 none/observe，生产自治优先；三模式必须可配置、可测试，且不得因治理缺失而伪造通过。",
+      "supersedes": [],
+      "evidence": [
+        "protocol/trust/verify.schema.json",
+        "desktop/src/core/trust/verify.py",
+        "docs/trust/THREAT_MODEL.md",
+        "desktop/tests/test_trust_verify.py"
+      ],
+      "falsifier": "若默认模式会阻断生产、或 require 之外的失败被静默改写为通过、或三模式无法配置测试，则本裁决失效。",
+      "plan_ref": "ADR-0009"
+    },
+    {
+      "id": "ADR-019",
+      "title": "生成物不可手改：真源唯一 + 生成器受审",
+      "status": "current",
+      "topic": "generated-immutable",
+      "decision": "真源唯一、生成物禁止手改：所有生成区（标准索引、层页、验证卡册、protocol/generated、results/interop 等）由生成器产出，禁止手改；判据必须是「生成物 == 实时重算」或「digest 钉住」，改生成器才算改动；生成物漂移即红。",
+      "supersedes": [],
+      "evidence": [
+        "docs/standards/index.md",
+        "docs/layers.md",
+        "protocol/generated/README.md",
+        "scripts/geo_export.py",
+        "scripts/build_verification_cards.py"
+      ],
+      "falsifier": "若生成物可被手改而门禁不红、或同一内容存在第二真源，则本裁决失效。",
+      "plan_ref": "ADR-0010"
+    },
+    {
+      "id": "ADR-020",
+      "title": "跨 Agent 可移植是一等验收",
+      "status": "current",
+      "topic": "agent-portability",
+      "decision": "跨 Agent 可移植是一等验收：同一 spec 经两个不同 Agent adapter 产出的可交付物都必须过同一契约/输出校验；差异只允许在质量而不在契约；parity 是每个阶段的退出条件，不是可选项。",
+      "supersedes": [],
+      "evidence": [
+        "desktop/src/core/agent_rules_adapter.py",
+        "desktop/src/core/driver.py",
+        "desktop/tests/test_agent_rules_adapter.py",
+        "06_Agent执行协议.md"
+      ],
+      "falsifier": "若同一 spec 在两个 adapter 下产出契约不一致、或只有一个 adapter 能通过验收，则本裁决失效。",
+      "plan_ref": "ADR-0011"
+    },
+    {
+      "id": "ADR-021",
+      "title": "自扫描/自补全是交付的一部分",
+      "status": "current",
+      "topic": "self-audit-delivery",
+      "decision": "自扫描/自补全是交付的一部分：每个阶段必须产出机器可读自审计（S0–S15 维度 + P0/P1 分诊 + claim 状态）与人读报告，未关闭项须有 owner/OPEN/ACCEPTED-RISK；停止条件（P0=0、P1 有 owner、UNSUPPORTED=0）不满足不得进入下一 Gate；自审计不是「跑一遍测试」。",
+      "supersedes": [],
+      "evidence": [
+        "scripts/trust_self_audit.py",
+        "results/trust/SELF_AUDIT.json",
+        "docs/trust/SELF_AUDIT.md",
+        "scripts/self_audit_probe.py"
+      ],
+      "falsifier": "若某阶段无自审计件仍被放行、或把未跑门禁写成全绿、或 P0 未清零即进入下一 Gate，则本裁决失效。",
+      "plan_ref": "ADR-0012"
     }
   ]
 }

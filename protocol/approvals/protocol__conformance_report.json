@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-14",
   "approved_by": "Monyeah777",
-  "note": "NF-Final WP-00 基线审计 + R0 仓库考古（results/ 新增两件）",
+  "note": "NF-Final WP-04 裁决登记（ADR-011..021 + plan_ref 映射 + 契约测试，EOL 修正后重冻）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "382db9e8bf9a931abb4e0524020d727c1f382a0b8d4022678de5ec4a98e7161d"
+  "subject_digest": "d7b49317de3812599742db3568d57e8052e30fb5f6c858051b07f48f7a284f9a"
 }

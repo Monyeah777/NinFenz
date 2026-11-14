@@ -49,10 +49,65 @@
       "id": "ADR-010",
       "status": "current",
       "topic": "trust-noscore"
+    },
+    {
+      "id": "ADR-011",
+      "status": "current",
+      "topic": "plane-independence"
+    },
+    {
+      "id": "ADR-012",
+      "status": "current",
+      "topic": "wiki-projection"
+    },
+    {
+      "id": "ADR-013",
+      "status": "current",
+      "topic": "spec-driven"
+    },
+    {
+      "id": "ADR-014",
+      "status": "current",
+      "topic": "agent-adapter"
+    },
+    {
+      "id": "ADR-015",
+      "status": "current",
+      "topic": "ecosystem-reuse"
+    },
+    {
+      "id": "ADR-016",
+      "status": "current",
+      "topic": "policy-adapter"
+    },
+    {
+      "id": "ADR-017",
+      "status": "current",
+      "topic": "ai-bom-standard"
+    },
+    {
+      "id": "ADR-018",
+      "status": "current",
+      "topic": "governance-attachment"
+    },
+    {
+      "id": "ADR-019",
+      "status": "current",
+      "topic": "generated-immutable"
+    },
+    {
+      "id": "ADR-020",
+      "status": "current",
+      "topic": "agent-portability"
+    },
+    {
+      "id": "ADR-021",
+      "status": "current",
+      "topic": "self-audit-delivery"
     }
   ],
   "counts": {
-    "adrs": 10,
+    "adrs": 21,
     "current_docs": 10,
     "docs": 16
   },
