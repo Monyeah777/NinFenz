@@ -5,8 +5,8 @@
     "floor": 5,
     "prod": 1057,
     "projection": 167,
-    "support": 475,
-    "verify": 1340
+    "support": 477,
+    "verify": 1344
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7385,6 +7385,18 @@
       "rule": "R-verify"
     },
     {
+      "function": "nf-context-lineage/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/context-lineage-bad-head.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-context-lineage/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/context-lineage-missing-prev.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "nf-dsse/1",
       "path": "desktop/tests/fixtures/trust/schemas/invalid/dsse-bad-payload.json",
       "role": "verify",
@@ -7507,6 +7519,12 @@
     {
       "function": "nf-claim-bundle/1",
       "path": "desktop/tests/fixtures/trust/schemas/valid/claim-bundle.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-context-lineage/1",
+      "path": "desktop/tests/fixtures/trust/schemas/valid/context-lineage.json",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -11189,6 +11207,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "trust.context_lineage 判据：prompt/context 血缘链 + 三方绑定（claim #34 / FR-A4-04）。",
+      "path": "desktop/tests/test_trust_context_lineage.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "trust.dsse 判据：pae 向量逐条 + 信封签名/验签 + 篡改矩阵 + 算法白名单。",
       "path": "desktop/tests/test_trust_dsse.py",
       "role": "verify",
@@ -11231,7 +11255,7 @@
       "rule": "R-verify"
     },
     {
-      "function": "Trust Fabric schema 门禁（WP-01/21/23/30/31）：11 件 IDL、正/反样例与变异自证。",
+      "function": "Trust Fabric schema 门禁（WP-01/21/23/30/31/32）：12 件 IDL、正/反样例与变异自证。",
       "path": "desktop/tests/test_trust_schemas.py",
       "role": "verify",
       "rule": "R-verify"
@@ -14424,16 +14448,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "103da70299393233f5c08606aa64de77088029c69e0a277fbec0ec380630cbf1",
+  "root_digest": "7e8365e6e26af89ff84d95f00b588c7369b824d642421b1ef34670891dc59319",
   "rule_counts": {
     "R-app": 1468,
-    "R-catch": 323,
+    "R-catch": 325,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 147,
     "R-support": 124,
-    "R-verify": 1214,
+    "R-verify": 1218,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

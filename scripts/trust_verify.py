@@ -24,6 +24,7 @@ sys.path.insert(0, str(ROOT / "desktop" / "src"))
 
 from core import atomic_write, json_doc  # noqa: E402
 from core.trust import anchor as ta  # noqa: E402
+from core.trust import context_lineage as tcl  # noqa: E402
 from core.trust import dsse  # noqa: E402
 from core.trust import entity as te  # noqa: E402
 from core.trust import keys as tk  # noqa: E402
@@ -142,6 +143,12 @@ def main(argv=None) -> int:
     ap.add_argument("--model-card", default="", help="nf-model-card/1 模型卡（可选）")
     ap.add_argument("--current-card", default="", help="当前模型卡（用于检测模型替换/评测变更）")
     ap.add_argument("--ai-evidence", default="", help="AI 证据实体 JSON（绑定模式）")
+    ap.add_argument("--context-lineage", default="",
+                    help="nf-context-lineage/1 上下文血缘（与 --ai-evidence 合用）")
+    ap.add_argument("--lineage", default="",
+                    help="只校验 context lineage（可配 --model-card 绑定）")
+    ap.add_argument("--lineage-build", default="", help="构建模式：输出 lineage 文件路径")
+    ap.add_argument("--contexts", default="", help="构建模式输入：[{role, content_b64}] JSON")
     ap.add_argument("--root", default=str(ROOT), help="仓库根（读冻结 schema 用）")
     ap.add_argument("--json", action="store_true", help="输出 nf-verify/1 报告 JSON")
     ap.add_argument("--out", default="", help="把报告写入文件（原子写）")
@@ -157,6 +164,37 @@ def main(argv=None) -> int:
     ap.add_argument("--witness-material", default="", help="witness hmac 材料 {id: hex}")
     ap.add_argument("--sth-material", default="", help="STH hmac 材料 {log_id: hex}")
     args = ap.parse_args(argv)
+    if args.lineage_build:
+        if not args.model_card or not args.contexts:
+            print("不可判定：--lineage-build 需要 --model-card 与 --contexts", file=sys.stderr)
+            return tv.EXIT_UNDECIDABLE
+        try:
+            card = tmc.load_card(args.model_card)
+            raw = json_doc.load(Path(args.contexts), list, what="contexts")
+            import base64
+            contents = [(str(item["role"]), base64.b64decode(str(item["content_b64"])))
+                        for item in raw]
+            doc = tcl.build_lineage(tmc.identity_digest(card), contents)
+            atomic_write.write_text(Path(args.lineage_build),
+                                    json.dumps(doc, ensure_ascii=False, indent=2) + "\n")
+        except (KeyError, OSError, ValueError) as exc:
+            print(f"不可判定：{exc}", file=sys.stderr)
+            return tv.EXIT_UNDECIDABLE
+        print(f"lineage built: head={doc['head'][:16]} segments={len(doc['segments'])}")
+        return 0
+    if args.lineage:
+        try:
+            lineage = tcl.load_lineage(args.lineage)
+            card = tmc.load_card(args.model_card) if args.model_card else None
+            result = tcl.verify_lineage(lineage, card, root=args.root)
+        except (OSError, ValueError) as exc:
+            print(f"不可判定：{exc}", file=sys.stderr)
+            return tv.EXIT_UNDECIDABLE
+        if result.get("ok"):
+            print(f"valid context lineage: head={result['head']}")
+            return 0
+        print(f"invalid context lineage: {result['issues'][0]['code']}")
+        return 1
     if args.ai_evidence:
         if not args.model_card:
             print("不可判定：--ai-evidence 模式需要 --model-card", file=sys.stderr)
@@ -169,12 +207,20 @@ def main(argv=None) -> int:
         except (OSError, ValueError) as exc:
             print(f"不可判定：{exc}", file=sys.stderr)
             return tv.EXIT_UNDECIDABLE
-        result = tmc.check_binding(evidence, bound, current, schema)
+        if args.context_lineage:
+            lineage = tcl.load_lineage(args.context_lineage)
+            result = tcl.check_context_binding(evidence, bound, lineage, root=args.root)
+            label = "model-card + context-lineage"
+        else:
+            result = tmc.check_binding(evidence, bound, current, schema)
+            label = "model-card"
         if result.get("ok"):
-            print(f"valid model-card binding: {result['bound_digest']}"
-                  + (f"（warning: {result['warning']}）" if result.get("warning") else ""))
+            extra = f" lineage={result.get('lineage_digest', '')[:16]}"
+            primary = result.get("bound_digest") or result.get("card_digest")
+            warning = f"（warning: {result['warning']}）" if result.get("warning") else ""
+            print(f"valid {label} binding: {primary}" + extra + warning)
             return 0
-        print(f"invalid model-card binding: {result.get('reason')}")
+        print(f"invalid {label} binding: {result.get('reason')}")
         return 1
     if args.entities:
         if not args.type_registry or not args.policy or not args.issuer_registry:

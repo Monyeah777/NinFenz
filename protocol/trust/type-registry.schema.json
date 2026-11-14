@@ -29,8 +29,8 @@
           "items": {"type": "string", "pattern": "^nf:[a-z0-9-]+:[a-z0-9-]+$", "maxLength": 96}
         },
         "allowed_ref_kinds": {
-          "type": "array", "minItems": 1, "maxItems": 8,
-          "items": {"enum": ["claim", "evidence", "process-step", "bundle", "card", "artifact"]}
+          "type": "array", "minItems": 1, "maxItems": 9,
+          "items": {"enum": ["claim", "evidence", "process-step", "bundle", "card", "artifact", "context"]}
         },
         "compose_with": {
           "type": "array", "maxItems": 64,

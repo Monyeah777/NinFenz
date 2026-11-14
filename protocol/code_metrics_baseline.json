@@ -1791,9 +1791,9 @@
       "max_fn_lines": 47
     },
     "scripts/trust_verify.py": {
-      "lines": 253,
-      "max_fn_cc": 32,
-      "max_fn_lines": 121
+      "lines": 299,
+      "max_fn_cc": 42,
+      "max_fn_lines": 166
     },
     "scripts/verifier_status.py": {
       "lines": 98,
