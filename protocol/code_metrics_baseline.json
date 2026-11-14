@@ -71,9 +71,9 @@
       "max_fn_lines": 50
     },
     "desktop/src/core/assembly_runtime.py": {
-      "lines": 187,
+      "lines": 194,
       "max_fn_cc": 18,
-      "max_fn_lines": 77
+      "max_fn_lines": 83
     },
     "desktop/src/core/assertions.py": {
       "lines": 299,
@@ -974,6 +974,11 @@
       "lines": 1508,
       "max_fn_cc": 29,
       "max_fn_lines": 71
+    },
+    "desktop/src/core/output_validation.py": {
+      "lines": 167,
+      "max_fn_cc": 15,
+      "max_fn_lines": 36
     },
     "desktop/src/core/pack_combo.py": {
       "lines": 1299,

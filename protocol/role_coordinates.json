@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1499,
+    "app": 1500,
     "entry": 26,
     "floor": 5,
     "prod": 1065,
-    "projection": 203,
+    "projection": 204,
     "support": 510,
-    "verify": 1420
+    "verify": 1422
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -6659,6 +6659,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "Output / Validation（WP-22）：把产物按 contract + output form 独立校验，失败拒收。",
+      "path": "desktop/src/core/output_validation.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "域包自由组合引擎（任意 n 元 × 任意组件）。",
       "path": "desktop/src/core/pack_combo.py",
       "role": "verify",
@@ -10375,6 +10381,12 @@
     {
       "function": "产出面清单的**落点逃逸**门禁（外来投稿 ⇄ 仓库外写入）。",
       "path": "desktop/tests/test_output_path_escape.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "WP-22 Output/Validation 判据（contract + output form；失败拒收）。",
+      "path": "desktop/tests/test_output_validation_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -14952,17 +14964,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "e6007956f9ab39146c0bff4db64ff5210e648d5187a6a9080fe675f1097d3c68",
+  "root_digest": "efbc3595c251f22ee7a3cc354d708514c82822e1d179c5a17cb9ea851864a549",
   "rule_counts": {
-    "R-app": 1499,
+    "R-app": 1500,
     "R-catch": 356,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 180,
+    "R-projection": 181,
     "R-support": 124,
-    "R-verify": 1291,
-    "auto:R-core": 303
+    "R-verify": 1292,
+    "auto:R-core": 304
   },
   "schema": "nf-role-coordinates/1"
 }

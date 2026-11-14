@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-14",
   "approved_by": "Monyeah777",
-  "note": "NF-Final G2 WP-21（预算容量调整 + 收尾）",
+  "note": "NF-Final G2 WP-22 Output/Validation（form+contract+拒收）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "0125e82db37151ab0a367f9949cdc6636fe24199d77039fedf306791c3e671ef"
+  "subject_digest": "af3888d92c0e31ca80c3f793ff299f9444dd2cff820005345591b047fe23cd94"
 }

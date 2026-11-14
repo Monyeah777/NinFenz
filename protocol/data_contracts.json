@@ -1006,6 +1006,18 @@
         "test_assembly_runtime_contract",
         "docs/assembly-runtime.md"
       ]
+    },
+    {
+      "id": "output-report",
+      "artifact": "results/output/output-report.json",
+      "quality_rule": "assertion:output-report",
+      "owner": "Output/Validation（core/output_validation.py + test_output_validation_contract）+ WP-22",
+      "status": "active",
+      "freshness": "task/adapter/form 口径变化后重跑 write_report（committed == 实时重算）",
+      "consumers": [
+        "test_output_validation_contract",
+        "docs/output-validation.md"
+      ]
     }
   ]
 }

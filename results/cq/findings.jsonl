@@ -92,3 +92,4 @@
 {"dim": "vulture", "file": "desktop\\src\\core\\eval_collapse.py", "fix": "人工确认后删/加白", "id": "F-092", "line": 0, "message": "desktop\\src\\core\\eval_collapse.py:32: unused variable 'collapse' (100% confidence)", "owner": "maintainers", "severity": "P3", "status": "open"}
 {"dim": "vulture", "file": "desktop\\src\\core\\meta_cockpit\\chain_vertical.py", "fix": "人工确认后删/加白", "id": "F-093", "line": 0, "message": "desktop\\src\\core\\meta_cockpit\\chain_vertical.py:164: unused variable 'n_subs' (100% confidence)", "owner": "maintainers", "severity": "P3", "status": "open"}
 {"dim": "claims-words", "file": "docs/agent-adapter.md", "fix": "改否定语境或删除声明", "id": "F-094", "line": 4, "message": "疑似过度声明：合规", "owner": "maintainers", "severity": "P2", "status": "open"}
+{"dim": "claims-words", "file": "docs/output-validation.md", "fix": "改否定语境或删除声明", "id": "F-095", "line": 4, "message": "疑似过度声明：合规", "owner": "maintainers", "severity": "P2", "status": "open"}
