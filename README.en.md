@@ -57,7 +57,7 @@ Keybindings follow the mainstream terminal conventions: `Tab` switches panes, `�
 
 `python tui/nf.py` opens the full-screen UI; `--selftest` runs the security self-check, `--demo` prints exactly the frame above, and `--exec "nf doctor"` is the scriptable surface
 (no TTY needed either: `--list-actions --json` gives agents the actions and exit codes). Commands run on a worker thread, so `Ctrl-C` while running cancels just that command;
-path arguments pass repository-containment checks, writes require typing `yes`, and API keys are read from the environment and masked. A single-file executable is shipped alongside.
+path arguments pass repository-containment checks, writes require typing `yes`, and API keys are read from the environment and masked.
 Details: `tui/README.md`.
 
 > MIT License · original open source · please cite the source when deriving/referencing
@@ -68,15 +68,16 @@ Details: `tui/README.md`.
 
 **What it is not**: not a model, not a prompt-template collection, not a vendor SDK — the protocol itself is domain-neutral and model-agnostic, and MCP is just one supported connection protocol.
 
-`bash verify.sh`（check 数与脚本版本以生成的统计区为准；本文档不钉运行时计数） · `python scripts/nf.py stats --check`
+`bash verify.sh` (check counts and script version live in the generated stats block; runtime counters are deliberately not pinned in prose; quick static-only pass: `bash verify.sh --checks-only`) · `python scripts/nf.py --version`
 
 > **Bilingual rule**: this file mirrors `README.md` section by section; the Chinese `README.md` is authoritative. The machine-checkable facts (version, check count, PASS baseline, protocol files, machine entries) are asserted identical by `verify.sh` check34 — a drift fails the gate.
-> 最后更新：2026-09-20
+> Last updated: 2026-11-12
 
 ## ⚡ If you are an AI / Agent
 
 - What this is: a spec-driven document factory — load modules/pipelines/assets → validate → emit.
-- Entry chain: `docs/agent/AGENT_START.md` (start) → `docs/agent/AI_ROUTING.md` (pick a route) → `docs/meta/DEEP_DIVE.md` (go deep).
+- Entry chain: `docs/agent/AGENT_START.md` (start) → `docs/agent/AI_ROUTING.md` (pick a route) → `docs/meta/DEEP_DIVE.md` (go deep); cloud pickup / recall by ID / submission guidance go through `docs/agent/ROUTES.md`.
+- Once installed: `npx -y ninfenz doctor` (health check 17/17) → `nf serve` (read-only MCP); the full install → self-check → MCP guide ships at the repository root.
 - Machine credential: `bash verify.sh` (run it locally — the static check count and script version live in the generated stats block below; runtime counters are deliberately not pinned in prose); the machine entry list is `llms.txt`; locales are `README.en.md` · `README.ja.md` (all three entries' machine facts and language switcher lines are asserted consistent by check34's locale scan; registry = `protocol/locales.json`).
 - To understand why NF is designed this way: read [docs/meta/DEEP_DIVE.md](docs/meta/DEEP_DIVE.md).
 
@@ -90,8 +91,10 @@ Human (author/developer, 5 minutes):
 2. `python scripts/nf.py shell` (interactive terminal — the human entry after the shell line retired; see `docs/terminal.md`)
 3. `python scripts/nf.py demo`
 4. `python scripts/nf.py --help`
-5. `python scripts/nf.py doctor`
+5. `python scripts/nf.py doctor` (health check: 17/17 passed)
 6. `python scripts/nf.py completion bash`
+
+Per-step acceptance: `bash verify.sh` must end with `PASS=` equal to the baseline and `FAIL=0`; `nf doctor` and every other command must exit 0 for that step to count as passed. On Windows run `bash verify.sh` from Git Bash; for a static-only fast pass use `bash verify.sh --checks-only` (no test run).
 
 > **Security boundary (`nf verify` executes the target repository's own gate scripts)**: the engine
 > runs the embedded Python from the target repo's `verify.sh` **in-process** (CWE-94). It therefore
@@ -119,6 +122,9 @@ AI assembly:
 - **How is output judged?** Only by the internal chain: the verify gate (statically checkable) + the five-axis depth review + real drills. External praise is not used as quality evidence.
 - **How do I cite it?** MIT license; please credit the source — machine-readable metadata lives in `CITATION.cff` at the repository root.
 - **Export & compliance?** Cryptography uses only the standard library plus external `ssh-keygen` (no home-grown algorithms); the export-control reading is in `docs/EXPORT.md`.
+- **How do I install it?** Zero-install: `npx -y ninfenz --version` (npm package `ninfenz`, no paid tier); to modify protocols or run the full gate, `git clone` then `python scripts/nf.py doctor` → `bash verify.sh`.
+- **What are the environment requirements?** Python ≥ 3.11 (core is standard-library only, no pip install); Node ≥ 18.17 only for the npm entry; on Windows run `bash verify.sh` from Git Bash.
+- **How do I connect MCP?** `nf serve` starts a read-only stdio server; declare `mcpServers` as `{ "ninfenz": { "command": "npx", "args": ["-y", "ninfenz", "serve"] } }`; the capability surface is 12 tools + 1 prompt (`assemble_guide`).
 
 ## Capabilities and assets
 
@@ -168,6 +174,8 @@ Last three content releases, described by **what they add**:
 | v0.93 | 2026-10-05 | knowledge-layer retrieval, terminal surface, digital-asset contracts (reusable across projects) |
 | v0.92 | 2026-09-10 | world-state model: deterministic abstract state + slots (same input, same output) |
 | v0.82 | 2026-09-09 | 45-point quality depth plus foundation layer A |
+
+Version sources: the CLI line = `pyproject.toml` (reconciled with npm package metadata); the quality baseline = `protocol/repo_stats.json` (asserted by `nf stats --check`).
 
 Release rules (since 2026-10-20): the content line uses `v0.xx` — small updates fold into the current release, a modest breakthrough adds **0.01**, an innovation adds **0.1**; the CLI line
 is versioned independently as `1.0.x`; every release updates `CHANGELOG.md`, and tags are placed

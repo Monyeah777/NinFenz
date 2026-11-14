@@ -316,6 +316,19 @@ class ReleaseAndSafetyTest(unittest.TestCase):
         self.assertEqual(build_atom_menu.render(), saved,
                          "ATOM_MENU.md 已与应用菜单生成器漂移（修复指引：运行模块 main 重生成）")
 
+    def test_atom_menu_documents_how_to_read_it(self):
+        """菜单必须自带读法（字段 / 选择纪律 / 执行器关系 / 分组口径）+ 33 原子 5 组。"""
+        saved = (PACKAGE / "ATOM_MENU.md").read_text(encoding="utf-8")
+        for marker in ("## 怎么读这一页", "**字段**", "**选择纪律**",
+                       "**与执行器的关系**", "**分组口径**"):
+            self.assertIn(marker, saved, f"菜单缺读法要素：{marker}")
+        self.assertIn("fail-closed", saved)
+        groups = [line for line in saved.splitlines() if line.startswith("## ")
+                  and line[3:] in ("知识", "监控", "控制", "评价", "整合")]
+        self.assertEqual(5, len(groups), "五个 function 分组必须齐全")
+        atoms = [line for line in saved.splitlines() if line.startswith("- `")]
+        self.assertGreaterEqual(len(atoms), 33, "菜单原子行数不足 33")
+
     def test_manifest_binds_runtime_and_limits(self):
         manifest = meta_runtime_manifest.build()
         self.assertEqual([], meta_runtime_manifest.verify(manifest))

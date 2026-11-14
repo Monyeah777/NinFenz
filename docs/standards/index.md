@@ -7,6 +7,14 @@
 - 可达性是**本机实测**（探针日期见每条），不可达条目照实标注、不假装可达。
 - 每条标准一个稳定锚：`#<id>`（如 `docs/standards/index.md#onnx`）。
 
+## 口径与复现
+
+- 生成物：`python scripts/geo_export.py --write` 重写本页；`--check` 比对生成物与真源，不一致即红。手改必红。
+- 每行字段：名称 · 机构 · 层 · 可达（HTTP · 探针日期） · 扩展点 · 绑定（主锚/辅锚） · 规范 URL。
+- 锚点：每条标准一个稳定锚 `#<id>`（例如 `#onnx`），可直接被生成式引擎引用。
+- 其它面：按层切片见 `layer-<layer>.md`；按问题形态聚合见 `answer-cards.md`。
+- 数据/代码/脚本三面一致性由 check40 判；本页只是**投影**，不是第二份事实。
+
 ### `adbc`
 - ADBC 数据库访问接口 · Apache · 层 data · 可达 是（200 · 2026-09-24） · 扩展点 driver-manager, statement-option · 绑定 主锚 0 / 辅锚 0 · https://arrow.apache.org/adbc/
 

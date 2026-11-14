@@ -13,3 +13,24 @@
 **标签 / Tags**：mcp, content-contract, spec-driven, verification, knowledge-base, python, llm
 **许可 / License**：MIT
 **图标 / Icon**：packaging/mcp/assets/icon-400.png（400×400 PNG）
+
+
+---
+
+## 字段自检（与材料包同源 · 2026-11-14 复核补）
+
+| 字段 | 本文件的值 | 真源 |
+|---|---|---|
+| 名称 | NinFenz Content Gate | `SUBMIT.md §4` / `DIRECTORIES.md §1` |
+| 仓库 | `https://github.com/Monyeah777/NinFenz` | 同上 |
+| 站点 | `https://ninfenz.dev/` | 同上 |
+| 安装 | `npx -y ninfenz serve` | 同上（零安装路径） |
+| 工具面 | 12 只读工具 + 1 prompt（`assemble_guide`），无写路径 | `desktop/src/core/mcp_runtime.py` |
+| 依赖 | 零第三方（Python 标准库） | `pyproject.toml` 的 `dependencies` 为空 |
+| 图标 | `packaging/mcp/assets/icon-400.png`（**真实 400×400**，读 IHDR） | `assets/README.md` |
+| 许可 | MIT | `LICENSE` |
+
+- **短表单族对偶**：本件与 `07-mcpservers-org.md` 的**字段正文逐字相同**（判据 `test_short_form_submission_doc_contract` 会逐行比对）；只有标题与入口不同。改一处必须两处一起改。
+- **平台侧未验**：mcpmarket 的提交入口在页脚、字段名以页面为准；收录与否不可从仓库证明。
+- **不钉运行时计数**：描述文案不带 check/PASS/单测条数。
+- 该站无审核 SLA；提交后不催、不重复投。

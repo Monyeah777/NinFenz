@@ -36,6 +36,53 @@ HEAD = ("> 本页由 `python scripts/geo_export.py --write` 生成，禁止手�
         "真源：`protocol/standards_catalog.json` + `protocol/standards_binding.json`。")
 
 
+_HOWTO_INDEX = [
+    "## 口径与复现", "",
+    "- 生成物：`python scripts/geo_export.py --write` 重写本页；"
+    "`--check` 比对生成物与真源，不一致即红。手改必红。",
+    "- 每行字段：名称 · 机构 · 层 · 可达（HTTP · 探针日期） · 扩展点 · "
+    "绑定（主锚/辅锚） · 规范 URL。",
+    "- 锚点：每条标准一个稳定锚 `#<id>`（例如 `#onnx`），可直接被生成式引擎引用。",
+    "- 其它面：按层切片见 `layer-<layer>.md`；按问题形态聚合见 `answer-cards.md`。",
+    "- 数据/代码/脚本三面一致性由 check40 判；本页只是**投影**，不是第二份事实。",
+    "",
+]
+LAYER_NOTES = {
+    "data": "数据/格式/模式与交换表示（文件格式、schema 语言、数据模型与语义词汇）",
+    "eng": "工程方法与过程约定（架构建模、构建交付、可观测性与协作约定）",
+    "form": "呈现与文档形态（标记语言、排版、图示与文档结构）",
+    "gov": "治理/合规/风险与制度框架（法规、审计准则、安全与隐私框架）",
+    "iface": "接口/协议与互操作（传输、API、身份与消息协议）",
+}
+
+
+_HOWTO_LAYER = [
+    "## 怎么读本页", "",
+    "- 生成物：`python scripts/geo_export.py --write` 重写本页；"
+    "`--check` 比对生成物与真源，不一致即红。手改必红。",
+    "- 切片口径：本页只收 `layer` 等于该层的标准，锚点与主索引 `index.md` 逐字一致。",
+    "- 行字段：名称 · 机构 · 层 · 可达（HTTP · 探针日期） · 扩展点 ·"
+    " 绑定（主锚/辅锚） · 规范 URL。",
+    "- 互指：全量见 `index.md`；按问题形态聚合见 `answer-cards.md`；"
+    "三面一致性由 check40 判，本页只是**投影**。",
+    "",
+]
+
+
+_HOWTO_CARDS = [
+    "## 口径与复现", "",
+    "- 生成物：`python scripts/geo_export.py --write` 重写本页；"
+    "`--check` 是新鲜度判据"
+    "（生成物与真源不一致即红）。**手改必红**。",
+    "- 计数口径：覆盖数取自 `protocol/standards_catalog.json`"
+    "（`standards / reachable / unreachable / bodies / depends_edges`）；"
+    "绑定数取自 `protocol/standards_binding.json`（总量 + 主锚/辅锚）。",
+    "- 可达性 = 本机探针实测（探针日期逐条写在主索引行内）；不可达条目照实披露。",
+    "- 数据/代码/脚本三面一致性由 check40 判；本页只是**投影**，不是第二份事实。",
+    "",
+]
+
+
 def _load(root: str) -> Tuple[List[Dict[str, Any]], Dict[str, Any], Dict[str, Dict[str, int]]]:
     cat = json_doc.load(os.path.join(root, CATALOG_REL), dict, what=CATALOG_REL)
     bind = json_doc.load(os.path.join(root, BINDING_REL), dict, what=BINDING_REL)
@@ -81,6 +128,41 @@ def _head(title: str, coverage: Dict[str, Any], extra: str = "") -> List[str]:
     return lines
 
 
+def _layer_body(layer, rows, coverage, counts):
+    head = _head("标准目录 · 层 %s（%d 条）" % (layer, len(rows)), coverage,
+                 "本页为 `%s` 的按层切片，锚点与主索引一致。" % INDEX_REL)
+    note = "- 本层含义：" + LAYER_NOTES[layer]
+    ok = sum(1 for s in rows if (s.get("evidence") or {}).get("reachable"))
+    stat = f"- 本层可达：{ok}/{len(rows)}（不可达 {len(rows) - ok}）"
+
+    def weight(s):
+        c = counts.get(s["id"]) or {}
+        return -(c.get("main", 0) + c.get("support", 0))
+
+    top = sorted(rows, key=weight)[:3]
+    parts = []
+    for s in top:
+        c = counts.get(s["id"]) or {}
+        parts.append(f"{s['id']}（主锚 {c.get('main', 0)} / 辅锚 {c.get('support', 0)}）")
+    binds = "- 本层绑定最多：" + " · ".join(parts)
+    dead = [s for s in rows if not (s.get("evidence") or {}).get("reachable")]
+    if dead:
+        items = [f"{s['id']}（HTTP {((s.get('evidence') or {}).get('http_status'))}）"
+                 for s in dead]
+        dead_line = "- 本层不可达：" + " · ".join(items)
+    else:
+        dead_line = "- 本层不可达：无（该层全部本机可达）"
+    bodies = {}
+    for s in rows:
+        name = str(s.get("body") or "—")
+        bodies[name] = bodies.get(name, 0) + 1
+    top_bodies = sorted(bodies.items(), key=lambda kv: (-kv[1], kv[0]))[:3]
+    body_line = "- 本层机构分布：" + " · ".join(
+        f"{name} {n} 条" for name, n in top_bodies)
+    return head + _HOWTO_LAYER[:2] + [note, stat, binds, dead_line,
+                                      body_line] + _HOWTO_LAYER[2:]
+
+
 def build(root: str) -> Dict[str, str]:
     standards, coverage, counts = _load(root)
     ordered = sorted(standards, key=lambda s: (str(s.get("layer") or ""), str(s.get("id") or "")))
@@ -88,14 +170,14 @@ def build(root: str) -> Dict[str, str]:
 
     idx = _head("标准目录 · 可引用索引（GEO 出口）", coverage,
                 "每条标准一个稳定锚：`#<id>`（如 `%s#onnx`）。" % INDEX_REL)
+    idx += _HOWTO_INDEX
     for s in ordered:
         idx += ["### `%s`" % s["id"], _line(s, counts), ""]
     outs[INDEX_REL] = "\n".join(idx).rstrip() + "\n"
 
     for layer in LAYERS:
         rows = [s for s in ordered if str(s.get("layer") or "") == layer]
-        body = _head("标准目录 · 层 %s（%d 条）" % (layer, len(rows)), coverage,
-                     "本页为 `%s` 的按层切片，锚点与主索引一致。" % INDEX_REL)
+        body = _layer_body(layer, rows, coverage, counts)
         for s in rows:
             body += ["### `%s`" % s["id"], _line(s, counts), ""]
         outs["docs/standards/layer-%s.md" % layer] = "\n".join(body).rstrip() + "\n"
@@ -103,6 +185,7 @@ def build(root: str) -> Dict[str, str]:
     # 可引用卡（按问题形态聚合）
     cards = _head("标准目录 · 可引用卡（按问题形态）", coverage,
                   "每张卡回答一类问题，可直接被生成式引擎引用；数据源同主索引。")
+    cards += _HOWTO_CARDS
     top_ext = sorted(standards,
  key=lambda s: (-len(s.get("ext_points") or []),
  str(s.get("id"))))[:20]

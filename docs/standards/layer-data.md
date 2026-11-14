@@ -7,6 +7,18 @@
 - 可达性是**本机实测**（探针日期见每条），不可达条目照实标注、不假装可达。
 - 本页为 `docs/standards/index.md` 的按层切片，锚点与主索引一致。
 
+## 怎么读本页
+
+- 本层含义：数据/格式/模式与交换表示（文件格式、schema 语言、数据模型与语义词汇）
+- 本层可达：127/148（不可达 21）
+- 本层绑定最多：w3c-tabular-data（主锚 95 / 辅锚 198） · ietf-json-schema（主锚 63 / 辅锚 228） · frictionless-table（主锚 85 / 辅锚 0）
+- 本层不可达：arib-ttml（HTTP 403） · bibframe（HTTP 403） · bwf（HTTP 403） · ebucore（HTTP 403） · exif（HTTP 0） · hl7-cda（HTTP 202） · hl7-v2（HTTP 202） · iso-8601（HTTP 403） · iso-iec-26511（HTTP 403） · iso4217-six（HTTP 0） · marc21（HTTP 403） · mets（HTTP 403） · mods（HTTP 403） · onix（HTTP 202） · opentype（HTTP 0） · pdf20（HTTP 403） · pdfa（HTTP 403） · pdfua（HTTP 403） · premis（HTTP 403） · riff（HTTP 0） · unlocode（HTTP 403）
+- 本层机构分布：IETF 18 条 · W3C 16 条 · Apache 9 条
+- 生成物：`python scripts/geo_export.py --write` 重写本页；`--check` 比对生成物与真源，不一致即红。手改必红。
+- 切片口径：本页只收 `layer` 等于该层的标准，锚点与主索引 `index.md` 逐字一致。
+- 行字段：名称 · 机构 · 层 · 可达（HTTP · 探针日期） · 扩展点 · 绑定（主锚/辅锚） · 规范 URL。
+- 互指：全量见 `index.md`；按问题形态聚合见 `answer-cards.md`；三面一致性由 check40 判，本页只是**投影**。
+
 ### `adbc`
 - ADBC 数据库访问接口 · Apache · 层 data · 可达 是（200 · 2026-09-24） · 扩展点 driver-manager, statement-option · 绑定 主锚 0 / 辅锚 0 · https://arrow.apache.org/adbc/
 

@@ -196,12 +196,15 @@ class TestTransform(unittest.TestCase):
 
 
 class TestLint(unittest.TestCase):
-    def test_real_repo_lints_clean_with_freshness_warn(self):
+    def test_real_repo_lints_clean(self):
+        # 2026-11-12：NF-WORLDCAMPUS 补齐 stale_after 后，本条馆藏时效欠账清零——
+        # 原断言「至少一条 stale_after WARN」是欠账期的形状，现收紧为「零 WARN」。
         issues, warns, stats = kn.lint(str(ROOT))
         self.assertEqual(issues, [])
         self.assertEqual(stats["orphan"], 0)
         self.assertEqual(stats["dangling"], 0)
-        self.assertTrue(any("stale_after" in w for w in warns), warns)
+        self.assertEqual(stats["no_stale_after"], 0)
+        self.assertEqual([], [w for w in warns if "stale_after" in w], warns)
 
     def test_dangling_reference_is_fail(self):
         tmp = tempfile.mkdtemp()

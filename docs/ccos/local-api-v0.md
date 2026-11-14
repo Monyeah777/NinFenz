@@ -2,7 +2,8 @@
 
 状态：**已实装**（CLI：`nf serve`；端点契约见 `nf evidence` 面）。
 > ⛔ 操作指令：阅读即执行——本文含可直接执行的命令与判定，勿当资料阅读。
-> 最后更新：2026-11-04
+> 最后更新：2026-11-13
+> **复核（2026-11-13）**：三端点/判定语义/安全边界**复核不变**；补四处现状：① 机器契约在 `protocol/endpoint_contract.json` 的 **local.health / local.verify / local.check** 三条（maps_to 指向真实 CLI）；② 常驻判据 `test_http_api` **18 项**；③ 页面资源嵌在 `core/web_pages.py`（CSP 常量同源）；④ **鉴权边界澄清**：`nf serve --ingress-policy`（nf-ingress-policy/1：token/工具白名单/限流/同意）属 **MCP 面**可选闸，**HTTP 面不走它**——HTTP 面仍是「本机单用户、无鉴权」，暴露到网络前必须先做鉴权与限流（不变）。见「§现状对照」。
 > **Status**: v0 已实装（nf serve --http）· **上位**: docs/ccos/abi-v0.md §4 cc_verify / §2 cc_check
 
 ## 是什么
@@ -45,6 +46,8 @@ CSP 锁死：`default-src 'none'; script-src 'self'; style-src 'self'; connect-s
 
 ## 安全边界（写死，不靠调用方自觉）
 
+> 口径区分：MCP 面可用 `--ingress-policy` 挂可选闸（缺省不过闸）；**HTTP 面没有鉴权层**，安全全靠「只绑回环 + CSRF Origin + 体量上限 + 无客户端可控路径」。两者不可混用。
+
 - **只绑回环**：非回环 host 直接抛错拒绝启动。
 - **CSRF 护栏**：带 `Origin` 的请求必须是本机同端口，否则 403；不带 `Origin`（curl/脚本）放行。
 - **体量上限**：请求体 8 MiB；超限先读掉请求体再回 413（不读就回会让客户端看到断连而不是指引）。
@@ -68,6 +71,30 @@ curl -s -X POST --data-binary @evidence.zip http://127.0.0.1:8765/api/verify
 # 单测（起真服务打真请求：端点可用 / invalid 也 200 / Origin 挡跨站 / 体量上限 / 拒绝非回环）
 python -m unittest desktop.tests.test_http_api            # 18 项全绿
 ```
+
+## 现状对照（2026-11-13 · 以实跑为准）
+
+| 面 | 本文声明 | 复核结果（读到本行时请重跑） |
+|---|---|---|
+| 端点 | /api/health · /api/verify · /api/check | **三条**（`http_api` 路由同源；契约 local.* 三条） |
+| 页面 | / 或 /verify + /assets/verify.js·css | **不变**（资源嵌 `core/web_pages.py`，不会 404） |
+| 判定语义 | invalid/revoked/expired 一律 200 | **不变**（4xx=请求不成立，5xx=服务异常） |
+| 安全边界 | 只绑回环 / Origin 白名单 / 8 MiB / 无路径 | **不变**（`LOOPBACK` 三值、`MAX_BODY=8*1024*1024`、CSP 同源） |
+| 鉴权 | 「无鉴权」 | **不变**；MCP 面 `--ingress-policy` 是另一面，HTTP 面不适用 |
+| 常驻判据 | 18 项 | **18 项**（`test_http_api`：端点/invalid 200/Origin/体量/回环） |
+| hmac / 单 JSON 形态 | 不验 / 只收 zip | **不变**（走 CLI `--key-file`/`--root`） |
+
+> 本表只作「当时 → 现行」导航，不替代实跑。
+
+## 复现与引用口径
+
+```bash
+python scripts/nf.py serve --http --port 0    # 内核分配端口起本地 HTTP 面
+python -m pytest desktop/tests/test_http_api.py -q   # 18 项（真服务真请求）
+```
+
+- 引用本文时：「判定不是 HTTP 错误（判定一律 200）」+「只绑回环 + 无鉴权」= 长期口径。
+- 端点契约真源：`protocol/endpoint_contract.json`（local.health / local.verify / local.check）；改路由须同步契约与判据。
 
 ## 边界（如实挂账）
 

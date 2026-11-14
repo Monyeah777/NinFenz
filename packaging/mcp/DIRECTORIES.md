@@ -225,3 +225,32 @@ npx -y --registry https://registry.npmjs.org ninfenz serve   # 应进入 stdio�
 | mcp.so / Glama / PulseMCP | 数天 |
 
 > 一个共同点：这些目录都**只读公开仓库/包**，没有需要 CI 凭证的写入面 —— 所以除登录动作外，材料一次备好就不用再回来改。
+
+---
+
+> **复核（2026-11-14）**：渠道清单、逐站流程与材料包**复核不变**；但这份文档混着两类信息——**仓库侧可核**（`server.json` / npm 包 `mcpName` / 图标像素 / 提交件在场）与**平台侧状态**（注册表最后记录、各目录是否收录、状态码）。本轮把两者分开：平台侧一律标注「平台侧未验」，不要拿它当本仓判据。见「§现状对照」。
+
+## 现状对照（2026-11-14 · 仓库侧可核 / 平台侧未验）
+
+| 面 | 现值 | 复核方式 |
+|---|---|---|
+| `server.json` | name `io.github.Monyeah777/ninfenz` · version **1.0.5** · packages[0].version **1.0.5** · schema `2025-12-11` | 该文件实读 |
+| npm 包归属 | `packaging/npm/package.json` 带 `mcpName`（注册表校验 npm 归属的前置硬条件） | 该文件实读 |
+| 版本对齐 | `packaging/npm/package.json` version **1.0.5** == `server.json` version（不同值会导致注册表查旧版本并报 missing mcpName） | 两文件比对 |
+| 图标 | `assets/icon-400.png` **400×400** · `icon-512.png` **512×512**（Cline 要求 400×400 PNG） | 读 PNG 头 |
+| 提交件 | `submissions/` **10** 个逐渠道文件（01–10） | 目录计数 |
+| 安装说明书 | 仓库根 `llms-install.md` 在场 | 文件实读 |
+| 官方注册表记录 | 原文「最后记录 v1.0.1（2026-10-08）」是**当时快照**；当前是否已上架 1.0.5 = **平台侧未验** | 需联网查 registry |
+| 各第三方目录收录状态 | **平台侧未验**（含文中 302/403/000 状态码，均为 2026-10-08 当时实测） | 需浏览器复核 |
+
+> 本表只作「当时 → 现行」导航；仓库侧以文件实读为准，平台侧状态**不进本仓判据**。
+
+## 复现与引用口径
+
+```bash
+python -c "import json;d=json.load(open('packaging/mcp/server.json',encoding='utf-8'));print(d['name'],d['version'],[p['version'] for p in d['packages']])"
+python -m pytest desktop/tests/test_mcp_packaging.py desktop/tests/test_mcp_manifest.py -q
+curl -s "https://registry.modelcontextprotocol.io/v0/servers?search=NinFenz"   # 平台侧：需联网
+```
+
+- 引用本文时：「仓库侧材料齐 ≠ 目录已收录」——两者分开说，平台侧状态一律注明「未验」。

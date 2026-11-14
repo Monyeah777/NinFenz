@@ -137,6 +137,10 @@
       "referenced": true
     },
     {
+      "module": "bundle",
+      "referenced": true
+    },
+    {
       "module": "calibration",
       "referenced": true
     },
@@ -154,6 +158,10 @@
     },
     {
       "module": "candidate_health",
+      "referenced": true
+    },
+    {
+      "module": "canonical",
       "referenced": true
     },
     {
@@ -314,7 +322,7 @@
     },
     {
       "module": "context_pack",
-      "referenced": false
+      "referenced": true
     },
     {
       "module": "contract_history",
@@ -402,7 +410,7 @@
     },
     {
       "module": "domain_neutral",
-      "referenced": false
+      "referenced": true
     },
     {
       "module": "domain_pack",
@@ -438,6 +446,10 @@
     },
     {
       "module": "engine_registry",
+      "referenced": true
+    },
+    {
+      "module": "entity",
       "referenced": true
     },
     {
@@ -834,7 +846,7 @@
     },
     {
       "module": "method_memory",
-      "referenced": false
+      "referenced": true
     },
     {
       "module": "method_pack",
@@ -1034,6 +1046,10 @@
     },
     {
       "module": "proc",
+      "referenced": true
+    },
+    {
+      "module": "process",
       "referenced": true
     },
     {
@@ -1394,7 +1410,7 @@
     },
     {
       "module": "web_pages",
-      "referenced": false
+      "referenced": true
     },
     {
       "module": "workflow_hardening",
@@ -1421,9 +1437,9 @@
       "referenced": true
     }
   ],
-  "modules": 355,
+  "modules": 359,
   "note": "粗粒度名字匹配（代理指标），不做导入图分析",
-  "referenced": 321,
+  "referenced": 329,
   "schema": "nf-core-judge-map/1",
-  "unreferenced": 34
+  "unreferenced": 30
 }

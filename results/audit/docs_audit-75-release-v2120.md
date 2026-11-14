@@ -6,16 +6,24 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - CHANGELOG.md:c33b70610b8e51f9d40a5f3e55f9400944d117bb5fdf9e2d0ee8f71dff81acf7
-  - docs/meta/VERSION-MATRIX.md:014144331c6e2715f4d4e441c69055e636d0194a1133d004904423bd23d2077a
-  - README.md:d61e2a9471653cc9fc4d6d5e1f1876d1e1a96b947a98949a9cf1a83dc80c523f
+  - CHANGELOG.md:95bebd2bb67e337dace03a85df842126322404006fe0ca44b1368eda6253ff6f
+  - docs/meta/VERSION-MATRIX.md:1df4ec534da93d4a685bb5b4f605a8bec00788ca84763e458de7b5fd47d9ebde
+  - README.md:16f85b2302bf066c85740daad2d90589e074499bbdb40a56c55d334329e54cfc
   - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
-  - docs/release.md:a878a24b8631d965e30d0bc865c9f88b71049f5a73025cf2984f5bd5cbca5dbb
+  - docs/release.md:09b0c6bbd0f2514a32cef0e404bb4dac877f42d57a6674157ea45b1629290aa2
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
 
 ---
+> 重审（2026-11-14）：CHANGELOG 顶尖化：补三段说明（怎么产生 / 只追加不重写 / 现状 4+1 节），并把「节序从新到旧、日期单调不增、生成器 issues 空」写成判据 test_changelog_doc_contract。
+
+> 重审（2026-11-13）：发布策略声明件顶尖化（11 步 ID 全列/冻结链 3/版本面 3/工件 4/锚 3 段 + 现状对照 / 复现；en·ja 译件同步后重签）+ 契约判据 test_release_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：版本矩阵文档顶尖化（修 v0.92 ⏳→✅ 与 CHANGELOG 一致 / 29 行 / 基线 repo_stats / 3 例 + 现状对照 / 复现）+ 契约判据 test_version_matrix_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-12）：README canonical 入口顶尖化（五节结构 / 快速开始六步带验收 / FAQ 三类高频问题 / 版本与 npm+pyproject 同源 / 命令与旗标真实 / stats 区外零计数）+ 契约判据 test_readme_contract；check12 权重增量实测。本轮为机械重绑。
+
 > 重审（2026-11-09）：冻结链
 
 > 重审（2026-11-09）：方法包声明可跑入口 runnable，清单与文档共用（含入口存在性判据）

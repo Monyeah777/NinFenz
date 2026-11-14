@@ -220,14 +220,15 @@ def render_alias(root: str = ".") -> str:
            % (MIRRORS[0]["raw"], MIRRORS[1]["raw"]),
            "> 本表由 `nf library reindex` 全量重建（真源 = 条目 frontmatter）；手工改将被覆盖。",
            "",
-           "| 小写键 | 真实编号 | 状态 | GitHub raw 链接 | Gitee raw 链接 |",
-           "|---|---|---|---|---|"]
+           "| 小写键 | 真实编号 | 状态 | GitHub raw 链接 | Gitee raw 链接 | 标题 |",
+           "|---|---|---|---|---|---|"]
     for e in rows:
-        out.append("| %s | %s | %s | %s | %s |" % (
+        out.append("| %s | %s | %s | %s | %s | %s |" % (
             e["id"].lower(), e["id"],
             str(e["fm"].get("status") or "active"),
             MIRRORS[0]["raw"] + "library/%s.md" % e["id"],
-            MIRRORS[1]["raw"] + "library/%s.md" % e["id"]))
+            MIRRORS[1]["raw"] + "library/%s.md" % e["id"],
+            _cell(e["fm"].get("title")) or e["id"]))
     return "\n".join(out) + "\n"
 
 

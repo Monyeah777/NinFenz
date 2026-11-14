@@ -1,0 +1,31 @@
+{
+  "schema": "nf-trust-policy/1",
+  "issuers": [
+    {
+      "id": "nf:local",
+      "keyid": "nf:local:ed25519:2026",
+      "alg": "ed25519",
+      "types": [
+        "claim",
+        "evidence"
+      ],
+      "not_after": "2027-11-14T00:00:00Z"
+    }
+  ],
+  "algorithms": [
+    "ed25519",
+    "hmac-sha256"
+  ],
+  "tsa_roots": [
+    {
+      "id": "tsa:freetsa",
+      "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    }
+  ],
+  "required_level": "T2",
+  "anchors": {
+    "tsa": true,
+    "transparency": true,
+    "witness_threshold": 1
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "schema": "nf-entity/1",
+  "type": "claim",
+  "subject": {
+    "kind": "claim",
+    "ref": "results/trust/demo/claim-C-001.json",
+    "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "issuer": "nf:local",
+  "issued_at": "2026-11-14T00:00:00Z",
+  "payload_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "refs": [
+    {
+      "kind": "contract",
+      "digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+    }
+  ],
+  "validity": {
+    "not_before": "2026-11-14T00:00:00Z",
+    "not_after": "2027-11-14T00:00:00Z"
+  },
+  "unexpected_extension": 1
+}

@@ -1,6 +1,6 @@
 # NF 抽象階梯（layers）
 
-> 最后更新：2026-09-26 (last updated)
+> 最終更新：2026-11-13
 
 > ⛔ 操作指示：本ファイルには直接実行できるコマンドと判定が含まれます。読んだら実行してください。資料として読まないでください。
 
@@ -79,6 +79,31 @@ python scripts/nf.py layers --write    # 本ファイルの生成区を再描画
 
 > 本区は `nf layers --write` が描画します。手での変更は禁止。真源 = `protocol/LAYERS.json`。
 <!-- nf:layers:end -->
+
+## 現状対照（2026-11-13 · 真源からの実読）
+
+| 面 | 現値 | 再確認方法 |
+|---|---|---|
+| 抽象軸 | **4 階**（contract / asset / engine / export） | protocol/LAYERS.json: tiers |
+| 資産子階 | **5**（声明 / 内容 / データ / 知識 / 本体） | asset_levels |
+| 入口面 | **4**（人機 / AI 組立ライン / MCP / 図書館取件） | surfaces |
+| 検証縦断件 | **6**（verify / conformance / audit / receipts / attest / provenance） | crosscut.components |
+| 派生免除 | **7** 件 | derived |
+| 退役登記 | **2** 件 | retirement |
+| 判定規則 | **L1-L10（10 条）** | rules |
+| 常駐判定 | 27 + 19 例 | test_layer_model / test_architecture_layers |
+
+> 生成区（begin と end のマーカーの間）は真源から描画される。不一致は L10 FAIL。本表は生成区外の検証可能な索引。
+
+## 再現と引用の口径
+
+```bash
+python scripts/nf.py layers --verify   # 階梯検診（verify check27 と同源、終了コードがゲート）
+python scripts/nf.py layers --json     # 階ごとの真源面 / インターフェース面 / 判定
+python -m pytest desktop/tests/test_layer_model.py desktop/tests/test_architecture_layers.py -q
+```
+
+- 引用時の口径：「依存は下方向のみ、階を跨ぐのはインターフェース面のみ、入口は真源ではない」が長期口径。真源を変えたら layers --write で生成区を再描画すること。
 
 ## 五つの規律（判定は `desktop/src/core/layer_model.py` の L1–L10）
 

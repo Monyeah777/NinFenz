@@ -14,7 +14,7 @@ subjects:
   - desktop/src/core/export_schema.py:9052dc891be0c70ceb5b42544eceeceeeb4dee8c4f107b1ec660913cf922ad3d
   - desktop/src/core/mcp_runtime.py:22e24633e87e95453d0c2cf4a595d0496bae5d7331c1fc644d5b1555e4925a41
   - desktop/src/core/import_adapter.py:0d062c6f28215b7d81eeb46e653fa4edcc7e8cb9f3e9178e73f2dff9f834bc35
-  - desktop/src/core/library.py:e5a867a775bbab717c882250187578b7d057c51a233c334190e5179f903918bf
+  - desktop/src/core/library.py:9dce50b2201724f55c00bf5ae2afa92d9916f196eb690d4d10da65e53eff694d
   - scripts/check_interop_schemas.py:f9c1add0ee80fb23a3913e32482027e9a4049c5ce70cb35b2b1be4afa075d091
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - library/intake.json:b8c31d480e9afdb71e923d526934fa759b9affd3814069d084fbd083a835d2cd
@@ -22,6 +22,8 @@ subjects:
   - results/interop-schema-validation.md:e2546c6407416b61912ac351d14d20c171167e36be4d4d3461f6c2fceb56c0c9
 
 ---
+> 重审（2026-11-12）：library/ALIAS 顶尖化（生成器加「标题」列 → ALIAS 重生成；投影一致性保持）+ 契约判据 test_alias_contract；权重增量重测。本轮为机械重绑。
+
 > 重审（2026-11-10）：config.yml 入投稿面声明
 
 > 重审（2026-11-08）：Ingress 网关（认证/白名单/限流/同意/回执）

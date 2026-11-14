@@ -1,5 +1,5 @@
 {
-  "built_for_date": "2026-11-11",
+  "built_for_date": "2026-11-14",
   "declared": {
     "coverage_note": "判据级抽查面 31 条，各对应 verify.sh 的一道或多道门禁；≠ 声明 check 总数 42（两者不可互替）",
     "expected_checks": 42,
@@ -228,7 +228,7 @@
       "source": "instruction_step_audit.scan",
       "stats": {
         "docs": 5,
-        "steps": 9
+        "steps": 30
       },
       "status": "pass",
       "warns": 0
@@ -260,12 +260,10 @@
           "NF-TECHDOC-Monyeah777-1",
           "NF-WORLDCAMPUS-Monyeah777-1"
         ],
-        "warns": [
-          "NF-1 attestation 与当前内容不符（内容已改，需重签）"
-        ]
+        "warns": []
       },
-      "status": "warn",
-      "warns": 1
+      "status": "pass",
+      "warns": 0
     },
     {
       "id": "library_projection",
@@ -285,7 +283,7 @@
       "source": "receipts.verify_wrapped",
       "stats": {
         "entries": 3,
-        "root": "42e1522438c6a5e485c7f188c7d22435c69f8b8a15a95b2ccf80700c7622caa1"
+        "root": "6afa7b1a02e044ea8b867ef03e110549d67aa5092c1ddb4f950d2a8ba64aff68"
       },
       "status": "pass",
       "warns": 0
@@ -299,7 +297,7 @@
       "stats": {
         "contracts": 27,
         "passed": 27,
-        "root": "b2ef9b0b9bc4a0699b485e3ae49cd35e311e05b167d55f1158b9d494365615ef",
+        "root": "6ae04aa1a18d9cebc5f9d00cee68a2da66d91ad1a9e57500812729d2b48e1bec",
         "verdict": "conformant"
       },
       "status": "pass",
@@ -369,8 +367,8 @@
       "sample": [],
       "source": "code_metrics.scan",
       "stats": {
-        "baseline": 369,
-        "files": 369,
+        "baseline": 370,
+        "files": 370,
         "max_fn_cc": 132,
         "max_fn_lines": 443,
         "max_lines": 9863
@@ -387,8 +385,8 @@
       "stats": {
         "budget_ms": 1500.0,
         "n": 65536,
-        "patterns": 260,
-        "probed": 260
+        "patterns": 264,
+        "probed": 264
       },
       "status": "pass",
       "warns": 0
@@ -526,8 +524,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4260,
-        "kernel": 2156,
+        "files": 4499,
+        "kernel": 2378,
         "kernel_no_self": 308,
         "rules": 9,
         "uncovered": 0,
@@ -538,12 +536,12 @@
       "warns": 0
     }
   ],
-  "root_digest": "048164ff8cf4aed0123650e0d78a7d0fb1635d66436cf3b440e5f3d169fc3919",
+  "root_digest": "a48e8f717baa0c4838737b765d432b47641e571a25a0bba49b28eccfb7af9f25",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
     "fail": 0,
-    "pass": 29,
-    "warn": 2
+    "pass": 30,
+    "warn": 1
   }
 }

@@ -1,7 +1,11 @@
 # 研究层 v0（认知核：切片检索词 + 方法论路径）
 
-> **状态**：已实装（2026-11-07）· `protocol/research_methods.json`（方法库）+
+> **状态**：已实装（2026-11-07，2026-11-13 复核）· `protocol/research_methods.json`（方法库）+
 > `core/cognition_plan.py`（计划器）+ `nf cognition --plan <主题>`
+> **最后更新：2026-11-13（复核）**：8 方法 / 7 切片 / depth 映射与「只有计划、不出结论」边界**逐项复核不变**；
+> 现状数字：方法库 `methods` **8 条**（每条 `id/title/when/steps/output/falsifier` 齐，`steps` ≥2）；
+> 切片 `SLICES` **7 个**（S1–S7：定义/机制/证据/边界/对比/量级/落地）；depth 映射 **1→3 / 2→5 / 3→7**；
+> 常驻判据 `test_cognition_plan` **16 项**；CLI `--list-methods` / `--plan` / `--methods` 在册。见「§现状对照」。
 
 ## 相关文档
 
@@ -63,6 +67,31 @@ python -m unittest desktop.tests.test_cognition_plan    # 16 项
 - 深度可调且**确定性**：同输入两次输出逐字节一致；
 - 不编造：纯 CJK 主题的英文检索词标 `en_needs_human=true`（不假装有译名），
   英文主题才派生英文词。
+
+## 现状对照（2026-11-13 · 以实跑为准）
+
+| 面 | 本文声明 | 复核结果（读到本行时请重跑） |
+|---|---|---|
+| 方法库 | M1–M8 共 8 条 | **`methods` 8 条**（每条含 steps≥2 / output / falsifier） |
+| 切片 | 固定 7 面 | **`cognition_plan.SLICES` = 7（S1–S7）** |
+| depth 映射 | 1→3 / 2→5 / 3→7 片 | **`_DEPTH_N` = {1:3, 2:5, 3:7}** |
+| 确定性 | 同输入两次逐字节一致 | **不变**（判据 `test_cognition_plan` 16 项覆盖） |
+| 不编造 | 纯 CJK 主题标 `en_needs_human=true` | **不变** |
+| 常驻判据 | 16 项 | **16 项** |
+| CLI | `--list-methods` / `--plan` / `--methods` | **均在册** |
+
+> 本表只作「当时 → 现行」导航，不替代实跑。
+
+## 复现与引用口径
+
+```bash
+nf cognition --list-methods                       # 方法库全量（8 条 + falsifier）
+nf cognition --plan "水印抗转码" --depth 2 --json  # 标准 5 片计划（--json 机读）
+python -m pytest desktop/tests/test_cognition_plan.py -q   # 16 项
+```
+
+- 引用本文时：「只做计划、不做结论；方法必须带 falsifier；确定性」= 长期口径。
+- 新增方法 = 加一条数据（含 `falsifier`），不改代码；方法库以 `protocol/research_methods.json` 实读为准。
 
 ## 边界（不承诺）
 

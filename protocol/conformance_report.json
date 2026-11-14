@@ -23,8 +23,8 @@
     },
     {
       "description": "文档四型覆盖",
-      "detail": "四型全覆盖 · 写法 WARN 3",
-      "digest": "06a3777455680c0dcf5acf6a618c67e7e41114744719b8ded1c29a350bc1b154",
+      "detail": "四型全覆盖 · 写法 WARN 2",
+      "digest": "55d790c1f5838303b1a23ce03af2a26ac0786b7f66e6ac8b90d4edfffc879180",
       "id": "doc-kinds",
       "ok": true
     },
@@ -58,8 +58,8 @@
     },
     {
       "description": "I/O 类型面（可证不匹配）",
-      "detail": "可证不匹配 0 · 类型覆盖 26.9%（303/1125 字段）",
-      "digest": "717a771bed5815d7ffdb93c40446a617fee021c2f1ad1f9f3d25f39997b3c257",
+      "detail": "可证不匹配 0 · 类型覆盖 27.0%（308/1141 字段）",
+      "digest": "d45fb3f6e2fe7ea3dc6f3086994a38c534d5496c3a3213541ca173a9a6d4188f",
       "id": "io-types",
       "ok": true
     },
@@ -121,8 +121,8 @@
     },
     {
       "description": "内容建模三件（词表/规范说明件/数据契约）",
-      "detail": "词表 12 · 规范件 37 / 说明件 2445 · 数据契约 54",
-      "digest": "52d96c75fb3a18e6c522cdc90bcd04229c1082fa0240e301dfb677f198c305e2",
+      "detail": "词表 12 · 规范件 37 / 说明件 2449 · 数据契约 54",
+      "digest": "7580ca79010e4da0d90c7e567bb6eed5dd10bf9d4506c4fdd05684c6849e3a50",
       "id": "modeling",
       "ok": true
     },
@@ -191,7 +191,7 @@
     }
   ],
   "passed": 27,
-  "root": "b2ef9b0b9bc4a0699b485e3ae49cd35e311e05b167d55f1158b9d494365615ef",
+  "root": "6ae04aa1a18d9cebc5f9d00cee68a2da66d91ad1a9e57500812729d2b48e1bec",
   "schema": "nf-conformance/1",
   "total": 27,
   "verdict": "conformant"

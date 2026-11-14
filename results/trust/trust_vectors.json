@@ -1,0 +1,1124 @@
+{
+  "count": 34,
+  "cross_language": {
+    "note": "Python/Go/.NET parity 在 G4 接线；当前以独立参考实现双算取证。",
+    "target": "G4"
+  },
+  "families": {
+    "canonical": 5,
+    "domain": 4,
+    "entity": 5,
+    "level": 7,
+    "merkle": 5,
+    "pae": 4,
+    "process": 4
+  },
+  "note": "Trust Fabric 测试向量（WP-03）：第三方只读本文件即可自验；期望值由独立参考实现算出，与 core/trust 实现互为双实现。",
+  "rules": {
+    "admissibility": "entity 先过 nf-entity/1 schema；issuer 须在 policy.issuers；entity.type 须在 issuer.types",
+    "canonical": "json.dumps(sort_keys=True, ensure_ascii=False, separators=(',', ':'), allow_nan=False)；只收 int/bool/null/str/list/object；float/NaN/Infinity 拒绝",
+    "domain": "sha256(tag_bytes + 0x00 + payload_bytes)；tag 须匹配 ^nf:[a-z0-9-]+:v[1-9][0-9]*:[a-z0-9-]+$",
+    "level": "T0 哈希自洽；T1 +签名；T2 +RFC3161；T3 +STH（witness 达阈值）；T4 +公共锚；任一 invalid → exit 1；achieved < required → exit 2",
+    "merkle": "RFC 6962：leaf=sha256(0x00||data)，node=sha256(0x01||left||right)；root 在最大 2 的幂处分裂；inclusion proof 自底向上",
+    "pae": "DSSEv1 <len(ptype)> <ptype> <len(payload)> <payload>（长度按字节）",
+    "process": "step_digest=sha256(tag(nf:process:v1:step)+0x00+canonical(step 去 digest))；prev=上一步 digest（创世=64 个 0）；seq 从 1 连续"
+  },
+  "schema": "nf-trust-vectors/1",
+  "vectors": [
+    {
+      "desc": "键排序：b 在 a 前也必须规范成 a,b",
+      "expected": {
+        "canonical_utf8": "{\"a\":2,\"b\":1}",
+        "sha256": "d3626ac30a87e6f7a6428233b3c68299976865fa5508e4267c5415c76af7a772",
+        "valid": true
+      },
+      "family": "canonical",
+      "id": "CV-01",
+      "input": {
+        "value": {
+          "a": 2,
+          "b": 1
+        }
+      }
+    },
+    {
+      "desc": "非 ASCII 原样 UTF-8（不转 \\u 转义）",
+      "expected": {
+        "canonical_utf8": "{\"名\":\"值\"}",
+        "sha256": "b071ef49859b3b3a7bce6a02c5bd542db70783707b139825d307ee65bd3a60be",
+        "valid": true
+      },
+      "family": "canonical",
+      "id": "CV-02",
+      "input": {
+        "value": {
+          "名": "值"
+        }
+      }
+    },
+    {
+      "desc": "嵌套对象/数组 + 紧凑分隔",
+      "expected": {
+        "canonical_utf8": "{\"a\":[1,2],\"b\":{\"c\":true}}",
+        "sha256": "0892a70d0c77910b3aaa73e72e42159c04bac703c33556ee9a9559de243070bf",
+        "valid": true
+      },
+      "family": "canonical",
+      "id": "CV-03",
+      "input": {
+        "value": {
+          "a": [
+            1,
+            2
+          ],
+          "b": {
+            "c": true
+          }
+        }
+      }
+    },
+    {
+      "desc": "float 拒绝（跨语言格式不确定）",
+      "expected": {
+        "reason": "FLOAT-FORBIDDEN",
+        "valid": false
+      },
+      "family": "canonical",
+      "id": "CV-04",
+      "input": {
+        "value": {
+          "x": 1.5
+        }
+      }
+    },
+    {
+      "desc": "NaN 拒绝（JSON 标准不允许；nonfinite 一律拒）",
+      "expected": {
+        "reason": "NONFINITE-FORBIDDEN",
+        "valid": false
+      },
+      "family": "canonical",
+      "id": "CV-05",
+      "input": {
+        "value": {
+          "x": {
+            "nonfinite": "NaN"
+          }
+        }
+      }
+    },
+    {
+      "desc": "域分隔摘要：tag + 0x00 + payload",
+      "expected": {
+        "digest": "1d16a28008bf4737db597b0e9eb2521c3499889529862cc6fede432af9b320b7",
+        "tag_ok": true
+      },
+      "family": "domain",
+      "id": "DM-01",
+      "input": {
+        "payload_utf8": "abc",
+        "tag": "nf:claim-bundle:v1:leaf"
+      }
+    },
+    {
+      "desc": "不同字段的 tag 必不同摘要",
+      "expected": {
+        "digest": "541773731b395d4ee0e98a09766de51ba34780a823acfaad12181ba5263bbe25",
+        "distinct_from": "1d16a28008bf4737db597b0e9eb2521c3499889529862cc6fede432af9b320b7",
+        "tag_ok": true
+      },
+      "family": "domain",
+      "id": "DM-02",
+      "input": {
+        "payload_utf8": "abc",
+        "tag": "nf:claim-bundle:v1:root"
+      }
+    },
+    {
+      "desc": "tag 走私：payload 等于另一个 tag 也不与那一个的摘要相同",
+      "expected": {
+        "digest": "8c4259d3969d1fab5e06e4211b97aa346f1f8bbbc223be741ab189c7a0bcf465",
+        "distinct_from": "9fdbe0e52038b03885f5df1fd1fa13977a2435a1dfc231118c53fa34ad3e4ff8",
+        "tag_ok": true
+      },
+      "family": "domain",
+      "id": "DM-03",
+      "input": {
+        "payload_utf8": "nf:claim-bundle:v1:root",
+        "tag": "nf:claim-bundle:v1:leaf"
+      }
+    },
+    {
+      "desc": "非法 tag 拒绝（缺版本段）",
+      "expected": {
+        "reason": "TAG-FORMAT",
+        "tag_ok": false
+      },
+      "family": "domain",
+      "id": "DM-04",
+      "input": {
+        "payload_utf8": "abc",
+        "tag": "nf:claim-bundle:leaf"
+      }
+    },
+    {
+      "desc": "PAE 基本形（DSSEv1 前缀 + 字节长度）",
+      "expected": {
+        "pae_b64": "RFNTRXYxIDM2IGFwcGxpY2F0aW9uL3ZuZC5uZi5jbGFpbS1idW5kbGUranNvbiAzMCB7InNjaGVtYSI6Im5mLWNsYWltLWJ1bmRsZS8xIn0=",
+        "pae_sha256": "c472c27bdf76f179dedcf67e1807ae7a55d27f3e2a89121ec45e45ca3e759305",
+        "valid": true
+      },
+      "family": "pae",
+      "id": "PA-01",
+      "input": {
+        "payload_b64": "eyJzY2hlbWEiOiJuZi1jbGFpbS1idW5kbGUvMSJ9",
+        "payload_type_utf8": "application/vnd.nf.claim-bundle+json"
+      }
+    },
+    {
+      "desc": "规范示例：type 29 字节 / payload 11 字节",
+      "expected": {
+        "pae_b64": "RFNTRXYxIDI5IGh0dHA6Ly9leGFtcGxlLmNvbS9IZWxsb1dvcmxkIDExIGhlbGxvIHdvcmxk",
+        "pae_sha256": "217751fac2c4f14edb2c9297fbc34abcb016ba88e74757e875ec4ac16fb6b6a1",
+        "valid": true
+      },
+      "family": "pae",
+      "id": "PA-02",
+      "input": {
+        "payload_b64": "aGVsbG8gd29ybGQ=",
+        "payload_type_utf8": "http://example.com/HelloWorld"
+      }
+    },
+    {
+      "desc": "长度按字节不按字符（中文 2 字 = 6 字节）",
+      "expected": {
+        "pae_b64": "RFNTRXYxIDI4IGFwcGxpY2F0aW9uL3ZuZC5uZi50ZXh0K3V0ZjggNiDkuK3mloc=",
+        "pae_sha256": "eb251d22549e39c86e0a4856f6545101430b246424c85dfbd1154220e1342e81",
+        "valid": true
+      },
+      "family": "pae",
+      "id": "PA-03",
+      "input": {
+        "payload_b64": "5Lit5paH",
+        "payload_type_utf8": "application/vnd.nf.text+utf8"
+      }
+    },
+    {
+      "desc": "空 payloadType 拒绝",
+      "expected": {
+        "reason": "PAE-EMPTY-TYPE",
+        "valid": false
+      },
+      "family": "pae",
+      "id": "PA-04",
+      "input": {
+        "payload_b64": "aGk=",
+        "payload_type_utf8": ""
+      }
+    },
+    {
+      "desc": "1 叶 RFC 6962 根与逐叶 inclusion proof",
+      "expected": {
+        "leaf_hashes": [
+          "305df59f9590c3c9ac63d2b2743c388e3792449078cebf7fb3dbe6471643b2b7"
+        ],
+        "proofs": [
+          {
+            "fold_root": "305df59f9590c3c9ac63d2b2743c388e3792449078cebf7fb3dbe6471643b2b7",
+            "index": 0,
+            "proof": []
+          }
+        ],
+        "root": "305df59f9590c3c9ac63d2b2743c388e3792449078cebf7fb3dbe6471643b2b7",
+        "valid": true
+      },
+      "family": "merkle",
+      "id": "MK-01",
+      "input": {
+        "leaves_utf8": [
+          "leaf-0"
+        ]
+      }
+    },
+    {
+      "desc": "2 叶 RFC 6962 根与逐叶 inclusion proof",
+      "expected": {
+        "leaf_hashes": [
+          "305df59f9590c3c9ac63d2b2743c388e3792449078cebf7fb3dbe6471643b2b7",
+          "3145c409f259b7c53e32036090ff76751025a2498ba9823ef718cac50b4e616f"
+        ],
+        "proofs": [
+          {
+            "fold_root": "60a53eed0de87a90c8e59427c59c46253c33a76a09502a51801300927b7e6bdc",
+            "index": 0,
+            "proof": [
+              {
+                "hash": "3145c409f259b7c53e32036090ff76751025a2498ba9823ef718cac50b4e616f",
+                "side": "right"
+              }
+            ]
+          },
+          {
+            "fold_root": "60a53eed0de87a90c8e59427c59c46253c33a76a09502a51801300927b7e6bdc",
+            "index": 1,
+            "proof": [
+              {
+                "hash": "305df59f9590c3c9ac63d2b2743c388e3792449078cebf7fb3dbe6471643b2b7",
+                "side": "left"
+              }
+            ]
+          }
+        ],
+        "root": "60a53eed0de87a90c8e59427c59c46253c33a76a09502a51801300927b7e6bdc",
+        "valid": true
+      },
+      "family": "merkle",
+      "id": "MK-02",
+      "input": {
+        "leaves_utf8": [
+          "leaf-0",
+          "leaf-1"
+        ]
+      }
+    },
+    {
+      "desc": "3 叶 RFC 6962 根与逐叶 inclusion proof",
+      "expected": {
+        "leaf_hashes": [
+          "305df59f9590c3c9ac63d2b2743c388e3792449078cebf7fb3dbe6471643b2b7",
+          "3145c409f259b7c53e32036090ff76751025a2498ba9823ef718cac50b4e616f",
+          "fca89f57c9f8c8eb4047a7ff9d333acf9e0f3384b20b255bceab0f216dcca267"
+        ],
+        "proofs": [
+          {
+            "fold_root": "cf763a041c81ceef1578a6083f75c61bef2e0014f2a3e683a97fcfca5be7f19a",
+            "index": 0,
+            "proof": [
+              {
+                "hash": "3145c409f259b7c53e32036090ff76751025a2498ba9823ef718cac50b4e616f",
+                "side": "right"
+              },
+              {
+                "hash": "fca89f57c9f8c8eb4047a7ff9d333acf9e0f3384b20b255bceab0f216dcca267",
+                "side": "right"
+              }
+            ]
+          },
+          {
+            "fold_root": "cf763a041c81ceef1578a6083f75c61bef2e0014f2a3e683a97fcfca5be7f19a",
+            "index": 1,
+            "proof": [
+              {
+                "hash": "305df59f9590c3c9ac63d2b2743c388e3792449078cebf7fb3dbe6471643b2b7",
+                "side": "left"
+              },
+              {
+                "hash": "fca89f57c9f8c8eb4047a7ff9d333acf9e0f3384b20b255bceab0f216dcca267",
+                "side": "right"
+              }
+            ]
+          },
+          {
+            "fold_root": "cf763a041c81ceef1578a6083f75c61bef2e0014f2a3e683a97fcfca5be7f19a",
+            "index": 2,
+            "proof": [
+              {
+                "hash": "60a53eed0de87a90c8e59427c59c46253c33a76a09502a51801300927b7e6bdc",
+                "side": "left"
+              }
+            ]
+          }
+        ],
+        "root": "cf763a041c81ceef1578a6083f75c61bef2e0014f2a3e683a97fcfca5be7f19a",
+        "valid": true
+      },
+      "family": "merkle",
+      "id": "MK-03",
+      "input": {
+        "leaves_utf8": [
+          "leaf-0",
+          "leaf-1",
+          "leaf-2"
+        ]
+      }
+    },
+    {
+      "desc": "5 叶 RFC 6962 根与逐叶 inclusion proof",
+      "expected": {
+        "leaf_hashes": [
+          "305df59f9590c3c9ac63d2b2743c388e3792449078cebf7fb3dbe6471643b2b7",
+          "3145c409f259b7c53e32036090ff76751025a2498ba9823ef718cac50b4e616f",
+          "fca89f57c9f8c8eb4047a7ff9d333acf9e0f3384b20b255bceab0f216dcca267",
+          "f76836325aec5699d8d71f8e42e9d47c5c29b08059ba296384f7ca40ad3a40ae",
+          "ea9fc1a1b6e191b460d0d6306e3e870c173f39330f13cda1b70cfc72bdc398ba"
+        ],
+        "proofs": [
+          {
+            "fold_root": "00d21829a5503145348abcf712513eacf2a274211ad83e970202bb5b6d80b286",
+            "index": 0,
+            "proof": [
+              {
+                "hash": "3145c409f259b7c53e32036090ff76751025a2498ba9823ef718cac50b4e616f",
+                "side": "right"
+              },
+              {
+                "hash": "bd45ff28796704d88bdac51b1df553fda59837b616d6d1cb2114dbc3b087ff69",
+                "side": "right"
+              },
+              {
+                "hash": "ea9fc1a1b6e191b460d0d6306e3e870c173f39330f13cda1b70cfc72bdc398ba",
+                "side": "right"
+              }
+            ]
+          },
+          {
+            "fold_root": "00d21829a5503145348abcf712513eacf2a274211ad83e970202bb5b6d80b286",
+            "index": 1,
+            "proof": [
+              {
+                "hash": "305df59f9590c3c9ac63d2b2743c388e3792449078cebf7fb3dbe6471643b2b7",
+                "side": "left"
+              },
+              {
+                "hash": "bd45ff28796704d88bdac51b1df553fda59837b616d6d1cb2114dbc3b087ff69",
+                "side": "right"
+              },
+              {
+                "hash": "ea9fc1a1b6e191b460d0d6306e3e870c173f39330f13cda1b70cfc72bdc398ba",
+                "side": "right"
+              }
+            ]
+          },
+          {
+            "fold_root": "00d21829a5503145348abcf712513eacf2a274211ad83e970202bb5b6d80b286",
+            "index": 2,
+            "proof": [
+              {
+                "hash": "f76836325aec5699d8d71f8e42e9d47c5c29b08059ba296384f7ca40ad3a40ae",
+                "side": "right"
+              },
+              {
+                "hash": "60a53eed0de87a90c8e59427c59c46253c33a76a09502a51801300927b7e6bdc",
+                "side": "left"
+              },
+              {
+                "hash": "ea9fc1a1b6e191b460d0d6306e3e870c173f39330f13cda1b70cfc72bdc398ba",
+                "side": "right"
+              }
+            ]
+          },
+          {
+            "fold_root": "00d21829a5503145348abcf712513eacf2a274211ad83e970202bb5b6d80b286",
+            "index": 3,
+            "proof": [
+              {
+                "hash": "fca89f57c9f8c8eb4047a7ff9d333acf9e0f3384b20b255bceab0f216dcca267",
+                "side": "left"
+              },
+              {
+                "hash": "60a53eed0de87a90c8e59427c59c46253c33a76a09502a51801300927b7e6bdc",
+                "side": "left"
+              },
+              {
+                "hash": "ea9fc1a1b6e191b460d0d6306e3e870c173f39330f13cda1b70cfc72bdc398ba",
+                "side": "right"
+              }
+            ]
+          },
+          {
+            "fold_root": "00d21829a5503145348abcf712513eacf2a274211ad83e970202bb5b6d80b286",
+            "index": 4,
+            "proof": [
+              {
+                "hash": "bdd1c5ff55b19cb6b0e7c761bf9a6ccaa27fbbfc07b74f1fabb6e911a0bd2ab3",
+                "side": "left"
+              }
+            ]
+          }
+        ],
+        "root": "00d21829a5503145348abcf712513eacf2a274211ad83e970202bb5b6d80b286",
+        "valid": true
+      },
+      "family": "merkle",
+      "id": "MK-05",
+      "input": {
+        "leaves_utf8": [
+          "leaf-0",
+          "leaf-1",
+          "leaf-2",
+          "leaf-3",
+          "leaf-4"
+        ]
+      }
+    },
+    {
+      "desc": "越界下标拒绝",
+      "expected": {
+        "reason": "INDEX-OUT-OF-RANGE",
+        "valid": false
+      },
+      "family": "merkle",
+      "id": "MK-06",
+      "input": {
+        "index": 2,
+        "leaves_utf8": [
+          "a",
+          "b"
+        ]
+      }
+    },
+    {
+      "desc": "3 步 prev 链：digest 与链头",
+      "expected": {
+        "digests": [
+          "820e6ea0eca4c38464a4d15ca8d1364ee2f43c0525f507e2bfa42400919bbaff",
+          "bcd428723fe975dfcab20f4c016eba6b2f5ccb0399ae655bcc7e866a9062abd0",
+          "da3bec125607af68ed2ece041fdbab7b5d5572576dd73ed3c6732ca3925efb0c"
+        ],
+        "head": "da3bec125607af68ed2ece041fdbab7b5d5572576dd73ed3c6732ca3925efb0c",
+        "valid": true
+      },
+      "family": "process",
+      "id": "PR-01",
+      "input": {
+        "steps": [
+          {
+            "actor": {
+              "id": "nf:agent:vec",
+              "kind": "agent"
+            },
+            "authorization": {
+              "digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "kind": "human"
+            },
+            "input_refs": [],
+            "output_refs": [],
+            "prev": "0000000000000000000000000000000000000000000000000000000000000000",
+            "process_id": "proc-vector",
+            "schema": "nf-process/1",
+            "state_digest": "1111111111111111111111111111111111111111111111111111111111111111",
+            "step": 1,
+            "type": "task-step"
+          },
+          {
+            "actor": {
+              "id": "nf:agent:vec",
+              "kind": "agent"
+            },
+            "authorization": {
+              "digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "kind": "human"
+            },
+            "input_refs": [],
+            "output_refs": [],
+            "prev": "820e6ea0eca4c38464a4d15ca8d1364ee2f43c0525f507e2bfa42400919bbaff",
+            "process_id": "proc-vector",
+            "schema": "nf-process/1",
+            "state_digest": "2222222222222222222222222222222222222222222222222222222222222222",
+            "step": 2,
+            "type": "task-step"
+          },
+          {
+            "actor": {
+              "id": "nf:agent:vec",
+              "kind": "agent"
+            },
+            "authorization": {
+              "digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "kind": "human"
+            },
+            "input_refs": [],
+            "output_refs": [],
+            "prev": "bcd428723fe975dfcab20f4c016eba6b2f5ccb0399ae655bcc7e866a9062abd0",
+            "process_id": "proc-vector",
+            "schema": "nf-process/1",
+            "state_digest": "3333333333333333333333333333333333333333333333333333333333333333",
+            "step": 3,
+            "type": "task-step"
+          }
+        ]
+      }
+    },
+    {
+      "desc": "删中间一步：prev 指向被删摘要即断链",
+      "expected": {
+        "reason": "SEQ-ORDER",
+        "valid": false
+      },
+      "family": "process",
+      "id": "PR-02",
+      "input": {
+        "steps": [
+          {
+            "actor": {
+              "id": "nf:agent:vec",
+              "kind": "agent"
+            },
+            "authorization": {
+              "digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "kind": "human"
+            },
+            "input_refs": [],
+            "output_refs": [],
+            "prev": "0000000000000000000000000000000000000000000000000000000000000000",
+            "process_id": "proc-vector",
+            "schema": "nf-process/1",
+            "state_digest": "1111111111111111111111111111111111111111111111111111111111111111",
+            "step": 1,
+            "type": "task-step"
+          },
+          {
+            "actor": {
+              "id": "nf:agent:vec",
+              "kind": "agent"
+            },
+            "authorization": {
+              "digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "kind": "human"
+            },
+            "input_refs": [],
+            "output_refs": [],
+            "prev": "bcd428723fe975dfcab20f4c016eba6b2f5ccb0399ae655bcc7e866a9062abd0",
+            "process_id": "proc-vector",
+            "schema": "nf-process/1",
+            "state_digest": "3333333333333333333333333333333333333333333333333333333333333333",
+            "step": 3,
+            "type": "task-step"
+          }
+        ]
+      }
+    },
+    {
+      "desc": "重排：seq 不连续即拒",
+      "expected": {
+        "reason": "SEQ-ORDER",
+        "valid": false
+      },
+      "family": "process",
+      "id": "PR-03",
+      "input": {
+        "steps": [
+          {
+            "actor": {
+              "id": "nf:agent:vec",
+              "kind": "agent"
+            },
+            "authorization": {
+              "digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "kind": "human"
+            },
+            "input_refs": [],
+            "output_refs": [],
+            "prev": "0000000000000000000000000000000000000000000000000000000000000000",
+            "process_id": "proc-vector",
+            "schema": "nf-process/1",
+            "state_digest": "1111111111111111111111111111111111111111111111111111111111111111",
+            "step": 1,
+            "type": "task-step"
+          },
+          {
+            "actor": {
+              "id": "nf:agent:vec",
+              "kind": "agent"
+            },
+            "authorization": {
+              "digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "kind": "human"
+            },
+            "input_refs": [],
+            "output_refs": [],
+            "prev": "bcd428723fe975dfcab20f4c016eba6b2f5ccb0399ae655bcc7e866a9062abd0",
+            "process_id": "proc-vector",
+            "schema": "nf-process/1",
+            "state_digest": "3333333333333333333333333333333333333333333333333333333333333333",
+            "step": 3,
+            "type": "task-step"
+          },
+          {
+            "actor": {
+              "id": "nf:agent:vec",
+              "kind": "agent"
+            },
+            "authorization": {
+              "digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "kind": "human"
+            },
+            "input_refs": [],
+            "output_refs": [],
+            "prev": "820e6ea0eca4c38464a4d15ca8d1364ee2f43c0525f507e2bfa42400919bbaff",
+            "process_id": "proc-vector",
+            "schema": "nf-process/1",
+            "state_digest": "2222222222222222222222222222222222222222222222222222222222222222",
+            "step": 2,
+            "type": "task-step"
+          }
+        ]
+      }
+    },
+    {
+      "desc": "prev 非 64 位 hex 即拒",
+      "expected": {
+        "reason": "PREV-FORMAT",
+        "valid": false
+      },
+      "family": "process",
+      "id": "PR-04",
+      "input": {
+        "steps": [
+          {
+            "actor": {
+              "id": "nf:agent:vec",
+              "kind": "agent"
+            },
+            "authorization": {
+              "digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "kind": "human"
+            },
+            "input_refs": [],
+            "output_refs": [],
+            "prev": "0000000000000000000000000000000000000000000000000000000000000000",
+            "process_id": "proc-vector",
+            "schema": "nf-process/1",
+            "state_digest": "1111111111111111111111111111111111111111111111111111111111111111",
+            "step": 1,
+            "type": "task-step"
+          },
+          {
+            "actor": {
+              "id": "nf:agent:vec",
+              "kind": "agent"
+            },
+            "authorization": {
+              "digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "kind": "human"
+            },
+            "input_refs": [],
+            "output_refs": [],
+            "prev": "ABC",
+            "process_id": "proc-vector",
+            "schema": "nf-process/1",
+            "state_digest": "2222222222222222222222222222222222222222222222222222222222222222",
+            "step": 2,
+            "type": "task-step"
+          },
+          {
+            "actor": {
+              "id": "nf:agent:vec",
+              "kind": "agent"
+            },
+            "authorization": {
+              "digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "kind": "human"
+            },
+            "input_refs": [],
+            "output_refs": [],
+            "prev": "bcd428723fe975dfcab20f4c016eba6b2f5ccb0399ae655bcc7e866a9062abd0",
+            "process_id": "proc-vector",
+            "schema": "nf-process/1",
+            "state_digest": "3333333333333333333333333333333333333333333333333333333333333333",
+            "step": 3,
+            "type": "task-step"
+          }
+        ]
+      }
+    },
+    {
+      "desc": "合法实体：issuer 在册且 type 被授权",
+      "expected": {
+        "admissible": true
+      },
+      "family": "entity",
+      "id": "EA-01",
+      "input": {
+        "entity": {
+          "issued_at": "2026-11-14T00:00:00Z",
+          "issuer": "nf:local",
+          "payload_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "schema": "nf-entity/1",
+          "subject": {
+            "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "kind": "claim",
+            "ref": "results/trust/demo/claim-01.json"
+          },
+          "type": "claim"
+        },
+        "policy": {
+          "algorithms": [
+            "ed25519"
+          ],
+          "anchors": {
+            "transparency": false,
+            "tsa": true,
+            "witness_threshold": 0
+          },
+          "issuers": [
+            {
+              "alg": "ed25519",
+              "id": "nf:local",
+              "keyid": "nf:local:ed25519:2026",
+              "types": [
+                "claim",
+                "evidence"
+              ]
+            }
+          ],
+          "required_level": "T2",
+          "schema": "nf-trust-policy/1",
+          "tsa_roots": []
+        }
+      }
+    },
+    {
+      "desc": "type 未被该 issuer 授权",
+      "expected": {
+        "admissible": false,
+        "reason": "TYPE-NOT-ALLOWED"
+      },
+      "family": "entity",
+      "id": "EA-02",
+      "input": {
+        "entity": {
+          "issued_at": "2026-11-14T00:00:00Z",
+          "issuer": "nf:local",
+          "payload_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "schema": "nf-entity/1",
+          "subject": {
+            "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "kind": "claim",
+            "ref": "results/trust/demo/claim-01.json"
+          },
+          "type": "process-step"
+        },
+        "policy": {
+          "algorithms": [
+            "ed25519"
+          ],
+          "anchors": {
+            "transparency": false,
+            "tsa": true,
+            "witness_threshold": 0
+          },
+          "issuers": [
+            {
+              "alg": "ed25519",
+              "id": "nf:local",
+              "keyid": "nf:local:ed25519:2026",
+              "types": [
+                "claim",
+                "evidence"
+              ]
+            }
+          ],
+          "required_level": "T2",
+          "schema": "nf-trust-policy/1",
+          "tsa_roots": []
+        }
+      }
+    },
+    {
+      "desc": "issuer 不在策略内",
+      "expected": {
+        "admissible": false,
+        "reason": "ISSUER-UNKNOWN"
+      },
+      "family": "entity",
+      "id": "EA-03",
+      "input": {
+        "entity": {
+          "issued_at": "2026-11-14T00:00:00Z",
+          "issuer": "nf:evil",
+          "payload_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "schema": "nf-entity/1",
+          "subject": {
+            "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "kind": "claim",
+            "ref": "results/trust/demo/claim-01.json"
+          },
+          "type": "claim"
+        },
+        "policy": {
+          "algorithms": [
+            "ed25519"
+          ],
+          "anchors": {
+            "transparency": false,
+            "tsa": true,
+            "witness_threshold": 0
+          },
+          "issuers": [
+            {
+              "alg": "ed25519",
+              "id": "nf:local",
+              "keyid": "nf:local:ed25519:2026",
+              "types": [
+                "claim",
+                "evidence"
+              ]
+            }
+          ],
+          "required_level": "T2",
+          "schema": "nf-trust-policy/1",
+          "tsa_roots": []
+        }
+      }
+    },
+    {
+      "desc": "结构非法（未知顶层字段）",
+      "expected": {
+        "admissible": false,
+        "reason": "SCHEMA-INVALID"
+      },
+      "family": "entity",
+      "id": "EA-04",
+      "input": {
+        "entity": {
+          "issued_at": "2026-11-14T00:00:00Z",
+          "issuer": "nf:local",
+          "payload_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "schema": "nf-entity/1",
+          "subject": {
+            "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "kind": "claim",
+            "ref": "results/trust/demo/claim-01.json"
+          },
+          "type": "claim",
+          "unexpected_extension": 1
+        },
+        "policy": {
+          "algorithms": [
+            "ed25519"
+          ],
+          "anchors": {
+            "transparency": false,
+            "tsa": true,
+            "witness_threshold": 0
+          },
+          "issuers": [
+            {
+              "alg": "ed25519",
+              "id": "nf:local",
+              "keyid": "nf:local:ed25519:2026",
+              "types": [
+                "claim",
+                "evidence"
+              ]
+            }
+          ],
+          "required_level": "T2",
+          "schema": "nf-trust-policy/1",
+          "tsa_roots": []
+        }
+      }
+    },
+    {
+      "desc": "摘要格式非法（大写 hex）先被结构层拒绝",
+      "expected": {
+        "admissible": false,
+        "reason": "SCHEMA-INVALID"
+      },
+      "family": "entity",
+      "id": "EA-05",
+      "input": {
+        "entity": {
+          "issued_at": "2026-11-14T00:00:00Z",
+          "issuer": "nf:local",
+          "payload_digest": "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
+          "schema": "nf-entity/1",
+          "subject": {
+            "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "kind": "claim",
+            "ref": "results/trust/demo/claim-01.json"
+          },
+          "type": "claim"
+        },
+        "policy": {
+          "algorithms": [
+            "ed25519"
+          ],
+          "anchors": {
+            "transparency": false,
+            "tsa": true,
+            "witness_threshold": 0
+          },
+          "issuers": [
+            {
+              "alg": "ed25519",
+              "id": "nf:local",
+              "keyid": "nf:local:ed25519:2026",
+              "types": [
+                "claim",
+                "evidence"
+              ]
+            }
+          ],
+          "required_level": "T2",
+          "schema": "nf-trust-policy/1",
+          "tsa_roots": []
+        }
+      }
+    },
+    {
+      "desc": "T0 要求 + 只哈希自洽",
+      "expected": {
+        "achieved": "T0",
+        "exit_code": 0,
+        "missing": []
+      },
+      "family": "level",
+      "id": "LV-01",
+      "input": {
+        "facts": {
+          "hash": "ok",
+          "public_anchor": "none",
+          "signature": "none",
+          "time_token": "none",
+          "transparency_sth": "none"
+        },
+        "policy_ok": true,
+        "required_level": "T0"
+      }
+    },
+    {
+      "desc": "T1 要求但无签名 → exit 2 缺 SIGNATURE-MISSING",
+      "expected": {
+        "achieved": "T0",
+        "exit_code": 2,
+        "missing": [
+          "SIGNATURE-MISSING"
+        ]
+      },
+      "family": "level",
+      "id": "LV-02",
+      "input": {
+        "facts": {
+          "hash": "ok",
+          "public_anchor": "none",
+          "signature": "none",
+          "time_token": "none",
+          "transparency_sth": "none"
+        },
+        "policy_ok": true,
+        "required_level": "T1"
+      }
+    },
+    {
+      "desc": "T2 要求、签名有效但无 TSA → exit 2 缺 ANCHOR-MISSING",
+      "expected": {
+        "achieved": "T0",
+        "exit_code": 2,
+        "missing": [
+          "SIGNATURE-MISSING",
+          "ANCHOR-MISSING"
+        ]
+      },
+      "family": "level",
+      "id": "LV-03",
+      "input": {
+        "facts": {
+          "hash": "ok",
+          "public_anchor": "none",
+          "signature": "valid",
+          "time_token": "none",
+          "transparency_sth": "none"
+        },
+        "policy_ok": true,
+        "required_level": "T2"
+      }
+    },
+    {
+      "desc": "TSA token 无效 → exit 1（验证失败，不是不可判定）",
+      "expected": {
+        "achieved": "none",
+        "exit_code": 1,
+        "missing": []
+      },
+      "family": "level",
+      "id": "LV-04",
+      "input": {
+        "facts": {
+          "hash": "ok",
+          "public_anchor": "none",
+          "signature": "valid",
+          "time_token": "invalid",
+          "transparency_sth": "none"
+        },
+        "policy_ok": true,
+        "required_level": "T2"
+      }
+    },
+    {
+      "desc": "T3 要求且签名/TSA/STH 均有效 → exit 0",
+      "expected": {
+        "achieved": "T0",
+        "exit_code": 2,
+        "missing": [
+          "SIGNATURE-MISSING",
+          "ANCHOR-MISSING",
+          "WITNESS-MISSING"
+        ]
+      },
+      "family": "level",
+      "id": "LV-05",
+      "input": {
+        "facts": {
+          "hash": "ok",
+          "public_anchor": "none",
+          "signature": "valid",
+          "time_token": "valid",
+          "transparency_sth": "valid"
+        },
+        "policy_ok": true,
+        "required_level": "T3"
+      }
+    },
+    {
+      "desc": "T4 要求但无公共锚 → exit 2 缺 PUBLIC-ANCHOR-MISSING",
+      "expected": {
+        "achieved": "T0",
+        "exit_code": 2,
+        "missing": [
+          "SIGNATURE-MISSING",
+          "ANCHOR-MISSING",
+          "WITNESS-MISSING",
+          "PUBLIC-ANCHOR-MISSING"
+        ]
+      },
+      "family": "level",
+      "id": "LV-06",
+      "input": {
+        "facts": {
+          "hash": "ok",
+          "public_anchor": "none",
+          "signature": "valid",
+          "time_token": "valid",
+          "transparency_sth": "valid"
+        },
+        "policy_ok": true,
+        "required_level": "T4"
+      }
+    },
+    {
+      "desc": "策略非法（未知算法/不可解析）→ exit 2 缺 POLICY-INVALID",
+      "expected": {
+        "achieved": "none",
+        "exit_code": 2,
+        "missing": [
+          "POLICY-INVALID"
+        ]
+      },
+      "family": "level",
+      "id": "LV-07",
+      "input": {
+        "facts": {
+          "hash": "ok",
+          "public_anchor": "none",
+          "signature": "none",
+          "time_token": "none",
+          "transparency_sth": "none"
+        },
+        "policy_ok": false,
+        "required_level": "T2"
+      }
+    }
+  ]
+}

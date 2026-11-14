@@ -1,6 +1,9 @@
 # 内容建模三件（modeling）
 > ⛔ 操作指令：阅读即执行——本文含可直接执行的命令与判定，勿当资料阅读。
-> 最后更新：2026-09-15
+> 最后更新：2026-11-13
+> **复核（2026-11-13）**：三件划分 / 判据 / 边界**复核不变**；补可核现状（`nf model` 实读）：
+> 词表 **12 个 scheme**（`literal` 0 个，全部有代码真源可比对）· 规范件 **37** / 说明件文件 **2445** / 回执受锚 **66** ·
+> 数据契约 **54** 条（`quality_rule` 解析到 **42** 个 check + **24** 个 assertion）· 判据 `test_modeling` **12 例**。见「§现状对照」。
 
 ## 是什么
 
@@ -31,6 +34,31 @@ python scripts/nf.py model --json
 | 词表（literal） | `probe.kind=literal` 表示以册为准（无代码真源），此时不比对只查形式 |
 | 规范/说明 | 两名单交集为空；规范件必须**有主**（被 `protocol/RECEIPTS.json` 锚定，或显式 `covered_by` 且 `checkN` 真实存在）；**说明件不得被回执锚定** |
 | 数据契约 | artifact 必须存在；`quality_rule` 必须解析到真实 `checkN` 或 `assertion:<id>`；owner / freshness 非空；status 在册 |
+
+## 现状对照（2026-11-13 · 以 `nf model` 实读为准）
+
+| 面 | 现值 | 复核方式 |
+|---|---|---|
+| 词表 scheme | **12**（literal 0） | `nf model vocab` 头行 |
+| 规范件 | **37** | `nf model normative` 的 `normative` |
+| 说明件文件 | **2445** | 同上 `informative_files` |
+| 回执受锚 | **66** | 同上 `receipts` |
+| 数据契约 | **54** | `nf model contracts` 的 `contracts` |
+| quality_rule 解析面 | **42 checks + 24 assertions** | 同上 `checks_seen` / `assertions_seen` |
+| 常驻判据 | **12 例** | `test_modeling.py` |
+
+> 本表只作「当时 → 现行」导航；数字以 `nf model --json` 实读为准。
+
+## 复现与引用口径
+
+```bash
+python scripts/nf.py model            # 三件全跑（任一漂移即红）
+python scripts/nf.py model --json     # 机读（schemes / normative / contracts 三段）
+python -m pytest desktop/tests/test_modeling.py -q   # 12 例
+```
+
+- 引用本文时：「册子只做声明+比对，不复制真源；说明件不得被回执锚定」= 长期口径。
+- 改真源后先跑 `nf model` 再改册；`literal` 档（以册为准）当前 0 个——出现即需说明理由。
 
 ## 边界
 

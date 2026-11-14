@@ -2,7 +2,8 @@
 
 状态：**已实装**（CLI：`nf evidence verify` 的四词判定含 `revoked`）。
 > ⛔ 操作指令：阅读即执行——本文含可直接执行的命令与判定，勿当资料阅读。
-> 最后更新：2026-11-06
+> 最后更新：2026-11-13
+> **复核（2026-11-13）**：feed 形状/签名/序号链/合并/信任锚/新鲜度口径**逐项复核不变**；修一处**与本节自相矛盾的旧边界**：文末「hmac 是对称的…吊销件还没走那条线」——实际 **ed25519 公钥签名已于 2026-11-07 实装**（见上节），已改为「ed25519 已支持；ssh-sig/sigstore 面仍未接」。现状数字：CLI 五子命令（sign/pubkey/verify/trust/merge）在册；`test_revocations` **43 项**、`test_trust_anchor` **16 项**；委派链深上限 **`MAX_DEPTH=2`**（root→org→team）。见「§现状对照」。
 > **Status**: v0 已实装（`core/revocations.py` + `nf evidence revocations`）· 仍是**拉取式**分发
 > **实现位置**：`desktop/src/core/revocations.py` · 判据 `desktop/tests/test_revocations.py`
 
@@ -172,11 +173,36 @@ expires_at, basis}`（`basis` = `expires_at|ttl|none`）；`nf evidence verify` 
 ## 边界（仍缺什么）
 
 - **没有自动分发**：本仓不发布、不订阅、不轮询；「签发方已撤销但你没收到」仍然无解。
-- **hmac 是对称的**：拿到密钥的人能伪造任意 feed。要跨组织证明来源，需要公钥签名（ssh-sig/sigstore 面
-  已有实现，但吊销件还没走那条线）。
+- **hmac 是对称的**：拿到密钥的人能伪造任意 feed。跨组织来源证明走 **ed25519 公钥签名**（2026-11-07 已实装，
+  见上节）；**ssh-sig / sigstore 面仍未接**吊销件。
 - **没有撤销时间语义**：feed 只说「哪些被吊销」，不说「从何时起」；时效仍由证据包的 `expires_at` 承担。
 - **新鲜度不是分发**：`expires_at`/`ttl` 只说明这份表**声称**多新，`status_uri` 只是一个指针；
   本仓仍不轮询、不自动取，也不验证指针可达性。
+
+## 现状对照（2026-11-13 · 以实跑为准）
+
+| 面 | 本文声明 | 复核结果（读到本行时请重跑） |
+|---|---|---|
+| feed 形状 | `nf-revocation-feed/1`（issuer/seq/issued_at/prev_digest/table/signature） | **不变**（签名体=除 signature 外全部字段） |
+| CLI | sign / verify / merge / pubkey / trust | **五子命令全在册** |
+| 签名方案 | hmac-sha256 + **ed25519**（2026-11-07 起） | **不变**（纯标准库 RFC 8032；缺密钥 fail-closed） |
+| 信任锚 | 钉根 + 有界委派，scope 仅 revocations | **不变**；链深 `MAX_DEPTH=2`（root→org→team） |
+| 新鲜度 | expires_at/ttl/status_uri 三可选字段 | **不变**（只进输出；硬拒需 `--require-fresh-revocations`） |
+| 常驻判据 | 43 项 + 信任锚 16 项 | **43 / 16** |
+| 分发 | 仍**拉取式**（不发布/不订阅/不轮询） | **不变** |
+
+> 本表只作「当时 → 现行」导航，不替代实跑。
+
+## 复现与引用口径
+
+```bash
+python -m pytest desktop/tests/test_revocations.py desktop/tests/test_trust_anchor.py -q   # 43 + 16 项
+nf evidence revocations verify f2.json --key-file k.bin --prev f1.json   # 校验 + 前序链
+nf evidence revocations merge f2.json f1.json --key-file k.bin --out revocations.json  # 合并（任一份坏即整次失败）
+```
+
+- 引用本文时：「信封只证来源与回滚、分发仍靠带外」= 长期口径；子命令与字段以 `--help` 与实现实读为准。
+- 新鲜度纪律：默认只 WARN；要硬拒须显式 `--require-fresh-revocations`，且「完全没有吊销来源」不得判死。
 
 ## 复核
 

@@ -28,6 +28,11 @@ REQUIRED_MARKERS = (
     "系统消息信任边界", "沙箱意识", "输出保护", "求证优先", "单问约束",
     "做了什么 / 遗留什么 / 设计偏差",
 )
+#: 止损清单（2026-11 加）：四条高发误判必须逐条在场（只增不减）
+LESSONS = ("下不全是普通文档", "一致性报告重算后必须重新批准",
+           "带译件的文档要同步三处", "没跑完的门禁不许写成全绿")
+LESSON_SECTION = "本仓高发误判"
+
 #: 破坏性命令清单（少一条即有人照着做）
 DESTRUCTIVE = ("git stash", "git reset --hard", "git checkout --", "git restore",
                "git clean", "git push -f", "git branch -D", "rm -rf")
@@ -47,6 +52,20 @@ def load_text(path: Path = AGENTS) -> str:
     if not text.strip():
         raise ValueError("AGENTS.md 为空")
     return text
+
+
+def lesson_issues(text: str) -> list:
+    """止损清单：段落在场、四条逐条在场、且不许把「部分通过」写成「全绿」。"""
+    issues = []
+    if LESSON_SECTION not in text:
+        issues.append("缺「本仓高发误判」止损清单段")
+        return issues
+    for item in LESSONS:
+        if item not in text:
+            issues.append(f"止损清单缺条目：{item}")
+    if "台账造假" not in text:
+        issues.append("缺「不许写成全绿 = 台账造假」口径")
+    return issues
 
 
 def dangling(text: str, root: Path = ROOT) -> list:
@@ -100,6 +119,7 @@ def agents_issues(text: str, root: Path = ROOT) -> list:
         issues.append("缺端壳退役记录 docs/L3_FROZEN.md")
     for target in dangling(text, root):
         issues.append(f"引用的仓内路径不存在：{target}（悬空引用）")
+    issues += lesson_issues(text)
     return issues
 
 
@@ -109,6 +129,10 @@ class AgentsContractTest(unittest.TestCase):
 
     def test_agents_matches_contract(self):
         self.assertEqual([], agents_issues(self.text), "AGENTS.md 不满足可核性契约")
+
+    def test_lessons_section_present(self):
+        """止损清单（2026-11 加）：四条高发误判逐条在场，且明令「不许写成全绿」。"""
+        self.assertEqual([], lesson_issues(self.text), "AGENTS.md 止损清单不完整")
 
     def test_references_resolve(self):
         """文中反引号路径与 Markdown 相对链接必须逐个可解析。"""

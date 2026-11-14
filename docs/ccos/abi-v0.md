@@ -1,8 +1,11 @@
 # CCOS ABI v0：7 个系统调用
 > ⛔ 操作指令：阅读即执行——本文含可直接执行的命令与判定，勿当资料阅读。
-> 最后更新：2026-11-07
+> 最后更新：2026-11-13
 > **Status**: Draft v0 · **性质**: 正式协议（形状固定；实装状态逐调用如实标注，未实装不许当已实装读）
 > **上位**: `STRATEGY.md`（方向与禁令）→ 本文件（ABI 层）。
+> **复核（2026-11-13）**：7 个调用的状态、错误面、maps_to 与判据数字**逐项复核仍成立**；本文已有**常驻机检** `test_ccos_abi_docs.py`（7 调用 id/状态、错误码登记、registry 校验、文档里写的 unittest 数、向量数、maps_to 可达）——不是纯散文。
+> 数字现状一：攻击矩阵 **38 例（38/38 PASS）**；`cc_resolve` 声明面 **23 条声明（22 面 + 1 链）**；链测 **9 项**；策略词表 **5 类**。
+> 数字现状二：独立实现向量集 **28 条**（真源 `results/ccos/evidence_verdict_vectors.json`）。见文末「§现状对照」。
 
 ## 是什么
 
@@ -295,7 +298,7 @@ python -m unittest desktop.tests.test_ccos_chain            # 9 项：摘要一�
 |---|---|---|
 | `cc_label` | 声明层 + sidecar 回退 + **PNG iTXt / JPEG APP15 载体**已有（读回 / 内容面不变 / 结构合法 / 对象绑定）；链上只接 **sidecar 标签环**（嵌入载体对象不进链，见上）；**仍缺**：水印嵌入、其余格式（MP4/PDF/…）载体、20+ 格式覆盖 | 水印与多格式需要专门的写入子系统；本季只做能自证的两种 |
 | `cc_check` | 判定面：封闭词表（5 类规则）；**编译面 v0 已有**（结构化意图 → 规则，不可表达项逐条挂账）；**法规原文 → 意图**仍需人写 | 政策编译的语义层：不承诺自动把法规原文变成意图，缺的意图必须逐条挂账 |
-| `cc_resolve` | v0 只认真实声明的契约面（23 条 spec，opt-in）；未声明的对象一律 unclaimed | 契约声明面为人工编纂；未认领给 `unclaimed` 而非放行，不得读成「查过了没问题」 |
+| `cc_resolve` | v0 只认真实声明的契约面（**23 条声明 = 22 面 + 1 链**，opt-in）；未声明的对象一律 unclaimed | 契约声明面为人工编纂；未认领给 `unclaimed` 而非放行，不得读成「查过了没问题」 |
 
 本表只记录**内部差距实证**；外部项目的能力不作为开项依据（`STRATEGY.md` §3.3）。
 
@@ -314,6 +317,32 @@ python -m unittest desktop.tests.test_ccos_chain            # 9 项：摘要一�
 | 外部盲评作质量判据 | 作者显式解冻外部实测，且 STRATEGY §3.1 同步修订；此前只作 advisory |
 | 公开基准 / 外部复验统计 | 同上（外部动作由作者显式触发） |
 | Go / WASM 验证器 | 出现无 Python 环境的第三方复验需求；零依赖单文件（scripts/nf_verify.py）是当前基线 |
+
+## 现状对照（2026-11-13 · 以实跑为准）
+
+| 面 | 本文声明 | 复核结果（读到本行时请重跑） |
+|---|---|---|
+| 7 调用 | cc_label / cc_check / cc_attest / cc_verify / cc_replay / cc_diff / cc_resolve | **7 个 id 与状态不变**（`test_ccos_abi_docs` 常驻校验） |
+| 攻击矩阵 | 38 条已知攻击 | **38 条，实跑 38/38 PASS**（`nf evidence bench`） |
+| 独立实现向量 | 28 条向量集同判 | **28 条**（`results/ccos/evidence_verdict_vectors.json`，`count == len(vectors)`） |
+| cc_check 策略词表 | 5 类封闭集 | **不变**（`check_policy.KINDS` 五项逐字一致） |
+| cc_resolve 声明面 | 「23 条 spec」 | **23 条声明 = 22 面（data 10 / code 7 / script 4 / index 1）+ 1 链** |
+| 链复现 | `scripts/ccos_chain.py` 四环 + 可选 label 环 | **不变**；链测 **9 项** |
+| 本文机检 | 未提 | `test_ccos_abi_docs.py`（7 例）+ `test_evidence_vectors.py`（8 例） |
+
+> 本表只作「当时 → 现行」导航，不替代实跑；数字以命令与数据文件实读为准。
+
+## 复现与引用口径
+
+```bash
+python scripts/nf.py evidence bench                      # 38 条攻击矩阵（任一条不达期望即 exit 1）
+python scripts/nf.py evidence verify --selfcheck         # 四词判定各自可达
+python scripts/ccos_chain.py --target STRATEGY.md --json # 链复现（同一摘要逐环流下去）
+python -m pytest desktop/tests/test_ccos_abi_docs.py -q  # 本文自身的机检（7 例）
+```
+
+- 引用本文时：7 调用形状/判定词表/退出码 = 稳定面（改即破坏性变更）；实装状态以各行标注 + 机检为准。
+- 失真定义照旧：任一调用的「实装状态」与实际能力不符 = **本文失真**，须改状态或改实现，不许两可。
 
 ## 版本与迁移
 

@@ -1,7 +1,11 @@
 # 搜索引擎提交：站点地图 · IndexNow · 各站控制台（详细流程）
 
 > 适用对象：NinFenz 站点（https://ninfenz.dev）。本文件是**操作手册**，不参与站点资产上传（已在 .assetsignore 里排除）。
-> 最后更新：2026-10-08
+>
+> **复核（2026-11-14）**：七类通道、IndexNow 配置与各控制台流程**复核不变**；
+> 本轮**修一处陈旧数字**（§1 原写「33+ 项离线判据 / 28 项联网判据」，实测离线为 **42 项**，联网项数不再钉），
+> 并补「§11 现状对照」「§12 复现与引用口径」——把「配置在哪个文件、密钥文件叫什么、哪些命令需要网络」写清。
+> 最后更新：2026-11-14（复核）
 
 ---
 
@@ -31,8 +35,8 @@
 
 ## 1 提交前的一次性自检（都已在位，列出来便于复核）
 
-    node site/tools/site-check.mjs --offline      # 33+ 项离线判据：canonical/hreflang/JSON-LD/机器面/CORS/抓取规则
-    node site/tools/site-check.mjs https://ninfenz.dev   # 28 项联网判据：状态码/响应头/内容协商/数字真值
+    node site/tools/site-check.mjs --offline      # 42 项离线判据：canonical/hreflang/JSON-LD/机器面/CORS/抓取规则
+    node site/tools/site-check.mjs https://ninfenz.dev   # 联网判据：状态码/响应头/内容协商/数字真值（需网络）
     node site/tools/sync-numbers.mjs             # 站点数字与仓库真源一致（防"发布旧数字"）
 
 三项都必须绿。**搜索引擎最忌讳的两种状态**是 canonical 指向别处、sitemap 里的 URL 返回非 200 —— 这两条判据都已覆盖。
@@ -233,3 +237,33 @@ ChatGPT / Claude / Perplexity / Gemini / Copilot 等**不提供站点地图提�
 **把控制台给出的"名称 + 值"原样发我，我用 Cloudflare API 加好并复核**（我们的 token 对该 Zone 有 DNS 编辑权，实测可改 Zone 设置、可删误建 zone）。
 
 Cloudflare 面板路径：ninfenz.dev → DNS → 记录 → 添加记录 → 类型 TXT / 名称 @ / 内容粘贴 / TTL Auto → 保存。
+
+
+---
+
+## 11 现状对照（2026-11-14 · 以 `site/tools/*.mjs` / `indexnow.json` / `.assetsignore` 实读为准）
+
+| 面 | 当前口径 | 复核方式 |
+|---|---|---|
+| 提交通道 | **7 类**（IndexNow / GSC / Bing / Yandex / 百度 / 中国其它 / AI 生成式） | §0 速览表 |
+| IndexNow 配置 | `site/tools/indexnow.json`：host `ninfenz.dev` · **urlList 4 条** · key `ninfenzff1511339a8885ca8dbee4b8` · enginesCovered **4 家**（Bing/Yandex/Seznam/Naver） | 该 JSON 实读 |
+| 密钥文件 | `site/ninfenzff1511339a8885ca8dbee4b8.txt`（内容 = 密钥本身，站点根可访问） | `ls site/*.txt` |
+| 离线判据 | `site-check --offline` **42 项**（canonical/hreflang/JSON-LD/机器面/CORS/抓取规则/无旧基址） | 本机实跑 |
+| 联网判据 | `site-check <url>`（状态码/响应头/内容协商/数字真值）；**需网络，本机未跑** | 部署后跑 |
+| 数字真值 | `sync-numbers.mjs`（站点数字 vs 仓库真源） | 本机实跑 |
+| 不入站点资产 | `.assetsignore` 排除 **9 条**：`CNAME` / `README.md` / 两篇 DEPLOY / `.nojekyll` / `.assetsignore` / `tools/` / `worker.js` | 该文件 |
+
+**本轮修口径**：§1 原写「**33+ 项**离线判据、**28 项**联网判据」——离线实为 **42 项**（`site-check --offline` 输出「离线体检全过（42 项）」）；联网项数随目标站点与网络状态而变，**不再钉数字**。
+
+**不钉的东西**：各引擎的收录状态（Google/Bing/Yandex/百度控制台里的「已编入」数是外部事实，随时变），本文只记录**我们这边的动作与判据**。
+
+## 12 复现与引用口径
+
+```bash
+node site/tools/site-check.mjs --offline      # 42 项离线判据（无需网络）
+node site/tools/sync-numbers.mjs             # 站点数字 vs 仓库真源（漂移 exit 1）
+node site/tools/indexnow.mjs --dry-run       # 只打印将提交的 URL（不发请求）
+```
+
+- 引用本页时：「已提交」= **我们发过请求且有响应码**；「已收录」是引擎侧事实，本文不声称（只有作者能在控制台看到）。
+- 需要网络的三件事——`site-check <url>`（联网判据）、`indexnow.mjs`（真实提交）、各控制台的「请求编入」——**本机一律未执行**，如实标注。

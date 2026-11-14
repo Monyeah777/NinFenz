@@ -1,6 +1,10 @@
 # リリース編成（release）
 > ⛔ 操作指示：本ファイルはリリース方針の**人読投影**です。機読真源は `protocol/release_policy.json`（`protocol/schema/release.schema.json` で検証）、機検前置は check38 の `release_gate` 子スキャンです。読んだら実行してください。
-> 最后更新：2026-10-11 (last updated)
+> 最終更新：2026-11-13
+> **再確認（2026-11-13）**：凍結チェーン順序・版の三面・Golden Master 退役・境界は**変更なし**。
+> 検証可能な現状を追記（`nf release --plan --json` と方策ファイルから実読）：計画 **11 步**
+> （pre-1/pre-2 · gate-1/gate-2 · changes-1 · freeze-1/freeze-2/freeze-3 · ver-1 · audit-1 · tag-1）· 凍結チェーン **3 步** ·
+> 版の三面 **3** · 必須成果物 **4** · 方策ファイルの錨 **3 節**。「§現状対照」を参照。
 
 ## これが解決するもの
 
@@ -51,6 +55,30 @@ python scripts/nf.py changelog --version X.Y.Z --date YYYY-MM-DD --write  # 挿�
 ```
 
 規則と理由は `changes/README.md`。判据は check38 の `release_gate` 子スキャン。
+
+## 現状対照（2026-11-13 · `nf release --plan --json` と方策ファイルの実読）
+
+| 面 | 現値 | 再確認方法 |
+|---|---|---|
+| 計画ステップ | **11**（pre-1 / pre-2 / gate-1 / gate-2 / changes-1 / freeze-1 / freeze-2 / freeze-3 / ver-1 / audit-1 / tag-1） | `nf release --plan --json` |
+| 凍結チェーン | **3 步**：conformance → approve → receipts（順序は入れ替え不可） | `protocol/release_policy.json: freeze_chain` |
+| 版の三面 | **3**：CHANGELOG / VERSION-MATRIX / README 版ブロック | 同上 `version_faces` |
+| 必須成果物 | **4**：conformance_report / RECEIPTS / approvals / results/audit | 同上 `required_artifacts` |
+| 方策の錨 | **3 節**（人読件に三節が揃うこと。`release_gate` が機検） | check38 の `release_gate` 子走査 |
+| `git tag` | **人が実行**（自動実行面に入れない） | 「境界」節 |
+
+> 索引のみ。ステップ順は `--plan --json` の実読が真（PASS 期待値はここに書かない）。
+
+## 再現と引用の口径
+
+```bash
+python scripts/nf.py release --plan --json    # 機読計画（11 步：コマンド / 産物 / 判定）
+python scripts/nf.py release --plan           # 人読計画
+python scripts/nf.py release                  # リリース前健診（verify + coverage + e2e + レポート鮮度）
+```
+
+- 引用時の口径：「凍結チェーンは順序を入れ替えない；回執は内容変更の後に最後に走らせる」が長期口径。
+- `--apply` は既存コマンドを順に呼ぶだけで、新しい書き込み意味論は足さない。タグ打ちは常に人が行う（不可逆）。
 
 ## 境界（宣伝しない）
 

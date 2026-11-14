@@ -12,6 +12,8 @@
 - [meta-cockpit-manifest.json](meta-cockpit-manifest.json)（运行时代码/契约/协议统一摘要清单）
 - [docs_audit-58-pending-items.md](audit/docs_audit-58-pending-items.md)（六条挂账收口 + 出口/会话面外部核验）
 - [docs_audit-57-external-protocols.md](audit/docs_audit-57-external-protocols.md) · [interop-schema-validation.md](interop-schema-validation.md)（外部权威校验取证）
+- [trust/BASELINE.md](trust/BASELINE.md) · [trust/CLAIM_MATRIX.md](trust/CLAIM_MATRIX.md)（Trust Fabric WP-00 基线审计：锚点复验 + 差距重估 + Claim–Evidence 矩阵）
+- [trust/trust_vectors.json](trust/trust_vectors.json)（Trust Fabric 测试向量集：34 条 / 7 族；跨语言可自验，生成器 `scripts/trust_vectors.py`）
 
 ## 互操作导出面（入仓投影）
 

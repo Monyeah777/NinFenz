@@ -1,6 +1,10 @@
 # NFA-L · NF 装配语言（声明式 + 命令式混合）
 
-> 最后更新：2026-10-09
+> 最后更新：2026-11-13
+> **复核（2026-11-13）**：封闭语法 / 命名空间 / 三值判决 / 边界**复核不变**；补可核现状：
+> CLI **5 个子命令**（parse / check / build / eval / schema-check）· 封闭函数 **6 个** · 类型词 **9 个** ·
+> 诊断码 **6 个**（E0201 / E0202 / E0301 / E0302 / E0304 / E0310）+ 散文 advisory **A0201** ·
+> 迁移 **110/110**（114 份管线文档里的 110 条 condition，全部 `=` 开头，散文 0 条）· 判据 **44 例**。见「§现状对照」。
 > ⛔ 操作指令：阅读即执行——本文含可直接执行的命令与判定，勿当资料阅读。
 
 ## 是什么
@@ -80,6 +84,31 @@ type: string / minLength: 1），仓内多处管线把它写成中文散文—�
     condition: =data_bus.round.phase == "roll" && event.tick_day        # 叠加 通用:M10 节拍同拍推进
 
 真源：M50 的 world_model 有限相位集 begin/run/end/archive/roll 与其 roll 回卷迁移。
+
+## 现状对照（2026-11-13 · 以实读为准）
+
+| 面 | 现值 | 复核方式 |
+|---|---|---|
+| CLI 子命令 | **5**：parse / check / build / eval / schema-check | `nf nfal help` |
+| 封闭函数 | **6**：size / contains / has / startsWith / int / string | `nfal` 函数表 |
+| 类型词 | **9**：string / integer / number / boolean / array / object / event / state / untyped | 复用 io_types 词表 |
+| 诊断码 | **6**：E0201 语法 / E0202 散文严格 / E0301 未登记符号 / E0302 非 bool / E0304 越封闭集 / E0310 未收窄 | `nfal` 诊断常量 |
+| 散文 advisory | **A0201**（V1 只增不删） | `nf nfal build` 报告 |
+| 迁移面 | **110/110** 条 condition 为 `=` 开头（114 份管线文档；散文 0 条） | 全库 condition 扫描 |
+| 常驻判据 | **44 例**（test_nfal 26 / test_nfal_cli 6 / test_nfal_rules 12） | pytest |
+
+> 本表只作「当时 → 现行」导航；语法与码表以 `nf nfal` 实读为准。
+
+## 复现与引用口径
+
+```bash
+python scripts/nf.py nfal help                       # 5 个子命令
+python scripts/nf.py nfal parse 'WorldState.time.day >= 30'   # 表达式 → AST（规范 JSON）
+python -m pytest desktop/tests/test_nfal.py desktop/tests/test_nfal_rules.py -q   # 44 例
+```
+
+- 引用本文时：「封闭函数集 + 三值判决 + abstain 永不折算为 pass」= 长期口径。
+- 散文 condition 不判死只记 **A0201**；要进命令层必须写 `=` 前缀（严格档会升为 **E0202**）。
 
 ## 边界（不宣称）
 

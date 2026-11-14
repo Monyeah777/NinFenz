@@ -1,6 +1,9 @@
 # Glama 上架一步一步教程（NinFenz Content Gate）
 
-> 更新时间：2026-10-18
+> 更新时间：2026-11-14（复核）
+> **复核（2026-11-14）**：13 节操作步骤与字段说明**复核不变**；补一件读者最需要分清的事——**哪些是「仓库侧可核」、哪些是「Glama 平台侧不可核」**：
+> 仓库侧本轮实读通过（Dockerfile 基座按 `@sha256` 钉版 + 非 root 用户 + `CMD ["python","scripts/nf.py","serve"]` + 运行期零 pip；`glama.json` 的 maintainers 与 schema；`pyproject.toml` 版本与文中一致；MCP 面 12 工具 + 1 prompt）。
+> **平台侧**（33% 完成度 / TDQS / Repository Not Ready / Releases）**只能在浏览器里看**，仓库无法验证，故一律标注「平台侧未验」——不要把它当成本仓的判据。
 > 你现在的页面状态：**Discovery/Profile 33% · TDQS 未评分 · Repository Not Ready · No releases · No tools**
 >
 > 先用三句话看懂：
@@ -9,6 +12,31 @@
 > 2. **Quality 现在未评分**，因为 Glama 还没成功构建并启动过这个服务；构建入口是 Dockerfile 页。
 > 3. 仓库侧文件已经全部写好并推到 GitHub；剩下 **4 个需要登录 Glama 的按钮**只能由你点
 >    （我没有你的 Glama OAuth 会话，无法代点）。下面把每个按钮、每个字段写清楚。
+
+## 现状对照（2026-11-14 · 仓库侧可核 / 平台侧不可核）
+
+| 面 | 现值 | 复核方式 |
+|---|---|---|
+| 镜像基座 | `python:3.11-slim` **按 `@sha256` 钉版**（裸 tag 会被 check41 拒） | `Dockerfile` 的 `FROM` 行 |
+| 运行用户 | 非 root（`USER nf`，uid 10001） | `Dockerfile` |
+| 启动命令 | `CMD ["python","scripts/nf.py","serve"]` | `Dockerfile` 尾行 |
+| 运行期依赖 | **零 pip / 零构建步**（纯 stdlib） | `Dockerfile` 注释与 COPY 面 |
+| 上架主张 | `glama.json`：maintainers = `Monyeah777`，schema = Glama server.json | 该文件实读 |
+| 版本口径 | `pyproject.toml` 与文中一致（`1.0.5`） | `pyproject.toml` |
+| MCP 面 | **12 工具 + 1 prompt** | `desktop/src/core/mcp_runtime.py` |
+| 平台侧状态 | **不可核（平台侧未验）**：完成度 %、TDQS、Repository Ready、Releases | 只能由作者在浏览器核对 |
+
+> 本表只作「当时 → 现行」导航；仓库侧数字/形态以文件实读为准，平台侧状态**不进本仓判据**。
+
+## 复现与引用口径
+
+```text
+python scripts/nf.py serve --help          # 入口与参数（stdio / 快照面 / --http）
+python -m pytest desktop/tests/test_mcp_runtime.py -q   # 工具面 12 + prompt 1 的判据
+```
+
+- 引用本文时：「仓库侧证件齐全 ≠ 平台侧已上架」——两者分开说，不混淆。
+- 文中提到的 commit 哈希是**当时快照**，不钉当前值；核对时以 `git log -1 --format=%H` 为准。
 
 ## 0. 你截图里的每一项是什么意思
 

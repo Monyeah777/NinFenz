@@ -1,6 +1,9 @@
 # 发布编排（release）
 > ⛔ 操作指令：本文是发布策略的**声明件**——`core/release_gate.py` 逐锚点机检（`nf release --plan` / check38 子扫描）；读到即执行，勿当资料。
-> 最后更新：2026-10-11
+> 最后更新：2026-11-13
+> **复核（2026-11-13）**：冻结链顺序、版本面三处、Golden Master 退役、边界**复核不变**；补可核现状（`nf release --plan --json` / 策略件实读）：
+> 计划 **11 步**（pre-1/pre-2 · gate-1/gate-2 · changes-1 · freeze-1/freeze-2/freeze-3 · ver-1 · audit-1 · tag-1）· 冻结链 **3 步** ·
+> 版本面 **3 处** · 必备工件 **4 件** · 策略件锚 **3 段**。见「§现状对照」。
 
 ## 这份文件解决什么
 
@@ -62,6 +65,31 @@ python scripts/nf.py changelog --version X.Y.Z --date YYYY-MM-DD --write  # 落�
 ```
 
 规则与理由见 `changes/README.md`；判据在 check38 的 `release_gate` 子扫描（字段缺失 / 条目不可溯源即红）。
+
+## 现状对照（2026-11-13 · 以 `nf release --plan --json` 与策略件实读为准）
+
+| 面 | 现值 | 复核方式 |
+|---|---|---|
+| 计划步数 | **11**（pre-1 / pre-2 / gate-1 / gate-2 / changes-1 / freeze-1 / freeze-2 / freeze-3 / ver-1 / audit-1 / tag-1） | `nf release --plan --json` |
+| 冻结链 | **3 步**：conformance → approve → receipts（顺序不可颠倒） | `protocol/release_policy.json: freeze_chain` |
+| 版本面 | **3 处**：CHANGELOG / VERSION-MATRIX / README 版本块 | 同上 `version_faces` |
+| 必备工件 | **4 件**：conformance_report / RECEIPTS / approvals / results/audit | 同上 `required_artifacts` |
+| 策略件锚 | **3 段**（人读件三段锚齐，`release_gate` 机检） | check38 的 `release_gate` 子扫描 |
+| `git tag` | **由人执行**（不入自动执行面） | 本文「边界」段 |
+
+> 本表只作「当时 → 现行」导航；步序以 `--plan --json` 实读为准（PASS 期望值不在此手写）。
+
+## 复现与引用口径
+
+```bash
+python scripts/nf.py release --plan --json    # 机读计划（11 步：命令 / 产出 / 判据）
+python scripts/nf.py release --plan           # 人读计划
+python scripts/nf.py release                  # 发布前体检（= verify + 覆盖率 + e2e + 报告新鲜度）
+```
+
+- 引用本文时：「冻结链顺序不可颠倒；回执在内容改动之后最后跑」= 长期口径。
+- `--apply` 只按序调既有命令，**不新增写语义**；打 tag 永远由人做（不可逆）。
+- 语言面：本指南有 en / ja 两版（见文末），改本文须同步译件并 `nf locales --write` 重签。
 
 ## 边界（不宣称）
 

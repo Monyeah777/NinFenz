@@ -17,9 +17,9 @@ import nf  # noqa: E402
 
 #: 第 123 轮审计时已知未被测试提及的路径旗标（冻结；新增的不许进这里）
 LEGACY_UNCOVERED = frozenset({
-    "--ballots", "--build-dest", "--check-file", "--check-md", "--compile",
-    "--context-dir", "--decision", "--experiment", "--handoff-out",
-    "--ingress-policy", "--injections", "--job-id", "--journal",
+    "--ballots", "--build-dest", "--check-file", "--check-md",
+    "--context-dir", "--decision", "--experiment",
+    "--job-id", "--journal",
     "--label-object", "--prev", "--responses", "--save-path", "--script-file",
     "--session-path", "--sidecar", "--state-path", "--template",
 })

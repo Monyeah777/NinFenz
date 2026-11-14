@@ -20,6 +20,10 @@
 
 ![NF ターミナル TUI デモ（枠線は閲覧者のフォントに依存しません）](site/assets/demo.gif)
 
+`python tui/nf.py` で全画面 UI が開きます。`--selftest` は安全自己検査、`--demo` は上のフレームをそのまま出力、`--exec "nf doctor"` はスクリプト面です
+（TTY なしでも可：`--list-actions --json` がエージェント向けにアクションと終了コードを返します）。コマンドはワーカースレッドで実行されるため、実行中の `Ctrl-C` はそのコマンドだけをキャンセルします。
+パス引数はリポジトリ内包判定を通り、書き込みは `yes` の入力が必要で、API キーは環境変数からのみ読み取ってマスク表示します。詳細は `tui/README.md` を参照。
+
 > MIT License · オリジナルのオープンソース · 派生・引用の際は出典を明記してください
 
 NF は**コンテンツ契約層（content contract layer）**です——「AI が長文コンテンツを安定して産出する」ためのプロトコル・品質ゲート・資産基準を定義します。プロトコル自体はドメイン中立・モデル非依存です。
@@ -33,9 +37,12 @@ NF は**コンテンツ契約層（content contract layer）**です——「AI 
 ## ⚡ AI / エージェントの方へ
 
 - これは何か：仕様駆動のドキュメント工場。モジュール／パイプライン／資産を搭載 → 検証 → 出力。
-- 入口チェーン：`docs/agent/AGENT_START.md`（着手）→ `docs/agent/AI_ROUTING.md`（経路選択）→ `docs/meta/DEEP_DIVE.md`（深く理解する）。
+- 入口チェーン：`docs/agent/AGENT_START.md`（着手）→ `docs/agent/AI_ROUTING.md`（経路選択）→ `docs/meta/DEEP_DIVE.md`（深く理解する）。クラウドからの取得・番号による呼び出し・投稿案内は `docs/agent/ROUTES.md` へ。
+- 導入後の一歩：`npx -y ninfenz doctor`（健康診断 17/17）→ `nf serve`（読み取り専用 MCP）。「導入 → 自己検査 → MCP 接続」の完全ガイドはリポジトリ直下に同梱されています。
 - 機械証憑：`bash verify.sh`（現在の基準値は下部の生成領域「品質証憑」行。`nf stats --write` が書き込みます）。機械向け入口一覧は `llms.txt`。言語面は `README.en.md` · `README.ja.md`（三面の機読事実と言語切替行は check34 の言語面スキャンが常時検証。登録表 = `protocol/locales.json`）。
 - 設計意図を知る：[docs/meta/DEEP_DIVE.md](docs/meta/DEEP_DIVE.md) を参照。
+
+> 最終更新：2026-11-12
 
 ## クイックスタート
 
@@ -47,8 +54,10 @@ NF は**コンテンツ契約層（content contract layer）**です——「AI 
 2. `python scripts/nf.py shell`（対話ターミナル。シェル退役後の人間向け入口。詳細は `docs/terminal.md`）
 3. `python scripts/nf.py demo`
 4. `python scripts/nf.py --help`
-5. `python scripts/nf.py doctor`
+5. `python scripts/nf.py doctor`（健康診断：17/17 合格）
 6. `python scripts/nf.py completion bash`
+
+各ステップの合格条件：`bash verify.sh` の最終行が `PASS=` 基準値かつ `FAIL=0`。`nf doctor` とその他のコマンドは終了コード 0 でそのステップ合格です。Windows では `bash verify.sh` を Git Bash から実行してください。静的面だけの高速検査は `bash verify.sh --checks-only`（テストは実行しません）。
 
 > **セキュリティ境界（`nf verify` は対象リポジトリ自身のゲートスクリプトを実行します）**：エンジンは
 > 対象リポジトリの `verify.sh` に埋め込まれた Python を**同一プロセス内**で実行します（CWE-94）。
@@ -61,7 +70,7 @@ NF は**コンテンツ契約層（content contract layer）**です——「AI 
 AI による組立：
 
 1. `docs/agent/AGENT_START.md` を読む
-2. `docs/agent/agent_组装指令包_v0.2.md` を読む（`v0.2.md` は同一ファイル）
+2. `docs/agent/agent_组装指令包_v0.2.md` を読む
 3. 必要に応じて 01/02/06/07 と `community/` のパッケージを取得
 4. 「完全版」を組み立て、`##7` のセルフチェックを通す
 5. `nf assemble "<要件>" --build --dest <ディレクトリ>`（組立コマンド：単一ファイルの「完全版」を直接生成）
@@ -76,6 +85,9 @@ AI による組立：
 - **産出物の合格判定は？** 判定は内部チェーンのみ：verify ゲート（静的に検証可能）＋五次元の縦深自己評価＋実戦例。外部評価は品質の裏付けとして用いません。
 - **引用方法は？** MIT ライセンス。引用時は出典を明記してください。機読メタデータはリポジトリ直下の引用ファイル（`CITATION.cff`）にあります。
 - **輸出・コンプライアンスは？** 暗号は標準ライブラリと外部 `ssh-keygen` のみ（独自アルゴリズムなし）。輸出管理の読み方は `docs/EXPORT.md` にあります。
+- **導入手順は？** ゼロインストール：`npx -y ninfenz --version`（npm パッケージ名 `ninfenz`、有料版なし）。プロトコルを改変する／全ゲートを実行する場合は `git clone` 後に `python scripts/nf.py doctor` → `bash verify.sh`。
+- **動作環境は？** Python ≥ 3.11（コアは標準ライブラリのみ、pip 不要）。Node ≥ 18.17 は npm 入口のみ必要。Windows では `bash verify.sh` を Git Bash から実行。
+- **MCP 接続は？** `nf serve` が読み取り専用の stdio サーバーを起動します。クライアント側で `mcpServers` を `{ "ninfenz": { "command": "npx", "args": ["-y", "ninfenz", "serve"] } }` と宣言してください。能力面は 12 ツール + 1 プロンプト（`assemble_guide`）。
 
 ## 機能と資産
 
@@ -126,7 +138,9 @@ nf stats                 # ゲートとリポジトリの状態
 |---|---|---|
 | v0.93 | 2026-10-05 | 知識層の検索、ターミナル形態、デジタル資産契約（資産を横断再利用） |
 | v0.92 | 2026-09-10 | 世界状態モデル：決定的な抽象状態＋スロット（同じ入力なら同じ出力） |
-| v0.82 | 2026-09-09 | 品質纵深 45 項目＋基盤層 A |
+| v0.82 | 2026-09-09 | 品質の縦深 45 項目＋基盤層 A |
+
+バージョンの真源：CLI 系列 = `pyproject.toml`（npm パッケージのメタデータと突合）。品質基準 = `protocol/repo_stats.json`（`nf stats --check` が断言）。
 
 リリース規則（2026-10-20 以降）：コンテンツ系列は `v0.xx` —— 小さな更新は現行版に統合、小さな突破は **+0.01**、革新的な突破は **+0.1**。CLI 系列は
 `1.0.x` で独立。リリースごとに `CHANGELOG.md` を更新し、タグは**機能を含むコミット**に打ちます。

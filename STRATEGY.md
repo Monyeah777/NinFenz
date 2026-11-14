@@ -56,6 +56,21 @@
 3. 公开文案纪律：仓库文档只写结果/状态；不写决策过程、不引作者原话、不写内部流水账。
 4. 开工依据检查：本波要补的内部差距是什么？（答不出 = 不开工）
 
+## 六、五维载体（可核索引 · 2026-11-14 补）
+
+> 本节**只做导航、不改口径**：§二 的五维纵深是质量定义，本节把「每一维在哪里被机检 / 在哪里留证」写清楚，避免「知道要看五维，却不知道去哪看」。
+
+| 维 | 机检载体 | 留证位置 | 复核命令 |
+|---|---|---|---|
+| 静态可核验 | `verify.sh`（check 族，只增不减） | `protocol/verification_report.json` | `bash verify.sh --checks-only` |
+| 动态可执行 | `desktop/tests/fixtures`（演练集与回合样本） | `docs/42_M1_P03_演练集.md` · `protocol/drill_fidelity.json` | `python -m pytest desktop/tests/test_drill_fidelity.py -q` |
+| 架构纯度 | conformance 契约族（purity / 层级） | `protocol/conformance_report.json` | `python scripts/nf.py conformance` |
+| 资产密度 | 资产/内容面判据（模块与资产台账） | `protocol/RECEIPTS.json` | `python scripts/nf.py receipts` |
+| 文档可执行性 | 文档判据（可达性 / 示例可跑 / 卫生） | `results/audit` | `python -m pytest desktop/tests/test_doc_examples.py -q` |
+
+- 这张表是**索引**，不是第二份事实：任一格与真源不一致时，以命令实读为准，并回头修表。
+- 五维之外不新增维度；若某维缺载体，那是缺口（如实登记），不是把该维删掉。
+
 ---
 
 > **v1 修订记录（2026-09-08）**：作者批准建立本文件——战略内核公开化（目标/验收/法官/发布边界），配套「计划内部消化」发布纪律；战术细节留本地密级档案，不随仓库分发。

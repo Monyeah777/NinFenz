@@ -2,13 +2,14 @@
 
 状态：**已实装**（判据：`desktop/tests/test_evidence_vectors.py` 8 项；结果件：`results/ccos/evidence_verdict_vectors.json`）。
 > ⛔ 操作指令：阅读即执行——本文含可直接执行的命令与判定，勿当资料阅读。
-> 最后更新：2026-11-05
+> 最后更新：2026-11-13
 > **Status**: v0 已实装（scripts/evidence_vectors.py + results/ccos/evidence_verdict_vectors.json）
+> **复核（2026-11-13）**：28 例结构、双实现同判、确定性口径**复核不变**；修三处**实际缺陷**：① 两个代码块围栏被写成单反引号（`` `json `` / `` `bash ``），围栏不成立 → 已改回三反引号；② 产物形状样例 `"count": 15` 与实况 **28** 不符 → 改 28；③ 覆盖表**漏了 3 个 decision 用例**（`decision_ok` / `decision_policy_swap` / `decision_strip`）→ 已补，现表恰 **18 包 + 4 回执 + 6 信封 = 28**。见「§现状对照」。
 
 ## 是什么
 
 一份**与实现无关**的 JSON：**28 例**「证据字节 → 期望判定 + 期望退出码」的固定用例，覆盖
-自包含包 / 回执 / 信封三种形态（分布见下表）。任何语言的
+自包含包 **18** / 回执 **4** / 信封 **6** 三种形态（分布见下表）。任何语言的
 `cc_verify` 实现都能只读这一份文件自证对不对——不需要读本仓代码、不需要装 NF 工具链。
 
 与攻击矩阵（`nf evidence bench`）的分工：矩阵证明「**本实现**抓得住攻击」；向量集证明
@@ -16,11 +17,11 @@
 
 ## 产物形状（nf-evidence-vectors/1）
 
-`json
+```json
 {
   "schema": "nf-evidence-vectors/1",
   "pinned_at": "2026-01-01T00:00:00Z",
-  "count": 15,
+  "count": 28,
   "vectors": [
     {"id": "ok_digest_only", "desc": "完好包（digest_only）",
      "expected": {"verdict": "ok", "exit_code": 0},
@@ -31,7 +32,7 @@
      "expected": {"verdict": "invalid", "exit_code": 4}}
   ]
 }
-`
+```
 
 字段语义：`bundle_b64` 解码即证据包字节（`bundle_sha256` 是它的摘要）；`key_b64` 给出时按
 hmac-sha256 级校验；`revocations` / `anchor` / `at` 就是 `nf evidence verify` 的对应参数。
@@ -50,6 +51,9 @@ hmac-sha256 级校验；`revocations` / `anchor` / `at` 就是 `nf evidence veri
 | revoked | 吊销表命中 | revoked / 2 |
 | expired | 有效期已过 | expired / 3 |
 | bad_revocations | 包内吊销表坏件（不是「无吊销」） | invalid / 1 |
+| decision_ok | 包带 decision 且两侧自洽 | ok / 0 |
+| decision_policy_swap | decision 策略摘要被换 | invalid / 1 |
+| decision_strip | decision 只留一侧（声明面/绑定面缺一） | invalid / 1 |
 | traversal_path | 成员路径含双点段（解包越界写的入口） | invalid / 1 |
 | dup_members | 重名成员（zip 歧义：判定不可复算） | invalid / 1 |
 | not_a_bundle | 输入不是证据包 | 用法错 / 4 |
@@ -72,15 +76,40 @@ hmac-sha256 级校验；`revocations` / `anchor` / `at` 就是 `nf evidence veri
 
 ## 本仓怎么生成与复核
 
-`bash
+```bash
 python scripts/evidence_vectors.py --write   # 重写向量集（确定性：钉死时间戳 + 固定密钥）
 python scripts/evidence_vectors.py --check   # 提交件 == 重算（CI / gate 用）
 python -m unittest desktop.tests.test_evidence_vectors   # 8 项：期望成立 + 双实现同判 + 可复现
 # 注：向量集里的容器面两条（traversal_path / dup_members）是 2026-11-05 容器加固的锚点
-`
+```
 
 确定性来自两处：`SOURCE_DATE_EPOCH` 钉到 `pinned_at`（信封时间戳固定）、zip 用固定时间戳 +
 不压缩 + 成员名排序。`--write` 两次逐字节一致——否则「向量」会随生成时刻漂移。
+
+## 现状对照（2026-11-13 · 以实跑为准）
+
+| 面 | 本文声明 | 复核结果（读到本行时请重跑） |
+|---|---|---|
+| 向量条数 | 28 例 | **28**（`count == len(vectors)`） |
+| 形态分布 | 包 / 回执 / 信封 | **18 / 4 / 6**（含 3 个 decision 绑定用例） |
+| schema | `nf-evidence-vectors/1` | **不变** |
+| 双实现同判 | core 版 ↔ `scripts/nf_verify.py` | **不变**（`test_evidence_vectors` 8 项含同判与可复现） |
+| 生成确定性 | SOURCE_DATE_EPOCH + 固定 zip 元数据 | **不变**（`--write` 两次逐字节一致） |
+| 注入面 | `key_b64` / `revocations` / `anchor` / `at` | **不变**；另支持 decision 相关用例（包内声明面） |
+| 判据数 | 8 项 | **8 项**（`test_evidence_vectors.py`） |
+
+> 本表只作「当时 → 现行」导航，不替代实跑。
+
+## 复现与引用口径
+
+```bash
+python scripts/evidence_vectors.py --check    # 提交件 == 重算（CI / gate 用）
+python scripts/nf.py evidence bench           # 攻击矩阵 38/38（与向量集分工不同：绑定实现）
+python -m pytest desktop/tests/test_evidence_vectors.py -q   # 8 项（期望成立 + 双实现同判 + 可复现）
+```
+
+- 引用本文时：「向量集绑定契约、矩阵绑定实现」= 长期分工；条数/分布以 JSON 实读为准。
+- 第三方用法不变：读 JSON → 校验 `bundle_sha256` → 按判定顺序复算 → 比 verdict 与退出码；**任一条不一致先查自己的实现**。
 
 ## 边界
 

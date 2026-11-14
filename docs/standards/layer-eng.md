@@ -7,6 +7,18 @@
 - 可达性是**本机实测**（探针日期见每条），不可达条目照实标注、不假装可达。
 - 本页为 `docs/standards/index.md` 的按层切片，锚点与主索引一致。
 
+## 怎么读本页
+
+- 本层含义：工程方法与过程约定（架构建模、构建交付、可观测性与协作约定）
+- 本层可达：34/38（不可达 4）
+- 本层绑定最多：mlcommons-bench（主锚 110 / 辅锚 0） · cncf-otel-semconv（主锚 46 / 辅锚 27） · peps（主锚 7 / 辅锚 0）
+- 本层不可达：archimate（HTTP 401） · iso-iec-25010（HTTP 403） · iso-iec-42010（HTTP 403） · togaf（HTTP 401）
+- 本层机构分布：OMG 4 条 · OpenSSF 4 条 · IETF 2 条
+- 生成物：`python scripts/geo_export.py --write` 重写本页；`--check` 比对生成物与真源，不一致即红。手改必红。
+- 切片口径：本页只收 `layer` 等于该层的标准，锚点与主索引 `index.md` 逐字一致。
+- 行字段：名称 · 机构 · 层 · 可达（HTTP · 探针日期） · 扩展点 · 绑定（主锚/辅锚） · 规范 URL。
+- 互指：全量见 `index.md`；按问题形态聚合见 `answer-cards.md`；三面一致性由 check40 判，本页只是**投影**。
+
 ### `archimate`
 - ArchiMate 3.2 企业架构建模 · The Open Group · 层 eng · 可达 否（401 · 2026-09-24） · 扩展点 specialization, exchange-format · 绑定 主锚 0 / 辅锚 0 · https://pubs.opengroup.org/architecture/archimate3-doc/
 

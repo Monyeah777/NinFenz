@@ -6,35 +6,87 @@ scope: 作者指令「把管线/模块/资产牵扯到叙述的全部删除，�
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - 01_核心协议.md:73f550896c9fa3185be72139adfed1277bf193bad7a363fab207d7bc3cdf0969
-  - 02_联动注册表.md:686e91e8bbb6055f7dfeea8cd9beae064dc941d7b31263909cc159e58447e3ba
-  - 06_Agent执行协议.md:849503effd94f1d7da1d5aab2c9dc2bc6113bb3ea8de4f6fa18446695ba8fd52
-  - 07_官方核心出厂与社区预设导航.md:c7c522fd4f0370674cc2c191855c2fe14849fba04f7a5d8b2c68b437d8c34233
-  - 03_管线库/P00_通用文档生成管线.md:e3acba0c5111b7e67094c4d82d815cd941bd2ebf6b36d5b71f8574241c2e06a2
-  - 03_管线库/P01_标准管线.md:45176d7415faa9b63055892717f8262538e6ead83fff2d3ee83c11ad6df375ee
-  - 03_管线库/P90_结构装配管线.md:b44562314643a042781a22f50a609785d339642c41c57db7ab134a732720b0dc
-  - 04_模块库/通用类/M00_数据槽总线.md:dd9a95691343370a880b4aad605716901d7cb794859094da62c4099eac5795c9
-  - 04_模块库/通用类/M10_节拍推进.md:d5e92a58ce3c0d5d144366828f919f3ce6eb7e2cc3234ad62a1c98535d77aacb
-  - 04_模块库/通用类/M23_可见性边界.md:9635fe2d9f74a8f1d7e5060bfac3c44dc3545f81c9de515aae134205bb51f007
-  - 04_模块库/通用类/M24_规则组合.md:1e5429032ca392f703c8123da4c4d0877bca0b60e1ad4b73744245a0329bc494
-  - 04_模块库/通用类/M50_调度器.md:ddb590f6af181c677caccc39190a5a65b04751e9b0aec4bf5fb5ec27c6a9d524
-  - 04_模块库/通用类/M80_输出质检门.md:b2dad838246b0f6287729131cd1aae464843691c1ede95bdcfb412a6eaf2cd48
-  - 04_模块库/事件类/M06_流程状态机.md:321bd9492a6d5f6390e00542c4de2dc1914fdd3ddf5e35e0da9cb3981f9ebdcd
-  - 04_模块库/事件类/M12_模板检索库.md:e927b0b1fc3d04b435fab672db4b92962ea28cb1ea8d2457c808ad377137006c
-  - 04_模块库/事件类/M13_实体交互.md:9fa11d50e132082e55522cd56a3f7f3e84403f24ab6ee90f84a3805af6868d64
-  - 04_模块库/事件类/M20_知识条目库.md:6178afdd65522494ba7fd9fe060d5b220269c0b4e893ec50ac631f4d0685e924
-  - 04_模块库/事件类/M22_事件编排.md:b9b9d9728621912f954a67ae5d5ce80dc5ee7ec7945441a6b602b37fbfc9ad1a
-  - 04_模块库/世界类/M08_环境状态.md:eb27707703c93a787150a8f32ecb0d5a2a273d56a8e93d2b4789def281c5fb81
-  - 04_模块库/技术文档类/M90_结构装配.md:7ed8a8435be582e59aa070a10d5d6a6b234dfc127a0613507bd5842bf5a876a4
-  - 05_资产库/README.md:7f8d241a8e6ce0f2b65a8e37b7708fa260044aec78b44f1efa986f7b57bf49bb
+  - 01_核心协议.md:c41235b97816da38d3a061d85823e60ecc677339e26b261daad2da8551efaf50
+  - 02_联动注册表.md:8c4c72367cc196034a7800f668be9e5e82daa1099ee84bd173c09cb1d337c200
+  - 06_Agent执行协议.md:5935ac3d9aa38a1eeb495238686877fd61ef8c0ff41a4495a3768974546e03ce
+  - 07_官方核心出厂与社区预设导航.md:d958c1f28681f22a3fa99784e906646cf2803372ad6e6896f2f8bc25fb3e9391
+  - 03_管线库/P00_通用文档生成管线.md:d02ba569b21ca459a131df465522dc4410585b78dac0412eea16fb10578b348b
+  - 03_管线库/P01_标准管线.md:f8548e1c7179b63ab2ce573371e1831c983032be9c6b45214d0d62882b73d1a0
+  - 03_管线库/P90_结构装配管线.md:078451643906e9a8a7b16b172b5af8561762258689a3087d3dd82539c30d4090
+  - 04_模块库/通用类/M00_数据槽总线.md:a7b8ecab2c1eac96120eb4aae811c1e5b15d2b4c215c2df52a5e6e1fc9118440
+  - 04_模块库/通用类/M10_节拍推进.md:5ff248d5843585e5132ae3a6a51c3f600f35cad893c5f8ff55b96d17292f1647
+  - 04_模块库/通用类/M23_可见性边界.md:52042fc2c60cbcae33136b3dd5d8829a0ee1b869243c22a338bedf56d60486e6
+  - 04_模块库/通用类/M24_规则组合.md:d1e4419c5833caf95d62760fb22704afee2bcd71cd9191cdb2e53734351c422c
+  - 04_模块库/通用类/M50_调度器.md:54a544d3d219c7fa03e6aa6217d4aabb08903c52d37823bc0175b6a2c122d9b4
+  - 04_模块库/通用类/M80_输出质检门.md:e4bf0cb24a1ed9fab4e12602f38fff1bb4fbd748c58003826ff2741318e599be
+  - 04_模块库/事件类/M06_流程状态机.md:926b752844c76852e748334522bd79b5fa90ff38bb83a197db1cfea5442e9edc
+  - 04_模块库/事件类/M12_模板检索库.md:542679405444e17a41ddd5ed333022be359a1abc3a3311c1af014fe58ca34fed
+  - 04_模块库/事件类/M13_实体交互.md:ceb1e8726acff0cd3951f544e2b9db9b045e72f8b9f8af905c31594ec843f368
+  - 04_模块库/事件类/M20_知识条目库.md:cbbaf05a888bc6c7a95714f178dc9ffb9a6ecbb07deadf0738f7b7a284ce489e
+  - 04_模块库/事件类/M22_事件编排.md:747a7dccdaf506b55ab457c08359f722a7775b1aca8821d92e9afe3e123a11f2
+  - 04_模块库/世界类/M08_环境状态.md:3327f91dd0fb83336c45f0b939a3bde9f58ab3630383d5306f646ffc2dfd8a7d
+  - 04_模块库/技术文档类/M90_结构装配.md:8e044fc382f526d15cb972fef07b25c358dc3b46e89bb3e659c9a95059de3750
+  - 05_资产库/README.md:2288451b33be5959789f7072a2089acc5b78e92902d4b105e354b0057a281d8f
   - 05_资产库/provenance.json:293d3d3dfd1bf25e0fdeaa32e4b14cc817ed974b4209fda45619c65a1473ab93
-  - 05_资产库/用户自定义/README.md:03068b5931dba4a0ae92020f9eddcb058bba27a852b0cf9ea015413607374dbf
-  - 05_资产库/用户自定义/STYLE_DNA.md:b7ebed51132f13d4f42d6b3e8b6c425a653e947531e5952d65aa49df8e0a4381
+  - 05_资产库/用户自定义/README.md:72b90b606c14015a1ec5c6ba2ad47e80ed0ff5ca28de567934974cfa220e3662
+  - 05_资产库/用户自定义/STYLE_DNA.md:08d9414ecf85bddc9b5825651c582c726508294aef2fd3cd6fcfcc0edf872d79
   - protocol/asset_keys.json:59d9fcfb03e4da3c21c1b23bc83c2c0518c6e0c94147b3a6aa3915700e2bd33f
   - desktop/src/core/registry.json:cdcb852579785d8817451398021e55441e635a857e0acd3557af9a86b030e7ca
   - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
 
 ---
+> 重审（2026-11-12）：STYLE_DNA 资产顶尖化（读法/机检 + 三式配置纪律 + 示例档语义 + Phase 1/2 标识符口径 + 不越界阈值声明）+ 契约判据 test_style_dna_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-12）：05_资产库/用户自定义 README 顶尖化（读法/机检 + 键清单/schema 速览与资产文件对账 + nf-asset 头/台账三方 + 校验面）+ 契约判据 test_user_assets_readme_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-12）：05_资产库 README 顶尖化（读法/机检段 + 五接口清单同源 01 §3 + provenance/asset_keys/用户自定义三源覆盖 + 单层货架硬规 + §6 引用映射口径）+ 契约判据 test_asset_library_readme_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-12）：M80 输出质检门顶尖化（唯一输出闸 / gate_action 单源 / 8 段判定记录 / 零事件固定节点豁免理由 / 硬门不可关）+ 契约判据 test_module_m80_contract；权重增量重测、边界重冻结。本轮为机械重绑。
+
+> 重审（2026-11-12）：M50 调度器顶尖化（world_model writes 改回 world_slots 在册冻结路径 / 全局调度器 layer·mounts 约定 / 三形态与机读投影口径）+ 契约判据 test_module_m50_contract；权重增量重测、边界重冻结。本轮为机械重绑。
+
+> 重审（2026-11-12）：M24 规则组合顶尖化（零事件+resolve 接口口径 / 不虚构 token 口径 / 依赖面与 02 §4 对账 / I4 配方表边界）+ 契约判据 test_module_m24_contract；权重增量重测、边界重冻结。本轮为机械重绑。
+
+> 重审（2026-11-12）：M23 可见性边界顶尖化（零事件+filter 接口口径 / 依赖面与 02 §4 对账 / 只读纪律 / Phase 2 迁移口径）+ 契约判据 test_module_m23_contract；权重增量重测、边界重冻结。本轮为机械重绑。
+
+> 重审（2026-11-12）：M10 节拍推进顶尖化（outputs 补全为双事件 payload 并集 / io_types 按规则重推 / tick_day 发布订阅对账 / 三形态与 I3·I4 边界）+ 契约判据 test_module_m10_contract；权重增量重测、边界重冻结。本轮为机械重绑。
+
+> 重审（2026-11-12）：M00 数据槽总线顶尖化（纯内部基座豁免依据 / 冻结槽位与 world_slots 对账 / 02 §4 依赖对账）+ 契约判据 test_module_m00_contract；权重增量重测、边界重冻结。本轮为机械重绑。
+
+> 重审（2026-11-12）：M90 结构装配顶尖化（四形态 / 双声明同源 / P90 八层挂载对账 / fail-closed）+ 去叙述词；机械重绑。
+
+> 重审（2026-11-12）：M90 结构装配顶尖化（四形态口径 / 机读块 ⇄ §2 Module 同源 / P90 八层挂载对账 / fail-closed 边界）+ 契约判据 test_module_m90_contract；权重增量重测、边界重冻结。本轮为机械重绑。
+
+> 重审（2026-11-12）：M22 事件编排顶尖化（outputs/payload 补全为 narrative_event 注册字段全集 / 七订阅在册 / inputs 空显式声明 / I3·I4 边界）+ 契约判据 test_module_m22_contract；权重增量重测、边界重冻结。本轮为机械重绑。
+
+> 重审（2026-11-12）：M20 知识条目库顶尖化（零事件+query 接口口径 / 双挂载 P70 active + P00 available 同源 / I3·I4 边界 / query 只读）+ 契约判据 test_module_m20_contract；权重增量重测、边界重冻结。本轮为机械重绑。
+
+> 重审（2026-11-12）：M13 实体交互顶尖化（outputs/payload 补全为 interaction_update 注册字段全集 / 三形态 / I3·I4 边界 / M12 search 接口引用）+ 契约判据 test_module_m13_contract；权重增量重测、边界重冻结。本轮为机械重绑。
+
+> 重审（2026-11-12）：M12 模板检索库顶尖化（零事件模块 interfaces 补全 search / 三形态口径 / I3·I4 只读边界）+ 契约判据 test_module_m12_contract；check12 权重增量重测、模块边界按新契约重冻结。本轮为机械重绑。
+
+> 重审（2026-11-12）：M06 流程状态机顶尖化（机读块 outputs/payload 补全为事件注册表全集 / 三形态口径 / I3·I4 边界 / 事件名在册）+ 契约判据；模块边界签名按新契约重冻结。本轮为机械重绑。
+
+> 重审（2026-11-12）：M08 环境状态模块顶尖化（三形态口径 / I3·I4 边界 / 机读投影口径 / 事件名在册）+ 契约判据 test_module_m08_contract；check12 权重增量实测。本轮为机械重绑。
+
+> 重审（2026-11-12）：P90 结构装配管线顶尖化（读法/机检 + 02 §7.1 同源）+ 去叙述词；本轮为机械重绑。
+
+> 重审（2026-11-12）：P90 结构装配管线顶尖化（读法/机检段 + 02 §7.1 同源判据 + 空行收口）+ 契约判据 test_pipeline_p90_contract；check12 权重增量实测。本轮为机械重绑。
+
+> 重审（2026-11-12）：P01 标准管线顶尖化（读法/机检段 + 三处同源判据 + 空行收口）+ 修 P70 optional 与 02/registry 三处漂移；契约判据 test_pipeline_p01_contract；check12 权重增量实测。本轮为机械重绑。
+
+> 重审（2026-11-12）：P00 管线骨架顶尖化（读法/机检段 + 运行规则空行 + 派生后验收出口）+ 契约判据 test_pipeline_p00_contract；check12 权重增量实测。本轮为机械重绑。
+
+> 重审（2026-11-12）：07 出厂与预设导航顶尖化（读法段 + 节→机检映射 / 7 处标题空行 / AGENT_START 七段描述同源 / 机制段余量 M99 / §7 九项机检映射 + 状态列口径 / 日期同步）+ 契约判据 test_navigation_doc_contract；check12 权重增量实测。本轮为机械重绑。
+
+> 重审（2026-11-12）：06 Agent 执行协议顶尖化（读法段 + 节→机检映射 / §10 标题空行 / RFC Date 与最后更新同步）+ 契约判据 test_execution_protocol_contract；check12 权重增量实测。本轮为机械重绑。
+
+> 重审（2026-11-12）：02 联动注册表顶尖化（读法段 + 节→机检映射 / 7 处标题空行 / 两处跨文件引用精度 / §7 源文切片去 § 形态 / 日期同步）+ 契约判据 test_registry_doc_contract；check12 权重增量实测。本轮为机械重绑。
+
+> 重审（2026-11-12）：01 核心协议顶尖化（读法段 / 机检映射 / 编号桥 / 引用精度）；RFC Date 与最后更新同步为 2026-11-12。本轮为机械重绑。
+
+> 重审（2026-11-12）：01 核心协议顶尖化（读法段 + 节→机检映射表 / 编号桥 / §引用精度 / 末尾分隔线 / 空行收口）+ 契约判据 test_core_protocol_contract；check12 权重增量实测。本轮为机械重绑。
+
 > 重审（2026-10-24）：CI 并发锁、Gitee 诊断与 ADR-0008 改变 verify/脚本字节；重审理由：相应测试与冻结链已同步
 
 > 重审（2026-10-23）：OTLP ID 判据与合作一致性稳定性修正：traceId/spanId 定长 hex，缺失真源诊断去 OS errno

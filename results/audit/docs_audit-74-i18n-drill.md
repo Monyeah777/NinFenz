@@ -6,28 +6,74 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——对应 62
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - protocol/locales.json:f6db86aa2ef8bdc93f8a8d81c26bbef27b57bac7c7fd5450cbf748e5b4cb0429
-  - docs/locales.md:cf3a21039dad98832b3cd92ead92adaa6559b38bd9c96006fea87f0af81a6dc7
-  - docs/en/locales.md:348a2b32a6f04cf830cb332b47b0b05f59265332c2fe37ec79ee63c0563168fa
-  - docs/ja/locales.md:7f870e599fc00ab10c998eb115350b7ceda21655a2ebfcf870f6a2b8300e5f34
-  - docs/en/mcp.md:0653be472bb4888c814d3fc3696e7d882b35c6e49b965cf09b84d41d34c8d6f0
-  - docs/ja/mcp.md:a7a248172cc0119e023b1ed7e5e2c254b3b3db3d357f76e7e6a322e41538ddf2
-  - docs/en/terminal.md:b99ee9b83dd9bcc433b97408785e85b8f265d797eb144abc09c8e0bcae97d046
-  - docs/ja/terminal.md:ae1b37be3309ff21f7bd2096b0295ee073e493ec7bb402c3672ef9f5a72d168e
-  - docs/en/layers.md:f92b4dcea20068c253a2a7455d21fb63bbf3c9493e80f81cb6460d4e464d6c20
-  - docs/ja/layers.md:1f3edfbad694b98228bb720574a54267f7b3b544fbc89436179d77950fde3d57
-  - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - docs/45_M2_回合级drill.md:55bf60d989aba4fe653bd30396b59c12af587151a3b100da9b65f3d2979429e0
+  - protocol/locales.json:09475ad8d3ee21ac44b1d996e600785a0e2f5e1909349d6323f52e03a5345e24
+  - docs/locales.md:49d614fa22cbeacff6166c292b6785566ea07b505556e2d842dfeb515127277a
+  - docs/en/locales.md:7190d1a17094cccd0be4a780230e5777e61694eb5b7f0003c9c3370d1d9ce3c1
+  - docs/ja/locales.md:a2e563172139d5fb7549acd1aca06463f6f5add713ab84aea713ac06af1be86d
+  - docs/en/mcp.md:333b580565595c01dc8fea640a9c2114a295d076cbdbcabcae26462d4e59f3e2
+  - docs/ja/mcp.md:b3c1cf3a9ba549590951460b99f28e64b5f63bdc6087e4fa5510089d5047d81f
+  - docs/en/terminal.md:dccf094dbd07d13ae6a8860775cdafd50cd4a852ddb010b1011d397989cf7db8
+  - docs/ja/terminal.md:09a12eb66595a862b73dea4f0e14a4222a79a7827dc3c1032d9765f84b2f18ef
+  - docs/en/layers.md:71e9d99723c8c5c1c7bcd9e21e991f7dc932d3a528333e7bdafa3f5e718479ac
+  - docs/ja/layers.md:ffd6d02dc518b893e5f9c1c2f60d4572d128b6c438c8261e9d58f2cb8717a086
+  - docs/44_M1_执行演练扩展.md:142a9157504702fa03498494dc452ae2fbb8cfbfcce836992b1d59d1078755e4
+  - docs/45_M2_回合级drill.md:90b57abcdee39848dfff6c8a46c9f9591dff1e1e6c60d5d90a08b66d789b859c
   - desktop/src/core/execution_drill.py:61337ffd5f93bca3cc2519e0f84c9f02f15d44c55ee74ed14acadc63538dd48b
   - desktop/src/core/drill_fidelity.py:a53d9366287ab64431787b2d5b389c3179f22b0cd6c0ca7a091cb86ac07ae190
-  - desktop/tests/test_execution_drill.py:f9df38b1f586fd4a705e608bf849b510ed217c8b38fd1dd68ab78176b2dcb02d
+  - desktop/tests/test_execution_drill.py:da40cad05aab283031afa324236f5780a3bd3192f6f09db5d74d27613dfba411
   - desktop/tests/test_round_drill.py:0a0997e935ce8cd417a7400fbaf2c897853e82297867f25165c9889117667a1a
   - desktop/tests/fixtures/execution/p04_drill_cases.json:9237e2713bab59df20ed8cc4df18f8a4f9bd1fe0437a4acf642b03ccdd9c5d07
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:603eca5fa943c130581f259610cb180f2c6171e2e96334c5a2c3eff1e9e5ab89
+  - protocol/code_metrics_baseline.json:fc99d894ab07d8698a9aa8e81206f8fda0dc6937a0560d4f0a6676125525b8a0
 ---
+> 重审（2026-11-14）：重生成派生面：trust WP-00..12 新增 trust 代码/schema/测试，code_metrics 与审计摘要同步重冻。
+
+> 重审（2026-11-14）：WP-11 trust bundle 入仓（机械重绑）
+
+> 重审（2026-11-14）：WP-03 测试向量与生成器入仓（机械重绑）
+
+> 重审（2026-11-14）：patterns evidence 校验加宽（任意前缀路径校验）使 patterns.py 增至 193 行：属门禁加固的合法增长，code_metrics 基线重冻。
+
+> 重审（2026-11-14）：patterns/INDEX 顶尖化：现状对照/复现口径改为**生成内容**（renderer 实时算计数），页面整页生成物声明；模块增至 192 行属合法生成逻辑增长，code_metrics 基线重冻（--write）；新增判据 test_patterns_index_doc_contract（reindex 幂等逐字节）。
+
+> 重审（2026-11-13）：终端入口文档顶尖化（77 命令/203 索引/8 族/9 区/13 表单/42 斜杠词/4 阻塞/24 确认动词/139 例 + 现状对照 / 复现；en·ja 译件同步后重签；⛔ 标识头归位修 doc_markers）+ 契约判据 test_terminal_doc_contract。
+
+> 重审（2026-11-13）：代码度量重冻：geo_export.py 310 行（机构分布所需 +8）
+
+> 重审（2026-11-13）：层切片页补本层不可达清单：_layer_body 增死链逐条（id + HTTP），无死链则声明「该层全部本机可达」；重生成五页；判据断言每页清单与 catalog 逐条相等；code_metrics 重冻（geo_export 302 行）。
+
+> 重审（2026-11-13）：层切片页补本层统计：生成器 _layer_body 增「本层可达 X/Y」与「绑定最多前三」（按主锚+辅锚排序，读自 binding packs），重生成五页；判据同步断言每个层页的统计与前三；code_metrics 重冻（geo_export 295 行）。
+
+> 重审（2026-11-13）：层切片页补「本层含义」：生成器加 LAYER_NOTES + _layer_body 助手，重生成五页（data/eng/form/gov/iface 各一句层定义）；修一处字符串被拆成两行的排版 bug；code_metrics 重冻（geo_export 282 行）。
+
+> 重审（2026-11-13）：标准层切片页顶尖化：生成器补「怎么读本页」段（切片口径/行字段/互指/投影）并重生成五个层页；code_metrics 重冻（geo_export 267 行）；新增契约判据 test_standards_layer_doc_contract（data 层为锚，另验五层同构）。
+
+> 重审（2026-11-13）：代码度量微调重冻：geo_export.py 254 行（恢复答案卡措辞后 +1）
+
+> 重审（2026-11-13）：标准主索引顶尖化：生成器补索引页「口径与复现」段（生成物纪律/行字段/锚点/其它面/投影）并把两段文案提为模块常量；重生成后索引 +8 行；代码度量重冻（geo_export 253 行）；新增契约判据 test_standards_index_doc_contract。
+
+> 重审（2026-11-13）：重冻代码度量基线（geo_export.py 238 行 / build() 82 行：新增「口径与复现」段所需；确需上调，评审后重冻）
+
+> 重审（2026-11-13）：发布策略声明件顶尖化（11 步 ID 全列/冻结链 3/版本面 3/工件 4/锚 3 段 + 现状对照 / 复现；en·ja 译件同步后重签）+ 契约判据 test_release_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：LSP 接入文档顶尖化（11 能力/16 方法/8MiB/utf-16/77 例 + 现状对照 / 复现；en·ja 译件同步后重签）+ 契约判据 test_lsp_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：MCP 接入文档顶尖化（能力表工具 7→12 全列 / 1 prompt / dual-era / 8MiB / 现状对照 / 复现；en·ja 译件同步后重签）+ 契约判据 test_mcp_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：语言面文档顶尖化（修「五份指南」→6 份含 LSP / 12 译件 / 3 语全 entry+guides；en/ja 译件同步后重签）+ 契约判据 test_locales_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：抽象阶梯文档 + en/ja 译件同步（新增现状对照/复现小节）+ 语言面重签；机械重绑。
+
+> 重审（2026-11-13）：他证通道说明页顶尖化：code_metrics 基线重签（生成器新增面谱/自跑口径文案，模块 513 行·最长函数 55，为有据增长）。
+
+> 重审（2026-11-13）：45 M2 回合级 drill 规范顶尖化（样本 5→6 含 selfrun / 测试 6 例 / --check-trace 回读口径 / 复现命令）+ 契约判据 test_round_drill_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：44 M1 演练覆盖真源顶尖化（8 集口径与实现统一：_hits 接 lexicon + p07_en 纳入测试 / 现状对照 / 复现口径；P06 记录同步 8 套）+ 契约判据 test_m1_drill_coverage_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-12）：library/ALIAS 标题列 + 生成器 +1 行 → code_metrics 基线评审后重冻；契约判据 test_alias_contract。机械重绑。
+
 > 重审（2026-11-11）：L4 判据质量：文字卫生 markdown 面收敛到 repo_face 单点扫描面（66547→370 件）+ .worktrees 静态剪枝
 
 > 重审（2026-11-11）：修复 CI 两处真红：①CodeQL 高优告警（generator 的 SPDX 表达式正则嵌套量词 ReDoS → 改 token 级判定）；②脚本孤儿棘轮（新判据 import 使 gen_third_party_notices 获得入口 → 从 ORPHANS 与一次性审计清单移除，清单 6→5）。本轮为机械重绑。
