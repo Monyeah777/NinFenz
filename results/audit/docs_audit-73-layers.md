@@ -11,18 +11,20 @@ subjects:
   - desktop/tests/test_layer_model.py:8cea98de879a4bdf795f95afff9c8fa9a7675ebac227018b7b7694a158bfd69c
   - desktop/src/core/purity_scan.py:bc114898836f914212cec64e0b22c7d3f93b8681557d82f845a200a85683b0cc
   - desktop/tests/test_purity_scan.py:6979d6c7f88822141daf73d04ac6e86b29ae47e01f5f35a8be80145925fca2d3
-  - scripts/nf.py:4e8fb0b08b1eff6e8df543911dab0ce38efd5f4a78218acd9438f9da97ce5426
+  - scripts/nf.py:3026aad56e562650ab4db01aa76e73694fd841998ab3d84050643a2dd9c0950e
   - verify.sh:3391c203ca4c17a56e0177ce6292239570ff367ee7fce6d08f19777f5ca54c8e
   - docs/layers.md:7b849fb07769ba6df5ca888a9de5323417b47a07ef54ec2c1c801673a7fbd7c0
   - docs/L3_FROZEN.md:863a152271b1b969a3249194d1169628f4a4647a9bdd801473cfc9cb75c6643b
-  - protocol/assertions.json:7e9b94526373078cd84d87b3385c72b3a0daa868a3001ed318cfb8cd6a88d01a
-  - protocol/data_contracts.json:326a93b6f3509db0979d55edf32842e6c06ec5dc98187bd2eea5cec3d5b7dcb4
+  - protocol/assertions.json:c2d5551b1963cfb3af8d644f051a845932316d0049cd250a3a3e67f6993d8624
+  - protocol/data_contracts.json:e1ab701fa294b939f0af8e8da24f851842d85f0ea9df15c5ad5588422c737ffc
   - protocol/normative.json:c1bbc14c92cea6bd66ff6cb54fdcf91bf3072f66adee7027f1d3f42e70fe1825
   - protocol/glossary.json:0af6a0f3b1f128b30c0eb88a8db0d2c143461910a889737dfdf4e38e89f85ba7
   - desktop/src/core/receipts.py:b748915bb519aeeb1aa0f7d367df2eb7d4321b369b85905a7f918d8d55d96363
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
 
 ---
+> 重审（2026-11-15）：NF-Final WP-23：新增 core/delivery.py、results/delivery/*（包+报告）、docs/delivery.md、test_delivery_contract.py；nf agent run --deliver/--sidecar；assertions/data_contracts/independence/code_metrics/check12 更新
+
 > 重审（2026-11-14）：NF-Final WP-22：新增 core/output_validation.py、results/output/output-report.json、docs/output-validation.md、test_output_validation_contract.py；assembly K-002 复用本模块；assertions/data_contracts/independence/code_metrics/check12 更新
 
 > 重审（2026-11-14）：NF-Final WP-21：新增 core/assembly_runtime.py、results/assembly/sample-document.assembly.json、docs/assembly-runtime.md、test_assembly_runtime_contract.py；nf agent run --assembly；assertions/data_contracts/independence/code_metrics/check12 更新

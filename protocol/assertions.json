@@ -994,6 +994,21 @@
       "message": "产物校验报告缺失或版本名不符（WP-22 判据依赖它）",
       "fix": "重跑 output_validation.write_report；再跑 test_output_validation_contract",
       "evidence": "test_output_validation_contract / conformance::modeling"
+    },
+    {
+      "id": "delivery-report",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "results/delivery/delivery-report.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-delivery-report/1"
+      },
+      "message": "交付报告缺失或版本名不符（WP-23 判据依赖它）",
+      "fix": "重跑 nf agent run --assembly --deliver --sidecar；再跑 test_delivery_contract",
+      "evidence": "test_delivery_contract / conformance::modeling"
     }
   ]
 }

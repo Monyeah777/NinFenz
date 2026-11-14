@@ -2155,6 +2155,10 @@ def _add_parser_governance(sub):
     agr.add_argument("--report", action="store_true", help="写 results/adapter/adapter-report.json")
     agr.add_argument("--assembly", action="store_true",
                      help="跑 WP-21 装配运行时（spec→task→context→adapter→校验→gate→export 记录）")
+    agr.add_argument("--deliver", action="store_true",
+                     help="WP-23：交付打包（需 --assembly 且 delivered）")
+    agr.add_argument("--sidecar", action="store_true",
+                     help="交付包附带 evidence/sidecar.json（可选，不阻塞）")
 
     wkp = sub.add_parser("wiki",
                          help="LLMWiki 编译（投影：pages/index/graph/llms.txt/MCP）",
@@ -9677,6 +9681,30 @@ def _cmd_agent(args) -> int:
             from core import assembly_runtime as ar
             record = ar.run(args.intent, args.adapter, ROOT, args.budget, args.role)
             status = str((record.get("run") or {}).get("status"))
+            if getattr(args, "deliver", False):
+                if status != "delivered":
+                    print("✗ 未 delivered 不能打包（修复指引：先让装配运行时 delivered）",
+                          file=sys.stderr)
+                    return 1
+                from core import delivery as dv
+                from core import output_validation as ov
+                intent = sc._load_intent_file(ROOT, args.intent)
+                task = sc.compile_intent(intent, ROOT, args.intent)["tasks"][0]
+                pack = cp.pack_task(task, ROOT, args.budget, args.role)
+                out = aa.run(args.adapter, task, pack, ROOT)
+                report = ov.validate(out, task, pack, ROOT)
+                pkg = dv.build(record, out, report, sidecar=bool(args.sidecar))
+                dv.write_pack(pkg, ROOT)
+                issues, drep = dv.verify(pkg["dest_rel"], ROOT)
+                dv.write_report(drep, "results/delivery/delivery-report.json", ROOT)
+                if issues:
+                    for item in issues[:5]:
+                        print("  ✗ %s" % item, file=sys.stderr)
+                    return 1
+                print("  ✓ 交付包：%s（files=%d · sidecar=%s · ok=%s）"
+                      % (pkg["dest_rel"], len(pkg["manifest"]["files"]),
+                         pkg["manifest"]["sidecar"], drep["ok"]))
+                return 0
             if getattr(args, "json", False):
                 print(ar.render(record), end="")
             else:

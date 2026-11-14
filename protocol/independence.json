@@ -45,6 +45,7 @@
       "context_packer",
       "contract_history",
       "cq_scan",
+      "delivery",
       "eval_validity",
       "evidence",
       "i18n_checks",

@@ -31,6 +31,7 @@
 - [../docs/agent-adapter.md](../docs/agent-adapter.md) · [adapter/adapter-report.json](adapter/adapter-report.json)（G2 WP-20 Agent Adapter：有界 task→受契约输出、2 adapter parity、编造引用=0；`nf agent list|run`，判据 `test_agent_adapter_contract.py`）
 - [../docs/assembly-runtime.md](../docs/assembly-runtime.md) · [assembly/sample-document.assembly.json](assembly/sample-document.assembly.json)（G2 WP-21 Assembly Runtime：P00 黄金路径 core-only E2E、接口两层记录、失败即停；`nf agent run --assembly`，判据 `test_assembly_runtime_contract.py`）
 - [../docs/output-validation.md](../docs/output-validation.md) · [output/output-report.json](output/output-report.json)（G2 WP-22 Output/Validation：adapter 契约 + nf-contract/1 + output form 校验、失败拒收；判据 `test_output_validation_contract.py`）
+- [../docs/delivery.md](../docs/delivery.md) · [delivery/delivery-report.json](delivery/delivery-report.json)（G2 WP-23 Delivery：manifest nf-delivery/1 + 可选 sidecar、路径安全/篡改检出/可复现；`nf agent run --assembly --deliver`，判据 `test_delivery_contract.py`）
 - [ADR_MAP.md](ADR_MAP.md)（方案 §16.2 裁决 → `nf-adr/1` 登记投影：12 条映射、`plan_ref` 一对一、实施状态与缺口 WP）
 - [independence.json](independence.json)（生产/治理双平面边界报告：`protocol/independence.json` 65 个模块归属 + 295 个 core 模块静态闭包零跨界，check49 判据件）
 - [production/threat_vectors.json](production/threat_vectors.json)（NF-Final §8 威胁向量：六条信任边界 + STRIDE 8 行 + 失败矩阵 8 行，逐条绑定控制点/证据/状态；判据 `test_production_threat_vectors.py`）

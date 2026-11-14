@@ -1,0 +1,31 @@
+{
+  "assembly_digest": "7a319fc36126b902d78a9bf103fbfc222c95ba13b1d02ebb9fa9234fc37532dd",
+  "files": [
+    {
+      "digest": "2b3a3794dd47880320c69fe7b1b250eb27715837e578c2430d387499d5bcc058",
+      "path": "artifact.md",
+      "role": "artifact",
+      "size": 63
+    },
+    {
+      "digest": "1cccd05580c2d7aecbeb734da7e070197aa0955ae4ab000af84ac9ffa2f5aae5",
+      "path": "evidence/sidecar.json",
+      "role": "sidecar",
+      "size": 2116
+    }
+  ],
+  "note": "交付包不带时间戳（同输入逐字节可复现）；路径必须相对 POSIX",
+  "output": {
+    "chars": 37,
+    "digest": "2b3a3794dd47880320c69fe7b1b250eb27715837e578c2430d387499d5bcc058",
+    "kind": "md",
+    "path": "out/module-M06.md",
+    "tokens": 9
+  },
+  "pipeline": "P00",
+  "schema": "nf-delivery/1",
+  "sidecar": true,
+  "slot": "wiki:module:M06",
+  "validation_digest": "5881e1fe509117aadfe342b2fa7db8d8a8a5a0614ca271437e2c6854ca6ec0f6",
+  "version": 1
+}
