@@ -17,6 +17,7 @@
 - [trust/SELF_AUDIT.json](trust/SELF_AUDIT.json) · [docs/trust/SELF_AUDIT.md](../docs/trust/SELF_AUDIT.md)（G1 收口自审计：S0–S12 维度 + P0/P1 分诊 + 门禁取证）
 - [BASELINE.md](BASELINE.md)（NF Final WP-00 基线审计：34 条 FR/NFR Claim–Evidence 矩阵 + check 编号对账 + 环境/门禁实读）
 - [reverse/INVENTORY.md](reverse/INVENTORY.md)（§4A R0 仓库考古：真源/生成物/草稿三表 + 入口 + 失败面初判）
+- [reverse/CONTRACT_MAP.md](reverse/CONTRACT_MAP.md)（§4A R1 契约提取：显式 11 组 / 隐式 8 组 / 缺口 5 条；机读 `reverse/contracts.json`，判据 `test_reverse_contracts.py`）
 - [ADR_MAP.md](ADR_MAP.md)（方案 §16.2 裁决 → `nf-adr/1` 登记投影：12 条映射、`plan_ref` 一对一、实施状态与缺口 WP）
 - [independence.json](independence.json)（生产/治理双平面边界报告：`protocol/independence.json` 65 个模块归属 + 295 个 core 模块静态闭包零跨界，check49 判据件）
 - [production/threat_vectors.json](production/threat_vectors.json)（NF-Final §8 威胁向量：六条信任边界 + STRIDE 8 行 + 失败矩阵 8 行，逐条绑定控制点/证据/状态；判据 `test_production_threat_vectors.py`）

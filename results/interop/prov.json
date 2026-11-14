@@ -151,7 +151,7 @@
     {
       "@id": "nf:file/protocol/assertions.json",
       "@type": "prov:Entity",
-      "nf:sha256": "cf262899b013882bdb7e06334622c81854be61590c4860638c5ceb8b6bc6430f"
+      "nf:sha256": "e6aa04cdb1235efcc62dbf12b4ed8c902187a5ba1410942254effa06b510a153"
     },
     {
       "@id": "nf:file/protocol/asset_contracts.json",
@@ -181,7 +181,7 @@
     {
       "@id": "nf:file/protocol/conformance_report.json",
       "@type": "prov:Entity",
-      "nf:sha256": "402525a31c0e6086e80db1991631f5555a9cd3ceafb6c590036a0e59f150d762"
+      "nf:sha256": "351ec437cf27c62bf9f8c7a5e8a3f97035e82df11a8f46b8390ea202e852cbe7"
     },
     {
       "@id": "nf:file/protocol/coupling_baseline.json",
@@ -191,7 +191,7 @@
     {
       "@id": "nf:file/protocol/data_contracts.json",
       "@type": "prov:Entity",
-      "nf:sha256": "f486a446e56fedb369ed6c924a8bd70d42f8b0167d7e4f70bd4061054c774c30"
+      "nf:sha256": "a8f267a10b6a3f2eec654f86d09de05618a0feb006dc476f436ec32b5f2fe5c8"
     },
     {
       "@id": "nf:file/protocol/decision_layer.json",
@@ -311,7 +311,7 @@
     {
       "@id": "nf:file/protocol/role_coordinates.json",
       "@type": "prov:Entity",
-      "nf:sha256": "ed3b1aa089e6368a05b1e83d3c1e81f8b44cb4672ac3a80e42cbfea3e42e943d"
+      "nf:sha256": "37836972e1f2675dc5a6eff72f2a8e505073470b0534f3d27e5eef6e6601000b"
     },
     {
       "@id": "nf:file/protocol/sast_baseline.json",

@@ -793,6 +793,21 @@
       "message": "产品发现登记缺失或版本名不符（WP-0A 判据依赖它）",
       "fix": "补/修 protocol/product.json；再跑 test_product_contract",
       "evidence": "test_product_contract / conformance::modeling"
+    },
+    {
+      "id": "reverse-contracts",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "results/reverse/contracts.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-reverse-contracts/1"
+      },
+      "message": "§4A R1 契约地图缺失或版本名不符（G0 逆向判据依赖它）",
+      "fix": "补/修 results/reverse/contracts.json；再跑 test_reverse_contracts",
+      "evidence": "test_reverse_contracts / conformance::modeling"
     }
   ]
 }

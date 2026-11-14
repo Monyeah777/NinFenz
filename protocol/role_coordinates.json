@@ -4,9 +4,9 @@
     "entry": 26,
     "floor": 5,
     "prod": 1062,
-    "projection": 184,
+    "projection": 186,
     "support": 503,
-    "verify": 1407
+    "verify": 1408
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -10925,6 +10925,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "§4A R1 契约地图判据（NF-Final G0 逆向工程）。",
+      "path": "desktop/tests/test_reverse_contracts.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "docs/ccos/revocation-feed-v0.md 契约：吊销 feed 文档必须「五子命令/链深/判据数与实现一致」。",
       "path": "desktop/tests/test_revocation_feed_doc_contract.py",
       "role": "verify",
@@ -14856,16 +14862,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "aa50b5530e16739d1343262dc76bc1675127d998ba9b214bcab351e45568f1aa",
+  "root_digest": "4e92d89a9714e4e2803d1fa5b72936302518fa7ffe6d5dbd3e30bfbc0694db04",
   "rule_counts": {
     "R-app": 1494,
     "R-catch": 350,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 162,
+    "R-projection": 164,
     "R-support": 124,
-    "R-verify": 1278,
+    "R-verify": 1279,
     "auto:R-core": 298
   },
   "schema": "nf-role-coordinates/1"
