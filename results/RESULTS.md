@@ -32,6 +32,7 @@
 - [G3_DOD.md](G3_DOD.md)（G3 QG3 收口审计：§14.3 八条 + §11.2 WP-30…33 + QG3 + 治理指标；verdict=pass-with-open-items、P0=0 → G4；机读 `g3_dod.json`，判据 `test_g3_dod.py`）
 - [../docs/ai-evidence.md](../docs/ai-evidence.md) · [ai/model-card.json](ai/model-card.json)（G4 WP-40 AI 证据链：模型卡+血缘+人类复核三件绑定与 PENDING/APPROVED 状态；真源 `protocol/ai_evidence.json`，判据 `test_ai_evidence_contract.py`）
 - [../docs/aibom.md](../docs/aibom.md) · [ai/aibom.cdx.json](ai/aibom.cdx.json) · [ai/aibom.spdx.json](ai/aibom.spdx.json)（G4 WP-41 AIBOM 导出：CycloneDX AI-BOM + SPDX 2.3 清单，确定性/闭合/无秘密；真源 `protocol/aibom.json`，判据 `test_aibom_contract.py`）
+- [../docs/policy-engine.md](../docs/policy-engine.md)（G4 WP-42 策略适配：外置 nf-policy/1 规则集、默认拒绝、优先级、判定可复算；真源 `protocol/policy_rules.json`，判据 `test_policy_engine_contract.py`）
 - [../docs/wiki.md](../docs/wiki.md) · [../wiki/llms.txt](../wiki/llms.txt)（G1 WP-10 LLMWiki 编译器：133 页投影 + pages/index/graph/llms/MCP 三入口；`nf wiki build/check/get/search/related/context`，判据 `test_wiki_compiler_contract.py`）
 - [../docs/spec-compiler.md](../docs/spec-compiler.md) · [intents/sample-document.json](../spec/intents/sample-document.json)（G1 WP-11 Spec Compiler：intent→nf-spec/1→nf-task/1，确定性/拒绝未知/任务图无环；`nf spec compile`，判据 `test_spec_compiler_contract.py`）
 - [../docs/context-packer.md](../docs/context-packer.md)（G1 WP-12 Context Packer：角色隔离 author/reviewer/governance、预算硬上限、citations 100%、注入检出/清除；`nf wiki context --role`，判据 `test_context_packer_contract.py`）

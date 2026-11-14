@@ -1150,6 +1150,18 @@
         "test_aibom_contract",
         "docs/aibom.md"
       ]
+    },
+    {
+      "id": "policy-rules",
+      "artifact": "protocol/policy_rules.json",
+      "quality_rule": "assertion:policy-rules",
+      "owner": "策略适配（core/policy_engine.py + test_policy_engine_contract）+ WP-42",
+      "status": "active",
+      "freshness": "规则/事实集变化须同步 registry 与求值器；默认拒绝不可改",
+      "consumers": [
+        "test_policy_engine_contract",
+        "docs/policy-engine.md"
+      ]
     }
   ]
 }

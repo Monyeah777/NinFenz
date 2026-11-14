@@ -1120,6 +1120,11 @@
       "max_fn_cc": 19,
       "max_fn_lines": 34
     },
+    "desktop/src/core/policy_engine.py": {
+      "lines": 123,
+      "max_fn_cc": 18,
+      "max_fn_lines": 34
+    },
     "desktop/src/core/policy_snapshot.py": {
       "lines": 19,
       "max_fn_cc": 1,

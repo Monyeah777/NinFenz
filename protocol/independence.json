@@ -59,6 +59,7 @@
       "legal",
       "ops",
       "output_validation",
+      "policy_engine",
       "policy_snapshot",
       "product",
       "production_metrics",

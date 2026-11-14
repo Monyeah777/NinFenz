@@ -1,0 +1,32 @@
+{
+  "schema": "nf-policy/1",
+  "note": "NF-Final G4 WP-42 策略适配机读件：把治理策略外置成可复算规则集（OPA/Cedar 的机制借鉴：策略即代码/判定可复算），本地纯函数求值，不引 Rego/Cedar 运行时。纪律：默认拒绝（deny-by-default）、规则优先级显式、判定给命中规则与理由、缺事实即拒绝（不猜）。判据 desktop/tests/test_policy_engine_contract.py。",
+  "default_effect": "deny",
+  "rules": [
+    {"id": "P-001", "priority": 10, "effect": "deny",
+     "when": {"contract_status": "retired"},
+     "reason": "retired 契约不得被引用/消费（契约生命周期义务）"},
+    {"id": "P-002", "priority": 20, "effect": "deny",
+     "when": {"attachment_mode": "require", "has_evidence": false},
+     "reason": "附件模式 require 下缺证据即拒（WP-32）"},
+    {"id": "P-003", "priority": 30, "effect": "deny",
+     "when": {"required_level": "T3"},
+     "reason": "T3 需签名/TSA/公共锚，本机适配器缺失（WP-31 不可达），不得降级冒充"},
+    {"id": "P-004", "priority": 40, "effect": "deny",
+     "when": {"required_level": "T4"},
+     "reason": "T4 需公共透明日志锚，外部未执行（OPEN），不得冒充"},
+    {"id": "P-005", "priority": 100, "effect": "allow",
+     "when": {"contract_status": "active", "has_evidence": true},
+     "reason": "active 契约 + 证据在场：允许（其余条件由事实层校验）"}
+  ],
+  "effect_vocabulary": ["allow", "deny", "require"],
+  "facts_vocabulary": ["required_level", "achieved_level", "attachment_mode",
+                       "has_evidence", "contract_status", "role"],
+  "rules_meta": {
+    "default": "无规则命中 → deny（不静默放行）",
+    "priority": "数值越小越先评估；deny 优先于 allow（同优先级下 deny 胜）",
+    "require": "require 规则产生义务清单（不直接 allow）"
+  },
+  "claims_boundary": ["策略只做判定与义务，不代替人类复核/外部审计",
+                      "不声称 OPA/Cedar 兼容；只借机制（策略外置/可复算判定）"]
+}

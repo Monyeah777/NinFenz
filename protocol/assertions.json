@@ -1163,6 +1163,21 @@
       "message": "SPDX 导出件缺失或版本名不符（WP-41 判据依赖它）",
       "fix": "重跑 aibom_export.write；再跑 test_aibom_contract",
       "evidence": "test_aibom_contract / conformance::modeling"
+    },
+    {
+      "id": "policy-rules",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "protocol/policy_rules.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-policy/1"
+      },
+      "message": "策略规则集缺失或版本名不符（WP-42 判据依赖它）",
+      "fix": "补/修 protocol/policy_rules.json；再跑 test_policy_engine_contract",
+      "evidence": "test_policy_engine_contract / conformance::modeling"
     }
   ]
 }
