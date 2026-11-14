@@ -19,6 +19,8 @@
 - [reverse/INVENTORY.md](reverse/INVENTORY.md)（§4A R0 仓库考古：真源/生成物/草稿三表 + 入口 + 失败面初判）
 - [ADR_MAP.md](ADR_MAP.md)（方案 §16.2 裁决 → `nf-adr/1` 登记投影：12 条映射、`plan_ref` 一对一、实施状态与缺口 WP）
 - [independence.json](independence.json)（生产/治理双平面边界报告：`protocol/independence.json` 65 个模块归属 + 295 个 core 模块静态闭包零跨界，check49 判据件）
+- [production/threat_vectors.json](production/threat_vectors.json)（NF-Final §8 威胁向量：六条信任边界 + STRIDE 8 行 + 失败矩阵 8 行，逐条绑定控制点/证据/状态；判据 `test_production_threat_vectors.py`）
+- [docs/production/THREAT_MODEL.md](../docs/production/THREAT_MODEL.md)（生产平面威胁模型人读面：边界/STRIDE/失败矩阵 + 状态词表 + 不承诺边界）
 
 ## 互操作导出面（入仓投影）
 
