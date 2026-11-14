@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:22e24633e87e95453d0c2cf4a595d0496bae5d7331c1fc644d5b1555e4925a41
-  - protocol/code_metrics_baseline.json:61a1328d90ea3374f578bf196ba46e3745d0139bea999b404cd88515bb486915
+  - protocol/code_metrics_baseline.json:f02723ab454e6ea1210c7cbb9d91b47b15e2fe6007aa75eeafbd553d6d29517c
 ---
+> 重审（2026-11-14）：WP-11 trust bundle 入仓（机械重绑）
+
 > 重审（2026-11-14）：WP-03 测试向量与生成器入仓（机械重绑）
 
 > 重审（2026-11-14）：patterns evidence 校验加宽（任意前缀路径校验）使 patterns.py 增至 193 行：属门禁加固的合法增长，code_metrics 基线重冻。

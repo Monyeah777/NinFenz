@@ -36,6 +36,7 @@
 | 27 | canonical 单点：键排序/紧凑分隔/禁 float 与 NaN/拒非法类型；域分隔摘要按 tag+0x00+payload；与既有签名口径逐字节一致 | `desktop/src/core/trust/canonical.py` | `test_trust_canonical.py`（12 条：向量逐条 + 既有实现对照 + 变异自证） | T0 | SUPPORTED |
 | 28 | 实体准入 fail-closed：结构 → issuer 在册 → type 被授权，未知一律拒绝且返回稳定 reason 码 | `desktop/src/core/trust/entity.py` | `test_trust_entity.py`（12 条：向量逐条 + 失败面 + 变异自证） | T0 | SUPPORTED |
 | 29 | claim bundle 构建/整包验证：RFC 6962 根 + 逐叶 proof + 覆盖/唯一性，且产物过冻结 schema | `desktop/src/core/trust/bundle.py` | `test_trust_bundle.py`（19 条：merkle 向量逐条 + 篡改矩阵） | T0 | SUPPORTED |
+| 30 | 流程步骤前向绑定：step 摘要含全部字段 + prev/seq 连续，删/改/重排可检测（本地重算边界如实声明） | `desktop/src/core/trust/process.py` | `test_trust_process.py`（20 条：process 向量逐条 + 篡改矩阵 + 就地重算边界） | T0 | SUPPORTED |
 
 **本轮判定**：`UNSUPPORTED` = 0（本轮抽检范围内）；`TODO` 6 条（15/16/18/19/20/21）全部落在计划 G2–G4 的工作包内，不构成文档过度声明。计划 §13.3 的示例行「删尾可检测 / T2 / TODO」与本矩阵第 15 行同源。
 

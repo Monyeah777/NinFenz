@@ -134,35 +134,30 @@ def fold_proof(leaf: str, proof: list) -> str:
     return cur
 
 
-def step_digest(step: dict, prev: str) -> str:
-    base = {
-        "process_id": step["process_id"],
-        "step": step["seq"],
-        "prev": prev,
-        "actor": {"id": step["actor_id"], "kind": "agent"},
-        "authorization": {"kind": "human", "digest": AUTH_DIGEST},
-        "input_refs": [],
-        "output_refs": [],
-        "state_digest": step["state_digest"],
-        "type": step["type"],
-    }
-    return domain_digest("nf:process:v1:step", canonical_bytes(base))
+def step_digest(step: dict) -> str:
+    """单步摘要：canonical(step 去 digest) 经域分隔（step 为 nf-process/1 形状）。"""
+    if not isinstance(step, dict):
+        raise ValueError("step 必须是对象（修复指引：见 nf-process/1 定义）")
+    body = {key: value for key, value in step.items() if key != "digest"}
+    return domain_digest("nf:process:v1:step", canonical_bytes(body))
 
 
 def chain_result(steps: list) -> dict:
     """按 prev 链规则重算；返回 {valid, digests, head} 或 {valid: false, reason}。"""
     digests = []
-    prev = ZERO
-    for i, step in enumerate(steps):
+    head = ZERO
+    for index, step in enumerate(steps):
+        if not isinstance(step, dict):
+            return {"valid": False, "reason": "STEP-NOT-OBJECT"}
         if not isinstance(step.get("prev"), str) or not HEX64.match(step["prev"]):
             return {"valid": False, "reason": "PREV-FORMAT"}
-        if step.get("seq") != i + 1:
+        if step.get("step") != index + 1:
             return {"valid": False, "reason": "SEQ-ORDER"}
-        if step["prev"] != prev:
+        if step["prev"] != head:
             return {"valid": False, "reason": "PREV-MISMATCH"}
-        prev = step_digest(step, prev)
-        digests.append(prev)
-    return {"valid": True, "digests": digests, "head": prev}
+        head = step_digest(step)
+        digests.append(head)
+    return {"valid": True, "digests": digests, "head": head}
 
 
 def admissibility(entity: dict, policy: dict, entity_schema: dict) -> dict:
@@ -300,17 +295,25 @@ def _merkle_vectors() -> list:
 
 
 def _process_vectors() -> list:
-    base = {"process_id": "proc-vector", "type": "task-step", "actor_id": "nf:agent:vec"}
+    base = {
+        "schema": "nf-process/1",
+        "process_id": "proc-vector",
+        "type": "task-step",
+        "actor": {"id": "nf:agent:vec", "kind": "agent"},
+        "authorization": {"kind": "human", "digest": AUTH_DIGEST},
+        "input_refs": [],
+        "output_refs": [],
+    }
     steps = [
-        {**base, "seq": 1, "prev": ZERO, "state_digest": STATE1},
-        {**base, "seq": 2, "prev": "", "state_digest": STATE2},
-        {**base, "seq": 3, "prev": "", "state_digest": STATE3},
+        {**base, "step": 1, "prev": ZERO, "state_digest": STATE1},
+        {**base, "step": 2, "prev": "", "state_digest": STATE2},
+        {**base, "step": 3, "prev": "", "state_digest": STATE3},
     ]
-    prev1 = step_digest(steps[0], ZERO)
-    prev2 = step_digest({**steps[1], "prev": prev1}, prev1)
-    chain = [steps[0], {**steps[1], "prev": prev1}, {**steps[2], "prev": prev2}]
+    steps[1]["prev"] = step_digest(steps[0])
+    steps[2]["prev"] = step_digest(steps[1])
+    chain = steps
     result = chain_result(chain)
-    if not result["valid"] or result["digests"][:2] != [prev1, prev2]:
+    if not result["valid"]:
         raise ValueError("向量自检失败：step 链参考实现不自洽"
                          "（修复指引：检查 step_digest 的 canonical 口径）")
     deleted = [chain[0], chain[2]]

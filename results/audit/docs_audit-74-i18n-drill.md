@@ -26,8 +26,10 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:61a1328d90ea3374f578bf196ba46e3745d0139bea999b404cd88515bb486915
+  - protocol/code_metrics_baseline.json:f02723ab454e6ea1210c7cbb9d91b47b15e2fe6007aa75eeafbd553d6d29517c
 ---
+> 重审（2026-11-14）：WP-11 trust bundle 入仓（机械重绑）
+
 > 重审（2026-11-14）：WP-03 测试向量与生成器入仓（机械重绑）
 
 > 重审（2026-11-14）：patterns evidence 校验加宽（任意前缀路径校验）使 patterns.py 增至 193 行：属门禁加固的合法增长，code_metrics 基线重冻。

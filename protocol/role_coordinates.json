@@ -5,8 +5,8 @@
     "floor": 5,
     "prod": 1057,
     "projection": 166,
-    "support": 460,
-    "verify": 1315
+    "support": 461,
+    "verify": 1316
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -11105,6 +11105,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "trust.process 判据：process 向量族逐条 + prev 链/seq/创世约定 + 删改重排反例。",
+      "path": "desktop/tests/test_trust_process.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "Trust Fabric schema 门禁（WP-01）：7 件 IDL、正/反样例与变异自证。",
       "path": "desktop/tests/test_trust_schemas.py",
       "role": "verify",
@@ -14274,16 +14280,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "e8a188b2ddc35ec78a9387d649fb401b242121a6d1ee44a29b1edaaf2886e28d",
+  "root_digest": "dcdc343c902d96233eec6c73f8438a47a6e220979acbaf342146bbd242a31e02",
   "rule_counts": {
     "R-app": 1467,
-    "R-catch": 308,
+    "R-catch": 309,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 146,
     "R-support": 124,
-    "R-verify": 1189,
+    "R-verify": 1190,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
