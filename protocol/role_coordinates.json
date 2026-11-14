@@ -4,9 +4,9 @@
     "entry": 26,
     "floor": 5,
     "prod": 1068,
-    "projection": 232,
+    "projection": 235,
     "support": 512,
-    "verify": 1449
+    "verify": 1451
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8699,6 +8699,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "WP-54 CQ6 综合审查判据（八维评分卡/红线/棘轮/整改/复审签署状态）。",
+      "path": "desktop/tests/test_cq6_scorecard.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "全仓 CQ0/CQ1 契约（NF-Final WP-0H）：工具矩阵 + 全量扫描件 + 热点 + 质量债/清单。",
       "path": "desktop/tests/test_cq_scan_contract.py",
       "role": "verify",
@@ -14621,6 +14627,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "NF-Final G5 WP-54 CQ6 综合审查登记：§13B.3 八维评分（0–5，权重合计 100%）、分档、红线、棘轮与复审签署要求。纪律：评分必须由**在场证据**按规则算出（不手填）、P0=0、任一维度<2 或未登记 P0 → 总评不得 A/B；人工复审签署不能由 AI 代签（§13C.3），未签如实记 pending-human。判据 desktop/tests/test_cq6_scorecard.py。",
+      "path": "protocol/cq6.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "数据契约登记（机制借鉴 ODCS / Data Contract Specification：契约 = 生产方与消费方的约定，须写明结构、质量、支持渠道）。NF 的机读件此前只有『有 schema 』这一层，没有『谁管、按什么规则判、坏了怎么重建』。本册给每个机读件补三样：quality_rule（谁来判）、owner（维护机制）、freshness（重建动作）——**指不出 quality_rule 的契约不许登记**。",
       "path": "protocol/data_contracts.json",
       "role": "verify",
@@ -15144,17 +15156,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "0ac40af97ba3728c264a194ff7f7ec356cb562830d94ddcc2aa972dc78bce916",
+  "root_digest": "88905b105cb52c1fdc733447a72fdd3021f3d5f2bea8fbc69b8fd345c99e2cdb",
   "rule_counts": {
     "R-app": 1510,
     "R-catch": 356,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 204,
+    "R-projection": 206,
     "R-support": 124,
-    "R-verify": 1317,
-    "auto:R-core": 316
+    "R-verify": 1319,
+    "auto:R-core": 317
   },
   "schema": "nf-role-coordinates/1"
 }

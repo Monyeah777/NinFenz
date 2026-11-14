@@ -84,7 +84,8 @@
       50,
       51,
       52,
-      53
+      53,
+      54
     ],
     "CAP_DETERMINISTIC": [
       25,
@@ -100,7 +101,8 @@
       50,
       51,
       52,
-      53
+      53,
+      54
     ],
     "CAP_TAMPER_EVIDENT": [
       23,
@@ -1257,6 +1259,21 @@
       "message": "最终 Gate 审计件缺失或版本名不符（NF-Final 收口判据依赖它）",
       "fix": "补/修 results/final_dod.json；再跑 test_final_dod",
       "evidence": "test_final_dod / conformance::modeling"
+    },
+    {
+      "id": "cq6-scorecard",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "results/cq/cq6_scorecard.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-cq6-scorecard/1"
+      },
+      "message": "CQ6 评分卡缺失或版本名不符（WP-54 判据依赖它）",
+      "fix": "重跑 cq6_scorecard.write；再跑 test_cq6_scorecard",
+      "evidence": "test_cq6_scorecard / conformance::modeling"
     }
   ]
 }

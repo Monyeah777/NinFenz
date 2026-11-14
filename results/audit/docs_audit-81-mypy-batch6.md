@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:6947df82537f671981dcaba09033d2866d6da88b18a95425e59bb55772abcf70
+  - protocol/code_metrics_baseline.json:dddd6dd43632910237a9845ad0bdfd007d53f035ab5f994d3afade5feadd1c8f
 ---
+> 重审（2026-11-15）：NF-Final WP-54：新增 protocol/cq6.json、core/cq6_scorecard.py、results/cq/{cq6_scorecard,cq6_baseline}.json、test_cq6_scorecard.py；verify.sh check54 + quality_baseline 54 条/PASS=101；docs CQ_REPORT CQ6 评分卡 + QUALITY_DEBT QD-09..11；派生面重生成
+
 > 重审（2026-11-15）：NF-Final WP-51：新增 protocol/stability.json、core/stability.py、results/stability/report.json、docs/stability.md、test_stability_contract.py；assertions/data_contracts/independence/code_metrics/check12 更新
 
 > 重审（2026-11-15）：NF-Final WP-50 收尾2：check12 权重含 test_docs_claims_contract（总 2180.5s ≤2185）、code_metrics 405 件

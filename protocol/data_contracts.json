@@ -1222,6 +1222,19 @@
         "test_final_dod",
         "results/FINAL_DOD.md"
       ]
+    },
+    {
+      "id": "cq6-scorecard",
+      "artifact": "results/cq/cq6_scorecard.json",
+      "quality_rule": "assertion:cq6-scorecard",
+      "owner": "CQ6 综合审查（core/cq6_scorecard.py + test_cq6_scorecard）+ WP-54",
+      "status": "active",
+      "freshness": "证据/评分规则变化后重跑 write；棘轮基线只许不降；复审签署必须人工",
+      "consumers": [
+        "test_cq6_scorecard",
+        "docs/CQ_REPORT.md",
+        "docs/QUALITY_DEBT.md"
+      ]
     }
   ]
 }

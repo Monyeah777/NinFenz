@@ -145,6 +145,7 @@
     "test_cot_exposure": 2.6,
     "test_coupling_metrics": 1.7,
     "test_coverage_workflow_contract": 0.2,
+    "test_cq6_scorecard": 0.2,
     "test_cq_scan_contract": 3.4,
     "test_cross_lang_matrix": 4.8,
     "test_cross_lang_verify": 1.6,
@@ -1951,6 +1952,16 @@
     "test_coverage_workflow_contract.CoverageWorkflowContractTest.test_fail_closed": 0.0,
     "test_coverage_workflow_contract.CoverageWorkflowContractTest.test_threshold_matches_release_gate": 0.0,
     "test_coverage_workflow_contract.CoverageWorkflowContractTest.test_workflow_matches_contract": 0.0,
+    "test_cq6_scorecard.CQ6ScorecardTest.test_baseline_regression_detected": 0.01,
+    "test_cq6_scorecard.CQ6ScorecardTest.test_check_green": 0.01,
+    "test_cq6_scorecard.CQ6ScorecardTest.test_committed_equals_live": 0.01,
+    "test_cq6_scorecard.CQ6ScorecardTest.test_mutations_red": 0.02,
+    "test_cq6_scorecard.CQ6ScorecardTest.test_ratchet_against_baseline": 0.0,
+    "test_cq6_scorecard.CQ6ScorecardTest.test_red_lines_and_grade": 0.0,
+    "test_cq6_scorecard.CQ6ScorecardTest.test_registry": 0.0,
+    "test_cq6_scorecard.CQ6ScorecardTest.test_remediation_owners": 0.0,
+    "test_cq6_scorecard.CQ6ScorecardTest.test_scoring_consistency": 0.0,
+    "test_cq6_scorecard.CQ6ScorecardTest.test_signoff_not_faked": 0.0,
     "test_cq_scan_contract.CqScanContractTest.test_artifacts_valid": 0.0,
     "test_cq_scan_contract.CqScanContractTest.test_blocked_tools_are_honest": 0.0,
     "test_cq_scan_contract.CqScanContractTest.test_cheap_live_scans_clean": 0.7,
@@ -6478,5 +6489,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2181.9
+  "total_s": 2182.1
 }

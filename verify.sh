@@ -118,7 +118,7 @@ fi
 #   运行时 + 档位）；输入没变直接回放摘要（秒级）。--no-cache 或 NF_VERIFY_CACHE=0 关掉。
 # 任何其它参数 = 用法错误（exit 2），以免"看上去像传了子集其实仍在全量"这类静默误读。
 # 矩阵分片（CI，2026-10-18）：`--tests-only --shard i/n` 只跑测试的第 i/n 片；
-# `--checks-only` 只跑 53 条静态 check（测试交给矩阵）。两者由 CI 组合成一次完整门禁：
+# `--checks-only` 只跑 54 条静态 check（测试交给矩阵）。两者由 CI 组合成一次完整门禁：
 # 静态 1 台 + 测试 n 台并行 ⇒ 全量墙钟从"一台机器的 ~600 s"降到"n 台各自 ~100 s"。
 NF_FAST=0; NF_BASE=''; NF_TIER='quick'; NF_CACHE="${NF_VERIFY_CACHE:-1}"
 NF_CHECKS_ONLY=0; NF_TESTS_ONLY=0; NF_SHARD=''
@@ -3503,6 +3503,73 @@ PYEOF
   return "$err"
 }
 
+check54(){
+  echo '== [54/段D] CQ6 综合审查门禁（G5：八维评分卡/红线/棘轮/整改/复审签署状态）=='
+  local err=0
+  if [ -n "$PY3" ]; then
+    if "$PY3" - <<'PYEOF' >"$NFL_TMP"/nf_check54.log 2>&1
+import os, sys
+sys.path.insert(0, os.path.join('desktop', 'src'))
+from core import cq6_scorecard as cq
+issues = cq.check('.')
+for item in issues:
+    print('[FAIL] %s' % item)
+card = cq.build('.')
+print('CQ6 统计：overall=%s grade=%s p0=%s signoff=%s'
+      % (card['overall'], card['grade'], card['red_lines']['p0'],
+         card['signoff']['status']))
+sys.exit(1 if issues else 0)
+PYEOF
+    then
+      ok 'CQ6 评分卡有效（check54：证据重算一致 + 权重 100 + 无棘轮回退 + 整改有 owner）'
+    else
+      no "CQ6 评分卡异常——$(tail -3 "$NFL_TMP"/nf_check54.log | tr '
+' ' ')"
+      err=1
+    fi
+    if "$PY3" - <<'PYEOF' >/dev/null 2>&1
+import json, sys
+card = json.load(open('results/cq/cq6_scorecard.json', encoding='utf-8'))
+bad = (card.get('signoff', {}).get('ai_may_sign') is not False
+       or card.get('signoff', {}).get('status') not in ('pending-human', 'signed', 'rejected')
+       or int(card.get('red_lines', {}).get('p0') or 0) != 0)
+sys.exit(1 if bad else 0)
+PYEOF
+    then
+      ok 'CQ6 红线/签署诚实（check54：P0=0、AI 不代签、未签保持 pending-human）'
+    else
+      no 'CQ6 红线或签署状态不诚实——修复指引：P0 清零；signoff.ai_may_sign=false'
+      err=1
+    fi
+    if "$PY3" - <<'PYEOF' >/dev/null 2>&1
+import json, sys
+card = json.load(open('results/cq/cq6_scorecard.json', encoding='utf-8'))
+sys.exit(1 if card.get('ratchet', {}).get('regressions') else 0)
+PYEOF
+    then
+      ok 'CQ6 棘轮无回退（check54：维度分/总分不低于基线）'
+    else
+      no 'CQ6 棘轮回退——修复指引：查评分卡 regressions 并修复根因，不得下调基线'
+      err=1
+    fi
+    if "$PY3" - <<'PYEOF' >/dev/null 2>&1
+import json, sys
+card = json.load(open('results/cq/cq6_scorecard.json', encoding='utf-8'))
+base = json.load(open('results/cq/cq6_baseline.json', encoding='utf-8'))
+sys.exit(0 if card.get('overall', 0) >= base.get('overall', 0) else 1)
+PYEOF
+    then
+      ok 'CQ6 总分不低于基线（check54：基线在场且棘轮起点有效）'
+    else
+      no 'CQ6 总分低于基线——修复指引：恢复评分或按流程评审基线变更'
+      err=1
+    fi
+  else
+    wn 'python3 不在 PATH（跳过 check54 CQ6 门禁）'
+  fi
+  return "$err"
+}
+
 # ---- P3b：判定缓存（输入内容寻址；只回放**绿**判定）----
 # key 由 scripts/verify_cache.py 按 HEAD + 工作树差异 + 未跟踪件 + 门禁代码 + 运行时 + 档位算出；
 # 输入没变就回放上次摘要（秒级）。红判定**不缓存**（红是瞬态），--fast/--no-cache 一律重算。
@@ -3564,7 +3631,7 @@ check37
 check38
 check39
 check40
-echo '—— 段 D：供应链与 Trust 证据面（check41-42 + check43/44 G1 Wiki-Spec + check45/46 Trust + check47 G4 + check48 DoD + check49 G0 双平面 + check50 G2 生产指标 + check51 G3 治理报告 + check52 G4 AI 信任面 + check53 G5 文档 claims）——'
+echo '—— 段 D：供应链与 Trust 证据面（check41-42 + check43/44 G1 Wiki-Spec + check45/46 Trust + check47 G4 + check48 DoD + check49 G0 双平面 + check50 G2 生产指标 + check51 G3 治理报告 + check52 G4 AI 信任面 + check53 G5 文档 claims + check54 G5 CQ6）——'
 check41
 check42
 check43
@@ -3578,6 +3645,7 @@ check50
 check51
 check52
 check53
+check54
 echo '=================================================='
 echo "结果统计: PASS=$PASS  WARN=$WARN  FAIL=$FAIL"
 # ---- 开发快车道（--fast · 显式 opt-in · 不改变上面的任何一条判定）----

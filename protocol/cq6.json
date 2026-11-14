@@ -1,0 +1,37 @@
+{
+  "schema": "nf-cq6/1",
+  "note": "NF-Final G5 WP-54 CQ6 综合审查登记：§13B.3 八维评分（0–5，权重合计 100%）、分档、红线、棘轮与复审签署要求。纪律：评分必须由**在场证据**按规则算出（不手填）、P0=0、任一维度<2 或未登记 P0 → 总评不得 A/B；人工复审签署不能由 AI 代签（§13C.3），未签如实记 pending-human。判据 desktop/tests/test_cq6_scorecard.py。",
+  "dimensions": [
+    {"id": "D1", "name": "正确性/契约一致", "weight": 20,
+     "evidence": ["protocol/verification_report.json", "protocol/conformance_report.json"]},
+    {"id": "D2", "name": "安全/健壮", "weight": 20,
+     "evidence": ["results/cq/scan.json", "results/cq/toolchain.json"]},
+    {"id": "D3", "name": "可维护性", "weight": 15,
+     "evidence": ["protocol/code_metrics_baseline.json", "results/cq/hotspots.md"]},
+    {"id": "D4", "name": "测试质量", "weight": 15,
+     "evidence": ["protocol/check12_weights.json", "desktop/tests"]},
+    {"id": "D5", "name": "可移植/兼容", "weight": 10,
+     "evidence": ["clients/go", "results/cq/toolchain.json"]},
+    {"id": "D6", "name": "性能/资源", "weight": 5,
+     "evidence": ["protocol/perf_budgets.json"]},
+    {"id": "D7", "name": "文档/声明一致", "weight": 10,
+     "evidence": ["results/docs_claims_report.json"]},
+    {"id": "D8", "name": "供应链/配置", "weight": 5,
+     "evidence": ["results/cq/toolchain.json", "results/ai/aibom.cdx.json"]}
+  ],
+  "grade_bands": {"A": 4.5, "B": 4.0, "C": 3.0, "D": 2.0, "E": 0.0},
+  "red_lines": {
+    "min_dimension": 2,
+    "unregistered_p0_forbids": ["A", "B"],
+    "rule": "任一维度 <2 → 总评封顶 C；存在未登记 P0 → 封顶 C，并进整改"
+  },
+  "ratchet": {"rule": "维度分与总分只许不降（对照 results/cq/cq6_baseline.json）；新增下降即红",
+              "baseline": "results/cq/cq6_baseline.json"},
+  "signoff": {"required": true, "role": "human-reviewer（作者/主持人/审查者 ≥2）",
+              "ai_may_sign": false,
+              "status_vocabulary": ["pending-human", "signed", "rejected"],
+              "note": "AI reviewer 不能替代人类签署（§13C.3）；未签记 pending-human，不冒充已签"},
+  "remediation": {"required": true, "owner_required": true, "status_vocabulary": ["open", "in-progress", "done", "accepted-risk"]},
+  "claims_boundary": ["评分是由证据规则算出的当前快照，不是质量认证",
+                      "未做的人工审查与外部工具保持 BLOCKED/OPEN，不写成通过"]
+}

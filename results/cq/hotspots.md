@@ -18,9 +18,9 @@
 | `desktop\src\core\eval_validity.py` | `validate` | 61 | 87 |
 | `desktop\src\core\meta_cockpit\atom_catalog.py` | `invariants` | 61 | 187 |
 | `desktop\src\core\pipelinerun.py` | `graph` | 59 | 85 |
+| `desktop\src\core\cq6_scorecard.py` | `_score_dimension` | 58 | 62 |
 | `desktop\src\core\i18n_checks.py` | `validate` | 58 | 113 |
 | `desktop\src\core\domain_metrics.py` | `synthesize` | 54 | 382 |
 | `desktop\src\core\library.py` | `verify` | 51 | 67 |
 | `desktop\src\core\ai_governance.py` | `validate` | 49 | 51 |
 | `desktop\src\core\ops.py` | `validate_vendors` | 49 | 166 |
-| `desktop\src\core\meta_cockpit\cockpit_ab.py` | `analyze` | 48 | 256 |
