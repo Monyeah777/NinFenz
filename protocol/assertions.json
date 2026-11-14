@@ -883,6 +883,21 @@
       "message": "§4A R6 不变量件缺失或版本名不符（G0 逆向判据依赖它）",
       "fix": "补/修 results/reverse/invariants.json；再跑 test_reverse_invariants",
       "evidence": "test_reverse_invariants / conformance::modeling"
+    },
+    {
+      "id": "g0-dod",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "results/g0_dod.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-g0-dod/1"
+      },
+      "message": "G0 DoD 收口审计缺失或版本名不符（Gate 准入判据依赖它）",
+      "fix": "补/修 results/g0_dod.json；再跑 test_g0_dod",
+      "evidence": "test_g0_dod / conformance::modeling"
     }
   ]
 }

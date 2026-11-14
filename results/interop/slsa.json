@@ -218,7 +218,7 @@
         "id": "https://ninfenz.dev/builder/verify-sh"
       },
       "metadata": {
-        "invocationId": "fa6822603d4556f1",
+        "invocationId": "c9a52ab7f30a5649",
         "note": "本地门禁执行事实；**不构成 SLSA 等级声明**（无远程 builder）"
       }
     }
@@ -329,7 +329,7 @@
     },
     {
       "digest": {
-        "sha256": "a7c4cfa414c1951adbf515673ff65d154ac0315ae426d825ce55e6ab1f7bd5b1"
+        "sha256": "a118a6016b4950b6ec0321d48da78ba2ebedb22694425fd5e7ca645f0c40bee6"
       },
       "name": "protocol/conformance_report.json"
     },
@@ -353,7 +353,7 @@
     },
     {
       "digest": {
-        "sha256": "2f0e25e027e2582d512be2cd6670d941e6c2d77a4c868a6b30724b6cd110e51c"
+        "sha256": "ac1af2601d62bd9a543dd8e4992336702be418f1d26b22aae025e60035cf57be"
       },
       "name": "protocol/role_coordinates.json"
     },
@@ -443,7 +443,7 @@
     },
     {
       "digest": {
-        "sha256": "2eeb48df21cc59e465cd401ccda28f3edfb24bec0dc6d8ecb4691fcd1b90cefb"
+        "sha256": "b39482466d3feecacff60bb1f15567cdd3c1fca5122754f8e35cd807fc4ce400"
       },
       "name": "protocol/assertions.json"
     },
@@ -479,7 +479,7 @@
     },
     {
       "digest": {
-        "sha256": "fda25d37b06e41326b252d3d10a22e39585fceb86bf9e6f6ee2b3417d224deb3"
+        "sha256": "aebe99ffd0e6c31cdfe050a849e87a4b0e289e4c97efb11a1dbde3b7e12bca73"
       },
       "name": "protocol/data_contracts.json"
     },

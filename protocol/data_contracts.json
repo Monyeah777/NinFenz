@@ -932,6 +932,18 @@
         "test_reverse_invariants",
         "results/reverse/INVARIANTS.md"
       ]
+    },
+    {
+      "id": "g0-dod",
+      "artifact": "results/g0_dod.json",
+      "quality_rule": "assertion:g0-dod",
+      "owner": "G0 DoD 收口审计（test_g0_dod 判据）",
+      "status": "active",
+      "freshness": "Gate 判据/证据变化须重跑收口；verdict 与 P0 必须一致",
+      "consumers": [
+        "test_g0_dod",
+        "results/G0_DOD.md"
+      ]
     }
   ]
 }

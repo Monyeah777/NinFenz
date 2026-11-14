@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-14",
   "approved_by": "Monyeah777",
-  "note": "NF-Final §4A R6 不变量（7 层 14 条 + 执行器）",
+  "note": "NF-Final G0 DoD 收口（verdict pass-with-open-items，P0=0）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "a7c4cfa414c1951adbf515673ff65d154ac0315ae426d825ce55e6ab1f7bd5b1"
+  "subject_digest": "a118a6016b4950b6ec0321d48da78ba2ebedb22694425fd5e7ca645f0c40bee6"
 }

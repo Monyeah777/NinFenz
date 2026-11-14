@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:75ed1ad2dda5fb07dbd914a6ffedb836e5cf1298bf34b98be602644827ebc925
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:b11e3d9a55f88e54b77093f8977c8e4a0f8186159a3e7e125c338c0b4c811a3b
+  - protocol/check12_weights.json:a48f45e5a54a36ed2b7db2d590149775881af63672cd15f2b2bb9fbe05f682e2
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:fa00a7fd014857af56e11f38ced1b7d888be053befaadb10b3dd494d27884316
   - docs/meta-cockpit/功能解析.md:de20c2340d19d541bcfde53f222a3acf22a6e440d8fb3dcf51a37aedf53c0c25
   - results/meta-cockpit-manifest.json:60c0e100798e49d393557ae5066c02d7e057ec27f386ee1a36ca3fc7740150ba
 
 ---
+> 重审（2026-11-14）：NF-Final G0 收口审计：新增 results/{G0_DOD.md,g0_dod.json}、test_g0_dod.py；assertions/data_contracts/check12 更新，被审对象变更后机械重绑
+
 > 重审（2026-11-14）：NF-Final R6 不变量：新增 results/reverse/{INVARIANTS.md,invariants.json}、test_reverse_invariants.py；assertions/data_contracts/check12 更新，被审对象变更后机械重绑
 
 > 重审（2026-11-14）：NF-Final R5 同行差分：新增 results/reverse/{PEER_DIFF.md,peers.json}、test_reverse_peers.py；assertions/data_contracts/check12 更新，被审对象变更后机械重绑
