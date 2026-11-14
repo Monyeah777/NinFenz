@@ -1,0 +1,27 @@
+{
+  "schema": "nf-docs-claims/1",
+  "note": "NF-Final G5 WP-50 文档 claims 一致性登记：哪些文档的哪些数字/措辞属于「当前声明」，必须与 quality_baseline/verify_report 实测一致；禁用认证/合规措辞（除非同行为否定语境）。机器件 results/docs_claims_report.json（committed==实时重算），judged 由 verify check53。判据 desktop/tests/test_docs_claims_contract.py。",
+  "documents": [
+    {"rel": "README.md", "kinds": ["pass_count", "check_label"]},
+    {"rel": "README.en.md", "kinds": ["pass_count", "check_label"]},
+    {"rel": "README.ja.md", "kinds": ["pass_count", "check_label"]},
+    {"rel": "protocol/CONFORMANCE.md", "kinds": ["pass_count", "check_label"]},
+    {"rel": "docs/meta/VERSION-MATRIX.md", "kinds": ["check_label", "baseline_keys"]}
+  ],
+  "patterns": {
+    "pass_count": "PASS=(\\d+)",
+    "check_label": "check1-44(?:/\\d+)+",
+    "baseline_keys": "(baseline_checks|baseline_pass)=(\\d+)"
+  },
+  "expected_source": "desktop/src/core/quality_baseline.py（EXPECTED_CHECKS/EXPECTED_PASS/CHECK_LABEL）",
+  "forbidden_claims": ["已认证", "通过认证", "获得认证", "ISO 27001 认证", "SOC 2 认证",
+                       "合规认证", "certified\\b"],
+  "negative_context": ["不", "非", "未", "no", "not", "never", "antonym"],
+  "rules": {
+    "current_only": "只把登记文档里的 PASS=/check 标签当当前声明；VERSION-MATRIX 历史行 PASS=NN 不算当前（该文件只核 check_label 与 baseline_* keys）",
+    "authoritative": "期望值只来自 quality_baseline 常量，文档不得自证",
+    "forbidden": "禁用词出现在非否定语境即红（防止把判据通过写成认证/合规）"
+  },
+  "claims_boundary": ["文档声明必须由门禁实测背书；本件只查数字/措辞一致性，不评价产品质量",
+                      "禁用词规则不是法律意见，不替代外部合规审查"]
+}

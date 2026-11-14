@@ -6,10 +6,10 @@ scope: 作者指令「拉取 jev 或 laya 这种模型作为决策层」——�
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - verify.sh:a462442226fa2faa405606a81c06ffb40dab9ecfa3897c9b6a301a5421fc2740
+  - verify.sh:cdab8be52be55d3c89157c971f7d321418d59c0fe3fba85e1fa9dd53f6d17241
   - protocol/decision_layer.json:9330d4057f07647d67f15daa6f37c84913834b7eed65f4e360bf5c7c413e5e06
   - protocol/normative.json:c1bbc14c92cea6bd66ff6cb54fdcf91bf3072f66adee7027f1d3f42e70fe1825
-  - protocol/data_contracts.json:a09258c68fa606ef68af373592bdfea8c3c819546b5b1d3cb7aad2abe2aa2864
+  - protocol/data_contracts.json:902fe77219a90e4ff2c033f583c60135a587c6e0c27ba28b6bd47a80ec7309cc
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/receipts.py:b748915bb519aeeb1aa0f7d367df2eb7d4321b369b85905a7f918d8d55d96363
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
@@ -19,6 +19,10 @@ subjects:
   - docs/decision-layer.md:cd3a254de738ece7c8f07db36904c74484e4622c58f688a3973c8998b441628c
 
 ---
+> 重审（2026-11-15）：NF-Final WP-50 收尾：check53 增加「报告新鲜」断言（total ok 与 PASS=97 对齐）
+
+> 重审（2026-11-15）：NF-Final WP-50：新增 protocol/docs_claims.json、core/docs_claims.py、results/docs_claims_report.json、test_docs_claims_contract.py；verify.sh check53 + quality_baseline 53 条/PASS=97；派生面重生成；CONFORMANCE 过期 PASS=83 修正
+
 > 重审（2026-11-15）：NF-Final G4 收口：新增 results/{G4_DOD.md,g4_dod.json}、test_g4_dod.py；assertions/data_contracts/check12/code_metrics 更新
 
 > 重审（2026-11-15）：NF-Final WP-44：verify.sh check52（G4 AI 信任面）+ quality_baseline 52 条/PASS=95；派生面全量重生成（验证卡/llms/repo_stats/CONFORMANCE/SELF_AUDIT/interop/README 三语/CHANGELOG/VERSION-MATRIX/能力索引）

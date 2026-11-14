@@ -1186,6 +1186,18 @@
         "test_g4_dod",
         "results/G4_DOD.md"
       ]
+    },
+    {
+      "id": "docs-claims",
+      "artifact": "results/docs_claims_report.json",
+      "quality_rule": "assertion:docs-claims",
+      "owner": "文档 claims 一致性（core/docs_claims.py + test_docs_claims_contract）+ WP-50",
+      "status": "active",
+      "freshness": "文档数字/标签/门禁常量变化后重跑 write（committed==实时重算）",
+      "consumers": [
+        "test_docs_claims_contract",
+        "protocol/docs_claims.json"
+      ]
     }
   ]
 }

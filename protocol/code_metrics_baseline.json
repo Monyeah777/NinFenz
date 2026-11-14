@@ -415,6 +415,11 @@
       "max_fn_cc": 7,
       "max_fn_lines": 12
     },
+    "desktop/src/core/docs_claims.py": {
+      "lines": 149,
+      "max_fn_cc": 24,
+      "max_fn_lines": 61
+    },
     "desktop/src/core/domain_metrics.py": {
       "lines": 481,
       "max_fn_cc": 52,

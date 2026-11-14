@@ -11,14 +11,18 @@ subjects:
   - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
   - scripts/nf:406c221f9f16fb6e318e230b0b0120e3a6d3c9231d57f66285e0e4615e18ca91
   - scripts/nf.cmd:d1e7ea3a9e99c0822102884cddafe1cdf3893d9b75d19abebe7a8d2a8abeec5a
-  - verify.sh:a462442226fa2faa405606a81c06ffb40dab9ecfa3897c9b6a301a5421fc2740
-  - desktop/src/core/quality_baseline.py:01260e03050319b66aa1b7e21261d25233941372f439e743e33aaf1b60f2155c
+  - verify.sh:cdab8be52be55d3c89157c971f7d321418d59c0fe3fba85e1fa9dd53f6d17241
+  - desktop/src/core/quality_baseline.py:70ea0996c27a09908146ae725886d1f733f862506ffe1663fcc4fe1cdb2d4e82
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - docs/terminal.md:69b41d4be9b9885f0f156b1aef30772c3d1a74224ec5db65001be5010872a06e
   - docs/L3_FROZEN.md:863a152271b1b969a3249194d1169628f4a4647a9bdd801473cfc9cb75c6643b
-  - protocol/CONFORMANCE.md:0e9f3fac4aeb9194f649d03d6f0273c16075b98089668d54a14d03f9ec6c03f4
+  - protocol/CONFORMANCE.md:e14b4976b55f51ac160f63fde3e800d17a4b592eda5219be8bc0a95b36ea6349
 
 ---
+> 重审（2026-11-15）：NF-Final WP-50 收尾：check53 增加「报告新鲜」断言（total ok 与 PASS=97 对齐）
+
+> 重审（2026-11-15）：NF-Final WP-50：新增 protocol/docs_claims.json、core/docs_claims.py、results/docs_claims_report.json、test_docs_claims_contract.py；verify.sh check53 + quality_baseline 53 条/PASS=97；派生面重生成；CONFORMANCE 过期 PASS=83 修正
+
 > 重审（2026-11-15）：NF-Final WP-44：verify.sh check52（G4 AI 信任面）+ quality_baseline 52 条/PASS=95；派生面全量重生成（验证卡/llms/repo_stats/CONFORMANCE/SELF_AUDIT/interop/README 三语/CHANGELOG/VERSION-MATRIX/能力索引）
 
 > 重审（2026-11-15）：NF-Final WP-33：新增 core/governance_report.py、results/governance/{report,audit}.json、test_governance_report_contract.py；verify.sh check51 + quality_baseline 51 条/PASS=93；派生面重生成

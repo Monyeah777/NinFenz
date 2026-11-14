@@ -83,7 +83,8 @@
       44,
       50,
       51,
-      52
+      52,
+      53
     ],
     "CAP_DETERMINISTIC": [
       25,
@@ -98,7 +99,8 @@
       48,
       50,
       51,
-      52
+      52,
+      53
     ],
     "CAP_TAMPER_EVIDENT": [
       23,
@@ -1210,6 +1212,21 @@
       "message": "G4 DoD 收口审计缺失或版本名不符（Gate 准入判据依赖它）",
       "fix": "补/修 results/g4_dod.json；再跑 test_g4_dod",
       "evidence": "test_g4_dod / conformance::modeling"
+    },
+    {
+      "id": "docs-claims",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "results/docs_claims_report.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-docs-claims-report/1"
+      },
+      "message": "文档 claims 报告缺失或版本名不符（WP-50 判据依赖它）",
+      "fix": "重跑 docs_claims.write；再跑 test_docs_claims_contract",
+      "evidence": "test_docs_claims_contract / conformance::modeling"
     }
   ]
 }

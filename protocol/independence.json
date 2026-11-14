@@ -51,6 +51,7 @@
       "contract_lifecycle",
       "cq_scan",
       "delivery",
+      "docs_claims",
       "eval_validity",
       "evidence",
       "governance_adapters",
