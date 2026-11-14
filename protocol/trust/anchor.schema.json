@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/trust/anchor.schema.json",
+  "title": "nf-anchor/1 外部锚（FR-A3-03）",
+  "description": "一个 target_digest 的外部锚集合，至少 1 条（minItems: 1）。四类锚各自封闭（oneOf + const kind）：rfc3161 / transparency-sth / witness / git-commit；不知名 kind 必被拒。",
+  "type": "object",
+  "required": [
+    "schema",
+    "target_digest",
+    "anchors"
+  ],
+  "properties": {
+    "schema": {
+      "const": "nf-anchor/1"
+    },
+    "target_digest": {
+      "$ref": "#/$defs/digest"
+    },
+    "anchors": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1024,
+      "items": {
+        "$ref": "#/$defs/anchor"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "base64": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9+/]+={0,2}$",
+      "description": "base64 形状（字符集 + 至多 2 个填充）；严格解码由 runtime 判定"
+    },
+    "anchor": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "tsa",
+            "token"
+          ],
+          "properties": {
+            "kind": {
+              "const": "rfc3161"
+            },
+            "tsa": {
+              "type": "string",
+              "minLength": 1,
+              "description": "TSA 标识（策略里 tsa_roots 可解析）"
+            },
+            "token": {
+              "$ref": "#/$defs/base64",
+              "description": "RFC 3161 TimeStampResp 原始字节",
+              "maxLength": 1048576
+            },
+            "note": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "log_id",
+            "tree_size",
+            "root",
+            "signature"
+          ],
+          "properties": {
+            "kind": {
+              "const": "transparency-sth"
+            },
+            "log_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "tree_size": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "root": {
+              "$ref": "#/$defs/digest"
+            },
+            "signature": {
+              "$ref": "#/$defs/base64",
+              "maxLength": 4096
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "witness_id",
+            "keyid",
+            "sig"
+          ],
+          "properties": {
+            "kind": {
+              "const": "witness"
+            },
+            "witness_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "keyid": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sig": {
+              "$ref": "#/$defs/base64",
+              "maxLength": 4096
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "repo",
+            "commit"
+          ],
+          "properties": {
+            "kind": {
+              "const": "git-commit"
+            },
+            "repo": {
+              "type": "string",
+              "minLength": 1
+            },
+            "commit": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    }
+  }
+}

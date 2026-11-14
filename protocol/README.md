@@ -57,3 +57,12 @@ python -m pytest desktop/tests/test_schema_reference.py -q    # 与标准实现�
 ```
 
 - 引用本层时：「IDL 单一真相 + 自实现子集（不引第三方）」是长期口径；schema 用了白名单外关键字 = check28 FAIL，不是「换个写法也行」。
+
+## trust 层 IDL（独立面）
+
+Trust Fabric 的 7 份 schema 在 `protocol/trust/*.schema.json`：entity / dsse / process / claim-bundle / anchor / policy / verify。
+
+- **与 `protocol/schema/` 刻意分开**：后者是内容契约/协议投影面的 IDL，由自实现子集校验器（check28）守；trust 层用 draft 2020-12 的完整关键字（`$defs` / `oneOf` / `const` / `uniqueItems`），由 `core.json_schema` 叶子校验器判定。两套校验器面不同，件数不混算。
+- 判据：`python -m pytest desktop/tests/test_trust_schemas.py -q`（7 件 schema + 正/反样例 + 变异自证 + 标准实现对照）。
+- trust 层 schema **不计入**本目录的 schema 件数与 `LINT_INPUTS` 扫描面；后两者仍以实读为准。
+

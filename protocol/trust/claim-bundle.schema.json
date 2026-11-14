@@ -1,0 +1,148 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/trust/claim-bundle.schema.json",
+  "title": "nf-claim-bundle/1 主张集（FR-A1-01）",
+  "description": "claim 级 Merkle 包：每条 claim 有独立 inclusion proof，单条可独立验证；bundle_id 进入叶域分隔（splice 防护）。proof 与 RFC 6962 audit path 同序，深度上限 64 层。",
+  "type": "object",
+  "required": [
+    "schema",
+    "bundle_id",
+    "contract_ref",
+    "claims",
+    "merkle_root",
+    "inclusion_proofs"
+  ],
+  "properties": {
+    "schema": {
+      "const": "nf-claim-bundle/1"
+    },
+    "bundle_id": {
+      "$ref": "#/$defs/digest"
+    },
+    "contract_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "claims": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1048576,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "subject_digest",
+          "payload_digest"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+          },
+          "type": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$"
+          },
+          "obligation": {
+            "type": "string",
+            "enum": [
+              "must",
+              "should",
+              "may"
+            ]
+          },
+          "subject_digest": {
+            "$ref": "#/$defs/digest"
+          },
+          "payload_digest": {
+            "$ref": "#/$defs/digest"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "merkle_root": {
+      "$ref": "#/$defs/digest"
+    },
+    "inclusion_proofs": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1048576,
+      "items": {
+        "type": "object",
+        "required": [
+          "index",
+          "leaf",
+          "proof"
+        ],
+        "properties": {
+          "index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "leaf": {
+            "$ref": "#/$defs/digest"
+          },
+          "proof": {
+            "type": "array",
+            "maxItems": 64,
+            "items": {
+              "type": "object",
+              "required": [
+                "side",
+                "hash"
+              ],
+              "properties": {
+                "side": {
+                  "type": "string",
+                  "enum": [
+                    "left",
+                    "right"
+                  ]
+                },
+                "hash": {
+                  "$ref": "#/$defs/digest"
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "evidence_refs": {
+      "type": "array",
+      "maxItems": 4096,
+      "items": {
+        "$ref": "#/$defs/refItem"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "refItem": {
+      "type": "object",
+      "required": [
+        "kind",
+        "digest"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "digest": {
+          "$ref": "#/$defs/digest"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

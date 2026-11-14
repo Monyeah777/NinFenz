@@ -102,7 +102,7 @@
 1. **ADR 落点**：计划写 `docs/adr/`；本仓政策是真实决策件进私有 Plan 仓（`decisions/ADR-0000-决策记录外置到私有仓.md`，pre-commit 阻断真实决策件），公开仓只留模板与登记（`decisions/` 模板 + `protocol/adr/registry.json`）。⇒ WP-04 改为「私有归档 + 公开登记投影」，不在公开仓新建 `docs/adr/`。
 2. **测试落点**：计划写 `tests/trust/vectors/`；本仓 check12 只 discover `desktop/tests`。⇒ 判据进 `desktop/tests/test_trust_*.py`，向量进 `desktop/tests/fixtures/trust/`（与既有 fixtures 同源）。
 3. **check 编号**：实仓现有 check1–42（`verify.sh` 末条 check42）；check43/44 在当前 HEAD 未被占用，但并行线存在撞号风险。⇒ G1 前先声明占用，且**只增不减**，不改既有 check 语义。
-4. **schema 落点**：计划写 `protocol/trust/*.schema.json`；实仓 schema 单点是 `protocol/schema/`（9 件，协议/模块/管线/发布/资产/契约/集成面）。⇒ 两个候选：`protocol/trust/`（新目录）或 `protocol/schema/trust/`；G0 冻结前二选一并写进 ADR，不得两处并存。
+4. **schema 落点（WP-01 已裁决）**：采用计划原路径 `protocol/trust/*.schema.json`（7 件）。理由：`protocol/schema/` 的元检（check28 / `schema_lint`）只允许 16 关键字子集，容不下计划不变量所需的 `$defs` / `oneOf` / `const` / `uniqueItems`（例如锚集合「四类之一且 ≥1」）；仓内已有**纯标准库**叶子校验器 `core.json_schema` 支持这些关键字，故 trust 层用完整 draft 2020-12 并由该叶子件判定。**不是两处并存**：`protocol/README.md` 已写明两层的校验器面与计数口径（trust 层不计入 `protocol/schema/` 件数、也不进 `LINT_INPUTS` 扫描面）。接入 check45 后由门禁接管；ADR 落点同 §5.1。
 5. **命名与既有语义**：计划新 schema（`nf-claim-bundle/1` 等）不得与既有 `nf-evidence/1`、`nf-time-token/1`、`nf-key-transparency/1`、`nf-revocation/1` 语义重叠；claim bundle 与 evidence bundle 的关系必须由 ADR 写死（包含、引用还是并列）。
 6. **CLI 命令面**：计划新增 `nf trust …`；实仓已有 `nf evidence`（含 `revocations` 子命令）/ `nf transparency` / `nf attest`。check39 检命令面策展与可达性。⇒ 优先「挂在既有命令族下」还是「新命令族」需 G0 裁决，不得出现第三套重复语义。
 
@@ -126,7 +126,8 @@
 - **ENV-02** `cosign` 不在场 → T4 公共锚本机不可验；T0–T2 可离线。
 - **ENV-03** 计划 §13.2 的 starter `nf-trust-self-audit.py` 未随计划提供（下载目录无此文件）→ 本轮用等效 grep/AST 命令；是否新增 `scripts/trust_self_audit.py` 在 G0 决定（计划 §13.2 建议）。
 - **ENV-04** 计划 §12.1.4 引用的 `scripts/refreeze.sh` 在本机不存在（`ls scripts | grep refreeze` 为空）→ 实仓等价入口为 `python scripts/nf.py release --freeze --apply --by <批准人> --note <说明>`（三步：conformance → approve → receipts，见 §2.1 实测）。
-- **下一步（G0 余项）**：WP-01 schema 草案（7 件）→ WP-02 威胁模型 → WP-03 测试向量 → WP-04 ADR（按 §5 的 6 条偏差裁决落点）。
+- **WP-01 已完成（2026-11-14）**：`protocol/trust/` 7 件 schema（entity / dsse / process / claim-bundle / anchor / policy / verify）+ 正/反样例 22 件 + 判据 `desktop/tests/test_trust_schemas.py`（23 条，含变异自证与标准实现对照）。
+- **下一步（G0 余项）**：WP-02 威胁模型（`docs/trust/THREAT_MODEL.md`）→ WP-03 测试向量 → WP-04 ADR（按 §5 的 6 条偏差裁决落点）。
 
 ## 8. 复跑命令
 
