@@ -4,7 +4,7 @@
     "algorithm": "RFC6962-style sha256 domain-separated",
     "count": 66,
     "note": "派生自 protocol/RECEIPTS.json；inclusion proof 留在原回执单根内。",
-    "root": "dbe8c2932644b7024438856309a83efe820630213de762948ff696a70875da5e",
+    "root": "b003fa511679d02cf781b16e5c460107dd305f1b7747421303da1a08b019ccbe",
     "scope": "protocol"
   },
   "predicateType": "https://ninfenz.dev/attestation/protocol-receipts/v1",
@@ -41,7 +41,7 @@
     },
     {
       "digest": {
-        "sha256": "8897571e40c8e46ec808f242407876be906740805dab908f4f35b494c949ac4f"
+        "sha256": "11c10bfe3fb314f88c452c15286b203f9aa32f45928b0c5b637cb287707da71c"
       },
       "name": "llms.txt"
     },
@@ -113,7 +113,7 @@
     },
     {
       "digest": {
-        "sha256": "aaa781b6320a26a88e52419da1c3774a457caddaa684ade3ebf218205b2237de"
+        "sha256": "47a745114f51a784901b74c6123f1df3865a4d215baadd4bc23eb23c02acf34e"
       },
       "name": "protocol/conformance_report.json"
     },
@@ -137,13 +137,13 @@
     },
     {
       "digest": {
-        "sha256": "c3a6aa8bba5ed2251e26d98f60176ab601409e3b56ecb06b1739289d9ad79a09"
+        "sha256": "edc4d2959e5ed866e6d5fed31bd3eea1de193df6a2c710d48401f07aa0c3c2c8"
       },
       "name": "protocol/role_coordinates.json"
     },
     {
       "digest": {
-        "sha256": "12f0e486a166866890af9a8ea6f7c378d59d46b8cc3d22501014cd0f0f095cbe"
+        "sha256": "0d5ecf503d8e4d05e6e2f91cd477e1c7ced1b124321073849806889beddbd3f0"
       },
       "name": "protocol/code_metrics_baseline.json"
     },
@@ -173,7 +173,7 @@
     },
     {
       "digest": {
-        "sha256": "d2b005477724d42063252b225371af9e1882c967caf58445394cf0902490e790"
+        "sha256": "cc86bc9b69c7b309c1ba8e4029d2e24ef7b65acbae89ca6a70f78e38ec274535"
       },
       "name": "protocol/repo_stats.json"
     },
@@ -185,7 +185,7 @@
     },
     {
       "digest": {
-        "sha256": "d3ea7759b22a530be4eb7eaea51e44bd6e8f681b5a1c79d9f4b4af637cbadfd7"
+        "sha256": "e8049d1bd3a3883a8183a9fe7397c0cf3436b7580fde709becce036ac55431c6"
       },
       "name": "protocol/CONFORMANCE.md"
     },
@@ -227,7 +227,7 @@
     },
     {
       "digest": {
-        "sha256": "bd5f20ec59373e999d140f2b41d772bf1011c9cf5257a351aa939bbe53bee2ef"
+        "sha256": "6a423b1f3034eaaf54dd88eddfc4e09dcb75bda9c3b21140235e969fc1db51c2"
       },
       "name": "protocol/assertions.json"
     },

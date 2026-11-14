@@ -553,6 +553,10 @@
       "referenced": true
     },
     {
+      "module": "gate_dod",
+      "referenced": true
+    },
+    {
       "module": "gate_engine",
       "referenced": true
     },
@@ -1481,9 +1485,9 @@
       "referenced": true
     }
   ],
-  "modules": 370,
+  "modules": 371,
   "note": "粗粒度名字匹配（代理指标），不做导入图分析",
-  "referenced": 340,
+  "referenced": 341,
   "schema": "nf-core-judge-map/1",
   "unreferenced": 30
 }

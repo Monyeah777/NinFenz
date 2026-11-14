@@ -234,7 +234,7 @@ def build(root: str = ".") -> dict:
         "findings": findings,
         "gate": {
             "verify": f"PASS={quality_baseline.EXPECTED_PASS} WARN=2 FAIL=0"
-                      "（bash verify.sh --checks-only 实跑）",
+                      f"（{quality_baseline.CHECK_LABEL} · bash verify.sh --checks-only 实跑）",
             "dotnet": "not-run（本机无 .NET SDK，见 BASELINE ENV-01）",
             "tests": "全量未跑；静态面全量 + 受影响面（G1 各 WP 记录）",
         },

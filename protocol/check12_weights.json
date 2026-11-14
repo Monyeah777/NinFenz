@@ -612,6 +612,7 @@
     "test_trust_gate45": 0.5,
     "test_trust_gate46": 0.3,
     "test_trust_gate47": 0.4,
+    "test_trust_gate48": 0.5,
     "test_trust_human_review": 0.2,
     "test_trust_keys": 0.4,
     "test_trust_model_card": 0.5,
@@ -5698,6 +5699,14 @@
     "test_trust_gate47.MutationRedTest.test_t4_claimed_is_caught": 0.01,
     "test_trust_gate47.MutationRedTest.test_threshold_weakening_is_caught": 0.01,
     "test_trust_gate47.RealRepoTest.test_clean_and_deterministic": 0.01,
+    "test_trust_gate48.MutationRedTest.test_dod_missing_env_is_red": 0.05,
+    "test_trust_gate48.MutationRedTest.test_missing_artifact_is_red": 0.04,
+    "test_trust_gate48.MutationRedTest.test_partial_without_env_is_red": 0.04,
+    "test_trust_gate48.MutationRedTest.test_pass_baseline_mismatch_red": 0.04,
+    "test_trust_gate48.MutationRedTest.test_self_audit_p0_red": 0.04,
+    "test_trust_gate48.MutationRedTest.test_todo_or_unsupported_claim_is_red": 0.09,
+    "test_trust_gate48.MutationRedTest.test_verify_chain_missing_is_red": 0.05,
+    "test_trust_gate48.RealRepoTest.test_clean_and_deterministic": 0.01,
     "test_trust_human_review.StatementTest.test_statement_rejections": 0.0,
     "test_trust_human_review.StatementTest.test_statement_schema": 0.0,
     "test_trust_human_review.VerifyIntegrationTest.test_approved_review_check": 0.0,
@@ -6083,5 +6092,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2131.5
+  "total_s": 2132.0
 }

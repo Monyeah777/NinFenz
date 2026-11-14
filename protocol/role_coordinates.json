@@ -4,9 +4,9 @@
     "entry": 26,
     "floor": 5,
     "prod": 1057,
-    "projection": 167,
-    "support": 481,
-    "verify": 1351
+    "projection": 168,
+    "support": 482,
+    "verify": 1352
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -11261,6 +11261,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "check48 判据自身判据：真仓全绿 + 变异必红（交付件/claim 口径/自审计/PASS 基线）。",
+      "path": "desktop/tests/test_trust_gate48.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "trust.human_review 判据：签名人类复核 + PENDING≠通过 + registry 生命周期（FR-A4-05）。",
       "path": "desktop/tests/test_trust_human_review.py",
       "role": "verify",
@@ -14490,16 +14496,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "b81274317010b5232640b94dc7b9b401b347ddd090e1331a9fa81a73fb7c20fe",
+  "root_digest": "0bd2eefd6ac8ea3d980c62f0d59d73c03c998b882a945f286d5f8028161250dc",
   "rule_counts": {
     "R-app": 1469,
-    "R-catch": 329,
+    "R-catch": 330,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 147,
+    "R-projection": 148,
     "R-support": 124,
-    "R-verify": 1225,
+    "R-verify": 1226,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

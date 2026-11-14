@@ -6,9 +6,9 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - CHANGELOG.md:76e2c7236e8016736dc9c183e6f87351e449e3f25784399f51bfd8e3f7160a38
-  - docs/meta/VERSION-MATRIX.md:1d60ae1fa194ae8bfd7eb235f04ed77fdf1bac0d398b56412af29f41d58be0f4
-  - README.md:d0b0560b53182c98c073936e44116fcb02ac524dd14316015f784603667a8139
+  - CHANGELOG.md:85338cc03e58640f54615dbb296a432ea64b916c477d4c0fa47cd5d554b2ed21
+  - docs/meta/VERSION-MATRIX.md:6e00c94dde8de0626635baf6b047a68f0f11db69e751844f0183130d262c4b70
+  - README.md:d3de14a0289903e70014f4217ac0c966b2ac89e0fe6066ef3d6c480f62185f2f
   - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
