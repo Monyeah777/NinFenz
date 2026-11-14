@@ -21,6 +21,10 @@
       "referenced": true
     },
     {
+      "module": "anchor",
+      "referenced": true
+    },
+    {
       "module": "anchor_align",
       "referenced": true
     },
@@ -1453,9 +1457,9 @@
       "referenced": true
     }
   ],
-  "modules": 363,
+  "modules": 364,
   "note": "粗粒度名字匹配（代理指标），不做导入图分析",
-  "referenced": 333,
+  "referenced": 334,
   "schema": "nf-core-judge-map/1",
   "unreferenced": 30
 }

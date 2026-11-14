@@ -16,6 +16,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from core import json_doc, json_schema
+from core.trust import anchor as ta
 from core.trust import bundle as tb
 from core.trust.canonical import digest_of, is_digest
 
@@ -111,8 +112,13 @@ def _missing_issues(codes: list) -> list:
     return out
 
 
-def verify(bundle: dict, policy: dict, root: str = ".") -> dict:
-    """验证 claim bundle：返回 {"report","decision","exit_code"}（不打印、不退出）。"""
+def verify(bundle: dict, policy: dict, root: str = ".", anchor: dict | None = None,
+           anchor_verifiers: dict | None = None) -> dict:
+    """验证 claim bundle：返回 {"report","decision","exit_code"}（不打印、不退出）。
+
+    anchor 给了就走 nf-anchor/1 核验：target 必须等于 bundle.merkle_root，事实
+    （time_token/transparency_sth）由 core.trust.anchor 投影；缺 verifier 记 none。
+    """
     policy_schema = load_schema(root, POLICY_SCHEMA_REL)
     bundle_schema = tb.load_schema(root)
     policy_problems = json_schema.json_schema_check(policy, policy_schema)
@@ -121,16 +127,31 @@ def verify(bundle: dict, policy: dict, root: str = ".") -> dict:
     policy_ok = not policy_problems and raw_required in LEVELS
     run = tb.verify_bundle(bundle, bundle_schema)
     hash_ok = bool(run["ok"])
-    decision = decide(skeleton_facts(hash_ok), required, policy_ok=policy_ok)
-    decision["required"] = required
+    facts = skeleton_facts(hash_ok)
     checks = [
         {"id": "A1-bundle-integrity", "ok": hash_ok,
          "detail": "bundle 结构/Merkle 根/逐叶 proof 全过" if hash_ok
                    else "bundle 校验失败：" + "；".join(run["issues"][:2])},
-        {"id": "A3-anchors", "ok": False,
-         "detail": "签名/TSA/STH/公共锚核验未接线（G2/G4）；本级只报缺项，不冒充等级"},
     ]
+    anchor_issues: list = []
+    if anchor is not None:
+        merged = ta.verify_anchor_set(anchor, str(bundle.get("merkle_root") or ""),
+                                      policy, anchor_verifiers, root=root)
+        facts.update(merged["facts"])
+        anchor_issues = merged["issues"]
+        checks.append({"id": "A2-anchor-facts", "ok": not anchor_issues,
+                       "detail": "anchor 事实：" + "；".join(
+                           f"{k}={v}" for k, v in sorted(merged["facts"].items()))})
+        checks.append({"id": "A2-anchor-details", "ok": not anchor_issues,
+                       "detail": "；".join(f"{d['kind']}:{d['status']}"
+                                          for d in merged["details"]) or "无锚"})
+    else:
+        checks.append({"id": "A2-anchor-facts", "ok": False,
+                       "detail": "未提供 nf-anchor/1；T2 及以上只报缺项，不冒充等级"})
+    decision = decide(facts, required, policy_ok=policy_ok)
+    decision["required"] = required
     issues = _missing_issues(decision["missing"])
+    issues.extend(anchor_issues)
     if not hash_ok:
         issues.insert(0, {"code": "BUNDLE-INVALID",
                           "message": "bundle 自洽性校验失败（" +

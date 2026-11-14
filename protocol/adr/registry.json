@@ -101,7 +101,9 @@
       "evidence": [
         "protocol/trust/anchor.schema.json",
         "results/trust/trust_vectors.json",
-        "desktop/src/core/timestamp.py"
+        "desktop/src/core/timestamp.py",
+        "desktop/src/core/trust/anchor.py",
+        "desktop/tests/test_trust_anchor_evidence.py"
       ],
       "falsifier": "若某等级仅凭本机时钟被判为 T2 及以上并作为对外结论，则本裁决失效。"
     },

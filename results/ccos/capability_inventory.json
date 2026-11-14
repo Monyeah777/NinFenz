@@ -1,5 +1,5 @@
 {
-  "digest": "6d5e15ea6990d85a810cbe13662ce29124ecef84650c4616b63344adf10b2a89",
+  "digest": "d471df2ad89e7913cf741f11307f11cabb80a6b062025ad13a4d6f932b787101",
   "entries": [
     {
       "doc": "其余 ABI 调用的判定向量：cc_label（IR 校验）→ 期望结论（跨语言可复核）。",
@@ -1121,8 +1121,13 @@
     {
       "doc": "离线验证入口（cc_verify 骨架的 CI 面；计划 §8.4）。",
       "flags": [
+        "--anchor",
+        "--anchor-anchors",
+        "--anchor-build",
+        "--anchor-target",
         "--bundle",
         "--envelope",
+        "--git-repo",
         "--hmac-key-hex",
         "--issuer-registry",
         "--json",
@@ -1131,7 +1136,12 @@
         "--now",
         "--out",
         "--policy",
-        "--root"
+        "--root",
+        "--sth-material",
+        "--tsa-ca",
+        "--tsa-query",
+        "--tsa-subject",
+        "--witness-material"
       ],
       "path": "scripts/trust_verify.py",
       "subcommands": []
@@ -1276,7 +1286,7 @@
       "subcommands": []
     }
   ],
-  "flags": 546,
+  "flags": 556,
   "note": "静态接口面（docs/flags/subcommands），不含缺省行为语义",
   "schema": "nf-capability-inventory/1",
   "scripts": 82

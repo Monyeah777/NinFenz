@@ -5,8 +5,8 @@
     "floor": 5,
     "prod": 1057,
     "projection": 167,
-    "support": 468,
-    "verify": 1326
+    "support": 469,
+    "verify": 1327
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -11111,6 +11111,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "trust.anchor 判据：nf-anchor/1 构建 + 四类锚核验 + 事实投影 + verify 接线。",
+      "path": "desktop/tests/test_trust_anchor_evidence.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "信任边界守卫（`core/trust_boundary.py`）+ MCP 越权面的回归测试。",
       "path": "desktop/tests/test_trust_boundary.py",
       "role": "verify",
@@ -14340,16 +14346,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "de10365b4e903337ace81b5e97a3015ed59df6e217bd0b6c2bfbcda1c674ad12",
+  "root_digest": "1575bab4c321e67f6158d4546c23554195332d95938790d7af97c84c474413af",
   "rule_counts": {
     "R-app": 1468,
-    "R-catch": 316,
+    "R-catch": 317,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 147,
     "R-support": 124,
-    "R-verify": 1200,
+    "R-verify": 1201,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

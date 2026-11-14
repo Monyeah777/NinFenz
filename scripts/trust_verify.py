@@ -14,6 +14,7 @@
 from __future__ import annotations
 
 import argparse
+import hmac
 import json
 import sys
 from pathlib import Path
@@ -22,6 +23,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "desktop" / "src"))
 
 from core import atomic_write, json_doc  # noqa: E402
+from core.trust import anchor as ta  # noqa: E402
 from core.trust import dsse  # noqa: E402
 from core.trust import keys as tk  # noqa: E402
 from core.trust import verify as tv  # noqa: E402
@@ -45,6 +47,35 @@ def _summary(report: dict) -> str:
         lines.append(f"issue {issue['code']}: {issue['message']}")
         lines.append(f"  fix: {issue['fix']}")
     return "\n".join(lines) + "\n"
+
+
+def _hmac_map(path: str) -> dict:
+    """{id: hex} → {id: callable(message_digest_str, sig_bytes)}（stdlib hmac）。"""
+    raw = json_doc.load(Path(path), dict, what="hmac material")
+    out = {}
+    for keyid, hex_text in raw.items():
+        key = bytes.fromhex(str(hex_text))
+
+        def check(message, signature, _key=key):
+            return hmac.compare_digest(dsse.hmac_sign(_key, message.encode()), signature)
+
+        out[str(keyid)] = check
+    return out
+
+
+def _anchor_verifiers(args) -> dict:
+    """按 CLI 提供的材料构造锚 verifier（没给的材料就没有对应 verifier=记 none）。"""
+    verifiers = {}
+    if args.tsa_query and args.tsa_ca:
+        verifiers["rfc3161"] = ta.make_timestamp_verifier(
+            args.tsa_query, args.tsa_ca, subject_path=args.tsa_subject)
+    if args.git_repo:
+        verifiers["git-commit"] = ta.make_git_commit_verifier(args.git_repo)
+    if args.witness_material:
+        verifiers["witness"] = ta.make_witness_verifier(_hmac_map(args.witness_material))
+    if args.sth_material:
+        verifiers["transparency-sth"] = ta.make_sth_verifier(_hmac_map(args.sth_material))
+    return verifiers
 
 
 def _verify_envelope(args) -> int:
@@ -107,7 +138,29 @@ def main(argv=None) -> int:
     ap.add_argument("--root", default=str(ROOT), help="仓库根（读冻结 schema 用）")
     ap.add_argument("--json", action="store_true", help="输出 nf-verify/1 报告 JSON")
     ap.add_argument("--out", default="", help="把报告写入文件（原子写）")
+    ap.add_argument("--anchor", default="", help="nf-anchor/1 锚件（可选；给了才核 T2 事实）")
+    ap.add_argument("--anchor-build", default="", help="构建模式：输出 nf-anchor/1 文件路径")
+    ap.add_argument("--anchor-target", default="", help="构建模式的 target_digest")
+    ap.add_argument("--anchor-anchors", default="", help="构建模式的 anchors JSON 数组文件")
+    ap.add_argument("--tsa-query", default="", help="RFC3161 verifier 的查询文件")
+    ap.add_argument("--tsa-ca", default="", help="RFC3161 verifier 的 TSA 根/中间证书 PEM")
+    ap.add_argument("--tsa-subject", default="", help="被时间戳盖章的数据文件（可选绑定校验）")
+    ap.add_argument("--git-repo", default="", help="git-commit 锚 verifier 的仓库路径")
+    ap.add_argument("--witness-material", default="", help="witness hmac 材料 {id: hex}")
+    ap.add_argument("--sth-material", default="", help="STH hmac 材料 {log_id: hex}")
     args = ap.parse_args(argv)
+    if args.anchor_build:
+        anchors = json_doc.load(Path(args.anchor_anchors), list, what="anchors") \
+            if args.anchor_anchors else []
+        try:
+            doc = ta.build_anchor_set(args.anchor_target, anchors)
+            atomic_write.write_text(Path(args.anchor_build),
+                                    json.dumps(doc, ensure_ascii=False, indent=2) + "\n")
+        except (OSError, ValueError) as exc:
+            print(f"不可判定：{exc}", file=sys.stderr)
+            return tv.EXIT_UNDECIDABLE
+        print(f"anchor built: target={args.anchor_target} anchors={len(anchors)}")
+        return 0
     if args.envelope:
         return _verify_envelope(args)
     if not args.bundle or not args.policy:
@@ -116,7 +169,9 @@ def main(argv=None) -> int:
     try:
         bundle = _load(args.bundle, "bundle")
         policy = _load(args.policy, "policy")
-        result = tv.verify(bundle, policy, root=args.root)
+        anchor_doc = _load(args.anchor, "anchor") if args.anchor else None
+        result = tv.verify(bundle, policy, root=args.root, anchor=anchor_doc,
+                           anchor_verifiers=_anchor_verifiers(args) if anchor_doc else None)
     except (OSError, ValueError) as exc:
         print(f"不可判定：{exc}", file=sys.stderr)
         return tv.EXIT_UNDECIDABLE
