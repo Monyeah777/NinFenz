@@ -137,7 +137,8 @@
         "desktop/src/core/trust/trust_store.py",
         "scripts/trust_keygen.py",
         "desktop/tests/test_trust_key_material.py",
-        "desktop/tests/test_trust_store.py"
+        "desktop/tests/test_trust_store.py",
+        "desktop/tests/test_trust_auto_anchor.py"
       ],
       "falsifier": "若 T3 可在无 witness / 无 STH 时达到，或本地链被当作外部见证抬升 T3，则本裁决失效。"
     },

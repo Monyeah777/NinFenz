@@ -1,7 +1,7 @@
 {
-  "bytes": 12556914,
+  "bytes": 12561899,
   "count": 608,
-  "digest": "1a91d95f3eba0080c45393130ca6a69f09e0893e7e3d86acab423c56d5652a3e",
+  "digest": "d46612a478b00425eb527cf8a200622aaf75b7f51a3cb6dfcd5c02692724849d",
   "materials": [
     {
       "bytes": 102,
@@ -1714,9 +1714,9 @@
       "sha256": "257614e63c2fc1acd859a0dae7dd3c0c5a99eada3f13866e3c8fe1ff14be8e2a"
     },
     {
-      "bytes": 15117,
+      "bytes": 16748,
       "path": "desktop/src/core/trust/anchor.py",
-      "sha256": "4031045aa75168d9df0cbf1c2a291660b07023c7205f5a412dafd34db2bdd2b3"
+      "sha256": "acaf4d9177980d63ddbd8bba439338d35f7f208cde22b4afdcf5cdae671b5de3"
     },
     {
       "bytes": 9668,
@@ -1759,9 +1759,9 @@
       "sha256": "6595cc4ddafae09d9d4dd286e59a9e58b597ee649777cfe93542e11d0babc278"
     },
     {
-      "bytes": 9444,
+      "bytes": 10374,
       "path": "desktop/src/core/trust/gate_g4.py",
-      "sha256": "e7b2eb403ed474aedbe05057003ed464e14e8bd16bf6c99004cad8b1a4ea8581"
+      "sha256": "b5b6482658f7534a9d8139bcf9fbb0abf7abca0911ebcf1d2c79545e3104b5b5"
     },
     {
       "bytes": 6883,
@@ -2001,12 +2001,12 @@
     {
       "bytes": 79590,
       "path": "protocol/RECEIPTS.json",
-      "sha256": "2636759af61dcbefdb8fa44e821d0dd470355641616a4abae2662ce5df44c644"
+      "sha256": "068594672080deab954dbfd5fd501327ae0392225bcac4831b2223a680e65a66"
     },
     {
-      "bytes": 10576,
+      "bytes": 10627,
       "path": "protocol/adr/registry.json",
-      "sha256": "89dde2b8bfad7ca819ac9cbc619806593d50cf28aa201be7b2c5f888047dd5bb"
+      "sha256": "cea37cd9054355e0e1d8789f9d9eb3143adb7b7fbf079dba197e30d9c74e6806"
     },
     {
       "bytes": 317,
@@ -2054,9 +2054,9 @@
       "sha256": "c2402950e34e3ff9bd0f09171c8bee821bf0f57c33f32d0dbc4bb4b3e6157914"
     },
     {
-      "bytes": 486929,
+      "bytes": 487374,
       "path": "protocol/check12_weights.json",
-      "sha256": "1b152d18e469d8688e331bbcbec8ac8bd13e4adb98d4b95b83b75361b4d8762e"
+      "sha256": "e51a92ccf2eb72fcac52b7853d258bfed20061cde578c4c8022ec0222a4ad0a1"
     },
     {
       "bytes": 16170,
@@ -2066,7 +2066,7 @@
     {
       "bytes": 42968,
       "path": "protocol/code_metrics_baseline.json",
-      "sha256": "48b822f55e44d1e5d1d48278e5b60d7b9c60f50e2251ceb9cdb9a0d11ef988a7"
+      "sha256": "8aa2c3332db3dc2471680d984084904196f21dd1d1e753cc2efed2c18b604831"
     },
     {
       "bytes": 87117,
@@ -2196,7 +2196,7 @@
     {
       "bytes": 27560,
       "path": "protocol/generated/receipt_chain.json",
-      "sha256": "2ca6d10e6b3623ec4b3e2b8ad4bc2e3189c6a03b403bec0b0cfb6129748d5204"
+      "sha256": "838f24b397dfcd324007185429c98e604202f6b3533047da8825d8b486a2eebd"
     },
     {
       "bytes": 918,
@@ -2449,9 +2449,9 @@
       "sha256": "87de7ac68f9846b333323efecdbb7555adf24215ae8145d573fe8d0688b8e86d"
     },
     {
-      "bytes": 534763,
+      "bytes": 535007,
       "path": "protocol/role_coordinates.json",
-      "sha256": "9d410e731aa434e4ddfefa97dcf8dce91241a19d281a2b5108cfc17aac39d856"
+      "sha256": "7d8675f34a980dbce78c97df058a91646bea4e0f3515c53d83e74122ad0fcbe1"
     },
     {
       "bytes": 9391,
@@ -2616,7 +2616,7 @@
     {
       "bytes": 13122,
       "path": "protocol/verification_report.json",
-      "sha256": "0a1d56ed516e3da7e3a60b1895d49224fa08ee9647debb8618639562e624d422"
+      "sha256": "7c9affd47c05961709999d6f395d0b5e7fb802ff8bfabb70e957e13a89cd5361"
     },
     {
       "bytes": 4160,
@@ -2974,9 +2974,9 @@
       "sha256": "aacf188610233408df88de23e5a8a6a5cd8398d2aff9cce1d7867f6feddfb23c"
     },
     {
-      "bytes": 18668,
+      "bytes": 20352,
       "path": "scripts/trust_verify.py",
-      "sha256": "45a93165bcd2c0b516dfb9fcb8de569f6f6029699b9610d75fa365d676d4b662"
+      "sha256": "16e9757dffb1f80fbac3bcca8fceb4ed5ac09828a84229d8d73656d76e743812"
     },
     {
       "bytes": 3884,

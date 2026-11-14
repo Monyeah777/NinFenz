@@ -1,5 +1,5 @@
 {
-  "digest": "d934628c15fbdf5e37ab58c16b73f28f43168d9faaefd35c596d72b08d477869",
+  "digest": "a277dbe73963cc57f021466c0679f24d10741304289c0a5ac860fc0e128d2b45",
   "entries": [
     {
       "doc": "其余 ABI 调用的判定向量：cc_label（IR 校验）→ 期望结论（跨语言可复核）。",
@@ -1134,7 +1134,9 @@
         "--anchor",
         "--anchor-anchors",
         "--anchor-build",
+        "--anchor-components",
         "--anchor-target",
+        "--auto-anchor",
         "--bundle",
         "--context-lineage",
         "--contexts",
@@ -1310,7 +1312,7 @@
       "subcommands": []
     }
   ],
-  "flags": 573,
+  "flags": 575,
   "note": "静态接口面（docs/flags/subcommands），不含缺省行为语义",
   "schema": "nf-capability-inventory/1",
   "scripts": 83

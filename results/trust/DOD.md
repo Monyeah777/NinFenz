@@ -37,7 +37,7 @@
 
 ## 5. 残余 OPEN（不在本轮声称范围）
 
-- 自动锚定编排（把已签链头自动挂锚进报告）仍为 OPEN；
+- ~~自动锚定编排~~ 已完成（`trust/anchor.py::auto_anchor` + `trust_verify.py --auto-anchor`：先验链头再组装锚件；错头/空组件必拒）；
 - ~~trust store 多根/类型权限合一~~ 已完成（`trust/trust_store.py`：policy×issuer registry×type registry 装配一致性 + lookup）；
 - ~~keygen 与 0600 强制~~ 已完成（`trust/key_material.py` + `scripts/trust_keygen.py`：0600/拒绝覆盖/拒绝符号链接/POSIX 权限校验；Windows 语义如实告警）；
 - 外部 witness 网络与公共锚接入（需外部基础设施）；
