@@ -231,6 +231,7 @@
     "test_full_sample_p03_doc_contract": 0.2,
     "test_g0_dod": 0.3,
     "test_g1_dod": 0.6,
+    "test_g2_dod": 0.7,
     "test_gap_review": 16.0,
     "test_gate_41_42": 0.6,
     "test_gate_cache": 0.2,
@@ -2587,6 +2588,9 @@
     "test_g1_dod.G1DodTest.test_g1_dod_valid": 0.06,
     "test_g1_dod.G1DodTest.test_live_metrics": 0.05,
     "test_g1_dod.G1DodTest.test_mutations_red": 0.35,
+    "test_g2_dod.G2DodTest.test_doc_cross_consistent": 0.0,
+    "test_g2_dod.G2DodTest.test_g2_dod_valid": 0.08,
+    "test_g2_dod.G2DodTest.test_mutations_red": 0.46,
     "test_gap_review.CandidateTest.test_candidates_are_deterministic_and_capped": 1.5,
     "test_gap_review.CandidateTest.test_class_filter_narrows_scope": 1.58,
     "test_gap_review.EvidenceTest.test_evidence_available_for_some_rows_and_always_a_string": 1.23,
@@ -6363,5 +6367,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2177.9
+  "total_s": 2178.6
 }
