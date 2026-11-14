@@ -1,6 +1,6 @@
 {
   "schema": "nf-final-dod/1",
-  "note": "NF-Final 质量报告收口 + 最终 Gate 审计机读件：汇总 G0–G4 收口 verdict 与 P0、门禁实测（53 条/PASS=97/WARN=2/FAIL=0）、DoD 最终版、OPEN 清单（外部/工具/债务）、claims 边界与交接。判据 desktop/tests/test_final_dod.py（含现场复算）。**pass-with-open-items ≠ 零缺陷**，外部 OPEN 不因收口而消失。",
+  "note": "NF-Final 质量报告收口 + 最终 Gate 审计机读件：汇总 G0–G4 收口 verdict 与 P0、门禁实测（53 条/PASS=97/WARN=2/FAIL=0）、DoD 最终版、OPEN 清单（外部/工具/债务）、claims 边界与交接。判据 desktop/tests/test_final_dod.py（含现场复算）。**pass-with-open-items ≠ 零缺陷**，外部 OPEN 不因收口而消失。 更新（R53）：G5 原文 WP-50/51/52/53/54 全部落地 + §19.1 交付物补件后，门禁实测 57 条/PASS=107；final Gate 结论不变（pass-with-open-items、P0=0）。",
   "gates": [
     {
       "id": "G0",
@@ -46,11 +46,11 @@
     }
   ],
   "gate_measurements": {
-    "checks": 53,
-    "pass": 97,
+    "checks": 57,
+    "pass": 107,
     "warn": 2,
     "fail": 0,
-    "label": "check1-44/45/46/47/48/49/50/51/52/53",
+    "label": "check1-44/45/46/47/48/49/50/51/52/53/54/55/56/57",
     "conformance": "conformant（27/27 契约）",
     "freshness": "4/4",
     "cq_p0": 0,
@@ -65,7 +65,7 @@
     },
     {
       "id": "FIN-02",
-      "text": "门禁实测：53 条 / PASS=97 / WARN=2 / FAIL=0；conformance 27/27；freshness 4/4；CQ P0=0",
+      "text": "门禁实测：57 条 / PASS=107 / WARN=2 / FAIL=0；conformance 27/27；freshness 4/4；CQ P0=0",
       "status": "pass"
     },
     {
@@ -164,6 +164,18 @@
       "id": "G5-DEBT-02",
       "text": "bash verify.sh --full（CI full 档）本机未跑；静态+受影响面+新鲜度三件套取证",
       "owner": "CI",
+      "blocking": false
+    },
+    {
+      "id": "G5-DEBT-03",
+      "text": "Go↔Python 运行时 parity 未验（本机无 go），只做静态对账（WP-51）",
+      "owner": "maintainers",
+      "blocking": false
+    },
+    {
+      "id": "G5-DEBT-04",
+      "text": "S15 红队（未知未知）未系统化，需作者触发（WP-50 自扫描 open 项）",
+      "owner": "maintainers",
       "blocking": false
     }
   ],
