@@ -49,6 +49,7 @@
       "delivery",
       "eval_validity",
       "evidence",
+      "governance_adapters",
       "i18n_checks",
       "key_transparency",
       "legal",

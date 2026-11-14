@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-15",
   "approved_by": "Monyeah777",
-  "note": "NF-Final G3 WP-30 契约生命周期/义务",
+  "note": "NF-Final G3 WP-31 治理 verify 适配",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "ddd217b853053c2a0f34c286480d553e93cb4a3e6618745dc0a2619d7d365ae2"
+  "subject_digest": "4d07c8c60f791df49d09b097ed88151ddf515c0c78cb0c0c5e3dc00a29e26ba4"
 }

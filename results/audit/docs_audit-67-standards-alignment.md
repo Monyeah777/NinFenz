@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/asset_density.py:aa60651ad8269e7db09a709570ae69192f39ee95cfd6bd1d4f652696b3d26c56
   - docs/domain-packs.md:f90ff233965ee1bb5a872dd833b79e200bfc1825db9c81f651ceca760d83d8b6
-  - protocol/data_contracts.json:89353f21e2a0c8b2a71f8a507755d10b7fc22e7a6dad615524156ee4bfe109ea
+  - protocol/data_contracts.json:e9aa8ef16fe796e1fe6237ea1a29639a58cdc455f53c9122de8df997bcd87c4a
 ---
+> 重审（2026-11-15）：NF-Final WP-31：新增 protocol/governance_adapters.json、core/governance_adapters.py、docs/governance-adapters.md、test_governance_adapters_contract.py；assertions/data_contracts/independence/code_metrics/check12 更新
+
 > 重审（2026-11-15）：NF-Final WP-30：新增 protocol/contract_lifecycle.json、core/contract_lifecycle.py、docs/contract-lifecycle.md、test_contract_lifecycle_contract.py；assertions/data_contracts/independence/code_metrics/check12 更新
 
 > 重审（2026-11-15）：NF-Final G2 收口：新增 results/{G2_DOD.md,g2_dod.json}、test_g2_dod.py；assertions/data_contracts/check12/code_metrics 更新

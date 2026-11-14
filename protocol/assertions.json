@@ -1041,6 +1041,21 @@
       "message": "契约生命周期义务表缺失或版本名不符（WP-30 判据依赖它）",
       "fix": "补/修 protocol/contract_lifecycle.json；再跑 test_contract_lifecycle_contract",
       "evidence": "test_contract_lifecycle_contract / conformance::modeling"
+    },
+    {
+      "id": "gov-adapters",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "protocol/governance_adapters.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-gov-adapters/1"
+      },
+      "message": "治理 verify 适配注册表缺失或版本名不符（WP-31 判据依赖它）",
+      "fix": "补/修 protocol/governance_adapters.json；再跑 test_governance_adapters_contract",
+      "evidence": "test_governance_adapters_contract / conformance::modeling"
     }
   ]
 }
