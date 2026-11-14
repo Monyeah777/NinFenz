@@ -233,6 +233,7 @@
     "test_feature_lifecycle": 0.2,
     "test_fence_health": 0.2,
     "test_fetch_guard": 0.1,
+    "test_final_dod": 0.5,
     "test_freshness_check": 30.4,
     "test_full_sample_p03_doc_contract": 0.2,
     "test_g0_dod": 0.3,
@@ -2639,6 +2640,9 @@
     "test_fetch_guard.Test.test_credentials_and_redirects": 0.0,
     "test_fetch_guard.Test.test_http_and_host_not_pinned": 0.0,
     "test_fetch_guard.Test.test_ok": 0.0,
+    "test_final_dod.FinalDodTest.test_doc_cross_consistent": 0.0,
+    "test_final_dod.FinalDodTest.test_final_dod_valid": 0.19,
+    "test_final_dod.FinalDodTest.test_mutations_red": 0.17,
     "test_freshness_check.TestAggregate.test_all_clean": 0.0,
     "test_freshness_check.TestAggregate.test_issue_list_is_capped": 0.0,
     "test_freshness_check.TestAggregate.test_one_stale_fails": 0.0,
@@ -6474,5 +6478,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2181.4
+  "total_s": 2181.9
 }

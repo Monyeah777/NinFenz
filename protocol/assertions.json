@@ -1242,6 +1242,21 @@
       "message": "稳定性报告缺失或版本名不符（WP-51 判据依赖它）",
       "fix": "重跑 stability.write；再跑 test_stability_contract",
       "evidence": "test_stability_contract / conformance::modeling"
+    },
+    {
+      "id": "final-dod",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "results/final_dod.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-final-dod/1"
+      },
+      "message": "最终 Gate 审计件缺失或版本名不符（NF-Final 收口判据依赖它）",
+      "fix": "补/修 results/final_dod.json；再跑 test_final_dod",
+      "evidence": "test_final_dod / conformance::modeling"
     }
   ]
 }

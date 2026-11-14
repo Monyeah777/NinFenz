@@ -1210,6 +1210,18 @@
         "test_stability_contract",
         "docs/stability.md"
       ]
+    },
+    {
+      "id": "final-dod",
+      "artifact": "results/final_dod.json",
+      "quality_rule": "assertion:final-dod",
+      "owner": "质量报告收口/最终 Gate（test_final_dod 判据+现场复算）+ WP-52",
+      "status": "active",
+      "freshness": "Gate 收口/门禁数字/OPEN 清单变化须重跑收口；verdict 与 P0 必须一致",
+      "consumers": [
+        "test_final_dod",
+        "results/FINAL_DOD.md"
+      ]
     }
   ]
 }
