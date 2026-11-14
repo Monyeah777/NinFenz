@@ -800,6 +800,11 @@
       "max_fn_cc": 19,
       "max_fn_lines": 49
     },
+    "desktop/src/core/keywords.py": {
+      "lines": 168,
+      "max_fn_cc": 49,
+      "max_fn_lines": 82
+    },
     "desktop/src/core/knowledge.py": {
       "lines": 502,
       "max_fn_cc": 62,
@@ -1831,7 +1836,7 @@
       "max_fn_lines": 26
     },
     "scripts/nf.py": {
-      "lines": 10121,
+      "lines": 10157,
       "max_fn_cc": 132,
       "max_fn_lines": 443
     },

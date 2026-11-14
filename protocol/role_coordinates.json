@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1510,
+    "app": 1511,
     "entry": 26,
     "floor": 5,
     "prod": 1068,
     "projection": 239,
     "support": 512,
-    "verify": 1455
+    "verify": 1458
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -6455,6 +6455,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "关键词/扩展口登记与检查（WP-52，G5）：§17 标签表/索引/中英对照 + §18 OPEN 扩展口。",
+      "path": "desktop/src/core/keywords.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "双源知识架构门禁（权威分层 / 消化可追溯 / 查询有序 / 时效 / 可见性）。",
       "path": "desktop/src/core/knowledge.py",
       "role": "verify",
@@ -9761,6 +9767,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "WP-52 关键词/扩展口判据（§17 标签索引 + §18 OPEN 扩展口不得静默关闭）。",
+      "path": "desktop/tests/test_keywords_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "双源知识层（knowledge）正式与否定用例：声明 / 顺序 / 溯源 / 巡检。",
       "path": "desktop/tests/test_knowledge.py",
       "role": "verify",
@@ -11621,7 +11633,7 @@
       "rule": "R-verify"
     },
     {
-      "function": "终端文档契约：79 命令 / 8 族 / 213 索引 / 9 区 / 13 表单 / 139 例必须与实读一致。",
+      "function": "终端文档契约：80 命令 / 8 族 / 215 索引 / 9 区 / 13 表单 / 139 例必须与实读一致。",
       "path": "desktop/tests/test_terminal_doc_contract.py",
       "role": "verify",
       "rule": "R-verify"
@@ -14801,6 +14813,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "NF-Final G5 WP-52 关键词/扩展口登记（§17/§18）：标签表、关键词索引、中英对照、扩展/创新口（OPEN-*）状态与 owner/接口/证据。纪律：标签只能本表定义；OPEN-* 不得静默关闭（open 必须有 owner+interface；closed 必须有在场证据）；禁用词必须带 [HONESTY] 或否定语境；无孤儿标签（用到的标签必须在册）。判据 desktop/tests/test_keywords_contract.py + verify check57。",
+      "path": "protocol/keywords.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "双源知识架构的机器可读声明（真源）：把「权威分层 / 消化可追溯 / 查询有序 / 时效 / 可见性」从散文变成可机检件。authority=contract 表示 NF 管辖内事实（本地编译层，可直接采信）；authority=reference 表示外部参考级（必须标注来源、不得写死、受时效约束）。机制借鉴一句式：编译时机按数据域选择——本地沉淀走写入时编译，外部变化走查询时检索（借 LLM Wiki 的编译优先主张与 GraphRAG 的 indexing/query 分段，实证判定见 results/audit）。",
       "path": "protocol/knowledge_sources.json",
       "role": "verify",
@@ -15180,17 +15198,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "23db2d20aaec7181c8b915d1a3c23f1bc3fce04597a6e68283aa7cbe5602bc49",
+  "root_digest": "788864109a018d185edafc3c00f61c3cb40d846483daf9c3fafa17249c04a435",
   "rule_counts": {
-    "R-app": 1510,
+    "R-app": 1511,
     "R-catch": 356,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 208,
     "R-support": 124,
-    "R-verify": 1323,
-    "auto:R-core": 319
+    "R-verify": 1325,
+    "auto:R-core": 320
   },
   "schema": "nf-role-coordinates/1"
 }

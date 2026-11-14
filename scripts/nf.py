@@ -2160,6 +2160,13 @@ def _add_parser_governance(sub):
     agr.add_argument("--sidecar", action="store_true",
                      help="交付包附带 evidence/sidecar.json（可选，不阻塞）")
 
+    kwp = sub.add_parser("keywords",
+                         help="关键词/扩展口（WP-52：§17 标签索引 + §18 OPEN 扩展口）",
+                         description="标签必须在册、OPEN 不得静默关闭、禁用词需 [HONESTY]；无孤儿标签")
+    kwsub = kwp.add_subparsers(dest="keywords_cmd", required=True)
+    kwc = kwsub.add_parser("check", help="检查标签/扩展口/禁用词一致性")
+    kwc.add_argument("--json", action="store_true", help="机读输出")
+
     wkp = sub.add_parser("wiki",
                          help="LLMWiki 编译（投影：pages/index/graph/llms.txt/MCP）",
                          description="Wiki 由真源编译（禁手改/禁复制正文）；check 用真源 digest 判陈旧")
@@ -9743,6 +9750,34 @@ def _cmd_agent(args) -> int:
     return 2
 
 
+def _cmd_keywords(args) -> int:
+    """nf keywords：§17 标签/关键词索引 + §18 扩展口一致性检查。"""
+    import json as _json
+
+    from core import keywords as kw
+    cmd = getattr(args, "keywords_cmd", None)
+    if cmd != "check":
+        print("用法：nf keywords check [--json]", file=sys.stderr)
+        return 2
+    issues = kw.check(".")
+    if getattr(args, "json", False):
+        print(_json.dumps({"schema": "nf-keywords-check/1", "issues": issues,
+                          "summary": kw.summary(".")},
+                         ensure_ascii=False, indent=2))
+        return 0 if not issues else 1
+    for item in issues:
+        print("  ✗ %s" % item, file=sys.stderr)
+    if issues:
+        print("关键词检查：%d 个问题（修复指引：见上）" % len(issues), file=sys.stderr)
+        return 1
+    s = kw.summary(".")
+    print("关键词检查通过：标签 %d · 关键词 %d · 中英对照 %d · 扩展口 %d（open %d / partial %d / closed %d）"
+          % (s["tags"], s["keywords"], s["synonyms"], s["openings"],
+             s["openings_by_status"]["open"], s["openings_by_status"]["partial"],
+             s["openings_by_status"]["closed"]))
+    return 0
+
+
 def _cmd_wiki(args) -> int:
     """nf wiki：LLMWiki 编译/自检/取页/检索/邻居/上下文（投影，非第二真源）。"""
     import json as _json
@@ -9819,6 +9854,7 @@ def _cmd_wiki(args) -> int:
 _COMMAND_HANDLERS = {
     "shell": _cmd_shell, "terminal": _cmd_shell,
     "agent": _cmd_agent,
+    "keywords": _cmd_keywords,
     "wiki": _cmd_wiki,
     "layers": _cmd_layers,
     "verify": _cmd_verify,
