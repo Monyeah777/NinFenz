@@ -4,9 +4,9 @@
     "entry": 26,
     "floor": 5,
     "prod": 1062,
-    "projection": 186,
+    "projection": 188,
     "support": 503,
-    "verify": 1408
+    "verify": 1409
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -10925,6 +10925,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "§4A R2 行为重建判据（NF-Final G0 逆向工程）。",
+      "path": "desktop/tests/test_reverse_behavior.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "§4A R1 契约地图判据（NF-Final G0 逆向工程）。",
       "path": "desktop/tests/test_reverse_contracts.py",
       "role": "verify",
@@ -14862,16 +14868,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "4e92d89a9714e4e2803d1fa5b72936302518fa7ffe6d5dbd3e30bfbc0694db04",
+  "root_digest": "16d328d62c0c52ca89c2dda005c38399b06bfce75520c763101ed4a148725a36",
   "rule_counts": {
     "R-app": 1494,
     "R-catch": 350,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 164,
+    "R-projection": 166,
     "R-support": 124,
-    "R-verify": 1279,
+    "R-verify": 1280,
     "auto:R-core": 298
   },
   "schema": "nf-role-coordinates/1"

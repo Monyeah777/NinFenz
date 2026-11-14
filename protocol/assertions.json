@@ -808,6 +808,21 @@
       "message": "§4A R1 契约地图缺失或版本名不符（G0 逆向判据依赖它）",
       "fix": "补/修 results/reverse/contracts.json；再跑 test_reverse_contracts",
       "evidence": "test_reverse_contracts / conformance::modeling"
+    },
+    {
+      "id": "reverse-behavior",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "results/reverse/behavior.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-reverse-behavior/1"
+      },
+      "message": "§4A R2 行为重建缺失或版本名不符（G0 逆向判据依赖它）",
+      "fix": "补/修 results/reverse/behavior.json；再跑 test_reverse_behavior",
+      "evidence": "test_reverse_behavior / conformance::modeling"
     }
   ]
 }

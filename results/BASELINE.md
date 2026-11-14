@@ -6,6 +6,7 @@
 > 性质：结果/状态件（审计记录），不是规划件。审计对象 = **本机检出**，不是方案所基于的那次检出。
 > 更新（R3，2026-11-14）：WP-02/check49 收口 IN-01/IN-02（§5.5 与矩阵汇总已按实读更新；数字变化以复跑命令为准，见 §7）。
 > 更新（R5，2026-11-14）：WP-01 五件生产 schema（`nf-contract/1`、`nf-wiki-page/1`、`nf-spec/1`、`nf-task/1`、`nf-assembly/1`）落 `protocol/production/`，正/反样例与变异自证在 `test_schema_reference.py`；**只有契约层、仍无编译器/页面生成器**，故 PR-02/WK 系列状态不变（见 §5）。
+> 更新（R16，2026-11-14）：§4A R2 行为重建落地——`results/reverse/BEHAVIOR.md` + `results/reverse/behavior.json`（11 条行为流：9 documented + 2 gap；状态机 S-01 冻结链/S-02 信任等级/S-03 契约生命周期；失败语义 exit 0/1/2）+ `test_reverse_behavior.py`（3 例，7 类变异自证）；§4A 仍余 R3–R6。
 > 更新（R15，2026-11-14）：§4A R1 契约提取落地——`results/reverse/CONTRACT_MAP.md` + `results/reverse/contracts.json`（显式契约 11 组、隐式契约 8 组、缺口 G-01…G-05）+ `test_reverse_contracts.py`（4 例，6 类变异自证）；§4A 仍余 R2–R6（G0 收口前必做）。
 > 更新（R14，2026-11-14）：WP-0A 产品发现/价值框架落地——`docs/product/{PRFAQ,GTM,INTERVIEWS}.md` + `protocol/product.json`（问题/JTBD、4 条价值假设全部 unverified、指标+反指标、MVP 做/不做、支持分级/定价假设、访谈计划 3 槽位 planned-external）+ `core/product.py` + `test_product_contract.py`（6 例，7 类变异自证）；D01 None→Partial、D14 None→Partial（BL-06 框架达成；外部访谈/试点/LOI 属外部操作，OPEN-PRODUCT 未关）。
 > 更新（R13，2026-11-14）：WP-0H 全仓 CQ0/CQ1 落地——`docs/CQ_REPORT.md`（工具矩阵 13 件、3 件 BLOCKED：dotnet/cosign/gitleaks；CQ1 九维自动扫描）+ `docs/QUALITY_DEBT.md`（QD-01…08）+ `docs/REVIEW_CHECKLIST.md`（人工审查清单/记录模板）+ `results/cq/{toolchain,scan}.json` + `results/cq/findings.jsonl` + `results/cq/hotspots.md` + `core/cq_scan.py` + `scripts/cq_scan.py` + `test_cq_scan_contract.py`（10 例，6 类变异自证）；CQ1 结果 P0=0/P1=0，P2=54/P3=37，CC>15 存量 302 已棘轮冻结。

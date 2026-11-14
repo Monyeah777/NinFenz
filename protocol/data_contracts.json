@@ -872,6 +872,18 @@
         "test_reverse_contracts",
         "results/reverse/CONTRACT_MAP.md"
       ]
+    },
+    {
+      "id": "reverse-behavior",
+      "artifact": "results/reverse/behavior.json",
+      "quality_rule": "assertion:reverse-behavior",
+      "owner": "§4A 逆向 R2 行为重建（test_reverse_behavior 判据）",
+      "status": "active",
+      "freshness": "入口/生成物/失败语义变化须重跑 R2；check 标签须在 verify.sh 命中",
+      "consumers": [
+        "test_reverse_behavior",
+        "results/reverse/BEHAVIOR.md"
+      ]
     }
   ]
 }

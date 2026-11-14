@@ -10,12 +10,14 @@ subjects:
   - desktop/src/core/quality_depth_scan.py:563059e8a929bbbba16d5d15a9c77d1f362f9518351860b5ca0682aeb07a23f9
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - scripts/nf.py:75ed1ad2dda5fb07dbd914a6ffedb836e5cf1298bf34b98be602644827ebc925
-  - protocol/data_contracts.json:a8f267a10b6a3f2eec654f86d09de05618a0feb006dc476f436ec32b5f2fe5c8
+  - protocol/data_contracts.json:f7dcc40776b126e93806c2ecea781d2c25e48c09f8225d06a3ac14b59dd57081
   - docs/combos.md:4f5b22bf353a07ff439e44596bd44bea74e7c95d8a811c8ddde17f42f8fbc45c
   - desktop/tests/test_pack_combo.py:38d6fbc122264bcd205e6d5cb8baac1a1a581f1cb8a43da2c12691e57314b0a6
   - community/校园西幻轻混组合包/protocol.yaml:093cc817ae089981b7cfe4aaf57ec7f5d2374455bb63fc8b7af06dc2d29a02a3
 
 ---
+> 重审（2026-11-14）：NF-Final R2 行为重建：新增 results/reverse/{BEHAVIOR.md,behavior.json}、test_reverse_behavior.py；assertions/data_contracts/check12 更新，被审对象变更后机械重绑
+
 > 重审（2026-11-14）：NF-Final R1 契约提取：新增 results/reverse/{CONTRACT_MAP.md,contracts.json}、test_reverse_contracts.py；assertions/data_contracts/check12 更新，被审对象变更后机械重绑
 
 > 重审（2026-11-14）：NF-Final WP-0A：新增 protocol/product.json、core/product.py、docs/product/{PRFAQ,GTM,INTERVIEWS}.md；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑

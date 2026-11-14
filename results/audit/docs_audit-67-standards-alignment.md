@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/asset_density.py:aa60651ad8269e7db09a709570ae69192f39ee95cfd6bd1d4f652696b3d26c56
   - docs/domain-packs.md:f90ff233965ee1bb5a872dd833b79e200bfc1825db9c81f651ceca760d83d8b6
-  - protocol/data_contracts.json:a8f267a10b6a3f2eec654f86d09de05618a0feb006dc476f436ec32b5f2fe5c8
+  - protocol/data_contracts.json:f7dcc40776b126e93806c2ecea781d2c25e48c09f8225d06a3ac14b59dd57081
 ---
+> 重审（2026-11-14）：NF-Final R2 行为重建：新增 results/reverse/{BEHAVIOR.md,behavior.json}、test_reverse_behavior.py；assertions/data_contracts/check12 更新，被审对象变更后机械重绑
+
 > 重审（2026-11-14）：NF-Final R1 契约提取：新增 results/reverse/{CONTRACT_MAP.md,contracts.json}、test_reverse_contracts.py；assertions/data_contracts/check12 更新，被审对象变更后机械重绑
 
 > 重审（2026-11-14）：NF-Final WP-0A：新增 protocol/product.json、core/product.py、docs/product/{PRFAQ,GTM,INTERVIEWS}.md；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑
