@@ -93,8 +93,9 @@ def _claim_matrix(root: Path) -> dict:
         if len(cells) >= 6 and cells[0].isdigit():
             rows.append({"id": cells[0], "claim": cells[1], "status": cells[5]})
     todo = [r for r in rows if r["status"].startswith("TODO")]
+    partial = [r for r in rows if r["status"].startswith("PARTIAL")]
     unsupported = [r for r in rows if "UNSUPPORTED" in r["status"]]
-    return {"rows": rows, "todo": todo, "unsupported": unsupported}
+    return {"rows": rows, "todo": todo, "partial": partial, "unsupported": unsupported}
 
 
 def _imports(files: list) -> list:
@@ -189,6 +190,10 @@ def build(root: str = ".") -> dict:
         add("S0_requirements", "P1", f"claim #{row['id']} 仍 TODO：{row['claim']}",
             "按 CLAIM_MATRIX 的落点阶段（G2-G4）实现并补测试后改状态",
             owner=OWNER, test="", status="open")
+    for row in matrix["partial"]:
+        add("S0_requirements", "P1", f"claim #{row['id']} 仍 PARTIAL：{row['claim']}",
+            "补完剩余面；若是环境缺件（如无 .NET SDK），保持 PARTIAL 并如实登记 ENV",
+            owner=OWNER, test="", status="open")
     add("S6_test_gaps", "P2",
         "属性测试/模糊测试未接（计划 §13.4）：bundle/链随机篡改尚无属性不变量",
         "G2 前补属性测试（随机 bundle/叶/篡改，不变量断言）", owner=OWNER, status="open")
@@ -205,8 +210,8 @@ def build(root: str = ".") -> dict:
         "S7_doc_overclaim": "green" if not positive else "red",
         "S8_deps": "green" if not foreign else "red",
         "S10_privacy": "green" if not secrets else "red",
-        "S0_requirements": "green" if not matrix["todo"] and not matrix["unsupported"]
-                           else "amber",
+        "S0_requirements": ("green" if not matrix["todo"] and not matrix["partial"]
+                            and not matrix["unsupported"] else "amber"),
         "S6_test_gaps": "amber",
         "S12_unknown": "amber",
         "S4_chain_order": "green",

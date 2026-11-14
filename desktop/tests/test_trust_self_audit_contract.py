@@ -42,6 +42,7 @@ def _matrix_counts():
             rows.append(cells[5])
     return {
         "todo": sum(1 for s in rows if s.startswith("TODO")),
+        "partial": sum(1 for s in rows if s.startswith("PARTIAL")),
         "unsupported": sum(1 for s in rows if "UNSUPPORTED" in s),
     }
 
@@ -102,8 +103,8 @@ def audit_issues(doc, md_text="") -> list:
     s0_open = [f for f in findings.values()
                if f.get("dim") == "S0_requirements" and f.get("severity") == "P1"
                and f.get("status") == "open"]
-    if len(s0_open) != counts["todo"]:
-        issues.append("S0 的 open P1 数不等于 CLAIM_MATRIX TODO 行数")
+    if len(s0_open) != counts["todo"] + counts["partial"]:
+        issues.append("S0 的 open P1 数不等于 CLAIM_MATRIX TODO+PARTIAL 行数")
     if counts["unsupported"] != 0:
         issues.append("CLAIM_MATRIX 仍有 UNSUPPORTED")
     gate = doc.get("gate") or {}

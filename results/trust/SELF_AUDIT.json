@@ -1,7 +1,7 @@
 {
   "schema": "nf-trust-self-audit/1",
-  "head": "9d4de3a372dd55fed05a3d73b5f40cc69099fd5a",
-  "scanned_at": "2026-11-14T07:18:07Z",
+  "head": "d881f6b0bc923bf412fd7d3148e4c666d5b73925",
+  "scanned_at": "2026-11-14T07:31:01Z",
   "dimensions": {
     "S0_requirements": {
       "status": "amber",
@@ -82,8 +82,8 @@
       "dim": "S0_requirements",
       "severity": "P1",
       "file": "",
-      "evidence": "claim #21 仍 TODO：Python ↔ .NET（引擎线）逐字节 parity（trust 面）",
-      "fix": "按 CLAIM_MATRIX 的落点阶段（G2-G4）实现并补测试后改状态",
+      "evidence": "claim #21 仍 PARTIAL：Python ↔ .NET（引擎线）逐字节 parity（trust 面）",
+      "fix": "补完剩余面；若是环境缺件（如无 .NET SDK），保持 PARTIAL 并如实登记 ENV",
       "test": "",
       "owner": "Monyeah777（维护者）",
       "status": "open"

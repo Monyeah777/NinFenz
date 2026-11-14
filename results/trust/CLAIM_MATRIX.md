@@ -27,7 +27,7 @@
 | 18 | 未知实体类型/越权组合 fail-closed（typed entity） | `protocol/trust/type-registry.schema.json` + `desktop/src/core/trust/entity.py`（typed_admissibility：issuer 注册 kind/显式授权/有效期/refs 数量类别重复自引；composition_check：ref 可解析 + compose_with 类型对 + DAG/深度有界） | `test_trust_types.py`（19 条：注册表语义 + 准入矩阵 + 组合/DAG/深度 + CLI + 规则移除变异自证） | T1 | SUPPORTED（G3 WP-30） |
 | 19 | 模型替换使旧 AI 证据失效（model card 绑定） | `protocol/trust/model-card.schema.json` + `desktop/src/core/trust/model_card.py`（card_digest 绑定 + pinned 语义 pre_registered/score_forbidden + MODEL-REPLACED / EVAL-PROTOCOL-CHANGED / CARD-REISSUED） | `test_trust_model_card.py`（11 条：pinned 语义 + 绑定矩阵 + 模型替换/评测变更/重发卡 + CLI + schema const 弱化变异自证） | T1 | SUPPORTED（G3 WP-31） |
 | 20 | 报告给出等级 + 缺项 + 修复指引 + 信任根（`nf-verify/1`） | `desktop/src/core/trust/verify.py` | `test_trust_verify.py`（11 条：level 向量 + 四场景退出码 + schema + CLI） | T0 骨架（签名/锚事实 G2） | SUPPORTED |
-| 21 | Python ↔ .NET（引擎线）逐字节 parity（trust 面） | 计划；.NET 引擎线未接 | — | — | TODO（G3/G4；本机无 SDK，见 BASELINE §7） |
+| 21 | Python ↔ .NET（引擎线）逐字节 parity（trust 面） | `scripts/trust_parity/verify.mjs`（Node.js 独立实现，不引 Python/仓内实现）+ `test_trust_parity.py` | 六族 29 条纯复算向量逐字节 parity（canonical/domain/pae/merkle/process/level）；entity 族需完整 JSON Schema 引擎列入 skipped | T1 | PARTIAL（Python↔Node.js parity 已建；.NET 引擎线无 SDK，见 BASELINE ENV-01） |
 | 22 | trust 层 7 件 IDL 结构 fail-closed（未知字段/封闭词表/摘要/时间/base64 形状） | `protocol/trust/*.schema.json`（7 件） | `test_trust_schemas.py`（23 条：正/反样例 + 变异自证） | T0 | SUPPORTED |
 | 23 | schema 不依赖校验器未实现语义（无静默忽略） | `core.json_schema` 叶子件 + `test_trust_schemas.py` 的 unsupported 断言 | 同上 | — | SUPPORTED |
 | 24 | 威胁模型边界自洽：STRIDE 8 行 / 删除矩阵 8 行 / 边界 6 条 / 红队 2×5 均绑定现存控制点与判据；T0/T1 不写成 T3/T4 | `docs/trust/THREAT_MODEL.md` | `test_trust_threat_model_doc_contract.py`（3 条 + 7 项变异自证） | — | SUPPORTED |
@@ -45,6 +45,6 @@
 
 | 34 | prompt/context 血缘绑定（上下文替换/前缀篡改/段重排/跨会话复用可检测；AI 证据同时绑模型身份与血缘摘要） | `protocol/trust/context-lineage.schema.json` + `desktop/src/core/trust/context_lineage.py`（逐段 digest/prev 链 + lineage_digest + identity_digest 绑定） | `test_trust_context_lineage.py`（12 条：构建/篡改矩阵/模型身份与 prompt 绑定/三方绑定/CLI；另 identity 摘要排除 prompt/notes 的正例） | T1 | SUPPORTED（G3 WP-32） |
 
-**本轮判定**：`UNSUPPORTED` = 0（本轮抽检范围内）；`TODO` 1 条（21）落在计划 G4 的工作包内；claim #15/#16/#18/#19/#32/#33/#34 均已 SUPPORTED（WP-20/22/23/30/31/32），不构成文档过度声明。
+**本轮判定**：`UNSUPPORTED` = 0；`TODO` = 0；`PARTIAL` = 1（#21：Python↔Node.js 逐字节 parity 已建，.NET 引擎线因本机无 SDK 未完成，环境事实见 BASELINE ENV-01）；其余 #13/#15/#16/#18/#19/#32/#33/#34 均 SUPPORTED，不构成文档过度声明。
 
 *维护纪律：新增 claim 必须同时补代码锚点与测试，再改状态；不得先写 SUPPORTED 后补测试。*

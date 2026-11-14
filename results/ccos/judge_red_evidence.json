@@ -2453,6 +2453,10 @@
       "source": "naming"
     },
     {
+      "module": "test_trust_parity.py",
+      "source": "naming"
+    },
+    {
       "module": "test_trust_process.py",
       "source": "negative_assertion"
     },
@@ -2633,10 +2637,10 @@
       "source": "negative_assertion"
     }
   ],
-  "modules": 658,
+  "modules": 659,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
-  "suspect": 171,
+  "suspect": 172,
   "with_evidence": 345,
   "without_evidence": 142
 }
