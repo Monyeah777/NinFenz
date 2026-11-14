@@ -90,7 +90,9 @@
         "desktop/tests/test_trust_vectors.py",
         "protocol/trust/chain-head.schema.json",
         "desktop/src/core/trust/signature.py",
-        "desktop/tests/test_trust_signature.py"
+        "desktop/tests/test_trust_signature.py",
+        "scripts/trust_parity/verify.mjs",
+        "desktop/tests/test_trust_parity.py"
       ],
       "falsifier": "若改用累加器实现、或去掉 bundle_id/域分隔仍能通过向量集 merkle 族与 splicing 负例，则本裁决失效。"
     },

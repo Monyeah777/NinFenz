@@ -5,8 +5,8 @@
     "floor": 5,
     "prod": 1057,
     "projection": 167,
-    "support": 479,
-    "verify": 1348
+    "support": 480,
+    "verify": 1349
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -11273,6 +11273,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "跨语言 parity 判据（claim #21）：Node.js 独立实现对冻结向量逐字节复算。",
+      "path": "desktop/tests/test_trust_parity.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "trust.process 判据：process 向量族逐条 + prev 链/seq/创世约定 + 删改重排反例。",
       "path": "desktop/tests/test_trust_process.py",
       "role": "verify",
@@ -14472,16 +14478,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "f90ffec5c5ae109f2b1c3f1474b4568468ab600019e21374883df1676fa976bb",
+  "root_digest": "8746d8bc8c3f819a872f272721a14a9f45d9460cde1cc03aca8612dd0750894c",
   "rule_counts": {
     "R-app": 1468,
-    "R-catch": 327,
+    "R-catch": 328,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 147,
     "R-support": 124,
-    "R-verify": 1222,
+    "R-verify": 1223,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
