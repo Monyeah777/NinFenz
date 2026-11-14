@@ -565,6 +565,10 @@
       "referenced": true
     },
     {
+      "module": "gate_g4",
+      "referenced": true
+    },
+    {
       "module": "gate_graph",
       "referenced": true
     },
@@ -1477,9 +1481,9 @@
       "referenced": true
     }
   ],
-  "modules": 369,
+  "modules": 370,
   "note": "粗粒度名字匹配（代理指标），不做导入图分析",
-  "referenced": 339,
+  "referenced": 340,
   "schema": "nf-core-judge-map/1",
   "unreferenced": 30
 }

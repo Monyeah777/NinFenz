@@ -108,7 +108,9 @@
         "results/trust/trust_vectors.json",
         "desktop/src/core/timestamp.py",
         "desktop/src/core/trust/anchor.py",
-        "desktop/tests/test_trust_anchor_evidence.py"
+        "desktop/tests/test_trust_anchor_evidence.py",
+        "desktop/src/core/trust/gate_g4.py",
+        "desktop/tests/test_trust_gate47.py"
       ],
       "falsifier": "若某等级仅凭本机时钟被判为 T2 及以上并作为对外结论，则本裁决失效。"
     },
@@ -122,7 +124,9 @@
       "evidence": [
         "protocol/trust/anchor.schema.json",
         "desktop/src/core/key_transparency.py",
-        "docs/trust/THREAT_MODEL.md"
+        "docs/trust/THREAT_MODEL.md",
+        "docs/trust/WITNESS_SPEC.md",
+        "desktop/tests/test_trust_t3.py"
       ],
       "falsifier": "若 T3 可在无 witness / 无 STH 时达到，或本地链被当作外部见证抬升 T3，则本裁决失效。"
     },

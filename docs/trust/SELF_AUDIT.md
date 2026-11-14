@@ -14,14 +14,15 @@
 | 单 claim 验证 O(log n) | ✅ | `test_trust_bundle.py`（只读一条 claim + proof 长度 ≤ log n） |
 | 删除/重排矩阵 | ✅ | `test_trust_bundle.py` / `test_trust_process.py` 篡改矩阵 |
 | check45 接线 | ✅ | `verify.sh` check45；`test_trust_gate45.py` 变异必红 |
-| 静态全量门禁 | ✅ | `bash verify.sh --checks-only` PASS=79 WARN=2 FAIL=0（44 条 check） |
-| .NET parity | ⚠️ 未跑 | 本机无 .NET SDK（BASELINE ENV-01），如实记录不写 ok |
+| 静态全量门禁 | ✅ | `bash verify.sh --checks-only` PASS=81 WARN=2 FAIL=0（45 条 check） |
+| T3 见证组合 | ✅ | WITNESS_SPEC + `test_trust_t3.py`（真 TSA 端到端 achieved=T3；T4 不声称） |
+| .NET parity | ⚠️ 未跑 | 本机无 .NET SDK（BASELINE ENV-01）；Python↔Node.js parity 已建（claim #21 PARTIAL） |
 
 ## 维度体检（S0–S12）
 
 | 维度 | 状态 | 判据 / 证据 |
 |---|---|---|
-| S0_requirements | amber | FR/NFR 已落地部分有代码+测试；claim #13/#15/#16/#18/#19/#32/#33/#34 SUPPORTED（WP-20/22/23/30/31/32/33）；#21 为 PARTIAL（Python↔Node.js parity 已建，.NET 无 SDK，ENV-01），有 owner |
+| S0_requirements | amber | FR/NFR 已落地部分有代码+测试；claim #13/#15/#16/#18/#19/#32/#33/#34/#35 SUPPORTED（WP-20/22/23/30/31/32/33/41）；#21 为 PARTIAL（Python↔Node.js parity 已建，.NET 无 SDK，ENV-01），有 owner |
 | S1_code_holes | green | trust 路径 TODO/FIXME/NotImplemented/pass 命中 0 |
 | S2_judgement_holes | green | 裸 except 0；默认放行形状 0（本轮修掉 2 处 `policy_ok` 缺省 True，见 F-001） |
 | S3_crypto | green | 无 md5/sha1/random/time.time/datetime.now；摘要统一 SHA-256 |
@@ -58,5 +59,5 @@ python -m pytest desktop/tests/test_trust_self_audit_contract.py -q
 ## 不改写的历史结论
 
 - 本报告不回溯改 G0 的 `results/trust/BASELINE.md` 判定；基线是**审计当时**的实读，后续状态以本报告与各阶段交接为准。
-- 本版按 G4/WP-40 更新：claim #21 转 PARTIAL（`scripts/trust_parity/verify.mjs` Python↔Node.js 六族 29 条逐字节 parity；.NET 无 SDK 未做，ENV-01）；G3 四项完成口径不变。
+- 本版按 G4/WP-41 更新：新增 claim #35（T3 见证组合）SUPPORTED，check47 接线（门禁 45 条 / PASS=81）；claim #21 保持 PARTIAL（Node.js parity 成立；.NET 无 SDK，ENV-01）。
 - 「全量 bash verify.sh（3100+ 测试）」本轮未跑，如实记；静态面全量与受影响面全量分别取证（见上表与各 WP 记录）。CI 的 full 档是唯一发布结论口径。

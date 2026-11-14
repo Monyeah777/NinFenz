@@ -7,16 +7,16 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:9a86928171c71f4a2d3d324508fdafccb60fd7cc8423d52197185214a40ea30f
-  - scripts/nf.py:ab7c78d75ad9482ab2d766353186a20cf5a9559c95b59b690c6dfb757cdf4513
+  - scripts/nf.py:4b065db63fb34f89faf545c3d91a0f5c76facedf18c3427353312461da8f0b92
   - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
   - scripts/nf:406c221f9f16fb6e318e230b0b0120e3a6d3c9231d57f66285e0e4615e18ca91
   - scripts/nf.cmd:d1e7ea3a9e99c0822102884cddafe1cdf3893d9b75d19abebe7a8d2a8abeec5a
-  - verify.sh:668f325fa342e75ed709b5a3a62694cccedff23099143c8a52c47845a5f958cf
-  - desktop/src/core/quality_baseline.py:448183a739487b91e4964dc9e56992e26bef09da1f24664034bd742f5ac9780a
+  - verify.sh:6d3bc479378fca6c424603c7cb0c125ef7d0c9bbf3a31a57e780876d356aa794
+  - desktop/src/core/quality_baseline.py:f474d25cd7ec48de3fc1ac266a81b441452e4a6e3728b494f2b2a99199aa834b
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - docs/terminal.md:5e3ac66ba65bb390425d1eef6ab251b5d763f443938e6bccfc9924f21d037d54
   - docs/L3_FROZEN.md:863a152271b1b969a3249194d1169628f4a4647a9bdd801473cfc9cb75c6643b
-  - protocol/CONFORMANCE.md:5a6437b4c985368eb7ea5d55b28e91faf7709f43963b151cc3ec49918d4aa237
+  - protocol/CONFORMANCE.md:d3ea7759b22a530be4eb7eaea51e44bd6e8f681b5a1c79d9f4b4af637cbadfd7
 
 ---
 > 重审（2026-11-14）：WP-15 check45 接线与 G1 收口（机械重绑）

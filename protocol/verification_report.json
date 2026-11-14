@@ -1,12 +1,12 @@
 {
   "built_for_date": "2026-11-14",
   "declared": {
-    "check_label": "check1-42/45/46",
-    "coverage_note": "判据级抽查面 31 条，各对应 verify.sh 的一道或多道门禁；≠ 声明 check 总数 44（两者不可互替）",
-    "expected_checks": 44,
-    "expected_pass": 79,
+    "check_label": "check1-42/45/46/47",
+    "coverage_note": "判据级抽查面 31 条，各对应 verify.sh 的一道或多道门禁；≠ 声明 check 总数 45（两者不可互替）",
+    "expected_checks": 45,
+    "expected_pass": 81,
     "report_items": 31,
-    "verify_version": "v2.32"
+    "verify_version": "v2.33"
   },
   "items": [
     {
@@ -241,8 +241,8 @@
       "sample": [],
       "source": "quality_baseline.scan",
       "stats": {
-        "checks": 44,
-        "verify_version": "v2.32"
+        "checks": 45,
+        "verify_version": "v2.33"
       },
       "status": "pass",
       "warns": 0
@@ -298,7 +298,7 @@
       "stats": {
         "contracts": 27,
         "passed": 27,
-        "root": "8f93daddd51b7eb846333a2c9d59961dad35e8a1dbcc9973a711861cba147c3d",
+        "root": "b0b14d351d7c22b170cb4525b745d0370e365686481b767485bf67dc8114f18a",
         "verdict": "conformant"
       },
       "status": "pass",
@@ -326,9 +326,9 @@
       "sample": [],
       "source": "repo_stats.check_strict",
       "stats": {
-        "baseline_checks": 44,
-        "baseline_pass": 79,
-        "check_label": "check1-42/45/46",
+        "baseline_checks": 45,
+        "baseline_pass": 81,
+        "check_label": "check1-42/45/46/47",
         "concept_graphs": 101,
         "core_modules": 13,
         "core_pipelines": [
@@ -356,8 +356,8 @@
         "standards_total": 370,
         "standards_unreachable": 38,
         "subdivisions_total": 1200,
-        "verify_checks": 44,
-        "verify_version": "2.32"
+        "verify_checks": 45,
+        "verify_version": "2.33"
       },
       "status": "pass",
       "warns": 0
@@ -373,7 +373,7 @@
         "files": 372,
         "max_fn_cc": 132,
         "max_fn_lines": 443,
-        "max_lines": 9873
+        "max_lines": 9882
       },
       "status": "pass",
       "warns": 0
@@ -526,8 +526,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4553,
-        "kernel": 2411,
+        "files": 4557,
+        "kernel": 2413,
         "kernel_no_self": 308,
         "rules": 9,
         "uncovered": 0,
@@ -538,7 +538,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "ad6957cf69d4a68fd333f4556b53c8f828f55ddd1d3b8a332fffa05e16a6a918",
+  "root_digest": "369fa7194a7f67f0e2790b61a4e193c15be4b4fc6b780b6e6a4f217f53d90e62",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

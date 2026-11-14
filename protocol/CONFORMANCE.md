@@ -17,7 +17,7 @@
 | registry schema | `2` | 02 头部 + `desktop/src/core/registry.json` |
 | machine_contract schema | `1` | `protocol/schema/contract.schema.json` |
 | IDL schema 集 | `9 件` | `protocol/schema/` |
-| 基线 | `v2.32 · check1-42/45/46 · PASS=79` | `verify.sh` + `quality_baseline.EXPECTED_*` |
+| 基线 | `v2.33 · check1-42/45/46/47 · PASS=81` | `verify.sh` + `quality_baseline.EXPECTED_*` |
 | 档位 | `quick`（默认：静态 + 受影响测试）· `--full`（发布结论：全量测试） | `verify.sh` 参数；`nf release` 与 CI 固定 `--full --no-cache` |
 
 ## 范围
@@ -86,7 +86,7 @@
 | 与报告的关系 | 本文**不替代**报告：报告说「跑过一遍的结论」，本文说「范围与版本边界」 | `docs/conformance.md` + 本页 |
 | 失败即冻结链阻断 | declaration 失败 → `nf conformance --write` 出 non-conformant → `approve` 拒批 → `receipts` 不推进 | `core/release_gate.DEFAULT_FREEZE_CHAIN` |
 
-**不钉运行时数字**：上表 5/19/11 是**当次实读**（`nf conformance --json`）；条数变化属正常演进，正文不把它们当承诺。版本表里的「基线 · `v2.32 · check1-42/45/46 · PASS=79`」是**真源比对项**（与 `quality_baseline.EXPECTED_*` 比对），可以钉、也必须钉。
+**不钉运行时数字**：上表 5/19/11 是**当次实读**（`nf conformance --json`）；条数变化属正常演进，正文不把它们当承诺。版本表里的「基线 · `v2.33 · check1-42/45/46/47 · PASS=81`」是**真源比对项**（与 `quality_baseline.EXPECTED_*` 比对），可以钉、也必须钉。
 
 ## 复现与引用口径
 

@@ -84,7 +84,8 @@
       40,
       41,
       45,
-      46
+      46,
+      47
     ],
     "CAP_TAMPER_EVIDENT": [
       23,
@@ -93,7 +94,8 @@
       40,
       42,
       45,
-      46
+      46,
+      47
     ],
     "CAP_LIFECYCLE_LEGAL": [
       17,
@@ -128,7 +130,8 @@
       35,
       36,
       45,
-      46
+      46,
+      47
     ]
   },
   "assertions": [
@@ -546,6 +549,21 @@
       "message": "issuer registry schema 不在位或版本名不符（check46 的判据前提缺失）",
       "fix": "补 protocol/trust/keys.schema.json（schema=nf-issuer-registry/1）",
       "evidence": "check46 / conformance::assertions"
+    },
+    {
+      "id": "trust-parity-independent",
+      "severity": "fail",
+      "capability": "CAP_TAMPER_EVIDENT",
+      "kind": "json_value",
+      "params": {
+        "path": "results/trust/trust_vectors.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-trust-vectors/1"
+      },
+      "message": "跨语言 parity 的向量集不在位或版本名不符（check47 的判据前提缺失）",
+      "fix": "跑 python scripts/trust_vectors.py --write 重建向量集",
+      "evidence": "check47 / conformance::assertions"
     }
   ]
 }

@@ -6,14 +6,14 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - CHANGELOG.md:af8d0f1f71dfd93c6efdced48c2412694612b046d7849fe3e85394893a407c5e
-  - docs/meta/VERSION-MATRIX.md:75a11e1a7508f6f77ea5530d23ca11f4c2b92303ddd20ee4f7763f77af429e4a
-  - README.md:0c9dbd8aab33e5e6b02681f026951b34c2081b2a631eaf8c4e2edbe5ae469e76
+  - CHANGELOG.md:76e2c7236e8016736dc9c183e6f87351e449e3f25784399f51bfd8e3f7160a38
+  - docs/meta/VERSION-MATRIX.md:1d60ae1fa194ae8bfd7eb235f04ed77fdf1bac0d398b56412af29f41d58be0f4
+  - README.md:d0b0560b53182c98c073936e44116fcb02ac524dd14316015f784603667a8139
   - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
   - docs/release.md:09b0c6bbd0f2514a32cef0e404bb4dac877f42d57a6674157ea45b1629290aa2
-  - scripts/nf.py:ab7c78d75ad9482ab2d766353186a20cf5a9559c95b59b690c6dfb757cdf4513
+  - scripts/nf.py:4b065db63fb34f89faf545c3d91a0f5c76facedf18c3427353312461da8f0b92
 
 ---
 > 重审（2026-11-14）：WP-15 check45 接线与 G1 收口（机械重绑）
