@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-15",
   "approved_by": "Monyeah777",
-  "note": "NF-Final G5 WP-54（收尾：check54 四断言）",
+  "note": "NF-Final G5 WP-50 自扫描全维度 + check55（55 条/PASS=103）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "c3c427579a9388399776a55a7ff4dc8ba144086c3f58a07c537c368da86da788"
+  "subject_digest": "d50174cbef7f78242a91b33f1959498494e2a4ceadfb369c1bcefb9ed78af1ef"
 }

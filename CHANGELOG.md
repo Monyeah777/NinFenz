@@ -6,6 +6,8 @@
 
 ## [未发布] - 2026-11-09 · 职能坐标（ADR-0006）+ 项目改名：NarrativeForge → NinFenz（宁封子）+ 全仓审计 V3 修复波
 
+- **门禁扩到 check55（G5 自扫描全维度，2026-11-15）**：新增 `check55`——§13.1 S0–S15 逐维聚合（探针覆盖需求/空洞/判定/密码学/链序/类型/测试/文档/供应链/路径DoS/隐私/恢复/Wiki/spec/独立性/红队），gap/open 必须带 owner+next、covered 必须有证据，不得把「没做」写成全绿。验收：verify v2.35 **check1-44/45/46/47/48/49/50/51/52/53/54/55 · PASS=103**。
+
 - **门禁扩到 check54（G5 CQ6 综合审查，2026-11-15）**：新增 `check54`——八维评分卡（§13B.3，权重 100%）由证据规则算出、红线（维 <2 / P0 → 封顶 C）、棘轮（对照基线只许不降）、整改 backlog 带 owner、复审签署**不得 AI 代签**（未签记 pending-human）。验收：verify v2.35 **check1-44/45/46/47/48/49/50/51/52/53/54 · PASS=101**。
 
 - **门禁扩到 check53（G5 文档 claims，2026-11-15）**：新增 `check53`——README 三语/CONFORMANCE/VERSION-MATRIX 的 PASS 数、check 标签、baseline_* 必须与 quality_baseline 实测一致；禁用「认证/合规」措辞（非否定语境即红）。验收：verify v2.35 **check1-44/45/46/47/48/49/50/51/52/53 · PASS=97**。

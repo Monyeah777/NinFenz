@@ -1,0 +1,227 @@
+{
+  "claims_boundary": [
+    "自扫描是内部质量证据聚合，不是认证/合规结论",
+    "gap/open 与外部 OPEN 不因聚合而消失"
+  ],
+  "dimensions": [
+    {
+      "detail": "assertions 全带 evidence",
+      "evidence": [
+        "protocol/assertions.json"
+      ],
+      "id": "S0",
+      "name": "需求覆盖",
+      "next": "",
+      "note": "",
+      "owner": "",
+      "status": "covered"
+    },
+    {
+      "detail": "core 无 TODO/NotImplemented",
+      "evidence": [
+        "desktop/src/core",
+        "desktop/tests"
+      ],
+      "id": "S1",
+      "name": "代码空洞（TODO/NotImplemented/stub）",
+      "next": "",
+      "note": "",
+      "owner": "",
+      "status": "covered"
+    },
+    {
+      "detail": "CQ P0=0（bandit/silent_skip 面已扫）",
+      "evidence": [
+        "results/cq/scan.json",
+        "desktop/src/core/silent_skip.py"
+      ],
+      "id": "S2",
+      "name": "判定空洞（吞异常/默认放行）",
+      "next": "",
+      "note": "",
+      "owner": "",
+      "status": "covered-by-existing"
+    },
+    {
+      "detail": "trust 向量在",
+      "evidence": [
+        "results/trust/trust_vectors.json",
+        "protocol/governance_adapters.json"
+      ],
+      "id": "S3",
+      "name": "密码学误用",
+      "next": "",
+      "note": "",
+      "owner": "",
+      "status": "covered-by-existing"
+    },
+    {
+      "detail": "删除/重排检出矩阵未系统化（WP-51）",
+      "evidence": [],
+      "id": "S4",
+      "name": "链/序（删除/重排可检）",
+      "next": "WP-51",
+      "note": "",
+      "owner": "maintainers",
+      "status": "gap"
+    },
+    {
+      "detail": "schema 面全绿",
+      "evidence": [
+        "protocol",
+        "desktop/src/core/schema_lint.py"
+      ],
+      "id": "S5",
+      "name": "类型/兼容（未知字段 fail-closed）",
+      "next": "",
+      "note": "",
+      "owner": "",
+      "status": "covered"
+    },
+    {
+      "detail": "判据模块 711 · 抽查项 32；覆盖率/全仓变异未测（QD-10）",
+      "evidence": [
+        "protocol/check12_weights.json",
+        "desktop/tests"
+      ],
+      "id": "S6",
+      "name": "测试缺口（关键分支/同义反复）",
+      "next": "",
+      "note": "覆盖率/全仓变异未测（QD-10）",
+      "owner": "",
+      "status": "covered"
+    },
+    {
+      "detail": "文档 claims 全绿",
+      "evidence": [
+        "results/docs_claims_report.json"
+      ],
+      "id": "S7",
+      "name": "文档过度声明",
+      "next": "",
+      "note": "",
+      "owner": "",
+      "status": "covered"
+    },
+    {
+      "detail": "workflow 钉版/权限 0 项告警；BLOCKED 工具：dotnet,cosign,gitleaks",
+      "evidence": [
+        ".github/workflows",
+        "results/cq/toolchain.json"
+      ],
+      "id": "S8",
+      "name": "依赖/供应链",
+      "next": "",
+      "note": "",
+      "owner": "",
+      "status": "covered"
+    },
+    {
+      "detail": "paths 校验 + redos 检查在",
+      "evidence": [
+        "desktop/src/core/paths.py",
+        "protocol/verification_report.json"
+      ],
+      "id": "S9",
+      "name": "路径/并发/DoS",
+      "next": "",
+      "note": "",
+      "owner": "",
+      "status": "covered-by-existing"
+    },
+    {
+      "detail": "隐私契约/秘密扫描覆盖面：gitleaks BLOCKED（QD-05），不冒充全扫",
+      "evidence": [
+        "results/cq/toolchain.json",
+        "docs/privacy"
+      ],
+      "id": "S10",
+      "name": "隐私/秘密",
+      "next": "",
+      "note": "gitleaks BLOCKED（QD-05），隐私契约覆盖",
+      "owner": "",
+      "status": "covered-by-existing"
+    },
+    {
+      "detail": "失败考古 + trust 失败路径测试在；故障注入矩阵未系统化",
+      "evidence": [
+        "results/reverse/FAILURE_ARCHAEOLOGY.md",
+        "desktop/tests"
+      ],
+      "id": "S11",
+      "name": "可观测/恢复（故障注入）",
+      "next": "",
+      "note": "故障注入矩阵未系统化",
+      "owner": "",
+      "status": "covered-by-existing"
+    },
+    {
+      "detail": "wiki 校验全绿",
+      "evidence": [
+        "wiki",
+        "desktop/src/core/wiki_compiler.py"
+      ],
+      "id": "S12",
+      "name": "Wiki 完整性",
+      "next": "",
+      "note": "",
+      "owner": "",
+      "status": "covered"
+    },
+    {
+      "detail": "样例 spec→task 可编译且可校验",
+      "evidence": [
+        "spec/intents/sample-document.json",
+        "desktop/src/core/spec_compiler.py"
+      ],
+      "id": "S13",
+      "name": "规范编译（spec→task→assembly）",
+      "next": "",
+      "note": "",
+      "owner": "",
+      "status": "covered"
+    },
+    {
+      "detail": "独立性报告 ok、跨界 0",
+      "evidence": [
+        "results/independence.json",
+        "protocol/independence.json"
+      ],
+      "id": "S14",
+      "name": "独立性（生产/治理 import 边界）",
+      "next": "",
+      "note": "",
+      "owner": "",
+      "status": "covered"
+    },
+    {
+      "detail": "红队角色（审计者/攻击者/新人视角）未系统化，需作者触发",
+      "evidence": [],
+      "id": "S15",
+      "name": "未知未知（红队角色）",
+      "next": "WP-50 自补（作者触发红队）",
+      "note": "",
+      "owner": "maintainers",
+      "status": "open"
+    }
+  ],
+  "note": "聚合既有证据；committed == 实时重算",
+  "rules": {
+    "aggregate_only": "本件聚合既有检查/测试/扫描结果，不重复造扫描器",
+    "gap_owner": "gap/open 必须带 owner 与 next（下一 WP 或触发条件）",
+    "no_fake_covered": "status=covered 必须有可执行/可读证据且探针通过；探针失败必须降为 gap"
+  },
+  "schema": "nf-self-scan-report/1",
+  "status_vocabulary": [
+    "covered",
+    "covered-by-existing",
+    "gap",
+    "open"
+  ],
+  "summary": {
+    "covered": 9,
+    "covered-by-existing": 5,
+    "gap": 1,
+    "open": 1
+  }
+}

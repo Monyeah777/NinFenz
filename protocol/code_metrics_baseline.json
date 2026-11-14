@@ -1380,6 +1380,11 @@
       "max_fn_cc": 9,
       "max_fn_lines": 37
     },
+    "desktop/src/core/self_scan.py": {
+      "lines": 250,
+      "max_fn_cc": 45,
+      "max_fn_lines": 104
+    },
     "desktop/src/core/semantic_conflict.py": {
       "lines": 118,
       "max_fn_cc": 16,

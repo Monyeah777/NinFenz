@@ -68,6 +68,7 @@
       "production_metrics",
       "provenance_external",
       "revocations",
+      "self_scan",
       "spec_compiler",
       "stability",
       "transparency_log",

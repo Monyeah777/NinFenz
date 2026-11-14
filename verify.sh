@@ -118,7 +118,7 @@ fi
 #   运行时 + 档位）；输入没变直接回放摘要（秒级）。--no-cache 或 NF_VERIFY_CACHE=0 关掉。
 # 任何其它参数 = 用法错误（exit 2），以免"看上去像传了子集其实仍在全量"这类静默误读。
 # 矩阵分片（CI，2026-10-18）：`--tests-only --shard i/n` 只跑测试的第 i/n 片；
-# `--checks-only` 只跑 54 条静态 check（测试交给矩阵）。两者由 CI 组合成一次完整门禁：
+# `--checks-only` 只跑 55 条静态 check（测试交给矩阵）。两者由 CI 组合成一次完整门禁：
 # 静态 1 台 + 测试 n 台并行 ⇒ 全量墙钟从"一台机器的 ~600 s"降到"n 台各自 ~100 s"。
 NF_FAST=0; NF_BASE=''; NF_TIER='quick'; NF_CACHE="${NF_VERIFY_CACHE:-1}"
 NF_CHECKS_ONLY=0; NF_TESTS_ONLY=0; NF_SHARD=''
@@ -3570,6 +3570,51 @@ PYEOF
   return "$err"
 }
 
+check55(){
+  echo '== [55/段D] 自扫描全维度门禁（G5：S0–S15 聚合 + gap/open 诚实登记）=='
+  local err=0
+  if [ -n "$PY3" ]; then
+    if "$PY3" - <<'PYEOF' >"$NFL_TMP"/nf_check55.log 2>&1
+import os, sys
+sys.path.insert(0, os.path.join('desktop', 'src'))
+from core import self_scan as ss
+issues = ss.check('.')
+for item in issues:
+    print('[FAIL] %s' % item)
+rep = ss.build('.')
+print('自扫描统计：covered=%d covered-by-existing=%d gap=%d open=%d'
+      % tuple(rep['summary'][k] for k in ('covered', 'covered-by-existing', 'gap', 'open')))
+sys.exit(1 if issues else 0)
+PYEOF
+    then
+      ok '自扫描聚合有效（check55：S0–S15 齐、证据在场、summary 一致）'
+    else
+      no "自扫描聚合异常——$(tail -3 "$NFL_TMP"/nf_check55.log | tr '
+' ' ')"
+      err=1
+    fi
+    if "$PY3" - <<'PYEOF' >/dev/null 2>&1
+import json, sys
+rep = json.load(open('results/self_audit/S0-S15.json', encoding='utf-8'))
+bad = [d['id'] for d in rep['dimensions']
+       if d['status'] in ('gap', 'open') and (not d.get('owner') or not d.get('next'))]
+for d in rep['dimensions']:
+    if d['status'] == 'covered' and not d.get('evidence'):
+        bad.append(d['id'])
+sys.exit(1 if bad else 0)
+PYEOF
+    then
+      ok '自扫描诚实（check55：gap/open 有 owner+next，covered 有证据）'
+    else
+      no '自扫描诚实性不足——修复指引：gap/open 补 owner+next；covered 必须有证据'
+      err=1
+    fi
+  else
+    wn 'python3 不在 PATH（跳过 check55 自扫描门禁）'
+  fi
+  return "$err"
+}
+
 # ---- P3b：判定缓存（输入内容寻址；只回放**绿**判定）----
 # key 由 scripts/verify_cache.py 按 HEAD + 工作树差异 + 未跟踪件 + 门禁代码 + 运行时 + 档位算出；
 # 输入没变就回放上次摘要（秒级）。红判定**不缓存**（红是瞬态），--fast/--no-cache 一律重算。
@@ -3631,7 +3676,7 @@ check37
 check38
 check39
 check40
-echo '—— 段 D：供应链与 Trust 证据面（check41-42 + check43/44 G1 Wiki-Spec + check45/46 Trust + check47 G4 + check48 DoD + check49 G0 双平面 + check50 G2 生产指标 + check51 G3 治理报告 + check52 G4 AI 信任面 + check53 G5 文档 claims + check54 G5 CQ6）——'
+echo '—— 段 D：供应链与 Trust 证据面（check41-42 + check43/44 G1 Wiki-Spec + check45/46 Trust + check47 G4 + check48 DoD + check49 G0 双平面 + check50 G2 生产指标 + check51 G3 治理报告 + check52 G4 AI 信任面 + check53 G5 文档 claims + check54 G5 CQ6 + check55 G5 自扫描）——'
 check41
 check42
 check43
@@ -3646,6 +3691,7 @@ check51
 check52
 check53
 check54
+check55
 echo '=================================================='
 echo "结果统计: PASS=$PASS  WARN=$WARN  FAIL=$FAIL"
 # ---- 开发快车道（--fast · 显式 opt-in · 不改变上面的任何一条判定）----

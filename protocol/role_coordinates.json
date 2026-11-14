@@ -4,9 +4,9 @@
     "entry": 26,
     "floor": 5,
     "prod": 1068,
-    "projection": 235,
+    "projection": 237,
     "support": 512,
-    "verify": 1451
+    "verify": 1453
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -11339,6 +11339,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "WP-50 自扫描全维度判据（S0–S15 聚合 + gap/open 诚实登记）。",
+      "path": "desktop/tests/test_self_scan_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "自包含装配样本重嵌工具单测（编码漂移检测 + 重嵌幂等 + 源逐字相等）。",
       "path": "desktop/tests/test_selfcontained_rebuild.py",
       "role": "verify",
@@ -14993,6 +14999,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "NF-Final G5 WP-50 自扫描全维度登记（§13.1 S0–S15，含 S15 未知未知）：每个维度必须有在场证据（文件/函数/检查号）或如实标 gap/open（带 owner 与下一 WP）。铁律：gap/open 不得写成 covered；本件是自扫描聚合，不是质量认证。判据 desktop/tests/test_self_scan_contract.py + verify check55。",
+      "path": "protocol/self_scan.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "ST 制卡质量规范 v0（验收层：只回答「什么算合格 / 需注意 / 有风险」）。级别语义对齐 CCv2/CCv3 的 MUST/SHOULD/MAY：M=必须 → fail、S=应当 → warn、R=建议 → info。本件是**声明**：NF 不做 ST 运行时，只把规则数据化，供制卡者自查、社群互查、以及未来校验器消费。",
       "path": "protocol/st_quality.json",
       "role": "verify",
@@ -15156,17 +15168,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "88905b105cb52c1fdc733447a72fdd3021f3d5f2bea8fbc69b8fd345c99e2cdb",
+  "root_digest": "3e85fbf031f8e2d85587ef3b3b46af9a6e03bba8dfbcff2fa3403411193fb22c",
   "rule_counts": {
     "R-app": 1510,
     "R-catch": 356,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 206,
+    "R-projection": 207,
     "R-support": 124,
-    "R-verify": 1319,
-    "auto:R-core": 317
+    "R-verify": 1321,
+    "auto:R-core": 318
   },
   "schema": "nf-role-coordinates/1"
 }

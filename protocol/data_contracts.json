@@ -1235,6 +1235,18 @@
         "docs/CQ_REPORT.md",
         "docs/QUALITY_DEBT.md"
       ]
+    },
+    {
+      "id": "self-scan",
+      "artifact": "results/self_audit/S0-S15.json",
+      "quality_rule": "assertion:self-scan",
+      "owner": "自扫描全维度（core/self_scan.py + test_self_scan_contract）+ WP-50",
+      "status": "active",
+      "freshness": "证据/检查号/文档变化后重跑 write；gap/open 必须带 owner+next",
+      "consumers": [
+        "test_self_scan_contract",
+        "protocol/self_scan.json"
+      ]
     }
   ]
 }

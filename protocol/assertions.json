@@ -85,7 +85,8 @@
       51,
       52,
       53,
-      54
+      54,
+      55
     ],
     "CAP_DETERMINISTIC": [
       25,
@@ -102,7 +103,8 @@
       51,
       52,
       53,
-      54
+      54,
+      55
     ],
     "CAP_TAMPER_EVIDENT": [
       23,
@@ -1274,6 +1276,21 @@
       "message": "CQ6 评分卡缺失或版本名不符（WP-54 判据依赖它）",
       "fix": "重跑 cq6_scorecard.write；再跑 test_cq6_scorecard",
       "evidence": "test_cq6_scorecard / conformance::modeling"
+    },
+    {
+      "id": "self-scan",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "results/self_audit/S0-S15.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-self-scan-report/1"
+      },
+      "message": "自扫描聚合件缺失或版本名不符（WP-50 判据依赖它）",
+      "fix": "重跑 self_scan.write；再跑 test_self_scan_contract",
+      "evidence": "test_self_scan_contract / conformance::modeling"
     }
   ]
 }
