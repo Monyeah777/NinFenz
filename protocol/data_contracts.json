@@ -667,6 +667,19 @@
         "nf asset contract ⑤",
         "docs/asset_contract.md"
       ]
+    },
+    {
+      "id": "independence-report",
+      "artifact": "results/independence.json",
+      "quality_rule": "check49",
+      "owner": "生产/治理双平面边界（core/independence.py）+ check49 边界扫描",
+      "status": "active",
+      "freshness": "重算：python scripts/check_independence.py --write；--check 断言在盘 == 实时重算",
+      "consumers": [
+        "check49",
+        "scripts/check_independence.py",
+        "results/RESULTS.md"
+      ]
     }
   ]
 }

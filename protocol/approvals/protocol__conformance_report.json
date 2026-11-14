@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-14",
   "approved_by": "Monyeah777",
-  "note": "NF-Final WP-02 收口（BASELINE 矩阵更新 IN-01/02 后最终冻结）",
+  "note": "NF-Final WP-01（asset 重冻 + audit rebind 后冻结）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "1228718fe2764c1f2850b9cada0043942510bc7c5fb0fdc73b0444964a42e224"
+  "subject_digest": "64b6318717c5a6b0421dba631fec9c957e658aa062b5afafc22b1c2b20d4ad03"
 }

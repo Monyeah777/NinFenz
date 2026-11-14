@@ -4,9 +4,9 @@
     "entry": 26,
     "floor": 5,
     "prod": 1057,
-    "projection": 173,
+    "projection": 174,
     "support": 489,
-    "verify": 1362
+    "verify": 1366
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -6263,6 +6263,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "生产/治理双平面边界（`nf-independence/1`）：把「谁不许 import 谁」做成可复算数据。",
+      "path": "desktop/src/core/independence.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "入库前端共用件（GitHub / Gitee 两通道的公共件）—— 2026-10-14 core 抽取。",
       "path": "desktop/src/core/ingest_common.py",
       "role": "prod",
@@ -9155,6 +9161,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "生产/治理双平面边界判据（方案 §5.5 IN-01/IN-02）：正例 + 变异自证。",
+      "path": "desktop/tests/test_independence.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "injection_budget 单测。",
       "path": "desktop/tests/test_injection_budget.py",
       "role": "verify",
@@ -10841,7 +10853,7 @@
       "rule": "R-verify"
     },
     {
-      "function": "43 追加 · IDL 元工具对照（可选：jsonschema 标准实现交叉验证）。",
+      "function": "IDL 元工具对照（可选：jsonschema 标准实现交叉验证）+ 生产平面 schema 门禁（WP-01）。",
       "path": "desktop/tests/test_schema_reference.py",
       "role": "verify",
       "rule": "R-verify"
@@ -14219,6 +14231,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "生产/治理双平面边界登记（方案 §5.5 IN-01/IN-02 的机读真源）。三平面互斥：生产 MUST NOT import 治理，治理 MUST NOT import 生产运行时，共享原语 MUST NOT 反向 import 任一平面；判据对「全部 core 模块」做静态导入闭包（不是只看清单内的一跳），并显式登记动态导入白名单。新增模块必须归入恰一个平面；归属改判要改本件并重跑判据。",
+      "path": "protocol/independence.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "注入预算档位（机制借鉴 MemVault agent_adapt.rs:21-58 + lorepack assemble.ts:28-45；消费方 core/injection_budget.py）。06 §8 的量化契约落点：条数/预算/优先级/排除类型，order in = order out。",
       "path": "protocol/injection_profiles.json",
       "role": "verify",
@@ -14477,6 +14495,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "生产/治理双平面 import 边界门禁（方案 §5.5 IN-01/IN-02/IN-04）。",
+      "path": "scripts/check_independence.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "互操作导出面的**外部权威校验**（非门禁 · 可选联网 · 只读）。",
       "path": "scripts/check_interop_schemas.py",
       "role": "verify",
@@ -14556,17 +14580,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "b31adb9e6b6d89df23a9b34af0e4366d1e21dcad2c51515dd9259a76138a50bb",
+  "root_digest": "8cf01301fec1133aa52c92fa06b1f673cd8b6bc11647ad00125fe5b3a7f29c29",
   "rule_counts": {
     "R-app": 1469,
     "R-catch": 337,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 153,
+    "R-projection": 154,
     "R-support": 124,
-    "R-verify": 1236,
-    "auto:R-core": 287
+    "R-verify": 1239,
+    "auto:R-core": 288
   },
   "schema": "nf-role-coordinates/1"
 }

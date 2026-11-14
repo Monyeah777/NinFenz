@@ -1,0 +1,35 @@
+{
+  "schema": "nf-wiki-page/1",
+  "id": "wiki:protocol:01-core",
+  "type": "protocol",
+  "summary": "NF 核心协议总纲（投影页，正文由真源编译）",
+  "spec_ref": {
+    "id": "protocol:01",
+    "digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  "machine_contract": {
+    "kind": "protocol",
+    "id": "01"
+  },
+  "relations": [
+    {
+      "kind": "references",
+      "target": "wiki:module:通用:M00"
+    }
+  ],
+  "constraints": [
+    "不得手改生成页"
+  ],
+  "examples": [
+    "nf wiki get wiki:protocol:01-core"
+  ],
+  "llm_hints": [
+    "先读 summary 再取 citations"
+  ],
+  "version": 1,
+  "provenance": {
+    "source": "01_核心协议.md",
+    "digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+  },
+  "citations": []
+}

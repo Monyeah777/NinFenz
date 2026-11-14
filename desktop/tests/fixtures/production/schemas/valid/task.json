@@ -1,0 +1,35 @@
+{
+  "schema": "nf-task/1",
+  "slot": {
+    "id": "slot:section:intro",
+    "kind": "section",
+    "max_items": 1
+  },
+  "spec_refs": [
+    {
+      "ref": "pipeline:P00",
+      "digest": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+    }
+  ],
+  "context_refs": [
+    {
+      "id": "wiki:protocol:01-core",
+      "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    }
+  ],
+  "output_schema": {
+    "kind": "md",
+    "path": "protocol/production/task.schema.json"
+  },
+  "acceptance": [
+    {
+      "id": "A-001",
+      "rule": "引用必须命中 wiki id"
+    }
+  ],
+  "budget": {
+    "max_tokens": 2000,
+    "max_steps": 3,
+    "max_cost": 0.5
+  }
+}
