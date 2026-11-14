@@ -868,6 +868,21 @@
       "message": "§4A R5 同行差分件缺失或版本名不符（G0 逆向判据依赖它）",
       "fix": "补/修 results/reverse/peers.json；再跑 test_reverse_peers",
       "evidence": "test_reverse_peers / conformance::modeling"
+    },
+    {
+      "id": "reverse-invariants",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "results/reverse/invariants.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-reverse-invariants/1"
+      },
+      "message": "§4A R6 不变量件缺失或版本名不符（G0 逆向判据依赖它）",
+      "fix": "补/修 results/reverse/invariants.json；再跑 test_reverse_invariants",
+      "evidence": "test_reverse_invariants / conformance::modeling"
     }
   ]
 }

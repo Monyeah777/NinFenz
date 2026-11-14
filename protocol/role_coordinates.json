@@ -4,9 +4,9 @@
     "entry": 26,
     "floor": 5,
     "prod": 1062,
-    "projection": 194,
+    "projection": 196,
     "support": 503,
-    "verify": 1412
+    "verify": 1413
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -10949,6 +10949,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "§4A R6 不变量判据（NF-Final G0 逆向工程）。",
+      "path": "desktop/tests/test_reverse_invariants.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "§4A R5 同行差分判据（NF-Final G0 逆向工程）。",
       "path": "desktop/tests/test_reverse_peers.py",
       "role": "verify",
@@ -14886,16 +14892,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "1baefa1ee4c09ac61a9c6a5a9c325e47c1c9fd6963a1d68549d93028717bec73",
+  "root_digest": "a92e89faf6bf57812f62ade705d843c1037864ea7b23ab0ca9a14a8230da42dd",
   "rule_counts": {
     "R-app": 1494,
     "R-catch": 350,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 172,
+    "R-projection": 174,
     "R-support": 124,
-    "R-verify": 1283,
+    "R-verify": 1284,
     "auto:R-core": 298
   },
   "schema": "nf-role-coordinates/1"
