@@ -63,7 +63,7 @@
 | TB-02 | 进程 ↔ TSA | 时间戳请求 / 响应 | MITM、伪造 token、时间回拨 | `desktop/src/core/timestamp.py`（token 摘要绑定 + CA 链 + 仅 http(s) + >1 MiB 拒收） | T2 部分 |
 | TB-03 | 进程 ↔ 透明日志 / 见证 | STH / 签名 | 分裂视图、共谋、重放 | `desktop/src/core/key_transparency.py`（一致性 + split_witness）；外部见证未建 | T1 部分（OPEN-G4） |
 | TB-04 | 进程 ↔ MCP 客户端 | 工具参数 | 注入、越权、超长、控制字符 | `desktop/src/core/trust_boundary.py`（check_arguments）（fail-closed） | T0 已有 |
-| TB-05 | 本地 ↔ 外部材料 | 文档 / 网页 | prompt injection、角色伪造 | `desktop/src/core/trust_boundary.py`（detect / envelope） + 外来面前缀 | T0 已有 |
+| TB-05 | 本地 ↔ 外部材料 | 文档 / 网页 | prompt injection、角色伪造 | `desktop/src/core/trust_boundary.py`（detect / envelope）+ 外来面前缀；`desktop/src/core/trust/context_lineage.py`（prompt/context 血缘：替换/前缀篡改/重排/跨会话复用可检测） | T0（边界检测 + 上下文血缘可追溯；注入内容真假本身不判） |
 | TB-06 | 模型 / 数据 ↔ 证据 | model card / eval | 模型替换、评测伪造、数据漂移 | `desktop/src/core/eval_harness.py`（预注册 / 禁 score / synthetic 不作证据）；`desktop/src/core/trust/model_card.py`（nf-model-card/1：model_digest + 评测协议摘要 + pinned 语义） | T0（预注册/禁 score + 模型卡绑定；评测质量本身不判） |
 
 ## 密钥与信任根（计划 §9.4）
@@ -119,7 +119,7 @@
 
 - **OPEN-G1（已关闭，2026-11-14）**：claim 级 bundle（含 splice 负例）、nf-process/1 prev 链、cc_verify 骨架、check45 接线与 §13 自审计均已落地（证据：results/trust/SELF_AUDIT.json，P0=0）；后续缺口转 OPEN-G2。
 - **OPEN-G2（已关闭，2026-11-14）**：DSSE / issuer registry / 外部锚核验 / 链头签名接口 / check46 组合门禁均已落地（G2 退出判据）；余项显式转记：自动锚定编排与 trust store 多根/类型权限合一 → OPEN-G3；T3 witness 语句外部化 / 公共锚 / keygen 与 0600 强制 → OPEN-G4。
-- **OPEN-G3**：类型注册表与组合 admissibility（WP-30）、model card 绑定（WP-31）已完成；余下：prompt/context lineage、签名人类复核；另有 G2 转入的自动锚定编排与 trust store 多根/类型权限合一。
+- **OPEN-G3**：类型注册表与组合 admissibility（WP-30）、model card 绑定（WP-31）、prompt/context lineage（WP-32）已完成；余下：签名人类复核；另有 G2 转入的自动锚定编排与 trust store 多根/类型权限合一。
 - **OPEN-G4**：外部见证（STH/witness）、公共锚（Sigstore/Rekor/公共 TSA）、独立 verifier parity。
 
 ## 现状对照

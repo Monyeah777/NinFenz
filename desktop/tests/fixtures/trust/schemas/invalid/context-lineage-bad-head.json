@@ -1,0 +1,22 @@
+{
+  "schema": "nf-context-lineage/1",
+  "model_card_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "segments": [
+    {
+      "seq": 1,
+      "role": "system",
+      "content_digest": "cd2c1f1c2954b6748b2e2b7b376a31358ca1bce8214d5bf60bf182611ec75f77",
+      "prev": "0000000000000000000000000000000000000000000000000000000000000000",
+      "digest": "3e5068c97a6b948845aad92127e7478ffca5cb1b21899847097e36288039e9b0"
+    },
+    {
+      "seq": 2,
+      "role": "user",
+      "content_digest": "c0a537036d100a42125d7e07bd22888263e37867a911b86d17d4c2764b7be45e",
+      "prev": "3e5068c97a6b948845aad92127e7478ffca5cb1b21899847097e36288039e9b0",
+      "digest": "3c5d50a59f927cbea1223347ef403449ea6408ca39118525d26a57cee0edcb12"
+    }
+  ],
+  "head": "ABC",
+  "lineage_digest": "a0f4ad1c85c60106369f916953c03daa950656e1b31c890f00a6562f7fa0f764"
+}

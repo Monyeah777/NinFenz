@@ -606,6 +606,7 @@
     "test_trust_boundary": 0.7,
     "test_trust_bundle": 1.0,
     "test_trust_canonical": 0.2,
+    "test_trust_context_lineage": 0.4,
     "test_trust_dsse": 0.2,
     "test_trust_entity": 0.2,
     "test_trust_gate45": 0.5,
@@ -5627,6 +5628,18 @@
     "test_trust_canonical.StrictnessTest.test_strictness_is_observable": 0.0,
     "test_trust_canonical.VectorParityTest.test_canonical_vectors": 0.0,
     "test_trust_canonical.VectorParityTest.test_domain_vectors": 0.0,
+    "test_trust_context_lineage.BindingTest.test_cli_lineage_build_and_binding": 0.16,
+    "test_trust_context_lineage.BindingTest.test_missing_and_mismatched_refs": 0.0,
+    "test_trust_context_lineage.BindingTest.test_three_way_binding": 0.0,
+    "test_trust_context_lineage.BuildTest.test_build_and_determinism": 0.0,
+    "test_trust_context_lineage.BuildTest.test_build_rejections": 0.0,
+    "test_trust_context_lineage.IdentityTest.test_identity_excludes_prompt_and_notes": 0.0,
+    "test_trust_context_lineage.VerifyTest.test_content_swap_is_detected": 0.0,
+    "test_trust_context_lineage.VerifyTest.test_cross_session_reuse_detected": 0.0,
+    "test_trust_context_lineage.VerifyTest.test_model_card_binding": 0.0,
+    "test_trust_context_lineage.VerifyTest.test_prefix_tamper_detected": 0.0,
+    "test_trust_context_lineage.VerifyTest.test_reorder_detected": 0.0,
+    "test_trust_context_lineage.VerifyTest.test_seq_and_head_and_digest_bindings": 0.0,
     "test_trust_dsse.BuildGuardTest.test_build_requires_signature": 0.0,
     "test_trust_dsse.BuildGuardTest.test_missing_schema_root_raises_with_guidance": 0.0,
     "test_trust_dsse.BuildGuardTest.test_signer_alg_whitelist": 0.0,
@@ -6043,5 +6056,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2129.8
+  "total_s": 2130.2
 }

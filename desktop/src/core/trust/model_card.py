@@ -69,8 +69,20 @@ def validate_card(card: Any, schema: dict | None = None, root: str = ".") -> lis
 
 
 def card_digest(card: dict) -> str:
-    """模型卡的规范摘要（绑定标识；同一卡任意两次结果一致）。"""
+    """模型卡的规范摘要（整卡，含 prompt_context_digest/notes；用于整卡绑定）。"""
     return tc.digest_of(card)
+
+
+def identity_digest(card: dict) -> str:
+    """模型身份摘要 = 域分隔(model_digest, eval_protocol)。
+
+    为什么不用整卡摘要：卡上可选的 prompt_context_digest 要指向血缘链头，而血缘又要绑
+    模型身份——用整卡会形成「卡 → 血缘 → 卡」自指环。身份摘要只含模型权重摘要与评测协议
+    摘要，模型替换/评测变更会变，prompt/notes 元数据变化不会变。
+    """
+    body = tc.canonical_bytes({"model_digest": str(card.get("model_digest")),
+                               "eval_protocol": card.get("eval_protocol") or {}})
+    return tc.domain_digest("nf:model-card:v1:identity", body)
 
 
 def _card_refs(entity: dict) -> list:

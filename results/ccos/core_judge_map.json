@@ -325,6 +325,10 @@
       "referenced": true
     },
     {
+      "module": "context_lineage",
+      "referenced": true
+    },
+    {
       "module": "context_pack",
       "referenced": true
     },
@@ -1469,9 +1473,9 @@
       "referenced": true
     }
   ],
-  "modules": 367,
+  "modules": 368,
   "note": "粗粒度名字匹配（代理指标），不做导入图分析",
-  "referenced": 337,
+  "referenced": 338,
   "schema": "nf-core-judge-map/1",
   "unreferenced": 30
 }

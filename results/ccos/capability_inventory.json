@@ -1,5 +1,5 @@
 {
-  "digest": "2c5d4607faa027845c09f58bef417801f8752469e39fed2a075485d9eec0d87f",
+  "digest": "af664e5ae458881275da04bbd3609ade065ae11177e6aa37fa851f47a6bfd8da",
   "entries": [
     {
       "doc": "其余 ABI 调用的判定向量：cc_label（IR 校验）→ 期望结论（跨语言可复核）。",
@@ -1127,6 +1127,8 @@
         "--anchor-build",
         "--anchor-target",
         "--bundle",
+        "--context-lineage",
+        "--contexts",
         "--current-card",
         "--entities",
         "--envelope",
@@ -1137,6 +1139,8 @@
         "--json",
         "--key-material",
         "--keyid",
+        "--lineage",
+        "--lineage-build",
         "--model-card",
         "--now",
         "--out",
@@ -1292,7 +1296,7 @@
       "subcommands": []
     }
   ],
-  "flags": 562,
+  "flags": 566,
   "note": "静态接口面（docs/flags/subcommands），不含缺省行为语义",
   "schema": "nf-capability-inventory/1",
   "scripts": 82

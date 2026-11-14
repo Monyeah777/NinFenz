@@ -43,6 +43,8 @@
 
 | 33 | 链头/卡/事件签名语句绑定（nf-chain-head/1；错 kind/digest 必拒；registry 吊销/过期则 T1 失守） | `protocol/trust/chain-head.schema.json` + `desktop/src/core/trust/signature.py` | `test_trust_signature.py`（14 条：语句绑定 + 生命周期 + 篡改 + 真签名+真 TSA 端到端 T2） | T1 | SUPPORTED（G2 WP-23） |
 
-**本轮判定**：`UNSUPPORTED` = 0（本轮抽检范围内）；`TODO` 1 条（21）落在计划 G4 的工作包内；claim #15/#16/#18/#19/#32/#33 均已 SUPPORTED（WP-20/22/23/30/31），不构成文档过度声明。
+| 34 | prompt/context 血缘绑定（上下文替换/前缀篡改/段重排/跨会话复用可检测；AI 证据同时绑模型身份与血缘摘要） | `protocol/trust/context-lineage.schema.json` + `desktop/src/core/trust/context_lineage.py`（逐段 digest/prev 链 + lineage_digest + identity_digest 绑定） | `test_trust_context_lineage.py`（12 条：构建/篡改矩阵/模型身份与 prompt 绑定/三方绑定/CLI；另 identity 摘要排除 prompt/notes 的正例） | T1 | SUPPORTED（G3 WP-32） |
+
+**本轮判定**：`UNSUPPORTED` = 0（本轮抽检范围内）；`TODO` 1 条（21）落在计划 G4 的工作包内；claim #15/#16/#18/#19/#32/#33/#34 均已 SUPPORTED（WP-20/22/23/30/31/32），不构成文档过度声明。
 
 *维护纪律：新增 claim 必须同时补代码锚点与测试，再改状态；不得先写 SUPPORTED 后补测试。*
