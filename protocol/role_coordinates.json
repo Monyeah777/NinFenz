@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1507,
+    "app": 1508,
     "entry": 26,
     "floor": 5,
     "prod": 1067,
     "projection": 223,
-    "support": 511,
-    "verify": 1439
+    "support": 512,
+    "verify": 1441
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -10697,6 +10697,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "WP-42 策略适配判据（外置规则集 + 默认拒绝 + 优先级 + 可复算判定）。",
+      "path": "desktop/tests/test_policy_engine_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "",
       "path": "desktop/tests/test_policy_snapshot.py",
       "role": "verify",
@@ -14801,6 +14807,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "NF-Final G4 WP-42 策略适配机读件：把治理策略外置成可复算规则集（OPA/Cedar 的机制借鉴：策略即代码/判定可复算），本地纯函数求值，不引 Rego/Cedar 运行时。纪律：默认拒绝（deny-by-default）、规则优先级显式、判定给命中规则与理由、缺事实即拒绝（不猜）。判据 desktop/tests/test_policy_engine_contract.py。",
+      "path": "protocol/policy_rules.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "复盘协议（机制借鉴 SRE postmortem：无指责 + 根因 + 行动项）。要解决的是「同一个坑踩两次」——教训若不落成机制，就只是一段回忆。硬约束：**根因必须指向机制而非人**；**每条行动项必须可指派且可验（带判据）**；**未复盘不得关闭**（closed 须已被协议回执锚定）。",
       "path": "protocol/postmortem.json",
       "role": "verify",
@@ -15078,17 +15090,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "a82151209c6f664f883f1dea1d74cfea828008c31fe0d4ed9de5131720cade37",
+  "root_digest": "0959d589c0466524aa3ceffef58e6f97f044c80d0d134f93ba98aab3d830ba85",
   "rule_counts": {
-    "R-app": 1507,
+    "R-app": 1508,
     "R-catch": 356,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 197,
     "R-support": 124,
-    "R-verify": 1307,
-    "auto:R-core": 312
+    "R-verify": 1309,
+    "auto:R-core": 313
   },
   "schema": "nf-role-coordinates/1"
 }

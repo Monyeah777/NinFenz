@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:142a9157504702fa03498494dc452ae2fbb8cfbfcce836992b1d59d1078755e4
-  - protocol/code_metrics_baseline.json:d7a79d1585d41106a10e5e1bea196b3dc8c7cd42d0d390e8f1689f3699f23218
+  - protocol/code_metrics_baseline.json:b5ff7f1e10acea980d13cb16944c667d70f6b846193c9495081a04af37cd6088
 ---
+> 重审（2026-11-15）：NF-Final WP-42：新增 protocol/policy_rules.json、core/policy_engine.py、docs/policy-engine.md、test_policy_engine_contract.py；assertions/data_contracts/independence/code_metrics/check12 更新
+
 > 重审（2026-11-15）：NF-Final WP-41：新增 protocol/aibom.json、core/aibom_export.py、results/ai/aibom.*、docs/aibom.md、test_aibom_contract.py；assertions/data_contracts/independence/code_metrics/check12 更新
 
 > 重审（2026-11-15）：NF-Final WP-40：新增 protocol/ai_evidence.json、core/ai_evidence.py、results/ai/*、docs/ai-evidence.md、test_ai_evidence_contract.py；assertions/data_contracts/independence/code_metrics/check12 更新

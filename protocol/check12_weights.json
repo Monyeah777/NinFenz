@@ -479,6 +479,7 @@
     "test_plugin_gate": 0.1,
     "test_plugin_manifest": 0.2,
     "test_plugin_wasm_host": 0.5,
+    "test_policy_engine_contract": 0.1,
     "test_policy_snapshot": 0.1,
     "test_postmortem": 0.2,
     "test_postmortem_template_doc_contract": 1.6,
@@ -4663,6 +4664,16 @@
     "test_plugin_wasm_host.LoadTest.test_wit_contract_is_checked_at_load_time": 0.0,
     "test_plugin_wasm_host.RealPluginTest.test_fuel_exhaustion_is_detected_and_falls_back": 0.0,
     "test_plugin_wasm_host.RealPluginTest.test_plugin_matches_python_reference_byte_for_byte": 0.0,
+    "test_policy_engine_contract.PolicyEngineContractTest.test_claims_boundary": 0.0,
+    "test_policy_engine_contract.PolicyEngineContractTest.test_default_deny": 0.0,
+    "test_policy_engine_contract.PolicyEngineContractTest.test_deterministic": 0.0,
+    "test_policy_engine_contract.PolicyEngineContractTest.test_missing_facts_rejected": 0.0,
+    "test_policy_engine_contract.PolicyEngineContractTest.test_registry_mutations_red": 0.0,
+    "test_policy_engine_contract.PolicyEngineContractTest.test_registry_selfcheck": 0.0,
+    "test_policy_engine_contract.PolicyEngineContractTest.test_require_without_evidence_denied": 0.0,
+    "test_policy_engine_contract.PolicyEngineContractTest.test_retired_contract_denied_by_priority": 0.0,
+    "test_policy_engine_contract.PolicyEngineContractTest.test_t1_allowed": 0.0,
+    "test_policy_engine_contract.PolicyEngineContractTest.test_t4_denied": 0.0,
     "test_policy_snapshot.Test.test_matches": 0.0,
     "test_policy_snapshot.Test.test_snapshot_is_order_insensitive": 0.0,
     "test_postmortem.TestNegatives.test_action_without_judgement_is_fail": 0.01,
@@ -6428,5 +6439,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2179.9
+  "total_s": 2180.0
 }
