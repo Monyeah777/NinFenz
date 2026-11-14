@@ -1120,6 +1120,11 @@
       "max_fn_cc": 73,
       "max_fn_lines": 105
     },
+    "desktop/src/core/production_metrics.py": {
+      "lines": 139,
+      "max_fn_cc": 13,
+      "max_fn_lines": 47
+    },
     "desktop/src/core/prose_lint.py": {
       "lines": 234,
       "max_fn_cc": 19,

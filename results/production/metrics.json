@@ -1,0 +1,83 @@
+{
+  "inputs": {
+    "adapter_parity": true,
+    "delivery_ok": true,
+    "output_ok": true
+  },
+  "metrics": [
+    {
+      "definition": "E2E 一次跑通且全部 K 检查通过 / 总样本数",
+      "id": "M-01",
+      "name": "首次成功（sample）",
+      "owner": "qa",
+      "scope": "sample-only",
+      "source": "results/assembly/sample-document.assembly.json",
+      "status": "measured",
+      "unit": "rate",
+      "value": 1.0
+    },
+    {
+      "definition": "失败后重跑次数 / 总交付数",
+      "id": "M-02",
+      "name": "返工（sample）",
+      "owner": "qa",
+      "scope": "sample-only",
+      "source": "results/assembly/sample-document.assembly.json",
+      "status": "measured",
+      "unit": "rate",
+      "value": 0.0
+    },
+    {
+      "definition": "每次交付的 adapter tokens（sample 输出 usage）",
+      "id": "M-03",
+      "name": "成本（sample）",
+      "owner": "qa",
+      "scope": "sample-only",
+      "source": "results/assembly/sample-document.assembly.json",
+      "status": "measured",
+      "unit": "tokens/delivery",
+      "value": 9
+    },
+    {
+      "definition": "每次交付消费的 Wiki 上下文页数（modules/context_refs）",
+      "id": "M-04",
+      "name": "复用（sample）",
+      "owner": "qa",
+      "scope": "sample-only",
+      "source": "results/assembly/sample-document.assembly.json",
+      "status": "measured",
+      "unit": "pages/delivery",
+      "value": 1
+    },
+    {
+      "definition": "外部真实交付的首次成功率（需外部试点数据）",
+      "id": "M-05",
+      "name": "真实用户首次成功率",
+      "note": "外部操作未执行（OPEN-PRODUCT），不冒充 measured",
+      "owner": "product",
+      "scope": "external",
+      "source": "",
+      "status": "no-data",
+      "unit": "rate",
+      "value": null
+    },
+    {
+      "definition": "外部真实交付的返工率（需外部试点数据）",
+      "id": "M-06",
+      "name": "真实返工率",
+      "note": "外部操作未执行（OPEN-PRODUCT），不冒充 measured",
+      "owner": "product",
+      "scope": "external",
+      "source": "",
+      "status": "no-data",
+      "unit": "rate",
+      "value": null
+    }
+  ],
+  "schema": "nf-production-metrics/1",
+  "scope_note": "当前仅 sample-only 指标来自入仓 E2E 产物；外部真实生产数据未采集（OPEN-PRODUCT），no-data 项不得写成 measured",
+  "status_vocabulary": [
+    "measured",
+    "no-data"
+  ]
+}

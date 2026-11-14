@@ -4,9 +4,9 @@
     "entry": 26,
     "floor": 5,
     "prod": 1065,
-    "projection": 208,
+    "projection": 210,
     "support": 510,
-    "verify": 1424
+    "verify": 1425
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -10697,6 +10697,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "WP-24 生产指标判据（首次成功/返工/成本/复用；口径可复算，缺数据不冒充）。",
+      "path": "desktop/tests/test_production_metrics_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "生产平面威胁模型三面一致判据（NF-Final WP-03）。",
       "path": "desktop/tests/test_production_threat_vectors.py",
       "role": "verify",
@@ -14976,17 +14982,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "b806723a6a6044b3da2e6947873228cd491e9e995b577003abcc4e829156f8ca",
+  "root_digest": "7de8fd1f4f5586654749df32828a1dfb29bd439fdbde7a741a80ab042f4fbda9",
   "rule_counts": {
     "R-app": 1501,
     "R-catch": 356,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 185,
+    "R-projection": 186,
     "R-support": 124,
-    "R-verify": 1293,
-    "auto:R-core": 305
+    "R-verify": 1294,
+    "auto:R-core": 306
   },
   "schema": "nf-role-coordinates/1"
 }

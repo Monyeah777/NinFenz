@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-15",
   "approved_by": "Monyeah777",
-  "note": "NF-Final G2 WP-23 Delivery（包/manifest/sidecar/路径安全）",
+  "note": "NF-Final G2 WP-24（收尾：测试修复 + 权重重测）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "8025689289961cbc58a2bcf67c91da52c49ce41c56862a09479636b9a554f6e3"
+  "subject_digest": "a55e95d34d9a7f92e729438e1a6c0c89f451fa404d77cf897cffaf61c732f6a6"
 }
