@@ -1,0 +1,8 @@
+{
+  "schema": "nf-intent/1",
+  "kind": "output",
+  "goal": "为 M06 流程状态机产出一节带引用的实现说明",
+  "wiki_ids": ["wiki:module:M06", "wiki:protocol:schema/module"],
+  "constraints": ["只写 M06 的槽位字段", "引用必须能解析到 Wiki 页", "不复制真源正文"],
+  "budget": {"max_tokens": 1200, "max_steps": 3}
+}

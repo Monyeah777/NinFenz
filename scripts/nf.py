@@ -141,10 +141,13 @@ def _add_parser_base(sub):
     spc = sub.add_parser("spec",
                          help="Spec Registry 查询（v2.5.0 Wave3：版本化 spec 查询）",
  description="Spec Registry 查询（v2.5.0 Wave3：版本化 spec 查询）")
-    spc.add_argument("action", nargs="?", default="ls", choices=["ls"],
-                     help="动作（ls 列 spec 版本清单）")
+    spc.add_argument("action", nargs="?", default="ls", choices=["ls", "compile"],
+                     help="动作（ls 列 spec 版本清单 / compile intent→spec→task）")
     spc.add_argument("--registry", default=None,
                      help="registry.json 路径（缺省 = desktop/src/core/registry.json）")
+    spc.add_argument("--intent", default=None,
+                     help="compile 用：nf-intent/1 JSON 路径（如 spec/intents/sample-document.json）")
+    spc.add_argument("--json", action="store_true", help="compile 用：机读输出 bundle")
 
     rnd = sub.add_parser("render",
                          help="协议多出口渲染（A3：protocol.yaml → agents/claude/skill rules）",
@@ -2806,7 +2809,37 @@ def _cmd_import(args) -> int:
 
 
 def _cmd_spec(args) -> int:
-    """nf spec ls：Spec Registry 查询（v2.5.0 Wave3：版本化 spec 清单）。"""
+    """nf spec：Spec Registry 查询（ls）/ intent→spec→task 编译（compile，WP-11）。"""
+    import json as _json
+
+    if getattr(args, "action", "ls") == "compile":
+        from core import spec_compiler as sc
+        if not getattr(args, "intent", None):
+            print("✗ compile 需要 --intent FILE（%s）" % sc.GUIDE, file=sys.stderr)
+            return 2
+        try:
+            intent = sc._load_intent_file(ROOT, args.intent)
+            bundle = sc.compile_intent(intent, ROOT, args.intent)
+        except sc.SpecError as exc:
+            print("✗ %s：%s" % (exc.code, exc.message), file=sys.stderr)
+            print("  %s" % exc.fix, file=sys.stderr)
+            return 2
+        issues = sc.validate_bundle(bundle, ROOT)
+        if issues:
+            for item in issues[:5]:
+                print("  ✗ %s" % item, file=sys.stderr)
+            return 1
+        if getattr(args, "json", False):
+            print(sc.render(bundle), end="")
+        else:
+            print("== nf spec compile ==")
+            print("  spec %s · digest %s…" % (bundle["spec"]["ref"],
+                                              bundle["spec"]["digest"][:12]))
+            for task in bundle["tasks"]:
+                print("  task %s（context %s，budget %s tokens）"
+                      % (task["slot"]["id"], task["context_refs"][0]["id"],
+                         task["budget"]["max_tokens"]))
+        return 0
     from core.registry_loader import load_registry
 
     reg_path = args.registry or os.path.join(ROOT, "desktop", "src", "core", "registry.json")

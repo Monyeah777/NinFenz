@@ -585,6 +585,7 @@
     "test_skill_adapter": 0.2,
     "test_skill_contract": 0.1,
     "test_skill_md_contract": 0.2,
+    "test_spec_compiler_contract": 2.9,
     "test_st_quality_checklist_doc_contract": 0.3,
     "test_st_validator": 0.1,
     "test_standards_index_doc_contract": 0.4,
@@ -5368,6 +5369,15 @@
     "test_skill_md_contract.SkillMdContractTest.test_contract_count_is_live": 0.0,
     "test_skill_md_contract.SkillMdContractTest.test_references_and_agent_config_exist": 0.0,
     "test_skill_md_contract.SkillMdContractTest.test_skill_md_matches_contract": 0.0,
+    "test_spec_compiler_contract.SpecCompilerContractTest.test_bundle_schema_valid": 0.0,
+    "test_spec_compiler_contract.SpecCompilerContractTest.test_cli_compile_and_reject": 2.74,
+    "test_spec_compiler_contract.SpecCompilerContractTest.test_context_refs_match_wiki": 0.0,
+    "test_spec_compiler_contract.SpecCompilerContractTest.test_deterministic": 0.0,
+    "test_spec_compiler_contract.SpecCompilerContractTest.test_sample_intent_valid": 0.0,
+    "test_spec_compiler_contract.SpecCompilerContractTest.test_task_graph_acyclic": 0.0,
+    "test_spec_compiler_contract.SpecCompilerContractTest.test_unknown_field_rejected": 0.0,
+    "test_spec_compiler_contract.SpecCompilerContractTest.test_unknown_kind_rejected": 0.0,
+    "test_spec_compiler_contract.SpecCompilerContractTest.test_unknown_wiki_id_rejected": 0.0,
     "test_st_quality_checklist_doc_contract.StChecklistDocTest.test_checklist_matches_contract": 0.0,
     "test_st_quality_checklist_doc_contract.StChecklistDocTest.test_contract_catches_mutations": 0.01,
     "test_st_quality_checklist_doc_contract.StChecklistDocTest.test_rules_live": 0.0,
@@ -6294,5 +6304,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2167.3
+  "total_s": 2170.2
 }

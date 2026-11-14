@@ -958,6 +958,18 @@
         "wiki/llms.txt",
         "wiki/mcp.json"
       ]
+    },
+    {
+      "id": "spec-intent-sample",
+      "artifact": "spec/intents/sample-document.json",
+      "quality_rule": "assertion:spec-intent-sample",
+      "owner": "Spec Compiler（core/spec_compiler.py + test_spec_compiler_contract）+ WP-11",
+      "status": "active",
+      "freshness": "intent 结构变化须同步样本与 protocol/production/{spec,task}.schema.json",
+      "consumers": [
+        "test_spec_compiler_contract",
+        "docs/spec-compiler.md"
+      ]
     }
   ]
 }
