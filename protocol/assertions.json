@@ -1195,6 +1195,21 @@
       "message": "AIGC 标识缺失或版本名不符（WP-43 判据依赖它）",
       "fix": "重跑 aigc_labeling.write_sample；再跑 test_aigc_labeling_contract",
       "evidence": "test_aigc_labeling_contract / conformance::modeling"
+    },
+    {
+      "id": "g4-dod",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "results/g4_dod.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-g4-dod/1"
+      },
+      "message": "G4 DoD 收口审计缺失或版本名不符（Gate 准入判据依赖它）",
+      "fix": "补/修 results/g4_dod.json；再跑 test_g4_dod",
+      "evidence": "test_g4_dod / conformance::modeling"
     }
   ]
 }

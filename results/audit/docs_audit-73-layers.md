@@ -15,14 +15,16 @@ subjects:
   - verify.sh:a462442226fa2faa405606a81c06ffb40dab9ecfa3897c9b6a301a5421fc2740
   - docs/layers.md:7b849fb07769ba6df5ca888a9de5323417b47a07ef54ec2c1c801673a7fbd7c0
   - docs/L3_FROZEN.md:863a152271b1b969a3249194d1169628f4a4647a9bdd801473cfc9cb75c6643b
-  - protocol/assertions.json:6614980a2c0e52bd90c2fa72b34a6021d3b220c07a1fbade8f3eeb25af464ddb
-  - protocol/data_contracts.json:d456e2615794f320eb10d5e5445585a67204ae7b770b1f393c018af7d925fca1
+  - protocol/assertions.json:cef08b765b72c2dfb5dd2be1539ca1e7ca031eecad4b580c5566088d9393e2b2
+  - protocol/data_contracts.json:a09258c68fa606ef68af373592bdfea8c3c819546b5b1d3cb7aad2abe2aa2864
   - protocol/normative.json:c1bbc14c92cea6bd66ff6cb54fdcf91bf3072f66adee7027f1d3f42e70fe1825
   - protocol/glossary.json:0af6a0f3b1f128b30c0eb88a8db0d2c143461910a889737dfdf4e38e89f85ba7
   - desktop/src/core/receipts.py:b748915bb519aeeb1aa0f7d367df2eb7d4321b369b85905a7f918d8d55d96363
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
 
 ---
+> 重审（2026-11-15）：NF-Final G4 收口：新增 results/{G4_DOD.md,g4_dod.json}、test_g4_dod.py；assertions/data_contracts/check12/code_metrics 更新
+
 > 重审（2026-11-15）：NF-Final WP-44：verify.sh check52（G4 AI 信任面）+ quality_baseline 52 条/PASS=95；派生面全量重生成（验证卡/llms/repo_stats/CONFORMANCE/SELF_AUDIT/interop/README 三语/CHANGELOG/VERSION-MATRIX/能力索引）
 
 > 重审（2026-11-15）：NF-Final WP-43：新增 protocol/aigc_labeling.json、core/aigc_labeling.py、results/ai/aigc-label.json、docs/aigc-labeling.md、test_aigc_labeling_contract.py；assertions/data_contracts/independence/code_metrics/check12 更新

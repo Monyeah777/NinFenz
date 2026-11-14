@@ -1174,6 +1174,18 @@
         "test_aigc_labeling_contract",
         "docs/aigc-labeling.md"
       ]
+    },
+    {
+      "id": "g4-dod",
+      "artifact": "results/g4_dod.json",
+      "quality_rule": "assertion:g4-dod",
+      "owner": "G4 DoD 收口审计（test_g4_dod 判据+现场复算）",
+      "status": "active",
+      "freshness": "G4 产物/门禁变化须重跑收口；verdict 与 P0 必须一致",
+      "consumers": [
+        "test_g4_dod",
+        "results/G4_DOD.md"
+      ]
     }
   ]
 }
