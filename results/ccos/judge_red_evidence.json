@@ -2413,6 +2413,10 @@
       "source": "negative_assertion"
     },
     {
+      "module": "test_trust_vectors.py",
+      "source": "naming"
+    },
+    {
       "module": "test_tui_readme_doc_contract.py",
       "source": "negative_assertion"
     },
@@ -2561,10 +2565,10 @@
       "source": "negative_assertion"
     }
   ],
-  "modules": 640,
+  "modules": 641,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
-  "suspect": 164,
+  "suspect": 165,
   "with_evidence": 335,
   "without_evidence": 141
 }

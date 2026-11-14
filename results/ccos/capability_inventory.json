@@ -1,5 +1,5 @@
 {
-  "digest": "ece22f2bfd914a2b75534bde1e36905a43773bc867c9fb73502a4ce19fdb2929",
+  "digest": "6416b74b8335b7431ab12a5801456b3da92ef7c3b3e8feded376f031f45529f8",
   "entries": [
     {
       "doc": "其余 ABI 调用的判定向量：cc_label（IR 校验）→ 期望结论（跨语言可复核）。",
@@ -1099,6 +1099,16 @@
       "subcommands": []
     },
     {
+      "doc": "Trust Fabric 测试向量集：把 G1/G2 的实现契约固化成跨语言可复核的单一产物。",
+      "flags": [
+        "--check",
+        "--json",
+        "--write"
+      ],
+      "path": "scripts/trust_vectors.py",
+      "subcommands": []
+    },
+    {
       "doc": "结论可复用性查询（自省层的用法出口）：这份结论还是「当前验证器」判的吗？",
       "flags": [
         "--conclusion",
@@ -1238,8 +1248,8 @@
       "subcommands": []
     }
   ],
-  "flags": 529,
+  "flags": 532,
   "note": "静态接口面（docs/flags/subcommands），不含缺省行为语义",
   "schema": "nf-capability-inventory/1",
-  "scripts": 79
+  "scripts": 80
 }
