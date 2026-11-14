@@ -4,7 +4,7 @@
     "algorithm": "RFC6962-style sha256 domain-separated",
     "count": 66,
     "note": "派生自 protocol/RECEIPTS.json；inclusion proof 留在原回执单根内。",
-    "root": "d3e93dcd0a4ec9fca213f31a27b04180e6412390301cf92c0acb1371bc737133",
+    "root": "f726babebc9570fe1de80002d94db2a0eb7631aaec949faf6f15b1833ba7798f",
     "scope": "protocol"
   },
   "predicateType": "https://ninfenz.dev/attestation/protocol-receipts/v1",
@@ -113,7 +113,7 @@
     },
     {
       "digest": {
-        "sha256": "0125e82db37151ab0a367f9949cdc6636fe24199d77039fedf306791c3e671ef"
+        "sha256": "af3888d92c0e31ca80c3f793ff299f9444dd2cff820005345591b047fe23cd94"
       },
       "name": "protocol/conformance_report.json"
     },
@@ -137,13 +137,13 @@
     },
     {
       "digest": {
-        "sha256": "c8773a3b2758c75d1ec53d626fbe6e91b7bbd7f069356af51dd1f841c8480def"
+        "sha256": "b930da99e46be37fd9c5d4df8bfa48ef434178b1d85f6f17a7c6827a4a050b7a"
       },
       "name": "protocol/role_coordinates.json"
     },
     {
       "digest": {
-        "sha256": "94cd39fe02d8e39e483b5733f760e8252da2aecf7424714c9467e4fe0689ad6b"
+        "sha256": "4e4e13d0ed3208717e947fd9f1afd3def6e5d07eeff55ec120ce6d56169124ca"
       },
       "name": "protocol/code_metrics_baseline.json"
     },
@@ -227,7 +227,7 @@
     },
     {
       "digest": {
-        "sha256": "e00c06e0cf95a00511bda3e961e56041084e0064ad94eae72d074c57db774344"
+        "sha256": "7e9b94526373078cd84d87b3385c72b3a0daa868a3001ed318cfb8cd6a88d01a"
       },
       "name": "protocol/assertions.json"
     },
@@ -263,7 +263,7 @@
     },
     {
       "digest": {
-        "sha256": "c3b44362ca6c19b0bf0ce3cfb03698f56af573ca55c1bb0e84d074e8536614f6"
+        "sha256": "326a93b6f3509db0979d55edf32842e6c06ec5dc98187bd2eea5cec3d5b7dcb4"
       },
       "name": "protocol/data_contracts.json"
     },

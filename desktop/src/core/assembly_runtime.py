@@ -20,6 +20,7 @@ from typing import Any, Dict, List
 
 from core import agent_adapter as aa
 from core import context_packer as cp
+from core import output_validation as ov
 from core import spec_compiler as sc
 
 ASSEMBLY_SCHEMA_REL = "protocol/production/assembly.schema.json"
@@ -105,12 +106,18 @@ def run(intent_rel: str, adapter: str = "mock", root: str = ".",
             raise
         trace.append({"id": "adapter", "ok": True, "detail": "citations=%s"
                       % ",".join(out["citations"])})
-        issues = aa.validate_output(out, task, pack)
-        checks.append({"id": "K-002", "ok": not issues,
-                       "detail": "；".join(issues[:2]) or "nf-adapter-output/1 通过"})
-        if issues:
-            raise AssemblyError("输出不合契约：%s（修复指引：按 task/output 修）"
-                                % "；".join(issues[:2]), code="OUTPUT-INVALID")
+        report = ov.validate(out, task, pack, root)
+        checks.append({"id": "K-002", "ok": report["ok"],
+                       "detail": "output-report：%s · violations=%d"
+                       % (report["form"], report["metrics"]["violations"])})
+        run_doc["validation"] = {"form": report["form"], "tier": report["tier"],
+                                 "digest": report["digest"],
+                                 "metrics": report["metrics"]}
+        if not report["ok"]:
+            first = report["issues"][0]
+            raise AssemblyError("输出被拒收：%s（%s；%s）"
+                                % (first["code"], first["message"], first["fix"]),
+                                code="OUTPUT-INVALID")
         content = str(out["output"]["content"])
         run_doc["output"] = {"kind": out["output"]["kind"], "path": out["output"]["path"],
                              "digest": _sha(content), "chars": len(content),

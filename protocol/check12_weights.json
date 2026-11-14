@@ -431,6 +431,7 @@
     "test_output_forms": 11.5,
     "test_output_forms_doc_contract": 0.3,
     "test_output_path_escape": 0.8,
+    "test_output_validation_contract": 0.1,
     "test_p06_drill_contract": 0.2,
     "test_p6_evaluations": 29.8,
     "test_pack_combo": 3.2,
@@ -4319,6 +4320,15 @@
     "test_output_path_escape.DeclaredPathEscapeTest.test_legit_declared_path_still_renders": 0.05,
     "test_output_path_escape.DeclaredPathEscapeTest.test_pkg_rel_rejects_escape_forms_and_keeps_legit_ones": 0.0,
     "test_output_path_escape.DeclaredPathEscapeTest.test_traversing_declared_path_is_refused_before_writing": 0.05,
+    "test_output_validation_contract.OutputValidationContractTest.test_assembly_gate_uses_validation": 0.0,
+    "test_output_validation_contract.OutputValidationContractTest.test_committed_report_equals_live": 0.0,
+    "test_output_validation_contract.OutputValidationContractTest.test_control_chars_rejected": 0.0,
+    "test_output_validation_contract.OutputValidationContractTest.test_fabricated_citation_rejected": 0.0,
+    "test_output_validation_contract.OutputValidationContractTest.test_form_vocab_matches_output_forms": 0.0,
+    "test_output_validation_contract.OutputValidationContractTest.test_good_output_accepted": 0.0,
+    "test_output_validation_contract.OutputValidationContractTest.test_json_form_invalid_rejected": 0.0,
+    "test_output_validation_contract.OutputValidationContractTest.test_md_without_heading_rejected": 0.0,
+    "test_output_validation_contract.OutputValidationContractTest.test_placeholder_rejected": 0.0,
     "test_p06_drill_contract.P06DrillContractTest.test_contract_catches_mutations": 0.0,
     "test_p06_drill_contract.P06DrillContractTest.test_coverage_facts_are_live": 0.0,
     "test_p06_drill_contract.P06DrillContractTest.test_p06_doc_matches_contract": 0.0,
@@ -6337,5 +6347,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2176.3
+  "total_s": 2176.4
 }

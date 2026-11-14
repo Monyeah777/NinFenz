@@ -51,6 +51,7 @@
       "key_transparency",
       "legal",
       "ops",
+      "output_validation",
       "policy_snapshot",
       "product",
       "provenance_external",

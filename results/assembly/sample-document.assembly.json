@@ -92,7 +92,7 @@
         "ok": true
       },
       {
-        "detail": "nf-adapter-output/1 通过",
+        "detail": "output-report：md · violations=0",
         "id": "K-002",
         "ok": true
       },
@@ -158,7 +158,22 @@
         "id": "export",
         "ok": true
       }
-    ]
+    ],
+    "validation": {
+      "digest": "2b3a3794dd47880320c69fe7b1b250eb27715837e578c2430d387499d5bcc058",
+      "form": "md",
+      "metrics": {
+        "chars": 37,
+        "citation_rate": 1.0,
+        "citations": 1,
+        "control_chars": 0,
+        "form": "md",
+        "tier": "T1",
+        "tokens": 9,
+        "violations": 0
+      },
+      "tier": "T1"
+    }
   },
   "schema": "nf-assembly-run/1"
 }

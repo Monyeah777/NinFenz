@@ -979,6 +979,21 @@
       "message": "装配运行时记录缺失或版本名不符（WP-21 判据依赖它）",
       "fix": "重跑 nf agent run --assembly 并用 assembly_runtime.write_record 写回；再跑 test_assembly_runtime_contract",
       "evidence": "test_assembly_runtime_contract / conformance::modeling"
+    },
+    {
+      "id": "output-report",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "results/output/output-report.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-output-report/1"
+      },
+      "message": "产物校验报告缺失或版本名不符（WP-22 判据依赖它）",
+      "fix": "重跑 output_validation.write_report；再跑 test_output_validation_contract",
+      "evidence": "test_output_validation_contract / conformance::modeling"
     }
   ]
 }

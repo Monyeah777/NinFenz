@@ -298,7 +298,7 @@
       "stats": {
         "contracts": 27,
         "passed": 27,
-        "root": "9a376c04f152bd957b75239eedbdea26bd8fabf41c4ce71b73eb8e12602e45c5",
+        "root": "60e97f549f1afac7bd8b6ed5f8ae142a0c7be46e2afcf92b09f8cdc6c7dfc385",
         "verdict": "conformant"
       },
       "status": "pass",
@@ -369,8 +369,8 @@
       "sample": [],
       "source": "code_metrics.scan",
       "stats": {
-        "baseline": 393,
-        "files": 393,
+        "baseline": 394,
+        "files": 394,
         "max_fn_cc": 132,
         "max_fn_lines": 443,
         "max_lines": 10093
@@ -431,9 +431,9 @@
       "stats": {
         "cycles": 0,
         "metrics_drift": 4,
-        "metrics_missing": 16,
+        "metrics_missing": 17,
         "metrics_recorded": 289,
-        "modules": 305,
+        "modules": 306,
         "registered_cycles": 0,
         "registered_sdp": 9,
         "sdp": 9
@@ -526,8 +526,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4729,
-        "kernel": 2490,
+        "files": 4733,
+        "kernel": 2492,
         "kernel_no_self": 308,
         "rules": 9,
         "uncovered": 0,
@@ -546,8 +546,8 @@
       "stats": {
         "dynamic_allow": 1,
         "forbidden_edges": 0,
-        "governance": 23,
-        "modules": 310,
+        "governance": 24,
+        "modules": 311,
         "production": 31,
         "shared": 26
       },
@@ -555,7 +555,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "9ecd482b8837b91c9b15aab54652fdaa99d9b8d3c503c87050cd376e047623d2",
+  "root_digest": "129955cf588e42b989c509d052332395e9341eba5888a2fb5912d90a445cba3a",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

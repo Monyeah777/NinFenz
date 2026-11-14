@@ -10,12 +10,14 @@ subjects:
   - desktop/src/core/quality_depth_scan.py:563059e8a929bbbba16d5d15a9c77d1f362f9518351860b5ca0682aeb07a23f9
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - scripts/nf.py:4e8fb0b08b1eff6e8df543911dab0ce38efd5f4a78218acd9438f9da97ce5426
-  - protocol/data_contracts.json:c3b44362ca6c19b0bf0ce3cfb03698f56af573ca55c1bb0e84d074e8536614f6
+  - protocol/data_contracts.json:326a93b6f3509db0979d55edf32842e6c06ec5dc98187bd2eea5cec3d5b7dcb4
   - docs/combos.md:4f5b22bf353a07ff439e44596bd44bea74e7c95d8a811c8ddde17f42f8fbc45c
   - desktop/tests/test_pack_combo.py:38d6fbc122264bcd205e6d5cb8baac1a1a581f1cb8a43da2c12691e57314b0a6
   - community/校园西幻轻混组合包/protocol.yaml:093cc817ae089981b7cfe4aaf57ec7f5d2374455bb63fc8b7af06dc2d29a02a3
 
 ---
+> 重审（2026-11-14）：NF-Final WP-22：新增 core/output_validation.py、results/output/output-report.json、docs/output-validation.md、test_output_validation_contract.py；assembly K-002 复用本模块；assertions/data_contracts/independence/code_metrics/check12 更新
+
 > 重审（2026-11-14）：NF-Final WP-21：新增 core/assembly_runtime.py、results/assembly/sample-document.assembly.json、docs/assembly-runtime.md、test_assembly_runtime_contract.py；nf agent run --assembly；assertions/data_contracts/independence/code_metrics/check12 更新
 
 > 重审（2026-11-14）：NF-Final WP-20：新增 core/agent_adapter.py、nf agent CLI、results/adapter/adapter-report.json、docs/agent-adapter.md、test_agent_adapter_contract.py；终端族/表面/文档计数/译件更新，audit 重绑
