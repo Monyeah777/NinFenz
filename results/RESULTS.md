@@ -26,6 +26,7 @@
 - [G0_DOD.md](G0_DOD.md)（G0 DoD 收口审计：§14.3 八条 + Gate 级判据；verdict=pass-with-open-items、P0 阻断=0；机读 `g0_dod.json`，判据 `test_g0_dod.py`）
 - [G1_DOD.md](G1_DOD.md)（G1 QG1 收口审计：§14.3 八条 + §11.2 WP-10…13 + QG1 + L3 packer 指标；verdict=pass-with-open-items、P0=0 → G2；机读 `g1_dod.json`，判据 `test_g1_dod.py`）
 - [G2_DOD.md](G2_DOD.md)（G2 QG2 收口审计：§14.3 八条 + §11.2 WP-20…24 + QG2 + L4/L7 指标；verdict=pass-with-open-items、P0=0 → G3；机读 `g2_dod.json`，判据 `test_g2_dod.py`）
+- [../docs/contract-lifecycle.md](../docs/contract-lifecycle.md)（G3 WP-30 契约生命周期/义务：draft/active/deprecated/retired 四态义务 + 引用策略；真源 `protocol/contract_lifecycle.json`，判据 `test_contract_lifecycle_contract.py`）
 - [../docs/wiki.md](../docs/wiki.md) · [../wiki/llms.txt](../wiki/llms.txt)（G1 WP-10 LLMWiki 编译器：133 页投影 + pages/index/graph/llms/MCP 三入口；`nf wiki build/check/get/search/related/context`，判据 `test_wiki_compiler_contract.py`）
 - [../docs/spec-compiler.md](../docs/spec-compiler.md) · [intents/sample-document.json](../spec/intents/sample-document.json)（G1 WP-11 Spec Compiler：intent→nf-spec/1→nf-task/1，确定性/拒绝未知/任务图无环；`nf spec compile`，判据 `test_spec_compiler_contract.py`）
 - [../docs/context-packer.md](../docs/context-packer.md)（G1 WP-12 Context Packer：角色隔离 author/reviewer/governance、预算硬上限、citations 100%、注入检出/清除；`nf wiki context --role`，判据 `test_context_packer_contract.py`）

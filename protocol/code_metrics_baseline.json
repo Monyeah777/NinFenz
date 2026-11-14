@@ -305,6 +305,11 @@
       "max_fn_cc": 13,
       "max_fn_lines": 62
     },
+    "desktop/src/core/contract_lifecycle.py": {
+      "lines": 120,
+      "max_fn_cc": 19,
+      "max_fn_lines": 28
+    },
     "desktop/src/core/contract_pin.py": {
       "lines": 33,
       "max_fn_cc": 9,

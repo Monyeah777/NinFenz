@@ -1042,6 +1042,18 @@
         "test_g2_dod",
         "results/G2_DOD.md"
       ]
+    },
+    {
+      "id": "contract-lifecycle",
+      "artifact": "protocol/contract_lifecycle.json",
+      "quality_rule": "assertion:contract-lifecycle",
+      "owner": "契约生命周期/义务（core/contract_lifecycle.py + test_contract_lifecycle_contract）+ WP-30",
+      "status": "active",
+      "freshness": "状态义务/词表变化须同步 registry 与本件；义务→check 映射必须指真实 check",
+      "consumers": [
+        "test_contract_lifecycle_contract",
+        "docs/contract-lifecycle.md"
+      ]
     }
   ]
 }
