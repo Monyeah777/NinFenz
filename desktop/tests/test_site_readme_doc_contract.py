@@ -132,7 +132,13 @@ class SiteReadmeTest(unittest.TestCase):
 
     def test_contract_catches_mutations(self):
         """变异自证：改坏 npm 体积 / 缺机器面 / 缺判据项数 / 缺手抄口径。"""
-        bad = self.text.replace(f"{_live_mb():.2f} MB", "24.74 MB")
+        if not MANIFEST.is_file():
+            self.skipTest("payload 清单不在场（CI 未暂存）：体积变异面跳过")
+        npm_line = next((ln for ln in self.text.splitlines()
+                        if "ninfenz" in ln and re.search(r"[0-9]+\.[0-9]+ MB", ln)), "")
+        m = re.search(r"[0-9]+\.[0-9]+ MB", npm_line)
+        bad = (self.text.replace(npm_line, npm_line.replace(m.group(0), "24.74 MB"), 1)
+               if m else self.text)
         self.assertTrue(any("npm 体积" in i for i in doc_issues(bad)))
         no_machine = self.text.replace("facts.json", "数据")
         self.assertTrue(any("facts.json" in i or "机器面" in i for i in doc_issues(no_machine)))
