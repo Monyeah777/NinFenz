@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-14",
   "approved_by": "Monyeah777",
-  "note": "WP-01 trust schema 与判据定稿（EOL 修正后重算），一致性报告重批准",
+  "note": "WP-02 威胁模型与契约判据入仓，一致性报告重算",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "97db82cfa95e453b965eecb56bfd6fd66ce8eafc79f86af359262d948e9ece35"
+  "subject_digest": "71d07c72aa268fa3d9798d255ce9932ed9f13c6bd2a876c8af50c873b0d45661"
 }
