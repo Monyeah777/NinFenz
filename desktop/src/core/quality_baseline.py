@@ -20,10 +20,10 @@ _ROOT = Path(__file__).resolve().parents[3]
 #: 本模块以 verify.sh 为单一真值做四处自洽断言，期望值集中在此，避免散落字面量。
 #: check 编号**显式清单**（2026-11-14 起）：为并行线预留空号（如 check43/44 留给其它线），
 #: 判据仍是「精确相等」——不弱化为范围包含。
-CHECK_NUMBERS = tuple(range(1, 45)) + (45, 46, 47, 48, 49, 50)
-EXPECTED_CHECKS = 50
-EXPECTED_PASS = 91
-CHECK_LABEL = "check1-44/45/46/47/48/49/50"
+CHECK_NUMBERS = tuple(range(1, 45)) + (45, 46, 47, 48, 49, 50, 51)
+EXPECTED_CHECKS = 51
+EXPECTED_PASS = 93
+CHECK_LABEL = "check1-44/45/46/47/48/49/50/51"
 
 
 def scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:

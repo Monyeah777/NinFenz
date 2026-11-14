@@ -81,7 +81,8 @@
       38,
       43,
       44,
-      50
+      50,
+      51
     ],
     "CAP_DETERMINISTIC": [
       25,
@@ -94,7 +95,8 @@
       46,
       47,
       48,
-      50
+      50,
+      51
     ],
     "CAP_TAMPER_EVIDENT": [
       23,
@@ -1071,6 +1073,36 @@
       "message": "附件模式登记缺失或版本名不符（WP-32 判据依赖它）",
       "fix": "补/修 protocol/attachment.json；再跑 test_attachment_contract",
       "evidence": "test_attachment_contract / conformance::modeling"
+    },
+    {
+      "id": "gov-report",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "results/governance/report.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-gov-report/1"
+      },
+      "message": "治理报告缺失或版本名不符（WP-33 判据依赖它）",
+      "fix": "重跑 core.governance_report.write；再跑 test_governance_report_contract",
+      "evidence": "test_governance_report_contract / conformance::modeling"
+    },
+    {
+      "id": "gov-audit",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "results/governance/audit.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-gov-audit/1"
+      },
+      "message": "治理审计包缺失或版本名不符（WP-33 判据依赖它）",
+      "fix": "重跑 core.governance_report.write；再跑 test_governance_report_contract",
+      "evidence": "test_governance_report_contract / conformance::modeling"
     }
   ]
 }

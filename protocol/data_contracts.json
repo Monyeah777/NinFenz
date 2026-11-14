@@ -1078,6 +1078,30 @@
         "test_attachment_contract",
         "docs/attachment.md"
       ]
+    },
+    {
+      "id": "gov-report",
+      "artifact": "results/governance/report.json",
+      "quality_rule": "assertion:gov-report",
+      "owner": "治理报告/审计包（core/governance_report.py + test_governance_report_contract）+ WP-33",
+      "status": "active",
+      "freshness": "适配器/契约/附件/自审计变化后重跑 write（committed==实时重算）",
+      "consumers": [
+        "test_governance_report_contract",
+        "docs/governance-report.md"
+      ]
+    },
+    {
+      "id": "gov-audit",
+      "artifact": "results/governance/audit.json",
+      "quality_rule": "assertion:gov-audit",
+      "owner": "治理报告/审计包（core/governance_report.py + test_governance_report_contract）+ WP-33",
+      "status": "active",
+      "freshness": "适配器/契约/附件/自审计变化后重跑 write（committed==实时重算）",
+      "consumers": [
+        "test_governance_report_contract",
+        "docs/governance-report.md"
+      ]
     }
   ]
 }

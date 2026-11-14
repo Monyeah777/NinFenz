@@ -6,7 +6,7 @@ scope: 作者指令「遗留全部补上」——处置 AUD-0009 §五 列出的
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - verify.sh:8e5fc8fa6f16c82d03323c4fcdd0b8671a763f4b5c2c526c5dd71704fd3db21c
+  - verify.sh:904661b179c65686b37d63a7fa0a175625c433d741239903527dad3da35a7874
   - desktop/src/core/transparency_log.py:8aba0254fcf72230452600d5cb0305b5d5320cd3e95d8ed57ebe54a5d0ae46a1
   - desktop/src/core/rating_gate.py:468759e5d971fbe9319ab86e84d95031c13bc3df2c44dbffac0af3fcb071f74e
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
@@ -22,6 +22,8 @@ subjects:
   - results/interop-schema-validation.md:e2546c6407416b61912ac351d14d20c171167e36be4d4d3461f6c2fceb56c0c9
 
 ---
+> 重审（2026-11-15）：NF-Final WP-33：新增 core/governance_report.py、results/governance/{report,audit}.json、test_governance_report_contract.py；verify.sh check51 + quality_baseline 51 条/PASS=93；派生面重生成
+
 > 重审（2026-11-15）：NF-Final WP-24：新增 core/production_metrics.py、results/production/metrics.json、test_production_metrics_contract.py；verify.sh check50 + quality_baseline 50 条/PASS=91；派生面重生成；independence 注册
 
 > 重审（2026-11-14）：NF-Final WP-13：verify.sh 新增 check43/44（Wiki/Spec），quality_baseline 常数 49/PASS=89、CHECK_LABEL；README/CHANGELOG/VERSION-MATRIX/CONFORMANCE/verification-cards/llms/repo_stats/SELF_AUDIT/interop 重新生成

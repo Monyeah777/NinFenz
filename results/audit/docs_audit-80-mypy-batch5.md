@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:22e24633e87e95453d0c2cf4a595d0496bae5d7331c1fc644d5b1555e4925a41
-  - protocol/code_metrics_baseline.json:7fba143ab97cad7447690a81d8e09fd52907ded9a47cf25492c1640b7e4e89a4
+  - protocol/code_metrics_baseline.json:5cff723263f780cc14203a7176ec85310a8344a622f5090d8c42215baa862a8e
 ---
+> 重审（2026-11-15）：NF-Final WP-33：新增 core/governance_report.py、results/governance/{report,audit}.json、test_governance_report_contract.py；verify.sh check51 + quality_baseline 51 条/PASS=93；派生面重生成
+
 > 重审（2026-11-15）：NF-Final WP-32：新增 protocol/attachment.json、core/attachment.py、docs/attachment.md、test_attachment_contract.py；assertions/data_contracts/independence/code_metrics/check12 更新
 
 > 重审（2026-11-15）：NF-Final WP-31：新增 protocol/governance_adapters.json、core/governance_adapters.py、docs/governance-adapters.md、test_governance_adapters_contract.py；assertions/data_contracts/independence/code_metrics/check12 更新

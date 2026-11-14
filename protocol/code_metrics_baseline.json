@@ -595,6 +595,11 @@
       "max_fn_cc": 23,
       "max_fn_lines": 35
     },
+    "desktop/src/core/governance_report.py": {
+      "lines": 156,
+      "max_fn_cc": 16,
+      "max_fn_lines": 61
+    },
     "desktop/src/core/grain_units.py": {
       "lines": 22,
       "max_fn_cc": 7,

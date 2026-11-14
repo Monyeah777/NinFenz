@@ -1,10 +1,10 @@
 {
   "built_for_date": "2026-11-14",
   "declared": {
-    "check_label": "check1-44/45/46/47/48/49/50",
-    "coverage_note": "判据级抽查面 32 条，各对应 verify.sh 的一道或多道门禁；≠ 声明 check 总数 50（两者不可互替）",
-    "expected_checks": 50,
-    "expected_pass": 91,
+    "check_label": "check1-44/45/46/47/48/49/50/51",
+    "coverage_note": "判据级抽查面 32 条，各对应 verify.sh 的一道或多道门禁；≠ 声明 check 总数 51（两者不可互替）",
+    "expected_checks": 51,
+    "expected_pass": 93,
     "report_items": 32,
     "verify_version": "v2.35"
   },
@@ -241,7 +241,7 @@
       "sample": [],
       "source": "quality_baseline.scan",
       "stats": {
-        "checks": 50,
+        "checks": 51,
         "verify_version": "v2.35"
       },
       "status": "pass",
@@ -298,7 +298,7 @@
       "stats": {
         "contracts": 27,
         "passed": 27,
-        "root": "6a1eacfd3d6aded97f96f55bb2199ddfff41a6c8e2325891eb9b303cbf2428a4",
+        "root": "6ef5084f9bf2ee789303f464f8995f4840e9614ba4ae416c3f32fb59959fd9d4",
         "verdict": "conformant"
       },
       "status": "pass",
@@ -326,9 +326,9 @@
       "sample": [],
       "source": "repo_stats.check_strict",
       "stats": {
-        "baseline_checks": 50,
-        "baseline_pass": 91,
-        "check_label": "check1-44/45/46/47/48/49/50",
+        "baseline_checks": 51,
+        "baseline_pass": 93,
+        "check_label": "check1-44/45/46/47/48/49/50/51",
         "concept_graphs": 101,
         "core_modules": 13,
         "core_pipelines": [
@@ -356,7 +356,7 @@
         "standards_total": 370,
         "standards_unreachable": 38,
         "subdivisions_total": 1200,
-        "verify_checks": 50,
+        "verify_checks": 51,
         "verify_version": "2.35"
       },
       "status": "pass",
@@ -369,8 +369,8 @@
       "sample": [],
       "source": "code_metrics.scan",
       "stats": {
-        "baseline": 399,
-        "files": 399,
+        "baseline": 400,
+        "files": 400,
         "max_fn_cc": 132,
         "max_fn_lines": 443,
         "max_lines": 10121
@@ -431,9 +431,9 @@
       "stats": {
         "cycles": 0,
         "metrics_drift": 4,
-        "metrics_missing": 22,
+        "metrics_missing": 23,
         "metrics_recorded": 289,
-        "modules": 311,
+        "modules": 312,
         "registered_cycles": 0,
         "registered_sdp": 9,
         "sdp": 9
@@ -526,8 +526,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4758,
-        "kernel": 2504,
+        "files": 4762,
+        "kernel": 2505,
         "kernel_no_self": 308,
         "rules": 9,
         "uncovered": 0,
@@ -546,8 +546,8 @@
       "stats": {
         "dynamic_allow": 1,
         "forbidden_edges": 0,
-        "governance": 29,
-        "modules": 316,
+        "governance": 30,
+        "modules": 317,
         "production": 31,
         "shared": 26
       },
@@ -555,7 +555,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "e5134d96b847c4eb562aa05af655e50c3f3b441d5477b6d8935e01da715cb44a",
+  "root_digest": "0dcf876ef565381857a644c5f9534a8f6eb4b67a9aa0dc4c111db74bd0c18ca5",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
-  - protocol/code_metrics_baseline.json:7fba143ab97cad7447690a81d8e09fd52907ded9a47cf25492c1640b7e4e89a4
+  - protocol/code_metrics_baseline.json:5cff723263f780cc14203a7176ec85310a8344a622f5090d8c42215baa862a8e
 ---
+> 重审（2026-11-15）：NF-Final WP-33：新增 core/governance_report.py、results/governance/{report,audit}.json、test_governance_report_contract.py；verify.sh check51 + quality_baseline 51 条/PASS=93；派生面重生成
+
 > 重审（2026-11-15）：NF-Final WP-32：新增 protocol/attachment.json、core/attachment.py、docs/attachment.md、test_attachment_contract.py；assertions/data_contracts/independence/code_metrics/check12 更新
 
 > 重审（2026-11-15）：NF-Final WP-31：新增 protocol/governance_adapters.json、core/governance_adapters.py、docs/governance-adapters.md、test_governance_adapters_contract.py；assertions/data_contracts/independence/code_metrics/check12 更新

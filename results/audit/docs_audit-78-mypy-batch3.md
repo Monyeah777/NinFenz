@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:7fba143ab97cad7447690a81d8e09fd52907ded9a47cf25492c1640b7e4e89a4
+  - protocol/code_metrics_baseline.json:5cff723263f780cc14203a7176ec85310a8344a622f5090d8c42215baa862a8e
 ---
+> 重审（2026-11-15）：NF-Final WP-33：新增 core/governance_report.py、results/governance/{report,audit}.json、test_governance_report_contract.py；verify.sh check51 + quality_baseline 51 条/PASS=93；派生面重生成
+
 > 重审（2026-11-15）：NF-Final WP-32：新增 protocol/attachment.json、core/attachment.py、docs/attachment.md、test_attachment_contract.py；assertions/data_contracts/independence/code_metrics/check12 更新
 
 > 重审（2026-11-15）：NF-Final WP-31：新增 protocol/governance_adapters.json、core/governance_adapters.py、docs/governance-adapters.md、test_governance_adapters_contract.py；assertions/data_contracts/independence/code_metrics/check12 更新

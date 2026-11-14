@@ -1,7 +1,7 @@
 {
   "schema": "nf-trust-self-audit/1",
-  "head": "2683688e2778b019f5afdc7c9d96a515c1d32bc7",
-  "scanned_at": "2026-11-14T16:07:19Z",
+  "head": "7e9fe6937df83ae9347d3cf7a80d645aac9f7b4c",
+  "scanned_at": "2026-11-14T16:48:01Z",
   "dimensions": {
     "S0_requirements": {
       "status": "green",
@@ -110,7 +110,7 @@
     }
   ],
   "gate": {
-    "verify": "PASS=91 WARN=2 FAIL=0（check1-44/45/46/47/48/49/50 · bash verify.sh --checks-only 实跑）",
+    "verify": "PASS=93 WARN=2 FAIL=0（check1-44/45/46/47/48/49/50/51 · bash verify.sh --checks-only 实跑）",
     "dotnet": "not-run（本机无 .NET SDK，见 BASELINE ENV-01）",
     "tests": "全量未跑；静态面全量 + 受影响面（G1 各 WP 记录）"
   },

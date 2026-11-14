@@ -12,17 +12,19 @@ subjects:
   - desktop/src/core/purity_scan.py:bc114898836f914212cec64e0b22c7d3f93b8681557d82f845a200a85683b0cc
   - desktop/tests/test_purity_scan.py:6979d6c7f88822141daf73d04ac6e86b29ae47e01f5f35a8be80145925fca2d3
   - scripts/nf.py:3026aad56e562650ab4db01aa76e73694fd841998ab3d84050643a2dd9c0950e
-  - verify.sh:8e5fc8fa6f16c82d03323c4fcdd0b8671a763f4b5c2c526c5dd71704fd3db21c
+  - verify.sh:904661b179c65686b37d63a7fa0a175625c433d741239903527dad3da35a7874
   - docs/layers.md:7b849fb07769ba6df5ca888a9de5323417b47a07ef54ec2c1c801673a7fbd7c0
   - docs/L3_FROZEN.md:863a152271b1b969a3249194d1169628f4a4647a9bdd801473cfc9cb75c6643b
-  - protocol/assertions.json:24c9d6e65b92ded31328fdf317531bd03dc966cd4d819ff9bf13b27db5105cfe
-  - protocol/data_contracts.json:a1344343873322e9c9cac7a93407b4107dd6be7a20a600d0b6cfc1e2fea05b07
+  - protocol/assertions.json:c3d6cbfeb58965c2e6077b121f4809d76b9e1c11860acd3039d23ef445c7766f
+  - protocol/data_contracts.json:f8fecc1ebc90f1b7595d147dda4833303a4517c57a406e02cc1eddee0d4fe502
   - protocol/normative.json:c1bbc14c92cea6bd66ff6cb54fdcf91bf3072f66adee7027f1d3f42e70fe1825
   - protocol/glossary.json:0af6a0f3b1f128b30c0eb88a8db0d2c143461910a889737dfdf4e38e89f85ba7
   - desktop/src/core/receipts.py:b748915bb519aeeb1aa0f7d367df2eb7d4321b369b85905a7f918d8d55d96363
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
 
 ---
+> 重审（2026-11-15）：NF-Final WP-33：新增 core/governance_report.py、results/governance/{report,audit}.json、test_governance_report_contract.py；verify.sh check51 + quality_baseline 51 条/PASS=93；派生面重生成
+
 > 重审（2026-11-15）：NF-Final WP-32：新增 protocol/attachment.json、core/attachment.py、docs/attachment.md、test_attachment_contract.py；assertions/data_contracts/independence/code_metrics/check12 更新
 
 > 重审（2026-11-15）：NF-Final WP-31：新增 protocol/governance_adapters.json、core/governance_adapters.py、docs/governance-adapters.md、test_governance_adapters_contract.py；assertions/data_contracts/independence/code_metrics/check12 更新
