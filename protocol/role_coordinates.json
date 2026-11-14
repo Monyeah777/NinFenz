@@ -5,8 +5,8 @@
     "floor": 5,
     "prod": 1057,
     "projection": 166,
-    "support": 463,
-    "verify": 1317
+    "support": 464,
+    "verify": 1318
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -11105,6 +11105,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "check45 判据自身判据：真仓全绿 + 变异必红（证明门禁不是同义反复）。",
+      "path": "desktop/tests/test_trust_gate45.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "trust.process 判据：process 向量族逐条 + prev 链/seq/创世约定 + 删改重排反例。",
       "path": "desktop/tests/test_trust_process.py",
       "role": "verify",
@@ -14286,16 +14292,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "f93572403b4cc1c77cd12dbd961af3bfda71145386003d65ff29bd2580ec9248",
+  "root_digest": "50f1ce930da8541fd5a88a9ee3b732295c492c6f97e481e77d2bf215e7ebc1e5",
   "rule_counts": {
     "R-app": 1467,
-    "R-catch": 311,
+    "R-catch": 312,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 146,
     "R-support": 124,
-    "R-verify": 1191,
+    "R-verify": 1192,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

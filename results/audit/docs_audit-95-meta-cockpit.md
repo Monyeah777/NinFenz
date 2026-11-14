@@ -16,15 +16,17 @@ subjects:
   - desktop/tests/test_meta_cockpit.py:017e3a591004b1e3c1bf28e8938ae22754e39ea61ae369e4ddcca1a556214280
   - desktop/tests/test_cli_error_framing.py:788460878349a907eadc21c74a1a689c9cdfe81888f5490c5a935b34fc121c8a
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
-  - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
+  - scripts/nf.py:f7aaad82e7a3476fdc4278c60c39698d639800ecdba9d8949bc91f9868144f8c
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:c3de2add60ea2cd936470408548f4fc9cad0634a7c8cca140adeead4bc3165ec
+  - protocol/check12_weights.json:4782d8733bb049f648f83cee10a8dec9e43b8ca7c8bf993a6b16a1e91ecb93df
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:fa00a7fd014857af56e11f38ced1b7d888be053befaadb10b3dd494d27884316
   - docs/meta-cockpit/功能解析.md:de20c2340d19d541bcfde53f222a3acf22a6e440d8fb3dcf51a37aedf53c0c25
   - results/meta-cockpit-manifest.json:60c0e100798e49d393557ae5066c02d7e057ec27f386ee1a36ca3fc7740150ba
 
 ---
+> 重审（2026-11-14）：WP-15 check45 接线与 G1 收口（机械重绑）
+
 > 重审（2026-11-14）：WP-11 trust bundle 入仓（机械重绑）
 
 > 重审（2026-11-14）：WP-10 trust canonical/entity 入仓（机械重绑）

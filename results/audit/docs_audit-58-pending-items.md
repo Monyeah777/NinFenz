@@ -6,7 +6,7 @@ scope: 作者指令「遗留全部补上」——处置 AUD-0009 §五 列出的
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
+  - verify.sh:1bc8f18b9343d60399d26cae4b6be2044efc61fd749303a9c48472677b3b9d4d
   - desktop/src/core/transparency_log.py:8aba0254fcf72230452600d5cb0305b5d5320cd3e95d8ed57ebe54a5d0ae46a1
   - desktop/src/core/rating_gate.py:468759e5d971fbe9319ab86e84d95031c13bc3df2c44dbffac0af3fcb071f74e
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
@@ -22,6 +22,10 @@ subjects:
   - results/interop-schema-validation.md:e2546c6407416b61912ac351d14d20c171167e36be4d4d3461f6c2fceb56c0c9
 
 ---
+> 重审（2026-11-14）：WP-15 check45 接线与 G1 收口（机械重绑）
+
+> 重审（2026-11-14）：WP-11 trust bundle 入仓（机械重绑）
+
 > 重审（2026-11-12）：library/ALIAS 顶尖化（生成器加「标题」列 → ALIAS 重生成；投影一致性保持）+ 契约判据 test_alias_contract；权重增量重测。本轮为机械重绑。
 
 > 重审（2026-11-10）：config.yml 入投稿面声明

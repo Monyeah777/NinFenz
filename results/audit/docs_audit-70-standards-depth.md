@@ -9,10 +9,14 @@ subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/retriever.py:97409e06af9b66d2b30bfde8a660d90b661c008bfe002b0b0712b824c7f6c9c4
   - desktop/tests/test_retriever.py:d47265d825ae4e602c478074ccfa1baf34d3b4a635a067125880e9f62723a854
-  - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
+  - verify.sh:1bc8f18b9343d60399d26cae4b6be2044efc61fd749303a9c48472677b3b9d4d
   - docs/domain-packs.md:f90ff233965ee1bb5a872dd833b79e200bfc1825db9c81f651ceca760d83d8b6
 
 ---
+> 重审（2026-11-14）：WP-15 check45 接线与 G1 收口（机械重绑）
+
+> 重审（2026-11-14）：WP-11 trust bundle 入仓（机械重绑）
+
 > 重审（2026-11-13）：域包文档顶尖化（修可达 332/不可达 38/绑定 1200 记录 2400 锚位 + 空壳 73·36·2628 + specs 可见性说明 / 现状对照 / 复现）+ 契约判据 test_domain_packs_doc_contract；权重增量重测。本轮为机械重绑。
 
 > 重审（2026-10-24）：CI 并发锁、Gitee 诊断与 ADR-0008 改变 verify/脚本字节；重审理由：相应测试与冻结链已同步

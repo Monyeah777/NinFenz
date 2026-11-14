@@ -6,16 +6,20 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - CHANGELOG.md:95bebd2bb67e337dace03a85df842126322404006fe0ca44b1368eda6253ff6f
-  - docs/meta/VERSION-MATRIX.md:1df4ec534da93d4a685bb5b4f605a8bec00788ca84763e458de7b5fd47d9ebde
-  - README.md:16f85b2302bf066c85740daad2d90589e074499bbdb40a56c55d334329e54cfc
+  - CHANGELOG.md:7881f582489b6efb6d75fd491ac8efe6cac48947cafd17fb98d68db05c564344
+  - docs/meta/VERSION-MATRIX.md:8ddb8f9ef59302c441a58ba82a908170326287826d382b1ec68038c6727a5511
+  - README.md:fd22231cf63c90803d640ecca61d7ade1d47b13c1005503bb91256ebece7a99e
   - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
   - docs/release.md:09b0c6bbd0f2514a32cef0e404bb4dac877f42d57a6674157ea45b1629290aa2
-  - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
+  - scripts/nf.py:f7aaad82e7a3476fdc4278c60c39698d639800ecdba9d8949bc91f9868144f8c
 
 ---
+> 重审（2026-11-14）：WP-15 check45 接线与 G1 收口（机械重绑）
+
+> 重审（2026-11-14）：WP-11 trust bundle 入仓（机械重绑）
+
 > 重审（2026-11-14）：CHANGELOG 顶尖化：补三段说明（怎么产生 / 只追加不重写 / 现状 4+1 节），并把「节序从新到旧、日期单调不增、生成器 issues 空」写成判据 test_changelog_doc_contract。
 
 > 重审（2026-11-13）：发布策略声明件顶尖化（11 步 ID 全列/冻结链 3/版本面 3/工件 4/锚 3 段 + 现状对照 / 复现；en·ja 译件同步后重签）+ 契约判据 test_release_doc_contract；权重增量重测。本轮为机械重绑。

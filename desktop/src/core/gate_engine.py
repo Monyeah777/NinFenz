@@ -394,6 +394,7 @@ def _register_delegated() -> None:
         (31, "protocol_golden", "verify_golden"),
         (32, "quality_depth_scan", "scan"),
         (40, "asset_contract", "scan"),
+        (45, "trust.gate", "scan"),
     ]
     text = _verify_sh() or ""
     for num, module, func in specs:

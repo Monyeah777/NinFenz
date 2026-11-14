@@ -9,12 +9,16 @@ subjects:
   - desktop/src/core/contract_history.py:e452d6d8a0d9849dece08210e7af2acbf554440e8871f8d656f745f533d06646
   - desktop/src/core/contract_text.py:01b784e63dd19425b3609ae3792b6c8d9f40366acb5806f71d10759c96de8fd6
   - desktop/src/core/knowledge_sig.py:06409878244907e1135846a71aae76e5d66303534a7e611b8870a1edd307c35e
-  - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
+  - scripts/nf.py:f7aaad82e7a3476fdc4278c60c39698d639800ecdba9d8949bc91f9868144f8c
   - desktop/tests/test_knowledge_sig.py:4705091a139b4fc4da9a61bc816e30eeec3221688f3d923e43afc3b11609c17e
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - docs/迁移指南-基于nf-sig-diff.md:02115fdf6e19c01142bc8f2561613ca421318db755769dedbd11498b6149c7b8
   - changes/unreleased/20261030-contract-history.md:4aa6c0df999193ab102115105c450ddae136dfa32c47d07fdebfe271f1059398
 ---
+> 重审（2026-11-14）：WP-15 check45 接线与 G1 收口（机械重绑）
+
+> 重审（2026-11-14）：WP-11 trust bundle 入仓（机械重绑）
+
 > 重审（2026-11-13）：迁移指南顶尖化（签名文档 4 / 历史面 15（4 根+2 protocol+9 schema）/ 影响度 3 值 / 命令三形态 + 现状对照 / 复现）+ 契约判据 test_migration_guide_doc_contract。
 
 > 重审（2026-11-09）：方法包声明可跑入口 runnable，清单与文档共用（含入口存在性判据）

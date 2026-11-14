@@ -525,6 +525,10 @@
       "referenced": true
     },
     {
+      "module": "gate",
+      "referenced": true
+    },
+    {
       "module": "gate_cache",
       "referenced": true
     },
@@ -1441,9 +1445,9 @@
       "referenced": true
     }
   ],
-  "modules": 360,
+  "modules": 361,
   "note": "粗粒度名字匹配（代理指标），不做导入图分析",
-  "referenced": 330,
+  "referenced": 331,
   "schema": "nf-core-judge-map/1",
   "unreferenced": 30
 }

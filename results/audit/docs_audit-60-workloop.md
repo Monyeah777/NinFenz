@@ -6,15 +6,19 @@ scope: 作者澄清「让这些模型替我干活，来构建 NF」——把决�
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
+  - verify.sh:1bc8f18b9343d60399d26cae4b6be2044efc61fd749303a9c48472677b3b9d4d
   - protocol/decision_layer.json:9330d4057f07647d67f15daa6f37c84913834b7eed65f4e360bf5c7c413e5e06
   - desktop/src/core/workloop.py:3ee94f2c11939abba5507741c6b9b4dae8e8cab77c3bda38419678e31e097056
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
-  - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
+  - scripts/nf.py:f7aaad82e7a3476fdc4278c60c39698d639800ecdba9d8949bc91f9868144f8c
   - desktop/tests/test_decision_layer.py:551419122f09c1b77f73e7724919f67698bd6d939c3d556d9c8ef98274a76257
   - docs/decision-layer.md:cd3a254de738ece7c8f07db36904c74484e4622c58f688a3973c8998b441628c
 
 ---
+> 重审（2026-11-14）：WP-15 check45 接线与 G1 收口（机械重绑）
+
+> 重审（2026-11-14）：WP-11 trust bundle 入仓（机械重绑）
+
 > 重审（2026-11-13）：决策层文档顶尖化（修三处计数陈旧 101/1142/1244 + 补 openai-json 适配器 / 三原语三候选活绑定 / 现状对照 / 复现）+ 契约判据 test_decision_layer_doc_contract；权重增量重测。本轮为机械重绑。
 
 > 重审（2026-11-09）：方法包声明可跑入口 runnable，清单与文档共用（含入口存在性判据）

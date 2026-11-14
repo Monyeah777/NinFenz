@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/io_types.py:09296daf865db85bda582fb646cece708c51f97e190a9e91c0eecd07252475f7
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
   - desktop/src/core/knowledge.py:d0b678c0f1176ce6f16a33b6f6d42a16b663099b4346306fae1ea547305e316b
-  - protocol/code_metrics_baseline.json:26dd9ecd222df4589a985e9059c76d04d7acc04ad1f759bd030f4fb43f6d7cfd
+  - protocol/code_metrics_baseline.json:6643cf1b3a3e3e1c3db0a84396c0e9b86a0c0c635e55108d7cee40985c24e956
 ---
+> 重审（2026-11-14）：WP-15 check45 接线与 G1 收口（机械重绑）
+
 > 重审（2026-11-14）：WP-11 trust bundle 入仓（机械重绑）
 
 > 重审（2026-11-14）：WP-03 测试向量与生成器入仓（机械重绑）

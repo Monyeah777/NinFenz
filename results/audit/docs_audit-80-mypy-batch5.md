@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:22e24633e87e95453d0c2cf4a595d0496bae5d7331c1fc644d5b1555e4925a41
-  - protocol/code_metrics_baseline.json:26dd9ecd222df4589a985e9059c76d04d7acc04ad1f759bd030f4fb43f6d7cfd
+  - protocol/code_metrics_baseline.json:6643cf1b3a3e3e1c3db0a84396c0e9b86a0c0c635e55108d7cee40985c24e956
 ---
+> 重审（2026-11-14）：WP-15 check45 接线与 G1 收口（机械重绑）
+
 > 重审（2026-11-14）：WP-11 trust bundle 入仓（机械重绑）
 
 > 重审（2026-11-14）：WP-03 测试向量与生成器入仓（机械重绑）

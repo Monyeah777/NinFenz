@@ -11,13 +11,17 @@ subjects:
   - desktop/src/core/output_forms.py:247645942b14dfac6642cf11bf66453ef12acb5f7fc4363d306dd860fe17bdf5
   - desktop/src/core/quality_depth_scan.py:563059e8a929bbbba16d5d15a9c77d1f362f9518351860b5ca0682aeb07a23f9
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
-  - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
+  - scripts/nf.py:f7aaad82e7a3476fdc4278c60c39698d639800ecdba9d8949bc91f9868144f8c
   - docs/domain-packs.md:f90ff233965ee1bb5a872dd833b79e200bfc1825db9c81f651ceca760d83d8b6
   - docs/output-forms.md:12773b8a39735eee7d8d433afd1f8ce8744758b886dc63c8f69d782a3f67b1c0
   - desktop/tests/test_domain_pack.py:e7ee496bdc2c0a78ead6baca16b252e776ceeab798c9965fa0b765fbb8c59410
-  - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
+  - verify.sh:1bc8f18b9343d60399d26cae4b6be2044efc61fd749303a9c48472677b3b9d4d
 
 ---
+> 重审（2026-11-14）：WP-15 check45 接线与 G1 收口（机械重绑）
+
+> 重审（2026-11-14）：WP-11 trust bundle 入仓（机械重绑）
+
 > 重审（2026-11-13）：产出形态文档顶尖化（116 条/12 类别/六档状态分布/106 包/1050 件/机验率 0.7688/34 例 + 现状对照 / 复现）+ 契约判据 test_output_forms_doc_contract；权重增量重测。本轮为机械重绑。
 
 > 重审（2026-11-13）：域包文档顶尖化（修可达 332/不可达 38/绑定 1200 记录 2400 锚位 + 空壳 73·36·2628 + specs 可见性说明 / 现状对照 / 复现）+ 契约判据 test_domain_packs_doc_contract；权重增量重测。本轮为机械重绑。
