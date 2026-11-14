@@ -2,6 +2,8 @@
 
 > **定位**：明确协议「什么算字段级新增、什么必须结构 bump」，并把 `nf diff` 的判定从兼容性一维升为「兼容判定 + 影响度三档」。任何对 01/02/03/04/05/06/07/registry/machine_contract/schema 定义的变更，先查本表定影响度，再按对应流程走。
 > **版本红线**：registry_schema_version / protocol.schema_version / machine_contract.schema 独立演进（01 §7 V3）；字段级新增不 bump（V1 只增不删）；结构性变更必须 bump + 迁移记录（V2）。
+>
+> **复核（2026-11-14）**：三档判据、派生三问、域包装卸不变量与回放样本**复核不变**；本轮补「§现状对照」「§复现与引用口径」——把「三档各自处理、check30/check13 怎么接线、哪些数字不许钉」写清。
 
 ## 判据表
 
@@ -49,3 +51,25 @@
 | 管线 type 值域补 `techdoc`（P90/P06 实际使用暴露） | 01 §2 + pipeline.schema.json | additive | 值域新增非结构（43 A1 check28 收口） |
 
 > 以上为 EXTENSION 判据的回放校验样本：凡归档为 bump 的均有迁移记录、凡 additive 的均未 bump 版本字段——check30 + check13 常驻守住该边界。
+
+## 现状对照（2026-11-14 · 以 `nf diff` / check30 / check13 实读为准）
+
+| 面 | 当前口径 | 复核方式 |
+|---|---|---|
+| 影响度三档 | **3 档**：`editorial` / `additive` / `bump`（判定进位关系确定：bump > additive > editorial） | `nf diff` 的 `判定` 行 + `nf diff --json` |
+| 派生三问 | **3 条**（基类在册 / 只增不删不改义 / 旧消费方可忽略） | 本文「派生三问」段 |
+| 门禁接线 | **check30**（结构性变更缺迁移记录即拦）+ **check13**（协议版本一致性/迁移完整性四步） | `python scripts/nf.py verify --only 30` / `--only 13` |
+| 域包装卸 | 移除社区包后，段 A / 段 C 结论不变；段 B 只记 `WARN` 不加 `FAIL` | `bash verify.sh --checks-only` 的段 B 输出 |
+| 回放样本 | **4 例**历史变更（2 bump + 2 additive）逐例落点与依据在文 | 本文「三档回放实证」表 |
+
+**不钉运行时数字**：本文不写「当前 registry 版本号 / schema 件数 / 迁移记录条数」这类会漂的值；版本真源是 `01 §7` / `02 §9.3` 与各 schema，实证以 `nf diff` 实读为准。**唯一必须钉的是判据结构**（三档 + 三问 + 两 check 接线）。
+
+## 复现与引用口径
+
+```bash
+python scripts/nf.py diff <旧文件> <新文件> --json    # verdict（兼容判定）+ impact（三档）
+python scripts/nf.py diff --history 20 01_核心协议.md  # 从 Git 重建演进时间线（逐版影响度）
+python scripts/nf.py verify --only 30                  # 单跑 check30（bump 必须有迁移记录）
+```
+
+- 引用本页时：`verdict`（兼容/需评审/破坏）与 `impact`（三档）**是两套判定**，不要互相替代；改 schema 先定影响度再走流程。

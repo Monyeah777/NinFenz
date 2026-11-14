@@ -99,7 +99,9 @@ class TestMutationSelfCheck(unittest.TestCase):
 class TestRepoIsolationPatterns(unittest.TestCase):
     def test_no_fragile_atomic_write_patches(self):
         bad = []
+        scanned = 0
         for path in sorted(TESTS.glob("test*.py")):
+            scanned += 1
             if path.name in REVIEWED_EXEMPT:
                 continue
             try:
@@ -110,6 +112,7 @@ class TestRepoIsolationPatterns(unittest.TestCase):
                 continue
             bad.extend(f"{path.name}:{lineno} 打在别名 {alias} 的 {attr} 上"
                        for lineno, alias, attr in hits)
+        self.assertGreaterEqual(scanned, 100, "判据扫描面塌缩（test*.py 过少）")
         self.assertEqual([], bad,
                          "打桩必须打在运行时模块上（修复指引：改用 _live 取当前模块 / "
                          "_no_replace()；理由见本文件 docstring）")

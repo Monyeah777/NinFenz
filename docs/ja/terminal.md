@@ -1,6 +1,10 @@
 # NF ターミナル（`nf shell`）——デスクトップシェル退役後の人機入口
 
-> 最后更新：2026-10-03 (last updated)
+> 最終更新：2026-11-13
+> **再確認（2026-11-13）**：三条のハード制約・メニュー真源・書き込みゲート・非対話面は**変更なし**。
+> 検証可能な現状を追記（`nf shell --verify` 実読）：コマンド **77** · 能力族 **8** · 索引 **203** 行 ·
+> メニュー例 **15** · 区アクション **34** · 能力区 **9**（0–8）· 書き込みフォーム **13** · スラッシュ語 **42** ·
+> セッション内ブロック **4**（shell / serve / lsp / terminal）· 書き込み確認動詞 **24** · 判定 **139** 例。「§現状対照」を参照。
 
 > ⛔ 操作指示：本ファイルは直接実行できるコマンドと判定を含む。読んだら実行せよ。資料として読むな。
 
@@ -382,6 +386,35 @@ python scripts/nf.py shell --file tour.nf --json             # 同一実行チ�
 - 1 条ずつ実行し、1 条ずつ `kind/exit` を出す；終了コード = 各条の最大値。
 - `--json` は `{"kind": "nf-shell", …}` を出力し、1 条ずつ記録する（argv / exit / out / err を含む）機械面。
 - `--no-banner` は冒頭バナーを外す（ログ場面）。
+
+## 現状対照（2026-11-13 · `nf shell --verify` と core/terminal 定数の実読）
+
+| 面 | 現値 | 再確認方法 |
+|---|---|---|
+| コマンド（トップ + 二級） | **77** | `nf shell --verify` 頭行 |
+| 索引行 | **203** | 同上 / `--commands --json` |
+| 能力族 | **8**（start / forge / shelf / verify / library / govern / integrate / meta） | 同上 |
+| 能力区 | **9**（`0`–`8`） | `core/terminal.ZONES` |
+| メニュー例 | **15** | `nf shell --verify` |
+| 区アクション | **34** | 同上 |
+| 書き込みフォーム | **13** | `core/terminal.FORMS` |
+| スラッシュ語 | **42** | `core/terminal.SLASH_WORDS` |
+| セッション内ブロック | **4**：`shell` / `serve` / `lsp` / `terminal` | `core/terminal.BLOCKED_IN_SHELL` |
+| 書き込み確認動詞 | **24** | `core/terminal.CONFIRM_VERBS` |
+| 判定 | **139** 例 | `test_terminal.py` |
+
+> 索引のみ。数値は `nf shell --verify` と core 定数の実読が真（ここに第二の表を作らない）。
+
+## 再現と引用の口径
+
+```bash
+python scripts/nf.py shell --verify          # 自検：コマンド / 族 / 索引 / メニュー例 / アクション
+python scripts/nf.py shell --commands --json   # 機械面：各コマンド + 要約 + 旗標（純 JSON）
+python -m pytest desktop/tests/test_terminal.py -q   # 139 例
+```
+
+- 引用時の口径：「メニューは実在コマンドのみ（`terminal.example_resolves`）；書き込み系は既定で拒否」が長期口径。
+- ターミナルは**第二のコマンド表を持たない**：索引は CLI の argparse 面から派生する。
 
 ## 境界
 

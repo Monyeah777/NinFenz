@@ -7,6 +7,18 @@
 - 可达性是**本机实测**（探针日期见每条），不可达条目照实标注、不假装可达。
 - 本页为 `docs/standards/index.md` 的按层切片，锚点与主索引一致。
 
+## 怎么读本页
+
+- 本层含义：治理/合规/风险与制度框架（法规、审计准则、安全与隐私框架）
+- 本层可达：66/71（不可达 5）
+- 本层绑定最多：w3c-prov-o（主锚 69 / 辅锚 88） · nist-ai-rmf（主锚 74 / 辅锚 0） · common-criteria（主锚 41 / 辅锚 0）
+- 本层不可达：council-europe-ai（HTTP 403） · eu-accessibility-act（HTTP 0） · fatf-recommendations（HTTP 403） · hipaa-security（HTTP 403） · iec-42001（HTTP 403）
+- 本层机构分布：NIST 11 条 · W3C 8 条 · EU 3 条
+- 生成物：`python scripts/geo_export.py --write` 重写本页；`--check` 比对生成物与真源，不一致即红。手改必红。
+- 切片口径：本页只收 `layer` 等于该层的标准，锚点与主索引 `index.md` 逐字一致。
+- 行字段：名称 · 机构 · 层 · 可达（HTTP · 探针日期） · 扩展点 · 绑定（主锚/辅锚） · 规范 URL。
+- 互指：全量见 `index.md`；按问题形态聚合见 `answer-cards.md`；三面一致性由 check40 判，本页只是**投影**。
+
 ### `aicpa-soc2`
 - SOC 2 信任服务准则 · AICPA · 层 gov · 可达 是（200 · 2026-09-24） · 扩展点 trust-services-category, criterion · 绑定 主锚 0 / 辅锚 0 · https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
 

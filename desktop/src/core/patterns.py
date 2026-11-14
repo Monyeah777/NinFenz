@@ -93,14 +93,15 @@ def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
             warns.append("%s 缺 evidence（可证性弱：无法回溯规则来源）" % d)
         for item in ev:
             s = item.strip()
-            if _CHECK.match(s) or s.startswith("docs/") or s.startswith("desktop/") \
-                    or s.startswith("protocol/") or s.startswith("library/"):
-                if _CHECK.match(s):
-                    continue
-                if not (Path(root) / s).exists():
-                    warns.append("%s 的 evidence 指向不存在的件：%s" % (d, s))
-            elif not s:
+            if not s:
                 warns.append("%s 的 evidence 有空项" % d)
+                continue
+            if _CHECK.match(s):
+                continue
+            # 任何带 / 的引用都按路径校验（此前只认 docs/ desktop/ protocol/ library/ 四个前缀，
+            # 其它前缀（如 handovers/）的悬空引用会被静默放过——实测抓到一个）。
+            if "/" in s and not (Path(root) / s).exists():
+                warns.append("%s 的 evidence 指向不存在的件：%s" % (d, s))
     stats = {"patterns": len(rows), "ids": sorted(seen)}
     return issues, warns, stats
 
@@ -116,9 +117,46 @@ def render_index(root: str = ".") -> str:
             fm.get("status", ""), "、".join(_as_list(fm.get("scope"))[:2]),
             len(_as_list(fm.get("rules")))))
     out += ["", "> 真源 = 各包 `PATTERN.md` 的 frontmatter；本表为投影（`nf patterns reindex` 重建"
-        "）。",
-            "", END]
-    return "\n".join(out)
+        "）。", ""]
+    return "\n".join(out + _status_section(rows) + [END])
+
+
+def _status_section(rows):
+    """现状对照 + 复现口径（生成；计数由本表实时算出，不手写）。"""
+    ids = [str(e["fm"].get("id") or e["dir"]) for e in rows]
+    rules = sum(len(_as_list(e["fm"].get("rules"))) for e in rows)
+    statuses = {}
+    for e in rows:
+        key = str(e["fm"].get("status") or "?")
+        statuses[key] = statuses.get(key, 0) + 1
+    per_pkg = sorted({len(_as_list(e["fm"].get("rules"))) for e in rows})
+    shape = "、".join(str(n) for n in per_pkg)
+    status_line = " · ".join(f"{k} {v}" for k, v in sorted(statuses.items()))
+    bt = chr(96) * 3
+    id_line = "、".join(chr(96) + i + chr(96) for i in ids)
+    return [
+        "## 现状对照（生成 · 计数由本表实时算出）",
+        "",
+        "| 面 | 现值 | 说明 |",
+        "|---|---|---|",
+        f"| 实践包 | **{len(rows)}** | 生成区表格行数 |",
+        f"| 规则总数 | **{rules}** | 各包 rules 长度求和（每包 {shape} 条） |",
+        f"| 状态分布 | {status_line} | 各包 frontmatter 的 status |",
+        "",
+        f"**包 id**（生成）：{id_line}",
+        "",
+        "## 复现与引用口径（生成）",
+        "",
+        bt + "bash",
+        "python scripts/nf.py patterns ls         # 列全部实践包（真源 = 各 PATTERN.md）",
+        "python scripts/nf.py patterns verify     # 格式 + 可证性机检",
+        "python scripts/nf.py patterns reindex    # 重建本页（幂等：无变化即输出「无变化」）",
+        bt,
+        "",
+        "- **本页整体是生成物**：手改会被下一次 reindex 覆盖；"
+        "要改内容请改 patterns/<id>/PATTERN.md。",
+        "",
+    ]
 
 
 def write_projection(root: str = ".") -> Dict[str, Any]:

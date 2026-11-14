@@ -8,7 +8,9 @@
       "status": "current",
       "topic": "architecture-core",
       "decision": "契约核（cc_* 七调用 + K1–K8）与认知核（discourse/15 moves/33 原子/11 算子/方法包）平级；两侧不读对方内部状态，只交换 commitment{cog_digest, claim_digest, cc_digest}。核心架构 v1 的「NF 降为可插拔后端」作废。",
-      "supersedes": ["CCOS-核心架构-v1（重定义 CCOS 部分）"],
+      "supersedes": [
+        "CCOS-核心架构-v1（重定义 CCOS 部分）"
+      ],
       "evidence": [
         "desktop/src/core/cognition_workspace/bridge.py",
         "desktop/tests/test_cognition_bridge.py",
@@ -22,7 +24,9 @@
       "status": "current",
       "topic": "abi",
       "decision": "cc_* 七调用（已实现 + 55 向量）冻结为 v1，只增不改；破坏性变更走 v2 + 适配层。新增 cog_* 一律 v0-experimental，直到 schema 文件 + 错误码 + 幂等声明 + 校验测试齐备才可标 frozen。",
-      "supersedes": ["整合方案(1) L128「ABI v0.1 待定稿」与 L225「v1 冻结」并存的自相矛盾"],
+      "supersedes": [
+        "整合方案(1) L128「ABI v0.1 待定稿」与 L225「v1 冻结」并存的自相矛盾"
+      ],
       "evidence": [
         "docs/ccos/abi-v0.md",
         "results/ccos/evidence_verdict_vectors.json",
@@ -55,6 +59,92 @@
         "git branch: origin/reasoning-plane-2026-11-03"
       ],
       "falsifier": "若 reasoning/ 出现在 HEAD 且默认 CLI 路径可达，则本裁决应改为 active 并补「默认路径可达」判据"
+    },
+    {
+      "id": "ADR-005",
+      "title": "Trust 签名信封采用 DSSE PAE（不自定义信封 / 不用 JWS）",
+      "status": "current",
+      "topic": "trust-dsse",
+      "decision": "信任层签名走 DSSE PAE：预认证编码 = DSSEv1 <len(ptype)> <ptype> <len(payload)> <payload>（长度按字节），信封为 nf-dsse/1（payloadType/payload/signatures，至少 1 个签名，keyid 在 issuer registry 解析）；算法可插拔（ed25519 首选 / ecdsa-p256 / hmac-sha256 白名单），未知算法 fail-closed。不自定义信封、不采用 JWS。",
+      "supersedes": [],
+      "evidence": [
+        "protocol/trust/dsse.schema.json",
+        "results/trust/trust_vectors.json",
+        "docs/trust/THREAT_MODEL.md"
+      ],
+      "falsifier": "若任一 trust 实现使用非 PAE 信封（自定义/ JWS）且仍被 policy 判为 T1 以上，则本裁决失效。"
+    },
+    {
+      "id": "ADR-006",
+      "title": "Claim Bundle 用 RFC 6962 风格 Merkle（不用累加器），bundle_id 与域分隔进叶",
+      "status": "current",
+      "topic": "trust-bundle",
+      "decision": "claim 级包用 RFC 6962 风格 Merkle：leaf=sha256(0x00||data)、node=sha256(0x01||left||right)，根在最大 2 的幂处分裂；inclusion proof 自底向上、深度上限 64；bundle_id 必填并进入叶域分隔（域标签 nf:<schema>:v1:<field>，摘要=sha256(tag+0x00+payload)），防跨 bundle 拼接；不引入累加器。",
+      "supersedes": [],
+      "evidence": [
+        "protocol/trust/claim-bundle.schema.json",
+        "desktop/src/core/trust/bundle.py",
+        "results/trust/trust_vectors.json",
+        "desktop/tests/test_trust_vectors.py"
+      ],
+      "falsifier": "若改用累加器实现、或去掉 bundle_id/域分隔仍能通过向量集 merkle 族与 splicing 负例，则本裁决失效。"
+    },
+    {
+      "id": "ADR-007",
+      "title": "时间锚用 RFC 3161，不信任本地时钟",
+      "status": "current",
+      "topic": "trust-time",
+      "decision": "T2 及以上只能由 RFC 3161 时间戳支撑：token 绑定被证数据 sha256、离线可验（需信任锚 CA 链），响应 >1 MiB 拒收、TSA 地址仅 http(s)。本地时钟只用于记录，不用于安全时间：未挂 time-record 的时效判定最高只到 T1 面。",
+      "supersedes": [],
+      "evidence": [
+        "protocol/trust/anchor.schema.json",
+        "results/trust/trust_vectors.json",
+        "desktop/src/core/timestamp.py"
+      ],
+      "falsifier": "若某等级仅凭本机时钟被判为 T2 及以上并作为对外结论，则本裁决失效。"
+    },
+    {
+      "id": "ADR-008",
+      "title": "本地透明日志默认 + 外部 witness 可选；T3 才要求见证",
+      "status": "current",
+      "topic": "trust-witness",
+      "decision": "默认信任本地透明日志（版本化根 + 追加链 + 包含证明 + 分叉见证）；外部 witness 为可选适配器，只有 T3 才要求 STH 且 witness 数达到 policy.anchors.witness_threshold。T0-T2 不因缺见证降级为不可判定，也不因有本地链冒充见证。",
+      "supersedes": [],
+      "evidence": [
+        "protocol/trust/anchor.schema.json",
+        "desktop/src/core/key_transparency.py",
+        "docs/trust/THREAT_MODEL.md"
+      ],
+      "falsifier": "若 T3 可在无 witness / 无 STH 时达到，或本地链被当作外部见证抬升 T3，则本裁决失效。"
+    },
+    {
+      "id": "ADR-009",
+      "title": "类型注册表 fail-closed：未知 type / issuer / 算法拒绝",
+      "status": "current",
+      "topic": "trust-types",
+      "decision": "实体类型、issuer 与算法三层都是封闭词表：结构先过 nf-entity/1 等 schema（未知字段拒绝），准入再查 issuer 是否在 policy.issuers、entity.type 是否在该 issuer 的 types 内；未知 type/issuer/算法一律拒绝（fail-closed），不做默认放行或猜测降级。",
+      "supersedes": [],
+      "evidence": [
+        "protocol/trust/entity.schema.json",
+        "desktop/src/core/trust/entity.py",
+        "protocol/trust/policy.schema.json",
+        "desktop/tests/test_trust_schemas.py"
+      ],
+      "falsifier": "若未知 type/issuer/算法被默认放行且验证结论仍为通过，则本裁决失效。"
+    },
+    {
+      "id": "ADR-010",
+      "title": "不把质量评分写回运行时；评测只作 external-advisory 证据",
+      "status": "current",
+      "topic": "trust-noscore",
+      "decision": "nf-verify/1 报告 no_scoring 恒 true：验证判定只由结构/签名/时间/锚/类型决定，不引入质量评分；eval 与盲评（nf-eval-protocol/1 一类）只作为 external-advisory 证据挂在 claim 旁，不进入运行时判定，也不写成合规/认证结论。",
+      "supersedes": [],
+      "evidence": [
+        "protocol/trust/verify.schema.json",
+        "desktop/src/core/eval_harness.py",
+        "docs/trust/THREAT_MODEL.md"
+      ],
+      "falsifier": "若 nf-verify 报告写入评分字段、或 eval 分数进入运行时判定/对外等级，则本裁决失效。"
     }
   ]
 }

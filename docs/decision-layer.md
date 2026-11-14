@@ -1,6 +1,11 @@
 # 决策层（decide）
 > ⛔ 操作指令：阅读即执行——本文含可直接执行的命令与判定，勿当资料阅读。
-> 最后更新：2026-09-22
+> 最后更新：2026-11-13
+> **复核（2026-11-13）**：三原语 / 门禁只许 stub / fail-closed / 应答契约 / 四条不可协商**逐项复核不变**；
+> 修三处**计数陈旧**：① 未定型字段 **104 → 101**（`protocol/type_backlog.json` 的 `count`）；
+> ② 管线 advisory **102 → 1142**（`protocol/pipeline_advisory.json` 的 `total`）；
+> ③ 构建回路工单候选 **206 → 1244**（`nf workloop --list` 实报）。另补一处**适配器清单不全**：实有三件
+> `stub` / `systemone-http` / **`openai-json`**（remote-http，非门禁、未标定），原文只列前两件。见「§现状对照」。
 
 ## 是什么
 
@@ -65,6 +70,10 @@ python scripts/pull_decision_model.py --candidate laya-multilingual --run --yes
 `results/audit/docs_audit-61-real-model-loop.md`）。**NF 不替作者决定下载数 GB 权重**：
 `pull_decision_model.py` 默认只打印命令，`--run --yes` 才执行。
 
+> 适配器三件（真源 `decision_layer.json: adapters`）：`stub`（offline-deterministic，`in_gate_path=true`，
+> `calibrated=false`）/ `systemone-http`（local-http，非门禁，`calibrated=true`）/ **`openai-json`**
+> （remote-http，非门禁，`calibrated=false`）。门禁判据只放行 `stub`。
+
 ## 判据（门禁 · check33 第 15 面）
 
 1. **声明完整**：三原语齐全、适配器带 `kind/in_gate_path/calibrated/note`、候选带
@@ -112,5 +121,33 @@ python scripts/nf.py workloop --close WO-xxxx --outcome landed --gate "PASS=<当
 ① 决策层不生成内容；② 工单只落内部档案（计划类产品内部消化，公开仓只收结果 + audit）；
 ③ 落笔方必须是 worker；④ 验收只认 `verify.sh` / `nf conformance`。
 
-实测（本仓 2026-09-22）：待办 **206 项**（未定型字段 104 + advisory 102），
-stub 工单确定性可复现（`WO-c9618c9f6e8a`，选择 `TB-001:beat_tick.buffered`）。
+实测（本仓 2026-11-13 复核）：待办 **1244 项**（未定型字段 **101** + advisory **1142**；
+2026-09-22 首测时为 206 项 = 104 + 102）。stub 工单确定性可复现——当时样例
+`WO-c9618c9f6e8a`（选择 `TB-001:beat_tick.buffered`）是**那一次**的产物；当前首项见 `nf workloop --list --top 3`。
+
+## 现状对照（2026-11-13 · 以实跑为准）
+
+| 面 | 本文声明 | 复核结果（读到本行时请重跑） |
+|---|---|---|
+| 三原语 | choice / noul / score | **不变**（`decision_layer.json: primitives` 三键） |
+| 适配器 | 原只列 stub/systemone | **三件**：stub（门禁，calibrated=false）/ systemone-http（非门禁，calibrated=true）/ openai-json（非门禁，calibrated=false） |
+| 候选模型 | 三件（1 已拉取 2 未拉取） | **不变**（laya-multilingual `pulled=true`，其余 false） |
+| 门禁面 | check33 第 15 面 | **不变**（check33 存在；门禁只许 stub） |
+| 未定型字段 | 104 | **101**（`type_backlog.count`） |
+| 管线 advisory | 102 | **1142**（`pipeline_advisory.total`） |
+| 工单候选 | 206 | **1244**（`nf workloop --list` 实报） |
+| 常驻判据 | 未计 | `test_decision_layer` **20 例** |
+
+> 本表只作「当时 → 现行」导航，不替代实跑。
+
+## 复现与引用口径
+
+```bash
+python scripts/nf.py decide --questions Q.json --dry-run          # 声明完整 + stub 确定性 + fail-closed
+python scripts/nf.py workloop --list --top 3                      # 候选面（实报在册总数）
+python -m pytest desktop/tests/test_decision_layer.py -q          # 20 例
+```
+
+- 引用本文时：「决策层是端口，不生成正文、不执行动作；门禁只许 stub」= 长期口径。
+- 计数真源：字段数看 `protocol/type_backlog.json` 的 `count`，advisory 看 `pipeline_advisory.total`，工单候选以 `workloop --list` 实报为准。
+- 真跑/拉取状态以 `decision_layer.json: candidates[].pulled` 为准；本仓不替作者下载权重。

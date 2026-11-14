@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1466,
+    "app": 1467,
     "entry": 26,
     "floor": 5,
     "prod": 1057,
-    "projection": 163,
-    "support": 448,
-    "verify": 1094
+    "projection": 166,
+    "support": 461,
+    "verify": 1316
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7343,8 +7343,158 @@
       "rule": "R-verify"
     },
     {
+      "function": "nf-anchor/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/anchor-empty.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-anchor/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/anchor-missing-token.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-anchor/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/anchor-unknown-kind.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-claim-bundle/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/claim-bundle-bad-side.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-claim-bundle/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/claim-bundle-missing-proofs.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-dsse/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/dsse-bad-payload.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-dsse/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/dsse-empty-signatures.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-entity/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/entity-bad-digest.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-entity/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/entity-unknown-field.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-trust-policy/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/policy-level-t5.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-trust-policy/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/policy-unknown-alg.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-process/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/process-prev-empty.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-process/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/process-step-zero.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-verify/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/verify-issue-missing-fix.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-verify/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/verify-no-scoring-false.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-anchor/1",
+      "path": "desktop/tests/fixtures/trust/schemas/valid/anchor.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-claim-bundle/1",
+      "path": "desktop/tests/fixtures/trust/schemas/valid/claim-bundle.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-dsse/1",
+      "path": "desktop/tests/fixtures/trust/schemas/valid/dsse.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-entity/1",
+      "path": "desktop/tests/fixtures/trust/schemas/valid/entity.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-trust-policy/1",
+      "path": "desktop/tests/fixtures/trust/schemas/valid/policy.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-process/1",
+      "path": "desktop/tests/fixtures/trust/schemas/valid/process.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-verify/1",
+      "path": "desktop/tests/fixtures/trust/schemas/valid/verify.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "absence_guard 单测。",
       "path": "desktop/tests/test_absence_guard.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "ADR-0000 决策记录契约：meta 决策的每一条声明都必须可机器核验。",
+      "path": "desktop/tests/test_adr_0000_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "ADR-9000 模板契约：公开面决策格式模板必须「机读合法 + 写法指引齐全 + INDEX 投影一致」。",
+      "path": "desktop/tests/test_adr_9000_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "ADR-9001 证据纪律示例契约：允许/禁止写法必须与 decisions.py 的实际校验逐条对齐。",
+      "path": "desktop/tests/test_adr_9001_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -7355,14 +7505,50 @@
       "rule": "R-verify"
     },
     {
+      "function": "AGENT_START 入口契约：装配师第一跳须「分流可执行、路径可达、工具面同源、失败即停」。",
+      "path": "desktop/tests/test_agent_start_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "AGENTS.md 契约判据：开工前必读链第一跳必须「路径可解析、事实与仓库一致」（2026-11-11）。",
       "path": "desktop/tests/test_agents_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
     {
+      "function": "docs/44_M2 契约：AI 通道内容规范必须「口径不变 + 三个基数活绑定 + 默认实时面 + 复现口径」。",
+      "path": "desktop/tests/test_ai_channel_spec_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "AI 系统域 · 概念前置闭包求值单测（域包战例回归 + 负例注入）。",
       "path": "desktop/tests/test_ai_domain_closure.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "ai-menu 菜单契约：一贴就发菜单的 B1 总闸门必须「菜单单源、事实同源、失败即停」。",
+      "path": "desktop/tests/test_ai_menu_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/ai-menu-fieldtest-v1 契约：执行状态如实 + 与菜单 v0.3 口径同步 + 回填位在。",
+      "path": "desktop/tests/test_ai_menu_fieldtest_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "AI_ROUTING 路由契约：入口第二跳必须「档位可自测、通道有落点、override 同源、失败即停」。",
+      "path": "desktop/tests/test_ai_routing_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "library/ALIAS 契约：转译表必须「生成器实时重算一致 + 小写键唯一 + 双镜像直链正确 + 标题列在场」。",
+      "path": "desktop/tests/test_alias_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -7415,6 +7601,18 @@
       "rule": "R-verify"
     },
     {
+      "function": "标准答题卡契约：生成物必须「口径段齐 / 4 张卡 / 计数与真源一致 / --check 新鲜」。",
+      "path": "desktop/tests/test_answer_cards_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/approval.md 契约：内容绑定批准文档必须「字段/命令/冻链位置与实现一致 + 现状活绑定」。",
+      "path": "desktop/tests/test_approval_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "批准记录命名（审计 W7：protocol/approvals/*.json.json 双扩展名）。",
       "path": "desktop/tests/test_approval_naming.py",
       "role": "verify",
@@ -7445,8 +7643,26 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/agent/agent_组装指令包_v0.2 契约：装配指令包必须「与现行入口/门禁一致 + 无退役面指引」。",
+      "path": "desktop/tests/test_assembly_pack_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "skills/ninfenz/references/assembly.md 契约：装配参考必须「骨架/编号/验收三真源对得上」。",
+      "path": "desktop/tests/test_assembly_reference_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "断言表（数据化断言）正式与否定用例。",
       "path": "desktop/tests/test_assertions.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/assertions.md 契约：数据化断言表文档必须「封闭集/表自身过门 + 现状活绑定 + 复现口径」。",
+      "path": "desktop/tests/test_assertions_doc_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -7459,6 +7675,12 @@
     {
       "function": "asset_contract._REPO_FILES 的新鲜度判据（2026-10-23）。",
       "path": "desktop/tests/test_asset_contract_cache.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/asset_contract.md 契约：四面/声明/CLI/同源判据与实现一致 + 现状活绑定。",
+      "path": "desktop/tests/test_asset_contract_doc_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -7493,6 +7715,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "05_资产库 README 契约：资产层总索引必须「五接口同源、台账可核、货架单层、引用不另立」。",
+      "path": "desktop/tests/test_asset_library_readme_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "社区资产行数基线单测（可重签工件：漂移检测 + 新增包未登记 + 缺包只 WARN + 重签幂等）。",
       "path": "desktop/tests/test_asset_line_baseline.py",
       "role": "verify",
@@ -7501,6 +7729,12 @@
     {
       "function": "素材来源与许可覆盖（审计 Z6：4 素材无来源的收口判据）。",
       "path": "desktop/tests/test_asset_provenance.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/42_M4 资产评估报告契约：快照状态 + 现状活绑定 + 结论口径不变 + 复现口径。",
+      "path": "desktop/tests/test_asset_report_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -7547,6 +7781,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/attest.md 契约：内容 attestation 文档必须「三级语义 + 六旗标 + 库签名边界 + 现状活绑定」。",
+      "path": "desktop/tests/test_attest_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "审计/验收（audit）正式与否定用例。",
       "path": "desktop/tests/test_audit.py",
       "role": "verify",
@@ -7565,6 +7805,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/bench.md 契约：执行结果跑分台文档必须「五维权重/用例/旗标与实现一致 + 端壳边界 + 复现」。",
+      "path": "desktop/tests/test_bench_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "双语入口（README.md / README.en.md）机读事实一致性测试。",
       "path": "desktop/tests/test_bilingual_entry.py",
       "role": "verify",
@@ -7579,6 +7825,30 @@
     {
       "function": "桥接真实证据包判据（对应闭包台账 D-03）：闭环输入必须是真 nf evidence verify 输出。",
       "path": "desktop/tests/test_bridge_real.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/41_波C_C1_C2 实测记录 契约：快照状态 + 现状对照 + 复现口径 + 引用件在场。",
+      "path": "desktop/tests/test_c1c2_record_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/41_波C_C7 实测记录 契约：快照 + 工具面现状对照 + 复现口径 + E3 口径。",
+      "path": "desktop/tests/test_c7_record_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/41_波C_C8 transport 契约：原结论保留 + 现行能力面复评 + 远程/本地口径分离。",
+      "path": "desktop/tests/test_c8_transport_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/41_波C_C9_回合装载指针_v0 契约：v0 指针规格必须「标明已被 v1 接续 + 样例装配数与真源一致」。",
+      "path": "desktop/tests/test_c9_pointer_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -7637,6 +7907,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/ccos/abi-v0.md 契约：CCOS ABI 文档必须「7 调用形状/状态与登记面一致 + 数字活绑定」。",
+      "path": "desktop/tests/test_ccos_abi_v0_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "CCOS 一条链复现单测（cc_check → [cc_label] → cc_attest → cc_verify → cc_replay）。",
       "path": "desktop/tests/test_ccos_chain.py",
       "role": "verify",
@@ -7651,6 +7927,12 @@
     {
       "function": "CCV3 映射层单测（v2.0.0 T1：IR→chara_card_v3 + world entries）。",
       "path": "desktop/tests/test_ccv3_adapter.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "CHANGELOG.md 契约：历史只追加不重写；节序从新到旧、日期单调不增；生成器自检无 issue。",
+      "path": "desktop/tests/test_changelog_doc_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -7687,6 +7969,12 @@
     {
       "function": "单对象策略体检（cc_check）单测——封闭词表、可复算 verdict、坏策略必须拒。",
       "path": "desktop/tests/test_check_policy.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/ccos/check-policy-v0.md 契约：单对象策略规范必须「5 类封闭词表/形状/CLI 五入口与实现一致」。",
+      "path": "desktop/tests/test_check_policy_doc_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -7769,6 +8057,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "submissions/02-cline-marketplace.md 契约：审核四要点 + 不钉运行时计数 + 平台侧未验。",
+      "path": "desktop/tests/test_cline_submission_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "闭包台账判据（P7）：断言必须指向**真实在场**的判据，债务必须写明。",
       "path": "desktop/tests/test_closure.py",
       "role": "verify",
@@ -7783,6 +8077,18 @@
     {
       "function": "行为准则契约判据：违规处置必须「通道清楚、档位可判、申诉有门」（2026-11-10）。",
       "path": "desktop/tests/test_coc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "COCKPIT_PROTOCOL.md 契约：驾驶舱协议必须「硬规则有界 / 边界 fail-closed / 口径可核」。",
+      "path": "desktop/tests/test_cockpit_protocol_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "COCKPIT_RELEASE_NOTES.md 契约：发布说明的可核数字与「存疑项」必须与资产一致。",
+      "path": "desktop/tests/test_cockpit_release_notes_doc_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -7847,6 +8153,18 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/combos.md 契约：组合引擎文档必须「包数/广度/证书/产物化与实跑一致」。",
+      "path": "desktop/tests/test_combos_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "skills/ninfenz/references/commands.md 契约：命令全在册 + 契约数不漂移 + 退出码语义对得上。",
+      "path": "desktop/tests/test_commands_reference_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "提交信息机检单测（CONTRIBUTING §1 判据化 · 含\"不打断自动化\"回归）。",
       "path": "desktop/tests/test_commit_msg.py",
       "role": "verify",
@@ -7873,6 +8191,12 @@
     {
       "function": "概念图健康门禁测试（check32 子扫描 `core.concept_graph` + 求值器同源校验）。",
       "path": "desktop/tests/test_concept_graph_gate.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/conformance.md 契约：一致性报告文档必须「契约条数/现场 root/门禁规模与报告实读一致」。",
+      "path": "desktop/tests/test_conformance_doc_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -7921,6 +8245,12 @@
     {
       "function": "core 引用面判据：未引用模块数只减不增（第 159 轮）。",
       "path": "desktop/tests/test_core_judge_map.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "01 核心协议契约：协议根必须「节号可寻址、机检映射同源、引用零悬空」。",
+      "path": "desktop/tests/test_core_protocol_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -7997,8 +8327,26 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/decision-layer.md 契约：决策层文档必须「三原语/适配器/候选/计数与真源一致」。",
+      "path": "desktop/tests/test_decision_layer_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "决策记录（ADR）正式与否定用例。",
       "path": "desktop/tests/test_decisions.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "decisions/INDEX 契约：生成区必须与实时重算逐字节一致，人读指引只能待在标记外。",
+      "path": "desktop/tests/test_decisions_index_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "decisions/README 契约：公开面政策说明必须「白名单 ⇄ 判据 ⇄ 事实」三面对齐。",
+      "path": "desktop/tests/test_decisions_readme_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8009,8 +8357,20 @@
       "rule": "R-verify"
     },
     {
+      "function": "DEEP_DIVE 理解层契约：心智模型必须「自足、可核、能自检」。",
+      "path": "desktop/tests/test_deep_dive_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "",
       "path": "desktop/tests/test_delete_evidence.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "protocol/demo_signers/README.md 契约：允许清单 / 锚状态 / 两条命令结论必须与实跑一致。",
+      "path": "desktop/tests/test_demo_signers_readme_doc_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8029,6 +8389,30 @@
     {
       "function": "dependency-audit 契约判据：四份固定集必须全审、fail-closed、审计日志可下载（2026-11-11）。",
       "path": "desktop/tests/test_dependency_audit_workflow_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "patterns/dependency-direction/PATTERN.md 契约：机制断言可核、数字不钉、基线只许收敛。",
+      "path": "desktop/tests/test_dependency_direction_pattern_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "site/DEPLOY-cloudflare-workers.md 契约：wrangler 关键键 / 站点工具 / 三条自检命令必须可核。",
+      "path": "desktop/tests/test_deploy_cloudflare_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/42_M5_设计自查清单契约：六问必须「口径不变 + 每问有判据映射 + 证据命令可跑」。",
+      "path": "desktop/tests/test_design_checklist_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "DIFFERENTIATION.md 契约：46 条核心的「声明 → 载体」对照必须与实现一致。",
+      "path": "desktop/tests/test_differentiation_doc_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8111,6 +8495,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/domain-packs.md 契约：域包文档必须「100 包/1200 细分/标准目录/绑定/空壳台账与真源一致」。",
+      "path": "desktop/tests/test_domain_packs_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "P5-08 判据：NativeAOT 产物必须**与 Python/规范逐字节等价**，且不依赖 .NET 运行时。",
       "path": "desktop/tests/test_dotnet_aot.py",
       "role": "verify",
@@ -8123,8 +8513,26 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/42_M1_P03 演练集契约：历史演练记录必须「快照状态 + 演练结果/机制现状 + 复现口径」。",
+      "path": "desktop/tests/test_drill_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "演练保真度（`core/drill_fidelity.py`）回归测试 —— 动态可执行面。",
       "path": "desktop/tests/test_drill_fidelity.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/driver.md 契约：指令档路由文档必须「工作流/指令档/工具绑定/判据语义与实现一致」。",
+      "path": "desktop/tests/test_driver_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/ccos/dual-core-invariants.md 契约：9 层与矩阵一致 + 判据/名单/门数活绑定。",
+      "path": "desktop/tests/test_dual_core_invariants_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8143,6 +8551,12 @@
     {
       "function": "core.effect_rows 回归：效应行识别 / 级别合并 / 规则层差分一致 / fail-closed。",
       "path": "desktop/tests/test_effect_rows.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/endpoint.md 契约：服务端点契约文档必须「端点计数/conventions/幂等例外/SSE 与契约实读一致」。",
+      "path": "desktop/tests/test_endpoint_doc_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8171,6 +8585,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "patterns/error-message-guidance/PATTERN.md 契约：R4 规则、check27 接线、不钉命中数。",
+      "path": "desktop/tests/test_error_message_guidance_pattern_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "",
       "path": "desktop/tests/test_eval_collapse.py",
       "role": "verify",
@@ -8195,6 +8615,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/ccos/evidence-bundle-v0.md 契约：判定顺序/矩阵/向量/判据数与实现一致。",
+      "path": "desktop/tests/test_evidence_bundle_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "证据面双实现 parity 收口：receipts / attest 两形态 + 仓外单文件复验。",
       "path": "desktop/tests/test_evidence_forms_parity.py",
       "role": "verify",
@@ -8213,8 +8639,20 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/ccos/evidence-vectors-v0.md 契约：28 条结构/分布/覆盖表与数据一致 + 围栏合法。",
+      "path": "desktop/tests/test_evidence_vectors_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "42 M1 + 44 扩展 —— 执行失范捕获器单测（多管线演练集 P01-P06/P90 + 变异自检/捕获率验收）。",
       "path": "desktop/tests/test_execution_drill.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "06 Agent 执行协议契约：运行时协议必须「节号可寻址、判据件在场、校验词同源」。",
+      "path": "desktop/tests/test_execution_protocol_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8237,6 +8675,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/EXPORT.md 契约：出口管制声明必须「署名声明与仓库密码学事实一致 + 机检面 + 复现口径」。",
+      "path": "desktop/tests/test_export_statement_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "导出层 exporter 单测（v2.0.0 T2：格式注册表 + CCV3 JSON/PNG 封装）。",
       "path": "desktop/tests/test_exporter.py",
       "role": "verify",
@@ -8245,6 +8689,12 @@
     {
       "function": "43 A3 —— 扩展策略 + nf diff 影响度三档单测。",
       "path": "desktop/tests/test_extension_impact.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "protocol/EXTENSION.md 契约：影响度三档 / 派生三问 / check30+check13 接线必须与实现一致。",
+      "path": "desktop/tests/test_extension_policy_doc_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8261,6 +8711,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "E1 样本说明契约：体积/sha256/结构判定必须与盘上一致。",
+      "path": "desktop/tests/test_external_validation_assets_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "极端渗透（八向）暴露问题的回归测试 —— 2026-09-28 波。",
       "path": "desktop/tests/test_extreme_hardening.py",
       "role": "verify",
@@ -8269,6 +8725,42 @@
     {
       "function": "",
       "path": "desktop/tests/test_face_coverage.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "patterns/fail-closed-verification/PATTERN.md 契约：示例必须与实测一致、check33 接线在场。",
+      "path": "desktop/tests/test_fail_closed_pattern_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/fde-sample/brief.md 契约：brief 的「诉求 → 可判定项」映射必须每条落点真实可复核。",
+      "path": "desktop/tests/test_fde_brief_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "交付物生成契约：五门口径一致 + 与 manifest sha 对得上。",
+      "path": "desktop/tests/test_fde_deliverable_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/fde-sample/run.md 契约：照做步骤必须「命令原文/期望输出/退出码与脚本实跑一致」。",
+      "path": "desktop/tests/test_fde_run_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/fde-sample/README.md 契约：五门数字/证据件/命令必须与证据实读一致。",
+      "path": "desktop/tests/test_fde_sample_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/fde-stack.md 契约：栈位契约必须「载体引用真实存在 + 五条达标线 + 互操作面清点一致」。",
+      "path": "desktop/tests/test_fde_stack_doc_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8293,6 +8785,12 @@
     {
       "function": "生成物新鲜度前置检查（scripts/freshness_check.py）判据。",
       "path": "desktop/tests/test_freshness_check.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/完整版样本_西幻生存流P03.md 契约：冻结证据件——字节不许变（它是保真度裁定的语料）。",
+      "path": "desktop/tests/test_full_sample_p03_doc_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8381,6 +8879,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "submissions 通用块契约：09（英文）/ 10（中文）的传输段逐字相同、字段块同义、JSON 可解析。",
+      "path": "desktop/tests/test_generic_blocks_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "Gitee polling failures must be categorized, visible, and fail closed.",
       "path": "desktop/tests/test_gitee_diagnostics.py",
       "role": "verify",
@@ -8395,6 +8899,24 @@
     {
       "function": "gitee-poll 契约判据：共享写锁、无令牌不假红、凭据保留显式、工件有限留存（2026-11-11）。",
       "path": "desktop/tests/test_gitee_poll_workflow_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "GLAMA.md 契约：上架教程必须「仓库侧证件可核 / 平台侧状态不冒充判据」。",
+      "path": "desktop/tests/test_glama_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "submissions/04-glama.md 契约：仓库侧证件可核、平台侧状态不冒充判据。",
+      "path": "desktop/tests/test_glama_submission_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "clients/go/README.md 契约：Go 侧第二实现文档必须「七调向量 55 / 7 子命令 / 前提写清」。",
+      "path": "desktop/tests/test_go_client_doc_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8437,6 +8959,24 @@
     {
       "function": "接力协议（SBAR）正式与否定用例。",
       "path": "desktop/tests/test_handover.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "handovers/HO-9000-示例-接力模板.md 契约：模板必须可机检、口径与协议件一致、公开面只留模板。",
+      "path": "desktop/tests/test_handover_template_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "handovers/README.md 契约：三个内部治理目录的公开面政策必须同构、白名单可机检。",
+      "path": "desktop/tests/test_handovers_readme_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "packaging/hf-space/README.md 契约：Space 说明必须「模式 / 限额 / 端口 / 前提 / doctor」自洽。",
+      "path": "desktop/tests/test_hf_space_readme_doc_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8531,8 +9071,20 @@
       "rule": "R-verify"
     },
     {
+      "function": "integrations/README.md 契约：接入面说明必须「行数 / 状态分布 / 词表使用 / 校验入口」自洽。",
+      "path": "desktop/tests/test_integrations_readme_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "core.interop 回归：分派 / 通知不应答 / 错误码 / 批量 / stdio 坏帧不杀会话。",
       "path": "desktop/tests/test_interop.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/interop.md 契约：互操作总览必须「12 种类/入仓 12 面/外部校验 14 行与实现一致」。",
+      "path": "desktop/tests/test_interop_doc_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8545,6 +9097,12 @@
     {
       "function": "互操作**外部权威校验工具**单测（离线可跑：只测声明面与失败口径，不联网）。",
       "path": "desktop/tests/test_interop_schema_tool.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/interop-thirdparty.md 契约：他证通道说明页必须「面谱分档/自跑≠他证/状态表对账一致」。",
+      "path": "desktop/tests/test_interop_thirdparty_doc_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8573,6 +9131,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/io_types.md 契约：I/O 类型面文档必须「9 值词表/覆盖率/判定原则与实现实读一致」。",
+      "path": "desktop/tests/test_io_types_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "IR 内容归一化层单测（v1.2.0 协议中转站 v2，2.0 E0-①）。",
       "path": "desktop/tests/test_ir.py",
       "role": "verify",
@@ -8587,6 +9151,12 @@
     {
       "function": "跨用例隔离的**静态**判据：不许把桩打在「模块导入时抓到的 core 模块」上。",
       "path": "desktop/tests/test_isolation_patterns.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/ccos/isomorphism-matrix.md 契约：矩阵说明档必须与矩阵数据件逐行一致 + 层数措辞正确。",
+      "path": "desktop/tests/test_isomorphism_doc_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8627,8 +9197,20 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/ccos/judge-families.md 契约：判据族谱必须「8 族齐 + 族证据真实存在 + 探针数字活绑定」。",
+      "path": "desktop/tests/test_judge_families_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "门禁变异探针判据：杀死率/误报率可算、两条判据各自有变异体、口径自洽。",
       "path": "desktop/tests/test_judge_mutation_probe.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/ccos/judge-design-questions.md 契约：11 问齐 + 比例棘轮活绑定 + 结果件新鲜。",
+      "path": "desktop/tests/test_judge_questions_doc_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8663,14 +9245,32 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/ccos/key-transparency-v0.md 契约：四子命令真实存在 + 形状/边界活绑定。",
+      "path": "desktop/tests/test_key_transparency_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "双源知识层（knowledge）正式与否定用例：声明 / 顺序 / 溯源 / 巡检。",
       "path": "desktop/tests/test_knowledge.py",
       "role": "verify",
       "rule": "R-verify"
     },
     {
+      "function": "docs/knowledge.md 契约：双源知识层文档必须「6 源分档/顺序全排列/巡检与台账实读一致」。",
+      "path": "desktop/tests/test_knowledge_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "v2.8.0 波C C1/C2 —— 知识签名 + 版本差异检测单测（41 规划，纯 unittest）。",
       "path": "desktop/tests/test_knowledge_sig.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/L3_FROZEN 契约：端壳退役记录必须「退役件不在树 + 保留件在场 + CI 清单现状 + 机检面」。",
+      "path": "desktop/tests/test_l3_frozen_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8683,6 +9283,12 @@
     {
       "function": "标注 IR v0（core/label_ir.py + nf label CLI）判据。",
       "path": "desktop/tests/test_label_ir.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/ccos/label-ir-v0.md 契约：承诺表/载体/边界自洽 + 数字活绑定 + 无重复小节。",
+      "path": "desktop/tests/test_label_ir_doc_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8711,6 +9317,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/layers.md 契约：抽象阶梯文档必须「四阶/五子级/入口 4/纵切 6/L1–L10 与真源一致」。",
+      "path": "desktop/tests/test_layers_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "`lazy_yaml` 的**出声**判据：缺 PyYAML 时不许静默换口径。",
       "path": "desktop/tests/test_lazy_yaml.py",
       "role": "verify",
@@ -8735,6 +9347,18 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/library.md 契约：图书馆机器面文档必须「条目数/分级/许可/词表与真源一致」。",
+      "path": "desktop/tests/test_library_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "library/INDEX 契约：两段生成区必须等于实时重算，人读区（怎么读/投稿须知/怎么验/调用）",
+      "path": "desktop/tests/test_library_index_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "library_ingest 脚本契约判据：标准库、真源通道、拒收闸门、原子写、推送韧性（2026-11-11）。",
       "path": "desktop/tests/test_library_ingest_script_contract.py",
       "role": "verify",
@@ -8743,6 +9367,24 @@
     {
       "function": "library-ingest 契约判据：入库机器人是「带写权限 + 公开输入」面，口径必须显式（2026-11-11）。",
       "path": "desktop/tests/test_library_ingest_workflow_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "library/NF-1 契约：馆藏条目必须「frontmatter 十字段合法 + 投影一致 + 回执新鲜 + 诚实缺口声明」。",
+      "path": "desktop/tests/test_library_nf1_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "library/NF-TECHDOC 契约：自包含装配样本必须「内嵌逐字一致 + 回执新鲜 + 投影一致 + 缺口头声明」。",
+      "path": "desktop/tests/test_library_techdoc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "library/NF-WORLDCAMPUS 契约：社区投稿短篇包必须「元数据齐全 + 自包含 + 许可如实 + 回执新鲜」。",
+      "path": "desktop/tests/test_library_worldcampus_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8783,8 +9425,26 @@
       "rule": "R-verify"
     },
     {
+      "function": "llms-full 完整单文件契约：一站读全的内容必须「同源、同步、可判」。",
+      "path": "desktop/tests/test_llms_full_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "llms-install 安装面契约：装好这件事必须「可判、同源、失败即停」。",
+      "path": "desktop/tests/test_llms_install_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "",
       "path": "desktop/tests/test_load_state.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/ccos/local-api-v0.md 契约：本地 HTTP 面规范必须「三端点/判定语义/安全边界与实现一致」。",
+      "path": "desktop/tests/test_local_api_doc_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8795,8 +9455,20 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/locales.md 契约：语言面声明必须「3 语/12 译件/6 指南/责任方与注册表一致」。",
+      "path": "desktop/tests/test_locales_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "LSP 服务器单测（分帧 / 能力 / 诊断定位 / 领域智能 / 编辑 / 退出语义 / 配置生成）。",
       "path": "desktop/tests/test_lsp.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/lsp.md 契约：LSP 接入文档必须「11 能力/16 方法/8 MiB/utf-16/77 例与实现一致」。",
+      "path": "desktop/tests/test_lsp_doc_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8819,6 +9491,42 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/44_M1 契约：8 集口径与夹具一致 + 测试参数化 8/8 + 保真面现状 + 复现口径。",
+      "path": "desktop/tests/test_m1_drill_coverage_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/42_M2 契约：回合状态头 v1 规范必须与 round_header.LAWS / 06 §11 双源一致 + 硬断言现状 6 条。",
+      "path": "desktop/tests/test_m2_round_header_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/42_M3 契约：规则族现状 R1–R8 + 载体在场 + 文案差异如实 + 复现口径。",
+      "path": "desktop/tests/test_m3_purity_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/42_M4 契约：历史普查必须「快照状态 + 清单规模现状 + 分类标准不变 + 复现口径」。",
+      "path": "desktop/tests/test_m4_census_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/42_M5_工程收口 契约：收口记录必须「快照状态 + 交付物现状 + bench 边界澄清 + 复现口径」。",
+      "path": "desktop/tests/test_m5_closure_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "机读块 retro-fit 契约：作用域/L0/字段映射/幂等必须与实读一致。",
+      "path": "desktop/tests/test_machine_contract_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "维护者契约判据：执行主体必须「具名、有职责、涉己回避、失能有预案」（2026-11-10）。",
       "path": "desktop/tests/test_maintainers_contract.py",
       "role": "verify",
@@ -8831,8 +9539,32 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/45_质量纵深收口总档契约：总档必须「结构/挂账口径不变 + 五维数字现状 + 版本口径 + 复现」。",
+      "path": "desktop/tests/test_master_closure_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "MCP server 定义导出单测（v2.1.0 A2：techdoc IR → MCP 资源型 server 定义）。",
       "path": "desktop/tests/test_mcp_adapter.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "packaging/mcp/assets/README.md 契约：图标真实像素 / 替换流程 / 来源声明边界必须写清。",
+      "path": "desktop/tests/test_mcp_assets_readme_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "packaging/mcp/DIRECTORIES.md 契约：仓库侧证件可核 / 平台侧状态不冒充判据。",
+      "path": "desktop/tests/test_mcp_directories_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/mcp.md 契约：MCP 接入文档必须「12 工具/1 prompt/版本口径与 mcp_runtime 一致」。",
+      "path": "desktop/tests/test_mcp_doc_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8879,6 +9611,18 @@
       "rule": "R-verify"
     },
     {
+      "function": "packaging/mcp/submissions/ 契约：10 份逐字可粘件必须同源（改动不同批跟进即矛盾）。",
+      "path": "desktop/tests/test_mcp_submissions_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "packaging/mcp/SUBMIT.md 契约：三处版本同值 / 自检期望可跑 / 平台侧不冒充判据。",
+      "path": "desktop/tests/test_mcp_submit_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "MCP 面的**信任边界标注**（外来内容 = 数据）——把 06 §12 的声明接上消费通道。",
       "path": "desktop/tests/test_mcp_trust_meta.py",
       "role": "verify",
@@ -8891,8 +9635,20 @@
       "rule": "R-verify"
     },
     {
+      "function": "submissions/03-mcp-so.md 契约：字段值与材料包同源；对外文案不钉运行时计数；平台侧不冒充判据。",
+      "path": "desktop/tests/test_mcpso_submission_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "Markdown 表格列数一致性（审计 W4：断链 2 / 表格列数不齐 11）。",
       "path": "desktop/tests/test_md_tables.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/meta/档案.md 契约：历史快照样例必须「来源/差异/非计划」三声明齐 + 正文仍可复现。",
+      "path": "desktop/tests/test_meta_archive_sample_doc_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8903,8 +9659,38 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/meta-cockpit/功能解析.md 契约：功能拆解必须「33 原子/10·5 节点/3·5 约束与资产一致」。",
+      "path": "desktop/tests/test_meta_cockpit_analysis_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "驾驶舱说明契约：33 原子/10 节点/5 节点/六类义务必须与资产一致。",
+      "path": "desktop/tests/test_meta_cockpit_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/meta/ROADMAP.md 契约：路标文档必须「版本三处一致 / 基线不手写 / check39 在门禁」。",
+      "path": "desktop/tests/test_meta_roadmap_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "方法包判据：领域专业性必须是**可校验的数据**，不是文档里的形容词。",
       "path": "desktop/tests/test_method_pack.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/ccos/method-packs-v0.md 契约：11 域/65 动作/31 类目 + judges 全覆盖 + CLI 用法活绑定。",
+      "path": "desktop/tests/test_method_packs_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "迁移指南契约：4 签名文档 / 15 历史面 / 3 影响度必须与实现一致。",
+      "path": "desktop/tests/test_migration_guide_doc_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8921,8 +9707,98 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/modeling.md 契约：建模三件文档必须「12 scheme/37 规范/54 契约与 nf model 实读一致」。",
+      "path": "desktop/tests/test_modeling_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "submissions/06-modelscope.md 契约：中文表单字段同源 / 仅 stdio / 平台侧不冒充判据。",
+      "path": "desktop/tests/test_modelscope_submission_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "40 总纲 v2.8 波B S5 —— 模块生命周期单测（status 位 + deprecate/restore + 引用门禁）。",
       "path": "desktop/tests/test_module_lifecycle.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "M00 数据槽总线模块契约：纯内部基座豁免 + 冻结槽位面必须与 world_slots.json 同源。",
+      "path": "desktop/tests/test_module_m00_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "M06 流程状态机模块契约：机读块 ⇄ 引用块 ⇄ 注册表 ⇄ 事件注册表 必须同源。",
+      "path": "desktop/tests/test_module_m06_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "M08 环境状态模块契约：模块文档必须「机读块 ⇄ 引用块 ⇄ 注册表 ⇄ 事件注册表」同源。",
+      "path": "desktop/tests/test_module_m08_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "通用:M10 节拍推进模块契约：双事件载荷并集 == outputs，且 tick_day 发布面与订阅面对账。",
+      "path": "desktop/tests/test_module_m10_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "M12 模板检索库模块契约：零事件模块必须以 interfaces 补全联动面，且四源同源。",
+      "path": "desktop/tests/test_module_m12_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "M13 实体交互模块契约：outputs == payload == event_registry，且四源同源。",
+      "path": "desktop/tests/test_module_m13_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "M20 知识条目库模块契约：零事件 + query 接口 + 双挂载必须四源同源。",
+      "path": "desktop/tests/test_module_m20_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "M22 事件编排模块契约：outputs == payload == narrative_event 全集，且订阅面全部在册。",
+      "path": "desktop/tests/test_module_m22_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "M23 可见性边界模块契约：零事件 + cognition.filter 接口面，且依赖面与 02 §4 对账。",
+      "path": "desktop/tests/test_module_m23_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "M24 规则组合模块契约：零事件 + resolve 接口面，依赖面与 02 §4 对账，且不虚构输出 token。",
+      "path": "desktop/tests/test_module_m24_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "M50 调度器模块契约：全局调度器（layer=调度器/mounts 空）+ world_model 槽面必须全在册。",
+      "path": "desktop/tests/test_module_m50_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "M80 输出质检门模块契约：唯一输出闸 + 声明式 gate_action + 零事件固定节点豁免理由。",
+      "path": "desktop/tests/test_module_m80_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "M90 结构装配模块契约：机读块 ⇄ §2 Module 声明 ⇄ registry/02 ⇄ P90 管线 四源同源。",
+      "path": "desktop/tests/test_module_m90_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8933,8 +9809,20 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/module_signature.md 契约：边界冻结文档必须「7 字段/248 全签/漂移 FAIL」与实现一致。",
+      "path": "desktop/tests/test_module_signature_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "MVU 变量模板导出适配器单测（fixture 自包含，不依赖仓库外部状态）。",
       "path": "desktop/tests/test_mvu_adapter.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "07 出厂与预设导航契约：导航面必须「节号可寻址、清单同源、验收项有机检映射」。",
+      "path": "desktop/tests/test_navigation_doc_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8987,6 +9875,18 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/nfal.md 契约：NFA-L 文档必须「5 子命令/6 函数/6 码/110 条迁移」与实现一致。",
+      "path": "desktop/tests/test_nfal_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "packaging/nfal/README.md 契约：镜像形态 / 子命令 / 本机限制必须与 Dockerfile 与 CI 一致。",
+      "path": "desktop/tests/test_nfal_packaging_readme_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "core.nfal_rules 回归：定点推导 / guard / fuel 溢出 fail-closed / 确定性。",
       "path": "desktop/tests/test_nfal_rules.py",
       "role": "verify",
@@ -9011,6 +9911,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "packaging/npm/README.md 契约：体积口径由 stager 生成、入口/供应链/引擎事实与 package.json 一致。",
+      "path": "desktop/tests/test_npm_readme_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "",
       "path": "desktop/tests/test_numeric_grounding.py",
       "role": "verify",
@@ -9019,6 +9925,12 @@
     {
       "function": "官方核心件清单的一致性（审计 Z1 F6：4 处硬编码、1 处写成 12）。",
       "path": "desktop/tests/test_official_core.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/ccos/one-shot-audits.md 契约：文档表必须与孤儿棘轮冻结集合逐项一致（且脚本在场）。",
+      "path": "desktop/tests/test_one_shot_audits_doc_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -9053,8 +9965,20 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/output-forms.md 契约：产出形态文档必须「116/12 类别/状态分布/机验率」与基线一致。",
+      "path": "desktop/tests/test_output_forms_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "产出面清单的**落点逃逸**门禁（外来投稿 ⇄ 仓库外写入）。",
       "path": "desktop/tests/test_output_path_escape.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/42_M1_P06 契约：快照状态 + 覆盖真源接续 + 判据覆盖面如实 + 复现口径。",
+      "path": "desktop/tests/test_p06_drill_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -9089,8 +10013,20 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/ccos/paper-adoption-v0.md 契约：论文台账文档必须「34 篇/四档计数/落点存在与实现一致」。",
+      "path": "desktop/tests/test_paper_adoption_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "论文台账判据（第 2026-11-10 批）：处置完整、落点可核、计数自洽。",
       "path": "desktop/tests/test_paper_ledger.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/paste_card.md 契约：冻结归档卡必须「8 段/编号域/7 项/分片规则 + 防篡改锚」不变。",
+      "path": "desktop/tests/test_paste_card_doc_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -9119,6 +10055,24 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/patterns.md 契约：实践包文档必须「7 条全 active/6 必填键/2 值词表」与注册表一致。",
+      "path": "desktop/tests/test_patterns_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "patterns/INDEX.md 契约：整页生成物必须与 `nf patterns reindex` 幂等、计数与真源一致。",
+      "path": "desktop/tests/test_patterns_index_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "patterns/README.md 契约：品类说明的「包数 / 必填键 / 词表 / 投影纪律」必须与实现一致。",
+      "path": "desktop/tests/test_patterns_readme_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "45 #5 · payload-consumer 雏形单测（确定性 + 消费映射）。",
       "path": "desktop/tests/test_payload_consumer.py",
       "role": "verify",
@@ -9133,6 +10087,12 @@
     {
       "function": "载荷收割的**形态覆盖**门禁：正文写了证据就必须收得到（缺口引擎的 `unharvestable-payload` 恒空）。",
       "path": "desktop/tests/test_payload_harvest_forms.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/45_M3 契约：已确认事实 + registry 现状活绑定 + 开放项如实 + 复现口径。",
+      "path": "desktop/tests/test_payload_proposal_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -9167,6 +10127,24 @@
       "rule": "R-verify"
     },
     {
+      "function": "P00 管线骨架契约：元管线必须「声明可解析、九槽稳定、派生实例在场、机检可指」。",
+      "path": "desktop/tests/test_pipeline_p00_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "P01 标准管线契约：官方默认装配实例必须「声明可解析、九层挂载三处同源、P00 骨架回指」。",
+      "path": "desktop/tests/test_pipeline_p01_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "P90 结构装配管线契约：技术文档实例必须「techdoc 结构可解析、九层挂载与 02 §7.1 同源」。",
+      "path": "desktop/tests/test_pipeline_p90_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "40 总纲 v2.8 波B S4 —— nf pipeline new 派生脚手架单测（纯 unittest，L2 core 零依赖）。",
       "path": "desktop/tests/test_pipeline_scaffold.py",
       "role": "verify",
@@ -9175,6 +10153,12 @@
     {
       "function": "管线抽象执行（dry-run → GraphSpec）单测。",
       "path": "desktop/tests/test_pipelinerun.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/pipelinerun.md 契约：管线抽象执行文档必须「114 管线/282 模块/hard 0/advisory 1142」一致。",
+      "path": "desktop/tests/test_pipelinerun_doc_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -9233,6 +10217,18 @@
       "rule": "R-verify"
     },
     {
+      "function": "postmortems/PO-9000-示例-复盘模板.md 契约：模板可机检、四段/行动项口径与 check 一致。",
+      "path": "desktop/tests/test_postmortem_template_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "postmortems/README.md 契约：三个内部治理目录的公开面政策必须同构、白名单可机检。",
+      "path": "desktop/tests/test_postmortems_readme_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "PR 模板契约判据：模板必须让评审**独立复跑**（2026-11-10）。",
       "path": "desktop/tests/test_pr_template_contract.py",
       "role": "verify",
@@ -9241,6 +10237,12 @@
     {
       "function": "提交前自查（fast lane）判据：名单不得腐烂、红要能红、不新增检查。",
       "path": "desktop/tests/test_precheck.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "patterns/predicate-single-source/PATTERN.md 契约：单一谓词仍被唯一实现、消费方走导入、不钉条数。",
+      "path": "desktop/tests/test_predicate_single_source_pattern_doc_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -9275,6 +10277,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "protocol/README.md 契约：IDL 层说明的「schema 件数 / 白名单 / 扫描面 / check 接线」与实现一致。",
+      "path": "desktop/tests/test_protocol_readme_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "协议定义向导单测（v2.0.x-E2：ProtocolForm → protocol.yaml v2 生成 + self_check）。",
       "path": "desktop/tests/test_protocol_wizard.py",
       "role": "verify",
@@ -9283,6 +10291,12 @@
     {
       "function": "公开仓发布边界：决策 / 交接 / 复盘三类内部材料**只能留模板**。",
       "path": "desktop/tests/test_publish_boundary.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "submissions/05-pulsemcp.md 契约：字段同源 / 邮箱纪律 / Cloudflare 提示 / 平台侧不冒充判据。",
+      "path": "desktop/tests/test_pulsemcp_submission_doc_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -9329,6 +10343,18 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/quickstart.md 契约：五分钟入口必须「6 步 ↔ 脚本 6 步 / 300s / check39 挂载 / Python 3.11」。",
+      "path": "desktop/tests/test_quickstart_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "skills/ninfenz/references/quickstart.md 契约：安装/自检/不克隆路径必须「可执行 + 真件在场」。",
+      "path": "desktop/tests/test_quickstart_reference_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "内容分级门单测（挂账收口）：词表真源 = 声明件；缺字段/越词表即 FAIL。",
       "path": "desktop/tests/test_rating_gate.py",
       "role": "verify",
@@ -9341,8 +10367,38 @@
       "rule": "R-verify"
     },
     {
+      "function": "README 入口契约：canonical 人读入口必须「结构稳、事实同源、照做能跑通」。",
+      "path": "desktop/tests/test_readme_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "README.en 镜像契约：English 入口必须与 canonical 面「同结构、同事实、同可执行性」。",
+      "path": "desktop/tests/test_readme_en_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "README.ja 镜像契约：日本語入口必须与 canonical 面「同结构、同事实、同可执行性」。",
+      "path": "desktop/tests/test_readme_ja_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/receipts.md 契约：回执文档必须「3 条馆藏 / 66 件协议 / 66 节链 / 算法三式」与实读一致。",
+      "path": "desktop/tests/test_receipts_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "正则失控回溯（ReDoS）回归 —— 2026-10-10 全仓审计 Y3。",
       "path": "desktop/tests/test_redos_patterns.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "02 联动注册表契约：注册真相源必须「文档 ↔ 机读投影同源、引用可解析、格式可渲染」。",
+      "path": "desktop/tests/test_registry_doc_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -9371,8 +10427,26 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/42_M5_Release-checklist 契约：路径现行 + 自动化入口 + 退役项如实 + 复现口径。",
+      "path": "desktop/tests/test_release_checklist_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "发布结论复跑器（scripts/release_conclusion.py）单测——纯函数判据 + dry-run 集成。",
       "path": "desktop/tests/test_release_conclusion.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/ccos/release-conclusion.md 契约：发布结论文档必须「五步/快照语义/预算与分工数字活绑定」。",
+      "path": "desktop/tests/test_release_conclusion_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/release.md 契约：发布策略声明件必须「11 步计划/3 步冻结链/3 版本面/4 工件」与策略件一致。",
+      "path": "desktop/tests/test_release_doc_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -9425,6 +10499,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/需求收敛模板.md 契约：收敛模板必须「8 字段 / 3+2 子命令 / 0 份工作单」与实读一致。",
+      "path": "desktop/tests/test_requirement_template_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "requirements-ci 契约判据：哈希完备、直钉镜像、可复现生成命令、ASCII（2026-11-11）。",
       "path": "desktop/tests/test_requirements_ci_contract.py",
       "role": "verify",
@@ -9433,6 +10513,12 @@
     {
       "function": "requirements-pins 契约判据：hash 完备、生成可复现、跨文件版本一致（2026-11-11）。",
       "path": "desktop/tests/test_requirements_pins_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/ccos/research-methods-v0.md 契约：研究层文档必须「8 方法/7 切片/depth 映射与实现一致」。",
+      "path": "desktop/tests/test_research_methods_doc_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -9467,6 +10553,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/ccos/revocation-feed-v0.md 契约：吊销 feed 文档必须「五子命令/链深/判据数与实现一致」。",
+      "path": "desktop/tests/test_revocation_feed_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "吊销分发件 v0（core/revocations.py + nf evidence revocations CLI）判据。",
       "path": "desktop/tests/test_revocations.py",
       "role": "verify",
@@ -9479,6 +10571,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/rfc.md 契约：RFC 头文档必须「4 件在册 / 全 Active / 3+1 类别 / 无链 / 4 值词表」与实现一致。",
+      "path": "desktop/tests/test_rfc_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "职能坐标（`core/role_model` · ADR-0006）回归 —— 三条可判定性 + 变异自证。",
       "path": "desktop/tests/test_role_model.py",
       "role": "verify",
@@ -9487,6 +10585,12 @@
     {
       "function": "45 A2 · 回合级 drill 单测（引用/推进/编造/跳号）。",
       "path": "desktop/tests/test_round_drill.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/45_M2 契约：回合级 drill 规范必须「判据不变 + 样本集/测试现状 + 轨迹回读口径 + 复现命令」。",
+      "path": "desktop/tests/test_round_drill_doc_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -9623,6 +10727,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "site/DEPLOY-search-submit.md 契约：通道清单 / IndexNow 配置 / 判据项数必须可核。",
+      "path": "desktop/tests/test_search_submit_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "安全策略契约判据：报告通道必须「分类清楚、模板可给、时限与披露可判」（2026-11-10）。",
       "path": "desktop/tests/test_security_contract.py",
       "role": "verify",
@@ -9637,6 +10747,12 @@
     {
       "function": "自包含装配样本重嵌工具单测（编码漂移检测 + 重嵌幂等 + 源逐字相等）。",
       "path": "desktop/tests/test_selfcontained_rebuild.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/42_M1_协议可执行性自测规范 契约：口径不变 + 规则集 6 条 + 覆盖/单测现状 + 复现口径。",
+      "path": "desktop/tests/test_selftest_spec_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -9695,6 +10811,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "submissions 短表单族契约：07/08 的字段正文必须逐字一致，且各自有自检段。",
+      "path": "desktop/tests/test_short_form_submission_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "静默跳过必须**成文理由**（`try/except: pass|continue` 逐站点）。",
       "path": "desktop/tests/test_silent_skip_reasons.py",
       "role": "verify",
@@ -9707,8 +10829,26 @@
       "rule": "R-verify"
     },
     {
+      "function": "patterns/single-source-truth/PATTERN.md 契约：五个投影件都在、标记与重算判据真实成立。",
+      "path": "desktop/tests/test_single_source_truth_pattern_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "site/assets/README.md 契约：素材来源/许可/字节/尺寸必须与实盘一致。",
+      "path": "desktop/tests/test_site_assets_readme_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "站点面（对外文档门户）常驻判据。",
       "path": "desktop/tests/test_site_face.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "site/README.md 契约：站点总览的「页数 / 机器面 / 工具 / 判据项数 / npm 口径」必须可核。",
+      "path": "desktop/tests/test_site_readme_doc_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -9725,8 +10865,32 @@
       "rule": "R-verify"
     },
     {
+      "function": "skills/ninfenz/SKILL.md 契约：外部 agent 装载面必须「命令面真实 + 契约数不漂移 + 红线在场」。",
+      "path": "desktop/tests/test_skill_md_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "ST 清单契约：29 规则 / M6 S17 R6 / W1=M / 自动面 1 / 待定 3 必须与真源一致。",
+      "path": "desktop/tests/test_st_quality_checklist_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "ST 制卡校验器原型（A-S3）单测：**自造 fixture**（非真实卡，仅验证判据）。",
       "path": "desktop/tests/test_st_validator.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "标准主索引契约：370 条逐条 / 每行七字段 / 口径段齐 / --check 新鲜。",
+      "path": "desktop/tests/test_standards_index_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/standards/layer-data.md 契约：层切片页必须「148 条 / 切片口径 / 五层同构 / --check 新鲜」。",
+      "path": "desktop/tests/test_standards_layer_doc_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -9767,6 +10931,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "STYLE_DNA 资产契约：profile 配置槽必须「文件头 ⇄ 台账 ⇄ 键词表 ⇄ schema 速览」四源一致。",
+      "path": "desktop/tests/test_style_dna_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "风格棘轮（Z2）回归测试。",
       "path": "desktop/tests/test_style_ratchet.py",
       "role": "verify",
@@ -9791,8 +10961,32 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/ccos/supply-chain-v0.md 契约：供应链对象文档必须「三摘要/材料清单/验证器名单与实现一致」。",
+      "path": "desktop/tests/test_supply_chain_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "SUPPORT 契约判据：支持入口不得与表单 / 入口配置 / 声明件分叉（2026-11-10）。",
       "path": "desktop/tests/test_support_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "TECH_RULES 资产契约：规范校验规则必须「schema ⇄ 条目 ⇄ 键清单 ⇄ 台账」四源一致。",
+      "path": "desktop/tests/test_tech_rules_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "TECH_TEMPLATES 资产契约：章节骨架模板必须「schema ⇄ 键清单 ⇄ 条目 ⇄ 台账」四源一致。",
+      "path": "desktop/tests/test_tech_templates_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/45_执行遥测规范契约：格式文档必须与 trace 写入点/映射载体/E3 待办一致 + 复现口径。",
+      "path": "desktop/tests/test_telemetry_doc_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -9809,14 +11003,44 @@
       "rule": "R-verify"
     },
     {
+      "function": "终端文档契约：77 命令 / 8 族 / 203 索引 / 9 区 / 13 表单 / 139 例必须与实读一致。",
+      "path": "desktop/tests/test_terminal_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "编码卫生门禁单测（check33 新面：RFC 3629 / RFC 8259 §4 / UAX #15 / UTS #39）。",
       "path": "desktop/tests/test_text_hygiene.py",
       "role": "verify",
       "rule": "R-verify"
     },
     {
+      "function": "docs/text-hygiene.md 契约：文本卫生文档必须「5 条规则 / 4399 文本 / 1240 JSON / 269070 键」自洽。",
+      "path": "desktop/tests/test_text_hygiene_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "第三方声明契约判据：notices 须与锁文件双向一致、许可可机读、生成器 fail-closed（2026-11-10）。",
       "path": "desktop/tests/test_third_party_notices_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "THIRD-PARTY-NOTICES.md 可复现性：入库件必须**逐字节等于生成器输出**（在线时才判）。",
+      "path": "desktop/tests/test_third_party_notices_reproducible.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/ccos/threat-model.md 契约：A1–A9/G1–G6 齐 + 载体面与 G4 自洽 + 不承诺不矛盾。",
+      "path": "desktop/tests/test_threat_model_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/ccos/time-token-v0.md 契约：TSA 时间戳文档必须「两子命令/接入旗标/判定/边界与实现一致」。",
+      "path": "desktop/tests/test_time_token_doc_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -9845,6 +11069,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "Trust Fabric 裁决登记契约（WP-04）：六条裁决与冻结工件互相绑定。",
+      "path": "desktop/tests/test_trust_adr_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "信任锚判据：根 → 委派链 → 吊销 feed 的公钥归属。",
       "path": "desktop/tests/test_trust_anchor.py",
       "role": "verify",
@@ -9857,6 +11087,54 @@
       "rule": "R-verify"
     },
     {
+      "function": "trust.bundle 判据：Merkle 族向量逐条 + 单 claim 验证（O(log n) / 只读一条）+ 篡改矩阵。",
+      "path": "desktop/tests/test_trust_bundle.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "trust.canonical 判据：与向量集 canonical/domain 族逐条对齐，且与既有签名口径逐字节一致。",
+      "path": "desktop/tests/test_trust_canonical.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "trust.entity 判据：向量 entity 族逐条对齐 + 结构/准入 fail-closed + 变异自证。",
+      "path": "desktop/tests/test_trust_entity.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "trust.process 判据：process 向量族逐条 + prev 链/seq/创世约定 + 删改重排反例。",
+      "path": "desktop/tests/test_trust_process.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "Trust Fabric schema 门禁（WP-01）：7 件 IDL、正/反样例与变异自证。",
+      "path": "desktop/tests/test_trust_schemas.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/trust/THREAT_MODEL.md 契约：STRIDE/删除矩阵/边界/红队/风险全绑定。",
+      "path": "desktop/tests/test_trust_threat_model_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "Trust Fabric 测试向量集判据（WP-03）：提交件 == 重算，且期望值可被独立复算。",
+      "path": "desktop/tests/test_trust_vectors.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "tui/README.md 契约：TUI 说明的「动作数 / 区数 / 闸门三表 / 自检 6 条 / 退出码」与实跑一致。",
+      "path": "desktop/tests/test_tui_readme_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "两轴同族判据：**LSP 面与 MCP 面必须对同一批 JSON-RPC 语义给同一档处理**。",
       "path": "desktop/tests/test_two_faces_jsonrpc.py",
       "role": "verify",
@@ -9865,6 +11143,12 @@
     {
       "function": "",
       "path": "desktop/tests/test_unknown_policy.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "05_资产库/用户自定义 README 契约：登记面必须「键清单 ⇄ schema 速览 ⇄ 资产文件 ⇄ 台账」四源一致。",
+      "path": "desktop/tests/test_user_assets_readme_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -9883,6 +11167,18 @@
     {
       "function": "验证卡册一致性门禁（`docs/verification-cards.md` ↔ `verify.sh`）。",
       "path": "desktop/tests/test_verification_cards.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/verification-cards.md 契约：卡册散文不得钉运行时计数，生成区必须与 verify.sh 一致。",
+      "path": "desktop/tests/test_verification_cards_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "patterns/verifier-must-run/PATTERN.md 契约：接线表/下限/四源面清单必须与实现一致。",
+      "path": "desktop/tests/test_verifier_must_run_pattern_doc_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -9941,6 +11237,30 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/meta/VERSION-MATRIX.md 契约：版本矩阵必须「行数/状态口径/双源/基线不手写」自洽。",
+      "path": "desktop/tests/test_version_matrix_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/41_波C_W2_C3_C4 契约：快照状态 + 三处修复现状 + 扫描面活绑定 + 复现口径。",
+      "path": "desktop/tests/test_w2_c3c4_record_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/41_波C_W3 契约：历史实测记录必须「快照状态 + C8/C9 接续指引 + 交付件在场 + 复现口径」。",
+      "path": "desktop/tests/test_w3_record_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "docs/41_波C_W5 契约：历史 lint/日志记录必须「快照状态 + D4 接线现状 + D3/D4 分工 + 复现口径」。",
+      "path": "desktop/tests/test_w5_record_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "目录监听 + 守护响应缓存单测（毫秒级执行层的「**不重算**」判据）。",
       "path": "desktop/tests/test_watch.py",
       "role": "verify",
@@ -9989,8 +11309,20 @@
       "rule": "R-verify"
     },
     {
+      "function": "patterns/worktree-vs-index/PATTERN.md 契约：证据可证、复现命令可跑、门禁口径与判据一致。",
+      "path": "desktop/tests/test_worktree_vs_index_pattern_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "world_model 契约扫描器单测。",
       "path": "desktop/tests/test_world_model.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "protocol/WORLD_MODEL.md 契约：schema 形状 / 硬门语义 / 运行器 API 必须与实现一致。",
+      "path": "desktop/tests/test_world_model_doc_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -12948,16 +14280,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "3c7a7d3e7d50137e63c8b7972ea63dfda9e7254b9b03a3385fc9cbc09fa6f697",
+  "root_digest": "dcdc343c902d96233eec6c73f8438a47a6e220979acbaf342146bbd242a31e02",
   "rule_counts": {
-    "R-app": 1466,
-    "R-catch": 296,
+    "R-app": 1467,
+    "R-catch": 309,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 143,
+    "R-projection": 146,
     "R-support": 124,
-    "R-verify": 968,
+    "R-verify": 1190,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

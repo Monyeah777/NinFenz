@@ -1,5 +1,5 @@
 # NinFenz MCP 接続（`nf serve` · 40 総綱 v2.7 波A S1-E3 / X2）
-> 最后更新：2026-10-18 (last updated)
+> 最終更新：2026-11-13
 
 > **状態**：公開化文書は基礎層 v2.7 とともに着地済み。**E3 プロトコル級ロード実測は 2026-09-08 に通過**（stdio JSON-RPC フレーム列の直測で五方法すべて緑、文末の記録を参照。P06 パイプラインの缺口二つ——閉じ ``` の欠落 / techdoc 宣言の欠落——を修復）。41 波C C7（2026-09-08）で読み取り専用 tools/prompts を開放（本機 stdio スモーク通過、docs/41_波C_C7_实测记录.md を参照）。**宿主型クライアント（Claude Desktop などの GUI ロード）は依然ユーザ側での追記を推奨**——README の MCP 宣言は現状維持（S13 ゲートは docs_external-validation-v2.7.md の規則に従い開放）、追記後に「正式化」を補う。
 
@@ -90,13 +90,35 @@ MCP stdio をサポートする任意のクライアントで、`nf.py serve` �
 | `resources/list` | ✅ | スナップショット登録資源の純メタデータ（text フィールドなし） |
 | `resources/templates/list` | ✅ | RFC 6570 レベル1サブセットの資源テンプレート（library / pattern / module / pipeline / asset の5本）、実資源 uri の全被覆は check33 が断言 |
 | `resources/read` | ✅ | 許可リスト uri → `contents[].text`；未知 uri → `-32602` |
-| `tools/list` / `tools/call`（読み取り専用 · 検索面） | ✅ | 41 波C C7：library_search / registry_search / pipeline_list / spec_list（inputSchema は実在、すべて読み取り専用） |
-| `tools/list` / `tools/call`（読み取り専用 · コンテンツチャネル） | ✅ | 44：module_read / pipeline_read / asset_read——モジュール/パイプライン/資産の本文実質内容を返す（メタデータだけではない） |
+| `tools/list` / `tools/call`（読み取り専用 · 検索面、**7 個**） | ✅ | `pipeline_list` / `spec_list` / `registry_search` / `library_search` / `pattern_list` / `asset_list` / `knowledge_order_read`（後半 3 個は 2026-10 以降に追加、すべて読み取り専用） |
+| `tools/list` / `tools/call`（読み取り専用 · コンテンツチャネル、**5 個**） | ✅ | `library_read` / `pattern_read` / `module_read` / `pipeline_read` / `asset_read`——本文実質内容を返す（メタデータだけではない） |
 | `tools/list` のツール注釈 | ✅ | 12 ツールすべてが `readOnlyHint` / `destructiveHint: false` / `idempotentHint` / `openWorldHint: false` を宣言（2026-10-18 以降）——「読み取り専用」は散文だけでなく、MCP クライアントが読み取り専用呼び出しを**自動許可**できます |
 | `prompts/list` / `prompts/get` | ✅ | 41 波C C7：assemble_guide ロードガイドテンプレート（読み取り専用） |
 | 書き込み経路ツール（未実装） | ❌ | 未知ツール → `-32602`；未知メソッド → `-32601`（読み取り専用安全層が構造的に書き込みを拒否） |
 
 標準エラーコード：`-32700` 解析エラー / `-32600` 不正リクエスト / `-32601` メソッド不存在 / `-32602` パラメータ不正 / `-32603` 内部エラー；版交渉エラー `-32022`（`data.supported` / `data.requested`）。
+
+## 現状対照（2026-11-13 · `mcp_runtime` からの実読）
+
+| 面 | 現値 | 再確認方法 |
+|---|---|---|
+| 読み取り専用ツール | **12 個**（検索面 7 + コンテンツ 5） | `mcp_runtime.TOOL_DEFS` |
+| ロードガイド prompt | **1 個**（`assemble_guide`） | `PROMPT_DEFS` |
+| プロトコル版 | **dual-era**：modern `2026-07-28` + legacy `2025-11-25` | フレーム実測 / `server/discover` |
+| 入站上限 | **8 MiB / メッセージ**（超過 → `-32600`、行末まで破棄） | フレーム規律の判据 |
+| 読み取り許可リスト | `resources/read` は登録 uri のみ、未知 → `-32602` | スモーク + check33 |
+| 書き込み面 | **未実装**（未知ツール `-32602` / 未知メソッド `-32601`） | 能力表の最終行 |
+
+> 索引のみ。ツール名は `TOOL_DEFS` が唯一の真源。
+
+## 再現と引用の口径
+
+```bash
+python scripts/nf.py serve --help    # 入口と引数（スナップショット / リアルタイム倉庫面 / --http）
+python -m pytest desktop/tests/test_mcp_runtime.py -q   # プロトコルフレーム/ツール面/エラーコード
+```
+
+- 引用時の口径：「読み取り専用 + 許可リスト + dual-era」が長期口径。ツール名は `TOOL_DEFS` を唯一の真源とする。
 
 ## E3 実測記録（2026-09-08 · プロトコル級ロード実測通過）
 

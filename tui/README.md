@@ -1,11 +1,14 @@
 # NF 终端 TUI（nf-tui）
 
-> 最后更新：2026-10-03
+> 最后更新：2026-11-14（复核）
 
 > 全屏人机入口，配套（不是替代）`nf shell` 的逐行交互面。命令真源仍是 `scripts/nf.py`
 > 的 argparse 面——TUI 只做「菜单 / 参数 / 闸门 / 渲染」，不复制任何业务逻辑，也**不留
 > 手抄表**：命令白名单、写盘闸门、能力区与动作目录全部来自生成件 `tui/_surface.py`
 > （`desktop/src/core/terminal.py` 策展表的投影）。
+>
+> **复核（2026-11-14）**：九能力区、四条安全底线、退出码与打包方式**复核不变**；
+> 本轮补「§现状对照」「§复现与引用口径」，并把动作/命令区/表单等数字明确为**`--selftest` 与 `--list-actions` 的实读值**（投影会随 CLI 演进，不当作承诺）。
 
 ## 是什么
 
@@ -110,3 +113,30 @@ CLI 调用改用 PATH 上的 `python`；找不到仓库时 `--demo` / `--selftes
   **不确认就能执行**——单源化顺带堵住这条。
 - **不是 `nf shell` 的替代**：要可重定向、可 diff、可进 CI 的形态，用 `nf shell`（见 `docs/terminal.md`）。
 - **只在仓库内读写**：需要写仓外路径的动作请在普通终端用 `nf` 直跑。
+
+
+## 现状对照（2026-11-14 · 以 `--selftest` / `--list-actions` 实跑为准）
+
+| 面 | 当前口径 | 复核方式 |
+|---|---|---|
+| 动作目录 | **34** 个动作 · **9** 个能力区 · 命令区 **77** 条 | `--list-actions --json` |
+| 写盘表单 | **13** 张（真源 `terminal.FORMS`） | 同上前提 + `--selftest` |
+| 闸门三表 | **14** 旗标 / **24** 动词 / **4** 配对；长驻 **5** 条（真源 4 + 本视图收紧 1） | `--selftest` 第一行 |
+| 投影同源 | 投影 sha256 与真源一致（`--selftest` 当场跑 `nf shell --surface --json` 比摘要） | `--selftest` 第二行 |
+| 自检项 | **6** 条全绿（闸门口径 / 投影同源 / 密钥不硬编码 / 渲染确定性 / 交互语义 / CLI 面漂移） | `python tui/nf.py --selftest`（退出码即结论） |
+| 退出码 | **6** 类：0/1/2/3/4/130 | `--list-actions --json` 的 `exit_codes` |
+| 渲染 | `--demo` 一帧 **30** 行定宽、无 ANSI、同状态两遍逐字一致 | `--selftest` 第四行 |
+
+**不钉的东西**：命令区条数与动作数是**投影**的结果，随 CLI 面演进——本文只写「以 `--selftest` / `--list-actions` 实读为准」，把 34/9/77 当**当次实读**而不是承诺。
+
+## 复现与引用口径
+
+```bash
+python tui/nf.py --selftest            # 6 条安全判据（退出码即结论）
+python tui/nf.py --list-actions --json # 动作目录 + exit_codes + surfaces + 投影摘要
+python tui/nf.py --demo                # 一帧确定性演示（无 TTY 也能渲染）
+python scripts/nf.py shell --surface-write   # 真源策展表 → tui/_surface.py 投影（改真源后必须跑）
+```
+
+- 引用本页时：「TUI 不是第二套命令面」是长期口径；`_surface.py` 是**生成件**，改它无效，改 `desktop/src/core/terminal.py` 后重生成。
+- 自检的退出码就是结论：`--selftest` 非 0 即存在安全底线缺口，别当成「环境问题」。

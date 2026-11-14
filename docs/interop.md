@@ -1,6 +1,10 @@
 # 互操作导出（interop）
 > ⛔ 操作指令：阅读即执行——本文含可直接执行的命令与判定，勿当资料阅读。
-> 最后更新：2026-09-21
+> 最后更新：2026-11-13
+> **复核（2026-11-13）**：12 种导出 / 六条判据 / 分层口径**复核不变**；补两处**可核锚**：
+> ① `--kind` 可选值已由 `interop_export.KINDS` 派生（**12 种**，与入仓面 12 件一一对应）；
+> ② 外部权威校验表改为**逐面 14 行**（12 导出面 + ccv3(E1) + mcp(E3)），与
+> `results/interop-schema-validation.md` 逐行对齐（ok 6 / no-schema 7 / unavailable 1）。见「§现状对照」。
 
 ## 是什么
 
@@ -76,19 +80,49 @@ python scripts/check_interop_schemas.py --fetch --write results/interop-schema-v
 ```
 
 它拉**官方 meta-schema** 逐面校验（`jsonschema` 软依赖，缺失即如实跳过），结果记档
-（`results/interop-schema-validation.md`）。已知实测（2026-09-21）：
+（`results/interop-schema-validation.md`）。实测（2026-11-13 复核，逐面 14 行与报告对齐）：
 
-| 面 | 官方 schema | 实测 |
+| 面 | 官方 schema | 结果 |
 |---|---|---|
-| openapi | `spec.openapis.org/oas/3.1/schema/2022-10-07` | **通过** |
-| asyncapi | `asyncapi/spec-json-schemas: schemas/3.0.0.json` | **通过**（draft-07 方言，须按 `$schema` 选 validator） |
-| sbom | `spdx/spdx-spec: schemas/spdx-schema-2-3.json` | **通过**（首轮 FAIL 两处，见下） |
-| slsa / intoto / a2a | 官方无 JSON Schema（CUE+Proto / Markdown / .proto） | **no-schema 如实记档** |
-| prov | `www.w3.org/ns/prov.jsonld` | 本机取不到（HTTP 300）→ 记 `unavailable`，不判不合格 |
-| cyclonedx | `CycloneDX/specification: schema/bom-1.5.schema.json` | **通过**（首轮 FAIL：根级 `x-nf-note` 越界 → 移入 `metadata.properties`） |
-| vc / c2pa / cid | 官方无独立 JSON Schema（规范正文 / CBOR-JUMBF / multiformats 表） | `no-schema`（cid 以已知向量自校） |
-| ccv3（E1 出口面） | SillyTavern 写卡源码字面量 | **通过**：`spec=chara_card_v3` / `spec_version=3.0` / `data` 结构在位（首轮暴露「假 v3」缺陷并修，见 `docs/external-validation-assets/README.md`） |
-| mcp（E3 会话面） | `modelcontextprotocol: schema/2026-07-28/schema.json` | **通过**：4 方法应答过官方 `$defs`（首轮 FAIL：list 三面缺 `resultType`/`ttlMs`/`cacheScope` → 已补） |
+| openapi | `spec.openapis.org/oas/3.1/schema/2022-10-07` | **ok** |
+| asyncapi | `asyncapi/spec-json-schemas: schemas/3.0.0.json` | **ok**（draft-07 方言，须按 `$schema` 选 validator） |
+| sbom | `spdx/spdx-spec: schemas/spdx-schema-2-3.json` | **ok**（首轮 FAIL 两处，见下） |
+| cyclonedx | `CycloneDX/specification: schema/bom-1.5.schema.json` | **ok**（首轮 FAIL：根级 `x-nf-note` 越界 → 移入 `metadata.properties`） |
+| slsa | 官方 CUE + Protobuf（`spec/schema/provenance.cue`） | **no-schema** |
+| intoto | 官方 Markdown 规范（`spec/v1/statement.md`） | **no-schema** |
+| a2a | 官方 `.proto` + 文档（`specification/a2a.proto`） | **no-schema** |
+| vc | W3C VC 2.0 规范正文 + JSON-LD 上下文 | **no-schema** |
+| c2pa | CBOR/JUMBF 容器 + 清单表示（无独立 JSON Schema） | **no-schema** |
+| cid | multiformats 规范 + multicodec 表 | **no-schema**（以已知向量自校） |
+| decisions | NF 自有形状（无外部 schema） | **no-schema** |
+| prov | `www.w3.org/ns/prov.jsonld` | **unavailable**（本机 HTTP 300，不判不合格） |
+| ccv3（E1 出口面） | SillyTavern 写卡源码字面量 | **ok**：`spec=chara_card_v3` / `spec_version=3.0` / `data` 结构在位（首轮暴露「假 v3」缺陷并修） |
+| mcp（E3 会话面） | `modelcontextprotocol: schema/2026-07-28/schema.json` | **ok**：4 方法应答过官方 `$defs`（首轮 FAIL：list 三面缺 `resultType`/`ttlMs`/`cacheScope` → 已补） |
+
+> 统计：**ok 6 / no-schema 7 / unavailable 1**（共 14 行）；不一致即报告与文档有一侧漂移。
+
+## 现状对照（2026-11-13 · 以实跑为准）
+
+| 面 | 现值 | 复核方式 |
+|---|---|---|
+| 导出种类 | **12** | `python -c "…interop_export.KINDS"`（CLI `--kind` 派生同源） |
+| 入仓面 | **12 件** `results/interop/*.json` | `ls results/interop/*.json`，与 KINDS 名一一对应 |
+| 场景面 | +2（ccv3(E1) / mcp(E3)） | 校验报告 14 行中的后两行 |
+| 确定性 | 两次渲染逐字节一致 | `python scripts/nf.py interop --check` |
+| 外部校验 | 14 行（ok 6 / no-schema 7 / unavailable 1） | `results/interop-schema-validation.md` |
+
+> 本表只作「当时 → 现行」导航，不替代实跑。
+
+## 复现与引用口径
+
+```bash
+python scripts/nf.py interop --list      # 种类清单（派生自 KINDS）
+python scripts/nf.py interop --check     # 入仓面 == 实时派生（逐字节）
+python -m pytest desktop/tests/test_interop.py desktop/tests/test_interop_export.py -q
+```
+
+- 引用本文时：「纯派生、不新增真源、入仓面是投影」= 长期口径；改声明件后必须重跑 `--all`。
+- 外部校验（联网）不进本页结论：它只记「上游官方 schema 是否接受」，失败不等于导出面错。
 
 **外部校验驱动的两处真修复**：① `creationInfo.created` 缺失（SPDX 2.3 必填）→ 取
 「仓内声明日期最大值」`<date>T00:00:00Z`（**非墙钟**，保「两次渲染逐字节一致」）；

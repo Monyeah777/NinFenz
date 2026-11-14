@@ -17,12 +17,12 @@ tags:
   - 校园情感
   - 装配样本
   - 引用式
-attestation: a3872e040ba2dc307bc665896908cc0b2a53802517bf867d39ba34d1dea83866
-attested_at: 2026-09-30
+attestation: 0f0bc81c061dd463bbcf20239de084468e041ab84696fc150e232a8a7ae3e879
+attested_at: 2026-11-12
 ---
 
 # 叙事世界完整版：校园情感流（高二 · 毕业遗憾线）
-> 📚 NF 云端图书馆条目 **NF-1** · 入库 2026-09-07 · 投稿人：NinFenz（NF）作者 · 类型：装配样本（历史引用式件——正文含引用与缺口声明；普通入馆件一律须自包含可召回）
+> 📚 NF 云端图书馆条目 **NF-1** · 入库 2026-09-06 · 投稿人：NinFenz（NF）作者 · 类型：装配样本（历史引用式件——正文含引用与缺口声明；普通入馆件一律须自包含可召回）
 > 许可：MIT（登记表同列同值；许可证门校验双源一致）
 
 > 版本：1.0.0 · 装配师：Operit（扮演外部 Agent）· 日期：2026-09-06 · 规范源：https://github.com/Monyeah777/NinFenz
@@ -180,5 +180,14 @@ attested_at: 2026-09-30
 - [x] 订阅/发布：仅列实证项（读自 02 §3 与三模块原文），未核对细目已声明缺口
 - [x] ## 0 装配记录完整：来源可追溯、精度档与缺口如实声明
 - [x] 可运行性：本文档 + 06 协议可启动回合叙事；资产正文/六件题材模块细目为引用式缺口（离线全量档需补嵌）
+
+## 8. 取件与核验（本条机检面）
+
+- **取件**：INDEX 三步取件（喂 raw 链接 → 筛登记表 → 拼 `library/NF-1.md`）；编号大小写拿不准先查 `library/ALIAS.md`；本地 `nf library show NF-1` 看 frontmatter + 正文头。
+- **双源一致**：frontmatter 十字段（id/type/title/description/author/rating/license/generated/verified/status/stale_after/attestation…）是**唯一真源**；INDEX 登记表与 ALIAS 均为投影（`nf library reindex` 重建）。许可（MIT）与分级（teen）在 frontmatter 与登记表两处一致。
+- **回执与重签**：`attestation` 为正文+元数据的摘要锚点——**内容改动后必须重签**（`nf library attest NF-1`），否则 `nf library verify` / check34 报 WARN（“内容已改，需重签”）。重签后分发新回执。
+- **时效**：`generated 2026-09-06`（首次入库）/ `verified 2026-09-14`（最近核对）/ `stale_after 2027-03-14`（超期须重核，超期件不自动下架但应重验）。
+- **缺口补齐路径**（把引用式转成离线自包含档）：① 粘贴 `community/校园情感领域包/assets/` 28 键正文；② 逐字核对 6 件契约摘要模块的订阅/发布细目；③ 重算 P02 装配后 21 模块最终执行顺序（官方 10 步 + 题材追加）；完成后重签回执并在 ## 0 更新精度档声明。
+- **机检入口**：`nf library verify`（frontmatter/投影/回执/分级/许可）、`verify check34`（图书馆面门禁）、`nf library reindex`（投影重建，勿手改生成区）。
 
 **收尾提醒**：把本文档另存为 .md 即可直接发给任意 AI 前端开跑（或按 ## 6 步骤装载）；若需微调（换模块/加资产/改管线/改全量自包含档），把需求再说一遍即可重装。

@@ -1,6 +1,10 @@
 # 馆藏回执与单根（receipts）
 > ⛔ 操作指令：阅读即执行——本文含可直接执行的命令与判定，勿当资料阅读。
-> 最后更新：2026-09-14
+> 最后更新：2026-11-13
+> **复核（2026-11-13）**：算法（叶/内部/根三式）、O(log n) 折叠、边界（不提供不可抵赖性）**复核不变**；补可核现状：
+> 馆藏回执 **3 条**（`library/RECEIPTS.json`，根前 16 位 `6afa7b1a02e044ea`）· 协议回执 **66 件**
+> （`protocol/RECEIPTS.json`）· 透明链 **66 节**（`protocol/generated/receipt_chain.json`；**链头随回执刷新而变，不钉值**，以 `nf transparency` 输出为准）·
+> 读者侧验证器 `nf_verify.py` 输出三项（inclusion / content / anchor）。见「§现状对照」。
 
 ## 是什么
 
@@ -28,6 +32,30 @@ python scripts/nf_verify.py --entry NF-1               # 读者侧独立验证�
 - 回执证明「属于本馆且未被换」；**签名锚**（`anchor_*`）另证「谁签过」——两者互补。
 - 落锚会改变锚字段，但**不改变规范摘要与全馆根**（锚字段排除在摘要之外，自指安全）。
 - `nf library attest` 会自动刷新回执，避免"锚了新、回执还是旧"。
+
+## 现状对照（2026-11-13 · 以 `nf library receipts` / `nf transparency` 实读为准）
+
+| 面 | 现值 | 复核方式 |
+|---|---|---|
+| 馆藏回执 | **3 条**（根 `6afa7b1a02e044ea…`） | `nf library receipts` 头行 |
+| 协议回执 | **66 件**（`protocol/RECEIPTS.json: count`） | 同上 / 该文件 |
+| 透明链 | **66 节**（链头**不钉值**：每次 `receipts --write` 后都变） | `nf transparency` |
+| 算法 | 叶 = SHA-256(0x00‖JSON) · 内部 = SHA-256(0x01‖L‖R) · 根 = 折叠终值 | 本页「算法」段 |
+| 读者侧验证 | `nf_verify.py` 三项：inclusion / content / anchor | `--entry NF-1` |
+| 不可抵赖性 | **不提供**（单人治理、无第二署名方；生成物 `boundary` 字段必在） | `nf transparency` 尾行 |
+
+> 本表只作「当时 → 现行」导航；根与条数以 `nf library receipts` / `nf transparency` 实读为准。
+
+## 复现与引用口径
+
+```bash
+python scripts/nf.py library receipts          # 校验每条折叠到根 + 根与重算一致
+python scripts/nf_verify.py --entry NF-1       # 读者侧独立验证（零 NF 依赖）
+python scripts/nf.py transparency              # 链自洽 + 与回执一致 + 在盘生成物一致
+```
+
+- 引用本文时：「回执证属于本馆且未被换；签名锚另证谁签过」= 长期口径；两者**互补不可互替**。
+- 链条只证 append-only 顺序 + 防删改；**不要**把它写成「不可抵赖」——那需要第三方见证。
 
 ## 透明日志（哈希链 · 2026-09-21 收口）
 

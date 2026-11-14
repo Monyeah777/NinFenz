@@ -1,6 +1,10 @@
 # NF terminal (`nf shell`) — the human entry point after the desktop shell retired
 
-> 最后更新：2026-10-03 (last updated)
+> Last updated: 2026-11-13
+> **Review (2026-11-13)**: the three hard constraints, menu source of truth, write gate and non-interactive face are **unchanged**;
+> added verifiable status (read from `nf shell --verify`): commands **77** · capability families **8** · index rows **203** ·
+> menu examples **15** · zone actions **34** · zones **9** (0–8) · write forms **13** · slash words **42** ·
+> blocked-in-session commands **4** (shell / serve / lsp / terminal) · write-confirm verbs **24** · tests **139**. See "§Status check".
 
 > ⛔ Operating instruction: this file contains directly executable commands and verdicts — read it and run it; do not read it as reference material.
 
@@ -382,6 +386,35 @@ python scripts/nf.py shell --file tour.nf --json             # the machine face 
 - It executes entry by entry and gives `kind/exit` for each; the exit code = the maximum of them.
 - With `--json` it outputs `{"kind": "nf-shell", …}`, a machine face recording each entry (with argv / exit / out / err).
 - `--no-banner` removes the opening banner (for logging scenarios).
+
+## Status check (2026-11-13 · read from `nf shell --verify` and core/terminal constants)
+
+| Surface | Current value | How to re-check |
+|---|---|---|
+| Commands (top + second level) | **77** | `nf shell --verify` header |
+| Index rows | **203** | same / `--commands --json` |
+| Capability families | **8** (start / forge / shelf / verify / library / govern / integrate / meta) | same |
+| Zones | **9** (`0`–`8`) | `core/terminal.ZONES` |
+| Menu examples | **15** | `nf shell --verify` |
+| Zone actions | **34** | same |
+| Write forms | **13** | `core/terminal.FORMS` |
+| Slash words | **42** | `core/terminal.SLASH_WORDS` |
+| Blocked in session | **4**: `shell` / `serve` / `lsp` / `terminal` | `core/terminal.BLOCKED_IN_SHELL` |
+| Write-confirm verbs | **24** | `core/terminal.CONFIRM_VERBS` |
+| Tests | **139** | `test_terminal.py` |
+
+> Index only; numbers come from `nf shell --verify` and the core constants (no second table here).
+
+## Reproduction and citation
+
+```bash
+python scripts/nf.py shell --verify          # self-check: commands / families / index / examples / actions
+python scripts/nf.py shell --commands --json   # machine face: per-command summary + flags (pure JSON)
+python -m pytest desktop/tests/test_terminal.py -q   # 139 cases
+```
+
+- Rule of thumb: "menu entries must point at real commands (`terminal.example_resolves`); write actions are refused by default" is the long-term rule.
+- The terminal keeps **no second command table**: the index derives from the CLI argparse surface.
 
 ## Boundaries
 

@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/trust/policy.schema.json",
+  "title": "nf-trust-policy/1 信任策略（§7.3）",
+  "description": "验证策略：允许的 issuer/算法/TSA 根、要求等级（T0-T4）与锚要求。未知字段拒绝；缺省不降级（required_level 决定 exit 2）。",
+  "type": "object",
+  "required": [
+    "schema",
+    "issuers",
+    "algorithms",
+    "required_level",
+    "anchors"
+  ],
+  "properties": {
+    "schema": {
+      "const": "nf-trust-policy/1"
+    },
+    "issuers": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1024,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "keyid",
+          "alg"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "keyid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "alg": {
+            "type": "string",
+            "enum": [
+              "ed25519",
+              "ecdsa-p256",
+              "hmac-sha256"
+            ]
+          },
+          "types": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 64,
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]*$"
+            }
+          },
+          "not_after": {
+            "$ref": "#/$defs/timestamp"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "algorithms": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": {
+        "type": "string",
+        "enum": [
+          "ed25519",
+          "ecdsa-p256",
+          "hmac-sha256"
+        ]
+      }
+    },
+    "tsa_roots": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "digest"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "digest": {
+            "$ref": "#/$defs/digest"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "required_level": {
+      "type": "string",
+      "enum": [
+        "T0",
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ]
+    },
+    "anchors": {
+      "type": "object",
+      "required": [
+        "tsa",
+        "transparency",
+        "witness_threshold"
+      ],
+      "properties": {
+        "tsa": {
+          "type": "boolean"
+        },
+        "transparency": {
+          "type": "boolean"
+        },
+        "witness_threshold": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    }
+  }
+}

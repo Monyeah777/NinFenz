@@ -13,8 +13,8 @@ subjects:
   - desktop/tests/test_purity_scan.py:6979d6c7f88822141daf73d04ac6e86b29ae47e01f5f35a8be80145925fca2d3
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
-  - docs/layers.md:be79f2699cee390f03d54d6d0428daee6964674dcbb5d0e6967bfbb150395450
-  - docs/L3_FROZEN.md:bde03a07d62aa37d5315d8b294d5fdfb24628c7a8556c1d3ff46848bc3d92186
+  - docs/layers.md:7b849fb07769ba6df5ca888a9de5323417b47a07ef54ec2c1c801673a7fbd7c0
+  - docs/L3_FROZEN.md:863a152271b1b969a3249194d1169628f4a4647a9bdd801473cfc9cb75c6643b
   - protocol/assertions.json:5a0bb383eabf678a9f660ae6d771f0be51cce5397a40a73f0d0d93457e4f1cba
   - protocol/data_contracts.json:6ca6174c77d41ad354b90e637c404bedfbe5d8ad0ce6400bb26f2ac7e5f19eb0
   - protocol/normative.json:c1bbc14c92cea6bd66ff6cb54fdcf91bf3072f66adee7027f1d3f42e70fe1825
@@ -23,6 +23,12 @@ subjects:
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
 
 ---
+> 重审（2026-11-13）：抽象阶梯文档顶尖化：把「⛔ 操作指令」标识上移至标题后（doc_markers 要求），保持内容不变；机械重绑。
+
+> 重审（2026-11-13）：抽象阶梯文档顶尖化（生成区外补现状对照：4 阶/5 子级/4 入口/6 纵切/7 派生/2 退役/10 规则/27+19 例 + 复现；生成区未手改）+ 契约判据 test_layers_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：L3_FROZEN 端壳退役真相源顶尖化（最后复核 / 退役+保留双侧机检面 / CI 22 workflow 全量点名 / 复现口径）+ 契约判据 test_l3_frozen_contract；权重增量重测。本轮为机械重绑。
+
 > 重审（2026-11-09）：冻结链
 
 > 重审（2026-11-09）：方法包声明可跑入口 runnable，清单与文档共用（含入口存在性判据）

@@ -8,7 +8,7 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/concept_graph.py:cc629a762576347a6065da4be34ff6c6902ec4ee7299663119abbc153bd50211
   - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
-  - README.en.md:cc72fc196f96281c28dfbbb0f019774c5a4434384d994da50e8ff9216bce18a5
+  - README.en.md:9bad8f96e163014ec3cbeff985a9b3e20ab9d0787c5306f8e6e8d1803f69ef41
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - community/量化金融域包/assets/DATA_CONTRACT.md:3815cd420ce535b571149a1ca0725b2d5c1757660e83d0edd8ed1d5c14ed2af1
   - community/量化金融域包/assets/STRATEGY_SPECS.md:9174638b5caf2d5d8586b80d07ed9aeca5d221e16f01ec19ce0e4c0f50859e65
@@ -16,6 +16,8 @@ subjects:
   - .github/workflows/external-links.yml:52c94a4c17a73d6fc40135019ea6ffb64dcc39f3ac9094d748e5ab09edd977a0
 
 ---
+> 重审（2026-11-12）：README.en English 入口镜像顶尖化（六步验收 / FAQ 三类 / ROUTES / 版本真源 / 最后更新与旧宣言收口）+ 契约判据 test_readme_en_contract；check12 权重增量实测。本轮为机械重绑。
+
 > 重审（2026-11-11）：external-links 契约化：非门禁定位（禁 push/PR 触发、独立并发组、禁调 verify.sh）、离线扫描步永远绿 + 联网步 fail-closed（禁兜底写法、pipefail、tee 落盘）、联网硬预算 --max-seconds 600（防慢站点拖到 job 超时）、报告只传 .artifacts/ 本 run 副本（禁受跟踪路径）、工件保留 7 天；新增 test_external_links_workflow_contract（4 项含五类变异自证）。本轮为机械重绑。
 
 > 重审（2026-11-09）：冻结链

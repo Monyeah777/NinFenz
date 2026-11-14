@@ -2,7 +2,7 @@
 """FDE 打样 · 可跑样例（check38 子扫描 4）。
 
 定位：证明「NF 是 FDE 的 AI infra 中游标准」不是宣言——样例把一次 FDE 交付跑成证据：
-    客户 brief → 域包（AI系统域包）装配面 → 四道门 → 交付物 + 证据包。
+    客户 brief → 域包（AI系统域包）装配面 → 五道门（G1–G4 + G5 中游出口）→ 交付物 + 证据包。
 
 样例链（全部本地、确定性、无网络）：
   G1 产出面自洽：包内 outputs/INDEX.json 声明的每个产出面在场且可解析
@@ -13,7 +13,7 @@
 
 产物（docs/fde-sample/evidence/）：
   deliverable.md  交付物（技术文档形态：系统卡摘要 + 概念闭包 + 产出面 + 装配步骤 + 验收判据）
-  gates.txt       四道门的原始输出
+  gates.txt       五道门的原始输出
   result.jsonl    逐门结论（JSONL）
   manifest.json   产物 sha256 + 时间戳 + 输入指纹
 
@@ -204,7 +204,7 @@ def _deliverable(root: str, facts: Dict[str, Any]) -> str:
         "4. 走本包管线：`%s/pipelines/P07_AI系统域装配流管线.md`" % PACK,
         "5. 交付出面：按 §3 清单产出（T2 schema / T3 data）",
         "",
-        "## 5. 验收判据（本样例实跑的四道门 + 中游层核验）",
+        "## 5. 验收判据（本样例实跑的五道门：G1–G4 结构面 + G5 中游出口）",
         "",
         "| 门 | 判据 | 证据 |",
         "|---|---|---|",

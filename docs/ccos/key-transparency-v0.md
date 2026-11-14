@@ -1,7 +1,8 @@
 # 密钥透明目录 v0（`nf-key-transparency/1`）
 
-> **状态**：已实装（2026-11-08）· 机制来源：IETF Key Transparency 协议（draft-keytrans-mcmillion-protocol，**正文关键段已读**）
-> **实现位置**：`desktop/src/core/key_transparency.py` · CLI `nf evidence revocations trust kt-build/kt-verify/kt-witness` · 判据 `desktop/tests/test_key_transparency.py`
+> **状态**：已实装（2026-11-08，2026-11-13 复核）· 机制来源：IETF Key Transparency 协议（draft-keytrans-mcmillion-protocol，**正文关键段已读**）
+> **实现位置**：`desktop/src/core/key_transparency.py` · CLI `nf evidence revocations trust` 的 **4 个子命令**：`kt-build` / `kt-verify` / `kt-lookup` / `kt-split` · 判据 `desktop/tests/test_key_transparency.py`
+> **最后更新：2026-11-13（复核）**：形状/判定/边界**复核不变**；**修一处失效 CLI 引用**——原文写 `kt-build/kt-verify/kt-witness`，其中 **`kt-witness` 并不存在**（实际第 4 个子命令是 `kt-split`，`kt-lookup` 也未列）；常驻判据 **15 例**。见「§现状对照」。
 
 ## 解决什么
 
@@ -46,6 +47,20 @@ nf evidence revocations trust kt-split --a kt2.json --b fake2.json
 | 一致性 | 新版本第 old_version 条的根 == 旧根 | fork |
 | 分叉 | 两份目录同版本不同根，或互不为延伸 | split + witness |
 
+## 现状对照（2026-11-13 · 以实跑为准）
+
+| 面 | 本文声明 | 复核结果（读到本行时请重跑） |
+|---|---|---|
+| 实装状态 | 已实装（2026-11-08） | **不变**（`core/key_transparency.py` 在场） |
+| CLI 子命令 | 原写「kt-build/kt-verify/kt-witness」 | **4 个真实子命令**：kt-build / kt-verify / kt-lookup / kt-split（**无 kt-witness**，已修正） |
+| 形状不变量 | 叶 0x00+canonical / 根 RFC6962 / `log[i].prev == log[i-1].root` / `len(log)==version` | **不变** |
+| 判定面 | 自洽 / 包含证明 / 一致性 / 分叉 | **不变**（invalid / 证明失败 / fork / split+witness） |
+| 常驻判据 | 15 项 | **15 例**（`test_key_transparency.py`） |
+| 不做项 | 前缀树 / abridged proof+审计者 / 隐私 | **不变**（如实挂账） |
+| 外部权威 | 客户端仍需知道哪份目录权威 | **不变**（分叉能发现，不能裁决） |
+
+> 本表只作「当时 → 现行」导航，不替代实跑。
+
 ## 边界（诚实写清）
 
 - **不做前缀树**：查找是 O(n)，目录大小会暴露——KT 的「可搜索且不泄漏」未实现；
@@ -61,6 +76,18 @@ python -m unittest desktop.tests.test_key_transparency   # 15 项
 
 覆盖：确定性构建 / 篡改 keys 与 log 必红 / 版本与 log 等长 / 包含证明与错公钥必拒 /
 同版本不同根的伪造目录（自身自洽）必被判 split / 历史改写必被判 fork / CLI 全链路。
+
+## 复现与引用口径
+
+```bash
+nf evidence revocations trust kt-build keys-v1.json --out kt1.json   # 造版
+nf evidence revocations trust kt-verify kt1.json --json             # 自洽校验
+nf evidence revocations trust kt-lookup kt1.json --id org-b/key-1 --json  # 包含证明
+nf evidence revocations trust kt-split --a kt1.json --b fake2.json  # 分叉检测
+```
+
+- 引用本文时：「形状不变量 + 四类判定 + 「发现分叉≠裁决谁对」」= 长期口径；子命令名以 `nf evidence revocations trust --help` 实读为准。
+- 新能力若加子命令，须同步本表与判据（本页曾有 `kt-witness` 失效引用，2026-11-13 已修）。
 
 ## 与既有件的关系
 

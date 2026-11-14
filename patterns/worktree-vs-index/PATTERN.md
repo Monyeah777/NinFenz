@@ -18,7 +18,7 @@ evidence:
   - desktop/src/core/text_hygiene.py
   - desktop/tests/test_text_hygiene.py
   - verify.sh
-  - handovers/HO-0002-顶尖化两线与收口.md
+  - desktop/src/core/repo_face.py
 ---
 
 ## 为什么
@@ -55,7 +55,7 @@ evidence:
 git status --porcelain <路径>        # ?? = 未跟踪：git diff 为空是正常的，别据此判「门禁错」
 git show :<路径> | wc -c             # 0 = 索引里没有它（未跟踪）；非 0 则可与盘上字节逐字节比
 python -c "raw=open('<路径>','rb').read(); print('worktree CRLF:', b'\r\n' in raw, len(raw))"
-python .rivet/scratch/crlf_scan.py   # 本仓的工作区级 EOL/BOM 全量扫描（面 = 仓库件）
+python -m pytest desktop/tests/test_text_hygiene.py -q   # 工作区级 EOL/BOM 判据（面 = 仓库件）
 ```
 
 判断顺序：**先量再判**。三种可能里只有第 ③ 种才算门禁缺陷，而它恰恰是最不该先假设的那种。
@@ -72,3 +72,29 @@ python .rivet/scratch/crlf_scan.py   # 本仓的工作区级 EOL/BOM 全量扫�
   （工作区 / 索引）口径不同，得先声明以谁为准，再谈判据。
 - 与 `verifier-must-run` 的关系：两者都在处理「判据与事实对不上」；那条管**没人跑**，这条管**跑的对象**
   与交付对象不是同一份字节。
+
+
+---
+
+## 现状对照（2026-11-14 · 以 `.gitattributes` / 判据实读为准）
+
+| 面 | 当前口径 | 复核方式 |
+|---|---|---|
+| 规范化规则 | `.gitattributes`：`* text=auto eol=lf`（+ 两处 `text eol=lf` 特例：`protocol/asset_line_baseline.json`、`protocol/generated/*.json`） | 该文件 |
+| 门禁口径 | **以工作区字节为准**（行尾 / 编码 / BOM / 引用可达）；git 口径只在 `git add` 时生效 | `desktop/tests/test_text_hygiene.py`（19 例） |
+| 判定三问 | ① 未跟踪（`??`）② 工作区 vs 索引规范化差异 ③ 门禁扫错面——**先量 `git show :<路径>` 与盘上字节** | 本文「为什么」的临时仓自证 |
+| 修法 | **重写工作区文件**（`git add` 只改索引；`git checkout` 对未跟踪件无效）；对未跟踪的进行中文件先另存到忽略面 | 本文规则 3 |
+
+- **本文不钉字节数/CRLF 计数**：那是运行时事实，以判据实读为准。
+- **本轮修掉的两处悬空引用**（历史留痕）：`evidence` 里的 `handovers/HO-0002-…`（该件不存在）与「怎么用」里的 `.rivet/scratch/crlf_scan.py`（本地临时脚本，不在仓内）——两者都会让读者照做即失败。
+
+## 复现与引用口径
+
+```bash
+python -m pytest desktop/tests/test_text_hygiene.py -q    # 工作区级 EOL/BOM 判据（19 例）
+git status --porcelain <路径>                            # ?? = 未跟踪（git diff 为空属正常）
+git show :<路径> | wc -c                                 # 0 = 索引里没有它（未跟踪）
+python -c "raw=open('<路径>','rb').read();print('CRLF:', b'\r\n' in raw, len(raw))"
+```
+
+- 引用本 pattern 时：「门禁看工作区、git 看索引」是机制断言；具体件是否 CRLF **以命令实读为准**。

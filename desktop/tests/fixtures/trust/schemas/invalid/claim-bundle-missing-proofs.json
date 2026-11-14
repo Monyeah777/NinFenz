@@ -1,0 +1,27 @@
+{
+  "schema": "nf-claim-bundle/1",
+  "bundle_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "contract_ref": "protocol/schema/trust-claim-bundle.schema.json",
+  "claims": [
+    {
+      "id": "C-001",
+      "type": "evidence",
+      "obligation": "must",
+      "subject_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "payload_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+    },
+    {
+      "id": "C-002",
+      "type": "evidence",
+      "subject_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "payload_digest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+    }
+  ],
+  "merkle_root": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "evidence_refs": [
+    {
+      "kind": "evidence",
+      "digest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "schema": "nf-dsse/1",
+  "payloadType": "application/vnd.nf.claim-bundle+json",
+  "payload": "eyJhIjoxfQ==",
+  "signatures": []
+}

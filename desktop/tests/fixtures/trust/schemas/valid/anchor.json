@@ -1,0 +1,22 @@
+{
+  "schema": "nf-anchor/1",
+  "target_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "anchors": [
+    {
+      "kind": "rfc3161",
+      "tsa": "tsa:freetsa",
+      "token": "TUlJRXhnWUpLb1pJaHZjTkFRY0dDQ3FH"
+    },
+    {
+      "kind": "witness",
+      "witness_id": "witness:demo-1",
+      "keyid": "nf:local:ed25519:2026",
+      "sig": "AAAA"
+    },
+    {
+      "kind": "git-commit",
+      "repo": "https://github.com/Monyeah777/NinFenz.git",
+      "commit": "8af1bef3c91b39866ba5c562ca3241a997a2e6ca"
+    }
+  ]
+}

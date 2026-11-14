@@ -57,3 +57,31 @@ cd desktop && python -m unittest tests.test_repo_face -q   # 扫描面清单：�
   同一判据不得有多份实现，且实现要能自证「哪些面在用它」。
 - 与 `dependency-direction` 的关系：谓词放叶子模块，天然不会给被依赖方添加反向依赖；收敛扫描面时
   顺手就避开了 SDP 违例。
+
+
+---
+
+## 现状对照（2026-11-14 · 以 `repo_face` / 消费方 / 判据实读为准）
+
+| 面 | 当前口径 | 复核方式 |
+|---|---|---|
+| 谓词载体 | `desktop/src/core/repo_face.py` 的 `walk_repo_paths(root)`（叶子模块，不 import core 兄弟） | 该文件 |
+| 消费方 | **3 处**显式导入：`asset_ledger` / `role_model` / `text_hygiene`（+ 判据件 `test_repo_face`） | `grep 'from core import repo_face'` |
+| 判据 | `desktop/tests/test_repo_face.py` **12 例**（含「生成副本不进扫描面」断言） | `python -m pytest desktop/tests/test_repo_face.py` |
+| 扫描面规模 | 当前 `walk_repo_paths('.')` 返回 **4436** 条（**以实读为准，本文不钉**） | 一行 Python 实跑 |
+| 门禁接线 | **check12**（unittest 全量含 `test_repo_face`）· **check23**（资产供应链闭合） | `verify.sh` 定义 + 权重表 |
+| 资产对账 | `nf asset inventory` 每件只列一次（无重复计数） | 命令实跑 |
+
+- **历史数值是留痕不是当前值**：正文「实测（2026-10-03）」的「台账 206 / 托管 614 → 真实值 103 / 307」记录的是**当时**副本污染后的对照，**当前值以命令实读为准**。
+- 「清单只许缩小」是本规则的可检面：新增扫描面必须先接入单一谓词，再登记——**不许**在新模块里再写一份目录白名单。
+
+## 复现与引用口径
+
+```bash
+python -m pytest desktop/tests/test_repo_face.py -q      # 12 例（含生成副本排除断言）
+python scripts/nf.py asset inventory                    # 单一谓词下每件只出现一次
+python -c "import sys;sys.path.insert(0,'desktop/src');from core import repo_face as rf;print(len(list(rf.walk_repo_paths('.'))))"
+```
+
+- 引用本 pattern 时：「一条判据只准有一处实现」是机制断言；**扫描面条数/资产台账数不钉**。
+- 复核口径：`grep -rn 'from core import repo_face' desktop/src/core` 看消费方是否都走单一谓词。

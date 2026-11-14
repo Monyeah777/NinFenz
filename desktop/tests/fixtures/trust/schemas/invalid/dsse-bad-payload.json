@@ -1,0 +1,11 @@
+{
+  "schema": "nf-dsse/1",
+  "payloadType": "application/vnd.nf.claim-bundle+json",
+  "payload": "not base64!!",
+  "signatures": [
+    {
+      "keyid": "nf:local:ed25519:2026",
+      "sig": "AAAA"
+    }
+  ]
+}

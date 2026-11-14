@@ -7,7 +7,7 @@ author: Monyeah777
 rating: general
 license: MIT
 generated: 2026-09-15
-verified: 2026-09-15
+verified: 2026-11-12
 status: active
 stale_after: 2027-03-15
 sources:
@@ -17,6 +17,8 @@ tags:
   - 技术文档
   - 自包含
   - 装配样本
+attestation: 6c55271afe5875fa2a002217434ddc019db83f619f6ae30774339c34f0d28670
+attested_at: 2026-11-12
 ---
 
 > 📚 NF 云端图书馆条目 **NF-TECHDOC-Monyeah777-1** · 入库 2026-09-15 · 投稿人：Monyeah777 · 类型：装配样本（内容自包含）
@@ -42,8 +44,8 @@ tags:
 - **缺口声明（如实）**：
   - ① 本件内嵌的是**模块层**正文与管线声明；`01_核心协议`/`02_联动注册表`/`06_Agent执行协议` 三份协议件不内嵌——
     它们是全库共用的上位规范，非本装配的专属件（引用式样本同样如此）。
-  - ② 内嵌正文为 2026-09-15 仓库快照的**逐字节复制**，不含改写；上游模块若变更，本件须重新生成。
-  - ③ 本件未挂签名锚（`anchor_*` 字段缺省），如需第三方独立验真，另走 `nf library attest`。
+  - ② 内嵌正文为 **2026-11-12 仓库快照**的**逐字节复制**（重嵌工具 = `scripts/rebuild_selfcontained_sample.py`，可按 `溯源：` 标记从源文件幂等重嵌；`--check` 无漂移即快照与当前源一致）。上游模块若变更，本件须重新生成并重签回执。
+  - ③ 回执级：`digest_only`（frontmatter `attestation` + `attested_at`，摘要自指安全）；如需 HMAC/SSH 非对称签名锚另走 `nf library attest --key-file/--ssh-key`。
 
 ## 1. 文档域速览
 
@@ -153,7 +155,7 @@ Pipeline:
 ```markdown
 # 模块 M00 · 数据槽总线
 
-> 类别：通用｜来源：核心｜挂载点：P00 数据基座（active）｜依赖：无｜被依赖：通用:M10、M50、M23、M24、M20、M90（核心；社区侧依赖见各包模块 inputs 声明）
+> 类别：通用｜来源：核心｜挂载点：P00 装载（active）｜依赖：无｜被依赖：通用:M10、M50、M23、M24、M20、M90（核心；社区侧依赖见各包模块 inputs 声明）
 
 ```yaml
 machine_contract:
@@ -178,12 +180,20 @@ machine_contract:
 
 定义全系统的**数据槽总线**与槽位契约，是所有模块读写的唯一数据通道。数据隔离（I4）与通信契约（I3）在此落地：模块之间不得直接互访内部状态，只能通过数据槽与事件交换。
 
+本文件三形态：
+
+- 头部引用块 = 速览（类别 / 来源 / 挂载 / 依赖 / 发布）；
+- machine_contract 块 = 机读投影（check16 契约仲裁 / check28 IDL 校验读取）；
+- §2–§5 正文 = 契约全集。
+
+**纯内部基座豁免**：按 01 §1.1，M00 零事件、零接口，`interfaces: []` 是显式声明而非缺省——联动面经「槽读写声明」体现（见 §2），不以事件/接口承接。
+
 ## 2. 总线
 
 ```yaml
 data_bus:
   schema_version: "1"     # 总线协议版本；只增不删，结构性变更须 bump 并注明迁移
-  注册: 模块启动时声明 [读槽, 写槽]，冲突由 M00 拒绝并报错
+  注册: 模块启动时声明 [读槽, 写槽]，冲突由 M00 拒绝并报错（fail-fast：冲突即拒绝，不静默覆盖）
   读写: 只允许写自己声明的槽；读他人槽须声明只读，写他人槽视为违例
   生命周期: 每回合结束由 M50 触发快照，供持久化与回卷
   active_pipeline: P01   # 当前装配管线 id（M50 调度/装配切换维护）
@@ -211,6 +221,7 @@ slots:
 ```
 
 - 核心只定义上述**结构与读写纪律**；实体字段、关系语义、环境维度由域包在自己的命名空间内声明，核心不内嵌任何领域字段。
+- 槽位的唯一通信面 = 数据槽与事件（I3）：模块不得绕过总线直读他人内部状态；读写次序与冲突仲裁由 M50 调度、M00 校验。
 - 形状演进只增不删（01 §7 V1）；新增顶层槽须在 02 §2 备注登记。
 
 ## 4. 冻结兼容槽位（Phase 1）
@@ -224,10 +235,14 @@ slots:
 # Phase 2 迁移为 context.time.* 与 state.memories.*，并重签 world_slots.json。
 ```
 
+- 冻结面逐项对账：上述四组路径在 `protocol/world_slots.json` 在册（`data_bus.active_pipeline` / `data_bus.round.phase` / `data_bus.round.phase_trace` / `WorldState.time.*` / `PlayerState.memories.*`），Phase 1 期间逐字保持；迁移须重签该文件并同步本段。
+
 ## 5. 违例与边界
 
 - 模块未声明写槽而写入 → M00 抛出 DATA_SLOT_VIOLATION，该写入丢弃并记录。
 - 持久化读取时未知字段忽略并告警，不崩溃（向前兼容）。
+- 未声明读槽的读取同样视为违例：读他人槽须在注册时声明只读（§2 读写纪律），不得以「只读」为由绕过声明。
+- 总线协议版本 `schema_version` 只增不删；结构性变更须 bump 并在 01 §7 V1 记录迁移（迁移前旧快照须可读）。
 ```
 
 **4.2 M06_流程状态机** · 归属：官方核心 · 溯源：04_模块库/事件类/M06_流程状态机.md
@@ -246,7 +261,7 @@ machine_contract:
   category: 事件
   layer: P30
   inputs: [M20]
-  outputs: [quest_id, state, tick]
+  outputs: [quest_id, state, tick, phase, objective, location, reward, next_quest]
   events:
     publish: [quest_state]
     subscribe: [combat_result, travel_event, chaos_event, reputation_change]
@@ -256,6 +271,11 @@ machine_contract:
       quest_id: string
       state: string
       tick: number
+      phase: untyped
+      objective: untyped
+      location: untyped
+      reward: untyped
+      next_quest: untyped
     inputs:
       M20: untyped
 ```
@@ -263,6 +283,14 @@ machine_contract:
 ## 1. 职责
 
 管理**流程/步骤的生成与状态机**：按模板实例化流程，维护其状态与链式依赖，按进度发布状态。是流程结构生成方——文本与表现交 M12/M13，具体结算交各自域模块。
+
+本文件三形态：
+
+- `> 引用块` = 速览（类别 / 来源 / 挂载 / 依赖 / 发布）；
+- `machine_contract` = 机读投影（check16 契约仲裁 / check28 IDL 校验读取）；
+- §2–§5 正文 = 契约全集。
+
+三者零矛盾，冲突时以引用块 / 正文为准（01 §1.1「投影须覆盖全集且不越界」）。
 
 ## 2. 流程规则
 
@@ -278,6 +306,8 @@ flow_chain:
 ```
 
 - 具体模板与数值随域包资产分发，经 asset_get 寻址。
+- 流程模板只从域包资产取（经五接口，I4）；域包未提供某模板 / 数值时留空并标注缺口，**不编造模板或阶段语义**。
+- 流程状态输出写入数据槽（I3），下游模块经数据槽读取，不直读 M06 内部结构。
 
 ## 3. 事件契约
 
@@ -289,9 +319,11 @@ subscribe:
   reputation_change: # 评价升降开关流程线（随域包）
 publish:
   quest_state:
-    payload: {quest_id, phase, objective, location, reward, next_quest}
+    payload: {quest_id, state, tick, phase, objective, location, reward, next_quest}
     subscribers: 需求消费方（随域包装配登记）
 ```
+
+- 机读投影口径：`machine_contract.events` 是机读投影，本段是正文事件契约全集；payload 字段与 `machine_contract.outputs` 同集，事件名须在 `protocol/event_registry.json` 在册（check16 读取本模块机读块做装配仲裁）。
 
 ## 4. 结算流程
 
@@ -300,11 +332,14 @@ publish:
 3. 推进 phase 变更并发布 quest_state。
 4. 相邻模块据此调整表现与结算。
 
+边界：订阅事件（`combat_result` / `travel_event` / `chaos_event` / `reputation_change`）缺失时流程不臆造推进（停在当前 phase 并留缺口）；流程资产缺模板 → 留空标注；M06 只维护 phase 状态，不裁决胜负与数值结算。
+
 ## 5. 违例与边界
 
 - M06 **只生成流程结构与状态**：不写文本（M12）、不裁决结算（各域模块）、不直接改评价。
 - 流程文本须经 M80 质检门（结构门 + profile 质量门）后输出，M06 内部不做渲染。
 - 关键失败/回卷判定归对应域模块与 M50，M06 不自行判死。
+- 不得发布 `event_registry` 未在册的事件名；事件名须合标识面词法（01 §1.1：ASCII 小写蛇形）。
 ```
 
 **4.3 M08_环境状态** · 归属：官方核心 · 溯源：04_模块库/世界类/M08_环境状态.md
@@ -343,6 +378,14 @@ machine_contract:
 
 管理**周期与环境状态**：按世界历推进周期，按周期权重生成环境状态，维护各区域当前环境并广播给依赖方。是环境依赖型模块的环境真相来源（具体维度与数值随域包）。
 
+本文件三形态：
+
+- `> 引用块` = 速览（类别 / 来源 / 挂载 / 依赖 / 发布）；
+- `machine_contract` = 机读投影（check16 契约仲裁 / check28 IDL 校验读取）；
+- §2–§5 正文 = 契约全集。
+
+三者零矛盾，冲突时以引用块 / 正文为准（01 §1.1「投影须覆盖全集且不越界」）。
+
 ## 2. 周期与环境规则
 
 ```yaml
@@ -357,6 +400,8 @@ effects:
 ```
 
 - 各区域环境描述与效果数值全表随域包资产分发，经 asset_get 寻址。
+- 环境维度只从域包资产取（经五接口，I4）；域包未提供某维度时留空并标注缺口，**不编造维度 / 数值**。
+- 环境状态输出写入数据槽（I3），下游模块经数据槽读取，不直读 M08 内部结构。
 
 ## 3. 事件契约
 
@@ -369,6 +414,8 @@ publish:
     subscribers: 域包环境消费方
 ```
 
+- 机读投影口径：`machine_contract.events` 是机读投影，本段是正文事件契约全集；payload 字段与 `machine_contract.outputs` 同集，事件名须在 `protocol/event_registry.json` 在册（check16 读取本模块机读块做装配仲裁）。
+
 ## 4. 结算流程
 
 1. 收到 tick_day，推进日历。
@@ -376,11 +423,14 @@ publish:
 3. 按权重生成/延续当前区域环境。
 4. 发布 weather_state，订阅方按需应用修正。
 
+边界：`tick_day` 缺失时**不得自行推进时间**（时间唯一来源 = 通用:M10）；环境资产缺维度 → 留空并标注缺口；本模块只广播状态，不裁决效果（效果修正由各域模块自行应用）。
+
 ## 5. 违例与边界
 
 - M08 **只计算环境状态并广播，不裁决结果**——修正由各域模块自行应用。
 - 不得跳过 tick_day 自行推进时间（时间唯一来源是 通用:M10）。
 - 环境异象若构成事件，须交事件:M22 组织，M08 不直接发布编排结果。
+- 不得发布 `event_registry` 未在册的事件名；事件名须合标识面词法（01 §1.1：ASCII 小写蛇形）。
 ```
 
 **4.4 M10_节拍推进** · 归属：官方核心 · 溯源：04_模块库/通用类/M10_节拍推进.md
@@ -399,7 +449,7 @@ machine_contract:
   category: 通用
   layer: P10
   inputs: [M00]
-  outputs: [tick, day, season]
+  outputs: [tick, day, is_new_day, season, season_ctx, minute]
   events:
     publish: [tick_day, minute_tick]
     subscribe: []
@@ -414,13 +464,16 @@ machine_contract:
       guidance:
         要算什么: 从 tick 折算 day、子刻、is_new_day 与 season_ctx
         输出形状: 整数 tick/day/子刻；布尔 is_new_day；字符串 season_ctx
-        对接字段: outputs=[tick, day, season]，事件 payload 见第 4 节
+        对接字段: outputs=[tick, day, is_new_day, season, season_ctx, minute]，事件 payload 见第 4 节
         常见坑: 子刻推进只在需要的域包启用；跨日只发布一次 tick_day；禁止模块自行推进时间
   io_types:
     outputs:
       tick: number
       day: number
+      is_new_day: boolean
       season: string
+      season_ctx: untyped
+      minute: number
     inputs:
       M00: state
 ```
@@ -428,6 +481,14 @@ machine_contract:
 ## 1. 职责
 
 驱动系统时间轴，维护 tick / day / season 三轨时钟，并广播推进事件。所有按回合/按日结算的模块均以本模块的推进信号为节拍。
+
+本文件三形态：
+
+- 头部引用块 = 速览（类别 / 来源 / 挂载 / 依赖 / 发布）；
+- machine_contract 块 = 机读投影（check16 契约仲裁 / check28 IDL 校验读取）；
+- §2–§5 正文 = 契约全集。
+
+三者零矛盾，冲突时以引用块 / 正文为准（01 §1.1「投影须覆盖全集且不越界」）。
 
 ## 2. 时间尺度
 
@@ -450,21 +511,28 @@ advance:
   4. 等待订阅者完成结算（同步），再返回 M50 继续下一层
 ```
 
+- tick 单调递增：除 M50 触发的时间回卷（回溯/读档）外不得回退；回卷由 M50 统一发起，M10 只接受指令并重放事件。
+- 跨日只发布**一次** tick_day（同日多次推进不重复广播）；子刻轨道未启用时不得发布 minute_tick。
+
 ## 4. 事件契约
 
 ```yaml
 publish: tick_day
-  payload: {tick, day, is_new_day: bool, season_ctx}
+  payload: {tick, day, is_new_day: bool, season, season_ctx}
   subscribers: 日粒度结算模块（随域包装配登记）
 publish: minute_tick        # 仅在启用子刻时
   payload: {tick, minute}
   subscribers: 子刻结算模块（随域包装配登记）
 ```
 
+- 机读投影口径：machine_contract 的 events 是机读投影，本段是正文事件契约全集；payload 字段并集与 machine_contract.outputs 同集，事件名与字段须在 protocol/event_registry.json 在册（check16 读取本模块机读块做装配仲裁）。
+
 ## 5. 违例与边界
 
 - 任何模块禁止自行推进系统时间；只允许请求 M10.advance(n)。
 - 时间回卷（回溯/读档）由 M50 统一触发，M10 只接受回卷指令并重放事件。
+- 不得发布 event_registry 未在册的事件名或字段；事件名须合标识面词法（01 §1.1：ASCII 小写蛇形）。
+- 时间状态写入数据槽（I3），模块不得绕过数据槽直读 M10 内部时钟（I4 隔离）。
 ```
 
 **4.5 M12_模板检索库** · 归属：官方核心 · 溯源：04_模块库/事件类/M12_模板检索库.md
@@ -487,7 +555,7 @@ machine_contract:
   events:
     publish: []
     subscribe: []
-  interfaces: []
+  interfaces: [search]
   io_types:
     outputs: {}
     inputs:
@@ -498,6 +566,14 @@ machine_contract:
 ## 1. 职责
 
 维护**可检索的内容模板库**：把「按条件供给可选项与文本」的能力集中于此，模板内容随域包扩展。是"素材库"，与 M13 的状态机构成模板-状态互查的双向耦合。
+
+本文件三形态：
+
+- 头部引用块 = 速览（类别 / 来源 / 挂载 / 依赖 / 发布）；
+- machine_contract 块 = 机读投影（check16 契约仲裁 / check28 IDL 校验读取）；
+- §2–§5 正文 = 契约全集。
+
+三者零矛盾；本模块为**零事件模块**（events 双空），按 01 §1.1 以 interfaces: [search] 补全对外查询接口面（不是纯内部模块）。
 
 ## 2. 模板规则
 
@@ -515,11 +591,14 @@ content_template:
 ```
 
 - 模板全表 → 对应域包资产（随域包分发，经 asset_get 寻址）。
+- 模板条目只从域包资产取（经五接口，I4）；域包未提供某类模板时留空并标注缺口，**不编造模板内容**。
+- 检索结果为只读素材（写入数据槽供下游消费，I3），M12 不写状态、不直接产出文本。
 
 ## 3. 模板-状态互查
 
 - M12 提供**静态模板**，M13 提供**运行时实体状态**（关联度/日程/目标/记忆）。
-- 触发 = M13 判定「该不该交互」→ M12 按条件检索「给什么模板」→ 效果回写 M13。
+- 触发 = M13 判定「该不该交互」→ M12 通过对外接口 search(condition) 按条件检索「给什么模板」→ 效果回写 M13（回写经 M13 的接口，不由 M12 直写状态）。
+- 机读投影口径：machine_contract 的 events / interfaces 是机读投影，本段是正文契约全集；零事件模块以 interfaces 承接联动面（check16 读取本模块机读块做装配仲裁）。
 - 二者循环依赖在注册表已登记；执行顺序由 M50 按注册表编排（跨预设并集见 06 §3；官方核心 10 步见 02 §6）。
 
 ## 4. 事件契约
@@ -532,6 +611,7 @@ publish: []    # 不发布事件；交互效果经 M13 的 interaction_update �
 ## 5. 违例与边界
 
 - M12 只提供模板与选项素材，**不裁决关系数值**（关联函数在 M13）、**不生成流程**（M06）。
+- search 接口**只读**：不得修改 M13 状态、不得发布事件、不得写数据槽以外位置（I3/I5）。
 - 模板含隐藏域信息时，供给消费方须经 M23 可见性裁剪。
 - 模板文本遵循 M80 质量门（profile 配置，若有）；禁止超长整段模板。
 ```
@@ -552,7 +632,7 @@ machine_contract:
   category: 事件
   layer: P30
   inputs: [M12, M06, M20]
-  outputs: [npc_id, action, result, tick]
+  outputs: [npc_id, action, result, tick, affinity_delta, context, flags, type]
   events:
     publish: [interaction_update]
     subscribe: [quest_state, level_up]
@@ -563,6 +643,10 @@ machine_contract:
       action: string
       result: string
       tick: number
+      affinity_delta: untyped
+      context: array
+      flags: array
+      type: untyped
     inputs:
       M12: untyped
       M06: untyped
@@ -572,6 +656,14 @@ machine_contract:
 ## 1. 职责
 
 管理**实体的运行时状态机、记忆、日程、目标与关联函数**：实例化实体个体，维护其与主体之间的关联度与交互历史，把每次交互结算为 interaction_update 广播给关系/评价/编排模块。**实体个体真相来源**（群体评价归域包群体模块）。
+
+本文件三形态：
+
+- 头部引用块 = 速览（类别 / 来源 / 挂载 / 依赖 / 发布）；
+- machine_contract 块 = 机读投影（check16 契约仲裁 / check28 IDL 校验读取）；
+- §2–§5 正文 = 契约全集。
+
+三者零矛盾，冲突时以引用块 / 正文为准（01 §1.1「投影须覆盖全集且不越界」）。
 
 ## 2. 实体状态机
 
@@ -589,6 +681,9 @@ affinity_function:
   输出: affinity_delta → interaction_update
 ```
 
+- 实体实例与记忆条目只从域包资产取（经 asset_get 等五接口，I4）；域包未提供字段时留空标注，**不编造实体状态**。
+- 交互结果写入数据槽（I3），M13 不直写消费方内部状态。
+
 ## 3. 事件契约
 
 ```yaml
@@ -597,16 +692,20 @@ subscribe:
   level_up: # 成长类模块 → 主体状态影响实体基线
 publish:
   interaction_update:
-    payload: {npc_id, type, affinity_delta, context, flags[]}
+    payload: {npc_id, action, result, tick, affinity_delta, context, flags, type}
     subscribers: 关系/评价/编排消费方（随域包装配登记）
 ```
 
+- 机读投影口径：machine_contract 的 events 是机读投影，本段是正文事件契约全集；payload 字段与 machine_contract.outputs 同集，事件名须在 protocol/event_registry.json 在册（check16 读取本模块机读块做装配仲裁）。
+
 ## 4. 结算流程
 
-1. 每日/事件驱动实体日程更新。
-2. 交互发起 → 经 M12 检索模板、消费方选择生效。
+1. 每日/事件驱动实体日程更新（日程随域包资产，经五接口 I4 取用，不编造条目）。
+2. 交互发起 → 经 M12 的 search 接口检索模板、消费方选择生效。
 3. 关联函数结算 affinity_delta。
 4. 发布 interaction_update：关系模型折算关联度、评价模块折算贡献、编排模块采集素材。
+
+边界：订阅事件（quest_state / level_up）缺失时不臆造目标或成长基线；实体数据只从域包资产取（I4），缺字段留空标注；interaction_update 写入数据槽（I3），M13 不直写消费方内部状态。
 
 ## 5. 违例与边界
 
@@ -614,6 +713,7 @@ publish:
 - 记忆写入须遵守 M23：不可见的记忆不进入可见域。
 - 实体存在状态判定归对应域模块，M13 只执行状态清理与继承。
 - 交互产生的文本表现归 M12/M80，M13 不做渲染。
+- 不得发布 event_registry 未在册的事件名；事件名须合标识面词法（01 §1.1：ASCII 小写蛇形）。
 ```
 
 **4.7 M20_知识条目库** · 归属：官方核心 · 溯源：04_模块库/事件类/M20_知识条目库.md
@@ -621,7 +721,7 @@ publish:
 ```markdown
 # 模块 M20 · 知识条目库
 
-> 类别：事件｜来源：共享｜挂载点：P70 参考素材（active）/ P00 数据基座（available）｜依赖：M00｜被依赖：M06、M12、M13｜发布：无
+> 类别：事件｜来源：共享｜挂载点：P70 素材（active）/ P00 装载（available）｜依赖：M00｜被依赖：M06、M12、M13｜发布：无
 
 ```yaml
 machine_contract:
@@ -647,6 +747,14 @@ machine_contract:
 
 管理**领域知识条目库**：按域提供结构化知识条目，按需供给各模块作为「背景上下文」，防止输出违反域内约定。**只读库，不含数值规则**（数值在各模块/资产库）；条目内容随域包分发。
 
+本文件三形态：
+
+- 头部引用块 = 速览（类别 / 来源 / 挂载 / 依赖 / 发布）；
+- machine_contract 块 = 机读投影（check16 契约仲裁 / check28 IDL 校验读取）；
+- §2–§5 正文 = 契约全集。
+
+三者零矛盾；本模块为**零事件模块**（events 双空），按 01 §1.1 以 interfaces: [query] 补全对外查询接口面；双挂载 = P70 素材（active，主挂载）+ P00 装载（available，常识装载槽位），机读层字段登记主挂载层。
+
 ## 2. 知识条目结构
 
 ```yaml
@@ -659,6 +767,8 @@ knowledge_entry:
 ```
 
 - 全量知识条目随域包资产分发，经 asset_get 寻址。
+- 条目只从域包资产取（经五接口，I4）；未知键**返回空并告警**，不编造条目内容（宁缺毋滥）。
+- 知识经 `query` 接口只读供给；M20 不写数据槽、不发布事件（I3/I5）。
 
 ## 3. 供给与查询
 
@@ -670,6 +780,8 @@ query(domain, key, viewer):
 装载时机: 由 M50 调度（按注册表执行顺序的常识装载位）
 ```
 
+- 机读投影口径：machine_contract 的 events / interfaces 是机读投影（events 双空 + interfaces: [query]），本段是正文契约全集；查询接口名与本节签名一致（check16 读取本模块机读块做装配仲裁）。
+
 ## 4. 与各模块的配合
 
 - 各域模块据知识库校验自身行为/能力是否符合域内设定。
@@ -680,6 +792,7 @@ query(domain, key, viewer):
 - M20 是**只读知识库**：不裁决行为、不产出流程、不持有数值曲线。
 - 消费方检索不到的键视为"知识不存在"，禁止凭模型先验脑补写入。
 - 新知识条目须走资产库新增，运行时不可直接改写知识库。
+- `query` 为**只读接口**：不得写库、不得发布事件、不得绕过 M23 可见性裁剪向消费方透传隐藏域内容。
 ```
 
 **4.8 M22_事件编排** · 归属：官方核心 · 溯源：04_模块库/事件类/M22_事件编排.md
@@ -698,14 +811,18 @@ machine_contract:
   category: 事件
   layer: P30
   inputs: []
-  outputs: [type, payload, tick]
+  outputs: [seq_no, type, beats, pov, causal_chain, payload, tick]
   events:
     publish: [narrative_event]
     subscribe: [death_trigger, relationship_change, chaos_event, ghost_event, market_event, production_output, interaction_update]
   interfaces: []
   io_types:
     outputs:
+      seq_no: untyped
       type: untyped
+      beats: array
+      pov: untyped
+      causal_chain: untyped
       payload: object
       tick: number
     inputs: {}
@@ -714,6 +831,14 @@ machine_contract:
 ## 1. 职责
 
 管理**事件编排、时间线推进与因果组织**：汇聚各源模块发布的事件，校验因果一致性后组织为按序的事件流，驱动连贯时间线。是**编排者**——不做数值结算，只做因果编排。
+
+本文件三形态：
+
+- 头部引用块 = 速览（类别 / 来源 / 挂载 / 依赖 / 发布）；
+- machine_contract 块 = 机读投影（check16 契约仲裁 / check28 IDL 校验读取）；
+- §2–§5 正文 = 契约全集。
+
+三者零矛盾，冲突时以引用块 / 正文为准（01 §1.1「投影须覆盖全集且不越界」）。inputs 为空是**显式声明**：本模块不发数据请求，输入面 = 订阅事件总线（见 §3）。
 
 ## 2. 事件编排规则
 
@@ -730,6 +855,10 @@ consistency_check:
   编排 → 因果顺序写入时间线
 ```
 
+- 事件源只从注册表在册事件取（订阅面见 §3，事件类型真源 = protocol/event_registry.json，I5）；未知事件名**拒收并告警**，不编造事件。
+- 边界：不直接读外部资产（I4 归域包装配面），事件历史经 M00 事件总线读（I3），编排结果写数据槽。
+- 编排结果写入数据槽（I3）：M22 不直写消费方渲染面，narrative_event 由订阅方（M80 / 域包）自行消费。
+
 ## 3. 事件契约
 
 ```yaml
@@ -743,9 +872,11 @@ subscribe:
   interaction_update: # 关键交互（M13）
 publish:
   narrative_event:
-    payload: {seq_no, type, beats[], pov, causal_chain}
+    payload: {seq_no, type, beats, pov, causal_chain, payload, tick}
     subscribers: [M80, 域包消费方]
 ```
+
+- 机读投影口径：machine_contract 的 events 是机读投影，本段是正文事件契约全集；payload 字段与 machine_contract.outputs 同集，事件名须在 protocol/event_registry.json 在册（check16 读取本模块机读块做装配仲裁）。
 
 ## 4. 编排流程
 
@@ -754,12 +885,15 @@ publish:
 3. 决定哪些入线、以何顺序、以何视角呈现（M23 裁剪）。
 4. 发布 narrative_event → M80 渲染为输出；域包消费方按需读取。
 
+边界：订阅事件缺失时**不空降编排**（每事件须有前因，禁止无源入线）；事件总线历史缺链 → 该事件暂不入线并告警；M22 只编排因果与顺序，数值结算归源模块。
+
 ## 5. 违例与边界
 
 - 事件:M22 **只编排因果与顺序**，不执行数值结算（结算在各源模块内完成）。
 - 未公开的线索放入隐藏域（M23），不得提前进入可见输出。
 - 域包若自发布事件，须在其登记中显式标记来源与豁免关系，不留隐式特例。
 - 时间线须尊重既有状态与设定（一致性纪律），禁止设定漂移。
+- 不得发布 event_registry 未在册的事件名；事件名须合标识面词法（01 §1.1：ASCII 小写蛇形）。
 ```
 
 **4.9 M23_可见性边界** · 归属：官方核心 · 溯源：04_模块库/通用类/M23_可见性边界.md
@@ -767,7 +901,7 @@ publish:
 ```markdown
 # 模块 M23 · 可见性边界
 
-> 类别：通用｜来源：核心｜挂载点：P20 实体状态（active）｜依赖：M00｜被依赖：M13、事件:M22
+> 类别：通用｜来源：核心｜挂载点：P20 实体状态（active）｜依赖：M00｜被依赖：M13、事件:M22｜发布：无
 
 ```yaml
 machine_contract:
@@ -793,6 +927,14 @@ machine_contract:
 
 执行**信息可见性裁剪**：输出只能呈现「消费方当前可知」的信息。任何内部状态、不可观察输入、系统真实状态一律不得进入输出素材——这是信息边界纪律（消费方可知原则）的系统侧保障。
 
+本文件三形态：
+
+- 头部引用块 = 速览（类别 / 来源 / 挂载 / 依赖 / 发布）；
+- machine_contract 块 = 机读投影（check16 契约仲裁 / check28 IDL 校验读取）；
+- §2–§5 正文 = 契约全集。
+
+三者零矛盾；本模块为**零事件模块**（events 双空），按 01 §1.1 以 interfaces: [cognition.filter] 补全对外查询接口面（不是纯内部模块：它被 M13 / 事件:M22 消费）。
+
 ## 2. 可见性模型
 
 ```yaml
@@ -805,6 +947,10 @@ visibility:
   - 隐藏域信息不得直接呈现；只可通过可观察证据间接透出
 ```
 
+- **只读纪律**：M23 只裁剪、不裁决、不写状态、不发布事件；裁剪结果经 cognition.filter 接口返回给消费方，由消费方决定如何呈现。
+- 裁剪输入只经数据槽（I3 通信 / I4 隔离）读取（M13 写入的实体状态、域包扩展状态槽）；知识条目经 M20 的 query 接口查询，不持有其输入。
+- 推断域结论须标注不确定（不得把推测写成事实），这是可见性纪律而非表现偏好。
+
 ## 3. 多重真相支持
 
 - 系统层可保留完整真相（供一致性校验与上层消费）；
@@ -814,12 +960,15 @@ visibility:
 ## 4. 联动
 
 - 读取：M13（实体运行时状态）、M20（知识条目库），以及域包扩展的实体状态。
-- 事件：M23 不发布事件；M13/事件:M22 每次取素材前须先过 cognition.filter()（接口标识符 Phase 1 冻结，Phase 2 迁移为 visibility.filter）。
+- 事件：M23 不发布事件；M13/事件:M22 每次取素材前须先过 cognition.filter(consumer, material)（接口标识符 Phase 1 冻结，Phase 2 迁移为 visibility.filter；迁移须同步本段与 machine_contract.interfaces）。
+- 机读投影口径：machine_contract 的 events（双空）/ interfaces 是机读投影，本段是正文接口契约全集；接口名须与 01 §1.1 示例一致（cognition.filter）。
 
 ## 5. 违例与边界
 
 - 输出中出现隐藏域直述 → 质检 fail（可见性纪律违例，M80 结构门 S5）。
 - 消费方失能/离线场景：可见域降为空，只能输出环境描述（不得臆测隐藏域）。
+- cognition.filter 为**只读接口**：不得写数据槽、不得发布事件、不得缓存隐藏域原文并以其它路径透出（含日志/调试面）。
+- 接口名与 Phase 1 冻结标识符一经登记不得单方改名；迁移须按 01 §7 V2 制度同步 01/02/本文件与 machine_contract。
 ```
 
 **4.10 M24_规则组合** · 归属：官方核心 · 溯源：04_模块库/通用类/M24_规则组合.md
@@ -827,7 +976,7 @@ visibility:
 ```markdown
 # 模块 M24 · 规则组合
 
-> 类别：通用｜来源：共享｜挂载点：P70 参考素材（active）｜依赖：M00｜被依赖：无
+> 类别：通用｜来源：共享｜挂载点：P70 素材（active）｜依赖：M00｜被依赖：无｜发布：无
 
 ```yaml
 machine_contract:
@@ -853,6 +1002,14 @@ machine_contract:
 
 系统**组合/推导规则**的唯一结算入口：把「两个或以上输入合出新结果」的规则统一在此登记与判定，防止各模块各自为政产生规则冲突。域包以各自配方表扩展本模块，核心不内嵌任何领域配方。
 
+本文件三形态：
+
+- 头部引用块 = 速览（类别 / 来源 / 挂载 / 依赖 / 发布）；
+- machine_contract 块 = 机读投影（check16 契约仲裁 / check28 IDL 校验读取）；
+- §2–§5 正文 = 契约全集。
+
+三者零矛盾；本模块为**零事件模块**（events 双空），按 01 §1.1 以 interfaces: [resolve] 补全对外查询接口面（不是纯内部模块：结算结果供输出层消费）。
+
 ## 2. 规则注册表
 
 ```yaml
@@ -864,6 +1021,9 @@ combinations:
     source: 规则出处（域包章节号或用户自定义包）
 ```
 
+- 配方表随域包资产分发（经 asset_get 等五接口读取，I4 隔离）；核心不内嵌领域配方，**不编造未登记的规则**。
+- 规则登记只增不删（01 §7 V1）：覆盖默认规则走 §4 优先级，不改写原条目出处。
+
 ## 3. 判定流程
 
 ```yaml
@@ -871,19 +1031,25 @@ resolve(inputA, inputB):
   1. 查规则表 → 命中返回 output
   2. 未命中 → 返回 null（不自动脑补组合，禁止自由发挥）
   3. 命中但条件不足 → 返回 blocked + 缺什么
-  4. 结算结果写入 P70 参考素材槽，供输出层消费
+  4. 结算结果写入 P70 素材槽，供输出层消费
 ```
+
+- 机读投影口径：machine_contract 的 events（双空）/ interfaces 是机读投影，本段是正文接口契约全集；接口名 resolve 与 01 §1.1 示例一致。
+- 槽位字段名由域包装配显式声明后补登记（届时同步 outputs 与 io_types）；未显式声明前机读 outputs 保持 []，**不虚构 token**（01 §1.1 投影不越界）。
 
 ## 4. 扩展约定
 
 - 新增规则须在此登记并附带出处（域包章节号或用户自定义包）。
 - 用户自定义包可覆盖默认规则，优先级：用户自定义 > 域包 > 核心默认。
 - 规则表按域包装配注入；核心不含领域词。
+- 覆盖默认规则须留出处与覆盖链（用户自定义 > 域包 > 核心默认），可追溯、可复现；不得静默改写他包规则。
 
 ## 5. 违例与边界
 
 - 禁止在规则表中不存在时自行生成「看似合理」的新组合——保持可解释、可复现。
 - 组合失败只返回 blocked 原因，不消耗输入（可重试），除非规则注明消耗。
+- resolve 为**只读查询 + 单点结算**：不发布事件（events 双空）、不写未声明槽、不得在规则表外自行生成组合或数值。
+- 规则命中判定必须确定性：同输入同规则表 → 同结果（禁止随机/时变策略）。
 ```
 
 **4.11 M50_调度器** · 归属：官方核心 · 溯源：04_模块库/通用类/M50_调度器.md
@@ -946,7 +1112,7 @@ machine_contract:
         - phase: run
           next: end
           guard: 按 02 §6 执行官方核心与域包合并顺序
-          writes: [memory.working]
+          writes: [PlayerState.memories.working]
         - phase: end
           next: archive
           guard: I2 核心固定结构/字段一致性校验通过
@@ -954,11 +1120,11 @@ machine_contract:
         - phase: archive
           next: roll
           guard: end 通过后执行回合末状态写回
-          writes: [memories.memory.episodic.items, memories.memory.semantic.facts]
+          writes: [PlayerState.memories.episodic, PlayerState.memories.semantic]
         - phase: roll
           next: begin
           guard: 回卷至 begin 快照并进入下一回合
-          writes: [memory.working]
+          writes: [PlayerState.memories.working]
     invariants:
       - "抽象状态变量必须是 world_model.abstract_state 显式声明的有限集"
       - "tick 单调不减"
@@ -987,9 +1153,20 @@ machine_contract:
 
 回合调度器。按注册表给出的执行顺序（官方核心装配真相源见 02 §6）依序驱动各层模块；装域包后按包索引动态合并。回合结束回卷并进入下一回合。主循环决定"谁先跑、谁后跑、何时结算"。
 
+本文件三形态：
+
+- 头部引用块 = 速览（类别 / 来源 / 挂载 / 依赖 / 发布）；
+- machine_contract 块 = 机读投影（check16 契约仲裁 / check28 IDL 校验读取；含唯一在用的 world_model 抽象世界模型）；
+- §2–§6 正文 = 契约全集。
+
+三者零矛盾。**全局调度器约定**：layer 字段写「调度器」而非 Pxx，registry 的 mounts 为空（不参与任何层挂载，02 §6 的 10 步顺序中占第 1/2/10 步）；M50 发布 intent_received，**不属零事件模块**，interfaces 保持 [] 合规。
+
 ## 2. 执行顺序
 
 官方装配的执行顺序以 **02_联动注册表.md §6 为唯一真相源（I5）**，本模块不维护静态编号清单，避免双源漂移。装配任域包后，按包索引把域包模块合并进对应层位（R3），生成最终执行顺序。
+
+- 官方核心 10 步顺序（02 §6）：M00 初始化 → M50 调度开始 → P10/P20/P30/P50/P70 各层 → M80 输出门 → M50 回卷；M50 自身占第 1、2、10 步，不入任何层。
+- 域包合并只追加到对应层位的 default/allowed（02 §5/§8 登记），M50 不维护第二份顺序清单。
 
 ## 3. 调度规则
 
@@ -1020,15 +1197,19 @@ writeback:  # 回合末状态写回（经 M00 数据槽总线，仅 M50 于 arch
                    # 直写他模块字段 = DATA_SLOT_VIOLATION
 ```
 
+world_model 口径（01 §1.1 抽象世界模型 · 首战实例）：abstract_state 四变量（pipeline/tick/phase/phase_trace）的 slot 必须在 protocol/world_slots.json 在册；transition 的 writes 写目标同样以该文件在册槽路径为准；checks 三类（finite_phase / monotonic / finite_sequence）由 WorldModelRuntime 确定性重放校验，不训练/不宣称模型优劣。
+
 ## 5. 违例与边界
 
 - 禁止任何模块在 step 之外自行触发其他模块逻辑（必须经由注册表订阅/挂载）。
 - 死循环防护：单回合执行超时/步数超限 → M50 强制打断并回卷。
+- 非 M50 模块不得直写 M00 数据槽（I4×I5）；M50 自身也只写 world_model 声明的槽，不越界改他模块内部字段。
 
 ## 6. 事件契约
 
 - 发布 intent_received：接收用户意图并广播，供意图驱动管线订阅（P90 的 M90 订阅）；载荷字段 intent_id / mode / text 的机读登记见 protocol/event_registry.json，本模块不另立第二份形状（I5）。
 - 订阅：无（M50 只发布不订阅）。
+- 机读投影口径：machine_contract.events 是机读投影，本段是正文事件契约全集；intent_received 载荷字段与 machine_contract.outputs 同集，事件名与字段须在 protocol/event_registry.json 在册（check16 读取本模块机读块做装配仲裁）。
 ```
 
 **4.12 M80_输出质检门** · 归属：官方核心 · 溯源：04_模块库/通用类/M80_输出质检门.md
@@ -1036,7 +1217,7 @@ writeback:  # 回合末状态写回（经 M00 数据槽总线，仅 M50 于 arch
 ```markdown
 # 模块 M80 · 输出质检门
 
-> 类别：通用｜来源：核心｜挂载点：P80 输出质检（active）｜依赖：M50、事件:M22｜被依赖：无
+> 类别：通用｜来源：核心｜挂载点：P80 输出（active）｜依赖：M50、事件:M22｜被依赖：无｜发布：无
 
 ```yaml
 machine_contract:
@@ -1063,6 +1244,14 @@ machine_contract:
 
 将上游素材/装配产物渲染为最终可读输出，是质检门的**执行器**：输出先过结构门（硬 · 全域通用），再按 profile 加载质量门（软 · profile 配置；profile 未配置时仅过结构门），判定后放行、自纠或重写。
 
+本文件三形态：
+
+- 头部引用块 = 速览（类别 / 来源 / 挂载 / 依赖 / 发布）；
+- machine_contract 块 = 机读投影（check16 契约仲裁 / check28 IDL 校验读取）；
+- §2–§5 正文 = 契约全集。
+
+三者零矛盾。**零事件固定节点口径**：M80 是管线末端的固定门禁节点——events 双空（门禁不发布事件，gate 决策记录走系统日志独立通道）且 interfaces []（不对外提供查询接口，由装配/调度触发）。这是**显式声明而非缺省**：M80 不属「以空契约脱离联动面」——联动面由 inputs（M50 调度、事件:M22 编排产物）与 02 §6 第 9 步顺序体现。
+
 ## 2. 质检双门
 
 ### 2.1 结构门（硬 · 全域通用 · 可机器核验）
@@ -1076,7 +1265,7 @@ machine_contract:
 ### 2.2 质量门（软 · 可插拔 profile · 可配置）
 
 - 渲染前加载当前 profile 配置（资产键 STYLE_DNA 或 protocol.yaml 的 profile 字段；标识符 Phase 1 冻结，Phase 2 迁移为通用「输出 profile」）；
-- profile 由用户/域包自定义——**协议层不内嵌任何固定条目**；
+- profile 由用户/域包自定义——**协议层不内嵌任何固定条目**；profile 资产经 asset_get 等五接口读取（I4 隔离），取不到时按「无 profile」处理，不编造风格规则；
 - profile 未配置时，仅过结构门即放行（风格由运行方自担）。
 
 ## 3. 质检门（声明式 gate_action 流水线）
@@ -1087,11 +1276,11 @@ gate:                      # 双门判定（2.1 结构门 + 2.2 质量 profile�
   warn: 结构门全过 且 profile 部分符合 → 自纠后输出（标注修订点）
   fail: 结构门违例（硬错）或 profile 连续不符 → 整段重写；连续 3 次 fail 降级为最小可读模式（保底，仅结构门）
 前置校验: 素材必须已过 M23 可见性裁剪（隐藏域直述 = fail）
-gate_action:               # 声明式门禁流水线
+gate_action:               # 声明式门禁流水线（真源 = 本段；各管线/M90 文档只引用不另立，I5）
   pass: [direct]
   warn: [self_correct, log_revision]
   fail: [rewrite, retry_limit: 3, fallback: minimal]
-gate_decision_record:      # 决策记录（结构化行，走系统日志独立通道，不进输出正文）
+gate_decision_record:      # 决策记录（结构化行，走系统日志独立通道，不进输出正文；8 段固定格式）
   格式: gate|<流水号>|tick|判定(pass/warn/fail)|命中项|修订点|重写次数|fallback
   样例: gate|014|t_2042|warn|S1,S3,D1,D3,D5|L7 直述改间接|0|none
         gate|015|t_2043|fail|S2|隐藏域直述|3|minimal
@@ -1107,6 +1296,9 @@ gate_decision_record:      # 决策记录（结构化行，走系统日志独立
 - 输出篇幅上限由管线参数控制；禁止输出 JSON/YAML 原始结构（只输出面向消费方的文本）。
 - 系统结算内容与呈现内容分离：系统日志走独立通道，不进输出正文。
 - 门禁为**唯一输出闸**（I2 核心固定）：任何域（含文档线经 M80）产出均不可绕过本 gate。
+- 结构门为**硬门不可关**：任何 profile 配置、域包参数或降级模式都不得跳过 §2.1 结构门；fail 降级只降质量门，不降硬门。
+- gate_action 词表与失败语义以本文件 §3 为唯一真源（P90/M90 等只引用）：新增 action 须同步 gate_action 与「判定记录格式」两处，避免双源。
+- gate 决策记录走独立日志通道（不进输出正文），消费方可审计但不得改写（I3 数据槽外通道）。
 ```
 
 **4.13 M90_结构装配** · 归属：官方核心 · 溯源：04_模块库/技术文档类/M90_结构装配.md
@@ -1143,6 +1335,15 @@ machine_contract:
 
 把自然语言意图解析为**结构化要素**：标题层级、章节骨架、术语表、表格/引用登记、修订记录；按资产键选择章节模板、按规则过一致性校验。是结构化装配类管线的领域装载模块。
 
+本文件四形态：
+
+- 头部引用块 = 速览（类别 / 来源 / 挂载 / 依赖 / 发布）；
+- machine_contract 块 = 机读投影（check16 契约仲裁 / check28 IDL 校验读取）；
+- §2 Module 声明 = 01 §1 模块协议全文（含 core 资产与可替换性）；
+- §3–§7 正文 = 数据槽 / 事件 / 逻辑 / 不变式 / 管线关系全集。
+
+四者零矛盾，冲突时以 §2 与正文为准（01 §1.1「投影须覆盖全集且不越界」）。
+
 ## 2. 协议声明（01 §1 模块协议）
 
 ```yaml
@@ -1164,6 +1365,8 @@ Module:
   replaceable: true
 ```
 
+§2 与 machine_contract 九键（schema/id/name/category/layer/inputs/outputs/events/interfaces）为同源投影：本段是 01 §1 模块协议全集（含 core.assets 与 replaceable），机读块是它的结构投影；两者字段必须逐项一致（00 类型面除外，io_types 在机读块内）。
+
 ## 3. 数据槽契约
 
 ```yaml
@@ -1181,6 +1384,7 @@ DocState:
 - publish doc_structure_ready：结构骨架就绪，通知 M80 进入渲染质检。
 - publish doc_delta_committed：章节增量已提交，供一致性/修订消费方读取。
 - subscribe intent_received：接收用户意图作为装载输入（发布方 M50；载荷机读登记见 protocol/event_registry.json，挂载与顺序见 02 §7.1–§7.2）。
+- 机读投影口径：machine_contract 的 events 是机读投影，本段是正文事件契约全集；三个事件名须在 protocol/event_registry.json 在册（check16 读取本模块机读块做装配仲裁）。
 
 ## 5. 核心逻辑（伪代码）
 
@@ -1193,6 +1397,8 @@ DocState:
 6. publish doc_structure_ready
 ```
 
+边界：模板/规则资产缺失（TECH_TEMPLATES / TECH_RULES 取不到）→ **fail-closed 提示并留缺口**，不编造章节骨架与校验规则；校验失败 → 修复或降级，不静默放行（宁缺毋滥）。
+
 ## 6. 不变式遵守（01 §5）
 
 - I1 三正交分离：只声明"结构能力"，不持有管线顺序（顺序在管线）与数据内容（内容在资产）。
@@ -1204,6 +1410,8 @@ DocState:
 ## 7. 与装配管线的关系
 
 本模块在九层管线中承担装载（骨架解析）、生产（片段）、决策（模板选择）、装配（章节组装）、一致性（跨章校验）等位职责；输出层仍由核心 M80 质检门把守（gate 唯一出口）。
+
+逐层对账（真相源 = 02 §7.1）：P00–P70 八层的 active / available 均含 M90；P80 文档输出的 active / available 为 [M80]（核心质检门，与官方标准装配共用）。挂载与执行顺序以 02 §7 为准，本文件不另立（I5）。
 ```
 
 **4.14 M97_术语管理** · 归属：技术文档域包（自带） · 溯源：community/技术文档域包/modules/M97_术语管理.md
@@ -1410,13 +1618,25 @@ revision_log:
 
 ## 7. 自检清单（交付前逐项核对）
 
-- [ ] §0–§7 八段骨架齐备
+- [ ] §0–§8 九段骨架齐备
 - [ ] §4 内嵌段数 = 15（两包自带 2 + 官方核心 13）
 - [ ] §3 执行顺序与 §2 管线 layers 一致（default 挂载不冲突）
 - [ ] 形态为**全文内嵌**：接收方在不访问仓库时可完成装载
-- [ ] 缺口声明与会话一致（协议件不内嵌 / 快照时点 / 未挂签名锚）
+- [ ] 缺口声明与会话一致（协议件不内嵌 / 快照时点 / 回执 digest_only）
 - [ ] 机器验收通过：nf assemble --check 本文件（需求原话见 §0）
+- [ ] 回执新鲜：nf library verify 对 NF-TECHDOC-Monyeah777-1 无 WARN（内容改动后重签 nf library attest）
+- [ ] 内嵌无漂移：python scripts/rebuild_selfcontained_sample.py --check 本文件（段 16 · 无漂移）
+
+## 8. 取件与核验（本条机检面）
+
+- **取件**：INDEX 三步取件（raw 链接 → 登记表 → 拼 `library/NF-TECHDOC-Monyeah777-1.md`）；编号大小写拿不准查 `library/ALIAS.md`；本地 `nf library show NF-TECHDOC-Monyeah777-1`。
+- **双源一致**：frontmatter 是唯一真源；INDEX 与 ALIAS 为投影（`nf library reindex` 重建）；许可 MIT 与分级 general 两处同值。
+- **内嵌一致性**：`python scripts/rebuild_selfcontained_sample.py --check 本文件` —— 按 `溯源：` 标记逐段与源文件比对，**段 16（模块 15 + 管线 1）无漂移**即内嵌与当前源一致；有漂移（上游模块变更）→ `--write` 重嵌后重签回执。
+- **回执与重签**：`attestation` 是正文+元数据摘要锚点——任何内容改动后 `nf library attest NF-TECHDOC-Monyeah777-1` 重签，否则 `nf library verify` / check34 报 WARN；欲加非对称签名锚用 `--ssh-key`。
+- **时效**：`generated 2026-09-15`（首次入库）/ `verified 2026-11-12`（本次重嵌核对）/ `stale_after 2027-03-15`（超期重核）。
+- **协议层缺口**：01/02/06 不内嵌——执行顺序（02 §6）与编号在册校验须另取 02；内容层自包含 ≠ 规范层自包含（见 §0 缺口 ①）。
+- **机检入口**：`nf library verify`、`verify check34`、`nf library reindex`（投影重建，勿手改生成区）。
 
 ---
 
-*—— 自包含样本 · 由 build_selfcontained_sample.ps1 生成（可复现）· 2026-09-15 · 内嵌 15 件*
+*—— 自包含样本 · 由 scripts/rebuild_selfcontained_sample.py 重嵌（可复现）· 2026-11-12 快照 · 内嵌 15 件*

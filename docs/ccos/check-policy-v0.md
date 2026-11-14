@@ -2,8 +2,9 @@
 
 状态：**已实装**（判据：`desktop/tests/test_check_policy.py` 19 项；CLI：`nf check --policy`）。
 > ⛔ 操作指令：阅读即执行——本文含可直接执行的命令与判定，勿当资料阅读。
-> 最后更新：2026-11-04
+> 最后更新：2026-11-13
 > **Status**: v0 已实装（nf check）· **上位**: docs/ccos/abi-v0.md §2 cc_check
+> **复核（2026-11-13）**：封闭词表（5 类）、策略形状、warn 不改判定、policy_digest 随结论走、坏策略带指引拒绝——**逐项复核不变**；补三处现状：① 常驻判据 **19 项**（`test_check_policy.py`，与 §判据 一致）；② CLI 现为**五个入口**：`--policy`（判定）/`--json`/`--compile`（意图→策略）/`--list-rules`（词表与不可表达规则）/`--intent-from-text`（**法规原文→意图草稿**，`nf-check-intent-draft/1`，2026-11-07 起，见 ABI §2 文本层）；③ 意图草稿的**四张账**（covered / pending / unsupported / uncovered）必须逐条在场，不许静默丢条。见文末「§现状对照」。
 
 ## 是什么
 
@@ -84,6 +85,15 @@ nf check 对象.md --policy policy.json                  # 拿编出来的策略
 `carrier_watermark`（要载体读写）、`visual_notice`（要媒体渲染）、`time_window`（要可信时间）、
 `owner_signature`（要身份/CA）。编译出的策略带 `compiled_from.digest`——判据版本随结论走。
 
+### 文本层：法规原文 → 意图草稿（`--intent-from-text`，2026-11-07 起）
+
+`nf check --intent-from-text <法规.txt>` 做**规则抽取草稿**（schema `nf-check-intent-draft/1`）：按条切分 +
+封闭关键词映射成意图草稿；能抽的参数（引号内文字、数字）就抽，抽不到的进 `pending`、需要能力才判的
+进 `unsupported`、关键词都没命中的进 `uncovered`——**四张账，绝不静默丢条**。
+
+> 这是**机械抽取**，不是自然语言理解：草稿必须人工补齐/裁决后才能当法规意图用（`covered[].confidence`
+> 与 `needs_human` 就是给这个用的）。草案未裁定前**不得**直接编译成策略去过门禁。
+
 ## 判定
 
 - 逐条规则出 finding（ok / fail / warn），**顺序 = 规则顺序**（确定性，可 diff）。
@@ -106,6 +116,33 @@ python scripts/nf.py check 01_核心协议.md --policy <策略.json> --json
 # 单测：两态可达 + warn 不改判定 + 坏策略全拒 + 摘要稳定
 python -m unittest desktop.tests.test_check_policy          # 19 项全绿
 ```
+
+## 现状对照（2026-11-13 · 以实跑为准）
+
+| 面 | 本文声明 | 复核结果（读到本行时请重跑） |
+|---|---|---|
+| 封闭词表 | 5 类（utf8 / regex_present / regex_absent / count_at_least / digest_pin） | **与 `check_policy.KINDS` 五项逐字一致** |
+| 策略形状 | `nf-check-policy/1` + schema/id/rules 与必填字段 | **不变**（坏策略带「修复指引：」拒绝） |
+| 判定 | verdict 只有 ok / invalid；warn 不改判定 | **不变**；退出码 0/1/2 |
+| policy_digest | `sha256(canonical(policy))` 随结论返回 | **不变**（`compiled_from.digest` 同） |
+| CLI 入口 | `--policy`（+`--json`） | **五入口**：+`--compile` / `--list-rules` / **`--intent-from-text`**（草稿四账） |
+| 常驻判据 | 19 项 | **19 项**（`test_check_policy.py`） |
+| 意图编译器 | 结构化意图 → 封闭词表 | **不变**；文本层为「草稿 + 人工裁决」，非自动法规翻译 |
+
+> 本表只作「当时 → 现行」导航，不替代实跑。
+
+## 复现与引用口径
+
+```bash
+python scripts/nf.py check --list-rules                # 可编译规则 + 不可表达规则
+python scripts/nf.py check --compile intent.json --out policy.json
+python scripts/nf.py check 01_核心协议.md --policy policy.json --json
+python scripts/nf.py check --intent-from-text <法规.txt>   # 草稿（四张账）
+python -m pytest desktop/tests/test_check_policy.py -q     # 19 项
+```
+
+- 引用本文时：封闭词表 + 只判「要求是否被满足」+ 不判内容质量 = 长期口径；词表/字段以 `check_policy.KINDS`/`FIELDS` 实读为准。
+- 草稿纪律：`--intent-from-text` 产物必须人工补齐 `pending`/裁定 `needs_human` 后才可编译。
 
 ## 边界
 

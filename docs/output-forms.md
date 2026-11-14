@@ -1,6 +1,10 @@
 # 产出形态（output forms）
 > ⛔ 操作指令：阅读即执行——本文含可直接执行的命令与判定，勿当资料阅读。
-> 最后更新：2026-09-22
+> 最后更新：2026-11-13
+> **复核（2026-11-13）**：形态清单 / T0–T4 档位判定 / 未做边界**复核不变**；补可核现状（`nf output verify` 实读）：
+> 形态 **116 条 / 12 类别**（可达 110，**6 条不可达**如实记档）· 状态分布 **absorbed 17 / supported 11 / reference 10 /
+> planned 61 / deferred 11 / unfit 6** · **106 个包级产出面**（1050 件产出）· 总体机验率 **0.7688**
+> （机验 1014 / 散文 305 / 功能面 102）· 判据 `test_output_forms` **34 例**。见「§现状对照」。
 
 ## 是什么
 
@@ -39,6 +43,30 @@ python scripts/nf.py output meter --write                   # 机验率 / 功能
 判定口径与门禁的关系：`verify.sh` 的 **check32 `output_forms` 子扫描**做三件事——
 形态清单自洽、包级产出面逐件校验（形态 / 档位 / schema / 双源 / T4 复算）、
 机验率不低于基线。**不新增 check 序号**（ADR-0002 门禁不注水）。
+
+## 现状对照（2026-11-13 · 以 `nf output verify` 实读为准）
+
+| 面 | 现值 | 复核方式 |
+|---|---|---|
+| 形态清单 | **116 条 / 12 类别**（可达 110 · 不可达 6） | `protocol/output_forms.json` |
+| 状态分布 | absorbed 17 · supported 11 · reference 10 · planned 61 · deferred 11 · unfit 6 | 同上 `forms[].status` |
+| 包级产出面 | **106 个**（`community/<包>/outputs/INDEX.json`） | 目录计数 |
+| 包内产出件 | **1050 件** | `nf output verify` 尾行 |
+| 总体机验率 | **0.7688**（机验 1014 / 散文 305；功能面 102） | `protocol/output_forms_baseline.json: totals` |
+| 常驻判据 | **34 例** | `test_output_forms.py` |
+
+> 本表只作「当时 → 现行」导航；数字以 `nf output verify` 与基线件实读为准（基线回退即 FAIL）。
+
+## 复现与引用口径
+
+```bash
+python scripts/nf.py output verify --json     # 全量机检（同 check32 语义）
+python scripts/nf.py output meter --write     # 重算机验率并重签基线
+python -m pytest desktop/tests/test_output_forms.py -q   # 34 例
+```
+
+- 引用本文时：「档位 = 本仓能做到的判定强度，不是格式高低」= 长期口径；机验率是**回退闸**，不是质量分。
+- 基线只能由 `output meter --write` 更新；手改数字会被 check32 判红。
 
 ## 本仓现在的机验产出面
 

@@ -126,7 +126,7 @@
       "path": "community/西幻生存领域包/modules/M04_战斗系统.md"
     },
     "M06": {
-      "digest": "caf15b750b1d3ea0d1b535c4e9774a18888eda1404912c3def7988c151be5bbe",
+      "digest": "75c5d431f81b6f966bf1a2fe8b2ea5e8820fe18d46f487edd2eb2682cc29df08",
       "path": "04_模块库/事件类/M06_流程状态机.md"
     },
     "M07": {
@@ -150,11 +150,11 @@
       "path": "community/西幻生存领域包/modules/M11_文字魔法.md"
     },
     "M12": {
-      "digest": "01d6a39cb9e4ae0f97a6d7ae66b2ba6f703dfa2ab650792ea1b2d27e57876714",
+      "digest": "bad92aaf87816a0bfc91227a69bf52b5ce677fe841ff0e88f16a77cc4e75d8ca",
       "path": "04_模块库/事件类/M12_模板检索库.md"
     },
     "M13": {
-      "digest": "4e29dc514268909c1b615aa6d7860c5b286815442af8766cfd7ba4562ecd8a1d",
+      "digest": "645d60f7daded414b3053df2860007f42bd329c2012cefe03fbff02d761b7e03",
       "path": "04_模块库/事件类/M13_实体交互.md"
     },
     "M14": {
@@ -306,7 +306,7 @@
       "path": "community/个人助理与日常生活域包/modules/E16b_个人助理与日常生活收口与形态派生.md"
     },
     "事件:M22": {
-      "digest": "d6afedbe5118ca92f6de75211b05eac64144a618e2e368ad0c1aa82af971af20",
+      "digest": "9f69a0760838ba595183ac2b4b22ff3f5c963e6a5f5c64ce6a1ee9ae53c9071a",
       "path": "04_模块库/事件类/M22_事件编排.md"
     },
     "交通与出行:M01": {
@@ -926,7 +926,7 @@
       "path": "community/语音转写与会议记录域包/modules/B13b_语音转写与会议记录收口与形态派生.md"
     },
     "通用:M10": {
-      "digest": "1b654bc697783cb6c7edf110190449a1bcb37786e153ab056ff536e297e6efdc",
+      "digest": "738d9a0b1e7b3f3eece7d870424262ec00df646737d64cc7ebdabb05f779c3aa",
       "path": "04_模块库/通用类/M10_节拍推进.md"
     },
     "量化金融:M31": {

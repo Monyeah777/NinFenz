@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/trust/entity.schema.json",
+  "title": "nf-entity/1 类型化实体（FR-A4-01）",
+  "description": "NF Trust Fabric 的签名实体信封。type 与 issuer 的合法性由类型注册表/issuer registry 在运行时判定；本 schema 只保证结构、摘要与时间格式合法，未知字段一律拒绝（fail-closed）。",
+  "type": "object",
+  "required": [
+    "schema",
+    "type",
+    "subject",
+    "issuer",
+    "issued_at",
+    "payload_digest"
+  ],
+  "properties": {
+    "schema": {
+      "const": "nf-entity/1"
+    },
+    "type": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$",
+      "description": "实体类型；判定以 issuer 的 types 与类型注册表为准"
+    },
+    "subject": {
+      "type": "object",
+      "required": [
+        "kind",
+        "ref",
+        "digest"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "claim",
+            "evidence",
+            "process-step",
+            "bundle",
+            "card",
+            "artifact"
+          ]
+        },
+        "ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "digest": {
+          "$ref": "#/$defs/digest"
+        }
+      },
+      "additionalProperties": false
+    },
+    "issuer": {
+      "type": "string",
+      "minLength": 1
+    },
+    "issued_at": {
+      "$ref": "#/$defs/timestamp"
+    },
+    "payload_digest": {
+      "$ref": "#/$defs/digest"
+    },
+    "refs": {
+      "type": "array",
+      "maxItems": 1024,
+      "items": {
+        "$ref": "#/$defs/refItem"
+      }
+    },
+    "validity": {
+      "type": "object",
+      "properties": {
+        "not_before": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "not_after": {
+          "$ref": "#/$defs/timestamp"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "SHA-256 小写 hex"
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$",
+      "description": "UTC ISO-8601 秒级"
+    },
+    "refItem": {
+      "type": "object",
+      "required": [
+        "kind",
+        "digest"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "digest": {
+          "$ref": "#/$defs/digest"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

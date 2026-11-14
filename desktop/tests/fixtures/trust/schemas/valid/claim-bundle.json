@@ -1,0 +1,49 @@
+{
+  "schema": "nf-claim-bundle/1",
+  "bundle_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "contract_ref": "protocol/schema/trust-claim-bundle.schema.json",
+  "claims": [
+    {
+      "id": "C-001",
+      "type": "evidence",
+      "obligation": "must",
+      "subject_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "payload_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+    },
+    {
+      "id": "C-002",
+      "type": "evidence",
+      "subject_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "payload_digest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+    }
+  ],
+  "merkle_root": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "inclusion_proofs": [
+    {
+      "index": 0,
+      "leaf": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "proof": [
+        {
+          "side": "right",
+          "hash": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "leaf": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "proof": [
+        {
+          "side": "left",
+          "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        }
+      ]
+    }
+  ],
+  "evidence_refs": [
+    {
+      "kind": "evidence",
+      "digest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+    }
+  ]
+}

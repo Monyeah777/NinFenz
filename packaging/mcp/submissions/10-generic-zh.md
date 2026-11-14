@@ -52,3 +52,23 @@
 | 协议版本 | modern `2026-07-28` + legacy `2025-11-25`（双版本并存） |
 | 工具数 / prompts | 12 个只读工具 + 1 个 prompt（`assemble_guide`）；`additionalProperties: false`，参数不合即 `-32602` |
 | 是否只读 | 是（无写路径） |
+
+
+---
+
+## 自检（与材料包同源 · 2026-11-14 复核补）
+
+| 面 | 现值 | 复核方式 |
+|---|---|---|
+| 中文字段 | 名称 / 一句话 / 描述 / 安装 / 仓库 / 站点 / 类目 / 标签 / 许可 **九项齐全** | 上方 `text` 块 |
+| 工具面 | **12 个只读工具 + 1 个 prompt**（`assemble_guide`），无写路径 | `desktop/src/core/mcp_runtime.py` |
+| 协议 | modern `2026-07-28` + legacy `2025-11-25`（双版本并存） | 同上 |
+| 传输 | **仅 stdio**（Streamable HTTP 与 SSE 未提供，表单留空） | `nf serve` 入口 |
+| 依赖 | 零第三方依赖（Python 标准库） | `pyproject.toml` 的 `dependencies` 为空 |
+| 许可 | MIT | `LICENSE` |
+| 中英对偶 | 本件与 `09-generic-en.md` **传输段逐字相同**、字段块同义不同文 | 判据 `test_generic_blocks_doc_contract` |
+| 平台侧 | **平台侧未验**：中文目录站的字段名/类目词表/限制都以该站为准 | 无法从仓库证明 |
+
+- **通用块的用途**：任何未单独列出的**中文**目录站，直接整段粘上方 `text` 块；需要 `mcpServers` JSON 的站，粘「完整配置」块。
+- **不钉运行时计数**：本件文案不带 check/PASS/单测条数——对外文案里的快照数字等于过期承诺。
+- 中英两份**同义不同文**：改字段值必须两边一起改（`09-generic-en.md` 是英文版）；**类目**在英文站填 `content-creation`、中文站填「内容创作」，不要混用。

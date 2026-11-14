@@ -44,6 +44,8 @@ class ApprovalNamingTest(unittest.TestCase):
         d = ROOT / approval.DIR_REL
         if not d.is_dir():
             self.skipTest("无 protocol/approvals 目录")
+        self.assertGreaterEqual(len(list(d.glob("*.json"))), 1,
+                                "protocol/approvals 下没有 .json 批准记录（判据会空转）")
         bad = [p.name for p in d.glob("*.json.json")]
         self.assertEqual([], bad, "批准记录仍有双扩展名：%s" % bad)
 

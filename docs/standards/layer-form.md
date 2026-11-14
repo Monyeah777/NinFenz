@@ -7,6 +7,18 @@
 - 可达性是**本机实测**（探针日期见每条），不可达条目照实标注、不假装可达。
 - 本页为 `docs/standards/index.md` 的按层切片，锚点与主索引一致。
 
+## 怎么读本页
+
+- 本层含义：呈现与文档形态（标记语言、排版、图示与文档结构）
+- 本层可达：29/29（不可达 0）
+- 本层绑定最多：vega-lite（主锚 5 / 辅锚 364） · commonmark（主锚 70 / 辅锚 111） · mermaid（主锚 4 / 辅锚 136）
+- 本层不可达：无（该层全部本机可达）
+- 本层机构分布：W3C 13 条 · Vega 2 条 · AsciiDoc 社区 1 条
+- 生成物：`python scripts/geo_export.py --write` 重写本页；`--check` 比对生成物与真源，不一致即红。手改必红。
+- 切片口径：本页只收 `layer` 等于该层的标准，锚点与主索引 `index.md` 逐字一致。
+- 行字段：名称 · 机构 · 层 · 可达（HTTP · 探针日期） · 扩展点 · 绑定（主锚/辅锚） · 规范 URL。
+- 互指：全量见 `index.md`；按问题形态聚合见 `answer-cards.md`；三面一致性由 check40 判，本页只是**投影**。
+
 ### `asciidoc`
 - AsciiDoc 标记语言 · AsciiDoc 社区 · 层 form · 可达 是（200 · 2026-09-24） · 扩展点 macro-extension, block-extension · 绑定 主锚 0 / 辅锚 0 · https://docs.asciidoctor.org/asciidoc/latest/
 

@@ -23,10 +23,15 @@ def _cells(line: str) -> int:
     return len(re.split(r"(?<!\\)\|", s))
 
 
+def scanned_markdown(root: Path) -> list:
+    """→ 判据扫描面：根层 markdown + docs/**（扫描面塌缩守卫要对它取数）。"""
+    return sorted(list(root.glob("*.md")) + list((root / "docs").rglob("*.md")))
+
+
 def table_mismatches(root: Path) -> list:
     """→ ["文件:行 表头N列 vs 数据M列", ...]（纯函数，变异自证直接喂文本也行）。"""
     out = []
-    files = sorted(list(root.glob("*.md")) + list((root / "docs").rglob("*.md")))
+    files = scanned_markdown(root)
     for p in files:
         if ".rivet" in p.parts:
             continue
@@ -51,6 +56,7 @@ def table_mismatches(root: Path) -> list:
 
 class MarkdownTableTest(unittest.TestCase):
     def test_repo_tables_are_consistent(self):
+        self.assertGreaterEqual(len(scanned_markdown(ROOT)), 50, "markdown 扫描面塌缩")
         bad = table_mismatches(ROOT)
         self.assertEqual([], bad[:10], "表格列数不齐（修复指引：补/删该行的 |，或转义字面竖线）")
 

@@ -27,6 +27,14 @@ REQUIRED_MARKERS = (
 )
 #: 五维纵深的名字（与条款一致）
 DIMENSIONS = ("静态可核验", "动态可执行", "架构纯度", "资产密度", "文档可执行性")
+#: §六 五维载体索引（每维一课载体 + 一条复核命令，缺一即索引断）
+DIM_CARRIERS = {
+    "静态可核验": "verify.sh",
+    "动态可执行": "desktop/tests/fixtures",
+    "架构纯度": "conformance",
+    "资产密度": "receipts",
+    "文档可执行性": "test_doc_examples.py",
+}
 #: STRATEGY §3.1「内部链」的四个载体（少一个即链断）
 CHAIN_CARRIERS = (
     "verify.sh", "results/audit", "desktop/tests/fixtures", "docs/42_M1_P03_演练集.md",
@@ -77,6 +85,24 @@ def public_plan_files(root: Path = ROOT) -> list:
     return sorted(p.name for p in root.glob("*.md") if "方案" in p.name)
 
 
+def carrier_issues(text: str, root: Path = ROOT) -> list:
+    """§六 五维载体索引：段落在场、五维各有载体、载体路径真实在场。"""
+    issues = []
+    if "五维载体" not in text:
+        issues.append("缺「五维载体」可核索引段")
+        return issues
+    for dim, carrier in DIM_CARRIERS.items():
+        if dim not in text or carrier not in text:
+            issues.append(f"五维载体缺行：{dim} -> {carrier}")
+    for rel in ("protocol/verification_report.json", "protocol/conformance_report.json",
+                "protocol/RECEIPTS.json", "results/audit"):
+        if not (root / rel).exists():
+            issues.append(f"载体留证位置不在场：{rel}")
+    if "不是第二份事实" not in text:
+        issues.append("缺「本表是索引、以命令实读为准」口径")
+    return issues
+
+
 def strategy_issues(text: str, root: Path = ROOT, plan_files: list = None) -> list:
     """STRATEGY 可核性问题列表（纯函数，便于变异自证）。"""
     issues = []
@@ -122,6 +148,10 @@ class StrategyContractTest(unittest.TestCase):
     def test_strategy_matches_contract(self):
         self.assertEqual([], strategy_issues(self.text), "STRATEGY.md 不满足可核性契约")
 
+    def test_dimension_carriers_indexed(self):
+        """§六 五维载体索引：五维各有载体且留证位置在场。"""
+        self.assertEqual([], carrier_issues(self.text), "STRATEGY 五维载体索引不完整")
+
     def test_internal_chain_carriers_exist(self):
         """§3.1 内部链的四个载体必须真实在场（verify / audit / fixtures / 演练集）。"""
         for rel in CHAIN_CARRIERS:
@@ -146,6 +176,10 @@ class StrategyContractTest(unittest.TestCase):
                         "改掉五维之一必须报")
         leaked = strategy_issues(self.text, plan_files=["41_x方案.md"])
         self.assertTrue(any("计划类文档" in i for i in leaked), "根层出现方案文档必须报")
+        row = [ln for ln in self.text.splitlines() if ln.startswith("| 文档可执行性 |")]
+        no_carrier = self.text.replace(row[0] + "\n", "") if row else self.text
+        self.assertTrue(any("五维载体缺行" in i for i in carrier_issues(no_carrier)),
+                        "删掉一维载体必须报")
         bad_path = self.text + "\n参考 " + chr(96) + "docs/nope.md" + chr(96) + "。\n"
         self.assertTrue(any("docs/nope.md" in i for i in strategy_issues(bad_path)),
                         "悬空路径必须报")

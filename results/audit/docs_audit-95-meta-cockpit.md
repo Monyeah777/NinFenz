@@ -8,23 +8,437 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/cli_bridge.py:4247ed0e73dfc1ca319f6b9881f3b73a875b01ee6b24eda3d4fe861736cadad8
   - desktop/src/core/meta_cockpit/__init__.py:f31cbadd59e3f25aab850122bbcc4ad5adcf5a65596a38c4996f264a38427fd7
-  - desktop/src/core/meta_cockpit/build_atom_menu.py:1bedd2efd340114f91442a41b6319f7a9e7f962996d49f656a132e45988dbf95
+  - desktop/src/core/meta_cockpit/build_atom_menu.py:3e4d8fe2c0ad594f97ae41dc754886bc757527dde035c01a2ca0aa491f785466
   - desktop/src/core/meta_cockpit/runtime_executor.py:204a67ec93855257323887011395b0866ac8d5ae1c485362e89eb058ffe64bfb
   - desktop/src/core/meta_cockpit/cockpit_service.py:18280c6966dd618a8b09daa058b461fa43f89e99f11c797ca884338ff5c13bbf
   - desktop/src/core/meta_cockpit/cockpit_ab.py:6afcade08f2469aad4adc6f44e0e3d28a17712a85e3223f41b14c0020c2f88e7
   - desktop/src/core/terminal.py:9a86928171c71f4a2d3d324508fdafccb60fd7cc8423d52197185214a40ea30f
-  - desktop/tests/test_meta_cockpit.py:cc2dc4f52729b35f400ca92aa367e685780f9f6735224e7fc0b7550b85f52662
+  - desktop/tests/test_meta_cockpit.py:017e3a591004b1e3c1bf28e8938ae22754e39ea61ae369e4ddcca1a556214280
   - desktop/tests/test_cli_error_framing.py:788460878349a907eadc21c74a1a689c9cdfe81888f5490c5a935b34fc121c8a
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:15d9a0ed619a2ae21811567f51709810e9f9ae34bfcbde2ca74f7bef8dd1af83
+  - protocol/check12_weights.json:f99c280da5393b177a6729cdf7067f66a372cbacf9c8603bc1f1ab1955809c31
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
-  - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
-  - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
-  - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
+  - docs/meta-cockpit/README.md:fa00a7fd014857af56e11f38ced1b7d888be053befaadb10b3dd494d27884316
+  - docs/meta-cockpit/功能解析.md:de20c2340d19d541bcfde53f222a3acf22a6e440d8fb3dcf51a37aedf53c0c25
+  - results/meta-cockpit-manifest.json:60c0e100798e49d393557ae5066c02d7e057ec27f386ee1a36ca3fc7740150ba
 
 ---
+> 重审（2026-11-14）：WP-11 trust bundle 入仓（机械重绑）
+
+> 重审（2026-11-14）：WP-10 trust canonical/entity 入仓（机械重绑）
+
+> 重审（2026-11-14）：WP-04 trust 裁决 ADR-005..010 登记入仓（机械重绑）
+
+> 重审（2026-11-14）：WP-03 测试向量与生成器入仓（机械重绑）
+
+> 重审（2026-11-14）：解开 164 号阻塞件：本机网络恢复，`gen_third_party_notices.py --write` 实跑成功（44 组件）且**工作区零差异**（入库件 == 生成器输出）；新增判据 test_third_party_notices_reproducible（在线重生成逐字节比对，离线 skip）。
+
+> 重审（2026-11-14）：tui/README 顶尖化（清单最后一件）：补 §现状对照（34 动作/9 区/77 命令/13 表单/闸门 14-24-4/自检 6 条/退出码 6 类/渲染 30 行）+ §复现口径（selftest/--list-actions/surface-write）+ 复核位；明确「投影数字不当作承诺」；新增判据 test_tui_readme_doc_contract（selftest 实跑 + 动作数实读比对）。
+
+> 重审（2026-11-14）：site/assets/README 顶尖化：补 §现状对照（三件素材字节/尺寸/来源 + 字体无 webfont）+ §复现口径 + 复核位；**实测生成器可复现性**：重跑 34501 B vs 入库 34487 B 字节不同 → 如实登记为债（一条命令可收，但改公开视觉，留作者决定）；新增判据 test_site_assets_readme_doc_contract（字节/尺寸与实盘比对 + 债务在文）。
+
+> 重审（2026-11-14）：site/README 顶尖化：**收掉 npm 口径漂移**（sync-numbers --write 把 24.74 MB 同步为清单真源 25.21 MB，改写 5 个站点面 + 根 llms-full.txt 投影）+ 补 §现状对照（4 页/6 机器面/5+1 工具/42 项离线/16 项 worker/npm 口径真源）+ 复现口径 + 复核位；新增判据 test_site_readme_doc_contract（npm 口径与 payload 清单现场比对）。
+
+> 重审（2026-11-14）：site/DEPLOY-search-submit 顶尖化：修陈旧数字（33+ 离线/28 联网 → 实测 42 项离线，联网项数不再钉）；补 §11 现状对照（7 类通道/indexnow.json 4 URL+4 引擎/密钥文件/42 项/.assetsignore 9 条）+ §12 复现口径 + 复核位；新增判据 test_search_submit_doc_contract（不声称已收录）。
+
+> 重审（2026-11-14）：site/DEPLOY-cloudflare-workers 顶尖化：补 §现状对照（wrangler 九键/五个站点工具/42 项离线判据/16 项 worker 判据/CI 两步）+ §复现口径 + 复核位；**如实登记实测漂移**（sync-numbers 红：站点 npm 体积 24.74 vs 清单 25.21 MB，跨域手写数字待下一轮随 site/README 收）；新增判据 test_deploy_cloudflare_doc_contract。
+
+> 重审（2026-11-14）：demo_signers README 顶尖化：校正过强口径（原文称「端到端复现验证」，实测 NF-1 未挂锚 → exit 0 + 真实性未验），补 §现状对照（允许清单 1 条/锚状态/两命令结论/私钥位置/生产口径）+ 复现口径 + 复核位；新增判据 test_demo_signers_readme_doc_contract（allowed_signers 四列格式 + 禁止过强断言 + nf_verify 实跑）。
+
+> 重审（2026-11-14）：WORLD_MODEL 顶尖化：补 §现状对照（scan 实读 模块1/变量4/相位5/不变式5/checks3/slots4-10 · check32 硬门 · 校验器四函数 + 运行器七方法 · CLI 四形态 · 判据 20+ 例）+ 复现口径 + 复核位；明确「扫描基线不钉死」与「契约自洽不等于质量好」边界；新增判据 test_world_model_doc_contract（含 nf worldmodel --run 实跑 digest）。
+
+> 重审（2026-11-14）：protocol/README 顶尖化：修三处陈旧钉数（五份→九份 schema 且拆 5 内容契约 + 4 其它面；44 模块/23-44 → 248 模块·13 在场机读块；8 管线/5 protocol.yaml → 114/111），改为以 LINT_INPUTS 实读为准；补 §现状对照（9 schema/16 白名单/9 扫描面/check28-31/交叉对照）+ 复现口径 + 复核位；新增判据 test_protocol_readme_doc_contract。
+
+> 重审（2026-11-14）：EXTENSION 顶尖化：补 §现状对照（三档/派生三问/check30+check13 接线/域包装卸/回放 4 例/不钉运行时版本号）+ 复现口径 + 复核位；新增判据 test_extension_policy_doc_contract（实现里三档字符串 + check30 实跑）。
+
+> 重审（2026-11-14）：postmortems/README 顶尖化：与 decisions/handovers 同构补齐（本文件怎么读 / 目录白名单 / 为什么这么定 / 怎么验 + 复核位 + 三种白名单并列 + 项目符号机检提示）；新增判据 test_postmortems_readme_doc_contract（三目录 README 同构）。
+
+> 重审（2026-11-14）：复盘模板顶尖化：补 §现状对照（四段/六键/行动项带负责人+判据/无指责/公开面边界）+ 复现口径 + **机检提示**（check 把全文每条 - 行当行动项，故模板除行动项段外不用列表——本轮实测踩坑）+ ADR 全名引用修正；新增判据 test_postmortem_template_doc_contract。
+
+> 重审（2026-11-14）：worktree-vs-index PATTERN 顶尖化：修两处悬空引用（evidence 的 handovers/HO-0002、不存在的 .rivet/scratch/crlf_scan.py）+ 补 §现状对照/复现口径；**同时修门**：patterns.scan 的 evidence 校验由「四个前缀」改为「任何带 / 的引用都按路径校验」（此前 handovers/ 悬空件被静默放过）；新增判据 test_worktree_vs_index_pattern_doc_contract。
+
+> 重审（2026-11-14）：verifier-must-run PATTERN 顶尖化：补 §现状对照（EXTERNAL_SUITES 2 条 + MIN_DISCOVERED 150 下限 + 四源面清单 + 3 例接线判据 + 变异自证）+ 复现口径（含 test_npm_package 的 payload 执行前置说明）；新增判据 test_verifier_must_run_pattern_doc_contract（登记套件目标在场、四源函数在场、接线判据实跑）。
+
+> 重审（2026-11-14）：single-source-truth PATTERN 顶尖化：补 §现状对照（五个投影件逐个 + 真源/生成方式 + 2 个生成标记 + 「两类工件两种锁」口径 + check34/35）+ 复现口径；新增判据 test_single_source_truth_pattern_doc_contract（五件在场、标记在、library/patterns verify 实跑零缺口）。
+
+> 重审（2026-11-14）：predicate-single-source PATTERN 顶尖化：补 §现状对照（谓词载体 walk_repo_paths / 3 处消费方 / test_repo_face 12 例 / 扫描面 4436 不钉 / check12+check23 接线 / 资产对账每件一次）+ 复现口径；明确历史数值（206→103 / 614→307）是 2026-10-03 留痕；新增判据 test_predicate_single_source_pattern_doc_contract（消费方 ≥3、谓词在场、test_repo_face 实跑）。
+
+> 重审（2026-11-14）：fail-closed-verification PATTERN 顶尖化：**校正示例与实测不符处**（原文称缺 allowed_signers 报 exit 1；实测 NF-1 未挂锚时为 exit 0 + 显式标注「真实性未验」），明确 fail-closed = 该验而验不了；补 §现状对照（check33 / 三级信任 / 缺锚与超时行为）与复现口径；新增判据 test_fail_closed_pattern_doc_contract（示例输出与实测比对）。
+
+> 重审（2026-11-14）：error-message-guidance PATTERN 顶尖化：补 §现状对照（R4 载体 / check27 接线 / applies_to 两目标 / evidence 可解析 / 命中数不钉）+ §复现口径（verify --only 27）；新增判据 test_error_message_guidance_pattern_doc_contract（R4 与 check27 双向在场 + checkN evidence 解析）。
+
+> 重审（2026-11-14）：dependency-direction PATTERN 顶尖化：补 §现状对照（适用面 290+79 / 度量 289 模块·环 0·SDP 违例 9 已登记 9 / 基线只许收敛 + **不钉当前 Ca/I** 口径）+ §复现口径；新增判据 test_dependency_direction_pattern_doc_contract（frontmatter 6 键/3 规则/applies_to 与 evidence 可证/verify 零缺口）。
+
+> 重审（2026-11-14）：patterns/README 顶尖化：补 §现状对照（7 包全 active / 2 值词表 / 6 必填键 / 可证性 / INDEX 整页生成幂等 / verify 机检）+ §新增/审阅四步 + 复现口径；新增判据 test_patterns_readme_doc_contract（README ↔ core/patterns 常量活绑定）。
+
+> 重审（2026-11-14）：patterns/INDEX 顶尖化：把「现状对照（实践包/规则总数/状态分布/包 id）+ 复现口径」做成**生成内容**（renderer 实时算），页头改为「整页生成物」声明 + 最后更新；新增判据 test_patterns_index_doc_contract（reindex 幂等逐字节、计数与真源一致）。
+
+> 重审（2026-11-14）：npm README 顶尖化：修生成口径漂移（体积 24.74 → 25.19 MB，由 stage --sync-readme 自动同步）+ 补 §现状对照/复现口径（版本/engines/bin/files/无 install 脚本/provenance/本机限制）+ 判据 test_npm_readme_doc_contract。
+
+> 重审（2026-11-14）：nfal 容器 README 顶尖化：补 §现状对照（digest 钉版/零 pip/ENTRYPOINT/VOLUME/5 子命令/工作流 2 job/44 例/**本机无 Docker 如实标注**）+ 复现口径；新增判据 test_nfal_packaging_readme_doc_contract。
+
+> 重审（2026-11-14）：通用中文块 10 顶尖化：补中文自检段（九字段/12+1/双协议/仅 stdio/零依赖/MIT/中英对偶/平台侧未验）+ 类目在中文站填「内容创作」不混用；判据扩展（中英互指）。
+
+> 重审（2026-11-14）：通用英文块 09 顶尖化：补§自检（九字段/12+1/双协议/仅 stdio/零依赖/MIT/与 10 中英对偶/平台侧未验/不钉计数）+ 新增判据 test_generic_blocks_doc_contract（09↔10 传输段逐字相等、两份 JSON args 可解析一致）。
+
+> 重审（2026-11-14）：轻量目录件 08 顶尖化：补字段自检（与 07 对偶、平台侧未验、不钉计数、无审核 SLA）+ 判据扩展（08 侧断言：自检段/指向 07/字段块逐行相等/入口不同）。
+
+> 重审（2026-11-14）：轻量目录提交件 07 顶尖化：补字段自检 8 行 + 「短表单族（07/08/09/10）字段正文必须逐字一致」纪律；新增判据 test_short_form_submission_doc_contract（07 与 08 的字段块逐行相等 + 邮箱泄漏检查）。
+
+> 重审（2026-11-14）：ModelScope 提交件 06 顶尖化：补字段自检 8 行（含**仅 stdio**、中文口径同义不同文提醒、平台侧未验、不钉计数）+ 带 JSON 校验的 stdio 配置检查；新增判据 test_modelscope_submission_doc_contract（含邮箱泄漏检查）。
+
+> 重审（2026-11-14）：PulseMCP 提交件 05 顶尖化：补字段自检 8 行 + 本渠道三条特有须知（平台侧未验 / 邮箱只作审核联系且不得写进内容 / Cloudflare 拦脚本别用 curl 探测）+ 不钉计数；新增判据 test_pulsemcp_submission_doc_contract（含邮箱泄漏检查）。
+
+> 重审（2026-11-14）：Glama 提交件 04 顶尖化：补「§口径分流」（仓库侧六项可核 / 平台侧未验 / 与 GLAMA.md 同源 / 不钉运行时计数 / Claim 账号一致性）+ 判据 test_glama_submission_doc_contract。
+
+> 重审（2026-11-14）：mcp.so 提交件 03 顶尖化：补「字段自检」8 行（名称/仓库/站点/安装/12+1 工具/零依赖/图标真 400×400/许可）+ 平台侧未验 + 不钉运行时计数 + 403 提示；新增判据 test_mcpso_submission_doc_contract。
+
+> 重审（2026-11-14）：Cline 提交件 02 顶尖化：改掉正文里钉死的「check1-40/PASS=72/约 2500 单测」（外部审核文案不该带会过期数字，改为以 nf stats 生成区为准）+ 补「审核要点自检」表（400×400 真像素/llms-install/12+1/双协议/平台侧未验/实测确认归作者）；新增判据 test_cline_submission_doc_contract。
+
+> 重审（2026-11-14）：MCP 提交件 01 号顶尖化：补「同源自检」表（展示名/仓库/站点/安装/工具面/零依赖 六项与材料包同源）+「10 份必须同批更新」纪律；新增跨文件判据 test_mcp_submissions_doc_contract（编号连续/共享值一致/图标引用）。
+
+> 重审（2026-11-14）：MCP 图标素材 README 顶尖化：补现状对照（真实像素 400²/512²、字节数、用途）+ 替换流程（两个一起改/记来源/只换一个会分叉）+「来源声明不可机检」诚实边界 + 复现命令；新增判据 test_mcp_assets_readme_doc_contract。
+
+> 重审（2026-11-14）：MCP 投稿教程（SUBMIT）顶尖化：补「仓库侧可核 / 平台侧未验」现状对照（三处版本同值 1.0.5 / mcpName / schema 2025-12-11 / 12 工具+1 prompt / conformance 27/27）+ 复现口径；新增判据 test_mcp_submit_doc_contract。
+
+> 重审（2026-11-14）：MCP 目录投稿文档顶尖化：补「仓库侧可核 / 平台侧未验」现状对照（server.json 1.0.5+packages 一致 / npm mcpName / 图标 400·512 真实像素 / submissions 10 件 / llms-install.md）+ 复现口径；新增判据 test_mcp_directories_doc_contract。
+
+> 重审（2026-11-14）：HF Space README 顶尖化：补 §现状对照（4 模式 / 200 KB / 180 s / 零 pip / 两段 @sha256 钉版 / EXPOSE 7860 + CMD server.py / 缺树退出码 3 / doctor 实测 17/17）+ §复现口径；新增判据 test_hf_space_readme_doc_contract。
+
+> 重审（2026-11-14）：接入面 README 顶尖化：补 §现状对照（14 面 / active 12·proposed 2 / 已用 kind 7 类 / 词表 kind 8·status 3·tier 2 / check38 子扫描）+ §复现口径（**没有 nf integrations 子命令**，走 check38 子扫描）；新增判据 test_integrations_readme_doc_contract。
+
+> 重审（2026-11-14）：handovers/README 顶尖化：补齐与 decisions/README 同构的政策说明（本文件怎么读 / 目录白名单 / 为什么这么定 / 三命令 / 私有仓路径 / 判据点名）+ 复核位；新增判据 test_handovers_readme_doc_contract。
+
+> 重审（2026-11-14）：接力模板顶尖化：补 §模板自检（五段/六必填/状态词表/未决项带判据/refs 可解析/公开面边界 + 三条只读命令），声明自检段不是第六段；新增判据 test_handover_template_doc_contract（模板↔protocol/handover.json↔CLI 三方对账）。
+
+> 重审（2026-11-14）：DIFFERENTIATION 顶尖化：补「§载体对照」把 46 条核心逐项对到真源（7 项有载体）并如实登记 5 项缺口（12 层反模式 / Ruff+Mypy 全覆盖 / C901 / Radon / 豁免白名单）；新增判据 test_differentiation_doc_contract；manifest 已重算。
+
+> 重审（2026-11-14）：COCKPIT_RELEASE_NOTES 顶尖化：补 §现状对照（33/14/10/5/8 逐值、PENDING 状态、machine digest 只指路）+ 把「12 层反模式审计」无代码载体标注为存疑；新增判据 test_cockpit_release_notes_doc_contract；manifest 已重算。
+
+> 重审（2026-11-14）：COCKPIT_PROTOCOL 顶尖化：补「给人看≠给模型指令」分隔 + §现状对照（3 原子/8 轮/1 次重规划/deadline/36000+8000 预算/33 原子/fail-closed/盲评四值）+ 复现口径；新增判据 test_cockpit_protocol_doc_contract；manifest 已重算。
+
+> 重审（2026-11-14）：ATOM_MENU 顶尖化：菜单生成器增「怎么读这一页」（字段/选择纪律/执行器关系/分组口径），重生成 33 原子菜单并同步 meta-cockpit-manifest 摘要；test_meta_cockpit 增读法判据。
+
+> 重审（2026-11-14）：Go 客户端 README 顶尖化：补七调向量 55（28/6/7/3/1/6/4 与 results/ccos 逐文件对账）、7 子命令、Go ≥1.24 前提与「本机未装 Go → go test 本轮未跑」诚实标注；新增判据 test_go_client_doc_contract。
+
+> 重审（2026-11-14）：STRATEGY 增「§六 五维载体（可核索引）」（只做导航不改口径：每维的机检载体/留证位置/复核命令），并扩展 test_strategy_contract 判据（五维载体逐行 + 留证位置在场 + 索引口径）。
+
+> 重审（2026-11-14）：GLAMA 上架教程顶尖化：补「仓库侧可核 / 平台侧不可核」现状对照（Dockerfile 钉版+非 root+CMD serve+零 pip、glama.json maintainers、版本一致、12 工具+1 prompt）+ 复现口径；新增判据 test_glama_doc_contract。
+
+> 重审（2026-11-14）：CHANGELOG 顶尖化：补三段说明（怎么产生 / 只追加不重写 / 现状 4+1 节），并把「节序从新到旧、日期单调不增、生成器 issues 空」写成判据 test_changelog_doc_contract。
+
+> 重审（2026-11-14）：AGENTS.md 增「本仓高发误判」止损清单（生成物/冻结件、conformance 后重批准、译件三处同步、未跑完不许写全绿），并把该段纳入 test_agents_contract 判据（只增纪律不减纪律）。
+
+> 重审（2026-11-14）：需求收敛模板顶尖化（8 字段 / steelman 3 形态 / audit 2 形态 / 当前 0 份库存 / 首例阻塞 / reference 分类 + 现状对照 / 复现）+ 契约判据 test_requirement_template_doc_contract。
+
+> 重审（2026-11-13）：迁移指南顶尖化（签名文档 4 / 历史面 15（4 根+2 protocol+9 schema）/ 影响度 3 值 / 命令三形态 + 现状对照 / 复现）+ 契约判据 test_migration_guide_doc_contract。
+
+> 重审（2026-11-13）：P03 样本冻结约束固化：新增 freeze 判据 test_full_sample_p03_doc_contract（sha256/非空白行/5 条裁定），样本字节已还原；权重增量重测。
+
+> 重审（2026-11-13）：完整版样本（P03）顶尖化：补可核锚（层 9 / 槽位 27 / token 71 / 事件 18 / hard 0 / advisory 11 / 去重 23（官方 20+包内 3）/ assets 23 内容 / NF-1 在场）+ 现状对照 + 复现口径；「默认装配 24」计法不吻合实读，标注为待澄清（不改历史句）。
+
+> 重审（2026-11-13）：验证卡册顶尖化：散文去掉钉死的 40 条/check1-40/PASS=70（生成区早已 42/76，属真漂移），改为指向生成区；新增判据 test_verification_cards_doc_contract（生成区与 verify.sh 一致 + 散文禁钉数）。
+
+> 重审（2026-11-13）：文本卫生文档顶尖化（补漏记的第 5 条 SemVer 规则 / 4399 文本·1240 JSON·269070 键·111 版本 + 现状对照 / 复现）+ 契约判据 test_text_hygiene_doc_contract。
+
+> 重审（2026-11-13）：终端入口文档顶尖化（77 命令/203 索引/8 族/9 区/13 表单/42 斜杠词/4 阻塞/24 确认动词/139 例 + 现状对照 / 复现）+ 契约判据 test_terminal_doc_contract；权重增量重测。
+
+> 重审（2026-11-13）：层切片页补本层机构分布（前三机构及条数，读自 catalog body 字段），重生成五页；判据断言每页机构分布与真源相等；iface 页现显示 IETF 15 / W3C 7 / OASIS 5。
+
+> 重审（2026-11-13）：层切片页补本层统计：生成器 _layer_body 增「本层可达 X/Y」与「绑定最多前三」（按主锚+辅锚排序，读自 binding packs），重生成五页；判据同步断言每个层页的统计与前三；code_metrics 重冻（geo_export 295 行）。
+
+> 重审（2026-11-13）：标准层切片页顶尖化：生成器补「怎么读本页」段（切片口径/行字段/互指/投影）并重生成五个层页；code_metrics 重冻（geo_export 267 行）；新增契约判据 test_standards_layer_doc_contract（data 层为锚，另验五层同构）。
+
+> 重审（2026-11-13）：标准主索引顶尖化：生成器补索引页「口径与复现」段（生成物纪律/行字段/锚点/其它面/投影）并把两段文案提为模块常量；重生成后索引 +8 行；代码度量重冻（geo_export 253 行）；新增契约判据 test_standards_index_doc_contract。
+
+> 重审（2026-11-13）：标准答题卡（生成物）顶尖化：生成器补「口径与复现」段（生成物纪律/计数来源/可达性/投影定位）后重新生成；新增契约判据 test_answer_cards_doc_contract（含 geo_export --check 新鲜度实跑）；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：ST 制卡清单顶尖化（修 W1 级别 S→M 与真源一致 / 29 条 M6 S17 R6 / 自动面 1 / 待定 3 / st-validate 原型 + 现状对照 / 复现）+ 契约判据 test_st_quality_checklist_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：RFC 头文档顶尖化（4 件逐条/全 Active/3+1 类别/链 0/4 值词表 + 现状对照 / 复现）+ 契约判据 test_rfc_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：发布策略声明件顶尖化（11 步 ID 全列/冻结链 3/版本面 3/工件 4/锚 3 段 + 现状对照 / 复现；en·ja 译件同步后重签）+ 契约判据 test_release_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：回执文档顶尖化（3 条馆藏/66 件协议/66 节链/算法三式/验证器三项 + 现状对照 / 复现）+ 契约判据 test_receipts_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：五分钟入口文档顶尖化（修 Python ≥3.10→≥3.11 真漂移 / 6 步与脚本 slug 对齐 / 300s / check39 + 现状对照 / 复现）+ 契约判据 test_quickstart_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：管线抽象执行文档顶尖化（114 管线/282 模块/13 基座/hard 0/advisory 1142 三分解/2 子命令 + 现状对照 / 复现）+ 契约判据 test_pipelinerun_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：实践包文档顶尖化（7 条全 active/6 必填键/2 值词表/INDEX 投影对账 + 现状对照 / 复现）+ 契约判据 test_patterns_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：冻结粘贴卡顶尖化（8 段/编号域/7 项/分片 2 段 + 现状对照；新增正文 sha256 防篡改锚，正文未改）+ 契约判据 test_paste_card_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：产出形态文档顶尖化（116 条/12 类别/六档状态分布/106 包/1050 件/机验率 0.7688/34 例 + 现状对照 / 复现）+ 契约判据 test_output_forms_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：NFA-L 文档顶尖化（5 子命令/6 函数/9 类型/6 码+A0201/迁移 110-110 散文 0/44 例 + 现状对照 / 复现）+ 契约判据 test_nfal_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：模块边界冻结文档顶尖化（7 字段/248 全签/漂移语义/契约 id + 现状对照 / 复现）+ 契约判据 test_module_signature_doc_contract；并修 live_doc_counts 红（设计自查清单 / 45 总档 / conformance 三处钉计数补实测留痕）；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：建模三件文档顶尖化（12 scheme/37 规范件/54 契约/42 checks+24 assertions/12 例 + 现状对照 / 复现）+ 契约判据 test_modeling_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：需求澄清快照文档顶尖化（补来源/差异/复现/非计划声明，正文原样保留）+ 契约判据 test_meta_archive_sample_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：版本矩阵文档顶尖化（修 v0.92 ⏳→✅ 与 CHANGELOG 一致 / 29 行 / 基线 repo_stats / 3 例 + 现状对照 / 复现）+ 契约判据 test_version_matrix_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：元层路标文档顶尖化（版本三处一致 / 基线不手写 / check39 端壳零回潮 + 现状对照 / 复现）+ 契约判据 test_meta_roadmap_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：元驾驶舱功能解析顶尖化（33 原子前缀分布/M0–M4/10·5 节点/3·5 约束/13 例；并把「14 方法节点」标为待澄清）+ 契约判据 test_meta_cockpit_analysis_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：元驾驶舱说明顶尖化（33 原子两处一致/内容管线 10/元管线 5/六类义务/13 例/CLI 旗标补全 + 现状对照 / 复现）+ 契约判据 test_meta_cockpit_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：机读块 retro-fit 文档顶尖化（作用域 13 件/L0 0/全库 248/6 组字段/幂等 + outputs 待补 1 件如实说明 / 现状对照 / 复现）+ 契约判据 test_machine_contract_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：LSP 接入文档顶尖化（11 能力/16 方法/8MiB/utf-16/77 例 + 现状对照 / 复现；en·ja 译件同步后重签）+ 契约判据 test_lsp_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：MCP 接入文档顶尖化（能力表工具 7→12 全列 / 1 prompt / dual-era / 8MiB / 现状对照 / 复现；en·ja 译件同步后重签）+ 契约判据 test_mcp_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：语言面文档顶尖化（修「五份指南」→6 份含 LSP / 12 译件 / 3 语全 entry+guides；en/ja 译件同步后重签）+ 契约判据 test_locales_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：图书馆机器面文档顶尖化（补 3 件全 active / 分级 3-of-3 / 许可 2+1 / 词表 4 值 / verify 绿 + 现状对照 / 复现）+ 契约判据 test_library_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：抽象阶梯文档顶尖化（生成区外补现状对照：4 阶/5 子级/4 入口/6 纵切/7 派生/2 退役/10 规则/27+19 例 + 复现；生成区未手改）+ 契约判据 test_layers_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：双源知识层文档顶尖化（补 6 源·3+3 / 可见性 4+2 / order 6 / M23 / lint 绿 / usage total 0 / 35+10 例 + 现状对照 / 复现）+ 契约判据 test_knowledge_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：I/O 类型面文档顶尖化（补 9 值词表/248 模块/308-of-1141·27.0%/0 不匹配/write 幂等 + 现状对照 / 复现）+ 契约判据 test_io_types_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：互操作总览顶尖化（12 种类/入仓 12 面/外部校验逐面 14 行 6-7-1 / 现状对照 / 复现）+ 契约判据 test_interop_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：他证通道说明页顶尖化（补「自跑≠他证」第 4 条 + 面谱 2-5-4-3 分档 + 现状对照；改生成器 render_doc 后重出说明页，不重跑 --emit 以保护回填表）+ 契约判据 test_interop_thirdparty_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：FDE 栈位文档顶尖化（修 mcp.json 失效引用 → 运行期产物 + 12 件互操作面清点 + 370/1200 + 五条达标线 + 现状对照 / 复现）+ 契约判据 test_fde_stack_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：FDE 照做步骤顶尖化（两命令期望串原文 / 两出口期望串 / 全量 vs --checks-only 时间预算 / 变更记录 / 现状核对）+ 契约判据 test_fde_run_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：FDE 交付物样本顶尖化（修同页 4≠5：四道门→五道门 G1–G4+G5，改生成器后 --run 重生成；manifest sha 同步）+ 契约判据 test_fde_deliverable_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：FDE brief 顶尖化（诉求→判定→落点逐条复核口径 / model_agnostic 字段路径 / brief 不进门禁 / 四门+G5 澄清 / 复现）+ 契约判据 test_fde_brief_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：FDE 样例说明顶尖化（补 6/2/48/47/4/370 机读现状 + check32 注册点 + 现状对照 / 复现）+ 契约判据 test_fde_sample_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：外部验证资产说明顶尖化（修记录↔盘上 sha/体积不一致：11,632B/a91f402c / P0 仍 ✗ / 只读复核 + 现状对照 / 不重出纪律）+ 契约判据 test_external_validation_assets_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：端点点契约文档顶尖化 + 权重增量重测 + 层位刷新后的机械重绑（最终轮次）。
+
+> 重审（2026-11-13）：指令档路由文档顶尖化（修判据过度陈述「逐名一致」→子集校验 / 3 工作流·3 指令档·8 工具·1 提示活绑定 / 现状对照 / 复现）+ 契约判据 test_driver_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：域包文档顶尖化（修可达 332/不可达 38/绑定 1200 记录 2400 锚位 + 空壳 73·36·2628 + specs 可见性说明 / 现状对照 / 复现）+ 契约判据 test_domain_packs_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：决策层文档顶尖化（修三处计数陈旧 101/1142/1244 + 补 openai-json 适配器 / 三原语三候选活绑定 / 现状对照 / 复现）+ 契约判据 test_decision_layer_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：一致性报告文档顶尖化（契约 10→27 条 / 门禁 35→check1-42 / 现场 27-27 root / 冻结链三环 / 现状对照 / 复现）+ 契约判据 test_conformance_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：组合引擎文档顶尖化（修 107→111 包/C(111,2)=6105/证书 18/产物化 5 / 五不变量活绑定 / 现状对照 / 复现）+ 契约判据 test_combos_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：可信时间戳 v0 文档顶尖化（两子命令/落盘三件/time-record 接入/五判定/信任锚不预置/1MiB 活绑定 / 现状对照 / 复现）+ 契约判据 test_time_token_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：供应链对象 v0 文档顶尖化（三摘要/材料 572/JUDGE_FILES 10/三态活绑定 / 现状对照 / 复现 + sbom 重算）+ 契约判据 test_supply_chain_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：吊销 feed v0 文档顶尖化（修旧边界「还没走那条线」与已实装 ed25519 矛盾 / 五子命令·链深 2·43+16 例活绑定 / 现状对照 / 复现）+ 契约判据 test_revocation_feed_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：威胁模型文档顶尖化（修两处与 G4 自相矛盾：无水印/不做水印 → 五格式载体+PNG LSB 水印现状 / A1–A9·G1–G6 活绑定 / 现状对照 / 复现）+ 契约判据 test_threat_model_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：研究层 v0 文档顶尖化（8 方法/7 切片/depth 映射/16 例活绑定 / 现状对照 / 复现）+ 契约判据 test_research_methods_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：发布结论文档顶尖化（修两处陈旧数字：1882.7s/4833 条权重·25 门/540 模块 / 五步与快照语义活绑定 / 复现）+ 契约判据 test_release_conclusion_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：论文筛选台账 v0 文档顶尖化（34/22·7·1·4 计数活绑定 / adopted 落点+证据面文件存在 / 脚本三选项 / 5 例 / 现状对照 / 复现）+ 契约判据 test_paper_adoption_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：一次性审计脚本清单顶尖化（文档表 ⇄ ORPHANS 双向活绑定 / 移出件判据入口核实 / 5 例 / 现状对照 / 复现）+ 契约判据 test_one_shot_audits_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：方法包 v0 文档顶尖化（11 域/65 动作/31 类目/judges 31 全覆盖活绑定 / 4+37 例 / CLI 三用法 / 现状对照 / 复现）+ 契约判据 test_method_packs_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：本地 HTTP 面 v0 文档顶尖化（三端点/契约 local.* / 18 例 / MAX_BODY/LOOPBACK/CSP 活绑定 / MCP-Http 鉴权边界澄清 / 现状对照 / 复现）+ 契约判据 test_local_api_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：标注 IR v0 文档顶尖化（修两处自相矛盾/重复小节：边界「没有实测」与载体节冲突、同名「与 cc_label 的关系」×2 / 16+33 判据 / 四探针结果件 / 现状对照 / 复现）+ 契约判据 test_label_ir_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：密钥透明目录 v0 文档顶尖化（修失效 CLI 引用 kt-witness→四真实子命令 / 形状与边界活绑定 / 15 例 / 现状对照 / 复现）+ 契约判据 test_key_transparency_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：判据族谱顶尖化（修失效引用 test_c2_envelopes→test_cognition_bridge / 探针数字活绑定 / 登记件重建 534·232·0.264）+ 契约判据 test_judge_families_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：判据设计十一问顶尖化（登记件陈旧→--write 重建 / 533 模块·硬 231·比例 0.2645 / 11 问齐 / 现状对照 / 复现）+ 契约判据 test_judge_questions_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：同构判据矩阵说明档顶尖化（修边界「5 条」旧措辞→9 层/9 条 / 矩阵 9 行 6 字段 / 11 例 / 现状对照 / 复现）+ 契约判据 test_isomorphism_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：证据判定向量集 v0 文档顶尖化（修单反引号围栏 / 样例 count 15→28 / 补 3 个 decision 用例 / 分布 18·4·6 / 现状对照 / 复现）+ 契约判据 test_evidence_vectors_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：证据包 v0 文档顶尖化（修跨段数字失同步 10→13 条 / 25→38 条 / 向量 28 / 66+8 判据 / 现状对照 / 复现）+ 契约判据 test_evidence_bundle_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：双核不变量文档顶尖化（复核位 / 9 层与矩阵 11 例 / JUDGE_FILES 10 / precheck 23 门 + 2 慢门 / 现状对照 / 复现）+ 契约判据 test_dual_core_invariants_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：check-policy v0 文档顶尖化（五个 CLI 入口含 --intent-from-text / 草稿四账 / 现状对照 / 复现）+ 契约判据 test_check_policy_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：CCOS ABI v0 文档顶尖化（复核位 / 本文机检声明 / 五数字活绑定 38·28·23·9·5 / 现状对照 / 复现口径）+ 契约判据 test_ccos_abi_v0_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：bench 执行结果跑分台文档顶尖化（五维权重表 / run 五旗标 / 用例 2 例 / 端壳同名边界 / 复现口径）+ 契约判据 test_bench_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：attest 内容 attestation 文档顶尖化（六旗标含 --selfcheck/--json / check42 入口 / 库签名边界 / 三级不降级 / 9 例）+ 契约判据 test_attest_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：asset_contract 数字资产契约文档顶尖化（22 面条+1 链 / 六旗标含 --freeze·--run-tests / 资产面 103·308 / 59 例 / 复现口径）+ 契约判据 test_asset_contract_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：assertions 数据化断言表文档顶尖化（字段表 6+2 / 表级词表与能力索引 / 24 条现状 / 复现口径）+ 契约判据 test_assertions_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：approval 内容绑定批准文档顶尖化（6 字段表 / 冻链第 2 环 / 1 条记录现状 / 复现口径）+ 契约判据 test_approval_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：Y5 外测作业书顶尖化（未执行/封存状态如实 + 菜单 v0.3 四处口径同步 + Y5 回填位）+ 契约判据 test_ai_menu_fieldtest_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：装配指令包顶尖化（通道 A 桌面→CLI / R1–R8 / 八段最低要求 / 12 工具 / 复核位）+ 契约判据 test_assembly_pack_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：L3_FROZEN 端壳退役真相源顶尖化（最后复核 / 退役+保留双侧机检面 / CI 22 workflow 全量点名 / 复现口径）+ 契约判据 test_l3_frozen_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：EXPORT 出口管制声明顶尖化（修正「不自制 ed25519」与事实不符 / 标准公开算法+纯标准库+可选 ssh-keygen / 声明⇄机检面 / 复现口径）+ 契约判据 test_export_statement_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：45 质量纵深收口总档顶尖化（结构/挂账不变、五维水位与各面数字现状、波次号≠产品版本、复现口径）+ 契约判据 test_master_closure_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：45 执行遥测规范顶尖化（phase 四值含 build / 字段按 phase 子集 / records 形态 / semconv 载体与 E3 待办 / 复现口径）+ 契约判据 test_telemetry_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：45 M3 载荷提案顶尖化（registry 443/438 现状活绑定 / 开放项如实 untyped 待办 / 复现口径）+ 契约判据 test_payload_proposal_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：45 M2 回合级 drill 规范顶尖化（样本 5→6 含 selfrun / 测试 6 例 / --check-trace 回读口径 / 复现命令）+ 契约判据 test_round_drill_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：44 M2 AI 通道内容规范顶尖化（模块 44→248 / 管线 8→114 / 工具 4→12 / 默认实时面 / drill R1–R8）+ 契约判据 test_ai_channel_spec_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：44 M1 演练覆盖真源顶尖化（8 集口径与实现统一：_hits 接 lexicon + p07_en 纳入测试 / 现状对照 / 复现口径；P06 记录同步 8 套）+ 契约判据 test_m1_drill_coverage_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：M5 设计自查清单顶尖化（六问口径不变 / 判据映射表 / 现状对照 / 复现口径）+ 契约判据 test_design_checklist_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：M5 工程收口顶尖化（快照横幅 / 交付物现状 / bench 边界澄清 / 复现口径）+ 契约判据 test_m5_closure_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：M5 Release checklist 顶尖化（docs/meta 路径修正 / 自动化入口 / 退役项如实 / 复现口径）+ 契约判据 test_release_checklist_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：M4 资产评估报告顶尖化（快照横幅 / 资产面 111 包·465 文件·台账 103·孤儿 0 活绑定 / 结论口径不变 / 复现口径）+ 契约判据 test_asset_report_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：M3 纯度体检规范顶尖化（规则族 R1–R8 / R7·R8 载体 / 单测 34 例 / explain 文案差异如实 / 复现口径）+ 契约判据 test_m3_purity_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：M2 回合状态头规范顶尖化（v1 复核 / 铁律 L1–L5 双源核对 / 硬断言 4→6 / 重入与复现口径）+ 契约判据 test_m2_round_header_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：42 M1 自测规范顶尖化（v1 复核扩写 / 规则 4→6 / 单测 3→18 / 8 集 / FIELD-001 挂账 / 复现口径）+ 契约判据 test_selftest_spec_contract；M4 契约 glob 修正；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：M4 文档分类普查顶尖化（快照横幅 / 清单规模 8→34·45 现状 / lint --kinds 分工 / 复现口径）+ 契约判据 test_m4_census_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：P06 演练集顶尖化（快照横幅 / 44 覆盖真源接续 / 判据覆盖面如实 7 套与 p07_en 例外 / 复现口径）+ 契约判据 test_p06_drill_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：P03 演练集顶尖化（快照横幅 / 8 例实跑复核 / 8 份夹具与 RULE_LAW 6 条现状 / FIELD-001 挂账 / 复现口径）+ 契约判据 test_drill_doc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：W5 实测记录顶尖化（快照横幅 / D4 接线现状复核 plog 出边已移除 / D3 与风格棘轮分工 / 复现命令）+ 契约判据 test_w5_record_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：W3 实测记录顶尖化（快照横幅 / C8·C9 接续指引 / 交付件与现行口径对照 / 复现命令）+ 契约判据 test_w3_record_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：W2 C3/C4 实测记录顶尖化（快照横幅 / 三处修复现状复核 / 扫描面 44→248 活绑定 / 复现口径）+ 契约判据 test_w2_c3c4_record_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：C9 回合装载指针 v0 顶尖化（v0 快照+已被 v1 接续 / P03 装配数 27·23 与真源对齐 / 样例笔误修正 / 复现口径）+ 契约判据 test_c9_pointer_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：C8 transport 评估顶尖化（评估快照+结论复评 / 本地 HTTP 面 vs 远程通道口径分离 / 复现命令 / 33_ 归档）+ 契约判据 test_c8_transport_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：C7 实测记录顶尖化（历史快照横幅 / 现状对照 4→12 工具与无需快照入口 / 复现口径 / E3 真源）+ 契约判据 test_c7_record_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：C1C2 实测记录顶尖化（历史快照横幅 / 现状对照 / 复现口径 / 归档事实标注）+ 契约判据 test_c1c2_record_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：quickstart 参考顶尖化（去死安装命令 / 环境前提 / 三步自检 / raw 直链 / 阅读指引）+ 契约判据 test_quickstart_reference_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-13）：commands 参考顶尖化（契约数 16→27 / 去重空段 / library 生命周期分行 / exit2 口径）+ 契约判据 test_commands_reference_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-12）：assembly 参考顶尖化（编号两通道 + 裸号不变量 + exit2 口径 + 参考机检面）+ 契约判据 test_assembly_reference_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-12）：SKILL.md 顶尖化（契约数 16→27 修正 / 常见失败模式 / 维护者校验段）+ 契约判据 test_skill_md_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-12）：NF-WORLDCAMPUS 馆藏顶尖化（补 verified/stale_after/回执 + 取件核验段 + 许可挂账口径；knowledge lint 时效欠账清零，判据收紧为零 WARN）+ 契约判据 test_library_worldcampus_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-12）：NF-TECHDOC 馆藏顶尖化（15 件内嵌重嵌至 2026-11-12 快照 / verified 更新 / §8 取件核验 / 回执重签；派生样例 techdoc_front 同步重嵌）+ 契约判据 test_library_techdoc_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-12）：NF-1 馆藏顶尖化（正文头日期对齐 generated / 补 §8 取件与核验 / 回执重签）+ 契约判据 test_library_nf1_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-12）：library/INDEX 顶尖化（人读区补三步取件/机检面 + 日配额对齐 intake；生成区未手改）+ 契约判据 test_library_index_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-12）：library/ALIAS 顶尖化（生成器加「标题」列 → ALIAS 重生成；投影一致性保持）+ 契约判据 test_alias_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-12）：decisions/README 顶尖化（读法/判据入口段 + 路由工具占位路径 + 白名单与 payload/ERRATA 事实对账）+ 契约判据 test_decisions_readme_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-12）：decisions/INDEX 顶尖化（标记外补读法/修复指引 + 生成区等价契约）+ 契约判据 test_decisions_index_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-12）：ADR-9001 证据纪律顶尖化（允许三类/禁止六项与 decisions.py 逐条对齐 + 示例表正反例 + 修错证 check35→check33）+ 契约判据 test_adr_9001_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-12）：ADR-9000 模板顶尖化（写法指引七键表 + 三段要点 + 投影/勘误/私有仓纪律）+ 契约判据 test_adr_9000_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-12）：ADR-0000 决策记录顶尖化（可核验面段 + 四条决策项精化 + payload-policy/白名单/ERRATA/RECEIPTS 事实交叉）+ 契约判据 test_adr_0000_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-12）：TECH_TEMPLATES 资产顶尖化（读法/机检 + 模板语义四类/子集不变式 + T904 note 例补齐 + 校验面）+ 契约判据 test_tech_templates_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-12）：TECH_RULES 资产顶尖化（读法/机检 + 规则语义四类/warn|fail 档位 + schema/条目/键清单对账 + 校验面）+ 契约判据 test_tech_rules_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-12）：STYLE_DNA 资产顶尖化（读法/机检 + 三式配置纪律 + 示例档语义 + Phase 1/2 标识符口径 + 不越界阈值声明）+ 契约判据 test_style_dna_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-12）：05_资产库/用户自定义 README 顶尖化（读法/机检 + 键清单/schema 速览与资产文件对账 + nf-asset 头/台账三方 + 校验面）+ 契约判据 test_user_assets_readme_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-12）：05_资产库 README 顶尖化（读法/机检段 + 五接口清单同源 01 §3 + provenance/asset_keys/用户自定义三源覆盖 + 单层货架硬规 + §6 引用映射口径）+ 契约判据 test_asset_library_readme_contract；权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-12）：M80 输出质检门顶尖化（唯一输出闸 / gate_action 单源 / 8 段判定记录 / 零事件固定节点豁免理由 / 硬门不可关）+ 契约判据 test_module_m80_contract；权重增量重测、边界重冻结。本轮为机械重绑。
+
+> 重审（2026-11-12）：M50 调度器顶尖化（world_model writes 改回 world_slots 在册冻结路径 / 全局调度器 layer·mounts 约定 / 三形态与机读投影口径）+ 契约判据 test_module_m50_contract；权重增量重测、边界重冻结。本轮为机械重绑。
+
+> 重审（2026-11-12）：M24 规则组合顶尖化（零事件+resolve 接口口径 / 不虚构 token 口径 / 依赖面与 02 §4 对账 / I4 配方表边界）+ 契约判据 test_module_m24_contract；权重增量重测、边界重冻结。本轮为机械重绑。
+
+> 重审（2026-11-12）：M23 可见性边界顶尖化（零事件+filter 接口口径 / 依赖面与 02 §4 对账 / 只读纪律 / Phase 2 迁移口径）+ 契约判据 test_module_m23_contract；权重增量重测、边界重冻结。本轮为机械重绑。
+
+> 重审（2026-11-12）：M10 节拍推进顶尖化（outputs 补全为双事件 payload 并集 / io_types 按规则重推 / tick_day 发布订阅对账 / 三形态与 I3·I4 边界）+ 契约判据 test_module_m10_contract；权重增量重测、边界重冻结。本轮为机械重绑。
+
+> 重审（2026-11-12）：M00 数据槽总线顶尖化（纯内部基座豁免依据 / 冻结槽位与 world_slots 对账 / 02 §4 依赖对账）+ 契约判据 test_module_m00_contract；权重增量重测、边界重冻结。本轮为机械重绑。
+
+> 重审（2026-11-12）：M90 结构装配顶尖化（四形态口径 / 机读块 ⇄ §2 Module 同源 / P90 八层挂载对账 / fail-closed 边界）+ 契约判据 test_module_m90_contract；权重增量重测、边界重冻结。本轮为机械重绑。
+
+> 重审（2026-11-12）：M22 事件编排顶尖化（outputs/payload 补全为 narrative_event 注册字段全集 / 七订阅在册 / inputs 空显式声明 / I3·I4 边界）+ 契约判据 test_module_m22_contract；权重增量重测、边界重冻结。本轮为机械重绑。
+
+> 重审（2026-11-12）：M20 知识条目库顶尖化（零事件+query 接口口径 / 双挂载 P70 active + P00 available 同源 / I3·I4 边界 / query 只读）+ 契约判据 test_module_m20_contract；权重增量重测、边界重冻结。本轮为机械重绑。
+
+> 重审（2026-11-12）：M13 实体交互顶尖化（outputs/payload 补全为 interaction_update 注册字段全集 / 三形态 / I3·I4 边界 / M12 search 接口引用）+ 契约判据 test_module_m13_contract；权重增量重测、边界重冻结。本轮为机械重绑。
+
+> 重审（2026-11-12）：M12 模板检索库顶尖化（零事件模块 interfaces 补全 search / 三形态口径 / I3·I4 只读边界）+ 契约判据 test_module_m12_contract；check12 权重增量重测、模块边界按新契约重冻结。本轮为机械重绑。
+
+> 重审（2026-11-12）：M06 契约补全 + 判据 test_module_m06_contract；check12 权重增量重测。本轮为机械重绑。
+
+> 重审（2026-11-12）：M08 环境状态模块顶尖化（三形态口径 / I3·I4 边界 / 机读投影口径 / 事件名在册）+ 契约判据 test_module_m08_contract；check12 权重增量实测。本轮为机械重绑。
+
+> 重审（2026-11-12）：P90 结构装配管线顶尖化（读法/机检段 + 02 §7.1 同源判据 + 空行收口）+ 契约判据 test_pipeline_p90_contract；check12 权重增量实测。本轮为机械重绑。
+
+> 重审（2026-11-12）：P01 标准管线顶尖化（读法/机检段 + 三处同源判据 + 空行收口）+ 修 P70 optional 与 02/registry 三处漂移；契约判据 test_pipeline_p01_contract；check12 权重增量实测。本轮为机械重绑。
+
+> 重审（2026-11-12）：P00 管线骨架顶尖化（读法/机检段 + 运行规则空行 + 派生后验收出口）+ 契约判据 test_pipeline_p00_contract；check12 权重增量实测。本轮为机械重绑。
+
+> 重审（2026-11-12）：07 出厂与预设导航顶尖化（读法段 + 节→机检映射 / 7 处标题空行 / AGENT_START 七段描述同源 / 机制段余量 M99 / §7 九项机检映射 + 状态列口径 / 日期同步）+ 契约判据 test_navigation_doc_contract；check12 权重增量实测。本轮为机械重绑。
+
+> 重审（2026-11-12）：06 Agent 执行协议顶尖化（读法段 + 节→机检映射 / §10 标题空行 / RFC Date 与最后更新同步）+ 契约判据 test_execution_protocol_contract；check12 权重增量实测。本轮为机械重绑。
+
+> 重审（2026-11-12）：02 联动注册表顶尖化（读法段 + 节→机检映射 / 7 处标题空行 / 两处跨文件引用精度 / §7 源文切片去 § 形态 / 日期同步）+ 契约判据 test_registry_doc_contract；check12 权重增量实测。本轮为机械重绑。
+
+> 重审（2026-11-12）：01 核心协议顶尖化（读法段 + 节→机检映射表 / 编号桥 / §引用精度 / 末尾分隔线 / 空行收口）+ 契约判据 test_core_protocol_contract；check12 权重增量实测。本轮为机械重绑。
+
+> 重审（2026-11-12）：README.ja 日本語入口镜像顶尖化（六步验收 / FAQ 三类 / ROUTES / 版本真源 / TUI 使用说明 / 中日混入修正）+ 契约判据 test_readme_ja_contract；check12 权重增量实测。本轮为机械重绑。
+
+> 重审（2026-11-12）：README.en English 入口镜像顶尖化（六步验收 / FAQ 三类 / ROUTES / 版本真源 / 最后更新与旧宣言收口）+ 契约判据 test_readme_en_contract；check12 权重增量实测。本轮为机械重绑。
+
+> 重审（2026-11-12）：README canonical 入口顶尖化（五节结构 / 快速开始六步带验收 / FAQ 三类高频问题 / 版本与 npm+pyproject 同源 / 命令与旗标真实 / stats 区外零计数）+ 契约判据 test_readme_contract；check12 权重增量实测。本轮为机械重绑。
+
+> 重审（2026-11-12）：llms-full 完整单文件顶尖化（12 工具面补全 / WARN 期望修正 / fail-closed 边界 / 安装说明书指针 / Node engines 与 npm 真源对齐）+ 契约判据 test_llms_full_contract；check12 权重增量实测。本轮为机械重绑。
+
+> 重审（2026-11-12）：llms-install 安装面顶尖化（三条安装路线 / MCP 能力面与 mcp_package 同源 / 双时代协议常量同源 / 运行数字与 repo_stats+实时 doctor 对账 / 探针四帧修正 / fail-closed）+ 契约判据 test_llms_install_contract；check12 权重增量实测。本轮为机械重绑。
+
+> 重审（2026-11-12）：llms.txt 机器入口清单顶尖化（按任务选入口七行 / 入口面覆盖 34 件 / 补 WORLD_MODEL·LAYERS·NFA-L·域包协议 / 事实描述同源 / fail-closed）+ 契约判据补入口覆盖；check12 权重增量实测。本轮为机械重绑。
+
+> 重审（2026-11-12）：ai-menu B1 菜单面顶尖化（菜单单源 / 九层与 M22/样本节号/Y5 等事实同源 / 执行前自检与停止条件）+ 契约判据 test_ai_menu_contract；check12 权重增量实测。本轮为机械重绑。
+
+> 重审（2026-11-12）：DEEP_DIVE 心智模型顶尖化（三正交/五条不变式与 01 §5 同源、五维纵深、六步运行表、十问逐问映射）+ 契约判据 test_deep_dive_contract；check12 权重增量实测。本轮为机械重绑。
+
+> 重审（2026-11-12）：ROUTES 云端导购顶尖化（入口链馆线落点 / 镜像路径可核 / 决策流 A-H / 出库前自检 / fail-closed）+ 契约判据补结构决策流与前缀分支；check12 权重增量实测。本轮为机械重绑。
+
+> 重审（2026-11-12）：AI_ROUTING 入口路由顶尖化（三档自测证据 / 档位⇄落点⇄验收 / driver.json 同源 / fail-closed）+ 契约判据 test_ai_routing_contract；check12 权重增量实测。本轮为机械重绑。
+
+> 重审（2026-11-12）：AGENT_START 入口顶尖化（七段分流 / DRIVER OVERRIDE 同源 / 三档可执行 / 失败即停）+ 契约判据 test_agent_start_contract（含变异自证）；check12 权重按增量实测更新。本轮为机械重绑。
+
+> 重审（2026-11-12）：L4 塌缩守卫：五个扫描型判据补非空下限断言
+
 > 重审（2026-11-11）：L4 判据质量：文字卫生 markdown 面收敛到 repo_face 单点扫描面（66547→370 件）+ .worktrees 静态剪枝
 
 > 重审（2026-11-11）：L4 判据质量：test_version_map 治理面改 git 追踪面（241 件等价，14.0s→0.05s）

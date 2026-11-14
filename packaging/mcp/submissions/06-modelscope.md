@@ -53,3 +53,24 @@
 | 协议版本 | modern `2026-07-28` + legacy `2025-11-25`（双版本并存） |
 | 工具数 / prompts | 12 个只读工具 + 1 个 prompt（`assemble_guide`）；`additionalProperties: false`，参数不合即 `-32602` |
 | 是否只读 | 是（无写路径） |
+
+
+---
+
+## 字段自检（与材料包同源 · 2026-11-14 复核补）
+
+| 字段 | 本文件的值 | 真源 |
+|---|---|---|
+| 名称 | NinFenz Content Gate（宁封子内容闸门） | `SUBMIT.md §4` / `DIRECTORIES.md §1` |
+| 仓库 | `https://github.com/Monyeah777/NinFenz` | 同上 |
+| 站点 | `https://ninfenz.dev/` | 同上 |
+| 安装 | `npx -y ninfenz serve` | 同上（零安装路径） |
+| 工具面 | 12 只读工具 + 1 prompt（`assemble_guide`），无写路径 | `desktop/src/core/mcp_runtime.py` |
+| 传输 | **仅 stdio**（Streamable HTTP / SSE 未提供） | 运行时入口 `nf serve` |
+| 图标 | `packaging/mcp/assets/icon-400.png`（**真实 400×400**，读 IHDR） | `assets/README.md` |
+| 许可 | MIT | `LICENSE` |
+
+- **平台侧未验**：魔搭的类目词表、表单字段名、审核要求以页面为准；收录与否不可从仓库证明。
+- **中文口径**：本件的「一句话 / 描述」是中文站专用措辞，与英文件**同义不同文**；改材料包时两边都要看一眼。
+- **传输只填 stdio**：表单里 HTTP/SSE 留空即可——多填一个未支持的传输等于虚假声明。
+- **不钉运行时计数**：描述文案不带 check/PASS/单测条数。

@@ -1,8 +1,11 @@
 # NF 终端（`nf shell`）——端壳退役后的人机入口
-
-> 最后更新：2026-10-03
-
 > ⛔ 操作指令：本文含可直接执行的命令与判定，读到即执行；勿当资料阅读。
+
+> 最后更新：2026-11-13
+> **复核（2026-11-13）**：三条硬约束、菜单真源、写盘闸门、非交互面**复核不变**；补可核现状（`nf shell --verify` 实读）：
+> 命令 **77** · 能力族 **8** · 索引条目 **203** · 菜单示例 **15** · 区动作 **34** · 能力区 **9**（0–8）·
+> 写盘表单 **13** 张 · 斜杠词 **42** · 会话内阻塞命令 **4**（shell / serve / lsp / terminal）· 写盘确认动词 **24** 条 ·
+> 判据 `test_terminal` **139 例**。见「§现状对照」。
 
 ## 这个终端是什么
 
@@ -507,6 +510,35 @@ python scripts/nf.py shell --file tour.nf --json             # 同一执行链�
 - 逐条执行并逐条给 `kind/exit`；退出码 = 各条最大值。
 - `--json` 输出 `{"kind": "nf-shell", …}` 逐条记录（含 argv / exit / out / err）机器面。
 - `--no-banner` 去掉开场横幅（日志场景）。
+
+## 现状对照（2026-11-13 · 以 `nf shell --verify` 与 core/terminal 常量实读为准）
+
+| 面 | 现值 | 复核方式 |
+|---|---|---|
+| 命令（顶层 + 二级） | **77** | `nf shell --verify` 头行 |
+| 索引条目 | **203** | 同上 / `--commands --json` |
+| 能力族 | **8**（start / forge / shelf / verify / library / govern / integrate / meta） | 同上 |
+| 能力区 | **9**（`0`–`8`） | `core/terminal.ZONES` |
+| 菜单示例 | **15** | `nf shell --verify` |
+| 区动作 | **34** | 同上（含 13 张表单投影） |
+| 写盘表单 | **13** | `core/terminal.FORMS` |
+| 斜杠词 | **42** | `core/terminal.SLASH_WORDS` |
+| 会话内阻塞命令 | **4**：`shell` / `serve` / `lsp` / `terminal` | `core/terminal.BLOCKED_IN_SHELL` |
+| 写盘确认动词 | **24** 条 | `core/terminal.CONFIRM_VERBS` |
+| 常驻判据 | **139 例** | `test_terminal.py` |
+
+> 本表只作「当时 → 现行」导航；数字以 `nf shell --verify` 与 core 常量为准，本文不另维护第二份表。
+
+## 复现与引用口径
+
+```bash
+python scripts/nf.py shell --verify          # 自检：命令面 / 族 / 索引 / 菜单示例 / 动作 五项计数 + 通过
+python scripts/nf.py shell --commands --json   # 机器面：逐条命令 + 摘要 + 旗标（纯 JSON）
+python -m pytest desktop/tests/test_terminal.py -q   # 139 例
+```
+
+- 引用本文时：「菜单只许指向真实命令（`terminal.example_resolves`）」「写盘默认拒跑、须显式确认」= 长期口径。
+- 终端**不维护第二份命令表**：索引由 CLI 的 argparse 面派生；改命令面即自动改索引。
 
 ## 边界
 

@@ -2,44 +2,44 @@
   "codec": "raw (0x71)",
   "entries": [
     {
-      "cid": "bafyreice2uvuy6dfspryq6nilak6fjbhp3zbzeo4wmhh5jxaqywaudvccq",
+      "cid": "bafyreihrgtysgcqmi2u5se7c5cudljcbyyjwqe6z2jetnvzxguldgufppq",
       "path": "STRATEGY.md",
-      "sha256": "44d52b4c786593e38879a85815e2a4277ef21c91dcb30e7ea6e0862c0a0ea214"
+      "sha256": "f134f1230a0c46a9d913e2e8a835a441c6136813d9d24936d73735163350af7c"
     },
     {
-      "cid": "bafyreidt6viis3e7ummfxzzbhgw75ujhppyzhowxunr7vmqh266dzxyjne",
+      "cid": "bafyreigeci23s6aw3i4nhidb3bmchzqozrtxgopcnmtb3kws3kcvd35pka",
       "path": "01_核心协议.md",
-      "sha256": "73f550896c9fa3185be72139adfed1277bf193bad7a363fab207d7bc3cdf0969"
+      "sha256": "c41235b97816da38d3a061d85823e60ecc677339e26b261daad2da8551efaf50"
     },
     {
-      "cid": "bafyreidin2i6ro5wavpx37xkrtm35lqgjxeudv5tcjrzbhgblhsyir7dxi",
+      "cid": "bafyreiemjrzdm7gbsybuu6aa6zul5hs6qlnkccm65bf5c46atsy5gn6caa",
       "path": "02_联动注册表.md",
-      "sha256": "686e91e8bbb6055f7dfeea8cd9beae064dc941d7b31263909cc159e58447e3ba"
+      "sha256": "8c4c72367cc196034a7800f668be9e5e82daa1099ee84bd173c09cb1d337c200"
     },
     {
-      "cid": "bafyreieesub677mu6hl5uhk2vmwj3qv4mej3wpvi3zhw7imeizuvxkh5ki",
+      "cid": "bafyreiczgwwd3gvdripowskshbugq575mhxyyd7udjcjli3wrf2fi3qdzy",
       "path": "06_Agent执行协议.md",
-      "sha256": "849503effd94f1d7da1d5aab2c9dc2bc6113bb3ea8de4f6fa18446695ba8fd52"
+      "sha256": "5935ac3d9aa38a1eeb495238686877fd61ef8c0ff41a4495a3768974546e03ce"
     },
     {
-      "cid": "bafyreighyurp2tydobtuzqwbsgcvyl7bjbe7xicppjoywldiwq35rq2cgm",
+      "cid": "bafyreigzlda7fbub6ivd7kmxqtuqmzdm6kadg4vnnzujn4xyxqs7wputse",
       "path": "07_官方核心出厂与社区预设导航.md",
-      "sha256": "c7c522fd4f0370674cc2c191855c2fe14849fba04f7a5d8b2c68b437d8c34233"
+      "sha256": "d958c1f28681f22a3fa99784e906646cf2803372ad6e6896f2f8bc25fb3e9391"
     },
     {
-      "cid": "bafyreigdvrymbrydcdbxyb6hsgkthfid65umjeamohokajjpucatcjxtju",
+      "cid": "bafyreihnxbf7vuhxerttxxxevixoudymjjv5p2qq3okhnl4gbt2loimy74",
       "path": "llms.txt",
-      "sha256": "c3ac70c0c70310c37c07c79195339503f768c4900c71dca0252fa0813126f34d"
+      "sha256": "edb84bfad0f724673bdee4aa2eea0f0c4a6bd7ea10db9476af860cf4b72198ff"
     },
     {
-      "cid": "bafyreifmbpfnx7mqdgjr5dukf4tttxlgapdt7zntffilrsakf2yaprlwdm",
+      "cid": "bafyreiaeb4tgoolgkslygkionyvd3uqbzqk2onybo3rssmzbyocrofk5hy",
       "path": "library/INDEX.md",
-      "sha256": "ac0bcadbfd9019931e8e8a2f2739dd6603c73fe5b32950b8c80a2eb007c5761b"
+      "sha256": "040f26673966549783290e6e2a3dd201cc15a7370176e3293321c38517155d3e"
     },
     {
-      "cid": "bafyreidmvkjbly6u74mxusyc7374o7532u6waztwahnhbqeb4t3fwuufyq",
+      "cid": "bafyreicsarrg7vx5iwn3i2p4brfbjy6b5zxftbhab6t2rnhkrix7nitheu",
       "path": "library/ALIAS.md",
-      "sha256": "6caa9215e3d4ff197a4b02feffc77fbbd53d60667601da70c081e4f65b5285c4"
+      "sha256": "5204626fd6fd459bb469fc0c4a14e3c1ee6e5984e00fa7a8b4ea8a2ff6a26725"
     },
     {
       "cid": "bafyreibqlthxbcjto5mi363mysnxlngpn75nptoa7donzg7bvv53s5zebe",
@@ -82,14 +82,14 @@
       "sha256": "00dbe82ff51bbfed817398ddecb5e256a76463dc512978b8f2f050abfe41d3b9"
     },
     {
-      "cid": "bafyreibrhikdz7pflj552w5zn7uxfjksydeglvly6zq5jjw3u2xwjttqnu",
+      "cid": "bafyreifeucw5qkxalwxhyw2w5ii4k2tvyptj4b44e5hfjkwxrzlwjh7vjm",
       "path": "protocol/module_signatures.json",
-      "sha256": "313a143cfde55a7bdd5bb96fe972a552c0c865d578f661d4a6dba6af64ce706d"
+      "sha256": "a4a0add82ae05dae7c5b56ea11c56a75c3e69e079c274e54aad78e57649ff54b"
     },
     {
-      "cid": "bafyreic7avzjbuosqbi3ydoeskqvzrctgsc24xlyrw4arcn63jgk52tw6u",
+      "cid": "bafyreibjwjteu2m67czrsyozxw2thod55yuikvb34kz67ffm3qiwktpauu",
       "path": "protocol/conformance_report.json",
-      "sha256": "5f057290d1d28051bc0dc492a15cc4533485ae5d788db80889beda4caeea76f5"
+      "sha256": "29b2664a699ef8b31961d9bdb533b87dee2885543be2b3ef94acdc11654de0a5"
     },
     {
       "cid": "bafyreiav4koretqkw26pbhyaw4e45ltrko727oqzo56f7pdn7zjljasc44",
@@ -107,14 +107,14 @@
       "sha256": "c9e39d009b8753805982b81ffb4b0f55fe94b009452fd42039dd97183e62ec7e"
     },
     {
-      "cid": "bafyreibgcuu52kkuo66s74rty6omk7gwhtvixslajqzwahlw2ogngxk3my",
+      "cid": "bafyreidutzxke5rijlbxnbjm5sj3mnnjjsedn6rrn4mxzsikmxvxd6grzm",
       "path": "protocol/role_coordinates.json",
-      "sha256": "261529dd295477bd2ff233c79cc57cd63cea8bc9604c33601d76d38cd35d5b66"
+      "sha256": "749e6ea276284ac376852cec93b635a94c8836fa316f197cc90a65eb71f8d1cb"
     },
     {
-      "cid": "bafyreidah3ff7kkdyeyfqhzfsyimwgapfrqxdyxjmm2mliwd57y6tznlre",
+      "cid": "bafyreih4thmjjkyh3buyvgvi5ajan6h5udogsn5akygu6ctgoyjfkjnyua",
       "path": "protocol/code_metrics_baseline.json",
-      "sha256": "603eca5fa943c130581f259610cb180f2c6171e2e96334c5a2c3eff1e9e5ab89"
+      "sha256": "fc99d894ab07d8698a9aa8e81206f8fda0dc6937a0560d4f0a6676125525b8a0"
     },
     {
       "cid": "bafyreifxa7jgri55ffokvxuynttoqd6vzindwjgxlrqdqhq5f2f4e7i5je",
@@ -147,9 +147,9 @@
       "sha256": "3c4cf2e34819d3919593a126cc5b394bf43ef3f7838b91910eb9ba10b09e0b40"
     },
     {
-      "cid": "bafyreiaannlhjc3nvlzedg7ebjssi7mq57lcshuhztlbyzjh5uksnnvu4q",
+      "cid": "bafyreiadoip3b6ywwpn5rpm524ifuo5lorqdzpuzk6nkjr4pe3yr3c2eiq",
       "path": "protocol/CONFORMANCE.md",
-      "sha256": "006b56748b6daaf2419be40a65247d90efd6291e87ccd61c6527ed1526b6b4e4"
+      "sha256": "03721fb0fb16b3dbd8bd9dd7105a3bab74603cbe99579aa4c78f26f11d8b4444"
     },
     {
       "cid": "bafyreigsbxn44kavcw34rhfaf4idkk65f4y6trvlqcshfkn23mdhqb7asm",
@@ -192,9 +192,9 @@
       "sha256": "0285b8b1fdf20b9ca9cd0857118cd7f3c09946256d33a6d42028a5c41aad0023"
     },
     {
-      "cid": "bafyreihw3odkulxyxxet7cunqhbgxpxspnl3vr6h7vkfbs7xjds3jsyefe",
+      "cid": "bafyreiaji5nnru7oegwejmozs3taa6c2byxv4gijgsowgi7vfyb2knc6eq",
       "path": "protocol/locales.json",
-      "sha256": "f6db86aa2ef8bdc93f8a8d81c26bbef27b57bac7c7fd5450cbf748e5b4cb0429"
+      "sha256": "09475ad8d3ee21ac44b1d996e600785a0e2f5e1909349d6323f52e03a5345e24"
     },
     {
       "cid": "bafyreia7f7b7fi6bzixcnkf32fob5wffrhrjovvcdgskspefprzs2flmmy",
@@ -217,9 +217,9 @@
       "sha256": "6ca6174c77d41ad354b90e637c404bedfbe5d8ad0ce6400bb26f2ac7e5f19eb0"
     },
     {
-      "cid": "bafyreicvyjbcel5d5aw623f76rvlgqymwvgeujqqr4mhv5hgpx7hlo6mry",
+      "cid": "bafyreib7g2mjlq65lfdnqj2tnejuhvbmrig3fyn4cgfv6r4fejzqyxwqam",
       "path": "decisions/INDEX.md",
-      "sha256": "55c242222fa3e82ded6cbff46ab3430cb54c4a26108f187af4e67dfe75bbcc8e"
+      "sha256": "3f369895c3dd5946d82753691343d42c8a0db2e1bc118b5f478522730c5ed003"
     },
     {
       "cid": "bafyreidpsmrdixkrxrpflye44bb6qa7kvmqt5ujdytxf2xiseog54oelg4",
@@ -312,24 +312,24 @@
       "sha256": "3b43958fafb0d9e03506214d7c373fca641397c0636fb3e112d9a30ddb326bb6"
     },
     {
-      "cid": "bafyreibvgsapurfphtmfk5t46rxxydanue2gbl6biwr24scwscnm66fpyi",
+      "cid": "bafyreicjlk5yogp7ez6d4o7e7d4t3k6rsnv2yg6rpp6ehds54bakbv66tq",
       "path": "decisions/ADR-0000-决策记录外置到私有仓.md",
-      "sha256": "353480fa44af3cd855767cf46f7c0c0da13460afc145a3ae4856909acf78afc2"
+      "sha256": "495abb8719ff267c3e3be4f8f93dabd1936bac1bd17bfc438e5de040a0d7de9c"
     },
     {
-      "cid": "bafyreihxcv2n3amfr2lrh7nu6x3jcgw4qtvr7bukcscen7hf6dlqr55f2m",
+      "cid": "bafyreihwbl2u2paikfqud4gzfd7kugqj3x7p5yjczw74xgy7w46qfx2wvi",
       "path": "decisions/ADR-9000-示例-决策格式模板.md",
-      "sha256": "f71574dd81858e9713fdb4f5f6911adc84eb1f868a148446fce5f0d708f7a5d3"
+      "sha256": "f60af54d3c08516141f0d928feaa1a09ddfefee122cdbfcb9b1fb73d02df56aa"
     },
     {
-      "cid": "bafyreidrluckdlaavpxgwvyu27kn5dbjiohpgigyhj36ozntttxeh6jigq",
+      "cid": "bafyreic2gxf52tc6xlr46kv7k73hcyyud67dijcumvx65nllrvu67ry6gu",
       "path": "decisions/ADR-9001-示例-证据必须可解析.md",
-      "sha256": "715d04a1ac00abee6b5714d7d4de8c29438ef320d83a77e765b39cee43f92834"
+      "sha256": "5a35cbdd4c5ebae3cf2abf57f67163141fbe342454656feeb56b8d69efc71e35"
     },
     {
-      "cid": "bafyreieducrcybittqwv3jvnkrsnzueqtpx7jsdsyfufhlxonfrtpf4qxu",
+      "cid": "bafyreidszr5upemtexyafiamndyzuejcvbiu7axivbrjmoxyhwbdobjdqy",
       "path": "postmortems/PO-9000-示例-复盘模板.md",
-      "sha256": "83a0a22c05139c2d5da6ad5464dcd0909beff4c872c16853aeee6963379790bd"
+      "sha256": "72cc7b47919325f002a00c68f19a1122a8514f82e8a862963af83d8237052386"
     }
   ],
   "multibase": "base32 (lowercase, no padding, prefix 'b')",

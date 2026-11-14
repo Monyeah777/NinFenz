@@ -47,8 +47,9 @@ class SensitiveIgnoreTest(unittest.TestCase):
     def test_no_sensitive_file_is_tracked(self):
         # `-z` 是必须的：默认输出把**非 ASCII 路径**转义加引号（`"05_\346\265..."`），
         # 于是 `.pem` 变成 `.pem"`、正则 $ 锚点失配——中文名敏感件会被**静默放过**。
-        listed = _git("ls-files", "-z").split("\0")
-        bad = [f for f in listed if f and MUST_NOT_TRACK.search(f)]
+        listed = [f for f in _git("ls-files", "-z").split("\0") if f]
+        self.assertGreaterEqual(len(listed), 1000, "git 追踪面塌缩（判据会空转）")
+        bad = [f for f in listed if MUST_NOT_TRACK.search(f)]
         self.assertEqual([], bad, "已跟踪敏感文件（撤凭据 + 从历史移除后重建）")
 
     def test_check_ignore_has_catch_power(self):

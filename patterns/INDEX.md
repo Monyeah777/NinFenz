@@ -1,7 +1,6 @@
 # NF Patterns 索引
-> 最后更新：2026-09-14
-
-> 真源 = 各 `patterns/<name>/PATTERN.md` 的 frontmatter；下表为**投影**（`nf patterns reindex` 重建，手改会被覆盖）。
+> 最后更新：2026-11-14（复核）
+> 本页**整体是生成物**：标题以下全部由 `nf patterns reindex` 从各 `PATTERN.md` 重建（含「现状对照」的计数）；手改会被覆盖。
 
 <!-- BEGIN GENERATED: patterns-index -->
 
@@ -18,5 +17,25 @@
 | worktree-vs-index | 门禁看工作区、git 看索引——两处口径先对齐 | active | 代码层 | 3 |
 
 > 真源 = 各包 `PATTERN.md` 的 frontmatter；本表为投影（`nf patterns reindex` 重建）。
+
+## 现状对照（生成 · 计数由本表实时算出）
+
+| 面 | 现值 | 说明 |
+|---|---|---|
+| 实践包 | **7** | 生成区表格行数 |
+| 规则总数 | **21** | 各包 rules 长度求和（每包 3 条） |
+| 状态分布 | active 7 | 各包 frontmatter 的 status |
+
+**包 id**（生成）：`dependency-direction`、`error-message-guidance`、`fail-closed-verification`、`predicate-single-source`、`single-source-truth`、`verifier-must-run`、`worktree-vs-index`
+
+## 复现与引用口径（生成）
+
+```bash
+python scripts/nf.py patterns ls         # 列全部实践包（真源 = 各 PATTERN.md）
+python scripts/nf.py patterns verify     # 格式 + 可证性机检
+python scripts/nf.py patterns reindex    # 重建本页（幂等：无变化即输出「无变化」）
+```
+
+- **本页整体是生成物**：手改会被下一次 reindex 覆盖；要改内容请改 patterns/<id>/PATTERN.md。
 
 <!-- END GENERATED: patterns-index -->
