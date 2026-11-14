@@ -95,8 +95,11 @@ def _check_process(family: list, issues: list, stats: dict) -> None:
 def _check_level(family: list, issues: list, stats: dict) -> None:
     for vec in family:
         case = vec["input"]
-        got = tv.decide(case["facts"], case["required_level"],
-                        policy_ok=case.get("policy_ok", True))
+        policy_ok = case.get("policy_ok")
+        if not isinstance(policy_ok, bool):
+            issues.append(f"{vec['id']}：policy_ok 缺失/非布尔（修复指引：向量须显式给出）")
+            continue
+        got = tv.decide(case["facts"], case["required_level"], policy_ok=policy_ok)
         if got != vec["expected"]:
             issues.append(f"{vec['id']}：等级/退出码判定与向量不符")
             continue

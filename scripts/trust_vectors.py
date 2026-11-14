@@ -174,7 +174,10 @@ def admissibility(entity: dict, policy: dict, entity_schema: dict) -> dict:
 
 
 def level_decision(case: dict) -> dict:
-    if not case.get("policy_ok", True):
+    policy_ok = case.get("policy_ok")
+    if not isinstance(policy_ok, bool):
+        raise ValueError("policy_ok 必须显式给布尔值（修复指引：向量不许默认放行）")
+    if not policy_ok:
         return {"achieved": "none", "exit_code": 2, "missing": ["POLICY-INVALID"]}
     facts = case["facts"]
     if facts.get("hash") != "ok" or any(

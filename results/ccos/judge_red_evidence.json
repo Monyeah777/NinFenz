@@ -2433,6 +2433,10 @@
       "source": "naming"
     },
     {
+      "module": "test_trust_self_audit_contract.py",
+      "source": "naming"
+    },
+    {
       "module": "test_trust_threat_model_doc_contract.py",
       "source": "negative_assertion"
     },
@@ -2593,10 +2597,10 @@
       "source": "negative_assertion"
     }
   ],
-  "modules": 648,
+  "modules": 649,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
-  "suspect": 167,
+  "suspect": 168,
   "with_evidence": 340,
   "without_evidence": 141
 }
