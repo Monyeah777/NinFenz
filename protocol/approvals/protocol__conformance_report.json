@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-14",
   "approved_by": "Monyeah777",
-  "note": "NF-Final WP-0G 保证案例+RAID+伦理（GSN C0-C3/A1-A8 + RAID 四类 + VSD 价值冲突）",
+  "note": "NF-Final WP-0H（independence 报告重算后冻结）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "f74a8f666e81d8e9c1c3d256ba483b9840cc92fea9b7dedac7dc2a0da98f0e9d"
+  "subject_digest": "abab87ea3266b4bf17f2b3b2fb5ed882822bdc63bc6ee1bb568ad3af88502c32"
 }

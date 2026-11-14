@@ -822,6 +822,31 @@
         "docs/RAID.md",
         "results/assurance/CLAIMS.json"
       ]
+    },
+    {
+      "id": "cq-toolchain",
+      "artifact": "results/cq/toolchain.json",
+      "quality_rule": "assertion:cq-toolchain",
+      "owner": "CQ 工具矩阵（core/cq_scan.py::toolchain + scripts/cq_scan.py）+ WP-0H",
+      "status": "active",
+      "freshness": "工具/环境变化时 python scripts/cq_scan.py --run；缺失工具记 BLOCKED",
+      "consumers": [
+        "test_cq_scan_contract",
+        "docs/CQ_REPORT.md"
+      ]
+    },
+    {
+      "id": "cq-scan",
+      "artifact": "results/cq/scan.json",
+      "quality_rule": "assertion:cq-scan",
+      "owner": "CQ 全量自动扫描（core/cq_scan.py::write + scripts/cq_scan.py）+ WP-0H",
+      "status": "active",
+      "freshness": "输入件/工具版本变化后 --run；--check 比对内容指纹",
+      "consumers": [
+        "test_cq_scan_contract",
+        "docs/CQ_REPORT.md",
+        "docs/QUALITY_DEBT.md"
+      ]
     }
   ]
 }

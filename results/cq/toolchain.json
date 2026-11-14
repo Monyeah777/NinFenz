@@ -1,0 +1,141 @@
+{
+  "blocked": [
+    "dotnet",
+    "cosign",
+    "gitleaks"
+  ],
+  "note": "工具版本固定后记录；缺失/不可用一律 blocked，不冒充通过",
+  "schema": "nf-cq-toolchain/1",
+  "tools": [
+    {
+      "blocked_reason": "",
+      "cmd": "python --version",
+      "id": "python",
+      "present": true,
+      "required": true,
+      "status": "ok",
+      "version": "Python 3.11.9",
+      "why": "运行时/语法扫描"
+    },
+    {
+      "blocked_reason": "",
+      "cmd": "ruff --version",
+      "id": "ruff",
+      "present": true,
+      "required": true,
+      "status": "ok",
+      "version": "ruff 0.16.8",
+      "why": "Python lint（钉版本）"
+    },
+    {
+      "blocked_reason": "",
+      "cmd": "bandit --version",
+      "id": "bandit",
+      "present": true,
+      "required": true,
+      "status": "ok",
+      "version": "bandit 1.9.4",
+      "why": "Python 安全 sink（SAST）"
+    },
+    {
+      "blocked_reason": "",
+      "cmd": "radon --version",
+      "id": "radon",
+      "present": true,
+      "required": true,
+      "status": "ok",
+      "version": "6.0.1",
+      "why": "复杂度/可维护性指标"
+    },
+    {
+      "blocked_reason": "",
+      "cmd": "mypy --version",
+      "id": "mypy",
+      "present": true,
+      "required": true,
+      "status": "ok",
+      "version": "mypy 2.3.1 (compiled: yes)",
+      "why": "类型检查（新增收缩）"
+    },
+    {
+      "blocked_reason": "",
+      "cmd": "coverage --version",
+      "id": "coverage",
+      "present": true,
+      "required": true,
+      "status": "ok",
+      "version": "Coverage.py, version 7.16.1 with C extension",
+      "why": "覆盖率（行/分支）"
+    },
+    {
+      "blocked_reason": "",
+      "cmd": "vulture --version",
+      "id": "vulture",
+      "present": true,
+      "required": true,
+      "status": "ok",
+      "version": "vulture 2.16",
+      "why": "死代码/未使用"
+    },
+    {
+      "blocked_reason": "",
+      "cmd": "shellcheck --version",
+      "id": "shellcheck",
+      "present": true,
+      "required": true,
+      "status": "ok",
+      "version": "ShellCheck - shell script analysis tool",
+      "why": "Shell 静态检查"
+    },
+    {
+      "blocked_reason": "",
+      "cmd": "node --version",
+      "id": "node",
+      "present": true,
+      "required": false,
+      "status": "ok",
+      "version": "v24.19.0",
+      "why": "跨语言实现/工具链"
+    },
+    {
+      "blocked_reason": "",
+      "cmd": "cargo --version",
+      "id": "cargo",
+      "present": true,
+      "required": false,
+      "status": "ok",
+      "version": "cargo 1.99.1 (5f94df478 2026-08-27)",
+      "why": "Rust 引擎"
+    },
+    {
+      "blocked_reason": "命令不可用：The command could not be loaded, possibly because:",
+      "cmd": "dotnet --version",
+      "id": "dotnet",
+      "present": true,
+      "required": false,
+      "status": "blocked",
+      "version": "The command could not be loaded, possibly because:",
+      "why": ".NET 引擎"
+    },
+    {
+      "blocked_reason": "工具不在场（缺失=BLOCKED，不写成通过）",
+      "cmd": "cosign version",
+      "id": "cosign",
+      "present": false,
+      "required": true,
+      "status": "blocked",
+      "version": "",
+      "why": "外部签名锚（缺失=BLOCKED，不冒充）"
+    },
+    {
+      "blocked_reason": "工具不在场（缺失=BLOCKED，不写成通过）",
+      "cmd": "gitleaks version",
+      "id": "gitleaks",
+      "present": false,
+      "required": true,
+      "status": "blocked",
+      "version": "",
+      "why": "秘密扫描（缺失=BLOCKED，不冒充）"
+    }
+  ]
+}

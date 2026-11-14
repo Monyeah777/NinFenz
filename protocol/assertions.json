@@ -748,6 +748,36 @@
       "message": "RAID 登记缺失或版本名不符（WP-0G 判据依赖它）",
       "fix": "补/修 protocol/raid.json；再跑 desktop/tests/test_assurance_contract.py",
       "evidence": "test_assurance_contract / conformance::modeling"
+    },
+    {
+      "id": "cq-toolchain",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "results/cq/toolchain.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-cq-toolchain/1"
+      },
+      "message": "CQ 工具矩阵缺失或版本名不符（WP-0H 判据依赖它）",
+      "fix": "python scripts/cq_scan.py --run 重算；再跑 test_cq_scan_contract",
+      "evidence": "test_cq_scan_contract / conformance::modeling"
+    },
+    {
+      "id": "cq-scan",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "results/cq/scan.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-cq-scan/1"
+      },
+      "message": "CQ 扫描件缺失或版本名不符（WP-0H 判据依赖它）",
+      "fix": "python scripts/cq_scan.py --run 重算；再跑 test_cq_scan_contract",
+      "evidence": "test_cq_scan_contract / conformance::modeling"
     }
   ]
 }

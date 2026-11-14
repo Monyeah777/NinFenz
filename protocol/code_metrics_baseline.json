@@ -305,6 +305,11 @@
       "max_fn_cc": 15,
       "max_fn_lines": 37
     },
+    "desktop/src/core/cq_scan.py": {
+      "lines": 417,
+      "max_fn_cc": 35,
+      "max_fn_lines": 48
+    },
     "desktop/src/core/daemon.py": {
       "lines": 944,
       "max_fn_cc": 16,
@@ -1594,6 +1599,11 @@
       "lines": 55,
       "max_fn_cc": 7,
       "max_fn_lines": 28
+    },
+    "scripts/cq_scan.py": {
+      "lines": 69,
+      "max_fn_cc": 13,
+      "max_fn_lines": 41
     },
     "scripts/cross_lang_verify.py": {
       "lines": 551,
