@@ -13,11 +13,11 @@
 | G2 | 生产/装配黄金路径 | pass-with-open-items | 0 | `g2_dod.json` |
 | G3 | 治理平面（可选） | pass-with-open-items | 0 | `g3_dod.json` |
 | G4 | AI 信任 + 生态导出 | pass-with-open-items | 0 | `g4_dod.json` |
-| G5 | 自审计与稳定 | pass-with-open-items | 0 | 本件 |
+| G5 | 自审计与稳定 | pass-with-open-items | 0 | 本件（G5 原文 WP-50…54 于 R50–R52 落地，§19.1 补件 R53） |
 
 ## 2. 门禁实测（最终）
 
-- `bash verify.sh --checks-only`：**53 条 · PASS=97 · WARN=2 · FAIL=0**（`check1-44/45/46/47/48/49/50/51/52/53`）
+- `bash verify.sh --checks-only`：**57 条 · PASS=107 · WARN=2 · FAIL=0**（`check1-44/45/46/47/48/49/50/51/52/53/54/55/56/57`）
 - conformance：conformant（**27/27** 契约）；freshness：**4/4**；CQ：**P0=0**（P2/P3 存量如实）；SELF_AUDIT：**P0=0**
 - 稳定性：7 条纯管线 × 10 次摘要 **0 mismatch**（非 soak）
 
@@ -26,7 +26,7 @@
 | 编号 | 判据 | 状态 |
 |---|---|---|
 | FIN-01 | 全 Gate 收口（P0=0） | pass |
-| FIN-02 | 门禁实测 53/PASS=97/WARN=2/FAIL=0 | pass |
+| FIN-02 | 门禁实测 57/PASS=107/WARN=2/FAIL=0 | pass |
 | FIN-03 | §14.3/§14.4 DoD 八条对齐 | pass |
 | FIN-04 | OPEN 清单完整、带 owner、非阻断 | pass |
 | FIN-05 | claims 边界（不声称认证/合规/外验） | pass |
@@ -39,14 +39,16 @@
 - **OPEN-EXTERNAL**：公共日志/外部 witness/离线解包/第三方合规审核未执行。
 - **OPEN-TOOLS**：cosign 不在场；TSA/透明日志未执行 → T2+ 不可达。
 - **OPEN-PRODUCT**：外部真实生产数据/试点/访谈未执行（M-05/M-06 no-data）。
-- **G2-DEBT-01**、**G2-DEBT-02**、**G3-DEBT-01**、**G4-DEBT-01**、**G4-DEBT-02**、**G4-DEBT-03**、**G5-DEBT-01**、**G5-DEBT-02**：见机读件，全部非阻断。
+- **G2-DEBT-01**、**G2-DEBT-02**、**G3-DEBT-01**、**G4-DEBT-01**、**G4-DEBT-02**、**G4-DEBT-03**、**G5-DEBT-01**（长稳 soak 未做）、**G5-DEBT-02**（`verify --full` 未跑）、**G5-DEBT-03**（Go 运行时 parity 未验）、**G5-DEBT-04**（S15 红队未做）：见机读件，全部非阻断。
 
 ## 5. 复现
 
 ```bash
-bash verify.sh --checks-only            # 期望 PASS=97 WARN=2 FAIL=0
+bash verify.sh --checks-only            # 期望 PASS=107 WARN=2 FAIL=0
 python -m pytest desktop/tests/test_final_dod.py -q
 python -c "import json;d=json.load(open('results/final_dod.json',encoding='utf-8'));print(d['schema'],len(d['gates']))"
 ```
 
 **未跑**：`bash verify.sh --full`（CI full 档）、外部实测线、长稳 soak——如实记，不写成全绿。
+
+> 追加（R53）：G5 原文 WP-50（自扫描 S0–S15）/WP-51（跨实现·断网·删除矩阵）/WP-52（文档·关键词·扩展口）/WP-53（交接包，本地档）/WP-54（CQ6）全部落地；§19.1 的 wiki/spec 报告、分层 QA、examples/ 已补件；门禁 57 条/PASS=107。外部 OPEN 与 G5-DEBT 不因收口关闭。
