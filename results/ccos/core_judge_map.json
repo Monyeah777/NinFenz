@@ -429,6 +429,10 @@
       "referenced": true
     },
     {
+      "module": "dsse",
+      "referenced": true
+    },
+    {
       "module": "ed25519",
       "referenced": true
     },
@@ -1445,9 +1449,9 @@
       "referenced": true
     }
   ],
-  "modules": 361,
+  "modules": 362,
   "note": "粗粒度名字匹配（代理指标），不做导入图分析",
-  "referenced": 331,
+  "referenced": 332,
   "schema": "nf-core-judge-map/1",
   "unreferenced": 30
 }

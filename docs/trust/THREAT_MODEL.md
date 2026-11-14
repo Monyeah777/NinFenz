@@ -33,7 +33,7 @@
 
 | 编号 | 类别 | 威胁 | 控制点 | 判据 | 状态 |
 |---|---|---|---|---|---|
-| TH-01 | S | issuer 伪造 | `desktop/src/core/trust_anchor.py`（anchor）（钉根 + 有界委派）；`desktop/src/core/attest.py`（sign_hmac / verify_external）；`desktop/src/core/key_transparency.py`（consistency） | `test_trust_anchor.py`、`test_attest.py`、`test_key_transparency.py` | T1 部分（DSSE 与统一 issuer registry 未建，G2） |
+| TH-01 | S | issuer 伪造 | `desktop/src/core/trust/dsse.py`（PAE + nf-dsse/1 信封：keyid/算法白名单/≥1 trusted 有效签名）；`desktop/src/core/trust_anchor.py`（钉根 + 有界委派）；`core/attest.py`（sign_hmac / verify_external）；`core/key_transparency.py`（consistency） | `test_trust_dsse.py`、`test_trust_anchor.py`、`test_attest.py`、`test_key_transparency.py` | T1 部分（DSSE 信封已落地；统一 issuer registry/轮换/吊销未建，G2 WP-21） |
 | TH-02 | T | 删/改中间 step | `desktop/src/core/trust/process.py`（nf-process/1 prev 链）；`desktop/src/core/meta_cockpit/session_journal.py`（append_turn）（prev_digest）；`desktop/src/core/cognition_workspace/records.py`（append）（prev）；`desktop/src/core/transparency_log.py`（build / verify） | `test_trust_process.py`、`test_meta_cockpit.py`、`test_cognition_workspace.py`、`test_transparency_log.py` | T0 已有 |
 | TH-03 | T | 删尾 + 重算本地摘要 | `desktop/src/core/evidence.py`（check_anchor）（外部锚点核对/截断检测）；`desktop/src/core/timestamp.py`（verify）；链头自动签名+锚定未建 | `test_evidence.py`（test_anchor_truncation_is_caught）、`test_timestamp.py` | T1 部分（journal/process 链头未签名，G2） |
 | TH-04 | R | 重放旧 bundle | `desktop/src/core/evidence.py`（时效/吊销/锚点）；`desktop/src/core/revocations.py`（table_of）；`desktop/src/core/timestamp.py`（record） | `test_evidence.py`、`test_revocations.py`、`test_timestamp.py` | T1 部分（默认本机时钟；挂 time-record 才是 T2 面） |
@@ -46,7 +46,7 @@
 
 | 编号 | 攻击 | 期望 | 控制点 | 判据 | 状态 |
 |---|---|---|---|---|---|
-| DT-01 | 改一条 obligation | 签名失败 / T2 失败 | DSSE + 锚（G2） | 计划 test_dsse_tamper（OPEN-G2） | OPEN-G2 |
+| DT-01 | 改一条 obligation | 签名失败 / T2 失败 | DSSE 信封（载荷/签名/算法篡改必 red）+ 锚定链头（锚 = WP-22） | `test_trust_dsse.py` 篡改矩阵（信封层）；claim 绑定/锚属 G2 后续 | T0 部分（信封层已覆盖；锚定后到 T2） |
 | DT-02 | 删中间 step | A2 链失败 | prev / seq（trust/process、session_journal、records、transparency_log） | `test_trust_process.py`、`test_meta_cockpit.py`、`test_cognition_workspace.py` | T0 已有 |
 | DT-03 | 删尾并重算本地 digest | A3 锚失败 | 外部锚点核对（证据包面）；链头签名未建（G2） | `test_evidence.py` + 计划 test_process_tail_delete（OPEN-G2） | T0 部分 |
 | DT-04 | 跨 bundle 拼接 claim | splice 失败 | `desktop/src/core/trust/bundle.py`（bundle_id/index 全进叶预像） | `test_trust_bundle.py`（cross-bundle splice 负例） | T0 部分（结构面已覆盖；签名/锚在 G2） |

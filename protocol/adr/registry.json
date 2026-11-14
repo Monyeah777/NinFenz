@@ -70,7 +70,9 @@
       "evidence": [
         "protocol/trust/dsse.schema.json",
         "results/trust/trust_vectors.json",
-        "docs/trust/THREAT_MODEL.md"
+        "docs/trust/THREAT_MODEL.md",
+        "desktop/src/core/trust/dsse.py",
+        "desktop/tests/test_trust_dsse.py"
       ],
       "falsifier": "若任一 trust 实现使用非 PAE 信封（自定义/ JWS）且仍被 policy 判为 T1 以上，则本裁决失效。"
     },

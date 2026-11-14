@@ -128,7 +128,15 @@ def build(root: str = ".") -> dict:
         return findings[-1]["id"]
 
     holes = _grep(code, HOLE)
-    bare = _grep(code, BARE_EXCEPT)
+    # 裸 except 的例外：行内/前后两行有显式「静默跳过理由/合理吞错」成文理由
+    # （与 silent_skip 门禁同口径；无理由仍判 P0）。
+    bare = []
+    for path, number, text in _grep(code, BARE_EXCEPT):
+        lines = path.read_text(encoding="utf-8").splitlines()
+        window = lines[max(0, number - 3):number + 1]
+        if any(("静默跳过理由" in ln or "合理吞错" in ln) for ln in window):
+            continue
+        bare.append((path, number, text))
     default_pass = _grep(code, DEFAULT_PASS)
     bad_crypto = _grep(code, BAD_CRYPTO)
     secrets = _grep(docs + code, SECRET)

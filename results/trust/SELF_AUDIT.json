@@ -1,7 +1,7 @@
 {
   "schema": "nf-trust-self-audit/1",
-  "head": "771ba7a5f63fe2fa7e46c8ab4e29882ef06ff183",
-  "scanned_at": "2026-11-14T05:27:13Z",
+  "head": "98c0009b3d6dc82ad775ef57ec091ccd0b5bb774",
+  "scanned_at": "2026-11-14T05:47:41Z",
   "dimensions": {
     "S0_requirements": {
       "status": "amber",
@@ -9,8 +9,7 @@
         "F-002",
         "F-003",
         "F-004",
-        "F-005",
-        "F-006"
+        "F-005"
       ]
     },
     "S1_code_holes": {
@@ -38,7 +37,7 @@
     "S6_test_gaps": {
       "status": "amber",
       "findings": [
-        "F-007"
+        "F-006"
       ]
     },
     "S7_doc_overclaim": {
@@ -64,8 +63,8 @@
     "S12_unknown": {
       "status": "amber",
       "findings": [
-        "F-008",
-        "F-009"
+        "F-007",
+        "F-008"
       ]
     }
   },
@@ -97,7 +96,7 @@
       "dim": "S0_requirements",
       "severity": "P1",
       "file": "",
-      "evidence": "claim #16 仍 TODO：DSSE/PAE 签名信封（≥1 有效签名、keyid 可解析）",
+      "evidence": "claim #18 仍 TODO：未知实体类型/越权组合 fail-closed（typed entity）",
       "fix": "按 CLAIM_MATRIX 的落点阶段（G2-G4）实现并补测试后改状态",
       "test": "",
       "owner": "Monyeah777（维护者）",
@@ -108,7 +107,7 @@
       "dim": "S0_requirements",
       "severity": "P1",
       "file": "",
-      "evidence": "claim #18 仍 TODO：未知实体类型/越权组合 fail-closed（typed entity）",
+      "evidence": "claim #19 仍 TODO：模型替换使旧 AI 证据失效（model card 绑定）",
       "fix": "按 CLAIM_MATRIX 的落点阶段（G2-G4）实现并补测试后改状态",
       "test": "",
       "owner": "Monyeah777（维护者）",
@@ -119,17 +118,6 @@
       "dim": "S0_requirements",
       "severity": "P1",
       "file": "",
-      "evidence": "claim #19 仍 TODO：模型替换使旧 AI 证据失效（model card 绑定）",
-      "fix": "按 CLAIM_MATRIX 的落点阶段（G2-G4）实现并补测试后改状态",
-      "test": "",
-      "owner": "Monyeah777（维护者）",
-      "status": "open"
-    },
-    {
-      "id": "F-006",
-      "dim": "S0_requirements",
-      "severity": "P1",
-      "file": "",
       "evidence": "claim #21 仍 TODO：Python ↔ .NET（引擎线）逐字节 parity（trust 面）",
       "fix": "按 CLAIM_MATRIX 的落点阶段（G2-G4）实现并补测试后改状态",
       "test": "",
@@ -137,7 +125,7 @@
       "status": "open"
     },
     {
-      "id": "F-007",
+      "id": "F-006",
       "dim": "S6_test_gaps",
       "severity": "P2",
       "file": "",
@@ -148,7 +136,7 @@
       "status": "open"
     },
     {
-      "id": "F-008",
+      "id": "F-007",
       "dim": "S12_unknown",
       "severity": "P2",
       "file": "",
@@ -159,7 +147,7 @@
       "status": "open"
     },
     {
-      "id": "F-009",
+      "id": "F-008",
       "dim": "S12_unknown",
       "severity": "P2",
       "file": "",
@@ -177,7 +165,7 @@
   },
   "stop": {
     "p0": 0,
-    "p1_open_with_owner": 5,
+    "p1_open_with_owner": 4,
     "claims_unsupported": 0
   }
 }
