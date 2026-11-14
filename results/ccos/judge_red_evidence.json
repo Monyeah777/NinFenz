@@ -2433,6 +2433,10 @@
       "source": "naming"
     },
     {
+      "module": "test_trust_gate46.py",
+      "source": "none"
+    },
+    {
       "module": "test_trust_keys.py",
       "source": "naming"
     },
@@ -2613,10 +2617,10 @@
       "source": "negative_assertion"
     }
   ],
-  "modules": 653,
+  "modules": 654,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
   "suspect": 169,
   "with_evidence": 343,
-  "without_evidence": 141
+  "without_evidence": 142
 }

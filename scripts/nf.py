@@ -3867,6 +3867,11 @@ CHECK_GUIDE = {
           "向量不一致，或向量族缺失/不可读）。补什么：先修实现或向量，再跑"
           " python scripts/trust_vectors.py --write；判定逻辑收口在 core.trust.gate.scan。"
           "示例：删了向量族 → 重跑 --write；改坏 bundle leaf → 按 nf-claim-bundle/1 重算。",
+    "46": "缺什么：trust G2 证据链断裂（DSSE/issuer registry/链头签名/锚 组合"
+          "判定失败，或冻结 schema 缺失）。补什么：先跑 core.trust.gate_g2.scan 看逐条；"
+          "再按失败面修 schema/签名语句/生命周期/等级判定。示例：错摘要签名未被拒 → "
+          "修 signature.verify_head；吊销 key 仍通过 → 修 keys 生命周期；T4 被标 ok → "
+          "删该声称。",
 }
 
 def _cmd_preset(args):
