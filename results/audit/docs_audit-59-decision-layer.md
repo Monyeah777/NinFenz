@@ -9,7 +9,7 @@ subjects:
   - verify.sh:904661b179c65686b37d63a7fa0a175625c433d741239903527dad3da35a7874
   - protocol/decision_layer.json:9330d4057f07647d67f15daa6f37c84913834b7eed65f4e360bf5c7c413e5e06
   - protocol/normative.json:c1bbc14c92cea6bd66ff6cb54fdcf91bf3072f66adee7027f1d3f42e70fe1825
-  - protocol/data_contracts.json:f8fecc1ebc90f1b7595d147dda4833303a4517c57a406e02cc1eddee0d4fe502
+  - protocol/data_contracts.json:555644324a81d6e06cbf84e5c5e9186c5e8f5623ea101574c7783bf43e6bb3ed
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/receipts.py:b748915bb519aeeb1aa0f7d367df2eb7d4321b369b85905a7f918d8d55d96363
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
@@ -19,6 +19,8 @@ subjects:
   - docs/decision-layer.md:cd3a254de738ece7c8f07db36904c74484e4622c58f688a3973c8998b441628c
 
 ---
+> 重审（2026-11-15）：NF-Final G3 收口：新增 results/{G3_DOD.md,g3_dod.json}、docs/governance-report.md、test_g3_dod.py；assertions/data_contracts/check12/code_metrics 更新
+
 > 重审（2026-11-15）：NF-Final WP-33：新增 core/governance_report.py、results/governance/{report,audit}.json、test_governance_report_contract.py；verify.sh check51 + quality_baseline 51 条/PASS=93；派生面重生成
 
 > 重审（2026-11-15）：NF-Final WP-32：新增 protocol/attachment.json、core/attachment.py、docs/attachment.md、test_attachment_contract.py；assertions/data_contracts/independence/code_metrics/check12 更新

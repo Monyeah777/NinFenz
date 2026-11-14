@@ -1102,6 +1102,18 @@
         "test_governance_report_contract",
         "docs/governance-report.md"
       ]
+    },
+    {
+      "id": "g3-dod",
+      "artifact": "results/g3_dod.json",
+      "quality_rule": "assertion:g3-dod",
+      "owner": "G3 DoD 收口审计（test_g3_dod 判据+现场复算）",
+      "status": "active",
+      "freshness": "G3 产物/等级/审计变化须重跑收口；verdict 与 P0 必须一致",
+      "consumers": [
+        "test_g3_dod",
+        "results/G3_DOD.md"
+      ]
     }
   ]
 }

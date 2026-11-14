@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/asset_density.py:aa60651ad8269e7db09a709570ae69192f39ee95cfd6bd1d4f652696b3d26c56
   - docs/domain-packs.md:f90ff233965ee1bb5a872dd833b79e200bfc1825db9c81f651ceca760d83d8b6
-  - protocol/data_contracts.json:f8fecc1ebc90f1b7595d147dda4833303a4517c57a406e02cc1eddee0d4fe502
+  - protocol/data_contracts.json:555644324a81d6e06cbf84e5c5e9186c5e8f5623ea101574c7783bf43e6bb3ed
 ---
+> 重审（2026-11-15）：NF-Final G3 收口：新增 results/{G3_DOD.md,g3_dod.json}、docs/governance-report.md、test_g3_dod.py；assertions/data_contracts/check12/code_metrics 更新
+
 > 重审（2026-11-15）：NF-Final WP-33：新增 core/governance_report.py、results/governance/{report,audit}.json、test_governance_report_contract.py；verify.sh check51 + quality_baseline 51 条/PASS=93；派生面重生成
 
 > 重审（2026-11-15）：NF-Final WP-32：新增 protocol/attachment.json、core/attachment.py、docs/attachment.md、test_attachment_contract.py；assertions/data_contracts/independence/code_metrics/check12 更新

@@ -29,6 +29,7 @@
 - [../docs/contract-lifecycle.md](../docs/contract-lifecycle.md)（G3 WP-30 契约生命周期/义务：draft/active/deprecated/retired 四态义务 + 引用策略；真源 `protocol/contract_lifecycle.json`，判据 `test_contract_lifecycle_contract.py`）
 - [../docs/governance-adapters.md](../docs/governance-adapters.md)（G3 WP-31 治理 verify 适配：DSSE/Sigstore/RFC3161/透明日志适配器与等级计划、缺工具降级不冒充；真源 `protocol/governance_adapters.json`，判据 `test_governance_adapters_contract.py`）
 - [../docs/attachment.md](../docs/attachment.md)（G3 WP-32 治理附件模式：none/observe/require + 生产独立性 digest 对照；真源 `protocol/attachment.json`，判据 `test_attachment_contract.py`）
+- [G3_DOD.md](G3_DOD.md)（G3 QG3 收口审计：§14.3 八条 + §11.2 WP-30…33 + QG3 + 治理指标；verdict=pass-with-open-items、P0=0 → G4；机读 `g3_dod.json`，判据 `test_g3_dod.py`）
 - [../docs/wiki.md](../docs/wiki.md) · [../wiki/llms.txt](../wiki/llms.txt)（G1 WP-10 LLMWiki 编译器：133 页投影 + pages/index/graph/llms/MCP 三入口；`nf wiki build/check/get/search/related/context`，判据 `test_wiki_compiler_contract.py`）
 - [../docs/spec-compiler.md](../docs/spec-compiler.md) · [intents/sample-document.json](../spec/intents/sample-document.json)（G1 WP-11 Spec Compiler：intent→nf-spec/1→nf-task/1，确定性/拒绝未知/任务图无环；`nf spec compile`，判据 `test_spec_compiler_contract.py`）
 - [../docs/context-packer.md](../docs/context-packer.md)（G1 WP-12 Context Packer：角色隔离 author/reviewer/governance、预算硬上限、citations 100%、注入检出/清除；`nf wiki context --role`，判据 `test_context_packer_contract.py`）

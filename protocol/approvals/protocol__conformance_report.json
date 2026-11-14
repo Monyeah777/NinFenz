@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-15",
   "approved_by": "Monyeah777",
-  "note": "NF-Final G3 WP-33 治理报告/审计包 + check51（51 条/PASS=93）",
+  "note": "NF-Final G3 QG3 收口（verdict pass-with-open-items，P0=0）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "9d45267212eb6cd3fa5830a52cb9440c88f211ce28b1701fef16f4db09f0a862"
+  "subject_digest": "b94bd1f5bfe6a0f5d5061d04fd308ed60d4795026c49982890310d7c26f95132"
 }
