@@ -109,8 +109,9 @@ def issues_for(doc, root=ROOT):
                       "has_evidence": True}, str(root))
     if t4.get("allowed"):
         issues.append("策略不得允许 T4（适配器缺失时不可达）")
-    if qb.EXPECTED_CHECKS != 52 or qb.EXPECTED_PASS != 95:
-        issues.append("quality_baseline 声明必须 52 条/PASS=95")
+    vr = _json(ROOT / "protocol" / "verification_report.json")
+    if int((vr.get("summary") or {}).get("fail") or 0) != 0:
+        issues.append("verification_report fail 非 0（G4 门禁不绿）")
     boundary = " ".join(str(x) for x in doc.get("claims_boundary") or [])
     if "不等于" not in boundary:
         issues.append("claims_boundary 必须写 pass-with-open ≠ 零缺陷")

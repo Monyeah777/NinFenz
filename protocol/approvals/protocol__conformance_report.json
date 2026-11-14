@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-15",
   "approved_by": "Monyeah777",
-  "note": "NF-Final G5 WP-51（收尾：测试相对化）",
+  "note": "NF-Final WP-52 质量报告收口 + 最终 Gate 审计（pass-with-open-items，P0=0）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "f27fc31d38719393fa44c08e4072c6ea1c6b96f5b719a453c2ecf56f0328b190"
+  "subject_digest": "018cd48d6da170bf1a242b5011bab581a1dc3466672c02dcf8f3524011f8a9b8"
 }

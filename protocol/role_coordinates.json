@@ -4,9 +4,9 @@
     "entry": 26,
     "floor": 5,
     "prod": 1068,
-    "projection": 230,
+    "projection": 232,
     "support": 512,
-    "verify": 1448
+    "verify": 1449
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9227,6 +9227,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "NF-Final 最终 Gate 审计判据（质量报告收口）。",
+      "path": "desktop/tests/test_final_dod.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "生成物新鲜度前置检查（scripts/freshness_check.py）判据。",
       "path": "desktop/tests/test_freshness_check.py",
       "role": "verify",
@@ -15138,16 +15144,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "370f6231f128ffac2e9d61a19d42e1f7d24ece2aef3d1df6e0592a64f7397e1a",
+  "root_digest": "0ac40af97ba3728c264a194ff7f7ec356cb562830d94ddcc2aa972dc78bce916",
   "rule_counts": {
     "R-app": 1510,
     "R-catch": 356,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 202,
+    "R-projection": 204,
     "R-support": 124,
-    "R-verify": 1316,
+    "R-verify": 1317,
     "auto:R-core": 316
   },
   "schema": "nf-role-coordinates/1"

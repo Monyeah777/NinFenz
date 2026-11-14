@@ -114,15 +114,15 @@
     },
     {
       "description": "数据化断言表（形状类断言数据化）",
-      "detail": "断言 71 条（通过 71）· kind 封闭集 4 种",
-      "digest": "af76ec508aed03e0235d577beb8ae97e92d142d44661ba97fcdbea4a1956d7f7",
+      "detail": "断言 72 条（通过 72）· kind 封闭集 4 种",
+      "digest": "c4fcfd960d28aace4f3b163fe8f23b98b97a27ae7d108f8244b909b6e2799d02",
       "id": "assertions",
       "ok": true
     },
     {
       "description": "内容建模三件（词表/规范说明件/数据契约）",
-      "detail": "词表 12 · 规范件 37 / 说明件 2549 · 数据契约 98",
-      "digest": "b937c0bb099e7845450fe8a26003c1fb02f9f5305e10a5510b3c75e852657797",
+      "detail": "词表 12 · 规范件 37 / 说明件 2551 · 数据契约 99",
+      "digest": "337b17f965d12ddb7488ee04f1025ee6fd92e2c9286b91a949c3ab8cb0b1c97c",
       "id": "modeling",
       "ok": true
     },
@@ -191,7 +191,7 @@
     }
   ],
   "passed": 27,
-  "root": "ea4dc8645420502ca7c678f85a731063821191640417d3a00feca250d359c484",
+  "root": "237af03c94e8fb888684b5047dc7a66bcf9a69c9992825dc20f4b34bdb73f4e2",
   "schema": "nf-conformance/1",
   "total": 27,
   "verdict": "conformant"
