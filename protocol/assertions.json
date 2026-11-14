@@ -934,6 +934,21 @@
       "message": "Spec Compiler 样本 intent 缺失或版本名不符（WP-11 判据依赖它）",
       "fix": "补/修 spec/intents/sample-document.json；再跑 test_spec_compiler_contract",
       "evidence": "test_spec_compiler_contract / conformance::modeling"
+    },
+    {
+      "id": "g1-dod",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "results/g1_dod.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-g1-dod/1"
+      },
+      "message": "G1 DoD 收口审计缺失或版本名不符（Gate 准入判据依赖它）",
+      "fix": "补/修 results/g1_dod.json；再跑 test_g1_dod",
+      "evidence": "test_g1_dod / conformance::modeling"
     }
   ]
 }

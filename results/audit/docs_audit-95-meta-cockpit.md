@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:29e1170dab08764e3970d90d64b57495bbd74dd256ebe7744db688a66b77aace
   - tui/_surface.py:2657310df6bd5f1582d3ee11c147f14faccaeee12935969a90379ee0bd09d42d
-  - protocol/check12_weights.json:ee0c3e4cabdd85bec5107ab617f714b32e5da990e5c906b5c982dbd540548b08
+  - protocol/check12_weights.json:f5d92d75e35dc4bf4793a9144ac4530c6a2e548117017b934b846cc7a8e954ab
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:fa00a7fd014857af56e11f38ced1b7d888be053befaadb10b3dd494d27884316
   - docs/meta-cockpit/功能解析.md:de20c2340d19d541bcfde53f222a3acf22a6e440d8fb3dcf51a37aedf53c0c25
   - results/meta-cockpit-manifest.json:60c0e100798e49d393557ae5066c02d7e057ec27f386ee1a36ca3fc7740150ba
 
 ---
+> 重审（2026-11-14）：NF-Final G1 收口：新增 results/{G1_DOD.md,g1_dod.json}、test_g1_dod.py；assertions/data_contracts/check12/code_metrics 更新，被审对象变更后机械重绑
+
 > 重审（2026-11-14）：NF-Final WP-12：新增 core/context_packer.py、docs/context-packer.md、test_context_packer_contract.py；nf wiki context --role 接入；independence/code_metrics/check12 更新，被审对象变更后机械重绑
 
 > 重审（2026-11-14）：NF-Final WP-11：新增 core/spec_compiler.py、spec/intents/sample-document.json、docs/spec-compiler.md、test_spec_compiler_contract.py、nf spec compile；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑

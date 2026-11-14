@@ -970,6 +970,18 @@
         "test_spec_compiler_contract",
         "docs/spec-compiler.md"
       ]
+    },
+    {
+      "id": "g1-dod",
+      "artifact": "results/g1_dod.json",
+      "quality_rule": "assertion:g1-dod",
+      "owner": "G1 DoD 收口审计（test_g1_dod 判据+现场复算）",
+      "status": "active",
+      "freshness": "Wiki/Spec/Packer 指标变化须重跑收口；verdict 与 P0 必须一致",
+      "consumers": [
+        "test_g1_dod",
+        "results/G1_DOD.md"
+      ]
     }
   ]
 }

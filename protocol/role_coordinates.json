@@ -4,9 +4,9 @@
     "entry": 26,
     "floor": 5,
     "prod": 1064,
-    "projection": 199,
+    "projection": 201,
     "support": 509,
-    "verify": 1417
+    "verify": 1418
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9149,6 +9149,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "G1 DoD 收口审计判据（NF-Final §14.3 / §11.2 G1 / §13A QG1 / L3）。",
+      "path": "desktop/tests/test_g1_dod.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "缺口逐行审查（gap_review）单测：候选筛法可复现 + 确定性证据复核 + stub 双轨纪律。",
       "path": "desktop/tests/test_gap_review.py",
       "role": "verify",
@@ -14928,16 +14934,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "0b1c87abf65c285e22bcd33fefbce16d7e314ae930c76b5338a34ecdd4120a9a",
+  "root_digest": "4941363e9205c9f7279fbc3beed6536c37aa503d8ef630d34a351c9ac00579bf",
   "rule_counts": {
     "R-app": 1497,
     "R-catch": 356,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 176,
+    "R-projection": 178,
     "R-support": 124,
-    "R-verify": 1288,
+    "R-verify": 1289,
     "auto:R-core": 301
   },
   "schema": "nf-role-coordinates/1"
