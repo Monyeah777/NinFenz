@@ -130,7 +130,8 @@
 - **WP-02 已完成（2026-11-14）**：`docs/trust/THREAT_MODEL.md`（STRIDE 8 行 / 删除·篡改 8 行 / 信任边界 6 条 / 红队 2 角色各 5 条 / ACCEPTED-RISK 4 条 / 已知缺口 OPEN-G1…G4）+ 判据 `desktop/tests/test_trust_threat_model_doc_contract.py`（3 条，含 7 项变异自证）。
 - **WP-03 已完成（2026-11-14）**：`scripts/trust_vectors.py` + `results/trust/trust_vectors.json`（schema `nf-trust-vectors/1`，**34 条 / 7 族**：canonical / domain / pae / merkle / process / entity / level）；判据 `desktop/tests/test_trust_vectors.py`（6 条：提交件==重算、独立实现复算全部期望值、9 项变异自证、实体向量对齐冻结 schema）。同时补清 `protocol/check12_weights.json` 对三个新测试模块的权重（`test_check12_budget` 从红转绿）。
 - **WP-04 已完成（2026-11-14）**：`protocol/adr/registry.json` 新增 **ADR-005…ADR-010** 六条 trust 裁决（current、topic 唯一、falsifier 必填、evidence 逐条在场）；判据 `desktop/tests/test_trust_adr_contract.py`（5 条：注册表过 `core.adr` 校验/reconcile、六条齐备、裁决↔工件双向绑定、发布边界、7 项变异自证）。**G0 四项交付（schema / 威胁模型 / 向量 / ADR）全部完成**，退出条件「无默认放行、schema/威胁模型/向量/ADR 评审可核」达成。
-- **下一步：G1（证据内核 A1+A2）**：WP-10 `trust/canonical.py` + `entity.py` → WP-11 `trust/bundle.py` → WP-12 `trust/process.py` + 事件链 → WP-14 `cc_verify` 骨架（挂 `nf verify`）→ WP-15 check45 + 冻结。
+- **WP-10 已完成（2026-11-14，G1 首项）**：`desktop/src/core/trust/canonical.py`（严格 canonical：键排序/紧凑分隔/禁 float 与 NaN/拒 bytes-set-tuple/非字符串键；域分隔 `sha256(tag+0x00+payload)`，tag 语法校验；错误消息入向量 reason 码）+ `desktop/src/core/trust/entity.py`（`nf-entity/1` 结构校验 + issuer 解析 + 准入：schema→issuer→type 三段 fail-closed，返回向量约定的 `{admissible, reason}`）。判据 `desktop/tests/test_trust_canonical.py`（12 条：canonical/domain 向量逐条、与 `attest.canonical`/`evidence.canonical` 逐字节对照、严格性变异自证）+ `desktop/tests/test_trust_entity.py`（12 条：entity 向量逐条、未知字段/issuer/类型/坏摘要/坏时间戳、schema 弱化与策略收窄变异自证）。
+- **下一步（G1 余项）**：WP-11 `trust/bundle.py`（Merkle 根/包含证明/单 claim 验证，对齐向量 merkle 族）→ WP-12 `trust/process.py` + 事件链 → WP-14 `cc_verify` 骨架（挂 `nf verify`）→ WP-15 check45 + 冻结。
 
 ## 8. 复跑命令
 

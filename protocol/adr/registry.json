@@ -125,6 +125,7 @@
       "supersedes": [],
       "evidence": [
         "protocol/trust/entity.schema.json",
+        "desktop/src/core/trust/entity.py",
         "protocol/trust/policy.schema.json",
         "desktop/tests/test_trust_schemas.py"
       ],

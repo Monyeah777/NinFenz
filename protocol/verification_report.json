@@ -385,8 +385,8 @@
       "stats": {
         "budget_ms": 1500.0,
         "n": 65536,
-        "patterns": 262,
-        "probed": 262
+        "patterns": 264,
+        "probed": 264
       },
       "status": "pass",
       "warns": 0
@@ -524,8 +524,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4490,
-        "kernel": 2374,
+        "files": 4495,
+        "kernel": 2376,
         "kernel_no_self": 308,
         "rules": 9,
         "uncovered": 0,
@@ -536,7 +536,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "6b652045aa33174a5229f18b38ce776bc6952b7d24d4b49b915ab56f13998092",
+  "root_digest": "39cc39a380180ba785e1eb23a7c3e27b3d7111600669df0b3430487220fc6c26",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

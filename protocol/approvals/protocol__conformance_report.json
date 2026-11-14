@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-11-14",
   "approved_by": "Monyeah777",
-  "note": "WP-04 trust 裁决登记与契约判据入仓，一致性报告重算",
+  "note": "WP-10 trust canonical/entity 与判据入仓，一致性报告重算",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "29b2664a699ef8b31961d9bdb533b87dee2885543be2b3ef94acdc11654de0a5"

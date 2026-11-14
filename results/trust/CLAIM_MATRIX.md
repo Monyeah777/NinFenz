@@ -33,6 +33,8 @@
 | 24 | 威胁模型边界自洽：STRIDE 8 行 / 删除矩阵 8 行 / 边界 6 条 / 红队 2×5 均绑定现存控制点与判据；T0/T1 不写成 T3/T4 | `docs/trust/THREAT_MODEL.md` | `test_trust_threat_model_doc_contract.py`（3 条 + 7 项变异自证） | — | SUPPORTED |
 | 25 | trust 实现契约被测试向量锚定：提交件==重算、期望值可被独立实现复算、跨语言 JSON 自验 | `scripts/trust_vectors.py` + `results/trust/trust_vectors.json`（34 条 / 7 族） | `test_trust_vectors.py`（6 条 + 9 项变异自证） | — | SUPPORTED |
 | 26 | 六条 trust 裁决可校验：登记投影过 ADR 校验/reconcile、evidence 在场、与 schema/向量/实现双向绑定、决策正文不进公开仓 | `protocol/adr/registry.json`（ADR-005…010） | `test_trust_adr_contract.py`（5 条 + 7 项变异自证） | — | SUPPORTED |
+| 27 | canonical 单点：键排序/紧凑分隔/禁 float 与 NaN/拒非法类型；域分隔摘要按 tag+0x00+payload；与既有签名口径逐字节一致 | `desktop/src/core/trust/canonical.py` | `test_trust_canonical.py`（12 条：向量逐条 + 既有实现对照 + 变异自证） | T0 | SUPPORTED |
+| 28 | 实体准入 fail-closed：结构 → issuer 在册 → type 被授权，未知一律拒绝且返回稳定 reason 码 | `desktop/src/core/trust/entity.py` | `test_trust_entity.py`（12 条：向量逐条 + 失败面 + 变异自证） | T0 | SUPPORTED |
 
 **本轮判定**：`UNSUPPORTED` = 0（本轮抽检范围内）；`TODO` 11 条全部落在计划 G1–G4 的工作包内，不构成文档过度声明。计划 §13.3 的示例行「删尾可检测 / T2 / TODO」与本矩阵第 15 行同源。
 
