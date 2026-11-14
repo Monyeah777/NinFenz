@@ -200,8 +200,11 @@ def build(root: str = ".") -> dict:
     add("S12_unknown", "P2",
         "红队角色剩余 4 个未跑（恶意 issuer / 新人 / 隐私攻击者 / 供应链攻击者）",
         "按轮次轮换红队角色并把路径写入威胁模型", owner=OWNER, status="open")
-    add("S12_unknown", "P2", "跨语言 parity（Go/.NET）未接：向量集已备，实现 parity 属 G4",
-        "G4 补独立 verifier 并跑同一向量集", owner=OWNER, status="open")
+    add("S12_unknown", "P2",
+        "实际向公共透明日志提交本仓条目、运营外部 witness 网络属外部操作"
+        "（需维护者 Sigstore 身份/公共基础设施）",
+        "由维护者以真实身份提交公共日志条目；外部 witness 网络按 WITNESS_SPEC 接入",
+        owner=OWNER, status="open")
 
     status_of = {
         "S1_code_holes": "green" if not holes else "red",

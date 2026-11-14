@@ -1,13 +1,11 @@
 {
   "schema": "nf-trust-self-audit/1",
-  "head": "a50d95ad2485eb1746d50232d43a88eb5e8de81f",
-  "scanned_at": "2026-11-14T08:02:03Z",
+  "head": "8dcfe5c6326411d28de8d73d02adebd2c037ef87",
+  "scanned_at": "2026-11-14T08:36:09Z",
   "dimensions": {
     "S0_requirements": {
-      "status": "amber",
-      "findings": [
-        "F-002"
-      ]
+      "status": "green",
+      "findings": []
     },
     "S1_code_holes": {
       "status": "green",
@@ -34,7 +32,7 @@
     "S6_test_gaps": {
       "status": "amber",
       "findings": [
-        "F-003"
+        "F-002"
       ]
     },
     "S7_doc_overclaim": {
@@ -60,8 +58,8 @@
     "S12_unknown": {
       "status": "amber",
       "findings": [
-        "F-004",
-        "F-005"
+        "F-003",
+        "F-004"
       ]
     }
   },
@@ -79,17 +77,6 @@
     },
     {
       "id": "F-002",
-      "dim": "S0_requirements",
-      "severity": "P1",
-      "file": "",
-      "evidence": "claim #21 仍 PARTIAL：Python ↔ .NET（引擎线）逐字节 parity（trust 面）",
-      "fix": "补完剩余面；若是环境缺件（如无 .NET SDK），保持 PARTIAL 并如实登记 ENV",
-      "test": "",
-      "owner": "Monyeah777（维护者）",
-      "status": "open"
-    },
-    {
-      "id": "F-003",
       "dim": "S6_test_gaps",
       "severity": "P2",
       "file": "",
@@ -100,7 +87,7 @@
       "status": "open"
     },
     {
-      "id": "F-004",
+      "id": "F-003",
       "dim": "S12_unknown",
       "severity": "P2",
       "file": "",
@@ -111,12 +98,12 @@
       "status": "open"
     },
     {
-      "id": "F-005",
+      "id": "F-004",
       "dim": "S12_unknown",
       "severity": "P2",
       "file": "",
-      "evidence": "跨语言 parity（Go/.NET）未接：向量集已备，实现 parity 属 G4",
-      "fix": "G4 补独立 verifier 并跑同一向量集",
+      "evidence": "实际向公共透明日志提交本仓条目、运营外部 witness 网络属外部操作（需维护者 Sigstore 身份/公共基础设施）",
+      "fix": "由维护者以真实身份提交公共日志条目；外部 witness 网络按 WITNESS_SPEC 接入",
       "test": "",
       "owner": "Monyeah777（维护者）",
       "status": "open"
@@ -129,7 +116,7 @@
   },
   "stop": {
     "p0": 0,
-    "p1_open_with_owner": 1,
+    "p1_open_with_owner": 0,
     "claims_unsupported": 0
   }
 }

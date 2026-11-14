@@ -19,6 +19,7 @@ from core import json_doc, json_schema
 from core.trust import anchor as ta
 from core.trust import bundle as tb
 from core.trust import human_review as hrev
+from core.trust import public_anchor as pua
 from core.trust import signature as tsig
 from core.trust.canonical import digest_of, is_digest
 
@@ -117,7 +118,9 @@ def _missing_issues(codes: list) -> list:
 def verify(bundle: dict, policy: dict, root: str = ".", anchor: dict | None = None,
            anchor_verifiers: dict | None = None, head_signature: dict | None = None,
            registry: dict | None = None, material: dict | None = None,
-           now: str | None = None, human_review: dict | None = None) -> dict:
+           now: str | None = None, human_review: dict | None = None,
+           public_anchor: dict | None = None,
+           public_anchor_verifier=None, public_log_id: str = "") -> dict:
     """验证 claim bundle：返回 {"report","decision","exit_code"}（不打印、不退出）。
 
     head_signature 给了就核链头签名（nf-chain-head/1 + DSSE + registry）→ signature 事实；
@@ -190,6 +193,25 @@ def verify(bundle: dict, policy: dict, root: str = ".", anchor: dict | None = No
     else:
         checks.append({"id": "A1-head-signature", "ok": False,
                        "detail": "未提供链头签名；T1 及以上只报缺项，不冒充等级"})
+    public_issues: list = []
+    if public_anchor is not None:
+        resolved = pua.verify_public_anchor(public_anchor, public_anchor_verifier,
+                                            public_log_id, subject_digest, root=root)
+        if resolved.get("ok"):
+            facts["public_anchor"] = "ok"
+            checks.append({"id": "A5-public-anchor", "ok": True,
+                           "detail": f"public anchor ok：log={resolved.get('log_id')} "
+                                     f"tree={resolved.get('tree_size')}"})
+        else:
+            facts["public_anchor"] = "invalid"
+            public_issues.append({"code": str(resolved.get("reason") or "PUBLIC-ANCHOR-INVALID"),
+                                  "message": "公共锚校验失败",
+                                  "fix": "核对 pinned log id/公钥、inclusion proof 与目标摘要"})
+            checks.append({"id": "A5-public-anchor", "ok": False,
+                           "detail": str(resolved.get("reason"))})
+    else:
+        checks.append({"id": "A5-public-anchor", "ok": False,
+                       "detail": "未提供公共锚（T4 只报缺项，不冒充已锚）"})
     review_state = hrev.STATE_PENDING
     review_issues: list = []
     if human_review is not None and registry and isinstance(material, dict):
@@ -221,6 +243,7 @@ def verify(bundle: dict, policy: dict, root: str = ".", anchor: dict | None = No
     issues.extend(anchor_issues)
     issues.extend(signature_issues)
     issues.extend(review_issues)
+    issues.extend(public_issues)
     if not hash_ok:
         issues.insert(0, {"code": "BUNDLE-INVALID",
                           "message": "bundle 自洽性校验失败（" +

@@ -27,7 +27,7 @@
 | 18 | 未知实体类型/越权组合 fail-closed（typed entity） | `protocol/trust/type-registry.schema.json` + `desktop/src/core/trust/entity.py`（typed_admissibility：issuer 注册 kind/显式授权/有效期/refs 数量类别重复自引；composition_check：ref 可解析 + compose_with 类型对 + DAG/深度有界） | `test_trust_types.py`（19 条：注册表语义 + 准入矩阵 + 组合/DAG/深度 + CLI + 规则移除变异自证） | T1 | SUPPORTED（G3 WP-30） |
 | 19 | 模型替换使旧 AI 证据失效（model card 绑定） | `protocol/trust/model-card.schema.json` + `desktop/src/core/trust/model_card.py`（card_digest 绑定 + pinned 语义 pre_registered/score_forbidden + MODEL-REPLACED / EVAL-PROTOCOL-CHANGED / CARD-REISSUED） | `test_trust_model_card.py`（11 条：pinned 语义 + 绑定矩阵 + 模型替换/评测变更/重发卡 + CLI + schema const 弱化变异自证） | T1 | SUPPORTED（G3 WP-31） |
 | 20 | 报告给出等级 + 缺项 + 修复指引 + 信任根（`nf-verify/1`） | `desktop/src/core/trust/verify.py` | `test_trust_verify.py`（11 条：level 向量 + 四场景退出码 + schema + CLI） | T0 骨架（签名/锚事实 G2） | SUPPORTED |
-| 21 | Python ↔ .NET（引擎线）逐字节 parity（trust 面） | `scripts/trust_parity/verify.mjs`（Node.js 独立实现，不引 Python/仓内实现）+ `test_trust_parity.py` | 六族 29 条纯复算向量逐字节 parity（canonical/domain/pae/merkle/process/level）；entity 族需完整 JSON Schema 引擎列入 skipped | T1 | PARTIAL（Python↔Node.js parity 已建；.NET 引擎线无 SDK，见 BASELINE ENV-01） |
+| 21 | Python ↔ .NET（引擎线）逐字节 parity（trust 面） | `scripts/trust_parity/verify.mjs`（Node.js）+ `scripts/trust_parity/csharp/`（.NET 8 C# 独立实现，均不引 Python/仓内实现）+ `test_trust_parity.py` / `test_trust_parity_dotnet.py` | 六族 29 条纯复算向量逐字节 parity（canonical/domain/pae/merkle/process/level）；Node.js 与 .NET 两侧均 mismatches=0；entity 族需完整 JSON Schema 引擎列入 skipped | T1 | SUPPORTED（Python↔Node.js + Python↔.NET 双实现） |
 | 22 | trust 层 7 件 IDL 结构 fail-closed（未知字段/封闭词表/摘要/时间/base64 形状） | `protocol/trust/*.schema.json`（7 件） | `test_trust_schemas.py`（23 条：正/反样例 + 变异自证） | T0 | SUPPORTED |
 | 23 | schema 不依赖校验器未实现语义（无静默忽略） | `core.json_schema` 叶子件 + `test_trust_schemas.py` 的 unsupported 断言 | 同上 | — | SUPPORTED |
 | 24 | 威胁模型边界自洽：STRIDE 8 行 / 删除矩阵 8 行 / 边界 6 条 / 红队 2×5 均绑定现存控制点与判据；T0/T1 不写成 T3/T4 | `docs/trust/THREAT_MODEL.md` | `test_trust_threat_model_doc_contract.py`（3 条 + 7 项变异自证） | — | SUPPORTED |
@@ -43,6 +43,8 @@
 | 34 | prompt/context 血缘绑定（上下文替换/前缀篡改/段重排/跨会话复用可检测；AI 证据同时绑模型身份与血缘摘要） | `protocol/trust/context-lineage.schema.json` + `desktop/src/core/trust/context_lineage.py`（逐段 digest/prev 链 + lineage_digest + identity_digest 绑定） | `test_trust_context_lineage.py`（12 条：构建/篡改矩阵/模型身份与 prompt 绑定/三方绑定/CLI；另 identity 摘要排除 prompt/notes 的正例） | T1 | SUPPORTED（G3 WP-32） |
 | 35 | T3 见证组合（签名 + RFC3161 + STH + witness 阈值同时成立才达 T3；阈值不足/缺公共锚不得高报） | `desktop/src/core/trust/anchor.py`（STH/witness 语句 + 阈值）+ `desktop/src/core/trust/verify.py`（事实投影）+ `docs/trust/WITNESS_SPEC.md` | `test_trust_t3.py`（5 条：真 TSA 端到端 T3、T4 不声称、阈值不足、STH/TSA 篡改必红） | T3（公共锚除外） | SUPPORTED（G4 WP-41） |
 
-**本轮判定**：`UNSUPPORTED` = 0；`TODO` = 0；`PARTIAL` = 1（#21：Python↔Node.js 逐字节 parity 已建，.NET 引擎线因本机无 SDK 未完成，环境事实见 BASELINE ENV-01）；其余 #13/#15/#16/#18/#19/#32/#33/#34/#35 均 SUPPORTED，不构成文档过度声明。
+| 36 | 公共锚 T4（Rekor 风格公共透明日志条目：RFC6962 inclusion + SET 日志签名 + 目标摘要绑定；离线验 + 显式联网抓取） | `protocol/trust/public-anchor.schema.json` + `desktop/src/core/trust/public_anchor.py` + `scripts/trust_verify.py --verify-public-anchor/--fetch-public-anchor` | `test_trust_public_anchor.py`（12 条）+ `test_trust_public_anchor_live.py`（2 条：对已提交的 Sigstore Rekor **真实条目**离线复验）+ `results/trust/PUBLIC_ANCHOR_LIVE.{json,md}`（logIndex 0 · tree 4163431 · 22 级 proof） | T4（验证面） | SUPPORTED（G4；真实公共日志条目已验证；实际向公共日志提交本仓条目需维护者 Sigstore 身份，属外部操作） |
+
+**本轮判定**：`UNSUPPORTED` = 0；`TODO` = 0；`PARTIAL` = 0；#13/#15/#16/#18/#19/#21/#32/#33/#34/#35/#36 均 SUPPORTED（#21 已由 Node.js + .NET 双实现补齐；实际公共日志提交属外部操作，已在 DOD 标注），不构成文档过度声明。
 
 *维护纪律：新增 claim 必须同时补代码锚点与测试，再改状态；不得先写 SUPPORTED 后补测试。*

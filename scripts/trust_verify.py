@@ -30,6 +30,7 @@ from core.trust import entity as te  # noqa: E402
 from core.trust import human_review as hrev  # noqa: E402
 from core.trust import keys as tk  # noqa: E402
 from core.trust import model_card as tmc  # noqa: E402
+from core.trust import public_anchor as pua  # noqa: E402
 from core.trust import trust_store as tstore  # noqa: E402
 from core.trust import verify as tv  # noqa: E402
 
@@ -157,6 +158,15 @@ def main(argv=None) -> int:
     ap.add_argument("--subject-kind", default="bundle",
                     help="复核绑定的对象类别")
     ap.add_argument("--subject-digest", default="", help="复核绑定的对象摘要")
+    ap.add_argument("--public-anchor", default="",
+                    help="nf-public-anchor/1 公共锚（bundle/report 模式）")
+    ap.add_argument("--verify-public-anchor", default="", help="只校验公共锚文件")
+    ap.add_argument("--public-log-id", default="", help="钉住的公共日志 ID")
+    ap.add_argument("--public-log-pubkey", default="", help="公共日志公钥 PEM")
+    ap.add_argument("--fetch-public-anchor", default="", help="联网抓取 Rekor 条目 UUID → --out")
+    ap.add_argument("--fetch-public-key", default="",
+                    help="联网抓取公共日志 publicKey → 写入该路径")
+    ap.add_argument("--rekor-url", default=pua.DEFAULT_REKOR, help="Rekor 基址")
     ap.add_argument("--trust-store", action="store_true",
                     help="校验 policy × issuer registry × type registry 一致性")
     ap.add_argument("--root", default=str(ROOT), help="仓库根（读冻结 schema 用）")
@@ -178,6 +188,47 @@ def main(argv=None) -> int:
     ap.add_argument("--witness-material", default="", help="witness hmac 材料 {id: hex}")
     ap.add_argument("--sth-material", default="", help="STH hmac 材料 {log_id: hex}")
     args = ap.parse_args(argv)
+    if args.fetch_public_key:
+        try:
+            pem = pua.fetch_rekor_public_key(args.rekor_url)
+            atomic_write.write_bytes(Path(args.fetch_public_key), pem.encode("utf-8"))
+        except (OSError, ValueError) as exc:
+            print(f"不可判定：{exc}", file=sys.stderr)
+            return tv.EXIT_UNDECIDABLE
+        print(f"public key written: {args.fetch_public_key}")
+        return 0
+    if args.fetch_public_anchor:
+        if not args.out:
+            print("不可判定：--fetch-public-anchor 需要 --out", file=sys.stderr)
+            return tv.EXIT_UNDECIDABLE
+        try:
+            doc = pua.fetch_rekor_entry(args.fetch_public_anchor, args.rekor_url)
+            atomic_write.write_text(Path(args.out),
+                                    json.dumps(doc, ensure_ascii=False, indent=2) + "\n")
+        except (OSError, ValueError) as exc:
+            print(f"不可判定：{exc}", file=sys.stderr)
+            return tv.EXIT_UNDECIDABLE
+        print(f"public anchor fetched: target={doc.get('target_digest', '?')}")
+        return 0
+    if args.verify_public_anchor:
+        if not args.public_log_id or not args.public_log_pubkey:
+            print("不可判定：--verify-public-anchor 需要 --public-log-id 与 --public-log-pubkey",
+                  file=sys.stderr)
+            return tv.EXIT_UNDECIDABLE
+        try:
+            doc = pua.load_public_anchor(args.verify_public_anchor)
+            verifier = pua.make_openssl_verifier(args.public_log_pubkey)
+            resolved = pua.verify_public_anchor(doc, verifier, args.public_log_id,
+                                                args.subject_digest, root=args.root)
+        except (OSError, ValueError) as exc:
+            print(f"不可判定：{exc}", file=sys.stderr)
+            return tv.EXIT_UNDECIDABLE
+        if resolved.get("ok"):
+            print(f"valid public anchor: log={resolved.get('log_id')} "
+                  f"tree={resolved.get('tree_size')} target={resolved.get('target_digest')}")
+            return 0
+        print(f"invalid public anchor: {resolved.get('reason')}")
+        return 1
     if args.trust_store:
         if not args.policy or not args.issuer_registry or not args.type_registry:
             print("不可判定：--trust-store 需要 --policy/--issuer-registry/--type-registry",
@@ -356,10 +407,16 @@ def main(argv=None) -> int:
         registry_doc = tk.load_registry(args.issuer_registry) if args.issuer_registry else None
         material_doc = (json_doc.load(Path(args.key_material), dict, what="key material")
                         if args.key_material else None)
+        public_doc = pua.load_public_anchor(args.public_anchor) if args.public_anchor else None
+        public_verifier = (pua.make_openssl_verifier(args.public_log_pubkey)
+                           if public_doc and args.public_log_pubkey else None)
         result = tv.verify(bundle, policy, root=args.root, anchor=anchor_doc,
                            anchor_verifiers=_anchor_verifiers(args) if anchor_doc else None,
                            head_signature=head, registry=registry_doc,
-                           material=material_doc, now=args.now or None)
+                           material=material_doc, now=args.now or None,
+                           public_anchor=public_doc,
+                           public_anchor_verifier=public_verifier,
+                           public_log_id=args.public_log_id)
     except (OSError, ValueError) as exc:
         print(f"不可判定：{exc}", file=sys.stderr)
         return tv.EXIT_UNDECIDABLE
