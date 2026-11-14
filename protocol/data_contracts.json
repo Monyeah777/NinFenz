@@ -797,6 +797,31 @@
         "I18N.md",
         "protocol/locales.json"
       ]
+    },
+    {
+      "id": "assurance-claims",
+      "artifact": "results/assurance/CLAIMS.json",
+      "quality_rule": "assertion:assurance-claims",
+      "owner": "保证案例（core/assurance.py + test_assurance_contract）+ WP-0G",
+      "status": "active",
+      "freshness": "改论证须同步 CLAIMS.json 与 docs/assurance/ASSURANCE_CASE.md；缺口须进 RAID",
+      "consumers": [
+        "test_assurance_contract",
+        "docs/assurance/ASSURANCE_CASE.md"
+      ]
+    },
+    {
+      "id": "raid-registry",
+      "artifact": "protocol/raid.json",
+      "quality_rule": "assertion:raid-registry",
+      "owner": "RAID/风险治理（core/assurance.py + test_assurance_contract）+ WP-0G",
+      "status": "active",
+      "freshness": "每 Gate 复审；改风险/假设/问题/依赖须同步 protocol/raid.json 与 docs/RAID.md",
+      "consumers": [
+        "test_assurance_contract",
+        "docs/RAID.md",
+        "results/assurance/CLAIMS.json"
+      ]
     }
   ]
 }

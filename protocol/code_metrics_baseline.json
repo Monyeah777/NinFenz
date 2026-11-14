@@ -95,6 +95,11 @@
       "max_fn_cc": 14,
       "max_fn_lines": 36
     },
+    "desktop/src/core/assurance.py": {
+      "lines": 217,
+      "max_fn_cc": 49,
+      "max_fn_lines": 69
+    },
     "desktop/src/core/ast_missing.py": {
       "lines": 38,
       "max_fn_cc": 6,

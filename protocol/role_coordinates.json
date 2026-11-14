@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1485,
+    "app": 1488,
     "entry": 26,
     "floor": 5,
-    "prod": 1060,
-    "projection": 178,
+    "prod": 1061,
+    "projection": 179,
     "support": 502,
-    "verify": 1402
+    "verify": 1404
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -5771,6 +5771,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "保证案例（GSN/CAE）+ RAID（`nf-assurance-claims/1` + `nf-raid/1`）：把「凭什么可信」做成可核图。",
+      "path": "desktop/src/core/assurance.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "AST 判据 + 缺失清单（机制借鉴 ha_agent 的 websocket 安全 AST 判据）。",
       "path": "desktop/src/core/ast_missing.py",
       "role": "verify",
@@ -8041,6 +8047,12 @@
     {
       "function": "docs/42_M4 资产评估报告契约：快照状态 + 现状活绑定 + 结论口径不变 + 复现口径。",
       "path": "desktop/tests/test_asset_report_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "保证案例 + RAID 契约（NF-Final WP-0G，P2 盲区 BL-12）。",
+      "path": "desktop/tests/test_assurance_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -14561,6 +14573,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "NF-Final §16A.4 RAID 与风险治理（WP-0G）：R=风险 / A=假设 / I=问题 / D=依赖，逐条 owner/触发/缓解/复审；风险矩阵概率×影响。与 docs/RAID.md 人读面、results/assurance/CLAIMS.json 的 gaps 交叉绑定。判据 test_assurance_contract.py。",
+      "path": "protocol/raid.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "nf-release-policy/1",
       "path": "protocol/release_policy.json",
       "role": "verify",
@@ -14814,17 +14832,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "a62d4685cfa6fd80d7c22e33da93ab57270fae02ea37523963569de13859fd1b",
+  "root_digest": "e6e02e77197bdfb443bc0b8d440709cdbe24b82d50c0cb83f8aed65615465479",
   "rule_counts": {
-    "R-app": 1485,
+    "R-app": 1488,
     "R-catch": 349,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 157,
+    "R-projection": 158,
     "R-support": 124,
-    "R-verify": 1273,
-    "auto:R-core": 295
+    "R-verify": 1275,
+    "auto:R-core": 296
   },
   "schema": "nf-role-coordinates/1"
 }

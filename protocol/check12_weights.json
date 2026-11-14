@@ -47,6 +47,7 @@
     "test_asset_line_baseline": 0.3,
     "test_asset_provenance": 0.2,
     "test_asset_report_contract": 0.5,
+    "test_assurance_contract": 0.2,
     "test_ast_missing": 0.2,
     "test_atom_catalog": 0.2,
     "test_atom_composition": 0.2,
@@ -1025,6 +1026,13 @@
     "test_asset_report_contract.AssetReportContractTest.test_asset_report_matches_contract": 0.04,
     "test_asset_report_contract.AssetReportContractTest.test_asset_stats_are_live": 0.04,
     "test_asset_report_contract.AssetReportContractTest.test_contract_catches_mutations": 0.22,
+    "test_assurance_contract.AssuranceContractTest.test_arguments_are_real_arguments": 0.0,
+    "test_assurance_contract.AssuranceContractTest.test_audit_clean_and_facts": 0.0,
+    "test_assurance_contract.AssuranceContractTest.test_docs_present_and_cross_consistent": 0.0,
+    "test_assurance_contract.AssuranceContractTest.test_gap_raid_linkage": 0.0,
+    "test_assurance_contract.AssuranceContractTest.test_mutations_red": 0.01,
+    "test_assurance_contract.AssuranceContractTest.test_no_overclaim": 0.0,
+    "test_assurance_contract.AssuranceContractTest.test_raid_completeness": 0.0,
     "test_ast_missing.Test.test_missing_list": 0.0,
     "test_ast_missing.Test.test_syntax_error_reported": 0.0,
     "test_atom_catalog.CandidateHealthTest.test_b1_no_produces": 0.0,
@@ -6217,5 +6225,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2143.8
+  "total_s": 2144.0
 }

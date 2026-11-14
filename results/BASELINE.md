@@ -6,6 +6,7 @@
 > 性质：结果/状态件（审计记录），不是规划件。审计对象 = **本机检出**，不是方案所基于的那次检出。
 > 更新（R3，2026-11-14）：WP-02/check49 收口 IN-01/IN-02（§5.5 与矩阵汇总已按实读更新；数字变化以复跑命令为准，见 §7）。
 > 更新（R5，2026-11-14）：WP-01 五件生产 schema（`nf-contract/1`、`nf-wiki-page/1`、`nf-spec/1`、`nf-task/1`、`nf-assembly/1`）落 `protocol/production/`，正/反样例与变异自证在 `test_schema_reference.py`；**只有契约层、仍无编译器/页面生成器**，故 PR-02/WK 系列状态不变（见 §5）。
+> 更新（R12，2026-11-14）：WP-0G 保证案例 + RAID + 伦理落地——`docs/assurance/ASSURANCE_CASE.md`（GSN：C0–C3 目标 / A1–A8 论证，逐条 assumption+rebuttal+真实证据）+ `results/assurance/CLAIMS.json` + `docs/RAID.md` + `protocol/raid.json`（R-01…R-08 风险 + AS-01…03 假设 + I-01…05 问题 + D-01…03 依赖 + 干系人 + 变更控制）+ `docs/ETHICS.md`（VSD/IEEE 7000 价值冲突 EV-01…06）+ `core/assurance.py` + `test_assurance_contract.py`（7 例，7 类变异自证）；D16 None→Partial（BL-12 closure）、D17 补 RAID/干系人/变更控制。
 > 更新（R11，2026-11-14）：WP-0E 可访问性/i18n/人因落地——`A11Y.md` + `I18N.md` + `docs/a11y/A11Y_QA.md` + `docs/i18n/I18N_QA.md` + `protocol/{accessibility,i18n}.json` + `core/{accessibility,i18n_checks}.py` + `test_a11y_i18n_contract.py`（10 例，9 类变异自证）；WCAG 8 项/PAIR-HAX 6 条/可用性模板/违规预算 0；locale 3/入口 3/文档译件 6 组镜像 + source_sha256 + UTC/bidi 零命中 + RTL 策略；D10/D11 由 None 重估为 Partial（BL-08/BL-09 closure 条件满足）。
 > 更新（R10，2026-11-14）：WP-0C 法务/许可/IP + 开源治理落地——`LEGAL.md` + `GOVERNANCE.md` + `docs/legal/{TRADEMARK,CONTRACTS,EXPORT}.md` + `protocol/legal.json` + `core/legal.py` + `scripts/legal_audit.py` + `test_legal_contract.py`（9 例，8 类变异自证）；**更正** D12 此前把 LICENSE 写成 AGPL（实为 MIT，方案 §15A.2 的 AGPL/双许可假设已作为偏差显式登记）；D12/D13 证据补强（BL-07/BL-10 closure 条件满足，仍不提供法律意见/不声称合规）。
 > 更新（R9，2026-11-14）：WP-0F AI 治理 + 评测效度落地——`docs/ai/AI_GOVERNANCE.md`（影响评估/模型风险/监管映射，claim 只写 mechanism-alignment）+ `docs/eval/EVAL_PROTOCOL.md`（预注册/样本量/inter-rater/反指标/效度威胁）+ `protocol/ai_governance.json` + `protocol/eval_validity.json` + `core/{ai_governance,eval_validity}.py` + `results/eval/interrater_sample.json` + `test_ai_eval_contract.py`（9 例，8 类变异自证）；D06/D15 证据补强（均仍 Partial——不声称合规，映射仅机制对照；BL-02/BL-05 closure 条件满足）。
@@ -154,11 +155,11 @@ python -V; node -v; dotnet --list-sdks | head -1
 | D13 | 开源治理/社区 | Partial | `GOVERNANCE.md`（角色/决策/发布/废弃/SemVer/Scorecard 登记）+ `CONTRIBUTING.md`、`CODE_OF_CONDUCT.md`、`MAINTAINERS.md`、`SECURITY.md`、`SUPPORT.md`、`CHANGELOG.md`、`docs/release.md`、`module_lifecycle` deprecate/restore、`.github/workflows/{release-gate,scorecard}.yml`；单维护者、无社区规模/SLA 承诺 | **Partial 成立**（BL-10 closure：贡献/发布/废弃/披露流程齐；社区治理仍单人事实） | WP-0C ✅ |
 | D14 | 商业/GTM/支持 | None | `SUPPORT.md` 在（支持分级雏形）；无定价假设/LOI/试点 | **Weak→None 成立**（仅支持面有雏形） | WP-0A/0C |
 | D15 | 测量/实验效度 | Partial | `docs/eval/EVAL_PROTOCOL.md` + `protocol/eval_validity.json`（预注册字段/冻结规则、样本量 ≥3、Cohen kappa ≥0.6 现算、反指标 CM-01…03、效度威胁 VT-01…05）+ `results/eval/interrater_sample.json` + `core/eval_validity.py`；具体预注册协议 `protocol/eval/protocol.json` 过 `eval_harness` 校验 | **Partial 成立**（BL-05 closure：预注册+inter-rater+反指标齐；真实外部盲评仍属外部操作） | WP-0F ✅ |
-| D16 | 伦理/保证 | None | 无 IEEE 7000/VSD/GSN/CAE 件 | **None 成立** | WP-0G |
-| D17 | 项目/项目群 | Partial | `decisions/`、`handovers/`、`postmortems/`；无 RAID log/干系人图/变更控制 | **Partial 成立** | WP-0G |
+| D16 | 伦理/保证 | Partial | `docs/assurance/ASSURANCE_CASE.md` + `results/assurance/CLAIMS.json`（GSN/CAE：C0–C3→A1–A8→证据；supported 须 ≥2 件含测试证据；缺口有 owner 并进 RAID）+ `docs/ETHICS.md`（IEEE 7000/VSD：干系人/价值冲突 EV-01…06/设计回应/残余风险）+ `core/assurance.py` + `test_assurance_contract.py`；不声称伦理认证/合规 | **重估为 Partial**（BL-12 closure：保证案例+伦理评审；外部伦理审查未做） | WP-0G ✅ |
+| D17 | 项目/项目群 | Partial | `docs/RAID.md` + `protocol/raid.json`（R-01…R-08 / AS-01…03 / I-01…05（link 保证案例缺口）/ D-01…03 / 4 类干系人 / 变更控制）+ `decisions/`、`handovers/`、`postmortems/`；单维护者/无正式 PMO | **Partial 成立**（RAID/干系人/变更控制齐；项目群治理仍单人） | WP-0G ✅ |
 | D18 | 供应商/第三方 | Partial | `docs/legal/VENDORS.md` + `protocol/vendors.json`（6 家：模型/TSA/公共日志/托管/包源/部署；used_by/attestation/退出计划/不得处理用户数据）+ 退出就绪演练（DR-04）；不签 DPA（本地优先不委托处理） | **重估为 Partial**（BL-04 closure：vendor register+exit plan+SBOM/attestation） | WP-0D ✅ |
 
-重估结论（R10 更新）：18 领域里 1 项被方案低估（D11）；D12 事实更正为 MIT（方案假设 AGPL/双许可，已登记偏差）。**P0 盲区 BL-01…BL-05 已全部 closure**（R7–R9）；P1 中 BL-07（法务）/BL-10（开源治理）达 closure 条件（R10）；BL-08（a11y）/BL-09（i18n）达 closure 条件（R11）；BL-06（产品）/BL-11（商业）仍缺；BL-12（伦理/保证案例，P2）缺。
+重估结论（R10 更新）：18 领域里 1 项被方案低估（D11）；D12 事实更正为 MIT（方案假设 AGPL/双许可，已登记偏差）。**P0 盲区 BL-01…BL-05 已全部 closure**（R7–R9）；P1 中 BL-07（法务）/BL-10（开源治理）达 closure 条件（R10）；BL-08（a11y）/BL-09（i18n）达 closure 条件（R11）；BL-06（产品）/BL-11（商业）仍缺；BL-12（伦理/保证案例，P2）达 closure 条件（R12）。
 
 ## 5. FR/NFR Claim–Evidence 矩阵（方案 §5.1–§5.5，共 34 条）
 

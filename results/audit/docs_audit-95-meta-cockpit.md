@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:75ed1ad2dda5fb07dbd914a6ffedb836e5cf1298bf34b98be602644827ebc925
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:1c513bd768e7fc3134c7d605fa849223ca8cdd983aba69d317280b758e2dc747
+  - protocol/check12_weights.json:501d5f219651df3f3d403ed8874c695e9a36dc4cce1b611ab2e5b8ad8ce5c288
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:fa00a7fd014857af56e11f38ced1b7d888be053befaadb10b3dd494d27884316
   - docs/meta-cockpit/功能解析.md:de20c2340d19d541bcfde53f222a3acf22a6e440d8fb3dcf51a37aedf53c0c25
   - results/meta-cockpit-manifest.json:60c0e100798e49d393557ae5066c02d7e057ec27f386ee1a36ca3fc7740150ba
 
 ---
+> 重审（2026-11-14）：NF-Final WP-0G：新增 results/assurance/CLAIMS.json、protocol/raid.json、core/assurance.py、docs/{assurance/ASSURANCE_CASE,RAID,ETHICS}；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑
+
 > 重审（2026-11-14）：NF-Final WP-0E：新增 protocol/{accessibility,i18n}.json、core/{accessibility,i18n_checks}.py、A11Y.md、I18N.md、docs/{a11y,i18n} QA；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑
 
 > 重审（2026-11-14）：NF-Final WP-0C：新增 protocol/legal.json、core/legal.py、scripts/legal_audit.py、LEGAL.md、GOVERNANCE.md、docs/legal 三件；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑

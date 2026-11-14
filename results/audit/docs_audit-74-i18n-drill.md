@@ -26,8 +26,10 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:d2fd2697f0c3cf5c75d6914f298de62d373f533084bf931da8f5cac0ced470a5
+  - protocol/code_metrics_baseline.json:90e8d285b2ec1d3df481eb266436a5032c31f15d062cce4cd9dbe7172952ceb1
 ---
+> 重审（2026-11-14）：NF-Final WP-0G：新增 results/assurance/CLAIMS.json、protocol/raid.json、core/assurance.py、docs/{assurance/ASSURANCE_CASE,RAID,ETHICS}；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑
+
 > 重审（2026-11-14）：NF-Final WP-0E：新增 protocol/{accessibility,i18n}.json、core/{accessibility,i18n_checks}.py、A11Y.md、I18N.md、docs/{a11y,i18n} QA；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑
 
 > 重审（2026-11-14）：NF-Final WP-0C：新增 protocol/legal.json、core/legal.py、scripts/legal_audit.py、LEGAL.md、GOVERNANCE.md、docs/legal 三件；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑
