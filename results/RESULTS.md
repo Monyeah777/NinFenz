@@ -23,6 +23,7 @@
 - [reverse/FAILURE_ARCHAEOLOGY.md](reverse/FAILURE_ARCHAEOLOGY.md)（§4A R4 失败考古：13 条失败模式、5 条文档-代码不一致、9 个缺口进 R6；机读 `reverse/failures.json`，判据 `test_reverse_failures.py`）
 - [reverse/PEER_DIFF.md](reverse/PEER_DIFF.md)（§4A R5 同行差分：6 项对照、借/不造边界、3 条影响设计的决策 D-PD-01…03；机读 `reverse/peers.json`，判据 `test_reverse_peers.py`）
 - [reverse/INVARIANTS.md](reverse/INVARIANTS.md)（§4A R6 不变量：7 层 14 条，tested 6 / covered-by-existing 4 / unobservable 4（挂 G1/G2）；机读 `reverse/invariants.json`，判据+执行器 `test_reverse_invariants.py`）
+- [G0_DOD.md](G0_DOD.md)（G0 DoD 收口审计：§14.3 八条 + Gate 级判据；verdict=pass-with-open-items、P0 阻断=0；机读 `g0_dod.json`，判据 `test_g0_dod.py`）
 - [ADR_MAP.md](ADR_MAP.md)（方案 §16.2 裁决 → `nf-adr/1` 登记投影：12 条映射、`plan_ref` 一对一、实施状态与缺口 WP）
 - [independence.json](independence.json)（生产/治理双平面边界报告：`protocol/independence.json` 65 个模块归属 + 295 个 core 模块静态闭包零跨界，check49 判据件）
 - [production/threat_vectors.json](production/threat_vectors.json)（NF-Final §8 威胁向量：六条信任边界 + STRIDE 8 行 + 失败矩阵 8 行，逐条绑定控制点/证据/状态；判据 `test_production_threat_vectors.py`）
