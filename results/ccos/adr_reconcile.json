@@ -19,10 +19,40 @@
       "id": "ADR-004",
       "status": "current",
       "topic": "reasoning-face"
+    },
+    {
+      "id": "ADR-005",
+      "status": "current",
+      "topic": "trust-dsse"
+    },
+    {
+      "id": "ADR-006",
+      "status": "current",
+      "topic": "trust-bundle"
+    },
+    {
+      "id": "ADR-007",
+      "status": "current",
+      "topic": "trust-time"
+    },
+    {
+      "id": "ADR-008",
+      "status": "current",
+      "topic": "trust-witness"
+    },
+    {
+      "id": "ADR-009",
+      "status": "current",
+      "topic": "trust-types"
+    },
+    {
+      "id": "ADR-010",
+      "status": "current",
+      "topic": "trust-noscore"
     }
   ],
   "counts": {
-    "adrs": 4,
+    "adrs": 10,
     "current_docs": 10,
     "docs": 16
   },

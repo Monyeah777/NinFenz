@@ -2397,6 +2397,10 @@
       "source": "naming"
     },
     {
+      "module": "test_trust_adr_contract.py",
+      "source": "naming"
+    },
+    {
       "module": "test_trust_anchor.py",
       "source": "naming"
     },
@@ -2565,10 +2569,10 @@
       "source": "negative_assertion"
     }
   ],
-  "modules": 641,
+  "modules": 642,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
-  "suspect": 165,
+  "suspect": 166,
   "with_evidence": 335,
   "without_evidence": 141
 }

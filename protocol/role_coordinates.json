@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 166,
     "support": 456,
-    "verify": 1311
+    "verify": 1312
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -11069,6 +11069,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "Trust Fabric 裁决登记契约（WP-04）：六条裁决与冻结工件互相绑定。",
+      "path": "desktop/tests/test_trust_adr_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "信任锚判据：根 → 委派链 → 吊销 feed 的公钥归属。",
       "path": "desktop/tests/test_trust_anchor.py",
       "role": "verify",
@@ -14250,7 +14256,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "2c8f2383c3532aca04d47d02e71f0747a1025f7885ca1bbf824ace1a69e157c5",
+  "root_digest": "477dea540d9b9257ce567a0ea8d9b60a4065c5029c7c8fd80682b00772dd6401",
   "rule_counts": {
     "R-app": 1467,
     "R-catch": 304,
@@ -14259,7 +14265,7 @@
     "R-prod": 944,
     "R-projection": 146,
     "R-support": 124,
-    "R-verify": 1185,
+    "R-verify": 1186,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
