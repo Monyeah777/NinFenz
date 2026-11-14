@@ -1340,6 +1340,11 @@
       "max_fn_cc": 4,
       "max_fn_lines": 8
     },
+    "desktop/src/core/spec_compiler.py": {
+      "lines": 231,
+      "max_fn_cc": 21,
+      "max_fn_lines": 59
+    },
     "desktop/src/core/st_quality.py": {
       "lines": 111,
       "max_fn_cc": 32,
@@ -1731,7 +1736,7 @@
       "max_fn_lines": 26
     },
     "scripts/nf.py": {
-      "lines": 9966,
+      "lines": 9999,
       "max_fn_cc": 132,
       "max_fn_lines": 443
     },

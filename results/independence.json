@@ -2,10 +2,10 @@
   "counts": {
     "dynamic_allow": 1,
     "forbidden_edges": 0,
-    "governance": 19,
-    "modules": 306,
+    "governance": 20,
+    "modules": 307,
     "planes": {
-      "governance": 19,
+      "governance": 20,
       "production": 31,
       "shared": 26
     },

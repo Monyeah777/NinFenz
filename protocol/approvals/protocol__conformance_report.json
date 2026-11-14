@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-14",
   "approved_by": "Monyeah777",
-  "note": "NF-Final G1 WP-10（译件同步 + locales 重签）",
+  "note": "NF-Final G1 WP-11（code_metrics 重冻后）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "21dcf30b66aa583f1f013e34c83ed9944d6033939e24a32e464ee46805c08e70"
+  "subject_digest": "22acc5b585eb4171f33a936e825d7dcc2cf4aa455fe5fbc0b3e5784a28d570cd"
 }
