@@ -1,0 +1,33 @@
+{
+  "schema": "nf-gov-adapters/1",
+  "note": "NF-Final G3 WP-31 治理 verify 适配注册表：把存量 core/trust/* 与外部标准（in-toto/DSSE、Sigstore/cosign、RFC3161 TSA、透明日志）对齐为**适配器**；每条登记标准/本地实现/外部工具/可用性/降级策略/证据。铁律：工具缺失或外部未执行 → 显式降级（exit 2 / 不可判定），**不冒充 T3/T4**。判据 desktop/tests/test_governance_adapters_contract.py。",
+  "adapters": [
+    {"id": "A-01", "standard": "in-toto / DSSE", "kind": "attestation",
+     "local_impl": "desktop/src/core/trust/dsse.py", "tool": "", "availability": "available",
+     "degrade": "无外部依赖；DSSE envelope 本地可验（签名事实缺 key 时记 none）",
+     "evidence": ["protocol/trust/dsse.schema.json", "desktop/tests/test_trust_verify.py"]},
+    {"id": "A-02", "standard": "Sigstore / cosign", "kind": "signature",
+     "local_impl": "desktop/src/core/trust/keys.py", "tool": "cosign", "availability": "blocked",
+     "blocked_reason": "cosign 不在场（本机 BLOCKED；results/cq/toolchain.json 已记）",
+     "degrade": "缺 cosign → 签名无法外部核验，最高只报 T0/T1，不得声称 T2+；exit 2 缺项",
+     "evidence": ["results/cq/toolchain.json", "desktop/tests/test_trust_gate46.py"]},
+    {"id": "A-03", "standard": "RFC3161 TSA", "kind": "timestamp",
+     "local_impl": "desktop/src/core/timestamp.py", "tool": "openssl", "availability": "external-open",
+     "blocked_reason": "外部 TSA 请求属外部操作，未执行；只允许离线验证已抓取 token",
+     "degrade": "无 TSA token → time_token 事实 none；T2 及以上只报缺项，不冒充",
+     "evidence": ["docs/sre/BCP_DR.md", "desktop/tests/test_trust_verify.py"]},
+    {"id": "A-04", "standard": "透明日志（Rekor / public anchor）", "kind": "transparency",
+     "local_impl": "desktop/src/core/trust/public_anchor.py", "tool": "",
+     "availability": "external-open",
+     "blocked_reason": "公共日志提交属外部操作；本机只做离线锚校验（T3 需 witness，T4 需 public anchor）",
+     "degrade": "缺公开锚 → 最高 T2；required=T3/T4 时 exit 2 + 缺项，不降级冒充",
+     "evidence": ["protocol/trust/public-anchor.schema.json",
+                  "results/trust/SELF_AUDIT.json"]}
+  ],
+  "level_requirements": {
+    "T0": [], "T1": ["A-01"], "T2": ["A-01", "A-03"],
+    "T3": ["A-01", "A-02", "A-03", "A-04"], "T4": ["A-01", "A-02", "A-03", "A-04"]
+  },
+  "claims_boundary": ["适配器只描述「本机能做什么/不能做什么」；外部标准不作质量背书",
+                      "缺工具/缺锚时显式降级，绝不把不可判定写成通过"]
+}

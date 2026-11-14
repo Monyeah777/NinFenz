@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1502,
+    "app": 1503,
     "entry": 26,
     "floor": 5,
     "prod": 1066,
     "projection": 212,
-    "support": 510,
-    "verify": 1428
+    "support": 511,
+    "verify": 1430
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9335,6 +9335,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "WP-31 治理 verify 适配判据（in-toto/DSSE、Sigstore、RFC3161、透明日志）。",
+      "path": "desktop/tests/test_governance_adapters_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "社区与内容治理件判据（审计 Z6：治理件在场且**承担语义**，不是占位文件）。",
       "path": "desktop/tests/test_governance_docs.py",
       "role": "verify",
@@ -14609,6 +14615,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "NF-Final G3 WP-31 治理 verify 适配注册表：把存量 core/trust/* 与外部标准（in-toto/DSSE、Sigstore/cosign、RFC3161 TSA、透明日志）对齐为**适配器**；每条登记标准/本地实现/外部工具/可用性/降级策略/证据。铁律：工具缺失或外部未执行 → 显式降级（exit 2 / 不可判定），**不冒充 T3/T4**。判据 desktop/tests/test_governance_adapters_contract.py。",
+      "path": "protocol/governance_adapters.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "交接协议（机制借鉴 SBAR/ISBAR：情境 → 背景 → 评估 → 建议 的结构化交接）。要解决的是「接手的人/agent 拿到一堆材料却不知道现在什么状态、下一步干什么」。判据硬约束：**空未决项 = 不合格交接**——没有未决就是没交接，只是总结。",
       "path": "protocol/handover.json",
       "role": "verify",
@@ -15006,17 +15018,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "c417f947cca58c49b48f24e6bd209d52743baa728b656b7463cd94f74d4026e3",
+  "root_digest": "7e3eb474301441786d37a8b924d27974b91969fcda8994f6023fd71df195a89a",
   "rule_counts": {
-    "R-app": 1502,
+    "R-app": 1503,
     "R-catch": 356,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 188,
     "R-support": 124,
-    "R-verify": 1297,
-    "auto:R-core": 307
+    "R-verify": 1299,
+    "auto:R-core": 308
   },
   "schema": "nf-role-coordinates/1"
 }

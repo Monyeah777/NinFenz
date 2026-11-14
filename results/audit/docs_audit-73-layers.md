@@ -15,14 +15,16 @@ subjects:
   - verify.sh:8e5fc8fa6f16c82d03323c4fcdd0b8671a763f4b5c2c526c5dd71704fd3db21c
   - docs/layers.md:7b849fb07769ba6df5ca888a9de5323417b47a07ef54ec2c1c801673a7fbd7c0
   - docs/L3_FROZEN.md:863a152271b1b969a3249194d1169628f4a4647a9bdd801473cfc9cb75c6643b
-  - protocol/assertions.json:be8a39da7918b8a9f629194b092498e963dffbe02ae8fa3ff17b58b5ebf19183
-  - protocol/data_contracts.json:89353f21e2a0c8b2a71f8a507755d10b7fc22e7a6dad615524156ee4bfe109ea
+  - protocol/assertions.json:22f03faaa2823bde8446693a259269681f95004a12cb5af5a9ef4f4d5d52ceee
+  - protocol/data_contracts.json:e9aa8ef16fe796e1fe6237ea1a29639a58cdc455f53c9122de8df997bcd87c4a
   - protocol/normative.json:c1bbc14c92cea6bd66ff6cb54fdcf91bf3072f66adee7027f1d3f42e70fe1825
   - protocol/glossary.json:0af6a0f3b1f128b30c0eb88a8db0d2c143461910a889737dfdf4e38e89f85ba7
   - desktop/src/core/receipts.py:b748915bb519aeeb1aa0f7d367df2eb7d4321b369b85905a7f918d8d55d96363
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
 
 ---
+> 重审（2026-11-15）：NF-Final WP-31：新增 protocol/governance_adapters.json、core/governance_adapters.py、docs/governance-adapters.md、test_governance_adapters_contract.py；assertions/data_contracts/independence/code_metrics/check12 更新
+
 > 重审（2026-11-15）：NF-Final WP-30：新增 protocol/contract_lifecycle.json、core/contract_lifecycle.py、docs/contract-lifecycle.md、test_contract_lifecycle_contract.py；assertions/data_contracts/independence/code_metrics/check12 更新
 
 > 重审（2026-11-15）：NF-Final G2 收口：新增 results/{G2_DOD.md,g2_dod.json}、test_g2_dod.py；assertions/data_contracts/check12/code_metrics 更新

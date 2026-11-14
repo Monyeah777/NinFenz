@@ -1054,6 +1054,18 @@
         "test_contract_lifecycle_contract",
         "docs/contract-lifecycle.md"
       ]
+    },
+    {
+      "id": "gov-adapters",
+      "artifact": "protocol/governance_adapters.json",
+      "quality_rule": "assertion:gov-adapters",
+      "owner": "治理 verify 适配（core/governance_adapters.py + test_governance_adapters_contract）+ WP-31",
+      "status": "active",
+      "freshness": "外部工具/标准变化后重查 detect；blocked/external-open 必须写理由与降级",
+      "consumers": [
+        "test_governance_adapters_contract",
+        "docs/governance-adapters.md"
+      ]
     }
   ]
 }
