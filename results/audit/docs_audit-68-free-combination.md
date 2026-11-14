@@ -10,12 +10,14 @@ subjects:
   - desktop/src/core/quality_depth_scan.py:563059e8a929bbbba16d5d15a9c77d1f362f9518351860b5ca0682aeb07a23f9
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - scripts/nf.py:75ed1ad2dda5fb07dbd914a6ffedb836e5cf1298bf34b98be602644827ebc925
-  - protocol/data_contracts.json:34fc6fd68847f03393b86aa57d21b545debd0bac3f0b330c5dfb20e2a3a3d6a1
+  - protocol/data_contracts.json:d49836a296788510b831913af42f9654957f27d14b9963e7d3384bfe9d7d6a16
   - docs/combos.md:4f5b22bf353a07ff439e44596bd44bea74e7c95d8a811c8ddde17f42f8fbc45c
   - desktop/tests/test_pack_combo.py:38d6fbc122264bcd205e6d5cb8baac1a1a581f1cb8a43da2c12691e57314b0a6
   - community/校园西幻轻混组合包/protocol.yaml:093cc817ae089981b7cfe4aaf57ec7f5d2374455bb63fc8b7af06dc2d29a02a3
 
 ---
+> 重审（2026-11-14）：NF-Final WP-0F：新增 protocol/{ai_governance,eval_validity}.json、core/{ai_governance,eval_validity}.py、docs/ai 与 docs/eval、results/eval/interrater_sample.json；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑
+
 > 重审（2026-11-14）：NF-Final WP-0D：新增 protocol/ops.json + vendors.json + core/ops.py + scripts/ops_drill.py + 演练报告 results/ops/drills.json + 文档四件；assertions/data_contracts/code_metrics/check12 权重更新，被审对象变更后机械重绑
 
 > 重审（2026-11-14）：NF-Final WP-0B：assertion:privacy-registry 接线（protocol/assertions.json）与 data_contracts quality_rule 更新，被审对象变更后机械重绑

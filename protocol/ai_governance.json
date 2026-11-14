@@ -1,0 +1,246 @@
+{
+  "schema": "nf-ai-governance/1",
+  "note": "NF-Final §3A D06 机读登记（WP-0F）：AI 面范围 + 影响评估 + 模型风险登记 + 监管映射 + 人类监督。原则：本仓是 AI 辅助的内容生产/装配系统，不是 AI 平台；**只做机制对照，不声称合规/认证**。判据 desktop/tests/test_ai_eval_contract.py。",
+  "scope": {
+    "system_purpose": "AI 辅助的长内容生产/装配（协议/模块/资产/管线/域包 → LLMWiki → 任务 → 装配 → 交付）",
+    "affected_parties": [
+      "使用工具的用户",
+      "内容读者",
+      "仓库维护者"
+    ],
+    "data_categories": [
+      "DC-02（会话/认知记录）",
+      "DC-07（评测/模型证据）"
+    ],
+    "out_of_scope": [
+      "模型训练",
+      "通用 Agent 监控/取证",
+      "托管 GRC/SaaS"
+    ],
+    "claims_boundary": [
+      "不声称合规、认证、高风险系统合格或不可抵赖",
+      "监管映射只说明机制对照（mechanism-alignment），不构成法律意见"
+    ]
+  },
+  "impact_assessment": {
+    "impact_level": "limited-to-high（取决于用户内容；本仓不判定具体场景分级）",
+    "criteria": [
+      {
+        "id": "IA-01",
+        "question": "是否处理特殊类别个人数据？",
+        "answer": "本仓不主动处理；用户把此类数据写进内容资产时风险回到用户侧",
+        "evidence": [
+          "PRIVACY.md"
+        ]
+      },
+      {
+        "id": "IA-02",
+        "question": "是否有自动化决策影响个人权益？",
+        "answer": "否：系统产出内容不直接决定个人权益；交付前有人类复核闸门",
+        "evidence": [
+          "desktop/src/core/trust/human_review.py"
+        ]
+      },
+      {
+        "id": "IA-03",
+        "question": "是否有实质人工监督？",
+        "answer": "是：人类复核须签名，未签=PENDING（不冒充通过）",
+        "evidence": [
+          "protocol/trust/human-review.schema.json"
+        ]
+      },
+      {
+        "id": "IA-04",
+        "question": "是否有可追溯的模型/评测证据？",
+        "answer": "是：模型卡绑定模型摘要；替换使旧证据失效",
+        "evidence": [
+          "desktop/src/core/trust/model_card.py"
+        ]
+      }
+    ],
+    "human_oversight": {
+      "level": "human-in-the-loop",
+      "mechanism": "签名人类复核；未签=PENDING；AI 不能签署",
+      "evidence": [
+        "desktop/src/core/trust/human_review.py",
+        "protocol/trust/human-review.schema.json"
+      ]
+    },
+    "transparency": {
+      "mechanism": "AIGC 标识证据可接入（labeling）",
+      "evidence": [
+        "desktop/src/core/label_ir.py",
+        "protocol/trust/human-review.schema.json"
+      ]
+    },
+    "recourse": {
+      "mechanism": "模型卡/评测证据绑定 + 人类复核签名；证据不足时显式待定",
+      "evidence": [
+        "desktop/src/core/trust/model_card.py",
+        "desktop/src/core/eval_harness.py"
+      ]
+    }
+  },
+  "model_risk_register": [
+    {
+      "id": "MR-01",
+      "risk": "模型替换后旧证据仍被当作有效",
+      "category": "map",
+      "likelihood": "medium",
+      "impact": "high",
+      "mitigation": "模型卡绑定模型摘要；替换 → MODEL-REPLACED，旧证据失效",
+      "evidence": [
+        "desktop/src/core/trust/model_card.py",
+        "desktop/tests/test_trust_model_card.py"
+      ],
+      "status": "enforced",
+      "owner": "ai-governance"
+    },
+    {
+      "id": "MR-02",
+      "risk": "人类复核被伪造或未签冒充通过",
+      "category": "govern",
+      "likelihood": "medium",
+      "impact": "high",
+      "mitigation": "签名复核；PENDING≠通过；AI 不能签署",
+      "evidence": [
+        "desktop/src/core/trust/human_review.py",
+        "desktop/tests/test_trust_human_review.py"
+      ],
+      "status": "enforced",
+      "owner": "ai-governance"
+    },
+    {
+      "id": "MR-03",
+      "risk": "评测自嗨/Goodhart（指标变目标）",
+      "category": "measure",
+      "likelihood": "high",
+      "impact": "medium",
+      "mitigation": "预注册 + 反指标 + inter-rater + 两份报告不合并",
+      "evidence": [
+        "protocol/eval_validity.json",
+        "protocol/eval/protocol.json"
+      ],
+      "status": "partial",
+      "planned_gate": "G0",
+      "owner": "eval"
+    },
+    {
+      "id": "MR-04",
+      "risk": "提示词/上下文注入导致越权或角色升级",
+      "category": "manage",
+      "likelihood": "medium",
+      "impact": "high",
+      "mitigation": "外部材料按数据处理 + 注入预算 + 角色隔离（G1 落地运行时校验）",
+      "evidence": [
+        "desktop/src/core/trust_boundary.py",
+        "desktop/src/core/injection_budget.py"
+      ],
+      "status": "partial",
+      "planned_gate": "G1",
+      "owner": "production"
+    },
+    {
+      "id": "MR-05",
+      "risk": "监管映射被写成合规结论",
+      "category": "govern",
+      "likelihood": "medium",
+      "impact": "medium",
+      "mitigation": "映射 claim 只允许 mechanism-alignment/not-claimed；文档禁用词判据",
+      "evidence": [
+        "protocol/ai_governance.json",
+        "desktop/tests/test_ai_eval_contract.py"
+      ],
+      "status": "enforced",
+      "owner": "ai-governance"
+    }
+  ],
+  "regulatory_mapping": [
+    {
+      "framework": "NIST AI RMF 1.0",
+      "clauses": [
+        "GOVERN",
+        "MAP",
+        "MEASURE",
+        "MANAGE"
+      ],
+      "repo_control": "AI 治理件 + 模型风险登记 + 效度协议",
+      "evidence": [
+        "protocol/ai_governance.json",
+        "protocol/eval_validity.json"
+      ],
+      "claim": "mechanism-alignment"
+    },
+    {
+      "framework": "ISO/IEC 42001:2023",
+      "clauses": [
+        "AI 管理体系要求"
+      ],
+      "repo_control": "模型卡/人类复核/证据链（机制对照）",
+      "evidence": [
+        "desktop/src/core/trust/model_card.py",
+        "desktop/src/core/trust/human_review.py"
+      ],
+      "claim": "mechanism-alignment"
+    },
+    {
+      "framework": "ISO/IEC 23894:2023",
+      "clauses": [
+        "AI 风险管理过程"
+      ],
+      "repo_control": "模型风险登记（概率/影响/缓解/证据/owner/状态）",
+      "evidence": [
+        "protocol/ai_governance.json"
+      ],
+      "claim": "mechanism-alignment"
+    },
+    {
+      "framework": "ISO/IEC 5338:2023",
+      "clauses": [
+        "AI 系统生命周期过程"
+      ],
+      "repo_control": "生产/装配流程与验收（spec→task→assembly→output）",
+      "evidence": [
+        "protocol/production/task.schema.json",
+        "protocol/production/assembly.schema.json"
+      ],
+      "claim": "mechanism-alignment"
+    },
+    {
+      "framework": "EU AI Act（一般义务对照）",
+      "clauses": [
+        "透明度",
+        "人工监督"
+      ],
+      "repo_control": "AIGC 标识证据 + 人类复核签名（不判定具体风险等级）",
+      "evidence": [
+        "desktop/src/core/label_ir.py",
+        "desktop/src/core/trust/human_review.py"
+      ],
+      "claim": "mechanism-alignment"
+    },
+    {
+      "framework": "SR 11-7（模型风险管理）",
+      "clauses": [
+        "模型验证",
+        "持续监控"
+      ],
+      "repo_control": "预注册评测协议 + 效度威胁检查 + 模型卡绑定",
+      "evidence": [
+        "protocol/eval/protocol.json",
+        "protocol/eval_validity.json"
+      ],
+      "claim": "mechanism-alignment"
+    }
+  ],
+  "status_vocabulary": [
+    "enforced",
+    "partial",
+    "planned",
+    "UNOBSERVABLE"
+  ],
+  "claim_vocabulary": [
+    "mechanism-alignment",
+    "not-claimed"
+  ]
+}

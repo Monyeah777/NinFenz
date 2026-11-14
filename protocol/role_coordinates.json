@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1478,
+    "app": 1480,
     "entry": 26,
     "floor": 5,
-    "prod": 1058,
-    "projection": 177,
-    "support": 496,
-    "verify": 1392
+    "prod": 1059,
+    "projection": 178,
+    "support": 497,
+    "verify": 1395
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -5693,6 +5693,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "AI 治理登记（`nf-ai-governance/1`）：影响评估 + 模型风险 + 监管映射，逐条可核。",
+      "path": "desktop/src/core/ai_governance.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "登记条目带有效期（机制借鉴 openmake audit-gate.cjs:31-47）。",
       "path": "desktop/src/core/allowlist_expiry.py",
       "role": "prod",
@@ -7795,6 +7801,12 @@
     {
       "function": "AI 系统域 · 概念前置闭包求值单测（域包战例回归 + 负例注入）。",
       "path": "desktop/tests/test_ai_domain_closure.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "AI 治理 + 评测效度契约（NF-Final WP-0F，P0 盲区 BL-02/BL-05）。",
+      "path": "desktop/tests/test_ai_eval_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -14195,6 +14207,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "NF-Final §3A D06 机读登记（WP-0F）：AI 面范围 + 影响评估 + 模型风险登记 + 监管映射 + 人类监督。原则：本仓是 AI 辅助的内容生产/装配系统，不是 AI 平台；**只做机制对照，不声称合规/认证**。判据 desktop/tests/test_ai_eval_contract.py。",
+      "path": "protocol/ai_governance.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "断言表（数据化断言，机制借鉴 Schematron 的 patterns→rules→assertions）：把「能确定性判定的形状类断言」从 check 代码里搬出来，新增规则 = 加一行数据。边界写死：kind 是**封闭集**（见 kind_vocabulary），只做搬运与去重，不做表达力扩张，不自造 DSL；业务语义断言仍留在 check 代码里。每条断言必须有 fix（修复指引）。",
       "path": "protocol/assertions.json",
       "role": "verify",
@@ -14323,6 +14341,12 @@
     {
       "function": "错误码中央登记（机制借鉴 loomvault error/ErrorCode.java + iskills domain/errors.ts）。抛出侧只给 code+params，文案由呈现层查表注入；消费方 core/error_codes.py。词法两类：大写码（NF_*）与 ABI 码 cc.<syscall>.<reason>（docs/ccos/abi-v0.md）。2026-11-05 起登记 CCOS ABI v0 错误面。",
       "path": "protocol/error_codes.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "NF-Final §3A D15 机读登记（WP-0F）：评测效度协议——预注册/样本量/inter-rater/反指标/效度威胁。原则：只计数不打分；内部永不产出盲评 pass；指标必须挂反指标（防 Goodhart）。判据 desktop/tests/test_ai_eval_contract.py。",
+      "path": "protocol/eval_validity.json",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -14742,17 +14766,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "c85c1ba645898ac6c9552031d65682d204125e7a5c53484066121d2e9b668abb",
+  "root_digest": "ba05ada98587e142c553ec07b770cef607e3f64c0c6f4c76d8d1a6fe3b2f18dd",
   "rule_counts": {
-    "R-app": 1478,
+    "R-app": 1480,
     "R-catch": 344,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 156,
+    "R-projection": 157,
     "R-support": 124,
-    "R-verify": 1265,
-    "auto:R-core": 290
+    "R-verify": 1268,
+    "auto:R-core": 292
   },
   "schema": "nf-role-coordinates/1"
 }

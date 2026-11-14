@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:22e24633e87e95453d0c2cf4a595d0496bae5d7331c1fc644d5b1555e4925a41
-  - protocol/code_metrics_baseline.json:1d2bf185cbfc3a6c6c335a3c3c4768198125ed11cba866b6a00a31a66181461f
+  - protocol/code_metrics_baseline.json:4067762a96f641e3ea7cb1c77bb6b6a3262e380a488c025de23a5bf3533b8699
 ---
+> 重审（2026-11-14）：NF-Final WP-0F：新增 protocol/{ai_governance,eval_validity}.json、core/{ai_governance,eval_validity}.py、docs/ai 与 docs/eval、results/eval/interrater_sample.json；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑
+
 > 重审（2026-11-14）：NF-Final WP-0D：新增 protocol/ops.json + vendors.json + core/ops.py + scripts/ops_drill.py + 演练报告 results/ops/drills.json + 文档四件；assertions/data_contracts/code_metrics/check12 权重更新，被审对象变更后机械重绑
 
 > 重审（2026-11-14）：NF-Final WP-0B：新增 protocol/privacy.json（数据契约登记）、core/privacy_scan.py、PRIVACY.md 与 docs/privacy/*、docs/qa/PRIVACY_QA.md；code_metrics 376 件、check12 权重 +1.6s；被审对象变更后机械重绑
