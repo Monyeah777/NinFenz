@@ -334,6 +334,7 @@
     "test_label_watermark": 2.1,
     "test_launcher": 119.4,
     "test_layer_model": 11.2,
+    "test_layer_reports": 0.5,
     "test_layers_doc_contract": 0.2,
     "test_lazy_yaml": 0.2,
     "test_leak_surface": 1.7,
@@ -3500,6 +3501,11 @@
     "test_layer_model.LayerScanTest.test_tier_faces_match_reference": 1.22,
     "test_layer_model.RenderTest.test_render_is_deterministic_and_covers_faces": 0.0,
     "test_layer_model.RenderTest.test_write_region_is_idempotent_and_lf": 0.15,
+    "test_layer_reports.LayerReportsContractTest.test_check_green": 0.19,
+    "test_layer_reports.LayerReportsContractTest.test_committed_equals_live": 0.17,
+    "test_layer_reports.LayerReportsContractTest.test_examples_and_qa_docs_present": 0.0,
+    "test_layer_reports.LayerReportsContractTest.test_qa_layers_complete": 0.0,
+    "test_layer_reports.LayerReportsContractTest.test_wiki_and_spec_reports_ok": 0.0,
     "test_layers_doc_contract.LayersDocTest.test_contract_catches_mutations": 0.0,
     "test_layers_doc_contract.LayersDocTest.test_layers_matches_contract": 0.0,
     "test_layers_doc_contract.LayersDocTest.test_truth_live": 0.0,
@@ -6515,5 +6521,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2185.9
+  "total_s": 2186.4
 }

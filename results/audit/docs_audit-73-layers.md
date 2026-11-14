@@ -15,14 +15,16 @@ subjects:
   - verify.sh:8428d8de7b60ea0a69a10b3635ee39a5fd948e9cc6373c80158da33d27cdd4c1
   - docs/layers.md:7b849fb07769ba6df5ca888a9de5323417b47a07ef54ec2c1c801673a7fbd7c0
   - docs/L3_FROZEN.md:863a152271b1b969a3249194d1169628f4a4647a9bdd801473cfc9cb75c6643b
-  - protocol/assertions.json:126cadbfa9bebcd63c034700696a80bc0e1c747272b27878c535a1151ef5b752
-  - protocol/data_contracts.json:7c24a69c082662da7fb0fcbf3b3546744630923f779d7eac884328218831c9d9
+  - protocol/assertions.json:7f0009dbfc308c35b924f4f943532489c9f9c916488c705ff22eaebce4993679
+  - protocol/data_contracts.json:e2babf2aa7090e1019fdea7dc48ff03fb12a567d0095393f4b02504838a0db75
   - protocol/normative.json:c1bbc14c92cea6bd66ff6cb54fdcf91bf3072f66adee7027f1d3f42e70fe1825
   - protocol/glossary.json:0af6a0f3b1f128b30c0eb88a8db0d2c143461910a889737dfdf4e38e89f85ba7
   - desktop/src/core/receipts.py:b748915bb519aeeb1aa0f7d367df2eb7d4321b369b85905a7f918d8d55d96363
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
 
 ---
+> 重审（2026-11-15）：NF-Final §19.1 补件：新增 core/layer_reports.py、results/{wiki-report,spec-report}.json、results/qa/{layers.json,README.md}、docs/qa/README.md、examples/{README,core-only,governance}/README.md、test_layer_reports.py；assertions/data_contracts/independence/code_metrics/check12 更新
+
 > 重审（2026-11-15）：NF-Final WP-52：新增 protocol/keywords.json、core/keywords.py、docs/keywords.md、test_keywords_contract.py、nf keywords check（命令 80/索引 215）；verify.sh check57 + quality_baseline 57 条/PASS=107；check12 预算 2185→2195（+1.4s CLI 烟测，容量调整）
 
 > 重审（2026-11-15）：NF-Final WP-51 收尾：crosscheck.py unlink 为 temp 夹具删除，登记 purity SINK_ALLOW（含理由）；派生面重算

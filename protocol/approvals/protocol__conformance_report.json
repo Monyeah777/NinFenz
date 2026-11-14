@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-15",
   "approved_by": "Monyeah777",
-  "note": "NF-Final G5 WP-52（收尾：译件重签）",
+  "note": "NF-Final §19.1 交付物补件（wiki/spec 报告 + 分层 QA + examples）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "06e905d841e9688665aa577297ac351c9bffbca137363fa8f0ffa4167b2ab387"
+  "subject_digest": "912bf3c105f54a84d4af8f13cec32c8d6e18a192e06468ebebf611a0ffab302f"
 }

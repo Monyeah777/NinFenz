@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:22e24633e87e95453d0c2cf4a595d0496bae5d7331c1fc644d5b1555e4925a41
-  - protocol/code_metrics_baseline.json:512a188ef70cd54db1563518b61abdf3b7f29b6a31b444f4b027c9122c4ec4d9
+  - protocol/code_metrics_baseline.json:c42c06101d6620e113b514e0c120b996174f3391f6c64c52081a049337512a1c
 ---
+> 重审（2026-11-15）：NF-Final §19.1 补件：新增 core/layer_reports.py、results/{wiki-report,spec-report}.json、results/qa/{layers.json,README.md}、docs/qa/README.md、examples/{README,core-only,governance}/README.md、test_layer_reports.py；assertions/data_contracts/independence/code_metrics/check12 更新
+
 > 重审（2026-11-15）：NF-Final WP-52：新增 protocol/keywords.json、core/keywords.py、docs/keywords.md、test_keywords_contract.py、nf keywords check（命令 80/索引 215）；verify.sh check57 + quality_baseline 57 条/PASS=107；check12 预算 2185→2195（+1.4s CLI 烟测，容量调整）
 
 > 重审（2026-11-15）：NF-Final WP-51 收尾2：purity SINK_ALLOW 登记使 purity_scan.py 584→588 行，按失败提示评审后重冻 code_metrics 基线（容量调整，非放宽判据）

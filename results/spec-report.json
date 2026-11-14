@@ -1,0 +1,10 @@
+{
+  "bundle_digest": "267b91d5c8a594eca9a2f2cfc1dc4fba93e43a6aede85345ac4bbd7a557b35c5",
+  "intent": "spec/intents/sample-document.json",
+  "issues": [],
+  "note": "由样例 intent 现算（committed==实时重算）",
+  "ok": true,
+  "schema": "nf-spec-report/1",
+  "specs": 0,
+  "tasks": 2
+}

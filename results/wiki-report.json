@@ -1,0 +1,36 @@
+{
+  "expected": {
+    "asset": 3,
+    "domain": 100,
+    "module": 13,
+    "pipeline": 3,
+    "protocol": 14
+  },
+  "files": {
+    "wiki/GRAPH.json": {
+      "digest": "0349ebd8c274abf9331fa2bdbff84e33417304520972a92623ac712955ab6529",
+      "size": 18008
+    },
+    "wiki/INDEX.json": {
+      "digest": "d92fcbb9dc2a72db7062713b30e3f340603ae638c769bb0317f16c51a9332ba3",
+      "size": 40851
+    },
+    "wiki/llms.txt": {
+      "digest": "8bb330af6942ff5fe21ffc83b390dfdbbe8902097c23e18d5ed361df2aff95cb",
+      "size": 21330
+    },
+    "wiki/mcp.json": {
+      "digest": "ed73824d91dffb44a1501608a46d2c9845dd9429203c43b8957b4a270302b88d",
+      "size": 765
+    },
+    "wiki/pages.json": {
+      "digest": "c22017a5e92d4d01ad793cfbc66bf91fda83e5258f7fe35862c841b4b6d75ea7",
+      "size": 133684
+    }
+  },
+  "issues": [],
+  "note": "由 wiki 投影现算（committed==实时重算）",
+  "ok": true,
+  "pages": 133,
+  "schema": "nf-wiki-report/1"
+}

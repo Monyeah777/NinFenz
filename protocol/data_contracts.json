@@ -1271,6 +1271,42 @@
         "test_keywords_contract",
         "docs/keywords.md"
       ]
+    },
+    {
+      "id": "wiki-report",
+      "artifact": "results/wiki-report.json",
+      "quality_rule": "assertion:wiki-report",
+      "owner": "§19.1 交付物（core/layer_reports.py + test_layer_reports）",
+      "status": "active",
+      "freshness": "wiki/spec/QA 证据变化后重跑 write（committed==实时重算）",
+      "consumers": [
+        "test_layer_reports",
+        "docs/qa/README.md"
+      ]
+    },
+    {
+      "id": "spec-report",
+      "artifact": "results/spec-report.json",
+      "quality_rule": "assertion:spec-report",
+      "owner": "§19.1 交付物（core/layer_reports.py + test_layer_reports）",
+      "status": "active",
+      "freshness": "wiki/spec/QA 证据变化后重跑 write（committed==实时重算）",
+      "consumers": [
+        "test_layer_reports",
+        "docs/qa/README.md"
+      ]
+    },
+    {
+      "id": "qa-layers",
+      "artifact": "results/qa/layers.json",
+      "quality_rule": "assertion:qa-layers",
+      "owner": "§19.1 交付物（core/layer_reports.py + test_layer_reports）",
+      "status": "active",
+      "freshness": "wiki/spec/QA 证据变化后重跑 write（committed==实时重算）",
+      "consumers": [
+        "test_layer_reports",
+        "docs/qa/README.md"
+      ]
     }
   ]
 }

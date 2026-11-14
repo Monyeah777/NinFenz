@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1511,
+    "app": 1512,
     "entry": 26,
     "floor": 5,
     "prod": 1068,
-    "projection": 239,
-    "support": 512,
-    "verify": 1458
+    "projection": 244,
+    "support": 515,
+    "verify": 1459
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9839,6 +9839,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "§19.1 补件判据：wiki/spec 报告 + 分层 QA 映射（L0–L20）+ examples/docs 入口。",
+      "path": "desktop/tests/test_layer_reports.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "docs/layers.md 契约：抽象阶梯文档必须「四阶/五子级/入口 4/纵切 6/L1–L10 与真源一致」。",
       "path": "desktop/tests/test_layers_doc_contract.py",
       "role": "verify",
@@ -15198,17 +15204,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "788864109a018d185edafc3c00f61c3cb40d846483daf9c3fafa17249c04a435",
+  "root_digest": "298ccf8028c8203232f244ff3966ae5ed7e80813047baa80d858a4ab4868c2e9",
   "rule_counts": {
-    "R-app": 1511,
-    "R-catch": 356,
+    "R-app": 1512,
+    "R-catch": 359,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 208,
+    "R-projection": 212,
     "R-support": 124,
-    "R-verify": 1325,
-    "auto:R-core": 320
+    "R-verify": 1326,
+    "auto:R-core": 321
   },
   "schema": "nf-role-coordinates/1"
 }
