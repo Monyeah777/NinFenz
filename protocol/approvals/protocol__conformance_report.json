@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-14",
   "approved_by": "Monyeah777",
-  "note": "NF-Final WP-0A 产品发现/GTM/访谈计划（假设全 unverified，外部验证挂 OPEN）",
+  "note": "NF-Final §4A R1 契约地图（显式 11/隐式 8/缺口 5）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "402525a31c0e6086e80db1991631f5555a9cd3ceafb6c590036a0e59f150d762"
+  "subject_digest": "351ec437cf27c62bf9f8c7a5e8a3f97035e82df11a8f46b8390ea202e852cbe7"
 }

@@ -1,0 +1,562 @@
+{
+  "schema": "nf-reverse-contracts/1",
+  "note": "NF-Final §4A R1 契约提取机读件（WP-?/G0 §4A）：显式契约（schema/注册表/声明件）+ 隐式契约（命名/哈希/顺序/错误/版本/生成物），逐条给 artifact/字段/消费方/证据/风险。判据 desktop/tests/test_reverse_contracts.py：字段必须在 artifact 正文命中、消费方与证据必须在场；隐式契约必须写风险与「未文档化」说明。人读：results/reverse/CONTRACT_MAP.md。",
+  "explicit": [
+    {
+      "id": "X-01",
+      "kind": "explicit",
+      "layer": "IDL schema 九件",
+      "status": "documented",
+      "artifacts": [
+        "protocol/schema/asset.schema.json",
+        "protocol/schema/module.schema.json",
+        "protocol/schema/pipeline.schema.json",
+        "protocol/schema/protocol.schema.json",
+        "protocol/schema/release.schema.json",
+        "protocol/schema/contract.schema.json",
+        "protocol/schema/integration.schema.json",
+        "protocol/schema/asset_contracts.schema.json",
+        "protocol/schema/integration_strings.schema.json"
+      ],
+      "fields": [
+        "id",
+        "name",
+        "category",
+        "source",
+        "structure",
+        "layers",
+        "dependencies",
+        "protocol",
+        "freeze_chain",
+        "required_artifacts",
+        "version_faces",
+        "conformance"
+      ],
+      "consumers": [
+        "desktop/src/core/schema_lint.py",
+        "verify.sh"
+      ],
+      "evidence": [
+        "desktop/tests/test_schema_lint.py"
+      ],
+      "risk": "字段级漂移由 check28 覆盖；新增 schema 未入 dialect 校验会哑"
+    },
+    {
+      "id": "X-02",
+      "kind": "explicit",
+      "layer": "trust 契约十四件",
+      "status": "documented",
+      "artifacts": [
+        "protocol/trust/claim-bundle.schema.json",
+        "protocol/trust/anchor.schema.json",
+        "protocol/trust/dsse.schema.json",
+        "protocol/trust/entity.schema.json",
+        "protocol/trust/verify.schema.json",
+        "protocol/trust/keys.schema.json",
+        "protocol/trust/policy.schema.json",
+        "protocol/trust/model-card.schema.json",
+        "protocol/trust/process.schema.json",
+        "protocol/trust/type-registry.schema.json",
+        "protocol/trust/chain-head.schema.json",
+        "protocol/trust/human-review.schema.json",
+        "protocol/trust/context-lineage.schema.json",
+        "protocol/trust/public-anchor.schema.json"
+      ],
+      "fields": [
+        "schema",
+        "bundle_id",
+        "merkle_root",
+        "inclusion_proofs",
+        "anchors",
+        "target_digest",
+        "no_scoring",
+        "issuers",
+        "model_id",
+        "reviewer",
+        "log_id",
+        "tree_size",
+        "prev",
+        "types"
+      ],
+      "consumers": [
+        "desktop/src/core/trust/bundle.py",
+        "desktop/src/core/trust/verify.py",
+        "scripts/trust_verify.py"
+      ],
+      "evidence": [
+        "desktop/tests/test_trust_schemas.py"
+      ],
+      "risk": "schema 只经测试与部分 check 消费；未统一进入 verify 的每件 schema 校验（G3）"
+    },
+    {
+      "id": "X-03",
+      "kind": "explicit",
+      "layer": "生产平面五件",
+      "status": "documented",
+      "artifacts": [
+        "protocol/production/contract.schema.json",
+        "protocol/production/wiki-page.schema.json",
+        "protocol/production/spec.schema.json",
+        "protocol/production/task.schema.json",
+        "protocol/production/assembly.schema.json"
+      ],
+      "fields": [
+        "version",
+        "artifact",
+        "constraints",
+        "acceptance",
+        "status",
+        "citations",
+        "provenance",
+        "spec_refs",
+        "context_refs",
+        "budget",
+        "slot",
+        "steps",
+        "fallback",
+        "output"
+      ],
+      "consumers": [
+        "desktop/tests/test_schema_reference.py",
+        "desktop/tests/test_assurance_contract.py"
+      ],
+      "evidence": [
+        "desktop/tests/test_schema_reference.py"
+      ],
+      "risk": "尚无编译器消费（G1/G2）；契约存在但运行时未接线"
+    },
+    {
+      "id": "X-04",
+      "kind": "explicit",
+      "layer": "运行时注册表",
+      "status": "documented",
+      "artifacts": [
+        "desktop/src/core/registry.json"
+      ],
+      "fields": [
+        "registry_schema_version",
+        "truth_source",
+        "modules",
+        "mount_points",
+        "subscriptions",
+        "protocols"
+      ],
+      "consumers": [
+        "desktop/src/core/registry_loader.py",
+        "desktop/src/core/registry_sync.py"
+      ],
+      "evidence": [
+        "desktop/tests/test_agents_contract.py"
+      ],
+      "risk": "modules 为数组（非 ID 索引），重复 ID 靠 check21 兜"
+    },
+    {
+      "id": "X-05",
+      "kind": "explicit",
+      "layer": "模块 machine_contract",
+      "status": "documented",
+      "artifacts": [
+        "04_模块库/通用类/M00_数据槽总线.md"
+      ],
+      "fields": [
+        "machine_contract",
+        "inputs",
+        "outputs",
+        "id"
+      ],
+      "consumers": [
+        "desktop/src/core/machine_contract.py",
+        "verify.sh"
+      ],
+      "evidence": [
+        "desktop/tests/test_agent_start_contract.py"
+      ],
+      "risk": "13 件模块文档的 fence 字段漂移由 check16/28 部分覆盖"
+    },
+    {
+      "id": "X-06",
+      "kind": "explicit",
+      "layer": "管线声明",
+      "status": "documented",
+      "artifacts": [
+        "03_管线库/P00_通用文档生成管线.md",
+        "03_管线库/P01_标准管线.md",
+        "03_管线库/P90_结构装配管线.md"
+      ],
+      "fields": [
+        "id",
+        "name",
+        "structure",
+        "layers",
+        "dependencies"
+      ],
+      "consumers": [
+        "desktop/src/core/pipeline_loader.py",
+        "verify.sh"
+      ],
+      "evidence": [
+        "desktop/tests/test_pipeline_loader.py"
+      ],
+      "risk": "community 111 个 protocol.yaml 与 03 官方三件的字段族未全量统一"
+    },
+    {
+      "id": "X-07",
+      "kind": "explicit",
+      "layer": "资产契约台账",
+      "status": "documented",
+      "artifacts": [
+        "protocol/asset_contracts.json"
+      ],
+      "fields": [
+        "data",
+        "code",
+        "script",
+        "index",
+        "chains"
+      ],
+      "consumers": [
+        "desktop/src/core/asset_contract.py",
+        "verify.sh"
+      ],
+      "evidence": [
+        "desktop/tests/test_asset_contract.py"
+      ],
+      "risk": "新增 protocol 数据件默认不入台账（需显式登记）"
+    },
+    {
+      "id": "X-08",
+      "kind": "explicit",
+      "layer": "语言面注册表",
+      "status": "documented",
+      "artifacts": [
+        "protocol/locales.json"
+      ],
+      "fields": [
+        "locales",
+        "docs",
+        "canonical",
+        "coverage",
+        "source_sha256"
+      ],
+      "consumers": [
+        "desktop/src/core/locales.py",
+        "verify.sh"
+      ],
+      "evidence": [
+        "desktop/tests/test_locales.py"
+      ],
+      "risk": "译件 SHA 过期靠 nf locales --write 重签，不自动"
+    },
+    {
+      "id": "X-09",
+      "kind": "explicit",
+      "layer": "域包 DOMAIN_SPEC",
+      "status": "documented",
+      "artifacts": [
+        "community/AI保险域包/outputs/DOMAIN_SPEC.json",
+        "community/AI制药与生物域包/outputs/DOMAIN_SPEC.json"
+      ],
+      "fields": [
+        "kind",
+        "code",
+        "domain",
+        "section",
+        "subdivisions",
+        "content_tier"
+      ],
+      "consumers": [
+        "desktop/src/core/domain_pack.py",
+        "verify.sh"
+      ],
+      "evidence": [
+        "desktop/tests/test_domain_pack.py"
+      ],
+      "risk": "100 份域包 spec 未统一 schema（字段族差异大）"
+    },
+    {
+      "id": "X-10",
+      "kind": "explicit",
+      "layer": "跨域登记族（隐私/运维/法务/AI/a11y/i18n/保证/RAID/产品/CQ）",
+      "status": "documented",
+      "artifacts": [
+        "protocol/privacy.json",
+        "protocol/ops.json",
+        "protocol/legal.json",
+        "protocol/ai_governance.json",
+        "protocol/accessibility.json",
+        "protocol/i18n.json",
+        "protocol/raid.json",
+        "protocol/product.json",
+        "results/cq/scan.json"
+      ],
+      "fields": [
+        "schema",
+        "claims_boundary",
+        "status_vocabulary",
+        "data_classes",
+        "severity_vocabulary",
+        "vendors",
+        "open_items",
+        "model_risk_register",
+        "wcag",
+        "countermetrics",
+        "risks",
+        "value_hypotheses"
+      ],
+      "consumers": [
+        "desktop/tests/test_privacy_contract.py",
+        "desktop/tests/test_legal_contract.py",
+        "desktop/tests/test_ai_eval_contract.py"
+      ],
+      "evidence": [
+        "desktop/tests/test_cq_scan_contract.py"
+      ],
+      "risk": "登记族由测试消费而非 verify check；G5 应统一接线（check50+）"
+    },
+    {
+      "id": "X-11",
+      "kind": "explicit",
+      "layer": "评测协议/效度",
+      "status": "documented",
+      "artifacts": [
+        "protocol/eval/protocol.json",
+        "protocol/eval_validity.json"
+      ],
+      "fields": [
+        "frozen_before_run",
+        "dimensions",
+        "analysis_plan",
+        "preregistration",
+        "inter_rater",
+        "countermetrics",
+        "metrics",
+        "prohibitions"
+      ],
+      "consumers": [
+        "desktop/src/core/eval_harness.py",
+        "desktop/src/core/eval_validity.py"
+      ],
+      "evidence": [
+        "desktop/tests/test_ai_eval_contract.py"
+      ],
+      "risk": "样本为示例数据，真实外部盲评未执行（OPEN）"
+    }
+  ],
+  "implicit": [
+    {
+      "id": "I-01",
+      "kind": "implicit",
+      "layer": "canonical JSON + 域分隔",
+      "status": "implicit-undocumented",
+      "artifacts": [
+        "desktop/src/core/trust/canonical.py"
+      ],
+      "fields": [
+        "domain_digest",
+        "canonical"
+      ],
+      "consumers": [
+        "desktop/src/core/trust/bundle.py",
+        "desktop/src/core/trust/dsse.py",
+        "desktop/src/core/trust/signature.py"
+      ],
+      "evidence": [
+        "desktop/tests/test_trust_canonical.py"
+      ],
+      "risk": "RFC 8785 子集与外部 JCS 未全量对照；数字/浮点边界未遍历"
+    },
+    {
+      "id": "I-02",
+      "kind": "implicit",
+      "layer": "Merkle/叶前缀",
+      "status": "implicit-undocumented",
+      "artifacts": [
+        "desktop/src/core/trust/bundle.py"
+      ],
+      "fields": [
+        "leaf_hash",
+        "merkle_root",
+        "inclusion_proof"
+      ],
+      "consumers": [
+        "scripts/trust_parity/verify.mjs",
+        "desktop/src/core/trust/verify.py"
+      ],
+      "evidence": [
+        "desktop/tests/test_trust_bundle.py"
+      ],
+      "risk": "跨实现 parity 已有（Node/.NET）；变更需重跑冻结向量"
+    },
+    {
+      "id": "I-03",
+      "kind": "implicit",
+      "layer": "路径包含性",
+      "status": "implicit-undocumented",
+      "artifacts": [
+        "desktop/src/core/paths.py"
+      ],
+      "fields": [
+        "validate_path",
+        "Path"
+      ],
+      "consumers": [
+        "desktop/src/core/asset_ledger.py",
+        "desktop/src/core/atomic_write.py",
+        "desktop/src/core/trust/key_material.py"
+      ],
+      "evidence": [
+        "desktop/tests/test_paths.py",
+        "desktop/tests/test_output_path_escape.py"
+      ],
+      "risk": "符号链接/大小写/Windows 短路径边界靠负例覆盖，未数学证明"
+    },
+    {
+      "id": "I-04",
+      "kind": "implicit",
+      "layer": "UTC/ISO-8601",
+      "status": "implicit-undocumented",
+      "artifacts": [
+        "desktop/src/core/iso8601.py"
+      ],
+      "fields": [
+        "is_iso_instant",
+        "parse_instant"
+      ],
+      "consumers": [
+        "desktop/src/core/ops.py",
+        "desktop/src/core/i18n_checks.py",
+        "desktop/src/core/trust/verify.py"
+      ],
+      "evidence": [
+        "desktop/tests/test_trust_verify.py"
+      ],
+      "risk": "本地时区仅显示层；证据必须 Z 结尾，靠 schema pattern + 审查"
+    },
+    {
+      "id": "I-05",
+      "kind": "implicit",
+      "layer": "错误码 + 修复指引",
+      "status": "implicit-undocumented",
+      "artifacts": [
+        "protocol/error_codes.json",
+        "desktop/src/core/error_codes.py"
+      ],
+      "fields": [
+        "修复指引",
+        "error"
+      ],
+      "consumers": [
+        "verify.sh",
+        "desktop/src/core/purity_scan.py"
+      ],
+      "evidence": [
+        "desktop/tests/test_error_message_guidance_pattern_doc_contract.py"
+      ],
+      "risk": "「修复指引」是文案约定而非 schema 必填；靠 check27 R6 抽样"
+    },
+    {
+      "id": "I-06",
+      "kind": "implicit",
+      "layer": "原子写/半截文件",
+      "status": "implicit-undocumented",
+      "artifacts": [
+        "desktop/src/core/atomic_write.py"
+      ],
+      "fields": [
+        "write_text",
+        "os.replace"
+      ],
+      "consumers": [
+        "desktop/src/core/independence.py",
+        "desktop/src/core/ops.py",
+        "desktop/src/core/repo_stats.py"
+      ],
+      "evidence": [
+        "desktop/tests/test_atomic_write.py"
+      ],
+      "risk": "Windows 替换语义已测；跨文件系统/网络盘未测"
+    },
+    {
+      "id": "I-07",
+      "kind": "implicit",
+      "layer": "冻结链顺序",
+      "status": "implicit-undocumented",
+      "artifacts": [
+        "docs/release.md"
+      ],
+      "fields": [
+        "conformance",
+        "approve",
+        "receipts"
+      ],
+      "consumers": [
+        "scripts/nf.py",
+        "verify.sh"
+      ],
+      "evidence": [
+        "desktop/tests/test_release_gate.py"
+      ],
+      "risk": "顺序在文档+脚本里，未由 schema 强制；错序会红但解释成本高"
+    },
+    {
+      "id": "I-08",
+      "kind": "implicit",
+      "layer": "生成物禁手改",
+      "status": "implicit-undocumented",
+      "artifacts": [
+        "docs/standards/index.md",
+        "docs/verification-cards.md"
+      ],
+      "fields": [
+        "生成",
+        "禁止手改"
+      ],
+      "consumers": [
+        "scripts/geo_export.py",
+        "scripts/build_verification_cards.py"
+      ],
+      "evidence": [
+        "desktop/tests/test_repo_stats.py"
+      ],
+      "risk": "靠生成器判据与人工纪律；新增生成区需同时加判据"
+    }
+  ],
+  "gaps": [
+    {
+      "id": "G-01",
+      "text": "生产/Wiki/spec 契约无运行时编译器（G1/G2）",
+      "owner": "WP-10/11/21",
+      "status": "open"
+    },
+    {
+      "id": "G-02",
+      "text": "trust 十四件 schema 未统一接入 verify 的逐件校验（当前靠测试 + 部分 check）",
+      "owner": "G3",
+      "status": "open"
+    },
+    {
+      "id": "G-03",
+      "text": "隐式契约（I-01…I-08）未全量机检：多为测试与文案约定",
+      "owner": "R3/R6",
+      "status": "open"
+    },
+    {
+      "id": "G-04",
+      "text": "100 份域包 DOMAIN_SPEC 未统一 schema（字段族差异）",
+      "owner": "G1/域包线",
+      "status": "open"
+    },
+    {
+      "id": "G-05",
+      "text": "跨域登记族未进 verify check（G5 check49/50 候选）",
+      "owner": "G5",
+      "status": "open"
+    }
+  ],
+  "status_vocabulary": [
+    "documented",
+    "implicit-undocumented",
+    "gap"
+  ],
+  "method": "按真源 → 机读契约（schema/注册表/声明件）→ 消费方 → 证据 逐层提取；隐式契约从代码约定与纪律文档反推；每条可复跑命令见 CONTRACT_MAP.md。"
+}

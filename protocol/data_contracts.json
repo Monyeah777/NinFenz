@@ -860,6 +860,18 @@
         "docs/product/PRFAQ.md",
         "docs/product/GTM.md"
       ]
+    },
+    {
+      "id": "reverse-contracts",
+      "artifact": "results/reverse/contracts.json",
+      "quality_rule": "assertion:reverse-contracts",
+      "owner": "§4A 逆向 R1 契约地图（test_reverse_contracts 判据）",
+      "status": "active",
+      "freshness": "真源/契约变化须重跑 R1；字段必须在 artifact 正文命中（测试复算）",
+      "consumers": [
+        "test_reverse_contracts",
+        "results/reverse/CONTRACT_MAP.md"
+      ]
     }
   ]
 }
