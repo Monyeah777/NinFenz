@@ -134,7 +134,9 @@
 - **WP-11 已完成（2026-11-14）**：`desktop/src/core/trust/bundle.py`——Merkle 原语**复用** `core.receipts`（同一 RFC 6962 口径，不造第二套哈希）；新增 claim 语义：叶预像 `nf:claim-bundle:v1:claim + 0x00 + canonical{bundle_id,index,claim}`（bundle_id/index/claim 全进叶 → splice/重排可检测）、`build_bundle`（确定性构建 + 逐叶 proof）、`verify_claim`（只读 1 条 claim + 1 条 proof，哈希 O(log n)，支持 proof 侧车免线性查找）、`verify_bundle`（结构 + 全叶根 + 覆盖/唯一性）。判据 `desktop/tests/test_trust_bundle.py`（19 条：merkle 向量逐条、schema 一致性、受控容器证明单 claim 读取、log n proof 长度、篡改矩阵 9 行）。
 - **WP-12 已完成（2026-11-14）**：`desktop/src/core/trust/process.py`——`nf-process/1` step 摘要（`domain_digest("nf:process:v1:step", canonical(step 去 digest))`，schema/actor/authorization/refs 全进摘要）、`append_step`（自动封 seq/prev，创世=64 个 0）、`verify_chain`（PREV-FORMAT → SEQ-ORDER → PREV-MISMATCH，形状与向量一致）、`validate_steps`（schema 结构面）、`chain_head`。判据 `desktop/tests/test_trust_process.py`（20 条：process 向量逐条、append/创世/确定性、摘要规则、删改重排反例、schema 结构面、**就地重算边界诚实声明**）。
 - **本轮同时校正了一处向量契约缺陷**：WP-03 的 process 族输入用的是精简形状（`seq`/`actor_id` + 常量补 authorization），与冻结 schema 不一致；已改为 schema 形状（`step`/`actor{id,kind}`/`authorization`/refs）并重算期望值，独立复算同步更新——向量现在钉的是真实算法。
-- **下一步（G1 余项）**：WP-14 `cc_verify` 骨架（挂 `nf verify`，报告 `nf-verify/1`，对齐 level 向量族）→ WP-15 check45 + 冻结/自审计（G1 退出条件）。
+- **WP-14 已完成（2026-11-14，骨架）**：`desktop/src/core/trust/verify.py`——`decide`（T0-T4 事实→等级→exit 0/1/2，与向量 level 族逐条一致）、`skeleton_facts`（hash 取真值，签名/TSA/STH/公共锚如实为 none）、`build_report`（nf-verify/1，结构不过 schema 即抛）；`scripts/trust_verify.py`（计划 §8.4 CI 入口：`--bundle/--policy/--json/--out`，缺参 exit 2 且带修复指引）。判据 `desktop/tests/test_trust_verify.py`（11 条：level 向量逐条、T0/T2/篡改/坏策略四场景退出码与报告、报告过冻结 schema、CLI 子进程 0/1/2 与确定性、--out 原子写）。
+  - **CLI 命令面裁决**：本轮先落计划 §8.4 的 CI 入口（`scripts/trust_verify.py`）；`nf trust` 命令族（§8.1）涉及 check39 命令面策展与文档同步，留到 check45 接线后统一做，避免半接线命令面（记录于 §5.6）。
+- **下一步（G1 收官）**：WP-15 check45 + 冻结/自审计——把 bundle/process/verify 判据接进 `verify.sh`（旧基线须能红），跑 §13 自扫描并更新 `SELF_AUDIT`/威胁模型状态。
 
 ## 8. 复跑命令
 
