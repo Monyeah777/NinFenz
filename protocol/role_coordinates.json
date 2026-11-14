@@ -5,8 +5,8 @@
     "floor": 5,
     "prod": 1057,
     "projection": 167,
-    "support": 466,
-    "verify": 1320
+    "support": 468,
+    "verify": 1326
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7397,6 +7397,30 @@
       "rule": "R-verify"
     },
     {
+      "function": "nf-issuer-registry/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/keys-bad-keyid.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-issuer-registry/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/keys-bad-time.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-issuer-registry/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/keys-empty-keys.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-issuer-registry/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/keys-unknown-status.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "nf-trust-policy/1",
       "path": "desktop/tests/fixtures/trust/schemas/invalid/policy-level-t5.json",
       "role": "verify",
@@ -7453,6 +7477,12 @@
     {
       "function": "nf-entity/1",
       "path": "desktop/tests/fixtures/trust/schemas/valid/entity.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-issuer-registry/1",
+      "path": "desktop/tests/fixtures/trust/schemas/valid/keys.json",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -11117,13 +11147,19 @@
       "rule": "R-verify"
     },
     {
+      "function": "trust.keys 判据：issuer registry 结构/语义 + 生命周期解析 + 注册表口径验签。",
+      "path": "desktop/tests/test_trust_keys.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "trust.process 判据：process 向量族逐条 + prev 链/seq/创世约定 + 删改重排反例。",
       "path": "desktop/tests/test_trust_process.py",
       "role": "verify",
       "rule": "R-verify"
     },
     {
-      "function": "Trust Fabric schema 门禁（WP-01）：7 件 IDL、正/反样例与变异自证。",
+      "function": "Trust Fabric schema 门禁（WP-01/21）：8 件 IDL、正/反样例与变异自证。",
       "path": "desktop/tests/test_trust_schemas.py",
       "role": "verify",
       "rule": "R-verify"
@@ -14304,16 +14340,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "44ee9dffc3a162813f09b82ae84590e7baf7451c3c51d34dd156bcd40d422801",
+  "root_digest": "de10365b4e903337ace81b5e97a3015ed59df6e217bd0b6c2bfbcda1c674ad12",
   "rule_counts": {
     "R-app": 1468,
-    "R-catch": 314,
+    "R-catch": 316,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 147,
     "R-support": 124,
-    "R-verify": 1194,
+    "R-verify": 1200,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/trust/keys.schema.json",
+  "title": "NinFenz issuer registry（issuer ↔ keyid ↔ alg ↔ 生命周期）",
+  "description": "ADR-009 准入注册表的冻结 IDL：未知 issuer/keyid/算法一律拒绝；时间字段一律 UTC ISO-8601 字符串（禁 float/epoch 数字）。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "issuers"],
+  "properties": {
+    "schema": {"const": "nf-issuer-registry/1"},
+    "issuers": {
+      "type": "array", "minItems": 1, "maxItems": 1024,
+      "items": {"$ref": "#/$defs/issuer"}
+    }
+  },
+  "$defs": {
+    "issuer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "keys"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^nf:[a-z0-9-]+:[a-z0-9-]+$", "maxLength": 96},
+        "kind": {"enum": ["human", "service", "ai-agent", "institution"]},
+        "display_name": {"type": "string", "minLength": 1, "maxLength": 120},
+        "delegated_by": {"type": "string", "pattern": "^nf:[a-z0-9-]+:[a-z0-9-]+$"},
+        "keys": {
+          "type": "array", "minItems": 1, "maxItems": 64,
+          "items": {"$ref": "#/$defs/key"}
+        }
+      }
+    },
+    "key": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["keyid", "alg", "status", "not_before", "not_after"],
+      "properties": {
+        "keyid": {"type": "string", "pattern": "^nf:[a-z0-9-]+:[a-z0-9-]+:[a-z0-9-]+$", "maxLength": 128},
+        "alg": {"enum": ["hmac-sha256", "ed25519", "ecdsa-p256"]},
+        "status": {"enum": ["active", "retired", "revoked"]},
+        "not_before": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"},
+        "not_after": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"},
+        "rotated_to": {"type": "string", "pattern": "^nf:[a-z0-9-]+:[a-z0-9-]+:[a-z0-9-]+$", "maxLength": 128},
+        "revoked_at": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"},
+        "revocation_reason": {"type": "string", "minLength": 1, "maxLength": 200},
+        "public_key_b64": {"type": "string", "minLength": 16, "maxLength": 2048}
+      }
+    }
+  }
+}
