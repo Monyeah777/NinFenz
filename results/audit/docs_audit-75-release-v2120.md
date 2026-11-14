@@ -6,16 +6,18 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - CHANGELOG.md:85338cc03e58640f54615dbb296a432ea64b916c477d4c0fa47cd5d554b2ed21
-  - docs/meta/VERSION-MATRIX.md:6e00c94dde8de0626635baf6b047a68f0f11db69e751844f0183130d262c4b70
-  - README.md:d3de14a0289903e70014f4217ac0c966b2ac89e0fe6066ef3d6c480f62185f2f
+  - CHANGELOG.md:64a59ca733b7232e9c225eae597728c91a8be377476e4520270356733e4ad461
+  - docs/meta/VERSION-MATRIX.md:c3c9f4ae8aa0c98b266a76ab7d5c6e0f01bf428e26570091485659485acc8d30
+  - README.md:27a6bc7449be1bcd2b90772a71049f28bcd7bdbf639938980a503d2c9897c594
   - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
   - docs/release.md:09b0c6bbd0f2514a32cef0e404bb4dac877f42d57a6674157ea45b1629290aa2
-  - scripts/nf.py:4b065db63fb34f89faf545c3d91a0f5c76facedf18c3427353312461da8f0b92
+  - scripts/nf.py:75ed1ad2dda5fb07dbd914a6ffedb836e5cf1298bf34b98be602644827ebc925
 
 ---
+> 重审（2026-11-14）：NF-Final WP-02 双平面边界 check49：verify.sh 新增 check49（段 D）+ quality_baseline v2.35（47 check / PASS=85），被审对象变更后机械重绑
+
 > 重审（2026-11-14）：WP-15 check45 接线与 G1 收口（机械重绑）
 
 > 重审（2026-11-14）：WP-11 trust bundle 入仓（机械重绑）

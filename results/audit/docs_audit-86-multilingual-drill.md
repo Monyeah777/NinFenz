@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:142a9157504702fa03498494dc452ae2fbb8cfbfcce836992b1d59d1078755e4
-  - protocol/code_metrics_baseline.json:a4fec0807c5390ecc7d39d89d9da83d6161e3b9932869620ac3f81f744d68e1b
+  - protocol/code_metrics_baseline.json:47e66c38d7c91dd12975170882dd2410e287dddd24232419ecaf9bf5b7874de3
 ---
+> 重审（2026-11-14）：NF-Final WP-02 双平面边界 check49：verify.sh 新增 check49（段 D）+ quality_baseline v2.35（47 check / PASS=85），被审对象变更后机械重绑
+
 > 重审（2026-11-14）：WP-15 check45 接线与 G1 收口（机械重绑）
 
 > 重审（2026-11-14）：WP-11 trust bundle 入仓（机械重绑）
