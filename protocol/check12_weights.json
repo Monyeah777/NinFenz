@@ -529,6 +529,7 @@
     "test_reverse_contracts": 0.3,
     "test_reverse_coupling": 8.1,
     "test_reverse_failures": 8.4,
+    "test_reverse_invariants": 0.3,
     "test_reverse_peers": 0.5,
     "test_revocation_feed_doc_contract": 0.2,
     "test_revocations": 1.8,
@@ -5000,6 +5001,17 @@
     "test_reverse_failures.ReverseFailuresTest.test_doc_cross_consistent": 0.0,
     "test_reverse_failures.ReverseFailuresTest.test_failures_valid": 1.31,
     "test_reverse_failures.ReverseFailuresTest.test_mutations_red": 6.81,
+    "test_reverse_invariants.ReverseInvariantsTest.test_doc_cross_consistent": 0.0,
+    "test_reverse_invariants.ReverseInvariantsTest.test_existing_tests_exist": 0.0,
+    "test_reverse_invariants.ReverseInvariantsTest.test_inv_01_wiki_page_required_fields": 0.0,
+    "test_reverse_invariants.ReverseInvariantsTest.test_inv_08_missing_anchor_exit_2": 0.0,
+    "test_reverse_invariants.ReverseInvariantsTest.test_inv_09_tampered_bundle_exit_1": 0.0,
+    "test_reverse_invariants.ReverseInvariantsTest.test_inv_10_contract_unknown_fields_rejected": 0.0,
+    "test_reverse_invariants.ReverseInvariantsTest.test_inv_11_task_bounded_fields": 0.0,
+    "test_reverse_invariants.ReverseInvariantsTest.test_inv_12_canonical_domain_separation": 0.0,
+    "test_reverse_invariants.ReverseInvariantsTest.test_mutations_red": 0.0,
+    "test_reverse_invariants.ReverseInvariantsTest.test_registry_valid": 0.0,
+    "test_reverse_invariants.ReverseInvariantsTest.test_unobservable_have_gate": 0.0,
     "test_reverse_peers.ReversePeersTest.test_doc_cross_consistent": 0.0,
     "test_reverse_peers.ReversePeersTest.test_mutations_red": 0.02,
     "test_reverse_peers.ReversePeersTest.test_peers_valid": 0.0,
@@ -6264,5 +6276,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2165.2
+  "total_s": 2165.5
 }

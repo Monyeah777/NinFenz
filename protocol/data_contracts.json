@@ -920,6 +920,18 @@
         "test_reverse_peers",
         "results/reverse/PEER_DIFF.md"
       ]
+    },
+    {
+      "id": "reverse-invariants",
+      "artifact": "results/reverse/invariants.json",
+      "quality_rule": "assertion:reverse-invariants",
+      "owner": "§4A 逆向 R6 不变量（test_reverse_invariants 判据+执行器）",
+      "status": "active",
+      "freshness": "不变量/状态变化须重跑 R6；unobservable 必须在对应 Gate 前转 tested 或挂 OPEN",
+      "consumers": [
+        "test_reverse_invariants",
+        "results/reverse/INVARIANTS.md"
+      ]
     }
   ]
 }

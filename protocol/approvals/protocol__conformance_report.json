@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-14",
   "approved_by": "Monyeah777",
-  "note": "NF-Final §4A R5 同行差分（6 项对照 + 3 条设计决策）",
+  "note": "NF-Final §4A R6 不变量（7 层 14 条 + 执行器）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "e4ad74bae23487fbbda43a92e72865a3a136b2cf1d8443cca1d62e5aad503ae5"
+  "subject_digest": "a7c4cfa414c1951adbf515673ff65d154ac0315ae426d825ce55e6ab1f7bd5b1"
 }
