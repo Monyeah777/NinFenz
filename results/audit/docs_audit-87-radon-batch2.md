@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:b5ff7f1e10acea980d13cb16944c667d70f6b846193c9495081a04af37cd6088
+  - protocol/code_metrics_baseline.json:d03927d8908a5f44acb14a5049b53cffdf8ef7ce0d64034627240ace55d57074
 ---
+> 重审（2026-11-15）：NF-Final WP-43：新增 protocol/aigc_labeling.json、core/aigc_labeling.py、results/ai/aigc-label.json、docs/aigc-labeling.md、test_aigc_labeling_contract.py；assertions/data_contracts/independence/code_metrics/check12 更新
+
 > 重审（2026-11-15）：NF-Final WP-42：新增 protocol/policy_rules.json、core/policy_engine.py、docs/policy-engine.md、test_policy_engine_contract.py；assertions/data_contracts/independence/code_metrics/check12 更新
 
 > 重审（2026-11-15）：NF-Final WP-41：新增 protocol/aibom.json、core/aibom_export.py、results/ai/aibom.*、docs/aibom.md、test_aibom_contract.py；assertions/data_contracts/independence/code_metrics/check12 更新

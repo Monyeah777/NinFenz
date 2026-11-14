@@ -1,0 +1,16 @@
+{
+  "generator": {
+    "model_digest": "95287be99ef87143be951e7d1adf5e67a3a3d9329e59e871d0b1550cd2f13a59",
+    "model_id": "nf.sample.model"
+  },
+  "label": "ai-assisted",
+  "labeled_at": "2026-11-15T00:00:00Z",
+  "note": "sample 标注：AI 辅助生成，绑定模型卡与复核证据",
+  "provenance_refs": [
+    "results/ai/model-card.json",
+    "results/ai/human-review.json"
+  ],
+  "schema": "nf-aigc-label/1",
+  "subject_digest": "2b3a3794dd47880320c69fe7b1b250eb27715837e578c2430d387499d5bcc058",
+  "subject_kind": "delivery-artifact"
+}

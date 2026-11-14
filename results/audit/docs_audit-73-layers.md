@@ -15,14 +15,16 @@ subjects:
   - verify.sh:904661b179c65686b37d63a7fa0a175625c433d741239903527dad3da35a7874
   - docs/layers.md:7b849fb07769ba6df5ca888a9de5323417b47a07ef54ec2c1c801673a7fbd7c0
   - docs/L3_FROZEN.md:863a152271b1b969a3249194d1169628f4a4647a9bdd801473cfc9cb75c6643b
-  - protocol/assertions.json:089e017feb54cdde9dbd1974a94db07c717c26e9586e14b73cee8a5882fa823e
-  - protocol/data_contracts.json:c91e9961194d02aba0d1cec452f8fda4a6a2fdc0156b632fbfd9906a35943caa
+  - protocol/assertions.json:a671f5768510d90e38d213f01c29823480e090aa5570cbdfc1ab3215864c7e48
+  - protocol/data_contracts.json:d456e2615794f320eb10d5e5445585a67204ae7b770b1f393c018af7d925fca1
   - protocol/normative.json:c1bbc14c92cea6bd66ff6cb54fdcf91bf3072f66adee7027f1d3f42e70fe1825
   - protocol/glossary.json:0af6a0f3b1f128b30c0eb88a8db0d2c143461910a889737dfdf4e38e89f85ba7
   - desktop/src/core/receipts.py:b748915bb519aeeb1aa0f7d367df2eb7d4321b369b85905a7f918d8d55d96363
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
 
 ---
+> 重审（2026-11-15）：NF-Final WP-43：新增 protocol/aigc_labeling.json、core/aigc_labeling.py、results/ai/aigc-label.json、docs/aigc-labeling.md、test_aigc_labeling_contract.py；assertions/data_contracts/independence/code_metrics/check12 更新
+
 > 重审（2026-11-15）：NF-Final WP-42：新增 protocol/policy_rules.json、core/policy_engine.py、docs/policy-engine.md、test_policy_engine_contract.py；assertions/data_contracts/independence/code_metrics/check12 更新
 
 > 重审（2026-11-15）：NF-Final WP-41：新增 protocol/aibom.json、core/aibom_export.py、results/ai/aibom.*、docs/aibom.md、test_aibom_contract.py；assertions/data_contracts/independence/code_metrics/check12 更新

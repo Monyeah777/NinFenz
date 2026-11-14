@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:b5ff7f1e10acea980d13cb16944c667d70f6b846193c9495081a04af37cd6088
+  - protocol/code_metrics_baseline.json:d03927d8908a5f44acb14a5049b53cffdf8ef7ce0d64034627240ace55d57074
 ---
+> 重审（2026-11-15）：NF-Final WP-43：新增 protocol/aigc_labeling.json、core/aigc_labeling.py、results/ai/aigc-label.json、docs/aigc-labeling.md、test_aigc_labeling_contract.py；assertions/data_contracts/independence/code_metrics/check12 更新
+
 > 重审（2026-11-15）：NF-Final WP-42：新增 protocol/policy_rules.json、core/policy_engine.py、docs/policy-engine.md、test_policy_engine_contract.py；assertions/data_contracts/independence/code_metrics/check12 更新
 
 > 重审（2026-11-15）：NF-Final WP-41：新增 protocol/aibom.json、core/aibom_export.py、results/ai/aibom.*、docs/aibom.md、test_aibom_contract.py；assertions/data_contracts/independence/code_metrics/check12 更新

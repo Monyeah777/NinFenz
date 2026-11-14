@@ -45,6 +45,11 @@
       "max_fn_cc": 32,
       "max_fn_lines": 57
     },
+    "desktop/src/core/aigc_labeling.py": {
+      "lines": 161,
+      "max_fn_cc": 30,
+      "max_fn_lines": 56
+    },
     "desktop/src/core/allowlist_expiry.py": {
       "lines": 50,
       "max_fn_cc": 8,

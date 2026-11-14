@@ -18,6 +18,7 @@
     "test_ai_menu_fieldtest_contract": 0.2,
     "test_ai_routing_contract": 0.3,
     "test_aibom_contract": 0.1,
+    "test_aigc_labeling_contract": 0.1,
     "test_alias_contract": 0.2,
     "test_allowlist_expiry": 0.2,
     "test_allstar_binary_artifacts_contract": 3.1,
@@ -834,6 +835,16 @@
     "test_aibom_contract.AIBOMContractTest.test_no_secrets_detector": 0.0,
     "test_aibom_contract.AIBOMContractTest.test_spdx_required_and_relationship": 0.0,
     "test_aibom_contract.AIBOMContractTest.test_tamper_red": 0.0,
+    "test_aigc_labeling_contract.AIGCLabelingContractTest.test_committed_equals_live": 0.0,
+    "test_aigc_labeling_contract.AIGCLabelingContractTest.test_deterministic": 0.0,
+    "test_aigc_labeling_contract.AIGCLabelingContractTest.test_human_label_needs_approve": 0.0,
+    "test_aigc_labeling_contract.AIGCLabelingContractTest.test_label_bindings": 0.0,
+    "test_aigc_labeling_contract.AIGCLabelingContractTest.test_missing_label": 0.01,
+    "test_aigc_labeling_contract.AIGCLabelingContractTest.test_ref_out_of_bounds_red": 0.0,
+    "test_aigc_labeling_contract.AIGCLabelingContractTest.test_registry_and_check_green": 0.0,
+    "test_aigc_labeling_contract.AIGCLabelingContractTest.test_tampered_subject_red": 0.0,
+    "test_aigc_labeling_contract.AIGCLabelingContractTest.test_unlabeled_not_default_human": 0.0,
+    "test_aigc_labeling_contract.AIGCLabelingContractTest.test_wrong_model_red": 0.0,
     "test_alias_contract.AliasContractTest.test_alias_equals_render": 0.0,
     "test_alias_contract.AliasContractTest.test_alias_matches_contract": 0.0,
     "test_alias_contract.AliasContractTest.test_contract_catches_mutations": 0.02,
@@ -6439,5 +6450,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2180.0
+  "total_s": 2180.1
 }
