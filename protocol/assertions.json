@@ -1133,6 +1133,36 @@
       "message": "AI 证据链登记缺失或版本名不符（WP-40 判据依赖它）",
       "fix": "补/修 protocol/ai_evidence.json；再跑 test_ai_evidence_contract",
       "evidence": "test_ai_evidence_contract / conformance::modeling"
+    },
+    {
+      "id": "aibom-cdx",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "results/ai/aibom.cdx.json",
+        "key": "bomFormat",
+        "op": "equals",
+        "value": "CycloneDX"
+      },
+      "message": "CycloneDX 导出件缺失或格式名不符（WP-41 判据依赖它）",
+      "fix": "重跑 aibom_export.write；再跑 test_aibom_contract",
+      "evidence": "test_aibom_contract / conformance::modeling"
+    },
+    {
+      "id": "aibom-spdx",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "results/ai/aibom.spdx.json",
+        "key": "spdxVersion",
+        "op": "equals",
+        "value": "SPDX-2.3"
+      },
+      "message": "SPDX 导出件缺失或版本名不符（WP-41 判据依赖它）",
+      "fix": "重跑 aibom_export.write；再跑 test_aibom_contract",
+      "evidence": "test_aibom_contract / conformance::modeling"
     }
   ]
 }

@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1506,
+    "app": 1507,
     "entry": 26,
     "floor": 5,
     "prod": 1067,
-    "projection": 220,
+    "projection": 223,
     "support": 511,
-    "verify": 1437
+    "verify": 1439
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7925,6 +7925,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "WP-41 AIBOM 导出判据（CycloneDX AI-BOM + SPDX 风格清单）。",
+      "path": "desktop/tests/test_aibom_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "library/ALIAS 契约：转译表必须「生成器实时重算一致 + 小写键唯一 + 双镜像直链正确 + 标题列在场」。",
       "path": "desktop/tests/test_alias_contract.py",
       "role": "verify",
@@ -14471,6 +14477,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "NF-Final G4 WP-41 AIBOM/Model Card 导出登记：从 AI 证据链（模型卡/血缘/复核）导出 CycloneDX AI-BOM 与 SPDX 风格清单。纪律：确定性（固定时间戳/序列号由摘要派生）、必填字段闭合、引用闭合、无秘密；不引第三方运行时、不冒充官方认证。判据 desktop/tests/test_aibom_contract.py。",
+      "path": "protocol/aibom.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "断言表（数据化断言，机制借鉴 Schematron 的 patterns→rules→assertions）：把「能确定性判定的形状类断言」从 check 代码里搬出来，新增规则 = 加一行数据。边界写死：kind 是**封闭集**（见 kind_vocabulary），只做搬运与去重，不做表达力扩张，不自造 DSL；业务语义断言仍留在 check 代码里。每条断言必须有 fix（修复指引）。",
       "path": "protocol/assertions.json",
       "role": "verify",
@@ -15066,17 +15078,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "45b4386d391f1098ac716bc9b30d11ab84b72801751e3d2e066efe6e3f1631f9",
+  "root_digest": "a82151209c6f664f883f1dea1d74cfea828008c31fe0d4ed9de5131720cade37",
   "rule_counts": {
-    "R-app": 1506,
+    "R-app": 1507,
     "R-catch": 356,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 195,
+    "R-projection": 197,
     "R-support": 124,
-    "R-verify": 1305,
-    "auto:R-core": 311
+    "R-verify": 1307,
+    "auto:R-core": 312
   },
   "schema": "nf-role-coordinates/1"
 }

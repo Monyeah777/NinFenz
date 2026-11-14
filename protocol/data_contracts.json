@@ -1126,6 +1126,30 @@
         "test_ai_evidence_contract",
         "docs/ai-evidence.md"
       ]
+    },
+    {
+      "id": "aibom-cdx",
+      "artifact": "results/ai/aibom.cdx.json",
+      "quality_rule": "assertion:aibom-cdx",
+      "owner": "AIBOM 导出（core/aibom_export.py + test_aibom_contract）+ WP-41",
+      "status": "active",
+      "freshness": "AI 证据链/评测协议变化后重跑 write（committed==实时重算）",
+      "consumers": [
+        "test_aibom_contract",
+        "docs/aibom.md"
+      ]
+    },
+    {
+      "id": "aibom-spdx",
+      "artifact": "results/ai/aibom.spdx.json",
+      "quality_rule": "assertion:aibom-spdx",
+      "owner": "AIBOM 导出（core/aibom_export.py + test_aibom_contract）+ WP-41",
+      "status": "active",
+      "freshness": "AI 证据链/评测协议变化后重跑 write（committed==实时重算）",
+      "consumers": [
+        "test_aibom_contract",
+        "docs/aibom.md"
+      ]
     }
   ]
 }

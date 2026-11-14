@@ -1,0 +1,35 @@
+{
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "creationInfo": {
+    "created": "2026-11-15T00:00:00Z",
+    "creators": [
+      "Tool: nf-aibom-1"
+    ]
+  },
+  "dataLicense": "CC0-1.0",
+  "documentNamespace": "urn:nf:aibom:bf66f4d4-3b98-2f66-ae03-5989d4be286e",
+  "name": "nf-aibom-95287be99ef8",
+  "packages": [
+    {
+      "SPDXID": "SPDXRef-Package-model",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "95287be99ef87143be951e7d1adf5e67a3a3d9329e59e871d0b1550cd2f13a59"
+        }
+      ],
+      "downloadLocation": "NOASSERTION",
+      "name": "nf.sample.model",
+      "supplier": "Organization: local-sample",
+      "versionInfo": "1"
+    }
+  ],
+  "relationships": [
+    {
+      "relatedSpdxElement": "SPDXRef-Package-model",
+      "relationshipType": "DESCRIBES",
+      "spdxElementId": "SPDXRef-DOCUMENT"
+    }
+  ],
+  "spdxVersion": "SPDX-2.3"
+}

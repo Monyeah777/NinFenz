@@ -1,0 +1,75 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "nf:context:6dabf10513ce",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "6dabf10513ceab3147874df9c7c6f3c6b48340a9380902ff7eba337ca87fbc57"
+        }
+      ],
+      "name": "context-lineage",
+      "type": "data",
+      "version": "1"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "nf:model:95287be99ef8",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "95287be99ef87143be951e7d1adf5e67a3a3d9329e59e871d0b1550cd2f13a59"
+        }
+      ],
+      "name": "nf.sample.model",
+      "supplier": {
+        "name": "local-sample"
+      },
+      "type": "machine-learning-model",
+      "version": "1"
+    },
+    "timestamp": "2026-11-15T00:00:00Z",
+    "tools": [
+      {
+        "name": "nf-aibom",
+        "vendor": "ninfenz",
+        "version": "1"
+      }
+    ]
+  },
+  "properties": [
+    {
+      "name": "nf:model_digest",
+      "value": "95287be99ef87143be951e7d1adf5e67a3a3d9329e59e871d0b1550cd2f13a59"
+    },
+    {
+      "name": "nf:eval_protocol_digest",
+      "value": "bf0b88dcd43a22f4fe8fc2616451d4d578def2e2ab9a472a937d3a188feac0c1"
+    },
+    {
+      "name": "nf:lineage_head",
+      "value": "6dabf10513ceab3147874df9c7c6f3c6b48340a9380902ff7eba337ca87fbc57"
+    },
+    {
+      "name": "nf:lineage_digest",
+      "value": "503f21e3ae8e6d5acc65551e49e9ad84e133b8dfc0cabf93fb038615ff5f89f6"
+    },
+    {
+      "name": "nf:human_review_decision",
+      "value": "approve"
+    },
+    {
+      "name": "nf:human_review_subject_digest",
+      "value": "71c86e9898e7c7fd5bf96bab0a997d9a1f234b84e374cad2189e06f8608d0649"
+    },
+    {
+      "name": "nf:human_review_reviewer",
+      "value": "nf:local:reviewer"
+    }
+  ],
+  "serialNumber": "urn:uuid:634d4ec2-622d-1e3b-8628-ec612225545b",
+  "specVersion": "1.5",
+  "version": 1
+}

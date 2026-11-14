@@ -40,6 +40,11 @@
       "max_fn_cc": 42,
       "max_fn_lines": 69
     },
+    "desktop/src/core/aibom_export.py": {
+      "lines": 195,
+      "max_fn_cc": 32,
+      "max_fn_lines": 57
+    },
     "desktop/src/core/allowlist_expiry.py": {
       "lines": 50,
       "max_fn_cc": 8,
