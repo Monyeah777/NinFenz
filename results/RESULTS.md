@@ -19,6 +19,7 @@
 - [reverse/INVENTORY.md](reverse/INVENTORY.md)（§4A R0 仓库考古：真源/生成物/草稿三表 + 入口 + 失败面初判）
 - [reverse/CONTRACT_MAP.md](reverse/CONTRACT_MAP.md)（§4A R1 契约提取：显式 11 组 / 隐式 8 组 / 缺口 5 条；机读 `reverse/contracts.json`，判据 `test_reverse_contracts.py`）
 - [reverse/BEHAVIOR.md](reverse/BEHAVIOR.md)（§4A R2 行为重建：11 条行为流 9 documented + 2 gap、3 个状态机、exit 0/1/2 失败语义；机读 `reverse/behavior.json`，判据 `test_reverse_behavior.py`）
+- [reverse/COUPLING.md](reverse/COUPLING.md)（§4A R3 耦合与重复实现：300 模块/540 边/0 环/9 SDP、fan-in/out 热点、7 项重复裁定；机读 `reverse/coupling.json`，判据 `test_reverse_coupling.py` 实时重算图）
 - [ADR_MAP.md](ADR_MAP.md)（方案 §16.2 裁决 → `nf-adr/1` 登记投影：12 条映射、`plan_ref` 一对一、实施状态与缺口 WP）
 - [independence.json](independence.json)（生产/治理双平面边界报告：`protocol/independence.json` 65 个模块归属 + 295 个 core 模块静态闭包零跨界，check49 判据件）
 - [production/threat_vectors.json](production/threat_vectors.json)（NF-Final §8 威胁向量：六条信任边界 + STRIDE 8 行 + 失败矩阵 8 行，逐条绑定控制点/证据/状态；判据 `test_production_threat_vectors.py`）

@@ -14,7 +14,7 @@
       "issues": 0
     },
     "json-parse": {
-      "files": 1347,
+      "files": 1348,
       "issues": 0
     },
     "radon-cc": {
@@ -154,7 +154,7 @@
       "issues": 0
     },
     "syntax-python": {
-      "files": 1287,
+      "files": 1288,
       "issues": 0
     },
     "vulture": {
@@ -1175,7 +1175,7 @@
     "P2": 54,
     "P3": 37
   },
-  "fingerprint": "a5661cc5161877bc35d59af35fd1ccc4dca3fae26557c8d8003b6c3634db25a7",
+  "fingerprint": "2421e25f852db20044bb4f3e0c59f6427a7f0bcc7470fdfec9658df9aea353a5",
   "hotspots": [
     {
       "complexity": 99,
