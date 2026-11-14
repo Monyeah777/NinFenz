@@ -16,7 +16,7 @@ class QualityBaselineTest(unittest.TestCase):
     def test_repo_scan_clean(self):
         issues, stats = qb.scan(ROOT)
         self.assertEqual(issues, [])
-        self.assertEqual(stats["verify_version"], "v2.32")
+        self.assertEqual(stats["verify_version"], "v2.33")
         self.assertEqual(stats["checks"], qb.EXPECTED_CHECKS)
 
     def test_drift_detected_in_fake_repo(self):

@@ -37,14 +37,12 @@
 | 28 | 实体准入 fail-closed：结构 → issuer 在册 → type 被授权，未知一律拒绝且返回稳定 reason 码 | `desktop/src/core/trust/entity.py` | `test_trust_entity.py`（12 条：向量逐条 + 失败面 + 变异自证） | T0 | SUPPORTED |
 | 29 | claim bundle 构建/整包验证：RFC 6962 根 + 逐叶 proof + 覆盖/唯一性，且产物过冻结 schema | `desktop/src/core/trust/bundle.py` | `test_trust_bundle.py`（19 条：merkle 向量逐条 + 篡改矩阵） | T0 | SUPPORTED |
 | 30 | 流程步骤前向绑定：step 摘要含全部字段 + prev/seq 连续，删/改/重排可检测（本地重算边界如实声明） | `desktop/src/core/trust/process.py` | `test_trust_process.py`（20 条：process 向量逐条 + 篡改矩阵 + 就地重算边界） | T0 | SUPPORTED |
-
 | 31 | issuer↔keyid↔alg 注册表 fail-closed（未知/未来/过期/吊销即拒；retired 仅历史验签且轮换可寻址） | `protocol/trust/keys.schema.json` + `desktop/src/core/trust/keys.py` | `test_trust_keys.py`（18 条：结构/语义矩阵 + 生命周期 + 注册表口径验签 + 轮换 + CLI） | T1 | SUPPORTED（G2 WP-21） |
 | 32 | 外部锚可离线验并投影为 T2/T3 事实（rfc3161/STH/witness/git-commit；错目标/错信任根/坏签名必 invalid，缺 verifier 记 none） | `protocol/trust/anchor.schema.json` + `desktop/src/core/trust/anchor.py` | `test_trust_anchor_evidence.py`（17 条：本地 TSA 全链路 + witness 阈值 + STH + 篡改/错根/错摘要 + verify 接线） | T2（TSA）/T3 部分（witness 语句为本仓约定） | SUPPORTED（G2 WP-22） |
-
 | 33 | 链头/卡/事件签名语句绑定（nf-chain-head/1；错 kind/digest 必拒；registry 吊销/过期则 T1 失守） | `protocol/trust/chain-head.schema.json` + `desktop/src/core/trust/signature.py` | `test_trust_signature.py`（14 条：语句绑定 + 生命周期 + 篡改 + 真签名+真 TSA 端到端 T2） | T1 | SUPPORTED（G2 WP-23） |
-
 | 34 | prompt/context 血缘绑定（上下文替换/前缀篡改/段重排/跨会话复用可检测；AI 证据同时绑模型身份与血缘摘要） | `protocol/trust/context-lineage.schema.json` + `desktop/src/core/trust/context_lineage.py`（逐段 digest/prev 链 + lineage_digest + identity_digest 绑定） | `test_trust_context_lineage.py`（12 条：构建/篡改矩阵/模型身份与 prompt 绑定/三方绑定/CLI；另 identity 摘要排除 prompt/notes 的正例） | T1 | SUPPORTED（G3 WP-32） |
+| 35 | T3 见证组合（签名 + RFC3161 + STH + witness 阈值同时成立才达 T3；阈值不足/缺公共锚不得高报） | `desktop/src/core/trust/anchor.py`（STH/witness 语句 + 阈值）+ `desktop/src/core/trust/verify.py`（事实投影）+ `docs/trust/WITNESS_SPEC.md` | `test_trust_t3.py`（5 条：真 TSA 端到端 T3、T4 不声称、阈值不足、STH/TSA 篡改必红） | T3（公共锚除外） | SUPPORTED（G4 WP-41） |
 
-**本轮判定**：`UNSUPPORTED` = 0；`TODO` = 0；`PARTIAL` = 1（#21：Python↔Node.js 逐字节 parity 已建，.NET 引擎线因本机无 SDK 未完成，环境事实见 BASELINE ENV-01）；其余 #13/#15/#16/#18/#19/#32/#33/#34 均 SUPPORTED，不构成文档过度声明。
+**本轮判定**：`UNSUPPORTED` = 0；`TODO` = 0；`PARTIAL` = 1（#21：Python↔Node.js 逐字节 parity 已建，.NET 引擎线因本机无 SDK 未完成，环境事实见 BASELINE ENV-01）；其余 #13/#15/#16/#18/#19/#32/#33/#34/#35 均 SUPPORTED，不构成文档过度声明。
 
 *维护纪律：新增 claim 必须同时补代码锚点与测试，再改状态；不得先写 SUPPORTED 后补测试。*

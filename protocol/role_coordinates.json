@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1468,
+    "app": 1469,
     "entry": 26,
     "floor": 5,
     "prod": 1057,
     "projection": 167,
-    "support": 480,
-    "verify": 1349
+    "support": 481,
+    "verify": 1351
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -11255,6 +11255,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "check47 判据自身判据：真仓全绿 + 变异必红（T3 组合 / T4 不声称 / parity 独立）。",
+      "path": "desktop/tests/test_trust_gate47.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "trust.human_review 判据：签名人类复核 + PENDING≠通过 + registry 生命周期（FR-A4-05）。",
       "path": "desktop/tests/test_trust_human_review.py",
       "role": "verify",
@@ -11299,6 +11305,12 @@
     {
       "function": "trust.signature 判据：链头语句绑定 + DSSE 签名 + registry 生命周期 + 端到端 T2。",
       "path": "desktop/tests/test_trust_signature.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "端到端 T3 判据（G4）：真 DSSE 签名 + 真 RFC3161（本地 openssl TSA）+ STH + witness 阈值。",
+      "path": "desktop/tests/test_trust_t3.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -14478,16 +14490,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "8746d8bc8c3f819a872f272721a14a9f45d9460cde1cc03aca8612dd0750894c",
+  "root_digest": "b81274317010b5232640b94dc7b9b401b347ddd090e1331a9fa81a73fb7c20fe",
   "rule_counts": {
-    "R-app": 1468,
-    "R-catch": 328,
+    "R-app": 1469,
+    "R-catch": 329,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 147,
     "R-support": 124,
-    "R-verify": 1223,
+    "R-verify": 1225,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

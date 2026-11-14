@@ -3872,6 +3872,15 @@ CHECK_GUIDE = {
           "再按失败面修 schema/签名语句/生命周期/等级判定。示例：错摘要签名未被拒 → "
           "修 signature.verify_head；吊销 key 仍通过 → 修 keys 生命周期；T4 被标 ok → "
           "删该声称。",
+    "47": "47缺什么：trust 见证面不成立（T3 组合未达成 / "
+          "witness 阈值失效 / T4 被声称（公共锚未建）/ "
+          "parity 证据缺失或非独立）。补什么：跑 core.tr"
+          "ust.gate_g4.scan 看逐条；T3 需 sign"
+          "ature+time_token+STH+witness 阈"
+          "值同时成立；T4 只准报缺项。示例：阈值不足仍达 T3 → "
+          "修 anchor.verify_anchor_set 的 t"
+          "hreshold 判定；parity 引用仓内实现 → 重写"
+          "独立复算。",
 }
 
 def _cmd_preset(args):

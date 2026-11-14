@@ -2441,6 +2441,10 @@
       "source": "none"
     },
     {
+      "module": "test_trust_gate47.py",
+      "source": "none"
+    },
+    {
       "module": "test_trust_human_review.py",
       "source": "negative_assertion"
     },
@@ -2471,6 +2475,10 @@
     {
       "module": "test_trust_signature.py",
       "source": "negative_assertion"
+    },
+    {
+      "module": "test_trust_t3.py",
+      "source": "naming"
     },
     {
       "module": "test_trust_threat_model_doc_contract.py",
@@ -2637,10 +2645,10 @@
       "source": "negative_assertion"
     }
   ],
-  "modules": 659,
+  "modules": 661,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
-  "suspect": 172,
+  "suspect": 173,
   "with_evidence": 345,
-  "without_evidence": 142
+  "without_evidence": 143
 }

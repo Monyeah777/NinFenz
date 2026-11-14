@@ -9,7 +9,7 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:7ce78a62c4b91ed63350e67400618fe1729b6e927026ebaf7cbf45fb8eaa3431
+  - protocol/code_metrics_baseline.json:12f0e486a166866890af9a8ea6f7c378d59d46b8cc3d22501014cd0f0f095cbe
 ---
 > 重审（2026-11-14）：WP-15 check45 接线与 G1 收口（机械重绑）
 

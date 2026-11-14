@@ -23,11 +23,11 @@ NF 的门禁是一份 bash 脚本，check 条数与声明基线**取自仓库真
 
 | 项 | 值 |
 |---|---|
-| 卡片总数 | 44（= verify.sh 的 check 函数数，实测） |
-| 门禁脚本 | 3280 行（verify.sh 实测） |
-| 声明基线 | check1-44 · PASS=79（源自 quality_baseline.EXPECTED_*） |
-| 段位分布 | 段A 官方核心 6 · 段B 社区包 5 · 段C 代码层 29 · 段D 供应链 4 |
-| 断言种类 | 真实单测 6 条 · 结构断言 38 条 |
+| 卡片总数 | 45（= verify.sh 的 check 函数数，实测） |
+| 门禁脚本 | 3312 行（verify.sh 实测） |
+| 声明基线 | check1-45 · PASS=81（源自 quality_baseline.EXPECTED_*） |
+| 段位分布 | 段A 官方核心 6 · 段B 社区包 5 · 段C 代码层 29 · 段D 供应链 5 |
+| 断言种类 | 真实单测 6 条 · 结构断言 39 条 |
 | 复跑入口 | `bash verify.sh`（全量）；单条见各卡片的「复跑命令」 |
 ## 卡片索引
 
@@ -77,6 +77,7 @@ NF 的门禁是一份 bash 脚本，check 条数与声明基线**取自仓库真
 | 42 | 段D | == [42/段D] 不可伪造 provenance 门禁（SLSA L3 Non-falsifiable：验签在生成进程之外 + 篡改必红）== | 结构断言 |
 | 45 | 段D | == [45/段D] Trust 证据面门禁（G1：bundle 守恒 + 单 claim + splice + prev 链 + 等级判定，对冻结向量复算）== | 结构断言 |
 | 46 | 段D | == [46/段D] Trust 证据链门禁（G2：DSSE + issuer registry + 链头签名 + 锚 组合判定）== | 结构断言 |
+| 47 | 段D | == [47/段D] Trust 见证面门禁（G4：T3 组合判定 + parity 证据在位 + T4 不得声称）== | 结构断言 |
 ---
 
 ## 逐条卡片

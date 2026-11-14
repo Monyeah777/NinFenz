@@ -8,7 +8,7 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/workloop.py:3ee94f2c11939abba5507741c6b9b4dae8e8cab77c3bda38419678e31e097056
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
-  - scripts/nf.py:ab7c78d75ad9482ab2d766353186a20cf5a9559c95b59b690c6dfb757cdf4513
+  - scripts/nf.py:4b065db63fb34f89faf545c3d91a0f5c76facedf18c3427353312461da8f0b92
   - scripts/check_interop_schemas.py:f9c1add0ee80fb23a3913e32482027e9a4049c5ce70cb35b2b1be4afa075d091
   - docs/interop.md:9512d9614028f8deae79e874d840e50937c3e13c4fda301394e3286a9d54b23f
   - desktop/tests/test_interop_export.py:2308d682b075fef25982c6577c67d41714980c94db1f4f538fee26ec7239a847

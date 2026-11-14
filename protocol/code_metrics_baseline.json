@@ -481,7 +481,7 @@
       "max_fn_lines": 30
     },
     "desktop/src/core/gate_engine.py": {
-      "lines": 640,
+      "lines": 641,
       "max_fn_cc": 20,
       "max_fn_lines": 80
     },
@@ -1656,7 +1656,7 @@
       "max_fn_lines": 26
     },
     "scripts/nf.py": {
-      "lines": 9873,
+      "lines": 9882,
       "max_fn_cc": 132,
       "max_fn_lines": 443
     },

@@ -6,11 +6,11 @@ scope: 作者澄清「让这些模型替我干活，来构建 NF」——把决�
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - verify.sh:668f325fa342e75ed709b5a3a62694cccedff23099143c8a52c47845a5f958cf
+  - verify.sh:6d3bc479378fca6c424603c7cb0c125ef7d0c9bbf3a31a57e780876d356aa794
   - protocol/decision_layer.json:9330d4057f07647d67f15daa6f37c84913834b7eed65f4e360bf5c7c413e5e06
   - desktop/src/core/workloop.py:3ee94f2c11939abba5507741c6b9b4dae8e8cab77c3bda38419678e31e097056
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
-  - scripts/nf.py:ab7c78d75ad9482ab2d766353186a20cf5a9559c95b59b690c6dfb757cdf4513
+  - scripts/nf.py:4b065db63fb34f89faf545c3d91a0f5c76facedf18c3427353312461da8f0b92
   - desktop/tests/test_decision_layer.py:551419122f09c1b77f73e7724919f67698bd6d939c3d556d9c8ef98274a76257
   - docs/decision-layer.md:cd3a254de738ece7c8f07db36904c74484e4622c58f688a3973c8998b441628c
 

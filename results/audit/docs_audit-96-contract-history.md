@@ -9,7 +9,7 @@ subjects:
   - desktop/src/core/contract_history.py:e452d6d8a0d9849dece08210e7af2acbf554440e8871f8d656f745f533d06646
   - desktop/src/core/contract_text.py:01b784e63dd19425b3609ae3792b6c8d9f40366acb5806f71d10759c96de8fd6
   - desktop/src/core/knowledge_sig.py:06409878244907e1135846a71aae76e5d66303534a7e611b8870a1edd307c35e
-  - scripts/nf.py:ab7c78d75ad9482ab2d766353186a20cf5a9559c95b59b690c6dfb757cdf4513
+  - scripts/nf.py:4b065db63fb34f89faf545c3d91a0f5c76facedf18c3427353312461da8f0b92
   - desktop/tests/test_knowledge_sig.py:4705091a139b4fc4da9a61bc816e30eeec3221688f3d923e43afc3b11609c17e
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - docs/迁移指南-基于nf-sig-diff.md:02115fdf6e19c01142bc8f2561613ca421318db755769dedbd11498b6149c7b8

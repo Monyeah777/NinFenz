@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # ============================================================
 # NinFenz verify.sh —— 两段式验收门禁（07 §7 可执行化）
-# 版本 : v2.32  配套 : 数字资产契约层 check40（数据/代码/脚本三面；真源 protocol/asset_contracts.json）+ 07_官方核心出厂与社区预设导航.md §7（两级结构终验）+ 08_社区扩展规划与验收方案.md T5 A5（资产三方对账）+ 09_v0.6.0_协议中转站方案（check12 代码层门禁 + check13 协议版本一致性/迁移完整性）+ 10_v0.7.0_自定义协议方案（check14 社区协议登记门禁）+ 11_v0.8.0_自定义模块组合方案（check15 组合引用门禁）+ 12_v1.0.0_自定义模块组合方案（check16 契约仲裁门禁）+ 16_v1.4.0_质量治理闭环方案（check17 质量治理门）+ 17_v2.0.0_导出层CCV3方案（check18 导出契约门）+ 33_v2.2.0_外部吸收首波方案（check19 导出产物 schema 合规 + check20 文档完整性门禁 + check21 registry 引用图闭合门禁）+ 35_v2.4.0_外部吸收大包方案（check22 导出物规范体检门禁 + 40 总纲 v2.7 S2 check23 资产供应链闭合门禁 + 40 总纲 v2.8 波B S4-S7 check24 模块生命周期门禁 + 41_v2.8.0_波C 质量编译深化规划（check25 协议知识签名可复现门禁 + 41_v2.8.0_波C 质量编译深化规划（check26 语义矛盾扫描门禁 + 42_顶尖质量纵深工程规划（check27 架构纯度体检门禁 + 43_协议层顶尖化工程规划（check28 协议层 IDL schema + check29 Conformance 分级 + check30 扩展策略/bump 迁移 + check31 生成物 golden）+ 终端线 check39（端壳退役零回潮 + nf shell 终端入口在场 + 菜单无死命令 + 输出确定）
+# 版本 : v2.33  配套 : 数字资产契约层 check40（数据/代码/脚本三面；真源 protocol/asset_contracts.json）+ 07_官方核心出厂与社区预设导航.md §7（两级结构终验）+ 08_社区扩展规划与验收方案.md T5 A5（资产三方对账）+ 09_v0.6.0_协议中转站方案（check12 代码层门禁 + check13 协议版本一致性/迁移完整性）+ 10_v0.7.0_自定义协议方案（check14 社区协议登记门禁）+ 11_v0.8.0_自定义模块组合方案（check15 组合引用门禁）+ 12_v1.0.0_自定义模块组合方案（check16 契约仲裁门禁）+ 16_v1.4.0_质量治理闭环方案（check17 质量治理门）+ 17_v2.0.0_导出层CCV3方案（check18 导出契约门）+ 33_v2.2.0_外部吸收首波方案（check19 导出产物 schema 合规 + check20 文档完整性门禁 + check21 registry 引用图闭合门禁）+ 35_v2.4.0_外部吸收大包方案（check22 导出物规范体检门禁 + 40 总纲 v2.7 S2 check23 资产供应链闭合门禁 + 40 总纲 v2.8 波B S4-S7 check24 模块生命周期门禁 + 41_v2.8.0_波C 质量编译深化规划（check25 协议知识签名可复现门禁 + 41_v2.8.0_波C 质量编译深化规划（check26 语义矛盾扫描门禁 + 42_顶尖质量纵深工程规划（check27 架构纯度体检门禁 + 43_协议层顶尖化工程规划（check28 协议层 IDL schema + check29 Conformance 分级 + check30 扩展策略/bump 迁移 + check31 生成物 golden）+ 终端线 check39（端壳退役零回潮 + nf shell 终端入口在场 + 菜单无死命令 + 输出确定）
 #        G2 扩展 check46 = Trust 证据链（DSSE + issuer registry + 链头签名 + 锚 组合判定；
 #        冻结 schema/签名语句/生命周期/等级判定任一处断裂即 FAIL；不联网、不依赖 openssl）。
 #        G1 扩展 check45 = Trust 证据面（对 results/trust/trust_vectors.json 冻结向量复算：bundle 守恒 /
-#        单 claim / splice / prev 链 / 等级判定；任一漂移即 FAIL；check47-48 预留）。
+#        单 claim / splice / prev 链 / 等级判定；任一漂移即 FAIL；check48 预留）。
 #        46 吸收七面 check33：MCP dual-era 版本对齐（2026-07-28/2025-11-25 + server/discover）/
 #        内容外挂签名 attestation / 基线相对回归评分 / 机械修复 + LSP / 正文 lint / 图书馆许可证门 / 遥测 semconv
 #        图书馆面 check34：条目 frontmatter 真源（OKF 借鉴）/ INDEX·ALIAS 投影一致（I5）/ 生命周期 /
@@ -3180,6 +3180,37 @@ PYEOF
   fi
 }
 
+check47(){
+  echo '== [47/段D] Trust 见证面门禁（G4：T3 组合判定 + parity 证据在位 + T4 不得声称）=='
+  local err=0
+  if [ -n "$PY3" ]; then
+    if "$PY3" - <<'PYEOF' >"$NFL_TMP"/nf_check47.log 2>&1
+import os, sys
+sys.path.insert(0, os.path.join('desktop', 'src'))
+try:
+    from core.trust import gate_g4
+except Exception as exc:
+    print('import 失败：%s' % exc)
+    sys.exit(1)
+issues, stats = gate_g4.scan('.')
+for i in issues:
+    print('[FAIL] %s' % i)
+print('trust 见证面统计：T3=%(t3)s · T4=%(t4)s · parity 族=%(parity_families)s' % stats)
+sys.exit(1 if issues else 0)
+PYEOF
+    then
+      ok 'Trust 见证面门禁全绿（check47：T3 组合可达成 / T4 不声称 / parity 证据在位）'
+    else
+      no "trust 见证面校验异常——$(tail -2 \"$NFL_TMP\"/nf_check47.log | tr '\n' ' ')"
+      err=1
+    fi
+  else
+    wn 'python3 不在 PATH（跳过 check47 trust 见证面门禁）'
+  fi
+  if [ "$err" -eq 0 ]; then ok 'Trust 见证面门禁全绿（check47：G4 组合判据 0 失败）'
+  fi
+}
+
 # ---- P3b：判定缓存（输入内容寻址；只回放**绿**判定）----
 # key 由 scripts/verify_cache.py 按 HEAD + 工作树差异 + 未跟踪件 + 门禁代码 + 运行时 + 档位算出；
 # 输入没变就回放上次摘要（秒级）。红判定**不缓存**（红是瞬态），--fast/--no-cache 一律重算。
@@ -3194,12 +3225,12 @@ fi
 
 # ================= 主执行体（三段式） =================
 echo '=================================================='
-echo ' NinFenz 三段式验收门禁  v2.32（对齐 07 §7 + 08 T5 A5 资产对账 + 09 v0.6.0 check12 代码层 + check13 迁移完整性 + 10 v0.7.0 check14 社区协议登记门禁 + 11 v0.8.0 check15 组合引用门禁 + 12 v1.0.0 check16 契约仲裁门禁 + 16 v1.4.0 check17 质量治理门 + 17 v2.0.0 check18 导出契约门 + 33 v2.2.0 check19-21 外部吸收首波 + 35 v2.4.0 check22 规范体检 + 终端线 check39 端壳零回潮/终端入口；分层治理 23 方案：L3 端壳退役移出，门禁默认锁 L0-L2）'
+echo ' NinFenz 三段式验收门禁  v2.33（对齐 07 §7 + 08 T5 A5 资产对账 + 09 v0.6.0 check12 代码层 + check13 迁移完整性 + 10 v0.7.0 check14 社区协议登记门禁 + 11 v0.8.0 check15 组合引用门禁 + 12 v1.0.0 check16 契约仲裁门禁 + 16 v1.4.0 check17 质量治理门 + 17 v2.0.0 check18 导出契约门 + 33 v2.2.0 check19-21 外部吸收首波 + 35 v2.4.0 check22 规范体检 + 终端线 check39 端壳零回潮/终端入口；分层治理 23 方案：L3 端壳退役移出，门禁默认锁 L0-L2）'
 echo '=================================================='
 if [ "$NF_TIER" = "full" ]; then
-  echo ' 档位：full（44 条静态 check + 全量测试；发布/推送结论用这一档）'
+  echo ' 档位：full（45 条静态 check + 全量测试；发布/推送结论用这一档）'
 else
-  echo ' 档位：quick（44 条静态 check + 受影响测试；不是发布结论——发布用 bash verify.sh --full）'
+  echo ' 档位：quick（45 条静态 check + 受影响测试；不是发布结论——发布用 bash verify.sh --full）'
 fi
 echo '—— 段 A：官方核心出厂（无 community 亦须通过）——'
 check1; check2; check3; check4; check5; check6
@@ -3241,11 +3272,12 @@ check37
 check38
 check39
 check40
-echo '—— 段 D：供应链与 Trust 证据面（check41-42 供应链 + check45 G1 证据面 + check46 G2 证据链）——'
+echo '—— 段 D：供应链与 Trust 证据面（check41-42 供应链 + check45 G1 + check46 G2 + check47 G4）——'
 check41
 check42
 check45
 check46
+check47
 echo '=================================================='
 echo "结果统计: PASS=$PASS  WARN=$WARN  FAIL=$FAIL"
 # ---- 开发快车道（--fast · 显式 opt-in · 不改变上面的任何一条判定）----
@@ -3267,7 +3299,7 @@ if [ "$FAIL" -gt 0 ]; then
   echo '>>> 存在 FAIL = 协议事故：请回滚本次修改，修正后重新运行验收 <<<'
   # 指引面接线（2026-09-30）：每条 check 都有「缺什么 / 补什么」条目（nf explain 1-39），
   # 但此前从不把用户指过去——红的时候只有「请回滚」，没有下一步。这里补一句可执行的指引。
-  echo "    修复指引：python scripts/nf.py explain <check 号>（逐条：缺什么 / 补什么 / 示例；全量见 python scripts/nf.py explain all（覆盖 check1-42/45/46））"
+  echo "    修复指引：python scripts/nf.py explain <check 号>（逐条：缺什么 / 补什么 / 示例；全量见 python scripts/nf.py explain all（覆盖 check1-42/45/46/47））"
   exit 1
 else
   if [ "$NF_CACHE" -eq 1 ] && [ "$NF_FAST" -eq 0 ] && [ -n "$_CACHE_KEY" ] && [ -n "$PY3" ]; then
