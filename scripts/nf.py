@@ -2158,6 +2158,8 @@ def _add_parser_governance(sub):
     wctx = wsub.add_parser("context", help="打包上下文（带 citations，受预算限制）")
     wctx.add_argument("ids", nargs="+")
     wctx.add_argument("--budget", type=int, default=1200)
+    wctx.add_argument("--role", default="",
+                      help="打包角色（author/reviewer/governance；缺省=轻量上下文）")
 
 
 def _add_parser_terminal(sub):
@@ -9688,6 +9690,20 @@ def _cmd_wiki(args) -> int:
         print(_json.dumps(wc.related(args.id), ensure_ascii=False, indent=2, sort_keys=True))
         return 0
     if cmd == "context":
+        if getattr(args, "role", ""):
+            from core import context_packer as cp
+            try:
+                pack = cp.pack_ids(args.ids, ".", args.budget, args.role)
+            except cp.PackError as exc:
+                print("✗ %s：%s" % (exc.code, exc.message), file=sys.stderr)
+                return 2
+            issues = cp.validate_pack(pack)
+            if issues:
+                for item in issues[:5]:
+                    print("  ✗ %s" % item, file=sys.stderr)
+                return 1
+            print(cp.render(pack), end="")
+            return 0
         print(_json.dumps(wc.context(args.ids, args.budget), ensure_ascii=False, indent=2,
                           sort_keys=True))
         return 0

@@ -128,6 +128,7 @@
     "test_conformance_run": 0.1,
     "test_conformance_scan": 28.5,
     "test_content_face": 0.3,
+    "test_context_packer_contract": 2.5,
     "test_contract_pin": 0.1,
     "test_contributing_contract": 0.2,
     "test_core": 0.4,
@@ -1775,6 +1776,15 @@
     "test_content_face.FrameAndPayloadParityTest.test_list_core_files_is_the_live_core_listing": 0.0,
     "test_content_face.FrameAndPayloadParityTest.test_payload_digest_matches_on_crlf_text": 0.0,
     "test_content_face.FrameAndPayloadParityTest.test_payload_digest_matches_on_real_files": 0.0,
+    "test_context_packer_contract.ContextPackerContractTest.test_budget_enforced": 0.0,
+    "test_context_packer_contract.ContextPackerContractTest.test_budget_too_small_rejected": 0.0,
+    "test_context_packer_contract.ContextPackerContractTest.test_cli_role_pack_and_reject": 2.36,
+    "test_context_packer_contract.ContextPackerContractTest.test_deterministic": 0.0,
+    "test_context_packer_contract.ContextPackerContractTest.test_injection_detected_and_sanitized": 0.0,
+    "test_context_packer_contract.ContextPackerContractTest.test_pack_contract_valid": 0.0,
+    "test_context_packer_contract.ContextPackerContractTest.test_role_escalation_rejected": 0.0,
+    "test_context_packer_contract.ContextPackerContractTest.test_role_isolation": 0.0,
+    "test_context_packer_contract.ContextPackerContractTest.test_unknown_page_rejected": 0.0,
     "test_contract_pin.Test.test_count_and_field_drift": 0.0,
     "test_contract_pin.Test.test_pin_and_verify": 0.0,
     "test_contributing_contract.ContributingContractTest.test_backtick_paths_resolve": 0.03,
@@ -6304,5 +6314,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2170.2
+  "total_s": 2172.7
 }
