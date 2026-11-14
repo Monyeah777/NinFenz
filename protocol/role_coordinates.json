@@ -4,9 +4,9 @@
     "entry": 26,
     "floor": 5,
     "prod": 1067,
-    "projection": 212,
+    "projection": 215,
     "support": 511,
-    "verify": 1432
+    "verify": 1433
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9365,6 +9365,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "WP-33 治理报告/审计包判据（可复算 + 诚实等级 + OPEN 有 owner）。",
+      "path": "desktop/tests/test_governance_report_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "",
       "path": "desktop/tests/test_grain_units.py",
       "role": "verify",
@@ -15036,17 +15042,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "045a35d941cdc94cfb072c03a954bf247d01d764c5dc94684d880a2ca89c6aba",
+  "root_digest": "c72c52a019370839f346d694e458d6f16ccab687b710896afd7d9cfdcd6841d8",
   "rule_counts": {
     "R-app": 1504,
     "R-catch": 356,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 188,
+    "R-projection": 190,
     "R-support": 124,
-    "R-verify": 1301,
-    "auto:R-core": 309
+    "R-verify": 1302,
+    "auto:R-core": 310
   },
   "schema": "nf-role-coordinates/1"
 }

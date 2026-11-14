@@ -1,0 +1,65 @@
+{
+  "checks": [
+    {
+      "desc": "适配器注册表自检",
+      "evidence": "protocol/governance_adapters.json",
+      "id": "AC-01",
+      "ok": true
+    },
+    {
+      "desc": "契约生命周期注册表自检",
+      "evidence": "protocol/contract_lifecycle.json",
+      "id": "AC-02",
+      "ok": true
+    },
+    {
+      "desc": "附件模式注册表自检",
+      "evidence": "protocol/attachment.json",
+      "id": "AC-03",
+      "ok": true
+    },
+    {
+      "desc": "SELF_AUDIT P0=0",
+      "evidence": "results/trust/SELF_AUDIT.json",
+      "id": "AC-04",
+      "ok": true
+    },
+    {
+      "desc": "生产/治理边界跨界=0",
+      "evidence": "results/independence.json",
+      "id": "AC-05",
+      "ok": true
+    },
+    {
+      "desc": "T3/T4 未冒称（缺适配器即不可达）",
+      "evidence": "protocol/governance_adapters.json",
+      "id": "AC-06",
+      "ok": true
+    },
+    {
+      "desc": "附件独立性（三模式纯函数）",
+      "evidence": "protocol/attachment.json",
+      "id": "AC-07",
+      "ok": true
+    }
+  ],
+  "note": "审计包只含 check/证据/结论；不替代外部审计",
+  "open_items": [
+    {
+      "id": "OPEN-EXTERNAL",
+      "owner": "maintainers",
+      "text": "公共日志提交/外部见证/第三方合规审核属外部操作"
+    },
+    {
+      "id": "OPEN-TOOLS",
+      "owner": "maintainers",
+      "text": "cosign 不在场 → 签名外部核验不可用（最高 T1 可达）"
+    }
+  ],
+  "schema": "nf-gov-audit/1",
+  "summary": {
+    "fail": 0,
+    "ok": 7,
+    "total": 7
+  }
+}

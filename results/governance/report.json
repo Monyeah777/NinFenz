@@ -1,0 +1,119 @@
+{
+  "adapters": {
+    "A-01": {
+      "declared": "available",
+      "kind": "attestation",
+      "live": "available",
+      "standard": "in-toto / DSSE"
+    },
+    "A-02": {
+      "declared": "blocked",
+      "kind": "signature",
+      "live": "blocked",
+      "standard": "Sigstore / cosign"
+    },
+    "A-03": {
+      "declared": "external-open",
+      "kind": "timestamp",
+      "live": "external-open",
+      "standard": "RFC3161 TSA"
+    },
+    "A-04": {
+      "declared": "external-open",
+      "kind": "transparency",
+      "live": "external-open",
+      "standard": "透明日志（Rekor / public anchor）"
+    }
+  },
+  "attachment_modes": {
+    "none": {
+      "blocking": false,
+      "min_level": "",
+      "records_observation": false
+    },
+    "observe": {
+      "blocking": false,
+      "min_level": "",
+      "records_observation": true
+    },
+    "require": {
+      "blocking": true,
+      "min_level": "T1",
+      "records_observation": true
+    }
+  },
+  "claims_boundary": [
+    "报告只复算已登记事实；T3/T4 未达即写 missing，不冒充",
+    "外部标准不作质量背书；外部 OPEN 带 owner 不静默"
+  ],
+  "contract_states": [
+    "active",
+    "deprecated",
+    "draft",
+    "retired"
+  ],
+  "independence": {
+    "forbidden_edges": 0,
+    "ok": true
+  },
+  "levels": {
+    "T0": {
+      "achievable": "T1",
+      "exit_code": 0,
+      "missing": [],
+      "ok": true
+    },
+    "T1": {
+      "achievable": "T1",
+      "exit_code": 0,
+      "missing": [],
+      "ok": true
+    },
+    "T2": {
+      "achievable": "T1",
+      "exit_code": 2,
+      "missing": [
+        "A-03"
+      ],
+      "ok": false
+    },
+    "T3": {
+      "achievable": "T1",
+      "exit_code": 2,
+      "missing": [
+        "A-02",
+        "A-03",
+        "A-04"
+      ],
+      "ok": false
+    },
+    "T4": {
+      "achievable": "T1",
+      "exit_code": 2,
+      "missing": [
+        "A-02",
+        "A-03",
+        "A-04"
+      ],
+      "ok": false
+    }
+  },
+  "note": "确定性报告（无时间戳）；committed == 实时重算由 check51 断言",
+  "open_items": [
+    {
+      "id": "OPEN-EXTERNAL",
+      "owner": "maintainers",
+      "text": "公共日志提交/外部见证/第三方合规审核属外部操作"
+    },
+    {
+      "id": "OPEN-TOOLS",
+      "owner": "maintainers",
+      "text": "cosign 不在场 → 签名外部核验不可用（最高 T1 可达）"
+    }
+  ],
+  "schema": "nf-gov-report/1",
+  "self_audit": {
+    "findings": 4,
+    "p0": 0
+  }
+}

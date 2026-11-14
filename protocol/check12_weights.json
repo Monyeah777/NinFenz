@@ -258,6 +258,7 @@
     "test_governance_adapters_contract": 0.2,
     "test_governance_docs": 0.2,
     "test_governance_faces": 14.4,
+    "test_governance_report_contract": 0.2,
     "test_grain_units": 0.2,
     "test_graph_health": 0.1,
     "test_grounding": 0.1,
@@ -2800,6 +2801,12 @@
     "test_governance_faces.TestRfc.test_date_must_match_last_updated": 0.01,
     "test_governance_faces.TestRfc.test_missing_head_and_duplicate_id": 0.01,
     "test_governance_faces.TestRfc.test_supersede_chain_must_resolve": 0.01,
+    "test_governance_report_contract.GovernanceReportContractTest.test_audit_all_green": 0.0,
+    "test_governance_report_contract.GovernanceReportContractTest.test_check_green": 0.0,
+    "test_governance_report_contract.GovernanceReportContractTest.test_committed_equals_live": 0.0,
+    "test_governance_report_contract.GovernanceReportContractTest.test_levels_honest": 0.0,
+    "test_governance_report_contract.GovernanceReportContractTest.test_mutations_red": 0.02,
+    "test_governance_report_contract.GovernanceReportContractTest.test_open_items_have_owner": 0.0,
     "test_grain_units.Test.test_ok_and_clock_vocab": 0.0,
     "test_grain_units.Test.test_required_fields": 0.0,
     "test_graph_health.Test.test_articulation": 0.0,
@@ -6396,5 +6403,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2179.1
+  "total_s": 2179.3
 }

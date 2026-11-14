@@ -118,7 +118,7 @@ fi
 #   运行时 + 档位）；输入没变直接回放摘要（秒级）。--no-cache 或 NF_VERIFY_CACHE=0 关掉。
 # 任何其它参数 = 用法错误（exit 2），以免"看上去像传了子集其实仍在全量"这类静默误读。
 # 矩阵分片（CI，2026-10-18）：`--tests-only --shard i/n` 只跑测试的第 i/n 片；
-# `--checks-only` 只跑 50 条静态 check（测试交给矩阵）。两者由 CI 组合成一次完整门禁：
+# `--checks-only` 只跑 51 条静态 check（测试交给矩阵）。两者由 CI 组合成一次完整门禁：
 # 静态 1 台 + 测试 n 台并行 ⇒ 全量墙钟从"一台机器的 ~600 s"降到"n 台各自 ~100 s"。
 NF_FAST=0; NF_BASE=''; NF_TIER='quick'; NF_CACHE="${NF_VERIFY_CACHE:-1}"
 NF_CHECKS_ONLY=0; NF_TESTS_ONLY=0; NF_SHARD=''
@@ -3385,6 +3385,40 @@ PYEOF
   return "$err"
 }
 
+check51(){
+  echo '== [51/段D] 治理报告/审计包门禁（G3：可复算 + 诚实等级 + OPEN 有 owner）=='
+  local err=0
+  if [ -n "$PY3" ]; then
+    if "$PY3" - <<'PYEOF' >"$NFL_TMP"/nf_check51.log 2>&1
+import os, sys
+sys.path.insert(0, os.path.join('desktop', 'src'))
+from core import governance_report as gr
+issues = gr.check('.')
+for item in issues:
+    print('[FAIL] %s' % item)
+doc = gr.build('.')
+rep = doc['report']
+achievable = rep['levels']['T4']['achievable']
+print('治理报告统计：audit=%s/%s · T4 achievable=%s · open=%d'
+      % (doc['audit']['summary']['ok'], doc['audit']['summary']['total'],
+         achievable, len(rep['open_items'])))
+sys.exit(1 if issues else 0)
+PYEOF
+    then
+      ok '治理报告/审计包全绿（check51：committed==live + 审计项 7/7 + OPEN 有 owner）'
+    else
+      no "治理报告异常——$(tail -3 "$NFL_TMP"/nf_check51.log | tr '
+' ' ')"
+      err=1
+    fi
+  else
+    wn 'python3 不在 PATH（跳过 check51 治理报告门禁）'
+  fi
+  if [ "$err" -eq 0 ]; then ok '治理等级诚实（check51：T3/T4 缺适配器即不可达）'
+  fi
+  return "$err"
+}
+
 # ---- P3b：判定缓存（输入内容寻址；只回放**绿**判定）----
 # key 由 scripts/verify_cache.py 按 HEAD + 工作树差异 + 未跟踪件 + 门禁代码 + 运行时 + 档位算出；
 # 输入没变就回放上次摘要（秒级）。红判定**不缓存**（红是瞬态），--fast/--no-cache 一律重算。
@@ -3446,7 +3480,7 @@ check37
 check38
 check39
 check40
-echo '—— 段 D：供应链与 Trust 证据面（check41-42 + check43/44 G1 Wiki-Spec + check45/46 Trust + check47 G4 + check48 DoD + check49 G0 双平面 + check50 G2 生产指标）——'
+echo '—— 段 D：供应链与 Trust 证据面（check41-42 + check43/44 G1 Wiki-Spec + check45/46 Trust + check47 G4 + check48 DoD + check49 G0 双平面 + check50 G2 生产指标 + check51 G3 治理报告）——'
 check41
 check42
 check43
@@ -3457,6 +3491,7 @@ check47
 check48
 check49
 check50
+check51
 echo '=================================================='
 echo "结果统计: PASS=$PASS  WARN=$WARN  FAIL=$FAIL"
 # ---- 开发快车道（--fast · 显式 opt-in · 不改变上面的任何一条判定）----

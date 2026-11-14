@@ -51,6 +51,7 @@
       "eval_validity",
       "evidence",
       "governance_adapters",
+      "governance_report",
       "i18n_checks",
       "key_transparency",
       "legal",
