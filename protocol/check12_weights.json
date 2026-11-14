@@ -482,6 +482,7 @@
     "test_privacy_contract": 1.6,
     "test_probe_manifest_wiring": 0.1,
     "test_product_contract": 0.2,
+    "test_production_metrics_contract": 0.1,
     "test_production_threat_vectors": 0.3,
     "test_prose_lint": 0.2,
     "test_protocol_golden": 1.2,
@@ -4642,6 +4643,11 @@
     "test_product_contract.ProductContractTest.test_mutations_red": 0.01,
     "test_product_contract.ProductContractTest.test_no_overclaim": 0.0,
     "test_product_contract.ProductContractTest.test_registry_valid": 0.0,
+    "test_production_metrics_contract.ProductionMetricsContractTest.test_check_green": 0.0,
+    "test_production_metrics_contract.ProductionMetricsContractTest.test_committed_equals_live": 0.0,
+    "test_production_metrics_contract.ProductionMetricsContractTest.test_four_measured_metrics": 0.0,
+    "test_production_metrics_contract.ProductionMetricsContractTest.test_mutations_red": 0.01,
+    "test_production_metrics_contract.ProductionMetricsContractTest.test_no_data_honest": 0.0,
     "test_production_threat_vectors.ProductionThreatModelTest.test_boundaries_registry": 0.0,
     "test_production_threat_vectors.ProductionThreatModelTest.test_boundary_coverage": 0.0,
     "test_production_threat_vectors.ProductionThreatModelTest.test_doc_and_vectors_cross_consistent": 0.0,
@@ -6357,5 +6363,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2177.8
+  "total_s": 2177.9
 }

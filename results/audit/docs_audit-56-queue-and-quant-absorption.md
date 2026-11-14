@@ -7,8 +7,8 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/concept_graph.py:cc629a762576347a6065da4be34ff6c6902ec4ee7299663119abbc153bd50211
-  - verify.sh:3391c203ca4c17a56e0177ce6292239570ff367ee7fce6d08f19777f5ca54c8e
-  - README.en.md:767049c2c9686014754e106c865f4561c98c9d7578e0966bcb2ec29ef74b10b0
+  - verify.sh:8e5fc8fa6f16c82d03323c4fcdd0b8671a763f4b5c2c526c5dd71704fd3db21c
+  - README.en.md:6bd8517ee0aa393f9d3683ca6272ad2abbd2241f304a19d54103c5abb8bc02dc
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - community/量化金融域包/assets/DATA_CONTRACT.md:3815cd420ce535b571149a1ca0725b2d5c1757660e83d0edd8ed1d5c14ed2af1
   - community/量化金融域包/assets/STRATEGY_SPECS.md:9174638b5caf2d5d8586b80d07ed9aeca5d221e16f01ec19ce0e4c0f50859e65
@@ -16,6 +16,8 @@ subjects:
   - .github/workflows/external-links.yml:52c94a4c17a73d6fc40135019ea6ffb64dcc39f3ac9094d748e5ab09edd977a0
 
 ---
+> 重审（2026-11-15）：NF-Final WP-24：新增 core/production_metrics.py、results/production/metrics.json、test_production_metrics_contract.py；verify.sh check50 + quality_baseline 50 条/PASS=91；派生面重生成；independence 注册
+
 > 重审（2026-11-14）：NF-Final WP-13：verify.sh 新增 check43/44（Wiki/Spec），quality_baseline 常数 49/PASS=89、CHECK_LABEL；README/CHANGELOG/VERSION-MATRIX/CONFORMANCE/verification-cards/llms/repo_stats/SELF_AUDIT/interop 重新生成
 
 > 重审（2026-11-14）：NF-Final WP-02 双平面边界 check49：verify.sh 新增 check49（段 D）+ quality_baseline v2.35（47 check / PASS=85），被审对象变更后机械重绑

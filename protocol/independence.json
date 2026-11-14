@@ -55,6 +55,7 @@
       "output_validation",
       "policy_snapshot",
       "product",
+      "production_metrics",
       "provenance_external",
       "revocations",
       "spec_compiler",

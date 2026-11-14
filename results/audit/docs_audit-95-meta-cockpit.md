@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:3026aad56e562650ab4db01aa76e73694fd841998ab3d84050643a2dd9c0950e
   - tui/_surface.py:fe497d3e1da2c99ff3642b0215e528a8d807461a52c846aabb4f7a7f33af6b43
-  - protocol/check12_weights.json:152236257134e5c8db96bf892812492f99b259263cc46dddafa6b6bb894fe508
+  - protocol/check12_weights.json:bb356cc639adaed17d1217bdbeb94a0424026408d6ee601fc3461c6e6ca5b93f
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:fa00a7fd014857af56e11f38ced1b7d888be053befaadb10b3dd494d27884316
   - docs/meta-cockpit/功能解析.md:de20c2340d19d541bcfde53f222a3acf22a6e440d8fb3dcf51a37aedf53c0c25
   - results/meta-cockpit-manifest.json:60c0e100798e49d393557ae5066c02d7e057ec27f386ee1a36ca3fc7740150ba
 
 ---
+> 重审（2026-11-15）：NF-Final WP-24 收尾：修复 metrics 测试 EOL/语法（P0 清除），check12 权重含新模块；派生面重生成后重绑
+
 > 重审（2026-11-15）：NF-Final WP-23：新增 core/delivery.py、results/delivery/*（包+报告）、docs/delivery.md、test_delivery_contract.py；nf agent run --deliver/--sidecar；assertions/data_contracts/independence/code_metrics/check12 更新
 
 > 重审（2026-11-14）：NF-Final WP-22：新增 core/output_validation.py、results/output/output-report.json、docs/output-validation.md、test_output_validation_contract.py；assembly K-002 复用本模块；assertions/data_contracts/independence/code_metrics/check12 更新

@@ -6,7 +6,7 @@ scope: 作者指令「拉取 jev 或 laya 这种模型作为决策层」——�
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - verify.sh:3391c203ca4c17a56e0177ce6292239570ff367ee7fce6d08f19777f5ca54c8e
+  - verify.sh:8e5fc8fa6f16c82d03323c4fcdd0b8671a763f4b5c2c526c5dd71704fd3db21c
   - protocol/decision_layer.json:9330d4057f07647d67f15daa6f37c84913834b7eed65f4e360bf5c7c413e5e06
   - protocol/normative.json:c1bbc14c92cea6bd66ff6cb54fdcf91bf3072f66adee7027f1d3f42e70fe1825
   - protocol/data_contracts.json:e1ab701fa294b939f0af8e8da24f851842d85f0ea9df15c5ad5588422c737ffc
@@ -19,6 +19,8 @@ subjects:
   - docs/decision-layer.md:cd3a254de738ece7c8f07db36904c74484e4622c58f688a3973c8998b441628c
 
 ---
+> 重审（2026-11-15）：NF-Final WP-24：新增 core/production_metrics.py、results/production/metrics.json、test_production_metrics_contract.py；verify.sh check50 + quality_baseline 50 条/PASS=91；派生面重生成；independence 注册
+
 > 重审（2026-11-15）：NF-Final WP-23：新增 core/delivery.py、results/delivery/*（包+报告）、docs/delivery.md、test_delivery_contract.py；nf agent run --deliver/--sidecar；assertions/data_contracts/independence/code_metrics/check12 更新
 
 > 重审（2026-11-14）：NF-Final WP-22：新增 core/output_validation.py、results/output/output-report.json、docs/output-validation.md、test_output_validation_contract.py；assembly K-002 复用本模块；assertions/data_contracts/independence/code_metrics/check12 更新

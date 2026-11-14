@@ -12,7 +12,7 @@ subjects:
   - desktop/tests/test_nf_language.py:59bd38b7c2e59fe09b70804a5837849f25ecc274b093efcf4674b5e2f7176644
   - desktop/tests/test_doc_truth.py:6c0584045a8edef8f000ea7cdd547a3fe15a32a696a026467599c11afea11685
   - desktop/tests/test_site_face.py:eed4013d8e598c7115300ab6442fa1d6dbb69e7cb4f28b3a15c2f03392c4fd72
-  - verify.sh:3391c203ca4c17a56e0177ce6292239570ff367ee7fce6d08f19777f5ca54c8e
+  - verify.sh:8e5fc8fa6f16c82d03323c4fcdd0b8671a763f4b5c2c526c5dd71704fd3db21c
   - scripts/nf.py:3026aad56e562650ab4db01aa76e73694fd841998ab3d84050643a2dd9c0950e
   - docs/lsp.md:e2745c7c2fe8c0a7df28d1e74d8f6300f7bfd7b54dfff529ded94e74e20a7069
   - docs/mcp.md:c96f080bc2cf26d409960597f8580bf8d4a65618554a22f12f36e3e03759316a
@@ -26,6 +26,8 @@ subjects:
   - skills/ninfenz/references/commands.md:ac8a602f9854fc103b44ae79a5f7b1b4a7e36cf0a4b4075b7e8eb693dad76602
 
 ---
+> 重审（2026-11-15）：NF-Final WP-24：新增 core/production_metrics.py、results/production/metrics.json、test_production_metrics_contract.py；verify.sh check50 + quality_baseline 50 条/PASS=91；派生面重生成；independence 注册
+
 > 重审（2026-11-15）：NF-Final WP-23：新增 core/delivery.py、results/delivery/*（包+报告）、docs/delivery.md、test_delivery_contract.py；nf agent run --deliver/--sidecar；assertions/data_contracts/independence/code_metrics/check12 更新
 
 > 重审（2026-11-14）：NF-Final WP-21：新增 core/assembly_runtime.py、results/assembly/sample-document.assembly.json、docs/assembly-runtime.md、test_assembly_runtime_contract.py；nf agent run --assembly；assertions/data_contracts/independence/code_metrics/check12 更新

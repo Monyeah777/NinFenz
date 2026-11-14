@@ -12,10 +12,10 @@ subjects:
   - desktop/src/core/purity_scan.py:bc114898836f914212cec64e0b22c7d3f93b8681557d82f845a200a85683b0cc
   - desktop/tests/test_purity_scan.py:6979d6c7f88822141daf73d04ac6e86b29ae47e01f5f35a8be80145925fca2d3
   - scripts/nf.py:3026aad56e562650ab4db01aa76e73694fd841998ab3d84050643a2dd9c0950e
-  - verify.sh:3391c203ca4c17a56e0177ce6292239570ff367ee7fce6d08f19777f5ca54c8e
+  - verify.sh:8e5fc8fa6f16c82d03323c4fcdd0b8671a763f4b5c2c526c5dd71704fd3db21c
   - docs/layers.md:7b849fb07769ba6df5ca888a9de5323417b47a07ef54ec2c1c801673a7fbd7c0
   - docs/L3_FROZEN.md:863a152271b1b969a3249194d1169628f4a4647a9bdd801473cfc9cb75c6643b
-  - protocol/assertions.json:c2d5551b1963cfb3af8d644f051a845932316d0049cd250a3a3e67f6993d8624
+  - protocol/assertions.json:2cd80921d5428f5286384bef308f963f5b4737a7684850333c5c9fe9c1e1dd3a
   - protocol/data_contracts.json:e1ab701fa294b939f0af8e8da24f851842d85f0ea9df15c5ad5588422c737ffc
   - protocol/normative.json:c1bbc14c92cea6bd66ff6cb54fdcf91bf3072f66adee7027f1d3f42e70fe1825
   - protocol/glossary.json:0af6a0f3b1f128b30c0eb88a8db0d2c143461910a889737dfdf4e38e89f85ba7
@@ -23,6 +23,8 @@ subjects:
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
 
 ---
+> 重审（2026-11-15）：NF-Final WP-24：新增 core/production_metrics.py、results/production/metrics.json、test_production_metrics_contract.py；verify.sh check50 + quality_baseline 50 条/PASS=91；派生面重生成；independence 注册
+
 > 重审（2026-11-15）：NF-Final WP-23：新增 core/delivery.py、results/delivery/*（包+报告）、docs/delivery.md、test_delivery_contract.py；nf agent run --deliver/--sidecar；assertions/data_contracts/independence/code_metrics/check12 更新
 
 > 重审（2026-11-14）：NF-Final WP-22：新增 core/output_validation.py、results/output/output-report.json、docs/output-validation.md、test_output_validation_contract.py；assembly K-002 复用本模块；assertions/data_contracts/independence/code_metrics/check12 更新

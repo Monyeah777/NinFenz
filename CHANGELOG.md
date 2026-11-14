@@ -6,6 +6,8 @@
 
 ## [未发布] - 2026-11-09 · 职能坐标（ADR-0006）+ 项目改名：NarrativeForge → NinFenz（宁封子）+ 全仓审计 V3 修复波
 
+- **门禁扩到 check50（G2 生产指标，2026-11-15）**：新增 `check50`——首次成功/返工/成本/复用四类 sample-only 指标从入仓 E2E 产物现算，committed 指标件须 == 实时重算；外部真实生产数据未采集的项标 no-data+owner（不冒充 measured）。验收：verify v2.35 **check1-44/45/46/47/48/49/50 · PASS=91**。
+
 - **门禁扩到 check43/44（G1 Wiki/Spec，2026-11-14）**：新增 `check43`（LLMWiki 完整性：覆盖/ID/关系/陈旧/三入口 + 生成物与真源逐字节）与 `check44`（Spec 编译：intent→nf-spec/1→nf-task/1 确定性 + schema + 拒绝未知 kind），对应 WP-13；`nf wiki check`/`nf spec compile` 不再是旁路判据。验收：verify v2.35 **check1-44/45/46/47/48/49 · PASS=89**。
 
 > 日期为该「未发布」节的**最新一次改动**日期（审计 W9：此前停在 2026-10-06，早于 HEAD）。

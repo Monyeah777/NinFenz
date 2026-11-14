@@ -6,20 +6,22 @@ scope: 作者指令「自述数字自动化，互操作性从他证，标准目�
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - verify.sh:3391c203ca4c17a56e0177ce6292239570ff367ee7fce6d08f19777f5ca54c8e
+  - verify.sh:8e5fc8fa6f16c82d03323c4fcdd0b8671a763f4b5c2c526c5dd71704fd3db21c
   - scripts/nf.py:3026aad56e562650ab4db01aa76e73694fd841998ab3d84050643a2dd9c0950e
   - desktop/src/core/repo_stats.py:d7fd457d3a1804c3e9ab266c8071ad9d8950d4b5eb0a782ce658a66e05e90f9c
-  - desktop/src/core/quality_baseline.py:20c76eb55402b419d31d5249da071992b19c331a62c59dce94ab3c965672f515
+  - desktop/src/core/quality_baseline.py:561cee64a54643d0901b8d055555301264abd5057a1cd9a14baaae9787dad562
   - scripts/interop_thirdparty_kit.py:4f967d3f29cd31deb79f1b97fdee5f59ae74fde0d378ced571d2896af2d275dc
   - scripts/geo_export.py:7a4200761fb7d79f945a37b557882eb8de968081057068d26a7a144d11d1b527
   - scripts/fde_sample_run.py:ae1e644b7ab0b61e430d6224ef4495e4371cba86e520d99c8d532cfb9370568d
-  - protocol/CONFORMANCE.md:f96beec1d99ba5a77c636467ba96ffa33797acccb8532d66f0d229d37cff98fd
+  - protocol/CONFORMANCE.md:1de11235b4467846e6bf7abfb8bdbf8f42a5bffcd273ba1d56c0962f2930b6d5
   - docs/fde-stack.md:96c074dffcbcc513fbf3bec79d5b895ac9cfec543430f21805eb5d2370b43bca
   - docs/fde-sample/README.md:ac3da5b467b4963681af3ded98c65a184577883e90f215b9e852aaca104294c4
   - docs/interop-thirdparty.md:108fd4cddc6ef082b29270a8269b7a7153cbb53e6113fec73227e84fb9276271
   - results/interop-thirdparty-status.md:e57c95980dd8b36bf137d23db0cf3c93ba8aee5221d2d26f2a6c782c30df0469
 
 ---
+> 重审（2026-11-15）：NF-Final WP-24：新增 core/production_metrics.py、results/production/metrics.json、test_production_metrics_contract.py；verify.sh check50 + quality_baseline 50 条/PASS=91；派生面重生成；independence 注册
+
 > 重审（2026-11-15）：NF-Final WP-23：新增 core/delivery.py、results/delivery/*（包+报告）、docs/delivery.md、test_delivery_contract.py；nf agent run --deliver/--sidecar；assertions/data_contracts/independence/code_metrics/check12 更新
 
 > 重审（2026-11-14）：NF-Final WP-21：新增 core/assembly_runtime.py、results/assembly/sample-document.assembly.json、docs/assembly-runtime.md、test_assembly_runtime_contract.py；nf agent run --assembly；assertions/data_contracts/independence/code_metrics/check12 更新

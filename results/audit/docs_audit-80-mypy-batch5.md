@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:22e24633e87e95453d0c2cf4a595d0496bae5d7331c1fc644d5b1555e4925a41
-  - protocol/code_metrics_baseline.json:53dfcbbac85cf2bf4a331b7068f7ec25027eca99f9b4eb0377557d8896d2b311
+  - protocol/code_metrics_baseline.json:d83f79e4eda56e22424901734d09c6b8c9f2478acfad3009e475d3f6e1ec151b
 ---
+> 重审（2026-11-15）：NF-Final WP-24：新增 core/production_metrics.py、results/production/metrics.json、test_production_metrics_contract.py；verify.sh check50 + quality_baseline 50 条/PASS=91；派生面重生成；independence 注册
+
 > 重审（2026-11-15）：NF-Final WP-23：新增 core/delivery.py、results/delivery/*（包+报告）、docs/delivery.md、test_delivery_contract.py；nf agent run --deliver/--sidecar；assertions/data_contracts/independence/code_metrics/check12 更新
 
 > 重审（2026-11-14）：NF-Final WP-22：新增 core/output_validation.py、results/output/output-report.json、docs/output-validation.md、test_output_validation_contract.py；assembly K-002 复用本模块；assertions/data_contracts/independence/code_metrics/check12 更新

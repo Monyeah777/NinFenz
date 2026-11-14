@@ -6,9 +6,9 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - CHANGELOG.md:ae3cd23842db863fba6ea54f8ec726067b783ca4661a4739fad4dc55bd6d4f94
-  - docs/meta/VERSION-MATRIX.md:1c2166a074b8c26456ee75a1522d1c5c2304ecaf5d9e8e2c19c4b054d6ad387b
-  - README.md:420ff186b6f6d14a53f6f4296a46e54b50cd32f6276073457eb5c66b09c979a4
+  - CHANGELOG.md:b9e5d1da1e2b7adf47f26f4cf4caac44cf5336a2f72d9a3c6e06cd49b24b3f4c
+  - docs/meta/VERSION-MATRIX.md:532537b0ee85442f8d7bd3802154e9daf7071334e911d7135f249cdf31217829
+  - README.md:00eaca2b99d9f02207f194b580af8fd8c2cc1fc5e9fe7e5991bb19999a9a80bb
   - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
@@ -16,6 +16,8 @@ subjects:
   - scripts/nf.py:3026aad56e562650ab4db01aa76e73694fd841998ab3d84050643a2dd9c0950e
 
 ---
+> 重审（2026-11-15）：NF-Final WP-24：新增 core/production_metrics.py、results/production/metrics.json、test_production_metrics_contract.py；verify.sh check50 + quality_baseline 50 条/PASS=91；派生面重生成；independence 注册
+
 > 重审（2026-11-15）：NF-Final WP-23：新增 core/delivery.py、results/delivery/*（包+报告）、docs/delivery.md、test_delivery_contract.py；nf agent run --deliver/--sidecar；assertions/data_contracts/independence/code_metrics/check12 更新
 
 > 重审（2026-11-14）：NF-Final WP-21：新增 core/assembly_runtime.py、results/assembly/sample-document.assembly.json、docs/assembly-runtime.md、test_assembly_runtime_contract.py；nf agent run --assembly；assertions/data_contracts/independence/code_metrics/check12 更新
