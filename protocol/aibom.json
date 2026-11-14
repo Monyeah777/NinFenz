@@ -1,0 +1,24 @@
+{
+  "schema": "nf-aibom/1",
+  "note": "NF-Final G4 WP-41 AIBOM/Model Card 导出登记：从 AI 证据链（模型卡/血缘/复核）导出 CycloneDX AI-BOM 与 SPDX 风格清单。纪律：确定性（固定时间戳/序列号由摘要派生）、必填字段闭合、引用闭合、无秘密；不引第三方运行时、不冒充官方认证。判据 desktop/tests/test_aibom_contract.py。",
+  "exports": {
+    "cyclonedx": {"rel": "results/ai/aibom.cdx.json", "format": "CycloneDX",
+                  "spec_version": "1.5", "component_type": "machine-learning-model",
+                  "required": ["bomFormat", "specVersion", "serialNumber", "version",
+                               "metadata", "components", "properties"]},
+    "spdx": {"rel": "results/ai/aibom.spdx.json", "format": "SPDX",
+             "spec_version": "SPDX-2.3",
+             "required": ["spdxVersion", "dataLicense", "SPDXID", "name",
+                          "documentNamespace", "creationInfo", "packages", "relationships"]}
+  },
+  "properties_required": ["nf:model_digest", "nf:eval_protocol_digest", "nf:lineage_head",
+                          "nf:human_review_decision", "nf:human_review_subject_digest"],
+  "rules": {
+    "determinism": "serialNumber/documentNamespace 由模型身份摘要派生；created/issued_at 用固定样例时间（不读时钟）",
+    "closed_refs": "bom 的 model_digest/eval digest/lineage head/review 必须与 results/ai 三件一致",
+    "no_secrets": "导出串不得含私钥/令牌/密码形状（判据扫描）",
+    "not_certified": "导出只是清单，不构成合规/认证声明"
+  },
+  "claims_boundary": ["导出件是清单，不声称官方认证或供应商合规",
+                      "字段映射以最小闭合集为准，不追全量规范"]
+}

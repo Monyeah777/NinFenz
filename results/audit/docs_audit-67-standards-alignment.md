@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/asset_density.py:aa60651ad8269e7db09a709570ae69192f39ee95cfd6bd1d4f652696b3d26c56
   - docs/domain-packs.md:f90ff233965ee1bb5a872dd833b79e200bfc1825db9c81f651ceca760d83d8b6
-  - protocol/data_contracts.json:e1e46d47d001118a045c3cb10696ebfb5bcb1571fb661d7344771fdc59d2947c
+  - protocol/data_contracts.json:77d2868494158650f95ddad243a195707f907c64b58755c6d6b6ecff2cb5805c
 ---
+> 重审（2026-11-15）：NF-Final WP-41：新增 protocol/aibom.json、core/aibom_export.py、results/ai/aibom.*、docs/aibom.md、test_aibom_contract.py；assertions/data_contracts/independence/code_metrics/check12 更新
+
 > 重审（2026-11-15）：NF-Final WP-40：新增 protocol/ai_evidence.json、core/ai_evidence.py、results/ai/*、docs/ai-evidence.md、test_ai_evidence_contract.py；assertions/data_contracts/independence/code_metrics/check12 更新
 
 > 重审（2026-11-15）：NF-Final G3 收口：新增 results/{G3_DOD.md,g3_dod.json}、docs/governance-report.md、test_g3_dod.py；assertions/data_contracts/check12/code_metrics 更新
