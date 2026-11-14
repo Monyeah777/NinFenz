@@ -6,7 +6,7 @@ scope: 作者澄清「让这些模型替我干活，来构建 NF」——把决�
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - verify.sh:904661b179c65686b37d63a7fa0a175625c433d741239903527dad3da35a7874
+  - verify.sh:a462442226fa2faa405606a81c06ffb40dab9ecfa3897c9b6a301a5421fc2740
   - protocol/decision_layer.json:9330d4057f07647d67f15daa6f37c84913834b7eed65f4e360bf5c7c413e5e06
   - desktop/src/core/workloop.py:3ee94f2c11939abba5507741c6b9b4dae8e8cab77c3bda38419678e31e097056
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
@@ -15,6 +15,8 @@ subjects:
   - docs/decision-layer.md:cd3a254de738ece7c8f07db36904c74484e4622c58f688a3973c8998b441628c
 
 ---
+> 重审（2026-11-15）：NF-Final WP-44：verify.sh check52（G4 AI 信任面）+ quality_baseline 52 条/PASS=95；派生面全量重生成（验证卡/llms/repo_stats/CONFORMANCE/SELF_AUDIT/interop/README 三语/CHANGELOG/VERSION-MATRIX/能力索引）
+
 > 重审（2026-11-15）：NF-Final WP-33：新增 core/governance_report.py、results/governance/{report,audit}.json、test_governance_report_contract.py；verify.sh check51 + quality_baseline 51 条/PASS=93；派生面重生成
 
 > 重审（2026-11-15）：NF-Final WP-24：新增 core/production_metrics.py、results/production/metrics.json、test_production_metrics_contract.py；verify.sh check50 + quality_baseline 50 条/PASS=91；派生面重生成；independence 注册

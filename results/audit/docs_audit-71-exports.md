@@ -6,20 +6,22 @@ scope: 作者指令「自述数字自动化，互操作性从他证，标准目�
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - verify.sh:904661b179c65686b37d63a7fa0a175625c433d741239903527dad3da35a7874
+  - verify.sh:a462442226fa2faa405606a81c06ffb40dab9ecfa3897c9b6a301a5421fc2740
   - scripts/nf.py:3026aad56e562650ab4db01aa76e73694fd841998ab3d84050643a2dd9c0950e
   - desktop/src/core/repo_stats.py:d7fd457d3a1804c3e9ab266c8071ad9d8950d4b5eb0a782ce658a66e05e90f9c
-  - desktop/src/core/quality_baseline.py:1b918d342a21f2679de8f509a8cf6faba6580cd3f96be33c2eacc3956ac23bbb
+  - desktop/src/core/quality_baseline.py:01260e03050319b66aa1b7e21261d25233941372f439e743e33aaf1b60f2155c
   - scripts/interop_thirdparty_kit.py:4f967d3f29cd31deb79f1b97fdee5f59ae74fde0d378ced571d2896af2d275dc
   - scripts/geo_export.py:7a4200761fb7d79f945a37b557882eb8de968081057068d26a7a144d11d1b527
   - scripts/fde_sample_run.py:ae1e644b7ab0b61e430d6224ef4495e4371cba86e520d99c8d532cfb9370568d
-  - protocol/CONFORMANCE.md:bb7016b1cf7f671e04ca8a651691e1b62aac420cbea9637c618d52ca1474fe7a
+  - protocol/CONFORMANCE.md:0e9f3fac4aeb9194f649d03d6f0273c16075b98089668d54a14d03f9ec6c03f4
   - docs/fde-stack.md:96c074dffcbcc513fbf3bec79d5b895ac9cfec543430f21805eb5d2370b43bca
   - docs/fde-sample/README.md:ac3da5b467b4963681af3ded98c65a184577883e90f215b9e852aaca104294c4
   - docs/interop-thirdparty.md:108fd4cddc6ef082b29270a8269b7a7153cbb53e6113fec73227e84fb9276271
   - results/interop-thirdparty-status.md:e57c95980dd8b36bf137d23db0cf3c93ba8aee5221d2d26f2a6c782c30df0469
 
 ---
+> 重审（2026-11-15）：NF-Final WP-44：verify.sh check52（G4 AI 信任面）+ quality_baseline 52 条/PASS=95；派生面全量重生成（验证卡/llms/repo_stats/CONFORMANCE/SELF_AUDIT/interop/README 三语/CHANGELOG/VERSION-MATRIX/能力索引）
+
 > 重审（2026-11-15）：NF-Final WP-33：新增 core/governance_report.py、results/governance/{report,audit}.json、test_governance_report_contract.py；verify.sh check51 + quality_baseline 51 条/PASS=93；派生面重生成
 
 > 重审（2026-11-15）：NF-Final WP-24：新增 core/production_metrics.py、results/production/metrics.json、test_production_metrics_contract.py；verify.sh check50 + quality_baseline 50 条/PASS=91；派生面重生成；independence 注册

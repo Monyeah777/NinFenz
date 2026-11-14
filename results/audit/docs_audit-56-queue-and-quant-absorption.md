@@ -7,8 +7,8 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/concept_graph.py:cc629a762576347a6065da4be34ff6c6902ec4ee7299663119abbc153bd50211
-  - verify.sh:904661b179c65686b37d63a7fa0a175625c433d741239903527dad3da35a7874
-  - README.en.md:2783326ef07339c1dceb604ac18945ba0d7abc5acae746b1930ce56b71a400cb
+  - verify.sh:a462442226fa2faa405606a81c06ffb40dab9ecfa3897c9b6a301a5421fc2740
+  - README.en.md:6008c183b78969e383e4073ed471748f56bb371c5d984452a36eb94f25337323
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - community/量化金融域包/assets/DATA_CONTRACT.md:3815cd420ce535b571149a1ca0725b2d5c1757660e83d0edd8ed1d5c14ed2af1
   - community/量化金融域包/assets/STRATEGY_SPECS.md:9174638b5caf2d5d8586b80d07ed9aeca5d221e16f01ec19ce0e4c0f50859e65
@@ -16,6 +16,8 @@ subjects:
   - .github/workflows/external-links.yml:52c94a4c17a73d6fc40135019ea6ffb64dcc39f3ac9094d748e5ab09edd977a0
 
 ---
+> 重审（2026-11-15）：NF-Final WP-44：verify.sh check52（G4 AI 信任面）+ quality_baseline 52 条/PASS=95；派生面全量重生成（验证卡/llms/repo_stats/CONFORMANCE/SELF_AUDIT/interop/README 三语/CHANGELOG/VERSION-MATRIX/能力索引）
+
 > 重审（2026-11-15）：NF-Final WP-33：新增 core/governance_report.py、results/governance/{report,audit}.json、test_governance_report_contract.py；verify.sh check51 + quality_baseline 51 条/PASS=93；派生面重生成
 
 > 重审（2026-11-15）：NF-Final WP-24：新增 core/production_metrics.py、results/production/metrics.json、test_production_metrics_contract.py；verify.sh check50 + quality_baseline 50 条/PASS=91；派生面重生成；independence 注册

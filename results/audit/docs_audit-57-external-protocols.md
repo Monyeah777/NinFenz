@@ -6,7 +6,7 @@ scope: 作者指示的七项任务（NF 深析 / 外部协议清单 ≥100 条 /
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - verify.sh:904661b179c65686b37d63a7fa0a175625c433d741239903527dad3da35a7874
+  - verify.sh:a462442226fa2faa405606a81c06ffb40dab9ecfa3897c9b6a301a5421fc2740
   - .gitattributes:f6fb4175293c85a259d4c60564352c811dded74210c1ad54ec4bfc0376a4188a
   - desktop/src/core/text_hygiene.py:99b38bfbb8656ad653689c4cba93679970a78183019fd5f02e2380d87ec99ff3
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
@@ -24,9 +24,11 @@ subjects:
   - docs/text-hygiene.md:5acf8a8a65384d7441b776341c42e9f75063ffc2e4e9ec5f50519c827ffe9a81
   - docs/endpoint.md:918c27e8f27b7479e173d57c4d0b2fac2664ff6b33d5f181000448ff1a344d10
   - docs/mcp.md:c96f080bc2cf26d409960597f8580bf8d4a65618554a22f12f36e3e03759316a
-  - llms.txt:0a2ec7b412071d65a5c64ba225b6bf5a53754cec0d115a3947b1d1f189707cbc
+  - llms.txt:5654278a2daf281aea54c3ec2b64776086b0de3ad27f2f7c033838de6aecdd29
 
 ---
+> 重审（2026-11-15）：NF-Final WP-44：verify.sh check52（G4 AI 信任面）+ quality_baseline 52 条/PASS=95；派生面全量重生成（验证卡/llms/repo_stats/CONFORMANCE/SELF_AUDIT/interop/README 三语/CHANGELOG/VERSION-MATRIX/能力索引）
+
 > 重审（2026-11-15）：NF-Final WP-33：新增 core/governance_report.py、results/governance/{report,audit}.json、test_governance_report_contract.py；verify.sh check51 + quality_baseline 51 条/PASS=93；派生面重生成
 
 > 重审（2026-11-15）：NF-Final WP-24：新增 core/production_metrics.py、results/production/metrics.json、test_production_metrics_contract.py；verify.sh check50 + quality_baseline 50 条/PASS=91；派生面重生成；independence 注册
