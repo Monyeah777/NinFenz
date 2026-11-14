@@ -1066,6 +1066,18 @@
         "test_governance_adapters_contract",
         "docs/governance-adapters.md"
       ]
+    },
+    {
+      "id": "attachment-registry",
+      "artifact": "protocol/attachment.json",
+      "quality_rule": "assertion:attachment-registry",
+      "owner": "治理附件模式（core/attachment.py + test_attachment_contract）+ WP-32",
+      "status": "active",
+      "freshness": "模式/等级要求变化须同步 registry；独立性规则必须保持纯函数",
+      "consumers": [
+        "test_attachment_contract",
+        "docs/attachment.md"
+      ]
     }
   ]
 }

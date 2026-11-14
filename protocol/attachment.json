@@ -1,0 +1,22 @@
+{
+  "schema": "nf-attachment/1",
+  "note": "NF-Final G3 WP-32 治理附件模式机读件：none（治理不介入）/ observe（只记录不阻塞）/ require（缺证据即拒）。铁律：附件策略不得改变生产输出（独立性）；require 缺证据时不产出交付（exit 2），observe 只留观察记录不阻塞。判据 desktop/tests/test_attachment_contract.py。",
+  "modes": [
+    {"id": "none", "desc": "不附带治理证据：生产照常，不记录、不阻塞",
+     "blocking": false, "records_observation": false, "min_level": ""},
+    {"id": "observe", "desc": "附带观察：记录证据是否在场/等级，但不阻塞交付",
+     "blocking": false, "records_observation": true, "min_level": ""},
+    {"id": "require", "desc": "强制要求：证据必须存在且验证通过、等级 ≥ min_level，否则拒收",
+     "blocking": true, "records_observation": true, "min_level": "T1"}
+  ],
+  "mode_vocabulary": ["none", "observe", "require"],
+  "evidence_requirements": {
+    "require": ["bundle_present=true", "verification.ok=true", "verification.level ≥ min_level（默认 T1）"],
+    "observe": ["不阻塞；缺证据记 warning"],
+    "none": []
+  },
+  "independence_rule": "附件评估是纯函数：不得读写生产产物；同 intent/adapter 的装配记录与交付包在三种模式下逐字节一致（判据断言 digest 相等）",
+  "exit_semantics": {"pass": 0, "blocked_by_attachment": 2},
+  "claims_boundary": ["本件只定义附件策略与独立性；不替代 WP-31 适配层与 WP-33 审计包",
+                      "observe 不是「通过治理」；require 只对证据在场/等级做门，不评价内容质量"]
+}

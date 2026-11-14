@@ -151,7 +151,7 @@
     {
       "@id": "nf:file/protocol/assertions.json",
       "@type": "prov:Entity",
-      "nf:sha256": "22f03faaa2823bde8446693a259269681f95004a12cb5af5a9ef4f4d5d52ceee"
+      "nf:sha256": "24c9d6e65b92ded31328fdf317531bd03dc966cd4d819ff9bf13b27db5105cfe"
     },
     {
       "@id": "nf:file/protocol/asset_contracts.json",
@@ -171,7 +171,7 @@
     {
       "@id": "nf:file/protocol/code_metrics_baseline.json",
       "@type": "prov:Entity",
-      "nf:sha256": "ce4af8b9af2ad21b57b09b84d7e24f111b56748689dc64eb23637f593b5a214f"
+      "nf:sha256": "7fba143ab97cad7447690a81d8e09fd52907ded9a47cf25492c1640b7e4e89a4"
     },
     {
       "@id": "nf:file/protocol/community_asset_ledger.json",
@@ -181,7 +181,7 @@
     {
       "@id": "nf:file/protocol/conformance_report.json",
       "@type": "prov:Entity",
-      "nf:sha256": "4d07c8c60f791df49d09b097ed88151ddf515c0c78cb0c0c5e3dc00a29e26ba4"
+      "nf:sha256": "66445b015ca6ad0d0bd0833f032af750552f9b6d5b15b3a19efda58cdc3a81ee"
     },
     {
       "@id": "nf:file/protocol/coupling_baseline.json",
@@ -191,7 +191,7 @@
     {
       "@id": "nf:file/protocol/data_contracts.json",
       "@type": "prov:Entity",
-      "nf:sha256": "e9aa8ef16fe796e1fe6237ea1a29639a58cdc455f53c9122de8df997bcd87c4a"
+      "nf:sha256": "a1344343873322e9c9cac7a93407b4107dd6be7a20a600d0b6cfc1e2fea05b07"
     },
     {
       "@id": "nf:file/protocol/decision_layer.json",
@@ -311,7 +311,7 @@
     {
       "@id": "nf:file/protocol/role_coordinates.json",
       "@type": "prov:Entity",
-      "nf:sha256": "d7a5ebf3fea68576b038c263624b78dff2e46e910b90631b93949368d3667d68"
+      "nf:sha256": "5e21c3b25558b5e7bebf02ef95e7cd3ce22f407f66b44ca5caa0d1ff3594bda8"
     },
     {
       "@id": "nf:file/protocol/sast_baseline.json",

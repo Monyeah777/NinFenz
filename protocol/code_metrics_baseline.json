@@ -120,6 +120,11 @@
       "max_fn_cc": 8,
       "max_fn_lines": 43
     },
+    "desktop/src/core/attachment.py": {
+      "lines": 136,
+      "max_fn_cc": 19,
+      "max_fn_lines": 48
+    },
     "desktop/src/core/attest.py": {
       "lines": 401,
       "max_fn_cc": 16,
