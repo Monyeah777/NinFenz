@@ -188,9 +188,23 @@ def _check_residuals(issues: list, stats: dict) -> None:
 def scan(root: str = ".") -> tuple:
     issues: list = []
     stats = {"t3": "none", "t3_exit": 0, "t4": "none", "parity_families": 0,
-             "store": 0, "keygen": 0}
+             "store": 0, "keygen": 0, "auto_anchor": 0}
     _check_artifacts(root, issues, stats)
     _check_residuals(issues, stats)
+    try:
+        bundle = tb.build_bundle("a" * 64, "protocol/trust/claim-bundle.schema.json",
+                                 copy.deepcopy(CLAIMS))
+        digest = tc.digest_of(bundle)
+        signers = [{"keyid": KEYID, "sign": lambda data: dsse.hmac_sign(HMAC_KEY, data)}]
+        head = tsig.sign_head("bundle", digest, signers, root=root)
+        doc = ta.auto_anchor(digest, [{"kind": "git-commit", "repo": ".", "commit": "0" * 40}],
+                             root=root, head=head, registry=_registry(),
+                             material=_material(), now=NOW)
+        if doc.get("target_digest") != digest or len(doc.get("anchors") or []) != 1:
+            issues.append("auto-anchor 编排产物形状不符（target/anchors）")
+        stats["auto_anchor"] = 1
+    except (OSError, ValueError) as exc:
+        issues.append(f"auto-anchor 编排失败：{exc}（{GUIDE}检查链头/组件）")
     try:
         _composition(root, issues, stats)
     except (OSError, ValueError) as exc:

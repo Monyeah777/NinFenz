@@ -72,6 +72,33 @@ def _b64d(text: Any) -> bytes:
         raise ValueError(f"base64 解码失败：{exc}（{GUIDE}用严格 base64 重编）") from exc
 
 
+def auto_anchor(target_digest: str, components: Any, schema: dict | None = None,
+                root: str = ".", head: dict | None = None, registry: dict | None = None,
+                material: dict | None = None, expected_kind: str = "bundle",
+                now: str | None = None) -> dict:
+    """一键编排：可选先验链头签名，再把 TSA/STH/witness/git-commit 组件组装成 nf-anchor/1。
+
+    纪律：给了 head 就必须先验签（target=target_digest）；组件至少 1 条；结构不过即抛。
+    不猜、不补默认锚；缺件/坏件一律 AUTO-ANCHOR-* 错误码。
+    """
+    if head is not None:
+        from core.trust import signature as tsig
+        if not registry or not isinstance(material, dict):
+            raise ValueError("AUTO-ANCHOR-HEAD-CONTEXT-MISSING：验链头需要 registry/material"
+                             f"（{GUIDE}补齐或去掉 head）")
+        verified = tsig.verify_head(head, expected_kind, target_digest, registry, material,
+                                    now=now, root=root)
+        if not verified.get("ok"):
+            raise ValueError(f"AUTO-ANCHOR-HEAD-INVALID：{verified.get('reason')}"
+                             f"（{GUIDE}先修链头签名/绑定）")
+    anchors = (components.get("anchors") if isinstance(components, dict)
+               else components)
+    if not isinstance(anchors, list) or not anchors:
+        raise ValueError(f"AUTO-ANCHOR-COMPONENTS-EMPTY：至少 1 条锚组件"
+                         f"（{GUIDE}给 nf-anchor/1 anchors 列表）")
+    return build_anchor_set(target_digest, anchors, schema, root)
+
+
 def witness_statement(target_digest: str, witness_id: str, keyid: str) -> str:
     """本仓 witness 签名语句（域分隔摘要）：witness 对「目标摘要 + 自己身份」签名。"""
     body = tc.canonical_bytes({"schema": WITNESS_STATEMENT, "target_digest": target_digest,

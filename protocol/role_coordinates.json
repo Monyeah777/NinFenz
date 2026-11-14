@@ -6,7 +6,7 @@
     "prod": 1057,
     "projection": 168,
     "support": 485,
-    "verify": 1354
+    "verify": 1355
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -11207,6 +11207,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "auto-anchor 编排判据：先验链头 → 组装 nf-anchor/1；错头/空组件/坏组件必须拒。",
+      "path": "desktop/tests/test_trust_auto_anchor.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "信任边界守卫（`core/trust_boundary.py`）+ MCP 越权面的回归测试。",
       "path": "desktop/tests/test_trust_boundary.py",
       "role": "verify",
@@ -14508,7 +14514,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "9f374ee4b1475731276d7266eab0364d5272cfc13194623c7a4ecefc161d11b9",
+  "root_digest": "baf4d3485f9b58f36fe3a972b3b6b0276e138b4fa0e1c9dd0c7459fbc262d8f7",
   "rule_counts": {
     "R-app": 1469,
     "R-catch": 333,
@@ -14517,7 +14523,7 @@
     "R-prod": 944,
     "R-projection": 148,
     "R-support": 124,
-    "R-verify": 1228,
+    "R-verify": 1229,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

@@ -167,6 +167,10 @@ def main(argv=None) -> int:
     ap.add_argument("--anchor-build", default="", help="构建模式：输出 nf-anchor/1 文件路径")
     ap.add_argument("--anchor-target", default="", help="构建模式的 target_digest")
     ap.add_argument("--anchor-anchors", default="", help="构建模式的 anchors JSON 数组文件")
+    ap.add_argument("--auto-anchor", default="",
+                    help="一键编排：输出锚件路径（可先验链头）+ 组件文件")
+    ap.add_argument("--anchor-components", default="",
+                    help="一键编排的组件（nf-anchor/1 的 anchors 列表或对象）")
     ap.add_argument("--tsa-query", default="", help="RFC3161 verifier 的查询文件")
     ap.add_argument("--tsa-ca", default="", help="RFC3161 verifier 的 TSA 根/中间证书 PEM")
     ap.add_argument("--tsa-subject", default="", help="被时间戳盖章的数据文件（可选绑定校验）")
@@ -305,6 +309,28 @@ def main(argv=None) -> int:
         if not issues:
             print(f"valid typed entities: {len(entities)}（准入 + 组合均通过）")
         return 0 if not issues else 1
+    if args.auto_anchor:
+        if not args.subject_digest or not args.anchor_components:
+            print("不可判定：--auto-anchor 需要 --subject-digest 与 --anchor-components",
+                  file=sys.stderr)
+            return tv.EXIT_UNDECIDABLE
+        try:
+            raw = json_doc.load(Path(args.anchor_components),
+                                (dict, list), what="anchor components")
+            head = _load(args.head_signature, "head signature") if args.head_signature else None
+            registry_doc = tk.load_registry(args.issuer_registry) if args.issuer_registry else None
+            material_doc = (json_doc.load(Path(args.key_material), dict, what="key material")
+                            if args.key_material else None)
+            doc = ta.auto_anchor(args.subject_digest, raw, root=args.root, head=head,
+                                 registry=registry_doc, material=material_doc,
+                                 now=args.now or None)
+            atomic_write.write_text(Path(args.auto_anchor),
+                                    json.dumps(doc, ensure_ascii=False, indent=2) + "\n")
+        except (OSError, ValueError) as exc:
+            print(f"不可判定：{exc}", file=sys.stderr)
+            return tv.EXIT_UNDECIDABLE
+        print(f"auto anchor built: target={args.subject_digest} anchors={len(doc['anchors'])}")
+        return 0
     if args.anchor_build:
         anchors = json_doc.load(Path(args.anchor_anchors), list, what="anchors") \
             if args.anchor_anchors else []
