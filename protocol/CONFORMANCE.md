@@ -17,7 +17,7 @@
 | registry schema | `2` | 02 头部 + `desktop/src/core/registry.json` |
 | machine_contract schema | `1` | `protocol/schema/contract.schema.json` |
 | IDL schema 集 | `9 件` | `protocol/schema/` |
-| 基线 | `v2.34 · check1-42/45/46/47/48 · PASS=83` | `verify.sh` + `quality_baseline.EXPECTED_*` |
+| 基线 | `v2.35 · check1-42/45/46/47/48/49 · PASS=85` | `verify.sh` + `quality_baseline.EXPECTED_*` |
 | 档位 | `quick`（默认：静态 + 受影响测试）· `--full`（发布结论：全量测试） | `verify.sh` 参数；`nf release` 与 CI 固定 `--full --no-cache` |
 
 ## 范围

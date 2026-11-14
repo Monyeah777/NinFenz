@@ -12,8 +12,8 @@ subjects:
   - desktop/tests/test_nf_language.py:59bd38b7c2e59fe09b70804a5837849f25ecc274b093efcf4674b5e2f7176644
   - desktop/tests/test_doc_truth.py:6c0584045a8edef8f000ea7cdd547a3fe15a32a696a026467599c11afea11685
   - desktop/tests/test_site_face.py:eed4013d8e598c7115300ab6442fa1d6dbb69e7cb4f28b3a15c2f03392c4fd72
-  - verify.sh:f29ba8bde445b32ff0674cc524468fe26d5ee583562d4a81183dcbfd17232553
-  - scripts/nf.py:4b065db63fb34f89faf545c3d91a0f5c76facedf18c3427353312461da8f0b92
+  - verify.sh:18e2089ead65a11b4729ded516860cdf1d31cdb54a35935051249b40fbf7b53d
+  - scripts/nf.py:75ed1ad2dda5fb07dbd914a6ffedb836e5cf1298bf34b98be602644827ebc925
   - docs/lsp.md:e2745c7c2fe8c0a7df28d1e74d8f6300f7bfd7b54dfff529ded94e74e20a7069
   - docs/mcp.md:c96f080bc2cf26d409960597f8580bf8d4a65618554a22f12f36e3e03759316a
   - docs/decision-layer.md:cd3a254de738ece7c8f07db36904c74484e4622c58f688a3973c8998b441628c
@@ -26,6 +26,8 @@ subjects:
   - skills/ninfenz/references/commands.md:ac8a602f9854fc103b44ae79a5f7b1b4a7e36cf0a4b4075b7e8eb693dad76602
 
 ---
+> 重审（2026-11-14）：NF-Final WP-02 双平面边界 check49：verify.sh 新增 check49（段 D）+ quality_baseline v2.35（47 check / PASS=85），被审对象变更后机械重绑
+
 > 重审（2026-11-14）：WP-15 check45 接线与 G1 收口（机械重绑）
 
 > 重审（2026-11-14）：WP-11 trust bundle 入仓（机械重绑）

@@ -4,6 +4,7 @@
 > 依据：`NF-Final-方案-2026-11-13.md` §12.1（只读基线）· §11.2 WP-00（基线审计 + Claim–Evidence 矩阵 + BASELINE）· §13.3/§14（claim 证据规则）· §19.2（启动提示第 1 步）
 > ⛔ 操作指令：下文每条判定都附复跑命令；改本文件必须重跑命令并更新数字，不得照抄旧值。
 > 性质：结果/状态件（审计记录），不是规划件。审计对象 = **本机检出**，不是方案所基于的那次检出。
+> 更新（R3，2026-11-14）：WP-02/check49 收口 IN-01/IN-02（§5.5 与矩阵汇总已按实读更新；数字变化以复跑命令为准，见 §7）。
 > 边界：本件是 `NF-Final` 方案的基线；`results/trust/BASELINE.md` 是 `NF-TrustFabric` 方案的基线。两份互不替代，数字各按各的复跑命令取用。
 
 ## 0. 结论（先行）
@@ -209,13 +210,13 @@ python -V; node -v; dotnet --list-sdks | head -1
 
 | ID | 级别 | 状态 | 本机等价锚点 | 测试/证据 | 缺口 → WP |
 |---|---|---|---|---|---|
-| IN-01 生产不 import 治理 | MUST | ABSENT | 无 `scripts/check_independence.py`；`core/boundaries.py` 是模块边界审批，不是 import 边界 | — | WP-02 |
-| IN-02 治理不 import 生产运行时 | MUST | ABSENT | 同上 | — | WP-02 |
-| IN-03 core-only 安装通过核心测试 | MUST | ABSENT | 无 core-only CI matrix（20 workflows 无此项） | — | WP-02/G2 |
-| IN-04 治理关闭不影响生产 | MUST | PARTIAL | `nf run` 链不引用 `core.trust.*`（待 WP-02 静态证） | 无开关测试 | WP-02/G3 |
+| IN-01 生产不 import 治理 | MUST | SUPPORTED | `protocol/independence.json`（三平面归属）+ `core/independence.py`（全 core 模块静态闭包）+ `scripts/check_independence.py`；check49 | `desktop/tests/test_independence.py`（11 例，6 类变异自证） | —（R3 收口） |
+| IN-02 治理不 import 生产运行时 | MUST | SUPPORTED | 同上（三平面互斥 + 禁止边 production↛governance / governance↛production / shared↛任一平面）；check49 | 同上；`results/independence.json` 在盘 == 实时重算 | —（R3 收口） |
+| IN-03 core-only 安装通过核心测试 | MUST | ABSENT | 无 core-only CI matrix（20 workflows 无此项）；静态边界已证但安装矩阵未建 | — | G2/WP-02 余项 |
+| IN-04 治理关闭不影响生产 | MUST | PARTIAL | 静态面无生产→治理 import（check49 已证）；运行面开关/逐字节一致未测 | 无开关测试 | G3 |
 | IN-05 契约 schema 双方共同评审 | MUST | PARTIAL | `decisions/` 3 件 ADR（含模板/示例），`protocol/adr/registry.json` | `test_trust_adr_contract.py` | 无双平面契约评审记录；G0 |
 
-**矩阵汇总（本机）**：SUPPORTED 4 / PARTIAL 17 / ABSENT 13（共 34）。没有任何一条被写成「已通过」；方案 §1.3 总 DoD 的 8 条本机均未达成。
+**矩阵汇总（本机，R3 更新）**：SUPPORTED 6 / PARTIAL 19 / ABSENT 9（共 34）。IN-01/IN-02 由 check49（`protocol/independence.json` + 全 core 模块闭包）收口；其余缺口按表内 WP 列推进。方案 §1.3 总 DoD 的 8 条本机仍未达成，矩阵里没有任何一条被写成「已通过」。
 
 ## 6. check 编号对账（方案 §14.1 与本仓基线）
 
@@ -225,7 +226,7 @@ python -V; node -v; dotnet --list-sdks | head -1
 |---|---|---|---|
 | check45 | Wiki 完整性 | **check43** | 43 是 `quality_baseline.py:21` 显式预留空号（「留给其它线」），先占先用 |
 | check46 | Spec 编译 + 黄金路径 + 2 Adapter | **check44** | 同上；且与 check43 成对落在 G1 |
-| check47 | 治理独立性 + 非 NF 产物 + 附件模式 | **check49** | 45–48 已被 Trust Fabric 占用，49 起顺延 |
+| check47 | 治理独立性 + 非 NF 产物 + 附件模式 | **check49（已落地 IN-01/IN-02 部分；非 NF 产物验证/附件模式属 G3）** | 45–48 已被 Trust Fabric 占用，49 起顺延 |
 | check48 | AI 证据 + 生态导出 + 自审计 | **check50** | 同上 |
 | check49 | 全仓代码质量棘轮 | **check51** | 同上 |
 | check50 | 文档 claims 一致性 | **check52** | 同上 |

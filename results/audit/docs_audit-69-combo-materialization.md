@@ -7,10 +7,12 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - scripts/nf.py:4b065db63fb34f89faf545c3d91a0f5c76facedf18c3427353312461da8f0b92
+  - scripts/nf.py:75ed1ad2dda5fb07dbd914a6ffedb836e5cf1298bf34b98be602644827ebc925
   - docs/combos.md:4f5b22bf353a07ff439e44596bd44bea74e7c95d8a811c8ddde17f42f8fbc45c
 
 ---
+> 重审（2026-11-14）：NF-Final WP-02 双平面边界 check49：verify.sh 新增 check49（段 D）+ quality_baseline v2.35（47 check / PASS=85），被审对象变更后机械重绑
+
 > 重审（2026-11-14）：WP-15 check45 接线与 G1 收口（机械重绑）
 
 > 重审（2026-11-14）：WP-11 trust bundle 入仓（机械重绑）

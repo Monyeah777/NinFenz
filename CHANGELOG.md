@@ -7,6 +7,7 @@
 ## [未发布] - 2026-11-09 · 职能坐标（ADR-0006）+ 项目改名：NarrativeForge → NinFenz（宁封子）+ 全仓审计 V3 修复波
 
 > 日期为该「未发布」节的**最新一次改动**日期（审计 W9：此前停在 2026-10-06，早于 HEAD）。
+- **门禁扩到 check49（G0 生产/治理双平面边界，2026-11-14）**：新增 `check49`——`protocol/independence.json` 三平面（production/governance/shared）互斥登记 + 对**全部 core 模块**做静态导入闭包（未登记中间模块也遍历），生产↛治理、治理↛生产、共享↛任一平面，任一跨界即 FAIL；动态导入（`__import__`/`importlib`）默认 FAIL，只允许 `dynamic_allow` 显式登记理由；报告 `results/independence.json` 须 == 实时重算。变异夹具 `test_independence`（11 例）证明跨平面边/未登记中间跳/缺件/重复归属/未白名单动态导入/报告漂移都能置红。验收：verify v2.35 **check1-42/45/46/47/48/49 · PASS=85**。
 - **门禁扩到 check48（DoD Trust 收口，2026-11-14）**：新增 `check48`——交付件在位（DOD/SELF_AUDIT/CLAIM_MATRIX/BASELINE/THREAT_MODEL/WITNESS_SPEC）、claim 无未完成/无证据状态、PARTIAL 必须绑定 ENV、自审计 P0=0 且门禁 PASS 与 quality_baseline 一致、verify.sh 的 check45-48 不断链。验收：verify v2.34 **check1-42/45/46/47/48 · PASS=83**。
 - **门禁扩到 check47（G4 Trust 见证面，2026-11-14）**：新增 `check47`——T3 组合判定（签名 + TSA 桩 + STH + witness 阈值 → achieved=T3）、witness 阈值不足不得达 T3、required=T4 必须 exit2 + PUBLIC-ANCHOR-MISSING（公共锚未建不得声称）、跨语言 parity 证据在位且实现独立；不联网、不依赖 openssl/node 运行时。验收：verify v2.33 **check1-42/45/46/47 · PASS=81**。
 - **门禁扩到 check46（G2 Trust 证据链，2026-11-14）**：新增 `check46`——DSSE + issuer registry + 链头签名 + 锚 的组合判定（冻结 schema/语句绑定/生命周期/等级判定任一处断裂即 FAIL；不联网、不依赖 openssl）；变异夹具 `test_trust_gate46` 用代码层打桩证明摘要绑定/吊销 fail-closed/T4 不许声称/组合等级四条判据都能被置红。验收：verify v2.32 **check1-42/45/46 · PASS=79**。

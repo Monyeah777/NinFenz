@@ -1,12 +1,12 @@
 {
   "built_for_date": "2026-11-14",
   "declared": {
-    "check_label": "check1-42/45/46/47/48",
-    "coverage_note": "判据级抽查面 31 条，各对应 verify.sh 的一道或多道门禁；≠ 声明 check 总数 46（两者不可互替）",
-    "expected_checks": 46,
-    "expected_pass": 83,
-    "report_items": 31,
-    "verify_version": "v2.34"
+    "check_label": "check1-42/45/46/47/48/49",
+    "coverage_note": "判据级抽查面 32 条，各对应 verify.sh 的一道或多道门禁；≠ 声明 check 总数 47（两者不可互替）",
+    "expected_checks": 47,
+    "expected_pass": 85,
+    "report_items": 32,
+    "verify_version": "v2.35"
   },
   "items": [
     {
@@ -241,8 +241,8 @@
       "sample": [],
       "source": "quality_baseline.scan",
       "stats": {
-        "checks": 46,
-        "verify_version": "v2.34"
+        "checks": 47,
+        "verify_version": "v2.35"
       },
       "status": "pass",
       "warns": 0
@@ -298,7 +298,7 @@
       "stats": {
         "contracts": 27,
         "passed": 27,
-        "root": "fc7329f7898418a417edcced08a4aeb73b2549f8310163f1d827d11431e61fe8",
+        "root": "7083ee9980076a43db7deaeb0c0178a3207409430c5afe8366d0a72049059378",
         "verdict": "conformant"
       },
       "status": "pass",
@@ -326,9 +326,9 @@
       "sample": [],
       "source": "repo_stats.check_strict",
       "stats": {
-        "baseline_checks": 46,
-        "baseline_pass": 83,
-        "check_label": "check1-42/45/46/47/48",
+        "baseline_checks": 47,
+        "baseline_pass": 85,
+        "check_label": "check1-42/45/46/47/48/49",
         "concept_graphs": 101,
         "core_modules": 13,
         "core_pipelines": [
@@ -356,8 +356,8 @@
         "standards_total": 370,
         "standards_unreachable": 38,
         "subdivisions_total": 1200,
-        "verify_checks": 46,
-        "verify_version": "2.34"
+        "verify_checks": 47,
+        "verify_version": "2.35"
       },
       "status": "pass",
       "warns": 0
@@ -369,11 +369,11 @@
       "sample": [],
       "source": "code_metrics.scan",
       "stats": {
-        "baseline": 373,
-        "files": 373,
+        "baseline": 375,
+        "files": 375,
         "max_fn_cc": 132,
         "max_fn_lines": 443,
-        "max_lines": 9882
+        "max_lines": 9888
       },
       "status": "pass",
       "warns": 0
@@ -430,10 +430,10 @@
       "source": "coupling_metrics.scan",
       "stats": {
         "cycles": 0,
-        "metrics_drift": 0,
-        "metrics_missing": 0,
+        "metrics_drift": 2,
+        "metrics_missing": 1,
         "metrics_recorded": 289,
-        "modules": 289,
+        "modules": 290,
         "registered_cycles": 0,
         "registered_sdp": 9,
         "sdp": 9
@@ -478,10 +478,10 @@
       "sample": [],
       "source": "judgement_coverage.scan",
       "stats": {
-        "consumed": 66,
+        "consumed": 67,
         "exceptions": 2,
         "orphans": 2,
-        "scanners": 68
+        "scanners": 69
       },
       "status": "pass",
       "warns": 0
@@ -526,8 +526,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4578,
-        "kernel": 2423,
+        "files": 4582,
+        "kernel": 2424,
         "kernel_no_self": 308,
         "rules": 9,
         "uncovered": 0,
@@ -536,14 +536,31 @@
       },
       "status": "pass",
       "warns": 0
+    },
+    {
+      "id": "independence",
+      "issues": 0,
+      "name": "生产/治理双平面 import 边界（闭包零跨界 + 报告可复算）",
+      "sample": [],
+      "source": "independence.scan",
+      "stats": {
+        "dynamic_allow": 1,
+        "forbidden_edges": 0,
+        "governance": 9,
+        "modules": 295,
+        "production": 31,
+        "shared": 25
+      },
+      "status": "pass",
+      "warns": 0
     }
   ],
-  "root_digest": "66d7b1445226f460446cf7f75d345287d7a2225c401c4db93e998aef184224aa",
+  "root_digest": "03f54e5a7090fa17ee6262d3e671fd65db471b6edf12b9485a677901823f417a",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
     "fail": 0,
-    "pass": 30,
+    "pass": 31,
     "warn": 1
   }
 }

@@ -4,9 +4,9 @@
     "entry": 26,
     "floor": 5,
     "prod": 1057,
-    "projection": 170,
+    "projection": 173,
     "support": 489,
-    "verify": 1361
+    "verify": 1362
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9989,6 +9989,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "NF-Final §16.2 仲裁登记契约（WP-04）：12 条裁决 ↔ 机器投影/真源工件互相绑定。",
+      "path": "desktop/tests/test_nf_final_adr_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "NF 语言面符号索引单测（编辑器智能的数据真源）。",
       "path": "desktop/tests/test_nf_language.py",
       "role": "verify",
@@ -14550,16 +14556,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "d20b592a03c04c65ddef5d2b85908b7032785df3de97f2140326ecc80b191f6e",
+  "root_digest": "b31adb9e6b6d89df23a9b34af0e4366d1e21dcad2c51515dd9259a76138a50bb",
   "rule_counts": {
     "R-app": 1469,
     "R-catch": 337,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 150,
+    "R-projection": 153,
     "R-support": 124,
-    "R-verify": 1235,
+    "R-verify": 1236,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

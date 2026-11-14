@@ -3881,6 +3881,12 @@ CHECK_GUIDE = {
           "修 anchor.verify_anchor_set 的 t"
           "hreshold 判定；parity 引用仓内实现 → 重写"
           "独立复算。",
+    "49": "缺什么：生产/治理双平面边界被破坏（生产 import 治理 / 治理 import 生产运行时 / "
+          "共享原语反向依赖平面；或 protocol/independence.json 登记缺件/跨平面重复/动态导入未白名单；"
+          "或 results/independence.json 与实时重算不一致）。补什么：跑 "
+          "python scripts/check_independence.py 看逐条闭包路径；改归属或断开依赖边；动态导入改静态或在 "
+          "dynamic_allow 登记理由；改完 --write 重算报告。示例：生产模块 from core import evidence "
+          "→ 改为调用方注入数据/共享原语。",
 }
 
 def _cmd_preset(args):

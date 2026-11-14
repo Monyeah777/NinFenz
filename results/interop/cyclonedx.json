@@ -59,7 +59,7 @@
   ],
   "metadata": {
     "component": {
-      "bom-ref": "pkg:nf/ninfenz@v2.34",
+      "bom-ref": "pkg:nf/ninfenz@v2.35",
       "licenses": [
         {
           "license": {
@@ -89,7 +89,7 @@
       }
     ]
   },
-  "serialNumber": "urn:uuid:cd5c8b59-6562-d642-3a6e-f88c05a88983",
+  "serialNumber": "urn:uuid:286262f1-6d8a-042e-60c4-5f258e00c921",
   "specVersion": "1.5",
   "version": 1
 }

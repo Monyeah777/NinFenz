@@ -7,18 +7,20 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:9a86928171c71f4a2d3d324508fdafccb60fd7cc8423d52197185214a40ea30f
-  - scripts/nf.py:4b065db63fb34f89faf545c3d91a0f5c76facedf18c3427353312461da8f0b92
+  - scripts/nf.py:75ed1ad2dda5fb07dbd914a6ffedb836e5cf1298bf34b98be602644827ebc925
   - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
   - scripts/nf:406c221f9f16fb6e318e230b0b0120e3a6d3c9231d57f66285e0e4615e18ca91
   - scripts/nf.cmd:d1e7ea3a9e99c0822102884cddafe1cdf3893d9b75d19abebe7a8d2a8abeec5a
-  - verify.sh:f29ba8bde445b32ff0674cc524468fe26d5ee583562d4a81183dcbfd17232553
-  - desktop/src/core/quality_baseline.py:2667ae7dde5c873a1a43b66d94de083d652c44ce212c5ea4c72ba52801eb0368
+  - verify.sh:18e2089ead65a11b4729ded516860cdf1d31cdb54a35935051249b40fbf7b53d
+  - desktop/src/core/quality_baseline.py:ce4f156f61ee54bf18d7432c6875717d44b319da00b62fef3dca9d947da0203f
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - docs/terminal.md:5e3ac66ba65bb390425d1eef6ab251b5d763f443938e6bccfc9924f21d037d54
   - docs/L3_FROZEN.md:863a152271b1b969a3249194d1169628f4a4647a9bdd801473cfc9cb75c6643b
-  - protocol/CONFORMANCE.md:e8049d1bd3a3883a8183a9fe7397c0cf3436b7580fde709becce036ac55431c6
+  - protocol/CONFORMANCE.md:b106affb01c8121848db824bcc9d52d5a41a90ea6419f4a35f4c6c1898e592f1
 
 ---
+> 重审（2026-11-14）：NF-Final WP-02 双平面边界 check49：verify.sh 新增 check49（段 D）+ quality_baseline v2.35（47 check / PASS=85），被审对象变更后机械重绑
+
 > 重审（2026-11-14）：WP-15 check45 接线与 G1 收口（机械重绑）
 
 > 重审（2026-11-14）：WP-11 trust bundle 入仓（机械重绑）

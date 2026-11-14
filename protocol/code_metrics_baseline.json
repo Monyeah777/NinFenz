@@ -585,6 +585,11 @@
       "max_fn_cc": 17,
       "max_fn_lines": 29
     },
+    "desktop/src/core/independence.py": {
+      "lines": 244,
+      "max_fn_cc": 15,
+      "max_fn_lines": 46
+    },
     "desktop/src/core/ingest_common.py": {
       "lines": 227,
       "max_fn_cc": 8,
@@ -1510,6 +1515,11 @@
       "max_fn_cc": 17,
       "max_fn_lines": 71
     },
+    "scripts/check_independence.py": {
+      "lines": 66,
+      "max_fn_cc": 12,
+      "max_fn_lines": 38
+    },
     "scripts/check_interop_schemas.py": {
       "lines": 391,
       "max_fn_cc": 22,
@@ -1656,7 +1666,7 @@
       "max_fn_lines": 26
     },
     "scripts/nf.py": {
-      "lines": 9882,
+      "lines": 9888,
       "max_fn_cc": 132,
       "max_fn_lines": 443
     },
