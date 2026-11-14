@@ -26,8 +26,10 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:d2342bf3a8b3f036b8e32c6118259aeeac2cec880ebc29775875320f41dc1ece
+  - protocol/code_metrics_baseline.json:94cd39fe02d8e39e483b5733f760e8252da2aecf7424714c9467e4fe0689ad6b
 ---
+> 重审（2026-11-14）：NF-Final WP-21：新增 core/assembly_runtime.py、results/assembly/sample-document.assembly.json、docs/assembly-runtime.md、test_assembly_runtime_contract.py；nf agent run --assembly；assertions/data_contracts/independence/code_metrics/check12 更新
+
 > 重审（2026-11-14）：NF-Final WP-20：新增 core/agent_adapter.py、nf agent CLI、results/adapter/adapter-report.json、docs/agent-adapter.md、test_agent_adapter_contract.py；终端族/表面/文档计数/译件更新，audit 重绑
 
 > 重审（2026-11-14）：NF-Final WP-12：新增 core/context_packer.py、docs/context-packer.md、test_context_packer_contract.py；nf wiki context --role 接入；independence/code_metrics/check12 更新，被审对象变更后机械重绑

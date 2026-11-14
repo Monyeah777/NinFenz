@@ -11,12 +11,14 @@ subjects:
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/storage.py:b64401314fd788fe0bae9676c21d61f162d704d3ac81e2f1d619b963149ab88c
   - desktop/src/core/gap_review.py:7d1d600926e13b9936f2a7d30e8a8ca95e4bb3b2a73308f88cfb89b563055953
-  - scripts/nf.py:ee012a63079baa894f255bf3594378f8d803359082785177178cfbe16d8ff107
+  - scripts/nf.py:4e8fb0b08b1eff6e8df543911dab0ce38efd5f4a78218acd9438f9da97ce5426
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - scripts/check_interop_schemas.py:f9c1add0ee80fb23a3913e32482027e9a4049c5ce70cb35b2b1be4afa075d091
   - scripts/ai_domain_closure.py:583cb8ef79afe689df27a1b73885b314dda31e667c8f4f585c907828571356ad
 
 ---
+> 重审（2026-11-14）：NF-Final WP-21：新增 core/assembly_runtime.py、results/assembly/sample-document.assembly.json、docs/assembly-runtime.md、test_assembly_runtime_contract.py；nf agent run --assembly；assertions/data_contracts/independence/code_metrics/check12 更新
+
 > 重审（2026-11-14）：NF-Final WP-20：新增 core/agent_adapter.py、nf agent CLI、results/adapter/adapter-report.json、docs/agent-adapter.md、test_agent_adapter_contract.py；终端族/表面/文档计数/译件更新，audit 重绑
 
 > 重审（2026-11-14）：NF-Final WP-12：新增 core/context_packer.py、docs/context-packer.md、test_context_packer_contract.py；nf wiki context --role 接入；independence/code_metrics/check12 更新，被审对象变更后机械重绑

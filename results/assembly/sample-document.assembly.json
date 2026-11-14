@@ -1,0 +1,164 @@
+{
+  "assembly": {
+    "assets": [],
+    "checks": [
+      {
+        "id": "K-001",
+        "rule": "输出 citations 必须来自上下文（编造引用=0）"
+      },
+      {
+        "id": "K-002",
+        "rule": "输出必须过 nf-adapter-output/1 契约"
+      },
+      {
+        "id": "K-003",
+        "rule": "content ≤ budget.max_tokens×4"
+      },
+      {
+        "id": "K-004",
+        "rule": "输出只在 task.slot 范围内"
+      }
+    ],
+    "fallback": {
+      "on_failure": "abort"
+    },
+    "modules": [
+      "wiki:module:M06"
+    ],
+    "output": {
+      "form": "md",
+      "path": "out/module-M06.md"
+    },
+    "pipeline": "P00",
+    "schema": "nf-assembly/1",
+    "steps": [
+      {
+        "id": "S01",
+        "inputs": [
+          "slot:module-M06"
+        ],
+        "module": "core:spec_compiler"
+      },
+      {
+        "id": "S02",
+        "inputs": [
+          "slot:module-M06"
+        ],
+        "module": "core:spec_compiler"
+      },
+      {
+        "id": "S03",
+        "inputs": [
+          "slot:module-M06"
+        ],
+        "module": "core:context_packer"
+      },
+      {
+        "id": "S04",
+        "inputs": [
+          "slot:module-M06"
+        ],
+        "module": "core:agent_adapter"
+      },
+      {
+        "id": "S05",
+        "inputs": [
+          "slot:module-M06"
+        ],
+        "module": "core:agent_adapter"
+      },
+      {
+        "id": "S06",
+        "inputs": [
+          "slot:module-M06"
+        ],
+        "module": "core:assembly_runtime"
+      },
+      {
+        "id": "S07",
+        "inputs": [
+          "slot:module-M06"
+        ],
+        "module": "core:assembly_runtime"
+      }
+    ]
+  },
+  "run": {
+    "adapter": "mock",
+    "checks": [
+      {
+        "detail": "citation_rate=1.0",
+        "id": "K-001",
+        "ok": true
+      },
+      {
+        "detail": "nf-adapter-output/1 通过",
+        "id": "K-002",
+        "ok": true
+      },
+      {
+        "detail": "chars=37 max=4800",
+        "id": "K-003",
+        "ok": true
+      },
+      {
+        "detail": "输出只在 slot slot:module-M06 内，引用均来自上下文",
+        "id": "K-004",
+        "ok": true
+      }
+    ],
+    "fallback": {
+      "mode": "fail-fast",
+      "used": false
+    },
+    "intent": "spec/intents/sample-document.json",
+    "note": "run 只存 digest/相对路径；正文不落记录",
+    "output": {
+      "chars": 37,
+      "digest": "2b3a3794dd47880320c69fe7b1b250eb27715837e578c2430d387499d5bcc058",
+      "kind": "md",
+      "path": "out/module-M06.md",
+      "tokens": 9
+    },
+    "schema": "nf-assembly-run/1",
+    "status": "delivered",
+    "steps": [
+      {
+        "detail": "spec=output:wiki:module:M06 digest=3ed4bd893806…",
+        "id": "spec",
+        "ok": true
+      },
+      {
+        "detail": "slot=slot:module-M06 refs=1",
+        "id": "task",
+        "ok": true
+      },
+      {
+        "detail": "entries=1 chars=210",
+        "id": "context",
+        "ok": true
+      },
+      {
+        "detail": "citations=wiki:module:M06",
+        "id": "adapter",
+        "ok": true
+      },
+      {
+        "detail": "kind=md chars=37 digest=2b3a3794dd47…",
+        "id": "output",
+        "ok": true
+      },
+      {
+        "detail": "checks=4 ok=4",
+        "id": "gate",
+        "ok": true
+      },
+      {
+        "detail": "export=记录（正文由 WP-23 Delivery 负责）",
+        "id": "export",
+        "ok": true
+      }
+    ]
+  },
+  "schema": "nf-assembly-run/1"
+}

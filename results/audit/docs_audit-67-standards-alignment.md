@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/asset_density.py:aa60651ad8269e7db09a709570ae69192f39ee95cfd6bd1d4f652696b3d26c56
   - docs/domain-packs.md:f90ff233965ee1bb5a872dd833b79e200bfc1825db9c81f651ceca760d83d8b6
-  - protocol/data_contracts.json:ac330f481bd61129a941e53163b7cadc39b089ff8dec3ea2700ee6b165936b88
+  - protocol/data_contracts.json:c3b44362ca6c19b0bf0ce3cfb03698f56af573ca55c1bb0e84d074e8536614f6
 ---
+> 重审（2026-11-14）：NF-Final WP-21：新增 core/assembly_runtime.py、results/assembly/sample-document.assembly.json、docs/assembly-runtime.md、test_assembly_runtime_contract.py；nf agent run --assembly；assertions/data_contracts/independence/code_metrics/check12 更新
+
 > 重审（2026-11-14）：NF-Final WP-20：新增 core/agent_adapter.py、nf agent CLI、results/adapter/adapter-report.json、docs/agent-adapter.md、test_agent_adapter_contract.py；终端族/表面/文档计数/译件更新，audit 重绑
 
 > 重审（2026-11-14）：NF-Final G1 收口：新增 results/{G1_DOD.md,g1_dod.json}、test_g1_dod.py；assertions/data_contracts/check12/code_metrics 更新，被审对象变更后机械重绑

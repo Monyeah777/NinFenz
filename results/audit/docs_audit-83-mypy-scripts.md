@@ -12,10 +12,12 @@ subjects:
   - scripts/interop_thirdparty_kit.py:4f967d3f29cd31deb79f1b97fdee5f59ae74fde0d378ced571d2896af2d275dc
   - scripts/build_verification_cards.py:370f465c17eb18e4ef928194351c759bf33af75e5c1cd5b85abfc2a4b1d39655
   - scripts/geo_export.py:7a4200761fb7d79f945a37b557882eb8de968081057068d26a7a144d11d1b527
-  - scripts/nf.py:ee012a63079baa894f255bf3594378f8d803359082785177178cfbe16d8ff107
+  - scripts/nf.py:4e8fb0b08b1eff6e8df543911dab0ce38efd5f4a78218acd9438f9da97ce5426
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:d2342bf3a8b3f036b8e32c6118259aeeac2cec880ebc29775875320f41dc1ece
+  - protocol/code_metrics_baseline.json:94cd39fe02d8e39e483b5733f760e8252da2aecf7424714c9467e4fe0689ad6b
 ---
+> 重审（2026-11-14）：NF-Final WP-21：新增 core/assembly_runtime.py、results/assembly/sample-document.assembly.json、docs/assembly-runtime.md、test_assembly_runtime_contract.py；nf agent run --assembly；assertions/data_contracts/independence/code_metrics/check12 更新
+
 > 重审（2026-11-14）：NF-Final WP-20：新增 core/agent_adapter.py、nf agent CLI、results/adapter/adapter-report.json、docs/agent-adapter.md、test_agent_adapter_contract.py；终端族/表面/文档计数/译件更新，audit 重绑
 
 > 重审（2026-11-14）：NF-Final WP-12：新增 core/context_packer.py、docs/context-packer.md、test_context_packer_contract.py；nf wiki context --role 接入；independence/code_metrics/check12 更新，被审对象变更后机械重绑

@@ -994,6 +994,18 @@
         "test_agent_adapter_contract",
         "docs/agent-adapter.md"
       ]
+    },
+    {
+      "id": "assembly-record",
+      "artifact": "results/assembly/sample-document.assembly.json",
+      "quality_rule": "assertion:assembly-record",
+      "owner": "Assembly Runtime（core/assembly_runtime.py + test_assembly_runtime_contract）+ WP-21",
+      "status": "active",
+      "freshness": "intent/adapter/wiki 变化后重跑 --assembly 并写回（committed == 实时重算）",
+      "consumers": [
+        "test_assembly_runtime_contract",
+        "docs/assembly-runtime.md"
+      ]
     }
   ]
 }

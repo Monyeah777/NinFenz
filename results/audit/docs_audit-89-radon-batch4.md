@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
-  - protocol/code_metrics_baseline.json:d2342bf3a8b3f036b8e32c6118259aeeac2cec880ebc29775875320f41dc1ece
+  - protocol/code_metrics_baseline.json:94cd39fe02d8e39e483b5733f760e8252da2aecf7424714c9467e4fe0689ad6b
 ---
+> 重审（2026-11-14）：NF-Final WP-21：新增 core/assembly_runtime.py、results/assembly/sample-document.assembly.json、docs/assembly-runtime.md、test_assembly_runtime_contract.py；nf agent run --assembly；assertions/data_contracts/independence/code_metrics/check12 更新
+
 > 重审（2026-11-14）：NF-Final WP-20：新增 core/agent_adapter.py、nf agent CLI、results/adapter/adapter-report.json、docs/agent-adapter.md、test_agent_adapter_contract.py；终端族/表面/文档计数/译件更新，audit 重绑
 
 > 重审（2026-11-14）：NF-Final WP-12：新增 core/context_packer.py、docs/context-packer.md、test_context_packer_contract.py；nf wiki context --role 接入；independence/code_metrics/check12 更新，被审对象变更后机械重绑
