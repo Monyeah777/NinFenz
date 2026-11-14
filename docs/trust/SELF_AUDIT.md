@@ -60,5 +60,5 @@ python -m pytest desktop/tests/test_trust_self_audit_contract.py -q
 ## 不改写的历史结论
 
 - 本报告不回溯改 G0 的 `results/trust/BASELINE.md` 判定；基线是**审计当时**的实读，后续状态以本报告与各阶段交接为准。
-- 本版按 G2 更新：claim #16（DSSE）SUPPORTED（WP-20）；claim #15（删尾）SUPPORTED（WP-22/23：`trust/anchor.py` + `trust/signature.py`，TSA 锚 + 链头签名，端到端 T2 判据 `test_trust_signature.py`）；P1 从 5→3 条。
+- 本版按 G2 更新：claim #15/#16/#32/#33 全部 SUPPORTED（WP-20/22/23）；**G2 收口**（WP-25：check46 组合门禁，门禁 44 条 / PASS=79）；P1 稳定在 3 条（#18/#19/#21，全部 G3–G4 且有 owner）。
 - 「全量 bash verify.sh（3100+ 测试）」本轮未跑，如实记；静态面全量与受影响面全量分别取证（见上表与各 WP 记录）。CI 的 full 档是唯一发布结论口径。

@@ -5,8 +5,8 @@
     "floor": 5,
     "prod": 1057,
     "projection": 167,
-    "support": 471,
-    "verify": 1331
+    "support": 472,
+    "verify": 1332
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -11171,6 +11171,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "check46 判据自身判据：真仓全绿 + 变异必红（证明 G2 组合门禁不是同义反复）。",
+      "path": "desktop/tests/test_trust_gate46.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "trust.keys 判据：issuer registry 结构/语义 + 生命周期解析 + 注册表口径验签。",
       "path": "desktop/tests/test_trust_keys.py",
       "role": "verify",
@@ -14370,16 +14376,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "da3ce3ef6f723e5cd09fb3f87de68229ba55de87ab568402536546b4b4f63948",
+  "root_digest": "95be8c7cd9b3f60a0a505919de80b889bae07faec3810eb449eda2a0539108e1",
   "rule_counts": {
     "R-app": 1468,
-    "R-catch": 319,
+    "R-catch": 320,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 147,
     "R-support": 124,
-    "R-verify": 1205,
+    "R-verify": 1206,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

@@ -4,7 +4,7 @@
 >
 > **最后更新：2026-11-13（复核）**：29 行映射 / 双源核验（CHANGELOG ⇄ 编号方案）/ 更新纪律**复核不变**；修一处**状态陈旧**：
 > v0.92 行原标 `⏳`，而 `CHANGELOG.md` 已有 `## [0.92] - 2026-09-14` 发布记录（v0.93 亦已收口）→ 改标 **✅**。
-> 现状：行 **29**（✅ 29）· 最新门禁基线见 `protocol/repo_stats.json`（`baseline_checks=43` / `baseline_pass=77`），门禁基线 **check1-42/45 · PASS=77** ·
+> 现状：行 **29**（✅ 29）· 最新门禁基线见 `protocol/repo_stats.json`（`baseline_checks=44` / `baseline_pass=79`），门禁基线 **check1-42/45/46 · PASS=79** ·
 > 常驻判据 `test_version_matrix` **3 例**。见「§现状对照」。
 
 | 版本 | 日期/状态 | 方案文件 | 能力 |
@@ -45,7 +45,7 @@
 |---|---|---|
 | 行数 | **29**（✅ 29 · ⏳ 0） | 本页表格行计数 |
 | 双源 | CHANGELOG 发布归档 + 编号方案文档 | `CHANGELOG.md` 的 `## [x.y]` 与根目录方案件 |
-| 最新门禁基线 | `baseline_checks=43` / `baseline_pass=77` | `protocol/repo_stats.json`（不在此手写） |
+| 最新门禁基线 | `baseline_checks=44` / `baseline_pass=79` | `protocol/repo_stats.json`（不在此手写） |
 | 常驻判据 | **3 例** | `test_version_matrix.py` |
 | 状态口径 | `✅` 已发布/已收口 · `⏳` 未收口 | 与 CHANGELOG 标题对照 |
 
