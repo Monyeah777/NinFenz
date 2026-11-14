@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/trust/model-card.schema.json",
+  "title": "nf-model-card/1 模型卡（FR-A4-03；AI 证据的模型/评测绑定）",
+  "description": "AI 类证据必须绑定模型卡：model_id + model_digest + provider + 预注册评测协议（禁 score）。模型替换或评测协议变更会使旧 AI 证据失效（fail-closed）。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "model_id", "model_digest", "provider", "eval_protocol", "issued_at"],
+  "properties": {
+    "schema": {"const": "nf-model-card/1"},
+    "model_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"},
+    "model_digest": {"$ref": "#/$defs/digest"},
+    "provider": {"type": "string", "minLength": 1, "maxLength": 120},
+    "prompt_context_digest": {"$ref": "#/$defs/digest"},
+    "eval_protocol": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["protocol_id", "protocol_digest", "pre_registered", "score_forbidden"],
+      "properties": {
+        "protocol_id": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$", "maxLength": 64},
+        "protocol_digest": {"$ref": "#/$defs/digest"},
+        "pre_registered": {"const": true},
+        "score_forbidden": {"const": true}
+      }
+    },
+    "issued_at": {"$ref": "#/$defs/timestamp"},
+    "notes": {"type": "string", "maxLength": 500}
+  },
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "timestamp": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"}
+  }
+}

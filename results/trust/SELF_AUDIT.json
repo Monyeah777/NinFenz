@@ -1,13 +1,12 @@
 {
   "schema": "nf-trust-self-audit/1",
-  "head": "28e40bed247b81d9f29829fc0807ca8f41eebdd3",
-  "scanned_at": "2026-11-14T06:52:37Z",
+  "head": "975058afc515fcbefc73b50a5d8c412574659d0b",
+  "scanned_at": "2026-11-14T07:03:40Z",
   "dimensions": {
     "S0_requirements": {
       "status": "amber",
       "findings": [
-        "F-002",
-        "F-003"
+        "F-002"
       ]
     },
     "S1_code_holes": {
@@ -35,7 +34,7 @@
     "S6_test_gaps": {
       "status": "amber",
       "findings": [
-        "F-004"
+        "F-003"
       ]
     },
     "S7_doc_overclaim": {
@@ -61,8 +60,8 @@
     "S12_unknown": {
       "status": "amber",
       "findings": [
-        "F-005",
-        "F-006"
+        "F-004",
+        "F-005"
       ]
     }
   },
@@ -83,17 +82,6 @@
       "dim": "S0_requirements",
       "severity": "P1",
       "file": "",
-      "evidence": "claim #19 仍 TODO：模型替换使旧 AI 证据失效（model card 绑定）",
-      "fix": "按 CLAIM_MATRIX 的落点阶段（G2-G4）实现并补测试后改状态",
-      "test": "",
-      "owner": "Monyeah777（维护者）",
-      "status": "open"
-    },
-    {
-      "id": "F-003",
-      "dim": "S0_requirements",
-      "severity": "P1",
-      "file": "",
       "evidence": "claim #21 仍 TODO：Python ↔ .NET（引擎线）逐字节 parity（trust 面）",
       "fix": "按 CLAIM_MATRIX 的落点阶段（G2-G4）实现并补测试后改状态",
       "test": "",
@@ -101,7 +89,7 @@
       "status": "open"
     },
     {
-      "id": "F-004",
+      "id": "F-003",
       "dim": "S6_test_gaps",
       "severity": "P2",
       "file": "",
@@ -112,7 +100,7 @@
       "status": "open"
     },
     {
-      "id": "F-005",
+      "id": "F-004",
       "dim": "S12_unknown",
       "severity": "P2",
       "file": "",
@@ -123,7 +111,7 @@
       "status": "open"
     },
     {
-      "id": "F-006",
+      "id": "F-005",
       "dim": "S12_unknown",
       "severity": "P2",
       "file": "",
@@ -141,7 +129,7 @@
   },
   "stop": {
     "p0": 0,
-    "p1_open_with_owner": 2,
+    "p1_open_with_owner": 1,
     "claims_unsupported": 0
   }
 }

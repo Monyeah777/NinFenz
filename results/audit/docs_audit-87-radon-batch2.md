@@ -8,7 +8,7 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:fc81583bba765d6c91645087f69635cd000eccfb5e5a29dda158e465569a61f5
+  - protocol/code_metrics_baseline.json:c261c45f00d0a38f88f39f0dc4d5315eda7343bd7cfd098fc57981bad44217c1
 ---
 > 重审（2026-11-14）：WP-15 check45 接线与 G1 收口（机械重绑）
 
