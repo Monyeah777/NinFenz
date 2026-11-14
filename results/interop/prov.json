@@ -131,7 +131,7 @@
     {
       "@id": "nf:file/llms.txt",
       "@type": "prov:Entity",
-      "nf:sha256": "5c2308118d135d4164148697574b8e88df8771b1fb484a10c6646af99c79e4b1"
+      "nf:sha256": "54504cae3939df600c9059a358e9e93d036495b0b172868daef2bd9e06da704d"
     },
     {
       "@id": "nf:file/postmortems/PO-9000-示例-复盘模板.md",
@@ -141,7 +141,7 @@
     {
       "@id": "nf:file/protocol/CONFORMANCE.md",
       "@type": "prov:Entity",
-      "nf:sha256": "b106affb01c8121848db824bcc9d52d5a41a90ea6419f4a35f4c6c1898e592f1"
+      "nf:sha256": "f96beec1d99ba5a77c636467ba96ffa33797acccb8532d66f0d229d37cff98fd"
     },
     {
       "@id": "nf:file/protocol/LAYERS.json",
@@ -151,7 +151,7 @@
     {
       "@id": "nf:file/protocol/assertions.json",
       "@type": "prov:Entity",
-      "nf:sha256": "20f9fe3429bf63fc221ee51b9defb38743d5162b8008b1bd624df630aacc1a7e"
+      "nf:sha256": "8a55f31d786725b28ecabfb433442db8433761e1a5afd2df312c5b700745f955"
     },
     {
       "@id": "nf:file/protocol/asset_contracts.json",
@@ -301,7 +301,7 @@
     {
       "@id": "nf:file/protocol/repo_stats.json",
       "@type": "prov:Entity",
-      "nf:sha256": "319f4569c130efe2971df96e6205c9521e9512fa7e828e92db1be8c25a55448f"
+      "nf:sha256": "8c59edb08cee14dc6c02b1eb9690e63395e178a77329732ae9d15443f05df42e"
     },
     {
       "@id": "nf:file/protocol/rfc_index.json",

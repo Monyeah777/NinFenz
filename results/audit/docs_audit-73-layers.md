@@ -12,10 +12,10 @@ subjects:
   - desktop/src/core/purity_scan.py:bc114898836f914212cec64e0b22c7d3f93b8681557d82f845a200a85683b0cc
   - desktop/tests/test_purity_scan.py:6979d6c7f88822141daf73d04ac6e86b29ae47e01f5f35a8be80145925fca2d3
   - scripts/nf.py:29e1170dab08764e3970d90d64b57495bbd74dd256ebe7744db688a66b77aace
-  - verify.sh:18e2089ead65a11b4729ded516860cdf1d31cdb54a35935051249b40fbf7b53d
+  - verify.sh:3391c203ca4c17a56e0177ce6292239570ff367ee7fce6d08f19777f5ca54c8e
   - docs/layers.md:7b849fb07769ba6df5ca888a9de5323417b47a07ef54ec2c1c801673a7fbd7c0
   - docs/L3_FROZEN.md:863a152271b1b969a3249194d1169628f4a4647a9bdd801473cfc9cb75c6643b
-  - protocol/assertions.json:20f9fe3429bf63fc221ee51b9defb38743d5162b8008b1bd624df630aacc1a7e
+  - protocol/assertions.json:8a55f31d786725b28ecabfb433442db8433761e1a5afd2df312c5b700745f955
   - protocol/data_contracts.json:d645602695bd2fd02fa3db5739034d28ffd549d922806c40f93e3271b6a67c49
   - protocol/normative.json:c1bbc14c92cea6bd66ff6cb54fdcf91bf3072f66adee7027f1d3f42e70fe1825
   - protocol/glossary.json:0af6a0f3b1f128b30c0eb88a8db0d2c143461910a889737dfdf4e38e89f85ba7
@@ -23,6 +23,10 @@ subjects:
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
 
 ---
+> 重审（2026-11-14）：NF-Final WP-13：capability_index 给 check43/44 挂能力（DETERMINISTIC/PROVENANCE_TRACE/CONTRACT_STRUCT），消除能力空洞
+
+> 重审（2026-11-14）：NF-Final WP-13：verify.sh 新增 check43/44（Wiki/Spec），quality_baseline 常数 49/PASS=89、CHECK_LABEL；README/CHANGELOG/VERSION-MATRIX/CONFORMANCE/verification-cards/llms/repo_stats/SELF_AUDIT/interop 重新生成
+
 > 重审（2026-11-14）：NF-Final WP-12：新增 core/context_packer.py、docs/context-packer.md、test_context_packer_contract.py；nf wiki context --role 接入；independence/code_metrics/check12 更新，被审对象变更后机械重绑
 
 > 重审（2026-11-14）：NF-Final WP-11：新增 core/spec_compiler.py、spec/intents/sample-document.json、docs/spec-compiler.md、test_spec_compiler_contract.py、nf spec compile；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑

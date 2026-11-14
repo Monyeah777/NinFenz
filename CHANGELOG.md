@@ -6,6 +6,8 @@
 
 ## [未发布] - 2026-11-09 · 职能坐标（ADR-0006）+ 项目改名：NarrativeForge → NinFenz（宁封子）+ 全仓审计 V3 修复波
 
+- **门禁扩到 check43/44（G1 Wiki/Spec，2026-11-14）**：新增 `check43`（LLMWiki 完整性：覆盖/ID/关系/陈旧/三入口 + 生成物与真源逐字节）与 `check44`（Spec 编译：intent→nf-spec/1→nf-task/1 确定性 + schema + 拒绝未知 kind），对应 WP-13；`nf wiki check`/`nf spec compile` 不再是旁路判据。验收：verify v2.35 **check1-44/45/46/47/48/49 · PASS=89**。
+
 > 日期为该「未发布」节的**最新一次改动**日期（审计 W9：此前停在 2026-10-06，早于 HEAD）。
 - **门禁扩到 check49（G0 生产/治理双平面边界，2026-11-14）**：新增 `check49`——`protocol/independence.json` 三平面（production/governance/shared）互斥登记 + 对**全部 core 模块**做静态导入闭包（未登记中间模块也遍历），生产↛治理、治理↛生产、共享↛任一平面，任一跨界即 FAIL；动态导入（`__import__`/`importlib`）默认 FAIL，只允许 `dynamic_allow` 显式登记理由；报告 `results/independence.json` 须 == 实时重算。变异夹具 `test_independence`（11 例）证明跨平面边/未登记中间跳/缺件/重复归属/未白名单动态导入/报告漂移都能置红。验收：verify v2.35 **check1-42/45/46/47/48/49 · PASS=85**。
 - **门禁扩到 check48（DoD Trust 收口，2026-11-14）**：新增 `check48`——交付件在位（DOD/SELF_AUDIT/CLAIM_MATRIX/BASELINE/THREAT_MODEL/WITNESS_SPEC）、claim 无未完成/无证据状态、PARTIAL 必须绑定 ENV、自审计 P0=0 且门禁 PASS 与 quality_baseline 一致、verify.sh 的 check45-48 不断链。验收：verify v2.34 **check1-42/45/46/47/48 · PASS=83**。

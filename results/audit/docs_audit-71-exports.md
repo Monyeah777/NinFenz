@@ -6,20 +6,22 @@ scope: 作者指令「自述数字自动化，互操作性从他证，标准目�
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - verify.sh:18e2089ead65a11b4729ded516860cdf1d31cdb54a35935051249b40fbf7b53d
+  - verify.sh:3391c203ca4c17a56e0177ce6292239570ff367ee7fce6d08f19777f5ca54c8e
   - scripts/nf.py:29e1170dab08764e3970d90d64b57495bbd74dd256ebe7744db688a66b77aace
   - desktop/src/core/repo_stats.py:d7fd457d3a1804c3e9ab266c8071ad9d8950d4b5eb0a782ce658a66e05e90f9c
-  - desktop/src/core/quality_baseline.py:ce4f156f61ee54bf18d7432c6875717d44b319da00b62fef3dca9d947da0203f
+  - desktop/src/core/quality_baseline.py:20c76eb55402b419d31d5249da071992b19c331a62c59dce94ab3c965672f515
   - scripts/interop_thirdparty_kit.py:4f967d3f29cd31deb79f1b97fdee5f59ae74fde0d378ced571d2896af2d275dc
   - scripts/geo_export.py:7a4200761fb7d79f945a37b557882eb8de968081057068d26a7a144d11d1b527
   - scripts/fde_sample_run.py:ae1e644b7ab0b61e430d6224ef4495e4371cba86e520d99c8d532cfb9370568d
-  - protocol/CONFORMANCE.md:b106affb01c8121848db824bcc9d52d5a41a90ea6419f4a35f4c6c1898e592f1
+  - protocol/CONFORMANCE.md:f96beec1d99ba5a77c636467ba96ffa33797acccb8532d66f0d229d37cff98fd
   - docs/fde-stack.md:96c074dffcbcc513fbf3bec79d5b895ac9cfec543430f21805eb5d2370b43bca
   - docs/fde-sample/README.md:ac3da5b467b4963681af3ded98c65a184577883e90f215b9e852aaca104294c4
   - docs/interop-thirdparty.md:108fd4cddc6ef082b29270a8269b7a7153cbb53e6113fec73227e84fb9276271
   - results/interop-thirdparty-status.md:e57c95980dd8b36bf137d23db0cf3c93ba8aee5221d2d26f2a6c782c30df0469
 
 ---
+> 重审（2026-11-14）：NF-Final WP-13：verify.sh 新增 check43/44（Wiki/Spec），quality_baseline 常数 49/PASS=89、CHECK_LABEL；README/CHANGELOG/VERSION-MATRIX/CONFORMANCE/verification-cards/llms/repo_stats/SELF_AUDIT/interop 重新生成
+
 > 重审（2026-11-14）：NF-Final WP-12：新增 core/context_packer.py、docs/context-packer.md、test_context_packer_contract.py；nf wiki context --role 接入；independence/code_metrics/check12 更新，被审对象变更后机械重绑
 
 > 重审（2026-11-14）：NF-Final WP-11：新增 core/spec_compiler.py、spec/intents/sample-document.json、docs/spec-compiler.md、test_spec_compiler_contract.py、nf spec compile；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑

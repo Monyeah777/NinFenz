@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-11-14",
   "approved_by": "Monyeah777",
-  "note": "NF-Final G1 WP-12 Context Packer（角色/预算/引用/抗注入）",
+  "note": "NF-Final G1 WP-13（能力索引覆盖 check43/44）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "8351e78dec93dccd7c6bf72df679bd5fd7384cc4539efec7d75c8a94b0d754fa"
