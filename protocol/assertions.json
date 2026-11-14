@@ -1103,6 +1103,21 @@
       "message": "治理审计包缺失或版本名不符（WP-33 判据依赖它）",
       "fix": "重跑 core.governance_report.write；再跑 test_governance_report_contract",
       "evidence": "test_governance_report_contract / conformance::modeling"
+    },
+    {
+      "id": "g3-dod",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "results/g3_dod.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-g3-dod/1"
+      },
+      "message": "G3 DoD 收口审计缺失或版本名不符（Gate 准入判据依赖它）",
+      "fix": "补/修 results/g3_dod.json；再跑 test_g3_dod",
+      "evidence": "test_g3_dod / conformance::modeling"
     }
   ]
 }
