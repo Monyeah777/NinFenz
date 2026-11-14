@@ -137,6 +137,7 @@
     "test_cot_exposure": 2.6,
     "test_coupling_metrics": 1.7,
     "test_coverage_workflow_contract": 0.2,
+    "test_cq_scan_contract": 3.4,
     "test_cross_lang_matrix": 4.8,
     "test_cross_lang_verify": 1.6,
     "test_cross_lang_workflow_contract": 0.2,
@@ -1846,6 +1847,16 @@
     "test_coverage_workflow_contract.CoverageWorkflowContractTest.test_fail_closed": 0.0,
     "test_coverage_workflow_contract.CoverageWorkflowContractTest.test_threshold_matches_release_gate": 0.0,
     "test_coverage_workflow_contract.CoverageWorkflowContractTest.test_workflow_matches_contract": 0.0,
+    "test_cq_scan_contract.CqScanContractTest.test_artifacts_valid": 0.0,
+    "test_cq_scan_contract.CqScanContractTest.test_blocked_tools_are_honest": 0.0,
+    "test_cq_scan_contract.CqScanContractTest.test_cheap_live_scans_clean": 0.7,
+    "test_cq_scan_contract.CqScanContractTest.test_docs_present_and_consistent": 0.0,
+    "test_cq_scan_contract.CqScanContractTest.test_findings_shaped_and_counted": 0.0,
+    "test_cq_scan_contract.CqScanContractTest.test_freshness_fingerprint": 2.55,
+    "test_cq_scan_contract.CqScanContractTest.test_hotspots_sorted": 0.0,
+    "test_cq_scan_contract.CqScanContractTest.test_mutations_red": 0.0,
+    "test_cq_scan_contract.CqScanContractTest.test_no_overclaim": 0.0,
+    "test_cq_scan_contract.CqScanContractTest.test_scan_dimensions_and_p0_zero": 0.0,
     "test_cross_lang_matrix.CSharpJcsBinaryTest.test_csharp_impl_matches_every_vector": 0.82,
     "test_cross_lang_matrix.EdgeFixtureParityTest.test_edge_fixtures_are_byte_identical_across_implementations": 0.28,
     "test_cross_lang_matrix.ExeSubstitutionTest.test_verify_runs_the_resolved_exe": 0.0,
@@ -6225,5 +6236,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2144.0
+  "total_s": 2147.4
 }

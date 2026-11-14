@@ -28,6 +28,7 @@
 - [../LEGAL.md](../LEGAL.md) · [../GOVERNANCE.md](../GOVERNANCE.md) · [../docs/legal/](../docs/legal/)（法务/许可/出口 + 开源治理；真源 `protocol/legal.json`，审计入口 `scripts/legal_audit.py`，判据 `test_legal_contract.py`）
 - [../A11Y.md](../A11Y.md) · [../I18N.md](../I18N.md) · [a11y/A11Y_QA.md](../docs/a11y/A11Y_QA.md) · [i18n/I18N_QA.md](../docs/i18n/I18N_QA.md)（可访问性 WCAG/PAIR-HAX + 语言面/时区/RTL-bidi；真源 `protocol/{accessibility,i18n}.json`，判据 `test_a11y_i18n_contract.py`）
 - [assurance/CLAIMS.json](assurance/CLAIMS.json) · [../docs/assurance/ASSURANCE_CASE.md](../docs/assurance/ASSURANCE_CASE.md) · [../docs/RAID.md](../docs/RAID.md) · [../docs/ETHICS.md](../docs/ETHICS.md)（GSN/CAE 保证案例 + RAID + 伦理评审；真源 `results/assurance/CLAIMS.json` + `protocol/raid.json`，判据 `test_assurance_contract.py`）
+- [cq/scan.json](cq/scan.json) · [cq/toolchain.json](cq/toolchain.json) · [../docs/CQ_REPORT.md](../docs/CQ_REPORT.md) · [../docs/QUALITY_DEBT.md](../docs/QUALITY_DEBT.md)（全仓 CQ0/CQ1：工具矩阵 + 九维自动扫描 + 质量债/人工审查清单；判据 `test_cq_scan_contract.py`）
 
 ## 互操作导出面（入仓投影）
 

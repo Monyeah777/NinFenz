@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1488,
+    "app": 1491,
     "entry": 26,
     "floor": 5,
     "prod": 1061,
-    "projection": 179,
-    "support": 502,
-    "verify": 1404
+    "projection": 184,
+    "support": 503,
+    "verify": 1405
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8591,6 +8591,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "全仓 CQ0/CQ1 契约（NF-Final WP-0H）：工具矩阵 + 全量扫描件 + 热点 + 质量债/清单。",
+      "path": "desktop/tests/test_cq_scan_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "P-C1/P-C3 跨语言实现矩阵的**常驻**判据（三实现真跑同一批契约向量）。",
       "path": "desktop/tests/test_cross_lang_matrix.py",
       "role": "verify",
@@ -14832,17 +14838,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "e6e02e77197bdfb443bc0b8d440709cdbe24b82d50c0cb83f8aed65615465479",
+  "root_digest": "b008b98910c49e73432a68692d7a9733b7a42cf927c37728eaa64c94ec1dc899",
   "rule_counts": {
-    "R-app": 1488,
-    "R-catch": 349,
+    "R-app": 1491,
+    "R-catch": 350,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 158,
+    "R-projection": 162,
     "R-support": 124,
-    "R-verify": 1275,
-    "auto:R-core": 296
+    "R-verify": 1276,
+    "auto:R-core": 297
   },
   "schema": "nf-role-coordinates/1"
 }
