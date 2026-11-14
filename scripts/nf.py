@@ -2140,6 +2140,20 @@ def _add_parser_governance(sub):
     loc.add_argument("--json", action="store_true", help="机读输出（issues + stats）")
     loc.add_argument("--write", action="store_true",
                      help="重签文档译件的 source_sha256（写 protocol/locales.json）")
+    ag = sub.add_parser("agent",
+                        help="Agent Adapter（WP-20：有界任务/输出契约/2 adapter parity）",
+                        description="Adapter 只接收 nf-task/1 有界槽位；输出受 output_schema 约束；编造引用=0")
+    asub = ag.add_subparsers(dest="agent_cmd", required=True)
+    agl = asub.add_parser("list", help="列 adapter（能力/确定性/成本）")
+    agl.add_argument("--json", action="store_true")
+    agr = asub.add_parser("run", help="跑 adapter（intent→spec→task→context→adapter）")
+    agr.add_argument("--adapter", required=True, help="adapter id（mock / local-template）")
+    agr.add_argument("--intent", required=True, help="nf-intent/1 JSON 路径")
+    agr.add_argument("--budget", type=int, default=2000, help="上下文预算（字符）")
+    agr.add_argument("--role", default="author", help="context packer 角色")
+    agr.add_argument("--json", action="store_true", help="机读输出")
+    agr.add_argument("--report", action="store_true", help="写 results/adapter/adapter-report.json")
+
     wkp = sub.add_parser("wiki",
                          help="LLMWiki 编译（投影：pages/index/graph/llms.txt/MCP）",
                          description="Wiki 由真源编译（禁手改/禁复制正文）；check 用真源 digest 判陈旧")
@@ -9638,6 +9652,51 @@ def _try_rust_face(args) -> Optional[int]:
     return 0
 
 
+def _cmd_agent(args) -> int:
+    """nf agent：list / run（adapter 只接有界 task；输出契约 + parity）。"""
+    import json as _json
+
+    from core import agent_adapter as aa
+    cmd = getattr(args, "agent_cmd", None)
+    if cmd == "list":
+        rows = aa.list_adapters()
+        if getattr(args, "json", False):
+            print(_json.dumps(rows, ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print("== nf agent list（%d）==" % len(rows))
+            for row in rows:
+                print("  %-15s %-11s %s · %s" % (row["id"], row["kind"],
+                                                row["determinism"], row["desc"]))
+        return 0
+    if cmd == "run":
+        from core import context_packer as cp
+        from core import spec_compiler as sc
+        try:
+            intent = sc._load_intent_file(ROOT, args.intent)
+            bundle = sc.compile_intent(intent, ROOT, args.intent)
+            task = bundle["tasks"][0]
+            pack = cp.pack_task(task, ROOT, args.budget, args.role)
+            out = aa.run(args.adapter, task, pack, ROOT)
+        except (sc.SpecError, cp.PackError, aa.AdapterError) as exc:
+            print("✗ %s：%s" % (exc.code, exc.message), file=sys.stderr)
+            return 2
+        report = aa.parity_report(task, pack, ROOT)
+        if getattr(args, "report", False):
+            aa.write_report(report)
+        payload = {"output": out, "report": report}
+        if getattr(args, "json", False):
+            print(_json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print("== nf agent run（%s）==" % args.adapter)
+            print("  task %s · citations %s · parity %s"
+                  % (task["slot"]["id"], ",".join(out["citations"]), report["parity"]))
+            for item in report.get("issues") or []:
+                print("  ✗ %s" % item)
+        return 0 if report["parity"] else 1
+    print("用法：nf agent {list|run}", file=sys.stderr)
+    return 2
+
+
 def _cmd_wiki(args) -> int:
     """nf wiki：LLMWiki 编译/自检/取页/检索/邻居/上下文（投影，非第二真源）。"""
     import json as _json
@@ -9713,6 +9772,7 @@ def _cmd_wiki(args) -> int:
 
 _COMMAND_HANDLERS = {
     "shell": _cmd_shell, "terminal": _cmd_shell,
+    "agent": _cmd_agent,
     "wiki": _cmd_wiki,
     "layers": _cmd_layers,
     "verify": _cmd_verify,

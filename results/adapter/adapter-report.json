@@ -1,0 +1,27 @@
+{
+  "adapters": [
+    {
+      "chars": 36,
+      "citations": [
+        "wiki:module:M06"
+      ],
+      "id": "local-template",
+      "ok": true,
+      "tokens": 9
+    },
+    {
+      "chars": 37,
+      "citations": [
+        "wiki:module:M06"
+      ],
+      "id": "mock",
+      "ok": true,
+      "tokens": 9
+    }
+  ],
+  "issues": [],
+  "note": "local-template 是本地子进程桩（非真实外部模型）；真实外部 adapter 属外部操作（OPEN）",
+  "parity": true,
+  "schema": "nf-adapter-report/1",
+  "task_slot": "slot:module-M06"
+}

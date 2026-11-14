@@ -6,19 +6,21 @@ scope: 作者指令「删除 NF 中的 GUI，且为 NF 构建一个终端（CLI 
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/terminal.py:b40b5b318e040d601a80ddddfd0c6e4f4d3788a0f133c66d76c84b29eda60d4b
-  - scripts/nf.py:29e1170dab08764e3970d90d64b57495bbd74dd256ebe7744db688a66b77aace
+  - desktop/src/core/terminal.py:0f08f7bd30a2f033769ce2af9e758f291fd69bdcc784dc226763ad2d6007663c
+  - scripts/nf.py:ee012a63079baa894f255bf3594378f8d803359082785177178cfbe16d8ff107
   - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
   - scripts/nf:406c221f9f16fb6e318e230b0b0120e3a6d3c9231d57f66285e0e4615e18ca91
   - scripts/nf.cmd:d1e7ea3a9e99c0822102884cddafe1cdf3893d9b75d19abebe7a8d2a8abeec5a
   - verify.sh:3391c203ca4c17a56e0177ce6292239570ff367ee7fce6d08f19777f5ca54c8e
   - desktop/src/core/quality_baseline.py:20c76eb55402b419d31d5249da071992b19c331a62c59dce94ab3c965672f515
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
-  - docs/terminal.md:7384c383b36f97087db9dddf718ade2c7bf01d167d605d603252b1f0a245117a
+  - docs/terminal.md:69b41d4be9b9885f0f156b1aef30772c3d1a74224ec5db65001be5010872a06e
   - docs/L3_FROZEN.md:863a152271b1b969a3249194d1169628f4a4647a9bdd801473cfc9cb75c6643b
   - protocol/CONFORMANCE.md:f96beec1d99ba5a77c636467ba96ffa33797acccb8532d66f0d229d37cff98fd
 
 ---
+> 重审（2026-11-14）：NF-Final WP-20：新增 core/agent_adapter.py、nf agent CLI、results/adapter/adapter-report.json、docs/agent-adapter.md、test_agent_adapter_contract.py；终端族/表面/文档计数/译件更新，audit 重绑
+
 > 重审（2026-11-14）：NF-Final WP-13：verify.sh 新增 check43/44（Wiki/Spec），quality_baseline 常数 49/PASS=89、CHECK_LABEL；README/CHANGELOG/VERSION-MATRIX/CONFORMANCE/verification-cards/llms/repo_stats/SELF_AUDIT/interop 重新生成
 
 > 重审（2026-11-14）：NF-Final WP-12：新增 core/context_packer.py、docs/context-packer.md、test_context_packer_contract.py；nf wiki context --role 接入；independence/code_metrics/check12 更新，被审对象变更后机械重绑

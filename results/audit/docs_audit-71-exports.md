@@ -7,7 +7,7 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - verify.sh:3391c203ca4c17a56e0177ce6292239570ff367ee7fce6d08f19777f5ca54c8e
-  - scripts/nf.py:29e1170dab08764e3970d90d64b57495bbd74dd256ebe7744db688a66b77aace
+  - scripts/nf.py:ee012a63079baa894f255bf3594378f8d803359082785177178cfbe16d8ff107
   - desktop/src/core/repo_stats.py:d7fd457d3a1804c3e9ab266c8071ad9d8950d4b5eb0a782ce658a66e05e90f9c
   - desktop/src/core/quality_baseline.py:20c76eb55402b419d31d5249da071992b19c331a62c59dce94ab3c965672f515
   - scripts/interop_thirdparty_kit.py:4f967d3f29cd31deb79f1b97fdee5f59ae74fde0d378ced571d2896af2d275dc
@@ -20,6 +20,8 @@ subjects:
   - results/interop-thirdparty-status.md:e57c95980dd8b36bf137d23db0cf3c93ba8aee5221d2d26f2a6c782c30df0469
 
 ---
+> 重审（2026-11-14）：NF-Final WP-20：新增 core/agent_adapter.py、nf agent CLI、results/adapter/adapter-report.json、docs/agent-adapter.md、test_agent_adapter_contract.py；终端族/表面/文档计数/译件更新，audit 重绑
+
 > 重审（2026-11-14）：NF-Final WP-13：verify.sh 新增 check43/44（Wiki/Spec），quality_baseline 常数 49/PASS=89、CHECK_LABEL；README/CHANGELOG/VERSION-MATRIX/CONFORMANCE/verification-cards/llms/repo_stats/SELF_AUDIT/interop 重新生成
 
 > 重审（2026-11-14）：NF-Final WP-12：新增 core/context_packer.py、docs/context-packer.md、test_context_packer_contract.py；nf wiki context --role 接入；independence/code_metrics/check12 更新，被审对象变更后机械重绑

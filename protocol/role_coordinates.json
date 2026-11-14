@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1497,
+    "app": 1498,
     "entry": 26,
     "floor": 5,
-    "prod": 1064,
-    "projection": 201,
+    "prod": 1065,
+    "projection": 202,
     "support": 509,
-    "verify": 1418
+    "verify": 1419
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -5699,6 +5699,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "Agent Adapter 协议（WP-20）：有界任务 → 受契约约束的输出；2 个可替换 adapter + parity。",
+      "path": "desktop/src/core/agent_adapter.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "AI 治理登记（`nf-ai-governance/1`）：影响评估 + 模型风险 + 监管映射，逐条可核。",
       "path": "desktop/src/core/ai_governance.py",
       "role": "prod",
@@ -7819,6 +7825,12 @@
     {
       "function": "ADR-9001 证据纪律示例契约：允许/禁止写法必须与 decisions.py 的实际校验逐条对齐。",
       "path": "desktop/tests/test_adr_9001_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "WP-20 Agent Adapter 判据（有界任务/输出契约/2 adapter parity）。",
+      "path": "desktop/tests/test_agent_adapter_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -11447,7 +11459,7 @@
       "rule": "R-verify"
     },
     {
-      "function": "终端文档契约：78 命令 / 8 族 / 210 索引 / 9 区 / 13 表单 / 139 例必须与实读一致。",
+      "function": "终端文档契约：79 命令 / 8 族 / 213 索引 / 9 区 / 13 表单 / 139 例必须与实读一致。",
       "path": "desktop/tests/test_terminal_doc_contract.py",
       "role": "verify",
       "rule": "R-verify"
@@ -14934,17 +14946,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "4941363e9205c9f7279fbc3beed6536c37aa503d8ef630d34a351c9ac00579bf",
+  "root_digest": "4c777185871c9e015a1b6f68f0cf7f99ce7b8605c20d709b7ac41aec85be8c6c",
   "rule_counts": {
-    "R-app": 1497,
+    "R-app": 1498,
     "R-catch": 356,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 178,
+    "R-projection": 179,
     "R-support": 124,
-    "R-verify": 1289,
-    "auto:R-core": 301
+    "R-verify": 1290,
+    "auto:R-core": 302
   },
   "schema": "nf-role-coordinates/1"
 }

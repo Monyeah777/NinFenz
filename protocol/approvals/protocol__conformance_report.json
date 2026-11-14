@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-14",
   "approved_by": "Monyeah777",
-  "note": "NF-Final G1 QG1 收口（verdict pass-with-open-items，P0=0）",
+  "note": "NF-Final G2 WP-20（测试瘦身 + 权重重测）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "98a43e9480f5c64095f156412d1b10749228ffbf91dd404f4d3ba577af189bb5"
+  "subject_digest": "2b385d3013718c8745786d607a308bc0031575267ae4309e34cf38418a7a30c9"
 }

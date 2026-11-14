@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""终端文档契约：78 命令 / 8 族 / 210 索引 / 9 区 / 13 表单 / 139 例必须与实读一致。
+"""终端文档契约：79 命令 / 8 族 / 213 索引 / 9 区 / 13 表单 / 139 例必须与实读一致。
 
 为什么必须有：这是端壳退役后唯一的人机入口说明——命令数、能力族、索引条数、能力区、写盘表单、
 会话内阻塞命令与写盘确认动词，任何一项漂移都会让读者对「终端到底能做什么、拦什么」判断错。
@@ -76,14 +76,14 @@ def terminal_issues(text: str) -> list:
         issues.append(f"阻塞命令数已变（{len(tm.BLOCKED_IN_SHELL)}）")
     if len(tm.CONFIRM_VERBS) != 24:
         issues.append(f"确认动词数已变（{len(tm.CONFIRM_VERBS)}）")
-    for label in ("**78**", "**210**", "**8**", "**9**", "**15**", "**34**",
+    for label in ("**79**", "**213**", "**8**", "**9**", "**15**", "**34**",
                   "**13**", "**42**", "**4**", "**24**", "**139 例**"):
         if label not in text:
             issues.append(f"现状缺要素：{label}")
     c = counts()
-    if c.get("cmds") != 78:
+    if c.get("cmds") != 79:
         issues.append(f"命令数已变（{c.get('cmds')}）")
-    if c.get("index") != 210:
+    if c.get("index") != 213:
         issues.append(f"索引条目已变（{c.get('index')}）")
     if "example_resolves" not in text:
         issues.append("缺「菜单只许指向真实命令」判据名 example_resolves")
@@ -123,8 +123,8 @@ class TerminalDocTest(unittest.TestCase):
 
     def test_contract_catches_mutations(self):
         """变异自证：命令数回退 / 区数回退 / 表单数回退 / 缺判据名 / 缺命令。"""
-        old = self.text.replace("**78**", "**70**")
-        self.assertTrue(any("78" in i for i in terminal_issues(old)))
+        old = self.text.replace("**79**", "**70**")
+        self.assertTrue(any("79" in i for i in terminal_issues(old)))
         old_z = self.text.replace("**9**", "**7**")
         self.assertTrue(any("9" in i for i in terminal_issues(old_z)))
         old_f = self.text.replace("**13**", "**10**")

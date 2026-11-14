@@ -37,6 +37,7 @@
     ],
     "governance": [
       "accessibility",
+      "agent_adapter",
       "ai_governance",
       "approval",
       "assurance",

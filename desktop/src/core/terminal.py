@@ -303,7 +303,7 @@ FAMILIES: tuple[dict[str, Any], ...] = (
     {"id": "forge", "name": "装配与生产",
      "summary": "从需求到产物：装配、全链管道、渲染、登记、元认知驾驶与离线盲评",
      "commands": ("assemble", "preset", "run", "render", "spec", "register", "import",
-                  "cockpit", "cockpit-ab")},
+                  "cockpit", "cockpit-ab", "agent")},
     {"id": "shelf", "name": "资产与货架",
      "summary": "市场、资产台账、模块生命周期、管线派生、组合引擎、域包工厂、产出形态",
      "commands": ("market", "asset", "module", "pipeline", "combine", "domain",

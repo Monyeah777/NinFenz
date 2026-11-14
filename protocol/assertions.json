@@ -949,6 +949,21 @@
       "message": "G1 DoD 收口审计缺失或版本名不符（Gate 准入判据依赖它）",
       "fix": "补/修 results/g1_dod.json；再跑 test_g1_dod",
       "evidence": "test_g1_dod / conformance::modeling"
+    },
+    {
+      "id": "adapter-report",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "results/adapter/adapter-report.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-adapter-report/1"
+      },
+      "message": "Adapter parity 报告缺失或版本名不符（WP-20 判据依赖它）",
+      "fix": "跑 nf agent run --report 重生成；再跑 test_agent_adapter_contract",
+      "evidence": "test_agent_adapter_contract / conformance::modeling"
     }
   ]
 }

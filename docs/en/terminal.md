@@ -2,7 +2,7 @@
 
 > Last updated: 2026-11-13
 > **Review (2026-11-13)**: the three hard constraints, menu source of truth, write gate and non-interactive face are **unchanged**;
-> added verifiable status (read from `nf shell --verify`): commands **78** · capability families **8** · index rows **210** ·
+> added verifiable status (read from `nf shell --verify`): commands **79** · capability families **8** · index rows **213** ·
 > menu examples **15** · zone actions **34** · zones **9** (0–8) · write forms **13** · slash words **42** ·
 > blocked-in-session commands **4** (shell / serve / lsp / terminal) · write-confirm verbs **24** · tests **139**. See "§Status check".
 
@@ -391,8 +391,8 @@ python scripts/nf.py shell --file tour.nf --json             # the machine face 
 
 | Surface | Current value | How to re-check |
 |---|---|---|
-| Commands (top + second level) | **78** | `nf shell --verify` header |
-| Index rows | **210** | same / `--commands --json` |
+| Commands (top + second level) | **79** | `nf shell --verify` header |
+| Index rows | **213** | same / `--commands --json` |
 | Capability families | **8** (start / forge / shelf / verify / library / govern / integrate / meta) | same |
 | Zones | **9** (`0`–`8`) | `core/terminal.ZONES` |
 | Menu examples | **15** | `nf shell --verify` |

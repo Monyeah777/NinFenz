@@ -20,6 +20,11 @@
       "max_fn_cc": 27,
       "max_fn_lines": 50
     },
+    "desktop/src/core/agent_adapter.py": {
+      "lines": 227,
+      "max_fn_cc": 20,
+      "max_fn_lines": 41
+    },
     "desktop/src/core/agent_rules_adapter.py": {
       "lines": 86,
       "max_fn_cc": 11,
@@ -1741,7 +1746,7 @@
       "max_fn_lines": 26
     },
     "scripts/nf.py": {
-      "lines": 10015,
+      "lines": 10075,
       "max_fn_cc": 132,
       "max_fn_lines": 443
     },

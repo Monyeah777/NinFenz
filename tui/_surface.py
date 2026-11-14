@@ -9,7 +9,7 @@
 
 KIND = 'nf-terminal-surface'
 SCHEMA = 'nf-terminal-surface/1'
-DIGEST = 'sha256:f7eee61fc20200b983d3b23f1d3cfe8b85b01cda1f9468e7a68923ed14272936'
+DIGEST = 'sha256:9767b5b8e5ed2aee980b93f27fc83a01eacf50868ce4c010f4e2f8cd5adb9d8f'
 SOURCE = {'module': 'desktop/src/core/terminal.py',
  'tables': ['ZONES',
             'FAMILIES',
@@ -19,7 +19,8 @@ SOURCE = {'module': 'desktop/src/core/terminal.py',
             'CONFIRM_FLAG_PAIRS',
             'BLOCKED_IN_SHELL'],
  'commands': 'scripts/nf.py 的 argparse 面'}
-COMMANDS = ['approve',
+COMMANDS = ['agent',
+ 'approve',
  'assemble',
  'assertions',
  'asset',
@@ -478,7 +479,8 @@ FAMILIES = [{'id': 'start',
                'register',
                'import',
                'cockpit',
-               'cockpit-ab']},
+               'cockpit-ab',
+               'agent']},
  {'id': 'shelf',
   'name': '资产与货架',
   'summary': '市场、资产台账、模块生命周期、管线派生、组合引擎、域包工厂、产出形态',
