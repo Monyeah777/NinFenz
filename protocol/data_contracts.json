@@ -944,6 +944,20 @@
         "test_g0_dod",
         "results/G0_DOD.md"
       ]
+    },
+    {
+      "id": "wiki-pages",
+      "artifact": "wiki/pages.json",
+      "quality_rule": "assertion:wiki-pages",
+      "owner": "LLMWiki 编译器（core/wiki_compiler.py + test_wiki_compiler_contract）+ WP-10",
+      "status": "active",
+      "freshness": "真源变化后 wiki build --write；check 用真源 digest 判陈旧",
+      "consumers": [
+        "test_wiki_compiler_contract",
+        "wiki/INDEX.json",
+        "wiki/llms.txt",
+        "wiki/mcp.json"
+      ]
     }
   ]
 }

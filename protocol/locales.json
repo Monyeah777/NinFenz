@@ -70,11 +70,11 @@
       "translations": {
         "en": {
           "path": "docs/en/terminal.md",
-          "source_sha256": "5e3ac66ba65bb390425d1eef6ab251b5d763f443938e6bccfc9924f21d037d54"
+          "source_sha256": "7384c383b36f97087db9dddf718ade2c7bf01d167d605d603252b1f0a245117a"
         },
         "ja": {
           "path": "docs/ja/terminal.md",
-          "source_sha256": "5e3ac66ba65bb390425d1eef6ab251b5d763f443938e6bccfc9924f21d037d54"
+          "source_sha256": "7384c383b36f97087db9dddf718ade2c7bf01d167d605d603252b1f0a245117a"
         }
       }
     },

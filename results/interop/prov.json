@@ -151,7 +151,7 @@
     {
       "@id": "nf:file/protocol/assertions.json",
       "@type": "prov:Entity",
-      "nf:sha256": "b39482466d3feecacff60bb1f15567cdd3c1fca5122754f8e35cd807fc4ce400"
+      "nf:sha256": "415003288940c0573467cbf4a63008deee32a34092b7e39ffe4020b7e3720ea7"
     },
     {
       "@id": "nf:file/protocol/asset_contracts.json",
@@ -171,7 +171,7 @@
     {
       "@id": "nf:file/protocol/code_metrics_baseline.json",
       "@type": "prov:Entity",
-      "nf:sha256": "564ab0c9dc65b2fdbe959105024b317793d1f320d9de9431c83b12f092b634df"
+      "nf:sha256": "9994facc420a054d386bc35cba797c9f71f2c75c05eede30bebf2490ffcb2525"
     },
     {
       "@id": "nf:file/protocol/community_asset_ledger.json",
@@ -181,7 +181,7 @@
     {
       "@id": "nf:file/protocol/conformance_report.json",
       "@type": "prov:Entity",
-      "nf:sha256": "a118a6016b4950b6ec0321d48da78ba2ebedb22694425fd5e7ca645f0c40bee6"
+      "nf:sha256": "21dcf30b66aa583f1f013e34c83ed9944d6033939e24a32e464ee46805c08e70"
     },
     {
       "@id": "nf:file/protocol/coupling_baseline.json",
@@ -191,7 +191,7 @@
     {
       "@id": "nf:file/protocol/data_contracts.json",
       "@type": "prov:Entity",
-      "nf:sha256": "aebe99ffd0e6c31cdfe050a849e87a4b0e289e4c97efb11a1dbde3b7e12bca73"
+      "nf:sha256": "aa013aba22b6133067f2b07c772c73ec20df41818d201b2fc91dc1b0470a820f"
     },
     {
       "@id": "nf:file/protocol/decision_layer.json",
@@ -261,7 +261,7 @@
     {
       "@id": "nf:file/protocol/locales.json",
       "@type": "prov:Entity",
-      "nf:sha256": "09475ad8d3ee21ac44b1d996e600785a0e2f5e1909349d6323f52e03a5345e24"
+      "nf:sha256": "7aca9c9201f4688233d7f2182c5d1f49ac41d0a8952ae902bd718dedb0a7f7c0"
     },
     {
       "@id": "nf:file/protocol/mcp_package.json",
@@ -311,7 +311,7 @@
     {
       "@id": "nf:file/protocol/role_coordinates.json",
       "@type": "prov:Entity",
-      "nf:sha256": "ac1af2601d62bd9a543dd8e4992336702be418f1d26b22aae025e60035cf57be"
+      "nf:sha256": "3bdb1199a77bb6a638c1c3dc0b423ebc9c9351aa01c9eda03edca248eccdd7b2"
     },
     {
       "@id": "nf:file/protocol/sast_baseline.json",

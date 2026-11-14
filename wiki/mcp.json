@@ -1,0 +1,39 @@
+{
+  "schema": "nf-wiki-mcp/1",
+  "tools": [
+    {
+      "args": {
+        "id": "string"
+      },
+      "desc": "按 id 取单页（含 spec_ref/relations）",
+      "name": "wiki_get"
+    },
+    {
+      "args": {
+        "q": "string"
+      },
+      "desc": "按 id/summary/type 子串检索",
+      "name": "wiki_search"
+    },
+    {
+      "args": {
+        "id": "string"
+      },
+      "desc": "邻居（出边+入边）",
+      "name": "wiki_related"
+    },
+    {
+      "args": {
+        "budget": "int",
+        "ids": "string[]"
+      },
+      "desc": "打包上下文（带 citations，受预算限制）",
+      "name": "wiki_context"
+    },
+    {
+      "args": {},
+      "desc": "完整性/陈旧/关系/ID 自检",
+      "name": "wiki_check"
+    }
+  ]
+}

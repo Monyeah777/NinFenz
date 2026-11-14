@@ -6,14 +6,14 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——对应 62
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - protocol/locales.json:09475ad8d3ee21ac44b1d996e600785a0e2f5e1909349d6323f52e03a5345e24
+  - protocol/locales.json:7aca9c9201f4688233d7f2182c5d1f49ac41d0a8952ae902bd718dedb0a7f7c0
   - docs/locales.md:49d614fa22cbeacff6166c292b6785566ea07b505556e2d842dfeb515127277a
   - docs/en/locales.md:7190d1a17094cccd0be4a780230e5777e61694eb5b7f0003c9c3370d1d9ce3c1
   - docs/ja/locales.md:a2e563172139d5fb7549acd1aca06463f6f5add713ab84aea713ac06af1be86d
   - docs/en/mcp.md:333b580565595c01dc8fea640a9c2114a295d076cbdbcabcae26462d4e59f3e2
   - docs/ja/mcp.md:b3c1cf3a9ba549590951460b99f28e64b5f63bdc6087e4fa5510089d5047d81f
-  - docs/en/terminal.md:dccf094dbd07d13ae6a8860775cdafd50cd4a852ddb010b1011d397989cf7db8
-  - docs/ja/terminal.md:09a12eb66595a862b73dea4f0e14a4222a79a7827dc3c1032d9765f84b2f18ef
+  - docs/en/terminal.md:a594a02adbdd375f6afe8582868b8ad200ff35006f97e6483b7b942612bb46df
+  - docs/ja/terminal.md:5601204b78b7d6c9efcde33c81ea1890dfb16f3024a1ef50fa7cba1da92d2cdc
   - docs/en/layers.md:71e9d99723c8c5c1c7bcd9e21e991f7dc932d3a528333e7bdafa3f5e718479ac
   - docs/ja/layers.md:ffd6d02dc518b893e5f9c1c2f60d4572d128b6c438c8261e9d58f2cb8717a086
   - docs/44_M1_执行演练扩展.md:142a9157504702fa03498494dc452ae2fbb8cfbfcce836992b1d59d1078755e4
@@ -26,8 +26,12 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:564ab0c9dc65b2fdbe959105024b317793d1f320d9de9431c83b12f092b634df
+  - protocol/code_metrics_baseline.json:9994facc420a054d386bc35cba797c9f71f2c75c05eede30bebf2490ffcb2525
 ---
+> 重审（2026-11-14）：NF-Final WP-10 跟进 3：docs/{en,ja}/terminal.md 计数同步 + nf locales --write 重签 12 条译件；protocol/locales.json 变更后重绑
+
+> 重审（2026-11-14）：NF-Final WP-10：新增 wiki/ 生成区、core/wiki_compiler.py、docs/wiki.md、test_wiki_compiler_contract.py、nf wiki CLI；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑
+
 > 重审（2026-11-14）：NF-Final WP-0A：新增 protocol/product.json、core/product.py、docs/product/{PRFAQ,GTM,INTERVIEWS}.md；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑
 
 > 重审（2026-11-14）：NF-Final WP-0H：新增 results/cq/*、core/cq_scan.py、scripts/cq_scan.py、docs/{CQ_REPORT,QUALITY_DEBT,REVIEW_CHECKLIST}.md；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑

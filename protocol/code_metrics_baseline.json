@@ -1475,6 +1475,11 @@
       "max_fn_cc": 1,
       "max_fn_lines": 2
     },
+    "desktop/src/core/wiki_compiler.py": {
+      "lines": 378,
+      "max_fn_cc": 27,
+      "max_fn_lines": 75
+    },
     "desktop/src/core/workflow_hardening.py": {
       "lines": 164,
       "max_fn_cc": 11,
@@ -1726,7 +1731,7 @@
       "max_fn_lines": 26
     },
     "scripts/nf.py": {
-      "lines": 9888,
+      "lines": 9966,
       "max_fn_cc": 132,
       "max_fn_lines": 443
     },

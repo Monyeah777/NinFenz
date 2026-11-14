@@ -6,19 +6,25 @@ scope: 作者指令「删除 NF 中的 GUI，且为 NF 构建一个终端（CLI 
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/terminal.py:9a86928171c71f4a2d3d324508fdafccb60fd7cc8423d52197185214a40ea30f
-  - scripts/nf.py:75ed1ad2dda5fb07dbd914a6ffedb836e5cf1298bf34b98be602644827ebc925
+  - desktop/src/core/terminal.py:b40b5b318e040d601a80ddddfd0c6e4f4d3788a0f133c66d76c84b29eda60d4b
+  - scripts/nf.py:36fb06164b600c2f21400e7253294aa79f683d942f469032f1b5d2f9b9413c27
   - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
   - scripts/nf:406c221f9f16fb6e318e230b0b0120e3a6d3c9231d57f66285e0e4615e18ca91
   - scripts/nf.cmd:d1e7ea3a9e99c0822102884cddafe1cdf3893d9b75d19abebe7a8d2a8abeec5a
   - verify.sh:18e2089ead65a11b4729ded516860cdf1d31cdb54a35935051249b40fbf7b53d
   - desktop/src/core/quality_baseline.py:ce4f156f61ee54bf18d7432c6875717d44b319da00b62fef3dca9d947da0203f
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
-  - docs/terminal.md:5e3ac66ba65bb390425d1eef6ab251b5d763f443938e6bccfc9924f21d037d54
+  - docs/terminal.md:7384c383b36f97087db9dddf718ade2c7bf01d167d605d603252b1f0a245117a
   - docs/L3_FROZEN.md:863a152271b1b969a3249194d1169628f4a4647a9bdd801473cfc9cb75c6643b
   - protocol/CONFORMANCE.md:b106affb01c8121848db824bcc9d52d5a41a90ea6419f4a35f4c6c1898e592f1
 
 ---
+> 重审（2026-11-14）：NF-Final WP-10 跟进 2：docs/terminal.md 命令/索引计数 78/210（新增 wiki 命令）+ test_terminal_doc_contract 常量同步；audit/conformance 重绑
+
+> 重审（2026-11-14）：NF-Final WP-10 跟进：nf wiki 命令接入终端面（FAMILIES/librar 族）+ 重生成 tui/_surface.py；assertions/data_contracts/independence/code_metrics/check12 已更新，终端真源变更后重绑
+
+> 重审（2026-11-14）：NF-Final WP-10：新增 wiki/ 生成区、core/wiki_compiler.py、docs/wiki.md、test_wiki_compiler_contract.py、nf wiki CLI；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑
+
 > 重审（2026-11-14）：NF-Final WP-02 双平面边界 check49：verify.sh 新增 check49（段 D）+ quality_baseline v2.35（47 check / PASS=85），被审对象变更后机械重绑
 
 > 重审（2026-11-14）：WP-15 check45 接线与 G1 收口（机械重绑）

@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-14",
   "approved_by": "Monyeah777",
-  "note": "NF-Final G0 DoD 收口（verdict pass-with-open-items，P0=0）",
+  "note": "NF-Final G1 WP-10（译件同步 + locales 重签）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "a118a6016b4950b6ec0321d48da78ba2ebedb22694425fd5e7ca645f0c40bee6"
+  "subject_digest": "21dcf30b66aa583f1f013e34c83ed9944d6033939e24a32e464ee46805c08e70"
 }
