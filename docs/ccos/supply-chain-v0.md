@@ -2,7 +2,7 @@
 
 状态：**已实装**（`core/sbom.py`、`core/verifier_version.py`、`scripts/self_audit_probe.py`、`scripts/sbom.py`）。
 > **最后更新：2026-11-13（复核）**：三摘要口径与「不做签名/不覆盖被测内容/非全仓清单」边界**逐项复核不变**；
-> 现状数字：材料清单 **`count` 572 == `materials` 572**（`scripts/sbom.py --check` 绿）；`verifier_digest` 覆盖
+> 现状数字：材料清单 **`count` 585 == `materials` 585**（`scripts/sbom.py --check` 绿）；`verifier_digest` 覆盖
 > **`JUDGE_FILES` 10 个判定面脚本**；`verifier_status` 当前 **`current`**（来源 `results/ccos/self_audit.json`），
 > 三态 `current/stale/unknown`（`stale` 退出码 1）。见「§现状对照」。
 
@@ -50,7 +50,7 @@ python scripts/verifier_status.py --conclusion F.json  # 查任意一份结论�
 | 面 | 本文声明 | 复核结果（读到本行时请重跑） |
 |---|---|---|
 | 三摘要 | head / verifier_digest / materials_digest | **不变**（互咬合：改树全变、改脚本验证器变、改输入材料变） |
-| 材料清单 | 显式范围，非全仓 | **`count` 572 / `materials` 572**（`--check` 绿） |
+| 材料清单 | 显式范围，非全仓 | **`count` 585 / `materials` 585**（`--check` 绿） |
 | 验证器摘要 | 判定面脚本 10 个 | **`verifier_version.JUDGE_FILES` 恰 10 项** |
 | 结论可复用性 | current / stale / unknown | **三态在文**；`stale` 退出码 1（可当 gate） |
 | 当前状态 | — | **`current`**（来源 `results/ccos/self_audit.json`） |

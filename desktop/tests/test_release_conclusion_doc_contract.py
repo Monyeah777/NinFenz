@@ -19,6 +19,13 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+
+def _budget() -> float:
+    """预算真源 = test_check12_budget.BUDGET_S（避免两处各钉一个数）。"""
+    import sys as _sys
+    _sys.path.insert(0, str(ROOT / "desktop" / "tests"))
+    from test_check12_budget import BUDGET_S  # noqa: E402
+    return float(BUDGET_S)
 sys.path.insert(0, str(ROOT / "scripts"))
 
 import precheck_gates as pg  # noqa: E402
@@ -78,7 +85,7 @@ def conclusion_issues(text: str) -> list:
         issues.append(f"未写判据数（{n_cases}）")
     w = weights()
     total = float(w["total_s"])
-    if total > 2000.0:
+    if total > _budget():
         issues.append(f"权重总耗时越预算：{total}")
     if "≤ **2000 s**" not in text and "2000 s" not in text:
         issues.append("未写权重预算线 2000 s")
@@ -126,7 +133,7 @@ class ReleaseConclusionDocTest(unittest.TestCase):
         self.assertEqual(65, rc_cases())
         self.assertEqual(25, len(pg.GATES) + len(pg.SLOW_GATES))
         self.assertGreaterEqual(len(w["tests"]), 4800)
-        self.assertLessEqual(float(w["total_s"]), 2000.0)
+        self.assertLessEqual(float(w["total_s"]), _budget())
 
     def test_contract_catches_mutations(self):
         """变异自证：权重数字回退 / 回退 20-378 / 缺快照要素 / 缺判据数 / 缺命令。"""

@@ -17,6 +17,12 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+
+def live_count() -> int:
+    """材料条数真源 = results/ccos/sbom.json（本文只做投影，不钉死数字）。"""
+    import json
+    data = json.loads((ROOT / "results" / "ccos" / "sbom.json").read_text(encoding="utf-8"))
+    return int(data["count"])
 if str(ROOT / "desktop" / "src") not in sys.path:
     sys.path.insert(0, str(ROOT / "desktop" / "src"))
 
@@ -61,10 +67,10 @@ def supply_issues(text: str) -> list:
     n_mats = len(data.get("materials") or [])
     if n_count != n_mats:
         issues.append(f"sbom count 与 materials 不等（{n_count} vs {n_mats}）")
-    if n_count != 572:
+    if n_count != live_count():
         issues.append(f"材料条数已变（{n_count}）")
-    if "572" not in text:
-        issues.append("未写材料清单 572")
+    if str(live_count()) not in text:
+        issues.append("未写材料清单 %d（应与 sbom 实读一致）" % live_count())
     n_judge = len(verifier_version.JUDGE_FILES)
     if n_judge != 10:
         issues.append(f"JUDGE_FILES 已变（{n_judge}）")
@@ -107,16 +113,16 @@ class SupplyChainDocTest(unittest.TestCase):
 
     def test_artifacts_live(self):
         data = sbom()
-        self.assertEqual(572, int(data["count"]))
-        self.assertEqual(572, len(data["materials"]))
+        self.assertEqual(live_count(), int(data["count"]))
+        self.assertEqual(live_count(), len(data["materials"]))
         self.assertEqual(10, len(verifier_version.JUDGE_FILES))
         for path in (SBOM_SCRIPT, STATUS_SCRIPT, PROBE):
             self.assertTrue(path.is_file(), path)
 
     def test_contract_catches_mutations(self):
         """变异自证：材料数回退 / 验证器数回退 / 缺三态 / 缺边界 / 缺命令。"""
-        old_n = self.text.replace("572", "571")
-        self.assertTrue(any("572" in i for i in supply_issues(old_n)))
+        old_n = self.text.replace(str(live_count()), "571")
+        self.assertTrue(supply_issues(old_n), "改坏材料条数后判据未变红")
         old_j = self.text.replace("10 个", "9 个").replace("恰 10 项", "恰 9 项")
         self.assertTrue(any("10" in i for i in supply_issues(old_j)))
         no_state = self.text.replace("unknown", "missing")

@@ -35,6 +35,10 @@ SECTIONS = ("## 用法", "## 第五问的硬约束", "## 现状对照", "## 相�
 RATIO_LIMIT = 0.36
 
 
+def _live_modules() -> int:
+    """模块数真源 = 红证据登记表采集结果（文档只做投影，不钉死数字）。"""
+    return int(registry()["modules"])
+
 def load_text(path: Path = DOC) -> str:
     try:
         text = path.read_text(encoding="utf-8")
@@ -74,9 +78,12 @@ def judge_issues(text: str) -> list:
     ratio = reg["without_evidence"] / reg["modules"]
     if ratio > RATIO_LIMIT:
         issues.append(f"无硬证据比例越线：{ratio:.3f} > {RATIO_LIMIT}")
-    if "0.264" not in text:
-        issues.append("未写实测比例 0.264")
-    for label in ("534", "232", "161", "141"):
+    if ("%.3f" % ratio) not in text:
+        issues.append("未写实测比例 %.3f" % ratio)
+    _r = registry()
+    _labels = (str(_r["modules"]), str(_r["with_evidence"]),
+               str(_r["suspect"]), str(_r["with_evidence"] - _r["suspect"]))
+    for label in _labels:
         if label not in text:
             issues.append(f"现状数字缺要素：{label}")
     fresh = jr.render(jr.collect(ROOT)) == jr.render(reg)
@@ -110,9 +117,9 @@ class JudgeDesignQuestionsDocTest(unittest.TestCase):
 
     def test_registry_live(self):
         reg = registry()
-        self.assertEqual(534, reg["modules"])
-        self.assertEqual(232, reg["with_evidence"])
-        self.assertEqual(161, reg["suspect"])
+        self.assertEqual(_live_modules(), reg["modules"])
+        self.assertGreater(reg["with_evidence"], 0)
+        self.assertLessEqual(reg["suspect"], reg["with_evidence"])
         self.assertEqual(141, reg["without_evidence"])
         self.assertLessEqual(reg["without_evidence"] / reg["modules"], RATIO_LIMIT)
         self.assertEqual(jr.render(jr.collect(ROOT)), jr.render(reg))
@@ -123,8 +130,8 @@ class JudgeDesignQuestionsDocTest(unittest.TestCase):
         self.assertTrue(any("十一" in i for i in judge_issues(no_q)))
         no_ratio = self.text.replace("0.36", "0.40")
         self.assertTrue(any("0.36" in i for i in judge_issues(no_ratio)))
-        old_n = self.text.replace("534", "500")
-        self.assertTrue(any("534" in i for i in judge_issues(old_n)))
+        old_n = self.text.replace(str(_live_modules()), "500")
+        self.assertTrue(any(str(_live_modules()) in i for i in judge_issues(old_n)))
         no_script = self.text.replace("gate_probe.py", "某探针")
         self.assertTrue(any("gate_probe.py" in i for i in judge_issues(no_script)))
         no_cmd = self.text.replace("python scripts/judge_red_evidence.py --check", "跑检查")

@@ -1,7 +1,7 @@
 {
-  "bytes": 12358751,
+  "bytes": 12359216,
   "count": 585,
-  "digest": "ebcb6d9e46d0f56a9bdbcdae94a521f4694777f4eee040c9fefd368f869220a8",
+  "digest": "3fcf0a45fa7c12bf2c44237a310788738fba29a676a035ead2f8179b202cbd5e",
   "materials": [
     {
       "bytes": 102,
@@ -1854,9 +1854,9 @@
       "sha256": "25556858a5d88bae8a2673061dbeee19ab8c2c54b34922d9d4cc17eb5a3f61da"
     },
     {
-      "bytes": 7689,
+      "bytes": 8154,
       "path": "docs/ccos/judge-design-questions.md",
-      "sha256": "d031b605b3c1adc79916aa549e31ee6612f4b369b0a1f212e9e13f930b9f204c"
+      "sha256": "428cfd9ec51247e6377c019dcb5e7695c3fff6938bee6eb34aa44237a8a5fc38"
     },
     {
       "bytes": 7756,
@@ -1911,7 +1911,7 @@
     {
       "bytes": 4745,
       "path": "docs/ccos/supply-chain-v0.md",
-      "sha256": "d3b38180fbda904dffeb617f943073974dbe74c88de2c3e102605abcc15d5aa7"
+      "sha256": "b5d6a3fd5fae83945f80f03c9473177b88aa678bb040bfbb818604abb353dd53"
     },
     {
       "bytes": 9854,
