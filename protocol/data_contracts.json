@@ -757,6 +757,20 @@
         "docs/eval/EVAL_PROTOCOL.md",
         "protocol/eval/protocol.json"
       ]
+    },
+    {
+      "id": "legal-registry",
+      "artifact": "protocol/legal.json",
+      "quality_rule": "assertion:legal-registry",
+      "owner": "法务/许可/出口 + 开源治理（core/legal.py + test_legal_contract）+ WP-0C",
+      "status": "active",
+      "freshness": "改许可/治理须同步 protocol/legal.json 与 LEGAL/GOVERNANCE/docs/legal；审计 scripts/legal_audit.py",
+      "consumers": [
+        "test_legal_contract",
+        "scripts/legal_audit.py",
+        "LEGAL.md",
+        "GOVERNANCE.md"
+      ]
     }
   ]
 }

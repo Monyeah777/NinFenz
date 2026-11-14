@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-14",
   "approved_by": "Monyeah777",
-  "note": "NF-Final WP-0F AI 治理 + 评测效度（影响评估/模型风险/监管映射 + 预注册/inter-rater/反指标）",
+  "note": "NF-Final WP-0C 法务/许可/出口 + 开源治理（审计脚本 + 许可/治理判据）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "fcde4fb66f9b07ce9d924bf282322ae3bdd3ec86304958cc83ab3e78f4419cf2"
+  "subject_digest": "80ee5c499af9caa54a00316740208fc330f1853fa699f3687da1bf86dbc47306"
 }

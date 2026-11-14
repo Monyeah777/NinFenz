@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
-  - protocol/code_metrics_baseline.json:4067762a96f641e3ea7cb1c77bb6b6a3262e380a488c025de23a5bf3533b8699
+  - protocol/code_metrics_baseline.json:a4ab6056831ca12281c3cfbd435ce10c3c6974763c16c304e439e015e036c73b
 ---
+> 重审（2026-11-14）：NF-Final WP-0C：新增 protocol/legal.json、core/legal.py、scripts/legal_audit.py、LEGAL.md、GOVERNANCE.md、docs/legal 三件；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑
+
 > 重审（2026-11-14）：NF-Final WP-0F：新增 protocol/{ai_governance,eval_validity}.json、core/{ai_governance,eval_validity}.py、docs/ai 与 docs/eval、results/eval/interrater_sample.json；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑
 
 > 重审（2026-11-14）：NF-Final WP-0D：新增 protocol/ops.json + vendors.json + core/ops.py + scripts/ops_drill.py + 演练报告 results/ops/drills.json + 文档四件；assertions/data_contracts/code_metrics/check12 权重更新，被审对象变更后机械重绑

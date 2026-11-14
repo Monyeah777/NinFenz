@@ -1,0 +1,90 @@
+{
+  "schema": "nf-legal/1",
+  "note": "NF-Final §15A.2 法务/许可/IP/出口 + 开源治理机读登记（WP-0C）：许可（SPDX/REUSE）、第三方 NOTICE、商标/署名、合同模板、出口/加密组件、OSS 治理（发布/废弃/评分卡）。判据 desktop/tests/test_legal_contract.py + scripts/legal_audit.py。纪律：不提供法律意见、不声称合规/认证。",
+  "license": {
+    "spdx": "MIT",
+    "file": "LICENSE",
+    "text": "LICENSES/MIT.txt",
+    "community_license": {
+      "spdx": "LicenseRef-Community-Submission",
+      "text": "LICENSES/LicenseRef-Community-Submission.txt",
+      "scope": ["library/NF-*.md", "library/anchors/**", "community/**"],
+      "note": "投稿面（含作者自投）按投稿条款再分发；条款文本在 LICENSES/ 与 library 投稿须知同源"
+    },
+    "plan_deviation": "方案 §15A.2 假设 AGPL-3.0-only/商业双许可；本仓实际为 MIT（更宽松）+ 投稿面 LicenseRef——以仓内 LICENSE/REUSE 为真源，不虚构双许可或 AGPL 结论"
+  },
+  "reuse": {
+    "toml": "REUSE.toml",
+    "aggregate_license": "MIT",
+    "criteria": "desktop/tests/test_reuse_contract.py",
+    "note": "新增一种许可 = REUSE.toml 加 annotation + LICENSES/ 放文本 + 判据自动跟随（不手写第三份清单）"
+  },
+  "third_party": {
+    "notice": "THIRD-PARTY-NOTICES.md",
+    "generator": "scripts/gen_third_party_notices.py",
+    "requirements": [
+      ".github/requirements-ci.txt",
+      ".github/requirements-lint.txt",
+      ".github/requirements-sast.txt",
+      ".github/requirements-audit.txt"
+    ],
+    "sbom": "results/ccos/sbom.json",
+    "distribution": "dev-toolchain-only：门禁/开发工具链依赖，不随产品分发（运行时核心零第三方，见 pyproject [project].dependencies=[] 与 packaging/npm/package.json 无 dependencies）"
+  },
+  "trademark": {
+    "name": "NinFenz / 宁封子",
+    "rules": [
+      "名称与标识仅用于指代本仓来源；不得暗示官方认证、背书或关联",
+      "二次分发须保留本仓署名与 LICENSE/NOTICE；不得移除版权声明",
+      "商业使用按 MIT 条款；不得使用本仓名称给衍生品背书"
+    ],
+    "attribution": "版权署名 = 2026 Monyeah777；第三方归属见 THIRD-PARTY-NOTICES.md",
+    "no_endorsement": "不得暗示官方认证/背书"
+  },
+  "contracts": [
+    {"id": "CT-01", "type": "service", "status": "template-in-doc", "path": "docs/legal/CONTRACTS.md"},
+    {"id": "CT-02", "type": "pilot", "status": "template-in-doc", "path": "docs/legal/CONTRACTS.md"},
+    {"id": "CT-03", "type": "nda", "status": "template-in-doc", "path": "docs/legal/CONTRACTS.md"},
+    {"id": "CT-04", "type": "dpa", "status": "template-in-doc", "path": "docs/legal/CONTRACTS.md"}
+  ],
+  "export": {
+    "crypto_components": [
+      "desktop/src/core/ed25519.py",
+      "desktop/src/core/timestamp.py",
+      "desktop/src/core/trust/dsse.py",
+      "desktop/src/core/trust/keys.py",
+      "desktop/src/core/trust/key_material.py",
+      "desktop/src/core/trust/public_anchor.py"
+    ],
+    "dual_use": ["数字签名（Ed25519/HMAC）", "RFC 3161 时间戳", "透明日志包含证明"],
+    "review_trigger": [
+      "新增密码算法/密钥交换/加密库时，须先评审出口/制裁影响",
+      "对外分发含签名/时间戳能力的构建物时，须核对本地法律要求"
+    ],
+    "not_legal_advice": "本清单只做工程登记，不构成出口/制裁法律意见"
+  },
+  "oss_governance": {
+    "files": {
+      "contributing": "CONTRIBUTING.md",
+      "code_of_conduct": "CODE_OF_CONDUCT.md",
+      "maintainers": "MAINTAINERS.md",
+      "security": "SECURITY.md",
+      "support": "SUPPORT.md",
+      "governance": "GOVERNANCE.md",
+      "changelog": "CHANGELOG.md",
+      "coc_report": "CODE_OF_CONDUCT.md"
+    },
+    "release_policy": "docs/release.md",
+    "deprecation_policy": "GOVERNANCE.md（资产/模块 deprecate/restore 与 SemVer 口径；实现见 desktop/src/core/module_lifecycle.py）",
+    "semver": "SemVer 2.0：破坏性变更走 major + 迁移说明；未发布节在 CHANGELOG",
+    "scorecard": {
+      "workflow": ".github/workflows/scorecard.yml",
+      "status": "CI-only：本机不跑，结果在 GitHub code scanning/Scorecard 面板；本文件不冒充已评分"
+    }
+  },
+  "claims_boundary": [
+    "不提供法律意见（许可/出口/合同模板仅供参考，签发前须人工/律师复核）",
+    "不声称合规或认证",
+    "不虚构 AGPL/双许可：实际为 MIT + 投稿面 LicenseRef（见 license.plan_deviation）"
+  ]
+}

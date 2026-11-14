@@ -6,6 +6,7 @@
 > 性质：结果/状态件（审计记录），不是规划件。审计对象 = **本机检出**，不是方案所基于的那次检出。
 > 更新（R3，2026-11-14）：WP-02/check49 收口 IN-01/IN-02（§5.5 与矩阵汇总已按实读更新；数字变化以复跑命令为准，见 §7）。
 > 更新（R5，2026-11-14）：WP-01 五件生产 schema（`nf-contract/1`、`nf-wiki-page/1`、`nf-spec/1`、`nf-task/1`、`nf-assembly/1`）落 `protocol/production/`，正/反样例与变异自证在 `test_schema_reference.py`；**只有契约层、仍无编译器/页面生成器**，故 PR-02/WK 系列状态不变（见 §5）。
+> 更新（R10，2026-11-14）：WP-0C 法务/许可/IP + 开源治理落地——`LEGAL.md` + `GOVERNANCE.md` + `docs/legal/{TRADEMARK,CONTRACTS,EXPORT}.md` + `protocol/legal.json` + `core/legal.py` + `scripts/legal_audit.py` + `test_legal_contract.py`（9 例，8 类变异自证）；**更正** D12 此前把 LICENSE 写成 AGPL（实为 MIT，方案 §15A.2 的 AGPL/双许可假设已作为偏差显式登记）；D12/D13 证据补强（BL-07/BL-10 closure 条件满足，仍不提供法律意见/不声称合规）。
 > 更新（R9，2026-11-14）：WP-0F AI 治理 + 评测效度落地——`docs/ai/AI_GOVERNANCE.md`（影响评估/模型风险/监管映射，claim 只写 mechanism-alignment）+ `docs/eval/EVAL_PROTOCOL.md`（预注册/样本量/inter-rater/反指标/效度威胁）+ `protocol/ai_governance.json` + `protocol/eval_validity.json` + `core/{ai_governance,eval_validity}.py` + `results/eval/interrater_sample.json` + `test_ai_eval_contract.py`（9 例，8 类变异自证）；D06/D15 证据补强（均仍 Partial——不声称合规，映射仅机制对照；BL-02/BL-05 closure 条件满足）。
 > 更新（R8，2026-11-14）：WP-0D 安全事件/漏洞披露/BCP/DR + 供应商登记落地——`docs/security/INCIDENT_RESPONSE.md`、`docs/sre/{SRE,BCP_DR}.md`、`docs/legal/VENDORS.md`、`SECURITY.md` 第七节入口；`protocol/ops.json`（S0–S3/runbook 7 步/披露口径/3 条 SLO/BCP 资产与场景）+ `protocol/vendors.json`（6 家供应商/退出计划/attestation）+ `core/ops.py` + `scripts/ops_drill.py` + `results/ops/drills.json`（桌面/恢复/披露/退出四类演练）+ `test_ops_contract.py`（10 例，7 类变异自证）；D09 由 None 重估为 Partial、D18 由 None 重估为 Partial、D04 补 IR/披露证据（仍 Partial——ASVS/LLM 映射缺）。
 > 更新（R7，2026-11-14）：WP-0B 隐私/数据生命周期落地——`PRIVACY.md` + `docs/privacy/{DATA_MAP,DPIA,RETENTION}.md` + `docs/qa/PRIVACY_QA.md` + `protocol/privacy.json`（8 数据类/四级分类/四保留模式）+ `core/privacy_scan.py` + `test_privacy_contract.py`（8 例，含删除失败/PII 扫描/脱敏抽样/变异自证）；D05 由 None 重估为 Partial，BL-01 的 closure 条件（数据地图+DPIA+保留/删除测试通过）已满足。
@@ -148,15 +149,15 @@ python -V; node -v; dotnet --list-sdks | head -1
 | D09 | 可靠性/SRE/BCP | Partial | `docs/sre/{SRE,BCP_DR}.md`（SLO 三条/错误预算逻辑口径/资产备份 RTO·RPO/三类故障场景）、`docs/security/INCIDENT_RESPONSE.md`（S0–S3 + IR-01…07）、`protocol/ops.json`、恢复演练（DR-02）；无 on-call/日历级 RTO（本地优先不适用） | **重估为 Partial**（BL-03 closure：IR runbook + BCP/恢复演练通过） | WP-0D ✅ |
 | D10 | 可访问性/UX/人因 | None | 无 WCAG 清单/PAIR/HAX/可用性测试件；TUI 在场（`tui/` 2 文件 2,450 行）但无 a11y 判据 | **None 成立** | WP-0E |
 | D11 | 本地化/i18n | None | **`docs/en/` 6 件、`docs/ja/` 6 件、`protocol/locales.json`、`core/locales.py`、`nf locales`**；缺 RTL/时区/CLDR 计划 | **重估为 Partial**（方案判 None 偏低） | WP-0E |
-| D12 | 法务/许可/IP | Partial | `LICENSE`（AGPL）、`LICENSES/`、`REUSE.toml`、`core/license_gate.py`、`THIRD-PARTY-NOTICES.md`（可复现判据见 `scripts/gen_third_party_notices.py`）；无许可审计报告模板/合同模板/出口检查 | **Partial 成立**（强于方案描述） | WP-0C |
-| D13 | 开源治理/社区 | Partial | `CONTRIBUTING.md` 23 KB、`CODE_OF_CONDUCT.md`、`MAINTAINERS.md`、`SECURITY.md`、`.github/` 20 workflows（含 `release-gate.yml`）；无发布/废弃政策、无公开 Scorecard 报告件 | **Partial 成立** | WP-0C |
+| D12 | 法务/许可/IP | Partial | **实际许可 = MIT（非方案假设的 AGPL/双许可）**：`LICENSE`/`LICENSES/{MIT,LicenseRef-Community-Submission}.txt`、`REUSE.toml`（3 annotations）、`LEGAL.md` + `docs/legal/{TRADEMARK,CONTRACTS,EXPORT}.md`、`protocol/legal.json`、`THIRD-PARTY-NOTICES.md`（44 行）+ 生成器/requirements/SBOM 可核、`scripts/legal_audit.py` + `test_legal_contract.py`；合同为模板（未签署）、不提供法律意见 | **Partial 成立**（BL-07 closure：许可审计+NOTICE+合同/出口检查；无正式法律审核/商标注册） | WP-0C ✅ |
+| D13 | 开源治理/社区 | Partial | `GOVERNANCE.md`（角色/决策/发布/废弃/SemVer/Scorecard 登记）+ `CONTRIBUTING.md`、`CODE_OF_CONDUCT.md`、`MAINTAINERS.md`、`SECURITY.md`、`SUPPORT.md`、`CHANGELOG.md`、`docs/release.md`、`module_lifecycle` deprecate/restore、`.github/workflows/{release-gate,scorecard}.yml`；单维护者、无社区规模/SLA 承诺 | **Partial 成立**（BL-10 closure：贡献/发布/废弃/披露流程齐；社区治理仍单人事实） | WP-0C ✅ |
 | D14 | 商业/GTM/支持 | None | `SUPPORT.md` 在（支持分级雏形）；无定价假设/LOI/试点 | **Weak→None 成立**（仅支持面有雏形） | WP-0A/0C |
 | D15 | 测量/实验效度 | Partial | `docs/eval/EVAL_PROTOCOL.md` + `protocol/eval_validity.json`（预注册字段/冻结规则、样本量 ≥3、Cohen kappa ≥0.6 现算、反指标 CM-01…03、效度威胁 VT-01…05）+ `results/eval/interrater_sample.json` + `core/eval_validity.py`；具体预注册协议 `protocol/eval/protocol.json` 过 `eval_harness` 校验 | **Partial 成立**（BL-05 closure：预注册+inter-rater+反指标齐；真实外部盲评仍属外部操作） | WP-0F ✅ |
 | D16 | 伦理/保证 | None | 无 IEEE 7000/VSD/GSN/CAE 件 | **None 成立** | WP-0G |
 | D17 | 项目/项目群 | Partial | `decisions/`、`handovers/`、`postmortems/`；无 RAID log/干系人图/变更控制 | **Partial 成立** | WP-0G |
 | D18 | 供应商/第三方 | Partial | `docs/legal/VENDORS.md` + `protocol/vendors.json`（6 家：模型/TSA/公共日志/托管/包源/部署；used_by/attestation/退出计划/不得处理用户数据）+ 退出就绪演练（DR-04）；不签 DPA（本地优先不委托处理） | **重估为 Partial**（BL-04 closure：vendor register+exit plan+SBOM/attestation） | WP-0D ✅ |
 
-重估结论：18 领域里 1 项被方案低估（D11），1 项强于方案描述（D12）；其余与方案 §3A 判定一致。P0/P1 盲区（方案 §3A.2 BL-01…BL-12）全部未 closure，闭包产物均缺（§3.1 已核目录不在场）。
+重估结论（R10 更新）：18 领域里 1 项被方案低估（D11）；D12 事实更正为 MIT（方案假设 AGPL/双许可，已登记偏差）。**P0 盲区 BL-01…BL-05 已全部 closure**（R7–R9）；P1 中 BL-07（法务）/BL-10（开源治理）达 closure 条件（R10）；BL-06（产品）/BL-08（a11y）/BL-09（i18n）/BL-11（商业）仍缺；BL-12（伦理/保证案例，P2）缺。
 
 ## 5. FR/NFR Claim–Evidence 矩阵（方案 §5.1–§5.5，共 34 条）
 
