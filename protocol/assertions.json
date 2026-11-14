@@ -85,7 +85,8 @@
       41,
       45,
       46,
-      47
+      47,
+      48
     ],
     "CAP_TAMPER_EVIDENT": [
       23,
@@ -95,7 +96,8 @@
       42,
       45,
       46,
-      47
+      47,
+      48
     ],
     "CAP_LIFECYCLE_LEGAL": [
       17,
@@ -131,7 +133,8 @@
       36,
       45,
       46,
-      47
+      47,
+      48
     ]
   },
   "assertions": [
@@ -564,6 +567,21 @@
       "message": "跨语言 parity 的向量集不在位或版本名不符（check47 的判据前提缺失）",
       "fix": "跑 python scripts/trust_vectors.py --write 重建向量集",
       "evidence": "check47 / conformance::assertions"
+    },
+    {
+      "id": "trust-dod-artifact",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "results/trust/SELF_AUDIT.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-trust-self-audit/1"
+      },
+      "message": "DoD 收口的自审计机器件不在位或 schema 不符（check48 的判据前提缺失）",
+      "fix": "跑 python scripts/trust_self_audit.py --write 重建自审计件",
+      "evidence": "check48 / conformance::assertions"
     }
   ]
 }

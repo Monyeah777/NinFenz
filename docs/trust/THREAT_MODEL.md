@@ -120,7 +120,7 @@
 - **OPEN-G1（已关闭，2026-11-14）**：claim 级 bundle（含 splice 负例）、nf-process/1 prev 链、cc_verify 骨架、check45 接线与 §13 自审计均已落地（证据：results/trust/SELF_AUDIT.json，P0=0）；后续缺口转 OPEN-G2。
 - **OPEN-G2（已关闭，2026-11-14）**：DSSE / issuer registry / 外部锚核验 / 链头签名接口 / check46 组合门禁均已落地（G2 退出判据）；余项显式转记：自动锚定编排与 trust store 多根/类型权限合一 → OPEN-G3；T3 witness 语句外部化 / 公共锚 / keygen 与 0600 强制 → OPEN-G4。
 - **OPEN-G3**：类型注册表与组合 admissibility（WP-30）、model card 绑定（WP-31）、prompt/context lineage（WP-32）、签名人类复核（WP-33）已完成；余下：G2 转入的自动锚定编排与 trust store 多根/类型权限合一。
-- **OPEN-G4**：独立 verifier parity 部分完成（`scripts/trust_parity/verify.mjs`：Python↔Node.js 六族 29 条向量逐字节 parity；.NET 引擎线因本机无 SDK 未做，ENV-01）；T3 见证组合已完成（WITNESS_SPEC + check47 + 真 TSA 端到端判据；本仓不运营公共 witness 网络）；余下：公共锚（Sigstore/Rekor/公共 TSA）、keygen 与 0600 强制、外部 witness 网络。
+- **OPEN-G4（收口，2026-11-14）**：T3 见证组合已完成（WITNESS_SPEC + check47 + 真 TSA 端到端判据）；DoD 收口（`results/trust/DOD.md` + check48）已完成；独立 verifier parity 部分完成（`scripts/trust_parity/verify.mjs` Python↔Node.js 六族 29 条；.NET 引擎线因本机无 SDK 未做，ENV-01）；公共锚（Sigstore/Rekor/公共 TSA，ENV-02）与 keygen/0600、公共 witness 网络仍为外部受限项，**不声称完成**。
 
 ## 现状对照
 

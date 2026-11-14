@@ -1,12 +1,12 @@
 {
   "built_for_date": "2026-11-14",
   "declared": {
-    "check_label": "check1-42/45/46/47",
-    "coverage_note": "判据级抽查面 31 条，各对应 verify.sh 的一道或多道门禁；≠ 声明 check 总数 45（两者不可互替）",
-    "expected_checks": 45,
-    "expected_pass": 81,
+    "check_label": "check1-42/45/46/47/48",
+    "coverage_note": "判据级抽查面 31 条，各对应 verify.sh 的一道或多道门禁；≠ 声明 check 总数 46（两者不可互替）",
+    "expected_checks": 46,
+    "expected_pass": 83,
     "report_items": 31,
-    "verify_version": "v2.33"
+    "verify_version": "v2.34"
   },
   "items": [
     {
@@ -241,8 +241,8 @@
       "sample": [],
       "source": "quality_baseline.scan",
       "stats": {
-        "checks": 45,
-        "verify_version": "v2.33"
+        "checks": 46,
+        "verify_version": "v2.34"
       },
       "status": "pass",
       "warns": 0
@@ -298,7 +298,7 @@
       "stats": {
         "contracts": 27,
         "passed": 27,
-        "root": "b0b14d351d7c22b170cb4525b745d0370e365686481b767485bf67dc8114f18a",
+        "root": "f73e946fd0d1b120f24cfd2585bccb1f0ebade2eb06e2164ad26d5c70088e025",
         "verdict": "conformant"
       },
       "status": "pass",
@@ -326,9 +326,9 @@
       "sample": [],
       "source": "repo_stats.check_strict",
       "stats": {
-        "baseline_checks": 45,
-        "baseline_pass": 81,
-        "check_label": "check1-42/45/46/47",
+        "baseline_checks": 46,
+        "baseline_pass": 83,
+        "check_label": "check1-42/45/46/47/48",
         "concept_graphs": 101,
         "core_modules": 13,
         "core_pipelines": [
@@ -356,8 +356,8 @@
         "standards_total": 370,
         "standards_unreachable": 38,
         "subdivisions_total": 1200,
-        "verify_checks": 45,
-        "verify_version": "2.33"
+        "verify_checks": 46,
+        "verify_version": "2.34"
       },
       "status": "pass",
       "warns": 0
@@ -526,8 +526,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4557,
-        "kernel": 2413,
+        "files": 4560,
+        "kernel": 2414,
         "kernel_no_self": 308,
         "rules": 9,
         "uncovered": 0,
@@ -538,7 +538,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "369fa7194a7f67f0e2790b61a4e193c15be4b4fc6b780b6e6a4f217f53d90e62",
+  "root_digest": "a60852361e2acd7ff62ff7c7736fdc27f31646c8a67761d5d32fb0db31bfa95d",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

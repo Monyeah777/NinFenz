@@ -92,7 +92,10 @@
         "desktop/src/core/trust/signature.py",
         "desktop/tests/test_trust_signature.py",
         "scripts/trust_parity/verify.mjs",
-        "desktop/tests/test_trust_parity.py"
+        "desktop/tests/test_trust_parity.py",
+        "desktop/src/core/trust/gate_dod.py",
+        "desktop/tests/test_trust_gate48.py",
+        "results/trust/DOD.md"
       ],
       "falsifier": "若改用累加器实现、或去掉 bundle_id/域分隔仍能通过向量集 merkle 族与 splicing 负例，则本裁决失效。"
     },
@@ -126,7 +129,10 @@
         "desktop/src/core/key_transparency.py",
         "docs/trust/THREAT_MODEL.md",
         "docs/trust/WITNESS_SPEC.md",
-        "desktop/tests/test_trust_t3.py"
+        "desktop/tests/test_trust_t3.py",
+        "desktop/src/core/trust/gate_dod.py",
+        "desktop/tests/test_trust_gate48.py",
+        "results/trust/DOD.md"
       ],
       "falsifier": "若 T3 可在无 witness / 无 STH 时达到，或本地链被当作外部见证抬升 T3，则本裁决失效。"
     },
