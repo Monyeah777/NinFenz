@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
-  - protocol/code_metrics_baseline.json:defe66f802dd30d5f8e4657a92aaa8d8f4d52880f6dc2fbb98c8f307e690977a
+  - protocol/code_metrics_baseline.json:1d2bf185cbfc3a6c6c335a3c3c4768198125ed11cba866b6a00a31a66181461f
 ---
+> 重审（2026-11-14）：NF-Final WP-0D：新增 protocol/ops.json + vendors.json + core/ops.py + scripts/ops_drill.py + 演练报告 results/ops/drills.json + 文档四件；assertions/data_contracts/code_metrics/check12 权重更新，被审对象变更后机械重绑
+
 > 重审（2026-11-14）：NF-Final WP-0B：新增 protocol/privacy.json（数据契约登记）、core/privacy_scan.py、PRIVACY.md 与 docs/privacy/*、docs/qa/PRIVACY_QA.md；code_metrics 376 件、check12 权重 +1.6s；被审对象变更后机械重绑
 
 > 重审（2026-11-14）：NF-Final WP-02 双平面边界 check49：verify.sh 新增 check49（段 D）+ quality_baseline v2.35（47 check / PASS=85），被审对象变更后机械重绑

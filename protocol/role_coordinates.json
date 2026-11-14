@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1474,
+    "app": 1478,
     "entry": 26,
     "floor": 5,
     "prod": 1058,
-    "projection": 175,
-    "support": 495,
-    "verify": 1389
+    "projection": 177,
+    "support": 496,
+    "verify": 1392
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -10217,6 +10217,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "运维/事件/BCP/供应商契约（NF-Final WP-0D，P0 盲区 BL-03/BL-04）。",
+      "path": "desktop/tests/test_ops_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "scripts/orchestrate.py（编排面 CLI 入口）回归：目录 / 计划编译 / 机检 / 退出码。",
       "path": "desktop/tests/test_orchestrate_cli.py",
       "role": "verify",
@@ -14429,6 +14435,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "NF-Final §15A.4 运维/事件/BCP 机读登记（WP-0D）：严重度分级 + 事件 runbook + 漏洞披露口径（以 SECURITY.md 为通道权威）+ SLO（本地优先工具的「正确/可复现/离线」目标，不承诺日历可用性）+ BCP/DR 资产与场景 + 演练清单。判据 desktop/tests/test_ops_contract.py 与机器演练报告 results/ops/drills.json。",
+      "path": "protocol/ops.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "产出形态清单（真源）。tier = 本仓可做到的**判定强度**（T0 散文 → T4 可复算），不是格式高低；status = 本仓落地状态（supported/absorbed/planned/deferred/unfit/reference/unreachable）。evidence = 本机逐条联网实测快照（可达性/取样 sha256），**外部规范只作形态入口与机制借鉴，不作质量背书**（STRATEGY §3.2/§3.3）。重签：scripts/nf.py output verify；生成：见内部档案。",
       "path": "protocol/output_forms.json",
       "role": "verify",
@@ -14615,6 +14627,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "NF-Final §15A.5 供应商/第三方登记（WP-0D）：每个 vendor 的能力/数据条款/关键度/attestation/退出计划。判据 desktop/tests/test_ops_contract.py：used_by/attestation 路径在场、critical/high 必须有 attestation、退出计划必须有 fallback+步骤+owner、不得声明处理用户数据（本仓本地优先，不向第三方发送用户内容）。",
+      "path": "protocol/vendors.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "词表登记册（机制借鉴 SKOS 的 ConceptScheme：概念用标识符 + 标签 + 层级/映射管理）。NF 的词表此前散在代码常量与 JSON 字段里，漂移只能靠人记；本册把它们集中声明，并用 probe 指回真源逐项比对——真源变了而册子没跟，门禁即 FAIL。probe.kind=literal 表示该词表以本册为准（无代码真源）。aliases 收录同义/历史写法（SKOS altLabel 思路），只用于读，不参与判定。",
       "path": "protocol/vocabularies.json",
       "role": "verify",
@@ -14724,17 +14742,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "4723164ba24ef658163e46a9ec23656728708b91ddea46dcb0c147a7b900d716",
+  "root_digest": "c85c1ba645898ac6c9552031d65682d204125e7a5c53484066121d2e9b668abb",
   "rule_counts": {
-    "R-app": 1474,
-    "R-catch": 343,
+    "R-app": 1478,
+    "R-catch": 344,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 155,
+    "R-projection": 156,
     "R-support": 124,
-    "R-verify": 1262,
-    "auto:R-core": 289
+    "R-verify": 1265,
+    "auto:R-core": 290
   },
   "schema": "nf-role-coordinates/1"
 }

@@ -22,6 +22,7 @@
 - [production/threat_vectors.json](production/threat_vectors.json)（NF-Final §8 威胁向量：六条信任边界 + STRIDE 8 行 + 失败矩阵 8 行，逐条绑定控制点/证据/状态；判据 `test_production_threat_vectors.py`）
 - [docs/production/THREAT_MODEL.md](../docs/production/THREAT_MODEL.md)（生产平面威胁模型人读面：边界/STRIDE/失败矩阵 + 状态词表 + 不承诺边界）
 - [docs/qa/PRIVACY_QA.md](../docs/qa/PRIVACY_QA.md)（隐私 QA：数据地图/删除证据/PII 扫描/保留约束的判据与实测；配套 `PRIVACY.md` + `protocol/privacy.json`）
+- [ops/drills.json](ops/drills.json)（运维演练报告：桌面演练 4 级 + 恢复闭环 + 披露口径 + 供应商退出就绪；判据 `test_ops_contract.py`，配套 `docs/security/INCIDENT_RESPONSE.md`/`docs/sre/`/`docs/legal/VENDORS.md`）
 
 ## 互操作导出面（入仓投影）
 

@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-14",
   "approved_by": "Monyeah777",
-  "note": "NF-Final WP-0B（audit rebind 后冻结）",
+  "note": "NF-Final WP-0D（BASELINE 更新 + independence 登记 ops 后最终冻结）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "f48192a575d647d94958e026aa0e337b2124d5f2aed9ff2256e9a5cd542e7269"
+  "subject_digest": "acc65e10e99990e69a378edb6107ab0ecbb0a51bb27858701fb3873db7595e9f"
 }

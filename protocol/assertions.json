@@ -598,6 +598,51 @@
       "message": "隐私数据契约登记缺失或版本名不符（WP-0B 判据 test_privacy_contract 依赖它）",
       "fix": "补/修 protocol/privacy.json 的 schema 字段；再跑 test_privacy_contract",
       "evidence": "test_privacy_contract / conformance::modeling"
+    },
+    {
+      "id": "ops-registry",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "protocol/ops.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-ops/1"
+      },
+      "message": "运维/事件/BCP 登记缺失或版本名不符（WP-0D 判据依赖它）",
+      "fix": "补/修 protocol/ops.json；再跑 python scripts/ops_drill.py --check",
+      "evidence": "test_ops_contract / conformance::modeling"
+    },
+    {
+      "id": "vendors-registry",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "protocol/vendors.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-vendors/1"
+      },
+      "message": "供应商登记缺失或版本名不符（WP-0D 判据依赖它）",
+      "fix": "补/修 protocol/vendors.json；再跑 python scripts/ops_drill.py --check",
+      "evidence": "test_ops_contract / conformance::modeling"
+    },
+    {
+      "id": "ops-drills",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "results/ops/drills.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-ops-drills/1"
+      },
+      "message": "运维演练报告缺失或版本名不符（IR/恢复/披露/供应商退出演练须可复算）",
+      "fix": "python scripts/ops_drill.py --run 重算报告",
+      "evidence": "test_ops_contract / conformance::modeling"
     }
   ]
 }

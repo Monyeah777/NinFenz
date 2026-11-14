@@ -1,0 +1,80 @@
+{
+  "schema": "nf-vendors/1",
+  "note": "NF-Final §15A.5 供应商/第三方登记（WP-0D）：每个 vendor 的能力/数据条款/关键度/attestation/退出计划。判据 desktop/tests/test_ops_contract.py：used_by/attestation 路径在场、critical/high 必须有 attestation、退出计划必须有 fallback+步骤+owner、不得声明处理用户数据（本仓本地优先，不向第三方发送用户内容）。",
+  "kind_vocabulary": ["model-provider", "tsa", "transparency-log", "hosting", "package-registry", "deploy"],
+  "criticality_vocabulary": ["critical", "high", "medium", "low"],
+  "status_vocabulary": ["active", "optional", "retired"],
+  "vendors": [
+    {
+      "id": "V-01",
+      "name": "外部模型/Agent provider（由用户自选）",
+      "kind": "model-provider",
+      "used_by": ["desktop/src/core/driver.py", "desktop/src/core/agent_rules_adapter.py"],
+      "data_terms": {"stores_user_data": false, "note": "凭据由用户本地配置；仓内不存；可换 adapter/模型"},
+      "criticality": "medium",
+      "attestation": [],
+      "exit_plan": {"fallback": "mock adapter 或其它模型", "steps": ["切 adapter", "同 spec 重跑契约校验"], "owner": "user"},
+      "status": "optional"
+    },
+    {
+      "id": "V-02",
+      "name": "RFC 3161 TSA（如 freeTSA）",
+      "kind": "tsa",
+      "used_by": ["desktop/src/core/timestamp.py"],
+      "data_terms": {"stores_user_data": false, "note": "只提交摘要级 token 请求；不提交正文"},
+      "criticality": "medium",
+      "attestation": ["results/interop/sbom.json"],
+      "exit_plan": {"fallback": "本地 TSA 桩 / 离线 token 验证", "steps": ["切 TSA URL", "旧 token 仍离线验"], "owner": "maintainers"},
+      "status": "optional"
+    },
+    {
+      "id": "V-03",
+      "name": "Sigstore/Rekor 公共透明日志",
+      "kind": "transparency-log",
+      "used_by": ["desktop/src/core/trust/public_anchor.py"],
+      "data_terms": {"stores_user_data": false, "note": "只读抓取条目/公钥；不向公共日志提交用户内容"},
+      "criticality": "medium",
+      "attestation": ["results/trust/PUBLIC_ANCHOR_LIVE.json"],
+      "exit_plan": {"fallback": "不声称 T4；离线验证已抓取条目", "steps": ["禁用公共锚", "报告写 PUBLIC-ANCHOR-MISSING"], "owner": "maintainers"},
+      "status": "optional"
+    },
+    {
+      "id": "V-04",
+      "name": "GitHub（托管/CI/Advisory）",
+      "kind": "hosting",
+      "used_by": [".github/workflows/ci-verify.yml"],
+      "data_terms": {"stores_user_data": false, "note": "仓库内容公开；安全报告走私密 Advisory；备份存在本地/镜像"},
+      "criticality": "high",
+      "attestation": ["results/interop/slsa.json"],
+      "exit_plan": {"fallback": "本地仓库 + 远端镜像（.gitee）", "steps": ["git remote 切换", "CI 改本地/自托管"], "owner": "maintainers"},
+      "status": "active"
+    },
+    {
+      "id": "V-05",
+      "name": "包注册源（PyPI/npm/Cargo/NuGet）",
+      "kind": "package-registry",
+      "used_by": ["requirements.txt", "packaging/npm/package.json"],
+      "data_terms": {"stores_user_data": false, "note": "只拉依赖；版本固定 + 依赖审计 + SBOM"},
+      "criticality": "high",
+      "attestation": ["results/interop/sbom.json", "results/interop/cyclonedx.json"],
+      "exit_plan": {"fallback": "固定版本 wheel/离线镜像", "steps": ["切镜像", "用锁定清单重建环境"], "owner": "maintainers"},
+      "status": "active"
+    },
+    {
+      "id": "V-06",
+      "name": "Cloudflare（站点部署，可选）",
+      "kind": "deploy",
+      "used_by": ["wrangler.jsonc"],
+      "data_terms": {"stores_user_data": false, "note": "只部署静态站点；不承载用户内容"},
+      "criticality": "low",
+      "attestation": [],
+      "exit_plan": {"fallback": "静态站点本地/其它静态托管", "steps": ["停自动部署", "改静态托管"], "owner": "maintainers"},
+      "status": "optional"
+    }
+  ],
+  "replacement_drills": [
+    {"id": "VD-01", "covers": ["V-02", "V-03"], "kind": "static-readiness",
+     "runner": "core.ops.vendor_readiness",
+     "note": "静态就绪检查（路径/attestation/退出计划可执行）；真实网络替换属外部操作，不冒充已演练"}
+  ]
+}

@@ -90,3 +90,10 @@
   被拒时**不产生任何执行副作用**。
 - **判据**：`desktop/tests/test_repo_trust.py`（URL 严格解析、伪造官方 origin 仍拒绝、安装根
   自动信任、拒绝无副作用、CLI 前置拒绝与 `--trust-repo` 放行）。
+
+## 七、事件响应 / 业务连续 / 供应商（NF-Final §15A）
+
+- **事件响应 runbook**：`docs/security/INCIDENT_RESPONSE.md`（S0–S3 分级、IR-01…IR-07 步骤、取证与披露衔接）；机读登记 `protocol/ops.json`。
+- **业务连续/灾难恢复**：`docs/sre/BCP_DR.md`（资产备份/RTO·RPO 逻辑口径、磁盘/密钥/外部依赖故障场景、恢复演练）。
+- **供应商与退出计划**：`docs/legal/VENDORS.md` + `protocol/vendors.json`（不处理他方个人数据、不签 DPA；critical/high 必须有 attestation）。
+- **演练判据**：`python scripts/ops_drill.py --check`（桌面/恢复/披露/供应商退出就绪，报告 `results/ops/drills.json`）与 `desktop/tests/test_ops_contract.py`；真实网络替换/外部协调披露属外部操作，不冒充已演练。
