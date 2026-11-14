@@ -8,14 +8,16 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/gap_review.py:7d1d600926e13b9936f2a7d30e8a8ca95e4bb3b2a73308f88cfb89b563055953
   - desktop/src/core/payload_harvest.py:514c493d341863b245b7dddb0bde8ee87ca969fe4407c9f2834a726bb92d1a76
-  - protocol/data_contracts.json:0e883c67944fb1db6fe59f1d4bda86b60c39a9a0a4395a295b1e31449fa22e71
-  - protocol/assertions.json:89007cd9e5684898da44289d6942990de437325a92c375df3da29e883a90d1fc
+  - protocol/data_contracts.json:ac330f481bd61129a941e53163b7cadc39b089ff8dec3ea2700ee6b165936b88
+  - protocol/assertions.json:cc4e6b7c3b3e7fcd095690b32b95f7a28383f68206ac2e672a3d4b7772de0267
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
   - desktop/src/core/text_hygiene.py:99b38bfbb8656ad653689c4cba93679970a78183019fd5f02e2380d87ec99ff3
   - desktop/src/core/workloop.py:3ee94f2c11939abba5507741c6b9b4dae8e8cab77c3bda38419678e31e097056
   - scripts/serve_decision_model.py:bbb36dff0e3816c2253150b7de6ab619877c3c78269a644c4c966083df15afee
-  - scripts/nf.py:29e1170dab08764e3970d90d64b57495bbd74dd256ebe7744db688a66b77aace
+  - scripts/nf.py:ee012a63079baa894f255bf3594378f8d803359082785177178cfbe16d8ff107
 ---
+> 重审（2026-11-14）：NF-Final WP-20：新增 core/agent_adapter.py、nf agent CLI、results/adapter/adapter-report.json、docs/agent-adapter.md、test_agent_adapter_contract.py；终端族/表面/文档计数/译件更新，audit 重绑
+
 > 重审（2026-11-14）：NF-Final G1 收口：新增 results/{G1_DOD.md,g1_dod.json}、test_g1_dod.py；assertions/data_contracts/check12/code_metrics 更新，被审对象变更后机械重绑
 
 > 重审（2026-11-14）：NF-Final WP-13：capability_index 给 check43/44 挂能力（DETERMINISTIC/PROVENANCE_TRACE/CONTRACT_STRUCT），消除能力空洞

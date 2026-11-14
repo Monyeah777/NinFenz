@@ -6,6 +6,7 @@
     "test_adr_0000_contract": 0.3,
     "test_adr_9000_contract": 0.2,
     "test_adr_9001_contract": 0.2,
+    "test_agent_adapter_contract": 1.5,
     "test_agent_rules_adapter": 0.2,
     "test_agent_start_contract": 0.2,
     "test_agents_contract": 0.2,
@@ -723,6 +724,14 @@
     "test_adr_9001_contract.Adr9001ContractTest.test_contract_catches_mutations": 0.01,
     "test_adr_9001_contract.Adr9001ContractTest.test_evidence_is_resolvable": 0.0,
     "test_adr_9001_contract.Adr9001ContractTest.test_examples_match_code_boundaries": 0.0,
+    "test_agent_adapter_contract.AgentAdapterContractTest.test_bad_task_and_unknown_adapter": 0.0,
+    "test_agent_adapter_contract.AgentAdapterContractTest.test_both_adapters_valid": 0.06,
+    "test_agent_adapter_contract.AgentAdapterContractTest.test_cli": 1.25,
+    "test_agent_adapter_contract.AgentAdapterContractTest.test_fabricated_citation_rejected": 0.0,
+    "test_agent_adapter_contract.AgentAdapterContractTest.test_kind_mismatch_rejected": 0.0,
+    "test_agent_adapter_contract.AgentAdapterContractTest.test_over_budget_rejected": 0.0,
+    "test_agent_adapter_contract.AgentAdapterContractTest.test_parity_report_and_committed": 0.06,
+    "test_agent_adapter_contract.AgentAdapterContractTest.test_two_adapters_listed": 0.0,
     "test_agent_rules_adapter.TestAgentsAdapter.test_capability_techdoc_rejected_toward_skill": 0.0,
     "test_agent_rules_adapter.TestAgentsAdapter.test_claude_format_exports_claude_md": 0.0,
     "test_agent_rules_adapter.TestAgentsAdapter.test_narrative_rejected_no_file": 0.0,
@@ -6319,5 +6328,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2173.3
+  "total_s": 2174.8
 }

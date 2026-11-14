@@ -982,6 +982,18 @@
         "test_g1_dod",
         "results/G1_DOD.md"
       ]
+    },
+    {
+      "id": "adapter-report",
+      "artifact": "results/adapter/adapter-report.json",
+      "quality_rule": "assertion:adapter-report",
+      "owner": "Agent Adapter 协议/parity（core/agent_adapter.py + test_agent_adapter_contract）+ WP-20",
+      "status": "active",
+      "freshness": "task/context/Wiki 变化后重跑 nf agent run --report；committed 必须 == 实时重算",
+      "consumers": [
+        "test_agent_adapter_contract",
+        "docs/agent-adapter.md"
+      ]
     }
   ]
 }

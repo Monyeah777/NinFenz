@@ -6,14 +6,14 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——对应 62
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - protocol/locales.json:7aca9c9201f4688233d7f2182c5d1f49ac41d0a8952ae902bd718dedb0a7f7c0
+  - protocol/locales.json:bde89c2d567cfe3418cee9834cd16bb91762a343e080e92a288a33a1c3a9c631
   - docs/locales.md:49d614fa22cbeacff6166c292b6785566ea07b505556e2d842dfeb515127277a
   - docs/en/locales.md:7190d1a17094cccd0be4a780230e5777e61694eb5b7f0003c9c3370d1d9ce3c1
   - docs/ja/locales.md:a2e563172139d5fb7549acd1aca06463f6f5add713ab84aea713ac06af1be86d
   - docs/en/mcp.md:333b580565595c01dc8fea640a9c2114a295d076cbdbcabcae26462d4e59f3e2
   - docs/ja/mcp.md:b3c1cf3a9ba549590951460b99f28e64b5f63bdc6087e4fa5510089d5047d81f
-  - docs/en/terminal.md:a594a02adbdd375f6afe8582868b8ad200ff35006f97e6483b7b942612bb46df
-  - docs/ja/terminal.md:5601204b78b7d6c9efcde33c81ea1890dfb16f3024a1ef50fa7cba1da92d2cdc
+  - docs/en/terminal.md:9a74652dbbd11df971c3c7ce0e0f3cb27c8596ae6d08ce8a7bd288892a8f93ee
+  - docs/ja/terminal.md:d75b4abb19687311c8a4a2fb0093c92ceafa0ed3411c1da20fd3cbd272dce742
   - docs/en/layers.md:71e9d99723c8c5c1c7bcd9e21e991f7dc932d3a528333e7bdafa3f5e718479ac
   - docs/ja/layers.md:ffd6d02dc518b893e5f9c1c2f60d4572d128b6c438c8261e9d58f2cb8717a086
   - docs/44_M1_执行演练扩展.md:142a9157504702fa03498494dc452ae2fbb8cfbfcce836992b1d59d1078755e4
@@ -26,8 +26,10 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:8dcc76d49946f613b42cf64c6f723d84fe129ae167252ddf159e60f414bf55e2
+  - protocol/code_metrics_baseline.json:d2342bf3a8b3f036b8e32c6118259aeeac2cec880ebc29775875320f41dc1ece
 ---
+> 重审（2026-11-14）：NF-Final WP-20：新增 core/agent_adapter.py、nf agent CLI、results/adapter/adapter-report.json、docs/agent-adapter.md、test_agent_adapter_contract.py；终端族/表面/文档计数/译件更新，audit 重绑
+
 > 重审（2026-11-14）：NF-Final WP-12：新增 core/context_packer.py、docs/context-packer.md、test_context_packer_contract.py；nf wiki context --role 接入；independence/code_metrics/check12 更新，被审对象变更后机械重绑
 
 > 重审（2026-11-14）：NF-Final WP-11 收尾：code_metrics 基线重冻（spec_compiler 231 行/最长 59 行为新模块实测值）
