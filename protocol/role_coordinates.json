@@ -4,9 +4,9 @@
     "entry": 26,
     "floor": 5,
     "prod": 1068,
-    "projection": 226,
+    "projection": 228,
     "support": 512,
-    "verify": 1444
+    "verify": 1446
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8921,6 +8921,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "WP-50 文档 claims 一致性判据（数字/标签/禁用措辞 vs 门禁实测）。",
+      "path": "desktop/tests/test_docs_claims_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "域包工厂 + 域功能引擎单测：口径公式 / 夹具确定性 / 生成器幂等 / 唯一性守卫 /",
       "path": "desktop/tests/test_domain_pack.py",
       "role": "verify",
@@ -14621,6 +14627,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "NF-Final G5 WP-50 文档 claims 一致性登记：哪些文档的哪些数字/措辞属于「当前声明」，必须与 quality_baseline/verify_report 实测一致；禁用认证/合规措辞（除非同行为否定语境）。机器件 results/docs_claims_report.json（committed==实时重算），judged 由 verify check53。判据 desktop/tests/test_docs_claims_contract.py。",
+      "path": "protocol/docs_claims.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "16 份架构文档台账：状态 + 归属裁决 + 仓内落点。仓内实现只按 current 执行；冲突未裁前以 ADR 为准（见 protocol/adr/registry.json）。文档原件在仓外（作者提供），此处只登记裁决与锚点。",
       "path": "protocol/docs_ledger.json",
       "role": "verify",
@@ -15114,17 +15126,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "8c8be408f6f713032cbcd19e724539d8ecf3711f1f9728c3162516bf725e7c34",
+  "root_digest": "fa8f024c21f3f253941c953913070b2249789fd6d57e082576f0e2ba7cf30b98",
   "rule_counts": {
     "R-app": 1509,
     "R-catch": 356,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 200,
+    "R-projection": 201,
     "R-support": 124,
-    "R-verify": 1312,
-    "auto:R-core": 314
+    "R-verify": 1314,
+    "auto:R-core": 315
   },
   "schema": "nf-role-coordinates/1"
 }

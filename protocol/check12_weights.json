@@ -182,6 +182,7 @@
     "test_doc_truth": 0.4,
     "test_docker_nfal_workflow_contract": 0.2,
     "test_docs_cite_probe_numbers": 0.1,
+    "test_docs_claims_contract": 0.2,
     "test_domain_pack": 0.3,
     "test_domain_pack_render": 0.3,
     "test_domain_packs_doc_contract": 0.3,
@@ -2269,6 +2270,16 @@
     "test_docker_nfal_workflow_contract.DockerNfalWorkflowContractTest.test_workflow_matches_contract": 0.0,
     "test_docs_cite_probe_numbers.ProbeNumberDocsTest.test_doc_numbers_match_results": 0.0,
     "test_docs_cite_probe_numbers.ProbeNumberDocsTest.test_judge_can_be_killed": 0.0,
+    "test_docs_claims_contract.DocsClaimsContractTest.test_baseline_keys_checked": 0.0,
+    "test_docs_claims_contract.DocsClaimsContractTest.test_check_green": 0.0,
+    "test_docs_claims_contract.DocsClaimsContractTest.test_claims_boundary": 0.0,
+    "test_docs_claims_contract.DocsClaimsContractTest.test_committed_equals_live": 0.0,
+    "test_docs_claims_contract.DocsClaimsContractTest.test_expected_from_quality_baseline": 0.0,
+    "test_docs_claims_contract.DocsClaimsContractTest.test_forbidden_claim_red": 0.0,
+    "test_docs_claims_contract.DocsClaimsContractTest.test_negative_context_allowed": 0.0,
+    "test_docs_claims_contract.DocsClaimsContractTest.test_stale_label_red": 0.0,
+    "test_docs_claims_contract.DocsClaimsContractTest.test_stale_pass_red": 0.0,
+    "test_docs_claims_contract.DocsClaimsContractTest.test_template_mutation_red": 0.0,
     "test_domain_pack.FactoryTest.test_build_dry_run_writes_nothing": 0.0,
     "test_domain_pack.FactoryTest.test_built_packs_match_generator": 0.0,
     "test_domain_pack.FactoryTest.test_identifier_uniqueness": 0.02,
@@ -6454,5 +6465,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2180.3
+  "total_s": 2180.5
 }

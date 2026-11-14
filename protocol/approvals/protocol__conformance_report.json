@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-15",
   "approved_by": "Monyeah777",
-  "note": "NF-Final G4 QG4 收口（verdict pass-with-open-items，P0=0）",
+  "note": "NF-Final G5 WP-50（收尾2：权重/度量更新）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "c1d1fb9877cc0cfb7877ca1ed06bd8cf23730e9320f1bb4272bce0708e68a9a7"
+  "subject_digest": "abc56aab7cfc31db59af966a06f90489990dec22176c72b26a3da297c5c1099a"
 }

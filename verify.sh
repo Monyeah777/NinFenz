@@ -118,7 +118,7 @@ fi
 #   运行时 + 档位）；输入没变直接回放摘要（秒级）。--no-cache 或 NF_VERIFY_CACHE=0 关掉。
 # 任何其它参数 = 用法错误（exit 2），以免"看上去像传了子集其实仍在全量"这类静默误读。
 # 矩阵分片（CI，2026-10-18）：`--tests-only --shard i/n` 只跑测试的第 i/n 片；
-# `--checks-only` 只跑 52 条静态 check（测试交给矩阵）。两者由 CI 组合成一次完整门禁：
+# `--checks-only` 只跑 53 条静态 check（测试交给矩阵）。两者由 CI 组合成一次完整门禁：
 # 静态 1 台 + 测试 n 台并行 ⇒ 全量墙钟从"一台机器的 ~600 s"降到"n 台各自 ~100 s"。
 NF_FAST=0; NF_BASE=''; NF_TIER='quick'; NF_CACHE="${NF_VERIFY_CACHE:-1}"
 NF_CHECKS_ONLY=0; NF_TESTS_ONLY=0; NF_SHARD=''
@@ -3461,6 +3461,48 @@ PYEOF
   return "$err"
 }
 
+check53(){
+  echo '== [53/段D] 文档 claims 一致性门禁（G5：数字/标签/禁用措辞 vs 门禁实测）=='
+  local err=0
+  if [ -n "$PY3" ]; then
+    if "$PY3" - <<'PYEOF' >"$NFL_TMP"/nf_check53.log 2>&1
+import os, sys
+sys.path.insert(0, os.path.join('desktop', 'src'))
+from core import docs_claims as dc
+issues = dc.check('.')
+for item in issues:
+    print('[FAIL] %s' % item)
+doc = dc.build('.')
+print('文档声明统计：claims=%d ok=%d violations=%d'
+      % (doc['counts']['claims'], doc['counts']['ok'], doc['counts']['violations']))
+sys.exit(1 if issues else 0)
+PYEOF
+    then
+      ok '文档 claims 一致（check53：数字/标签与 quality_baseline 实测一致 + 无认证措辞）'
+    else
+      no "文档 claims 不一致——$(tail -3 "$NFL_TMP"/nf_check53.log | tr '
+' ' ')"
+      err=1
+    fi
+    if "$PY3" - <<'PYEOF' >/dev/null 2>&1
+import json, os, sys
+sys.path.insert(0, os.path.join('desktop', 'src'))
+from core import docs_claims as dc
+committed = json.load(open(os.path.join('results', 'docs_claims_report.json'), encoding='utf-8'))
+sys.exit(0 if dc.render(committed) == dc.render(dc.build('.')) else 1)
+PYEOF
+    then
+      ok '文档声明报告新鲜（check53：committed == 实时重算）'
+    else
+      no '文档声明报告过期——修复指引：重跑 docs_claims.write'
+      err=1
+    fi
+  else
+    wn 'python3 不在 PATH（跳过 check53 文档 claims 门禁）'
+  fi
+  return "$err"
+}
+
 # ---- P3b：判定缓存（输入内容寻址；只回放**绿**判定）----
 # key 由 scripts/verify_cache.py 按 HEAD + 工作树差异 + 未跟踪件 + 门禁代码 + 运行时 + 档位算出；
 # 输入没变就回放上次摘要（秒级）。红判定**不缓存**（红是瞬态），--fast/--no-cache 一律重算。
@@ -3522,7 +3564,7 @@ check37
 check38
 check39
 check40
-echo '—— 段 D：供应链与 Trust 证据面（check41-42 + check43/44 G1 Wiki-Spec + check45/46 Trust + check47 G4 + check48 DoD + check49 G0 双平面 + check50 G2 生产指标 + check51 G3 治理报告 + check52 G4 AI 信任面）——'
+echo '—— 段 D：供应链与 Trust 证据面（check41-42 + check43/44 G1 Wiki-Spec + check45/46 Trust + check47 G4 + check48 DoD + check49 G0 双平面 + check50 G2 生产指标 + check51 G3 治理报告 + check52 G4 AI 信任面 + check53 G5 文档 claims）——'
 check41
 check42
 check43
@@ -3535,6 +3577,7 @@ check49
 check50
 check51
 check52
+check53
 echo '=================================================='
 echo "结果统计: PASS=$PASS  WARN=$WARN  FAIL=$FAIL"
 # ---- 开发快车道（--fast · 显式 opt-in · 不改变上面的任何一条判定）----
