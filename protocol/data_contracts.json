@@ -1018,6 +1018,18 @@
         "test_output_validation_contract",
         "docs/output-validation.md"
       ]
+    },
+    {
+      "id": "delivery-report",
+      "artifact": "results/delivery/delivery-report.json",
+      "quality_rule": "assertion:delivery-report",
+      "owner": "Delivery（core/delivery.py + test_delivery_contract）+ WP-23",
+      "status": "active",
+      "freshness": "交付包/产物变化后重跑 --deliver 并重写报告（committed == 实时 verify）",
+      "consumers": [
+        "test_delivery_contract",
+        "docs/delivery.md"
+      ]
     }
   ]
 }

@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1500,
+    "app": 1501,
     "entry": 26,
     "floor": 5,
     "prod": 1065,
-    "projection": 204,
+    "projection": 208,
     "support": 510,
-    "verify": 1422
+    "verify": 1424
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -6047,6 +6047,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "Delivery（WP-23）：把通过校验的产物打成可交付包（manifest/元数据/可选 sidecar）。",
+      "path": "desktop/src/core/delivery.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "传递依赖闭包 ⊆ 白名单（机制借鉴 tinychannels scripts/check-bus-purity.py）。",
       "path": "desktop/src/core/dep_closure.py",
       "role": "prod",
@@ -8737,6 +8743,12 @@
     {
       "function": "",
       "path": "desktop/tests/test_delete_evidence.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "WP-23 Delivery 判据（包完整/路径安全/可重复/sidecar 不阻塞）。",
+      "path": "desktop/tests/test_delivery_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -14964,17 +14976,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "efbc3595c251f22ee7a3cc354d708514c82822e1d179c5a17cb9ea851864a549",
+  "root_digest": "b806723a6a6044b3da2e6947873228cd491e9e995b577003abcc4e829156f8ca",
   "rule_counts": {
-    "R-app": 1500,
+    "R-app": 1501,
     "R-catch": 356,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 181,
+    "R-projection": 185,
     "R-support": 124,
-    "R-verify": 1292,
-    "auto:R-core": 304
+    "R-verify": 1293,
+    "auto:R-core": 305
   },
   "schema": "nf-role-coordinates/1"
 }

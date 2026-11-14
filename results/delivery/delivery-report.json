@@ -1,0 +1,12 @@
+{
+  "files": 2,
+  "issues": [],
+  "metrics": {
+    "bytes": 2179,
+    "files": 2,
+    "sidecar": true
+  },
+  "ok": true,
+  "schema": "nf-delivery-report/1",
+  "sidecar": true
+}

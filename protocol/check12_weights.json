@@ -1,5 +1,5 @@
 {
-  "measured_at": "2026-11-14",
+  "measured_at": "2026-11-15",
   "modules": {
     "test_a11y_i18n_contract": 0.3,
     "test_absence_guard": 0.2,
@@ -157,6 +157,7 @@
     "test_declined_ledger": 0.1,
     "test_deep_dive_contract": 0.3,
     "test_delete_evidence": 0.2,
+    "test_delivery_contract": 1.4,
     "test_demo_signers_readme_doc_contract": 0.3,
     "test_dep_closure": 0.2,
     "test_dependabot_contract": 0.4,
@@ -2088,6 +2089,15 @@
     "test_deep_dive_contract.DeepDiveContractTest.test_ten_questions_are_mapped": 0.0,
     "test_delete_evidence.Test.test_kind_and_ref_required": 0.0,
     "test_delete_evidence.Test.test_ok_and_blame": 0.0,
+    "test_delivery_contract.DeliveryContractTest.test_cli_deliver": 1.24,
+    "test_delivery_contract.DeliveryContractTest.test_committed_report_equals_live": 0.0,
+    "test_delivery_contract.DeliveryContractTest.test_manifest_deterministic": 0.0,
+    "test_delivery_contract.DeliveryContractTest.test_not_delivered_rejected": 0.0,
+    "test_delivery_contract.DeliveryContractTest.test_pack_manifest_and_verify": 0.0,
+    "test_delivery_contract.DeliveryContractTest.test_path_traversal_rejected": 0.01,
+    "test_delivery_contract.DeliveryContractTest.test_sidecar_optional": 0.0,
+    "test_delivery_contract.DeliveryContractTest.test_symlink_rejected": 0.01,
+    "test_delivery_contract.DeliveryContractTest.test_tamper_detected": 0.01,
     "test_demo_signers_readme_doc_contract.DemoSignersReadmeTest.test_contract_catches_mutations": 0.0,
     "test_demo_signers_readme_doc_contract.DemoSignersReadmeTest.test_reader_verify_runs_and_reports_truth_scope": 0.12,
     "test_demo_signers_readme_doc_contract.DemoSignersReadmeTest.test_readme_matches_contract": 0.0,
@@ -6347,5 +6357,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2176.4
+  "total_s": 2177.8
 }

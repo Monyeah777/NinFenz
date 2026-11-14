@@ -355,6 +355,11 @@
       "max_fn_cc": 5,
       "max_fn_lines": 11
     },
+    "desktop/src/core/delivery.py": {
+      "lines": 198,
+      "max_fn_cc": 26,
+      "max_fn_lines": 63
+    },
     "desktop/src/core/dep_closure.py": {
       "lines": 41,
       "max_fn_cc": 6,
@@ -1756,7 +1761,7 @@
       "max_fn_lines": 26
     },
     "scripts/nf.py": {
-      "lines": 10093,
+      "lines": 10121,
       "max_fn_cc": 132,
       "max_fn_lines": 443
     },

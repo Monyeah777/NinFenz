@@ -1,8 +1,8 @@
 {
-  "approved_at": "2026-11-14",
+  "approved_at": "2026-11-15",
   "approved_by": "Monyeah777",
-  "note": "NF-Final G2 WP-22 Output/Validation（form+contract+拒收）",
+  "note": "NF-Final G2 WP-23 Delivery（包/manifest/sidecar/路径安全）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "af3888d92c0e31ca80c3f793ff299f9444dd2cff820005345591b047fe23cd94"
+  "subject_digest": "8025689289961cbc58a2bcf67c91da52c49ce41c56862a09479636b9a554f6e3"
 }

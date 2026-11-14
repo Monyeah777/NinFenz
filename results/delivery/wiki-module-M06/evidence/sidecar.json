@@ -1,0 +1,90 @@
+{
+  "assembly_run": {
+    "checks": [
+      {
+        "detail": "citation_rate=1.0",
+        "id": "K-001",
+        "ok": true
+      },
+      {
+        "detail": "output-report：md · violations=0",
+        "id": "K-002",
+        "ok": true
+      },
+      {
+        "detail": "chars=37 max=4800",
+        "id": "K-003",
+        "ok": true
+      },
+      {
+        "detail": "输出只在 slot slot:module-M06 内，引用均来自上下文",
+        "id": "K-004",
+        "ok": true
+      }
+    ],
+    "output": {
+      "chars": 37,
+      "digest": "2b3a3794dd47880320c69fe7b1b250eb27715837e578c2430d387499d5bcc058",
+      "kind": "md",
+      "path": "out/module-M06.md",
+      "tokens": 9
+    },
+    "status": "delivered"
+  },
+  "note": "可选证据 sidecar；缺失不阻塞交付",
+  "schema": "nf-delivery-sidecar/1",
+  "validation": {
+    "contract": {
+      "acceptance": [
+        {
+          "id": "A-001"
+        },
+        {
+          "id": "A-002"
+        }
+      ],
+      "artifact": {
+        "digest": "2b3a3794dd47880320c69fe7b1b250eb27715837e578c2430d387499d5bcc058",
+        "kind": "doc",
+        "path": "out/module-M06.md"
+      },
+      "constraints": [
+        {
+          "id": "C-001",
+          "rule": "citations ⊆ context_refs（编造引用=0）",
+          "severity": "MUST"
+        },
+        {
+          "id": "C-002",
+          "rule": "content ≤ budget.max_tokens×4",
+          "severity": "MUST"
+        },
+        {
+          "id": "C-003",
+          "rule": "output form 语法/控制字符/占位符合规",
+          "severity": "MUST"
+        }
+      ],
+      "id": "nf:output:module-M06",
+      "schema": "nf-contract/1",
+      "status": "active",
+      "version": 1
+    },
+    "digest": "2b3a3794dd47880320c69fe7b1b250eb27715837e578c2430d387499d5bcc058",
+    "form": "md",
+    "issues": [],
+    "metrics": {
+      "chars": 37,
+      "citation_rate": 1.0,
+      "citations": 1,
+      "control_chars": 0,
+      "form": "md",
+      "tier": "T1",
+      "tokens": 9,
+      "violations": 0
+    },
+    "ok": true,
+    "schema": "nf-output-report/1",
+    "tier": "T1"
+  }
+}
