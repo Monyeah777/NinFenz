@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1467,
+    "app": 1468,
     "entry": 26,
     "floor": 5,
     "prod": 1057,
-    "projection": 166,
-    "support": 464,
-    "verify": 1318
+    "projection": 167,
+    "support": 465,
+    "verify": 1319
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -11123,6 +11123,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "trust 自审计契约：机器件（SELF_AUDIT.json）与 CLAIM_MATRIX/门禁真源互相绑定。",
+      "path": "desktop/tests/test_trust_self_audit_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "docs/trust/THREAT_MODEL.md 契约：STRIDE/删除矩阵/边界/红队/风险全绑定。",
       "path": "desktop/tests/test_trust_threat_model_doc_contract.py",
       "role": "verify",
@@ -14292,16 +14298,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "50f1ce930da8541fd5a88a9ee3b732295c492c6f97e481e77d2bf215e7ebc1e5",
+  "root_digest": "659d98cc790e99edf9a74f7b208f2ec6bf7a2a7fc300c0fa01e36d1ceadb043b",
   "rule_counts": {
-    "R-app": 1467,
-    "R-catch": 312,
+    "R-app": 1468,
+    "R-catch": 313,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 146,
+    "R-projection": 147,
     "R-support": 124,
-    "R-verify": 1192,
+    "R-verify": 1193,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

@@ -1,5 +1,5 @@
 {
-  "digest": "2ccc32b1a7ec84e3a156931a0a0b184f0ec8d18c639a1697188d69cd66cb534d",
+  "digest": "b6d88e8be9f7cf61c5d1271a9612268665ba71de0cef5bc5055b592fff0a9c49",
   "entries": [
     {
       "doc": "其余 ABI 调用的判定向量：cc_label（IR 校验）→ 期望结论（跨语言可复核）。",
@@ -1099,6 +1099,16 @@
       "subcommands": []
     },
     {
+      "doc": "计划 §13 自扫描：S0-S12 维度体检 → results/trust/SELF_AUDIT.json（nf-trust-self-audit/1）。",
+      "flags": [
+        "--check",
+        "--json",
+        "--write"
+      ],
+      "path": "scripts/trust_self_audit.py",
+      "subcommands": []
+    },
+    {
       "doc": "Trust Fabric 测试向量集：把 G1/G2 的实现契约固化成跨语言可复核的单一产物。",
       "flags": [
         "--check",
@@ -1260,8 +1270,8 @@
       "subcommands": []
     }
   ],
-  "flags": 537,
+  "flags": 540,
   "note": "静态接口面（docs/flags/subcommands），不含缺省行为语义",
   "schema": "nf-capability-inventory/1",
-  "scripts": 81
+  "scripts": 82
 }

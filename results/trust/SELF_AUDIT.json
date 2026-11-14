@@ -1,0 +1,183 @@
+{
+  "schema": "nf-trust-self-audit/1",
+  "head": "771ba7a5f63fe2fa7e46c8ab4e29882ef06ff183",
+  "scanned_at": "2026-11-14T05:27:13Z",
+  "dimensions": {
+    "S0_requirements": {
+      "status": "amber",
+      "findings": [
+        "F-002",
+        "F-003",
+        "F-004",
+        "F-005",
+        "F-006"
+      ]
+    },
+    "S1_code_holes": {
+      "status": "green",
+      "findings": []
+    },
+    "S2_judgement_holes": {
+      "status": "green",
+      "findings": [
+        "F-001"
+      ]
+    },
+    "S3_crypto": {
+      "status": "green",
+      "findings": []
+    },
+    "S4_chain_order": {
+      "status": "green",
+      "findings": []
+    },
+    "S5_types_compat": {
+      "status": "green",
+      "findings": []
+    },
+    "S6_test_gaps": {
+      "status": "amber",
+      "findings": [
+        "F-007"
+      ]
+    },
+    "S7_doc_overclaim": {
+      "status": "green",
+      "findings": []
+    },
+    "S8_deps": {
+      "status": "green",
+      "findings": []
+    },
+    "S9_path_dos": {
+      "status": "green",
+      "findings": []
+    },
+    "S10_privacy": {
+      "status": "green",
+      "findings": []
+    },
+    "S11_observability": {
+      "status": "green",
+      "findings": []
+    },
+    "S12_unknown": {
+      "status": "amber",
+      "findings": [
+        "F-008",
+        "F-009"
+      ]
+    }
+  },
+  "findings": [
+    {
+      "id": "F-001",
+      "dim": "S2_judgement_holes",
+      "severity": "P1",
+      "file": "",
+      "evidence": "自扫描发现默认放行形状：desktop/src/core/trust/gate.py 与 scripts/trust_vectors.py 的 level 判定均用 case.get(\"policy_ok\", True) 缺省放行；本轮已改为显式布尔（缺失即拒）",
+      "fix": "缺省一律 fail-closed：policy_ok 必须显式给出，缺失/非布尔即拒绝",
+      "test": "test_trust_gate45.py",
+      "owner": "",
+      "status": "fixed"
+    },
+    {
+      "id": "F-002",
+      "dim": "S0_requirements",
+      "severity": "P1",
+      "file": "",
+      "evidence": "claim #15 仍 TODO：删尾并重算本地摘要可被检测（head 签名/TSA）",
+      "fix": "按 CLAIM_MATRIX 的落点阶段（G2-G4）实现并补测试后改状态",
+      "test": "",
+      "owner": "Monyeah777（维护者）",
+      "status": "open"
+    },
+    {
+      "id": "F-003",
+      "dim": "S0_requirements",
+      "severity": "P1",
+      "file": "",
+      "evidence": "claim #16 仍 TODO：DSSE/PAE 签名信封（≥1 有效签名、keyid 可解析）",
+      "fix": "按 CLAIM_MATRIX 的落点阶段（G2-G4）实现并补测试后改状态",
+      "test": "",
+      "owner": "Monyeah777（维护者）",
+      "status": "open"
+    },
+    {
+      "id": "F-004",
+      "dim": "S0_requirements",
+      "severity": "P1",
+      "file": "",
+      "evidence": "claim #18 仍 TODO：未知实体类型/越权组合 fail-closed（typed entity）",
+      "fix": "按 CLAIM_MATRIX 的落点阶段（G2-G4）实现并补测试后改状态",
+      "test": "",
+      "owner": "Monyeah777（维护者）",
+      "status": "open"
+    },
+    {
+      "id": "F-005",
+      "dim": "S0_requirements",
+      "severity": "P1",
+      "file": "",
+      "evidence": "claim #19 仍 TODO：模型替换使旧 AI 证据失效（model card 绑定）",
+      "fix": "按 CLAIM_MATRIX 的落点阶段（G2-G4）实现并补测试后改状态",
+      "test": "",
+      "owner": "Monyeah777（维护者）",
+      "status": "open"
+    },
+    {
+      "id": "F-006",
+      "dim": "S0_requirements",
+      "severity": "P1",
+      "file": "",
+      "evidence": "claim #21 仍 TODO：Python ↔ .NET（引擎线）逐字节 parity（trust 面）",
+      "fix": "按 CLAIM_MATRIX 的落点阶段（G2-G4）实现并补测试后改状态",
+      "test": "",
+      "owner": "Monyeah777（维护者）",
+      "status": "open"
+    },
+    {
+      "id": "F-007",
+      "dim": "S6_test_gaps",
+      "severity": "P2",
+      "file": "",
+      "evidence": "属性测试/模糊测试未接（计划 §13.4）：bundle/链随机篡改尚无属性不变量",
+      "fix": "G2 前补属性测试（随机 bundle/叶/篡改，不变量断言）",
+      "test": "",
+      "owner": "Monyeah777（维护者）",
+      "status": "open"
+    },
+    {
+      "id": "F-008",
+      "dim": "S12_unknown",
+      "severity": "P2",
+      "file": "",
+      "evidence": "红队角色剩余 4 个未跑（恶意 issuer / 新人 / 隐私攻击者 / 供应链攻击者）",
+      "fix": "按轮次轮换红队角色并把路径写入威胁模型",
+      "test": "",
+      "owner": "Monyeah777（维护者）",
+      "status": "open"
+    },
+    {
+      "id": "F-009",
+      "dim": "S12_unknown",
+      "severity": "P2",
+      "file": "",
+      "evidence": "跨语言 parity（Go/.NET）未接：向量集已备，实现 parity 属 G4",
+      "fix": "G4 补独立 verifier 并跑同一向量集",
+      "test": "",
+      "owner": "Monyeah777（维护者）",
+      "status": "open"
+    }
+  ],
+  "gate": {
+    "verify": "PASS=77 WARN=2 FAIL=0（bash verify.sh --checks-only 实跑）",
+    "dotnet": "not-run（本机无 .NET SDK，见 BASELINE ENV-01）",
+    "tests": "全量未跑；静态面全量 + 受影响面（G1 各 WP 记录）"
+  },
+  "stop": {
+    "p0": 0,
+    "p1_open_with_owner": 5,
+    "claims_unsupported": 0
+  }
+}

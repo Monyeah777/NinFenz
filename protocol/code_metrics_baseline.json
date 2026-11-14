@@ -1780,9 +1780,14 @@
       "max_fn_cc": 5,
       "max_fn_lines": 29
     },
+    "scripts/trust_self_audit.py": {
+      "lines": 285,
+      "max_fn_cc": 21,
+      "max_fn_lines": 118
+    },
     "scripts/trust_vectors.py": {
-      "lines": 482,
-      "max_fn_cc": 7,
+      "lines": 485,
+      "max_fn_cc": 8,
       "max_fn_lines": 47
     },
     "scripts/trust_verify.py": {

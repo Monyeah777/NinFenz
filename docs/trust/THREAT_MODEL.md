@@ -117,7 +117,7 @@
 
 ## 已知缺口（按阶段）
 
-- **OPEN-G1（收口中）**：claim 级 bundle（含 splice 负例）、nf-process/1 prev 链与 cc_verify 骨架（含 nf-verify/1 报告）已落地；剩余 check45 接线与 G1 自审计。
+- **OPEN-G1（已关闭，2026-11-14）**：claim 级 bundle（含 splice 负例）、nf-process/1 prev 链、cc_verify 骨架、check45 接线与 §13 自审计均已落地（证据：results/trust/SELF_AUDIT.json，P0=0）；后续缺口转 OPEN-G2。
 - **OPEN-G2**：DSSE、链头签名与自动锚定、issuer registry / trust store / 轮换、签名/TSA/STH 事实的运行时核验（nf-verify 报告骨架已落地，事实接线在 G2）、keygen 与 0600 强制。
 - **OPEN-G3**：类型注册表与组合 admissibility、model card、prompt/context lineage、签名人类复核。
 - **OPEN-G4**：外部见证（STH/witness）、公共锚（Sigstore/Rekor/公共 TSA）、独立 verifier parity。
