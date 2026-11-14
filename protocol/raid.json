@@ -1,0 +1,72 @@
+{
+  "schema": "nf-raid/1",
+  "note": "NF-Final §16A.4 RAID 与风险治理（WP-0G）：R=风险 / A=假设 / I=问题 / D=依赖，逐条 owner/触发/缓解/复审；风险矩阵概率×影响。与 docs/RAID.md 人读面、results/assurance/CLAIMS.json 的 gaps 交叉绑定。判据 test_assurance_contract.py。",
+  "risk_matrix": {"scale": ["low", "medium", "high"], "cells": "probability × impact"},
+  "risks": [
+    {"id": "R-01", "raid_type": "risk", "title": "生产被治理拖重", "probability": "high", "impact": "high",
+     "owner": "architecture", "trigger": "import/延迟上升", "mitigation": "check49 双平面闭包 + core-only 目标",
+     "review": "每 Gate", "status": "mitigated"},
+    {"id": "R-02", "raid_type": "risk", "title": "Wiki 变第二真源", "probability": "high", "impact": "high",
+     "owner": "wiki", "trigger": "手改/重复正文", "mitigation": "生成物禁手改 + wiki-page schema + 新鲜度判据",
+     "review": "G1", "status": "partial"},
+    {"id": "R-03", "raid_type": "risk", "title": "Agent 忽略 spec", "probability": "high", "impact": "high",
+     "owner": "production", "trigger": "编造引用", "mitigation": "无 spec 不生成 + nf-task/1 槽位 + 引用校验（G1/G2 落地）",
+     "review": "G1/G2", "status": "partial"},
+    {"id": "R-04", "raid_type": "risk", "title": "规范过度/上下文超预算", "probability": "medium", "impact": "medium",
+     "owner": "context", "trigger": "上下文超预算", "mitigation": "短页/分层/注入预算上限",
+     "review": "G1", "status": "mitigated"},
+    {"id": "R-05", "raid_type": "risk", "title": "治理范围膨胀", "probability": "medium", "impact": "high",
+     "owner": "governance", "trigger": "新「通用信任」需求", "mitigation": "只做契约约束下产物/流程；ADR-0001/0002 边界",
+     "review": "每 Gate", "status": "mitigated"},
+    {"id": "R-06", "raid_type": "risk", "title": "生态标准变化（in-toto/Sigstore）", "probability": "medium", "impact": "medium",
+     "owner": "trust", "trigger": "上游协议变更", "mitigation": "适配器隔离 + 冻结向量",
+     "review": "每版本", "status": "mitigated"},
+    {"id": "R-07", "raid_type": "risk", "title": "双平面版本漂移", "probability": "medium", "impact": "high",
+     "owner": "architecture", "trigger": "兼容失败", "mitigation": "契约版本 + 双方 contract test + schema 版本化",
+     "review": "G3", "status": "partial"},
+    {"id": "R-08", "raid_type": "risk", "title": "自扫描遗漏", "probability": "medium", "impact": "high",
+     "owner": "qa", "trigger": "P0 反复", "mitigation": "S0–S15 + 变异/负例 + 外部复核（外部操作）",
+     "review": "每 Gate", "status": "partial"}
+  ],
+  "assumptions": [
+    {"id": "AS-01", "raid_type": "assumption", "title": "用户需要规范驱动交付而非又一个 Agent",
+     "owner": "product", "trigger": "访谈否定", "mitigation": "回退产品假设（OPEN-PRODUCT）", "review": "G0", "status": "open"},
+    {"id": "AS-02", "raid_type": "assumption", "title": "本地优先足以覆盖目标场景",
+     "owner": "product", "trigger": "出现强在线协作需求", "mitigation": "以适配器/外部服务对接，不改变本仓离线核心", "review": "G0", "status": "open"},
+    {"id": "AS-03", "raid_type": "assumption", "title": "关键判定用抽样变异测试即可代表测试有效性",
+     "owner": "qa", "trigger": "关键面 mutation 存活", "mitigation": "扩到大面积 mutation（OPEN-MUT）", "review": "G5", "status": "open"}
+  ],
+  "issues": [
+    {"id": "I-01", "raid_type": "issue", "title": "Wiki/spec 编译器未建", "severity": "high",
+     "owner": "WP-10/11", "link_gap": "OPEN-G1", "status": "open"},
+    {"id": "I-02", "raid_type": "issue", "title": "跨 Agent parity 判据未建", "severity": "high",
+     "owner": "WP-20", "link_gap": "OPEN-G2", "status": "open"},
+    {"id": "I-03", "raid_type": "issue", "title": "全仓 mutation score 未测", "severity": "medium",
+     "owner": "WP-0H/54", "link_gap": "OPEN-MUT", "status": "open"},
+    {"id": "I-04", "raid_type": "issue", "title": "产品发现/价值验证需外部访谈", "severity": "medium",
+     "owner": "WP-0A", "link_gap": "OPEN-PRODUCT", "status": "open"},
+    {"id": "I-05", "raid_type": "issue", "title": "外部提交/见证/语言服务/第三方合规审核", "severity": "medium",
+     "owner": "维护者", "link_gap": "OPEN-EXTERNAL", "status": "open"}
+  ],
+  "dependencies": [
+    {"id": "D-01", "raid_type": "dependency", "title": "GitHub（托管/CI/Advisory）", "owner": "maintainers",
+     "trigger": "断供/封禁", "mitigation": "本地仓库 + 远端镜像（见 docs/legal/VENDORS.md）", "review": "每版本", "status": "active"},
+    {"id": "D-02", "raid_type": "dependency", "title": "包注册源（PyPI/npm/Cargo/NuGet）", "owner": "maintainers",
+     "trigger": "供应链投毒/断供", "mitigation": "固定版本 + SBOM + 依赖审计 + 离线镜像", "review": "每版本", "status": "active"},
+    {"id": "D-03", "raid_type": "dependency", "title": "外部 TSA/Rekor", "owner": "trust",
+     "trigger": "不可达/行为变化", "mitigation": "显式降级、不声称 T3/T4；离线验证已抓取证据", "review": "每版本", "status": "active"}
+  ],
+  "stakeholders": [
+    {"id": "S-01", "role": "维护者/作者", "interest": "方向、质量与发布裁决"},
+    {"id": "S-02", "role": "使用者（内容生产者）", "interest": "可交付、可复现、离线可用"},
+    {"id": "S-03", "role": "外部审查者/复现者", "interest": "证据可独立复算"},
+    {"id": "S-04", "role": "第三方投稿人", "interest": "投稿条款与署名"}
+  ],
+  "change_control": {
+    "process": "任何改动走 Conventional Commits + 门禁（verify --checks-only）+ 冻结链；破坏性变更走新版本号/ADR",
+    "record": "CHANGELOG.md + decisions/ + protocol/adr/registry.json",
+    "evidence": "docs/release.md",
+    "review": "每提交/每 Gate"
+  },
+  "status_vocabulary": ["open", "partial", "mitigated", "active", "accepted-risk"]
+}

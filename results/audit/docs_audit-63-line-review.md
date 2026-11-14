@@ -8,14 +8,16 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/gap_review.py:7d1d600926e13b9936f2a7d30e8a8ca95e4bb3b2a73308f88cfb89b563055953
   - desktop/src/core/payload_harvest.py:514c493d341863b245b7dddb0bde8ee87ca969fe4407c9f2834a726bb92d1a76
-  - protocol/data_contracts.json:ff6b0032d98c97ac38e6f33261bd3798ba424aad3d94ba7220d78c906b8289b2
-  - protocol/assertions.json:740adf911ca7d74c5352acb935a3ea8e75baabdc6668d0607ea90067c35c0062
+  - protocol/data_contracts.json:d04ccd3d596d1489025d6dda986133168dc14aee88fe9a3e4956646b820706ad
+  - protocol/assertions.json:4da9e4f4254c44c2f9e7b6436ba6ab271c6e12f80ea1d2dcc71fac5204e5e25e
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
   - desktop/src/core/text_hygiene.py:99b38bfbb8656ad653689c4cba93679970a78183019fd5f02e2380d87ec99ff3
   - desktop/src/core/workloop.py:3ee94f2c11939abba5507741c6b9b4dae8e8cab77c3bda38419678e31e097056
   - scripts/serve_decision_model.py:bbb36dff0e3816c2253150b7de6ab619877c3c78269a644c4c966083df15afee
   - scripts/nf.py:75ed1ad2dda5fb07dbd914a6ffedb836e5cf1298bf34b98be602644827ebc925
 ---
+> 重审（2026-11-14）：NF-Final WP-0G：新增 results/assurance/CLAIMS.json、protocol/raid.json、core/assurance.py、docs/{assurance/ASSURANCE_CASE,RAID,ETHICS}；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑
+
 > 重审（2026-11-14）：NF-Final WP-0E：新增 protocol/{accessibility,i18n}.json、core/{accessibility,i18n_checks}.py、A11Y.md、I18N.md、docs/{a11y,i18n} QA；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑
 
 > 重审（2026-11-14）：NF-Final WP-0C：新增 protocol/legal.json、core/legal.py、scripts/legal_audit.py、LEGAL.md、GOVERNANCE.md、docs/legal 三件；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑

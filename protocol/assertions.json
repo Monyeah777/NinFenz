@@ -718,6 +718,36 @@
       "message": "语言面登记缺失或版本名不符（WP-0E 判据依赖它）",
       "fix": "补/修 protocol/i18n.json；再跑 desktop/tests/test_a11y_i18n_contract.py",
       "evidence": "test_a11y_i18n_contract / conformance::modeling"
+    },
+    {
+      "id": "assurance-claims",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "results/assurance/CLAIMS.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-assurance-claims/1"
+      },
+      "message": "保证案例机读件缺失或版本名不符（WP-0G 判据依赖它）",
+      "fix": "补/修 results/assurance/CLAIMS.json；再跑 desktop/tests/test_assurance_contract.py",
+      "evidence": "test_assurance_contract / conformance::modeling"
+    },
+    {
+      "id": "raid-registry",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "protocol/raid.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-raid/1"
+      },
+      "message": "RAID 登记缺失或版本名不符（WP-0G 判据依赖它）",
+      "fix": "补/修 protocol/raid.json；再跑 desktop/tests/test_assurance_contract.py",
+      "evidence": "test_assurance_contract / conformance::modeling"
     }
   ]
 }

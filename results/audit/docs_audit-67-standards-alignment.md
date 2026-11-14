@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/asset_density.py:aa60651ad8269e7db09a709570ae69192f39ee95cfd6bd1d4f652696b3d26c56
   - docs/domain-packs.md:f90ff233965ee1bb5a872dd833b79e200bfc1825db9c81f651ceca760d83d8b6
-  - protocol/data_contracts.json:ff6b0032d98c97ac38e6f33261bd3798ba424aad3d94ba7220d78c906b8289b2
+  - protocol/data_contracts.json:d04ccd3d596d1489025d6dda986133168dc14aee88fe9a3e4956646b820706ad
 ---
+> 重审（2026-11-14）：NF-Final WP-0G：新增 results/assurance/CLAIMS.json、protocol/raid.json、core/assurance.py、docs/{assurance/ASSURANCE_CASE,RAID,ETHICS}；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑
+
 > 重审（2026-11-14）：NF-Final WP-0E：新增 protocol/{accessibility,i18n}.json、core/{accessibility,i18n_checks}.py、A11Y.md、I18N.md、docs/{a11y,i18n} QA；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑
 
 > 重审（2026-11-14）：NF-Final WP-0C：新增 protocol/legal.json、core/legal.py、scripts/legal_audit.py、LEGAL.md、GOVERNANCE.md、docs/legal 三件；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑
