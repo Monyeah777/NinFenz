@@ -1781,7 +1781,7 @@
       "max_fn_lines": 29
     },
     "scripts/trust_vectors.py": {
-      "lines": 482,
+      "lines": 495,
       "max_fn_cc": 7,
       "max_fn_lines": 47
     },

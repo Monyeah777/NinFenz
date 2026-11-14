@@ -1,7 +1,7 @@
 {
-  "bytes": 12358137,
+  "bytes": 12358751,
   "count": 585,
-  "digest": "0bea0406e17bfbc09d978c88a73760fdd8b22b17d0d635c8a16b07fb9e427a09",
+  "digest": "ebcb6d9e46d0f56a9bdbcdae94a521f4694777f4eee040c9fefd368f869220a8",
   "materials": [
     {
       "bytes": 102,
@@ -1931,7 +1931,7 @@
     {
       "bytes": 79590,
       "path": "protocol/RECEIPTS.json",
-      "sha256": "658b35bb7f61f22c302e717447c52f03e5a1caa5620425ff736587050ff0dedd"
+      "sha256": "535f858f488c32964a16f0b1c7059344b3225a711ae976b3df39a034fa0049e5"
     },
     {
       "bytes": 8588,
@@ -1996,7 +1996,7 @@
     {
       "bytes": 42640,
       "path": "protocol/code_metrics_baseline.json",
-      "sha256": "f02723ab454e6ea1210c7cbb9d91b47b15e2fe6007aa75eeafbd553d6d29517c"
+      "sha256": "fc99d894ab07d8698a9aa8e81206f8fda0dc6937a0560d4f0a6676125525b8a0"
     },
     {
       "bytes": 87117,
@@ -2126,7 +2126,7 @@
     {
       "bytes": 27560,
       "path": "protocol/generated/receipt_chain.json",
-      "sha256": "fb92856d905c815532aeb6a20d86c30e8e7aa17251faec5e727b3d7c50bfa78d"
+      "sha256": "203d29f4dd973bd7ea8e1494cec41354f45ceabfd292a9c4c71ba9abfa6f55ee"
     },
     {
       "bytes": 918,
@@ -2859,9 +2859,9 @@
       "sha256": "1aeb2a920186cd0859668dd1467736f8e42bab8179473cded16590ba09a9d4c2"
     },
     {
-      "bytes": 22242,
+      "bytes": 22856,
       "path": "scripts/trust_vectors.py",
-      "sha256": "d2a44406b262eccc6c1a261fba2470c9f3ae9b1f94b7bf8362fe48787b5a2cce"
+      "sha256": "418dd6156fb84411eec9a79b99338047858034e19a2f389328094fc8e573d568"
     },
     {
       "bytes": 3884,
