@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:75ed1ad2dda5fb07dbd914a6ffedb836e5cf1298bf34b98be602644827ebc925
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:52ca8195fddfff3d684a2f885834cd5ad0135dcbfbc131e98cccb3d08d25af65
+  - protocol/check12_weights.json:d4c83628e60179fd7be2be01f0e267860d5526da0b5ff00b4b95c9c1a40efa7b
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:fa00a7fd014857af56e11f38ced1b7d888be053befaadb10b3dd494d27884316
   - docs/meta-cockpit/功能解析.md:de20c2340d19d541bcfde53f222a3acf22a6e440d8fb3dcf51a37aedf53c0c25
   - results/meta-cockpit-manifest.json:60c0e100798e49d393557ae5066c02d7e057ec27f386ee1a36ca3fc7740150ba
 
 ---
+> 重审（2026-11-14）：NF-Final R5 同行差分：新增 results/reverse/{PEER_DIFF.md,peers.json}、test_reverse_peers.py；assertions/data_contracts/check12 更新，被审对象变更后机械重绑
+
 > 重审（2026-11-14）：NF-Final R4 失败考古：新增 results/reverse/{FAILURE_ARCHAEOLOGY.md,failures.json}、test_reverse_failures.py；assertions/data_contracts/check12 更新，被审对象变更后机械重绑
 
 > 重审（2026-11-14）：NF-Final R3 耦合/重复：新增 results/reverse/{COUPLING.md,coupling.json}、test_reverse_coupling.py；assertions/data_contracts/check12 权重与预算（2150→2175 容量调整）更新，被审对象变更后机械重绑

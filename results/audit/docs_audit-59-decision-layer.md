@@ -9,7 +9,7 @@ subjects:
   - verify.sh:18e2089ead65a11b4729ded516860cdf1d31cdb54a35935051249b40fbf7b53d
   - protocol/decision_layer.json:9330d4057f07647d67f15daa6f37c84913834b7eed65f4e360bf5c7c413e5e06
   - protocol/normative.json:c1bbc14c92cea6bd66ff6cb54fdcf91bf3072f66adee7027f1d3f42e70fe1825
-  - protocol/data_contracts.json:4a421d5887d8bb2da44dfc23c277d1554dbf7b3cbccfe3059d45c6062321c5a3
+  - protocol/data_contracts.json:45593ed9ad8b62b56721f074a680f1057094dce002c9376924d277d6c671e373
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/receipts.py:b748915bb519aeeb1aa0f7d367df2eb7d4321b369b85905a7f918d8d55d96363
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
@@ -19,6 +19,8 @@ subjects:
   - docs/decision-layer.md:cd3a254de738ece7c8f07db36904c74484e4622c58f688a3973c8998b441628c
 
 ---
+> 重审（2026-11-14）：NF-Final R5 同行差分：新增 results/reverse/{PEER_DIFF.md,peers.json}、test_reverse_peers.py；assertions/data_contracts/check12 更新，被审对象变更后机械重绑
+
 > 重审（2026-11-14）：NF-Final R4 失败考古：新增 results/reverse/{FAILURE_ARCHAEOLOGY.md,failures.json}、test_reverse_failures.py；assertions/data_contracts/check12 更新，被审对象变更后机械重绑
 
 > 重审（2026-11-14）：NF-Final R3 耦合/重复：新增 results/reverse/{COUPLING.md,coupling.json}、test_reverse_coupling.py；assertions/data_contracts/check12 权重与预算（2150→2175 容量调整）更新，被审对象变更后机械重绑

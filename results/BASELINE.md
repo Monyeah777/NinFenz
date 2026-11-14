@@ -6,6 +6,7 @@
 > 性质：结果/状态件（审计记录），不是规划件。审计对象 = **本机检出**，不是方案所基于的那次检出。
 > 更新（R3，2026-11-14）：WP-02/check49 收口 IN-01/IN-02（§5.5 与矩阵汇总已按实读更新；数字变化以复跑命令为准，见 §7）。
 > 更新（R5，2026-11-14）：WP-01 五件生产 schema（`nf-contract/1`、`nf-wiki-page/1`、`nf-spec/1`、`nf-task/1`、`nf-assembly/1`）落 `protocol/production/`，正/反样例与变异自证在 `test_schema_reference.py`；**只有契约层、仍无编译器/页面生成器**，故 PR-02/WK 系列状态不变（见 §5）。
+> 更新（R19，2026-11-14）：§4A R5 同行差分落地——`results/reverse/PEER_DIFF.md` + `peers.json`（6 项对照：Spec Kit/OpenSpec、DeepWiki-GitMCP-Context7、ODCS-datacontract-cli、in-toto-Sigstore-CycloneDX、OPA-Cedar；借/不造边界；3 条影响设计的决策 D-PD-01…03 落 G1/G3）+ `test_reverse_peers.py`（3 例，6 类变异自证）。只作机制借鉴、不作质量背书。§4A 仍余 R6。
 > 更新（R18，2026-11-14）：§4A R4 失败考古落地——`results/reverse/FAILURE_ARCHAEOLOGY.md` + `results/reverse/failures.json`（13 条失败模式：CI 假绿/required-skip 放行/隐藏件/provenance/基线松动/SAST 键级漂移/死链/路径虚假保证/生成区误改/台账造假 等；5 条文档-代码不一致；9 个缺口 R4-01…R4-09 进 R6）+ `test_reverse_failures.py`（3 例，6 类变异自证；commit 存在性 + skip 实时重算 + 固定窗口 stats）。§4A 仍余 R5–R6。
 > 更新（R17，2026-11-14）：§4A R3 耦合/重复实现落地——`results/reverse/COUPLING.md` + `coupling.json`（300 模块/540 边/0 环/9 条 SDP 已进基线；fan-in/out 热点；7 项重复裁定：canonical 兼容重复、sha256/JSON/原子写共享原语、路径包含性 duplicate-suspected、覆盖率与注册表 distinct-role）+ `test_reverse_coupling.py`（3 例，6 类变异自证；实时重算图比对，图变即红）；check12 预算 2150→2175（+8.1s 模块，容量调整）。§4A 仍余 R4–R6。
 > 更新（R16，2026-11-14）：§4A R2 行为重建落地——`results/reverse/BEHAVIOR.md` + `results/reverse/behavior.json`（11 条行为流：9 documented + 2 gap；状态机 S-01 冻结链/S-02 信任等级/S-03 契约生命周期；失败语义 exit 0/1/2）+ `test_reverse_behavior.py`（3 例，7 类变异自证）；§4A 仍余 R3–R6。
