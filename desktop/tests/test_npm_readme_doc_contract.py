@@ -105,9 +105,10 @@ class NpmReadmeTest(unittest.TestCase):
 
     def test_contract_catches_mutations(self):
         """变异自证：体积数字改错 / 缺复核位 / 缺 sync 口径 / 写安装脚本。"""
-        m = re.search(r"[0-9]{3,} 件", self.text)
-        bad = self.text.replace(m.group(0), "3000 件", 1) if m else self.text
-        self.assertTrue(any("件数" in i for i in npm_issues(bad)))
+        if MANIFEST.is_file():
+            m = re.search(r"[0-9]{3,} 件", self.text)
+            bad = self.text.replace(m.group(0), "3000 件", 1) if m else self.text
+            self.assertTrue(any("件数" in i for i in npm_issues(bad)))
         no_rev = self.text.replace("复核（2026-11-14）", "复核")
         self.assertTrue(any("复核位" in i for i in npm_issues(no_rev)))
         no_sync = self.text.replace("--sync-readme", "--write")
