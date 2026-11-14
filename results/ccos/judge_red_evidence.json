@@ -2453,6 +2453,10 @@
       "source": "negative_assertion"
     },
     {
+      "module": "test_trust_key_material.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_trust_keys.py",
       "source": "naming"
     },
@@ -2478,6 +2482,10 @@
     },
     {
       "module": "test_trust_signature.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_trust_store.py",
       "source": "negative_assertion"
     },
     {
@@ -2649,10 +2657,10 @@
       "source": "negative_assertion"
     }
   ],
-  "modules": 662,
+  "modules": 664,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
   "suspect": 173,
-  "with_evidence": 345,
+  "with_evidence": 347,
   "without_evidence": 144
 }

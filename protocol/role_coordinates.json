@@ -5,8 +5,8 @@
     "floor": 5,
     "prod": 1057,
     "projection": 168,
-    "support": 482,
-    "verify": 1352
+    "support": 485,
+    "verify": 1354
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -11273,6 +11273,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "key_material 判据：HMAC keygen（0600/不覆盖/不跟随符号链接）+ 读入校验。",
+      "path": "desktop/tests/test_trust_key_material.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "trust.keys 判据：issuer registry 结构/语义 + 生命周期解析 + 注册表口径验签。",
       "path": "desktop/tests/test_trust_keys.py",
       "role": "verify",
@@ -11311,6 +11317,12 @@
     {
       "function": "trust.signature 判据：链头语句绑定 + DSSE 签名 + registry 生命周期 + 端到端 T2。",
       "path": "desktop/tests/test_trust_signature.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "trust_store 判据：policy × issuer registry × type registry 装配一致性。",
+      "path": "desktop/tests/test_trust_store.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -14496,16 +14508,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "0bd2eefd6ac8ea3d980c62f0d59d73c03c998b882a945f286d5f8028161250dc",
+  "root_digest": "9f374ee4b1475731276d7266eab0364d5272cfc13194623c7a4ecefc161d11b9",
   "rule_counts": {
     "R-app": 1469,
-    "R-catch": 330,
+    "R-catch": 333,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 148,
     "R-support": 124,
-    "R-verify": 1226,
+    "R-verify": 1228,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

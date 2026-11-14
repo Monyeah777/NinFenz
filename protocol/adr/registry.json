@@ -132,7 +132,12 @@
         "desktop/tests/test_trust_t3.py",
         "desktop/src/core/trust/gate_dod.py",
         "desktop/tests/test_trust_gate48.py",
-        "results/trust/DOD.md"
+        "results/trust/DOD.md",
+        "desktop/src/core/trust/key_material.py",
+        "desktop/src/core/trust/trust_store.py",
+        "scripts/trust_keygen.py",
+        "desktop/tests/test_trust_key_material.py",
+        "desktop/tests/test_trust_store.py"
       ],
       "falsifier": "若 T3 可在无 witness / 无 STH 时达到，或本地链被当作外部见证抬升 T3，则本裁决失效。"
     },
@@ -161,7 +166,12 @@
         "desktop/tests/test_trust_context_lineage.py",
         "protocol/trust/human-review.schema.json",
         "desktop/src/core/trust/human_review.py",
-        "desktop/tests/test_trust_human_review.py"
+        "desktop/tests/test_trust_human_review.py",
+        "desktop/src/core/trust/key_material.py",
+        "desktop/src/core/trust/trust_store.py",
+        "scripts/trust_keygen.py",
+        "desktop/tests/test_trust_key_material.py",
+        "desktop/tests/test_trust_store.py"
       ],
       "falsifier": "若未知 type/issuer/算法被默认放行且验证结论仍为通过，则本裁决失效。"
     },
