@@ -86,8 +86,8 @@
       "max_fn_lines": 50
     },
     "desktop/src/core/assembly_runtime.py": {
-      "lines": 194,
-      "max_fn_cc": 18,
+      "lines": 201,
+      "max_fn_cc": 21,
       "max_fn_lines": 83
     },
     "desktop/src/core/assertions.py": {
@@ -354,6 +354,11 @@
       "lines": 417,
       "max_fn_cc": 35,
       "max_fn_lines": 48
+    },
+    "desktop/src/core/crosscheck.py": {
+      "lines": 257,
+      "max_fn_cc": 20,
+      "max_fn_lines": 70
     },
     "desktop/src/core/daemon.py": {
       "lines": 944,
@@ -1201,7 +1206,7 @@
       "max_fn_lines": 29
     },
     "desktop/src/core/purity_scan.py": {
-      "lines": 584,
+      "lines": 588,
       "max_fn_cc": 24,
       "max_fn_lines": 96
     },

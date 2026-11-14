@@ -7,10 +7,16 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
-  - desktop/src/core/purity_scan.py:bc114898836f914212cec64e0b22c7d3f93b8681557d82f845a200a85683b0cc
+  - desktop/src/core/purity_scan.py:ad02db87eb8908b74ea9c8817ad2a8375eb8a8b37eabc01b2f265387ee4174cb
   - desktop/src/core/asset_contract.py:8e2fbc3954c771d6c2eb78d9cf47dcf22612b63b9b16929bd9013792f803f9a2
-  - protocol/code_metrics_baseline.json:1b8472d3763f91814a250ba37d335b2b469e3444776f8d327f920afc75b718b0
+  - protocol/code_metrics_baseline.json:f2c59d1654e84d50d38c09a32d937c8270acea79fee3494be8c40d8220995980
 ---
+> 重审（2026-11-15）：NF-Final WP-51 收尾2：purity SINK_ALLOW 登记使 purity_scan.py 584→588 行，按失败提示评审后重冻 code_metrics 基线（容量调整，非放宽判据）
+
+> 重审（2026-11-15）：NF-Final WP-51 收尾：crosscheck.py unlink 为 temp 夹具删除，登记 purity SINK_ALLOW（含理由）；派生面重算
+
+> 重审（2026-11-15）：NF-Final WP-51：新增 protocol/crosscheck.json、core/crosscheck.py、results/crosscheck/report.json、test_crosscheck_contract.py；verify.sh check56 + quality_baseline 56 条/PASS=105；assembly_runtime 计划/轨迹对齐加固（D-05 修复驱动）
+
 > 重审（2026-11-15）：NF-Final WP-50：新增 protocol/self_scan.json、core/self_scan.py、results/self_audit/S0-S15.json、test_self_scan_contract.py；verify.sh check55 + quality_baseline 55 条/PASS=103；派生面重生成
 
 > 重审（2026-11-15）：NF-Final WP-54：新增 protocol/cq6.json、core/cq6_scorecard.py、results/cq/{cq6_scorecard,cq6_baseline}.json、test_cq6_scorecard.py；verify.sh check54 + quality_baseline 54 条/PASS=101；docs CQ_REPORT CQ6 评分卡 + QUALITY_DEBT QD-09..11；派生面重生成

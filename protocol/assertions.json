@@ -86,7 +86,8 @@
       52,
       53,
       54,
-      55
+      55,
+      56
     ],
     "CAP_DETERMINISTIC": [
       25,
@@ -104,7 +105,8 @@
       52,
       53,
       54,
-      55
+      55,
+      56
     ],
     "CAP_TAMPER_EVIDENT": [
       23,
@@ -1291,6 +1293,21 @@
       "message": "自扫描聚合件缺失或版本名不符（WP-50 判据依赖它）",
       "fix": "重跑 self_scan.write；再跑 test_self_scan_contract",
       "evidence": "test_self_scan_contract / conformance::modeling"
+    },
+    {
+      "id": "crosscheck",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "results/crosscheck/report.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-crosscheck-report/1"
+      },
+      "message": "跨实现/断网/删除矩阵报告缺失或版本名不符（WP-51 判据依赖它）",
+      "fix": "重跑 crosscheck.write；再跑 test_crosscheck_contract",
+      "evidence": "test_crosscheck_contract / conformance::modeling"
     }
   ]
 }

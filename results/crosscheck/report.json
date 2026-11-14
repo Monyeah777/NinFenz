@@ -1,0 +1,92 @@
+{
+  "claims_boundary": [
+    "Go 运行时 parity 未验（工具缺失，OPEN），静态对账不等于跑通",
+    "断网探针只证 core-only 管线不依赖网络，不证外部服务行为",
+    "删除矩阵只覆盖登记的 10 个 case，不声称穷尽"
+  ],
+  "deletion_matrix": [
+    {
+      "detail": "包内缺文件：artifact.md",
+      "detected": true,
+      "id": "D-01"
+    },
+    {
+      "detail": "缺 manifest.json（修复指引：交付包必须带 manifest）",
+      "detected": true,
+      "id": "D-02"
+    },
+    {
+      "detail": "manifest 不可解析：Expecting value: line 1 column 39 (char 38)（修复指引：重打包）",
+      "detected": true,
+      "id": "D-03"
+    },
+    {
+      "detail": "包内缺文件：evidence/sidecar.json; manifest 声明 sidecar 但包内缺失（修复指引：重打包或去掉声明）",
+      "detected": true,
+      "id": "D-04"
+    },
+    {
+      "detail": "assembly.steps 与执行轨迹不对齐（期望 ['S01', 'S02', 'S03', 'S04', 'S05', 'S06', 'S07']，实际 ['S02', 'S03', 'S04', 'S05', 'S06', 'S07']）",
+      "detected": true,
+      "id": "D-05"
+    },
+    {
+      "detail": "截断后不可解析",
+      "detected": true,
+      "id": "D-06"
+    },
+    {
+      "detail": "删段后链断可检出",
+      "detected": true,
+      "id": "D-07"
+    },
+    {
+      "detail": "重排后 prev/digest 不符可检出",
+      "detected": true,
+      "id": "D-08"
+    },
+    {
+      "detail": "篡改 lineage_digest 可检出",
+      "detected": true,
+      "id": "D-09"
+    },
+    {
+      "detail": "截断后不可解析",
+      "detected": true,
+      "id": "D-10"
+    }
+  ],
+  "note": "committed == 实时重算；Go 运行时 parity 属 OPEN",
+  "offline": {
+    "checks": {
+      "assembly": true,
+      "delivery": true,
+      "docs_claims": true,
+      "self_scan": true,
+      "spec": true,
+      "wiki": true
+    },
+    "error": "",
+    "ok": true
+  },
+  "parity": {
+    "evidence": {
+      "go_client": true,
+      "python_verifier": true,
+      "vector_files": 7,
+      "vector_total": 55
+    },
+    "note": "静态对账（向量数/CLI/退出码面）不等于跑通；运行时 parity 属 OPEN",
+    "runtime": "open",
+    "runtime_reason": "go 工具链不在场（go: command not found），运行时 parity 未执行",
+    "status": "static-only"
+  },
+  "schema": "nf-crosscheck-report/1",
+  "summary": {
+    "deletion_cases": 10,
+    "deletion_detected": 10,
+    "deletion_missed": 0,
+    "offline_ok": true,
+    "parity_status": "static-only"
+  }
+}

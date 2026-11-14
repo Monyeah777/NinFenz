@@ -1247,6 +1247,18 @@
         "test_self_scan_contract",
         "protocol/self_scan.json"
       ]
+    },
+    {
+      "id": "crosscheck",
+      "artifact": "results/crosscheck/report.json",
+      "quality_rule": "assertion:crosscheck",
+      "owner": "跨实现/断网/删除矩阵（core/crosscheck.py + test_crosscheck_contract）+ WP-51",
+      "status": "active",
+      "freshness": "验证器/记录/交付包变化后重跑 write；Go 缺失必须 parity runtime=open",
+      "consumers": [
+        "test_crosscheck_contract",
+        "protocol/crosscheck.json"
+      ]
     }
   ]
 }
