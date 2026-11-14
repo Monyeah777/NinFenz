@@ -1,0 +1,243 @@
+{
+  "schema": "nf-g4-dod/1",
+  "note": "NF-Final G4（AI 信任 + 生态导出）QG4 收口审计机读件：§14.3 DoD 八条 + §11.2 G4 交付物（WP-40…44）+ QG4（AI 信任 / 生态导出 / 策略诚实）+ AI 面指标（证据链 APPROVED、AIBOM 闭合、T4 拒绝、AIGC 标识）。逐条给在场证据；P0 阻断=0 才允许进 G5。人读：results/G4_DOD.md。",
+  "gate": "G4",
+  "verdict": "pass-with-open-items",
+  "p0_blockers": 0,
+  "criteria": [
+    {
+      "id": "DOD-01",
+      "source": "14.3",
+      "text": "AI 面正/反测试（证据链/AIBOM/策略/AIGC 标识）",
+      "status": "pass",
+      "evidence": [
+        "desktop/tests/test_ai_evidence_contract.py",
+        "desktop/tests/test_aibom_contract.py",
+        "desktop/tests/test_policy_engine_contract.py",
+        "desktop/tests/test_aigc_labeling_contract.py",
+        "verify.sh"
+      ],
+      "gaps": []
+    },
+    {
+      "id": "DOD-02",
+      "source": "14.3",
+      "text": "旧基线能红、新基线全绿（变异/负例自证）",
+      "status": "pass",
+      "evidence": [
+        "desktop/tests/test_ai_evidence_contract.py",
+        "desktop/tests/test_aibom_contract.py",
+        "desktop/tests/test_policy_engine_contract.py",
+        "desktop/tests/test_aigc_labeling_contract.py",
+        "results/BASELINE.md"
+      ],
+      "gaps": []
+    },
+    {
+      "id": "DOD-03",
+      "source": "14.3",
+      "text": "冻结链按序执行并解释 diff",
+      "status": "pass",
+      "evidence": [
+        "protocol/generated/receipt_chain.json",
+        "protocol/conformance_report.json",
+        "protocol/approvals/protocol__conformance_report.json",
+        "protocol/RECEIPTS.json"
+      ],
+      "gaps": []
+    },
+    {
+      "id": "DOD-04",
+      "source": "14.3",
+      "text": ".NET/Rust 面同步（如涉及）",
+      "status": "n/a",
+      "reason": "G4 为 AI 证据/导出/策略层，未改引擎；dotnet 本机 BLOCKED 如实记",
+      "evidence": [
+        "results/cq/toolchain.json"
+      ],
+      "gaps": []
+    },
+    {
+      "id": "DOD-05",
+      "source": "14.3",
+      "text": "文档/ADR/keyword 索引更新",
+      "status": "pass",
+      "evidence": [
+        "docs/ai-evidence.md",
+        "docs/aibom.md",
+        "docs/policy-engine.md",
+        "docs/aigc-labeling.md",
+        "results/ADR_MAP.md"
+      ],
+      "gaps": []
+    },
+    {
+      "id": "DOD-06",
+      "source": "14.3",
+      "text": "SELF_AUDIT.json P0=0",
+      "status": "pass",
+      "evidence": [
+        "results/trust/SELF_AUDIT.json"
+      ],
+      "gaps": []
+    },
+    {
+      "id": "DOD-07",
+      "source": "14.3",
+      "text": "无未登记 OPEN/TODO 在关键路径",
+      "status": "pass-with-open",
+      "evidence": [
+        "results/governance/report.json",
+        "results/g3_dod.json"
+      ],
+      "gaps": [
+        "OPEN-EXTERNAL",
+        "OPEN-TOOLS"
+      ]
+    },
+    {
+      "id": "DOD-08",
+      "source": "14.3",
+      "text": "交接报告完整（BASELINE/RESULTS/台账）",
+      "status": "pass",
+      "evidence": [
+        "results/BASELINE.md",
+        "results/RESULTS.md"
+      ],
+      "gaps": []
+    },
+    {
+      "id": "G4-ART",
+      "source": "11.2",
+      "text": "G4 交付物 WP-40…WP-44 全部落地",
+      "status": "pass",
+      "evidence": [
+        "protocol/ai_evidence.json",
+        "desktop/src/core/ai_evidence.py",
+        "results/ai/model-card.json",
+        "results/ai/lineage.json",
+        "results/ai/human-review.json",
+        "protocol/aibom.json",
+        "desktop/src/core/aibom_export.py",
+        "results/ai/aibom.cdx.json",
+        "results/ai/aibom.spdx.json",
+        "protocol/policy_rules.json",
+        "desktop/src/core/policy_engine.py",
+        "protocol/aigc_labeling.json",
+        "desktop/src/core/aigc_labeling.py",
+        "results/ai/aigc-label.json",
+        "verify.sh",
+        "docs/verification-cards.md"
+      ],
+      "gaps": []
+    },
+    {
+      "id": "QG4-01",
+      "source": "13A",
+      "text": "AI 信任：模型卡/血缘/人类复核三件绑定，状态 APPROVED",
+      "status": "pass",
+      "evidence": [
+        "results/ai/model-card.json",
+        "results/ai/lineage.json",
+        "results/ai/human-review.json",
+        "desktop/tests/test_ai_evidence_contract.py"
+      ],
+      "gaps": []
+    },
+    {
+      "id": "QG4-02",
+      "source": "13A",
+      "text": "生态导出：AIBOM（CycloneDX/SPDX）闭合、无秘密、确定性",
+      "status": "pass",
+      "evidence": [
+        "results/ai/aibom.cdx.json",
+        "results/ai/aibom.spdx.json",
+        "desktop/tests/test_aibom_contract.py"
+      ],
+      "gaps": []
+    },
+    {
+      "id": "QG4-03",
+      "source": "13A",
+      "text": "策略诚实：默认拒绝、T4 缺适配器即拒（不冒充）",
+      "status": "pass",
+      "evidence": [
+        "protocol/policy_rules.json",
+        "desktop/src/core/policy_engine.py",
+        "desktop/tests/test_policy_engine_contract.py"
+      ],
+      "gaps": []
+    },
+    {
+      "id": "QG4-04",
+      "source": "13A",
+      "text": "AIGC 标识：机器可读标识闭合、未标注不默认 human",
+      "status": "pass",
+      "evidence": [
+        "protocol/aigc_labeling.json",
+        "results/ai/aigc-label.json",
+        "desktop/tests/test_aigc_labeling_contract.py"
+      ],
+      "gaps": []
+    },
+    {
+      "id": "L4-01",
+      "source": "13A",
+      "text": "AI 证据链指标：三件绑定 + eval digest 实时绑定（协议变即失效）",
+      "status": "pass",
+      "evidence": [
+        "results/ai/model-card.json",
+        "protocol/eval_validity.json",
+        "desktop/tests/test_ai_evidence_contract.py"
+      ],
+      "gaps": []
+    },
+    {
+      "id": "L4-02",
+      "source": "13A",
+      "text": "门禁汇总：check52 绿（52 条 / PASS=95）",
+      "status": "pass",
+      "evidence": [
+        "protocol/verification_report.json"
+      ],
+      "gaps": []
+    }
+  ],
+  "open_items": [
+    {
+      "id": "OPEN-EXTERNAL",
+      "text": "公共日志提交/外部 witness/第三方合规审核属外部操作，未执行",
+      "owner": "maintainers",
+      "blocking": false
+    },
+    {
+      "id": "OPEN-TOOLS",
+      "text": "cosign 不在场；TSA/透明日志请求未执行 → T2+ 不可达",
+      "owner": "maintainers",
+      "blocking": false
+    },
+    {
+      "id": "G4-DEBT-01",
+      "text": "真实外部模型 adapter 未接（local-template 仅 parity 桩，无真实模型调用）",
+      "owner": "G5",
+      "blocking": false
+    },
+    {
+      "id": "G4-DEBT-02",
+      "text": "AIBOM 为最小闭合集，未追全量 CycloneDX/SPDX 字段规范",
+      "owner": "G5",
+      "blocking": false
+    },
+    {
+      "id": "G4-DEBT-03",
+      "text": "策略引擎非 OPA/Cedar 运行时（只借机制），跨语言策略互操作未做",
+      "owner": "G5",
+      "blocking": false
+    }
+  ],
+  "next_gate": "G5",
+  "claims_boundary": [
+    "pass-with-open-items 不等于零缺陷；外部 OPEN 与 G4-DEBT 显式挂账",
+    "本审计只判 G4 入口，不替代 G5 门禁；不声称任何外部模型/供应商合规"
+  ]
+}

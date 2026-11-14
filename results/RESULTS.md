@@ -34,6 +34,7 @@
 - [../docs/aibom.md](../docs/aibom.md) · [ai/aibom.cdx.json](ai/aibom.cdx.json) · [ai/aibom.spdx.json](ai/aibom.spdx.json)（G4 WP-41 AIBOM 导出：CycloneDX AI-BOM + SPDX 2.3 清单，确定性/闭合/无秘密；真源 `protocol/aibom.json`，判据 `test_aibom_contract.py`）
 - [../docs/policy-engine.md](../docs/policy-engine.md)（G4 WP-42 策略适配：外置 nf-policy/1 规则集、默认拒绝、优先级、判定可复算；真源 `protocol/policy_rules.json`，判据 `test_policy_engine_contract.py`）
 - [../docs/aigc-labeling.md](../docs/aigc-labeling.md) · [ai/aigc-label.json](ai/aigc-label.json)（G4 WP-43 AIGC 标注证据：机器可读标识 + 模型卡/产物/引用闭合；真源 `protocol/aigc_labeling.json`，判据 `test_aigc_labeling_contract.py`）
+- [G4_DOD.md](G4_DOD.md)（G4 QG4 收口审计：§14.3 八条 + §11.2 WP-40…44 + QG4 + AI 面指标；verdict=pass-with-open-items、P0=0 → G5；机读 `g4_dod.json`，判据 `test_g4_dod.py`）
 - [../docs/wiki.md](../docs/wiki.md) · [../wiki/llms.txt](../wiki/llms.txt)（G1 WP-10 LLMWiki 编译器：133 页投影 + pages/index/graph/llms/MCP 三入口；`nf wiki build/check/get/search/related/context`，判据 `test_wiki_compiler_contract.py`）
 - [../docs/spec-compiler.md](../docs/spec-compiler.md) · [intents/sample-document.json](../spec/intents/sample-document.json)（G1 WP-11 Spec Compiler：intent→nf-spec/1→nf-task/1，确定性/拒绝未知/任务图无环；`nf spec compile`，判据 `test_spec_compiler_contract.py`）
 - [../docs/context-packer.md](../docs/context-packer.md)（G1 WP-12 Context Packer：角色隔离 author/reviewer/governance、预算硬上限、citations 100%、注入检出/清除；`nf wiki context --role`，判据 `test_context_packer_contract.py`）
