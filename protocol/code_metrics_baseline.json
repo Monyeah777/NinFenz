@@ -1780,6 +1780,11 @@
       "max_fn_cc": 5,
       "max_fn_lines": 29
     },
+    "scripts/trust_keygen.py": {
+      "lines": 31,
+      "max_fn_cc": 2,
+      "max_fn_lines": 12
+    },
     "scripts/trust_self_audit.py": {
       "lines": 298,
       "max_fn_cc": 26,
@@ -1791,9 +1796,9 @@
       "max_fn_lines": 47
     },
     "scripts/trust_verify.py": {
-      "lines": 333,
-      "max_fn_cc": 52,
-      "max_fn_lines": 199
+      "lines": 352,
+      "max_fn_cc": 57,
+      "max_fn_lines": 217
     },
     "scripts/verifier_status.py": {
       "lines": 98,

@@ -30,6 +30,7 @@ from core.trust import entity as te  # noqa: E402
 from core.trust import human_review as hrev  # noqa: E402
 from core.trust import keys as tk  # noqa: E402
 from core.trust import model_card as tmc  # noqa: E402
+from core.trust import trust_store as tstore  # noqa: E402
 from core.trust import verify as tv  # noqa: E402
 
 
@@ -156,6 +157,8 @@ def main(argv=None) -> int:
     ap.add_argument("--subject-kind", default="bundle",
                     help="复核绑定的对象类别")
     ap.add_argument("--subject-digest", default="", help="复核绑定的对象摘要")
+    ap.add_argument("--trust-store", action="store_true",
+                    help="校验 policy × issuer registry × type registry 一致性")
     ap.add_argument("--root", default=str(ROOT), help="仓库根（读冻结 schema 用）")
     ap.add_argument("--json", action="store_true", help="输出 nf-verify/1 报告 JSON")
     ap.add_argument("--out", default="", help="把报告写入文件（原子写）")
@@ -171,6 +174,22 @@ def main(argv=None) -> int:
     ap.add_argument("--witness-material", default="", help="witness hmac 材料 {id: hex}")
     ap.add_argument("--sth-material", default="", help="STH hmac 材料 {log_id: hex}")
     args = ap.parse_args(argv)
+    if args.trust_store:
+        if not args.policy or not args.issuer_registry or not args.type_registry:
+            print("不可判定：--trust-store 需要 --policy/--issuer-registry/--type-registry",
+                  file=sys.stderr)
+            return tv.EXIT_UNDECIDABLE
+        try:
+            policy_doc = _load(args.policy, "policy")
+            issuer_registry = tk.load_registry(args.issuer_registry)
+            type_registry = te.load_type_registry(args.type_registry)
+            store = tstore.build_store(policy_doc, issuer_registry, type_registry)
+        except (OSError, ValueError) as exc:
+            print(f"invalid trust store: {exc}")
+            return tv.EXIT_INVALID
+        print(f"valid trust store: issuers={len(store['issuers'])} "
+              f"keyids={len(store['keyids'])} types={len(store['types'])}")
+        return 0
     if args.review_gate or args.human_review:
         if not args.human_review:
             print("human review state: PENDING（未提供记录；PENDING 不等于通过）")

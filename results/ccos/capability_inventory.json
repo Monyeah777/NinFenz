@@ -1,5 +1,5 @@
 {
-  "digest": "ee894747866f18daf8b1069ade53fd7a3e123f78162571b6f340c113dd29bb8a",
+  "digest": "d934628c15fbdf5e37ab58c16b73f28f43168d9faaefd35c596d72b08d477869",
   "entries": [
     {
       "doc": "其余 ABI 调用的判定向量：cc_label（IR 校验）→ 期望结论（跨语言可复核）。",
@@ -1099,6 +1099,15 @@
       "subcommands": []
     },
     {
+      "doc": "本地 HMAC key 生成入口（0600；不覆盖；不生成非对称私钥）。",
+      "flags": [
+        "--alg",
+        "--out"
+      ],
+      "path": "scripts/trust_keygen.py",
+      "subcommands": []
+    },
+    {
       "doc": "计划 §13 自扫描：S0-S12 维度体检 → results/trust/SELF_AUDIT.json（nf-trust-self-audit/1）。",
       "flags": [
         "--check",
@@ -1151,6 +1160,7 @@
         "--sth-material",
         "--subject-digest",
         "--subject-kind",
+        "--trust-store",
         "--tsa-ca",
         "--tsa-query",
         "--tsa-subject",
@@ -1300,8 +1310,8 @@
       "subcommands": []
     }
   ],
-  "flags": 570,
+  "flags": 573,
   "note": "静态接口面（docs/flags/subcommands），不含缺省行为语义",
   "schema": "nf-capability-inventory/1",
-  "scripts": 82
+  "scripts": 83
 }

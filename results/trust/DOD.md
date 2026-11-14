@@ -37,7 +37,9 @@
 
 ## 5. 残余 OPEN（不在本轮声称范围）
 
-- 自动锚定编排、trust store 多根/类型权限合一、keygen 与 0600 强制；
+- 自动锚定编排（把已签链头自动挂锚进报告）仍为 OPEN；
+- ~~trust store 多根/类型权限合一~~ 已完成（`trust/trust_store.py`：policy×issuer registry×type registry 装配一致性 + lookup）；
+- ~~keygen 与 0600 强制~~ 已完成（`trust/key_material.py` + `scripts/trust_keygen.py`：0600/拒绝覆盖/拒绝符号链接/POSIX 权限校验；Windows 语义如实告警）；
 - 外部 witness 网络与公共锚接入（需外部基础设施）；
 - 全量 `bash verify.sh`（3100+ 测试）未跑：本报告口径为「静态面全量 + 受影响面全量 + 仓库原生新鲜度命令」三件套；CI full 档才是发布结论。
 

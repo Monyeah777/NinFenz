@@ -614,6 +614,7 @@
     "test_trust_gate47": 0.4,
     "test_trust_gate48": 0.5,
     "test_trust_human_review": 0.2,
+    "test_trust_key_material": 0.5,
     "test_trust_keys": 0.4,
     "test_trust_model_card": 0.5,
     "test_trust_parity": 0.3,
@@ -621,6 +622,7 @@
     "test_trust_schemas": 1.3,
     "test_trust_self_audit_contract": 0.2,
     "test_trust_signature": 0.6,
+    "test_trust_store": 0.7,
     "test_trust_t3": 0.4,
     "test_trust_threat_model_doc_contract": 0.2,
     "test_trust_types": 0.5,
@@ -5721,6 +5723,12 @@
     "test_trust_human_review.VerifyTest.test_reject_and_escalate_are_not_approval": 0.0,
     "test_trust_human_review.VerifyTest.test_reviewer_must_be_human": 0.0,
     "test_trust_human_review.VerifyTest.test_subject_binding": 0.0,
+    "test_trust_key_material.GenerateTest.test_bad_material_rejected": 0.01,
+    "test_trust_key_material.GenerateTest.test_cli_keygen": 0.17,
+    "test_trust_key_material.GenerateTest.test_generate_and_load": 0.02,
+    "test_trust_key_material.GenerateTest.test_generated_key_signs_and_verifies": 0.02,
+    "test_trust_key_material.GenerateTest.test_posix_permissions": 0.0,
+    "test_trust_key_material.GenerateTest.test_refuses_overwrite_and_symlink": 0.0,
     "test_trust_keys.CliRegistryTest.test_cli_valid_and_revoked": 0.15,
     "test_trust_keys.RegistrySchemaTest.test_rotation_chain_passes": 0.0,
     "test_trust_keys.RegistrySchemaTest.test_schema_const": 0.0,
@@ -5809,6 +5817,10 @@
     "test_trust_signature.StatementTest.test_issued_at_is_explicit_only": 0.0,
     "test_trust_signature.StatementTest.test_schema_unknown_field_rejected": 0.0,
     "test_trust_signature.StatementTest.test_statement_roundtrip": 0.0,
+    "test_trust_store.BuildStoreTest.test_cli_trust_store": 0.41,
+    "test_trust_store.BuildStoreTest.test_lookup_keyid": 0.01,
+    "test_trust_store.BuildStoreTest.test_registration_mismatches": 0.0,
+    "test_trust_store.BuildStoreTest.test_valid_store": 0.0,
     "test_trust_threat_model_doc_contract.TrustThreatModelTest.test_contract_catches_mutations": 0.04,
     "test_trust_threat_model_doc_contract.TrustThreatModelTest.test_doc_satisfies_contract": 0.01,
     "test_trust_threat_model_doc_contract.TrustThreatModelTest.test_live_anchors_exist": 0.0,
@@ -6092,5 +6104,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2132.0
+  "total_s": 2133.2
 }

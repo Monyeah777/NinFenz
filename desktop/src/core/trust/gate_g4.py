@@ -18,7 +18,9 @@ from core.trust import anchor as ta
 from core.trust import bundle as tb
 from core.trust import canonical as tc
 from core.trust import dsse
+from core.trust import key_material as tkm
 from core.trust import signature as tsig
+from core.trust import trust_store as tstore
 from core.trust import verify as tv
 
 GUIDE = "修复指引："
@@ -138,10 +140,57 @@ def _check_artifacts(root: str, issues: list, stats: dict) -> None:
         issues.append(f"向量族不足 7：{families}")
 
 
+def _store_docs() -> tuple:
+    policy = {"schema": "nf-trust-policy/1",
+              "issuers": [{"id": ISSUER, "keyid": KEYID, "alg": "hmac-sha256",
+                           "types": ["claim"]}],
+              "algorithms": ["hmac-sha256"], "tsa_roots": [], "required_level": "T0",
+              "anchors": {"tsa": False, "transparency": True, "witness_threshold": 0}}
+    registry = _registry()
+    types = {"schema": "nf-type-registry/1", "types": [
+        {"id": "claim", "allowed_issuer_kinds": ["service"],
+         "allowed_ref_kinds": ["evidence"], "compose_with": [], "max_refs": 4}]}
+    return policy, registry, types
+
+
+def _check_residuals(issues: list, stats: dict) -> None:
+    import tempfile
+    policy, registry, types = _store_docs()
+    store_issues = tstore.build_store_issues(policy, registry, types)
+    if store_issues:
+        issues.append(f"trust store 装配不一致：{store_issues[0]}")
+    else:
+        store = tstore.build_store(policy, registry, types)
+        got = tstore.lookup_keyid(store, KEYID, NOW, registry)
+        if not got.get("ok"):
+            issues.append(f"trust store lookup 失败：{got.get('reason')}")
+        stats["store"] = len(store["keyids"])
+    with tempfile.TemporaryDirectory() as tmp:
+        path = Path(tmp) / "key.hex"
+        try:
+            meta = tkm.generate_hmac_key(str(path))
+            key = tkm.load_hmac_key(str(path))
+        except (OSError, ValueError) as exc:
+            issues.append(f"keygen/0600 面失败：{exc}（{GUIDE}检查权限纪律）")
+            return
+        perms = meta.get("permissions") or {}
+        if not perms.get("ok"):
+            issues.append(f"key 权限检查失败：{perms.get('reason')}（{GUIDE}chmod 600）")
+        envelope = dsse.sign_envelope("application/vnd.nf.gate+json", b"x", [
+            {"keyid": KEYID, "sign": lambda data: dsse.hmac_sign(key, data)}])
+        verified = dsse.verify_envelope(envelope, {KEYID: {
+            "alg": "hmac-sha256", "verify": dsse.hmac_verifier(key)}})
+        if not verified.get("valid"):
+            issues.append("keygen 产出的 key 不能完成 DSSE 签/验")
+        stats["keygen"] = 1
+
+
 def scan(root: str = ".") -> tuple:
     issues: list = []
-    stats = {"t3": "none", "t3_exit": 0, "t4": "none", "parity_families": 0}
+    stats = {"t3": "none", "t3_exit": 0, "t4": "none", "parity_families": 0,
+             "store": 0, "keygen": 0}
     _check_artifacts(root, issues, stats)
+    _check_residuals(issues, stats)
     try:
         _composition(root, issues, stats)
     except (OSError, ValueError) as exc:
