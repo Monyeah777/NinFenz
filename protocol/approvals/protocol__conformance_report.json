@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-14",
   "approved_by": "Monyeah777",
-  "note": "NF-Final WP-0C 法务/许可/出口 + 开源治理（审计脚本 + 许可/治理判据）",
+  "note": "NF-Final WP-0E 可访问性/i18n/人因（WCAG+PAIR/HAX+locale/bidi/timezone 判据）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "80ee5c499af9caa54a00316740208fc330f1853fa699f3687da1bf86dbc47306"
+  "subject_digest": "b8e56cbb29c75f543fe811a1ce0a44b1df02fb3ccc6822d924421cf0e88edd1c"
 }

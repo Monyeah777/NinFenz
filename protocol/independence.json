@@ -36,11 +36,13 @@
       "official_core"
     ],
     "governance": [
+      "accessibility",
       "ai_governance",
       "approval",
       "contract_history",
       "eval_validity",
       "evidence",
+      "i18n_checks",
       "key_transparency",
       "legal",
       "ops",

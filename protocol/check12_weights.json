@@ -1,6 +1,7 @@
 {
   "measured_at": "2026-11-14",
   "modules": {
+    "test_a11y_i18n_contract": 0.3,
     "test_absence_guard": 0.2,
     "test_adr_0000_contract": 0.3,
     "test_adr_9000_contract": 0.2,
@@ -680,6 +681,16 @@
   "note": "check12 墙钟基线（--write-weights 实测；P0 棘轮与分片均衡共用）",
   "schema": "nf-check12-weights/1",
   "tests": {
+    "test_a11y_i18n_contract.A11yI18nContractTest.test_bidi_scan_detects_injected_file": 0.01,
+    "test_a11y_i18n_contract.A11yI18nContractTest.test_claims_boundary": 0.0,
+    "test_a11y_i18n_contract.A11yI18nContractTest.test_docs_present_and_cross_consistent": 0.0,
+    "test_a11y_i18n_contract.A11yI18nContractTest.test_i18n_bidi_clean": 0.02,
+    "test_a11y_i18n_contract.A11yI18nContractTest.test_i18n_coverage": 0.0,
+    "test_a11y_i18n_contract.A11yI18nContractTest.test_i18n_rtl_policy": 0.0,
+    "test_a11y_i18n_contract.A11yI18nContractTest.test_i18n_timezone": 0.0,
+    "test_a11y_i18n_contract.A11yI18nContractTest.test_mutations_red": 0.09,
+    "test_a11y_i18n_contract.A11yI18nContractTest.test_registries_valid": 0.02,
+    "test_a11y_i18n_contract.A11yI18nContractTest.test_terminal_facts": 0.0,
     "test_absence_guard.Test.test_absence_without_boundary_is_issue": 0.0,
     "test_absence_guard.Test.test_boundary_declared_is_ok": 0.0,
     "test_absence_guard.Test.test_boundary_does_not_leak_across_far_clauses": 0.0,
@@ -6206,5 +6217,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2143.5
+  "total_s": 2143.8
 }

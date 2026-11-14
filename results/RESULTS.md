@@ -26,6 +26,7 @@
 - [docs/ai/AI_GOVERNANCE.md](../docs/ai/AI_GOVERNANCE.md) · [docs/eval/EVAL_PROTOCOL.md](../docs/eval/EVAL_PROTOCOL.md)（AI 影响评估/模型风险/监管映射 + 评测效度协议；真源 `protocol/{ai_governance,eval_validity}.json`，判据 `test_ai_eval_contract.py`）
 - [eval/interrater_sample.json](eval/interrater_sample.json)（inter-rater 样本：12 条双评；Cohen's kappa 由 `core.eval_validity.interrater` 现算）
 - [../LEGAL.md](../LEGAL.md) · [../GOVERNANCE.md](../GOVERNANCE.md) · [../docs/legal/](../docs/legal/)（法务/许可/出口 + 开源治理；真源 `protocol/legal.json`，审计入口 `scripts/legal_audit.py`，判据 `test_legal_contract.py`）
+- [../A11Y.md](../A11Y.md) · [../I18N.md](../I18N.md) · [a11y/A11Y_QA.md](../docs/a11y/A11Y_QA.md) · [i18n/I18N_QA.md](../docs/i18n/I18N_QA.md)（可访问性 WCAG/PAIR-HAX + 语言面/时区/RTL-bidi；真源 `protocol/{accessibility,i18n}.json`，判据 `test_a11y_i18n_contract.py`）
 
 ## 互操作导出面（入仓投影）
 
