@@ -1,7 +1,7 @@
 {
-  "bytes": 12443256,
-  "count": 593,
-  "digest": "a25488102d3f17626f238fc4020f5a1a29469ff331f7f5b085a540c5f368410f",
+  "bytes": 12454997,
+  "count": 595,
+  "digest": "5bd533728294c57021735c188cc9d4a7d36879cb75875ac75b6cb5a4dabdefb2",
   "materials": [
     {
       "bytes": 102,
@@ -1754,9 +1754,14 @@
       "sha256": "a2aba28dd31cdb82e809f836cb0844186327a93783af4df04397c2c400bff668"
     },
     {
-      "bytes": 8639,
+      "bytes": 5976,
+      "path": "desktop/src/core/trust/signature.py",
+      "sha256": "2f9c12af7dc52f6b631ba3bcba3d3ab125bf6557c6aebbea5975827fc64e26a5"
+    },
+    {
+      "bytes": 11080,
       "path": "desktop/src/core/trust/verify.py",
-      "sha256": "11b52cd53e098366a440901641cd066732e433f4363e592adea7faa8ed3fe31a"
+      "sha256": "05d417b401a565d59f496517f87fb32b9d43e5f4a9daa029097326c6576d65d2"
     },
     {
       "bytes": 7863,
@@ -1956,12 +1961,12 @@
     {
       "bytes": 79590,
       "path": "protocol/RECEIPTS.json",
-      "sha256": "906a960e7f48a81620a63fd4f6c831fd076ca9442bfbb2ed5b4baafa0a827862"
+      "sha256": "dca380c8b835f496c8081203a5ea9c1c71b54df56201de63306b7d5b91a51ab4"
     },
     {
-      "bytes": 8902,
+      "bytes": 9047,
       "path": "protocol/adr/registry.json",
-      "sha256": "9eb13e9aa0780616db2ce835463d7771d53b8e995472decaa7226ff8104f3dfc"
+      "sha256": "b9033ef813144ebecec1c2443a331aa66320f526628e88c158fb54265ae76f77"
     },
     {
       "bytes": 317,
@@ -2009,9 +2014,9 @@
       "sha256": "c2402950e34e3ff9bd0f09171c8bee821bf0f57c33f32d0dbc4bb4b3e6157914"
     },
     {
-      "bytes": 478855,
+      "bytes": 479710,
       "path": "protocol/check12_weights.json",
-      "sha256": "945f57f2daa771169f85682fcc138ea464ca1e8ad8b79017a08ca44f62632294"
+      "sha256": "df82bfd8abacc2a17be6df2f381ff26810209ed510138c2cbc57457b86be283b"
     },
     {
       "bytes": 16170,
@@ -2021,7 +2026,7 @@
     {
       "bytes": 42861,
       "path": "protocol/code_metrics_baseline.json",
-      "sha256": "3e1ffdd6cfea5c83ddd8248bc0a5f784186c0b24882b902898ccfd3eac0c0961"
+      "sha256": "37e79baf4351d5f69ba7e9c9d09d05338149c2b01e386dcdca3984a575088ff7"
     },
     {
       "bytes": 87117,
@@ -2151,7 +2156,7 @@
     {
       "bytes": 27560,
       "path": "protocol/generated/receipt_chain.json",
-      "sha256": "932420153cbbc7edeb8b4a6874dc9e5596b9c22dc717293acfbfdf7a849caff6"
+      "sha256": "7a8b2ffa2adcc730359a286ad8a32e847efc0dbd07417f669509ac03be56e4d4"
     },
     {
       "bytes": 918,
@@ -2404,9 +2409,9 @@
       "sha256": "87de7ac68f9846b333323efecdbb7555adf24215ae8145d573fe8d0688b8e86d"
     },
     {
-      "bytes": 529056,
+      "bytes": 529846,
       "path": "protocol/role_coordinates.json",
-      "sha256": "225dcc9ab311c97f2742cea67b2888939cfcdb973201977790325883dc094f5d"
+      "sha256": "ff93801272c2a9eaf7d1603eb1de42000bb221be6d61e123d63e9a13e6594b45"
     },
     {
       "bytes": 9391,
@@ -2504,6 +2509,11 @@
       "sha256": "915048767d4e64f108abd2242bf01d44d314b5fe808811e399e749e5d654efef"
     },
     {
+      "bytes": 953,
+      "path": "protocol/trust/chain-head.schema.json",
+      "sha256": "a293bd5aa559fbb3639aa5a80d1676c37a394ea5cdc47674d1ac94425cde42b3"
+    },
+    {
       "bytes": 3422,
       "path": "protocol/trust/claim-bundle.schema.json",
       "sha256": "7aa8d8a1e678c9750246e4bdb78aa25bf0bc4f93588918eea3f008a8fb2ed16a"
@@ -2546,7 +2556,7 @@
     {
       "bytes": 13104,
       "path": "protocol/verification_report.json",
-      "sha256": "1793b73d76f63daf6b29210a4fe88f0bb7cf3bb65f8a8a4d7fd21c8ba43bb5e4"
+      "sha256": "c3dce9094c20f498306b6fb2f34fe683258f65f65fe811642593b3a45dd34756"
     },
     {
       "bytes": 4160,
@@ -2899,9 +2909,9 @@
       "sha256": "aacf188610233408df88de23e5a8a6a5cd8398d2aff9cce1d7867f6feddfb23c"
     },
     {
-      "bytes": 9218,
+      "bytes": 9799,
       "path": "scripts/trust_verify.py",
-      "sha256": "62730ca795eadc3775e5cdc0dad8b38e0d74f82e43ad38dcfe036558518c41d1"
+      "sha256": "984f4bb07e92b54d8f7c836960bdd9fa9393067ca13962893bfb7aa4574e05d1"
     },
     {
       "bytes": 3884,

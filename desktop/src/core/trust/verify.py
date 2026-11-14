@@ -7,9 +7,9 @@
 - achieved < required → exit 2（不可判定，报告写清缺什么）；否则 exit 0；
 - 策略非法（schema 不过 / required_level 非 T0-T4）→ exit 2，缺项码 POLICY-INVALID。
 
-**骨架边界（不夸大）**：本轮只能把 hash 事实算成真值；T1 签名/DSSE、T2 RFC 3161 token、
-T3 STH/witness、T4 公共锚的核验在 G2/G3 接线，四者恒为 "none"——报告如实写缺项并 exit 2，
-不把「没验」写成「验过」。
+**接线边界（不夸大）**：hash 恒为真值；给了 head_signature（DSSE + issuer registry）才核
+signature 事实；给了 nf-anchor/1（+ verifier）才核 time_token / transparency_sth 事实；
+T4 公共锚仍未建（G4）。缺材料一律记 "none" 并如实报缺项，不把「没验/没材料」写成「验过」。
 """
 from __future__ import annotations
 
@@ -18,6 +18,7 @@ from pathlib import Path
 from core import json_doc, json_schema
 from core.trust import anchor as ta
 from core.trust import bundle as tb
+from core.trust import signature as tsig
 from core.trust.canonical import digest_of, is_digest
 
 GUIDE = "修复指引："
@@ -113,11 +114,14 @@ def _missing_issues(codes: list) -> list:
 
 
 def verify(bundle: dict, policy: dict, root: str = ".", anchor: dict | None = None,
-           anchor_verifiers: dict | None = None) -> dict:
+           anchor_verifiers: dict | None = None, head_signature: dict | None = None,
+           registry: dict | None = None, material: dict | None = None,
+           now: str | None = None) -> dict:
     """验证 claim bundle：返回 {"report","decision","exit_code"}（不打印、不退出）。
 
-    anchor 给了就走 nf-anchor/1 核验：target 必须等于 bundle.merkle_root，事实
-    （time_token/transparency_sth）由 core.trust.anchor 投影；缺 verifier 记 none。
+    head_signature 给了就核链头签名（nf-chain-head/1 + DSSE + registry）→ signature 事实；
+    anchor 给了就核 nf-anchor/1 → time_token/transparency_sth 事实，target = subject_digest
+    （bundle 的规范摘要；锚必须绑这个对象）。缺 registry/material/verifier 记 none，不假装验过。
     """
     policy_schema = load_schema(root, POLICY_SCHEMA_REL)
     bundle_schema = tb.load_schema(root)
@@ -127,6 +131,9 @@ def verify(bundle: dict, policy: dict, root: str = ".", anchor: dict | None = No
     policy_ok = not policy_problems and raw_required in LEVELS
     run = tb.verify_bundle(bundle, bundle_schema)
     hash_ok = bool(run["ok"])
+    subject_digest = digest_of(bundle)
+    if not is_digest(subject_digest):
+        raise ValueError(f"无法计算 subject digest（{GUIDE}检查 canonical 编码）")
     facts = skeleton_facts(hash_ok)
     checks = [
         {"id": "A1-bundle-integrity", "ok": hash_ok,
@@ -135,8 +142,8 @@ def verify(bundle: dict, policy: dict, root: str = ".", anchor: dict | None = No
     ]
     anchor_issues: list = []
     if anchor is not None:
-        merged = ta.verify_anchor_set(anchor, str(bundle.get("merkle_root") or ""),
-                                      policy, anchor_verifiers, root=root)
+        merged = ta.verify_anchor_set(anchor, subject_digest, policy,
+                                      anchor_verifiers, root=root)
         facts.update(merged["facts"])
         anchor_issues = merged["issues"]
         checks.append({"id": "A2-anchor-facts", "ok": not anchor_issues,
@@ -148,10 +155,45 @@ def verify(bundle: dict, policy: dict, root: str = ".", anchor: dict | None = No
     else:
         checks.append({"id": "A2-anchor-facts", "ok": False,
                        "detail": "未提供 nf-anchor/1；T2 及以上只报缺项，不冒充等级"})
+    signature_issues: list = []
+    if head_signature is not None:
+        if not registry or not isinstance(material, dict):
+            checks.append({"id": "A1-head-signature", "ok": False,
+                           "detail": "给了签名信封但缺 registry/material，签名事实记 none"})
+        else:
+            try:
+                envelope_schema = json_doc.load(
+                    Path(root) / "protocol/trust/dsse.schema.json", dict,
+                    what="dsse schema")
+            except (OSError, ValueError):
+                envelope_schema = None
+            verified = tsig.verify_head(head_signature, "bundle", subject_digest,
+                                        registry, material, envelope_schema,
+                                        now=now, root=root)
+            if verified.get("ok"):
+                facts["signature"] = "ok"
+                checks.append({"id": "A1-head-signature", "ok": True,
+                               "detail": "链头签名有效：signers=" + ",".join(
+                                   verified.get("signers") or [])})
+            elif verified.get("reason") in ("KEY-UNKNOWN", "VERIFIER-MISSING"):
+                checks.append({"id": "A1-head-signature", "ok": False,
+                               "detail": "签名无法判定：" + str(verified.get("reason"))})
+            else:
+                facts["signature"] = "invalid"
+                reason = str(verified.get("reason") or "SIGNATURE-INVALID")
+                signature_issues.append({
+                    "code": reason, "message": "链头签名校验失败",
+                    "fix": "重签链头并确认 issuer registry 生命周期（吊销/过期/轮换）"})
+                checks.append({"id": "A1-head-signature", "ok": False,
+                               "detail": "链头签名失败：" + reason})
+    else:
+        checks.append({"id": "A1-head-signature", "ok": False,
+                       "detail": "未提供链头签名；T1 及以上只报缺项，不冒充等级"})
     decision = decide(facts, required, policy_ok=policy_ok)
     decision["required"] = required
     issues = _missing_issues(decision["missing"])
     issues.extend(anchor_issues)
+    issues.extend(signature_issues)
     if not hash_ok:
         issues.insert(0, {"code": "BUNDLE-INVALID",
                           "message": "bundle 自洽性校验失败（" +
@@ -163,9 +205,6 @@ def verify(bundle: dict, policy: dict, root: str = ".", anchor: dict | None = No
         "tsa": [str(item.get("id")) for item in (policy or {}).get("tsa_roots") or []
                 if isinstance(item, dict)],
     }
-    subject_digest = digest_of(bundle)
-    if not is_digest(subject_digest):
-        raise ValueError(f"无法计算 subject digest（{GUIDE}检查 canonical 编码）")
     report = build_report("bundle", subject_digest, decision, checks, issues, trust_roots,
                           root=root)
     return {"report": report, "decision": decision, "exit_code": decision["exit_code"]}

@@ -20,6 +20,7 @@ sys.path.insert(0, str(ROOT / "desktop" / "src"))
 from core import json_schema  # noqa: E402
 from core.trust import anchor as ta  # noqa: E402
 from core.trust import bundle as tb  # noqa: E402
+from core.trust import canonical as tc  # noqa: E402
 from core.trust import dsse  # noqa: E402
 from core.trust import verify as tv  # noqa: E402
 
@@ -277,7 +278,7 @@ class VerifyIntegrationTest(unittest.TestCase):
         ])
 
     def test_anchor_fact_checks_appear(self):
-        anchor = ta.build_anchor_set(self.bundle["merkle_root"],
+        anchor = ta.build_anchor_set(tc.digest_of(self.bundle),
                                      [{"kind": "git-commit", "repo": str(ROOT),
                                        "commit": "0" * 40}])
         result = tv.verify(self.bundle, _policy(), str(ROOT), anchor=anchor,
@@ -298,7 +299,7 @@ class VerifyIntegrationTest(unittest.TestCase):
                             for i in result["report"]["issues"]))
 
     def test_missing_signature_still_blocks_t2(self):
-        anchor = ta.build_anchor_set(self.bundle["merkle_root"],
+        anchor = ta.build_anchor_set(tc.digest_of(self.bundle),
                                      [{"kind": "git-commit", "repo": str(ROOT),
                                        "commit": "0" * 40}])
         result = tv.verify(self.bundle, _policy(required="T2"), str(ROOT), anchor=anchor,
@@ -330,7 +331,7 @@ class CliAnchorTest(unittest.TestCase):
             build = subprocess.run(
                 [sys.executable, str(ROOT / "scripts" / "trust_verify.py"),
                  "--anchor-build", str(anchor_path),
-                 "--anchor-target", bundle["merkle_root"],
+                 "--anchor-target", tc.digest_of(bundle),
                  "--anchor-anchors", str(anchors_path)],
                 capture_output=True, text=True, encoding="utf-8")
             self.assertEqual(0, build.returncode, build.stderr + build.stdout)

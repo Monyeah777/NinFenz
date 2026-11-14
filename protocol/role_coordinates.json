@@ -5,8 +5,8 @@
     "floor": 5,
     "prod": 1057,
     "projection": 167,
-    "support": 469,
-    "verify": 1327
+    "support": 471,
+    "verify": 1331
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7361,6 +7361,18 @@
       "rule": "R-verify"
     },
     {
+      "function": "nf-chain-head/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/chain-head-bad-digest.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-chain-head/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/chain-head-bad-kind.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "nf-claim-bundle/1",
       "path": "desktop/tests/fixtures/trust/schemas/invalid/claim-bundle-bad-side.json",
       "role": "verify",
@@ -7459,6 +7471,12 @@
     {
       "function": "nf-anchor/1",
       "path": "desktop/tests/fixtures/trust/schemas/valid/anchor.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-chain-head/1",
+      "path": "desktop/tests/fixtures/trust/schemas/valid/chain-head.json",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -11165,7 +11183,7 @@
       "rule": "R-verify"
     },
     {
-      "function": "Trust Fabric schema 门禁（WP-01/21）：8 件 IDL、正/反样例与变异自证。",
+      "function": "Trust Fabric schema 门禁（WP-01/21/23）：9 件 IDL、正/反样例与变异自证。",
       "path": "desktop/tests/test_trust_schemas.py",
       "role": "verify",
       "rule": "R-verify"
@@ -11173,6 +11191,12 @@
     {
       "function": "trust 自审计契约：机器件（SELF_AUDIT.json）与 CLAIM_MATRIX/门禁真源互相绑定。",
       "path": "desktop/tests/test_trust_self_audit_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "trust.signature 判据：链头语句绑定 + DSSE 签名 + registry 生命周期 + 端到端 T2。",
+      "path": "desktop/tests/test_trust_signature.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -14346,16 +14370,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "1575bab4c321e67f6158d4546c23554195332d95938790d7af97c84c474413af",
+  "root_digest": "da3ce3ef6f723e5cd09fb3f87de68229ba55de87ab568402536546b4b4f63948",
   "rule_counts": {
     "R-app": 1468,
-    "R-catch": 317,
+    "R-catch": 319,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 147,
     "R-support": 124,
-    "R-verify": 1201,
+    "R-verify": 1205,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
