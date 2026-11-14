@@ -1,0 +1,20 @@
+{
+  "schema": "nf-stability/1",
+  "note": "NF-Final G5 WP-51 稳定性/长稳证据登记：对纯管线做**进程内重复**与**并发**确定性对照（assembly/output/delivery/metrics/docs-claims/AIBOM/AI 证据链），要求逐字节一致、0 mismatch。铁律：本件只证明「进程内重复/并发确定性」，**不是长稳 soak（小时级）**，不对外部环境/真实模型作稳定承诺。判据 desktop/tests/test_stability_contract.py。",
+  "checks": [
+    {"id": "S-01", "name": "assembly record", "module": "core.assembly_runtime", "digest": "render(run(...))"},
+    {"id": "S-02", "name": "output report", "module": "core.output_validation", "digest": "render(validate(...))"},
+    {"id": "S-03", "name": "delivery manifest", "module": "core.delivery", "digest": "manifest bytes"},
+    {"id": "S-04", "name": "production metrics", "module": "core.production_metrics", "digest": "render(build(...))"},
+    {"id": "S-05", "name": "docs claims report", "module": "core.docs_claims", "digest": "render(build(...))"},
+    {"id": "S-06", "name": "AIBOM exports", "module": "core.aibom_export", "digest": "render(cdx)+render(spdx)"},
+    {"id": "S-07", "name": "AI evidence chain", "module": "core.ai_evidence", "digest": "check + sample digests"}
+  ],
+  "runs": 5,
+  "concurrency": 4,
+  "tolerance": {"mismatches": 0},
+  "scope": {"in_process_repeat": true, "concurrent": true, "soak_hours": false,
+             "note": "长稳 soak 与外部环境稳定性属外部操作（OPEN），本件不声称"},
+  "claims_boundary": ["只证明进程内重复/并发确定性；不是长稳 soak，也不代表真实模型/外部环境稳定",
+                      "不声称 SLA/可用性承诺"]
+}

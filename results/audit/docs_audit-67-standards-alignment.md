@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/asset_density.py:aa60651ad8269e7db09a709570ae69192f39ee95cfd6bd1d4f652696b3d26c56
   - docs/domain-packs.md:f90ff233965ee1bb5a872dd833b79e200bfc1825db9c81f651ceca760d83d8b6
-  - protocol/data_contracts.json:902fe77219a90e4ff2c033f583c60135a587c6e0c27ba28b6bd47a80ec7309cc
+  - protocol/data_contracts.json:f6e6fcd1a332a42edeb59e4e0d809fe49a7fe7f5162160b4569e66fee05f25c6
 ---
+> 重审（2026-11-15）：NF-Final WP-51：新增 protocol/stability.json、core/stability.py、results/stability/report.json、docs/stability.md、test_stability_contract.py；assertions/data_contracts/independence/code_metrics/check12 更新
+
 > 重审（2026-11-15）：NF-Final WP-50：新增 protocol/docs_claims.json、core/docs_claims.py、results/docs_claims_report.json、test_docs_claims_contract.py；verify.sh check53 + quality_baseline 53 条/PASS=97；派生面重生成；CONFORMANCE 过期 PASS=83 修正
 
 > 重审（2026-11-15）：NF-Final G4 收口：新增 results/{G4_DOD.md,g4_dod.json}、test_g4_dod.py；assertions/data_contracts/check12/code_metrics 更新

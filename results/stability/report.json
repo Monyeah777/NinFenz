@@ -1,0 +1,79 @@
+{
+  "checks": [
+    {
+      "digest": "a0d2046dd0e36296d357ec586aa21411379ed477bd1fd42167dce7ccd453c165",
+      "id": "S-01",
+      "identical": true,
+      "mismatches": 0,
+      "name": "assembly record",
+      "runs": 10
+    },
+    {
+      "digest": "aa4dc9a797feaf6a5fe3f819dad97be8eb0238bf0ea3016cd9733808c97f89a3",
+      "id": "S-02",
+      "identical": true,
+      "mismatches": 0,
+      "name": "output report",
+      "runs": 10
+    },
+    {
+      "digest": "e3a93895179e7fd545c65ff0901fb2edb9353b9f926ba4686805473832862e4f",
+      "id": "S-03",
+      "identical": true,
+      "mismatches": 0,
+      "name": "delivery manifest",
+      "runs": 10
+    },
+    {
+      "digest": "f27035b2c8a557bddd701725b6a504ff821447a1e2e2451dd3b584a8b42883d2",
+      "id": "S-04",
+      "identical": true,
+      "mismatches": 0,
+      "name": "production metrics",
+      "runs": 10
+    },
+    {
+      "digest": "93f0551dcfb8bc5652138b55aed58082af3b0eb3b31971ba7f9c7446b566d113",
+      "id": "S-05",
+      "identical": true,
+      "mismatches": 0,
+      "name": "docs claims report",
+      "runs": 10
+    },
+    {
+      "digest": "f8e4218c8db00bbcc2044b84c3a6b864f0a3f94216658cee4f2682f13d3243d5",
+      "id": "S-06",
+      "identical": true,
+      "mismatches": 0,
+      "name": "AIBOM exports",
+      "runs": 10
+    },
+    {
+      "digest": "c19f3d35b1d5a953fbb5ca66b66317bc5f2405034904d087131c5ebe3837827d",
+      "id": "S-07",
+      "identical": true,
+      "mismatches": 0,
+      "name": "AI evidence chain",
+      "runs": 10
+    }
+  ],
+  "claims_boundary": [
+    "只证明进程内重复/并发确定性；不是长稳 soak，也不代表真实模型/外部环境稳定",
+    "不声称 SLA/可用性承诺"
+  ],
+  "concurrency": 4,
+  "note": "committed == 实时重算",
+  "runs": 5,
+  "schema": "nf-stability-report/1",
+  "scope": {
+    "concurrent": true,
+    "in_process_repeat": true,
+    "note": "只证明进程内重复/并发确定性；长稳 soak 与外部环境稳定属 OPEN",
+    "soak_hours": false
+  },
+  "summary": {
+    "checks": 7,
+    "mismatches": 0,
+    "unique_digests": 7
+  }
+}

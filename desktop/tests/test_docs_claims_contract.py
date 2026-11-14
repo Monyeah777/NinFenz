@@ -47,13 +47,14 @@ class DocsClaimsContractTest(unittest.TestCase):
         self.assertGreaterEqual(self.report["counts"]["claims"], 10)
 
     def test_stale_pass_red(self):
-        report = _mutate_readme("PASS=95", "PASS=90")
+        report = _mutate_readme("PASS=%d" % qb.EXPECTED_PASS,
+                                "PASS=%d" % (qb.EXPECTED_PASS - 5))
         self.assertTrue(report["violations"], "过期 PASS 数字必须红")
         self.assertTrue(any(v["kind"] == "pass_count" for v in report["violations"]))
 
     def test_stale_label_red(self):
-        report = _mutate_readme("check1-44/45/46/47/48/49/50/51/52",
-                                "check1-44/45/46/47/48/49/50/51")
+        label = qb.CHECK_LABEL
+        report = _mutate_readme(label, label.rsplit("/", 1)[0])
         self.assertTrue(report["violations"], "过期 check 标签必须红")
 
     def test_forbidden_claim_red(self):

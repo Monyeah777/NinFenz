@@ -68,6 +68,7 @@
       "provenance_external",
       "revocations",
       "spec_compiler",
+      "stability",
       "transparency_log",
       "trust",
       "wiki_compiler"

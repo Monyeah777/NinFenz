@@ -15,14 +15,16 @@ subjects:
   - verify.sh:cdab8be52be55d3c89157c971f7d321418d59c0fe3fba85e1fa9dd53f6d17241
   - docs/layers.md:7b849fb07769ba6df5ca888a9de5323417b47a07ef54ec2c1c801673a7fbd7c0
   - docs/L3_FROZEN.md:863a152271b1b969a3249194d1169628f4a4647a9bdd801473cfc9cb75c6643b
-  - protocol/assertions.json:b93e2a7a9c220c22bb036c2f7ac4c92e0eae1ffda79e3905bee5756472ac1343
-  - protocol/data_contracts.json:902fe77219a90e4ff2c033f583c60135a587c6e0c27ba28b6bd47a80ec7309cc
+  - protocol/assertions.json:ad61bfb95261b26647020a19dcb0710425e9abc637fb5e28f2eb48db2d865954
+  - protocol/data_contracts.json:f6e6fcd1a332a42edeb59e4e0d809fe49a7fe7f5162160b4569e66fee05f25c6
   - protocol/normative.json:c1bbc14c92cea6bd66ff6cb54fdcf91bf3072f66adee7027f1d3f42e70fe1825
   - protocol/glossary.json:0af6a0f3b1f128b30c0eb88a8db0d2c143461910a889737dfdf4e38e89f85ba7
   - desktop/src/core/receipts.py:b748915bb519aeeb1aa0f7d367df2eb7d4321b369b85905a7f918d8d55d96363
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
 
 ---
+> 重审（2026-11-15）：NF-Final WP-51：新增 protocol/stability.json、core/stability.py、results/stability/report.json、docs/stability.md、test_stability_contract.py；assertions/data_contracts/independence/code_metrics/check12 更新
+
 > 重审（2026-11-15）：NF-Final WP-50 收尾：check53 增加「报告新鲜」断言（total ok 与 PASS=97 对齐）
 
 > 重审（2026-11-15）：NF-Final WP-50：新增 protocol/docs_claims.json、core/docs_claims.py、results/docs_claims_report.json、test_docs_claims_contract.py；verify.sh check53 + quality_baseline 53 条/PASS=97；派生面重生成；CONFORMANCE 过期 PASS=83 修正

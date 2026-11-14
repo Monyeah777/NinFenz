@@ -607,6 +607,7 @@
     "test_spec_compiler_contract": 2.9,
     "test_st_quality_checklist_doc_contract": 0.3,
     "test_st_validator": 0.1,
+    "test_stability_contract": 0.9,
     "test_standards_index_doc_contract": 0.4,
     "test_standards_layer_doc_contract": 0.5,
     "test_state_front": 0.1,
@@ -5551,6 +5552,14 @@
     "test_st_validator.TestMvu.test_initial_mismatch_is_fail": 0.0,
     "test_st_validator.TestWorldbook.test_comma_key_and_duplicate_are_warn": 0.0,
     "test_st_validator.TestWorldbook.test_missing_entries_is_fail": 0.0,
+    "test_stability_contract.StabilityContractTest.test_all_identical": 0.0,
+    "test_stability_contract.StabilityContractTest.test_build_deterministic": 0.18,
+    "test_stability_contract.StabilityContractTest.test_check_green": 0.17,
+    "test_stability_contract.StabilityContractTest.test_committed_equals_live": 0.18,
+    "test_stability_contract.StabilityContractTest.test_mutations_red": 0.18,
+    "test_stability_contract.StabilityContractTest.test_registry": 0.0,
+    "test_stability_contract.StabilityContractTest.test_scope_honest": 0.0,
+    "test_stability_contract.StabilityContractTest.test_unknown_check_rejected": 0.0,
     "test_standards_index_doc_contract.StandardsIndexDocTest.test_contract_catches_mutations": 0.02,
     "test_standards_index_doc_contract.StandardsIndexDocTest.test_freshness": 0.23,
     "test_standards_index_doc_contract.StandardsIndexDocTest.test_index_matches_contract": 0.0,
@@ -6465,5 +6474,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2180.5
+  "total_s": 2181.4
 }
