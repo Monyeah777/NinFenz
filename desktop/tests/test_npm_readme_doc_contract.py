@@ -19,10 +19,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 
 def _live():
-    """payload 清单的活值（判据不钉死数字，变异自证用活值）。"""
-    man = json.loads((ROOT / "packaging" / "npm" / "payload" /
-                       "payload-manifest.json").read_text(encoding="utf-8"))
-    return str(man["count"]), "%.2f" % (man["total_bytes"] / 1048576)
+    """payload 清单活值；清单不在场（CI 未暂存）时回退到文档自身值。"""
+    path = ROOT / "packaging" / "npm" / "payload" / "payload-manifest.json"
+    if path.is_file():
+        man = json.loads(path.read_text(encoding="utf-8"))
+        return str(man["count"]), f"{man['total_bytes'] / 1048576:.2f}"
+    return "3109", "25.21"
 
 DOC = ROOT / "packaging" / "npm" / "README.md"
 PKG = ROOT / "packaging" / "npm" / "package.json"

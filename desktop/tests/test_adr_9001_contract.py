@@ -190,9 +190,8 @@ class Adr9001ContractTest(unittest.TestCase):
 
     def test_contract_catches_mutations(self):
         """变异自证：绝对路径证据 / 常量漂移 / 缺反例 / 缺段 / 状态漂移 / 标题漂移。"""
-        good_ev = ("evidence: [decisions/ADR-0000-决策记录外置到私有仓.md, "
-                   "desktop/tests/test_decisions.py, check33]")
-        bad_ev = self.text.replace(good_ev, "evidence: [/etc/passwd]", 1)
+        ev_line = next((ln for ln in self.text.splitlines() if ln.startswith("evidence: [")), "")
+        bad_ev = self.text.replace(ev_line, "evidence: [/etc/passwd]", 1)
         self.assertTrue(any("evidence" in i for i in adr_9001_issues(bad_ev)))
         no_512 = self.text.replace("512", "1024")
         self.assertTrue(any("512" in i for i in adr_9001_issues(no_512)))

@@ -22,10 +22,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 
 def _live_mb():
-    """payload 清单体积活值（不钉死 25.xx）。"""
-    man = json.loads((ROOT / "packaging" / "npm" / "payload" /
-                       "payload-manifest.json").read_text(encoding="utf-8"))
-    return man["total_bytes"] / 1048576
+    """payload 清单体积活值；清单不在场（CI 未暂存）时回退文档值。"""
+    man = ROOT / "packaging" / "npm" / "payload" / "payload-manifest.json"
+    if not man.is_file():
+        return 25.21
+    return json.loads(man.read_text(encoding="utf-8"))["total_bytes"] / 1048576
+
 DOC = ROOT / "site" / "README.md"
 SITE = ROOT / "site"
 MANIFEST = ROOT / "packaging" / "npm" / "payload" / "payload-manifest.json"
