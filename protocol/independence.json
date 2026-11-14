@@ -36,8 +36,10 @@
       "official_core"
     ],
     "governance": [
+      "ai_governance",
       "approval",
       "contract_history",
+      "eval_validity",
       "evidence",
       "key_transparency",
       "ops",

@@ -732,6 +732,31 @@
         "scripts/ops_drill.py",
         "test_ops_contract"
       ]
+    },
+    {
+      "id": "ai-governance",
+      "artifact": "protocol/ai_governance.json",
+      "quality_rule": "assertion:ai-governance",
+      "owner": "AI 治理（core/ai_governance.py + test_ai_eval_contract）+ WP-0F",
+      "status": "active",
+      "freshness": "改风险/映射须同步 protocol/ai_governance.json 与 docs/ai/AI_GOVERNANCE.md",
+      "consumers": [
+        "test_ai_eval_contract",
+        "docs/ai/AI_GOVERNANCE.md"
+      ]
+    },
+    {
+      "id": "eval-validity",
+      "artifact": "protocol/eval_validity.json",
+      "quality_rule": "assertion:eval-validity",
+      "owner": "评测效度（core/eval_validity.py + test_ai_eval_contract）+ WP-0F",
+      "status": "active",
+      "freshness": "改效度规则须同步 protocol/eval_validity.json 与 docs/eval/EVAL_PROTOCOL.md；kappa 现算",
+      "consumers": [
+        "test_ai_eval_contract",
+        "docs/eval/EVAL_PROTOCOL.md",
+        "protocol/eval/protocol.json"
+      ]
     }
   ]
 }

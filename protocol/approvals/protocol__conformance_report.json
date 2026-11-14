@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-14",
   "approved_by": "Monyeah777",
-  "note": "NF-Final WP-0D（BASELINE 更新 + independence 登记 ops 后最终冻结）",
+  "note": "NF-Final WP-0F AI 治理 + 评测效度（影响评估/模型风险/监管映射 + 预注册/inter-rater/反指标）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "acc65e10e99990e69a378edb6107ab0ecbb0a51bb27858701fb3873db7595e9f"
+  "subject_digest": "fcde4fb66f9b07ce9d924bf282322ae3bdd3ec86304958cc83ab3e78f4419cf2"
 }

@@ -1,0 +1,58 @@
+{
+  "schema": "nf-eval-validity/1",
+  "note": "NF-Final §3A D15 机读登记（WP-0F）：评测效度协议——预注册/样本量/inter-rater/反指标/效度威胁。原则：只计数不打分；内部永不产出盲评 pass；指标必须挂反指标（防 Goodhart）。判据 desktop/tests/test_ai_eval_contract.py。",
+  "concrete_protocols": ["protocol/eval/protocol.json"],
+  "preregistration": {
+    "required_fields": ["schema", "version", "registered_at", "question", "conditions",
+                        "tasks", "dimensions", "samples_per_task", "analysis_plan",
+                        "prohibitions", "frozen_before_run"],
+    "freeze_rule": "跑前冻结（frozen_before_run=true）；改协议 = 新协议 + 新版本号，不原地改",
+    "evidence": "desktop/src/core/eval_harness.py"
+  },
+  "power": {
+    "min_samples_per_task": 3,
+    "rule": "样本 < 3 只报描述统计，不做差异/显著性宣称",
+    "evidence": "protocol/eval/protocol.json"
+  },
+  "inter_rater": {
+    "method": "cohen_kappa",
+    "min_kappa": 0.6,
+    "sample": "results/eval/interrater_sample.json",
+    "rule": "两名评分者对同一批样本的盲评一致性 ≥0.6 才算可用的盲评；低于则重训/重采",
+    "evidence": "desktop/src/core/eval_validity.py"
+  },
+  "countermetrics": [
+    {"id": "CM-01", "guards": "被菜单/框架窄化", "metric": "table_external_mechanisms",
+     "evidence": "protocol/eval/protocol.json"},
+    {"id": "CM-02", "guards": "内部自评自嗨（自证）", "metric": "盲评与门禁交付分两份报告、不合并",
+     "evidence": "protocol/eval/protocol.json"},
+    {"id": "CM-03", "guards": "计数/覆盖率 Goodhart", "metric": "结果指标 + 抽样人工复核 + 反指标趋势",
+     "evidence": "docs/eval/EVAL_PROTOCOL.md"}
+  ],
+  "metrics": [
+    {"id": "ME-01", "name": "frame_change", "countermetric": "CM-01"},
+    {"id": "ME-02", "name": "assumption_explicit", "countermetric": "CM-01"},
+    {"id": "ME-03", "name": "counterexample_quality", "countermetric": "CM-02"},
+    {"id": "ME-04", "name": "coherence", "countermetric": "CM-02"},
+    {"id": "ME-05", "name": "depth", "countermetric": "CM-02"},
+    {"id": "ME-06", "name": "deliverable", "countermetric": "CM-03"},
+    {"id": "ME-07", "name": "table_external_mechanisms", "countermetric": "CM-01"}
+  ],
+  "validity_threats": [
+    {"id": "VT-01", "threat": "Goodhart：指标变目标",
+     "check": "每个 metric 必须挂反指标；反指标不参与奖励/排序",
+     "evidence": "protocol/eval_validity.json"},
+    {"id": "VT-02", "threat": "预注册后挑指标/改协议",
+     "check": "frozen_before_run=true；改协议走新版本号",
+     "evidence": "desktop/src/core/eval_harness.py"},
+    {"id": "VT-03", "threat": "评分者一致性未测（inter-rater 缺失）",
+     "check": "Cohen's kappa ≥0.6；样本在 results/eval/interrater_sample.json",
+     "evidence": "results/eval/interrater_sample.json"},
+    {"id": "VT-04", "threat": "样本量不足却宣称差异",
+     "check": "min_samples_per_task=3；不足只做描述统计",
+     "evidence": "protocol/eval/protocol.json"},
+    {"id": "VT-05", "threat": "自评打分写回运行时",
+     "check": "no_scoring 恒真（ADR-010）；运行时只判定不评分",
+     "evidence": "protocol/trust/verify.schema.json"}
+  ]
+}

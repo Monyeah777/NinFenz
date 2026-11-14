@@ -1,0 +1,20 @@
+{
+  "schema": "nf-interrater-sample/1",
+  "note": "inter-rater 样本（WP-0F）：两名评分者独立盲评同一批 12 条；labels 为 pass/fail。判据：Cohens kappa ≥ 0.6（core.eval_validity.interrater）。样本是示例数据，不冒充真实外部盲评。",
+  "raters": ["R1", "R2"],
+  "labels": ["pass", "fail"],
+  "items": [
+    {"id": "I-01", "R1": "pass", "R2": "pass"},
+    {"id": "I-02", "R1": "pass", "R2": "pass"},
+    {"id": "I-03", "R1": "fail", "R2": "fail"},
+    {"id": "I-04", "R1": "pass", "R2": "pass"},
+    {"id": "I-05", "R1": "fail", "R2": "fail"},
+    {"id": "I-06", "R1": "pass", "R2": "pass"},
+    {"id": "I-07", "R1": "fail", "R2": "fail"},
+    {"id": "I-08", "R1": "fail", "R2": "fail"},
+    {"id": "I-09", "R1": "pass", "R2": "pass"},
+    {"id": "I-10", "R1": "pass", "R2": "fail"},
+    {"id": "I-11", "R1": "fail", "R2": "fail"},
+    {"id": "I-12", "R1": "pass", "R2": "pass"}
+  ]
+}

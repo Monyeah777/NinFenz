@@ -643,6 +643,36 @@
       "message": "运维演练报告缺失或版本名不符（IR/恢复/披露/供应商退出演练须可复算）",
       "fix": "python scripts/ops_drill.py --run 重算报告",
       "evidence": "test_ops_contract / conformance::modeling"
+    },
+    {
+      "id": "ai-governance",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "protocol/ai_governance.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-ai-governance/1"
+      },
+      "message": "AI 治理登记缺失或版本名不符（WP-0F 判据依赖它）",
+      "fix": "补/修 protocol/ai_governance.json；再跑 desktop/tests/test_ai_eval_contract.py",
+      "evidence": "test_ai_eval_contract / conformance::modeling"
+    },
+    {
+      "id": "eval-validity",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "protocol/eval_validity.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-eval-validity/1"
+      },
+      "message": "评测效度协议缺失或版本名不符（WP-0F 判据依赖它）",
+      "fix": "补/修 protocol/eval_validity.json；再跑 desktop/tests/test_ai_eval_contract.py",
+      "evidence": "test_ai_eval_contract / conformance::modeling"
     }
   ]
 }

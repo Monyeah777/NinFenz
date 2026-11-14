@@ -87,9 +87,9 @@
       "sha256": "a4a0add82ae05dae7c5b56ea11c56a75c3e69e079c274e54aad78e57649ff54b"
     },
     {
-      "cid": "bafyreifmyzpbb2mzsdtjun4o3nqqpkyozoykkg5spbmhah5tq463owk6t4",
+      "cid": "bafyreih43zh3m343a7hj3esl6kbdekxdxxj6zbrqjfmmza5lhz4piqm46i",
       "path": "protocol/conformance_report.json",
-      "sha256": "acc65e10e99990e69a378edb6107ab0ecbb0a51bb27858701fb3873db7595e9f"
+      "sha256": "fcde4fb66f9b07ce9d924bf282322ae3bdd3ec86304958cc83ab3e78f4419cf2"
     },
     {
       "cid": "bafyreiav4koretqkw26pbhyaw4e45ltrko727oqzo56f7pdn7zjljasc44",
@@ -107,14 +107,14 @@
       "sha256": "c9e39d009b8753805982b81ffb4b0f55fe94b009452fd42039dd97183e62ec7e"
     },
     {
-      "cid": "bafyreigkerivjciudnshgclhqpg7cjoafvespwosm6yryqcpxlcvxvtz6q",
+      "cid": "bafyreiepnwgairmtorjrhbjwkkbjr6gc6b6kczhhf33wzuru4bjnegqpqm",
       "path": "protocol/role_coordinates.json",
-      "sha256": "ca24515489141b6473096783cdf125c02d4927d9d267b11c404fbac55bd679f4"
+      "sha256": "8f6d8c0445937453138536528298f8c2f07ca164e72ef76cd234e052d21a0f83"
     },
     {
-      "cid": "bafyreia5fpyyls74hjwgym22hq6eo2azqes62eolvbtlniakggtgdakgd4",
+      "cid": "bafyreicam53cvfxwihr6u7fry553nnvdeyxdqcsirqbf3yr2lpzvgo4gte",
       "path": "protocol/code_metrics_baseline.json",
-      "sha256": "1d2bf185cbfc3a6c6c335a3c3c4768198125ed11cba866b6a00a31a66181461f"
+      "sha256": "4067762a96f641e3ea7cb1c77bb6b6a3262e380a488c025de23a5bf3533b8699"
     },
     {
       "cid": "bafyreifxa7jgri55ffokvxuynttoqd6vzindwjgxlrqdqhq5f2f4e7i5je",
@@ -182,9 +182,9 @@
       "sha256": "c2b024386b746578e571c91085af09b8767b85e09862b733bd1c3f572ec99e44"
     },
     {
-      "cid": "bafyreifhnownr54vet2p4k57w5lbicqtj7r7pty5kmrhg7rbezzmcqwwqm",
+      "cid": "bafyreidxoqfiefd2udx6vr355wlomdof2rygmd5uyfyxtcxrpuaegxzqxy",
       "path": "protocol/assertions.json",
-      "sha256": "a76bacd8f79524f4fe2bbfb756140a134fe3f7cf1d5322737e212672c142d683"
+      "sha256": "77740a82147aa0efeac77ded96e60dc5d470660fb4c171798af17d00435f30be"
     },
     {
       "cid": "bafyreihe7ooqwferljwsjhr7iu52n2hdu4tovs67btlxo5miz7gyofi5bu",
@@ -212,9 +212,9 @@
       "sha256": "c1bbc14c92cea6bd66ff6cb54fdcf91bf3072f66adee7027f1d3f42e70fe1825"
     },
     {
-      "cid": "bafyreibu7rx5ncch6azzhodkuv6sdnkf326qxlb7bmzqyxp3edrkhi6wue",
+      "cid": "bafyreiguta3kfftyquilqmmrhl2c7fsusv7spukltfr6puzyjp7j27lkcy",
       "path": "protocol/data_contracts.json",
-      "sha256": "34fc6fd68847f03393b86aa57d21b545debd0bac3f0b330c5dfb20e2a3a3d6a1"
+      "sha256": "d49836a296788510b831913af42f9654957f27d14b9963e7d3384bfe9d7d6a16"
     },
     {
       "cid": "bafyreib7g2mjlq65lfdnqj2tnejuhvbmrig3fyn4cgfv6r4fejzqyxwqam",

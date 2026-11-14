@@ -23,6 +23,8 @@
 - [docs/production/THREAT_MODEL.md](../docs/production/THREAT_MODEL.md)（生产平面威胁模型人读面：边界/STRIDE/失败矩阵 + 状态词表 + 不承诺边界）
 - [docs/qa/PRIVACY_QA.md](../docs/qa/PRIVACY_QA.md)（隐私 QA：数据地图/删除证据/PII 扫描/保留约束的判据与实测；配套 `PRIVACY.md` + `protocol/privacy.json`）
 - [ops/drills.json](ops/drills.json)（运维演练报告：桌面演练 4 级 + 恢复闭环 + 披露口径 + 供应商退出就绪；判据 `test_ops_contract.py`，配套 `docs/security/INCIDENT_RESPONSE.md`/`docs/sre/`/`docs/legal/VENDORS.md`）
+- [docs/ai/AI_GOVERNANCE.md](../docs/ai/AI_GOVERNANCE.md) · [docs/eval/EVAL_PROTOCOL.md](../docs/eval/EVAL_PROTOCOL.md)（AI 影响评估/模型风险/监管映射 + 评测效度协议；真源 `protocol/{ai_governance,eval_validity}.json`，判据 `test_ai_eval_contract.py`）
+- [eval/interrater_sample.json](eval/interrater_sample.json)（inter-rater 样本：12 条双评；Cohen's kappa 由 `core.eval_validity.interrater` 现算）
 
 ## 互操作导出面（入仓投影）
 

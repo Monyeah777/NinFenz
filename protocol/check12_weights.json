@@ -10,6 +10,7 @@
     "test_agents_contract": 0.2,
     "test_ai_channel_spec_contract": 0.5,
     "test_ai_domain_closure": 0.2,
+    "test_ai_eval_contract": 0.3,
     "test_ai_menu_contract": 0.3,
     "test_ai_menu_fieldtest_contract": 0.2,
     "test_ai_routing_contract": 0.3,
@@ -745,6 +746,15 @@
     "test_ai_domain_closure.OrderingTest.test_declared_course_order_has_no_violation": 0.0,
     "test_ai_domain_closure.OrderingTest.test_declared_directory_order_does_violate": 0.0,
     "test_ai_domain_closure.OrderingTest.test_declared_guide_order_violation_is_the_eval_reliability_edge": 0.0,
+    "test_ai_eval_contract.AiEvalContractTest.test_ai_claims_restricted_and_no_overclaim": 0.0,
+    "test_ai_eval_contract.AiEvalContractTest.test_concrete_protocol_preregistered": 0.0,
+    "test_ai_eval_contract.AiEvalContractTest.test_countermetric_wiring": 0.0,
+    "test_ai_eval_contract.AiEvalContractTest.test_docs_present_and_cross_consistent": 0.0,
+    "test_ai_eval_contract.AiEvalContractTest.test_interrater_kappa": 0.0,
+    "test_ai_eval_contract.AiEvalContractTest.test_mutations_red": 0.01,
+    "test_ai_eval_contract.AiEvalContractTest.test_no_runtime_scoring": 0.0,
+    "test_ai_eval_contract.AiEvalContractTest.test_registries_valid": 0.0,
+    "test_ai_eval_contract.AiEvalContractTest.test_risk_register_rules": 0.0,
     "test_ai_menu_contract.AiMenuContractTest.test_contract_catches_broken_menu": 0.05,
     "test_ai_menu_contract.AiMenuContractTest.test_facts_match_sources": 0.0,
     "test_ai_menu_contract.AiMenuContractTest.test_menu_matches_contract": 0.01,
@@ -6186,5 +6196,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2143.0
+  "total_s": 2143.3
 }

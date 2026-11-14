@@ -20,6 +20,11 @@
       "max_fn_cc": 11,
       "max_fn_lines": 20
     },
+    "desktop/src/core/ai_governance.py": {
+      "lines": 132,
+      "max_fn_cc": 42,
+      "max_fn_lines": 69
+    },
     "desktop/src/core/allowlist_expiry.py": {
       "lines": 50,
       "max_fn_cc": 8,
@@ -414,6 +419,11 @@
       "lines": 343,
       "max_fn_cc": 36,
       "max_fn_lines": 70
+    },
+    "desktop/src/core/eval_validity.py": {
+      "lines": 162,
+      "max_fn_cc": 53,
+      "max_fn_lines": 76
     },
     "desktop/src/core/evidence.py": {
       "lines": 1891,
