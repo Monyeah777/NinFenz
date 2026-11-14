@@ -50,7 +50,7 @@
 | DT-02 | 删中间 step | A2 链失败 | prev / seq（trust/process、session_journal、records、transparency_log） | `test_trust_process.py`、`test_meta_cockpit.py`、`test_cognition_workspace.py` | T0 已有 |
 | DT-03 | 删尾并重算本地 digest | A3 锚失败 | 外部锚点核对（证据包面）；链头签名未建（G2） | `test_evidence.py` + 计划 test_process_tail_delete（OPEN-G2） | T0 部分 |
 | DT-04 | 跨 bundle 拼接 claim | splice 失败 | `desktop/src/core/trust/bundle.py`（bundle_id/index 全进叶预像） | `test_trust_bundle.py`（cross-bundle splice 负例） | T0 部分（结构面已覆盖；签名/锚在 G2） |
-| DT-05 | 替换 model-card | claim 失效 | A4 类型绑定（G3） | 计划 test_model_card_binding（OPEN-G3） | OPEN-G3 |
+| DT-05 | 替换 model-card | claim 失效 | model card 摘要绑定（nf-model-card/1）；模型摘要变 → MODEL-REPLACED，评测协议变 → EVAL-PROTOCOL-CHANGED | `test_trust_model_card.py`（含重发卡仍有效的正例） | T0/T1（绑定判定已实现；评测本身不在本仓） |
 | DT-06 | 撤销后旧签名 | 验证失败 / 降级报告 | `desktop/src/core/revocations.py`、`desktop/src/core/trust_anchor.py` | `test_revocations.py`、`test_trust_anchor.py` | T1 部分 |
 | DT-07 | TSA 时间回拨 | token 失败 | `desktop/src/core/timestamp.py`（verify）（摘要绑定 + CA 链；>1 MiB 拒收） | `test_timestamp.py` | T2 部分 |
 | DT-08 | 无锚声称 T3 / T4 | 报告失败 + 文档红 | `protocol/trust/policy.schema.json` 的 required_level；本文禁止过度声明 | 计划 test_trust_policy_level（OPEN-G2）+ `test_trust_threat_model_doc_contract.py` | OPEN-G2 |
@@ -64,7 +64,7 @@
 | TB-03 | 进程 ↔ 透明日志 / 见证 | STH / 签名 | 分裂视图、共谋、重放 | `desktop/src/core/key_transparency.py`（一致性 + split_witness）；外部见证未建 | T1 部分（OPEN-G4） |
 | TB-04 | 进程 ↔ MCP 客户端 | 工具参数 | 注入、越权、超长、控制字符 | `desktop/src/core/trust_boundary.py`（check_arguments）（fail-closed） | T0 已有 |
 | TB-05 | 本地 ↔ 外部材料 | 文档 / 网页 | prompt injection、角色伪造 | `desktop/src/core/trust_boundary.py`（detect / envelope） + 外来面前缀 | T0 已有 |
-| TB-06 | 模型 / 数据 ↔ 证据 | model card / eval | 模型替换、评测伪造、数据漂移 | `desktop/src/core/eval_harness.py`（预注册 / 禁 score / synthetic 不作证据）；model card 未建 | T0 部分（OPEN-G3） |
+| TB-06 | 模型 / 数据 ↔ 证据 | model card / eval | 模型替换、评测伪造、数据漂移 | `desktop/src/core/eval_harness.py`（预注册 / 禁 score / synthetic 不作证据）；`desktop/src/core/trust/model_card.py`（nf-model-card/1：model_digest + 评测协议摘要 + pinned 语义） | T0（预注册/禁 score + 模型卡绑定；评测质量本身不判） |
 
 ## 密钥与信任根（计划 §9.4）
 
@@ -85,7 +85,7 @@
 | 某时点已存在 | 部分 | RFC 3161 token 可离线验；未自动锚到 trust 链头（OPEN-G2） | T2 面 |
 | 写入后不可否认（不可抵赖） | 不能 | 无外部见证 / 公共日志；本仓不提供该性质 | — |
 | 内容真实 / 合规 | 不能 | 不跑模型、不做内容判定；只提供工程证据 | — |
-| 模型身份 / 评测绑定 | 不能 | model card 未建（OPEN-G3） | — |
+| 模型身份 / 评测绑定 | 不能 | 只把「模型卡摘要 + 评测协议摘要」绑定进证据；**不判模型质量/数据质量**（model_card.py） | — |
 | 私钥不外泄 | 部分 | 本机文件权限纪律 + CI 密钥扫描；无 keygen/0600 强制（OPEN-G2） | — |
 
 ## 红队回合（计划 §13.5）
@@ -119,7 +119,7 @@
 
 - **OPEN-G1（已关闭，2026-11-14）**：claim 级 bundle（含 splice 负例）、nf-process/1 prev 链、cc_verify 骨架、check45 接线与 §13 自审计均已落地（证据：results/trust/SELF_AUDIT.json，P0=0）；后续缺口转 OPEN-G2。
 - **OPEN-G2（已关闭，2026-11-14）**：DSSE / issuer registry / 外部锚核验 / 链头签名接口 / check46 组合门禁均已落地（G2 退出判据）；余项显式转记：自动锚定编排与 trust store 多根/类型权限合一 → OPEN-G3；T3 witness 语句外部化 / 公共锚 / keygen 与 0600 强制 → OPEN-G4。
-- **OPEN-G3**：类型注册表与组合 admissibility 已完成（WP-30）；余下：model card、prompt/context lineage、签名人类复核；另有 G2 转入的自动锚定编排与 trust store 多根/类型权限合一。
+- **OPEN-G3**：类型注册表与组合 admissibility（WP-30）、model card 绑定（WP-31）已完成；余下：prompt/context lineage、签名人类复核；另有 G2 转入的自动锚定编排与 trust store 多根/类型权限合一。
 - **OPEN-G4**：外部见证（STH/witness）、公共锚（Sigstore/Rekor/公共 TSA）、独立 verifier parity。
 
 ## 现状对照

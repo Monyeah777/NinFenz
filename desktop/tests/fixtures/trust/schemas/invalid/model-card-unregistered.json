@@ -1,0 +1,14 @@
+{
+  "schema": "nf-model-card/1",
+  "model_id": "nf-reasoner-7b",
+  "model_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "provider": "NF Lab",
+  "prompt_context_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "eval_protocol": {
+    "protocol_id": "eval-v1",
+    "protocol_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "pre_registered": false,
+    "score_forbidden": true
+  },
+  "issued_at": "2026-11-14T00:00:00Z"
+}

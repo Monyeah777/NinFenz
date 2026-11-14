@@ -27,6 +27,7 @@ from core.trust import anchor as ta  # noqa: E402
 from core.trust import dsse  # noqa: E402
 from core.trust import entity as te  # noqa: E402
 from core.trust import keys as tk  # noqa: E402
+from core.trust import model_card as tmc  # noqa: E402
 from core.trust import verify as tv  # noqa: E402
 
 
@@ -138,6 +139,9 @@ def main(argv=None) -> int:
                     help="注册表口径的判定时刻（UTC 秒级，必填；不隐式取墙钟）")
     ap.add_argument("--entities", default="", help="类型化实体 JSON 数组（组合/准入模式）")
     ap.add_argument("--type-registry", default="", help="nf-type-registry/1 类型注册表")
+    ap.add_argument("--model-card", default="", help="nf-model-card/1 模型卡（可选）")
+    ap.add_argument("--current-card", default="", help="当前模型卡（用于检测模型替换/评测变更）")
+    ap.add_argument("--ai-evidence", default="", help="AI 证据实体 JSON（绑定模式）")
     ap.add_argument("--root", default=str(ROOT), help="仓库根（读冻结 schema 用）")
     ap.add_argument("--json", action="store_true", help="输出 nf-verify/1 报告 JSON")
     ap.add_argument("--out", default="", help="把报告写入文件（原子写）")
@@ -153,6 +157,25 @@ def main(argv=None) -> int:
     ap.add_argument("--witness-material", default="", help="witness hmac 材料 {id: hex}")
     ap.add_argument("--sth-material", default="", help="STH hmac 材料 {log_id: hex}")
     args = ap.parse_args(argv)
+    if args.ai_evidence:
+        if not args.model_card:
+            print("不可判定：--ai-evidence 模式需要 --model-card", file=sys.stderr)
+            return tv.EXIT_UNDECIDABLE
+        try:
+            evidence = _load(args.ai_evidence, "ai evidence")
+            bound = tmc.load_card(args.model_card)
+            current = tmc.load_card(args.current_card) if args.current_card else None
+            schema = tmc.load_schema(args.root)
+        except (OSError, ValueError) as exc:
+            print(f"不可判定：{exc}", file=sys.stderr)
+            return tv.EXIT_UNDECIDABLE
+        result = tmc.check_binding(evidence, bound, current, schema)
+        if result.get("ok"):
+            print(f"valid model-card binding: {result['bound_digest']}"
+                  + (f"（warning: {result['warning']}）" if result.get("warning") else ""))
+            return 0
+        print(f"invalid model-card binding: {result.get('reason')}")
+        return 1
     if args.entities:
         if not args.type_registry or not args.policy or not args.issuer_registry:
             print("不可判定：--entities 模式需要 --type-registry/--policy/--issuer-registry",

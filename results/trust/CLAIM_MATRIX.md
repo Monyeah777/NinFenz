@@ -25,7 +25,7 @@
 | 16 | DSSE/PAE 签名信封（≥1 有效签名、keyid 可解析） | `desktop/src/core/trust/dsse.py`（PAE + nf-dsse/1；算法白名单 hmac-sha256 / ed25519 / ecdsa-p256，后两者可插拔回调）+ `desktop/tests/test_trust_dsse.py` | `pae` 族向量逐条一致；信封签/验 + 篡改矩阵（载荷/签名/keyid/算法越界/算法不符） | T1 | SUPPORTED（G2 WP-20；issuer 注册/轮换/吊销接线 = WP-21） |
 | 17 | 跨 bundle 拼接被拒（splice 防护） | `desktop/src/core/trust/bundle.py`（叶预像含 bundle_id/index） | `test_trust_bundle.py` cross-bundle splice 负例 | T1 | SUPPORTED |
 | 18 | 未知实体类型/越权组合 fail-closed（typed entity） | `protocol/trust/type-registry.schema.json` + `desktop/src/core/trust/entity.py`（typed_admissibility：issuer 注册 kind/显式授权/有效期/refs 数量类别重复自引；composition_check：ref 可解析 + compose_with 类型对 + DAG/深度有界） | `test_trust_types.py`（19 条：注册表语义 + 准入矩阵 + 组合/DAG/深度 + CLI + 规则移除变异自证） | T1 | SUPPORTED（G3 WP-30） |
-| 19 | 模型替换使旧 AI 证据失效（model card 绑定） | 计划 `core/ai_trust/`（未建） | — | — | TODO（G3） |
+| 19 | 模型替换使旧 AI 证据失效（model card 绑定） | `protocol/trust/model-card.schema.json` + `desktop/src/core/trust/model_card.py`（card_digest 绑定 + pinned 语义 pre_registered/score_forbidden + MODEL-REPLACED / EVAL-PROTOCOL-CHANGED / CARD-REISSUED） | `test_trust_model_card.py`（11 条：pinned 语义 + 绑定矩阵 + 模型替换/评测变更/重发卡 + CLI + schema const 弱化变异自证） | T1 | SUPPORTED（G3 WP-31） |
 | 20 | 报告给出等级 + 缺项 + 修复指引 + 信任根（`nf-verify/1`） | `desktop/src/core/trust/verify.py` | `test_trust_verify.py`（11 条：level 向量 + 四场景退出码 + schema + CLI） | T0 骨架（签名/锚事实 G2） | SUPPORTED |
 | 21 | Python ↔ .NET（引擎线）逐字节 parity（trust 面） | 计划；.NET 引擎线未接 | — | — | TODO（G3/G4；本机无 SDK，见 BASELINE §7） |
 | 22 | trust 层 7 件 IDL 结构 fail-closed（未知字段/封闭词表/摘要/时间/base64 形状） | `protocol/trust/*.schema.json`（7 件） | `test_trust_schemas.py`（23 条：正/反样例 + 变异自证） | T0 | SUPPORTED |
@@ -43,6 +43,6 @@
 
 | 33 | 链头/卡/事件签名语句绑定（nf-chain-head/1；错 kind/digest 必拒；registry 吊销/过期则 T1 失守） | `protocol/trust/chain-head.schema.json` + `desktop/src/core/trust/signature.py` | `test_trust_signature.py`（14 条：语句绑定 + 生命周期 + 篡改 + 真签名+真 TSA 端到端 T2） | T1 | SUPPORTED（G2 WP-23） |
 
-**本轮判定**：`UNSUPPORTED` = 0（本轮抽检范围内）；`TODO` 2 条（19/21）落在计划 G3–G4 的工作包内；claim #15/#16/#18/#32/#33 均已 SUPPORTED（WP-20/22/23/30），不构成文档过度声明。
+**本轮判定**：`UNSUPPORTED` = 0（本轮抽检范围内）；`TODO` 1 条（21）落在计划 G4 的工作包内；claim #15/#16/#18/#19/#32/#33 均已 SUPPORTED（WP-20/22/23/30/31），不构成文档过度声明。
 
 *维护纪律：新增 claim 必须同时补代码锚点与测试，再改状态；不得先写 SUPPORTED 后补测试。*

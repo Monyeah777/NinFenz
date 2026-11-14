@@ -5,8 +5,8 @@
     "floor": 5,
     "prod": 1057,
     "projection": 167,
-    "support": 473,
-    "verify": 1336
+    "support": 475,
+    "verify": 1340
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7433,6 +7433,18 @@
       "rule": "R-verify"
     },
     {
+      "function": "nf-model-card/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/model-card-bad-digest.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-model-card/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/model-card-unregistered.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "nf-trust-policy/1",
       "path": "desktop/tests/fixtures/trust/schemas/invalid/policy-level-t5.json",
       "role": "verify",
@@ -7513,6 +7525,12 @@
     {
       "function": "nf-issuer-registry/1",
       "path": "desktop/tests/fixtures/trust/schemas/valid/keys.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-model-card/1",
+      "path": "desktop/tests/fixtures/trust/schemas/valid/model-card.json",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -11201,13 +11219,19 @@
       "rule": "R-verify"
     },
     {
+      "function": "trust.model_card 判据：模型卡 pinned 语义 + AI 证据绑定 + 模型替换/评测变更失效。",
+      "path": "desktop/tests/test_trust_model_card.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "trust.process 判据：process 向量族逐条 + prev 链/seq/创世约定 + 删改重排反例。",
       "path": "desktop/tests/test_trust_process.py",
       "role": "verify",
       "rule": "R-verify"
     },
     {
-      "function": "Trust Fabric schema 门禁（WP-01/21/23/30）：10 件 IDL、正/反样例与变异自证。",
+      "function": "Trust Fabric schema 门禁（WP-01/21/23/30/31）：11 件 IDL、正/反样例与变异自证。",
       "path": "desktop/tests/test_trust_schemas.py",
       "role": "verify",
       "rule": "R-verify"
@@ -14400,16 +14424,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "27fd12b51b3391adef3797311d04fbaac42cf03a462bfbe39ad489c17df93b40",
+  "root_digest": "103da70299393233f5c08606aa64de77088029c69e0a277fbec0ec380630cbf1",
   "rule_counts": {
     "R-app": 1468,
-    "R-catch": 321,
+    "R-catch": 323,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 147,
     "R-support": 124,
-    "R-verify": 1210,
+    "R-verify": 1214,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"
