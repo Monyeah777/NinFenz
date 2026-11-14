@@ -13,6 +13,7 @@
     "test_ai_channel_spec_contract": 0.5,
     "test_ai_domain_closure": 0.2,
     "test_ai_eval_contract": 0.3,
+    "test_ai_evidence_contract": 0.2,
     "test_ai_menu_contract": 0.3,
     "test_ai_menu_fieldtest_contract": 0.2,
     "test_ai_routing_contract": 0.3,
@@ -800,6 +801,16 @@
     "test_ai_eval_contract.AiEvalContractTest.test_no_runtime_scoring": 0.0,
     "test_ai_eval_contract.AiEvalContractTest.test_registries_valid": 0.0,
     "test_ai_eval_contract.AiEvalContractTest.test_risk_register_rules": 0.0,
+    "test_ai_evidence_contract.AIEvidenceContractTest.test_approved_state": 0.0,
+    "test_ai_evidence_contract.AIEvidenceContractTest.test_claims_boundary": 0.0,
+    "test_ai_evidence_contract.AIEvidenceContractTest.test_committed_equals_live": 0.0,
+    "test_ai_evidence_contract.AIEvidenceContractTest.test_eval_digest_mismatch": 0.0,
+    "test_ai_evidence_contract.AIEvidenceContractTest.test_lineage_binds_identity": 0.0,
+    "test_ai_evidence_contract.AIEvidenceContractTest.test_missing_review_pending": 0.0,
+    "test_ai_evidence_contract.AIEvidenceContractTest.test_registry_and_check_green": 0.0,
+    "test_ai_evidence_contract.AIEvidenceContractTest.test_reject_and_escalate_states": 0.0,
+    "test_ai_evidence_contract.AIEvidenceContractTest.test_review_binding_mismatch": 0.0,
+    "test_ai_evidence_contract.AIEvidenceContractTest.test_tampered_lineage_invalid": 0.0,
     "test_ai_menu_contract.AiMenuContractTest.test_contract_catches_broken_menu": 0.05,
     "test_ai_menu_contract.AiMenuContractTest.test_facts_match_sources": 0.0,
     "test_ai_menu_contract.AiMenuContractTest.test_menu_matches_contract": 0.01,
@@ -6407,5 +6418,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2179.6
+  "total_s": 2179.8
 }

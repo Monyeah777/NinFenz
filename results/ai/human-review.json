@@ -1,0 +1,13 @@
+{
+  "decision": "approve",
+  "rationale": "sample 证据链绑定复核（approve）",
+  "reviewed_at": "2026-11-15T00:05:00Z",
+  "reviewer": {
+    "issuer_id": "nf:local:reviewer",
+    "keyid": "nf:local:reviewer:ed25519-2026",
+    "kind": "human"
+  },
+  "schema": "nf-human-review/1",
+  "subject_digest": "71c86e9898e7c7fd5bf96bab0a997d9a1f234b84e374cad2189e06f8608d0649",
+  "subject_kind": "card"
+}

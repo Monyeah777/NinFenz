@@ -1118,6 +1118,21 @@
       "message": "G3 DoD 收口审计缺失或版本名不符（Gate 准入判据依赖它）",
       "fix": "补/修 results/g3_dod.json；再跑 test_g3_dod",
       "evidence": "test_g3_dod / conformance::modeling"
+    },
+    {
+      "id": "ai-evidence",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "protocol/ai_evidence.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-ai-evidence/1"
+      },
+      "message": "AI 证据链登记缺失或版本名不符（WP-40 判据依赖它）",
+      "fix": "补/修 protocol/ai_evidence.json；再跑 test_ai_evidence_contract",
+      "evidence": "test_ai_evidence_contract / conformance::modeling"
     }
   ]
 }

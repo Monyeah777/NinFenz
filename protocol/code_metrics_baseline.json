@@ -30,6 +30,11 @@
       "max_fn_cc": 11,
       "max_fn_lines": 20
     },
+    "desktop/src/core/ai_evidence.py": {
+      "lines": 197,
+      "max_fn_cc": 18,
+      "max_fn_lines": 38
+    },
     "desktop/src/core/ai_governance.py": {
       "lines": 132,
       "max_fn_cc": 42,

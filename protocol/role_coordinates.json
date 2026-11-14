@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1505,
+    "app": 1506,
     "entry": 26,
     "floor": 5,
     "prod": 1067,
-    "projection": 217,
+    "projection": 220,
     "support": 511,
-    "verify": 1434
+    "verify": 1437
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -5705,6 +5705,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "AI 证据链（WP-40，G4）：模型卡 / 上下文血缘 / 人类复核 三件绑定与拒收。",
+      "path": "desktop/src/core/ai_evidence.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "AI 治理登记（`nf-ai-governance/1`）：影响评估 + 模型风险 + 监管映射，逐条可核。",
       "path": "desktop/src/core/ai_governance.py",
       "role": "prod",
@@ -7891,6 +7897,12 @@
     {
       "function": "AI 治理 + 评测效度契约（NF-Final WP-0F，P0 盲区 BL-02/BL-05）。",
       "path": "desktop/tests/test_ai_eval_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "WP-40 AI 证据链判据（模型卡/血缘/人类复核绑定 + 拒收状态）。",
+      "path": "desktop/tests/test_ai_evidence_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -14447,6 +14459,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "NF-Final G4 WP-40 AI 证据链登记：模型卡（nf-model-card/1）/ 上下文血缘（nf-context-lineage/1）/ 人类复核（nf-human-review/1）三件绑定关系与拒收条件。纪律：AI 类交付必须有模型卡+预注册评测引用+血缘+人类复核 approve；缺一即 PENDING/拒收，不冒充通过。判据 desktop/tests/test_ai_evidence_contract.py。",
+      "path": "protocol/ai_evidence.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "NF-Final §3A D06 机读登记（WP-0F）：AI 面范围 + 影响评估 + 模型风险登记 + 监管映射 + 人类监督。原则：本仓是 AI 辅助的内容生产/装配系统，不是 AI 平台；**只做机制对照，不声称合规/认证**。判据 desktop/tests/test_ai_eval_contract.py。",
       "path": "protocol/ai_governance.json",
       "role": "verify",
@@ -15048,17 +15066,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "4f773b3afc32e37f72c79baec0c6af07de2680ffb8960d33de791f2fd68aec08",
+  "root_digest": "45b4386d391f1098ac716bc9b30d11ab84b72801751e3d2e066efe6e3f1631f9",
   "rule_counts": {
-    "R-app": 1505,
+    "R-app": 1506,
     "R-catch": 356,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 192,
+    "R-projection": 195,
     "R-support": 124,
-    "R-verify": 1303,
-    "auto:R-core": 310
+    "R-verify": 1305,
+    "auto:R-core": 311
   },
   "schema": "nf-role-coordinates/1"
 }

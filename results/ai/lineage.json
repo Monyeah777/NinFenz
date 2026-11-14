@@ -1,0 +1,22 @@
+{
+  "head": "6dabf10513ceab3147874df9c7c6f3c6b48340a9380902ff7eba337ca87fbc57",
+  "lineage_digest": "503f21e3ae8e6d5acc65551e49e9ad84e133b8dfc0cabf93fb038615ff5f89f6",
+  "model_card_digest": "8659d8239e087556b2bf457a0b9e1404080c611431d8ff1e0ab5db412eb92b04",
+  "schema": "nf-context-lineage/1",
+  "segments": [
+    {
+      "content_digest": "9ca44e4381ce46fe1e4e6d02d642070b1d40004b9eaf5fa178104c6302ff7244",
+      "digest": "c62ac9283460a261783a8536dd7685b208ef00ce8fd3eef443e7d5784b0b00a7",
+      "prev": "0000000000000000000000000000000000000000000000000000000000000000",
+      "role": "system",
+      "seq": 1
+    },
+    {
+      "content_digest": "ff1356ad2029aeea2b639bcf65560e11e64f4dd27f20c10dd398c8405c512e12",
+      "digest": "6dabf10513ceab3147874df9c7c6f3c6b48340a9380902ff7eba337ca87fbc57",
+      "prev": "c62ac9283460a261783a8536dd7685b208ef00ce8fd3eef443e7d5784b0b00a7",
+      "role": "user",
+      "seq": 2
+    }
+  ]
+}

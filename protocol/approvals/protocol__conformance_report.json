@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-15",
   "approved_by": "Monyeah777",
-  "note": "NF-Final G3 QG3 收口（verdict pass-with-open-items，P0=0）",
+  "note": "NF-Final G4 WP-40 AI 证据链（模型卡/血缘/复核绑定）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "b94bd1f5bfe6a0f5d5061d04fd308ed60d4795026c49982890310d7c26f95132"
+  "subject_digest": "e08d627a9b1af6a6cea72f7ee70e40eb9f8bc58ab369b5bc4920cef34c2b527e"
 }
