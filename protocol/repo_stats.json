@@ -1,7 +1,7 @@
 {
-  "baseline_checks": 53,
-  "baseline_pass": 97,
-  "check_label": "check1-44/45/46/47/48/49/50/51/52/53",
+  "baseline_checks": 54,
+  "baseline_pass": 101,
+  "check_label": "check1-44/45/46/47/48/49/50/51/52/53/54",
   "concept_graphs": 101,
   "core_modules": 13,
   "core_pipelines": [
@@ -29,6 +29,6 @@
   "standards_total": 370,
   "standards_unreachable": 38,
   "subdivisions_total": 1200,
-  "verify_checks": 53,
+  "verify_checks": 54,
   "verify_version": "2.35"
 }

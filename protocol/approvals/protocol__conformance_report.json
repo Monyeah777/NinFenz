@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-15",
   "approved_by": "Monyeah777",
-  "note": "NF-Final WP-52 质量报告收口 + 最终 Gate 审计（pass-with-open-items，P0=0）",
+  "note": "NF-Final G5 WP-54（收尾：check54 四断言）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "018cd48d6da170bf1a242b5011bab581a1dc3466672c02dcf8f3524011f8a9b8"
+  "subject_digest": "c3c427579a9388399776a55a7ff4dc8ba144086c3f58a07c537c368da86da788"
 }

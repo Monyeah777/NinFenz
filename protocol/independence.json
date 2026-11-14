@@ -49,6 +49,7 @@
       "context_packer",
       "contract_history",
       "contract_lifecycle",
+      "cq6_scorecard",
       "cq_scan",
       "delivery",
       "docs_claims",

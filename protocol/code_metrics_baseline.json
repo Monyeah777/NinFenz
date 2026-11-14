@@ -345,6 +345,11 @@
       "max_fn_cc": 15,
       "max_fn_lines": 37
     },
+    "desktop/src/core/cq6_scorecard.py": {
+      "lines": 296,
+      "max_fn_cc": 49,
+      "max_fn_lines": 113
+    },
     "desktop/src/core/cq_scan.py": {
       "lines": 417,
       "max_fn_cc": 35,

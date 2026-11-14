@@ -64,6 +64,24 @@ CQ1 自动扫描覆盖 A–E、G/H 的文本面（Rust/.NET 引擎只登记工�
 - **未做**：CQ2 人工高危审查（信任/治理/生产/密钥/路径/MCP）、CQ3 测试质量（覆盖/变异/负例/flaky）、CQ4 跨语言 parity、CQ5 文档/供应链、CQ6 评分卡与复审签署。
 - **不声称**：本报告不是「全仓质量全绿」结论；cosign/gitleaks/dotnet 缺失与未跑面（cargo/dotnet 构建）明确挂账。
 
+## CQ6 综合审查（评分卡）
+
+机读：`results/cq/cq6_scorecard.json`（`nf-cq6-scorecard/1`）· 登记：`protocol/cq6.json` · 基线：`results/cq/cq6_baseline.json` · 判据：`desktop/tests/test_cq6_scorecard.py` + verify `check54`。
+
+| 维度 | 权重 | 分 | 依据 |
+|---|---|---|---|
+| D1 正确性/契约一致 | 20% | 5 | verification_report fail=0 + conformance conformant |
+| D2 安全/健壮 | 20% | 4 | CQ P0=0；gitleaks/dotnet/cosign BLOCKED 扣分 |
+| D3 可维护性 | 15% | 3 | 存量 max_fn_cc 超阈值（棘轮冻结）+ hotspots |
+| D4 测试质量 | 15% | 4 | 判据面齐全；覆盖率/全仓变异未测（QD-06） |
+| D5 可移植/兼容 | 10% | 2 | Go↔Python parity/离线未见证明；dotnet BLOCKED |
+| D6 性能/资源 | 5% | 5 | 8 项预算记录、0 超预算 |
+| D7 文档/声明一致 | 10% | 5 | check53 文档 claims 全绿 |
+| D8 供应链/配置 | 5% | 3 | 依赖/CI 钉版有查；外部审计工具受限；AIBOM 在 |
+
+**总分 3.95 → C（红线未触发：min 维=2、P0=0）**；整改 9 项（owner=maintainers，状态 open）见评分卡 `remediation`。
+**复审签署：pending-human**——AI 不代签（§13C.3），人类复审签署是 OPEN 项（QD-09），不写成已签。
+
 ## 复核命令
 
 ```bash

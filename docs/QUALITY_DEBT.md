@@ -15,6 +15,9 @@
 | QD-06 | 测试质量 | P2 | 全仓 mutation score 未测（当前只有关键面抽样；`OPEN-MUT`） | qa | open | CQ3 / G5 |
 | QD-07 | 人工审查 | P2 | CQ2 人工高危审查（信任/治理/生产/密钥/路径/MCP）未做；CQ1 仅自动扫描 | maintainers | open | CQ2 |
 | QD-08 | 跨语言 | P2 | cargo/dotnet 构建门禁本轮未跑（`cargo` 可用但未构建；`dotnet` BLOCKED） | engine | open | CQ4 |
+| QD-09 | CQ6 | P2 | CQ6 复审签署未完成（AI 不代签，评分卡 signoff=pending-human） | author | open | 人工复审 |
+| QD-10 | CQ6 | P2 | 核心覆盖率/全仓 mutation score 未测（评分卡 D4 扣分；coverage 工具在，未接线） | qa | open | CQ3 / G5 |
+| QD-11 | CQ6 | P2 | Go↔Python parity 与离线验证未做（评分卡 D5=2；WP-51） | maintainers | open | WP-51 |
 
 ## 规则
 

@@ -2,127 +2,127 @@
   "claims": [
     {
       "doc": "README.md",
-      "expected": 97,
+      "expected": 101,
       "kind": "pass_count",
       "line": 127,
       "ok": true,
-      "value": 97
+      "value": 101
     },
     {
       "doc": "README.md",
-      "expected": "check1-44/45/46/47/48/49/50/51/52/53",
+      "expected": "check1-44/45/46/47/48/49/50/51/52/53/54",
       "kind": "check_label",
       "line": 127,
       "ok": true,
-      "value": "check1-44/45/46/47/48/49/50/51/52/53"
+      "value": "check1-44/45/46/47/48/49/50/51/52/53/54"
     },
     {
       "doc": "README.en.md",
-      "expected": 97,
+      "expected": 101,
       "kind": "pass_count",
       "line": 134,
       "ok": true,
-      "value": 97
+      "value": 101
     },
     {
       "doc": "README.en.md",
-      "expected": "check1-44/45/46/47/48/49/50/51/52/53",
+      "expected": "check1-44/45/46/47/48/49/50/51/52/53/54",
       "kind": "check_label",
       "line": 134,
       "ok": true,
-      "value": "check1-44/45/46/47/48/49/50/51/52/53"
+      "value": "check1-44/45/46/47/48/49/50/51/52/53/54"
     },
     {
       "doc": "README.ja.md",
-      "expected": 97,
+      "expected": 101,
       "kind": "pass_count",
       "line": 97,
       "ok": true,
-      "value": 97
+      "value": 101
     },
     {
       "doc": "README.ja.md",
-      "expected": "check1-44/45/46/47/48/49/50/51/52/53",
+      "expected": "check1-44/45/46/47/48/49/50/51/52/53/54",
       "kind": "check_label",
       "line": 97,
       "ok": true,
-      "value": "check1-44/45/46/47/48/49/50/51/52/53"
+      "value": "check1-44/45/46/47/48/49/50/51/52/53/54"
     },
     {
       "doc": "protocol/CONFORMANCE.md",
-      "expected": 97,
+      "expected": 101,
       "kind": "pass_count",
       "line": 20,
       "ok": true,
-      "value": 97
+      "value": 101
     },
     {
       "doc": "protocol/CONFORMANCE.md",
-      "expected": "check1-44/45/46/47/48/49/50/51/52/53",
+      "expected": "check1-44/45/46/47/48/49/50/51/52/53/54",
       "kind": "check_label",
       "line": 20,
       "ok": true,
-      "value": "check1-44/45/46/47/48/49/50/51/52/53"
+      "value": "check1-44/45/46/47/48/49/50/51/52/53/54"
     },
     {
       "doc": "protocol/CONFORMANCE.md",
-      "expected": 97,
+      "expected": 101,
       "kind": "pass_count",
       "line": 89,
       "ok": true,
-      "value": 97
+      "value": 101
     },
     {
       "doc": "protocol/CONFORMANCE.md",
-      "expected": "check1-44/45/46/47/48/49/50/51/52/53",
+      "expected": "check1-44/45/46/47/48/49/50/51/52/53/54",
       "kind": "check_label",
       "line": 89,
       "ok": true,
-      "value": "check1-44/45/46/47/48/49/50/51/52/53"
+      "value": "check1-44/45/46/47/48/49/50/51/52/53/54"
     },
     {
       "doc": "docs/meta/VERSION-MATRIX.md",
-      "expected": "check1-44/45/46/47/48/49/50/51/52/53",
+      "expected": "check1-44/45/46/47/48/49/50/51/52/53/54",
       "kind": "check_label",
       "line": 7,
       "ok": true,
-      "value": "check1-44/45/46/47/48/49/50/51/52/53"
+      "value": "check1-44/45/46/47/48/49/50/51/52/53/54"
     },
     {
       "doc": "docs/meta/VERSION-MATRIX.md",
-      "expected": 53,
+      "expected": 54,
       "key": "baseline_checks",
       "kind": "baseline_keys",
       "line": 7,
       "ok": true,
-      "value": 53
+      "value": 54
     },
     {
       "doc": "docs/meta/VERSION-MATRIX.md",
-      "expected": 97,
+      "expected": 101,
       "key": "baseline_pass",
       "kind": "baseline_keys",
       "line": 7,
       "ok": true,
-      "value": 97
+      "value": 101
     },
     {
       "doc": "docs/meta/VERSION-MATRIX.md",
-      "expected": 53,
+      "expected": 54,
       "key": "baseline_checks",
       "kind": "baseline_keys",
       "line": 48,
       "ok": true,
-      "value": 53
+      "value": 54
     },
     {
       "doc": "docs/meta/VERSION-MATRIX.md",
-      "expected": 97,
+      "expected": 101,
       "key": "baseline_pass",
       "kind": "baseline_keys",
       "line": 48,
       "ok": true,
-      "value": 97
+      "value": 101
     }
   ],
   "counts": {
@@ -132,10 +132,10 @@
     "violations": 0
   },
   "expected": {
-    "baseline_checks": 53,
-    "baseline_pass": 97,
-    "check_label": "check1-44/45/46/47/48/49/50/51/52/53",
-    "pass_count": 97
+    "baseline_checks": 54,
+    "baseline_pass": 101,
+    "check_label": "check1-44/45/46/47/48/49/50/51/52/53/54",
+    "pass_count": 101
   },
   "note": "期望值只来自 quality_baseline；committed == 实时重算",
   "schema": "nf-docs-claims-report/1",

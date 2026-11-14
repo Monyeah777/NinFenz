@@ -1,0 +1,192 @@
+{
+  "claims_boundary": [
+    "评分是由证据规则算出的当前快照，不是质量认证",
+    "未做的人工审查与外部工具保持 BLOCKED/OPEN，不写成通过"
+  ],
+  "dimensions": [
+    {
+      "evidence": [
+        "protocol/verification_report.json",
+        "protocol/conformance_report.json"
+      ],
+      "gaps": [],
+      "id": "D1",
+      "name": "正确性/契约一致",
+      "reason": "fail=0 且 conformance=conformant",
+      "score": 5,
+      "weight": 20
+    },
+    {
+      "evidence": [
+        "results/cq/scan.json",
+        "results/cq/toolchain.json"
+      ],
+      "gaps": [
+        "工具 BLOCKED：dotnet,cosign,gitleaks",
+        "gitleaks 不在场：秘密扫描未全覆盖"
+      ],
+      "id": "D2",
+      "name": "安全/健壮",
+      "reason": "P0=0；BLOCKED 工具如实扣分",
+      "score": 4,
+      "weight": 20
+    },
+    {
+      "evidence": [
+        "protocol/code_metrics_baseline.json",
+        "results/cq/hotspots.md"
+      ],
+      "gaps": [
+        "存量 max_fn_cc=132 > 阈值 25（已棘轮冻结，需登记热点 owner）"
+      ],
+      "id": "D3",
+      "name": "可维护性",
+      "reason": "复杂度在棘轮内但存在存量热点",
+      "score": 3,
+      "weight": 15
+    },
+    {
+      "evidence": [
+        "protocol/check12_weights.json"
+      ],
+      "gaps": [
+        "核心覆盖率未测（coverage 工具在，未接线为门禁指标）",
+        "全仓 mutation score 未测（QD-06），只有关键面抽样"
+      ],
+      "id": "D4",
+      "name": "测试质量",
+      "reason": "判据面齐全但覆盖/变异未全量测量",
+      "score": 4,
+      "weight": 15
+    },
+    {
+      "evidence": [
+        "clients/go",
+        "results/cq/toolchain.json"
+      ],
+      "gaps": [
+        "Go↔Python parity 未做（WP-51）",
+        "离线（无网）验证未系统化",
+        "dotnet BLOCKED：.NET 门禁未跑"
+      ],
+      "id": "D5",
+      "name": "可移植/兼容",
+      "reason": "跨实现/离线未证明，按红线附近给分",
+      "score": 2,
+      "weight": 10
+    },
+    {
+      "evidence": [
+        "protocol/perf_budget.json"
+      ],
+      "gaps": [],
+      "id": "D6",
+      "name": "性能/资源",
+      "reason": "预算内（8 项记录，0 超预算）",
+      "score": 5,
+      "weight": 5
+    },
+    {
+      "evidence": [
+        "results/docs_claims_report.json"
+      ],
+      "gaps": [],
+      "id": "D7",
+      "name": "文档/声明一致",
+      "reason": "文档 claims 与实测一致",
+      "score": 5,
+      "weight": 10
+    },
+    {
+      "evidence": [
+        "results/cq/toolchain.json",
+        "results/ai/aibom.cdx.json"
+      ],
+      "gaps": [
+        "工具链 BLOCKED：dotnet,cosign,gitleaks"
+      ],
+      "id": "D8",
+      "name": "供应链/配置",
+      "reason": "依赖钉版/CI 权限有检查；外部审计工具受限",
+      "score": 3,
+      "weight": 5
+    }
+  ],
+  "grade": "C",
+  "note": "评分由证据规则算出；committed == 实时重算",
+  "overall": 3.95,
+  "ratchet": {
+    "baseline_present": true,
+    "regressions": []
+  },
+  "red_lines": {
+    "capped": false,
+    "min_dimension": 2,
+    "p0": 0,
+    "rule": "任一维度 <2 → 总评封顶 C；存在未登记 P0 → 封顶 C，并进整改"
+  },
+  "remediation": [
+    {
+      "dimension": "D2",
+      "gap": "工具 BLOCKED：dotnet,cosign,gitleaks",
+      "owner": "maintainers",
+      "status": "open"
+    },
+    {
+      "dimension": "D2",
+      "gap": "gitleaks 不在场：秘密扫描未全覆盖",
+      "owner": "maintainers",
+      "status": "open"
+    },
+    {
+      "dimension": "D3",
+      "gap": "存量 max_fn_cc=132 > 阈值 25（已棘轮冻结，需登记热点 owner）",
+      "owner": "maintainers",
+      "status": "open"
+    },
+    {
+      "dimension": "D4",
+      "gap": "核心覆盖率未测（coverage 工具在，未接线为门禁指标）",
+      "owner": "maintainers",
+      "status": "open"
+    },
+    {
+      "dimension": "D4",
+      "gap": "全仓 mutation score 未测（QD-06），只有关键面抽样",
+      "owner": "maintainers",
+      "status": "open"
+    },
+    {
+      "dimension": "D5",
+      "gap": "Go↔Python parity 未做（WP-51）",
+      "owner": "maintainers",
+      "status": "open"
+    },
+    {
+      "dimension": "D5",
+      "gap": "离线（无网）验证未系统化",
+      "owner": "maintainers",
+      "status": "open"
+    },
+    {
+      "dimension": "D5",
+      "gap": "dotnet BLOCKED：.NET 门禁未跑",
+      "owner": "maintainers",
+      "status": "open"
+    },
+    {
+      "dimension": "D8",
+      "gap": "工具链 BLOCKED：dotnet,cosign,gitleaks",
+      "owner": "maintainers",
+      "status": "open"
+    }
+  ],
+  "schema": "nf-cq6-scorecard/1",
+  "signoff": {
+    "ai_may_sign": false,
+    "note": "AI 不能替代人类签署（§13C.3）；未签如实记 pending-human",
+    "owner": "author",
+    "required": true,
+    "status": "pending-human"
+  }
+}

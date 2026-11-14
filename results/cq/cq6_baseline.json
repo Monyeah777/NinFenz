@@ -1,0 +1,40 @@
+{
+  "schema": "nf-cq6-baseline/1",
+  "established": "2026-11-15",
+  "overall": 3.95,
+  "dimensions": [
+    {
+      "id": "D1",
+      "score": 5
+    },
+    {
+      "id": "D2",
+      "score": 4
+    },
+    {
+      "id": "D3",
+      "score": 3
+    },
+    {
+      "id": "D4",
+      "score": 4
+    },
+    {
+      "id": "D5",
+      "score": 2
+    },
+    {
+      "id": "D6",
+      "score": 5
+    },
+    {
+      "id": "D7",
+      "score": 5
+    },
+    {
+      "id": "D8",
+      "score": 3
+    }
+  ],
+  "note": "CQ6 首次评分基线（棘轮起点）；后续只许不降"
+}
