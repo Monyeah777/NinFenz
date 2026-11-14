@@ -83,6 +83,7 @@
       "supersedes": [],
       "evidence": [
         "protocol/trust/claim-bundle.schema.json",
+        "desktop/src/core/trust/bundle.py",
         "results/trust/trust_vectors.json",
         "desktop/tests/test_trust_vectors.py"
       ],
