@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1466,
+    "app": 1467,
     "entry": 26,
     "floor": 5,
     "prod": 1057,
     "projection": 165,
     "support": 455,
-    "verify": 1309
+    "verify": 1310
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -11087,6 +11087,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/trust/THREAT_MODEL.md 契约：STRIDE/删除矩阵/边界/红队/风险全绑定。",
+      "path": "desktop/tests/test_trust_threat_model_doc_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "tui/README.md 契约：TUI 说明的「动作数 / 区数 / 闸门三表 / 自检 6 条 / 退出码」与实跑一致。",
       "path": "desktop/tests/test_tui_readme_doc_contract.py",
       "role": "verify",
@@ -14238,16 +14244,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "5c53f6f47cb48805c3c51fe970c108660110f8266a4ff1063c488c70e399f7a6",
+  "root_digest": "fe00c12e45c7b50ce4c81149e5f94b0d1b9064ec5dd9a7574ad30a0e5b7f24cd",
   "rule_counts": {
-    "R-app": 1466,
+    "R-app": 1467,
     "R-catch": 303,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 145,
     "R-support": 124,
-    "R-verify": 1183,
+    "R-verify": 1184,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

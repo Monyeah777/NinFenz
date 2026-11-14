@@ -127,7 +127,8 @@
 - **ENV-03** 计划 §13.2 的 starter `nf-trust-self-audit.py` 未随计划提供（下载目录无此文件）→ 本轮用等效 grep/AST 命令；是否新增 `scripts/trust_self_audit.py` 在 G0 决定（计划 §13.2 建议）。
 - **ENV-04** 计划 §12.1.4 引用的 `scripts/refreeze.sh` 在本机不存在（`ls scripts | grep refreeze` 为空）→ 实仓等价入口为 `python scripts/nf.py release --freeze --apply --by <批准人> --note <说明>`（三步：conformance → approve → receipts，见 §2.1 实测）。
 - **WP-01 已完成（2026-11-14）**：`protocol/trust/` 7 件 schema（entity / dsse / process / claim-bundle / anchor / policy / verify）+ 正/反样例 22 件 + 判据 `desktop/tests/test_trust_schemas.py`（23 条，含变异自证与标准实现对照）。
-- **下一步（G0 余项）**：WP-02 威胁模型（`docs/trust/THREAT_MODEL.md`）→ WP-03 测试向量 → WP-04 ADR（按 §5 的 6 条偏差裁决落点）。
+- **WP-02 已完成（2026-11-14）**：`docs/trust/THREAT_MODEL.md`（STRIDE 8 行 / 删除·篡改 8 行 / 信任边界 6 条 / 红队 2 角色各 5 条 / ACCEPTED-RISK 4 条 / 已知缺口 OPEN-G1…G4）+ 判据 `desktop/tests/test_trust_threat_model_doc_contract.py`（3 条，含 7 项变异自证）。
+- **下一步（G0 余项）**：WP-03 测试向量 → WP-04 ADR（按 §5 的 6 条偏差裁决落点）。
 
 ## 8. 复跑命令
 
