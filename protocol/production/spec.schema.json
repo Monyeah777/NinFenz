@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/production/spec.schema.json",
+  "title": "NF 规范引用（nf-spec/1）",
+  "description": "规范引用：kind/ref/digest 三元组把任务钉到确定版本的真源；constraints 声明该 spec 的硬约束（WP-01 草案）。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "kind",
+    "ref",
+    "digest",
+    "constraints",
+    "version"
+  ],
+  "properties": {
+    "schema": {
+      "const": "nf-spec/1"
+    },
+    "kind": {
+      "enum": [
+        "protocol",
+        "module",
+        "pipeline",
+        "asset",
+        "domain",
+        "output"
+      ]
+    },
+    "ref": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*:[^\\s]+$"
+    },
+    "digest": {
+      "$ref": "#/$defs/digest"
+    },
+    "constraints": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    }
+  },
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

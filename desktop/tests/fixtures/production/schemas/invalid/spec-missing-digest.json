@@ -1,0 +1,9 @@
+{
+  "schema": "nf-spec/1",
+  "kind": "pipeline",
+  "ref": "pipeline:P00",
+  "constraints": [
+    "不得跳过质检门"
+  ],
+  "version": 1
+}

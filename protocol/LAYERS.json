@@ -633,6 +633,10 @@
       "scripts/sast_check.py": {
         "why": "SAST 计数基线冻结（--write；棘轮显式动作）",
         "artifact": "protocol/sast_baseline.json"
+      },
+      "desktop/src/core/independence.py": {
+        "why": "边界扫描报告落盘（--write/--check）：报告是派生投影，重算即恢复，不承载新事实",
+        "artifact": "results/independence.json"
       }
     }
   }

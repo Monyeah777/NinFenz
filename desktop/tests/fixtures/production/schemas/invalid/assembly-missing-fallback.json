@@ -1,0 +1,29 @@
+{
+  "schema": "nf-assembly/1",
+  "pipeline": "P00",
+  "steps": [
+    {
+      "id": "S01",
+      "module": "通用:M00",
+      "inputs": [
+        "requirement"
+      ]
+    }
+  ],
+  "modules": [
+    "通用:M00"
+  ],
+  "assets": [
+    "tech_rules"
+  ],
+  "output": {
+    "form": "md",
+    "path": "out/draft.md"
+  },
+  "checks": [
+    {
+      "id": "K-001",
+      "rule": "输出形态校验"
+    }
+  ]
+}

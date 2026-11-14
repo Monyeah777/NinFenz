@@ -540,7 +540,7 @@
     "test_scale_receipts": 2.0,
     "test_schema_lint": 1.1,
     "test_schema_pins": 0.1,
-    "test_schema_reference": 0.4,
+    "test_schema_reference": 1.5,
     "test_scorecard_workflow_contract": 0.2,
     "test_scratch": 0.3,
     "test_script_orphans": 1.1,
@@ -5083,6 +5083,17 @@
     "test_schema_lint.SchemaSubsetValidatorTest.test_type_and_required_catch": 0.0,
     "test_schema_pins.Test.test_drift": 0.0,
     "test_schema_pins.Test.test_validate_and_covers": 0.0,
+    "test_schema_reference.ProductionSchemaGateTest.test_all_five_present_and_exact": 0.0,
+    "test_schema_reference.ProductionSchemaGateTest.test_digest_pattern_single_source": 0.0,
+    "test_schema_reference.ProductionSchemaGateTest.test_fail_closed_by_default": 0.0,
+    "test_schema_reference.ProductionSchemaGateTest.test_id_schema_and_versioned_name": 0.0,
+    "test_schema_reference.ProductionSchemaGateTest.test_invalid_samples_rejected_with_expected_reason": 0.0,
+    "test_schema_reference.ProductionSchemaGateTest.test_mutation_self_proof": 0.0,
+    "test_schema_reference.ProductionSchemaGateTest.test_no_placeholder_debt": 0.0,
+    "test_schema_reference.ProductionSchemaGateTest.test_patterns_are_anchored": 0.0,
+    "test_schema_reference.ProductionSchemaGateTest.test_standard_validator_agrees": 0.03,
+    "test_schema_reference.ProductionSchemaGateTest.test_unknown_field_rejected_everywhere": 0.0,
+    "test_schema_reference.ProductionSchemaGateTest.test_valid_samples_pass_and_validator_supports_them": 0.0,
     "test_schema_reference.SchemaReferenceTest.test_representative_instance_matches_reference": 0.03,
     "test_schema_reference.SchemaReferenceTest.test_schema_files_valid_draft2020": 0.05,
     "test_scorecard_workflow_contract.ScorecardWorkflowContractTest.test_codeql_action_version_matches_codeql_workflow": 0.03,
@@ -6147,5 +6158,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2139.6
+  "total_s": 2140.7
 }

@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/production/assembly.schema.json",
+  "title": "NF 装配计划（nf-assembly/1）",
+  "description": "装配计划：pipeline + steps + modules/assets + output + checks + fallback；任一步骤失败按 fallback 处置，不得静默跳过（WP-01 草案）。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "pipeline",
+    "steps",
+    "modules",
+    "assets",
+    "output",
+    "checks",
+    "fallback"
+  ],
+  "properties": {
+    "schema": {
+      "const": "nf-assembly/1"
+    },
+    "pipeline": {
+      "type": "string",
+      "pattern": "^P[0-9]{2}$"
+    },
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/step"
+      }
+    },
+    "modules": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "assets": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "form"
+      ],
+      "properties": {
+        "form": {
+          "enum": [
+            "md",
+            "json",
+            "file",
+            "bundle"
+          ]
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "checks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/check"
+      }
+    },
+    "fallback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "on_failure"
+      ],
+      "properties": {
+        "on_failure": {
+          "enum": [
+            "abort",
+            "retry",
+            "degrade"
+          ]
+        },
+        "max_retries": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  },
+  "$defs": {
+    "step": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "module"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^S[0-9]{2}$"
+        },
+        "module": {
+          "type": "string",
+          "pattern": "^[^\\s:]+:[^\\s:]+$"
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "rule"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^K-[0-9]{3}$"
+        },
+        "rule": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/production/wiki-page.schema.json",
+  "title": "LLMWiki 页（nf-wiki-page/1）",
+  "description": "Wiki 是投影不是第二真源：每页必须带 spec_ref 与 provenance，引用 citations 非空；正文由真源编译，禁止手改（WP-01 草案）。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "id",
+    "type",
+    "summary",
+    "spec_ref",
+    "version",
+    "provenance",
+    "citations"
+  ],
+  "properties": {
+    "schema": {
+      "const": "nf-wiki-page/1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^wiki:[^\\s]+$"
+    },
+    "type": {
+      "enum": [
+        "protocol",
+        "module",
+        "pipeline",
+        "asset",
+        "domain"
+      ]
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "spec_ref": {
+      "$ref": "#/$defs/ref"
+    },
+    "machine_contract": {
+      "type": "object"
+    },
+    "relations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/relation"
+      }
+    },
+    "constraints": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "examples": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "llm_hints": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "digest"
+      ],
+      "properties": {
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "digest": {
+          "$ref": "#/$defs/digest"
+        }
+      }
+    },
+    "citations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/ref"
+      }
+    }
+  },
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "digest": {
+          "$ref": "#/$defs/digest"
+        }
+      }
+    },
+    "relation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "target"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "references",
+            "depends_on",
+            "implements",
+            "supersedes"
+          ]
+        },
+        "target": {
+          "type": "string",
+          "pattern": "^wiki:[^\\s]+$"
+        }
+      }
+    }
+  }
+}

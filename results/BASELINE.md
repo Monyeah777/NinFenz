@@ -5,6 +5,7 @@
 > ⛔ 操作指令：下文每条判定都附复跑命令；改本文件必须重跑命令并更新数字，不得照抄旧值。
 > 性质：结果/状态件（审计记录），不是规划件。审计对象 = **本机检出**，不是方案所基于的那次检出。
 > 更新（R3，2026-11-14）：WP-02/check49 收口 IN-01/IN-02（§5.5 与矩阵汇总已按实读更新；数字变化以复跑命令为准，见 §7）。
+> 更新（R5，2026-11-14）：WP-01 五件生产 schema（`nf-contract/1`、`nf-wiki-page/1`、`nf-spec/1`、`nf-task/1`、`nf-assembly/1`）落 `protocol/production/`，正/反样例与变异自证在 `test_schema_reference.py`；**只有契约层、仍无编译器/页面生成器**，故 PR-02/WK 系列状态不变（见 §5）。
 > 边界：本件是 `NF-Final` 方案的基线；`results/trust/BASELINE.md` 是 `NF-TrustFabric` 方案的基线。两份互不替代，数字各按各的复跑命令取用。
 
 ## 0. 结论（先行）
@@ -162,7 +163,7 @@ python -V; node -v; dotnet --list-sdks | head -1
 | ID | 级别 | 状态 | 本机等价锚点 | 测试/证据 | 缺口 → WP |
 |---|---|---|---|---|---|
 | PR-01 无治理完成交付 | MUST | PARTIAL | `scripts/nf.py run`（retrieve→compose→gate→export）、`core/pipeline.py`、`core/exporter.py` | `test_pipeline.py`、`test_exporter.py` | 无 core-only 安装矩阵；无交付事件；G2 |
-| PR-02 spec→task/assembly | MUST | ABSENT | `nf spec` 仅 registry 查询；无 `nf-spec/1`/`nf-task/1`/`nf-assembly/1` | — | G1/G2 |
+| PR-02 spec→task/assembly | MUST | ABSENT | **五件 schema 已落地**（`protocol/production/`：nf-contract/nf-wiki-page/nf-spec/nf-task/nf-assembly）；`nf spec` 仍仅 registry 查询，无 intent→spec→task 编译器 | `test_schema_reference.py`（13 例，含 5 类变异自证） | G1（WP-11 编译器） |
 | PR-03 有界任务槽位 | MUST | PARTIAL | `06_Agent执行协议.md`、`nf-task-profile/1`、`nf-task-handoff/1`、`core/injection_budget.py` | `test_agent_start_contract.py`、`test_injection_budget.py` | 无槽位越界拒绝测试；G1/G2 |
 | PR-04 生产事件（纯数据） | MUST | PARTIAL | 事件族 `nf-job-event/1`、`nf-external-events/1`、`protocol/event_registry.json` | 无专项测试 | 无 `nf-production-event/1`；G2 |
 | PR-05 2 Adapter 同 spec 可移植 | MUST | ABSENT | 7 个 `*adapter*` 模块（import/skill/mcp/mvu/ccv3/agent_rules/driver） | 各 adapter 单测在场 | 无「同 spec 双 adapter parity」判据；G2 |
