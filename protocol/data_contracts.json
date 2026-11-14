@@ -847,6 +847,19 @@
         "docs/CQ_REPORT.md",
         "docs/QUALITY_DEBT.md"
       ]
+    },
+    {
+      "id": "product-registry",
+      "artifact": "protocol/product.json",
+      "quality_rule": "assertion:product-registry",
+      "owner": "产品发现/GTM 假设（core/product.py + test_product_contract）+ WP-0A",
+      "status": "active",
+      "freshness": "假设/指标变化须同步 protocol/product.json 与 docs/product/*；外部访谈保持 unverified",
+      "consumers": [
+        "test_product_contract",
+        "docs/product/PRFAQ.md",
+        "docs/product/GTM.md"
+      ]
     }
   ]
 }

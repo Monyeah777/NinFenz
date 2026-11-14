@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:9a86928171c71f4a2d3d324508fdafccb60fd7cc8423d52197185214a40ea30f
-  - protocol/code_metrics_baseline.json:d0d49ab9784f70f9c7601b6c6a739551db6cf20bdfb08b580d270b6bd23163c8
+  - protocol/code_metrics_baseline.json:564ab0c9dc65b2fdbe959105024b317793d1f320d9de9431c83b12f092b634df
 ---
+> 重审（2026-11-14）：NF-Final WP-0A：新增 protocol/product.json、core/product.py、docs/product/{PRFAQ,GTM,INTERVIEWS}.md；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑
+
 > 重审（2026-11-14）：NF-Final WP-0H：新增 results/cq/*、core/cq_scan.py、scripts/cq_scan.py、docs/{CQ_REPORT,QUALITY_DEBT,REVIEW_CHECKLIST}.md；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑
 
 > 重审（2026-11-14）：NF-Final WP-0G：新增 results/assurance/CLAIMS.json、protocol/raid.json、core/assurance.py、docs/{assurance/ASSURANCE_CASE,RAID,ETHICS}；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑

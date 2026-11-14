@@ -6,6 +6,7 @@
 > 性质：结果/状态件（审计记录），不是规划件。审计对象 = **本机检出**，不是方案所基于的那次检出。
 > 更新（R3，2026-11-14）：WP-02/check49 收口 IN-01/IN-02（§5.5 与矩阵汇总已按实读更新；数字变化以复跑命令为准，见 §7）。
 > 更新（R5，2026-11-14）：WP-01 五件生产 schema（`nf-contract/1`、`nf-wiki-page/1`、`nf-spec/1`、`nf-task/1`、`nf-assembly/1`）落 `protocol/production/`，正/反样例与变异自证在 `test_schema_reference.py`；**只有契约层、仍无编译器/页面生成器**，故 PR-02/WK 系列状态不变（见 §5）。
+> 更新（R14，2026-11-14）：WP-0A 产品发现/价值框架落地——`docs/product/{PRFAQ,GTM,INTERVIEWS}.md` + `protocol/product.json`（问题/JTBD、4 条价值假设全部 unverified、指标+反指标、MVP 做/不做、支持分级/定价假设、访谈计划 3 槽位 planned-external）+ `core/product.py` + `test_product_contract.py`（6 例，7 类变异自证）；D01 None→Partial、D14 None→Partial（BL-06 框架达成；外部访谈/试点/LOI 属外部操作，OPEN-PRODUCT 未关）。
 > 更新（R13，2026-11-14）：WP-0H 全仓 CQ0/CQ1 落地——`docs/CQ_REPORT.md`（工具矩阵 13 件、3 件 BLOCKED：dotnet/cosign/gitleaks；CQ1 九维自动扫描）+ `docs/QUALITY_DEBT.md`（QD-01…08）+ `docs/REVIEW_CHECKLIST.md`（人工审查清单/记录模板）+ `results/cq/{toolchain,scan}.json` + `results/cq/findings.jsonl` + `results/cq/hotspots.md` + `core/cq_scan.py` + `scripts/cq_scan.py` + `test_cq_scan_contract.py`（10 例，6 类变异自证）；CQ1 结果 P0=0/P1=0，P2=54/P3=37，CC>15 存量 302 已棘轮冻结。
 > 更新（R12，2026-11-14）：WP-0G 保证案例 + RAID + 伦理落地——`docs/assurance/ASSURANCE_CASE.md`（GSN：C0–C3 目标 / A1–A8 论证，逐条 assumption+rebuttal+真实证据）+ `results/assurance/CLAIMS.json` + `docs/RAID.md` + `protocol/raid.json`（R-01…R-08 风险 + AS-01…03 假设 + I-01…05 问题 + D-01…03 依赖 + 干系人 + 变更控制）+ `docs/ETHICS.md`（VSD/IEEE 7000 价值冲突 EV-01…06）+ `core/assurance.py` + `test_assurance_contract.py`（7 例，7 类变异自证）；D16 None→Partial（BL-12 closure）、D17 补 RAID/干系人/变更控制。
 > 更新（R11，2026-11-14）：WP-0E 可访问性/i18n/人因落地——`A11Y.md` + `I18N.md` + `docs/a11y/A11Y_QA.md` + `docs/i18n/I18N_QA.md` + `protocol/{accessibility,i18n}.json` + `core/{accessibility,i18n_checks}.py` + `test_a11y_i18n_contract.py`（10 例，9 类变异自证）；WCAG 8 项/PAIR-HAX 6 条/可用性模板/违规预算 0；locale 3/入口 3/文档译件 6 组镜像 + source_sha256 + UTC/bidi 零命中 + RTL 策略；D10/D11 由 None 重估为 Partial（BL-08/BL-09 closure 条件满足）。
@@ -141,7 +142,7 @@ python -V; node -v; dotnet --list-sdks | head -1
 
 | # | 领域 | 方案判定 | 本机实读证据 | 重估 | closure（方案） |
 |---|---|---|---|---|---|
-| D01 | 产品发现/价值 | None | 无 PR/FAQ、无用户访谈、无价值假设件 | **None 成立** | WP-0A |
+| D01 | 产品发现/价值 | Partial | `docs/product/{PRFAQ,GTM,INTERVIEWS}.md` + `protocol/product.json`（3 JTBD、4 价值假设 unverified、指标/反指标、MVP、机会解决树、访谈计划/同意/问题脚本）+ `core/product.py` + `test_product_contract.py`；**3 次访谈与试点/LOI 属外部操作未执行（OPEN-PRODUCT）** | **重估为 Partial**（BL-06 框架达成；外部验证挂 OPEN） | WP-0A ✅/外部 |
 | D02 | 需求工程 | Partial | `01_核心协议.md` 415 行、`protocol/normative.json`、`nf-requirements/1`；无 RTM、无 ISO 25010 NFR 表 | **Partial 成立** | WP-01/0A |
 | D03 | 架构 | Partial | `docs/ccos/` 20 件、`decisions/` 3 件（含 2 件示例）；无质量属性场景/ATAM-lite、无 arc42 视图件 | **Partial 成立** | WP-02/04 |
 | D04 | 安全 | Partial | `SECURITY.md`（含私密披露通道与处理口径）、`docs/security/INCIDENT_RESPONSE.md`（IR runbook/分级/披露衔接）、`docs/trust/THREAT_MODEL.md`、`docs/production/THREAT_MODEL.md` + `protocol/boundaries.json`、`results/production/threat_vectors.json`、`protocol/ops.json`、`scripts/sast_check.py`、`core/trust_boundary.py`；仍无 ASVS/LLM Top10 映射 | **Partial 成立**（IR/披露面补齐；ASVS/LLM 映射仍缺） | WP-0D ✅/WP-0F |

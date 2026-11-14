@@ -1,0 +1,75 @@
+{
+  "schema": "nf-product/1",
+  "note": "NF-Final §3A D01/D14 机读登记（WP-0A）：问题/JTBD + 价值假设 + 成功指标/反指标 + MVP 范围 + GTM/支持/试点。纪律：外部访谈与试点属外部操作，当前全部为 unverified（OPEN-PRODUCT）；不伪造访谈结论、不以外部背书作为质量论据（STRATEGY §3）。判据 desktop/tests/test_product_contract.py。",
+  "problem": {
+    "statement": "AI 长内容生产不可验证、不可复现：同一需求换模型/换人产出质量漂移，声称无法被独立复核。",
+    "affected": ["内容生产者（作者/团队）", "需要复核交付物的人", "外部审查者"],
+    "jtbd": [
+      {"id": "J-01", "when": "要交付一篇长内容却无法保证跨模型一致", "want": "用契约把交付物与验收钉住", "so": "换模型/换人不掉质量"},
+      {"id": "J-02", "when": "需要证明交付物不是凭空生成", "want": "有可独立复算的证据链", "so": "外部审查者能复核"},
+      {"id": "J-03", "when": "团队里多人/多 Agent 并行生产", "want": "同一 spec 不同执行者产出可比较", "so": "协作不靠口头约定"}
+    ]
+  },
+  "value_hypotheses": [
+    {"id": "H-01", "hypothesis": "规范驱动（spec→task→assembly）能显著降低跨模型交付漂移",
+     "metric": "M-01", "countermetric": "CM-01", "status": "unverified", "owner": "product",
+     "evidence": ["protocol/production/task.schema.json", "docs/quickstart.md"]},
+    {"id": "H-02", "hypothesis": "离线可复算的证据链是外部复核的刚需",
+     "metric": "M-02", "countermetric": "CM-02", "status": "unverified", "owner": "product",
+     "evidence": ["docs/assurance/ASSURANCE_CASE.md", "scripts/cq_scan.py"]},
+    {"id": "H-03", "hypothesis": "五分钟上手能覆盖首次成功，不需要培训服务",
+     "metric": "M-03", "countermetric": "CM-03", "status": "unverified", "owner": "product",
+     "evidence": ["docs/quickstart.md", "scripts/quickstart_check.sh"]},
+    {"id": "H-04", "hypothesis": "用户愿意为「可验证交付」付可选服务费（不绑架开源核心）",
+     "metric": "M-04", "countermetric": "CM-02", "status": "unverified", "owner": "product",
+     "evidence": ["GOVERNANCE.md", "LEGAL.md"]}
+  ],
+  "metrics": [
+    {"id": "M-01", "name": "同 spec 跨模型交付差异", "definition": "同 spec/同任务在 ≥2 个 adapter 下产物通过同一契约校验的比例",
+     "direction": "higher-better", "source": "future：G2 parity 判据", "countermetric": "CM-01"},
+    {"id": "M-02", "name": "证据可独立复算率", "definition": "外部复现者按文档一次复算成功的比例",
+     "direction": "higher-better", "source": "future：CQ/QA 模板", "countermetric": "CM-02"},
+    {"id": "M-03", "name": "首次成功耗时", "definition": "新人按 quickstart 完成一次 verify 复跑的耗时与卡点",
+     "direction": "lower-better", "source": "docs/qa/A11Y_QA.md UT-01/02 模板", "countermetric": "CM-03"},
+    {"id": "M-04", "name": "可选服务转化（假设）", "definition": "试点转付费的比例（当前无数据，仅假设）",
+     "direction": "higher-better", "source": "future：外部试点（OPEN-PRODUCT）", "countermetric": "CM-02"}
+  ],
+  "countermetrics": [
+    {"id": "CM-01", "guards": "为降差异而过度约束、扼杀创作多样性", "measure": "产物多样性抽样 + 人工评审"},
+    {"id": "CM-02", "guards": "为转化/收入而降低开源核心或夸大保证", "measure": "许可/声明审计（legal/assurance 判据）"},
+    {"id": "CM-03", "guards": "为提速而跳过校验（假成功）", "measure": "门禁真实执行率 + 失败注入"}
+  ],
+  "mvp": {
+    "in_scope": ["协议/契约（01–07 + 生成器）", "生产/装配核心（P00 链）", "门禁与冻结链", "离线证据与复算", "五分钟上手"],
+    "out_of_scope": ["托管 SaaS", "团队协作 UI", "自动发布到第三方平台", "模型训练"],
+    "success_criteria": ["G2 生产黄金路径 E2E 可复跑", "外部审查者可独立复算证据", "五分钟上手无阻断"]
+  },
+  "gtm": {
+    "pricing_hypothesis": {"model": "MIT 免费开源；可选服务（试点/部署支持）未定价", "status": "unverified",
+                           "note": "不承诺价格/SLA；商业条款走 docs/legal/CONTRACTS.md 模板"},
+    "support_tiers": [
+      {"id": "ST-01", "tier": "community", "channel": "Issue/文档", "response": "尽力而为（不自称 SLA）"},
+      {"id": "ST-02", "tier": "best-effort", "channel": "维护者直联（试点期）", "response": "逻辑口径，无日历承诺"},
+      {"id": "ST-03", "tier": "paid-tbd", "channel": "合同（模板）", "response": "未定价、未开通（OPEN-PRODUCT）"}
+    ],
+    "pilot": {"status": "external-open", "note": "试点/LOI 属外部操作，本仓只提供模板与判据，不伪造结果（OPEN-PRODUCT）"}
+  },
+  "interviews": {
+    "target_count": 3,
+    "status": "planned-external",
+    "guide": "docs/product/INTERVIEWS.md",
+    "rule": "访谈记录属用户数据（DC-02 机密），只在本地经同意后保存；本仓不存访谈原文，不伪造结论",
+    "slots": ["I-01", "I-02", "I-03"]
+  },
+  "open_items": [
+    {"id": "OPEN-PRODUCT", "text": "3 次用户访谈 + 试点/LOI 属外部操作，未执行；假设全部 unverified",
+     "owner": "product", "status": "open"},
+    {"id": "OPEN-METRICS", "text": "M-01/M-02/M-04 尚无实测数据（依赖 G2 parity 与外部试点）",
+     "owner": "product", "status": "open"}
+  ],
+  "status_vocabulary": ["unverified", "hypothesis", "validated-external", "rejected", "accepted-risk"],
+  "claims_boundary": [
+    "不以外部背书/热度作为质量论据（STRATEGY §3）",
+    "未做访谈/试点前不写「已验证需求」；假设一律 unverified"
+  ]
+}

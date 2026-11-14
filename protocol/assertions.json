@@ -778,6 +778,21 @@
       "message": "CQ 扫描件缺失或版本名不符（WP-0H 判据依赖它）",
       "fix": "python scripts/cq_scan.py --run 重算；再跑 test_cq_scan_contract",
       "evidence": "test_cq_scan_contract / conformance::modeling"
+    },
+    {
+      "id": "product-registry",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "protocol/product.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-product/1"
+      },
+      "message": "产品发现登记缺失或版本名不符（WP-0A 判据依赖它）",
+      "fix": "补/修 protocol/product.json；再跑 test_product_contract",
+      "evidence": "test_product_contract / conformance::modeling"
     }
   ]
 }

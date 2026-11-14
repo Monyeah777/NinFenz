@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:bc114898836f914212cec64e0b22c7d3f93b8681557d82f845a200a85683b0cc
   - desktop/src/core/asset_contract.py:8e2fbc3954c771d6c2eb78d9cf47dcf22612b63b9b16929bd9013792f803f9a2
-  - protocol/code_metrics_baseline.json:d0d49ab9784f70f9c7601b6c6a739551db6cf20bdfb08b580d270b6bd23163c8
+  - protocol/code_metrics_baseline.json:564ab0c9dc65b2fdbe959105024b317793d1f320d9de9431c83b12f092b634df
 ---
+> 重审（2026-11-14）：NF-Final WP-0A：新增 protocol/product.json、core/product.py、docs/product/{PRFAQ,GTM,INTERVIEWS}.md；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑
+
 > 重审（2026-11-14）：NF-Final WP-0H：新增 results/cq/*、core/cq_scan.py、scripts/cq_scan.py、docs/{CQ_REPORT,QUALITY_DEBT,REVIEW_CHECKLIST}.md；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑
 
 > 重审（2026-11-14）：NF-Final WP-0G：新增 results/assurance/CLAIMS.json、protocol/raid.json、core/assurance.py、docs/{assurance/ASSURANCE_CASE,RAID,ETHICS}；assertions/data_contracts/independence/code_metrics/check12 更新，被审对象变更后机械重绑

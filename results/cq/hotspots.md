@@ -6,6 +6,7 @@
 |---|---|---|---|
 | `desktop\src\core\meta_cockpit\constrained_loop.py` | `run` | 99 | 117 |
 | `desktop\src\core\legal.py` | `validate` | 86 | 99 |
+| `desktop\src\core\product.py` | `validate` | 84 | 61 |
 | `desktop\src\core\pack_combo.py` | `combine` | 83 | 447 |
 | `desktop\src\core\ops.py` | `validate_ops` | 79 | 65 |
 | `desktop\src\core\domain_pack.py` | `manifest_verify` | 75 | 1982 |
@@ -23,4 +24,3 @@
 | `desktop\src\core\ai_governance.py` | `validate` | 49 | 51 |
 | `desktop\src\core\ops.py` | `validate_vendors` | 49 | 166 |
 | `desktop\src\core\meta_cockpit\cockpit_ab.py` | `analyze` | 48 | 256 |
-| `desktop\src\core\schema_lint.py` | `subset_validate` | 47 | 92 |

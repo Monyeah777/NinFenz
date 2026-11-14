@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1491,
+    "app": 1494,
     "entry": 26,
     "floor": 5,
-    "prod": 1061,
+    "prod": 1062,
     "projection": 184,
     "support": 503,
-    "verify": 1405
+    "verify": 1407
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -6767,6 +6767,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "产品发现登记（`nf-product/1`）：问题/JTBD + 价值假设 + 指标/反指标 + MVP + GTM。",
+      "path": "desktop/src/core/product.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "正文级 lint（内部差距实证：NF 的风格门是 M80 的**档位 DNA 资产**——靠执行方自觉比对，",
       "path": "desktop/src/core/prose_lint.py",
       "role": "prod",
@@ -10609,6 +10615,12 @@
     {
       "function": "`.NET` 加速线的 probe 清单接线判据：`probe_manifest.json` ⟷ `probes/*.py` 必须严格对齐。",
       "path": "desktop/tests/test_probe_manifest_wiring.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "产品发现契约（NF-Final WP-0A，P1 盲区 BL-06）。",
+      "path": "desktop/tests/test_product_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -14579,6 +14591,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "NF-Final §3A D01/D14 机读登记（WP-0A）：问题/JTBD + 价值假设 + 成功指标/反指标 + MVP 范围 + GTM/支持/试点。纪律：外部访谈与试点属外部操作，当前全部为 unverified（OPEN-PRODUCT）；不伪造访谈结论、不以外部背书作为质量论据（STRATEGY §3）。判据 desktop/tests/test_product_contract.py。",
+      "path": "protocol/product.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "NF-Final §16A.4 RAID 与风险治理（WP-0G）：R=风险 / A=假设 / I=问题 / D=依赖，逐条 owner/触发/缓解/复审；风险矩阵概率×影响。与 docs/RAID.md 人读面、results/assurance/CLAIMS.json 的 gaps 交叉绑定。判据 test_assurance_contract.py。",
       "path": "protocol/raid.json",
       "role": "verify",
@@ -14838,17 +14856,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "b008b98910c49e73432a68692d7a9733b7a42cf927c37728eaa64c94ec1dc899",
+  "root_digest": "aa50b5530e16739d1343262dc76bc1675127d998ba9b214bcab351e45568f1aa",
   "rule_counts": {
-    "R-app": 1491,
+    "R-app": 1494,
     "R-catch": 350,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 162,
     "R-support": 124,
-    "R-verify": 1276,
-    "auto:R-core": 297
+    "R-verify": 1278,
+    "auto:R-core": 298
   },
   "schema": "nf-role-coordinates/1"
 }
