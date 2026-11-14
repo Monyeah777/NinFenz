@@ -471,11 +471,11 @@
       "desc": "3 步 prev 链：digest 与链头",
       "expected": {
         "digests": [
-          "20655eb84f0715eb3c63126694c9abcd821797fe514fb71f1267b067f7fbd106",
-          "c781e6baed7d1d84e6370ac46e700350ad5ca9fb9b327edba975cdc5eab0a579",
-          "5718de8aed5edeefede3facffe19e935e08e26adc1be4f22f626f51945bdc81e"
+          "820e6ea0eca4c38464a4d15ca8d1364ee2f43c0525f507e2bfa42400919bbaff",
+          "bcd428723fe975dfcab20f4c016eba6b2f5ccb0399ae655bcc7e866a9062abd0",
+          "da3bec125607af68ed2ece041fdbab7b5d5572576dd73ed3c6732ca3925efb0c"
         ],
-        "head": "5718de8aed5edeefede3facffe19e935e08e26adc1be4f22f626f51945bdc81e",
+        "head": "da3bec125607af68ed2ece041fdbab7b5d5572576dd73ed3c6732ca3925efb0c",
         "valid": true
       },
       "family": "process",
@@ -483,27 +483,57 @@
       "input": {
         "steps": [
           {
-            "actor_id": "nf:agent:vec",
+            "actor": {
+              "id": "nf:agent:vec",
+              "kind": "agent"
+            },
+            "authorization": {
+              "digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "kind": "human"
+            },
+            "input_refs": [],
+            "output_refs": [],
             "prev": "0000000000000000000000000000000000000000000000000000000000000000",
             "process_id": "proc-vector",
-            "seq": 1,
+            "schema": "nf-process/1",
             "state_digest": "1111111111111111111111111111111111111111111111111111111111111111",
+            "step": 1,
             "type": "task-step"
           },
           {
-            "actor_id": "nf:agent:vec",
-            "prev": "20655eb84f0715eb3c63126694c9abcd821797fe514fb71f1267b067f7fbd106",
+            "actor": {
+              "id": "nf:agent:vec",
+              "kind": "agent"
+            },
+            "authorization": {
+              "digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "kind": "human"
+            },
+            "input_refs": [],
+            "output_refs": [],
+            "prev": "820e6ea0eca4c38464a4d15ca8d1364ee2f43c0525f507e2bfa42400919bbaff",
             "process_id": "proc-vector",
-            "seq": 2,
+            "schema": "nf-process/1",
             "state_digest": "2222222222222222222222222222222222222222222222222222222222222222",
+            "step": 2,
             "type": "task-step"
           },
           {
-            "actor_id": "nf:agent:vec",
-            "prev": "c781e6baed7d1d84e6370ac46e700350ad5ca9fb9b327edba975cdc5eab0a579",
+            "actor": {
+              "id": "nf:agent:vec",
+              "kind": "agent"
+            },
+            "authorization": {
+              "digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "kind": "human"
+            },
+            "input_refs": [],
+            "output_refs": [],
+            "prev": "bcd428723fe975dfcab20f4c016eba6b2f5ccb0399ae655bcc7e866a9062abd0",
             "process_id": "proc-vector",
-            "seq": 3,
+            "schema": "nf-process/1",
             "state_digest": "3333333333333333333333333333333333333333333333333333333333333333",
+            "step": 3,
             "type": "task-step"
           }
         ]
@@ -520,19 +550,39 @@
       "input": {
         "steps": [
           {
-            "actor_id": "nf:agent:vec",
+            "actor": {
+              "id": "nf:agent:vec",
+              "kind": "agent"
+            },
+            "authorization": {
+              "digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "kind": "human"
+            },
+            "input_refs": [],
+            "output_refs": [],
             "prev": "0000000000000000000000000000000000000000000000000000000000000000",
             "process_id": "proc-vector",
-            "seq": 1,
+            "schema": "nf-process/1",
             "state_digest": "1111111111111111111111111111111111111111111111111111111111111111",
+            "step": 1,
             "type": "task-step"
           },
           {
-            "actor_id": "nf:agent:vec",
-            "prev": "c781e6baed7d1d84e6370ac46e700350ad5ca9fb9b327edba975cdc5eab0a579",
+            "actor": {
+              "id": "nf:agent:vec",
+              "kind": "agent"
+            },
+            "authorization": {
+              "digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "kind": "human"
+            },
+            "input_refs": [],
+            "output_refs": [],
+            "prev": "bcd428723fe975dfcab20f4c016eba6b2f5ccb0399ae655bcc7e866a9062abd0",
             "process_id": "proc-vector",
-            "seq": 3,
+            "schema": "nf-process/1",
             "state_digest": "3333333333333333333333333333333333333333333333333333333333333333",
+            "step": 3,
             "type": "task-step"
           }
         ]
@@ -549,27 +599,57 @@
       "input": {
         "steps": [
           {
-            "actor_id": "nf:agent:vec",
+            "actor": {
+              "id": "nf:agent:vec",
+              "kind": "agent"
+            },
+            "authorization": {
+              "digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "kind": "human"
+            },
+            "input_refs": [],
+            "output_refs": [],
             "prev": "0000000000000000000000000000000000000000000000000000000000000000",
             "process_id": "proc-vector",
-            "seq": 1,
+            "schema": "nf-process/1",
             "state_digest": "1111111111111111111111111111111111111111111111111111111111111111",
+            "step": 1,
             "type": "task-step"
           },
           {
-            "actor_id": "nf:agent:vec",
-            "prev": "c781e6baed7d1d84e6370ac46e700350ad5ca9fb9b327edba975cdc5eab0a579",
+            "actor": {
+              "id": "nf:agent:vec",
+              "kind": "agent"
+            },
+            "authorization": {
+              "digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "kind": "human"
+            },
+            "input_refs": [],
+            "output_refs": [],
+            "prev": "bcd428723fe975dfcab20f4c016eba6b2f5ccb0399ae655bcc7e866a9062abd0",
             "process_id": "proc-vector",
-            "seq": 3,
+            "schema": "nf-process/1",
             "state_digest": "3333333333333333333333333333333333333333333333333333333333333333",
+            "step": 3,
             "type": "task-step"
           },
           {
-            "actor_id": "nf:agent:vec",
-            "prev": "20655eb84f0715eb3c63126694c9abcd821797fe514fb71f1267b067f7fbd106",
+            "actor": {
+              "id": "nf:agent:vec",
+              "kind": "agent"
+            },
+            "authorization": {
+              "digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "kind": "human"
+            },
+            "input_refs": [],
+            "output_refs": [],
+            "prev": "820e6ea0eca4c38464a4d15ca8d1364ee2f43c0525f507e2bfa42400919bbaff",
             "process_id": "proc-vector",
-            "seq": 2,
+            "schema": "nf-process/1",
             "state_digest": "2222222222222222222222222222222222222222222222222222222222222222",
+            "step": 2,
             "type": "task-step"
           }
         ]
@@ -586,27 +666,57 @@
       "input": {
         "steps": [
           {
-            "actor_id": "nf:agent:vec",
+            "actor": {
+              "id": "nf:agent:vec",
+              "kind": "agent"
+            },
+            "authorization": {
+              "digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "kind": "human"
+            },
+            "input_refs": [],
+            "output_refs": [],
             "prev": "0000000000000000000000000000000000000000000000000000000000000000",
             "process_id": "proc-vector",
-            "seq": 1,
+            "schema": "nf-process/1",
             "state_digest": "1111111111111111111111111111111111111111111111111111111111111111",
+            "step": 1,
             "type": "task-step"
           },
           {
-            "actor_id": "nf:agent:vec",
+            "actor": {
+              "id": "nf:agent:vec",
+              "kind": "agent"
+            },
+            "authorization": {
+              "digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "kind": "human"
+            },
+            "input_refs": [],
+            "output_refs": [],
             "prev": "ABC",
             "process_id": "proc-vector",
-            "seq": 2,
+            "schema": "nf-process/1",
             "state_digest": "2222222222222222222222222222222222222222222222222222222222222222",
+            "step": 2,
             "type": "task-step"
           },
           {
-            "actor_id": "nf:agent:vec",
-            "prev": "c781e6baed7d1d84e6370ac46e700350ad5ca9fb9b327edba975cdc5eab0a579",
+            "actor": {
+              "id": "nf:agent:vec",
+              "kind": "agent"
+            },
+            "authorization": {
+              "digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "kind": "human"
+            },
+            "input_refs": [],
+            "output_refs": [],
+            "prev": "bcd428723fe975dfcab20f4c016eba6b2f5ccb0399ae655bcc7e866a9062abd0",
             "process_id": "proc-vector",
-            "seq": 3,
+            "schema": "nf-process/1",
             "state_digest": "3333333333333333333333333333333333333333333333333333333333333333",
+            "step": 3,
             "type": "task-step"
           }
         ]

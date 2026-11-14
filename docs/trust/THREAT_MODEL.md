@@ -34,7 +34,7 @@
 | 编号 | 类别 | 威胁 | 控制点 | 判据 | 状态 |
 |---|---|---|---|---|---|
 | TH-01 | S | issuer 伪造 | `desktop/src/core/trust_anchor.py`（anchor）（钉根 + 有界委派）；`desktop/src/core/attest.py`（sign_hmac / verify_external）；`desktop/src/core/key_transparency.py`（consistency） | `test_trust_anchor.py`、`test_attest.py`、`test_key_transparency.py` | T1 部分（DSSE 与统一 issuer registry 未建，G2） |
-| TH-02 | T | 删/改中间 step | `desktop/src/core/meta_cockpit/session_journal.py`（append_turn）（prev_digest）；`desktop/src/core/cognition_workspace/records.py`（append）（prev）；`desktop/src/core/transparency_log.py`（build / verify） | `test_meta_cockpit.py`、`test_cognition_workspace.py`、`test_transparency_log.py` | T0 已有 |
+| TH-02 | T | 删/改中间 step | `desktop/src/core/trust/process.py`（nf-process/1 prev 链）；`desktop/src/core/meta_cockpit/session_journal.py`（append_turn）（prev_digest）；`desktop/src/core/cognition_workspace/records.py`（append）（prev）；`desktop/src/core/transparency_log.py`（build / verify） | `test_trust_process.py`、`test_meta_cockpit.py`、`test_cognition_workspace.py`、`test_transparency_log.py` | T0 已有 |
 | TH-03 | T | 删尾 + 重算本地摘要 | `desktop/src/core/evidence.py`（check_anchor）（外部锚点核对/截断检测）；`desktop/src/core/timestamp.py`（verify）；链头自动签名+锚定未建 | `test_evidence.py`（test_anchor_truncation_is_caught）、`test_timestamp.py` | T1 部分（journal/process 链头未签名，G2） |
 | TH-04 | R | 重放旧 bundle | `desktop/src/core/evidence.py`（时效/吊销/锚点）；`desktop/src/core/revocations.py`（table_of）；`desktop/src/core/timestamp.py`（record） | `test_evidence.py`、`test_revocations.py`、`test_timestamp.py` | T1 部分（默认本机时钟；挂 time-record 才是 T2 面） |
 | TH-05 | I | 证据泄露 | 证据只收摘要与仓相对路径；`desktop/src/core/meta_cockpit/secret_guard.py`（scan_text / redact）；CI 明文密钥扫描（`.github/workflows/ci-verify.yml`）；机器路径泄漏判据 | `test_meta_cockpit.py`（secret_guard）、`test_text_hygiene.py` | T0 已有（边界：调用方把正文打进 payload 仍可能泄露，见 R-04） |
@@ -47,7 +47,7 @@
 | 编号 | 攻击 | 期望 | 控制点 | 判据 | 状态 |
 |---|---|---|---|---|---|
 | DT-01 | 改一条 obligation | 签名失败 / T2 失败 | DSSE + 锚（G2） | 计划 test_dsse_tamper（OPEN-G2） | OPEN-G2 |
-| DT-02 | 删中间 step | A2 链失败 | prev / seq（session_journal、records、transparency_log） | `test_meta_cockpit.py`、`test_cognition_workspace.py` | T0 已有 |
+| DT-02 | 删中间 step | A2 链失败 | prev / seq（trust/process、session_journal、records、transparency_log） | `test_trust_process.py`、`test_meta_cockpit.py`、`test_cognition_workspace.py` | T0 已有 |
 | DT-03 | 删尾并重算本地 digest | A3 锚失败 | 外部锚点核对（证据包面）；链头签名未建（G2） | `test_evidence.py` + 计划 test_process_tail_delete（OPEN-G2） | T0 部分 |
 | DT-04 | 跨 bundle 拼接 claim | splice 失败 | `desktop/src/core/trust/bundle.py`（bundle_id/index 全进叶预像） | `test_trust_bundle.py`（cross-bundle splice 负例） | T0 部分（结构面已覆盖；签名/锚在 G2） |
 | DT-05 | 替换 model-card | claim 失效 | A4 类型绑定（G3） | 计划 test_model_card_binding（OPEN-G3） | OPEN-G3 |
@@ -117,7 +117,7 @@
 
 ## 已知缺口（按阶段）
 
-- **OPEN-G1（进行中）**：claim 级 bundle 与单 claim 验证已落地（`desktop/src/core/trust/bundle.py`，含 splice 负例）；剩余 process 链、`cc_verify` 骨架与 check45 收口。
+- **OPEN-G1（进行中）**：claim 级 bundle（含 splice 负例）与 nf-process/1 prev 链已落地（`desktop/src/core/trust/bundle.py`、`process.py`）；剩余 `cc_verify` 骨架与 check45 收口。
 - **OPEN-G2**：DSSE、链头签名与自动锚定、issuer registry / trust store / 轮换、policy 判定与 nf-verify 报告、keygen 与 0600 强制。
 - **OPEN-G3**：类型注册表与组合 admissibility、model card、prompt/context lineage、签名人类复核。
 - **OPEN-G4**：外部见证（STH/witness）、公共锚（Sigstore/Rekor/公共 TSA）、独立 verifier parity。

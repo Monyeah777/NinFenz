@@ -127,32 +127,22 @@ def _fold(leaf: str, proof: list) -> str:
     return cur
 
 
-def _step_digest(step: dict, prev: str) -> str:
-    body = {
-        "process_id": step["process_id"],
-        "step": step["seq"],
-        "prev": prev,
-        "actor": {"id": step["actor_id"], "kind": "agent"},
-        "authorization": {"kind": "human", "digest": "d" * 64},
-        "input_refs": [],
-        "output_refs": [],
-        "state_digest": step["state_digest"],
-        "type": step["type"],
-    }
+def _step_digest(step: dict) -> str:
+    body = {key: value for key, value in step.items() if key != "digest"}
     return _domain("nf:process:v1:step", _canon_strict(body))
 
 
 def _chain(steps: list) -> dict:
     head = "0" * 64
     digests = []
-    for i, step in enumerate(steps):
+    for index, step in enumerate(steps):
         if not isinstance(step.get("prev"), str) or not HEX64.match(step["prev"]):
             return {"valid": False, "reason": "PREV-FORMAT"}
-        if step.get("seq") != i + 1:
+        if step.get("step") != index + 1:
             return {"valid": False, "reason": "SEQ-ORDER"}
         if step["prev"] != head:
             return {"valid": False, "reason": "PREV-MISMATCH"}
-        head = _step_digest(step, head)
+        head = _step_digest(step)
         digests.append(head)
     return {"valid": True, "digests": digests, "head": head}
 
