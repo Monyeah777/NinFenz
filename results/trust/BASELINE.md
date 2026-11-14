@@ -49,6 +49,8 @@
 
 复跑 `bash verify.sh --checks-only`：PASS=75 WARN=2 FAIL=0，exit 0。
 
+随后为刷新 `role_coordinates.json` / `verification_report.json` / `sbom.json` 等投影，又执行了完整重冻（code_metrics → layers → audit rebind → conformance → approve → receipts → self_audit/capability/judge/core_judge → verify_report → sbom → freshness/style/precheck）。**最终提交态**：回执根=5f2cb5a24d315f3b（66 件）、freshness 4/4、precheck 23/23、`--checks-only` PASS=75 WARN=2 FAIL=0。上列数字均为本轮实读，复核以命令输出为准（不钉死）。
+
 **操作约束（给后续 WP）**：内容改动必须在冻结链**之前**定稿——冻结后再改任何受 root 覆盖的文件，check35 必红，只能整链重跑。计划 §12.1.4 引用的 `scripts/refreeze.sh` 在本机不存在（见 §7 ENV-04）；实仓入口是 `python scripts/nf.py release --freeze --apply --by <批准人> --note <说明>`。
 
 ## 3. 计划锚点复验（§1.2 / §3.1 / §3.2）
