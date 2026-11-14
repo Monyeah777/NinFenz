@@ -39,7 +39,7 @@
 | TH-04 | R | 重放旧 bundle | `desktop/src/core/evidence.py`（时效/吊销/锚点）；`desktop/src/core/revocations.py`（table_of）；`desktop/src/core/timestamp.py`（record） | `test_evidence.py`、`test_revocations.py`、`test_timestamp.py` | T1 部分（默认本机时钟；挂 time-record 才是 T2 面） |
 | TH-05 | I | 证据泄露 | 证据只收摘要与仓相对路径；`desktop/src/core/meta_cockpit/secret_guard.py`（scan_text / redact）；CI 明文密钥扫描（`.github/workflows/ci-verify.yml`）；机器路径泄漏判据 | `test_meta_cockpit.py`（secret_guard）、`test_text_hygiene.py` | T0 已有（边界：调用方把正文打进 payload 仍可能泄露，见 R-04） |
 | TH-06 | D | 资源耗尽 | `desktop/src/core/evidence.py`（单件 16 MiB / 整包 96 MiB / 重名判死 / 路径安全）；`desktop/src/core/trust_boundary.py`（check_arguments）（参数上限）；`protocol/trust/*.schema.json`（maxItems） | `test_evidence.py`（test_oversized_member_is_invalid）、`test_trust_boundary.py`、`test_trust_schemas.py` | T0 已有 |
-| TH-07 | E | 类型混淆 / 越权 | `protocol/trust/` 7 件 schema（未知字段/封闭词表）；`desktop/src/core/trust_boundary.py`（check_arguments）；类型注册表与组合 admissibility 未建 | `test_trust_schemas.py`、`test_trust_boundary.py` | T0 部分（结构层已封，语义层 OPEN-G3） |
+| TH-07 | E | 类型混淆 / 越权 | `protocol/trust/` 7 件 schema（未知字段/封闭词表）；`desktop/src/core/trust/entity.py`（issuer/type 准入）；`desktop/src/core/trust_boundary.py`（check_arguments）；组合检查与完整类型注册表未建 | `test_trust_schemas.py`、`test_trust_entity.py`、`test_trust_boundary.py` | T0 部分（结构 + 准入已实现；组合/注册表 OPEN-G3） |
 | TH-08 | S | 自签自验冒充外锚 | `desktop/src/core/attest.py`（verify_external）（外部进程验签，缺验证器 fail-closed）；check42（验签方 ≠ 签名方 + 篡改必红）；等级只写进报告（nf-verify/1 已冻结 schema，判定 G2） | `test_attest.py`、`verify.sh` check42 | T1 部分（cosign 不在场时按 WARN 记「仓库 provenance 缺签名外锚」，不冒充已签） |
 
 ## 删除 / 篡改矩阵（计划 §9.3，八行）
@@ -49,7 +49,7 @@
 | DT-01 | 改一条 obligation | 签名失败 / T2 失败 | DSSE + 锚（G2） | 计划 test_dsse_tamper（OPEN-G2） | OPEN-G2 |
 | DT-02 | 删中间 step | A2 链失败 | prev / seq（session_journal、records、transparency_log） | `test_meta_cockpit.py`、`test_cognition_workspace.py` | T0 已有 |
 | DT-03 | 删尾并重算本地 digest | A3 锚失败 | 外部锚点核对（证据包面）；链头签名未建（G2） | `test_evidence.py` + 计划 test_process_tail_delete（OPEN-G2） | T0 部分 |
-| DT-04 | 跨 bundle 拼接 claim | splice 失败 | `bundle_id` 域分隔（schema 已冻结） | 计划 test_claim_bundle_splice（OPEN-G1） | OPEN-G1 |
+| DT-04 | 跨 bundle 拼接 claim | splice 失败 | `desktop/src/core/trust/bundle.py`（bundle_id/index 全进叶预像） | `test_trust_bundle.py`（cross-bundle splice 负例） | T0 部分（结构面已覆盖；签名/锚在 G2） |
 | DT-05 | 替换 model-card | claim 失效 | A4 类型绑定（G3） | 计划 test_model_card_binding（OPEN-G3） | OPEN-G3 |
 | DT-06 | 撤销后旧签名 | 验证失败 / 降级报告 | `desktop/src/core/revocations.py`、`desktop/src/core/trust_anchor.py` | `test_revocations.py`、`test_trust_anchor.py` | T1 部分 |
 | DT-07 | TSA 时间回拨 | token 失败 | `desktop/src/core/timestamp.py`（verify）（摘要绑定 + CA 链；>1 MiB 拒收） | `test_timestamp.py` | T2 部分 |
@@ -117,7 +117,7 @@
 
 ## 已知缺口（按阶段）
 
-- **OPEN-G1**：claim 级 bundle（含 splice 防护）、单 claim 独立验证未建。
+- **OPEN-G1（进行中）**：claim 级 bundle 与单 claim 验证已落地（`desktop/src/core/trust/bundle.py`，含 splice 负例）；剩余 process 链、`cc_verify` 骨架与 check45 收口。
 - **OPEN-G2**：DSSE、链头签名与自动锚定、issuer registry / trust store / 轮换、policy 判定与 nf-verify 报告、keygen 与 0600 强制。
 - **OPEN-G3**：类型注册表与组合 admissibility、model card、prompt/context lineage、签名人类复核。
 - **OPEN-G4**：外部见证（STH/witness）、公共锚（Sigstore/Rekor/公共 TSA）、独立 verifier parity。
