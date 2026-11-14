@@ -2473,8 +2473,20 @@
       "source": "naming"
     },
     {
+      "module": "test_trust_parity_dotnet.py",
+      "source": "naming"
+    },
+    {
       "module": "test_trust_process.py",
       "source": "negative_assertion"
+    },
+    {
+      "module": "test_trust_public_anchor.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_trust_public_anchor_live.py",
+      "source": "naming"
     },
     {
       "module": "test_trust_schemas.py",
@@ -2661,10 +2673,10 @@
       "source": "negative_assertion"
     }
   ],
-  "modules": 665,
+  "modules": 668,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
-  "suspect": 173,
+  "suspect": 176,
   "with_evidence": 348,
   "without_evidence": 144
 }

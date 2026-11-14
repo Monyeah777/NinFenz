@@ -4,9 +4,9 @@
     "entry": 26,
     "floor": 5,
     "prod": 1057,
-    "projection": 168,
-    "support": 485,
-    "verify": 1355
+    "projection": 170,
+    "support": 489,
+    "verify": 1361
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7493,6 +7493,18 @@
       "rule": "R-verify"
     },
     {
+      "function": "nf-public-anchor/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/public-anchor-bad-kind.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-public-anchor/1",
+      "path": "desktop/tests/fixtures/trust/schemas/invalid/public-anchor-bad-proof.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "nf-type-registry/1",
       "path": "desktop/tests/fixtures/trust/schemas/invalid/type-registry-bad-ref-kind.json",
       "role": "verify",
@@ -7579,6 +7591,12 @@
     {
       "function": "nf-process/1",
       "path": "desktop/tests/fixtures/trust/schemas/valid/process.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-public-anchor/1",
+      "path": "desktop/tests/fixtures/trust/schemas/valid/public-anchor.json",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -11303,13 +11321,31 @@
       "rule": "R-verify"
     },
     {
+      "function": ".NET (C#) parity 判据（claim #21 的 .NET 半边）：独立 C# 实现对冻结向量复算六族。",
+      "path": "desktop/tests/test_trust_parity_dotnet.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "trust.process 判据：process 向量族逐条 + prev 链/seq/创世约定 + 删改重排反例。",
       "path": "desktop/tests/test_trust_process.py",
       "role": "verify",
       "rule": "R-verify"
     },
     {
-      "function": "Trust Fabric schema 门禁（WP-01/21/23/30/31/32/33）：13 件 IDL、正/反样例与变异自证。",
+      "function": "public_anchor 判据：Rekor 风格 inclusion + SET 签名 + 目标绑定；离线验、显式联网抓取。",
+      "path": "desktop/tests/test_trust_public_anchor.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "公共锚 live 证据判据：对已提交的 Rekor 真实条目做离线复验（openssl ECDSA SET）。",
+      "path": "desktop/tests/test_trust_public_anchor_live.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "Trust Fabric schema 门禁（WP-01/21/23/30/31/32/33/34）：14 件 IDL、正/反样例与变异自证。",
       "path": "desktop/tests/test_trust_schemas.py",
       "role": "verify",
       "rule": "R-verify"
@@ -14514,16 +14550,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "baf4d3485f9b58f36fe3a972b3b6b0276e138b4fa0e1c9dd0c7459fbc262d8f7",
+  "root_digest": "d20b592a03c04c65ddef5d2b85908b7032785df3de97f2140326ecc80b191f6e",
   "rule_counts": {
     "R-app": 1469,
-    "R-catch": 333,
+    "R-catch": 337,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 148,
+    "R-projection": 150,
     "R-support": 124,
-    "R-verify": 1229,
+    "R-verify": 1235,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

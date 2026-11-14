@@ -1117,6 +1117,10 @@
       "referenced": true
     },
     {
+      "module": "public_anchor",
+      "referenced": true
+    },
+    {
       "module": "purity_scan",
       "referenced": true
     },
@@ -1493,9 +1497,9 @@
       "referenced": true
     }
   ],
-  "modules": 373,
+  "modules": 374,
   "note": "粗粒度名字匹配（代理指标），不做导入图分析",
-  "referenced": 343,
+  "referenced": 344,
   "schema": "nf-core-judge-map/1",
   "unreferenced": 30
 }

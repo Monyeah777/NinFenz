@@ -1,5 +1,5 @@
 {
-  "digest": "a277dbe73963cc57f021466c0679f24d10741304289c0a5ac860fc0e128d2b45",
+  "digest": "3aa049c03ef1c96d23950426237b2f3155506b526092f24ad9a32acbf37ebde4",
   "entries": [
     {
       "doc": "其余 ABI 调用的判定向量：cc_label（IR 校验）→ 期望结论（跨语言可复核）。",
@@ -1143,6 +1143,8 @@
         "--current-card",
         "--entities",
         "--envelope",
+        "--fetch-public-anchor",
+        "--fetch-public-key",
         "--git-repo",
         "--head-signature",
         "--hmac-key-hex",
@@ -1157,6 +1159,10 @@
         "--now",
         "--out",
         "--policy",
+        "--public-anchor",
+        "--public-log-id",
+        "--public-log-pubkey",
+        "--rekor-url",
         "--review-gate",
         "--root",
         "--sth-material",
@@ -1167,6 +1173,7 @@
         "--tsa-query",
         "--tsa-subject",
         "--type-registry",
+        "--verify-public-anchor",
         "--witness-material"
       ],
       "path": "scripts/trust_verify.py",
@@ -1312,7 +1319,7 @@
       "subcommands": []
     }
   ],
-  "flags": 575,
+  "flags": 582,
   "note": "静态接口面（docs/flags/subcommands），不含缺省行为语义",
   "schema": "nf-capability-inventory/1",
   "scripts": 83

@@ -95,7 +95,17 @@
         "desktop/tests/test_trust_parity.py",
         "desktop/src/core/trust/gate_dod.py",
         "desktop/tests/test_trust_gate48.py",
-        "results/trust/DOD.md"
+        "results/trust/DOD.md",
+        "protocol/trust/public-anchor.schema.json",
+        "desktop/src/core/trust/public_anchor.py",
+        "desktop/tests/test_trust_public_anchor.py",
+        "scripts/trust_parity/csharp/TrustParity.csproj",
+        "scripts/trust_parity/csharp/Program.cs",
+        "desktop/tests/test_trust_parity_dotnet.py",
+        "results/trust/PUBLIC_ANCHOR_LIVE.json",
+        "results/trust/PUBLIC_ANCHOR_LIVE.md",
+        "results/trust/rekor-public-key.pem",
+        "desktop/tests/test_trust_public_anchor_live.py"
       ],
       "falsifier": "若改用累加器实现、或去掉 bundle_id/域分隔仍能通过向量集 merkle 族与 splicing 负例，则本裁决失效。"
     },
@@ -138,7 +148,17 @@
         "scripts/trust_keygen.py",
         "desktop/tests/test_trust_key_material.py",
         "desktop/tests/test_trust_store.py",
-        "desktop/tests/test_trust_auto_anchor.py"
+        "desktop/tests/test_trust_auto_anchor.py",
+        "protocol/trust/public-anchor.schema.json",
+        "desktop/src/core/trust/public_anchor.py",
+        "desktop/tests/test_trust_public_anchor.py",
+        "scripts/trust_parity/csharp/TrustParity.csproj",
+        "scripts/trust_parity/csharp/Program.cs",
+        "desktop/tests/test_trust_parity_dotnet.py",
+        "results/trust/PUBLIC_ANCHOR_LIVE.json",
+        "results/trust/PUBLIC_ANCHOR_LIVE.md",
+        "results/trust/rekor-public-key.pem",
+        "desktop/tests/test_trust_public_anchor_live.py"
       ],
       "falsifier": "若 T3 可在无 witness / 无 STH 时达到，或本地链被当作外部见证抬升 T3，则本裁决失效。"
     },
@@ -172,7 +192,17 @@
         "desktop/src/core/trust/trust_store.py",
         "scripts/trust_keygen.py",
         "desktop/tests/test_trust_key_material.py",
-        "desktop/tests/test_trust_store.py"
+        "desktop/tests/test_trust_store.py",
+        "protocol/trust/public-anchor.schema.json",
+        "desktop/src/core/trust/public_anchor.py",
+        "desktop/tests/test_trust_public_anchor.py",
+        "scripts/trust_parity/csharp/TrustParity.csproj",
+        "scripts/trust_parity/csharp/Program.cs",
+        "desktop/tests/test_trust_parity_dotnet.py",
+        "results/trust/PUBLIC_ANCHOR_LIVE.json",
+        "results/trust/PUBLIC_ANCHOR_LIVE.md",
+        "results/trust/rekor-public-key.pem",
+        "desktop/tests/test_trust_public_anchor_live.py"
       ],
       "falsifier": "若未知 type/issuer/算法被默认放行且验证结论仍为通过，则本裁决失效。"
     },

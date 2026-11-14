@@ -9,43 +9,43 @@
 | 判据 | 结果 | 证据 |
 |---|---|---|
 | P0 = 0 | ✅ | `stop.p0 = 0`；S1/S2/S3/S7/S8/S10 全绿 |
-| P1 全部有 owner（或已修） | ✅ 1 条 PARTIAL（#21，环境受限）有 owner + 1 条已修 | `stop.p1_open_with_owner = 1`；`findings` |
+| P1 全部有 owner（或已修） | ✅ 0 条未决 + 1 条已修 | `stop.p1_open_with_owner = 0`；`findings` |
 | UNSUPPORTED claims = 0 | ✅ | `stop.claims_unsupported = 0`；CLAIM_MATRIX 无 UNSUPPORTED |
 | 单 claim 验证 O(log n) | ✅ | `test_trust_bundle.py`（只读一条 claim + proof 长度 ≤ log n） |
 | 删除/重排矩阵 | ✅ | `test_trust_bundle.py` / `test_trust_process.py` 篡改矩阵 |
 | check45-48 接线 | ✅ | `verify.sh` check45/46/47/48；四个 gate 变异判据均必红 |
 | 静态全量门禁 | ✅ | `bash verify.sh --checks-only` PASS=83 WARN=2 FAIL=0（46 条 check） |
 | T3 见证组合 | ✅ | WITNESS_SPEC + `test_trust_t3.py`（真 TSA 端到端 achieved=T3；T4 不声称） |
-| .NET parity | ⚠️ 未跑 | 本机无 .NET SDK（BASELINE ENV-01）；Python↔Node.js parity 已建（claim #21 PARTIAL） |
+| .NET parity | ✅ | 本机已装 .NET SDK 8.0；C# 独立实现六族 29 条向量 mismatches=0（claim #21 SUPPORTED，ENV-01 解除） |
+| T4 公共锚 | ✅ 验证面 | `nf-public-anchor/1`（inclusion+SET+目标绑定）+ CLI fetch；实际提交公共日志条目属外部操作 |
 | DoD 收口 | ✅ | `results/trust/DOD.md` + `check48`（交付件/claim 口径/自审计/PASS 一致性） |
 
 ## 维度体检（S0–S12）
 
 | 维度 | 状态 | 判据 / 证据 |
 |---|---|---|
-| S0_requirements | amber | FR/NFR 已落地部分有代码+测试；claim #13/#15/#16/#18/#19/#32/#33/#34/#35 SUPPORTED（WP-20/22/23/30/31/32/33/41）；#21 为 PARTIAL（Python↔Node.js parity 已建，.NET 无 SDK，ENV-01），有 owner |
+| S0_requirements | green | 全部 claim SUPPORTED：#13/#15/#16/#18/#19/#21/#32/#33/#34/#35/#36（WP-20/22/23/30/31/32/33/41/43/44/45）；UNSUPPORTED/TODO/PARTIAL 均为 0 |
 | S1_code_holes | green | trust 路径 TODO/FIXME/NotImplemented/pass 命中 0 |
 | S2_judgement_holes | green | 裸 except 0；默认放行形状 0（本轮修掉 2 处 `policy_ok` 缺省 True，见 F-001） |
 | S3_crypto | green | 无 md5/sha1/random/time.time/datetime.now；摘要统一 SHA-256 |
 | S4_chain_order | green | bundle Merkle 根/包含证明 + nf-process/1 prev 链删除/重排负例 |
-| S5_types_compat | green | 13 件 schema 未知字段/封闭词表负例；schema 名带 /1 版本 |
+| S5_types_compat | green | 14 件 schema 未知字段/封闭词表负例；schema 名带 /1 版本 |
 | S6_test_gaps | amber | 属性测试/模糊测试未接（P2，owner 已登记） |
 | S7_doc_overclaim | green | trust 文档禁用词命中全部为否定/边界语境（自扫描分类） |
 | S8_deps | green | trust 面 import 仅 stdlib + core（自扫描用 sys.stdlib_module_names 判定） |
 | S9_path_dos | green | proof 深度上限 64、schema maxItems、组合图 DAG/深度有界（≤32）、血缘段数上限 4096、无路径穿越面（纯函数） |
 | S10_privacy | green | 证据只含摘要/相对路径；无密钥/令牌标记 |
 | S11_observability | green | 错误消息带修复指引；`nf-verify/1` 缺项码 + exit 0/1/2 |
-| S12_unknown | amber | 红队角色剩 4 个未跑；跨语言 parity 留 G4（P2，owner 已登记） |
+| S12_unknown | amber | 红队角色剩 4 个未跑；实际公共日志提交/外部 witness 网络属外部操作（P2，owner 已登记） |
 
 ## 发现清单（P0/P1/P2）
 
 | ID | 维度 | 级别 | 状态 | 证据 | 修复 / 归属 |
 |---|---|---|---|---|---|
 | F-001 | S2_judgement_holes | P1 | fixed | gate.py 与 trust_vectors.py 的 level 判定用 `case.get("policy_ok", True)` 缺省放行 | 改显式布尔（缺失即拒）；`test_trust_gate45.py` |
-| F-002 | S0_requirements | P1 | open | claim #21 仍 PARTIAL：Python↔Node.js 六族 29 条 parity 已建；.NET 引擎线因本机无 SDK 未做（ENV-01） | .NET SDK 可用时补 C#/引擎线独立 verifier 跑同一向量集；owner 同上 |
-| F-003 | S6_test_gaps | P2 | open | 属性测试/模糊测试未接 | G2 前补随机 bundle/链篡改不变量；owner 同上 |
-| F-004 | S12_unknown | P2 | open | 红队角色剩 4 个未跑 | 按轮次轮换并写入威胁模型；owner 同上 |
-| F-005 | S12_unknown | P2 | open | 跨语言 parity 未接 | G4 补独立 verifier；owner 同上 |
+| F-002 | S6_test_gaps | P2 | open | 属性测试/模糊测试未接 | G2 前补随机 bundle/链篡改不变量；owner 同上 |
+| F-003 | S12_unknown | P2 | open | 红队角色剩 4 个未跑 | 按轮次轮换并写入威胁模型；owner 同上 |
+| F-004 | S12_unknown | P2 | open | 实际公共日志提交/外部 witness 网络属外部操作 | 维护者以真实身份提交公共条目；owner 同上 |
 
 ## 本轮扫描命令（可复跑）
 
@@ -60,5 +60,5 @@ python -m pytest desktop/tests/test_trust_self_audit_contract.py -q
 ## 不改写的历史结论
 
 - 本报告不回溯改 G0 的 `results/trust/BASELINE.md` 判定；基线是**审计当时**的实读，后续状态以本报告与各阶段交接为准。
-- 本版按 G4/WP-42 更新：DoD 收口件与 check48 落地（门禁 46 条 / PASS=83）；G4 结论为「T3 收口、parity PARTIAL（ENV-01）、T4 不声称（ENV-02）」；DOD 明确不声称全部完成。
+- 本版按 G4/WP-45 更新：安装 .NET SDK 并补 C# parity（#21 SUPPORTED）；公共锚验证面接入（#36 SUPPORTED）；ENV-01 解除、ENV-02 验证面解除；P1 归零，仅剩外部提交类 P2。
 - 「全量 bash verify.sh（3100+ 测试）」本轮未跑，如实记；静态面全量与受影响面全量分别取证（见上表与各 WP 记录）。CI 的 full 档是唯一发布结论口径。

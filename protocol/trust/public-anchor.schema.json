@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/trust/public-anchor.schema.json",
+  "title": "nf-public-anchor/1 公共锚（T4；Rekor 风格公共透明日志条目）",
+  "description": "公共锚 = 公共透明日志（如 Sigstore Rekor）中的一个条目：RFC6962 inclusion proof 到已签 tree root + log 对 SET 的签名 + 目标摘要绑定。离线可验；fetch 由 CLI 显式联网。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "log_id", "log_index", "tree_size", "root_hash",
+                "body_b64", "integrated_time", "signed_entry_timestamp", "inclusion_proof"],
+  "properties": {
+    "schema": {"const": "nf-public-anchor/1"},
+    "kind": {"const": "rekor-entry"},
+    "log_id": {"type": "string", "minLength": 1, "maxLength": 256},
+    "log_index": {"type": "integer", "minimum": 0},
+    "tree_size": {"type": "integer", "minimum": 1},
+    "root_hash": {"$ref": "#/$defs/digest"},
+    "body_b64": {"$ref": "#/$defs/base64"},
+    "integrated_time": {"type": "integer", "minimum": 1},
+    "signed_entry_timestamp": {"$ref": "#/$defs/base64", "maxLength": 4096},
+    "inclusion_proof": {
+      "type": "array", "maxItems": 64,
+      "items": {"$ref": "#/$defs/digest"}
+    },
+    "target_digest": {"$ref": "#/$defs/digest"},
+    "log_url": {"type": "string", "maxLength": 512},
+    "note": {"type": "string", "maxLength": 500}
+  },
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "base64": {"type": "string", "pattern": "^[A-Za-z0-9+/]+={0,2}$"}
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "schema": "nf-public-anchor/1",
+  "kind": "public-tsa",
+  "log_id": "c0d23d6ad406973f9559f3ba2d1ca01f84147d8ffc5b8445c224c76f77a0a1c8",
+  "log_index": 0,
+  "tree_size": 1,
+  "root_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "body_b64": "eyJhcGlWZXJzaW9uIjoiMC4wLjEifQ==",
+  "integrated_time": 1700000000,
+  "signed_entry_timestamp": "c2lnbmF0dXJl",
+  "inclusion_proof": []
+}

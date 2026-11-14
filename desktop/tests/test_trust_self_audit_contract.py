@@ -159,7 +159,12 @@ class SelfAuditContractTest(unittest.TestCase):
             for f in doc["findings"]:
                 if f["severity"] == "P1" and f["status"] == "open":
                     f["owner"] = ""
-                    break
+                    return
+            # 当前没有 open P1（全部收口）：合成一条无 owner 的 open P1 以验证判据本身。
+            doc["findings"].append({
+                "id": "F-099", "dim": "S0_requirements", "severity": "P1",
+                "file": "", "evidence": "synthetic", "fix": "synthetic",
+                "test": "", "owner": "", "status": "open"})
 
         def broken_claims(doc):
             doc["stop"]["claims_unsupported"] = 1
