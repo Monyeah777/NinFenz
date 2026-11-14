@@ -5,8 +5,8 @@
     "floor": 5,
     "prod": 1057,
     "projection": 166,
-    "support": 456,
-    "verify": 1312
+    "support": 459,
+    "verify": 1314
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -11087,6 +11087,18 @@
       "rule": "R-verify"
     },
     {
+      "function": "trust.canonical 判据：与向量集 canonical/domain 族逐条对齐，且与既有签名口径逐字节一致。",
+      "path": "desktop/tests/test_trust_canonical.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "trust.entity 判据：向量 entity 族逐条对齐 + 结构/准入 fail-closed + 变异自证。",
+      "path": "desktop/tests/test_trust_entity.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "Trust Fabric schema 门禁（WP-01）：7 件 IDL、正/反样例与变异自证。",
       "path": "desktop/tests/test_trust_schemas.py",
       "role": "verify",
@@ -14256,16 +14268,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "477dea540d9b9257ce567a0ea8d9b60a4065c5029c7c8fd80682b00772dd6401",
+  "root_digest": "d78ad4b01ead531d53184309920ef87415fe3ddec1980053e079de67325c2269",
   "rule_counts": {
     "R-app": 1467,
-    "R-catch": 304,
+    "R-catch": 307,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 146,
     "R-support": 124,
-    "R-verify": 1186,
+    "R-verify": 1188,
     "auto:R-core": 287
   },
   "schema": "nf-role-coordinates/1"

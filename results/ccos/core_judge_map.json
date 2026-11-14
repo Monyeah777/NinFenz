@@ -157,6 +157,10 @@
       "referenced": true
     },
     {
+      "module": "canonical",
+      "referenced": true
+    },
+    {
       "module": "capability_battery",
       "referenced": true
     },
@@ -438,6 +442,10 @@
     },
     {
       "module": "engine_registry",
+      "referenced": true
+    },
+    {
+      "module": "entity",
       "referenced": true
     },
     {
@@ -1421,9 +1429,9 @@
       "referenced": true
     }
   ],
-  "modules": 355,
+  "modules": 357,
   "note": "粗粒度名字匹配（代理指标），不做导入图分析",
-  "referenced": 325,
+  "referenced": 327,
   "schema": "nf-core-judge-map/1",
   "unreferenced": 30
 }
