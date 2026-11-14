@@ -314,7 +314,7 @@
     },
     {
       "module": "context_pack",
-      "referenced": false
+      "referenced": true
     },
     {
       "module": "contract_history",
@@ -402,7 +402,7 @@
     },
     {
       "module": "domain_neutral",
-      "referenced": false
+      "referenced": true
     },
     {
       "module": "domain_pack",
@@ -834,7 +834,7 @@
     },
     {
       "module": "method_memory",
-      "referenced": false
+      "referenced": true
     },
     {
       "module": "method_pack",
@@ -1394,7 +1394,7 @@
     },
     {
       "module": "web_pages",
-      "referenced": false
+      "referenced": true
     },
     {
       "module": "workflow_hardening",
@@ -1423,7 +1423,7 @@
   ],
   "modules": 355,
   "note": "粗粒度名字匹配（代理指标），不做导入图分析",
-  "referenced": 321,
+  "referenced": 325,
   "schema": "nf-core-judge-map/1",
-  "unreferenced": 34
+  "unreferenced": 30
 }

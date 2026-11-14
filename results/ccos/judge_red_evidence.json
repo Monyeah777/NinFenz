@@ -85,6 +85,10 @@
       "source": "none"
     },
     {
+      "module": "test_answer_cards_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_approval_contract.py",
       "source": "negative_assertion"
     },
@@ -301,6 +305,10 @@
       "source": "none"
     },
     {
+      "module": "test_changelog_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_changelog_gen.py",
       "source": "negative_assertion"
     },
@@ -381,6 +389,10 @@
       "source": "none"
     },
     {
+      "module": "test_cline_submission_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_closure.py",
       "source": "naming"
     },
@@ -390,6 +402,14 @@
     },
     {
       "module": "test_coc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_cockpit_protocol_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_cockpit_release_notes_doc_contract.py",
       "source": "negative_assertion"
     },
     {
@@ -433,6 +453,10 @@
       "source": "negative_assertion"
     },
     {
+      "module": "test_combos_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_commands_reference_contract.py",
       "source": "negative_assertion"
     },
@@ -455,6 +479,10 @@
     {
       "module": "test_concept_graph_gate.py",
       "source": "naming"
+    },
+    {
+      "module": "test_conformance_doc_contract.py",
+      "source": "negative_assertion"
     },
     {
       "module": "test_conformance_run.py",
@@ -541,6 +569,10 @@
       "source": "negative_assertion"
     },
     {
+      "module": "test_decision_layer_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_decisions.py",
       "source": "naming"
     },
@@ -565,6 +597,10 @@
       "source": "none"
     },
     {
+      "module": "test_demo_signers_readme_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_dep_closure.py",
       "source": "none"
     },
@@ -577,7 +613,19 @@
       "source": "negative_assertion"
     },
     {
+      "module": "test_dependency_direction_pattern_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_deploy_cloudflare_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_design_checklist_contract.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_differentiation_doc_contract.py",
       "source": "negative_assertion"
     },
     {
@@ -633,6 +681,10 @@
       "source": "negative_assertion"
     },
     {
+      "module": "test_domain_packs_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_dotnet_aot.py",
       "source": "none"
     },
@@ -647,6 +699,10 @@
     {
       "module": "test_drill_fidelity.py",
       "source": "naming"
+    },
+    {
+      "module": "test_driver_doc_contract.py",
+      "source": "negative_assertion"
     },
     {
       "module": "test_dual_core_invariants_contract.py",
@@ -665,6 +721,10 @@
       "source": "naming"
     },
     {
+      "module": "test_endpoint_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_engine_ffi_binding.py",
       "source": "naming"
     },
@@ -678,6 +738,10 @@
     },
     {
       "module": "test_error_codes.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_error_message_guidance_pattern_doc_contract.py",
       "source": "negative_assertion"
     },
     {
@@ -749,6 +813,10 @@
       "source": "none"
     },
     {
+      "module": "test_extension_policy_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_external_links_workflow_contract.py",
       "source": "negative_assertion"
     },
@@ -757,12 +825,40 @@
       "source": "naming"
     },
     {
+      "module": "test_external_validation_assets_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_extreme_hardening.py",
       "source": "none"
     },
     {
       "module": "test_face_coverage.py",
       "source": "none"
+    },
+    {
+      "module": "test_fail_closed_pattern_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_fde_brief_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_fde_deliverable_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_fde_run_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_fde_sample_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_fde_stack_doc_contract.py",
+      "source": "negative_assertion"
     },
     {
       "module": "test_feature_lifecycle.py",
@@ -779,6 +875,10 @@
     {
       "module": "test_freshness_check.py",
       "source": "naming"
+    },
+    {
+      "module": "test_full_sample_p03_doc_contract.py",
+      "source": "negative_assertion"
     },
     {
       "module": "test_gap_review.py",
@@ -837,6 +937,10 @@
       "source": "naming"
     },
     {
+      "module": "test_generic_blocks_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_gitee_diagnostics.py",
       "source": "negative_assertion"
     },
@@ -846,6 +950,18 @@
     },
     {
       "module": "test_gitee_poll_workflow_contract.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_glama_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_glama_submission_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_go_client_doc_contract.py",
       "source": "negative_assertion"
     },
     {
@@ -875,6 +991,18 @@
     {
       "module": "test_handover.py",
       "source": "naming"
+    },
+    {
+      "module": "test_handover_template_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_handovers_readme_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_hf_space_readme_doc_contract.py",
+      "source": "negative_assertion"
     },
     {
       "module": "test_host_projection.py",
@@ -937,8 +1065,16 @@
       "source": "naming"
     },
     {
+      "module": "test_integrations_readme_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_interop.py",
       "source": "naming"
+    },
+    {
+      "module": "test_interop_doc_contract.py",
+      "source": "negative_assertion"
     },
     {
       "module": "test_interop_export.py",
@@ -947,6 +1083,10 @@
     {
       "module": "test_interop_schema_tool.py",
       "source": "none"
+    },
+    {
+      "module": "test_interop_thirdparty_doc_contract.py",
+      "source": "negative_assertion"
     },
     {
       "module": "test_interop_thirdparty_kit.py",
@@ -963,6 +1103,10 @@
     {
       "module": "test_io_types.py",
       "source": "naming"
+    },
+    {
+      "module": "test_io_types_doc_contract.py",
+      "source": "negative_assertion"
     },
     {
       "module": "test_ir.py",
@@ -1037,8 +1181,16 @@
       "source": "negative_assertion"
     },
     {
+      "module": "test_key_transparency_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_knowledge.py",
       "source": "naming"
+    },
+    {
+      "module": "test_knowledge_doc_contract.py",
+      "source": "negative_assertion"
     },
     {
       "module": "test_knowledge_sig.py",
@@ -1054,6 +1206,10 @@
     },
     {
       "module": "test_label_ir.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_label_ir_doc_contract.py",
       "source": "negative_assertion"
     },
     {
@@ -1073,6 +1229,10 @@
       "source": "naming"
     },
     {
+      "module": "test_layers_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_lazy_yaml.py",
       "source": "none"
     },
@@ -1086,6 +1246,10 @@
     },
     {
       "module": "test_library.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_library_doc_contract.py",
       "source": "negative_assertion"
     },
     {
@@ -1149,11 +1313,23 @@
       "source": "none"
     },
     {
+      "module": "test_local_api_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_locales.py",
       "source": "none"
     },
     {
+      "module": "test_locales_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_lsp.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_lsp_doc_contract.py",
       "source": "negative_assertion"
     },
     {
@@ -1189,6 +1365,10 @@
       "source": "negative_assertion"
     },
     {
+      "module": "test_machine_contract_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_maintainers_contract.py",
       "source": "negative_assertion"
     },
@@ -1203,6 +1383,18 @@
     {
       "module": "test_mcp_adapter.py",
       "source": "naming"
+    },
+    {
+      "module": "test_mcp_assets_readme_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_mcp_directories_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_mcp_doc_contract.py",
+      "source": "negative_assertion"
     },
     {
       "module": "test_mcp_ingress.py",
@@ -1233,6 +1425,14 @@
       "source": "negative_assertion"
     },
     {
+      "module": "test_mcp_submissions_doc_contract.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_mcp_submit_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_mcp_trust_meta.py",
       "source": "naming"
     },
@@ -1241,16 +1441,44 @@
       "source": "none"
     },
     {
+      "module": "test_mcpso_submission_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_md_tables.py",
       "source": "naming"
+    },
+    {
+      "module": "test_meta_archive_sample_doc_contract.py",
+      "source": "negative_assertion"
     },
     {
       "module": "test_meta_cockpit.py",
       "source": "negative_assertion"
     },
     {
+      "module": "test_meta_cockpit_analysis_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_meta_cockpit_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_meta_roadmap_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_method_pack.py",
       "source": "negative_case"
+    },
+    {
+      "module": "test_method_packs_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_migration_guide_doc_contract.py",
+      "source": "negative_assertion"
     },
     {
       "module": "test_missing_sentinel.py",
@@ -1259,6 +1487,14 @@
     {
       "module": "test_modeling.py",
       "source": "naming"
+    },
+    {
+      "module": "test_modeling_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_modelscope_submission_doc_contract.py",
+      "source": "negative_assertion"
     },
     {
       "module": "test_module_lifecycle.py",
@@ -1321,6 +1557,10 @@
       "source": "none"
     },
     {
+      "module": "test_module_signature_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_mvu_adapter.py",
       "source": "negative_assertion"
     },
@@ -1361,6 +1601,14 @@
       "source": "naming"
     },
     {
+      "module": "test_nfal_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_nfal_packaging_readme_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_nfal_rules.py",
       "source": "naming"
     },
@@ -1377,12 +1625,20 @@
       "source": "negative_assertion"
     },
     {
+      "module": "test_npm_readme_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_numeric_grounding.py",
       "source": "none"
     },
     {
       "module": "test_official_core.py",
       "source": "none"
+    },
+    {
+      "module": "test_one_shot_audits_doc_contract.py",
+      "source": "negative_assertion"
     },
     {
       "module": "test_orchestrate_cli.py",
@@ -1403,6 +1659,10 @@
     {
       "module": "test_output_forms.py",
       "source": "naming"
+    },
+    {
+      "module": "test_output_forms_doc_contract.py",
+      "source": "negative_assertion"
     },
     {
       "module": "test_output_path_escape.py",
@@ -1433,8 +1693,16 @@
       "source": "none"
     },
     {
+      "module": "test_paper_adoption_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_paper_ledger.py",
       "source": "naming"
+    },
+    {
+      "module": "test_paste_card_doc_contract.py",
+      "source": "negative_assertion"
     },
     {
       "module": "test_path_flag_ratchet.py",
@@ -1450,6 +1718,18 @@
     },
     {
       "module": "test_paths.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_patterns_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_patterns_index_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_patterns_readme_doc_contract.py",
       "source": "negative_assertion"
     },
     {
@@ -1509,6 +1789,10 @@
       "source": "negative_assertion"
     },
     {
+      "module": "test_pipelinerun_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_pkg_cli.py",
       "source": "none"
     },
@@ -1545,12 +1829,24 @@
       "source": "naming"
     },
     {
+      "module": "test_postmortem_template_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_postmortems_readme_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_pr_template_contract.py",
       "source": "negative_assertion"
     },
     {
       "module": "test_precheck.py",
       "source": "none"
+    },
+    {
+      "module": "test_predicate_single_source_pattern_doc_contract.py",
+      "source": "negative_assertion"
     },
     {
       "module": "test_preset_cli.py",
@@ -1573,12 +1869,20 @@
       "source": "none"
     },
     {
+      "module": "test_protocol_readme_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_protocol_wizard.py",
       "source": "negative_assertion"
     },
     {
       "module": "test_publish_boundary.py",
       "source": "none"
+    },
+    {
+      "module": "test_pulsemcp_submission_doc_contract.py",
+      "source": "negative_assertion"
     },
     {
       "module": "test_purity_scan.py",
@@ -1609,6 +1913,10 @@
       "source": "negative_assertion"
     },
     {
+      "module": "test_quickstart_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_quickstart_reference_contract.py",
       "source": "negative_assertion"
     },
@@ -1630,6 +1938,10 @@
     },
     {
       "module": "test_readme_ja_contract.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_receipts_doc_contract.py",
       "source": "negative_assertion"
     },
     {
@@ -1665,6 +1977,14 @@
       "source": "naming"
     },
     {
+      "module": "test_release_conclusion_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_release_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_release_gate.py",
       "source": "none"
     },
@@ -1697,12 +2017,20 @@
       "source": "naming"
     },
     {
+      "module": "test_requirement_template_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_requirements_ci_contract.py",
       "source": "naming"
     },
     {
       "module": "test_requirements_pins_contract.py",
       "source": "naming"
+    },
+    {
+      "module": "test_research_methods_doc_contract.py",
+      "source": "negative_assertion"
     },
     {
       "module": "test_residual_registry.py",
@@ -1725,12 +2053,20 @@
       "source": "negative_assertion"
     },
     {
+      "module": "test_revocation_feed_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_revocations.py",
       "source": "negative_assertion"
     },
     {
       "module": "test_rewrite_tool.py",
       "source": "naming"
+    },
+    {
+      "module": "test_rfc_doc_contract.py",
+      "source": "negative_assertion"
     },
     {
       "module": "test_role_model.py",
@@ -1833,6 +2169,10 @@
       "source": "none"
     },
     {
+      "module": "test_search_submit_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_security_contract.py",
       "source": "negative_assertion"
     },
@@ -1885,6 +2225,10 @@
       "source": "none"
     },
     {
+      "module": "test_short_form_submission_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_silent_skip_reasons.py",
       "source": "negative_case"
     },
@@ -1893,8 +2237,20 @@
       "source": "naming"
     },
     {
+      "module": "test_single_source_truth_pattern_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_site_assets_readme_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_site_face.py",
       "source": "naming"
+    },
+    {
+      "module": "test_site_readme_doc_contract.py",
+      "source": "negative_assertion"
     },
     {
       "module": "test_skill_adapter.py",
@@ -1909,8 +2265,20 @@
       "source": "negative_assertion"
     },
     {
+      "module": "test_st_quality_checklist_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_st_validator.py",
       "source": "naming"
+    },
+    {
+      "module": "test_standards_index_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_standards_layer_doc_contract.py",
+      "source": "negative_assertion"
     },
     {
       "module": "test_state_front.py",
@@ -1957,6 +2325,10 @@
       "source": "none"
     },
     {
+      "module": "test_supply_chain_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_support_contract.py",
       "source": "negative_assertion"
     },
@@ -1981,11 +2353,31 @@
       "source": "negative_assertion"
     },
     {
+      "module": "test_terminal_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_text_hygiene.py",
       "source": "naming"
     },
     {
+      "module": "test_text_hygiene_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_third_party_notices_contract.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_third_party_notices_reproducible.py",
+      "source": "naming"
+    },
+    {
+      "module": "test_threat_model_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_time_token_doc_contract.py",
       "source": "negative_assertion"
     },
     {
@@ -2013,6 +2405,10 @@
       "source": "negative_assertion"
     },
     {
+      "module": "test_tui_readme_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_two_faces_jsonrpc.py",
       "source": "naming"
     },
@@ -2035,6 +2431,14 @@
     {
       "module": "test_verification_cards.py",
       "source": "none"
+    },
+    {
+      "module": "test_verification_cards_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_verifier_must_run_pattern_doc_contract.py",
+      "source": "negative_assertion"
     },
     {
       "module": "test_verifier_props.py",
@@ -2071,6 +2475,10 @@
     {
       "module": "test_version_matrix.py",
       "source": "none"
+    },
+    {
+      "module": "test_version_matrix_doc_contract.py",
+      "source": "negative_assertion"
     },
     {
       "module": "test_w2_c3c4_record_contract.py",
@@ -2117,7 +2525,15 @@
       "source": "naming"
     },
     {
+      "module": "test_worktree_vs_index_pattern_doc_contract.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_world_model.py",
+      "source": "negative_assertion"
+    },
+    {
+      "module": "test_world_model_doc_contract.py",
       "source": "negative_assertion"
     },
     {
@@ -2137,10 +2553,10 @@
       "source": "negative_assertion"
     }
   ],
-  "modules": 534,
+  "modules": 638,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
-  "suspect": 161,
-  "with_evidence": 232,
+  "suspect": 163,
+  "with_evidence": 334,
   "without_evidence": 141
 }
