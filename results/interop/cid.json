@@ -87,9 +87,9 @@
       "sha256": "a4a0add82ae05dae7c5b56ea11c56a75c3e69e079c274e54aad78e57649ff54b"
     },
     {
-      "cid": "bafyreibvd3cdptzhyyv7t6ghuxukh6lqgxuc34i2r5dlqoiouiboquwl44",
+      "cid": "bafyreie5kxgh7hlkw4qj7afyfcnn2w5ltasvqxqobfsslabwglpqxnwqti",
       "path": "protocol/conformance_report.json",
-      "sha256": "351ec437cf27c62bf9f8c7a5e8a3f97035e82df11a8f46b8390ea202e852cbe7"
+      "sha256": "9d55cc7f9d6ab7209f80b8289add5bab9825585e0e096525803632df0bb6d09a"
     },
     {
       "cid": "bafyreiav4koretqkw26pbhyaw4e45ltrko727oqzo56f7pdn7zjljasc44",
@@ -107,9 +107,9 @@
       "sha256": "c9e39d009b8753805982b81ffb4b0f55fe94b009452fd42039dd97183e62ec7e"
     },
     {
-      "cid": "bafyreibxqnuxfypsm5o4ljxp64xsvdsqkbzuocyfgtz5e7s655xgmaiabm",
+      "cid": "bafyreiguq4bzcusr7oofmp7cuvcti3lpdsa6obq2d6yhxsmjqizcdvp6wq",
       "path": "protocol/role_coordinates.json",
-      "sha256": "37836972e1f2675dc5a6eff72f2a8e505073470b0534f3d27e5eef6e6601000b"
+      "sha256": "d48703915251fb9c563fe2a545346d6f1c81e7061a1fb07bc989823221d5feb4"
     },
     {
       "cid": "bafyreicwjkymtxdfwl635fmraubewmlxspi7gigz32kddsb3clyjfnru34",
@@ -182,9 +182,9 @@
       "sha256": "c2b024386b746578e571c91085af09b8767b85e09862b733bd1c3f572ec99e44"
     },
     {
-      "cid": "bafyreihgvicm3mjdl36mmln7ck2o3deqegd2loqucckcevhp7idlkefbkm",
+      "cid": "bafyreigb2bmtpoc6obidepahn5kfdl7b5ctiydmsha3fla6xoto6jo2nbe",
       "path": "protocol/assertions.json",
-      "sha256": "e6aa04cdb1235efcc62dbf12b4ed8c902187a5ba1410942254effa06b510a153"
+      "sha256": "c1d05937b85e7050323c076f5451afe1e8a68c0d9238365583d774dde4bb4d09"
     },
     {
       "cid": "bafyreihe7ooqwferljwsjhr7iu52n2hdu4tovs67btlxo5miz7gyofi5bu",
@@ -212,9 +212,9 @@
       "sha256": "c1bbc14c92cea6bd66ff6cb54fdcf91bf3072f66adee7027f1d3f42e70fe1825"
     },
     {
-      "cid": "bafyreifi6jt2cc3kh4xoyzkpq3ij3ycwdcqp5mag3rdw6q3oymvv6l7fza",
+      "cid": "bafyreihx3tcao5vre3utqbwc5tvhqhjmexsiycpyejoqni5mcs2z3vlqqe",
       "path": "protocol/data_contracts.json",
-      "sha256": "a8f267a10b6a3f2eec654f86d09de05618a0feb006dc476f436ec32b5f2fe5c8"
+      "sha256": "f7dcc40776b126e93806c2ecea781d2c25e48c09f8225d06a3ac14b59dd57081"
     },
     {
       "cid": "bafyreib7g2mjlq65lfdnqj2tnejuhvbmrig3fyn4cgfv6r4fejzqyxwqam",

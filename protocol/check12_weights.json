@@ -525,6 +525,7 @@
     "test_retriever": 1.0,
     "test_retry_semantics": 0.1,
     "test_reuse_contract": 2.8,
+    "test_reverse_behavior": 0.3,
     "test_reverse_contracts": 0.3,
     "test_revocation_feed_doc_contract": 0.2,
     "test_revocations": 1.8,
@@ -4983,6 +4984,9 @@
     "test_reuse_contract.ReuseContractTest.test_override_globs_are_not_empty": 0.33,
     "test_reuse_contract.ReuseContractTest.test_reuse_matches_contract": 0.33,
     "test_reuse_contract.ReuseContractTest.test_submission_surface_is_declared": 0.05,
+    "test_reverse_behavior.ReverseBehaviorTest.test_behavior_valid": 0.01,
+    "test_reverse_behavior.ReverseBehaviorTest.test_doc_cross_consistent": 0.0,
+    "test_reverse_behavior.ReverseBehaviorTest.test_mutations_red": 0.04,
     "test_reverse_contracts.ReverseContractsTest.test_contracts_valid": 0.02,
     "test_reverse_contracts.ReverseContractsTest.test_doc_cross_consistent": 0.0,
     "test_reverse_contracts.ReverseContractsTest.test_mutations_red": 0.09,
@@ -6248,5 +6252,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2147.9
+  "total_s": 2148.2
 }

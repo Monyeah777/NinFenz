@@ -1,0 +1,477 @@
+{
+  "schema": "nf-reverse-behavior/1",
+  "note": "NF-Final §4A R2 行为重建机读件：入口→阶段→生成物→校验链→失败语义，及状态机（冻结链/信任等级/契约生命周期）。判据 desktop/tests/test_reverse_behavior.py：入口/生成物/证据在场；check 标签在 verify.sh 命中；失败语义 exit∈{0,1,2}；状态迁移端点合法且命令在证据件正文命中；gap 必须写 owner。人读：results/reverse/BEHAVIOR.md。",
+  "flows": [
+    {
+      "id": "F-01",
+      "name": "生产全链 run",
+      "entry": "scripts/nf.py",
+      "command": "nf run --fmt <fmt>",
+      "status": "documented",
+      "stages": [
+        "retrieve",
+        "compose",
+        "gate",
+        "export"
+      ],
+      "outputs": [
+        "protocol/output_forms.json",
+        "results/interop/cid.json"
+      ],
+      "checks": [
+        "check12",
+        "check18"
+      ],
+      "contracts": [
+        "X-04",
+        "X-06",
+        "X-07"
+      ],
+      "failures": [
+        {
+          "condition": "gate.n_fail>0 且未 force",
+          "exit": 1,
+          "evidence": "desktop/src/core/pipeline.py"
+        },
+        {
+          "condition": "未知 fmt（exporter 注册表无此项）",
+          "exit": 2,
+          "evidence": "desktop/src/core/exporter.py"
+        }
+      ],
+      "note": "PipeResult.ok 与 export 分离：门不过则 ok=False，产物不冒充合格"
+    },
+    {
+      "id": "F-02",
+      "name": "需求自组装 assemble",
+      "entry": "scripts/nf.py",
+      "command": "nf assemble '<需求>' [--check OUT.md] [--build]",
+      "status": "documented",
+      "stages": [
+        "plan",
+        "build",
+        "check"
+      ],
+      "outputs": [
+        "protocol/production/assembly.schema.json"
+      ],
+      "checks": [
+        "check16"
+      ],
+      "contracts": [
+        "X-03",
+        "X-05"
+      ],
+      "failures": [
+        {
+          "condition": "需求空/不可解析",
+          "exit": 2,
+          "evidence": "desktop/src/core/assemble_plan.py"
+        },
+        {
+          "condition": "成品未过 --check 验收",
+          "exit": 1,
+          "evidence": "desktop/src/core/assemble_build.py"
+        }
+      ],
+      "note": "装配计划与成品校验分离；成品必须过机器验收才算通过"
+    },
+    {
+      "id": "F-03",
+      "name": "冻结链",
+      "entry": "docs/release.md",
+      "command": "nf conformance --write → nf approve → nf receipts --scope protocol --write",
+      "status": "documented",
+      "stages": [
+        "conformance",
+        "approve",
+        "receipts"
+      ],
+      "outputs": [
+        "protocol/conformance_report.json",
+        "protocol/approvals/protocol__conformance_report.json",
+        "protocol/RECEIPTS.json"
+      ],
+      "checks": [
+        "check35"
+      ],
+      "contracts": [
+        "X-01",
+        "X-07"
+      ],
+      "failures": [
+        {
+          "condition": "内容改在重冻结之后（单根覆盖旧字节）",
+          "exit": 1,
+          "evidence": "docs/release.md"
+        },
+        {
+          "condition": "approve 后对象再改（内容绑定失效）",
+          "exit": 1,
+          "evidence": "desktop/src/core/approval.py"
+        }
+      ],
+      "note": "顺序不可颠倒：内容定稿→conformance→approve→receipts"
+    },
+    {
+      "id": "F-04",
+      "name": "门禁 verify",
+      "entry": "verify.sh",
+      "command": "bash verify.sh [--checks-only|--full]",
+      "status": "documented",
+      "stages": [
+        "checks-only",
+        "tests",
+        "report"
+      ],
+      "outputs": [
+        "protocol/verification_report.json"
+      ],
+      "checks": [
+        "check12",
+        "check38"
+      ],
+      "contracts": [
+        "X-01",
+        "X-08"
+      ],
+      "failures": [
+        {
+          "condition": "任一 check FAIL",
+          "exit": 1,
+          "evidence": "verify.sh"
+        },
+        {
+          "condition": "--tests-only 缺 scripts/verify_tests.py",
+          "exit": 2,
+          "evidence": "verify.sh"
+        }
+      ],
+      "note": "PASS 计数与 quality_baseline 声明联动；红即回滚"
+    },
+    {
+      "id": "F-05",
+      "name": "证据包 evidence",
+      "entry": "scripts/nf.py",
+      "command": "nf evidence build|verify",
+      "status": "documented",
+      "stages": [
+        "build",
+        "self-verify",
+        "third-party verify"
+      ],
+      "outputs": [
+        "results/trust/SELF_AUDIT.json",
+        "results/trust/trust_vectors.json"
+      ],
+      "checks": [
+        "check45",
+        "check48"
+      ],
+      "contracts": [
+        "X-02"
+      ],
+      "failures": [
+        {
+          "condition": "缺锚/等级不足",
+          "exit": 2,
+          "evidence": "desktop/src/core/trust/verify.py"
+        },
+        {
+          "condition": "bundle 不自洽/被篡改",
+          "exit": 1,
+          "evidence": "desktop/src/core/trust/bundle.py"
+        }
+      ],
+      "note": "报告只判等级与缺项，不写质量评分"
+    },
+    {
+      "id": "F-06",
+      "name": "信任等级判定",
+      "entry": "scripts/trust_verify.py",
+      "command": "python scripts/trust_verify.py --bundle B --policy P",
+      "status": "documented",
+      "stages": [
+        "load-bundle",
+        "load-policy",
+        "decide-level"
+      ],
+      "outputs": [
+        "protocol/trust/verify.schema.json"
+      ],
+      "checks": [
+        "check46"
+      ],
+      "contracts": [
+        "X-02",
+        "X-11"
+      ],
+      "failures": [
+        {
+          "condition": "required>achieved（缺锚/见证不足）",
+          "exit": 2,
+          "evidence": "desktop/src/core/trust/verify.py"
+        },
+        {
+          "condition": "策略非法/输入缺失",
+          "exit": 2,
+          "evidence": "scripts/trust_verify.py"
+        },
+        {
+          "condition": "bundle 结构或签名失败",
+          "exit": 1,
+          "evidence": "desktop/src/core/trust/bundle.py"
+        }
+      ],
+      "note": "exit 0/1/2 与 nf-verify/1 报告一致；T3/T4 缺锚不得冒充"
+    },
+    {
+      "id": "F-07",
+      "name": "发布体检/冻结",
+      "entry": "scripts/nf.py",
+      "command": "nf release --plan → nf release --freeze --apply",
+      "status": "documented",
+      "stages": [
+        "gate",
+        "changes",
+        "freeze",
+        "verify",
+        "audit"
+      ],
+      "outputs": [
+        "protocol/approvals/protocol__conformance_report.json",
+        "protocol/generated/receipt_chain.json"
+      ],
+      "checks": [
+        "check38"
+      ],
+      "contracts": [
+        "X-01"
+      ],
+      "failures": [
+        {
+          "condition": "体检未过或冻结链顺序错",
+          "exit": 1,
+          "evidence": "desktop/src/core/release_gate.py"
+        }
+      ],
+      "note": "11 步计划 + 3 步冻结链；缺省只打印不执行"
+    },
+    {
+      "id": "F-08",
+      "name": "语言面重签",
+      "entry": "scripts/nf.py",
+      "command": "nf locales --write",
+      "status": "documented",
+      "stages": [
+        "scan-entries",
+        "mirror-check",
+        "resign-sha256"
+      ],
+      "outputs": [
+        "protocol/locales.json"
+      ],
+      "checks": [
+        "check34"
+      ],
+      "contracts": [
+        "X-08"
+      ],
+      "failures": [
+        {
+          "condition": "译件缺件/未声明语言面",
+          "exit": 1,
+          "evidence": "desktop/src/core/locales.py"
+        }
+      ],
+      "note": "文件即真源 + source_sha256；只重签不翻译"
+    },
+    {
+      "id": "F-09",
+      "name": "Spec Registry 查询",
+      "entry": "scripts/nf.py",
+      "command": "nf spec ls",
+      "status": "documented",
+      "stages": [
+        "load-registry",
+        "list-versions"
+      ],
+      "outputs": [
+        "desktop/src/core/registry.json"
+      ],
+      "checks": [],
+      "contracts": [
+        "X-04"
+      ],
+      "failures": [
+        {
+          "condition": "registry 不可读",
+          "exit": 2,
+          "evidence": "desktop/src/core/registry_loader.py"
+        }
+      ],
+      "note": "只查询，不编译（编译属 G1 WP-11）"
+    },
+    {
+      "id": "F-10",
+      "name": "Wiki 编译（未实现）",
+      "entry": "scripts/nf.py",
+      "command": "nf wiki build（计划）",
+      "status": "gap",
+      "stages": [
+        "compile",
+        "index",
+        "graph"
+      ],
+      "outputs": [
+        "protocol/production/wiki-page.schema.json"
+      ],
+      "checks": [
+        "check43"
+      ],
+      "contracts": [
+        "X-03"
+      ],
+      "failures": [
+        {
+          "condition": "未实现：G1 WP-10",
+          "exit": 2,
+          "evidence": "docs/CQ_REPORT.md"
+        }
+      ],
+      "gap": "G-01",
+      "note": "契约已就位（nf-wiki-page/1），编译器未建"
+    },
+    {
+      "id": "F-11",
+      "name": "Spec 编译（未实现）",
+      "entry": "scripts/nf.py",
+      "command": "nf spec compile（计划）",
+      "status": "gap",
+      "stages": [
+        "parse-intent",
+        "emit-spec",
+        "emit-task"
+      ],
+      "outputs": [
+        "protocol/production/spec.schema.json"
+      ],
+      "checks": [
+        "check44"
+      ],
+      "contracts": [
+        "X-03"
+      ],
+      "failures": [
+        {
+          "condition": "未实现：G1 WP-11",
+          "exit": 2,
+          "evidence": "docs/CQ_REPORT.md"
+        }
+      ],
+      "gap": "G-01",
+      "note": "契约已就位（nf-spec/1、nf-task/1），编译器未建"
+    }
+  ],
+  "state_machines": [
+    {
+      "id": "S-01",
+      "name": "冻结链状态机",
+      "evidence": "protocol/release_policy.json",
+      "states": [
+        "content-final",
+        "conformance",
+        "approval",
+        "receipts"
+      ],
+      "transitions": [
+        {
+          "from": "content-final",
+          "to": "conformance",
+          "cmd": "nf conformance --write"
+        },
+        {
+          "from": "conformance",
+          "to": "approval",
+          "cmd": "nf approve"
+        },
+        {
+          "from": "approval",
+          "to": "receipts",
+          "cmd": "nf receipts --scope protocol --write"
+        }
+      ],
+      "rule": "状态只能单向前进；回退=重做内容并整链重跑"
+    },
+    {
+      "id": "S-02",
+      "name": "信任等级",
+      "evidence": "desktop/src/core/trust/verify.py",
+      "states": [
+        "T0",
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "transitions": [
+        {
+          "from": "T0",
+          "to": "T1",
+          "cmd": "signature"
+        },
+        {
+          "from": "T1",
+          "to": "T2",
+          "cmd": "time-token"
+        },
+        {
+          "from": "T2",
+          "to": "T3",
+          "cmd": "witness"
+        },
+        {
+          "from": "T3",
+          "to": "T4",
+          "cmd": "public-anchor"
+        }
+      ],
+      "rule": "achieved ≥ required 才通过；缺项 exit 2，不得降级冒充"
+    },
+    {
+      "id": "S-03",
+      "name": "契约生命周期",
+      "evidence": "protocol/production/contract.schema.json",
+      "states": [
+        "draft",
+        "active",
+        "deprecated",
+        "retired"
+      ],
+      "transitions": [
+        {
+          "from": "draft",
+          "to": "active",
+          "cmd": "approve"
+        },
+        {
+          "from": "active",
+          "to": "deprecated",
+          "cmd": "deprecate"
+        },
+        {
+          "from": "deprecated",
+          "to": "retired",
+          "cmd": "retired"
+        }
+      ],
+      "rule": "deprecated/retired 不得被引用（check24 同源）"
+    }
+  ],
+  "status_vocabulary": [
+    "documented",
+    "partial",
+    "gap"
+  ],
+  "method": "按 R1 消费方列从入口（nf.py/verify.sh/trust_verify.py）读调用链；阶段名来自实现 docstring/参数；失败语义来自 code 的 return/exit 分支；未实现流显式 status=gap + owner。"
+}
