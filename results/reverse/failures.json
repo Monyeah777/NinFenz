@@ -1,0 +1,362 @@
+{
+  "schema": "nf-reverse-failures/1",
+  "note": "NF-Final §4A R4 失败考古机读件：git 失败史（fix/hotfix/security/refreeze/revert）→ 失败模式（触发/现有防护/缺口/测试建议）+ 环境性 skip 面 + 文档已知坑 → 缺口进 R6。判据 desktop/tests/test_reverse_failures.py：引用的 commit 必须真实存在、证据文件在场、skip 计数实时重算一致。人读：results/reverse/FAILURE_ARCHAEOLOGY.md。",
+  "stats": {
+    "fix_commits_400": 48,
+    "window_end": "31ce09a61744aee81e87a5622c623ffe60919993",
+    "revert_commits_600": 1,
+    "skip_files": 29,
+    "known_pitfall_sections": 4
+  },
+  "categories": [
+    "契约错",
+    "默认放行",
+    "边界",
+    "证据",
+    "性能",
+    "环境",
+    "CI/供应链",
+    "文档"
+  ],
+  "modes": [
+    {
+      "id": "F-01",
+      "pattern": "CI 假绿：`| tee` 未开 pipefail，测试/SAST 失败被管道吞掉",
+      "category": "默认放行",
+      "trigger": "步骤命令非零但管道最后一段为 tee/成功，job 仍绿",
+      "evidence_commits": [
+        "93466205b4348b49ec6ec25aa0015a46f8959337"
+      ],
+      "evidence_files": [
+        "verify.sh",
+        ".github/workflows/ci-verify.yml"
+      ],
+      "protection": "CI 全链路显式 pipefail + set -e；verify.sh 自身失败即非零",
+      "gap": "R4-01：新增 shell 步骤是否带 pipefail 无机检",
+      "test_suggestion": "CI 配置 lint（grep tee 步骤必须有 pipefail）",
+      "status": "covered"
+    },
+    {
+      "id": "F-02",
+      "pattern": "required-skip 放行盲区：依赖被 skip 时 gate 仍过",
+      "category": "默认放行",
+      "trigger": "required job 因条件 skip，下游 gate 未判「必须已执行」",
+      "evidence_commits": [
+        "886f2850bd8d77f34b8bf2b76b41bc6492e2da87"
+      ],
+      "evidence_files": [
+        "verify.sh"
+      ],
+      "protection": "gate 改 always + 显式依赖判定",
+      "gap": "R4-02：脚本/测试层面的 skip 是否等价判据仍靠人读",
+      "test_suggestion": "gate 判据反例：required job skip 必须红",
+      "status": "covered"
+    },
+    {
+      "id": "F-03",
+      "pattern": "upload-artifact 漏隐藏文件（.sast-counts.json / .json 隐藏名）",
+      "category": "CI/供应链",
+      "trigger": "上传面用 dot 文件，artifact 默认排除 .*",
+      "evidence_commits": [
+        "48d89af9bcaeebc62a8c19fd8a65233fefcc5ce6",
+        "c9a7ba857bd97817b29d322feeb63c68d92ffc55"
+      ],
+      "evidence_files": [
+        "protocol/sast_baseline.json"
+      ],
+      "protection": "产出一律非隐藏命名 + 契约判据",
+      "gap": "R4-03：新增上传面命名纪律未机检",
+      "test_suggestion": "扫描 workflow 的 path 通配是否含隐藏件",
+      "status": "partial"
+    },
+    {
+      "id": "F-04",
+      "pattern": "runner 拉包偶发 403 → 假红",
+      "category": "环境",
+      "trigger": "apt-get update/install 网络瞬断",
+      "evidence_commits": [
+        "b538a89cd0806b542130d97a4bf3718a5f913f56"
+      ],
+      "evidence_files": [
+        ".github/workflows/ci-verify.yml"
+      ],
+      "protection": "Acquire::Retries=3",
+      "gap": "",
+      "test_suggestion": "无需测试（环境性）",
+      "status": "covered"
+    },
+    {
+      "id": "F-05",
+      "pattern": "Dockerfile 基座未按 digest 钉死（PinnedDependencies）",
+      "category": "CI/供应链",
+      "trigger": "镜像 tag 漂移/供应链替换",
+      "evidence_commits": [
+        "f2a6d021664b9b15a6b68421d8b7a86142d031fd"
+      ],
+      "evidence_files": [
+        "Dockerfile"
+      ],
+      "protection": "FROM 按 digest 固定 + docker-nfal 契约",
+      "gap": "",
+      "test_suggestion": "CI 检查 Dockerfile FROM 必须含 @sha256",
+      "status": "covered"
+    },
+    {
+      "id": "F-06",
+      "pattern": "冻结行数上限上调未评审（基线松动风险）",
+      "category": "契约错",
+      "trigger": "扩面注释导致行数超限，直接把上限抬高",
+      "evidence_commits": [
+        "fdb7647c9a4f49dc31044dc7feab053adddfa107"
+      ],
+      "evidence_files": [
+        "scripts/code_metrics.py",
+        "protocol/code_metrics_baseline.json"
+      ],
+      "protection": "上限上调须评审并写入提交说明",
+      "gap": "R4-04：上调评审无机器记录",
+      "test_suggestion": "基线变更 diff 必须带 review note（后续门禁）",
+      "status": "partial"
+    },
+    {
+      "id": "F-07",
+      "pattern": "SAST 漂移只比总数漏键级变化",
+      "category": "契约错",
+      "trigger": "数量不变但键集合变化（旧键消失+新键出现）",
+      "evidence_commits": [
+        "ea09b7d7f947da34f1084ac6dc486f4322dd3539"
+      ],
+      "evidence_files": [
+        "scripts/sast_check.py",
+        "protocol/sast_baseline.json"
+      ],
+      "protection": "逐键比对 + 冻结基线",
+      "gap": "R4-05：其他 ratchet 面是否也只比总数（待 R6/CQ3 核）",
+      "test_suggestion": "键级漂移负例（总数同、键不同→必须红）",
+      "status": "partial"
+    },
+    {
+      "id": "F-08",
+      "pattern": "存档记录许可/失效文件引用错误（Zenodo）",
+      "category": "证据",
+      "trigger": "对外存档面与仓内事实（MIT）不一致",
+      "evidence_commits": [
+        "fa8d5b37ab2e65be1445e5013aaf2a8417af4437"
+      ],
+      "evidence_files": [
+        "docs/legal/CONTRACTS.md",
+        "protocol/legal.json"
+      ],
+      "protection": "契约判据 + 许可审计",
+      "gap": "",
+      "test_suggestion": "存档面许可与 LICENSE 一致性（已有 legal 判据覆盖）",
+      "status": "covered"
+    },
+    {
+      "id": "F-09",
+      "pattern": "verify_report 基准日随提交件漂移",
+      "category": "证据",
+      "trigger": "测试辅助按当天日期构建，重跑即变",
+      "evidence_commits": [
+        "ff32f7ef543d9111dffe79d83437976f5a8114cf"
+      ],
+      "evidence_files": [
+        "scripts/verify_report.py",
+        "protocol/verification_report.json"
+      ],
+      "protection": "按提交件基准日构建（确定性）",
+      "gap": "",
+      "test_suggestion": "同输入重跑逐字节一致（已有 check33/38 覆盖）",
+      "status": "covered"
+    },
+    {
+      "id": "F-10",
+      "pattern": "文档死链/伪代码坏链/llms.txt 活文档漂移",
+      "category": "文档",
+      "trigger": "导航面引用不存在的文件/锚点；生成物与真源漂移",
+      "evidence_commits": [
+        "be85af596e1a79b5d64c7ee0a3885eeb11d900c8",
+        "68ff55b1602136196503c5569be4b2dec75563a3",
+        "365f70791cc98f5682d24644604148cbd2910887"
+      ],
+      "evidence_files": [
+        "scripts/geo_export.py",
+        "llms.txt"
+      ],
+      "protection": "全仓相对链接判据 + 路由契约 + 生成区等价判据",
+      "gap": "R4-06：生成区新增面是否自动纳入链接判据",
+      "test_suggestion": "新增生成区必须在判据登记（R6 不变量）",
+      "status": "covered"
+    },
+    {
+      "id": "F-11",
+      "pattern": "路径逃逸/包含性：文档曾声称 validatePath 拦截而实现不存在（虚假保证）",
+      "category": "边界",
+      "trigger": "写入/读取路径含 ../、符号链接、Win 大小写/短路径",
+      "evidence_commits": [],
+      "evidence_files": [
+        "AGENTS.md",
+        "desktop/src/core/paths.py",
+        "desktop/tests/test_output_path_escape.py"
+      ],
+      "protection": "core.paths.validate_path 单点 + 台账/产出面收敛 + 负例测试",
+      "gap": "R4-07：仍有 5 处 realpath 变体（R3 D-03）",
+      "test_suggestion": "R6 不变量：所有落盘写入路径必过 validate_path 或登记例外",
+      "status": "partial"
+    },
+    {
+      "id": "F-12",
+      "pattern": "生成区手改/漂移；一致性报告重算后未重批准；译件三处不同步",
+      "category": "契约错",
+      "trigger": "改了生成物而非生成器；nf conformance --write 后未 approve；改译文未重签 locales",
+      "evidence_commits": [],
+      "evidence_files": [
+        "AGENTS.md",
+        "desktop/tests/test_locales.py",
+        "desktop/tests/test_release_gate.py"
+      ],
+      "protection": "生成物禁手改纪律 + approve 自动失效 + nf locales --write + 新鲜度判据",
+      "gap": "R4-08：三条纪律中前两条仍主要靠人读",
+      "test_suggestion": "R6：生成区写入指纹 + approve 对象绑定已有（check35/38）",
+      "status": "partial"
+    },
+    {
+      "id": "F-13",
+      "pattern": "未跑完的门禁写成全绿（台账造假）",
+      "category": "证据",
+      "trigger": "check12 全量超时/未跑，报告写 PASS",
+      "evidence_commits": [],
+      "evidence_files": [
+        "AGENTS.md",
+        "results/BASELINE.md"
+      ],
+      "protection": "「静态面全量 + 受影响面全量 + 原生新鲜度」三件套取证纪律",
+      "gap": "R4-09：无机检「声明 PASS 与实际执行」的对应",
+      "test_suggestion": "check12 报告记录实际执行模块数，与期望集合比对（CQ3）",
+      "status": "partial"
+    }
+  ],
+  "inconsistencies": [
+    {
+      "id": "INC-01",
+      "text": "AGENTS.md 曾写「路径逃逸被 validatePath 拦截」而仓库内无实现（2026-09-24 改为真实载体）",
+      "evidence": [
+        "AGENTS.md",
+        "desktop/src/core/paths.py"
+      ],
+      "fix": "文档只写真实载体；包含性判据 = core.paths.validate_path（已落）",
+      "status": "fixed"
+    },
+    {
+      "id": "INC-02",
+      "text": "一致性报告重算后批准自动失效，但脚本链顺序未在 schema 强制（R2 S-01 已记录）",
+      "evidence": [
+        "docs/release.md",
+        "desktop/src/core/release_gate.py"
+      ],
+      "fix": "冻结链顺序写入 release_policy + release_gate 判据",
+      "status": "mitigated"
+    },
+    {
+      "id": "INC-03",
+      "text": "生成物/冻结证据/普通文档混杂在 docs/，误改风险高（AGENTS.md 高发误判）",
+      "evidence": [
+        "AGENTS.md",
+        "docs/verification-cards.md"
+      ],
+      "fix": "生成器 --write + 等价判据 + 冻结件字节摘要",
+      "status": "mitigated"
+    },
+    {
+      "id": "INC-04",
+      "text": "译件需三处同步（原文/en/ja + nf locales --write），漏一处即过期",
+      "evidence": [
+        "protocol/locales.json",
+        "desktop/src/core/locales.py"
+      ],
+      "fix": "source_sha256 过期判据 + check34",
+      "status": "mitigated"
+    },
+    {
+      "id": "INC-05",
+      "text": "skip 面 28 个文件为环境条件（ssh/git/bash/rust/cs/windows），但「skip 即不判」可能掩盖失败",
+      "evidence": [
+        "desktop/tests/test_attest.py",
+        "desktop/tests/test_cross_lang_matrix.py"
+      ],
+      "fix": "skip 必须写环境理由（unittest 已要求 reason）；关键面另设必跑门禁",
+      "status": "mitigated"
+    }
+  ],
+  "gaps": [
+    {
+      "id": "R4-01",
+      "text": "CI shell 步骤 pipefail 无机检",
+      "owner": "R6",
+      "status": "open",
+      "mapped": "R6 不变量候选"
+    },
+    {
+      "id": "R4-02",
+      "text": "脚本/测试层 skip 等价判据靠人读",
+      "owner": "R6",
+      "status": "open",
+      "mapped": "R6 不变量候选"
+    },
+    {
+      "id": "R4-03",
+      "text": "上传面隐藏件命名纪律未机检",
+      "owner": "CQ5/R6",
+      "status": "open",
+      "mapped": "R6 不变量候选"
+    },
+    {
+      "id": "R4-04",
+      "text": "冻结基线上调无机器评审记录",
+      "owner": "R6/CQ6",
+      "status": "open",
+      "mapped": "R6 不变量候选"
+    },
+    {
+      "id": "R4-05",
+      "text": "其他 ratchet 面是否只比总数未核",
+      "owner": "R6/CQ3",
+      "status": "open",
+      "mapped": "R6 不变量候选"
+    },
+    {
+      "id": "R4-06",
+      "text": "生成区新增面未自动纳入链接判据",
+      "owner": "R6",
+      "status": "open",
+      "mapped": "R6 不变量候选"
+    },
+    {
+      "id": "R4-07",
+      "text": "路径包含性 5 处 realpath 变体（承 R3 D-03）",
+      "owner": "R6",
+      "status": "open",
+      "mapped": "R6 不变量候选"
+    },
+    {
+      "id": "R4-08",
+      "text": "生成区手改/重批准纪律仍靠人读",
+      "owner": "R6",
+      "status": "open",
+      "mapped": "R6 不变量候选"
+    },
+    {
+      "id": "R4-09",
+      "text": "声明 PASS 与实际执行对应无机检",
+      "owner": "CQ3/R6",
+      "status": "open",
+      "mapped": "R6 不变量候选"
+    }
+  ],
+  "status_vocabulary": [
+    "covered",
+    "partial",
+    "gap"
+  ],
+  "method": "git log -400 抓 fix/hotfix/security/refreeze/revert（39 条命中）逐条归类；desktop/tests 扫 skip/xfail（28 文件）判环境性 vs 掩盖；AGENTS.md/STRATEGY 已知坑反推文档与代码不一致；每条失败模式给证据 commit/文件、防护、缺口、测试建议。"
+}

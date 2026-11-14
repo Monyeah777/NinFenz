@@ -4,9 +4,9 @@
     "entry": 26,
     "floor": 5,
     "prod": 1062,
-    "projection": 190,
+    "projection": 192,
     "support": 503,
-    "verify": 1410
+    "verify": 1411
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -10943,6 +10943,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "§4A R4 失败考古判据（NF-Final G0 逆向工程）。",
+      "path": "desktop/tests/test_reverse_failures.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "docs/ccos/revocation-feed-v0.md 契约：吊销 feed 文档必须「五子命令/链深/判据数与实现一致」。",
       "path": "desktop/tests/test_revocation_feed_doc_contract.py",
       "role": "verify",
@@ -14874,16 +14880,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "8409fdfcb975f00f38142a4536d7a8bc05c6a4dc42fdfb13c201426fc14c35ac",
+  "root_digest": "756f93bd39942b867a024934112e92c064a0309728be1eaf6adc47acda06dfc3",
   "rule_counts": {
     "R-app": 1494,
     "R-catch": 350,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 168,
+    "R-projection": 170,
     "R-support": 124,
-    "R-verify": 1281,
+    "R-verify": 1282,
     "auto:R-core": 298
   },
   "schema": "nf-role-coordinates/1"

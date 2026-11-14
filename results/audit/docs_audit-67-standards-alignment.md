@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/asset_density.py:aa60651ad8269e7db09a709570ae69192f39ee95cfd6bd1d4f652696b3d26c56
   - docs/domain-packs.md:f90ff233965ee1bb5a872dd833b79e200bfc1825db9c81f651ceca760d83d8b6
-  - protocol/data_contracts.json:ae2362fb55b312383552c934c038c93d2a6011f79b1e2f5c6c876774f78cafc5
+  - protocol/data_contracts.json:4a421d5887d8bb2da44dfc23c277d1554dbf7b3cbccfe3059d45c6062321c5a3
 ---
+> 重审（2026-11-14）：NF-Final R4 失败考古：新增 results/reverse/{FAILURE_ARCHAEOLOGY.md,failures.json}、test_reverse_failures.py；assertions/data_contracts/check12 更新，被审对象变更后机械重绑
+
 > 重审（2026-11-14）：NF-Final R3 耦合/重复：新增 results/reverse/{COUPLING.md,coupling.json}、test_reverse_coupling.py；assertions/data_contracts/check12 权重与预算（2150→2175 容量调整）更新，被审对象变更后机械重绑
 
 > 重审（2026-11-14）：NF-Final R2 行为重建：新增 results/reverse/{BEHAVIOR.md,behavior.json}、test_reverse_behavior.py；assertions/data_contracts/check12 更新，被审对象变更后机械重绑

@@ -8,14 +8,16 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/gap_review.py:7d1d600926e13b9936f2a7d30e8a8ca95e4bb3b2a73308f88cfb89b563055953
   - desktop/src/core/payload_harvest.py:514c493d341863b245b7dddb0bde8ee87ca969fe4407c9f2834a726bb92d1a76
-  - protocol/data_contracts.json:ae2362fb55b312383552c934c038c93d2a6011f79b1e2f5c6c876774f78cafc5
-  - protocol/assertions.json:46e55b06c0e532c12e73efb99957968c5f5f3a0a6411059148e9eb6cf47fe42c
+  - protocol/data_contracts.json:4a421d5887d8bb2da44dfc23c277d1554dbf7b3cbccfe3059d45c6062321c5a3
+  - protocol/assertions.json:a402ae5355af014832e14b4e0a66738aeac0dc60ad2793363e652b7cfb7a883f
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
   - desktop/src/core/text_hygiene.py:99b38bfbb8656ad653689c4cba93679970a78183019fd5f02e2380d87ec99ff3
   - desktop/src/core/workloop.py:3ee94f2c11939abba5507741c6b9b4dae8e8cab77c3bda38419678e31e097056
   - scripts/serve_decision_model.py:bbb36dff0e3816c2253150b7de6ab619877c3c78269a644c4c966083df15afee
   - scripts/nf.py:75ed1ad2dda5fb07dbd914a6ffedb836e5cf1298bf34b98be602644827ebc925
 ---
+> 重审（2026-11-14）：NF-Final R4 失败考古：新增 results/reverse/{FAILURE_ARCHAEOLOGY.md,failures.json}、test_reverse_failures.py；assertions/data_contracts/check12 更新，被审对象变更后机械重绑
+
 > 重审（2026-11-14）：NF-Final R3 耦合/重复：新增 results/reverse/{COUPLING.md,coupling.json}、test_reverse_coupling.py；assertions/data_contracts/check12 权重与预算（2150→2175 容量调整）更新，被审对象变更后机械重绑
 
 > 重审（2026-11-14）：NF-Final R2 行为重建：新增 results/reverse/{BEHAVIOR.md,behavior.json}、test_reverse_behavior.py；assertions/data_contracts/check12 更新，被审对象变更后机械重绑

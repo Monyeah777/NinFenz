@@ -838,6 +838,21 @@
       "message": "§4A R3 耦合/重复实现件缺失或版本名不符（G0 逆向判据依赖它）",
       "fix": "补/修 results/reverse/coupling.json；再跑 test_reverse_coupling",
       "evidence": "test_reverse_coupling / conformance::modeling"
+    },
+    {
+      "id": "reverse-failures",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "results/reverse/failures.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-reverse-failures/1"
+      },
+      "message": "§4A R4 失败考古件缺失或版本名不符（G0 逆向判据依赖它）",
+      "fix": "补/修 results/reverse/failures.json；再跑 test_reverse_failures",
+      "evidence": "test_reverse_failures / conformance::modeling"
     }
   ]
 }

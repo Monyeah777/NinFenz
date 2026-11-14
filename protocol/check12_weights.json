@@ -528,6 +528,7 @@
     "test_reverse_behavior": 0.3,
     "test_reverse_contracts": 0.3,
     "test_reverse_coupling": 8.1,
+    "test_reverse_failures": 8.4,
     "test_revocation_feed_doc_contract": 0.2,
     "test_revocations": 1.8,
     "test_rewrite_tool": 0.8,
@@ -4995,6 +4996,9 @@
     "test_reverse_coupling.ReverseCouplingTest.test_coupling_valid_and_live": 1.67,
     "test_reverse_coupling.ReverseCouplingTest.test_doc_cross_consistent": 0.0,
     "test_reverse_coupling.ReverseCouplingTest.test_mutations_red": 6.16,
+    "test_reverse_failures.ReverseFailuresTest.test_doc_cross_consistent": 0.0,
+    "test_reverse_failures.ReverseFailuresTest.test_failures_valid": 1.31,
+    "test_reverse_failures.ReverseFailuresTest.test_mutations_red": 6.81,
     "test_revocation_feed_doc_contract.RevocationFeedDocTest.test_contract_catches_mutations": 0.01,
     "test_revocation_feed_doc_contract.RevocationFeedDocTest.test_feed_doc_matches_contract": 0.0,
     "test_revocation_feed_doc_contract.RevocationFeedDocTest.test_implementation_live": 0.0,
@@ -6256,5 +6260,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2156.3
+  "total_s": 2164.7
 }

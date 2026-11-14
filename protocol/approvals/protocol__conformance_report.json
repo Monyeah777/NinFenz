@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-14",
   "approved_by": "Monyeah777",
-  "note": "NF-Final §4A R3 耦合/重复实现（300 模块/540 边/0 环/9 SDP + 7 项裁定）",
+  "note": "NF-Final §4A R4 失败考古（13 模式 + 5 不一致 + 9 缺口）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "a0f90b48014fd298a076759a7a23a1b2193a283e8dc2463a1889346de07a4c8c"
+  "subject_digest": "239b249b004d781a24798a257dbdefa0b6e765bbec682624afd654c405826446"
 }

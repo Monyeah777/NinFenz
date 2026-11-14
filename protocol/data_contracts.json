@@ -896,6 +896,18 @@
         "test_reverse_coupling",
         "results/reverse/COUPLING.md"
       ]
+    },
+    {
+      "id": "reverse-failures",
+      "artifact": "results/reverse/failures.json",
+      "quality_rule": "assertion:reverse-failures",
+      "owner": "§4A 逆向 R4 失败考古（test_reverse_failures 判据：commit 存在/skip 实时重算）",
+      "status": "active",
+      "freshness": "git 窗口/skip 面变化须重跑 R4（测试实时重算）",
+      "consumers": [
+        "test_reverse_failures",
+        "results/reverse/FAILURE_ARCHAEOLOGY.md"
+      ]
     }
   ]
 }
