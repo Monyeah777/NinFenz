@@ -2441,6 +2441,10 @@
       "source": "none"
     },
     {
+      "module": "test_trust_human_review.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_trust_keys.py",
       "source": "naming"
     },
@@ -2629,10 +2633,10 @@
       "source": "negative_assertion"
     }
   ],
-  "modules": 657,
+  "modules": 658,
   "note": "hard = negative_case + mutation；naming 只是代理指标",
   "schema": "nf-judge-red-evidence/1",
   "suspect": 171,
-  "with_evidence": 344,
+  "with_evidence": 345,
   "without_evidence": 142
 }

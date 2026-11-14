@@ -633,6 +633,10 @@
       "referenced": true
     },
     {
+      "module": "human_review",
+      "referenced": true
+    },
+    {
       "module": "impact_check",
       "referenced": true
     },
@@ -1473,9 +1477,9 @@
       "referenced": true
     }
   ],
-  "modules": 368,
+  "modules": 369,
   "note": "粗粒度名字匹配（代理指标），不做导入图分析",
-  "referenced": 338,
+  "referenced": 339,
   "schema": "nf-core-judge-map/1",
   "unreferenced": 30
 }

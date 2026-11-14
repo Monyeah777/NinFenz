@@ -19,7 +19,7 @@
 | 10 | 会话事件 prev 链 + 重放一致 | `session_journal.py:98/310` | `test_meta_cockpit.py` | T0 | SUPPORTED |
 | 11 | 认知记录 prev 链 + 重放 fail-closed | `cognition_workspace/records.py:23/45/67` | `test_cognition_workspace.py` | T0 | SUPPORTED |
 | 12 | 预注册评测协议（禁 score / synthetic 不作证据） | `eval_harness.py:21-23` | `test_eval_harness.py` | — | SUPPORTED |
-| 13 | 人类复核状态机（未签 = PENDING，不得冒充通过） | `runtime_executor.py:213` | `test_meta_cockpit.py` | — | PARTIAL（状态机在，记录未签名） |
+| 13 | 人类复核状态机（未签 = PENDING，不得冒充通过） | `runtime_executor.py:213`（流程状态机）+ `protocol/trust/human-review.schema.json` + `desktop/src/core/trust/human_review.py`（可独立验签的复核记录：reviewer.kind=human / decision / 对象摘要绑定 / registry 生命周期） | `test_meta_cockpit.py` + `test_trust_human_review.py`（13 条：approve→APPROVED、reject/escalate 非批准、缺记录 PENDING、非 human kind 拒、吊销/过期拒、CLI、verify 报告接线、语义 decision 变异自证） | T1 | SUPPORTED（G3 WP-33） |
 | 14 | 单 claim 可独立验证（claim 级、不读全包、O(log n)） | `desktop/src/core/trust/bundle.py` verify_claim | `test_trust_bundle.py`（只读一条 claim + proof 长度 ≤ log n） | T1（结构/哈希面；签名在 G2） | SUPPORTED |
 | 15 | 删尾并重算本地摘要可被检测（head 签名/TSA） | `desktop/src/core/trust/anchor.py`（nf-anchor/1：target_digest 绑定 + RFC3161 token 离线验）+ `desktop/src/core/trust/signature.py`（nf-chain-head/1 链头签名，复用 DSSE + issuer registry） | `test_trust_anchor_evidence.py`（17 条）+ `test_trust_signature.py`（14 条，含真签名+真 TSA 端到端 T2） | T2 | SUPPORTED（WP-22/23） |
 | 16 | DSSE/PAE 签名信封（≥1 有效签名、keyid 可解析） | `desktop/src/core/trust/dsse.py`（PAE + nf-dsse/1；算法白名单 hmac-sha256 / ed25519 / ecdsa-p256，后两者可插拔回调）+ `desktop/tests/test_trust_dsse.py` | `pae` 族向量逐条一致；信封签/验 + 篡改矩阵（载荷/签名/keyid/算法越界/算法不符） | T1 | SUPPORTED（G2 WP-20；issuer 注册/轮换/吊销接线 = WP-21） |

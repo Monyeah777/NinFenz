@@ -1,7 +1,7 @@
 {
   "schema": "nf-trust-self-audit/1",
-  "head": "c8c97ef9346e4fc42617ca7ce39d473003179543",
-  "scanned_at": "2026-11-14T07:10:58Z",
+  "head": "9d4de3a372dd55fed05a3d73b5f40cc69099fd5a",
+  "scanned_at": "2026-11-14T07:18:07Z",
   "dimensions": {
     "S0_requirements": {
       "status": "amber",
