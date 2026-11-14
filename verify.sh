@@ -118,7 +118,7 @@ fi
 #   运行时 + 档位）；输入没变直接回放摘要（秒级）。--no-cache 或 NF_VERIFY_CACHE=0 关掉。
 # 任何其它参数 = 用法错误（exit 2），以免"看上去像传了子集其实仍在全量"这类静默误读。
 # 矩阵分片（CI，2026-10-18）：`--tests-only --shard i/n` 只跑测试的第 i/n 片；
-# `--checks-only` 只跑 55 条静态 check（测试交给矩阵）。两者由 CI 组合成一次完整门禁：
+# `--checks-only` 只跑 56 条静态 check（测试交给矩阵）。两者由 CI 组合成一次完整门禁：
 # 静态 1 台 + 测试 n 台并行 ⇒ 全量墙钟从"一台机器的 ~600 s"降到"n 台各自 ~100 s"。
 NF_FAST=0; NF_BASE=''; NF_TIER='quick'; NF_CACHE="${NF_VERIFY_CACHE:-1}"
 NF_CHECKS_ONLY=0; NF_TESTS_ONLY=0; NF_SHARD=''
@@ -3615,6 +3615,54 @@ PYEOF
   return "$err"
 }
 
+check56(){
+  echo '== [56/段D] 跨实现/断网/删除矩阵门禁（G5：parity 诚实 + core-only 断网可用 + 删除可检出）=='
+  local err=0
+  if [ -n "$PY3" ]; then
+    if "$PY3" - <<'PYEOF' >"$NFL_TMP"/nf_check56.log 2>&1
+import os, sys
+sys.path.insert(0, os.path.join('desktop', 'src'))
+from core import crosscheck as cc
+issues = cc.check('.')
+for item in issues:
+    print('[FAIL] %s' % item)
+rep = cc.build('.')
+print('跨实现统计：parity=%s runtime=%s offline=%s deletion=%d/%d'
+      % (rep['parity']['status'], rep['parity']['runtime'], rep['offline']['ok'],
+         rep['summary']['deletion_detected'], rep['summary']['deletion_cases']))
+sys.exit(1 if issues else 0)
+PYEOF
+    then
+      ok '跨实现/断网/删除矩阵有效（check56：报告可复算 + 断网 6 管线可用 + 删除 10/10 检出）'
+    else
+      no "跨实现/删除矩阵异常——$(tail -3 "$NFL_TMP"/nf_check56.log | tr '
+' ' ')"
+      err=1
+    fi
+    if "$PY3" - <<'PYEOF' >/dev/null 2>&1
+import json, shutil, sys
+rep = json.load(open('results/crosscheck/report.json', encoding='utf-8'))
+bad = []
+if not shutil.which('go') and rep['parity']['runtime'] != 'open':
+    bad.append('parity runtime 非 open')
+if rep['summary']['deletion_missed'] != 0:
+    bad.append('删除漏检')
+if not rep['offline']['ok']:
+    bad.append('断网探针失败')
+sys.exit(1 if bad else 0)
+PYEOF
+    then
+      ok '跨实现诚实（check56：Go 缺失即 runtime=open，删除 0 漏检，断网全绿）'
+    else
+      no '跨实现诚实性不足——修复指引：Go 缺失不得写 parity pass；删除漏检必须修验证器'
+      err=1
+    fi
+  else
+    wn 'python3 不在 PATH（跳过 check56 跨实现门禁）'
+  fi
+  return "$err"
+}
+
 # ---- P3b：判定缓存（输入内容寻址；只回放**绿**判定）----
 # key 由 scripts/verify_cache.py 按 HEAD + 工作树差异 + 未跟踪件 + 门禁代码 + 运行时 + 档位算出；
 # 输入没变就回放上次摘要（秒级）。红判定**不缓存**（红是瞬态），--fast/--no-cache 一律重算。
@@ -3676,7 +3724,7 @@ check37
 check38
 check39
 check40
-echo '—— 段 D：供应链与 Trust 证据面（check41-42 + check43/44 G1 Wiki-Spec + check45/46 Trust + check47 G4 + check48 DoD + check49 G0 双平面 + check50 G2 生产指标 + check51 G3 治理报告 + check52 G4 AI 信任面 + check53 G5 文档 claims + check54 G5 CQ6 + check55 G5 自扫描）——'
+echo '—— 段 D：供应链与 Trust 证据面（check41-42 + check43/44 G1 Wiki-Spec + check45/46 Trust + check47 G4 + check48 DoD + check49 G0 双平面 + check50 G2 生产指标 + check51 G3 治理报告 + check52 G4 AI 信任面 + check53 G5 文档 claims + check54 G5 CQ6 + check55 G5 自扫描 + check56 G5 跨实现）——'
 check41
 check42
 check43
@@ -3692,6 +3740,7 @@ check52
 check53
 check54
 check55
+check56
 echo '=================================================='
 echo "结果统计: PASS=$PASS  WARN=$WARN  FAIL=$FAIL"
 # ---- 开发快车道（--fast · 显式 opt-in · 不改变上面的任何一条判定）----

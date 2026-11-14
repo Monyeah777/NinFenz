@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-15",
   "approved_by": "Monyeah777",
-  "note": "NF-Final G5 WP-50 自扫描全维度 + check55（55 条/PASS=103）",
+  "note": "NF-Final G5 WP-51（收尾2：度量基线重冻）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "d50174cbef7f78242a91b33f1959498494e2a4ceadfb369c1bcefb9ed78af1ef"
+  "subject_digest": "1824e7b1980c5a048281ffe4c170712c4870b9b35de3a25300753126265c95bd"
 }

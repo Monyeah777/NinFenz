@@ -51,6 +51,7 @@
       "contract_lifecycle",
       "cq6_scorecard",
       "cq_scan",
+      "crosscheck",
       "delivery",
       "docs_claims",
       "eval_validity",

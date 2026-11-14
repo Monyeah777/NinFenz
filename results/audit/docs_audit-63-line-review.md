@@ -8,14 +8,16 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/gap_review.py:7d1d600926e13b9936f2a7d30e8a8ca95e4bb3b2a73308f88cfb89b563055953
   - desktop/src/core/payload_harvest.py:514c493d341863b245b7dddb0bde8ee87ca969fe4407c9f2834a726bb92d1a76
-  - protocol/data_contracts.json:69a18065d06500de0d86c9b83ae4fce2cd79cdaf088e1be4002ff38317c4a5a1
-  - protocol/assertions.json:b32f2e7d4a6d355052ac2b5149aca709a2566361261075585a8ddf07bc6290b0
+  - protocol/data_contracts.json:c1bfc7a5770680feb21105200e55e78841b0a1a3372f303868eac25819c6bd34
+  - protocol/assertions.json:77679f251b7072709cd8bde65a0138cdb17410ca324f4ac362aa364f83e48175
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
   - desktop/src/core/text_hygiene.py:99b38bfbb8656ad653689c4cba93679970a78183019fd5f02e2380d87ec99ff3
   - desktop/src/core/workloop.py:3ee94f2c11939abba5507741c6b9b4dae8e8cab77c3bda38419678e31e097056
   - scripts/serve_decision_model.py:bbb36dff0e3816c2253150b7de6ab619877c3c78269a644c4c966083df15afee
   - scripts/nf.py:3026aad56e562650ab4db01aa76e73694fd841998ab3d84050643a2dd9c0950e
 ---
+> 重审（2026-11-15）：NF-Final WP-51：新增 protocol/crosscheck.json、core/crosscheck.py、results/crosscheck/report.json、test_crosscheck_contract.py；verify.sh check56 + quality_baseline 56 条/PASS=105；assembly_runtime 计划/轨迹对齐加固（D-05 修复驱动）
+
 > 重审（2026-11-15）：NF-Final WP-50：新增 protocol/self_scan.json、core/self_scan.py、results/self_audit/S0-S15.json、test_self_scan_contract.py；verify.sh check55 + quality_baseline 55 条/PASS=103；派生面重生成
 
 > 重审（2026-11-15）：NF-Final WP-54：新增 protocol/cq6.json、core/cq6_scorecard.py、results/cq/{cq6_scorecard,cq6_baseline}.json、test_cq6_scorecard.py；verify.sh check54 + quality_baseline 54 条/PASS=101；docs CQ_REPORT CQ6 评分卡 + QUALITY_DEBT QD-09..11；派生面重生成

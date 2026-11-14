@@ -151,6 +151,7 @@
     "test_cross_lang_verify": 1.6,
     "test_cross_lang_workflow_contract": 0.2,
     "test_cross_platform_workflow_contract": 0.2,
+    "test_crosscheck_contract": 1.2,
     "test_daemon": 23.0,
     "test_daemon_limits": 0.3,
     "test_daemon_parity": 173.6,
@@ -2001,6 +2002,13 @@
     "test_cross_platform_workflow_contract.CrossPlatformWorkflowContractTest.test_contract_catches_broken_workflow": 0.0,
     "test_cross_platform_workflow_contract.CrossPlatformWorkflowContractTest.test_three_os_matrix": 0.0,
     "test_cross_platform_workflow_contract.CrossPlatformWorkflowContractTest.test_workflow_matches_contract": 0.0,
+    "test_crosscheck_contract.CrosscheckContractTest.test_assembly_plan_deletion_detected": 0.0,
+    "test_crosscheck_contract.CrosscheckContractTest.test_claims_boundary": 0.0,
+    "test_crosscheck_contract.CrosscheckContractTest.test_deletion_matrix_complete": 0.0,
+    "test_crosscheck_contract.CrosscheckContractTest.test_mutations_red": 0.51,
+    "test_crosscheck_contract.CrosscheckContractTest.test_offline_green": 0.0,
+    "test_crosscheck_contract.CrosscheckContractTest.test_parity_honest": 0.03,
+    "test_crosscheck_contract.CrosscheckContractTest.test_registry_check_and_freshness": 0.49,
     "test_daemon.DaemonFreshnessTest.test_content_keyed_caches_are_kept": 0.04,
     "test_daemon.DaemonFreshnessTest.test_path_keyed_caches_are_cleared_per_request": 0.39,
     "test_daemon.DaemonFreshnessTest.test_source_fingerprint_triggers_reload": 0.01,
@@ -6498,5 +6506,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2183.3
+  "total_s": 2184.5
 }

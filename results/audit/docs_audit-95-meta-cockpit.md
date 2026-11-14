@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:3026aad56e562650ab4db01aa76e73694fd841998ab3d84050643a2dd9c0950e
   - tui/_surface.py:fe497d3e1da2c99ff3642b0215e528a8d807461a52c846aabb4f7a7f33af6b43
-  - protocol/check12_weights.json:0df8cd4f117f7ae5f6dcca75e3a7ce088da7ad1523b46863c31434c73ee90aa3
+  - protocol/check12_weights.json:f3de981c765d99762614ba9371d2135c295d17654ff84a5eb49594336ebabd19
   - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
   - docs/meta-cockpit/README.md:fa00a7fd014857af56e11f38ced1b7d888be053befaadb10b3dd494d27884316
   - docs/meta-cockpit/功能解析.md:de20c2340d19d541bcfde53f222a3acf22a6e440d8fb3dcf51a37aedf53c0c25
   - results/meta-cockpit-manifest.json:60c0e100798e49d393557ae5066c02d7e057ec27f386ee1a36ca3fc7740150ba
 
 ---
+> 重审（2026-11-15）：NF-Final WP-51：新增 protocol/crosscheck.json、core/crosscheck.py、results/crosscheck/report.json、test_crosscheck_contract.py；verify.sh check56 + quality_baseline 56 条/PASS=105；assembly_runtime 计划/轨迹对齐加固（D-05 修复驱动）
+
 > 重审（2026-11-15）：NF-Final WP-50：新增 protocol/self_scan.json、core/self_scan.py、results/self_audit/S0-S15.json、test_self_scan_contract.py；verify.sh check55 + quality_baseline 55 条/PASS=103；派生面重生成
 
 > 重审（2026-11-15）：NF-Final WP-54：新增 protocol/cq6.json、core/cq6_scorecard.py、results/cq/{cq6_scorecard,cq6_baseline}.json、test_cq6_scorecard.py；verify.sh check54 + quality_baseline 54 条/PASS=101；docs CQ_REPORT CQ6 评分卡 + QUALITY_DEBT QD-09..11；派生面重生成

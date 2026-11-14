@@ -6,9 +6,9 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - CHANGELOG.md:93c66935cbbc28514d189f4071914cd6afa81ae34bf217281c0f4fcecb3a6611
-  - docs/meta/VERSION-MATRIX.md:9ed4eb90851cb4b5dcbc872589048d53cab66e18c2cefcba90c53ccfb7deb752
-  - README.md:5eb7e9e1edbf38e443db4204cbfd4ce430863f8fea912ca5c7e2d8dcddfe08db
+  - CHANGELOG.md:99cfa0d0d9b05c8f6aca4cd91ef07f183a3a10d596e3cb940f20f6f7d3902321
+  - docs/meta/VERSION-MATRIX.md:04d5e0cc2ad1eab1f667eea2dc36e2371549801f61dad039ca297dbe7add2916
+  - README.md:7a938e7e6ba3b77ca61e40d6ebaf514c9f6ee94fb03c168dd13b247387f9ba68
   - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
@@ -16,6 +16,8 @@ subjects:
   - scripts/nf.py:3026aad56e562650ab4db01aa76e73694fd841998ab3d84050643a2dd9c0950e
 
 ---
+> 重审（2026-11-15）：NF-Final WP-51：新增 protocol/crosscheck.json、core/crosscheck.py、results/crosscheck/report.json、test_crosscheck_contract.py；verify.sh check56 + quality_baseline 56 条/PASS=105；assembly_runtime 计划/轨迹对齐加固（D-05 修复驱动）
+
 > 重审（2026-11-15）：NF-Final WP-50：新增 protocol/self_scan.json、core/self_scan.py、results/self_audit/S0-S15.json、test_self_scan_contract.py；verify.sh check55 + quality_baseline 55 条/PASS=103；派生面重生成
 
 > 重审（2026-11-15）：NF-Final WP-54：新增 protocol/cq6.json、core/cq6_scorecard.py、results/cq/{cq6_scorecard,cq6_baseline}.json、test_cq6_scorecard.py；verify.sh check54 + quality_baseline 54 条/PASS=101；docs CQ_REPORT CQ6 评分卡 + QUALITY_DEBT QD-09..11；派生面重生成

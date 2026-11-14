@@ -157,6 +157,10 @@ SINK_ALLOW = {
         "自己写的状态文件，用于避免陈旧 port/token 被复用；worker 随后重写该件",
     "regression_score.py:__import__":
         "模块名取自内部常量表 SIGNAL_SPECS（非用户输入），用于按名调用既有扫描器",
+    "crosscheck.py:unlink":
+        "删除矩阵的**夹具构造**：只对 tempfile.TemporaryDirectory 里 copytree 出来的交付包副本执行"
+        "（落点由本模块 mkdtemp 现建，非外部可控路径），目的是验证「删文件后验证器必须报红」；"
+        "真实交付包只读，不删仓库内文件",
     "release_conclusion.py:shutil.rmtree":
         "快照门禁的**失败自清**：落点由本模块 tempfile.mkdtemp 现建（前缀 nf-gate-snap-<sha>），"
         "只在 git worktree add 失败时删掉这个刚建的空壳；不接收外部路径参数。成功路径交给 "

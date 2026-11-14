@@ -170,6 +170,13 @@ def validate_record(record: Dict[str, Any], root: str = ".") -> List[str]:
         issues.append("run.status 非法")
     if run_doc.get("status") == "delivered":
         trace_ids = [str(s.get("id")) for s in run_doc.get("steps") or []]
+        # 计划的步骤序列必须与执行轨迹对齐（S01…S0N 连续、不重排/不删段）：
+        # 删除/重排计划步骤会让「计划 vs 执行」不一致，必须可检出（WP-51 删除矩阵）。
+        plan_ids = [str(s.get("id")) for s in (record.get("assembly") or {}).get("steps") or []]
+        expected = ["S%02d" % (i + 1) for i in range(len(trace_ids))]
+        if plan_ids != expected:
+            issues.append("assembly.steps 与执行轨迹不对齐（期望 %s，实际 %s）"
+                          % (expected, plan_ids))
         for need in ("spec", "task", "context", "adapter", "output", "gate", "export"):
             if need not in trace_ids:
                 issues.append("delivered 记录缺步骤：%s" % need)

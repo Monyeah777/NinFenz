@@ -10,8 +10,12 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:1b8472d3763f91814a250ba37d335b2b469e3444776f8d327f920afc75b718b0
+  - protocol/code_metrics_baseline.json:f2c59d1654e84d50d38c09a32d937c8270acea79fee3494be8c40d8220995980
 ---
+> 重审（2026-11-15）：NF-Final WP-51 收尾2：purity SINK_ALLOW 登记使 purity_scan.py 584→588 行，按失败提示评审后重冻 code_metrics 基线（容量调整，非放宽判据）
+
+> 重审（2026-11-15）：NF-Final WP-51：新增 protocol/crosscheck.json、core/crosscheck.py、results/crosscheck/report.json、test_crosscheck_contract.py；verify.sh check56 + quality_baseline 56 条/PASS=105；assembly_runtime 计划/轨迹对齐加固（D-05 修复驱动）
+
 > 重审（2026-11-15）：NF-Final WP-50：新增 protocol/self_scan.json、core/self_scan.py、results/self_audit/S0-S15.json、test_self_scan_contract.py；verify.sh check55 + quality_baseline 55 条/PASS=103；派生面重生成
 
 > 重审（2026-11-15）：NF-Final WP-54：新增 protocol/cq6.json、core/cq6_scorecard.py、results/cq/{cq6_scorecard,cq6_baseline}.json、test_cq6_scorecard.py；verify.sh check54 + quality_baseline 54 条/PASS=101；docs CQ_REPORT CQ6 评分卡 + QUALITY_DEBT QD-09..11；派生面重生成

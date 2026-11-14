@@ -4,9 +4,9 @@
     "entry": 26,
     "floor": 5,
     "prod": 1068,
-    "projection": 237,
+    "projection": 239,
     "support": 512,
-    "verify": 1453
+    "verify": 1455
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8735,6 +8735,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "WP-51 跨实现/断网/删除矩阵判据（Go parity 静态对账 + 断网探针 + 10 删除矩阵）。",
+      "path": "desktop/tests/test_crosscheck_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "执行层常驻守护（core/daemon.py）单测：协议 / 令牌 / 拒绝面 / 等价性 / 新鲜度 / 相对加速。",
       "path": "desktop/tests/test_daemon.py",
       "role": "verify",
@@ -14639,6 +14645,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "NF-Final G5 WP-51 跨实现/断网/删除矩阵登记：三件事——(a) Go↔Python verify parity：本机无 Go 工具链，只做**静态对账**（向量数/CLI 子命令/退出码），运行时 parity 显式 OPEN；(b) 断网：子进程禁用 socket 后跑 core-only 管线（assembly/delivery/docs-claims/wiki/spec/self-scan），证明交付路径不依赖网络；(c) 删除/重排/截断矩阵：对交付包/装配记录/血缘/报告做删除/重排/截断，验证器必须报红。判据 desktop/tests/test_crosscheck_contract.py + verify check56。",
+      "path": "protocol/crosscheck.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "数据契约登记（机制借鉴 ODCS / Data Contract Specification：契约 = 生产方与消费方的约定，须写明结构、质量、支持渠道）。NF 的机读件此前只有『有 schema 』这一层，没有『谁管、按什么规则判、坏了怎么重建』。本册给每个机读件补三样：quality_rule（谁来判）、owner（维护机制）、freshness（重建动作）——**指不出 quality_rule 的契约不许登记**。",
       "path": "protocol/data_contracts.json",
       "role": "verify",
@@ -15168,17 +15180,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "3e85fbf031f8e2d85587ef3b3b46af9a6e03bba8dfbcff2fa3403411193fb22c",
+  "root_digest": "23db2d20aaec7181c8b915d1a3c23f1bc3fce04597a6e68283aa7cbe5602bc49",
   "rule_counts": {
     "R-app": 1510,
     "R-catch": 356,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 207,
+    "R-projection": 208,
     "R-support": 124,
-    "R-verify": 1321,
-    "auto:R-core": 318
+    "R-verify": 1323,
+    "auto:R-core": 319
   },
   "schema": "nf-role-coordinates/1"
 }
