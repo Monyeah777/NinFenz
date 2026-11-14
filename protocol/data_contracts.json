@@ -1162,6 +1162,18 @@
         "test_policy_engine_contract",
         "docs/policy-engine.md"
       ]
+    },
+    {
+      "id": "aigc-label",
+      "artifact": "results/ai/aigc-label.json",
+      "quality_rule": "assertion:aigc-label",
+      "owner": "AIGC 标注证据（core/aigc_labeling.py + test_aigc_labeling_contract）+ WP-43",
+      "status": "active",
+      "freshness": "交付产物/模型卡/复核变化须重签标识；committed==实时重算",
+      "consumers": [
+        "test_aigc_labeling_contract",
+        "docs/aigc-labeling.md"
+      ]
     }
   ]
 }

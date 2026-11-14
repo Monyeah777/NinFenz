@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-15",
   "approved_by": "Monyeah777",
-  "note": "NF-Final G4 WP-42 策略适配",
+  "note": "NF-Final G4 WP-43 AIGC/标注证据",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "58a70547c917dcfa9c2144c99210256230bf315d8a6dd975b1b65088c00c2e0a"
+  "subject_digest": "41167c75c75175e8481bde68e84fd6cc8003da127d1e809c3f5735960881b56d"
 }

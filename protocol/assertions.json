@@ -1178,6 +1178,21 @@
       "message": "策略规则集缺失或版本名不符（WP-42 判据依赖它）",
       "fix": "补/修 protocol/policy_rules.json；再跑 test_policy_engine_contract",
       "evidence": "test_policy_engine_contract / conformance::modeling"
+    },
+    {
+      "id": "aigc-label",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "results/ai/aigc-label.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-aigc-label/1"
+      },
+      "message": "AIGC 标识缺失或版本名不符（WP-43 判据依赖它）",
+      "fix": "重跑 aigc_labeling.write_sample；再跑 test_aigc_labeling_contract",
+      "evidence": "test_aigc_labeling_contract / conformance::modeling"
     }
   ]
 }

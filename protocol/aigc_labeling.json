@@ -1,0 +1,19 @@
+{
+  "schema": "nf-aigc-labeling/1",
+  "note": "NF-Final G4 WP-43 AIGC/标注证据接入登记：AI 生成/辅助内容必须带机器可读标识（nf-aigc-label/1），标识绑定生成器模型卡摘要、内容摘要与 AI 证据链引用。纪律：未标注/标识不闭合/引用悬空 = 红；human 标注需人类复核 approve；不声称外部内容标识规范兼容。判据 desktop/tests/test_aigc_labeling_contract.py。",
+  "label_artifact": {"rel": "results/ai/aigc-label.json", "schema": "nf-aigc-label/1",
+                     "required": ["schema", "subject_digest", "subject_kind", "label",
+                                  "generator", "provenance_refs", "labeled_at"]},
+  "label_vocabulary": ["ai-generated", "ai-assisted", "human"],
+  "subject_kinds": ["delivery-artifact", "wiki-page", "model-card"],
+  "rules": {
+    "label_required": "交付产物若源自 AI 生成/辅助，必须带标识；无标识=红（不默认 human）",
+    "generator_binding": "generator.model_digest 必须等于 results/ai/model-card.json 的 model_digest",
+    "subject_binding": "subject_digest 必须等于被标注产物（样例：results/delivery/wiki-module-M06/artifact.md）的 SHA-256",
+    "provenance_closed": "provenance_refs 必须全部在场且指向 results/ai/* 或 protocol/ai_evidence.json",
+    "human_needs_review": "label=human 时需复核 decision=approve（引用 human-review.json）",
+    "deterministic": "labeled_at 固定样例时间，不读时钟"
+  },
+  "claims_boundary": ["标识是仓库内证据面，不声称符合外部内容标识法规/标准",
+                      "不替代人工内容审核与平台义务"]
+}
