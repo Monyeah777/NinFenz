@@ -131,6 +131,7 @@
     "test_conformance_scan": 28.5,
     "test_content_face": 0.3,
     "test_context_packer_contract": 2.5,
+    "test_contract_lifecycle_contract": 0.1,
     "test_contract_pin": 0.1,
     "test_contributing_contract": 0.2,
     "test_core": 0.4,
@@ -1808,6 +1809,15 @@
     "test_context_packer_contract.ContextPackerContractTest.test_role_escalation_rejected": 0.0,
     "test_context_packer_contract.ContextPackerContractTest.test_role_isolation": 0.0,
     "test_context_packer_contract.ContextPackerContractTest.test_unknown_page_rejected": 0.0,
+    "test_contract_lifecycle_contract.ContractLifecycleContractTest.test_acceptance_required": 0.0,
+    "test_contract_lifecycle_contract.ContractLifecycleContractTest.test_active_contract_passes": 0.0,
+    "test_contract_lifecycle_contract.ContractLifecycleContractTest.test_constraint_rule_required": 0.0,
+    "test_contract_lifecycle_contract.ContractLifecycleContractTest.test_evidence_required": 0.0,
+    "test_contract_lifecycle_contract.ContractLifecycleContractTest.test_reference_policy": 0.0,
+    "test_contract_lifecycle_contract.ContractLifecycleContractTest.test_registry_mutations_red": 0.0,
+    "test_contract_lifecycle_contract.ContractLifecycleContractTest.test_registry_selfcheck": 0.0,
+    "test_contract_lifecycle_contract.ContractLifecycleContractTest.test_schema_invalid_contract": 0.0,
+    "test_contract_lifecycle_contract.ContractLifecycleContractTest.test_unknown_status_rejected": 0.0,
     "test_contract_pin.Test.test_count_and_field_drift": 0.0,
     "test_contract_pin.Test.test_pin_and_verify": 0.0,
     "test_contributing_contract.ContributingContractTest.test_backtick_paths_resolve": 0.03,
@@ -6367,5 +6377,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2178.6
+  "total_s": 2178.7
 }

@@ -1,0 +1,37 @@
+{
+  "schema": "nf-contract-lifecycle/1",
+  "note": "NF-Final G3 WP-30 契约生命周期与义务机读件（nf-contract/1）：状态词表、各状态的证据/验收/引用义务、可消费性、义务→既有 check 映射。义务只使用 nf-contract/1 已有字段（schema 为 additionalProperties=false，不新增字段）；引用/消费策略由 core.contract_lifecycle.can_reference 提供。判据 desktop/tests/test_contract_lifecycle_contract.py。",
+  "states": [
+    {"id": "draft", "desc": "未生效草案：可自用，不得被外部引用/消费",
+     "consumable": false, "references_allowed": false,
+     "evidence_min": 0, "acceptance_required": false,
+     "obligations": ["不得被其它契约/产物引用（can_reference=false）"]},
+    {"id": "active", "desc": "生效契约：可被引用与消费",
+     "consumable": true, "references_allowed": true,
+     "evidence_min": 1, "acceptance_required": true,
+     "obligations": ["evidence ≥1（证据引用可解析）", "acceptance ≥1",
+                     "constraints 每条 MUST/SHOULD/MAY 可核"]},
+    {"id": "deprecated", "desc": "已弃用：既有引用仍可读，但不得新增引用",
+     "consumable": false, "references_allowed": "existing-only",
+     "evidence_min": 1, "acceptance_required": true,
+     "obligations": ["保留 evidence ≥1（历史可核）", "新增引用被拒（can_reference=false for new）"]},
+    {"id": "retired", "desc": "已退役：不得被引用/消费，证据保留供审计",
+     "consumable": false, "references_allowed": false,
+     "evidence_min": 1, "acceptance_required": true,
+     "obligations": ["evidence 必须保留（不得静默删除）", "retired 不得出现在任何新装配/引用中"]}
+  ],
+  "status_vocabulary": ["draft", "active", "deprecated", "retired"],
+  "obligation_checks": {
+    "evidence-presence": "nf-contract/1 evidence 数组非空（core.contract_lifecycle.check_contract）",
+    "acceptance-presence": "nf-contract/1 acceptance 数组非空（同上）",
+    "lifecycle-gate": "check35 一致性报告 + check38 发布体检（存量门禁按状态使用）",
+    "module-lifecycle": "check24 模块生命周期（模块面，与契约面同纪律：deprecated/retired 不得被引用）"
+  },
+  "consumers_rule": {
+    "api": "core.contract_lifecycle.can_reference(contract_id, state, new_reference: bool) -> bool",
+    "rules": {"draft": "false", "active": "true", "deprecated": "new_reference=true 时 false（existing-only）",
+              "retired": "false"}
+  },
+  "claims_boundary": ["本件只定义契约状态义务与引用策略；不替代治理 verify（WP-31）与附件模式（WP-32）",
+                      "不新增 nf-contract/1 schema 字段（additionalProperties=false）"]
+}

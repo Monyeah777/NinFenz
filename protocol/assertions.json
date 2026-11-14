@@ -1026,6 +1026,21 @@
       "message": "G2 DoD 收口审计缺失或版本名不符（Gate 准入判据依赖它）",
       "fix": "补/修 results/g2_dod.json；再跑 test_g2_dod",
       "evidence": "test_g2_dod / conformance::modeling"
+    },
+    {
+      "id": "contract-lifecycle",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "protocol/contract_lifecycle.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-contract-lifecycle/1"
+      },
+      "message": "契约生命周期义务表缺失或版本名不符（WP-30 判据依赖它）",
+      "fix": "补/修 protocol/contract_lifecycle.json；再跑 test_contract_lifecycle_contract",
+      "evidence": "test_contract_lifecycle_contract / conformance::modeling"
     }
   ]
 }

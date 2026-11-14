@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1501,
+    "app": 1502,
     "entry": 26,
     "floor": 5,
-    "prod": 1065,
+    "prod": 1066,
     "projection": 212,
     "support": 510,
-    "verify": 1426
+    "verify": 1428
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -5993,6 +5993,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "契约生命周期与义务（WP-30，G3）：nf-contract/1 状态义务 + 引用/消费策略。",
+      "path": "desktop/src/core/contract_lifecycle.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "上游契约 pin + 逐字段对账 + 数量钉死（机制借鉴 OpenAgentCore upstream_contract_test）。",
       "path": "desktop/src/core/contract_pin.py",
       "role": "prod",
@@ -8587,6 +8593,12 @@
     {
       "function": "WP-12 Context Packer 判据（角色隔离/预算/引用/抗注入）。",
       "path": "desktop/tests/test_context_packer_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "WP-30 契约生命周期/义务判据（nf-contract/1 状态义务 + 引用策略）。",
+      "path": "desktop/tests/test_contract_lifecycle_contract.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -14483,6 +14495,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "NF-Final G3 WP-30 契约生命周期与义务机读件（nf-contract/1）：状态词表、各状态的证据/验收/引用义务、可消费性、义务→既有 check 映射。义务只使用 nf-contract/1 已有字段（schema 为 additionalProperties=false，不新增字段）；引用/消费策略由 core.contract_lifecycle.can_reference 提供。判据 desktop/tests/test_contract_lifecycle_contract.py。",
+      "path": "protocol/contract_lifecycle.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "存量耦合债登记（棘轮：只许减少；新增环/SDP 违例判 FAIL，除非评审后重登）",
       "path": "protocol/coupling_baseline.json",
       "role": "verify",
@@ -14988,17 +15006,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "c5b135e5e9b2e298fe43d1b8927cb305113f68136ba28d30643db5146c411eeb",
+  "root_digest": "c417f947cca58c49b48f24e6bd209d52743baa728b656b7463cd94f74d4026e3",
   "rule_counts": {
-    "R-app": 1501,
+    "R-app": 1502,
     "R-catch": 356,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 188,
     "R-support": 124,
-    "R-verify": 1295,
-    "auto:R-core": 306
+    "R-verify": 1297,
+    "auto:R-core": 307
   },
   "schema": "nf-role-coordinates/1"
 }
