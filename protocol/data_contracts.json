@@ -1030,6 +1030,18 @@
         "test_delivery_contract",
         "docs/delivery.md"
       ]
+    },
+    {
+      "id": "g2-dod",
+      "artifact": "results/g2_dod.json",
+      "quality_rule": "assertion:g2-dod",
+      "owner": "G2 DoD 收口审计（test_g2_dod 判据+现场复算）",
+      "status": "active",
+      "freshness": "G2 产物/指标变化须重跑收口；verdict 与 P0 必须一致",
+      "consumers": [
+        "test_g2_dod",
+        "results/G2_DOD.md"
+      ]
     }
   ]
 }

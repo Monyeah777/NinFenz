@@ -1011,6 +1011,21 @@
       "message": "交付报告缺失或版本名不符（WP-23 判据依赖它）",
       "fix": "重跑 nf agent run --assembly --deliver --sidecar；再跑 test_delivery_contract",
       "evidence": "test_delivery_contract / conformance::modeling"
+    },
+    {
+      "id": "g2-dod",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "results/g2_dod.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-g2-dod/1"
+      },
+      "message": "G2 DoD 收口审计缺失或版本名不符（Gate 准入判据依赖它）",
+      "fix": "补/修 results/g2_dod.json；再跑 test_g2_dod",
+      "evidence": "test_g2_dod / conformance::modeling"
     }
   ]
 }
