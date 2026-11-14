@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1509,
+    "app": 1510,
     "entry": 26,
     "floor": 5,
     "prod": 1068,
-    "projection": 228,
+    "projection": 230,
     "support": 512,
-    "verify": 1446
+    "verify": 1448
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -11471,6 +11471,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "WP-51 稳定性/长稳证据判据（进程内重复 + 并发确定性，非 soak）。",
+      "path": "desktop/tests/test_stability_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "标准主索引契约：370 条逐条 / 每行七字段 / 口径段齐 / --check 新鲜。",
       "path": "desktop/tests/test_standards_index_doc_contract.py",
       "role": "verify",
@@ -14975,6 +14981,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "NF-Final G5 WP-51 稳定性/长稳证据登记：对纯管线做**进程内重复**与**并发**确定性对照（assembly/output/delivery/metrics/docs-claims/AIBOM/AI 证据链），要求逐字节一致、0 mismatch。铁律：本件只证明「进程内重复/并发确定性」，**不是长稳 soak（小时级）**，不对外部环境/真实模型作稳定承诺。判据 desktop/tests/test_stability_contract.py。",
+      "path": "protocol/stability.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "域包 × 细分 → 可扩展标准目录条目的绑定表（公开结果面）。判据（check32 domain_packs）：① 每条细分都有 standard_ref；② 引用 id 必须在 protocol/standards_catalog.json 在册；③ 每包绑定覆盖率 100%；④ 概念密度（边/节点，含标准节点与绑定边）≥ 门槛。",
       "path": "protocol/standards_binding.json",
       "role": "verify",
@@ -15126,17 +15138,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "fa8f024c21f3f253941c953913070b2249789fd6d57e082576f0e2ba7cf30b98",
+  "root_digest": "370f6231f128ffac2e9d61a19d42e1f7d24ece2aef3d1df6e0592a64f7397e1a",
   "rule_counts": {
-    "R-app": 1509,
+    "R-app": 1510,
     "R-catch": 356,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 201,
+    "R-projection": 202,
     "R-support": 124,
-    "R-verify": 1314,
-    "auto:R-core": 315
+    "R-verify": 1316,
+    "auto:R-core": 316
   },
   "schema": "nf-role-coordinates/1"
 }

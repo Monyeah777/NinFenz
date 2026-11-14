@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-15",
   "approved_by": "Monyeah777",
-  "note": "NF-Final G5 WP-50（收尾2：权重/度量更新）",
+  "note": "NF-Final G5 WP-51（收尾：测试相对化）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "abc56aab7cfc31db59af966a06f90489990dec22176c72b26a3da297c5c1099a"
+  "subject_digest": "f27fc31d38719393fa44c08e4072c6ea1c6b96f5b719a453c2ecf56f0328b190"
 }

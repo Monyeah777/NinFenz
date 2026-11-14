@@ -1430,6 +1430,11 @@
       "max_fn_cc": 17,
       "max_fn_lines": 35
     },
+    "desktop/src/core/stability.py": {
+      "lines": 164,
+      "max_fn_cc": 16,
+      "max_fn_lines": 41
+    },
     "desktop/src/core/state_front.py": {
       "lines": 150,
       "max_fn_cc": 21,

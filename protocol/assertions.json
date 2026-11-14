@@ -1227,6 +1227,21 @@
       "message": "文档 claims 报告缺失或版本名不符（WP-50 判据依赖它）",
       "fix": "重跑 docs_claims.write；再跑 test_docs_claims_contract",
       "evidence": "test_docs_claims_contract / conformance::modeling"
+    },
+    {
+      "id": "stability-report",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "results/stability/report.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-stability-report/1"
+      },
+      "message": "稳定性报告缺失或版本名不符（WP-51 判据依赖它）",
+      "fix": "重跑 stability.write；再跑 test_stability_contract",
+      "evidence": "test_stability_contract / conformance::modeling"
     }
   ]
 }

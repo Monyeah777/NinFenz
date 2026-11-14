@@ -1198,6 +1198,18 @@
         "test_docs_claims_contract",
         "protocol/docs_claims.json"
       ]
+    },
+    {
+      "id": "stability-report",
+      "artifact": "results/stability/report.json",
+      "quality_rule": "assertion:stability-report",
+      "owner": "稳定性证据（core/stability.py + test_stability_contract）+ WP-51",
+      "status": "active",
+      "freshness": "纯管线/门禁常量变化后重跑 write（committed==实时重算）",
+      "consumers": [
+        "test_stability_contract",
+        "docs/stability.md"
+      ]
     }
   ]
 }
