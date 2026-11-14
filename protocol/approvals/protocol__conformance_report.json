@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-11-14",
   "approved_by": "Monyeah777",
-  "note": "NF-Final WP-01（asset 重冻 + audit rebind 后冻结）",
+  "note": "NF-Final WP-01：提交后投影重算（新件转为 tracked，role_coordinates/verification_report 根摘要随之更新）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "64b6318717c5a6b0421dba631fec9c957e658aa062b5afafc22b1c2b20d4ad03"
