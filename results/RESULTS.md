@@ -15,6 +15,8 @@
 - [trust/BASELINE.md](trust/BASELINE.md) · [trust/CLAIM_MATRIX.md](trust/CLAIM_MATRIX.md)（Trust Fabric WP-00 基线审计：锚点复验 + 差距重估 + Claim–Evidence 矩阵）
 - [trust/trust_vectors.json](trust/trust_vectors.json)（Trust Fabric 测试向量集：34 条 / 7 族；跨语言可自验，生成器 `scripts/trust_vectors.py`）
 - [trust/SELF_AUDIT.json](trust/SELF_AUDIT.json) · [docs/trust/SELF_AUDIT.md](../docs/trust/SELF_AUDIT.md)（G1 收口自审计：S0–S12 维度 + P0/P1 分诊 + 门禁取证）
+- [BASELINE.md](BASELINE.md)（NF Final WP-00 基线审计：34 条 FR/NFR Claim–Evidence 矩阵 + check 编号对账 + 环境/门禁实读）
+- [reverse/INVENTORY.md](reverse/INVENTORY.md)（§4A R0 仓库考古：真源/生成物/草稿三表 + 入口 + 失败面初判）
 
 ## 互操作导出面（入仓投影）
 
