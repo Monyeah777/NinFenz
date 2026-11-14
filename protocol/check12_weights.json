@@ -600,6 +600,7 @@
     "test_tool_face": 0.3,
     "test_trace_drill": 3.3,
     "test_transparency_log": 0.2,
+    "test_trust_adr_contract": 0.2,
     "test_trust_anchor": 1.5,
     "test_trust_boundary": 0.7,
     "test_trust_schemas": 1.3,
@@ -5511,6 +5512,11 @@
     "test_transparency_log.TransparencyLogTest.test_receipts_change_without_refresh_is_detected": 0.02,
     "test_transparency_log.TransparencyLogTest.test_repo_chain_is_consistent_and_on_disk": 0.01,
     "test_transparency_log.TransparencyLogTest.test_tampered_generated_chain_detected": 0.01,
+    "test_trust_adr_contract.TrustAdrContractTest.test_contract_catches_mutations": 0.01,
+    "test_trust_adr_contract.TrustAdrContractTest.test_decisions_bind_to_frozen_artifacts": 0.0,
+    "test_trust_adr_contract.TrustAdrContractTest.test_publish_boundary": 0.0,
+    "test_trust_adr_contract.TrustAdrContractTest.test_registry_valid_and_evidence_present": 0.0,
+    "test_trust_adr_contract.TrustAdrContractTest.test_six_trust_adrs": 0.0,
     "test_trust_anchor.AnchorChainTest.test_chain_beyond_depth_is_rejected": 0.02,
     "test_trust_anchor.AnchorChainTest.test_delegation_requires_expiry": 0.0,
     "test_trust_anchor.AnchorChainTest.test_expired_delegation_is_rejected": 0.01,
@@ -5835,5 +5841,5 @@
     "test_zenodo_contract.ZenodoContractTest.test_no_stale_file_references": 0.0,
     "test_zenodo_contract.ZenodoContractTest.test_zenodo_matches_contract": 0.0
   },
-  "total_s": 2119.5
+  "total_s": 2119.7
 }
