@@ -6,13 +6,20 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -154,7 +161,31 @@ fun CcosScreen(onBack: () -> Unit) {
         }
     }
 
-    NfScaffold(title = stringResource(dev.ninfenz.mobile.R.string.ccos_title), onBack = onBack) {
+    LaunchedEffect(busy) {
+        if (busy) {
+            delay(30_000)
+            if (busy) {
+                busy = false
+                outcome = context.getString(dev.ninfenz.mobile.R.string.ccos_submit_timeout)
+            }
+        }
+    }
+
+    NfScaffold(
+        title = stringResource(dev.ninfenz.mobile.R.string.ccos_title),
+        onBack = onBack,
+        bottomBar = {
+            val r = result
+            if (r != null && r.reviewState == "pending") {
+                CcosReviewActions(
+                    busy = busy,
+                    outcome = outcome,
+                    onApprove = { submitReview(true) },
+                    onReject = { submitReview(false) }
+                )
+            }
+        }
+    ) {
         CardBox(title = stringResource(dev.ninfenz.mobile.R.string.ccos_step1)) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(onClick = { taskPicker.launch(arrayOf("application/json", "text/plain")) }) { Text(stringResource(dev.ninfenz.mobile.R.string.ccos_open_task)) }
@@ -217,16 +248,37 @@ fun CcosScreen(onBack: () -> Unit) {
                 } else {
                     FormTextField(label = "reviewer", value = reviewer, onValueChange = { reviewer = it })
                     FormTextField(label = stringResource(dev.ninfenz.mobile.R.string.ccos_note_field), value = note, onValueChange = { note = it }, singleLine = false)
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Button(enabled = !busy, onClick = { submitReview(true) }) { Text(if (busy) stringResource(dev.ninfenz.mobile.R.string.ccos_submitting) else stringResource(dev.ninfenz.mobile.R.string.ccos_submit)) }
-                        OutlinedButton(enabled = !busy, onClick = { submitReview(false) }) { Text(stringResource(dev.ninfenz.mobile.R.string.ccos_reject)) }
-                    }
                     Notice(stringResource(dev.ninfenz.mobile.R.string.ccos_review_notice), Tone.INFO)
                 }
                 outcome?.let { MonoText(it) }
             }
         } else {
             EmptyState(stringResource(dev.ninfenz.mobile.R.string.ccos_no_result))
+        }
+    }
+}
+
+/** 固定底部人审操作区：与滚动列表解耦，避免按钮被输入框/滚动遮挡。 */
+@Composable
+fun CcosReviewActions(
+    busy: Boolean,
+    outcome: String?,
+    onApprove: () -> Unit,
+    onReject: () -> Unit
+) {
+    Surface(tonalElevation = 3.dp, modifier = Modifier.navigationBarsPadding()) {
+        Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
+            outcome?.let {
+                Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
+            }
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(enabled = !busy, onClick = onApprove) {
+                    Text(if (busy) stringResource(dev.ninfenz.mobile.R.string.ccos_submitting) else stringResource(dev.ninfenz.mobile.R.string.ccos_submit))
+                }
+                OutlinedButton(enabled = !busy, onClick = onReject) {
+                    Text(stringResource(dev.ninfenz.mobile.R.string.ccos_reject))
+                }
+            }
         }
     }
 }

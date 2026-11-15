@@ -404,4 +404,5 @@
     <string name="status_exported">已导出</string>
     <string name="status_reviewed">已人审</string>
     <string name="error_fix_prefix">修复：%1$s</string>
+    <string name="ccos_submit_timeout">提交超时，请重试</string>
 </resources>

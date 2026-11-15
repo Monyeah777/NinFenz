@@ -404,4 +404,5 @@
     <string name="status_exported">Exported</string>
     <string name="status_reviewed">Reviewed</string>
     <string name="error_fix_prefix">Fix: %1$s</string>
+    <string name="ccos_submit_timeout">Submit timed out; retry</string>
 </resources>

@@ -40,9 +40,11 @@ fun NfScaffold(
     title: String,
     onBack: (() -> Unit)?,
     actions: @Composable RowScope.() -> Unit = {},
+    bottomBar: @Composable () -> Unit = {},
     content: @Composable (PaddingValues) -> Unit
 ) {
     Scaffold(
+        bottomBar = bottomBar,
         topBar = {
             TopAppBar(
                 title = { Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis) },
