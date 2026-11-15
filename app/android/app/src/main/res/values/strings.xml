@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">NF Mobile</string>
+    <string name="share_receiver_label">导入到 NF Mobile</string>
+    <string name="share_receiver_cancel">取消</string>
+    <string name="share_receiver_confirm">导入</string>
+</resources>

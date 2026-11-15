@@ -1,0 +1,74 @@
+{
+  "schema": "nf-pack-update/1",
+  "from": {
+    "id": "demo-pack",
+    "version": "1.0.0",
+    "tree": "e629fa6598d732768f7c726b4b621285f9c3b85303900aa912017db7617d8bdb"
+  },
+  "to": {
+    "id": "demo-pack",
+    "version": "1.1.0",
+    "tree": "b17ef6d19c7a5b1ee83b907c595526dcb1eb06db8227d650d5dda0a9f4ce8cd9"
+  },
+  "changes": {
+    "added": [
+      {
+        "path": "assets/new.md",
+        "sha256": "4523540f1504cd17100c4835e85b7eefd49911580f8efff0599a8f283be6b9e3",
+        "size": 10
+      }
+    ],
+    "removed": [
+      {
+        "path": "docs/legacy.md",
+        "sha256": "4ec9599fc203d176a301536c2e091a19bc852759b255bd6818810a42c5fed14a"
+      }
+    ]
+  },
+  "impact": {
+    "breaking": true,
+    "projects": [
+      "demo-project"
+    ],
+    "overlay_keys": [
+      "clauses"
+    ],
+    "notes": [
+      "删除文件"
+    ]
+  },
+  "merge": {
+    "actions": [
+      {
+        "kind": "take_new",
+        "path": "assets/new.md",
+        "reason": "added"
+      },
+      {
+        "kind": "defer",
+        "path": "docs/legacy.md",
+        "reason": "removed"
+      }
+    ],
+    "on_conflict": "require_user"
+  },
+  "conflicts": [
+    {
+      "id": "CFL-01",
+      "kind": "delete",
+      "path": "docs/legacy.md",
+      "old_sha256": "4ec9599fc203d176a301536c2e091a19bc852759b255bd6818810a42c5fed14a",
+      "options": [
+        "keep_mine",
+        "take_new",
+        "defer"
+      ],
+      "default": "defer"
+    }
+  ],
+  "policy": {
+    "auto_merge": true,
+    "backup": true,
+    "rollback": true
+  }
+}

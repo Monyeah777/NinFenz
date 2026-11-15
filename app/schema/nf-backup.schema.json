@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/app/schema/nf-backup.schema.json",
+  "title": "NF 更新备份清单（nf-backup/1）",
+  "description": "pack 应用前的备份清单（本地数据目录，不入 canonical 产物链）；时间戳只允许出现在本文件（人读）。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "tree",
+    "files"
+  ],
+  "properties": {
+    "schema": {
+      "const": "nf-backup/1"
+    },
+    "created_at": {
+      "type": "string"
+    },
+    "tree": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "sha256"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      }
+    }
+  }
+}

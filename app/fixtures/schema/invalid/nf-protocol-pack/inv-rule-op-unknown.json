@@ -1,0 +1,80 @@
+{
+  "schema": "nf-protocol-pack/1",
+  "id": "demo-protocol",
+  "version": "1.0.0",
+  "title": "演示协议",
+  "proto_version": 1,
+  "clauses": [
+    {
+      "id": "C-001",
+      "title": "主题句先行",
+      "level": "MUST",
+      "text": "开篇必须给出主题句：{{F-001}}",
+      "enabled": true,
+      "fields": [
+        "F-001"
+      ],
+      "source": {
+        "path": "01_核心协议.md",
+        "anchor": "§1"
+      }
+    }
+  ],
+  "fields": [
+    {
+      "id": "F-001",
+      "clause": "C-001",
+      "label": "主题句",
+      "type": "text",
+      "required": true,
+      "default": "在这里写主题句",
+      "constraint": {
+        "max_len": 120
+      }
+    }
+  ],
+  "rules": [
+    {
+      "id": "R-001",
+      "expr": {
+        "op": "xor",
+        "args": [
+          {
+            "op": "exists",
+            "field": "F-001"
+          },
+          {
+            "field": "F-001"
+          }
+        ]
+      },
+      "severity": "error",
+      "message": "主题句必填",
+      "fix": "补主题句"
+    }
+  ],
+  "examples": [
+    {
+      "id": "EX-01",
+      "title": "示例",
+      "keywords": [
+        "西幻"
+      ],
+      "body": "示例正文"
+    }
+  ],
+  "compat": {
+    "protocol_min": 1,
+    "protocol_max": 1,
+    "app_min": "1.0.0"
+  },
+  "migrations": [
+    {
+      "from": 1,
+      "to": 2,
+      "steps": [
+        "声明式迁移：人工确认后再执行"
+      ]
+    }
+  ]
+}

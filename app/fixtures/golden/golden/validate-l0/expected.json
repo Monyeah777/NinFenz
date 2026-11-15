@@ -1,0 +1,1 @@
+{"error":null,"exit":0,"ok":true,"result":{"issues":[],"level":"L0","schema":"nf-validate-report/1","summary":{"error":0,"info":0,"warn":0},"target":{"digest":"da66854fc00485caf889f521b242d2d7b171e742c06508ed196ad92d283c90a1","kind":"assembly","ref":"demo-graph"},"verdict":"pass"}}

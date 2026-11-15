@@ -1,0 +1,1 @@
+{"error":null,"exit":0,"ok":true,"result":{"clauses":[{"id":"C-001","text":"角色 法师 位于 塔。"},{"id":"C-002","text":"基调：冷。"}],"warnings":[{"code":"NF-PRT-005","message":"规则 R-002 未满足：基调为冷","severity":"warn"}]}}

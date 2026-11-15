@@ -1,0 +1,40 @@
+{
+  "schema": "nf-app-limits/1",
+  "note": "APP 解析/解包默认上限（单一真源）。实现（Rust 核心）必须从本件读取，不得散落字面量；测试可显式覆盖但必须记录。",
+  "json": {
+    "max_depth": 64,
+    "max_bytes": 67108864
+  },
+  "yaml": {
+    "max_alias_expansions": 1000,
+    "max_depth": 64
+  },
+  "xml": {
+    "entities": false,
+    "max_depth": 32
+  },
+  "zip": {
+    "max_entries": 5000,
+    "max_total_unpacked_bytes": 536870912,
+    "max_file_bytes": 67108864,
+    "max_compression_ratio": 100,
+    "max_nesting": 1,
+    "allow_symlink": false
+  },
+  "pack": {
+    "max_items": 5000,
+    "max_file_bytes": 67108864,
+    "max_total_bytes": 536870912
+  },
+  "import": {
+    "max_headings": 2000,
+    "max_code_blocks": 1000,
+    "max_tables": 500
+  },
+  "text": {
+    "max_chars": 20000000
+  },
+  "markdown": {
+    "max_fence_lines": 100000
+  }
+}

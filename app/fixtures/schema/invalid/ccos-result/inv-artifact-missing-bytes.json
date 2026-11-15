@@ -1,0 +1,35 @@
+{
+  "schema": "ccos-result/1",
+  "task_id": "task-demo-0001",
+  "task_digest": "02d20bbd7e394ad5999a4cebabac9619732c343a4cac99470c03e23ba2bdc2bc",
+  "status": "succeeded",
+  "artifacts": [
+    {
+      "name": "result.md",
+      "mime": "text/markdown",
+      "path": "artifacts/result.md",
+      "sha256": "7688b6ef52555962d008fff894223582c484517cea7da49ee67800adc7fc8866"
+    }
+  ],
+  "evidence": [
+    {
+      "kind": "log",
+      "ref": "evidence/run.log",
+      "digest": "c837649cce43f2729138e72cc315207057ac82599a59be72765a477f22d14a54"
+    }
+  ],
+  "report": {
+    "summary": "完成",
+    "issues": []
+  },
+  "provenance": {
+    "engine": "ccos-demo",
+    "model": "demo-model",
+    "started_at": "2026-11-15T00:00:00Z",
+    "finished_at": "2026-11-15T00:01:00Z"
+  },
+  "human_review": {
+    "required": true,
+    "state": "pending"
+  }
+}

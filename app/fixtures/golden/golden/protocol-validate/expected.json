@@ -1,0 +1,1 @@
+{"error":null,"exit":0,"ok":true,"result":{"issues":[],"level":"L0","schema":"nf-validate-report/1","summary":{"error":0,"info":0,"warn":0},"target":{"digest":"cf207981a15fcb8dc4b6a4b871c65ee5485fd9282d7a417aca9ed86838e43e7b","kind":"protocol-pack","ref":"demo-proto"},"verdict":"pass"}}

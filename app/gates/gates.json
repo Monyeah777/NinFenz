@@ -1,0 +1,319 @@
+{
+  "schema": "nf-app-gates/1",
+  "note": "APP 门禁注册表（QA0–QA6）。kind: cmd=子命令（按 exit 期望）；files=路径必须存在；glob_min=glob 命中数下限；json_ok=文件必须可解析为 JSON；func=run_gates.py 内置断言函数名。required=false 的项在未完成时记 OPEN（必须有 owner+next），不判红；required=true 缺失即 FAIL。",
+  "gates": [
+    {
+      "id": "QA0",
+      "title": "架构/数据模型/FFI 契约/威胁模型/ADR 评审",
+      "checks": [
+        {
+          "id": "q0-schema-json",
+          "kind": "glob_json",
+          "glob": "app/schema/*.schema.json",
+          "min": 13,
+          "title": "13 个 schema 可解析且在场"
+        },
+        {
+          "id": "q0-schema-json",
+          "kind": "glob_json",
+          "glob": "app/schema/*.json",
+          "min": 15,
+          "title": "schema + limits/error_codes 全 JSON 可解析（≥15 件）"
+        },
+        {
+          "id": "q0-contract-docs",
+          "kind": "files",
+          "paths": [
+            "app/docs/CONTRACT.md",
+            "app/docs/CLI.md",
+            "app/docs/ARCHITECTURE.md",
+            "app/docs/THREAT_MODEL.md"
+          ],
+          "title": "契约/CLI/架构/威胁模型文档在位"
+        },
+        {
+          "id": "q0-adr",
+          "kind": "glob_min",
+          "glob": "app/docs/adr/ADR-APP-*.md",
+          "min": 10,
+          "title": "10 条 ADR 在位（ADR-APP-001…010 + 偏差记录）"
+        },
+        {
+          "id": "q0-fixtures",
+          "kind": "files",
+          "paths": [
+            "app/fixtures/schema/valid",
+            "app/fixtures/schema/invalid",
+            "app/fixtures/schema/invalid/EXPECTED.json"
+          ],
+          "title": "schema 正反夹具与期望错误清单在位"
+        },
+        {
+          "id": "q0-schema-tests",
+          "kind": "cmd",
+          "argv": [
+            "python",
+            "-m",
+            "pytest",
+            "app/tests/test_schema_valid.py",
+            "app/tests/test_schema_negative.py",
+            "-q"
+          ],
+          "title": "schema 正/反样例测试全绿"
+        },
+        {
+          "id": "q0-encoding",
+          "kind": "func",
+          "name": "check_encoding",
+          "title": "app/ 文本文件 UTF-8 无 BOM + LF（仓库编码卫生口径）"
+        },
+        {
+          "id": "q0-no-machine-paths",
+          "kind": "func",
+          "name": "check_no_machine_paths",
+          "title": "契约/核心/控制面/测试/夹具无本机绝对路径硬编码"
+        }
+      ]
+    },
+    {
+      "id": "QA1",
+      "title": "Pack/导入/映射/搜索；负例",
+      "checks": [
+        {
+          "id": "q1-core-test",
+          "kind": "cmd",
+          "argv": [
+            "cargo",
+            "test"
+          ],
+          "title": "Rust 核心单测全绿（cwd=app/core 以读取 .cargo 配置）",
+          "cwd": "app/core"
+        },
+        {
+          "id": "q1-pack-import",
+          "kind": "cmd",
+          "argv": [
+            "python",
+            "-m",
+            "pytest",
+            "app/tests/test_e2e_first_loop.py",
+            "-q",
+            "-k",
+            "import or pack"
+          ],
+          "title": "导入/Pack 用例全绿"
+        },
+        {
+          "id": "q1-negative",
+          "kind": "cmd",
+          "argv": [
+            "python",
+            "-m",
+            "pytest",
+            "app/tests/test_security_negative.py",
+            "app/tests/test_cli_contract.py",
+            "-q"
+          ],
+          "title": "负例与 CLI 契约全绿"
+        }
+      ]
+    },
+    {
+      "id": "QA2",
+      "title": "协议/管线/装配/校验/导出；golden",
+      "checks": [
+        {
+          "id": "q2-golden",
+          "kind": "cmd",
+          "argv": [
+            "python",
+            "-m",
+            "pytest",
+            "app/tests/test_golden.py",
+            "app/tests/test_oracle_parity.py",
+            "-q"
+          ],
+          "title": "golden 与 Python oracle 对账全绿"
+        },
+        {
+          "id": "q2-e2e",
+          "kind": "cmd",
+          "argv": [
+            "python",
+            "-m",
+            "pytest",
+            "app/tests/test_e2e_first_loop.py",
+            "-q"
+          ],
+          "title": "首闭环 E2E 全绿"
+        }
+      ]
+    },
+    {
+      "id": "QA3",
+      "title": "分享/回填/Pack 更新/冲突/回滚；负例",
+      "checks": [
+        {
+          "id": "q3-update",
+          "kind": "cmd",
+          "argv": [
+            "python",
+            "-m",
+            "pytest",
+            "app/tests/test_e2e_first_loop.py",
+            "-q",
+            "-k",
+            "update or rollback or conflict"
+          ],
+          "title": "更新/冲突/回滚用例全绿"
+        },
+        {
+          "id": "q3-share",
+          "kind": "cmd",
+          "argv": [
+            "python",
+            "-m",
+            "pytest",
+            "app/tests/test_cli_contract.py",
+            "-q",
+            "-k",
+            "share"
+          ],
+          "title": "分享脱敏/形态用例全绿（share prompt/json/out）",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "QA4",
+      "title": "桌面/TUI/CCOS 交接；跨端一致",
+      "checks": [
+        {
+          "id": "q4-tui",
+          "kind": "cmd",
+          "argv": [
+            "python",
+            "tui/nf.py",
+            "--selftest"
+          ],
+          "title": "TUI selftest 全绿（复用不重写）"
+        },
+        {
+          "id": "q4-ccos",
+          "kind": "cmd",
+          "argv": [
+            "python",
+            "-m",
+            "pytest",
+            "app/tests/test_e2e_first_loop.py",
+            "-q",
+            "-k",
+            "first_loop or ccos"
+          ],
+          "title": "CCOS task/result/人审用例全绿"
+        },
+        {
+          "id": "q4-android-build",
+          "kind": "files",
+          "paths": [
+            "app/android/gradlew"
+          ],
+          "title": "Android 工程可构建（gradle wrapper 在位）",
+          "required": false,
+          "owner": "toolchain-scout",
+          "next": "工具链可行时补 APK 构建证据；不可行记 OPEN-TOOLCHAIN"
+        },
+        {
+          "id": "q4-desktop-build",
+          "kind": "files",
+          "paths": [
+            "app/desktop/build.gradle.kts"
+          ],
+          "title": "Desktop CMP 工程在位",
+          "required": false,
+          "owner": "kotlin-ui",
+          "next": "CMP 工程与构建脚本落地"
+        }
+      ]
+    },
+    {
+      "id": "QA5",
+      "title": "安全/性能/无障碍/16KB/设备矩阵",
+      "checks": [
+        {
+          "id": "q5-security",
+          "kind": "cmd",
+          "argv": [
+            "python",
+            "-m",
+            "pytest",
+            "app/tests/test_security_negative.py",
+            "-q"
+          ],
+          "title": "解析安全负例全绿"
+        },
+        {
+          "id": "q5-device-matrix",
+          "kind": "files",
+          "paths": [
+            "app/docs/DEVICE_MATRIX.md"
+          ],
+          "title": "设备/ABI/16KB 矩阵登记",
+          "required": false,
+          "owner": "lead",
+          "next": "真机/模拟器矩阵不可执行时如实登记 OPEN"
+        },
+        {
+          "id": "q5-perf",
+          "kind": "files",
+          "paths": [
+            "app/docs/PERF_BUDGET.md"
+          ],
+          "title": "性能预算与实测口径登记",
+          "required": false,
+          "owner": "lead",
+          "next": "缺 Android 运行环境时只给静态预算"
+        }
+      ]
+    },
+    {
+      "id": "QA6",
+      "title": "发布/签名/公证/数据安全/许可；自审计 P0=0",
+      "checks": [
+        {
+          "id": "q6-scripts",
+          "kind": "files",
+          "paths": [
+            "app/scripts/build_android.sh",
+            "app/scripts/build_desktop.sh",
+            "app/scripts/sign_windows.ps1",
+            "app/scripts/notarize_macos.sh",
+            "app/scripts/RELEASE_CHECKLIST.md"
+          ],
+          "title": "发布/签名/公证脚本与清单在位"
+        },
+        {
+          "id": "q6-docs",
+          "kind": "files",
+          "paths": [
+            "app/docs/LEGAL.md",
+            "app/docs/PRIVACY.md",
+            "app/docs/DOD.md"
+          ],
+          "title": "法务/隐私/DoD 文档在位"
+        },
+        {
+          "id": "q6-signing",
+          "kind": "files",
+          "paths": [
+            "app/scripts/RELEASE_EVIDENCE.md"
+          ],
+          "title": "签名/公证证据（证书/平台不在场 → OPEN）",
+          "required": false,
+          "owner": "lead",
+          "next": "无证书/无 macOS：记 OPEN-EXTERNAL，不冒充"
+        }
+      ]
+    }
+  ]
+}

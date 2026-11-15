@@ -1,0 +1,39 @@
+{
+  "case": "sample-pack",
+  "core": {
+    "abi": "nf-app-core/1",
+    "version": "0.1.0"
+  },
+  "expect": {
+    "ok": true
+  },
+  "expected": {
+    "error": null,
+    "exit": 0,
+    "ok": true,
+    "result": {
+      "issues": [],
+      "level": "L0",
+      "schema": "nf-validate-report/1",
+      "summary": {
+        "error": 0,
+        "info": 0,
+        "warn": 0
+      },
+      "target": {
+        "digest": "998077ce27e234de63b4c7b98eb28f7ecad4b7db1e51c7a00cba77c3e09cbc0b",
+        "kind": "pack",
+        "ref": "demo-pack"
+      },
+      "verdict": "pass"
+    }
+  },
+  "expected_exit": 0,
+  "expected_sha256": "eda30c268e5da5910832d053962476acf13c65703f21c5b302dd4b6bdd16e86b",
+  "note": "expected 由 app/core release 的 nf-app-core 生成（不是手写）；expected_sha256 钉核心 stdout 原始字节",
+  "op": "pack-verify",
+  "request": {
+    "root": "$fixtures/sample-pack"
+  },
+  "schema": "nf-golden-case/1"
+}

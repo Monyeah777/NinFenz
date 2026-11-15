@@ -1,0 +1,64 @@
+{
+  "schema": "nf-pipeline-graph/1",
+  "id": "demo-pipeline",
+  "version": "1.0.0",
+  "title": "演示管线",
+  "mode": "pro",
+  "nodes": [
+    {
+      "id": "AN01",
+      "kind": "stage",
+      "title": "输入",
+      "ports": {
+        "in": [],
+        "out": [
+          "text"
+        ]
+      }
+    },
+    {
+      "id": "N02",
+      "kind": "module",
+      "title": "大纲",
+      "module_ref": {
+        "id": "mod-outline",
+        "version": "1.0.0"
+      },
+      "ports": {
+        "in": [
+          "text"
+        ],
+        "out": [
+          "outline"
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "E01",
+      "from": "N01",
+      "to": "N02",
+      "from_port": "text",
+      "to_port": "text",
+      "type": "data"
+    }
+  ],
+  "weights": {
+    "N01": 30,
+    "N02": 40
+  },
+  "params": {
+    "tone": "冷静"
+  },
+  "settings": {
+    "required_stages": [
+      "N01"
+    ],
+    "seed": 42,
+    "budget": {
+      "max_tokens": 1000,
+      "max_chars": 4000
+    }
+  }
+}

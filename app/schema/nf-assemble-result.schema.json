@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/app/schema/nf-assemble-result.schema.json",
+  "title": "NF 装配结果元数据（nf-assemble-result/1）",
+  "description": "装配出的 Markdown 的元数据（与 Markdown 同目录落 result.meta.json）；确定性：不含时间戳/随机/路径。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "plan_digest",
+    "spec_digest",
+    "markdown_digest",
+    "slots",
+    "missing"
+  ],
+  "properties": {
+    "schema": {
+      "const": "nf-assemble-result/1"
+    },
+    "plan_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "spec_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "markdown_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "slots": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "section",
+          "chars"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^SLT-[0-9]{2,3}$"
+          },
+          "section": {
+            "type": "string",
+            "pattern": "^SEC-[0-9]{2}$"
+          },
+          "chars": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "missing": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "stage": {
+      "type": "string"
+    },
+    "block": {
+      "type": "string"
+    }
+  }
+}

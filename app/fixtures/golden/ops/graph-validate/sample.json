@@ -1,0 +1,171 @@
+{
+  "case": "sample",
+  "core": {
+    "abi": "nf-app-core/1",
+    "version": "0.1.0"
+  },
+  "expect": {
+    "ok": true
+  },
+  "expected": {
+    "error": null,
+    "exit": 0,
+    "ok": true,
+    "result": {
+      "issues": [],
+      "level": "L0",
+      "schema": "nf-validate-report/1",
+      "summary": {
+        "error": 0,
+        "info": 0,
+        "warn": 0
+      },
+      "target": {
+        "digest": "62fdb39d9cd32c0bdfd9c1adcd05ceb64ec2c54d07e5bb948cbcbc6b6d84d429",
+        "kind": "pipeline-graph",
+        "ref": "demo-pipeline"
+      },
+      "verdict": "pass"
+    }
+  },
+  "expected_exit": 0,
+  "expected_sha256": "35e2b6e0b3c015a298e1b39fdb3a0065228a095fc2731413e6da5e62cfad8129",
+  "note": "expected 由 app/core release 的 nf-app-core 生成（不是手写）；expected_sha256 钉核心 stdout 原始字节",
+  "op": "graph-validate",
+  "request": {
+    "graph": {
+      "edges": [
+        {
+          "from": "N01",
+          "from_port": "text",
+          "id": "E01",
+          "to": "N02",
+          "to_port": "text",
+          "type": "data"
+        },
+        {
+          "from": "N02",
+          "from_port": "outline",
+          "id": "E02",
+          "to": "N03",
+          "to_port": "outline",
+          "type": "data"
+        },
+        {
+          "from": "N03",
+          "from_port": "draft",
+          "id": "E03",
+          "to": "N04",
+          "to_port": "draft",
+          "type": "data"
+        },
+        {
+          "from": "N04",
+          "from_port": "final",
+          "id": "E04",
+          "to": "N05",
+          "to_port": "final",
+          "type": "data"
+        }
+      ],
+      "id": "demo-pipeline",
+      "mode": "pro",
+      "nodes": [
+        {
+          "id": "N01",
+          "kind": "stage",
+          "ports": {
+            "in": [],
+            "out": [
+              "text"
+            ]
+          },
+          "title": "输入"
+        },
+        {
+          "id": "N02",
+          "kind": "module",
+          "module_ref": {
+            "id": "mod-outline",
+            "version": "1.0.0"
+          },
+          "ports": {
+            "in": [
+              "text"
+            ],
+            "out": [
+              "outline"
+            ]
+          },
+          "title": "大纲"
+        },
+        {
+          "id": "N03",
+          "kind": "stage",
+          "ports": {
+            "in": [
+              "outline"
+            ],
+            "out": [
+              "draft"
+            ]
+          },
+          "title": "起草"
+        },
+        {
+          "id": "N04",
+          "kind": "module",
+          "module_ref": {
+            "id": "mod-polish",
+            "version": "1.0.0"
+          },
+          "ports": {
+            "in": [
+              "draft"
+            ],
+            "out": [
+              "final"
+            ]
+          },
+          "title": "润色"
+        },
+        {
+          "id": "N05",
+          "kind": "gate",
+          "ports": {
+            "in": [
+              "final"
+            ],
+            "out": [
+              "checked"
+            ]
+          },
+          "title": "质检"
+        }
+      ],
+      "params": {
+        "tone": "冷静"
+      },
+      "schema": "nf-pipeline-graph/1",
+      "settings": {
+        "budget": {
+          "max_chars": 12000,
+          "max_tokens": 4000
+        },
+        "required_stages": [
+          "N01",
+          "N03"
+        ],
+        "seed": 42
+      },
+      "title": "示例管线",
+      "version": "1.0.0",
+      "weights": {
+        "N01": 30,
+        "N02": 40,
+        "N04": 70
+      }
+    }
+  },
+  "schema": "nf-golden-case/1"
+}

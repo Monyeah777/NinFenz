@@ -1,0 +1,69 @@
+{
+  "case": "draft",
+  "core": {
+    "abi": "nf-app-core/1",
+    "version": "0.1.0"
+  },
+  "expect": {
+    "ok": true
+  },
+  "expected": {
+    "error": null,
+    "exit": 0,
+    "ok": true,
+    "result": {
+      "issues": [],
+      "level": "L0",
+      "schema": "nf-validate-report/1",
+      "summary": {
+        "error": 0,
+        "info": 0,
+        "warn": 0
+      },
+      "target": {
+        "digest": "133a59bbabdb14a9e58f6e972d0e569ad77741a04368c035780c972eae97eb39",
+        "kind": "project",
+        "ref": "golden-project"
+      },
+      "verdict": "pass"
+    }
+  },
+  "expected_exit": 0,
+  "expected_sha256": "360b0be9df5ce03dfb886181f60423ae0511b6b7831f2a51262534bee2414f9f",
+  "note": "expected 由 app/core release 的 nf-app-core 生成（不是手写）；expected_sha256 钉核心 stdout 原始字节",
+  "op": "project-validate",
+  "request": {
+    "project": {
+      "history": [],
+      "id": "golden-project",
+      "refs": {
+        "base_pack": {
+          "id": "demo-pack",
+          "tree": "4cb1502595c81614d6f924fac7f6acbad1b794412bf5a270cf2d111a5789a95e",
+          "version": "1.0.0"
+        },
+        "graph": {
+          "digest": "62fdb39d9cd32c0bdfd9c1adcd05ceb64ec2c54d07e5bb948cbcbc6b6d84d429",
+          "id": "demo-pipeline",
+          "path": "pack/pipeline/main.nfg.json",
+          "sha256": "62fdb39d9cd32c0bdfd9c1adcd05ceb64ec2c54d07e5bb948cbcbc6b6d84d429",
+          "version": "1.0.0"
+        },
+        "spec": {
+          "digest": "7e265bb4c336c1af3e03cdc292e7e723d506c16c8793b658e772c791a59f63c8",
+          "id": "demo-spec",
+          "path": "pack/spec/main.nfspec.json",
+          "sha256": "7e265bb4c336c1af3e03cdc292e7e723d506c16c8793b658e772c791a59f63c8",
+          "version": "1.0.0"
+        }
+      },
+      "review": {
+        "state": "none"
+      },
+      "schema": "nf-project/1",
+      "status": "draft",
+      "title": "golden"
+    }
+  },
+  "schema": "nf-golden-case/1"
+}

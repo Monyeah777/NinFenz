@@ -1,0 +1,21 @@
+{
+  "schema": "nf-assemble-result/1",
+  "plan_digest": "39fa9ec190eee7b6f4dff1100d6343e10918d044c75eac8f9e9a2596173f80c9",
+  "spec_digest": "d029fa3a95e174a19934857f535eb9427d967218a36ea014b70ad704bc6c8d1c",
+  "markdown_digest": "81b8a03f97e8787c53fe1a86bda042b6f0de9b0ec9c09357e107c99ba4d6948a",
+  "slots": [
+    {
+      "id": "SLT-01",
+      "section": "SEC-01",
+      "chars": 12
+    },
+    {
+      "id": "SLT-02",
+      "section": "SEC-01",
+      "chars": 0
+    }
+  ],
+  "missing": [
+    "SLT-02"
+  ]
+}

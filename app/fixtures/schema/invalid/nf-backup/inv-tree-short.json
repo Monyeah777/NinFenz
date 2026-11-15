@@ -1,0 +1,11 @@
+{
+  "schema": "nf-backup/1",
+  "created_at": "2026-11-15T00:00:00Z",
+  "tree": "abc",
+  "files": [
+    {
+      "path": "docs/a.md",
+      "sha256": "108c995b953c8a35561103e2014cf828eb654a99e310f87fab94c2f4b7d2a04f"
+    }
+  ]
+}

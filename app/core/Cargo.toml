@@ -1,0 +1,20 @@
+[package]
+name = "nf-app-core"
+version = "0.1.0"
+edition = "2021"
+description = "NF APP shared core (canonical/validation/import/assembly/pack ops) — A0-A5 reference implementation"
+license = "MIT"
+
+[lib]
+name = "nf_app_core"
+crate-type = ["rlib", "cdylib"]
+
+[[bin]]
+name = "nf-app-core"
+path = "src/bin/nf-app-core.rs"
+
+[dependencies]
+serde_json = "=1.0.151"
+sha2 = "=0.10.9"
+zip = { version = "=2.6.1", default-features = false, features = ["deflate"] }
+regex = "=1.13.1"

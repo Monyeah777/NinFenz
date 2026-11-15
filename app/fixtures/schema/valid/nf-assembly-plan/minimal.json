@@ -1,0 +1,54 @@
+{
+  "schema": "nf-assembly-plan/1",
+  "pipeline": {
+    "id": "demo-pipeline",
+    "version": "1.0.0",
+    "digest": "4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5"
+  },
+  "steps": [
+    {
+      "id": "S01",
+      "node": "N02",
+      "stage": "N01",
+      "module": "mod-outline",
+      "weight": 40,
+      "inputs": [
+        "text"
+      ],
+      "outputs": [
+        "outline"
+      ],
+      "params": {
+        "tone": "冷静"
+      }
+    }
+  ],
+  "modules": [
+    {
+      "id": "mod-outline",
+      "version": "1.0.0",
+      "digest": "4fc82b26aecb47d2868c4efbe3581732a3e7cbcc6c2efb32062c08170a05eeb8"
+    }
+  ],
+  "assets": [
+    {
+      "key": "tone",
+      "digest": "6b51d431df5d7f141cbececcf79edf3dd861c3b4069f0b11661a3eefacbba918"
+    }
+  ],
+  "slots": [
+    "SLT-01"
+  ],
+  "output": {
+    "form": "md",
+    "path": "result.md"
+  },
+  "fallback": {
+    "on_failure": "abort",
+    "max_retries": 0
+  },
+  "settings": {
+    "seed": 42
+  },
+  "digest": "3fdba35f04dc8c462986c992bcf875546257113072a909c162f7e470e581e278"
+}

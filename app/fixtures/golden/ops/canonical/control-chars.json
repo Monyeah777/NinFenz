@@ -1,0 +1,30 @@
+{
+  "case": "control-chars",
+  "core": {
+    "abi": "nf-app-core/1",
+    "version": "0.1.0"
+  },
+  "expect": {
+    "ok": true
+  },
+  "expected": {
+    "error": null,
+    "exit": 0,
+    "ok": true,
+    "result": {
+      "canonical": "{\"ctrl\":\"a\\nb\\tc\",\"quote\":\"say \\\"hi\\\"\\\\\"}",
+      "digest": "82e8e8581e2b558568db71ed3b796b2dd8835bce84d578e7197acfba0632059e"
+    }
+  },
+  "expected_exit": 0,
+  "expected_sha256": "61b4c2d1470dd0e479f4114bdaa1aec0a8ba873beebf3fd601793b95a737ea4b",
+  "note": "expected 由 app/core release 的 nf-app-core 生成（不是手写）；expected_sha256 钉核心 stdout 原始字节",
+  "op": "canonical",
+  "request": {
+    "value": {
+      "ctrl": "a\nb\tc",
+      "quote": "say \"hi\"\\"
+    }
+  },
+  "schema": "nf-golden-case/1"
+}

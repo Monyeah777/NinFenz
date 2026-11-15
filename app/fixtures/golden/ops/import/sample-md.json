@@ -1,0 +1,95 @@
+{
+  "case": "sample-md",
+  "core": {
+    "abi": "nf-app-core/1",
+    "version": "0.1.0"
+  },
+  "expect": {
+    "ok": true
+  },
+  "expected": {
+    "error": null,
+    "exit": 0,
+    "ok": true,
+    "result": {
+      "assets": [],
+      "detected": {
+        "candidates": [
+          {
+            "confidence": 85,
+            "format": "markdown"
+          },
+          {
+            "confidence": 55,
+            "format": "text"
+          }
+        ],
+        "confidence": 85,
+        "format": "markdown"
+      },
+      "schema": "nf-import/1",
+      "source": {
+        "kind": "file",
+        "name": "sample.md",
+        "sha256": "bdda935f5fa201d57cadd66d596d27b5687ee45155cbe57080735203aa058160",
+        "size": 346
+      },
+      "structure": {
+        "code_blocks": [
+          {
+            "lang": "markdown",
+            "lines": 1
+          }
+        ],
+        "headings": [
+          {
+            "level": 1,
+            "line": 1,
+            "text": "西幻生存开篇（示例导入）"
+          },
+          {
+            "level": 2,
+            "line": 3,
+            "text": "场景"
+          },
+          {
+            "level": 2,
+            "line": 7,
+            "text": "结构"
+          },
+          {
+            "level": 2,
+            "line": 13,
+            "text": "示例"
+          }
+        ],
+        "paragraphs": 2,
+        "tables": [
+          {
+            "columns": 2,
+            "rows": 2
+          }
+        ]
+      },
+      "suggested": {
+        "mappings": [],
+        "unmapped": []
+      },
+      "text": "# 西幻生存开篇（示例导入）\n\n## 场景\n\n雨夜的边境小镇，主角必须在一个时辰内找到落脚点。\n\n## 结构\n\n1. 开头：环境压力\n2. 中段：选择与代价\n3. 结尾：留下钩子\n\n## 示例\n\n```markdown\n> 引用：灯灭之前，别回头。\n```\n\n| 项 | 值 |\n|---|---|\n| 语气 | 冷静 |\n| 节奏 | 中速 |\n",
+      "text_digest": "bdda935f5fa201d57cadd66d596d27b5687ee45155cbe57080735203aa058160",
+      "warnings": []
+    }
+  },
+  "expected_exit": 0,
+  "expected_sha256": "009436e1fa05cbd5663c52e36b458ed09f6d87d69173d0b04f76b471f167da2a",
+  "note": "expected 由 app/core release 的 nf-app-core 生成（不是手写）；expected_sha256 钉核心 stdout 原始字节",
+  "op": "import",
+  "request": {
+    "file": "$fixtures/sample-pack/docs/sample.md",
+    "source": {
+      "kind": "file",
+      "name": "sample.md"
+    }
+  },
+  "schema": "nf-golden-case/1"
+}

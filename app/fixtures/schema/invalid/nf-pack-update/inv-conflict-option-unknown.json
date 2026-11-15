@@ -1,0 +1,82 @@
+{
+  "schema": "nf-pack-update/1",
+  "from": {
+    "id": "demo-pack",
+    "version": "1.0.0",
+    "tree": "e629fa6598d732768f7c726b4b621285f9c3b85303900aa912017db7617d8bdb"
+  },
+  "to": {
+    "id": "demo-pack",
+    "version": "1.1.0",
+    "tree": "b17ef6d19c7a5b1ee83b907c595526dcb1eb06db8227d650d5dda0a9f4ce8cd9"
+  },
+  "changes": {
+    "added": [
+      {
+        "path": "assets/new.md",
+        "sha256": "4523540f1504cd17100c4835e85b7eefd49911580f8efff0599a8f283be6b9e3",
+        "size": 10
+      }
+    ],
+    "removed": [
+      {
+        "path": "docs/legacy.md",
+        "sha256": "4ec9599fc203d176a301536c2e091a19bc852759b255bd6818810a42c5fed14a"
+      }
+    ],
+    "modified": [
+      {
+        "path": "spec/main.nfspec.json",
+        "sha256": "9400f1b21cb527d7fa3d3eabba93557a18ebe7a2ca4e471cfe5e4c5b4ca7f767",
+        "new_sha256": "f5ca38f748a1d6eaf726b8a42fb575c3c71f1864a8143301782de13da2d9202b"
+      }
+    ]
+  },
+  "impact": {
+    "breaking": true,
+    "projects": [
+      "demo-project"
+    ],
+    "overlay_keys": [
+      "clauses"
+    ],
+    "notes": [
+      "删除文件"
+    ]
+  },
+  "merge": {
+    "actions": [
+      {
+        "kind": "take_new",
+        "path": "assets/new.md",
+        "reason": "added"
+      },
+      {
+        "kind": "defer",
+        "path": "docs/legacy.md",
+        "reason": "removed"
+      }
+    ],
+    "on_conflict": "require_user"
+  },
+  "conflicts": [
+    {
+      "id": "CFL-01",
+      "kind": "delete",
+      "path": "docs/legacy.md",
+      "old_sha256": "4ec9599fc203d176a301536c2e091a19bc852759b255bd6818810a42c5fed14a",
+      "options": [
+        "keep_mine",
+        "take_new",
+        "defer",
+        "keep_theirs"
+      ],
+      "default": "defer"
+    }
+  ],
+  "policy": {
+    "auto_merge": true,
+    "backup": true,
+    "rollback": true
+  }
+}
