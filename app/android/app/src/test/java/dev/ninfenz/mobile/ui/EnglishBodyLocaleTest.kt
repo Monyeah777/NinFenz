@@ -4,6 +4,10 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import android.content.Context
+import androidx.test.core.app.ApplicationProvider
+import dev.ninfenz.mobile.data.LibraryStore
+import dev.ninfenz.mobile.ui.screens.ImportScreen
 import dev.ninfenz.mobile.ui.screens.NewProjectScreen
 import dev.ninfenz.mobile.ui.screens.OnboardingScreen
 import dev.ninfenz.mobile.ui.theme.NfTheme
@@ -31,6 +35,18 @@ class EnglishBodyLocaleTest {
         compose.onNodeWithText("Put content into a protocol").assertIsDisplayed()
         compose.onNodeWithText("Next").performClick()
         compose.onNodeWithText("Start with a sample").assertIsDisplayed()
+    }
+
+    @Test
+    fun importUsesEnglishBody() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val store = LibraryStore(context.filesDir)
+        compose.setContent { NfTheme { ImportScreen(prefill = null, store = store, onBack = {}) } }
+        compose.onNodeWithText("Import").assertIsDisplayed()
+        compose.onNodeWithText("Choose a source").assertIsDisplayed()
+        compose.onNodeWithText("Choose file").assertIsDisplayed()
+        compose.onNodeWithText("Clipboard").assertIsDisplayed()
+        compose.onNodeWithText("Nothing imported yet").assertIsDisplayed()
     }
 
     @Test

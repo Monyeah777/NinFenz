@@ -4,7 +4,7 @@ NF APP 的 Android 控制面：本地处理、无账号、无遥测、**未声�
 app/docs/CONTRACT.md + app/docs/CLI.md + app/schema/error_codes.json（A0 冻结层）。
 
 > v0.02（W1）现状：四目的地外壳（库/创作/交付/我的）+ 自适应底部栏/rail + FAB 导入 + 首启示例 Pack/3 步引导 +
-> 设计 token/字体/暗色主题 + 自适应 launcher icon。旧 8 个功能页保留在详情层；W2 已接入新建项目向导、示例演示项目、本地搜索与 Pack 校验；W3 已把导入重做为产品向导；W4 已接入项目态创作台；W5 已接入项目态交付台、Pack 中心、CCOS 步骤化；Pack 更新支持应用内「选新版 Pack zip → 安全解包 → core pack-diff → 决策 → apply/回滚」；W4b 已接入创作台作者覆盖保存（nf-overlay/1）与交付状态写回；W6 已开始质量收口（heading 语义、设计 token/路由可达单测、Robolectric+Compose 语义测试 7 条、三档导航 + 9 组窗口尺寸矩阵、外壳 i18n + values-en + 英文 locale 测试）；RESULTS/FINAL_DOD 已加 v0.02 增量段；app/gates 7/7 PASS（FAIL=0）。onboarding/new project/顶层四屏正文已资源化；导入/创作/交付/Pack 中心/CCOS 正文仍 OPEN。
+> 设计 token/字体/暗色主题 + 自适应 launcher icon。旧 8 个功能页保留在详情层；W2 已接入新建项目向导、示例演示项目、本地搜索与 Pack 校验；W3 已把导入重做为产品向导；W4 已接入项目态创作台；W5 已接入项目态交付台、Pack 中心、CCOS 步骤化；Pack 更新支持应用内「选新版 Pack zip → 安全解包 → core pack-diff → 决策 → apply/回滚」；W4b 已接入创作台作者覆盖保存（nf-overlay/1）与交付状态写回；W6 已开始质量收口（heading 语义、设计 token/路由可达单测、Robolectric+Compose 语义测试 7 条、三档导航 + 9 组窗口尺寸矩阵、外壳 i18n + values-en + 英文 locale 测试）；RESULTS/FINAL_DOD 已加 v0.02 增量段；app/gates 7/7 PASS（FAIL=0）。onboarding/new project/顶层四屏/导入正文已资源化；搜索/Pack 中心/创作/交付/CCOS 正文仍 OPEN。
 
 ## 工程结构
 
@@ -90,7 +90,7 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 
 ## 单测
 
-92 条（JVM，无需模拟器）：
+93 条（JVM，无需模拟器）：
 
 - CoreResponseTest（10）：信封解析/矛盾拒绝/NF-E-005。
 - CoreBridgeContractTest（5）：op+payload 原样透传、错误 exit 语义、fake 无队列 fail-closed。
@@ -114,12 +114,12 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 - ShellNavigationComposeTest（3，Robolectric）：w360 底部栏、w700 rail、w900 rail 四目的地。
 - ShellEnglishLocaleTest（1，Robolectric）：en-rUS 下 Library/Create/Deliver/Me 资源生效。
 - ShellSizeMatrixTest（9，Robolectric）：compact/medium/expanded 宽 × 三档高，四目的地语义可达。
-- EnglishBodyLocaleTest（2，Robolectric）：onboarding/new project 正文英文资源生效。
+- EnglishBodyLocaleTest（3，Robolectric）：onboarding/new project/import 正文英文资源生效。
 
 ## 构建证据（本机，2026-11-15）
 
 - v0.02 W5（2026-11-15）：`./gradlew :app:assembleDebug` 成功：app-debug.apk = 18,323,958 bytes，
-  sha256 = ea045f7f9c4ea73e40e14034491585882a50babbc8d5d6d1b19dee67301b23cc（含双 ABI 原生库 + 9 个示例 Pack assets）。
+  sha256 = 246a31a1ae77b5c31adb95a501208145990c904026c35d155bd6fcdf567c7bba（含双 ABI 原生库 + 9 个示例 Pack assets）。
 - `./gradlew :app:testDebugUnitTest` 全绿：58 条 JVM 单测（42 基线 + AdaptiveLayout 4 + ShellState 4 + PackStore 3 + ProjectFactory 1 + ProjectCreator 2 + SearchIndex 3 + PackVerifier 1 + AuthorArtifactsLoader 2）。
 - `zipalign -c -P 16 -v 4 app-debug.apk` → Verification successful（native lib 16KB page 对齐）。
 - `bash app/scripts/build_core_android.sh --clean` 成功：NDK 27.0.12077973 + rustup targets

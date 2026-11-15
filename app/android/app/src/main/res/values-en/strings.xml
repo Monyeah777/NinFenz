@@ -108,4 +108,34 @@
     <string name="pack_detail_tree">tree: %1$s</string>
     <string name="pack_detail_dir">Directory: %1$s</string>
     <string name="pack_detail_update">Pack update</string>
+
+    <string name="import_title">Import</string>
+    <string name="import_source">Choose a source</string>
+    <string name="import_pick_file">Choose file</string>
+    <string name="import_clipboard">Clipboard</string>
+    <string name="import_sample">Sample content</string>
+    <string name="import_share_received">Share payload received</string>
+    <string name="import_share_from">From share: %1$s</string>
+    <string name="import_busy">Calling core import…</string>
+    <string name="import_explain">Core produces nf-import/1; low confidence (&lt;60) is never auto-accepted, mappings carry confidence.</string>
+    <string name="import_empty_title">Nothing imported yet</string>
+    <string name="import_empty_body">Start from Files, clipboard or sample content; share intake also lands here.</string>
+    <string name="import_preview">Preview</string>
+    <string name="import_low_confidence">Low confidence</string>
+    <string name="import_source_label">Source: %1$s</string>
+    <string name="import_structure">Structure: %1$d headings · %2$d paragraphs · %3$d code blocks · %4$d tables</string>
+    <string name="import_digest">digest: %1$s…</string>
+    <string name="import_mapping">Mapping suggestions (%1$d)</string>
+    <string name="import_no_mapping">No mapping candidates (NF-MAP-001): content goes to assets/unclassified.</string>
+    <string name="import_accepted">Accepted %1$d/%2$d</string>
+    <string name="import_accept_all">Accept all</string>
+    <string name="import_accept_none">Clear all</string>
+    <string name="import_unmapped">Unmapped: %1$s</string>
+    <string name="import_suggest_done">Suggestions from core map-suggest</string>
+    <string name="import_draft">Draft</string>
+    <string name="import_save">Save import draft + mapping decisions</string>
+    <string name="import_saved">Draft saved: %1$s</string>
+    <string name="import_saved_note">Draft stays in app-private storage and is not written into a project; draft → project conversion lands in W4+.</string>
+    <string name="import_done">Done</string>
+    <string name="import_again">Import another</string>
 </resources>

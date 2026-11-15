@@ -108,4 +108,34 @@
     <string name="pack_detail_tree">tree：%1$s</string>
     <string name="pack_detail_dir">目录：%1$s</string>
     <string name="pack_detail_update">Pack 更新</string>
+
+    <string name="import_title">导入</string>
+    <string name="import_source">选择来源</string>
+    <string name="import_pick_file">选择文件</string>
+    <string name="import_clipboard">剪贴板</string>
+    <string name="import_sample">示例内容</string>
+    <string name="import_share_received">已接收分享载荷</string>
+    <string name="import_share_from">来自分享：%1$s</string>
+    <string name="import_busy">正在调用核心 import…</string>
+    <string name="import_explain">导入由核心产出 nf-import/1；低置信（&lt;60）不自动入库，映射建议逐条给出 confidence。</string>
+    <string name="import_empty_title">还没有导入内容</string>
+    <string name="import_empty_body">从文件、剪贴板或示例内容开始；分享接收也会走这里。</string>
+    <string name="import_preview">预览</string>
+    <string name="import_low_confidence">低置信</string>
+    <string name="import_source_label">来源：%1$s</string>
+    <string name="import_structure">结构：标题 %1$d · 段落 %2$d · 代码块 %3$d · 表格 %4$d</string>
+    <string name="import_digest">digest：%1$s…</string>
+    <string name="import_mapping">映射建议（%1$d 条）</string>
+    <string name="import_no_mapping">无映射候选（NF-MAP-001）：内容会归入素材/未分类。</string>
+    <string name="import_accepted">已采纳 %1$d/%2$d</string>
+    <string name="import_accept_all">全部采纳</string>
+    <string name="import_accept_none">全部取消</string>
+    <string name="import_unmapped">未映射：%1$s</string>
+    <string name="import_suggest_done">映射建议来自 core map-suggest</string>
+    <string name="import_draft">草稿</string>
+    <string name="import_save">保存导入草稿 + 映射决策</string>
+    <string name="import_saved">已保存草稿：%1$s</string>
+    <string name="import_saved_note">草稿保存在应用私有目录，未写入项目；W4 再接入「草稿 → 项目」的转换。</string>
+    <string name="import_done">完成</string>
+    <string name="import_again">再导入一个</string>
 </resources>

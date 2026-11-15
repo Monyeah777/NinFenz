@@ -29,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.core.CoreError
 import dev.ninfenz.mobile.core.CoreResponse
@@ -108,7 +109,7 @@ fun ImportScreen(prefill: SharePayload?, store: LibraryStore, onBack: () -> Unit
                             doc = ImportModel.parse(suggestedObj)
                             rawResult = suggestedObj
                             acceptedMappings = doc!!.mappings.indices.filter { doc!!.mappings[it].confidence >= 80 }.toSet()
-                            suggestNote = "映射建议来自 core map-suggest"
+                            suggestNote = context.getString(dev.ninfenz.mobile.R.string.import_suggest_done)
                         }
                     } else {
                         suggestNote = "核心未给出映射建议：" + (suggest.error?.message ?: "未知原因") + "（可手动采纳/跳过）"
@@ -181,7 +182,7 @@ fun ImportScreen(prefill: SharePayload?, store: LibraryStore, onBack: () -> Unit
 
     LaunchedEffect(prefill) {
         if (prefill != null) {
-            prefillNote = "来自分享：" + prefill.summary()
+            prefillNote = context.getString(dev.ninfenz.mobile.R.string.import_share_from, prefill.summary())
             importShare(prefill)
         }
     }
@@ -201,7 +202,7 @@ fun ImportScreen(prefill: SharePayload?, store: LibraryStore, onBack: () -> Unit
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        NfTopAppBar(title = "导入", onBack = onBack)
+        NfTopAppBar(title = stringResource(dev.ninfenz.mobile.R.string.import_title), onBack = onBack)
         LazyColumn(
             contentPadding = androidx.compose.foundation.layout.PaddingValues(NfSpacing.page),
             verticalArrangement = Arrangement.spacedBy(NfSpacing.m)
@@ -209,22 +210,22 @@ fun ImportScreen(prefill: SharePayload?, store: LibraryStore, onBack: () -> Unit
             item {
                 NfCard {
                     Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                        Text("选择来源", style = MaterialTheme.typography.titleLarge)
+                        Text(stringResource(dev.ninfenz.mobile.R.string.import_source), style = MaterialTheme.typography.titleLarge)
                         Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                            Button(onClick = { filePicker.launch(arrayOf("*/*")) }, enabled = !busy) { Text("选择文件") }
-                            OutlinedButton(onClick = { importClipboard() }, enabled = !busy) { Text("剪贴板") }
+                            Button(onClick = { filePicker.launch(arrayOf("*/*")) }, enabled = !busy) { Text(stringResource(dev.ninfenz.mobile.R.string.import_pick_file)) }
+                            OutlinedButton(onClick = { importClipboard() }, enabled = !busy) { Text(stringResource(dev.ninfenz.mobile.R.string.import_clipboard)) }
                         }
                         Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                            OutlinedButton(onClick = { importSample() }, enabled = !busy) { Text("示例内容") }
+                            OutlinedButton(onClick = { importSample() }, enabled = !busy) { Text(stringResource(dev.ninfenz.mobile.R.string.import_sample)) }
                             if (prefillNote != null) {
-                                Text("已接收分享载荷", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
+                                Text(stringResource(dev.ninfenz.mobile.R.string.import_share_received), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
                             }
                         }
                         if (prefillNote != null) {
                             Text(prefillNote!!, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                         Text(
-                            "导入由核心产出 nf-import/1；低置信（<60）不自动入库，映射建议逐条给出 confidence。",
+                            stringResource(dev.ninfenz.mobile.R.string.import_explain),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -233,7 +234,7 @@ fun ImportScreen(prefill: SharePayload?, store: LibraryStore, onBack: () -> Unit
             }
             if (busy) {
                 item { LinearProgressIndicator(modifier = Modifier.fillMaxWidth().padding(horizontal = NfSpacing.page)) }
-                item { Text("正在调用核心 import…", style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
+                item { Text(stringResource(dev.ninfenz.mobile.R.string.import_busy), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
             }
             if (error != null) {
                 item { NfErrorCard(error!!.code, error!!.message, error!!.fix, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
@@ -247,8 +248,8 @@ fun ImportScreen(prefill: SharePayload?, store: LibraryStore, onBack: () -> Unit
                 item {
                     NfEmptyState(
                         icon = Icons.Filled.Add,
-                        title = "还没有导入内容",
-                        message = "从文件、剪贴板或示例内容开始；分享接收也会走这里。",
+                        title = stringResource(dev.ninfenz.mobile.R.string.import_empty_title),
+                        message = stringResource(dev.ninfenz.mobile.R.string.import_empty_body),
                         actionLabel = "选择文件",
                         onAction = { filePicker.launch(arrayOf("*/*")) },
                         secondaryLabel = "示例内容",
@@ -257,38 +258,43 @@ fun ImportScreen(prefill: SharePayload?, store: LibraryStore, onBack: () -> Unit
                 }
             }
             if (current != null) {
-                item { NfSectionHeader("预览") }
+                item { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.import_preview)) }
                 item {
                     NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
                         Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                             Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s), verticalAlignment = Alignment.CenterVertically) {
                                 NfStatusChip(current.format + " · " + current.confidence + "%")
-                                if (current.lowConfidence) NfStatusChip("低置信", MaterialTheme.colorScheme.error)
+                                if (current.lowConfidence) NfStatusChip(stringResource(dev.ninfenz.mobile.R.string.import_low_confidence), MaterialTheme.colorScheme.error)
                                 NfStatusChip(current.source.kind)
                             }
-                            Text("来源：" + current.source.name, style = MaterialTheme.typography.bodySmall)
+                            Text(stringResource(dev.ninfenz.mobile.R.string.import_source_label, current.source.name), style = MaterialTheme.typography.bodySmall)
                             Text(
-                                "结构：标题 " + current.structure.headings.size + " · 段落 " + current.structure.paragraphs +
-                                    " · 代码块 " + current.structure.codeBlocks.size + " · 表格 " + current.structure.tables.size,
+                                stringResource(
+                                    dev.ninfenz.mobile.R.string.import_structure,
+                                    current.structure.headings.size,
+                                    current.structure.paragraphs,
+                                    current.structure.codeBlocks.size,
+                                    current.structure.tables.size
+                                ),
                                 style = MaterialTheme.typography.bodySmall
                             )
-                            current.textDigest?.let { Text("digest：" + it.take(16) + "…", style = MaterialTheme.typography.bodySmall) }
+                            current.textDigest?.let { Text(stringResource(dev.ninfenz.mobile.R.string.import_digest, it.take(16)), style = MaterialTheme.typography.bodySmall) }
                             for (note in current.reviewNotes()) {
                                 Text(note, style = MaterialTheme.typography.bodySmall, color = if (current.lowConfidence) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                         }
                     }
                 }
-                item { NfSectionHeader("映射建议（" + current.mappings.size + " 条）") }
+                item { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.import_mapping, current.mappings.size)) }
                 if (current.mappings.isEmpty()) {
-                    item { Text("无映射候选（NF-MAP-001）：内容会归入素材/未分类。", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
+                    item { Text(stringResource(dev.ninfenz.mobile.R.string.import_no_mapping), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
                 } else {
                     item {
                         Row(modifier = Modifier.fillMaxWidth().padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                            Text("已采纳 " + acceptedMappings.size + "/" + current.mappings.size, style = MaterialTheme.typography.bodySmall)
+                            Text(stringResource(dev.ninfenz.mobile.R.string.import_accepted, acceptedMappings.size, current.mappings.size), style = MaterialTheme.typography.bodySmall)
                             TextButton(onClick = {
                                 acceptedMappings = if (acceptedMappings.size == current.mappings.size) emptySet() else current.mappings.indices.toSet()
-                            }) { Text(if (acceptedMappings.size == current.mappings.size) "全部取消" else "全部采纳") }
+                            }) { Text(if (acceptedMappings.size == current.mappings.size) stringResource(dev.ninfenz.mobile.R.string.import_accept_none) else stringResource(dev.ninfenz.mobile.R.string.import_accept_all)) }
                         }
                     }
                     items(current.mappings.size) { index ->
@@ -318,12 +324,12 @@ fun ImportScreen(prefill: SharePayload?, store: LibraryStore, onBack: () -> Unit
                     }
                 }
                 if (current.unmapped.isNotEmpty()) {
-                    item { Text("未映射：" + current.unmapped.joinToString("；"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
+                    item { Text(stringResource(dev.ninfenz.mobile.R.string.import_unmapped, current.unmapped.joinToString("；")), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
                 }
                 suggestNote?.let { message ->
                     item { Text(message, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
                 }
-                item { NfSectionHeader("草稿") }
+                item { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.import_draft)) }
                 item {
                     if (savedName == null) {
                         Button(
@@ -342,14 +348,14 @@ fun ImportScreen(prefill: SharePayload?, store: LibraryStore, onBack: () -> Unit
                                 }
                             },
                             modifier = Modifier.padding(horizontal = NfSpacing.page)
-                        ) { Text("保存导入草稿 + 映射决策") }
+                        ) { Text(stringResource(dev.ninfenz.mobile.R.string.import_save)) }
                     } else {
                         NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
                             Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                                Text("已保存草稿：" + savedName, style = MaterialTheme.typography.titleMedium)
-                                Text("草稿保存在应用私有目录，未写入项目；W4 再接入「草稿 → 项目」的转换。", style = MaterialTheme.typography.bodySmall)
+                                Text(stringResource(dev.ninfenz.mobile.R.string.import_saved, savedName ?: ""), style = MaterialTheme.typography.titleMedium)
+                                Text(stringResource(dev.ninfenz.mobile.R.string.import_saved_note), style = MaterialTheme.typography.bodySmall)
                                 Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                                    Button(onClick = onBack) { Text("完成") }
+                                    Button(onClick = onBack) { Text(stringResource(dev.ninfenz.mobile.R.string.import_done)) }
                                     TextButton(onClick = {
                                         doc = null
                                         rawResult = null
@@ -357,7 +363,7 @@ fun ImportScreen(prefill: SharePayload?, store: LibraryStore, onBack: () -> Unit
                                         acceptedMappings = emptySet()
                                         error = null
                                         suggestNote = null
-                                    }) { Text("再导入一个") }
+                                    }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_again)) }
                                 }
                             }
                         }
