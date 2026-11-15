@@ -86,10 +86,17 @@ object ProjectFactory {
  */
 class ProjectCreator(
     private val filesDir: File,
-    private val bridge: CoreBridge = Core.bridge
+    private val injectedBridge: CoreBridge? = null
 ) {
+    private fun bridge(): CoreBridge? = injectedBridge ?: runCatching { Core.bridge }.getOrNull()
+
     suspend fun create(pack: PackEntry, title: String, preferredId: String? = null): CreateProjectResult =
         withContext(Dispatchers.IO) {
+            val core = bridge() ?: return@withContext CreateProjectResult.Failure(
+                "NF-E-005",
+                "原生核心不可用，无法创建项目",
+                "重装原生库并运行诊断；项目创建需要 canonical/project-validate"
+            )
             try {
                 val protocolFile = File(pack.dir, "protocol/nf-protocol-pack.json")
                 val graphFile = File(pack.dir, "pipeline/main.nfg.json")
@@ -105,9 +112,9 @@ class ProjectCreator(
                 val graph = Json.parseToJsonElement(graphFile.readText(Charsets.UTF_8)).jsonObject
                 val spec = Json.parseToJsonElement(specFile.readText(Charsets.UTF_8)).jsonObject
 
-                val protocolDigest = canonicalDigest(protocol) ?: return@withContext coreFailure()
-                val graphDigest = canonicalDigest(graph) ?: return@withContext coreFailure()
-                val specDigest = canonicalDigest(spec) ?: return@withContext coreFailure()
+                val protocolDigest = canonicalDigest(core, protocol) ?: return@withContext coreFailure()
+                val graphDigest = canonicalDigest(core, graph) ?: return@withContext coreFailure()
+                val specDigest = canonicalDigest(core, spec) ?: return@withContext coreFailure()
 
                 val projectId = uniqueId(preferredId ?: slug(title))
                 val document = ProjectFactory.build(
@@ -129,7 +136,7 @@ class ProjectCreator(
                     specSha256 = sha256(specFile.readBytes())
                 )
 
-                val validate = bridge.call("project-validate", buildJsonObject { put("project", document) })
+                val validate = core.call("project-validate", buildJsonObject { put("project", document) })
                 if (!validate.ok) {
                     val error = validate.error
                     return@withContext CreateProjectResult.Failure(
@@ -159,9 +166,9 @@ class ProjectCreator(
             }
         }
 
-    private suspend fun canonicalDigest(obj: JsonObject): String? {
+    private suspend fun canonicalDigest(core: CoreBridge, obj: JsonObject): String? {
         val response: CoreResponse = try {
-            bridge.call("canonical", buildJsonObject { put("value", obj) })
+            core.call("canonical", buildJsonObject { put("value", obj) })
         } catch (t: Throwable) {
             return null
         }
