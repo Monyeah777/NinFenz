@@ -50,7 +50,7 @@
 - 结论：**不是提交树的问题**；是工作树里历史会话留下的构建产物。处置 = 清理本地产物后复跑（本方案不改这些面）。
 - 复跑：`bash verify.sh --checks-only > .nf-logs/verify.log 2>&1; grep -c '\[FAIL\]' .nf-logs/verify.log`
 
-### 2.3 干净 clone 门禁（同 HEAD，仍红 1 条）
+### 2.3 干净 clone 门禁（历史：曾红 1 条；**2026-11-15 已修复并复绿**）
 
 `git clone --local D:\NinFenz D:\tmp\nf-baseline-clean` → `bash verify.sh --checks-only` → **FAIL=1**：
 
