@@ -16,6 +16,7 @@
 | 装配 | pass：填 4 个槽位后 assemble 返回 markdown（开篇/正文/收束） | 截图 19 |
 | L1 校验 | pass：L1 pass（error=0 warn=0 info=3）；状态 assembled→validated 写回 | run-as 读项目 |
 | 导出 md/zip | pass：files/exports/delivery/result.md + result.zip + manifest；状态 validated→exported 写回 | run-as 读文件 |
+| Pack diff/apply/rollback | pass：NFTest/demo-pack-1.0.1.zip → diff（1.0.0→1.0.1，modified 1，无冲突）→ 应用（applied/nf-pack.json=1.0.1）→ 回滚（applied-rollback/nf-pack.json=1.0.0） |
 | 文件导入（SAF） | pass：自建 /sdcard/NFTest 目录选 nf-file-import.md → markdown 85%、结构 2 标题/2 段落、4 条映射；全部采纳后保存 drafts/nf-file-import.md.json + mapping.json |
 | 导入示例 | pass（修复后）：markdown 85%，8 条映射，全部采纳后保存 files/drafts/sample.md.json + .mapping.json | 截图 29–31 |
 | 项目状态历史 | pass：overlay:save → status:authoring->assembled → status:assembled->validated → export → status:validated->exported | run-as 读项目 |
@@ -37,6 +38,7 @@
 | 200% 字号 | pass：font_scale=2.0 重启后库页不崩、主 CTA 仍可见 |
 | 冷启动/内存 | 407/409/411ms；PSS 107,589 KB（3 次 force-stop 后） |
 | 分享接收 | 修复后进入 Import：显示「已接收分享载荷」+ markdown 85% 预览 |
+| TalkBack 服务 | partial：TalkBack 服务可绑定、APP 启动不崩、搜索/设置等节点有 contentDescription；未做语音手势走查（ADB 无法模拟 TalkBack 手势），已关闭服务 |
 | CCOS 交接 | 修复中：task/result 加载通过；提交区已移到固定底栏并加 navigationBarsPadding（原按钮落在手势导航区，点击被系统拦截）；CcosReviewActionsTest 通过，设备复测待补 |
 | docx 导出 | **已修复**：根因是 jniLibs .so 还是 15:35 旧构建（core 源码 16:30 才实现 docx）；重跑 build_core_android.sh 后导出 result.docx（2754B，OOXML 条目完整，zip 校验通过） |
 
