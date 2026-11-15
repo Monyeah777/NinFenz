@@ -18,11 +18,11 @@
 | 自适应/9 组尺寸语义矩阵 | pass（语义层） | ShellNavigation/ShellSizeMatrix 测试 |
 | i18n/主题切换（全部屏主要文案） | partial | values-en + 资源化；我的支持 zh/en/system + 动态取色；少量错误/技术提示仍内联（OPEN-I18N-BODY 尾项） |
 | 像素截图矩阵 | pass（本机） | Paparazzi 10 张基线（360/700/900 × 640/800/900/1000），testDebugUnitTest verify |
-| 真机/模拟器 | OPEN-TOOLCHAIN | OPEN-DEVICE |
+| 真机/模拟器 | partial | OnePlus Android16 smoke 通过首启/导入/创作保存/装配/校验/导出 md+zip；docx/TalkBack/主题/CCOS/分享仍 OPEN（DEVICE_RESULTS.md） |
 | 草稿→项目 | OPEN | OPEN-DRAFT-PROJECT |
 | app/gates v0.02 UX 检查 | pass | 7/7 gate PASS、FAIL=0；GATES/SELF_AUDIT 已更新（本提交） |
 
-**收口实测（2026-11-15）**：app/gates 7/7 PASS、FAIL=0；verify.sh --checks-only PASS=107 WARN=2 FAIL=0；JVM 123/123；APK 19,011,427 B sha256 ecc56ba8…。
+**收口实测（2026-11-15）**：app/gates 7/7 PASS、FAIL=0；verify.sh --checks-only PASS=107 WARN=2 FAIL=0；JVM 124/124；APK 19,429,689 B sha256 fb968466…。
 
 **发布面：仍为 OPEN-EXTERNAL**（签名/公证/真机矩阵/Play 数据安全），不得据此宣称可发布。
 

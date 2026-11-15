@@ -171,7 +171,7 @@
     <string name="author_pack_missing_body">Project references %1$s · %2$s, which is not installed or has moved.</string>
     <string name="author_back">Back</string>
     <string name="author_pack_label">Pack: %1$s · %2$s</string>
-    <string name="author_preview_note">Local preview: edits are not written back yet (save/undo lands later in W4); checks run in core.</string>
+    <string name="author_preview_note">Local editing: clauses/fields/pipeline/spec save to the project (undo/redo + debounced autosave); checks run in core.</string>
     <string name="author_go_deliver">Deliver</string>
     <string name="author_load_error">Failed to read project content: %1$s</string>
     <string name="author_load_fix">Reinstall the bound pack, or recreate the project</string>
@@ -208,7 +208,7 @@
     <string name="delivery_pack_missing_body">Project references %1$s, which is not installed; cannot assemble.</string>
     <string name="delivery_back">Back</string>
     <string name="delivery_pack_label">Pack: %1$s · %2$s</string>
-    <string name="delivery_note">Assemble/validate run in core; project status writeback and PDF engine remain OPEN.</string>
+    <string name="delivery_note">Assemble/validate run in core; the PDF engine remains OPEN (platform print).</string>
     <string name="delivery_load_error">Failed to read project content: %1$s</string>
     <string name="delivery_load_fix">Reinstall the bound pack</string>
     <string name="delivery_plan">1 · Assembly plan</string>

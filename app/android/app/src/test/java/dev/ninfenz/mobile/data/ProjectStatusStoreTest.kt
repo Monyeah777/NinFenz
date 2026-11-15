@@ -35,8 +35,11 @@ class ProjectStatusStoreTest {
     fun advancesStepwiseAndAppendsHistory() = runBlocking {
         val filesDir = Files.createTempDirectory("nf-status-store").toFile()
         val project = setup(filesDir)
-        val bridge = FakeCoreBridge().enqueue(CoreResponse.ok(buildJsonObject { put("verdict", "pass") }))
-        val result = ProjectStatusStore(filesDir, bridge).advance(project, ProjectStatus.VALIDATED)
+        val bridge = FakeCoreBridge()
+            .enqueue(CoreResponse.ok(buildJsonObject { put("digest", hex) }))
+            .enqueue(CoreResponse.ok(buildJsonObject { put("verdict", "pass") }))
+        val result = ProjectStatusStore(filesDir, bridge)
+            .advance(project, ProjectStatus.VALIDATED, AssemblyArtifact("markdown".toByteArray()))
         assertTrue(result is StatusAdvanceResult.Advanced)
         val advanced = result as StatusAdvanceResult.Advanced
         assertEquals(ProjectStatus.VALIDATED, advanced.to)
@@ -45,8 +48,29 @@ class ProjectStatusStoreTest {
             File(filesDir, "projects/p.nfproject.json").readText(Charsets.UTF_8)
         ).jsonObject
         assertEquals("validated", raw["status"]?.jsonPrimitive?.content)
+        assertEquals("authoring/assembly.md", raw["refs"]!!.jsonObject["assembly"]!!.jsonObject["path"]?.jsonPrimitive?.content)
+        assertTrue(File(filesDir, "projects/p/authoring/assembly.md").isFile)
         val ops = Regex("\"op\":\"(status:[^\"]+)\"").findAll(raw["history"].toString()).map { it.groupValues[1] }.toList()
         assertEquals(listOf("status:draft->authoring", "status:authoring->assembled", "status:assembled->validated"), ops)
+    }
+
+    @Test
+    fun exportedRequiresAndAppendsExportHistory() = runBlocking {
+        val filesDir = Files.createTempDirectory("nf-status-export").toFile()
+        val project = setup(filesDir)
+        val bridge = FakeCoreBridge()
+            .enqueue(CoreResponse.ok(buildJsonObject { put("digest", hex) }))
+            .enqueue(CoreResponse.ok(buildJsonObject { put("verdict", "pass") }))
+        val result = ProjectStatusStore(filesDir, bridge)
+            .advance(project, ProjectStatus.EXPORTED, AssemblyArtifact("markdown".toByteArray()))
+        assertTrue(result is StatusAdvanceResult.Advanced)
+        val raw = kotlinx.serialization.json.Json.parseToJsonElement(
+            File(filesDir, "projects/p.nfproject.json").readText(Charsets.UTF_8)
+        ).jsonObject
+        assertEquals("exported", raw["status"]?.jsonPrimitive?.content)
+        val ops = Regex("\"op\":\"([^\"]+)\"").findAll(raw["history"].toString()).map { it.groupValues[1] }.toList()
+        assertTrue(ops.contains("export"))
+        assertTrue(ops.contains("status:validated->exported"))
     }
 
     @Test

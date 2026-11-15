@@ -171,7 +171,7 @@
     <string name="author_pack_missing_body">项目引用的 %1$s · %2$s 未安装或已移动。</string>
     <string name="author_back">返回</string>
     <string name="author_pack_label">Pack：%1$s · %2$s</string>
-    <string name="author_preview_note">本地预演：编辑不写回项目（保存/撤销在 W4 后续接入）；校验走核心。</string>
+    <string name="author_preview_note">本地编辑：条款/字段/管线/规格可保存到项目（撤销/重做 + 防抖自动保存）；校验走核心。</string>
     <string name="author_go_deliver">去交付</string>
     <string name="author_load_error">读取项目内容失败：%1$s</string>
     <string name="author_load_fix">重装绑定的 Pack，或重新创建项目</string>
@@ -208,7 +208,7 @@
     <string name="delivery_pack_missing_body">项目引用的 %1$s 未安装，无法装配。</string>
     <string name="delivery_back">返回</string>
     <string name="delivery_pack_label">Pack：%1$s · %2$s</string>
-    <string name="delivery_note">装配/校验走核心；项目状态写回与 PDF 内核仍 OPEN。</string>
+    <string name="delivery_note">装配/校验走核心；PDF 内核仍 OPEN（平台打印）。</string>
     <string name="delivery_load_error">读取项目内容失败：%1$s</string>
     <string name="delivery_load_fix">重装绑定的 Pack</string>
     <string name="delivery_plan">1 · 装配计划</string>

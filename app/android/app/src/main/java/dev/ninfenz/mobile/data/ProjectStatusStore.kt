@@ -16,16 +16,26 @@ import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
+import kotlinx.serialization.json.putJsonObject
 
 sealed interface StatusAdvanceResult {
     data class Advanced(val project: Project, val from: ProjectStatus, val to: ProjectStatus) : StatusAdvanceResult
     data class Failure(val code: String, val message: String, val fix: String) : StatusAdvanceResult
 }
 
+/** 装配产物：进入 assembled 时写入项目 refs.assembly（project-validate 要求）。 */
+data class AssemblyArtifact(
+    val bytes: ByteArray,
+    val fileName: String = "assembly.md",
+    val id: String = "assembly",
+    val version: String = "1.0.0"
+)
+
 /**
  * 项目状态写回（CONTRACT §5.10）：只能相邻前进；每步追加 history；
- * core project-validate 通过后才原子写盘。回退仍需显式 force（本类不提供隐式回退）。
+ * 进入 assembled 时必须提供 assembly 引用；core project-validate 通过后才原子写盘。
  */
 class ProjectStatusStore(
     private val filesDir: File,
@@ -33,18 +43,11 @@ class ProjectStatusStore(
 ) {
     private fun bridge(): CoreBridge? = injectedBridge ?: runCatching { Core.bridge }.getOrNull()
 
-    suspend fun advance(project: Project, target: ProjectStatus): StatusAdvanceResult = withContext(Dispatchers.IO) {
-        if (project.status == target) {
-            return@withContext StatusAdvanceResult.Advanced(project, project.status, project.status)
-        }
-        var cursor = project.status
-        val path = mutableListOf<ProjectStatus>()
-        while (cursor != target) {
-            val next = ProjectModel.next(cursor)
-                ?: return@withContext StatusAdvanceResult.Failure("NF-VAL-001", "无法从 " + cursor.wire + " 前进到 " + target.wire, "检查项目状态机")
-            path.add(next)
-            cursor = next
-        }
+    suspend fun advance(
+        project: Project,
+        target: ProjectStatus,
+        assembly: AssemblyArtifact? = null
+    ): StatusAdvanceResult = withContext(Dispatchers.IO) {
         val core = bridge() ?: return@withContext StatusAdvanceResult.Failure(
             "NF-E-005", "原生核心不可用，无法写回项目状态", "重装原生库并运行诊断"
         )
@@ -52,22 +55,108 @@ class ProjectStatusStore(
             val file = File(File(filesDir, "projects"), project.id + ".nfproject.json")
             if (!file.isFile) return@withContext StatusAdvanceResult.Failure("NF-PCK-003", "项目文件不存在", "重新创建项目")
             var raw = Json.parseToJsonElement(file.readText(Charsets.UTF_8)).jsonObject
-            var current = project.status
+            var current = ProjectStatus.fromWire(raw["status"]?.jsonPrimitive?.content ?: "")
+                ?: return@withContext StatusAdvanceResult.Failure("NF-VAL-001", "项目 status 无法识别", "检查项目文件")
+            if (current == target) {
+                return@withContext StatusAdvanceResult.Advanced(ProjectModel.parse(raw.toString()), current, current)
+            }
+            val from = current
+            var cursor = current
+            val path = mutableListOf<ProjectStatus>()
+            while (cursor != target) {
+                val next = ProjectModel.next(cursor)
+                    ?: return@withContext StatusAdvanceResult.Failure("NF-VAL-001", "无法从 " + cursor.wire + " 前进到 " + target.wire, "检查项目状态机")
+                path.add(next)
+                cursor = next
+            }
             for (step in path) {
+                if (step == ProjectStatus.ASSEMBLED && raw["refs"]?.jsonObject?.get("assembly") == null) {
+                    val artifact = assembly ?: return@withContext StatusAdvanceResult.Failure(
+                        "NF-VAL-001",
+                        "进入 assembled 前必须提供 assembly 引用",
+                        "先装配并写入 assembly.md 再写回状态"
+                    )
+                    raw = withAssembly(core, raw, project.id, artifact)
+                        ?: return@withContext StatusAdvanceResult.Failure("NF-E-005", "assembly 摘要计算失败", "检查核心 canonical")
+                }
+                if (step == ProjectStatus.EXPORTED) {
+                    raw = withHistory(raw, "export", sha256(("export:" + project.id).toByteArray(Charsets.UTF_8)))
+                }
                 raw = withStatus(raw, current, step)
                 current = step
+                cursor = step
             }
             val validate = core.call("project-validate", buildJsonObject { put("project", raw) })
             if (!validate.ok) {
                 val e = validate.error
                 return@withContext StatusAdvanceResult.Failure(
-                    e?.code ?: "NF-VAL-001", e?.message ?: "项目状态校验失败", e?.fix ?: "检查 history/status"
+                    e?.code ?: "NF-VAL-001", e?.message ?: "项目状态校验失败", e?.fix ?: "检查 refs/history/status"
                 )
             }
             atomicWrite(file, raw.toString())
-            StatusAdvanceResult.Advanced(ProjectModel.parse(raw.toString()), project.status, target)
+            StatusAdvanceResult.Advanced(ProjectModel.parse(raw.toString()), from, target)
         } catch (t: Throwable) {
             StatusAdvanceResult.Failure("NF-E-005", "状态写回失败：" + (t.message ?: t.javaClass.simpleName), "检查项目文件与核心桥")
+        }
+    }
+
+    private suspend fun withAssembly(core: CoreBridge, raw: JsonObject, projectId: String, artifact: AssemblyArtifact): JsonObject? {
+        val relative = "authoring/" + artifact.fileName
+        val target = File(File(filesDir, "projects/" + projectId), relative)
+        target.parentFile?.mkdirs()
+        target.writeBytes(artifact.bytes)
+        val sha = sha256(artifact.bytes)
+        val canonical = core.call("canonical", buildJsonObject {
+            put("value", buildJsonObject { put("markdown", artifact.bytes.toString(Charsets.UTF_8)) })
+        })
+        if (!canonical.ok) return null
+        val digest = canonical.resultObject()?.get("digest")?.jsonPrimitive?.content ?: return null
+        val refs = raw["refs"]?.jsonObject ?: emptyMap<String, kotlinx.serialization.json.JsonElement>()
+        val newRefs = buildJsonObject {
+            for ((key, value) in refs) {
+                if (key == "assembly") {
+                    putJsonObject("assembly") {
+                        put("id", artifact.id)
+                        put("version", artifact.version)
+                        put("digest", digest)
+                        put("path", relative)
+                        put("sha256", sha)
+                    }
+                } else {
+                    put(key, value)
+                }
+            }
+            if (refs["assembly"] == null) {
+                putJsonObject("assembly") {
+                    put("id", artifact.id)
+                    put("version", artifact.version)
+                    put("digest", digest)
+                    put("path", relative)
+                    put("sha256", sha)
+                }
+            }
+        }
+        return buildJsonObject {
+            for ((key, value) in raw) {
+                if (key == "refs") put("refs", newRefs) else put(key, value)
+            }
+        }
+    }
+
+
+    private fun withHistory(raw: JsonObject, op: String, digest: String): JsonObject {
+        val history = raw["history"]?.jsonArray ?: JsonArray(emptyList())
+        val newHistory = buildJsonArray {
+            for (entry in history) add(entry)
+            add(buildJsonObject {
+                put("op", op)
+                put("digest", digest)
+            })
+        }
+        return buildJsonObject {
+            for ((key, value) in raw) {
+                if (key == "history") put("history", newHistory) else put(key, value)
+            }
         }
     }
 

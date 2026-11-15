@@ -149,7 +149,7 @@ fun ImportScreen(prefill: SharePayload?, store: LibraryStore, onBack: () -> Unit
                 val text = context.assets.open("sample-pack/docs/sample.md").bufferedReader(Charsets.UTF_8).use { it.readText() }
                 val file = File(File(context.cacheDir, "imports").apply { mkdirs() }, "sample.md")
                 file.writeText(text, Charsets.UTF_8)
-                importFromFile(file, "sample", "sample.md", "text/markdown", text.toByteArray(Charsets.UTF_8).size.toLong())
+                importFromFile(file, "file", "sample.md", "text/markdown", text.toByteArray(Charsets.UTF_8).size.toLong())
             } catch (t: Throwable) {
                 error = CoreResponse.failure("NF-E-004", "读取示例内容失败：" + (t.message ?: t.javaClass.simpleName), "检查 APK assets/sample-pack/docs/sample.md", 2).error
             }

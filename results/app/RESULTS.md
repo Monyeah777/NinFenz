@@ -24,8 +24,8 @@
 
 | 项 | 结果 |
 |---|---|
-| APK | app-debug.apk = 19,011,427 B；sha256 ecc56ba8a17e797476a1f172396f8608aa108177386ed5f2b2260b93124d5937 |
-| JVM 测试 | 123 条全绿（v1 基线 42 + v0.02 新增 81；含 Robolectric/Compose/Paparazzi） |
+| APK | app-debug.apk = 19,429,689 B；sha256 fb9684660570d816a282f2dcb3fc99bbe345cf317281c3a03ba454283a309fe8 |
+| JVM 测试 | 124 条全绿（v1 基线 42 + v0.02 新增 82；含 Robolectric/Compose/Paparazzi） |
 | 构建 | ./gradlew :app:assembleDebug 成功；:app:testDebugUnitTest 123/123 |
 | i18n | 全部屏主要文案已资源化 + values-en；「我的」zh/en/跟随系统切换；动态取色开关；库/Pack 中心下拉刷新；节点删除 Snackbar 撤销 + 触觉；expanded 双栏（主列表+详情）；导航 Crossfade（NfMotion.MEDIUM_MS）；统一 loading/skeleton 组件；少量错误/技术提示仍内联（OPEN-I18N-BODY 尾项） |
 | 适配 | compact/medium/expanded 三档导航 + 9 组窗口尺寸语义矩阵 |
@@ -42,7 +42,7 @@
 ### 0.4 v0.02 收口（2026-11-15）
 
 - 机读门禁：app/gates **7/7 PASS，FAIL=0**（QA0 10 / QA5 5）；仓库 verify **PASS=107 WARN=2 FAIL=0**。
-- 测试/产物：JVM **123/123**；APK 19,011,427 B，sha256 ecc56ba8…。
+- 测试/产物：JVM **124/124**；APK 19,429,689 B，sha256 fb968466…。
 - 结论：**v0.02 实现面 pass-with-open-items**；下方 OPEN 不因收口消失，未跑面不写成 pass。
 
 ### 0.5 v0.02 OPEN（带 owner+next）
@@ -51,7 +51,8 @@
 |---|---|---|---|
 | OPEN-I18N-BODY | 全部屏主要文案已资源化；少量错误/技术提示仍内联；应用内 zh/en 切换已做，系统 per-app locale 入口未做 | lead | 抽取尾项 strings + localeConfig |
 | SCREENSHOT | Paparazzi 2.0.0-alpha02 已接入，10 张截图基线随 testDebugUnitTest verify；更新基线用 recordPaparazziDebug | lead | 完成（本提交） |
-| OPEN-DEVICE | 真机/模拟器首启/分享/折叠/TalkBack/性能 | lead | 设备到位后跑 DEVICE_MATRIX 清单 |
+| DEVICE (partial) | OnePlus PLF110/Android16 已跑：首启/示例导入/创作保存/装配/L1/导出 md+zip，并修复 3 个真机问题；docx/TalkBack/主题/CCOS/分享/折叠/性能未跑 | lead | results/app/DEVICE_RESULTS.md |
+| OPEN-DEVICE | 剩余真机项（TalkBack、主题/语言、CCOS、分享、折叠、性能） | lead | 继续 DEVICE_RESULTS 清单 |
 | OPEN-DRAFT-PROJECT | 导入草稿→项目转换未定义（契约无 import→project 字段） | lead | 需 v1 §15 契约变更评估 |
 | OPEN-REVIEWED | CCOS approve 时 exported 项目回写 reviewed；非 exported 项目跳过（不伪造） | lead | 如需强制 reviewed，补 project-validate 前置条件 |
 
