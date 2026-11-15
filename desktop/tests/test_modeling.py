@@ -37,6 +37,22 @@ class TestRealRepo(unittest.TestCase):
                 self.assertTrue(rule.startswith("assertion:"), c["id"])
 
 
+class TestTrackedOnlyInformative(unittest.TestCase):
+    """说明件计数只认 git 追踪面（修 BASELINE-F-001：未跟踪件不得改变 conformance root）。"""
+
+    def test_untracked_file_does_not_change_count(self):
+        from unittest import mock
+        issues, _warns, base = M.verify_normative(str(ROOT))
+        self.assertEqual(issues, [])
+        tracked = M._tracked(str(ROOT))
+        self.assertIsNotNone(tracked)
+        self.assertIn("README.md", tracked)
+        with mock.patch.object(M, "_tracked", return_value=tracked - {"README.md"}):
+            issues2, _warns2, stats2 = M.verify_normative(str(ROOT))
+        self.assertEqual(issues2, [])
+        self.assertEqual(stats2["informative_files"], base["informative_files"] - 1)
+
+
 class TestVocabNegatives(unittest.TestCase):
     def _scene(self, tmp):
         for rel in (M.VOCAB_REL, "protocol/knowledge_sources.json"):

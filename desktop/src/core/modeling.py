@@ -17,6 +17,7 @@ import importlib
 import json
 import re
 import functools
+import subprocess
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
@@ -173,6 +174,9 @@ def verify_normative(root: str = ".") -> Tuple[List[str], List[str], Dict[str, A
             warns.append("说明件名单的条目无匹配（可能写错）：%s" % g)
         for p in hits:
             info_hits.add(p.relative_to(r).as_posix())
+    tracked = _tracked(root)
+    if tracked is not None:
+        info_hits = {rel for rel in info_hits if rel in tracked}
     for rel in sorted(info_hits):
         if rel in receipts:
             issues.append("说明件被回执锚定（等于把解释当规范）：%s" % rel)
@@ -246,3 +250,21 @@ def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
         warns += w
         stats[name] = s
     return issues, warns, stats
+
+
+def _tracked(root: str) -> set | None:
+    """git 追踪面（可复现口径）：说明件计数只认 tracked 文件。
+
+    动机（2026-11-15 实测）：informative globs 覆盖 results/** 等路径，本地未跟踪件
+    （如 results/trust/rekor-public-key.pem，被 .gitignore 吸收）会让 conformance root
+    依赖本机状态——同一 commit 在干净 clone 上算出不同的 root（BASELINE-F-001）。
+    说明件是仓库内容，不应由本机未跟踪文件改变计数；git 不可用时返回 None（保持旧行为）。
+    """
+    try:
+        out = subprocess.run(["git", "-C", str(root), "ls-files", "-z"],
+                             capture_output=True, text=True, timeout=60)
+    except Exception:
+        return None
+    if out.returncode != 0:
+        return None
+    return {p for p in out.stdout.split("\0") if p}
