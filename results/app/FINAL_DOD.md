@@ -16,7 +16,7 @@
 | Pack 中心/CCOS/Pack zip 更新 | pass（工程面） | 1dc695125/4d816f3c5/6c30f241e |
 | JVM 测试 | pass | 90/90（含 Robolectric/Compose） |
 | 自适应/9 组尺寸语义矩阵 | pass（语义层） | ShellNavigation/ShellSizeMatrix 测试 |
-| i18n（全部屏主要文案） | partial | values-en + 资源化；少量错误/技术提示仍内联（OPEN-I18N-BODY 尾项） |
+| i18n/主题切换（全部屏主要文案） | partial | values-en + 资源化；我的支持 zh/en/system + 动态取色；少量错误/技术提示仍内联（OPEN-I18N-BODY 尾项） |
 | 像素截图矩阵 | OPEN | OPEN-SCREENSHOT；Robolectric captureToImage 实测超时，需 Paparazzi/Roborazzi/设备 |
 | 真机/模拟器 | OPEN-TOOLCHAIN | OPEN-DEVICE |
 | 草稿→项目；reviewed 串联 | OPEN | OPEN-DRAFT-PROJECT / OPEN-REVIEWED |

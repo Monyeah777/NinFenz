@@ -383,4 +383,9 @@
     <string name="author_stage">stage</string>
     <string name="author_module_node">module</string>
     <string name="author_asset_node">asset</string>
+
+    <string name="me_dynamic_color">动态取色（Android 12+）</string>
+    <string name="me_language_system">跟随系统</string>
+    <string name="me_language_zh">中文</string>
+    <string name="me_language_en">English</string>
 </resources>

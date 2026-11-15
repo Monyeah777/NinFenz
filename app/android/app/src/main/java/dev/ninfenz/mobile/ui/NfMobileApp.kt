@@ -45,6 +45,7 @@ import dev.ninfenz.mobile.data.ProjectCreator
 import dev.ninfenz.mobile.data.ProjectEntry
 import dev.ninfenz.mobile.data.SampleSeeder
 import dev.ninfenz.mobile.data.SeedResult
+import dev.ninfenz.mobile.data.LanguageMode
 import dev.ninfenz.mobile.data.ThemeMode
 import dev.ninfenz.mobile.share.ShareHandoff
 import dev.ninfenz.mobile.ui.components.NfEmptyState
@@ -83,7 +84,11 @@ import kotlinx.coroutines.withContext
 fun NfMobileApp(
     prefs: AppPrefs,
     themeMode: ThemeMode,
-    onThemeMode: (ThemeMode) -> Unit
+    onThemeMode: (ThemeMode) -> Unit,
+    languageMode: LanguageMode = LanguageMode.SYSTEM,
+    onLanguageMode: (LanguageMode) -> Unit = {},
+    dynamicColor: Boolean = false,
+    onDynamicColor: (Boolean) -> Unit = {}
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -249,6 +254,10 @@ fun NfMobileApp(
                         TopDestination.ME -> MeScreen(
                             themeMode = themeMode,
                             onThemeMode = onThemeMode,
+                            languageMode = languageMode,
+                            onLanguageMode = onLanguageMode,
+                            dynamicColor = dynamicColor,
+                            onDynamicColor = onDynamicColor,
                             storageText = storageText,
                             nativeReady = nativeReady,
                             abi = abi,

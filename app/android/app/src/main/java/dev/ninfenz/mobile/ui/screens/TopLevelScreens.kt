@@ -40,6 +40,7 @@ import dev.ninfenz.mobile.data.PackEntry
 import dev.ninfenz.mobile.data.PackVerifier
 import dev.ninfenz.mobile.data.ProjectEntry
 import dev.ninfenz.mobile.data.SeedResult
+import dev.ninfenz.mobile.data.LanguageMode
 import dev.ninfenz.mobile.data.ThemeMode
 import dev.ninfenz.mobile.model.Project
 import dev.ninfenz.mobile.ui.components.NfCard
@@ -348,6 +349,10 @@ fun DeliverScreen(
 fun MeScreen(
     themeMode: ThemeMode,
     onThemeMode: (ThemeMode) -> Unit,
+    languageMode: LanguageMode = LanguageMode.SYSTEM,
+    onLanguageMode: (LanguageMode) -> Unit = {},
+    dynamicColor: Boolean = false,
+    onDynamicColor: (Boolean) -> Unit = {},
     storageText: String,
     nativeReady: Boolean,
     abi: String?,
@@ -375,15 +380,40 @@ fun MeScreen(
                     }
                 }
             }
+            item {
+                Row(
+                    modifier = Modifier.padding(horizontal = NfSpacing.page),
+                    horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)
+                ) {
+                    FilterChip(
+                        selected = dynamicColor,
+                        onClick = { onDynamicColor(!dynamicColor) },
+                        label = { Text(stringResource(dev.ninfenz.mobile.R.string.me_dynamic_color)) }
+                    )
+                }
+            }
             item { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.me_section_language)) }
             item {
-                NfListRow(
-                    title = stringResource(dev.ninfenz.mobile.R.string.me_language_title),
-                    subtitle = stringResource(dev.ninfenz.mobile.R.string.me_language_subtitle),
-                    leading = Icons.Filled.Person,
-                    trailing = "›",
-                    onClick = onSettings
-                )
+                Row(
+                    modifier = Modifier.padding(horizontal = NfSpacing.page),
+                    horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)
+                ) {
+                    LanguageMode.entries.forEach { mode ->
+                        FilterChip(
+                            selected = mode == languageMode,
+                            onClick = { onLanguageMode(mode) },
+                            label = {
+                                Text(
+                                    when (mode) {
+                                        LanguageMode.SYSTEM -> stringResource(dev.ninfenz.mobile.R.string.me_language_system)
+                                        LanguageMode.ZH -> stringResource(dev.ninfenz.mobile.R.string.me_language_zh)
+                                        LanguageMode.EN -> stringResource(dev.ninfenz.mobile.R.string.me_language_en)
+                                    }
+                                )
+                            }
+                        )
+                    }
+                }
             }
             item { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.me_section_storage)) }
             item {
