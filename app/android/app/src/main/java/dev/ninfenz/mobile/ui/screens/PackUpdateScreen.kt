@@ -7,12 +7,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,6 +28,9 @@ import dev.ninfenz.mobile.core.CoreResponse
 import dev.ninfenz.mobile.core.J
 import dev.ninfenz.mobile.data.FileAccess
 import dev.ninfenz.mobile.data.LibraryStore
+import dev.ninfenz.mobile.data.PackEntry
+import dev.ninfenz.mobile.data.PackStore
+import dev.ninfenz.mobile.data.PackZipLoader
 import dev.ninfenz.mobile.model.ConflictBoard
 import dev.ninfenz.mobile.model.PackUpdate
 import dev.ninfenz.mobile.model.PackUpdateModel
@@ -38,7 +43,9 @@ import dev.ninfenz.mobile.ui.components.MonoText
 import dev.ninfenz.mobile.ui.components.NfScaffold
 import dev.ninfenz.mobile.ui.components.Notice
 import dev.ninfenz.mobile.ui.components.Tone
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
@@ -54,6 +61,44 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit) {
     var decisions by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
     var resultText by remember { mutableStateOf<String?>(null) }
     var busy by remember { mutableStateOf(false) }
+    var packs by remember { mutableStateOf<List<PackEntry>>(emptyList()) }
+    var selected by remember { mutableStateOf<PackEntry?>(null) }
+    var newRoot by remember { mutableStateOf<File?>(null) }
+    var diffBusy by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        packs = withContext(Dispatchers.IO) { PackStore(context.filesDir).scan().packs }
+        selected = packs.firstOrNull()
+    }
+
+    fun runDiff(oldPack: PackEntry?, root: File?) {
+        if (oldPack == null || root == null || diffBusy) return
+        scope.launch {
+            diffBusy = true
+            error = null
+            try {
+                val payload = buildJsonObject {
+                    put("old_root", oldPack.dir.absolutePath)
+                    put("new_root", root.absolutePath)
+                }
+                val response = safeCall("pack-diff", payload)
+                val obj = response.resultObject()
+                if (response.ok && obj != null) {
+                    val parsed = PackUpdateModel.parse(obj)
+                    update = parsed
+                    rawUpdate = obj
+                    decisions = parsed.conflicts.associate { it.id to it.defaultOption }
+                    resultText = null
+                } else {
+                    error = response.error
+                }
+            } catch (e: Exception) {
+                error = CoreResponse.failure("NF-PCK-001", "pack-diff 失败：" + (e.message ?: e.javaClass.simpleName), "检查两版 Pack 目录", 1).error
+            } finally {
+                diffBusy = false
+            }
+        }
+    }
 
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         if (uri == null) return@rememberLauncherForActivityResult
@@ -73,15 +118,53 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit) {
         }
     }
 
+    val zipPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        scope.launch {
+            error = null
+            try {
+                val meta = FileAccess.meta(context, uri)
+                val zip = FileAccess.copyToCache(context, uri, meta.name)
+                val dest = File(context.cacheDir, "new-pack")
+                val root = withContext(Dispatchers.IO) { PackZipLoader.extract(zip, dest) }
+                newRoot = root
+                runDiff(selected, root)
+            } catch (e: Exception) {
+                error = CoreResponse.failure("NF-PCK-002", "新版 Pack 解包失败：" + (e.message ?: e.javaClass.simpleName), "确认 zip 根/单层目录含 nf-pack.json", 1).error
+            }
+        }
+    }
+
     fun packDir(id: String, version: String): File = File(File(File(context.filesDir, "library/packs"), id), version)
 
     NfScaffold(title = "PackUpdate · diff/冲突/应用/回滚", onBack = onBack) {
-        CardBox(title = "更新计划") {
-            Button(onClick = { picker.launch(arrayOf("application/json", "text/plain")) }) { Text("打开 .nfupdate.json") }
-            val u = update
-            if (u == null) {
-                EmptyState("尚未加载更新计划。应用/回滚需要 library/packs/<id>/<version> 两端目录都在场。")
+        CardBox(title = "1 · 更新来源") {
+            if (packs.isEmpty()) {
+                EmptyState("尚未安装任何 Pack；先到库/Pack 中心载入示例。")
             } else {
+                Text("选择要更新的已装 Pack：", style = MaterialTheme.typography.bodySmall)
+                for (pack in packs) {
+                    FilterChip(
+                        selected = selected?.id == pack.id && selected?.version == pack.version,
+                        onClick = { selected = pack; update = null; rawUpdate = null; resultText = null },
+                        label = { Text(pack.id + " · " + pack.version) },
+                        modifier = Modifier.padding(end = 6.dp)
+                    )
+                }
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Button(onClick = { zipPicker.launch(arrayOf("application/zip", "application/octet-stream", "*/*")) }, enabled = !diffBusy) {
+                        Text(if (diffBusy) "比对中…" else "选择新版 Pack zip")
+                    }
+                    OutlinedButton(onClick = { picker.launch(arrayOf("application/json", "text/plain")) }) { Text("打开更新计划") }
+                }
+                selected?.let { Text("base：" + it.id + " · " + it.version + "（" + it.dir.absolutePath + "）", style = MaterialTheme.typography.bodySmall) }
+                newRoot?.let { Text("new：" + it.absolutePath, style = MaterialTheme.typography.bodySmall) }
+                if (selected != null && newRoot == null) {
+                    Notice("选择新版 zip 后会调用 core pack-diff 生成差异/冲突；也可直接打开已有 .nfupdate.json。", Tone.INFO)
+                }
+            }
+            val u = update
+            if (u != null) {
                 KeyValue("from", u.from.id + " " + u.from.version)
                 KeyValue("to", u.to.id + " " + u.to.version)
                 KeyValue("changes", "added " + u.added.size + " · removed " + u.removed.size + " · modified " + u.modified.size)
@@ -133,8 +216,8 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit) {
             }
 
             CardBox(title = "应用 / 回滚") {
-                val base = packDir(u.from.id, u.from.version)
-                val target = packDir(u.to.id, u.to.version)
+                val base = selected?.dir ?: packDir(u.from.id, u.from.version)
+                val target = newRoot ?: packDir(u.to.id, u.to.version)
                 KeyValue("base 目录", if (base.exists()) "在场" else "缺失 " + base.absolutePath)
                 KeyValue("new 目录", if (target.exists()) "在场" else "缺失 " + target.absolutePath)
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
