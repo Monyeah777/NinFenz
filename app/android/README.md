@@ -4,7 +4,7 @@ NF APP 的 Android 控制面：本地处理、无账号、无遥测、**未声�
 app/docs/CONTRACT.md + app/docs/CLI.md + app/schema/error_codes.json（A0 冻结层）。
 
 > v0.02（W1）现状：四目的地外壳（库/创作/交付/我的）+ 自适应底部栏/rail + FAB 导入 + 首启示例 Pack/3 步引导 +
-> 设计 token/字体/暗色主题 + 自适应 launcher icon。旧 8 个功能页保留在详情层；W2 已接入新建项目向导、示例演示项目、本地搜索与 Pack 校验；W3 已把导入重做为产品向导；W4 已接入项目态创作台；W5 已接入项目态交付台、Pack 中心、CCOS 步骤化；Pack 更新支持应用内「选新版 Pack zip → 安全解包 → core pack-diff → 决策 → apply/回滚」；W4b 已接入创作台作者覆盖保存（nf-overlay/1）与交付状态写回（assembled/validated/exported，逐步 history + core project-validate）；W6 质量收口。
+> 设计 token/字体/暗色主题 + 自适应 launcher icon。旧 8 个功能页保留在详情层；W2 已接入新建项目向导、示例演示项目、本地搜索与 Pack 校验；W3 已把导入重做为产品向导；W4 已接入项目态创作台；W5 已接入项目态交付台、Pack 中心、CCOS 步骤化；Pack 更新支持应用内「选新版 Pack zip → 安全解包 → core pack-diff → 决策 → apply/回滚」；W4b 已接入创作台作者覆盖保存（nf-overlay/1）与交付状态写回；W6 已开始质量收口（标题 heading 语义、设计 token 单测、全详情路由可达性单测）；i18n/截图矩阵/设备项/RESULTS 待收口。
 
 ## 工程结构
 
@@ -90,7 +90,7 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 
 ## 单测
 
-66 条（JVM，无需模拟器）：
+70 条（JVM，无需模拟器）：
 
 - CoreResponseTest（10）：信封解析/矛盾拒绝/NF-E-005。
 - CoreBridgeContractTest（5）：op+payload 原样透传、错误 exit 语义、fake 无队列 fail-closed。
@@ -108,11 +108,13 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 - PackZipLoaderTest（4）：根/单层目录包、zip slip 拒绝、缺 manifest 拒绝。
 - AuthorOverlayStoreTest（2）：overlay 形状；保存后 refs.overlay/status=authoring/history 更新。
 - ProjectStatusStoreTest（2）：draft→validated 逐步 history；核心失败不写盘。
+- DesignTokenTest（3）：间距 4 倍数、shape 梯度、7 档字号/行高。
+- ShellStateTest 增补：全部 14 类 Detail 路由 open/back 可达。
 
 ## 构建证据（本机，2026-11-15）
 
 - v0.02 W5（2026-11-15）：`./gradlew :app:assembleDebug` 成功：app-debug.apk = 18,323,958 bytes，
-  sha256 = 5b4b817dd4ab8dfca7cfd4b200c73a4c991cd875ffb6023f1175863cad2e1c67（含双 ABI 原生库 + 9 个示例 Pack assets）。
+  sha256 = 3dc85f180a01554891a15f0aa014fd84f56133d584bc8f2658c26b3c6c063da6（含双 ABI 原生库 + 9 个示例 Pack assets）。
 - `./gradlew :app:testDebugUnitTest` 全绿：58 条 JVM 单测（42 基线 + AdaptiveLayout 4 + ShellState 4 + PackStore 3 + ProjectFactory 1 + ProjectCreator 2 + SearchIndex 3 + PackVerifier 1 + AuthorArtifactsLoader 2）。
 - `zipalign -c -P 16 -v 4 app-debug.apk` → Verification successful（native lib 16KB page 对齐）。
 - `bash app/scripts/build_core_android.sh --clean` 成功：NDK 27.0.12077973 + rustup targets

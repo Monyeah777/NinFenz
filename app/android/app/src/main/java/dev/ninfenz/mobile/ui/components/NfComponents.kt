@@ -32,7 +32,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.ui.theme.NfSpacing
@@ -45,7 +46,7 @@ fun NfTopAppBar(
     actions: @Composable RowScope.() -> Unit = {}
 ) {
     TopAppBar(
-        title = { Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+        title = { Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.semantics { heading() }) },
         navigationIcon = {
             if (onBack != null) {
                 IconButton(onClick = onBack) {
@@ -65,7 +66,7 @@ fun NfSectionHeader(text: String, modifier: Modifier = Modifier, action: (@Compo
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(text, style = MaterialTheme.typography.titleLarge)
+        Text(text, style = MaterialTheme.typography.titleLarge, modifier = Modifier.semantics { heading() })
         action?.invoke()
     }
 }
@@ -92,7 +93,7 @@ fun NfEmptyState(
             tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(48.dp)
         )
-        Text(title, style = MaterialTheme.typography.titleLarge, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+        Text(title, style = MaterialTheme.typography.titleLarge, textAlign = androidx.compose.ui.text.style.TextAlign.Center, modifier = Modifier.semantics { heading() })
         Text(
             message,
             style = MaterialTheme.typography.bodyMedium,
