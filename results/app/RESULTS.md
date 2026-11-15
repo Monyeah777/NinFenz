@@ -63,8 +63,8 @@
 |---|---|---|---|
 | VAL-01 | L0 结构 / L1 契约；L2 可选 NF | pass（L0/L1）/ OPEN（L2 环境） | `validate`；L2 缺 `nf` CLI → exit 4 + NF-VAL-005 |
 | VAL-02 | 报告按对象路径定位 + fix | pass | `nf-validate-report/1` + issues path/fix |
-| EXP-01 | md/zip/docx/pdf | partial | md/zip/json 已实现且确定性；docx/pdf = NF-EXP-004 exit 4（OPEN） |
-| EXP-02 | skill/MCP 包（导出模板/脚手架） | partial | 桌面/控制面导出 md/zip；skill/MCP 包模板 = OPEN |
+| EXP-01 | md/zip/docx/pdf | pass（md/zip/json/docx）/ OPEN（pdf） | md/zip/json 确定性；**docx = 核心直出 OOXML（确定性、CJK）**；pdf = 平台打印（核心 exit 4 + NF-EXP-004，OPEN） |
+| EXP-02 | skill/MCP 包（导出模板/脚手架） | pass | `export --format skill` → `SKILL.md` + `mcp.json`（nf-mcp-scaffold/1）+ `README.md` + result 件；测试 `app/tests/test_export_formats.py` 与 `app/core/tests/ops_export.rs` |
 | EXP-03 | 导出确定性/manifest | pass | `nf-export-manifest/1` + 固定 zip mtime/顺序 |
 
 ### 3.4 Pack/Overlay（PACK）
@@ -128,8 +128,8 @@
 | Windows MSI | 66,573,406 B；app jar 内含 `native/nf_app_core.dll` | `bash app/scripts/build_desktop.sh package`（WIX_PATH） |
 | Rust CLI / cdylib | `nf-app-core.exe` / `nf_app_core.dll` | `bash app/scripts/build_core.sh --release` |
 | 工具链定版 | Gradle 8.11.1 / AGP 8.10.1 / Kotlin 2.1.20 / CMP 1.7.3 / compileSdk 36 / NDK r27 | `app/results/TOOLCHAIN.md` |
-| Python 测试 | **485 passed / 0 failed / 0 skipped / 0 xfailed（128s）** | `python -m pytest app/tests -q` |
-| Rust 测试 | **180 断言 / 21 二进制 / 0 failed** | `cd app/core && cargo test` |
+| Python 测试 | **490 passed / 0 failed / 0 skipped / 0 xfailed（127s）** | `python -m pytest app/tests -q` |
+| Rust 测试 | **182 断言 / 21 二进制 / 0 failed** | `cd app/core && cargo test` |
 | 两端 JVM 测试 | Android 38 / Desktop 20（含真实 JNA FFI） | `./gradlew test` / `:app:testDebugUnitTest` |
 
 ## 6. 扩展口（计划 §17）

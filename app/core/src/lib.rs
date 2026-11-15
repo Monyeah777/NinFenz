@@ -3,6 +3,7 @@
 
 pub mod backup;
 pub mod canonical;
+pub mod docx;
 pub mod cli;
 pub mod error;
 pub mod ext;
@@ -15,6 +16,7 @@ pub mod markdown;
 pub mod ops;
 pub mod report;
 pub mod schema;
+pub mod skillpack;
 pub mod yaml;
 pub mod zipsec;
 

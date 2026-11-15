@@ -8,8 +8,9 @@
 **APP 实现面：pass-with-open-items（P0 = 0）**。依据：
 - APP 门禁 `python app/gates/run_gates.py` → **7/7 门 FAIL=0**（QA0–QA6 全部 PASS；无 OPEN 阻塞），`P0=0`；
 - 自审计 S0–S15 → **covered 13 / gap 1 / open 2**，全部 gap/open 带 owner+next（P1=3）；
-- 核心 `cargo test` **180 断言 / 21 个测试二进制 / 0 failed**；控制面 + 契约 + 安全 + golden + E2E：**pytest 485 passed / 0 failed / 0 skipped / 0 xfailed（128s）**；
+- 核心 `cargo test` **182 断言 / 21 个测试二进制 / 0 failed**；控制面 + 契约 + 安全 + golden + E2E：**pytest 490 passed / 0 failed / 0 skipped / 0 xfailed（127s）**；
 - 构建实测：Android APK（17,973,649 B，16KB 对齐通过）+ Windows MSI（66,573,406 B）均含 Rust 核心。
+- 导出面：**md/zip/json/docx/skill 已实现**（docx = 核心直出 OOXML 确定性 zip，CJK 可用；skill = SKILL.md+mcp.json+README.md 的 MCP 脚手架）；**pdf 不内置**（平台打印另存为 PDF，核心 exit 4 + NF-EXP-004，OPEN）。EXP-01/EXP-02 的 MUST 面由此闭合或显式 OPEN。
 
 **发布面：未完成（OPEN-EXTERNAL）**——签名/公证/真机矩阵/Play 数据安全未执行，不得宣称「可发布」。
 
@@ -55,7 +56,7 @@
 | 面 | 数字 | 复跑 |
 |---|---|---|
 | Rust 核心 | 180 断言 / 21 二进制 / 0 failed | `cd app/core && cargo test` |
-| Python 控制面/契约/安全/golden/E2E | **485 passed / 0 failed / 0 skipped / 0 xfailed（128s）** | `python -m pytest app/tests -q` |
+| Python 控制面/契约/安全/golden/E2E | **490 passed / 0 failed / 0 skipped / 0 xfailed（127s）** | `python -m pytest app/tests -q` |
 | Android JVM | 38 条 | `cd app/android && ./gradlew :app:testDebugUnitTest` |
 | Desktop JVM | 20 条（含真实 JNA FFI） | `cd app/desktop && ./gradlew test` |
 | APK | 17,973,649 B；16KB 对齐通过；双 ABI `.so` | `bash app/scripts/build_android.sh debug` |
@@ -80,7 +81,7 @@
 
 ```bash
 python app/gates/run_gates.py            # 期望：7/7 门 FAIL=0，P0=0，exit 0
-python -m pytest app/tests -q             # 期望：485 passed / 0 failed
+python -m pytest app/tests -q             # 期望：490 passed / 0 failed
 cd app/core && cargo test                # 期望：180 断言 0 failed
 bash app/scripts/build_core.sh --release --test
 python tui/nf.py --selftest              # 期望：9 项全 ✔

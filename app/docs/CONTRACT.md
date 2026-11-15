@@ -112,7 +112,7 @@ APP = 人的控制面（Android/桌面/平板）；CCOS = 执行面；TUI/CLI = 
 
 ### 5.8 导出（A5）
 
-- 形式：`md`、`zip`、`json`；`docx`/`pdf` 走「导出器探测」：环境缺失 → exit 4 + NF-EXP-004（OPEN，不冒充）。
+- 形式：`md`、`zip`、`json`、`docx`、`skill`。`docx` = 核心直出 OOXML（WordprocessingML，确定性 zip，Unicode/CJK 可用）；`skill` = skill/MCP 脚手架包（`SKILL.md` + `mcp.json` + `README.md` + 可选 result.md/meta，`nf-mcp-scaffold/1`）。`pdf` **不内置**：用平台打印另存为 PDF（Android PrintManager / 桌面 javax.print）→ 核心 `export --format pdf` 返回 exit 4 + NF-EXP-004（OPEN，不冒充）。
 - zip 确定性：entry 顺序 = path 升序；mtime 固定 1980-01-01T00:00:00Z；权限 0644/0755；不写 extra field；同名冲突拒绝（NF-EXP-003）。
 - manifest（`nf-export-manifest/1`）：输出件摘要 + 来源 project/plan/spec digest；同输入同字节。
 
