@@ -1,6 +1,5 @@
 package dev.ninfenz.mobile.ui.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -12,21 +11,28 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import dev.ninfenz.mobile.ui.theme.NfSpacing
 
+/** v0.02 视觉壳：旧功能屏复用同一 TopAppBar/卡片/错误视觉，避免开发面板感。 */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NfScaffold(
@@ -38,13 +44,16 @@ fun NfScaffold(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(title) },
+                title = { Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis) },
                 navigationIcon = {
                     if (onBack != null) {
-                        TextButton(onClick = onBack) { Text("返回") }
+                        IconButton(onClick = onBack) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "返回")
+                        }
                     }
                 },
-                actions = actions
+                actions = actions,
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
             )
         }
     ) { padding ->
@@ -53,8 +62,8 @@ fun NfScaffold(
                 .padding(padding)
                 .fillMaxWidth()
                 .verticalScroll(rememberScrollState())
-                .padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+                .padding(horizontal = NfSpacing.page, vertical = NfSpacing.m),
+            verticalArrangement = Arrangement.spacedBy(NfSpacing.m)
         ) {
             content(padding)
         }
@@ -63,35 +72,48 @@ fun NfScaffold(
 
 @Composable
 fun CardBox(title: String?, modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
-    Card(modifier = modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            if (title != null) {
-                Text(text = title, style = MaterialTheme.typography.titleMedium)
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.large,
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f)
+    ) {
+        Column(
+            modifier = Modifier.padding(NfSpacing.l),
+            verticalArrangement = Arrangement.spacedBy(NfSpacing.s),
+            content = {
+                if (title != null) {
+                    Text(title, style = MaterialTheme.typography.titleLarge)
+                }
+                content()
             }
-            content()
-        }
+        )
     }
 }
 
 @Composable
 fun ErrorNotice(error: dev.ninfenz.mobile.core.CoreError, modifier: Modifier = Modifier) {
     val entry = dev.ninfenz.mobile.core.ErrorCatalog.find(error.code)
-    Card(
+    Surface(
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)
+        shape = MaterialTheme.shapes.medium,
+        color = MaterialTheme.colorScheme.errorContainer
     ) {
-        Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text(text = "[" + error.code + "] " + error.message, style = MaterialTheme.typography.titleSmall)
-            if (error.path != null) {
-                Text(
-                    text = "path: " + error.path,
-                    style = MaterialTheme.typography.bodySmall,
-                    fontFamily = FontFamily.Monospace
-                )
-            }
-            Text(text = "修复：" + (entry?.fix?.takeIf { it.isNotBlank() } ?: error.fix), style = MaterialTheme.typography.bodySmall)
+        Column(modifier = Modifier.padding(NfSpacing.m), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
             Text(
-                text = "exit=" + error.exit + " · severity=" + (entry?.severity ?: "unknown") + " · backend=" +
+                "[" + error.code + "] " + error.message,
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onErrorContainer
+            )
+            if (error.path != null) {
+                Text("path: " + error.path, style = MaterialTheme.typography.bodySmall, fontFamily = FontFamily.Monospace)
+            }
+            Text(
+                "修复：" + (entry?.fix?.takeIf { it.isNotBlank() } ?: error.fix),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onErrorContainer
+            )
+            Text(
+                "exit=" + error.exit + " · severity=" + (entry?.severity ?: "unknown") + " · backend=" +
                     dev.ninfenz.mobile.core.Core.bridge.backendName,
                 style = MaterialTheme.typography.labelSmall
             )
@@ -101,61 +123,42 @@ fun ErrorNotice(error: dev.ninfenz.mobile.core.CoreError, modifier: Modifier = M
 
 @Composable
 fun Notice(text: String, tone: Tone = Tone.INFO) {
-    val bg = when (tone) {
-        Tone.INFO -> MaterialTheme.colorScheme.surfaceVariant
-        Tone.WARN -> Color(0xFFFFF3E0)
-        Tone.ERROR -> MaterialTheme.colorScheme.errorContainer
+    val colors = when (tone) {
+        Tone.INFO -> MaterialTheme.colorScheme.secondaryContainer to MaterialTheme.colorScheme.onSecondaryContainer
+        Tone.WARN -> MaterialTheme.colorScheme.tertiaryContainer to MaterialTheme.colorScheme.onTertiaryContainer
+        Tone.ERROR -> MaterialTheme.colorScheme.errorContainer to MaterialTheme.colorScheme.onErrorContainer
     }
-    Text(
-        text = text,
-        style = MaterialTheme.typography.bodySmall,
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(bg)
-            .padding(8.dp)
-    )
+    Surface(shape = MaterialTheme.shapes.medium, color = colors.first, contentColor = colors.second, modifier = Modifier.fillMaxWidth()) {
+        Text(text = text, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(NfSpacing.m))
+    }
 }
 
 enum class Tone { INFO, WARN, ERROR }
 
 @Composable
 fun KeyValue(label: String, value: String) {
-    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-        Text(text = label, style = MaterialTheme.typography.labelLarge)
-        Text(text = value, style = MaterialTheme.typography.bodySmall)
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+        Text(text = label, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(text = value, style = MaterialTheme.typography.bodySmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
     }
 }
 
 @Composable
 fun MonoText(text: String) {
-    Text(
-        text = text,
-        style = MaterialTheme.typography.bodySmall,
-        fontFamily = FontFamily.Monospace,
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-            .padding(8.dp)
-    )
+    Surface(shape = MaterialTheme.shapes.small, color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f), modifier = Modifier.fillMaxWidth()) {
+        Text(text = text, style = MaterialTheme.typography.bodySmall, fontFamily = FontFamily.Monospace, modifier = Modifier.padding(NfSpacing.m))
+    }
 }
 
 @Composable
 fun EmptyState(text: String) {
-    Text(
-        text = text,
-        style = MaterialTheme.typography.bodyMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = Modifier.padding(12.dp)
-    )
+    Surface(shape = MaterialTheme.shapes.medium, color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f), modifier = Modifier.fillMaxWidth()) {
+        Text(text = text, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(NfSpacing.l))
+    }
 }
 
 @Composable
-fun FormTextField(
-    label: String,
-    value: String,
-    onValueChange: (String) -> Unit,
-    singleLine: Boolean = true
-) {
+fun FormTextField(label: String, value: String, onValueChange: (String) -> Unit, singleLine: Boolean = true) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
