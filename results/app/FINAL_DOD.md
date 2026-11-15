@@ -1,9 +1,31 @@
 # NF APP 收口审计（FINAL DOD）
 
 > ⛔ 操作指令：本件是 APP 收口结论的人读面；机读真源 `app/results/GATES.json`（QA0–QA6）+ `app/results/SELF_AUDIT.json`（S0–S15），判据 `app/docs/DOD.md`。**pass-with-open-items ≠ 零缺陷**：外部 OPEN 与债务不因收口消失；未跑面不得写成 pass。
-> 状态：v1（2026-11-15）· 依据：计划 §13（QA0–QA6）/§15.3（自审计）/§18（DoD）。
+> 状态：v1（2026-11-15）+ v0.02 增量（2026-11-15）· 依据：计划 §13（QA0–QA6）/§15.3（自审计）/§18（DoD）。
+
+## 0. v0.02 增量收口（2026-11-15，Android 端）
+
+**结论：v0.02 实现面 pass-with-open-items。** v1 的 QA0–QA6/S0–S15 结论仍有效；v0.02 在 Android 端叠加体验层，不改变 core/schema/CCOS 边界。以下只列 v0.02 增量证据与 OPEN，未跑面不写成 pass。
+
+| 项 | 结果 | 证据 |
+|---|---|---|
+| 四目的地外壳/设计 token/首启示例 | pass（工程面） | 5e14b5019；APK/测试见 RESULTS §0.2 |
+| 项目创建/搜索/Pack 校验/导入向导 | pass（工程面） | e5b2b0bfd..3ef6db5f2；ProjectCreator/SearchIndex/PackVerifier/Import 测试 |
+| 项目态创作台/交付台 | pass（工程面，含核心校验/导出） | 6ac657b52/86191976e；Delivery/Author 测试与构建 |
+| 作者覆盖保存/状态写回 | pass（工程面） | a14456833/902789796；Overlay/Status 测试 |
+| Pack 中心/CCOS/Pack zip 更新 | pass（工程面） | 1dc695125/4d816f3c5/6c30f241e |
+| JVM 测试 | pass | 90/90（含 Robolectric/Compose） |
+| 自适应/9 组尺寸语义矩阵 | pass（语义层） | ShellNavigation/ShellSizeMatrix 测试 |
+| i18n（外壳） | partial | values-en + 外壳资源化；正文 OPEN-I18N-BODY |
+| 像素截图矩阵 | OPEN | OPEN-SCREENSHOT |
+| 真机/模拟器 | OPEN-TOOLCHAIN | OPEN-DEVICE |
+| 草稿→项目；管线/规格保存；reviewed 串联 | OPEN | OPEN-DRAFT-PROJECT / OPEN-AUTHOR-GRAPH-SPEC / OPEN-REVIEWED |
+| app/gates v0.02 UX 检查 | OPEN | OPEN-GATES；本段为人工增量，待机读门禁更新 |
+
+**发布面：仍为 OPEN-EXTERNAL**（签名/公证/真机矩阵/Play 数据安全），不得据此宣称可发布。
 
 ## 1. 结论
+
 
 **APP 实现面：pass-with-open-items（P0 = 0）**。收口判定（2026-11-15）：实现面全部可本机验证的 MUST/主路径已落地并取证；计划 §18.3 的发布边界项（签名/公证/真机矩阵/Play 数据安全）与 per-format 平台项（PDF=平台打印）保留 OPEN，见 §6/§7。依据：
 - APP 门禁 `python app/gates/run_gates.py` → **7/7 门 FAIL=0**（QA0–QA6 全部 PASS；无 OPEN 阻塞），`P0=0`；

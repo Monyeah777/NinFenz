@@ -2,9 +2,54 @@
 
 > 本件是 APP 实施面的**结果/状态导航**（不是规划件）。开工依据 `NF-APP-Final-方案-2026-11-15.md`；基线 `results/app/BASELINE.md`；收口判据 `app/docs/DOD.md`；机读门禁 `app/results/GATES.json` + `app/results/SELF_AUDIT.json`。
 > 现场复跑：`python app/gates/run_gates.py`（QA0–QA6 + S0–S15）。本件不给「应该绿」，只给「现在能跑出什么」。
-> 状态：v1（2026-11-15）
+> 状态：v1（2026-11-15）+ v0.02 增量（2026-11-15）
+
+## 0. v0.02 增量（2026-11-15，Android 端）
+
+> 本段是 v0.02（v2 方案）Android 端增量结果；下方 §1–§6 仍是 v1 快照（core/CLI/桌面口径不变）。v0.02 不改 app/schema、core ABI、CCOS 边界。
+
+### 0.1 交付与提交
+
+| 波次 | 内容 | 提交 |
+|---|---|---|
+| W1 | 四目的地外壳/设计 token/首启示例/引导/自适应 icon | 5e14b5019 |
+| W2 | 新建项目向导/演示项目/搜索/Pack 校验 | e5b2b0bfd, d30db5099, 4a0c9cf09 |
+| W3 | 导入产品向导（来源→预览→map-suggest 映射→草稿） | 3ef6db5f2 |
+| W4 | 项目态创作台（协议/管线/规格 + 核心校验/渲染） | 6ac657b52 |
+| W4b | nf-overlay 作者覆盖保存 + 撤销；项目状态写回 | a14456833, 902789796 |
+| W5 | 交付台/视觉壳/Pack 中心/CCOS/Pack zip 更新 | 86191976e, 350285a44, 1dc695125, 4d816f3c5, 6c30f241e |
+| W6 | a11y/token/路由测试、Robolectric、三尺寸/九矩阵、外壳 i18n | cbc913478, 07ccf027f, 3eef0a5af, 6614f7301, 本提交 |
+
+### 0.2 实测（本机）
+
+| 项 | 结果 |
+|---|---|
+| APK | app-debug.apk = 18,425,095 B；sha256 a77f94999ebe6d92dfdd333f58253775f1c1ba1322714955039bd866172487be |
+| JVM 测试 | 90 条全绿（v1 基线 42 + v0.02 新增 48；含 Robolectric/Compose） |
+| 构建 | ./gradlew :app:assembleDebug 成功；:app:testDebugUnitTest 90/90 |
+| i18n | 外壳 labels/标题/动作/关于已资源化 + values-en；正文文案仍内联（OPEN） |
+| 适配 | compact/medium/expanded 三档导航 + 9 组窗口尺寸语义矩阵 |
+
+### 0.3 状态
+
+- W1–W5：已完成（v0.02 范围）。
+- W4b：作者覆盖保存/撤销、状态写回已完成；管线/规格保存、草稿→项目仍 OPEN。
+- W6：部分完成（见 0.4）；未跑面不写成 pass。
+
+### 0.4 v0.02 OPEN（带 owner+next）
+
+| id | 内容 | owner | next |
+|---|---|---|---|
+| OPEN-I18N-BODY | 新屏正文/错误文案仍内联中文；无 per-app language 切换 | lead | 抽取剩余 strings + localeConfig |
+| OPEN-SCREENSHOT | 9 组尺寸已有语义矩阵，像素截图基线未接 | lead | Roborazzi/Paparazzi 或 bitmap 基线 |
+| OPEN-DEVICE | 真机/模拟器首启/分享/折叠/TalkBack/性能 | lead | 设备到位后跑 DEVICE_MATRIX 清单 |
+| OPEN-DRAFT-PROJECT | 导入草稿→项目转换未定义（契约无 import→project 字段） | lead | 需 v1 §15 契约变更评估 |
+| OPEN-AUTHOR-GRAPH-SPEC | 创作台仅保存协议条款/字段；管线/规格保存未做 | lead | overlay 扩展或项目引用重算 |
+| OPEN-REVIEWED | reviewed 状态与 CCOS 人审串联未做 | lead | project-validate + CCOS result 回钉 |
+| OPEN-GATES | app/gates 的 v0.02 UX 检查未加；RESULTS/FINAL_DOD 本段为本轮人工增量 | lead | 更新 GATES/SELF_AUDIT 并复跑 |
 
 ## 1. 结论（先行）
+
 
 1. **共享契约层 + Rust 核心 + Python 控制面 + Android/Desktop 端壳**四层已落地：13 个共享格式、20 个核心 op（CLI + C ABI）、控制面用户流、Compose 两端 UI。
 2. **构建面已实测**：Android APK（含 Rust `.so` 双 ABI，16KB 页对齐通过）与 Windows MSI（含 Rust `cdylib`）均由本机工具链产出；macOS 与签名/公证 = `OPEN-EXTERNAL`。
