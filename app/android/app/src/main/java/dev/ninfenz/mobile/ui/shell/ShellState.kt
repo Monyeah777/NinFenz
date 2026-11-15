@@ -9,6 +9,7 @@ enum class TopDestination(val label: String) {
 
 sealed interface Detail {
     data object Import : Detail
+    data object Search : Detail
     data object NewProject : Detail
     data object Settings : Detail
     data object Protocol : Detail

@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
@@ -25,11 +26,17 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.data.PackEntry
+import dev.ninfenz.mobile.data.PackVerifier
 import dev.ninfenz.mobile.data.ProjectEntry
 import dev.ninfenz.mobile.data.SeedResult
 import dev.ninfenz.mobile.data.ThemeMode
@@ -42,6 +49,7 @@ import dev.ninfenz.mobile.ui.components.NfSectionHeader
 import dev.ninfenz.mobile.ui.components.NfStatusChip
 import dev.ninfenz.mobile.ui.components.NfTopAppBar
 import dev.ninfenz.mobile.ui.theme.NfSpacing
+import kotlinx.coroutines.launch
 
 @Composable
 fun LibraryHomeScreen(
@@ -54,12 +62,14 @@ fun LibraryHomeScreen(
     onImport: () -> Unit,
     onOpenPack: (PackEntry) -> Unit,
     onOpenProject: (ProjectEntry) -> Unit,
+    onSearch: () -> Unit,
     onSettings: () -> Unit
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         NfTopAppBar(
             title = "库",
             actions = {
+                IconButton(onClick = onSearch) { Icon(Icons.Filled.Search, contentDescription = "搜索") }
                 IconButton(onClick = onSettings) { Icon(Icons.Filled.Settings, contentDescription = "设置") }
             }
         )
@@ -450,6 +460,11 @@ fun ProjectDetailScreen(
 
 @Composable
 fun PackDetailScreen(pack: PackEntry, onBack: () -> Unit, onUpdate: () -> Unit) {
+    val scope = rememberCoroutineScope()
+    var verifying by remember { mutableStateOf(false) }
+    var report by remember { mutableStateOf<String?>(null) }
+    var errorText by remember { mutableStateOf<String?>(null) }
+
     Column(modifier = Modifier.fillMaxSize()) {
         NfTopAppBar(title = pack.title, onBack = onBack)
         LazyColumn(
@@ -467,7 +482,47 @@ fun PackDetailScreen(pack: PackEntry, onBack: () -> Unit, onUpdate: () -> Unit) 
                     }
                 }
             }
-            item { Button(onClick = onUpdate, modifier = Modifier.fillMaxWidth()) { Text("Pack 更新 / 校验") } }
+            item {
+                Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+                    Button(
+                        onClick = {
+                            if (verifying) return@Button
+                            verifying = true
+                            errorText = null
+                            report = null
+                            scope.launch {
+                                val response = PackVerifier().verify(pack)
+                                val result = response.resultObject()
+                                val verdict = result?.get("verdict")?.let { it.toString().trim('"') }
+                                val issues = result?.get("issues")?.toString() ?: ""
+                                if (response.ok) {
+                                    report = "校验通过：verdict=" + (verdict ?: "pass") + (if (issues == "[]") "" else " · issues=" + issues)
+                                } else {
+                                    val err = response.error
+                                    errorText = "[" + (err?.code ?: "NF-VAL-001") + "] " + (err?.message ?: "校验失败") + "；修复：" + (err?.fix ?: "查看诊断")
+                                }
+                                verifying = false
+                            }
+                        },
+                        enabled = !verifying
+                    ) { Text(if (verifying) "校验中…" else "校验 Pack") }
+                    Button(onClick = onUpdate) { Text("Pack 更新") }
+                }
+            }
+            if (report != null) {
+                item {
+                    Surface(color = MaterialTheme.colorScheme.primaryContainer, shape = MaterialTheme.shapes.medium) {
+                        Text(report!!, modifier = Modifier.padding(NfSpacing.m), style = MaterialTheme.typography.bodySmall)
+                    }
+                }
+            }
+            if (errorText != null) {
+                item {
+                    Surface(color = MaterialTheme.colorScheme.errorContainer, shape = MaterialTheme.shapes.medium) {
+                        Text(errorText!!, modifier = Modifier.padding(NfSpacing.m), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onErrorContainer)
+                    }
+                }
+            }
         }
     }
 }

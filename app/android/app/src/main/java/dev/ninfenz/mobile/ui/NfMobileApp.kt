@@ -60,6 +60,7 @@ import dev.ninfenz.mobile.ui.screens.PackDetailScreen
 import dev.ninfenz.mobile.ui.screens.PackUpdateScreen
 import dev.ninfenz.mobile.ui.screens.ProjectDetailScreen
 import dev.ninfenz.mobile.ui.screens.ProtocolScreen
+import dev.ninfenz.mobile.ui.screens.SearchScreen
 import dev.ninfenz.mobile.ui.screens.SettingsScreen
 import dev.ninfenz.mobile.ui.shell.Detail
 import dev.ninfenz.mobile.ui.shell.ShellState
@@ -219,6 +220,7 @@ fun NfMobileApp(
                             onImport = { shell = shell.open(Detail.Import) },
                             onOpenPack = { shell = shell.open(Detail.Pack(it.id, it.version)) },
                             onOpenProject = { shell = shell.open(Detail.Project(it.project.id)) },
+                            onSearch = { shell = shell.open(Detail.Search) },
                             onSettings = { shell = shell.open(Detail.Settings) }
                         )
                         TopDestination.CREATE -> CreateScreen(
@@ -258,6 +260,11 @@ fun NfMobileApp(
                             runSeed()
                         },
                         onCreate = { pack, title -> createProject(pack, title) }
+                    )
+                    is Detail.Search -> SearchScreen(
+                        onBack = { shell = shell.back() ?: shell },
+                        onOpenPack = { id, version -> shell = shell.open(Detail.Pack(id, version)) },
+                        onOpenProject = { id -> shell = shell.open(Detail.Project(id)) }
                     )
                     is Detail.Settings -> SettingsScreen(onBack = { shell = shell.back() ?: shell })
                     is Detail.Protocol -> ProtocolScreen(onBack = { shell = shell.back() ?: shell })
