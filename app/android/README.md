@@ -3,6 +3,9 @@
 NF APP 的 Android 控制面：本地处理、无账号、无遥测、**未声明 INTERNET 权限**；所有格式/操作语义/错误码按
 app/docs/CONTRACT.md + app/docs/CLI.md + app/schema/error_codes.json（A0 冻结层）。
 
+> v0.02（W1）现状：四目的地外壳（库/创作/交付/我的）+ 自适应底部栏/rail + FAB 导入 + 首启示例 Pack/3 步引导 +
+> 设计 token/字体/暗色主题 + 自适应 launcher icon。旧 8 个功能页保留在详情层；W2+ 继续产品化（项目向导、搜索、作者台/交付台）。
+
 ## 工程结构
 
 ~~~text
@@ -20,7 +23,9 @@ app/android/
       core/                  # CoreBridge 接口 / CoreResponse 信封 / JNA 原生桥 / 错误码表
       model/                 # nf-import、nf-protocol-pack、nf-pipeline-graph、nf-md-spec、
                              # nf-assembly-plan、nf-validate-report、nf-pack-update、ccos-*、nf-project
-      state/                 # NavState（返回栈，纯逻辑可单测）
+      state/                 # 旧 NavState（保留兼容；v0.02 外壳用 ui/shell/ShellState）
+      ui/shell/              # ShellState（四目的地 + 单层详情，纯逻辑可单测）
+      ui/theme/              # NfTheme / NfTypography / NfSpacing / NfShapes / 动效 token
       share/                 # ShareReceiverActivity（透明）+ SharePayload 解析 + FileProvider 导出
       ui/                    # Compose Material3 屏幕（card/edge-to-edge/预测返回）
     src/main/res/            # strings/styles（透明分享主题）/xml/file_paths.xml
@@ -56,17 +61,17 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 
 ## 屏幕与入口
 
-| 屏幕 | 入口 | 要点 |
+| 入口 | 类型 | 要点 |
 |---|---|---|
-| Home | 启动 | Pack 库（library/packs）+ 项目扫描（projects/*.nfproject.json）+ 核心诊断；安装 Pack 走 SAF 目录树复制（只写 app 私有目录） |
-| Import | Home / 分享 / SAF / 剪贴板 | 核心 import 产出 nf-import/1 → 嗅探/结构/映射建议预览；低置信（<60）必须人工确认；草稿+映射决策 sidecar 落盘 |
-| Protocol | Home | 条款表单（开关 / 字段值 / 必填与占位符本地预检）→ 核心 protocol-render 权威渲染 |
-| Graph | Home | 节点/边/权重编辑（本地表单检查：dup/dangling/weight/cycle）→ 核心 graph-validate / graph-compile |
-| Assembly | Home | plan+spec+inputs → 核心 assemble → validate L1 → export md/zip → FileProvider 分享 |
-| PackUpdate | Home | diff/impact/breaking 展示 + 冲突决策（keep_mine/take_new/defer，NF-PCK-006：未裁决不得应用）→ 核心 pack-merge；回滚=反向 update 走同一 op |
-| Ccos | Home | ccos-task/ccos-result 人审（reviewer+note 必填，required 恒 true）→ 核心 ccos-import-result 回钉 task_digest |
-| Settings | Home | 核心桥诊断（backend/ABI/原生库就绪/错误码登记条数）+ 隐私说明 + 诊断复制；无遥测 |
+| 库 | 顶层 1 | 渐变 hero + 最近项目/已安装 Pack；FAB 导入；空态可载入示例；扫描 library/packs 与 projects/*.nfproject.json |
+| 创作 | 顶层 2 | 项目列表 + 空态（项目向导 W2 接入）；点项目进详情 |
+| 交付 | 顶层 3 | 项目列表/装配入口 + Pack 更新 / CCOS 快捷入口 |
+| 我的 | 顶层 4 | 主题三态（跟随系统/浅色/深色）+ 存储/诊断/关于；中文默认 |
+| 详情：Import / Protocol / Graph / Assembly / PackUpdate / Ccos / Settings | 各屏详情 | 旧 8 屏保留，经详情层可达（返回回顶层）；能力/负例/错误码行为不变 |
+| 详情：Project / Pack | 列表点击 | 项目状态/引用摘要 + 继续创作/装配；Pack 版本/条目/tree + 更新入口 |
 | ShareReceiverActivity | SEND / SEND_MULTIPLE / VIEW / PROCESS_TEXT | 透明 Activity，只做载荷预览与「去导入」，不在接收层解析/落盘 |
+| 首启引导 | 首次启动 | 3 步（价值→示例 Pack→试导入），可跳过；示例载入失败可重试，不阻断 |
+| Onboarding 数据 | SharedPreferences | onboarding_done / sample_seeded / theme_mode（DataStore 迁移列 W6） |
 
 ## 核心桥（CLI.md §5）
 
@@ -84,19 +89,22 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 
 ## 单测
 
-42 条（JVM，无需模拟器）：
+49 条（JVM，无需模拟器）：
 
 - CoreResponseTest（10）：信封解析/矛盾拒绝/NF-E-005。
 - CoreBridgeContractTest（5）：op+payload 原样透传、错误 exit 语义、fake 无队列 fail-closed。
 - ModelParsingTest（16）：9 类格式解析 + 负例（未知版本/浮点/网络策略/人审 required）+ 图编辑纯函数/环检测/回滚反向。
 - StateMachineTest（6）：导航栈、冲突决策台、项目状态机、评审留痕约束。
 - FixtureFilesTest（1）：用 app/fixtures/schema/valid/* 契约夹具逐格式解析（夹具缺失时 skip，不伪造通过）。
+- AdaptiveLayoutTest（4）：窗口宽 599/600/839/840 分档。
+- ShellStateTest（4）：四目的地/详情栈/根返回 null。
+- PackStoreTest（3）：正常 Pack 扫描/坏 manifest 入 errors/空目录。
 
 ## 构建证据（本机，2026-11-15）
 
-- `./gradlew :app:assembleDebug` 成功：app-debug.apk = 17,973,649 bytes（含 lib/arm64-v8a + lib/x86_64 的
-  libnf_app_core.so 与 libjnidispatch.so）。
-- `./gradlew :app:testDebugUnitTest` 全绿：42 条 JVM 单测（含 `AdaptiveLayoutTest` 分档边界）。
+- v0.02 W1（2026-11-15）：`./gradlew :app:assembleDebug` 成功：app-debug.apk = 17,988,622 bytes，
+  sha256 = 9944bab4561b5ec6b30bfd8449863c443ded9784e27bca87976145da52e7a9c9（含双 ABI 原生库 + 9 个示例 Pack assets）。
+- `./gradlew :app:testDebugUnitTest` 全绿：49 条 JVM 单测（42 条基线 + AdaptiveLayoutTest 4 + ShellStateTest 4 + PackStoreTest 3）。
 - `zipalign -c -P 16 -v 4 app-debug.apk` → Verification successful（native lib 16KB page 对齐）。
 - `bash app/scripts/build_core_android.sh --clean` 成功：NDK 27.0.12077973 + rustup targets
   （aarch64-linux-android / x86_64-linux-android，经 rsproxy 镜像安装）；两个 .so 的 LOAD align 均为 0x4000。

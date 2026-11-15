@@ -13,8 +13,8 @@ android {
         applicationId = "dev.ninfenz.mobile"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = 2
+        versionName = "0.2.0"
         // ABI 与 Rust 交叉编译目标一致（app/scripts/build_core_android.sh）
         ndk {
             abiFilters.addAll(listOf("arm64-v8a", "x86_64"))
