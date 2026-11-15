@@ -291,7 +291,8 @@ fun NfMobileApp(
                                 project = entry.project,
                                 pack = pack,
                                 onBack = { shell = shell.back() ?: shell },
-                                onAssembly = { shell = shell.open(Detail.Delivery(entry.project.id)) }
+                                onAssembly = { shell = shell.open(Detail.Delivery(entry.project.id)) },
+                                onSaved = { refresh() }
                             )
                         }
                     }

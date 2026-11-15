@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Tab
@@ -34,7 +35,9 @@ import dev.ninfenz.mobile.core.CoreResponse
 import dev.ninfenz.mobile.core.J
 import dev.ninfenz.mobile.data.AuthorArtifacts
 import dev.ninfenz.mobile.data.AuthorArtifactsLoader
+import dev.ninfenz.mobile.data.AuthorOverlayStore
 import dev.ninfenz.mobile.data.PackEntry
+import dev.ninfenz.mobile.data.SaveOverlayResult
 import dev.ninfenz.mobile.model.Project
 import dev.ninfenz.mobile.model.ProtocolModel
 import dev.ninfenz.mobile.ui.components.NfCard
@@ -67,7 +70,7 @@ private enum class AuthorTab(val label: String) {
  * 编辑保存（写回引用/digest）留 W4 后续；当前明确标「本地预演」。
  */
 @Composable
-fun AuthorScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onAssembly: () -> Unit) {
+fun AuthorScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onAssembly: () -> Unit, onSaved: () -> Unit = {}) {
     if (pack == null) {
         Column(modifier = Modifier.fillMaxSize()) {
             NfTopAppBar(title = project.title, onBack = onBack)
@@ -145,7 +148,7 @@ fun AuthorScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onAssem
             val current = artifacts
             if (current != null) {
                 when (AuthorTab.entries[tab]) {
-                    AuthorTab.PROTOCOL -> ProtocolAuthorContent(current)
+                    AuthorTab.PROTOCOL -> ProtocolAuthorContent(current, project, pack, onSaved)
                     AuthorTab.GRAPH -> GraphAuthorContent(current)
                     AuthorTab.SPEC -> SpecAuthorContent(current)
                 }
@@ -155,18 +158,34 @@ fun AuthorScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onAssem
 }
 
 @Composable
-private fun ProtocolAuthorContent(artifacts: AuthorArtifacts) {
-    val pack = artifacts.protocol
-    var values by remember(artifacts.protocolJson) { mutableStateOf(pack.fields.associate { it.id to (it.defaultText ?: "") }) }
-    var enabled by remember(artifacts.protocolJson) { mutableStateOf(pack.clauses.associate { it.id to it.enabled }) }
+private fun ProtocolAuthorContent(
+    artifacts: AuthorArtifacts,
+    project: Project,
+    pack: PackEntry,
+    onSaved: () -> Unit
+) {
+    val protocol = artifacts.protocol
+    val context = androidx.compose.ui.platform.LocalContext.current
+    data class Snapshot(val values: Map<String, String>, val enabled: Map<String, Boolean>)
+    var values by remember(artifacts.protocolJson) { mutableStateOf(protocol.fields.associate { it.id to (it.defaultText ?: "") }) }
+    var enabled by remember(artifacts.protocolJson) { mutableStateOf(protocol.clauses.associate { it.id to it.enabled }) }
+    var undo by remember { mutableStateOf<List<Snapshot>>(emptyList()) }
     var rendered by remember { mutableStateOf<List<String>?>(null) }
     var renderError by remember { mutableStateOf<CoreError?>(null) }
     var busy by remember { mutableStateOf(false) }
+    var saving by remember { mutableStateOf(false) }
+    var saveMessage by remember { mutableStateOf<String?>(null) }
+    var saveError by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
+    val store = remember { AuthorOverlayStore(context.filesDir) }
+
+    fun pushUndo() {
+        undo = undo + Snapshot(values, enabled)
+    }
 
     Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.m)) {
-        NfSectionHeader("条款（" + pack.clauses.size + "）")
-        for (clause in pack.clauses) {
+        NfSectionHeader("条款（" + protocol.clauses.size + "）")
+        for (clause in protocol.clauses) {
             NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
                 Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -175,20 +194,29 @@ private fun ProtocolAuthorContent(artifacts: AuthorArtifacts) {
                     }
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text("启用本条", style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
-                        Switch(checked = enabled[clause.id] ?: clause.enabled, onCheckedChange = { enabled = enabled + (clause.id to it) })
+                        Switch(
+                            checked = enabled[clause.id] ?: clause.enabled,
+                            onCheckedChange = { checked ->
+                                pushUndo()
+                                enabled = enabled + (clause.id to checked)
+                            }
+                        )
                     }
                     Text(clause.text, style = MaterialTheme.typography.bodyMedium)
-                    val check = ProtocolModel.checkClause(pack, clause, values)
+                    val check = ProtocolModel.checkClause(protocol, clause, values)
                     if (!check.ok) {
                         if (check.missing.isNotEmpty()) Text("缺必填：" + check.missing.joinToString(", ") + "（NF-PRT-003）", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
                         if (check.unknown.isNotEmpty()) Text("未声明占位符：" + check.unknown.joinToString(", ") + "（NF-PRT-004）", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
                     }
-                    for (field in pack.fields.filter { it.clause == clause.id }) {
+                    for (field in protocol.fields.filter { it.clause == clause.id }) {
                         Column {
                             Text(field.id + " · " + field.label + (if (field.required) "（必填）" else ""), style = MaterialTheme.typography.labelLarge)
                             OutlinedTextField(
                                 value = values[field.id] ?: "",
-                                onValueChange = { values = values + (field.id to it) },
+                                onValueChange = { text ->
+                                    pushUndo()
+                                    values = values + (field.id to text)
+                                },
                                 singleLine = true,
                                 modifier = Modifier.fillMaxWidth()
                             )
@@ -196,6 +224,45 @@ private fun ProtocolAuthorContent(artifacts: AuthorArtifacts) {
                     }
                 }
             }
+        }
+        Row(
+            modifier = Modifier.padding(horizontal = NfSpacing.page),
+            horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)
+        ) {
+            OutlinedButton(
+                enabled = undo.isNotEmpty() && !saving,
+                onClick = {
+                    val last = undo.last()
+                    undo = undo.dropLast(1)
+                    values = last.values
+                    enabled = last.enabled
+                    saveMessage = null
+                    saveError = null
+                }
+            ) { Text("撤销编辑") }
+            Button(
+                enabled = !saving,
+                onClick = {
+                    saving = true
+                    saveMessage = null
+                    saveError = null
+                    scope.launch {
+                        val result = store.save(project, pack, enabled, values)
+                        when (result) {
+                            is SaveOverlayResult.Saved -> {
+                                saveMessage = "已保存 overlay · " + result.status.wire + " · sha " + result.overlaySha256.take(12) + "…"
+                                onSaved()
+                            }
+                            is SaveOverlayResult.Failure -> saveError = "[" + result.code + "] " + result.message + "；修复：" + result.fix
+                        }
+                        saving = false
+                    }
+                }
+            ) { Text(if (saving) "保存中…" else "保存到项目") }
+        }
+        saveMessage?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
+        saveError?.let { message ->
+            NfErrorCard("NF-PCK-003", message, "查看诊断或重新创建项目", modifier = Modifier.padding(horizontal = NfSpacing.page))
         }
         Button(
             enabled = !busy,
