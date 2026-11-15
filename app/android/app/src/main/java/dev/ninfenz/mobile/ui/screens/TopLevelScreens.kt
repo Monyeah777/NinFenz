@@ -34,6 +34,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.data.PackEntry
 import dev.ninfenz.mobile.data.PackVerifier
@@ -68,10 +69,10 @@ fun LibraryHomeScreen(
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         NfTopAppBar(
-            title = "库",
+            title = stringResource(dev.ninfenz.mobile.R.string.nav_library),
             actions = {
-                IconButton(onClick = onSearch) { Icon(Icons.Filled.Search, contentDescription = "搜索") }
-                IconButton(onClick = onSettings) { Icon(Icons.Filled.Settings, contentDescription = "设置") }
+                IconButton(onClick = onSearch) { Icon(Icons.Filled.Search, contentDescription = stringResource(dev.ninfenz.mobile.R.string.action_search)) }
+                IconButton(onClick = onSettings) { Icon(Icons.Filled.Settings, contentDescription = stringResource(dev.ninfenz.mobile.R.string.action_settings)) }
             }
         )
         LazyColumn(
@@ -202,7 +203,7 @@ fun CreateScreen(
     onLoadSample: () -> Unit
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
-        NfTopAppBar(title = "创作")
+        NfTopAppBar(title = stringResource(dev.ninfenz.mobile.R.string.nav_create))
         if (packs.isEmpty()) {
             NfEmptyState(
                 icon = Icons.Filled.Edit,
@@ -285,7 +286,7 @@ fun DeliverScreen(
     onCcos: () -> Unit
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
-        NfTopAppBar(title = "交付")
+        NfTopAppBar(title = stringResource(dev.ninfenz.mobile.R.string.nav_deliver))
         if (projects.isEmpty()) {
             NfEmptyState(
                 icon = Icons.AutoMirrored.Filled.List,
@@ -354,7 +355,7 @@ fun MeScreen(
     onAbout: () -> Unit
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
-        NfTopAppBar(title = "我的")
+        NfTopAppBar(title = stringResource(dev.ninfenz.mobile.R.string.nav_me))
         LazyColumn(
             contentPadding = androidx.compose.foundation.layout.PaddingValues(vertical = NfSpacing.l),
             verticalArrangement = Arrangement.spacedBy(NfSpacing.m)

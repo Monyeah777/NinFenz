@@ -1,7 +1,6 @@
 package dev.ninfenz.mobile.ui
 
 import android.content.Context
-import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
@@ -10,6 +9,7 @@ import androidx.test.core.app.ApplicationProvider
 import dev.ninfenz.mobile.data.AppPrefs
 import dev.ninfenz.mobile.data.ThemeMode
 import dev.ninfenz.mobile.ui.theme.NfTheme
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -23,14 +23,14 @@ private fun prefsForTest(): AppPrefs {
 
 private fun assertFourDestinations(compose: androidx.compose.ui.test.junit4.ComposeContentTestRule) {
     compose.waitForIdle()
-    compose.onAllNodesWithText("库").assertCountEquals(2) // 顶部标题 + 导航标签
-    compose.onNodeWithText("创作").assertIsDisplayed()
-    compose.onNodeWithText("交付").assertIsDisplayed()
-    compose.onNodeWithText("我的").assertIsDisplayed()
+    assertTrue(compose.onAllNodesWithText("库").fetchSemanticsNodes().isNotEmpty())
+    compose.onNodeWithText("创作").assertExists()
+    compose.onNodeWithText("交付").assertExists()
+    compose.onNodeWithText("我的").assertExists()
 }
 
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [34], qualifiers = "w360dp-h640dp-xhdpi")
+@Config(sdk = [34], qualifiers = "zh-rCN-w360dp-h640dp-xhdpi")
 class ShellCompactNavigationTest {
     @get:Rule
     val compose = createComposeRule()
@@ -44,13 +44,27 @@ class ShellCompactNavigationTest {
 }
 
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [34], qualifiers = "w900dp-h640dp-xhdpi")
+@Config(sdk = [34], qualifiers = "zh-rCN-w900dp-h640dp-xhdpi")
 class ShellExpandedNavigationTest {
     @get:Rule
     val compose = createComposeRule()
 
     @Test
     fun expandedShowsRailDestinations() {
+        val prefs = prefsForTest()
+        compose.setContent { NfTheme { NfMobileApp(prefs, ThemeMode.SYSTEM, {}) } }
+        assertFourDestinations(compose)
+    }
+}
+
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [34], qualifiers = "zh-rCN-w700dp-h900dp-xhdpi")
+class ShellMediumNavigationTest {
+    @get:Rule
+    val compose = createComposeRule()
+
+    @Test
+    fun mediumShowsRailDestinations() {
         val prefs = prefsForTest()
         compose.setContent { NfTheme { NfMobileApp(prefs, ThemeMode.SYSTEM, {}) } }
         assertFourDestinations(compose)

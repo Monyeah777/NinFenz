@@ -4,4 +4,18 @@
     <string name="share_receiver_label">导入到 NF</string>
     <string name="share_receiver_cancel">取消</string>
     <string name="share_receiver_confirm">导入</string>
+
+    <string name="nav_library">库</string>
+    <string name="nav_create">创作</string>
+    <string name="nav_deliver">交付</string>
+    <string name="nav_me">我的</string>
+
+    <string name="action_back">返回</string>
+    <string name="action_search">搜索</string>
+    <string name="action_settings">设置</string>
+    <string name="action_import">导入</string>
+    <string name="action_close">关闭</string>
+
+    <string name="about_title">关于 NF</string>
+    <string name="about_body">NF Mobile 0.2.0（v0.02）\n本地处理 · 无网络权限 · 无遥测\nMIT License · 详见仓库 app/docs/LEGAL.md</string>
 </resources>

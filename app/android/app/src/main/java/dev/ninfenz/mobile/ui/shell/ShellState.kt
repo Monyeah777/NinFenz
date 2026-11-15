@@ -1,10 +1,10 @@
 package dev.ninfenz.mobile.ui.shell
 
-enum class TopDestination(val label: String) {
-    LIBRARY("库"),
-    CREATE("创作"),
-    DELIVER("交付"),
-    ME("我的")
+enum class TopDestination(val labelRes: Int) {
+    LIBRARY(dev.ninfenz.mobile.R.string.nav_library),
+    CREATE(dev.ninfenz.mobile.R.string.nav_create),
+    DELIVER(dev.ninfenz.mobile.R.string.nav_deliver),
+    ME(dev.ninfenz.mobile.R.string.nav_me)
 }
 
 sealed interface Detail {

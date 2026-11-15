@@ -32,6 +32,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.platform.LocalContext
 import dev.ninfenz.mobile.core.Core
 import dev.ninfenz.mobile.data.AppPrefs
@@ -202,7 +203,7 @@ fun NfMobileApp(
         floatingActionButton = {
             if (shell.detail == null && shell.destination == TopDestination.LIBRARY) {
                 FloatingActionButton(onClick = { shell = shell.open(Detail.Import) }) {
-                    Icon(Icons.Filled.Add, contentDescription = "导入")
+                    Icon(Icons.Filled.Add, contentDescription = stringResource(dev.ninfenz.mobile.R.string.action_import))
                 }
             }
         }
@@ -366,11 +367,11 @@ fun NfMobileApp(
     if (showAbout) {
         AlertDialog(
             onDismissRequest = { showAbout = false },
-            title = { Text("关于 NF") },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.about_title)) },
             text = {
                 Text("NF Mobile 0.2.0（v0.02）\n本地处理 · 无网络权限 · 无遥测\nMIT License · 详见仓库 app/docs/LEGAL.md")
             },
-            confirmButton = { TextButton(onClick = { showAbout = false }) { Text("关闭") } }
+            confirmButton = { TextButton(onClick = { showAbout = false }) { Text(stringResource(dev.ninfenz.mobile.R.string.action_close)) } }
         )
     }
 }
@@ -383,7 +384,7 @@ private fun NfBottomBar(current: TopDestination, onSelect: (TopDestination) -> U
                 selected = destination == current,
                 onClick = { onSelect(destination) },
                 icon = { Icon(destinationIcon(destination), contentDescription = null) },
-                label = { Text(destination.label) }
+                label = { Text(stringResource(destination.labelRes)) }
             )
         }
     }
@@ -397,7 +398,7 @@ private fun NfRail(current: TopDestination, onSelect: (TopDestination) -> Unit) 
                 selected = destination == current,
                 onClick = { onSelect(destination) },
                 icon = { Icon(destinationIcon(destination), contentDescription = null) },
-                label = { Text(destination.label) }
+                label = { Text(stringResource(destination.labelRes)) }
             )
         }
     }

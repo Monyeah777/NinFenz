@@ -27,7 +27,7 @@ import org.robolectric.annotation.Config
 
 /** W6：Robolectric + Compose 语义测试（无需模拟器）。 */
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [34], qualifiers = "w360dp-h640dp-xhdpi")
+@Config(sdk = [34], qualifiers = "zh-rCN-w360dp-h640dp-xhdpi")
 class ComposeSmokeTest {
 
     @get:Rule
