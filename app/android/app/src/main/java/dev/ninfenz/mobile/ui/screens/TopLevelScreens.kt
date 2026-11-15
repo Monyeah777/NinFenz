@@ -82,14 +82,14 @@ fun LibraryHomeScreen(
         ) {
             item {
                 NfGradientHero(
-                    title = "把内容写进协议",
-                    subtitle = "本地处理 · 无网络 · 示例已就绪",
+                    title = stringResource(dev.ninfenz.mobile.R.string.library_hero_title),
+                    subtitle = stringResource(dev.ninfenz.mobile.R.string.library_hero_subtitle),
                     modifier = Modifier.padding(horizontal = NfSpacing.page)
                 ) {
                     Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                        Button(onClick = onImport) { Text("导入内容") }
+                        Button(onClick = onImport) { Text(stringResource(dev.ninfenz.mobile.R.string.library_import)) }
                         TextButton(onClick = onSeed, enabled = !seeding) {
-                            Text(if (seeding) "载入中…" else "载入示例")
+                            Text(if (seeding) stringResource(dev.ninfenz.mobile.R.string.library_loading_sample) else stringResource(dev.ninfenz.mobile.R.string.library_load_sample))
                         }
                     }
                     SeedLine(seedState)
@@ -99,17 +99,17 @@ fun LibraryHomeScreen(
                 item {
                     NfEmptyState(
                         icon = Icons.Filled.Home,
-                        title = "还没有内容",
-                        message = "载入内置示例 Pack，或从文件管理器/分享导入第一份内容。",
-                        actionLabel = "载入示例 Pack",
+                        title = stringResource(dev.ninfenz.mobile.R.string.library_empty_title),
+                        message = stringResource(dev.ninfenz.mobile.R.string.library_empty_body),
+                        actionLabel = stringResource(dev.ninfenz.mobile.R.string.library_action_load_sample),
                         onAction = onSeed,
-                        secondaryLabel = "导入文件",
+                        secondaryLabel = stringResource(dev.ninfenz.mobile.R.string.library_action_import_file),
                         onSecondary = onImport
                     )
                 }
             }
             if (projects.isNotEmpty()) {
-                item { NfSectionHeader("最近项目") }
+                item { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.library_section_projects)) }
                 items(projects.size) { index ->
                     val entry = projects[index]
                     NfCard(
@@ -128,8 +128,8 @@ fun LibraryHomeScreen(
             }
             if (packs.isNotEmpty()) {
                 item {
-                    NfSectionHeader("已安装 Pack", action = {
-                        TextButton(onClick = onPackCenter) { Text("管理") }
+                    NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.library_section_packs), action = {
+                        TextButton(onClick = onPackCenter) { Text(stringResource(dev.ninfenz.mobile.R.string.library_manage)) }
                     })
                 }
                 items(packs.size) { index ->
@@ -160,7 +160,7 @@ fun LibraryHomeScreen(
                         modifier = Modifier.padding(horizontal = NfSpacing.page)
                     ) {
                         Column(modifier = Modifier.padding(NfSpacing.m)) {
-                            Text("有 " + errors.size + " 个条目无法读取", style = MaterialTheme.typography.titleMedium)
+                            Text(stringResource(dev.ninfenz.mobile.R.string.library_errors, errors.size), style = MaterialTheme.typography.titleMedium)
                             errors.take(3).forEach { Text(it, style = MaterialTheme.typography.bodySmall) }
                         }
                     }
@@ -174,12 +174,12 @@ fun LibraryHomeScreen(
 private fun SeedLine(seed: SeedResult?) {
     when (seed) {
         is SeedResult.Installed -> Text(
-            "示例已载入：" + seed.id + " · " + seed.version,
+            stringResource(dev.ninfenz.mobile.R.string.library_seed_ready, seed.id, seed.version),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.primary
         )
         is SeedResult.AlreadyPresent -> Text(
-            "示例已存在：" + seed.id + " · " + seed.version,
+            stringResource(dev.ninfenz.mobile.R.string.library_seed_exists, seed.id, seed.version),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.primary
         )
@@ -207,11 +207,11 @@ fun CreateScreen(
         if (packs.isEmpty()) {
             NfEmptyState(
                 icon = Icons.Filled.Edit,
-                title = "还没有可用的 Pack",
-                message = "先载入内置示例 Pack，或从文件管理器导入 Pack，再创建项目。",
-                actionLabel = "载入示例 Pack",
+                title = stringResource(dev.ninfenz.mobile.R.string.create_no_pack_title),
+                message = stringResource(dev.ninfenz.mobile.R.string.create_no_pack_body),
+                actionLabel = stringResource(dev.ninfenz.mobile.R.string.create_action_load_sample),
                 onAction = onLoadSample,
-                secondaryLabel = "导入内容",
+                secondaryLabel = stringResource(dev.ninfenz.mobile.R.string.create_action_import),
                 onSecondary = onImport
             )
         } else {
@@ -227,9 +227,9 @@ fun CreateScreen(
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(NfSpacing.m)) {
                             Icon(Icons.Filled.Add, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                             Column(modifier = Modifier.weight(1f)) {
-                                Text("从 Pack 新建项目", style = MaterialTheme.typography.titleMedium)
+                                Text(stringResource(dev.ninfenz.mobile.R.string.create_from_pack), style = MaterialTheme.typography.titleMedium)
                                 Text(
-                                    "选择示例 Pack → 标题 → 创建（core 校验引用）",
+                                    stringResource(dev.ninfenz.mobile.R.string.create_from_pack_subtitle),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -241,16 +241,16 @@ fun CreateScreen(
                     item {
                         NfEmptyState(
                             icon = Icons.Filled.Edit,
-                            title = "还没有项目",
-                            message = "选一个 Pack 创建项目，或先导入内容。",
-                            actionLabel = "新建项目",
+                            title = stringResource(dev.ninfenz.mobile.R.string.create_no_project_title),
+                            message = stringResource(dev.ninfenz.mobile.R.string.create_no_project_body),
+                            actionLabel = stringResource(dev.ninfenz.mobile.R.string.create_action_new),
                             onAction = onCreateProject,
-                            secondaryLabel = "查看库",
+                            secondaryLabel = stringResource(dev.ninfenz.mobile.R.string.create_action_library),
                             onSecondary = onGoLibrary
                         )
                     }
                 } else {
-                    item { NfSectionHeader("项目") }
+                    item { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.create_section_projects)) }
                     items(projects.size) { index ->
                         val entry = projects[index]
                         NfCard(
@@ -290,11 +290,11 @@ fun DeliverScreen(
         if (projects.isEmpty()) {
             NfEmptyState(
                 icon = Icons.AutoMirrored.Filled.List,
-                title = "还没有可交付的项目",
-                message = "先创建或打开一个项目，再装配、校验、导出与分享。",
-                actionLabel = "去创作",
+                title = stringResource(dev.ninfenz.mobile.R.string.deliver_empty_title),
+                message = stringResource(dev.ninfenz.mobile.R.string.deliver_empty_body),
+                actionLabel = stringResource(dev.ninfenz.mobile.R.string.deliver_action_create),
                 onAction = onGoCreate,
-                secondaryLabel = "Pack 更新",
+                secondaryLabel = stringResource(dev.ninfenz.mobile.R.string.deliver_action_pack_update),
                 onSecondary = onPackUpdate
             )
         } else {
@@ -302,7 +302,7 @@ fun DeliverScreen(
                 contentPadding = androidx.compose.foundation.layout.PaddingValues(vertical = NfSpacing.l),
                 verticalArrangement = Arrangement.spacedBy(NfSpacing.m)
             ) {
-                item { NfSectionHeader("项目") }
+                item { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.create_section_projects)) }
                 items(projects.size) { index ->
                     val entry = projects[index]
                     NfCard(
@@ -318,23 +318,23 @@ fun DeliverScreen(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
-                            Button(onClick = { onOpenDelivery(entry) }) { Text("去交付") }
+                            Button(onClick = { onOpenDelivery(entry) }) { Text(stringResource(dev.ninfenz.mobile.R.string.deliver_action_go)) }
                         }
                     }
                 }
-                item { NfSectionHeader("更多") }
+                item { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.deliver_section_more)) }
                 item {
                     NfListRow(
-                        title = "Pack 中心",
-                        subtitle = "已装列表 / 校验 / 更新",
+                        title = stringResource(dev.ninfenz.mobile.R.string.deliver_pack_center_title),
+                        subtitle = stringResource(dev.ninfenz.mobile.R.string.deliver_pack_center_subtitle),
                         leading = Icons.Filled.Refresh,
                         onClick = onPackUpdate
                     )
                 }
                 item {
                     NfListRow(
-                        title = "CCOS 交接",
-                        subtitle = "task / result / 人审",
+                        title = stringResource(dev.ninfenz.mobile.R.string.deliver_ccos_title),
+                        subtitle = stringResource(dev.ninfenz.mobile.R.string.deliver_ccos_subtitle),
                         leading = Icons.Filled.Info,
                         onClick = onCcos
                     )
@@ -360,7 +360,7 @@ fun MeScreen(
             contentPadding = androidx.compose.foundation.layout.PaddingValues(vertical = NfSpacing.l),
             verticalArrangement = Arrangement.spacedBy(NfSpacing.m)
         ) {
-            item { NfSectionHeader("外观") }
+            item { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.me_section_appearance)) }
             item {
                 Row(
                     modifier = Modifier.padding(horizontal = NfSpacing.page),
@@ -375,20 +375,20 @@ fun MeScreen(
                     }
                 }
             }
-            item { NfSectionHeader("语言") }
+            item { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.me_section_language)) }
             item {
                 NfListRow(
-                    title = "中文（默认）",
-                    subtitle = "English 在 v0.1 接入",
+                    title = stringResource(dev.ninfenz.mobile.R.string.me_language_title),
+                    subtitle = stringResource(dev.ninfenz.mobile.R.string.me_language_subtitle),
                     leading = Icons.Filled.Person,
                     trailing = "›",
                     onClick = onSettings
                 )
             }
-            item { NfSectionHeader("存储与诊断") }
+            item { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.me_section_storage)) }
             item {
                 NfListRow(
-                    title = "存储与数据",
+                    title = stringResource(dev.ninfenz.mobile.R.string.me_storage_title),
                     subtitle = storageText,
                     leading = Icons.Filled.Home,
                     trailing = "›",
@@ -397,18 +397,18 @@ fun MeScreen(
             }
             item {
                 NfListRow(
-                    title = "诊断",
-                    subtitle = if (nativeReady) "核心正常 · " + (abi ?: "") else "核心不可用（NF-E-005）",
+                    title = stringResource(dev.ninfenz.mobile.R.string.me_diagnostic_title),
+                    subtitle = if (nativeReady) stringResource(dev.ninfenz.mobile.R.string.me_diag_ok, abi ?: "") else stringResource(dev.ninfenz.mobile.R.string.me_diag_missing),
                     leading = Icons.Filled.Refresh,
                     trailing = "›",
                     onClick = onSettings
                 )
             }
-            item { NfSectionHeader("关于") }
+            item { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.me_section_about)) }
             item {
                 NfListRow(
-                    title = "关于 NF / 许可 / 隐私",
-                    subtitle = "本地处理 · 无网络权限 · 无遥测",
+                    title = stringResource(dev.ninfenz.mobile.R.string.me_about_title),
+                    subtitle = stringResource(dev.ninfenz.mobile.R.string.me_about_subtitle),
                     leading = Icons.Filled.Info,
                     trailing = "›",
                     onClick = onAbout
@@ -435,30 +435,30 @@ fun ProjectDetailScreen(
                 NfCard {
                     Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text("状态", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+                            Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_status), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
                             NfStatusChip(projectStatusLabel(project))
                         }
-                        Text("项目 ID：" + project.id, style = MaterialTheme.typography.bodySmall)
+                        Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_id, project.id), style = MaterialTheme.typography.bodySmall)
                         Text(
-                            "Pack：" + project.refs.basePackId + " · " + project.refs.basePackVersion,
+                            stringResource(dev.ninfenz.mobile.R.string.project_detail_pack, project.refs.basePackId, project.refs.basePackVersion),
                             style = MaterialTheme.typography.bodySmall
                         )
                         Text(
-                            "协议：" + project.refs.protocolId.ifBlank { "未绑定" },
+                            stringResource(dev.ninfenz.mobile.R.string.project_detail_protocol, project.refs.protocolId.ifBlank { "未绑定" }),
                             style = MaterialTheme.typography.bodySmall
                         )
                         Text(
-                            "历史：" + project.historyCount + " 条",
+                            stringResource(dev.ninfenz.mobile.R.string.project_detail_history, project.historyCount),
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
                 }
             }
             item {
-                NfSectionHeader("继续")
+                NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.project_detail_section_continue))
             }
-            item { NfListRow("创作台", "协议 / 管线 / 规格（核心校验）", Icons.Filled.Edit, "›", onAuthor) }
-            item { NfListRow("装配与交付", "预览 / 校验 / 导出", Icons.Filled.Info, "›", onAssembly) }
+            item { NfListRow(stringResource(dev.ninfenz.mobile.R.string.project_detail_author), stringResource(dev.ninfenz.mobile.R.string.project_detail_author_subtitle), Icons.Filled.Edit, "›", onAuthor) }
+            item { NfListRow(stringResource(dev.ninfenz.mobile.R.string.project_detail_delivery), stringResource(dev.ninfenz.mobile.R.string.project_detail_delivery_subtitle), Icons.Filled.Info, "›", onAssembly) }
         }
     }
 }
@@ -481,9 +481,9 @@ fun PackDetailScreen(pack: PackEntry, onBack: () -> Unit, onUpdate: () -> Unit) 
                     Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                         Text(pack.id + " · " + pack.version, style = MaterialTheme.typography.titleMedium)
                         Text(pack.description, style = MaterialTheme.typography.bodyMedium)
-                        Text("条目：" + pack.itemCount, style = MaterialTheme.typography.bodySmall)
-                        Text("tree：" + pack.tree.take(16) + "…", style = MaterialTheme.typography.bodySmall)
-                        Text("目录：" + pack.dir.absolutePath, style = MaterialTheme.typography.bodySmall)
+                        Text(stringResource(dev.ninfenz.mobile.R.string.pack_detail_items, pack.itemCount), style = MaterialTheme.typography.bodySmall)
+                        Text(stringResource(dev.ninfenz.mobile.R.string.pack_detail_tree, pack.tree.take(16) + "…"), style = MaterialTheme.typography.bodySmall)
+                        Text(stringResource(dev.ninfenz.mobile.R.string.pack_detail_dir, pack.dir.absolutePath), style = MaterialTheme.typography.bodySmall)
                     }
                 }
             }
@@ -511,7 +511,7 @@ fun PackDetailScreen(pack: PackEntry, onBack: () -> Unit, onUpdate: () -> Unit) 
                         },
                         enabled = !verifying
                     ) { Text(if (verifying) "校验中…" else "校验 Pack") }
-                    Button(onClick = onUpdate) { Text("Pack 更新") }
+                    Button(onClick = onUpdate) { Text(stringResource(dev.ninfenz.mobile.R.string.pack_detail_update)) }
                 }
             }
             if (report != null) {
