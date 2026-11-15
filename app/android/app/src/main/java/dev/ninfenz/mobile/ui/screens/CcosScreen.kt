@@ -19,6 +19,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.core.CoreError
 import dev.ninfenz.mobile.core.CoreResponse
@@ -68,8 +69,8 @@ fun CcosScreen(onBack: () -> Unit) {
             } catch (e: Exception) {
                 error = CoreResponse.failure(
                     (e as? dev.ninfenz.mobile.core.ModelException)?.code ?: "NF-CCOS-001",
-                    "ccos-task 解析失败：" + (e.message ?: e.javaClass.simpleName),
-                    "按 app/schema/ccos-task.schema.json 修正",
+                    context.getString(dev.ninfenz.mobile.R.string.ccos_task_parse_error, e.message ?: e.javaClass.simpleName),
+                    context.getString(dev.ninfenz.mobile.R.string.ccos_task_parse_fix),
                     1
                 ).error
             }
@@ -86,8 +87,8 @@ fun CcosScreen(onBack: () -> Unit) {
             } catch (e: Exception) {
                 error = CoreResponse.failure(
                     (e as? dev.ninfenz.mobile.core.ModelException)?.code ?: "NF-CCOS-001",
-                    "ccos-result 解析失败：" + (e.message ?: e.javaClass.simpleName),
-                    "按 app/schema/ccos-result.schema.json 修正",
+                    context.getString(dev.ninfenz.mobile.R.string.ccos_result_parse_error, e.message ?: e.javaClass.simpleName),
+                    context.getString(dev.ninfenz.mobile.R.string.ccos_result_parse_fix),
                     1
                 ).error
             }
@@ -99,12 +100,12 @@ fun CcosScreen(onBack: () -> Unit) {
         val rawT = rawTask
         val decision = CcosModel.review(current, approve, reviewer, note)
         if (!decision.ok) {
-            outcome = "未提交：" + decision.message
+            outcome = context.getString(dev.ninfenz.mobile.R.string.ccos_outcome_not_submitted, decision.message)
             return
         }
         val reviewed = CcosModel.withReview(current, decision.state, reviewer, note)
         if (rawT == null) {
-            outcome = "缺原始 task JSON：无法回钉 task_digest（重新加载 task）"
+            outcome = context.getString(dev.ninfenz.mobile.R.string.ccos_outcome_no_task)
             return
         }
         scope.launch {
@@ -117,7 +118,7 @@ fun CcosScreen(onBack: () -> Unit) {
                 }
                 val response = safeCall("ccos-import-result", payload)
                 if (response.ok) {
-                    outcome = "核心已接收结果：" + (response.result?.toString() ?: "（无 result）")
+                    outcome = context.getString(dev.ninfenz.mobile.R.string.ccos_outcome_accepted, response.result?.toString() ?: context.getString(dev.ninfenz.mobile.R.string.ccos_outcome_empty))
                     result = reviewed
                 } else {
                     error = response.error
@@ -128,20 +129,20 @@ fun CcosScreen(onBack: () -> Unit) {
         }
     }
 
-    NfScaffold(title = "CCOS 交接", onBack = onBack) {
-        CardBox(title = "1 · 准备（文件交换）") {
+    NfScaffold(title = stringResource(dev.ninfenz.mobile.R.string.ccos_title), onBack = onBack) {
+        CardBox(title = stringResource(dev.ninfenz.mobile.R.string.ccos_step1)) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(onClick = { taskPicker.launch(arrayOf("application/json", "text/plain")) }) { Text("打开 ccos-task") }
-                Button(onClick = { resultPicker.launch(arrayOf("application/json", "text/plain")) }) { Text("打开 ccos-result") }
+                Button(onClick = { taskPicker.launch(arrayOf("application/json", "text/plain")) }) { Text(stringResource(dev.ninfenz.mobile.R.string.ccos_open_task)) }
+                Button(onClick = { resultPicker.launch(arrayOf("application/json", "text/plain")) }) { Text(stringResource(dev.ninfenz.mobile.R.string.ccos_open_result)) }
             }
-            Notice("步骤：加载 ccos-task → 导入 ccos-result → 人工复核。APP 不直连 API；task/result 以文件交换，密钥只在 CCOS 执行面。", Tone.INFO)
+            Notice(stringResource(dev.ninfenz.mobile.R.string.ccos_steps_notice), Tone.INFO)
         }
 
         error?.let { ErrorNotice(it) }
 
         val t = task
         if (t != null) {
-            CardBox(title = "2 · 任务 " + t.id) {
+            CardBox(title = stringResource(dev.ninfenz.mobile.R.string.ccos_task_title, t.id)) {
                 KeyValue("created_at", t.createdAt)
                 KeyValue("pack", t.packId + " " + t.packVersion)
                 KeyValue("protocol digest", t.protocolDigest.take(16) + "…")
@@ -153,14 +154,14 @@ fun CcosScreen(onBack: () -> Unit) {
                 KeyValue("provenance", t.projectId + " · " + t.projectDigest.take(16) + "…")
             }
         } else {
-            EmptyState("尚未加载 ccos-task。")
+            EmptyState(stringResource(dev.ninfenz.mobile.R.string.ccos_no_task))
         }
 
         val r = result
         if (r != null) {
-            CardBox(title = "3 · 结果 " + r.taskId) {
+            CardBox(title = stringResource(dev.ninfenz.mobile.R.string.ccos_result_title, r.taskId)) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("状态", style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(dev.ninfenz.mobile.R.string.ccos_status), style = MaterialTheme.typography.bodySmall)
                     NfStatusChip(r.status)
                 }
                 KeyValue("task_digest", r.taskDigest.take(24) + "…")
@@ -181,26 +182,26 @@ fun CcosScreen(onBack: () -> Unit) {
                 }
                 KeyValue("required", r.reviewRequired.toString())
                 if (r.reviewState != "pending") {
-                    Notice("已裁决：state=" + r.reviewState + " · reviewer=" + (r.reviewer ?: "-"), Tone.INFO)
+                    Notice(stringResource(dev.ninfenz.mobile.R.string.ccos_review_done, r.reviewState, r.reviewer ?: "-"), Tone.INFO)
                 }
             }
 
-            CardBox(title = "4 · 人审（必填留痕）") {
+            CardBox(title = stringResource(dev.ninfenz.mobile.R.string.ccos_review_title)) {
                 if (r.reviewState != "pending") {
-                    EmptyState("该结果已裁决，不可重复人审。")
+                    EmptyState(stringResource(dev.ninfenz.mobile.R.string.ccos_review_closed))
                 } else {
                     FormTextField(label = "reviewer", value = reviewer, onValueChange = { reviewer = it })
-                    FormTextField(label = "note（必填）", value = note, onValueChange = { note = it }, singleLine = false)
+                    FormTextField(label = stringResource(dev.ninfenz.mobile.R.string.ccos_note_field), value = note, onValueChange = { note = it }, singleLine = false)
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Button(enabled = !busy, onClick = { submitReview(true) }) { Text(if (busy) "提交中…" else "通过并回传") }
-                        OutlinedButton(enabled = !busy, onClick = { submitReview(false) }) { Text("驳回") }
+                        Button(enabled = !busy, onClick = { submitReview(true) }) { Text(if (busy) stringResource(dev.ninfenz.mobile.R.string.ccos_submitting) else stringResource(dev.ninfenz.mobile.R.string.ccos_submit)) }
+                        OutlinedButton(enabled = !busy, onClick = { submitReview(false) }) { Text(stringResource(dev.ninfenz.mobile.R.string.ccos_reject)) }
                     }
-                    Notice("通过/驳回都必须 reviewer + note；结果 required=true 不可关（NF-CCOS-004）。", Tone.INFO)
+                    Notice(stringResource(dev.ninfenz.mobile.R.string.ccos_review_notice), Tone.INFO)
                 }
                 outcome?.let { MonoText(it) }
             }
         } else {
-            EmptyState("尚未加载 ccos-result。")
+            EmptyState(stringResource(dev.ninfenz.mobile.R.string.ccos_no_result))
         }
     }
 }

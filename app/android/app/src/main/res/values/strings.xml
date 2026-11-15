@@ -238,4 +238,31 @@
     <string name="delivery_status_validated">已校验</string>
     <string name="delivery_status_exported">已导出</string>
     <string name="delivery_status_reviewed">已人审</string>
+
+    <string name="ccos_title">CCOS 交接</string>
+    <string name="ccos_step1">1 · 准备（文件交换）</string>
+    <string name="ccos_open_task">打开 ccos-task</string>
+    <string name="ccos_open_result">打开 ccos-result</string>
+    <string name="ccos_steps_notice">步骤：加载 ccos-task → 导入 ccos-result → 人工复核。APP 不直连 API；task/result 以文件交换，密钥只在 CCOS 执行面。</string>
+    <string name="ccos_task_title">2 · 任务 %1$s</string>
+    <string name="ccos_no_task">尚未加载 ccos-task。</string>
+    <string name="ccos_result_title">3 · 结果 %1$s</string>
+    <string name="ccos_status">状态</string>
+    <string name="ccos_review_done">已裁决：state=%1$s · reviewer=%2$s</string>
+    <string name="ccos_review_title">4 · 人审（必填留痕）</string>
+    <string name="ccos_review_closed">该结果已裁决，不可重复人审。</string>
+    <string name="ccos_note_field">note（必填）</string>
+    <string name="ccos_submit">通过并回传</string>
+    <string name="ccos_submitting">提交中…</string>
+    <string name="ccos_reject">驳回</string>
+    <string name="ccos_review_notice">通过/驳回都必须 reviewer + note；结果 required=true 不可关（NF-CCOS-004）。</string>
+    <string name="ccos_no_result">尚未加载 ccos-result。</string>
+    <string name="ccos_task_parse_error">ccos-task 解析失败：%1$s</string>
+    <string name="ccos_task_parse_fix">按 app/schema/ccos-task.schema.json 修正</string>
+    <string name="ccos_result_parse_error">ccos-result 解析失败：%1$s</string>
+    <string name="ccos_result_parse_fix">按 app/schema/ccos-result.schema.json 修正</string>
+    <string name="ccos_outcome_not_submitted">未提交：%1$s</string>
+    <string name="ccos_outcome_no_task">缺原始 task JSON：无法回钉 task_digest（重新加载 task）</string>
+    <string name="ccos_outcome_accepted">核心已接收结果：%1$s</string>
+    <string name="ccos_outcome_empty">（无 result）</string>
 </resources>

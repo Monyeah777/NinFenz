@@ -238,4 +238,31 @@
     <string name="delivery_status_validated">Validated</string>
     <string name="delivery_status_exported">Exported</string>
     <string name="delivery_status_reviewed">Reviewed</string>
+
+    <string name="ccos_title">CCOS handoff</string>
+    <string name="ccos_step1">1 · Prepare (file exchange)</string>
+    <string name="ccos_open_task">Open ccos-task</string>
+    <string name="ccos_open_result">Open ccos-result</string>
+    <string name="ccos_steps_notice">Flow: load ccos-task → import ccos-result → human review. The app never calls the API directly; task/result travel as files and keys stay in the CCOS execution plane.</string>
+    <string name="ccos_task_title">2 · Task %1$s</string>
+    <string name="ccos_no_task">No ccos-task loaded yet.</string>
+    <string name="ccos_result_title">3 · Result %1$s</string>
+    <string name="ccos_status">Status</string>
+    <string name="ccos_review_done">Decided: state=%1$s · reviewer=%2$s</string>
+    <string name="ccos_review_title">4 · Human review (audit required)</string>
+    <string name="ccos_review_closed">This result is already decided; review cannot repeat.</string>
+    <string name="ccos_note_field">note (required)</string>
+    <string name="ccos_submit">Approve &amp; hand back</string>
+    <string name="ccos_submitting">Submitting…</string>
+    <string name="ccos_reject">Reject</string>
+    <string name="ccos_review_notice">Approve/reject both require reviewer + note; results with required=true cannot be closed (NF-CCOS-004).</string>
+    <string name="ccos_no_result">No ccos-result loaded yet.</string>
+    <string name="ccos_task_parse_error">Failed to parse ccos-task: %1$s</string>
+    <string name="ccos_task_parse_fix">Fix per app/schema/ccos-task.schema.json</string>
+    <string name="ccos_result_parse_error">Failed to parse ccos-result: %1$s</string>
+    <string name="ccos_result_parse_fix">Fix per app/schema/ccos-result.schema.json</string>
+    <string name="ccos_outcome_not_submitted">Not submitted: %1$s</string>
+    <string name="ccos_outcome_no_task">Missing original task JSON: cannot pin task_digest (reload task)</string>
+    <string name="ccos_outcome_accepted">Core accepted result: %1$s</string>
+    <string name="ccos_outcome_empty">(no result)</string>
 </resources>

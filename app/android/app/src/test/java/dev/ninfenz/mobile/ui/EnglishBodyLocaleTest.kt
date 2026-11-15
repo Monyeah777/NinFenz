@@ -10,6 +10,7 @@ import dev.ninfenz.mobile.data.LibraryStore
 import dev.ninfenz.mobile.data.ProjectFactory
 import dev.ninfenz.mobile.model.ProjectModel
 import dev.ninfenz.mobile.ui.screens.AuthorScreen
+import dev.ninfenz.mobile.ui.screens.CcosScreen
 import dev.ninfenz.mobile.ui.screens.DeliveryScreen
 import dev.ninfenz.mobile.ui.screens.ImportScreen
 import dev.ninfenz.mobile.ui.screens.NewProjectScreen
@@ -97,6 +98,14 @@ class EnglishBodyLocaleTest {
         )
         compose.setContent { NfTheme { DeliveryScreen(project = project, pack = null, onBack = {}) } }
         compose.onNodeWithText("Bound pack is not on this device").assertIsDisplayed()
+    }
+
+    @Test
+    fun ccosUsesEnglishBody() {
+        compose.setContent { NfTheme { CcosScreen(onBack = {}) } }
+        compose.onNodeWithText("CCOS handoff").assertIsDisplayed()
+        compose.onNodeWithText("Open ccos-task").assertIsDisplayed()
+        compose.onNodeWithText("No ccos-task loaded yet.").assertIsDisplayed()
     }
 
     @Test
