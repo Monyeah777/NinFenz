@@ -23,6 +23,7 @@ import androidx.compose.material3.TextButton
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
@@ -63,6 +64,7 @@ import dev.ninfenz.mobile.ui.components.NfTopAppBar
 import dev.ninfenz.mobile.ui.safeCall
 import dev.ninfenz.mobile.ui.theme.NfSpacing
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonArray
@@ -339,6 +341,21 @@ private fun GraphAuthorContent(artifacts: AuthorArtifacts, project: Project, onS
     var edgeToPort by remember { mutableStateOf("in") }
     val scope = rememberCoroutineScope()
     val store = remember { AuthorArtifactStore(context.filesDir) }
+    var autoSavePrimed by remember { mutableStateOf(false) }
+    LaunchedEffect(graph) {
+        if (!autoSavePrimed) {
+            autoSavePrimed = true
+        } else {
+            delay(900)
+            when (val result = store.saveGraph(project, graph)) {
+                is SaveArtifactResult.Saved -> {
+                    savedMsg = context.getString(dev.ninfenz.mobile.R.string.author_saved_artifact, result.path, result.sha256.take(12))
+                    onSaved()
+                }
+                is SaveArtifactResult.Failure -> error = CoreError(result.code, result.message, result.fix, null, 1)
+            }
+        }
+    }
 
     Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.m)) {
         NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.author_nodes, graph.nodes.size))
@@ -505,6 +522,21 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
     var savedMsg by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
     val store = remember { AuthorArtifactStore(context.filesDir) }
+    var autoSavePrimed by remember { mutableStateOf(false) }
+    LaunchedEffect(spec) {
+        if (!autoSavePrimed) {
+            autoSavePrimed = true
+        } else {
+            delay(900)
+            when (val result = store.saveSpec(project, spec)) {
+                is SaveArtifactResult.Saved -> {
+                    savedMsg = context.getString(dev.ninfenz.mobile.R.string.author_saved_artifact, result.path, result.sha256.take(12))
+                    onSaved()
+                }
+                is SaveArtifactResult.Failure -> error = CoreError(result.code, result.message, result.fix, null, 1)
+            }
+        }
+    }
 
     Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.m)) {
         NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.author_sections, spec.sections.size))
