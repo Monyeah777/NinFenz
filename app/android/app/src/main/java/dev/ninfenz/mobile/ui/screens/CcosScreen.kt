@@ -16,6 +16,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -34,6 +35,7 @@ import dev.ninfenz.mobile.ui.components.FormTextField
 import dev.ninfenz.mobile.ui.components.KeyValue
 import dev.ninfenz.mobile.ui.components.MonoText
 import dev.ninfenz.mobile.ui.components.NfScaffold
+import dev.ninfenz.mobile.ui.components.NfStatusChip
 import dev.ninfenz.mobile.ui.components.Notice
 import dev.ninfenz.mobile.ui.components.Tone
 import kotlinx.coroutines.launch
@@ -126,20 +128,20 @@ fun CcosScreen(onBack: () -> Unit) {
         }
     }
 
-    NfScaffold(title = "CCOS · task/result/人审", onBack = onBack) {
-        CardBox(title = "输入") {
+    NfScaffold(title = "CCOS 交接", onBack = onBack) {
+        CardBox(title = "1 · 准备（文件交换）") {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(onClick = { taskPicker.launch(arrayOf("application/json", "text/plain")) }) { Text("打开 ccos-task") }
                 Button(onClick = { resultPicker.launch(arrayOf("application/json", "text/plain")) }) { Text("打开 ccos-result") }
             }
-            Notice("APP 不直连 API：task/result 以文件交换；密钥只在 CCOS 执行面。", Tone.INFO)
+            Notice("步骤：加载 ccos-task → 导入 ccos-result → 人工复核。APP 不直连 API；task/result 以文件交换，密钥只在 CCOS 执行面。", Tone.INFO)
         }
 
         error?.let { ErrorNotice(it) }
 
         val t = task
         if (t != null) {
-            CardBox(title = "任务 " + t.id) {
+            CardBox(title = "2 · 任务 " + t.id) {
                 KeyValue("created_at", t.createdAt)
                 KeyValue("pack", t.packId + " " + t.packVersion)
                 KeyValue("protocol digest", t.protocolDigest.take(16) + "…")
@@ -156,7 +158,11 @@ fun CcosScreen(onBack: () -> Unit) {
 
         val r = result
         if (r != null) {
-            CardBox(title = "结果 " + r.taskId + " · " + r.status) {
+            CardBox(title = "3 · 结果 " + r.taskId) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("状态", style = MaterialTheme.typography.bodySmall)
+                    NfStatusChip(r.status)
+                }
                 KeyValue("task_digest", r.taskDigest.take(24) + "…")
                 KeyValue("artifacts", r.artifacts.size.toString())
                 for (a in r.artifacts) {
@@ -169,13 +175,17 @@ fun CcosScreen(onBack: () -> Unit) {
                 }
                 KeyValue("report", r.reportSummary)
                 for (issue in r.issues) Notice(issue.code + "：" + issue.message, Tone.WARN)
-                KeyValue("human_review", r.reviewState + "（required=" + r.reviewRequired + "）")
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("human_review", style = MaterialTheme.typography.bodySmall)
+                    NfStatusChip(r.reviewState)
+                }
+                KeyValue("required", r.reviewRequired.toString())
                 if (r.reviewState != "pending") {
                     Notice("已裁决：state=" + r.reviewState + " · reviewer=" + (r.reviewer ?: "-"), Tone.INFO)
                 }
             }
 
-            CardBox(title = "人审（必填留痕）") {
+            CardBox(title = "4 · 人审（必填留痕）") {
                 if (r.reviewState != "pending") {
                     EmptyState("该结果已裁决，不可重复人审。")
                 } else {

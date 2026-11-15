@@ -4,7 +4,7 @@ NF APP 的 Android 控制面：本地处理、无账号、无遥测、**未声�
 app/docs/CONTRACT.md + app/docs/CLI.md + app/schema/error_codes.json（A0 冻结层）。
 
 > v0.02（W1）现状：四目的地外壳（库/创作/交付/我的）+ 自适应底部栏/rail + FAB 导入 + 首启示例 Pack/3 步引导 +
-> 设计 token/字体/暗色主题 + 自适应 launcher icon。旧 8 个功能页保留在详情层；W2 已接入新建项目向导、示例演示项目、本地搜索与 Pack 校验；W3 已把导入重做为产品向导；W4 已接入项目态创作台；W5 已接入项目态交付台（graph-compile→assemble→validate L1→export md/zip/docx→分享，PDF 仍平台打印）、Pack 中心（已装列表/逐 Pack 校验/详情/更新入口）；旧功能屏共用新的 NfScaffold/CardBox/Notice 视觉壳；W5 尾项 CCOS 与 W6 质量收口。
+> 设计 token/字体/暗色主题 + 自适应 launcher icon。旧 8 个功能页保留在详情层；W2 已接入新建项目向导、示例演示项目、本地搜索与 Pack 校验；W3 已把导入重做为产品向导；W4 已接入项目态创作台；W5 已接入项目态交付台（graph-compile→assemble→validate L1→export md/zip/docx→分享，PDF 仍平台打印）、Pack 中心（已装列表/逐 Pack 校验/详情/更新入口）、CCOS 步骤化（准备→任务→结果→人审，状态 chip）；旧功能屏共用新的 NfScaffold/CardBox/Notice 视觉壳；W6 质量收口。
 
 ## 工程结构
 
@@ -109,7 +109,7 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 ## 构建证据（本机，2026-11-15）
 
 - v0.02 W5（2026-11-15）：`./gradlew :app:assembleDebug` 成功：app-debug.apk = 18,323,958 bytes，
-  sha256 = 5383591f6baad26d273276341e84357460fa148bfdbf094259a6f43a6c85afe9（含双 ABI 原生库 + 9 个示例 Pack assets）。
+  sha256 = 683415856878847bad51aaa678e2ca1733f56fe41a3f993eb449684b652293f0（含双 ABI 原生库 + 9 个示例 Pack assets）。
 - `./gradlew :app:testDebugUnitTest` 全绿：58 条 JVM 单测（42 基线 + AdaptiveLayout 4 + ShellState 4 + PackStore 3 + ProjectFactory 1 + ProjectCreator 2 + SearchIndex 3 + PackVerifier 1 + AuthorArtifactsLoader 2）。
 - `zipalign -c -P 16 -v 4 app-debug.apk` → Verification successful（native lib 16KB page 对齐）。
 - `bash app/scripts/build_core_android.sh --clean` 成功：NDK 27.0.12077973 + rustup targets
