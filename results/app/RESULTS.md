@@ -24,9 +24,9 @@
 
 | 项 | 结果 |
 |---|---|
-| APK | app-debug.apk = 18,580,671 B；sha256 4b353686e16f84b4a6a3b188de8e7fe608dbcc2d778e3fa16dd45c85efc970a5 |
-| JVM 测试 | 103 条全绿（v1 基线 42 + v0.02 新增 61；含 Robolectric/Compose） |
-| 构建 | ./gradlew :app:assembleDebug 成功；:app:testDebugUnitTest 90/90 |
+| APK | app-debug.apk = 18,590,279 B；sha256 8b0e4dc09cf7fbba17de2e80843fda013cb0966af44b7d6008a30a4531a28233 |
+| JVM 测试 | 105 条全绿（v1 基线 42 + v0.02 新增 63；含 Robolectric/Compose） |
+| 构建 | ./gradlew :app:assembleDebug 成功；:app:testDebugUnitTest 105/105 |
 | i18n | 全部屏主要文案已资源化 + values-en；少量错误/技术提示仍内联（OPEN-I18N-BODY 缩为尾项） |
 | 适配 | compact/medium/expanded 三档导航 + 9 组窗口尺寸语义矩阵 |
 | app/gates | 7/7 gate PASS、FAIL=0（QA0 10 checks、QA5 5 checks；含 v0.02 UX/i18n/测试矩阵检查） |
@@ -34,7 +34,7 @@
 ### 0.3 状态
 
 - W1–W5：已完成（v0.02 范围）。
-- W4b：作者覆盖保存/撤销、状态写回已完成；管线/规格保存、草稿→项目仍 OPEN。
+- W4b：作者覆盖保存/撤销、状态写回、管线/规格编辑+保存（撤销/重做 + 防抖自动保存）已完成；草稿→项目仍 OPEN。
 - W6：部分完成（见 0.4）；未跑面不写成 pass。
 
 ### 0.4 v0.02 OPEN（带 owner+next）
@@ -45,7 +45,6 @@
 | OPEN-SCREENSHOT | 9 组尺寸已有语义矩阵；像素截图基线未接。已实测 Robolectric NATIVE 下 Compose captureToImage 超时（ComposeTimeoutException），该路径不可用 | lead | 需 Paparazzi/Roborazzi 或设备截图 |
 | OPEN-DEVICE | 真机/模拟器首启/分享/折叠/TalkBack/性能 | lead | 设备到位后跑 DEVICE_MATRIX 清单 |
 | OPEN-DRAFT-PROJECT | 导入草稿→项目转换未定义（契约无 import→project 字段） | lead | 需 v1 §15 契约变更评估 |
-| OPEN-AUTHOR-GRAPH-SPEC | 创作台仅保存协议条款/字段；管线/规格保存未做 | lead | overlay 扩展或项目引用重算 |
 | OPEN-REVIEWED | reviewed 状态与 CCOS 人审串联未做 | lead | project-validate + CCOS result 回钉 |
 
 ## 1. 结论（先行）

@@ -4,7 +4,7 @@ NF APP 的 Android 控制面：本地处理、无账号、无遥测、**未声�
 app/docs/CONTRACT.md + app/docs/CLI.md + app/schema/error_codes.json（A0 冻结层）。
 
 > v0.02（W1）现状：四目的地外壳（库/创作/交付/我的）+ 自适应底部栏/rail + FAB 导入 + 首启示例 Pack/3 步引导 +
-> 设计 token/字体/暗色主题 + 自适应 launcher icon。旧 8 个功能页保留在详情层；W2 已接入新建项目向导、示例演示项目、本地搜索与 Pack 校验；W3 已把导入重做为产品向导；W4 已接入项目态创作台；W5 已接入项目态交付台、Pack 中心、CCOS 步骤化；Pack 更新支持应用内「选新版 Pack zip → 安全解包 → core pack-diff → 决策 → apply/回滚」；W4b 已接入创作台作者覆盖保存（nf-overlay/1）与交付状态写回；W6 已开始质量收口（heading 语义、设计 token/路由可达单测、Robolectric+Compose 语义测试 7 条、三档导航 + 9 组窗口尺寸矩阵、外壳 i18n + values-en + 英文 locale 测试）；RESULTS/FINAL_DOD 已加 v0.02 增量段；app/gates 7/7 PASS（FAIL=0）。全部屏主要文案已资源化（含 Protocol/Graph/Assembly 旧屏）；少量错误/技术提示仍内联。
+> 设计 token/字体/暗色主题 + 自适应 launcher icon。旧 8 个功能页保留在详情层；W2 已接入新建项目向导、示例演示项目、本地搜索与 Pack 校验；W3 已把导入重做为产品向导；W4 已接入项目态创作台；W5 已接入项目态交付台、Pack 中心、CCOS 步骤化；Pack 更新支持应用内「选新版 Pack zip → 安全解包 → core pack-diff → 决策 → apply/回滚」；W4b 已接入创作台协议覆盖保存、管线/规格编辑+保存（撤销/重做 + 防抖自动保存）、交付状态写回；W6 已开始质量收口（heading 语义、设计 token/路由可达单测、Robolectric+Compose 语义测试 7 条、三档导航 + 9 组窗口尺寸矩阵、外壳 i18n + values-en + 英文 locale 测试）；RESULTS/FINAL_DOD 已加 v0.02 增量段；app/gates 7/7 PASS（FAIL=0）。全部屏主要文案已资源化（含 Protocol/Graph/Assembly 旧屏）；少量错误/技术提示仍内联。
 
 ## 工程结构
 
@@ -118,9 +118,9 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 
 ## 构建证据（本机，2026-11-15）
 
-- v0.02 W5（2026-11-15）：`./gradlew :app:assembleDebug` 成功：app-debug.apk = 18,323,958 bytes，
-  sha256 = 4b353686e16f84b4a6a3b188de8e7fe608dbcc2d778e3fa16dd45c85efc970a5（含双 ABI 原生库 + 9 个示例 Pack assets）。
-- `./gradlew :app:testDebugUnitTest` 全绿：58 条 JVM 单测（42 基线 + AdaptiveLayout 4 + ShellState 4 + PackStore 3 + ProjectFactory 1 + ProjectCreator 2 + SearchIndex 3 + PackVerifier 1 + AuthorArtifactsLoader 2）。
+- v0.02 W6（2026-11-15）：`./gradlew :app:assembleDebug` 成功：app-debug.apk = 18,590,279 bytes，
+  sha256 = 8b0e4dc09cf7fbba17de2e80843fda013cb0966af44b7d6008a30a4531a28233（含双 ABI 原生库 + 9 个示例 Pack assets）。
+- `./gradlew :app:testDebugUnitTest` 全绿：105 条 JVM 单测（v1 42 + v0.02 63；含 Robolectric/Compose 语义/矩阵/英文 locale）。
 - `zipalign -c -P 16 -v 4 app-debug.apk` → Verification successful（native lib 16KB page 对齐）。
 - `bash app/scripts/build_core_android.sh --clean` 成功：NDK 27.0.12077973 + rustup targets
   （aarch64-linux-android / x86_64-linux-android，经 rsproxy 镜像安装）；两个 .so 的 LOAD align 均为 0x4000。

@@ -19,7 +19,7 @@
 | i18n（全部屏主要文案） | partial | values-en + 资源化；少量错误/技术提示仍内联（OPEN-I18N-BODY 尾项） |
 | 像素截图矩阵 | OPEN | OPEN-SCREENSHOT；Robolectric captureToImage 实测超时，需 Paparazzi/Roborazzi/设备 |
 | 真机/模拟器 | OPEN-TOOLCHAIN | OPEN-DEVICE |
-| 草稿→项目；管线/规格保存；reviewed 串联 | OPEN | OPEN-DRAFT-PROJECT / OPEN-AUTHOR-GRAPH-SPEC / OPEN-REVIEWED |
+| 草稿→项目；reviewed 串联 | OPEN | OPEN-DRAFT-PROJECT / OPEN-REVIEWED |
 | app/gates v0.02 UX 检查 | pass | 7/7 gate PASS、FAIL=0；GATES/SELF_AUDIT 已更新（本提交） |
 
 **发布面：仍为 OPEN-EXTERNAL**（签名/公证/真机矩阵/Play 数据安全），不得据此宣称可发布。
