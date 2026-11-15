@@ -12,6 +12,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import dev.ninfenz.mobile.BuildConfig
 import dev.ninfenz.mobile.core.Core
 import dev.ninfenz.mobile.core.CoreBridgeNative
@@ -40,37 +41,37 @@ fun SettingsScreen(onBack: () -> Unit) {
         appendLine("telemetry=none network=denied account=none")
     }
 
-    NfScaffold(title = "Settings · 诊断/隐私", onBack = onBack) {
-        CardBox(title = "核心诊断") {
+    NfScaffold(title = stringResource(dev.ninfenz.mobile.R.string.settings_title), onBack = onBack) {
+        CardBox(title = stringResource(dev.ninfenz.mobile.R.string.settings_core_diag)) {
             KeyValue("backend", diag.backend)
-            KeyValue("ABI 版本", diag.abiVersion ?: "不可用")
-            KeyValue("原生库", if (diag.nativeReady) "已加载" else "缺失")
-            KeyValue("错误码登记", if (diag.errorCatalogLoaded) diag.errorCodeCount.toString() + " 条" else "未打包")
+            KeyValue(stringResource(dev.ninfenz.mobile.R.string.settings_abi), diag.abiVersion ?: stringResource(dev.ninfenz.mobile.R.string.settings_abi_unavailable))
+            KeyValue(stringResource(dev.ninfenz.mobile.R.string.settings_native), if (diag.nativeReady) stringResource(dev.ninfenz.mobile.R.string.settings_loaded) else stringResource(dev.ninfenz.mobile.R.string.settings_missing))
+            KeyValue(stringResource(dev.ninfenz.mobile.R.string.settings_err_registry), if (diag.errorCatalogLoaded) stringResource(dev.ninfenz.mobile.R.string.settings_err_count, diag.errorCodeCount) else stringResource(dev.ninfenz.mobile.R.string.settings_not_packaged))
             if (!diag.nativeReady) {
                 Notice("NF-E-005：共享核心原生库不可用。\n" + CoreBridgeNative.GUIDANCE, Tone.ERROR)
             }
             Text(
-                text = "错误码文本取自 app/schema/error_codes.json（构建时复制为资源）；登记条数 = " + ErrorCatalog.all().size,
+                text = stringResource(dev.ninfenz.mobile.R.string.settings_error_hint, ErrorCatalog.all().size),
                 style = MaterialTheme.typography.bodySmall
             )
         }
 
-        CardBox(title = "隐私说明") {
-            Text("• 全部处理在本机；APP 未声明 INTERNET 权限。", style = MaterialTheme.typography.bodySmall)
-            Text("• 无遥测、无账号、无云端同步；不直连任何 API。", style = MaterialTheme.typography.bodySmall)
-            Text("• 诊断信息只落本机（本页手动复制/分享）。", style = MaterialTheme.typography.bodySmall)
-            Text("• 分享只读 URI 限于 app cache/shared，可随时清理。", style = MaterialTheme.typography.bodySmall)
-            Text("• 密钥只属于 CCOS 执行面；APP 侧拒绝含密钥字段的 ccos-task/result（NF-CCOS-003）。", style = MaterialTheme.typography.bodySmall)
+        CardBox(title = stringResource(dev.ninfenz.mobile.R.string.settings_privacy)) {
+            Text(stringResource(dev.ninfenz.mobile.R.string.settings_privacy_1), style = MaterialTheme.typography.bodySmall)
+            Text(stringResource(dev.ninfenz.mobile.R.string.settings_privacy_2), style = MaterialTheme.typography.bodySmall)
+            Text(stringResource(dev.ninfenz.mobile.R.string.settings_privacy_3), style = MaterialTheme.typography.bodySmall)
+            Text(stringResource(dev.ninfenz.mobile.R.string.settings_privacy_4), style = MaterialTheme.typography.bodySmall)
+            Text(stringResource(dev.ninfenz.mobile.R.string.settings_privacy_5), style = MaterialTheme.typography.bodySmall)
         }
 
-        CardBox(title = "诊断信息") {
+        CardBox(title = stringResource(dev.ninfenz.mobile.R.string.settings_diag_info)) {
             MonoText(diagnosticsText)
             Button(onClick = {
                 val manager = context.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
                 manager?.setPrimaryClip(ClipData.newPlainText("NF Mobile diagnostics", diagnosticsText))
                 copied = true
             }) {
-                Text(if (copied) "已复制到剪贴板" else "复制诊断信息")
+                Text(if (copied) stringResource(dev.ninfenz.mobile.R.string.settings_copied) else stringResource(dev.ninfenz.mobile.R.string.settings_copy))
             }
         }
     }

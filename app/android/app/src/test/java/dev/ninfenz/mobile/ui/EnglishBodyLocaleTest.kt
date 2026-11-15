@@ -14,6 +14,8 @@ import dev.ninfenz.mobile.ui.screens.CcosScreen
 import dev.ninfenz.mobile.ui.screens.DeliveryScreen
 import dev.ninfenz.mobile.ui.screens.ImportScreen
 import dev.ninfenz.mobile.ui.screens.NewProjectScreen
+import dev.ninfenz.mobile.ui.screens.PackUpdateScreen
+import dev.ninfenz.mobile.ui.screens.SettingsScreen
 import dev.ninfenz.mobile.ui.screens.PackCenterScreen
 import dev.ninfenz.mobile.ui.screens.SearchScreen
 import dev.ninfenz.mobile.ui.screens.OnboardingScreen
@@ -106,6 +108,21 @@ class EnglishBodyLocaleTest {
         compose.onNodeWithText("CCOS handoff").assertIsDisplayed()
         compose.onNodeWithText("Open ccos-task").assertIsDisplayed()
         compose.onNodeWithText("No ccos-task loaded yet.").assertIsDisplayed()
+    }
+
+    @Test
+    fun settingsUsesEnglishBody() {
+        compose.setContent { NfTheme { SettingsScreen(onBack = {}) } }
+        compose.onNodeWithText("Settings · diagnostics/privacy").assertIsDisplayed()
+        compose.onNodeWithText("Privacy").assertIsDisplayed()
+    }
+
+    @Test
+    fun packUpdateUsesEnglishBody() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        compose.setContent { NfTheme { PackUpdateScreen(store = LibraryStore(context.filesDir), onBack = {}) } }
+        compose.onNodeWithText("PackUpdate · diff/conflicts/apply/rollback").assertIsDisplayed()
+        compose.onNodeWithText("No packs installed; load the sample from Library/Pack center first.").assertIsDisplayed()
     }
 
     @Test

@@ -22,6 +22,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.core.CoreError
 import dev.ninfenz.mobile.core.CoreResponse
@@ -137,12 +138,12 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit) {
 
     fun packDir(id: String, version: String): File = File(File(File(context.filesDir, "library/packs"), id), version)
 
-    NfScaffold(title = "PackUpdate · diff/冲突/应用/回滚", onBack = onBack) {
-        CardBox(title = "1 · 更新来源") {
+    NfScaffold(title = stringResource(dev.ninfenz.mobile.R.string.packupdate_title), onBack = onBack) {
+        CardBox(title = stringResource(dev.ninfenz.mobile.R.string.packupdate_step1)) {
             if (packs.isEmpty()) {
-                EmptyState("尚未安装任何 Pack；先到库/Pack 中心载入示例。")
+                EmptyState(stringResource(dev.ninfenz.mobile.R.string.packupdate_no_packs))
             } else {
-                Text("选择要更新的已装 Pack：", style = MaterialTheme.typography.bodySmall)
+                Text(stringResource(dev.ninfenz.mobile.R.string.packupdate_select_base), style = MaterialTheme.typography.bodySmall)
                 for (pack in packs) {
                     FilterChip(
                         selected = selected?.id == pack.id && selected?.version == pack.version,
@@ -153,14 +154,14 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit) {
                 }
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Button(onClick = { zipPicker.launch(arrayOf("application/zip", "application/octet-stream", "*/*")) }, enabled = !diffBusy) {
-                        Text(if (diffBusy) "比对中…" else "选择新版 Pack zip")
+                        Text(if (diffBusy) stringResource(dev.ninfenz.mobile.R.string.packupdate_compare) else stringResource(dev.ninfenz.mobile.R.string.packupdate_choose_zip))
                     }
                     OutlinedButton(onClick = { picker.launch(arrayOf("application/json", "text/plain")) }) { Text("打开更新计划") }
                 }
-                selected?.let { Text("base：" + it.id + " · " + it.version + "（" + it.dir.absolutePath + "）", style = MaterialTheme.typography.bodySmall) }
-                newRoot?.let { Text("new：" + it.absolutePath, style = MaterialTheme.typography.bodySmall) }
+                selected?.let { Text(stringResource(dev.ninfenz.mobile.R.string.packupdate_base, it.id, it.version, it.dir.absolutePath), style = MaterialTheme.typography.bodySmall) }
+                newRoot?.let { Text(stringResource(dev.ninfenz.mobile.R.string.packupdate_new, it.absolutePath), style = MaterialTheme.typography.bodySmall) }
                 if (selected != null && newRoot == null) {
-                    Notice("选择新版 zip 后会调用 core pack-diff 生成差异/冲突；也可直接打开已有 .nfupdate.json。", Tone.INFO)
+                    Notice(stringResource(dev.ninfenz.mobile.R.string.packupdate_hint), Tone.INFO)
                 }
             }
             val u = update
@@ -168,9 +169,9 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit) {
                 KeyValue("from", u.from.id + " " + u.from.version)
                 KeyValue("to", u.to.id + " " + u.to.version)
                 KeyValue("changes", "added " + u.added.size + " · removed " + u.removed.size + " · modified " + u.modified.size)
-                KeyValue("breaking", if (u.breaking) "是（删除/结构变更）" else "否")
-                KeyValue("影响项目", if (u.affectedProjects.isEmpty()) "（无）" else u.affectedProjects.joinToString(","))
-                KeyValue("overlay 键", if (u.overlayKeys.isEmpty()) "（无）" else u.overlayKeys.joinToString(","))
+                KeyValue("breaking", if (u.breaking) stringResource(dev.ninfenz.mobile.R.string.packupdate_breaking_yes) else stringResource(dev.ninfenz.mobile.R.string.packupdate_breaking_no))
+                KeyValue("影响项目", if (u.affectedProjects.isEmpty()) stringResource(dev.ninfenz.mobile.R.string.packupdate_none) else u.affectedProjects.joinToString(","))
+                KeyValue("overlay 键", if (u.overlayKeys.isEmpty()) stringResource(dev.ninfenz.mobile.R.string.packupdate_none) else u.overlayKeys.joinToString(","))
                 for (note in u.notes) Notice(note, Tone.WARN)
             }
         }
@@ -179,16 +180,16 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit) {
 
         val u = update
         if (u != null) {
-            CardBox(title = "变更") {
+            CardBox(title = stringResource(dev.ninfenz.mobile.R.string.packupdate_changes)) {
                 for (c in u.added) Text("+ " + c.path, style = MaterialTheme.typography.bodySmall)
                 for (c in u.removed) Text("- " + c.path, style = MaterialTheme.typography.bodySmall)
                 for (c in u.modified) Text("~ " + c.path, style = MaterialTheme.typography.bodySmall)
-                if (u.totalChanges == 0) EmptyState("无变更")
+                if (u.totalChanges == 0) EmptyState(stringResource(dev.ninfenz.mobile.R.string.packupdate_no_changes))
             }
 
-            CardBox(title = "冲突决策（默认 defer）") {
+            CardBox(title = stringResource(dev.ninfenz.mobile.R.string.packupdate_conflicts)) {
                 if (u.conflicts.isEmpty()) {
-                    Notice("无冲突：可直接应用。", Tone.INFO)
+                    Notice(stringResource(dev.ninfenz.mobile.R.string.packupdate_no_conflicts), Tone.INFO)
                 } else {
                     for (conflict in u.conflicts) {
                         Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -208,18 +209,18 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit) {
                     }
                     val unresolved = u.conflicts.filter { (decisions[it.id] ?: it.defaultOption) == "defer" }
                     if (unresolved.isEmpty()) {
-                        Notice("全部冲突已裁决（" + u.conflicts.size + " 个）", Tone.INFO)
+                        Notice(stringResource(dev.ninfenz.mobile.R.string.packupdate_all_decided, u.conflicts.size), Tone.INFO)
                     } else {
-                        Notice("未裁决 " + unresolved.size + " 个：defer 不得应用（NF-PCK-006）", Tone.ERROR)
+                        Notice(stringResource(dev.ninfenz.mobile.R.string.packupdate_unresolved, unresolved.size), Tone.ERROR)
                     }
                 }
             }
 
-            CardBox(title = "应用 / 回滚") {
+            CardBox(title = stringResource(dev.ninfenz.mobile.R.string.packupdate_apply_rollback)) {
                 val base = selected?.dir ?: packDir(u.from.id, u.from.version)
                 val target = newRoot ?: packDir(u.to.id, u.to.version)
-                KeyValue("base 目录", if (base.exists()) "在场" else "缺失 " + base.absolutePath)
-                KeyValue("new 目录", if (target.exists()) "在场" else "缺失 " + target.absolutePath)
+                KeyValue(stringResource(dev.ninfenz.mobile.R.string.packupdate_base_dir), if (base.exists()) stringResource(dev.ninfenz.mobile.R.string.packupdate_present) else stringResource(dev.ninfenz.mobile.R.string.packupdate_missing, base.absolutePath))
+                KeyValue(stringResource(dev.ninfenz.mobile.R.string.packupdate_new_dir), if (target.exists()) stringResource(dev.ninfenz.mobile.R.string.packupdate_present) else stringResource(dev.ninfenz.mobile.R.string.packupdate_missing, target.absolutePath))
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Button(
                         enabled = !busy && base.exists() && target.exists() && u.conflicts.all { (decisions[it.id] ?: it.defaultOption) != "defer" },
@@ -251,7 +252,7 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit) {
                                 }
                             }
                         }
-                    ) { Text(if (busy) "应用中…" else "应用更新") }
+                    ) { Text(if (busy) stringResource(dev.ninfenz.mobile.R.string.packupdate_applying) else stringResource(dev.ninfenz.mobile.R.string.packupdate_apply)) }
 
                     OutlinedButton(
                         enabled = !busy && base.exists() && target.exists(),
@@ -274,7 +275,7 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit) {
                                     }
                                     val response = safeCall("pack-merge", payload)
                                     if (response.ok) {
-                                        resultText = "回滚结果：" + response.result?.toString()
+                                        resultText = context.getString(dev.ninfenz.mobile.R.string.packupdate_result, response.result?.toString() ?: "")
                                     } else {
                                         error = response.error
                                     }
@@ -283,10 +284,10 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit) {
                                 }
                             }
                         }
-                    ) { Text(if (busy) "回滚中…" else "回滚") }
+                    ) { Text(if (busy) stringResource(dev.ninfenz.mobile.R.string.packupdate_rolling) else stringResource(dev.ninfenz.mobile.R.string.packupdate_rollback)) }
                 }
                 resultText?.let { MonoText(it) }
-                Notice("应用/回滚均为原子替换 + 复验；失败时核心返回错误码（NF-PCK-00x）而不是静默部分写入。", Tone.INFO)
+                Notice(stringResource(dev.ninfenz.mobile.R.string.packupdate_notice), Tone.INFO)
             }
         }
     }
