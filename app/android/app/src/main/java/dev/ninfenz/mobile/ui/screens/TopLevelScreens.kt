@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -77,8 +79,8 @@ fun LibraryHomeScreen(
         NfTopAppBar(
             title = stringResource(dev.ninfenz.mobile.R.string.nav_library),
             actions = {
-                IconButton(onClick = onSearch) { Icon(Icons.Filled.Search, contentDescription = stringResource(dev.ninfenz.mobile.R.string.action_search)) }
-                IconButton(onClick = onSettings) { Icon(Icons.Filled.Settings, contentDescription = stringResource(dev.ninfenz.mobile.R.string.action_settings)) }
+                IconButton(onClick = onSearch, modifier = Modifier.size(48.dp)) { Icon(Icons.Filled.Search, contentDescription = stringResource(dev.ninfenz.mobile.R.string.action_search)) }
+                IconButton(onClick = onSettings, modifier = Modifier.size(48.dp)) { Icon(Icons.Filled.Settings, contentDescription = stringResource(dev.ninfenz.mobile.R.string.action_settings)) }
             }
         )
         PullToRefreshBox(
@@ -98,8 +100,8 @@ fun LibraryHomeScreen(
                     modifier = Modifier.padding(horizontal = NfSpacing.page)
                 ) {
                     Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                        Button(onClick = onImport) { Text(stringResource(dev.ninfenz.mobile.R.string.library_import)) }
-                        TextButton(onClick = onSeed, enabled = !seeding) {
+                        Button(onClick = onImport, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(dev.ninfenz.mobile.R.string.library_import)) }
+                        TextButton(onClick = onSeed, enabled = !seeding, modifier = Modifier.heightIn(min = 48.dp)) {
                             Text(if (seeding) stringResource(dev.ninfenz.mobile.R.string.library_loading_sample) else stringResource(dev.ninfenz.mobile.R.string.library_load_sample))
                         }
                     }

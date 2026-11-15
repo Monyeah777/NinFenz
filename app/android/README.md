@@ -116,12 +116,13 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 - ShellSizeMatrixTest（9，Robolectric）：compact/medium/expanded 宽 × 三档高，四目的地语义可达。
 - EnglishBodyLocaleTest（13，Robolectric）：onboarding/new project/import/search/pack center/author/delivery/ccos/settings/pack update/protocol/graph/assembly 正文英文资源生效。
 - AppPrefsTest（1）：languageMode/dynamicColor 持久化。
+- A11yComposeTest（3，Robolectric）：图标 contentDescription、返回/搜索/设置/CTA 触控目标 ≥48dp。
 
 ## 构建证据（本机，2026-11-15）
 
-- v0.02 W6（2026-11-15）：`./gradlew :app:assembleDebug` 成功：app-debug.apk = 19,423,854 bytes，
-  sha256 = b6dff27747eb98e6cb940696fef322fbd8fdb6548cc4336be9f98b2eb20efd6d（含双 ABI 原生库 + 9 个示例 Pack assets）。
-- `./gradlew :app:testDebugUnitTest` 全绿：106 条 JVM 单测（v1 42 + v0.02 64；含 Robolectric/Compose 语义/矩阵/英文 locale）。
+- v0.02 W6（2026-11-15）：`./gradlew :app:assembleDebug` 成功：app-debug.apk = 19,424,381 bytes，
+  sha256 = 3963379c5024f93a4236b8b8bd3bf35e281b0d48266a215ca9c87ae1cd32c93d（含双 ABI 原生库 + 9 个示例 Pack assets）。
+- `./gradlew :app:testDebugUnitTest` 全绿：109 条 JVM 单测（v1 42 + v0.02 67；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y）。
 - `zipalign -c -P 16 -v 4 app-debug.apk` → Verification successful（native lib 16KB page 对齐）。
 - `bash app/scripts/build_core_android.sh --clean` 成功：NDK 27.0.12077973 + rustup targets
   （aarch64-linux-android / x86_64-linux-android，经 rsproxy 镜像安装）；两个 .so 的 LOAD align 均为 0x4000。

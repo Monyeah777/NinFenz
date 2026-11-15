@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -50,7 +52,7 @@ fun NfTopAppBar(
         title = { Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.semantics { heading() }) },
         navigationIcon = {
             if (onBack != null) {
-                IconButton(onClick = onBack) {
+                IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(dev.ninfenz.mobile.R.string.action_back))
                 }
             }
@@ -101,7 +103,7 @@ fun NfEmptyState(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center
         )
-        Button(onClick = onAction) { Text(actionLabel) }
+        Button(onClick = onAction, modifier = Modifier.heightIn(min = 48.dp)) { Text(actionLabel) }
         if (secondaryLabel != null && onSecondary != null) {
             TextButton(onClick = onSecondary) { Text(secondaryLabel) }
         }

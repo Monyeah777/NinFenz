@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.size
@@ -56,7 +57,7 @@ fun OnboardingScreen(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.End
         ) {
-            TextButton(onClick = onSkip) { Text(stringResource(dev.ninfenz.mobile.R.string.onboarding_skip)) }
+            TextButton(onClick = onSkip, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(dev.ninfenz.mobile.R.string.onboarding_skip)) }
         }
         Column(
             modifier = Modifier.fillMaxWidth(),
@@ -94,7 +95,7 @@ fun OnboardingScreen(
                 Spacer(modifier = Modifier.size(1.dp))
             }
             if (step < 2) {
-                Button(onClick = { step += 1 }) { Text(stringResource(dev.ninfenz.mobile.R.string.onboarding_next)) }
+                Button(onClick = { step += 1 }, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(dev.ninfenz.mobile.R.string.onboarding_next)) }
             } else {
                 Button(onClick = onDone) { Text(stringResource(dev.ninfenz.mobile.R.string.onboarding_start)) }
             }
@@ -150,8 +151,8 @@ private fun SeedStatus(seedState: SeedResult?, seeding: Boolean, onSeed: () -> U
         seedState is SeedResult.Failed -> Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(seedState.message, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error, textAlign = TextAlign.Center)
             Text(seedState.fix, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
-            TextButton(onClick = onSeed) { Text(stringResource(dev.ninfenz.mobile.R.string.onboarding_retry)) }
+            TextButton(onClick = onSeed, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(dev.ninfenz.mobile.R.string.onboarding_retry)) }
         }
-        else -> Button(onClick = onSeed) { Text(stringResource(dev.ninfenz.mobile.R.string.onboarding_load_sample)) }
+        else -> Button(onClick = onSeed, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(dev.ninfenz.mobile.R.string.onboarding_load_sample)) }
     }
 }
