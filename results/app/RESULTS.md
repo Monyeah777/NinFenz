@@ -42,7 +42,7 @@
 | id | 内容 | owner | next |
 |---|---|---|---|
 | OPEN-I18N-BODY | 导入/创作台/交付/Pack 中心/CCOS 正文仍内联；无 per-app language 切换 | lead | 抽取剩余 strings + localeConfig |
-| OPEN-SCREENSHOT | 9 组尺寸已有语义矩阵，像素截图基线未接 | lead | Roborazzi/Paparazzi 或 bitmap 基线 |
+| OPEN-SCREENSHOT | 9 组尺寸已有语义矩阵；像素截图基线未接。已实测 Robolectric NATIVE 下 Compose captureToImage 超时（ComposeTimeoutException），该路径不可用 | lead | 需 Paparazzi/Roborazzi 或设备截图 |
 | OPEN-DEVICE | 真机/模拟器首启/分享/折叠/TalkBack/性能 | lead | 设备到位后跑 DEVICE_MATRIX 清单 |
 | OPEN-DRAFT-PROJECT | 导入草稿→项目转换未定义（契约无 import→project 字段） | lead | 需 v1 §15 契约变更评估 |
 | OPEN-AUTHOR-GRAPH-SPEC | 创作台仅保存协议条款/字段；管线/规格保存未做 | lead | overlay 扩展或项目引用重算 |
