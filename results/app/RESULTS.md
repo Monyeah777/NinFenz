@@ -25,11 +25,11 @@
 | 项 | 结果 |
 |---|---|
 | APK | app-debug.apk = 19,424,381 B；sha256 438fb27e2ba265437c7b90be57a67ae7ac258584f204dbd1394fa8ee68cd680f |
-| JVM 测试 | 109 条全绿（v1 基线 42 + v0.02 新增 67；含 Robolectric/Compose） |
+| JVM 测试 | 110 条全绿（v1 基线 42 + v0.02 新增 68；含 Robolectric/Compose） |
 | 构建 | ./gradlew :app:assembleDebug 成功；:app:testDebugUnitTest 105/105 |
 | i18n | 全部屏主要文案已资源化 + values-en；「我的」zh/en/跟随系统切换；动态取色开关；库/Pack 中心下拉刷新；节点删除 Snackbar 撤销 + 触觉；expanded 双栏（主列表+详情）；导航 Crossfade（NfMotion.MEDIUM_MS）；统一 loading/skeleton 组件；少量错误/技术提示仍内联（OPEN-I18N-BODY 尾项） |
 | 适配 | compact/medium/expanded 三档导航 + 9 组窗口尺寸语义矩阵 |
-| a11y | 图标 contentDescription 与 48dp 触控目标断言（A11yComposeTest 3） |
+| a11y | 图标 contentDescription、48dp 触控目标（A11yComposeTest 3）、200% 字号（LargeFont 1） |
 | app/gates | 7/7 gate PASS、FAIL=0（QA0 10 checks、QA5 5 checks；含 v0.02 UX/i18n/测试矩阵检查） |
 
 ### 0.3 状态
