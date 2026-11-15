@@ -252,7 +252,7 @@
       "pass": 3
     }
   },
-  "head": "ea8a5bfe02d3b40f61199514834a42de98fc3cb4",
+  "head": "9236cb1721d7fded76b3eb459086ddc5f789d4f5",
   "open_items": [
     {
       "id": "S11",
@@ -857,6 +857,8 @@
         "app/android/app/src/test/java/dev/ninfenz/mobile/FixtureFilesTest.kt",
         "app/android/app/src/test/java/dev/ninfenz/mobile/ModelParsingTest.kt",
         "app/android/app/src/test/java/dev/ninfenz/mobile/StateMachineTest.kt",
+        "app/android/app/src/test/java/dev/ninfenz/mobile/data/AppPrefsTest.kt",
+        "app/android/app/src/test/java/dev/ninfenz/mobile/data/AuthorArtifactStoreTest.kt",
         "app/android/app/src/test/java/dev/ninfenz/mobile/data/AuthorArtifactsLoaderTest.kt",
         "app/android/app/src/test/java/dev/ninfenz/mobile/data/AuthorOverlayStoreTest.kt",
         "app/android/app/src/test/java/dev/ninfenz/mobile/data/PackStoreTest.kt",
@@ -866,11 +868,9 @@
         "app/android/app/src/test/java/dev/ninfenz/mobile/data/ProjectFactoryTest.kt",
         "app/android/app/src/test/java/dev/ninfenz/mobile/data/ProjectStatusStoreTest.kt",
         "app/android/app/src/test/java/dev/ninfenz/mobile/data/SearchIndexTest.kt",
+        "app/android/app/src/test/java/dev/ninfenz/mobile/ui/A11yComposeTest.kt",
         "app/android/app/src/test/java/dev/ninfenz/mobile/ui/AdaptiveLayoutTest.kt",
-        "app/android/app/src/test/java/dev/ninfenz/mobile/ui/ComposeSmokeTest.kt",
-        "app/android/app/src/test/java/dev/ninfenz/mobile/ui/EnglishBodyLocaleTest.kt",
-        "app/android/app/src/test/java/dev/ninfenz/mobile/ui/ShellEnglishLocaleTest.kt",
-        "app/android/app/src/test/java/dev/ninfenz/mobile/ui/ShellNavigationComposeTest.kt"
+        "app/android/app/src/test/java/dev/ninfenz/mobile/ui/ComposeSmokeTest.kt"
       ],
       "gate": "QA5",
       "kind": "glob_min",

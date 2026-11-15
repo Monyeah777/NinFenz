@@ -26,7 +26,7 @@
 |---|---|
 | APK | app-debug.apk = 19,424,381 B；sha256 438fb27e2ba265437c7b90be57a67ae7ac258584f204dbd1394fa8ee68cd680f |
 | JVM 测试 | 110 条全绿（v1 基线 42 + v0.02 新增 68；含 Robolectric/Compose） |
-| 构建 | ./gradlew :app:assembleDebug 成功；:app:testDebugUnitTest 105/105 |
+| 构建 | ./gradlew :app:assembleDebug 成功；:app:testDebugUnitTest 110/110 |
 | i18n | 全部屏主要文案已资源化 + values-en；「我的」zh/en/跟随系统切换；动态取色开关；库/Pack 中心下拉刷新；节点删除 Snackbar 撤销 + 触觉；expanded 双栏（主列表+详情）；导航 Crossfade（NfMotion.MEDIUM_MS）；统一 loading/skeleton 组件；少量错误/技术提示仍内联（OPEN-I18N-BODY 尾项） |
 | 适配 | compact/medium/expanded 三档导航 + 9 组窗口尺寸语义矩阵 |
 | a11y | 图标 contentDescription、48dp 触控目标（A11yComposeTest 3）、200% 字号（LargeFont 1） |
@@ -38,11 +38,17 @@
 - W4b：作者覆盖保存/撤销、状态写回、管线/规格编辑+保存（撤销/重做 + 防抖自动保存）已完成；草稿→项目仍 OPEN。
 - W6：部分完成（见 0.4）；未跑面不写成 pass。
 
-### 0.4 v0.02 OPEN（带 owner+next）
+### 0.4 v0.02 收口（2026-11-15）
+
+- 机读门禁：app/gates **7/7 PASS，FAIL=0**（QA0 10 / QA5 5）；仓库 verify **PASS=107 WARN=2 FAIL=0**。
+- 测试/产物：JVM **110/110**；APK 19,424,591 B，sha256 438fb27e…。
+- 结论：**v0.02 实现面 pass-with-open-items**；下方 OPEN 不因收口消失，未跑面不写成 pass。
+
+### 0.5 v0.02 OPEN（带 owner+next）
 
 | id | 内容 | owner | next |
 |---|---|---|---|
-| OPEN-I18N-BODY | 导入/创作台/交付/Pack 中心/CCOS 正文仍内联；无 per-app language 切换 | lead | 抽取剩余 strings + localeConfig |
+| OPEN-I18N-BODY | 全部屏主要文案已资源化；少量错误/技术提示仍内联；应用内 zh/en 切换已做，系统 per-app locale 入口未做 | lead | 抽取尾项 strings + localeConfig |
 | OPEN-SCREENSHOT | 9 组尺寸已有语义矩阵；像素截图基线未接。已实测 Robolectric NATIVE 下 Compose captureToImage 超时（ComposeTimeoutException），该路径不可用 | lead | 需 Paparazzi/Roborazzi 或设备截图 |
 | OPEN-DEVICE | 真机/模拟器首启/分享/折叠/TalkBack/性能 | lead | 设备到位后跑 DEVICE_MATRIX 清单 |
 | OPEN-DRAFT-PROJECT | 导入草稿→项目转换未定义（契约无 import→project 字段） | lead | 需 v1 §15 契约变更评估 |
