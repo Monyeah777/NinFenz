@@ -31,6 +31,11 @@
 | 我的/English | partial：section/语言选项切英文，但主题标签仍中文（i18n 尾项） |
 | 动态取色 | pass：Android 12+ 开关生效 |
 | 分享接收 | **已修复**：此前确认分享会崩（No ActivityResultRegistryOwner），且 payload 未传入导入；修复后显示「已接收分享载荷」+ markdown 85% 预览 |
+| 新建项目 | pass：Create→从 Pack 新建→标题 device-test→创建，生成 devicetest.nfproject.json |
+| 横屏 | pass：旋转后自动切 NavigationRail（四目的地竖排） |
+| 200% 字号 | pass：font_scale=2.0 重启后库页不崩、主 CTA 仍可见 |
+| 冷启动/内存 | 407/409/411ms；PSS 107,589 KB（3 次 force-stop 后） |
+| 分享接收 | 修复后进入 Import：显示「已接收分享载荷」+ markdown 85% 预览 |
 | docx 导出 | OPEN：返回 NF-EXP-004（未实现），UI 明确报错 |
 
 ## 3. 真机发现并已修复
@@ -45,7 +50,7 @@
 - docx 导出：真机返回 NF-EXP-004 docx 导出器不可用（本版本未实现：OPEN），UI 明确报错，不伪造；计划中的 docx 仍未实现。
 - English 下主题标签（跟随系统/浅色/深色）仍中文，需资源化。
 - 创作台撤销：一次点击「撤销编辑」后 F-002 未回退，需复测/定位（可能点击命中或撤销栈语义）。
-- 未跑：CCOS 任务/结果/人审、分享 chooser、旋转/折叠、200% 字号、TalkBack、性能 profile。
+- 未跑：CCOS 任务/结果/人审、分享 chooser、折叠屏（本机非折叠）、TalkBack、对比度实测。
 - 本机无第二台设备/折叠屏，设备矩阵仍不完整。
 
 ## 5. 复跑入口
