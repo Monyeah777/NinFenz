@@ -2,6 +2,14 @@ package dev.ninfenz.mobile.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.ui.draw.clip
+import dev.ninfenz.mobile.ui.theme.NfMotion
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,6 +37,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -234,3 +243,48 @@ fun NfErrorCard(code: String, message: String, fix: String, modifier: Modifier =
         }
     }
 }
+
+/** 统一加载态（§18.12 三态组件）：转圈 + 可选文案。 */
+@Composable
+fun NfLoadingState(message: String? = null) {
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(NfSpacing.page),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(NfSpacing.s)
+    ) {
+        CircularProgressIndicator()
+        message?.let {
+            Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+    }
+}
+
+/** 统一骨架态：最多 5 行、1200ms shimmer；与真实布局同构的占位。 */
+@Composable
+fun NfSkeleton(lines: Int = 3) {
+    val transition = rememberInfiniteTransition(label = "nf-skeleton")
+    val alpha by transition.animateFloat(
+        initialValue = 0.25f,
+        targetValue = 0.6f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = NfMotion.SKELETON_MS),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "nf-skeleton-alpha"
+    )
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(NfSpacing.page),
+        verticalArrangement = Arrangement.spacedBy(NfSpacing.s)
+    ) {
+        repeat(lines.coerceIn(1, 5)) { index ->
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(if (index == lines - 1) 0.6f else 1f)
+                    .height(12.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = alpha))
+            )
+        }
+    }
+}
+

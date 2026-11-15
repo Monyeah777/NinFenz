@@ -30,6 +30,7 @@ object NfMotion {
     const val SHORT_MS = 120
     const val MEDIUM_MS = 220
     const val LONG_MS = 320
+    const val SKELETON_MS = 1200
     const val PRESS_DOWN_MS = 90
     const val PRESS_DAMPING = 0.7f
     const val PRESS_STIFFNESS = 500f

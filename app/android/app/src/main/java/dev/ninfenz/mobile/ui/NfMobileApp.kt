@@ -1,7 +1,11 @@
 package dev.ninfenz.mobile.ui
 
+import dev.ninfenz.mobile.ui.theme.NfMotion
+
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -389,16 +393,22 @@ is Detail.Import -> ImportScreen(prefill = null, store = library, onBack = { she
                 NfRail(shell.destination) { shell = shell.select(it) }
             }
             Box(modifier = Modifier.weight(1f).padding(padding)) {
-                if (shell.detail == null) {
-                    topLevelContent()
-                } else if (!compact && LocalConfiguration.current.screenWidthDp >= 840) {
-                    Row(modifier = Modifier.fillMaxSize()) {
-                        Box(modifier = Modifier.width(380.dp).fillMaxHeight()) { topLevelContent() }
-                        VerticalDivider()
-                        Box(modifier = Modifier.weight(1f)) { detailContent() }
+                Crossfade(
+                    targetState = shell.detail,
+                    animationSpec = tween(durationMillis = NfMotion.MEDIUM_MS),
+                    label = "nf-shell"
+                ) { detail ->
+                    if (detail == null) {
+                        topLevelContent()
+                    } else if (!compact && LocalConfiguration.current.screenWidthDp >= 840) {
+                        Row(modifier = Modifier.fillMaxSize()) {
+                            Box(modifier = Modifier.width(380.dp).fillMaxHeight()) { topLevelContent() }
+                            VerticalDivider()
+                            Box(modifier = Modifier.weight(1f)) { detailContent() }
+                        }
+                    } else {
+                        detailContent()
                     }
-                } else {
-                    detailContent()
                 }
             }
         }
