@@ -1,5 +1,7 @@
 package dev.ninfenz.mobile.ui.screens
 
+import java.io.File
+
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -25,9 +27,13 @@ import dev.ninfenz.mobile.core.CoreError
 import dev.ninfenz.mobile.core.CoreResponse
 import dev.ninfenz.mobile.core.J
 import dev.ninfenz.mobile.data.FileAccess
+import dev.ninfenz.mobile.data.ProjectStatusStore
+import dev.ninfenz.mobile.data.StatusAdvanceResult
 import dev.ninfenz.mobile.model.CcosModel
 import dev.ninfenz.mobile.model.CcosResult
 import dev.ninfenz.mobile.model.CcosTask
+import dev.ninfenz.mobile.model.ProjectModel
+import dev.ninfenz.mobile.model.ProjectStatus
 import dev.ninfenz.mobile.ui.safeCall
 import dev.ninfenz.mobile.ui.components.CardBox
 import dev.ninfenz.mobile.ui.components.EmptyState
@@ -118,7 +124,26 @@ fun CcosScreen(onBack: () -> Unit) {
                 }
                 val response = safeCall("ccos-import-result", payload)
                 if (response.ok) {
-                    outcome = context.getString(dev.ninfenz.mobile.R.string.ccos_outcome_accepted, response.result?.toString() ?: context.getString(dev.ninfenz.mobile.R.string.ccos_outcome_empty))
+                    val base = context.getString(dev.ninfenz.mobile.R.string.ccos_outcome_accepted, response.result?.toString() ?: context.getString(dev.ninfenz.mobile.R.string.ccos_outcome_empty))
+                    var extra = ""
+                    val projectId = task?.projectId
+                    if (approve && !projectId.isNullOrBlank()) {
+                        val file = File(File(context.filesDir, "projects"), projectId + ".nfproject.json")
+                        if (file.isFile) {
+                            extra = runCatching {
+                                val project = ProjectModel.parse(file.readText(Charsets.UTF_8))
+                                if (project.status != ProjectStatus.EXPORTED) {
+                                    context.getString(dev.ninfenz.mobile.R.string.ccos_reviewed_skip, project.status.wire)
+                                } else {
+                                    when (val advanced = ProjectStatusStore(context.filesDir).advance(project, ProjectStatus.REVIEWED)) {
+                                        is StatusAdvanceResult.Advanced -> context.getString(dev.ninfenz.mobile.R.string.ccos_reviewed_ok)
+                                        is StatusAdvanceResult.Failure -> context.getString(dev.ninfenz.mobile.R.string.ccos_reviewed_fail, advanced.message)
+                                    }
+                                }
+                            }.getOrDefault("")
+                        }
+                    }
+                    outcome = base + extra
                     result = reviewed
                 } else {
                     error = response.error

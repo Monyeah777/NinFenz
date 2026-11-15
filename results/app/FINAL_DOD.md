@@ -19,7 +19,7 @@
 | i18n/主题切换（全部屏主要文案） | partial | values-en + 资源化；我的支持 zh/en/system + 动态取色；少量错误/技术提示仍内联（OPEN-I18N-BODY 尾项） |
 | 像素截图矩阵 | OPEN | OPEN-SCREENSHOT；Robolectric captureToImage 实测超时，需 Paparazzi/Roborazzi/设备 |
 | 真机/模拟器 | OPEN-TOOLCHAIN | OPEN-DEVICE |
-| 草稿→项目；reviewed 串联 | OPEN | OPEN-DRAFT-PROJECT / OPEN-REVIEWED |
+| 草稿→项目 | OPEN | OPEN-DRAFT-PROJECT |
 | app/gates v0.02 UX 检查 | pass | 7/7 gate PASS、FAIL=0；GATES/SELF_AUDIT 已更新（本提交） |
 
 **收口实测（2026-11-15）**：app/gates 7/7 PASS、FAIL=0；verify.sh --checks-only PASS=107 WARN=2 FAIL=0；JVM 110/110；APK 19,424,591 B sha256 438fb27e…。

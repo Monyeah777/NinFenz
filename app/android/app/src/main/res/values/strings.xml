@@ -389,4 +389,8 @@
     <string name="me_language_zh">中文</string>
     <string name="me_language_en">English</string>
     <string name="author_deleted">已删除节点</string>
+
+    <string name="ccos_reviewed_ok"> · 项目已标记 reviewed</string>
+    <string name="ccos_reviewed_skip"> · 项目当前 %1$s，未回写 reviewed</string>
+    <string name="ccos_reviewed_fail"> · 项目状态未写回：%1$s</string>
 </resources>

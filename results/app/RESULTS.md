@@ -24,7 +24,7 @@
 
 | 项 | 结果 |
 |---|---|
-| APK | app-debug.apk = 19,424,381 B；sha256 438fb27e2ba265437c7b90be57a67ae7ac258584f204dbd1394fa8ee68cd680f |
+| APK | app-debug.apk = 19,011,427 B；sha256 0a36a88e0afd2688bd1deba25dbc80df0795e07ab58f17c8143a89ddf67a87a4 |
 | JVM 测试 | 110 条全绿（v1 基线 42 + v0.02 新增 68；含 Robolectric/Compose） |
 | 构建 | ./gradlew :app:assembleDebug 成功；:app:testDebugUnitTest 110/110 |
 | i18n | 全部屏主要文案已资源化 + values-en；「我的」zh/en/跟随系统切换；动态取色开关；库/Pack 中心下拉刷新；节点删除 Snackbar 撤销 + 触觉；expanded 双栏（主列表+详情）；导航 Crossfade（NfMotion.MEDIUM_MS）；统一 loading/skeleton 组件；少量错误/技术提示仍内联（OPEN-I18N-BODY 尾项） |
@@ -52,7 +52,7 @@
 | OPEN-SCREENSHOT | 9 组尺寸已有语义矩阵；像素截图基线未接。已实测 Robolectric NATIVE 下 Compose captureToImage 超时（ComposeTimeoutException），该路径不可用 | lead | 需 Paparazzi/Roborazzi 或设备截图 |
 | OPEN-DEVICE | 真机/模拟器首启/分享/折叠/TalkBack/性能 | lead | 设备到位后跑 DEVICE_MATRIX 清单 |
 | OPEN-DRAFT-PROJECT | 导入草稿→项目转换未定义（契约无 import→project 字段） | lead | 需 v1 §15 契约变更评估 |
-| OPEN-REVIEWED | reviewed 状态与 CCOS 人审串联未做 | lead | project-validate + CCOS result 回钉 |
+| OPEN-REVIEWED | CCOS approve 时 exported 项目回写 reviewed；非 exported 项目跳过（不伪造） | lead | 如需强制 reviewed，补 project-validate 前置条件 |
 
 ## 1. 结论（先行）
 

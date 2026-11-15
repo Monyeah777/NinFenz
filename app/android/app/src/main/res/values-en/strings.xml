@@ -389,4 +389,8 @@
     <string name="me_language_zh">中文</string>
     <string name="me_language_en">English</string>
     <string name="author_deleted">Node deleted</string>
+
+    <string name="ccos_reviewed_ok"> · project marked reviewed</string>
+    <string name="ccos_reviewed_skip"> · project is %1$s, reviewed not written back</string>
+    <string name="ccos_reviewed_fail"> · project status writeback failed: %1$s</string>
 </resources>
