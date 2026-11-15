@@ -36,6 +36,7 @@
 | 200% 字号 | pass：font_scale=2.0 重启后库页不崩、主 CTA 仍可见 |
 | 冷启动/内存 | 407/409/411ms；PSS 107,589 KB（3 次 force-stop 后） |
 | 分享接收 | 修复后进入 Import：显示「已接收分享载荷」+ markdown 85% 预览 |
+| CCOS 交接 | partial：task-demo-0001 与 result 成功加载（succeeded / artifacts 1 / evidence 1）；reviewer/note 已填，提交按钮点击后未见 outcome，需后续定位 |
 | docx 导出 | **已修复**：根因是 jniLibs .so 还是 15:35 旧构建（core 源码 16:30 才实现 docx）；重跑 build_core_android.sh 后导出 result.docx（2754B，OOXML 条目完整，zip 校验通过） |
 
 ## 3. 真机发现并已修复
@@ -50,7 +51,8 @@
 - 撤销复测通过：F-002 由「冷静x」点撤销回到「冷静」；此前失败是键盘未收起时点到了键盘。
 - English 主题标签已资源化（System/Light/Dark）。
 - 新增盲区修复：jniLibs .so 陈旧导致 docx 被误报 NF-EXP-004；重跑 build_core_android.sh 后恢复。
-- 未跑：CCOS 文件选择器流程（DocumentsUI 多级选择耗时）、分享 chooser 实点、折叠屏（本机非折叠）、TalkBack 语音走查、对比度实测。
+- CCOS：task/result 能加载，但点击「通过并回传」未见 outcome（需继续定位点击命中或 core 回执展示）。
+- 未跑：分享 chooser 实点、折叠屏（本机非折叠）、TalkBack 语音走查、对比度实测。
 - 本机无第二台设备/折叠屏，设备矩阵仍不完整。
 
 ## 5. 复跑入口
