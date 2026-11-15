@@ -127,5 +127,7 @@ env | grep -i android || echo NO_ANDROID_ENV # 期望：NO_ANDROID_ENV（本机�
 python tui/nf.py --selftest                 # TUI 复用面（9 项）
 ```
 
+> 代码侧自适应：三档宽度（<600 / 600–839 / ≥840）→ 紧凑单页导航栈 / 常驻 NavigationRail + 内容区（`app/android/.../ui/Adaptive.kt`，JVM 单测 `AdaptiveLayoutTest`）；折叠/平板/多窗口的**真机实测**仍为 `OPEN-TOOLCHAIN`。
+>
 > 本件为覆盖登记：所有 `OPEN-*` 格都不是「已验证支持」。发布结论必须以 `app/scripts/RELEASE_EVIDENCE.md` 的实测证据为准。
 

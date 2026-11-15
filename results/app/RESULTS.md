@@ -95,8 +95,8 @@
 | ID | 需求 | 状态 | 证据 |
 |---|---|---|---|
 | PLAT-01 | target 36/edge-to-edge/预测返回/16KB/ABI | pass（构建面） | `app/android/app/build.gradle.kts` + `zipalign -c -P 16 4` 通过 + 双 ABI `.so`；真机未跑 |
-| PLAT-02 | 自适应（手机/折叠/平板/Chromebook/多窗口） | partial | WindowSizeClass/ListDetail 设计；运行面 OPEN-TOOLCHAIN |
-| PLAT-03 | 无障碍/中英/RTL/字体缩放 | partial | supportsRtl + 主题；TalkBack 实测 OPEN |
+| PLAT-02 | 自适应（手机/折叠/平板/Chromebook/多窗口） | pass（代码侧）/ OPEN-TOOLCHAIN（真机） | 三档宽度（<600 / 600–839 / ≥840）→ 紧凑单页导航栈 / 常驻 NavigationRail + 内容区（`app/android/.../ui/Adaptive.kt`）；JVM 单测 `AdaptiveLayoutTest` 4 条 |
+| PLAT-03 | 无障碍/中英/RTL/字体缩放 | partial（代码侧）/ OPEN（真机） | supportsRtl + 中文可读标签（Rail 图标清空语义避免 TalkBack 重复朗读）+ Material sp 排版缩放；TalkBack/字体缩放实测 OPEN-TOOLCHAIN |
 | SEC-01 | MASVS/威胁模型/WebView/解析/组件/深链 | partial | THREAT_MODEL（21 控制点）+ 解析负例 47 条；深链/WebView 未启用 |
 | SEC-02 | 无遥测/本地诊断/密钥不进 APP | pass | manifest 无网络权限；PRIVACY.md 数据地图；gate `check_no_machine_paths` |
 | PERF-01 | 启动/装配/包体/内存预算 | OPEN | 无运行时真机 → PERF_BUDGET no-data + owner |
@@ -130,7 +130,7 @@
 | 工具链定版 | Gradle 8.11.1 / AGP 8.10.1 / Kotlin 2.1.20 / CMP 1.7.3 / compileSdk 36 / NDK r27 | `app/results/TOOLCHAIN.md` |
 | Python 测试 | **490 passed / 0 failed / 0 skipped / 0 xfailed（127s）** | `python -m pytest app/tests -q` |
 | Rust 测试 | **182 断言 / 21 二进制 / 0 failed** | `cd app/core && cargo test` |
-| 两端 JVM 测试 | Android 38 / Desktop 20（含真实 JNA FFI） | `./gradlew test` / `:app:testDebugUnitTest` |
+| 两端 JVM 测试 | Android 42（含自适应分档 4 条）/ Desktop 20（含真实 JNA FFI） | `./gradlew test` / `:app:testDebugUnitTest` |
 
 ## 6. 扩展口（计划 §17）
 

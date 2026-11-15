@@ -84,7 +84,7 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 
 ## 单测
 
-38 条（JVM，无需模拟器）：
+42 条（JVM，无需模拟器）：
 
 - CoreResponseTest（10）：信封解析/矛盾拒绝/NF-E-005。
 - CoreBridgeContractTest（5）：op+payload 原样透传、错误 exit 语义、fake 无队列 fail-closed。
@@ -96,7 +96,7 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 
 - `./gradlew :app:assembleDebug` 成功：app-debug.apk = 17,973,649 bytes（含 lib/arm64-v8a + lib/x86_64 的
   libnf_app_core.so 与 libjnidispatch.so）。
-- `./gradlew :app:testDebugUnitTest` 全绿：38 条 JVM 单测。
+- `./gradlew :app:testDebugUnitTest` 全绿：42 条 JVM 单测（含 `AdaptiveLayoutTest` 分档边界）。
 - `zipalign -c -P 16 -v 4 app-debug.apk` → Verification successful（native lib 16KB page 对齐）。
 - `bash app/scripts/build_core_android.sh --clean` 成功：NDK 27.0.12077973 + rustup targets
   （aarch64-linux-android / x86_64-linux-android，经 rsproxy 镜像安装）；两个 .so 的 LOAD align 均为 0x4000。
