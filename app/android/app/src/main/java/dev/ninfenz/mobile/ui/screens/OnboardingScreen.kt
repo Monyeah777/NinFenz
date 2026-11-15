@@ -28,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.data.SeedResult
@@ -55,7 +56,7 @@ fun OnboardingScreen(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.End
         ) {
-            TextButton(onClick = onSkip) { Text("跳过") }
+            TextButton(onClick = onSkip) { Text(stringResource(dev.ninfenz.mobile.R.string.onboarding_skip)) }
         }
         Column(
             modifier = Modifier.fillMaxWidth(),
@@ -66,18 +67,18 @@ fun OnboardingScreen(
             when (step) {
                 0 -> Step(
                     icon = { Icon(Icons.Filled.Home, contentDescription = null, modifier = Modifier.size(56.dp), tint = MaterialTheme.colorScheme.primary) },
-                    title = "把内容写进协议",
-                    body = "NF 把导入的内容套进协议、管线与规格，再装配、校验、导出。全部在本机完成，不需要网络。"
+                    title = stringResource(dev.ninfenz.mobile.R.string.onboarding_step0_title),
+                    body = stringResource(dev.ninfenz.mobile.R.string.onboarding_step0_body)
                 )
                 1 -> Step(
                     icon = { Icon(Icons.AutoMirrored.Filled.List, contentDescription = null, modifier = Modifier.size(56.dp), tint = MaterialTheme.colorScheme.primary) },
-                    title = "先给你一份示例",
-                    body = "内置示例 Pack：8 个条目，含协议、管线、规格与素材。载入后即可在「库」里看到它。"
+                    title = stringResource(dev.ninfenz.mobile.R.string.onboarding_step1_title),
+                    body = stringResource(dev.ninfenz.mobile.R.string.onboarding_step1_body)
                 )
                 else -> Step(
                     icon = { Icon(Icons.Filled.Check, contentDescription = null, modifier = Modifier.size(56.dp), tint = MaterialTheme.colorScheme.primary) },
-                    title = "从一次导入开始",
-                    body = "进入「库」后点右下角「导入」，从文件管理器、分享或剪贴板带内容进来。"
+                    title = stringResource(dev.ninfenz.mobile.R.string.onboarding_step2_title),
+                    body = stringResource(dev.ninfenz.mobile.R.string.onboarding_step2_body)
                 )
             }
             SeedStatus(seedState, seeding, onSeed)
@@ -88,14 +89,14 @@ fun OnboardingScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (step > 0) {
-                TextButton(onClick = { step -= 1 }) { Text("上一步") }
+                TextButton(onClick = { step -= 1 }) { Text(stringResource(dev.ninfenz.mobile.R.string.onboarding_prev)) }
             } else {
                 Spacer(modifier = Modifier.size(1.dp))
             }
             if (step < 2) {
-                Button(onClick = { step += 1 }) { Text("下一步") }
+                Button(onClick = { step += 1 }) { Text(stringResource(dev.ninfenz.mobile.R.string.onboarding_next)) }
             } else {
-                Button(onClick = onDone) { Text("开始使用") }
+                Button(onClick = onDone) { Text(stringResource(dev.ninfenz.mobile.R.string.onboarding_start)) }
             }
         }
     }
@@ -135,22 +136,22 @@ private fun Step(icon: @Composable () -> Unit, title: String, body: String) {
 @Composable
 private fun SeedStatus(seedState: SeedResult?, seeding: Boolean, onSeed: () -> Unit) {
     when {
-        seeding -> Text("正在载入示例…", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        seeding -> Text(stringResource(dev.ninfenz.mobile.R.string.onboarding_seed_loading), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         seedState is SeedResult.Installed -> Text(
-            "示例已就绪：" + seedState.id + " · " + seedState.version + "（" + seedState.files + " 个文件）",
+            stringResource(dev.ninfenz.mobile.R.string.onboarding_seed_ready, seedState.id, seedState.version, seedState.files),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.primary
         )
         seedState is SeedResult.AlreadyPresent -> Text(
-            "示例已存在：" + seedState.id + " · " + seedState.version,
+            stringResource(dev.ninfenz.mobile.R.string.onboarding_seed_exists, seedState.id, seedState.version),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.primary
         )
         seedState is SeedResult.Failed -> Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(seedState.message, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error, textAlign = TextAlign.Center)
             Text(seedState.fix, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
-            TextButton(onClick = onSeed) { Text("重试") }
+            TextButton(onClick = onSeed) { Text(stringResource(dev.ninfenz.mobile.R.string.onboarding_retry)) }
         }
-        else -> Button(onClick = onSeed) { Text("载入示例 Pack") }
+        else -> Button(onClick = onSeed) { Text(stringResource(dev.ninfenz.mobile.R.string.onboarding_load_sample)) }
     }
 }

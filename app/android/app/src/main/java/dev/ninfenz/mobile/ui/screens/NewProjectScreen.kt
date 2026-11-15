@@ -25,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.data.PackEntry
 import dev.ninfenz.mobile.ui.components.NfCard
@@ -47,13 +48,13 @@ fun NewProjectScreen(
     var title by remember { mutableStateOf("") }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        NfTopAppBar(title = "新建项目", onBack = onBack)
+        NfTopAppBar(title = stringResource(dev.ninfenz.mobile.R.string.new_project_title), onBack = onBack)
         if (packs.isEmpty()) {
             NfEmptyState(
                 icon = Icons.Filled.Add,
-                title = "还没有可用的 Pack",
-                message = "先载入内置示例 Pack，或从文件管理器导入一个 Pack。",
-                actionLabel = "载入示例 Pack",
+                title = stringResource(dev.ninfenz.mobile.R.string.new_project_no_pack_title),
+                message = stringResource(dev.ninfenz.mobile.R.string.new_project_no_pack_body),
+                actionLabel = stringResource(dev.ninfenz.mobile.R.string.new_project_load_sample),
                 onAction = onLoadSample
             )
         } else {
@@ -61,7 +62,7 @@ fun NewProjectScreen(
                 contentPadding = androidx.compose.foundation.layout.PaddingValues(NfSpacing.page),
                 verticalArrangement = Arrangement.spacedBy(NfSpacing.m)
             ) {
-                item { NfSectionHeader("选择 Pack") }
+                item { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.new_project_select_pack)) }
                 items(packs.size) { index ->
                     val pack = packs[index]
                     NfCard(onClick = { selected = pack }) {
@@ -82,10 +83,10 @@ fun NewProjectScreen(
                     OutlinedTextField(
                         value = title,
                         onValueChange = { title = it },
-                        label = { Text("项目标题") },
+                        label = { Text(stringResource(dev.ninfenz.mobile.R.string.new_project_field_title)) },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
-                        supportingText = { Text("留空则使用「未命名项目」") }
+                        supportingText = { Text(stringResource(dev.ninfenz.mobile.R.string.new_project_field_hint)) }
                     )
                 }
                 if (error != null) {
@@ -109,10 +110,10 @@ fun NewProjectScreen(
                             if (creating) {
                                 CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
                             } else {
-                                Text("创建项目")
+                                Text(stringResource(dev.ninfenz.mobile.R.string.new_project_create))
                             }
                         }
-                        TextButton(onClick = onBack) { Text("取消") }
+                        TextButton(onClick = onBack) { Text(stringResource(dev.ninfenz.mobile.R.string.new_project_cancel)) }
                     }
                 }
             }

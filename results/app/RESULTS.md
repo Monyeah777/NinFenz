@@ -27,7 +27,7 @@
 | APK | app-debug.apk = 18,425,095 B；sha256 a77f94999ebe6d92dfdd333f58253775f1c1ba1322714955039bd866172487be |
 | JVM 测试 | 90 条全绿（v1 基线 42 + v0.02 新增 48；含 Robolectric/Compose） |
 | 构建 | ./gradlew :app:assembleDebug 成功；:app:testDebugUnitTest 90/90 |
-| i18n | 外壳 labels/标题/动作/关于已资源化 + values-en；正文文案仍内联（OPEN） |
+| i18n | 外壳 + onboarding/new project 正文已资源化 + values-en；其余正文仍内联（OPEN） |
 | 适配 | compact/medium/expanded 三档导航 + 9 组窗口尺寸语义矩阵 |
 | app/gates | 7/7 gate PASS、FAIL=0（QA0 10 checks、QA5 5 checks；含 v0.02 UX/i18n/测试矩阵检查） |
 
@@ -41,7 +41,7 @@
 
 | id | 内容 | owner | next |
 |---|---|---|---|
-| OPEN-I18N-BODY | 新屏正文/错误文案仍内联中文；无 per-app language 切换 | lead | 抽取剩余 strings + localeConfig |
+| OPEN-I18N-BODY | 导入/创作台/交付/Pack 中心/CCOS 正文仍内联；无 per-app language 切换 | lead | 抽取剩余 strings + localeConfig |
 | OPEN-SCREENSHOT | 9 组尺寸已有语义矩阵，像素截图基线未接 | lead | Roborazzi/Paparazzi 或 bitmap 基线 |
 | OPEN-DEVICE | 真机/模拟器首启/分享/折叠/TalkBack/性能 | lead | 设备到位后跑 DEVICE_MATRIX 清单 |
 | OPEN-DRAFT-PROJECT | 导入草稿→项目转换未定义（契约无 import→project 字段） | lead | 需 v1 §15 契约变更评估 |

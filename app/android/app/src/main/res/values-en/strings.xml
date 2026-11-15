@@ -18,4 +18,30 @@
 
     <string name="about_title">About NF</string>
     <string name="about_body">NF Mobile 0.2.0 (v0.02)\nLocal-only · No network permission · No telemetry\nMIT License · See app/docs/LEGAL.md</string>
+
+    <string name="onboarding_skip">Skip</string>
+    <string name="onboarding_prev">Back</string>
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_start">Get started</string>
+    <string name="onboarding_seed_loading">Loading sample…</string>
+    <string name="onboarding_seed_ready">Sample ready: %1$s · %2$s (%3$d files)</string>
+    <string name="onboarding_seed_exists">Sample already present: %1$s · %2$s</string>
+    <string name="onboarding_retry">Retry</string>
+    <string name="onboarding_load_sample">Load sample pack</string>
+    <string name="onboarding_step0_title">Put content into a protocol</string>
+    <string name="onboarding_step0_body">NF fits imported content into protocols, pipelines and specs, then assembles, validates and exports. Everything stays on this device, no network needed.</string>
+    <string name="onboarding_step1_title">Start with a sample</string>
+    <string name="onboarding_step1_body">A bundled sample pack: 8 items with protocol, pipeline, spec and assets. Load it and it appears in Library.</string>
+    <string name="onboarding_step2_title">Begin with one import</string>
+    <string name="onboarding_step2_body">In Library, tap Import (bottom right) to bring content from Files, Share or clipboard.</string>
+
+    <string name="new_project_title">New project</string>
+    <string name="new_project_no_pack_title">No packs available yet</string>
+    <string name="new_project_no_pack_body">Load the bundled sample pack, or import a pack from Files.</string>
+    <string name="new_project_load_sample">Load sample pack</string>
+    <string name="new_project_select_pack">Select pack</string>
+    <string name="new_project_field_title">Project title</string>
+    <string name="new_project_field_hint">Leave empty to use “Untitled project”</string>
+    <string name="new_project_create">Create project</string>
+    <string name="new_project_cancel">Cancel</string>
 </resources>

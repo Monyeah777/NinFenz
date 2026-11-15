@@ -18,4 +18,30 @@
 
     <string name="about_title">关于 NF</string>
     <string name="about_body">NF Mobile 0.2.0（v0.02）\n本地处理 · 无网络权限 · 无遥测\nMIT License · 详见仓库 app/docs/LEGAL.md</string>
+
+    <string name="onboarding_skip">跳过</string>
+    <string name="onboarding_prev">上一步</string>
+    <string name="onboarding_next">下一步</string>
+    <string name="onboarding_start">开始使用</string>
+    <string name="onboarding_seed_loading">正在载入示例…</string>
+    <string name="onboarding_seed_ready">示例已就绪：%1$s · %2$s（%3$d 个文件）</string>
+    <string name="onboarding_seed_exists">示例已存在：%1$s · %2$s</string>
+    <string name="onboarding_retry">重试</string>
+    <string name="onboarding_load_sample">载入示例 Pack</string>
+    <string name="onboarding_step0_title">把内容写进协议</string>
+    <string name="onboarding_step0_body">NF 把导入的内容套进协议、管线与规格，再装配、校验、导出。全部在本机完成，不需要网络。</string>
+    <string name="onboarding_step1_title">先给你一份示例</string>
+    <string name="onboarding_step1_body">内置示例 Pack：8 个条目，含协议、管线、规格与素材。载入后即可在「库」里看到它。</string>
+    <string name="onboarding_step2_title">从一次导入开始</string>
+    <string name="onboarding_step2_body">进入「库」后点右下角「导入」，从文件管理器、分享或剪贴板带内容进来。</string>
+
+    <string name="new_project_title">新建项目</string>
+    <string name="new_project_no_pack_title">还没有可用的 Pack</string>
+    <string name="new_project_no_pack_body">先载入内置示例 Pack，或从文件管理器导入一个 Pack。</string>
+    <string name="new_project_load_sample">载入示例 Pack</string>
+    <string name="new_project_select_pack">选择 Pack</string>
+    <string name="new_project_field_title">项目标题</string>
+    <string name="new_project_field_hint">留空则使用「未命名项目」</string>
+    <string name="new_project_create">创建项目</string>
+    <string name="new_project_cancel">取消</string>
 </resources>
