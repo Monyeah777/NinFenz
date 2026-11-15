@@ -388,4 +388,5 @@
     <string name="me_language_system">跟随系统</string>
     <string name="me_language_zh">中文</string>
     <string name="me_language_en">English</string>
+    <string name="author_deleted">已删除节点</string>
 </resources>

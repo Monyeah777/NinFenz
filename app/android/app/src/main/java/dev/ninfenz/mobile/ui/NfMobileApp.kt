@@ -103,6 +103,7 @@ fun NfMobileApp(
     var projectErrors by remember { mutableStateOf<List<String>>(emptyList()) }
     var seedState by remember { mutableStateOf<SeedResult?>(null) }
     var seeding by remember { mutableStateOf(false) }
+    var refreshing by remember { mutableStateOf(false) }
     var onboardingDone by remember { mutableStateOf(prefs.onboardingDone) }
     var showAbout by remember { mutableStateOf(false) }
     var storageText by remember { mutableStateOf("计算中…") }
@@ -113,6 +114,7 @@ fun NfMobileApp(
     var abi by remember { mutableStateOf<String?>(null) }
 
     fun refresh() {
+        refreshing = true
         scope.launch {
             val packSnapshot = withContext(Dispatchers.IO) { packStore.scan() }
             val projectSnapshot = withContext(Dispatchers.IO) { library.loadProjects() }
@@ -124,6 +126,7 @@ fun NfMobileApp(
             storageText = humanSize(size)
             nativeReady = diag?.nativeReady == true
             abi = diag?.abiVersion
+            refreshing = false
         }
     }
 
@@ -232,7 +235,9 @@ fun NfMobileApp(
                             onOpenProject = { shell = shell.open(Detail.Project(it.project.id)) },
                             onSearch = { shell = shell.open(Detail.Search) },
                             onPackCenter = { shell = shell.open(Detail.PackCenter) },
-                            onSettings = { shell = shell.open(Detail.Settings) }
+                            onSettings = { shell = shell.open(Detail.Settings) },
+                            refreshing = refreshing,
+                            onRefresh = { refresh() }
                         )
                         TopDestination.CREATE -> CreateScreen(
                             projects = projects,

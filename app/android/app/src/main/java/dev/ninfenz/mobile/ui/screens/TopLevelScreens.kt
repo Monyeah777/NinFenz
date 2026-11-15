@@ -18,7 +18,9 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -53,6 +55,7 @@ import dev.ninfenz.mobile.ui.components.NfTopAppBar
 import dev.ninfenz.mobile.ui.theme.NfSpacing
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LibraryHomeScreen(
     packs: List<PackEntry>,
@@ -66,7 +69,9 @@ fun LibraryHomeScreen(
     onOpenProject: (ProjectEntry) -> Unit,
     onSearch: () -> Unit,
     onPackCenter: () -> Unit,
-    onSettings: () -> Unit
+    onSettings: () -> Unit,
+    refreshing: Boolean = false,
+    onRefresh: () -> Unit = {}
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         NfTopAppBar(
@@ -76,6 +81,11 @@ fun LibraryHomeScreen(
                 IconButton(onClick = onSettings) { Icon(Icons.Filled.Settings, contentDescription = stringResource(dev.ninfenz.mobile.R.string.action_settings)) }
             }
         )
+        PullToRefreshBox(
+            isRefreshing = refreshing,
+            onRefresh = onRefresh,
+            modifier = Modifier.fillMaxSize()
+        ) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 96.dp),
@@ -167,6 +177,7 @@ fun LibraryHomeScreen(
                     }
                 }
             }
+        }
         }
     }
 }

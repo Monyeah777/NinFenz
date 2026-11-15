@@ -1,5 +1,8 @@
 package dev.ninfenz.mobile.ui.screens
 
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,6 +22,9 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.TextButton
 import android.content.Context
 import androidx.compose.runtime.Composable
@@ -327,6 +333,30 @@ private fun GraphAuthorContent(artifacts: AuthorArtifacts, project: Project, onS
         redo.clear()
         graph = next
     }
+    val snackbar = remember { SnackbarHostState() }
+    val haptics = LocalHapticFeedback.current
+    val snackbarScope = rememberCoroutineScope()
+    fun deleteNode(node: GraphNode) {
+        val previous = graph
+        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+        apply(
+            graph.copy(
+                nodes = graph.nodes.filter { it.id != node.id },
+                edges = graph.edges.filter { it.from != node.id && it.to != node.id },
+                weights = graph.weights - node.id
+            )
+        )
+        snackbarScope.launch {
+            val outcome = snackbar.showSnackbar(
+                message = context.getString(dev.ninfenz.mobile.R.string.author_deleted),
+                actionLabel = context.getString(dev.ninfenz.mobile.R.string.author_undo),
+                duration = androidx.compose.material3.SnackbarDuration.Short
+            )
+            if (outcome == SnackbarResult.ActionPerformed) {
+                graph = previous
+            }
+        }
+    }
     var report by remember { mutableStateOf<String?>(null) }
     var error by remember { mutableStateOf<CoreError?>(null) }
     var busy by remember { mutableStateOf(false) }
@@ -365,15 +395,7 @@ private fun GraphAuthorContent(artifacts: AuthorArtifacts, project: Project, onS
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(node.id + " · " + node.title, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
                         NfStatusChip(node.kind)
-                        TextButton(onClick = {
-                            apply(
-                                graph.copy(
-                                    nodes = graph.nodes.filter { it.id != node.id },
-                                    edges = graph.edges.filter { it.from != node.id && it.to != node.id },
-                                    weights = graph.weights - node.id
-                                )
-                            )
-                        }) { Text(stringResource(dev.ninfenz.mobile.R.string.author_delete)) }
+                        TextButton(onClick = { deleteNode(node) }) { Text(stringResource(dev.ninfenz.mobile.R.string.author_delete)) }
                     }
                     Text(
                         stringResource(
@@ -502,6 +524,7 @@ private fun GraphAuthorContent(artifacts: AuthorArtifacts, project: Project, onS
         report?.let { text -> Text(text, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
         savedMsg?.let { text -> Text(text, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
         error?.let { err -> NfErrorCard(err.code, err.message, err.fix, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
+        SnackbarHost(hostState = snackbar, modifier = Modifier.padding(horizontal = NfSpacing.page))
     }
 }
 

@@ -388,4 +388,5 @@
     <string name="me_language_system">System</string>
     <string name="me_language_zh">中文</string>
     <string name="me_language_en">English</string>
+    <string name="author_deleted">Node deleted</string>
 </resources>
