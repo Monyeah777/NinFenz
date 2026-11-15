@@ -202,4 +202,40 @@
     <string name="author_required_label">必填</string>
     <string name="author_optional_label">可选</string>
     <string name="author_validate_result">校验结果：%1$s · issues=%2$d</string>
+
+    <string name="delivery_title">交付 · %1$s</string>
+    <string name="delivery_pack_missing_title">绑定的 Pack 不在本机</string>
+    <string name="delivery_pack_missing_body">项目引用的 %1$s 未安装，无法装配。</string>
+    <string name="delivery_back">返回</string>
+    <string name="delivery_pack_label">Pack：%1$s · %2$s</string>
+    <string name="delivery_note">装配/校验走核心；项目状态写回与 PDF 内核仍 OPEN。</string>
+    <string name="delivery_load_error">读取项目内容失败：%1$s</string>
+    <string name="delivery_load_fix">重装绑定的 Pack</string>
+    <string name="delivery_plan">1 · 装配计划</string>
+    <string name="delivery_compile">编译 graph-compile</string>
+    <string name="delivery_compiling">编译中…</string>
+    <string name="delivery_plan_summary">plan：steps %1$d · slots %2$d</string>
+    <string name="delivery_slots">2 · 槽位输入</string>
+    <string name="delivery_compile_first">先编译计划。</string>
+    <string name="delivery_no_slots">该计划无需槽位输入。</string>
+    <string name="delivery_assemble_validate">3 · 装配与校验</string>
+    <string name="delivery_assemble">assemble</string>
+    <string name="delivery_assembling">装配中…</string>
+    <string name="delivery_validate">validate L1</string>
+    <string name="delivery_validating">校验中…</string>
+    <string name="delivery_status_note">项目状态：%1$s</string>
+    <string name="delivery_status_fail">状态写回失败：%1$s</string>
+    <string name="delivery_export_section">4 · 导出与分享</string>
+    <string name="delivery_share_md">分享 Markdown</string>
+    <string name="delivery_share_file">分享导出文件</string>
+    <string name="delivery_pdf_note">PDF：平台打印（OPEN-EXPORT-STYLE），本屏不伪造 PDF。</string>
+    <string name="delivery_preview">预览</string>
+    <string name="delivery_not_assembled">尚未装配。预览只显示核心返回的 markdown。</string>
+    <string name="delivery_export">导出 %1$s</string>
+    <string name="delivery_status_draft">草稿</string>
+    <string name="delivery_status_authoring">创作中</string>
+    <string name="delivery_status_assembled">已装配</string>
+    <string name="delivery_status_validated">已校验</string>
+    <string name="delivery_status_exported">已导出</string>
+    <string name="delivery_status_reviewed">已人审</string>
 </resources>

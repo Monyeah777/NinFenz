@@ -26,7 +26,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import android.content.Context
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.core.CoreError
 import dev.ninfenz.mobile.core.CoreResponse
@@ -101,9 +103,9 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
             NfTopAppBar(title = project.title, onBack = onBack)
             NfEmptyState(
                 icon = Icons.Filled.Info,
-                title = "绑定的 Pack 不在本机",
-                message = "项目引用的 " + project.refs.basePackId + " 未安装，无法装配。",
-                actionLabel = "返回",
+                title = stringResource(dev.ninfenz.mobile.R.string.delivery_pack_missing_title),
+                message = stringResource(dev.ninfenz.mobile.R.string.delivery_pack_missing_body, project.refs.basePackId),
+                actionLabel = stringResource(dev.ninfenz.mobile.R.string.delivery_back),
                 onAction = onBack
             )
         }
@@ -111,7 +113,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        NfTopAppBar(title = "交付 · " + project.title, onBack = onBack)
+        NfTopAppBar(title = stringResource(dev.ninfenz.mobile.R.string.delivery_title, project.title), onBack = onBack)
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -123,26 +125,26 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                 Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(project.title, style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
-                        NfStatusChip(statusText(status))
+                        NfStatusChip(statusText(context, status))
                     }
                     Text(
-                        "Pack：" + project.refs.basePackId + " · " + project.refs.basePackVersion,
+                        stringResource(dev.ninfenz.mobile.R.string.delivery_pack_label, project.refs.basePackId, project.refs.basePackVersion),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    Text("装配/校验走核心；项目状态写回与 PDF 内核仍 OPEN。", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(stringResource(dev.ninfenz.mobile.R.string.delivery_note), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
             statusNote?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
             if (loading) LinearProgressIndicator(modifier = Modifier.fillMaxWidth().padding(horizontal = NfSpacing.page))
             if (loadError != null) {
-                NfErrorCard("NF-PCK-003", "读取项目内容失败：" + loadError!!, "重装绑定的 Pack", modifier = Modifier.padding(horizontal = NfSpacing.page))
+                NfErrorCard("NF-PCK-003", stringResource(dev.ninfenz.mobile.R.string.delivery_load_error, loadError!!), stringResource(dev.ninfenz.mobile.R.string.delivery_load_fix), modifier = Modifier.padding(horizontal = NfSpacing.page))
             }
             error?.let { err -> NfErrorCard(err.code, err.message, err.fix, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
 
             val current = artifacts
             if (current != null) {
-                NfSectionHeader("1 · 装配计划")
+                NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.delivery_plan))
                 Button(
                     enabled = !busy,
                     modifier = Modifier.padding(horizontal = NfSpacing.page),
@@ -174,20 +176,20 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                             busy = false
                         }
                     }
-                ) { Text(if (busy) "编译中…" else "编译 graph-compile") }
+                ) { Text(if (busy) stringResource(dev.ninfenz.mobile.R.string.delivery_compiling) else stringResource(dev.ninfenz.mobile.R.string.delivery_compile)) }
                 plan?.let { p ->
                     Text(
-                        "plan：steps " + p.steps.size + " · slots " + p.slots.size,
+                        stringResource(dev.ninfenz.mobile.R.string.delivery_plan_summary, p.steps.size, p.slots.size),
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.padding(horizontal = NfSpacing.page)
                     )
                 }
 
-                NfSectionHeader("2 · 槽位输入")
+                NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.delivery_slots))
                 if (plan == null) {
-                    Text("先编译计划。", style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page))
+                    Text(stringResource(dev.ninfenz.mobile.R.string.delivery_compile_first), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page))
                 } else if (plan!!.slots.isEmpty()) {
-                    Text("该计划无需槽位输入。", style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page))
+                    Text(stringResource(dev.ninfenz.mobile.R.string.delivery_no_slots), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page))
                 } else {
                     for (slot in plan!!.slots) {
                         Column(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
@@ -202,7 +204,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                     }
                 }
 
-                NfSectionHeader("3 · 装配与校验")
+                NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.delivery_assemble_validate))
                 Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                     Button(
                         enabled = !busy && rawPlan != null,
@@ -224,10 +226,10 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                     when (val advanced = statusStore.advance(project, ProjectStatus.ASSEMBLED)) {
                                         is StatusAdvanceResult.Advanced -> {
                                             status = advanced.to
-                                            statusNote = "项目状态：" + statusText(advanced.to)
+                                            statusNote = context.getString(dev.ninfenz.mobile.R.string.delivery_status_note, statusText(context, advanced.to))
                                             onStatusChanged()
                                         }
-                                        is StatusAdvanceResult.Failure -> statusNote = "状态写回失败：" + advanced.message
+                                        is StatusAdvanceResult.Failure -> statusNote = context.getString(dev.ninfenz.mobile.R.string.delivery_status_fail, advanced.message)
                                     }
                                 } else {
                                     error = response.error ?: CoreResponse.failure("NF-ASM-002", "装配未返回 markdown", "检查槽位输入", 1).error
@@ -235,7 +237,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                 busy = false
                             }
                         }
-                    ) { Text(if (busy) "装配中…" else "assemble") }
+                    ) { Text(if (busy) stringResource(dev.ninfenz.mobile.R.string.delivery_assembling) else stringResource(dev.ninfenz.mobile.R.string.delivery_assemble)) }
                     Button(
                         enabled = !busy && markdown != null && rawPlan != null,
                         onClick = {
@@ -263,16 +265,16 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                     when (val advanced = statusStore.advance(project, ProjectStatus.VALIDATED)) {
                                         is StatusAdvanceResult.Advanced -> {
                                             status = advanced.to
-                                            statusNote = "项目状态：" + statusText(advanced.to)
+                                            statusNote = context.getString(dev.ninfenz.mobile.R.string.delivery_status_note, statusText(context, advanced.to))
                                             onStatusChanged()
                                         }
-                                        is StatusAdvanceResult.Failure -> statusNote = "状态写回失败：" + advanced.message
+                                        is StatusAdvanceResult.Failure -> statusNote = context.getString(dev.ninfenz.mobile.R.string.delivery_status_fail, advanced.message)
                                     }
                                 }
                                 busy = false
                             }
                         }
-                    ) { Text(if (busy) "校验中…" else "validate L1") }
+                    ) { Text(if (busy) stringResource(dev.ninfenz.mobile.R.string.delivery_validating) else stringResource(dev.ninfenz.mobile.R.string.delivery_validate)) }
                 }
                 report?.let { r ->
                     Text(ReportModel.line(r), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(horizontal = NfSpacing.page))
@@ -286,7 +288,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                     }
                 }
 
-                NfSectionHeader("4 · 导出与分享")
+                NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.delivery_export_section))
                 Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                     ExportButton("md", "text/markdown", markdown, project, context, scope, { busy = it }, { error = it }) { file, manifest ->
                         exportedFile = file
@@ -295,10 +297,10 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                             when (val advanced = statusStore.advance(project, ProjectStatus.EXPORTED)) {
                                 is StatusAdvanceResult.Advanced -> {
                                     status = advanced.to
-                                    statusNote = "项目状态：" + statusText(advanced.to)
+                                    statusNote = context.getString(dev.ninfenz.mobile.R.string.delivery_status_note, statusText(context, advanced.to))
                                     onStatusChanged()
                                 }
-                                is StatusAdvanceResult.Failure -> statusNote = "状态写回失败：" + advanced.message
+                                is StatusAdvanceResult.Failure -> statusNote = context.getString(dev.ninfenz.mobile.R.string.delivery_status_fail, advanced.message)
                             }
                         }
                     }
@@ -317,9 +319,9 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                         onClick = {
                             val md = markdown ?: return@OutlinedButton
                             val intent = ShareExporter.shareMarkdown(context, "nf-" + project.id, md)
-                            context.startActivity(Intent.createChooser(intent, "分享 Markdown"))
+                            context.startActivity(Intent.createChooser(intent, context.getString(dev.ninfenz.mobile.R.string.delivery_share_md)))
                         }
-                    ) { Text("分享 Markdown") }
+                    ) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_share_md)) }
                     OutlinedButton(
                         enabled = exportedFile != null,
                         onClick = {
@@ -331,29 +333,29 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                 else -> "application/octet-stream"
                             }
                             val intent = ShareExporter.shareFileIntent(context, file, mime, project.title)
-                            context.startActivity(Intent.createChooser(intent, "分享导出文件"))
+                            context.startActivity(Intent.createChooser(intent, context.getString(dev.ninfenz.mobile.R.string.delivery_share_file)))
                         }
-                    ) { Text("分享导出文件") }
+                    ) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_share_file)) }
                 }
-                Text("PDF：平台打印（OPEN-EXPORT-STYLE），本屏不伪造 PDF。", style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page))
+                Text(stringResource(dev.ninfenz.mobile.R.string.delivery_pdf_note), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page))
                 manifestText?.let { Text(it, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
 
-                NfSectionHeader("预览")
+                NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.delivery_preview))
                 markdown?.let { md ->
                     Text(md.take(4000), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(horizontal = NfSpacing.page))
-                } ?: Text("尚未装配。预览只显示核心返回的 markdown。", style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page))
+                } ?: Text(stringResource(dev.ninfenz.mobile.R.string.delivery_not_assembled), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page))
             }
         }
     }
 }
 
-private fun statusText(status: ProjectStatus): String = when (status) {
-    ProjectStatus.DRAFT -> "草稿"
-    ProjectStatus.AUTHORING -> "创作中"
-    ProjectStatus.ASSEMBLED -> "已装配"
-    ProjectStatus.VALIDATED -> "已校验"
-    ProjectStatus.EXPORTED -> "已导出"
-    ProjectStatus.REVIEWED -> "已人审"
+private fun statusText(context: Context, status: ProjectStatus): String = when (status) {
+    ProjectStatus.DRAFT -> context.getString(dev.ninfenz.mobile.R.string.delivery_status_draft)
+    ProjectStatus.AUTHORING -> context.getString(dev.ninfenz.mobile.R.string.delivery_status_authoring)
+    ProjectStatus.ASSEMBLED -> context.getString(dev.ninfenz.mobile.R.string.delivery_status_assembled)
+    ProjectStatus.VALIDATED -> context.getString(dev.ninfenz.mobile.R.string.delivery_status_validated)
+    ProjectStatus.EXPORTED -> context.getString(dev.ninfenz.mobile.R.string.delivery_status_exported)
+    ProjectStatus.REVIEWED -> context.getString(dev.ninfenz.mobile.R.string.delivery_status_reviewed)
 }
 
 @Composable
@@ -401,5 +403,5 @@ private fun ExportButton(
                 }
             }
         }
-    ) { Text("导出 " + format) }
+    ) { Text(context.getString(dev.ninfenz.mobile.R.string.delivery_export, format)) }
 }

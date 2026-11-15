@@ -16,7 +16,7 @@
 | Pack 中心/CCOS/Pack zip 更新 | pass（工程面） | 1dc695125/4d816f3c5/6c30f241e |
 | JVM 测试 | pass | 90/90（含 Robolectric/Compose） |
 | 自适应/9 组尺寸语义矩阵 | pass（语义层） | ShellNavigation/ShellSizeMatrix 测试 |
-| i18n（外壳 + onboarding/new project + 顶层四屏 + 导入/搜索/Pack 中心/创作台） | partial | values-en + 资源化；交付/CCOS 正文 OPEN-I18N-BODY |
+| i18n（外壳 + onboarding/new project + 顶层四屏 + 导入/搜索/Pack 中心/创作台/交付） | partial | values-en + 资源化；CCOS 正文 OPEN-I18N-BODY |
 | 像素截图矩阵 | OPEN | OPEN-SCREENSHOT |
 | 真机/模拟器 | OPEN-TOOLCHAIN | OPEN-DEVICE |
 | 草稿→项目；管线/规格保存；reviewed 串联 | OPEN | OPEN-DRAFT-PROJECT / OPEN-AUTHOR-GRAPH-SPEC / OPEN-REVIEWED |

@@ -24,10 +24,10 @@
 
 | 项 | 结果 |
 |---|---|
-| APK | app-debug.apk = 18,507,739 B；sha256 1bb659896fe07d8a5b5934ca49f88339b206273872cadcecd374b3c1683d3b24 |
-| JVM 测试 | 96 条全绿（v1 基线 42 + v0.02 新增 54；含 Robolectric/Compose） |
+| APK | app-debug.apk = 18,523,775 B；sha256 33b17c0d877b4cf48a789e96a8318469eab0a8d8583dd52ad7f51ef6413c5ee3 |
+| JVM 测试 | 97 条全绿（v1 基线 42 + v0.02 新增 55；含 Robolectric/Compose） |
 | 构建 | ./gradlew :app:assembleDebug 成功；:app:testDebugUnitTest 90/90 |
-| i18n | 外壳 + onboarding/new project + 顶层四屏 + 导入/搜索/Pack 中心/创作台正文已资源化 + values-en；交付/CCOS 仍内联（OPEN） |
+| i18n | 外壳 + onboarding/new project + 顶层四屏 + 导入/搜索/Pack 中心/创作台/交付正文已资源化 + values-en；CCOS 仍内联（OPEN） |
 | 适配 | compact/medium/expanded 三档导航 + 9 组窗口尺寸语义矩阵 |
 | app/gates | 7/7 gate PASS、FAIL=0（QA0 10 checks、QA5 5 checks；含 v0.02 UX/i18n/测试矩阵检查） |
 
