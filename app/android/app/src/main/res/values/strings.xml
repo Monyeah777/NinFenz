@@ -405,4 +405,7 @@
     <string name="status_reviewed">已人审</string>
     <string name="error_fix_prefix">修复：%1$s</string>
     <string name="ccos_submit_timeout">提交超时，请重试</string>
+    <string name="action_expand">展开</string>
+    <string name="action_collapse">收起</string>
+    <string name="delivery_slot_chars">已输入 %1$d 字</string>
 </resources>

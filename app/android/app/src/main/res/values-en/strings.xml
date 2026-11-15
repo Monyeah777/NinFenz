@@ -405,4 +405,7 @@
     <string name="status_reviewed">Reviewed</string>
     <string name="error_fix_prefix">Fix: %1$s</string>
     <string name="ccos_submit_timeout">Submit timed out; retry</string>
+    <string name="action_expand">Expand</string>
+    <string name="action_collapse">Collapse</string>
+    <string name="delivery_slot_chars">%1$d chars</string>
 </resources>

@@ -2,6 +2,10 @@ package dev.ninfenz.mobile.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -21,11 +25,12 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -38,6 +43,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -47,6 +55,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.style.TextOverflow as NfTextOverflow
 import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.ui.theme.NfSpacing
 
@@ -80,6 +89,74 @@ fun NfSectionHeader(text: String, modifier: Modifier = Modifier, action: (@Compo
     ) {
         Text(text, style = MaterialTheme.typography.titleLarge, modifier = Modifier.semantics { heading() })
         action?.invoke()
+    }
+}
+
+/** 可折叠分组：标题行常驻，内容可收起/展开，适合长表单与长预览。 */
+@Composable
+fun NfCollapsibleSection(
+    title: String,
+    subtitle: String? = null,
+    initiallyExpanded: Boolean = true,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    var expanded by remember { mutableStateOf(initiallyExpanded) }
+    Column(modifier = Modifier.fillMaxWidth().animateContentSize()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { expanded = !expanded }
+                .padding(horizontal = NfSpacing.page, vertical = NfSpacing.s),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(title, style = MaterialTheme.typography.titleLarge, modifier = Modifier.semantics { heading() })
+                subtitle?.let {
+                    Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+            Icon(
+                imageVector = if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                contentDescription = stringResource(if (expanded) dev.ninfenz.mobile.R.string.action_collapse else dev.ninfenz.mobile.R.string.action_expand)
+            )
+        }
+        if (expanded) {
+            Column(content = content)
+        }
+    }
+}
+
+/** 长文本预览：默认截断，展开后限高滚动，避免把整页撑爆。 */
+@Composable
+fun NfExpandableText(
+    text: String,
+    modifier: Modifier = Modifier,
+    collapsedLines: Int = 12,
+    collapsedChars: Int = 600
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val needsToggle = text.length > collapsedChars || text.count { it == '\n' } >= collapsedLines
+    Column(modifier = modifier.fillMaxWidth()) {
+        Box(
+            modifier = if (expanded) {
+                Modifier.fillMaxWidth().heightIn(max = 420.dp).verticalScroll(rememberScrollState())
+            } else {
+                Modifier.fillMaxWidth()
+            }
+        ) {
+            Text(
+                text = text,
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = if (expanded) Int.MAX_VALUE else collapsedLines,
+                overflow = NfTextOverflow.Ellipsis
+            )
+        }
+        if (needsToggle) {
+            TextButton(onClick = { expanded = !expanded }) {
+                Text(stringResource(if (expanded) dev.ninfenz.mobile.R.string.action_collapse else dev.ninfenz.mobile.R.string.action_expand))
+            }
+        }
     }
 }
 

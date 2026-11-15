@@ -16,6 +16,7 @@
 | 装配 | pass：填 4 个槽位后 assemble 返回 markdown（开篇/正文/收束） | 截图 19 |
 | L1 校验 | pass：L1 pass（error=0 warn=0 info=3）；状态 assembled→validated 写回 | run-as 读项目 |
 | 导出 md/zip | pass：files/exports/delivery/result.md + result.zip + manifest；状态 validated→exported 写回 | run-as 读文件 |
+| 交付折叠/长文预览 | pass：槽位分组可收起/展开（真机点击标题折叠后 SLT-01..04 消失，再展开恢复）；槽位输入 minLines=2/maxLines=6 + 已输入字数；预览全文不再 take(4000)，默认 12 行折叠，展开后限高滚动 |
 | Pack diff/apply/rollback | pass：NFTest/demo-pack-1.0.1.zip → diff（1.0.0→1.0.1，modified 1，无冲突）→ 应用（applied/nf-pack.json=1.0.1）→ 回滚（applied-rollback/nf-pack.json=1.0.0） |
 | 文件导入（SAF） | pass：自建 /sdcard/NFTest 目录选 nf-file-import.md → markdown 85%、结构 2 标题/2 段落、4 条映射；全部采纳后保存 drafts/nf-file-import.md.json + mapping.json |
 | 导入示例 | pass（修复后）：markdown 85%，8 条映射，全部采纳后保存 files/drafts/sample.md.json + .mapping.json | 截图 29–31 |

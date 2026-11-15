@@ -47,6 +47,8 @@ import dev.ninfenz.mobile.model.ValidateReport
 import dev.ninfenz.mobile.share.ShareExporter
 import dev.ninfenz.mobile.ui.components.NfCard
 import dev.ninfenz.mobile.ui.components.NfEmptyState
+import dev.ninfenz.mobile.ui.components.NfCollapsibleSection
+import dev.ninfenz.mobile.ui.components.NfExpandableText
 import dev.ninfenz.mobile.ui.components.NfErrorCard
 import dev.ninfenz.mobile.ui.components.NfLoadingState
 import dev.ninfenz.mobile.ui.components.NfSectionHeader
@@ -186,21 +188,29 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                     )
                 }
 
-                NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.delivery_slots))
-                if (plan == null) {
-                    Text(stringResource(dev.ninfenz.mobile.R.string.delivery_compile_first), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page))
-                } else if (plan!!.slots.isEmpty()) {
-                    Text(stringResource(dev.ninfenz.mobile.R.string.delivery_no_slots), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page))
-                } else {
-                    for (slot in plan!!.slots) {
-                        Column(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
-                            Text(slot, style = MaterialTheme.typography.labelLarge)
-                            OutlinedTextField(
-                                value = inputs[slot] ?: "",
-                                onValueChange = { inputs = inputs + (slot to it) },
-                                singleLine = false,
-                                modifier = Modifier.fillMaxWidth()
-                            )
+                NfCollapsibleSection(
+                    title = stringResource(dev.ninfenz.mobile.R.string.delivery_slots),
+                    subtitle = plan?.let { stringResource(dev.ninfenz.mobile.R.string.delivery_plan_summary, it.steps.size, it.slots.size) },
+                    initiallyExpanded = true
+                ) {
+                    if (plan == null) {
+                        Text(stringResource(dev.ninfenz.mobile.R.string.delivery_compile_first), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page))
+                    } else if (plan!!.slots.isEmpty()) {
+                        Text(stringResource(dev.ninfenz.mobile.R.string.delivery_no_slots), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page))
+                    } else {
+                        for (slot in plan!!.slots) {
+                            Column(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
+                                Text(slot, style = MaterialTheme.typography.labelLarge)
+                                OutlinedTextField(
+                                    value = inputs[slot] ?: "",
+                                    onValueChange = { inputs = inputs + (slot to it) },
+                                    singleLine = false,
+                                    minLines = 2,
+                                    maxLines = 6,
+                                    supportingText = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_slot_chars, (inputs[slot] ?: "").length)) },
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
                         }
                     }
                 }
@@ -289,7 +299,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                     }
                 }
 
-                NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.delivery_export_section))
+                NfCollapsibleSection(title = stringResource(dev.ninfenz.mobile.R.string.delivery_export_section), initiallyExpanded = true) {
                 Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                     ExportButton("md", "text/markdown", markdown, project, context, scope, { busy = it }, { error = it }) { file, manifest ->
                         exportedFile = file
@@ -340,11 +350,13 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                 }
                 Text(stringResource(dev.ninfenz.mobile.R.string.delivery_pdf_note), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page))
                 manifestText?.let { Text(it, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
+                }
 
-                NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.delivery_preview))
-                markdown?.let { md ->
-                    Text(md.take(4000), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(horizontal = NfSpacing.page))
-                } ?: Text(stringResource(dev.ninfenz.mobile.R.string.delivery_not_assembled), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page))
+                NfCollapsibleSection(title = stringResource(dev.ninfenz.mobile.R.string.delivery_preview), initiallyExpanded = true) {
+                    markdown?.let { md ->
+                        NfExpandableText(md, modifier = Modifier.padding(horizontal = NfSpacing.page))
+                    } ?: Text(stringResource(dev.ninfenz.mobile.R.string.delivery_not_assembled), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page))
+                }
             }
         }
     }
