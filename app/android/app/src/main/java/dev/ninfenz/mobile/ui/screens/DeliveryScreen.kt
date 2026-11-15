@@ -34,9 +34,12 @@ import dev.ninfenz.mobile.core.J
 import dev.ninfenz.mobile.data.AuthorArtifacts
 import dev.ninfenz.mobile.data.AuthorArtifactsLoader
 import dev.ninfenz.mobile.data.PackEntry
+import dev.ninfenz.mobile.data.ProjectStatusStore
+import dev.ninfenz.mobile.data.StatusAdvanceResult
 import dev.ninfenz.mobile.model.AssemblyPlan
 import dev.ninfenz.mobile.model.PlanModel
 import dev.ninfenz.mobile.model.Project
+import dev.ninfenz.mobile.model.ProjectStatus
 import dev.ninfenz.mobile.model.ReportModel
 import dev.ninfenz.mobile.model.ValidateReport
 import dev.ninfenz.mobile.share.ShareExporter
@@ -62,9 +65,12 @@ import kotlinx.serialization.json.put
  * 项目状态写回与 PDF 内核仍未接（PDF=平台打印，OPEN）。
  */
 @Composable
-fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit) {
+fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onStatusChanged: () -> Unit = {}) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val statusStore = remember { ProjectStatusStore(context.filesDir) }
+    var status by remember(project.id) { mutableStateOf(project.status) }
+    var statusNote by remember { mutableStateOf<String?>(null) }
     var artifacts by remember { mutableStateOf<AuthorArtifacts?>(null) }
     var loadError by remember { mutableStateOf<String?>(null) }
     var loading by remember { mutableStateOf(true) }
@@ -117,7 +123,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit) {
                 Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(project.title, style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
-                        NfStatusChip(projectStatusLabel(project))
+                        NfStatusChip(statusText(status))
                     }
                     Text(
                         "Pack：" + project.refs.basePackId + " · " + project.refs.basePackVersion,
@@ -127,6 +133,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit) {
                     Text("装配/校验走核心；项目状态写回与 PDF 内核仍 OPEN。", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
+            statusNote?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
             if (loading) LinearProgressIndicator(modifier = Modifier.fillMaxWidth().padding(horizontal = NfSpacing.page))
             if (loadError != null) {
                 NfErrorCard("NF-PCK-003", "读取项目内容失败：" + loadError!!, "重装绑定的 Pack", modifier = Modifier.padding(horizontal = NfSpacing.page))
@@ -214,6 +221,14 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit) {
                                 if (response.ok && !md.isNullOrBlank()) {
                                     markdown = md
                                     report = null
+                                    when (val advanced = statusStore.advance(project, ProjectStatus.ASSEMBLED)) {
+                                        is StatusAdvanceResult.Advanced -> {
+                                            status = advanced.to
+                                            statusNote = "项目状态：" + statusText(advanced.to)
+                                            onStatusChanged()
+                                        }
+                                        is StatusAdvanceResult.Failure -> statusNote = "状态写回失败：" + advanced.message
+                                    }
                                 } else {
                                     error = response.error ?: CoreResponse.failure("NF-ASM-002", "装配未返回 markdown", "检查槽位输入", 1).error
                                 }
@@ -244,6 +259,16 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit) {
                                     }
                                 }
                                 if (!response.ok) error = response.error
+                                if (report?.verdict == "pass") {
+                                    when (val advanced = statusStore.advance(project, ProjectStatus.VALIDATED)) {
+                                        is StatusAdvanceResult.Advanced -> {
+                                            status = advanced.to
+                                            statusNote = "项目状态：" + statusText(advanced.to)
+                                            onStatusChanged()
+                                        }
+                                        is StatusAdvanceResult.Failure -> statusNote = "状态写回失败：" + advanced.message
+                                    }
+                                }
                                 busy = false
                             }
                         }
@@ -266,6 +291,16 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit) {
                     ExportButton("md", "text/markdown", markdown, project, context, scope, { busy = it }, { error = it }) { file, manifest ->
                         exportedFile = file
                         manifestText = manifest
+                        scope.launch {
+                            when (val advanced = statusStore.advance(project, ProjectStatus.EXPORTED)) {
+                                is StatusAdvanceResult.Advanced -> {
+                                    status = advanced.to
+                                    statusNote = "项目状态：" + statusText(advanced.to)
+                                    onStatusChanged()
+                                }
+                                is StatusAdvanceResult.Failure -> statusNote = "状态写回失败：" + advanced.message
+                            }
+                        }
                     }
                     ExportButton("zip", "application/zip", markdown, project, context, scope, { busy = it }, { error = it }) { file, manifest ->
                         exportedFile = file
@@ -310,6 +345,15 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit) {
             }
         }
     }
+}
+
+private fun statusText(status: ProjectStatus): String = when (status) {
+    ProjectStatus.DRAFT -> "草稿"
+    ProjectStatus.AUTHORING -> "创作中"
+    ProjectStatus.ASSEMBLED -> "已装配"
+    ProjectStatus.VALIDATED -> "已校验"
+    ProjectStatus.EXPORTED -> "已导出"
+    ProjectStatus.REVIEWED -> "已人审"
 }
 
 @Composable

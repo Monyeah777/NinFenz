@@ -312,7 +312,7 @@ fun NfMobileApp(
                             val pack = packs.packs.firstOrNull {
                                 it.id == entry.project.refs.basePackId && it.version == entry.project.refs.basePackVersion
                             }
-                            DeliveryScreen(project = entry.project, pack = pack, onBack = { shell = shell.back() ?: shell })
+                            DeliveryScreen(project = entry.project, pack = pack, onBack = { shell = shell.back() ?: shell }, onStatusChanged = { refresh() })
                         }
                     }
                     is Detail.Assembly -> AssemblyScreen(onBack = { shell = shell.back() ?: shell })
