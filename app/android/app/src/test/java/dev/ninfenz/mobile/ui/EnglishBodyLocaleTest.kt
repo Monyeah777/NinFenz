@@ -9,6 +9,8 @@ import androidx.test.core.app.ApplicationProvider
 import dev.ninfenz.mobile.data.LibraryStore
 import dev.ninfenz.mobile.ui.screens.ImportScreen
 import dev.ninfenz.mobile.ui.screens.NewProjectScreen
+import dev.ninfenz.mobile.ui.screens.PackCenterScreen
+import dev.ninfenz.mobile.ui.screens.SearchScreen
 import dev.ninfenz.mobile.ui.screens.OnboardingScreen
 import dev.ninfenz.mobile.ui.theme.NfTheme
 import org.junit.Assert.assertTrue
@@ -47,6 +49,20 @@ class EnglishBodyLocaleTest {
         compose.onNodeWithText("Choose file").assertIsDisplayed()
         compose.onNodeWithText("Clipboard").assertIsDisplayed()
         compose.onNodeWithText("Nothing imported yet").assertIsDisplayed()
+    }
+
+    @Test
+    fun searchUsesEnglishBody() {
+        compose.setContent { NfTheme { SearchScreen(onBack = {}, onOpenPack = { _, _ -> }, onOpenProject = {}) } }
+        compose.onNodeWithText("Search").assertIsDisplayed()
+        compose.onNodeWithText("Type a keyword", substring = true).assertIsDisplayed()
+    }
+
+    @Test
+    fun packCenterUsesEnglishBody() {
+        compose.setContent { NfTheme { PackCenterScreen(packs = emptyList(), onBack = {}, onOpenPack = {}, onUpdatePlan = {}, onLoadSample = {}) } }
+        compose.onNodeWithText("Pack center").assertIsDisplayed()
+        compose.onNodeWithText("No packs yet").assertIsDisplayed()
     }
 
     @Test

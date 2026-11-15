@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.data.SearchHit
@@ -49,24 +50,24 @@ fun SearchScreen(
     val results = remember(query, all) { index.search(all, query) }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        NfTopAppBar(title = "搜索", onBack = onBack)
+        NfTopAppBar(title = stringResource(dev.ninfenz.mobile.R.string.search_title), onBack = onBack)
         OutlinedTextField(
             value = query,
             onValueChange = { query = it },
             modifier = Modifier.fillMaxWidth().padding(horizontal = NfSpacing.page),
-            placeholder = { Text("搜索 Pack、条款、节点、章节、槽位、项目") },
+            placeholder = { Text(stringResource(dev.ninfenz.mobile.R.string.search_placeholder)) },
             leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
             singleLine = true
         )
         when {
             query.isBlank() -> Text(
-                "输入关键词开始搜索；索引 " + all.size + " 条（本地）。",
+                stringResource(dev.ninfenz.mobile.R.string.search_hint, all.size),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(NfSpacing.page)
             )
             results.isEmpty() -> Text(
-                "没有匹配项",
+                stringResource(dev.ninfenz.mobile.R.string.search_no_result),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(NfSpacing.page)

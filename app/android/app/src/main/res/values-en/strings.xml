@@ -138,4 +138,29 @@
     <string name="import_saved_note">Draft stays in app-private storage and is not written into a project; draft → project conversion lands in W4+.</string>
     <string name="import_done">Done</string>
     <string name="import_again">Import another</string>
+
+    <string name="search_title">Search</string>
+    <string name="search_placeholder">Search packs, clauses, nodes, sections, slots, projects</string>
+    <string name="search_hint">Type a keyword; %1$d local items indexed.</string>
+    <string name="search_no_result">No matches</string>
+    <string name="search_section">%1$s · %2$d</string>
+    <string name="search_kind_project">Projects</string>
+    <string name="search_kind_pack">Packs</string>
+    <string name="search_kind_clause">Clauses</string>
+    <string name="search_kind_field">Fields</string>
+    <string name="search_kind_node">Pipeline nodes</string>
+    <string name="search_kind_section">Spec sections</string>
+    <string name="search_kind_slot">Spec slots</string>
+    <string name="packcenter_title">Pack center</string>
+    <string name="packcenter_update_plan">Update plan</string>
+    <string name="packcenter_empty_title">No packs yet</string>
+    <string name="packcenter_empty_body">Load the bundled sample pack, or import a pack from Files.</string>
+    <string name="packcenter_load_sample">Load sample pack</string>
+    <string name="packcenter_installed_count">Installed (%1$d)</string>
+    <string name="packcenter_installed">Installed</string>
+    <string name="packcenter_tree">tree: %1$s…</string>
+    <string name="packcenter_verify">Verify</string>
+    <string name="packcenter_verifying">Verifying…</string>
+    <string name="packcenter_detail">Details</string>
+    <string name="packcenter_verify_pass">Verified · verdict=%1$s</string>
 </resources>

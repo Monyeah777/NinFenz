@@ -22,6 +22,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.launch
 import dev.ninfenz.mobile.data.PackEntry
 import dev.ninfenz.mobile.data.PackVerifier
@@ -43,24 +45,25 @@ fun PackCenterScreen(
     onLoadSample: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     var verifyingId by remember { mutableStateOf<String?>(null) }
     var results by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
     var errors by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
 
     Column(modifier = Modifier.fillMaxSize()) {
         NfTopAppBar(
-            title = "Pack 中心",
+            title = stringResource(dev.ninfenz.mobile.R.string.packcenter_title),
             onBack = onBack,
             actions = {
-                TextButton(onClick = onUpdatePlan) { Text("更新计划") }
+                TextButton(onClick = onUpdatePlan) { Text(stringResource(dev.ninfenz.mobile.R.string.packcenter_update_plan)) }
             }
         )
         if (packs.isEmpty()) {
             NfEmptyState(
                 icon = Icons.Filled.Add,
-                title = "还没有 Pack",
-                message = "载入内置示例 Pack，或从文件管理器导入一个 Pack。",
-                actionLabel = "载入示例 Pack",
+                title = stringResource(dev.ninfenz.mobile.R.string.packcenter_empty_title),
+                message = stringResource(dev.ninfenz.mobile.R.string.packcenter_empty_body),
+                actionLabel = stringResource(dev.ninfenz.mobile.R.string.packcenter_load_sample),
                 onAction = onLoadSample
             )
         } else {
@@ -68,7 +71,7 @@ fun PackCenterScreen(
                 contentPadding = androidx.compose.foundation.layout.PaddingValues(NfSpacing.page),
                 verticalArrangement = Arrangement.spacedBy(NfSpacing.m)
             ) {
-                item { NfSectionHeader("已安装（" + packs.size + "）") }
+                item { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.packcenter_installed_count, packs.size)) }
                 items(packs.size) { index ->
                     val pack = packs[index]
                     NfCard(modifier = Modifier.fillMaxWidth()) {
@@ -82,9 +85,9 @@ fun PackCenterScreen(
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
-                                NfStatusChip("已安装")
+                                NfStatusChip(stringResource(dev.ninfenz.mobile.R.string.packcenter_installed))
                             }
-                            Text("tree：" + pack.tree.take(16) + "…", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(stringResource(dev.ninfenz.mobile.R.string.packcenter_tree, pack.tree.take(16)), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                                 OutlinedButton(
                                     enabled = verifyingId == null,
@@ -94,7 +97,7 @@ fun PackCenterScreen(
                                             val response = PackVerifier().verify(pack)
                                             val verdict = response.resultObject()?.get("verdict")?.toString()?.trim('"')
                                             if (response.ok) {
-                                                results = results + (pack.id to ("校验通过 · verdict=" + (verdict ?: "pass")))
+                                                results = results + (pack.id to (context.getString(dev.ninfenz.mobile.R.string.packcenter_verify_pass, verdict ?: "pass")))
                                             } else {
                                                 val err = response.error
                                                 errors = errors + (pack.id to ("[" + (err?.code ?: "NF-VAL-001") + "] " + (err?.message ?: "校验失败") + "；修复：" + (err?.fix ?: "查看诊断")))
@@ -102,8 +105,8 @@ fun PackCenterScreen(
                                             verifyingId = null
                                         }
                                     }
-                                ) { Text(if (verifyingId == pack.id) "校验中…" else "校验") }
-                                Button(onClick = { onOpenPack(pack) }) { Text("详情") }
+                                ) { Text(if (verifyingId == pack.id) stringResource(dev.ninfenz.mobile.R.string.packcenter_verifying) else stringResource(dev.ninfenz.mobile.R.string.packcenter_verify)) }
+                                Button(onClick = { onOpenPack(pack) }) { Text(stringResource(dev.ninfenz.mobile.R.string.packcenter_detail)) }
                             }
                             results[pack.id]?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary) }
                             errors[pack.id]?.let { message ->
