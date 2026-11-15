@@ -4,7 +4,7 @@ NF APP 的 Android 控制面：本地处理、无账号、无遥测、**未声�
 app/docs/CONTRACT.md + app/docs/CLI.md + app/schema/error_codes.json（A0 冻结层）。
 
 > v0.02（W1）现状：四目的地外壳（库/创作/交付/我的）+ 自适应底部栏/rail + FAB 导入 + 首启示例 Pack/3 步引导 +
-> 设计 token/字体/暗色主题 + 自适应 launcher icon。旧 8 个功能页保留在详情层；W2 已接入新建项目向导（选 Pack→标题→core canonical/project-validate→原子写 nf-project）、示例演示项目自动生成、本地搜索索引（Pack 条款/字段/节点/章节/槽位 + 项目）与 Pack 校验；W3+ 继续导入/作者/交付产品化。
+> 设计 token/字体/暗色主题 + 自适应 launcher icon。旧 8 个功能页保留在详情层；W2 已接入新建项目向导、示例演示项目、本地搜索与 Pack 校验；W3 已把导入重做为产品向导（来源→预览→map-suggest 映射→草稿+决策 sidecar，含示例内容导入）；W4+ 继续作者台/交付台。
 
 ## 工程结构
 
@@ -67,7 +67,8 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 | 创作 | 顶层 2 | 项目列表 + 空态（项目向导 W2 接入）；点项目进详情 |
 | 交付 | 顶层 3 | 项目列表/装配入口 + Pack 更新 / CCOS 快捷入口 |
 | 我的 | 顶层 4 | 主题三态（跟随系统/浅色/深色）+ 存储/诊断/关于；中文默认 |
-| 详情：Import / Protocol / Graph / Assembly / PackUpdate / Ccos / Settings | 各屏详情 | 旧 8 屏保留，经详情层可达（返回回顶层）；能力/负例/错误码行为不变 |
+| 详情：Import | FAB/分享/空态 | 来源（文件/剪贴板/示例/分享）→ 预览（格式/置信度/结构）→ 映射（core map-suggest，逐条采纳）→ 草稿 + 决策 sidecar |
+| 详情：Protocol / Graph / Assembly / PackUpdate / Ccos / Settings | 各屏详情 | 旧功能页保留，经详情层可达（返回回顶层）；能力/负例/错误码行为不变 |
 | 详情：Project / Pack / Search | 列表点击/顶栏 | 项目状态/引用摘要 + 继续创作/装配；Pack 版本/条目/tree + core pack-verify 校验 + 更新；Search 本地索引（无网络） |
 | ShareReceiverActivity | SEND / SEND_MULTIPLE / VIEW / PROCESS_TEXT | 透明 Activity，只做载荷预览与「去导入」，不在接收层解析/落盘 |
 | 首启引导 | 首次启动 | 3 步（价值→示例 Pack→试导入），可跳过；示例载入失败可重试，不阻断 |
@@ -106,8 +107,8 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 
 ## 构建证据（本机，2026-11-15）
 
-- v0.02 W2 完成（2026-11-15）：`./gradlew :app:assembleDebug` 成功：app-debug.apk = 18,236,445 bytes，
-  sha256 = 3f45a09c0240bc45833b816a35e8ca6fab96789d39593bff4484bf87e6d05e88（含双 ABI 原生库 + 9 个示例 Pack assets）。
+- v0.02 W3（2026-11-15）：`./gradlew :app:assembleDebug` 成功：app-debug.apk = 18,255,407 bytes，
+  sha256 = ba16e47f54f586c87a6d53632955047721bf50b8c3ed4b7f4af213fe3979faac（含双 ABI 原生库 + 9 个示例 Pack assets）。
 - `./gradlew :app:testDebugUnitTest` 全绿：56 条 JVM 单测（42 基线 + AdaptiveLayout 4 + ShellState 4 + PackStore 3 + ProjectFactory 1 + ProjectCreator 2 + SearchIndex 3 + PackVerifier 1）。
 - `zipalign -c -P 16 -v 4 app-debug.apk` → Verification successful（native lib 16KB page 对齐）。
 - `bash app/scripts/build_core_android.sh --clean` 成功：NDK 27.0.12077973 + rustup targets

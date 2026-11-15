@@ -216,3 +216,17 @@ fun NfHint(text: String) {
         modifier = Modifier.padding(horizontal = NfSpacing.page)
     )
 }
+
+@Composable
+fun NfErrorCard(code: String, message: String, fix: String, modifier: Modifier = Modifier) {
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.medium,
+        color = MaterialTheme.colorScheme.errorContainer
+    ) {
+        Column(modifier = Modifier.padding(NfSpacing.m), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+            Text("[" + code + "] " + message, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onErrorContainer)
+            Text("修复：" + fix, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onErrorContainer)
+        }
+    }
+}
