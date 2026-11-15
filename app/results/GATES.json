@@ -210,10 +210,10 @@
   ],
   "gates": {
     "QA0": {
-      "checks": 8,
+      "checks": 10,
       "fail": 0,
       "open": 0,
-      "pass": 8
+      "pass": 10
     },
     "QA1": {
       "checks": 3,
@@ -240,10 +240,10 @@
       "pass": 4
     },
     "QA5": {
-      "checks": 3,
+      "checks": 5,
       "fail": 0,
       "open": 0,
-      "pass": 3
+      "pass": 5
     },
     "QA6": {
       "checks": 3,
@@ -252,7 +252,7 @@
       "pass": 3
     }
   },
-  "head": "c69e081beb6f5c43087c8c4fde4886e0e8c16209",
+  "head": "f7bfe3ae5ca513df74413d498864dfe0b29a9f60",
   "open_items": [
     {
       "id": "S11",
@@ -443,6 +443,40 @@
       "required": true,
       "status": "PASS",
       "title": "契约/核心/控制面/测试/夹具无本机绝对路径硬编码"
+    },
+    {
+      "check": "q0-ux-v002-shell",
+      "detail": null,
+      "evidence": [
+        "app/android/app/src/main/java/dev/ninfenz/mobile/ui/NfMobileApp.kt",
+        "app/android/app/src/main/java/dev/ninfenz/mobile/ui/components/NfComponents.kt",
+        "app/android/app/src/main/java/dev/ninfenz/mobile/ui/screens/TopLevelScreens.kt",
+        "app/android/app/src/main/java/dev/ninfenz/mobile/ui/shell/ShellState.kt",
+        "app/android/app/src/main/java/dev/ninfenz/mobile/ui/theme/Theme.kt",
+        "app/android/app/src/main/java/dev/ninfenz/mobile/ui/theme/Tokens.kt"
+      ],
+      "gate": "QA0",
+      "kind": "files",
+      "next": null,
+      "owner": null,
+      "required": true,
+      "status": "PASS",
+      "title": "v0.02 UX 外壳/设计 token/四目的地文件在位"
+    },
+    {
+      "check": "q0-ux-v002-i18n",
+      "detail": null,
+      "evidence": [
+        "app/android/app/src/main/res/values-en/strings.xml",
+        "app/android/app/src/main/res/values/strings.xml"
+      ],
+      "gate": "QA0",
+      "kind": "files",
+      "next": null,
+      "owner": null,
+      "required": true,
+      "status": "PASS",
+      "title": "v0.02 外壳 i18n 资源（zh/en）在位"
     },
     {
       "check": "q1-core-test",
@@ -812,6 +846,56 @@
       "required": false,
       "status": "PASS",
       "title": "性能预算与实测口径登记"
+    },
+    {
+      "check": "q5-ux-v002-tests",
+      "detail": null,
+      "evidence": [
+        "app/android/app/src/test/java/dev/ninfenz/mobile/CoreBridgeContractTest.kt",
+        "app/android/app/src/test/java/dev/ninfenz/mobile/CoreResponseTest.kt",
+        "app/android/app/src/test/java/dev/ninfenz/mobile/FakeCoreBridge.kt",
+        "app/android/app/src/test/java/dev/ninfenz/mobile/FixtureFilesTest.kt",
+        "app/android/app/src/test/java/dev/ninfenz/mobile/ModelParsingTest.kt",
+        "app/android/app/src/test/java/dev/ninfenz/mobile/StateMachineTest.kt",
+        "app/android/app/src/test/java/dev/ninfenz/mobile/data/AuthorArtifactsLoaderTest.kt",
+        "app/android/app/src/test/java/dev/ninfenz/mobile/data/AuthorOverlayStoreTest.kt",
+        "app/android/app/src/test/java/dev/ninfenz/mobile/data/PackStoreTest.kt",
+        "app/android/app/src/test/java/dev/ninfenz/mobile/data/PackVerifierTest.kt",
+        "app/android/app/src/test/java/dev/ninfenz/mobile/data/PackZipLoaderTest.kt",
+        "app/android/app/src/test/java/dev/ninfenz/mobile/data/ProjectCreatorTest.kt",
+        "app/android/app/src/test/java/dev/ninfenz/mobile/data/ProjectFactoryTest.kt",
+        "app/android/app/src/test/java/dev/ninfenz/mobile/data/ProjectStatusStoreTest.kt",
+        "app/android/app/src/test/java/dev/ninfenz/mobile/data/SearchIndexTest.kt",
+        "app/android/app/src/test/java/dev/ninfenz/mobile/ui/AdaptiveLayoutTest.kt",
+        "app/android/app/src/test/java/dev/ninfenz/mobile/ui/ComposeSmokeTest.kt",
+        "app/android/app/src/test/java/dev/ninfenz/mobile/ui/ShellEnglishLocaleTest.kt",
+        "app/android/app/src/test/java/dev/ninfenz/mobile/ui/ShellNavigationComposeTest.kt",
+        "app/android/app/src/test/java/dev/ninfenz/mobile/ui/ShellSizeMatrixTest.kt"
+      ],
+      "gate": "QA5",
+      "kind": "glob_min",
+      "next": null,
+      "owner": null,
+      "required": true,
+      "status": "PASS",
+      "title": "v0.02 Android JVM/Robolectric 测试文件 >=20"
+    },
+    {
+      "check": "q5-ux-v002-matrix",
+      "detail": null,
+      "evidence": [
+        "app/android/app/src/test/java/dev/ninfenz/mobile/ui/ComposeSmokeTest.kt",
+        "app/android/app/src/test/java/dev/ninfenz/mobile/ui/ShellEnglishLocaleTest.kt",
+        "app/android/app/src/test/java/dev/ninfenz/mobile/ui/ShellNavigationComposeTest.kt",
+        "app/android/app/src/test/java/dev/ninfenz/mobile/ui/ShellSizeMatrixTest.kt"
+      ],
+      "gate": "QA5",
+      "kind": "files",
+      "next": null,
+      "owner": null,
+      "required": true,
+      "status": "PASS",
+      "title": "v0.02 空态/三档导航/9 组尺寸/英文 locale 测试在位"
     },
     {
       "check": "q6-scripts",

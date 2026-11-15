@@ -4,7 +4,7 @@ NF APP 的 Android 控制面：本地处理、无账号、无遥测、**未声�
 app/docs/CONTRACT.md + app/docs/CLI.md + app/schema/error_codes.json（A0 冻结层）。
 
 > v0.02（W1）现状：四目的地外壳（库/创作/交付/我的）+ 自适应底部栏/rail + FAB 导入 + 首启示例 Pack/3 步引导 +
-> 设计 token/字体/暗色主题 + 自适应 launcher icon。旧 8 个功能页保留在详情层；W2 已接入新建项目向导、示例演示项目、本地搜索与 Pack 校验；W3 已把导入重做为产品向导；W4 已接入项目态创作台；W5 已接入项目态交付台、Pack 中心、CCOS 步骤化；Pack 更新支持应用内「选新版 Pack zip → 安全解包 → core pack-diff → 决策 → apply/回滚」；W4b 已接入创作台作者覆盖保存（nf-overlay/1）与交付状态写回；W6 已开始质量收口（heading 语义、设计 token/路由可达单测、Robolectric+Compose 语义测试 7 条、三档导航 + 9 组窗口尺寸矩阵、外壳 i18n + values-en + 英文 locale 测试）；RESULTS/FINAL_DOD 已加 v0.02 增量段；正文 i18n、像素截图、设备项仍 OPEN。
+> 设计 token/字体/暗色主题 + 自适应 launcher icon。旧 8 个功能页保留在详情层；W2 已接入新建项目向导、示例演示项目、本地搜索与 Pack 校验；W3 已把导入重做为产品向导；W4 已接入项目态创作台；W5 已接入项目态交付台、Pack 中心、CCOS 步骤化；Pack 更新支持应用内「选新版 Pack zip → 安全解包 → core pack-diff → 决策 → apply/回滚」；W4b 已接入创作台作者覆盖保存（nf-overlay/1）与交付状态写回；W6 已开始质量收口（heading 语义、设计 token/路由可达单测、Robolectric+Compose 语义测试 7 条、三档导航 + 9 组窗口尺寸矩阵、外壳 i18n + values-en + 英文 locale 测试）；RESULTS/FINAL_DOD 已加 v0.02 增量段；app/gates 7/7 PASS（FAIL=0）。正文 i18n、像素截图、设备项仍 OPEN。
 
 ## 工程结构
 

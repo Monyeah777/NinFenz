@@ -29,6 +29,7 @@
 | 构建 | ./gradlew :app:assembleDebug 成功；:app:testDebugUnitTest 90/90 |
 | i18n | 外壳 labels/标题/动作/关于已资源化 + values-en；正文文案仍内联（OPEN） |
 | 适配 | compact/medium/expanded 三档导航 + 9 组窗口尺寸语义矩阵 |
+| app/gates | 7/7 gate PASS、FAIL=0（QA0 10 checks、QA5 5 checks；含 v0.02 UX/i18n/测试矩阵检查） |
 
 ### 0.3 状态
 
@@ -46,7 +47,6 @@
 | OPEN-DRAFT-PROJECT | 导入草稿→项目转换未定义（契约无 import→project 字段） | lead | 需 v1 §15 契约变更评估 |
 | OPEN-AUTHOR-GRAPH-SPEC | 创作台仅保存协议条款/字段；管线/规格保存未做 | lead | overlay 扩展或项目引用重算 |
 | OPEN-REVIEWED | reviewed 状态与 CCOS 人审串联未做 | lead | project-validate + CCOS result 回钉 |
-| OPEN-GATES | app/gates 的 v0.02 UX 检查未加；RESULTS/FINAL_DOD 本段为本轮人工增量 | lead | 更新 GATES/SELF_AUDIT 并复跑 |
 
 ## 1. 结论（先行）
 

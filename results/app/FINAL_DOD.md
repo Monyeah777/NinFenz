@@ -20,7 +20,7 @@
 | 像素截图矩阵 | OPEN | OPEN-SCREENSHOT |
 | 真机/模拟器 | OPEN-TOOLCHAIN | OPEN-DEVICE |
 | 草稿→项目；管线/规格保存；reviewed 串联 | OPEN | OPEN-DRAFT-PROJECT / OPEN-AUTHOR-GRAPH-SPEC / OPEN-REVIEWED |
-| app/gates v0.02 UX 检查 | OPEN | OPEN-GATES；本段为人工增量，待机读门禁更新 |
+| app/gates v0.02 UX 检查 | pass | 7/7 gate PASS、FAIL=0；GATES/SELF_AUDIT 已更新（本提交） |
 
 **发布面：仍为 OPEN-EXTERNAL**（签名/公证/真机矩阵/Play 数据安全），不得据此宣称可发布。
 

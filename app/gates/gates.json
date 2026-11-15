@@ -72,6 +72,28 @@
           "kind": "func",
           "name": "check_no_machine_paths",
           "title": "契约/核心/控制面/测试/夹具无本机绝对路径硬编码"
+        },
+        {
+          "id": "q0-ux-v002-shell",
+          "kind": "files",
+          "paths": [
+            "app/android/app/src/main/java/dev/ninfenz/mobile/ui/NfMobileApp.kt",
+            "app/android/app/src/main/java/dev/ninfenz/mobile/ui/shell/ShellState.kt",
+            "app/android/app/src/main/java/dev/ninfenz/mobile/ui/screens/TopLevelScreens.kt",
+            "app/android/app/src/main/java/dev/ninfenz/mobile/ui/components/NfComponents.kt",
+            "app/android/app/src/main/java/dev/ninfenz/mobile/ui/theme/Theme.kt",
+            "app/android/app/src/main/java/dev/ninfenz/mobile/ui/theme/Tokens.kt"
+          ],
+          "title": "v0.02 UX 外壳/设计 token/四目的地文件在位"
+        },
+        {
+          "id": "q0-ux-v002-i18n",
+          "kind": "files",
+          "paths": [
+            "app/android/app/src/main/res/values/strings.xml",
+            "app/android/app/src/main/res/values-en/strings.xml"
+          ],
+          "title": "v0.02 外壳 i18n 资源（zh/en）在位"
         }
       ]
     },
@@ -285,6 +307,24 @@
           "required": false,
           "owner": "lead",
           "next": "缺 Android 运行环境时只给静态预算"
+        },
+        {
+          "id": "q5-ux-v002-tests",
+          "kind": "glob_min",
+          "glob": "app/android/app/src/test/**/*.kt",
+          "min": 20,
+          "title": "v0.02 Android JVM/Robolectric 测试文件 >=20"
+        },
+        {
+          "id": "q5-ux-v002-matrix",
+          "kind": "files",
+          "paths": [
+            "app/android/app/src/test/java/dev/ninfenz/mobile/ui/ComposeSmokeTest.kt",
+            "app/android/app/src/test/java/dev/ninfenz/mobile/ui/ShellNavigationComposeTest.kt",
+            "app/android/app/src/test/java/dev/ninfenz/mobile/ui/ShellSizeMatrixTest.kt",
+            "app/android/app/src/test/java/dev/ninfenz/mobile/ui/ShellEnglishLocaleTest.kt"
+          ],
+          "title": "v0.02 空态/三档导航/9 组尺寸/英文 locale 测试在位"
         }
       ]
     },
