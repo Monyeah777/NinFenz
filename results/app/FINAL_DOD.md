@@ -5,7 +5,7 @@
 
 ## 1. 结论
 
-**APP 实现面：pass-with-open-items（P0 = 0）**。依据：
+**APP 实现面：pass-with-open-items（P0 = 0）**。收口判定（2026-11-15）：实现面全部可本机验证的 MUST/主路径已落地并取证；计划 §18.3 的发布边界项（签名/公证/真机矩阵/Play 数据安全）与 per-format 平台项（PDF=平台打印）保留 OPEN，见 §6/§7。依据：
 - APP 门禁 `python app/gates/run_gates.py` → **7/7 门 FAIL=0**（QA0–QA6 全部 PASS；无 OPEN 阻塞），`P0=0`；
 - 自审计 S0–S15 → **covered 13 / gap 1 / open 2**，全部 gap/open 带 owner+next（P1=3）；
 - 核心 `cargo test` **182 断言 / 21 个测试二进制 / 0 failed**；控制面 + 契约 + 安全 + golden + E2E：**pytest 490 passed / 0 failed / 0 skipped / 0 xfailed（127s）**；
@@ -16,7 +16,7 @@
 
 ## 2. 门禁收口（QA0–QA6）
 
-> **仓库层（2026-11-15 实测）**：`bash verify.sh --checks-only` → **PASS=107 WARN=2 FAIL=0**（exit 0；HEAD `f19e41660`）。APP 面**未新增/未改** check1–57；入仓提交链：`8d679c726`（modeling 可复现性修复）→ `8e75a3173`（APP MVP）→ `f19e41660`（冻结链投影重算）→ `af72d5903`（收口 docs/OPEN 登记）。干净 clone 同源复现见 `results/app/BASELINE.md` 附录 A。
+> **仓库层（2026-11-15 实测）**：`bash verify.sh --checks-only` → **PASS=107 WARN=2 FAIL=0**（exit 0）。APP 面**未新增/未改** check1–57；入仓提交链：`8d679c726`（modeling 可复现性修复）→ `8e75a3173`（APP MVP）→ `f19e41660`（冻结链）→ `af72d5903`（OPEN 登记）→ `0734595d0`（导出 docx/skill）→ `af39bc34f`（冻结链）→ `220351f88`（Android 自适应/无障碍）→ `c69e081be`（冻结链）。干净 clone 同源复现见 `results/app/BASELINE.md` 附录 A。
 
 | 门 | 内容 | 结果 | 证据 |
 |---|---|---|---|
@@ -25,7 +25,7 @@
 | QA2 | 协议/管线/装配/校验/导出；golden | **PASS** | golden + oracle 对账 31 条；首闭环 E2E 6 条 |
 | QA3 | 分享/回填/Pack 更新/冲突/回滚；负例 | **PASS** | 更新/冲突/回滚 E2E；分享脱敏 5 条 |
 | QA4 | 桌面/TUI/CCOS 交接；跨端一致 | **PASS** | TUI selftest 全绿；CCOS 相关 E2E；Android/Desktop 工程与构建证据 |
-| QA5 | 安全/性能/无障碍/16KB/设备矩阵 | **PASS（含 OPEN）** | 解析安全负例全绿；设备矩阵/性能预算文档在位（实测面 OPEN-TOOLCHAIN） |
+| QA5 | 安全/性能/无障碍/16KB/设备矩阵 | **PASS（含 OPEN）** | 解析安全负例全绿；设备矩阵/性能预算文档在位；自适应三档布局（紧凑单页/中等/扩展 NavigationRail）与无障碍可读标签代码侧落地（JVM 42 条，含分档边界）；真机实测面 OPEN-TOOLCHAIN |
 | QA6 | 发布/签名/公证/数据安全/许可；P0=0 | **PASS（含 OPEN）** | 脚本/文档在位；签名证据 OPEN-EXTERNAL；SELF_AUDIT p0=0 |
 
 ## 3. 自审计（S0–S15）
