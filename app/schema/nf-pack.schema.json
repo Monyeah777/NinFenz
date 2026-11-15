@@ -1,0 +1,163 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/app/schema/nf-pack.schema.json",
+  "title": "NF Pack 清单（nf-pack/1）",
+  "description": "Pack 清单：id/version/items/hashes/requires。items 按 path 升序且禁重复；tree = sha256(canonical([{path,sha256,size}]))，不含自身与签名件。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "id",
+    "version",
+    "kind",
+    "items",
+    "hashes",
+    "requires",
+    "compat"
+  ],
+  "properties": {
+    "schema": {
+      "const": "nf-pack/1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{1,63}$"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "kind": {
+      "enum": [
+        "base",
+        "template",
+        "overlay"
+      ]
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string"
+    },
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/item"
+      }
+    },
+    "hashes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tree",
+        "count"
+      ],
+      "properties": {
+        "tree": {
+          "$ref": "#/$defs/digest"
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "requires": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/requires"
+      }
+    },
+    "compat": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "min_app_version",
+        "schema_version"
+      ],
+      "properties": {
+        "min_app_version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        },
+        "schema_version": {
+          "const": 1
+        }
+      }
+    },
+    "x-created_at": {
+      "type": "string"
+    }
+  },
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "kind",
+        "sha256",
+        "size"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?!/)(?!.*(^|/)\\.\\.?/)(?!.*\\u0000)[^\\\\]+$",
+          "description": "POSIX 相对路径；禁 .. 与反斜杠"
+        },
+        "kind": {
+          "enum": [
+            "protocol",
+            "pipeline",
+            "md-spec",
+            "assets",
+            "template",
+            "overlay",
+            "docs",
+            "meta"
+          ]
+        },
+        "sha256": {
+          "$ref": "#/$defs/digest"
+        },
+        "size": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "mime": {
+          "type": "string"
+        }
+      }
+    },
+    "requires": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "min"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]{1,63}$"
+        },
+        "min": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        },
+        "max": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        }
+      }
+    }
+  }
+}

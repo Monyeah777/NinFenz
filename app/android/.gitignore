@@ -1,0 +1,10 @@
+# 本文件由 app/android 工程维护：构建产物与本地 SDK 指针不入库
+.gradle/
+build/
+.kotlin/
+local.properties
+*.iml
+.idea/
+captures/
+# 原生核心 .so 由 app/scripts/build_core_android.sh 交叉编译生成，不入库
+app/src/main/jniLibs/**/*.so

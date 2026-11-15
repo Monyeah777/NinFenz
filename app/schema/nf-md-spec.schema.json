@@ -1,0 +1,300 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/app/schema/nf-md-spec.schema.json",
+  "title": "NF Markdown 规范（nf-md-spec/1）",
+  "description": "章节/槽位/约束/示例/验收/预算。双向一致与预算上限由核心校验（NF-SPC-002/004）。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "id",
+    "title",
+    "domain",
+    "version",
+    "heading_level",
+    "sections",
+    "slots",
+    "constraints",
+    "acceptance",
+    "references"
+  ],
+  "properties": {
+    "schema": {
+      "const": "nf-md-spec/1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{1,63}$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "domain": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "heading_level": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 4
+    },
+    "sections": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/section"
+      }
+    },
+    "slots": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/slot"
+      }
+    },
+    "constraints": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/constraint"
+      }
+    },
+    "acceptance": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/acceptance"
+      }
+    },
+    "references": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ref"
+      }
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "全 spec 预算（可选）：省略时不做 NF-SPC-004 总预算判据；给定时 Σ slot 预算不得超过。",
+      "properties": {
+        "max_total_chars": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "max_total_tokens": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    }
+  },
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "section": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "order",
+        "required",
+        "slots"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^SEC-[0-9]{2}$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "order": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "slots": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^SLT-[0-9]{2,3}$"
+          }
+        }
+      }
+    },
+    "slot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "section",
+        "kind",
+        "required",
+        "constraints",
+        "examples",
+        "acceptance",
+        "budget"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^SLT-[0-9]{2,3}$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "section": {
+          "type": "string",
+          "pattern": "^SEC-[0-9]{2}$"
+        },
+        "kind": {
+          "enum": [
+            "text",
+            "list",
+            "table",
+            "code",
+            "json"
+          ]
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "lang": {
+          "type": "string"
+        },
+        "constraints": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/constraint"
+          }
+        },
+        "examples": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "acceptance": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^A-[0-9]{2}$"
+          }
+        },
+        "budget": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "max_chars"
+          ],
+          "properties": {
+            "max_chars": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "max_tokens": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        }
+      }
+    },
+    "constraint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "op"
+      ],
+      "properties": {
+        "op": {
+          "enum": [
+            "min_chars",
+            "max_chars",
+            "max_tokens",
+            "pattern",
+            "non_empty",
+            "starts_with",
+            "ends_with"
+          ]
+        },
+        "value": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    "acceptance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "description",
+        "severity"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^A-[0-9]{2}$"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "severity": {
+          "enum": [
+            "error",
+            "warn"
+          ]
+        }
+      }
+    },
+    "ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "ref",
+        "digest"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "protocol",
+            "module",
+            "pipeline",
+            "asset",
+            "domain",
+            "output"
+          ]
+        },
+        "ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    }
+  }
+}

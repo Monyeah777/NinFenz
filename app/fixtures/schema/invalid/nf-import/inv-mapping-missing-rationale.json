@@ -1,0 +1,78 @@
+{
+  "schema": "nf-import/1",
+  "source": {
+    "kind": "file",
+    "name": "clip.md",
+    "mime": "text/markdown",
+    "size": 42,
+    "sha256": "2e7d2c03a9507ae265ecf5b5356885a53393a2029d241394997265a1a25aefc6"
+  },
+  "detected": {
+    "format": "markdown",
+    "confidence": 92,
+    "candidates": [
+      {
+        "format": "markdown",
+        "confidence": 92
+      },
+      {
+        "format": "text",
+        "confidence": 30
+      }
+    ]
+  },
+  "text": "# 标题\n\n正文。",
+  "text_digest": "2e7d2c03a9507ae265ecf5b5356885a53393a2029d241394997265a1a25aefc6",
+  "structure": {
+    "headings": [
+      {
+        "line": 1,
+        "level": 1,
+        "text": "标题"
+      }
+    ],
+    "paragraphs": 1,
+    "code_blocks": [
+      {
+        "lang": "markdown",
+        "lines": 3
+      }
+    ],
+    "tables": [
+      {
+        "columns": 2,
+        "rows": 1
+      }
+    ]
+  },
+  "assets": [
+    {
+      "path": "assets/a.png",
+      "sha256": "3f79bb7b435b05321651daefd374cdc681dc06faa65e374e38337b88ca046dea",
+      "size": 10,
+      "mime": "image/png"
+    }
+  ],
+  "suggested": {
+    "template_id": "demo-spec",
+    "mappings": [
+      {
+        "from_kind": "heading",
+        "from_index": 0,
+        "to_kind": "section",
+        "to_id": "SEC-01",
+        "confidence": 80
+      }
+    ],
+    "unmapped": [
+      "段落 2"
+    ]
+  },
+  "warnings": [
+    {
+      "code": "NF-IMP-002",
+      "message": "低置信",
+      "path": "/detected/confidence"
+    }
+  ]
+}

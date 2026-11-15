@@ -1,0 +1,68 @@
+{
+  "schema": "nf-md-spec/1",
+  "id": "demo-spec",
+  "title": "演示规范",
+  "domain": "写作",
+  "version": "1.0.0",
+  "heading_level": 7,
+  "sections": [
+    {
+      "id": "SEC-01",
+      "title": "开篇",
+      "order": 1,
+      "required": true,
+      "slots": [
+        "SLT-01"
+      ]
+    }
+  ],
+  "slots": [
+    {
+      "id": "SLT-01",
+      "name": "主题句",
+      "section": "SEC-01",
+      "kind": "text",
+      "required": true,
+      "lang": "markdown",
+      "constraints": [
+        {
+          "op": "max_chars",
+          "value": 200
+        },
+        {
+          "op": "non_empty"
+        }
+      ],
+      "examples": [
+        "雨夜，灯灭之前别回头。"
+      ],
+      "acceptance": [
+        "A-01"
+      ],
+      "budget": {
+        "max_chars": 200,
+        "max_tokens": 100
+      }
+    }
+  ],
+  "constraints": [
+    {
+      "op": "min_chars",
+      "value": 1
+    }
+  ],
+  "acceptance": [
+    {
+      "id": "A-01",
+      "description": "开篇必须有主题句",
+      "severity": "error"
+    }
+  ],
+  "references": [
+    {
+      "kind": "protocol",
+      "ref": "demo-protocol",
+      "digest": "252f10c83610ebca1a059c0bae8255eba2f95be4d1d7bcfa89d7248a82d9f111"
+    }
+  ]
+}

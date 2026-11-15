@@ -1,0 +1,37 @@
+{
+  "case": "nested-unicode",
+  "core": {
+    "abi": "nf-app-core/1",
+    "version": "0.1.0"
+  },
+  "expect": {
+    "ok": true
+  },
+  "expected": {
+    "error": null,
+    "exit": 0,
+    "ok": true,
+    "result": {
+      "canonical": "{\"a\":[true,null,\"ü\"],\"b\":1,\"z\":{\"k\":\"v\"}}",
+      "digest": "6ef3eca845a8ac31a951898e634fb819c96c5a966b1b73fc6bbe04d3a19df0f1"
+    }
+  },
+  "expected_exit": 0,
+  "expected_sha256": "542fcc0f36a6ae05380708d0581cd02034c27294fa0a3e8e019fdb9c3e316114",
+  "note": "expected 由 app/core release 的 nf-app-core 生成（不是手写）；expected_sha256 钉核心 stdout 原始字节",
+  "op": "canonical",
+  "request": {
+    "value": {
+      "a": [
+        true,
+        null,
+        "ü"
+      ],
+      "b": 1,
+      "z": {
+        "k": "v"
+      }
+    }
+  },
+  "schema": "nf-golden-case/1"
+}

@@ -83,3 +83,18 @@ trace.json
 # C# parity 构建产物（不入库）
 scripts/trust_parity/csharp/bin/
 scripts/trust_parity/csharp/obj/
+
+
+# ── NF APP（app/）构建产物与本地工具链（不入库；app/README.md 记录构建入口）──
+app/core/target/
+app/core/.cargo/config.toml
+app/android/.gradle/
+app/android/build/
+app/android/app/build/
+app/android/local.properties
+app/android/app/src/main/jniLibs/
+app/desktop/.gradle/
+app/desktop/build/
+app/desktop/local.properties
+app/results/logs/
+app/**/__pycache__/

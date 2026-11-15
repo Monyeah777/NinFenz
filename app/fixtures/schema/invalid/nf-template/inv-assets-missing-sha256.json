@@ -1,0 +1,39 @@
+{
+  "schema": "nf-template/1",
+  "manifest": {
+    "id": "demo-template",
+    "version": "1.0.0",
+    "title": "演示模板",
+    "description": "内嵌快照"
+  },
+  "template_md": {
+    "path": "template/template.md",
+    "sha256": "d59eced1ded07f84c145592f65bdf854358e009c5cd705f5215bf18697fed103"
+  },
+  "spec": {
+    "path": "template/spec.json",
+    "sha256": "3d914f9348c9cc0ff8a79716700b9fcd4d2f3e711608004eb8f138bcba7f14d9"
+  },
+  "protocol": {
+    "path": "template/protocol.json",
+    "sha256": "73475cb40a568e8da8a045ced110137e159f890ac4da883b6b17dc651b3a8049"
+  },
+  "pipeline": {
+    "path": "template/pipeline.json",
+    "sha256": "44cb730c420480a0477b505ae68af508fb90f96cf0ec54c6ad16949dd427f13a"
+  },
+  "assets": [
+    {
+      "path": "template/assets/a.md",
+      "size": 10
+    }
+  ],
+  "hashes": {
+    "tree": "811786ad1ae74adfdd20dd0372abaaebc6246e343aebd01da0bfc4c02bf0106c",
+    "count": 5
+  },
+  "compat": {
+    "min_app_version": "1.0.0",
+    "schema_version": 1
+  }
+}

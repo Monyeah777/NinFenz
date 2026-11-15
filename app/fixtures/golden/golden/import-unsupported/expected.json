@@ -1,0 +1,1 @@
+{"error":{"code":"NF-IMP-004","fix":"升级版本或先转成 markdown","message":"格式 html 的适配器本版本未实现（首版：text/markdown/json/yaml/zip/nftpl/nfpack）"},"exit":3,"ok":false,"result":null}

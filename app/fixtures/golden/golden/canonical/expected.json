@@ -1,0 +1,1 @@
+{"error":null,"exit":0,"ok":true,"result":{"canonical":"{\"a\":true,\"b\":[1,2,{\"a\":\"é\",\"z\":\"中\"}]}","digest":"f0b50f337571c0c4eef87180ac138f1639dba03a656bcbf0ed545b8e96db8f29"}}

@@ -1,0 +1,101 @@
+{
+  "case": "sample-pack-to-v2",
+  "core": {
+    "abi": "nf-app-core/1",
+    "version": "0.1.0"
+  },
+  "expect": {
+    "ok": true
+  },
+  "expected": {
+    "error": null,
+    "exit": 0,
+    "ok": true,
+    "result": {
+      "changes": {
+        "added": [
+          {
+            "path": "assets/v2-added.md",
+            "sha256": "e29b8fdb47f5037918894c9839c341ef40cce047db11cfcdaf89f5d1d740ad0f",
+            "size": 34
+          }
+        ],
+        "modified": [
+          {
+            "new_sha256": "f7effabeb2bd6a88189b0679f9534e32f7a9c1de6ff2d4d81bfa3a0fe3370085",
+            "path": "spec/main.nfspec.json",
+            "sha256": "7e265bb4c336c1af3e03cdc292e7e723d506c16c8793b658e772c791a59f63c8"
+          }
+        ],
+        "removed": [
+          {
+            "path": "assets/notes-brand.md",
+            "sha256": "6536112794438b700697018ce9e0a1e56cf6d304480dc252d6cd0c24206e4bec"
+          },
+          {
+            "path": "docs/legacy.md",
+            "sha256": "628aa099ca9e4bce9b2e05614ddd4744a22e1ee573d2dd91559489b2b22d6f73"
+          }
+        ]
+      },
+      "conflicts": [],
+      "from": {
+        "id": "demo-pack",
+        "tree": "4cb1502595c81614d6f924fac7f6acbad1b794412bf5a270cf2d111a5789a95e",
+        "version": "1.0.0"
+      },
+      "impact": {
+        "breaking": true,
+        "overlay_keys": [
+          "custom_assets"
+        ],
+        "projects": []
+      },
+      "merge": {
+        "actions": [
+          {
+            "kind": "take_new",
+            "path": "assets/v2-added.md",
+            "reason": "new file"
+          },
+          {
+            "kind": "merge",
+            "path": "spec/main.nfspec.json",
+            "reason": "content changed"
+          },
+          {
+            "kind": "defer",
+            "path": "assets/notes-brand.md",
+            "reason": "removed upstream"
+          },
+          {
+            "kind": "defer",
+            "path": "docs/legacy.md",
+            "reason": "removed upstream"
+          }
+        ],
+        "on_conflict": "require_user"
+      },
+      "policy": {
+        "auto_merge": true,
+        "backup": true,
+        "rollback": true
+      },
+      "schema": "nf-pack-update/1",
+      "to": {
+        "id": "demo-pack",
+        "tree": "bd91ad4925549ab0db09021c5db0f547ac2498e7e2a92b4dec8a32856ba73855",
+        "version": "1.1.0"
+      }
+    }
+  },
+  "expected_exit": 0,
+  "expected_sha256": "1af39a78922fdf334f1cc362798208c7b7bde6d5a1b593082c2086769eef58bb",
+  "note": "expected 由 app/core release 的 nf-app-core 生成（不是手写）；expected_sha256 钉核心 stdout 原始字节",
+  "op": "pack-diff",
+  "request": {
+    "new_root": "$fixtures/sample-pack-v2",
+    "old_root": "$fixtures/sample-pack"
+  },
+  "schema": "nf-golden-case/1"
+}

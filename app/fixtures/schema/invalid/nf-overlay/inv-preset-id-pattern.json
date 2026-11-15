@@ -1,0 +1,32 @@
+{
+  "schema": "nf-overlay/1",
+  "base": {
+    "id": "demo-pack",
+    "version": "1.0.0",
+    "tree": "6f4b6612125fb3a0daecd2799dfd6c9c299424fd920f9b308110a2c1fbd8f443"
+  },
+  "clauses": {
+    "C-001": {
+      "enabled": false,
+      "text_sha256": "785f3ec7eb32f30b90cd0fcf3657d388b5ff4297f2f9716ff66e9b69c05ddd09"
+    }
+  },
+  "params": {
+    "tone": "冷静"
+  },
+  "presets": [
+    {
+      "id": "Preset A",
+      "name": "预设 A",
+      "graph": "535fa30d7e25dd8a49f1536779734ec8286108d115da5045d77f3b4185d8f790"
+    }
+  ],
+  "custom_assets": [
+    {
+      "key": "brand",
+      "path": "assets/notes-brand.md",
+      "sha256": "c2356069e9d1e79ca924378153cfbbfb4d4416b1f99d41a2940bfdb66c5319db",
+      "size": 10
+    }
+  ]
+}

@@ -1,0 +1,178 @@
+{
+  "schema": "nf-app-self-audit/1",
+  "note": "§15.3 S0–S15 自扫描维度。status: covered（有证据）/ gap（有 owner+next 的缺口）/ open（外部不可执行，需 owner）。evidence 必须是仓库内现存路径（不得超过到 § 小节）；禁止把「没做」写成 covered。",
+  "dimensions": [
+    {
+      "id": "S0",
+      "title": "需求覆盖",
+      "evidence": [
+        "app/docs/CONTRACT.md",
+        "app/gates/gates.json",
+        "results/app/RESULTS.md"
+      ],
+      "status": "covered",
+      "note": "FR/NFR 逐条映射见 RESULTS §3"
+    },
+    {
+      "id": "S1",
+      "title": "代码空洞",
+      "evidence": [
+        "app/gates/run_gates.py",
+        "app/core/src",
+        "app/cli"
+      ],
+      "status": "covered",
+      "note": "run_gates 的 check_voids 每轮现扫 app/core/src + app/cli；命中即转 gap"
+    },
+    {
+      "id": "S2",
+      "title": "默认放行",
+      "evidence": [
+        "app/docs/CONTRACT.md",
+        "app/tests/test_security_negative.py",
+        "app/schema/error_codes.json"
+      ],
+      "status": "covered",
+      "note": "unknown enum/op/版本 fail-closed；错误码登记单一真源"
+    },
+    {
+      "id": "S3",
+      "title": "密码学",
+      "evidence": [
+        "app/docs/CONTRACT.md",
+        "app/docs/THREAT_MODEL.md"
+      ],
+      "status": "open",
+      "owner": "lead",
+      "next": "APP 只做完整性摘要（SHA-256）；签名/加密未引入（OPEN-EXTERNAL；引入需独立评审）"
+    },
+    {
+      "id": "S4",
+      "title": "链/序",
+      "evidence": [
+        "app/tests/test_oracle_parity.py",
+        "app/tests/test_e2e_first_loop.py",
+        "app/core/tests"
+      ],
+      "status": "covered",
+      "note": "DAG 拓扑序、append-only history、pack 更新 base 链"
+    },
+    {
+      "id": "S5",
+      "title": "类型兼容",
+      "evidence": [
+        "app/schema",
+        "app/tests/test_schema_valid.py",
+        "app/tests/test_schema_negative.py"
+      ],
+      "status": "covered",
+      "note": "schema 版本常量 + unknown 版本 fail-closed + 正反夹具"
+    },
+    {
+      "id": "S6",
+      "title": "测试缺口/变异",
+      "evidence": [
+        "app/core/tests",
+        "app/tests/test_security_negative.py"
+      ],
+      "status": "covered",
+      "note": "cargo 180 断言（含每 op 负例/变异）；安全负例 47 条"
+    },
+    {
+      "id": "S7",
+      "title": "文档过度声明",
+      "evidence": [
+        "results/app/BASELINE.md",
+        "app/docs/DOD.md",
+        "results/app/RESULTS.md"
+      ],
+      "status": "covered",
+      "note": "未跑/不可执行一律 OPEN；claims 边界见 DOD/RESULTS"
+    },
+    {
+      "id": "S8",
+      "title": "依赖/供应链",
+      "evidence": [
+        "app/core/Cargo.lock",
+        "app/docs/DEPENDENCIES.md",
+        "app/core/.cargo/config.toml.example"
+      ],
+      "status": "covered",
+      "note": "锁文件 + 41 包许可/用途清单；镜像配置 gitignored"
+    },
+    {
+      "id": "S9",
+      "title": "路径/DoS",
+      "evidence": [
+        "app/schema/limits.json",
+        "app/tests/test_security_negative.py"
+      ],
+      "status": "covered",
+      "note": "zip slip/bomb/symlink/YAML bomb/JSON 深度/路径穿越"
+    },
+    {
+      "id": "S10",
+      "title": "隐私/秘密",
+      "evidence": [
+        "app/docs/PRIVACY.md",
+        "app/tests/test_cli_contract.py",
+        "app/tests/test_security_negative.py"
+      ],
+      "status": "covered",
+      "note": "数据地图 + 分享脱敏（绝对路径/用户名/邮箱/密钥形状）有测试"
+    },
+    {
+      "id": "S11",
+      "title": "可观测/恢复",
+      "evidence": [
+        "app/docs/CONTRACT.md",
+        "app/core/tests/backup.rs"
+      ],
+      "status": "gap",
+      "owner": "lead",
+      "next": "pack 更新备份/回滚已有；进程死亡/崩溃恢复未实现（A6/Q 后补，OPEN-DATADIR）"
+    },
+    {
+      "id": "S12",
+      "title": "导入/适配器矩阵",
+      "evidence": [
+        "app/docs/CONTRACT.md",
+        "app/tests/test_security_negative.py",
+        "app/tests/test_oracle_parity.py"
+      ],
+      "status": "covered",
+      "note": "text/md/json/yaml/zip/nftpl/nfpack 已实现；html/docx/pdf/ocr 显式 NF-IMP-004 exit 3（OPEN 已登记）"
+    },
+    {
+      "id": "S13",
+      "title": "Pack diff/merge/回滚",
+      "evidence": [
+        "app/tests/test_e2e_first_loop.py",
+        "app/core/tests"
+      ],
+      "status": "covered"
+    },
+    {
+      "id": "S14",
+      "title": "APP/CCOS 边界",
+      "evidence": [
+        "app/schema/ccos-task.schema.json",
+        "app/schema/ccos-result.schema.json",
+        "app/tests/test_e2e_first_loop.py"
+      ],
+      "status": "covered",
+      "note": "密钥只在 CCOS；人审 required"
+    },
+    {
+      "id": "S15",
+      "title": "红队（文件管理器/AI 输出/恶意 pack/深链/分享）",
+      "evidence": [
+        "app/tests/test_security_negative.py",
+        "app/docs/THREAT_MODEL.md"
+      ],
+      "status": "open",
+      "owner": "lead",
+      "next": "本机无 Android 运行时/真机：深链/分享/文件管理器红队 OPEN-EXTERNAL"
+    }
+  ]
+}

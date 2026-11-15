@@ -1,0 +1,7 @@
+# 本机开发用 cargo 镜像（不要提交 config.toml；CI 用默认 crates.io）
+# 用法：cp app/core/.cargo/config.toml.example app/core/.cargo/config.toml
+[source.crates-io]
+replace-with = "rsproxy-sparse"
+
+[source.rsproxy-sparse]
+registry = "sparse+https://rsproxy.cn/index/"

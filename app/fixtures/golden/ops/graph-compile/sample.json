@@ -1,0 +1,367 @@
+{
+  "case": "sample",
+  "core": {
+    "abi": "nf-app-core/1",
+    "version": "0.1.0"
+  },
+  "expect": {
+    "ok": true
+  },
+  "expected": {
+    "error": null,
+    "exit": 0,
+    "ok": true,
+    "result": {
+      "assets": [],
+      "digest": "7f173c1c0e9c3a041acc8fd8f6323282770426870f750f2fd1a47005d94f45c1",
+      "fallback": {
+        "max_retries": 0,
+        "on_failure": "abort"
+      },
+      "modules": [
+        {
+          "id": "mod-outline",
+          "version": "1.0.0"
+        },
+        {
+          "id": "mod-polish",
+          "version": "1.0.0"
+        }
+      ],
+      "output": {
+        "form": "md",
+        "path": "result.md"
+      },
+      "pipeline": {
+        "digest": "62fdb39d9cd32c0bdfd9c1adcd05ceb64ec2c54d07e5bb948cbcbc6b6d84d429",
+        "id": "demo-pipeline",
+        "version": "1.0.0"
+      },
+      "schema": "nf-assembly-plan/1",
+      "settings": {
+        "seed": 42
+      },
+      "slots": [
+        "SLT-01",
+        "SLT-02",
+        "SLT-03",
+        "SLT-04"
+      ],
+      "steps": [
+        {
+          "id": "S01",
+          "inputs": [
+            "text"
+          ],
+          "module": "mod-outline",
+          "node": "N02",
+          "outputs": [
+            "outline"
+          ],
+          "stage": "N01",
+          "weight": 40
+        },
+        {
+          "id": "S02",
+          "inputs": [
+            "draft"
+          ],
+          "module": "mod-polish",
+          "node": "N04",
+          "outputs": [
+            "final"
+          ],
+          "stage": "N03",
+          "weight": 70
+        }
+      ]
+    }
+  },
+  "expected_exit": 0,
+  "expected_sha256": "0d24b9d1abc8489e368795479ade45a65b794b9d1354dd40869b605823ef549f",
+  "note": "expected 由 app/core release 的 nf-app-core 生成（不是手写）；expected_sha256 钉核心 stdout 原始字节",
+  "op": "graph-compile",
+  "request": {
+    "graph": {
+      "edges": [
+        {
+          "from": "N01",
+          "from_port": "text",
+          "id": "E01",
+          "to": "N02",
+          "to_port": "text",
+          "type": "data"
+        },
+        {
+          "from": "N02",
+          "from_port": "outline",
+          "id": "E02",
+          "to": "N03",
+          "to_port": "outline",
+          "type": "data"
+        },
+        {
+          "from": "N03",
+          "from_port": "draft",
+          "id": "E03",
+          "to": "N04",
+          "to_port": "draft",
+          "type": "data"
+        },
+        {
+          "from": "N04",
+          "from_port": "final",
+          "id": "E04",
+          "to": "N05",
+          "to_port": "final",
+          "type": "data"
+        }
+      ],
+      "id": "demo-pipeline",
+      "mode": "pro",
+      "nodes": [
+        {
+          "id": "N01",
+          "kind": "stage",
+          "ports": {
+            "in": [],
+            "out": [
+              "text"
+            ]
+          },
+          "title": "输入"
+        },
+        {
+          "id": "N02",
+          "kind": "module",
+          "module_ref": {
+            "id": "mod-outline",
+            "version": "1.0.0"
+          },
+          "ports": {
+            "in": [
+              "text"
+            ],
+            "out": [
+              "outline"
+            ]
+          },
+          "title": "大纲"
+        },
+        {
+          "id": "N03",
+          "kind": "stage",
+          "ports": {
+            "in": [
+              "outline"
+            ],
+            "out": [
+              "draft"
+            ]
+          },
+          "title": "起草"
+        },
+        {
+          "id": "N04",
+          "kind": "module",
+          "module_ref": {
+            "id": "mod-polish",
+            "version": "1.0.0"
+          },
+          "ports": {
+            "in": [
+              "draft"
+            ],
+            "out": [
+              "final"
+            ]
+          },
+          "title": "润色"
+        },
+        {
+          "id": "N05",
+          "kind": "gate",
+          "ports": {
+            "in": [
+              "final"
+            ],
+            "out": [
+              "checked"
+            ]
+          },
+          "title": "质检"
+        }
+      ],
+      "params": {
+        "tone": "冷静"
+      },
+      "schema": "nf-pipeline-graph/1",
+      "settings": {
+        "budget": {
+          "max_chars": 12000,
+          "max_tokens": 4000
+        },
+        "required_stages": [
+          "N01",
+          "N03"
+        ],
+        "seed": 42
+      },
+      "title": "示例管线",
+      "version": "1.0.0",
+      "weights": {
+        "N01": 30,
+        "N02": 40,
+        "N04": 70
+      }
+    },
+    "spec": {
+      "acceptance": [
+        {
+          "description": "开篇必须有主题句与读者设定",
+          "id": "A-01",
+          "severity": "error"
+        },
+        {
+          "description": "正文不超预算",
+          "id": "A-02",
+          "severity": "warn"
+        }
+      ],
+      "constraints": [],
+      "domain": "写作",
+      "heading_level": 2,
+      "id": "demo-spec",
+      "references": [
+        {
+          "digest": "c5a51872718454769ea5d9a61a3734fffe15ae988a46e33c348545589810a86f",
+          "kind": "protocol",
+          "ref": "demo-protocol"
+        }
+      ],
+      "schema": "nf-md-spec/1",
+      "sections": [
+        {
+          "id": "SEC-01",
+          "order": 1,
+          "required": true,
+          "slots": [
+            "SLT-01",
+            "SLT-02"
+          ],
+          "title": "开篇"
+        },
+        {
+          "id": "SEC-02",
+          "order": 2,
+          "required": true,
+          "slots": [
+            "SLT-03"
+          ],
+          "title": "正文"
+        },
+        {
+          "id": "SEC-03",
+          "order": 3,
+          "required": false,
+          "slots": [
+            "SLT-04"
+          ],
+          "title": "收束"
+        }
+      ],
+      "slots": [
+        {
+          "acceptance": [
+            "A-01"
+          ],
+          "budget": {
+            "max_chars": 200,
+            "max_tokens": 100
+          },
+          "constraints": [
+            {
+              "op": "max_chars",
+              "value": 200
+            },
+            {
+              "op": "non_empty"
+            }
+          ],
+          "examples": [
+            "灯灭之前，别回头。"
+          ],
+          "id": "SLT-01",
+          "kind": "text",
+          "name": "主题句",
+          "required": true,
+          "section": "SEC-01"
+        },
+        {
+          "acceptance": [
+            "A-01"
+          ],
+          "budget": {
+            "max_chars": 100,
+            "max_tokens": 50
+          },
+          "constraints": [
+            {
+              "op": "max_chars",
+              "value": 100
+            }
+          ],
+          "examples": [],
+          "id": "SLT-02",
+          "kind": "text",
+          "name": "读者设定",
+          "required": true,
+          "section": "SEC-01"
+        },
+        {
+          "acceptance": [
+            "A-02"
+          ],
+          "budget": {
+            "max_chars": 2000,
+            "max_tokens": 800
+          },
+          "constraints": [
+            {
+              "op": "max_chars",
+              "value": 2000
+            }
+          ],
+          "examples": [],
+          "id": "SLT-03",
+          "kind": "text",
+          "name": "正文段落",
+          "required": true,
+          "section": "SEC-02"
+        },
+        {
+          "acceptance": [],
+          "budget": {
+            "max_chars": 500,
+            "max_tokens": 200
+          },
+          "constraints": [
+            {
+              "op": "max_chars",
+              "value": 500
+            }
+          ],
+          "examples": [],
+          "id": "SLT-04",
+          "kind": "text",
+          "name": "补充",
+          "required": false,
+          "section": "SEC-03"
+        }
+      ],
+      "title": "示例开篇规范",
+      "version": "1.0.0"
+    }
+  },
+  "schema": "nf-golden-case/1"
+}

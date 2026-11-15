@@ -1,0 +1,225 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/app/schema/nf-assembly-plan.schema.json",
+  "title": "NF 装配计划（nf-assembly-plan/1）",
+  "description": "作者图编译产物：步骤/模块/资产/权重/槽位/输出/回退。digest = sha256(canonical(去掉 digest 后的对象))。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "pipeline",
+    "steps",
+    "modules",
+    "assets",
+    "slots",
+    "output",
+    "fallback",
+    "settings",
+    "digest"
+  ],
+  "properties": {
+    "schema": {
+      "const": "nf-assembly-plan/1"
+    },
+    "pipeline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "version",
+        "digest"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]{1,63}$"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        },
+        "digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/step"
+      }
+    },
+    "modules": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "string"
+          },
+          "digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
+    "assets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "key"
+        ],
+        "properties": {
+          "key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "string"
+          },
+          "digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
+    "slots": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^SLT-[0-9]{2,3}$"
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "form"
+      ],
+      "properties": {
+        "form": {
+          "enum": [
+            "md",
+            "json",
+            "bundle"
+          ]
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "fallback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "on_failure",
+        "max_retries"
+      ],
+      "properties": {
+        "on_failure": {
+          "enum": [
+            "abort",
+            "retry",
+            "degrade"
+          ]
+        },
+        "max_retries": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "settings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "seed"
+      ],
+      "properties": {
+        "seed": {
+          "type": "integer"
+        }
+      }
+    },
+    "digest": {
+      "$ref": "#/$defs/digest"
+    }
+  },
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "step": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "node",
+        "stage",
+        "module",
+        "weight",
+        "inputs",
+        "outputs"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^S[0-9]{2}$"
+        },
+        "node": {
+          "type": "string",
+          "pattern": "^N[0-9]{2,3}$"
+        },
+        "stage": {
+          "type": "string",
+          "minLength": 1
+        },
+        "module": {
+          "type": "string",
+          "minLength": 1
+        },
+        "weight": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "outputs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "params": {
+          "type": "object",
+          "additionalProperties": {}
+        }
+      }
+    }
+  }
+}

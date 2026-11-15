@@ -1,0 +1,154 @@
+{
+  "case": "sample",
+  "core": {
+    "abi": "nf-app-core/1",
+    "version": "0.1.0"
+  },
+  "expect": {
+    "ok": true
+  },
+  "expected": {
+    "error": null,
+    "exit": 0,
+    "ok": true,
+    "result": {
+      "issues": [],
+      "level": "L0",
+      "schema": "nf-validate-report/1",
+      "summary": {
+        "error": 0,
+        "info": 0,
+        "warn": 0
+      },
+      "target": {
+        "digest": "c5a51872718454769ea5d9a61a3734fffe15ae988a46e33c348545589810a86f",
+        "kind": "protocol-pack",
+        "ref": "demo-protocol"
+      },
+      "verdict": "pass"
+    }
+  },
+  "expected_exit": 0,
+  "expected_sha256": "80e477df9490ade49a52ded669bb3522b48fb6b700f5b25ce4fde2acfda2122a",
+  "note": "expected 由 app/core release 的 nf-app-core 生成（不是手写）；expected_sha256 钉核心 stdout 原始字节",
+  "op": "protocol-validate",
+  "request": {
+    "pack": {
+      "clauses": [
+        {
+          "enabled": true,
+          "fields": [
+            "F-001"
+          ],
+          "id": "C-001",
+          "level": "MUST",
+          "source": {
+            "anchor": "§主题",
+            "path": "01_核心协议.md"
+          },
+          "text": "开篇必须给出可验证的主题句：{{F-001}}",
+          "title": "主题句先行"
+        },
+        {
+          "enabled": true,
+          "fields": [
+            "F-002"
+          ],
+          "id": "C-002",
+          "level": "SHOULD",
+          "text": "全文语气保持{{F-002}}，禁止夸张广告语。",
+          "title": "语气克制"
+        },
+        {
+          "enabled": false,
+          "fields": [
+            "F-003"
+          ],
+          "id": "C-003",
+          "level": "SHOULD",
+          "text": "引用素材时给出可追溯标识：{{F-003}}",
+          "title": "引用可追溯"
+        }
+      ],
+      "compat": {
+        "app_min": "0.1.0",
+        "protocol_max": 1,
+        "protocol_min": 1
+      },
+      "examples": [
+        {
+          "body": "灯灭之前，别回头。",
+          "id": "EX-01",
+          "keywords": [
+            "西幻",
+            "生存"
+          ],
+          "title": "雨夜开篇"
+        }
+      ],
+      "fields": [
+        {
+          "clause": "C-001",
+          "id": "F-001",
+          "label": "主题句",
+          "required": true,
+          "type": "text"
+        },
+        {
+          "clause": "C-002",
+          "default": "冷静",
+          "id": "F-002",
+          "label": "语气",
+          "options": [
+            "冷静",
+            "温和",
+            "犀利"
+          ],
+          "required": true,
+          "type": "enum"
+        },
+        {
+          "clause": "C-003",
+          "id": "F-003",
+          "label": "素材标识",
+          "required": false,
+          "type": "text"
+        }
+      ],
+      "id": "demo-protocol",
+      "migrations": [],
+      "proto_version": 1,
+      "rules": [
+        {
+          "expr": {
+            "field": "F-001",
+            "op": "exists"
+          },
+          "fix": "补 F-001",
+          "id": "R-001",
+          "message": "主题句必填",
+          "severity": "error"
+        },
+        {
+          "expr": {
+            "field": "F-002",
+            "op": "in",
+            "value": [
+              "冷静",
+              "温和",
+              "犀利"
+            ]
+          },
+          "fix": "选用白名单语气",
+          "id": "R-002",
+          "message": "语气需在白名单内",
+          "severity": "warn"
+        }
+      ],
+      "schema": "nf-protocol-pack/1",
+      "title": "示例写作协议",
+      "version": "1.0.0"
+    }
+  },
+  "schema": "nf-golden-case/1"
+}

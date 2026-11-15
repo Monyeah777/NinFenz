@@ -1,0 +1,24 @@
+{
+  "schema": "nf-validate-report/1",
+  "target": {
+    "kind": "nf-pipeline-graph/1",
+    "ref": "demo-pipeline"
+  },
+  "level": "L1",
+  "issues": [
+    {
+      "code": "NF-GRF-005",
+      "severity": "warn",
+      "path": "$.settings.required_stages",
+      "message": "未声明必需阶段",
+      "fix": "补 settings.required_stages",
+      "rule": "graph.required_stages"
+    }
+  ],
+  "summary": {
+    "error": 0,
+    "warn": 1,
+    "info": 0
+  },
+  "verdict": "warn"
+}

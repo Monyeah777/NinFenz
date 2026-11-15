@@ -1,0 +1,293 @@
+{
+  "schema": "nf-app-fixture-expectations/1",
+  "note": "invalid 夹具 → 期望错误码（码必须登记于 app/schema/error_codes.json）。测试断言：夹具被对应 schema 拒绝、映射与目录一致、code 已登记且 exit 与登记一致。",
+  "fixtures": {
+    "invalid/nf-pack/inv-id-pattern.json": {
+      "schema": "nf-pack",
+      "codes": [
+        "NF-PCK-001"
+      ],
+      "violated": "id 必须 ^[a-z][a-z0-9-]{1,63}$（大写/下划线非法）"
+    },
+    "invalid/nf-pack/inv-item-path-traversal.json": {
+      "schema": "nf-pack",
+      "codes": [
+        "NF-PCK-003"
+      ],
+      "violated": "item.path 禁 .. 与出包路径"
+    },
+    "invalid/nf-pack/inv-missing-requires.json": {
+      "schema": "nf-pack",
+      "codes": [
+        "NF-PCK-001"
+      ],
+      "violated": "顶层 required 缺 requires"
+    },
+    "invalid/nf-import/inv-detected-format-unknown.json": {
+      "schema": "nf-import",
+      "codes": [
+        "NF-E-002"
+      ],
+      "violated": "detected.format 不在 enum（未知格式 fail-closed）"
+    },
+    "invalid/nf-import/inv-mapping-missing-rationale.json": {
+      "schema": "nf-import",
+      "codes": [
+        "NF-IMP-001"
+      ],
+      "violated": "suggested.mappings[] required rationale"
+    },
+    "invalid/nf-import/inv-heading-level-range.json": {
+      "schema": "nf-import",
+      "codes": [
+        "NF-IMP-001"
+      ],
+      "violated": "structure.headings[].level maximum 6"
+    },
+    "invalid/nf-protocol-pack/inv-rule-op-unknown.json": {
+      "schema": "nf-protocol-pack",
+      "codes": [
+        "NF-E-002"
+      ],
+      "violated": "rule.expr.op 不在白名单（未知 op fail-closed）"
+    },
+    "invalid/nf-protocol-pack/inv-clause-id-pattern.json": {
+      "schema": "nf-protocol-pack",
+      "codes": [
+        "NF-PRT-001"
+      ],
+      "violated": "clause.id 必须 ^C-[0-9]{3}$"
+    },
+    "invalid/nf-protocol-pack/inv-compat-missing-app-min.json": {
+      "schema": "nf-protocol-pack",
+      "codes": [
+        "NF-PRT-001"
+      ],
+      "violated": "compat required app_min"
+    },
+    "invalid/nf-pipeline-graph/inv-node-id-pattern.json": {
+      "schema": "nf-pipeline-graph",
+      "codes": [
+        "NF-GRF-001"
+      ],
+      "violated": "node.id 必须 ^N[0-9]{2,3}$"
+    },
+    "invalid/nf-pipeline-graph/inv-weight-out-of-range.json": {
+      "schema": "nf-pipeline-graph",
+      "codes": [
+        "NF-GRF-007"
+      ],
+      "violated": "weights 值 0..100"
+    },
+    "invalid/nf-pipeline-graph/inv-settings-additional-props.json": {
+      "schema": "nf-pipeline-graph",
+      "codes": [
+        "NF-GRF-001"
+      ],
+      "violated": "settings additionalProperties=false"
+    },
+    "invalid/nf-md-spec/inv-slot-section-missing.json": {
+      "schema": "nf-md-spec",
+      "codes": [
+        "NF-SPC-002"
+      ],
+      "violated": "slot.section 必填（section/slot 双向一致的前置）"
+    },
+    "invalid/nf-md-spec/inv-constraint-op-unknown.json": {
+      "schema": "nf-md-spec",
+      "codes": [
+        "NF-E-002"
+      ],
+      "violated": "constraint.op enum"
+    },
+    "invalid/nf-md-spec/inv-heading-level-range.json": {
+      "schema": "nf-md-spec",
+      "codes": [
+        "NF-SPC-001"
+      ],
+      "violated": "heading_level 1..4"
+    },
+    "invalid/nf-assembly-plan/inv-step-id-pattern.json": {
+      "schema": "nf-assembly-plan",
+      "codes": [
+        "NF-VAL-001"
+      ],
+      "violated": "step.id 必须 ^S[0-9]{2}$"
+    },
+    "invalid/nf-assembly-plan/inv-digest-uppercase.json": {
+      "schema": "nf-assembly-plan",
+      "codes": [
+        "NF-ASM-001"
+      ],
+      "violated": "digest 必须小写 64hex"
+    },
+    "invalid/nf-validate-report/inv-verdict-unknown.json": {
+      "schema": "nf-validate-report",
+      "codes": [
+        "NF-VAL-001"
+      ],
+      "violated": "verdict enum pass/warn/fail"
+    },
+    "invalid/nf-validate-report/inv-target-missing-digest.json": {
+      "schema": "nf-validate-report",
+      "codes": [
+        "NF-VAL-003"
+      ],
+      "violated": "target.digest 必填（不可追溯）"
+    },
+    "invalid/nf-pack-update/inv-conflict-option-unknown.json": {
+      "schema": "nf-pack-update",
+      "codes": [
+        "NF-E-002"
+      ],
+      "violated": "conflict.options enum"
+    },
+    "invalid/nf-pack-update/inv-changes-missing-modified.json": {
+      "schema": "nf-pack-update",
+      "codes": [
+        "NF-PCK-001"
+      ],
+      "violated": "changes required added/removed/modified"
+    },
+    "invalid/nf-pack-update/inv-breaking-string.json": {
+      "schema": "nf-pack-update",
+      "codes": [
+        "NF-PCK-001"
+      ],
+      "violated": "impact.breaking 必须是 boolean"
+    },
+    "invalid/nf-overlay/inv-preset-id-pattern.json": {
+      "schema": "nf-overlay",
+      "codes": [
+        "NF-PCK-001"
+      ],
+      "violated": "preset.id pattern"
+    },
+    "invalid/nf-overlay/inv-base-tree-short.json": {
+      "schema": "nf-overlay",
+      "codes": [
+        "NF-PCK-001"
+      ],
+      "violated": "base.tree 必须 64hex"
+    },
+    "invalid/nf-project/inv-status-unknown.json": {
+      "schema": "nf-project",
+      "codes": [
+        "NF-E-002"
+      ],
+      "violated": "status enum（未知状态 fail-closed）"
+    },
+    "invalid/nf-project/inv-refs-missing-spec.json": {
+      "schema": "nf-project",
+      "codes": [
+        "NF-VAL-001"
+      ],
+      "violated": "refs required spec"
+    },
+    "invalid/nf-project/inv-history-op-empty.json": {
+      "schema": "nf-project",
+      "codes": [
+        "NF-VAL-001"
+      ],
+      "violated": "history[].op minLength 1"
+    },
+    "invalid/nf-template/inv-manifest-id-pattern.json": {
+      "schema": "nf-template",
+      "codes": [
+        "NF-PCK-001"
+      ],
+      "violated": "manifest.id pattern"
+    },
+    "invalid/nf-template/inv-assets-missing-sha256.json": {
+      "schema": "nf-template",
+      "codes": [
+        "NF-PCK-001"
+      ],
+      "violated": "assets[] required sha256"
+    },
+    "invalid/ccos-task/inv-policy-network-true.json": {
+      "schema": "ccos-task",
+      "codes": [
+        "NF-CCOS-003"
+      ],
+      "violated": "policy.network 必须 false（策略越界）"
+    },
+    "invalid/ccos-task/inv-budget-missing-seconds.json": {
+      "schema": "ccos-task",
+      "codes": [
+        "NF-CCOS-001"
+      ],
+      "violated": "budget required max_seconds"
+    },
+    "invalid/ccos-task/inv-extra-secret-field.json": {
+      "schema": "ccos-task",
+      "codes": [
+        "NF-CCOS-003"
+      ],
+      "violated": "顶层 additionalProperties=false（禁密钥形状字段）"
+    },
+    "invalid/ccos-result/inv-human-review-required-false.json": {
+      "schema": "ccos-result",
+      "codes": [
+        "NF-CCOS-004"
+      ],
+      "violated": "human_review.required const true"
+    },
+    "invalid/ccos-result/inv-task-digest-short.json": {
+      "schema": "ccos-result",
+      "codes": [
+        "NF-CCOS-002"
+      ],
+      "violated": "task_digest 必须 64hex（回钉）"
+    },
+    "invalid/ccos-result/inv-artifact-missing-bytes.json": {
+      "schema": "ccos-result",
+      "codes": [
+        "NF-CCOS-001"
+      ],
+      "violated": "artifacts[] required bytes"
+    },
+    "invalid/nf-assemble-result/inv-slot-missing-section.json": {
+      "schema": "nf-assemble-result",
+      "codes": [
+        "NF-ASM-003"
+      ],
+      "violated": "slots[] required section（nf-assemble-result/1）"
+    },
+    "invalid/nf-assemble-result/inv-chars-negative.json": {
+      "schema": "nf-assemble-result",
+      "codes": [
+        "NF-ASM-003"
+      ],
+      "violated": "slots[].chars integer minimum 0"
+    },
+    "invalid/nf-export-manifest/inv-format-unknown.json": {
+      "schema": "nf-export-manifest",
+      "codes": [
+        "NF-E-002"
+      ],
+      "violated": "format enum md/zip/json/docx/pdf（未知格式 fail-closed）"
+    },
+    "invalid/nf-export-manifest/inv-files-missing-bytes.json": {
+      "schema": "nf-export-manifest",
+      "codes": [
+        "NF-EXP-001"
+      ],
+      "violated": "files[] required bytes"
+    },
+    "invalid/nf-backup/inv-tree-short.json": {
+      "schema": "nf-backup",
+      "codes": [
+        "NF-PCK-007"
+      ],
+      "violated": "tree 必须 64hex（备份清单不可校验）"
+    },
+    "invalid/nf-backup/inv-file-path-empty.json": {
+      "schema": "nf-backup",
+      "codes": [
+        "NF-PCK-007"
+      ],
+      "violated": "files[].path minLength 1"
+    }
+  }
+}

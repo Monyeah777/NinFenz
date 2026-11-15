@@ -1,0 +1,364 @@
+{
+  "case": "sample-md",
+  "core": {
+    "abi": "nf-app-core/1",
+    "version": "0.1.0"
+  },
+  "expect": {
+    "ok": true
+  },
+  "expected": {
+    "error": null,
+    "exit": 0,
+    "ok": true,
+    "result": {
+      "assets": [],
+      "detected": {
+        "candidates": [
+          {
+            "confidence": 85,
+            "format": "markdown"
+          },
+          {
+            "confidence": 55,
+            "format": "text"
+          }
+        ],
+        "confidence": 85,
+        "format": "markdown"
+      },
+      "schema": "nf-import/1",
+      "source": {
+        "kind": "file",
+        "name": "sample.md",
+        "sha256": "bdda935f5fa201d57cadd66d596d27b5687ee45155cbe57080735203aa058160",
+        "size": 346
+      },
+      "structure": {
+        "code_blocks": [
+          {
+            "lang": "markdown",
+            "lines": 1
+          }
+        ],
+        "headings": [
+          {
+            "level": 1,
+            "line": 1,
+            "text": "西幻生存开篇（示例导入）"
+          },
+          {
+            "level": 2,
+            "line": 3,
+            "text": "场景"
+          },
+          {
+            "level": 2,
+            "line": 7,
+            "text": "结构"
+          },
+          {
+            "level": 2,
+            "line": 13,
+            "text": "示例"
+          }
+        ],
+        "paragraphs": 2,
+        "tables": [
+          {
+            "columns": 2,
+            "rows": 2
+          }
+        ]
+      },
+      "suggested": {
+        "mappings": [
+          {
+            "confidence": 60,
+            "from_index": 0,
+            "from_kind": "heading",
+            "rationale": "无标题匹配，按出现顺序对应 spec 章节",
+            "to_id": "SEC-01",
+            "to_kind": "section"
+          },
+          {
+            "confidence": 60,
+            "from_index": 1,
+            "from_kind": "heading",
+            "rationale": "无标题匹配，按出现顺序对应 spec 章节",
+            "to_id": "SEC-02",
+            "to_kind": "section"
+          },
+          {
+            "confidence": 60,
+            "from_index": 2,
+            "from_kind": "heading",
+            "rationale": "无标题匹配，按出现顺序对应 spec 章节",
+            "to_id": "SEC-03",
+            "to_kind": "section"
+          },
+          {
+            "confidence": 55,
+            "from_index": 0,
+            "from_kind": "paragraph",
+            "rationale": "无语言模型的首版规则：按段落序对应槽位序（需用户复核）",
+            "to_id": "SLT-01",
+            "to_kind": "slot"
+          },
+          {
+            "confidence": 55,
+            "from_index": 1,
+            "from_kind": "paragraph",
+            "rationale": "无语言模型的首版规则：按段落序对应槽位序（需用户复核）",
+            "to_id": "SLT-02",
+            "to_kind": "slot"
+          },
+          {
+            "confidence": 70,
+            "from_index": 0,
+            "from_kind": "code_block",
+            "rationale": "代码块（lang=markdown）作为示例候选",
+            "to_id": "EX-01",
+            "to_kind": "example"
+          },
+          {
+            "confidence": 65,
+            "from_index": 0,
+            "from_kind": "table",
+            "rationale": "表格（2 列）作为结构化数据候选",
+            "to_id": "TBL-01",
+            "to_kind": "structured"
+          }
+        ],
+        "unmapped": [
+          "heading[3]:示例"
+        ]
+      },
+      "text": "# 西幻生存开篇（示例导入）\n\n## 场景\n\n雨夜的边境小镇，主角必须在一个时辰内找到落脚点。\n\n## 结构\n\n1. 开头：环境压力\n2. 中段：选择与代价\n3. 结尾：留下钩子\n\n## 示例\n\n```markdown\n> 引用：灯灭之前，别回头。\n```\n\n| 项 | 值 |\n|---|---|\n| 语气 | 冷静 |\n| 节奏 | 中速 |\n",
+      "text_digest": "bdda935f5fa201d57cadd66d596d27b5687ee45155cbe57080735203aa058160",
+      "warnings": []
+    }
+  },
+  "expected_exit": 0,
+  "expected_sha256": "ab11dbcf38bdd32fdf835cd85815907d237b888421e067ca86524bd34ebc3b51",
+  "note": "expected 由 app/core release 的 nf-app-core 生成（不是手写）；expected_sha256 钉核心 stdout 原始字节",
+  "op": "map-suggest",
+  "request": {
+    "import": {
+      "assets": [],
+      "detected": {
+        "candidates": [
+          {
+            "confidence": 85,
+            "format": "markdown"
+          },
+          {
+            "confidence": 55,
+            "format": "text"
+          }
+        ],
+        "confidence": 85,
+        "format": "markdown"
+      },
+      "schema": "nf-import/1",
+      "source": {
+        "kind": "file",
+        "name": "sample.md",
+        "sha256": "bdda935f5fa201d57cadd66d596d27b5687ee45155cbe57080735203aa058160",
+        "size": 346
+      },
+      "structure": {
+        "code_blocks": [
+          {
+            "lang": "markdown",
+            "lines": 1
+          }
+        ],
+        "headings": [
+          {
+            "level": 1,
+            "line": 1,
+            "text": "西幻生存开篇（示例导入）"
+          },
+          {
+            "level": 2,
+            "line": 3,
+            "text": "场景"
+          },
+          {
+            "level": 2,
+            "line": 7,
+            "text": "结构"
+          },
+          {
+            "level": 2,
+            "line": 13,
+            "text": "示例"
+          }
+        ],
+        "paragraphs": 2,
+        "tables": [
+          {
+            "columns": 2,
+            "rows": 2
+          }
+        ]
+      },
+      "suggested": {
+        "mappings": [],
+        "unmapped": []
+      },
+      "text": "# 西幻生存开篇（示例导入）\n\n## 场景\n\n雨夜的边境小镇，主角必须在一个时辰内找到落脚点。\n\n## 结构\n\n1. 开头：环境压力\n2. 中段：选择与代价\n3. 结尾：留下钩子\n\n## 示例\n\n```markdown\n> 引用：灯灭之前，别回头。\n```\n\n| 项 | 值 |\n|---|---|\n| 语气 | 冷静 |\n| 节奏 | 中速 |\n",
+      "text_digest": "bdda935f5fa201d57cadd66d596d27b5687ee45155cbe57080735203aa058160",
+      "warnings": []
+    },
+    "spec": {
+      "acceptance": [
+        {
+          "description": "开篇必须有主题句与读者设定",
+          "id": "A-01",
+          "severity": "error"
+        },
+        {
+          "description": "正文不超预算",
+          "id": "A-02",
+          "severity": "warn"
+        }
+      ],
+      "constraints": [],
+      "domain": "写作",
+      "heading_level": 2,
+      "id": "demo-spec",
+      "references": [
+        {
+          "digest": "c5a51872718454769ea5d9a61a3734fffe15ae988a46e33c348545589810a86f",
+          "kind": "protocol",
+          "ref": "demo-protocol"
+        }
+      ],
+      "schema": "nf-md-spec/1",
+      "sections": [
+        {
+          "id": "SEC-01",
+          "order": 1,
+          "required": true,
+          "slots": [
+            "SLT-01",
+            "SLT-02"
+          ],
+          "title": "开篇"
+        },
+        {
+          "id": "SEC-02",
+          "order": 2,
+          "required": true,
+          "slots": [
+            "SLT-03"
+          ],
+          "title": "正文"
+        },
+        {
+          "id": "SEC-03",
+          "order": 3,
+          "required": false,
+          "slots": [
+            "SLT-04"
+          ],
+          "title": "收束"
+        }
+      ],
+      "slots": [
+        {
+          "acceptance": [
+            "A-01"
+          ],
+          "budget": {
+            "max_chars": 200,
+            "max_tokens": 100
+          },
+          "constraints": [
+            {
+              "op": "max_chars",
+              "value": 200
+            },
+            {
+              "op": "non_empty"
+            }
+          ],
+          "examples": [
+            "灯灭之前，别回头。"
+          ],
+          "id": "SLT-01",
+          "kind": "text",
+          "name": "主题句",
+          "required": true,
+          "section": "SEC-01"
+        },
+        {
+          "acceptance": [
+            "A-01"
+          ],
+          "budget": {
+            "max_chars": 100,
+            "max_tokens": 50
+          },
+          "constraints": [
+            {
+              "op": "max_chars",
+              "value": 100
+            }
+          ],
+          "examples": [],
+          "id": "SLT-02",
+          "kind": "text",
+          "name": "读者设定",
+          "required": true,
+          "section": "SEC-01"
+        },
+        {
+          "acceptance": [
+            "A-02"
+          ],
+          "budget": {
+            "max_chars": 2000,
+            "max_tokens": 800
+          },
+          "constraints": [
+            {
+              "op": "max_chars",
+              "value": 2000
+            }
+          ],
+          "examples": [],
+          "id": "SLT-03",
+          "kind": "text",
+          "name": "正文段落",
+          "required": true,
+          "section": "SEC-02"
+        },
+        {
+          "acceptance": [],
+          "budget": {
+            "max_chars": 500,
+            "max_tokens": 200
+          },
+          "constraints": [
+            {
+              "op": "max_chars",
+              "value": 500
+            }
+          ],
+          "examples": [],
+          "id": "SLT-04",
+          "kind": "text",
+          "name": "补充",
+          "required": false,
+          "section": "SEC-03"
+        }
+      ],
+      "title": "示例开篇规范",
+      "version": "1.0.0"
+    }
+  },
+  "schema": "nf-golden-case/1"
+}

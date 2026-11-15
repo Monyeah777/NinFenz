@@ -1,0 +1,327 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/app/schema/nf-import.schema.json",
+  "title": "NF 导入识别结果（nf-import/1）",
+  "description": "一次导入的识别/结构抽取/映射建议；必须保留原文与来源；不覆盖已有项目（只生成草稿）。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "source",
+    "detected",
+    "structure",
+    "assets",
+    "suggested",
+    "warnings"
+  ],
+  "properties": {
+    "schema": {
+      "const": "nf-import/1"
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "name"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "share",
+            "view",
+            "process_text",
+            "saf",
+            "clipboard",
+            "file",
+            "inbox"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mime": {
+          "type": "string"
+        },
+        "size": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "uri_kind": {
+          "type": "string"
+        }
+      }
+    },
+    "detected": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "format",
+        "confidence",
+        "candidates"
+      ],
+      "properties": {
+        "format": {
+          "enum": [
+            "text",
+            "markdown",
+            "json",
+            "yaml",
+            "zip",
+            "nftpl",
+            "nfpack",
+            "html",
+            "docx",
+            "pdf",
+            "ocr",
+            "unsupported"
+          ]
+        },
+        "confidence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "candidates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "format",
+              "confidence"
+            ],
+            "properties": {
+              "format": {
+                "type": "string"
+              },
+              "confidence": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              }
+            }
+          }
+        }
+      }
+    },
+    "text": {
+      "type": "string",
+      "description": "规范化后的原文（大文件用 text_path + digest 替代）"
+    },
+    "text_path": {
+      "type": "string"
+    },
+    "text_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "structure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "headings",
+        "paragraphs",
+        "code_blocks",
+        "tables"
+      ],
+      "properties": {
+        "headings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "line",
+              "level",
+              "text"
+            ],
+            "properties": {
+              "line": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "level": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 6
+              },
+              "text": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "paragraphs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "code_blocks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "lang",
+              "lines"
+            ],
+            "properties": {
+              "lang": {
+                "type": "string"
+              },
+              "lines": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        "tables": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "columns",
+              "rows"
+            ],
+            "properties": {
+              "columns": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "rows": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          }
+        }
+      }
+    },
+    "assets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "sha256",
+          "size"
+        ],
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "mime": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "suggested": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mappings",
+        "unmapped"
+      ],
+      "properties": {
+        "template_id": {
+          "type": "string"
+        },
+        "mappings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "from_kind",
+              "from_index",
+              "to_kind",
+              "to_id",
+              "confidence",
+              "rationale"
+            ],
+            "properties": {
+              "from_kind": {
+                "enum": [
+                  "heading",
+                  "paragraph",
+                  "code_block",
+                  "table"
+                ]
+              },
+              "from_index": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "to_kind": {
+                "enum": [
+                  "section",
+                  "slot",
+                  "example",
+                  "structured"
+                ]
+              },
+              "to_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "confidence": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "rationale": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "unmapped": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "pattern": "^NF-[A-Z]+-[0-9]{3}$"
+          },
+          "message": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

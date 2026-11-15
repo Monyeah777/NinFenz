@@ -1,0 +1,55 @@
+{
+  "case": "float-rejected",
+  "core": {
+    "abi": "nf-app-core/1",
+    "version": "0.1.0"
+  },
+  "expect": {
+    "code": "NF-E-006",
+    "ok": false
+  },
+  "expected": {
+    "error": {
+      "code": "NF-E-006",
+      "fix": "改用 int/字符串",
+      "message": "$.x: canonical 禁止浮点数（path=$.x）",
+      "path": "$.x"
+    },
+    "exit": 1,
+    "ok": false,
+    "result": {
+      "issues": [
+        {
+          "code": "NF-E-006",
+          "fix": "改用 int/字符串",
+          "message": "canonical 禁止浮点数（path=$.x）",
+          "path": "$.x",
+          "severity": "error"
+        }
+      ],
+      "level": "L0",
+      "schema": "nf-validate-report/1",
+      "summary": {
+        "error": 1,
+        "info": 0,
+        "warn": 0
+      },
+      "target": {
+        "digest": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+        "kind": "unknown",
+        "ref": "$"
+      },
+      "verdict": "fail"
+    }
+  },
+  "expected_exit": 1,
+  "expected_sha256": "a45eb983dba62eafc35f463fa3386bcbb36a42a4a8506acce05be51a8da62da2",
+  "note": "expected 由 app/core release 的 nf-app-core 生成（不是手写）；expected_sha256 钉核心 stdout 原始字节",
+  "op": "canonical",
+  "request": {
+    "value": {
+      "x": 1.5
+    }
+  },
+  "schema": "nf-golden-case/1"
+}

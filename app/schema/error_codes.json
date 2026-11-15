@@ -1,0 +1,412 @@
+{
+  "schema": "nf-app-error-codes/1",
+  "note": "错误码单一真源。实现与测试都从这里取；新增码必须先改本件。severity: error 阻断 / warn 提示 / info 记录。exit: 进程退出码（0 成功；1 校验失败；2 用法/IO；3 拒绝；4 环境缺失）。",
+  "codes": [
+    {
+      "code": "NF-IMP-001",
+      "severity": "error",
+      "exit": 3,
+      "message": "导入格式无法识别（嗅探低置信且无候选）",
+      "fix": "显式选择格式或换输入"
+    },
+    {
+      "code": "NF-IMP-002",
+      "severity": "warn",
+      "exit": 0,
+      "message": "嗅探置信度低（<0.6），需用户确认",
+      "fix": "在候选里手动选择格式"
+    },
+    {
+      "code": "NF-IMP-003",
+      "severity": "error",
+      "exit": 3,
+      "message": "结构抽取超限（见 limits.json import）",
+      "fix": "拆分输入或提高显式上限并记录"
+    },
+    {
+      "code": "NF-IMP-004",
+      "severity": "error",
+      "exit": 3,
+      "message": "本版本未实现该格式适配器（html/docx/pdf/ocr）",
+      "fix": "升级版本或先转成 markdown"
+    },
+    {
+      "code": "NF-MAP-001",
+      "severity": "warn",
+      "exit": 0,
+      "message": "无映射候选（归入素材/未分类）",
+      "fix": "在映射向导里手动指定"
+    },
+    {
+      "code": "NF-PRT-001",
+      "severity": "error",
+      "exit": 1,
+      "message": "协议包不满足 schema",
+      "fix": "按报告 path 修复字段"
+    },
+    {
+      "code": "NF-PRT-002",
+      "severity": "error",
+      "exit": 1,
+      "message": "条款/字段/规则 id 重复",
+      "fix": "改用唯一 id"
+    },
+    {
+      "code": "NF-PRT-003",
+      "severity": "error",
+      "exit": 1,
+      "message": "必填字段无值（条款占位符无法渲染）",
+      "fix": "在条款表单里补值"
+    },
+    {
+      "code": "NF-PRT-004",
+      "severity": "error",
+      "exit": 1,
+      "message": "条款文本含未声明占位符",
+      "fix": "改占位符或补字段声明"
+    },
+    {
+      "code": "NF-PRT-005",
+      "severity": "error",
+      "exit": 3,
+      "message": "规则表达式 op 未知/类型不匹配（fail-closed）",
+      "fix": "改用白名单 op 或修表达式"
+    },
+    {
+      "code": "NF-PRT-006",
+      "severity": "error",
+      "exit": 3,
+      "message": "协议兼容范围不满足（compat.protocol_min/max 或 app_min）",
+      "fix": "升级 APP 或换协议包版本"
+    },
+    {
+      "code": "NF-GRF-001",
+      "severity": "error",
+      "exit": 1,
+      "message": "管线图不满足 schema",
+      "fix": "按报告 path 修复"
+    },
+    {
+      "code": "NF-GRF-002",
+      "severity": "error",
+      "exit": 1,
+      "message": "节点/边 id 重复",
+      "fix": "改用唯一 id"
+    },
+    {
+      "code": "NF-GRF-003",
+      "severity": "error",
+      "exit": 1,
+      "message": "边端点或端口不存在/未声明",
+      "fix": "补节点/端口声明或修边"
+    },
+    {
+      "code": "NF-GRF-004",
+      "severity": "error",
+      "exit": 1,
+      "message": "管线图含环（非 DAG）",
+      "fix": "删除回边或改分支为 DAG"
+    },
+    {
+      "code": "NF-GRF-005",
+      "severity": "error",
+      "exit": 1,
+      "message": "必需阶段缺失或节点不可达",
+      "fix": "补阶段/连边"
+    },
+    {
+      "code": "NF-GRF-006",
+      "severity": "error",
+      "exit": 1,
+      "message": "模式限制被违反（simple 禁 branch/merge/asset）",
+      "fix": "切 Pro/Expert 模式或删非法节点"
+    },
+    {
+      "code": "NF-GRF-007",
+      "severity": "error",
+      "exit": 1,
+      "message": "权重越界或挂在非法节点类型",
+      "fix": "权重限 0..100 且只挂 stage/module"
+    },
+    {
+      "code": "NF-SPC-001",
+      "severity": "error",
+      "exit": 1,
+      "message": "md spec 不满足 schema",
+      "fix": "按报告 path 修复"
+    },
+    {
+      "code": "NF-SPC-002",
+      "severity": "error",
+      "exit": 1,
+      "message": "section/slot 双向引用不一致",
+      "fix": "补齐两侧引用"
+    },
+    {
+      "code": "NF-SPC-003",
+      "severity": "error",
+      "exit": 1,
+      "message": "约束非法（min>max 或值越界）",
+      "fix": "修正约束"
+    },
+    {
+      "code": "NF-SPC-004",
+      "severity": "error",
+      "exit": 1,
+      "message": "预算超上限（Σ slot 预算 > 总预算）",
+      "fix": "调低槽位预算或提高总预算"
+    },
+    {
+      "code": "NF-SPC-005",
+      "severity": "error",
+      "exit": 1,
+      "message": "acceptance id 重复",
+      "fix": "改用唯一 A-##"
+    },
+    {
+      "code": "NF-ASM-001",
+      "severity": "error",
+      "exit": 1,
+      "message": "plan/spec digest 与项目引用不一致",
+      "fix": "重新编译 plan 或刷新项目引用"
+    },
+    {
+      "code": "NF-ASM-002",
+      "severity": "error",
+      "exit": 1,
+      "message": "必填槽位缺失",
+      "fix": "补 inputs 或改槽位为可选"
+    },
+    {
+      "code": "NF-ASM-003",
+      "severity": "error",
+      "exit": 1,
+      "message": "渲染失败（语法/围栏/结构）",
+      "fix": "按 path 修 plan/spec"
+    },
+    {
+      "code": "NF-ASM-004",
+      "severity": "error",
+      "exit": 1,
+      "message": "块级编辑目标节不存在",
+      "fix": "检查 section id"
+    },
+    {
+      "code": "NF-VAL-001",
+      "severity": "error",
+      "exit": 1,
+      "message": "L0 结构校验失败",
+      "fix": "按 path 修复产物"
+    },
+    {
+      "code": "NF-VAL-002",
+      "severity": "error",
+      "exit": 1,
+      "message": "L1 契约/验收条件失败",
+      "fix": "按 rules 修复内容"
+    },
+    {
+      "code": "NF-VAL-003",
+      "severity": "error",
+      "exit": 1,
+      "message": "报告缺 target.digest（不可追溯）",
+      "fix": "补摘要"
+    },
+    {
+      "code": "NF-VAL-004",
+      "severity": "error",
+      "exit": 1,
+      "message": "报告非确定性（两次不一致）",
+      "fix": "去掉时间戳/随机"
+    },
+    {
+      "code": "NF-VAL-005",
+      "severity": "error",
+      "exit": 4,
+      "message": "L2（仓库协议层）校验不可用",
+      "fix": "安装 nf CLI 或降级为 L1 并记录"
+    },
+    {
+      "code": "NF-EXP-001",
+      "severity": "error",
+      "exit": 2,
+      "message": "导出失败（IO/格式）",
+      "fix": "检查路径与权限"
+    },
+    {
+      "code": "NF-EXP-002",
+      "severity": "error",
+      "exit": 3,
+      "message": "导出路径越界（traversal）",
+      "fix": "改用包内相对路径"
+    },
+    {
+      "code": "NF-EXP-003",
+      "severity": "error",
+      "exit": 1,
+      "message": "zip entry 重名",
+      "fix": "去重"
+    },
+    {
+      "code": "NF-EXP-004",
+      "severity": "error",
+      "exit": 4,
+      "message": "导出器不可用（docx/pdf 依赖缺失）",
+      "fix": "安装导出器或改用 md/zip"
+    },
+    {
+      "code": "NF-PCK-001",
+      "severity": "error",
+      "exit": 1,
+      "message": "Pack 清单不满足 schema",
+      "fix": "按报告 path 修复"
+    },
+    {
+      "code": "NF-PCK-002",
+      "severity": "error",
+      "exit": 1,
+      "message": "item 摘要/大小与清单不符",
+      "fix": "重打包或改清单"
+    },
+    {
+      "code": "NF-PCK-003",
+      "severity": "error",
+      "exit": 3,
+      "message": "item 路径不安全（绝对/../symlink）",
+      "fix": "改用包内相对路径"
+    },
+    {
+      "code": "NF-PCK-004",
+      "severity": "error",
+      "exit": 3,
+      "message": "同 id+version 不同 digest（篡改/冲突）",
+      "fix": "提升版本号或恢复原件"
+    },
+    {
+      "code": "NF-PCK-005",
+      "severity": "error",
+      "exit": 1,
+      "message": "requires 不满足",
+      "fix": "安装依赖 pack"
+    },
+    {
+      "code": "NF-PCK-006",
+      "severity": "error",
+      "exit": 1,
+      "message": "更新冲突未裁决（默认 defer 不应用）",
+      "fix": "在冲突 UI 逐个决定"
+    },
+    {
+      "code": "NF-PCK-007",
+      "severity": "error",
+      "exit": 2,
+      "message": "回滚失败（备份缺失/摘要不符）",
+      "fix": "从备份手工恢复并登记"
+    },
+    {
+      "code": "NF-SEC-001",
+      "severity": "error",
+      "exit": 3,
+      "message": "zip slip（解包路径越界）",
+      "fix": "拒绝该包"
+    },
+    {
+      "code": "NF-SEC-002",
+      "severity": "error",
+      "exit": 3,
+      "message": "symlink/junction/硬链（拒绝）",
+      "fix": "重打包为普通文件"
+    },
+    {
+      "code": "NF-SEC-003",
+      "severity": "error",
+      "exit": 3,
+      "message": "解包超限（zip bomb 防护）",
+      "fix": "拆分或压缩后重试"
+    },
+    {
+      "code": "NF-SEC-004",
+      "severity": "error",
+      "exit": 3,
+      "message": "YAML 别名爆炸",
+      "fix": "改用 JSON 或精简 YAML"
+    },
+    {
+      "code": "NF-SEC-005",
+      "severity": "error",
+      "exit": 3,
+      "message": "XML 实体/DTD（禁用）",
+      "fix": "去掉实体声明"
+    },
+    {
+      "code": "NF-CCOS-001",
+      "severity": "error",
+      "exit": 1,
+      "message": "ccos-task/result 不满足 schema",
+      "fix": "按报告 path 修复"
+    },
+    {
+      "code": "NF-CCOS-002",
+      "severity": "error",
+      "exit": 1,
+      "message": "task_digest 回钉不一致",
+      "fix": "重新生成任务或核对结果"
+    },
+    {
+      "code": "NF-CCOS-003",
+      "severity": "error",
+      "exit": 3,
+      "message": "任务/结果含密钥/策略越界字段",
+      "fix": "删除密钥，仅留策略声明"
+    },
+    {
+      "code": "NF-CCOS-004",
+      "severity": "error",
+      "exit": 1,
+      "message": "人审未完成（required=true 必须 approved）",
+      "fix": "在 APP 内完成人工复核"
+    },
+    {
+      "code": "NF-E-001",
+      "severity": "error",
+      "exit": 3,
+      "message": "未知 schema 版本（fail-closed）",
+      "fix": "升级 APP 或导出兼容版本"
+    },
+    {
+      "code": "NF-E-002",
+      "severity": "error",
+      "exit": 3,
+      "message": "未知 enum/op/格式（fail-closed）",
+      "fix": "改用已声明值"
+    },
+    {
+      "code": "NF-E-003",
+      "severity": "error",
+      "exit": 2,
+      "message": "用法错误",
+      "fix": "看 --help"
+    },
+    {
+      "code": "NF-E-004",
+      "severity": "error",
+      "exit": 2,
+      "message": "IO 错误（读不到/写不了）",
+      "fix": "检查路径权限"
+    },
+    {
+      "code": "NF-E-005",
+      "severity": "error",
+      "exit": 4,
+      "message": "平台不支持",
+      "fix": "换平台或安装缺失工具"
+    },
+    {
+      "code": "NF-E-006",
+      "severity": "error",
+      "exit": 1,
+      "message": "canonical 输入非法（float/NaN/非字符串键）",
+      "fix": "改用 int/字符串"
+    }
+  ]
+}
