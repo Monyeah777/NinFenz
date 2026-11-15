@@ -1,0 +1,118 @@
+package dev.ninfenz.mobile.ui.screens
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import kotlinx.coroutines.launch
+import dev.ninfenz.mobile.data.PackEntry
+import dev.ninfenz.mobile.data.PackVerifier
+import dev.ninfenz.mobile.ui.components.NfCard
+import dev.ninfenz.mobile.ui.components.NfEmptyState
+import dev.ninfenz.mobile.ui.components.NfErrorCard
+import dev.ninfenz.mobile.ui.components.NfSectionHeader
+import dev.ninfenz.mobile.ui.components.NfStatusChip
+import dev.ninfenz.mobile.ui.components.NfTopAppBar
+import dev.ninfenz.mobile.ui.theme.NfSpacing
+
+/** W5 Pack 中心：已装列表 + 逐 Pack 校验 + 详情/更新入口（diff/冲突/回滚仍在 PackUpdate）。 */
+@Composable
+fun PackCenterScreen(
+    packs: List<PackEntry>,
+    onBack: () -> Unit,
+    onOpenPack: (PackEntry) -> Unit,
+    onUpdatePlan: () -> Unit,
+    onLoadSample: () -> Unit
+) {
+    val scope = rememberCoroutineScope()
+    var verifyingId by remember { mutableStateOf<String?>(null) }
+    var results by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
+    var errors by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
+
+    Column(modifier = Modifier.fillMaxSize()) {
+        NfTopAppBar(
+            title = "Pack 中心",
+            onBack = onBack,
+            actions = {
+                TextButton(onClick = onUpdatePlan) { Text("更新计划") }
+            }
+        )
+        if (packs.isEmpty()) {
+            NfEmptyState(
+                icon = Icons.Filled.Add,
+                title = "还没有 Pack",
+                message = "载入内置示例 Pack，或从文件管理器导入一个 Pack。",
+                actionLabel = "载入示例 Pack",
+                onAction = onLoadSample
+            )
+        } else {
+            LazyColumn(
+                contentPadding = androidx.compose.foundation.layout.PaddingValues(NfSpacing.page),
+                verticalArrangement = Arrangement.spacedBy(NfSpacing.m)
+            ) {
+                item { NfSectionHeader("已安装（" + packs.size + "）") }
+                items(packs.size) { index ->
+                    val pack = packs[index]
+                    NfCard(modifier = Modifier.fillMaxWidth()) {
+                        Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(pack.title, style = MaterialTheme.typography.titleMedium)
+                                    Text(
+                                        pack.id + " · " + pack.version + " · " + pack.itemCount + " 项",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                                NfStatusChip("已安装")
+                            }
+                            Text("tree：" + pack.tree.take(16) + "…", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+                                OutlinedButton(
+                                    enabled = verifyingId == null,
+                                    onClick = {
+                                        verifyingId = pack.id
+                                        scope.launch {
+                                            val response = PackVerifier().verify(pack)
+                                            val verdict = response.resultObject()?.get("verdict")?.toString()?.trim('"')
+                                            if (response.ok) {
+                                                results = results + (pack.id to ("校验通过 · verdict=" + (verdict ?: "pass")))
+                                            } else {
+                                                val err = response.error
+                                                errors = errors + (pack.id to ("[" + (err?.code ?: "NF-VAL-001") + "] " + (err?.message ?: "校验失败") + "；修复：" + (err?.fix ?: "查看诊断")))
+                                            }
+                                            verifyingId = null
+                                        }
+                                    }
+                                ) { Text(if (verifyingId == pack.id) "校验中…" else "校验") }
+                                Button(onClick = { onOpenPack(pack) }) { Text("详情") }
+                            }
+                            results[pack.id]?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary) }
+                            errors[pack.id]?.let { message ->
+                                NfErrorCard("NF-VAL-001", message, "查看诊断或重装该 Pack")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

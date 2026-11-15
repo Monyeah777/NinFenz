@@ -63,6 +63,7 @@ fun LibraryHomeScreen(
     onOpenPack: (PackEntry) -> Unit,
     onOpenProject: (ProjectEntry) -> Unit,
     onSearch: () -> Unit,
+    onPackCenter: () -> Unit,
     onSettings: () -> Unit
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
@@ -125,7 +126,11 @@ fun LibraryHomeScreen(
                 }
             }
             if (packs.isNotEmpty()) {
-                item { NfSectionHeader("已安装 Pack") }
+                item {
+                    NfSectionHeader("已安装 Pack", action = {
+                        TextButton(onClick = onPackCenter) { Text("管理") }
+                    })
+                }
                 items(packs.size) { index ->
                     val pack = packs[index]
                     NfCard(
@@ -319,8 +324,8 @@ fun DeliverScreen(
                 item { NfSectionHeader("更多") }
                 item {
                     NfListRow(
-                        title = "Pack 更新",
-                        subtitle = "diff / 冲突 / 回滚",
+                        title = "Pack 中心",
+                        subtitle = "已装列表 / 校验 / 更新",
                         leading = Icons.Filled.Refresh,
                         onClick = onPackUpdate
                     )

@@ -16,6 +16,7 @@ sealed interface Detail {
     data object Graph : Detail
     data object Assembly : Detail
     data object PackUpdate : Detail
+    data object PackCenter : Detail
     data object Ccos : Detail
     data class Project(val id: String) : Detail
     data class Author(val id: String) : Detail

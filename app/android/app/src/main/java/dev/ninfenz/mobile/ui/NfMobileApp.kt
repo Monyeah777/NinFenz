@@ -59,6 +59,7 @@ import dev.ninfenz.mobile.ui.screens.LibraryHomeScreen
 import dev.ninfenz.mobile.ui.screens.MeScreen
 import dev.ninfenz.mobile.ui.screens.NewProjectScreen
 import dev.ninfenz.mobile.ui.screens.OnboardingScreen
+import dev.ninfenz.mobile.ui.screens.PackCenterScreen
 import dev.ninfenz.mobile.ui.screens.PackDetailScreen
 import dev.ninfenz.mobile.ui.screens.PackUpdateScreen
 import dev.ninfenz.mobile.ui.screens.ProjectDetailScreen
@@ -224,6 +225,7 @@ fun NfMobileApp(
                             onOpenPack = { shell = shell.open(Detail.Pack(it.id, it.version)) },
                             onOpenProject = { shell = shell.open(Detail.Project(it.project.id)) },
                             onSearch = { shell = shell.open(Detail.Search) },
+                            onPackCenter = { shell = shell.open(Detail.PackCenter) },
                             onSettings = { shell = shell.open(Detail.Settings) }
                         )
                         TopDestination.CREATE -> CreateScreen(
@@ -240,7 +242,7 @@ fun NfMobileApp(
                             onOpenProject = { shell = shell.open(Detail.Project(it.project.id)) },
                             onOpenDelivery = { shell = shell.open(Detail.Delivery(it.project.id)) },
                             onGoCreate = { shell = shell.select(TopDestination.CREATE) },
-                            onPackUpdate = { shell = shell.open(Detail.PackUpdate) },
+                            onPackUpdate = { shell = shell.open(Detail.PackCenter) },
                             onCcos = { shell = shell.open(Detail.Ccos) }
                         )
                         TopDestination.ME -> MeScreen(
@@ -313,6 +315,13 @@ fun NfMobileApp(
                         }
                     }
                     is Detail.Assembly -> AssemblyScreen(onBack = { shell = shell.back() ?: shell })
+                    is Detail.PackCenter -> PackCenterScreen(
+                        packs = packs.packs,
+                        onBack = { shell = shell.back() ?: shell },
+                        onOpenPack = { pack -> shell = shell.open(Detail.Pack(pack.id, pack.version)) },
+                        onUpdatePlan = { shell = shell.open(Detail.PackUpdate) },
+                        onLoadSample = ::runSeed
+                    )
                     is Detail.PackUpdate -> PackUpdateScreen(store = library, onBack = { shell = shell.back() ?: shell })
                     is Detail.Ccos -> CcosScreen(onBack = { shell = shell.back() ?: shell })
                     is Detail.Pack -> {
