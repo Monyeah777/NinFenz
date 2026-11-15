@@ -121,7 +121,7 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 ## 构建证据（本机，2026-11-15）
 
 - v0.02 W6（2026-11-15）：`./gradlew :app:assembleDebug` 成功：app-debug.apk = 19,424,381 bytes，
-  sha256 = 3963379c5024f93a4236b8b8bd3bf35e281b0d48266a215ca9c87ae1cd32c93d（含双 ABI 原生库 + 9 个示例 Pack assets）。
+  sha256 = cd13fcebcdca4fec364929f85e4ac03ae912c82997ec08e55e87156b932b6e83（含双 ABI 原生库 + 9 个示例 Pack assets）。
 - `./gradlew :app:testDebugUnitTest` 全绿：109 条 JVM 单测（v1 42 + v0.02 67；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y）。
 - `zipalign -c -P 16 -v 4 app-debug.apk` → Verification successful（native lib 16KB page 对齐）。
 - `bash app/scripts/build_core_android.sh --clean` 成功：NDK 27.0.12077973 + rustup targets

@@ -3,6 +3,9 @@ package dev.ninfenz.mobile.ui
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -32,6 +35,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.platform.LocalContext
 import dev.ninfenz.mobile.core.Core
@@ -202,27 +206,9 @@ fun NfMobileApp(
         shell = next ?: shell.select(TopDestination.LIBRARY)
     }
 
-    Scaffold(
-        bottomBar = {
-            if (compact && shell.detail == null) {
-                NfBottomBar(shell.destination) { shell = shell.select(it) }
-            }
-        },
-        floatingActionButton = {
-            if (shell.detail == null && shell.destination == TopDestination.LIBRARY) {
-                FloatingActionButton(onClick = { shell = shell.open(Detail.Import) }) {
-                    Icon(Icons.Filled.Add, contentDescription = stringResource(dev.ninfenz.mobile.R.string.action_import))
-                }
-            }
-        }
-    ) { padding ->
-        Row(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
-            if (!compact) {
-                NfRail(shell.destination) { shell = shell.select(it) }
-            }
-            Box(modifier = Modifier.weight(1f).padding(padding)) {
-                when (val detail = shell.detail) {
-                    null -> when (shell.destination) {
+    val topLevelContent: @Composable () -> Unit = {
+        when (shell.destination) {
+
                         TopDestination.LIBRARY -> LibraryHomeScreen(
                             packs = packs.packs,
                             projects = projects,
@@ -269,8 +255,13 @@ fun NfMobileApp(
                             onSettings = { shell = shell.open(Detail.Settings) },
                             onAbout = { showAbout = true }
                         )
-                    }
-                    is Detail.Import -> ImportScreen(prefill = null, store = library, onBack = { shell = shell.back() ?: shell })
+                    
+        }
+    }
+    val detailContent: @Composable () -> Unit = {
+        when (val detail = shell.detail) {
+            null -> Unit
+is Detail.Import -> ImportScreen(prefill = null, store = library, onBack = { shell = shell.back() ?: shell })
                     is Detail.NewProject -> NewProjectScreen(
                         packs = packs.packs,
                         creating = creatingProject,
@@ -375,6 +366,39 @@ fun NfMobileApp(
                             )
                         }
                     }
+                
+        }
+    }
+
+    Scaffold(
+        bottomBar = {
+            if (compact && shell.detail == null) {
+                NfBottomBar(shell.destination) { shell = shell.select(it) }
+            }
+        },
+        floatingActionButton = {
+            if (shell.detail == null && shell.destination == TopDestination.LIBRARY) {
+                FloatingActionButton(onClick = { shell = shell.open(Detail.Import) }) {
+                    Icon(Icons.Filled.Add, contentDescription = stringResource(dev.ninfenz.mobile.R.string.action_import))
+                }
+            }
+        }
+    ) { padding ->
+        Row(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
+            if (!compact) {
+                NfRail(shell.destination) { shell = shell.select(it) }
+            }
+            Box(modifier = Modifier.weight(1f).padding(padding)) {
+                if (shell.detail == null) {
+                    topLevelContent()
+                } else if (!compact && LocalConfiguration.current.screenWidthDp >= 840) {
+                    Row(modifier = Modifier.fillMaxSize()) {
+                        Box(modifier = Modifier.width(380.dp).fillMaxHeight()) { topLevelContent() }
+                        VerticalDivider()
+                        Box(modifier = Modifier.weight(1f)) { detailContent() }
+                    }
+                } else {
+                    detailContent()
                 }
             }
         }
