@@ -160,7 +160,7 @@ fun LibraryHomeScreen(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
-                            NfStatusChip("已安装")
+                            NfStatusChip(stringResource(dev.ninfenz.mobile.R.string.packcenter_installed))
                         }
                     }
                 }
@@ -575,17 +575,19 @@ fun PackDetailScreen(pack: PackEntry, onBack: () -> Unit, onUpdate: () -> Unit) 
     }
 }
 
+@Composable
 fun projectStatusLabel(project: Project): String = when (project.status) {
-    dev.ninfenz.mobile.model.ProjectStatus.DRAFT -> "草稿"
-    dev.ninfenz.mobile.model.ProjectStatus.AUTHORING -> "创作中"
-    dev.ninfenz.mobile.model.ProjectStatus.ASSEMBLED -> "已装配"
-    dev.ninfenz.mobile.model.ProjectStatus.VALIDATED -> "已校验"
-    dev.ninfenz.mobile.model.ProjectStatus.EXPORTED -> "已导出"
-    dev.ninfenz.mobile.model.ProjectStatus.REVIEWED -> "已人审"
+    dev.ninfenz.mobile.model.ProjectStatus.DRAFT -> stringResource(dev.ninfenz.mobile.R.string.status_draft)
+    dev.ninfenz.mobile.model.ProjectStatus.AUTHORING -> stringResource(dev.ninfenz.mobile.R.string.status_authoring)
+    dev.ninfenz.mobile.model.ProjectStatus.ASSEMBLED -> stringResource(dev.ninfenz.mobile.R.string.status_assembled)
+    dev.ninfenz.mobile.model.ProjectStatus.VALIDATED -> stringResource(dev.ninfenz.mobile.R.string.status_validated)
+    dev.ninfenz.mobile.model.ProjectStatus.EXPORTED -> stringResource(dev.ninfenz.mobile.R.string.status_exported)
+    dev.ninfenz.mobile.model.ProjectStatus.REVIEWED -> stringResource(dev.ninfenz.mobile.R.string.status_reviewed)
 }
 
+@Composable
 fun themeModeLabel(mode: ThemeMode): String = when (mode) {
-    ThemeMode.SYSTEM -> "跟随系统"
-    ThemeMode.LIGHT -> "浅色"
-    ThemeMode.DARK -> "深色"
+    ThemeMode.SYSTEM -> stringResource(dev.ninfenz.mobile.R.string.theme_system)
+    ThemeMode.LIGHT -> stringResource(dev.ninfenz.mobile.R.string.theme_light)
+    ThemeMode.DARK -> stringResource(dev.ninfenz.mobile.R.string.theme_dark)
 }

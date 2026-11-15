@@ -393,4 +393,15 @@
     <string name="ccos_reviewed_ok"> · project marked reviewed</string>
     <string name="ccos_reviewed_skip"> · project is %1$s, reviewed not written back</string>
     <string name="ccos_reviewed_fail"> · project status writeback failed: %1$s</string>
+
+    <string name="theme_system">System</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="status_draft">Draft</string>
+    <string name="status_authoring">Authoring</string>
+    <string name="status_assembled">Assembled</string>
+    <string name="status_validated">Validated</string>
+    <string name="status_exported">Exported</string>
+    <string name="status_reviewed">Reviewed</string>
+    <string name="error_fix_prefix">Fix: %1$s</string>
 </resources>

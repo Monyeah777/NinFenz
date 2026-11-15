@@ -26,6 +26,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
@@ -108,7 +109,7 @@ fun ErrorNotice(error: dev.ninfenz.mobile.core.CoreError, modifier: Modifier = M
                 Text("path: " + error.path, style = MaterialTheme.typography.bodySmall, fontFamily = FontFamily.Monospace)
             }
             Text(
-                "修复：" + (entry?.fix?.takeIf { it.isNotBlank() } ?: error.fix),
+                stringResource(dev.ninfenz.mobile.R.string.error_fix_prefix, entry?.fix?.takeIf { it.isNotBlank() } ?: error.fix),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onErrorContainer
             )

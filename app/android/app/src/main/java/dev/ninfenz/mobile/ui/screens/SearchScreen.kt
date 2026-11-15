@@ -81,7 +81,18 @@ fun SearchScreen(
                     SearchKind.entries.forEach { kind ->
                         val hits = grouped[kind] ?: return@forEach
                         if (hits.isEmpty()) return@forEach
-                        item { SectionLabel(kind.label + " · " + hits.size) }
+                        item {
+                            val label = when (kind) {
+                                dev.ninfenz.mobile.data.SearchKind.PROJECT -> stringResource(dev.ninfenz.mobile.R.string.search_kind_project)
+                                dev.ninfenz.mobile.data.SearchKind.PACK -> stringResource(dev.ninfenz.mobile.R.string.search_kind_pack)
+                                dev.ninfenz.mobile.data.SearchKind.CLAUSE -> stringResource(dev.ninfenz.mobile.R.string.search_kind_clause)
+                                dev.ninfenz.mobile.data.SearchKind.FIELD -> stringResource(dev.ninfenz.mobile.R.string.search_kind_field)
+                                dev.ninfenz.mobile.data.SearchKind.NODE -> stringResource(dev.ninfenz.mobile.R.string.search_kind_node)
+                                dev.ninfenz.mobile.data.SearchKind.SECTION -> stringResource(dev.ninfenz.mobile.R.string.search_kind_section)
+                                dev.ninfenz.mobile.data.SearchKind.SLOT -> stringResource(dev.ninfenz.mobile.R.string.search_kind_slot)
+                            }
+                            SectionLabel(label + " · " + hits.size)
+                        }
                         items(hits.size) { i ->
                             val hit = hits[i]
                             ResultRow(hit) {

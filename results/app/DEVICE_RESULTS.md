@@ -36,7 +36,7 @@
 | 200% 字号 | pass：font_scale=2.0 重启后库页不崩、主 CTA 仍可见 |
 | 冷启动/内存 | 407/409/411ms；PSS 107,589 KB（3 次 force-stop 后） |
 | 分享接收 | 修复后进入 Import：显示「已接收分享载荷」+ markdown 85% 预览 |
-| docx 导出 | OPEN：返回 NF-EXP-004（未实现），UI 明确报错 |
+| docx 导出 | **已修复**：根因是 jniLibs .so 还是 15:35 旧构建（core 源码 16:30 才实现 docx）；重跑 build_core_android.sh 后导出 result.docx（2754B，OOXML 条目完整，zip 校验通过） |
 
 ## 3. 真机发现并已修复
 
@@ -47,9 +47,9 @@
 
 ## 4. 真机仍 OPEN / 未跑
 
-- docx 导出：真机返回 NF-EXP-004 docx 导出器不可用（本版本未实现：OPEN），UI 明确报错，不伪造；计划中的 docx 仍未实现。
-- English 下主题标签（跟随系统/浅色/深色）仍中文，需资源化。
-- 创作台撤销：一次点击「撤销编辑」后 F-002 未回退，需复测/定位（可能点击命中或撤销栈语义）。
+- 撤销复测通过：F-002 由「冷静x」点撤销回到「冷静」；此前失败是键盘未收起时点到了键盘。
+- English 主题标签已资源化（System/Light/Dark）。
+- 新增盲区修复：jniLibs .so 陈旧导致 docx 被误报 NF-EXP-004；重跑 build_core_android.sh 后恢复。
 - 未跑：CCOS 任务/结果/人审、分享 chooser、折叠屏（本机非折叠）、TalkBack、对比度实测。
 - 本机无第二台设备/折叠屏，设备矩阵仍不完整。
 

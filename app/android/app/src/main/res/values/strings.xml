@@ -393,4 +393,15 @@
     <string name="ccos_reviewed_ok"> · 项目已标记 reviewed</string>
     <string name="ccos_reviewed_skip"> · 项目当前 %1$s，未回写 reviewed</string>
     <string name="ccos_reviewed_fail"> · 项目状态未写回：%1$s</string>
+
+    <string name="theme_system">跟随系统</string>
+    <string name="theme_light">浅色</string>
+    <string name="theme_dark">深色</string>
+    <string name="status_draft">草稿</string>
+    <string name="status_authoring">创作中</string>
+    <string name="status_assembled">已装配</string>
+    <string name="status_validated">已校验</string>
+    <string name="status_exported">已导出</string>
+    <string name="status_reviewed">已人审</string>
+    <string name="error_fix_prefix">修复：%1$s</string>
 </resources>
