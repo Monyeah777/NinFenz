@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -112,6 +113,7 @@ fun NfMobileApp(
     var seedState by remember { mutableStateOf<SeedResult?>(null) }
     var seeding by remember { mutableStateOf(false) }
     var refreshing by remember { mutableStateOf(false) }
+    var sharedPrefill by remember { mutableStateOf<dev.ninfenz.mobile.share.SharePayload?>(null) }
     var onboardingDone by remember { mutableStateOf(prefs.onboardingDone) }
     var showAbout by remember { mutableStateOf(false) }
     var storageText by remember { mutableStateOf("计算中…") }
@@ -168,7 +170,10 @@ fun NfMobileApp(
 
     LaunchedEffect(Unit) {
         val pending = ShareHandoff.consume()
-        if (pending != null) shell = shell.open(Detail.Import)
+        if (pending != null) {
+            sharedPrefill = pending
+            shell = shell.open(Detail.Import)
+        }
         refresh()
     }
 
@@ -265,7 +270,15 @@ fun NfMobileApp(
     val detailContent: @Composable () -> Unit = {
         when (val detail = shell.detail) {
             null -> Unit
-is Detail.Import -> ImportScreen(prefill = null, store = library, onBack = { shell = shell.back() ?: shell })
+is Detail.Import -> ImportScreen(
+                        prefill = sharedPrefill,
+                        store = library,
+                        onBack = {
+                            sharedPrefill = null
+                            shell = shell.back() ?: shell
+                        },
+                        onPrefillConsumed = { sharedPrefill = null }
+                    )
                     is Detail.NewProject -> NewProjectScreen(
                         packs = packs.packs,
                         creating = creatingProject,
@@ -375,6 +388,7 @@ is Detail.Import -> ImportScreen(prefill = null, store = library, onBack = { she
     }
 
     Scaffold(
+        contentWindowInsets = WindowInsets(0),
         bottomBar = {
             if (compact && shell.detail == null) {
                 NfBottomBar(shell.destination) { shell = shell.select(it) }
@@ -388,7 +402,7 @@ is Detail.Import -> ImportScreen(prefill = null, store = library, onBack = { she
             }
         }
     ) { padding ->
-        Row(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
+        Row(modifier = Modifier.fillMaxSize()) {
             if (!compact) {
                 NfRail(shell.destination) { shell = shell.select(it) }
             }

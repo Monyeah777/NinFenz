@@ -59,7 +59,12 @@ import kotlinx.serialization.json.put
  * → 保存草稿 + 映射决策 sidecar。核心失败只显示错误码/fix，不伪造预览。
  */
 @Composable
-fun ImportScreen(prefill: SharePayload?, store: LibraryStore, onBack: () -> Unit) {
+fun ImportScreen(
+    prefill: SharePayload?,
+    store: LibraryStore,
+    onBack: () -> Unit,
+    onPrefillConsumed: () -> Unit = {}
+) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var doc by remember { mutableStateOf<ImportDoc?>(null) }
@@ -184,6 +189,7 @@ fun ImportScreen(prefill: SharePayload?, store: LibraryStore, onBack: () -> Unit
         if (prefill != null) {
             prefillNote = context.getString(dev.ninfenz.mobile.R.string.import_share_from, prefill.summary())
             importShare(prefill)
+            onPrefillConsumed()
         }
     }
 

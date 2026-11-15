@@ -19,21 +19,36 @@
 | 导入示例 | pass（修复后）：markdown 85%，8 条映射，全部采纳后保存 files/drafts/sample.md.json + .mapping.json | 截图 29–31 |
 | 项目状态历史 | pass：overlay:save → status:authoring->assembled → status:assembled->validated → export → status:validated->exported | run-as 读项目 |
 
-## 2. 真机发现并已修复
+## 2. 追加实测（2026-11-15 晚）
+
+| 项目 | 结果 |
+|---|---|
+| 顶部大空隙 | **已修复**：Scaffold 默认 insets + Row statusBarsPadding + TopAppBar 三重叠加；改为 contentWindowInsets=0、TopAppBar 负责状态栏 |
+| 搜索 | pass：索引 20 条；搜 demo 命中项目 1 + Pack 1 |
+| 设置/诊断 | pass：backend=jna-native、ABI=nf-app-core/1、原生库已加载、错误码 58 条 |
+| Pack 中心 | pass：已装 1，逐 Pack 校验返回 校验通过 · verdict=pass |
+| 我的/深色 | pass：深色主题整体生效 |
+| 我的/English | partial：section/语言选项切英文，但主题标签仍中文（i18n 尾项） |
+| 动态取色 | pass：Android 12+ 开关生效 |
+| 分享接收 | **已修复**：此前确认分享会崩（No ActivityResultRegistryOwner），且 payload 未传入导入；修复后显示「已接收分享载荷」+ markdown 85% 预览 |
+| docx 导出 | OPEN：返回 NF-EXP-004（未实现），UI 明确报错 |
+
+## 3. 真机发现并已修复
 
 1. assembled 状态缺 refs.assembly：project-validate 拒绝；修为进入 assembled 时写 authoring/assembly.md 并补 assembly 引用（path/sha256/digest）。
 2. exported 状态缺 history op=export：project-validate 拒绝；修为进入 exported 时追加 export history。
 3. 示例导入 source.kind=sample 不在 schema enum：core 返回 NF-IMP-001；修为使用 file。
 4. 创作台/交付页旧提示文案（保存/撤销后续接入、状态写回仍 OPEN）已改为当前行为。
 
-## 3. 真机仍 OPEN / 未跑
+## 4. 真机仍 OPEN / 未跑
 
 - docx 导出：真机返回 NF-EXP-004 docx 导出器不可用（本版本未实现：OPEN），UI 明确报错，不伪造；计划中的 docx 仍未实现。
+- English 下主题标签（跟随系统/浅色/深色）仍中文，需资源化。
 - 创作台撤销：一次点击「撤销编辑」后 F-002 未回退，需复测/定位（可能点击命中或撤销栈语义）。
-- 未跑：搜索、设置/诊断、Pack 中心逐 Pack 校验、CCOS 任务/结果/人审、分享 chooser、明暗/语言/动态取色、旋转/折叠、200% 字号、TalkBack、性能 profile。
+- 未跑：CCOS 任务/结果/人审、分享 chooser、旋转/折叠、200% 字号、TalkBack、性能 profile。
 - 本机无第二台设备/折叠屏，设备矩阵仍不完整。
 
-## 4. 复跑入口
+## 5. 复跑入口
 
     adb install -r app/android/app/build/outputs/apk/debug/app-debug.apk
     adb shell am start -W -n dev.ninfenz.mobile/.MainActivity
