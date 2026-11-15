@@ -136,7 +136,8 @@ fun NfExpandableText(
     collapsedChars: Int = 600
 ) {
     var expanded by remember { mutableStateOf(false) }
-    val needsToggle = text.length > collapsedChars || text.count { it == '\n' } >= collapsedLines
+    val estimatedLines = text.split('\n').sumOf { line -> (line.length / 24) + 1 }
+    val needsToggle = text.length > collapsedChars || estimatedLines > collapsedLines
     Column(modifier = modifier.fillMaxWidth()) {
         Box(
             modifier = if (expanded) {
