@@ -15,7 +15,7 @@
 
 ## 2. 门禁收口（QA0–QA6）
 
-> **仓库层（2026-11-15 实测）**：`bash verify.sh --checks-only` → **PASS=107 WARN=2 FAIL=0**（exit 0；HEAD `f19e41660`）。APP 面**未新增/未改** check1–57；入仓提交：`8d679c726`（modeling 可复现性修复）/ `8e75a3173`（APP MVP）/ `f19e41660`（冻结链投影重算）。干净 clone 同源复现见 `results/app/BASELINE.md` 附录 A。
+> **仓库层（2026-11-15 实测）**：`bash verify.sh --checks-only` → **PASS=107 WARN=2 FAIL=0**（exit 0；HEAD `f19e41660`）。APP 面**未新增/未改** check1–57；入仓提交链：`8d679c726`（modeling 可复现性修复）→ `8e75a3173`（APP MVP）→ `f19e41660`（冻结链投影重算）→ `af72d5903`（收口 docs/OPEN 登记）。干净 clone 同源复现见 `results/app/BASELINE.md` 附录 A。
 
 | 门 | 内容 | 结果 | 证据 |
 |---|---|---|---|
