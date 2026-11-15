@@ -14,8 +14,10 @@ subjects:
   - scripts/geo_export.py:7a4200761fb7d79f945a37b557882eb8de968081057068d26a7a144d11d1b527
   - scripts/nf.py:4223fce17ca1a66a7e4818776492a1447fedde490c4b685b31cffad39a8a265a
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:c42c06101d6620e113b514e0c120b996174f3391f6c64c52081a049337512a1c
+  - protocol/code_metrics_baseline.json:d2c50454e886e9e7d522b637892af8a2ca5e9f20446731e1427df5a3c54332f0
 ---
+> 重审（2026-11-15）：APP MVP: code_metrics baseline refresh (app subtree 入仓)
+
 > 重审（2026-11-15）：NF-Final §19.1 补件：新增 core/layer_reports.py、results/{wiki-report,spec-report}.json、results/qa/{layers.json,README.md}、docs/qa/README.md、examples/{README,core-only,governance}/README.md、test_layer_reports.py；assertions/data_contracts/independence/code_metrics/check12 更新
 
 > 重审（2026-11-15）：NF-Final WP-52：新增 protocol/keywords.json、core/keywords.py、docs/keywords.md、test_keywords_contract.py、nf keywords check（命令 80/索引 215）；verify.sh check57 + quality_baseline 57 条/PASS=107；check12 预算 2185→2195（+1.4s CLI 烟测，容量调整）

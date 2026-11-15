@@ -26,8 +26,10 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:c42c06101d6620e113b514e0c120b996174f3391f6c64c52081a049337512a1c
+  - protocol/code_metrics_baseline.json:d2c50454e886e9e7d522b637892af8a2ca5e9f20446731e1427df5a3c54332f0
 ---
+> 重审（2026-11-15）：APP MVP: code_metrics baseline refresh (app subtree 入仓)
+
 > 重审（2026-11-15）：NF-Final §19.1 补件：新增 core/layer_reports.py、results/{wiki-report,spec-report}.json、results/qa/{layers.json,README.md}、docs/qa/README.md、examples/{README,core-only,governance}/README.md、test_layer_reports.py；assertions/data_contracts/independence/code_metrics/check12 更新
 
 > 重审（2026-11-15）：NF-Final WP-52 收尾：terminal 文档计数更新后重签译件（locales）

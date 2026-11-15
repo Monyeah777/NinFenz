@@ -956,9 +956,9 @@
       "max_fn_lines": 7
     },
     "desktop/src/core/modeling.py": {
-      "lines": 248,
+      "lines": 270,
       "max_fn_cc": 28,
-      "max_fn_lines": 53
+      "max_fn_lines": 56
     },
     "desktop/src/core/models.py": {
       "lines": 215,
