@@ -360,4 +360,27 @@
     <string name="assembly_report">Validation report</string>
     <string name="assembly_preview">Preview</string>
     <string name="assembly_not_assembled">Nothing assembled yet. Preview only shows core markdown, no local stitching.</string>
+
+    <string name="author_redo">Redo</string>
+    <string name="author_delete">Delete</string>
+    <string name="author_add_node">Add node</string>
+    <string name="author_add_edge">Add edge</string>
+    <string name="author_node_id">Node ID (N##)</string>
+    <string name="author_node_title">Node title</string>
+    <string name="author_node_kind">Node kind (stage/module/asset/branch/merge)</string>
+    <string name="author_node_module">module id (optional)</string>
+    <string name="author_edge_from">from node</string>
+    <string name="author_edge_to">to node</string>
+    <string name="author_edge_from_port">from_port</string>
+    <string name="author_edge_to_port">to_port</string>
+    <string name="author_add">Add</string>
+    <string name="author_save_graph">Save pipeline</string>
+    <string name="author_save_spec">Save spec</string>
+    <string name="author_saving_artifact">Saving…</string>
+    <string name="author_saved_artifact">Saved %1$s · sha %2$s…</string>
+    <string name="author_section_title">Section title</string>
+    <string name="author_slot_name">Slot name</string>
+    <string name="author_stage">stage</string>
+    <string name="author_module_node">module</string>
+    <string name="author_asset_node">asset</string>
 </resources>

@@ -360,4 +360,27 @@
     <string name="assembly_report">校验报告</string>
     <string name="assembly_preview">预览</string>
     <string name="assembly_not_assembled">尚未装配。预览只显示核心返回的 markdown，不做本地拼接。</string>
+
+    <string name="author_redo">重做</string>
+    <string name="author_delete">删除</string>
+    <string name="author_add_node">加节点</string>
+    <string name="author_add_edge">加边</string>
+    <string name="author_node_id">节点 ID（N##）</string>
+    <string name="author_node_title">节点标题</string>
+    <string name="author_node_kind">节点类型（stage/module/asset/branch/merge）</string>
+    <string name="author_node_module">module id（可空）</string>
+    <string name="author_edge_from">from 节点</string>
+    <string name="author_edge_to">to 节点</string>
+    <string name="author_edge_from_port">from_port</string>
+    <string name="author_edge_to_port">to_port</string>
+    <string name="author_add">添加</string>
+    <string name="author_save_graph">保存管线</string>
+    <string name="author_save_spec">保存规格</string>
+    <string name="author_saving_artifact">保存中…</string>
+    <string name="author_saved_artifact">已保存 %1$s · sha %2$s…</string>
+    <string name="author_section_title">章节标题</string>
+    <string name="author_slot_name">槽位名称</string>
+    <string name="author_stage">stage</string>
+    <string name="author_module_node">module</string>
+    <string name="author_asset_node">asset</string>
 </resources>
