@@ -18,6 +18,7 @@ sealed interface Detail {
     data object PackUpdate : Detail
     data object Ccos : Detail
     data class Project(val id: String) : Detail
+    data class Author(val id: String) : Detail
     data class Pack(val id: String, val version: String) : Detail
 }
 

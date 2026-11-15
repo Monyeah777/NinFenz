@@ -47,6 +47,7 @@ import dev.ninfenz.mobile.data.ThemeMode
 import dev.ninfenz.mobile.share.ShareHandoff
 import dev.ninfenz.mobile.ui.components.NfEmptyState
 import dev.ninfenz.mobile.ui.screens.AssemblyScreen
+import dev.ninfenz.mobile.ui.screens.AuthorScreen
 import dev.ninfenz.mobile.ui.screens.CcosScreen
 import dev.ninfenz.mobile.ui.screens.CreateScreen
 import dev.ninfenz.mobile.ui.screens.DeliverScreen
@@ -267,6 +268,28 @@ fun NfMobileApp(
                         onOpenProject = { id -> shell = shell.open(Detail.Project(id)) }
                     )
                     is Detail.Settings -> SettingsScreen(onBack = { shell = shell.back() ?: shell })
+                    is Detail.Author -> {
+                        val entry = projects.firstOrNull { it.project.id == detail.id }
+                        if (entry == null) {
+                            NfEmptyState(
+                                icon = Icons.Filled.Edit,
+                                title = "项目不存在",
+                                message = "可能已被删除或文件损坏。",
+                                actionLabel = "返回库",
+                                onAction = { shell = shell.back() ?: shell }
+                            )
+                        } else {
+                            val pack = packs.packs.firstOrNull {
+                                it.id == entry.project.refs.basePackId && it.version == entry.project.refs.basePackVersion
+                            }
+                            AuthorScreen(
+                                project = entry.project,
+                                pack = pack,
+                                onBack = { shell = shell.back() ?: shell },
+                                onAssembly = { shell = shell.open(Detail.Assembly) }
+                            )
+                        }
+                    }
                     is Detail.Protocol -> ProtocolScreen(onBack = { shell = shell.back() ?: shell })
                     is Detail.Graph -> GraphScreen(store = library, onBack = { shell = shell.back() ?: shell })
                     is Detail.Assembly -> AssemblyScreen(onBack = { shell = shell.back() ?: shell })
@@ -300,8 +323,7 @@ fun NfMobileApp(
                             ProjectDetailScreen(
                                 project = entry.project,
                                 onBack = { shell = shell.back() ?: shell },
-                                onProtocol = { shell = shell.open(Detail.Protocol) },
-                                onGraph = { shell = shell.open(Detail.Graph) },
+                                onAuthor = { shell = shell.open(Detail.Author(entry.project.id)) },
                                 onAssembly = { shell = shell.open(Detail.Assembly) }
                             )
                         }

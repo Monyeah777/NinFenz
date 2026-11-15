@@ -415,8 +415,7 @@ fun MeScreen(
 fun ProjectDetailScreen(
     project: Project,
     onBack: () -> Unit,
-    onProtocol: () -> Unit,
-    onGraph: () -> Unit,
+    onAuthor: () -> Unit,
     onAssembly: () -> Unit
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
@@ -451,8 +450,7 @@ fun ProjectDetailScreen(
             item {
                 NfSectionHeader("继续")
             }
-            item { NfListRow("协议表单", "参数 / 条款 / 校验", Icons.Filled.Edit, "›", onProtocol) }
-            item { NfListRow("管线编辑", "阶段 / 权重 / 边", Icons.AutoMirrored.Filled.List, "›", onGraph) }
+            item { NfListRow("创作台", "协议 / 管线 / 规格（核心校验）", Icons.Filled.Edit, "›", onAuthor) }
             item { NfListRow("装配与交付", "预览 / 校验 / 导出", Icons.Filled.Info, "›", onAssembly) }
         }
     }
