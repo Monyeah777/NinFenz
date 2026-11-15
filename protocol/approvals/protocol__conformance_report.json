@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-15",
   "approved_by": "Monyeah777",
-  "note": "R53 final Gate 覆盖说明更新（57 条/PASS=107）",
+  "note": "APP MVP: conformance recalc after app subtree + tracked-only informative fix",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "912bf3c105f54a84d4af8f13cec32c8d6e18a192e06468ebebf611a0ffab302f"
+  "subject_digest": "920537a16d9c1febd228274c8f177d4804a3e65d256531d867a84ad9e2627589"
 }
