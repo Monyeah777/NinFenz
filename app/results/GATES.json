@@ -25,7 +25,7 @@
       "owner": null,
       "probes": {
         "hits": [],
-        "scanned_files": 55,
+        "scanned_files": 57,
         "void_hits": 0
       },
       "status": "covered",
@@ -222,10 +222,10 @@
       "pass": 3
     },
     "QA2": {
-      "checks": 2,
+      "checks": 3,
       "fail": 0,
       "open": 0,
-      "pass": 2
+      "pass": 3
     },
     "QA3": {
       "checks": 2,
@@ -252,7 +252,7 @@
       "pass": 3
     }
   },
-  "head": "e7855c2372e1b07c83bc2be85d351a3401c73e3b",
+  "head": "af39bc34fb4db2cbf8adf5dbaf002837a21a78f4",
   "open_items": [
     {
       "id": "S11",
@@ -517,7 +517,7 @@
           "collected": null,
           "errors": null,
           "failed": null,
-          "passed": 107
+          "passed": 106
         }
       },
       "gate": "QA1",
@@ -584,6 +584,34 @@
       "required": true,
       "status": "PASS",
       "title": "首闭环 E2E 全绿"
+    },
+    {
+      "check": "q2-export",
+      "detail": null,
+      "evidence": {
+        "argv": [
+          "python",
+          "-m",
+          "pytest",
+          "app/tests/test_export_formats.py",
+          "-q"
+        ],
+        "exit": 0,
+        "log": "app/results/logs/python_-m_pytest_app-tests-test_export_formats.py_-q.log",
+        "summary": {
+          "collected": null,
+          "errors": null,
+          "failed": null,
+          "passed": 5
+        }
+      },
+      "gate": "QA2",
+      "kind": "cmd",
+      "next": null,
+      "owner": null,
+      "required": true,
+      "status": "PASS",
+      "title": "导出格式：docx（OOXML）/ skill（MCP 脚手架）/ pdf 显式 OPEN 全绿"
     },
     {
       "check": "q3-update",

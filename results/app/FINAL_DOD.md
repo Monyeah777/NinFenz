@@ -57,7 +57,7 @@
 |---|---|---|
 | Rust 核心 | 180 断言 / 21 二进制 / 0 failed | `cd app/core && cargo test` |
 | Python 控制面/契约/安全/golden/E2E | **490 passed / 0 failed / 0 skipped / 0 xfailed（127s）** | `python -m pytest app/tests -q` |
-| Android JVM | 38 条 | `cd app/android && ./gradlew :app:testDebugUnitTest` |
+| Android JVM | 42 条（含自适应分档 4 条） | `cd app/android && ./gradlew :app:testDebugUnitTest` |
 | Desktop JVM | 20 条（含真实 JNA FFI） | `cd app/desktop && ./gradlew test` |
 | APK | 17,973,649 B；16KB 对齐通过；双 ABI `.so` | `bash app/scripts/build_android.sh debug` |
 | MSI | 66,573,406 B；jar 内含 `native/nf_app_core.dll` | `bash app/scripts/build_desktop.sh package` |
