@@ -274,7 +274,8 @@ fun CreateScreen(
 fun DeliverScreen(
     projects: List<ProjectEntry>,
     onOpenProject: (ProjectEntry) -> Unit,
-    onOpenAssembly: () -> Unit,
+    onOpenDelivery: (ProjectEntry) -> Unit,
+    onGoCreate: () -> Unit,
     onPackUpdate: () -> Unit,
     onCcos: () -> Unit
 ) {
@@ -285,8 +286,8 @@ fun DeliverScreen(
                 icon = Icons.AutoMirrored.Filled.List,
                 title = "还没有可交付的项目",
                 message = "先创建或打开一个项目，再装配、校验、导出与分享。",
-                actionLabel = "去装配",
-                onAction = onOpenAssembly,
+                actionLabel = "去创作",
+                onAction = onGoCreate,
                 secondaryLabel = "Pack 更新",
                 onSecondary = onPackUpdate
             )
@@ -311,7 +312,7 @@ fun DeliverScreen(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
-                            Button(onClick = onOpenAssembly) { Text("去装配") }
+                            Button(onClick = { onOpenDelivery(entry) }) { Text("去交付") }
                         }
                     }
                 }

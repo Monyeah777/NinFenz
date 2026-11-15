@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
@@ -50,6 +51,7 @@ import dev.ninfenz.mobile.ui.screens.AssemblyScreen
 import dev.ninfenz.mobile.ui.screens.AuthorScreen
 import dev.ninfenz.mobile.ui.screens.CcosScreen
 import dev.ninfenz.mobile.ui.screens.CreateScreen
+import dev.ninfenz.mobile.ui.screens.DeliveryScreen
 import dev.ninfenz.mobile.ui.screens.DeliverScreen
 import dev.ninfenz.mobile.ui.screens.GraphScreen
 import dev.ninfenz.mobile.ui.screens.ImportScreen
@@ -236,7 +238,8 @@ fun NfMobileApp(
                         TopDestination.DELIVER -> DeliverScreen(
                             projects = projects,
                             onOpenProject = { shell = shell.open(Detail.Project(it.project.id)) },
-                            onOpenAssembly = { shell = shell.open(Detail.Assembly) },
+                            onOpenDelivery = { shell = shell.open(Detail.Delivery(it.project.id)) },
+                            onGoCreate = { shell = shell.select(TopDestination.CREATE) },
                             onPackUpdate = { shell = shell.open(Detail.PackUpdate) },
                             onCcos = { shell = shell.open(Detail.Ccos) }
                         )
@@ -286,12 +289,29 @@ fun NfMobileApp(
                                 project = entry.project,
                                 pack = pack,
                                 onBack = { shell = shell.back() ?: shell },
-                                onAssembly = { shell = shell.open(Detail.Assembly) }
+                                onAssembly = { shell = shell.open(Detail.Delivery(entry.project.id)) }
                             )
                         }
                     }
                     is Detail.Protocol -> ProtocolScreen(onBack = { shell = shell.back() ?: shell })
                     is Detail.Graph -> GraphScreen(store = library, onBack = { shell = shell.back() ?: shell })
+                    is Detail.Delivery -> {
+                        val entry = projects.firstOrNull { it.project.id == detail.id }
+                        if (entry == null) {
+                            NfEmptyState(
+                                icon = Icons.Filled.Info,
+                                title = "项目不存在",
+                                message = "可能已被删除或文件损坏。",
+                                actionLabel = "返回库",
+                                onAction = { shell = shell.back() ?: shell }
+                            )
+                        } else {
+                            val pack = packs.packs.firstOrNull {
+                                it.id == entry.project.refs.basePackId && it.version == entry.project.refs.basePackVersion
+                            }
+                            DeliveryScreen(project = entry.project, pack = pack, onBack = { shell = shell.back() ?: shell })
+                        }
+                    }
                     is Detail.Assembly -> AssemblyScreen(onBack = { shell = shell.back() ?: shell })
                     is Detail.PackUpdate -> PackUpdateScreen(store = library, onBack = { shell = shell.back() ?: shell })
                     is Detail.Ccos -> CcosScreen(onBack = { shell = shell.back() ?: shell })
@@ -324,7 +344,7 @@ fun NfMobileApp(
                                 project = entry.project,
                                 onBack = { shell = shell.back() ?: shell },
                                 onAuthor = { shell = shell.open(Detail.Author(entry.project.id)) },
-                                onAssembly = { shell = shell.open(Detail.Assembly) }
+                                onAssembly = { shell = shell.open(Detail.Delivery(entry.project.id)) }
                             )
                         }
                     }
