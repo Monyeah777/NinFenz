@@ -24,12 +24,12 @@
 
 | 项 | 结果 |
 |---|---|
-| APK | app-debug.apk = 19,011,427 B；sha256 0a36a88e0afd2688bd1deba25dbc80df0795e07ab58f17c8143a89ddf67a87a4 |
-| JVM 测试 | 110 条全绿（v1 基线 42 + v0.02 新增 68；含 Robolectric/Compose） |
+| APK | app-debug.apk = 19,011,427 B；sha256 ecc56ba8a17e797476a1f172396f8608aa108177386ed5f2b2260b93124d5937 |
+| JVM 测试 | 113 条全绿（v1 基线 42 + v0.02 新增 71；含 Robolectric/Compose） |
 | 构建 | ./gradlew :app:assembleDebug 成功；:app:testDebugUnitTest 110/110 |
 | i18n | 全部屏主要文案已资源化 + values-en；「我的」zh/en/跟随系统切换；动态取色开关；库/Pack 中心下拉刷新；节点删除 Snackbar 撤销 + 触觉；expanded 双栏（主列表+详情）；导航 Crossfade（NfMotion.MEDIUM_MS）；统一 loading/skeleton 组件；少量错误/技术提示仍内联（OPEN-I18N-BODY 尾项） |
 | 适配 | compact/medium/expanded 三档导航 + 9 组窗口尺寸语义矩阵 |
-| a11y | 图标 contentDescription、48dp 触控目标（A11yComposeTest 3）、200% 字号（LargeFont 1） |
+| a11y | contentDescription/48dp（A11yComposeTest 3）、200% 字号（LargeFont 1）、WCAG AA 对比度（Contrast 3） |
 | app/gates | 7/7 gate PASS、FAIL=0（QA0 10 checks、QA5 5 checks；含 v0.02 UX/i18n/测试矩阵检查） |
 
 ### 0.3 状态

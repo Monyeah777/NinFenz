@@ -15,38 +15,66 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
+
+/** 品牌调色板（对比度单测的单一来源）。 */
+object NfPalette {
+    val LightPrimary = Color(0xFF1E5F5B)
+    val LightOnPrimary = Color.White
+    val LightBackground = Color(0xFFF7FAF9)
+    val LightOnBackground = Color(0xFF1A1C1B)
+    val LightSurface = Color(0xFFF7FAF9)
+    val LightOnSurface = Color(0xFF1A1C1B)
+    val LightError = Color(0xFFB3261E)
+    val LightOnError = Color.White
+
+    val DarkPrimary = Color(0xFF9BD0CB)
+    val DarkOnPrimary = Color(0xFF003733)
+    val DarkBackground = Color(0xFF0F1413)
+    val DarkOnBackground = Color(0xFFE2E3E1)
+    val DarkSurface = Color(0xFF0F1413)
+    val DarkOnSurface = Color(0xFFE2E3E1)
+    val DarkError = Color(0xFFF2B8B5)
+    val DarkOnError = Color(0xFF601410)
+}
+
 private val Light = lightColorScheme(
-    primary = Color(0xFF1E5F5B),
-    onPrimary = Color.White,
+    primary = NfPalette.LightPrimary,
+    onPrimary = NfPalette.LightOnPrimary,
     primaryContainer = Color(0xFFB7E4DF),
     onPrimaryContainer = Color(0xFF00201D),
     secondary = Color(0xFF4A6360),
     secondaryContainer = Color(0xFFCCE8E4),
     onSecondaryContainer = Color(0xFF00201D),
     tertiary = Color(0xFF3F6375),
-    background = Color(0xFFF7FAF9),
-    surface = Color(0xFFF7FAF9),
+    background = NfPalette.LightBackground,
+    onBackground = NfPalette.LightOnBackground,
+    surface = NfPalette.LightSurface,
+    onSurface = NfPalette.LightOnSurface,
     surfaceVariant = Color(0xFFDBE5E2),
     onSurfaceVariant = Color(0xFF3F4947),
     outline = Color(0xFF6F7977),
-    error = Color(0xFFB3261E)
+    error = NfPalette.LightError,
+    onError = NfPalette.LightOnError
 )
 
 private val Dark = darkColorScheme(
-    primary = Color(0xFF9BD0CB),
-    onPrimary = Color(0xFF003733),
+    primary = NfPalette.DarkPrimary,
+    onPrimary = NfPalette.DarkOnPrimary,
     primaryContainer = Color(0xFF00504B),
     onPrimaryContainer = Color(0xFFB7E4DF),
     secondary = Color(0xFFB1CCC8),
     secondaryContainer = Color(0xFF324B48),
     onSecondaryContainer = Color(0xFFCCE8E4),
     tertiary = Color(0xFFA7CBDF),
-    background = Color(0xFF0F1413),
-    surface = Color(0xFF0F1413),
+    background = NfPalette.DarkBackground,
+    onBackground = NfPalette.DarkOnBackground,
+    surface = NfPalette.DarkSurface,
+    onSurface = NfPalette.DarkOnSurface,
     surfaceVariant = Color(0xFF3F4947),
     onSurfaceVariant = Color(0xFFBFC9C6),
     outline = Color(0xFF899390),
-    error = Color(0xFFF2B8B5)
+    error = NfPalette.DarkError,
+    onError = NfPalette.DarkOnError
 )
 
 /** NF 7 档字体（§18.1）：中文行高 1.6–1.7，标题 600/正文 400。 */
