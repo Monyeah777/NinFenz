@@ -336,7 +336,9 @@ fun NfMobileApp(
                         onBack = { shell = shell.back() ?: shell },
                         onOpenPack = { pack -> shell = shell.open(Detail.Pack(pack.id, pack.version)) },
                         onUpdatePlan = { shell = shell.open(Detail.PackUpdate) },
-                        onLoadSample = ::runSeed
+                        onLoadSample = ::runSeed,
+                        refreshing = refreshing,
+                        onRefresh = { refresh() }
                     )
                     is Detail.PackUpdate -> PackUpdateScreen(store = library, onBack = { shell = shell.back() ?: shell })
                     is Detail.Ccos -> CcosScreen(onBack = { shell = shell.back() ?: shell })

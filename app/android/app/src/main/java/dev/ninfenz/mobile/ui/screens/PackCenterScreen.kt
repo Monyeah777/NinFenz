@@ -10,6 +10,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -36,13 +38,16 @@ import dev.ninfenz.mobile.ui.components.NfTopAppBar
 import dev.ninfenz.mobile.ui.theme.NfSpacing
 
 /** W5 Pack 中心：已装列表 + 逐 Pack 校验 + 详情/更新入口（diff/冲突/回滚仍在 PackUpdate）。 */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PackCenterScreen(
     packs: List<PackEntry>,
     onBack: () -> Unit,
     onOpenPack: (PackEntry) -> Unit,
     onUpdatePlan: () -> Unit,
-    onLoadSample: () -> Unit
+    onLoadSample: () -> Unit,
+    refreshing: Boolean = false,
+    onRefresh: () -> Unit = {}
 ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -67,6 +72,7 @@ fun PackCenterScreen(
                 onAction = onLoadSample
             )
         } else {
+            PullToRefreshBox(isRefreshing = refreshing, onRefresh = onRefresh, modifier = Modifier.fillMaxSize()) {
             LazyColumn(
                 contentPadding = androidx.compose.foundation.layout.PaddingValues(NfSpacing.page),
                 verticalArrangement = Arrangement.spacedBy(NfSpacing.m)
@@ -115,6 +121,7 @@ fun PackCenterScreen(
                         }
                     }
                 }
+            }
             }
         }
     }
