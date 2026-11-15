@@ -55,7 +55,8 @@
 - English 主题标签已资源化（System/Light/Dark）。
 - 新增盲区修复：jniLibs .so 陈旧导致 docx 被误报 NF-EXP-004；重跑 build_core_android.sh 后恢复。
 - CCOS：task/result 能加载；提交区已改固定底栏 + navigationBarsPadding，设备端最终复测仍待补。
-- 未跑：分享 chooser 实点、折叠屏（本机非折叠）、TalkBack 语音走查、对比度实测。
+- 分享 chooser 已真机通过（NEW_TASK 修复）。
+- 未跑：折叠屏（本机非折叠）、TalkBack 语音走查、对比度实测。
 - 本机无第二台设备/折叠屏，设备矩阵仍不完整。
 
 ## 5. 复跑入口

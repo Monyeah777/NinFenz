@@ -40,6 +40,13 @@ object ShareExporter {
         return shareFileIntent(context, file, "text/markdown", title)
     }
 
+    /** 从任意 Context（含本地化 wrapper）拉起系统分享面板；非 Activity 必须 NEW_TASK。 */
+    fun launchChooser(context: Context, target: Intent, title: String) {
+        val chooser = Intent.createChooser(target, title)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        context.startActivity(chooser)
+    }
+
     fun cleanup(context: Context) {
         val dir = File(context.cacheDir, "shared")
         if (dir.exists()) {

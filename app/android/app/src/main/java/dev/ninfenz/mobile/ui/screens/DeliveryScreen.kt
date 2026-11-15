@@ -320,7 +320,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                         onClick = {
                             val md = markdown ?: return@OutlinedButton
                             val intent = ShareExporter.shareMarkdown(context, "nf-" + project.id, md)
-                            context.startActivity(Intent.createChooser(intent, context.getString(dev.ninfenz.mobile.R.string.delivery_share_md)))
+                            ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.delivery_share_md))
                         }
                     ) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_share_md)) }
                     OutlinedButton(
@@ -334,7 +334,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                 else -> "application/octet-stream"
                             }
                             val intent = ShareExporter.shareFileIntent(context, file, mime, project.title)
-                            context.startActivity(Intent.createChooser(intent, context.getString(dev.ninfenz.mobile.R.string.delivery_share_file)))
+                            ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.delivery_share_file))
                         }
                     ) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_share_file)) }
                 }

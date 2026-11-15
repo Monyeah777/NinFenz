@@ -253,7 +253,7 @@ fun AssemblyScreen(onBack: () -> Unit) {
                     OutlinedButton(enabled = !busy && markdown != null, onClick = {
                         val md = markdown ?: return@OutlinedButton
                         val intent = ShareExporter.shareMarkdown(context, "nf-assembly", md)
-                        context.startActivity(Intent.createChooser(intent, "分享装配结果"))
+                        ShareExporter.launchChooser(context, intent, "分享装配结果")
                     }) { Text(stringResource(dev.ninfenz.mobile.R.string.assembly_share_md)) }
                 }
                 manifest?.let { MonoText(it) }
