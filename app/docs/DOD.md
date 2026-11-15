@@ -40,6 +40,8 @@
 
 ## 4. 完成判定
 
+> 仓库门禁（2026-11-15 实测）：`bash verify.sh --checks-only` → PASS=107 WARN=2 FAIL=0（exit 0）。APP 自有门禁与本条互不替代：前者判 APP 面，后者判仓库面。
+
 - **APP 面完成** = DOD-01/02/04/06/07/08 pass，DOD-03/05 明确 OPEN 且不影响功能面结论。
 - **发布面完成** = 追加 DOD-03/05 pass（需外部环境）；在此之前**不得**宣称「可发布/已公证/已上架」。
 - 收口报告以 `results/app/RESULTS.md` + `results/app/FINAL_DOD.md` 为准，并以现场复跑命令取证。

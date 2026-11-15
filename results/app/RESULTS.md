@@ -119,6 +119,8 @@
 
 ## 5. 测试与构建证据
 
+> **仓库门禁（实现入仓后实测）**：`bash verify.sh --checks-only` → PASS=107 WARN=2 FAIL=0（exit 0，HEAD `f19e41660`）；conformance conformant；CQ6 3.95/C 与基线一致。APP 未改 check1–57。
+
 | 产物 | 值 | 复跑 |
 |---|---|---|
 | Android APK | 17,973,649 B；含 `lib/{arm64-v8a,x86_64}/libnf_app_core.so`；`zipalign -c -P 16 4` 通过 | `bash app/scripts/build_android.sh debug` |
