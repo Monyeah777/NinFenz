@@ -408,4 +408,13 @@
     <string name="action_expand">Expand</string>
     <string name="action_collapse">Collapse</string>
     <string name="delivery_slot_chars">%1$d chars</string>
+    <string name="delivery_slot_paste">Paste</string>
+    <string name="delivery_slot_import_title">Import into %1$s</string>
+    <string name="delivery_slot_import_meta">Source %1$s · %2$s · %3$d → %4$d chars</string>
+    <string name="delivery_slot_replace">Replace</string>
+    <string name="delivery_slot_append">Append</string>
+    <string name="delivery_slot_import_empty">Imported text is empty</string>
+    <string name="delivery_slot_import_empty_fix">Pick a non-empty text file</string>
+    <string name="delivery_slot_import_fail">Import failed: %1$s</string>
+    <string name="delivery_slot_import_fail_fix">Check file encoding/permission</string>
 </resources>

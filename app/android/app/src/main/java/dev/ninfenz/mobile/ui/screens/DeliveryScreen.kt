@@ -1,6 +1,8 @@
 package dev.ninfenz.mobile.ui.screens
 
 import android.content.Intent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,7 +16,10 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.TextButton
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -43,6 +48,7 @@ import dev.ninfenz.mobile.model.PlanModel
 import dev.ninfenz.mobile.model.Project
 import dev.ninfenz.mobile.model.ProjectStatus
 import dev.ninfenz.mobile.model.ReportModel
+import dev.ninfenz.mobile.model.SlotTextAdapter
 import dev.ninfenz.mobile.model.ValidateReport
 import dev.ninfenz.mobile.share.ShareExporter
 import dev.ninfenz.mobile.ui.components.NfCard
@@ -88,6 +94,61 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
     var manifestText by remember { mutableStateOf<String?>(null) }
     var exportedFile by remember { mutableStateOf<File?>(null) }
     var error by remember { mutableStateOf<CoreError?>(null) }
+    var slotImportTarget by remember { mutableStateOf<String?>(null) }
+    var slotImportSource by remember { mutableStateOf("") }
+    var slotImportFormat by remember { mutableStateOf("text") }
+    var slotImportOriginal by remember { mutableStateOf(0) }
+    var slotImportAdapted by remember { mutableStateOf(0) }
+    var slotImportText by remember { mutableStateOf("") }
+
+    fun pasteSlot(slot: String) {
+        val manager = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager
+        val text = manager?.primaryClip?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.coerceToText(context)?.toString()
+        if (text.isNullOrBlank()) {
+            error = CoreResponse.failure("NF-E-003", context.getString(dev.ninfenz.mobile.R.string.delivery_slot_import_empty), context.getString(dev.ninfenz.mobile.R.string.delivery_slot_import_empty_fix), 2).error
+            return
+        }
+        val adapted = SlotTextAdapter.adapt(text, "clipboard.md")
+        slotImportTarget = slot
+        slotImportSource = "clipboard"
+        slotImportFormat = adapted.format
+        slotImportOriginal = adapted.original.length
+        slotImportAdapted = adapted.adapted.length
+        slotImportText = adapted.adapted
+    }
+
+    val slotPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri == null) { slotImportTarget = null; return@rememberLauncherForActivityResult }
+        val target = slotImportTarget ?: return@rememberLauncherForActivityResult
+        scope.launch {
+            try {
+                val name = uri.lastPathSegment?.substringAfterLast('/') ?: "import"
+                val raw = withContext(Dispatchers.IO) {
+                    context.contentResolver.openInputStream(uri)?.bufferedReader(Charsets.UTF_8)?.use { it.readText() } ?: ""
+                }
+                if (raw.isBlank()) {
+                    error = CoreResponse.failure("NF-E-003", context.getString(dev.ninfenz.mobile.R.string.delivery_slot_import_empty), context.getString(dev.ninfenz.mobile.R.string.delivery_slot_import_empty_fix), 2).error
+                    slotImportTarget = null
+                } else {
+                    val adapted = SlotTextAdapter.adapt(raw, name)
+                    slotImportSource = name
+                    slotImportFormat = adapted.format
+                    slotImportOriginal = adapted.original.length
+                    slotImportAdapted = adapted.adapted.length
+                    slotImportText = adapted.adapted
+                }
+            } catch (t: Throwable) {
+                error = CoreResponse.failure("NF-E-003", context.getString(dev.ninfenz.mobile.R.string.delivery_slot_import_fail, t.message ?: t.javaClass.simpleName), context.getString(dev.ninfenz.mobile.R.string.delivery_slot_import_fail_fix), 2).error
+                slotImportTarget = null
+            }
+        }
+    }
+
+    fun openSlotPicker(slot: String) {
+        slotImportTarget = slot
+        slotPicker.launch(arrayOf("*/*"))
+    }
+
     var busy by remember { mutableStateOf(false) }
 
     LaunchedEffect(pack?.dir?.absolutePath) {
@@ -200,7 +261,17 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                     } else {
                         for (slot in plan!!.slots) {
                             Column(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
-                                Text(slot, style = MaterialTheme.typography.labelLarge)
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(slot, style = MaterialTheme.typography.labelLarge)
+                                    Row {
+                                        TextButton(onClick = { pasteSlot(slot) }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_slot_paste)) }
+                                        TextButton(onClick = { openSlotPicker(slot) }) { Text(stringResource(dev.ninfenz.mobile.R.string.action_import)) }
+                                    }
+                                }
                                 OutlinedTextField(
                                     value = inputs[slot] ?: "",
                                     onValueChange = { inputs = inputs + (slot to it) },
@@ -359,6 +430,48 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                 }
             }
         }
+    }
+
+    slotImportTarget?.let { target ->
+        AlertDialog(
+            onDismissRequest = { slotImportTarget = null },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_slot_import_title, target)) },
+            text = {
+                Column(
+                    modifier = Modifier
+                        .heightIn(max = 420.dp)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    Text(
+                        stringResource(
+                            dev.ninfenz.mobile.R.string.delivery_slot_import_meta,
+                            slotImportSource,
+                            slotImportFormat,
+                            slotImportOriginal,
+                            slotImportAdapted
+                        ),
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                    NfExpandableText(slotImportText, collapsedLines = 10)
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    inputs = inputs + (target to slotImportText)
+                    slotImportTarget = null
+                }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_slot_replace)) }
+            },
+            dismissButton = {
+                Row {
+                    TextButton(onClick = {
+                        val old = inputs[target].orEmpty().trim()
+                        inputs = inputs + (target to if (old.isBlank()) slotImportText else old + "\n\n" + slotImportText)
+                        slotImportTarget = null
+                    }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_slot_append)) }
+                    TextButton(onClick = { slotImportTarget = null }) { Text(stringResource(android.R.string.cancel)) }
+                }
+            }
+        )
     }
 }
 

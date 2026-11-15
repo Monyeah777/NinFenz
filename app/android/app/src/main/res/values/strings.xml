@@ -408,4 +408,13 @@
     <string name="action_expand">展开</string>
     <string name="action_collapse">收起</string>
     <string name="delivery_slot_chars">已输入 %1$d 字</string>
+    <string name="delivery_slot_paste">粘贴</string>
+    <string name="delivery_slot_import_title">导入到 %1$s</string>
+    <string name="delivery_slot_import_meta">来源 %1$s · %2$s · %3$d → %4$d 字</string>
+    <string name="delivery_slot_replace">替换</string>
+    <string name="delivery_slot_append">追加</string>
+    <string name="delivery_slot_import_empty">导入文本为空</string>
+    <string name="delivery_slot_import_empty_fix">选择包含文本的文件</string>
+    <string name="delivery_slot_import_fail">导入失败：%1$s</string>
+    <string name="delivery_slot_import_fail_fix">检查文件编码/权限</string>
 </resources>
