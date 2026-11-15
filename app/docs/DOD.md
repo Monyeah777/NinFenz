@@ -32,11 +32,19 @@
 
 | id | 内容 | owner | 判据/下一步 |
 |---|---|---|---|
-| OPEN-TOOLCHAIN | 本机无 Gradle/Android SDK/kotlinc；Android APK 构建与 Compose Multiplatform 构建不可执行 | toolchain-scout → lead | 工具链勘察报告 `app/results/TOOLCHAIN.md`；可行则补构建证据，不可行则保留工程源码 + 可复跑脚本 |
-| OPEN-EXTERNAL | 签名/公证/真机/设备矩阵/Play 数据安全提交不在本机能力内 | lead | 发布清单 + 证据模板；不冒充已签/已公证 |
+| OPEN-TOOLCHAIN | 真机/模拟器 E2E、APK 安装启动、MSI 安装双击、CMP 交互运行（构建面已在本机工具链验证） | lead | 需 adb 设备/模拟器；不阻断构建结论 |
+| OPEN-EXTERNAL | 签名/公证/Play 数据安全/macOS 构建（无证书/无 macOS） | lead | `app/scripts/RELEASE_EVIDENCE.md` 留位，不冒充 |
 | OPEN-UNIFFI | UniFFI 依赖本机不可得，改用 JSON-C ABI（ADR-APP-011） | lead | 依赖可得时加 UDL 绑定（不破 ABI） |
-| OPEN-L2 | L2（仓库协议层）校验依赖 `nf` CLI 子进程，本方案默认 L0/L1 | lead | 环境缺失时 exit 4（NF-VAL-005），已实现语义 |
+| OPEN-L2 | L2（仓库协议层）校验依赖 `nf` CLI 子进程，本方案默认 L0/L1 | lead | 缺环境 exit 4（NF-VAL-005），语义已实现 |
 | OPEN-DOCXPDF | docx/pdf 导出未实现（首版只 md/zip/json） | lead | exit 4 + NF-EXP-004；次版补导出器探测 |
+| OPEN-CHECK58 | APP 门禁未接入仓库 `verify.sh`（check58） | lead | 前置已满足（`bash verify.sh --checks-only` = PASS=107 WARN=2 FAIL=0）；接入需改 check1–57 之外新增 58 + 版本面/README 三语/PASS 基线联动 + 冻结链——本波未做（可选下一波） |
+| OPEN-DATADIR | 数据目录保留窗口/崩溃恢复（进程死亡恢复）未实现 | lead | 保留策略与恢复测试（A6/Q 后补） |
+| OPEN-MAP-DECISION | map-suggest 决策仅落 sidecar JSON，未接 core 复算 | python-plane | 接 core `map-suggest` 复算并加用例 |
+| OPEN-INBOX | 授权目录 Inbox 自动解析（WorkManager 遍历/去重/撤销） | kotlin-ui | 需 Android 运行时 |
+| OPEN-DEEPLINK | 深链/QR 传输（计划 §10.2 可选） | kotlin-ui | 未实现 |
+| OPEN-A11Y | TalkBack/RTL/字体缩放实测 | kotlin-ui | 需设备 |
+| OPEN-PERF | 启动/装配/内存/包体实测预算 | lead | 需 Android 运行时；`PERF_BUDGET.md` 已给口径 |
+| OPEN-REPRO | 构建可复现（同源二次构建逐字节） | lead | buildinfo 对照 |
 
 ## 4. 完成判定
 
