@@ -19,6 +19,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.core.CoreError
 import dev.ninfenz.mobile.core.CoreResponse
@@ -93,11 +94,11 @@ fun AssemblyScreen(onBack: () -> Unit) {
         }
     }
 
-    NfScaffold(title = "Assembly · 装配/校验/导出", onBack = onBack) {
-        CardBox(title = "输入") {
+    NfScaffold(title = stringResource(dev.ninfenz.mobile.R.string.assembly_title), onBack = onBack) {
+        CardBox(title = stringResource(dev.ninfenz.mobile.R.string.assembly_input)) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedButton(onClick = { planPicker.launch(arrayOf("application/json", "text/plain")) }) { Text("打开 plan") }
-                OutlinedButton(onClick = { specPicker.launch(arrayOf("application/json", "text/plain")) }) { Text("打开 spec") }
+                OutlinedButton(onClick = { planPicker.launch(arrayOf("application/json", "text/plain")) }) { Text(stringResource(dev.ninfenz.mobile.R.string.assembly_open_plan)) }
+                OutlinedButton(onClick = { specPicker.launch(arrayOf("application/json", "text/plain")) }) { Text(stringResource(dev.ninfenz.mobile.R.string.assembly_open_spec)) }
             }
             KeyValue("plan", plan?.let { it.pipelineId + " · steps " + it.steps.size + " · slots " + it.slots.size } ?: "未加载")
             KeyValue("spec", spec?.let { it.id + " · sections " + it.sections.size + " · slots " + it.slots.size } ?: "未加载")
@@ -118,10 +119,10 @@ fun AssemblyScreen(onBack: () -> Unit) {
         val p = plan
         val s = spec
         if (p == null || s == null) {
-            EmptyState("请先加载 plan 与 spec（二者均来自核心 graph-compile / spec 产物）。")
+            EmptyState(stringResource(dev.ninfenz.mobile.R.string.assembly_need_plan))
         } else {
-            CardBox(title = "槽位输入（inputs）") {
-                if (p.slots.isEmpty()) EmptyState("plan.slots 为空：无需输入？请先核对 plan。")
+            CardBox(title = stringResource(dev.ninfenz.mobile.R.string.assembly_slots)) {
+                if (p.slots.isEmpty()) EmptyState(stringResource(dev.ninfenz.mobile.R.string.assembly_no_slots))
                 for (slot in p.slots) {
                     FormTextField(
                         label = slot,
@@ -132,7 +133,7 @@ fun AssemblyScreen(onBack: () -> Unit) {
                 }
             }
 
-            CardBox(title = "核心装配（assemble）") {
+            CardBox(title = stringResource(dev.ninfenz.mobile.R.string.assembly_assemble)) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Button(enabled = !busy, onClick = {
                         val rawP = rawPlan ?: return@Button
@@ -199,7 +200,7 @@ fun AssemblyScreen(onBack: () -> Unit) {
                 metaSummary?.let { MonoText(it) }
             }
 
-            CardBox(title = "导出 / 分享") {
+            CardBox(title = stringResource(dev.ninfenz.mobile.R.string.assembly_export)) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Button(enabled = !busy && markdown != null, onClick = {
                         val md = markdown ?: return@Button
@@ -224,7 +225,7 @@ fun AssemblyScreen(onBack: () -> Unit) {
                                 busy = false
                             }
                         }
-                    }) { Text("导出 md") }
+                    }) { Text(stringResource(dev.ninfenz.mobile.R.string.assembly_export_md)) }
                     Button(enabled = !busy && markdown != null, onClick = {
                         val md = markdown ?: return@Button
                         scope.launch {
@@ -248,18 +249,18 @@ fun AssemblyScreen(onBack: () -> Unit) {
                                 busy = false
                             }
                         }
-                    }) { Text("导出 zip") }
+                    }) { Text(stringResource(dev.ninfenz.mobile.R.string.assembly_export_zip)) }
                     OutlinedButton(enabled = !busy && markdown != null, onClick = {
                         val md = markdown ?: return@OutlinedButton
                         val intent = ShareExporter.shareMarkdown(context, "nf-assembly", md)
                         context.startActivity(Intent.createChooser(intent, "分享装配结果"))
-                    }) { Text("分享 Markdown") }
+                    }) { Text(stringResource(dev.ninfenz.mobile.R.string.assembly_share_md)) }
                 }
                 manifest?.let { MonoText(it) }
             }
 
             report?.let { r ->
-                CardBox(title = "校验报告") {
+                CardBox(title = stringResource(dev.ninfenz.mobile.R.string.assembly_report)) {
                     KeyValue("verdict", ReportModel.line(r))
                     KeyValue("target", r.target.kind + " · " + r.target.ref)
                     for (issue in r.issues) {
@@ -269,10 +270,10 @@ fun AssemblyScreen(onBack: () -> Unit) {
                 }
             }
 
-            CardBox(title = "预览") {
+            CardBox(title = stringResource(dev.ninfenz.mobile.R.string.assembly_preview)) {
                 val md = markdown
                 if (md == null) {
-                    EmptyState("尚未装配。预览只显示核心返回的 markdown，不做本地拼接。")
+                    EmptyState(stringResource(dev.ninfenz.mobile.R.string.assembly_not_assembled))
                 } else {
                     MonoText(md)
                 }

@@ -315,4 +315,49 @@
     <string name="packupdate_breaking_yes">是（删除/结构变更）</string>
     <string name="packupdate_breaking_no">否</string>
     <string name="packupdate_none">（无）</string>
+
+    <string name="protocol_title">Protocol · 条款表单</string>
+    <string name="protocol_pack">协议包</string>
+    <string name="protocol_pick">选择 protocol.json</string>
+    <string name="protocol_clear_render">清空渲染</string>
+    <string name="protocol_empty">尚未加载协议包。表单值只在本地，权威渲染走核心 protocol-render。</string>
+    <string name="protocol_enable">启用本条</string>
+    <string name="protocol_rules">规则：%1$s</string>
+    <string name="protocol_render">核心渲染（protocol-render）</string>
+    <string name="protocol_note">本地检查只做占位符/必填预检；规则求值、兼容性由核心 fail-closed 判定。</string>
+    <string name="protocol_no_clauses">核心未返回条款（result.clauses 为空）</string>
+    <string name="graph_default_title">未命名管线</string>
+    <string name="graph_title">Graph · 管线图</string>
+    <string name="graph_card">图</string>
+    <string name="graph_open">打开 .nfg.json</string>
+    <string name="graph_new">新建空图</string>
+    <string name="graph_empty">尚未打开管线图。节点/边/权重编辑在本地；校验与编译必须走核心。</string>
+    <string name="graph_nodes">节点列表</string>
+    <string name="graph_no_nodes">无节点。至少需要 1 个 stage + 1 个 module。</string>
+    <string name="graph_ports">ports in=%1$s out=%2$s</string>
+    <string name="graph_delete">删</string>
+    <string name="graph_add_node">加节点</string>
+    <string name="graph_edges">边列表</string>
+    <string name="graph_no_edges">无边。边 from/to 必须引用已存在节点与已声明端口。</string>
+    <string name="graph_type">type=%1$s</string>
+    <string name="graph_add_edge">加边</string>
+    <string name="graph_local_check">本地表单检查（非契约校验）</string>
+    <string name="graph_core">核心校验 / 编译</string>
+    <string name="graph_save">保存</string>
+    <string name="graph_save_draft">保存图草稿</string>
+    <string name="assembly_title">Assembly · 装配/校验/导出</string>
+    <string name="assembly_input">输入</string>
+    <string name="assembly_open_plan">打开 plan</string>
+    <string name="assembly_open_spec">打开 spec</string>
+    <string name="assembly_need_plan">请先加载 plan 与 spec（二者均来自核心 graph-compile / spec 产物）。</string>
+    <string name="assembly_slots">槽位输入（inputs）</string>
+    <string name="assembly_no_slots">plan.slots 为空：无需输入？请先核对 plan。</string>
+    <string name="assembly_assemble">核心装配（assemble）</string>
+    <string name="assembly_export">导出 / 分享</string>
+    <string name="assembly_export_md">导出 md</string>
+    <string name="assembly_export_zip">导出 zip</string>
+    <string name="assembly_share_md">分享 Markdown</string>
+    <string name="assembly_report">校验报告</string>
+    <string name="assembly_preview">预览</string>
+    <string name="assembly_not_assembled">尚未装配。预览只显示核心返回的 markdown，不做本地拼接。</string>
 </resources>

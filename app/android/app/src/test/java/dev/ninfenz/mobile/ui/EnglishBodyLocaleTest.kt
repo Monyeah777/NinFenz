@@ -9,7 +9,10 @@ import androidx.test.core.app.ApplicationProvider
 import dev.ninfenz.mobile.data.LibraryStore
 import dev.ninfenz.mobile.data.ProjectFactory
 import dev.ninfenz.mobile.model.ProjectModel
+import dev.ninfenz.mobile.ui.screens.AssemblyScreen
 import dev.ninfenz.mobile.ui.screens.AuthorScreen
+import dev.ninfenz.mobile.ui.screens.GraphScreen
+import dev.ninfenz.mobile.ui.screens.ProtocolScreen
 import dev.ninfenz.mobile.ui.screens.CcosScreen
 import dev.ninfenz.mobile.ui.screens.DeliveryScreen
 import dev.ninfenz.mobile.ui.screens.ImportScreen
@@ -123,6 +126,25 @@ class EnglishBodyLocaleTest {
         compose.setContent { NfTheme { PackUpdateScreen(store = LibraryStore(context.filesDir), onBack = {}) } }
         compose.onNodeWithText("PackUpdate · diff/conflicts/apply/rollback").assertIsDisplayed()
         compose.onNodeWithText("No packs installed; load the sample from Library/Pack center first.").assertIsDisplayed()
+    }
+
+    @Test
+    fun protocolEditorUsesEnglishBody() {
+        compose.setContent { NfTheme { ProtocolScreen(onBack = {}) } }
+        compose.onNodeWithText("Protocol · clause form").assertIsDisplayed()
+    }
+
+    @Test
+    fun graphEditorUsesEnglishBody() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        compose.setContent { NfTheme { GraphScreen(store = LibraryStore(context.filesDir), onBack = {}) } }
+        compose.onNodeWithText("Graph · pipeline").assertIsDisplayed()
+    }
+
+    @Test
+    fun assemblyEditorUsesEnglishBody() {
+        compose.setContent { NfTheme { AssemblyScreen(onBack = {}) } }
+        compose.onNodeWithText("Assembly · assemble/validate/export").assertIsDisplayed()
     }
 
     @Test

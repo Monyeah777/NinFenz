@@ -315,4 +315,49 @@
     <string name="packupdate_breaking_yes">yes (deletion/structure change)</string>
     <string name="packupdate_breaking_no">no</string>
     <string name="packupdate_none">(none)</string>
+
+    <string name="protocol_title">Protocol · clause form</string>
+    <string name="protocol_pack">Protocol pack</string>
+    <string name="protocol_pick">Choose protocol.json</string>
+    <string name="protocol_clear_render">Clear render</string>
+    <string name="protocol_empty">No protocol pack loaded. Form values stay local; authoritative render runs in core protocol-render.</string>
+    <string name="protocol_enable">Enable clause</string>
+    <string name="protocol_rules">Rules: %1$s</string>
+    <string name="protocol_render">Core render (protocol-render)</string>
+    <string name="protocol_note">Local checks only preflight placeholders/required fields; rule evaluation and compatibility are decided fail-closed by core.</string>
+    <string name="protocol_no_clauses">Core returned no clauses (result.clauses is empty)</string>
+    <string name="graph_default_title">Untitled pipeline</string>
+    <string name="graph_title">Graph · pipeline</string>
+    <string name="graph_card">Graph</string>
+    <string name="graph_open">Open .nfg.json</string>
+    <string name="graph_new">New empty graph</string>
+    <string name="graph_empty">No pipeline graph open. Nodes/edges/weights are edited locally; validation and compile must run in core.</string>
+    <string name="graph_nodes">Nodes</string>
+    <string name="graph_no_nodes">No nodes. At least 1 stage + 1 module is required.</string>
+    <string name="graph_ports">ports in=%1$s out=%2$s</string>
+    <string name="graph_delete">Delete</string>
+    <string name="graph_add_node">Add node</string>
+    <string name="graph_edges">Edges</string>
+    <string name="graph_no_edges">No edges. from/to must reference existing nodes and declared ports.</string>
+    <string name="graph_type">type=%1$s</string>
+    <string name="graph_add_edge">Add edge</string>
+    <string name="graph_local_check">Local form check (not contract validation)</string>
+    <string name="graph_core">Core validate / compile</string>
+    <string name="graph_save">Save</string>
+    <string name="graph_save_draft">Save graph draft</string>
+    <string name="assembly_title">Assembly · assemble/validate/export</string>
+    <string name="assembly_input">Inputs</string>
+    <string name="assembly_open_plan">Open plan</string>
+    <string name="assembly_open_spec">Open spec</string>
+    <string name="assembly_need_plan">Load plan and spec first (both come from core graph-compile / spec output).</string>
+    <string name="assembly_slots">Slot inputs</string>
+    <string name="assembly_no_slots">plan.slots is empty: nothing to input? Verify the plan first.</string>
+    <string name="assembly_assemble">Core assemble</string>
+    <string name="assembly_export">Export / share</string>
+    <string name="assembly_export_md">Export md</string>
+    <string name="assembly_export_zip">Export zip</string>
+    <string name="assembly_share_md">Share Markdown</string>
+    <string name="assembly_report">Validation report</string>
+    <string name="assembly_preview">Preview</string>
+    <string name="assembly_not_assembled">Nothing assembled yet. Preview only shows core markdown, no local stitching.</string>
 </resources>

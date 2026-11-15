@@ -19,6 +19,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.core.CoreError
 import dev.ninfenz.mobile.core.CoreResponse
@@ -98,20 +99,20 @@ fun GraphScreen(store: LibraryStore, onBack: () -> Unit) {
         }
     }
 
-    NfScaffold(title = "Graph · 管线图", onBack = onBack) {
-        CardBox(title = "图") {
+    NfScaffold(title = stringResource(dev.ninfenz.mobile.R.string.graph_title), onBack = onBack) {
+        CardBox(title = stringResource(dev.ninfenz.mobile.R.string.graph_card)) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(onClick = { picker.launch(arrayOf("application/json", "text/plain")) }) { Text("打开 .nfg.json") }
+                Button(onClick = { picker.launch(arrayOf("application/json", "text/plain")) }) { Text(stringResource(dev.ninfenz.mobile.R.string.graph_open)) }
                 OutlinedButton(onClick = {
                     graph = emptyGraph()
                     report = null
                     planSummary = null
                     error = null
-                }) { Text("新建空图") }
+                }) { Text(stringResource(dev.ninfenz.mobile.R.string.graph_new)) }
             }
             val g = graph
             if (g == null) {
-                EmptyState("尚未打开管线图。节点/边/权重编辑在本地；校验与编译必须走核心。")
+                EmptyState(stringResource(dev.ninfenz.mobile.R.string.graph_empty))
             } else {
                 KeyValue("id/version", g.id + " " + g.version)
                 KeyValue("mode", g.mode)
@@ -124,13 +125,13 @@ fun GraphScreen(store: LibraryStore, onBack: () -> Unit) {
 
         val g = graph
         if (g != null) {
-            CardBox(title = "节点列表") {
-                if (g.nodes.isEmpty()) EmptyState("无节点。至少需要 1 个 stage + 1 个 module。")
+            CardBox(title = stringResource(dev.ninfenz.mobile.R.string.graph_nodes)) {
+                if (g.nodes.isEmpty()) EmptyState(stringResource(dev.ninfenz.mobile.R.string.graph_no_nodes))
                 for (node in g.nodes) {
                     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
                         Column(modifier = Modifier.weight(1f)) {
                             Text(node.id + " · " + node.kind + " · " + node.title, style = MaterialTheme.typography.bodyMedium)
-                            Text("ports in=" + node.portsIn.joinToString(",") + " out=" + node.portsOut.joinToString(","),
+                            Text(stringResource(dev.ninfenz.mobile.R.string.graph_ports, node.portsIn.joinToString(","), node.portsOut.joinToString(",")),
                                 style = MaterialTheme.typography.bodySmall)
                         }
                         FormTextField(
@@ -141,7 +142,7 @@ fun GraphScreen(store: LibraryStore, onBack: () -> Unit) {
                                 graph = GraphModel.withWeight(g, node.id, if (v.isBlank()) null else weight)
                             }
                         )
-                        OutlinedButton(onClick = { graph = GraphModel.withoutNode(g, node.id) }) { Text("删") }
+                        OutlinedButton(onClick = { graph = GraphModel.withoutNode(g, node.id) }) { Text(stringResource(dev.ninfenz.mobile.R.string.graph_delete)) }
                     }
                 }
                 FormTextField(label = "新节点标题", value = nodeTitle, onValueChange = { nodeTitle = it })
@@ -165,20 +166,20 @@ fun GraphScreen(store: LibraryStore, onBack: () -> Unit) {
                         nodeTitle = ""
                         report = null
                         planSummary = null
-                    }) { Text("加节点") }
+                    }) { Text(stringResource(dev.ninfenz.mobile.R.string.graph_add_node)) }
                 }
             }
 
-            CardBox(title = "边列表") {
-                if (g.edges.isEmpty()) EmptyState("无边。边 from/to 必须引用已存在节点与已声明端口。")
+            CardBox(title = stringResource(dev.ninfenz.mobile.R.string.graph_edges)) {
+                if (g.edges.isEmpty()) EmptyState(stringResource(dev.ninfenz.mobile.R.string.graph_no_edges))
                 for (edge in g.edges) {
                     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
                         Column(modifier = Modifier.weight(1f)) {
                             Text(edge.id + " · " + edge.from + "(" + edge.fromPort + ") -> " + edge.to + "(" + edge.toPort + ")",
                                 style = MaterialTheme.typography.bodySmall)
-                            Text("type=" + edge.type, style = MaterialTheme.typography.labelSmall)
+                            Text(stringResource(dev.ninfenz.mobile.R.string.graph_type, edge.type), style = MaterialTheme.typography.labelSmall)
                         }
-                        OutlinedButton(onClick = { graph = GraphModel.withoutEdge(g, edge.id) }) { Text("删") }
+                        OutlinedButton(onClick = { graph = GraphModel.withoutEdge(g, edge.id) }) { Text(stringResource(dev.ninfenz.mobile.R.string.graph_delete)) }
                     }
                 }
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -202,16 +203,16 @@ fun GraphScreen(store: LibraryStore, onBack: () -> Unit) {
                     graph = GraphModel.withEdge(g, edge)
                     report = null
                     planSummary = null
-                }) { Text("加边") }
+                }) { Text(stringResource(dev.ninfenz.mobile.R.string.graph_add_edge)) }
             }
 
-            CardBox(title = "本地表单检查（非契约校验）") {
+            CardBox(title = stringResource(dev.ninfenz.mobile.R.string.graph_local_check)) {
                 val issues = GraphModel.formIssues(g)
                 if (issues.isEmpty()) Notice("本地检查未发现问题。", Tone.INFO)
                 for (issue in issues) Notice(issue.code + " " + issue.path + "：" + issue.message + "；修复：" + issue.fix, Tone.WARN)
             }
 
-            CardBox(title = "核心校验 / 编译") {
+            CardBox(title = stringResource(dev.ninfenz.mobile.R.string.graph_core)) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Button(enabled = !busy, onClick = {
                         scope.launch {
@@ -265,11 +266,11 @@ fun GraphScreen(store: LibraryStore, onBack: () -> Unit) {
                 planSummary?.let { MonoText(it) }
             }
 
-            CardBox(title = "保存") {
+            CardBox(title = stringResource(dev.ninfenz.mobile.R.string.graph_save)) {
                 Button(onClick = {
                     val path = store.saveDraft("graph-" + g.id, GraphModel.toJson(g).toString())
                     savedPath = path.absolutePath
-                }) { Text("保存图草稿") }
+                }) { Text(stringResource(dev.ninfenz.mobile.R.string.graph_save_draft)) }
                 savedPath?.let { Notice("已保存：" + it, Tone.INFO) }
             }
         }
