@@ -38,6 +38,8 @@ import dev.ninfenz.mobile.data.LibraryStore
 import dev.ninfenz.mobile.data.PackEntry
 import dev.ninfenz.mobile.data.PackSnapshot
 import dev.ninfenz.mobile.data.PackStore
+import dev.ninfenz.mobile.data.CreateProjectResult
+import dev.ninfenz.mobile.data.ProjectCreator
 import dev.ninfenz.mobile.data.ProjectEntry
 import dev.ninfenz.mobile.data.SampleSeeder
 import dev.ninfenz.mobile.data.SeedResult
@@ -52,6 +54,7 @@ import dev.ninfenz.mobile.ui.screens.GraphScreen
 import dev.ninfenz.mobile.ui.screens.ImportScreen
 import dev.ninfenz.mobile.ui.screens.LibraryHomeScreen
 import dev.ninfenz.mobile.ui.screens.MeScreen
+import dev.ninfenz.mobile.ui.screens.NewProjectScreen
 import dev.ninfenz.mobile.ui.screens.OnboardingScreen
 import dev.ninfenz.mobile.ui.screens.PackDetailScreen
 import dev.ninfenz.mobile.ui.screens.PackUpdateScreen
@@ -81,6 +84,7 @@ fun NfMobileApp(
     val library = remember { LibraryStore(context.filesDir) }
     val packStore = remember { PackStore(context.filesDir) }
     val seeder = remember { SampleSeeder(context, context.filesDir, prefs) }
+    val projectCreator = remember { ProjectCreator(context.filesDir) }
 
     var shell by remember { mutableStateOf(ShellState()) }
     var packs by remember { mutableStateOf<PackSnapshot>(PackSnapshot(emptyList(), emptyList())) }
@@ -92,6 +96,9 @@ fun NfMobileApp(
     var showAbout by remember { mutableStateOf(false) }
     var storageText by remember { mutableStateOf("计算中…") }
     var nativeReady by remember { mutableStateOf(false) }
+    var creatingProject by remember { mutableStateOf(false) }
+    var createError by remember { mutableStateOf<String?>(null) }
+    var demoTried by remember { mutableStateOf(false) }
     var abi by remember { mutableStateOf<String?>(null) }
 
     fun refresh() {
@@ -119,10 +126,40 @@ fun NfMobileApp(
         }
     }
 
+    fun createProject(pack: PackEntry, title: String) {
+        if (creatingProject) return
+        creatingProject = true
+        createError = null
+        scope.launch {
+            when (val result = projectCreator.create(pack, title)) {
+                is CreateProjectResult.Success -> {
+                    refresh()
+                    shell = shell.open(Detail.Project(result.project.id))
+                }
+                is CreateProjectResult.Failure -> {
+                    createError = "[" + result.code + "] " + result.message + "；修复：" + result.fix
+                }
+            }
+            creatingProject = false
+        }
+    }
+
     LaunchedEffect(Unit) {
         val pending = ShareHandoff.consume()
         if (pending != null) shell = shell.open(Detail.Import)
         refresh()
+    }
+
+    // 示例载入且核心可用时，自动生成演示项目（失败不阻断，库页仍可手动新建）。
+    LaunchedEffect(nativeReady, packs.packs.size, projects.size) {
+        if (!demoTried && nativeReady && projects.isEmpty() && packs.packs.isNotEmpty()) {
+            demoTried = true
+            val pack = packs.packs.first()
+            when (val result = projectCreator.create(pack, "演示项目", "demo-project")) {
+                is CreateProjectResult.Success -> refresh()
+                is CreateProjectResult.Failure -> Unit
+            }
+        }
     }
 
     if (!onboardingDone) {
@@ -186,9 +223,12 @@ fun NfMobileApp(
                         )
                         TopDestination.CREATE -> CreateScreen(
                             projects = projects,
+                            packs = packs.packs,
                             onImport = { shell = shell.open(Detail.Import) },
+                            onCreateProject = { shell = shell.open(Detail.NewProject) },
                             onOpenProject = { shell = shell.open(Detail.Project(it.project.id)) },
-                            onGoLibrary = { shell = shell.select(TopDestination.LIBRARY) }
+                            onGoLibrary = { shell = shell.select(TopDestination.LIBRARY) },
+                            onLoadSample = ::runSeed
                         )
                         TopDestination.DELIVER -> DeliverScreen(
                             projects = projects,
@@ -208,6 +248,17 @@ fun NfMobileApp(
                         )
                     }
                     is Detail.Import -> ImportScreen(prefill = null, store = library, onBack = { shell = shell.back() ?: shell })
+                    is Detail.NewProject -> NewProjectScreen(
+                        packs = packs.packs,
+                        creating = creatingProject,
+                        error = createError,
+                        onBack = { shell = shell.back() ?: shell },
+                        onLoadSample = {
+                            shell = shell.select(TopDestination.LIBRARY)
+                            runSeed()
+                        },
+                        onCreate = { pack, title -> createProject(pack, title) }
+                    )
                     is Detail.Settings -> SettingsScreen(onBack = { shell = shell.back() ?: shell })
                     is Detail.Protocol -> ProtocolScreen(onBack = { shell = shell.back() ?: shell })
                     is Detail.Graph -> GraphScreen(store = library, onBack = { shell = shell.back() ?: shell })

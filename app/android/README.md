@@ -4,7 +4,7 @@ NF APP 的 Android 控制面：本地处理、无账号、无遥测、**未声�
 app/docs/CONTRACT.md + app/docs/CLI.md + app/schema/error_codes.json（A0 冻结层）。
 
 > v0.02（W1）现状：四目的地外壳（库/创作/交付/我的）+ 自适应底部栏/rail + FAB 导入 + 首启示例 Pack/3 步引导 +
-> 设计 token/字体/暗色主题 + 自适应 launcher icon。旧 8 个功能页保留在详情层；W2+ 继续产品化（项目向导、搜索、作者台/交付台）。
+> 设计 token/字体/暗色主题 + 自适应 launcher icon。旧 8 个功能页保留在详情层；W2 已接入新建项目向导（选 Pack→标题→core canonical/project-validate→原子写 nf-project）与示例演示项目自动生成；W3+ 继续导入/作者/交付产品化。
 
 ## 工程结构
 
@@ -89,7 +89,7 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 
 ## 单测
 
-49 条（JVM，无需模拟器）：
+52 条（JVM，无需模拟器）：
 
 - CoreResponseTest（10）：信封解析/矛盾拒绝/NF-E-005。
 - CoreBridgeContractTest（5）：op+payload 原样透传、错误 exit 语义、fake 无队列 fail-closed。
@@ -99,12 +99,14 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 - AdaptiveLayoutTest（4）：窗口宽 599/600/839/840 分档。
 - ShellStateTest（4）：四目的地/详情栈/根返回 null。
 - PackStoreTest（3）：正常 Pack 扫描/坏 manifest 入 errors/空目录。
+- ProjectFactoryTest（1）：nf-project 文档形状 + ProjectModel 解析。
+- ProjectCreatorTest（2）：canonical×3 + project-validate 成功写盘；核心失败不写半成品。
 
 ## 构建证据（本机，2026-11-15）
 
-- v0.02 W1（2026-11-15）：`./gradlew :app:assembleDebug` 成功：app-debug.apk = 17,988,622 bytes，
-  sha256 = 9944bab4561b5ec6b30bfd8449863c443ded9784e27bca87976145da52e7a9c9（含双 ABI 原生库 + 9 个示例 Pack assets）。
-- `./gradlew :app:testDebugUnitTest` 全绿：49 条 JVM 单测（42 条基线 + AdaptiveLayoutTest 4 + ShellStateTest 4 + PackStoreTest 3）。
+- v0.02 W2（2026-11-15）：`./gradlew :app:assembleDebug` 成功：app-debug.apk = 18,220,420 bytes，
+  sha256 = 91eb9be49191cf8e853cb734f11f017b521e7ed32fa5889e45677cfc6eae1d28（含双 ABI 原生库 + 9 个示例 Pack assets）。
+- `./gradlew :app:testDebugUnitTest` 全绿：52 条 JVM 单测（42 基线 + AdaptiveLayout 4 + ShellState 4 + PackStore 3 + ProjectFactory 1 + ProjectCreator 2）。
 - `zipalign -c -P 16 -v 4 app-debug.apk` → Verification successful（native lib 16KB page 对齐）。
 - `bash app/scripts/build_core_android.sh --clean` 成功：NDK 27.0.12077973 + rustup targets
   （aarch64-linux-android / x86_64-linux-android，经 rsproxy 镜像安装）；两个 .so 的 LOAD align 均为 0x4000。

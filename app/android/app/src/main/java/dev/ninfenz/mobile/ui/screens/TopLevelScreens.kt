@@ -179,43 +179,79 @@ private fun SeedLine(seed: SeedResult?) {
 @Composable
 fun CreateScreen(
     projects: List<ProjectEntry>,
+    packs: List<PackEntry>,
     onImport: () -> Unit,
+    onCreateProject: () -> Unit,
     onOpenProject: (ProjectEntry) -> Unit,
-    onGoLibrary: () -> Unit
+    onGoLibrary: () -> Unit,
+    onLoadSample: () -> Unit
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         NfTopAppBar(title = "创作")
-        if (projects.isEmpty()) {
+        if (packs.isEmpty()) {
             NfEmptyState(
                 icon = Icons.Filled.Edit,
-                title = "还没有项目",
-                message = "先从示例 Pack 或导入内容开始；项目创建向导会在下一波接入。",
-                actionLabel = "导入内容",
-                onAction = onImport,
-                secondaryLabel = "查看库",
-                onSecondary = onGoLibrary
+                title = "还没有可用的 Pack",
+                message = "先载入内置示例 Pack，或从文件管理器导入 Pack，再创建项目。",
+                actionLabel = "载入示例 Pack",
+                onAction = onLoadSample,
+                secondaryLabel = "导入内容",
+                onSecondary = onImport
             )
         } else {
             LazyColumn(
                 contentPadding = androidx.compose.foundation.layout.PaddingValues(vertical = NfSpacing.l),
                 verticalArrangement = Arrangement.spacedBy(NfSpacing.m)
             ) {
-                items(projects.size) { index ->
-                    val entry = projects[index]
+                item {
                     NfCard(
                         modifier = Modifier.padding(horizontal = NfSpacing.page),
-                        onClick = { onOpenProject(entry) }
+                        onClick = onCreateProject
                     ) {
-                        Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(entry.project.title, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
-                                NfStatusChip(projectStatusLabel(entry.project))
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(NfSpacing.m)) {
+                            Icon(Icons.Filled.Add, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text("从 Pack 新建项目", style = MaterialTheme.typography.titleMedium)
+                                Text(
+                                    "选择示例 Pack → 标题 → 创建（core 校验引用）",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
                             }
-                            Text(
-                                "Pack " + entry.project.refs.basePackId + " · " + entry.project.refs.basePackVersion,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+                        }
+                    }
+                }
+                if (projects.isEmpty()) {
+                    item {
+                        NfEmptyState(
+                            icon = Icons.Filled.Edit,
+                            title = "还没有项目",
+                            message = "选一个 Pack 创建项目，或先导入内容。",
+                            actionLabel = "新建项目",
+                            onAction = onCreateProject,
+                            secondaryLabel = "查看库",
+                            onSecondary = onGoLibrary
+                        )
+                    }
+                } else {
+                    item { NfSectionHeader("项目") }
+                    items(projects.size) { index ->
+                        val entry = projects[index]
+                        NfCard(
+                            modifier = Modifier.padding(horizontal = NfSpacing.page),
+                            onClick = { onOpenProject(entry) }
+                        ) {
+                            Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(entry.project.title, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+                                    NfStatusChip(projectStatusLabel(entry.project))
+                                }
+                                Text(
+                                    "Pack " + entry.project.refs.basePackId + " · " + entry.project.refs.basePackVersion,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
                         }
                     }
                 }
