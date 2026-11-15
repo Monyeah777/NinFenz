@@ -32,6 +32,7 @@
 | 我的/深色 | pass：深色主题整体生效 |
 | 我的/English | pass（修复后）：Appearance 下 System/Light/Dark、Language 选项均为英文 |
 | 动态取色 | pass：Android 12+ 开关生效 |
+| 分享 chooser（出站） | pass（修复后）：非 Activity Context 调用 chooser 缺 `FLAG_ACTIVITY_NEW_TASK` 导致 `AndroidRuntimeException`；修复后真机拉起系统分享面板，显示 nf-demo-project.md 59B 与目标应用，进程存活 |
 | 分享接收 | **已修复**：此前确认分享会崩（No ActivityResultRegistryOwner），且 payload 未传入导入；修复后显示「已接收分享载荷」+ markdown 85% 预览 |
 | 新建项目 | pass：Create→从 Pack 新建→标题 device-test→创建，生成 devicetest.nfproject.json |
 | 横屏 | pass：旋转后自动切 NavigationRail（四目的地竖排） |
