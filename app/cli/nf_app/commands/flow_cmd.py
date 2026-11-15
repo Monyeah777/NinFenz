@@ -30,7 +30,7 @@ from .common import (
 )
 
 VALID_LEVELS = ("L0", "L1", "L2")
-EXPORT_FORMATS = ("md", "zip", "json", "docx", "pdf")
+EXPORT_FORMATS = ("md", "zip", "json", "docx", "skill", "pdf")
 
 
 def _verify_file_ref(base: Path, ref: dict, *, what: str) -> Path:
@@ -293,13 +293,13 @@ def _export_sources(project: dict) -> list[dict]:
 
 def cmd_export(args) -> Outcome:
     fmt = args.format
-    if fmt in ("docx", "pdf"):
+    if fmt == "pdf":
         raise AppError(
             "NF-EXP-004",
-            message=f"{fmt} 导出器未实现（OPEN，不冒充）",
-            fix="改用 --format md|zip|json；docx/pdf 待导出器探测落地",
+            message="PDF 导出未内置：用平台打印另存为 PDF（Android PrintManager / 桌面 javax.print）",
+            fix="改用 --format md|zip|json|docx|skill；PDF 走平台打印（OPEN）",
         )
-    require(fmt in EXPORT_FORMATS, "NF-E-002", f"未知导出格式: {fmt}", fix="md/zip/json（docx/pdf 目前 NF-EXP-004）")
+    require(fmt in EXPORT_FORMATS, "NF-E-002", f"未知导出格式: {fmt}", fix="md/zip/json/docx/skill（pdf 走平台打印）")
     project_path = Path(args.project)
     project = load_doc(project_path, "nf-project")
     base = project_path.resolve().parent

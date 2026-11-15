@@ -97,12 +97,12 @@ fn export_failure(format: &str, code: &str, path: &str, message: &str) -> Value 
 pub fn export(req: &Value) -> OpOutcome {
     let format = req_str(req, "format")?;
     let out_dir = req_str(req, "out_dir")?;
-    if matches!(format, "docx" | "pdf") {
+    if format == "pdf" {
         return Err(CoreError::new("NF-EXP-004")
-            .with_message(format!("{format} 导出器不可用（本版本未实现：OPEN）"))
+            .with_message("PDF 导出未内置：用平台打印另存为 PDF（Android PrintManager / 桌面 javax.print），核心不产 PDF（OPEN）")
             .with_exit(4));
     }
-    if !matches!(format, "md" | "zip" | "json") {
+    if !matches!(format, "md" | "zip" | "json" | "docx" | "skill") {
         return Err(CoreError::new("NF-E-002")
             .with_message(format!("未知导出格式 {format}（只支持 md/zip/json）"))
             .with_exit(3));
@@ -157,6 +157,11 @@ pub fn export(req: &Value) -> OpOutcome {
         }
     }
 
+    let source = json!({
+        "plan_digest": resolve_digest(req, "plan_digest", "plan", result.as_ref()),
+        "spec_digest": resolve_digest(req, "spec_digest", "spec", result.as_ref()),
+        "markdown_digest": markdown_digest_of(req, result.as_ref(), markdown),
+    });
     let mut files: Vec<Value> = Vec::new();
     match format {
         "md" => {
@@ -227,14 +232,55 @@ pub fn export(req: &Value) -> OpOutcome {
                 "bytes": bytes.len() as u64,
             }));
         }
+        "docx" => {
+            let content = markdown
+                .map(|s| s.to_string())
+                .or_else(|| {
+                    result
+                        .as_ref()
+                        .and_then(|r| r.get("markdown"))
+                        .and_then(|v| v.as_str())
+                        .map(|s| s.to_string())
+                })
+                .unwrap_or_default();
+            let title = opt_str(req, "title")?.unwrap_or("NF Export");
+            let bytes = crate::docx::build_docx(&content, title)?;
+            crate::fsutil::write_bytes(&dir.join("result.docx"), &bytes)?;
+            files.push(json!({
+                "name": "result.docx",
+                "sha256": crate::canonical::sha256_hex(&bytes),
+                "bytes": bytes.len() as u64,
+            }));
+        }
+        "skill" => {
+            let md = markdown.or_else(|| {
+                result
+                    .as_ref()
+                    .and_then(|r| r.get("markdown"))
+                    .and_then(|v| v.as_str())
+            });
+            let meta = result.as_ref().and_then(|r| r.get("meta"));
+            let project_id = opt_str(req, "project_id")?.unwrap_or("");
+            let title = opt_str(req, "title")?.unwrap_or("");
+            let bytes = crate::skillpack::build_skill_pack(
+                project_id,
+                title,
+                md,
+                meta,
+                source["plan_digest"].as_str().unwrap_or(""),
+                source["spec_digest"].as_str().unwrap_or(""),
+                source["markdown_digest"].as_str().unwrap_or(""),
+            )?;
+            crate::fsutil::write_bytes(&dir.join("result.skill.zip"), &bytes)?;
+            files.push(json!({
+                "name": "result.skill.zip",
+                "sha256": crate::canonical::sha256_hex(&bytes),
+                "bytes": bytes.len() as u64,
+            }));
+        }
         _ => unreachable!(),
     }
 
-    let source = json!({
-        "plan_digest": resolve_digest(req, "plan_digest", "plan", result.as_ref()),
-        "spec_digest": resolve_digest(req, "spec_digest", "spec", result.as_ref()),
-        "markdown_digest": markdown_digest_of(req, result.as_ref(), markdown),
-    });
     let manifest = json!({
         "schema": "nf-export-manifest/1",
         "format": format,

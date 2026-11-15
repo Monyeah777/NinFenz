@@ -123,13 +123,12 @@ def test_missing_core_export(tmp_path: Path) -> None:
     )
 
 
-# ---------------------------------------------------------------- 导出器缺失（OPEN，不冒充）
+# ---------------------------------------------------------------- pdf 走平台打印（OPEN，不冒充）
 
-@pytest.mark.parametrize("fmt", ["docx", "pdf"])
-def test_export_docx_pdf_not_implemented(tmp_path: Path, fmt: str) -> None:
-    result = run_cli("--json", "export", str(tmp_path / "missing.json"), "--format", fmt)
+def test_export_pdf_is_platform_print_open(tmp_path: Path) -> None:
+    result = run_cli("--json", "export", str(tmp_path / "missing.json"), "--format", "pdf")
     env = _assert_error(result, "NF-EXP-004", 4)
-    assert "md" in env["error"]["fix"] or "zip" in env["error"]["fix"]
+    assert "平台打印" in env["error"]["message"] or "平台打印" in env["error"]["fix"]
 
 
 def test_selftest_smoke_all_ops(core: Path) -> None:

@@ -109,7 +109,7 @@ src/ext.rs 提供 8 个最小接口 + 默认实现（tests/ext.rs 9 条单测）
 
 1. **assemble --stage 的 section 可达性**：plan.steps 与 spec.sections 之间无映射字段，实现为“按 stage 过滤 plan steps；若 step.params.slots 声明则过滤 section，否则退回全部 section”。—— owner: A2 契约。
 2. **pack-merge 的三方合并策略**：内容级 merge 未实现（modified 默认 take_new，merge action 仅记录意图；keep_mine 取 base 文件）；三类冲突（delete/rename/schema）按稳定 ID 检测，不静默丢。—— owner: A4。
-3. **docx/pdf 导出**（NF-EXP-004 exit4）与 **html/docx/pdf/ocr 导入**（NF-IMP-004 exit3）：按契约首版未实现，不冒充成功。—— owner: A5/A3。
+3. **pdf 导出**不内置（平台打印另存为 PDF；核心 NF-EXP-004 exit4）与 **html/docx/pdf/ocr 导入**（NF-IMP-004 exit3）：按契约首版未实现，不冒充成功。**docx 导出已实现**（`src/docx.rs`：OOXML 确定性 zip，CJK 可用）。—— owner: A5/A3。
 4. **L2 校验**：需环境变量 NF_APP_L2_CMD 指向适配器（stdin 收 {op,level,markdown,spec,plan}、stdout 回 {issues:[...]}）；未配置 → NF-VAL-005 exit4。默认 nf CLI 适配器未接线。—— owner: A2/A5。
 5. **回滚（rollback）不是 CLI op**：核心提供确定性重算/覆盖写；apply→逆 update 再 pack-merge 已验证能回到 base tree（tests/ops_update.rs）；备份清单由 nf-backup/1 API 提供，备份目录指针（backups/<ts>）属 APP 数据目录职责。—— owner: APP 控制面。
 6. **加密 zip**：无专用错误码，按 NF-E-002（未知/不支持）拒绝。—— owner: Lead（如需专用码改 error_codes.json）。

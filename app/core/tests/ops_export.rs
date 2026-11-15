@@ -112,17 +112,6 @@ fn export_traversal_is_exit3() {
 }
 
 #[test]
-fn export_docx_unavailable_is_exit4() {
-    let out = tmpdir("exp_docx");
-    run_err(
-        "export",
-        &json!({"markdown": "x", "format": "docx", "out_dir": pstr(&out)}),
-        4,
-        "NF-EXP-004",
-    );
-}
-
-#[test]
 fn export_unknown_format_is_exit3() {
     let out = tmpdir("exp_unknown");
     run_err(
@@ -158,4 +147,95 @@ fn export_source_digests_explicit() {
     assert_eq!(r["source"]["plan_digest"], nf_app_core::fixtures::hex64('c'));
     assert_eq!(r["source"]["spec_digest"], nf_app_core::fixtures::hex64('d'));
     assert_eq!(nf_app_core::schema::validate("nf-export-manifest", &r).len(), 0);
+}
+
+#[test]
+fn export_docx_is_valid_ooxml_and_deterministic() {
+    let a = tmpdir("exp_docx_a");
+    let b = tmpdir("exp_docx_b");
+    let req = |out: &std::path::PathBuf| {
+        json!({
+            "markdown": "# 标题一\n\n正文**加粗**。\n\n## 小标题\n\n- 列表一\n- 列表二\n",
+            "format": "docx",
+            "out_dir": pstr(out),
+            "title": "演示标题"
+        })
+    };
+    let ra = run_ok("export", &req(&a));
+    let rb = run_ok("export", &req(&b));
+    assert_eq!(ra["format"], "docx");
+    assert_eq!(ra["files"][0]["name"], "result.docx");
+    let ba = std::fs::read(a.join("result.docx")).unwrap();
+    let bb = std::fs::read(b.join("result.docx")).unwrap();
+    assert_eq!(ba, bb, "同输入两次 docx 必须逐字节一致");
+    assert_eq!(ra["files"][0]["sha256"], nf_app_core::canonical::sha256_hex(&ba));
+    let entries = nf_app_core::zipsec::read_zip_bytes(&ba).unwrap();
+    let names: Vec<&str> = entries.iter().map(|e| e.name.as_str()).collect();
+    for need in [
+        "[Content_Types].xml",
+        "_rels/.rels",
+        "word/document.xml",
+        "word/styles.xml",
+        "docProps/core.xml",
+    ] {
+        assert!(names.contains(&need), "docx 缺 entry {need}（实有 {names:?}）");
+    }
+    let doc = entries
+        .iter()
+        .find(|e| e.name == "word/document.xml")
+        .map(|e| String::from_utf8_lossy(&e.data).to_string())
+        .unwrap();
+    assert!(doc.contains("Heading1"), "一级标题应用 Heading1 样式");
+    assert!(doc.contains("标题一"));
+    assert!(doc.contains("• 列表一"), "列表应转为项目符号段落");
+    assert_eq!(nf_app_core::schema::validate("nf-export-manifest", &ra).len(), 0);
+}
+
+#[test]
+fn export_skill_pack_contains_scaffold() {
+    let out = tmpdir("exp_skill");
+    let r = run_ok(
+        "export",
+        &json!({
+            "markdown": "# 产物\n正文\n",
+            "format": "skill",
+            "out_dir": pstr(&out),
+            "title": "演示技能",
+            "project_id": "demo-project",
+            "manifest": true
+        }),
+    );
+    assert_eq!(r["format"], "skill");
+    assert_eq!(r["files"][0]["name"], "result.skill.zip");
+    let bytes = std::fs::read(out.join("result.skill.zip")).unwrap();
+    assert_eq!(r["files"][0]["sha256"], nf_app_core::canonical::sha256_hex(&bytes));
+    let entries = nf_app_core::zipsec::read_zip_bytes(&bytes).unwrap();
+    let names: Vec<&str> = entries.iter().map(|e| e.name.as_str()).collect();
+    for need in ["SKILL.md", "mcp.json", "README.md", "result.md"] {
+        assert!(names.contains(&need), "skill 包缺 entry {need}（实有 {names:?}）");
+    }
+    let mcp: serde_json::Value = serde_json::from_slice(
+        &entries
+            .iter()
+            .find(|e| e.name == "mcp.json")
+            .map(|e| e.data.clone())
+            .unwrap(),
+    )
+    .unwrap();
+    assert_eq!(mcp["schema"], "nf-mcp-scaffold/1");
+    assert_eq!(mcp["server"]["transport"], "stdio");
+    assert_eq!(mcp["provenance"]["markdown_digest"], r["source"]["markdown_digest"]);
+    assert_eq!(nf_app_core::schema::validate("nf-export-manifest", &r).len(), 0);
+    assert!(out.join("manifest.json").is_file());
+}
+
+#[test]
+fn export_pdf_is_explicit_open_exit4() {
+    let out = tmpdir("exp_pdf");
+    run_err(
+        "export",
+        &json!({"markdown": "# t\n", "format": "pdf", "out_dir": pstr(&out)}),
+        4,
+        "NF-EXP-004",
+    );
 }

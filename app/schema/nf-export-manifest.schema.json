@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ninfenz.dev/app/schema/nf-export-manifest.schema.json",
   "title": "NF 导出清单（nf-export-manifest/1）",
-  "description": "导出面清单：输出件摘要 + 来源 plan/spec digest；同输入同字节（禁时间戳）。",
+  "description": "导出面清单：输出件摘要 + 来源 plan/spec digest；同输入同字节（禁时间戳）。format=skill 表示 skill/MCP 脚手架包（result.skill.zip）；pdf 目前由平台打印提供（核心不产 PDF，OPEN）。",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -21,7 +21,8 @@
         "zip",
         "json",
         "docx",
-        "pdf"
+        "pdf",
+        "skill"
       ]
     },
     "files": {

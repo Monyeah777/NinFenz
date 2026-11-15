@@ -51,7 +51,7 @@ PowerShell：
 | author protocol 或 graph 或 spec | 条款开关/字段默认值；节点·边·权重增删改（先删后加）；槽位约束/预算。每次编辑后跑核心校验，失败不落盘 | 1 校验失败 |
 | assemble PROJECT | 核心 graph-compile + assemble；写 result.md / result.meta.json / plan.nfplan.json，刷新 assembly 引用并推进状态 | 1 摘要不符/必填缺失 |
 | validate --level L0 或 L1 | nf-validate-report/1（默认项目目录 report-LEVEL.nfreport.json）；`--record` 通过时推进到 validated | 1 fail；4 L2 不可用 |
-| export --format md 或 zip 或 json | 核心 export；manifest 输出件摘要+来源 digest；zip 逐字节确定（mtime 1980、0644、path 升序） | 4 docx/pdf（NF-EXP-004，OPEN） |
+| export --format md/zip/json/docx/skill | 核心 export；manifest 输出件摘要+来源 digest；zip/docx/skill 包逐字节确定（mtime 1980、0644、path 升序）；skill = SKILL.md+mcp.json+README.md 脚手架 | 4 pdf（平台打印；NF-EXP-004，OPEN） |
 | share prompt 或 markdown 或 json | 分享文本/文件；绝对路径/家目录/用户名/邮箱/密钥模式脱敏，脱敏后仍命中则 fail-closed（NF-E-002） | 2 |
 | pack update 或 apply 或 rollback | diff → 冲突（默认 defer，未裁决 NF-PCK-006/exit 1）→ decisions 应用；`--backup` 本地备份；回滚校验摘要/目标（NF-PCK-007/exit 2）；apply 前后复算 base tree（base 只读，变了 NF-PCK-004/exit 3） | 1/2/3 |
 | ccos task 或 import-result 或 review | ccos-task/1（项目必须 validated）；结果回钉 task_digest；人审 pending→approved/rejected，approve 必须 reviewer+note，绑定 subject_digest | 1 回钉不符/未人审 |
@@ -85,7 +85,7 @@ PowerShell：
 
 ## OPEN（明确未实现，不冒充）
 
-1. export --format docx 或 pdf：导出器未接入 → NF-EXP-004 / exit 4（不生成伪文件）。
+1. export --format pdf：核心不内置 PDF → NF-EXP-004 / exit 4（平台打印另存为 PDF；不生成伪文件）。docx/skill 已实现。
 2. assemble --block SEC-##：需要既有 result.md 作为 base_markdown（核心只替换该节、保留其余字节，缺失 → NF-ASM-004）；块编辑后建议重跑 validate L0。
 3. assemble --stage：spec section 与 plan stage 无冻结映射字段，核心按可用信息尽力过滤（OPEN，测试只断言可调用/产物结构）。
 4. ccos 的 QR/本地桥传输：文件/zip 默认，QR 未实现。

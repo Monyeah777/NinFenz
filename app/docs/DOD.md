@@ -36,7 +36,7 @@
 | OPEN-EXTERNAL | 签名/公证/Play 数据安全/macOS 构建（无证书/无 macOS） | lead | `app/scripts/RELEASE_EVIDENCE.md` 留位，不冒充 |
 | OPEN-UNIFFI | UniFFI 依赖本机不可得，改用 JSON-C ABI（ADR-APP-011） | lead | 依赖可得时加 UDL 绑定（不破 ABI） |
 | OPEN-L2 | L2（仓库协议层）校验依赖 `nf` CLI 子进程，本方案默认 L0/L1 | lead | 缺环境 exit 4（NF-VAL-005），语义已实现 |
-| OPEN-DOCXPDF | docx/pdf 导出未实现（首版只 md/zip/json） | lead | exit 4 + NF-EXP-004；次版补导出器探测 |
+| OPEN-PDF | PDF 导出不内置（docx 已实现；pdf 走平台打印另存为 PDF） | lead | 平台打印（Android PrintManager / 桌面 javax.print）；核心 exit 4 + NF-EXP-004，不冒充 |
 | OPEN-CHECK58 | APP 门禁未接入仓库 `verify.sh`（check58） | lead | 前置已满足（`bash verify.sh --checks-only` = PASS=107 WARN=2 FAIL=0）；接入需改 check1–57 之外新增 58 + 版本面/README 三语/PASS 基线联动 + 冻结链——本波未做（可选下一波） |
 | OPEN-DATADIR | 数据目录保留窗口/崩溃恢复（进程死亡恢复）未实现 | lead | 保留策略与恢复测试（A6/Q 后补） |
 | OPEN-MAP-DECISION | map-suggest 决策仅落 sidecar JSON，未接 core 复算 | python-plane | 接 core `map-suggest` 复算并加用例 |

@@ -146,6 +146,18 @@
             "-q"
           ],
           "title": "首闭环 E2E 全绿"
+        },
+        {
+          "id": "q2-export",
+          "kind": "cmd",
+          "argv": [
+            "python",
+            "-m",
+            "pytest",
+            "app/tests/test_export_formats.py",
+            "-q"
+          ],
+          "title": "导出格式：docx（OOXML）/ skill（MCP 脚手架）/ pdf 显式 OPEN 全绿"
         }
       ]
     },
