@@ -163,4 +163,43 @@
     <string name="packcenter_verifying">Verifying…</string>
     <string name="packcenter_detail">Details</string>
     <string name="packcenter_verify_pass">Verified · verdict=%1$s</string>
+
+    <string name="author_tab_protocol">Protocol</string>
+    <string name="author_tab_graph">Pipeline</string>
+    <string name="author_tab_spec">Spec</string>
+    <string name="author_pack_missing_title">Bound pack is not on this device</string>
+    <string name="author_pack_missing_body">Project references %1$s · %2$s, which is not installed or has moved.</string>
+    <string name="author_back">Back</string>
+    <string name="author_pack_label">Pack: %1$s · %2$s</string>
+    <string name="author_preview_note">Local preview: edits are not written back yet (save/undo lands later in W4); checks run in core.</string>
+    <string name="author_go_deliver">Deliver</string>
+    <string name="author_load_error">Failed to read project content: %1$s</string>
+    <string name="author_load_fix">Reinstall the bound pack, or recreate the project</string>
+    <string name="author_clauses">Clauses (%1$d)</string>
+    <string name="author_enable">Enable clause</string>
+    <string name="author_missing">Missing required: %1$s (NF-PRT-003)</string>
+    <string name="author_unknown">Undeclared placeholder: %1$s (NF-PRT-004)</string>
+    <string name="author_required">(required)</string>
+    <string name="author_undo">Undo edit</string>
+    <string name="author_save">Save to project</string>
+    <string name="author_saving">Saving…</string>
+    <string name="author_saved">Overlay saved · %1$s · sha %2$s…</string>
+    <string name="author_diag_fix">Open diagnostics or recreate the project</string>
+    <string name="author_render">Render protocol with core</string>
+    <string name="author_rendering">Rendering…</string>
+    <string name="author_render_results">Rendered clauses (%1$d)</string>
+    <string name="author_nodes">Nodes (%1$d)</string>
+    <string name="author_weight">Weight: %1$d</string>
+    <string name="author_edges">Edges (%1$d)</string>
+    <string name="author_sections">Sections (%1$d)</string>
+    <string name="author_slots">Slots (%1$d)</string>
+    <string name="author_validate_graph">Validate pipeline in core</string>
+    <string name="author_validate_spec">Validate spec in core</string>
+    <string name="author_validating">Validating…</string>
+    <string name="author_module">Module: %1$s · in=%2$s · out=%3$s</string>
+    <string name="author_not_bound">not bound</string>
+    <string name="author_order">order=%1$d · %2$s · slots=%3$s</string>
+    <string name="author_required_label">required</string>
+    <string name="author_optional_label">optional</string>
+    <string name="author_validate_result">Validation: %1$s · issues=%2$d</string>
 </resources>

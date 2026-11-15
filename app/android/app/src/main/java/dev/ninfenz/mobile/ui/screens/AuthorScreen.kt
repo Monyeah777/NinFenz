@@ -19,6 +19,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
+import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -29,6 +30,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.core.CoreError
 import dev.ninfenz.mobile.core.CoreResponse
@@ -58,10 +60,10 @@ import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 
-private enum class AuthorTab(val label: String) {
-    PROTOCOL("协议"),
-    GRAPH("管线"),
-    SPEC("规格")
+private enum class AuthorTab(val labelRes: Int) {
+    PROTOCOL(dev.ninfenz.mobile.R.string.author_tab_protocol),
+    GRAPH(dev.ninfenz.mobile.R.string.author_tab_graph),
+    SPEC(dev.ninfenz.mobile.R.string.author_tab_spec)
 }
 
 /**
@@ -76,9 +78,9 @@ fun AuthorScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onAssem
             NfTopAppBar(title = project.title, onBack = onBack)
             NfEmptyState(
                 icon = Icons.Filled.Info,
-                title = "绑定的 Pack 不在本机",
-                message = "项目引用的 " + project.refs.basePackId + " · " + project.refs.basePackVersion + " 未安装或已移动。",
-                actionLabel = "返回",
+                title = stringResource(dev.ninfenz.mobile.R.string.author_pack_missing_title),
+                message = stringResource(dev.ninfenz.mobile.R.string.author_pack_missing_body, project.refs.basePackId, project.refs.basePackVersion),
+                actionLabel = stringResource(dev.ninfenz.mobile.R.string.author_back),
                 onAction = onBack
             )
         }
@@ -117,31 +119,31 @@ fun AuthorScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onAssem
                         NfStatusChip(projectStatusLabel(project))
                     }
                     Text(
-                        "Pack：" + project.refs.basePackId + " · " + project.refs.basePackVersion,
+                        stringResource(dev.ninfenz.mobile.R.string.author_pack_label, project.refs.basePackId, project.refs.basePackVersion),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        "本地预演：编辑不写回项目（保存/撤销在 W4 后续接入）；校验走核心。",
+                        stringResource(dev.ninfenz.mobile.R.string.author_preview_note),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                        Button(onClick = onAssembly) { Text("去交付") }
+                        Button(onClick = onAssembly) { Text(stringResource(dev.ninfenz.mobile.R.string.author_go_deliver)) }
                     }
                 }
             }
             TabRow(selectedTabIndex = tab) {
                 AuthorTab.entries.forEachIndexed { index, item ->
-                    Tab(selected = tab == index, onClick = { tab = index }, text = { Text(item.label) })
+                    Tab(selected = tab == index, onClick = { tab = index }, text = { Text(stringResource(item.labelRes)) })
                 }
             }
             if (loading) LinearProgressIndicator(modifier = Modifier.fillMaxWidth().padding(horizontal = NfSpacing.page))
             if (loadError != null) {
                 NfErrorCard(
                     "NF-PCK-003",
-                    "读取项目内容失败：" + loadError!!,
-                    "重装绑定的 Pack，或重新创建项目",
+                    stringResource(dev.ninfenz.mobile.R.string.author_load_error, loadError!!),
+                    stringResource(dev.ninfenz.mobile.R.string.author_load_fix),
                     modifier = Modifier.padding(horizontal = NfSpacing.page)
                 )
             }
@@ -184,7 +186,7 @@ private fun ProtocolAuthorContent(
     }
 
     Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.m)) {
-        NfSectionHeader("条款（" + protocol.clauses.size + "）")
+        NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.author_clauses, protocol.clauses.size))
         for (clause in protocol.clauses) {
             NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
                 Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
@@ -193,7 +195,7 @@ private fun ProtocolAuthorContent(
                         NfStatusChip(clause.level)
                     }
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("启用本条", style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
+                        Text(stringResource(dev.ninfenz.mobile.R.string.author_enable), style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
                         Switch(
                             checked = enabled[clause.id] ?: clause.enabled,
                             onCheckedChange = { checked ->
@@ -205,12 +207,12 @@ private fun ProtocolAuthorContent(
                     Text(clause.text, style = MaterialTheme.typography.bodyMedium)
                     val check = ProtocolModel.checkClause(protocol, clause, values)
                     if (!check.ok) {
-                        if (check.missing.isNotEmpty()) Text("缺必填：" + check.missing.joinToString(", ") + "（NF-PRT-003）", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
-                        if (check.unknown.isNotEmpty()) Text("未声明占位符：" + check.unknown.joinToString(", ") + "（NF-PRT-004）", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+                        if (check.missing.isNotEmpty()) Text(stringResource(dev.ninfenz.mobile.R.string.author_missing, check.missing.joinToString(", ")), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+                        if (check.unknown.isNotEmpty()) Text(stringResource(dev.ninfenz.mobile.R.string.author_unknown, check.unknown.joinToString(", ")), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
                     }
                     for (field in protocol.fields.filter { it.clause == clause.id }) {
                         Column {
-                            Text(field.id + " · " + field.label + (if (field.required) "（必填）" else ""), style = MaterialTheme.typography.labelLarge)
+                            Text(field.id + " · " + field.label + (if (field.required) stringResource(dev.ninfenz.mobile.R.string.author_required) else ""), style = MaterialTheme.typography.labelLarge)
                             OutlinedTextField(
                                 value = values[field.id] ?: "",
                                 onValueChange = { text ->
@@ -239,7 +241,7 @@ private fun ProtocolAuthorContent(
                     saveMessage = null
                     saveError = null
                 }
-            ) { Text("撤销编辑") }
+            ) { Text(stringResource(dev.ninfenz.mobile.R.string.author_undo)) }
             Button(
                 enabled = !saving,
                 onClick = {
@@ -250,7 +252,7 @@ private fun ProtocolAuthorContent(
                         val result = store.save(project, pack, enabled, values)
                         when (result) {
                             is SaveOverlayResult.Saved -> {
-                                saveMessage = "已保存 overlay · " + result.status.wire + " · sha " + result.overlaySha256.take(12) + "…"
+                                saveMessage = context.getString(dev.ninfenz.mobile.R.string.author_saved, result.status.wire, result.overlaySha256.take(12))
                                 onSaved()
                             }
                             is SaveOverlayResult.Failure -> saveError = "[" + result.code + "] " + result.message + "；修复：" + result.fix
@@ -258,11 +260,11 @@ private fun ProtocolAuthorContent(
                         saving = false
                     }
                 }
-            ) { Text(if (saving) "保存中…" else "保存到项目") }
+            ) { Text(if (saving) stringResource(dev.ninfenz.mobile.R.string.author_saving) else stringResource(dev.ninfenz.mobile.R.string.author_save)) }
         }
         saveMessage?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
         saveError?.let { message ->
-            NfErrorCard("NF-PCK-003", message, "查看诊断或重新创建项目", modifier = Modifier.padding(horizontal = NfSpacing.page))
+            NfErrorCard("NF-PCK-003", message, stringResource(dev.ninfenz.mobile.R.string.author_diag_fix), modifier = Modifier.padding(horizontal = NfSpacing.page))
         }
         Button(
             enabled = !busy,
@@ -287,12 +289,12 @@ private fun ProtocolAuthorContent(
                     busy = false
                 }
             }
-        ) { Text(if (busy) "渲染中…" else "用核心渲染协议") }
+        ) { Text(if (busy) stringResource(dev.ninfenz.mobile.R.string.author_rendering) else stringResource(dev.ninfenz.mobile.R.string.author_render)) }
         renderError?.let { error ->
             NfErrorCard(error.code, error.message, error.fix, modifier = Modifier.padding(horizontal = NfSpacing.page))
         }
         rendered?.let { lines ->
-            NfSectionHeader("渲染结果（" + lines.size + "）")
+            NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.author_render_results, lines.size))
             for (line in lines) {
                 Text(line, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(horizontal = NfSpacing.page))
             }
@@ -303,13 +305,14 @@ private fun ProtocolAuthorContent(
 @Composable
 private fun GraphAuthorContent(artifacts: AuthorArtifacts) {
     val graph = artifacts.graph
+    val context = androidx.compose.ui.platform.LocalContext.current
     var report by remember { mutableStateOf<String?>(null) }
     var error by remember { mutableStateOf<CoreError?>(null) }
     var busy by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
     Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.m)) {
-        NfSectionHeader("节点（" + graph.nodes.size + "）")
+        NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.author_nodes, graph.nodes.size))
         for (node in graph.nodes) {
             NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
                 Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
@@ -318,15 +321,20 @@ private fun GraphAuthorContent(artifacts: AuthorArtifacts) {
                         NfStatusChip(node.kind)
                     }
                     Text(
-                        "模块：" + (node.moduleId ?: "未绑定") + " · in=" + node.portsIn.joinToString(",") + " · out=" + node.portsOut.joinToString(","),
+                        stringResource(
+                            dev.ninfenz.mobile.R.string.author_module,
+                            node.moduleId ?: stringResource(dev.ninfenz.mobile.R.string.author_not_bound),
+                            node.portsIn.joinToString(","),
+                            node.portsOut.joinToString(",")
+                        ),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    graph.weights[node.id]?.let { Text("权重：" + it, style = MaterialTheme.typography.bodySmall) }
+                    graph.weights[node.id]?.let { Text(stringResource(dev.ninfenz.mobile.R.string.author_weight, it), style = MaterialTheme.typography.bodySmall) }
                 }
             }
         }
-        NfSectionHeader("边（" + graph.edges.size + "）")
+        NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.author_edges, graph.edges.size))
         for (edge in graph.edges) {
             Text(
                 edge.from + "." + edge.fromPort + " → " + edge.to + "." + edge.toPort + "（" + edge.type + "）",
@@ -343,11 +351,11 @@ private fun GraphAuthorContent(artifacts: AuthorArtifacts) {
                 report = null
                 scope.launch {
                     val response = safeCall("graph-validate", buildJsonObject { put("graph", artifacts.graphJson) })
-                    if (response.ok) report = summarizeReport(response) else error = response.error
+                    if (response.ok) report = summarizeReport(context, response) else error = response.error
                     busy = false
                 }
             }
-        ) { Text(if (busy) "校验中…" else "核心校验管线") }
+        ) { Text(if (busy) stringResource(dev.ninfenz.mobile.R.string.author_validating) else stringResource(dev.ninfenz.mobile.R.string.author_validate_graph)) }
         report?.let { text -> Text(text, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
         error?.let { err -> NfErrorCard(err.code, err.message, err.fix, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
     }
@@ -356,29 +364,35 @@ private fun GraphAuthorContent(artifacts: AuthorArtifacts) {
 @Composable
 private fun SpecAuthorContent(artifacts: AuthorArtifacts) {
     val spec = artifacts.spec
+    val context = androidx.compose.ui.platform.LocalContext.current
     var report by remember { mutableStateOf<String?>(null) }
     var error by remember { mutableStateOf<CoreError?>(null) }
     var busy by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
     Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.m)) {
-        NfSectionHeader("章节（" + spec.sections.size + "）")
+        NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.author_sections, spec.sections.size))
         for (section in spec.sections) {
             NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
                 Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
                     Text(section.id + " · " + section.title, style = MaterialTheme.typography.titleMedium)
                     Text(
-                        "order=" + section.order + (if (section.required) " · 必填" else " · 可选") + " · slots=" + section.slots.joinToString(","),
+                        stringResource(
+                            dev.ninfenz.mobile.R.string.author_order,
+                            section.order,
+                            if (section.required) stringResource(dev.ninfenz.mobile.R.string.author_required_label) else stringResource(dev.ninfenz.mobile.R.string.author_optional_label),
+                            section.slots.joinToString(",")
+                        ),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
         }
-        NfSectionHeader("槽位（" + spec.slots.size + "）")
+        NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.author_slots, spec.slots.size))
         for (slot in spec.slots) {
             Text(
-                slot.id + " · " + slot.name + " · " + slot.kind + (if (slot.required) " · 必填" else ""),
+                slot.id + " · " + slot.name + " · " + slot.kind + (if (slot.required) " · " + stringResource(dev.ninfenz.mobile.R.string.author_required_label) else ""),
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(horizontal = NfSpacing.page)
             )
@@ -392,20 +406,21 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts) {
                 report = null
                 scope.launch {
                     val response = safeCall("spec-validate", buildJsonObject { put("spec", artifacts.specJson) })
-                    if (response.ok) report = summarizeReport(response) else error = response.error
+                    if (response.ok) report = summarizeReport(context, response) else error = response.error
                     busy = false
                 }
             }
-        ) { Text(if (busy) "校验中…" else "核心校验规格") }
+        ) { Text(if (busy) stringResource(dev.ninfenz.mobile.R.string.author_validating) else stringResource(dev.ninfenz.mobile.R.string.author_validate_spec)) }
         report?.let { text -> Text(text, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
         error?.let { err -> NfErrorCard(err.code, err.message, err.fix, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
     }
 }
 
-private fun summarizeReport(response: CoreResponse): String {
+private fun summarizeReport(context: Context, response: CoreResponse): String {
     val result = response.resultObject()
     val verdict = result?.get("verdict")?.jsonPrimitive?.content ?: "pass"
     val summary = result?.get("summary")?.toString() ?: ""
     val issues = result?.get("issues")?.let { if (it is JsonArray) it.size else 0 } ?: 0
-    return "校验结果：" + verdict + " · issues=" + issues + (if (summary.isNotBlank()) " · " + summary else "")
+    val line = context.getString(dev.ninfenz.mobile.R.string.author_validate_result, verdict, issues)
+    return line + (if (summary.isNotBlank()) " · " + summary else "")
 }

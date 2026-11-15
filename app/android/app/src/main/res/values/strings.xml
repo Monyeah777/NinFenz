@@ -163,4 +163,43 @@
     <string name="packcenter_verifying">校验中…</string>
     <string name="packcenter_detail">详情</string>
     <string name="packcenter_verify_pass">校验通过 · verdict=%1$s</string>
+
+    <string name="author_tab_protocol">协议</string>
+    <string name="author_tab_graph">管线</string>
+    <string name="author_tab_spec">规格</string>
+    <string name="author_pack_missing_title">绑定的 Pack 不在本机</string>
+    <string name="author_pack_missing_body">项目引用的 %1$s · %2$s 未安装或已移动。</string>
+    <string name="author_back">返回</string>
+    <string name="author_pack_label">Pack：%1$s · %2$s</string>
+    <string name="author_preview_note">本地预演：编辑不写回项目（保存/撤销在 W4 后续接入）；校验走核心。</string>
+    <string name="author_go_deliver">去交付</string>
+    <string name="author_load_error">读取项目内容失败：%1$s</string>
+    <string name="author_load_fix">重装绑定的 Pack，或重新创建项目</string>
+    <string name="author_clauses">条款（%1$d）</string>
+    <string name="author_enable">启用本条</string>
+    <string name="author_missing">缺必填：%1$s（NF-PRT-003）</string>
+    <string name="author_unknown">未声明占位符：%1$s（NF-PRT-004）</string>
+    <string name="author_required">（必填）</string>
+    <string name="author_undo">撤销编辑</string>
+    <string name="author_save">保存到项目</string>
+    <string name="author_saving">保存中…</string>
+    <string name="author_saved">已保存 overlay · %1$s · sha %2$s…</string>
+    <string name="author_diag_fix">查看诊断或重新创建项目</string>
+    <string name="author_render">用核心渲染协议</string>
+    <string name="author_rendering">渲染中…</string>
+    <string name="author_render_results">渲染结果（%1$d）</string>
+    <string name="author_nodes">节点（%1$d）</string>
+    <string name="author_weight">权重：%1$d</string>
+    <string name="author_edges">边（%1$d）</string>
+    <string name="author_sections">章节（%1$d）</string>
+    <string name="author_slots">槽位（%1$d）</string>
+    <string name="author_validate_graph">核心校验管线</string>
+    <string name="author_validate_spec">核心校验规格</string>
+    <string name="author_validating">校验中…</string>
+    <string name="author_module">模块：%1$s · in=%2$s · out=%3$s</string>
+    <string name="author_not_bound">未绑定</string>
+    <string name="author_order">order=%1$d · %2$s · slots=%3$s</string>
+    <string name="author_required_label">必填</string>
+    <string name="author_optional_label">可选</string>
+    <string name="author_validate_result">校验结果：%1$s · issues=%2$d</string>
 </resources>
