@@ -252,7 +252,7 @@
       "pass": 3
     }
   },
-  "head": "f7bfe3ae5ca513df74413d498864dfe0b29a9f60",
+  "head": "7a9e7653260e6cf0a5f1c8b19aa379da91f37e32",
   "open_items": [
     {
       "id": "S11",
@@ -868,9 +868,9 @@
         "app/android/app/src/test/java/dev/ninfenz/mobile/data/SearchIndexTest.kt",
         "app/android/app/src/test/java/dev/ninfenz/mobile/ui/AdaptiveLayoutTest.kt",
         "app/android/app/src/test/java/dev/ninfenz/mobile/ui/ComposeSmokeTest.kt",
+        "app/android/app/src/test/java/dev/ninfenz/mobile/ui/EnglishBodyLocaleTest.kt",
         "app/android/app/src/test/java/dev/ninfenz/mobile/ui/ShellEnglishLocaleTest.kt",
-        "app/android/app/src/test/java/dev/ninfenz/mobile/ui/ShellNavigationComposeTest.kt",
-        "app/android/app/src/test/java/dev/ninfenz/mobile/ui/ShellSizeMatrixTest.kt"
+        "app/android/app/src/test/java/dev/ninfenz/mobile/ui/ShellNavigationComposeTest.kt"
       ],
       "gate": "QA5",
       "kind": "glob_min",
