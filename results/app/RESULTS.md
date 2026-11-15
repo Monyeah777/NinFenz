@@ -25,11 +25,12 @@
 | 项 | 结果 |
 |---|---|
 | APK | app-debug.apk = 19,011,427 B；sha256 ecc56ba8a17e797476a1f172396f8608aa108177386ed5f2b2260b93124d5937 |
-| JVM 测试 | 113 条全绿（v1 基线 42 + v0.02 新增 71；含 Robolectric/Compose） |
+| JVM 测试 | 123 条全绿（v1 基线 42 + v0.02 新增 81；含 Robolectric/Compose/Paparazzi） |
 | 构建 | ./gradlew :app:assembleDebug 成功；:app:testDebugUnitTest 110/110 |
 | i18n | 全部屏主要文案已资源化 + values-en；「我的」zh/en/跟随系统切换；动态取色开关；库/Pack 中心下拉刷新；节点删除 Snackbar 撤销 + 触觉；expanded 双栏（主列表+详情）；导航 Crossfade（NfMotion.MEDIUM_MS）；统一 loading/skeleton 组件；少量错误/技术提示仍内联（OPEN-I18N-BODY 尾项） |
 | 适配 | compact/medium/expanded 三档导航 + 9 组窗口尺寸语义矩阵 |
 | a11y | contentDescription/48dp（A11yComposeTest 3）、200% 字号（LargeFont 1）、WCAG AA 对比度（Contrast 3） |
+| 截图基线 | Paparazzi 10 张（360/700/900 × 640/800/900/1000），verify 模式下纳入 testDebugUnitTest |
 | app/gates | 7/7 gate PASS、FAIL=0（QA0 10 checks、QA5 5 checks；含 v0.02 UX/i18n/测试矩阵检查） |
 
 ### 0.3 状态
@@ -49,7 +50,7 @@
 | id | 内容 | owner | next |
 |---|---|---|---|
 | OPEN-I18N-BODY | 全部屏主要文案已资源化；少量错误/技术提示仍内联；应用内 zh/en 切换已做，系统 per-app locale 入口未做 | lead | 抽取尾项 strings + localeConfig |
-| OPEN-SCREENSHOT | 9 组尺寸已有语义矩阵；像素截图基线未接。已实测 Robolectric NATIVE 下 Compose captureToImage 超时（ComposeTimeoutException），该路径不可用 | lead | 需 Paparazzi/Roborazzi 或设备截图 |
+| SCREENSHOT | Paparazzi 2.0.0-alpha02 已接入，10 张截图基线随 testDebugUnitTest verify；更新基线用 recordPaparazziDebug | lead | 完成（本提交） |
 | OPEN-DEVICE | 真机/模拟器首启/分享/折叠/TalkBack/性能 | lead | 设备到位后跑 DEVICE_MATRIX 清单 |
 | OPEN-DRAFT-PROJECT | 导入草稿→项目转换未定义（契约无 import→project 字段） | lead | 需 v1 §15 契约变更评估 |
 | OPEN-REVIEWED | CCOS approve 时 exported 项目回写 reviewed；非 exported 项目跳过（不伪造） | lead | 如需强制 reviewed，补 project-validate 前置条件 |

@@ -17,7 +17,7 @@
 | JVM 测试 | pass | 110/110（含 Robolectric/Compose） |
 | 自适应/9 组尺寸语义矩阵 | pass（语义层） | ShellNavigation/ShellSizeMatrix 测试 |
 | i18n/主题切换（全部屏主要文案） | partial | values-en + 资源化；我的支持 zh/en/system + 动态取色；少量错误/技术提示仍内联（OPEN-I18N-BODY 尾项） |
-| 像素截图矩阵 | OPEN | OPEN-SCREENSHOT；Robolectric captureToImage 实测超时，需 Paparazzi/Roborazzi/设备 |
+| 像素截图矩阵 | pass（本机） | Paparazzi 10 张基线（360/700/900 × 640/800/900/1000），testDebugUnitTest verify |
 | 真机/模拟器 | OPEN-TOOLCHAIN | OPEN-DEVICE |
 | 草稿→项目 | OPEN | OPEN-DRAFT-PROJECT |
 | app/gates v0.02 UX 检查 | pass | 7/7 gate PASS、FAIL=0；GATES/SELF_AUDIT 已更新（本提交） |
