@@ -28,7 +28,7 @@
 | 设置/诊断 | pass：backend=jna-native、ABI=nf-app-core/1、原生库已加载、错误码 58 条 |
 | Pack 中心 | pass：已装 1，逐 Pack 校验返回 校验通过 · verdict=pass |
 | 我的/深色 | pass：深色主题整体生效 |
-| 我的/English | partial：section/语言选项切英文，但主题标签仍中文（i18n 尾项） |
+| 我的/English | pass（修复后）：Appearance 下 System/Light/Dark、Language 选项均为英文 |
 | 动态取色 | pass：Android 12+ 开关生效 |
 | 分享接收 | **已修复**：此前确认分享会崩（No ActivityResultRegistryOwner），且 payload 未传入导入；修复后显示「已接收分享载荷」+ markdown 85% 预览 |
 | 新建项目 | pass：Create→从 Pack 新建→标题 device-test→创建，生成 devicetest.nfproject.json |
@@ -50,7 +50,7 @@
 - 撤销复测通过：F-002 由「冷静x」点撤销回到「冷静」；此前失败是键盘未收起时点到了键盘。
 - English 主题标签已资源化（System/Light/Dark）。
 - 新增盲区修复：jniLibs .so 陈旧导致 docx 被误报 NF-EXP-004；重跑 build_core_android.sh 后恢复。
-- 未跑：CCOS 任务/结果/人审、分享 chooser、折叠屏（本机非折叠）、TalkBack、对比度实测。
+- 未跑：CCOS 文件选择器流程（DocumentsUI 多级选择耗时）、分享 chooser 实点、折叠屏（本机非折叠）、TalkBack 语音走查、对比度实测。
 - 本机无第二台设备/折叠屏，设备矩阵仍不完整。
 
 ## 5. 复跑入口
