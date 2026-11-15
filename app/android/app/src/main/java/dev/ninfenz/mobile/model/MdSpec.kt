@@ -3,6 +3,9 @@ package dev.ninfenz.mobile.model
 import dev.ninfenz.mobile.core.J
 import dev.ninfenz.mobile.core.ModelException
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 
 data class SpecSection(val id: String, val title: String, val order: Int, val required: Boolean, val slots: List<String>)
 data class SpecSlot(val id: String, val name: String, val section: String, val kind: String, val required: Boolean)
@@ -85,5 +88,32 @@ object SpecModel {
             }
         }
         return issues
+    }
+
+    /** 回写 nf-md-spec/1（供核心 spec-validate / 项目引用保存使用）。 */
+    fun toJson(s: MdSpec): JsonObject = buildJsonObject {
+        put("schema", SCHEMA)
+        put("id", s.id)
+        put("title", s.title)
+        put("version", s.version)
+        put("heading_level", s.headingLevel)
+        put("sections", buildJsonArray {
+            for (section in s.sections) add(buildJsonObject {
+                put("id", section.id)
+                put("title", section.title)
+                put("order", section.order)
+                put("required", section.required)
+                put("slots", buildJsonArray { for (slot in section.slots) add(kotlinx.serialization.json.JsonPrimitive(slot)) })
+            })
+        })
+        put("slots", buildJsonArray {
+            for (slot in s.slots) add(buildJsonObject {
+                put("id", slot.id)
+                put("name", slot.name)
+                put("section", slot.section)
+                put("kind", slot.kind)
+                put("required", slot.required)
+            })
+        })
     }
 }

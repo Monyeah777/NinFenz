@@ -19,11 +19,13 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -35,15 +37,25 @@ import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.core.CoreError
 import dev.ninfenz.mobile.core.CoreResponse
 import dev.ninfenz.mobile.core.J
+import dev.ninfenz.mobile.data.AuthorArtifactStore
 import dev.ninfenz.mobile.data.AuthorArtifacts
+import dev.ninfenz.mobile.data.SaveArtifactResult
 import dev.ninfenz.mobile.data.AuthorArtifactsLoader
 import dev.ninfenz.mobile.data.AuthorOverlayStore
 import dev.ninfenz.mobile.data.PackEntry
 import dev.ninfenz.mobile.data.SaveOverlayResult
+import dev.ninfenz.mobile.model.GraphEdge
+import dev.ninfenz.mobile.model.GraphModel
+import dev.ninfenz.mobile.model.GraphNode
+import dev.ninfenz.mobile.model.PipelineGraph
 import dev.ninfenz.mobile.model.Project
+import dev.ninfenz.mobile.model.SpecModel
+import dev.ninfenz.mobile.model.SpecSection
+import dev.ninfenz.mobile.model.SpecSlot
 import dev.ninfenz.mobile.model.ProtocolModel
 import dev.ninfenz.mobile.ui.components.NfCard
 import dev.ninfenz.mobile.ui.components.NfEmptyState
+import dev.ninfenz.mobile.ui.components.FormTextField
 import dev.ninfenz.mobile.ui.components.NfErrorCard
 import dev.ninfenz.mobile.ui.components.NfSectionHeader
 import dev.ninfenz.mobile.ui.components.NfStatusChip
@@ -151,8 +163,8 @@ fun AuthorScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onAssem
             if (current != null) {
                 when (AuthorTab.entries[tab]) {
                     AuthorTab.PROTOCOL -> ProtocolAuthorContent(current, project, pack, onSaved)
-                    AuthorTab.GRAPH -> GraphAuthorContent(current)
-                    AuthorTab.SPEC -> SpecAuthorContent(current)
+                    AuthorTab.GRAPH -> GraphAuthorContent(current, project, onSaved)
+                    AuthorTab.SPEC -> SpecAuthorContent(current, project, onSaved)
                 }
             }
         }
@@ -303,22 +315,48 @@ private fun ProtocolAuthorContent(
 }
 
 @Composable
-private fun GraphAuthorContent(artifacts: AuthorArtifacts) {
-    val graph = artifacts.graph
+private fun GraphAuthorContent(artifacts: AuthorArtifacts, project: Project, onSaved: () -> Unit) {
     val context = androidx.compose.ui.platform.LocalContext.current
+    var graph by remember(artifacts.graphJson) { mutableStateOf(artifacts.graph) }
+    val undo = remember { mutableStateListOf<PipelineGraph>() }
+    val redo = remember { mutableStateListOf<PipelineGraph>() }
+    fun apply(next: PipelineGraph) {
+        undo.add(graph)
+        redo.clear()
+        graph = next
+    }
     var report by remember { mutableStateOf<String?>(null) }
     var error by remember { mutableStateOf<CoreError?>(null) }
     var busy by remember { mutableStateOf(false) }
+    var savedMsg by remember { mutableStateOf<String?>(null) }
+    var nodeId by remember { mutableStateOf("") }
+    var nodeTitle by remember { mutableStateOf("") }
+    var nodeKind by remember { mutableStateOf("stage") }
+    var nodeModule by remember { mutableStateOf("") }
+    var edgeFrom by remember { mutableStateOf("") }
+    var edgeTo by remember { mutableStateOf("") }
+    var edgeFromPort by remember { mutableStateOf("out") }
+    var edgeToPort by remember { mutableStateOf("in") }
     val scope = rememberCoroutineScope()
+    val store = remember { AuthorArtifactStore(context.filesDir) }
 
     Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.m)) {
         NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.author_nodes, graph.nodes.size))
         for (node in graph.nodes) {
             NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
                 Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
-                    Row {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(node.id + " · " + node.title, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
                         NfStatusChip(node.kind)
+                        TextButton(onClick = {
+                            apply(
+                                graph.copy(
+                                    nodes = graph.nodes.filter { it.id != node.id },
+                                    edges = graph.edges.filter { it.from != node.id && it.to != node.id },
+                                    weights = graph.weights - node.id
+                                )
+                            )
+                        }) { Text(stringResource(dev.ninfenz.mobile.R.string.author_delete)) }
                     }
                     Text(
                         stringResource(
@@ -336,12 +374,79 @@ private fun GraphAuthorContent(artifacts: AuthorArtifacts) {
         }
         NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.author_edges, graph.edges.size))
         for (edge in graph.edges) {
-            Text(
-                edge.from + "." + edge.fromPort + " → " + edge.to + "." + edge.toPort + "（" + edge.type + "）",
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(horizontal = NfSpacing.page)
-            )
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = NfSpacing.page)) {
+                Text(
+                    edge.from + "." + edge.fromPort + " → " + edge.to + "." + edge.toPort + "（" + edge.type + "）",
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.weight(1f)
+                )
+                TextButton(onClick = { apply(graph.copy(edges = graph.edges.filter { it.id != edge.id })) }) {
+                    Text(stringResource(dev.ninfenz.mobile.R.string.author_delete))
+                }
+            }
         }
+
+        NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.author_add_node))
+        Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs), modifier = Modifier.padding(horizontal = NfSpacing.page)) {
+            FormTextField(label = stringResource(dev.ninfenz.mobile.R.string.author_node_id), value = nodeId, onValueChange = { nodeId = it })
+            FormTextField(label = stringResource(dev.ninfenz.mobile.R.string.author_node_title), value = nodeTitle, onValueChange = { nodeTitle = it })
+            FormTextField(label = stringResource(dev.ninfenz.mobile.R.string.author_node_kind), value = nodeKind, onValueChange = { nodeKind = it })
+            FormTextField(label = stringResource(dev.ninfenz.mobile.R.string.author_node_module), value = nodeModule, onValueChange = { nodeModule = it })
+            Button(onClick = {
+                if (nodeId.isNotBlank()) {
+                    val module = nodeModule.trim().ifBlank { null }
+                    apply(
+                        graph.copy(
+                            nodes = graph.nodes + GraphNode(
+                                id = nodeId.trim(), kind = nodeKind.trim().ifBlank { "stage" },
+                                title = nodeTitle.trim().ifBlank { nodeId.trim() },
+                                portsIn = emptyList(), portsOut = listOf("out"),
+                                moduleId = module, moduleVersion = null, moduleDigest = null
+                            )
+                        )
+                    )
+                    nodeId = ""
+                    nodeTitle = ""
+                    nodeModule = ""
+                }
+            }) { Text(stringResource(dev.ninfenz.mobile.R.string.author_add_node)) }
+        }
+
+        NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.author_add_edge))
+        Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs), modifier = Modifier.padding(horizontal = NfSpacing.page)) {
+            FormTextField(label = stringResource(dev.ninfenz.mobile.R.string.author_edge_from), value = edgeFrom, onValueChange = { edgeFrom = it })
+            FormTextField(label = stringResource(dev.ninfenz.mobile.R.string.author_edge_to), value = edgeTo, onValueChange = { edgeTo = it })
+            FormTextField(label = stringResource(dev.ninfenz.mobile.R.string.author_edge_from_port), value = edgeFromPort, onValueChange = { edgeFromPort = it })
+            FormTextField(label = stringResource(dev.ninfenz.mobile.R.string.author_edge_to_port), value = edgeToPort, onValueChange = { edgeToPort = it })
+            Button(onClick = {
+                if (edgeFrom.isNotBlank() && edgeTo.isNotBlank()) {
+                    val next = (graph.edges.mapNotNull { Regex("E(\\d+)").matchEntire(it.id)?.groupValues?.get(1)?.toIntOrNull() }.maxOrNull() ?: 0) + 1
+                    val id = "E" + next.toString().padStart(2, '0')
+                    apply(
+                        graph.copy(
+                            edges = graph.edges + GraphEdge(
+                                id = id, from = edgeFrom.trim(), to = edgeTo.trim(),
+                                fromPort = edgeFromPort.trim(), toPort = edgeToPort.trim(), type = "data"
+                            )
+                        )
+                    )
+                }
+            }) { Text(stringResource(dev.ninfenz.mobile.R.string.author_add_edge)) }
+        }
+
+        Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+            TextButton(enabled = undo.isNotEmpty(), onClick = {
+                val previous = undo.removeAt(undo.lastIndex)
+                redo.add(graph)
+                graph = previous
+            }) { Text(stringResource(dev.ninfenz.mobile.R.string.author_undo)) }
+            TextButton(enabled = redo.isNotEmpty(), onClick = {
+                val next = redo.removeAt(redo.lastIndex)
+                undo.add(graph)
+                graph = next
+            }) { Text(stringResource(dev.ninfenz.mobile.R.string.author_redo)) }
+        }
+
         Button(
             enabled = !busy,
             modifier = Modifier.padding(horizontal = NfSpacing.page),
@@ -350,32 +455,70 @@ private fun GraphAuthorContent(artifacts: AuthorArtifacts) {
                 error = null
                 report = null
                 scope.launch {
-                    val response = safeCall("graph-validate", buildJsonObject { put("graph", artifacts.graphJson) })
+                    val response = safeCall("graph-validate", buildJsonObject { put("graph", GraphModel.toJson(graph)) })
                     if (response.ok) report = summarizeReport(context, response) else error = response.error
                     busy = false
                 }
             }
         ) { Text(if (busy) stringResource(dev.ninfenz.mobile.R.string.author_validating) else stringResource(dev.ninfenz.mobile.R.string.author_validate_graph)) }
+
+        Button(
+            enabled = !busy,
+            modifier = Modifier.padding(horizontal = NfSpacing.page),
+            onClick = {
+                busy = true
+                error = null
+                savedMsg = null
+                scope.launch {
+                    when (val result = store.saveGraph(project, graph)) {
+                        is SaveArtifactResult.Saved -> {
+                            savedMsg = context.getString(dev.ninfenz.mobile.R.string.author_saved_artifact, result.path, result.sha256.take(12))
+                            onSaved()
+                        }
+                        is SaveArtifactResult.Failure -> error = CoreError(result.code, result.message, result.fix, null, 1)
+                    }
+                    busy = false
+                }
+            }
+        ) { Text(if (busy) stringResource(dev.ninfenz.mobile.R.string.author_saving_artifact) else stringResource(dev.ninfenz.mobile.R.string.author_save_graph)) }
+
         report?.let { text -> Text(text, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
+        savedMsg?.let { text -> Text(text, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
         error?.let { err -> NfErrorCard(err.code, err.message, err.fix, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
     }
 }
 
 @Composable
-private fun SpecAuthorContent(artifacts: AuthorArtifacts) {
-    val spec = artifacts.spec
+private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSaved: () -> Unit) {
     val context = androidx.compose.ui.platform.LocalContext.current
+    var spec by remember(artifacts.specJson) { mutableStateOf(artifacts.spec) }
+    val undo = remember { mutableStateListOf<dev.ninfenz.mobile.model.MdSpec>() }
+    val redo = remember { mutableStateListOf<dev.ninfenz.mobile.model.MdSpec>() }
+    fun apply(next: dev.ninfenz.mobile.model.MdSpec) {
+        undo.add(spec)
+        redo.clear()
+        spec = next
+    }
     var report by remember { mutableStateOf<String?>(null) }
     var error by remember { mutableStateOf<CoreError?>(null) }
     var busy by remember { mutableStateOf(false) }
+    var savedMsg by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
+    val store = remember { AuthorArtifactStore(context.filesDir) }
 
     Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.m)) {
         NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.author_sections, spec.sections.size))
         for (section in spec.sections) {
             NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
                 Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
-                    Text(section.id + " · " + section.title, style = MaterialTheme.typography.titleMedium)
+                    Text(section.id + " · order=" + section.order, style = MaterialTheme.typography.bodySmall)
+                    FormTextField(
+                        label = stringResource(dev.ninfenz.mobile.R.string.author_section_title),
+                        value = section.title,
+                        onValueChange = { newTitle ->
+                            apply(spec.copy(sections = spec.sections.map { if (it.id == section.id) it.copy(title = newTitle) else it }))
+                        }
+                    )
                     Text(
                         stringResource(
                             dev.ninfenz.mobile.R.string.author_order,
@@ -391,11 +534,30 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts) {
         }
         NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.author_slots, spec.slots.size))
         for (slot in spec.slots) {
-            Text(
-                slot.id + " · " + slot.name + " · " + slot.kind + (if (slot.required) " · " + stringResource(dev.ninfenz.mobile.R.string.author_required_label) else ""),
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(horizontal = NfSpacing.page)
-            )
+            NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
+                Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                    Text(slot.id + " · " + slot.kind + (if (slot.required) " · " + stringResource(dev.ninfenz.mobile.R.string.author_required_label) else ""), style = MaterialTheme.typography.bodySmall)
+                    FormTextField(
+                        label = stringResource(dev.ninfenz.mobile.R.string.author_slot_name),
+                        value = slot.name,
+                        onValueChange = { newName ->
+                            apply(spec.copy(slots = spec.slots.map { if (it.id == slot.id) it.copy(name = newName) else it }))
+                        }
+                    )
+                }
+            }
+        }
+        Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+            TextButton(enabled = undo.isNotEmpty(), onClick = {
+                val previous = undo.removeAt(undo.lastIndex)
+                redo.add(spec)
+                spec = previous
+            }) { Text(stringResource(dev.ninfenz.mobile.R.string.author_undo)) }
+            TextButton(enabled = redo.isNotEmpty(), onClick = {
+                val next = redo.removeAt(redo.lastIndex)
+                undo.add(spec)
+                spec = next
+            }) { Text(stringResource(dev.ninfenz.mobile.R.string.author_redo)) }
         }
         Button(
             enabled = !busy,
@@ -405,13 +567,33 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts) {
                 error = null
                 report = null
                 scope.launch {
-                    val response = safeCall("spec-validate", buildJsonObject { put("spec", artifacts.specJson) })
+                    val response = safeCall("spec-validate", buildJsonObject { put("spec", SpecModel.toJson(spec)) })
                     if (response.ok) report = summarizeReport(context, response) else error = response.error
                     busy = false
                 }
             }
         ) { Text(if (busy) stringResource(dev.ninfenz.mobile.R.string.author_validating) else stringResource(dev.ninfenz.mobile.R.string.author_validate_spec)) }
+        Button(
+            enabled = !busy,
+            modifier = Modifier.padding(horizontal = NfSpacing.page),
+            onClick = {
+                busy = true
+                error = null
+                savedMsg = null
+                scope.launch {
+                    when (val result = store.saveSpec(project, spec)) {
+                        is SaveArtifactResult.Saved -> {
+                            savedMsg = context.getString(dev.ninfenz.mobile.R.string.author_saved_artifact, result.path, result.sha256.take(12))
+                            onSaved()
+                        }
+                        is SaveArtifactResult.Failure -> error = CoreError(result.code, result.message, result.fix, null, 1)
+                    }
+                    busy = false
+                }
+            }
+        ) { Text(if (busy) stringResource(dev.ninfenz.mobile.R.string.author_saving_artifact) else stringResource(dev.ninfenz.mobile.R.string.author_save_spec)) }
         report?.let { text -> Text(text, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
+        savedMsg?.let { text -> Text(text, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
         error?.let { err -> NfErrorCard(err.code, err.message, err.fix, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
     }
 }
