@@ -132,7 +132,12 @@ fun ImportScreen(
         if (file.name.endsWith(".zip", ignoreCase = true) && ProjectPackageImporter.hasProjectJson(file)) {
             try {
                 val imported = withContext(Dispatchers.IO) { ProjectPackageImporter.import(context.filesDir, file) }
-                notice = context.getString(dev.ninfenz.mobile.R.string.import_project_package_done, imported.id, imported.dataFiles)
+                notice = context.resources.getQuantityString(
+                    dev.ninfenz.mobile.R.plurals.import_project_package_done,
+                    imported.dataFiles,
+                    imported.id,
+                    imported.dataFiles
+                )
                 onProjectImported(imported.id)
             } catch (t: Throwable) {
                 error = CoreResponse.failure("NF-PRJ-001", "项目包导入失败：" + (t.message ?: t.javaClass.simpleName), "确认 zip 为完整项目包", 2).error
