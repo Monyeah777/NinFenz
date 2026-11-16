@@ -471,4 +471,6 @@
     <string name="project_archive_title">Archive project</string>
     <string name="project_archive_body">The project leaves the library list; its file stays in projects-archive/ and is not deleted.</string>
     <string name="project_archive_confirm">Archive</string>
+    <string name="library_section_archive">Archived projects</string>
+    <string name="project_archive_restore">Restore</string>
 </resources>

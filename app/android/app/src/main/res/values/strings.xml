@@ -471,4 +471,6 @@
     <string name="project_archive_title">归档项目</string>
     <string name="project_archive_body">项目会移出库列表，文件保留在 projects-archive/，不会删除内容。</string>
     <string name="project_archive_confirm">归档</string>
+    <string name="library_section_archive">归档项目</string>
+    <string name="project_archive_restore">恢复</string>
 </resources>

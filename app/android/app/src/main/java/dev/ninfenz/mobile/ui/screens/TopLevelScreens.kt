@@ -64,6 +64,7 @@ import dev.ninfenz.mobile.ui.components.NfSectionHeader
 import dev.ninfenz.mobile.ui.components.NfStatusChip
 import dev.ninfenz.mobile.ui.components.NfTopAppBar
 import dev.ninfenz.mobile.ui.theme.NfSpacing
+import java.io.File
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -82,6 +83,8 @@ fun LibraryHomeScreen(
     onPackCenter: () -> Unit,
     onSettings: () -> Unit,
     onCommands: () -> Unit = {},
+    archived: List<File> = emptyList(),
+    onRestoreArchive: (File) -> Unit = {},
     refreshing: Boolean = false,
     onRefresh: () -> Unit = {}
 ) {
@@ -210,6 +213,20 @@ fun LibraryHomeScreen(
                                 )
                             }
                             NfStatusChip(stringResource(dev.ninfenz.mobile.R.string.packcenter_installed))
+                        }
+                    }
+                }
+            }
+            if (archived.isNotEmpty()) {
+                item { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.library_section_archive)) }
+                items(archived.size) { index ->
+                    val file = archived[index]
+                    NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(file.name, style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
+                            TextButton(onClick = { onRestoreArchive(file) }) {
+                                Text(stringResource(dev.ninfenz.mobile.R.string.project_archive_restore))
+                            }
                         }
                     }
                 }

@@ -27,6 +27,35 @@ object ProjectArchiver {
         return target
     }
 
+    fun list(filesDir: File): List<File> {
+        val dir = File(filesDir, "projects-archive")
+        if (!dir.isDirectory) return emptyList()
+        return dir.listFiles { f -> f.isFile && f.name.endsWith(".archived") }
+            ?.sortedByDescending { it.lastModified() }
+            ?: emptyList()
+    }
+
+    fun restore(archived: File, filesDir: File): File {
+        require(archived.isFile) { "归档文件不存在" }
+        val raw = archived.readText(Charsets.UTF_8)
+        dev.ninfenz.mobile.model.ProjectModel.parse(raw)
+        val original = archived.name.substringBefore(".nfproject.json") + ".nfproject.json"
+        val projects = File(filesDir, "projects").apply { mkdirs() }
+        var target = File(projects, original)
+        var index = 2
+        while (target.exists()) {
+            target = File(projects, original.removeSuffix(".nfproject.json") + "-" + index + ".nfproject.json")
+            index++
+        }
+        try {
+            Files.move(archived.toPath(), target.toPath(), StandardCopyOption.ATOMIC_MOVE)
+        } catch (t: Throwable) {
+            target.writeBytes(archived.readBytes())
+            if (!archived.delete()) throw IllegalStateException("归档恢复后删除失败：" + archived)
+        }
+        return target
+    }
+
     private fun guardFailure(src: File, target: File) {
         if (src.exists()) {
             throw IllegalStateException("归档复制成功但原文件删除失败：" + src + " -> " + target)

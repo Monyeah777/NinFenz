@@ -133,6 +133,7 @@ fun NfMobileApp(
     var shell by rememberSaveable(stateSaver = ShellStateSaver) { mutableStateOf(ShellState()) }
     var packs by remember { mutableStateOf<PackSnapshot>(PackSnapshot(emptyList(), emptyList())) }
     var projects by remember { mutableStateOf<List<ProjectEntry>>(emptyList()) }
+    var archivedProjects by remember { mutableStateOf<List<File>>(emptyList()) }
     var projectErrors by remember { mutableStateOf<List<String>>(emptyList()) }
     var seedState by remember { mutableStateOf<SeedResult?>(null) }
     var seeding by remember { mutableStateOf(false) }
@@ -160,6 +161,7 @@ fun NfMobileApp(
             val diag = runCatching { withContext(Dispatchers.IO) { Core.diagnostics() } }.getOrNull()
             packs = packSnapshot
             projects = projectSnapshot.projects
+            archivedProjects = withContext(Dispatchers.IO) { ProjectArchiver.list(context.filesDir) }
             projectErrors = projectSnapshot.errors
             storageText = humanSize(size)
             nativeReady = diag?.nativeReady == true
@@ -276,6 +278,18 @@ fun NfMobileApp(
                             onPackCenter = { shell = shell.open(Detail.PackCenter) },
                             onSettings = { shell = shell.open(Detail.Settings) },
                             onCommands = { showCommands = true },
+                            archived = archivedProjects,
+                            onRestoreArchive = { file ->
+                                scope.launch {
+                                    val restored = withContext(Dispatchers.IO) {
+                                        ProjectArchiver.restore(file, context.filesDir)
+                                    }
+                                    refresh()
+                                    shell = shell.open(
+                                        Detail.Project(restored.name.removeSuffix(".nfproject.json"))
+                                    )
+                                }
+                            },
                             refreshing = refreshing,
                             onRefresh = { refresh() }
                         )
