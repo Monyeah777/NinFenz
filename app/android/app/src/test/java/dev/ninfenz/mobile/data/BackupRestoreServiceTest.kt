@@ -81,6 +81,20 @@ class BackupRestoreServiceTest {
     }
 
     @Test
+    fun acceptsManifestWithBom() {
+        val dir = Files.createTempDirectory("nf-restore-bom").toFile()
+        val good = File(dir, "bom.zip")
+        val data = "hello".toByteArray()
+        val sha = ProjectPackage.sha256(data)
+        ZipOutputStream(good.outputStream()).use { out ->
+            val manifest = "\uFEFF" + "{\"schema\":\"nf-backup/1\",\"files\":[{\"path\":\"projects/a\",\"bytes\":5,\"sha256\":\"" + sha + "\"}]}"
+            out.putNextEntry(ZipEntry("manifest.json")); out.write(manifest.toByteArray()); out.closeEntry()
+            out.putNextEntry(ZipEntry("projects/a")); out.write(data); out.closeEntry()
+        }
+        assertTrue(BackupRestoreService.inspect(good).error ?: "", BackupRestoreService.inspect(good).ok)
+    }
+
+    @Test
     fun rejectsPathTraversalEntry() {
         val dir = Files.createTempDirectory("nf-restore-bad").toFile()
         val bad = File(dir, "bad.zip")

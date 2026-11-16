@@ -21,9 +21,9 @@ object BackupRestoreService {
         return try {
             ZipFile(file).use { zip ->
                 val manifestEntry = zip.getEntry("manifest.json") ?: return Inspect(emptyList(), false, "缺 manifest.json")
-                val root = Json.parseToJsonElement(
-                    zip.getInputStream(manifestEntry).bufferedReader(Charsets.UTF_8).readText()
-                ).jsonObject
+                val manifestBytes = zip.getInputStream(manifestEntry).use { it.readBytes() }
+                val manifestText = TextEncoding.decode(manifestBytes)?.text ?: String(manifestBytes, Charsets.UTF_8)
+                val root = Json.parseToJsonElement(manifestText).jsonObject
                 if (root["schema"]?.jsonPrimitive?.content != "nf-backup/1") {
                     return Inspect(emptyList(), false, "不是 nf-backup/1")
                 }
