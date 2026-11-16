@@ -20,7 +20,10 @@
     <string name="onboarding_next">Next</string>
     <string name="onboarding_start">Get started</string>
     <string name="onboarding_seed_loading">Loading sample…</string>
-    <string name="onboarding_seed_ready">Sample ready: %1$s · %2$s (%3$d files)</string>
+    <plurals name="onboarding_seed_ready">
+        <item quantity="one">Sample ready: %1$s · %2$s (%3$d file)</item>
+        <item quantity="other">Sample ready: %1$s · %2$s (%3$d files)</item>
+    </plurals>
     <string name="onboarding_seed_exists">Sample already present: %1$s · %2$s</string>
     <string name="onboarding_retry">Retry</string>
     <string name="onboarding_load_sample">Load sample pack</string>
@@ -119,7 +122,10 @@
     <string name="import_preview">Preview</string>
     <string name="import_low_confidence">Low confidence</string>
     <string name="import_source_label">Source: %1$s</string>
-    <string name="import_structure">Structure: %1$d headings · %2$d paragraphs · %3$d code blocks · %4$d tables</string>
+    <plurals name="import_structure">
+        <item quantity="one">Structure: %1$d heading · %2$d paragraphs · %3$d code blocks · %4$d tables</item>
+        <item quantity="other">Structure: %1$d headings · %2$d paragraphs · %3$d code blocks · %4$d tables</item>
+    </plurals>
     <string name="import_digest">digest: %1$s…</string>
     <string name="import_mapping">Mapping suggestions (%1$d)</string>
     <string name="import_no_mapping">No mapping candidates (NF-MAP-001): content goes to assets/unclassified.</string>
@@ -302,7 +308,10 @@
     <string name="packupdate_conflicts">Conflict decisions (defer by default)</string>
     <string name="packupdate_no_conflicts">No conflicts: safe to apply.</string>
     <string name="packupdate_all_decided">All conflicts decided (%1$d)</string>
-    <string name="packupdate_unresolved">%1$d unresolved: defer blocks apply (NF-PCK-006)</string>
+    <plurals name="packupdate_unresolved">
+        <item quantity="one">%1$d unresolved: defer blocks apply (NF-PCK-006)</item>
+        <item quantity="other">%1$d unresolved: defer blocks apply (NF-PCK-006)</item>
+    </plurals>
     <string name="packupdate_apply_rollback">Apply / rollback</string>
     <string name="packupdate_base_dir">base dir</string>
     <string name="packupdate_new_dir">new dir</string>
@@ -404,10 +413,16 @@
     <string name="ccos_submit_timeout">Submit timed out; retry</string>
     <string name="action_expand">Expand</string>
     <string name="action_collapse">Collapse</string>
-    <string name="delivery_slot_chars">%1$d chars</string>
+    <plurals name="delivery_slot_chars">
+        <item quantity="one">%1$d char</item>
+        <item quantity="other">%1$d chars</item>
+    </plurals>
     <string name="delivery_slot_paste">Paste</string>
     <string name="delivery_slot_import_title">Import into %1$s</string>
-    <string name="delivery_slot_import_meta">Source %1$s · %2$s · %3$d → %4$d chars</string>
+    <plurals name="delivery_slot_import_meta">
+        <item quantity="one">Source %1$s · %2$s · %3$d paragraphs · %4$d char</item>
+        <item quantity="other">Source %1$s · %2$s · %3$d paragraphs · %4$d chars</item>
+    </plurals>
     <string name="delivery_slot_replace">Replace</string>
     <string name="delivery_slot_append">Append</string>
     <string name="delivery_slot_import_empty">Imported text is empty</string>
@@ -416,9 +431,15 @@
     <string name="delivery_slot_import_fail_fix">Check file encoding/permission</string>
     <string name="delivery_slot_batch_import">Batch import</string>
     <string name="delivery_slot_batch_hint">Split by --- or blank lines; fill multiple slots at once</string>
-    <string name="delivery_slot_batch_title">Batch import · %1$d blocks → %2$d slots</string>
+    <plurals name="delivery_slot_batch_title">
+        <item quantity="one">Batch import · %1$d block · %2$d slots</item>
+        <item quantity="other">Batch import · %1$d blocks · %2$d slots</item>
+    </plurals>
     <string name="delivery_slot_batch_meta">Source %1$s (split by --- or blank lines)</string>
-    <string name="delivery_slot_batch_overflow">%1$d extra blocks: dropped when filling empty only; appended to last slot in overwrite mode</string>
+    <plurals name="delivery_slot_batch_overflow">
+        <item quantity="one">%1$d extra block: dropped when filling empty only; appended to last slot in overwrite mode</item>
+        <item quantity="other">%1$d extra blocks: dropped when filling empty only; appended to last slot in overwrite mode</item>
+    </plurals>
     <string name="delivery_slot_batch_fill_empty">Empty only</string>
     <string name="delivery_slot_batch_replace_all">Overwrite existing</string>
     <string name="delivery_slot_batch_empty">Batch import is empty</string>
@@ -459,13 +480,22 @@
     </plurals>
     <string name="project_history_title">Status history</string>
     <string name="settings_backup_export">Export local backup</string>
-    <string name="settings_backup_done">Backup created: %1$d files · %2$s</string>
+    <plurals name="settings_backup_done">
+        <item quantity="one">Backup created: %1$d file · %2$s</item>
+        <item quantity="other">Backup created: %1$d files · %2$s</item>
+    </plurals>
     <string name="settings_backup_restore">Restore local backup</string>
     <string name="settings_backup_restore_title">Restore backup</string>
-    <string name="settings_backup_restore_warning">Restore %1$d files and overwrite projects/drafts with the same names; this cannot be undone.</string>
+    <plurals name="settings_backup_restore_warning">
+        <item quantity="one">Restore %1$d file and overwrite projects/drafts with the same names; this cannot be undone.</item>
+        <item quantity="other">Restore %1$d files and overwrite projects/drafts with the same names; this cannot be undone.</item>
+    </plurals>
     <string name="settings_backup_restore_confirm">Restore</string>
     <string name="settings_restoring">Restoring…</string>
-    <string name="settings_backup_restored">Restored %1$d files; pre-restore snapshot: %2$s</string>
+    <plurals name="settings_backup_restored">
+        <item quantity="one">Restored %1$d file; pre-restore snapshot: %2$s</item>
+        <item quantity="other">Restored %1$d files; pre-restore snapshot: %2$s</item>
+    </plurals>
     <string name="settings_backup_restore_one">Restore this backup</string>
     <string name="settings_backup_all">All backups (%1$d)</string>
     <string name="settings_backup_delete">Delete</string>
@@ -497,7 +527,10 @@
     <string name="search_filter_all_packs">All packs</string>
     <string name="project_diff_library">Compare with library</string>
     <string name="project_diff_search">Search projects</string>
-    <string name="import_share_queue">%1$d shared items, showing %2$d</string>
+    <plurals name="import_share_queue">
+        <item quantity="one">%1$d shared item, showing %2$d</item>
+        <item quantity="other">%1$d shared items, showing %2$d</item>
+    </plurals>
     <string name="import_share_current">Import current</string>
     <string name="import_share_next">Import next</string>
     <string name="import_share_ignore">Ignore rest</string>

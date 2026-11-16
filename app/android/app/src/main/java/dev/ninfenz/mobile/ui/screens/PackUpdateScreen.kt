@@ -22,6 +22,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.core.CoreError
@@ -211,7 +212,7 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit) {
                     if (unresolved.isEmpty()) {
                         Notice(stringResource(dev.ninfenz.mobile.R.string.packupdate_all_decided, u.conflicts.size), Tone.INFO)
                     } else {
-                        Notice(stringResource(dev.ninfenz.mobile.R.string.packupdate_unresolved, unresolved.size), Tone.ERROR)
+                        Notice(pluralStringResource(dev.ninfenz.mobile.R.plurals.packupdate_unresolved, unresolved.size, unresolved.size), Tone.ERROR)
                     }
                 }
             }

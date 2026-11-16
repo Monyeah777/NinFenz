@@ -29,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -139,7 +140,7 @@ private fun SeedStatus(seedState: SeedResult?, seeding: Boolean, onSeed: () -> U
     when {
         seeding -> Text(stringResource(dev.ninfenz.mobile.R.string.onboarding_seed_loading), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         seedState is SeedResult.Installed -> Text(
-            stringResource(dev.ninfenz.mobile.R.string.onboarding_seed_ready, seedState.id, seedState.version, seedState.files),
+            pluralStringResource(dev.ninfenz.mobile.R.plurals.onboarding_seed_ready, seedState.files, seedState.id, seedState.version, seedState.files),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.primary
         )

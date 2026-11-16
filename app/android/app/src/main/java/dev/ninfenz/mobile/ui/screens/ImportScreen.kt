@@ -34,6 +34,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.core.CoreError
@@ -316,7 +317,7 @@ fun ImportScreen(
                         if (shareQueue.isNotEmpty()) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
-                                    stringResource(dev.ninfenz.mobile.R.string.import_share_queue, shareQueue.size, shareCursor + 1),
+                                    pluralStringResource(dev.ninfenz.mobile.R.plurals.import_share_queue, shareQueue.size, shareQueue.size, shareCursor + 1),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier.weight(1f)
@@ -381,8 +382,9 @@ fun ImportScreen(
                             }
                             Text(stringResource(dev.ninfenz.mobile.R.string.import_source_label, current.source.name), style = MaterialTheme.typography.bodySmall)
                             Text(
-                                stringResource(
-                                    dev.ninfenz.mobile.R.string.import_structure,
+                                pluralStringResource(
+                                    dev.ninfenz.mobile.R.plurals.import_structure,
+                                    current.structure.headings.size,
                                     current.structure.headings.size,
                                     current.structure.paragraphs,
                                     current.structure.codeBlocks.size,

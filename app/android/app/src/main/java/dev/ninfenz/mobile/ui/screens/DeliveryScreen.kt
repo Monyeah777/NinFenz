@@ -35,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import android.content.Context
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.core.CoreError
@@ -384,7 +385,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                     singleLine = false,
                                     minLines = 2,
                                     maxLines = 6,
-                                    supportingText = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_slot_chars, (inputs[slot] ?: "").length)) },
+                                    supportingText = { Text(pluralStringResource(dev.ninfenz.mobile.R.plurals.delivery_slot_chars, (inputs[slot] ?: "").length, (inputs[slot] ?: "").length)) },
                                     modifier = Modifier.fillMaxWidth()
                                 )
                             }
@@ -630,8 +631,9 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                         .verticalScroll(rememberScrollState())
                 ) {
                     Text(
-                        stringResource(
-                            dev.ninfenz.mobile.R.string.delivery_slot_import_meta,
+                        pluralStringResource(
+                            dev.ninfenz.mobile.R.plurals.delivery_slot_import_meta,
+                            slotImportAdapted,
                             slotImportSource,
                             slotImportFormat,
                             slotImportOriginal,
@@ -665,7 +667,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
         val slots = plan?.slots.orEmpty()
         AlertDialog(
             onDismissRequest = { batchChunks = emptyList() },
-            title = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_slot_batch_title, batchChunks.size, slots.size)) },
+            title = { Text(pluralStringResource(dev.ninfenz.mobile.R.plurals.delivery_slot_batch_title, batchChunks.size, batchChunks.size, slots.size)) },
             text = {
                 Column(
                     modifier = Modifier
@@ -684,7 +686,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                     }
                     if (batchChunks.size > slots.size) {
                         Text(
-                            stringResource(dev.ninfenz.mobile.R.string.delivery_slot_batch_overflow, batchChunks.size - slots.size),
+                            pluralStringResource(dev.ninfenz.mobile.R.plurals.delivery_slot_batch_overflow, batchChunks.size - slots.size, batchChunks.size - slots.size),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.error
                         )

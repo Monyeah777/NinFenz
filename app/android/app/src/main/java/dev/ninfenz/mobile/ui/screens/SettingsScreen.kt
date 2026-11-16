@@ -145,7 +145,7 @@ fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
                     val intent = ShareExporter.shareFileIntent(context, created.file, "application/zip", created.file.name)
                     ShareExporter.launchChooser(context, intent, created.file.name)
                     backups = BackupService.list(context.filesDir)
-                    backupMessage = context.getString(dev.ninfenz.mobile.R.string.settings_backup_done, created.entries, humanBytes(created.bytes))
+                    backupMessage = context.resources.getQuantityString(dev.ninfenz.mobile.R.plurals.settings_backup_done, created.entries, created.entries, humanBytes(created.bytes))
                 }
             }) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_backup_export)) }
             backupMessage?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary) }
@@ -305,7 +305,7 @@ fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
             title = { Text(stringResource(dev.ninfenz.mobile.R.string.settings_backup_restore_title)) },
             text = {
                 Column {
-                    Text(stringResource(dev.ninfenz.mobile.R.string.settings_backup_restore_warning, restoreEntries))
+                    Text(pluralStringResource(dev.ninfenz.mobile.R.plurals.settings_backup_restore_warning, restoreEntries, restoreEntries))
                     if (restoring) {
                         LinearProgressIndicator(modifier = Modifier.padding(top = 12.dp))
                     }
@@ -323,8 +323,9 @@ fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
                         }
                         backupMessage = result.fold(
                             onSuccess = {
-                                context.getString(
-                                    dev.ninfenz.mobile.R.string.settings_backup_restored,
+                                context.resources.getQuantityString(
+                                    dev.ninfenz.mobile.R.plurals.settings_backup_restored,
+                                    it.files,
                                     it.files,
                                     it.snapshot?.name ?: "-"
                                 )
