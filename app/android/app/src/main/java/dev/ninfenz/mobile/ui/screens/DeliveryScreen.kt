@@ -22,12 +22,15 @@ import androidx.compose.material3.TextButton
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.delay
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import android.content.Context
@@ -39,6 +42,7 @@ import dev.ninfenz.mobile.core.CoreResponse
 import dev.ninfenz.mobile.core.J
 import dev.ninfenz.mobile.data.AuthorArtifacts
 import dev.ninfenz.mobile.data.AuthorArtifactsLoader
+import dev.ninfenz.mobile.data.DeliveryDraftStore
 import dev.ninfenz.mobile.data.PackEntry
 import dev.ninfenz.mobile.data.AssemblyArtifact
 import dev.ninfenz.mobile.data.ProjectStatusStore
@@ -104,6 +108,11 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
     var batchChunks by remember { mutableStateOf<List<SlotBatchImporter.Chunk>>(emptyList()) }
     var batchSource by remember { mutableStateOf("") }
     var batchNote by remember { mutableStateOf<String?>(null) }
+    val draftStore = remember { DeliveryDraftStore(context.filesDir) }
+    val restoredInputs = remember(project.id) { draftStore.load(project.id) }
+    var draftNote by remember(project.id) {
+        mutableStateOf(if (restoredInputs.isNotEmpty()) context.getString(dev.ninfenz.mobile.R.string.delivery_draft_restored) else null)
+    }
 
     fun pasteSlot(slot: String) {
         val manager = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager
@@ -190,6 +199,20 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
 
     var busy by remember { mutableStateOf(false) }
 
+    val latestInputs by rememberUpdatedState(inputs)
+    val latestPlan by rememberUpdatedState(plan)
+    LaunchedEffect(project.id, plan, inputs) {
+        if (plan != null) {
+            delay(500)
+            withContext(Dispatchers.IO) { draftStore.save(project.id, inputs) }
+        }
+    }
+    DisposableEffect(project.id) {
+        onDispose {
+            if (latestPlan != null) draftStore.save(project.id, latestInputs)
+        }
+    }
+
     LaunchedEffect(pack?.dir?.absolutePath) {
         loading = true
         loadError = null
@@ -265,7 +288,8 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                     val parsed = PlanModel.parse(obj)
                                     plan = parsed
                                     rawPlan = obj
-                                    inputs = parsed.slots.associate { it to "" }
+                                    inputs = parsed.slots.associate { it to (restoredInputs[it] ?: "") }
+                                    draftNote = if (restoredInputs.isNotEmpty()) context.getString(dev.ninfenz.mobile.R.string.delivery_draft_restored) else null
                                     markdown = null
                                     report = null
                                     exportedFile = null
@@ -308,6 +332,9 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                         }
                         batchNote?.let {
                             Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page))
+                        }
+                        draftNote?.let {
+                            Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(horizontal = NfSpacing.page))
                         }
                     }
                     if (plan == null) {
