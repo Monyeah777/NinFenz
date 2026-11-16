@@ -56,6 +56,16 @@
 | OPEN-DRAFT-PROJECT | 导入草稿→项目转换未定义（契约无 import→project 字段） | lead | 需 v1 §15 契约变更评估 |
 | OPEN-REVIEWED | CCOS approve 时 exported 项目回写 reviewed；非 exported 项目跳过（不伪造） | lead | 如需强制 reviewed，补 project-validate 前置条件 |
 
+### 0.6 v0.02+ 扩展实现（2026-11-16）
+
+- 导入：HTML/EPUB/DOCX 轻量转换、UTF-8/UTF-16 BOM 与无 BOM 启发式、HTML 嵌套列表/表格/图片/代码块/引用块/实体。
+- 导出：HTML 单文件（表格对齐/安全链接/图片/代码语言）、EPUB（章节表格/对齐/链接/代码/图片）、PDF 基础文本；均带结构自检。
+- 项目包：manifest 完整性校验、嵌套/深层目录、BOM、临时文件过滤、篡改/未列条目拒绝、完整项目分享与导入。
+- 备份：manifest BOM/字段必填/未列条目拒绝/声明与实际大小上限、导出后自检、恢复后刷新库。
+- 其他：最近项目动态快捷方式、错误码目录与使用扫描、清空导出记录、崩溃日志分享、项目复制/归档/恢复的回滚加固。
+- 当前本机：JVM **317/317**、Python **493 passed**、Rust **186/186**、lint 0、verify PASS=107/WARN=2/FAIL=0。
+- 真机矩阵与签名/公证仍 OPEN-EXTERNAL/OPEN-TOOLCHAIN，不得据此宣称可发布。
+
 ## 1. 结论（先行）
 
 
