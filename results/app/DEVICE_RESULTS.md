@@ -3,7 +3,7 @@
 > 设备：OnePlus PLF110，Android 16（SDK 36），1080×2392 / 480dpi；历史真机会话 serial 3B65AR0183V00000。
 > **2026-11-16 当前 `adb devices` 为空**：下表 2026-11-15 行是历史真机证据；本轮新增功能仅有 JVM/构建/门禁证据，真机矩阵仍 OPEN-TOOLCHAIN。
 > APK：0.2.0 / versionCode 2，minSdk 26 / target 36。本件只记实际跑过的项目；未跑项标 OPEN，不写成 pass。
-> 当前本机验证总览：Android JVM **318/318**、Rust core **186/186**、app Python **496 passed**、APP 门禁 QA0–QA6 PASS/gap=0、lint **0 warnings**、`verify.sh --checks-only` PASS=107/WARN=2/FAIL=0。
+> 当前本机验证总览：Android JVM **318/318**、Rust core **186/186**、app Python **498 passed**、APP 门禁 QA0–QA6 PASS/gap=0、lint **0 warnings**、`verify.sh --checks-only` PASS=107/WARN=2/FAIL=0。
 
 ## 1. 已实测（2026-11-15）
 
@@ -32,6 +32,7 @@
 | 全量复核（round53） | pass（本机）：verify PASS=107/WARN=2/FAIL=0；gates PASS/gap=0；rust 186；pytest 493。 |
 | Python 全量复核（round61） | pass（本机）：schema 变更后 `pytest app/tests` 493 passed / 0 failed（126s）。 |
 | 全量复核（round60） | pass（本机）：verify 107/2/0；gates PASS/gap=0；rust 186；JVM 317。 |
+| UI 中文硬编码守卫（Python） | pass（本机）：扫描 ui/**/*.kt 字符串字面量，仅豁免 CoreCall 无 Context 回退；pytest 498。 |
 | 纯函数标签清理（JVM） | pass（本机）：移除仅测试用的 screenLabel 中文映射；UI 中文硬编码仅剩 CoreCall 无 Context 回退。 |
 | 全量复核（round104） | pass（本机）：pytest 496；verify 107/2/0；gates PASS/gap=0；rust 186；JVM 319。 |
 | CoreCall 异常文案 i18n（JVM） | pass（本机）：安装 applicationContext，异常/修复建议取资源；无 Context 时回退中文。 |
