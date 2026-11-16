@@ -17,8 +17,11 @@ class ProjectPackageTest {
         val zip = ProjectPackage.create(project, File(root, "p"), File(root, "out"))
         ZipFile(zip).use { z ->
             val names = z.entries().toList().map { it.name }.sorted()
-            assertEquals(listOf("data/authoring/assembly.md", "p.nfproject.json"), names)
+            assertEquals(listOf("data/authoring/assembly.md", "manifest.json", "p.nfproject.json"), names)
             assertEquals("body", z.getInputStream(z.getEntry("data/authoring/assembly.md")).bufferedReader().readText())
+            val manifest = z.getInputStream(z.getEntry("manifest.json")).bufferedReader().readText()
+            assertTrue(manifest.contains("nf-project-package/1"))
+            assertTrue(manifest.contains("data/authoring/assembly.md"))
         }
     }
 

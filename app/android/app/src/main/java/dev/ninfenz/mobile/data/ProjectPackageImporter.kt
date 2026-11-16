@@ -7,7 +7,9 @@ import java.util.zip.ZipFile
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 
 /** 完整项目 zip 导入：一个项目 JSON + 可选 data/ 目录；不覆盖已有项目。 */
 object ProjectPackageImporter {
@@ -28,6 +30,24 @@ object ProjectPackageImporter {
         }
     } catch (t: Throwable) {
         false
+    }
+
+    private fun verifyManifest(entries: List<Pair<String, ByteArray>>, projectText: String, prefix: String) {
+        val manifestBytes = entries.firstOrNull { (name, _) -> name == ProjectPackage.MANIFEST }?.second ?: return
+        val manifest = Json.parseToJsonElement(String(manifestBytes, Charsets.UTF_8)).jsonObject
+        val expected = manifest["project_sha256"]?.jsonPrimitive?.content
+        require(expected == null || expected == ProjectPackage.sha256(projectText.toByteArray(Charsets.UTF_8))) {
+            "项目 JSON 完整性校验失败"
+        }
+        manifest["data"]?.jsonArray?.forEach { item ->
+            val obj = item.jsonObject
+            val path = obj["path"]?.jsonPrimitive?.content ?: return@forEach
+            val sha = obj["sha256"]?.jsonPrimitive?.content ?: return@forEach
+            val actualName = if (prefix.isBlank()) path else prefix + "/" + path
+            val bytes = entries.firstOrNull { (name, _) -> name == actualName }?.second
+                ?: throw IllegalArgumentException("manifest 缺少条目：" + path)
+            require(ProjectPackage.sha256(bytes) == sha) { "数据完整性校验失败：" + path }
+        }
     }
 
     fun import(filesDir: File, zipFile: File): Imported {
@@ -59,6 +79,7 @@ object ProjectPackageImporter {
         val dataPrefix = if (prefix.isBlank()) "data/" else prefix + "/data/"
         val data = entries.filter { (name, _) -> name.startsWith(dataPrefix) }
             .map { (name, bytes) -> name.removePrefix(dataPrefix) to bytes }
+        verifyManifest(entries, text, prefix)
         val source = Json.parseToJsonElement(text).jsonObject
         val sourceId = source["id"]?.let { (it as? JsonPrimitive)?.content } ?: throw IllegalArgumentException("项目缺 id")
         var id = sourceId
