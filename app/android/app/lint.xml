@@ -4,4 +4,8 @@
     <issue id="ObsoleteSdkInt">
         <ignore path="src/main/res/mipmap-anydpi-v26" />
     </issue>
+    <!-- Paparazzi alpha05 depends on kotlin-stdlib 2.3; Kotlin 2.1 cannot read its metadata. -->
+    <issue id="GradleDependency">
+        <ignore regexp="app\.cash\.paparazzi.*2\.0\.0-alpha05" />
+    </issue>
 </lint>

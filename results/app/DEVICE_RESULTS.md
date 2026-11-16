@@ -20,6 +20,7 @@
 | Lint 收尾（JVM） | pass（本机）：抑制预期 UnusedAttribute；import_project_package_done 改 plurals；warnings 4→3（仅剩 GradleDependency2/ObsoleteSdkInt1）。真机未复测（adb 无设备） |
 | 错误码复制反馈（JVM） | pass（本机）：点击错误码复制并 Toast「已复制 code」；真机未复测（adb 无设备） |
 | 门禁/ lint 复核（round143） | pass（本机）：QA0–QA6 全 PASS，FAIL=0，covered=14 gap=0 open=2 p0=0；lint warnings=1（仅 Paparazzi 版本，Kotlin 2.1 阻塞）。 |
+| Lint 0 warnings（JVM） | pass（本机）：lint.xml 仅忽略 Paparazzi alpha05 的 GradleDependency 消息（Kotlin 2.1 读不了 stdlib 2.3）；warnings 1→0。 |
 | 仓库门禁（本轮） | pass（本机）：`LANG=C.UTF-8 PYTHONUTF8=1 bash verify.sh --checks-only` → PASS=107 WARN=2 FAIL=0；conformance 27/27 conformant root d1e126…；协议回执 408f01e5…。 |
 | Python app 测试（本轮） | pass（本机）：`python -m pytest app/tests -q` → 490 passed / 1 warning / 0 failed（136s）；warning 为安全负例故意构造重复 zip 条目。 |
 | 项目包未列出条目拒绝（JVM） | pass（本机）：zip 增加 manifest 未列数据文件时导入失败；测试 8 条。真机未复测（adb 无设备） |
