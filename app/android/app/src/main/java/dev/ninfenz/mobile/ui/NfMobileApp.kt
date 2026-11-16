@@ -67,6 +67,7 @@ import dev.ninfenz.mobile.data.ProjectArchiver
 import dev.ninfenz.mobile.data.DraftProjectBinder
 import dev.ninfenz.mobile.data.ProjectDuplicator
 import dev.ninfenz.mobile.data.ProjectRenamer
+import dev.ninfenz.mobile.data.ProjectPackage
 import dev.ninfenz.mobile.data.ProjectReviewStore
 import dev.ninfenz.mobile.share.ShareExporter
 import dev.ninfenz.mobile.data.ProjectEntry
@@ -487,6 +488,19 @@ is Detail.Import -> ImportScreen(
                                         val shared = ShareExporter.writeSharedFile(context, "nf-project-" + entry.project.id, "json", text)
                                         val intent = ShareExporter.shareFileIntent(context, shared, "application/json", entry.project.title)
                                         ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.project_detail_share))
+                                    }
+                                },
+                                onShareFull = {
+                                    scope.launch {
+                                        val zip = withContext(Dispatchers.IO) {
+                                            ProjectPackage.create(
+                                                entry.file,
+                                                File(File(context.filesDir, "projects"), entry.project.id),
+                                                File(context.cacheDir, "shared")
+                                            )
+                                        }
+                                        val intent = ShareExporter.shareFileIntent(context, zip, "application/zip", entry.project.title)
+                                        ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.project_detail_share_full))
                                     }
                                 },
                                 onReview = { approve, reviewer, note ->

@@ -515,6 +515,7 @@
     <string name="project_detail_rename">Rename</string>
     <string name="project_detail_review">Review</string>
     <string name="project_detail_share">Share project file</string>
+    <string name="project_detail_share_full">Share full project</string>
     <string name="project_review_current">Current review: %1$s</string>
     <string name="project_review_summary">Review: %1$s · reviewer %2$s</string>
     <string name="project_review_need_validate">Validate or export before approving</string>
