@@ -28,6 +28,7 @@
 | 永久删除项目（JVM） | pass（本机）：项目详情强确认后删除 JSON+projects/<id>/ 数据；提示建议先归档/分享；测试 6 条。真机未复测（adb 无设备） |
 | Paparazzi 升级尝试（JVM） | blocked（本机）：alpha05 拉入 kotlin-stdlib 2.3.0，当前 Kotlin 编译器 2.1.0 无法读取元数据；回退 alpha02，构建/243 tests 恢复全绿。 |
 | 依赖升级 coroutines（JVM） | pass（本机）：coroutines 1.9.0→1.10.2，243 tests 全绿；lint warnings 3→2；debug APK 因未压缩 dex 增至 24.7MB。真机未复测（adb 无设备） |
+| Clean build（本轮） | pass（本机）：`gradlew clean` + `testDebugUnitTest --rerun-tasks` + assembleDebug；248/248 全绿；clean APK 19,032,264 B sha256 f4501bfe…；zipalign 16KB 通过。增量 APK 24.7MB 为旧构建膨胀，clean 产物为准。 |
 | Rust core 单测（本轮） | pass（本机）：`cargo test` 186 passed / 0 failed；Android 端无 core 改动。 |
 | Release 构建（构建） | pass（本机）：`:app:assembleRelease` 成功；app-release-unsigned.apk 15,248,757 B sha256 3e5d751f…；zipalign 16KB 通过；apksigner 显示未签名（预期，签名 OPEN-EXTERNAL）。 |
 | 16KB 页对齐（构建） | pass（本机）：`zipalign -c -P 16 4 app-debug.apk` exit=0；未真机安装验证。 |
