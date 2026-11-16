@@ -41,6 +41,14 @@ class HtmlImporterTest {
     }
 
     @Test
+    fun convertsCodeBlocks() {
+        val md = HtmlImporter.toMarkdown("<pre><code>val x = 1</code></pre><p>使用 <code>nf</code></p>")
+        assertTrue(md.contains("```"))
+        assertTrue(md.contains("val x = 1"))
+        assertTrue(md.contains("`nf`"))
+    }
+
+    @Test
     fun removesScriptAndStyle() {
         val md = HtmlImporter.toMarkdown("<style>x{}</style><script>alert(1)</script><p>正文</p>")
         assertTrue(md.contains("正文"))

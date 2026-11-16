@@ -10,6 +10,12 @@ object HtmlImporter {
         text = Regex("(?is)<h([1-6])[^>]*>(.*?)</h\\1>").replace(text) { m ->
             "\n\n" + "#".repeat(m.groupValues[1].toInt()) + " " + strip(m.groupValues[2]).trim() + "\n\n"
         }
+        text = Regex("(?is)<pre[^>]*>(.*?)</pre>").replace(text) { m ->
+            "\n\n```\n" + decode(strip(m.groupValues[1])).trim('\n') + "\n```\n\n"
+        }
+        text = Regex("(?is)<code[^>]*>(.*?)</code>").replace(text) { m ->
+            "`" + decode(strip(m.groupValues[1])).trim() + "`"
+        }
         text = Regex("(?is)<table[^>]*>(.*?)</table>").replace(text) { m ->
             "\n\n" + table(m.groupValues[1]) + "\n\n"
         }
