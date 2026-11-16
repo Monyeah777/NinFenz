@@ -29,6 +29,7 @@
 | HTML 表格对齐（JVM） | pass（本机）：:---/::/---: → style text-align；测试 12 条。真机未复测（adb 无设备） |
 | EPUB 导出 data URI 图片（JVM） | pass（本机）：Markdown data:image 渲染为 img；测试 10 条。真机未复测（adb 无设备） |
 | EPUB 图片内嵌（JVM） | pass（本机）：EPUB img 转 data URI（单图 ≤2MiB、总量 ≤20MiB）；测试 6 条。真机未复测（adb 无设备） |
+| Lint 复核（round42） | pass（本机）：`:app:lintDebug` 0 warnings。 |
 | Rust golden 同步（本轮） | pass（本机）：错误码 NF-IMP-004 fix 文案变更导致 golden 漂移；`golden-gen` 重新生成并复测 `cargo test` 186/186。 |
 | Android 测试强制重跑（本轮） | pass（本机）：`:app:testDebugUnitTest --rerun-tasks` 304/304，全任务实际执行。 |
 | 错误码 schema LF 守卫（pytest） | pass（本机）：新增字节级 CRLF 断言；error code 测试 2 条。 |
