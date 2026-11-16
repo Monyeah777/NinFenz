@@ -40,6 +40,7 @@ import dev.ninfenz.mobile.data.BackupService
 import dev.ninfenz.mobile.data.StorageStats
 import dev.ninfenz.mobile.share.ShareExporter
 import java.io.File
+import java.util.Locale
 import dev.ninfenz.mobile.ui.components.CardBox
 import dev.ninfenz.mobile.ui.components.KeyValue
 import dev.ninfenz.mobile.ui.components.MonoText
@@ -280,7 +281,11 @@ fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
                     pendingDeleteBackup = null
                     backups = BackupService.list(context.filesDir)
                     stats = StorageStats.scan(context.filesDir, context.cacheDir)
-                    backupMessage = context.getString(dev.ninfenz.mobile.R.string.settings_backup_deleted, ok)
+                    backupMessage = if (ok) {
+                        context.getString(dev.ninfenz.mobile.R.string.settings_backup_deleted, backup.name)
+                    } else {
+                        "删除备份失败：" + backup.name
+                    }
                 }) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_backup_delete)) }
             },
             dismissButton = {
@@ -345,5 +350,5 @@ private fun findActivity(context: Context): Activity? {
 private fun humanBytes(bytes: Long): String = when {
     bytes < 1024 -> bytes.toString() + " B"
     bytes < 1024 * 1024 -> (bytes / 1024).toString() + " KB"
-    else -> String.format("%.1f MB", bytes / 1024.0 / 1024.0)
+    else -> String.format(Locale.US, "%.1f MB", bytes / 1024.0 / 1024.0)
 }

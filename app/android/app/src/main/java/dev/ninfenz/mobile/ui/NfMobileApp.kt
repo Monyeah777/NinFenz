@@ -99,6 +99,7 @@ import dev.ninfenz.mobile.ui.shell.ShellState
 import dev.ninfenz.mobile.ui.shell.ShellStateCodec
 import dev.ninfenz.mobile.ui.shell.TopDestination
 import java.io.File
+import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -654,5 +655,5 @@ private fun dirSize(dir: File): Long {
 private fun humanSize(bytes: Long): String = when {
     bytes < 1024 -> bytes.toString() + " B"
     bytes < 1024 * 1024 -> (bytes / 1024).toString() + " KB"
-    else -> String.format("%.1f MB", bytes / 1024.0 / 1024.0)
+    else -> String.format(Locale.US, "%.1f MB", bytes / 1024.0 / 1024.0)
 }
