@@ -253,3 +253,73 @@ fn map_suggest_invalid_import_is_report() {
     assert_eq!(env.exit, 1);
     assert_eq!(env.result.as_ref().unwrap()["verdict"], "fail");
 }
+
+#[test]
+fn sniff_epub_is_not_zip() {
+    let dir = tmpdir("sniff_epub");
+    let entries = vec![
+        ("mimetype".to_string(), b"application/epub+zip".to_vec()),
+        ("META-INF/container.xml".to_string(), b"<container/>".to_vec()),
+    ];
+    let bytes = zipsec::zip_bytes(&entries).unwrap();
+    let p = dir.join("book.epub");
+    std::fs::write(&p, &bytes).unwrap();
+    run_err(
+        "import-sniff",
+        &json!({"name": "book.epub", "file": pstr(&p)}),
+        3,
+        "NF-IMP-004",
+    );
+}
+
+#[test]
+fn sniff_xlsx_is_not_docx() {
+    let dir = tmpdir("sniff_xlsx");
+    let entries = vec![
+        ("[Content_Types].xml".to_string(), b"<Types/>".to_vec()),
+        ("xl/workbook.xml".to_string(), b"<workbook/>".to_vec()),
+    ];
+    let bytes = zipsec::zip_bytes(&entries).unwrap();
+    let p = dir.join("book.xlsx");
+    std::fs::write(&p, &bytes).unwrap();
+    run_err(
+        "import-sniff",
+        &json!({"name": "book.xlsx", "file": pstr(&p)}),
+        3,
+        "NF-IMP-004",
+    );
+}
+
+#[test]
+fn sniff_utf16le_text_with_bom() {
+    let dir = tmpdir("sniff_utf16");
+    let mut bytes = vec![0xFF, 0xFE];
+    for unit in "你好\n第二行".encode_utf16() {
+        bytes.extend_from_slice(&unit.to_le_bytes());
+    }
+    let p = dir.join("note.txt");
+    std::fs::write(&p, &bytes).unwrap();
+    let r = run_ok("import-sniff", &json!({"name": "note.txt", "file": pstr(&p)}));
+    assert_eq!(r["format"], "text");
+    let imported = run_ok(
+        "import",
+        &json!({"file": pstr(&p), "source": {"kind": "file", "name": "note.txt"}}),
+    );
+    assert!(imported["text"].as_str().unwrap().contains("你好"));
+    assert!(imported["text"].as_str().unwrap().contains("第二行"));
+}
+
+#[test]
+fn normalizer_reports_unsupported_legacy_encoding() {
+    let dir = tmpdir("sniff_gbk");
+    // 非 UTF-8/UTF-16 的字节序列：保持 fail-closed，不冒充成功。
+    let bytes = vec![0xC4, 0xE3, 0xBA, 0xC3];
+    let p = dir.join("gbk.txt");
+    std::fs::write(&p, &bytes).unwrap();
+    run_err(
+        "import",
+        &json!({"file": pstr(&p), "source": {"kind": "file", "name": "gbk.txt"}}),
+        3,
+        "NF-IMP-001",
+    );
+}

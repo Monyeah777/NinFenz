@@ -23,7 +23,7 @@ pub struct Sniff {
     pub candidates: Vec<(String, u32)>,
 }
 
-const UNSUPPORTED: &[&str] = &["html", "docx", "pdf", "ocr"];
+const UNSUPPORTED: &[&str] = &["html", "docx", "pdf", "ocr", "epub", "xlsx", "pptx"];
 
 fn add_signal(cands: &mut BTreeMap<String, u32>, format: &str, confidence: u32) {
     let e = cands.entry(format.to_string()).or_insert(0);
@@ -52,6 +52,9 @@ fn ext_format(ext: &str) -> Option<&'static str> {
         "html" | "htm" => "html",
         "docx" => "docx",
         "pdf" => "pdf",
+        "epub" => "epub",
+        "xlsx" => "xlsx",
+        "pptx" => "pptx",
         _ => return None,
     })
 }
@@ -67,17 +70,43 @@ fn mime_format(mime: &str) -> Option<&'static str> {
         "application/pdf" => "pdf",
         "text/html" => "html",
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document" => "docx",
+        "application/epub+zip" => "epub",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" => "xlsx",
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation" => "pptx",
         _ => return None,
     })
 }
 
+fn decode_utf16(bytes: &[u8], little_endian: bool) -> Option<String> {
+    if bytes.len() % 2 != 0 {
+        return None;
+    }
+    let mut units = Vec::with_capacity(bytes.len() / 2);
+    for pair in bytes.chunks_exact(2) {
+        units.push(if little_endian {
+            u16::from_le_bytes([pair[0], pair[1]])
+        } else {
+            u16::from_be_bytes([pair[0], pair[1]])
+        });
+    }
+    String::from_utf16(&units).ok()
+}
+
 fn normalize_text(bytes: &[u8]) -> Result<String, CoreError> {
-    let text = std::str::from_utf8(bytes).map_err(|_| {
+    let decoded = if bytes.starts_with(&[0xFF, 0xFE]) {
+        decode_utf16(&bytes[2..], true)
+    } else if bytes.starts_with(&[0xFE, 0xFF]) {
+        decode_utf16(&bytes[2..], false)
+    } else {
+        std::str::from_utf8(bytes)
+            .ok()
+            .map(|s| s.strip_prefix('\u{feff}').unwrap_or(s).to_string())
+    };
+    let text = decoded.ok_or_else(|| {
         CoreError::new("NF-IMP-001")
-            .with_message("内容不是合法 UTF-8 文本，无法按文本格式导入")
+            .with_message("内容不是合法 UTF-8/UTF-16 文本，无法按文本格式导入（GB18030/Big5 请先转码）")
             .with_exit(3)
     })?;
-    let text = text.strip_prefix('\u{feff}').unwrap_or(text);
     Ok(text.replace("\r\n", "\n").replace('\r', "\n"))
 }
 
@@ -138,12 +167,24 @@ pub fn sniff(
         if b.starts_with(b"PK\x03\x04") {
             let entries = zipsec::read_zip_bytes(b)?;
             let has = |needle: &str| entries.iter().any(|e| e.name == needle || e.name.ends_with(needle));
+            let epub_mimetype = entries
+                .iter()
+                .find(|e| e.name == "mimetype")
+                .map(|e| String::from_utf8_lossy(&e.data).trim().to_string());
             if has("nf-pack.json") {
                 add_signal(&mut cands, "nfpack", 100);
             } else if has("nf-template.json") {
                 add_signal(&mut cands, "nftpl", 100);
-            } else if has("[Content_Types].xml") || has("word/document.xml") {
+            } else if epub_mimetype.as_deref() == Some("application/epub+zip")
+                || has("META-INF/container.xml")
+            {
+                add_signal(&mut cands, "epub", 100);
+            } else if has("word/document.xml") {
                 add_signal(&mut cands, "docx", 100);
+            } else if has("xl/workbook.xml") {
+                add_signal(&mut cands, "xlsx", 100);
+            } else if has("ppt/presentation.xml") {
+                add_signal(&mut cands, "pptx", 100);
             } else {
                 add_signal(&mut cands, "zip", 95);
             }

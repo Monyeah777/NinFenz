@@ -11,6 +11,8 @@ import java.io.File
 /** SAF URI → 文本 / 缓存文件 / 目录树副本（只写 app 私有目录）。 */
 object FileAccess {
 
+    const val MAX_IMPORT_BYTES = 64L * 1024 * 1024
+
     data class FileMeta(val name: String, val size: Long, val mime: String?)
 
     suspend fun readText(context: Context, uri: Uri): String = withContext(Dispatchers.IO) {
@@ -42,7 +44,21 @@ object FileAccess {
         val safe = name.replace(Regex("[^A-Za-z0-9._-]"), "_").ifBlank { "input" }
         val target = File(dir, System.nanoTime().toString() + "-" + safe)
         context.contentResolver.openInputStream(uri)?.use { input ->
-            target.outputStream().use { output -> input.copyTo(output) }
+            target.outputStream().use { output ->
+                val buffer = ByteArray(8192)
+                var total = 0L
+                while (true) {
+                    val n = input.read(buffer)
+                    if (n < 0) break
+                    total += n
+                    if (total > MAX_IMPORT_BYTES) {
+                        output.close()
+                        target.delete()
+                        throw IllegalStateException("文件超过 64 MiB 导入上限，已拒绝复制")
+                    }
+                    output.write(buffer, 0, n)
+                }
+            }
         } ?: throw IllegalStateException("无法读取 URI：" + uri)
         target
     }

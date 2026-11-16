@@ -34,6 +34,20 @@ class LibraryStore(private val filesDir: File) {
         return LibrarySnapshot(entries, errors)
     }
 
+    fun uniqueDraftBase(baseName: String): String {
+        val safe = baseName.replace(Regex("[^A-Za-z0-9._-]"), "_").ifBlank { "draft" }
+        var candidate = safe
+        var index = 2
+        while (
+            File(draftsDir(), candidate + ".json").exists() ||
+            File(draftsDir(), candidate + ".mapping.json").exists()
+        ) {
+            candidate = "$safe-$index"
+            index++
+        }
+        return candidate
+    }
+
     fun saveDraft(baseName: String, json: String): File {
         val safe = baseName.replace(Regex("[^A-Za-z0-9._-]"), "_").ifBlank { "draft" }
         val file = File(draftsDir(), safe + ".json")

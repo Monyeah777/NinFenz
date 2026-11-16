@@ -164,6 +164,9 @@ fun ImportScreen(
     fun importShare(payload: SharePayload) {
         scope.launch {
             val item = payload.items.firstOrNull()
+            if (payload.items.size > 1) {
+                prefillNote = context.getString(dev.ninfenz.mobile.R.string.import_share_multi, payload.items.size, payload.items.size - 1)
+            }
             if (item == null) {
                 error = CoreResponse.failure("NF-IMP-001", "分享载荷无可导入条目", "换一种分享方式", 3).error
                 return@launch
@@ -344,12 +347,13 @@ fun ImportScreen(
                                 if (raw == null) {
                                     error = CoreResponse.failure("NF-E-004", "原始响应未保留，拒绝以重序列化结果冒充核心产物", "重新导入", 2).error
                                 } else {
-                                    val file = store.saveDraft(current.source.name, raw.toString())
+                                    val base = store.uniqueDraftBase(current.source.name)
+                                    val file = store.saveDraft(base, raw.toString())
                                     val mappingJson = buildJsonObject {
                                         put("accepted", JsonArray(acceptedMappings.sorted().map { JsonPrimitive(it) }))
                                         put("unmapped", JsonArray(current.unmapped.map { JsonPrimitive(it) }))
                                     }.toString()
-                                    store.saveDraft(current.source.name + ".mapping", mappingJson)
+                                    store.saveDraft(base + ".mapping", mappingJson)
                                     savedName = file.name
                                 }
                             },
