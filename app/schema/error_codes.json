@@ -27,8 +27,36 @@
       "code": "NF-IMP-004",
       "severity": "error",
       "exit": 3,
-      "message": "本版本未实现该格式适配器（html/docx/pdf/ocr）",
-      "fix": "升级版本或先转成 markdown"
+      "message": "当前版本不支持该格式（如 pdf/ocr）",
+      "fix": "转换为 markdown/text 后再导入"
+    },
+    {
+      "code": "NF-IMP-006",
+      "severity": "error",
+      "exit": 2,
+      "message": "分享授权失效，无法读取条目",
+      "fix": "重新分享，或改用文件选择器导入"
+    },
+    {
+      "code": "NF-IMP-007",
+      "severity": "error",
+      "exit": 2,
+      "message": "EPUB 解析失败或无正文",
+      "fix": "确认 EPUB 含 container/OPF/XHTML 章节"
+    },
+    {
+      "code": "NF-IMP-008",
+      "severity": "error",
+      "exit": 2,
+      "message": "DOCX 解析失败或无正文",
+      "fix": "确认 DOCX 含 word/document.xml"
+    },
+    {
+      "code": "NF-PRJ-001",
+      "severity": "error",
+      "exit": 3,
+      "message": "完整项目包导入失败",
+      "fix": "确认 zip 含项目 JSON/manifest 且未篡改"
     },
     {
       "code": "NF-MAP-001",
