@@ -394,7 +394,10 @@ is Detail.Import -> ImportScreen(
                         },
                         onPrefillConsumed = { sharedPrefill = null },
                         packs = packs.packs,
-                        onProjectImported = { id ->
+                        onProjectImported = { id, packId, packVersion ->
+                            if (packId.isNotBlank() && packs.packs.none { it.id == packId && it.version == packVersion }) {
+                                missingPackWarning = packId to packVersion
+                            }
                             refresh()
                             shell = shell.open(Detail.Project(id))
                         },

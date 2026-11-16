@@ -82,7 +82,7 @@ fun ImportScreen(
     onPrefillConsumed: () -> Unit = {},
     packs: List<PackEntry> = emptyList(),
     onCreateProjectFromDraft: (PackEntry, String, File) -> Unit = { _, _, _ -> },
-    onProjectImported: (String) -> Unit = {}
+    onProjectImported: (String, String, String) -> Unit = { _, _, _ -> }
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -138,7 +138,7 @@ fun ImportScreen(
                     imported.id,
                     imported.dataFiles
                 )
-                onProjectImported(imported.id)
+                onProjectImported(imported.id, imported.packId, imported.packVersion)
             } catch (t: Throwable) {
                 error = CoreResponse.failure("NF-PRJ-001", "项目包导入失败：" + (t.message ?: t.javaClass.simpleName), "确认 zip 为完整项目包", 2).error
             }

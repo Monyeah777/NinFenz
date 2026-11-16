@@ -21,6 +21,7 @@
 | 错误码复制反馈（JVM） | pass（本机）：点击错误码复制并 Toast「已复制 code」；真机未复测（adb 无设备） |
 | 快捷方式图标（构建） | pass（构建）：静态导入/新建/搜索改用三套独立 vector 图标；未真机长按验证（adb 无设备） |
 | 最近项目动态快捷方式（JVM） | pass（本机）：refresh 发布最多 3 个最近项目快捷方式；MainActivity 解析 OPEN_PROJECT 并直达项目；ShortcutManager 失败静默。真机未复测（adb 无设备） |
+| 分享导入缺 Pack 提示（JVM） | pass（本机）：分享/选文件导入项目包也返回 base_pack，缺 Pack 时弹同一对话框；真机未复测（adb 无设备） |
 | 项目包条目预检（JVM） | pass（本机）：读 entry 前检查声明大小与总量上限，避免压缩炸弹先读入内存；测试 5 条仍绿。真机未复测（adb 无设备） |
 | HTML 结构自检（JVM） | pass（本机）：导出后检查 doctype/html/head/body/title/charset；失败显示原因；测试 2 条。真机未复测（adb 无设备） |
 | HTML 导出（JVM） | pass（本机）：交付台「导出 html」生成单文件 result.html（基础 Markdown、内联 CSS、转义）；测试 2 条。真机未复测（adb 无设备） |
@@ -30,7 +31,7 @@
 | 依赖升级 coroutines（JVM） | pass（本机）：coroutines 1.9.0→1.10.2，243 tests 全绿；lint warnings 3→2；debug APK 因未压缩 dex 增至 24.7MB。真机未复测（adb 无设备） |
 | Clean build（本轮） | pass（本机）：`gradlew clean` + `testDebugUnitTest --rerun-tasks` + assembleDebug；248/248 全绿；clean APK 19,032,264 B sha256 f4501bfe…；zipalign 16KB 通过。增量 APK 24.7MB 为旧构建膨胀，clean 产物为准。 |
 | Rust core 单测（本轮） | pass（本机）：`cargo test` 186 passed / 0 failed；Android 端无 core 改动。 |
-| Release 构建（构建） | pass（本机）：clean 后重建 `:app:assembleRelease` 成功；app-release-unsigned.apk 15,248,757 B sha256 3e5d751f…；zipalign 16KB 通过；apksigner 显示未签名（预期，签名 OPEN-EXTERNAL）。 |
+| Release 构建（构建） | pass（本机）：clean 后重建 `:app:assembleRelease` 成功；app-release-unsigned.apk 15,248,757 B sha256 3f0ffaf7…；zipalign 16KB 通过；apksigner 显示未签名（预期，签名 OPEN-EXTERNAL）。 |
 | 16KB 页对齐（构建） | pass（本机）：`zipalign -c -P 16 4 app-debug.apk` exit=0；未真机安装验证。 |
 | APP 门禁（本轮） | pass（本机）：QA0–QA6 全部 PASS，FAIL=0；自审计 covered=14 gap=0 open=2 p0=0。 |
 | 备份导出后自检（JVM） | pass（本机）：导出后立即 inspect zip，显示“导出校验通过/失败原因”；真机未复测（adb 无设备） |
