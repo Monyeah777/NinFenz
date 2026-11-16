@@ -15,6 +15,7 @@ class PackTrustStoreTest {
         assertTrue(store.isPinned("pack", "1.0.0", "tree-a"))
         assertFalse(store.isPinned("pack", "1.0.0", "tree-b"))
         assertEquals("tree-a", store.load()["pack@1.0.0"]?.tree)
+        assertEquals("tree-a", store.pinnedTree("pack", "1.0.0"))
         store.clear("pack", "1.0.0")
         assertFalse(store.isPinned("pack", "1.0.0", "tree-a"))
     }

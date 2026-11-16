@@ -16,6 +16,7 @@
 | 装配 | pass：填 4 个槽位后 assemble 返回 markdown（开篇/正文/收束） | 截图 19 |
 | L1 校验 | pass：L1 pass（error=0 warn=0 info=3）；状态 assembled→validated 写回 | run-as 读项目 |
 | 导出 md/zip | pass：files/exports/delivery/result.md + result.zip + manifest；状态 validated→exported 写回 | run-as 读文件 |
+| Pack 固定 tree 变化告警（JVM） | pass（本机）：已固定 pack 的 tree 与当前不一致时显示红色告警，可「更新固定」；测试 pinnedTree 读取。真机未复测（adb 无设备） |
 | Pack 本地信任固定（JVM） | pass（本机）：Pack 详情可固定/取消固定当前 tree，按 pack@version 存 pack-trust.json；明确标注“非签名”；测试 2 条。真机未复测（adb 无设备） |
 | PDF 结构自检（JVM） | pass（本机）：导出后检查 %PDF- 头、%%EOF/startxref、/Encrypt、页对象；失败显示原因；测试 3 条。真机未复测（adb 无设备） |
 | PDF 导出（JVM） | pass（仅分页逻辑单测）：交付台「导出 pdf」用 Android PdfDocument 生成 A4 文本 PDF、自动折行/分页；PdfPager 2 条测试；PdfDocument 渲染未真机/仪器验证。真机未复测（adb 无设备） |

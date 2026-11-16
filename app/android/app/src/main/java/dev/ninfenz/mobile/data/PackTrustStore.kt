@@ -39,8 +39,11 @@ class PackTrustStore(private val filesDir: File) {
         save(next)
     }
 
+    fun pinnedTree(id: String, version: String): String? =
+        load()[key(id, version)]?.tree
+
     fun isPinned(id: String, version: String, tree: String): Boolean =
-        load()[key(id, version)]?.tree == tree
+        pinnedTree(id, version) == tree
 
     private fun save(values: Map<String, Pinned>) {
         val obj = buildJsonObject {

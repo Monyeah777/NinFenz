@@ -632,7 +632,8 @@ fun PackDetailScreen(pack: PackEntry, onBack: () -> Unit, onUpdate: () -> Unit) 
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val trustStore = remember { PackTrustStore(context.filesDir) }
-    var trustPinned by remember { mutableStateOf(trustStore.isPinned(pack.id, pack.version, pack.tree)) }
+    var pinnedTree by remember { mutableStateOf(trustStore.pinnedTree(pack.id, pack.version)) }
+    val trustMatches = pinnedTree == null || pinnedTree == pack.tree
     var verifying by remember { mutableStateOf(false) }
     var report by remember { mutableStateOf<String?>(null) }
     var errorText by remember { mutableStateOf<String?>(null) }
@@ -653,21 +654,36 @@ fun PackDetailScreen(pack: PackEntry, onBack: () -> Unit, onUpdate: () -> Unit) 
                         Text(stringResource(dev.ninfenz.mobile.R.string.pack_detail_dir, pack.dir.absolutePath), style = MaterialTheme.typography.bodySmall)
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
-                                if (trustPinned) stringResource(dev.ninfenz.mobile.R.string.pack_trust_pinned)
-                                else stringResource(dev.ninfenz.mobile.R.string.pack_trust_unpinned),
+                                when {
+                                    pinnedTree == null -> stringResource(dev.ninfenz.mobile.R.string.pack_trust_unpinned)
+                                    trustMatches -> stringResource(dev.ninfenz.mobile.R.string.pack_trust_pinned)
+                                    else -> stringResource(dev.ninfenz.mobile.R.string.pack_trust_mismatch)
+                                },
                                 style = MaterialTheme.typography.bodySmall,
-                                color = if (trustPinned) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                                color = when {
+                                    pinnedTree == null -> MaterialTheme.colorScheme.onSurfaceVariant
+                                    trustMatches -> MaterialTheme.colorScheme.primary
+                                    else -> MaterialTheme.colorScheme.error
+                                },
                                 modifier = Modifier.weight(1f)
                             )
                             TextButton(onClick = {
-                                if (trustPinned) {
+                                if (pinnedTree != null && trustMatches) {
                                     trustStore.clear(pack.id, pack.version)
                                 } else {
                                     trustStore.pin(pack.id, pack.version, pack.tree)
                                 }
-                                trustPinned = !trustPinned
+                                pinnedTree = trustStore.pinnedTree(pack.id, pack.version)
                             }) {
-                                Text(stringResource(if (trustPinned) dev.ninfenz.mobile.R.string.pack_trust_clear else dev.ninfenz.mobile.R.string.pack_trust_pin))
+                                Text(
+                                    stringResource(
+                                        when {
+                                            pinnedTree == null -> dev.ninfenz.mobile.R.string.pack_trust_pin
+                                            trustMatches -> dev.ninfenz.mobile.R.string.pack_trust_clear
+                                            else -> dev.ninfenz.mobile.R.string.pack_trust_update
+                                        }
+                                    )
+                                )
                             }
                         }
                     }

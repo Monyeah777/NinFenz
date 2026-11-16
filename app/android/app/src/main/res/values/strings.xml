@@ -474,6 +474,8 @@
     <string name="pack_trust_unpinned">本地信任：未固定（仅本地标记，非签名）</string>
     <string name="pack_trust_pin">固定为可信</string>
     <string name="pack_trust_clear">取消固定</string>
+    <string name="pack_trust_mismatch">本地信任：tree 与固定值不一致，可能被替换</string>
+    <string name="pack_trust_update">更新固定</string>
     <string name="project_detail_archive">归档项目</string>
     <string name="project_archive_title">归档项目</string>
     <string name="project_archive_body">项目会移出库列表，文件保留在 projects-archive/，不会删除内容。</string>

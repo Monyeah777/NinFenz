@@ -474,6 +474,8 @@
     <string name="pack_trust_unpinned">Local trust: not pinned (local marker, not a signature)</string>
     <string name="pack_trust_pin">Pin as trusted</string>
     <string name="pack_trust_clear">Unpin</string>
+    <string name="pack_trust_mismatch">Local trust: tree differs from pinned value (possible replacement)</string>
+    <string name="pack_trust_update">Update pin</string>
     <string name="project_detail_archive">Archive project</string>
     <string name="project_archive_title">Archive project</string>
     <string name="project_archive_body">The project leaves the library list; its file stays in projects-archive/ and is not deleted.</string>
