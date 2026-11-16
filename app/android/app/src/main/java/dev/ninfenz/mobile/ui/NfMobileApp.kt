@@ -268,7 +268,7 @@ fun NfMobileApp(
         if (!demoTried && nativeReady && projects.isEmpty() && packs.packs.isNotEmpty()) {
             demoTried = true
             val pack = packs.packs.first()
-            when (val result = projectCreator.create(pack, "演示项目", "demo-project")) {
+            when (val result = projectCreator.create(pack, context.getString(dev.ninfenz.mobile.R.string.demo_project_title), "demo-project")) {
                 is CreateProjectResult.Success -> refresh()
                 is CreateProjectResult.Failure -> Unit
             }
@@ -449,7 +449,7 @@ is Detail.Import -> ImportScreen(
                                 icon = Icons.Filled.Edit,
                                 title = stringResource(dev.ninfenz.mobile.R.string.project_missing_title),
                                 message = stringResource(dev.ninfenz.mobile.R.string.project_missing_body),
-                                actionLabel = "返回库",
+                                actionLabel = stringResource(dev.ninfenz.mobile.R.string.back_to_library),
                                 onAction = { shell = shell.back() ?: shell }
                             )
                         } else {
@@ -474,7 +474,7 @@ is Detail.Import -> ImportScreen(
                                 icon = Icons.Filled.Info,
                                 title = stringResource(dev.ninfenz.mobile.R.string.project_missing_title),
                                 message = stringResource(dev.ninfenz.mobile.R.string.project_missing_body),
-                                actionLabel = "返回库",
+                                actionLabel = stringResource(dev.ninfenz.mobile.R.string.back_to_library),
                                 onAction = { shell = shell.back() ?: shell }
                             )
                         } else {
@@ -503,7 +503,7 @@ is Detail.Import -> ImportScreen(
                                 icon = Icons.Filled.Home,
                                 title = stringResource(dev.ninfenz.mobile.R.string.pack_missing_title),
                                 message = stringResource(dev.ninfenz.mobile.R.string.pack_missing_body),
-                                actionLabel = "返回库",
+                                actionLabel = stringResource(dev.ninfenz.mobile.R.string.back_to_library),
                                 onAction = { shell = shell.back() ?: shell }
                             )
                         } else {
@@ -517,7 +517,7 @@ is Detail.Import -> ImportScreen(
                                 icon = Icons.Filled.Edit,
                                 title = stringResource(dev.ninfenz.mobile.R.string.project_missing_title),
                                 message = stringResource(dev.ninfenz.mobile.R.string.project_missing_body),
-                                actionLabel = "返回库",
+                                actionLabel = stringResource(dev.ninfenz.mobile.R.string.back_to_library),
                                 onAction = { shell = shell.back() ?: shell }
                             )
                         } else {

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NF</string>
+    <string name="back_to_library">Back to library</string>
+    <string name="demo_project_title">Demo project</string>
     <string name="project_package_import_failed">Project package import failed: %1$s</string>
     <string name="error_with_fix">[%1$s] %2$s; fix: %3$s</string>
     <string name="project_missing_title">Project not found</string>
