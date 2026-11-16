@@ -572,11 +572,20 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                     )
                 }
                 if (exportEntries.isNotEmpty()) {
-                    Text(
-                        stringResource(dev.ninfenz.mobile.R.string.delivery_recent_exports),
-                        style = MaterialTheme.typography.titleSmall,
-                        modifier = Modifier.padding(horizontal = NfSpacing.page)
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = NfSpacing.page),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            stringResource(dev.ninfenz.mobile.R.string.delivery_recent_exports),
+                            style = MaterialTheme.typography.titleSmall
+                        )
+                        TextButton(onClick = {
+                            exportHistory.clear()
+                            exportEntries = emptyList()
+                        }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_clear_exports)) }
+                    }
                     exportEntries.take(5).forEach { entry ->
                         Column(modifier = Modifier.fillMaxWidth().padding(horizontal = NfSpacing.page)) {
                         Row(

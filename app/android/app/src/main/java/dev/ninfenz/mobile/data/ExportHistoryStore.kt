@@ -67,6 +67,8 @@ class ExportHistoryStore(private val filesDir: File) {
         AtomicFiles.writeText(file(), arr.toString())
     }
 
+    fun clear(): Boolean = file().delete()
+
     private fun JsonObject.text(key: String): String =
         this[key]?.jsonPrimitive?.content ?: ""
 

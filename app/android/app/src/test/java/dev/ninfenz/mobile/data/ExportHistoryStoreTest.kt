@@ -3,6 +3,7 @@ package dev.ninfenz.mobile.data
 import java.io.File
 import java.nio.file.Files
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class ExportHistoryStoreTest {
@@ -21,6 +22,16 @@ class ExportHistoryStoreTest {
         assertEquals("sha3", entries.first().sha256)
         assertEquals(false, entries.first().ok)
         assertEquals("bad", entries.first().message)
+    }
+
+    @Test
+    fun clearRemovesHistory() {
+        val dir = Files.createTempDirectory("nf-export-history-clear").toFile()
+        val store = ExportHistoryStore(dir)
+        store.record("md", File(dir, "a.md").apply { writeText("a") }, "sha")
+        assertTrue(store.load().isNotEmpty())
+        assertTrue(store.clear())
+        assertEquals(0, store.load().size)
     }
 
     @Test

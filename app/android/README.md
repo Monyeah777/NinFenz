@@ -149,7 +149,7 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 - ErrorCodeFilterTest（2）：空查询全量、code/message/fix 大小写不敏感过滤。
 - ProjectFilterTest（2）：项目按状态过滤，null 全量。
 - ProtocolDraftStoreTest（2）：协议未保存 values/enabled 存取、清空/坏 JSON 容错。
-- ExportHistoryStoreTest（2）：最近导出/路径去重、最多 20 条、坏 JSON 容错。
+- ExportHistoryStoreTest（3）：最近导出/路径去重、最多 20 条、坏 JSON 容错、清空记录。
 - CommandPaletteTest（3）：空查询全量、标题/id 过滤、最近使用排序。
 - CommandHistoryStoreTest（2）：最近命令去重/上限 5。
 - StorageStatsTest（2）：目录占用汇总、只清 imports/shared 缓存、缺失目录为 0。
@@ -181,9 +181,9 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 - 真机 smoke：连接并授权后运行 `bash app/scripts/device_smoke.sh`（安装 debug APK、冷启动、前台 Activity、最近崩溃日志）；设 `CAPTURE_DIR=…` 额外拉取 `home.png` 与 `ui.xml`。
 
 - 2026-11-16 当前：`./gradlew :app:assembleDebug` 成功：app-debug.apk = 19,049,108 bytes，
-  sha256 = 371126d53cb358177ba36db3b5cf7faef51ca094bd3455fada6ac300944712c7（含双 ABI 原生库 + 9 个示例 Pack assets）。
+  sha256 = 8bb291172e66b72f85e983e8fcdaf058960b208d7d6ae5cb44e9e396c1cbc79f（含双 ABI 原生库 + 9 个示例 Pack assets）。
 - 仓库级门禁在 UTF-8 locale 下运行：`LANG=C.UTF-8 PYTHONUTF8=1 bash verify.sh --checks-only`（GBK 控制台会让 `git ls-files` 解码失败，触发 modeling 检查异常）。
-- `./gradlew :app:testDebugUnitTest` 全绿：308 条 JVM 单测（v1 42 + v0.02 266；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y/大字号/对比度/Paparazzi 截图）。
+- `./gradlew :app:testDebugUnitTest` 全绿：309 条 JVM 单测（v1 42 + v0.02 267；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y/大字号/对比度/Paparazzi 截图）。
 - `zipalign -c -P 16 -v 4 app-debug.apk` → Verification successful（native lib 16KB page 对齐）。
 - `bash app/scripts/build_core_android.sh --clean` 成功：NDK 27.0.12077973 + rustup targets
   （aarch64-linux-android / x86_64-linux-android，经 rsproxy 镜像安装）；两个 .so 的 LOAD align 均为 0x4000。

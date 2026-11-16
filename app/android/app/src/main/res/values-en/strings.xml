@@ -461,6 +461,7 @@
     <string name="library_filter_empty">No projects in this status</string>
     <string name="author_draft_restored">Restored unsaved protocol edits</string>
     <string name="delivery_recent_exports">Recent exports</string>
+    <string name="delivery_clear_exports">Clear history</string>
     <string name="action_commands">Commands</string>
     <string name="commands_title">Command palette</string>
     <string name="commands_placeholder">Search commands</string>
