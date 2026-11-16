@@ -158,6 +158,12 @@
     <string name="search_kind_slot">规格槽位</string>
     <string name="packcenter_title">Pack 中心</string>
     <string name="packcenter_update_plan">更新计划</string>
+    <string name="pack_update_diff_failed">pack-diff 失败：%1$s</string>
+    <string name="pack_update_diff_failed_fix">检查两版 Pack 目录</string>
+    <string name="pack_update_plan_failed">更新计划解析失败：%1$s</string>
+    <string name="pack_update_plan_failed_fix">按 app/schema/nf-pack-update.schema.json 修正</string>
+    <string name="pack_update_extract_failed">新版 Pack 解包失败：%1$s</string>
+    <string name="pack_update_extract_failed_fix">确认 zip 根/单层目录含 nf-pack.json</string>
     <string name="packcenter_empty_title">还没有 Pack</string>
     <string name="packcenter_empty_body">载入内置示例 Pack，或从文件管理器导入一个 Pack。</string>
     <string name="packcenter_load_sample">载入示例 Pack</string>

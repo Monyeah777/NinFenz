@@ -95,7 +95,12 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit) {
                     error = response.error
                 }
             } catch (e: Exception) {
-                error = CoreResponse.failure("NF-PCK-001", "pack-diff 失败：" + (e.message ?: e.javaClass.simpleName), "检查两版 Pack 目录", 1).error
+                error = CoreResponse.failure(
+                    "NF-PCK-001",
+                    context.getString(dev.ninfenz.mobile.R.string.pack_update_diff_failed, e.message ?: e.javaClass.simpleName),
+                    context.getString(dev.ninfenz.mobile.R.string.pack_update_diff_failed_fix),
+                    1
+                ).error
             } finally {
                 diffBusy = false
             }
@@ -115,7 +120,12 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit) {
                 error = null
                 resultText = null
             } catch (e: Exception) {
-                error = CoreResponse.failure("NF-PCK-001", "更新计划解析失败：" + (e.message ?: e.javaClass.simpleName), "按 app/schema/nf-pack-update.schema.json 修正", 1).error
+                error = CoreResponse.failure(
+                    "NF-PCK-001",
+                    context.getString(dev.ninfenz.mobile.R.string.pack_update_plan_failed, e.message ?: e.javaClass.simpleName),
+                    context.getString(dev.ninfenz.mobile.R.string.pack_update_plan_failed_fix),
+                    1
+                ).error
             }
         }
     }
@@ -132,7 +142,12 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit) {
                 newRoot = root
                 runDiff(selected, root)
             } catch (e: Exception) {
-                error = CoreResponse.failure("NF-PCK-002", "新版 Pack 解包失败：" + (e.message ?: e.javaClass.simpleName), "确认 zip 根/单层目录含 nf-pack.json", 1).error
+                error = CoreResponse.failure(
+                    "NF-PCK-002",
+                    context.getString(dev.ninfenz.mobile.R.string.pack_update_extract_failed, e.message ?: e.javaClass.simpleName),
+                    context.getString(dev.ninfenz.mobile.R.string.pack_update_extract_failed_fix),
+                    1
+                ).error
             }
         }
     }

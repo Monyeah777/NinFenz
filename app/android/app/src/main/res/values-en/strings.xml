@@ -158,6 +158,12 @@
     <string name="search_kind_slot">Spec slots</string>
     <string name="packcenter_title">Pack center</string>
     <string name="packcenter_update_plan">Update plan</string>
+    <string name="pack_update_diff_failed">pack-diff failed: %1$s</string>
+    <string name="pack_update_diff_failed_fix">Check both Pack directories</string>
+    <string name="pack_update_plan_failed">Update plan parse failed: %1$s</string>
+    <string name="pack_update_plan_failed_fix">Fix per app/schema/nf-pack-update.schema.json</string>
+    <string name="pack_update_extract_failed">New Pack extraction failed: %1$s</string>
+    <string name="pack_update_extract_failed_fix">Confirm the zip root/single directory contains nf-pack.json</string>
     <string name="packcenter_empty_title">No packs yet</string>
     <string name="packcenter_empty_body">Load the bundled sample pack, or import a pack from Files.</string>
     <string name="packcenter_load_sample">Load sample pack</string>
