@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -552,6 +553,7 @@ fun ProjectDetailScreen(
     var diffReport by remember { mutableStateOf<ProjectDiff.Report?>(null) }
     var diffError by remember { mutableStateOf<String?>(null) }
     var showComparePicker by remember { mutableStateOf(false) }
+    var compareQuery by remember { mutableStateOf("") }
     val diffPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: android.net.Uri? ->
         if (uri != null) {
             diffScope.launch {
@@ -655,7 +657,17 @@ fun ProjectDetailScreen(
             title = { Text(stringResource(dev.ninfenz.mobile.R.string.project_diff_library)) },
             text = {
                 Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                    compareCandidates.filter { it.project.id != project.id }.forEach { candidate ->
+                    OutlinedTextField(
+                        value = compareQuery,
+                        onValueChange = { compareQuery = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        placeholder = { Text(stringResource(dev.ninfenz.mobile.R.string.project_diff_search)) }
+                    )
+                    compareCandidates.filter {
+                        it.project.id != project.id &&
+                            (compareQuery.isBlank() || it.project.title.contains(compareQuery, ignoreCase = true) || it.project.id.contains(compareQuery, ignoreCase = true))
+                    }.forEach { candidate ->
                         TextButton(onClick = {
                             showComparePicker = false
                             diffScope.launch {
