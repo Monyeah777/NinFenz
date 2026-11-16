@@ -8,7 +8,8 @@ import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.state.Screen
@@ -23,7 +24,13 @@ fun layoutClassFor(widthDp: Int): LayoutClass = when {
 }
 
 @Composable
-fun currentLayoutClass(): LayoutClass = layoutClassFor(LocalConfiguration.current.screenWidthDp)
+fun currentWindowWidthDp(): Int {
+    val pixels = LocalWindowInfo.current.containerSize.width
+    return with(LocalDensity.current) { pixels.toDp().value.toInt() }
+}
+
+@Composable
+fun currentLayoutClass(): LayoutClass = layoutClassFor(currentWindowWidthDp())
 
 /** 屏幕的中文标签（无障碍朗读用；与 title 的英文内部名分离）。 */
 fun screenLabel(screen: Screen): String = when (screen) {

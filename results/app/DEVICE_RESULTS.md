@@ -17,6 +17,7 @@
 | L1 校验 | pass：L1 pass（error=0 warn=0 info=3）；状态 assembled→validated 写回 | run-as 读项目 |
 | 导出 md/zip | pass：files/exports/delivery/result.md + result.zip + manifest；状态 validated→exported 写回 | run-as 读文件 |
 | 桌面快捷方式（构建） | pass（构建）：静态 shortcuts（导入/新建/搜索）+ MainActivity 冷启动/onNewIntent 路由；未真机长按图标验证（adb 无设备） |
+| 窗口宽度 API 迁移（JVM） | pass（本机）：screenWidthDp 改 LocalWindowInfo.containerSize + LocalDensity；三档导航/矩阵测试仍绿；lint warnings 7→4。真机未复测（adb 无设备） |
 | 剩余复数资源清零（JVM） | pass（本机）：剩余 11 条英文复数改 plurals；lint warnings 18→7（仅剩 Compose 宽度/Gradle/ObsoleteSdk/UnusedAttribute）；真机未复测（adb 无设备） |
 | 英文复数资源（JVM） | pass（本机）：library_errors/search_hint/settings_err_count/storage_cleaned/backup_pruned 改 plurals + pluralStringResource/getQuantityString；lint warnings 23→18。真机未复测（adb 无设备） |
 | 分享授权失效指引（JVM） | pass（本机）：SecurityException 映射 NF-IMP-006，提示重新分享/改用文件选择；真机未复测（adb 无设备） |

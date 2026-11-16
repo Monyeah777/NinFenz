@@ -270,7 +270,7 @@ fun NfMobileApp(
         }
     }
 
-    val layout = layoutClassFor(LocalConfiguration.current.screenWidthDp)
+    val layout = layoutClassFor(currentWindowWidthDp())
     val compact = layout == LayoutClass.COMPACT
 
     BackHandler(enabled = shell.detail != null || shell.destination != TopDestination.LIBRARY) {
@@ -545,7 +545,7 @@ is Detail.Import -> ImportScreen(
                 ) { detail ->
                     if (detail == null) {
                         topLevelContent()
-                    } else if (!compact && LocalConfiguration.current.screenWidthDp >= 840) {
+                    } else if (!compact && currentWindowWidthDp() >= 840) {
                         Row(modifier = Modifier.fillMaxSize()) {
                             Box(modifier = Modifier.width(380.dp).fillMaxHeight()) { topLevelContent() }
                             VerticalDivider()
