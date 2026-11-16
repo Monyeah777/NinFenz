@@ -138,6 +138,18 @@ class ProjectPackageImporterTest {
     }
 
     @Test
+    fun importsUtf16ProjectJson() {
+        val root = Files.createTempDirectory("nf-utf16-project").toFile()
+        val bytes = byteArrayOf(0xFF.toByte(), 0xFE.toByte()) + doc.toByteArray(java.nio.charset.Charset.forName("UTF-16LE"))
+        val zip = File.createTempFile("nf-utf16", ".zip")
+        ZipOutputStream(zip.outputStream()).use { out ->
+            out.putNextEntry(ZipEntry("p.nfproject.json")); out.write(bytes); out.closeEntry()
+        }
+        val imported = ProjectPackageImporter.import(root, zip)
+        assertEquals("p", imported.id)
+    }
+
+    @Test
     fun rejectsMissingProjectJson() {
         val root = Files.createTempDirectory("nf-no-project").toFile()
         assertTrue(runCatching { ProjectPackageImporter.import(root, zip(listOf("data/a.md" to "x"))) }.isFailure)

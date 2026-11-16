@@ -29,6 +29,7 @@
 | HTML 表格对齐（JVM） | pass（本机）：:---/::/---: → style text-align；测试 12 条。真机未复测（adb 无设备） |
 | EPUB 导出 data URI 图片（JVM） | pass（本机）：Markdown data:image 渲染为 img；测试 10 条。真机未复测（adb 无设备） |
 | EPUB 图片内嵌（JVM） | pass（本机）：EPUB img 转 data URI（单图 ≤2MiB、总量 ≤20MiB）；测试 6 条。真机未复测（adb 无设备） |
+| UTF-16 项目 JSON（JVM） | pass（本机）：UTF-16LE BOM 项目 JSON 可导入；项目包测试 13 条。 |
 | 评审错误码补登（JVM） | pass（本机）：错误码扫描扩为全部 NF 字符串，补 NF-REV-001/002；error code 测试 2 条。 |
 | 清空导出记录（JVM） | pass（本机）：交付台「清空记录」删除 history.json；测试 3 条。真机未复测（adb 无设备） |
 | Lint 复核（round42） | pass（本机）：`:app:lintDebug` 0 warnings。 |
