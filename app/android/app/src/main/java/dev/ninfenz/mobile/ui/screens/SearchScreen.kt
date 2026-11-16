@@ -42,6 +42,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.data.SearchHit
 import dev.ninfenz.mobile.data.SearchHistoryStore
+import dev.ninfenz.mobile.data.SearchFilterStore
 import dev.ninfenz.mobile.data.SearchIndex
 import dev.ninfenz.mobile.data.SearchKind
 import dev.ninfenz.mobile.model.SearchFilter
@@ -64,8 +65,12 @@ fun SearchScreen(
     var all by remember { mutableStateOf<List<SearchHit>>(emptyList()) }
     var query by rememberSaveable { mutableStateOf("") }
     var selected by remember { mutableStateOf(0) }
-    var filterName by rememberSaveable { mutableStateOf<String?>(null) }
-    var selectedPackId by rememberSaveable { mutableStateOf<String?>(null) }
+    val filterStore = remember { SearchFilterStore(context.filesDir) }
+    val savedFilter = remember { filterStore.load() }
+    var filterName by rememberSaveable { mutableStateOf(savedFilter?.kind) }
+    var selectedPackId by rememberSaveable {
+        mutableStateOf(savedFilter?.packId?.takeIf { it in packIds })
+    }
     val filterKind = filterName?.let { name -> SearchKind.entries.firstOrNull { it.name == name } }
     val historyStore = remember { SearchHistoryStore(context.filesDir) }
     var history by remember { mutableStateOf(historyStore.load()) }
@@ -74,6 +79,9 @@ fun SearchScreen(
 
     LaunchedEffect(Unit) {
         all = withContext(Dispatchers.IO) { index.build() }
+    }
+    LaunchedEffect(filterName, selectedPackId) {
+        filterStore.save(filterName, selectedPackId)
     }
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
