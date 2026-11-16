@@ -63,6 +63,7 @@ import dev.ninfenz.mobile.data.PackSnapshot
 import dev.ninfenz.mobile.data.PackStore
 import dev.ninfenz.mobile.data.CreateProjectResult
 import dev.ninfenz.mobile.data.ProjectCreator
+import dev.ninfenz.mobile.data.ProjectArchiver
 import dev.ninfenz.mobile.data.ProjectDuplicator
 import dev.ninfenz.mobile.data.ProjectEntry
 import dev.ninfenz.mobile.data.SampleSeeder
@@ -428,6 +429,13 @@ is Detail.Import -> ImportScreen(
                                 onBack = { shell = shell.back() ?: shell },
                                 onAuthor = { shell = shell.open(Detail.Author(entry.project.id)) },
                                 onAssembly = { shell = shell.open(Detail.Delivery(entry.project.id)) },
+                                onArchive = {
+                                    scope.launch {
+                                        withContext(Dispatchers.IO) { ProjectArchiver.archive(entry.file, context.filesDir) }
+                                        refresh()
+                                        shell = shell.select(TopDestination.LIBRARY)
+                                    }
+                                },
                                 onDuplicate = {
                                     scope.launch {
                                         val copy = withContext(Dispatchers.IO) {

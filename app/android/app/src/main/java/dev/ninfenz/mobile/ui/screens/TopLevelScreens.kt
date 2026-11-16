@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -515,9 +516,11 @@ fun ProjectDetailScreen(
     onBack: () -> Unit,
     onAuthor: () -> Unit,
     onAssembly: () -> Unit,
-    onDuplicate: () -> Unit = {}
+    onDuplicate: () -> Unit = {},
+    onArchive: () -> Unit = {}
 ) {
     val context = LocalContext.current
+    var showArchive by remember { mutableStateOf(false) }
     Column(modifier = Modifier.fillMaxSize()) {
         NfTopAppBar(title = project.title, onBack = onBack)
         LazyColumn(
@@ -546,6 +549,9 @@ fun ProjectDetailScreen(
                         )
                         TextButton(onClick = onDuplicate) {
                             Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_duplicate))
+                        }
+                        TextButton(onClick = { showArchive = true }) {
+                            Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_archive))
                         }
                     }
                 }
@@ -583,6 +589,23 @@ fun ProjectDetailScreen(
             item { NfListRow(stringResource(dev.ninfenz.mobile.R.string.project_detail_author), stringResource(dev.ninfenz.mobile.R.string.project_detail_author_subtitle), Icons.Filled.Edit, "›", onAuthor) }
             item { NfListRow(stringResource(dev.ninfenz.mobile.R.string.project_detail_delivery), stringResource(dev.ninfenz.mobile.R.string.project_detail_delivery_subtitle), Icons.Filled.Info, "›", onAssembly) }
         }
+    }
+
+    if (showArchive) {
+        AlertDialog(
+            onDismissRequest = { showArchive = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.project_archive_title)) },
+            text = { Text(stringResource(dev.ninfenz.mobile.R.string.project_archive_body)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    showArchive = false
+                    onArchive()
+                }) { Text(stringResource(dev.ninfenz.mobile.R.string.project_archive_confirm)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showArchive = false }) { Text(stringResource(android.R.string.cancel)) }
+            }
+        )
     }
 }
 

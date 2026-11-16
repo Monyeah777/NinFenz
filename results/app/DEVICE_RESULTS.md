@@ -16,6 +16,7 @@
 | 装配 | pass：填 4 个槽位后 assemble 返回 markdown（开篇/正文/收束） | 截图 19 |
 | L1 校验 | pass：L1 pass（error=0 warn=0 info=3）；状态 assembled→validated 写回 | run-as 读项目 |
 | 导出 md/zip | pass：files/exports/delivery/result.md + result.zip + manifest；状态 validated→exported 写回 | run-as 读文件 |
+| 项目归档（JVM） | pass（本机）：项目详情「归档项目」确认后移动到 projects-archive/，不删除；清单刷新回库；越界文件拒绝。真机未复测（adb 无设备） |
 | 项目复制（JVM） | pass（本机）：项目详情「复制项目」保留 refs，ID 生成 -copy/-copy-2，状态重置 draft、评审 pending、history 清空；测试 2 条。真机未复测（adb 无设备） |
 | 项目历史分享（JVM） | pass（本机）：项目详情历史卡新增「分享历史」，生成 Markdown 表格（op/digest/at），标题/单元格转义；空历史可导出。真机未复测（adb 无设备） |
 | JSON/Skill 导出（JVM） | pass（本机）：交付台新增「导出 json」「导出 skill」；json 产 result.json，skill 产 result.skill.zip；纳入校验与最近导出/重新分享；真机未复测（adb 无设备） |
