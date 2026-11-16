@@ -80,6 +80,13 @@ class HtmlExporterTest {
     }
 
     @Test
+    fun rendersCodeLanguageClass() {
+        val dir = Files.createTempDirectory("nf-html-lang").toFile()
+        val created = HtmlExporter.export("\u0060\u0060\u0060kotlin\nval x = 1\n\u0060\u0060\u0060", "t", dir)
+        assertTrue(created.file.readText().contains("<code class=\"language-kotlin\">"))
+    }
+
+    @Test
     fun handlesCodeFence() {
         val dir = Files.createTempDirectory("nf-html-2").toFile()
         val created = HtmlExporter.export("\u0060\u0060\u0060\ncode\n\u0060\u0060\u0060", "t", dir)
