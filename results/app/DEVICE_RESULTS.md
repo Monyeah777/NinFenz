@@ -16,6 +16,7 @@
 | 装配 | pass：填 4 个槽位后 assemble 返回 markdown（开篇/正文/收束） | 截图 19 |
 | L1 校验 | pass：L1 pass（error=0 warn=0 info=3）；状态 assembled→validated 写回 | run-as 读项目 |
 | 导出 md/zip | pass：files/exports/delivery/result.md + result.zip + manifest；状态 validated→exported 写回 | run-as 读文件 |
+| 搜索键盘导航（JVM） | pass（本机）：搜索框自动聚焦，↑↓ 移动高亮，Enter 打开，Esc 清空；`SearchKeyboardTest` 覆盖边界；真机键盘未复测（adb 无设备） |
 | 导入/原子写/槽位草稿（JVM/core） | pass（本机）：EPUB/OOXML 不再误判、UTF-16LE/BE+BOM 可导入、64 MiB 预检/缓存上限、草稿同名自动后缀、SEND_MULTIPLE 非首项显式提示、JSON 状态原子写+fsync+.bak；新增交付槽位草稿防抖保存/重进恢复。Rust ops_import 21/21、Android 143/143；真机未复测（adb 无设备） |
 | 批量槽位导入 | pass：slot-batch.md（4 段）→ 弹窗 4 段/4 槽位预览；仅填空槽填入 4；再次仅填空槽跳过 4（已有内容不覆盖）；slot-batch-overflow.md（5 段）显示「超出 1 段」提示 |
 | 槽位文本导入/适配 | pass：槽位「导入」选 slot-import.md（含 YAML/标题/粗斜体/链接/列表）→ 弹窗显示「markdown · 87 → 31 字」适配预览；替换后槽位字数 31，内容已去 frontmatter/井号/强调/链接目标 |

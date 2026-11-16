@@ -1,12 +1,16 @@
 package dev.ninfenz.mobile.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
@@ -20,6 +24,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -27,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.data.SearchHit
 import dev.ninfenz.mobile.data.SearchIndex
 import dev.ninfenz.mobile.data.SearchKind
+import dev.ninfenz.mobile.model.SearchKeyboard
 import dev.ninfenz.mobile.ui.components.NfTopAppBar
 import dev.ninfenz.mobile.ui.theme.NfSpacing
 import kotlinx.coroutines.Dispatchers
@@ -43,22 +55,83 @@ fun SearchScreen(
     val index = remember { SearchIndex(context.filesDir) }
     var all by remember { mutableStateOf<List<SearchHit>>(emptyList()) }
     var query by remember { mutableStateOf("") }
+    var selected by remember { mutableStateOf(0) }
+    val focusRequester = remember { FocusRequester() }
+    val listState = rememberLazyListState()
 
     LaunchedEffect(Unit) {
         all = withContext(Dispatchers.IO) { index.build() }
     }
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
     val results = remember(query, all) { index.search(all, query) }
+    LaunchedEffect(results) { selected = 0 }
+    val rows = remember(results) {
+        val out = mutableListOf<SearchRow>()
+        var flat = 0
+        SearchKind.entries.forEach { kind ->
+            val hits = results.filter { it.kind == kind }
+            if (hits.isNotEmpty()) {
+                out.add(SearchRow(kind = kind))
+                hits.forEach { hit ->
+                    out.add(SearchRow(hit = hit, flatIndex = flat))
+                    flat++
+                }
+            }
+        }
+        out
+    }
+    fun openHit(hit: SearchHit) {
+        when {
+            hit.kind == SearchKind.PROJECT && hit.projectId != null -> onOpenProject(hit.projectId)
+            hit.packId != null && hit.packVersion != null -> onOpenPack(hit.packId, hit.packVersion)
+        }
+    }
+    fun select(delta: Int) {
+        selected = SearchKeyboard.move(selected, results.size, delta)
+    }
+    LaunchedEffect(selected, rows) {
+        val itemIndex = rows.indexOfFirst { it.hit != null && it.flatIndex == selected }
+        if (itemIndex >= 0) listState.animateScrollToItem(itemIndex)
+    }
 
     Column(modifier = Modifier.fillMaxSize()) {
         NfTopAppBar(title = stringResource(dev.ninfenz.mobile.R.string.search_title), onBack = onBack)
         OutlinedTextField(
             value = query,
             onValueChange = { query = it },
-            modifier = Modifier.fillMaxWidth().padding(horizontal = NfSpacing.page),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = NfSpacing.page)
+                .focusRequester(focusRequester)
+                .onPreviewKeyEvent { event ->
+                    if (event.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
+                    when (event.key) {
+                        Key.DirectionDown -> { select(1); true }
+                        Key.DirectionUp -> { select(-1); true }
+                        Key.Enter, Key.NumPadEnter -> {
+                            val hit = results.getOrNull(selected)
+                            if (hit != null) { openHit(hit); true } else false
+                        }
+                        Key.Escape -> {
+                            if (query.isNotEmpty()) { query = ""; true } else false
+                        }
+                        else -> false
+                    }
+                },
             placeholder = { Text(stringResource(dev.ninfenz.mobile.R.string.search_placeholder)) },
             leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
             singleLine = true
         )
+        if (query.isNotBlank() && results.isNotEmpty()) {
+            Text(
+                stringResource(dev.ninfenz.mobile.R.string.search_keyboard_hint),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = NfSpacing.page, vertical = 4.dp)
+            )
+        }
         when {
             query.isBlank() -> Text(
                 stringResource(dev.ninfenz.mobile.R.string.search_hint, all.size),
@@ -72,41 +145,39 @@ fun SearchScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(NfSpacing.page)
             )
-            else -> {
-                val grouped = results.groupBy { it.kind }
-                LazyColumn(
-                    contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 96.dp),
-                    verticalArrangement = Arrangement.spacedBy(2.dp)
-                ) {
-                    SearchKind.entries.forEach { kind ->
-                        val hits = grouped[kind] ?: return@forEach
-                        if (hits.isEmpty()) return@forEach
-                        item {
-                            val label = when (kind) {
-                                dev.ninfenz.mobile.data.SearchKind.PROJECT -> stringResource(dev.ninfenz.mobile.R.string.search_kind_project)
-                                dev.ninfenz.mobile.data.SearchKind.PACK -> stringResource(dev.ninfenz.mobile.R.string.search_kind_pack)
-                                dev.ninfenz.mobile.data.SearchKind.CLAUSE -> stringResource(dev.ninfenz.mobile.R.string.search_kind_clause)
-                                dev.ninfenz.mobile.data.SearchKind.FIELD -> stringResource(dev.ninfenz.mobile.R.string.search_kind_field)
-                                dev.ninfenz.mobile.data.SearchKind.NODE -> stringResource(dev.ninfenz.mobile.R.string.search_kind_node)
-                                dev.ninfenz.mobile.data.SearchKind.SECTION -> stringResource(dev.ninfenz.mobile.R.string.search_kind_section)
-                                dev.ninfenz.mobile.data.SearchKind.SLOT -> stringResource(dev.ninfenz.mobile.R.string.search_kind_slot)
-                            }
-                            SectionLabel(label + " · " + hits.size)
-                        }
-                        items(hits.size) { i ->
-                            val hit = hits[i]
-                            ResultRow(hit) {
-                                when {
-                                    hit.kind == SearchKind.PROJECT && hit.projectId != null -> onOpenProject(hit.projectId)
-                                    hit.packId != null && hit.packVersion != null -> onOpenPack(hit.packId, hit.packVersion)
-                                }
-                            }
-                        }
+            else -> LazyColumn(
+                state = listState,
+                contentPadding = PaddingValues(bottom = 96.dp),
+                verticalArrangement = Arrangement.spacedBy(2.dp)
+            ) {
+                itemsIndexed(rows) { _, row ->
+                    val kind = row.kind
+                    val hit = row.hit
+                    when {
+                        kind != null -> SectionLabel(kindLabel(kind))
+                        hit != null -> ResultRow(hit, selected == row.flatIndex) { openHit(hit) }
                     }
                 }
             }
         }
     }
+}
+
+private data class SearchRow(
+    val kind: SearchKind? = null,
+    val hit: SearchHit? = null,
+    val flatIndex: Int = -1
+)
+
+@Composable
+private fun kindLabel(kind: SearchKind): String = when (kind) {
+    SearchKind.PROJECT -> stringResource(dev.ninfenz.mobile.R.string.search_kind_project)
+    SearchKind.PACK -> stringResource(dev.ninfenz.mobile.R.string.search_kind_pack)
+    SearchKind.CLAUSE -> stringResource(dev.ninfenz.mobile.R.string.search_kind_clause)
+    SearchKind.FIELD -> stringResource(dev.ninfenz.mobile.R.string.search_kind_field)
+    SearchKind.NODE -> stringResource(dev.ninfenz.mobile.R.string.search_kind_node)
+    SearchKind.SECTION -> stringResource(dev.ninfenz.mobile.R.string.search_kind_section)
+    SearchKind.SLOT -> stringResource(dev.ninfenz.mobile.R.string.search_kind_slot)
 }
 
 @Composable
@@ -119,10 +190,11 @@ private fun SectionLabel(text: String) {
 }
 
 @Composable
-private fun ResultRow(hit: SearchHit, onClick: () -> Unit) {
+private fun ResultRow(hit: SearchHit, selected: Boolean, onClick: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .background(if (selected) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surface)
             .clickable(onClick = onClick)
             .padding(horizontal = NfSpacing.page, vertical = 10.dp)
     ) {
