@@ -93,11 +93,18 @@ object HtmlImporter {
     private fun strip(html: String): String = Regex("(?s)<[^>]+>").replace(html, "")
         .replace('\u00A0', ' ')
 
-    private fun decode(text: String): String = text
-        .replace("&nbsp;", " ")
+    private fun decode(text: String): String {
+        val numeric = Regex("&#(x?[0-9A-Fa-f]+);").replace(text) { m ->
+            val raw = m.groupValues[1]
+            val code = if (raw.startsWith("x", true)) raw.drop(1).toIntOrNull(16) else raw.toIntOrNull()
+            code?.takeIf { it in 1..0x10FFFF }?.let { String(Character.toChars(it)) } ?: m.value
+        }
+        return numeric
+            .replace("&nbsp;", " ")
         .replace("&lt;", "<")
         .replace("&gt;", ">")
         .replace("&quot;", "\"")
         .replace("&#39;", "'")
         .replace("&amp;", "&")
+}
 }
