@@ -44,6 +44,7 @@ import dev.ninfenz.mobile.data.AuthorArtifacts
 import dev.ninfenz.mobile.data.AuthorArtifactsLoader
 import dev.ninfenz.mobile.data.DeliveryDraftStore
 import dev.ninfenz.mobile.data.EpubExporter
+import dev.ninfenz.mobile.data.EpubValidator
 import dev.ninfenz.mobile.data.ExportHistoryStore
 import dev.ninfenz.mobile.data.ExportVerifier
 import dev.ninfenz.mobile.data.PackEntry
@@ -193,7 +194,11 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
         val sha = manifest?.let { Regex("\"sha256\":\"([^\"]+)\"").find(it)?.groupValues?.getOrNull(1) }.orEmpty()
         exportHistory.record(format, file, sha)
         exportEntries = exportHistory.load()
-        exportVerify = if (verify) ExportVerifier.verify(file, manifest) else null
+        exportVerify = when {
+            !verify -> null
+            format == "epub" -> EpubValidator.inspect(file).let { ExportVerifier.Result(it.ok, it.message) }
+            else -> ExportVerifier.verify(file, manifest)
+        }
     }
 
     fun applyBatch(onlyEmpty: Boolean) {
@@ -511,7 +516,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                     EpubExportButton(markdown, project, context, scope, { busy = it }, { error = it }) { file ->
                         exportedFile = file
                         manifestText = null
-                        recordExport("epub", file, null, verify = false)
+                        recordExport("epub", file, null)
                     }
                 }
                 Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
