@@ -37,6 +37,17 @@ class DocxImporterTest {
     }
 
     @Test
+    fun extractsTables() {
+        val xml = "<w:document><w:body><w:tbl>" +
+            "<w:tr><w:tc><w:p><w:r><w:t>A</w:t></w:r></w:p></w:tc><w:tc><w:p><w:r><w:t>B</w:t></w:r></w:p></w:tc></w:tr>" +
+            "<w:tr><w:tc><w:p><w:r><w:t>1</w:t></w:r></w:p></w:tc><w:tc><w:p><w:r><w:t>2</w:t></w:r></w:p></w:tc></w:tr>" +
+            "</w:tbl></w:body></w:document>"
+        val md = DocxImporter.extract(docx(xml))
+        assertTrue(md.contains("| A | B |"))
+        assertTrue(md.contains("| 1 | 2 |"))
+    }
+
+    @Test
     fun rejectsMissingDocument() {
         val f = File.createTempFile("nf-docx-bad", ".docx")
         ZipOutputStream(f.outputStream()).use { out ->
