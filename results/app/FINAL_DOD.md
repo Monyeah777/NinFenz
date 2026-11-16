@@ -57,7 +57,7 @@
 | 结论 | 维度 |
 |---|---|
 | covered（13） | S0 需求覆盖、S1 代码空洞、S2 默认放行、S4 链/序、S5 类型兼容、S6 测试缺口/变异、S7 文档过度声明、S8 依赖/供应链、S9 路径/DoS、S10 隐私/秘密、S12 导入矩阵、S13 Pack diff/merge/回滚、S14 APP/CCOS 边界 |
-| gap（1，带 owner+next） | S11 崩溃/进程死亡恢复未实现（owner: lead） |
+| gap（0） | S11 已关闭：shell/导入/槽位/协议草稿 + crash 日志覆盖关键进程死亡恢复；真机矩阵仍 OPEN-TOOLCHAIN |
 | open（2，带 owner+next） | S3 密码学（仅完整性摘要，无签名/加密）、S15 红队（无 Android 运行时/真机） |
 
 停止条件（计划 §15.3）：QA0–QA6 FAIL=0 ✔；P0=0 ✔；UNSUPPORTED 全带 owner+next ✔；**「连续两轮」已达成**（Round2 与 Round3 各跑一轮 run_gates.py，均 FAIL=0 / P0=0，证据见两轮 GATES 现场输出）。

@@ -147,14 +147,18 @@
     },
     {
       "evidence": [
-        "app/docs/CONTRACT.md",
-        "app/core/tests/backup.rs"
+        "app/android/app/src/main/java/dev/ninfenz/mobile/ui/shell/ShellStateCodec.kt",
+        "app/android/app/src/main/java/dev/ninfenz/mobile/data/ImportDraftStore.kt",
+        "app/android/app/src/main/java/dev/ninfenz/mobile/data/ProtocolDraftStore.kt",
+        "app/android/app/src/main/java/dev/ninfenz/mobile/data/DeliveryDraftStore.kt",
+        "app/android/app/src/main/java/dev/ninfenz/mobile/data/CrashLogStore.kt",
+        "app/android/app/src/test/java/dev/ninfenz/mobile/ui/shell/ShellStateCodecTest.kt"
       ],
       "id": "S11",
-      "next": "pack 更新备份/回滚已有；进程死亡/崩溃恢复未实现（A6/Q 后补，OPEN-DATADIR）",
-      "note": null,
-      "owner": "lead",
-      "status": "gap",
+      "next": null,
+      "note": "v0.02 Android: shell 路由/导入预览/槽位/协议编辑草稿 rememberSaveable + AtomicFiles；未捕获异常写 crash 日志；进程重启恢复关键编辑（真机矩阵仍 OPEN-TOOLCHAIN）",
+      "owner": null,
+      "status": "covered",
       "title": "可观测/恢复"
     },
     {
@@ -252,14 +256,8 @@
       "pass": 3
     }
   },
-  "head": "badf74ce82060602cfa8bffd04b9cf130a9e4101",
+  "head": "c1d07e25fca96e1c23130f1bb30a9dcb02f4c737",
   "open_items": [
-    {
-      "id": "S11",
-      "next": "pack 更新备份/回滚已有；进程死亡/崩溃恢复未实现（A6/Q 后补，OPEN-DATADIR）",
-      "owner": "lead",
-      "title": "可观测/恢复"
-    },
     {
       "id": "S3",
       "next": "APP 只做完整性摘要（SHA-256）；签名/加密未引入（OPEN-EXTERNAL；引入需独立评审）",
@@ -857,20 +855,20 @@
         "app/android/app/src/test/java/dev/ninfenz/mobile/FixtureFilesTest.kt",
         "app/android/app/src/test/java/dev/ninfenz/mobile/ModelParsingTest.kt",
         "app/android/app/src/test/java/dev/ninfenz/mobile/StateMachineTest.kt",
+        "app/android/app/src/test/java/dev/ninfenz/mobile/core/ErrorCodeFilterTest.kt",
         "app/android/app/src/test/java/dev/ninfenz/mobile/data/AppPrefsTest.kt",
+        "app/android/app/src/test/java/dev/ninfenz/mobile/data/AtomicFilesTest.kt",
         "app/android/app/src/test/java/dev/ninfenz/mobile/data/AuthorArtifactStoreTest.kt",
         "app/android/app/src/test/java/dev/ninfenz/mobile/data/AuthorArtifactsLoaderTest.kt",
         "app/android/app/src/test/java/dev/ninfenz/mobile/data/AuthorOverlayStoreTest.kt",
-        "app/android/app/src/test/java/dev/ninfenz/mobile/data/PackStoreTest.kt",
-        "app/android/app/src/test/java/dev/ninfenz/mobile/data/PackVerifierTest.kt",
-        "app/android/app/src/test/java/dev/ninfenz/mobile/data/PackZipLoaderTest.kt",
-        "app/android/app/src/test/java/dev/ninfenz/mobile/data/ProjectCreatorTest.kt",
-        "app/android/app/src/test/java/dev/ninfenz/mobile/data/ProjectFactoryTest.kt",
-        "app/android/app/src/test/java/dev/ninfenz/mobile/data/ProjectStatusStoreTest.kt",
-        "app/android/app/src/test/java/dev/ninfenz/mobile/data/SearchIndexTest.kt",
-        "app/android/app/src/test/java/dev/ninfenz/mobile/ui/A11yComposeTest.kt",
-        "app/android/app/src/test/java/dev/ninfenz/mobile/ui/AdaptiveLayoutTest.kt",
-        "app/android/app/src/test/java/dev/ninfenz/mobile/ui/ComposeSmokeTest.kt"
+        "app/android/app/src/test/java/dev/ninfenz/mobile/data/BackupRestoreServiceTest.kt",
+        "app/android/app/src/test/java/dev/ninfenz/mobile/data/BackupServiceTest.kt",
+        "app/android/app/src/test/java/dev/ninfenz/mobile/data/CommandHistoryStoreTest.kt",
+        "app/android/app/src/test/java/dev/ninfenz/mobile/data/CrashLogStoreTest.kt",
+        "app/android/app/src/test/java/dev/ninfenz/mobile/data/DeliveryDraftStoreTest.kt",
+        "app/android/app/src/test/java/dev/ninfenz/mobile/data/DiagnosticsBundleTest.kt",
+        "app/android/app/src/test/java/dev/ninfenz/mobile/data/DraftLibraryTest.kt",
+        "app/android/app/src/test/java/dev/ninfenz/mobile/data/EpubExporterTest.kt"
       ],
       "gate": "QA5",
       "kind": "glob_min",
@@ -948,12 +946,12 @@
   ],
   "schema": "nf-app-gates/1",
   "self_audit": {
-    "covered": 13,
+    "covered": 14,
     "dimensions": 16,
-    "gap": 1,
+    "gap": 0,
     "open": 2,
     "p0": 0,
-    "p1": 3,
+    "p1": 2,
     "stop_condition": "QA0–QA6 FAIL=0 且 P0=0 且 UNSUPPORTED 全部带 owner+next（连续两轮）"
   }
 }

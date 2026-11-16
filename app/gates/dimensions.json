@@ -125,12 +125,17 @@
       "id": "S11",
       "title": "可观测/恢复",
       "evidence": [
-        "app/docs/CONTRACT.md",
-        "app/core/tests/backup.rs"
+        "app/android/app/src/main/java/dev/ninfenz/mobile/ui/shell/ShellStateCodec.kt",
+        "app/android/app/src/main/java/dev/ninfenz/mobile/data/ImportDraftStore.kt",
+        "app/android/app/src/main/java/dev/ninfenz/mobile/data/ProtocolDraftStore.kt",
+        "app/android/app/src/main/java/dev/ninfenz/mobile/data/DeliveryDraftStore.kt",
+        "app/android/app/src/main/java/dev/ninfenz/mobile/data/CrashLogStore.kt",
+        "app/android/app/src/test/java/dev/ninfenz/mobile/ui/shell/ShellStateCodecTest.kt"
       ],
-      "status": "gap",
-      "owner": "lead",
-      "next": "pack 更新备份/回滚已有；进程死亡/崩溃恢复未实现（A6/Q 后补，OPEN-DATADIR）"
+      "status": "covered",
+      "owner": null,
+      "next": null,
+      "note": "v0.02 Android: shell 路由/导入预览/槽位/协议编辑草稿 rememberSaveable + AtomicFiles；未捕获异常写 crash 日志；进程重启恢复关键编辑（真机矩阵仍 OPEN-TOOLCHAIN）"
     },
     {
       "id": "S12",

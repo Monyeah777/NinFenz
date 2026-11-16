@@ -147,14 +147,18 @@
     },
     {
       "evidence": [
-        "app/docs/CONTRACT.md",
-        "app/core/tests/backup.rs"
+        "app/android/app/src/main/java/dev/ninfenz/mobile/ui/shell/ShellStateCodec.kt",
+        "app/android/app/src/main/java/dev/ninfenz/mobile/data/ImportDraftStore.kt",
+        "app/android/app/src/main/java/dev/ninfenz/mobile/data/ProtocolDraftStore.kt",
+        "app/android/app/src/main/java/dev/ninfenz/mobile/data/DeliveryDraftStore.kt",
+        "app/android/app/src/main/java/dev/ninfenz/mobile/data/CrashLogStore.kt",
+        "app/android/app/src/test/java/dev/ninfenz/mobile/ui/shell/ShellStateCodecTest.kt"
       ],
       "id": "S11",
-      "next": "pack 更新备份/回滚已有；进程死亡/崩溃恢复未实现（A6/Q 后补，OPEN-DATADIR）",
-      "note": null,
-      "owner": "lead",
-      "status": "gap",
+      "next": null,
+      "note": "v0.02 Android: shell 路由/导入预览/槽位/协议编辑草稿 rememberSaveable + AtomicFiles；未捕获异常写 crash 日志；进程重启恢复关键编辑（真机矩阵仍 OPEN-TOOLCHAIN）",
+      "owner": null,
+      "status": "covered",
       "title": "可观测/恢复"
     },
     {
@@ -208,14 +212,8 @@
       "title": "红队（文件管理器/AI 输出/恶意 pack/深链/分享）"
     }
   ],
-  "head": "badf74ce82060602cfa8bffd04b9cf130a9e4101",
+  "head": "c1d07e25fca96e1c23130f1bb30a9dcb02f4c737",
   "open_items": [
-    {
-      "id": "S11",
-      "next": "pack 更新备份/回滚已有；进程死亡/崩溃恢复未实现（A6/Q 后补，OPEN-DATADIR）",
-      "owner": "lead",
-      "title": "可观测/恢复"
-    },
     {
       "id": "S3",
       "next": "APP 只做完整性摘要（SHA-256）；签名/加密未引入（OPEN-EXTERNAL；引入需独立评审）",
@@ -231,12 +229,12 @@
   ],
   "schema": "nf-app-self-audit/1",
   "summary": {
-    "covered": 13,
+    "covered": 14,
     "dimensions": 16,
-    "gap": 1,
+    "gap": 0,
     "open": 2,
     "p0": 0,
-    "p1": 3,
+    "p1": 2,
     "stop_condition": "QA0–QA6 FAIL=0 且 P0=0 且 UNSUPPORTED 全部带 owner+next（连续两轮）"
   }
 }
