@@ -42,6 +42,7 @@ import dev.ninfenz.mobile.core.CoreResponse
 import dev.ninfenz.mobile.core.J
 import dev.ninfenz.mobile.data.DraftLibrary
 import dev.ninfenz.mobile.data.PackEntry
+import dev.ninfenz.mobile.data.DocxImporter
 import dev.ninfenz.mobile.data.EpubImporter
 import dev.ninfenz.mobile.data.HtmlImporter
 import dev.ninfenz.mobile.data.ProjectPackageImporter
@@ -156,12 +157,21 @@ fun ImportScreen(
         savedName = null
         suggestNote = null
         acceptedMappings = emptySet()
+        val isDocx = name.endsWith(".docx", true) || mime == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         val isEpub = name.endsWith(".epub", true) || mime == "application/epub+zip" ||
             ((name.endsWith(".zip", true) || mime == "application/zip") && EpubImporter.isEpub(file))
-        val isHtml = !isEpub && (name.endsWith(".html", true) || name.endsWith(".htm", true) || mime == "text/html")
-        val isText = !isEpub && !isHtml && (name.endsWith(".txt", true) || name.endsWith(".md", true) ||
+        val isHtml = !isEpub && !isDocx && (name.endsWith(".html", true) || name.endsWith(".htm", true) || mime == "text/html")
+        val isText = !isEpub && !isDocx && !isHtml && (name.endsWith(".txt", true) || name.endsWith(".md", true) ||
             name.endsWith(".markdown", true) || mime?.startsWith("text/") == true)
         val sourceFile = when {
+            isDocx -> {
+                val markdown = runCatching { DocxImporter.extract(file) }.getOrNull()?.takeIf { it.isNotBlank() }
+                if (markdown == null) {
+                    error = CoreResponse.failure("NF-IMP-008", "DOCX 解析失败或无正文", "确认 DOCX 含 word/document.xml", 2).error
+                    return
+                }
+                File(file.parentFile, "docx-import.md").apply { writeText(markdown, Charsets.UTF_8) }
+            }
             isEpub -> {
                 val markdown = runCatching { EpubImporter.extract(file) }.getOrNull()?.takeIf { it.isNotBlank() }
                 if (markdown == null) {
