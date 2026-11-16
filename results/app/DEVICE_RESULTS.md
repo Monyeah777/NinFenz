@@ -19,6 +19,7 @@
 | 桌面快捷方式（构建） | pass（构建）：静态 shortcuts（导入/新建/搜索）+ MainActivity 冷启动/onNewIntent 路由；未真机长按图标验证（adb 无设备） |
 | Lint 收尾（JVM） | pass（本机）：抑制预期 UnusedAttribute；import_project_package_done 改 plurals；warnings 4→3（仅剩 GradleDependency2/ObsoleteSdkInt1）。真机未复测（adb 无设备） |
 | 错误码复制反馈（JVM） | pass（本机）：点击错误码复制并 Toast「已复制 code」；真机未复测（adb 无设备） |
+| Lint ObsoleteSdkInt 收口（JVM） | pass（本机）：新增 lint.xml 按路径忽略 mipmap-anydpi-v26（minSdk=26 下冗余但保留给 launcher 工具）；lint warnings 2→1，仅剩 Paparazzi 版本（被 Kotlin 2.1 阻塞）。 |
 | 删除线（JVM） | pass（本机）：HTML/EPUB `~~旧~~` 渲染 del；各 1 条测试。真机未复测（adb 无设备） |
 | 有序列表（JVM） | pass（本机）：HTML/EPUB `1.` 行渲染 ol/li 并正确闭合；各 1 条测试。真机未复测（adb 无设备） |
 | 引用块（JVM） | pass（本机）：HTML/EPUB `> ` 行渲染 blockquote/p；各 1 条测试。真机未复测（adb 无设备） |
