@@ -2,9 +2,14 @@ package dev.ninfenz.mobile.ui.screens
 
 import android.content.ClipData
 import android.content.ClipboardManager
+import android.net.Uri
 import android.content.Context
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,9 +24,11 @@ import dev.ninfenz.mobile.BuildConfig
 import dev.ninfenz.mobile.core.Core
 import dev.ninfenz.mobile.core.CoreBridgeNative
 import dev.ninfenz.mobile.core.ErrorCatalog
+import dev.ninfenz.mobile.data.BackupRestoreService
 import dev.ninfenz.mobile.data.BackupService
 import dev.ninfenz.mobile.data.StorageStats
 import dev.ninfenz.mobile.share.ShareExporter
+import java.io.File
 import dev.ninfenz.mobile.ui.components.CardBox
 import dev.ninfenz.mobile.ui.components.KeyValue
 import dev.ninfenz.mobile.ui.components.MonoText
@@ -40,7 +47,28 @@ fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
     var stats by remember { mutableStateOf(StorageStats.scan(context.filesDir, context.cacheDir)) }
     var cleaned by remember { mutableStateOf<String?>(null) }
     var backupMessage by remember { mutableStateOf<String?>(null) }
+    var pendingRestore by remember { mutableStateOf<File?>(null) }
+    var restoreEntries by remember { mutableStateOf(0) }
     val scope = rememberCoroutineScope()
+    val restorePicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        scope.launch {
+            backupMessage = null
+            val file = File(context.cacheDir, "restore.zip")
+            withContext(Dispatchers.IO) {
+                context.contentResolver.openInputStream(uri)?.use { input ->
+                    file.outputStream().use { output -> input.copyTo(output) }
+                }
+            }
+            val checked = withContext(Dispatchers.IO) { BackupRestoreService.inspect(file) }
+            if (!checked.ok) {
+                backupMessage = "备份校验失败：" + (checked.error ?: "未知原因")
+            } else {
+                pendingRestore = file
+                restoreEntries = checked.entries.size
+            }
+        }
+    }
 
     val diagnosticsText = buildString {
         appendLine("app=dev.ninfenz.mobile " + BuildConfig.VERSION_NAME + " (" + BuildConfig.VERSION_CODE + ")")
@@ -92,6 +120,9 @@ fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
                 }
             }) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_backup_export)) }
             backupMessage?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary) }
+            OutlinedButton(onClick = {
+                restorePicker.launch(arrayOf("application/zip", "*/*"))
+            }) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_backup_restore)) }
         }
 
         CardBox(title = stringResource(dev.ninfenz.mobile.R.string.settings_privacy)) {
@@ -112,6 +143,31 @@ fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
                 Text(if (copied) stringResource(dev.ninfenz.mobile.R.string.settings_copied) else stringResource(dev.ninfenz.mobile.R.string.settings_copy))
             }
         }
+    }
+
+    pendingRestore?.let { file ->
+        AlertDialog(
+            onDismissRequest = { pendingRestore = null },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.settings_backup_restore_title)) },
+            text = { Text(stringResource(dev.ninfenz.mobile.R.string.settings_backup_restore_warning, restoreEntries)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    scope.launch {
+                        val result = withContext(Dispatchers.IO) {
+                            runCatching { BackupRestoreService.restore(file, context.filesDir) }
+                        }
+                        backupMessage = result.fold(
+                            onSuccess = { "已恢复 " + it.files + " 个文件" },
+                            onFailure = { "恢复失败：" + (it.message ?: it.javaClass.simpleName) }
+                        )
+                        pendingRestore = null
+                    }
+                }) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_backup_restore_confirm)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { pendingRestore = null }) { Text(stringResource(android.R.string.cancel)) }
+            }
+        )
     }
 }
 

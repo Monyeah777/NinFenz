@@ -459,4 +459,8 @@
     <string name="project_history_title">Status history</string>
     <string name="settings_backup_export">Export local backup</string>
     <string name="settings_backup_done">Backup created: %1$d files · %2$s</string>
+    <string name="settings_backup_restore">Restore local backup</string>
+    <string name="settings_backup_restore_title">Restore backup</string>
+    <string name="settings_backup_restore_warning">Restore %1$d files and overwrite projects/drafts with the same names; this cannot be undone.</string>
+    <string name="settings_backup_restore_confirm">Restore</string>
 </resources>

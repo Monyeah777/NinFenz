@@ -16,6 +16,7 @@
 | 装配 | pass：填 4 个槽位后 assemble 返回 markdown（开篇/正文/收束） | 截图 19 |
 | L1 校验 | pass：L1 pass（error=0 warn=0 info=3）；状态 assembled→validated 写回 | run-as 读项目 |
 | 导出 md/zip | pass：files/exports/delivery/result.md + result.zip + manifest；状态 validated→exported 写回 | run-as 读文件 |
+| 本地备份恢复（JVM） | pass（本机）：Settings 选 zip → inspect 校验（路径/重复/bytes/sha256）→ 确认对话框 → 恢复 projects/drafts；路径穿越/坏摘要拒绝；不可撤销提示。真机未复测（adb 无设备） |
 | 本地备份导出（JVM） | pass（本机）：设置→导出本地备份，zip 含 manifest.json + projects/ + drafts/；manifest 记 sha256/bytes；空备份也有 manifest；通过 Sharesheet 导出。恢复/导入备份未实现。真机未复测（adb 无设备） |
 | 项目状态历史（JVM） | pass（本机）：ProjectModel 解析 history 的 op/digest/at；项目详情展示最近 20 条；解析断言加入模型测试。真机未复测（adb 无设备） |
 | 存储面板/缓存清理（JVM） | pass（本机）：设置页显示 projects/drafts/exports/cache/total；只清理 cache/imports 与 cache/shared，保留其他缓存；测试覆盖占用与清理。真机未复测（adb 无设备） |
