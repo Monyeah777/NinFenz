@@ -46,6 +46,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.data.PackEntry
+import dev.ninfenz.mobile.data.PackTrustStore
 import dev.ninfenz.mobile.data.PackVerifier
 import dev.ninfenz.mobile.data.ProjectEntry
 import dev.ninfenz.mobile.data.SeedResult
@@ -629,6 +630,9 @@ fun ProjectDetailScreen(
 @Composable
 fun PackDetailScreen(pack: PackEntry, onBack: () -> Unit, onUpdate: () -> Unit) {
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val trustStore = remember { PackTrustStore(context.filesDir) }
+    var trustPinned by remember { mutableStateOf(trustStore.isPinned(pack.id, pack.version, pack.tree)) }
     var verifying by remember { mutableStateOf(false) }
     var report by remember { mutableStateOf<String?>(null) }
     var errorText by remember { mutableStateOf<String?>(null) }
@@ -647,6 +651,25 @@ fun PackDetailScreen(pack: PackEntry, onBack: () -> Unit, onUpdate: () -> Unit) 
                         Text(stringResource(dev.ninfenz.mobile.R.string.pack_detail_items, pack.itemCount), style = MaterialTheme.typography.bodySmall)
                         Text(stringResource(dev.ninfenz.mobile.R.string.pack_detail_tree, pack.tree.take(16) + "…"), style = MaterialTheme.typography.bodySmall)
                         Text(stringResource(dev.ninfenz.mobile.R.string.pack_detail_dir, pack.dir.absolutePath), style = MaterialTheme.typography.bodySmall)
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                if (trustPinned) stringResource(dev.ninfenz.mobile.R.string.pack_trust_pinned)
+                                else stringResource(dev.ninfenz.mobile.R.string.pack_trust_unpinned),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = if (trustPinned) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.weight(1f)
+                            )
+                            TextButton(onClick = {
+                                if (trustPinned) {
+                                    trustStore.clear(pack.id, pack.version)
+                                } else {
+                                    trustStore.pin(pack.id, pack.version, pack.tree)
+                                }
+                                trustPinned = !trustPinned
+                            }) {
+                                Text(stringResource(if (trustPinned) dev.ninfenz.mobile.R.string.pack_trust_clear else dev.ninfenz.mobile.R.string.pack_trust_pin))
+                            }
+                        }
                     }
                 }
             }

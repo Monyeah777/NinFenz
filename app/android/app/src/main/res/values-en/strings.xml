@@ -470,6 +470,10 @@
     <string name="import_share_queue">%1$d shared items, showing %2$d</string>
     <string name="import_share_next">Import next</string>
     <string name="import_share_ignore">Ignore rest</string>
+    <string name="pack_trust_pinned">Local trust: current tree pinned</string>
+    <string name="pack_trust_unpinned">Local trust: not pinned (local marker, not a signature)</string>
+    <string name="pack_trust_pin">Pin as trusted</string>
+    <string name="pack_trust_clear">Unpin</string>
     <string name="project_detail_archive">Archive project</string>
     <string name="project_archive_title">Archive project</string>
     <string name="project_archive_body">The project leaves the library list; its file stays in projects-archive/ and is not deleted.</string>
