@@ -3,6 +3,7 @@ package dev.ninfenz.mobile.ui.screens
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.net.toUri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -214,7 +215,7 @@ fun ImportScreen(
                 importFromFile(file, "share", "shared-text.md", item.mime ?: "text/plain", item.text.toByteArray(Charsets.UTF_8).size.toLong())
             } else if (item.uri != null) {
                 try {
-                    val uri = Uri.parse(item.uri)
+                    val uri = item.uri.toUri()
                     val meta = FileAccess.meta(context, uri)
                     if (meta.size > FileAccess.MAX_IMPORT_BYTES) {
                         error = CoreResponse.failure("NF-IMP-003", context.getString(dev.ninfenz.mobile.R.string.import_file_too_large), "换用更小的文件", 3).error
