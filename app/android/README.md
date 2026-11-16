@@ -147,6 +147,7 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 - EpubExporterTest（2）：EPUB3 结构（mimetype STORED/OPF/nav/chapter、HTML 转义）、无标题单章。
 - EpubValidatorTest（3）：导出物通过、缺 EPUB 结构拒绝、缺文件拒绝。
 - PdfPagerTest（2）：折行、分页/空输入。
+- PdfValidatorTest（3）：最小 PDF 通过、坏/加密 PDF 拒绝、缺文件拒绝。
 - ExportVerifierTest（2）：manifest bytes/sha256 一致通过；缺文件/错字节/错摘要/manifest 缺失失败。
 - A11yComposeTest（3，Robolectric）：图标 contentDescription、返回/搜索/设置/CTA 触控目标 ≥48dp。
 - LargeFontComposeTest（1，Robolectric）：fontScale 200% 下库页主文案/CTA 仍可见。
@@ -157,7 +158,7 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 
 - v0.02 W6（2026-11-15）：`./gradlew :app:assembleDebug` 成功：app-debug.apk = 21,710,683 bytes，
   sha256 = cd5287a2094b8ef8db12a502917c2b8e35cc53aafcd3c0976c16a553727eafa0（含双 ABI 原生库 + 9 个示例 Pack assets）。
-- `./gradlew :app:testDebugUnitTest` 全绿：199 条 JVM 单测（v1 42 + v0.02 157；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y/大字号/对比度/Paparazzi 截图）。
+- `./gradlew :app:testDebugUnitTest` 全绿：202 条 JVM 单测（v1 42 + v0.02 160；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y/大字号/对比度/Paparazzi 截图）。
 - `zipalign -c -P 16 -v 4 app-debug.apk` → Verification successful（native lib 16KB page 对齐）。
 - `bash app/scripts/build_core_android.sh --clean` 成功：NDK 27.0.12077973 + rustup targets
   （aarch64-linux-android / x86_64-linux-android，经 rsproxy 镜像安装）；两个 .so 的 LOAD align 均为 0x4000。
