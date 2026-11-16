@@ -397,6 +397,11 @@
     <string name="protocol_empty">No protocol pack loaded. Form values stay local; authoritative render runs in core protocol-render.</string>
     <string name="protocol_parse_failed">Protocol pack parse failed: %1$s</string>
     <string name="protocol_parse_failed_fix">Fix per app/schema/nf-protocol-pack.schema.json</string>
+    <string name="protocol_stats">Clauses/fields/rules</string>
+    <string name="field_required">(required)</string>
+    <string name="field_optional">(optional)</string>
+    <string name="protocol_rendering">Rendering…</string>
+    <string name="protocol_render_button">Render clauses with core</string>
     <string name="protocol_placeholder_ok">Placeholder check passed (local precheck)</string>
     <string name="protocol_missing_fields">Missing required fields: %1$s (NF-PRT-003)</string>
     <string name="protocol_unknown_placeholders">Undeclared placeholders: %1$s (NF-PRT-004)</string>

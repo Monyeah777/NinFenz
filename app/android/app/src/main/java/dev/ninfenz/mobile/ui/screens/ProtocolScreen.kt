@@ -94,7 +94,10 @@ fun ProtocolScreen(onBack: () -> Unit) {
                 EmptyState(stringResource(dev.ninfenz.mobile.R.string.protocol_empty))
             } else {
                 KeyValue("id/version", p.id + " " + p.version + "（proto " + p.protoVersion + "）")
-                KeyValue("条款/字段/规则", p.clauses.size.toString() + " / " + p.fields.size + " / " + p.rules.size)
+                KeyValue(
+                    context.getString(dev.ninfenz.mobile.R.string.protocol_stats),
+                    p.clauses.size.toString() + " / " + p.fields.size + " / " + p.rules.size
+                )
                 KeyValue("compat", "protocol " + p.protocolMin + ".." + p.protocolMax + " · app_min " + p.appMin)
             }
         }
@@ -127,7 +130,7 @@ fun ProtocolScreen(onBack: () -> Unit) {
                     }
                     for (field in p.fields.filter { it.clause == clause.id }) {
                         FormTextField(
-                            label = field.id + " · " + field.label + (if (field.required) "（必填）" else "（可选）") + " [" + field.type + "]",
+                            label = field.id + " · " + field.label + (if (field.required) context.getString(dev.ninfenz.mobile.R.string.field_required) else context.getString(dev.ninfenz.mobile.R.string.field_optional)) + " [" + field.type + "]",
                             value = values[field.id] ?: "",
                             onValueChange = { v -> values = values + (field.id to v) }
                         )
@@ -169,7 +172,7 @@ fun ProtocolScreen(onBack: () -> Unit) {
                             }
                         }
                     }
-                ) { Text(if (busy) "渲染中…" else "用核心渲染条款") }
+                ) { Text(if (busy) context.getString(dev.ninfenz.mobile.R.string.protocol_rendering) else context.getString(dev.ninfenz.mobile.R.string.protocol_render_button)) }
                 Text(stringResource(dev.ninfenz.mobile.R.string.protocol_note), style = MaterialTheme.typography.bodySmall)
                 renderError?.let { ErrorNotice(it) }
                 rendered?.let { list ->

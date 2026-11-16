@@ -397,6 +397,11 @@
     <string name="protocol_empty">尚未加载协议包。表单值只在本地，权威渲染走核心 protocol-render。</string>
     <string name="protocol_parse_failed">协议包解析失败：%1$s</string>
     <string name="protocol_parse_failed_fix">按 app/schema/nf-protocol-pack.schema.json 修正</string>
+    <string name="protocol_stats">条款/字段/规则</string>
+    <string name="field_required">（必填）</string>
+    <string name="field_optional">（可选）</string>
+    <string name="protocol_rendering">渲染中…</string>
+    <string name="protocol_render_button">用核心渲染条款</string>
     <string name="protocol_placeholder_ok">占位符检查通过（本地预检）</string>
     <string name="protocol_missing_fields">缺必填字段：%1$s（NF-PRT-003）</string>
     <string name="protocol_unknown_placeholders">未声明占位符：%1$s（NF-PRT-004）</string>
