@@ -488,6 +488,8 @@
     <string name="import_share_queue">%1$d shared items, showing %2$d</string>
     <string name="import_share_next">Import next</string>
     <string name="import_share_ignore">Ignore rest</string>
+    <string name="import_saved_drafts">Saved drafts</string>
+    <string name="import_open_draft">Open</string>
     <string name="pack_trust_pinned">Local trust: current tree pinned</string>
     <string name="pack_trust_unpinned">Local trust: not pinned (local marker, not a signature)</string>
     <string name="pack_trust_pin">Pin as trusted</string>

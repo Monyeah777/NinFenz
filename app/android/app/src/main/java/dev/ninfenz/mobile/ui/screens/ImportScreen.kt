@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.core.CoreError
 import dev.ninfenz.mobile.core.CoreResponse
 import dev.ninfenz.mobile.core.J
+import dev.ninfenz.mobile.data.DraftLibrary
 import dev.ninfenz.mobile.data.FileAccess
 import dev.ninfenz.mobile.data.ImportDraftStore
 import dev.ninfenz.mobile.data.ImportHistoryStore
@@ -86,6 +87,7 @@ fun ImportScreen(
     var suggestNote by remember { mutableStateOf<String?>(null) }
     val importHistory = remember { ImportHistoryStore(context.filesDir) }
     val importDraftStore = remember { ImportDraftStore(context.filesDir) }
+    var drafts by remember { mutableStateOf(DraftLibrary.list(context.filesDir)) }
     LaunchedEffect(Unit) {
         if (doc == null && rawResult == null && error == null) {
             val raw = withContext(Dispatchers.IO) { importDraftStore.load() }
@@ -428,6 +430,7 @@ fun ImportScreen(
                                     }.toString()
                                     store.saveDraft(base + ".mapping", mappingJson)
                                     savedName = file.name
+                                    drafts = DraftLibrary.list(context.filesDir)
                                 }
                             },
                             modifier = Modifier.padding(horizontal = NfSpacing.page)
@@ -448,6 +451,37 @@ fun ImportScreen(
                                         suggestNote = null
                                         importDraftStore.clear()
                                     }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_again)) }
+                                }
+                            }
+                        }
+                    }
+                }
+                if (drafts.isNotEmpty()) {
+                    item { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.import_saved_drafts)) }
+                    drafts.take(5).forEach { draft ->
+                        item {
+                            NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(draft.name, style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
+                                    TextButton(onClick = {
+                                        val raw = DraftLibrary.read(draft)
+                                        if (raw == null) {
+                                            error = CoreResponse.failure("NF-IMP-004", "草稿读取失败", "文件可能已被删除", 2).error
+                                        } else {
+                                            try {
+                                                val obj = J.parseObject(raw, ImportModel.SCHEMA)
+                                                val parsed = ImportModel.parse(obj)
+                                                rawResult = obj
+                                                doc = parsed
+                                                acceptedMappings = parsed.mappings.indices.filter { parsed.mappings[it].confidence >= 80 }.toSet()
+                                                savedName = draft.name.removeSuffix(".json")
+                                                error = null
+                                                importDraftStore.save(raw)
+                                            } catch (t: Throwable) {
+                                                error = CoreResponse.failure("NF-E-002", "草稿解析失败：" + (t.message ?: t.javaClass.simpleName), "删除该草稿或重新导入", 2).error
+                                            }
+                                        }
+                                    }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_open_draft)) }
                                 }
                             }
                         }

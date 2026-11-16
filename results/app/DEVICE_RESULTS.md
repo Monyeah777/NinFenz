@@ -17,6 +17,7 @@
 | L1 校验 | pass：L1 pass（error=0 warn=0 info=3）；状态 assembled→validated 写回 | run-as 读项目 |
 | 导出 md/zip | pass：files/exports/delivery/result.md + result.zip + manifest；状态 validated→exported 写回 | run-as 读文件 |
 | 桌面快捷方式（构建） | pass（构建）：静态 shortcuts（导入/新建/搜索）+ MainActivity 冷启动/onNewIntent 路由；未真机长按图标验证（adb 无设备） |
+| 已保存草稿列表（JVM） | pass（本机）：导入页列出最多 5 个已保存草稿，可重新打开预览；排除 mapping/import-last/import-history；测试 2 条。真机未复测（adb 无设备） |
 | 项目重命名（JVM） | pass（本机）：项目详情重命名对话框，只改 title，保留 refs/status/review/history；空标题拒绝；测试 2 条。真机未复测（adb 无设备） |
 | 库内对比搜索（JVM） | pass（本机）：对比选择对话框支持按项目标题/ID 搜索；真机未复测（adb 无设备） |
 | 备份管理对话框（JVM） | pass（本机）：设置「全部备份」列出所有备份，可恢复或经确认删除；删除后刷新统计；真机未复测（adb 无设备） |
