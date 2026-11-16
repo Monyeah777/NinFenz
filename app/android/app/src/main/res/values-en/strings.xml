@@ -441,4 +441,5 @@
     <string name="error_codes_search">Search code/message/fix</string>
     <string name="error_codes_not_loaded">Error code catalog is not packaged</string>
     <string name="error_codes_no_result">No matching error code</string>
+    <string name="library_filter_empty">No projects in this status</string>
 </resources>

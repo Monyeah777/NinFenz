@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
@@ -34,6 +36,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,6 +50,8 @@ import dev.ninfenz.mobile.data.SeedResult
 import dev.ninfenz.mobile.data.LanguageMode
 import dev.ninfenz.mobile.data.ThemeMode
 import dev.ninfenz.mobile.model.Project
+import dev.ninfenz.mobile.model.ProjectFilter
+import dev.ninfenz.mobile.model.ProjectStatus
 import dev.ninfenz.mobile.ui.components.NfCard
 import dev.ninfenz.mobile.ui.components.NfEmptyState
 import dev.ninfenz.mobile.ui.components.NfGradientHero
@@ -75,6 +80,10 @@ fun LibraryHomeScreen(
     refreshing: Boolean = false,
     onRefresh: () -> Unit = {}
 ) {
+    var statusFilter by rememberSaveable { mutableStateOf<String?>(null) }
+    val filterStatus = statusFilter?.let { ProjectStatus.fromWire(it) }
+    val filteredProjects = remember(projects, statusFilter) { ProjectFilter.apply(projects, filterStatus) }
+
     Column(modifier = Modifier.fillMaxSize()) {
         NfTopAppBar(
             title = stringResource(dev.ninfenz.mobile.R.string.nav_library),
@@ -108,6 +117,29 @@ fun LibraryHomeScreen(
                     SeedLine(seedState)
                 }
             }
+            if (projects.isNotEmpty()) {
+                item {
+                    LazyRow(
+                        contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = NfSpacing.page),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        item {
+                            FilterChip(
+                                selected = filterStatus == null,
+                                onClick = { statusFilter = null },
+                                label = { Text(stringResource(dev.ninfenz.mobile.R.string.search_filter_all)) }
+                            )
+                        }
+                        items(ProjectStatus.entries) { status ->
+                            FilterChip(
+                                selected = filterStatus == status,
+                                onClick = { statusFilter = status.wire },
+                                label = { Text(projectStatusLabel(status)) }
+                            )
+                        }
+                    }
+                }
+            }
             if (packs.isEmpty() && projects.isEmpty()) {
                 item {
                     NfEmptyState(
@@ -121,10 +153,10 @@ fun LibraryHomeScreen(
                     )
                 }
             }
-            if (projects.isNotEmpty()) {
+            if (filteredProjects.isNotEmpty()) {
                 item { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.library_section_projects)) }
-                items(projects.size) { index ->
-                    val entry = projects[index]
+                items(filteredProjects.size) { index ->
+                    val entry = filteredProjects[index]
                     NfCard(
                         modifier = Modifier.padding(horizontal = NfSpacing.page),
                         onClick = { onOpenProject(entry) }
@@ -137,6 +169,15 @@ fun LibraryHomeScreen(
                             NfStatusChip(projectStatusLabel(entry.project))
                         }
                     }
+                }
+            } else if (projects.isNotEmpty()) {
+                item {
+                    Text(
+                        stringResource(dev.ninfenz.mobile.R.string.library_filter_empty),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(horizontal = NfSpacing.page)
+                    )
                 }
             }
             if (packs.isNotEmpty()) {
@@ -576,7 +617,10 @@ fun PackDetailScreen(pack: PackEntry, onBack: () -> Unit, onUpdate: () -> Unit) 
 }
 
 @Composable
-fun projectStatusLabel(project: Project): String = when (project.status) {
+fun projectStatusLabel(project: Project): String = projectStatusLabel(project.status)
+
+@Composable
+fun projectStatusLabel(status: dev.ninfenz.mobile.model.ProjectStatus): String = when (status) {
     dev.ninfenz.mobile.model.ProjectStatus.DRAFT -> stringResource(dev.ninfenz.mobile.R.string.status_draft)
     dev.ninfenz.mobile.model.ProjectStatus.AUTHORING -> stringResource(dev.ninfenz.mobile.R.string.status_authoring)
     dev.ninfenz.mobile.model.ProjectStatus.ASSEMBLED -> stringResource(dev.ninfenz.mobile.R.string.status_assembled)
