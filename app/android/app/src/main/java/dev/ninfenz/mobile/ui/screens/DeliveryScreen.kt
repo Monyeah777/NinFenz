@@ -46,6 +46,7 @@ import dev.ninfenz.mobile.data.AuthorArtifactsLoader
 import dev.ninfenz.mobile.data.DeliveryDraftStore
 import dev.ninfenz.mobile.data.EpubExporter
 import dev.ninfenz.mobile.data.EpubValidator
+import dev.ninfenz.mobile.data.HtmlExporter
 import dev.ninfenz.mobile.data.PdfExporter
 import dev.ninfenz.mobile.data.PdfValidator
 import dev.ninfenz.mobile.data.ExportHistoryStore
@@ -528,6 +529,11 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                         manifestText = null
                         recordExport("pdf", file, null)
                     }
+                    HtmlExportButton(markdown, project, context, scope, { busy = it }, { error = it }) { file ->
+                        exportedFile = file
+                        manifestText = null
+                        recordExport("html", file, null, verify = false)
+                    }
                 }
                 Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                     OutlinedButton(
@@ -849,6 +855,37 @@ private fun PdfExportButton(
     ) { Text(context.getString(dev.ninfenz.mobile.R.string.delivery_export, "pdf")) }
 }
 
+@Composable
+private fun HtmlExportButton(
+    markdown: String?,
+    project: Project,
+    context: android.content.Context,
+    scope: kotlinx.coroutines.CoroutineScope,
+    setBusy: (Boolean) -> Unit,
+    setError: (CoreError?) -> Unit,
+    onDone: (File) -> Unit
+) {
+    Button(
+        enabled = markdown != null,
+        onClick = {
+            val md = markdown ?: return@Button
+            setBusy(true)
+            setError(null)
+            scope.launch {
+                try {
+                    val outDir = File(File(context.filesDir, "exports"), "delivery").apply { mkdirs() }
+                    val created = HtmlExporter.export(md, project.title, outDir)
+                    onDone(created.file)
+                } catch (t: Throwable) {
+                    setError(CoreError("NF-EXP-003", "HTML 导出失败：" + (t.message ?: t.javaClass.simpleName), "检查存储空间", null, 1))
+                } finally {
+                    setBusy(false)
+                }
+            }
+        }
+    ) { Text(context.getString(dev.ninfenz.mobile.R.string.delivery_export, "html")) }
+}
+
 private fun mimeFor(format: String): String = when (format) {
     "md" -> "text/markdown"
     "zip", "skill" -> "application/zip"
@@ -856,5 +893,6 @@ private fun mimeFor(format: String): String = when (format) {
     "json" -> "application/json"
     "epub" -> "application/epub+zip"
     "pdf" -> "application/pdf"
+    "html" -> "text/html"
     else -> "application/octet-stream"
 }
