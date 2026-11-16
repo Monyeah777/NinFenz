@@ -70,6 +70,30 @@ class PackZipLoaderTest {
     }
 
     @Test
+    fun rejectsEncryptedZipFromCentralDirectory() {
+        fun put16(a: ByteArray, off: Int, v: Int) {
+            a[off] = (v and 0xFF).toByte(); a[off + 1] = ((v shr 8) and 0xFF).toByte()
+        }
+        fun put32(a: ByteArray, off: Int, v: Long) {
+            put16(a, off, (v and 0xFFFF).toInt()); put16(a, off + 2, ((v shr 16) and 0xFFFF).toInt())
+        }
+        val name = "a".toByteArray()
+        val central = ByteArray(46)
+        put32(central, 0, 0x02014b50L)
+        put16(central, 8, 1) // encrypted flag
+        put16(central, 28, name.size)
+        val eocd = ByteArray(22)
+        put32(eocd, 0, 0x06054b50L)
+        put16(eocd, 8, 1); put16(eocd, 10, 1)
+        put32(eocd, 12, (central.size + name.size).toLong())
+        put32(eocd, 16, 0)
+        val file = File.createTempFile("nf-pack-enc", ".zip")
+        file.writeBytes(central + name + eocd)
+        val dest = File.createTempFile("nf-pack-out8", "").let { it.delete(); it }
+        assertTrue(runCatching { PackZipLoader.extract(file, dest) }.isFailure)
+    }
+
+    @Test
     fun rejectsMissingManifest() {
         val zip = zip("readme.txt" to "x")
         val dest = File.createTempFile("nf-pack-out4", "").let { it.delete(); it }

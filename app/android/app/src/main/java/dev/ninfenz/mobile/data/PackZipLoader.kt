@@ -61,6 +61,9 @@ object PackZipLoader {
 
     /** 解包前用 central directory 做压缩比/声明总量预检，防高压缩比炸弹。 */
     private fun preflight(zipFile: File) {
+        if (containsEncryptedEntry(zipFile)) {
+            throw PackZipException("zip 含加密条目", "拒绝加密 Pack zip")
+        }
         java.util.zip.ZipFile(zipFile).use { zf ->
             var declared = 0L
             var count = 0
@@ -78,6 +81,47 @@ object PackZipLoader {
             }
         }
     }
+
+    /** 读 central directory 的通用位标记，检测加密条目（不依赖解包异常）。 */
+    private fun containsEncryptedEntry(zipFile: File): Boolean {
+        return try {
+            java.io.RandomAccessFile(zipFile, "r").use { raf ->
+                val length = raf.length()
+                if (length < 22) return false
+                val tailLength = minOf(length, 65557L).toInt()
+                val tail = ByteArray(tailLength)
+                raf.seek(length - tailLength)
+                raf.readFully(tail)
+                var eocd = -1
+                for (i in tail.size - 22 downTo 0) {
+                    if (le32(tail, i) == 0x06054b50L) { eocd = i; break }
+                }
+                if (eocd < 0) return false
+                val count = le16(tail, eocd + 10)
+                val offset = le32(tail, eocd + 16)
+                if (offset <= 0 || offset >= length) return false
+                raf.seek(offset)
+                repeat(count) {
+                    val header = ByteArray(46)
+                    raf.readFully(header)
+                    if (le32(header, 0) != 0x02014b50L) return false
+                    val flags = le16(header, 8)
+                    if (flags and 1 != 0) return true
+                    val skip = le16(header, 28) + le16(header, 30) + le16(header, 32)
+                    raf.seek(raf.filePointer + skip)
+                }
+                false
+            }
+        } catch (t: Throwable) {
+            false
+        }
+    }
+
+    private fun le16(bytes: ByteArray, at: Int): Int =
+        (bytes[at].toInt() and 0xFF) or ((bytes[at + 1].toInt() and 0xFF) shl 8)
+
+    private fun le32(bytes: ByteArray, at: Int): Long =
+        (le16(bytes, at).toLong()) or (le16(bytes, at + 2).toLong() shl 16)
 
     private fun findRoot(destDir: File): File? {
         if (File(destDir, "nf-pack.json").isFile) return destDir

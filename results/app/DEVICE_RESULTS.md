@@ -17,6 +17,7 @@
 | L1 校验 | pass：L1 pass（error=0 warn=0 info=3）；状态 assembled→validated 写回 | run-as 读项目 |
 | 导出 md/zip | pass：files/exports/delivery/result.md + result.zip + manifest；状态 validated→exported 写回 | run-as 读文件 |
 | 桌面快捷方式（构建） | pass（构建）：静态 shortcuts（导入/新建/搜索）+ MainActivity 冷启动/onNewIntent 路由；未真机长按图标验证（adb 无设备） |
+| Pack zip 加密检测（JVM） | pass（本机）：解析 EOCD/central directory 通用位标记，含加密条目直接拒绝；测试手工构造加密 flag zip。真机未复测（adb 无设备） |
 | Pack zip 压缩比预检（JVM） | pass（本机）：解包前读 central directory，拒绝声明总量/条目数超限与压缩比 >1000 的条目；测试造 20 MiB 零字节炸弹。真机未复测（adb 无设备） |
 | 导出失败原因展示（JVM） | pass（本机）：最近导出失败时在记录下方显示 message；成功不显示；真机未复测（adb 无设备） |
 | 导出记录校验状态（JVM） | pass（本机）：最近导出记录保存 ok/message，列表显示通过/失败；旧记录缺字段按 null 处理；测试覆盖状态持久化。真机未复测（adb 无设备） |
