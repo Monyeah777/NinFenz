@@ -576,6 +576,7 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="settings_crash_title">Last crash</string>
     <string name="error_codes_copied">Copied %1$s</string>
     <string name="settings_crash_clear">Clear crash log</string>
+    <string name="settings_crash_share">Share crash log</string>
     <string name="export_verified">passed</string>
     <string name="export_verify_failed">failed</string>
     <string name="project_detail_archive">Archive project</string>

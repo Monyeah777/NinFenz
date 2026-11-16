@@ -231,10 +231,18 @@ fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
         if (crash != null) {
             CardBox(title = stringResource(dev.ninfenz.mobile.R.string.settings_crash_title)) {
                 MonoText(crash!!.take(2000))
-                Button(onClick = {
-                    CrashLogStore(context.filesDir).clear()
-                    crash = null
-                }) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_crash_clear)) }
+                Row(horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp)) {
+                    OutlinedButton(onClick = {
+                        val text = crash ?: return@OutlinedButton
+                        val file = ShareExporter.writeSharedFile(context, "nf-crash", "txt", text)
+                        val intent = ShareExporter.shareFileIntent(context, file, "text/plain", "NF Mobile crash log")
+                        ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.settings_crash_share))
+                    }) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_crash_share)) }
+                    Button(onClick = {
+                        CrashLogStore(context.filesDir).clear()
+                        crash = null
+                    }) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_crash_clear)) }
+                }
             }
         }
     }

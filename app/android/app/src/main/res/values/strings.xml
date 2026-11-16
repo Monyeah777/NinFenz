@@ -576,6 +576,7 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="settings_crash_title">最近崩溃</string>
     <string name="error_codes_copied">已复制 %1$s</string>
     <string name="settings_crash_clear">清除崩溃日志</string>
+    <string name="settings_crash_share">分享崩溃日志</string>
     <string name="export_verified">通过</string>
     <string name="export_verify_failed">失败</string>
     <string name="project_detail_archive">归档项目</string>
