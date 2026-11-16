@@ -14,27 +14,27 @@
 | 项目态创作台/交付台 | pass（工程面，含核心校验/导出） | 6ac657b52/86191976e；Delivery/Author 测试与构建 |
 | 作者覆盖保存/状态写回 | pass（工程面） | a14456833/902789796；Overlay/Status 测试 |
 | Pack 中心/CCOS/Pack zip 更新 | pass（工程面） | 1dc695125/4d816f3c5/6c30f241e |
-| JVM 测试 | pass | 123/123（含 Robolectric/Compose/Paparazzi） |
+| JVM 测试 | pass | 248/248（含 Robolectric/Compose/Paparazzi） |
 | 自适应/9 组尺寸语义矩阵 | pass（语义层） | ShellNavigation/ShellSizeMatrix 测试 |
 | i18n/主题切换（全部屏主要文案） | partial | values-en + 资源化；我的支持 zh/en/system + 动态取色；少量错误/技术提示仍内联（OPEN-I18N-BODY 尾项） |
 | 像素截图矩阵 | pass（本机） | Paparazzi 10 张基线（360/700/900 × 640/800/900/1000），testDebugUnitTest verify |
 | 真机/模拟器 | partial | OnePlus Android16 smoke 通过首启/导入/创作保存/装配/校验/导出 md+zip；docx/TalkBack/主题/CCOS/分享仍 OPEN（DEVICE_RESULTS.md） |
-| 草稿→项目 | OPEN | OPEN-DRAFT-PROJECT |
+| 草稿→项目 | partial | 草稿可创建项目壳并把草稿 JSON 作为 authoring 来源副本；导入内容尚未映射进协议字段（OPEN-DRAFT-PROJECT 收窄） |
 | app/gates v0.02 UX 检查 | pass | 7/7 gate PASS、FAIL=0；GATES/SELF_AUDIT 已更新（本提交） |
 
-**收口实测（2026-11-15）**：app/gates 7/7 PASS、FAIL=0；verify.sh --checks-only PASS=107 WARN=2 FAIL=0；JVM 231/231；APK 24,744,777 B sha256 6c203bb9…。
+**收口实测（2026-11-16 更新）**：app/gates 7/7 PASS、FAIL=0；verify.sh --checks-only PASS=107 WARN=2 FAIL=0；JVM 248/248；APK 24,744,777 B sha256 36806ef2…；Release unsigned 15,248,757 B sha256 3e5d751f…（16KB 对齐通过）。
 
 **发布面：仍为 OPEN-EXTERNAL**（签名/公证/真机矩阵/Play 数据安全），不得据此宣称可发布。
 
 ## 1. 结论
 
 
-**APP 实现面：pass-with-open-items（P0 = 0）**。收口判定（2026-11-15）：实现面全部可本机验证的 MUST/主路径已落地并取证；计划 §18.3 的发布边界项（签名/公证/真机矩阵/Play 数据安全）与 per-format 平台项（PDF=平台打印）保留 OPEN，见 §6/§7。依据：
+**APP 实现面：pass-with-open-items（P0 = 0）**。收口判定（2026-11-15）：实现面全部可本机验证的 MUST/主路径已落地并取证；计划 §18.3 的发布边界项（签名/公证/真机矩阵/Play 数据安全）保留 OPEN；PDF 已接本地基础文本导出，复杂排版/平台打印仍 OPEN，见 §6/§7。依据：
 - APP 门禁 `python app/gates/run_gates.py` → **7/7 门 FAIL=0**（QA0–QA6 全部 PASS；无 OPEN 阻塞），`P0=0`；
-- 自审计 S0–S15 → **covered 13 / gap 1 / open 2**，全部 gap/open 带 owner+next（P1=3）；
-- 核心 `cargo test` **182 断言 / 21 个测试二进制 / 0 failed**；控制面 + 契约 + 安全 + golden + E2E：**pytest 490 passed / 0 failed / 0 skipped / 0 xfailed（127s）**；
-- 构建实测：Android APK（17,973,649 B，16KB 对齐通过）+ Windows MSI（66,573,406 B）均含 Rust 核心。
-- 导出面：**md/zip/json/docx/skill 已实现**（docx = 核心直出 OOXML 确定性 zip，CJK 可用；skill = SKILL.md+mcp.json+README.md 的 MCP 脚手架）；**pdf 不内置**（平台打印另存为 PDF，核心 exit 4 + NF-EXP-004，OPEN）。EXP-01/EXP-02 的 MUST 面由此闭合或显式 OPEN。
+- 自审计 S0–S15 → **covered 14 / gap 0 / open 2**，全部 open 带 owner+next（P1=2）；
+- 核心 `cargo test` **186 passed / 0 failed**；控制面 + 契约 + 安全 + golden + E2E：**pytest 490 passed / 0 failed / 0 skipped / 0 xfailed（127s）**；
+- 构建实测：Android debug APK 24,744,777 B、Release unsigned 15,248,757 B（16KB 对齐通过）；Windows MSI 为历史证据（66,573,406 B）。
+- 导出面：**md/zip/json/docx/skill 已实现**（core）；Android 另接 **EPUB/PDF/HTML 本地导出**（PDF 为基础文本、EPUB 轻量 EPUB3、HTML 单文件），并各自带结构自检；复杂排版/EPUBCheck 级语义仍 OPEN。
 
 **发布面：未完成（OPEN-EXTERNAL）**——签名/公证/真机矩阵/Play 数据安全未执行，不得宣称「可发布」。
 
