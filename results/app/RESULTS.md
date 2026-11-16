@@ -181,7 +181,7 @@
 | Windows MSI | 66,573,406 B；app jar 内含 `native/nf_app_core.dll` | `bash app/scripts/build_desktop.sh package`（WIX_PATH） |
 | Rust CLI / cdylib | `nf-app-core.exe` / `nf_app_core.dll` | `bash app/scripts/build_core.sh --release` |
 | 工具链定版 | Gradle 8.11.1 / AGP 8.10.1 / Kotlin 2.1.20 / CMP 1.7.3 / compileSdk 36 / NDK r27 | `app/results/TOOLCHAIN.md` |
-| Python 测试 | **492 passed / 0 failed / 0 skipped / 0 xfailed（147s）** | `python -m pytest app/tests -q` |
+| Python 测试 | **493 passed / 0 failed / 0 skipped / 0 xfailed（147s）** | `python -m pytest app/tests -q` |
 | Rust 测试 | **182 断言 / 21 二进制 / 0 failed** | `cd app/core && cargo test` |
 | 两端 JVM 测试 | Android 42（含自适应分档 4 条）/ Desktop 20（含真实 JNA FFI） | `./gradlew test` / `:app:testDebugUnitTest` |
 

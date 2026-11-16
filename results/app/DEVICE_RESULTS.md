@@ -3,7 +3,7 @@
 > 设备：OnePlus PLF110，Android 16（SDK 36），1080×2392 / 480dpi；历史真机会话 serial 3B65AR0183V00000。
 > **2026-11-16 当前 `adb devices` 为空**：下表 2026-11-15 行是历史真机证据；本轮新增功能仅有 JVM/构建/门禁证据，真机矩阵仍 OPEN-TOOLCHAIN。
 > APK：0.2.0 / versionCode 2，minSdk 26 / target 36。本件只记实际跑过的项目；未跑项标 OPEN，不写成 pass。
-> 当前本机验证总览：Android JVM **304/304**、Rust core **186/186**、app Python **492 passed**、APP 门禁 QA0–QA6 PASS/gap=0、lint **0 warnings**、`verify.sh --checks-only` PASS=107/WARN=2/FAIL=0。
+> 当前本机验证总览：Android JVM **304/304**、Rust core **186/186**、app Python **493 passed**、APP 门禁 QA0–QA6 PASS/gap=0、lint **0 warnings**、`verify.sh --checks-only` PASS=107/WARN=2/FAIL=0。
 
 ## 1. 已实测（2026-11-15）
 
@@ -25,6 +25,7 @@
 | 备份未列条目拒绝（JVM） | pass（本机）：manifest 未列出的 zip 条目导致 inspect 失败；BackupRestoreServiceTest 5 条。真机未复测（adb 无设备） |
 | 全量复核（round161） | pass（本机）：verify.sh PASS=107 WARN=2 FAIL=0；app gates QA0–QA6 PASS，gap=0，P0=0；lint 0 warnings。 |
 | 全量复核（round15） | pass（本机）：verify PASS=107 WARN=2 FAIL=0；app gates QA0–QA6 PASS，gap=0，P0=0。 |
+| 错误码 schema LF 守卫（pytest） | pass（本机）：新增字节级 CRLF 断言；error code 测试 2 条。 |
 | 错误码 schema EOL 修复（verify） | pass（本机）：error_codes.json CRLF→LF；重新批准 conformance；verify PASS=107 WARN=2 FAIL=0。 |
 | 错误码使用登记校验（pytest） | pass（本机）：扫描 Kotlin 内联 `CoreResponse.failure`/`CoreError` 码，发现并补登 NF-IMP-005；新增测试通过。 |
 | 错误码目录补齐（JVM） | pass（本机）：新增 NF-IMP-006/007/008、NF-PRJ-001；NF-IMP-004 改为仅 pdf/ocr 未支持；schema negative 85 passed。 |

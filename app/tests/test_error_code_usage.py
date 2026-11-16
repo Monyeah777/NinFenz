@@ -17,6 +17,10 @@ def _registered() -> set[str]:
     return {item["code"] for item in data["codes"]}
 
 
+def test_schema_uses_lf() -> None:
+    assert b"\r\n" not in SCHEMA.read_bytes(), "error_codes.json 必须使用 LF 行尾"
+
+
 def test_ui_error_codes_registered() -> None:
     registered = _registered()
     used: set[str] = set()
