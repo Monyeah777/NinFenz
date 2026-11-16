@@ -113,6 +113,12 @@ object EpubExporter {
                 if (!separator) table.add(cells)
                 return@forEach
             }
+            if (Regex("^-{3,}$").matches(trimmed)) {
+                flushTable()
+                if (inList) { out.append("</ul>\n"); inList = false }
+                out.append("<hr/>")
+                return@forEach
+            }
             val heading = Regex("^(#{1,6})\\s+(.+)$").find(line)
             if (heading != null) {
                 flushTable()

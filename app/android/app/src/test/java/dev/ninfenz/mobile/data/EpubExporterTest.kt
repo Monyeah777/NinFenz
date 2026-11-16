@@ -52,6 +52,16 @@ class EpubExporterTest {
     }
 
     @Test
+    fun rendersHorizontalRule() {
+        val dir = Files.createTempDirectory("nf-epub-hr").toFile()
+        val created = EpubExporter.export("# 章\n\n前\n\n---\n\n后", "章", dir)
+        ZipFile(created.file).use { zip ->
+            val chapter = zip.getInputStream(zip.getEntry("OEBPS/chapter-001.xhtml")).bufferedReader().readText()
+            assertTrue(chapter.contains("<hr/>"))
+        }
+    }
+
+    @Test
     fun noHeadingFallsBackToSingleChapter() {
         assertEquals(1, EpubExporter.chapters("只有一段正文").size)
         assertEquals("正文", EpubExporter.chapters("只有一段正文").first().title)
