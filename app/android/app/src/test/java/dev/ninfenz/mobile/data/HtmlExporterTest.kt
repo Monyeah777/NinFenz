@@ -64,6 +64,13 @@ class HtmlExporterTest {
     }
 
     @Test
+    fun rendersStrikethrough() {
+        val dir = Files.createTempDirectory("nf-html-del").toFile()
+        val created = HtmlExporter.export("~~旧~~ 新", "t", dir)
+        assertTrue(created.file.readText().contains("<del>旧</del>"))
+    }
+
+    @Test
     fun handlesCodeFence() {
         val dir = Files.createTempDirectory("nf-html-2").toFile()
         val created = HtmlExporter.export("\u0060\u0060\u0060\ncode\n\u0060\u0060\u0060", "t", dir)
