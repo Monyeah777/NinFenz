@@ -75,7 +75,12 @@ fun AssemblyScreen(onBack: () -> Unit) {
                 inputs = plan?.slots?.associate { it to "" } ?: emptyMap()
                 error = null
             } catch (e: Exception) {
-                error = CoreResponse.failure("NF-ASM-003", "plan 解析失败：" + (e.message ?: e.javaClass.simpleName), "按 app/schema/nf-assembly-plan.schema.json 修正", 1).error
+                error = CoreResponse.failure(
+                    "NF-ASM-003",
+                    context.getString(dev.ninfenz.mobile.R.string.assembly_plan_failed, e.message ?: e.javaClass.simpleName),
+                    context.getString(dev.ninfenz.mobile.R.string.assembly_plan_failed_fix),
+                    1
+                ).error
             }
         }
     }
@@ -89,7 +94,12 @@ fun AssemblyScreen(onBack: () -> Unit) {
                 rawSpec = obj
                 error = null
             } catch (e: Exception) {
-                error = CoreResponse.failure("NF-SPC-001", "spec 解析失败：" + (e.message ?: e.javaClass.simpleName), "按 app/schema/nf-md-spec.schema.json 修正", 1).error
+                error = CoreResponse.failure(
+                    "NF-SPC-001",
+                    context.getString(dev.ninfenz.mobile.R.string.assembly_spec_failed, e.message ?: e.javaClass.simpleName),
+                    context.getString(dev.ninfenz.mobile.R.string.assembly_spec_failed_fix),
+                    1
+                ).error
             }
         }
     }

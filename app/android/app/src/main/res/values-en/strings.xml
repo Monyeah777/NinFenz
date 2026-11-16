@@ -361,6 +361,10 @@
     <string name="graph_save">Save</string>
     <string name="graph_save_draft">Save graph draft</string>
     <string name="assembly_title">Assembly · assemble/validate/export</string>
+    <string name="assembly_plan_failed">Plan parse failed: %1$s</string>
+    <string name="assembly_plan_failed_fix">Fix per app/schema/nf-assembly-plan.schema.json</string>
+    <string name="assembly_spec_failed">Spec parse failed: %1$s</string>
+    <string name="assembly_spec_failed_fix">Fix per app/schema/nf-md-spec.schema.json</string>
     <string name="assembly_input">Inputs</string>
     <string name="assembly_open_plan">Open plan</string>
     <string name="assembly_open_spec">Open spec</string>

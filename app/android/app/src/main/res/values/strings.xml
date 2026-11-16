@@ -361,6 +361,10 @@
     <string name="graph_save">保存</string>
     <string name="graph_save_draft">保存图草稿</string>
     <string name="assembly_title">Assembly · 装配/校验/导出</string>
+    <string name="assembly_plan_failed">plan 解析失败：%1$s</string>
+    <string name="assembly_plan_failed_fix">按 app/schema/nf-assembly-plan.schema.json 修正</string>
+    <string name="assembly_spec_failed">spec 解析失败：%1$s</string>
+    <string name="assembly_spec_failed_fix">按 app/schema/nf-md-spec.schema.json 修正</string>
     <string name="assembly_input">输入</string>
     <string name="assembly_open_plan">打开 plan</string>
     <string name="assembly_open_spec">打开 spec</string>
