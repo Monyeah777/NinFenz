@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="import"
+        android:enabled="true"
+        android:icon="@drawable/ic_launcher_foreground"
+        android:shortcutShortLabel="@string/action_import"
+        android:shortcutLongLabel="@string/library_action_import_file">
+        <intent
+            android:action="dev.ninfenz.mobile.SHORTCUT_IMPORT"
+            android:targetPackage="dev.ninfenz.mobile"
+            android:targetClass="dev.ninfenz.mobile.MainActivity" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="new_project"
+        android:enabled="true"
+        android:icon="@drawable/ic_launcher_foreground"
+        android:shortcutShortLabel="@string/new_project_title"
+        android:shortcutLongLabel="@string/new_project_title">
+        <intent
+            android:action="dev.ninfenz.mobile.SHORTCUT_NEW_PROJECT"
+            android:targetPackage="dev.ninfenz.mobile"
+            android:targetClass="dev.ninfenz.mobile.MainActivity" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="search"
+        android:enabled="true"
+        android:icon="@drawable/ic_launcher_foreground"
+        android:shortcutShortLabel="@string/search_title"
+        android:shortcutLongLabel="@string/search_title">
+        <intent
+            android:action="dev.ninfenz.mobile.SHORTCUT_SEARCH"
+            android:targetPackage="dev.ninfenz.mobile"
+            android:targetClass="dev.ninfenz.mobile.MainActivity" />
+    </shortcut>
+</shortcuts>

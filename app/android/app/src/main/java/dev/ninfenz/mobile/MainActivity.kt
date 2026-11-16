@@ -1,5 +1,6 @@
 package dev.ninfenz.mobile
 
+import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.KeyEvent
@@ -25,6 +26,21 @@ import dev.ninfenz.mobile.ui.theme.NfTheme
 
 /** 主界面：edge-to-edge + 预测返回；主题三态由 AppPrefs 持久化。 */
 class MainActivity : ComponentActivity() {
+    private var pendingShortcut by mutableStateOf<String?>(null)
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        pendingShortcut = shortcutFrom(intent)
+    }
+
+    private fun shortcutFrom(intent: Intent?): String? = when (intent?.action) {
+        "dev.ninfenz.mobile.SHORTCUT_IMPORT" -> "import"
+        "dev.ninfenz.mobile.SHORTCUT_NEW_PROJECT" -> "new_project"
+        "dev.ninfenz.mobile.SHORTCUT_SEARCH" -> "search"
+        else -> null
+    }
+
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if (event != null && (event.isCtrlPressed || event.isMetaPressed) && keyCode == KeyEvent.KEYCODE_K) {
             CommandBus.request()
@@ -36,6 +52,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        pendingShortcut = shortcutFrom(intent)
         val prefs = AppPrefs(this)
         setContent {
             var themeMode by remember { mutableStateOf(prefs.themeMode) }
@@ -79,7 +96,9 @@ class MainActivity : ComponentActivity() {
                         onDynamicColor = { enabled ->
                             prefs.dynamicColor = enabled
                             dynamicColor = enabled
-                        }
+                        },
+                        shortcut = pendingShortcut,
+                        onShortcutConsumed = { pendingShortcut = null }
                     )
                 }
             }

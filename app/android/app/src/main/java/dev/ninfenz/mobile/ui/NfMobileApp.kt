@@ -119,7 +119,9 @@ fun NfMobileApp(
     languageMode: LanguageMode = LanguageMode.SYSTEM,
     onLanguageMode: (LanguageMode) -> Unit = {},
     dynamicColor: Boolean = false,
-    onDynamicColor: (Boolean) -> Unit = {}
+    onDynamicColor: (Boolean) -> Unit = {},
+    shortcut: String? = null,
+    onShortcutConsumed: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -251,6 +253,17 @@ fun NfMobileApp(
             }
         )
         return
+    }
+
+    LaunchedEffect(shortcut, onboardingDone) {
+        if (onboardingDone && shortcut != null) {
+            when (shortcut) {
+                "import" -> shell = shell.open(Detail.Import)
+                "new_project" -> shell = shell.open(Detail.NewProject)
+                "search" -> shell = shell.open(Detail.Search)
+            }
+            onShortcutConsumed()
+        }
     }
 
     val layout = layoutClassFor(LocalConfiguration.current.screenWidthDp)
