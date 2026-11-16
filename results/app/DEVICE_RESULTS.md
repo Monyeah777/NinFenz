@@ -32,6 +32,7 @@
 | 全量复核（round53） | pass（本机）：verify PASS=107/WARN=2/FAIL=0；gates PASS/gap=0；rust 186；pytest 493。 |
 | Python 全量复核（round61） | pass（本机）：schema 变更后 `pytest app/tests` 493 passed / 0 failed（126s）。 |
 | 全量复核（round60） | pass（本机）：verify 107/2/0；gates PASS/gap=0；rust 186；JVM 317。 |
+| 全量复核（round104） | pass（本机）：pytest 496；verify 107/2/0；gates PASS/gap=0；rust 186；JVM 319。 |
 | CoreCall 异常文案 i18n（JVM） | pass（本机）：安装 applicationContext，异常/修复建议取资源；无 Context 时回退中文。 |
 | PackUpdate 标签 i18n（JVM） | pass（本机）：打开更新计划/影响项目/overlay 键改资源。 |
 | Settings/存储/新建项目/作者 i18n（JVM） | pass（本机）：核心缺失/未知原因/计算中/Pack 条目数/保存修复后缀改资源。 |
