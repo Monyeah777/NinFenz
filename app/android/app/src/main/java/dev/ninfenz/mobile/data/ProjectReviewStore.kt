@@ -50,8 +50,9 @@ class ProjectReviewStore(
             if (approve && status !in setOf("validated", "exported", "reviewed")) {
                 return@withContext ReviewResult.Failure("NF-REV-002", "当前状态不可评审通过：" + status, "先完成 validate/export")
             }
+            val subject = JsonObject(raw.toMutableMap().apply { remove("review") })
             val canonical = core.call("canonical", buildJsonObject {
-                put("value", buildJsonObject { put("project_id", project.id); put("status", status) })
+                put("value", subject)
             })
             if (!canonical.ok) return@withContext ReviewResult.Failure("NF-E-005", "评审 subject_digest 计算失败", "检查核心 canonical")
             val digest = canonical.resultObject()?.get("digest")?.jsonPrimitive?.content
