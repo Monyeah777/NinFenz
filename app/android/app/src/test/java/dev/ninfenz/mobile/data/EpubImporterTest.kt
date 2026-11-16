@@ -77,6 +77,20 @@ class EpubImporterTest {
     }
 
     @Test
+    fun embedsImageAsDataUri() {
+        val file = epub(
+            listOf(
+                "META-INF/container.xml" to "<container><rootfiles><rootfile full-path=\"OEBPS/content.opf\"/></rootfiles></container>",
+                "OEBPS/content.opf" to "<package><manifest><item id=\"c1\" href=\"one.xhtml\" media-type=\"application/xhtml+xml\"/></manifest><spine><itemref idref=\"c1\"/></spine></package>",
+                "OEBPS/one.xhtml" to "<p><img src=\"img/a.png\" alt=\"图\"/></p>",
+                "OEBPS/img/a.png" to "PNG"
+            )
+        )
+        val text = EpubImporter.extract(file)
+        assertTrue(text.contains("data:image/png;base64,"))
+    }
+
+    @Test
     fun rejectsMissingContainer() {
         val f = epub(listOf("OEBPS/chapter.xhtml" to "<p>x</p>"))
         assertTrue(runCatching { EpubImporter.extract(f) }.isFailure)

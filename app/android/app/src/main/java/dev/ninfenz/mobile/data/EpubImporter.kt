@@ -45,8 +45,9 @@ object EpubImporter {
                 total += entry.size.coerceAtLeast(0)
                 require(total <= 256L * 1024 * 1024) { "EPUB 章节总量超限" }
             }
+            val budget = longArrayOf(20L * 1024 * 1024)
             val chapters = chapterPaths.mapNotNull { path ->
-                read(zip, path)?.let { HtmlImporter.toMarkdown(it) }?.takeIf { it.isNotBlank() }
+                read(zip, path)?.let { HtmlImporter.toMarkdown(embedImages(zip, path, it, budget)) }?.takeIf { it.isNotBlank() }
             }
             if (chapters.isEmpty()) throw IllegalArgumentException("EPUB 无可读章节")
             val body = chapters.joinToString("\n\n")
@@ -55,6 +56,31 @@ object EpubImporter {
                 ?.let { HtmlImporter.toMarkdown(it).trim() }
                 .orEmpty()
             return if (title.isNotBlank() && !body.startsWith("# ")) "# $title\n\n$body" else body
+        }
+    }
+
+    private fun embedImages(zip: ZipFile, chapterPath: String, html: String, budget: LongArray): String {
+        val base = chapterPath.substringBeforeLast('/', "")
+        return Regex("(?is)<img\\s+([^>]*?)src=[\"']([^\"']+)[\"']([^>]*)>").replace(html) { m ->
+            val src = m.groupValues[2]
+            if (src.startsWith("data:") || src.startsWith("http://") || src.startsWith("https://")) {
+                return@replace m.value
+            }
+            val entryPath = resolve(base, src)
+            val entry = zip.getEntry(entryPath) ?: return@replace m.value
+            if (entry.size !in 0..(2L * 1024 * 1024) || entry.size > budget[0]) return@replace m.value
+            val mime = when (entryPath.substringAfterLast('.', "").lowercase()) {
+                "png" -> "image/png"
+                "jpg", "jpeg" -> "image/jpeg"
+                "gif" -> "image/gif"
+                "webp" -> "image/webp"
+                "svg" -> "image/svg+xml"
+                else -> return@replace m.value
+            }
+            val bytes = zip.getInputStream(entry).use { it.readBytes() }
+            budget[0] -= bytes.size
+            val b64 = java.util.Base64.getEncoder().encodeToString(bytes)
+            "<img " + m.groupValues[1] + "src=\"data:" + mime + ";base64," + b64 + "\"" + m.groupValues[3] + ">"
         }
     }
 
