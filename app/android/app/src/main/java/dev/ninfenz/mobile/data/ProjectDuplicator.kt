@@ -1,6 +1,8 @@
 package dev.ninfenz.mobile.data
 
 import java.io.File
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
@@ -29,10 +31,20 @@ object ProjectDuplicator {
         next["status"] = kotlinx.serialization.json.JsonPrimitive("draft")
         next["review"] = buildJsonObject { put("state", "pending") }
         next["history"] = kotlinx.serialization.json.buildJsonArray { }
-        AtomicFiles.writeText(target, JsonObject(next).toString())
-        val sourceDir = File(File(filesDir, "projects"), sourceId)
-        if (sourceDir.isDirectory) {
-            copyDir(sourceDir, File(File(filesDir, "projects"), newId))
+        val targetDir = File(projects, newId)
+        val staging = File(projects, ".dup-" + newId + "-" + System.nanoTime())
+        try {
+            val sourceDir = File(projects, sourceId)
+            if (sourceDir.isDirectory) copyDir(sourceDir, staging)
+            if (staging.exists()) {
+                Files.move(staging.toPath(), targetDir.toPath(), StandardCopyOption.ATOMIC_MOVE)
+            }
+            AtomicFiles.writeText(target, JsonObject(next).toString())
+        } catch (t: Throwable) {
+            staging.deleteRecursively()
+            targetDir.deleteRecursively()
+            target.delete()
+            throw t
         }
         return target
     }

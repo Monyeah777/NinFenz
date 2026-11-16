@@ -40,6 +40,19 @@ class ProjectDuplicatorTest {
     }
 
     @Test
+    fun cleansUpWhenTargetDataDirBlocksMove() {
+        val root = Files.createTempDirectory("nf-dup-3").toFile()
+        val source = writeSource(root)
+        java.io.File(root, "projects/p/authoring").mkdirs()
+        java.io.File(root, "projects/p/authoring/assembly.md").writeText("body")
+        val blocked = java.io.File(root, "projects/p-copy").apply { mkdirs() }
+        java.io.File(blocked, "child").writeText("x")
+        assertTrue(runCatching { ProjectDuplicator.duplicate(source, root) }.isFailure)
+        assertTrue(source.isFile)
+        assertTrue(!java.io.File(root, "projects/p-copy.nfproject.json").exists())
+    }
+
+    @Test
     fun avoidsIdCollision() {
         val root = Files.createTempDirectory("nf-dup-2").toFile()
         val source = writeSource(root)
