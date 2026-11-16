@@ -492,6 +492,9 @@
     <string name="import_open_draft">Open</string>
     <string name="import_delete_draft">Delete</string>
     <string name="import_delete_draft_body">Delete draft %1$s? Its mapping sidecar will also be removed.</string>
+    <string name="import_rename_draft">Rename</string>
+    <string name="import_rename_draft_label">Draft file name</string>
+    <string name="import_rename_confirm">Save</string>
     <string name="pack_trust_pinned">Local trust: current tree pinned</string>
     <string name="pack_trust_unpinned">Local trust: not pinned (local marker, not a signature)</string>
     <string name="pack_trust_pin">Pin as trusted</string>

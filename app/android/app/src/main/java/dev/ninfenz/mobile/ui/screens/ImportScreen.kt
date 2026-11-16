@@ -15,6 +15,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Switch
@@ -90,6 +91,8 @@ fun ImportScreen(
     val importDraftStore = remember { ImportDraftStore(context.filesDir) }
     var drafts by remember { mutableStateOf(DraftLibrary.list(context.filesDir)) }
     var pendingDeleteDraft by remember { mutableStateOf<File?>(null) }
+    var renameDraft by remember { mutableStateOf<File?>(null) }
+    var renameDraftText by remember { mutableStateOf("") }
     LaunchedEffect(Unit) {
         if (doc == null && rawResult == null && error == null) {
             val raw = withContext(Dispatchers.IO) { importDraftStore.load() }
@@ -484,6 +487,10 @@ fun ImportScreen(
                                             }
                                         }
                                     }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_open_draft)) }
+                                    TextButton(onClick = {
+                                        renameDraft = draft
+                                        renameDraftText = draft.name.removeSuffix(".json")
+                                    }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_rename_draft)) }
                                     TextButton(onClick = { pendingDeleteDraft = draft }) {
                                         Text(stringResource(dev.ninfenz.mobile.R.string.import_delete_draft))
                                     }
@@ -504,6 +511,42 @@ fun ImportScreen(
                 }
             }
         }
+    }
+
+    renameDraft?.let { draft ->
+        AlertDialog(
+            onDismissRequest = { renameDraft = null },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.import_rename_draft)) },
+            text = {
+                OutlinedTextField(
+                    value = renameDraftText,
+                    onValueChange = { renameDraftText = it },
+                    singleLine = true,
+                    label = { Text(stringResource(dev.ninfenz.mobile.R.string.import_rename_draft_label)) }
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    enabled = renameDraftText.isNotBlank(),
+                    onClick = {
+                        try {
+                            val renamed = DraftLibrary.rename(draft, renameDraftText)
+                            drafts = DraftLibrary.list(context.filesDir)
+                            if (savedName == draft.name.removeSuffix(".json")) {
+                                savedName = renamed.name.removeSuffix(".json")
+                            }
+                            renameDraft = null
+                        } catch (t: Throwable) {
+                            error = CoreResponse.failure("NF-IMP-005", "重命名失败：" + (t.message ?: t.javaClass.simpleName), "换一个名称后重试", 2).error
+                            renameDraft = null
+                        }
+                    }
+                ) { Text(stringResource(dev.ninfenz.mobile.R.string.import_rename_confirm)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { renameDraft = null }) { Text(stringResource(android.R.string.cancel)) }
+            }
+        )
     }
 
     pendingDeleteDraft?.let { draft ->
