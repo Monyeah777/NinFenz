@@ -23,9 +23,18 @@ object EpubImporter {
                 attr(m.value, "idref")
             }.toList()
             val order = spine.ifEmpty { manifest.keys.toList() }
-            val chapters = order.mapNotNull { id ->
+            val chapterPaths = order.mapNotNull { id ->
                 val (_, type, path) = manifest[id] ?: return@mapNotNull null
                 if (type.isNotBlank() && !type.contains("xhtml") && !type.contains("html")) return@mapNotNull null
+                path
+            }
+            var total = 0L
+            chapterPaths.forEach { path ->
+                val entry = zip.getEntry(path) ?: return@forEach
+                total += entry.size.coerceAtLeast(0)
+                require(total <= 256L * 1024 * 1024) { "EPUB 章节总量超限" }
+            }
+            val chapters = chapterPaths.mapNotNull { path ->
                 read(zip, path)?.let { HtmlImporter.toMarkdown(it) }?.takeIf { it.isNotBlank() }
             }
             if (chapters.isEmpty()) throw IllegalArgumentException("EPUB 无可读章节")
