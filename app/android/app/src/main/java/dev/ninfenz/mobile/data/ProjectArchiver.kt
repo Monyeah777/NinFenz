@@ -56,6 +56,14 @@ object ProjectArchiver {
         return target
     }
 
+    fun delete(archived: File, filesDir: File): Boolean {
+        val archiveRoot = File(filesDir, "projects-archive").canonicalFile
+        val target = archived.canonicalFile
+        require(target.path.startsWith(archiveRoot.path + File.separator)) { "不在归档目录：" + target }
+        require(target.isFile) { "归档文件不存在" }
+        return target.delete()
+    }
+
     private fun guardFailure(src: File, target: File) {
         if (src.exists()) {
             throw IllegalStateException("归档复制成功但原文件删除失败：" + src + " -> " + target)

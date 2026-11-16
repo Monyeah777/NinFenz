@@ -529,4 +529,6 @@
     <string name="library_sort_title">Title</string>
     <string name="library_sort_status">Status</string>
     <string name="project_archive_restore">Restore</string>
+    <string name="project_archive_delete">Delete</string>
+    <string name="project_archive_delete_body">Permanently delete archived %1$s? This cannot be undone.</string>
 </resources>

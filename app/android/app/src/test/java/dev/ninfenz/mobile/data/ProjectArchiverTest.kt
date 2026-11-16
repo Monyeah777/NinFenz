@@ -39,6 +39,17 @@ class ProjectArchiverTest {
     }
 
     @Test
+    fun deletesArchivedFileOnlyInsideArchive() {
+        val root = Files.createTempDirectory("nf-archive-delete").toFile()
+        val archive = java.io.File(root, "projects-archive").apply { mkdirs() }
+        val f = java.io.File(archive, "a.nfproject.json.1.archived").apply { writeText("x") }
+        assertTrue(ProjectArchiver.delete(f, root))
+        assertTrue(!f.exists())
+        val outside = java.io.File(root, "outside").apply { writeText("x") }
+        assertTrue(runCatching { ProjectArchiver.delete(outside, root) }.isFailure)
+    }
+
+    @Test
     fun rejectsInvalidArchivedProject() {
         val root = Files.createTempDirectory("nf-archive-4").toFile()
         val archive = java.io.File(root, "projects-archive").apply { mkdirs() }

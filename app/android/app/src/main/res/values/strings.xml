@@ -529,4 +529,6 @@
     <string name="library_sort_title">标题</string>
     <string name="library_sort_status">状态</string>
     <string name="project_archive_restore">恢复</string>
+    <string name="project_archive_delete">删除</string>
+    <string name="project_archive_delete_body">永久删除归档 %1$s？不可撤销。</string>
 </resources>

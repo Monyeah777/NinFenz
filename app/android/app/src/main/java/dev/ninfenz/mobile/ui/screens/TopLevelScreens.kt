@@ -56,6 +56,7 @@ import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.data.PackEntry
 import dev.ninfenz.mobile.data.PackTrustStore
 import dev.ninfenz.mobile.data.PackVerifier
+import dev.ninfenz.mobile.data.ProjectArchiver
 import dev.ninfenz.mobile.data.ProjectEntry
 import dev.ninfenz.mobile.data.SeedResult
 import dev.ninfenz.mobile.data.LanguageMode
@@ -111,6 +112,7 @@ fun LibraryHomeScreen(
     val viewFilesDir = remember { runCatching { context.filesDir }.getOrNull() }
     val viewStore = remember(viewFilesDir) { viewFilesDir?.let { LibraryViewStore(it) } }
     val savedView = remember { viewStore?.load() }
+    var pendingDeleteArchive by remember { mutableStateOf<File?>(null) }
     var statusFilter by rememberSaveable { mutableStateOf(savedView?.status) }
     var sortName by rememberSaveable { mutableStateOf(savedView?.sort ?: ProjectSort.RECENT.name) }
     LaunchedEffect(statusFilter, sortName) {
@@ -284,6 +286,9 @@ fun LibraryHomeScreen(
                             TextButton(onClick = { onRestoreArchive(file) }) {
                                 Text(stringResource(dev.ninfenz.mobile.R.string.project_archive_restore))
                             }
+                            TextButton(onClick = { pendingDeleteArchive = file }) {
+                                Text(stringResource(dev.ninfenz.mobile.R.string.project_archive_delete))
+                            }
                         }
                     }
                 }
@@ -304,6 +309,24 @@ fun LibraryHomeScreen(
             }
         }
         }
+    }
+
+    pendingDeleteArchive?.let { file ->
+        AlertDialog(
+            onDismissRequest = { pendingDeleteArchive = null },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.project_archive_delete)) },
+            text = { Text(stringResource(dev.ninfenz.mobile.R.string.project_archive_delete_body, file.name)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    ProjectArchiver.delete(file, context.filesDir)
+                    pendingDeleteArchive = null
+                    onRefresh()
+                }) { Text(stringResource(dev.ninfenz.mobile.R.string.project_archive_delete)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { pendingDeleteArchive = null }) { Text(stringResource(android.R.string.cancel)) }
+            }
+        )
     }
 }
 

@@ -17,6 +17,7 @@
 | L1 校验 | pass：L1 pass（error=0 warn=0 info=3）；状态 assembled→validated 写回 | run-as 读项目 |
 | 导出 md/zip | pass：files/exports/delivery/result.md + result.zip + manifest；状态 validated→exported 写回 | run-as 读文件 |
 | 桌面快捷方式（构建） | pass（构建）：静态 shortcuts（导入/新建/搜索）+ MainActivity 冷启动/onNewIntent 路由；未真机长按图标验证（adb 无设备） |
+| 归档项目删除（JVM） | pass（本机）：库页归档行可永久删除，二次确认，仅允许 projects-archive 内；测试 5 条。真机未复测（adb 无设备） |
 | 最近导入重新打开（JVM） | pass（本机）：最近导入按 digest 找匹配草稿并可重新打开；草稿已删时提示；真机未复测（adb 无设备） |
 | 禁止云备份/迁移（JVM） | pass（构建）：data_extraction_rules 对 cloud-backup/device-transfer 全排除；allowBackup=false；lint 通过。真机未复测（adb 无设备） |
 | Android lint（JVM） | pass（本机）：:app:lintDebug 通过；修复 backup_deleted 格式参数错误与 DefaultLocale 告警；剩余 46 warnings 登记未清零。真机未复测（adb 无设备） |
