@@ -29,6 +29,7 @@
 | HTML 表格对齐（JVM） | pass（本机）：:---/::/---: → style text-align；测试 12 条。真机未复测（adb 无设备） |
 | EPUB 导出 data URI 图片（JVM） | pass（本机）：Markdown data:image 渲染为 img；测试 10 条。真机未复测（adb 无设备） |
 | EPUB 图片内嵌（JVM） | pass（本机）：EPUB img 转 data URI（单图 ≤2MiB、总量 ≤20MiB）；测试 6 条。真机未复测（adb 无设备） |
+| HTML 嵌套有序列表（JVM） | pass（本机）：ol 内嵌 ol 缩进编号；测试 15 条。 |
 | HTML 嵌套列表（JVM） | pass（本机）：ul/ol 嵌套转缩进 Markdown；测试 14 条。真机未复测（adb 无设备） |
 | 无 BOM UTF-16 启发式（JVM） | pass（本机）：按 NUL 奇偶分布识别无 BOM UTF-16LE/BE；测试 3 条。 |
 | UTF-16 项目 JSON（JVM） | pass（本机）：UTF-16LE BOM 项目 JSON 可导入；项目包测试 13 条。 |
