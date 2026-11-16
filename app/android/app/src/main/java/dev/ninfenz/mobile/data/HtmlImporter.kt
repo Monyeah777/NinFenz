@@ -2,6 +2,14 @@ package dev.ninfenz.mobile.data
 
 /** 轻量 HTML → Markdown：去脚本/样式，保留标题/列表/段落/换行，解码常见实体。 */
 object HtmlImporter {
+    fun decode(bytes: ByteArray): String {
+        TextEncoding.decode(bytes)?.let { return it.text }
+        val head = String(bytes, 0, minOf(bytes.size, 4096), Charsets.ISO_8859_1)
+        val charset = Regex("(?i)<meta[^>]+charset=[\"']?([A-Za-z0-9._-]+)").find(head)?.groupValues?.getOrNull(1)
+        val cs = charset?.let { runCatching { java.nio.charset.Charset.forName(it) }.getOrNull() }
+        return if (cs != null) String(bytes, cs) else String(bytes, Charsets.UTF_8)
+    }
+
     fun toMarkdown(html: String): String {
         var text = html
         text = Regex("(?is)<script.*?</script>").replace(text, " ")

@@ -61,6 +61,13 @@ class HtmlImporterTest {
     }
 
     @Test
+    fun decodesMetaCharset() {
+        val bytes = "<meta charset=\"gbk\"><p>中文</p>".toByteArray(java.nio.charset.Charset.forName("GBK"))
+        assertTrue(HtmlImporter.decode(bytes).contains("中文"))
+        assertTrue(HtmlImporter.decode("<p>utf8 中文</p>".toByteArray()).contains("utf8 中文"))
+    }
+
+    @Test
     fun removesScriptAndStyle() {
         val md = HtmlImporter.toMarkdown("<style>x{}</style><script>alert(1)</script><p>正文</p>")
         assertTrue(md.contains("正文"))

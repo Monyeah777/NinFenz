@@ -160,7 +160,7 @@ fun ImportScreen(
             name.endsWith(".markdown", true) || mime?.startsWith("text/") == true)
         val sourceFile = when {
             isHtml -> {
-                val raw = TextEncoding.decode(file.readBytes())?.text ?: file.readText(Charsets.UTF_8)
+                val raw = HtmlImporter.decode(file.readBytes())
                 val markdown = HtmlImporter.toMarkdown(raw)
                 File(file.parentFile, "html-import.md").apply { writeText(markdown, Charsets.UTF_8) }
             }
