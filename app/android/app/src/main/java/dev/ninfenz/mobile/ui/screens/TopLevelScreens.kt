@@ -629,6 +629,7 @@ fun ProjectDetailScreen(
     var showRename by remember { mutableStateOf(false) }
     var renameText by remember(project.title) { mutableStateOf(project.title) }
     var showReview by remember { mutableStateOf(false) }
+    val canApprove = project.status in setOf(ProjectStatus.VALIDATED, ProjectStatus.EXPORTED, ProjectStatus.REVIEWED)
     var reviewer by remember { mutableStateOf("") }
     var reviewNote by remember { mutableStateOf("") }
     val diffPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: android.net.Uri? ->
@@ -670,6 +671,14 @@ fun ProjectDetailScreen(
                         )
                         Text(
                             stringResource(dev.ninfenz.mobile.R.string.project_detail_protocol, project.refs.protocolId.ifBlank { "未绑定" }),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                        Text(
+                            stringResource(
+                                dev.ninfenz.mobile.R.string.project_review_summary,
+                                project.review.state,
+                                project.review.reviewer ?: "-"
+                            ),
                             style = MaterialTheme.typography.bodySmall
                         )
                         Text(
@@ -753,11 +762,18 @@ fun ProjectDetailScreen(
                         onValueChange = { reviewNote = it },
                         label = { Text(stringResource(dev.ninfenz.mobile.R.string.project_review_note)) }
                     )
+                    if (!canApprove) {
+                        Text(
+                            stringResource(dev.ninfenz.mobile.R.string.project_review_need_validate),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
                 }
             },
             confirmButton = {
                 TextButton(
-                    enabled = reviewer.isNotBlank() && reviewNote.isNotBlank(),
+                    enabled = canApprove && reviewer.isNotBlank() && reviewNote.isNotBlank(),
                     onClick = {
                         showReview = false
                         onReview(true, reviewer, reviewNote)

@@ -469,6 +469,8 @@
     <string name="project_detail_rename">重命名</string>
     <string name="project_detail_review">评审</string>
     <string name="project_review_current">当前评审：%1$s</string>
+    <string name="project_review_summary">评审：%1$s · 评审人 %2$s</string>
+    <string name="project_review_need_validate">需先完成校验/导出后才能评审通过</string>
     <string name="project_review_reviewer">评审人</string>
     <string name="project_review_note">评审意见</string>
     <string name="project_review_approve">通过</string>
