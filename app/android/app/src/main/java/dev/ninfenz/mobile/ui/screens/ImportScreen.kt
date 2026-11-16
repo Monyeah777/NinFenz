@@ -41,6 +41,7 @@ import dev.ninfenz.mobile.data.LibraryStore
 import dev.ninfenz.mobile.model.ImportDoc
 import dev.ninfenz.mobile.model.ImportModel
 import dev.ninfenz.mobile.share.SharePayload
+import dev.ninfenz.mobile.share.SharedItem
 import dev.ninfenz.mobile.ui.components.NfCard
 import dev.ninfenz.mobile.ui.components.NfEmptyState
 import dev.ninfenz.mobile.ui.components.NfErrorCard
@@ -79,6 +80,8 @@ fun ImportScreen(
     var busy by remember { mutableStateOf(false) }
     var savedName by remember { mutableStateOf<String?>(null) }
     var prefillNote by remember { mutableStateOf<String?>(null) }
+    var shareQueue by remember { mutableStateOf<List<SharedItem>>(emptyList()) }
+    var shareCursor by remember { mutableStateOf(0) }
     var acceptedMappings by remember { mutableStateOf<Set<Int>>(emptySet()) }
     var suggestNote by remember { mutableStateOf<String?>(null) }
     val importHistory = remember { ImportHistoryStore(context.filesDir) }
@@ -194,16 +197,8 @@ fun ImportScreen(
         }
     }
 
-    fun importShare(payload: SharePayload) {
+    fun importSharedItem(item: SharedItem) {
         scope.launch {
-            val item = payload.items.firstOrNull()
-            if (payload.items.size > 1) {
-                prefillNote = context.getString(dev.ninfenz.mobile.R.string.import_share_multi, payload.items.size, payload.items.size - 1)
-            }
-            if (item == null) {
-                error = CoreResponse.failure("NF-IMP-001", "分享载荷无可导入条目", "换一种分享方式", 3).error
-                return@launch
-            }
             if (item.text != null) {
                 val file = File(File(context.cacheDir, "imports").apply { mkdirs() }, "shared-text.md")
                 file.writeText(item.text, Charsets.UTF_8)
@@ -223,6 +218,24 @@ fun ImportScreen(
                 }
             }
         }
+    }
+
+    fun importShare(payload: SharePayload) {
+        shareQueue = payload.items
+        shareCursor = 0
+        val item = payload.items.firstOrNull()
+        if (item == null) {
+            error = CoreResponse.failure("NF-IMP-001", "分享载荷无可导入条目", "换一种分享方式", 3).error
+            return
+        }
+        importSharedItem(item)
+    }
+
+    fun importNextSharedItem() {
+        val next = shareCursor + 1
+        if (next >= shareQueue.size) return
+        shareCursor = next
+        importSharedItem(shareQueue[next])
     }
 
     LaunchedEffect(prefill) {
@@ -273,6 +286,25 @@ fun ImportScreen(
                         }
                         if (prefillNote != null) {
                             Text(prefillNote!!, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                        if (shareQueue.size > 1) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    stringResource(dev.ninfenz.mobile.R.string.import_share_queue, shareQueue.size, shareCursor + 1),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                if (shareCursor < shareQueue.size - 1) {
+                                    TextButton(onClick = { importNextSharedItem() }) {
+                                        Text(stringResource(dev.ninfenz.mobile.R.string.import_share_next))
+                                    }
+                                }
+                                TextButton(onClick = {
+                                    shareQueue = emptyList()
+                                    shareCursor = 0
+                                }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_share_ignore)) }
+                            }
                         }
                         Text(
                             stringResource(dev.ninfenz.mobile.R.string.import_explain),

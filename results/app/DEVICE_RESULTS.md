@@ -16,6 +16,7 @@
 | 装配 | pass：填 4 个槽位后 assemble 返回 markdown（开篇/正文/收束） | 截图 19 |
 | L1 校验 | pass：L1 pass（error=0 warn=0 info=3）；状态 assembled→validated 写回 | run-as 读项目 |
 | 导出 md/zip | pass：files/exports/delivery/result.md + result.zip + manifest；状态 validated→exported 写回 | run-as 读文件 |
+| 多条目分享队列（JVM） | pass（本机）：SEND_MULTIPLE 接收后保留全部条目，显示「共 N 项/当前第 X 项」，可逐项导入或忽略其余；不再只取第一项并静默丢弃。真机未复测（adb 无设备） |
 | EPUB 结构自检（JVM） | pass（本机）：导出后校验 mimetype 首个/STORED、container/OPF 引用/spine/nav、XHTML 可解析、路径约束；失败显示原因；测试 3 条。真机未复测（adb 无设备） |
 | EPUB 导出（JVM） | pass（本机）：交付台「导出 epub」用 EpubExporter 生成 EPUB3（mimetype STORED、container/OPF/nav/chapter），基础 Markdown→XHTML，HTML 转义；测试 2 条覆盖结构与无标题；未接 EPUBCheck。真机未复测（adb 无设备） |
 | 归档列表/恢复（JVM） | pass（本机）：库页显示 projects-archive/ 归档列表，点「恢复」校验项目 JSON 后移回 projects/；坏归档拒绝；测试 4 条。真机未复测（adb 无设备） |
