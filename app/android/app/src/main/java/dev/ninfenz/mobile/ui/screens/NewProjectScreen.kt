@@ -102,9 +102,10 @@ fun NewProjectScreen(
                     }
                 }
                 item {
+                    val unnamedTitle = stringResource(dev.ninfenz.mobile.R.string.unnamed_project)
                     Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s), verticalAlignment = Alignment.CenterVertically) {
                         Button(
-                            onClick = { selected?.let { onCreate(it, title.ifBlank { "未命名项目" }) } },
+                            onClick = { selected?.let { onCreate(it, title.ifBlank { unnamedTitle }) } },
                             enabled = selected != null && !creating
                         ) {
                             if (creating) {

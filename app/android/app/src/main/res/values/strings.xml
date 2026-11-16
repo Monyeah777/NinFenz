@@ -3,6 +3,7 @@
     <string name="app_name">NF</string>
     <string name="back_to_library">返回库</string>
     <string name="demo_project_title">演示项目</string>
+    <string name="unnamed_project">未命名项目</string>
     <string name="project_package_import_failed">项目包导入失败：%1$s</string>
     <string name="error_with_fix">[%1$s] %2$s；修复：%3$s</string>
     <string name="project_missing_title">项目不存在</string>

@@ -32,6 +32,7 @@
 | 全量复核（round53） | pass（本机）：verify PASS=107/WARN=2/FAIL=0；gates PASS/gap=0；rust 186；pytest 493。 |
 | Python 全量复核（round61） | pass（本机）：schema 变更后 `pytest app/tests` 493 passed / 0 failed（126s）。 |
 | 全量复核（round60） | pass（本机）：verify 107/2/0；gates PASS/gap=0；rust 186；JVM 317。 |
+| 未命名项目 i18n（JVM） | pass（本机）：新建项目默认标题改资源；修复 Composable lambda 作用域后构建通过。 |
 | Lint 0 warnings 复核（round85） | pass（本机）：新增字符串触发 3 条 PluralsCandidate，调整格式后 lint 0 warnings/0 errors。 |
 | 分享授权/草稿错误 i18n（JVM） | pass（本机）：授权失效/URI 读取/草稿读取/解析改资源；318 tests。 |
 | Import 解析/分享错误 i18n（JVM） | pass（本机）：nf-import 解析/示例读取/分享空载荷改资源；318 tests。 |
@@ -147,7 +148,7 @@
 | 依赖升级 coroutines（JVM） | pass（本机）：coroutines 1.9.0→1.10.2，243 tests 全绿；lint warnings 3→2；debug APK 因未压缩 dex 增至 24.7MB。真机未复测（adb 无设备） |
 | Clean build（本轮） | pass（本机）：`gradlew clean` + `testDebugUnitTest --rerun-tasks` + assembleDebug；248/248 全绿；clean APK 19,032,264 B sha256 f4501bfe…；zipalign 16KB 通过。增量 APK 24.7MB 为旧构建膨胀，clean 产物为准。 |
 | Rust core 单测（本轮） | pass（本机）：`cargo test` 186 passed / 0 failed；Android 端无 core 改动。 |
-| Release 构建（构建） | pass（本机）：clean 后重建 `:app:assembleRelease` 成功；app-release-unsigned.apk 15,319,469 B sha256 f3882afc…；zipalign 16KB 通过；apksigner 显示未签名（预期，签名 OPEN-EXTERNAL）。 |
+| Release 构建（构建） | pass（本机）：clean 后重建 `:app:assembleRelease` 成功；app-release-unsigned.apk 15,319,925 B sha256 9f2e81c4…；zipalign 16KB 通过；apksigner 显示未签名（预期，签名 OPEN-EXTERNAL）。 |
 | 16KB 页对齐（构建） | pass（本机）：`zipalign -c -P 16 4 app-debug.apk` exit=0；未真机安装验证。 |
 | APP 门禁（round127） | pass（本机）：QA0–QA6 全 PASS，FAIL=0；covered=14 gap=0 open=2 p0=0；台账刷新到当前 HEAD。 |
 | APP 门禁（本轮） | pass（本机）：QA0–QA6 全部 PASS，FAIL=0；自审计 covered=14 gap=0 open=2 p0=0。 |
