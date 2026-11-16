@@ -49,6 +49,7 @@ fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
     var backupMessage by remember { mutableStateOf<String?>(null) }
     var pendingRestore by remember { mutableStateOf<File?>(null) }
     var restoreEntries by remember { mutableStateOf(0) }
+    var lastSnapshot by remember { mutableStateOf(BackupRestoreService.lastSnapshot(context.filesDir)) }
     val scope = rememberCoroutineScope()
     val restorePicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         if (uri == null) return@rememberLauncherForActivityResult
@@ -123,6 +124,19 @@ fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
             OutlinedButton(onClick = {
                 restorePicker.launch(arrayOf("application/zip", "*/*"))
             }) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_backup_restore)) }
+            lastSnapshot?.let { snapshot ->
+                OutlinedButton(onClick = {
+                    scope.launch {
+                        val checked = withContext(Dispatchers.IO) { BackupRestoreService.inspect(snapshot) }
+                        if (!checked.ok) {
+                            backupMessage = "快照校验失败：" + (checked.error ?: "未知原因")
+                        } else {
+                            pendingRestore = snapshot
+                            restoreEntries = checked.entries.size
+                        }
+                    }
+                }) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_backup_rollback)) }
+            }
         }
 
         CardBox(title = stringResource(dev.ninfenz.mobile.R.string.settings_privacy)) {
@@ -166,6 +180,7 @@ fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
                             },
                             onFailure = { "恢复失败：" + (it.message ?: it.javaClass.simpleName) }
                         )
+                        lastSnapshot = BackupRestoreService.lastSnapshot(context.filesDir)
                         pendingRestore = null
                     }
                 }) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_backup_restore_confirm)) }

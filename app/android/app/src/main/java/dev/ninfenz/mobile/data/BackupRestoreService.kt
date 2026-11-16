@@ -61,6 +61,10 @@ object BackupRestoreService {
         val checked = inspect(file)
         require(checked.ok) { checked.error ?: "备份校验失败" }
         val snapshot = BackupService.create(filesDir).file
+        pointerFile(filesDir).let { pointer ->
+            pointer.parentFile?.mkdirs()
+            AtomicFiles.writeText(pointer, snapshot.absolutePath)
+        }
         var restored = 0
         ZipFile(file).use { zip ->
             for (e in checked.entries) {
@@ -75,6 +79,19 @@ object BackupRestoreService {
         }
         return Restored(restored, 0, snapshot)
     }
+
+    fun lastSnapshot(filesDir: File): File? {
+        val pointer = pointerFile(filesDir)
+        if (!pointer.isFile) return null
+        return try {
+            pointer.readText(Charsets.UTF_8).trim().takeIf { it.isNotBlank() }?.let { File(it).takeIf { f -> f.isFile } }
+        } catch (t: Throwable) {
+            null
+        }
+    }
+
+    private fun pointerFile(filesDir: File): File =
+        File(File(filesDir, "exports/backups").apply { mkdirs() }, "last-restore-snapshot.txt")
 
     private fun safePath(path: String): Boolean =
         (path.startsWith("projects/") || path.startsWith("drafts/")) &&

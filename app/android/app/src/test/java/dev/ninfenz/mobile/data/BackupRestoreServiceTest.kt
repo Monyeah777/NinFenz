@@ -30,6 +30,25 @@ class BackupRestoreServiceTest {
     }
 
     @Test
+    fun remembersLastSnapshotForRollback() {
+        val src = Files.createTempDirectory("nf-restore-rollback-src").toFile()
+        File(src, "projects").mkdirs()
+        File(src, "projects/new.json").writeText("new")
+        val backup = BackupService.create(src, 999L).file
+
+        val dst = Files.createTempDirectory("nf-restore-rollback-dst").toFile()
+        File(dst, "projects").mkdirs()
+        File(dst, "projects/old.json").writeText("old")
+        BackupRestoreService.restore(backup, dst)
+        assertTrue(File(dst, "projects/new.json").isFile)
+
+        val snapshot = BackupRestoreService.lastSnapshot(dst)
+        assertTrue(snapshot != null && snapshot!!.isFile)
+        BackupRestoreService.restore(snapshot!!, dst)
+        assertEquals("old", File(dst, "projects/old.json").readText())
+    }
+
+    @Test
     fun rejectsPathTraversalEntry() {
         val dir = Files.createTempDirectory("nf-restore-bad").toFile()
         val bad = File(dir, "bad.zip")
