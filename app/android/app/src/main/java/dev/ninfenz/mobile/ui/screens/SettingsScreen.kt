@@ -88,7 +88,7 @@ fun SettingsScreen(
             }
             val checked = withContext(Dispatchers.IO) { BackupRestoreService.inspect(file) }
             if (!checked.ok) {
-                backupMessage = "备份校验失败：" + (checked.error ?: "未知原因")
+                backupMessage = context.getString(dev.ninfenz.mobile.R.string.backup_verify_failed, checked.error ?: context.getString(dev.ninfenz.mobile.R.string.unknown_reason))
             } else {
                 pendingRestore = file
                 restoreEntries = checked.entries.size
@@ -181,7 +181,7 @@ fun SettingsScreen(
                         scope.launch {
                             val checked = withContext(Dispatchers.IO) { BackupRestoreService.inspect(backup) }
                             if (!checked.ok) {
-                                backupMessage = "备份校验失败：" + (checked.error ?: "未知原因")
+                                backupMessage = context.getString(dev.ninfenz.mobile.R.string.backup_verify_failed, checked.error ?: context.getString(dev.ninfenz.mobile.R.string.unknown_reason))
                             } else {
                                 pendingRestore = backup
                                 restoreEntries = checked.entries.size
@@ -195,7 +195,7 @@ fun SettingsScreen(
                     scope.launch {
                         val checked = withContext(Dispatchers.IO) { BackupRestoreService.inspect(snapshot) }
                         if (!checked.ok) {
-                            backupMessage = "快照校验失败：" + (checked.error ?: "未知原因")
+                            backupMessage = context.getString(dev.ninfenz.mobile.R.string.backup_snapshot_failed, checked.error ?: context.getString(dev.ninfenz.mobile.R.string.unknown_reason))
                         } else {
                             pendingRestore = snapshot
                             restoreEntries = checked.entries.size
@@ -269,7 +269,7 @@ fun SettingsScreen(
                                 scope.launch {
                                     val checked = withContext(Dispatchers.IO) { BackupRestoreService.inspect(backup) }
                                     if (!checked.ok) {
-                                        backupMessage = "备份校验失败：" + (checked.error ?: "未知原因")
+                                        backupMessage = context.getString(dev.ninfenz.mobile.R.string.backup_verify_failed, checked.error ?: context.getString(dev.ninfenz.mobile.R.string.unknown_reason))
                                     } else {
                                         pendingRestore = backup
                                         restoreEntries = checked.entries.size
@@ -304,7 +304,7 @@ fun SettingsScreen(
                     backupMessage = if (ok) {
                         context.getString(dev.ninfenz.mobile.R.string.settings_backup_deleted, backup.name)
                     } else {
-                        "删除备份失败：" + backup.name
+                        context.getString(dev.ninfenz.mobile.R.string.backup_delete_failed, backup.name)
                     }
                 }) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_backup_delete)) }
             },
@@ -345,7 +345,7 @@ fun SettingsScreen(
                                     it.snapshot?.name ?: "-"
                                 )
                             },
-                            onFailure = { "恢复失败：" + (it.message ?: it.javaClass.simpleName) }
+                            onFailure = { context.getString(dev.ninfenz.mobile.R.string.backup_restore_failed, it.message ?: it.javaClass.simpleName) }
                         )
                         lastSnapshot = BackupRestoreService.lastSnapshot(context.filesDir)
                         onDataRestored()

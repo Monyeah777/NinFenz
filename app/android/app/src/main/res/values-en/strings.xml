@@ -510,6 +510,11 @@
     <string name="settings_backup_delete_title">Delete backup</string>
     <string name="settings_backup_delete_body">Delete %1$s? This cannot be undone.</string>
     <string name="settings_backup_deleted">Backup deleted: %1$s</string>
+    <string name="backup_verify_failed">Backup verification failed: %1$s</string>
+    <string name="backup_snapshot_failed">Snapshot verification failed: %1$s</string>
+    <string name="backup_delete_failed">Failed to delete backup: %1$s</string>
+    <string name="backup_restore_failed">Restore failed: %1$s</string>
+    <string name="unknown_reason">Unknown reason</string>
     <string name="settings_prefs_restart">Preferences restored; restarting app…</string>
     <string name="settings_backup_rollback">Roll back last restore</string>
     <string name="settings_backup_prune">Prune old backups (keep 5)</string>

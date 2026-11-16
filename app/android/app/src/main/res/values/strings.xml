@@ -510,6 +510,11 @@
     <string name="settings_backup_delete_title">删除备份</string>
     <string name="settings_backup_delete_body">确定删除 %1$s？此操作不可撤销。</string>
     <string name="settings_backup_deleted">删除备份：%1$s</string>
+    <string name="backup_verify_failed">备份校验失败：%1$s</string>
+    <string name="backup_snapshot_failed">快照校验失败：%1$s</string>
+    <string name="backup_delete_failed">删除备份失败：%1$s</string>
+    <string name="backup_restore_failed">恢复失败：%1$s</string>
+    <string name="unknown_reason">未知原因</string>
     <string name="settings_prefs_restart">偏好已恢复，正在重启应用…</string>
     <string name="settings_backup_rollback">回滚上次恢复</string>
     <string name="settings_backup_prune">清理旧备份（保留 5 个）</string>
