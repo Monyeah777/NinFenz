@@ -73,6 +73,7 @@ object EpubExporter {
         var inList = false
         var inQuote = false
         var inOrdered = false
+        var codeLang = ""
         val code = StringBuilder()
         val table = mutableListOf<List<String>>()
         fun closeQuote() {
@@ -102,8 +103,12 @@ object EpubExporter {
             val fence = line.trimStart().startsWith("\u0060\u0060\u0060")
             if (fence) {
                 if (inCode) {
-                    out.append("<pre><code>").append(esc(code.toString().trimEnd())).append("</code></pre>\n")
+                    val cls = if (codeLang.isNotBlank()) " class=\"language-" + codeLang + "\"" else ""
+                    out.append("<pre><code").append(cls).append(">").append(esc(code.toString().trimEnd())).append("</code></pre>\n")
                     code.clear()
+                    codeLang = ""
+                } else {
+                    codeLang = line.trimStart().removePrefix("\u0060\u0060\u0060").trim().takeWhile { it.isLetterOrDigit() || it == '_' || it == '-' }
                 }
                 inCode = !inCode
                 return@forEach

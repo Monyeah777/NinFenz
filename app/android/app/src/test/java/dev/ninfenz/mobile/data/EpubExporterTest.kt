@@ -92,6 +92,16 @@ class EpubExporterTest {
     }
 
     @Test
+    fun rendersCodeLanguageClass() {
+        val dir = Files.createTempDirectory("nf-epub-lang").toFile()
+        val created = EpubExporter.export("# 章\n\n\u0060\u0060\u0060kotlin\nval x = 1\n\u0060\u0060\u0060", "章", dir)
+        ZipFile(created.file).use { zip ->
+            val chapter = zip.getInputStream(zip.getEntry("OEBPS/chapter-001.xhtml")).bufferedReader().readText()
+            assertTrue(chapter.contains("<code class=\"language-kotlin\">"))
+        }
+    }
+
+    @Test
     fun noHeadingFallsBackToSingleChapter() {
         assertEquals(1, EpubExporter.chapters("只有一段正文").size)
         assertEquals("正文", EpubExporter.chapters("只有一段正文").first().title)

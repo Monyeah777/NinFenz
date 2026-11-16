@@ -24,8 +24,8 @@
 
 | 项 | 结果 |
 |---|---|
-| APK | app-debug.apk = 19,065,492 B；sha256 dd85288484b43515c4b089bb964fe9578cd8cabcf7177499a1c00084ba4e3b31 |
-| JVM 测试 | 303 条全绿（v1 基线 42 + v0.02 新增 261；含 Robolectric/Compose/Paparazzi） |
+| APK | app-debug.apk = 19,065,492 B；sha256 c12153fe9b6245439535efeafcb39832b73008cf4fec4cbb1132fdf22dac4e07 |
+| JVM 测试 | 304 条全绿（v1 基线 42 + v0.02 新增 262；含 Robolectric/Compose/Paparazzi） |
 | 构建 | ./gradlew :app:assembleDebug 成功；:app:testDebugUnitTest 123/123 |
 | i18n | 全部屏主要文案已资源化 + values-en；「我的」zh/en/跟随系统切换；动态取色开关；库/Pack 中心下拉刷新；节点删除 Snackbar 撤销 + 触觉；expanded 双栏（主列表+详情）；导航 Crossfade（NfMotion.MEDIUM_MS）；统一 loading/skeleton 组件；少量错误/技术提示仍内联（OPEN-I18N-BODY 尾项） |
 | 适配 | compact/medium/expanded 三档导航 + 9 组窗口尺寸语义矩阵 |
@@ -42,7 +42,7 @@
 ### 0.4 v0.02 收口（2026-11-15）
 
 - 机读门禁：app/gates **7/7 PASS，FAIL=0**（QA0 10 / QA5 5）；仓库 verify **PASS=107 WARN=2 FAIL=0**。
-- 测试/产物：JVM **303/303**；APK 19,065,492 B，sha256 dd852884…。
+- 测试/产物：JVM **304/304**；APK 19,065,492 B，sha256 c12153fe…。
 - 结论：**v0.02 实现面 pass-with-open-items**；下方 OPEN 不因收口消失，未跑面不写成 pass。
 
 ### 0.5 v0.02 OPEN（带 owner+next）
