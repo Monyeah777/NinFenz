@@ -3,7 +3,10 @@ package dev.ninfenz.mobile.ui.screens
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.net.Uri
+import android.app.Activity
 import android.content.Context
+import android.content.ContextWrapper
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
@@ -308,9 +311,15 @@ fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
                             onFailure = { "恢复失败：" + (it.message ?: it.javaClass.simpleName) }
                         )
                         lastSnapshot = BackupRestoreService.lastSnapshot(context.filesDir)
-                        runCatching {
+                        val prefsRestored = runCatching {
                             File(context.filesDir, "app-prefs.json").takeIf { it.isFile }?.readText()
-                                ?.let { AppPrefs(context).restore(it) }
+                                ?.let { AppPrefs(context).restore(it) } ?: false
+                        }.getOrDefault(false)
+                        if (prefsRestored) {
+                            findActivity(context)?.let { activity ->
+                                Toast.makeText(context, dev.ninfenz.mobile.R.string.settings_prefs_restart, Toast.LENGTH_SHORT).show()
+                                activity.recreate()
+                            }
                         }
                         backups = BackupService.list(context.filesDir)
                         pendingRestore = null
@@ -322,6 +331,15 @@ fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
             }
         )
     }
+}
+
+private fun findActivity(context: Context): Activity? {
+    var current: Context? = context
+    while (current is ContextWrapper) {
+        if (current is Activity) return current
+        current = current.baseContext
+    }
+    return null
 }
 
 private fun humanBytes(bytes: Long): String = when {
