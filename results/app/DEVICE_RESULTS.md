@@ -24,6 +24,7 @@
 | 门禁/ lint 复核（round143） | pass（本机）：QA0–QA6 全 PASS，FAIL=0，covered=14 gap=0 open=2 p0=0；lint warnings=1（仅 Paparazzi 版本，Kotlin 2.1 阻塞）。 |
 | 备份未列条目拒绝（JVM） | pass（本机）：manifest 未列出的 zip 条目导致 inspect 失败；BackupRestoreServiceTest 5 条。真机未复测（adb 无设备） |
 | 全量复核（round161） | pass（本机）：verify.sh PASS=107 WARN=2 FAIL=0；app gates QA0–QA6 PASS，gap=0，P0=0；lint 0 warnings。 |
+| 全量复核（round15） | pass（本机）：verify PASS=107 WARN=2 FAIL=0；app gates QA0–QA6 PASS，gap=0，P0=0。 |
 | EPUB 标题补全（JVM） | pass（本机）：无标题章节时用 dc:title 作首行标题；测试 4 条。真机未复测（adb 无设备） |
 | EPUB 章节总量上限（JVM） | pass（本机）：章节声明总量 >256MiB 拒绝；292 tests 全绿。真机未复测（adb 无设备） |
 | EPUB spine 顺序（JVM） | pass（本机）：按 spine itemref 顺序输出章节；测试 3 条。真机未复测（adb 无设备） |
