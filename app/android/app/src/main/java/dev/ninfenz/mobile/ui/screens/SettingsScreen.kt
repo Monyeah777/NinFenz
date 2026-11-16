@@ -56,7 +56,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Composable
-fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
+fun SettingsScreen(
+    onBack: () -> Unit,
+    onErrorCodes: () -> Unit = {},
+    onDataRestored: () -> Unit = {}
+) {
     val context = LocalContext.current
     val diag = remember { Core.diagnostics() }
     var crash by remember { mutableStateOf(CrashLogStore(context.filesDir).read()) }
@@ -344,6 +348,7 @@ fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
                             onFailure = { "恢复失败：" + (it.message ?: it.javaClass.simpleName) }
                         )
                         lastSnapshot = BackupRestoreService.lastSnapshot(context.filesDir)
+                        onDataRestored()
                         val prefsRestored = runCatching {
                             File(context.filesDir, "app-prefs.json").takeIf { it.isFile }?.readText()
                                 ?.let { AppPrefs(context).restore(it) } ?: false

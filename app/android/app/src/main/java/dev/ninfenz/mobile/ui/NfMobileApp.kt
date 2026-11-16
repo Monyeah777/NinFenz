@@ -438,7 +438,8 @@ is Detail.Import -> ImportScreen(
                     )
                     is Detail.Settings -> SettingsScreen(
                         onBack = { shell = shell.back() ?: shell },
-                        onErrorCodes = { shell = shell.open(Detail.ErrorCodes) }
+                        onErrorCodes = { shell = shell.open(Detail.ErrorCodes) },
+                        onDataRestored = { refresh() }
                     )
                     is Detail.ErrorCodes -> ErrorCodesScreen(onBack = { shell = shell.back() ?: shell })
                     is Detail.Author -> {
