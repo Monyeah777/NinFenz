@@ -49,6 +49,7 @@ class SampleSeeder(
                 return@withContext SeedResult.AlreadyPresent(id, version)
             }
             PackInstaller.install(stage, target)
+            PackStore(filesDir).invalidate()
             prefs.sampleSeeded = true
             SeedResult.Installed(id, version, count.coerceAtLeast(expected))
         } catch (t: Throwable) {
