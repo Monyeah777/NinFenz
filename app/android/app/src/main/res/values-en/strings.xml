@@ -235,6 +235,10 @@
     <string name="delivery_share_file">Share exported file</string>
     <string name="delivery_open_file">Open</string>
     <string name="delivery_pdf_note">PDF: local basic-text export; rich layout remains OPEN.</string>
+    <string name="export_epub_failed">EPUB export failed: %1$s</string>
+    <string name="export_pdf_failed">PDF export failed: %1$s</string>
+    <string name="export_html_failed">HTML export failed: %1$s</string>
+    <string name="export_failed_fix">Check storage space</string>
     <string name="delivery_preview">Preview</string>
     <string name="delivery_not_assembled">Nothing assembled yet. Preview only shows markdown returned by core.</string>
     <string name="delivery_export">Export %1$s</string>

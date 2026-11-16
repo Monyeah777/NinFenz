@@ -828,7 +828,7 @@ private fun EpubExportButton(
                     val created = EpubExporter.export(md, project.title, outDir)
                     onDone(created.file)
                 } catch (t: Throwable) {
-                    setError(CoreError("NF-EXP-001", "EPUB 导出失败：" + (t.message ?: t.javaClass.simpleName), "检查存储空间", null, 1))
+                    setError(CoreError("NF-EXP-001", context.getString(dev.ninfenz.mobile.R.string.export_epub_failed, t.message ?: t.javaClass.simpleName), context.getString(dev.ninfenz.mobile.R.string.export_failed_fix), null, 1))
                 } finally {
                     setBusy(false)
                 }
@@ -860,7 +860,7 @@ private fun PdfExportButton(
                     val created = PdfExporter.export(md, project.title, outDir)
                     onDone(created.file)
                 } catch (t: Throwable) {
-                    setError(CoreError("NF-EXP-002", "PDF 导出失败：" + (t.message ?: t.javaClass.simpleName), "检查存储空间", null, 1))
+                    setError(CoreError("NF-EXP-002", context.getString(dev.ninfenz.mobile.R.string.export_pdf_failed, t.message ?: t.javaClass.simpleName), context.getString(dev.ninfenz.mobile.R.string.export_failed_fix), null, 1))
                 } finally {
                     setBusy(false)
                 }
@@ -892,7 +892,7 @@ private fun HtmlExportButton(
                     val created = HtmlExporter.export(md, project.title, outDir)
                     onDone(created.file)
                 } catch (t: Throwable) {
-                    setError(CoreError("NF-EXP-003", "HTML 导出失败：" + (t.message ?: t.javaClass.simpleName), "检查存储空间", null, 1))
+                    setError(CoreError("NF-EXP-003", context.getString(dev.ninfenz.mobile.R.string.export_html_failed, t.message ?: t.javaClass.simpleName), context.getString(dev.ninfenz.mobile.R.string.export_failed_fix), null, 1))
                 } finally {
                     setBusy(false)
                 }
