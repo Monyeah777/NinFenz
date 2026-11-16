@@ -40,6 +40,9 @@ object BackupRestoreService {
                     Entry(path, bytes, sha)
                 }
                 if (entries.isEmpty()) return Inspect(emptyList(), true)
+                if (entries.any { it.bytes > 256L * 1024 * 1024 }) {
+                    return Inspect(entries, false, "备份单条声明过大")
+                }
                 val total = entries.sumOf { it.bytes }
                 if (total > 512L * 1024 * 1024) return Inspect(entries, false, "备份声明总量超限")
                 val listed = entries.map { it.path }.toSet()

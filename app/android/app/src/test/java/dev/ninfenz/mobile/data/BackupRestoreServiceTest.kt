@@ -106,6 +106,17 @@ class BackupRestoreServiceTest {
     }
 
     @Test
+    fun rejectsOversizedSingleEntry() {
+        val dir = Files.createTempDirectory("nf-restore-entry").toFile()
+        val bad = File(dir, "bad.zip")
+        ZipOutputStream(bad.outputStream()).use { out ->
+            val manifest = "{\"schema\":\"nf-backup/1\",\"files\":[{\"path\":\"projects/a\",\"bytes\":300000000,\"sha256\":\"x\"}]}"
+            out.putNextEntry(ZipEntry("manifest.json")); out.write(manifest.toByteArray()); out.closeEntry()
+        }
+        assertFalse(BackupRestoreService.inspect(bad).ok)
+    }
+
+    @Test
     fun rejectsPathTraversalEntry() {
         val dir = Files.createTempDirectory("nf-restore-bad").toFile()
         val bad = File(dir, "bad.zip")
