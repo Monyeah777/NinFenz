@@ -1,6 +1,9 @@
 package dev.ninfenz.mobile.data
 
+import dev.ninfenz.mobile.model.ImportModel
 import java.io.File
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
 
 /** 已保存的导入草稿列表；排除映射 sidecar、最近预览与导入历史。 */
 object DraftLibrary {
@@ -14,6 +17,19 @@ object DraftLibrary {
                 !f.name.endsWith(".mapping.json") &&
                 f.name !in SPECIAL
         }?.sortedByDescending { it.lastModified() } ?: emptyList()
+    }
+
+    fun findByDigest(filesDir: File, digest: String): File? {
+        if (digest.isBlank()) return null
+        return list(filesDir).firstOrNull { file ->
+            val raw = read(file) ?: return@firstOrNull false
+            try {
+                val doc = ImportModel.parse(Json.parseToJsonElement(raw).jsonObject)
+                (doc.source.sha256 ?: doc.textDigest) == digest
+            } catch (t: Throwable) {
+                false
+            }
+        }
     }
 
     fun read(file: File): String? = try {

@@ -507,11 +507,36 @@ fun ImportScreen(
                         NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
                             Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
                                 recentImports.take(5).forEach { entry ->
-                                    Text(
-                                        entry.name + " · " + entry.digest.take(10),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
+                                    val matched = DraftLibrary.findByDigest(context.filesDir, entry.digest)
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Text(
+                                            entry.name + " · " + entry.digest.take(10),
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            modifier = Modifier.weight(1f)
+                                        )
+                                        if (matched != null) {
+                                            TextButton(onClick = {
+                                                val raw = DraftLibrary.read(matched)
+                                                if (raw != null) {
+                                                    try {
+                                                        val obj = J.parseObject(raw, ImportModel.SCHEMA)
+                                                        val parsed = ImportModel.parse(obj)
+                                                        rawResult = obj
+                                                        doc = parsed
+                                                        acceptedMappings = parsed.mappings.indices.filter { parsed.mappings[it].confidence >= 80 }.toSet()
+                                                        savedName = matched.name.removeSuffix(".json")
+                                                        error = null
+                                                        importDraftStore.save(raw)
+                                                    } catch (t: Throwable) {
+                                                        error = CoreResponse.failure("NF-E-002", "草稿解析失败：" + (t.message ?: t.javaClass.simpleName), "删除该草稿或重新导入", 2).error
+                                                    }
+                                                }
+                                            }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_open_draft)) }
+                                        } else {
+                                            Text(stringResource(dev.ninfenz.mobile.R.string.import_draft_missing), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        }
+                                    }
                                 }
                                 TextButton(onClick = {
                                     importHistory.clear()
