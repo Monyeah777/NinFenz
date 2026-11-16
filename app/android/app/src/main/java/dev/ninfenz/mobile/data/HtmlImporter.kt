@@ -35,7 +35,8 @@ object HtmlImporter {
             val items = Regex("(?is)<li[^>]*>(.*?)</li>").findAll(m.groupValues[1]).map {
                 strip(it.groupValues[1]).trim()
             }.toList()
-            "\n" + items.mapIndexed { i, item -> "${i + 1}. $item" }.joinToString("\n") + "\n"
+            val start = Regex("(?i)start=[\"']?(\\d+)").find(m.value)?.groupValues?.getOrNull(1)?.toIntOrNull() ?: 1
+            "\n" + items.mapIndexed { i, item -> (start + i).toString() + ". " + item }.joinToString("\n") + "\n"
         }
         text = Regex("(?is)<li[^>]*>(.*?)</li>").replace(text) { m ->
             "\n- " + strip(m.groupValues[1]).trim()
