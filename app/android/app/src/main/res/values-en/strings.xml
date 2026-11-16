@@ -146,6 +146,7 @@
     <string name="validate_passed">Validation passed: verdict=%1$s</string>
     <string name="validate_failed">Validation failed</string>
     <string name="view_diagnostics">View diagnostics</string>
+    <string name="view_diag_or_reinstall">View diagnostics or reinstall this Pack</string>
     <string name="validating">Validating…</string>
     <string name="validate_pack">Validate Pack</string>
     <string name="project_review_stale">Content changed; the review may be stale — re-review recommended</string>

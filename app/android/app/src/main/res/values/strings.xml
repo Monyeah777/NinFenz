@@ -146,6 +146,7 @@
     <string name="validate_passed">校验通过：verdict=%1$s</string>
     <string name="validate_failed">校验失败</string>
     <string name="view_diagnostics">查看诊断</string>
+    <string name="view_diag_or_reinstall">查看诊断或重装该 Pack</string>
     <string name="validating">校验中…</string>
     <string name="validate_pack">校验 Pack</string>
     <string name="project_review_stale">内容已变更，评审结论可能失效，建议重新评审</string>

@@ -88,7 +88,7 @@ fun PackCenterScreen(
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(pack.title, style = MaterialTheme.typography.titleMedium)
                                     Text(
-                                        pack.id + " · " + pack.version + " · " + pack.itemCount + " 项",
+                                        pack.id + " · " + pack.version + " · " + context.getString(dev.ninfenz.mobile.R.string.pack_item_count, pack.itemCount),
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
@@ -116,7 +116,7 @@ fun PackCenterScreen(
                                                 results = results + (pack.id to (context.getString(dev.ninfenz.mobile.R.string.packcenter_verify_pass, verdict ?: "pass")))
                                             } else {
                                                 val err = response.error
-                                                errors = errors + (pack.id to ("[" + (err?.code ?: "NF-VAL-001") + "] " + (err?.message ?: "校验失败") + "；修复：" + (err?.fix ?: "查看诊断")))
+                                                errors = errors + (pack.id to ("[" + (err?.code ?: "NF-VAL-001") + "] " + (err?.message ?: context.getString(dev.ninfenz.mobile.R.string.validate_failed)) + context.getString(dev.ninfenz.mobile.R.string.error_fix_suffix) + (err?.fix ?: context.getString(dev.ninfenz.mobile.R.string.view_diagnostics))))
                                             }
                                             verifyingId = null
                                         }
@@ -126,7 +126,7 @@ fun PackCenterScreen(
                             }
                             results[pack.id]?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary) }
                             errors[pack.id]?.let { message ->
-                                NfErrorCard("NF-VAL-001", message, "查看诊断或重装该 Pack")
+                                NfErrorCard("NF-VAL-001", message, context.getString(dev.ninfenz.mobile.R.string.view_diag_or_reinstall))
                             }
                         }
                     }
