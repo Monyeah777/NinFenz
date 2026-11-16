@@ -16,6 +16,7 @@
 | 装配 | pass：填 4 个槽位后 assemble 返回 markdown（开篇/正文/收束） | 截图 19 |
 | L1 校验 | pass：L1 pass（error=0 warn=0 info=3）；状态 assembled→validated 写回 | run-as 读项目 |
 | 导出 md/zip | pass：files/exports/delivery/result.md + result.zip + manifest；状态 validated→exported 写回 | run-as 读文件 |
+| 错误码浏览器（JVM） | pass（本机）：设置→错误码屏；58 个错误码可按 code/message/fix 过滤，点击复制 code；路由纳入 ShellStateCodec。真机未复测（adb 无设备） |
 | Author tab 恢复（JVM） | pass（本机）：AuthorScreen 三 tab 选择经 rememberSaveable 跨进程恢复；未做真机杀进程复测（adb 无设备） |
 | Pack 索引缓存（JVM） | pass（本机）：library/pack-index.json 缓存 packs/errors；目录 mtime 变更重建；损坏索引回退扫描；SampleSeeder 安装后 invalidate。真机未复测（adb 无设备） |
 | 搜索 kind 过滤（JVM） | pass（本机）：FilterChip 全部/项目/Pack/条款/字段/节点/章节/槽位；过滤后空态与键盘选择使用过滤结果；真机未复测（adb 无设备） |

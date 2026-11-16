@@ -437,4 +437,8 @@
     <string name="search_history_clear">Clear</string>
     <string name="import_restored_notice">Restored previous import preview</string>
     <string name="search_filter_all">All</string>
+    <string name="error_codes_title">Error codes</string>
+    <string name="error_codes_search">Search code/message/fix</string>
+    <string name="error_codes_not_loaded">Error code catalog is not packaged</string>
+    <string name="error_codes_no_result">No matching error code</string>
 </resources>

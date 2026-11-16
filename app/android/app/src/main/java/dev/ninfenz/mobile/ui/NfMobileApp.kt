@@ -65,6 +65,7 @@ import dev.ninfenz.mobile.ui.screens.AuthorScreen
 import dev.ninfenz.mobile.ui.screens.CcosScreen
 import dev.ninfenz.mobile.ui.screens.CreateScreen
 import dev.ninfenz.mobile.ui.screens.DeliveryScreen
+import dev.ninfenz.mobile.ui.screens.ErrorCodesScreen
 import dev.ninfenz.mobile.ui.screens.DeliverScreen
 import dev.ninfenz.mobile.ui.screens.GraphScreen
 import dev.ninfenz.mobile.ui.screens.ImportScreen
@@ -303,7 +304,11 @@ is Detail.Import -> ImportScreen(
                         onOpenPack = { id, version -> shell = shell.open(Detail.Pack(id, version)) },
                         onOpenProject = { id -> shell = shell.open(Detail.Project(id)) }
                     )
-                    is Detail.Settings -> SettingsScreen(onBack = { shell = shell.back() ?: shell })
+                    is Detail.Settings -> SettingsScreen(
+                        onBack = { shell = shell.back() ?: shell },
+                        onErrorCodes = { shell = shell.open(Detail.ErrorCodes) }
+                    )
+                    is Detail.ErrorCodes -> ErrorCodesScreen(onBack = { shell = shell.back() ?: shell })
                     is Detail.Author -> {
                         val entry = projects.firstOrNull { it.project.id == detail.id }
                         if (entry == null) {

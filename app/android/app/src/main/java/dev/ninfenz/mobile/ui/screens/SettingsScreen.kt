@@ -5,6 +5,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -25,7 +26,7 @@ import dev.ninfenz.mobile.ui.components.Notice
 import dev.ninfenz.mobile.ui.components.Tone
 
 @Composable
-fun SettingsScreen(onBack: () -> Unit) {
+fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
     val context = LocalContext.current
     val diag = remember { Core.diagnostics() }
     var copied by remember { mutableStateOf(false) }
@@ -54,6 +55,9 @@ fun SettingsScreen(onBack: () -> Unit) {
                 text = stringResource(dev.ninfenz.mobile.R.string.settings_error_hint, ErrorCatalog.all().size),
                 style = MaterialTheme.typography.bodySmall
             )
+            OutlinedButton(onClick = onErrorCodes) {
+                Text(stringResource(dev.ninfenz.mobile.R.string.error_codes_title))
+            }
         }
 
         CardBox(title = stringResource(dev.ninfenz.mobile.R.string.settings_privacy)) {
