@@ -457,4 +457,6 @@
     <string name="settings_storage_clear">清理导入/分享缓存</string>
     <string name="settings_storage_cleaned">已清理 %1$d 个临时文件</string>
     <string name="project_history_title">状态历史</string>
+    <string name="settings_backup_export">导出本地备份</string>
+    <string name="settings_backup_done">备份已生成：%1$d 个文件 · %2$s</string>
 </resources>

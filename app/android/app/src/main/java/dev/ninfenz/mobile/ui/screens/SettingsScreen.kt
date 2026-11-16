@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -18,13 +19,18 @@ import dev.ninfenz.mobile.BuildConfig
 import dev.ninfenz.mobile.core.Core
 import dev.ninfenz.mobile.core.CoreBridgeNative
 import dev.ninfenz.mobile.core.ErrorCatalog
+import dev.ninfenz.mobile.data.BackupService
 import dev.ninfenz.mobile.data.StorageStats
+import dev.ninfenz.mobile.share.ShareExporter
 import dev.ninfenz.mobile.ui.components.CardBox
 import dev.ninfenz.mobile.ui.components.KeyValue
 import dev.ninfenz.mobile.ui.components.MonoText
 import dev.ninfenz.mobile.ui.components.NfScaffold
 import dev.ninfenz.mobile.ui.components.Notice
 import dev.ninfenz.mobile.ui.components.Tone
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
@@ -33,6 +39,8 @@ fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
     var copied by remember { mutableStateOf(false) }
     var stats by remember { mutableStateOf(StorageStats.scan(context.filesDir, context.cacheDir)) }
     var cleaned by remember { mutableStateOf<String?>(null) }
+    var backupMessage by remember { mutableStateOf<String?>(null) }
+    val scope = rememberCoroutineScope()
 
     val diagnosticsText = buildString {
         appendLine("app=dev.ninfenz.mobile " + BuildConfig.VERSION_NAME + " (" + BuildConfig.VERSION_CODE + ")")
@@ -75,6 +83,15 @@ fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
                 cleaned = context.getString(dev.ninfenz.mobile.R.string.settings_storage_cleaned, removed)
             }) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_storage_clear)) }
             cleaned?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary) }
+            OutlinedButton(onClick = {
+                scope.launch {
+                    val created = withContext(Dispatchers.IO) { BackupService.create(context.filesDir) }
+                    val intent = ShareExporter.shareFileIntent(context, created.file, "application/zip", created.file.name)
+                    ShareExporter.launchChooser(context, intent, created.file.name)
+                    backupMessage = context.getString(dev.ninfenz.mobile.R.string.settings_backup_done, created.entries, humanBytes(created.bytes))
+                }
+            }) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_backup_export)) }
+            backupMessage?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary) }
         }
 
         CardBox(title = stringResource(dev.ninfenz.mobile.R.string.settings_privacy)) {
