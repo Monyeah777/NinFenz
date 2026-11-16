@@ -16,6 +16,10 @@ object HtmlImporter {
         text = Regex("(?is)<code[^>]*>(.*?)</code>").replace(text) { m ->
             "`" + decode(strip(m.groupValues[1])).trim() + "`"
         }
+        text = Regex("(?is)<blockquote[^>]*>(.*?)</blockquote>").replace(text) { m ->
+            val content = decode(strip(m.groupValues[1])).trim()
+            "\n\n" + content.split('\n').joinToString("\n") { "> " + it.trim() } + "\n\n"
+        }
         text = Regex("(?is)<table[^>]*>(.*?)</table>").replace(text) { m ->
             "\n\n" + table(m.groupValues[1]) + "\n\n"
         }
