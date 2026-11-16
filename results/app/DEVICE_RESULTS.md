@@ -16,6 +16,7 @@
 | 装配 | pass：填 4 个槽位后 assemble 返回 markdown（开篇/正文/收束） | 截图 19 |
 | L1 校验 | pass：L1 pass（error=0 warn=0 info=3）；状态 assembled→validated 写回 | run-as 读项目 |
 | 导出 md/zip | pass：files/exports/delivery/result.md + result.zip + manifest；状态 validated→exported 写回 | run-as 读文件 |
+| 命令面板（JVM） | pass（本机）：库页顶栏「命令」打开对话框；搜索导入/新建/搜索/Pack 中心/更新/CCOS/设置/错误码；空结果提示；命令过滤纯逻辑测试。真机未复测（adb 无设备） |
 | 最近导出记录（JVM） | pass（本机）：导出 md/zip/docx 后记录 format/name/path/sha256/时间，最多 20 条；交付页显示最近 5 条并可重新分享；真机未复测（adb 无设备） |
 | 协议未保存草稿恢复（JVM） | pass（本机）：协议字段 values/enabled 编辑 500ms 防抖存 drafts/author-protocol-<id>.json；重进提示「已恢复上次未保存的协议编辑」；保存成功清理。真机未复测（adb 无设备） |
 | 项目状态过滤（JVM） | pass（本机）：库页状态 FilterChip（全部/草稿/创作中/已装配/已校验/已导出/已审阅），空状态提示；过滤状态 rememberSaveable。真机未复测（adb 无设备） |

@@ -77,6 +77,7 @@ fun LibraryHomeScreen(
     onSearch: () -> Unit,
     onPackCenter: () -> Unit,
     onSettings: () -> Unit,
+    onCommands: () -> Unit = {},
     refreshing: Boolean = false,
     onRefresh: () -> Unit = {}
 ) {
@@ -88,6 +89,9 @@ fun LibraryHomeScreen(
         NfTopAppBar(
             title = stringResource(dev.ninfenz.mobile.R.string.nav_library),
             actions = {
+                TextButton(onClick = onCommands, modifier = Modifier.heightIn(min = 48.dp)) {
+                    Text(stringResource(dev.ninfenz.mobile.R.string.action_commands))
+                }
                 IconButton(onClick = onSearch, modifier = Modifier.size(48.dp)) { Icon(Icons.Filled.Search, contentDescription = stringResource(dev.ninfenz.mobile.R.string.action_search)) }
                 IconButton(onClick = onSettings, modifier = Modifier.size(48.dp)) { Icon(Icons.Filled.Settings, contentDescription = stringResource(dev.ninfenz.mobile.R.string.action_settings)) }
             }

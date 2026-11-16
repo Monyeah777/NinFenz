@@ -1,9 +1,12 @@
 package dev.ninfenz.mobile.ui
 
 import dev.ninfenz.mobile.ui.theme.NfMotion
+import dev.ninfenz.mobile.ui.theme.NfSpacing
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Row
@@ -11,8 +14,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -28,6 +35,7 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -44,6 +52,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
+import dev.ninfenz.mobile.model.CommandPalette
 import androidx.compose.ui.platform.LocalContext
 import dev.ninfenz.mobile.core.Core
 import dev.ninfenz.mobile.data.AppPrefs
@@ -125,6 +134,7 @@ fun NfMobileApp(
     var sharedPrefill by remember { mutableStateOf<dev.ninfenz.mobile.share.SharePayload?>(null) }
     var onboardingDone by remember { mutableStateOf(prefs.onboardingDone) }
     var showAbout by remember { mutableStateOf(false) }
+    var showCommands by rememberSaveable { mutableStateOf(false) }
     var storageText by remember { mutableStateOf("计算中…") }
     var nativeReady by remember { mutableStateOf(false) }
     var creatingProject by remember { mutableStateOf(false) }
@@ -156,6 +166,20 @@ fun NfMobileApp(
             seedState = seeder.seed()
             seeding = false
             refresh()
+        }
+    }
+
+    fun runCommand(id: String) {
+        showCommands = false
+        when (id) {
+            "import" -> shell = shell.open(Detail.Import)
+            "new_project" -> shell = shell.open(Detail.NewProject)
+            "search" -> shell = shell.open(Detail.Search)
+            "pack_center" -> shell = shell.open(Detail.PackCenter)
+            "pack_update" -> shell = shell.open(Detail.PackUpdate)
+            "ccos" -> shell = shell.open(Detail.Ccos)
+            "settings" -> shell = shell.open(Detail.Settings)
+            "error_codes" -> shell = shell.open(Detail.ErrorCodes)
         }
     }
 
@@ -240,6 +264,7 @@ fun NfMobileApp(
                             onSearch = { shell = shell.open(Detail.Search) },
                             onPackCenter = { shell = shell.open(Detail.PackCenter) },
                             onSettings = { shell = shell.open(Detail.Settings) },
+                            onCommands = { showCommands = true },
                             refreshing = refreshing,
                             onRefresh = { refresh() }
                         )
@@ -451,6 +476,66 @@ is Detail.Import -> ImportScreen(
             confirmButton = { TextButton(onClick = { showAbout = false }) { Text(stringResource(dev.ninfenz.mobile.R.string.action_close)) } }
         )
     }
+
+    if (showCommands) {
+        val items = listOf(
+            CommandPalette.Item("import", stringResource(dev.ninfenz.mobile.R.string.action_import)),
+            CommandPalette.Item("new_project", stringResource(dev.ninfenz.mobile.R.string.new_project_title)),
+            CommandPalette.Item("search", stringResource(dev.ninfenz.mobile.R.string.search_title)),
+            CommandPalette.Item("pack_center", stringResource(dev.ninfenz.mobile.R.string.deliver_pack_center_title)),
+            CommandPalette.Item("pack_update", stringResource(dev.ninfenz.mobile.R.string.pack_detail_update)),
+            CommandPalette.Item("ccos", stringResource(dev.ninfenz.mobile.R.string.ccos_title)),
+            CommandPalette.Item("settings", stringResource(dev.ninfenz.mobile.R.string.settings_title)),
+            CommandPalette.Item("error_codes", stringResource(dev.ninfenz.mobile.R.string.error_codes_title))
+        )
+        CommandPaletteDialog(items, onDismiss = { showCommands = false }, onRun = ::runCommand)
+    }
+}
+
+@Composable
+private fun CommandPaletteDialog(
+    items: List<CommandPalette.Item>,
+    onDismiss: () -> Unit,
+    onRun: (String) -> Unit
+) {
+    var query by rememberSaveable { mutableStateOf("") }
+    val filtered = CommandPalette.filter(items, query)
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(dev.ninfenz.mobile.R.string.commands_title)) },
+        text = {
+            Column {
+                OutlinedTextField(
+                    value = query,
+                    onValueChange = { query = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = { Text(stringResource(dev.ninfenz.mobile.R.string.commands_placeholder)) },
+                    singleLine = true
+                )
+                if (filtered.isEmpty()) {
+                    Text(
+                        stringResource(dev.ninfenz.mobile.R.string.commands_no_result),
+                        modifier = Modifier.padding(NfSpacing.m)
+                    )
+                } else {
+                    LazyColumn(modifier = Modifier.heightIn(max = 360.dp)) {
+                        items(filtered, key = { it.id }) { item ->
+                            Text(
+                                item.title,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { onRun(item.id) }
+                                    .padding(horizontal = NfSpacing.m, vertical = 12.dp)
+                            )
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(dev.ninfenz.mobile.R.string.action_close)) }
+        }
+    )
 }
 
 @Composable

@@ -444,4 +444,8 @@
     <string name="library_filter_empty">该状态下暂无项目</string>
     <string name="author_draft_restored">已恢复上次未保存的协议编辑</string>
     <string name="delivery_recent_exports">最近导出</string>
+    <string name="action_commands">命令</string>
+    <string name="commands_title">命令面板</string>
+    <string name="commands_placeholder">搜索命令</string>
+    <string name="commands_no_result">没有匹配命令</string>
 </resources>
