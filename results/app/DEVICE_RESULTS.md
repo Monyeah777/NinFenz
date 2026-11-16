@@ -19,7 +19,7 @@
 | 桌面快捷方式（构建） | pass（构建）：静态 shortcuts（导入/新建/搜索）+ MainActivity 冷启动/onNewIntent 路由；未真机长按图标验证（adb 无设备） |
 | Lint 收尾（JVM） | pass（本机）：抑制预期 UnusedAttribute；import_project_package_done 改 plurals；warnings 4→3（仅剩 GradleDependency2/ObsoleteSdkInt1）。真机未复测（adb 无设备） |
 | 依赖升级 coroutines（JVM） | pass（本机）：coroutines 1.9.0→1.10.2，243 tests 全绿；lint warnings 3→2；debug APK 因未压缩 dex 增至 24.7MB。真机未复测（adb 无设备） |
-| Release 构建（构建） | pass（本机）：`:app:assembleRelease` 成功；app-release-unsigned.apk 15,227,513 B sha256 04c317ab…；zipalign 16KB 通过；apksigner 显示未签名（预期，签名 OPEN-EXTERNAL）。 |
+| Release 构建（构建） | pass（本机）：`:app:assembleRelease` 成功；app-release-unsigned.apk 15,243,901 B sha256 fce174e6…；zipalign 16KB 通过；apksigner 显示未签名（预期，签名 OPEN-EXTERNAL）。 |
 | 16KB 页对齐（构建） | pass（本机）：`zipalign -c -P 16 4 app-debug.apk` exit=0；未真机安装验证。 |
 | APP 门禁（本轮） | pass（本机）：QA0–QA6 全部 PASS，FAIL=0；自审计 covered=14 gap=0 open=2 p0=0。 |
 | 备份导出后自检（JVM） | pass（本机）：导出后立即 inspect zip，显示“导出校验通过/失败原因”；真机未复测（adb 无设备） |
