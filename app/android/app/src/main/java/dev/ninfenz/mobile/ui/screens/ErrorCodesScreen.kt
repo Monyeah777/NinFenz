@@ -3,6 +3,7 @@ package dev.ninfenz.mobile.ui.screens
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -67,6 +68,7 @@ fun ErrorCodesScreen(onBack: () -> Unit) {
                     ErrorCodeRow(entry) {
                         val manager = context.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
                         manager?.setPrimaryClip(ClipData.newPlainText(entry.code, entry.code))
+                        Toast.makeText(context, context.getString(dev.ninfenz.mobile.R.string.error_codes_copied, entry.code), Toast.LENGTH_SHORT).show()
                     }
                 }
             }
