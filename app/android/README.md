@@ -116,7 +116,7 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 - ShareQueueStoreTest（2）：多条目队列/游标存取、空/坏 JSON 容错。
 - ProjectPackageTest（2）：完整项目 zip 含 JSON+data、缺项目拒绝。
 - ProjectPackageImporterTest（12）：JSON+data 导入、嵌套目录包、ID 冲突改名、路径穿越拒绝、导出→导入往返、项目包识别、manifest 篡改拒绝、未列出条目拒绝、缺项目 JSON、缺 id、项目 JSON BOM、深层目录。
-- HtmlExporterTest（11）：单文件 HTML/转义/列表、代码块、管道表格、安全链接、行内代码、水平线、引用块、有序列表、删除线、安全图片、代码语言 class。
+- HtmlExporterTest（12）：单文件 HTML/转义/列表、代码块、管道表格、安全链接、行内代码、水平线、引用块、有序列表、删除线、安全图片、代码语言 class、表格对齐。
 - HtmlValidatorTest（2）：导出物结构通过、坏/缺 HTML 拒绝。
 - RtlShellTest（1）：RTL 下四目的地文本仍可见。
 - AuthorOverlayStoreTest（2）：overlay 形状；保存后 refs.overlay/status=authoring/history 更新。
@@ -181,9 +181,9 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 - 真机 smoke：连接并授权后运行 `bash app/scripts/device_smoke.sh`（安装 debug APK、冷启动、前台 Activity、最近崩溃日志）；设 `CAPTURE_DIR=…` 额外拉取 `home.png` 与 `ui.xml`。
 
 - 2026-11-16 当前：`./gradlew :app:assembleDebug` 成功：app-debug.apk = 19,049,108 bytes，
-  sha256 = d8114c280dafd4729b8ab2322e69c465f03e7c7ffccf8d3a6d40523454e3ee61（含双 ABI 原生库 + 9 个示例 Pack assets）。
+  sha256 = a6a8192ac6f7855ea4098b65d2831709461a96166154d7a8ca16fd16dd8cf939（含双 ABI 原生库 + 9 个示例 Pack assets）。
 - 仓库级门禁在 UTF-8 locale 下运行：`LANG=C.UTF-8 PYTHONUTF8=1 bash verify.sh --checks-only`（GBK 控制台会让 `git ls-files` 解码失败，触发 modeling 检查异常）。
-- `./gradlew :app:testDebugUnitTest` 全绿：306 条 JVM 单测（v1 42 + v0.02 264；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y/大字号/对比度/Paparazzi 截图）。
+- `./gradlew :app:testDebugUnitTest` 全绿：307 条 JVM 单测（v1 42 + v0.02 265；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y/大字号/对比度/Paparazzi 截图）。
 - `zipalign -c -P 16 -v 4 app-debug.apk` → Verification successful（native lib 16KB page 对齐）。
 - `bash app/scripts/build_core_android.sh --clean` 成功：NDK 27.0.12077973 + rustup targets
   （aarch64-linux-android / x86_64-linux-android，经 rsproxy 镜像安装）；两个 .so 的 LOAD align 均为 0x4000。

@@ -87,6 +87,16 @@ class HtmlExporterTest {
     }
 
     @Test
+    fun rendersTableAlignment() {
+        val dir = Files.createTempDirectory("nf-html-align").toFile()
+        val created = HtmlExporter.export("| A | B | C |\n|:---|:---:|---:|\n| 1 | 2 | 3 |", "t", dir)
+        val text = created.file.readText()
+        assertTrue(text.contains("style=\"text-align:left\""))
+        assertTrue(text.contains("style=\"text-align:center\""))
+        assertTrue(text.contains("style=\"text-align:right\""))
+    }
+
+    @Test
     fun handlesCodeFence() {
         val dir = Files.createTempDirectory("nf-html-2").toFile()
         val created = HtmlExporter.export("\u0060\u0060\u0060\ncode\n\u0060\u0060\u0060", "t", dir)
