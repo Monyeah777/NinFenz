@@ -134,6 +134,7 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 - PackStoreTest 扩展（3）：索引缓存写入/损坏回退、目录变更重建、invalidate。
 - ErrorCodeFilterTest（2）：空查询全量、code/message/fix 大小写不敏感过滤。
 - ProjectFilterTest（2）：项目按状态过滤，null 全量。
+- ProtocolDraftStoreTest（2）：协议未保存 values/enabled 存取、清空/坏 JSON 容错。
 - A11yComposeTest（3，Robolectric）：图标 contentDescription、返回/搜索/设置/CTA 触控目标 ≥48dp。
 - LargeFontComposeTest（1，Robolectric）：fontScale 200% 下库页主文案/CTA 仍可见。
 - ContrastTest（3）：明暗品牌调色板 WCAG 2.2 AA 对比度（正文 4.5、大字 3.0）。
@@ -142,8 +143,8 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 ## 构建证据（本机，2026-11-15）
 
 - v0.02 W6（2026-11-15）：`./gradlew :app:assembleDebug` 成功：app-debug.apk = 21,710,683 bytes，
-  sha256 = 7e6d6420a26425c06c44126cd85189411c741e2c5bf004f50cce6133742420b7（含双 ABI 原生库 + 9 个示例 Pack assets）。
-- `./gradlew :app:testDebugUnitTest` 全绿：164 条 JVM 单测（v1 42 + v0.02 122；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y/大字号/对比度/Paparazzi 截图）。
+  sha256 = 712b7f477ba29d7a784609ed75df156fd480cc6cb5cd7ff03a33315ced2db0e7（含双 ABI 原生库 + 9 个示例 Pack assets）。
+- `./gradlew :app:testDebugUnitTest` 全绿：166 条 JVM 单测（v1 42 + v0.02 124；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y/大字号/对比度/Paparazzi 截图）。
 - `zipalign -c -P 16 -v 4 app-debug.apk` → Verification successful（native lib 16KB page 对齐）。
 - `bash app/scripts/build_core_android.sh --clean` 成功：NDK 27.0.12077973 + rustup targets
   （aarch64-linux-android / x86_64-linux-android，经 rsproxy 镜像安装）；两个 .so 的 LOAD align 均为 0x4000。

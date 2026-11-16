@@ -48,6 +48,7 @@ import dev.ninfenz.mobile.data.AuthorArtifacts
 import dev.ninfenz.mobile.data.SaveArtifactResult
 import dev.ninfenz.mobile.data.AuthorArtifactsLoader
 import dev.ninfenz.mobile.data.AuthorOverlayStore
+import dev.ninfenz.mobile.data.ProtocolDraftStore
 import dev.ninfenz.mobile.data.PackEntry
 import dev.ninfenz.mobile.data.SaveOverlayResult
 import dev.ninfenz.mobile.model.GraphEdge
@@ -189,20 +190,41 @@ private fun ProtocolAuthorContent(
     val protocol = artifacts.protocol
     val context = androidx.compose.ui.platform.LocalContext.current
     data class Snapshot(val values: Map<String, String>, val enabled: Map<String, Boolean>)
-    var values by remember(artifacts.protocolJson) { mutableStateOf(protocol.fields.associate { it.id to (it.defaultText ?: "") }) }
-    var enabled by remember(artifacts.protocolJson) { mutableStateOf(protocol.clauses.associate { it.id to it.enabled }) }
+    val draftStore = remember { ProtocolDraftStore(context.filesDir) }
+    val draft = remember(project.id, artifacts.protocolJson) { draftStore.load(project.id) }
+    var values by remember(artifacts.protocolJson) {
+        mutableStateOf(protocol.fields.associate {
+            it.id to (draft?.values?.get(it.id) ?: it.defaultText ?: "")
+        })
+    }
+    var enabled by remember(artifacts.protocolJson) {
+        mutableStateOf(protocol.clauses.associate {
+            it.id to (draft?.enabled?.get(it.id) ?: it.enabled)
+        })
+    }
+    var edited by remember { mutableStateOf(draft != null) }
     var undo by remember { mutableStateOf<List<Snapshot>>(emptyList()) }
     var rendered by remember { mutableStateOf<List<String>?>(null) }
     var renderError by remember { mutableStateOf<CoreError?>(null) }
     var busy by remember { mutableStateOf(false) }
     var saving by remember { mutableStateOf(false) }
-    var saveMessage by remember { mutableStateOf<String?>(null) }
+    var saveMessage by remember {
+        mutableStateOf(if (draft != null) context.getString(dev.ninfenz.mobile.R.string.author_draft_restored) else null)
+    }
     var saveError by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
     val store = remember { AuthorOverlayStore(context.filesDir) }
 
     fun pushUndo() {
         undo = undo + Snapshot(values, enabled)
+        edited = true
+    }
+
+    LaunchedEffect(project.id, values, enabled, edited) {
+        if (edited) {
+            delay(500)
+            draftStore.save(project.id, values, enabled)
+        }
     }
 
     Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.m)) {
@@ -272,6 +294,7 @@ private fun ProtocolAuthorContent(
                         val result = store.save(project, pack, enabled, values)
                         when (result) {
                             is SaveOverlayResult.Saved -> {
+                                draftStore.clear(project.id)
                                 saveMessage = context.getString(dev.ninfenz.mobile.R.string.author_saved, result.status.wire, result.overlaySha256.take(12))
                                 onSaved()
                             }
