@@ -28,6 +28,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.launch
 import dev.ninfenz.mobile.data.PackEntry
+import dev.ninfenz.mobile.data.PackTrustStore
 import dev.ninfenz.mobile.data.PackVerifier
 import dev.ninfenz.mobile.ui.components.NfCard
 import dev.ninfenz.mobile.ui.components.NfEmptyState
@@ -51,6 +52,7 @@ fun PackCenterScreen(
 ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    val trust = remember { PackTrustStore(context.filesDir).load() }
     var verifyingId by remember { mutableStateOf<String?>(null) }
     var results by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
     var errors by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
@@ -94,6 +96,14 @@ fun PackCenterScreen(
                                 NfStatusChip(stringResource(dev.ninfenz.mobile.R.string.packcenter_installed))
                             }
                             Text(stringResource(dev.ninfenz.mobile.R.string.packcenter_tree, pack.tree.take(16)), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            val pinned = trust[pack.id + "@" + pack.version]?.tree
+                            if (pinned != null && pinned != pack.tree) {
+                                Text(
+                                    stringResource(dev.ninfenz.mobile.R.string.packcenter_trust_mismatch),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            }
                             Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                                 OutlinedButton(
                                     enabled = verifyingId == null,
