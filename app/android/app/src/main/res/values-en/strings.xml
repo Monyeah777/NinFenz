@@ -448,4 +448,12 @@
     <string name="commands_title">Command palette</string>
     <string name="commands_placeholder">Search commands</string>
     <string name="commands_no_result">No matching command</string>
+    <string name="settings_storage_title">Storage</string>
+    <string name="settings_storage_projects">Projects</string>
+    <string name="settings_storage_drafts">Drafts</string>
+    <string name="settings_storage_exports">Exports</string>
+    <string name="settings_storage_cache">Cache</string>
+    <string name="settings_storage_total">Total</string>
+    <string name="settings_storage_clear">Clear import/share cache</string>
+    <string name="settings_storage_cleaned">Cleared %1$d temp files</string>
 </resources>

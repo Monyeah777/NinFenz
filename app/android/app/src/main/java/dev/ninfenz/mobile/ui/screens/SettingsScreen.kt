@@ -18,6 +18,7 @@ import dev.ninfenz.mobile.BuildConfig
 import dev.ninfenz.mobile.core.Core
 import dev.ninfenz.mobile.core.CoreBridgeNative
 import dev.ninfenz.mobile.core.ErrorCatalog
+import dev.ninfenz.mobile.data.StorageStats
 import dev.ninfenz.mobile.ui.components.CardBox
 import dev.ninfenz.mobile.ui.components.KeyValue
 import dev.ninfenz.mobile.ui.components.MonoText
@@ -30,6 +31,8 @@ fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
     val context = LocalContext.current
     val diag = remember { Core.diagnostics() }
     var copied by remember { mutableStateOf(false) }
+    var stats by remember { mutableStateOf(StorageStats.scan(context.filesDir, context.cacheDir)) }
+    var cleaned by remember { mutableStateOf<String?>(null) }
 
     val diagnosticsText = buildString {
         appendLine("app=dev.ninfenz.mobile " + BuildConfig.VERSION_NAME + " (" + BuildConfig.VERSION_CODE + ")")
@@ -60,6 +63,20 @@ fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
             }
         }
 
+        CardBox(title = stringResource(dev.ninfenz.mobile.R.string.settings_storage_title)) {
+            KeyValue(stringResource(dev.ninfenz.mobile.R.string.settings_storage_projects), humanBytes(stats.projects))
+            KeyValue(stringResource(dev.ninfenz.mobile.R.string.settings_storage_drafts), humanBytes(stats.drafts))
+            KeyValue(stringResource(dev.ninfenz.mobile.R.string.settings_storage_exports), humanBytes(stats.exports))
+            KeyValue(stringResource(dev.ninfenz.mobile.R.string.settings_storage_cache), humanBytes(stats.cache))
+            KeyValue(stringResource(dev.ninfenz.mobile.R.string.settings_storage_total), humanBytes(stats.total))
+            Button(onClick = {
+                val removed = StorageStats.clearImportCache(context.cacheDir)
+                stats = StorageStats.scan(context.filesDir, context.cacheDir)
+                cleaned = context.getString(dev.ninfenz.mobile.R.string.settings_storage_cleaned, removed)
+            }) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_storage_clear)) }
+            cleaned?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary) }
+        }
+
         CardBox(title = stringResource(dev.ninfenz.mobile.R.string.settings_privacy)) {
             Text(stringResource(dev.ninfenz.mobile.R.string.settings_privacy_1), style = MaterialTheme.typography.bodySmall)
             Text(stringResource(dev.ninfenz.mobile.R.string.settings_privacy_2), style = MaterialTheme.typography.bodySmall)
@@ -79,4 +96,10 @@ fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
             }
         }
     }
+}
+
+private fun humanBytes(bytes: Long): String = when {
+    bytes < 1024 -> bytes.toString() + " B"
+    bytes < 1024 * 1024 -> (bytes / 1024).toString() + " KB"
+    else -> String.format("%.1f MB", bytes / 1024.0 / 1024.0)
 }

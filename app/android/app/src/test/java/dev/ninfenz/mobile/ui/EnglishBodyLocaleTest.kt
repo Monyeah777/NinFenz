@@ -4,6 +4,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import dev.ninfenz.mobile.data.LibraryStore
@@ -117,7 +118,7 @@ class EnglishBodyLocaleTest {
     fun settingsUsesEnglishBody() {
         compose.setContent { NfTheme { SettingsScreen(onBack = {}) } }
         compose.onNodeWithText("Settings · diagnostics/privacy").assertIsDisplayed()
-        compose.onNodeWithText("Privacy").assertIsDisplayed()
+        compose.onNodeWithText("Privacy").performScrollTo().assertIsDisplayed()
     }
 
     @Test
