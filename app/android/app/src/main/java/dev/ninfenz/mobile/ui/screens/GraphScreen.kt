@@ -49,10 +49,10 @@ import kotlinx.serialization.json.put
 import kotlinx.serialization.json.JsonPrimitive
 import java.io.File
 
-private fun emptyGraph(): PipelineGraph = PipelineGraph(
+private fun emptyGraph(title: String): PipelineGraph = PipelineGraph(
     id = "draft-graph",
     version = "0.1.0",
-    title = "未命名管线",
+    title = title,
     mode = "pro",
     nodes = emptyList(),
     edges = emptyList(),
@@ -65,6 +65,7 @@ private fun emptyGraph(): PipelineGraph = PipelineGraph(
 @Composable
 fun GraphScreen(store: LibraryStore, onBack: () -> Unit) {
     val context = LocalContext.current
+    val unnamedTitle = stringResource(dev.ninfenz.mobile.R.string.unnamed_pipeline)
     val scope = rememberCoroutineScope()
     var graph by remember { mutableStateOf<PipelineGraph?>(null) }
     var error by remember { mutableStateOf<CoreError?>(null) }
@@ -104,7 +105,7 @@ fun GraphScreen(store: LibraryStore, onBack: () -> Unit) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(onClick = { picker.launch(arrayOf("application/json", "text/plain")) }) { Text(stringResource(dev.ninfenz.mobile.R.string.graph_open)) }
                 OutlinedButton(onClick = {
-                    graph = emptyGraph()
+                    graph = emptyGraph(unnamedTitle)
                     report = null
                     planSummary = null
                     error = null
