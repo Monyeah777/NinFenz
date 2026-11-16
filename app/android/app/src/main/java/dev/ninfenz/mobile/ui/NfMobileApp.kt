@@ -95,6 +95,7 @@ import dev.ninfenz.mobile.ui.shell.ShellStateCodec
 import dev.ninfenz.mobile.ui.shell.TopDestination
 import java.io.File
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -135,6 +136,9 @@ fun NfMobileApp(
     var onboardingDone by remember { mutableStateOf(prefs.onboardingDone) }
     var showAbout by remember { mutableStateOf(false) }
     var showCommands by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        CommandBus.requests.collect { showCommands = true }
+    }
     var storageText by remember { mutableStateOf("计算中…") }
     var nativeReady by remember { mutableStateOf(false) }
     var creatingProject by remember { mutableStateOf(false) }

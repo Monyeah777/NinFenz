@@ -2,6 +2,7 @@ package dev.ninfenz.mobile
 
 import android.content.res.Configuration
 import android.os.Bundle
+import android.view.KeyEvent
 import java.util.Locale
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivityResultRegistryOwner
@@ -18,11 +19,20 @@ import androidx.compose.ui.platform.LocalContext
 import dev.ninfenz.mobile.data.AppPrefs
 import dev.ninfenz.mobile.data.LanguageMode
 import dev.ninfenz.mobile.data.ThemeMode
+import dev.ninfenz.mobile.ui.CommandBus
 import dev.ninfenz.mobile.ui.NfMobileApp
 import dev.ninfenz.mobile.ui.theme.NfTheme
 
 /** 主界面：edge-to-edge + 预测返回；主题三态由 AppPrefs 持久化。 */
 class MainActivity : ComponentActivity() {
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        if (event != null && (event.isCtrlPressed || event.isMetaPressed) && keyCode == KeyEvent.KEYCODE_K) {
+            CommandBus.request()
+            return true
+        }
+        return super.onKeyDown(keyCode, event)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
