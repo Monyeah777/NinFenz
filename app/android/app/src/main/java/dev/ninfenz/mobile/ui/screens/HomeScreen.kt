@@ -110,40 +110,46 @@ fun HomeScreen(store: LibraryStore, onOpen: (Screen) -> Unit) {
     }
 
     NfScaffold(title = "NF Mobile · Home", onBack = null) {
-        CardBox(title = "控制面") {
-            Text("本地处理 · 无账号 · 无遥测 · 无网络权限", style = MaterialTheme.typography.bodySmall)
+        CardBox(title = context.getString(dev.ninfenz.mobile.R.string.home_control_plane)) {
+            Text(context.getString(dev.ninfenz.mobile.R.string.home_local_only), style = MaterialTheme.typography.bodySmall)
             val diag = remember { Core.diagnostics() }
-            KeyValue("核心桥", diag.backend + (if (diag.nativeReady) " · " + (diag.abiVersion ?: "") else " · 不可用（NF-E-005）"))
-            KeyValue("错误码登记", if (diag.errorCatalogLoaded) diag.errorCodeCount.toString() + " 条（单一真源）" else "未打包")
+            KeyValue(
+                context.getString(dev.ninfenz.mobile.R.string.home_core_bridge),
+                diag.backend + (if (diag.nativeReady) " · " + (diag.abiVersion ?: "") else context.getString(dev.ninfenz.mobile.R.string.home_core_unavailable))
+            )
+            KeyValue(
+                context.getString(dev.ninfenz.mobile.R.string.home_error_codes),
+                if (diag.errorCatalogLoaded) context.getString(dev.ninfenz.mobile.R.string.home_error_code_count, diag.errorCodeCount) else context.getString(dev.ninfenz.mobile.R.string.home_not_bundled)
+            )
         }
 
-        CardBox(title = "屏幕导航") {
+        CardBox(title = context.getString(dev.ninfenz.mobile.R.string.home_screen_nav)) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedButton(onClick = { onOpen(Screen.IMPORT) }) { Text("导入") }
-                OutlinedButton(onClick = { onOpen(Screen.PROTOCOL) }) { Text("协议") }
-                OutlinedButton(onClick = { onOpen(Screen.GRAPH) }) { Text("管线图") }
+                OutlinedButton(onClick = { onOpen(Screen.IMPORT) }) { Text(context.getString(dev.ninfenz.mobile.R.string.screen_import)) }
+                OutlinedButton(onClick = { onOpen(Screen.PROTOCOL) }) { Text(context.getString(dev.ninfenz.mobile.R.string.screen_protocol)) }
+                OutlinedButton(onClick = { onOpen(Screen.GRAPH) }) { Text(context.getString(dev.ninfenz.mobile.R.string.home_pipeline)) }
             }
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedButton(onClick = { onOpen(Screen.ASSEMBLY) }) { Text("装配") }
-                OutlinedButton(onClick = { onOpen(Screen.PACK_UPDATE) }) { Text("Pack 更新") }
-                OutlinedButton(onClick = { onOpen(Screen.CCOS) }) { Text("CCOS 人审") }
+                OutlinedButton(onClick = { onOpen(Screen.ASSEMBLY) }) { Text(context.getString(dev.ninfenz.mobile.R.string.screen_assembly)) }
+                OutlinedButton(onClick = { onOpen(Screen.PACK_UPDATE) }) { Text(context.getString(dev.ninfenz.mobile.R.string.screen_pack_update)) }
+                OutlinedButton(onClick = { onOpen(Screen.CCOS) }) { Text(context.getString(dev.ninfenz.mobile.R.string.home_ccos_review)) }
             }
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedButton(onClick = { onOpen(Screen.SETTINGS) }) { Text("设置/诊断") }
+                OutlinedButton(onClick = { onOpen(Screen.SETTINGS) }) { Text(context.getString(dev.ninfenz.mobile.R.string.home_settings_diag)) }
             }
         }
 
-        CardBox(title = "Pack 库（library/packs）") {
+        CardBox(title = context.getString(dev.ninfenz.mobile.R.string.home_pack_library)) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(onClick = { treePicker.launch(null) }, enabled = !busy) {
-                    Text(if (busy) "安装中…" else "安装 Pack（选目录）")
+                    Text(if (busy) context.getString(dev.ninfenz.mobile.R.string.home_installing) else context.getString(dev.ninfenz.mobile.R.string.home_install_pack))
                 }
-                OutlinedButton(onClick = { refresh() }) { Text("刷新") }
+                OutlinedButton(onClick = { refresh() }) { Text(context.getString(dev.ninfenz.mobile.R.string.home_refresh)) }
             }
             val packsDir = File(context.filesDir, "library/packs")
             val ids = packsDir.listFiles()?.filter { it.isDirectory }?.sortedBy { it.name } ?: emptyList()
             if (ids.isEmpty()) {
-                EmptyState("尚无已安装 Pack。安装只写 app 私有目录，不触碰外部存储根。")
+                EmptyState(context.getString(dev.ninfenz.mobile.R.string.home_pack_empty))
             } else {
                 for (idDir in ids) {
                     val versions = idDir.listFiles()?.filter { it.isDirectory }?.map { it.name }?.sorted() ?: emptyList()
@@ -154,25 +160,32 @@ fun HomeScreen(store: LibraryStore, onOpen: (Screen) -> Unit) {
             message?.let { Notice(it, Tone.INFO) }
         }
 
-        CardBox(title = "项目（projects/*.nfproject.json）") {
+        CardBox(title = context.getString(dev.ninfenz.mobile.R.string.home_project_library)) {
             val snap = snapshot
             if (snap == null) {
-                EmptyState("读取中…")
+                EmptyState(context.getString(dev.ninfenz.mobile.R.string.home_loading))
             } else if (snap.projects.isEmpty() && snap.errors.isEmpty()) {
-                EmptyState("尚无项目文件。项目=引用集合（ID+digest），不内嵌 Pack 内容。")
+                EmptyState(context.getString(dev.ninfenz.mobile.R.string.home_project_empty))
             } else {
                 for (entry in snap.projects) {
                     Card(modifier = Modifier.fillMaxWidth()) {
                         Column(modifier = Modifier.padding(8.dp)) {
                             Text(entry.project.title + " · " + entry.project.status.wire, style = MaterialTheme.typography.titleSmall)
                             Text(entry.project.id + " · base " + entry.project.refs.basePackId + " " + entry.project.refs.basePackVersion, style = MaterialTheme.typography.bodySmall)
-                            Text("评审 " + entry.project.review.state + " · history " + entry.project.historyCount + " 条", style = MaterialTheme.typography.bodySmall)
+                            Text(
+                                context.getString(
+                                    dev.ninfenz.mobile.R.string.home_review_summary,
+                                    entry.project.review.state,
+                                    entry.project.historyCount
+                                ),
+                                style = MaterialTheme.typography.bodySmall
+                            )
                         }
                     }
                 }
-                for (err in snap.errors) Notice("项目解析失败：" + err, Tone.ERROR)
+                for (err in snap.errors) Notice(context.getString(dev.ninfenz.mobile.R.string.home_project_parse_failed, err), Tone.ERROR)
             }
-            TextButton(onClick = { refresh() }) { Text("重新扫描") }
+            TextButton(onClick = { refresh() }) { Text(context.getString(dev.ninfenz.mobile.R.string.home_rescan)) }
         }
     }
 }

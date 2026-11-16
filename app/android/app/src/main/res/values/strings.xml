@@ -24,6 +24,28 @@
     <string name="screen_pack_update">Pack 更新</string>
     <string name="screen_ccos">CCOS</string>
     <string name="screen_settings">设置</string>
+    <string name="home_control_plane">控制面</string>
+    <string name="home_local_only">本地处理 · 无账号 · 无遥测 · 无网络权限</string>
+    <string name="home_core_bridge">核心桥</string>
+    <string name="home_core_unavailable"> · 不可用（NF-E-005）</string>
+    <string name="home_error_codes">错误码登记</string>
+    <string name="home_error_code_count">%1$d 条（单一真源）</string>
+    <string name="home_not_bundled">未打包</string>
+    <string name="home_screen_nav">屏幕导航</string>
+    <string name="home_pipeline">管线图</string>
+    <string name="home_ccos_review">CCOS 人审</string>
+    <string name="home_settings_diag">设置/诊断</string>
+    <string name="home_pack_library">Pack 库（library/packs）</string>
+    <string name="home_installing">安装中…</string>
+    <string name="home_install_pack">安装 Pack（选目录）</string>
+    <string name="home_refresh">刷新</string>
+    <string name="home_pack_empty">尚无已安装 Pack。安装只写 app 私有目录，不触碰外部存储根。</string>
+    <string name="home_project_library">项目（projects/*.nfproject.json）</string>
+    <string name="home_loading">读取中…</string>
+    <string name="home_project_empty">尚无项目文件。项目=引用集合（ID+digest），不内嵌 Pack 内容。</string>
+    <string name="home_review_summary">评审 %1$s · history %2$d 条</string>
+    <string name="home_project_parse_failed">项目解析失败：%1$s</string>
+    <string name="home_rescan">重新扫描</string>
 
     <string name="action_back">返回</string>
     <string name="common_more">更多</string>
