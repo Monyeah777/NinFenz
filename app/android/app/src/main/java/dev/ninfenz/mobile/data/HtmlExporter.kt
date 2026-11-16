@@ -95,6 +95,14 @@ object HtmlExporter {
         var text = esc(s)
         text = Regex("\\*\\*([^*]+)\\*\\*").replace(text, "<strong>$1</strong>")
         text = Regex("\\*([^*]+)\\*").replace(text, "<em>$1</em>")
+        text = Regex("\\[([^\\]]+)\\]\\(([^)]+)\\)").replace(text) { match ->
+            val href = match.groupValues[2]
+            if (href.startsWith("http://") || href.startsWith("https://") || href.startsWith("mailto:") || href.startsWith("#")) {
+                "<a href=\"" + href + "\">" + match.groupValues[1] + "</a>"
+            } else {
+                match.value
+            }
+        }
         return text
     }
 

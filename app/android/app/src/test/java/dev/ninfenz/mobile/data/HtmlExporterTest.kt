@@ -27,6 +27,15 @@ class HtmlExporterTest {
     }
 
     @Test
+    fun rendersOnlySafeLinks() {
+        val dir = Files.createTempDirectory("nf-html-link").toFile()
+        val created = HtmlExporter.export("[官网](https://example.com) [坏](javascript:alert(1))", "t", dir)
+        val text = created.file.readText()
+        assertTrue(text.contains("<a href=\"https://example.com\">官网</a>"))
+        assertTrue(text.contains("[坏](javascript:alert(1))"))
+    }
+
+    @Test
     fun handlesCodeFence() {
         val dir = Files.createTempDirectory("nf-html-2").toFile()
         val created = HtmlExporter.export("\u0060\u0060\u0060\ncode\n\u0060\u0060\u0060", "t", dir)

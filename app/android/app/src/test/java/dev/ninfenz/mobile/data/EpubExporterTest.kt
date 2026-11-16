@@ -42,6 +42,16 @@ class EpubExporterTest {
     }
 
     @Test
+    fun rendersOnlySafeLinks() {
+        val dir = Files.createTempDirectory("nf-epub-link").toFile()
+        val created = EpubExporter.export("# 链\n\n[官网](https://example.com)", "链", dir)
+        ZipFile(created.file).use { zip ->
+            val chapter = zip.getInputStream(zip.getEntry("OEBPS/chapter-001.xhtml")).bufferedReader().readText()
+            assertTrue(chapter.contains("<a href=\"https://example.com\">官网</a>"))
+        }
+    }
+
+    @Test
     fun noHeadingFallsBackToSingleChapter() {
         assertEquals(1, EpubExporter.chapters("只有一段正文").size)
         assertEquals("正文", EpubExporter.chapters("只有一段正文").first().title)
