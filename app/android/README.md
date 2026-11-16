@@ -97,7 +97,7 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 - ModelParsingTest（16）：9 类格式解析 + 负例（未知版本/浮点/网络策略/人审 required）+ 图编辑纯函数/环检测/回滚反向。
 - StateMachineTest（6）：导航栈、冲突决策台、项目状态机、评审留痕约束。
 - FixtureFilesTest（1）：用 app/fixtures/schema/valid/* 契约夹具逐格式解析（夹具缺失时 skip，不伪造通过）。
-- AdaptiveLayoutTest（4）：窗口宽 599/600/839/840 分档。
+- AdaptiveLayoutTest（5）：窗口宽 599/600/839/840 分档、导航标签资源唯一。
 - ShellStateTest（4）：四目的地/详情栈/根返回 null。
 - PackStoreTest（3）：正常 Pack 扫描/坏 manifest 入 errors/空目录。
 - ProjectFactoryTest（1）：nf-project 文档形状 + ProjectModel 解析。
@@ -183,7 +183,7 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 - 2026-11-16 当前：`./gradlew :app:assembleDebug` 成功：app-debug.apk = 19,049,108 bytes，
   sha256 = 8bf30e0f2a31ab23d033e6c7e30f19531e3c9c8b50b2b0489203a590d5efc663（含双 ABI 原生库 + 9 个示例 Pack assets）。
 - 仓库级门禁在 UTF-8 locale 下运行：`LANG=C.UTF-8 PYTHONUTF8=1 bash verify.sh --checks-only`（GBK 控制台会让 `git ls-files` 解码失败，触发 modeling 检查异常）。
-- `./gradlew :app:testDebugUnitTest` 全绿：318 条 JVM 单测（v1 42 + v0.02 276；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y/大字号/对比度/Paparazzi 截图）。
+- `./gradlew :app:testDebugUnitTest` 全绿：319 条 JVM 单测（v1 42 + v0.02 277；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y/大字号/对比度/Paparazzi 截图）。
 - `zipalign -c -P 16 -v 4 app-debug.apk` → Verification successful（native lib 16KB page 对齐）。
 - `bash app/scripts/build_core_android.sh --clean` 成功：NDK 27.0.12077973 + rustup targets
   （aarch64-linux-android / x86_64-linux-android，经 rsproxy 镜像安装）；两个 .so 的 LOAD align 均为 0x4000。

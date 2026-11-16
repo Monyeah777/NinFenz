@@ -32,6 +32,7 @@
 | 全量复核（round53） | pass（本机）：verify PASS=107/WARN=2/FAIL=0；gates PASS/gap=0；rust 186；pytest 493。 |
 | Python 全量复核（round61） | pass（本机）：schema 变更后 `pytest app/tests` 493 passed / 0 failed（126s）。 |
 | 全量复核（round60） | pass（本机）：verify 107/2/0；gates PASS/gap=0；rust 186；JVM 317。 |
+| 导航标签资源唯一（JVM） | pass（本机）：8 个 Screen 的 string 资源 ID 两两不同；AdaptiveLayoutTest 5 条。 |
 | 通用返回/更多 i18n（JVM） | pass（本机）：TopAppBar 返回与溢出菜单 contentDescription 改资源。 |
 | 宽屏导航标签 i18n（JVM） | pass（本机）：AdaptiveNavigationRail 标签改 stringResource；纯函数 screenLabel 保留单测。 |
 | 全量复核（round89） | pass（本机）：verify 107/2/0；gates PASS/gap=0；rust 186；JVM 318；pytest 496。 |
