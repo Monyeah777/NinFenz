@@ -29,6 +29,7 @@ import dev.ninfenz.mobile.BuildConfig
 import dev.ninfenz.mobile.core.Core
 import dev.ninfenz.mobile.core.CoreBridgeNative
 import dev.ninfenz.mobile.core.ErrorCatalog
+import dev.ninfenz.mobile.data.AppPrefs
 import dev.ninfenz.mobile.data.BackupRestoreService
 import dev.ninfenz.mobile.data.CrashLogStore
 import dev.ninfenz.mobile.data.DiagnosticsBundle
@@ -128,7 +129,10 @@ fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
             cleaned?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary) }
             OutlinedButton(onClick = {
                 scope.launch {
-                    val created = withContext(Dispatchers.IO) { BackupService.create(context.filesDir) }
+                    val created = withContext(Dispatchers.IO) {
+                        File(context.filesDir, "app-prefs.json").writeText(AppPrefs(context).snapshot())
+                        BackupService.create(context.filesDir)
+                    }
                     val intent = ShareExporter.shareFileIntent(context, created.file, "application/zip", created.file.name)
                     ShareExporter.launchChooser(context, intent, created.file.name)
                     backups = BackupService.list(context.filesDir)
@@ -304,6 +308,10 @@ fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
                             onFailure = { "恢复失败：" + (it.message ?: it.javaClass.simpleName) }
                         )
                         lastSnapshot = BackupRestoreService.lastSnapshot(context.filesDir)
+                        runCatching {
+                            File(context.filesDir, "app-prefs.json").takeIf { it.isFile }?.readText()
+                                ?.let { AppPrefs(context).restore(it) }
+                        }
                         backups = BackupService.list(context.filesDir)
                         pendingRestore = null
                     }

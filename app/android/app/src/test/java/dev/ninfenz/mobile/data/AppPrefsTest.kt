@@ -27,4 +27,25 @@ class AppPrefsTest {
         assertEquals(LanguageMode.SYSTEM, AppPrefs(context).languageMode)
         assertFalse(AppPrefs(context).dynamicColor)
     }
+
+    @Test
+    fun snapshotRestoresThemeLanguageAndFlags() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val prefs = AppPrefs(context)
+        prefs.themeMode = ThemeMode.DARK
+        prefs.languageMode = LanguageMode.EN
+        prefs.dynamicColor = true
+        prefs.onboardingDone = true
+        val snapshot = prefs.snapshot()
+
+        prefs.themeMode = ThemeMode.LIGHT
+        prefs.languageMode = LanguageMode.SYSTEM
+        prefs.dynamicColor = false
+        prefs.onboardingDone = false
+        assertTrue(prefs.restore(snapshot))
+        assertEquals(ThemeMode.DARK, prefs.themeMode)
+        assertEquals(LanguageMode.EN, prefs.languageMode)
+        assertTrue(prefs.dynamicColor)
+        assertTrue(prefs.onboardingDone)
+    }
 }

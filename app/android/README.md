@@ -121,7 +121,7 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 - ShellEnglishLocaleTest（1，Robolectric）：en-rUS 下 Library/Create/Deliver/Me 资源生效。
 - ShellSizeMatrixTest（9，Robolectric）：compact/medium/expanded 宽 × 三档高，四目的地语义可达。
 - EnglishBodyLocaleTest（13，Robolectric）：onboarding/new project/import/search/pack center/author/delivery/ccos/settings/pack update/protocol/graph/assembly 正文英文资源生效。
-- AppPrefsTest（1）：languageMode/dynamicColor 持久化。
+- AppPrefsTest（2）：languageMode/dynamicColor 持久化、snapshot/restore 主题语言标记。
 - CcosReviewActionsTest（1，Robolectric）：固定底部人审按钮点击回调。
 - ShareExporterTest（1，Robolectric）：非 Activity Context 拉起 chooser 必须带 NEW_TASK。
 - NfExpandableComponentsTest（2，Robolectric/Compose）：长文本展开收起、分组折叠切换。
@@ -167,7 +167,7 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 
 - v0.02 W6（2026-11-15）：`./gradlew :app:assembleDebug` 成功：app-debug.apk = 21,710,750 bytes，
   sha256 = cd5287a2094b8ef8db12a502917c2b8e35cc53aafcd3c0976c16a553727eafa0（含双 ABI 原生库 + 9 个示例 Pack assets）。
-- `./gradlew :app:testDebugUnitTest` 全绿：228 条 JVM 单测（v1 42 + v0.02 186；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y/大字号/对比度/Paparazzi 截图）。
+- `./gradlew :app:testDebugUnitTest` 全绿：229 条 JVM 单测（v1 42 + v0.02 187；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y/大字号/对比度/Paparazzi 截图）。
 - `zipalign -c -P 16 -v 4 app-debug.apk` → Verification successful（native lib 16KB page 对齐）。
 - `bash app/scripts/build_core_android.sh --clean` 成功：NDK 27.0.12077973 + rustup targets
   （aarch64-linux-android / x86_64-linux-android，经 rsproxy 镜像安装）；两个 .so 的 LOAD align 均为 0x4000。

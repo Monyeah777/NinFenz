@@ -17,6 +17,7 @@
 | L1 校验 | pass：L1 pass（error=0 warn=0 info=3）；状态 assembled→validated 写回 | run-as 读项目 |
 | 导出 md/zip | pass：files/exports/delivery/result.md + result.zip + manifest；状态 validated→exported 写回 | run-as 读文件 |
 | 桌面快捷方式（构建） | pass（构建）：静态 shortcuts（导入/新建/搜索）+ MainActivity 冷启动/onNewIntent 路由；未真机长按图标验证（adb 无设备） |
+| 偏好备份（JVM） | pass（本机）：备份前写 app-prefs.json（主题/语言/动态色/引导/示例标记），恢复后回填 AppPrefs；主题需重启生效；测试 2 条。真机未复测（adb 无设备） |
 | 对比候选修改时间（JVM） | pass（本机）：对比列表显示最近修改时间；README 测试清单修正；真机未复测（adb 无设备） |
 | 偏好元数据备份（JVM） | pass（本机）：备份包含 pack-trust/search-history/search-filter/command-history/library-view；恢复白名单允许这些根文件；测试 4 条。真机未复测（adb 无设备） |
 | 库页过滤/排序持久化（JVM） | pass（本机）：状态过滤与排序存 library-view.json，重进恢复；Paparazzi 无 filesDir 时安全降级；测试 2 条。真机未复测（adb 无设备） |
