@@ -172,7 +172,7 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit) {
                     Button(onClick = { zipPicker.launch(arrayOf("application/zip", "application/octet-stream", "*/*")) }, enabled = !diffBusy) {
                         Text(if (diffBusy) stringResource(dev.ninfenz.mobile.R.string.packupdate_compare) else stringResource(dev.ninfenz.mobile.R.string.packupdate_choose_zip))
                     }
-                    OutlinedButton(onClick = { picker.launch(arrayOf("application/json", "text/plain")) }) { Text("打开更新计划") }
+                    OutlinedButton(onClick = { picker.launch(arrayOf("application/json", "text/plain")) }) { Text(stringResource(dev.ninfenz.mobile.R.string.pack_update_open_plan)) }
                 }
                 selected?.let { Text(stringResource(dev.ninfenz.mobile.R.string.packupdate_base, it.id, it.version, it.dir.absolutePath), style = MaterialTheme.typography.bodySmall) }
                 newRoot?.let { Text(stringResource(dev.ninfenz.mobile.R.string.packupdate_new, it.absolutePath), style = MaterialTheme.typography.bodySmall) }
@@ -186,8 +186,8 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit) {
                 KeyValue("to", u.to.id + " " + u.to.version)
                 KeyValue("changes", "added " + u.added.size + " · removed " + u.removed.size + " · modified " + u.modified.size)
                 KeyValue("breaking", if (u.breaking) stringResource(dev.ninfenz.mobile.R.string.packupdate_breaking_yes) else stringResource(dev.ninfenz.mobile.R.string.packupdate_breaking_no))
-                KeyValue("影响项目", if (u.affectedProjects.isEmpty()) stringResource(dev.ninfenz.mobile.R.string.packupdate_none) else u.affectedProjects.joinToString(","))
-                KeyValue("overlay 键", if (u.overlayKeys.isEmpty()) stringResource(dev.ninfenz.mobile.R.string.packupdate_none) else u.overlayKeys.joinToString(","))
+                KeyValue(stringResource(dev.ninfenz.mobile.R.string.pack_update_affected_projects), if (u.affectedProjects.isEmpty()) stringResource(dev.ninfenz.mobile.R.string.packupdate_none) else u.affectedProjects.joinToString(","))
+                KeyValue(stringResource(dev.ninfenz.mobile.R.string.pack_update_overlay_keys), if (u.overlayKeys.isEmpty()) stringResource(dev.ninfenz.mobile.R.string.packupdate_none) else u.overlayKeys.joinToString(","))
                 for (note in u.notes) Notice(note, Tone.WARN)
             }
         }

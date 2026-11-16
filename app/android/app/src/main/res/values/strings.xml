@@ -212,6 +212,9 @@
     <string name="packcenter_update_plan">更新计划</string>
     <string name="pack_update_diff_failed">pack-diff 失败：%1$s</string>
     <string name="pack_update_diff_failed_fix">检查两版 Pack 目录</string>
+    <string name="pack_update_open_plan">打开更新计划</string>
+    <string name="pack_update_affected_projects">影响项目</string>
+    <string name="pack_update_overlay_keys">overlay 键</string>
     <string name="pack_update_plan_failed">更新计划解析失败：%1$s</string>
     <string name="pack_update_plan_failed_fix">按 app/schema/nf-pack-update.schema.json 修正</string>
     <string name="pack_update_extract_failed">新版 Pack 解包失败：%1$s</string>

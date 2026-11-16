@@ -212,6 +212,9 @@
     <string name="packcenter_update_plan">Update plan</string>
     <string name="pack_update_diff_failed">pack-diff failed: %1$s</string>
     <string name="pack_update_diff_failed_fix">Check both Pack directories</string>
+    <string name="pack_update_open_plan">Open update plan</string>
+    <string name="pack_update_affected_projects">Affected projects</string>
+    <string name="pack_update_overlay_keys">Overlay keys</string>
     <string name="pack_update_plan_failed">Update plan parse failed: %1$s</string>
     <string name="pack_update_plan_failed_fix">Fix per app/schema/nf-pack-update.schema.json</string>
     <string name="pack_update_extract_failed">New Pack extraction failed: %1$s</string>
