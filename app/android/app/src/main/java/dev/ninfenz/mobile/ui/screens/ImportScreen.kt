@@ -43,6 +43,7 @@ import dev.ninfenz.mobile.core.J
 import dev.ninfenz.mobile.data.DraftLibrary
 import dev.ninfenz.mobile.data.PackEntry
 import dev.ninfenz.mobile.data.ProjectPackageImporter
+import dev.ninfenz.mobile.data.TextEncoding
 import dev.ninfenz.mobile.data.ShareQueueStore
 import dev.ninfenz.mobile.data.FileAccess
 import dev.ninfenz.mobile.data.ImportDraftStore
@@ -153,8 +154,11 @@ fun ImportScreen(
         savedName = null
         suggestNote = null
         acceptedMappings = emptySet()
+        val isText = name.endsWith(".txt", true) || name.endsWith(".md", true) ||
+            name.endsWith(".markdown", true) || mime?.startsWith("text/") == true
+        val sourceFile = if (isText) TextEncoding.toUtf8(file) ?: file else file
         val payload = buildJsonObject {
-            put("file", file.absolutePath)
+            put("file", sourceFile.absolutePath)
             put("source", buildJsonObject {
                 put("kind", sourceKind)
                 put("name", name)
@@ -208,6 +212,7 @@ fun ImportScreen(
             error = response.error
         }
         rawResult?.let { importDraftStore.save(it.toString()) }
+        if (sourceFile != file) sourceFile.delete()
         busy = false
     }
 

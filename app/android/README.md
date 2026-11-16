@@ -155,6 +155,7 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 - StorageStatsTest（2）：目录占用汇总、只清 imports/shared 缓存、缺失目录为 0。
 - BackupServiceTest（4）：备份 zip 含 manifest/projects/drafts、空备份仍有 manifest、列表/裁剪旧备份、偏好元数据。
 - BackupRestoreServiceTest（6）：合法备份恢复、回滚快照、路径穿越拒绝、sha256 不匹配拒绝、未列条目拒绝、缺 sha256 拒绝。
+- TextEncodingTest（2）：UTF-16LE/UTF-8 BOM 识别、无 BOM 不处理。
 - ProjectHistoryExportTest（2）：历史 Markdown 表格/标题转义、空历史。
 - ProjectDuplicatorTest（2）：复制保留 refs、重置状态/评审/历史、避免 id 冲突。
 - ProjectArchiverTest（6）：归档移出 projects/、列表/恢复、删除仅在归档目录、永久删除项目+数据、坏归档拒绝、越界拒绝。
@@ -174,9 +175,9 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 ## 构建证据（本机，2026-11-15）
 
 - 2026-11-16 当前：`./gradlew :app:assembleDebug` 成功：app-debug.apk = 19,049,108 bytes，
-  sha256 = 8567577c9c85a9144ce9509519b47f0f61d2e21c5726d37ada8d18dfe09dbdcb（含双 ABI 原生库 + 9 个示例 Pack assets）。
+  sha256 = 4a206916d75e9dc78c46d2b9280d8b8f5a7b3483f7dd3d36ba95988b9edce546（含双 ABI 原生库 + 9 个示例 Pack assets）。
 - 仓库级门禁在 UTF-8 locale 下运行：`LANG=C.UTF-8 PYTHONUTF8=1 bash verify.sh --checks-only`（GBK 控制台会让 `git ls-files` 解码失败，触发 modeling 检查异常）。
-- `./gradlew :app:testDebugUnitTest` 全绿：270 条 JVM 单测（v1 42 + v0.02 228；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y/大字号/对比度/Paparazzi 截图）。
+- `./gradlew :app:testDebugUnitTest` 全绿：272 条 JVM 单测（v1 42 + v0.02 230；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y/大字号/对比度/Paparazzi 截图）。
 - `zipalign -c -P 16 -v 4 app-debug.apk` → Verification successful（native lib 16KB page 对齐）。
 - `bash app/scripts/build_core_android.sh --clean` 成功：NDK 27.0.12077973 + rustup targets
   （aarch64-linux-android / x86_64-linux-android，经 rsproxy 镜像安装）；两个 .so 的 LOAD align 均为 0x4000。
