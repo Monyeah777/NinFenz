@@ -25,6 +25,7 @@
 | 备份未列条目拒绝（JVM） | pass（本机）：manifest 未列出的 zip 条目导致 inspect 失败；BackupRestoreServiceTest 5 条。真机未复测（adb 无设备） |
 | 全量复核（round161） | pass（本机）：verify.sh PASS=107 WARN=2 FAIL=0；app gates QA0–QA6 PASS，gap=0，P0=0；lint 0 warnings。 |
 | 全量复核（round15） | pass（本机）：verify PASS=107 WARN=2 FAIL=0；app gates QA0–QA6 PASS，gap=0，P0=0。 |
+| 全量复核（round25） | pass（本机）：verify PASS=107 WARN=2 FAIL=0；gates PASS/gap=0；debug APK zipalign 16KB exit=0。 |
 | HTML 导出图片（JVM） | pass（本机）：Markdown 图片安全协议转 img，危险协议保留原文；测试 10 条。真机未复测（adb 无设备） |
 | DOCX 文档大小上限（JVM） | pass（本机）：document.xml >64MiB 拒绝；301 tests 全绿。真机未复测（adb 无设备） |
 | 项目包深层目录（JVM） | pass（本机）：项目 JSON 深度 ≤4 的包可导入；测试 12 条。真机未复测（adb 无设备） |

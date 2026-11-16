@@ -256,7 +256,7 @@
       "pass": 3
     }
   },
-  "head": "540bba2996ab780e20793b64463c2d897f8e5817",
+  "head": "5f95377f895a936d6b5c2e11efe26a5309855eb5",
   "open_items": [
     {
       "id": "S3",
@@ -867,8 +867,8 @@
         "app/android/app/src/test/java/dev/ninfenz/mobile/data/CrashLogStoreTest.kt",
         "app/android/app/src/test/java/dev/ninfenz/mobile/data/DeliveryDraftStoreTest.kt",
         "app/android/app/src/test/java/dev/ninfenz/mobile/data/DiagnosticsBundleTest.kt",
-        "app/android/app/src/test/java/dev/ninfenz/mobile/data/DraftLibraryTest.kt",
-        "app/android/app/src/test/java/dev/ninfenz/mobile/data/DraftProjectBinderTest.kt"
+        "app/android/app/src/test/java/dev/ninfenz/mobile/data/DocxImporterTest.kt",
+        "app/android/app/src/test/java/dev/ninfenz/mobile/data/DraftLibraryTest.kt"
       ],
       "gate": "QA5",
       "kind": "glob_min",
