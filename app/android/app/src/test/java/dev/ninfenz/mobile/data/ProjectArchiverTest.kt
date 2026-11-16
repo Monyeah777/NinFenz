@@ -70,6 +70,22 @@ class ProjectArchiverTest {
     }
 
     @Test
+    fun rollsBackWhenDataMoveFails() {
+        val root = Files.createTempDirectory("nf-archive-rollback").toFile()
+        val projects = java.io.File(root, "projects").apply { mkdirs() }
+        val project = java.io.File(projects, "p.nfproject.json").apply { writeText(valid) }
+        java.io.File(projects, "p/authoring").mkdirs()
+        java.io.File(projects, "p/authoring/assembly.md").writeText("body")
+        val archive = java.io.File(root, "projects-archive").apply { mkdirs() }
+        val blocked = java.io.File(archive, "p.nfproject.json.123.archived.data").apply { mkdirs() }
+        java.io.File(blocked, "child").writeText("x")
+        assertTrue(runCatching { ProjectArchiver.archive(project, root, 123L) }.isFailure)
+        assertTrue(project.isFile)
+        assertTrue(java.io.File(projects, "p/authoring/assembly.md").isFile)
+        assertTrue(!java.io.File(archive, "p.nfproject.json.123.archived").exists())
+    }
+
+    @Test
     fun rejectsInvalidArchivedProject() {
         val root = Files.createTempDirectory("nf-archive-4").toFile()
         val archive = java.io.File(root, "projects-archive").apply { mkdirs() }

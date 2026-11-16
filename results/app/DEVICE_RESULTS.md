@@ -30,6 +30,7 @@
 | EPUB 导出 data URI 图片（JVM） | pass（本机）：Markdown data:image 渲染为 img；测试 10 条。真机未复测（adb 无设备） |
 | EPUB 图片内嵌（JVM） | pass（本机）：EPUB img 转 data URI（单图 ≤2MiB、总量 ≤20MiB）；测试 6 条。真机未复测（adb 无设备） |
 | 全量复核（round53） | pass（本机）：verify PASS=107/WARN=2/FAIL=0；gates PASS/gap=0；rust 186；pytest 493。 |
+| 归档回滚故障注入（JVM） | pass（本机）：预置非空 data 目标使移动失败，验证 JSON/data 回滚；归档测试 7 条。 |
 | 归档部分移动回滚（JVM） | pass（本机）：JSON 已移动但 data 移动失败时回滚 JSON/data，不再用已删源文件重写；归档测试保持全绿。 |
 | 表格内行内格式（JVM） | pass（本机）：表格单元格保留粗体/链接 Markdown；测试 17 条。 |
 | 列表内行内格式（JVM） | pass（本机）：先做链接/粗斜/图片转换再解析列表，列表项保留 Markdown；测试 16 条。 |
