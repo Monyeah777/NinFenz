@@ -25,6 +25,7 @@ class BackupRestoreServiceTest {
         val dst = Files.createTempDirectory("nf-restore-dst").toFile()
         val restored = BackupRestoreService.restore(created.file, dst)
         assertEquals(2, restored.files)
+        assertTrue(restored.snapshot?.isFile == true)
         assertEquals("draft", File(dst, "drafts/a.md.json").readText())
     }
 

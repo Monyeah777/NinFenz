@@ -14,7 +14,7 @@ import kotlinx.serialization.json.long
 object BackupRestoreService {
     data class Entry(val path: String, val bytes: Long, val sha256: String)
     data class Inspect(val entries: List<Entry>, val ok: Boolean, val error: String? = null)
-    data class Restored(val files: Int, val skipped: Int)
+    data class Restored(val files: Int, val skipped: Int, val snapshot: File? = null)
 
     fun inspect(file: File): Inspect {
         if (!file.isFile) return Inspect(emptyList(), false, "备份文件不存在")
@@ -60,6 +60,7 @@ object BackupRestoreService {
     fun restore(file: File, filesDir: File): Restored {
         val checked = inspect(file)
         require(checked.ok) { checked.error ?: "备份校验失败" }
+        val snapshot = BackupService.create(filesDir).file
         var restored = 0
         ZipFile(file).use { zip ->
             for (e in checked.entries) {
@@ -72,7 +73,7 @@ object BackupRestoreService {
                 restored++
             }
         }
-        return Restored(restored, 0)
+        return Restored(restored, 0, snapshot)
     }
 
     private fun safePath(path: String): Boolean =

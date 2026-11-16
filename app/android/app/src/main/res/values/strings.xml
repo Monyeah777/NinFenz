@@ -463,4 +463,5 @@
     <string name="settings_backup_restore_title">恢复备份</string>
     <string name="settings_backup_restore_warning">将恢复 %1$d 个文件，覆盖同名项目/草稿；此操作不可撤销。</string>
     <string name="settings_backup_restore_confirm">确认恢复</string>
+    <string name="settings_backup_restored">已恢复 %1$d 个文件；恢复前快照：%2$s</string>
 </resources>

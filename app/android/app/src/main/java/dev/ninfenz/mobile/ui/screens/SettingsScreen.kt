@@ -157,7 +157,13 @@ fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
                             runCatching { BackupRestoreService.restore(file, context.filesDir) }
                         }
                         backupMessage = result.fold(
-                            onSuccess = { "已恢复 " + it.files + " 个文件" },
+                            onSuccess = {
+                                context.getString(
+                                    dev.ninfenz.mobile.R.string.settings_backup_restored,
+                                    it.files,
+                                    it.snapshot?.name ?: "-"
+                                )
+                            },
                             onFailure = { "恢复失败：" + (it.message ?: it.javaClass.simpleName) }
                         )
                         pendingRestore = null
