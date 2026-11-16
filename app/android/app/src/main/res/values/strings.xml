@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NF</string>
+    <string name="project_package_import_failed">项目包导入失败：%1$s</string>
+    <string name="error_with_fix">[%1$s] %2$s；修复：%3$s</string>
+    <string name="project_missing_title">项目不存在</string>
+    <string name="project_missing_body">可能已被删除或文件损坏。</string>
+    <string name="pack_missing_title">Pack 不存在</string>
+    <string name="pack_missing_body">可能已被删除或版本变化。</string>
 
     <string name="nav_library">库</string>
     <string name="nav_create">创作</string>

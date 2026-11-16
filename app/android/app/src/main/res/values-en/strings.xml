@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NF</string>
+    <string name="project_package_import_failed">Project package import failed: %1$s</string>
+    <string name="error_with_fix">[%1$s] %2$s; fix: %3$s</string>
+    <string name="project_missing_title">Project not found</string>
+    <string name="project_missing_body">It may have been deleted or the file is corrupted.</string>
+    <string name="pack_missing_title">Pack not found</string>
+    <string name="pack_missing_body">It may have been deleted or the version changed.</string>
 
     <string name="nav_library">Library</string>
     <string name="nav_create">Create</string>

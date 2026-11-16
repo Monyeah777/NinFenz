@@ -203,7 +203,7 @@ fun NfMobileApp(
                     refresh()
                     shell = shell.open(Detail.Project(imported.id))
                 }.onFailure {
-                    android.widget.Toast.makeText(context, "项目包导入失败：" + (it.message ?: it.javaClass.simpleName), android.widget.Toast.LENGTH_LONG).show()
+                    android.widget.Toast.makeText(context, context.getString(dev.ninfenz.mobile.R.string.project_package_import_failed, it.message ?: it.javaClass.simpleName), android.widget.Toast.LENGTH_LONG).show()
                 }
             }
         }
@@ -247,7 +247,7 @@ fun NfMobileApp(
                     shell = shell.open(Detail.Project(result.project.id))
                 }
                 is CreateProjectResult.Failure -> {
-                    createError = "[" + result.code + "] " + result.message + "；修复：" + result.fix
+                    createError = context.getString(dev.ninfenz.mobile.R.string.error_with_fix, result.code, result.message, result.fix)
                 }
             }
             creatingProject = false
@@ -447,8 +447,8 @@ is Detail.Import -> ImportScreen(
                         if (entry == null) {
                             NfEmptyState(
                                 icon = Icons.Filled.Edit,
-                                title = "项目不存在",
-                                message = "可能已被删除或文件损坏。",
+                                title = stringResource(dev.ninfenz.mobile.R.string.project_missing_title),
+                                message = stringResource(dev.ninfenz.mobile.R.string.project_missing_body),
                                 actionLabel = "返回库",
                                 onAction = { shell = shell.back() ?: shell }
                             )
@@ -472,8 +472,8 @@ is Detail.Import -> ImportScreen(
                         if (entry == null) {
                             NfEmptyState(
                                 icon = Icons.Filled.Info,
-                                title = "项目不存在",
-                                message = "可能已被删除或文件损坏。",
+                                title = stringResource(dev.ninfenz.mobile.R.string.project_missing_title),
+                                message = stringResource(dev.ninfenz.mobile.R.string.project_missing_body),
                                 actionLabel = "返回库",
                                 onAction = { shell = shell.back() ?: shell }
                             )
@@ -501,8 +501,8 @@ is Detail.Import -> ImportScreen(
                         if (pack == null) {
                             NfEmptyState(
                                 icon = Icons.Filled.Home,
-                                title = "Pack 不存在",
-                                message = "可能已被删除或版本变化。",
+                                title = stringResource(dev.ninfenz.mobile.R.string.pack_missing_title),
+                                message = stringResource(dev.ninfenz.mobile.R.string.pack_missing_body),
                                 actionLabel = "返回库",
                                 onAction = { shell = shell.back() ?: shell }
                             )
@@ -515,8 +515,8 @@ is Detail.Import -> ImportScreen(
                         if (entry == null) {
                             NfEmptyState(
                                 icon = Icons.Filled.Edit,
-                                title = "项目不存在",
-                                message = "可能已被删除或文件损坏。",
+                                title = stringResource(dev.ninfenz.mobile.R.string.project_missing_title),
+                                message = stringResource(dev.ninfenz.mobile.R.string.project_missing_body),
                                 actionLabel = "返回库",
                                 onAction = { shell = shell.back() ?: shell }
                             )
