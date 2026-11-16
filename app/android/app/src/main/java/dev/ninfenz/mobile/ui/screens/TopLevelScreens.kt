@@ -1,5 +1,7 @@
 package dev.ninfenz.mobile.ui.screens
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,6 +11,8 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -54,7 +58,9 @@ import dev.ninfenz.mobile.data.LanguageMode
 import dev.ninfenz.mobile.data.ThemeMode
 import dev.ninfenz.mobile.model.Project
 import dev.ninfenz.mobile.model.ProjectFilter
+import dev.ninfenz.mobile.model.ProjectDiff
 import dev.ninfenz.mobile.model.ProjectHistoryExport
+import dev.ninfenz.mobile.model.ProjectModel
 import dev.ninfenz.mobile.model.ProjectStatus
 import dev.ninfenz.mobile.share.ShareExporter
 import dev.ninfenz.mobile.ui.components.NfCard
@@ -66,7 +72,9 @@ import dev.ninfenz.mobile.ui.components.NfStatusChip
 import dev.ninfenz.mobile.ui.components.NfTopAppBar
 import dev.ninfenz.mobile.ui.theme.NfSpacing
 import java.io.File
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -538,7 +546,29 @@ fun ProjectDetailScreen(
     onArchive: () -> Unit = {}
 ) {
     val context = LocalContext.current
+    val diffScope = rememberCoroutineScope()
     var showArchive by remember { mutableStateOf(false) }
+    var diffReport by remember { mutableStateOf<ProjectDiff.Report?>(null) }
+    var diffError by remember { mutableStateOf<String?>(null) }
+    val diffPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: android.net.Uri? ->
+        if (uri != null) {
+            diffScope.launch {
+                diffError = null
+                try {
+                    val text = withContext(Dispatchers.IO) {
+                        context.contentResolver.openInputStream(uri)?.bufferedReader(Charsets.UTF_8)?.use { it.readText() }
+                    }
+                    if (text == null) {
+                        diffError = "无法读取所选项目文件"
+                    } else {
+                        diffReport = ProjectDiff.compare(project, ProjectModel.parse(text))
+                    }
+                } catch (t: Throwable) {
+                    diffError = "项目解析失败：" + (t.message ?: t.javaClass.simpleName)
+                }
+            }
+        }
+    }
     Column(modifier = Modifier.fillMaxSize()) {
         NfTopAppBar(title = project.title, onBack = onBack)
         LazyColumn(
@@ -570,6 +600,9 @@ fun ProjectDetailScreen(
                         }
                         TextButton(onClick = { showArchive = true }) {
                             Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_archive))
+                        }
+                        TextButton(onClick = { diffPicker.launch(arrayOf("application/json", "*/*")) }) {
+                            Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_diff))
                         }
                     }
                 }
@@ -607,6 +640,36 @@ fun ProjectDetailScreen(
             item { NfListRow(stringResource(dev.ninfenz.mobile.R.string.project_detail_author), stringResource(dev.ninfenz.mobile.R.string.project_detail_author_subtitle), Icons.Filled.Edit, "›", onAuthor) }
             item { NfListRow(stringResource(dev.ninfenz.mobile.R.string.project_detail_delivery), stringResource(dev.ninfenz.mobile.R.string.project_detail_delivery_subtitle), Icons.Filled.Info, "›", onAssembly) }
         }
+    }
+
+    diffError?.let { message ->
+        AlertDialog(
+            onDismissRequest = { diffError = null },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_diff)) },
+            text = { Text(message) },
+            confirmButton = { TextButton(onClick = { diffError = null }) { Text(stringResource(dev.ninfenz.mobile.R.string.action_close)) } }
+        )
+    }
+
+    diffReport?.let { report ->
+        AlertDialog(
+            onDismissRequest = { diffReport = null },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_diff)) },
+            text = {
+                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                    if (!report.hasChanges) {
+                        Text(stringResource(dev.ninfenz.mobile.R.string.project_diff_same))
+                    } else {
+                        report.changes.forEach { change ->
+                            Text(change.field + ": " + change.before + " → " + change.after, style = MaterialTheme.typography.bodySmall)
+                        }
+                        report.historyOnlyBefore.forEach { Text("history -: " + it, style = MaterialTheme.typography.bodySmall) }
+                        report.historyOnlyAfter.forEach { Text("history +: " + it, style = MaterialTheme.typography.bodySmall) }
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { diffReport = null }) { Text(stringResource(dev.ninfenz.mobile.R.string.action_close)) } }
+        )
     }
 
     if (showArchive) {
