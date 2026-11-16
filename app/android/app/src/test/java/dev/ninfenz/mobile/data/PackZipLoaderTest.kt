@@ -56,6 +56,20 @@ class PackZipLoaderTest {
     }
 
     @Test
+    fun rejectsCompressionBomb() {
+        val file = File.createTempFile("nf-pack-bomb", ".zip")
+        ZipOutputStream(FileOutputStream(file)).use { out ->
+            out.putNextEntry(ZipEntry("nf-pack.json")); out.write("{}".toByteArray()); out.closeEntry()
+            out.putNextEntry(ZipEntry("zeros.bin"))
+            val chunk = ByteArray(1024 * 1024)
+            repeat(20) { out.write(chunk) }
+            out.closeEntry()
+        }
+        val dest = File.createTempFile("nf-pack-out7", "").let { it.delete(); it }
+        assertTrue(runCatching { PackZipLoader.extract(file, dest) }.isFailure)
+    }
+
+    @Test
     fun rejectsMissingManifest() {
         val zip = zip("readme.txt" to "x")
         val dest = File.createTempFile("nf-pack-out4", "").let { it.delete(); it }

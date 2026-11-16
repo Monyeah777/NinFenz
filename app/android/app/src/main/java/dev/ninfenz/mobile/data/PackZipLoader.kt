@@ -17,6 +17,7 @@ object PackZipLoader {
 
     fun extract(zipFile: File, destDir: File): File {
         if (!zipFile.isFile) throw PackZipException("zip 不存在", "重新选择文件")
+        preflight(zipFile)
         if (destDir.exists()) destDir.deleteRecursively()
         if (!destDir.mkdirs()) throw PackZipException("无法创建临时目录", "检查应用存储空间")
 
@@ -56,6 +57,26 @@ object PackZipLoader {
         }
         val root = findRoot(destDir)
         return root ?: throw PackZipException("zip 里找不到 nf-pack.json", "确认选择的是 Pack zip（根目录或单层目录含 nf-pack.json）")
+    }
+
+    /** 解包前用 central directory 做压缩比/声明总量预检，防高压缩比炸弹。 */
+    private fun preflight(zipFile: File) {
+        java.util.zip.ZipFile(zipFile).use { zf ->
+            var declared = 0L
+            var count = 0
+            for (entry in zf.entries()) {
+                count++
+                if (count > MAX_ENTRIES) throw PackZipException("条目数超限", "Pack 条目上限 " + MAX_ENTRIES)
+                if (entry.size > 0) declared += entry.size
+                if (declared > MAX_BYTES) throw PackZipException("声明解压总量超限", "Pack 解压总量上限 512 MiB")
+                if (entry.size > 0 && entry.compressedSize > 0) {
+                    val ratio = entry.size.toDouble() / entry.compressedSize.toDouble()
+                    if (ratio > 1000.0) {
+                        throw PackZipException("压缩比异常：" + entry.name, "拒绝高压缩比 Pack zip")
+                    }
+                }
+            }
+        }
     }
 
     private fun findRoot(destDir: File): File? {
