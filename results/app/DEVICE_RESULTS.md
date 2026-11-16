@@ -18,6 +18,8 @@
 | 导出 md/zip | pass：files/exports/delivery/result.md + result.zip + manifest；状态 validated→exported 写回 | run-as 读文件 |
 | 桌面快捷方式（构建） | pass（构建）：静态 shortcuts（导入/新建/搜索）+ MainActivity 冷启动/onNewIntent 路由；未真机长按图标验证（adb 无设备） |
 | Lint 收尾（JVM） | pass（本机）：抑制预期 UnusedAttribute；import_project_package_done 改 plurals；warnings 4→3（仅剩 GradleDependency2/ObsoleteSdkInt1）。真机未复测（adb 无设备） |
+| 16KB 页对齐（构建） | pass（本机）：`zipalign -c -P 16 4 app-debug.apk` exit=0；未真机安装验证。 |
+| APP 门禁（本轮） | pass（本机）：QA0–QA6 全部 PASS，FAIL=0；自审计 covered=14 gap=0 open=2 p0=0。 |
 | 备份导出后自检（JVM） | pass（本机）：导出后立即 inspect zip，显示“导出校验通过/失败原因”；真机未复测（adb 无设备） |
 | 分享/文件选择导入项目包（JVM） | pass（本机）：导入流程检测 zip 内根项目 JSON，直接走 ProjectPackageImporter 并打开项目；测试识别用例。真机未复测（adb 无设备） |
 | 项目包导出→导入往返（JVM） | pass（本机）：ProjectPackage 导出 zip 后 ProjectPackageImporter 导入新根，项目 JSON/assembly 内容一致；真机未复测（adb 无设备） |

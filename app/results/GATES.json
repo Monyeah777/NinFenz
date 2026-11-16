@@ -256,7 +256,7 @@
       "pass": 3
     }
   },
-  "head": "c1d07e25fca96e1c23130f1bb30a9dcb02f4c737",
+  "head": "e5a3ecf1cc2478d423304fbe76b850bed17a8c2b",
   "open_items": [
     {
       "id": "S3",
@@ -868,7 +868,7 @@
         "app/android/app/src/test/java/dev/ninfenz/mobile/data/DeliveryDraftStoreTest.kt",
         "app/android/app/src/test/java/dev/ninfenz/mobile/data/DiagnosticsBundleTest.kt",
         "app/android/app/src/test/java/dev/ninfenz/mobile/data/DraftLibraryTest.kt",
-        "app/android/app/src/test/java/dev/ninfenz/mobile/data/EpubExporterTest.kt"
+        "app/android/app/src/test/java/dev/ninfenz/mobile/data/DraftProjectBinderTest.kt"
       ],
       "gate": "QA5",
       "kind": "glob_min",
