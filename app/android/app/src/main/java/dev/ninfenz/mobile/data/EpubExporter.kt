@@ -76,6 +76,7 @@ object EpubExporter {
         var codeLang = ""
         val code = StringBuilder()
         val table = mutableListOf<List<String>>()
+        var tableAlign = emptyList<String>()
         fun closeQuote() {
             if (inQuote) { out.append("</blockquote>"); inQuote = false }
         }
@@ -91,13 +92,18 @@ object EpubExporter {
                 if (index == 0) out.append("<thead>")
                 if (index == 1) out.append("<tbody>")
                 out.append("<tr>")
-                cells.forEach { out.append("<").append(tag).append(">").append(inline(it)).append("</").append(tag).append(">") }
+                cells.forEachIndexed { i, cell ->
+                    val align = tableAlign.getOrNull(i).orEmpty()
+                    val style = if (align.isBlank()) "" else " style=\"text-align:" + align + "\""
+                    out.append("<").append(tag).append(style).append(">").append(inline(cell)).append("</").append(tag).append(">")
+                }
                 out.append("</tr>")
                 if (index == 0) out.append("</thead>")
             }
             if (table.size > 1) out.append("</tbody>")
             out.append("</table>")
             table.clear()
+            tableAlign = emptyList()
         }
         markdown.replace("\r\n", "\n").split('\n').forEach { line ->
             val fence = line.trimStart().startsWith("\u0060\u0060\u0060")
@@ -142,7 +148,18 @@ object EpubExporter {
                 closeLists()
                 val cells = trimmed.trim('|').split('|').map { it.trim() }
                 val separator = cells.isNotEmpty() && cells.all { Regex("^:?-{2,}:?$").matches(it) }
-                if (!separator) table.add(cells)
+                if (separator) {
+                    tableAlign = cells.map {
+                        when {
+                            it.startsWith(":") && it.endsWith(":") -> "center"
+                            it.startsWith(":") -> "left"
+                            it.endsWith(":") -> "right"
+                            else -> ""
+                        }
+                    }
+                } else {
+                    table.add(cells)
+                }
                 return@forEach
             }
             if (Regex("^-{3,}$").matches(trimmed)) {
