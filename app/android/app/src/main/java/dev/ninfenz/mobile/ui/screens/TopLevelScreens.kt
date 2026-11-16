@@ -542,6 +542,22 @@ fun ProjectDetailScreen(
                     }
                 }
             }
+            if (project.history.isNotEmpty()) {
+                item {
+                    NfCard {
+                        Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                            Text(stringResource(dev.ninfenz.mobile.R.string.project_history_title), style = MaterialTheme.typography.titleMedium)
+                            project.history.takeLast(20).forEach { h ->
+                                Text(
+                                    h.op + (h.digest?.let { " · " + it.take(12) } ?: "") + (h.at?.let { " · " + it } ?: ""),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    }
+                }
+            }
             item {
                 NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.project_detail_section_continue))
             }

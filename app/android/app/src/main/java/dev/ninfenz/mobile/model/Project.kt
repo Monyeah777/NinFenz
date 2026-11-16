@@ -35,13 +35,20 @@ data class ProjectReview(
     val subjectDigest: String?
 )
 
+data class ProjectHistoryEntry(
+    val op: String,
+    val digest: String?,
+    val at: String?
+)
+
 data class Project(
     val id: String,
     val title: String,
     val refs: ProjectRefs,
     val status: ProjectStatus,
     val review: ProjectReview,
-    val historyCount: Int
+    val historyCount: Int,
+    val history: List<ProjectHistoryEntry> = emptyList()
 )
 
 data class TransitionResult(val ok: Boolean, val status: ProjectStatus, val message: String)
@@ -91,7 +98,15 @@ object ProjectModel {
                 note = J.optString(reviewObj, "note"),
                 subjectDigest = J.optString(reviewObj, "subject_digest")
             ),
-            historyCount = J.optArray(o, "history").size
+            historyCount = J.optArray(o, "history").size,
+            history = J.optArray(o, "history").mapNotNull { element ->
+                val h = element as? JsonObject ?: return@mapNotNull null
+                ProjectHistoryEntry(
+                    op = J.optString(h, "op") ?: "",
+                    digest = J.optString(h, "digest"),
+                    at = J.optString(h, "at")
+                )
+            }
         )
     }
 

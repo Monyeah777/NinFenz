@@ -456,4 +456,5 @@
     <string name="settings_storage_total">合计</string>
     <string name="settings_storage_clear">清理导入/分享缓存</string>
     <string name="settings_storage_cleaned">已清理 %1$d 个临时文件</string>
+    <string name="project_history_title">状态历史</string>
 </resources>
