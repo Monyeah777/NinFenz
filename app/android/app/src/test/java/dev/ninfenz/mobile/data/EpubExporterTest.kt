@@ -72,6 +72,16 @@ class EpubExporterTest {
     }
 
     @Test
+    fun rendersOrderedList() {
+        val dir = Files.createTempDirectory("nf-epub-ol").toFile()
+        val created = EpubExporter.export("# 章\n\n1. 一\n2. 二", "章", dir)
+        ZipFile(created.file).use { zip ->
+            val chapter = zip.getInputStream(zip.getEntry("OEBPS/chapter-001.xhtml")).bufferedReader().readText()
+            assertTrue(chapter.contains("<ol><li>一</li><li>二</li></ol>"))
+        }
+    }
+
+    @Test
     fun noHeadingFallsBackToSingleChapter() {
         assertEquals(1, EpubExporter.chapters("只有一段正文").size)
         assertEquals("正文", EpubExporter.chapters("只有一段正文").first().title)

@@ -57,6 +57,13 @@ class HtmlExporterTest {
     }
 
     @Test
+    fun rendersOrderedList() {
+        val dir = Files.createTempDirectory("nf-html-ol").toFile()
+        val created = HtmlExporter.export("1. 一\n2. 二", "t", dir)
+        assertTrue(created.file.readText().contains("<ol><li>一</li><li>二</li></ol>"))
+    }
+
+    @Test
     fun handlesCodeFence() {
         val dir = Files.createTempDirectory("nf-html-2").toFile()
         val created = HtmlExporter.export("\u0060\u0060\u0060\ncode\n\u0060\u0060\u0060", "t", dir)
