@@ -48,6 +48,7 @@ import dev.ninfenz.mobile.model.PlanModel
 import dev.ninfenz.mobile.model.Project
 import dev.ninfenz.mobile.model.ProjectStatus
 import dev.ninfenz.mobile.model.ReportModel
+import dev.ninfenz.mobile.model.SlotBatchImporter
 import dev.ninfenz.mobile.model.SlotTextAdapter
 import dev.ninfenz.mobile.model.ValidateReport
 import dev.ninfenz.mobile.share.ShareExporter
@@ -100,6 +101,9 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
     var slotImportOriginal by remember { mutableStateOf(0) }
     var slotImportAdapted by remember { mutableStateOf(0) }
     var slotImportText by remember { mutableStateOf("") }
+    var batchChunks by remember { mutableStateOf<List<SlotBatchImporter.Chunk>>(emptyList()) }
+    var batchSource by remember { mutableStateOf("") }
+    var batchNote by remember { mutableStateOf<String?>(null) }
 
     fun pasteSlot(slot: String) {
         val manager = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager
@@ -147,6 +151,41 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
     fun openSlotPicker(slot: String) {
         slotImportTarget = slot
         slotPicker.launch(arrayOf("*/*"))
+    }
+
+    val batchPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        scope.launch {
+            try {
+                val name = uri.lastPathSegment?.substringAfterLast('/') ?: "batch"
+                val raw = withContext(Dispatchers.IO) { readTextLimited(context, uri) }
+                val chunks = SlotBatchImporter.chunks(raw, name)
+                if (chunks.isEmpty()) {
+                    error = CoreResponse.failure("NF-E-003", context.getString(dev.ninfenz.mobile.R.string.delivery_slot_batch_empty), context.getString(dev.ninfenz.mobile.R.string.delivery_slot_batch_empty_fix), 2).error
+                } else {
+                    batchSource = name
+                    batchNote = null
+                    batchChunks = chunks
+                }
+            } catch (t: Throwable) {
+                error = CoreResponse.failure("NF-E-003", context.getString(dev.ninfenz.mobile.R.string.delivery_slot_import_fail, t.message ?: t.javaClass.simpleName), context.getString(dev.ninfenz.mobile.R.string.delivery_slot_import_fail_fix), 2).error
+            }
+        }
+    }
+
+    fun applyBatch(onlyEmpty: Boolean) {
+        val slots = plan?.slots ?: return
+        if (slots.isEmpty() || batchChunks.isEmpty()) return
+        val result = SlotBatchImporter.apply(batchChunks, slots, inputs, onlyEmpty)
+        inputs = result.values
+        batchNote = context.getString(
+            dev.ninfenz.mobile.R.string.delivery_slot_batch_done,
+            result.filled,
+            result.skipped,
+            result.appended,
+            result.dropped
+        )
+        batchChunks = emptyList()
     }
 
     var busy by remember { mutableStateOf(false) }
@@ -231,6 +270,8 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                     report = null
                                     exportedFile = null
                                     manifestText = null
+                                    batchChunks = emptyList()
+                                    batchNote = null
                                 } catch (t: Throwable) {
                                     error = CoreResponse.failure("NF-ASM-003", "plan 解析失败：" + (t.message ?: t.javaClass.simpleName), "检查核心 graph-compile 输出", 1).error
                                 }
@@ -254,6 +295,21 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                     subtitle = plan?.let { stringResource(dev.ninfenz.mobile.R.string.delivery_plan_summary, it.steps.size, it.slots.size) },
                     initiallyExpanded = true
                 ) {
+                    plan?.let { p ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = NfSpacing.page),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(stringResource(dev.ninfenz.mobile.R.string.delivery_slot_batch_hint), style = MaterialTheme.typography.bodySmall)
+                            TextButton(onClick = { batchPicker.launch(arrayOf("*/*")) }) {
+                                Text(stringResource(dev.ninfenz.mobile.R.string.delivery_slot_batch_import))
+                            }
+                        }
+                        batchNote?.let {
+                            Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page))
+                        }
+                    }
                     if (plan == null) {
                         Text(stringResource(dev.ninfenz.mobile.R.string.delivery_compile_first), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page))
                     } else if (plan!!.slots.isEmpty()) {
@@ -472,6 +528,72 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                 }
             }
         )
+    }
+
+    if (batchChunks.isNotEmpty()) {
+        val slots = plan?.slots.orEmpty()
+        AlertDialog(
+            onDismissRequest = { batchChunks = emptyList() },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_slot_batch_title, batchChunks.size, slots.size)) },
+            text = {
+                Column(
+                    modifier = Modifier
+                        .heightIn(max = 420.dp)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    Text(
+                        stringResource(dev.ninfenz.mobile.R.string.delivery_slot_batch_meta, batchSource),
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                    slots.forEachIndexed { index, slot ->
+                        val chunk = batchChunks.getOrNull(index)
+                        if (chunk != null) {
+                            Text("$slot ← " + chunk.text.replace('\n', ' ').take(48), style = MaterialTheme.typography.bodySmall)
+                        }
+                    }
+                    if (batchChunks.size > slots.size) {
+                        Text(
+                            stringResource(dev.ninfenz.mobile.R.string.delivery_slot_batch_overflow, batchChunks.size - slots.size),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { applyBatch(onlyEmpty = true) }) {
+                    Text(stringResource(dev.ninfenz.mobile.R.string.delivery_slot_batch_fill_empty))
+                }
+            },
+            dismissButton = {
+                Row {
+                    TextButton(onClick = { applyBatch(onlyEmpty = false) }) {
+                        Text(stringResource(dev.ninfenz.mobile.R.string.delivery_slot_batch_replace_all))
+                    }
+                    TextButton(onClick = { batchChunks = emptyList() }) { Text(stringResource(android.R.string.cancel)) }
+                }
+            }
+        )
+    }
+}
+
+private const val MAX_IMPORT_CHARS = 1_048_576
+
+private fun readTextLimited(context: Context, uri: android.net.Uri): String {
+    val stream = context.contentResolver.openInputStream(uri) ?: return ""
+    stream.use { input ->
+        val reader = java.io.InputStreamReader(input, Charsets.UTF_8)
+        val buffer = CharArray(8192)
+        val out = StringBuilder()
+        while (true) {
+            val n = reader.read(buffer)
+            if (n < 0) break
+            out.append(buffer, 0, n)
+            if (out.length > MAX_IMPORT_CHARS) {
+                throw IllegalArgumentException(context.getString(dev.ninfenz.mobile.R.string.delivery_slot_import_too_large))
+            }
+        }
+        return out.toString()
     }
 }
 

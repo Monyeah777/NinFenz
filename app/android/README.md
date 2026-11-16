@@ -120,6 +120,7 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 - ShareExporterTest（1，Robolectric）：非 Activity Context 拉起 chooser 必须带 NEW_TASK。
 - NfExpandableComponentsTest（2，Robolectric/Compose）：长文本展开收起、分组折叠切换。
 - SlotTextAdapterTest（2）：Markdown/纯文本槽位导入适配、BOM/换行归一。
+- SlotBatchImporterTest（7）：显式 ---/空行分段、逐段适配、仅填空槽、覆盖+溢出、段数不足。
 - A11yComposeTest（3，Robolectric）：图标 contentDescription、返回/搜索/设置/CTA 触控目标 ≥48dp。
 - LargeFontComposeTest（1，Robolectric）：fontScale 200% 下库页主文案/CTA 仍可见。
 - ContrastTest（3）：明暗品牌调色板 WCAG 2.2 AA 对比度（正文 4.5、大字 3.0）。
@@ -128,8 +129,8 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 ## 构建证据（本机，2026-11-15）
 
 - v0.02 W6（2026-11-15）：`./gradlew :app:assembleDebug` 成功：app-debug.apk = 22,741,307 bytes，
-  sha256 = 8e4ed4b9877a368d87eb8e6dacd205ee7402d066d547a1af3b82d1bec800ebba（含双 ABI 原生库 + 9 个示例 Pack assets）。
-- `./gradlew :app:testDebugUnitTest` 全绿：130 条 JVM 单测（v1 42 + v0.02 88；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y/大字号/对比度/Paparazzi 截图）。
+  sha256 = e45974b38abf1581da12214fc8e1d5afdb6250c3118489ebf734a2350df1f76d（含双 ABI 原生库 + 9 个示例 Pack assets）。
+- `./gradlew :app:testDebugUnitTest` 全绿：137 条 JVM 单测（v1 42 + v0.02 95；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y/大字号/对比度/Paparazzi 截图）。
 - `zipalign -c -P 16 -v 4 app-debug.apk` → Verification successful（native lib 16KB page 对齐）。
 - `bash app/scripts/build_core_android.sh --clean` 成功：NDK 27.0.12077973 + rustup targets
   （aarch64-linux-android / x86_64-linux-android，经 rsproxy 镜像安装）；两个 .so 的 LOAD align 均为 0x4000。

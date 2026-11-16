@@ -417,4 +417,15 @@
     <string name="delivery_slot_import_empty_fix">Pick a non-empty text file</string>
     <string name="delivery_slot_import_fail">Import failed: %1$s</string>
     <string name="delivery_slot_import_fail_fix">Check file encoding/permission</string>
+    <string name="delivery_slot_batch_import">Batch import</string>
+    <string name="delivery_slot_batch_hint">Split by --- or blank lines; fill multiple slots at once</string>
+    <string name="delivery_slot_batch_title">Batch import · %1$d blocks → %2$d slots</string>
+    <string name="delivery_slot_batch_meta">Source %1$s (split by --- or blank lines)</string>
+    <string name="delivery_slot_batch_overflow">%1$d extra blocks: dropped when filling empty only; appended to last slot in overwrite mode</string>
+    <string name="delivery_slot_batch_fill_empty">Empty only</string>
+    <string name="delivery_slot_batch_replace_all">Overwrite existing</string>
+    <string name="delivery_slot_batch_empty">Batch import is empty</string>
+    <string name="delivery_slot_batch_empty_fix">Split with --- or blank lines and retry</string>
+    <string name="delivery_slot_batch_done">Batch import: filled %1$d, skipped %2$d, appended %3$d, dropped %4$d</string>
+    <string name="delivery_slot_import_too_large">File exceeds 1 MiB limit</string>
 </resources>

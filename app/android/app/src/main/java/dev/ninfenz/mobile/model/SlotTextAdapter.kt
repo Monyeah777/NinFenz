@@ -13,8 +13,11 @@ object SlotTextAdapter {
         val changed: Boolean
     )
 
+    fun normalize(raw: String): String =
+        raw.removePrefix("\uFEFF").replace("\r\n", "\n").replace('\r', '\n')
+
     fun adapt(raw: String, fileName: String? = null): Adapted {
-        val normalized = raw.removePrefix("\uFEFF").replace("\r\n", "\n").replace('\r', '\n')
+        val normalized = normalize(raw)
         val stripped = stripFrontMatter(normalized)
         val looksMarkdown = fileName?.lowercase()?.let { it.endsWith(".md") || it.endsWith(".markdown") } == true ||
             stripped.contains(Regex("(?m)^#{1,6}\\s")) ||
@@ -28,7 +31,7 @@ object SlotTextAdapter {
         )
     }
 
-    private fun stripFrontMatter(text: String): String {
+    fun stripFrontMatter(text: String): String {
         if (!text.startsWith("---\n")) return text
         val end = text.indexOf("\n---", startIndex = 4)
         if (end < 0) return text
