@@ -45,6 +45,21 @@ class MainActivity : ComponentActivity() {
         else -> null
     }
 
+    private fun syncSystemLocale(mode: LanguageMode) {
+        if (android.os.Build.VERSION.SDK_INT < 33) return
+        runCatching {
+            val manager = getSystemService(android.app.LocaleManager::class.java) ?: return
+            val desired = if (mode.tag == null) {
+                android.os.LocaleList.getEmptyLocaleList()
+            } else {
+                android.os.LocaleList.forLanguageTags(mode.tag)
+            }
+            if (manager.applicationLocales != desired) {
+                manager.applicationLocales = desired
+            }
+        }
+    }
+
     private fun installCrashHandler() {
         if (crashHandlerInstalled) return
         crashHandlerInstalled = true
@@ -78,6 +93,9 @@ class MainActivity : ComponentActivity() {
         installCrashHandler()
         pendingShortcut = shortcutFrom(intent)
         val prefs = AppPrefs(this)
+        if (prefs.languageMode != LanguageMode.SYSTEM) {
+            syncSystemLocale(prefs.languageMode)
+        }
         setContent {
             var themeMode by remember { mutableStateOf(prefs.themeMode) }
             var languageMode by remember { mutableStateOf(prefs.languageMode) }
@@ -115,6 +133,7 @@ class MainActivity : ComponentActivity() {
                         onLanguageMode = { mode ->
                             prefs.languageMode = mode
                             languageMode = mode
+                            syncSystemLocale(mode)
                         },
                         dynamicColor = dynamicColor,
                         onDynamicColor = { enabled ->
