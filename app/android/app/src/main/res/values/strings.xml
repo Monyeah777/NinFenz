@@ -453,6 +453,8 @@
     <string name="settings_storage_drafts">草稿</string>
     <string name="settings_storage_exports">导出</string>
     <string name="settings_storage_cache">缓存</string>
+    <string name="settings_storage_packs">Pack</string>
+    <string name="settings_storage_archives">归档项目</string>
     <string name="settings_storage_total">合计</string>
     <string name="settings_storage_clear">清理导入/分享缓存</string>
     <string name="settings_storage_cleaned">已清理 %1$d 个临时文件</string>

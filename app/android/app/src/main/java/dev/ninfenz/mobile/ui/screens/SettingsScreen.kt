@@ -109,6 +109,8 @@ fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
             KeyValue(stringResource(dev.ninfenz.mobile.R.string.settings_storage_drafts), humanBytes(stats.drafts))
             KeyValue(stringResource(dev.ninfenz.mobile.R.string.settings_storage_exports), humanBytes(stats.exports))
             KeyValue(stringResource(dev.ninfenz.mobile.R.string.settings_storage_cache), humanBytes(stats.cache))
+            KeyValue(stringResource(dev.ninfenz.mobile.R.string.settings_storage_packs), humanBytes(stats.packs))
+            KeyValue(stringResource(dev.ninfenz.mobile.R.string.settings_storage_archives), humanBytes(stats.archives))
             KeyValue(stringResource(dev.ninfenz.mobile.R.string.settings_storage_total), humanBytes(stats.total))
             Button(onClick = {
                 val removed = StorageStats.clearImportCache(context.cacheDir)

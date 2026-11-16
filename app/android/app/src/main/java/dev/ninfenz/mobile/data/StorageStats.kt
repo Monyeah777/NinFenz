@@ -8,16 +8,20 @@ object StorageStats {
         val projects: Long,
         val drafts: Long,
         val exports: Long,
-        val cache: Long
+        val cache: Long,
+        val packs: Long = 0L,
+        val archives: Long = 0L
     ) {
-        val total: Long get() = projects + drafts + exports + cache
+        val total: Long get() = projects + drafts + exports + cache + packs + archives
     }
 
     fun scan(filesDir: File, cacheDir: File): Breakdown = Breakdown(
         projects = size(File(filesDir, "projects")),
         drafts = size(File(filesDir, "drafts")),
         exports = size(File(filesDir, "exports")),
-        cache = size(cacheDir)
+        cache = size(cacheDir),
+        packs = size(File(filesDir, "library/packs")),
+        archives = size(File(filesDir, "projects-archive"))
     )
 
     fun clearImportCache(cacheDir: File): Int {

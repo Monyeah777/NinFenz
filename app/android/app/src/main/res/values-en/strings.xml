@@ -453,6 +453,8 @@
     <string name="settings_storage_drafts">Drafts</string>
     <string name="settings_storage_exports">Exports</string>
     <string name="settings_storage_cache">Cache</string>
+    <string name="settings_storage_packs">Packs</string>
+    <string name="settings_storage_archives">Archived projects</string>
     <string name="settings_storage_total">Total</string>
     <string name="settings_storage_clear">Clear import/share cache</string>
     <string name="settings_storage_cleaned">Cleared %1$d temp files</string>
