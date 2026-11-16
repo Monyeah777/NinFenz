@@ -23,6 +23,7 @@
 | 错误码复制反馈（JVM） | pass（本机）：点击错误码复制并 Toast「已复制 code」；真机未复测（adb 无设备） |
 | 门禁/ lint 复核（round143） | pass（本机）：QA0–QA6 全 PASS，FAIL=0，covered=14 gap=0 open=2 p0=0；lint warnings=1（仅 Paparazzi 版本，Kotlin 2.1 阻塞）。 |
 | 备份未列条目拒绝（JVM） | pass（本机）：manifest 未列出的 zip 条目导致 inspect 失败；BackupRestoreServiceTest 5 条。真机未复测（adb 无设备） |
+| 全量复核（round161） | pass（本机）：verify.sh PASS=107 WARN=2 FAIL=0；app gates QA0–QA6 PASS，gap=0，P0=0；lint 0 warnings。 |
 | 备份 manifest BOM 兼容（JVM） | pass（本机）：带 UTF-8 BOM 的备份 manifest 可正常校验；备份测试 7 条。真机未复测（adb 无设备） |
 | 项目 JSON BOM 兼容（JVM） | pass（本机）：项目包 JSON/manifest 带 BOM 仍能解析；导入测试 11 条。真机未复测（adb 无设备） |
 | UTF-16/BOM 文本导入（JVM） | pass（本机）：txt/md 带 UTF-16LE/BE 或 UTF-8 BOM 时先转 UTF-8 临时文件再交给 core；测试 2 条。真机未复测（adb 无设备） |
