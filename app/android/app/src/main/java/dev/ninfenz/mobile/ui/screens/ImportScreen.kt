@@ -216,7 +216,12 @@ fun ImportScreen(
         if (response.ok) {
             val obj = response.resultObject()
             if (obj == null) {
-                error = CoreResponse.failure("NF-E-002", "核心 import 响应缺 result", "检查核心版本", 2).error
+                error = CoreResponse.failure(
+                    "NF-E-002",
+                    context.getString(dev.ninfenz.mobile.R.string.import_core_missing_result),
+                    context.getString(dev.ninfenz.mobile.R.string.import_core_missing_result_fix),
+                    2
+                ).error
             } else {
                 try {
                     val imported = ImportModel.parse(obj)
@@ -243,7 +248,10 @@ fun ImportScreen(
                             suggestNote = context.getString(dev.ninfenz.mobile.R.string.import_suggest_done)
                         }
                     } else {
-                        suggestNote = "核心未给出映射建议：" + (suggest.error?.message ?: "未知原因") + "（可手动采纳/跳过）"
+                        suggestNote = context.getString(
+                            dev.ninfenz.mobile.R.string.import_no_suggestion,
+                            suggest.error?.message ?: context.getString(dev.ninfenz.mobile.R.string.unknown_reason)
+                        )
                     }
                 } catch (e: Exception) {
                     error = CoreResponse.failure(
@@ -305,7 +313,7 @@ fun ImportScreen(
                     val uri = item.uri.toUri()
                     val meta = FileAccess.meta(context, uri)
                     if (meta.size > FileAccess.MAX_IMPORT_BYTES) {
-                        error = CoreResponse.failure("NF-IMP-003", context.getString(dev.ninfenz.mobile.R.string.import_file_too_large), "换用更小的文件", 3).error
+                        error = CoreResponse.failure("NF-IMP-003", context.getString(dev.ninfenz.mobile.R.string.import_file_too_large), context.getString(dev.ninfenz.mobile.R.string.import_file_too_large_fix), 3).error
                         return@launch
                     }
                     val file = FileAccess.copyToCache(context, uri, meta.name)
@@ -363,13 +371,18 @@ fun ImportScreen(
                 try {
                     val meta = FileAccess.meta(context, uri)
                     if (meta.size > FileAccess.MAX_IMPORT_BYTES) {
-                        error = CoreResponse.failure("NF-IMP-003", context.getString(dev.ninfenz.mobile.R.string.import_file_too_large), "换用更小的文件", 3).error
+                        error = CoreResponse.failure("NF-IMP-003", context.getString(dev.ninfenz.mobile.R.string.import_file_too_large), context.getString(dev.ninfenz.mobile.R.string.import_file_too_large_fix), 3).error
                         return@launch
                     }
                     val file = FileAccess.copyToCache(context, uri, meta.name)
                     importFromFile(file, "saf", meta.name, meta.mime, meta.size)
                 } catch (e: Exception) {
-                    error = CoreResponse.failure("NF-E-004", "读取文件失败：" + (e.message ?: e.javaClass.simpleName), "确认授权后重试", 2).error
+                    error = CoreResponse.failure(
+                        "NF-E-004",
+                        context.getString(dev.ninfenz.mobile.R.string.import_read_failed, e.message ?: e.javaClass.simpleName),
+                        context.getString(dev.ninfenz.mobile.R.string.import_read_failed_fix),
+                        2
+                    ).error
                 }
             }
         }
@@ -447,9 +460,9 @@ fun ImportScreen(
                         icon = Icons.Filled.Add,
                         title = stringResource(dev.ninfenz.mobile.R.string.import_empty_title),
                         message = stringResource(dev.ninfenz.mobile.R.string.import_empty_body),
-                        actionLabel = "选择文件",
+                        actionLabel = context.getString(dev.ninfenz.mobile.R.string.import_pick_file_action),
                         onAction = { filePicker.launch(arrayOf("*/*")) },
-                        secondaryLabel = "示例内容",
+                        secondaryLabel = context.getString(dev.ninfenz.mobile.R.string.import_sample_content),
                         onSecondary = { importSample() }
                     )
                 }

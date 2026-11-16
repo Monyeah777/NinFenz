@@ -608,6 +608,14 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="import_draft_to_project">To project</string>
     <string name="import_project_failed">Project package import failed: %1$s</string>
     <string name="import_project_failed_fix">Confirm the zip is a complete project package</string>
+    <string name="import_core_missing_result">Core import response lacks result</string>
+    <string name="import_core_missing_result_fix">Check the core version</string>
+    <string name="import_no_suggestion">Core gave no mapping suggestion: %1$s (you can accept/skip manually)</string>
+    <string name="import_file_too_large_fix">Use a smaller file</string>
+    <string name="import_read_failed">Failed to read file: %1$s</string>
+    <string name="import_read_failed_fix">Confirm permission and retry</string>
+    <string name="import_sample_content">Sample content</string>
+    <string name="import_pick_file_action">Choose file to import</string>
     <string name="import_parse_failed">nf-import/1 parse failed: %1$s</string>
     <string name="import_parse_failed_fix">Check that core output satisfies app/schema/nf-import.schema.json</string>
     <string name="import_sample_read_failed">Failed to read sample content: %1$s</string>
