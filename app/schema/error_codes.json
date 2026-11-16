@@ -31,6 +31,13 @@
       "fix": "转换为 markdown/text 后再导入"
     },
     {
+      "code": "NF-IMP-005",
+      "severity": "error",
+      "exit": 2,
+      "message": "草稿重命名失败",
+      "fix": "换一个名称后重试"
+    },
+    {
       "code": "NF-IMP-006",
       "severity": "error",
       "exit": 2,
