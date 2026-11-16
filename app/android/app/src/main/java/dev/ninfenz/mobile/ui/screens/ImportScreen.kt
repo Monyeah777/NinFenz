@@ -33,7 +33,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.core.CoreError
 import dev.ninfenz.mobile.core.CoreResponse
+import dev.ninfenz.mobile.core.J
 import dev.ninfenz.mobile.data.FileAccess
+import dev.ninfenz.mobile.data.ImportDraftStore
 import dev.ninfenz.mobile.data.ImportHistoryStore
 import dev.ninfenz.mobile.data.LibraryStore
 import dev.ninfenz.mobile.model.ImportDoc
@@ -48,7 +50,9 @@ import dev.ninfenz.mobile.ui.components.NfTopAppBar
 import dev.ninfenz.mobile.ui.safeCall
 import dev.ninfenz.mobile.ui.theme.NfSpacing
 import java.io.File
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
@@ -78,6 +82,24 @@ fun ImportScreen(
     var acceptedMappings by remember { mutableStateOf<Set<Int>>(emptySet()) }
     var suggestNote by remember { mutableStateOf<String?>(null) }
     val importHistory = remember { ImportHistoryStore(context.filesDir) }
+    val importDraftStore = remember { ImportDraftStore(context.filesDir) }
+    LaunchedEffect(Unit) {
+        if (doc == null && rawResult == null && error == null) {
+            val raw = withContext(Dispatchers.IO) { importDraftStore.load() }
+            if (raw != null) {
+                try {
+                    val obj = J.parseObject(raw, ImportModel.SCHEMA)
+                    val restored = ImportModel.parse(obj)
+                    rawResult = obj
+                    doc = restored
+                    acceptedMappings = restored.mappings.indices.filter { restored.mappings[it].confidence >= 80 }.toSet()
+                    notice = context.getString(dev.ninfenz.mobile.R.string.import_restored_notice)
+                } catch (t: Throwable) {
+                    importDraftStore.clear()
+                }
+            }
+        }
+    }
 
     suspend fun importFromFile(file: File, sourceKind: String, name: String, mime: String?, size: Long) {
         busy = true
@@ -141,6 +163,7 @@ fun ImportScreen(
         } else {
             error = response.error
         }
+        rawResult?.let { importDraftStore.save(it.toString()) }
         busy = false
     }
 
@@ -391,6 +414,7 @@ fun ImportScreen(
                                         acceptedMappings = emptySet()
                                         error = null
                                         suggestNote = null
+                                        importDraftStore.clear()
                                     }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_again)) }
                                 }
                             }

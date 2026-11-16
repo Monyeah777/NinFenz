@@ -435,4 +435,5 @@
     <string name="import_duplicate_notice">同一内容此前已导入：%1$s（digest %2$s）</string>
     <string name="search_history_title">最近搜索</string>
     <string name="search_history_clear">清空</string>
+    <string name="import_restored_notice">已恢复上次导入预览</string>
 </resources>

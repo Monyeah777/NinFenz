@@ -435,4 +435,5 @@
     <string name="import_duplicate_notice">Same content imported before: %1$s (digest %2$s)</string>
     <string name="search_history_title">Recent searches</string>
     <string name="search_history_clear">Clear</string>
+    <string name="import_restored_notice">Restored previous import preview</string>
 </resources>
