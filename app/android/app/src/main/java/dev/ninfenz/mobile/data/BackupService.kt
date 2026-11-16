@@ -16,7 +16,7 @@ object BackupService {
         val root = File(filesDir, "exports/backups").apply { mkdirs() }
         val target = File(root, "nf-backup-" + stamp + ".zip")
         val sources = mutableListOf<Pair<String, File>>()
-        listOf("projects", "drafts").forEach { name ->
+        listOf("projects", "projects-archive", "drafts").forEach { name ->
             val dir = File(filesDir, name)
             if (dir.isDirectory) {
                 dir.walkTopDown().filter { it.isFile }.sortedBy { it.path }.forEach { f ->

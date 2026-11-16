@@ -17,15 +17,18 @@ class BackupRestoreServiceTest {
         File(src, "projects/p.nfproject.json").writeText("{\"schema\":\"nf-project/1\"}")
         File(src, "drafts").mkdirs()
         File(src, "drafts/a.md.json").writeText("draft")
+        File(src, "projects-archive").mkdirs()
+        File(src, "projects-archive/old.nfproject.json.1.archived").writeText("archived")
         val created = BackupService.create(src, 789L)
         val checked = BackupRestoreService.inspect(created.file)
         assertTrue(checked.error ?: "", checked.ok)
-        assertEquals(2, checked.entries.size)
+        assertEquals(3, checked.entries.size)
 
         val dst = Files.createTempDirectory("nf-restore-dst").toFile()
         val restored = BackupRestoreService.restore(created.file, dst)
-        assertEquals(2, restored.files)
+        assertEquals(3, restored.files)
         assertTrue(restored.snapshot?.isFile == true)
+        assertEquals("archived", File(dst, "projects-archive/old.nfproject.json.1.archived").readText())
         assertEquals("draft", File(dst, "drafts/a.md.json").readText())
     }
 
