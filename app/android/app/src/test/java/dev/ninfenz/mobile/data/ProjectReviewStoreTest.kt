@@ -14,6 +14,7 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -66,6 +67,8 @@ class ProjectReviewStoreTest {
         file.writeText(JsonObject(raw).toString())
         val bridge = FakeCoreBridge().enqueue(CoreResponse.ok(buildJsonObject { put("digest", "new") }))
         assertTrue(ProjectReviewStore(filesDir, bridge).isStale(file))
+        val same = FakeCoreBridge().enqueue(CoreResponse.ok(buildJsonObject { put("digest", "old") }))
+        assertFalse(ProjectReviewStore(filesDir, same).isStale(file))
     }
 
     @Test
