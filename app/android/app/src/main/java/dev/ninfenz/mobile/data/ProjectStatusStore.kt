@@ -181,14 +181,7 @@ class ProjectStatusStore(
         }
     }
 
-    private fun atomicWrite(target: File, text: String) {
-        val temp = File(target.parentFile, target.name + ".tmp")
-        temp.writeText(text, Charsets.UTF_8)
-        if (!temp.renameTo(target)) {
-            target.writeText(text, Charsets.UTF_8)
-            temp.delete()
-        }
-    }
+    private fun atomicWrite(target: File, text: String) = AtomicFiles.writeText(target, text)
 
     private fun sha256(bytes: ByteArray): String =
         MessageDigest.getInstance("SHA-256").digest(bytes).joinToString("") { "%02x".format(it) }

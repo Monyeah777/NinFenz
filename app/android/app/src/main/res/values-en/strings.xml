@@ -429,4 +429,5 @@
     <string name="delivery_slot_batch_done">Batch import: filled %1$d, skipped %2$d, appended %3$d, dropped %4$d</string>
     <string name="delivery_slot_import_too_large">File exceeds 1 MiB limit</string>
     <string name="import_share_multi">Share contains %1$d items; only the first is imported, %2$d skipped</string>
+    <string name="import_file_too_large">File exceeds the 64 MiB import limit</string>
 </resources>

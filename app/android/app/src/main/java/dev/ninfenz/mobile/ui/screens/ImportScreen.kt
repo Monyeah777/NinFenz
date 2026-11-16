@@ -179,6 +179,10 @@ fun ImportScreen(
                 try {
                     val uri = Uri.parse(item.uri)
                     val meta = FileAccess.meta(context, uri)
+                    if (meta.size > FileAccess.MAX_IMPORT_BYTES) {
+                        error = CoreResponse.failure("NF-IMP-003", context.getString(dev.ninfenz.mobile.R.string.import_file_too_large), "换用更小的文件", 3).error
+                        return@launch
+                    }
                     val file = FileAccess.copyToCache(context, uri, meta.name)
                     importFromFile(file, "share", meta.name, meta.mime ?: item.mime, meta.size)
                 } catch (e: Exception) {
@@ -201,6 +205,10 @@ fun ImportScreen(
             scope.launch {
                 try {
                     val meta = FileAccess.meta(context, uri)
+                    if (meta.size > FileAccess.MAX_IMPORT_BYTES) {
+                        error = CoreResponse.failure("NF-IMP-003", context.getString(dev.ninfenz.mobile.R.string.import_file_too_large), "换用更小的文件", 3).error
+                        return@launch
+                    }
                     val file = FileAccess.copyToCache(context, uri, meta.name)
                     importFromFile(file, "saf", meta.name, meta.mime, meta.size)
                 } catch (e: Exception) {

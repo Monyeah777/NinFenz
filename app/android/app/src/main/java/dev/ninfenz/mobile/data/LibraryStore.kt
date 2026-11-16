@@ -51,7 +51,7 @@ class LibraryStore(private val filesDir: File) {
     fun saveDraft(baseName: String, json: String): File {
         val safe = baseName.replace(Regex("[^A-Za-z0-9._-]"), "_").ifBlank { "draft" }
         val file = File(draftsDir(), safe + ".json")
-        file.writeText(json, Charsets.UTF_8)
+        AtomicFiles.writeText(file, json)
         return file
     }
 }

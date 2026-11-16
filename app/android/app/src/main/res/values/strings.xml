@@ -429,4 +429,5 @@
     <string name="delivery_slot_batch_done">批量导入：填入 %1$d，跳过 %2$d，追加 %3$d，丢弃 %4$d</string>
     <string name="delivery_slot_import_too_large">文件超过 1 MiB 上限</string>
     <string name="import_share_multi">分享包含 %1$d 项，本次只导入第 1 项；其余 %2$d 项未导入</string>
+    <string name="import_file_too_large">文件超过 64 MiB 上限，已拒绝导入</string>
 </resources>

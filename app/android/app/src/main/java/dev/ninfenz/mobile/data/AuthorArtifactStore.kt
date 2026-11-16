@@ -122,14 +122,7 @@ class AuthorArtifactStore(
             }
         }
 
-    private fun atomicWrite(target: File, bytes: ByteArray) {
-        val temp = File(target.parentFile, target.name + ".tmp")
-        temp.writeBytes(bytes)
-        if (!temp.renameTo(target)) {
-            target.writeBytes(bytes)
-            temp.delete()
-        }
-    }
+    private fun atomicWrite(target: File, bytes: ByteArray) = AtomicFiles.writeBytes(target, bytes)
 
     private fun sha256(bytes: ByteArray): String =
         MessageDigest.getInstance("SHA-256").digest(bytes).joinToString("") { "%02x".format(it) }

@@ -209,12 +209,5 @@ class ProjectCreator(
         return digest.joinToString("") { byte -> "%02x".format(byte) }
     }
 
-    private fun atomicWrite(target: File, text: String) {
-        val temp = File(target.parentFile, target.name + ".tmp")
-        temp.writeText(text, Charsets.UTF_8)
-        if (!temp.renameTo(target)) {
-            target.writeText(text, Charsets.UTF_8)
-            temp.delete()
-        }
-    }
+    private fun atomicWrite(target: File, text: String) = AtomicFiles.writeText(target, text)
 }
