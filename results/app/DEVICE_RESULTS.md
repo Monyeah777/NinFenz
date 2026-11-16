@@ -32,6 +32,7 @@
 | 全量复核（round53） | pass（本机）：verify PASS=107/WARN=2/FAIL=0；gates PASS/gap=0；rust 186；pytest 493。 |
 | Python 全量复核（round61） | pass（本机）：schema 变更后 `pytest app/tests` 493 passed / 0 failed（126s）。 |
 | 全量复核（round60） | pass（本机）：verify 107/2/0；gates PASS/gap=0；rust 186；JVM 317。 |
+| 全量复核（round89） | pass（本机）：verify 107/2/0；gates PASS/gap=0；rust 186；JVM 318；pytest 496。 |
 | 中英资源一致性测试（Python） | pass（本机）：字符串名称集合/重复名/占位符一致，2 条测试；pytest 496。 |
 | 未命名管线 i18n（JVM） | pass（本机）：空白管线默认标题改资源；修复 lambda 作用域后构建通过。 |
 | 未命名项目 i18n（JVM） | pass（本机）：新建项目默认标题改资源；修复 Composable lambda 作用域后构建通过。 |
