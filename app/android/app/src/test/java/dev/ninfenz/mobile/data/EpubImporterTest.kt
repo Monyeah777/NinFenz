@@ -33,6 +33,23 @@ class EpubImporterTest {
     }
 
     @Test
+    fun followsSpineOrder() {
+        val file = epub(
+            listOf(
+                "META-INF/container.xml" to "<container><rootfiles><rootfile full-path=\"OEBPS/content.opf\"/></rootfiles></container>",
+                "OEBPS/content.opf" to "<package><manifest>" +
+                    "<item id=\"c1\" href=\"one.xhtml\" media-type=\"application/xhtml+xml\"/>" +
+                    "<item id=\"c2\" href=\"two.xhtml\" media-type=\"application/xhtml+xml\"/>" +
+                    "</manifest><spine><itemref idref=\"c2\"/><itemref idref=\"c1\"/></spine></package>",
+                "OEBPS/one.xhtml" to "<h1>一</h1>",
+                "OEBPS/two.xhtml" to "<h1>二</h1>"
+            )
+        )
+        val text = EpubImporter.extract(file)
+        assertTrue(text.indexOf("# 二") < text.indexOf("# 一"))
+    }
+
+    @Test
     fun rejectsMissingContainer() {
         val f = epub(listOf("OEBPS/chapter.xhtml" to "<p>x</p>"))
         assertTrue(runCatching { EpubImporter.extract(f) }.isFailure)

@@ -35,6 +35,7 @@ object EpubImporter {
 
     private fun read(zip: ZipFile, path: String): String? {
         val entry = zip.getEntry(path) ?: return null
+        require(entry.size in 0..(64L * 1024 * 1024)) { "EPUB 条目过大：" + path }
         return zip.getInputStream(entry).use { String(it.readBytes(), Charsets.UTF_8) }
     }
 
