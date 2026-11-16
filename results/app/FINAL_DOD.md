@@ -14,7 +14,7 @@
 | 项目态创作台/交付台 | pass（工程面，含核心校验/导出） | 6ac657b52/86191976e；Delivery/Author 测试与构建 |
 | 作者覆盖保存/状态写回 | pass（工程面） | a14456833/902789796；Overlay/Status 测试 |
 | Pack 中心/CCOS/Pack zip 更新 | pass（工程面） | 1dc695125/4d816f3c5/6c30f241e |
-| JVM 测试 | pass | 276/276（含 Robolectric/Compose/Paparazzi） |
+| JVM 测试 | pass | 278/278（含 Robolectric/Compose/Paparazzi） |
 | 自适应/9 组尺寸语义矩阵 | pass（语义层） | ShellNavigation/ShellSizeMatrix 测试 |
 | i18n/主题切换（全部屏主要文案） | partial | values-en + 资源化；我的支持 zh/en/system + 动态取色；少量错误/技术提示仍内联（OPEN-I18N-BODY 尾项） |
 | 像素截图矩阵 | pass（本机） | Paparazzi 10 张基线（360/700/900 × 640/800/900/1000），testDebugUnitTest verify |
@@ -22,7 +22,7 @@
 | 草稿→项目 | partial | 草稿可创建项目壳并把草稿 JSON 作为 authoring 来源副本；导入内容尚未映射进协议字段（OPEN-DRAFT-PROJECT 收窄） |
 | app/gates v0.02 UX 检查 | pass | 7/7 gate PASS、FAIL=0；GATES/SELF_AUDIT 已更新（本提交） |
 
-**收口实测（2026-11-16 更新）**：app/gates 7/7 PASS、FAIL=0；verify.sh --checks-only PASS=107 WARN=2 FAIL=0；JVM 276/276；APK 19,049,108 B sha256 8c90e798…；Release unsigned 15,249,217 B sha256 419c891d…（16KB 对齐通过）。
+**收口实测（2026-11-16 更新）**：app/gates 7/7 PASS、FAIL=0；verify.sh --checks-only PASS=107 WARN=2 FAIL=0；JVM 278/278；APK 19,049,108 B sha256 06d3b8f5…；Release unsigned 15,265,601 B sha256 145f3cb1…（16KB 对齐通过）。
 
 **发布面：仍为 OPEN-EXTERNAL**（签名/公证/真机矩阵/Play 数据安全），不得据此宣称可发布。
 
@@ -33,7 +33,7 @@
 - APP 门禁 `python app/gates/run_gates.py` → **7/7 门 FAIL=0**（QA0–QA6 全部 PASS；无 OPEN 阻塞），`P0=0`；
 - 自审计 S0–S15 → **covered 14 / gap 0 / open 2**，全部 open 带 owner+next（P1=2）；
 - 核心 `cargo test` **186 passed / 0 failed**；控制面 + 契约 + 安全 + golden + E2E：**pytest 490 passed / 0 failed / 0 skipped / 0 xfailed（127s）**；
-- 构建实测：Android debug APK 19,049,108 B、Release unsigned 15,249,217 B（16KB 对齐通过）；Windows MSI 为历史证据（66,573,406 B）。
+- 构建实测：Android debug APK 19,049,108 B、Release unsigned 15,265,601 B（16KB 对齐通过）；Windows MSI 为历史证据（66,573,406 B）。
 - 导出面：**md/zip/json/docx/skill 已实现**（core）；Android 另接 **EPUB/PDF/HTML 本地导出**（PDF 为基础文本、EPUB 轻量 EPUB3、HTML 单文件），并各自带结构自检；复杂排版/EPUBCheck 级语义仍 OPEN。
 
 **发布面：未完成（OPEN-EXTERNAL）**——签名/公证/真机矩阵/Play 数据安全未执行，不得宣称「可发布」。

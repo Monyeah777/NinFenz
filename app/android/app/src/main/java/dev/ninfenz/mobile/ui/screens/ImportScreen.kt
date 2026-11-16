@@ -42,6 +42,7 @@ import dev.ninfenz.mobile.core.CoreResponse
 import dev.ninfenz.mobile.core.J
 import dev.ninfenz.mobile.data.DraftLibrary
 import dev.ninfenz.mobile.data.PackEntry
+import dev.ninfenz.mobile.data.HtmlImporter
 import dev.ninfenz.mobile.data.ProjectPackageImporter
 import dev.ninfenz.mobile.data.TextEncoding
 import dev.ninfenz.mobile.data.ShareQueueStore
@@ -154,9 +155,18 @@ fun ImportScreen(
         savedName = null
         suggestNote = null
         acceptedMappings = emptySet()
-        val isText = name.endsWith(".txt", true) || name.endsWith(".md", true) ||
-            name.endsWith(".markdown", true) || mime?.startsWith("text/") == true
-        val sourceFile = if (isText) TextEncoding.toUtf8(file) ?: file else file
+        val isHtml = name.endsWith(".html", true) || name.endsWith(".htm", true) || mime == "text/html"
+        val isText = !isHtml && (name.endsWith(".txt", true) || name.endsWith(".md", true) ||
+            name.endsWith(".markdown", true) || mime?.startsWith("text/") == true)
+        val sourceFile = when {
+            isHtml -> {
+                val raw = TextEncoding.decode(file.readBytes())?.text ?: file.readText(Charsets.UTF_8)
+                val markdown = HtmlImporter.toMarkdown(raw)
+                File(file.parentFile, "html-import.md").apply { writeText(markdown, Charsets.UTF_8) }
+            }
+            isText -> TextEncoding.toUtf8(file) ?: file
+            else -> file
+        }
         val payload = buildJsonObject {
             put("file", sourceFile.absolutePath)
             put("source", buildJsonObject {
