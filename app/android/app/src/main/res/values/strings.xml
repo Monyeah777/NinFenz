@@ -481,6 +481,12 @@
     <string name="project_detail_duplicate">复制项目</string>
     <string name="project_detail_diff">对比项目</string>
     <string name="project_detail_rename">重命名</string>
+    <string name="project_detail_review">评审</string>
+    <string name="project_review_current">当前评审：%1$s</string>
+    <string name="project_review_reviewer">评审人</string>
+    <string name="project_review_note">评审意见</string>
+    <string name="project_review_approve">通过</string>
+    <string name="project_review_reject">驳回</string>
     <string name="project_detail_rename_label">项目标题</string>
     <string name="project_detail_rename_confirm">保存</string>
     <string name="project_diff_same">两个项目状态/引用/评审/历史一致</string>

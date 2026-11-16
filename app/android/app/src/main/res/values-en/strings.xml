@@ -481,6 +481,12 @@
     <string name="project_detail_duplicate">Duplicate project</string>
     <string name="project_detail_diff">Compare project</string>
     <string name="project_detail_rename">Rename</string>
+    <string name="project_detail_review">Review</string>
+    <string name="project_review_current">Current review: %1$s</string>
+    <string name="project_review_reviewer">Reviewer</string>
+    <string name="project_review_note">Review note</string>
+    <string name="project_review_approve">Approve</string>
+    <string name="project_review_reject">Reject</string>
     <string name="project_detail_rename_label">Project title</string>
     <string name="project_detail_rename_confirm">Save</string>
     <string name="project_diff_same">Projects match on state/refs/review/history</string>

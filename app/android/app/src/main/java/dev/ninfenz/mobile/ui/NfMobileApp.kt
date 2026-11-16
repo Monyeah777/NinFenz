@@ -66,6 +66,7 @@ import dev.ninfenz.mobile.data.ProjectCreator
 import dev.ninfenz.mobile.data.ProjectArchiver
 import dev.ninfenz.mobile.data.ProjectDuplicator
 import dev.ninfenz.mobile.data.ProjectRenamer
+import dev.ninfenz.mobile.data.ProjectReviewStore
 import dev.ninfenz.mobile.data.ProjectEntry
 import dev.ninfenz.mobile.data.SampleSeeder
 import dev.ninfenz.mobile.data.SeedResult
@@ -459,6 +460,15 @@ is Detail.Import -> ImportScreen(
                                 onAuthor = { shell = shell.open(Detail.Author(entry.project.id)) },
                                 onAssembly = { shell = shell.open(Detail.Delivery(entry.project.id)) },
                                 compareCandidates = projects,
+                                onReview = { approve, reviewer, note ->
+                                    scope.launch {
+                                        when (val result = ProjectReviewStore(context.filesDir).review(entry.project, approve, reviewer, note)) {
+                                            is dev.ninfenz.mobile.data.ReviewResult.Reviewed -> refresh()
+                                            is dev.ninfenz.mobile.data.ReviewResult.Failure ->
+                                                android.widget.Toast.makeText(context, result.message, android.widget.Toast.LENGTH_LONG).show()
+                                        }
+                                    }
+                                },
                                 onRename = { title ->
                                     scope.launch {
                                         withContext(Dispatchers.IO) { ProjectRenamer.rename(entry.file, title) }

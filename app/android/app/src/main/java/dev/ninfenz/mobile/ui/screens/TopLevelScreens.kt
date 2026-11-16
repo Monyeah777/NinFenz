@@ -593,6 +593,7 @@ fun ProjectDetailScreen(
     onDuplicate: () -> Unit = {},
     onArchive: () -> Unit = {},
     onRename: (String) -> Unit = {},
+    onReview: (Boolean, String, String) -> Unit = { _, _, _ -> },
     compareCandidates: List<ProjectEntry> = emptyList()
 ) {
     val context = LocalContext.current
@@ -604,6 +605,9 @@ fun ProjectDetailScreen(
     var compareQuery by remember { mutableStateOf("") }
     var showRename by remember { mutableStateOf(false) }
     var renameText by remember(project.title) { mutableStateOf(project.title) }
+    var showReview by remember { mutableStateOf(false) }
+    var reviewer by remember { mutableStateOf("") }
+    var reviewNote by remember { mutableStateOf("") }
     val diffPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: android.net.Uri? ->
         if (uri != null) {
             diffScope.launch {
@@ -667,6 +671,9 @@ fun ProjectDetailScreen(
                             renameText = project.title
                             showRename = true
                         }) { Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_rename)) }
+                        TextButton(onClick = { showReview = true }) {
+                            Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_review))
+                        }
                     }
                 }
             }
@@ -703,6 +710,47 @@ fun ProjectDetailScreen(
             item { NfListRow(stringResource(dev.ninfenz.mobile.R.string.project_detail_author), stringResource(dev.ninfenz.mobile.R.string.project_detail_author_subtitle), Icons.Filled.Edit, "›", onAuthor) }
             item { NfListRow(stringResource(dev.ninfenz.mobile.R.string.project_detail_delivery), stringResource(dev.ninfenz.mobile.R.string.project_detail_delivery_subtitle), Icons.Filled.Info, "›", onAssembly) }
         }
+    }
+
+    if (showReview) {
+        AlertDialog(
+            onDismissRequest = { showReview = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_review)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+                    Text(stringResource(dev.ninfenz.mobile.R.string.project_review_current, project.review.state), style = MaterialTheme.typography.bodySmall)
+                    OutlinedTextField(
+                        value = reviewer,
+                        onValueChange = { reviewer = it },
+                        singleLine = true,
+                        label = { Text(stringResource(dev.ninfenz.mobile.R.string.project_review_reviewer)) }
+                    )
+                    OutlinedTextField(
+                        value = reviewNote,
+                        onValueChange = { reviewNote = it },
+                        label = { Text(stringResource(dev.ninfenz.mobile.R.string.project_review_note)) }
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    enabled = reviewer.isNotBlank() && reviewNote.isNotBlank(),
+                    onClick = {
+                        showReview = false
+                        onReview(true, reviewer, reviewNote)
+                    }
+                ) { Text(stringResource(dev.ninfenz.mobile.R.string.project_review_approve)) }
+            },
+            dismissButton = {
+                TextButton(
+                    enabled = reviewer.isNotBlank() && reviewNote.isNotBlank(),
+                    onClick = {
+                        showReview = false
+                        onReview(false, reviewer, reviewNote)
+                    }
+                ) { Text(stringResource(dev.ninfenz.mobile.R.string.project_review_reject)) }
+            }
+        )
     }
 
     if (showRename) {
