@@ -93,6 +93,7 @@ object HtmlExporter {
 
     private fun inline(s: String): String {
         var text = esc(s)
+        text = Regex("\u0060([^\u0060]+)\u0060").replace(text, "<code>$1</code>")
         text = Regex("\\*\\*([^*]+)\\*\\*").replace(text, "<strong>$1</strong>")
         text = Regex("\\*([^*]+)\\*").replace(text, "<em>$1</em>")
         text = Regex("\\[([^\\]]+)\\]\\(([^)]+)\\)").replace(text) { match ->

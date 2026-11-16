@@ -36,6 +36,13 @@ class HtmlExporterTest {
     }
 
     @Test
+    fun rendersInlineCode() {
+        val dir = Files.createTempDirectory("nf-html-code").toFile()
+        val created = HtmlExporter.export("使用 `nf` 命令", "t", dir)
+        assertTrue(created.file.readText().contains("<code>nf</code>"))
+    }
+
+    @Test
     fun handlesCodeFence() {
         val dir = Files.createTempDirectory("nf-html-2").toFile()
         val created = HtmlExporter.export("\u0060\u0060\u0060\ncode\n\u0060\u0060\u0060", "t", dir)
