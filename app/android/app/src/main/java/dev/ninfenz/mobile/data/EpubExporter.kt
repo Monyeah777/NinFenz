@@ -71,8 +71,12 @@ object EpubExporter {
         val out = StringBuilder()
         var inCode = false
         var inList = false
+        var inQuote = false
         val code = StringBuilder()
         val table = mutableListOf<List<String>>()
+        fun closeQuote() {
+            if (inQuote) { out.append("</blockquote>"); inQuote = false }
+        }
         fun flushTable() {
             if (table.isEmpty()) return
             out.append("<table>")
@@ -103,10 +107,19 @@ object EpubExporter {
             if (line.isBlank()) {
                 if (inList) { out.append("</ul>\n"); inList = false }
                 flushTable()
+                closeQuote()
                 return@forEach
             }
             val trimmed = line.trim()
+            if (trimmed.startsWith("> ")) {
+                flushTable()
+                if (inList) { out.append("</ul>\n"); inList = false }
+                if (!inQuote) { out.append("<blockquote>"); inQuote = true }
+                out.append("<p>").append(inline(trimmed.removePrefix("> "))).append("</p>")
+                return@forEach
+            }
             if (trimmed.startsWith("|") && trimmed.endsWith("|")) {
+                closeQuote()
                 if (inList) { out.append("</ul>\n"); inList = false }
                 val cells = trimmed.trim('|').split('|').map { it.trim() }
                 val separator = cells.isNotEmpty() && cells.all { Regex("^:?-{2,}:?$").matches(it) }
@@ -115,6 +128,7 @@ object EpubExporter {
             }
             if (Regex("^-{3,}$").matches(trimmed)) {
                 flushTable()
+                closeQuote()
                 if (inList) { out.append("</ul>\n"); inList = false }
                 out.append("<hr/>")
                 return@forEach
@@ -122,6 +136,7 @@ object EpubExporter {
             val heading = Regex("^(#{1,6})\\s+(.+)$").find(line)
             if (heading != null) {
                 flushTable()
+                closeQuote()
                 if (inList) { out.append("</ul>\n"); inList = false }
                 val level = heading.groupValues[1].length
                 out.append("<h").append(level).append(">").append(inline(heading.groupValues[2]))
@@ -130,15 +145,18 @@ object EpubExporter {
             }
             if (line.trimStart().startsWith("- ")) {
                 flushTable()
+                closeQuote()
                 if (!inList) { out.append("<ul>\n"); inList = true }
                 out.append("<li>").append(inline(line.trimStart().removePrefix("- "))).append("</li>\n")
                 return@forEach
             }
             if (inList) { out.append("</ul>\n"); inList = false }
             flushTable()
+            closeQuote()
             out.append("<p>").append(inline(line)).append("</p>\n")
         }
         flushTable()
+        closeQuote()
         if (inList) out.append("</ul>\n")
         if (inCode && code.isNotEmpty()) out.append("<pre><code>").append(esc(code.toString().trimEnd())).append("</code></pre>\n")
         return out.toString()

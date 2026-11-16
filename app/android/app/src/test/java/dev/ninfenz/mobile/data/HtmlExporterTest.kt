@@ -50,6 +50,13 @@ class HtmlExporterTest {
     }
 
     @Test
+    fun rendersBlockquote() {
+        val dir = Files.createTempDirectory("nf-html-quote").toFile()
+        val created = HtmlExporter.export("> 引用\n\n正文", "t", dir)
+        assertTrue(created.file.readText().contains("<blockquote><p>引用</p></blockquote>"))
+    }
+
+    @Test
     fun handlesCodeFence() {
         val dir = Files.createTempDirectory("nf-html-2").toFile()
         val created = HtmlExporter.export("\u0060\u0060\u0060\ncode\n\u0060\u0060\u0060", "t", dir)

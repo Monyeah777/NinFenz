@@ -62,6 +62,16 @@ class EpubExporterTest {
     }
 
     @Test
+    fun rendersBlockquote() {
+        val dir = Files.createTempDirectory("nf-epub-quote").toFile()
+        val created = EpubExporter.export("# 章\n\n> 引用", "章", dir)
+        ZipFile(created.file).use { zip ->
+            val chapter = zip.getInputStream(zip.getEntry("OEBPS/chapter-001.xhtml")).bufferedReader().readText()
+            assertTrue(chapter.contains("<blockquote><p>引用</p></blockquote>"))
+        }
+    }
+
+    @Test
     fun noHeadingFallsBackToSingleChapter() {
         assertEquals(1, EpubExporter.chapters("只有一段正文").size)
         assertEquals("正文", EpubExporter.chapters("只有一段正文").first().title)
