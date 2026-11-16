@@ -452,6 +452,7 @@
     <string name="settings_backup_restore_title">Restore backup</string>
     <string name="settings_backup_restore_warning">Restore %1$d files and overwrite projects/drafts with the same names; this cannot be undone.</string>
     <string name="settings_backup_restore_confirm">Restore</string>
+    <string name="settings_restoring">Restoring…</string>
     <string name="settings_backup_restored">Restored %1$d files; pre-restore snapshot: %2$s</string>
     <string name="settings_backup_restore_one">Restore this backup</string>
     <string name="settings_backup_all">All backups (%1$d)</string>

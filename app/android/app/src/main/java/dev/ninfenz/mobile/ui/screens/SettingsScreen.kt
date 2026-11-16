@@ -10,12 +10,15 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.OutlinedButton
@@ -63,6 +66,7 @@ fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
     var backups by remember { mutableStateOf(BackupService.list(context.filesDir)) }
     var showAllBackups by remember { mutableStateOf(false) }
     var pendingDeleteBackup by remember { mutableStateOf<File?>(null) }
+    var restoring by remember { mutableStateOf(false) }
     var pendingRestore by remember { mutableStateOf<File?>(null) }
     var restoreEntries by remember { mutableStateOf(0) }
     var lastSnapshot by remember { mutableStateOf(BackupRestoreService.lastSnapshot(context.filesDir)) }
@@ -298,10 +302,21 @@ fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
         AlertDialog(
             onDismissRequest = { pendingRestore = null },
             title = { Text(stringResource(dev.ninfenz.mobile.R.string.settings_backup_restore_title)) },
-            text = { Text(stringResource(dev.ninfenz.mobile.R.string.settings_backup_restore_warning, restoreEntries)) },
+            text = {
+                Column {
+                    Text(stringResource(dev.ninfenz.mobile.R.string.settings_backup_restore_warning, restoreEntries))
+                    if (restoring) {
+                        LinearProgressIndicator(modifier = Modifier.padding(top = 12.dp))
+                    }
+                }
+            },
             confirmButton = {
-                TextButton(onClick = {
+                TextButton(
+                    enabled = !restoring,
+                    onClick = {
+                    restoring = true
                     scope.launch {
+                        try {
                         val result = withContext(Dispatchers.IO) {
                             runCatching { BackupRestoreService.restore(file, context.filesDir) }
                         }
@@ -328,11 +343,14 @@ fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
                         }
                         backups = BackupService.list(context.filesDir)
                         pendingRestore = null
+                        } finally {
+                            restoring = false
+                        }
                     }
-                }) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_backup_restore_confirm)) }
+                }) { Text(stringResource(if (restoring) dev.ninfenz.mobile.R.string.settings_restoring else dev.ninfenz.mobile.R.string.settings_backup_restore_confirm)) }
             },
             dismissButton = {
-                TextButton(onClick = { pendingRestore = null }) { Text(stringResource(android.R.string.cancel)) }
+                TextButton(enabled = !restoring, onClick = { pendingRestore = null }) { Text(stringResource(android.R.string.cancel)) }
             }
         )
     }

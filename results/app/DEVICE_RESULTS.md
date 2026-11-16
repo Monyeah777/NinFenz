@@ -17,6 +17,7 @@
 | L1 校验 | pass：L1 pass（error=0 warn=0 info=3）；状态 assembled→validated 写回 | run-as 读项目 |
 | 导出 md/zip | pass：files/exports/delivery/result.md + result.zip + manifest；状态 validated→exported 写回 | run-as 读文件 |
 | 桌面快捷方式（构建） | pass（构建）：静态 shortcuts（导入/新建/搜索）+ MainActivity 冷启动/onNewIntent 路由；未真机长按图标验证（adb 无设备） |
+| 恢复中进度/防重复（JVM） | pass（本机）：恢复确认后按钮/取消禁用并显示进度条，完成/失败复位；真机未复测（adb 无设备） |
 | 评审摘要/前置校验（JVM） | pass（本机）：项目卡显示 review 状态+评审人；未 validated/exported/reviewed 时禁用通过并提示；真机未复测（adb 无设备） |
 | Lint KTX 收尾（JVM） | pass（本机）：Uri.parse 改 androidx.core.net.toUri；warnings 24→23；lint/232 tests 通过。真机未复测（adb 无设备） |
 | Lint 未使用资源清理（JVM） | pass（本机）：删除 14 个确认未使用字符串（中英各一份），warnings 39→24；lint/232 tests 通过。真机未复测（adb 无设备） |
