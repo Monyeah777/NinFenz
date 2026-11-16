@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.core.CoreError
 import dev.ninfenz.mobile.core.CoreResponse
 import dev.ninfenz.mobile.data.FileAccess
+import dev.ninfenz.mobile.data.ImportHistoryStore
 import dev.ninfenz.mobile.data.LibraryStore
 import dev.ninfenz.mobile.model.ImportDoc
 import dev.ninfenz.mobile.model.ImportModel
@@ -76,6 +77,7 @@ fun ImportScreen(
     var prefillNote by remember { mutableStateOf<String?>(null) }
     var acceptedMappings by remember { mutableStateOf<Set<Int>>(emptySet()) }
     var suggestNote by remember { mutableStateOf<String?>(null) }
+    val importHistory = remember { ImportHistoryStore(context.filesDir) }
 
     suspend fun importFromFile(file: File, sourceKind: String, name: String, mime: String?, size: Long) {
         busy = true
@@ -103,6 +105,14 @@ fun ImportScreen(
             } else {
                 try {
                     val imported = ImportModel.parse(obj)
+                    val digest = imported.source.sha256 ?: imported.textDigest
+                    if (!digest.isNullOrBlank()) {
+                        val previous = importHistory.find(digest)
+                        if (previous != null) {
+                            notice = context.getString(dev.ninfenz.mobile.R.string.import_duplicate_notice, previous.name, digest.take(12))
+                        }
+                        importHistory.record(digest, imported.source.name)
+                    }
                     rawResult = obj
                     doc = imported
                     acceptedMappings = imported.mappings.indices.filter { imported.mappings[it].confidence >= 80 }.toSet()
