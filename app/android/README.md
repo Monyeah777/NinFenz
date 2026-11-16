@@ -181,7 +181,7 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 - 真机 smoke：连接并授权后运行 `bash app/scripts/device_smoke.sh`（安装 debug APK、冷启动、前台 Activity、最近崩溃日志）；设 `CAPTURE_DIR=…` 额外拉取 `home.png` 与 `ui.xml`。
 
 - 2026-11-16 当前：`./gradlew :app:assembleDebug` 成功：app-debug.apk = 19,049,108 bytes，
-  sha256 = 00318b84c27551aea1d80e19ba13f8a0421629451f841ce5a98c3751d594c03a（含双 ABI 原生库 + 9 个示例 Pack assets）。
+  sha256 = 46a60e2554435f00336d2b20e526e750cf6c4329706f1e03435a6fc11739cb48（含双 ABI 原生库 + 9 个示例 Pack assets）。
 - 仓库级门禁在 UTF-8 locale 下运行：`LANG=C.UTF-8 PYTHONUTF8=1 bash verify.sh --checks-only`（GBK 控制台会让 `git ls-files` 解码失败，触发 modeling 检查异常）。
 - `./gradlew :app:testDebugUnitTest` 全绿：318 条 JVM 单测（v1 42 + v0.02 276；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y/大字号/对比度/Paparazzi 截图）。
 - `zipalign -c -P 16 -v 4 app-debug.apk` → Verification successful（native lib 16KB page 对齐）。

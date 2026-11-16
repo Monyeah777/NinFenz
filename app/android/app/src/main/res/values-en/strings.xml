@@ -16,6 +16,14 @@
     <string name="nav_create">Create</string>
     <string name="nav_deliver">Deliver</string>
     <string name="nav_me">Me</string>
+    <string name="screen_home">Home</string>
+    <string name="screen_import">Import</string>
+    <string name="screen_protocol">Protocol</string>
+    <string name="screen_graph">Pipeline</string>
+    <string name="screen_assembly">Assembly</string>
+    <string name="screen_pack_update">Pack update</string>
+    <string name="screen_ccos">CCOS</string>
+    <string name="screen_settings">Settings</string>
 
     <string name="action_back">Back</string>
     <string name="action_search">Search</string>

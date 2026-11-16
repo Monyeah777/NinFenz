@@ -16,6 +16,14 @@
     <string name="nav_create">创作</string>
     <string name="nav_deliver">交付</string>
     <string name="nav_me">我的</string>
+    <string name="screen_home">首页</string>
+    <string name="screen_import">导入</string>
+    <string name="screen_protocol">协议</string>
+    <string name="screen_graph">管线</string>
+    <string name="screen_assembly">装配</string>
+    <string name="screen_pack_update">Pack 更新</string>
+    <string name="screen_ccos">CCOS</string>
+    <string name="screen_settings">设置</string>
 
     <string name="action_back">返回</string>
     <string name="action_search">搜索</string>
