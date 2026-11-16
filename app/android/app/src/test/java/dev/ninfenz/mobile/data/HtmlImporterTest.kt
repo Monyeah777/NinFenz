@@ -35,6 +35,12 @@ class HtmlImporterTest {
     }
 
     @Test
+    fun convertsImages() {
+        val md = HtmlImporter.toMarkdown("<p><img src=\"a.png\" alt=\"图\"/></p>")
+        assertTrue(md.contains("![图](a.png)"))
+    }
+
+    @Test
     fun removesScriptAndStyle() {
         val md = HtmlImporter.toMarkdown("<style>x{}</style><script>alert(1)</script><p>正文</p>")
         assertTrue(md.contains("正文"))
