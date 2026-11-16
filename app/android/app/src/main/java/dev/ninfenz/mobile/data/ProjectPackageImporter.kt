@@ -58,13 +58,28 @@ object ProjectPackageImporter {
         val json = JsonObject(next)
         ProjectModel.parse(json) // fail-closed
         val target = File(projectsDir, id + ".nfproject.json")
-        AtomicFiles.writeText(target, json.toString())
         val dataDir = File(projectsDir, id)
-        data.forEach { (path, bytes) ->
-            val out = File(dataDir, path)
-            require(out.canonicalPath.startsWith(dataDir.canonicalPath + File.separator)) { "data 路径越界" }
-            out.parentFile?.mkdirs()
-            out.writeBytes(bytes)
+        val staging = File(projectsDir, ".import-" + id + "-" + System.nanoTime())
+        try {
+            data.forEach { (path, bytes) ->
+                val out = File(staging, path)
+                require(out.canonicalPath.startsWith(staging.canonicalPath + File.separator)) { "data 路径越界" }
+                out.parentFile?.mkdirs()
+                out.writeBytes(bytes)
+            }
+            if (staging.exists()) {
+                java.nio.file.Files.move(
+                    staging.toPath(),
+                    dataDir.toPath(),
+                    java.nio.file.StandardCopyOption.ATOMIC_MOVE
+                )
+            }
+            AtomicFiles.writeText(target, json.toString())
+        } catch (t: Throwable) {
+            staging.deleteRecursively()
+            dataDir.deleteRecursively()
+            target.delete()
+            throw t
         }
         val pack = source["refs"]?.let { refs ->
             (refs as? JsonObject)?.get("base_pack") as? JsonObject
