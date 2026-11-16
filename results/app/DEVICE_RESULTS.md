@@ -16,6 +16,7 @@
 | 装配 | pass：填 4 个槽位后 assemble 返回 markdown（开篇/正文/收束） | 截图 19 |
 | L1 校验 | pass：L1 pass（error=0 warn=0 info=3）；状态 assembled→validated 写回 | run-as 读项目 |
 | 导出 md/zip | pass：files/exports/delivery/result.md + result.zip + manifest；状态 validated→exported 写回 | run-as 读文件 |
+| 搜索历史（JVM） | pass（本机）：最近搜索最多 10 条、去重、最近优先；空查询显示 chips，可点击复用/清空；真机未复测（adb 无设备） |
 | Pack 原子安装（JVM） | pass（本机）：staging 全量 fsync → 旧版本 .old 备份 → rename → fsync 父目录；失败回滚；SampleSeeder 已接入。真机未复测（adb 无设备） |
 | 导入幂等提示（JVM） | pass（本机）：导入历史按 digest 记录最近 100 条；同内容再次导入显示「同一内容此前已导入：name（digest）」；不阻断用户。真机未复测（adb 无设备） |
 | 进程死亡路由恢复（JVM） | pass（本机）：ShellState 经 rememberSaveable + Codec 持久化四目的地/详情（项目/作者/交付/Pack id+version）；非法/缺失回退根；未做真机杀进程复测（adb 无设备） |

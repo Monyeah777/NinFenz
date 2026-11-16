@@ -433,4 +433,6 @@
     <string name="delivery_draft_restored">Restored previous slot draft</string>
     <string name="search_keyboard_hint">↑↓ select · Enter open · Esc clear</string>
     <string name="import_duplicate_notice">Same content imported before: %1$s (digest %2$s)</string>
+    <string name="search_history_title">Recent searches</string>
+    <string name="search_history_clear">Clear</string>
 </resources>

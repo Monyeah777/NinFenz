@@ -9,19 +9,24 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -36,6 +41,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.data.SearchHit
+import dev.ninfenz.mobile.data.SearchHistoryStore
 import dev.ninfenz.mobile.data.SearchIndex
 import dev.ninfenz.mobile.data.SearchKind
 import dev.ninfenz.mobile.model.SearchKeyboard
@@ -54,8 +60,10 @@ fun SearchScreen(
     val context = LocalContext.current
     val index = remember { SearchIndex(context.filesDir) }
     var all by remember { mutableStateOf<List<SearchHit>>(emptyList()) }
-    var query by remember { mutableStateOf("") }
+    var query by rememberSaveable { mutableStateOf("") }
     var selected by remember { mutableStateOf(0) }
+    val historyStore = remember { SearchHistoryStore(context.filesDir) }
+    var history by remember { mutableStateOf(historyStore.load()) }
     val focusRequester = remember { FocusRequester() }
     val listState = rememberLazyListState()
 
@@ -83,6 +91,8 @@ fun SearchScreen(
         out
     }
     fun openHit(hit: SearchHit) {
+        historyStore.record(query)
+        history = historyStore.load()
         when {
             hit.kind == SearchKind.PROJECT && hit.projectId != null -> onOpenProject(hit.projectId)
             hit.packId != null && hit.packVersion != null -> onOpenPack(hit.packId, hit.packVersion)
@@ -133,11 +143,11 @@ fun SearchScreen(
             )
         }
         when {
-            query.isBlank() -> Text(
-                stringResource(dev.ninfenz.mobile.R.string.search_hint, all.size),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(NfSpacing.page)
+            query.isBlank() -> SearchHistoryPanel(
+                history = history,
+                total = all.size,
+                onPick = { query = it },
+                onClear = { historyStore.clear(); history = emptyList() }
             )
             results.isEmpty() -> Text(
                 stringResource(dev.ninfenz.mobile.R.string.search_no_result),
@@ -178,6 +188,38 @@ private fun kindLabel(kind: SearchKind): String = when (kind) {
     SearchKind.NODE -> stringResource(dev.ninfenz.mobile.R.string.search_kind_node)
     SearchKind.SECTION -> stringResource(dev.ninfenz.mobile.R.string.search_kind_section)
     SearchKind.SLOT -> stringResource(dev.ninfenz.mobile.R.string.search_kind_slot)
+}
+
+
+@Composable
+private fun SearchHistoryPanel(
+    history: List<String>,
+    total: Int,
+    onPick: (String) -> Unit,
+    onClear: () -> Unit
+) {
+    Column(modifier = Modifier.fillMaxWidth().padding(NfSpacing.page)) {
+        Text(
+            stringResource(dev.ninfenz.mobile.R.string.search_hint, total),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        if (history.isNotEmpty()) {
+            androidx.compose.foundation.layout.Row(
+                modifier = Modifier.fillMaxWidth().padding(top = NfSpacing.m),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+            ) {
+                Text(stringResource(dev.ninfenz.mobile.R.string.search_history_title), style = MaterialTheme.typography.titleMedium)
+                TextButton(onClick = onClear) { Text(stringResource(dev.ninfenz.mobile.R.string.search_history_clear)) }
+            }
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                items(history) { q ->
+                    FilterChip(selected = false, onClick = { onPick(q) }, label = { Text(q) })
+                }
+            }
+        }
+    }
 }
 
 @Composable
