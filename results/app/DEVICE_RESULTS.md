@@ -16,6 +16,7 @@
 | 装配 | pass：填 4 个槽位后 assemble 返回 markdown（开篇/正文/收束） | 截图 19 |
 | L1 校验 | pass：L1 pass（error=0 warn=0 info=3）；状态 assembled→validated 写回 | run-as 读项目 |
 | 导出 md/zip | pass：files/exports/delivery/result.md + result.zip + manifest；状态 validated→exported 写回 | run-as 读文件 |
+| 命令最近使用排序（JVM） | pass（本机）：命令执行记录最近 5 个 id；命令面板最近使用前置；测试 5 条。真机未复测（adb 无设备） |
 | Ctrl/Cmd+K 命令快捷键（JVM） | pass（本机）：MainActivity 捕获 Ctrl/Cmd+K → CommandBus → 打开命令面板；真机键盘未复测（adb 无设备） |
 | 导出产物校验（JVM） | pass（本机）：导出后校验文件存在、manifest bytes/sha256 一致；交付页显示通过/失败原因；测试覆盖缺文件/错字节/错摘要。真机未复测（adb 无设备） |
 | 命令面板（JVM） | pass（本机）：库页顶栏「命令」打开对话框；搜索导入/新建/搜索/Pack 中心/更新/CCOS/设置/错误码；空结果提示；命令过滤纯逻辑测试。真机未复测（adb 无设备） |

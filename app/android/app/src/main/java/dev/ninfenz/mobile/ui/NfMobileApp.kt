@@ -56,6 +56,7 @@ import dev.ninfenz.mobile.model.CommandPalette
 import androidx.compose.ui.platform.LocalContext
 import dev.ninfenz.mobile.core.Core
 import dev.ninfenz.mobile.data.AppPrefs
+import dev.ninfenz.mobile.data.CommandHistoryStore
 import dev.ninfenz.mobile.data.LibraryStore
 import dev.ninfenz.mobile.data.PackEntry
 import dev.ninfenz.mobile.data.PackSnapshot
@@ -124,6 +125,8 @@ fun NfMobileApp(
     val packStore = remember { PackStore(context.filesDir) }
     val seeder = remember { SampleSeeder(context, context.filesDir, prefs) }
     val projectCreator = remember { ProjectCreator(context.filesDir) }
+    val commandHistory = remember { CommandHistoryStore(context.filesDir) }
+    var recentCommands by remember { mutableStateOf(commandHistory.load()) }
 
     var shell by rememberSaveable(stateSaver = ShellStateSaver) { mutableStateOf(ShellState()) }
     var packs by remember { mutableStateOf<PackSnapshot>(PackSnapshot(emptyList(), emptyList())) }
@@ -175,6 +178,8 @@ fun NfMobileApp(
 
     fun runCommand(id: String) {
         showCommands = false
+        commandHistory.record(id)
+        recentCommands = commandHistory.load()
         when (id) {
             "import" -> shell = shell.open(Detail.Import)
             "new_project" -> shell = shell.open(Detail.NewProject)
@@ -492,7 +497,7 @@ is Detail.Import -> ImportScreen(
             CommandPalette.Item("settings", stringResource(dev.ninfenz.mobile.R.string.settings_title)),
             CommandPalette.Item("error_codes", stringResource(dev.ninfenz.mobile.R.string.error_codes_title))
         )
-        CommandPaletteDialog(items, onDismiss = { showCommands = false }, onRun = ::runCommand)
+        CommandPaletteDialog(CommandPalette.order(items, recentCommands), onDismiss = { showCommands = false }, onRun = ::runCommand)
     }
 }
 

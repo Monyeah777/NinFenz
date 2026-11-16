@@ -22,4 +22,10 @@ class CommandPaletteTest {
         assertEquals(listOf("search"), CommandPalette.filter(items, "SEARCH").map { it.id })
         assertEquals(0, CommandPalette.filter(items, "不存在").size)
     }
+
+    @Test
+    fun ordersRecentFirstThenOriginalOrder() {
+        val ordered = CommandPalette.order(items, listOf("settings", "import"))
+        assertEquals(listOf("settings", "import", "search"), ordered.map { it.id })
+    }
 }

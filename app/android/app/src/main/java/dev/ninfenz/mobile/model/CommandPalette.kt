@@ -9,4 +9,10 @@ object CommandPalette {
         if (q.isEmpty()) return items
         return items.filter { it.title.lowercase().contains(q) || it.id.lowercase().contains(q) }
     }
+
+    /** 最近使用项前置，其余保持原顺序。 */
+    fun order(items: List<Item>, recentIds: List<String>): List<Item> {
+        val rank = recentIds.withIndex().associate { (i, id) -> id to i }
+        return items.sortedBy { rank[it.id] ?: (recentIds.size + items.indexOf(it)) }
+    }
 }
