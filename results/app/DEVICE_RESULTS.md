@@ -17,6 +17,7 @@
 | L1 校验 | pass：L1 pass（error=0 warn=0 info=3）；状态 assembled→validated 写回 | run-as 读项目 |
 | 导出 md/zip | pass：files/exports/delivery/result.md + result.zip + manifest；状态 validated→exported 写回 | run-as 读文件 |
 | 桌面快捷方式（构建） | pass（构建）：静态 shortcuts（导入/新建/搜索）+ MainActivity 冷启动/onNewIntent 路由；未真机长按图标验证（adb 无设备） |
+| 备份管理对话框（JVM） | pass（本机）：设置「全部备份」列出所有备份，可恢复或经确认删除；删除后刷新统计；真机未复测（adb 无设备） |
 | 备份列表恢复（JVM） | pass（本机）：设置存储卡列出最近 3 个备份（名称/大小），可一键校验并走确认恢复；真机未复测（adb 无设备） |
 | 备份清理（JVM） | pass（本机）：设置→清理旧备份保留最近 5 个，删除更早 zip；快照指针失效自动忽略；测试 3 条。真机未复测（adb 无设备） |
 | 存储面板补齐 Pack/归档（JVM） | pass（本机）：StorageStats 增加 library/packs 与 projects-archive，合计覆盖全部本地数据；测试补断言。真机未复测（adb 无设备） |

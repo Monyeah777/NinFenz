@@ -467,6 +467,11 @@
     <string name="settings_backup_restore_confirm">确认恢复</string>
     <string name="settings_backup_restored">已恢复 %1$d 个文件；恢复前快照：%2$s</string>
     <string name="settings_backup_restore_one">恢复此备份</string>
+    <string name="settings_backup_all">全部备份（%1$d）</string>
+    <string name="settings_backup_delete">删除</string>
+    <string name="settings_backup_delete_title">删除备份</string>
+    <string name="settings_backup_delete_body">确定删除 %1$s？此操作不可撤销。</string>
+    <string name="settings_backup_deleted">删除备份：%1$s</string>
     <string name="settings_backup_rollback">回滚上次恢复</string>
     <string name="settings_backup_prune">清理旧备份（保留 5 个）</string>
     <string name="settings_backup_pruned">已清理 %1$d 个旧备份</string>

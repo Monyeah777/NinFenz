@@ -467,6 +467,11 @@
     <string name="settings_backup_restore_confirm">Restore</string>
     <string name="settings_backup_restored">Restored %1$d files; pre-restore snapshot: %2$s</string>
     <string name="settings_backup_restore_one">Restore this backup</string>
+    <string name="settings_backup_all">All backups (%1$d)</string>
+    <string name="settings_backup_delete">Delete</string>
+    <string name="settings_backup_delete_title">Delete backup</string>
+    <string name="settings_backup_delete_body">Delete %1$s? This cannot be undone.</string>
+    <string name="settings_backup_deleted">Backup deleted: %1$s</string>
     <string name="settings_backup_rollback">Roll back last restore</string>
     <string name="settings_backup_prune">Prune old backups (keep 5)</string>
     <string name="settings_backup_pruned">Removed %1$d old backups</string>

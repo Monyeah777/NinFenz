@@ -6,7 +6,10 @@ import android.net.Uri
 import android.content.Context
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.Modifier
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -53,6 +56,8 @@ fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
     var cleaned by remember { mutableStateOf<String?>(null) }
     var backupMessage by remember { mutableStateOf<String?>(null) }
     var backups by remember { mutableStateOf(BackupService.list(context.filesDir)) }
+    var showAllBackups by remember { mutableStateOf(false) }
+    var pendingDeleteBackup by remember { mutableStateOf<File?>(null) }
     var pendingRestore by remember { mutableStateOf<File?>(null) }
     var restoreEntries by remember { mutableStateOf(0) }
     var lastSnapshot by remember { mutableStateOf(BackupRestoreService.lastSnapshot(context.filesDir)) }
@@ -140,6 +145,11 @@ fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
                 stats = StorageStats.scan(context.filesDir, context.cacheDir)
                 cleaned = context.getString(dev.ninfenz.mobile.R.string.settings_backup_pruned, removed)
             }) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_backup_prune)) }
+            if (backups.size > 3) {
+                OutlinedButton(onClick = { showAllBackups = true }) {
+                    Text(stringResource(dev.ninfenz.mobile.R.string.settings_backup_all, backups.size))
+                }
+            }
             backups.take(3).forEach { backup ->
                 Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
                     Text(
@@ -211,6 +221,65 @@ fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
                 }) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_crash_clear)) }
             }
         }
+    }
+
+    if (showAllBackups) {
+        AlertDialog(
+            onDismissRequest = { showAllBackups = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.settings_backup_all, backups.size)) },
+            text = {
+                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                    backups.forEach { backup ->
+                        Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                            Text(
+                                backup.name + " · " + humanBytes(backup.length()),
+                                style = MaterialTheme.typography.bodySmall,
+                                modifier = Modifier.weight(1f)
+                            )
+                            TextButton(onClick = {
+                                showAllBackups = false
+                                scope.launch {
+                                    val checked = withContext(Dispatchers.IO) { BackupRestoreService.inspect(backup) }
+                                    if (!checked.ok) {
+                                        backupMessage = "备份校验失败：" + (checked.error ?: "未知原因")
+                                    } else {
+                                        pendingRestore = backup
+                                        restoreEntries = checked.entries.size
+                                    }
+                                }
+                            }) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_backup_restore_one)) }
+                            TextButton(onClick = {
+                                showAllBackups = false
+                                pendingDeleteBackup = backup
+                            }) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_backup_delete)) }
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showAllBackups = false }) { Text(stringResource(dev.ninfenz.mobile.R.string.action_close)) }
+            }
+        )
+    }
+
+    pendingDeleteBackup?.let { backup ->
+        AlertDialog(
+            onDismissRequest = { pendingDeleteBackup = null },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.settings_backup_delete_title)) },
+            text = { Text(stringResource(dev.ninfenz.mobile.R.string.settings_backup_delete_body, backup.name)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    val ok = backup.delete()
+                    pendingDeleteBackup = null
+                    backups = BackupService.list(context.filesDir)
+                    stats = StorageStats.scan(context.filesDir, context.cacheDir)
+                    backupMessage = context.getString(dev.ninfenz.mobile.R.string.settings_backup_deleted, ok)
+                }) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_backup_delete)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { pendingDeleteBackup = null }) { Text(stringResource(android.R.string.cancel)) }
+            }
+        )
     }
 
     pendingRestore?.let { file ->
