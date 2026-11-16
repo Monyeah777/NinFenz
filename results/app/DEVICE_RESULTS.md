@@ -37,6 +37,7 @@
 | Rust core 单测（本轮） | pass（本机）：`cargo test` 186 passed / 0 failed；Android 端无 core 改动。 |
 | Release 构建（构建） | pass（本机）：clean 后重建 `:app:assembleRelease` 成功；app-release-unsigned.apk 15,249,217 B sha256 8fc25360…；zipalign 16KB 通过；apksigner 显示未签名（预期，签名 OPEN-EXTERNAL）。 |
 | 16KB 页对齐（构建） | pass（本机）：`zipalign -c -P 16 4 app-debug.apk` exit=0；未真机安装验证。 |
+| APP 门禁（round127） | pass（本机）：QA0–QA6 全 PASS，FAIL=0；covered=14 gap=0 open=2 p0=0；台账刷新到当前 HEAD。 |
 | APP 门禁（本轮） | pass（本机）：QA0–QA6 全部 PASS，FAIL=0；自审计 covered=14 gap=0 open=2 p0=0。 |
 | 备份导出后自检（JVM） | pass（本机）：导出后立即 inspect zip，显示“导出校验通过/失败原因”；真机未复测（adb 无设备） |
 | 分享/文件选择导入项目包（JVM） | pass（本机）：导入流程检测 zip 内根项目 JSON，直接走 ProjectPackageImporter 并打开项目；测试识别用例。真机未复测（adb 无设备） |
