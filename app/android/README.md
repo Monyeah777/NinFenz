@@ -175,7 +175,7 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 
 ## 构建证据（本机，2026-11-15）
 
-> Windows 下 clean/assembleRelease 若报 `lintVitalAnalyzeRelease` 的 lint jar 被占用，先 `./gradlew --stop` 再重试。
+> Windows 下 clean/assembleRelease 若报 `lintVitalAnalyzeRelease` 的 lint jar 被占用，先 `./gradlew --stop` 再重试；也可直接用 `bash app/scripts/build_android_safe.sh`（失败自动 stop+重试一次）。
 
 - 2026-11-16 当前：`./gradlew :app:assembleDebug` 成功：app-debug.apk = 19,049,108 bytes，
   sha256 = 7ff80fd127af73fd26ac127f40d4b44be3b495b656d3a150edde350ff1cad698（含双 ABI 原生库 + 9 个示例 Pack assets）。
