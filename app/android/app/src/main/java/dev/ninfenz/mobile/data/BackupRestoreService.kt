@@ -52,11 +52,16 @@ object BackupRestoreService {
                     .toSet()
                 if (actual != listed) return Inspect(entries, false, "manifest 与备份条目不一致")
                 val seen = mutableSetOf<String>()
+                var actualTotal = 0L
                 for (e in entries) {
                     if (!safePath(e.path)) return Inspect(entries, false, "非法路径：" + e.path)
                     if (!seen.add(e.path)) return Inspect(entries, false, "重复条目：" + e.path)
                     val ze = zip.getEntry(e.path) ?: return Inspect(entries, false, "缺条目：" + e.path)
                     val data = zip.getInputStream(ze).use { it.readBytes() }
+                    actualTotal += data.size
+                    if (data.size > 256L * 1024 * 1024 || actualTotal > 512L * 1024 * 1024) {
+                        return Inspect(entries, false, "备份实际内容超限：" + e.path)
+                    }
                     if (e.bytes >= 0 && data.size.toLong() != e.bytes) {
                         return Inspect(entries, false, "bytes 不一致：" + e.path)
                     }
