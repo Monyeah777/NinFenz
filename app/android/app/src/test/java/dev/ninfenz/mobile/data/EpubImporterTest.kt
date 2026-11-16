@@ -64,6 +64,19 @@ class EpubImporterTest {
     }
 
     @Test
+    fun detectsEpubContainer() {
+        val good = epub(
+            listOf(
+                "mimetype" to "application/epub+zip",
+                "META-INF/container.xml" to "<container/>"
+            )
+        )
+        assertTrue(EpubImporter.isEpub(good))
+        val plain = epub(listOf("data/a.txt" to "x"))
+        assertTrue(!EpubImporter.isEpub(plain))
+    }
+
+    @Test
     fun rejectsMissingContainer() {
         val f = epub(listOf("OEBPS/chapter.xhtml" to "<p>x</p>"))
         assertTrue(runCatching { EpubImporter.extract(f) }.isFailure)

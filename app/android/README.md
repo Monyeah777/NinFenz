@@ -157,7 +157,7 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 - BackupRestoreServiceTest（9）：合法备份恢复、回滚快照、路径穿越拒绝、sha256 不匹配拒绝、未列条目拒绝、缺 sha256 拒绝、manifest BOM、声明总量超限、单条过大。
 - TextEncodingTest（2）：UTF-16LE/UTF-8 BOM 识别、无 BOM 不处理。
 - HtmlImporterTest（13）：标题/列表/实体转换、脚本/样式剔除、表格/链接、有序列表、图片、代码块、引用块、水平线、meta charset、粗体/斜体、删除线、数字实体、ol start。
-- EpubImporterTest（4）：按 OPF spine 提取章节、缺 container 拒绝、spine 顺序、dc:title 补标题。
+- EpubImporterTest（5）：按 OPF spine 提取章节、缺 container 拒绝、spine 顺序、dc:title 补标题、容器识别。
 - ProjectHistoryExportTest（2）：历史 Markdown 表格/标题转义、空历史。
 - ProjectDuplicatorTest（2）：复制保留 refs、重置状态/评审/历史、避免 id 冲突。
 - ProjectArchiverTest（6）：归档移出 projects/、列表/恢复、删除仅在归档目录、永久删除项目+数据、坏归档拒绝、越界拒绝。
@@ -179,9 +179,9 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 > Windows 下 clean/assembleRelease 若报 `lintVitalAnalyzeRelease` 的 lint jar 被占用，先 `./gradlew --stop` 再重试；也可直接用 `bash app/scripts/build_android_safe.sh`（失败自动 stop+重试一次）。
 
 - 2026-11-16 当前：`./gradlew :app:assembleDebug` 成功：app-debug.apk = 19,049,108 bytes，
-  sha256 = 53a74c02a96864f1d5d4e480b7e348b7f15f701dddd498a03f78bead523b31fd（含双 ABI 原生库 + 9 个示例 Pack assets）。
+  sha256 = b64e5cc7a2251a1eda4e93b143997606222283837333b046867543a91f13bfd1（含双 ABI 原生库 + 9 个示例 Pack assets）。
 - 仓库级门禁在 UTF-8 locale 下运行：`LANG=C.UTF-8 PYTHONUTF8=1 bash verify.sh --checks-only`（GBK 控制台会让 `git ls-files` 解码失败，触发 modeling 检查异常）。
-- `./gradlew :app:testDebugUnitTest` 全绿：293 条 JVM 单测（v1 42 + v0.02 251；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y/大字号/对比度/Paparazzi 截图）。
+- `./gradlew :app:testDebugUnitTest` 全绿：294 条 JVM 单测（v1 42 + v0.02 252；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y/大字号/对比度/Paparazzi 截图）。
 - `zipalign -c -P 16 -v 4 app-debug.apk` → Verification successful（native lib 16KB page 对齐）。
 - `bash app/scripts/build_core_android.sh --clean` 成功：NDK 27.0.12077973 + rustup targets
   （aarch64-linux-android / x86_64-linux-android，经 rsproxy 镜像安装）；两个 .so 的 LOAD align 均为 0x4000。

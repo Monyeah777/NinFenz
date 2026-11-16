@@ -156,7 +156,8 @@ fun ImportScreen(
         savedName = null
         suggestNote = null
         acceptedMappings = emptySet()
-        val isEpub = name.endsWith(".epub", true) || mime == "application/epub+zip"
+        val isEpub = name.endsWith(".epub", true) || mime == "application/epub+zip" ||
+            ((name.endsWith(".zip", true) || mime == "application/zip") && EpubImporter.isEpub(file))
         val isHtml = !isEpub && (name.endsWith(".html", true) || name.endsWith(".htm", true) || mime == "text/html")
         val isText = !isEpub && !isHtml && (name.endsWith(".txt", true) || name.endsWith(".md", true) ||
             name.endsWith(".markdown", true) || mime?.startsWith("text/") == true)

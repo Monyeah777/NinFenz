@@ -6,6 +6,17 @@ import java.util.zip.ZipFile
 
 /** EPUB 轻量导入：按 container.xml → OPF spine 顺序读取 XHTML，再转 Markdown。 */
 object EpubImporter {
+    fun isEpub(file: File): Boolean = try {
+        ZipFile(file).use { zip ->
+            val mime = zip.getEntry("mimetype")?.let { entry ->
+                zip.getInputStream(entry).use { String(it.readBytes(), Charsets.US_ASCII).trim() }
+            }
+            mime == "application/epub+zip" || zip.getEntry("META-INF/container.xml") != null
+        }
+    } catch (t: Throwable) {
+        false
+    }
+
     fun extract(file: File): String {
         ZipFile(file).use { zip ->
             val container = read(zip, "META-INF/container.xml")
