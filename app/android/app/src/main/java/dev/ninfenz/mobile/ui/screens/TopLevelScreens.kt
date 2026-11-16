@@ -715,7 +715,11 @@ fun ProjectDetailScreen(
                                     diffError = "项目解析失败：" + (t.message ?: t.javaClass.simpleName)
                                 }
                             }
-                        }) { Text(candidate.project.title + " · " + candidate.project.id) }
+                        }) {
+                            Text(
+                                candidate.project.title + " · " + candidate.project.id + " · " + projectStatusLabel(candidate.project)
+                            )
+                        }
                     }
                 }
             },

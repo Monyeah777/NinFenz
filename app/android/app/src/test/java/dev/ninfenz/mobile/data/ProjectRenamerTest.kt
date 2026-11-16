@@ -23,6 +23,14 @@ class ProjectRenamerTest {
     }
 
     @Test
+    fun rejectsTooLongTitle() {
+        val dir = Files.createTempDirectory("nf-rename-3").toFile()
+        val f = java.io.File(dir, "p.nfproject.json").apply { writeText(doc) }
+        assertTrue(runCatching { ProjectRenamer.rename(f, "x".repeat(121)) }.isFailure)
+        assertTrue(f.readText().contains("旧标题"))
+    }
+
+    @Test
     fun rejectsBlankTitleAndLeavesFile() {
         val dir = Files.createTempDirectory("nf-rename-2").toFile()
         val f = java.io.File(dir, "p.nfproject.json").apply { writeText(doc) }

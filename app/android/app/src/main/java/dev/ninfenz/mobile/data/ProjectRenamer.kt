@@ -13,6 +13,7 @@ object ProjectRenamer {
     fun rename(projectFile: File, newTitle: String): Project {
         val title = newTitle.trim()
         require(title.isNotBlank()) { "标题不能为空" }
+        require(title.length <= 120) { "标题不能超过 120 字" }
         val source = Json.parseToJsonElement(projectFile.readText(Charsets.UTF_8)).jsonObject
         val next = source.toMutableMap()
         next["title"] = JsonPrimitive(title)
