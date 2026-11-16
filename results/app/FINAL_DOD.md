@@ -14,7 +14,7 @@
 | 项目态创作台/交付台 | pass（工程面，含核心校验/导出） | 6ac657b52/86191976e；Delivery/Author 测试与构建 |
 | 作者覆盖保存/状态写回 | pass（工程面） | a14456833/902789796；Overlay/Status 测试 |
 | Pack 中心/CCOS/Pack zip 更新 | pass（工程面） | 1dc695125/4d816f3c5/6c30f241e |
-| JVM 测试 | pass | 248/248（含 Robolectric/Compose/Paparazzi） |
+| JVM 测试 | pass | 265/265（含 Robolectric/Compose/Paparazzi） |
 | 自适应/9 组尺寸语义矩阵 | pass（语义层） | ShellNavigation/ShellSizeMatrix 测试 |
 | i18n/主题切换（全部屏主要文案） | partial | values-en + 资源化；我的支持 zh/en/system + 动态取色；少量错误/技术提示仍内联（OPEN-I18N-BODY 尾项） |
 | 像素截图矩阵 | pass（本机） | Paparazzi 10 张基线（360/700/900 × 640/800/900/1000），testDebugUnitTest verify |
@@ -22,7 +22,7 @@
 | 草稿→项目 | partial | 草稿可创建项目壳并把草稿 JSON 作为 authoring 来源副本；导入内容尚未映射进协议字段（OPEN-DRAFT-PROJECT 收窄） |
 | app/gates v0.02 UX 检查 | pass | 7/7 gate PASS、FAIL=0；GATES/SELF_AUDIT 已更新（本提交） |
 
-**收口实测（2026-11-16 更新）**：app/gates 7/7 PASS、FAIL=0；verify.sh --checks-only PASS=107 WARN=2 FAIL=0；JVM 248/248；APK 19,049,108 B sha256 513749b7…；Release unsigned 15,249,217 B sha256 2f2ebc1c…（16KB 对齐通过）。
+**收口实测（2026-11-16 更新）**：app/gates 7/7 PASS、FAIL=0；verify.sh --checks-only PASS=107 WARN=2 FAIL=0；JVM 265/265；APK 19,049,108 B sha256 87fa63a2…；Release unsigned 15,249,217 B sha256 2f2ebc1c…（16KB 对齐通过）。
 
 **发布面：仍为 OPEN-EXTERNAL**（签名/公证/真机矩阵/Play 数据安全），不得据此宣称可发布。
 
@@ -83,7 +83,7 @@
 | Python 控制面/契约/安全/golden/E2E | **490 passed / 0 failed / 0 skipped / 0 xfailed（127s）** | `python -m pytest app/tests -q` |
 | Android JVM | 42 条（含自适应分档 4 条） | `cd app/android && ./gradlew :app:testDebugUnitTest` |
 | Desktop JVM | 20 条（含真实 JNA FFI） | `cd app/desktop && ./gradlew test` |
-| APK | 17,973,649 B；16KB 对齐通过；双 ABI `.so` | `bash app/scripts/build_android.sh debug` |
+| APK | 19,049,108 B；16KB 对齐通过；双 ABI `.so` | `bash app/scripts/build_android.sh debug` |
 | MSI | 66,573,406 B；jar 内含 `native/nf_app_core.dll` | `bash app/scripts/build_desktop.sh package` |
 
 ## 6. OPEN（不因收口关闭）
