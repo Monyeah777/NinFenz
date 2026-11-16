@@ -32,9 +32,20 @@ object ProjectPackageImporter {
         false
     }
 
-    private fun verifyManifest(entries: List<Pair<String, ByteArray>>, projectText: String, prefix: String) {
+    private fun verifyManifest(
+        entries: List<Pair<String, ByteArray>>,
+        projectText: String,
+        prefix: String,
+        projectPath: String
+    ) {
         val manifestBytes = entries.firstOrNull { (name, _) -> name == ProjectPackage.MANIFEST }?.second ?: return
         val manifest = Json.parseToJsonElement(String(manifestBytes, Charsets.UTF_8)).jsonObject
+        val schema = manifest["schema"]?.jsonPrimitive?.content
+        require(schema == null || schema == "nf-project-package/1") { "不支持的项目包版本：" + schema }
+        val declaredProject = manifest["project"]?.jsonPrimitive?.content
+        require(declaredProject == null || declaredProject == projectPath.substringAfterLast('/')) {
+            "manifest 项目文件名不一致"
+        }
         val expected = manifest["project_sha256"]?.jsonPrimitive?.content
         require(expected == null || expected == ProjectPackage.sha256(projectText.toByteArray(Charsets.UTF_8))) {
             "项目 JSON 完整性校验失败"
@@ -79,7 +90,7 @@ object ProjectPackageImporter {
         val dataPrefix = if (prefix.isBlank()) "data/" else prefix + "/data/"
         val data = entries.filter { (name, _) -> name.startsWith(dataPrefix) }
             .map { (name, bytes) -> name.removePrefix(dataPrefix) to bytes }
-        verifyManifest(entries, text, prefix)
+        verifyManifest(entries, text, prefix, projectPath)
         val source = Json.parseToJsonElement(text).jsonObject
         val sourceId = source["id"]?.let { (it as? JsonPrimitive)?.content } ?: throw IllegalArgumentException("项目缺 id")
         var id = sourceId
