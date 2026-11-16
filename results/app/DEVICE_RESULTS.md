@@ -30,6 +30,7 @@
 | EPUB 导出 data URI 图片（JVM） | pass（本机）：Markdown data:image 渲染为 img；测试 10 条。真机未复测（adb 无设备） |
 | EPUB 图片内嵌（JVM） | pass（本机）：EPUB img 转 data URI（单图 ≤2MiB、总量 ≤20MiB）；测试 6 条。真机未复测（adb 无设备） |
 | 全量复核（round53） | pass（本机）：verify PASS=107/WARN=2/FAIL=0；gates PASS/gap=0；rust 186；pytest 493。 |
+| 全量复核（round60） | pass（本机）：verify 107/2/0；gates PASS/gap=0；rust 186；JVM 317。 |
 | 备份实际内容上限（JVM） | pass（本机）：读取时校验实际单条/总量 256MiB/512MiB，防声明值造假；317 tests 全绿。 |
 | PackStore 指纹稳定（JVM） | pass（本机）：目录指纹改为子项名称+mtime，PackStoreTest 连续 3 次 --rerun-tasks 全绿。 |
 | 归档恢复 data 回滚（JVM） | pass（本机）：恢复时 data 移动失败会把归档 JSON 移回；归档测试保持全绿。 |
