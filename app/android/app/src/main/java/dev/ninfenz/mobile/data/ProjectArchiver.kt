@@ -74,8 +74,13 @@ object ProjectArchiver {
         val archivedData = File(archived.parentFile, archived.name + ".data")
         if (archivedData.isDirectory) {
             val projectDir = File(projects, target.name.removeSuffix(".nfproject.json"))
-            if (projectDir.exists()) projectDir.deleteRecursively()
-            Files.move(archivedData.toPath(), projectDir.toPath(), StandardCopyOption.ATOMIC_MOVE)
+            try {
+                if (projectDir.exists()) projectDir.deleteRecursively()
+                Files.move(archivedData.toPath(), projectDir.toPath(), StandardCopyOption.ATOMIC_MOVE)
+            } catch (t: Throwable) {
+                runCatching { Files.move(target.toPath(), archived.toPath(), StandardCopyOption.ATOMIC_MOVE) }
+                throw t
+            }
         }
         return target
     }
