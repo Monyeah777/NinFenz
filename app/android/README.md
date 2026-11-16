@@ -193,7 +193,7 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 1. **.so 未提交入库**：按纪律 jniLibs/*.so 不进 git；干净检出需先跑 app/scripts/build_core_android.sh 再 assembleDebug。.so 缺失时 APK 仍可构建，运行时明确报 NF-E-005。
 2. **map-suggest 决策回算**：采纳/未采纳只落 sidecar JSON，未再接 core map-suggest 复核（决策持久化格式待契约登记）。
 3. **Pack 安装的签名校验**：当前只做 nf-pack.json schema 读取与安装位置管理；签名/来源验证未实现。
-4. **真机 smoke（OnePlus PLF110 / Android 16）**：已跑首启、示例导入、创作台保存、装配/L1/导出 md+zip；发现并修复 7 个真机问题（状态引用/导出 history/示例导入 kind/顶部 insets/分享崩溃与 prefill/jniLibs 陈旧导致 docx 误报/英文主题标签）；docx、TalkBack、主题/语言、CCOS、分享等仍 OPEN。详见 results/app/DEVICE_RESULTS.md。
+4. **真机 smoke（OnePlus PLF110 / Android 16）**：已跑首启、示例导入、创作台保存、装配/L1/导出 md+zip；发现并修复 7 个真机问题（状态引用/导出 history/示例导入 kind/顶部 insets/分享崩溃与 prefill/jniLibs 陈旧导致 docx 误报/英文主题标签）；docx/HTML/EPUB 导入、TalkBack、主题/语言、CCOS、分享等仍只有本机验证，真机未复测。详见 results/app/DEVICE_RESULTS.md。
 5. **SAF 授权差异**：PROCESS_TEXT/SEND 的 URI 读取在部分 OEM ROM 仍需实测。
 6. **深链/QR 交接**：CONTRACT §5.11 标 OPEN，未实现。
 7. **instrumented test**：connectedAndroidTest 未纳入本轮。
