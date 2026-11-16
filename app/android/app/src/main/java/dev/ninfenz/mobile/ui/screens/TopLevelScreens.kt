@@ -51,6 +51,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.data.PackEntry
@@ -301,7 +302,7 @@ fun LibraryHomeScreen(
                         modifier = Modifier.padding(horizontal = NfSpacing.page)
                     ) {
                         Column(modifier = Modifier.padding(NfSpacing.m)) {
-                            Text(stringResource(dev.ninfenz.mobile.R.string.library_errors, errors.size), style = MaterialTheme.typography.titleMedium)
+                            Text(pluralStringResource(dev.ninfenz.mobile.R.plurals.library_errors, errors.size, errors.size), style = MaterialTheme.typography.titleMedium)
                             errors.take(3).forEach { Text(it, style = MaterialTheme.typography.bodySmall) }
                         }
                     }

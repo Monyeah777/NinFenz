@@ -30,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import dev.ninfenz.mobile.BuildConfig
 import dev.ninfenz.mobile.core.Core
@@ -108,7 +109,7 @@ fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
             KeyValue("backend", diag.backend)
             KeyValue(stringResource(dev.ninfenz.mobile.R.string.settings_abi), diag.abiVersion ?: stringResource(dev.ninfenz.mobile.R.string.settings_abi_unavailable))
             KeyValue(stringResource(dev.ninfenz.mobile.R.string.settings_native), if (diag.nativeReady) stringResource(dev.ninfenz.mobile.R.string.settings_loaded) else stringResource(dev.ninfenz.mobile.R.string.settings_missing))
-            KeyValue(stringResource(dev.ninfenz.mobile.R.string.settings_err_registry), if (diag.errorCatalogLoaded) stringResource(dev.ninfenz.mobile.R.string.settings_err_count, diag.errorCodeCount) else stringResource(dev.ninfenz.mobile.R.string.settings_not_packaged))
+            KeyValue(stringResource(dev.ninfenz.mobile.R.string.settings_err_registry), if (diag.errorCatalogLoaded) pluralStringResource(dev.ninfenz.mobile.R.plurals.settings_err_count, diag.errorCodeCount, diag.errorCodeCount) else stringResource(dev.ninfenz.mobile.R.string.settings_not_packaged))
             if (!diag.nativeReady) {
                 Notice("NF-E-005：共享核心原生库不可用。\n" + CoreBridgeNative.GUIDANCE, Tone.ERROR)
             }
@@ -132,7 +133,7 @@ fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
             Button(onClick = {
                 val removed = StorageStats.clearImportCache(context.cacheDir)
                 stats = StorageStats.scan(context.filesDir, context.cacheDir)
-                cleaned = context.getString(dev.ninfenz.mobile.R.string.settings_storage_cleaned, removed)
+                cleaned = context.resources.getQuantityString(dev.ninfenz.mobile.R.plurals.settings_storage_cleaned, removed, removed)
             }) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_storage_clear)) }
             cleaned?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary) }
             OutlinedButton(onClick = {
@@ -155,7 +156,7 @@ fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
                 val removed = BackupService.prune(context.filesDir, 5)
                 backups = BackupService.list(context.filesDir)
                 stats = StorageStats.scan(context.filesDir, context.cacheDir)
-                cleaned = context.getString(dev.ninfenz.mobile.R.string.settings_backup_pruned, removed)
+                cleaned = context.resources.getQuantityString(dev.ninfenz.mobile.R.plurals.settings_backup_pruned, removed, removed)
             }) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_backup_prune)) }
             if (backups.size > 3) {
                 OutlinedButton(onClick = { showAllBackups = true }) {

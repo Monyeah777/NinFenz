@@ -37,6 +37,7 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -239,7 +240,7 @@ private fun SearchHistoryPanel(
 ) {
     Column(modifier = Modifier.fillMaxWidth().padding(NfSpacing.page)) {
         Text(
-            stringResource(dev.ninfenz.mobile.R.string.search_hint, total),
+            pluralStringResource(dev.ninfenz.mobile.R.plurals.search_hint, total, total),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )

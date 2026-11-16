@@ -53,7 +53,10 @@
     <string name="library_action_load_sample">载入示例 Pack</string>
     <string name="library_action_import_file">导入文件</string>
     <string name="library_manage">管理</string>
-    <string name="library_errors">有 %1$d 个条目无法读取</string>
+    <plurals name="library_errors">
+        <item quantity="one">有 %1$d 个条目无法读取</item>
+        <item quantity="other">有 %1$d 个条目无法读取</item>
+    </plurals>
     <string name="library_section_projects">最近项目</string>
     <string name="library_section_packs">已安装 Pack</string>
     <string name="create_no_pack_title">还没有可用的 Pack</string>
@@ -134,7 +137,10 @@
 
     <string name="search_title">搜索</string>
     <string name="search_placeholder">搜索 Pack、条款、节点、章节、槽位、项目</string>
-    <string name="search_hint">输入关键词开始搜索；索引 %1$d 条（本地）。</string>
+    <plurals name="search_hint">
+        <item quantity="one">输入关键词开始搜索；索引 %1$d 条（本地）。</item>
+        <item quantity="other">输入关键词开始搜索；索引 %1$d 条（本地）。</item>
+    </plurals>
     <string name="search_no_result">没有匹配项</string>
     <string name="search_kind_project">项目</string>
     <string name="search_kind_pack">Pack</string>
@@ -266,7 +272,10 @@
     <string name="settings_loaded">已加载</string>
     <string name="settings_missing">缺失</string>
     <string name="settings_err_registry">错误码登记</string>
-    <string name="settings_err_count">%1$d 条</string>
+    <plurals name="settings_err_count">
+        <item quantity="one">%1$d 条</item>
+        <item quantity="other">%1$d 条</item>
+    </plurals>
     <string name="settings_not_packaged">未打包</string>
     <string name="settings_abi_unavailable">不可用</string>
     <string name="settings_error_hint">错误码文本取自 app/schema/error_codes.json（构建时复制为资源）；登记条数 = %1$d</string>
@@ -444,7 +453,10 @@
     <string name="settings_storage_archives">归档项目</string>
     <string name="settings_storage_total">合计</string>
     <string name="settings_storage_clear">清理导入/分享缓存</string>
-    <string name="settings_storage_cleaned">已清理 %1$d 个临时文件</string>
+    <plurals name="settings_storage_cleaned">
+        <item quantity="one">已清理 %1$d 个临时文件</item>
+        <item quantity="other">已清理 %1$d 个临时文件</item>
+    </plurals>
     <string name="project_history_title">状态历史</string>
     <string name="settings_backup_export">导出本地备份</string>
     <string name="settings_backup_done">备份已生成：%1$d 个文件 · %2$s</string>
@@ -463,7 +475,10 @@
     <string name="settings_prefs_restart">偏好已恢复，正在重启应用…</string>
     <string name="settings_backup_rollback">回滚上次恢复</string>
     <string name="settings_backup_prune">清理旧备份（保留 5 个）</string>
-    <string name="settings_backup_pruned">已清理 %1$d 个旧备份</string>
+    <plurals name="settings_backup_pruned">
+        <item quantity="one">已清理 %1$d 个旧备份</item>
+        <item quantity="other">已清理 %1$d 个旧备份</item>
+    </plurals>
     <string name="project_history_share">分享历史</string>
     <string name="project_detail_duplicate">复制项目</string>
     <string name="project_detail_diff">对比项目</string>

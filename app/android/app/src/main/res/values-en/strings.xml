@@ -53,7 +53,10 @@
     <string name="library_action_load_sample">Load sample pack</string>
     <string name="library_action_import_file">Import file</string>
     <string name="library_manage">Manage</string>
-    <string name="library_errors">%1$d items could not be read</string>
+    <plurals name="library_errors">
+        <item quantity="one">%1$d item could not be read</item>
+        <item quantity="other">%1$d items could not be read</item>
+    </plurals>
     <string name="library_section_projects">Recent projects</string>
     <string name="library_section_packs">Installed packs</string>
     <string name="create_no_pack_title">No packs available yet</string>
@@ -134,7 +137,10 @@
 
     <string name="search_title">Search</string>
     <string name="search_placeholder">Search packs, clauses, nodes, sections, slots, projects</string>
-    <string name="search_hint">Type a keyword; %1$d local items indexed.</string>
+    <plurals name="search_hint">
+        <item quantity="one">Type a keyword; %1$d local item indexed.</item>
+        <item quantity="other">Type a keyword; %1$d local items indexed.</item>
+    </plurals>
     <string name="search_no_result">No matches</string>
     <string name="search_kind_project">Projects</string>
     <string name="search_kind_pack">Packs</string>
@@ -266,7 +272,10 @@
     <string name="settings_loaded">loaded</string>
     <string name="settings_missing">missing</string>
     <string name="settings_err_registry">Error registry</string>
-    <string name="settings_err_count">%1$d entries</string>
+    <plurals name="settings_err_count">
+        <item quantity="one">%1$d entry</item>
+        <item quantity="other">%1$d entries</item>
+    </plurals>
     <string name="settings_not_packaged">not packaged</string>
     <string name="settings_abi_unavailable">unavailable</string>
     <string name="settings_error_hint">Error text comes from app/schema/error_codes.json (copied as a build resource); registry size = %1$d</string>
@@ -444,7 +453,10 @@
     <string name="settings_storage_archives">Archived projects</string>
     <string name="settings_storage_total">Total</string>
     <string name="settings_storage_clear">Clear import/share cache</string>
-    <string name="settings_storage_cleaned">Cleared %1$d temp files</string>
+    <plurals name="settings_storage_cleaned">
+        <item quantity="one">Cleared %1$d temp file</item>
+        <item quantity="other">Cleared %1$d temp files</item>
+    </plurals>
     <string name="project_history_title">Status history</string>
     <string name="settings_backup_export">Export local backup</string>
     <string name="settings_backup_done">Backup created: %1$d files · %2$s</string>
@@ -463,7 +475,10 @@
     <string name="settings_prefs_restart">Preferences restored; restarting app…</string>
     <string name="settings_backup_rollback">Roll back last restore</string>
     <string name="settings_backup_prune">Prune old backups (keep 5)</string>
-    <string name="settings_backup_pruned">Removed %1$d old backups</string>
+    <plurals name="settings_backup_pruned">
+        <item quantity="one">Removed %1$d old backup</item>
+        <item quantity="other">Removed %1$d old backups</item>
+    </plurals>
     <string name="project_history_share">Share history</string>
     <string name="project_detail_duplicate">Duplicate project</string>
     <string name="project_detail_diff">Compare project</string>
