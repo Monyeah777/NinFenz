@@ -44,6 +44,7 @@ import dev.ninfenz.mobile.data.AuthorArtifacts
 import dev.ninfenz.mobile.data.AuthorArtifactsLoader
 import dev.ninfenz.mobile.data.DeliveryDraftStore
 import dev.ninfenz.mobile.data.ExportHistoryStore
+import dev.ninfenz.mobile.data.ExportVerifier
 import dev.ninfenz.mobile.data.PackEntry
 import dev.ninfenz.mobile.data.AssemblyArtifact
 import dev.ninfenz.mobile.data.ProjectStatusStore
@@ -112,6 +113,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
     val draftStore = remember { DeliveryDraftStore(context.filesDir) }
     val exportHistory = remember { ExportHistoryStore(context.filesDir) }
     var exportEntries by remember { mutableStateOf(exportHistory.load()) }
+    var exportVerify by remember { mutableStateOf<ExportVerifier.Result?>(null) }
     val restoredInputs = remember(project.id) { draftStore.load(project.id) }
     var draftNote by remember(project.id) {
         mutableStateOf(if (restoredInputs.isNotEmpty()) context.getString(dev.ninfenz.mobile.R.string.delivery_draft_restored) else null)
@@ -190,6 +192,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
         val sha = manifest?.let { Regex("\"sha256\":\"([^\"]+)\"").find(it)?.groupValues?.getOrNull(1) }.orEmpty()
         exportHistory.record(format, file, sha)
         exportEntries = exportHistory.load()
+        exportVerify = ExportVerifier.verify(file, manifest)
     }
 
     fun applyBatch(onlyEmpty: Boolean) {
@@ -517,6 +520,14 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                 }
                 Text(stringResource(dev.ninfenz.mobile.R.string.delivery_pdf_note), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page))
                 manifestText?.let { Text(it, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
+                exportVerify?.let {
+                    Text(
+                        it.message,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = if (it.ok) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(horizontal = NfSpacing.page)
+                    )
+                }
                 if (exportEntries.isNotEmpty()) {
                     Text(
                         stringResource(dev.ninfenz.mobile.R.string.delivery_recent_exports),
