@@ -478,6 +478,9 @@
     <string name="project_history_share">Share history</string>
     <string name="project_detail_duplicate">Duplicate project</string>
     <string name="project_detail_diff">Compare project</string>
+    <string name="project_detail_rename">Rename</string>
+    <string name="project_detail_rename_label">Project title</string>
+    <string name="project_detail_rename_confirm">Save</string>
     <string name="project_diff_same">Projects match on state/refs/review/history</string>
     <string name="search_filter_all_packs">All packs</string>
     <string name="project_diff_library">Compare with library</string>

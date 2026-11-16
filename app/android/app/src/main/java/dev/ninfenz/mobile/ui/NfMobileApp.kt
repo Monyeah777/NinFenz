@@ -65,6 +65,7 @@ import dev.ninfenz.mobile.data.CreateProjectResult
 import dev.ninfenz.mobile.data.ProjectCreator
 import dev.ninfenz.mobile.data.ProjectArchiver
 import dev.ninfenz.mobile.data.ProjectDuplicator
+import dev.ninfenz.mobile.data.ProjectRenamer
 import dev.ninfenz.mobile.data.ProjectEntry
 import dev.ninfenz.mobile.data.SampleSeeder
 import dev.ninfenz.mobile.data.SeedResult
@@ -458,6 +459,12 @@ is Detail.Import -> ImportScreen(
                                 onAuthor = { shell = shell.open(Detail.Author(entry.project.id)) },
                                 onAssembly = { shell = shell.open(Detail.Delivery(entry.project.id)) },
                                 compareCandidates = projects,
+                                onRename = { title ->
+                                    scope.launch {
+                                        withContext(Dispatchers.IO) { ProjectRenamer.rename(entry.file, title) }
+                                        refresh()
+                                    }
+                                },
                                 onArchive = {
                                     scope.launch {
                                         withContext(Dispatchers.IO) { ProjectArchiver.archive(entry.file, context.filesDir) }

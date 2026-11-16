@@ -478,6 +478,9 @@
     <string name="project_history_share">分享历史</string>
     <string name="project_detail_duplicate">复制项目</string>
     <string name="project_detail_diff">对比项目</string>
+    <string name="project_detail_rename">重命名</string>
+    <string name="project_detail_rename_label">项目标题</string>
+    <string name="project_detail_rename_confirm">保存</string>
     <string name="project_diff_same">两个项目状态/引用/评审/历史一致</string>
     <string name="search_filter_all_packs">全部 Pack</string>
     <string name="project_diff_library">与库内项目对比</string>

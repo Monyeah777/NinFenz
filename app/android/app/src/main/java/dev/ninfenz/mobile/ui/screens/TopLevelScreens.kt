@@ -27,6 +27,8 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -545,6 +547,7 @@ fun ProjectDetailScreen(
     onAssembly: () -> Unit,
     onDuplicate: () -> Unit = {},
     onArchive: () -> Unit = {},
+    onRename: (String) -> Unit = {},
     compareCandidates: List<ProjectEntry> = emptyList()
 ) {
     val context = LocalContext.current
@@ -554,6 +557,8 @@ fun ProjectDetailScreen(
     var diffError by remember { mutableStateOf<String?>(null) }
     var showComparePicker by remember { mutableStateOf(false) }
     var compareQuery by remember { mutableStateOf("") }
+    var showRename by remember { mutableStateOf(false) }
+    var renameText by remember(project.title) { mutableStateOf(project.title) }
     val diffPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: android.net.Uri? ->
         if (uri != null) {
             diffScope.launch {
@@ -613,6 +618,10 @@ fun ProjectDetailScreen(
                                 Text(stringResource(dev.ninfenz.mobile.R.string.project_diff_library))
                             }
                         }
+                        TextButton(onClick = {
+                            renameText = project.title
+                            showRename = true
+                        }) { Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_rename)) }
                     }
                 }
             }
@@ -649,6 +658,34 @@ fun ProjectDetailScreen(
             item { NfListRow(stringResource(dev.ninfenz.mobile.R.string.project_detail_author), stringResource(dev.ninfenz.mobile.R.string.project_detail_author_subtitle), Icons.Filled.Edit, "›", onAuthor) }
             item { NfListRow(stringResource(dev.ninfenz.mobile.R.string.project_detail_delivery), stringResource(dev.ninfenz.mobile.R.string.project_detail_delivery_subtitle), Icons.Filled.Info, "›", onAssembly) }
         }
+    }
+
+    if (showRename) {
+        AlertDialog(
+            onDismissRequest = { showRename = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_rename)) },
+            text = {
+                OutlinedTextField(
+                    value = renameText,
+                    onValueChange = { renameText = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    label = { Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_rename_label)) }
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    enabled = renameText.isNotBlank(),
+                    onClick = {
+                        showRename = false
+                        onRename(renameText.trim())
+                    }
+                ) { Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_rename_confirm)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showRename = false }) { Text(stringResource(android.R.string.cancel)) }
+            }
+        )
     }
 
     if (showComparePicker) {
