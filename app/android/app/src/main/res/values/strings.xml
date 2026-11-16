@@ -557,6 +557,12 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="import_delete_draft_body">确定删除草稿 %1$s？映射 sidecar 也会删除。</string>
     <string name="import_rename_draft">重命名</string>
     <string name="import_draft_to_project">转为项目</string>
+    <string name="import_project_failed">项目包导入失败：%1$s</string>
+    <string name="import_project_failed_fix">确认 zip 为完整项目包</string>
+    <string name="import_epub_failed">EPUB 解析失败或无正文</string>
+    <string name="import_epub_failed_fix">确认 EPUB 含 container/OPF/XHTML 章节</string>
+    <string name="import_docx_failed">DOCX 解析失败或无正文</string>
+    <string name="import_docx_failed_fix">确认 DOCX 含 word/document.xml</string>
     <plurals name="import_project_package_done">
         <item quantity="one">已导入项目包：%1$s（%2$d 个数据文件）</item>
         <item quantity="other">已导入项目包：%1$s（%2$d 个数据文件）</item>

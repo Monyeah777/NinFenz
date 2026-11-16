@@ -145,7 +145,12 @@ fun ImportScreen(
                 file.delete()
                 onProjectImported(imported.id, imported.packId, imported.packVersion)
             } catch (t: Throwable) {
-                error = CoreResponse.failure("NF-PRJ-001", "项目包导入失败：" + (t.message ?: t.javaClass.simpleName), "确认 zip 为完整项目包", 2).error
+                error = CoreResponse.failure(
+                    "NF-PRJ-001",
+                    context.getString(dev.ninfenz.mobile.R.string.import_project_failed, t.message ?: t.javaClass.simpleName),
+                    context.getString(dev.ninfenz.mobile.R.string.import_project_failed_fix),
+                    2
+                ).error
             }
             return
         }
@@ -167,7 +172,12 @@ fun ImportScreen(
             isDocx -> {
                 val markdown = runCatching { DocxImporter.extract(file) }.getOrNull()?.takeIf { it.isNotBlank() }
                 if (markdown == null) {
-                    error = CoreResponse.failure("NF-IMP-008", "DOCX 解析失败或无正文", "确认 DOCX 含 word/document.xml", 2).error
+                    error = CoreResponse.failure(
+                        "NF-IMP-008",
+                        context.getString(dev.ninfenz.mobile.R.string.import_docx_failed),
+                        context.getString(dev.ninfenz.mobile.R.string.import_docx_failed_fix),
+                        2
+                    ).error
                     return
                 }
                 File(file.parentFile, "docx-import.md").apply { writeText(markdown, Charsets.UTF_8) }
@@ -175,7 +185,12 @@ fun ImportScreen(
             isEpub -> {
                 val markdown = runCatching { EpubImporter.extract(file) }.getOrNull()?.takeIf { it.isNotBlank() }
                 if (markdown == null) {
-                    error = CoreResponse.failure("NF-IMP-007", "EPUB 解析失败或无正文", "确认 EPUB 含 container/OPF/XHTML 章节", 2).error
+                    error = CoreResponse.failure(
+                        "NF-IMP-007",
+                        context.getString(dev.ninfenz.mobile.R.string.import_epub_failed),
+                        context.getString(dev.ninfenz.mobile.R.string.import_epub_failed_fix),
+                        2
+                    ).error
                     return
                 }
                 File(file.parentFile, "epub-import.md").apply { writeText(markdown, Charsets.UTF_8) }
