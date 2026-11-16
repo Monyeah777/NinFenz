@@ -22,7 +22,7 @@
 | 草稿→项目 | OPEN | OPEN-DRAFT-PROJECT |
 | app/gates v0.02 UX 检查 | pass | 7/7 gate PASS、FAIL=0；GATES/SELF_AUDIT 已更新（本提交） |
 
-**收口实测（2026-11-15）**：app/gates 7/7 PASS、FAIL=0；verify.sh --checks-only PASS=107 WARN=2 FAIL=0；JVM 149/149；APK 21,710,683 B sha256 a6540623…。
+**收口实测（2026-11-15）**：app/gates 7/7 PASS、FAIL=0；verify.sh --checks-only PASS=107 WARN=2 FAIL=0；JVM 151/151；APK 21,710,683 B sha256 8a5af9c6…。
 
 **发布面：仍为 OPEN-EXTERNAL**（签名/公证/真机矩阵/Play 数据安全），不得据此宣称可发布。
 

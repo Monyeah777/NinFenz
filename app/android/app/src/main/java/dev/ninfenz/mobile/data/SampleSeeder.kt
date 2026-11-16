@@ -48,12 +48,7 @@ class SampleSeeder(
                 prefs.sampleSeeded = true
                 return@withContext SeedResult.AlreadyPresent(id, version)
             }
-            target.parentFile?.mkdirs()
-            if (target.exists()) target.deleteRecursively()
-            if (!stage.renameTo(target)) {
-                stage.copyRecursively(target, overwrite = true)
-                stage.deleteRecursively()
-            }
+            PackInstaller.install(stage, target)
             prefs.sampleSeeded = true
             SeedResult.Installed(id, version, count.coerceAtLeast(expected))
         } catch (t: Throwable) {
