@@ -129,6 +129,15 @@ class ProjectPackageImporterTest {
     }
 
     @Test
+    fun importsProjectUnderDeeperFolder() {
+        val root = Files.createTempDirectory("nf-import-deep").toFile()
+        val zip = zip(listOf("a/b/p.nfproject.json" to doc, "a/b/data/authoring/assembly.md" to "deep"))
+        val imported = ProjectPackageImporter.import(root, zip)
+        assertEquals("p", imported.id)
+        assertEquals("deep", java.io.File(root, "projects/p/authoring/assembly.md").readText())
+    }
+
+    @Test
     fun rejectsMissingProjectJson() {
         val root = Files.createTempDirectory("nf-no-project").toFile()
         assertTrue(runCatching { ProjectPackageImporter.import(root, zip(listOf("data/a.md" to "x"))) }.isFailure)

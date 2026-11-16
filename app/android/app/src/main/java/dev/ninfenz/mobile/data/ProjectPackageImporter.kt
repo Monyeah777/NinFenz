@@ -25,7 +25,7 @@ object ProjectPackageImporter {
         if (!zipFile.isFile) false else ZipFile(zipFile).use { zip ->
             zip.entries().asSequence().any { entry ->
                 !entry.isDirectory && entry.name.replace('\\', '/').endsWith(".nfproject.json") &&
-                    entry.name.replace('\\', '/').split('/').size <= 2
+                    entry.name.replace('\\', '/').split('/').size <= 4
             }
         }
     } catch (t: Throwable) {
@@ -87,7 +87,7 @@ object ProjectPackageImporter {
             }
         }
         val projectEntries = entries.filter { (name, _) ->
-            name.endsWith(".nfproject.json") && name.split('/').size <= 2
+            name.endsWith(".nfproject.json") && name.split('/').size <= 4
         }
         require(projectEntries.size == 1) { "zip 需且仅需一个项目 JSON" }
         val (projectPath, projectBytes) = projectEntries.first()
