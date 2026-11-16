@@ -42,6 +42,7 @@ import dev.ninfenz.mobile.core.CoreResponse
 import dev.ninfenz.mobile.core.J
 import dev.ninfenz.mobile.data.DraftLibrary
 import dev.ninfenz.mobile.data.PackEntry
+import dev.ninfenz.mobile.data.EpubImporter
 import dev.ninfenz.mobile.data.HtmlImporter
 import dev.ninfenz.mobile.data.ProjectPackageImporter
 import dev.ninfenz.mobile.data.TextEncoding
@@ -155,10 +156,19 @@ fun ImportScreen(
         savedName = null
         suggestNote = null
         acceptedMappings = emptySet()
-        val isHtml = name.endsWith(".html", true) || name.endsWith(".htm", true) || mime == "text/html"
-        val isText = !isHtml && (name.endsWith(".txt", true) || name.endsWith(".md", true) ||
+        val isEpub = name.endsWith(".epub", true) || mime == "application/epub+zip"
+        val isHtml = !isEpub && (name.endsWith(".html", true) || name.endsWith(".htm", true) || mime == "text/html")
+        val isText = !isEpub && !isHtml && (name.endsWith(".txt", true) || name.endsWith(".md", true) ||
             name.endsWith(".markdown", true) || mime?.startsWith("text/") == true)
         val sourceFile = when {
+            isEpub -> {
+                val markdown = runCatching { EpubImporter.extract(file) }.getOrNull()?.takeIf { it.isNotBlank() }
+                if (markdown == null) {
+                    error = CoreResponse.failure("NF-IMP-007", "EPUB 解析失败或无正文", "确认 EPUB 含 container/OPF/XHTML 章节", 2).error
+                    return
+                }
+                File(file.parentFile, "epub-import.md").apply { writeText(markdown, Charsets.UTF_8) }
+            }
             isHtml -> {
                 val raw = HtmlImporter.decode(file.readBytes())
                 val markdown = HtmlImporter.toMarkdown(raw)

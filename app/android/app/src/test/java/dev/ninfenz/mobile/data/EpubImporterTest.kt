@@ -1,0 +1,40 @@
+package dev.ninfenz.mobile.data
+
+import java.io.File
+import java.nio.file.Files
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
+import org.junit.Assert.assertTrue
+import org.junit.Test
+
+class EpubImporterTest {
+    private fun epub(entries: List<Pair<String, String>>): File {
+        val f = File.createTempFile("nf-epub-import", ".epub")
+        ZipOutputStream(f.outputStream()).use { out ->
+            entries.forEach { (name, text) ->
+                out.putNextEntry(ZipEntry(name)); out.write(text.toByteArray()); out.closeEntry()
+            }
+        }
+        return f
+    }
+
+    @Test
+    fun extractsSpineChapters() {
+        val file = epub(
+            listOf(
+                "META-INF/container.xml" to "<container><rootfiles><rootfile full-path=\"OEBPS/content.opf\"/></rootfiles></container>",
+                "OEBPS/content.opf" to "<package><manifest><item id=\"c1\" href=\"chapter1.xhtml\" media-type=\"application/xhtml+xml\"/></manifest><spine><itemref idref=\"c1\"/></spine></package>",
+                "OEBPS/chapter1.xhtml" to "<h1>章</h1><p>正文</p>"
+            )
+        )
+        val text = EpubImporter.extract(file)
+        assertTrue(text.contains("# 章"))
+        assertTrue(text.contains("正文"))
+    }
+
+    @Test
+    fun rejectsMissingContainer() {
+        val f = epub(listOf("OEBPS/chapter.xhtml" to "<p>x</p>"))
+        assertTrue(runCatching { EpubImporter.extract(f) }.isFailure)
+    }
+}
