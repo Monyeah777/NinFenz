@@ -569,8 +569,9 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                         modifier = Modifier.padding(horizontal = NfSpacing.page)
                     )
                     exportEntries.take(5).forEach { entry ->
+                        Column(modifier = Modifier.fillMaxWidth().padding(horizontal = NfSpacing.page)) {
                         Row(
-                            modifier = Modifier.fillMaxWidth().padding(horizontal = NfSpacing.page),
+                            modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -598,6 +599,14 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                     ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.delivery_share_file))
                                 }
                             }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_share_file)) }
+                        }
+                        entry.message?.takeIf { entry.ok != true }?.let { message ->
+                            Text(
+                                message,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        }
                         }
                     }
                 }
