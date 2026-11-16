@@ -11,7 +11,13 @@ import kotlinx.serialization.json.jsonObject
 
 /** 完整项目 zip 导入：一个项目 JSON + 可选 data/ 目录；不覆盖已有项目。 */
 object ProjectPackageImporter {
-    data class Imported(val id: String, val file: File, val dataFiles: Int)
+    data class Imported(
+        val id: String,
+        val file: File,
+        val dataFiles: Int,
+        val packId: String,
+        val packVersion: String
+    )
 
     fun import(filesDir: File, zipFile: File): Imported {
         require(zipFile.isFile) { "zip 不存在" }
@@ -60,6 +66,15 @@ object ProjectPackageImporter {
             out.parentFile?.mkdirs()
             out.writeBytes(bytes)
         }
-        return Imported(id, target, data.size)
+        val pack = source["refs"]?.let { refs ->
+            (refs as? JsonObject)?.get("base_pack") as? JsonObject
+        }
+        return Imported(
+            id = id,
+            file = target,
+            dataFiles = data.size,
+            packId = pack?.get("id")?.let { (it as? JsonPrimitive)?.content }.orEmpty(),
+            packVersion = pack?.get("version")?.let { (it as? JsonPrimitive)?.content }.orEmpty()
+        )
     }
 }

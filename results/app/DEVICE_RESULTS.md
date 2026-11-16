@@ -17,6 +17,7 @@
 | L1 校验 | pass：L1 pass（error=0 warn=0 info=3）；状态 assembled→validated 写回 | run-as 读项目 |
 | 导出 md/zip | pass：files/exports/delivery/result.md + result.zip + manifest；状态 validated→exported 写回 | run-as 读文件 |
 | 桌面快捷方式（构建） | pass（构建）：静态 shortcuts（导入/新建/搜索）+ MainActivity 冷启动/onNewIntent 路由；未真机长按图标验证（adb 无设备） |
+| 导入缺 Pack 提示（JVM） | pass（本机）：导入返回 base_pack 引用；缺 Pack 时 Toast 提示但仍打开项目；真机未复测（adb 无设备） |
 | 完整项目包导入（JVM） | pass（本机）：命令面板「导入项目包」选 zip，校验路径/总量，JSON 冲突自动 -import 改名，data/ 还原；测试 3 条。真机未复测（adb 无设备） |
 | 分享完整项目包（JVM） | pass（本机）：项目详情「分享完整项目」生成 zip（JSON+data/），含 authoring/assembly；测试 2 条。真机未复测（adb 无设备） |
 | 分享项目文件（JVM） | pass（本机）：项目详情「分享项目文件」写 cache/shared 后走 Sharesheet；只分享 JSON，不含项目数据目录/assembly。真机未复测（adb 无设备） |

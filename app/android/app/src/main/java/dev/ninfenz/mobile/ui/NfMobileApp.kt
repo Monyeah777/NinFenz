@@ -194,6 +194,13 @@ fun NfMobileApp(
                     }
                 }
                 result.onSuccess { imported ->
+                    if (imported.packId.isNotBlank() && packs.packs.none { it.id == imported.packId && it.version == imported.packVersion }) {
+                        android.widget.Toast.makeText(
+                            context,
+                            "项目已导入，但绑定 Pack " + imported.packId + "@" + imported.packVersion + " 未安装；请先安装该 Pack",
+                            android.widget.Toast.LENGTH_LONG
+                        ).show()
+                    }
                     refresh()
                     shell = shell.open(Detail.Project(imported.id))
                 }.onFailure {
