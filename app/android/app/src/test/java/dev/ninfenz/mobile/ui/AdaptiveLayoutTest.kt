@@ -33,10 +33,4 @@ class AdaptiveLayoutTest {
         assertEquals(ids.distinct().size, ids.size)
     }
 
-    @Test
-    fun labelsAreNonEmptyAndUnique() {
-        val labels = dev.ninfenz.mobile.state.Screen.entries.map { screenLabel(it) }
-        assertEquals(labels.distinct().size, labels.size)
-        assertEquals(true, labels.all { it.isNotBlank() })
-    }
 }

@@ -46,18 +46,6 @@ fun screenLabelRes(screen: Screen): Int = when (screen) {
     Screen.SETTINGS -> R.string.screen_settings
 }
 
-/** 纯函数中文标签：仅供非 Compose 单测/诊断使用；界面走 screenLabelRes。 */
-fun screenLabel(screen: Screen): String = when (screen) {
-    Screen.HOME -> "首页"
-    Screen.IMPORT -> "导入"
-    Screen.PROTOCOL -> "协议"
-    Screen.GRAPH -> "管线"
-    Screen.ASSEMBLY -> "装配"
-    Screen.PACK_UPDATE -> "Pack 更新"
-    Screen.CCOS -> "CCOS"
-    Screen.SETTINGS -> "设置"
-}
-
 /**
  * 中等/扩展宽度下的常驻导航栏（折叠展开/平板/Chromebook/多窗口）。
  * 图标用中文首字并清空语义，避免 TalkBack 重复朗读（标签已可读）。
