@@ -17,6 +17,7 @@
 | L1 校验 | pass：L1 pass（error=0 warn=0 info=3）；状态 assembled→validated 写回 | run-as 读项目 |
 | 导出 md/zip | pass：files/exports/delivery/result.md + result.zip + manifest；状态 validated→exported 写回 | run-as 读文件 |
 | 桌面快捷方式（构建） | pass（构建）：静态 shortcuts（导入/新建/搜索）+ MainActivity 冷启动/onNewIntent 路由；未真机长按图标验证（adb 无设备） |
+| 崩溃日志查看/清除（JVM） | pass（本机）：Settings 显示最近崩溃前 2000 字并可清除；处理器改为进程内只安装一次、保留原 handler/兜底终止；真机崩溃未复测（adb 无设备） |
 | 崩溃日志（JVM） | pass（本机）：MainActivity 安装未捕获异常处理器写 crash/last-crash.txt，最多 64 KiB；诊断包含 crash.txt；测试 2 条。真机崩溃未复测（adb 无设备） |
 | 诊断包导出（JVM） | pass（本机）：Settings 导出 zip（diagnostics.txt + README），无网络/账号/正文；Sharesheet 分享；测试 2 条。真机未复测（adb 无设备） |
 | Pack 中心 trust 告警（JVM） | pass（本机）：Pack 中心列表读取本地固定 tree，发现不一致时红色提示；真机未复测（adb 无设备） |

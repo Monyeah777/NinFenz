@@ -43,16 +43,22 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun installCrashHandler() {
+        if (crashHandlerInstalled) return
+        crashHandlerInstalled = true
         val previous = Thread.getDefaultUncaughtExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
             runCatching { CrashLogStore(filesDir).record(throwable) }
-            if (previous != null && previous !== Thread.getDefaultUncaughtExceptionHandler()) {
+            if (previous != null) {
                 previous.uncaughtException(thread, throwable)
             } else {
                 android.os.Process.killProcess(android.os.Process.myPid())
                 kotlin.system.exitProcess(10)
             }
         }
+    }
+
+    private companion object {
+        var crashHandlerInstalled = false
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {

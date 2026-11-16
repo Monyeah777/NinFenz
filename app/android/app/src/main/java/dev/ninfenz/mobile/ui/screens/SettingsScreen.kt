@@ -45,7 +45,7 @@ import kotlinx.coroutines.withContext
 fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
     val context = LocalContext.current
     val diag = remember { Core.diagnostics() }
-    val crash = remember { CrashLogStore(context.filesDir).read() }
+    var crash by remember { mutableStateOf(CrashLogStore(context.filesDir).read()) }
     var copied by remember { mutableStateOf(false) }
     var stats by remember { mutableStateOf(StorageStats.scan(context.filesDir, context.cacheDir)) }
     var cleaned by remember { mutableStateOf<String?>(null) }
@@ -168,6 +168,16 @@ fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
                     backupMessage = context.getString(dev.ninfenz.mobile.R.string.settings_diagnostics_done, humanBytes(created.bytes))
                 }
             }) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_diagnostics_export)) }
+        }
+
+        if (crash != null) {
+            CardBox(title = stringResource(dev.ninfenz.mobile.R.string.settings_crash_title)) {
+                MonoText(crash!!.take(2000))
+                Button(onClick = {
+                    CrashLogStore(context.filesDir).clear()
+                    crash = null
+                }) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_crash_clear)) }
+            }
         }
     }
 
