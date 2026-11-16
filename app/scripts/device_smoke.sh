@@ -18,4 +18,13 @@ sleep 3
 echo "[activity] $("$ADB" shell dumpsys activity activities | grep -m1 "mResumedActivity" || true)"
 echo "[crash]"
 "$ADB" logcat -d -t 200 | grep -E "FATAL EXCEPTION|AndroidRuntime" || echo "none"
+echo "[crash] done"
+CAPTURE_DIR="${CAPTURE_DIR:-}"
+if [ -n "$CAPTURE_DIR" ]; then
+  mkdir -p "$CAPTURE_DIR"
+  "$ADB" exec-out screencap -p > "$CAPTURE_DIR/home.png"
+  "$ADB" shell uiautomator dump /sdcard/nf-ui.xml >/dev/null 2>&1 || true
+  "$ADB" pull /sdcard/nf-ui.xml "$CAPTURE_DIR/ui.xml" >/dev/null 2>&1 || true
+  echo "[capture] $CAPTURE_DIR/home.png + ui.xml"
+fi
 echo "[device] smoke 完成"
