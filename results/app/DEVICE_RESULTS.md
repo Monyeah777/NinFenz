@@ -17,6 +17,7 @@
 | L1 校验 | pass：L1 pass（error=0 warn=0 info=3）；状态 assembled→validated 写回 | run-as 读项目 |
 | 导出 md/zip | pass：files/exports/delivery/result.md + result.zip + manifest；状态 validated→exported 写回 | run-as 读文件 |
 | 桌面快捷方式（构建） | pass（构建）：静态 shortcuts（导入/新建/搜索）+ MainActivity 冷启动/onNewIntent 路由；未真机长按图标验证（adb 无设备） |
+| 库内项目对比（JVM） | pass（本机）：项目详情「与库内项目对比」列出其它项目，直接读取 JSON 生成差异；无需文件选择器；真机未复测（adb 无设备） |
 | 搜索 Pack 过滤（JVM） | pass（本机）：搜索页新增 Pack 过滤 chips，与 kind 过滤组合；测试 SearchFilter.apply 包维度。真机未复测（adb 无设备） |
 | 项目对比（JVM） | pass（本机）：项目详情「对比项目」选另一项目 JSON，比较状态/refs/评审/历史；相同提示一致；测试 2 条。真机未复测（adb 无设备） |
 | Pack zip 加密检测（JVM） | pass（本机）：解析 EOCD/central directory 通用位标记，含加密条目直接拒绝；测试手工构造加密 flag zip。真机未复测（adb 无设备） |

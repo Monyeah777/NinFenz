@@ -543,13 +543,15 @@ fun ProjectDetailScreen(
     onAuthor: () -> Unit,
     onAssembly: () -> Unit,
     onDuplicate: () -> Unit = {},
-    onArchive: () -> Unit = {}
+    onArchive: () -> Unit = {},
+    compareCandidates: List<ProjectEntry> = emptyList()
 ) {
     val context = LocalContext.current
     val diffScope = rememberCoroutineScope()
     var showArchive by remember { mutableStateOf(false) }
     var diffReport by remember { mutableStateOf<ProjectDiff.Report?>(null) }
     var diffError by remember { mutableStateOf<String?>(null) }
+    var showComparePicker by remember { mutableStateOf(false) }
     val diffPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: android.net.Uri? ->
         if (uri != null) {
             diffScope.launch {
@@ -604,6 +606,11 @@ fun ProjectDetailScreen(
                         TextButton(onClick = { diffPicker.launch(arrayOf("application/json", "*/*")) }) {
                             Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_diff))
                         }
+                        if (compareCandidates.isNotEmpty()) {
+                            TextButton(onClick = { showComparePicker = true }) {
+                                Text(stringResource(dev.ninfenz.mobile.R.string.project_diff_library))
+                            }
+                        }
                     }
                 }
             }
@@ -640,6 +647,33 @@ fun ProjectDetailScreen(
             item { NfListRow(stringResource(dev.ninfenz.mobile.R.string.project_detail_author), stringResource(dev.ninfenz.mobile.R.string.project_detail_author_subtitle), Icons.Filled.Edit, "›", onAuthor) }
             item { NfListRow(stringResource(dev.ninfenz.mobile.R.string.project_detail_delivery), stringResource(dev.ninfenz.mobile.R.string.project_detail_delivery_subtitle), Icons.Filled.Info, "›", onAssembly) }
         }
+    }
+
+    if (showComparePicker) {
+        AlertDialog(
+            onDismissRequest = { showComparePicker = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.project_diff_library)) },
+            text = {
+                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                    compareCandidates.filter { it.project.id != project.id }.forEach { candidate ->
+                        TextButton(onClick = {
+                            showComparePicker = false
+                            diffScope.launch {
+                                try {
+                                    val text = withContext(Dispatchers.IO) { candidate.file.readText(Charsets.UTF_8) }
+                                    diffReport = ProjectDiff.compare(project, ProjectModel.parse(text))
+                                } catch (t: Throwable) {
+                                    diffError = "项目解析失败：" + (t.message ?: t.javaClass.simpleName)
+                                }
+                            }
+                        }) { Text(candidate.project.title + " · " + candidate.project.id) }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showComparePicker = false }) { Text(stringResource(dev.ninfenz.mobile.R.string.action_close)) }
+            }
+        )
     }
 
     diffError?.let { message ->

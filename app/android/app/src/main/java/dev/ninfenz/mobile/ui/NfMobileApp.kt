@@ -457,6 +457,7 @@ is Detail.Import -> ImportScreen(
                                 onBack = { shell = shell.back() ?: shell },
                                 onAuthor = { shell = shell.open(Detail.Author(entry.project.id)) },
                                 onAssembly = { shell = shell.open(Detail.Delivery(entry.project.id)) },
+                                compareCandidates = projects,
                                 onArchive = {
                                     scope.launch {
                                         withContext(Dispatchers.IO) { ProjectArchiver.archive(entry.file, context.filesDir) }
