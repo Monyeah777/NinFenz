@@ -37,6 +37,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -79,11 +81,17 @@ import dev.ninfenz.mobile.ui.screens.SearchScreen
 import dev.ninfenz.mobile.ui.screens.SettingsScreen
 import dev.ninfenz.mobile.ui.shell.Detail
 import dev.ninfenz.mobile.ui.shell.ShellState
+import dev.ninfenz.mobile.ui.shell.ShellStateCodec
 import dev.ninfenz.mobile.ui.shell.TopDestination
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+
+private val ShellStateSaver = Saver<ShellState, List<String>>(
+    save = { ShellStateCodec.encode(it) },
+    restore = { ShellStateCodec.decode(it) }
+)
 
 /**
  * v0.02 应用外壳：四目的地（库/创作/交付/我的）+ 自适应底部栏/rail + FAB 导入 + 单层详情。
@@ -106,7 +114,7 @@ fun NfMobileApp(
     val seeder = remember { SampleSeeder(context, context.filesDir, prefs) }
     val projectCreator = remember { ProjectCreator(context.filesDir) }
 
-    var shell by remember { mutableStateOf(ShellState()) }
+    var shell by rememberSaveable(stateSaver = ShellStateSaver) { mutableStateOf(ShellState()) }
     var packs by remember { mutableStateOf<PackSnapshot>(PackSnapshot(emptyList(), emptyList())) }
     var projects by remember { mutableStateOf<List<ProjectEntry>>(emptyList()) }
     var projectErrors by remember { mutableStateOf<List<String>>(emptyList()) }
