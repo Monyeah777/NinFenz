@@ -69,6 +69,18 @@ class BackupRestoreServiceTest {
     }
 
     @Test
+    fun rejectsManifestMissingSha() {
+        val dir = Files.createTempDirectory("nf-restore-nosha").toFile()
+        val bad = File(dir, "bad.zip")
+        ZipOutputStream(bad.outputStream()).use { out ->
+            val manifest = "{\"schema\":\"nf-backup/1\",\"files\":[{\"path\":\"projects/a\",\"bytes\":5}]}"
+            out.putNextEntry(ZipEntry("manifest.json")); out.write(manifest.toByteArray()); out.closeEntry()
+            out.putNextEntry(ZipEntry("projects/a")); out.write("hello".toByteArray()); out.closeEntry()
+        }
+        assertFalse(BackupRestoreService.inspect(bad).ok)
+    }
+
+    @Test
     fun rejectsPathTraversalEntry() {
         val dir = Files.createTempDirectory("nf-restore-bad").toFile()
         val bad = File(dir, "bad.zip")

@@ -27,15 +27,18 @@ object BackupRestoreService {
                 if (root["schema"]?.jsonPrimitive?.content != "nf-backup/1") {
                     return Inspect(emptyList(), false, "不是 nf-backup/1")
                 }
-                val entries = root["files"]?.jsonArray?.mapNotNull { el ->
-                    val o = el as? JsonObject ?: return@mapNotNull null
-                    val path = o["path"]?.jsonPrimitive?.content ?: return@mapNotNull null
-                    Entry(
-                        path = path,
-                        bytes = o["bytes"]?.jsonPrimitive?.long ?: -1L,
-                        sha256 = o["sha256"]?.jsonPrimitive?.content ?: ""
-                    )
-                } ?: emptyList()
+                val rawFiles = root["files"]?.jsonArray ?: return Inspect(emptyList(), false, "manifest 缺 files")
+                val entries = rawFiles.map { el ->
+                    val o = el as? JsonObject ?: return Inspect(emptyList(), false, "manifest 条目格式错误")
+                    val path = o["path"]?.jsonPrimitive?.content
+                        ?: return Inspect(emptyList(), false, "manifest 条目缺 path")
+                    val bytes = o["bytes"]?.jsonPrimitive?.long
+                        ?: return Inspect(emptyList(), false, "manifest 条目缺 bytes")
+                    val sha = o["sha256"]?.jsonPrimitive?.content
+                        ?: return Inspect(emptyList(), false, "manifest 条目缺 sha256")
+                    if (bytes < 0 || sha.isBlank()) return Inspect(emptyList(), false, "manifest 条目字段非法")
+                    Entry(path, bytes, sha)
+                }
                 if (entries.isEmpty()) return Inspect(emptyList(), true)
                 val listed = entries.map { it.path }.toSet()
                 val actual = zip.entries().asSequence()
