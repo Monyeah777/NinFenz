@@ -75,8 +75,8 @@ fun ProtocolScreen(onBack: () -> Unit) {
             } catch (e: Exception) {
                 error = CoreResponse.failure(
                     (e as? dev.ninfenz.mobile.core.ModelException)?.code ?: "NF-PRT-001",
-                    "协议包解析失败：" + (e.message ?: e.javaClass.simpleName),
-                    "按 app/schema/nf-protocol-pack.schema.json 修正",
+                    context.getString(dev.ninfenz.mobile.R.string.protocol_parse_failed, e.message ?: e.javaClass.simpleName),
+                    context.getString(dev.ninfenz.mobile.R.string.protocol_parse_failed_fix),
                     1
                 ).error
             }
@@ -116,13 +116,13 @@ fun ProtocolScreen(onBack: () -> Unit) {
                     MonoText(clause.text)
                     val check = ProtocolModel.checkClause(p, clause, values)
                     if (check.ok) {
-                        Notice("占位符检查通过（本地预检）", Tone.INFO)
+                        Notice(stringResource(dev.ninfenz.mobile.R.string.protocol_placeholder_ok), Tone.INFO)
                     } else {
                         if (check.missing.isNotEmpty()) {
-                            Notice("缺必填字段：" + check.missing.joinToString(", ") + "（NF-PRT-003）", Tone.ERROR)
+                            Notice(context.getString(dev.ninfenz.mobile.R.string.protocol_missing_fields, check.missing.joinToString(", ")), Tone.ERROR)
                         }
                         if (check.unknown.isNotEmpty()) {
-                            Notice("未声明占位符：" + check.unknown.joinToString(", ") + "（NF-PRT-004）", Tone.WARN)
+                            Notice(context.getString(dev.ninfenz.mobile.R.string.protocol_unknown_placeholders, check.unknown.joinToString(", ")), Tone.WARN)
                         }
                     }
                     for (field in p.fields.filter { it.clause == clause.id }) {
