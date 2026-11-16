@@ -18,6 +18,7 @@
 | 导出 md/zip | pass：files/exports/delivery/result.md + result.zip + manifest；状态 validated→exported 写回 | run-as 读文件 |
 | 桌面快捷方式（构建） | pass（构建）：静态 shortcuts（导入/新建/搜索）+ MainActivity 冷启动/onNewIntent 路由；未真机长按图标验证（adb 无设备） |
 | Lint 收尾（JVM） | pass（本机）：抑制预期 UnusedAttribute；import_project_package_done 改 plurals；warnings 4→3（仅剩 GradleDependency2/ObsoleteSdkInt1）。真机未复测（adb 无设备） |
+| 关于页 i18n（JVM） | pass（本机）：About 正文改用资源（版本/versionCode 参数），中英可切换；244 tests 全绿。真机未复测（adb 无设备） |
 | 永久删除项目（JVM） | pass（本机）：项目详情强确认后删除 JSON+projects/<id>/ 数据；提示建议先归档/分享；测试 6 条。真机未复测（adb 无设备） |
 | Paparazzi 升级尝试（JVM） | blocked（本机）：alpha05 拉入 kotlin-stdlib 2.3.0，当前 Kotlin 编译器 2.1.0 无法读取元数据；回退 alpha02，构建/243 tests 恢复全绿。 |
 | 依赖升级 coroutines（JVM） | pass（本机）：coroutines 1.9.0→1.10.2，243 tests 全绿；lint warnings 3→2；debug APK 因未压缩 dex 增至 24.7MB。真机未复测（adb 无设备） |

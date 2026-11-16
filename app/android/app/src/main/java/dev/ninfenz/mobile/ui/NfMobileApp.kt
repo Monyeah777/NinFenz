@@ -628,7 +628,13 @@ is Detail.Import -> ImportScreen(
             onDismissRequest = { showAbout = false },
             title = { Text(stringResource(dev.ninfenz.mobile.R.string.about_title)) },
             text = {
-                Text("NF Mobile 0.2.0（v0.02）\n本地处理 · 无网络权限 · 无遥测\nMIT License · 详见仓库 app/docs/LEGAL.md")
+                Text(
+                    stringResource(
+                        dev.ninfenz.mobile.R.string.about_body,
+                        dev.ninfenz.mobile.BuildConfig.VERSION_NAME,
+                        dev.ninfenz.mobile.BuildConfig.VERSION_CODE
+                    )
+                )
             },
             confirmButton = { TextButton(onClick = { showAbout = false }) { Text(stringResource(dev.ninfenz.mobile.R.string.action_close)) } }
         )
