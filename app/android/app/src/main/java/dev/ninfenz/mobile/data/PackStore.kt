@@ -36,7 +36,17 @@ class PackStore(private val filesDir: File) {
 
     fun scan(): PackSnapshot {
         val root = packsRoot()
-        val fingerprint = if (root.isDirectory) root.lastModified() else 0L
+        val fingerprint = if (!root.isDirectory) {
+            0L
+        } else {
+            val children = root.listFiles()?.sortedBy { it.name }.orEmpty()
+            var hash = children.size.toLong()
+            children.forEach {
+                hash = hash * 31 + it.name.hashCode()
+                hash = hash * 31 + it.lastModified()
+            }
+            hash
+        }
         loadIndex(fingerprint)?.let { return it }
         val snapshot = scanDirs(root)
         saveIndex(fingerprint, snapshot)

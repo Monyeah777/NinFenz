@@ -30,6 +30,7 @@
 | EPUB 导出 data URI 图片（JVM） | pass（本机）：Markdown data:image 渲染为 img；测试 10 条。真机未复测（adb 无设备） |
 | EPUB 图片内嵌（JVM） | pass（本机）：EPUB img 转 data URI（单图 ≤2MiB、总量 ≤20MiB）；测试 6 条。真机未复测（adb 无设备） |
 | 全量复核（round53） | pass（本机）：verify PASS=107/WARN=2/FAIL=0；gates PASS/gap=0；rust 186；pytest 493。 |
+| PackStore 指纹稳定（JVM） | pass（本机）：目录指纹改为子项名称+mtime，PackStoreTest 连续 3 次 --rerun-tasks 全绿。 |
 | 归档恢复 data 回滚（JVM） | pass（本机）：恢复时 data 移动失败会把归档 JSON 移回；归档测试保持全绿。 |
 | 复制失败清理（JVM） | pass（本机）：目标 data 目录阻塞移动时删除 staging/目标 JSON；测试 3 条。 |
 | 归档回滚故障注入（JVM） | pass（本机）：预置非空 data 目标使移动失败，验证 JSON/data 回滚；归档测试 7 条。 |
@@ -124,7 +125,7 @@
 | 依赖升级 coroutines（JVM） | pass（本机）：coroutines 1.9.0→1.10.2，243 tests 全绿；lint warnings 3→2；debug APK 因未压缩 dex 增至 24.7MB。真机未复测（adb 无设备） |
 | Clean build（本轮） | pass（本机）：`gradlew clean` + `testDebugUnitTest --rerun-tasks` + assembleDebug；248/248 全绿；clean APK 19,032,264 B sha256 f4501bfe…；zipalign 16KB 通过。增量 APK 24.7MB 为旧构建膨胀，clean 产物为准。 |
 | Rust core 单测（本轮） | pass（本机）：`cargo test` 186 passed / 0 failed；Android 端无 core 改动。 |
-| Release 构建（构建） | pass（本机）：clean 后重建 `:app:assembleRelease` 成功；app-release-unsigned.apk 15,266,329 B sha256 6bf65162…；zipalign 16KB 通过；apksigner 显示未签名（预期，签名 OPEN-EXTERNAL）。 |
+| Release 构建（构建） | pass（本机）：clean 后重建 `:app:assembleRelease` 成功；app-release-unsigned.apk 15,266,329 B sha256 55bf1846…；zipalign 16KB 通过；apksigner 显示未签名（预期，签名 OPEN-EXTERNAL）。 |
 | 16KB 页对齐（构建） | pass（本机）：`zipalign -c -P 16 4 app-debug.apk` exit=0；未真机安装验证。 |
 | APP 门禁（round127） | pass（本机）：QA0–QA6 全 PASS，FAIL=0；covered=14 gap=0 open=2 p0=0；台账刷新到当前 HEAD。 |
 | APP 门禁（本轮） | pass（本机）：QA0–QA6 全部 PASS，FAIL=0；自审计 covered=14 gap=0 open=2 p0=0。 |
