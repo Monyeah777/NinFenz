@@ -117,8 +117,8 @@ fun GraphScreen(store: LibraryStore, onBack: () -> Unit) {
             } else {
                 KeyValue("id/version", g.id + " " + g.version)
                 KeyValue("mode", g.mode)
-                KeyValue("节点/边", g.nodes.size.toString() + " / " + g.edges.size)
-                KeyValue("required_stages", g.requiredStages.joinToString(",").ifBlank { "（空）" })
+                KeyValue(context.getString(dev.ninfenz.mobile.R.string.graph_nodes_edges), g.nodes.size.toString() + " / " + g.edges.size)
+                KeyValue("required_stages", g.requiredStages.joinToString(",").ifBlank { context.getString(dev.ninfenz.mobile.R.string.graph_empty_value) })
             }
         }
 
@@ -136,7 +136,7 @@ fun GraphScreen(store: LibraryStore, onBack: () -> Unit) {
                                 style = MaterialTheme.typography.bodySmall)
                         }
                         FormTextField(
-                            label = "权重",
+                            label = context.getString(dev.ninfenz.mobile.R.string.graph_weight),
                             value = g.weights[node.id]?.toString() ?: "",
                             onValueChange = { v ->
                                 val weight = v.toIntOrNull()
@@ -146,7 +146,7 @@ fun GraphScreen(store: LibraryStore, onBack: () -> Unit) {
                         OutlinedButton(onClick = { graph = GraphModel.withoutNode(g, node.id) }) { Text(stringResource(dev.ninfenz.mobile.R.string.graph_delete)) }
                     }
                 }
-                FormTextField(label = "新节点标题", value = nodeTitle, onValueChange = { nodeTitle = it })
+                FormTextField(label = context.getString(dev.ninfenz.mobile.R.string.graph_new_node_title), value = nodeTitle, onValueChange = { nodeTitle = it })
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedButton(onClick = { nodeKind = "stage" }) { Text(if (nodeKind == "stage") "[stage]" else "stage") }
                     OutlinedButton(onClick = { nodeKind = "module" }) { Text(if (nodeKind == "module") "[module]" else "module") }
@@ -210,7 +210,7 @@ fun GraphScreen(store: LibraryStore, onBack: () -> Unit) {
             CardBox(title = stringResource(dev.ninfenz.mobile.R.string.graph_local_check)) {
                 val issues = GraphModel.formIssues(g)
                 if (issues.isEmpty()) Notice(stringResource(dev.ninfenz.mobile.R.string.graph_local_ok), Tone.INFO)
-                for (issue in issues) Notice(issue.code + " " + issue.path + "：" + issue.message + "；修复：" + issue.fix, Tone.WARN)
+                for (issue in issues) Notice(issue.code + " " + issue.path + "：" + issue.message + context.getString(dev.ninfenz.mobile.R.string.error_fix_suffix) + issue.fix, Tone.WARN)
             }
 
             CardBox(title = stringResource(dev.ninfenz.mobile.R.string.graph_core)) {
@@ -235,7 +235,7 @@ fun GraphScreen(store: LibraryStore, onBack: () -> Unit) {
                                 busy = false
                             }
                         }
-                    }) { Text(if (busy) "调用中…" else "core graph-validate") }
+                    }) { Text(if (busy) context.getString(dev.ninfenz.mobile.R.string.graph_calling) else "core graph-validate") }
                     Button(enabled = !busy, onClick = {
                         scope.launch {
                             busy = true
@@ -260,11 +260,11 @@ fun GraphScreen(store: LibraryStore, onBack: () -> Unit) {
                                 busy = false
                             }
                         }
-                    }) { Text(if (busy) "调用中…" else "core graph-compile") }
+                    }) { Text(if (busy) context.getString(dev.ninfenz.mobile.R.string.graph_calling) else "core graph-compile") }
                 }
                 report?.let { r ->
-                    KeyValue("校验", ReportModel.line(r))
-                    for (issue in r.issues) Notice(issue.code + " " + (issue.path ?: "-") + "：" + issue.message + "；修复：" + issue.fix,
+                    KeyValue(context.getString(dev.ninfenz.mobile.R.string.graph_validate_label), ReportModel.line(r))
+                    for (issue in r.issues) Notice(issue.code + " " + (issue.path ?: "-") + "：" + issue.message + context.getString(dev.ninfenz.mobile.R.string.error_fix_suffix) + issue.fix,
                         if (issue.severity == "error") Tone.ERROR else Tone.WARN)
                 }
                 planSummary?.let { MonoText(it) }
@@ -275,7 +275,7 @@ fun GraphScreen(store: LibraryStore, onBack: () -> Unit) {
                     val path = store.saveDraft("graph-" + g.id, GraphModel.toJson(g).toString())
                     savedPath = path.absolutePath
                 }) { Text(stringResource(dev.ninfenz.mobile.R.string.graph_save_draft)) }
-                savedPath?.let { Notice("已保存：" + it, Tone.INFO) }
+                savedPath?.let { Notice(context.getString(dev.ninfenz.mobile.R.string.graph_saved_prefix, it), Tone.INFO) }
             }
         }
     }

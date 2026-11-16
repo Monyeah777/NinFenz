@@ -392,6 +392,13 @@
     <string name="graph_parse_failed_fix">Fix per app/schema/nf-pipeline-graph.schema.json</string>
     <string name="graph_core_no_plan">Core returned no plan</string>
     <string name="graph_none">(none)</string>
+    <string name="graph_nodes_edges">Nodes/edges</string>
+    <string name="graph_empty_value">(empty)</string>
+    <string name="graph_weight">Weight</string>
+    <string name="graph_new_node_title">New node title</string>
+    <string name="graph_calling">Calling…</string>
+    <string name="graph_validate_label">Validation</string>
+    <string name="graph_saved_prefix">Saved: %1$s</string>
     <string name="graph_plan_summary">plan digest=%1$s slots=%3$s steps=%2$d</string>
     <string name="graph_core">Core validate / compile</string>
     <string name="graph_save">Save</string>
