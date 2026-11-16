@@ -122,6 +122,18 @@ class ProjectPackageImporterTest {
     }
 
     @Test
+    fun rejectsMissingProjectJson() {
+        val root = Files.createTempDirectory("nf-no-project").toFile()
+        assertTrue(runCatching { ProjectPackageImporter.import(root, zip(listOf("data/a.md" to "x"))) }.isFailure)
+    }
+
+    @Test
+    fun rejectsProjectWithoutId() {
+        val root = Files.createTempDirectory("nf-no-id").toFile()
+        assertTrue(runCatching { ProjectPackageImporter.import(root, zip(listOf("p.nfproject.json" to "{}"))) }.isFailure)
+    }
+
+    @Test
     fun rejectsTraversal() {
         val root = Files.createTempDirectory("nf-import-project-3").toFile()
         assertTrue(runCatching { ProjectPackageImporter.import(root, zip(listOf("../evil.nfproject.json" to doc))) }.isFailure)

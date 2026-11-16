@@ -23,6 +23,7 @@
 | 错误码复制反馈（JVM） | pass（本机）：点击错误码复制并 Toast「已复制 code」；真机未复测（adb 无设备） |
 | 门禁/ lint 复核（round143） | pass（本机）：QA0–QA6 全 PASS，FAIL=0，covered=14 gap=0 open=2 p0=0；lint warnings=1（仅 Paparazzi 版本，Kotlin 2.1 阻塞）。 |
 | 备份未列条目拒绝（JVM） | pass（本机）：manifest 未列出的 zip 条目导致 inspect 失败；BackupRestoreServiceTest 5 条。真机未复测（adb 无设备） |
+| 项目包负例测试（JVM） | pass（本机）：缺项目 JSON、项目缺 id 均拒绝导入；导入测试 10 条。真机未复测（adb 无设备） |
 | 分享导入临时文件清理（JVM） | pass（本机）：分享/SAF 项目包导入完成后删除 cache 临时 zip；267 tests 全绿。真机未复测（adb 无设备） |
 | 项目包临时文件清理（JVM） | pass（本机）：命令面板导入完成后删除 cache/imports 临时 zip；267 tests 全绿。真机未复测（adb 无设备） |
 | APP 门禁（round153） | pass（本机）：QA0–QA6 全 PASS，FAIL=0；covered=14 gap=0 open=2 p0=0；台账刷新到当前 HEAD。 |
