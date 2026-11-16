@@ -19,6 +19,7 @@
 | 桌面快捷方式（构建） | pass（构建）：静态 shortcuts（导入/新建/搜索）+ MainActivity 冷启动/onNewIntent 路由；未真机长按图标验证（adb 无设备） |
 | Lint 收尾（JVM） | pass（本机）：抑制预期 UnusedAttribute；import_project_package_done 改 plurals；warnings 4→3（仅剩 GradleDependency2/ObsoleteSdkInt1）。真机未复测（adb 无设备） |
 | 错误码复制反馈（JVM） | pass（本机）：点击错误码复制并 Toast「已复制 code」；真机未复测（adb 无设备） |
+| 门禁/ lint 复核（round143） | pass（本机）：QA0–QA6 全 PASS，FAIL=0，covered=14 gap=0 open=2 p0=0；lint warnings=1（仅 Paparazzi 版本，Kotlin 2.1 阻塞）。 |
 | 备份排除临时文件（JVM） | pass（本机）：备份 zip 排除 `.bak`/`.tmp`；测试仍 2 条（含 .bak 断言）。真机未复测（adb 无设备） |
 | 分享包排除临时文件（JVM） | pass（本机）：data 下 `.bak`/`.tmp` 不进入分享包；测试 2 条。真机未复测（adb 无设备） |
 | manifest 版本/项目名校验（JVM） | pass（本机）：拒绝未知 schema 或项目文件名不一致；旧包无 manifest 仍兼容。真机未复测（adb 无设备） |
