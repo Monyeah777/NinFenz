@@ -24,6 +24,7 @@
 | 门禁/ lint 复核（round143） | pass（本机）：QA0–QA6 全 PASS，FAIL=0，covered=14 gap=0 open=2 p0=0；lint warnings=1（仅 Paparazzi 版本，Kotlin 2.1 阻塞）。 |
 | 备份未列条目拒绝（JVM） | pass（本机）：manifest 未列出的 zip 条目导致 inspect 失败；BackupRestoreServiceTest 5 条。真机未复测（adb 无设备） |
 | 全量复核（round161） | pass（本机）：verify.sh PASS=107 WARN=2 FAIL=0；app gates QA0–QA6 PASS，gap=0，P0=0；lint 0 warnings。 |
+| 安全构建脚本 E2E（本轮） | pass（本机）：`bash app/scripts/build_android_safe.sh` 一次成功；clean/test/debug/release 全流程；284 tests；debug sha 7ff80fd1…、release sha 4554db7d…。 |
 | HTML 水平线导入（JVM） | pass（本机）：hr → Markdown `---`；测试 8 条。真机未复测（adb 无设备） |
 | HTML 引用块导入（JVM） | pass（本机）：blockquote → `> ` 引用；测试 7 条。真机未复测（adb 无设备） |
 | HTML 代码块导入（JVM） | pass（本机）：pre/code → Markdown 代码块/行内代码；测试 6 条。真机未复测（adb 无设备） |
