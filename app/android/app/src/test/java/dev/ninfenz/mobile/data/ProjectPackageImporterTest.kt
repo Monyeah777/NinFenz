@@ -44,6 +44,19 @@ class ProjectPackageImporterTest {
     }
 
     @Test
+    fun roundTripsPackageExportImport() {
+        val source = Files.createTempDirectory("nf-package-src").toFile()
+        val project = java.io.File(source, "p.nfproject.json").apply { writeText(doc) }
+        java.io.File(source, "p/authoring").mkdirs()
+        java.io.File(source, "p/authoring/assembly.md").writeText("body")
+        val zip = ProjectPackage.create(project, java.io.File(source, "p"), java.io.File(source, "out"))
+        val target = Files.createTempDirectory("nf-package-dst").toFile()
+        val imported = ProjectPackageImporter.import(target, zip)
+        assertEquals("p", imported.id)
+        assertEquals("body", java.io.File(target, "projects/p/authoring/assembly.md").readText())
+    }
+
+    @Test
     fun rejectsTraversal() {
         val root = Files.createTempDirectory("nf-import-project-3").toFile()
         assertTrue(runCatching { ProjectPackageImporter.import(root, zip(listOf("../evil.nfproject.json" to doc))) }.isFailure)
