@@ -3,6 +3,7 @@ package dev.ninfenz.mobile.data
 import java.io.File
 import java.nio.file.Files
 import java.util.zip.ZipEntry
+import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -72,6 +73,28 @@ class ProjectPackageImporterTest {
         assertEquals("p", imported.id)
         assertEquals("nested", java.io.File(root, "projects/p/authoring/assembly.md").readText())
         assertTrue(ProjectPackageImporter.hasProjectJson(zip))
+    }
+
+    @Test
+    fun rejectsTamperedData() {
+        val source = Files.createTempDirectory("nf-tamper-src").toFile()
+        val project = java.io.File(source, "p.nfproject.json").apply { writeText(doc) }
+        java.io.File(source, "p/authoring").mkdirs()
+        java.io.File(source, "p/authoring/assembly.md").writeText("body")
+        val zip = ProjectPackage.create(project, java.io.File(source, "p"), java.io.File(source, "out"))
+        val bad = java.io.File(source, "bad.zip")
+        ZipFile(zip).use { z ->
+            ZipOutputStream(bad.outputStream()).use { out ->
+                z.entries().toList().forEach { entry ->
+                    out.putNextEntry(ZipEntry(entry.name))
+                    val bytes = z.getInputStream(entry).readBytes()
+                    out.write(if (entry.name == "data/authoring/assembly.md") "tampered".toByteArray() else bytes)
+                    out.closeEntry()
+                }
+            }
+        }
+        val target = Files.createTempDirectory("nf-tamper-dst").toFile()
+        assertTrue(runCatching { ProjectPackageImporter.import(target, bad) }.isFailure)
     }
 
     @Test
