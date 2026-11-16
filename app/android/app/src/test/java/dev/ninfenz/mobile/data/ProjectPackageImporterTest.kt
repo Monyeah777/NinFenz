@@ -98,6 +98,30 @@ class ProjectPackageImporterTest {
     }
 
     @Test
+    fun rejectsUnlistedDataEntry() {
+        val source = Files.createTempDirectory("nf-unlisted-src").toFile()
+        val project = java.io.File(source, "p.nfproject.json").apply { writeText(doc) }
+        java.io.File(source, "p/authoring").mkdirs()
+        java.io.File(source, "p/authoring/assembly.md").writeText("body")
+        val zip = ProjectPackage.create(project, java.io.File(source, "p"), java.io.File(source, "out"))
+        val bad = java.io.File(source, "bad.zip")
+        ZipFile(zip).use { z ->
+            ZipOutputStream(bad.outputStream()).use { out ->
+                z.entries().toList().forEach { entry ->
+                    out.putNextEntry(ZipEntry(entry.name))
+                    out.write(z.getInputStream(entry).readBytes())
+                    out.closeEntry()
+                }
+                out.putNextEntry(ZipEntry("data/authoring/extra.txt"))
+                out.write("extra".toByteArray())
+                out.closeEntry()
+            }
+        }
+        val target = Files.createTempDirectory("nf-unlisted-dst").toFile()
+        assertTrue(runCatching { ProjectPackageImporter.import(target, bad) }.isFailure)
+    }
+
+    @Test
     fun rejectsTraversal() {
         val root = Files.createTempDirectory("nf-import-project-3").toFile()
         assertTrue(runCatching { ProjectPackageImporter.import(root, zip(listOf("../evil.nfproject.json" to doc))) }.isFailure)

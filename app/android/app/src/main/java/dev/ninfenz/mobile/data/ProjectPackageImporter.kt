@@ -50,15 +50,20 @@ object ProjectPackageImporter {
         require(expected == null || expected == ProjectPackage.sha256(projectText.toByteArray(Charsets.UTF_8))) {
             "项目 JSON 完整性校验失败"
         }
+        val dataPrefix = if (prefix.isBlank()) "data/" else prefix + "/data/"
+        val listedNames = mutableSetOf<String>()
         manifest["data"]?.jsonArray?.forEach { item ->
             val obj = item.jsonObject
             val path = obj["path"]?.jsonPrimitive?.content ?: return@forEach
             val sha = obj["sha256"]?.jsonPrimitive?.content ?: return@forEach
             val actualName = if (prefix.isBlank()) path else prefix + "/" + path
+            listedNames.add(actualName)
             val bytes = entries.firstOrNull { (name, _) -> name == actualName }?.second
                 ?: throw IllegalArgumentException("manifest 缺少条目：" + path)
             require(ProjectPackage.sha256(bytes) == sha) { "数据完整性校验失败：" + path }
         }
+        val actualNames = entries.map { it.first }.filter { it.startsWith(dataPrefix) }.toSet()
+        require(actualNames == listedNames) { "manifest 与数据条目不一致" }
     }
 
     fun import(filesDir: File, zipFile: File): Imported {
