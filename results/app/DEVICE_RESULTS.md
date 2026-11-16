@@ -16,6 +16,7 @@
 | 装配 | pass：填 4 个槽位后 assemble 返回 markdown（开篇/正文/收束） | 截图 19 |
 | L1 校验 | pass：L1 pass（error=0 warn=0 info=3）；状态 assembled→validated 写回 | run-as 读项目 |
 | 导出 md/zip | pass：files/exports/delivery/result.md + result.zip + manifest；状态 validated→exported 写回 | run-as 读文件 |
+| 项目历史分享（JVM） | pass（本机）：项目详情历史卡新增「分享历史」，生成 Markdown 表格（op/digest/at），标题/单元格转义；空历史可导出。真机未复测（adb 无设备） |
 | JSON/Skill 导出（JVM） | pass（本机）：交付台新增「导出 json」「导出 skill」；json 产 result.json，skill 产 result.skill.zip；纳入校验与最近导出/重新分享；真机未复测（adb 无设备） |
 | 一键回滚上次恢复（JVM） | pass（本机）：restore 写 last-restore-snapshot.txt 指针；Settings 显示「回滚上次恢复」，校验快照后走确认恢复；测试验证旧文件恢复。真机未复测（adb 无设备） |
 | 恢复前自动快照（JVM） | pass（本机）：每次 restore 先 BackupService.create 生成 pre-restore 快照，再写 projects/drafts；UI 显示快照文件名；测试断言快照存在。真机未复测（adb 无设备） |

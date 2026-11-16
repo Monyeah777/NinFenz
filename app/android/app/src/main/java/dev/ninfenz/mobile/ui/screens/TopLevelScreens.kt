@@ -41,6 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.data.PackEntry
@@ -51,7 +52,9 @@ import dev.ninfenz.mobile.data.LanguageMode
 import dev.ninfenz.mobile.data.ThemeMode
 import dev.ninfenz.mobile.model.Project
 import dev.ninfenz.mobile.model.ProjectFilter
+import dev.ninfenz.mobile.model.ProjectHistoryExport
 import dev.ninfenz.mobile.model.ProjectStatus
+import dev.ninfenz.mobile.share.ShareExporter
 import dev.ninfenz.mobile.ui.components.NfCard
 import dev.ninfenz.mobile.ui.components.NfEmptyState
 import dev.ninfenz.mobile.ui.components.NfGradientHero
@@ -513,6 +516,7 @@ fun ProjectDetailScreen(
     onAuthor: () -> Unit,
     onAssembly: () -> Unit
 ) {
+    val context = LocalContext.current
     Column(modifier = Modifier.fillMaxSize()) {
         NfTopAppBar(title = project.title, onBack = onBack)
         LazyColumn(
@@ -546,7 +550,18 @@ fun ProjectDetailScreen(
                 item {
                     NfCard {
                         Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
-                            Text(stringResource(dev.ninfenz.mobile.R.string.project_history_title), style = MaterialTheme.typography.titleMedium)
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    stringResource(dev.ninfenz.mobile.R.string.project_history_title),
+                                    style = MaterialTheme.typography.titleMedium,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                TextButton(onClick = {
+                                    val md = ProjectHistoryExport.toMarkdown(project)
+                                    val intent = ShareExporter.shareMarkdown(context, "nf-history-" + project.id, md)
+                                    ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.project_history_share))
+                                }) { Text(stringResource(dev.ninfenz.mobile.R.string.project_history_share)) }
+                            }
                             project.history.takeLast(20).forEach { h ->
                                 Text(
                                     h.op + (h.digest?.let { " · " + it.take(12) } ?: "") + (h.at?.let { " · " + it } ?: ""),

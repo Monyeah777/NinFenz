@@ -465,4 +465,5 @@
     <string name="settings_backup_restore_confirm">确认恢复</string>
     <string name="settings_backup_restored">已恢复 %1$d 个文件；恢复前快照：%2$s</string>
     <string name="settings_backup_rollback">回滚上次恢复</string>
+    <string name="project_history_share">分享历史</string>
 </resources>
