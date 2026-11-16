@@ -292,7 +292,7 @@ fun NfListRow(
 @Composable
 fun NfOverflowButton(onClick: () -> Unit) {
     IconButton(onClick = onClick) {
-        Icon(Icons.Filled.MoreVert, contentDescription = "更多")
+        Icon(Icons.Filled.MoreVert, contentDescription = stringResource(dev.ninfenz.mobile.R.string.common_more))
     }
 }
 

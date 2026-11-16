@@ -26,6 +26,7 @@
     <string name="screen_settings">设置</string>
 
     <string name="action_back">返回</string>
+    <string name="common_more">更多</string>
     <string name="action_search">搜索</string>
     <string name="action_settings">设置</string>
     <string name="action_import">导入</string>
