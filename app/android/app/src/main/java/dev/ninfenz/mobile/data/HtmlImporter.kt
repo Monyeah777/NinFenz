@@ -15,23 +15,6 @@ object HtmlImporter {
         text = Regex("(?is)<script.*?</script>").replace(text, " ")
         text = Regex("(?is)<style.*?</style>").replace(text, " ")
         text = Regex("(?s)<!--.*?-->").replace(text, " ")
-        text = lists(text)
-        text = Regex("(?is)<h([1-6])[^>]*>(.*?)</h\\1>").replace(text) { m ->
-            "\n\n" + "#".repeat(m.groupValues[1].toInt()) + " " + strip(m.groupValues[2]).trim() + "\n\n"
-        }
-        text = Regex("(?is)<pre[^>]*>(.*?)</pre>").replace(text) { m ->
-            "\n\n```\n" + decode(strip(m.groupValues[1])).trim('\n') + "\n```\n\n"
-        }
-        text = Regex("(?is)<code[^>]*>(.*?)</code>").replace(text) { m ->
-            "`" + decode(strip(m.groupValues[1])).trim() + "`"
-        }
-        text = Regex("(?is)<blockquote[^>]*>(.*?)</blockquote>").replace(text) { m ->
-            val content = decode(strip(m.groupValues[1])).trim()
-            "\n\n" + content.split('\n').joinToString("\n") { "> " + it.trim() } + "\n\n"
-        }
-        text = Regex("(?is)<table[^>]*>(.*?)</table>").replace(text) { m ->
-            "\n\n" + table(m.groupValues[1]) + "\n\n"
-        }
         text = Regex("(?is)<a\\s+[^>]*href=[\"']([^\"']+)[\"'][^>]*>(.*?)</a>").replace(text) { m ->
             "[" + strip(m.groupValues[2]).trim() + "](" + m.groupValues[1] + ")"
         }
@@ -49,6 +32,23 @@ object HtmlImporter {
             val src = Regex("(?is)src=[\"']([^\"']+)[\"']").find(tag)?.groupValues?.getOrNull(1).orEmpty()
             val alt = Regex("(?is)alt=[\"']([^\"']*)[\"']").find(tag)?.groupValues?.getOrNull(1).orEmpty()
             if (src.isBlank()) "" else "![" + alt + "](" + src + ")"
+        }
+        text = lists(text)
+        text = Regex("(?is)<h([1-6])[^>]*>(.*?)</h\\1>").replace(text) { m ->
+            "\n\n" + "#".repeat(m.groupValues[1].toInt()) + " " + strip(m.groupValues[2]).trim() + "\n\n"
+        }
+        text = Regex("(?is)<pre[^>]*>(.*?)</pre>").replace(text) { m ->
+            "\n\n```\n" + decode(strip(m.groupValues[1])).trim('\n') + "\n```\n\n"
+        }
+        text = Regex("(?is)<code[^>]*>(.*?)</code>").replace(text) { m ->
+            "`" + decode(strip(m.groupValues[1])).trim() + "`"
+        }
+        text = Regex("(?is)<blockquote[^>]*>(.*?)</blockquote>").replace(text) { m ->
+            val content = decode(strip(m.groupValues[1])).trim()
+            "\n\n" + content.split('\n').joinToString("\n") { "> " + it.trim() } + "\n\n"
+        }
+        text = Regex("(?is)<table[^>]*>(.*?)</table>").replace(text) { m ->
+            "\n\n" + table(m.groupValues[1]) + "\n\n"
         }
         text = Regex("(?is)<hr\\s*/?>").replace(text, "\n\n---\n\n")
         text = Regex("(?is)<br\\s*/?>").replace(text, "\n")
