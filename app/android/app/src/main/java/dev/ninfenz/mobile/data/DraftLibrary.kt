@@ -38,6 +38,19 @@ object DraftLibrary {
         null
     }
 
+    fun acceptedMappings(file: File): Set<Int>? {
+        val mapping = File(file.parentFile, file.name.removeSuffix(".json") + ".mapping.json")
+        if (!mapping.isFile) return null
+        return try {
+            val root = Json.parseToJsonElement(mapping.readText(Charsets.UTF_8)).jsonObject
+            root["accepted"]?.let { el ->
+                (el as? kotlinx.serialization.json.JsonArray)?.mapNotNull { (it as? kotlinx.serialization.json.JsonPrimitive)?.content?.toIntOrNull() }?.toSet()
+            }
+        } catch (t: Throwable) {
+            null
+        }
+    }
+
     fun delete(file: File): Boolean {
         val mapping = File(file.parentFile, file.name.removeSuffix(".json") + ".mapping.json")
         mapping.delete()

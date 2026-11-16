@@ -520,7 +520,8 @@ fun ImportScreen(
                                                 val parsed = ImportModel.parse(obj)
                                                 rawResult = obj
                                                 doc = parsed
-                                                acceptedMappings = parsed.mappings.indices.filter { parsed.mappings[it].confidence >= 80 }.toSet()
+                                                acceptedMappings = DraftLibrary.acceptedMappings(draft)
+                                                    ?: parsed.mappings.indices.filter { parsed.mappings[it].confidence >= 80 }.toSet()
                                                 savedName = draft.name.removeSuffix(".json")
                                                 error = null
                                                 importDraftStore.save(raw)
@@ -569,7 +570,8 @@ fun ImportScreen(
                                                         val parsed = ImportModel.parse(obj)
                                                         rawResult = obj
                                                         doc = parsed
-                                                        acceptedMappings = parsed.mappings.indices.filter { parsed.mappings[it].confidence >= 80 }.toSet()
+                                                        acceptedMappings = DraftLibrary.acceptedMappings(matched)
+                                                            ?: parsed.mappings.indices.filter { parsed.mappings[it].confidence >= 80 }.toSet()
                                                         savedName = matched.name.removeSuffix(".json")
                                                         error = null
                                                         importDraftStore.save(raw)

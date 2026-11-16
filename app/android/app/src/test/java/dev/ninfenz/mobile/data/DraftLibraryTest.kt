@@ -42,6 +42,17 @@ class DraftLibraryTest {
     }
 
     @Test
+    fun readsAcceptedMappingSidecar() {
+        val dir = Files.createTempDirectory("nf-drafts-map").toFile()
+        val drafts = java.io.File(dir, "drafts").apply { mkdirs() }
+        val f = java.io.File(drafts, "a.json").apply { writeText("{}") }
+        java.io.File(drafts, "a.mapping.json").writeText("{\"accepted\":[1,3]}")
+        assertEquals(setOf(1, 3), DraftLibrary.acceptedMappings(f))
+        java.io.File(drafts, "a.mapping.json").writeText("{bad")
+        assertEquals(null, DraftLibrary.acceptedMappings(f))
+    }
+
+    @Test
     fun missingDirectoryIsEmpty() {
         val dir = Files.createTempDirectory("nf-drafts-2").toFile()
         assertTrue(DraftLibrary.list(dir).isEmpty())
