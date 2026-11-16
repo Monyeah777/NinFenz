@@ -99,7 +99,7 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.10.1")
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
     // JNA aar：内含 Android ABI 的 libjnidispatch.so（Android 上 JNA 必须用 aar 变体）
     implementation("net.java.dev.jna:jna:5.17.0@aar")
 
