@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-11-16",
   "approved_by": "Monyeah777",
-  "note": "APP v0.02: export/import hardening (package manifest, backup filters, HTML/EPUB markdown coverage)",
+  "note": "APP error catalog import/project codes (LF)",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "670508412e72485b068b4f73d3b43b659e1e3e9ae360fe659e2620dbb2aa195f"

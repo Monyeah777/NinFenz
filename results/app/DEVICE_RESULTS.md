@@ -25,6 +25,7 @@
 | 备份未列条目拒绝（JVM） | pass（本机）：manifest 未列出的 zip 条目导致 inspect 失败；BackupRestoreServiceTest 5 条。真机未复测（adb 无设备） |
 | 全量复核（round161） | pass（本机）：verify.sh PASS=107 WARN=2 FAIL=0；app gates QA0–QA6 PASS，gap=0，P0=0；lint 0 warnings。 |
 | 全量复核（round15） | pass（本机）：verify PASS=107 WARN=2 FAIL=0；app gates QA0–QA6 PASS，gap=0，P0=0。 |
+| 错误码 schema EOL 修复（verify） | pass（本机）：error_codes.json CRLF→LF；重新批准 conformance；verify PASS=107 WARN=2 FAIL=0。 |
 | 错误码使用登记校验（pytest） | pass（本机）：扫描 Kotlin 内联 `CoreResponse.failure`/`CoreError` 码，发现并补登 NF-IMP-005；新增测试通过。 |
 | 错误码目录补齐（JVM） | pass（本机）：新增 NF-IMP-006/007/008、NF-PRJ-001；NF-IMP-004 改为仅 pdf/ocr 未支持；schema negative 85 passed。 |
 | EPUB 代码语言 class（JVM） | pass（本机）：EPUB 章节代码块 class=language-…；测试 9 条。真机未复测（adb 无设备） |
