@@ -15,6 +15,7 @@ object HtmlImporter {
         text = Regex("(?is)<script.*?</script>").replace(text, " ")
         text = Regex("(?is)<style.*?</style>").replace(text, " ")
         text = Regex("(?s)<!--.*?-->").replace(text, " ")
+        text = lists(text)
         text = Regex("(?is)<h([1-6])[^>]*>(.*?)</h\\1>").replace(text) { m ->
             "\n\n" + "#".repeat(m.groupValues[1].toInt()) + " " + strip(m.groupValues[2]).trim() + "\n\n"
         }
@@ -30,16 +31,6 @@ object HtmlImporter {
         }
         text = Regex("(?is)<table[^>]*>(.*?)</table>").replace(text) { m ->
             "\n\n" + table(m.groupValues[1]) + "\n\n"
-        }
-        text = Regex("(?is)<ol[^>]*>(.*?)</ol>").replace(text) { m ->
-            val items = Regex("(?is)<li[^>]*>(.*?)</li>").findAll(m.groupValues[1]).map {
-                strip(it.groupValues[1]).trim()
-            }.toList()
-            val start = Regex("(?i)start=[\"']?(\\d+)").find(m.value)?.groupValues?.getOrNull(1)?.toIntOrNull() ?: 1
-            "\n" + items.mapIndexed { i, item -> (start + i).toString() + ". " + item }.joinToString("\n") + "\n"
-        }
-        text = Regex("(?is)<li[^>]*>(.*?)</li>").replace(text) { m ->
-            "\n- " + strip(m.groupValues[1]).trim()
         }
         text = Regex("(?is)<a\\s+[^>]*href=[\"']([^\"']+)[\"'][^>]*>(.*?)</a>").replace(text) { m ->
             "[" + strip(m.groupValues[2]).trim() + "](" + m.groupValues[1] + ")"
@@ -64,9 +55,91 @@ object HtmlImporter {
         text = Regex("(?is)</p\\s*>").replace(text, "\n\n")
         text = strip(text)
         text = decode(text)
-        return text.split('\n').joinToString("\n") { it.trim() }
+        return text.split('\n').joinToString("\n") { it.trimEnd() }
             .replace(Regex("\n{3,}"), "\n\n")
             .trim()
+    }
+
+    private fun lists(html: String): String {
+        val out = StringBuilder()
+        var index = 0
+        while (index < html.length) {
+            val m = Regex("(?i)<(ul|ol)(\\s[^>]*)?>").find(html, index)
+            if (m == null) {
+                out.append(html.substring(index))
+                break
+            }
+            out.append(html.substring(index, m.range.first))
+            val tag = m.groupValues[1].lowercase()
+            val close = findClose(html, m.range.last + 1)
+            if (close < 0) {
+                out.append(html.substring(m.range.first))
+                break
+            }
+            out.append(renderList(tag, m.value, html.substring(m.range.last + 1, close), 0))
+            index = close + ("</" + tag + ">").length
+        }
+        return out.toString()
+    }
+
+    private fun findClose(html: String, start: Int): Int {
+        val re = Regex("(?i)</?(ul|ol)\\b[^>]*>")
+        var depth = 1
+        for (t in re.findAll(html, start)) {
+            if (t.value.startsWith("</")) depth-- else depth++
+            if (depth == 0) return t.range.first
+        }
+        return -1
+    }
+
+    private fun renderList(tag: String, open: String, inner: String, depth: Int): String {
+        val items = mutableListOf<String>()
+        var pos = 0
+        while (true) {
+            val li = Regex("(?i)<li(\\s[^>]*)?>").find(inner, pos) ?: break
+            val close = findLiClose(inner, li.range.last + 1)
+            if (close < 0) break
+            items.add(inner.substring(li.range.last + 1, close))
+            pos = close + 5
+        }
+        if (items.isEmpty()) return ""
+        val start = Regex("(?i)start=[\"']?(\\d+)").find(open)?.groupValues?.getOrNull(1)?.toIntOrNull() ?: 1
+        return items.mapIndexed { i, item ->
+            renderItem(item, if (tag == "ol") (start + i).toString() + ". " else "- ", depth)
+        }.joinToString("\n")
+    }
+
+    private fun findLiClose(html: String, start: Int): Int {
+        val re = Regex("(?i)</?li\\b[^>]*>")
+        var depth = 1
+        for (t in re.findAll(html, start)) {
+            if (t.value.startsWith("</")) depth-- else depth++
+            if (depth == 0) return t.range.first
+        }
+        return -1
+    }
+
+    private fun renderItem(item: String, marker: String, depth: Int): String {
+        val out = StringBuilder()
+        var index = 0
+        while (index < item.length) {
+            val m = Regex("(?i)<(ul|ol)(\\s[^>]*)?>").find(item, index)
+            if (m == null) {
+                out.append(item.substring(index))
+                break
+            }
+            out.append(item.substring(index, m.range.first))
+            val tag = m.groupValues[1].lowercase()
+            val close = findClose(item, m.range.last + 1)
+            if (close < 0) {
+                out.append(item.substring(m.range.first))
+                break
+            }
+            out.append("\n").append(renderList(tag, m.value, item.substring(m.range.last + 1, close), depth + 1))
+            index = close + ("</" + tag + ">").length
+        }
+        val text = strip(out.toString()).trim()
+        return "  ".repeat(depth) + marker + text
     }
 
     private fun table(html: String): String {

@@ -156,7 +156,7 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 - BackupServiceTest（4）：备份 zip 含 manifest/projects/drafts、空备份仍有 manifest、列表/裁剪旧备份、偏好元数据。
 - BackupRestoreServiceTest（9）：合法备份恢复、回滚快照、路径穿越拒绝、sha256 不匹配拒绝、未列条目拒绝、缺 sha256 拒绝、manifest BOM、声明总量超限、单条过大。
 - TextEncodingTest（3）：UTF-16LE/UTF-8 BOM 识别、无 BOM 不处理、无 BOM UTF-16 启发式。
-- HtmlImporterTest（13）：标题/列表/实体转换、脚本/样式剔除、表格/链接、有序列表、图片、代码块、引用块、水平线、meta charset、粗体/斜体、删除线、数字实体、ol start。
+- HtmlImporterTest（14）：标题/列表/实体转换、脚本/样式剔除、表格/链接、有序列表、图片、代码块、引用块、水平线、meta charset、粗体/斜体、删除线、数字实体、ol start、嵌套列表。
 - EpubImporterTest（6）：按 OPF spine 提取章节、缺 container 拒绝、spine 顺序、dc:title 补标题、容器识别、图片 data URI。
 - DocxImporterTest（6）：Heading/正文提取、缺 document.xml 拒绝、列表段落、表格、粗体/斜体 run、超链接。
 - ProjectHistoryExportTest（2）：历史 Markdown 表格/标题转义、空历史。
@@ -181,9 +181,9 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 - 真机 smoke：连接并授权后运行 `bash app/scripts/device_smoke.sh`（安装 debug APK、冷启动、前台 Activity、最近崩溃日志）；设 `CAPTURE_DIR=…` 额外拉取 `home.png` 与 `ui.xml`。
 
 - 2026-11-16 当前：`./gradlew :app:assembleDebug` 成功：app-debug.apk = 19,049,108 bytes，
-  sha256 = 002e41966633c896b047da0f93ad4cc4a62653a2ef7257a01ff9e3ef6a4a1a89（含双 ABI 原生库 + 9 个示例 Pack assets）。
+  sha256 = 5c5897d0aa393d8e8d5bbed0b0a5bbc2f1b0de12a6ce3cdc7bef02dc7448de94（含双 ABI 原生库 + 9 个示例 Pack assets）。
 - 仓库级门禁在 UTF-8 locale 下运行：`LANG=C.UTF-8 PYTHONUTF8=1 bash verify.sh --checks-only`（GBK 控制台会让 `git ls-files` 解码失败，触发 modeling 检查异常）。
-- `./gradlew :app:testDebugUnitTest` 全绿：311 条 JVM 单测（v1 42 + v0.02 269；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y/大字号/对比度/Paparazzi 截图）。
+- `./gradlew :app:testDebugUnitTest` 全绿：312 条 JVM 单测（v1 42 + v0.02 270；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y/大字号/对比度/Paparazzi 截图）。
 - `zipalign -c -P 16 -v 4 app-debug.apk` → Verification successful（native lib 16KB page 对齐）。
 - `bash app/scripts/build_core_android.sh --clean` 成功：NDK 27.0.12077973 + rustup targets
   （aarch64-linux-android / x86_64-linux-android，经 rsproxy 镜像安装）；两个 .so 的 LOAD align 均为 0x4000。

@@ -93,6 +93,13 @@ class HtmlImporterTest {
     }
 
     @Test
+    fun convertsNestedList() {
+        val md = HtmlImporter.toMarkdown("<ul><li>父<ul><li>子</li></ul></li></ul>")
+        assertTrue(md.contains("- 父"))
+        assertTrue(md.contains("  - 子"))
+    }
+
+    @Test
     fun removesScriptAndStyle() {
         val md = HtmlImporter.toMarkdown("<style>x{}</style><script>alert(1)</script><p>正文</p>")
         assertTrue(md.contains("正文"))
