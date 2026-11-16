@@ -397,6 +397,13 @@
     <string name="graph_save">Save</string>
     <string name="graph_save_draft">Save graph draft</string>
     <string name="assembly_title">Assembly · assemble/validate/export</string>
+    <string name="assembly_not_loaded">Not loaded</string>
+    <string name="assembly_spec_local_ok">Spec local check passed</string>
+    <string name="assembly_plan_local_ok">Plan local check passed</string>
+    <string name="assembly_busy">Assembling…</string>
+    <string name="assembly_validating">Validating…</string>
+    <string name="assembly_share_title">Share assembly result</string>
+    <string name="error_fix_suffix">; fix: </string>
     <string name="assembly_plan_failed">Plan parse failed: %1$s</string>
     <string name="assembly_plan_failed_fix">Fix per app/schema/nf-assembly-plan.schema.json</string>
     <string name="assembly_spec_failed">Spec parse failed: %1$s</string>

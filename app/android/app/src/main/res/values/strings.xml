@@ -397,6 +397,13 @@
     <string name="graph_save">保存</string>
     <string name="graph_save_draft">保存图草稿</string>
     <string name="assembly_title">Assembly · 装配/校验/导出</string>
+    <string name="assembly_not_loaded">未加载</string>
+    <string name="assembly_spec_local_ok">spec 本地检查通过</string>
+    <string name="assembly_plan_local_ok">plan 本地检查通过</string>
+    <string name="assembly_busy">装配中…</string>
+    <string name="assembly_validating">校验中…</string>
+    <string name="assembly_share_title">分享装配结果</string>
+    <string name="error_fix_suffix">；修复：</string>
     <string name="assembly_plan_failed">plan 解析失败：%1$s</string>
     <string name="assembly_plan_failed_fix">按 app/schema/nf-assembly-plan.schema.json 修正</string>
     <string name="assembly_spec_failed">spec 解析失败：%1$s</string>

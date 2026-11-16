@@ -110,16 +110,16 @@ fun AssemblyScreen(onBack: () -> Unit) {
                 OutlinedButton(onClick = { planPicker.launch(arrayOf("application/json", "text/plain")) }) { Text(stringResource(dev.ninfenz.mobile.R.string.assembly_open_plan)) }
                 OutlinedButton(onClick = { specPicker.launch(arrayOf("application/json", "text/plain")) }) { Text(stringResource(dev.ninfenz.mobile.R.string.assembly_open_spec)) }
             }
-            KeyValue("plan", plan?.let { it.pipelineId + " · steps " + it.steps.size + " · slots " + it.slots.size } ?: "未加载")
-            KeyValue("spec", spec?.let { it.id + " · sections " + it.sections.size + " · slots " + it.slots.size } ?: "未加载")
+            KeyValue("plan", plan?.let { it.pipelineId + " · steps " + it.steps.size + " · slots " + it.slots.size } ?: context.getString(dev.ninfenz.mobile.R.string.assembly_not_loaded))
+            KeyValue("spec", spec?.let { it.id + " · sections " + it.sections.size + " · slots " + it.slots.size } ?: context.getString(dev.ninfenz.mobile.R.string.assembly_not_loaded))
             spec?.let { s ->
                 val issues = SpecModel.formIssues(s)
-                if (issues.isEmpty()) Notice("spec 本地检查通过", Tone.INFO)
+                if (issues.isEmpty()) Notice(context.getString(dev.ninfenz.mobile.R.string.assembly_spec_local_ok), Tone.INFO)
                 for (issue in issues) Notice(issue.code + "：" + issue.message, Tone.WARN)
             }
             plan?.let { p ->
                 val issues = PlanModel.formIssues(p)
-                if (issues.isEmpty()) Notice("plan 本地检查通过", Tone.INFO)
+                if (issues.isEmpty()) Notice(context.getString(dev.ninfenz.mobile.R.string.assembly_plan_local_ok), Tone.INFO)
                 for (issue in issues) Notice(issue.code + "：" + issue.message, Tone.WARN)
             }
         }
@@ -180,7 +180,7 @@ fun AssemblyScreen(onBack: () -> Unit) {
                                 busy = false
                             }
                         }
-                    }) { Text(if (busy) "装配中…" else "assemble") }
+                    }) { Text(if (busy) context.getString(dev.ninfenz.mobile.R.string.assembly_busy) else "assemble") }
                     OutlinedButton(enabled = !busy, onClick = {
                         val md = markdown ?: return@OutlinedButton
                         val rawS = rawSpec ?: return@OutlinedButton
@@ -205,7 +205,7 @@ fun AssemblyScreen(onBack: () -> Unit) {
                                 busy = false
                             }
                         }
-                    }) { Text(if (busy) "校验中…" else "validate L1") }
+                    }) { Text(if (busy) context.getString(dev.ninfenz.mobile.R.string.assembly_validating) else "validate L1") }
                 }
                 metaSummary?.let { MonoText(it) }
             }
@@ -263,7 +263,7 @@ fun AssemblyScreen(onBack: () -> Unit) {
                     OutlinedButton(enabled = !busy && markdown != null, onClick = {
                         val md = markdown ?: return@OutlinedButton
                         val intent = ShareExporter.shareMarkdown(context, "nf-assembly", md)
-                        ShareExporter.launchChooser(context, intent, "分享装配结果")
+                        ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.assembly_share_title))
                     }) { Text(stringResource(dev.ninfenz.mobile.R.string.assembly_share_md)) }
                 }
                 manifest?.let { MonoText(it) }
@@ -274,7 +274,7 @@ fun AssemblyScreen(onBack: () -> Unit) {
                     KeyValue("verdict", ReportModel.line(r))
                     KeyValue("target", r.target.kind + " · " + r.target.ref)
                     for (issue in r.issues) {
-                        Notice(issue.code + " " + (issue.path ?: "-") + "：" + issue.message + "；修复：" + issue.fix,
+                        Notice(issue.code + " " + (issue.path ?: "-") + "：" + issue.message + context.getString(dev.ninfenz.mobile.R.string.error_fix_suffix) + issue.fix,
                             if (issue.severity == "error") Tone.ERROR else Tone.WARN)
                     }
                 }
