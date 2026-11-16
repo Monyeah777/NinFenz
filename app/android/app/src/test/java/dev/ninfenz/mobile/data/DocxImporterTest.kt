@@ -31,6 +31,12 @@ class DocxImporterTest {
     }
 
     @Test
+    fun extractsListParagraphs() {
+        val xml = "<w:document><w:body><w:p><w:pPr><w:numPr/></w:pPr><w:r><w:t>项</w:t></w:r></w:p></w:body></w:document>"
+        assertTrue(DocxImporter.extract(docx(xml)).contains("- 项"))
+    }
+
+    @Test
     fun rejectsMissingDocument() {
         val f = File.createTempFile("nf-docx-bad", ".docx")
         ZipOutputStream(f.outputStream()).use { out ->

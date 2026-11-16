@@ -23,7 +23,11 @@ object DocxImporter {
                 if (text.isBlank()) return@mapNotNull null
                 val style = Regex("w:pStyle\\s+w:val=\"([^\"]+)\"").find(para)?.groupValues?.getOrNull(1).orEmpty()
                 val level = Regex("(?i)heading\\s*([1-6])").find(style)?.groupValues?.getOrNull(1)?.toIntOrNull()
-                if (level != null) "#".repeat(level) + " " + text else text
+                when {
+                    level != null -> "#".repeat(level) + " " + text
+                    para.contains("<w:numPr") -> "- " + text
+                    else -> text
+                }
             }.toList()
             if (paragraphs.isEmpty()) throw IllegalArgumentException("DOCX 无可读段落")
             return paragraphs.joinToString("\n\n")
