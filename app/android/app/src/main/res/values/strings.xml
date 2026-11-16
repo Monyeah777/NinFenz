@@ -481,6 +481,8 @@
     <string name="settings_diagnostics_done">诊断包已生成：%1$s</string>
     <string name="settings_crash_title">最近崩溃</string>
     <string name="settings_crash_clear">清除崩溃日志</string>
+    <string name="export_verified">通过</string>
+    <string name="export_verify_failed">失败</string>
     <string name="project_detail_archive">归档项目</string>
     <string name="project_archive_title">归档项目</string>
     <string name="project_archive_body">项目会移出库列表，文件保留在 projects-archive/，不会删除内容。</string>

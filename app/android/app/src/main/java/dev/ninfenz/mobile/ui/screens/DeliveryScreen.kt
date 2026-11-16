@@ -194,14 +194,15 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
     fun recordExport(format: String, file: File?, manifest: String?, verify: Boolean = true) {
         if (file == null) return
         val sha = manifest?.let { Regex("\"sha256\":\"([^\"]+)\"").find(it)?.groupValues?.getOrNull(1) }.orEmpty()
-        exportHistory.record(format, file, sha)
-        exportEntries = exportHistory.load()
-        exportVerify = when {
+        val verdict = when {
             !verify -> null
             format == "epub" -> EpubValidator.inspect(file).let { ExportVerifier.Result(it.ok, it.message) }
             format == "pdf" -> PdfValidator.inspect(file).let { ExportVerifier.Result(it.ok, it.message) }
             else -> ExportVerifier.verify(file, manifest)
         }
+        exportVerify = verdict
+        exportHistory.record(format, file, sha, verdict?.ok, verdict?.message)
+        exportEntries = exportHistory.load()
     }
 
     fun applyBatch(onlyEmpty: Boolean) {
@@ -574,6 +575,13 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(entry.format + " · " + entry.name, style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
+                            entry.ok?.let { ok ->
+                                Text(
+                                    stringResource(if (ok) dev.ninfenz.mobile.R.string.export_verified else dev.ninfenz.mobile.R.string.export_verify_failed),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = if (ok) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                                )
+                            }
                             TextButton(onClick = {
                                 val file = File(entry.path)
                                 if (file.isFile) {

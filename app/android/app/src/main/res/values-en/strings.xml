@@ -481,6 +481,8 @@
     <string name="settings_diagnostics_done">Diagnostics bundle created: %1$s</string>
     <string name="settings_crash_title">Last crash</string>
     <string name="settings_crash_clear">Clear crash log</string>
+    <string name="export_verified">passed</string>
+    <string name="export_verify_failed">failed</string>
     <string name="project_detail_archive">Archive project</string>
     <string name="project_archive_title">Archive project</string>
     <string name="project_archive_body">The project leaves the library list; its file stays in projects-archive/ and is not deleted.</string>

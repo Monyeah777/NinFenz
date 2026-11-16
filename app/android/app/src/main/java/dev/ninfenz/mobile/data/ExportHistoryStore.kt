@@ -13,7 +13,15 @@ import kotlinx.serialization.json.put
 
 /** 最近导出记录：格式/文件名/sha256/时间，最多 20 条。 */
 class ExportHistoryStore(private val filesDir: File) {
-    data class Entry(val format: String, val name: String, val path: String, val sha256: String, val at: Long)
+    data class Entry(
+        val format: String,
+        val name: String,
+        val path: String,
+        val sha256: String,
+        val at: Long,
+        val ok: Boolean? = null,
+        val message: String? = null
+    )
 
     private fun file(): File = File(File(filesDir, "exports").apply { mkdirs() }, "history.json")
 
@@ -28,7 +36,9 @@ class ExportHistoryStore(private val filesDir: File) {
                     name = o.text("name"),
                     path = o.text("path"),
                     sha256 = o.text("sha256"),
-                    at = o["at"]?.jsonPrimitive?.long ?: 0L
+                    at = o["at"]?.jsonPrimitive?.long ?: 0L,
+                    ok = o["ok"]?.jsonPrimitive?.content?.toBooleanStrictOrNull(),
+                    message = o.optText("message")
                 )
             }
         } catch (t: Throwable) {
@@ -36,10 +46,11 @@ class ExportHistoryStore(private val filesDir: File) {
         }
     }
 
-    fun record(format: String, file: File, sha256: String) {
+    fun record(format: String, file: File, sha256: String, ok: Boolean? = null, message: String? = null) {
         val name = file.name
-        val next = (listOf(Entry(format, name, file.absolutePath, sha256, System.currentTimeMillis())) +
-            load().filterNot { it.path == file.absolutePath }).take(20)
+        val next = (listOf(
+            Entry(format, name, file.absolutePath, sha256, System.currentTimeMillis(), ok, message)
+        ) + load().filterNot { it.path == file.absolutePath }).take(20)
         val arr = buildJsonArray {
             next.forEach { e ->
                 add(buildJsonObject {
@@ -48,6 +59,8 @@ class ExportHistoryStore(private val filesDir: File) {
                     put("path", e.path)
                     put("sha256", e.sha256)
                     put("at", e.at)
+                    e.ok?.let { put("ok", it) }
+                    e.message?.let { put("message", it) }
                 })
             }
         }
@@ -56,4 +69,7 @@ class ExportHistoryStore(private val filesDir: File) {
 
     private fun JsonObject.text(key: String): String =
         this[key]?.jsonPrimitive?.content ?: ""
+
+    private fun JsonObject.optText(key: String): String? =
+        this[key]?.jsonPrimitive?.content
 }

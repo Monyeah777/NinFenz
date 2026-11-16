@@ -12,13 +12,15 @@ class ExportHistoryStoreTest {
         val store = ExportHistoryStore(dir)
         val f1 = File(dir, "a.md").apply { writeText("a") }
         val f2 = File(dir, "b.md").apply { writeText("b") }
-        store.record("md", f1, "sha1")
+        store.record("md", f1, "sha1", true, "ok")
         store.record("md", f2, "sha2")
-        store.record("md", f1, "sha3")
+        store.record("md", f1, "sha3", false, "bad")
         val entries = store.load()
         assertEquals(2, entries.size)
         assertEquals("a.md", entries.first().name)
         assertEquals("sha3", entries.first().sha256)
+        assertEquals(false, entries.first().ok)
+        assertEquals("bad", entries.first().message)
     }
 
     @Test
