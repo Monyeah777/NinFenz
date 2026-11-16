@@ -41,6 +41,7 @@ object HtmlImporter {
             val alt = Regex("(?is)alt=[\"']([^\"']*)[\"']").find(tag)?.groupValues?.getOrNull(1).orEmpty()
             if (src.isBlank()) "" else "![" + alt + "](" + src + ")"
         }
+        text = Regex("(?is)<hr\\s*/?>").replace(text, "\n\n---\n\n")
         text = Regex("(?is)<br\\s*/?>").replace(text, "\n")
         text = Regex("(?is)</p\\s*>").replace(text, "\n\n")
         text = strip(text)

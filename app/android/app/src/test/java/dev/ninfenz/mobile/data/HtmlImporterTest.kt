@@ -55,6 +55,12 @@ class HtmlImporterTest {
     }
 
     @Test
+    fun convertsHorizontalRule() {
+        val md = HtmlImporter.toMarkdown("<p>上</p><hr/><p>下</p>")
+        assertTrue(md.contains("---"))
+    }
+
+    @Test
     fun removesScriptAndStyle() {
         val md = HtmlImporter.toMarkdown("<style>x{}</style><script>alert(1)</script><p>正文</p>")
         assertTrue(md.contains("正文"))
