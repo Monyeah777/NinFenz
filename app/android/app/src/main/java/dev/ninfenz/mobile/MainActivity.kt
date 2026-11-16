@@ -91,6 +91,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         installCrashHandler()
+        dev.ninfenz.mobile.ui.installCoreCallContext(this)
         pendingShortcut = shortcutFrom(intent)
         val prefs = AppPrefs(this)
         if (prefs.languageMode != LanguageMode.SYSTEM) {
