@@ -25,6 +25,7 @@ import dev.ninfenz.mobile.core.Core
 import dev.ninfenz.mobile.core.CoreBridgeNative
 import dev.ninfenz.mobile.core.ErrorCatalog
 import dev.ninfenz.mobile.data.BackupRestoreService
+import dev.ninfenz.mobile.data.CrashLogStore
 import dev.ninfenz.mobile.data.DiagnosticsBundle
 import dev.ninfenz.mobile.data.BackupService
 import dev.ninfenz.mobile.data.StorageStats
@@ -44,6 +45,7 @@ import kotlinx.coroutines.withContext
 fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
     val context = LocalContext.current
     val diag = remember { Core.diagnostics() }
+    val crash = remember { CrashLogStore(context.filesDir).read() }
     var copied by remember { mutableStateOf(false) }
     var stats by remember { mutableStateOf(StorageStats.scan(context.filesDir, context.cacheDir)) }
     var cleaned by remember { mutableStateOf<String?>(null) }
@@ -81,6 +83,7 @@ fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
         appendLine("core.nativeReady=" + diag.nativeReady)
         appendLine("errorCatalog.loaded=" + diag.errorCatalogLoaded + " count=" + diag.errorCodeCount)
         appendLine("telemetry=none network=denied account=none")
+        appendLine("crash.log=" + (crash != null))
     }
 
     NfScaffold(title = stringResource(dev.ninfenz.mobile.R.string.settings_title), onBack = onBack) {
@@ -159,7 +162,7 @@ fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
             }
             OutlinedButton(onClick = {
                 scope.launch {
-                    val created = withContext(Dispatchers.IO) { DiagnosticsBundle.create(context.filesDir, diagnosticsText) }
+                    val created = withContext(Dispatchers.IO) { DiagnosticsBundle.create(context.filesDir, diagnosticsText, crash) }
                     val intent = ShareExporter.shareFileIntent(context, created.file, "application/zip", created.file.name)
                     ShareExporter.launchChooser(context, intent, created.file.name)
                     backupMessage = context.getString(dev.ninfenz.mobile.R.string.settings_diagnostics_done, humanBytes(created.bytes))

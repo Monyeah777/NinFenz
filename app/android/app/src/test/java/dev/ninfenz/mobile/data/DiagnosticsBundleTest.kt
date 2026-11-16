@@ -10,10 +10,10 @@ class DiagnosticsBundleTest {
     @Test
     fun bundleContainsDiagnosticsAndReadmeOnly() {
         val dir = Files.createTempDirectory("nf-diag").toFile()
-        val created = DiagnosticsBundle.create(dir, "app=test\\ncore=ok\\n")
+        val created = DiagnosticsBundle.create(dir, "app=test\ncore=ok\n", "boom")
         ZipFile(created.file).use { zip ->
             val names = zip.entries().toList().map { it.name }.sorted()
-            assertEquals(listOf("README.txt", "diagnostics.txt"), names)
+            assertEquals(listOf("README.txt", "crash.txt", "diagnostics.txt"), names)
             val text = zip.getInputStream(zip.getEntry("diagnostics.txt")).bufferedReader().readText()
             assertTrue(text.contains("core=ok"))
             assertTrue(zip.getInputStream(zip.getEntry("README.txt")).bufferedReader().readText().contains("无网络"))

@@ -8,12 +8,13 @@ import java.util.zip.ZipOutputStream
 object DiagnosticsBundle {
     data class Created(val file: File, val bytes: Long)
 
-    fun create(filesDir: File, diagnostics: String): Created {
+    fun create(filesDir: File, diagnostics: String, crash: String? = null): Created {
         val dir = File(filesDir, "exports/diagnostics").apply { mkdirs() }
         val target = File(dir, "nf-diagnostics-" + System.currentTimeMillis() + ".zip")
         ZipOutputStream(target.outputStream()).use { out ->
             put(out, "diagnostics.txt", diagnostics)
-            put(out, "README.txt", "NF Mobile 本地诊断包。无网络请求、无账号、无遥测；仅包含应用/核心/错误目录状态与环境信息。\\n")
+            put(out, "README.txt", "NF Mobile 本地诊断包。无网络请求、无账号、无遥测；仅包含应用/核心/错误目录状态与环境信息。\n")
+            if (crash != null) put(out, "crash.txt", crash)
         }
         return Created(target, target.length())
     }

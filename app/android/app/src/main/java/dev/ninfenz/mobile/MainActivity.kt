@@ -18,6 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import dev.ninfenz.mobile.data.AppPrefs
+import dev.ninfenz.mobile.data.CrashLogStore
 import dev.ninfenz.mobile.data.LanguageMode
 import dev.ninfenz.mobile.data.ThemeMode
 import dev.ninfenz.mobile.ui.CommandBus
@@ -41,6 +42,19 @@ class MainActivity : ComponentActivity() {
         else -> null
     }
 
+    private fun installCrashHandler() {
+        val previous = Thread.getDefaultUncaughtExceptionHandler()
+        Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
+            runCatching { CrashLogStore(filesDir).record(throwable) }
+            if (previous != null && previous !== Thread.getDefaultUncaughtExceptionHandler()) {
+                previous.uncaughtException(thread, throwable)
+            } else {
+                android.os.Process.killProcess(android.os.Process.myPid())
+                kotlin.system.exitProcess(10)
+            }
+        }
+    }
+
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if (event != null && (event.isCtrlPressed || event.isMetaPressed) && keyCode == KeyEvent.KEYCODE_K) {
             CommandBus.request()
@@ -52,6 +66,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        installCrashHandler()
         pendingShortcut = shortcutFrom(intent)
         val prefs = AppPrefs(this)
         setContent {
