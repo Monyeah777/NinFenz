@@ -38,7 +38,12 @@ object EpubImporter {
                 read(zip, path)?.let { HtmlImporter.toMarkdown(it) }?.takeIf { it.isNotBlank() }
             }
             if (chapters.isEmpty()) throw IllegalArgumentException("EPUB 无可读章节")
-            return chapters.joinToString("\n\n")
+            val body = chapters.joinToString("\n\n")
+            val title = Regex("(?is)<dc:title[^>]*>(.*?)</dc:title>").find(opf)
+                ?.groupValues?.getOrNull(1)
+                ?.let { HtmlImporter.toMarkdown(it).trim() }
+                .orEmpty()
+            return if (title.isNotBlank() && !body.startsWith("# ")) "# $title\n\n$body" else body
         }
     }
 

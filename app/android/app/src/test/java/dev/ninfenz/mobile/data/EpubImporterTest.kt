@@ -50,6 +50,20 @@ class EpubImporterTest {
     }
 
     @Test
+    fun addsTitleWhenMissingHeading() {
+        val file = epub(
+            listOf(
+                "META-INF/container.xml" to "<container><rootfiles><rootfile full-path=\"OEBPS/content.opf\"/></rootfiles></container>",
+                "OEBPS/content.opf" to "<package><metadata><dc:title>书名</dc:title></metadata>" +
+                    "<manifest><item id=\"c1\" href=\"one.xhtml\" media-type=\"application/xhtml+xml\"/></manifest>" +
+                    "<spine><itemref idref=\"c1\"/></spine></package>",
+                "OEBPS/one.xhtml" to "<p>正文</p>"
+            )
+        )
+        assertTrue(EpubImporter.extract(file).startsWith("# 书名"))
+    }
+
+    @Test
     fun rejectsMissingContainer() {
         val f = epub(listOf("OEBPS/chapter.xhtml" to "<p>x</p>"))
         assertTrue(runCatching { EpubImporter.extract(f) }.isFailure)
