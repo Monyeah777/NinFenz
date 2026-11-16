@@ -68,6 +68,7 @@ import dev.ninfenz.mobile.data.DraftProjectBinder
 import dev.ninfenz.mobile.data.ProjectDuplicator
 import dev.ninfenz.mobile.data.ProjectRenamer
 import dev.ninfenz.mobile.data.ProjectReviewStore
+import dev.ninfenz.mobile.share.ShareExporter
 import dev.ninfenz.mobile.data.ProjectEntry
 import dev.ninfenz.mobile.data.SampleSeeder
 import dev.ninfenz.mobile.data.SeedResult
@@ -480,6 +481,14 @@ is Detail.Import -> ImportScreen(
                                 onAuthor = { shell = shell.open(Detail.Author(entry.project.id)) },
                                 onAssembly = { shell = shell.open(Detail.Delivery(entry.project.id)) },
                                 compareCandidates = projects,
+                                onShare = {
+                                    val text = runCatching { entry.file.readText(Charsets.UTF_8) }.getOrNull()
+                                    if (text != null) {
+                                        val shared = ShareExporter.writeSharedFile(context, "nf-project-" + entry.project.id, "json", text)
+                                        val intent = ShareExporter.shareFileIntent(context, shared, "application/json", entry.project.title)
+                                        ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.project_detail_share))
+                                    }
+                                },
                                 onReview = { approve, reviewer, note ->
                                     scope.launch {
                                         when (val result = ProjectReviewStore(context.filesDir).review(entry.project, approve, reviewer, note)) {

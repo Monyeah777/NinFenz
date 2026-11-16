@@ -618,6 +618,7 @@ fun ProjectDetailScreen(
     onArchive: () -> Unit = {},
     onRename: (String) -> Unit = {},
     onReview: (Boolean, String, String) -> Unit = { _, _, _ -> },
+    onShare: () -> Unit = {},
     compareCandidates: List<ProjectEntry> = emptyList()
 ) {
     val context = LocalContext.current
@@ -706,6 +707,9 @@ fun ProjectDetailScreen(
                         }) { Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_rename)) }
                         TextButton(onClick = { showReview = true }) {
                             Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_review))
+                        }
+                        TextButton(onClick = onShare) {
+                            Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_share))
                         }
                     }
                 }

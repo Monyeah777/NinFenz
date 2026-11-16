@@ -514,6 +514,7 @@
     <string name="project_detail_diff">对比项目</string>
     <string name="project_detail_rename">重命名</string>
     <string name="project_detail_review">评审</string>
+    <string name="project_detail_share">分享项目文件</string>
     <string name="project_review_current">当前评审：%1$s</string>
     <string name="project_review_summary">评审：%1$s · 评审人 %2$s</string>
     <string name="project_review_need_validate">需先完成校验/导出后才能评审通过</string>

@@ -17,6 +17,7 @@
 | L1 校验 | pass：L1 pass（error=0 warn=0 info=3）；状态 assembled→validated 写回 | run-as 读项目 |
 | 导出 md/zip | pass：files/exports/delivery/result.md + result.zip + manifest；状态 validated→exported 写回 | run-as 读文件 |
 | 桌面快捷方式（构建） | pass（构建）：静态 shortcuts（导入/新建/搜索）+ MainActivity 冷启动/onNewIntent 路由；未真机长按图标验证（adb 无设备） |
+| 分享项目文件（JVM） | pass（本机）：项目详情「分享项目文件」写 cache/shared 后走 Sharesheet；只分享 JSON，不含项目数据目录/assembly。真机未复测（adb 无设备） |
 | 项目数据目录随复制/归档（JVM） | pass（本机）：duplicate 复制 projects/<id>/ 数据；archive/restore 移动 .data 目录；删除归档清理数据；测试断言 assembly 副本往返。真机未复测（adb 无设备） |
 | PDF 文案对齐（JVM） | pass（本机）：删除“PDF 未接/平台打印 OPEN”过期文案，改为本地基础文本导出；复杂排版仍 OPEN。真机未复测（adb 无设备） |
 | 窗口宽度 API 迁移（JVM） | pass（本机）：screenWidthDp 改 LocalWindowInfo.containerSize + LocalDensity；三档导航/矩阵测试仍绿；lint warnings 7→4。真机未复测（adb 无设备） |
