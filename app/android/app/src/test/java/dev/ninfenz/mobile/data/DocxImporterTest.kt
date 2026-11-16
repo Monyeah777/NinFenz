@@ -48,6 +48,17 @@ class DocxImporterTest {
     }
 
     @Test
+    fun extractsBoldAndItalicRuns() {
+        val xml = "<w:document><w:body><w:p>" +
+            "<w:r><w:rPr><w:b/></w:rPr><w:t>粗</w:t></w:r>" +
+            "<w:r><w:rPr><w:i/></w:rPr><w:t>斜</w:t></w:r>" +
+            "</w:p></w:body></w:document>"
+        val md = DocxImporter.extract(docx(xml))
+        assertTrue(md.contains("**粗**"))
+        assertTrue(md.contains("*斜*"))
+    }
+
+    @Test
     fun rejectsMissingDocument() {
         val f = File.createTempFile("nf-docx-bad", ".docx")
         ZipOutputStream(f.outputStream()).use { out ->

@@ -36,9 +36,7 @@ object DocxImporter {
     private fun appendParagraphs(out: StringBuilder, xml: String) {
         Regex("(?s)<w:p[ >].*?</w:p>").findAll(xml).forEach { m ->
             val para = m.value
-            val text = Regex("(?s)<w:t(?:\\s[^>]*)?>(.*?)</w:t>").findAll(para).joinToString("") { esc(it.groupValues[1]) }
-                .replace("<w:br/>", "\n")
-                .trim()
+            val text = runs(para).trim()
             if (text.isBlank()) return@forEach
             val block = when {
                 para.contains("<w:numPr") -> "- " + text
@@ -53,11 +51,28 @@ object DocxImporter {
         }
     }
 
+    private fun runs(para: String): String {
+        return Regex("(?s)<w:r[ >].*?</w:r>").findAll(para).joinToString("") { m ->
+            val run = m.value
+            val text = Regex("(?s)<w:t(?:\\s[^>]*)?>(.*?)</w:t>").findAll(run).joinToString("") { esc(it.groupValues[1]) }
+            if (text.isBlank()) return@joinToString ""
+            var styled = text
+            if (on(run, "b")) styled = "**" + styled + "**"
+            if (on(run, "i")) styled = "*" + styled + "*"
+            styled
+        }
+    }
+
+    private fun on(run: String, tag: String): Boolean {
+        val m = Regex("(?s)<w:" + tag + "(?:\\s[^>]*)?/?>").find(run) ?: return false
+        val v = Regex("w:val=\"([^\"]+)\"").find(m.value)?.groupValues?.getOrNull(1)
+        return v == null || v == "1" || v.equals("true", true)
+    }
+
     private fun table(html: String): String {
         val rows = Regex("(?s)<w:tr[ >].*?</w:tr>").findAll(html).map { row ->
             Regex("(?s)<w:tc[ >].*?</w:tc>").findAll(row.value).map { cell ->
-                Regex("(?s)<w:t(?:\\s[^>]*)?>(.*?)</w:t>").findAll(cell.value).joinToString("") { esc(it.groupValues[1]) }
-                    .replace("|", "\\|").trim()
+                runs(cell.value).replace("|", "\\|").trim()
             }.toList()
         }.filter { it.isNotEmpty() }.toList()
         if (rows.isEmpty()) return ""
