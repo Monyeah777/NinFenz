@@ -138,6 +138,7 @@ fun ImportScreen(
                     imported.id,
                     imported.dataFiles
                 )
+                file.delete()
                 onProjectImported(imported.id, imported.packId, imported.packVersion)
             } catch (t: Throwable) {
                 error = CoreResponse.failure("NF-PRJ-001", "项目包导入失败：" + (t.message ?: t.javaClass.simpleName), "确认 zip 为完整项目包", 2).error
