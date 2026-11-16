@@ -565,6 +565,11 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="import_raw_missing_fix">Import again</string>
     <string name="import_rename_failed">Rename failed: %1$s</string>
     <string name="import_rename_failed_fix">Try another name</string>
+    <string name="pack_install_missing_manifest">Selected folder has no nf-pack.json (%1$d files copied to library/incoming, not installed)</string>
+    <string name="pack_install_missing_id">nf-pack.json lacks id/version (not installed; files remain in library/incoming)</string>
+    <string name="pack_install_duplicate">Same id+version already exists (NF-PCK-004): %1$s %2$s, not overwritten</string>
+    <string name="pack_install_move_failed">Move to %1$s failed</string>
+    <string name="pack_install_failed">Install failed: %1$s</string>
     <string name="import_epub_failed">EPUB parse failed or no text</string>
     <string name="import_epub_failed_fix">Confirm EPUB contains container/OPF/XHTML chapters</string>
     <string name="import_docx_failed">DOCX parse failed or no text</string>

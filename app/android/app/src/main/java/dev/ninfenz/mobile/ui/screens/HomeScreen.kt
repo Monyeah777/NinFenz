@@ -63,22 +63,22 @@ fun HomeScreen(store: LibraryStore, onOpen: (Screen) -> Unit) {
                 val count = FileAccess.copyTree(context, uri, incoming)
                 val manifest = File(incoming, "nf-pack.json")
                 if (!manifest.exists()) {
-                    installError = "所选目录缺 nf-pack.json（复制 " + count + " 个文件到 library/incoming，未安装）"
+                    installError = context.getString(dev.ninfenz.mobile.R.string.pack_install_missing_manifest, count)
                 } else {
                     val obj = J.parseObject(manifest.readText(Charsets.UTF_8), "nf-pack/1")
                     val id = J.optString(obj, "id")
                     val version = J.optString(obj, "version")
                     if (id == null || version == null) {
-                        installError = "nf-pack.json 缺 id/version（未安装；文件留在 library/incoming）"
+                        installError = context.getString(dev.ninfenz.mobile.R.string.pack_install_missing_id)
                     } else {
                         val target = File(File(File(context.filesDir, "library/packs"), id), version)
                         target.parentFile?.mkdirs()
                         if (target.exists()) {
-                            installError = "同 id+version 已存在（NF-PCK-004）：" + id + " " + version + "，未覆盖"
+                            installError = context.getString(dev.ninfenz.mobile.R.string.pack_install_duplicate, id, version)
                         } else {
                             val ok = incoming.renameTo(target)
                             if (!ok) {
-                                installError = "移动到 " + target.absolutePath + " 失败"
+                                installError = context.getString(dev.ninfenz.mobile.R.string.pack_install_move_failed, target.absolutePath)
                             } else {
                                 message = "已安装 pack " + id + " " + version + "（" + count + " 个文件）"
                                 val verify = if (Core.diagnostics().nativeReady) {
@@ -92,7 +92,7 @@ fun HomeScreen(store: LibraryStore, onOpen: (Screen) -> Unit) {
                     }
                 }
             } catch (e: Exception) {
-                installError = "安装失败：" + (e.message ?: e.javaClass.simpleName)
+                installError = context.getString(dev.ninfenz.mobile.R.string.pack_install_failed, e.message ?: e.javaClass.simpleName)
             } finally {
                 busy = false
                 incomingCleanup(context)

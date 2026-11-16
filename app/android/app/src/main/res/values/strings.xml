@@ -565,6 +565,11 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="import_raw_missing_fix">重新导入</string>
     <string name="import_rename_failed">重命名失败：%1$s</string>
     <string name="import_rename_failed_fix">换一个名称后重试</string>
+    <string name="pack_install_missing_manifest">所选目录缺 nf-pack.json（复制 %1$d 个文件到 library/incoming，未安装）</string>
+    <string name="pack_install_missing_id">nf-pack.json 缺 id/version（未安装；文件留在 library/incoming）</string>
+    <string name="pack_install_duplicate">同 id+version 已存在（NF-PCK-004）：%1$s %2$s，未覆盖</string>
+    <string name="pack_install_move_failed">移动到 %1$s 失败</string>
+    <string name="pack_install_failed">安装失败：%1$s</string>
     <string name="import_epub_failed">EPUB 解析失败或无正文</string>
     <string name="import_epub_failed_fix">确认 EPUB 含 container/OPF/XHTML 章节</string>
     <string name="import_docx_failed">DOCX 解析失败或无正文</string>
