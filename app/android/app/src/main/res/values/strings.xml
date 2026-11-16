@@ -490,6 +490,7 @@
     <string name="import_delete_draft">删除</string>
     <string name="import_delete_draft_body">确定删除草稿 %1$s？映射 sidecar 也会删除。</string>
     <string name="import_rename_draft">重命名</string>
+    <string name="import_draft_to_project">转为项目</string>
     <string name="import_rename_draft_label">草稿文件名</string>
     <string name="import_rename_confirm">保存</string>
     <string name="import_recent_history">最近导入</string>

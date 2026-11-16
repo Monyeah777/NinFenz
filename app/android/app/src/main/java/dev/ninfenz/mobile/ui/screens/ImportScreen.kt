@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AlertDialog
@@ -38,6 +40,7 @@ import dev.ninfenz.mobile.core.CoreError
 import dev.ninfenz.mobile.core.CoreResponse
 import dev.ninfenz.mobile.core.J
 import dev.ninfenz.mobile.data.DraftLibrary
+import dev.ninfenz.mobile.data.PackEntry
 import dev.ninfenz.mobile.data.FileAccess
 import dev.ninfenz.mobile.data.ImportDraftStore
 import dev.ninfenz.mobile.data.ImportHistoryStore
@@ -73,7 +76,9 @@ fun ImportScreen(
     prefill: SharePayload?,
     store: LibraryStore,
     onBack: () -> Unit,
-    onPrefillConsumed: () -> Unit = {}
+    onPrefillConsumed: () -> Unit = {},
+    packs: List<PackEntry> = emptyList(),
+    onCreateProjectFromDraft: (PackEntry, String, File) -> Unit = { _, _, _ -> }
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -93,6 +98,7 @@ fun ImportScreen(
     var drafts by remember { mutableStateOf(DraftLibrary.list(context.filesDir)) }
     var recentImports by remember { mutableStateOf(importHistory.recent()) }
     var pendingDeleteDraft by remember { mutableStateOf<File?>(null) }
+    var convertDraft by remember { mutableStateOf<File?>(null) }
     var renameDraft by remember { mutableStateOf<File?>(null) }
     var renameDraftText by remember { mutableStateOf("") }
     LaunchedEffect(Unit) {
@@ -490,6 +496,11 @@ fun ImportScreen(
                                             }
                                         }
                                     }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_open_draft)) }
+                                    if (packs.isNotEmpty()) {
+                                        TextButton(onClick = { convertDraft = draft }) {
+                                            Text(stringResource(dev.ninfenz.mobile.R.string.import_draft_to_project))
+                                        }
+                                    }
                                     TextButton(onClick = {
                                         renameDraft = draft
                                         renameDraftText = draft.name.removeSuffix(".json")
@@ -593,6 +604,26 @@ fun ImportScreen(
             },
             dismissButton = {
                 TextButton(onClick = { renameDraft = null }) { Text(stringResource(android.R.string.cancel)) }
+            }
+        )
+    }
+
+    convertDraft?.let { draft ->
+        AlertDialog(
+            onDismissRequest = { convertDraft = null },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.import_draft_to_project)) },
+            text = {
+                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                    packs.forEach { pack ->
+                        TextButton(onClick = {
+                            convertDraft = null
+                            onCreateProjectFromDraft(pack, draft.name.removeSuffix(".json"), draft)
+                        }) { Text(pack.title + " · " + pack.id + "@" + pack.version) }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { convertDraft = null }) { Text(stringResource(dev.ninfenz.mobile.R.string.action_close)) }
             }
         )
     }

@@ -64,6 +64,7 @@ import dev.ninfenz.mobile.data.PackStore
 import dev.ninfenz.mobile.data.CreateProjectResult
 import dev.ninfenz.mobile.data.ProjectCreator
 import dev.ninfenz.mobile.data.ProjectArchiver
+import dev.ninfenz.mobile.data.DraftProjectBinder
 import dev.ninfenz.mobile.data.ProjectDuplicator
 import dev.ninfenz.mobile.data.ProjectRenamer
 import dev.ninfenz.mobile.data.ProjectReviewStore
@@ -352,7 +353,25 @@ is Detail.Import -> ImportScreen(
                             sharedPrefill = null
                             shell = shell.back() ?: shell
                         },
-                        onPrefillConsumed = { sharedPrefill = null }
+                        onPrefillConsumed = { sharedPrefill = null },
+                        packs = packs.packs,
+                        onCreateProjectFromDraft = { pack, title, draft ->
+                            scope.launch {
+                                when (val result = projectCreator.create(pack, title)) {
+                                    is CreateProjectResult.Success -> {
+                                        runCatching {
+                                            withContext(Dispatchers.IO) {
+                                                DraftProjectBinder.bind(context.filesDir, result.project.id, draft)
+                                            }
+                                        }
+                                        refresh()
+                                        shell = shell.open(Detail.Project(result.project.id))
+                                    }
+                                    is CreateProjectResult.Failure ->
+                                        android.widget.Toast.makeText(context, result.message, android.widget.Toast.LENGTH_LONG).show()
+                                }
+                            }
+                        }
                     )
                     is Detail.NewProject -> NewProjectScreen(
                         packs = packs.packs,
