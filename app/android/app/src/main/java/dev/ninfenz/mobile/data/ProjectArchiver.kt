@@ -20,12 +20,21 @@ object ProjectArchiver {
         }
         val dataDir = File(root, projectFile.name.removeSuffix(".nfproject.json"))
         val dataTarget = File(archive, target.name + ".data")
+        var jsonMoved = false
         try {
             Files.move(src.toPath(), target.toPath(), StandardCopyOption.ATOMIC_MOVE)
+            jsonMoved = true
             if (dataDir.isDirectory) {
                 Files.move(dataDir.toPath(), dataTarget.toPath(), StandardCopyOption.ATOMIC_MOVE)
             }
         } catch (t: Throwable) {
+            if (jsonMoved) {
+                runCatching { Files.move(target.toPath(), src.toPath(), StandardCopyOption.ATOMIC_MOVE) }
+                if (dataTarget.exists() && !dataDir.exists()) {
+                    runCatching { Files.move(dataTarget.toPath(), dataDir.toPath(), StandardCopyOption.ATOMIC_MOVE) }
+                }
+                throw t
+            }
             target.writeBytes(src.readBytes())
             if (!src.delete()) guardFailure(src, target)
             if (dataDir.isDirectory && !dataTarget.exists()) {
