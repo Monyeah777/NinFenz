@@ -9,7 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 SCHEMA = ROOT / "app" / "schema" / "error_codes.json"
 UI = ROOT / "app" / "android" / "app" / "src" / "main" / "java"
-PATTERN = re.compile(r'(?:CoreResponse\.failure|CoreError)\(\s*"(NF-[A-Z]+-\d{3})"')
+PATTERN = re.compile(r'"(NF-[A-Z]+-\d{3})"')
 
 
 def _registered() -> set[str]:

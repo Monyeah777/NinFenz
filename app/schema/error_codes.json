@@ -262,6 +262,20 @@
       "fix": "安装 nf CLI 或降级为 L1 并记录"
     },
     {
+      "code": "NF-REV-002",
+      "severity": "error",
+      "exit": 2,
+      "message": "当前状态不可评审通过",
+      "fix": "先完成 validate/export"
+    },
+    {
+      "code": "NF-REV-001",
+      "severity": "error",
+      "exit": 2,
+      "message": "评审人/意见不能为空",
+      "fix": "填写 reviewer 与 note"
+    },
+    {
       "code": "NF-EXP-001",
       "severity": "error",
       "exit": 2,
