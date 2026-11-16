@@ -39,7 +39,8 @@ object ProjectPackageImporter {
         projectPath: String
     ) {
         val manifestBytes = entries.firstOrNull { (name, _) -> name == ProjectPackage.MANIFEST }?.second ?: return
-        val manifest = Json.parseToJsonElement(String(manifestBytes, Charsets.UTF_8)).jsonObject
+        val manifestText = TextEncoding.decode(manifestBytes)?.text ?: String(manifestBytes, Charsets.UTF_8)
+        val manifest = Json.parseToJsonElement(manifestText).jsonObject
         val schema = manifest["schema"]?.jsonPrimitive?.content
         require(schema == null || schema == "nf-project-package/1") { "不支持的项目包版本：" + schema }
         val declaredProject = manifest["project"]?.jsonPrimitive?.content
@@ -90,7 +91,7 @@ object ProjectPackageImporter {
         }
         require(projectEntries.size == 1) { "zip 需且仅需一个项目 JSON" }
         val (projectPath, projectBytes) = projectEntries.first()
-        val text = String(projectBytes, Charsets.UTF_8)
+        val text = TextEncoding.decode(projectBytes)?.text ?: String(projectBytes, Charsets.UTF_8)
         val prefix = projectPath.substringBeforeLast('/', "")
         val dataPrefix = if (prefix.isBlank()) "data/" else prefix + "/data/"
         val data = entries.filter { (name, _) -> name.startsWith(dataPrefix) }

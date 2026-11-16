@@ -122,6 +122,13 @@ class ProjectPackageImporterTest {
     }
 
     @Test
+    fun importsProjectJsonWithBom() {
+        val root = Files.createTempDirectory("nf-bom-project").toFile()
+        val imported = ProjectPackageImporter.import(root, zip(listOf("p.nfproject.json" to "\uFEFF" + doc)))
+        assertEquals("p", imported.id)
+    }
+
+    @Test
     fun rejectsMissingProjectJson() {
         val root = Files.createTempDirectory("nf-no-project").toFile()
         assertTrue(runCatching { ProjectPackageImporter.import(root, zip(listOf("data/a.md" to "x"))) }.isFailure)
