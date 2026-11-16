@@ -613,6 +613,8 @@
     <string name="backup_delete_failed">Failed to delete backup: %1$s</string>
     <string name="backup_restore_failed">Restore failed: %1$s</string>
     <string name="unknown_reason">Unknown reason</string>
+    <string name="settings_core_missing">NF-E-005: shared core native library unavailable.\n%1$s</string>
+    <string name="storage_calculating">Calculating…</string>
     <string name="settings_prefs_restart">Preferences restored; restarting app…</string>
     <string name="settings_backup_rollback">Roll back last restore</string>
     <string name="settings_backup_prune">Prune old backups (keep 5)</string>

@@ -158,7 +158,7 @@ fun NfMobileApp(
     LaunchedEffect(Unit) {
         CommandBus.requests.collect { showCommands = true }
     }
-    var storageText by remember { mutableStateOf("计算中…") }
+    var storageText by remember { mutableStateOf(context.getString(dev.ninfenz.mobile.R.string.storage_calculating)) }
     var nativeReady by remember { mutableStateOf(false) }
     var creatingProject by remember { mutableStateOf(false) }
     var createError by remember { mutableStateOf<String?>(null) }

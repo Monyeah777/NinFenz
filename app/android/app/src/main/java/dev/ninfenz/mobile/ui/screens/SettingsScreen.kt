@@ -115,7 +115,7 @@ fun SettingsScreen(
             KeyValue(stringResource(dev.ninfenz.mobile.R.string.settings_native), if (diag.nativeReady) stringResource(dev.ninfenz.mobile.R.string.settings_loaded) else stringResource(dev.ninfenz.mobile.R.string.settings_missing))
             KeyValue(stringResource(dev.ninfenz.mobile.R.string.settings_err_registry), if (diag.errorCatalogLoaded) pluralStringResource(dev.ninfenz.mobile.R.plurals.settings_err_count, diag.errorCodeCount, diag.errorCodeCount) else stringResource(dev.ninfenz.mobile.R.string.settings_not_packaged))
             if (!diag.nativeReady) {
-                Notice("NF-E-005：共享核心原生库不可用。\n" + CoreBridgeNative.GUIDANCE, Tone.ERROR)
+                Notice(context.getString(dev.ninfenz.mobile.R.string.settings_core_missing, CoreBridgeNative.GUIDANCE), Tone.ERROR)
             }
             Text(
                 text = stringResource(dev.ninfenz.mobile.R.string.settings_error_hint, ErrorCatalog.all().size),
@@ -152,7 +152,7 @@ fun SettingsScreen(
                     backups = BackupService.list(context.filesDir)
                     backupMessage = context.resources.getQuantityString(dev.ninfenz.mobile.R.plurals.settings_backup_done, created.entries, created.entries, humanBytes(created.bytes)) +
                         if (checked.ok) context.getString(dev.ninfenz.mobile.R.string.settings_backup_verified)
-                        else context.getString(dev.ninfenz.mobile.R.string.settings_backup_verify_failed, checked.error ?: "未知原因")
+                        else context.getString(dev.ninfenz.mobile.R.string.settings_backup_verify_failed, checked.error ?: context.getString(dev.ninfenz.mobile.R.string.unknown_reason))
                 }
             }) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_backup_export)) }
             backupMessage?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary) }

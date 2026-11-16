@@ -613,6 +613,8 @@
     <string name="backup_delete_failed">删除备份失败：%1$s</string>
     <string name="backup_restore_failed">恢复失败：%1$s</string>
     <string name="unknown_reason">未知原因</string>
+    <string name="settings_core_missing">NF-E-005：共享核心原生库不可用。\n%1$s</string>
+    <string name="storage_calculating">计算中…</string>
     <string name="settings_prefs_restart">偏好已恢复，正在重启应用…</string>
     <string name="settings_backup_rollback">回滚上次恢复</string>
     <string name="settings_backup_prune">清理旧备份（保留 5 个）</string>

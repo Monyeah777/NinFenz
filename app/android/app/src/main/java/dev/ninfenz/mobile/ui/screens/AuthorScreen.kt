@@ -298,7 +298,7 @@ private fun ProtocolAuthorContent(
                                 saveMessage = context.getString(dev.ninfenz.mobile.R.string.author_saved, result.status.wire, result.overlaySha256.take(12))
                                 onSaved()
                             }
-                            is SaveOverlayResult.Failure -> saveError = "[" + result.code + "] " + result.message + "；修复：" + result.fix
+                            is SaveOverlayResult.Failure -> saveError = "[" + result.code + "] " + result.message + context.getString(dev.ninfenz.mobile.R.string.error_fix_suffix) + result.fix
                         }
                         saving = false
                     }

@@ -71,7 +71,7 @@ fun NewProjectScreen(
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(pack.title, style = MaterialTheme.typography.titleMedium)
                                 Text(
-                                    pack.id + " · " + pack.version + " · " + pack.itemCount + " 项",
+                                    pack.id + " · " + pack.version + " · " + stringResource(dev.ninfenz.mobile.R.string.pack_item_count, pack.itemCount),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
