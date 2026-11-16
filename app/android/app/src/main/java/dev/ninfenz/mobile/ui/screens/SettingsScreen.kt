@@ -300,7 +300,7 @@ fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
 
     pendingRestore?.let { file ->
         AlertDialog(
-            onDismissRequest = { pendingRestore = null },
+            onDismissRequest = { if (!restoring) pendingRestore = null },
             title = { Text(stringResource(dev.ninfenz.mobile.R.string.settings_backup_restore_title)) },
             text = {
                 Column {
