@@ -18,11 +18,20 @@ object ProjectArchiver {
             target = File(archive, projectFile.name + "." + stamp + "-" + index + ".archived")
             index++
         }
+        val dataDir = File(root, projectFile.name.removeSuffix(".nfproject.json"))
+        val dataTarget = File(archive, target.name + ".data")
         try {
             Files.move(src.toPath(), target.toPath(), StandardCopyOption.ATOMIC_MOVE)
+            if (dataDir.isDirectory) {
+                Files.move(dataDir.toPath(), dataTarget.toPath(), StandardCopyOption.ATOMIC_MOVE)
+            }
         } catch (t: Throwable) {
             target.writeBytes(src.readBytes())
             if (!src.delete()) guardFailure(src, target)
+            if (dataDir.isDirectory && !dataTarget.exists()) {
+                copyDir(dataDir, dataTarget)
+                dataDir.deleteRecursively()
+            }
         }
         return target
     }
@@ -53,6 +62,12 @@ object ProjectArchiver {
             target.writeBytes(archived.readBytes())
             if (!archived.delete()) throw IllegalStateException("归档恢复后删除失败：" + archived)
         }
+        val archivedData = File(archived.parentFile, archived.name + ".data")
+        if (archivedData.isDirectory) {
+            val projectDir = File(projects, target.name.removeSuffix(".nfproject.json"))
+            if (projectDir.exists()) projectDir.deleteRecursively()
+            Files.move(archivedData.toPath(), projectDir.toPath(), StandardCopyOption.ATOMIC_MOVE)
+        }
         return target
     }
 
@@ -61,7 +76,20 @@ object ProjectArchiver {
         val target = archived.canonicalFile
         require(target.path.startsWith(archiveRoot.path + File.separator)) { "不在归档目录：" + target }
         require(target.isFile) { "归档文件不存在" }
+        val dataDir = File(target.parentFile, target.name + ".data")
+        if (dataDir.isDirectory) dataDir.deleteRecursively()
         return target.delete()
+    }
+
+    private fun copyDir(source: File, target: File) {
+        target.mkdirs()
+        source.walkTopDown().forEach { file ->
+            if (file.isFile) {
+                val out = File(target, file.relativeTo(source).path)
+                out.parentFile?.mkdirs()
+                file.copyTo(out, overwrite = true)
+            }
+        }
     }
 
     private fun guardFailure(src: File, target: File) {

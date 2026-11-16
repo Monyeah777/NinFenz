@@ -30,6 +30,22 @@ object ProjectDuplicator {
         next["review"] = buildJsonObject { put("state", "pending") }
         next["history"] = kotlinx.serialization.json.buildJsonArray { }
         AtomicFiles.writeText(target, JsonObject(next).toString())
+        val sourceDir = File(File(filesDir, "projects"), sourceId)
+        if (sourceDir.isDirectory) {
+            copyDir(sourceDir, File(File(filesDir, "projects"), newId))
+        }
         return target
+    }
+
+    private fun copyDir(source: File, target: File) {
+        target.mkdirs()
+        source.walkTopDown().forEach { file ->
+            if (file.isFile) {
+                val rel = file.relativeTo(source)
+                val out = File(target, rel.path)
+                out.parentFile?.mkdirs()
+                file.copyTo(out, overwrite = true)
+            }
+        }
     }
 }

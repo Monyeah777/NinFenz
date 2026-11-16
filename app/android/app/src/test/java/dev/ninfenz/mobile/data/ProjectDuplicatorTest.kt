@@ -27,8 +27,11 @@ class ProjectDuplicatorTest {
     fun copiesRefsAndResetsStateReviewHistory() {
         val root = Files.createTempDirectory("nf-dup").toFile()
         val source = writeSource(root)
+        java.io.File(root, "projects/p/authoring").mkdirs()
+        java.io.File(root, "projects/p/authoring/assembly.md").writeText("body")
         val target = ProjectDuplicator.duplicate(source, root)
         assertTrue(target.name.startsWith("p-copy"))
+        assertEquals("body", java.io.File(root, "projects/p-copy/authoring/assembly.md").readText())
         val obj = Json.parseToJsonElement(target.readText()).jsonObject
         assertEquals("draft", obj["status"].toString().trim('"'))
         assertEquals("pending", obj["review"].toString().let { Regex("\"state\":\"([^\"]+)\"").find(it)?.groupValues?.get(1) })
