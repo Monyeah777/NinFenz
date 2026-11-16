@@ -17,6 +17,16 @@ class HtmlExporterTest {
     }
 
     @Test
+    fun rendersPipeTable() {
+        val dir = Files.createTempDirectory("nf-html-table").toFile()
+        val created = HtmlExporter.export("| A | B |\n|---|---|\n| 1 | 2 |", "t", dir)
+        val text = created.file.readText()
+        assertTrue(text.contains("<table>"))
+        assertTrue(text.contains("<th>A</th>"))
+        assertTrue(text.contains("<td>1</td>"))
+    }
+
+    @Test
     fun handlesCodeFence() {
         val dir = Files.createTempDirectory("nf-html-2").toFile()
         val created = HtmlExporter.export("\u0060\u0060\u0060\ncode\n\u0060\u0060\u0060", "t", dir)
