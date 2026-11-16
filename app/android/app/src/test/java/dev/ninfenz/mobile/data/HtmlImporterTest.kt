@@ -114,6 +114,12 @@ class HtmlImporterTest {
     }
 
     @Test
+    fun keepsInlineFormattingInTable() {
+        val md = HtmlImporter.toMarkdown("<table><tr><td><strong>粗</strong></td><td><a href=\"https://e\">链</a></td></tr></table>")
+        assertTrue(md.contains("| **粗** | [链](https://e) |"))
+    }
+
+    @Test
     fun removesScriptAndStyle() {
         val md = HtmlImporter.toMarkdown("<style>x{}</style><script>alert(1)</script><p>正文</p>")
         assertTrue(md.contains("正文"))
