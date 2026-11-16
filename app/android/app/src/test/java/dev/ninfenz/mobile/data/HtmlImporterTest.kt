@@ -17,6 +17,17 @@ class HtmlImporterTest {
     }
 
     @Test
+    fun convertsTablesAndLinks() {
+        val md = HtmlImporter.toMarkdown(
+            "<table><tr><th>A</th><th>B</th></tr><tr><td>1</td><td>2</td></tr></table>" +
+                "<p><a href=\"https://example.com\">官网</a></p>"
+        )
+        assertTrue(md.contains("| A | B |"))
+        assertTrue(md.contains("| 1 | 2 |"))
+        assertTrue(md.contains("[官网](https://example.com)"))
+    }
+
+    @Test
     fun removesScriptAndStyle() {
         val md = HtmlImporter.toMarkdown("<style>x{}</style><script>alert(1)</script><p>正文</p>")
         assertTrue(md.contains("正文"))
