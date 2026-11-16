@@ -514,7 +514,8 @@ fun ProjectDetailScreen(
     project: Project,
     onBack: () -> Unit,
     onAuthor: () -> Unit,
-    onAssembly: () -> Unit
+    onAssembly: () -> Unit,
+    onDuplicate: () -> Unit = {}
 ) {
     val context = LocalContext.current
     Column(modifier = Modifier.fillMaxSize()) {
@@ -543,6 +544,9 @@ fun ProjectDetailScreen(
                             stringResource(dev.ninfenz.mobile.R.string.project_detail_history, project.historyCount),
                             style = MaterialTheme.typography.bodySmall
                         )
+                        TextButton(onClick = onDuplicate) {
+                            Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_duplicate))
+                        }
                     }
                 }
             }

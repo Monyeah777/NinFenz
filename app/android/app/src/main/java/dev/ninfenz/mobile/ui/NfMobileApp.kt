@@ -63,6 +63,7 @@ import dev.ninfenz.mobile.data.PackSnapshot
 import dev.ninfenz.mobile.data.PackStore
 import dev.ninfenz.mobile.data.CreateProjectResult
 import dev.ninfenz.mobile.data.ProjectCreator
+import dev.ninfenz.mobile.data.ProjectDuplicator
 import dev.ninfenz.mobile.data.ProjectEntry
 import dev.ninfenz.mobile.data.SampleSeeder
 import dev.ninfenz.mobile.data.SeedResult
@@ -426,7 +427,16 @@ is Detail.Import -> ImportScreen(
                                 project = entry.project,
                                 onBack = { shell = shell.back() ?: shell },
                                 onAuthor = { shell = shell.open(Detail.Author(entry.project.id)) },
-                                onAssembly = { shell = shell.open(Detail.Delivery(entry.project.id)) }
+                                onAssembly = { shell = shell.open(Detail.Delivery(entry.project.id)) },
+                                onDuplicate = {
+                                    scope.launch {
+                                        val copy = withContext(Dispatchers.IO) {
+                                            ProjectDuplicator.duplicate(entry.file, context.filesDir)
+                                        }
+                                        refresh()
+                                        shell = shell.open(Detail.Project(copy.name.removeSuffix(".nfproject.json")))
+                                    }
+                                }
                             )
                         }
                     }
