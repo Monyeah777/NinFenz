@@ -32,7 +32,7 @@
 **APP 实现面：pass-with-open-items（P0 = 0）**。收口判定（2026-11-15）：实现面全部可本机验证的 MUST/主路径已落地并取证；计划 §18.3 的发布边界项（签名/公证/真机矩阵/Play 数据安全）保留 OPEN；PDF 已接本地基础文本导出，复杂排版/平台打印仍 OPEN，见 §6/§7。依据：
 - APP 门禁 `python app/gates/run_gates.py` → **7/7 门 FAIL=0**（QA0–QA6 全部 PASS；无 OPEN 阻塞），`P0=0`；
 - 自审计 S0–S15 → **covered 14 / gap 0 / open 2**，全部 open 带 owner+next（P1=2）；
-- 核心 `cargo test` **186 passed / 0 failed**；控制面 + 契约 + 安全 + golden + E2E：**pytest 493 passed / 0 failed / 0 skipped / 0 xfailed（147s）**；
+- 核心 `cargo test` **186 passed / 0 failed**；控制面 + 契约 + 安全 + golden + E2E：**pytest 496 passed / 0 failed / 0 skipped / 0 xfailed（126s）**；
 - 构建实测：Android debug APK 19,120,319 B、Release unsigned 15,320,377 B（16KB 对齐通过）；Windows MSI 为历史证据（66,573,406 B）。
 - 导出面：**md/zip/json/docx/skill 已实现**（core）；Android 另接 **EPUB/PDF/HTML 本地导出**（PDF 为基础文本、EPUB 轻量 EPUB3、HTML 单文件），并各自带结构自检；复杂排版/EPUBCheck 级语义仍 OPEN。
 
@@ -80,7 +80,7 @@
 | 面 | 数字 | 复跑 |
 |---|---|---|
 | Rust 核心 | 180 断言 / 21 二进制 / 0 failed | `cd app/core && cargo test` |
-| Python 控制面/契约/安全/golden/E2E | **493 passed / 0 failed / 0 skipped / 0 xfailed（147s）** | `python -m pytest app/tests -q` |
+| Python 控制面/契约/安全/golden/E2E | **496 passed / 0 failed / 0 skipped / 0 xfailed（126s）** | `python -m pytest app/tests -q` |
 | Android JVM | 42 条（含自适应分档 4 条） | `cd app/android && ./gradlew :app:testDebugUnitTest` |
 | Desktop JVM | 20 条（含真实 JNA FFI） | `cd app/desktop && ./gradlew test` |
 | APK | 19,120,319 B；16KB 对齐通过；双 ABI `.so` | `bash app/scripts/build_android.sh debug` |
@@ -105,7 +105,7 @@
 
 ```bash
 python app/gates/run_gates.py            # 期望：7/7 门 FAIL=0，P0=0，exit 0
-python -m pytest app/tests -q             # 期望：493 passed / 0 failed
+python -m pytest app/tests -q             # 期望：496 passed / 0 failed
 cd app/core && cargo test                # 期望：180 断言 0 failed
 bash app/scripts/build_core.sh --release --test
 python tui/nf.py --selftest              # 期望：9 项全 ✔
