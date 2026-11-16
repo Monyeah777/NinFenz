@@ -105,13 +105,13 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 - SearchIndexTest（3）：Pack 条款/字段/节点/章节/槽位 + 项目索引；空查询/缺目录容错。
 - PackVerifierTest（1）：pack-verify 传已安装 root；失败由错误码路径覆盖。
 - AuthorArtifactsLoaderTest（2）：sample-pack 读取 protocol/graph/spec；缺文件 fail-closed。
-- PackZipLoaderTest（7）
+- PackZipLoaderTest（7）：根/单层目录包、zip slip、缺 manifest、控制字符、压缩炸弹、加密条目拒绝。
 - ProjectDiffTest（2）：状态/历史差异、相同项目无差异。
 - SearchFilterStoreTest（2）：kind/pack 过滤存取与清空、坏 JSON 容错。
 - ProjectRenamerTest（3）：重命名保留其它字段、空标题/超 120 字拒绝且不改文件。
 - ProjectSorterTest（1）：按最近修改/标题/状态排序。
 - LibraryViewStoreTest（2）：状态过滤/排序存取清空、坏 JSON 容错。
-- DraftLibraryTest（4）：只列真实草稿、缺目录为空、删除含 mapping、重命名/冲突拒绝。：根/单层目录包、zip slip 拒绝、缺 manifest 拒绝。
+- DraftLibraryTest（4）：只列真实草稿、缺目录为空、删除含 mapping、重命名/冲突拒绝。
 - AuthorOverlayStoreTest（2）：overlay 形状；保存后 refs.overlay/status=authoring/history 更新。
 - ProjectStatusStoreTest（2）：draft→validated 逐步 history；核心失败不写盘。
 - DesignTokenTest（3）：间距 4 倍数、shape 梯度、7 档字号/行高。

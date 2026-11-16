@@ -79,6 +79,9 @@ import dev.ninfenz.mobile.ui.components.NfStatusChip
 import dev.ninfenz.mobile.ui.components.NfTopAppBar
 import dev.ninfenz.mobile.ui.theme.NfSpacing
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -759,7 +762,9 @@ fun ProjectDetailScreen(
                             }
                         }) {
                             Text(
-                                candidate.project.title + " · " + candidate.project.id + " · " + projectStatusLabel(candidate.project)
+                                candidate.project.title + " · " + candidate.project.id + " · " +
+                                    projectStatusLabel(candidate.project) + " · " +
+                                    SimpleDateFormat("MM-dd HH:mm", Locale.getDefault()).format(Date(candidate.file.lastModified()))
                             )
                         }
                     }
