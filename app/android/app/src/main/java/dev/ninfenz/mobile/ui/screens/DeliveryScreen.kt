@@ -586,19 +586,17 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                             TextButton(onClick = {
                                 val file = File(entry.path)
                                 if (file.isFile) {
-                                    val mime = when (entry.format) {
-                                        "md" -> "text/markdown"
-                                        "zip", "skill" -> "application/zip"
-                                        "docx" -> "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                                        "json" -> "application/json"
-                                        "epub" -> "application/epub+zip"
-                                        "pdf" -> "application/pdf"
-                                        else -> "application/octet-stream"
-                                    }
-                                    val intent = ShareExporter.shareFileIntent(context, file, mime, entry.name)
+                                    val intent = ShareExporter.shareFileIntent(context, file, mimeFor(entry.format), entry.name)
                                     ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.delivery_share_file))
                                 }
                             }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_share_file)) }
+                            TextButton(onClick = {
+                                val file = File(entry.path)
+                                if (file.isFile) {
+                                    val intent = ShareExporter.viewFileIntent(context, file, mimeFor(entry.format))
+                                    ShareExporter.launchView(context, intent, context.getString(dev.ninfenz.mobile.R.string.delivery_open_file))
+                                }
+                            }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_open_file)) }
                         }
                         entry.message?.takeIf { entry.ok != true }?.let { message ->
                             Text(
@@ -847,4 +845,14 @@ private fun PdfExportButton(
             }
         }
     ) { Text(context.getString(dev.ninfenz.mobile.R.string.delivery_export, "pdf")) }
+}
+
+private fun mimeFor(format: String): String = when (format) {
+    "md" -> "text/markdown"
+    "zip", "skill" -> "application/zip"
+    "docx" -> "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    "json" -> "application/json"
+    "epub" -> "application/epub+zip"
+    "pdf" -> "application/pdf"
+    else -> "application/octet-stream"
 }

@@ -35,6 +35,21 @@ object ShareExporter {
         return intent
     }
 
+    /** 用外部应用打开导出文件（只读 URI）；无匹配应用时由 chooser 处理。 */
+    fun viewFileIntent(context: Context, file: File, mime: String): Intent {
+        val uri = FileProvider.getUriForFile(context, AUTHORITY, file)
+        return Intent(Intent.ACTION_VIEW).apply {
+            setDataAndType(uri, mime)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+    }
+
+    fun launchView(context: Context, target: Intent, title: String) {
+        val chooser = Intent.createChooser(target, title)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        context.startActivity(chooser)
+    }
+
     fun shareMarkdown(context: Context, title: String, markdown: String): Intent {
         val file = writeSharedFile(context, title, "md", markdown)
         return shareFileIntent(context, file, "text/markdown", title)

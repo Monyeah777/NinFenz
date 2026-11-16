@@ -17,6 +17,7 @@
 | L1 校验 | pass：L1 pass（error=0 warn=0 info=3）；状态 assembled→validated 写回 | run-as 读项目 |
 | 导出 md/zip | pass：files/exports/delivery/result.md + result.zip + manifest；状态 validated→exported 写回 | run-as 读文件 |
 | 桌面快捷方式（构建） | pass（构建）：静态 shortcuts（导入/新建/搜索）+ MainActivity 冷启动/onNewIntent 路由；未真机长按图标验证（adb 无设备） |
+| 打开导出文件（JVM） | pass（本机）：最近导出行新增「打开」，ACTION_VIEW + FileProvider 只读 URI；无匹配应用时 chooser 提示；真机未复测（adb 无设备） |
 | 最近导入记录（JVM） | pass（本机）：导入页显示最近 5 条导入（名称/digest），可清空；用于重复导入提示；测试 3 条。真机未复测（adb 无设备） |
 | 草稿重命名（JVM） | pass（本机）：草稿行重命名并同步 mapping sidecar；冲突/同名拒绝；真机未复测（adb 无设备） |
 | 草稿删除（JVM） | pass（本机）：导入页草稿行可删除，二次确认，同时删除 mapping sidecar；测试 4 条。真机未复测（adb 无设备） |
