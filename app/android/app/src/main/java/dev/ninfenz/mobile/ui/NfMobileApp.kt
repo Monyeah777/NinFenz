@@ -72,6 +72,7 @@ import dev.ninfenz.mobile.data.ProjectRenamer
 import dev.ninfenz.mobile.data.ProjectPackage
 import dev.ninfenz.mobile.data.ProjectPackageImporter
 import dev.ninfenz.mobile.data.ProjectReviewStore
+import dev.ninfenz.mobile.data.RecentProjectShortcuts
 import dev.ninfenz.mobile.share.ShareExporter
 import dev.ninfenz.mobile.data.ProjectEntry
 import dev.ninfenz.mobile.data.SampleSeeder
@@ -173,6 +174,7 @@ fun NfMobileApp(
             val diag = runCatching { withContext(Dispatchers.IO) { Core.diagnostics() } }.getOrNull()
             packs = packSnapshot
             projects = projectSnapshot.projects
+            RecentProjectShortcuts.publish(context, dev.ninfenz.mobile.model.ProjectSorter.sort(projectSnapshot.projects, dev.ninfenz.mobile.model.ProjectSort.RECENT))
             archivedProjects = withContext(Dispatchers.IO) { ProjectArchiver.list(context.filesDir) }
             projectErrors = projectSnapshot.errors
             storageText = humanSize(size)
@@ -293,10 +295,15 @@ fun NfMobileApp(
 
     LaunchedEffect(shortcut, onboardingDone) {
         if (onboardingDone && shortcut != null) {
-            when (shortcut) {
-                "import" -> shell = shell.open(Detail.Import)
-                "new_project" -> shell = shell.open(Detail.NewProject)
-                "search" -> shell = shell.open(Detail.Search)
+            if (shortcut.startsWith("project:")) {
+                val id = shortcut.removePrefix("project:")
+                if (id.isNotBlank()) shell = shell.open(Detail.Project(id))
+            } else {
+                when (shortcut) {
+                    "import" -> shell = shell.open(Detail.Import)
+                    "new_project" -> shell = shell.open(Detail.NewProject)
+                    "search" -> shell = shell.open(Detail.Search)
+                }
             }
             onShortcutConsumed()
         }

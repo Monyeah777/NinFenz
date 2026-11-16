@@ -24,7 +24,7 @@
 
 | 项 | 结果 |
 |---|---|
-| APK | app-debug.apk = 24,744,537 B；sha256 10402f54524aaf3225fa250c72aee7ec9780b76b78f3d71de2ca09fe3a754f67 |
+| APK | app-debug.apk = 24,744,537 B；sha256 48ff8bb9ba9aefcb0100d03483ad5f1734c13b9d6a415701311f99861f0ec14a |
 | JVM 测试 | 248 条全绿（v1 基线 42 + v0.02 新增 206；含 Robolectric/Compose/Paparazzi） |
 | 构建 | ./gradlew :app:assembleDebug 成功；:app:testDebugUnitTest 123/123 |
 | i18n | 全部屏主要文案已资源化 + values-en；「我的」zh/en/跟随系统切换；动态取色开关；库/Pack 中心下拉刷新；节点删除 Snackbar 撤销 + 触觉；expanded 双栏（主列表+详情）；导航 Crossfade（NfMotion.MEDIUM_MS）；统一 loading/skeleton 组件；少量错误/技术提示仍内联（OPEN-I18N-BODY 尾项） |

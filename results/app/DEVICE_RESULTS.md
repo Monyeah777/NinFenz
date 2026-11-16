@@ -18,6 +18,7 @@
 | 导出 md/zip | pass：files/exports/delivery/result.md + result.zip + manifest；状态 validated→exported 写回 | run-as 读文件 |
 | 桌面快捷方式（构建） | pass（构建）：静态 shortcuts（导入/新建/搜索）+ MainActivity 冷启动/onNewIntent 路由；未真机长按图标验证（adb 无设备） |
 | Lint 收尾（JVM） | pass（本机）：抑制预期 UnusedAttribute；import_project_package_done 改 plurals；warnings 4→3（仅剩 GradleDependency2/ObsoleteSdkInt1）。真机未复测（adb 无设备） |
+| 最近项目动态快捷方式（JVM） | pass（本机）：refresh 发布最多 3 个最近项目快捷方式；MainActivity 解析 OPEN_PROJECT 并直达项目；ShortcutManager 失败静默。真机未复测（adb 无设备） |
 | 项目包条目预检（JVM） | pass（本机）：读 entry 前检查声明大小与总量上限，避免压缩炸弹先读入内存；测试 5 条仍绿。真机未复测（adb 无设备） |
 | HTML 结构自检（JVM） | pass（本机）：导出后检查 doctype/html/head/body/title/charset；失败显示原因；测试 2 条。真机未复测（adb 无设备） |
 | HTML 导出（JVM） | pass（本机）：交付台「导出 html」生成单文件 result.html（基础 Markdown、内联 CSS、转义）；测试 2 条。真机未复测（adb 无设备） |

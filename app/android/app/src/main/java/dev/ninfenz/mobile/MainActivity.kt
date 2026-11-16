@@ -19,6 +19,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import dev.ninfenz.mobile.data.AppPrefs
 import dev.ninfenz.mobile.data.CrashLogStore
+import dev.ninfenz.mobile.data.RecentProjectShortcuts
 import dev.ninfenz.mobile.data.LanguageMode
 import dev.ninfenz.mobile.data.ThemeMode
 import dev.ninfenz.mobile.ui.CommandBus
@@ -36,6 +37,8 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun shortcutFrom(intent: Intent?): String? = when (intent?.action) {
+        RecentProjectShortcuts.ACTION_OPEN_PROJECT ->
+            intent.getStringExtra(RecentProjectShortcuts.EXTRA_PROJECT_ID)?.takeIf { it.isNotBlank() }?.let { "project:" + it }
         "dev.ninfenz.mobile.SHORTCUT_IMPORT" -> "import"
         "dev.ninfenz.mobile.SHORTCUT_NEW_PROJECT" -> "new_project"
         "dev.ninfenz.mobile.SHORTCUT_SEARCH" -> "search"
