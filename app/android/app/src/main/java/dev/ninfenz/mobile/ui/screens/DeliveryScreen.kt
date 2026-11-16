@@ -47,6 +47,7 @@ import dev.ninfenz.mobile.data.DeliveryDraftStore
 import dev.ninfenz.mobile.data.EpubExporter
 import dev.ninfenz.mobile.data.EpubValidator
 import dev.ninfenz.mobile.data.HtmlExporter
+import dev.ninfenz.mobile.data.HtmlValidator
 import dev.ninfenz.mobile.data.PdfExporter
 import dev.ninfenz.mobile.data.PdfValidator
 import dev.ninfenz.mobile.data.ExportHistoryStore
@@ -200,6 +201,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
             !verify -> null
             format == "epub" -> EpubValidator.inspect(file).let { ExportVerifier.Result(it.ok, it.message) }
             format == "pdf" -> PdfValidator.inspect(file).let { ExportVerifier.Result(it.ok, it.message) }
+            format == "html" -> HtmlValidator.inspect(file).let { ExportVerifier.Result(it.ok, it.message) }
             else -> ExportVerifier.verify(file, manifest)
         }
         exportVerify = verdict
@@ -532,7 +534,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                     HtmlExportButton(markdown, project, context, scope, { busy = it }, { error = it }) { file ->
                         exportedFile = file
                         manifestText = null
-                        recordExport("html", file, null, verify = false)
+                        recordExport("html", file, null)
                     }
                 }
                 Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
