@@ -29,6 +29,7 @@
 | HTML 表格对齐（JVM） | pass（本机）：:---/::/---: → style text-align；测试 12 条。真机未复测（adb 无设备） |
 | EPUB 导出 data URI 图片（JVM） | pass（本机）：Markdown data:image 渲染为 img；测试 10 条。真机未复测（adb 无设备） |
 | EPUB 图片内嵌（JVM） | pass（本机）：EPUB img 转 data URI（单图 ≤2MiB、总量 ≤20MiB）；测试 6 条。真机未复测（adb 无设备） |
+| 全量复核（round53） | pass（本机）：verify PASS=107/WARN=2/FAIL=0；gates PASS/gap=0；rust 186；pytest 493。 |
 | 表格内行内格式（JVM） | pass（本机）：表格单元格保留粗体/链接 Markdown；测试 17 条。 |
 | 列表内行内格式（JVM） | pass（本机）：先做链接/粗斜/图片转换再解析列表，列表项保留 Markdown；测试 16 条。 |
 | HTML 嵌套有序列表（JVM） | pass（本机）：ol 内嵌 ol 缩进编号；测试 15 条。 |
