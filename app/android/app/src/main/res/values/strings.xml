@@ -603,6 +603,14 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="import_sample_read_failed_fix">检查 APK assets/sample-pack/docs/sample.md</string>
     <string name="import_share_empty">分享载荷无可导入条目</string>
     <string name="import_share_empty_fix">换一种分享方式</string>
+    <string name="import_share_permission_lost">分享授权已失效，无法读取该条目</string>
+    <string name="import_share_permission_lost_fix">重新分享，或改用文件选择器导入</string>
+    <string name="import_share_uri_failed">读取分享 URI 失败：%1$s</string>
+    <string name="import_share_uri_failed_fix">确认授权后重试</string>
+    <string name="import_draft_read_failed">草稿读取失败</string>
+    <string name="import_draft_read_failed_fix">文件可能已被删除</string>
+    <string name="import_draft_parse_failed">草稿解析失败：%1$s</string>
+    <string name="import_draft_parse_failed_fix">删除该草稿或重新导入</string>
     <string name="import_clipboard_empty">剪贴板为空</string>
     <string name="import_clipboard_empty_fix">先复制一段文本</string>
     <string name="import_raw_missing">原始响应未保留，拒绝以重序列化结果冒充核心产物</string>

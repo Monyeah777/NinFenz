@@ -312,9 +312,19 @@ fun ImportScreen(
                     importFromFile(file, "share", meta.name, meta.mime ?: item.mime, meta.size)
                 } catch (e: Exception) {
                     error = if (e is SecurityException) {
-                        CoreResponse.failure("NF-IMP-006", "分享授权已失效，无法读取该条目", "重新分享，或改用文件选择器导入", 2).error
+                        CoreResponse.failure(
+                            "NF-IMP-006",
+                            context.getString(dev.ninfenz.mobile.R.string.import_share_permission_lost),
+                            context.getString(dev.ninfenz.mobile.R.string.import_share_permission_lost_fix),
+                            2
+                        ).error
                     } else {
-                        CoreResponse.failure("NF-E-004", "读取分享 URI 失败：" + (e.message ?: e.javaClass.simpleName), "确认授权后重试", 2).error
+                        CoreResponse.failure(
+                            "NF-E-004",
+                            context.getString(dev.ninfenz.mobile.R.string.import_share_uri_failed, e.message ?: e.javaClass.simpleName),
+                            context.getString(dev.ninfenz.mobile.R.string.import_share_uri_failed_fix),
+                            2
+                        ).error
                     }
                 }
             }
@@ -575,7 +585,12 @@ fun ImportScreen(
                                     TextButton(onClick = {
                                         val raw = DraftLibrary.read(draft)
                                         if (raw == null) {
-                                            error = CoreResponse.failure("NF-IMP-004", "草稿读取失败", "文件可能已被删除", 2).error
+                                            error = CoreResponse.failure(
+                                                "NF-IMP-004",
+                                                context.getString(dev.ninfenz.mobile.R.string.import_draft_read_failed),
+                                                context.getString(dev.ninfenz.mobile.R.string.import_draft_read_failed_fix),
+                                                2
+                                            ).error
                                         } else {
                                             try {
                                                 val obj = J.parseObject(raw, ImportModel.SCHEMA)
@@ -588,7 +603,12 @@ fun ImportScreen(
                                                 error = null
                                                 importDraftStore.save(raw)
                                             } catch (t: Throwable) {
-                                                error = CoreResponse.failure("NF-E-002", "草稿解析失败：" + (t.message ?: t.javaClass.simpleName), "删除该草稿或重新导入", 2).error
+                                                error = CoreResponse.failure(
+                                                    "NF-E-002",
+                                                    context.getString(dev.ninfenz.mobile.R.string.import_draft_parse_failed, t.message ?: t.javaClass.simpleName),
+                                                    context.getString(dev.ninfenz.mobile.R.string.import_draft_parse_failed_fix),
+                                                    2
+                                                ).error
                                             }
                                         }
                                     }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_open_draft)) }
@@ -638,7 +658,12 @@ fun ImportScreen(
                                                         error = null
                                                         importDraftStore.save(raw)
                                                     } catch (t: Throwable) {
-                                                        error = CoreResponse.failure("NF-E-002", "草稿解析失败：" + (t.message ?: t.javaClass.simpleName), "删除该草稿或重新导入", 2).error
+                                                        error = CoreResponse.failure(
+                                                    "NF-E-002",
+                                                    context.getString(dev.ninfenz.mobile.R.string.import_draft_parse_failed, t.message ?: t.javaClass.simpleName),
+                                                    context.getString(dev.ninfenz.mobile.R.string.import_draft_parse_failed_fix),
+                                                    2
+                                                ).error
                                                     }
                                                 }
                                             }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_open_draft)) }

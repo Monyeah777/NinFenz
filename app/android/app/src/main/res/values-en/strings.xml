@@ -603,6 +603,14 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="import_sample_read_failed_fix">Check APK assets/sample-pack/docs/sample.md</string>
     <string name="import_share_empty">Shared payload has no importable item</string>
     <string name="import_share_empty_fix">Try a different share method</string>
+    <string name="import_share_permission_lost">Share permission expired; cannot read this item</string>
+    <string name="import_share_permission_lost_fix">Share again, or import via the file picker</string>
+    <string name="import_share_uri_failed">Failed to read shared URI: %1$s</string>
+    <string name="import_share_uri_failed_fix">Confirm permission and retry</string>
+    <string name="import_draft_read_failed">Failed to read draft</string>
+    <string name="import_draft_read_failed_fix">The file may have been deleted</string>
+    <string name="import_draft_parse_failed">Draft parse failed: %1$s</string>
+    <string name="import_draft_parse_failed_fix">Delete the draft or import again</string>
     <string name="import_clipboard_empty">Clipboard is empty</string>
     <string name="import_clipboard_empty_fix">Copy some text first</string>
     <string name="import_raw_missing">Raw core response missing; refusing to substitute re-serialized output</string>
