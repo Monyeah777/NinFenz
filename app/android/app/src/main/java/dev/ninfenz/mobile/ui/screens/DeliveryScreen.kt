@@ -43,6 +43,7 @@ import dev.ninfenz.mobile.core.J
 import dev.ninfenz.mobile.data.AuthorArtifacts
 import dev.ninfenz.mobile.data.AuthorArtifactsLoader
 import dev.ninfenz.mobile.data.DeliveryDraftStore
+import dev.ninfenz.mobile.data.ExportHistoryStore
 import dev.ninfenz.mobile.data.PackEntry
 import dev.ninfenz.mobile.data.AssemblyArtifact
 import dev.ninfenz.mobile.data.ProjectStatusStore
@@ -109,6 +110,8 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
     var batchSource by remember { mutableStateOf("") }
     var batchNote by remember { mutableStateOf<String?>(null) }
     val draftStore = remember { DeliveryDraftStore(context.filesDir) }
+    val exportHistory = remember { ExportHistoryStore(context.filesDir) }
+    var exportEntries by remember { mutableStateOf(exportHistory.load()) }
     val restoredInputs = remember(project.id) { draftStore.load(project.id) }
     var draftNote by remember(project.id) {
         mutableStateOf(if (restoredInputs.isNotEmpty()) context.getString(dev.ninfenz.mobile.R.string.delivery_draft_restored) else null)
@@ -180,6 +183,13 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                 error = CoreResponse.failure("NF-E-003", context.getString(dev.ninfenz.mobile.R.string.delivery_slot_import_fail, t.message ?: t.javaClass.simpleName), context.getString(dev.ninfenz.mobile.R.string.delivery_slot_import_fail_fix), 2).error
             }
         }
+    }
+
+    fun recordExport(format: String, file: File?, manifest: String?) {
+        if (file == null) return
+        val sha = manifest?.let { Regex("\"sha256\":\"([^\"]+)\"").find(it)?.groupValues?.getOrNull(1) }.orEmpty()
+        exportHistory.record(format, file, sha)
+        exportEntries = exportHistory.load()
     }
 
     fun applyBatch(onlyEmpty: Boolean) {
@@ -458,6 +468,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                     ExportButton("md", "text/markdown", markdown, project, context, scope, { busy = it }, { error = it }) { file, manifest ->
                         exportedFile = file
                         manifestText = manifest
+                        recordExport("md", file, manifest)
                         scope.launch {
                             when (val advanced = statusStore.advance(project, ProjectStatus.EXPORTED)) {
                                 is StatusAdvanceResult.Advanced -> {
@@ -472,10 +483,12 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                     ExportButton("zip", "application/zip", markdown, project, context, scope, { busy = it }, { error = it }) { file, manifest ->
                         exportedFile = file
                         manifestText = manifest
+                        recordExport("zip", file, manifest)
                     }
                     ExportButton("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", markdown, project, context, scope, { busy = it }, { error = it }) { file, manifest ->
                         exportedFile = file
                         manifestText = manifest
+                        recordExport("docx", file, manifest)
                     }
                 }
                 Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
@@ -504,6 +517,35 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                 }
                 Text(stringResource(dev.ninfenz.mobile.R.string.delivery_pdf_note), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page))
                 manifestText?.let { Text(it, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
+                if (exportEntries.isNotEmpty()) {
+                    Text(
+                        stringResource(dev.ninfenz.mobile.R.string.delivery_recent_exports),
+                        style = MaterialTheme.typography.titleSmall,
+                        modifier = Modifier.padding(horizontal = NfSpacing.page)
+                    )
+                    exportEntries.take(5).forEach { entry ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = NfSpacing.page),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(entry.format + " · " + entry.name, style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
+                            TextButton(onClick = {
+                                val file = File(entry.path)
+                                if (file.isFile) {
+                                    val mime = when (entry.format) {
+                                        "md" -> "text/markdown"
+                                        "zip" -> "application/zip"
+                                        "docx" -> "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                                        else -> "application/octet-stream"
+                                    }
+                                    val intent = ShareExporter.shareFileIntent(context, file, mime, entry.name)
+                                    ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.delivery_share_file))
+                                }
+                            }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_share_file)) }
+                        }
+                    }
+                }
                 }
 
                 NfCollapsibleSection(title = stringResource(dev.ninfenz.mobile.R.string.delivery_preview), initiallyExpanded = true) {
