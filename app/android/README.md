@@ -180,7 +180,7 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 > Windows 下 clean/assembleRelease 若报 `lintVitalAnalyzeRelease` 的 lint jar 被占用，先 `./gradlew --stop` 再重试；也可直接用 `bash app/scripts/build_android_safe.sh`（失败自动 stop+重试一次）。
 
 - 2026-11-16 当前：`./gradlew :app:assembleDebug` 成功：app-debug.apk = 19,049,108 bytes，
-  sha256 = 34f28846b84d8c82b9991d1ddf2adad6b22c2b3987a176f2e26ba050baabc96a（含双 ABI 原生库 + 9 个示例 Pack assets）。
+  sha256 = 562a63a3c696f5c680f4b65ea640600ab4adb0132525f01d343294d267509e38（含双 ABI 原生库 + 9 个示例 Pack assets）。
 - 仓库级门禁在 UTF-8 locale 下运行：`LANG=C.UTF-8 PYTHONUTF8=1 bash verify.sh --checks-only`（GBK 控制台会让 `git ls-files` 解码失败，触发 modeling 检查异常）。
 - `./gradlew :app:testDebugUnitTest` 全绿：301 条 JVM 单测（v1 42 + v0.02 259；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y/大字号/对比度/Paparazzi 截图）。
 - `zipalign -c -P 16 -v 4 app-debug.apk` → Verification successful（native lib 16KB page 对齐）。

@@ -14,6 +14,7 @@ object DocxImporter {
     fun extract(file: File): String {
         ZipFile(file).use { zip ->
             val entry = zip.getEntry("word/document.xml") ?: throw IllegalArgumentException("DOCX 缺 document.xml")
+            require(entry.size in 0..(64L * 1024 * 1024)) { "DOCX document.xml 过大" }
             val xml = zip.getInputStream(entry).use { String(it.readBytes(), Charsets.UTF_8) }
             val links = zip.getEntry("word/_rels/document.xml.rels")?.let { rel ->
                 val relXml = zip.getInputStream(rel).use { String(it.readBytes(), Charsets.UTF_8) }
