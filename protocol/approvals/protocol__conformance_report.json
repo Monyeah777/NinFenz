@@ -1,8 +1,8 @@
 {
-  "approved_at": "2026-11-15",
+  "approved_at": "2026-11-16",
   "approved_by": "Monyeah777",
-  "note": "APP android adaptive/a11y code-side",
+  "note": "APP v0.02: export/import hardening (package manifest, backup filters, HTML/EPUB markdown coverage)",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "920537a16d9c1febd228274c8f177d4804a3e65d256531d867a84ad9e2627589"
+  "subject_digest": "670508412e72485b068b4f73d3b43b659e1e3e9ae360fe659e2620dbb2aa195f"
 }
