@@ -85,7 +85,7 @@ import kotlinx.serialization.json.put
 
 /**
  * W5 交付台：项目 → graph-compile 计划 → 槽位输入 → assemble → validate L1 → 导出 md/zip/docx → 分享。
- * 项目状态写回与 PDF 内核仍未接（PDF=平台打印，OPEN）。
+ * 项目状态写回已接；PDF 为本地基础文本导出（PdfExporter），复杂排版/平台打印仍 OPEN。
  */
 @Composable
 fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onStatusChanged: () -> Unit = {}) {
