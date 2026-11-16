@@ -17,7 +17,8 @@ object ProjectPackage {
         outDir.mkdirs()
         val projectBytes = projectFile.readBytes()
         val data = if (projectDir.isDirectory) {
-            projectDir.walkTopDown().filter { it.isFile }
+            projectDir.walkTopDown()
+                .filter { it.isFile && !it.name.endsWith(".bak") && !it.name.endsWith(".tmp") }
                 .map { "data/" + it.relativeTo(projectDir).path.replace('\\', '/') to it.readBytes() }
                 .sortedBy { it.first }
                 .toList()

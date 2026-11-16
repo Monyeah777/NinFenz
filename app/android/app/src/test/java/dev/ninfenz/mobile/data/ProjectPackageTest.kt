@@ -14,6 +14,7 @@ class ProjectPackageTest {
         val project = File(root, "p.nfproject.json").apply { writeText("{}") }
         val data = File(root, "p/authoring").apply { mkdirs() }
         File(data, "assembly.md").writeText("body")
+        File(data, "assembly.md.bak").writeText("old")
         val zip = ProjectPackage.create(project, File(root, "p"), File(root, "out"))
         ZipFile(zip).use { z ->
             val names = z.entries().toList().map { it.name }.sorted()
