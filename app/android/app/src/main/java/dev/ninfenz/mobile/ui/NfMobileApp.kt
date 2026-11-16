@@ -193,7 +193,7 @@ fun NfMobileApp(
                         context.contentResolver.openInputStream(uri)?.use { input ->
                             temp.outputStream().use { output -> input.copyTo(output) }
                         }
-                        ProjectPackageImporter.import(context.filesDir, temp)
+                        ProjectPackageImporter.import(context.filesDir, temp).also { temp.delete() }
                     }
                 }
                 result.onSuccess { imported ->
