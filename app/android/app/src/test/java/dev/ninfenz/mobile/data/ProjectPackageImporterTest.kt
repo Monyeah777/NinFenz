@@ -65,6 +65,16 @@ class ProjectPackageImporterTest {
     }
 
     @Test
+    fun importsProjectNestedUnderFolder() {
+        val root = Files.createTempDirectory("nf-import-nested").toFile()
+        val zip = zip(listOf("bundle/p.nfproject.json" to doc, "bundle/data/authoring/assembly.md" to "nested"))
+        val imported = ProjectPackageImporter.import(root, zip)
+        assertEquals("p", imported.id)
+        assertEquals("nested", java.io.File(root, "projects/p/authoring/assembly.md").readText())
+        assertTrue(ProjectPackageImporter.hasProjectJson(zip))
+    }
+
+    @Test
     fun rejectsTraversal() {
         val root = Files.createTempDirectory("nf-import-project-3").toFile()
         assertTrue(runCatching { ProjectPackageImporter.import(root, zip(listOf("../evil.nfproject.json" to doc))) }.isFailure)

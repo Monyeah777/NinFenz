@@ -21,7 +21,10 @@ object ProjectPackageImporter {
 
     fun hasProjectJson(zipFile: File): Boolean = try {
         if (!zipFile.isFile) false else ZipFile(zipFile).use { zip ->
-            zip.entries().asSequence().any { !it.isDirectory && it.name.endsWith(".nfproject.json") && !it.name.contains('/') }
+            zip.entries().asSequence().any { entry ->
+                !entry.isDirectory && entry.name.replace('\\', '/').endsWith(".nfproject.json") &&
+                    entry.name.replace('\\', '/').split('/').size <= 2
+            }
         }
     } catch (t: Throwable) {
         false
@@ -30,8 +33,7 @@ object ProjectPackageImporter {
     fun import(filesDir: File, zipFile: File): Imported {
         require(zipFile.isFile) { "zip 不存在" }
         val projectsDir = File(filesDir, "projects").apply { mkdirs() }
-        var projectText: String? = null
-        val data = mutableListOf<Pair<String, ByteArray>>()
+        val entries = mutableListOf<Pair<String, ByteArray>>()
         ZipFile(zipFile).use { zip ->
             var total = 0L
             var count = 0
@@ -44,16 +46,19 @@ object ProjectPackageImporter {
                 require(entry.size in 0..(512L * 1024 * 1024)) { "条目过大：" + name }
                 total += entry.size.coerceAtLeast(0)
                 require(total <= 512L * 1024 * 1024) { "解压总量超限" }
-                val bytes = zip.getInputStream(entry).use { it.readBytes() }
-                if (name.endsWith(".nfproject.json") && !name.contains('/')) {
-                    require(projectText == null) { "包含多个项目文件" }
-                    projectText = String(bytes, Charsets.UTF_8)
-                } else if (name.startsWith("data/")) {
-                    data.add(name.removePrefix("data/") to bytes)
-                }
+                entries.add(name to zip.getInputStream(entry).use { it.readBytes() })
             }
         }
-        val text = projectText ?: throw IllegalArgumentException("zip 缺少项目 JSON")
+        val projectEntries = entries.filter { (name, _) ->
+            name.endsWith(".nfproject.json") && name.split('/').size <= 2
+        }
+        require(projectEntries.size == 1) { "zip 需且仅需一个项目 JSON" }
+        val (projectPath, projectBytes) = projectEntries.first()
+        val text = String(projectBytes, Charsets.UTF_8)
+        val prefix = projectPath.substringBeforeLast('/', "")
+        val dataPrefix = if (prefix.isBlank()) "data/" else prefix + "/data/"
+        val data = entries.filter { (name, _) -> name.startsWith(dataPrefix) }
+            .map { (name, bytes) -> name.removePrefix(dataPrefix) to bytes }
         val source = Json.parseToJsonElement(text).jsonObject
         val sourceId = source["id"]?.let { (it as? JsonPrimitive)?.content } ?: throw IllegalArgumentException("项目缺 id")
         var id = sourceId

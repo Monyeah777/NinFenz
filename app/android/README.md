@@ -115,7 +115,7 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 - DraftProjectBinderTest（2）：草稿副本写入项目 authoring；缺项目/草稿拒绝。
 - ShareQueueStoreTest（2）：多条目队列/游标存取、空/坏 JSON 容错。
 - ProjectPackageTest（2）：完整项目 zip 含 JSON+data、缺项目拒绝。
-- ProjectPackageImporterTest（5）：JSON+data 导入、ID 冲突改名、路径穿越拒绝、导出→导入往返、项目包识别。
+- ProjectPackageImporterTest（6）：JSON+data 导入、嵌套目录包、ID 冲突改名、路径穿越拒绝、导出→导入往返、项目包识别。
 - HtmlExporterTest（2）：单文件 HTML/转义/列表、代码块。
 - HtmlValidatorTest（2）：导出物结构通过、坏/缺 HTML 拒绝。
 - RtlShellTest（1）：RTL 下四目的地文本仍可见。
@@ -175,7 +175,7 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 
 - v0.02 W6（2026-11-15）：`./gradlew :app:assembleDebug` 成功：app-debug.apk = 21,710,750 bytes，
   sha256 = cd5287a2094b8ef8db12a502917c2b8e35cc53aafcd3c0976c16a553727eafa0（含双 ABI 原生库 + 9 个示例 Pack assets）。
-- `./gradlew :app:testDebugUnitTest` 全绿：250 条 JVM 单测（v1 42 + v0.02 208；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y/大字号/对比度/Paparazzi 截图）。
+- `./gradlew :app:testDebugUnitTest` 全绿：251 条 JVM 单测（v1 42 + v0.02 209；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y/大字号/对比度/Paparazzi 截图）。
 - `zipalign -c -P 16 -v 4 app-debug.apk` → Verification successful（native lib 16KB page 对齐）。
 - `bash app/scripts/build_core_android.sh --clean` 成功：NDK 27.0.12077973 + rustup targets
   （aarch64-linux-android / x86_64-linux-android，经 rsproxy 镜像安装）；两个 .so 的 LOAD align 均为 0x4000。
