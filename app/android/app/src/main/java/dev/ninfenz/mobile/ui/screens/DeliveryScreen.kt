@@ -482,7 +482,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
 
                 NfCollapsibleSection(title = stringResource(dev.ninfenz.mobile.R.string.delivery_export_section), initiallyExpanded = true) {
                 Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                    ExportButton("md", "text/markdown", markdown, project, context, scope, { busy = it }, { error = it }) { file, manifest ->
+                    ExportButton("md", "text/markdown", markdown, project, context, scope, { busy = it }, { error = it }, busy) { file, manifest ->
                         exportedFile = file
                         manifestText = manifest
                         recordExport("md", file, manifest)
@@ -497,41 +497,41 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                             }
                         }
                     }
-                    ExportButton("zip", "application/zip", markdown, project, context, scope, { busy = it }, { error = it }) { file, manifest ->
+                    ExportButton("zip", "application/zip", markdown, project, context, scope, { busy = it }, { error = it }, busy) { file, manifest ->
                         exportedFile = file
                         manifestText = manifest
                         recordExport("zip", file, manifest)
                     }
-                    ExportButton("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", markdown, project, context, scope, { busy = it }, { error = it }) { file, manifest ->
+                    ExportButton("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", markdown, project, context, scope, { busy = it }, { error = it }, busy) { file, manifest ->
                         exportedFile = file
                         manifestText = manifest
                         recordExport("docx", file, manifest)
                     }
                 }
                 Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                    ExportButton("json", "application/json", markdown, project, context, scope, { busy = it }, { error = it }) { file, manifest ->
+                    ExportButton("json", "application/json", markdown, project, context, scope, { busy = it }, { error = it }, busy) { file, manifest ->
                         exportedFile = file
                         manifestText = manifest
                         recordExport("json", file, manifest)
                     }
-                    ExportButton("skill", "application/zip", markdown, project, context, scope, { busy = it }, { error = it }) { file, manifest ->
+                    ExportButton("skill", "application/zip", markdown, project, context, scope, { busy = it }, { error = it }, busy) { file, manifest ->
                         exportedFile = file
                         manifestText = manifest
                         recordExport("skill", file, manifest)
                     }
                 }
                 Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                    EpubExportButton(markdown, project, context, scope, { busy = it }, { error = it }) { file ->
+                    EpubExportButton(markdown, project, context, scope, { busy = it }, { error = it }, busy) { file ->
                         exportedFile = file
                         manifestText = null
                         recordExport("epub", file, null)
                     }
-                    PdfExportButton(markdown, project, context, scope, { busy = it }, { error = it }) { file ->
+                    PdfExportButton(markdown, project, context, scope, { busy = it }, { error = it }, busy) { file ->
                         exportedFile = file
                         manifestText = null
                         recordExport("pdf", file, null)
                     }
-                    HtmlExportButton(markdown, project, context, scope, { busy = it }, { error = it }) { file ->
+                    HtmlExportButton(markdown, project, context, scope, { busy = it }, { error = it }, busy) { file ->
                         exportedFile = file
                         manifestText = null
                         recordExport("html", file, null)
@@ -539,7 +539,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                 }
                 Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                     OutlinedButton(
-                        enabled = markdown != null,
+                        enabled = markdown != null && !busy,
                         onClick = {
                             val md = markdown ?: return@OutlinedButton
                             val intent = ShareExporter.shareMarkdown(context, "nf-" + project.id, md)
@@ -757,10 +757,11 @@ private fun ExportButton(
     scope: kotlinx.coroutines.CoroutineScope,
     setBusy: (Boolean) -> Unit,
     setError: (CoreError?) -> Unit,
+    busy: Boolean,
     onDone: (File?, String?) -> Unit
 ) {
     Button(
-        enabled = markdown != null,
+        enabled = markdown != null && !busy,
         onClick = {
             val md = markdown ?: return@Button
             setBusy(true)
@@ -803,10 +804,11 @@ private fun EpubExportButton(
     scope: kotlinx.coroutines.CoroutineScope,
     setBusy: (Boolean) -> Unit,
     setError: (CoreError?) -> Unit,
+    busy: Boolean,
     onDone: (File) -> Unit
 ) {
     Button(
-        enabled = markdown != null,
+        enabled = markdown != null && !busy,
         onClick = {
             val md = markdown ?: return@Button
             setBusy(true)
@@ -834,10 +836,11 @@ private fun PdfExportButton(
     scope: kotlinx.coroutines.CoroutineScope,
     setBusy: (Boolean) -> Unit,
     setError: (CoreError?) -> Unit,
+    busy: Boolean,
     onDone: (File) -> Unit
 ) {
     Button(
-        enabled = markdown != null,
+        enabled = markdown != null && !busy,
         onClick = {
             val md = markdown ?: return@Button
             setBusy(true)
@@ -865,10 +868,11 @@ private fun HtmlExportButton(
     scope: kotlinx.coroutines.CoroutineScope,
     setBusy: (Boolean) -> Unit,
     setError: (CoreError?) -> Unit,
+    busy: Boolean,
     onDone: (File) -> Unit
 ) {
     Button(
-        enabled = markdown != null,
+        enabled = markdown != null && !busy,
         onClick = {
             val md = markdown ?: return@Button
             setBusy(true)
