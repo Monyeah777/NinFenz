@@ -15,28 +15,37 @@ object DocxImporter {
         ZipFile(file).use { zip ->
             val entry = zip.getEntry("word/document.xml") ?: throw IllegalArgumentException("DOCX 缺 document.xml")
             val xml = zip.getInputStream(entry).use { String(it.readBytes(), Charsets.UTF_8) }
+            val links = zip.getEntry("word/_rels/document.xml.rels")?.let { rel ->
+                val relXml = zip.getInputStream(rel).use { String(it.readBytes(), Charsets.UTF_8) }
+                Regex("(?is)<Relationship\\s[^>]*>").findAll(relXml).mapNotNull { m ->
+                    val type = attr(m.value, "Type").orEmpty()
+                    val id = attr(m.value, "Id") ?: return@mapNotNull null
+                    val target = attr(m.value, "Target") ?: return@mapNotNull null
+                    if (type.contains("hyperlink")) id to target else null
+                }.toMap()
+            } ?: emptyMap()
             val out = StringBuilder()
             var last = 0
             Regex("(?s)<w:tbl[ >].*?</w:tbl>").findAll(xml).forEach { m ->
-                appendParagraphs(out, xml.substring(last, m.range.first))
-                val table = table(m.value)
+                appendParagraphs(out, xml.substring(last, m.range.first), links)
+                val table = table(m.value, links)
                 if (table.isNotBlank()) {
                     if (out.isNotEmpty()) out.append("\n\n")
                     out.append(table)
                 }
                 last = m.range.last + 1
             }
-            appendParagraphs(out, xml.substring(last))
+            appendParagraphs(out, xml.substring(last), links)
             val text = out.toString().trim()
             if (text.isBlank()) throw IllegalArgumentException("DOCX 无可读段落")
             return text
         }
     }
 
-    private fun appendParagraphs(out: StringBuilder, xml: String) {
+    private fun appendParagraphs(out: StringBuilder, xml: String, links: Map<String, String>) {
         Regex("(?s)<w:p[ >].*?</w:p>").findAll(xml).forEach { m ->
             val para = m.value
-            val text = runs(para).trim()
+            val text = runs(para, links).trim()
             if (text.isBlank()) return@forEach
             val block = when {
                 para.contains("<w:numPr") -> "- " + text
@@ -51,8 +60,18 @@ object DocxImporter {
         }
     }
 
-    private fun runs(para: String): String {
-        return Regex("(?s)<w:r[ >].*?</w:r>").findAll(para).joinToString("") { m ->
+    private fun runs(para: String, links: Map<String, String>): String {
+        val refs = mutableListOf<String>()
+        val withLinks = Regex("(?is)<w:hyperlink[^>]*r:id=\"([^\"]+)\"[^>]*>(.*?)</w:hyperlink>").replace(para) { m ->
+            val target = links[m.groupValues[1]]
+            if (target == null) {
+                m.value
+            } else {
+                refs.add("[" + runs(m.groupValues[2], links).trim() + "](" + target + ")")
+                "<w:r><w:t>%%NF_LINK_" + (refs.size - 1) + "%%</w:t></w:r>"
+            }
+        }
+        val rendered = Regex("(?s)<w:r[ >].*?</w:r>").findAll(withLinks).joinToString("") { m ->
             val run = m.value
             val text = Regex("(?s)<w:t(?:\\s[^>]*)?>(.*?)</w:t>").findAll(run).joinToString("") { esc(it.groupValues[1]) }
             if (text.isBlank()) return@joinToString ""
@@ -61,6 +80,9 @@ object DocxImporter {
             if (on(run, "i")) styled = "*" + styled + "*"
             styled
         }
+        var result = rendered
+        refs.forEachIndexed { i, link -> result = result.replace("%%NF_LINK_" + i + "%%", link) }
+        return result
     }
 
     private fun on(run: String, tag: String): Boolean {
@@ -69,10 +91,10 @@ object DocxImporter {
         return v == null || v == "1" || v.equals("true", true)
     }
 
-    private fun table(html: String): String {
+    private fun table(html: String, links: Map<String, String>): String {
         val rows = Regex("(?s)<w:tr[ >].*?</w:tr>").findAll(html).map { row ->
             Regex("(?s)<w:tc[ >].*?</w:tc>").findAll(row.value).map { cell ->
-                runs(cell.value).replace("|", "\\|").trim()
+                runs(cell.value, links).replace("|", "\\|").trim()
             }.toList()
         }.filter { it.isNotEmpty() }.toList()
         if (rows.isEmpty()) return ""
@@ -93,6 +115,9 @@ object DocxImporter {
         }
         return out.toString().trimEnd()
     }
+
+    private fun attr(tag: String, name: String): String? =
+        Regex("(?i)" + Regex.escape(name) + "\\s*=\\s*[\"']([^\"']*)[\"']").find(tag)?.groupValues?.getOrNull(1)
 
     private fun esc(s: String): String = s
         .replace("&lt;", "<").replace("&gt;", ">").replace("&quot;", "\"").replace("&amp;", "&")

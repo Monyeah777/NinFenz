@@ -59,6 +59,21 @@ class DocxImporterTest {
     }
 
     @Test
+    fun extractsHyperlinks() {
+        val f = File.createTempFile("nf-docx-link", ".docx")
+        ZipOutputStream(f.outputStream()).use { out ->
+            out.putNextEntry(ZipEntry("word/document.xml"))
+            out.write(("<w:document><w:body><w:p><w:hyperlink r:id=\"rId1\">" +
+                "<w:r><w:t>官网</w:t></w:r></w:hyperlink></w:p></w:body></w:document>").toByteArray())
+            out.closeEntry()
+            out.putNextEntry(ZipEntry("word/_rels/document.xml.rels"))
+            out.write(("<Relationships><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink\" Target=\"https://example.com\"/></Relationships>").toByteArray())
+            out.closeEntry()
+        }
+        assertTrue(DocxImporter.extract(f).contains("[官网](https://example.com)"))
+    }
+
+    @Test
     fun rejectsMissingDocument() {
         val f = File.createTempFile("nf-docx-bad", ".docx")
         ZipOutputStream(f.outputStream()).use { out ->
