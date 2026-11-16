@@ -15,6 +15,7 @@ class BackupServiceTest {
         File(root, "projects/p.nfproject.json").writeText("{\"schema\":\"nf-project/1\"}")
         File(root, "drafts").mkdirs()
         File(root, "drafts/a.md.json").writeText("draft")
+        File(root, "drafts/a.md.json.bak").writeText("old")
         val created = BackupService.create(root, 123L)
         assertTrue(created.file.isFile)
         assertEquals(2, created.entries)

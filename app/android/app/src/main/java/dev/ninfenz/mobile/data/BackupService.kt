@@ -19,7 +19,9 @@ object BackupService {
         listOf("projects", "projects-archive", "drafts").forEach { name ->
             val dir = File(filesDir, name)
             if (dir.isDirectory) {
-                dir.walkTopDown().filter { it.isFile }.sortedBy { it.path }.forEach { f ->
+                dir.walkTopDown()
+                    .filter { it.isFile && !it.name.endsWith(".bak") && !it.name.endsWith(".tmp") }
+                    .sortedBy { it.path }.forEach { f ->
                     sources.add(name + "/" + f.relativeTo(dir).path.replace('\\', '/') to f)
                 }
             }
