@@ -636,7 +636,7 @@ fun ProjectDetailScreen(
     var showReview by remember { mutableStateOf(false) }
     val canApprove = project.status in setOf(ProjectStatus.VALIDATED, ProjectStatus.EXPORTED, ProjectStatus.REVIEWED)
     var reviewStale by remember { mutableStateOf(false) }
-    LaunchedEffect(project.id, project.review.state) {
+    LaunchedEffect(project.id, project.review.state, project.review.subjectDigest) {
         reviewStale = runCatching {
             withContext(Dispatchers.IO) {
                 dev.ninfenz.mobile.data.ProjectReviewStore(context.filesDir).isStale(
