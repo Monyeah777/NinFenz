@@ -381,7 +381,7 @@
     <string name="graph_parse_failed_fix">按 app/schema/nf-pipeline-graph.schema.json 修正</string>
     <string name="graph_core_no_plan">核心未返回 plan</string>
     <string name="graph_none">（无）</string>
-    <string name="graph_plan_summary">plan digest=%1$s steps=%2$d slots=%3$s</string>
+    <string name="graph_plan_summary">plan digest=%1$s slots=%3$s steps=%2$d</string>
     <string name="graph_core">核心校验 / 编译</string>
     <string name="graph_save">保存</string>
     <string name="graph_save_draft">保存图草稿</string>

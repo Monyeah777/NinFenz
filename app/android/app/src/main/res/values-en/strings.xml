@@ -381,7 +381,7 @@
     <string name="graph_parse_failed_fix">Fix per app/schema/nf-pipeline-graph.schema.json</string>
     <string name="graph_core_no_plan">Core returned no plan</string>
     <string name="graph_none">(none)</string>
-    <string name="graph_plan_summary">plan digest=%1$s steps=%2$d slots=%3$s</string>
+    <string name="graph_plan_summary">plan digest=%1$s slots=%3$s steps=%2$d</string>
     <string name="graph_core">Core validate / compile</string>
     <string name="graph_save">Save</string>
     <string name="graph_save_draft">Save graph draft</string>
@@ -617,12 +617,12 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="import_raw_missing_fix">Import again</string>
     <string name="import_rename_failed">Rename failed: %1$s</string>
     <string name="import_rename_failed_fix">Try another name</string>
-    <string name="pack_install_missing_manifest">Selected folder has no nf-pack.json (%1$d files copied to library/incoming, not installed)</string>
+    <string name="pack_install_missing_manifest">Selected folder has no nf-pack.json (copied to library/incoming, not installed; files=%1$d)</string>
     <string name="pack_install_missing_id">nf-pack.json lacks id/version (not installed; files remain in library/incoming)</string>
     <string name="pack_install_duplicate">Same id+version already exists (NF-PCK-004): %1$s %2$s, not overwritten</string>
     <string name="pack_install_move_failed">Move to %1$s failed</string>
     <string name="pack_install_failed">Install failed: %1$s</string>
-    <string name="pack_install_done">Installed pack %1$s %2$s (%3$d files)</string>
+    <string name="pack_install_done">Installed pack %1$s %2$s (files=%3$d)</string>
     <string name="pack_install_done_with_status">%1$s; %2$s</string>
     <string name="pack_install_core_ready">Core available: verify further in Assembly/Pack update (core pack-verify)</string>
     <string name="pack_install_core_missing">Core missing (NF-E-005): installed but digest not verified</string>
