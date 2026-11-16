@@ -56,7 +56,8 @@ import kotlinx.coroutines.withContext
 fun SearchScreen(
     onBack: () -> Unit,
     onOpenPack: (packId: String, version: String) -> Unit,
-    onOpenProject: (projectId: String) -> Unit
+    onOpenProject: (projectId: String) -> Unit,
+    packIds: List<String> = emptyList()
 ) {
     val context = LocalContext.current
     val index = remember { SearchIndex(context.filesDir) }
@@ -64,6 +65,7 @@ fun SearchScreen(
     var query by rememberSaveable { mutableStateOf("") }
     var selected by remember { mutableStateOf(0) }
     var filterName by rememberSaveable { mutableStateOf<String?>(null) }
+    var selectedPackId by rememberSaveable { mutableStateOf<String?>(null) }
     val filterKind = filterName?.let { name -> SearchKind.entries.firstOrNull { it.name == name } }
     val historyStore = remember { SearchHistoryStore(context.filesDir) }
     var history by remember { mutableStateOf(historyStore.load()) }
@@ -77,7 +79,7 @@ fun SearchScreen(
         focusRequester.requestFocus()
     }
     val results = remember(query, all) { index.search(all, query) }
-    val filtered = remember(results, filterName) { SearchFilter.apply(results, filterKind) }
+    val filtered = remember(results, filterName, selectedPackId) { SearchFilter.apply(results, filterKind, selectedPackId) }
     LaunchedEffect(filtered) { selected = 0 }
     val rows = remember(filtered) {
         val out = mutableListOf<SearchRow>()
@@ -142,6 +144,9 @@ fun SearchScreen(
             SearchFilterRow(filterKind) { kind ->
                 filterName = kind?.name
             }
+            if (packIds.isNotEmpty()) {
+                PackFilterRow(packIds, selectedPackId) { selectedPackId = it }
+            }
             Text(
                 stringResource(dev.ninfenz.mobile.R.string.search_keyboard_hint),
                 style = MaterialTheme.typography.bodySmall,
@@ -185,6 +190,25 @@ private data class SearchRow(
     val hit: SearchHit? = null,
     val flatIndex: Int = -1
 )
+
+@Composable
+private fun PackFilterRow(packIds: List<String>, selected: String?, onPick: (String?) -> Unit) {
+    LazyRow(
+        contentPadding = PaddingValues(horizontal = NfSpacing.page),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        item {
+            FilterChip(
+                selected = selected == null,
+                onClick = { onPick(null) },
+                label = { Text(stringResource(dev.ninfenz.mobile.R.string.search_filter_all_packs)) }
+            )
+        }
+        items(packIds) { id ->
+            FilterChip(selected = selected == id, onClick = { onPick(id) }, label = { Text(id) })
+        }
+    }
+}
 
 @Composable
 private fun kindLabel(kind: SearchKind): String = when (kind) {

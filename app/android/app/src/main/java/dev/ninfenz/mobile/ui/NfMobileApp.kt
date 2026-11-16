@@ -365,7 +365,8 @@ is Detail.Import -> ImportScreen(
                     is Detail.Search -> SearchScreen(
                         onBack = { shell = shell.back() ?: shell },
                         onOpenPack = { id, version -> shell = shell.open(Detail.Pack(id, version)) },
-                        onOpenProject = { id -> shell = shell.open(Detail.Project(id)) }
+                        onOpenProject = { id -> shell = shell.open(Detail.Project(id)) },
+                        packIds = packs.packs.map { it.id }.distinct().sorted()
                     )
                     is Detail.Settings -> SettingsScreen(
                         onBack = { shell = shell.back() ?: shell },

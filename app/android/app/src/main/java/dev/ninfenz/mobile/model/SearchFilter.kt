@@ -5,8 +5,10 @@ import dev.ninfenz.mobile.data.SearchKind
 
 /** 搜索结果 kind 过滤：null = 全部。 */
 object SearchFilter {
-    fun apply(hits: List<SearchHit>, kind: SearchKind?): List<SearchHit> {
-        if (kind == null) return hits
-        return hits.filter { it.kind == kind }
+    fun apply(hits: List<SearchHit>, kind: SearchKind?, packId: String? = null): List<SearchHit> {
+        var out = hits
+        if (kind != null) out = out.filter { it.kind == kind }
+        if (packId != null) out = out.filter { it.packId == packId }
+        return out
     }
 }

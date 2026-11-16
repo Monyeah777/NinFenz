@@ -469,6 +469,7 @@
     <string name="project_detail_duplicate">Duplicate project</string>
     <string name="project_detail_diff">Compare project</string>
     <string name="project_diff_same">Projects match on state/refs/review/history</string>
+    <string name="search_filter_all_packs">All packs</string>
     <string name="import_share_queue">%1$d shared items, showing %2$d</string>
     <string name="import_share_next">Import next</string>
     <string name="import_share_ignore">Ignore rest</string>

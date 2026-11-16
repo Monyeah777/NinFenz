@@ -18,6 +18,14 @@ class SearchFilterTest {
     }
 
     @Test
+    fun filtersByPackId() {
+        val a = SearchHit(SearchKind.PACK, "a", "", "pack-a", "1.0.0")
+        val b = SearchHit(SearchKind.PACK, "b", "", "pack-b", "1.0.0")
+        assertEquals(listOf(a), SearchFilter.apply(listOf(a, b), null, "pack-a"))
+        assertEquals(0, SearchFilter.apply(listOf(a), SearchKind.PROJECT, "pack-a").size)
+    }
+
+    @Test
     fun filtersByKind() {
         val all = listOf(hit(SearchKind.PROJECT), hit(SearchKind.PACK), hit(SearchKind.PROJECT))
         assertEquals(2, SearchFilter.apply(all, SearchKind.PROJECT).size)
