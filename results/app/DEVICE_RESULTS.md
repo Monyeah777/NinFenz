@@ -25,6 +25,7 @@
 | 备份未列条目拒绝（JVM） | pass（本机）：manifest 未列出的 zip 条目导致 inspect 失败；BackupRestoreServiceTest 5 条。真机未复测（adb 无设备） |
 | 全量复核（round161） | pass（本机）：verify.sh PASS=107 WARN=2 FAIL=0；app gates QA0–QA6 PASS，gap=0，P0=0；lint 0 warnings。 |
 | 全量复核（round15） | pass（本机）：verify PASS=107 WARN=2 FAIL=0；app gates QA0–QA6 PASS，gap=0，P0=0。 |
+| Android 测试强制重跑（本轮） | pass（本机）：`:app:testDebugUnitTest --rerun-tasks` 304/304，全任务实际执行。 |
 | 错误码 schema LF 守卫（pytest） | pass（本机）：新增字节级 CRLF 断言；error code 测试 2 条。 |
 | 错误码 schema EOL 修复（verify） | pass（本机）：error_codes.json CRLF→LF；重新批准 conformance；verify PASS=107 WARN=2 FAIL=0。 |
 | 错误码使用登记校验（pytest） | pass（本机）：扫描 Kotlin 内联 `CoreResponse.failure`/`CoreError` 码，发现并补登 NF-IMP-005；新增测试通过。 |
