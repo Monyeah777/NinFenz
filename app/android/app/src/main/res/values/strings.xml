@@ -517,6 +517,9 @@
     <string name="project_detail_share">分享项目文件</string>
     <string name="project_detail_share_full">分享完整项目</string>
     <string name="project_import_command">导入项目包</string>
+    <string name="project_import_missing_pack_title">缺少绑定 Pack</string>
+    <string name="project_import_missing_pack_body">项目已导入，但绑定的 Pack %1$s@%2$s 未安装；安装后可正常校验/装配。</string>
+    <string name="project_import_missing_pack_action">前往 Pack 中心</string>
     <string name="project_review_current">当前评审：%1$s</string>
     <string name="project_review_summary">评审：%1$s · 评审人 %2$s</string>
     <string name="project_review_need_validate">需先完成校验/导出后才能评审通过</string>

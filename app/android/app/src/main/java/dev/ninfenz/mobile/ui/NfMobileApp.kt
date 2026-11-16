@@ -153,6 +153,7 @@ fun NfMobileApp(
     var onboardingDone by remember { mutableStateOf(prefs.onboardingDone) }
     var showAbout by remember { mutableStateOf(false) }
     var showCommands by rememberSaveable { mutableStateOf(false) }
+    var missingPackWarning by remember { mutableStateOf<Pair<String, String>?>(null) }
     LaunchedEffect(Unit) {
         CommandBus.requests.collect { showCommands = true }
     }
@@ -195,11 +196,7 @@ fun NfMobileApp(
                 }
                 result.onSuccess { imported ->
                     if (imported.packId.isNotBlank() && packs.packs.none { it.id == imported.packId && it.version == imported.packVersion }) {
-                        android.widget.Toast.makeText(
-                            context,
-                            "项目已导入，但绑定 Pack " + imported.packId + "@" + imported.packVersion + " 未安装；请先安装该 Pack",
-                            android.widget.Toast.LENGTH_LONG
-                        ).show()
+                        missingPackWarning = imported.packId to imported.packVersion
                     }
                     refresh()
                     shell = shell.open(Detail.Project(imported.id))
@@ -623,6 +620,23 @@ is Detail.Import -> ImportScreen(
                 Text("NF Mobile 0.2.0（v0.02）\n本地处理 · 无网络权限 · 无遥测\nMIT License · 详见仓库 app/docs/LEGAL.md")
             },
             confirmButton = { TextButton(onClick = { showAbout = false }) { Text(stringResource(dev.ninfenz.mobile.R.string.action_close)) } }
+        )
+    }
+
+    missingPackWarning?.let { (id, version) ->
+        AlertDialog(
+            onDismissRequest = { missingPackWarning = null },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.project_import_missing_pack_title)) },
+            text = { Text(stringResource(dev.ninfenz.mobile.R.string.project_import_missing_pack_body, id, version)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    missingPackWarning = null
+                    shell = shell.open(Detail.PackCenter)
+                }) { Text(stringResource(dev.ninfenz.mobile.R.string.project_import_missing_pack_action)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { missingPackWarning = null }) { Text(stringResource(dev.ninfenz.mobile.R.string.action_close)) }
+            }
         )
     }
 
