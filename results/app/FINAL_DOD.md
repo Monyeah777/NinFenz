@@ -16,7 +16,7 @@
 | Pack 中心/CCOS/Pack zip 更新 | pass（工程面） | 1dc695125/4d816f3c5/6c30f241e |
 | JVM 测试 | pass | 318/318（含 Robolectric/Compose/Paparazzi） |
 | 自适应/9 组尺寸语义矩阵 | pass（语义层） | ShellNavigation/ShellSizeMatrix 测试 |
-| i18n/主题切换（全部屏主要文案） | partial | values-en + 资源化；我的支持 zh/en/system + 动态取色；系统 per-app locale 已声明并同步；少量错误/技术提示仍内联（OPEN-I18N-BODY 尾项） |
+| i18n/主题切换（全部屏主要文案） | pass | values-en + 资源化；我的支持 zh/en/system + 动态取色；系统 per-app locale 已声明并同步；UI 中文硬编码守卫通过（仅 CoreCall 无 Context 回退豁免） |
 | 像素截图矩阵 | pass（本机） | Paparazzi 10 张基线（360/700/900 × 640/800/900/1000），testDebugUnitTest verify |
 | 真机/模拟器 | partial | OnePlus Android16 smoke 通过首启/导入/创作保存/装配/校验/导出 md+zip；docx/TalkBack/主题/CCOS/分享仍 OPEN（DEVICE_RESULTS.md） |
 | 草稿→项目 | partial | 草稿可创建项目壳并把草稿 JSON 作为 authoring 来源副本；导入内容尚未映射进协议字段（OPEN-DRAFT-PROJECT 收窄） |

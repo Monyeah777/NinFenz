@@ -27,7 +27,7 @@
 | APK | app-debug.apk = 19,157,623 B；sha256 659b025b823c4556a6730619604b7b897ed4323bf3dcfc8be43aec59de10286f |
 | JVM 测试 | 318 条全绿（v1 基线 42 + v0.02 新增 276；含 Robolectric/Compose/Paparazzi） |
 | 构建 | ./gradlew :app:assembleDebug 成功；:app:testDebugUnitTest 318/318；lint 0 warnings |
-| i18n | 全部屏主要文案已资源化 + values-en；「我的」zh/en/跟随系统切换；动态取色开关；库/Pack 中心下拉刷新；节点删除 Snackbar 撤销 + 触觉；expanded 双栏（主列表+详情）；导航 Crossfade（NfMotion.MEDIUM_MS）；统一 loading/skeleton 组件；少量错误/技术提示仍内联（OPEN-I18N-BODY 尾项） |
+| i18n | 全部屏主要文案已资源化 + values-en；「我的」zh/en/跟随系统切换；动态取色开关；库/Pack 中心下拉刷新；节点删除 Snackbar 撤销 + 触觉；expanded 双栏（主列表+详情）；导航 Crossfade（NfMotion.MEDIUM_MS）；统一 loading/skeleton 组件；UI 中文硬编码守卫通过 |
 | 适配 | compact/medium/expanded 三档导航 + 9 组窗口尺寸语义矩阵 |
 | a11y | contentDescription/48dp（A11yComposeTest 3）、200% 字号（LargeFont 1）、WCAG AA 对比度（Contrast 3） |
 | 截图基线 | Paparazzi 10 张（360/700/900 × 640/800/900/1000），verify 模式下纳入 testDebugUnitTest |
@@ -49,7 +49,7 @@
 
 | id | 内容 | owner | next |
 |---|---|---|---|
-| OPEN-I18N-BODY | 全部屏主要文案已资源化；少量错误/技术提示仍内联；应用内 zh/en 切换与系统 per-app locale（localeConfig + LocaleManager）已做 | lead | 抽取剩余尾项 strings |
+| OPEN-I18N-BODY | closed：全部 UI 文案资源化；中文硬编码守卫通过（仅 CoreCall 无 Context 回退豁免）；应用内 zh/en 切换与系统 per-app locale（localeConfig + LocaleManager）已做 | lead | — |
 | SCREENSHOT | Paparazzi 2.0.0-alpha02 已接入，10 张截图基线随 testDebugUnitTest verify；更新基线用 recordPaparazziDebug | lead | 完成（本提交） |
 | DEVICE (partial) | OnePlus PLF110/Android16 已跑：首启/示例导入/创作保存/装配/L1/导出 md+zip，并修复 7 个真机问题（含顶部 insets、分享崩溃/prefill、jniLibs 陈旧致 docx 误报）；docx/TalkBack/主题/CCOS/分享/折叠/性能未跑 | lead | results/app/DEVICE_RESULTS.md |
 | OPEN-DEVICE | 剩余真机项（TalkBack、主题/语言、CCOS、分享、折叠、性能） | lead | 继续 DEVICE_RESULTS 清单 |
