@@ -309,7 +309,7 @@ fun ImportScreen(
                         if (prefillNote != null) {
                             Text(prefillNote!!, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
-                        if (shareQueue.size > 1) {
+                        if (shareQueue.isNotEmpty()) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
                                     stringResource(dev.ninfenz.mobile.R.string.import_share_queue, shareQueue.size, shareCursor + 1),
@@ -317,7 +317,11 @@ fun ImportScreen(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier.weight(1f)
                                 )
-                                if (shareCursor < shareQueue.size - 1) {
+                                if (doc == null) {
+                                    TextButton(onClick = { importSharedItem(shareQueue[shareCursor]) }) {
+                                        Text(stringResource(dev.ninfenz.mobile.R.string.import_share_current))
+                                    }
+                                } else if (shareCursor < shareQueue.size - 1) {
                                     TextButton(onClick = { importNextSharedItem() }) {
                                         Text(stringResource(dev.ninfenz.mobile.R.string.import_share_next))
                                     }

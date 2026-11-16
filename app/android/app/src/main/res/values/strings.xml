@@ -483,6 +483,7 @@
     <string name="project_diff_library">与库内项目对比</string>
     <string name="project_diff_search">搜索项目</string>
     <string name="import_share_queue">分享共 %1$d 项，当前第 %2$d 项</string>
+    <string name="import_share_current">导入当前项</string>
     <string name="import_share_next">导入下一项</string>
     <string name="import_share_ignore">忽略其余</string>
     <string name="import_saved_drafts">已保存草稿</string>
