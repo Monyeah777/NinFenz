@@ -495,6 +495,18 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                     }
                 }
                 Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+                    ExportButton("json", "application/json", markdown, project, context, scope, { busy = it }, { error = it }) { file, manifest ->
+                        exportedFile = file
+                        manifestText = manifest
+                        recordExport("json", file, manifest)
+                    }
+                    ExportButton("skill", "application/zip", markdown, project, context, scope, { busy = it }, { error = it }) { file, manifest ->
+                        exportedFile = file
+                        manifestText = manifest
+                        recordExport("skill", file, manifest)
+                    }
+                }
+                Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                     OutlinedButton(
                         enabled = markdown != null,
                         onClick = {
@@ -546,8 +558,9 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                 if (file.isFile) {
                                     val mime = when (entry.format) {
                                         "md" -> "text/markdown"
-                                        "zip" -> "application/zip"
+                                        "zip", "skill" -> "application/zip"
                                         "docx" -> "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                                        "json" -> "application/json"
                                         else -> "application/octet-stream"
                                     }
                                     val intent = ShareExporter.shareFileIntent(context, file, mime, entry.name)
