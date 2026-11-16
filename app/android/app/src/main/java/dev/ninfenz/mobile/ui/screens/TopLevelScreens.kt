@@ -40,6 +40,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -58,6 +59,7 @@ import dev.ninfenz.mobile.data.PackVerifier
 import dev.ninfenz.mobile.data.ProjectEntry
 import dev.ninfenz.mobile.data.SeedResult
 import dev.ninfenz.mobile.data.LanguageMode
+import dev.ninfenz.mobile.data.LibraryViewStore
 import dev.ninfenz.mobile.data.ThemeMode
 import dev.ninfenz.mobile.model.Project
 import dev.ninfenz.mobile.model.ProjectFilter
@@ -102,8 +104,15 @@ fun LibraryHomeScreen(
     refreshing: Boolean = false,
     onRefresh: () -> Unit = {}
 ) {
-    var statusFilter by rememberSaveable { mutableStateOf<String?>(null) }
-    var sortName by rememberSaveable { mutableStateOf(ProjectSort.RECENT.name) }
+    val context = LocalContext.current
+    val viewFilesDir = remember { runCatching { context.filesDir }.getOrNull() }
+    val viewStore = remember(viewFilesDir) { viewFilesDir?.let { LibraryViewStore(it) } }
+    val savedView = remember { viewStore?.load() }
+    var statusFilter by rememberSaveable { mutableStateOf(savedView?.status) }
+    var sortName by rememberSaveable { mutableStateOf(savedView?.sort ?: ProjectSort.RECENT.name) }
+    LaunchedEffect(statusFilter, sortName) {
+        viewStore?.save(statusFilter, sortName)
+    }
     val filterStatus = statusFilter?.let { ProjectStatus.fromWire(it) }
     val filterSort = ProjectSort.entries.firstOrNull { it.name == sortName } ?: ProjectSort.RECENT
     val filteredProjects = remember(projects, statusFilter, sortName) {
