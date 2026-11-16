@@ -72,6 +72,23 @@ object EpubExporter {
         var inCode = false
         var inList = false
         val code = StringBuilder()
+        val table = mutableListOf<List<String>>()
+        fun flushTable() {
+            if (table.isEmpty()) return
+            out.append("<table>")
+            table.forEachIndexed { index, cells ->
+                val tag = if (index == 0) "th" else "td"
+                if (index == 0) out.append("<thead>")
+                if (index == 1) out.append("<tbody>")
+                out.append("<tr>")
+                cells.forEach { out.append("<").append(tag).append(">").append(inline(it)).append("</").append(tag).append(">") }
+                out.append("</tr>")
+                if (index == 0) out.append("</thead>")
+            }
+            if (table.size > 1) out.append("</tbody>")
+            out.append("</table>")
+            table.clear()
+        }
         markdown.replace("\r\n", "\n").split('\n').forEach { line ->
             val fence = line.trimStart().startsWith("\u0060\u0060\u0060")
             if (fence) {
@@ -85,10 +102,20 @@ object EpubExporter {
             if (inCode) { code.append(line).append('\n'); return@forEach }
             if (line.isBlank()) {
                 if (inList) { out.append("</ul>\n"); inList = false }
+                flushTable()
+                return@forEach
+            }
+            val trimmed = line.trim()
+            if (trimmed.startsWith("|") && trimmed.endsWith("|")) {
+                if (inList) { out.append("</ul>\n"); inList = false }
+                val cells = trimmed.trim('|').split('|').map { it.trim() }
+                val separator = cells.isNotEmpty() && cells.all { Regex("^:?-{2,}:?$").matches(it) }
+                if (!separator) table.add(cells)
                 return@forEach
             }
             val heading = Regex("^(#{1,6})\\s+(.+)$").find(line)
             if (heading != null) {
+                flushTable()
                 if (inList) { out.append("</ul>\n"); inList = false }
                 val level = heading.groupValues[1].length
                 out.append("<h").append(level).append(">").append(inline(heading.groupValues[2]))
@@ -96,13 +123,16 @@ object EpubExporter {
                 return@forEach
             }
             if (line.trimStart().startsWith("- ")) {
+                flushTable()
                 if (!inList) { out.append("<ul>\n"); inList = true }
                 out.append("<li>").append(inline(line.trimStart().removePrefix("- "))).append("</li>\n")
                 return@forEach
             }
             if (inList) { out.append("</ul>\n"); inList = false }
+            flushTable()
             out.append("<p>").append(inline(line)).append("</p>\n")
         }
+        flushTable()
         if (inList) out.append("</ul>\n")
         if (inCode && code.isNotEmpty()) out.append("<pre><code>").append(esc(code.toString().trimEnd())).append("</code></pre>\n")
         return out.toString()

@@ -19,6 +19,7 @@
 | 桌面快捷方式（构建） | pass（构建）：静态 shortcuts（导入/新建/搜索）+ MainActivity 冷启动/onNewIntent 路由；未真机长按图标验证（adb 无设备） |
 | Lint 收尾（JVM） | pass（本机）：抑制预期 UnusedAttribute；import_project_package_done 改 plurals；warnings 4→3（仅剩 GradleDependency2/ObsoleteSdkInt1）。真机未复测（adb 无设备） |
 | 错误码复制反馈（JVM） | pass（本机）：点击错误码复制并 Toast「已复制 code」；真机未复测（adb 无设备） |
+| EPUB 表格（JVM） | pass（本机）：EPUB 章节同步管道表格 table/thead/tbody；测试 3 条。真机未复测（adb 无设备） |
 | HTML 表格/行内格式（JVM） | pass（本机）：管道表格渲染为 table/thead/tbody；修正 inline 正则，普通文本不再被误包 strong/em；测试 3 条。真机未复测（adb 无设备） |
 | 嵌套项目包导入（JVM） | pass（本机）：支持 bundle/ 顶层目录内的项目 JSON + bundle/data/；测试 6 条。真机未复测（adb 无设备） |
 | 恢复后刷新库（JVM） | pass（本机）：备份恢复成功后回调 NfMobileApp.refresh，库/项目状态立即更新；真机未复测（adb 无设备） |
@@ -37,7 +38,7 @@
 | 依赖升级 coroutines（JVM） | pass（本机）：coroutines 1.9.0→1.10.2，243 tests 全绿；lint warnings 3→2；debug APK 因未压缩 dex 增至 24.7MB。真机未复测（adb 无设备） |
 | Clean build（本轮） | pass（本机）：`gradlew clean` + `testDebugUnitTest --rerun-tasks` + assembleDebug；248/248 全绿；clean APK 19,032,264 B sha256 f4501bfe…；zipalign 16KB 通过。增量 APK 24.7MB 为旧构建膨胀，clean 产物为准。 |
 | Rust core 单测（本轮） | pass（本机）：`cargo test` 186 passed / 0 failed；Android 端无 core 改动。 |
-| Release 构建（构建） | pass（本机）：clean 后重建 `:app:assembleRelease` 成功；app-release-unsigned.apk 15,249,217 B sha256 9bf5902a…；zipalign 16KB 通过；apksigner 显示未签名（预期，签名 OPEN-EXTERNAL）。 |
+| Release 构建（构建） | pass（本机）：clean 后重建 `:app:assembleRelease` 成功；app-release-unsigned.apk 15,249,217 B sha256 19bf70bd…；zipalign 16KB 通过；apksigner 显示未签名（预期，签名 OPEN-EXTERNAL）。 |
 | 16KB 页对齐（构建） | pass（本机）：`zipalign -c -P 16 4 app-debug.apk` exit=0；未真机安装验证。 |
 | APP 门禁（round127） | pass（本机）：QA0–QA6 全 PASS，FAIL=0；covered=14 gap=0 open=2 p0=0；台账刷新到当前 HEAD。 |
 | APP 门禁（本轮） | pass（本机）：QA0–QA6 全部 PASS，FAIL=0；自审计 covered=14 gap=0 open=2 p0=0。 |

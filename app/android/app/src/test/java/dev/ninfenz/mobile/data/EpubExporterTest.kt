@@ -30,6 +30,18 @@ class EpubExporterTest {
     }
 
     @Test
+    fun rendersPipeTableInChapter() {
+        val dir = Files.createTempDirectory("nf-epub-table").toFile()
+        val created = EpubExporter.export("# 表\n\n| A | B |\n|---|---|\n| 1 | 2 |", "表", dir)
+        ZipFile(created.file).use { zip ->
+            val chapter = zip.getInputStream(zip.getEntry("OEBPS/chapter-001.xhtml")).bufferedReader().readText()
+            assertTrue(chapter.contains("<table>"))
+            assertTrue(chapter.contains("<th>A</th>"))
+            assertTrue(chapter.contains("<td>1</td>"))
+        }
+    }
+
+    @Test
     fun noHeadingFallsBackToSingleChapter() {
         assertEquals(1, EpubExporter.chapters("只有一段正文").size)
         assertEquals("正文", EpubExporter.chapters("只有一段正文").first().title)
