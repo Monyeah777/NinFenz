@@ -477,6 +477,8 @@
     <string name="pack_trust_mismatch">Local trust: tree differs from pinned value (possible replacement)</string>
     <string name="pack_trust_update">Update pin</string>
     <string name="packcenter_trust_mismatch">Pinned tree differs from current</string>
+    <string name="settings_diagnostics_export">Export diagnostics</string>
+    <string name="settings_diagnostics_done">Diagnostics bundle created: %1$s</string>
     <string name="project_detail_archive">Archive project</string>
     <string name="project_archive_title">Archive project</string>
     <string name="project_archive_body">The project leaves the library list; its file stays in projects-archive/ and is not deleted.</string>

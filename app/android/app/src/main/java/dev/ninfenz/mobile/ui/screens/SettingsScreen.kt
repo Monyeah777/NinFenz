@@ -25,6 +25,7 @@ import dev.ninfenz.mobile.core.Core
 import dev.ninfenz.mobile.core.CoreBridgeNative
 import dev.ninfenz.mobile.core.ErrorCatalog
 import dev.ninfenz.mobile.data.BackupRestoreService
+import dev.ninfenz.mobile.data.DiagnosticsBundle
 import dev.ninfenz.mobile.data.BackupService
 import dev.ninfenz.mobile.data.StorageStats
 import dev.ninfenz.mobile.share.ShareExporter
@@ -156,6 +157,14 @@ fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
             }) {
                 Text(if (copied) stringResource(dev.ninfenz.mobile.R.string.settings_copied) else stringResource(dev.ninfenz.mobile.R.string.settings_copy))
             }
+            OutlinedButton(onClick = {
+                scope.launch {
+                    val created = withContext(Dispatchers.IO) { DiagnosticsBundle.create(context.filesDir, diagnosticsText) }
+                    val intent = ShareExporter.shareFileIntent(context, created.file, "application/zip", created.file.name)
+                    ShareExporter.launchChooser(context, intent, created.file.name)
+                    backupMessage = context.getString(dev.ninfenz.mobile.R.string.settings_diagnostics_done, humanBytes(created.bytes))
+                }
+            }) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_diagnostics_export)) }
         }
     }
 

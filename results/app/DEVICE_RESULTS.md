@@ -17,6 +17,7 @@
 | L1 校验 | pass：L1 pass（error=0 warn=0 info=3）；状态 assembled→validated 写回 | run-as 读项目 |
 | 导出 md/zip | pass：files/exports/delivery/result.md + result.zip + manifest；状态 validated→exported 写回 | run-as 读文件 |
 | 桌面快捷方式（构建） | pass（构建）：静态 shortcuts（导入/新建/搜索）+ MainActivity 冷启动/onNewIntent 路由；未真机长按图标验证（adb 无设备） |
+| 诊断包导出（JVM） | pass（本机）：Settings 导出 zip（diagnostics.txt + README），无网络/账号/正文；Sharesheet 分享；测试 2 条。真机未复测（adb 无设备） |
 | Pack 中心 trust 告警（JVM） | pass（本机）：Pack 中心列表读取本地固定 tree，发现不一致时红色提示；真机未复测（adb 无设备） |
 | Pack 固定 tree 变化告警（JVM） | pass（本机）：已固定 pack 的 tree 与当前不一致时显示红色告警，可「更新固定」；测试 pinnedTree 读取。真机未复测（adb 无设备） |
 | Pack 本地信任固定（JVM） | pass（本机）：Pack 详情可固定/取消固定当前 tree，按 pack@version 存 pack-trust.json；明确标注“非签名”；测试 2 条。真机未复测（adb 无设备） |
