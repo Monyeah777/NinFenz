@@ -30,6 +30,17 @@ class BackupServiceTest {
     }
 
     @Test
+    fun includesPreferenceFiles() {
+        val root = Files.createTempDirectory("nf-backup-meta").toFile()
+        File(root, "pack-trust.json").writeText("trust")
+        val created = BackupService.create(root, 321L)
+        assertEquals(1, created.entries)
+        ZipFile(created.file).use { zip ->
+            assertTrue(zip.getEntry("pack-trust.json") != null)
+        }
+    }
+
+    @Test
     fun listsAndPrunesOldBackups() {
         val root = Files.createTempDirectory("nf-backup-prune").toFile()
         repeat(7) { BackupService.create(root, 1000L + it) }

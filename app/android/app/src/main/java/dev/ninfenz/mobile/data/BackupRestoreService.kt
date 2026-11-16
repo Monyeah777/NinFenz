@@ -94,7 +94,10 @@ object BackupRestoreService {
         File(File(filesDir, "exports/backups").apply { mkdirs() }, "last-restore-snapshot.txt")
 
     private fun safePath(path: String): Boolean =
-        (path.startsWith("projects/") || path.startsWith("projects-archive/") || path.startsWith("drafts/")) &&
+        (
+            path.startsWith("projects/") || path.startsWith("projects-archive/") || path.startsWith("drafts/") ||
+                path in BackupService.META_FILES
+            ) &&
             !path.contains("..") && !path.startsWith("/") && !path.contains("\\")
 
     private fun sha256(bytes: ByteArray): String =

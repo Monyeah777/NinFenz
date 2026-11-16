@@ -24,6 +24,10 @@ object BackupService {
                 }
             }
         }
+        META_FILES.forEach { name ->
+            val f = File(filesDir, name)
+            if (f.isFile) sources.add(name to f)
+        }
         val manifest = buildJsonObject {
             put("schema", "nf-backup/1")
             put("generated_at", stamp)
@@ -66,6 +70,14 @@ object BackupService {
         all.drop(keep).forEach { if (it.delete()) removed++ }
         return removed
     }
+
+    val META_FILES = listOf(
+        "pack-trust.json",
+        "search-history.json",
+        "search-filter.json",
+        "command-history.json",
+        "library-view.json"
+    )
 
     private fun sha256(file: File): String {
         val digest = MessageDigest.getInstance("SHA-256")
