@@ -19,6 +19,7 @@
 | 桌面快捷方式（构建） | pass（构建）：静态 shortcuts（导入/新建/搜索）+ MainActivity 冷启动/onNewIntent 路由；未真机长按图标验证（adb 无设备） |
 | Lint 收尾（JVM） | pass（本机）：抑制预期 UnusedAttribute；import_project_package_done 改 plurals；warnings 4→3（仅剩 GradleDependency2/ObsoleteSdkInt1）。真机未复测（adb 无设备） |
 | 错误码复制反馈（JVM） | pass（本机）：点击错误码复制并 Toast「已复制 code」；真机未复测（adb 无设备） |
+| RTL 外壳（JVM） | pass（本机）：RTL LayoutDirection 下库/我的目的地仍可见；测试 1 条。真机未复测（adb 无设备） |
 | 快捷方式图标（构建） | pass（构建）：静态导入/新建/搜索改用三套独立 vector 图标；未真机长按验证（adb 无设备） |
 | 最近项目动态快捷方式（JVM） | pass（本机）：refresh 发布最多 3 个最近项目快捷方式；MainActivity 解析 OPEN_PROJECT 并直达项目；ShortcutManager 失败静默。真机未复测（adb 无设备） |
 | 分享导入缺 Pack 提示（JVM） | pass（本机）：分享/选文件导入项目包也返回 base_pack，缺 Pack 时弹同一对话框；真机未复测（adb 无设备） |
