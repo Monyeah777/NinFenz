@@ -236,7 +236,11 @@ fun ImportScreen(
                     val file = FileAccess.copyToCache(context, uri, meta.name)
                     importFromFile(file, "share", meta.name, meta.mime ?: item.mime, meta.size)
                 } catch (e: Exception) {
-                    error = CoreResponse.failure("NF-E-004", "读取分享 URI 失败：" + (e.message ?: e.javaClass.simpleName), "确认授权后重试", 2).error
+                    error = if (e is SecurityException) {
+                        CoreResponse.failure("NF-IMP-006", "分享授权已失效，无法读取该条目", "重新分享，或改用文件选择器导入", 2).error
+                    } else {
+                        CoreResponse.failure("NF-E-004", "读取分享 URI 失败：" + (e.message ?: e.javaClass.simpleName), "确认授权后重试", 2).error
+                    }
                 }
             }
         }
