@@ -68,6 +68,13 @@ class HtmlImporterTest {
     }
 
     @Test
+    fun convertsBoldAndItalic() {
+        val md = HtmlImporter.toMarkdown("<p><strong>粗</strong>与<em>斜</em></p>")
+        assertTrue(md.contains("**粗**"))
+        assertTrue(md.contains("*斜*"))
+    }
+
+    @Test
     fun removesScriptAndStyle() {
         val md = HtmlImporter.toMarkdown("<style>x{}</style><script>alert(1)</script><p>正文</p>")
         assertTrue(md.contains("正文"))
