@@ -267,7 +267,7 @@ fun LibraryHomeScreen(
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(pack.title, style = MaterialTheme.typography.titleMedium)
                                 Text(
-                                    pack.id + " · " + pack.version + " · " + pack.itemCount + " 项",
+                                    pack.id + " · " + pack.version + " · " + context.getString(dev.ninfenz.mobile.R.string.pack_item_count, pack.itemCount),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -474,7 +474,7 @@ fun DeliverScreen(
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(entry.project.title, style = MaterialTheme.typography.titleMedium)
                                 Text(
-                                    "装配 / 校验 / 导出",
+                                    stringResource(dev.ninfenz.mobile.R.string.project_flow_label),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -656,12 +656,12 @@ fun ProjectDetailScreen(
                         context.contentResolver.openInputStream(uri)?.bufferedReader(Charsets.UTF_8)?.use { it.readText() }
                     }
                     if (text == null) {
-                        diffError = "无法读取所选项目文件"
+                        diffError = context.getString(dev.ninfenz.mobile.R.string.project_diff_read_failed)
                     } else {
                         diffReport = ProjectDiff.compare(project, ProjectModel.parse(text))
                     }
                 } catch (t: Throwable) {
-                    diffError = "项目解析失败：" + (t.message ?: t.javaClass.simpleName)
+                    diffError = context.getString(dev.ninfenz.mobile.R.string.project_parse_failed, t.message ?: t.javaClass.simpleName)
                 }
             }
         }
@@ -685,7 +685,7 @@ fun ProjectDetailScreen(
                             style = MaterialTheme.typography.bodySmall
                         )
                         Text(
-                            stringResource(dev.ninfenz.mobile.R.string.project_detail_protocol, project.refs.protocolId.ifBlank { "未绑定" }),
+                            stringResource(dev.ninfenz.mobile.R.string.project_detail_protocol, project.refs.protocolId.ifBlank { stringResource(dev.ninfenz.mobile.R.string.not_bound) }),
                             style = MaterialTheme.typography.bodySmall
                         )
                         Text(
@@ -892,7 +892,7 @@ fun ProjectDetailScreen(
                                     val text = withContext(Dispatchers.IO) { candidate.file.readText(Charsets.UTF_8) }
                                     diffReport = ProjectDiff.compare(project, ProjectModel.parse(text))
                                 } catch (t: Throwable) {
-                                    diffError = "项目解析失败：" + (t.message ?: t.javaClass.simpleName)
+                                    diffError = context.getString(dev.ninfenz.mobile.R.string.project_parse_failed, t.message ?: t.javaClass.simpleName)
                                 }
                             }
                         }) {
@@ -1035,16 +1035,19 @@ fun PackDetailScreen(pack: PackEntry, onBack: () -> Unit, onUpdate: () -> Unit) 
                                 val verdict = result?.get("verdict")?.let { it.toString().trim('"') }
                                 val issues = result?.get("issues")?.toString() ?: ""
                                 if (response.ok) {
-                                    report = "校验通过：verdict=" + (verdict ?: "pass") + (if (issues == "[]") "" else " · issues=" + issues)
+                                    report = context.getString(dev.ninfenz.mobile.R.string.validate_passed, verdict ?: "pass") + (if (issues == "[]") "" else " · issues=" + issues)
                                 } else {
                                     val err = response.error
-                                    errorText = "[" + (err?.code ?: "NF-VAL-001") + "] " + (err?.message ?: "校验失败") + "；修复：" + (err?.fix ?: "查看诊断")
+                                    errorText = "[" + (err?.code ?: "NF-VAL-001") + "] " +
+                                        (err?.message ?: context.getString(dev.ninfenz.mobile.R.string.validate_failed)) +
+                                        context.getString(dev.ninfenz.mobile.R.string.error_fix_suffix) +
+                                        (err?.fix ?: context.getString(dev.ninfenz.mobile.R.string.view_diagnostics))
                                 }
                                 verifying = false
                             }
                         },
                         enabled = !verifying
-                    ) { Text(if (verifying) "校验中…" else "校验 Pack") }
+                    ) { Text(if (verifying) context.getString(dev.ninfenz.mobile.R.string.validating) else context.getString(dev.ninfenz.mobile.R.string.validate_pack)) }
                     Button(onClick = onUpdate) { Text(stringResource(dev.ninfenz.mobile.R.string.pack_detail_update)) }
                 }
             }

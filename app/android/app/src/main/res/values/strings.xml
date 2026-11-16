@@ -138,6 +138,16 @@
     <string name="project_detail_id">项目 ID：%1$s</string>
     <string name="project_detail_pack">Pack：%1$s · %2$s</string>
     <string name="project_detail_protocol">协议：%1$s</string>
+    <string name="pack_item_count">%1$d 项</string>
+    <string name="project_flow_label">装配 / 校验 / 导出</string>
+    <string name="project_diff_read_failed">无法读取所选项目文件</string>
+    <string name="project_parse_failed">项目解析失败：%1$s</string>
+    <string name="not_bound">未绑定</string>
+    <string name="validate_passed">校验通过：verdict=%1$s</string>
+    <string name="validate_failed">校验失败</string>
+    <string name="view_diagnostics">查看诊断</string>
+    <string name="validating">校验中…</string>
+    <string name="validate_pack">校验 Pack</string>
     <string name="project_review_stale">内容已变更，评审结论可能失效，建议重新评审</string>
     <string name="project_detail_history">历史：%1$d 条</string>
     <string name="project_detail_section_continue">继续</string>
