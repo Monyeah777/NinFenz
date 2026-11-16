@@ -620,6 +620,7 @@ fun ProjectDetailScreen(
     onReview: (Boolean, String, String) -> Unit = { _, _, _ -> },
     onShare: () -> Unit = {},
     onShareFull: () -> Unit = {},
+    onDelete: () -> Unit = {},
     compareCandidates: List<ProjectEntry> = emptyList()
 ) {
     val context = LocalContext.current
@@ -629,6 +630,7 @@ fun ProjectDetailScreen(
     var diffError by remember { mutableStateOf<String?>(null) }
     var showComparePicker by remember { mutableStateOf(false) }
     var compareQuery by remember { mutableStateOf("") }
+    var showDelete by remember { mutableStateOf(false) }
     var showRename by remember { mutableStateOf(false) }
     var renameText by remember(project.title) { mutableStateOf(project.title) }
     var showReview by remember { mutableStateOf(false) }
@@ -715,6 +717,9 @@ fun ProjectDetailScreen(
                         TextButton(onClick = onShareFull) {
                             Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_share_full))
                         }
+                        TextButton(onClick = { showDelete = true }) {
+                            Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_delete))
+                        }
                     }
                 }
             }
@@ -751,6 +756,23 @@ fun ProjectDetailScreen(
             item { NfListRow(stringResource(dev.ninfenz.mobile.R.string.project_detail_author), stringResource(dev.ninfenz.mobile.R.string.project_detail_author_subtitle), Icons.Filled.Edit, "›", onAuthor) }
             item { NfListRow(stringResource(dev.ninfenz.mobile.R.string.project_detail_delivery), stringResource(dev.ninfenz.mobile.R.string.project_detail_delivery_subtitle), Icons.Filled.Info, "›", onAssembly) }
         }
+    }
+
+    if (showDelete) {
+        AlertDialog(
+            onDismissRequest = { showDelete = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.project_delete_title)) },
+            text = { Text(stringResource(dev.ninfenz.mobile.R.string.project_delete_body, project.title)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    showDelete = false
+                    onDelete()
+                }) { Text(stringResource(dev.ninfenz.mobile.R.string.project_delete_confirm)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDelete = false }) { Text(stringResource(android.R.string.cancel)) }
+            }
+        )
     }
 
     if (showReview) {

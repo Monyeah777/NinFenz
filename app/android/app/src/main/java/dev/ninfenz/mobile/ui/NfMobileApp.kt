@@ -524,6 +524,13 @@ is Detail.Import -> ImportScreen(
                                         ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.project_detail_share))
                                     }
                                 },
+                                onDelete = {
+                                    scope.launch {
+                                        withContext(Dispatchers.IO) { ProjectArchiver.deleteProject(entry.file, context.filesDir) }
+                                        refresh()
+                                        shell = shell.select(TopDestination.LIBRARY)
+                                    }
+                                },
                                 onShareFull = {
                                     scope.launch {
                                         val zip = withContext(Dispatchers.IO) {

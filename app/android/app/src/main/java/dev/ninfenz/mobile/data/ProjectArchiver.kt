@@ -71,6 +71,17 @@ object ProjectArchiver {
         return target
     }
 
+    fun deleteProject(projectFile: File, filesDir: File): Boolean {
+        val root = File(filesDir, "projects").canonicalFile
+        val target = projectFile.canonicalFile
+        require(target.path.startsWith(root.path + File.separator)) { "不在 projects 目录：" + target }
+        require(target.isFile) { "项目文件不存在" }
+        val id = target.name.removeSuffix(".nfproject.json")
+        val dataDir = File(root, id)
+        if (dataDir.isDirectory) dataDir.deleteRecursively()
+        return target.delete()
+    }
+
     fun delete(archived: File, filesDir: File): Boolean {
         val archiveRoot = File(filesDir, "projects-archive").canonicalFile
         val target = archived.canonicalFile

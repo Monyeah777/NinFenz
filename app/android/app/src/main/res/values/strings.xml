@@ -520,6 +520,10 @@
     <string name="project_detail_share_full">分享完整项目</string>
     <string name="project_import_command">导入项目包</string>
     <string name="project_import_missing_pack_title">缺少绑定 Pack</string>
+    <string name="project_detail_delete">删除项目</string>
+    <string name="project_delete_title">永久删除项目</string>
+    <string name="project_delete_body">确定永久删除「%1$s」？项目 JSON 与 authoring/assembly 数据一并删除，不可撤销。建议先归档或分享完整项目。</string>
+    <string name="project_delete_confirm">永久删除</string>
     <string name="project_import_missing_pack_body">项目已导入，但绑定的 Pack %1$s@%2$s 未安装；安装后可正常校验/装配。</string>
     <string name="project_import_missing_pack_action">前往 Pack 中心</string>
     <string name="project_review_current">当前评审：%1$s</string>

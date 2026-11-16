@@ -58,6 +58,18 @@ class ProjectArchiverTest {
     }
 
     @Test
+    fun deletesProjectAndDataDir() {
+        val root = Files.createTempDirectory("nf-project-delete").toFile()
+        val projects = java.io.File(root, "projects").apply { mkdirs() }
+        val f = java.io.File(projects, "p.nfproject.json").apply { writeText("{}") }
+        java.io.File(projects, "p/authoring").mkdirs()
+        java.io.File(projects, "p/authoring/assembly.md").writeText("body")
+        assertTrue(ProjectArchiver.deleteProject(f, root))
+        assertTrue(!f.exists())
+        assertTrue(!java.io.File(projects, "p").exists())
+    }
+
+    @Test
     fun rejectsInvalidArchivedProject() {
         val root = Files.createTempDirectory("nf-archive-4").toFile()
         val archive = java.io.File(root, "projects-archive").apply { mkdirs() }
