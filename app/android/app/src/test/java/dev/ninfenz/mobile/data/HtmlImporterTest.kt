@@ -75,6 +75,12 @@ class HtmlImporterTest {
     }
 
     @Test
+    fun convertsStrikethrough() {
+        val md = HtmlImporter.toMarkdown("<p><del>旧</del></p>")
+        assertTrue(md.contains("~~旧~~"))
+    }
+
+    @Test
     fun removesScriptAndStyle() {
         val md = HtmlImporter.toMarkdown("<style>x{}</style><script>alert(1)</script><p>正文</p>")
         assertTrue(md.contains("正文"))

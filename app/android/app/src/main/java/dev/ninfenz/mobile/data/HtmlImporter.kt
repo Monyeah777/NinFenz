@@ -49,6 +49,9 @@ object HtmlImporter {
         text = Regex("(?is)<(?:i|em)[^>]*>(.*?)</(?:i|em)>").replace(text) { m ->
             "*" + strip(m.groupValues[1]).trim() + "*"
         }
+        text = Regex("(?is)<(?:s|strike|del)[^>]*>(.*?)</(?:s|strike|del)>").replace(text) { m ->
+            "~~" + strip(m.groupValues[1]).trim() + "~~"
+        }
         text = Regex("(?is)<img[^>]*>").replace(text) { m ->
             val tag = m.value
             val src = Regex("(?is)src=[\"']([^\"']+)[\"']").find(tag)?.groupValues?.getOrNull(1).orEmpty()
