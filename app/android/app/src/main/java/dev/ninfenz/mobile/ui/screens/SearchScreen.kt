@@ -44,6 +44,7 @@ import dev.ninfenz.mobile.data.SearchHit
 import dev.ninfenz.mobile.data.SearchHistoryStore
 import dev.ninfenz.mobile.data.SearchIndex
 import dev.ninfenz.mobile.data.SearchKind
+import dev.ninfenz.mobile.model.SearchFilter
 import dev.ninfenz.mobile.model.SearchKeyboard
 import dev.ninfenz.mobile.ui.components.NfTopAppBar
 import dev.ninfenz.mobile.ui.theme.NfSpacing
@@ -62,6 +63,8 @@ fun SearchScreen(
     var all by remember { mutableStateOf<List<SearchHit>>(emptyList()) }
     var query by rememberSaveable { mutableStateOf("") }
     var selected by remember { mutableStateOf(0) }
+    var filterName by rememberSaveable { mutableStateOf<String?>(null) }
+    val filterKind = filterName?.let { name -> SearchKind.entries.firstOrNull { it.name == name } }
     val historyStore = remember { SearchHistoryStore(context.filesDir) }
     var history by remember { mutableStateOf(historyStore.load()) }
     val focusRequester = remember { FocusRequester() }
@@ -74,12 +77,13 @@ fun SearchScreen(
         focusRequester.requestFocus()
     }
     val results = remember(query, all) { index.search(all, query) }
-    LaunchedEffect(results) { selected = 0 }
-    val rows = remember(results) {
+    val filtered = remember(results, filterName) { SearchFilter.apply(results, filterKind) }
+    LaunchedEffect(filtered) { selected = 0 }
+    val rows = remember(filtered) {
         val out = mutableListOf<SearchRow>()
         var flat = 0
         SearchKind.entries.forEach { kind ->
-            val hits = results.filter { it.kind == kind }
+            val hits = filtered.filter { it.kind == kind }
             if (hits.isNotEmpty()) {
                 out.add(SearchRow(kind = kind))
                 hits.forEach { hit ->
@@ -99,7 +103,7 @@ fun SearchScreen(
         }
     }
     fun select(delta: Int) {
-        selected = SearchKeyboard.move(selected, results.size, delta)
+        selected = SearchKeyboard.move(selected, filtered.size, delta)
     }
     LaunchedEffect(selected, rows) {
         val itemIndex = rows.indexOfFirst { it.hit != null && it.flatIndex == selected }
@@ -121,7 +125,7 @@ fun SearchScreen(
                         Key.DirectionDown -> { select(1); true }
                         Key.DirectionUp -> { select(-1); true }
                         Key.Enter, Key.NumPadEnter -> {
-                            val hit = results.getOrNull(selected)
+                            val hit = filtered.getOrNull(selected)
                             if (hit != null) { openHit(hit); true } else false
                         }
                         Key.Escape -> {
@@ -135,6 +139,9 @@ fun SearchScreen(
             singleLine = true
         )
         if (query.isNotBlank() && results.isNotEmpty()) {
+            SearchFilterRow(filterKind) { kind ->
+                filterName = kind?.name
+            }
             Text(
                 stringResource(dev.ninfenz.mobile.R.string.search_keyboard_hint),
                 style = MaterialTheme.typography.bodySmall,
@@ -149,7 +156,7 @@ fun SearchScreen(
                 onPick = { query = it },
                 onClear = { historyStore.clear(); history = emptyList() }
             )
-            results.isEmpty() -> Text(
+            filtered.isEmpty() -> Text(
                 stringResource(dev.ninfenz.mobile.R.string.search_no_result),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -218,6 +225,30 @@ private fun SearchHistoryPanel(
                     FilterChip(selected = false, onClick = { onPick(q) }, label = { Text(q) })
                 }
             }
+        }
+    }
+}
+
+
+@Composable
+private fun SearchFilterRow(selected: SearchKind?, onPick: (SearchKind?) -> Unit) {
+    LazyRow(
+        contentPadding = PaddingValues(horizontal = NfSpacing.page),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        item {
+            FilterChip(
+                selected = selected == null,
+                onClick = { onPick(null) },
+                label = { Text(stringResource(dev.ninfenz.mobile.R.string.search_filter_all)) }
+            )
+        }
+        items(SearchKind.entries) { kind ->
+            FilterChip(
+                selected = selected == kind,
+                onClick = { onPick(kind) },
+                label = { Text(kindLabel(kind)) }
+            )
         }
     }
 }

@@ -436,4 +436,5 @@
     <string name="search_history_title">最近搜索</string>
     <string name="search_history_clear">清空</string>
     <string name="import_restored_notice">已恢复上次导入预览</string>
+    <string name="search_filter_all">全部</string>
 </resources>

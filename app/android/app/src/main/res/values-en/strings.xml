@@ -436,4 +436,5 @@
     <string name="search_history_title">Recent searches</string>
     <string name="search_history_clear">Clear</string>
     <string name="import_restored_notice">Restored previous import preview</string>
+    <string name="search_filter_all">All</string>
 </resources>
