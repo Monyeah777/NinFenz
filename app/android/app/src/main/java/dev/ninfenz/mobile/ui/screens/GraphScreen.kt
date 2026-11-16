@@ -91,8 +91,8 @@ fun GraphScreen(store: LibraryStore, onBack: () -> Unit) {
             } catch (e: Exception) {
                 error = CoreResponse.failure(
                     (e as? dev.ninfenz.mobile.core.ModelException)?.code ?: "NF-GRF-001",
-                    "管线图解析失败：" + (e.message ?: e.javaClass.simpleName),
-                    "按 app/schema/nf-pipeline-graph.schema.json 修正",
+                    context.getString(dev.ninfenz.mobile.R.string.graph_parse_failed, e.message ?: e.javaClass.simpleName),
+                    context.getString(dev.ninfenz.mobile.R.string.graph_parse_failed_fix),
                     1
                 ).error
             }
@@ -208,7 +208,7 @@ fun GraphScreen(store: LibraryStore, onBack: () -> Unit) {
 
             CardBox(title = stringResource(dev.ninfenz.mobile.R.string.graph_local_check)) {
                 val issues = GraphModel.formIssues(g)
-                if (issues.isEmpty()) Notice("本地检查未发现问题。", Tone.INFO)
+                if (issues.isEmpty()) Notice(stringResource(dev.ninfenz.mobile.R.string.graph_local_ok), Tone.INFO)
                 for (issue in issues) Notice(issue.code + " " + issue.path + "：" + issue.message + "；修复：" + issue.fix, Tone.WARN)
             }
 
@@ -245,10 +245,13 @@ fun GraphScreen(store: LibraryStore, onBack: () -> Unit) {
                                 val response = safeCall("graph-compile", payload)
                                 if (response.ok) {
                                     val result = response.resultObject()
-                                    planSummary = if (result == null) "核心未返回 plan" else
-                                        "plan digest=" + (J.optString(result, "digest") ?: "（无）") +
-                                            " steps=" + J.optArray(result, "steps").size +
-                                            " slots=" + J.optStringList(result, "slots").joinToString(",")
+                                    planSummary = if (result == null) context.getString(dev.ninfenz.mobile.R.string.graph_core_no_plan) else
+                                        context.getString(
+                                            dev.ninfenz.mobile.R.string.graph_plan_summary,
+                                            J.optString(result, "digest") ?: context.getString(dev.ninfenz.mobile.R.string.graph_none),
+                                            J.optArray(result, "steps").size,
+                                            J.optStringList(result, "slots").joinToString(",")
+                                        )
                                 } else {
                                     error = response.error
                                 }

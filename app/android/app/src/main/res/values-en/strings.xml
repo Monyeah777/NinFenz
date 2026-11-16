@@ -357,6 +357,12 @@
     <string name="graph_type">type=%1$s</string>
     <string name="graph_add_edge">Add edge</string>
     <string name="graph_local_check">Local form check (not contract validation)</string>
+    <string name="graph_local_ok">Local check found no issues.</string>
+    <string name="graph_parse_failed">Pipeline graph parse failed: %1$s</string>
+    <string name="graph_parse_failed_fix">Fix per app/schema/nf-pipeline-graph.schema.json</string>
+    <string name="graph_core_no_plan">Core returned no plan</string>
+    <string name="graph_none">(none)</string>
+    <string name="graph_plan_summary">plan digest=%1$s steps=%2$d slots=%3$s</string>
     <string name="graph_core">Core validate / compile</string>
     <string name="graph_save">Save</string>
     <string name="graph_save_draft">Save graph draft</string>
