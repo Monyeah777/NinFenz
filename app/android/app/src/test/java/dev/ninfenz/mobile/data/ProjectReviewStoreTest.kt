@@ -7,6 +7,7 @@ import java.io.File
 import java.nio.file.Files
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonObject
@@ -47,6 +48,24 @@ class ProjectReviewStoreTest {
         assertEquals("approved", review["state"]?.jsonPrimitive?.content)
         assertEquals("reviewer-a", review["reviewer"]?.jsonPrimitive?.content)
         assertTrue(raw["history"].toString().contains("review:approved"))
+    }
+
+    @Test
+    fun detectsStaleReviewDigest() = runBlocking {
+        val filesDir = Files.createTempDirectory("nf-review-stale").toFile()
+        setup(filesDir)
+        val file = File(filesDir, "projects/p.nfproject.json")
+        val raw = Json.parseToJsonElement(file.readText()).jsonObject.toMutableMap()
+        raw["status"] = JsonPrimitive("reviewed")
+        raw["review"] = buildJsonObject {
+            put("state", "approved")
+            put("reviewer", "r")
+            put("note", "ok")
+            put("subject_digest", "old")
+        }
+        file.writeText(JsonObject(raw).toString())
+        val bridge = FakeCoreBridge().enqueue(CoreResponse.ok(buildJsonObject { put("digest", "new") }))
+        assertTrue(ProjectReviewStore(filesDir, bridge).isStale(file))
     }
 
     @Test

@@ -635,6 +635,16 @@ fun ProjectDetailScreen(
     var renameText by remember(project.title) { mutableStateOf(project.title) }
     var showReview by remember { mutableStateOf(false) }
     val canApprove = project.status in setOf(ProjectStatus.VALIDATED, ProjectStatus.EXPORTED, ProjectStatus.REVIEWED)
+    var reviewStale by remember { mutableStateOf(false) }
+    LaunchedEffect(project.id, project.review.state) {
+        reviewStale = runCatching {
+            withContext(Dispatchers.IO) {
+                dev.ninfenz.mobile.data.ProjectReviewStore(context.filesDir).isStale(
+                    java.io.File(java.io.File(context.filesDir, "projects"), project.id + ".nfproject.json")
+                )
+            }
+        }.getOrDefault(false)
+    }
     var reviewer by remember { mutableStateOf("") }
     var reviewNote by remember { mutableStateOf("") }
     val diffPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: android.net.Uri? ->
@@ -686,6 +696,13 @@ fun ProjectDetailScreen(
                             ),
                             style = MaterialTheme.typography.bodySmall
                         )
+                        if (reviewStale) {
+                            Text(
+                                stringResource(dev.ninfenz.mobile.R.string.project_review_stale),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        }
                         Text(
                             stringResource(dev.ninfenz.mobile.R.string.project_detail_history, project.historyCount),
                             style = MaterialTheme.typography.bodySmall

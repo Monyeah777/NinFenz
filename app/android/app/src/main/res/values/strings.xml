@@ -97,6 +97,7 @@
     <string name="project_detail_id">项目 ID：%1$s</string>
     <string name="project_detail_pack">Pack：%1$s · %2$s</string>
     <string name="project_detail_protocol">协议：%1$s</string>
+    <string name="project_review_stale">内容已变更，评审结论可能失效，建议重新评审</string>
     <string name="project_detail_history">历史：%1$d 条</string>
     <string name="project_detail_section_continue">继续</string>
     <string name="project_detail_author">创作台</string>

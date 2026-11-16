@@ -77,6 +77,20 @@ class ProjectReviewStore(
         }
     }
 
+    suspend fun isStale(projectFile: File): Boolean = withContext(Dispatchers.IO) {
+        if (!projectFile.isFile) return@withContext false
+        val raw = runCatching { Json.parseToJsonElement(projectFile.readText(Charsets.UTF_8)).jsonObject }.getOrNull()
+            ?: return@withContext false
+        val review = raw["review"] as? JsonObject ?: return@withContext false
+        if (review["state"]?.jsonPrimitive?.content != "approved") return@withContext false
+        val expected = review["subject_digest"]?.jsonPrimitive?.content ?: return@withContext false
+        val core = bridge() ?: return@withContext false
+        val subject = JsonObject(raw.toMutableMap().apply { remove("review") })
+        val canonical = core.call("canonical", buildJsonObject { put("value", subject) })
+        val current = canonical.resultObject()?.get("digest")?.jsonPrimitive?.content ?: return@withContext false
+        current != expected
+    }
+
     private fun withReview(raw: JsonObject, approve: Boolean, reviewer: String, note: String, digest: String): JsonObject {
         val next = raw.toMutableMap()
         next["review"] = buildJsonObject {

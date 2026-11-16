@@ -97,6 +97,7 @@
     <string name="project_detail_id">Project ID: %1$s</string>
     <string name="project_detail_pack">Pack: %1$s · %2$s</string>
     <string name="project_detail_protocol">Protocol: %1$s</string>
+    <string name="project_review_stale">Content changed; the review may be stale — re-review recommended</string>
     <string name="project_detail_history">History: %1$d</string>
     <string name="project_detail_section_continue">Continue</string>
     <string name="project_detail_author">Author workspace</string>
