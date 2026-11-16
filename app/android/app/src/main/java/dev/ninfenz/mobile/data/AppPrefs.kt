@@ -1,6 +1,7 @@
 package dev.ninfenz.mobile.data
 
 import android.content.Context
+import androidx.core.content.edit
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonObject
@@ -17,25 +18,25 @@ class AppPrefs(context: Context) {
 
     var onboardingDone: Boolean
         get() = sp.getBoolean("onboarding_done", false)
-        set(value) = sp.edit().putBoolean("onboarding_done", value).apply()
+        set(value) = sp.edit { putBoolean("onboarding_done", value) }
 
     var sampleSeeded: Boolean
         get() = sp.getBoolean("sample_seeded", false)
-        set(value) = sp.edit().putBoolean("sample_seeded", value).apply()
+        set(value) = sp.edit { putBoolean("sample_seeded", value) }
 
     var themeMode: ThemeMode
         get() = runCatching { ThemeMode.valueOf(sp.getString("theme_mode", "SYSTEM") ?: "SYSTEM") }
             .getOrDefault(ThemeMode.SYSTEM)
-        set(value) = sp.edit().putString("theme_mode", value.name).apply()
+        set(value) = sp.edit { putString("theme_mode", value.name) }
 
     var languageMode: LanguageMode
         get() = runCatching { LanguageMode.valueOf(sp.getString("language_mode", "SYSTEM") ?: "SYSTEM") }
             .getOrDefault(LanguageMode.SYSTEM)
-        set(value) = sp.edit().putString("language_mode", value.name).apply()
+        set(value) = sp.edit { putString("language_mode", value.name) }
 
     var dynamicColor: Boolean
         get() = sp.getBoolean("dynamic_color", false)
-        set(value) = sp.edit().putBoolean("dynamic_color", value).apply()
+        set(value) = sp.edit { putBoolean("dynamic_color", value) }
 
     /** 备份用快照（仅本地偏好，不含内容）。 */
     fun snapshot(): String = buildJsonObject {
