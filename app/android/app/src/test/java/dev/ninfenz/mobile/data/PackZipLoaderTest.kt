@@ -49,6 +49,13 @@ class PackZipLoaderTest {
     }
 
     @Test
+    fun rejectsControlCharacterEntryName() {
+        val zip = zip("nf-\u0001.json" to "{}")
+        val dest = File.createTempFile("nf-pack-out6", "").let { it.delete(); it }
+        assertTrue(runCatching { PackZipLoader.extract(zip, dest) }.isFailure)
+    }
+
+    @Test
     fun rejectsMissingManifest() {
         val zip = zip("readme.txt" to "x")
         val dest = File.createTempFile("nf-pack-out4", "").let { it.delete(); it }

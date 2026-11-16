@@ -23,12 +23,19 @@ object PackZipLoader {
         val destCanonical = destDir.canonicalFile
         var entries = 0
         var total = 0L
+        val seen = mutableSetOf<String>()
         ZipInputStream(BufferedInputStream(FileInputStream(zipFile))).use { zis ->
             while (true) {
                 val entry = zis.nextEntry ?: break
                 entries += 1
                 if (entries > MAX_ENTRIES) throw PackZipException("条目数超限", "Pack 条目上限 " + MAX_ENTRIES)
                 val name = entry.name.replace('\\', '/')
+                if (name.isBlank() || name.any { it.code < 0x20 }) {
+                    throw PackZipException("zip 含非法条目名", "拒绝不安全的 Pack zip")
+                }
+                if (!seen.add(name)) {
+                    throw PackZipException("zip 含重复条目：" + name, "拒绝不安全的 Pack zip")
+                }
                 if (name.startsWith("/") || name.split('/').any { it == ".." }) {
                     throw PackZipException("zip 含越界路径：" + name, "拒绝不安全的 Pack zip")
                 }
