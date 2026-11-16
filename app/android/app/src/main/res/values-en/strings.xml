@@ -495,6 +495,8 @@
     <string name="import_rename_draft">Rename</string>
     <string name="import_rename_draft_label">Draft file name</string>
     <string name="import_rename_confirm">Save</string>
+    <string name="import_recent_history">Recent imports</string>
+    <string name="import_recent_clear">Clear history</string>
     <string name="pack_trust_pinned">Local trust: current tree pinned</string>
     <string name="pack_trust_unpinned">Local trust: not pinned (local marker, not a signature)</string>
     <string name="pack_trust_pin">Pin as trusted</string>

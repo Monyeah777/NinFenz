@@ -18,6 +18,18 @@ class ImportHistoryStoreTest {
     }
 
     @Test
+    fun recentAndClear() {
+        val dir = Files.createTempDirectory("nf-import-history-3").toFile()
+        val store = ImportHistoryStore(dir)
+        store.record("a", "a.md")
+        store.record("b", "b.md")
+        assertEquals(1, store.recent(1).size)
+        assertEquals(2, store.recent().size)
+        store.clear()
+        assertEquals(0, store.recent().size)
+    }
+
+    @Test
     fun duplicateDigestUpdatesInsteadOfAppending() {
         val dir = Files.createTempDirectory("nf-import-history-2").toFile()
         val store = ImportHistoryStore(dir)

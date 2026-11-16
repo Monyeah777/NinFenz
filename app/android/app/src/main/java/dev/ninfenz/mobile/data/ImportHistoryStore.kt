@@ -23,6 +23,12 @@ class ImportHistoryStore(private val filesDir: File) {
         return load().firstOrNull { it.digest == digest }
     }
 
+    fun recent(limit: Int = 10): List<Entry> = load().take(limit.coerceAtLeast(0))
+
+    fun clear() {
+        file().delete()
+    }
+
     fun record(digest: String, name: String) {
         if (digest.isBlank()) return
         val now = System.currentTimeMillis()

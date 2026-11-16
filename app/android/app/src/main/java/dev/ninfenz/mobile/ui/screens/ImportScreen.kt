@@ -90,6 +90,7 @@ fun ImportScreen(
     val importHistory = remember { ImportHistoryStore(context.filesDir) }
     val importDraftStore = remember { ImportDraftStore(context.filesDir) }
     var drafts by remember { mutableStateOf(DraftLibrary.list(context.filesDir)) }
+    var recentImports by remember { mutableStateOf(importHistory.recent()) }
     var pendingDeleteDraft by remember { mutableStateOf<File?>(null) }
     var renameDraft by remember { mutableStateOf<File?>(null) }
     var renameDraftText by remember { mutableStateOf("") }
@@ -144,6 +145,7 @@ fun ImportScreen(
                             notice = context.getString(dev.ninfenz.mobile.R.string.import_duplicate_notice, previous.name, digest.take(12))
                         }
                         importHistory.record(digest, imported.source.name)
+                        recentImports = importHistory.recent()
                     }
                     rawResult = obj
                     doc = imported
@@ -495,6 +497,26 @@ fun ImportScreen(
                                         Text(stringResource(dev.ninfenz.mobile.R.string.import_delete_draft))
                                     }
                                 }
+                            }
+                        }
+                    }
+                }
+                if (recentImports.isNotEmpty()) {
+                    item { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.import_recent_history)) }
+                    item {
+                        NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
+                            Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                                recentImports.take(5).forEach { entry ->
+                                    Text(
+                                        entry.name + " · " + entry.digest.take(10),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                                TextButton(onClick = {
+                                    importHistory.clear()
+                                    recentImports = importHistory.recent()
+                                }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_recent_clear)) }
                             }
                         }
                     }

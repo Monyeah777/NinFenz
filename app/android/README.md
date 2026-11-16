@@ -130,7 +130,7 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 - DeliveryDraftStoreTest（2）：槽位草稿保存/恢复、空值清理、坏 JSON 忽略。
 - SearchKeyboardTest（2）：上下选择边界、空结果不越界。
 - ShellStateCodecTest（2）：四目的地/全部详情类型的进程死亡编码与非法输入回退。
-- ImportHistoryStoreTest（2）：digest 去重、重复记录更新。
+- ImportHistoryStoreTest（3）：digest 去重、重复记录更新。
 - PackInstallerTest（2）：staging→fsync→rename、替换旧版本、清理 .old。
 - SearchHistoryStoreTest（2）：最近优先/去重、最多 10 条、清空。
 - ImportDraftStoreTest（2）：最近导入预览保存/恢复、空白/损坏容错。
@@ -165,7 +165,7 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 
 - v0.02 W6（2026-11-15）：`./gradlew :app:assembleDebug` 成功：app-debug.apk = 21,710,683 bytes，
   sha256 = cd5287a2094b8ef8db12a502917c2b8e35cc53aafcd3c0976c16a553727eafa0（含双 ABI 原生库 + 9 个示例 Pack assets）。
-- `./gradlew :app:testDebugUnitTest` 全绿：222 条 JVM 单测（v1 42 + v0.02 180；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y/大字号/对比度/Paparazzi 截图）。
+- `./gradlew :app:testDebugUnitTest` 全绿：223 条 JVM 单测（v1 42 + v0.02 181；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y/大字号/对比度/Paparazzi 截图）。
 - `zipalign -c -P 16 -v 4 app-debug.apk` → Verification successful（native lib 16KB page 对齐）。
 - `bash app/scripts/build_core_android.sh --clean` 成功：NDK 27.0.12077973 + rustup targets
   （aarch64-linux-android / x86_64-linux-android，经 rsproxy 镜像安装）；两个 .so 的 LOAD align 均为 0x4000。
