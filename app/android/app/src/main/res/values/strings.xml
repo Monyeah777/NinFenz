@@ -293,6 +293,12 @@
     <string name="delivery_share_file">分享导出文件</string>
     <string name="delivery_open_file">打开</string>
     <string name="delivery_pdf_note">PDF：本地基础文本导出；复杂排版仍 OPEN。</string>
+    <string name="delivery_plan_failed">plan 解析失败：%1$s</string>
+    <string name="delivery_plan_failed_fix">检查核心 graph-compile 输出</string>
+    <string name="delivery_no_markdown">装配未返回 markdown</string>
+    <string name="delivery_no_markdown_fix">检查槽位输入</string>
+    <string name="delivery_report_failed">报告解析失败：%1$s</string>
+    <string name="delivery_report_failed_fix">检查核心输出</string>
     <string name="export_epub_failed">EPUB 导出失败：%1$s</string>
     <string name="export_pdf_failed">PDF 导出失败：%1$s</string>
     <string name="export_html_failed">HTML 导出失败：%1$s</string>

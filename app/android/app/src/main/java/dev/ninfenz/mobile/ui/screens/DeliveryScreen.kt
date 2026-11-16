@@ -324,7 +324,12 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                     batchChunks = emptyList()
                                     batchNote = null
                                 } catch (t: Throwable) {
-                                    error = CoreResponse.failure("NF-ASM-003", "plan 解析失败：" + (t.message ?: t.javaClass.simpleName), "检查核心 graph-compile 输出", 1).error
+                                    error = CoreResponse.failure(
+                                        "NF-ASM-003",
+                                        context.getString(dev.ninfenz.mobile.R.string.delivery_plan_failed, t.message ?: t.javaClass.simpleName),
+                                        context.getString(dev.ninfenz.mobile.R.string.delivery_plan_failed_fix),
+                                        1
+                                    ).error
                                 }
                             } else {
                                 error = response.error
@@ -424,7 +429,12 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                         is StatusAdvanceResult.Failure -> statusNote = context.getString(dev.ninfenz.mobile.R.string.delivery_status_fail, advanced.message)
                                     }
                                 } else {
-                                    error = response.error ?: CoreResponse.failure("NF-ASM-002", "装配未返回 markdown", "检查槽位输入", 1).error
+                                    error = response.error ?: CoreResponse.failure(
+                                        "NF-ASM-002",
+                                        context.getString(dev.ninfenz.mobile.R.string.delivery_no_markdown),
+                                        context.getString(dev.ninfenz.mobile.R.string.delivery_no_markdown_fix),
+                                        1
+                                    ).error
                                 }
                                 busy = false
                             }
@@ -449,7 +459,12 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                     try {
                                         report = ReportModel.parse(result)
                                     } catch (t: Throwable) {
-                                        error = CoreResponse.failure("NF-VAL-001", "报告解析失败：" + (t.message ?: t.javaClass.simpleName), "检查核心输出", 1).error
+                                        error = CoreResponse.failure(
+                                            "NF-VAL-001",
+                                            context.getString(dev.ninfenz.mobile.R.string.delivery_report_failed, t.message ?: t.javaClass.simpleName),
+                                            context.getString(dev.ninfenz.mobile.R.string.delivery_report_failed_fix),
+                                            1
+                                        ).error
                                     }
                                 }
                                 if (!response.ok) error = response.error
@@ -472,7 +487,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                     Text(ReportModel.line(r), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(horizontal = NfSpacing.page))
                     for (issue in r.issues.take(20)) {
                         Text(
-                            issue.code + " " + (issue.path ?: "-") + "：" + issue.message + "；修复：" + issue.fix,
+                            issue.code + " " + (issue.path ?: "-") + "：" + issue.message + context.getString(dev.ninfenz.mobile.R.string.error_fix_suffix) + issue.fix,
                             style = MaterialTheme.typography.bodySmall,
                             color = if (issue.severity == "error") MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(horizontal = NfSpacing.page)

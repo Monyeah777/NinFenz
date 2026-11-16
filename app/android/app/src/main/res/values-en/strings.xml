@@ -293,6 +293,12 @@
     <string name="delivery_share_file">Share exported file</string>
     <string name="delivery_open_file">Open</string>
     <string name="delivery_pdf_note">PDF: local basic-text export; rich layout remains OPEN.</string>
+    <string name="delivery_plan_failed">Plan parse failed: %1$s</string>
+    <string name="delivery_plan_failed_fix">Check core graph-compile output</string>
+    <string name="delivery_no_markdown">Assembly returned no markdown</string>
+    <string name="delivery_no_markdown_fix">Check slot inputs</string>
+    <string name="delivery_report_failed">Report parse failed: %1$s</string>
+    <string name="delivery_report_failed_fix">Check core output</string>
     <string name="export_epub_failed">EPUB export failed: %1$s</string>
     <string name="export_pdf_failed">PDF export failed: %1$s</string>
     <string name="export_html_failed">HTML export failed: %1$s</string>
