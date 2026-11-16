@@ -41,9 +41,10 @@ object ProjectPackageImporter {
                 require(count <= 5000) { "条目过多" }
                 val name = entry.name.replace('\\', '/')
                 require(!name.startsWith("/") && name.split('/').none { it == ".." }) { "非法路径：" + name }
-                val bytes = zip.getInputStream(entry).use { it.readBytes() }
-                total += bytes.size
+                require(entry.size in 0..(512L * 1024 * 1024)) { "条目过大：" + name }
+                total += entry.size.coerceAtLeast(0)
                 require(total <= 512L * 1024 * 1024) { "解压总量超限" }
+                val bytes = zip.getInputStream(entry).use { it.readBytes() }
                 if (name.endsWith(".nfproject.json") && !name.contains('/')) {
                     require(projectText == null) { "包含多个项目文件" }
                     projectText = String(bytes, Charsets.UTF_8)
