@@ -559,6 +559,12 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="import_draft_to_project">To project</string>
     <string name="import_project_failed">Project package import failed: %1$s</string>
     <string name="import_project_failed_fix">Confirm the zip is a complete project package</string>
+    <string name="import_clipboard_empty">Clipboard is empty</string>
+    <string name="import_clipboard_empty_fix">Copy some text first</string>
+    <string name="import_raw_missing">Raw core response missing; refusing to substitute re-serialized output</string>
+    <string name="import_raw_missing_fix">Import again</string>
+    <string name="import_rename_failed">Rename failed: %1$s</string>
+    <string name="import_rename_failed_fix">Try another name</string>
     <string name="import_epub_failed">EPUB parse failed or no text</string>
     <string name="import_epub_failed_fix">Confirm EPUB contains container/OPF/XHTML chapters</string>
     <string name="import_docx_failed">DOCX parse failed or no text</string>

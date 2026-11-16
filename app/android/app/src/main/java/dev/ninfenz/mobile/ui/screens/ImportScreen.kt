@@ -266,7 +266,12 @@ fun ImportScreen(
         val manager = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager
         val text = manager?.primaryClip?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.coerceToText(context)?.toString()
         if (text.isNullOrBlank()) {
-            error = CoreResponse.failure("NF-E-003", "剪贴板为空", "先复制一段文本", 2).error
+            error = CoreResponse.failure(
+                "NF-E-003",
+                context.getString(dev.ninfenz.mobile.R.string.import_clipboard_empty),
+                context.getString(dev.ninfenz.mobile.R.string.import_clipboard_empty_fix),
+                2
+            ).error
             return
         }
         scope.launch {
@@ -519,7 +524,12 @@ fun ImportScreen(
                             onClick = {
                                 val raw = rawResult
                                 if (raw == null) {
-                                    error = CoreResponse.failure("NF-E-004", "原始响应未保留，拒绝以重序列化结果冒充核心产物", "重新导入", 2).error
+                                    error = CoreResponse.failure(
+                                        "NF-E-004",
+                                        context.getString(dev.ninfenz.mobile.R.string.import_raw_missing),
+                                        context.getString(dev.ninfenz.mobile.R.string.import_raw_missing_fix),
+                                        2
+                                    ).error
                                 } else {
                                     val base = store.uniqueDraftBase(current.source.name)
                                     val file = store.saveDraft(base, raw.toString())
@@ -683,7 +693,12 @@ fun ImportScreen(
                             }
                             renameDraft = null
                         } catch (t: Throwable) {
-                            error = CoreResponse.failure("NF-IMP-005", "重命名失败：" + (t.message ?: t.javaClass.simpleName), "换一个名称后重试", 2).error
+                            error = CoreResponse.failure(
+                                "NF-IMP-005",
+                                context.getString(dev.ninfenz.mobile.R.string.import_rename_failed, t.message ?: t.javaClass.simpleName),
+                                context.getString(dev.ninfenz.mobile.R.string.import_rename_failed_fix),
+                                2
+                            ).error
                             renameDraft = null
                         }
                     }
