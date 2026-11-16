@@ -16,6 +16,7 @@
 | 装配 | pass：填 4 个槽位后 assemble 返回 markdown（开篇/正文/收束） | 截图 19 |
 | L1 校验 | pass：L1 pass（error=0 warn=0 info=3）；状态 assembled→validated 写回 | run-as 读项目 |
 | 导出 md/zip | pass：files/exports/delivery/result.md + result.zip + manifest；状态 validated→exported 写回 | run-as 读文件 |
+| PDF 导出（JVM） | pass（仅分页逻辑单测）：交付台「导出 pdf」用 Android PdfDocument 生成 A4 文本 PDF、自动折行/分页；PdfPager 2 条测试；PdfDocument 渲染未真机/仪器验证。真机未复测（adb 无设备） |
 | Pack zip 解包硬化（JVM） | pass（本机）：拒绝空/控制字符条目名、重复条目、绝对路径/..、条目数/总量超限；测试补控制字符用例。真机未复测（adb 无设备） |
 | 多条目分享队列（JVM） | pass（本机）：SEND_MULTIPLE 接收后保留全部条目，显示「共 N 项/当前第 X 项」，可逐项导入或忽略其余；不再只取第一项并静默丢弃。真机未复测（adb 无设备） |
 | EPUB 结构自检（JVM） | pass（本机）：导出后校验 mimetype 首个/STORED、container/OPF 引用/spine/nav、XHTML 可解析、路径约束；失败显示原因；测试 3 条。真机未复测（adb 无设备） |

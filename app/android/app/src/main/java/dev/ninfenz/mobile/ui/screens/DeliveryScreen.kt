@@ -45,6 +45,7 @@ import dev.ninfenz.mobile.data.AuthorArtifactsLoader
 import dev.ninfenz.mobile.data.DeliveryDraftStore
 import dev.ninfenz.mobile.data.EpubExporter
 import dev.ninfenz.mobile.data.EpubValidator
+import dev.ninfenz.mobile.data.PdfExporter
 import dev.ninfenz.mobile.data.ExportHistoryStore
 import dev.ninfenz.mobile.data.ExportVerifier
 import dev.ninfenz.mobile.data.PackEntry
@@ -518,6 +519,11 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                         manifestText = null
                         recordExport("epub", file, null)
                     }
+                    PdfExportButton(markdown, project, context, scope, { busy = it }, { error = it }) { file ->
+                        exportedFile = file
+                        manifestText = null
+                        recordExport("pdf", file, null, verify = false)
+                    }
                 }
                 Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                     OutlinedButton(
@@ -575,6 +581,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                         "docx" -> "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                                         "json" -> "application/json"
                                         "epub" -> "application/epub+zip"
+                                        "pdf" -> "application/pdf"
                                         else -> "application/octet-stream"
                                     }
                                     val intent = ShareExporter.shareFileIntent(context, file, mime, entry.name)
@@ -790,4 +797,35 @@ private fun EpubExportButton(
             }
         }
     ) { Text(context.getString(dev.ninfenz.mobile.R.string.delivery_export, "epub")) }
+}
+
+@Composable
+private fun PdfExportButton(
+    markdown: String?,
+    project: Project,
+    context: android.content.Context,
+    scope: kotlinx.coroutines.CoroutineScope,
+    setBusy: (Boolean) -> Unit,
+    setError: (CoreError?) -> Unit,
+    onDone: (File) -> Unit
+) {
+    Button(
+        enabled = markdown != null,
+        onClick = {
+            val md = markdown ?: return@Button
+            setBusy(true)
+            setError(null)
+            scope.launch {
+                try {
+                    val outDir = File(File(context.filesDir, "exports"), "delivery").apply { mkdirs() }
+                    val created = PdfExporter.export(md, project.title, outDir)
+                    onDone(created.file)
+                } catch (t: Throwable) {
+                    setError(CoreError("NF-EXP-002", "PDF 导出失败：" + (t.message ?: t.javaClass.simpleName), "检查存储空间", null, 1))
+                } finally {
+                    setBusy(false)
+                }
+            }
+        }
+    ) { Text(context.getString(dev.ninfenz.mobile.R.string.delivery_export, "pdf")) }
 }
