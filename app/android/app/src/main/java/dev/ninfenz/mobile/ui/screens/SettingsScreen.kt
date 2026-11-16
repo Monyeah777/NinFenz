@@ -142,10 +142,13 @@ fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
                         File(context.filesDir, "app-prefs.json").writeText(AppPrefs(context).snapshot())
                         BackupService.create(context.filesDir)
                     }
+                    val checked = withContext(Dispatchers.IO) { BackupRestoreService.inspect(created.file) }
                     val intent = ShareExporter.shareFileIntent(context, created.file, "application/zip", created.file.name)
                     ShareExporter.launchChooser(context, intent, created.file.name)
                     backups = BackupService.list(context.filesDir)
-                    backupMessage = context.resources.getQuantityString(dev.ninfenz.mobile.R.plurals.settings_backup_done, created.entries, created.entries, humanBytes(created.bytes))
+                    backupMessage = context.resources.getQuantityString(dev.ninfenz.mobile.R.plurals.settings_backup_done, created.entries, created.entries, humanBytes(created.bytes)) +
+                        if (checked.ok) context.getString(dev.ninfenz.mobile.R.string.settings_backup_verified)
+                        else context.getString(dev.ninfenz.mobile.R.string.settings_backup_verify_failed, checked.error ?: "未知原因")
                 }
             }) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_backup_export)) }
             backupMessage?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary) }

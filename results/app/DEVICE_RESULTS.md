@@ -17,6 +17,7 @@
 | L1 校验 | pass：L1 pass（error=0 warn=0 info=3）；状态 assembled→validated 写回 | run-as 读项目 |
 | 导出 md/zip | pass：files/exports/delivery/result.md + result.zip + manifest；状态 validated→exported 写回 | run-as 读文件 |
 | 桌面快捷方式（构建） | pass（构建）：静态 shortcuts（导入/新建/搜索）+ MainActivity 冷启动/onNewIntent 路由；未真机长按图标验证（adb 无设备） |
+| 备份导出后自检（JVM） | pass（本机）：导出后立即 inspect zip，显示“导出校验通过/失败原因”；真机未复测（adb 无设备） |
 | 分享/文件选择导入项目包（JVM） | pass（本机）：导入流程检测 zip 内根项目 JSON，直接走 ProjectPackageImporter 并打开项目；测试识别用例。真机未复测（adb 无设备） |
 | 项目包导出→导入往返（JVM） | pass（本机）：ProjectPackage 导出 zip 后 ProjectPackageImporter 导入新根，项目 JSON/assembly 内容一致；真机未复测（adb 无设备） |
 | 项目包导入原子化（JVM） | pass（本机）：data 先写 staging，再移动，最后原子写项目 JSON；失败清理 staging/data/JSON；测试 3 条。真机未复测（adb 无设备） |

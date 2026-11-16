@@ -485,6 +485,8 @@
         <item quantity="other">Backup created: %1$d files · %2$s</item>
     </plurals>
     <string name="settings_backup_restore">Restore local backup</string>
+    <string name="settings_backup_verified"> · export verified</string>
+    <string name="settings_backup_verify_failed"> · export verify failed: %1$s</string>
     <string name="settings_backup_restore_title">Restore backup</string>
     <plurals name="settings_backup_restore_warning">
         <item quantity="one">Restore %1$d file and overwrite projects/drafts with the same names; this cannot be undone.</item>
