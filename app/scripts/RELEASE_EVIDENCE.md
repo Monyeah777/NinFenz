@@ -7,16 +7,18 @@
 
 | 平台 | 构建 | 签名 | 公证/上架 | 结论 |
 |---|---|---|---|---|
-| Android | OPEN-TOOLCHAIN | OPEN-EXTERNAL | OPEN-EXTERNAL | 未发布 |
+| Android | 构建 pass（debug/release unsigned） | OPEN-EXTERNAL | OPEN-EXTERNAL | 未发布 |
 | Windows | OPEN-TOOLCHAIN | OPEN-EXTERNAL | — | 未发布 |
 | macOS | OPEN-EXTERNAL | OPEN-EXTERNAL | OPEN-EXTERNAL | 未发布 |
 
 ## 明细
 
 ### Android
-- assembleDebug：**未跑**（本机无 Android SDK/Gradle；工具链勘察见 `app/results/TOOLCHAIN.md`）
-- 产物 SHA-256：—
-- 签名证书指纹（SHA-256）：—
+- assembleDebug：**pass**（2026-11-16，Android SDK 36 / build-tools 36.0.0）
+- app-debug.apk：19,066,779 B；SHA-256 `60cd5db798c97fd1ae2db43d42f8a9c52f15f026847607d3e78bb7163967e77c`
+- assembleRelease（unsigned）：pass；15,266,881 B；SHA-256 `36781ba621f2836c21f250939c069d62942c3407abcf81c7425d5415bcd3a72a`
+- 16KB 对齐：`zipalign -c -P 16 4` exit 0
+- 签名证书指纹（SHA-256）：—（未签名，OPEN-EXTERNAL）
 - 数据安全表单提交：**未提交**
 
 ### Windows
