@@ -3,7 +3,7 @@
 > 设备：OnePlus PLF110，Android 16（SDK 36），1080×2392 / 480dpi；历史真机会话 serial 3B65AR0183V00000。
 > **2026-11-16 当前 `adb devices` 为空**：下表 2026-11-15 行是历史真机证据；本轮新增功能仅有 JVM/构建/门禁证据，真机矩阵仍 OPEN-TOOLCHAIN。
 > APK：0.2.0 / versionCode 2，minSdk 26 / target 36。本件只记实际跑过的项目；未跑项标 OPEN，不写成 pass。
-> 当前本机验证总览：Android JVM **267/267**、Rust core **186/186**、app Python **490 passed**、APP 门禁 QA0–QA6 PASS/gap=0、lint **0 warnings**、`verify.sh --checks-only` PASS=107/WARN=2/FAIL=0。
+> 当前本机验证总览：Android JVM **304/304**、Rust core **186/186**、app Python **492 passed**、APP 门禁 QA0–QA6 PASS/gap=0、lint **0 warnings**、`verify.sh --checks-only` PASS=107/WARN=2/FAIL=0。
 
 ## 1. 已实测（2026-11-15）
 
@@ -68,7 +68,7 @@
 | APP 门禁（round153） | pass（本机）：QA0–QA6 全 PASS，FAIL=0；covered=14 gap=0 open=2 p0=0；台账刷新到当前 HEAD。 |
 | Lint 0 warnings（JVM） | pass（本机）：lint.xml 仅忽略 Paparazzi alpha05 的 GradleDependency 消息（Kotlin 2.1 读不了 stdlib 2.3）；warnings 1→0。 |
 | 仓库门禁（本轮） | pass（本机）：`LANG=C.UTF-8 PYTHONUTF8=1 bash verify.sh --checks-only` → PASS=107 WARN=2 FAIL=0；conformance 27/27 conformant root d1e126…；协议回执 408f01e5…。 |
-| Python app 测试（本轮） | pass（本机）：`python -m pytest app/tests -q` → 490 passed / 1 warning / 0 failed（136s）；warning 为安全负例故意构造重复 zip 条目。 |
+| Python app 测试（本轮） | pass（本机）：`python -m pytest app/tests -q` → **492 passed** / 1 warning / 0 failed（147s）；warning 为安全负例故意构造重复 zip 条目。 |
 | 项目包未列出条目拒绝（JVM） | pass（本机）：zip 增加 manifest 未列数据文件时导入失败；测试 8 条。真机未复测（adb 无设备） |
 | 交付导出防重入（JVM） | pass（本机）：导出/分享按钮在 busy 时禁用，避免并发覆盖；265 tests 全绿。真机未复测（adb 无设备） |
 | 备份排除临时文件（JVM） | pass（本机）：备份 zip 排除 `.bak`/`.tmp`；测试仍 2 条（含 .bak 断言）。真机未复测（adb 无设备） |
