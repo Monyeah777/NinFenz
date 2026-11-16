@@ -30,6 +30,15 @@ class BackupServiceTest {
     }
 
     @Test
+    fun listsAndPrunesOldBackups() {
+        val root = Files.createTempDirectory("nf-backup-prune").toFile()
+        repeat(7) { BackupService.create(root, 1000L + it) }
+        assertEquals(7, BackupService.list(root).size)
+        assertEquals(4, BackupService.prune(root, 3))
+        assertEquals(3, BackupService.list(root).size)
+    }
+
+    @Test
     fun emptyBackupStillHasManifest() {
         val root = Files.createTempDirectory("nf-backup-2").toFile()
         val created = BackupService.create(root, 456L)

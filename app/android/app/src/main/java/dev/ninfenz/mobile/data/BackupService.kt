@@ -50,6 +50,23 @@ object BackupService {
         return Created(target, sources.size, target.length())
     }
 
+    fun list(filesDir: File): List<File> {
+        val dir = File(filesDir, "exports/backups")
+        if (!dir.isDirectory) return emptyList()
+        return dir.listFiles { f -> f.isFile && f.name.endsWith(".zip") }
+            ?.sortedByDescending { it.lastModified() }
+            ?: emptyList()
+    }
+
+    /** 只保留最近 keep 个备份，返回删除数；keep 至少 1。 */
+    fun prune(filesDir: File, keep: Int): Int {
+        require(keep >= 1) { "keep 至少为 1" }
+        val all = list(filesDir)
+        var removed = 0
+        all.drop(keep).forEach { if (it.delete()) removed++ }
+        return removed
+    }
+
     private fun sha256(file: File): String {
         val digest = MessageDigest.getInstance("SHA-256")
         file.inputStream().use { input ->

@@ -141,7 +141,7 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 - CommandPaletteTest（3）：空查询全量、标题/id 过滤、最近使用排序。
 - CommandHistoryStoreTest（2）：最近命令去重/上限 5。
 - StorageStatsTest（2）：目录占用汇总、只清 imports/shared 缓存、缺失目录为 0。
-- BackupServiceTest（2）：备份 zip 含 manifest/projects/drafts、空备份仍有 manifest。
+- BackupServiceTest（3）：备份 zip 含 manifest/projects/drafts、空备份仍有 manifest、列表/裁剪旧备份。
 - BackupRestoreServiceTest（3）：合法备份恢复、路径穿越拒绝、sha256 不匹配拒绝。
 - ProjectHistoryExportTest（2）：历史 Markdown 表格/标题转义、空历史。
 - ProjectDuplicatorTest（2）：复制保留 refs、重置状态/评审/历史、避免 id 冲突。
@@ -163,7 +163,7 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 
 - v0.02 W6（2026-11-15）：`./gradlew :app:assembleDebug` 成功：app-debug.apk = 21,710,683 bytes，
   sha256 = cd5287a2094b8ef8db12a502917c2b8e35cc53aafcd3c0976c16a553727eafa0（含双 ABI 原生库 + 9 个示例 Pack assets）。
-- `./gradlew :app:testDebugUnitTest` 全绿：215 条 JVM 单测（v1 42 + v0.02 173；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y/大字号/对比度/Paparazzi 截图）。
+- `./gradlew :app:testDebugUnitTest` 全绿：216 条 JVM 单测（v1 42 + v0.02 174；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y/大字号/对比度/Paparazzi 截图）。
 - `zipalign -c -P 16 -v 4 app-debug.apk` → Verification successful（native lib 16KB page 对齐）。
 - `bash app/scripts/build_core_android.sh --clean` 成功：NDK 27.0.12077973 + rustup targets
   （aarch64-linux-android / x86_64-linux-android，经 rsproxy 镜像安装）；两个 .so 的 LOAD align 均为 0x4000。

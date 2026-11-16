@@ -17,6 +17,7 @@
 | L1 校验 | pass：L1 pass（error=0 warn=0 info=3）；状态 assembled→validated 写回 | run-as 读项目 |
 | 导出 md/zip | pass：files/exports/delivery/result.md + result.zip + manifest；状态 validated→exported 写回 | run-as 读文件 |
 | 桌面快捷方式（构建） | pass（构建）：静态 shortcuts（导入/新建/搜索）+ MainActivity 冷启动/onNewIntent 路由；未真机长按图标验证（adb 无设备） |
+| 备份清理（JVM） | pass（本机）：设置→清理旧备份保留最近 5 个，删除更早 zip；快照指针失效自动忽略；测试 3 条。真机未复测（adb 无设备） |
 | 存储面板补齐 Pack/归档（JVM） | pass（本机）：StorageStats 增加 library/packs 与 projects-archive，合计覆盖全部本地数据；测试补断言。真机未复测（adb 无设备） |
 | 搜索过滤持久化（JVM） | pass（本机）：kind/pack 过滤存 search-filter.json，重进恢复；已卸载 Pack 的过期 pack 过滤自动忽略；测试 2 条。真机未复测（adb 无设备） |
 | 库内项目对比（JVM） | pass（本机）：项目详情「与库内项目对比」列出其它项目，直接读取 JSON 生成差异；无需文件选择器；真机未复测（adb 无设备） |

@@ -130,6 +130,11 @@ fun SettingsScreen(onBack: () -> Unit, onErrorCodes: () -> Unit = {}) {
             OutlinedButton(onClick = {
                 restorePicker.launch(arrayOf("application/zip", "*/*"))
             }) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_backup_restore)) }
+            OutlinedButton(onClick = {
+                val removed = BackupService.prune(context.filesDir, 5)
+                stats = StorageStats.scan(context.filesDir, context.cacheDir)
+                cleaned = context.getString(dev.ninfenz.mobile.R.string.settings_backup_pruned, removed)
+            }) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_backup_prune)) }
             lastSnapshot?.let { snapshot ->
                 OutlinedButton(onClick = {
                     scope.launch {
