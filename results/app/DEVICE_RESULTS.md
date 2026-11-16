@@ -25,6 +25,7 @@
 | 备份未列条目拒绝（JVM） | pass（本机）：manifest 未列出的 zip 条目导致 inspect 失败；BackupRestoreServiceTest 5 条。真机未复测（adb 无设备） |
 | 全量复核（round161） | pass（本机）：verify.sh PASS=107 WARN=2 FAIL=0；app gates QA0–QA6 PASS，gap=0，P0=0；lint 0 warnings。 |
 | 全量复核（round15） | pass（本机）：verify PASS=107 WARN=2 FAIL=0；app gates QA0–QA6 PASS，gap=0，P0=0。 |
+| HTML 导出图片（JVM） | pass（本机）：Markdown 图片安全协议转 img，危险协议保留原文；测试 10 条。真机未复测（adb 无设备） |
 | DOCX 文档大小上限（JVM） | pass（本机）：document.xml >64MiB 拒绝；301 tests 全绿。真机未复测（adb 无设备） |
 | 项目包深层目录（JVM） | pass（本机）：项目 JSON 深度 ≤4 的包可导入；测试 12 条。真机未复测（adb 无设备） |
 | DOCX 超链接（JVM） | pass（本机）：r:id + document.xml.rels 转 Markdown 链接；测试 6 条。真机未复测（adb 无设备） |
@@ -96,7 +97,7 @@
 | 依赖升级 coroutines（JVM） | pass（本机）：coroutines 1.9.0→1.10.2，243 tests 全绿；lint warnings 3→2；debug APK 因未压缩 dex 增至 24.7MB。真机未复测（adb 无设备） |
 | Clean build（本轮） | pass（本机）：`gradlew clean` + `testDebugUnitTest --rerun-tasks` + assembleDebug；248/248 全绿；clean APK 19,032,264 B sha256 f4501bfe…；zipalign 16KB 通过。增量 APK 24.7MB 为旧构建膨胀，clean 产物为准。 |
 | Rust core 单测（本轮） | pass（本机）：`cargo test` 186 passed / 0 failed；Android 端无 core 改动。 |
-| Release 构建（构建） | pass（本机）：clean 后重建 `:app:assembleRelease` 成功；app-release-unsigned.apk 15,265,601 B sha256 34d1b90c…；zipalign 16KB 通过；apksigner 显示未签名（预期，签名 OPEN-EXTERNAL）。 |
+| Release 构建（构建） | pass（本机）：clean 后重建 `:app:assembleRelease` 成功；app-release-unsigned.apk 15,265,601 B sha256 2d87cc10…；zipalign 16KB 通过；apksigner 显示未签名（预期，签名 OPEN-EXTERNAL）。 |
 | 16KB 页对齐（构建） | pass（本机）：`zipalign -c -P 16 4 app-debug.apk` exit=0；未真机安装验证。 |
 | APP 门禁（round127） | pass（本机）：QA0–QA6 全 PASS，FAIL=0；covered=14 gap=0 open=2 p0=0；台账刷新到当前 HEAD。 |
 | APP 门禁（本轮） | pass（本机）：QA0–QA6 全部 PASS，FAIL=0；自审计 covered=14 gap=0 open=2 p0=0。 |

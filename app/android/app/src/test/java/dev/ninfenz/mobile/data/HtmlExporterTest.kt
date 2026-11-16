@@ -71,6 +71,15 @@ class HtmlExporterTest {
     }
 
     @Test
+    fun rendersSafeImages() {
+        val dir = Files.createTempDirectory("nf-html-img").toFile()
+        val created = HtmlExporter.export("![图](https://e/x.png) ![坏](javascript:x)", "t", dir)
+        val text = created.file.readText()
+        assertTrue(text.contains("<img src=\"https://e/x.png\" alt=\"图\"/>"))
+        assertTrue(text.contains("![坏](javascript:x)"))
+    }
+
+    @Test
     fun handlesCodeFence() {
         val dir = Files.createTempDirectory("nf-html-2").toFile()
         val created = HtmlExporter.export("\u0060\u0060\u0060\ncode\n\u0060\u0060\u0060", "t", dir)

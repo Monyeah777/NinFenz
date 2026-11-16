@@ -136,6 +136,14 @@ object HtmlExporter {
         text = Regex("\\*\\*([^*]+)\\*\\*").replace(text, "<strong>$1</strong>")
         text = Regex("\\*([^*]+)\\*").replace(text, "<em>$1</em>")
         text = Regex("~~([^~]+)~~").replace(text, "<del>$1</del>")
+        text = Regex("!\\[([^\\]]*)\\]\\(([^)]+)\\)").replace(text) { match ->
+            val src = match.groupValues[2]
+            if (src.startsWith("http://") || src.startsWith("https://") || src.startsWith("data:image/")) {
+                "<img src=\"" + src + "\" alt=\"" + match.groupValues[1] + "\"/>"
+            } else {
+                match.value
+            }
+        }
         text = Regex("\\[([^\\]]+)\\]\\(([^)]+)\\)").replace(text) { match ->
             val href = match.groupValues[2]
             if (href.startsWith("http://") || href.startsWith("https://") || href.startsWith("mailto:") || href.startsWith("#")) {
