@@ -54,6 +54,21 @@ class BackupRestoreServiceTest {
     }
 
     @Test
+    fun rejectsUnlistedExtraEntry() {
+        val dir = Files.createTempDirectory("nf-restore-extra").toFile()
+        val bad = File(dir, "bad.zip")
+        val data = "hello".toByteArray()
+        val sha = ProjectPackage.sha256(data)
+        ZipOutputStream(bad.outputStream()).use { out ->
+            val manifest = "{\"schema\":\"nf-backup/1\",\"files\":[{\"path\":\"projects/a\",\"bytes\":5,\"sha256\":\"" + sha + "\"}]}"
+            out.putNextEntry(ZipEntry("manifest.json")); out.write(manifest.toByteArray()); out.closeEntry()
+            out.putNextEntry(ZipEntry("projects/a")); out.write(data); out.closeEntry()
+            out.putNextEntry(ZipEntry("extra.txt")); out.write("x".toByteArray()); out.closeEntry()
+        }
+        assertFalse(BackupRestoreService.inspect(bad).ok)
+    }
+
+    @Test
     fun rejectsPathTraversalEntry() {
         val dir = Files.createTempDirectory("nf-restore-bad").toFile()
         val bad = File(dir, "bad.zip")

@@ -37,6 +37,12 @@ object BackupRestoreService {
                     )
                 } ?: emptyList()
                 if (entries.isEmpty()) return Inspect(emptyList(), true)
+                val listed = entries.map { it.path }.toSet()
+                val actual = zip.entries().asSequence()
+                    .filter { !it.isDirectory && it.name != "manifest.json" }
+                    .map { it.name }
+                    .toSet()
+                if (actual != listed) return Inspect(entries, false, "manifest 与备份条目不一致")
                 val seen = mutableSetOf<String>()
                 for (e in entries) {
                     if (!safePath(e.path)) return Inspect(entries, false, "非法路径：" + e.path)
