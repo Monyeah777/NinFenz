@@ -16,6 +16,12 @@ class TextEncodingTest {
     }
 
     @Test
+    fun detectsUtf16WithoutBom() {
+        val bytes = "{\"a\":1}".toByteArray(Charset.forName("UTF-16LE"))
+        assertEquals("{\"a\":1}", TextEncoding.decode(bytes)?.text)
+    }
+
+    @Test
     fun decodesUtf8BomAndIgnoresPlainText() {
         val bytes = byteArrayOf(0xEF.toByte(), 0xBB.toByte(), 0xBF.toByte()) + "hi".toByteArray()
         assertEquals("hi", TextEncoding.decode(bytes)?.text)

@@ -3,7 +3,7 @@ package dev.ninfenz.mobile.data
 import java.io.File
 import java.nio.charset.Charset
 
-/** 文本编码识别：带 BOM 的 UTF-8/UTF-16 统一转成 UTF-8；无 BOM 返回 null。 */
+/** 文本编码识别：带 BOM 的 UTF-8/UTF-16 统一转成 UTF-8；另按 NUL 分布识别无 BOM UTF-16；其余返回 null。 */
 object TextEncoding {
     data class Decoded(val text: String, val encoding: String)
 
@@ -16,6 +16,21 @@ object TextEncoding {
         }
         if (bytes.size >= 2 && bytes[0] == 0xFE.toByte() && bytes[1] == 0xFF.toByte()) {
             return Decoded(String(bytes, 2, bytes.size - 2, Charset.forName("UTF-16BE")), "UTF-16BE")
+        }
+        if (bytes.size >= 8) {
+            var oddZero = 0
+            var evenZero = 0
+            for (i in bytes.indices) {
+                if (bytes[i] == 0.toByte()) {
+                    if (i % 2 == 0) evenZero++ else oddZero++
+                }
+            }
+            if (oddZero > bytes.size / 3 && evenZero < bytes.size / 10) {
+                return Decoded(String(bytes, Charset.forName("UTF-16LE")), "UTF-16LE")
+            }
+            if (evenZero > bytes.size / 3 && oddZero < bytes.size / 10) {
+                return Decoded(String(bytes, Charset.forName("UTF-16BE")), "UTF-16BE")
+            }
         }
         return null
     }
