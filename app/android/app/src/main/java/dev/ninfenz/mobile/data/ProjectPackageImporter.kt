@@ -19,6 +19,14 @@ object ProjectPackageImporter {
         val packVersion: String
     )
 
+    fun hasProjectJson(zipFile: File): Boolean = try {
+        if (!zipFile.isFile) false else ZipFile(zipFile).use { zip ->
+            zip.entries().asSequence().any { !it.isDirectory && it.name.endsWith(".nfproject.json") && !it.name.contains('/') }
+        }
+    } catch (t: Throwable) {
+        false
+    }
+
     fun import(filesDir: File, zipFile: File): Imported {
         require(zipFile.isFile) { "zip 不存在" }
         val projectsDir = File(filesDir, "projects").apply { mkdirs() }

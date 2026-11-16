@@ -387,6 +387,10 @@ is Detail.Import -> ImportScreen(
                         },
                         onPrefillConsumed = { sharedPrefill = null },
                         packs = packs.packs,
+                        onProjectImported = { id ->
+                            refresh()
+                            shell = shell.open(Detail.Project(id))
+                        },
                         onCreateProjectFromDraft = { pack, title, draft ->
                             scope.launch {
                                 when (val result = projectCreator.create(pack, title)) {

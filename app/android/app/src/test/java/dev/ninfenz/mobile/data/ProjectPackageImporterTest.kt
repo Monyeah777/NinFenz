@@ -57,6 +57,14 @@ class ProjectPackageImporterTest {
     }
 
     @Test
+    fun detectsProjectPackage() {
+        val root = Files.createTempDirectory("nf-project-detect").toFile()
+        val zip = zip(listOf("p.nfproject.json" to doc))
+        assertTrue(ProjectPackageImporter.hasProjectJson(zip))
+        assertTrue(!ProjectPackageImporter.hasProjectJson(zip(listOf("data/a.txt" to "x"))))
+    }
+
+    @Test
     fun rejectsTraversal() {
         val root = Files.createTempDirectory("nf-import-project-3").toFile()
         assertTrue(runCatching { ProjectPackageImporter.import(root, zip(listOf("../evil.nfproject.json" to doc))) }.isFailure)

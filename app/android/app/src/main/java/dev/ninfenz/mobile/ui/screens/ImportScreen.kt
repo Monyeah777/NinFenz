@@ -42,6 +42,7 @@ import dev.ninfenz.mobile.core.CoreResponse
 import dev.ninfenz.mobile.core.J
 import dev.ninfenz.mobile.data.DraftLibrary
 import dev.ninfenz.mobile.data.PackEntry
+import dev.ninfenz.mobile.data.ProjectPackageImporter
 import dev.ninfenz.mobile.data.ShareQueueStore
 import dev.ninfenz.mobile.data.FileAccess
 import dev.ninfenz.mobile.data.ImportDraftStore
@@ -80,7 +81,8 @@ fun ImportScreen(
     onBack: () -> Unit,
     onPrefillConsumed: () -> Unit = {},
     packs: List<PackEntry> = emptyList(),
-    onCreateProjectFromDraft: (PackEntry, String, File) -> Unit = { _, _, _ -> }
+    onCreateProjectFromDraft: (PackEntry, String, File) -> Unit = { _, _, _ -> },
+    onProjectImported: (String) -> Unit = {}
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -127,6 +129,16 @@ fun ImportScreen(
     }
 
     suspend fun importFromFile(file: File, sourceKind: String, name: String, mime: String?, size: Long) {
+        if (file.name.endsWith(".zip", ignoreCase = true) && ProjectPackageImporter.hasProjectJson(file)) {
+            try {
+                val imported = withContext(Dispatchers.IO) { ProjectPackageImporter.import(context.filesDir, file) }
+                notice = context.getString(dev.ninfenz.mobile.R.string.import_project_package_done, imported.id, imported.dataFiles)
+                onProjectImported(imported.id)
+            } catch (t: Throwable) {
+                error = CoreResponse.failure("NF-PRJ-001", "项目包导入失败：" + (t.message ?: t.javaClass.simpleName), "确认 zip 为完整项目包", 2).error
+            }
+            return
+        }
         busy = true
         error = null
         notice = null
