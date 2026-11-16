@@ -597,6 +597,12 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="import_draft_to_project">To project</string>
     <string name="import_project_failed">Project package import failed: %1$s</string>
     <string name="import_project_failed_fix">Confirm the zip is a complete project package</string>
+    <string name="import_parse_failed">nf-import/1 parse failed: %1$s</string>
+    <string name="import_parse_failed_fix">Check that core output satisfies app/schema/nf-import.schema.json</string>
+    <string name="import_sample_read_failed">Failed to read sample content: %1$s</string>
+    <string name="import_sample_read_failed_fix">Check APK assets/sample-pack/docs/sample.md</string>
+    <string name="import_share_empty">Shared payload has no importable item</string>
+    <string name="import_share_empty_fix">Try a different share method</string>
     <string name="import_clipboard_empty">Clipboard is empty</string>
     <string name="import_clipboard_empty_fix">Copy some text first</string>
     <string name="import_raw_missing">Raw core response missing; refusing to substitute re-serialized output</string>

@@ -248,8 +248,8 @@ fun ImportScreen(
                 } catch (e: Exception) {
                     error = CoreResponse.failure(
                         (e as? dev.ninfenz.mobile.core.ModelException)?.code ?: "NF-E-002",
-                        "nf-import/1 解析失败：" + (e.message ?: e.javaClass.simpleName),
-                        "检查核心输出是否满足 app/schema/nf-import.schema.json",
+                        context.getString(dev.ninfenz.mobile.R.string.import_parse_failed, e.message ?: e.javaClass.simpleName),
+                        context.getString(dev.ninfenz.mobile.R.string.import_parse_failed_fix),
                         1
                     ).error
                 }
@@ -289,7 +289,7 @@ fun ImportScreen(
                 file.writeText(text, Charsets.UTF_8)
                 importFromFile(file, "file", "sample.md", "text/markdown", text.toByteArray(Charsets.UTF_8).size.toLong())
             } catch (t: Throwable) {
-                error = CoreResponse.failure("NF-E-004", "读取示例内容失败：" + (t.message ?: t.javaClass.simpleName), "检查 APK assets/sample-pack/docs/sample.md", 2).error
+                error = CoreResponse.failure("NF-E-004", context.getString(dev.ninfenz.mobile.R.string.import_sample_read_failed, t.message ?: t.javaClass.simpleName), context.getString(dev.ninfenz.mobile.R.string.import_sample_read_failed_fix), 2).error
             }
         }
     }
@@ -326,7 +326,7 @@ fun ImportScreen(
         shareCursor = 0
         val item = payload.items.firstOrNull()
         if (item == null) {
-            error = CoreResponse.failure("NF-IMP-001", "分享载荷无可导入条目", "换一种分享方式", 3).error
+            error = CoreResponse.failure("NF-IMP-001", context.getString(dev.ninfenz.mobile.R.string.import_share_empty), context.getString(dev.ninfenz.mobile.R.string.import_share_empty_fix), 3).error
             return
         }
         importSharedItem(item)
