@@ -28,6 +28,13 @@ class HtmlImporterTest {
     }
 
     @Test
+    fun convertsOrderedList() {
+        val md = HtmlImporter.toMarkdown("<ol><li>一</li><li>二</li></ol>")
+        assertTrue(md.contains("1. 一"))
+        assertTrue(md.contains("2. 二"))
+    }
+
+    @Test
     fun removesScriptAndStyle() {
         val md = HtmlImporter.toMarkdown("<style>x{}</style><script>alert(1)</script><p>正文</p>")
         assertTrue(md.contains("正文"))

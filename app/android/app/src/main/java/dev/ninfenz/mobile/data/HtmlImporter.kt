@@ -13,6 +13,12 @@ object HtmlImporter {
         text = Regex("(?is)<table[^>]*>(.*?)</table>").replace(text) { m ->
             "\n\n" + table(m.groupValues[1]) + "\n\n"
         }
+        text = Regex("(?is)<ol[^>]*>(.*?)</ol>").replace(text) { m ->
+            val items = Regex("(?is)<li[^>]*>(.*?)</li>").findAll(m.groupValues[1]).map {
+                strip(it.groupValues[1]).trim()
+            }.toList()
+            "\n" + items.mapIndexed { i, item -> "${i + 1}. $item" }.joinToString("\n") + "\n"
+        }
         text = Regex("(?is)<li[^>]*>(.*?)</li>").replace(text) { m ->
             "\n- " + strip(m.groupValues[1]).trim()
         }

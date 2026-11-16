@@ -24,6 +24,7 @@
 | 门禁/ lint 复核（round143） | pass（本机）：QA0–QA6 全 PASS，FAIL=0，covered=14 gap=0 open=2 p0=0；lint warnings=1（仅 Paparazzi 版本，Kotlin 2.1 阻塞）。 |
 | 备份未列条目拒绝（JVM） | pass（本机）：manifest 未列出的 zip 条目导致 inspect 失败；BackupRestoreServiceTest 5 条。真机未复测（adb 无设备） |
 | 全量复核（round161） | pass（本机）：verify.sh PASS=107 WARN=2 FAIL=0；app gates QA0–QA6 PASS，gap=0，P0=0；lint 0 warnings。 |
+| HTML 有序列表导入（JVM） | pass（本机）：ol/li → 1./2. 有序列表；测试 4 条。真机未复测（adb 无设备） |
 | HTML 表格/链接导入（JVM） | pass（本机）：table → Markdown 管道表、a href → Markdown 链接；测试 3 条。真机未复测（adb 无设备） |
 | HTML 导入（JVM） | pass（本机）：html/htm 去脚本样式后转 Markdown 交 core import；测试 2 条。真机未复测（adb 无设备） |
 | 备份单条上限（JVM） | pass（本机）：单条声明 >256MiB 拒绝 inspect；备份测试 9 条。真机未复测（adb 无设备） |
@@ -72,7 +73,7 @@
 | 依赖升级 coroutines（JVM） | pass（本机）：coroutines 1.9.0→1.10.2，243 tests 全绿；lint warnings 3→2；debug APK 因未压缩 dex 增至 24.7MB。真机未复测（adb 无设备） |
 | Clean build（本轮） | pass（本机）：`gradlew clean` + `testDebugUnitTest --rerun-tasks` + assembleDebug；248/248 全绿；clean APK 19,032,264 B sha256 f4501bfe…；zipalign 16KB 通过。增量 APK 24.7MB 为旧构建膨胀，clean 产物为准。 |
 | Rust core 单测（本轮） | pass（本机）：`cargo test` 186 passed / 0 failed；Android 端无 core 改动。 |
-| Release 构建（构建） | pass（本机）：clean 后重建 `:app:assembleRelease` 成功；app-release-unsigned.apk 15,265,601 B sha256 23a05d59…；zipalign 16KB 通过；apksigner 显示未签名（预期，签名 OPEN-EXTERNAL）。 |
+| Release 构建（构建） | pass（本机）：clean 后重建 `:app:assembleRelease` 成功；app-release-unsigned.apk 15,265,601 B sha256 f32d57e9…；zipalign 16KB 通过；apksigner 显示未签名（预期，签名 OPEN-EXTERNAL）。 |
 | 16KB 页对齐（构建） | pass（本机）：`zipalign -c -P 16 4 app-debug.apk` exit=0；未真机安装验证。 |
 | APP 门禁（round127） | pass（本机）：QA0–QA6 全 PASS，FAIL=0；covered=14 gap=0 open=2 p0=0；台账刷新到当前 HEAD。 |
 | APP 门禁（本轮） | pass（本机）：QA0–QA6 全部 PASS，FAIL=0；自审计 covered=14 gap=0 open=2 p0=0。 |
