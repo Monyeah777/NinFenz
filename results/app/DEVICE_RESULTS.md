@@ -17,6 +17,7 @@
 | L1 校验 | pass：L1 pass（error=0 warn=0 info=3）；状态 assembled→validated 写回 | run-as 读项目 |
 | 导出 md/zip | pass：files/exports/delivery/result.md + result.zip + manifest；状态 validated→exported 写回 | run-as 读文件 |
 | 桌面快捷方式（构建） | pass（构建）：静态 shortcuts（导入/新建/搜索）+ MainActivity 冷启动/onNewIntent 路由；未真机长按图标验证（adb 无设备） |
+| 分享队列持久化（JVM） | pass（本机）：多条目分享队列/游标存 share-queue.json，进程死亡后恢复；忽略/清空时删除；测试 2 条。真机未复测（adb 无设备） |
 | 草稿转项目（JVM） | pass（本机）：草稿行选 Pack 后创建项目，并把草稿副本写入项目 authoring/import-*.json 作为来源；项目壳+来源副本，未把导入内容写入协议字段（partial）。测试 2 条。真机未复测（adb 无设备） |
 | 恢复中禁止 dismiss（JVM） | pass（本机）：restoring 期间点击对话框外部不关闭；真机未复测（adb 无设备） |
 | 恢复中进度/防重复（JVM） | pass（本机）：恢复确认后按钮/取消禁用并显示进度条，完成/失败复位；真机未复测（adb 无设备） |

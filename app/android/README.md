@@ -113,6 +113,7 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 - LibraryViewStoreTest（2）：状态过滤/排序存取清空、坏 JSON 容错。
 - DraftLibraryTest（4）：只列真实草稿、缺目录为空、删除含 mapping、重命名/冲突拒绝。
 - DraftProjectBinderTest（2）：草稿副本写入项目 authoring；缺项目/草稿拒绝。
+- ShareQueueStoreTest（2）：多条目队列/游标存取、空/坏 JSON 容错。
 - AuthorOverlayStoreTest（2）：overlay 形状；保存后 refs.overlay/status=authoring/history 更新。
 - ProjectStatusStoreTest（2）：draft→validated 逐步 history；核心失败不写盘。
 - DesignTokenTest（3）：间距 4 倍数、shape 梯度、7 档字号/行高。
@@ -169,7 +170,7 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 
 - v0.02 W6（2026-11-15）：`./gradlew :app:assembleDebug` 成功：app-debug.apk = 21,710,750 bytes，
   sha256 = cd5287a2094b8ef8db12a502917c2b8e35cc53aafcd3c0976c16a553727eafa0（含双 ABI 原生库 + 9 个示例 Pack assets）。
-- `./gradlew :app:testDebugUnitTest` 全绿：234 条 JVM 单测（v1 42 + v0.02 192；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y/大字号/对比度/Paparazzi 截图）。
+- `./gradlew :app:testDebugUnitTest` 全绿：236 条 JVM 单测（v1 42 + v0.02 194；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y/大字号/对比度/Paparazzi 截图）。
 - `zipalign -c -P 16 -v 4 app-debug.apk` → Verification successful（native lib 16KB page 对齐）。
 - `bash app/scripts/build_core_android.sh --clean` 成功：NDK 27.0.12077973 + rustup targets
   （aarch64-linux-android / x86_64-linux-android，经 rsproxy 镜像安装）；两个 .so 的 LOAD align 均为 0x4000。

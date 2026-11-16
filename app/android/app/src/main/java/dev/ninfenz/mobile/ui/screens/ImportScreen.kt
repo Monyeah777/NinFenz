@@ -41,6 +41,7 @@ import dev.ninfenz.mobile.core.CoreResponse
 import dev.ninfenz.mobile.core.J
 import dev.ninfenz.mobile.data.DraftLibrary
 import dev.ninfenz.mobile.data.PackEntry
+import dev.ninfenz.mobile.data.ShareQueueStore
 import dev.ninfenz.mobile.data.FileAccess
 import dev.ninfenz.mobile.data.ImportDraftStore
 import dev.ninfenz.mobile.data.ImportHistoryStore
@@ -89,8 +90,13 @@ fun ImportScreen(
     var busy by remember { mutableStateOf(false) }
     var savedName by remember { mutableStateOf<String?>(null) }
     var prefillNote by remember { mutableStateOf<String?>(null) }
-    var shareQueue by remember { mutableStateOf<List<SharedItem>>(emptyList()) }
-    var shareCursor by remember { mutableStateOf(0) }
+    val shareQueueStore = remember { ShareQueueStore(context.filesDir) }
+    val savedQueue = remember { shareQueueStore.load() }
+    var shareQueue by remember { mutableStateOf(savedQueue?.items ?: emptyList<SharedItem>()) }
+    var shareCursor by remember { mutableStateOf(savedQueue?.cursor ?: 0) }
+    LaunchedEffect(shareQueue, shareCursor) {
+        if (shareQueue.isEmpty()) shareQueueStore.clear() else shareQueueStore.save(shareQueue, shareCursor)
+    }
     var acceptedMappings by remember { mutableStateOf<Set<Int>>(emptySet()) }
     var suggestNote by remember { mutableStateOf<String?>(null) }
     val importHistory = remember { ImportHistoryStore(context.filesDir) }
