@@ -50,6 +50,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import dev.ninfenz.mobile.model.CommandPalette
@@ -68,6 +70,7 @@ import dev.ninfenz.mobile.data.DraftProjectBinder
 import dev.ninfenz.mobile.data.ProjectDuplicator
 import dev.ninfenz.mobile.data.ProjectRenamer
 import dev.ninfenz.mobile.data.ProjectPackage
+import dev.ninfenz.mobile.data.ProjectPackageImporter
 import dev.ninfenz.mobile.data.ProjectReviewStore
 import dev.ninfenz.mobile.share.ShareExporter
 import dev.ninfenz.mobile.data.ProjectEntry
@@ -178,6 +181,28 @@ fun NfMobileApp(
         }
     }
 
+    val projectImportLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) {
+            scope.launch {
+                val result = runCatching {
+                    val temp = File(File(context.cacheDir, "imports").apply { mkdirs() }, "project.zip")
+                    withContext(Dispatchers.IO) {
+                        context.contentResolver.openInputStream(uri)?.use { input ->
+                            temp.outputStream().use { output -> input.copyTo(output) }
+                        }
+                        ProjectPackageImporter.import(context.filesDir, temp)
+                    }
+                }
+                result.onSuccess { imported ->
+                    refresh()
+                    shell = shell.open(Detail.Project(imported.id))
+                }.onFailure {
+                    android.widget.Toast.makeText(context, "项目包导入失败：" + (it.message ?: it.javaClass.simpleName), android.widget.Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
+
     fun runSeed() {
         if (seeding) return
         seeding = true
@@ -201,6 +226,7 @@ fun NfMobileApp(
             "ccos" -> shell = shell.open(Detail.Ccos)
             "settings" -> shell = shell.open(Detail.Settings)
             "error_codes" -> shell = shell.open(Detail.ErrorCodes)
+            "project_import" -> projectImportLauncher.launch(arrayOf("application/zip", "*/*"))
         }
     }
 
@@ -602,7 +628,8 @@ is Detail.Import -> ImportScreen(
             CommandPalette.Item("pack_update", stringResource(dev.ninfenz.mobile.R.string.pack_detail_update)),
             CommandPalette.Item("ccos", stringResource(dev.ninfenz.mobile.R.string.ccos_title)),
             CommandPalette.Item("settings", stringResource(dev.ninfenz.mobile.R.string.settings_title)),
-            CommandPalette.Item("error_codes", stringResource(dev.ninfenz.mobile.R.string.error_codes_title))
+            CommandPalette.Item("error_codes", stringResource(dev.ninfenz.mobile.R.string.error_codes_title)),
+            CommandPalette.Item("project_import", stringResource(dev.ninfenz.mobile.R.string.project_import_command))
         )
         CommandPaletteDialog(CommandPalette.order(items, recentCommands), onDismiss = { showCommands = false }, onRun = ::runCommand)
     }

@@ -1,0 +1,51 @@
+package dev.ninfenz.mobile.data
+
+import java.io.File
+import java.nio.file.Files
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Test
+
+class ProjectPackageImporterTest {
+    private fun zip(entries: List<Pair<String, String>>): File {
+        val f = File.createTempFile("nf-project", ".zip")
+        ZipOutputStream(f.outputStream()).use { out ->
+            entries.forEach { (name, text) ->
+                out.putNextEntry(ZipEntry(name)); out.write(text.toByteArray()); out.closeEntry()
+            }
+        }
+        return f
+    }
+
+    private val doc = "{\"schema\":\"nf-project/1\",\"id\":\"p\",\"title\":\"p\",\"refs\":{" +
+        "\"base_pack\":{\"id\":\"pack\",\"version\":\"1.0.0\"}," +
+        "\"protocol\":{\"id\":\"proto\",\"digest\":\"0000\"}," +
+        "\"graph\":{\"digest\":\"1111\"},\"spec\":{\"digest\":\"2222\"}}," +
+        "\"status\":\"draft\",\"review\":{\"state\":\"pending\"},\"history\":[]}"
+
+    @Test
+    fun importsJsonAndData() {
+        val root = Files.createTempDirectory("nf-import-project").toFile()
+        val imported = ProjectPackageImporter.import(root, zip(listOf("p.nfproject.json" to doc, "data/authoring/assembly.md" to "body")))
+        assertEquals("p", imported.id)
+        assertEquals("body", File(root, "projects/p/authoring/assembly.md").readText())
+    }
+
+    @Test
+    fun doesNotOverwriteExistingId() {
+        val root = Files.createTempDirectory("nf-import-project-2").toFile()
+        File(root, "projects").mkdirs()
+        File(root, "projects/p.nfproject.json").writeText(doc)
+        val imported = ProjectPackageImporter.import(root, zip(listOf("p.nfproject.json" to doc)))
+        assertTrue(imported.id != "p")
+        assertTrue(File(root, "projects/p.nfproject.json").readText().contains("\"p\""))
+    }
+
+    @Test
+    fun rejectsTraversal() {
+        val root = Files.createTempDirectory("nf-import-project-3").toFile()
+        assertTrue(runCatching { ProjectPackageImporter.import(root, zip(listOf("../evil.nfproject.json" to doc))) }.isFailure)
+    }
+}
