@@ -80,13 +80,22 @@ fun HomeScreen(store: LibraryStore, onOpen: (Screen) -> Unit) {
                             if (!ok) {
                                 installError = context.getString(dev.ninfenz.mobile.R.string.pack_install_move_failed, target.absolutePath)
                             } else {
-                                message = "已安装 pack " + id + " " + version + "（" + count + " 个文件）"
+                                message = context.getString(
+                                    dev.ninfenz.mobile.R.string.pack_install_done,
+                                    id,
+                                    version,
+                                    count
+                                )
                                 val verify = if (Core.diagnostics().nativeReady) {
-                                    "核心在场：可在装配/Pack 更新屏继续校验（core pack-verify）"
+                                    context.getString(dev.ninfenz.mobile.R.string.pack_install_core_ready)
                                 } else {
-                                    "核心缺失（NF-E-005）：安装完成但未做摘要校验"
+                                    context.getString(dev.ninfenz.mobile.R.string.pack_install_core_missing)
                                 }
-                                message = (message ?: "") + "；" + verify
+                                message = context.getString(
+                                    dev.ninfenz.mobile.R.string.pack_install_done_with_status,
+                                    message ?: "",
+                                    verify
+                                )
                             }
                         }
                     }

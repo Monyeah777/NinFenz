@@ -570,6 +570,10 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="pack_install_duplicate">Same id+version already exists (NF-PCK-004): %1$s %2$s, not overwritten</string>
     <string name="pack_install_move_failed">Move to %1$s failed</string>
     <string name="pack_install_failed">Install failed: %1$s</string>
+    <string name="pack_install_done">Installed pack %1$s %2$s (%3$d files)</string>
+    <string name="pack_install_done_with_status">%1$s; %2$s</string>
+    <string name="pack_install_core_ready">Core available: verify further in Assembly/Pack update (core pack-verify)</string>
+    <string name="pack_install_core_missing">Core missing (NF-E-005): installed but digest not verified</string>
     <string name="import_epub_failed">EPUB parse failed or no text</string>
     <string name="import_epub_failed_fix">Confirm EPUB contains container/OPF/XHTML chapters</string>
     <string name="import_docx_failed">DOCX parse failed or no text</string>

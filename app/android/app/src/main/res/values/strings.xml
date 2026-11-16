@@ -570,6 +570,10 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="pack_install_duplicate">同 id+version 已存在（NF-PCK-004）：%1$s %2$s，未覆盖</string>
     <string name="pack_install_move_failed">移动到 %1$s 失败</string>
     <string name="pack_install_failed">安装失败：%1$s</string>
+    <string name="pack_install_done">已安装 pack %1$s %2$s（%3$d 个文件）</string>
+    <string name="pack_install_done_with_status">%1$s；%2$s</string>
+    <string name="pack_install_core_ready">核心在场：可在装配/Pack 更新屏继续校验（core pack-verify）</string>
+    <string name="pack_install_core_missing">核心缺失（NF-E-005）：安装完成但未做摘要校验</string>
     <string name="import_epub_failed">EPUB 解析失败或无正文</string>
     <string name="import_epub_failed_fix">确认 EPUB 含 container/OPF/XHTML 章节</string>
     <string name="import_docx_failed">DOCX 解析失败或无正文</string>
