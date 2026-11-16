@@ -28,6 +28,13 @@ android {
         buildConfig = true
     }
 
+    // 动态语言切换：AAB 不分语言拆包，避免运行期切 locale 缺资源
+    bundle {
+        language {
+            enableSplit = false
+        }
+    }
+
     // 16KB page：native lib 以未压缩、页对齐方式打包（AGP 8.10 起 useLegacyPackaging=false 为默认，仍显式钉住）
     packaging {
         jniLibs {
