@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -88,6 +89,7 @@ fun ImportScreen(
     val importHistory = remember { ImportHistoryStore(context.filesDir) }
     val importDraftStore = remember { ImportDraftStore(context.filesDir) }
     var drafts by remember { mutableStateOf(DraftLibrary.list(context.filesDir)) }
+    var pendingDeleteDraft by remember { mutableStateOf<File?>(null) }
     LaunchedEffect(Unit) {
         if (doc == null && rawResult == null && error == null) {
             val raw = withContext(Dispatchers.IO) { importDraftStore.load() }
@@ -482,6 +484,9 @@ fun ImportScreen(
                                             }
                                         }
                                     }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_open_draft)) }
+                                    TextButton(onClick = { pendingDeleteDraft = draft }) {
+                                        Text(stringResource(dev.ninfenz.mobile.R.string.import_delete_draft))
+                                    }
                                 }
                             }
                         }
@@ -499,5 +504,25 @@ fun ImportScreen(
                 }
             }
         }
+    }
+
+    pendingDeleteDraft?.let { draft ->
+        AlertDialog(
+            onDismissRequest = { pendingDeleteDraft = null },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.import_delete_draft)) },
+            text = { Text(stringResource(dev.ninfenz.mobile.R.string.import_delete_draft_body, draft.name)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    val base = draft.name.removeSuffix(".json")
+                    DraftLibrary.delete(draft)
+                    drafts = DraftLibrary.list(context.filesDir)
+                    if (savedName == base) savedName = null
+                    pendingDeleteDraft = null
+                }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_delete_draft)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { pendingDeleteDraft = null }) { Text(stringResource(android.R.string.cancel)) }
+            }
+        )
     }
 }

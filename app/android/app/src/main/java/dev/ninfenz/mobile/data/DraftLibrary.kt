@@ -21,4 +21,21 @@ object DraftLibrary {
     } catch (t: Throwable) {
         null
     }
+
+    fun delete(file: File): Boolean {
+        val mapping = File(file.parentFile, file.name.removeSuffix(".json") + ".mapping.json")
+        mapping.delete()
+        return file.delete()
+    }
+
+    fun rename(file: File, newBase: String): File {
+        val safe = newBase.trim().replace(Regex("[^A-Za-z0-9._-]"), "_").ifBlank { "draft" }
+        val target = File(file.parentFile, safe + ".json")
+        require(target != file) { "文件名未变化" }
+        require(!target.exists()) { "同名草稿已存在" }
+        require(file.renameTo(target)) { "重命名失败" }
+        val oldMapping = File(file.parentFile, file.name.removeSuffix(".json") + ".mapping.json")
+        if (oldMapping.isFile) oldMapping.renameTo(File(file.parentFile, safe + ".mapping.json"))
+        return target
+    }
 }

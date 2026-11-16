@@ -490,6 +490,8 @@
     <string name="import_share_ignore">Ignore rest</string>
     <string name="import_saved_drafts">Saved drafts</string>
     <string name="import_open_draft">Open</string>
+    <string name="import_delete_draft">Delete</string>
+    <string name="import_delete_draft_body">Delete draft %1$s? Its mapping sidecar will also be removed.</string>
     <string name="pack_trust_pinned">Local trust: current tree pinned</string>
     <string name="pack_trust_unpinned">Local trust: not pinned (local marker, not a signature)</string>
     <string name="pack_trust_pin">Pin as trusted</string>

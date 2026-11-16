@@ -490,6 +490,8 @@
     <string name="import_share_ignore">忽略其余</string>
     <string name="import_saved_drafts">已保存草稿</string>
     <string name="import_open_draft">打开</string>
+    <string name="import_delete_draft">删除</string>
+    <string name="import_delete_draft_body">确定删除草稿 %1$s？映射 sidecar 也会删除。</string>
     <string name="pack_trust_pinned">本地信任：已固定当前 tree</string>
     <string name="pack_trust_unpinned">本地信任：未固定（仅本地标记，非签名）</string>
     <string name="pack_trust_pin">固定为可信</string>
