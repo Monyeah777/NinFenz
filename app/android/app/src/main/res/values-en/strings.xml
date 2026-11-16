@@ -516,5 +516,9 @@
     <string name="project_archive_body">The project leaves the library list; its file stays in projects-archive/ and is not deleted.</string>
     <string name="project_archive_confirm">Archive</string>
     <string name="library_section_archive">Archived projects</string>
+    <string name="library_sort_label">Sort</string>
+    <string name="library_sort_recent">Recent</string>
+    <string name="library_sort_title">Title</string>
+    <string name="library_sort_status">Status</string>
     <string name="project_archive_restore">Restore</string>
 </resources>

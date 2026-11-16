@@ -64,6 +64,8 @@ import dev.ninfenz.mobile.model.ProjectFilter
 import dev.ninfenz.mobile.model.ProjectDiff
 import dev.ninfenz.mobile.model.ProjectHistoryExport
 import dev.ninfenz.mobile.model.ProjectModel
+import dev.ninfenz.mobile.model.ProjectSort
+import dev.ninfenz.mobile.model.ProjectSorter
 import dev.ninfenz.mobile.model.ProjectStatus
 import dev.ninfenz.mobile.share.ShareExporter
 import dev.ninfenz.mobile.ui.components.NfCard
@@ -101,8 +103,12 @@ fun LibraryHomeScreen(
     onRefresh: () -> Unit = {}
 ) {
     var statusFilter by rememberSaveable { mutableStateOf<String?>(null) }
+    var sortName by rememberSaveable { mutableStateOf(ProjectSort.RECENT.name) }
     val filterStatus = statusFilter?.let { ProjectStatus.fromWire(it) }
-    val filteredProjects = remember(projects, statusFilter) { ProjectFilter.apply(projects, filterStatus) }
+    val filterSort = ProjectSort.entries.firstOrNull { it.name == sortName } ?: ProjectSort.RECENT
+    val filteredProjects = remember(projects, statusFilter, sortName) {
+        ProjectSorter.sort(ProjectFilter.apply(projects, filterStatus), filterSort)
+    }
 
     Column(modifier = Modifier.fillMaxSize()) {
         NfTopAppBar(
@@ -158,6 +164,33 @@ fun LibraryHomeScreen(
                                 selected = filterStatus == status,
                                 onClick = { statusFilter = status.wire },
                                 label = { Text(projectStatusLabel(status)) }
+                            )
+                        }
+                    }
+                }
+            }
+            if (projects.isNotEmpty()) {
+                item {
+                    LazyRow(
+                        contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = NfSpacing.page),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        item {
+                            Text(stringResource(dev.ninfenz.mobile.R.string.library_sort_label), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 12.dp))
+                        }
+                        items(ProjectSort.entries) { mode ->
+                            FilterChip(
+                                selected = filterSort == mode,
+                                onClick = { sortName = mode.name },
+                                label = {
+                                    Text(
+                                        when (mode) {
+                                            ProjectSort.RECENT -> stringResource(dev.ninfenz.mobile.R.string.library_sort_recent)
+                                            ProjectSort.TITLE -> stringResource(dev.ninfenz.mobile.R.string.library_sort_title)
+                                            ProjectSort.STATUS -> stringResource(dev.ninfenz.mobile.R.string.library_sort_status)
+                                        }
+                                    )
+                                }
                             )
                         }
                     }
