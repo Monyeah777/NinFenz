@@ -1,7 +1,7 @@
 # NF APP 真机结果（DEVICE_RESULTS）
 
-> 设备：OnePlus PLF110，Android 16（SDK 36），1080×2392 / 480dpi；历史真机会话 serial 3B65AR0183V00000。
-> **2026-11-16 当前 `adb devices` 为空**：下表 2026-11-15 行是历史真机证据；本轮新增功能仅有 JVM/构建/门禁证据，真机矩阵仍 OPEN-TOOLCHAIN。
+> 设备：OnePlus PLF110，Android 16（SDK 36），1080×2392 / 480dpi；serial 3B65AR0183V00000。
+> **2026-11-17 真机已连接**：本轮新增安装/冷启动、WebView PDF、杀进程路由与槽位恢复实测（见第 6 节）；其余未跑项仍标 OPEN。
 > APK：0.2.0 / versionCode 2，minSdk 26 / target 36。本件只记实际跑过的项目；未跑项标 OPEN，不写成 pass。
 > 当前本机验证总览：Android JVM **372/372**、Rust core **198/198**、app Python **498 passed**、APP 门禁 QA0–QA6 PASS/gap=0、lint **0 warnings**、`verify.sh --checks-only` PASS=107/WARN=2/FAIL=0。
 
@@ -357,10 +357,21 @@
 - 撤销复测通过：F-002 由「冷静x」点撤销回到「冷静」；此前失败是键盘未收起时点到了键盘。
 - English 主题标签已资源化（System/Light/Dark）。
 - 新增盲区修复：jniLibs .so 陈旧导致 docx 被误报 NF-EXP-004；重跑 build_core_android.sh 后恢复。
-- CCOS：task/result 能加载；提交区已改固定底栏 + navigationBarsPadding，设备端最终复测仍待补。
+- CCOS：task/result 能加载；提交区已改固定底栏 + navigationBarsPadding；2026-11-17 未重跑评审提交，仍标待复测。
+- WebView PDF：2026-11-17 已在真机通过（见第 6 节）。
+- 杀进程恢复：2026-11-17 已用 run-as kill -9 + 最近任务重开验证路由/槽位草稿（见第 6 节）。
 - 分享 chooser 已真机通过（NEW_TASK 修复）。
 - 未跑：折叠屏（本机非折叠）、TalkBack 语音走查、对比度实测。
 - 本机无第二台设备/折叠屏，设备矩阵仍不完整。
+
+## 6. 2026-11-17 真机复核（OnePlus PLF110 / Android 16）
+
+| 项目 | 结果 | 证据 |
+|---|---|---|
+| 安装/冷启动 | pass：adb install -r 成功；冷启动 LaunchState=COLD，TotalTime=525ms，WaitTime=530ms；logcat 无 FATAL EXCEPTION | device_smoke.sh |
+| WebView PDF | pass：交付台导出 result.pdf 31,067 B；界面显示“PDF 结构校验通过（1 页）”“复现检查：两次导出一致”；经 FileProvider 分享到 Edge，页面可见“演示项目 / 开篇 / 正文 / 收束” | result.pdf、pdf-share-edge2.png |
+| 杀进程路由/槽位恢复 | pass：Home 后 run-as kill -9；最近任务重开；交付台路由保留，SLT-01 显示“已恢复上次槽位草稿”且内容恢复 | form-restored.png |
+| device_smoke 脚本 | 已修复：原 echo 中的 ADB 命令被 bash 当成算术展开，真机首跑报 unbound variable；改为普通命令替换 | app/scripts/device_smoke.sh |
 
 ## 5. 复跑入口
 

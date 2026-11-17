@@ -10,12 +10,12 @@ if ! "$ADB" devices | grep -q "device$"; then
   exit 2
 fi
 [ -f "$APK" ] || { echo "缺 APK：$APK" >&2; exit 2; }
-echo "[device] $(($ADB devices -l | sed -n "2p"))"
+echo "[device] $("$ADB" devices -l | sed -n '2p')"
 "$ADB" install -r "$APK" >/dev/null
 "$ADB" shell am force-stop "$PKG"
 "$ADB" shell am start -W -n "$ACT" | tail -5
 sleep 3
-echo "[activity] $("$ADB" shell dumpsys activity activities | grep -m1 "mResumedActivity" || true)"
+echo "[activity] $("$ADB" shell dumpsys activity activities | grep -m1 -E "mResumedActivity|topResumedActivity" || true)"
 echo "[crash]"
 "$ADB" logcat -d -t 200 | grep -E "FATAL EXCEPTION|AndroidRuntime" || echo "none"
 echo "[crash] done"
