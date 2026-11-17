@@ -33,13 +33,13 @@ fn inline_plain(line: &str) -> String {
     s
 }
 
-fn paragraph(text: &str, style: Option<&str>, numbered: bool) -> String {
+fn paragraph(text: &str, style: Option<&str>, numbered: bool, num_id: &str) -> String {
     let mut ppr = String::new();
     if let Some(st) = style {
         ppr.push_str(&format!("<w:pStyle w:val=\"{}\"/>", st));
     }
     if numbered && style.is_none() {
-        ppr.push_str("<w:numPr><w:ilvl w:val=\"0\"/><w:numId w:val=\"1\"/></w:numPr>");
+        ppr.push_str(&format!("<w:numPr><w:ilvl w:val=\"0\"/><w:numId w:val=\"{num_id}\"/></w:numPr>"));
     }
     let ppr = if ppr.is_empty() { ppr } else { format!("<w:pPr>{ppr}</w:pPr>") };
     format!(
@@ -60,7 +60,7 @@ fn heading_style(level: usize) -> &'static str {
 }
 
 /// Markdown → document.xml 的 body 段落序列（确定性）。
-fn document_body(markdown: &str, numbered: bool) -> String {
+fn document_body(markdown: &str, numbered: bool, num_id: &str) -> String {
     let mut parts: Vec<String> = Vec::new();
     let mut in_code = false;
     for raw in markdown.lines() {
@@ -71,7 +71,7 @@ fn document_body(markdown: &str, numbered: bool) -> String {
             continue;
         }
         if in_code {
-            parts.push(paragraph(if line.is_empty() { " " } else { line }, Some("Code"), false));
+            parts.push(paragraph(if line.is_empty() { " " } else { line }, Some("Code"), false, num_id));
             continue;
         }
         if trimmed.is_empty() {
@@ -81,7 +81,7 @@ fn document_body(markdown: &str, numbered: bool) -> String {
         if (1..=6).contains(&hashes) {
             let rest = trimmed[hashes..].trim();
             if !rest.is_empty() {
-                parts.push(paragraph(&inline_plain(rest), Some(heading_style(hashes)), false));
+                parts.push(paragraph(&inline_plain(rest), Some(heading_style(hashes)), false, num_id));
                 continue;
             }
         }
@@ -91,13 +91,13 @@ fn document_body(markdown: &str, numbered: bool) -> String {
             .or_else(|| trimmed.strip_prefix("+ "))
         {
             let bullet_text = if numbered { inline_plain(rest) } else { format!("• {}", inline_plain(rest)) };
-            parts.push(paragraph(&bullet_text, None, numbered));
+            parts.push(paragraph(&bullet_text, None, numbered, num_id));
             continue;
         }
-        parts.push(paragraph(&inline_plain(trimmed), None, false));
+        parts.push(paragraph(&inline_plain(trimmed), None, false, num_id));
     }
     if parts.is_empty() {
-        parts.push(paragraph(" ", None, false));
+        parts.push(paragraph(" ", None, false, num_id));
     }
     parts.join("")
 }
@@ -156,10 +156,10 @@ fn core_props(title: &str) -> String {
 
 const DEFAULT_SECT_PR: &str = r#"<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440" w:header="708" w:footer="708" w:gutter="0"/></w:sectPr>"#;
 
-fn document_xml(markdown: &str, sect_pr: &str, numbered: bool) -> String {
+fn document_xml(markdown: &str, sect_pr: &str, numbered: bool, num_id: &str) -> String {
     format!(
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<w:document xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><w:body>{}{}</w:body></w:document>\n",
-        document_body(markdown, numbered),
+        document_body(markdown, numbered, num_id),
         sect_pr
     )
 }
@@ -237,6 +237,15 @@ pub fn build_docx_with_styles(
             .with_message("docx 参考样式缺 w:styles 根")
             .with_exit(3));
     }
+    let num_id = numbering
+        .and_then(|n| {
+            Regex::new(r#"w:num[^>]*w:numId="([0-9]+)""#)
+                .ok()
+                .and_then(|re| re.captures(n))
+                .and_then(|c| c.get(1))
+                .map(|m| m.as_str().to_string())
+        })
+        .unwrap_or_else(|| "1".to_string());
     let mut content_types = CONTENT_TYPES.to_string();
     let mut document_rels = DOCUMENT_RELS.to_string();
     if numbering.is_some() {
@@ -299,7 +308,7 @@ pub fn build_docx_with_styles(
         ),
         (
             "word/document.xml".to_string(),
-            document_xml(markdown, sect_xml, numbering.is_some()).into_bytes(),
+            document_xml(markdown, sect_xml, numbering.is_some(), &num_id).into_bytes(),
         ),
         ("word/styles.xml".to_string(), styles_xml.as_bytes().to_vec()),
     ];

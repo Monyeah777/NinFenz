@@ -273,7 +273,7 @@ fn export_docx_reference_theme_is_used() {
 #[test]
 fn export_docx_reference_numbering_is_used() {
     let out = tmpdir("exp_docx_num");
-    let numbering = r#"<w:numbering xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:num w:numId="1"><w:abstractNumId w:val="0"/></w:num></w:numbering>"#;
+    let numbering = r#"<w:numbering xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:num w:numId="7"><w:abstractNumId w:val="0"/></w:num></w:numbering>"#;
     run_ok(
         "export",
         &json!({
@@ -298,6 +298,7 @@ fn export_docx_reference_numbering_is_used() {
         .map(|e| String::from_utf8_lossy(&e.data).to_string())
         .unwrap();
     assert!(doc.contains("<w:numPr>"));
+    assert!(doc.contains("w:numId w:val=\"7\""));
 }
 
 #[test]
