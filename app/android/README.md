@@ -99,7 +99,8 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 - FixtureFilesTest（1）：用 app/fixtures/schema/valid/* 契约夹具逐格式解析（夹具缺失时 skip，不伪造通过）。
 - AdaptiveLayoutTest（4）：窗口宽 599/600/839/840 分档、导航标签资源唯一。
 - ShellStateTest（4）：四目的地/详情栈/根返回 null。
-- PackStoreTest（4）：正常 Pack 扫描/坏 manifest 入 errors/空目录/安装时间 sidecar。
+- PackStoreTest（4）：正常 Pack 扫描/坏 manifest 入 errors/空目录/安装时间注册表。
+- UndoStackTest（3）：有界撤销栈保留最近 100 条、顺序、零上限。
 - ProjectFactoryTest（1）：nf-project 文档形状 + ProjectModel 解析。
 - ProjectCreatorTest（2）：canonical×3 + project-validate 成功写盘；核心失败不写半成品。
 - SearchIndexTest（3）：Pack 条款/字段/节点/章节/槽位 + 项目索引；空查询/缺目录容错。
@@ -181,9 +182,9 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 - 真机 smoke：连接并授权后运行 `bash app/scripts/device_smoke.sh`（安装 debug APK、冷启动、前台 Activity、最近崩溃日志）；设 `CAPTURE_DIR=…` 额外拉取 `home.png` 与 `ui.xml`。
 
 - 2026-11-16 当前：`./gradlew :app:assembleDebug` 成功：app-debug.apk = 19,049,108 bytes，
-  sha256 = 2af9c2ec896907a598ab56fc09d0033a2fae802ac0bd3b9ac96c71e3e560a179（含双 ABI 原生库 + 9 个示例 Pack assets）。
+  sha256 = 03f28cf78fadda1282371ab6d936a1234d2dc5e41e41df135d1cffd0e2135bec（含双 ABI 原生库 + 9 个示例 Pack assets）。
 - 仓库级门禁在 UTF-8 locale 下运行：`LANG=C.UTF-8 PYTHONUTF8=1 bash verify.sh --checks-only`（GBK 控制台会让 `git ls-files` 解码失败，触发 modeling 检查异常）。
-- `./gradlew :app:testDebugUnitTest` 全绿：319 条 JVM 单测（v1 42 + v0.02 277；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y/大字号/对比度/Paparazzi 截图）。
+- `./gradlew :app:testDebugUnitTest` 全绿：322 条 JVM 单测（v1 42 + v0.02 280；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y/大字号/对比度/Paparazzi 截图）。
 - `zipalign -c -P 16 -v 4 app-debug.apk` → Verification successful（native lib 16KB page 对齐）。
 - `bash app/scripts/build_core_android.sh --clean` 成功：NDK 27.0.12077973 + rustup targets
   （aarch64-linux-android / x86_64-linux-android，经 rsproxy 镜像安装）；两个 .so 的 LOAD align 均为 0x4000。

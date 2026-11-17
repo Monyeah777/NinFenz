@@ -216,7 +216,7 @@ private fun ProtocolAuthorContent(
     val store = remember { AuthorOverlayStore(context.filesDir) }
 
     fun pushUndo() {
-        undo = undo + Snapshot(values, enabled)
+        undo = UndoStack.push(undo, Snapshot(values, enabled))
         edited = true
     }
 
