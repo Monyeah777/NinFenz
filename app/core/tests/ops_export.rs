@@ -385,6 +385,7 @@ fn export_docx_renders_markdown_table() {
     assert!(doc.contains("<w:tblBorders>"));
     assert!(doc.contains("<w:tblGrid>"));
     assert!(doc.contains("<w:gridCol"));
+    assert!(doc.contains("<w:tblHeader/>"));
     assert!(doc.contains("<w:b/>"));
     assert!(doc.contains("列A"));
     assert!(doc.contains("列B"));
@@ -435,6 +436,29 @@ fn export_docx_renders_inline_emphasis() {
     assert!(doc.contains("<w:b/>"));
     assert!(doc.contains("<w:i/>"));
     assert!(doc.contains("Consolas"));
+}
+
+#[test]
+fn export_docx_code_block_has_shading() {
+    let out = tmpdir("exp_docx_code");
+    run_ok(
+        "export",
+        &json!({
+            "markdown": "~~~\ncode\n~~~\n",
+            "format": "docx",
+            "out_dir": pstr(&out),
+            "title": "代码"
+        }),
+    );
+    let bytes = std::fs::read(out.join("result.docx")).unwrap();
+    let entries = nf_app_core::zipsec::read_zip_bytes(&bytes).unwrap();
+    let doc = entries
+        .iter()
+        .find(|e| e.name == "word/document.xml")
+        .map(|e| String::from_utf8_lossy(&e.data).to_string())
+        .unwrap();
+    assert!(doc.contains("w:shd"));
+    assert!(doc.contains("F5F5F5"));
 }
 
 #[test]

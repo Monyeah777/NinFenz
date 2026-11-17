@@ -107,6 +107,9 @@ fn paragraph_with(text: &str, style: Option<&str>, numbered: bool, num_id: &str,
     if numbered && style.is_none() {
         ppr.push_str(&format!("<w:numPr><w:ilvl w:val=\"0\"/><w:numId w:val=\"{num_id}\"/></w:numPr>"));
     }
+    if plain_run {
+        ppr.push_str("<w:shd w:val=\"clear\" w:color=\"auto\" w:fill=\"F5F5F5\"/>");
+    }
     let ppr = if ppr.is_empty() { ppr } else { format!("<w:pPr>{ppr}</w:pPr>") };
     let runs = if plain_run { run(text, false, false, true) } else { runs_xml(text) };
     format!("<w:p>{ppr}{runs}</w:p>")
@@ -178,6 +181,9 @@ fn table_xml(rows: &[Vec<String>]) -> String {
     out.push_str("</w:tblGrid>");
     for (ri, row) in rows.iter().enumerate() {
         out.push_str("<w:tr>");
+        if ri == 0 {
+            out.push_str("<w:trPr><w:tblHeader/></w:trPr>");
+        }
         for c in 0..cols {
             let cell = row.get(c).map(|s| s.as_str()).unwrap_or("");
             out.push_str(&format!(
