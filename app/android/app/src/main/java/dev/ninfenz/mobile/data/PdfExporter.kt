@@ -38,7 +38,8 @@ object PdfExporter {
             val spans: List<PdfMarkdown.Span> = emptyList(),
             val image: Bitmap? = null,
             val imageWidth: Float = 0f,
-            val imageHeight: Float = 0f
+            val imageHeight: Float = 0f,
+            val weight: Int = 1
         )
 
         val lineHeight = 16f
@@ -83,7 +84,15 @@ object PdfExporter {
                         val scale = minOf(1f, maxWidth / bitmap.width)
                         val w = bitmap.width * scale
                         val h = bitmap.height * scale
-                        add(Line(block.text, 10f, false, image = bitmap, imageWidth = w, imageHeight = h))
+                        add(
+                            Line(
+                                block.text, 10f, false,
+                                image = bitmap,
+                                imageWidth = w,
+                                imageHeight = h,
+                                weight = (h / lineHeight).toInt().coerceAtLeast(1)
+                            )
+                        )
                     } else {
                         add(Line(block.text, 10f, false))
                     }
@@ -123,7 +132,8 @@ object PdfExporter {
             }
         }
         val firstPageLines = ((pageHeight - margin * 2 - lineHeight * 4) / lineHeight).toInt().coerceAtLeast(1)
-        val pages = PdfPager.paginateItems(lines, firstPageLines)
+        val pages = PdfPager.paginateWeighted(lines.map { it.weight }, firstPageLines)
+            .map { lines.subList(it.first, it.last + 1) }
         val doc = PdfDocument()
         try {
             pages.forEachIndexed { index, pageLines ->

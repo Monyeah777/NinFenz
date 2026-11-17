@@ -170,7 +170,7 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 - ProjectArchiverTest（7）：归档移出 projects/、列表/恢复、删除仅在归档目录、永久删除项目+数据、坏归档拒绝、越界拒绝、data 移动失败回滚。
 - EpubExporterTest（11）：EPUB3 结构（mimetype STORED/OPF/nav/chapter、HTML 转义）、无标题单章、管道表格、安全链接、水平线、引用块、有序列表、删除线、代码语言 class、data URI 图片、表格对齐。
 - EpubValidatorTest（3）：导出物通过、缺 EPUB 结构拒绝、缺文件拒绝。
-- PdfPagerTest（2）：折行、分页/空输入。
+- PdfPagerTest（3）：折行、分页/空输入、图片权重分页。
 - PdfValidatorTest（3）：最小 PDF 通过、坏/加密 PDF 拒绝、缺文件拒绝。
 - PackTrustStoreTest（2）：按 pack@version 固定 tree、取消固定、坏 JSON 容错。
 - DiagnosticsBundleTest（2）：诊断包仅含 diagnostics/README、文件名唯一。
@@ -187,9 +187,9 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 - 真机 smoke：连接并授权后运行 `bash app/scripts/device_smoke.sh`（安装 debug APK、冷启动、前台 Activity、最近崩溃日志）；设 `CAPTURE_DIR=…` 额外拉取 `home.png` 与 `ui.xml`。
 
 - 2026-11-16 当前：`./gradlew :app:assembleDebug` 成功：app-debug.apk = 19,049,108 bytes，
-  sha256 = 5d3cc26f0964d36afe2f5d2855e5fd059618c21a10156bb20351d6393bc5888d（含双 ABI 原生库 + 9 个示例 Pack assets）。
+  sha256 = 0191535e08e0ff4c6154d77bbab70df49364849ff49a40dd0422a828303f3fa3（含双 ABI 原生库 + 9 个示例 Pack assets）。
 - 仓库级门禁在 UTF-8 locale 下运行：`LANG=C.UTF-8 PYTHONUTF8=1 bash verify.sh --checks-only`（GBK 控制台会让 `git ls-files` 解码失败，触发 modeling 检查异常）。
-- `./gradlew :app:testDebugUnitTest` 全绿：348 条 JVM 单测（v1 42 + v0.02 306；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y/大字号/对比度/Paparazzi 截图）。
+- `./gradlew :app:testDebugUnitTest` 全绿：349 条 JVM 单测（v1 42 + v0.02 307；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y/大字号/对比度/Paparazzi 截图）。
 - `zipalign -c -P 16 -v 4 app-debug.apk` → Verification successful（native lib 16KB page 对齐）。
 - `bash app/scripts/build_core_android.sh --clean` 成功：NDK 27.0.12077973 + rustup targets
   （aarch64-linux-android / x86_64-linux-android，经 rsproxy 镜像安装）；两个 .so 的 LOAD align 均为 0x4000。

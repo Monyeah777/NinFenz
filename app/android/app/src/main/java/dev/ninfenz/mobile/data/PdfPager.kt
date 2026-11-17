@@ -25,6 +25,26 @@ object PdfPager {
         return lines.chunked(linesPerPage)
     }
 
+    /** 按权重（图片占多行）切页，返回每页的 [start, end) 下标。 */
+    fun paginateWeighted(weights: List<Int>, linesPerPage: Int): List<IntRange> {
+        require(linesPerPage > 0) { "linesPerPage 必须为正" }
+        if (weights.isEmpty()) return emptyList()
+        val out = mutableListOf<IntRange>()
+        var start = 0
+        var used = 0
+        for (i in weights.indices) {
+            val w = weights[i].coerceAtLeast(1)
+            if (i > start && used + w > linesPerPage) {
+                out.add(start until i)
+                start = i
+                used = 0
+            }
+            used += w
+        }
+        out.add(start until weights.size)
+        return out
+    }
+
     fun <T> paginateItems(lines: List<T>, linesPerPage: Int): List<List<T>> {
         require(linesPerPage > 0) { "linesPerPage 必须为正" }
         if (lines.isEmpty()) return emptyList()

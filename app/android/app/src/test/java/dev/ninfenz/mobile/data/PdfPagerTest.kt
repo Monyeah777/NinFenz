@@ -13,6 +13,12 @@ class PdfPagerTest {
     }
 
     @Test
+    fun paginatesByWeightForImages() {
+        val ranges = PdfPager.paginateWeighted(listOf(1, 8, 1), 8)
+        assertEquals(listOf(0..0, 1..1, 2..2), ranges)
+    }
+
+    @Test
     fun paginatesAndKeepsEmptyPage() {
         assertEquals(listOf(listOf("a", "b"), listOf("c")), PdfPager.paginate(listOf("a", "b", "c"), 2))
         assertEquals(listOf(listOf("")), PdfPager.paginate(emptyList(), 10))
