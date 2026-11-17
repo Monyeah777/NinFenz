@@ -31,7 +31,8 @@ object PdfExporter {
             val rule: Boolean = false,
             val cells: List<String> = emptyList(),
             val table: Boolean = false,
-            val weights: FloatArray? = null
+            val weights: FloatArray? = null,
+            val spans: List<PdfMarkdown.Span> = emptyList()
         )
 
         val lineHeight = 16f
@@ -45,6 +46,21 @@ object PdfExporter {
                     colWeights[i] = maxOf(colWeights[i], cell.length.toFloat().coerceAtMost(40f))
                 }
             }
+        }
+        fun sliceSpans(spans: List<PdfMarkdown.Span>, start: Int, end: Int): List<PdfMarkdown.Span> {
+            val out = mutableListOf<PdfMarkdown.Span>()
+            var pos = 0
+            for (span in spans) {
+                val spanStart = pos
+                val spanEnd = pos + span.text.length
+                val from = maxOf(start, spanStart)
+                val to = minOf(end, spanEnd)
+                if (from < to) {
+                    out.add(span.copy(text = span.text.substring(from - spanStart, to - spanStart)))
+                }
+                pos = spanEnd
+            }
+            return out
         }
         val lines = buildList {
             add(Line(title, 18f, true))
@@ -75,9 +91,16 @@ object PdfExporter {
                     else -> 11f
                 }
                 val bold = block.level > 0 || block.tableHeader
-                val prefix = if (block.bullet) "• " else ""
-                PdfPager.wrap(prefix + block.text, contentWidth) { paint.measureText(it) * (size / 11f) }
-                    .forEach { add(Line(it, size, bold, block.code, block.quote)) }
+                val baseSpans = if (block.spans.isEmpty()) listOf(PdfMarkdown.Span(block.text)) else block.spans
+                val spans = if (block.bullet) listOf(PdfMarkdown.Span("• ")) + baseSpans else baseSpans
+                val plain = spans.joinToString("") { it.text }
+                var offset = 0
+                PdfPager.wrap(plain, contentWidth) { paint.measureText(it) * (size / 11f) }
+                    .forEach { wrapped ->
+                        val end = offset + wrapped.length
+                        add(Line(wrapped, size, bold, block.code, block.quote, spans = sliceSpans(spans, offset, end)))
+                        offset = end
+                    }
             }
         }
         val firstPageLines = ((pageHeight - margin * 2 - lineHeight * 4) / lineHeight).toInt().coerceAtLeast(1)
@@ -92,6 +115,22 @@ object PdfExporter {
                     if (line.rule) {
                         canvas.drawLine(margin, y - 6f, pageWidth - margin, y - 6f, paint)
                         y += 8f
+                        return@forEach
+                    }
+                    if (line.spans.isNotEmpty()) {
+                        var x = margin
+                        for (span in line.spans) {
+                            if (span.text.isEmpty()) continue
+                            val sp = Paint(paint).apply {
+                                textSize = line.size
+                                isFakeBoldText = line.bold || span.bold
+                                typeface = if (span.code || line.mono) Typeface.MONOSPACE else Typeface.DEFAULT
+                                if (line.italic || span.italic) textSkewX = -0.25f
+                            }
+                            canvas.drawText(span.text, x, y, sp)
+                            x += sp.measureText(span.text)
+                        }
+                        y += maxOf(lineHeight, line.size * 1.3f)
                         return@forEach
                     }
                     if (line.cells.isNotEmpty()) {

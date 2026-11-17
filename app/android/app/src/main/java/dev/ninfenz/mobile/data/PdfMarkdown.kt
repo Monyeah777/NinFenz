@@ -2,6 +2,13 @@ package dev.ninfenz.mobile.data
 
 /** PDF 基础文本预处理：去 Markdown 标记、标题符号、链接/图片语法与代码围栏。 */
 object PdfMarkdown {
+    data class Span(
+        val text: String,
+        val bold: Boolean = false,
+        val italic: Boolean = false,
+        val code: Boolean = false
+    )
+
     data class Block(
         val text: String,
         val level: Int = 0,
@@ -11,7 +18,8 @@ object PdfMarkdown {
         val tableHeader: Boolean = false,
         val quote: Boolean = false,
         val rule: Boolean = false,
-        val cells: List<String> = emptyList()
+        val cells: List<String> = emptyList(),
+        val spans: List<Span> = emptyList()
     )
 
     fun blocks(markdown: String): List<Block> {
@@ -49,19 +57,19 @@ object PdfMarkdown {
                 continue
             }
             if (trimmed.startsWith(">")) {
-                out.add(Block(inline(trimmed.removePrefix(">").trim()), quote = true))
+                out.add(blockOf(trimmed.removePrefix(">").trim(), quote = true))
                 continue
             }
             val hashes = trimmed.takeWhile { it == '#' }.length
             if (hashes in 1..6) {
-                out.add(Block(inline(trimmed.substring(hashes).trim()), level = hashes))
+                out.add(blockOf(trimmed.substring(hashes).trim(), level = hashes))
                 continue
             }
             if (trimmed.startsWith("- ") || trimmed.startsWith("* ") || trimmed.startsWith("+ ")) {
-                out.add(Block(inline(trimmed.substring(2).trim()), bullet = true))
+                out.add(blockOf(trimmed.substring(2).trim(), bullet = true))
                 continue
             }
-            out.add(Block(inline(trimmed)))
+            out.add(blockOf(trimmed))
         }
         return out
     }
@@ -75,12 +83,46 @@ object PdfMarkdown {
         }
     }
 
-    fun inline(s: String): String {
-        var text = s
-        text = Regex("!\\[([^\\]]*)\\]\\([^)]*\\)").replace(text, "$1")
-        text = Regex("\\[([^\\]]*)\\]\\([^)]*\\)").replace(text, "$1")
-        text = text.replace("**", "").replace("__", "").replace("~~", "").replace("\u0060", "")
-        text = text.replace("*", "")
-        return text.trim()
+    private fun blockOf(raw: String, level: Int = 0, bullet: Boolean = false, quote: Boolean = false): Block {
+        val spans = spanize(raw)
+        return Block(spans.joinToString("") { it.text }, level = level, bullet = bullet, quote = quote, spans = spans)
     }
+
+    fun spanize(raw: String): List<Span> {
+        var text = raw
+        text = Regex("!\\[([^\\]]*)\\]\\([^)]*\\)").replace(text) { it.groupValues[1] }
+        text = Regex("\\[([^\\]]*)\\]\\([^)]*\\)").replace(text) { it.groupValues[1] }
+        text = text.replace("~~", "")
+        val out = mutableListOf<Span>()
+        var i = 0
+        fun marker(open: String, close: String, bold: Boolean = false, italic: Boolean = false, code: Boolean = false): Boolean {
+            if (!text.startsWith(open, i)) return false
+            val end = text.indexOf(close, i + open.length)
+            if (end < 0) return false
+            val inner = text.substring(i + open.length, end)
+            if (inner.isNotEmpty()) out.add(Span(inner, bold = bold, italic = italic, code = code))
+            i = end + close.length
+            return true
+        }
+        while (i < text.length) {
+            when {
+                marker("**", "**", bold = true) -> {}
+                marker("__", "__", bold = true) -> {}
+                marker("\u0060", "\u0060", code = true) -> {}
+                marker("*", "*", italic = true) -> {}
+                marker("_", "_", italic = true) -> {}
+                else -> {
+                    var j = i + 1
+                    while (j < text.length && !text.startsWith("**", j) && !text.startsWith("__", j) &&
+                        text[j] != '\u0060' && text[j] != '*' && text[j] != '_'
+                    ) j++
+                    out.add(Span(text.substring(i, j)))
+                    i = j
+                }
+            }
+        }
+        return out.ifEmpty { listOf(Span("")) }
+    }
+
+    fun inline(s: String): String = spanize(s).joinToString("") { it.text }.trim()
 }

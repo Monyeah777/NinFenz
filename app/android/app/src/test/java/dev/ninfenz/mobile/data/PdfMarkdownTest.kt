@@ -40,6 +40,15 @@ class PdfMarkdownTest {
     }
 
     @Test
+    fun inlineSpansCarryEmphasis() {
+        val spans = PdfMarkdown.spanize("a **b** *c* `d`")
+        assertEquals("a ", spans[0].text)
+        assertTrue(spans.first { it.text == "b" }.bold)
+        assertTrue(spans.first { it.text == "c" }.italic)
+        assertTrue(spans.first { it.text == "d" }.code)
+    }
+
+    @Test
     fun bulletsUseDotPrefix() {
         assertEquals(listOf("• 一", "• 二"), PdfMarkdown.lines("- 一\n* 二"))
     }
