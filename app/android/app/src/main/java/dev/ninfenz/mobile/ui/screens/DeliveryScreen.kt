@@ -434,14 +434,29 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                             busy = true
                             error = null
                             scope.launch {
-                                val response = safeCall("assemble", buildJsonObject {
+                                val assemblePayload = buildJsonObject {
                                     put("plan", raw)
                                     put("spec", current.specJson)
                                     put("inputs", buildJsonObject { for ((k, v) in inputs) put(k, v) })
-                                })
+                                }
+                                val response = safeCall("assemble", assemblePayload)
                                 val result = response.resultObject()
                                 val md = result?.let { J.optString(it, "markdown") }
                                 if (response.ok && !md.isNullOrBlank()) {
+                                    val second = safeCall("assemble", assemblePayload)
+                                    val secondMd = second.resultObject()?.let { J.optString(it, "markdown") }
+                                    if (second.ok && !secondMd.isNullOrBlank()) {
+                                        val offset = dev.ninfenz.mobile.data.ReproChecker.firstDifference(
+                                            md.toByteArray(Charsets.UTF_8),
+                                            secondMd.toByteArray(Charsets.UTF_8)
+                                        )
+                                        reproOk = offset == null
+                                        reproText = if (offset == null) {
+                                            context.getString(dev.ninfenz.mobile.R.string.repro_stable)
+                                        } else {
+                                            context.getString(dev.ninfenz.mobile.R.string.repro_diff, offset)
+                                        }
+                                    }
                                     markdown = md
                                     report = null
                                     when (val advanced = statusStore.advance(project, ProjectStatus.ASSEMBLED, AssemblyArtifact(md.toByteArray(Charsets.UTF_8)))) {
