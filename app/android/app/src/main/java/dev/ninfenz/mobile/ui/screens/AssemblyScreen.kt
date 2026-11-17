@@ -63,6 +63,8 @@ fun AssemblyScreen(onBack: () -> Unit) {
     var report by remember { mutableStateOf<ValidateReport?>(null) }
     var manifest by remember { mutableStateOf<String?>(null) }
     var busy by remember { mutableStateOf(false) }
+    var assembleRepro by remember { mutableStateOf<String?>(null) }
+    var validateRepro by remember { mutableStateOf<String?>(null) }
 
     val planPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         if (uri == null) return@rememberLauncherForActivityResult
@@ -166,6 +168,21 @@ fun AssemblyScreen(onBack: () -> Unit) {
                                 val response = safeCall("assemble", payload)
                                 if (response.ok) {
                                     val result = response.resultObject()
+                                    if (result != null) {
+                                        val second = safeCall("assemble", payload)
+                                        val secondResult = second.resultObject()
+                                        if (second.ok && secondResult != null) {
+                                            val offset = dev.ninfenz.mobile.data.ReproChecker.firstDifference(
+                                                result.toString().toByteArray(Charsets.UTF_8),
+                                                secondResult.toString().toByteArray(Charsets.UTF_8)
+                                            )
+                                            assembleRepro = if (offset == null) {
+                                                context.getString(dev.ninfenz.mobile.R.string.repro_stable)
+                                            } else {
+                                                context.getString(dev.ninfenz.mobile.R.string.repro_diff, offset)
+                                            }
+                                        }
+                                    }
                                     markdown = result?.let { J.optString(it, "markdown") }
                                     val meta = result?.let { J.optChild(it, "meta") }
                                     metaSummary = meta?.let {
@@ -198,7 +215,21 @@ fun AssemblyScreen(onBack: () -> Unit) {
                                 }
                                 val response = safeCall("validate", payload)
                                 if (response.resultObject() != null) {
-                                    report = ReportModel.parse(response.resultObject()!!)
+                                    val result = response.resultObject()!!
+                                    report = ReportModel.parse(result)
+                                    val second = safeCall("validate", payload)
+                                    val secondResult = second.resultObject()
+                                    if (second.ok && secondResult != null) {
+                                        val offset = dev.ninfenz.mobile.data.ReproChecker.firstDifference(
+                                            result.toString().toByteArray(Charsets.UTF_8),
+                                            secondResult.toString().toByteArray(Charsets.UTF_8)
+                                        )
+                                        validateRepro = if (offset == null) {
+                                            context.getString(dev.ninfenz.mobile.R.string.repro_stable)
+                                        } else {
+                                            context.getString(dev.ninfenz.mobile.R.string.repro_diff, offset)
+                                        }
+                                    }
                                 }
                                 if (!response.ok) error = response.error
                             } finally {
@@ -208,6 +239,8 @@ fun AssemblyScreen(onBack: () -> Unit) {
                     }) { Text(if (busy) context.getString(dev.ninfenz.mobile.R.string.assembly_validating) else "validate L1") }
                 }
                 metaSummary?.let { MonoText(it) }
+                assembleRepro?.let { MonoText(it) }
+                validateRepro?.let { MonoText(it) }
             }
 
             CardBox(title = stringResource(dev.ninfenz.mobile.R.string.assembly_export)) {
