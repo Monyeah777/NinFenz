@@ -41,6 +41,12 @@ class DocxReferenceStylesTest {
     }
 
     @Test
+    fun readsNumberingXml() {
+        val numbering = "<w:numbering xmlns:w=\"x\"></w:numbering>"
+        assertEquals(numbering, DocxReferenceStyles.extractNumbering(zip(mapOf("word/numbering.xml" to numbering))))
+    }
+
+    @Test
     fun rejectsMissingOrNonStyles() {
         assertNull(DocxReferenceStyles.extract(zip(mapOf("word/document.xml" to "<w:document/>"))))
         assertNull(DocxReferenceStyles.extract(zip(mapOf("word/styles.xml" to "<not-styles/>"))))

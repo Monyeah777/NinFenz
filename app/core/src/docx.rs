@@ -32,11 +32,15 @@ fn inline_plain(line: &str) -> String {
     s
 }
 
-fn paragraph(text: &str, style: Option<&str>) -> String {
-    let ppr = match style {
-        Some(st) => format!("<w:pPr><w:pStyle w:val=\"{}\"/></w:pPr>", st),
-        None => String::new(),
-    };
+fn paragraph(text: &str, style: Option<&str>, numbered: bool) -> String {
+    let mut ppr = String::new();
+    if let Some(st) = style {
+        ppr.push_str(&format!("<w:pStyle w:val=\"{}\"/>", st));
+    }
+    if numbered && style.is_none() {
+        ppr.push_str("<w:numPr><w:ilvl w:val=\"0\"/><w:numId w:val=\"1\"/></w:numPr>");
+    }
+    let ppr = if ppr.is_empty() { ppr } else { format!("<w:pPr>{ppr}</w:pPr>") };
     format!(
         "<w:p>{ppr}<w:r><w:t xml:space=\"preserve\">{}</w:t></w:r></w:p>",
         esc(text)
@@ -55,7 +59,7 @@ fn heading_style(level: usize) -> &'static str {
 }
 
 /// Markdown → document.xml 的 body 段落序列（确定性）。
-fn document_body(markdown: &str) -> String {
+fn document_body(markdown: &str, numbered: bool) -> String {
     let mut parts: Vec<String> = Vec::new();
     let mut in_code = false;
     for raw in markdown.lines() {
@@ -66,7 +70,7 @@ fn document_body(markdown: &str) -> String {
             continue;
         }
         if in_code {
-            parts.push(paragraph(if line.is_empty() { " " } else { line }, Some("Code")));
+            parts.push(paragraph(if line.is_empty() { " " } else { line }, Some("Code"), false));
             continue;
         }
         if trimmed.is_empty() {
@@ -76,7 +80,7 @@ fn document_body(markdown: &str) -> String {
         if (1..=6).contains(&hashes) {
             let rest = trimmed[hashes..].trim();
             if !rest.is_empty() {
-                parts.push(paragraph(&inline_plain(rest), Some(heading_style(hashes))));
+                parts.push(paragraph(&inline_plain(rest), Some(heading_style(hashes)), false));
                 continue;
             }
         }
@@ -85,13 +89,14 @@ fn document_body(markdown: &str) -> String {
             .or_else(|| trimmed.strip_prefix("* "))
             .or_else(|| trimmed.strip_prefix("+ "))
         {
-            parts.push(paragraph(&format!("• {}", inline_plain(rest)), None));
+            let bullet_text = if numbered { inline_plain(rest) } else { format!("• {}", inline_plain(rest)) };
+            parts.push(paragraph(&bullet_text, None, numbered));
             continue;
         }
-        parts.push(paragraph(&inline_plain(trimmed), None));
+        parts.push(paragraph(&inline_plain(trimmed), None, false));
     }
     if parts.is_empty() {
-        parts.push(paragraph(" ", None));
+        parts.push(paragraph(" ", None, false));
     }
     parts.join("")
 }
@@ -150,17 +155,17 @@ fn core_props(title: &str) -> String {
 
 const DEFAULT_SECT_PR: &str = r#"<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440" w:header="708" w:footer="708" w:gutter="0"/></w:sectPr>"#;
 
-fn document_xml(markdown: &str, sect_pr: &str) -> String {
+fn document_xml(markdown: &str, sect_pr: &str, numbered: bool) -> String {
     format!(
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<w:document xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><w:body>{}{}</w:body></w:document>\n",
-        document_body(markdown),
+        document_body(markdown, numbered),
         sect_pr
     )
 }
 
 /// 生成 .docx 字节（确定性；同 input 同 bytes）。
 pub fn build_docx(markdown: &str, title: &str) -> Result<Vec<u8>, CoreError> {
-    build_docx_with_styles(markdown, title, None, None, None)
+    build_docx_with_styles(markdown, title, None, None, None, None)
 }
 
 /// 参考样式：用调用方提供的 word/styles.xml 替换内置样式（reference-doc 继承）。
@@ -170,6 +175,7 @@ pub fn build_docx_with_styles(
     styles: Option<&str>,
     sect_pr: Option<&str>,
     theme: Option<&str>,
+    numbering: Option<&str>,
 ) -> Result<Vec<u8>, CoreError> {
     let styles_xml = styles.unwrap_or(STYLES);
     let sect_xml = sect_pr.unwrap_or(DEFAULT_SECT_PR);
@@ -177,6 +183,13 @@ pub fn build_docx_with_styles(
         if t.len() > 1024 * 1024 || !t.contains("<a:theme") {
             return Err(CoreError::new("NF-EXP-002")
                 .with_message("docx 参考主题非法（需 a:theme）")
+                .with_exit(3));
+        }
+    }
+    if let Some(n) = numbering {
+        if n.len() > 1024 * 1024 || !n.contains("<w:numbering") {
+            return Err(CoreError::new("NF-EXP-002")
+                .with_message("docx 参考编号非法（需 w:numbering）")
                 .with_exit(3));
         }
     }
@@ -197,6 +210,16 @@ pub fn build_docx_with_styles(
     }
     let mut content_types = CONTENT_TYPES.to_string();
     let mut document_rels = DOCUMENT_RELS.to_string();
+    if numbering.is_some() {
+        content_types = content_types.replace(
+            "</Types>",
+            "<Override PartName=\"/word/numbering.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml\"/></Types>",
+        );
+        document_rels = document_rels.replace(
+            "</Relationships>",
+            "<Relationship Id=\"rId3\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/numbering\" Target=\"numbering.xml\"/></Relationships>",
+        );
+    }
     if theme.is_some() {
         content_types = content_types.replace(
             "</Types>",
@@ -227,10 +250,13 @@ pub fn build_docx_with_styles(
         ),
         (
             "word/document.xml".to_string(),
-            document_xml(markdown, sect_xml).into_bytes(),
+            document_xml(markdown, sect_xml, numbering.is_some()).into_bytes(),
         ),
         ("word/styles.xml".to_string(), styles_xml.as_bytes().to_vec()),
     ];
+    if let Some(n) = numbering {
+        entries.push(("word/numbering.xml".to_string(), n.as_bytes().to_vec()));
+    }
     if let Some(t) = theme {
         entries.push(("word/theme/theme1.xml".to_string(), t.as_bytes().to_vec()));
     }

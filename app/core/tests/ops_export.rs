@@ -271,6 +271,36 @@ fn export_docx_reference_theme_is_used() {
 }
 
 #[test]
+fn export_docx_reference_numbering_is_used() {
+    let out = tmpdir("exp_docx_num");
+    let numbering = r#"<w:numbering xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:num w:numId="1"><w:abstractNumId w:val="0"/></w:num></w:numbering>"#;
+    run_ok(
+        "export",
+        &json!({
+            "markdown": "- 一\n- 二\n",
+            "format": "docx",
+            "out_dir": pstr(&out),
+            "title": "参考编号",
+            "docx_numbering": numbering
+        }),
+    );
+    let bytes = std::fs::read(out.join("result.docx")).unwrap();
+    let entries = nf_app_core::zipsec::read_zip_bytes(&bytes).unwrap();
+    let number_xml = entries
+        .iter()
+        .find(|e| e.name == "word/numbering.xml")
+        .map(|e| String::from_utf8_lossy(&e.data).to_string())
+        .unwrap();
+    assert_eq!(number_xml, numbering);
+    let doc = entries
+        .iter()
+        .find(|e| e.name == "word/document.xml")
+        .map(|e| String::from_utf8_lossy(&e.data).to_string())
+        .unwrap();
+    assert!(doc.contains("<w:numPr>"));
+}
+
+#[test]
 fn export_skill_pack_contains_scaffold() {
     let out = tmpdir("exp_skill");
     let r = run_ok(

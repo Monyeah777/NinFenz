@@ -247,12 +247,14 @@ pub fn export(req: &Value) -> OpOutcome {
             let styles = opt_str(req, "docx_styles")?;
             let sect_pr = opt_str(req, "docx_sect_pr")?;
             let theme = opt_str(req, "docx_theme")?;
+            let numbering = opt_str(req, "docx_numbering")?;
             let bytes = crate::docx::build_docx_with_styles(
                 &content,
                 &title,
                 styles.as_deref(),
                 sect_pr.as_deref(),
                 theme.as_deref(),
+                numbering.as_deref(),
             )?;
             crate::fsutil::write_bytes(&dir.join("result.docx"), &bytes)?;
             files.push(json!({

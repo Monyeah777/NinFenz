@@ -129,6 +129,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
     var docxStyles by remember { mutableStateOf<String?>(null) }
     var docxSectPr by remember { mutableStateOf<String?>(null) }
     var docxTheme by remember { mutableStateOf<String?>(null) }
+    var docxNumbering by remember { mutableStateOf<String?>(null) }
     val referencePicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) {
             scope.launch {
@@ -136,10 +137,12 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                 val styles = file?.let { DocxReferenceStyles.extract(it) }
                 val sectPr = file?.let { DocxReferenceStyles.extractSectPr(it) }
                 val theme = file?.let { DocxReferenceStyles.extractTheme(it) }
+                val numbering = file?.let { DocxReferenceStyles.extractNumbering(it) }
                 file?.delete()
                 docxStyles = styles
                 docxSectPr = sectPr
                 docxTheme = theme
+                docxNumbering = numbering
                 if (styles == null) {
                     error = CoreError(
                         "NF-EXP-002",
@@ -594,7 +597,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                         }
                         recordExport("zip", file, manifest)
                     }
-                    ExportButton("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", markdown, project, context, scope, { busy = it }, { error = it }, busy, docxStyles = docxStyles, docxSectPr = docxSectPr, docxTheme = docxTheme) { file, manifest, report ->
+                    ExportButton("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", markdown, project, context, scope, { busy = it }, { error = it }, busy, docxStyles = docxStyles, docxSectPr = docxSectPr, docxTheme = docxTheme, docxNumbering = docxNumbering) { file, manifest, report ->
                         exportedFile = file
                         manifestText = manifest
                         reproOk = report?.stable
@@ -922,6 +925,7 @@ private fun ExportButton(
     docxStyles: String? = null,
     docxSectPr: String? = null,
     docxTheme: String? = null,
+    docxNumbering: String? = null,
     onDone: (File?, String?, dev.ninfenz.mobile.data.ReproChecker.Report?) -> Unit
 ) {
     Button(
@@ -943,6 +947,7 @@ private fun ExportButton(
                         if (format == "docx" && docxStyles != null) put("docx_styles", docxStyles)
                         if (format == "docx" && docxSectPr != null) put("docx_sect_pr", docxSectPr)
                         if (format == "docx" && docxTheme != null) put("docx_theme", docxTheme)
+                        if (format == "docx" && docxNumbering != null) put("docx_numbering", docxNumbering)
                     }
                     fun fileFor(dir: File, manifest: kotlinx.serialization.json.JsonObject?): File? {
                         val name = manifest?.get("files")?.toString()?.let { raw ->

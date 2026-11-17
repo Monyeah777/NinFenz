@@ -16,6 +16,9 @@ object DocxReferenceStyles {
     fun extractTheme(file: File): String? = readEntry(file, "word/theme/theme1.xml")
         ?.takeIf { it.contains("<a:theme") }
 
+    fun extractNumbering(file: File): String? = readEntry(file, "word/numbering.xml")
+        ?.takeIf { it.contains("<w:numbering") }
+
     private fun readEntry(file: File, name: String): String? {
         if (!file.isFile) return null
         return try {
