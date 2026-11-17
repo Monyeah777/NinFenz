@@ -1,5 +1,7 @@
 package dev.ninfenz.mobile.data
 
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -54,6 +56,25 @@ class PdfMarkdownTest {
         val blocks = PdfMarkdown.blocks("![图](data:image/png;base64," + png + ")")
         assertEquals("图", blocks[0].text)
         assertTrue(blocks[0].image != null && blocks[0].image!!.isNotEmpty())
+    }
+
+    @Test
+    fun malformedMarkdownDoesNotThrow() {
+        val samples = listOf(
+            "**unclosed",
+            "![no](data:image/png;base64,@@@)",
+            "[link](",
+            "| a | b",
+            "> ",
+            "~~~",
+            "***",
+            "#".repeat(10) + " x",
+            "a\u0000b"
+        )
+        for (s in samples) {
+            assertNotNull(PdfMarkdown.blocks(s))
+            assertNotNull(PdfMarkdown.lines(s))
+        }
     }
 
     @Test

@@ -114,7 +114,7 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 - PackZipLoaderTest（10）：根/单层目录包、zip slip、缺 manifest、控制字符、压缩炸弹、加密条目、Windows 保留名、symlink、特殊文件拒绝。
 - DocxReferenceStylesTest（7）：读取 word/styles.xml、sectPr、theme、numbering、header/footer、清理引用、缺 styles 拒绝。
 - CcosPrecheckTest（3）：结果完整通过、task_id 不一致、危险路径/摘要。
-- PdfMarkdownTest（8）：标题/行内标记、链接图片、代码围栏、项目符号、表格行、引用/分隔线、强调 span、data URI 图片。
+- PdfMarkdownTest（9）：标题/行内标记、链接图片、代码围栏、项目符号、表格行、引用/分隔线、强调 span、data URI 图片、畸形输入不崩。
 - StateRestorationTest（2，Robolectric）：新建项目标题、Pack 选择 SavedState 恢复。
 - ProjectDiffTest（2）：状态/历史差异、相同项目无差异。
 - SearchFilterStoreTest（2）：kind/pack 过滤存取与清空、坏 JSON 容错。
@@ -200,7 +200,7 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 - 2026-11-16 当前：`./gradlew :app:assembleDebug` 成功：app-debug.apk = 19,049,108 bytes，
   sha256 = 6ccf12a548b30d21ed7c36f14d12b5830853ed9bf35794100f0b5f8398a65dad（含双 ABI 原生库 + 9 个示例 Pack assets）。
 - 仓库级门禁在 UTF-8 locale 下运行：`LANG=C.UTF-8 PYTHONUTF8=1 bash verify.sh --checks-only`（GBK 控制台会让 `git ls-files` 解码失败，触发 modeling 检查异常）。
-- `./gradlew :app:testDebugUnitTest` 全绿：370 条 JVM 单测（v1 42 + v0.02 328；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y/大字号/对比度/Paparazzi 截图）。
+- `./gradlew :app:testDebugUnitTest` 全绿：371 条 JVM 单测（v1 42 + v0.02 329；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y/大字号/对比度/Paparazzi 截图）。
 - `zipalign -c -P 16 -v 4 app-debug.apk` → Verification successful（native lib 16KB page 对齐）。
 - `bash app/scripts/build_core_android.sh --clean` 成功：NDK 27.0.12077973 + rustup targets
   （aarch64-linux-android / x86_64-linux-android，经 rsproxy 镜像安装）；两个 .so 的 LOAD align 均为 0x4000。
