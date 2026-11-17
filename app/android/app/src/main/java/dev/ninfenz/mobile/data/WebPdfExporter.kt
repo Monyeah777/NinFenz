@@ -28,6 +28,16 @@ import kotlin.coroutines.resumeWithException
 object WebPdfExporter {
     data class Created(val file: File, val pages: Int, val bytes: Long)
 
+    fun pageCount(contentHeight: Int, width: Int): Int {
+        require(width > 0) { "width 必须为正" }
+        if (contentHeight <= 0) return 1
+        val pageWidth = 595
+        val pageHeight = 842
+        val scale = pageWidth.toFloat() / width
+        val perPage = pageHeight / scale
+        return ceil(contentHeight / perPage).toInt().coerceIn(1, 200)
+    }
+
     suspend fun export(
         context: Context,
         markdown: String,
@@ -73,7 +83,7 @@ object WebPdfExporter {
             val pageHeight = 842
             val scale = pageWidth.toFloat() / width
             val perPage = pageHeight / scale
-            val pageCount = ceil(height / perPage).toInt().coerceIn(1, 200)
+            val pageCount = pageCount(height, width)
             outDir.mkdirs()
             val target = File(outDir, "result.pdf")
             val doc = PdfDocument()
