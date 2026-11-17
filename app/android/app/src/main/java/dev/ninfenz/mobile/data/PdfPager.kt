@@ -24,4 +24,10 @@ object PdfPager {
         if (lines.isEmpty()) return listOf(listOf(""))
         return lines.chunked(linesPerPage)
     }
+
+    fun <T> paginateItems(lines: List<T>, linesPerPage: Int): List<List<T>> {
+        require(linesPerPage > 0) { "linesPerPage 必须为正" }
+        if (lines.isEmpty()) return emptyList()
+        return lines.chunked(linesPerPage)
+    }
 }
