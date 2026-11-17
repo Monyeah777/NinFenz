@@ -406,6 +406,7 @@
     <string name="packupdate_rollback">Rollback</string>
     <string name="packupdate_rolling">Rolling back…</string>
     <string name="packupdate_result">Rollback result: %1$s</string>
+    <string name="packupdate_pre_backup">Pre-migration backup: %1$s</string>
     <string name="packupdate_notice">Apply/rollback are atomic replace + re-verify; on failure core returns an error code (NF-PCK-00x) instead of silently writing partially.</string>
     <string name="packupdate_breaking_yes">yes (deletion/structure change)</string>
     <string name="packupdate_breaking_no">no</string>

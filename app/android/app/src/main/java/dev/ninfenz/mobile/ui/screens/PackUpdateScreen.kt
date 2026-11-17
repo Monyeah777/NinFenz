@@ -30,6 +30,7 @@ import dev.ninfenz.mobile.core.CoreResponse
 import dev.ninfenz.mobile.core.J
 import dev.ninfenz.mobile.data.FileAccess
 import dev.ninfenz.mobile.data.LibraryStore
+import dev.ninfenz.mobile.data.BackupService
 import dev.ninfenz.mobile.data.PackEntry
 import dev.ninfenz.mobile.data.PackStore
 import dev.ninfenz.mobile.data.PackZipLoader
@@ -67,6 +68,7 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit) {
     var selected by remember { mutableStateOf<PackEntry?>(null) }
     var newRoot by remember { mutableStateOf<File?>(null) }
     var diffBusy by remember { mutableStateOf(false) }
+    var preUpdateBackup by remember { mutableStateOf<File?>(null) }
 
     LaunchedEffect(Unit) {
         packs = withContext(Dispatchers.IO) { PackStore(context.filesDir).scan().packs }
@@ -247,6 +249,9 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit) {
                                 error = null
                                 resultText = null
                                 try {
+                                    preUpdateBackup = withContext(Dispatchers.IO) {
+                                        BackupService.create(context.filesDir).file
+                                    }
                                     val outDir = File(context.filesDir, "library/applied").apply { mkdirs() }
                                     val payload = buildJsonObject {
                                         put("update", raw)
@@ -303,6 +308,12 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit) {
                     ) { Text(if (busy) stringResource(dev.ninfenz.mobile.R.string.packupdate_rolling) else stringResource(dev.ninfenz.mobile.R.string.packupdate_rollback)) }
                 }
                 resultText?.let { MonoText(it) }
+                preUpdateBackup?.let {
+                    Text(
+                        stringResource(dev.ninfenz.mobile.R.string.packupdate_pre_backup, it.absolutePath),
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
                 Notice(stringResource(dev.ninfenz.mobile.R.string.packupdate_notice), Tone.INFO)
             }
         }
