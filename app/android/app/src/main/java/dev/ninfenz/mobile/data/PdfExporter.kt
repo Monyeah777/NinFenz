@@ -2,7 +2,10 @@ package dev.ninfenz.mobile.data
 
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Paint
+import android.graphics.RectF
 import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
 import java.io.File
@@ -32,7 +35,10 @@ object PdfExporter {
             val cells: List<String> = emptyList(),
             val table: Boolean = false,
             val weights: FloatArray? = null,
-            val spans: List<PdfMarkdown.Span> = emptyList()
+            val spans: List<PdfMarkdown.Span> = emptyList(),
+            val image: Bitmap? = null,
+            val imageWidth: Float = 0f,
+            val imageHeight: Float = 0f
         )
 
         val lineHeight = 16f
@@ -68,6 +74,19 @@ object PdfExporter {
             blockList.forEach { block ->
                 if (block.rule) {
                     add(Line("", 11f, false, rule = true))
+                    return@forEach
+                }
+                if (block.image != null) {
+                    val bitmap = BitmapFactory.decodeByteArray(block.image, 0, block.image.size)
+                    if (bitmap != null) {
+                        val maxWidth = contentWidth * 0.8f
+                        val scale = minOf(1f, maxWidth / bitmap.width)
+                        val w = bitmap.width * scale
+                        val h = bitmap.height * scale
+                        add(Line(block.text, 10f, false, image = bitmap, imageWidth = w, imageHeight = h))
+                    } else {
+                        add(Line(block.text, 10f, false))
+                    }
                     return@forEach
                 }
                 if (block.table && block.cells.isNotEmpty()) {
@@ -115,6 +134,12 @@ object PdfExporter {
                     if (line.rule) {
                         canvas.drawLine(margin, y - 6f, pageWidth - margin, y - 6f, paint)
                         y += 8f
+                        return@forEach
+                    }
+                    if (line.image != null) {
+                        val bmp = line.image
+                        canvas.drawBitmap(bmp, null, RectF(margin, y, margin + line.imageWidth, y + line.imageHeight), null)
+                        y += line.imageHeight + 4f
                         return@forEach
                     }
                     if (line.spans.isNotEmpty()) {

@@ -19,7 +19,8 @@ object PdfMarkdown {
         val quote: Boolean = false,
         val rule: Boolean = false,
         val cells: List<String> = emptyList(),
-        val spans: List<Span> = emptyList()
+        val spans: List<Span> = emptyList(),
+        val image: ByteArray? = null
     )
 
     fun blocks(markdown: String): List<Block> {
@@ -52,6 +53,14 @@ object PdfMarkdown {
                 continue
             }
             lastTableBlock = -1
+            val imageMatch = Regex("^!\\[([^\\]]*)\\]\\(data:image/[^;]+;base64,([^)]+)\\)$").find(trimmed)
+            if (imageMatch != null) {
+                val bytes = runCatching { java.util.Base64.getDecoder().decode(imageMatch.groupValues[2].trim()) }.getOrNull()
+                if (bytes != null) {
+                    out.add(Block(imageMatch.groupValues[1], image = bytes))
+                    continue
+                }
+            }
             if (trimmed.length >= 3 && (trimmed.all { it == '-' } || trimmed.all { it == '*' } || trimmed.all { it == '_' })) {
                 out.add(Block("", rule = true))
                 continue

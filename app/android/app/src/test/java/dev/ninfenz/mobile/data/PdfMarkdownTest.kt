@@ -49,6 +49,14 @@ class PdfMarkdownTest {
     }
 
     @Test
+    fun dataUriImageIsDecoded() {
+        val png = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII="
+        val blocks = PdfMarkdown.blocks("![图](data:image/png;base64," + png + ")")
+        assertEquals("图", blocks[0].text)
+        assertTrue(blocks[0].image != null && blocks[0].image!!.isNotEmpty())
+    }
+
+    @Test
     fun bulletsUseDotPrefix() {
         assertEquals(listOf("• 一", "• 二"), PdfMarkdown.lines("- 一\n* 二"))
     }
