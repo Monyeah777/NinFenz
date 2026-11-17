@@ -35,6 +35,12 @@ class DocxReferenceStylesTest {
     }
 
     @Test
+    fun readsThemeXml() {
+        val theme = "<a:theme xmlns:a=\"x\"><a:name val=\"ref\"/></a:theme>"
+        assertEquals(theme, DocxReferenceStyles.extractTheme(zip(mapOf("word/theme/theme1.xml" to theme))))
+    }
+
+    @Test
     fun rejectsMissingOrNonStyles() {
         assertNull(DocxReferenceStyles.extract(zip(mapOf("word/document.xml" to "<w:document/>"))))
         assertNull(DocxReferenceStyles.extract(zip(mapOf("word/styles.xml" to "<not-styles/>"))))

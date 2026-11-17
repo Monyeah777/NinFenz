@@ -160,7 +160,7 @@ fn document_xml(markdown: &str, sect_pr: &str) -> String {
 
 /// 生成 .docx 字节（确定性；同 input 同 bytes）。
 pub fn build_docx(markdown: &str, title: &str) -> Result<Vec<u8>, CoreError> {
-    build_docx_with_styles(markdown, title, None, None)
+    build_docx_with_styles(markdown, title, None, None, None)
 }
 
 /// 参考样式：用调用方提供的 word/styles.xml 替换内置样式（reference-doc 继承）。
@@ -169,9 +169,17 @@ pub fn build_docx_with_styles(
     title: &str,
     styles: Option<&str>,
     sect_pr: Option<&str>,
+    theme: Option<&str>,
 ) -> Result<Vec<u8>, CoreError> {
     let styles_xml = styles.unwrap_or(STYLES);
     let sect_xml = sect_pr.unwrap_or(DEFAULT_SECT_PR);
+    if let Some(t) = theme {
+        if t.len() > 1024 * 1024 || !t.contains("<a:theme") {
+            return Err(CoreError::new("NF-EXP-002")
+                .with_message("docx 参考主题非法（需 a:theme）")
+                .with_exit(3));
+        }
+    }
     if sect_xml.len() > 1024 * 1024 || !sect_xml.contains("<w:sectPr") || !sect_xml.contains("</w:sectPr>") {
         return Err(CoreError::new("NF-EXP-002")
             .with_message("docx 参考页面设置非法（需 w:sectPr）")
@@ -187,10 +195,22 @@ pub fn build_docx_with_styles(
             .with_message("docx 参考样式缺 w:styles 根")
             .with_exit(3));
     }
-    let entries: Vec<(String, Vec<u8>)> = vec![
+    let mut content_types = CONTENT_TYPES.to_string();
+    let mut document_rels = DOCUMENT_RELS.to_string();
+    if theme.is_some() {
+        content_types = content_types.replace(
+            "</Types>",
+            "<Override PartName=\"/word/theme/theme1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.theme+xml\"/></Types>",
+        );
+        document_rels = document_rels.replace(
+            "</Relationships>",
+            "<Relationship Id=\"rId2\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme\" Target=\"theme/theme1.xml\"/></Relationships>",
+        );
+    }
+    let mut entries: Vec<(String, Vec<u8>)> = vec![
         (
             "[Content_Types].xml".to_string(),
-            CONTENT_TYPES.as_bytes().to_vec(),
+            content_types.into_bytes(),
         ),
         ("_rels/.rels".to_string(), ROOT_RELS.as_bytes().to_vec()),
         (
@@ -203,7 +223,7 @@ pub fn build_docx_with_styles(
         ),
         (
             "word/_rels/document.xml.rels".to_string(),
-            DOCUMENT_RELS.as_bytes().to_vec(),
+            document_rels.into_bytes(),
         ),
         (
             "word/document.xml".to_string(),
@@ -211,5 +231,8 @@ pub fn build_docx_with_styles(
         ),
         ("word/styles.xml".to_string(), styles_xml.as_bytes().to_vec()),
     ];
+    if let Some(t) = theme {
+        entries.push(("word/theme/theme1.xml".to_string(), t.as_bytes().to_vec()));
+    }
     zipsec::zip_bytes(&entries)
 }

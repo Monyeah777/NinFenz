@@ -241,6 +241,36 @@ fn export_docx_reference_sect_pr_is_used() {
 }
 
 #[test]
+fn export_docx_reference_theme_is_used() {
+    let out = tmpdir("exp_docx_theme");
+    let theme = r#"<a:theme xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:name val="ref"/></a:theme>"#;
+    run_ok(
+        "export",
+        &json!({
+            "markdown": "# 标题\n",
+            "format": "docx",
+            "out_dir": pstr(&out),
+            "title": "参考主题",
+            "docx_theme": theme
+        }),
+    );
+    let bytes = std::fs::read(out.join("result.docx")).unwrap();
+    let entries = nf_app_core::zipsec::read_zip_bytes(&bytes).unwrap();
+    let actual = entries
+        .iter()
+        .find(|e| e.name == "word/theme/theme1.xml")
+        .map(|e| String::from_utf8_lossy(&e.data).to_string())
+        .unwrap();
+    assert_eq!(actual, theme);
+    let rels = entries
+        .iter()
+        .find(|e| e.name == "word/_rels/document.xml.rels")
+        .map(|e| String::from_utf8_lossy(&e.data).to_string())
+        .unwrap();
+    assert!(rels.contains("theme/theme1.xml"));
+}
+
+#[test]
 fn export_skill_pack_contains_scaffold() {
     let out = tmpdir("exp_skill");
     let r = run_ok(

@@ -3,7 +3,7 @@
 > 设备：OnePlus PLF110，Android 16（SDK 36），1080×2392 / 480dpi；历史真机会话 serial 3B65AR0183V00000。
 > **2026-11-16 当前 `adb devices` 为空**：下表 2026-11-15 行是历史真机证据；本轮新增功能仅有 JVM/构建/门禁证据，真机矩阵仍 OPEN-TOOLCHAIN。
 > APK：0.2.0 / versionCode 2，minSdk 26 / target 36。本件只记实际跑过的项目；未跑项标 OPEN，不写成 pass。
-> 当前本机验证总览：Android JVM **339/339**、Rust core **189/189**、app Python **498 passed**、APP 门禁 QA0–QA6 PASS/gap=0、lint **0 warnings**、`verify.sh --checks-only` PASS=107/WARN=2/FAIL=0。
+> 当前本机验证总览：Android JVM **340/340**、Rust core **190/190**、app Python **498 passed**、APP 门禁 QA0–QA6 PASS/gap=0、lint **0 warnings**、`verify.sh --checks-only` PASS=107/WARN=2/FAIL=0。
 
 ## 1. 已实测（2026-11-15）
 
@@ -32,6 +32,7 @@
 | 全量复核（round53） | pass（本机）：verify PASS=107/WARN=2/FAIL=0；gates PASS/gap=0；rust 186；pytest 493。 |
 | Python 全量复核（round61） | pass（本机）：schema 变更后 `pytest app/tests` 493 passed / 0 failed（126s）。 |
 | 全量复核（round60） | pass（本机）：verify 107/2/0；gates PASS/gap=0；rust 186；JVM 317。 |
+| DOCX 参考主题（Rust+JVM） | pass（本机）：继承 word/theme/theme1.xml 并写主题关系；Rust 190。 |
 | DOCX 参考页面设置（Rust+JVM） | pass（本机）：继承 word/document.xml 的 sectPr（页边距/纸张）；3 条 JVM 测试。 |
 | 迁移前自动备份（JVM） | pass（本机）：Pack 更新应用前调用 BackupService.create 并显示备份路径；恢复走设置页既有备份恢复。 |
 | PDF 标题/粗体样式（JVM） | pass（本机）：标题按 level 字号加粗，正文/项目符号分样式绘制。 |
@@ -192,7 +193,7 @@
 | 依赖升级 coroutines（JVM） | pass（本机）：coroutines 1.9.0→1.10.2，243 tests 全绿；lint warnings 3→2；debug APK 因未压缩 dex 增至 24.7MB。真机未复测（adb 无设备） |
 | Clean build（本轮） | pass（本机）：`gradlew clean` + `testDebugUnitTest --rerun-tasks` + assembleDebug；248/248 全绿；clean APK 19,032,264 B sha256 f4501bfe…；zipalign 16KB 通过。增量 APK 24.7MB 为旧构建膨胀，clean 产物为准。 |
 | Rust core 单测（本轮） | pass（本机）：`cargo test` 186 passed / 0 failed；Android 端无 core 改动。 |
-| Release 构建（构建） | pass（本机）：clean 后重建 `:app:assembleRelease` 成功；app-release-unsigned.apk 15,391,533 B sha256 fb7831de…；zipalign 16KB 通过；apksigner 显示未签名（预期，签名 OPEN-EXTERNAL）。 |
+| Release 构建（构建） | pass（本机）：clean 后重建 `:app:assembleRelease` 成功；app-release-unsigned.apk 15,386,669 B sha256 8acd8c42…；zipalign 16KB 通过；apksigner 显示未签名（预期，签名 OPEN-EXTERNAL）。 |
 | 16KB 页对齐（构建） | pass（本机）：`zipalign -c -P 16 4 app-debug.apk` exit=0；未真机安装验证。 |
 | APP 门禁（round127） | pass（本机）：QA0–QA6 全 PASS，FAIL=0；covered=14 gap=0 open=2 p0=0；台账刷新到当前 HEAD。 |
 | APP 门禁（本轮） | pass（本机）：QA0–QA6 全部 PASS，FAIL=0；自审计 covered=14 gap=0 open=2 p0=0。 |
