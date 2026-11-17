@@ -376,6 +376,7 @@
 | CCOS 会话/预检 | partial：run-as 预置 task/result 后，CCOS 屏恢复 task-demo-0001、result succeeded、显示“导入前预检通过”；人审提交未完成 | ui-ccos5.xml |
 | 横屏自适应 | pass：旋转到横屏后 NavigationRail 竖排四目的地，内容区重排 | landscape.png |
 | Release 结构 | partial：zipalign 16KB 通过；apksigner 报 Missing META-INF/MANIFEST.MF（未签名，签名仍 OPEN-EXTERNAL） | zipalign/apksigner 输出 |
+| Signed release 内部自测 | pass（非生产）：debug keystore 签 release 后安装成功，冷启动 926ms；release 内导出 PDF 显示结构校验通过（1 页）；生产 upload key 未提供 | release-pdf.png、release-signed-home.png |
 | device_smoke 脚本 | 已修复：原 echo 中的 ADB 命令被 bash 当成算术展开，真机首跑报 unbound variable；改为普通命令替换 | app/scripts/device_smoke.sh |
 
 ## 5. 复跑入口
