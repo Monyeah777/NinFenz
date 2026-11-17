@@ -327,6 +327,41 @@ fn export_docx_strips_header_footer_sect_refs() {
 }
 
 #[test]
+fn export_docx_reference_header_footer_are_used() {
+    let out = tmpdir("exp_docx_hf");
+    let header = r#"<w:hdr xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:p><w:r><w:t>页眉</w:t></w:r></w:p></w:hdr>"#;
+    let footer = r#"<w:ftr xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:p><w:r><w:t>页脚</w:t></w:r></w:p></w:ftr>"#;
+    run_ok(
+        "export",
+        &json!({
+            "markdown": "# 标题\n",
+            "format": "docx",
+            "out_dir": pstr(&out),
+            "title": "页眉页脚",
+            "docx_header": header,
+            "docx_footer": footer
+        }),
+    );
+    let bytes = std::fs::read(out.join("result.docx")).unwrap();
+    let entries = nf_app_core::zipsec::read_zip_bytes(&bytes).unwrap();
+    let doc = entries
+        .iter()
+        .find(|e| e.name == "word/document.xml")
+        .map(|e| String::from_utf8_lossy(&e.data).to_string())
+        .unwrap();
+    assert!(doc.contains("rId100"));
+    assert!(doc.contains("rId101"));
+    assert_eq!(
+        entries.iter().find(|e| e.name == "word/header1.xml").map(|e| String::from_utf8_lossy(&e.data).to_string()).unwrap(),
+        header
+    );
+    assert_eq!(
+        entries.iter().find(|e| e.name == "word/footer1.xml").map(|e| String::from_utf8_lossy(&e.data).to_string()).unwrap(),
+        footer
+    );
+}
+
+#[test]
 fn export_skill_pack_contains_scaffold() {
     let out = tmpdir("exp_skill");
     let r = run_ok(

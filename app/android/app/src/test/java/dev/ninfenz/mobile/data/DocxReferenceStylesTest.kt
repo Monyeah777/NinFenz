@@ -57,6 +57,14 @@ class DocxReferenceStylesTest {
     }
 
     @Test
+    fun readsHeaderAndFooterXml() {
+        val header = "<w:hdr xmlns:w=\"x\">页眉</w:hdr>"
+        val footer = "<w:ftr xmlns:w=\"x\">页脚</w:ftr>"
+        assertEquals(header, DocxReferenceStyles.extractHeader(zip(mapOf("word/header1.xml" to header))))
+        assertEquals(footer, DocxReferenceStyles.extractFooter(zip(mapOf("word/footer1.xml" to footer))))
+    }
+
+    @Test
     fun rejectsMissingOrNonStyles() {
         assertNull(DocxReferenceStyles.extract(zip(mapOf("word/document.xml" to "<w:document/>"))))
         assertNull(DocxReferenceStyles.extract(zip(mapOf("word/styles.xml" to "<not-styles/>"))))

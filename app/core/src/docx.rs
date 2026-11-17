@@ -166,7 +166,7 @@ fn document_xml(markdown: &str, sect_pr: &str, numbered: bool) -> String {
 
 /// 生成 .docx 字节（确定性；同 input 同 bytes）。
 pub fn build_docx(markdown: &str, title: &str) -> Result<Vec<u8>, CoreError> {
-    build_docx_with_styles(markdown, title, None, None, None, None)
+    build_docx_with_styles(markdown, title, None, None, None, None, None, None)
 }
 
 /// 参考样式：用调用方提供的 word/styles.xml 替换内置样式（reference-doc 继承）。
@@ -177,14 +177,22 @@ pub fn build_docx_with_styles(
     sect_pr: Option<&str>,
     theme: Option<&str>,
     numbering: Option<&str>,
+    header: Option<&str>,
+    footer: Option<&str>,
 ) -> Result<Vec<u8>, CoreError> {
     let styles_xml = styles.unwrap_or(STYLES);
     let sect_xml_raw = sect_pr.unwrap_or(DEFAULT_SECT_PR);
     // 当前只继承页面设置，不继承页眉页脚；移除悬空引用，避免 Word 打开失败。
-    let sect_xml = Regex::new(r"<w:(header|footer)Reference[^>]*/>")
+    let mut sect_xml = Regex::new(r"<w:(header|footer)Reference[^>]*/>")
         .expect("sectPr 清理正则")
         .replace_all(sect_xml_raw, "")
         .to_string();
+    if header.is_some() {
+        sect_xml = sect_xml.replace("</w:sectPr>", "<w:headerReference w:type=\"default\" r:id=\"rId100\"/></w:sectPr>");
+    }
+    if footer.is_some() {
+        sect_xml = sect_xml.replace("</w:sectPr>", "<w:footerReference w:type=\"default\" r:id=\"rId101\"/></w:sectPr>");
+    }
     let sect_xml = sect_xml.as_str();
     if let Some(t) = theme {
         if t.len() > 1024 * 1024 || !t.contains("<a:theme") {
@@ -197,6 +205,20 @@ pub fn build_docx_with_styles(
         if n.len() > 1024 * 1024 || !n.contains("<w:numbering") {
             return Err(CoreError::new("NF-EXP-002")
                 .with_message("docx 参考编号非法（需 w:numbering）")
+                .with_exit(3));
+        }
+    }
+    if let Some(h) = header {
+        if h.len() > 1024 * 1024 || !h.contains("<w:hdr") {
+            return Err(CoreError::new("NF-EXP-002")
+                .with_message("docx 参考页眉非法（需 w:hdr）")
+                .with_exit(3));
+        }
+    }
+    if let Some(f) = footer {
+        if f.len() > 1024 * 1024 || !f.contains("<w:ftr") {
+            return Err(CoreError::new("NF-EXP-002")
+                .with_message("docx 参考页脚非法（需 w:ftr）")
                 .with_exit(3));
         }
     }
@@ -225,6 +247,26 @@ pub fn build_docx_with_styles(
         document_rels = document_rels.replace(
             "</Relationships>",
             "<Relationship Id=\"rId3\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/numbering\" Target=\"numbering.xml\"/></Relationships>",
+        );
+    }
+    if header.is_some() {
+        content_types = content_types.replace(
+            "</Types>",
+            "<Override PartName=\"/word/header1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml\"/></Types>",
+        );
+        document_rels = document_rels.replace(
+            "</Relationships>",
+            "<Relationship Id=\"rId100\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/header\" Target=\"header1.xml\"/></Relationships>",
+        );
+    }
+    if footer.is_some() {
+        content_types = content_types.replace(
+            "</Types>",
+            "<Override PartName=\"/word/footer1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml\"/></Types>",
+        );
+        document_rels = document_rels.replace(
+            "</Relationships>",
+            "<Relationship Id=\"rId101\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer\" Target=\"footer1.xml\"/></Relationships>",
         );
     }
     if theme.is_some() {
@@ -263,6 +305,12 @@ pub fn build_docx_with_styles(
     ];
     if let Some(n) = numbering {
         entries.push(("word/numbering.xml".to_string(), n.as_bytes().to_vec()));
+    }
+    if let Some(h) = header {
+        entries.push(("word/header1.xml".to_string(), h.as_bytes().to_vec()));
+    }
+    if let Some(f) = footer {
+        entries.push(("word/footer1.xml".to_string(), f.as_bytes().to_vec()));
     }
     if let Some(t) = theme {
         entries.push(("word/theme/theme1.xml".to_string(), t.as_bytes().to_vec()));

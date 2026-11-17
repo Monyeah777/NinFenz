@@ -20,6 +20,12 @@ object DocxReferenceStyles {
     fun extractNumbering(file: File): String? = readEntry(file, "word/numbering.xml")
         ?.takeIf { it.contains("<w:numbering") }
 
+    fun extractHeader(file: File): String? = readEntry(file, "word/header1.xml")
+        ?.takeIf { it.contains("<w:hdr") }
+
+    fun extractFooter(file: File): String? = readEntry(file, "word/footer1.xml")
+        ?.takeIf { it.contains("<w:ftr") }
+
     private fun readEntry(file: File, name: String): String? {
         if (!file.isFile) return null
         return try {

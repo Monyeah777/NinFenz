@@ -130,6 +130,8 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
     var docxSectPr by remember { mutableStateOf<String?>(null) }
     var docxTheme by remember { mutableStateOf<String?>(null) }
     var docxNumbering by remember { mutableStateOf<String?>(null) }
+    var docxHeader by remember { mutableStateOf<String?>(null) }
+    var docxFooter by remember { mutableStateOf<String?>(null) }
     val referencePicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) {
             scope.launch {
@@ -138,11 +140,15 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                 val sectPr = file?.let { DocxReferenceStyles.extractSectPr(it) }
                 val theme = file?.let { DocxReferenceStyles.extractTheme(it) }
                 val numbering = file?.let { DocxReferenceStyles.extractNumbering(it) }
+                val header = file?.let { DocxReferenceStyles.extractHeader(it) }
+                val footer = file?.let { DocxReferenceStyles.extractFooter(it) }
                 file?.delete()
                 docxStyles = styles
                 docxSectPr = sectPr
                 docxTheme = theme
                 docxNumbering = numbering
+                docxHeader = header
+                docxFooter = footer
                 if (styles == null) {
                     error = CoreError(
                         "NF-EXP-002",
@@ -597,7 +603,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                         }
                         recordExport("zip", file, manifest)
                     }
-                    ExportButton("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", markdown, project, context, scope, { busy = it }, { error = it }, busy, docxStyles = docxStyles, docxSectPr = docxSectPr, docxTheme = docxTheme, docxNumbering = docxNumbering) { file, manifest, report ->
+                    ExportButton("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", markdown, project, context, scope, { busy = it }, { error = it }, busy, docxStyles = docxStyles, docxSectPr = docxSectPr, docxTheme = docxTheme, docxNumbering = docxNumbering, docxHeader = docxHeader, docxFooter = docxFooter) { file, manifest, report ->
                         exportedFile = file
                         manifestText = manifest
                         reproOk = report?.stable
@@ -926,6 +932,8 @@ private fun ExportButton(
     docxSectPr: String? = null,
     docxTheme: String? = null,
     docxNumbering: String? = null,
+    docxHeader: String? = null,
+    docxFooter: String? = null,
     onDone: (File?, String?, dev.ninfenz.mobile.data.ReproChecker.Report?) -> Unit
 ) {
     Button(
@@ -948,6 +956,8 @@ private fun ExportButton(
                         if (format == "docx" && docxSectPr != null) put("docx_sect_pr", docxSectPr)
                         if (format == "docx" && docxTheme != null) put("docx_theme", docxTheme)
                         if (format == "docx" && docxNumbering != null) put("docx_numbering", docxNumbering)
+                        if (format == "docx" && docxHeader != null) put("docx_header", docxHeader)
+                        if (format == "docx" && docxFooter != null) put("docx_footer", docxFooter)
                     }
                     fun fileFor(dir: File, manifest: kotlinx.serialization.json.JsonObject?): File? {
                         val name = manifest?.get("files")?.toString()?.let { raw ->
