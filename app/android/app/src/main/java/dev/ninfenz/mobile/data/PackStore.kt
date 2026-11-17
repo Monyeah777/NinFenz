@@ -82,6 +82,7 @@ object PackRegistry {
             if (!f.isFile) return null
             val db = SQLiteDatabase.openDatabase(f.path, null, SQLiteDatabase.OPEN_READONLY)
             db.use {
+                it.execSQL("PRAGMA busy_timeout=3000")
                 val out = mutableMapOf<String, PackRegistryEntry>()
                 it.rawQuery("SELECT id, version, installed_at, source FROM pack_registry", null).use { c ->
                     while (c.moveToNext()) {
@@ -101,6 +102,8 @@ object PackRegistry {
             f.parentFile?.mkdirs()
             val db = SQLiteDatabase.openOrCreateDatabase(f, null)
             db.use { database ->
+                database.execSQL("PRAGMA journal_mode=WAL")
+                database.execSQL("PRAGMA busy_timeout=3000")
                 database.beginTransaction()
                 try {
                     database.execSQL(
