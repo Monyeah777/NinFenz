@@ -30,21 +30,39 @@ object PdfExporter {
             val italic: Boolean = false,
             val rule: Boolean = false,
             val cells: List<String> = emptyList(),
-            val table: Boolean = false
+            val table: Boolean = false,
+            val weights: FloatArray? = null
         )
 
         val lineHeight = 16f
         val contentWidth = pageWidth - margin * 2
+        val blockList = PdfMarkdown.blocks(markdown)
+        val maxCols = blockList.filter { it.table }.maxOfOrNull { it.cells.size } ?: 0
+        val colWeights = FloatArray(maxCols) { 1f }
+        blockList.forEach { block ->
+            if (block.table) {
+                block.cells.forEachIndexed { i, cell ->
+                    colWeights[i] = maxOf(colWeights[i], cell.length.toFloat().coerceAtMost(40f))
+                }
+            }
+        }
         val lines = buildList {
             add(Line(title, 18f, true))
             add(Line("", 11f, false))
-            PdfMarkdown.blocks(markdown).forEach { block ->
+            blockList.forEach { block ->
                 if (block.rule) {
                     add(Line("", 11f, false, rule = true))
                     return@forEach
                 }
                 if (block.table && block.cells.isNotEmpty()) {
-                    add(Line("", 10f, block.tableHeader, cells = block.cells, table = true))
+                    add(
+                        Line(
+                            "", 10f, block.tableHeader,
+                            cells = block.cells,
+                            table = true,
+                            weights = if (colWeights.size == block.cells.size) colWeights else null
+                        )
+                    )
                     return@forEach
                 }
                 val size = if (block.table) 10f else when (block.level) {
@@ -77,18 +95,23 @@ object PdfExporter {
                         return@forEach
                     }
                     if (line.cells.isNotEmpty()) {
-                        val colWidth = contentWidth / line.cells.size
+                        val weights = line.weights ?: FloatArray(line.cells.size) { 1f }
+                        val totalWeight = weights.sum().coerceAtLeast(1f)
                         val p = Paint(paint).apply {
                             textSize = line.size
                             isFakeBoldText = line.bold
                         }
+                        var x = margin
+                        val xs = mutableListOf<Float>()
                         line.cells.forEachIndexed { i, cell ->
-                            canvas.drawText(ellipsize(cell, p, colWidth - 6f), margin + i * colWidth, y, p)
+                            val w = contentWidth * weights[i] / totalWeight
+                            canvas.drawText(ellipsize(cell, p, w - 6f), x, y, p)
+                            xs.add(x)
+                            x += w
                         }
                         if (line.table) {
                             for (i in 1 until line.cells.size) {
-                                val x = margin + i * colWidth
-                                canvas.drawLine(x, y - line.size, x, y + 4f, paint)
+                                canvas.drawLine(xs[i], y - line.size, xs[i], y + 4f, paint)
                             }
                             canvas.drawLine(margin, y + 4f, pageWidth - margin, y + 4f, paint)
                         }
