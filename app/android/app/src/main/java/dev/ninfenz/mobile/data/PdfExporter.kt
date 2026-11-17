@@ -118,6 +118,13 @@ object PdfExporter {
                         y += lineHeight
                         return@forEach
                     }
+                    if (line.mono) {
+                        val bg = Paint().apply { color = Color.rgb(245, 245, 245) }
+                        canvas.drawRect(margin - 4f, y - line.size - 2f, margin + contentWidth, y + 4f, bg)
+                    }
+                    if (line.italic) {
+                        canvas.drawLine(margin - 6f, y - line.size, margin - 6f, y + 4f, paint)
+                    }
                     val p = Paint(paint).apply {
                         textSize = line.size
                         isFakeBoldText = line.bold
