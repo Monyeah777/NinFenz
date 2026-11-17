@@ -7,7 +7,7 @@
 # Keep stdout pure JSON-RPC (the startup banner in nf.py goes to stderr).
 # Digest from Dockerfile.crosscheck's pinned PY_BASE (SLSA check41: base images
 # must be digest-pinned; a bare tag is rejected).
-FROM python:3.11-slim@sha256:e88e9763f943ec1834f992a4b51e0f24500486803e8bc534c5767af9ea65f6ce
+FROM python:3.15-slim@sha256:65a65fc7b30b06cb6df4930fd4650697cb23f4c2698ab81fc87e4b031bc36928
 
 LABEL org.opencontainers.image.title="NinFenz Content Gate" \
       org.opencontainers.image.description="Read-only MCP server for the NinFenz content contract layer" \
