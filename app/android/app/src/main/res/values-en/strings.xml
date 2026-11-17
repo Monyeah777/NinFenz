@@ -31,7 +31,7 @@
     <string name="home_core_bridge">Core bridge</string>
     <string name="home_core_unavailable"> · unavailable (NF-E-005)</string>
     <string name="home_error_codes">Error code registry</string>
-    <string name="home_error_code_count">%1$d entries (single source)</string>
+    <string name="home_error_code_count">entries=%1$d (single source)</string>
     <string name="home_not_bundled">Not bundled</string>
     <string name="home_screen_nav">Screen navigation</string>
     <string name="home_pipeline">Pipeline</string>
@@ -45,7 +45,7 @@
     <string name="home_project_library">Projects (projects/*.nfproject.json)</string>
     <string name="home_loading">Loading…</string>
     <string name="home_project_empty">No project files. A project is a reference set (ID+digest); Pack content is not embedded.</string>
-    <string name="home_review_summary">Review %1$s · history %2$d entries</string>
+    <string name="home_review_summary">Review %1$s · history entries=%2$d</string>
     <string name="home_project_parse_failed">Project parse failed: %1$s</string>
     <string name="home_rescan">Rescan</string>
 
@@ -140,7 +140,7 @@
     <string name="project_detail_id">Project ID: %1$s</string>
     <string name="project_detail_pack">Pack: %1$s · %2$s</string>
     <string name="project_detail_protocol">Protocol: %1$s</string>
-    <string name="pack_item_count">%1$d items</string>
+    <string name="pack_item_count">items=%1$d</string>
     <string name="project_flow_label">Assemble / validate / export</string>
     <string name="project_diff_read_failed">Cannot read the selected project file</string>
     <string name="project_parse_failed">Project parse failed: %1$s</string>
