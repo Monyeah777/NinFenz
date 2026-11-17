@@ -19,7 +19,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.core.CoreError
 import dev.ninfenz.mobile.core.CoreResponse
 import dev.ninfenz.mobile.core.J
+import dev.ninfenz.mobile.data.CcosSessionStore
 import dev.ninfenz.mobile.data.FileAccess
 import dev.ninfenz.mobile.data.ProjectStatusStore
 import dev.ninfenz.mobile.data.StatusAdvanceResult
@@ -71,6 +74,24 @@ fun CcosScreen(onBack: () -> Unit) {
     var outcome by remember { mutableStateOf<String?>(null) }
     var busy by remember { mutableStateOf(false) }
     var precheckFindings by remember { mutableStateOf<List<dev.ninfenz.mobile.model.CcosPrecheck.Finding>>(emptyList()) }
+    LaunchedEffect(Unit) {
+        val taskText = withContext(Dispatchers.IO) { CcosSessionStore.loadTask(context.filesDir) }
+        taskText?.let { text ->
+            runCatching {
+                val obj = J.parseObject(text, "ccos-task/1")
+                task = CcosModel.parseTask(obj)
+                rawTask = obj
+            }
+        }
+        val resultText = withContext(Dispatchers.IO) { CcosSessionStore.loadResult(context.filesDir) }
+        resultText?.let { text ->
+            runCatching {
+                val r = CcosModel.parseResult(text)
+                result = r
+                precheckFindings = dev.ninfenz.mobile.model.CcosPrecheck.check(r, task)
+            }
+        }
+    }
 
     val taskPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         if (uri == null) return@rememberLauncherForActivityResult
@@ -80,6 +101,7 @@ fun CcosScreen(onBack: () -> Unit) {
                 val obj = J.parseObject(text, "ccos-task/1")
                 task = CcosModel.parseTask(obj)
                 rawTask = obj
+                withContext(Dispatchers.IO) { CcosSessionStore.saveTask(context.filesDir, text) }
                 result?.let { precheckFindings = dev.ninfenz.mobile.model.CcosPrecheck.check(it, task) }
                 error = null
             } catch (e: Exception) {
@@ -98,6 +120,7 @@ fun CcosScreen(onBack: () -> Unit) {
             try {
                 val text = FileAccess.readText(context, uri)
                 result = CcosModel.parseResult(text)
+                withContext(Dispatchers.IO) { CcosSessionStore.saveResult(context.filesDir, text) }
                 precheckFindings = dev.ninfenz.mobile.model.CcosPrecheck.check(result!!, task)
                 error = null
                 outcome = null
