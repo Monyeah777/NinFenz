@@ -1,8 +1,8 @@
 {
-  "approved_at": "2026-11-16",
+  "approved_at": "2026-11-17",
   "approved_by": "Monyeah777",
-  "note": "APP error catalog import/project codes (LF)",
+  "note": "2026-11-17 真机验证后重建；用户授权",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "670508412e72485b068b4f73d3b43b659e1e3e9ae360fe659e2620dbb2aa195f"
+  "subject_digest": "b42323e75492203c29b3c9b0df1c28c712db5ec7c1f8c03be8eb8d35f6c86db2"
 }

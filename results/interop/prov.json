@@ -181,7 +181,7 @@
     {
       "@id": "nf:file/protocol/conformance_report.json",
       "@type": "prov:Entity",
-      "nf:sha256": "670508412e72485b068b4f73d3b43b659e1e3e9ae360fe659e2620dbb2aa195f"
+      "nf:sha256": "b42323e75492203c29b3c9b0df1c28c712db5ec7c1f8c03be8eb8d35f6c86db2"
     },
     {
       "@id": "nf:file/protocol/coupling_baseline.json",
