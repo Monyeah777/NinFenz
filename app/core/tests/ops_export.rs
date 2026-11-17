@@ -383,6 +383,8 @@ fn export_docx_renders_markdown_table() {
         .unwrap();
     assert!(doc.contains("<w:tbl>"));
     assert!(doc.contains("<w:tblBorders>"));
+    assert!(doc.contains("<w:tblGrid>"));
+    assert!(doc.contains("<w:gridCol"));
     assert!(doc.contains("<w:b/>"));
     assert!(doc.contains("列A"));
     assert!(doc.contains("列B"));

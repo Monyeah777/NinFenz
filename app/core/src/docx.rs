@@ -150,8 +150,19 @@ fn table_xml(rows: &[Vec<String>]) -> String {
         return String::new();
     }
     let cols = rows.iter().map(|r| r.len()).max().unwrap_or(1).max(1);
+    let mut weights = vec![1usize; cols];
+    for row in rows {
+        for (i, cell) in row.iter().enumerate() {
+            weights[i] = weights[i].max(cell.chars().count().min(40));
+        }
+    }
+    let total: usize = weights.iter().sum::<usize>().max(1);
+    let widths: Vec<usize> = weights
+        .iter()
+        .map(|w| (9360 * w / total).max(600))
+        .collect();
     let mut out = String::from(
-        "<w:tbl><w:tblPr><w:tblW w:w=\"0\" w:type=\"auto\"/><w:tblBorders>\
+        "<w:tbl><w:tblPr><w:tblW w:w=\"9360\" w:type=\"dxa\"/><w:tblBorders>\
          <w:top w:val=\"single\" w:sz=\"4\" w:space=\"0\" w:color=\"auto\"/>\
          <w:left w:val=\"single\" w:sz=\"4\" w:space=\"0\" w:color=\"auto\"/>\
          <w:bottom w:val=\"single\" w:sz=\"4\" w:space=\"0\" w:color=\"auto\"/>\
@@ -160,11 +171,19 @@ fn table_xml(rows: &[Vec<String>]) -> String {
          <w:insideV w:val=\"single\" w:sz=\"4\" w:space=\"0\" w:color=\"auto\"/>\
          </w:tblBorders></w:tblPr>",
     );
+    out.push_str("<w:tblGrid>");
+    for w in &widths {
+        out.push_str(&format!("<w:gridCol w:w=\"{w}\"/>"));
+    }
+    out.push_str("</w:tblGrid>");
     for (ri, row) in rows.iter().enumerate() {
         out.push_str("<w:tr>");
         for c in 0..cols {
             let cell = row.get(c).map(|s| s.as_str()).unwrap_or("");
-            out.push_str("<w:tc><w:tcPr><w:tcW w:w=\"0\" w:type=\"auto\"/></w:tcPr>");
+            out.push_str(&format!(
+                "<w:tc><w:tcPr><w:tcW w:w=\"{}\" w:type=\"dxa\"/></w:tcPr>",
+                widths.get(c).copied().unwrap_or(600)
+            ));
             out.push_str(&cell_paragraph(cell, ri == 0));
             out.push_str("</w:tc>");
         }
