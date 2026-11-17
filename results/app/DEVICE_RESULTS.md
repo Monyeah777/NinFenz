@@ -1,7 +1,7 @@
 # NF APP 真机结果（DEVICE_RESULTS）
 
 > 设备：OnePlus PLF110，Android 16（SDK 36），1080×2392 / 480dpi；serial 3B65AR0183V00000。
-> **2026-11-17 真机已连接**：本轮新增安装/冷启动、WebView PDF、杀进程路由与槽位恢复实测（见第 6 节）；其余未跑项仍标 OPEN。
+> **2026-11-17 真机已连接**：本轮新增安装/冷启动、WebView PDF、杀进程路由与槽位恢复、SQLite 迁移、CCOS 会话/预检、TalkBack 服务、横屏自适应实测（见第 6 节）；其余未跑项仍标 OPEN。
 > APK：0.2.0 / versionCode 2，minSdk 26 / target 36。本件只记实际跑过的项目；未跑项标 OPEN，不写成 pass。
 > 当前本机验证总览：Android JVM **373/373**、Rust core **198/198**、app Python **498 passed**、APP 门禁 QA0–QA6 PASS/gap=0、lint **0 warnings**、`verify.sh --checks-only` PASS=107/WARN=2/FAIL=0。
 
