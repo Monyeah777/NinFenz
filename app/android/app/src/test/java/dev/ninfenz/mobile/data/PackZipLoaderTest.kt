@@ -119,6 +119,24 @@ class PackZipLoaderTest {
     }
 
     @Test
+    fun rejectsSpecialFileEntryFromCentralDirectory() {
+        val file = zip("nf-pack.json" to "{}")
+        val bytes = file.readBytes()
+        val at = (0..bytes.size - 4).first { i ->
+            bytes[i] == 0x50.toByte() && bytes[i + 1] == 0x4B.toByte() &&
+                bytes[i + 2] == 0x01.toByte() && bytes[i + 3] == 0x02.toByte()
+        }
+        bytes[at + 5] = 3
+        bytes[at + 38] = 0
+        bytes[at + 39] = 0
+        bytes[at + 40] = 0
+        bytes[at + 41] = 0x10.toByte() // fifo mode 0x1000
+        file.writeBytes(bytes)
+        val dest = File.createTempFile("nf-pack-out11", "").let { it.delete(); it }
+        assertTrue(runCatching { PackZipLoader.extract(file, dest) }.isFailure)
+    }
+
+    @Test
     fun rejectsMissingManifest() {
         val zip = zip("readme.txt" to "x")
         val dest = File.createTempFile("nf-pack-out4", "").let { it.delete(); it }

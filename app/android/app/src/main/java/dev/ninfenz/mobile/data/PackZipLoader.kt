@@ -71,8 +71,8 @@ object PackZipLoader {
 
     /** 解包前用 central directory 做压缩比/声明总量预检，防高压缩比炸弹。 */
     private fun preflight(zipFile: File) {
-        if (containsSymlinkEntry(zipFile)) {
-            throw PackZipException("zip 含符号链接条目", "拒绝不安全的 Pack zip")
+        if (containsUnsafeEntry(zipFile)) {
+            throw PackZipException("zip 含特殊文件条目", "拒绝不安全的 Pack zip")
         }
         if (containsEncryptedEntry(zipFile)) {
             throw PackZipException("zip 含加密条目", "拒绝加密 Pack zip")
@@ -95,8 +95,8 @@ object PackZipLoader {
         }
     }
 
-    /** 读 central directory 的 external attributes，检测 Unix symlink（mode 0xA000）。 */
-    private fun containsSymlinkEntry(zipFile: File): Boolean {
+    /** 读 central directory 的 external attributes，拒绝 symlink/fifo/device/socket；普通文件与目录放行。 */
+    private fun containsUnsafeEntry(zipFile: File): Boolean {
         return try {
             java.io.RandomAccessFile(zipFile, "r").use { raf ->
                 val length = raf.length()
@@ -122,7 +122,7 @@ object PackZipLoader {
                     val os = (madeBy ushr 8) and 0xFF
                     val external = le32(header, 38)
                     val mode = ((external ushr 16) and 0xF000).toInt()
-                    if (os == 3 && mode == 0xA000) return true
+                    if (os == 3 && mode != 0 && mode != 0x8000 && mode != 0x4000) return true
                     val skip = le16(header, 28) + le16(header, 30) + le16(header, 32)
                     raf.seek(raf.filePointer + skip)
                 }
