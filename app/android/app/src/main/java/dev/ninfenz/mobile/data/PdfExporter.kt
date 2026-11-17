@@ -32,7 +32,7 @@ object PdfExporter {
         val lines = buildList {
             add(title)
             add("")
-            markdown.replace("\r\n", "\n").split('\n').forEach { raw ->
+            PdfMarkdown.lines(markdown).forEach { raw ->
                 PdfPager.wrap(raw, contentWidth) { paint.measureText(it) }.forEach { add(it) }
             }
         }
