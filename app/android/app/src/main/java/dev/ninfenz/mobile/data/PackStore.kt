@@ -1,5 +1,7 @@
 package dev.ninfenz.mobile.data
 
+import android.content.ContentValues
+import android.database.sqlite.SQLiteDatabase
 import java.io.File
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
@@ -24,13 +26,18 @@ data class PackEntry(
 
 data class PackSnapshot(val packs: List<PackEntry>, val errors: List<String>)
 
-/** Pack 安装注册表：library/pack-registry.json（独立于 Pack 目录，不参与 pack tree 摘要）。 */
+/** Pack 安装注册表：SQLite 为主（library/pack-registry.db），JSON 镜像兼容旧环境；均独立于 Pack 目录。 */
 data class PackRegistryEntry(val installedAt: Long, val source: String)
 
 object PackRegistry {
     private fun file(filesDir: File): File = File(filesDir, "library/pack-registry.json")
 
     fun load(filesDir: File): Map<String, PackRegistryEntry> {
+        sqliteLoad(filesDir)?.takeIf { it.isNotEmpty() }?.let { return it }
+        return jsonLoad(filesDir)
+    }
+
+    private fun jsonLoad(filesDir: File): Map<String, PackRegistryEntry> {
         val f = file(filesDir)
         if (!f.isFile) return emptyMap()
         return try {
@@ -50,6 +57,7 @@ object PackRegistry {
         val filesDir = target.parentFile?.parentFile?.parentFile?.parentFile ?: return
         val id = target.parentFile?.name ?: return
         val version = target.name
+        sqliteRecord(filesDir, id, version, source)
         val next = load(filesDir).toMutableMap()
         next[id + "@" + version] = PackRegistryEntry(System.currentTimeMillis(), source)
         val obj = buildJsonObject {
@@ -64,6 +72,52 @@ object PackRegistry {
             })
         }
         runCatching { AtomicFiles.writeText(file(filesDir), obj.toString()) }
+    }
+
+    private fun dbFile(filesDir: File): File = File(filesDir, "library/pack-registry.db")
+
+    private fun sqliteLoad(filesDir: File): Map<String, PackRegistryEntry>? {
+        return try {
+            val f = dbFile(filesDir)
+            if (!f.isFile) return null
+            val db = SQLiteDatabase.openDatabase(f.path, null, SQLiteDatabase.OPEN_READONLY)
+            db.use {
+                val out = mutableMapOf<String, PackRegistryEntry>()
+                it.rawQuery("SELECT id, version, installed_at, source FROM pack_registry", null).use { c ->
+                    while (c.moveToNext()) {
+                        out[c.getString(0) + "@" + c.getString(1)] = PackRegistryEntry(c.getLong(2), c.getString(3))
+                    }
+                }
+                out
+            }
+        } catch (t: Throwable) {
+            null
+        }
+    }
+
+    private fun sqliteRecord(filesDir: File, id: String, version: String, source: String): Boolean {
+        return try {
+            val f = dbFile(filesDir)
+            f.parentFile?.mkdirs()
+            val db = SQLiteDatabase.openOrCreateDatabase(f, null)
+            db.use {
+                it.execSQL(
+                    "CREATE TABLE IF NOT EXISTS pack_registry (" +
+                        "id TEXT NOT NULL, version TEXT NOT NULL, installed_at INTEGER NOT NULL, source TEXT NOT NULL, " +
+                        "PRIMARY KEY(id, version))"
+                )
+                val values = ContentValues().apply {
+                    put("id", id)
+                    put("version", version)
+                    put("installed_at", System.currentTimeMillis())
+                    put("source", source)
+                }
+                it.insertWithOnConflict("pack_registry", null, values, SQLiteDatabase.CONFLICT_REPLACE)
+            }
+            true
+        } catch (t: Throwable) {
+            false
+        }
     }
 
     private fun JsonObject.text(key: String): String =
