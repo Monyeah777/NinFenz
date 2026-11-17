@@ -53,6 +53,49 @@ object PackRegistry {
         }
     }
 
+    /** 旧 JSON 注册表迁移到 SQLite；由 PackStore.scan 在首次扫描时调用。 */
+    fun ensureMigrated(filesDir: File) {
+        val f = dbFile(filesDir)
+        if (f.isFile) return
+        try {
+            f.parentFile?.mkdirs()
+            val db = SQLiteDatabase.openOrCreateDatabase(f, null)
+            db.use { database ->
+                database.beginTransaction()
+                try {
+                    database.execSQL(CREATE_TABLE_SQL)
+                    var count = 0L
+                    database.rawQuery("SELECT COUNT(*) FROM pack_registry", null).use { c ->
+                        if (c.moveToFirst()) count = c.getLong(0)
+                    }
+                    if (count == 0L) {
+                        jsonLoad(filesDir).forEach { (key, entry) ->
+                            val at = key.lastIndexOf('@')
+                            if (at > 0) {
+                                val values = ContentValues().apply {
+                                    put("id", key.substring(0, at))
+                                    put("version", key.substring(at + 1))
+                                    put("installed_at", entry.installedAt)
+                                    put("source", entry.source)
+                                }
+                                database.insertWithOnConflict("pack_registry", null, values, SQLiteDatabase.CONFLICT_REPLACE)
+                            }
+                        }
+                    }
+                    database.setTransactionSuccessful()
+                } finally {
+                    database.endTransaction()
+                }
+            }
+        } catch (t: Throwable) {
+            // 迁移失败保留 JSON 回退，不阻断扫描
+        }
+    }
+
+    const val CREATE_TABLE_SQL = "CREATE TABLE IF NOT EXISTS pack_registry (" +
+        "id TEXT NOT NULL, version TEXT NOT NULL, installed_at INTEGER NOT NULL, source TEXT NOT NULL, " +
+        "PRIMARY KEY(id, version))"
+
     fun record(target: File, source: String) {
         val filesDir = target.parentFile?.parentFile?.parentFile?.parentFile ?: return
         val id = target.parentFile?.name ?: return
@@ -106,11 +149,7 @@ object PackRegistry {
                 database.execSQL("PRAGMA busy_timeout=3000")
                 database.beginTransaction()
                 try {
-                    database.execSQL(
-                        "CREATE TABLE IF NOT EXISTS pack_registry (" +
-                            "id TEXT NOT NULL, version TEXT NOT NULL, installed_at INTEGER NOT NULL, source TEXT NOT NULL, " +
-                            "PRIMARY KEY(id, version))"
-                    )
+                            database.execSQL(CREATE_TABLE_SQL)
                     fun put(id: String, version: String, at: Long, source: String) {
                         val values = ContentValues().apply {
                             put("id", id)
@@ -161,6 +200,7 @@ class PackStore(private val filesDir: File) {
     }
 
     fun scan(): PackSnapshot {
+        PackRegistry.ensureMigrated(filesDir)
         val root = packsRoot()
         val fingerprint = if (!root.isDirectory) {
             0L

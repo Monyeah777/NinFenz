@@ -3,7 +3,7 @@
 > 设备：OnePlus PLF110，Android 16（SDK 36），1080×2392 / 480dpi；serial 3B65AR0183V00000。
 > **2026-11-17 真机已连接**：本轮新增安装/冷启动、WebView PDF、杀进程路由与槽位恢复实测（见第 6 节）；其余未跑项仍标 OPEN。
 > APK：0.2.0 / versionCode 2，minSdk 26 / target 36。本件只记实际跑过的项目；未跑项标 OPEN，不写成 pass。
-> 当前本机验证总览：Android JVM **372/372**、Rust core **198/198**、app Python **498 passed**、APP 门禁 QA0–QA6 PASS/gap=0、lint **0 warnings**、`verify.sh --checks-only` PASS=107/WARN=2/FAIL=0。
+> 当前本机验证总览：Android JVM **373/373**、Rust core **198/198**、app Python **498 passed**、APP 门禁 QA0–QA6 PASS/gap=0、lint **0 warnings**、`verify.sh --checks-only` PASS=107/WARN=2/FAIL=0。
 
 ## 1. 已实测（2026-11-15）
 
@@ -213,7 +213,7 @@
 | 依赖升级 coroutines（JVM） | pass（本机）：coroutines 1.9.0→1.10.2，243 tests 全绿；lint warnings 3→2；debug APK 因未压缩 dex 增至 24.7MB。真机未复测（adb 无设备） |
 | Clean build（本轮） | pass（本机）：`gradlew clean` + `testDebugUnitTest --rerun-tasks` + assembleDebug；248/248 全绿；clean APK 19,032,264 B sha256 f4501bfe…；zipalign 16KB 通过。增量 APK 24.7MB 为旧构建膨胀，clean 产物为准。 |
 | Rust core 单测（本轮） | pass（本机）：`cargo test` 186 passed / 0 failed；Android 端无 core 改动。 |
-| Release 构建（构建） | pass（本机）：clean 后重建 `:app:assembleRelease` 成功；app-release-unsigned.apk 15,529,949 B sha256 2a2b29a2…；zipalign 16KB 通过；apksigner 显示未签名（预期，签名 OPEN-EXTERNAL）。 |
+| Release 构建（构建） | pass（本机）：clean 后重建 `:app:assembleRelease` 成功；app-release-unsigned.apk 15,529,949 B sha256 160699b4…；zipalign 16KB 通过；apksigner 显示未签名（预期，签名 OPEN-EXTERNAL）。 |
 | 16KB 页对齐（构建） | pass（本机）：`zipalign -c -P 16 4 app-debug.apk` exit=0；未真机安装验证。 |
 | APP 门禁（round127） | pass（本机）：QA0–QA6 全 PASS，FAIL=0；covered=14 gap=0 open=2 p0=0；台账刷新到当前 HEAD。 |
 | APP 门禁（本轮） | pass（本机）：QA0–QA6 全部 PASS，FAIL=0；自审计 covered=14 gap=0 open=2 p0=0。 |
@@ -372,6 +372,7 @@
 | WebView PDF | pass：交付台导出 result.pdf 31,067 B；界面显示“PDF 结构校验通过（1 页）”“复现检查：两次导出一致”；经 FileProvider 分享到 Edge，页面可见“演示项目 / 开篇 / 正文 / 收束” | result.pdf、pdf-share-edge2.png |
 | 杀进程路由/槽位恢复 | pass：Home 后 run-as kill -9；最近任务重开；交付台路由保留，SLT-01 显示“已恢复上次槽位草稿”且内容恢复 | form-restored.png |
 | TalkBack 服务 | partial/pass（服务层）：开启 TalkBack 后服务已 Bound，APP 前台运行、无 FATAL；未做语音手势逐项走查 | talkback-back.png |
+| SQLite 注册表 | pass：预置旧 JSON 后 force-stop/启动，生成 pack-registry.db，查询到 demo-pack/1.0.0/123456/device-migrate-test；随后清理种子数据 | pack-registry.db |
 | CCOS 会话/预检 | partial：run-as 预置 task/result 后，CCOS 屏恢复 task-demo-0001、result succeeded、显示“导入前预检通过”；人审提交未完成 | ui-ccos5.xml |
 | 横屏自适应 | pass：旋转到横屏后 NavigationRail 竖排四目的地，内容区重排 | landscape.png |
 | Release 结构 | partial：zipalign 16KB 通过；apksigner 报 Missing META-INF/MANIFEST.MF（未签名，签名仍 OPEN-EXTERNAL） | zipalign/apksigner 输出 |

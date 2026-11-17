@@ -29,6 +29,19 @@ class PackRegistrySqliteTest {
     }
 
     @Test
+    fun scanMigratesLegacyJsonToSqlite() {
+        val root = Files.createTempDirectory("nf-pack-registry-scan").toFile()
+        val json = File(root, "library/pack-registry.json").apply { parentFile?.mkdirs() }
+        json.writeText(
+            "{\"schema\":\"nf-pack-registry/1\",\"packs\":{\"old@1.0.0\":{\"installed_at\":123,\"source\":\"legacy\"}}}",
+            Charsets.UTF_8
+        )
+        PackStore(root).scan()
+        assertTrue(File(root, "library/pack-registry.db").isFile)
+        assertEquals("legacy", PackRegistry.load(root)["old@1.0.0"]?.source)
+    }
+
+    @Test
     fun recordsAndLoadsSqliteRegistry() {
         val root = Files.createTempDirectory("nf-pack-registry").toFile()
         val target = File(root, "library/packs/demo/1.0.0").apply { mkdirs() }
