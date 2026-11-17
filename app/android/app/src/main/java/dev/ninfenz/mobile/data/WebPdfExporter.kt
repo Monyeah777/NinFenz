@@ -3,6 +3,7 @@ package dev.ninfenz.mobile.data
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Paint
 import android.graphics.pdf.PdfDocument
 import android.view.View
 import android.view.ContextThemeWrapper
@@ -102,6 +103,11 @@ object WebPdfExporter {
             outDir.mkdirs()
             val target = File(outDir, "result.pdf")
             val doc = PdfDocument()
+            val footer = Paint().apply {
+                color = Color.GRAY
+                textSize = 8f
+                isAntiAlias = true
+            }
             try {
                 for (i in 0 until pageCount) {
                     val page = doc.startPage(PdfDocument.PageInfo.Builder(pageWidth, pageHeight, i + 1).create())
@@ -112,6 +118,8 @@ object WebPdfExporter {
                         translate(0f, -i * perPage)
                         view.draw(this)
                     }
+                    val label = (i + 1).toString() + " / " + pageCount
+                    canvas.drawText(label, pageWidth - 12f - footer.measureText(label), pageHeight - 16f, footer)
                     doc.finishPage(page)
                 }
                 target.outputStream().use { doc.writeTo(it) }

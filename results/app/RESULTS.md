@@ -24,7 +24,7 @@
 
 | 项 | 结果 |
 |---|---|
-| APK | app-debug.apk = 19,345,815 B；sha256 72a79b89e3266b785a29537ebd3514c4e6108d015bbf999df5a6c715afb597bc |
+| APK | app-debug.apk = 19,345,815 B；sha256 7d975c4e3624c41ed58c177ba4586583797a84d271fe539cd8e2954744a6ba81 |
 | JVM 测试 | 362 条全绿（v1 基线 42 + v0.02 新增 320；含 Robolectric/Compose/Paparazzi） |
 | 构建 | ./gradlew :app:assembleDebug 成功；:app:testDebugUnitTest 362/362；lint 0 warnings |
 | i18n | 全部屏主要文案已资源化 + values-en；「我的」zh/en/跟随系统切换；动态取色开关；库/Pack 中心下拉刷新；节点删除 Snackbar 撤销 + 触觉；expanded 双栏（主列表+详情）；导航 Crossfade（NfMotion.MEDIUM_MS）；统一 loading/skeleton 组件；UI 中文硬编码守卫通过 |
@@ -42,7 +42,7 @@
 ### 0.4 v0.02 收口（2026-11-15）
 
 - 机读门禁：app/gates **7/7 PASS，FAIL=0**（QA0 10 / QA5 5）；仓库 verify **PASS=107 WARN=2 FAIL=0**。
-- 测试/产物：JVM **362/362**；APK 19,345,815 B，sha256 72a79b89…。
+- 测试/产物：JVM **362/362**；APK 19,345,815 B，sha256 7d975c4e…。
 - 结论：**v0.02 实现面 pass-with-open-items**；下方 OPEN 不因收口消失，未跑面不写成 pass。
 
 ### 0.5 v0.02 OPEN（带 owner+next）
