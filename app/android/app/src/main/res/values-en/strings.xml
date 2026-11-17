@@ -227,6 +227,7 @@
     <string name="packcenter_installed_count">Installed (%1$d)</string>
     <string name="packcenter_installed">Installed</string>
     <string name="packcenter_tree">tree: %1$s…</string>
+    <string name="packcenter_installed_at">Installed %1$s</string>
     <string name="packcenter_verify">Verify</string>
     <string name="packcenter_verifying">Verifying…</string>
     <string name="packcenter_detail">Details</string>

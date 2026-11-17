@@ -18,7 +18,8 @@ data class PackEntry(
     val description: String,
     val itemCount: Int,
     val tree: String,
-    val dir: File
+    val dir: File,
+    val installedAt: Long = 0L
 )
 
 data class PackSnapshot(val packs: List<PackEntry>, val errors: List<String>)
@@ -70,7 +71,8 @@ class PackStore(private val filesDir: File) {
                     val description = obj.text("description")
                     val items = obj["items"]?.jsonArray?.size ?: 0
                     val tree = obj["hashes"]?.jsonObject?.get("tree")?.jsonPrimitive?.content ?: ""
-                    entries.add(PackEntry(id, version, title, description, items, tree, vDir))
+                    val installedAt = readInstalledAt(vDir)
+                    entries.add(PackEntry(id, version, title, description, items, tree, vDir, installedAt))
                 } catch (t: Throwable) {
                     errors.add(vDir.name + "：" + (t.message ?: t.javaClass.simpleName))
                 }
@@ -98,7 +100,8 @@ class PackStore(private val filesDir: File) {
                     description = p.text("description"),
                     itemCount = p["items"]?.jsonPrimitive?.int ?: 0,
                     tree = p.text("tree"),
-                    dir = dir
+                    dir = dir,
+                    installedAt = p["installed_at"]?.jsonPrimitive?.content?.toLongOrNull() ?: dir.lastModified()
                 )
             } ?: return null
             val errors = o["errors"]?.jsonArray?.mapNotNull { it.jsonPrimitive.content } ?: emptyList()
@@ -123,12 +126,24 @@ class PackStore(private val filesDir: File) {
                         put("items", p.itemCount)
                         put("tree", p.tree)
                         put("rel", p.dir.relativeTo(root).path.replace('\\', '/'))
+                        put("installed_at", if (p.installedAt > 0) p.installedAt else p.dir.lastModified())
                     })
                 }
             })
             put("errors", buildJsonArray { snapshot.errors.forEach { add(kotlinx.serialization.json.JsonPrimitive(it)) } })
         }
         AtomicFiles.writeText(indexFile(), obj.toString())
+    }
+
+    private fun readInstalledAt(dir: File): Long {
+        val sidecar = File(dir, ".nf-install.json")
+        if (!sidecar.isFile) return dir.lastModified()
+        return try {
+            Json.parseToJsonElement(sidecar.readText(Charsets.UTF_8)).jsonObject
+                .text("installed_at").toLongOrNull() ?: dir.lastModified()
+        } catch (t: Throwable) {
+            dir.lastModified()
+        }
     }
 
     private fun JsonObject.text(key: String): String =

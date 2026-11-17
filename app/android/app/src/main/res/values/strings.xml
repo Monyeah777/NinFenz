@@ -227,6 +227,7 @@
     <string name="packcenter_installed_count">已安装（%1$d）</string>
     <string name="packcenter_installed">已安装</string>
     <string name="packcenter_tree">tree：%1$s…</string>
+    <string name="packcenter_installed_at">安装于 %1$s</string>
     <string name="packcenter_verify">校验</string>
     <string name="packcenter_verifying">校验中…</string>
     <string name="packcenter_detail">详情</string>

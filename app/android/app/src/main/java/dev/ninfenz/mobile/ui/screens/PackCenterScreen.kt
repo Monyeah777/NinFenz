@@ -38,6 +38,12 @@ import dev.ninfenz.mobile.ui.components.NfStatusChip
 import dev.ninfenz.mobile.ui.components.NfTopAppBar
 import dev.ninfenz.mobile.ui.theme.NfSpacing
 
+private fun formatInstalledAt(at: Long): String = if (at <= 0) {
+    "-"
+} else {
+    java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", java.util.Locale.getDefault()).format(java.util.Date(at))
+}
+
 /** W5 Pack 中心：已装列表 + 逐 Pack 校验 + 详情/更新入口（diff/冲突/回滚仍在 PackUpdate）。 */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -96,6 +102,11 @@ fun PackCenterScreen(
                                 NfStatusChip(stringResource(dev.ninfenz.mobile.R.string.packcenter_installed))
                             }
                             Text(stringResource(dev.ninfenz.mobile.R.string.packcenter_tree, pack.tree.take(16)), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(
+                                stringResource(dev.ninfenz.mobile.R.string.packcenter_installed_at, formatInstalledAt(pack.installedAt)),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                             val pinned = trust[pack.id + "@" + pack.version]?.tree
                             if (pinned != null && pinned != pack.tree) {
                                 Text(

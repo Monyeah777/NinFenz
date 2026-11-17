@@ -76,10 +76,8 @@ fun HomeScreen(store: LibraryStore, onOpen: (Screen) -> Unit) {
                         if (target.exists()) {
                             installError = context.getString(dev.ninfenz.mobile.R.string.pack_install_duplicate, id, version)
                         } else {
-                            val ok = incoming.renameTo(target)
-                            if (!ok) {
-                                installError = context.getString(dev.ninfenz.mobile.R.string.pack_install_move_failed, target.absolutePath)
-                            } else {
+                            try {
+                                dev.ninfenz.mobile.data.PackInstaller.install(incoming, target, "directory")
                                 message = context.getString(
                                     dev.ninfenz.mobile.R.string.pack_install_done,
                                     id,
@@ -95,6 +93,11 @@ fun HomeScreen(store: LibraryStore, onOpen: (Screen) -> Unit) {
                                     dev.ninfenz.mobile.R.string.pack_install_done_with_status,
                                     message ?: "",
                                     verify
+                                )
+                            } catch (t: Throwable) {
+                                installError = context.getString(
+                                    dev.ninfenz.mobile.R.string.pack_install_move_failed,
+                                    t.message ?: target.absolutePath
                                 )
                             }
                         }
