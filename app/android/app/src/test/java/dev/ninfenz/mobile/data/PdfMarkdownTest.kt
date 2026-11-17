@@ -31,6 +31,14 @@ class PdfMarkdownTest {
     }
 
     @Test
+    fun quoteAndHorizontalRuleAreMarked() {
+        val blocks = PdfMarkdown.blocks("> 引用\n\n---")
+        assertTrue(blocks[0].quote)
+        assertEquals("│ 引用", PdfMarkdown.lines("> 引用")[0])
+        assertTrue(blocks[1].rule)
+    }
+
+    @Test
     fun bulletsUseDotPrefix() {
         assertEquals(listOf("• 一", "• 二"), PdfMarkdown.lines("- 一\n* 二"))
     }

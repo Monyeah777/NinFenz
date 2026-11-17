@@ -8,7 +8,9 @@ object PdfMarkdown {
         val bullet: Boolean = false,
         val code: Boolean = false,
         val table: Boolean = false,
-        val tableHeader: Boolean = false
+        val tableHeader: Boolean = false,
+        val quote: Boolean = false,
+        val rule: Boolean = false
     )
 
     fun blocks(markdown: String): List<Block> {
@@ -41,6 +43,14 @@ object PdfMarkdown {
                 continue
             }
             lastTableBlock = -1
+            if (trimmed.length >= 3 && (trimmed.all { it == '-' } || trimmed.all { it == '*' } || trimmed.all { it == '_' })) {
+                out.add(Block("", rule = true))
+                continue
+            }
+            if (trimmed.startsWith(">")) {
+                out.add(Block(inline(trimmed.removePrefix(">").trim()), quote = true))
+                continue
+            }
             val hashes = trimmed.takeWhile { it == '#' }.length
             if (hashes in 1..6) {
                 out.add(Block(inline(trimmed.substring(hashes).trim()), level = hashes))
@@ -56,7 +66,12 @@ object PdfMarkdown {
     }
 
     fun lines(markdown: String): List<String> = blocks(markdown).map {
-        (if (it.bullet) "• " else "") + it.text
+        when {
+            it.rule -> ""
+            it.quote -> "│ " + it.text
+            it.bullet -> "• " + it.text
+            else -> it.text
+        }
     }
 
     fun inline(s: String): String {

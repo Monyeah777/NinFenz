@@ -22,7 +22,14 @@ object PdfExporter {
             textSize = 11f
             isAntiAlias = true
         }
-        data class Line(val text: String, val size: Float, val bold: Boolean, val mono: Boolean = false)
+        data class Line(
+            val text: String,
+            val size: Float,
+            val bold: Boolean,
+            val mono: Boolean = false,
+            val italic: Boolean = false,
+            val rule: Boolean = false
+        )
 
         val lineHeight = 16f
         val contentWidth = pageWidth - margin * 2
@@ -30,6 +37,10 @@ object PdfExporter {
             add(Line(title, 18f, true))
             add(Line("", 11f, false))
             PdfMarkdown.blocks(markdown).forEach { block ->
+                if (block.rule) {
+                    add(Line("", 11f, false, rule = true))
+                    return@forEach
+                }
                 val size = if (block.table) 10f else when (block.level) {
                     1 -> 20f
                     2 -> 18f
@@ -42,7 +53,7 @@ object PdfExporter {
                 val bold = block.level > 0 || block.tableHeader
                 val prefix = if (block.bullet) "• " else ""
                 PdfPager.wrap(prefix + block.text, contentWidth) { paint.measureText(it) * (size / 11f) }
-                    .forEach { add(Line(it, size, bold, block.code)) }
+                    .forEach { add(Line(it, size, bold, block.code, block.quote)) }
             }
         }
         val firstPageLines = ((pageHeight - margin * 2 - lineHeight * 4) / lineHeight).toInt().coerceAtLeast(1)
@@ -54,10 +65,16 @@ object PdfExporter {
                 val canvas: Canvas = page.canvas
                 var y = margin + 20f
                 pageLines.forEach { line ->
+                    if (line.rule) {
+                        canvas.drawLine(margin, y - 6f, pageWidth - margin, y - 6f, paint)
+                        y += 8f
+                        return@forEach
+                    }
                     val p = Paint(paint).apply {
                         textSize = line.size
                         isFakeBoldText = line.bold
                         typeface = if (line.mono) Typeface.MONOSPACE else Typeface.DEFAULT
+                        if (line.italic) textSkewX = -0.25f
                     }
                     canvas.drawText(line.text, margin, y, p)
                     y += maxOf(lineHeight, line.size * 1.3f)
