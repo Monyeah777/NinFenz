@@ -9,6 +9,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -28,8 +31,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import dev.ninfenz.mobile.data.PackEntry
+import dev.ninfenz.mobile.data.PackZipInstaller
 import dev.ninfenz.mobile.data.PackTrustStore
 import dev.ninfenz.mobile.data.ProjectEntry
 import dev.ninfenz.mobile.data.PackVerifier
@@ -40,6 +46,7 @@ import dev.ninfenz.mobile.ui.components.NfSectionHeader
 import dev.ninfenz.mobile.ui.components.NfStatusChip
 import dev.ninfenz.mobile.ui.components.NfTopAppBar
 import dev.ninfenz.mobile.ui.theme.NfSpacing
+import java.io.File
 
 private fun formatInstalledAt(at: Long): String = if (at <= 0) {
     "-"
@@ -70,11 +77,51 @@ fun PackCenterScreen(
     var pendingUninstall by remember { mutableStateOf<PackEntry?>(null) }
     var uninstallErrors by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
 
+    val zipPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        scope.launch {
+            val result = runCatching {
+                val temp = File(File(context.cacheDir, "pack-install").apply { mkdirs() }, "pack.zip")
+                withContext(Dispatchers.IO) {
+                    context.contentResolver.openInputStream(uri)?.use { input ->
+                        temp.outputStream().use { output -> input.copyTo(output) }
+                    }
+                    PackZipInstaller.install(temp, context.filesDir).also { temp.delete() }
+                }
+            }
+            result.onSuccess {
+                if (it.ok) {
+                    android.widget.Toast.makeText(
+                        context,
+                        context.getString(dev.ninfenz.mobile.R.string.packcenter_install_zip_done, it.id, it.version),
+                        android.widget.Toast.LENGTH_SHORT
+                    ).show()
+                    onRefresh()
+                } else {
+                    android.widget.Toast.makeText(
+                        context,
+                        context.getString(dev.ninfenz.mobile.R.string.packcenter_install_zip_failed, it.message),
+                        android.widget.Toast.LENGTH_LONG
+                    ).show()
+                }
+            }.onFailure {
+                android.widget.Toast.makeText(
+                    context,
+                    context.getString(dev.ninfenz.mobile.R.string.packcenter_install_zip_failed, it.message ?: it.javaClass.simpleName),
+                    android.widget.Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+    }
+
     Column(modifier = Modifier.fillMaxSize()) {
         NfTopAppBar(
             title = stringResource(dev.ninfenz.mobile.R.string.packcenter_title),
             onBack = onBack,
             actions = {
+                TextButton(onClick = { zipPicker.launch(arrayOf("application/zip", "application/octet-stream", "*/*")) }) {
+                    Text(stringResource(dev.ninfenz.mobile.R.string.packcenter_install_zip))
+                }
                 TextButton(onClick = onUpdatePlan) { Text(stringResource(dev.ninfenz.mobile.R.string.packcenter_update_plan)) }
             }
         )

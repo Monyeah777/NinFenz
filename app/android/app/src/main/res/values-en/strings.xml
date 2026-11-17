@@ -212,6 +212,9 @@
     <string name="search_kind_slot">Spec slots</string>
     <string name="packcenter_title">Pack center</string>
     <string name="packcenter_update_plan">Update plan</string>
+    <string name="packcenter_install_zip">Install zip</string>
+    <string name="packcenter_install_zip_done">Installed %1$s · %2$s</string>
+    <string name="packcenter_install_zip_failed">Install failed: %1$s</string>
     <string name="pack_update_diff_failed">pack-diff failed: %1$s</string>
     <string name="pack_update_diff_failed_fix">Check both Pack directories</string>
     <string name="pack_update_open_plan">Open update plan</string>

@@ -212,6 +212,9 @@
     <string name="search_kind_slot">规格槽位</string>
     <string name="packcenter_title">Pack 中心</string>
     <string name="packcenter_update_plan">更新计划</string>
+    <string name="packcenter_install_zip">安装 zip</string>
+    <string name="packcenter_install_zip_done">已安装 %1$s · %2$s</string>
+    <string name="packcenter_install_zip_failed">安装失败：%1$s</string>
     <string name="pack_update_diff_failed">pack-diff 失败：%1$s</string>
     <string name="pack_update_diff_failed_fix">检查两版 Pack 目录</string>
     <string name="pack_update_open_plan">打开更新计划</string>
