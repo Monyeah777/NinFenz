@@ -1,9 +1,12 @@
 package dev.ninfenz.mobile.ui
 
+import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.hasSetTextAction
+import androidx.compose.ui.test.isSelectable
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import dev.ninfenz.mobile.data.PackEntry
 import dev.ninfenz.mobile.ui.screens.NewProjectScreen
@@ -40,5 +43,27 @@ class StateRestorationTest {
         compose.onNode(hasSetTextAction()).performTextInput("我的项目")
         tester.emulateSavedInstanceStateRestore()
         compose.onNodeWithText("我的项目").assertExists()
+    }
+
+    @Test
+    fun selectedPackSurvivesStateRestore() {
+        val packA = PackEntry("a", "1.0.0", "示例A", "", 1, "tree", File("/tmp"), 0L)
+        val packB = PackEntry("b", "1.0.0", "示例B", "", 1, "tree", File("/tmp"), 0L)
+        val tester = StateRestorationTester(compose)
+        tester.setContent {
+            NfTheme {
+                NewProjectScreen(
+                    packs = listOf(packA, packB),
+                    creating = false,
+                    error = null,
+                    onBack = {},
+                    onLoadSample = {},
+                    onCreate = { _, _ -> }
+                )
+            }
+        }
+        compose.onNodeWithText("示例B").performClick()
+        tester.emulateSavedInstanceStateRestore()
+        compose.onAllNodes(isSelectable())[1].assertIsSelected()
     }
 }

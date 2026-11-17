@@ -3,7 +3,7 @@
 > 设备：OnePlus PLF110，Android 16（SDK 36），1080×2392 / 480dpi；历史真机会话 serial 3B65AR0183V00000。
 > **2026-11-16 当前 `adb devices` 为空**：下表 2026-11-15 行是历史真机证据；本轮新增功能仅有 JVM/构建/门禁证据，真机矩阵仍 OPEN-TOOLCHAIN。
 > APK：0.2.0 / versionCode 2，minSdk 26 / target 36。本件只记实际跑过的项目；未跑项标 OPEN，不写成 pass。
-> 当前本机验证总览：Android JVM **344/344**、Rust core **193/193**、app Python **498 passed**、APP 门禁 QA0–QA6 PASS/gap=0、lint **0 warnings**、`verify.sh --checks-only` PASS=107/WARN=2/FAIL=0。
+> 当前本机验证总览：Android JVM **345/345**、Rust core **193/193**、app Python **498 passed**、APP 门禁 QA0–QA6 PASS/gap=0、lint **0 warnings**、`verify.sh --checks-only` PASS=107/WARN=2/FAIL=0。
 
 ## 1. 已实测（2026-11-15）
 
@@ -41,7 +41,7 @@
 | DOCX 参考页面设置（Rust+JVM） | pass（本机）：继承 word/document.xml 的 sectPr（页边距/纸张）；3 条 JVM 测试。 |
 | 迁移前自动备份/回滚（JVM） | pass（本机）：Pack 更新应用前自动备份并显示路径；新增确认对话框一键恢复该备份，调用 BackupRestoreService.restore。 |
 | PDF 标题/粗体样式（JVM） | pass（本机）：标题按 level 字号加粗，正文/项目符号分样式绘制。 |
-| SavedState 恢复测试（JVM） | pass（本机）：StateRestorationTester 验证新建项目标题进程恢复；338 tests。 |
+| SavedState 恢复测试（JVM） | pass（本机）：StateRestorationTester 验证新建项目标题与 Pack 选择进程恢复；345 tests。 |
 | CCOS 评审字段 SavedState（JVM） | pass（本机）：reviewer/note 改 rememberSaveable；337 tests。 |
 | Assembly 双跑检查（JVM） | pass（本机）：AssemblyScreen assemble/validate 各两次比较结果 JSON。 |
 | graph-compile 双跑检查（JVM） | pass（本机）：graph-compile 两次调用比较结果 JSON；图屏显示稳定/差异。 |
