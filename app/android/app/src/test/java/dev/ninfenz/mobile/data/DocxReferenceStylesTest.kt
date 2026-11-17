@@ -47,6 +47,16 @@ class DocxReferenceStylesTest {
     }
 
     @Test
+    fun sectPrDropsDanglingHeaderFooterRefs() {
+        val sect = "<w:sectPr><w:headerReference w:type=\"default\" r:id=\"rId9\"/><w:footerReference w:type=\"default\" r:id=\"rId10\"/><w:pgSz w:w=\"11906\"/></w:sectPr>"
+        val file = zip(mapOf("word/document.xml" to ("<w:document><w:body>" + sect + "</w:body></w:document>")))
+        val actual = DocxReferenceStyles.extractSectPr(file) ?: ""
+        assertEquals(false, actual.contains("headerReference"))
+        assertEquals(false, actual.contains("footerReference"))
+        assertEquals(true, actual.contains("pgSz"))
+    }
+
+    @Test
     fun rejectsMissingOrNonStyles() {
         assertNull(DocxReferenceStyles.extract(zip(mapOf("word/document.xml" to "<w:document/>"))))
         assertNull(DocxReferenceStyles.extract(zip(mapOf("word/styles.xml" to "<not-styles/>"))))

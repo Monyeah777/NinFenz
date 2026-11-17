@@ -12,6 +12,7 @@ object DocxReferenceStyles {
 
     fun extractSectPr(file: File): String? = readEntry(file, "word/document.xml")
         ?.let { Regex("<w:sectPr[\\s\\S]*?</w:sectPr>").find(it)?.value }
+        ?.replace(Regex("<w:(header|footer)Reference[^>]*/>"), "")
 
     fun extractTheme(file: File): String? = readEntry(file, "word/theme/theme1.xml")
         ?.takeIf { it.contains("<a:theme") }

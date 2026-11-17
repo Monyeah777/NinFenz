@@ -7,6 +7,7 @@
 
 use crate::error::CoreError;
 use crate::zipsec;
+use regex::Regex;
 
 const CORE_DATE: &str = "1980-01-01T00:00:00Z";
 
@@ -178,7 +179,13 @@ pub fn build_docx_with_styles(
     numbering: Option<&str>,
 ) -> Result<Vec<u8>, CoreError> {
     let styles_xml = styles.unwrap_or(STYLES);
-    let sect_xml = sect_pr.unwrap_or(DEFAULT_SECT_PR);
+    let sect_xml_raw = sect_pr.unwrap_or(DEFAULT_SECT_PR);
+    // 当前只继承页面设置，不继承页眉页脚；移除悬空引用，避免 Word 打开失败。
+    let sect_xml = Regex::new(r"<w:(header|footer)Reference[^>]*/>")
+        .expect("sectPr 清理正则")
+        .replace_all(sect_xml_raw, "")
+        .to_string();
+    let sect_xml = sect_xml.as_str();
     if let Some(t) = theme {
         if t.len() > 1024 * 1024 || !t.contains("<a:theme") {
             return Err(CoreError::new("NF-EXP-002")

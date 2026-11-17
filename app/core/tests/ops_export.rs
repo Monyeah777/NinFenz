@@ -301,6 +301,32 @@ fn export_docx_reference_numbering_is_used() {
 }
 
 #[test]
+fn export_docx_strips_header_footer_sect_refs() {
+    let out = tmpdir("exp_docx_hdr");
+    let sect = r#"<w:sectPr><w:headerReference w:type="default" r:id="rId9"/><w:footerReference w:type="default" r:id="rId10"/><w:pgSz w:w="11906" w:h="16838"/></w:sectPr>"#;
+    run_ok(
+        "export",
+        &json!({
+            "markdown": "# 标题\n",
+            "format": "docx",
+            "out_dir": pstr(&out),
+            "title": "页眉清理",
+            "docx_sect_pr": sect
+        }),
+    );
+    let bytes = std::fs::read(out.join("result.docx")).unwrap();
+    let entries = nf_app_core::zipsec::read_zip_bytes(&bytes).unwrap();
+    let doc = entries
+        .iter()
+        .find(|e| e.name == "word/document.xml")
+        .map(|e| String::from_utf8_lossy(&e.data).to_string())
+        .unwrap();
+    assert!(!doc.contains("headerReference"));
+    assert!(!doc.contains("footerReference"));
+    assert!(doc.contains("pgSz"));
+}
+
+#[test]
 fn export_skill_pack_contains_scaffold() {
     let out = tmpdir("exp_skill");
     let r = run_ok(
