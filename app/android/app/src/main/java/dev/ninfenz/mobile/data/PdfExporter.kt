@@ -81,7 +81,8 @@ object PdfExporter {
                     val bitmap = BitmapFactory.decodeByteArray(block.image, 0, block.image.size)
                     if (bitmap != null) {
                         val maxWidth = contentWidth * 0.8f
-                        val scale = minOf(1f, maxWidth / bitmap.width)
+                        val maxHeight = pageHeight - margin * 2 - lineHeight * 4
+                        val scale = minOf(1f, maxWidth / bitmap.width, maxHeight / bitmap.height)
                         val w = bitmap.width * scale
                         val h = bitmap.height * scale
                         add(
@@ -148,7 +149,8 @@ object PdfExporter {
                     }
                     if (line.image != null) {
                         val bmp = line.image
-                        canvas.drawBitmap(bmp, null, RectF(margin, y, margin + line.imageWidth, y + line.imageHeight), null)
+                        val x = margin + (contentWidth - line.imageWidth) / 2f
+                        canvas.drawBitmap(bmp, null, RectF(x, y, x + line.imageWidth, y + line.imageHeight), null)
                         y += line.imageHeight + 4f
                         return@forEach
                     }
