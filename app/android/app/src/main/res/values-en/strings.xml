@@ -330,6 +330,7 @@
     <string name="ccos_step1">1 · Prepare (file exchange)</string>
     <string name="ccos_open_task">Open ccos-task</string>
     <string name="ccos_open_result">Open ccos-result</string>
+    <string name="ccos_clear_session">Clear imported session</string>
     <string name="ccos_steps_notice">Flow: load ccos-task → import ccos-result → human review. The app never calls the API directly; task/result travel as files and keys stay in the CCOS execution plane.</string>
     <string name="ccos_task_title">2 · Task %1$s</string>
     <string name="ccos_no_task">No ccos-task loaded yet.</string>

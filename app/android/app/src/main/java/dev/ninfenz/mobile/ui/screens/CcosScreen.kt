@@ -222,6 +222,19 @@ fun CcosScreen(onBack: () -> Unit) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(onClick = { taskPicker.launch(arrayOf("application/json", "text/plain")) }) { Text(stringResource(dev.ninfenz.mobile.R.string.ccos_open_task)) }
                 Button(onClick = { resultPicker.launch(arrayOf("application/json", "text/plain")) }) { Text(stringResource(dev.ninfenz.mobile.R.string.ccos_open_result)) }
+                if (task != null || result != null) {
+                    OutlinedButton(enabled = !busy, onClick = {
+                        scope.launch {
+                            withContext(Dispatchers.IO) { CcosSessionStore.clearAll(context.filesDir) }
+                            task = null
+                            result = null
+                            rawTask = null
+                            precheckFindings = emptyList()
+                            outcome = null
+                            error = null
+                        }
+                    }) { Text(stringResource(dev.ninfenz.mobile.R.string.ccos_clear_session)) }
+                }
             }
             Notice(stringResource(dev.ninfenz.mobile.R.string.ccos_steps_notice), Tone.INFO)
         }

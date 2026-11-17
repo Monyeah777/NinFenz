@@ -330,6 +330,7 @@
     <string name="ccos_step1">1 · 准备（文件交换）</string>
     <string name="ccos_open_task">打开 ccos-task</string>
     <string name="ccos_open_result">打开 ccos-result</string>
+    <string name="ccos_clear_session">清除导入会话</string>
     <string name="ccos_steps_notice">步骤：加载 ccos-task → 导入 ccos-result → 人工复核。APP 不直连 API；task/result 以文件交换，密钥只在 CCOS 执行面。</string>
     <string name="ccos_task_title">2 · 任务 %1$s</string>
     <string name="ccos_no_task">尚未加载 ccos-task。</string>

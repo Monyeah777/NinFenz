@@ -18,6 +18,11 @@ object CcosSessionStore {
         File(dir(filesDir), "result.json").delete()
     }
 
+    fun clearAll(filesDir: File) {
+        File(dir(filesDir), "task.json").delete()
+        File(dir(filesDir), "result.json").delete()
+    }
+
     private fun readOrNull(file: File): String? =
         if (file.isFile) runCatching { file.readText(Charsets.UTF_8) }.getOrNull() else null
 }

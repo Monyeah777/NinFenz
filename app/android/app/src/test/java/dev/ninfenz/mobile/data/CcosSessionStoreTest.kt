@@ -26,6 +26,16 @@ class CcosSessionStoreTest {
     }
 
     @Test
+    fun clearAllRemovesBoth() {
+        val dir = Files.createTempDirectory("nf-ccos-clear-all").toFile()
+        CcosSessionStore.saveTask(dir, "task")
+        CcosSessionStore.saveResult(dir, "result")
+        CcosSessionStore.clearAll(dir)
+        assertNull(CcosSessionStore.loadTask(dir))
+        assertNull(CcosSessionStore.loadResult(dir))
+    }
+
+    @Test
     fun missingFilesReturnNull() {
         val dir = Files.createTempDirectory("nf-ccos-empty").toFile()
         assertNull(CcosSessionStore.loadTask(dir))
