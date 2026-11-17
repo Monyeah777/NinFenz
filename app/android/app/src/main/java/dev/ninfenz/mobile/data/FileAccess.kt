@@ -12,6 +12,8 @@ import java.io.File
 object FileAccess {
 
     const val MAX_IMPORT_BYTES = 64L * 1024 * 1024
+    const val MAX_TREE_FILE_BYTES = 128L * 1024 * 1024
+    const val MAX_TREE_BYTES = 512L * 1024 * 1024
 
     data class FileMeta(val name: String, val size: Long, val mime: String?)
 
@@ -86,10 +88,11 @@ object FileAccess {
             treeUri,
             DocumentsContract.getTreeDocumentId(treeUri)
         )
-        copyDocument(context, rootDoc, dest, 0)
+        val budget = longArrayOf(MAX_TREE_BYTES)
+        copyDocument(context, rootDoc, dest, 0, budget)
     }
 
-    private fun copyDocument(context: Context, docUri: Uri, destDir: File, depth: Int): Int {
+    private fun copyDocument(context: Context, docUri: Uri, destDir: File, depth: Int, budget: LongArray): Int {
         if (depth > 32) throw IllegalStateException("目录层级过深（>32）")
         destDir.mkdirs()
         val childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(
@@ -112,16 +115,43 @@ object FileAccess {
                 val safe = name.replace(Regex("[^A-Za-z0-9._-]"), "_").ifBlank { "item" }
                 val childUri = DocumentsContract.buildDocumentUriUsingTree(docUri, docId)
                 if (mime == DocumentsContract.Document.MIME_TYPE_DIR) {
-                    copied += copyDocument(context, childUri, File(destDir, safe), depth + 1)
+                    copied += copyDocument(context, childUri, File(destDir, safe), depth + 1, budget)
                 } else {
-                    context.contentResolver.openInputStream(childUri)?.use { input ->
-                        File(destDir, safe).outputStream().use { output -> input.copyTo(output) }
+                    val target = File(destDir, safe)
+                    try {
+                        context.contentResolver.openInputStream(childUri)?.use { input ->
+                            target.outputStream().use { output ->
+                                copyLimited(input, output, MAX_TREE_FILE_BYTES, budget)
+                            }
+                        }
+                    } catch (t: Throwable) {
+                        target.delete()
+                        throw t
                     }
                     copied++
                 }
             }
         }
         return copied
+    }
+
+    fun copyLimited(
+        input: java.io.InputStream,
+        output: java.io.OutputStream,
+        maxBytes: Long,
+        budget: LongArray = longArrayOf(Long.MAX_VALUE)
+    ) {
+        val buffer = ByteArray(8192)
+        var total = 0L
+        while (true) {
+            val n = input.read(buffer)
+            if (n < 0) break
+            total += n
+            if (total > maxBytes) throw IllegalStateException("单个文件超过目录导入上限")
+            budget[0] -= n
+            if (budget[0] < 0) throw IllegalStateException("目录导入总量超过上限")
+            output.write(buffer, 0, n)
+        }
     }
 
     fun listFiles(dir: File): List<File> =
