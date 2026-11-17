@@ -26,14 +26,80 @@ fn esc(s: &str) -> String {
     out
 }
 
-/// 去掉最常见的行内标记（加粗星号与反引号），其余原样保留——不做完整 MD 解析器。
-fn inline_plain(line: &str) -> String {
-    let mut s = line.replace("**", "");
-    s = s.replace(char::from(96), "");
-    s
+fn run(text: &str, bold: bool, italic: bool, code: bool) -> String {
+    let mut rpr = String::new();
+    if bold {
+        rpr.push_str("<w:b/>");
+    }
+    if italic {
+        rpr.push_str("<w:i/>");
+    }
+    if code {
+        rpr.push_str("<w:rFonts w:ascii=\"Consolas\" w:hAnsi=\"Consolas\" w:eastAsia=\"Consolas\"/>");
+    }
+    let rpr = if rpr.is_empty() { rpr } else { format!("<w:rPr>{rpr}</w:rPr>") };
+    format!(
+        "<w:r>{rpr}<w:t xml:space=\"preserve\">{}</w:t></w:r>",
+        esc(text)
+    )
+}
+
+fn runs_xml(text: &str) -> String {
+    let mut out = String::new();
+    let mut plain = String::new();
+    let mut i = 0usize;
+    while i < text.len() {
+        let rest = &text[i..];
+        let (open, close, bold, italic, code): (&str, &str, bool, bool, bool) = if rest.starts_with("**") {
+            ("**", "**", true, false, false)
+        } else if rest.starts_with("__") {
+            ("__", "__", true, false, false)
+        } else if rest.starts_with('\u{0060}') {
+            ("\u{0060}", "\u{0060}", false, false, true)
+        } else if rest.starts_with('*') {
+            ("*", "*", false, true, false)
+        } else if rest.starts_with('_') {
+            ("_", "_", false, true, false)
+        } else {
+            ("", "", false, false, false)
+        };
+        if open.is_empty() {
+            let ch = rest.chars().next().unwrap();
+            plain.push(ch);
+            i += ch.len_utf8();
+            continue;
+        }
+        if let Some(pos) = rest[open.len()..].find(close) {
+            let inner = &rest[open.len()..open.len() + pos];
+            if !inner.is_empty() {
+                if !plain.is_empty() {
+                    out.push_str(&run(&plain, false, false, false));
+                    plain.clear();
+                }
+                out.push_str(&run(inner, bold, italic, code));
+                i += open.len() + inner.len() + close.len();
+                continue;
+            }
+        }
+        let ch = rest.chars().next().unwrap();
+        plain.push(ch);
+        i += ch.len_utf8();
+    }
+    if !plain.is_empty() {
+        out.push_str(&run(&plain, false, false, false));
+    }
+    out
 }
 
 fn paragraph(text: &str, style: Option<&str>, numbered: bool, num_id: &str) -> String {
+    paragraph_with(text, style, numbered, num_id, false)
+}
+
+fn paragraph_code(text: &str, style: Option<&str>, numbered: bool, num_id: &str) -> String {
+    paragraph_with(text, style, numbered, num_id, true)
+}
+
+fn paragraph_with(text: &str, style: Option<&str>, numbered: bool, num_id: &str, plain_run: bool) -> String {
     let mut ppr = String::new();
     if let Some(st) = style {
         ppr.push_str(&format!("<w:pStyle w:val=\"{}\"/>", st));
@@ -42,10 +108,8 @@ fn paragraph(text: &str, style: Option<&str>, numbered: bool, num_id: &str) -> S
         ppr.push_str(&format!("<w:numPr><w:ilvl w:val=\"0\"/><w:numId w:val=\"{num_id}\"/></w:numPr>"));
     }
     let ppr = if ppr.is_empty() { ppr } else { format!("<w:pPr>{ppr}</w:pPr>") };
-    format!(
-        "<w:p>{ppr}<w:r><w:t xml:space=\"preserve\">{}</w:t></w:r></w:p>",
-        esc(text)
-    )
+    let runs = if plain_run { run(text, false, false, true) } else { runs_xml(text) };
+    format!("<w:p>{ppr}{runs}</w:p>")
 }
 
 fn heading_style(level: usize) -> &'static str {
@@ -102,7 +166,7 @@ fn table_xml(rows: &[Vec<String>]) -> String {
         for c in 0..cols {
             let cell = row.get(c).map(|s| s.as_str()).unwrap_or("");
             out.push_str("<w:tc><w:tcPr><w:tcW w:w=\"0\" w:type=\"auto\"/></w:tcPr>");
-            out.push_str(&cell_paragraph(&inline_plain(cell), ri == 0));
+            out.push_str(&cell_paragraph(cell, ri == 0));
             out.push_str("</w:tc>");
         }
         out.push_str("</w:tr>");
@@ -127,7 +191,7 @@ fn document_body(markdown: &str, numbered: bool, num_id: &str) -> String {
             continue;
         }
         if in_code {
-            parts.push(paragraph(if line.is_empty() { " " } else { line }, Some("Code"), false, num_id));
+            parts.push(paragraph_code(if line.is_empty() { " " } else { line }, Some("Code"), false, num_id));
             continue;
         }
         if trimmed.is_empty() {
@@ -152,7 +216,7 @@ fn document_body(markdown: &str, numbered: bool, num_id: &str) -> String {
             continue;
         }
         if trimmed.starts_with('>') {
-            parts.push(paragraph(&inline_plain(trimmed.trim_start_matches('>').trim()), Some("Quote"), false, num_id));
+            parts.push(paragraph(trimmed.trim_start_matches('>').trim(), Some("Quote"), false, num_id));
             continue;
         }
         if trimmed.len() >= 3
@@ -170,7 +234,7 @@ fn document_body(markdown: &str, numbered: bool, num_id: &str) -> String {
         if (1..=6).contains(&hashes) {
             let rest = trimmed[hashes..].trim();
             if !rest.is_empty() {
-                parts.push(paragraph(&inline_plain(rest), Some(heading_style(hashes)), false, num_id));
+                parts.push(paragraph(rest, Some(heading_style(hashes)), false, num_id));
                 continue;
             }
         }
@@ -179,11 +243,11 @@ fn document_body(markdown: &str, numbered: bool, num_id: &str) -> String {
             .or_else(|| trimmed.strip_prefix("* "))
             .or_else(|| trimmed.strip_prefix("+ "))
         {
-            let bullet_text = if numbered { inline_plain(rest) } else { format!("• {}", inline_plain(rest)) };
+            let bullet_text = if numbered { rest.to_string() } else { format!("• {rest}") };
             parts.push(paragraph(&bullet_text, None, numbered, num_id));
             continue;
         }
-        parts.push(paragraph(&inline_plain(trimmed), None, false, num_id));
+        parts.push(paragraph(trimmed, None, false, num_id));
     }
     if parts.is_empty() {
         parts.push(paragraph(" ", None, false, num_id));

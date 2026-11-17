@@ -412,6 +412,30 @@ fn export_docx_renders_quote_and_rule() {
 }
 
 #[test]
+fn export_docx_renders_inline_emphasis() {
+    let out = tmpdir("exp_docx_emph");
+    run_ok(
+        "export",
+        &json!({
+            "markdown": "普通 **粗体** *斜体* \u{0060}代码\u{0060}\n",
+            "format": "docx",
+            "out_dir": pstr(&out),
+            "title": "强调"
+        }),
+    );
+    let bytes = std::fs::read(out.join("result.docx")).unwrap();
+    let entries = nf_app_core::zipsec::read_zip_bytes(&bytes).unwrap();
+    let doc = entries
+        .iter()
+        .find(|e| e.name == "word/document.xml")
+        .map(|e| String::from_utf8_lossy(&e.data).to_string())
+        .unwrap();
+    assert!(doc.contains("<w:b/>"));
+    assert!(doc.contains("<w:i/>"));
+    assert!(doc.contains("Consolas"));
+}
+
+#[test]
 fn export_skill_pack_contains_scaffold() {
     let out = tmpdir("exp_skill");
     let r = run_ok(
