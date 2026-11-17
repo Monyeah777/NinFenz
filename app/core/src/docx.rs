@@ -151,6 +151,21 @@ fn document_body(markdown: &str, numbered: bool, num_id: &str) -> String {
             parts.push(table_xml(&rows));
             continue;
         }
+        if trimmed.starts_with('>') {
+            parts.push(paragraph(&inline_plain(trimmed.trim_start_matches('>').trim()), Some("Quote"), false, num_id));
+            continue;
+        }
+        if trimmed.len() >= 3
+            && (trimmed.chars().all(|c| c == '-')
+                || trimmed.chars().all(|c| c == '*')
+                || trimmed.chars().all(|c| c == '_'))
+        {
+            parts.push(
+                "<w:p><w:pPr><w:pBdr><w:bottom w:val=\"single\" w:sz=\"6\" w:space=\"1\" w:color=\"auto\"/></w:pBdr></w:pPr><w:r><w:t> </w:t></w:r></w:p>"
+                    .to_string(),
+            );
+            continue;
+        }
         let hashes = trimmed.chars().take_while(|c| *c == '#').count();
         if (1..=6).contains(&hashes) {
             let rest = trimmed[hashes..].trim();
@@ -186,6 +201,7 @@ const STYLES: &str = r#"<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <w:style w:type="paragraph" w:styleId="Heading5"><w:name w:val="heading 5"/><w:basedOn w:val="Normal"/><w:next w:val="Normal"/><w:qFormat/><w:pPr><w:keepNext/><w:outlineLvl w:val="4"/></w:pPr><w:rPr><w:b/><w:sz w:val="22"/></w:rPr></w:style>
 <w:style w:type="paragraph" w:styleId="Heading6"><w:name w:val="heading 6"/><w:basedOn w:val="Normal"/><w:next w:val="Normal"/><w:qFormat/><w:pPr><w:keepNext/><w:outlineLvl w:val="5"/></w:pPr><w:rPr><w:b/><w:sz w:val="20"/></w:rPr></w:style>
 <w:style w:type="paragraph" w:styleId="Code"><w:name w:val="Code"/><w:basedOn w:val="Normal"/><w:rPr><w:rFonts w:ascii="Consolas" w:hAnsi="Consolas" w:eastAsia="Consolas"/><w:sz w:val="20"/></w:rPr></w:style>
+<w:style w:type="paragraph" w:styleId="Quote"><w:name w:val="Quote"/><w:basedOn w:val="Normal"/><w:qFormat/><w:pPr><w:ind w:left="360"/><w:pBdr><w:left w:val="single" w:sz="6" w:space="4" w:color="auto"/></w:pBdr></w:pPr><w:rPr><w:i/></w:rPr></w:style>
 </w:styles>
 "#;
 

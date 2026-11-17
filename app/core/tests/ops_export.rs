@@ -389,6 +389,29 @@ fn export_docx_renders_markdown_table() {
 }
 
 #[test]
+fn export_docx_renders_quote_and_rule() {
+    let out = tmpdir("exp_docx_quote");
+    run_ok(
+        "export",
+        &json!({
+            "markdown": "> 引用\n\n---\n",
+            "format": "docx",
+            "out_dir": pstr(&out),
+            "title": "引用"
+        }),
+    );
+    let bytes = std::fs::read(out.join("result.docx")).unwrap();
+    let entries = nf_app_core::zipsec::read_zip_bytes(&bytes).unwrap();
+    let doc = entries
+        .iter()
+        .find(|e| e.name == "word/document.xml")
+        .map(|e| String::from_utf8_lossy(&e.data).to_string())
+        .unwrap();
+    assert!(doc.contains("w:pStyle w:val=\"Quote\""));
+    assert!(doc.contains("<w:pBdr>"));
+}
+
+#[test]
 fn export_skill_pack_contains_scaffold() {
     let out = tmpdir("exp_skill");
     let r = run_ok(
