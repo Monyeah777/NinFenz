@@ -114,6 +114,7 @@ fun ImportScreen(
     var convertDraft by remember { mutableStateOf<File?>(null) }
     var renameDraft by remember { mutableStateOf<File?>(null) }
     var renameDraftText by remember { mutableStateOf("") }
+    var duplicatePrompt by remember { mutableStateOf<DuplicatePrompt?>(null) }
     LaunchedEffect(Unit) {
         if (doc == null && rawResult == null && error == null) {
             val raw = withContext(Dispatchers.IO) { importDraftStore.load() }
@@ -230,6 +231,7 @@ fun ImportScreen(
                         val previous = importHistory.find(digest)
                         if (previous != null) {
                             notice = context.getString(dev.ninfenz.mobile.R.string.import_duplicate_notice, previous.name, digest.take(12))
+                            duplicatePrompt = DuplicatePrompt(digest, DraftLibrary.findByDigest(context.filesDir, digest))
                         }
                         importHistory.record(digest, imported.source.name)
                         recentImports = importHistory.recent()
@@ -768,6 +770,61 @@ fun ImportScreen(
         )
     }
 
+    duplicatePrompt?.let { prompt ->
+        AlertDialog(
+            onDismissRequest = { duplicatePrompt = null },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.import_duplicate_title)) },
+            text = {
+                Text(stringResource(dev.ninfenz.mobile.R.string.import_duplicate_body, prompt.digest.take(12)))
+            },
+            confirmButton = {
+                TextButton(
+                    enabled = prompt.draft != null,
+                    onClick = {
+                        val draft = prompt.draft
+                        val raw = draft?.let { DraftLibrary.read(it) }
+                        if (raw == null) {
+                            duplicatePrompt = null
+                        } else {
+                            try {
+                                val obj = J.parseObject(raw, ImportModel.SCHEMA)
+                                val parsed = ImportModel.parse(obj)
+                                rawResult = obj
+                                doc = parsed
+                                acceptedMappings = parsed.mappings.indices.filter { parsed.mappings[it].confidence >= 80 }.toSet()
+                                importDraftStore.save(raw)
+                                notice = context.getString(dev.ninfenz.mobile.R.string.import_duplicate_updated)
+                            } catch (t: Throwable) {
+                                error = CoreResponse.failure(
+                                    "NF-E-002",
+                                    context.getString(dev.ninfenz.mobile.R.string.import_parse_failed, t.message ?: t.javaClass.simpleName),
+                                    context.getString(dev.ninfenz.mobile.R.string.import_parse_failed_fix),
+                                    1
+                                ).error
+                            }
+                            duplicatePrompt = null
+                        }
+                    }
+                ) { Text(stringResource(dev.ninfenz.mobile.R.string.import_duplicate_update)) }
+            },
+            dismissButton = {
+                Row {
+                    TextButton(onClick = {
+                        duplicatePrompt = null
+                        doc = null
+                        rawResult = null
+                        acceptedMappings = emptySet()
+                        importDraftStore.clear()
+                        notice = context.getString(dev.ninfenz.mobile.R.string.import_duplicate_skipped)
+                    }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_duplicate_skip)) }
+                    TextButton(onClick = { duplicatePrompt = null }) {
+                        Text(stringResource(dev.ninfenz.mobile.R.string.import_duplicate_new))
+                    }
+                }
+            }
+        )
+    }
+
     pendingDeleteDraft?.let { draft ->
         AlertDialog(
             onDismissRequest = { pendingDeleteDraft = null },
@@ -788,3 +845,5 @@ fun ImportScreen(
         )
     }
 }
+
+private data class DuplicatePrompt(val digest: String, val draft: File?)

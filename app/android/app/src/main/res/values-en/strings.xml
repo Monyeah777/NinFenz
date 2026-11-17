@@ -559,6 +559,13 @@
     <string name="delivery_draft_restored">Restored previous slot draft</string>
     <string name="search_keyboard_hint">↑↓ select · Enter open · Esc clear</string>
     <string name="import_duplicate_notice">Same content imported before: %1$s (digest %2$s)</string>
+    <string name="import_duplicate_title">Duplicate import</string>
+    <string name="import_duplicate_body">Same content was imported before (digest %1$s). Choose how to proceed.</string>
+    <string name="import_duplicate_skip">Skip</string>
+    <string name="import_duplicate_new">New draft</string>
+    <string name="import_duplicate_update">Update existing draft</string>
+    <string name="import_duplicate_updated">Loaded the existing draft; edit and save</string>
+    <string name="import_duplicate_skipped">Duplicate import skipped</string>
     <string name="search_history_title">Recent searches</string>
     <string name="search_history_clear">Clear</string>
     <string name="import_restored_notice">Restored previous import preview</string>

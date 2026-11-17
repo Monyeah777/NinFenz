@@ -559,6 +559,13 @@
     <string name="delivery_draft_restored">已恢复上次槽位草稿</string>
     <string name="search_keyboard_hint">↑↓ 选择 · Enter 打开 · Esc 清空</string>
     <string name="import_duplicate_notice">同一内容此前已导入：%1$s（digest %2$s）</string>
+    <string name="import_duplicate_title">重复导入</string>
+    <string name="import_duplicate_body">同一内容此前已导入（digest %1$s），请选择处理方式。</string>
+    <string name="import_duplicate_skip">跳过</string>
+    <string name="import_duplicate_new">新建</string>
+    <string name="import_duplicate_update">更新现有草稿</string>
+    <string name="import_duplicate_updated">已载入现有草稿，可继续编辑后保存</string>
+    <string name="import_duplicate_skipped">已跳过重复导入</string>
     <string name="search_history_title">最近搜索</string>
     <string name="search_history_clear">清空</string>
     <string name="import_restored_notice">已恢复上次导入预览</string>
