@@ -45,6 +45,23 @@ object PdfPager {
         return out
     }
 
+    fun <T> repeatTableHeaders(
+        items: List<T>,
+        ranges: List<IntRange>,
+        isTable: (T) -> Boolean,
+        isHeader: (T) -> Boolean
+    ): List<List<T>> {
+        return ranges.mapIndexed { index, range ->
+            val page = items.subList(range.first, range.last + 1)
+            if (index > 0 && page.firstOrNull()?.let(isTable) == true) {
+                val header = items.subList(0, range.first).lastOrNull(isHeader)
+                if (header != null) listOf(header) + page else page
+            } else {
+                page
+            }
+        }
+    }
+
     fun <T> paginateItems(lines: List<T>, linesPerPage: Int): List<List<T>> {
         require(linesPerPage > 0) { "linesPerPage 必须为正" }
         if (lines.isEmpty()) return emptyList()

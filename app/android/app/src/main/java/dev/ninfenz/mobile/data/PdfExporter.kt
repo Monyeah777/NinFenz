@@ -136,15 +136,12 @@ object PdfExporter {
         }
         val firstPageLines = ((pageHeight - margin * 2 - lineHeight * 4) / lineHeight).toInt().coerceAtLeast(1)
         val pageRanges = PdfPager.paginateWeighted(lines.map { it.weight }, firstPageLines)
-        val pages = pageRanges.mapIndexed { index, range ->
-            val page = lines.subList(range.first, range.last + 1)
-            if (index > 0 && page.firstOrNull()?.table == true) {
-                val header = lines.subList(0, range.first).lastOrNull { it.tableHeader }
-                if (header != null) listOf(header) + page else page
-            } else {
-                page
-            }
-        }
+        val pages = PdfPager.repeatTableHeaders(
+            lines,
+            pageRanges,
+            isTable = { it.table },
+            isHeader = { it.tableHeader }
+        )
         val doc = PdfDocument()
         try {
             pages.forEachIndexed { index, pageLines ->

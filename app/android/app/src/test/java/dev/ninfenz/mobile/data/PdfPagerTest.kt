@@ -13,6 +13,18 @@ class PdfPagerTest {
     }
 
     @Test
+    fun repeatsTableHeaderOnContinuationPage() {
+        val items = listOf("H", "r1", "r2", "r3")
+        val pages = PdfPager.repeatTableHeaders(
+            items,
+            listOf(0..1, 2..3),
+            isTable = { it.startsWith("r") },
+            isHeader = { it == "H" }
+        )
+        assertEquals(listOf(listOf("H", "r1"), listOf("H", "r2", "r3")), pages)
+    }
+
+    @Test
     fun paginatesByWeightForImages() {
         val ranges = PdfPager.paginateWeighted(listOf(1, 8, 1), 8)
         assertEquals(listOf(0..0, 1..1, 2..2), ranges)
