@@ -462,6 +462,29 @@ fn export_docx_code_block_has_shading() {
 }
 
 #[test]
+fn export_docx_renders_nested_emphasis() {
+    let out = tmpdir("exp_docx_nested");
+    run_ok(
+        "export",
+        &json!({
+            "markdown": "**粗 *斜***\n",
+            "format": "docx",
+            "out_dir": pstr(&out),
+            "title": "嵌套"
+        }),
+    );
+    let bytes = std::fs::read(out.join("result.docx")).unwrap();
+    let entries = nf_app_core::zipsec::read_zip_bytes(&bytes).unwrap();
+    let doc = entries
+        .iter()
+        .find(|e| e.name == "word/document.xml")
+        .map(|e| String::from_utf8_lossy(&e.data).to_string())
+        .unwrap();
+    assert!(doc.contains("<w:b/>"));
+    assert!(doc.contains("<w:i/>"));
+}
+
+#[test]
 fn export_skill_pack_contains_scaffold() {
     let out = tmpdir("exp_skill");
     let r = run_ok(
