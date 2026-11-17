@@ -22,7 +22,7 @@
 | 草稿→项目 | partial | 草稿可创建项目壳并把草稿 JSON 作为 authoring 来源副本；导入内容尚未映射进协议字段（OPEN-DRAFT-PROJECT 收窄） |
 | app/gates v0.02 UX 检查 | pass | 7/7 gate PASS、FAIL=0；GATES/SELF_AUDIT 已更新（本提交） |
 
-**收口实测（2026-11-16 更新）**：app/gates 7/7 PASS、FAIL=0；verify.sh --checks-only PASS=107 WARN=2 FAIL=0；JVM 340/340；APK 19,202,995 B sha256 3ebe4072…；Release unsigned 15,386,669 B sha256 8acd8c42…（16KB 对齐通过）。
+**收口实测（2026-11-16 更新）**：app/gates 7/7 PASS、FAIL=0；verify.sh --checks-only PASS=107 WARN=2 FAIL=0；JVM 340/340；APK 19,202,995 B sha256 085d72b6…；Release unsigned 15,386,669 B sha256 fb004f29…（16KB 对齐通过）。
 
 **发布面：仍为 OPEN-EXTERNAL**（签名/公证/真机矩阵/Play 数据安全），不得据此宣称可发布。
 

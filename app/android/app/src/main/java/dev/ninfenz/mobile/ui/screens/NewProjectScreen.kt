@@ -21,7 +21,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -45,7 +44,8 @@ fun NewProjectScreen(
     onLoadSample: () -> Unit,
     onCreate: (PackEntry, String) -> Unit
 ) {
-    var selected by remember(packs) { mutableStateOf(packs.firstOrNull()) }
+    var selectedKey by rememberSaveable { mutableStateOf<String?>(null) }
+    val selected = packs.firstOrNull { selectedKey == it.id + "@" + it.version } ?: packs.firstOrNull()
     var title by rememberSaveable { mutableStateOf("") }
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -66,9 +66,9 @@ fun NewProjectScreen(
                 item { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.new_project_select_pack)) }
                 items(packs.size) { index ->
                     val pack = packs[index]
-                    NfCard(onClick = { selected = pack }) {
+                    NfCard(onClick = { selectedKey = pack.id + "@" + pack.version }) {
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                            RadioButton(selected = selected?.id == pack.id, onClick = { selected = pack })
+                            RadioButton(selected = selected?.id == pack.id && selected?.version == pack.version, onClick = { selectedKey = pack.id + "@" + pack.version })
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(pack.title, style = MaterialTheme.typography.titleMedium)
                                 Text(
