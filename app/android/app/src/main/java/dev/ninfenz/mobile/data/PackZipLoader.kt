@@ -40,6 +40,9 @@ object PackZipLoader {
                 if (name.startsWith("/") || name.split('/').any { it == ".." }) {
                     throw PackZipException("zip 含越界路径：" + name, "拒绝不安全的 Pack zip")
                 }
+                if (name.split('/').any { isWindowsReserved(it) }) {
+                    throw PackZipException("zip 含 Windows 保留名：" + name, "拒绝不安全的 Pack zip")
+                }
                 val out = File(destDir, name)
                 if (!out.canonicalFile.toPath().startsWith(destCanonical.toPath())) {
                     throw PackZipException("zip 路径越界：" + name, "拒绝不安全的 Pack zip")
@@ -57,6 +60,13 @@ object PackZipLoader {
         }
         val root = findRoot(destDir)
         return root ?: throw PackZipException("zip 里找不到 nf-pack.json", "确认选择的是 Pack zip（根目录或单层目录含 nf-pack.json）")
+    }
+
+    private fun isWindowsReserved(component: String): Boolean {
+        val base = component.substringBefore('.').trim().uppercase()
+        if (base in setOf("CON", "PRN", "AUX", "NUL")) return true
+        if (base.length == 4 && (base.startsWith("COM") || base.startsWith("LPT")) && base[3] in '1'..'9') return true
+        return component.endsWith(".") || component.endsWith(" ")
     }
 
     /** 解包前用 central directory 做压缩比/声明总量预检，防高压缩比炸弹。 */
