@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-17",
   "approved_by": "Monyeah777",
-  "note": "2026-11-17 Pack 卸载功能后重建；用户已授权",
+  "note": "2026-11-17 Pack 安装后重建；用户已授权",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "d5f23a09237345147554f708e4d8b195298b50974e9b755743047803ea7a6a84"
+  "subject_digest": "c1aa79e28fcf822fa5cd18d0ff31b746b92a896c35b243a6029128b3bc7e3ada"
 }
