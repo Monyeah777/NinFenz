@@ -28,6 +28,7 @@ class PdfMarkdownTest {
         assertEquals(listOf("A  B", "1  2"), blocks.map { it.text })
         assertTrue(blocks[0].tableHeader)
         assertFalse(blocks[1].tableHeader)
+        assertEquals(listOf("A", "B"), blocks[0].cells)
     }
 
     @Test

@@ -10,7 +10,8 @@ object PdfMarkdown {
         val table: Boolean = false,
         val tableHeader: Boolean = false,
         val quote: Boolean = false,
-        val rule: Boolean = false
+        val rule: Boolean = false,
+        val cells: List<String> = emptyList()
     )
 
     fun blocks(markdown: String): List<Block> {
@@ -38,7 +39,7 @@ object PdfMarkdown {
                     }
                     continue
                 }
-                out.add(Block(cells.joinToString("  "), table = true))
+                out.add(Block(cells.joinToString("  "), table = true, cells = cells))
                 lastTableBlock = out.lastIndex
                 continue
             }

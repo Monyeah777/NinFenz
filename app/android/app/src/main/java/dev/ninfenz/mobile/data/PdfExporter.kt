@@ -28,7 +28,8 @@ object PdfExporter {
             val bold: Boolean,
             val mono: Boolean = false,
             val italic: Boolean = false,
-            val rule: Boolean = false
+            val rule: Boolean = false,
+            val cells: List<String> = emptyList()
         )
 
         val lineHeight = 16f
@@ -39,6 +40,10 @@ object PdfExporter {
             PdfMarkdown.blocks(markdown).forEach { block ->
                 if (block.rule) {
                     add(Line("", 11f, false, rule = true))
+                    return@forEach
+                }
+                if (block.table && block.cells.isNotEmpty()) {
+                    add(Line("", 10f, block.tableHeader, cells = block.cells))
                     return@forEach
                 }
                 val size = if (block.table) 10f else when (block.level) {
@@ -70,6 +75,18 @@ object PdfExporter {
                         y += 8f
                         return@forEach
                     }
+                    if (line.cells.isNotEmpty()) {
+                        val colWidth = contentWidth / line.cells.size
+                        val p = Paint(paint).apply {
+                            textSize = line.size
+                            isFakeBoldText = line.bold
+                        }
+                        line.cells.forEachIndexed { i, cell ->
+                            canvas.drawText(ellipsize(cell, p, colWidth - 6f), margin + i * colWidth, y, p)
+                        }
+                        y += lineHeight
+                        return@forEach
+                    }
                     val p = Paint(paint).apply {
                         textSize = line.size
                         isFakeBoldText = line.bold
@@ -87,5 +104,12 @@ object PdfExporter {
             doc.close()
         }
         return Created(target, pages.size, target.length())
+    }
+
+    private fun ellipsize(text: String, paint: Paint, maxWidth: Float): String {
+        if (paint.measureText(text) <= maxWidth) return text
+        var end = text.length
+        while (end > 0 && paint.measureText(text.substring(0, end) + "…") > maxWidth) end--
+        return text.substring(0, end) + "…"
     }
 }
