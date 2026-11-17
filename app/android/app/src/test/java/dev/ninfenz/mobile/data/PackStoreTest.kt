@@ -32,14 +32,17 @@ class PackStoreTest {
     }
 
     @Test
-    fun readsInstalledAtFromSidecarAndIndex() {
+    fun readsInstalledAtFromRegistryAndIndex() {
         val root = tempRoot()
         writePack(
             root, "demo-pack", "1.0.0",
             "{\"id\":\"demo-pack\",\"version\":\"1.0.0\",\"title\":\"示例\",\"description\":\"d\",\"items\":[],\"hashes\":{\"tree\":\"abc\"}}"
         )
-        val sidecar = root.resolve("library/packs/demo-pack/1.0.0/.nf-install.json")
-        sidecar.toFile().writeText("{\"schema\":\"nf-install/1\",\"installed_at\":123456,\"source\":\"test\"}", Charsets.UTF_8)
+        val registry = root.resolve("library/pack-registry.json")
+        registry.toFile().writeText(
+            "{\"schema\":\"nf-pack-registry/1\",\"packs\":{\"demo-pack@1.0.0\":{\"installed_at\":123456,\"source\":\"test\"}}}",
+            Charsets.UTF_8
+        )
         val first = PackStore(root.toFile()).scan()
         assertEquals(123456L, first.packs[0].installedAt)
         val second = PackStore(root.toFile()).scan()

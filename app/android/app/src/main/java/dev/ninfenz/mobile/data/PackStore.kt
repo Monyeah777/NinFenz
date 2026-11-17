@@ -24,6 +24,54 @@ data class PackEntry(
 
 data class PackSnapshot(val packs: List<PackEntry>, val errors: List<String>)
 
+/** Pack 安装注册表：library/pack-registry.json（独立于 Pack 目录，不参与 pack tree 摘要）。 */
+data class PackRegistryEntry(val installedAt: Long, val source: String)
+
+object PackRegistry {
+    private fun file(filesDir: File): File = File(filesDir, "library/pack-registry.json")
+
+    fun load(filesDir: File): Map<String, PackRegistryEntry> {
+        val f = file(filesDir)
+        if (!f.isFile) return emptyMap()
+        return try {
+            val o = Json.parseToJsonElement(f.readText(Charsets.UTF_8)).jsonObject
+            if (o.text("schema") != "nf-pack-registry/1") return emptyMap()
+            o["packs"]?.jsonObject?.mapNotNull { (key, value) ->
+                val item = value as? JsonObject ?: return@mapNotNull null
+                val at = item["installed_at"]?.jsonPrimitive?.content?.toLongOrNull() ?: return@mapNotNull null
+                key to PackRegistryEntry(at, item.text("source"))
+            }?.toMap().orEmpty()
+        } catch (t: Throwable) {
+            emptyMap()
+        }
+    }
+
+    fun record(target: File, source: String) {
+        val filesDir = target.parentFile?.parentFile?.parentFile?.parentFile ?: return
+        val id = target.parentFile?.name ?: return
+        val version = target.name
+        val next = load(filesDir).toMutableMap()
+        next[id + "@" + version] = PackRegistryEntry(System.currentTimeMillis(), source)
+        val obj = buildJsonObject {
+            put("schema", "nf-pack-registry/1")
+            put("packs", buildJsonObject {
+                next.toSortedMap().forEach { (key, entry) ->
+                    put(key, buildJsonObject {
+                        put("installed_at", entry.installedAt)
+                        put("source", entry.source)
+                    })
+                }
+            })
+        }
+        runCatching { AtomicFiles.writeText(file(filesDir), obj.toString()) }
+    }
+
+    private fun JsonObject.text(key: String): String =
+        this[key]?.jsonPrimitive?.content ?: ""
+}
+
+
+
 /** 已安装 Pack：library/packs/<id>/<version>/nf-pack.json；目录变更时重建索引缓存。 */
 class PackStore(private val filesDir: File) {
 
@@ -57,6 +105,7 @@ class PackStore(private val filesDir: File) {
     private fun scanDirs(root: File): PackSnapshot {
         val entries = mutableListOf<PackEntry>()
         val errors = mutableListOf<String>()
+        val registry = PackRegistry.load(filesDir)
         val versions = root.listFiles()?.filter { it.isDirectory } ?: emptyList()
         for (idDir in versions.sortedBy { it.name }) {
             val versionDirs = idDir.listFiles()?.filter { it.isDirectory } ?: emptyList()
@@ -71,7 +120,7 @@ class PackStore(private val filesDir: File) {
                     val description = obj.text("description")
                     val items = obj["items"]?.jsonArray?.size ?: 0
                     val tree = obj["hashes"]?.jsonObject?.get("tree")?.jsonPrimitive?.content ?: ""
-                    val installedAt = readInstalledAt(vDir)
+                    val installedAt = registry[id + "@" + version]?.installedAt ?: vDir.lastModified()
                     entries.add(PackEntry(id, version, title, description, items, tree, vDir, installedAt))
                 } catch (t: Throwable) {
                     errors.add(vDir.name + "：" + (t.message ?: t.javaClass.simpleName))
@@ -133,17 +182,6 @@ class PackStore(private val filesDir: File) {
             put("errors", buildJsonArray { snapshot.errors.forEach { add(kotlinx.serialization.json.JsonPrimitive(it)) } })
         }
         AtomicFiles.writeText(indexFile(), obj.toString())
-    }
-
-    private fun readInstalledAt(dir: File): Long {
-        val sidecar = File(dir, ".nf-install.json")
-        if (!sidecar.isFile) return dir.lastModified()
-        return try {
-            Json.parseToJsonElement(sidecar.readText(Charsets.UTF_8)).jsonObject
-                .text("installed_at").toLongOrNull() ?: dir.lastModified()
-        } catch (t: Throwable) {
-            dir.lastModified()
-        }
     }
 
     private fun JsonObject.text(key: String): String =
