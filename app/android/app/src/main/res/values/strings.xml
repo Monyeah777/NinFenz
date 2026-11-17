@@ -77,6 +77,8 @@
     <string name="common_more">更多</string>
     <string name="action_search">搜索</string>
     <string name="action_settings">设置</string>
+    <string name="action_more">更多</string>
+    <string name="project_more_actions">更多操作</string>
     <string name="action_import">导入</string>
     <string name="action_close">关闭</string>
 

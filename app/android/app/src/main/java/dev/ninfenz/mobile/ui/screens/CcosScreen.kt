@@ -65,33 +65,28 @@ import kotlinx.serialization.json.put
 fun CcosScreen(onBack: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    var task by remember { mutableStateOf<CcosTask?>(null) }
-    var result by remember { mutableStateOf<CcosResult?>(null) }
-    var rawTask by remember { mutableStateOf<JsonObject?>(null) }
+    val restored = remember(context.filesDir) {
+        val taskText = CcosSessionStore.loadTask(context.filesDir)
+        val resultText = CcosSessionStore.loadResult(context.filesDir)
+        val taskObj = taskText?.let { runCatching { J.parseObject(it, "ccos-task/1") }.getOrNull() }
+        val parsedTask = taskObj?.let { runCatching { CcosModel.parseTask(it) }.getOrNull() }
+        val parsedResult = resultText?.let { runCatching { CcosModel.parseResult(it) }.getOrNull() }
+        RestoredCcos(
+            task = parsedTask,
+            result = parsedResult,
+            rawTask = taskObj,
+            findings = parsedResult?.let { dev.ninfenz.mobile.model.CcosPrecheck.check(it, parsedTask) }.orEmpty()
+        )
+    }
+    var task by remember { mutableStateOf(restored.task) }
+    var result by remember { mutableStateOf(restored.result) }
+    var rawTask by remember { mutableStateOf(restored.rawTask) }
     var reviewer by rememberSaveable { mutableStateOf("") }
     var note by rememberSaveable { mutableStateOf("") }
     var error by remember { mutableStateOf<CoreError?>(null) }
     var outcome by remember { mutableStateOf<String?>(null) }
     var busy by remember { mutableStateOf(false) }
-    var precheckFindings by remember { mutableStateOf<List<dev.ninfenz.mobile.model.CcosPrecheck.Finding>>(emptyList()) }
-    LaunchedEffect(Unit) {
-        val taskText = withContext(Dispatchers.IO) { CcosSessionStore.loadTask(context.filesDir) }
-        taskText?.let { text ->
-            runCatching {
-                val obj = J.parseObject(text, "ccos-task/1")
-                task = CcosModel.parseTask(obj)
-                rawTask = obj
-            }
-        }
-        val resultText = withContext(Dispatchers.IO) { CcosSessionStore.loadResult(context.filesDir) }
-        resultText?.let { text ->
-            runCatching {
-                val r = CcosModel.parseResult(text)
-                result = r
-                precheckFindings = dev.ninfenz.mobile.model.CcosPrecheck.check(r, task)
-            }
-        }
-    }
+    var precheckFindings by remember { mutableStateOf(restored.findings) }
 
     val taskPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         if (uri == null) return@rememberLauncherForActivityResult
@@ -339,3 +334,10 @@ fun CcosReviewActions(
         }
     }
 }
+
+private data class RestoredCcos(
+    val task: CcosTask?,
+    val result: CcosResult?,
+    val rawTask: JsonObject?,
+    val findings: List<dev.ninfenz.mobile.model.CcosPrecheck.Finding>
+)

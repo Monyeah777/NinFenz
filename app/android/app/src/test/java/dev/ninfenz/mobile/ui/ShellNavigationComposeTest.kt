@@ -5,6 +5,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.test.core.app.ApplicationProvider
 import dev.ninfenz.mobile.data.AppPrefs
 import dev.ninfenz.mobile.data.ThemeMode
@@ -39,6 +40,9 @@ class ShellCompactNavigationTest {
         val prefs = prefsForTest()
         compose.setContent { NfTheme { NfMobileApp(prefs, ThemeMode.SYSTEM, {}) } }
         assertThreeDestinations(compose)
+        compose.onNodeWithText("工作台").performClick()
+        compose.waitForIdle()
+        compose.onNodeWithText("一个入口，继续内容").assertExists()
     }
 }
 

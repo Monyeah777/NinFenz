@@ -164,6 +164,7 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 - PackCenterUninstallTest（1，Compose）：卸载按钮→确认弹窗→回调。
 - MarkdownPreviewTest（1，Compose）：标题/列表/引用/代码/表格渲染。
 - FlowUiTest（2，Compose）：工作台单入口/下一步、项目五阶段工作流。
+- ProjectDetailMountTest（2，Compose）：项目详情挂载、overflow 更多操作。
 - SearchHistoryStoreTest（2）：最近优先/去重、最多 10 条、清空。
 - ImportDraftStoreTest（2）：最近导入预览保存/恢复、空白/损坏容错。
 - SearchFilterTest（3）：kind=null 全量、按 kind 过滤。
@@ -203,9 +204,9 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 - 真机 smoke：连接并授权后运行 `bash app/scripts/device_smoke.sh`（安装 debug APK、冷启动、前台 Activity、最近崩溃日志）；设 `CAPTURE_DIR=…` 额外拉取 `home.png` 与 `ui.xml`。
 
 - 2026-11-16 当前：`./gradlew :app:assembleDebug` 成功：app-debug.apk = 19,049,108 bytes，
-  sha256 = 285c3b389a87d2b36d91da04802d5a959fce481b67f6228fd4d3a6a508172837（含双 ABI 原生库 + 9 个示例 Pack assets）。
+  sha256 = d675489883bad6c9efc826d7362ca23070c92c0eaac40bcee9d5a8e92878f3bb（含双 ABI 原生库 + 9 个示例 Pack assets）。
 - 仓库级门禁在 UTF-8 locale 下运行：`LANG=C.UTF-8 PYTHONUTF8=1 bash verify.sh --checks-only`（GBK 控制台会让 `git ls-files` 解码失败，触发 modeling 检查异常）。
-- `./gradlew :app:testDebugUnitTest` 全绿：383 条 JVM 单测（v1 42 + v0.02 341；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y/大字号/对比度/Paparazzi 截图）。
+- `./gradlew :app:testDebugUnitTest` 全绿：384 条 JVM 单测（v1 42 + v0.02 342；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y/大字号/对比度/Paparazzi 截图）。
 - `zipalign -c -P 16 -v 4 app-debug.apk` → Verification successful（native lib 16KB page 对齐）。
 - `bash app/scripts/build_core_android.sh --clean` 成功：NDK 27.0.12077973 + rustup targets
   （aarch64-linux-android / x86_64-linux-android，经 rsproxy 镜像安装）；两个 .so 的 LOAD align 均为 0x4000。

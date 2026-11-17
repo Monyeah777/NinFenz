@@ -3,6 +3,7 @@ package dev.ninfenz.mobile.ui.screens
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,11 +23,14 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextField
@@ -638,6 +642,7 @@ fun ProjectDetailScreen(
     onShare: () -> Unit = {},
     onShareFull: () -> Unit = {},
     onDelete: () -> Unit = {},
+    onFlow: () -> Unit = {},
     compareCandidates: List<ProjectEntry> = emptyList()
 ) {
     val context = LocalContext.current
@@ -651,6 +656,7 @@ fun ProjectDetailScreen(
     var showRename by remember { mutableStateOf(false) }
     var renameText by remember(project.title) { mutableStateOf(project.title) }
     var showReview by remember { mutableStateOf(false) }
+    var showMoreActions by remember { mutableStateOf(false) }
     val canApprove = project.status in setOf(ProjectStatus.VALIDATED, ProjectStatus.EXPORTED, ProjectStatus.REVIEWED)
     var reviewStale by remember { mutableStateOf(false) }
     LaunchedEffect(project.id, project.review.state, project.review.subjectDigest) {
@@ -684,7 +690,69 @@ fun ProjectDetailScreen(
         }
     }
     Column(modifier = Modifier.fillMaxSize()) {
-        NfTopAppBar(title = project.title, onBack = onBack)
+        NfTopAppBar(
+            title = project.title,
+            onBack = onBack,
+            actions = {
+                Box {
+                    IconButton(onClick = { showMoreActions = true }) {
+                        Icon(
+                            Icons.Filled.MoreVert,
+                            contentDescription = stringResource(dev.ninfenz.mobile.R.string.action_more)
+                        )
+                    }
+                    DropdownMenu(expanded = showMoreActions, onDismissRequest = { showMoreActions = false }) {
+                        DropdownMenuItem(text = { Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_duplicate)) }, onClick = {
+                            showMoreActions = false
+                            onDuplicate()
+                        })
+                        DropdownMenuItem(text = { Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_archive)) }, onClick = {
+                            showMoreActions = false
+                            showArchive = true
+                        })
+                        DropdownMenuItem(text = { Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_diff)) }, onClick = {
+                            showMoreActions = false
+                            diffPicker.launch(arrayOf("application/json", "*/*"))
+                        })
+                        if (compareCandidates.isNotEmpty()) {
+                            DropdownMenuItem(text = { Text(stringResource(dev.ninfenz.mobile.R.string.project_diff_library)) }, onClick = {
+                                showMoreActions = false
+                                showComparePicker = true
+                            })
+                        }
+                        DropdownMenuItem(text = { Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_rename)) }, onClick = {
+                            showMoreActions = false
+                            renameText = project.title
+                            showRename = true
+                        })
+                        DropdownMenuItem(text = { Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_review)) }, onClick = {
+                            showMoreActions = false
+                            showReview = true
+                        })
+                        DropdownMenuItem(text = { Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_share)) }, onClick = {
+                            showMoreActions = false
+                            onShare()
+                        })
+                        DropdownMenuItem(text = { Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_share_full)) }, onClick = {
+                            showMoreActions = false
+                            onShareFull()
+                        })
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    stringResource(dev.ninfenz.mobile.R.string.project_detail_delete),
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            },
+                            onClick = {
+                                showMoreActions = false
+                                showDelete = true
+                            }
+                        )
+                    }
+                }
+            }
+        )
         LazyColumn(
             contentPadding = androidx.compose.foundation.layout.PaddingValues(NfSpacing.page),
             verticalArrangement = Arrangement.spacedBy(NfSpacing.m)
@@ -724,35 +792,13 @@ fun ProjectDetailScreen(
                             stringResource(dev.ninfenz.mobile.R.string.project_detail_history, project.historyCount),
                             style = MaterialTheme.typography.bodySmall
                         )
-                        TextButton(onClick = onDuplicate) {
-                            Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_duplicate))
-                        }
-                        TextButton(onClick = { showArchive = true }) {
-                            Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_archive))
-                        }
-                        TextButton(onClick = { diffPicker.launch(arrayOf("application/json", "*/*")) }) {
-                            Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_diff))
-                        }
-                        if (compareCandidates.isNotEmpty()) {
-                            TextButton(onClick = { showComparePicker = true }) {
-                                Text(stringResource(dev.ninfenz.mobile.R.string.project_diff_library))
+                        Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+                            TextButton(onClick = onFlow) {
+                                Text(stringResource(dev.ninfenz.mobile.R.string.flow_title))
                             }
-                        }
-                        TextButton(onClick = {
-                            renameText = project.title
-                            showRename = true
-                        }) { Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_rename)) }
-                        TextButton(onClick = { showReview = true }) {
-                            Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_review))
-                        }
-                        TextButton(onClick = onShare) {
-                            Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_share))
-                        }
-                        TextButton(onClick = onShareFull) {
-                            Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_share_full))
-                        }
-                        TextButton(onClick = { showDelete = true }) {
-                            Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_delete))
+                            TextButton(onClick = { showMoreActions = true }) {
+                                Text(stringResource(dev.ninfenz.mobile.R.string.project_more_actions))
+                            }
                         }
                     }
                 }

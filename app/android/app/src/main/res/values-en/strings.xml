@@ -77,6 +77,8 @@
     <string name="common_more">More</string>
     <string name="action_search">Search</string>
     <string name="action_settings">Settings</string>
+    <string name="action_more">More</string>
+    <string name="project_more_actions">More actions</string>
     <string name="action_import">Import</string>
     <string name="action_close">Close</string>
 

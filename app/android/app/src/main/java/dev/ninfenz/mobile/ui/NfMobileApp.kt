@@ -624,6 +624,7 @@ is Detail.Import -> ImportScreen(
                                 onBack = { shell = shell.back() ?: shell },
                                 onAuthor = { shell = shell.open(Detail.Author(entry.project.id)) },
                                 onAssembly = { shell = shell.open(Detail.Delivery(entry.project.id)) },
+                                onFlow = { shell = shell.open(Detail.Flow(entry.project.id)) },
                                 compareCandidates = projects,
                                 onShare = {
                                     val text = runCatching { entry.file.readText(Charsets.UTF_8) }.getOrNull()

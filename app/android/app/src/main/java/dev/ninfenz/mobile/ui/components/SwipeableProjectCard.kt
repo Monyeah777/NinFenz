@@ -36,7 +36,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -65,6 +67,8 @@ fun SwipeableProjectCard(
     val offset = remember(entry.project.id) { Animatable(0f) }
     val scope = rememberCoroutineScope()
     var width by remember { mutableStateOf(0) }
+    var armed by remember { mutableStateOf(false) }
+    val haptic = LocalHapticFeedback.current
 
     LaunchedEffect(entry.project.id) {
         delay((index.coerceAtMost(8) * 45L))
@@ -122,6 +126,7 @@ fun SwipeableProjectCard(
                             onDragEnd = {
                                 scope.launch {
                                     val threshold = width * 0.5f
+                                    armed = false
                                     when {
                                         offset.value > threshold -> {
                                             offset.animateTo(0f)
@@ -139,6 +144,13 @@ fun SwipeableProjectCard(
                                 change.consume()
                                 scope.launch {
                                     val next = (offset.value + dragAmount).coerceIn(-width * 0.75f, width * 0.75f)
+                                    val crossed = width > 0 && kotlin.math.abs(next) >= width * 0.5f
+                                    if (crossed && !armed) {
+                                        armed = true
+                                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    } else if (!crossed) {
+                                        armed = false
+                                    }
                                     offset.snapTo(next)
                                 }
                             }
