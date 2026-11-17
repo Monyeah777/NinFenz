@@ -499,9 +499,15 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
 
                 NfCollapsibleSection(title = stringResource(dev.ninfenz.mobile.R.string.delivery_export_section), initiallyExpanded = true) {
                 Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                    ExportButton("md", "text/markdown", markdown, project, context, scope, { busy = it }, { error = it }, busy) { file, manifest ->
+                    ExportButton("md", "text/markdown", markdown, project, context, scope, { busy = it }, { error = it }, busy) { file, manifest, report ->
                         exportedFile = file
                         manifestText = manifest
+                        reproOk = report?.stable
+                        reproText = when {
+                            report == null -> null
+                            report.stable -> context.getString(dev.ninfenz.mobile.R.string.repro_stable)
+                            else -> context.getString(dev.ninfenz.mobile.R.string.repro_diff, report.firstDiff ?: -1)
+                        }
                         recordExport("md", file, manifest)
                         scope.launch {
                             when (val advanced = statusStore.advance(project, ProjectStatus.EXPORTED)) {
@@ -514,26 +520,50 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                             }
                         }
                     }
-                    ExportButton("zip", "application/zip", markdown, project, context, scope, { busy = it }, { error = it }, busy) { file, manifest ->
+                    ExportButton("zip", "application/zip", markdown, project, context, scope, { busy = it }, { error = it }, busy) { file, manifest, report ->
                         exportedFile = file
                         manifestText = manifest
+                        reproOk = report?.stable
+                        reproText = when {
+                            report == null -> null
+                            report.stable -> context.getString(dev.ninfenz.mobile.R.string.repro_stable)
+                            else -> context.getString(dev.ninfenz.mobile.R.string.repro_diff, report.firstDiff ?: -1)
+                        }
                         recordExport("zip", file, manifest)
                     }
-                    ExportButton("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", markdown, project, context, scope, { busy = it }, { error = it }, busy) { file, manifest ->
+                    ExportButton("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", markdown, project, context, scope, { busy = it }, { error = it }, busy) { file, manifest, report ->
                         exportedFile = file
                         manifestText = manifest
+                        reproOk = report?.stable
+                        reproText = when {
+                            report == null -> null
+                            report.stable -> context.getString(dev.ninfenz.mobile.R.string.repro_stable)
+                            else -> context.getString(dev.ninfenz.mobile.R.string.repro_diff, report.firstDiff ?: -1)
+                        }
                         recordExport("docx", file, manifest)
                     }
                 }
                 Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                    ExportButton("json", "application/json", markdown, project, context, scope, { busy = it }, { error = it }, busy) { file, manifest ->
+                    ExportButton("json", "application/json", markdown, project, context, scope, { busy = it }, { error = it }, busy) { file, manifest, report ->
                         exportedFile = file
                         manifestText = manifest
+                        reproOk = report?.stable
+                        reproText = when {
+                            report == null -> null
+                            report.stable -> context.getString(dev.ninfenz.mobile.R.string.repro_stable)
+                            else -> context.getString(dev.ninfenz.mobile.R.string.repro_diff, report.firstDiff ?: -1)
+                        }
                         recordExport("json", file, manifest)
                     }
-                    ExportButton("skill", "application/zip", markdown, project, context, scope, { busy = it }, { error = it }, busy) { file, manifest ->
+                    ExportButton("skill", "application/zip", markdown, project, context, scope, { busy = it }, { error = it }, busy) { file, manifest, report ->
                         exportedFile = file
                         manifestText = manifest
+                        reproOk = report?.stable
+                        reproText = when {
+                            report == null -> null
+                            report.stable -> context.getString(dev.ninfenz.mobile.R.string.repro_stable)
+                            else -> context.getString(dev.ninfenz.mobile.R.string.repro_diff, report.firstDiff ?: -1)
+                        }
                         recordExport("skill", file, manifest)
                     }
                 }
@@ -549,9 +579,15 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                         }
                         recordExport("epub", file, null)
                     }
-                    PdfExportButton(markdown, project, context, scope, { busy = it }, { error = it }, busy) { file ->
+                    PdfExportButton(markdown, project, context, scope, { busy = it }, { error = it }, busy) { file, report ->
                         exportedFile = file
                         manifestText = null
+                        reproOk = report.stable
+                        reproText = if (report.stable) {
+                            context.getString(dev.ninfenz.mobile.R.string.repro_stable)
+                        } else {
+                            context.getString(dev.ninfenz.mobile.R.string.repro_diff, report.firstDiff ?: -1)
+                        }
                         recordExport("pdf", file, null)
                     }
                     HtmlExportButton(markdown, project, context, scope, { busy = it }, { error = it }, busy) { file, report ->
@@ -804,7 +840,7 @@ private fun ExportButton(
     setBusy: (Boolean) -> Unit,
     setError: (CoreError?) -> Unit,
     busy: Boolean,
-    onDone: (File?, String?) -> Unit
+    onDone: (File?, String?, dev.ninfenz.mobile.data.ReproChecker.Report?) -> Unit
 ) {
     Button(
         enabled = markdown != null && !busy,
@@ -815,22 +851,37 @@ private fun ExportButton(
             scope.launch {
                 try {
                     val outDir = File(File(context.filesDir, "exports"), "delivery").apply { mkdirs() }
-                    val payload = buildJsonObject {
+                    fun payloadFor(dir: File) = buildJsonObject {
                         put("markdown", md)
                         put("format", format)
-                        put("out_dir", outDir.absolutePath)
+                        put("out_dir", dir.absolutePath)
                         put("manifest", true)
                         put("title", project.title)
                         put("project_id", project.id)
                     }
-                    val response = safeCall("export", payload)
-                    if (response.ok) {
-                        val manifest = response.resultObject()
+                    fun fileFor(dir: File, manifest: kotlinx.serialization.json.JsonObject?): File? {
                         val name = manifest?.get("files")?.toString()?.let { raw ->
                             Regex("\"name\":\"([^\"]+)\"").find(raw)?.groupValues?.getOrNull(1)
                         }
-                        val file = name?.let { File(outDir, it) }
-                        onDone(file, manifest?.toString())
+                        return name?.let { File(dir, it) }
+                    }
+                    val response = safeCall("export", payloadFor(outDir))
+                    if (response.ok) {
+                        val manifest = response.resultObject()
+                        val file = fileFor(outDir, manifest)
+                        var report: dev.ninfenz.mobile.data.ReproChecker.Report? = null
+                        if (file != null) {
+                            val reproDir = File(context.cacheDir, "repro-core-" + format).apply { deleteRecursively(); mkdirs() }
+                            val second = safeCall("export", payloadFor(reproDir))
+                            if (second.ok) {
+                                val secondFile = fileFor(reproDir, second.resultObject())
+                                if (secondFile != null) {
+                                    report = dev.ninfenz.mobile.data.ReproChecker.check(file, secondFile)
+                                }
+                            }
+                            reproDir.deleteRecursively()
+                        }
+                        onDone(file, manifest?.toString(), report)
                     } else {
                         setError(response.error)
                     }
@@ -887,7 +938,7 @@ private fun PdfExportButton(
     setBusy: (Boolean) -> Unit,
     setError: (CoreError?) -> Unit,
     busy: Boolean,
-    onDone: (File) -> Unit
+    onDone: (File, dev.ninfenz.mobile.data.ReproChecker.Report) -> Unit
 ) {
     Button(
         enabled = markdown != null && !busy,
@@ -899,7 +950,11 @@ private fun PdfExportButton(
                 try {
                     val outDir = File(File(context.filesDir, "exports"), "delivery").apply { mkdirs() }
                     val created = PdfExporter.export(md, project.title, outDir)
-                    onDone(created.file)
+                    val reproDir = File(context.cacheDir, "repro-pdf").apply { deleteRecursively(); mkdirs() }
+                    val second = PdfExporter.export(md, project.title, reproDir)
+                    val report = dev.ninfenz.mobile.data.ReproChecker.check(created.file, second.file)
+                    reproDir.deleteRecursively()
+                    onDone(created.file, report)
                 } catch (t: Throwable) {
                     setError(CoreError("NF-EXP-002", context.getString(dev.ninfenz.mobile.R.string.export_pdf_failed, t.message ?: t.javaClass.simpleName), context.getString(dev.ninfenz.mobile.R.string.export_failed_fix), null, 1))
                 } finally {
