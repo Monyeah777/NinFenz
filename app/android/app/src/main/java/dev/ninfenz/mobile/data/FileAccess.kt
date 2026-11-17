@@ -84,12 +84,17 @@ object FileAccess {
     /** 目录树复制（ACTION_OPEN_DOCUMENT_TREE → app 私有目录）；返回复制文件数。 */
     suspend fun copyTree(context: Context, treeUri: Uri, dest: File): Int = withContext(Dispatchers.IO) {
         dest.mkdirs()
-        val rootDoc = DocumentsContract.buildDocumentUriUsingTree(
-            treeUri,
-            DocumentsContract.getTreeDocumentId(treeUri)
-        )
-        val budget = longArrayOf(MAX_TREE_BYTES)
-        copyDocument(context, rootDoc, dest, 0, budget)
+        try {
+            val rootDoc = DocumentsContract.buildDocumentUriUsingTree(
+                treeUri,
+                DocumentsContract.getTreeDocumentId(treeUri)
+            )
+            val budget = longArrayOf(MAX_TREE_BYTES)
+            copyDocument(context, rootDoc, dest, 0, budget)
+        } catch (t: Throwable) {
+            dest.deleteRecursively()
+            throw t
+        }
     }
 
     private fun copyDocument(context: Context, docUri: Uri, destDir: File, depth: Int, budget: LongArray): Int {
