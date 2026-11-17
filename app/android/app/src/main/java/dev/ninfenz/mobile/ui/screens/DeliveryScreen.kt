@@ -44,7 +44,9 @@ import dev.ninfenz.mobile.core.J
 import dev.ninfenz.mobile.data.AuthorArtifacts
 import dev.ninfenz.mobile.data.AuthorArtifactsLoader
 import dev.ninfenz.mobile.data.DeliveryDraftStore
+import dev.ninfenz.mobile.data.DocxReferenceStyles
 import dev.ninfenz.mobile.data.EpubExporter
+import dev.ninfenz.mobile.data.FileAccess
 import dev.ninfenz.mobile.data.EpubValidator
 import dev.ninfenz.mobile.data.HtmlExporter
 import dev.ninfenz.mobile.data.HtmlValidator
@@ -123,6 +125,26 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
     var exportVerify by remember { mutableStateOf<ExportVerifier.Result?>(null) }
     var reproText by remember { mutableStateOf<String?>(null) }
     var reproOk by remember { mutableStateOf<Boolean?>(null) }
+    var docxStyles by remember { mutableStateOf<String?>(null) }
+    val referencePicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) {
+            scope.launch {
+                val file = runCatching { FileAccess.copyToCache(context, uri, "reference.docx") }.getOrNull()
+                val styles = file?.let { DocxReferenceStyles.extract(it) }
+                file?.delete()
+                docxStyles = styles
+                if (styles == null) {
+                    error = CoreError(
+                        "NF-EXP-002",
+                        context.getString(dev.ninfenz.mobile.R.string.docx_reference_failed),
+                        context.getString(dev.ninfenz.mobile.R.string.docx_reference_failed_fix),
+                        null,
+                        2
+                    )
+                }
+            }
+        }
+    }
     val restoredInputs = remember(project.id) { draftStore.load(project.id) }
     var draftNote by remember(project.id) {
         mutableStateOf(if (restoredInputs.isNotEmpty()) context.getString(dev.ninfenz.mobile.R.string.delivery_draft_restored) else null)
@@ -531,7 +553,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                         }
                         recordExport("zip", file, manifest)
                     }
-                    ExportButton("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", markdown, project, context, scope, { busy = it }, { error = it }, busy) { file, manifest, report ->
+                    ExportButton("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", markdown, project, context, scope, { busy = it }, { error = it }, busy, docxStyles = docxStyles) { file, manifest, report ->
                         exportedFile = file
                         manifestText = manifest
                         reproOk = report?.stable
@@ -625,6 +647,22 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                             ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.delivery_share_file))
                         }
                     ) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_share_file)) }
+                }
+                Row(
+                    modifier = Modifier.padding(horizontal = NfSpacing.page),
+                    horizontalArrangement = Arrangement.spacedBy(NfSpacing.s),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    OutlinedButton(onClick = {
+                        referencePicker.launch(arrayOf("application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
+                    }) { Text(stringResource(dev.ninfenz.mobile.R.string.docx_reference_pick)) }
+                    Text(
+                        stringResource(
+                            if (docxStyles != null) dev.ninfenz.mobile.R.string.docx_reference_loaded
+                            else dev.ninfenz.mobile.R.string.docx_reference_none
+                        ),
+                        style = MaterialTheme.typography.bodySmall
+                    )
                 }
                 Text(stringResource(dev.ninfenz.mobile.R.string.delivery_pdf_note), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page))
                 manifestText?.let { Text(it, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
@@ -840,6 +878,7 @@ private fun ExportButton(
     setBusy: (Boolean) -> Unit,
     setError: (CoreError?) -> Unit,
     busy: Boolean,
+    docxStyles: String? = null,
     onDone: (File?, String?, dev.ninfenz.mobile.data.ReproChecker.Report?) -> Unit
 ) {
     Button(
@@ -858,6 +897,7 @@ private fun ExportButton(
                         put("manifest", true)
                         put("title", project.title)
                         put("project_id", project.id)
+                        if (format == "docx" && docxStyles != null) put("docx_styles", docxStyles)
                     }
                     fun fileFor(dir: File, manifest: kotlinx.serialization.json.JsonObject?): File? {
                         val name = manifest?.get("files")?.toString()?.let { raw ->

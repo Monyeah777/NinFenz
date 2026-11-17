@@ -244,7 +244,8 @@ pub fn export(req: &Value) -> OpOutcome {
                 })
                 .unwrap_or_default();
             let title = opt_str(req, "title")?.unwrap_or("NF Export");
-            let bytes = crate::docx::build_docx(&content, title)?;
+            let styles = opt_str(req, "docx_styles")?;
+            let bytes = crate::docx::build_docx_with_styles(&content, &title, styles.as_deref())?;
             crate::fsutil::write_bytes(&dir.join("result.docx"), &bytes)?;
             files.push(json!({
                 "name": "result.docx",

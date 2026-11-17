@@ -192,6 +192,31 @@ fn export_docx_is_valid_ooxml_and_deterministic() {
 }
 
 #[test]
+fn export_docx_reference_styles_are_used() {
+    let out = tmpdir("exp_docx_ref");
+    let styles = r#"<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="RefNormal"/></w:style></w:styles>"#;
+    let r = run_ok(
+        "export",
+        &json!({
+            "markdown": "# 标题\n\n正文\n",
+            "format": "docx",
+            "out_dir": pstr(&out),
+            "title": "参考样式",
+            "docx_styles": styles
+        }),
+    );
+    let bytes = std::fs::read(out.join("result.docx")).unwrap();
+    let entries = nf_app_core::zipsec::read_zip_bytes(&bytes).unwrap();
+    let actual = entries
+        .iter()
+        .find(|e| e.name == "word/styles.xml")
+        .map(|e| String::from_utf8_lossy(&e.data).to_string())
+        .unwrap();
+    assert_eq!(actual, styles);
+    assert_eq!(r["files"][0]["sha256"], nf_app_core::canonical::sha256_hex(&bytes));
+}
+
+#[test]
 fn export_skill_pack_contains_scaffold() {
     let out = tmpdir("exp_skill");
     let r = run_ok(

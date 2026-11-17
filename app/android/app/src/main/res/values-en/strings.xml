@@ -299,6 +299,11 @@
     <string name="delivery_share_file">Share exported file</string>
     <string name="delivery_open_file">Open</string>
     <string name="delivery_pdf_note">PDF: local basic-text export; rich layout remains OPEN.</string>
+    <string name="docx_reference_pick">Choose reference DOCX</string>
+    <string name="docx_reference_loaded">Reference styles loaded</string>
+    <string name="docx_reference_none">No reference styles</string>
+    <string name="docx_reference_failed">Failed to read reference styles</string>
+    <string name="docx_reference_failed_fix">Confirm the DOCX contains word/styles.xml</string>
     <string name="repro_stable">Repro check: two exports match</string>
     <string name="repro_diff">Repro check: exports differ (first diff offset %1$d)</string>
     <string name="delivery_plan_failed">Plan parse failed: %1$s</string>

@@ -157,6 +157,26 @@ fn document_xml(markdown: &str) -> String {
 
 /// 生成 .docx 字节（确定性；同 input 同 bytes）。
 pub fn build_docx(markdown: &str, title: &str) -> Result<Vec<u8>, CoreError> {
+    build_docx_with_styles(markdown, title, None)
+}
+
+/// 参考样式：用调用方提供的 word/styles.xml 替换内置样式（reference-doc 继承）。
+pub fn build_docx_with_styles(
+    markdown: &str,
+    title: &str,
+    styles: Option<&str>,
+) -> Result<Vec<u8>, CoreError> {
+    let styles_xml = styles.unwrap_or(STYLES);
+    if styles_xml.len() > 1024 * 1024 {
+        return Err(CoreError::new("NF-EXP-002")
+            .with_message("docx 参考样式超过 1 MiB")
+            .with_exit(3));
+    }
+    if !styles_xml.contains("<w:styles") {
+        return Err(CoreError::new("NF-EXP-002")
+            .with_message("docx 参考样式缺 w:styles 根")
+            .with_exit(3));
+    }
     let entries: Vec<(String, Vec<u8>)> = vec![
         (
             "[Content_Types].xml".to_string(),
@@ -179,7 +199,7 @@ pub fn build_docx(markdown: &str, title: &str) -> Result<Vec<u8>, CoreError> {
             "word/document.xml".to_string(),
             document_xml(markdown).into_bytes(),
         ),
-        ("word/styles.xml".to_string(), STYLES.as_bytes().to_vec()),
+        ("word/styles.xml".to_string(), styles_xml.as_bytes().to_vec()),
     ];
     zipsec::zip_bytes(&entries)
 }
