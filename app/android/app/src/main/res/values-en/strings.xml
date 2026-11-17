@@ -130,6 +130,8 @@
         <item quantity="other">%1$d items could not be read</item>
     </plurals>
     <string name="library_section_projects">Recent projects</string>
+    <string name="library_project_archived">Moved to archive</string>
+    <string name="library_project_undo">Undo</string>
     <string name="library_section_packs">Installed packs</string>
     <string name="create_no_pack_title">No packs available yet</string>
     <string name="create_no_pack_body">Load the bundled sample pack or import a pack from Files before creating a project.</string>

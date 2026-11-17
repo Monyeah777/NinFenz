@@ -40,6 +40,10 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -106,7 +110,6 @@ fun LibraryHomeScreen(
     onOpenPack: (PackEntry) -> Unit,
     onOpenProject: (ProjectEntry) -> Unit,
     onOpenFlow: (ProjectEntry) -> Unit = {},
-    onDeleteProject: (ProjectEntry) -> Unit = {},
     onSearch: () -> Unit,
     onPackCenter: () -> Unit,
     onSettings: () -> Unit,
@@ -121,7 +124,8 @@ fun LibraryHomeScreen(
     val viewStore = remember(viewFilesDir) { viewFilesDir?.let { LibraryViewStore(it) } }
     val savedView = remember { viewStore?.load() }
     var pendingDeleteArchive by remember { mutableStateOf<File?>(null) }
-    var pendingDeleteProject by remember { mutableStateOf<ProjectEntry?>(null) }
+    val snackbar = remember { SnackbarHostState() }
+    val snackbarScope = rememberCoroutineScope()
     var statusFilter by rememberSaveable { mutableStateOf(savedView?.status) }
     var sortName by rememberSaveable { mutableStateOf(savedView?.sort ?: ProjectSort.RECENT.name) }
     LaunchedEffect(statusFilter, sortName) {
@@ -133,6 +137,7 @@ fun LibraryHomeScreen(
         ProjectSorter.sort(ProjectFilter.apply(projects, filterStatus), filterSort)
     }
 
+    Box(modifier = Modifier.fillMaxSize()) {
     Column(modifier = Modifier.fillMaxSize()) {
         NfTopAppBar(
             title = stringResource(dev.ninfenz.mobile.R.string.nav_library),
@@ -241,7 +246,25 @@ fun LibraryHomeScreen(
                         index = index,
                         onOpen = { onOpenProject(entry) },
                         onFlow = { onOpenFlow(entry) },
-                        onDelete = { pendingDeleteProject = entry },
+                        onDelete = {
+                            snackbarScope.launch {
+                                val archived = runCatching {
+                                    ProjectArchiver.archive(entry.file, context.filesDir)
+                                }.getOrNull()
+                                if (archived != null) {
+                                    onRefresh()
+                                    val result = snackbar.showSnackbar(
+                                        message = context.getString(dev.ninfenz.mobile.R.string.library_project_archived),
+                                        actionLabel = context.getString(dev.ninfenz.mobile.R.string.library_project_undo),
+                                        duration = SnackbarDuration.Long
+                                    )
+                                    if (result == SnackbarResult.ActionPerformed) {
+                                        runCatching { ProjectArchiver.restore(archived, context.filesDir) }
+                                        onRefresh()
+                                    }
+                                }
+                            }
+                        },
                         modifier = Modifier.padding(horizontal = NfSpacing.page)
                     )
                 }
@@ -315,22 +338,7 @@ fun LibraryHomeScreen(
         }
         }
     }
-
-    pendingDeleteProject?.let { entry ->
-        AlertDialog(
-            onDismissRequest = { pendingDeleteProject = null },
-            title = { Text(stringResource(dev.ninfenz.mobile.R.string.project_delete_title)) },
-            text = { Text(stringResource(dev.ninfenz.mobile.R.string.project_delete_body, entry.project.title)) },
-            confirmButton = {
-                TextButton(onClick = {
-                    pendingDeleteProject = null
-                    onDeleteProject(entry)
-                }) { Text(stringResource(dev.ninfenz.mobile.R.string.project_delete_confirm)) }
-            },
-            dismissButton = {
-                TextButton(onClick = { pendingDeleteProject = null }) { Text(stringResource(android.R.string.cancel)) }
-            }
-        )
+    SnackbarHost(snackbar, modifier = Modifier.align(Alignment.BottomCenter))
     }
 
     pendingDeleteArchive?.let { file ->

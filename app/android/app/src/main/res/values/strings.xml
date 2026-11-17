@@ -130,6 +130,8 @@
         <item quantity="other">有 %1$d 个条目无法读取</item>
     </plurals>
     <string name="library_section_projects">最近项目</string>
+    <string name="library_project_archived">已移到归档</string>
+    <string name="library_project_undo">撤销</string>
     <string name="library_section_packs">已安装 Pack</string>
     <string name="create_no_pack_title">还没有可用的 Pack</string>
     <string name="create_no_pack_body">先载入内置示例 Pack，或从文件管理器导入 Pack，再创建项目。</string>

@@ -339,14 +339,6 @@ fun NfMobileApp(
                             onOpenPack = { shell = shell.open(Detail.Pack(it.id, it.version)) },
                             onOpenProject = { shell = shell.open(Detail.Project(it.project.id)) },
                             onOpenFlow = { shell = shell.open(Detail.Flow(it.project.id)) },
-                            onDeleteProject = { entry ->
-                                scope.launch {
-                                    withContext(Dispatchers.IO) {
-                                        ProjectArchiver.deleteProject(entry.file, context.filesDir)
-                                    }
-                                    refresh()
-                                }
-                            },
                             onSearch = { shell = shell.open(Detail.Search) },
                             onPackCenter = { shell = shell.open(Detail.PackCenter) },
                             onSettings = { shell = shell.open(Detail.Settings) },
