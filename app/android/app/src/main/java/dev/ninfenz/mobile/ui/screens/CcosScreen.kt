@@ -24,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -64,8 +65,8 @@ fun CcosScreen(onBack: () -> Unit) {
     var task by remember { mutableStateOf<CcosTask?>(null) }
     var result by remember { mutableStateOf<CcosResult?>(null) }
     var rawTask by remember { mutableStateOf<JsonObject?>(null) }
-    var reviewer by remember { mutableStateOf("") }
-    var note by remember { mutableStateOf("") }
+    var reviewer by rememberSaveable { mutableStateOf("") }
+    var note by rememberSaveable { mutableStateOf("") }
     var error by remember { mutableStateOf<CoreError?>(null) }
     var outcome by remember { mutableStateOf<String?>(null) }
     var busy by remember { mutableStateOf(false) }
