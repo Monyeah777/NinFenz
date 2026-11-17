@@ -217,6 +217,30 @@ fn export_docx_reference_styles_are_used() {
 }
 
 #[test]
+fn export_docx_reference_sect_pr_is_used() {
+    let out = tmpdir("exp_docx_sect");
+    let sect = r#"<w:sectPr><w:pgSz w:w="12240" w:h="15840"/><w:pgMar w:top="720" w:right="720" w:bottom="720" w:left="720" w:header="0" w:footer="0" w:gutter="0"/></w:sectPr>"#;
+    run_ok(
+        "export",
+        &json!({
+            "markdown": "# 标题\n",
+            "format": "docx",
+            "out_dir": pstr(&out),
+            "title": "参考页面",
+            "docx_sect_pr": sect
+        }),
+    );
+    let bytes = std::fs::read(out.join("result.docx")).unwrap();
+    let entries = nf_app_core::zipsec::read_zip_bytes(&bytes).unwrap();
+    let doc = entries
+        .iter()
+        .find(|e| e.name == "word/document.xml")
+        .map(|e| String::from_utf8_lossy(&e.data).to_string())
+        .unwrap();
+    assert!(doc.contains(sect));
+}
+
+#[test]
 fn export_skill_pack_contains_scaffold() {
     let out = tmpdir("exp_skill");
     let r = run_ok(

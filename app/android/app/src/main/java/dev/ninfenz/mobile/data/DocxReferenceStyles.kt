@@ -7,15 +7,21 @@ import java.util.zip.ZipFile
 object DocxReferenceStyles {
     const val MAX_BYTES = 1024 * 1024
 
-    fun extract(file: File): String? {
+    fun extract(file: File): String? = readEntry(file, "word/styles.xml")
+        ?.takeIf { it.contains("<w:styles") }
+
+    fun extractSectPr(file: File): String? = readEntry(file, "word/document.xml")
+        ?.let { Regex("<w:sectPr[\\s\\S]*?</w:sectPr>").find(it)?.value }
+
+    private fun readEntry(file: File, name: String): String? {
         if (!file.isFile) return null
         return try {
             ZipFile(file).use { zip ->
-                val entry = zip.getEntry("word/styles.xml") ?: return null
+                val entry = zip.getEntry(name) ?: return null
                 if (entry.size > MAX_BYTES) return null
                 val bytes = zip.getInputStream(entry).use { it.readBytes() }
                 if (bytes.size > MAX_BYTES) return null
-                String(bytes, Charsets.UTF_8).takeIf { it.contains("<w:styles") }
+                String(bytes, Charsets.UTF_8)
             }
         } catch (t: Throwable) {
             null

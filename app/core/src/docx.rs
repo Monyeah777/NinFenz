@@ -148,16 +148,19 @@ fn core_props(title: &str) -> String {
     )
 }
 
-fn document_xml(markdown: &str) -> String {
+const DEFAULT_SECT_PR: &str = r#"<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440" w:header="708" w:footer="708" w:gutter="0"/></w:sectPr>"#;
+
+fn document_xml(markdown: &str, sect_pr: &str) -> String {
     format!(
-        "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<w:document xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><w:body>{}<w:sectPr><w:pgSz w:w=\"11906\" w:h=\"16838\"/><w:pgMar w:top=\"1440\" w:right=\"1440\" w:bottom=\"1440\" w:left=\"1440\" w:header=\"708\" w:footer=\"708\" w:gutter=\"0\"/></w:sectPr></w:body></w:document>\n",
-        document_body(markdown)
+        "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<w:document xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><w:body>{}{}</w:body></w:document>\n",
+        document_body(markdown),
+        sect_pr
     )
 }
 
 /// 生成 .docx 字节（确定性；同 input 同 bytes）。
 pub fn build_docx(markdown: &str, title: &str) -> Result<Vec<u8>, CoreError> {
-    build_docx_with_styles(markdown, title, None)
+    build_docx_with_styles(markdown, title, None, None)
 }
 
 /// 参考样式：用调用方提供的 word/styles.xml 替换内置样式（reference-doc 继承）。
@@ -165,8 +168,15 @@ pub fn build_docx_with_styles(
     markdown: &str,
     title: &str,
     styles: Option<&str>,
+    sect_pr: Option<&str>,
 ) -> Result<Vec<u8>, CoreError> {
     let styles_xml = styles.unwrap_or(STYLES);
+    let sect_xml = sect_pr.unwrap_or(DEFAULT_SECT_PR);
+    if sect_xml.len() > 1024 * 1024 || !sect_xml.contains("<w:sectPr") || !sect_xml.contains("</w:sectPr>") {
+        return Err(CoreError::new("NF-EXP-002")
+            .with_message("docx 参考页面设置非法（需 w:sectPr）")
+            .with_exit(3));
+    }
     if styles_xml.len() > 1024 * 1024 {
         return Err(CoreError::new("NF-EXP-002")
             .with_message("docx 参考样式超过 1 MiB")
@@ -197,7 +207,7 @@ pub fn build_docx_with_styles(
         ),
         (
             "word/document.xml".to_string(),
-            document_xml(markdown).into_bytes(),
+            document_xml(markdown, sect_xml).into_bytes(),
         ),
         ("word/styles.xml".to_string(), styles_xml.as_bytes().to_vec()),
     ];

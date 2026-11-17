@@ -28,6 +28,13 @@ class DocxReferenceStylesTest {
     }
 
     @Test
+    fun readsSectPrFromDocumentXml() {
+        val sect = "<w:sectPr><w:pgMar w:top=\"720\"/></w:sectPr>"
+        val file = zip(mapOf("word/document.xml" to ("<w:document><w:body>" + sect + "</w:body></w:document>")))
+        assertEquals(sect, DocxReferenceStyles.extractSectPr(file))
+    }
+
+    @Test
     fun rejectsMissingOrNonStyles() {
         assertNull(DocxReferenceStyles.extract(zip(mapOf("word/document.xml" to "<w:document/>"))))
         assertNull(DocxReferenceStyles.extract(zip(mapOf("word/styles.xml" to "<not-styles/>"))))
