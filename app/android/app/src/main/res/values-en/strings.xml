@@ -299,6 +299,8 @@
     <string name="delivery_share_file">Share exported file</string>
     <string name="delivery_open_file">Open</string>
     <string name="delivery_pdf_note">PDF: local basic-text export; rich layout remains OPEN.</string>
+    <string name="repro_stable">Repro check: two exports match</string>
+    <string name="repro_diff">Repro check: exports differ (first diff offset %1$d)</string>
     <string name="delivery_plan_failed">Plan parse failed: %1$s</string>
     <string name="delivery_plan_failed_fix">Check core graph-compile output</string>
     <string name="delivery_no_markdown">Assembly returned no markdown</string>

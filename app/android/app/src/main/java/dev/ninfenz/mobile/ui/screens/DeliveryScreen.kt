@@ -121,6 +121,8 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
     val exportHistory = remember { ExportHistoryStore(context.filesDir) }
     var exportEntries by remember { mutableStateOf(exportHistory.load()) }
     var exportVerify by remember { mutableStateOf<ExportVerifier.Result?>(null) }
+    var reproText by remember { mutableStateOf<String?>(null) }
+    var reproOk by remember { mutableStateOf<Boolean?>(null) }
     val restoredInputs = remember(project.id) { draftStore.load(project.id) }
     var draftNote by remember(project.id) {
         mutableStateOf(if (restoredInputs.isNotEmpty()) context.getString(dev.ninfenz.mobile.R.string.delivery_draft_restored) else null)
@@ -536,9 +538,15 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                     }
                 }
                 Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                    EpubExportButton(markdown, project, context, scope, { busy = it }, { error = it }, busy) { file ->
+                    EpubExportButton(markdown, project, context, scope, { busy = it }, { error = it }, busy) { file, report ->
                         exportedFile = file
                         manifestText = null
+                        reproOk = report.stable
+                        reproText = if (report.stable) {
+                            context.getString(dev.ninfenz.mobile.R.string.repro_stable)
+                        } else {
+                            context.getString(dev.ninfenz.mobile.R.string.repro_diff, report.firstDiff ?: -1)
+                        }
                         recordExport("epub", file, null)
                     }
                     PdfExportButton(markdown, project, context, scope, { busy = it }, { error = it }, busy) { file ->
@@ -546,9 +554,15 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                         manifestText = null
                         recordExport("pdf", file, null)
                     }
-                    HtmlExportButton(markdown, project, context, scope, { busy = it }, { error = it }, busy) { file ->
+                    HtmlExportButton(markdown, project, context, scope, { busy = it }, { error = it }, busy) { file, report ->
                         exportedFile = file
                         manifestText = null
+                        reproOk = report.stable
+                        reproText = if (report.stable) {
+                            context.getString(dev.ninfenz.mobile.R.string.repro_stable)
+                        } else {
+                            context.getString(dev.ninfenz.mobile.R.string.repro_diff, report.firstDiff ?: -1)
+                        }
                         recordExport("html", file, null)
                     }
                 }
@@ -583,6 +597,14 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                         it.message,
                         style = MaterialTheme.typography.bodySmall,
                         color = if (it.ok) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(horizontal = NfSpacing.page)
+                    )
+                }
+                reproText?.let {
+                    Text(
+                        it,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = if (reproOk == true) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
                         modifier = Modifier.padding(horizontal = NfSpacing.page)
                     )
                 }
@@ -829,7 +851,7 @@ private fun EpubExportButton(
     setBusy: (Boolean) -> Unit,
     setError: (CoreError?) -> Unit,
     busy: Boolean,
-    onDone: (File) -> Unit
+    onDone: (File, dev.ninfenz.mobile.data.ReproChecker.Report) -> Unit
 ) {
     Button(
         enabled = markdown != null && !busy,
@@ -841,7 +863,11 @@ private fun EpubExportButton(
                 try {
                     val outDir = File(File(context.filesDir, "exports"), "delivery").apply { mkdirs() }
                     val created = EpubExporter.export(md, project.title, outDir)
-                    onDone(created.file)
+                    val reproDir = File(context.cacheDir, "repro-epub").apply { deleteRecursively(); mkdirs() }
+                    val second = EpubExporter.export(md, project.title, reproDir)
+                    val report = dev.ninfenz.mobile.data.ReproChecker.check(created.file, second.file)
+                    reproDir.deleteRecursively()
+                    onDone(created.file, report)
                 } catch (t: Throwable) {
                     setError(CoreError("NF-EXP-001", context.getString(dev.ninfenz.mobile.R.string.export_epub_failed, t.message ?: t.javaClass.simpleName), context.getString(dev.ninfenz.mobile.R.string.export_failed_fix), null, 1))
                 } finally {
@@ -893,7 +919,7 @@ private fun HtmlExportButton(
     setBusy: (Boolean) -> Unit,
     setError: (CoreError?) -> Unit,
     busy: Boolean,
-    onDone: (File) -> Unit
+    onDone: (File, dev.ninfenz.mobile.data.ReproChecker.Report) -> Unit
 ) {
     Button(
         enabled = markdown != null && !busy,
@@ -905,7 +931,11 @@ private fun HtmlExportButton(
                 try {
                     val outDir = File(File(context.filesDir, "exports"), "delivery").apply { mkdirs() }
                     val created = HtmlExporter.export(md, project.title, outDir)
-                    onDone(created.file)
+                    val reproDir = File(context.cacheDir, "repro-html").apply { deleteRecursively(); mkdirs() }
+                    val second = HtmlExporter.export(md, project.title, reproDir)
+                    val report = dev.ninfenz.mobile.data.ReproChecker.check(created.file, second.file)
+                    reproDir.deleteRecursively()
+                    onDone(created.file, report)
                 } catch (t: Throwable) {
                     setError(CoreError("NF-EXP-003", context.getString(dev.ninfenz.mobile.R.string.export_html_failed, t.message ?: t.javaClass.simpleName), context.getString(dev.ninfenz.mobile.R.string.export_failed_fix), null, 1))
                 } finally {
