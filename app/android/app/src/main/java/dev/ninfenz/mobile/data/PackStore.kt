@@ -100,19 +100,33 @@ object PackRegistry {
             val f = dbFile(filesDir)
             f.parentFile?.mkdirs()
             val db = SQLiteDatabase.openOrCreateDatabase(f, null)
-            db.use {
-                it.execSQL(
+            db.use { database ->
+                database.execSQL(
                     "CREATE TABLE IF NOT EXISTS pack_registry (" +
                         "id TEXT NOT NULL, version TEXT NOT NULL, installed_at INTEGER NOT NULL, source TEXT NOT NULL, " +
                         "PRIMARY KEY(id, version))"
                 )
-                val values = ContentValues().apply {
-                    put("id", id)
-                    put("version", version)
-                    put("installed_at", System.currentTimeMillis())
-                    put("source", source)
+                fun put(id: String, version: String, at: Long, source: String) {
+                    val values = ContentValues().apply {
+                        put("id", id)
+                        put("version", version)
+                        put("installed_at", at)
+                        put("source", source)
+                    }
+                    database.insertWithOnConflict("pack_registry", null, values, SQLiteDatabase.CONFLICT_REPLACE)
                 }
-                it.insertWithOnConflict("pack_registry", null, values, SQLiteDatabase.CONFLICT_REPLACE)
+                var count = 0L
+                database.rawQuery("SELECT COUNT(*) FROM pack_registry", null).use { c ->
+                    if (c.moveToFirst()) count = c.getLong(0)
+                }
+                if (count == 0L) {
+                    // 首次建库：把旧 JSON 注册表迁入 SQLite，避免丢 installed_at/source。
+                    jsonLoad(filesDir).forEach { (key, entry) ->
+                        val at = key.lastIndexOf('@')
+                        if (at > 0) put(key.substring(0, at), key.substring(at + 1), entry.installedAt, entry.source)
+                    }
+                }
+                put(id, version, System.currentTimeMillis(), source)
             }
             true
         } catch (t: Throwable) {
