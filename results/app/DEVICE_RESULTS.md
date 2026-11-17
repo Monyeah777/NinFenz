@@ -3,7 +3,7 @@
 > 设备：OnePlus PLF110，Android 16（SDK 36），1080×2392 / 480dpi；历史真机会话 serial 3B65AR0183V00000。
 > **2026-11-16 当前 `adb devices` 为空**：下表 2026-11-15 行是历史真机证据；本轮新增功能仅有 JVM/构建/门禁证据，真机矩阵仍 OPEN-TOOLCHAIN。
 > APK：0.2.0 / versionCode 2，minSdk 26 / target 36。本件只记实际跑过的项目；未跑项标 OPEN，不写成 pass。
-> 当前本机验证总览：Android JVM **337/337**、Rust core **188/188**、app Python **498 passed**、APP 门禁 QA0–QA6 PASS/gap=0、lint **0 warnings**、`verify.sh --checks-only` PASS=107/WARN=2/FAIL=0。
+> 当前本机验证总览：Android JVM **338/338**、Rust core **188/188**、app Python **498 passed**、APP 门禁 QA0–QA6 PASS/gap=0、lint **0 warnings**、`verify.sh --checks-only` PASS=107/WARN=2/FAIL=0。
 
 ## 1. 已实测（2026-11-15）
 
@@ -32,6 +32,7 @@
 | 全量复核（round53） | pass（本机）：verify PASS=107/WARN=2/FAIL=0；gates PASS/gap=0；rust 186；pytest 493。 |
 | Python 全量复核（round61） | pass（本机）：schema 变更后 `pytest app/tests` 493 passed / 0 failed（126s）。 |
 | 全量复核（round60） | pass（本机）：verify 107/2/0；gates PASS/gap=0；rust 186；JVM 317。 |
+| SavedState 恢复测试（JVM） | pass（本机）：StateRestorationTester 验证新建项目标题进程恢复；338 tests。 |
 | CCOS 评审字段 SavedState（JVM） | pass（本机）：reviewer/note 改 rememberSaveable；337 tests。 |
 | Assembly 双跑检查（JVM） | pass（本机）：AssemblyScreen assemble/validate 各两次比较结果 JSON。 |
 | graph-compile 双跑检查（JVM） | pass（本机）：graph-compile 两次调用比较结果 JSON；图屏显示稳定/差异。 |
