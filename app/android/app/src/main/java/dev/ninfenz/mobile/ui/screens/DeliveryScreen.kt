@@ -14,12 +14,15 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.TextButton
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -38,6 +41,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import dev.ninfenz.mobile.core.CoreError
 import dev.ninfenz.mobile.core.CoreResponse
 import dev.ninfenz.mobile.core.J
@@ -76,6 +81,7 @@ import dev.ninfenz.mobile.ui.components.NfLoadingState
 import dev.ninfenz.mobile.ui.components.NfSectionHeader
 import dev.ninfenz.mobile.ui.components.NfStatusChip
 import dev.ninfenz.mobile.ui.components.NfTopAppBar
+import dev.ninfenz.mobile.ui.components.MarkdownPreview
 import dev.ninfenz.mobile.ui.safeCall
 import dev.ninfenz.mobile.ui.theme.NfSpacing
 import java.io.File
@@ -106,6 +112,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
     var rawPlan by remember { mutableStateOf<JsonObject?>(null) }
     var inputs by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
     var markdown by remember { mutableStateOf<String?>(null) }
+    var showFullPreview by remember { mutableStateOf(false) }
     var report by remember { mutableStateOf<ValidateReport?>(null) }
     var manifestText by remember { mutableStateOf<String?>(null) }
     var exportedFile by remember { mutableStateOf<File?>(null) }
@@ -791,7 +798,12 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
 
                 NfCollapsibleSection(title = stringResource(dev.ninfenz.mobile.R.string.delivery_preview), initiallyExpanded = true) {
                     markdown?.let { md ->
-                        NfExpandableText(md, modifier = Modifier.padding(horizontal = NfSpacing.page))
+                        Column(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
+                            MarkdownPreview(md, limitBlocks = 8)
+                            TextButton(onClick = { showFullPreview = true }) {
+                                Text(stringResource(dev.ninfenz.mobile.R.string.preview_full))
+                            }
+                        }
                     } ?: Text(stringResource(dev.ninfenz.mobile.R.string.delivery_not_assembled), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page))
                 }
             }
@@ -885,6 +897,42 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                 }
             }
         )
+    }
+    if (showFullPreview) {
+        val md = markdown
+        if (md != null) {
+            Dialog(
+                onDismissRequest = { showFullPreview = false },
+                properties = DialogProperties(usePlatformDefaultWidth = false)
+            ) {
+                Surface(modifier = Modifier.fillMaxSize()) {
+                    Column(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = NfSpacing.page, vertical = NfSpacing.s),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                stringResource(dev.ninfenz.mobile.R.string.delivery_preview),
+                                style = MaterialTheme.typography.titleLarge,
+                                modifier = Modifier.weight(1f)
+                            )
+                            TextButton(onClick = { showFullPreview = false }) {
+                                Text(stringResource(dev.ninfenz.mobile.R.string.preview_close))
+                            }
+                        }
+                        HorizontalDivider()
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .verticalScroll(rememberScrollState())
+                                .padding(NfSpacing.page)
+                        ) {
+                            MarkdownPreview(md)
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 

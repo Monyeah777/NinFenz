@@ -327,6 +327,10 @@
     <string name="export_html_failed">HTML export failed: %1$s</string>
     <string name="export_failed_fix">Check storage space</string>
     <string name="delivery_preview">Preview</string>
+    <string name="preview_full">Full preview</string>
+    <string name="preview_close">Close preview</string>
+    <string name="preview_more">… %1$d more blocks; open full preview</string>
+    <string name="preview_image">Image</string>
     <string name="delivery_not_assembled">Nothing assembled yet. Preview only shows markdown returned by core.</string>
     <string name="delivery_export">Export %1$s</string>
     <string name="delivery_status_draft">Draft</string>
