@@ -357,7 +357,7 @@
 - 撤销复测通过：F-002 由「冷静x」点撤销回到「冷静」；此前失败是键盘未收起时点到了键盘。
 - English 主题标签已资源化（System/Light/Dark）。
 - 新增盲区修复：jniLibs .so 陈旧导致 docx 被误报 NF-EXP-004；重跑 build_core_android.sh 后恢复。
-- CCOS：task/result 能加载；提交区已改固定底栏 + navigationBarsPadding；2026-11-17 未重跑评审提交，仍标待复测。
+- CCOS：2026-11-17 真机恢复 task/result 并通过导入前预检；人审提交未完成，仍标待复测。
 - WebView PDF：2026-11-17 已在真机通过（见第 6 节）。
 - 杀进程恢复：2026-11-17 已用 run-as kill -9 + 最近任务重开验证路由/槽位草稿（见第 6 节）。
 - 分享 chooser 已真机通过（NEW_TASK 修复）。
@@ -372,6 +372,7 @@
 | WebView PDF | pass：交付台导出 result.pdf 31,067 B；界面显示“PDF 结构校验通过（1 页）”“复现检查：两次导出一致”；经 FileProvider 分享到 Edge，页面可见“演示项目 / 开篇 / 正文 / 收束” | result.pdf、pdf-share-edge2.png |
 | 杀进程路由/槽位恢复 | pass：Home 后 run-as kill -9；最近任务重开；交付台路由保留，SLT-01 显示“已恢复上次槽位草稿”且内容恢复 | form-restored.png |
 | TalkBack 服务 | partial/pass（服务层）：开启 TalkBack 后服务已 Bound，APP 前台运行、无 FATAL；未做语音手势逐项走查 | talkback-back.png |
+| CCOS 会话/预检 | partial：run-as 预置 task/result 后，CCOS 屏恢复 task-demo-0001、result succeeded、显示“导入前预检通过”；人审提交未完成 | ui-ccos5.xml |
 | 横屏自适应 | pass：旋转到横屏后 NavigationRail 竖排四目的地，内容区重排 | landscape.png |
 | Release 结构 | partial：zipalign 16KB 通过；apksigner 报 Missing META-INF/MANIFEST.MF（未签名，签名仍 OPEN-EXTERNAL） | zipalign/apksigner 输出 |
 | device_smoke 脚本 | 已修复：原 echo 中的 ADB 命令被 bash 当成算术展开，真机首跑报 unbound variable；改为普通命令替换 | app/scripts/device_smoke.sh |
