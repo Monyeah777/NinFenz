@@ -139,11 +139,10 @@ fn is_table_separator(cells: &[String]) -> bool {
 }
 
 fn cell_paragraph(text: &str, bold: bool) -> String {
-    let rpr = if bold { "<w:rPr><w:b/></w:rPr>" } else { "" };
-    format!(
-        "<w:p><w:r>{rpr}<w:t xml:space=\"preserve\">{}</w:t></w:r></w:p>",
-        esc(text)
-    )
+    if bold {
+        return format!("<w:p>{}</w:p>", run(text, true, false, false));
+    }
+    format!("<w:p>{}</w:p>", runs_xml(text))
 }
 
 fn table_xml(rows: &[Vec<String>]) -> String {
