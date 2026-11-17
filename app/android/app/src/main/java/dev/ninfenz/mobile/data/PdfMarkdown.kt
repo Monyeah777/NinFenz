@@ -6,7 +6,8 @@ object PdfMarkdown {
         val text: String,
         val level: Int = 0,
         val bullet: Boolean = false,
-        val code: Boolean = false
+        val code: Boolean = false,
+        val table: Boolean = false
     )
 
     fun blocks(markdown: String): List<Block> {
@@ -23,6 +24,12 @@ object PdfMarkdown {
                 continue
             }
             if (trimmed.isEmpty()) continue
+            if (trimmed.startsWith("|") && trimmed.endsWith("|")) {
+                val cells = trimmed.trim('|').split('|').map { inline(it.trim()) }
+                if (cells.all { Regex("^:?-{3,}:?$").matches(it) }) continue
+                out.add(Block(cells.joinToString("  "), table = true))
+                continue
+            }
             val hashes = trimmed.takeWhile { it == '#' }.length
             if (hashes in 1..6) {
                 out.add(Block(inline(trimmed.substring(hashes).trim()), level = hashes))

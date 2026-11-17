@@ -21,6 +21,12 @@ class PdfMarkdownTest {
     }
 
     @Test
+    fun tableRowsBecomeSpacedColumns() {
+        val lines = PdfMarkdown.lines("| A | B |\n|---|---|\n| 1 | 2 |")
+        assertEquals(listOf("A  B", "1  2"), lines)
+    }
+
+    @Test
     fun bulletsUseDotPrefix() {
         assertEquals(listOf("• 一", "• 二"), PdfMarkdown.lines("- 一\n* 二"))
     }

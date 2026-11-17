@@ -29,7 +29,7 @@ object PdfExporter {
             add(Line(title, 18f, true))
             add(Line("", 11f, false))
             PdfMarkdown.blocks(markdown).forEach { block ->
-                val size = when (block.level) {
+                val size = if (block.table) 10f else when (block.level) {
                     1 -> 20f
                     2 -> 18f
                     3 -> 16f
