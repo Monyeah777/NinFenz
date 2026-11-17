@@ -129,6 +129,23 @@ fn protocol_render_warn_rule_goes_to_warnings() {
 }
 
 #[test]
+fn protocol_render_explain_contains_rule_trace() {
+    let mut pack = fixtures::protocol_pack();
+    pack["rules"] = json!([
+        {"id": "R-009", "expr": {"op": "eq", "args": [{"field": "F-003"}, "冷"]}, "severity": "warn", "message": "冷调", "fix": "ok"}
+    ]);
+    let r = run_ok(
+        "protocol-render",
+        &json!({"pack": pack, "values": {"F-001": "a", "F-002": "b", "F-003": "冷"}, "explain": true}),
+    );
+    let explain = r["explain"].as_array().unwrap();
+    assert_eq!(explain[0]["rule"], "R-009");
+    let trace = explain[0]["trace"].as_array().unwrap();
+    assert!(trace.iter().any(|node| node["op"] == "eq"));
+    assert!(trace.iter().any(|node| node["value"] == true));
+}
+
+#[test]
 fn protocol_render_default_applies_for_optional_field() {
     let r = run_ok(
         "protocol-render",

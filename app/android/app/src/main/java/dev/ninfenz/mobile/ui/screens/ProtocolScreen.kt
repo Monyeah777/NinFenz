@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Switch
@@ -57,6 +58,8 @@ fun ProtocolScreen(onBack: () -> Unit) {
     var rendered by remember { mutableStateOf<List<String>?>(null) }
     var renderError by remember { mutableStateOf<CoreError?>(null) }
     var busy by remember { mutableStateOf(false) }
+    var explainRules by remember { mutableStateOf(false) }
+    var explainLines by remember { mutableStateOf<List<String>>(emptyList()) }
 
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         if (uri == null) return@rememberLauncherForActivityResult
@@ -71,6 +74,7 @@ fun ProtocolScreen(onBack: () -> Unit) {
                 enabled = parsed.clauses.associate { it.id to it.enabled }
                 error = null
                 rendered = null
+                explainLines = emptyList()
                 renderError = null
             } catch (e: Exception) {
                 error = CoreResponse.failure(
@@ -155,6 +159,7 @@ fun ProtocolScreen(onBack: () -> Unit) {
                                     put("values", buildJsonObject {
                                         for ((k, v) in values) put(k, v)
                                     })
+                                    put("explain", explainRules)
                                 }
                                 val response = safeCall("protocol-render", payload)
                                 if (response.ok) {
@@ -163,6 +168,18 @@ fun ProtocolScreen(onBack: () -> Unit) {
                                     rendered = clauses?.map { el ->
                                         val o = el as? JsonObject
                                         (o?.let { J.optString(it, "id") } ?: "?") + "：" + (o?.let { J.optString(it, "text") } ?: "")
+                                    } ?: emptyList()
+                                    val explain = result?.get("explain") as? JsonArray
+                                    explainLines = explain?.flatMap { el ->
+                                        val rule = el as? JsonObject ?: return@flatMap emptyList()
+                                        val rid = J.optString(rule, "rule")
+                                        val trace = rule["trace"] as? JsonArray ?: return@flatMap emptyList()
+                                        trace.mapNotNull { node ->
+                                            val n = node as? JsonObject ?: return@mapNotNull null
+                                            rid + " " + J.optString(n, "path") + " " +
+                                                (n["op"]?.let { J.optString(n, "op") } ?: "") +
+                                                "=" + (n["value"]?.toString() ?: "")
+                                        }
                                     } ?: emptyList()
                                 } else {
                                     renderError = response.error
@@ -173,6 +190,14 @@ fun ProtocolScreen(onBack: () -> Unit) {
                         }
                     }
                 ) { Text(if (busy) context.getString(dev.ninfenz.mobile.R.string.protocol_rendering) else context.getString(dev.ninfenz.mobile.R.string.protocol_render_button)) }
+                Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                    Checkbox(checked = explainRules, onCheckedChange = { explainRules = it })
+                    Text(stringResource(dev.ninfenz.mobile.R.string.protocol_explain))
+                }
+                if (explainLines.isNotEmpty()) {
+                    Text(stringResource(dev.ninfenz.mobile.R.string.protocol_explain_trace), style = MaterialTheme.typography.titleSmall)
+                    for (line in explainLines) MonoText(line)
+                }
                 Text(stringResource(dev.ninfenz.mobile.R.string.protocol_note), style = MaterialTheme.typography.bodySmall)
                 renderError?.let { ErrorNotice(it) }
                 rendered?.let { list ->

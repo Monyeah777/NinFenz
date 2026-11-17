@@ -521,6 +521,29 @@ fn eval_expr(expr: &Value, values: &Map<String, Value>) -> Result<Value, CoreErr
     }
 }
 
+fn eval_expr_traced(
+    expr: &Value,
+    values: &Map<String, Value>,
+    trace: &mut Vec<Value>,
+    path: &str,
+) -> Result<Value, CoreError> {
+    let value = eval_expr(expr, values)?;
+    let op = expr.get("op").and_then(|v| v.as_str()).unwrap_or("");
+    trace.push(json!({"path": path, "op": op, "value": value.clone()}));
+    if let Some(args) = expr.get("args").and_then(|v| v.as_array()) {
+        for (i, arg) in args.iter().enumerate() {
+            let child_path = format!("{path}.args[{i}]");
+            if arg.get("op").is_some() {
+                eval_expr_traced(arg, values, trace, &child_path)?;
+            } else {
+                let operand = resolve_operand(arg, values)?;
+                trace.push(json!({"path": child_path, "value": operand}));
+            }
+        }
+    }
+    Ok(value)
+}
+
 fn compare_values(a: &Value, b: &Value, op: &str) -> Result<bool, CoreError> {
     match (a, b) {
         (Value::Number(x), Value::Number(y)) => {
@@ -557,6 +580,8 @@ pub fn protocol_render(req: &Value) -> OpOutcome {
         Some(Value::Object(m)) => m.clone(),
         Some(_) => return Err(usage("请求字段 values 必须是 object")),
     };
+    let explain = req.get("explain").and_then(|v| v.as_bool()).unwrap_or(false);
+    let mut explain_out: Vec<Value> = Vec::new();
     // fail-closed：协议版本不在兼容范围直接拒绝（exit 3）
     if let (Some(pv), Some(compat)) = (
         pack.get("proto_version").and_then(|v| v.as_i64()),
@@ -646,7 +671,14 @@ pub fn protocol_render(req: &Value) -> OpOutcome {
                 Some(e) => e,
                 None => continue,
             };
-            let value = eval_expr(expr, &values)?;
+            let value = if explain {
+                let mut trace: Vec<Value> = Vec::new();
+                let value = eval_expr_traced(expr, &values, &mut trace, &format!("$.rules[{i}].expr"))?;
+                explain_out.push(json!({"rule": rid, "value": value, "trace": trace}));
+                value
+            } else {
+                eval_expr(expr, &values)?
+            };
             let ok = match value {
                 Value::Bool(b) => b,
                 _ => return Err(expr_error(format!("规则 {rid} 求值结果不是 bool"))),
@@ -681,10 +713,15 @@ pub fn protocol_render(req: &Value) -> OpOutcome {
         for (code, path, msg) in &errors {
             report.error(code, path, msg);
         }
-        return Ok((1, report.to_value()));
+        let mut value = report.to_value();
+        if explain {
+            value["explain"] = Value::Array(explain_out);
+        }
+        return Ok((1, value));
     }
-    Ok((
-        0,
-        json!({"clauses": rendered, "warnings": warnings}),
-    ))
+    let mut result = json!({"clauses": rendered, "warnings": warnings});
+    if explain {
+        result["explain"] = Value::Array(explain_out);
+    }
+    Ok((0, result))
 }

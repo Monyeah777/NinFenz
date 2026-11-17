@@ -423,6 +423,8 @@
     <string name="protocol_rules">Rules: %1$s</string>
     <string name="protocol_render">Core render (protocol-render)</string>
     <string name="protocol_note">Local checks only preflight placeholders/required fields; rule evaluation and compatibility are decided fail-closed by core.</string>
+    <string name="protocol_explain">Explain rule evaluation</string>
+    <string name="protocol_explain_trace">Rule evaluation trace</string>
     <string name="protocol_no_clauses">Core returned no clauses (result.clauses is empty)</string>
     <string name="graph_title">Graph · pipeline</string>
     <string name="graph_card">Graph</string>

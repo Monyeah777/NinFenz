@@ -423,6 +423,8 @@
     <string name="protocol_rules">规则：%1$s</string>
     <string name="protocol_render">核心渲染（protocol-render）</string>
     <string name="protocol_note">本地检查只做占位符/必填预检；规则求值、兼容性由核心 fail-closed 判定。</string>
+    <string name="protocol_explain">解释规则求值</string>
+    <string name="protocol_explain_trace">规则求值轨迹</string>
     <string name="protocol_no_clauses">核心未返回条款（result.clauses 为空）</string>
     <string name="graph_title">Graph · 管线图</string>
     <string name="graph_card">图</string>
