@@ -129,7 +129,7 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 - FileAccessLimitTest（4）：文本限额、目录单文件/总预算。
 - ImportPreflightTest（3）：小 zip 通过、条目过多、压缩比过高。
 - ProjectDetailMountTest（1，Robolectric）：项目详情页可挂载并显示标题。
-- CcosSessionRestoreTest（1，Robolectric）：预置会话文件后挂载 CcosScreen，恢复 task/result。
+- CcosSessionRestoreTest（2，Robolectric）：预置会话文件后恢复 task/result；清除按钮删除会话。
 - CcosSessionStoreTest（4）：task/result 落盘恢复、清结果保留 task、清全部、缺文件回 null。
 - WebPdfExporterTest（3）：A4 缩放页数、空/极小宽度、WebView 安全开关。
 - A11yComposeTest（4）：库页图标/触控目标、返回、引导按钮、溢出菜单 48dp。
@@ -200,7 +200,7 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 - 2026-11-16 当前：`./gradlew :app:assembleDebug` 成功：app-debug.apk = 19,049,108 bytes，
   sha256 = 4db3a89bc9d321a718184d8090f3582c35c8b6253a00eccf87cea2d9d6e0af77（含双 ABI 原生库 + 9 个示例 Pack assets）。
 - 仓库级门禁在 UTF-8 locale 下运行：`LANG=C.UTF-8 PYTHONUTF8=1 bash verify.sh --checks-only`（GBK 控制台会让 `git ls-files` 解码失败，触发 modeling 检查异常）。
-- `./gradlew :app:testDebugUnitTest` 全绿：368 条 JVM 单测（v1 42 + v0.02 326；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y/大字号/对比度/Paparazzi 截图）。
+- `./gradlew :app:testDebugUnitTest` 全绿：369 条 JVM 单测（v1 42 + v0.02 327；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y/大字号/对比度/Paparazzi 截图）。
 - `zipalign -c -P 16 -v 4 app-debug.apk` → Verification successful（native lib 16KB page 对齐）。
 - `bash app/scripts/build_core_android.sh --clean` 成功：NDK 27.0.12077973 + rustup targets
   （aarch64-linux-android / x86_64-linux-android，经 rsproxy 镜像安装）；两个 .so 的 LOAD align 均为 0x4000。

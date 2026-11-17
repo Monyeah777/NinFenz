@@ -2,11 +2,15 @@ package dev.ninfenz.mobile.ui
 
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.test.core.app.ApplicationProvider
 import android.content.Context
 import dev.ninfenz.mobile.data.CcosSessionStore
 import dev.ninfenz.mobile.ui.screens.CcosScreen
 import dev.ninfenz.mobile.ui.theme.NfTheme
+import org.junit.Assert.assertNull
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -31,6 +35,22 @@ class CcosSessionRestoreTest {
         }
         compose.onAllNodesWithText("task-demo-0001", substring = true)[0].assertExists()
         compose.onAllNodesWithText("succeeded", substring = true)[0].assertExists()
+    }
+
+    @Test
+    fun clearButtonRemovesSession() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        CcosSessionStore.saveTask(context.filesDir, TASK)
+        CcosSessionStore.saveResult(context.filesDir, RESULT)
+        compose.setContent { NfTheme { CcosScreen(onBack = {}) } }
+        compose.waitUntil(5_000) {
+            compose.onAllNodes(androidx.compose.ui.test.hasText("task-demo-0001", substring = true))
+                .fetchSemanticsNodes().isNotEmpty()
+        }
+        compose.onNodeWithText("清除导入会话").performScrollTo().performClick()
+        compose.waitUntil(5_000) { CcosSessionStore.loadTask(context.filesDir) == null }
+        assertNull(CcosSessionStore.loadTask(context.filesDir))
+        assertNull(CcosSessionStore.loadResult(context.filesDir))
     }
 
     private companion object {
