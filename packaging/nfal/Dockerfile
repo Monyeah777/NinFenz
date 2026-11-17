@@ -4,7 +4,7 @@
 #   docker build -f packaging/nfal/Dockerfile -t nfal .
 # Scorecard PinnedDependenciesID（2026-11-09）：基座按 digest 钉死，tag 漂移不影响可复现构建。
 # 升级方式：取新 digest 后**显式**改这一行（不要只改 tag）。
-FROM python:3.12-slim@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b
+FROM python:3.15-slim@sha256:65a65fc7b30b06cb6df4930fd4650697cb23f4c2698ab81fc87e4b031bc36928
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONUTF8=1 \
