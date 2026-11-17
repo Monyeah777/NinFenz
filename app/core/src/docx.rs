@@ -45,6 +45,10 @@ fn run(text: &str, bold: bool, italic: bool, code: bool) -> String {
 }
 
 fn runs_xml(text: &str) -> String {
+    runs_xml_with(text, false)
+}
+
+fn runs_xml_with(text: &str, force_bold: bool) -> String {
     let mut out = String::new();
     let mut plain = String::new();
     let mut i = 0usize;
@@ -73,10 +77,10 @@ fn runs_xml(text: &str) -> String {
             let inner = &rest[open.len()..open.len() + pos];
             if !inner.is_empty() {
                 if !plain.is_empty() {
-                    out.push_str(&run(&plain, false, false, false));
+                    out.push_str(&run(&plain, force_bold, false, false));
                     plain.clear();
                 }
-                out.push_str(&run(inner, bold, italic, code));
+                out.push_str(&run(inner, force_bold || bold, italic, code));
                 i += open.len() + inner.len() + close.len();
                 continue;
             }
@@ -86,7 +90,7 @@ fn runs_xml(text: &str) -> String {
         i += ch.len_utf8();
     }
     if !plain.is_empty() {
-        out.push_str(&run(&plain, false, false, false));
+        out.push_str(&run(&plain, force_bold, false, false));
     }
     out
 }
@@ -142,10 +146,7 @@ fn is_table_separator(cells: &[String]) -> bool {
 }
 
 fn cell_paragraph(text: &str, bold: bool) -> String {
-    if bold {
-        return format!("<w:p>{}</w:p>", run(text, true, false, false));
-    }
-    format!("<w:p>{}</w:p>", runs_xml(text))
+    format!("<w:p>{}</w:p>", runs_xml_with(text, bold))
 }
 
 fn table_xml(rows: &[Vec<String>]) -> String {
