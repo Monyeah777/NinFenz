@@ -3,6 +3,7 @@ package dev.ninfenz.mobile.data
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
 import java.io.File
 
@@ -21,7 +22,7 @@ object PdfExporter {
             textSize = 11f
             isAntiAlias = true
         }
-        data class Line(val text: String, val size: Float, val bold: Boolean)
+        data class Line(val text: String, val size: Float, val bold: Boolean, val mono: Boolean = false)
 
         val lineHeight = 16f
         val contentWidth = pageWidth - margin * 2
@@ -38,10 +39,10 @@ object PdfExporter {
                     6 -> 12f
                     else -> 11f
                 }
-                val bold = block.level > 0
+                val bold = block.level > 0 || block.tableHeader
                 val prefix = if (block.bullet) "• " else ""
                 PdfPager.wrap(prefix + block.text, contentWidth) { paint.measureText(it) * (size / 11f) }
-                    .forEach { add(Line(it, size, bold)) }
+                    .forEach { add(Line(it, size, bold, block.code)) }
             }
         }
         val firstPageLines = ((pageHeight - margin * 2 - lineHeight * 4) / lineHeight).toInt().coerceAtLeast(1)
@@ -56,6 +57,7 @@ object PdfExporter {
                     val p = Paint(paint).apply {
                         textSize = line.size
                         isFakeBoldText = line.bold
+                        typeface = if (line.mono) Typeface.MONOSPACE else Typeface.DEFAULT
                     }
                     canvas.drawText(line.text, margin, y, p)
                     y += maxOf(lineHeight, line.size * 1.3f)

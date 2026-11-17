@@ -1,6 +1,8 @@
 package dev.ninfenz.mobile.data
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class PdfMarkdownTest {
@@ -22,8 +24,10 @@ class PdfMarkdownTest {
 
     @Test
     fun tableRowsBecomeSpacedColumns() {
-        val lines = PdfMarkdown.lines("| A | B |\n|---|---|\n| 1 | 2 |")
-        assertEquals(listOf("A  B", "1  2"), lines)
+        val blocks = PdfMarkdown.blocks("| A | B |\n|---|---|\n| 1 | 2 |")
+        assertEquals(listOf("A  B", "1  2"), blocks.map { it.text })
+        assertTrue(blocks[0].tableHeader)
+        assertFalse(blocks[1].tableHeader)
     }
 
     @Test

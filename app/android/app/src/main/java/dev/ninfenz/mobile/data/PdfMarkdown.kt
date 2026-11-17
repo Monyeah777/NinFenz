@@ -7,12 +7,14 @@ object PdfMarkdown {
         val level: Int = 0,
         val bullet: Boolean = false,
         val code: Boolean = false,
-        val table: Boolean = false
+        val table: Boolean = false,
+        val tableHeader: Boolean = false
     )
 
     fun blocks(markdown: String): List<Block> {
         val out = mutableListOf<Block>()
         var inCode = false
+        var lastTableBlock = -1
         for (raw in markdown.replace("\r\n", "\n").split('\n')) {
             val trimmed = raw.trim()
             if (trimmed.startsWith("\u0060\u0060\u0060") || trimmed.startsWith("~~~")) {
@@ -21,15 +23,24 @@ object PdfMarkdown {
             }
             if (inCode) {
                 out.add(Block(raw, code = true))
+                lastTableBlock = -1
                 continue
             }
             if (trimmed.isEmpty()) continue
             if (trimmed.startsWith("|") && trimmed.endsWith("|")) {
                 val cells = trimmed.trim('|').split('|').map { inline(it.trim()) }
-                if (cells.all { Regex("^:?-{3,}:?$").matches(it) }) continue
+                if (cells.all { Regex("^:?-{3,}:?$").matches(it) }) {
+                    if (lastTableBlock >= 0) {
+                        out[lastTableBlock] = out[lastTableBlock].copy(tableHeader = true)
+                        lastTableBlock = -1
+                    }
+                    continue
+                }
                 out.add(Block(cells.joinToString("  "), table = true))
+                lastTableBlock = out.lastIndex
                 continue
             }
+            lastTableBlock = -1
             val hashes = trimmed.takeWhile { it == '#' }.length
             if (hashes in 1..6) {
                 out.add(Block(inline(trimmed.substring(hashes).trim()), level = hashes))
