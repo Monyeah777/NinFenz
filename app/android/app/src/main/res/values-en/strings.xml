@@ -407,6 +407,11 @@
     <string name="packupdate_rolling">Rolling back…</string>
     <string name="packupdate_result">Rollback result: %1$s</string>
     <string name="packupdate_pre_backup">Pre-migration backup: %1$s</string>
+    <string name="packupdate_restore_backup">Roll back to pre-migration backup</string>
+    <string name="packupdate_restore_backup_body">This overwrites local projects/drafts with the backup. Continue?</string>
+    <string name="packupdate_restore_backup_confirm">Restore</string>
+    <string name="packupdate_restore_backup_done">Restored files=%1$d</string>
+    <string name="packupdate_restore_backup_failed">Restore failed: %1$s</string>
     <string name="packupdate_notice">Apply/rollback are atomic replace + re-verify; on failure core returns an error code (NF-PCK-00x) instead of silently writing partially.</string>
     <string name="packupdate_breaking_yes">yes (deletion/structure change)</string>
     <string name="packupdate_breaking_no">no</string>

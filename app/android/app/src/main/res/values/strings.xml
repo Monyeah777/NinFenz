@@ -407,6 +407,11 @@
     <string name="packupdate_rolling">回滚中…</string>
     <string name="packupdate_result">回滚结果：%1$s</string>
     <string name="packupdate_pre_backup">迁移前备份：%1$s</string>
+    <string name="packupdate_restore_backup">回滚到迁移前备份</string>
+    <string name="packupdate_restore_backup_body">将用该备份覆盖 projects/drafts 等本地数据，确定继续？</string>
+    <string name="packupdate_restore_backup_confirm">恢复</string>
+    <string name="packupdate_restore_backup_done">已恢复 %1$d 个文件</string>
+    <string name="packupdate_restore_backup_failed">恢复失败：%1$s</string>
     <string name="packupdate_notice">应用/回滚均为原子替换 + 复验；失败时核心返回错误码（NF-PCK-00x）而不是静默部分写入。</string>
     <string name="packupdate_breaking_yes">是（删除/结构变更）</string>
     <string name="packupdate_breaking_no">否</string>

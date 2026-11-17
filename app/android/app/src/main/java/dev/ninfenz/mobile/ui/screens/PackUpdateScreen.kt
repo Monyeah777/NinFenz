@@ -8,11 +8,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -30,6 +32,7 @@ import dev.ninfenz.mobile.core.CoreResponse
 import dev.ninfenz.mobile.core.J
 import dev.ninfenz.mobile.data.FileAccess
 import dev.ninfenz.mobile.data.LibraryStore
+import dev.ninfenz.mobile.data.BackupRestoreService
 import dev.ninfenz.mobile.data.BackupService
 import dev.ninfenz.mobile.data.PackEntry
 import dev.ninfenz.mobile.data.PackStore
@@ -69,6 +72,8 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit) {
     var newRoot by remember { mutableStateOf<File?>(null) }
     var diffBusy by remember { mutableStateOf(false) }
     var preUpdateBackup by remember { mutableStateOf<File?>(null) }
+    var showRollbackBackup by remember { mutableStateOf(false) }
+    var backupRollbackMessage by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(Unit) {
         packs = withContext(Dispatchers.IO) { PackStore(context.filesDir).scan().packs }
@@ -313,9 +318,56 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit) {
                         stringResource(dev.ninfenz.mobile.R.string.packupdate_pre_backup, it.absolutePath),
                         style = MaterialTheme.typography.bodySmall
                     )
+                    TextButton(enabled = !busy, onClick = { showRollbackBackup = true }) {
+                        Text(stringResource(dev.ninfenz.mobile.R.string.packupdate_restore_backup))
+                    }
                 }
+                backupRollbackMessage?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
                 Notice(stringResource(dev.ninfenz.mobile.R.string.packupdate_notice), Tone.INFO)
             }
         }
+    }
+
+    if (showRollbackBackup) {
+        val backup = preUpdateBackup
+        AlertDialog(
+            onDismissRequest = { showRollbackBackup = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.packupdate_restore_backup)) },
+            text = { Text(stringResource(dev.ninfenz.mobile.R.string.packupdate_restore_backup_body)) },
+            confirmButton = {
+                TextButton(
+                    enabled = backup != null && !busy,
+                    onClick = {
+                        showRollbackBackup = false
+                        if (backup != null) {
+                            scope.launch {
+                                busy = true
+                                try {
+                                    val restored = withContext(Dispatchers.IO) {
+                                        BackupRestoreService.restore(backup, context.filesDir)
+                                    }
+                                    backupRollbackMessage = context.getString(
+                                        dev.ninfenz.mobile.R.string.packupdate_restore_backup_done,
+                                        restored.files
+                                    )
+                                } catch (t: Throwable) {
+                                    backupRollbackMessage = context.getString(
+                                        dev.ninfenz.mobile.R.string.packupdate_restore_backup_failed,
+                                        t.message ?: t.javaClass.simpleName
+                                    )
+                                } finally {
+                                    busy = false
+                                }
+                            }
+                        }
+                    }
+                ) { Text(stringResource(dev.ninfenz.mobile.R.string.packupdate_restore_backup_confirm)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showRollbackBackup = false }) {
+                    Text(stringResource(android.R.string.cancel))
+                }
+            }
+        )
     }
 }

@@ -37,7 +37,7 @@
 | DOCX 参考编号（Rust+JVM） | pass（本机）：继承 word/numbering.xml，列表段落写 numPr；Rust 191。 |
 | DOCX 参考主题（Rust+JVM） | pass（本机）：继承 word/theme/theme1.xml 并写主题关系；Rust 190。 |
 | DOCX 参考页面设置（Rust+JVM） | pass（本机）：继承 word/document.xml 的 sectPr（页边距/纸张）；3 条 JVM 测试。 |
-| 迁移前自动备份（JVM） | pass（本机）：Pack 更新应用前调用 BackupService.create 并显示备份路径；恢复走设置页既有备份恢复。 |
+| 迁移前自动备份/回滚（JVM） | pass（本机）：Pack 更新应用前自动备份并显示路径；新增确认对话框一键恢复该备份，调用 BackupRestoreService.restore。 |
 | PDF 标题/粗体样式（JVM） | pass（本机）：标题按 level 字号加粗，正文/项目符号分样式绘制。 |
 | SavedState 恢复测试（JVM） | pass（本机）：StateRestorationTester 验证新建项目标题进程恢复；338 tests。 |
 | CCOS 评审字段 SavedState（JVM） | pass（本机）：reviewer/note 改 rememberSaveable；337 tests。 |
@@ -196,7 +196,7 @@
 | 依赖升级 coroutines（JVM） | pass（本机）：coroutines 1.9.0→1.10.2，243 tests 全绿；lint warnings 3→2；debug APK 因未压缩 dex 增至 24.7MB。真机未复测（adb 无设备） |
 | Clean build（本轮） | pass（本机）：`gradlew clean` + `testDebugUnitTest --rerun-tasks` + assembleDebug；248/248 全绿；clean APK 19,032,264 B sha256 f4501bfe…；zipalign 16KB 通过。增量 APK 24.7MB 为旧构建膨胀，clean 产物为准。 |
 | Rust core 单测（本轮） | pass（本机）：`cargo test` 186 passed / 0 failed；Android 端无 core 改动。 |
-| Release 构建（构建） | pass（本机）：clean 后重建 `:app:assembleRelease` 成功；app-release-unsigned.apk 15,451,485 B sha256 95415b88…；zipalign 16KB 通过；apksigner 显示未签名（预期，签名 OPEN-EXTERNAL）。 |
+| Release 构建（构建） | pass（本机）：clean 后重建 `:app:assembleRelease` 成功；app-release-unsigned.apk 15,470,253 B sha256 cfc50086…；zipalign 16KB 通过；apksigner 显示未签名（预期，签名 OPEN-EXTERNAL）。 |
 | 16KB 页对齐（构建） | pass（本机）：`zipalign -c -P 16 4 app-debug.apk` exit=0；未真机安装验证。 |
 | APP 门禁（round127） | pass（本机）：QA0–QA6 全 PASS，FAIL=0；covered=14 gap=0 open=2 p0=0；台账刷新到当前 HEAD。 |
 | APP 门禁（本轮） | pass（本机）：QA0–QA6 全部 PASS，FAIL=0；自审计 covered=14 gap=0 open=2 p0=0。 |
