@@ -71,6 +71,7 @@ fun GraphScreen(store: LibraryStore, onBack: () -> Unit) {
     var error by remember { mutableStateOf<CoreError?>(null) }
     var report by remember { mutableStateOf<ValidateReport?>(null) }
     var planSummary by remember { mutableStateOf<String?>(null) }
+    var compileRepro by remember { mutableStateOf<String?>(null) }
     var busy by remember { mutableStateOf(false) }
     var nodeTitle by remember { mutableStateOf("") }
     var nodeKind by remember { mutableStateOf("stage") }
@@ -241,11 +242,27 @@ fun GraphScreen(store: LibraryStore, onBack: () -> Unit) {
                             busy = true
                             error = null
                             planSummary = null
+                            compileRepro = null
                             try {
                                 val payload = buildJsonObject { put("graph", GraphModel.toJson(g)) }
                                 val response = safeCall("graph-compile", payload)
                                 if (response.ok) {
                                     val result = response.resultObject()
+                                    if (result != null) {
+                                        val second = safeCall("graph-compile", payload)
+                                        val secondResult = second.resultObject()
+                                        if (second.ok && secondResult != null) {
+                                            val offset = dev.ninfenz.mobile.data.ReproChecker.firstDifference(
+                                                result.toString().toByteArray(Charsets.UTF_8),
+                                                secondResult.toString().toByteArray(Charsets.UTF_8)
+                                            )
+                                            compileRepro = if (offset == null) {
+                                                context.getString(dev.ninfenz.mobile.R.string.repro_stable)
+                                            } else {
+                                                context.getString(dev.ninfenz.mobile.R.string.repro_diff, offset)
+                                            }
+                                        }
+                                    }
                                     planSummary = if (result == null) context.getString(dev.ninfenz.mobile.R.string.graph_core_no_plan) else
                                         context.getString(
                                             dev.ninfenz.mobile.R.string.graph_plan_summary,
@@ -268,6 +285,7 @@ fun GraphScreen(store: LibraryStore, onBack: () -> Unit) {
                         if (issue.severity == "error") Tone.ERROR else Tone.WARN)
                 }
                 planSummary?.let { MonoText(it) }
+                compileRepro?.let { MonoText(it) }
             }
 
             CardBox(title = stringResource(dev.ninfenz.mobile.R.string.graph_save)) {
