@@ -28,6 +28,20 @@ import kotlin.coroutines.resumeWithException
 object WebPdfExporter {
     data class Created(val file: File, val pages: Int, val bytes: Long)
 
+    data class SecurityConfig(
+        val javaScriptEnabled: Boolean,
+        val blockNetworkLoads: Boolean,
+        val allowFileAccess: Boolean,
+        val allowContentAccess: Boolean
+    )
+
+    fun securityConfig() = SecurityConfig(
+        javaScriptEnabled = false,
+        blockNetworkLoads = true,
+        allowFileAccess = false,
+        allowContentAccess = false
+    )
+
     fun pageCount(contentHeight: Int, width: Int): Int {
         require(width > 0) { "width 必须为正" }
         if (contentHeight <= 0) return 1
@@ -49,10 +63,11 @@ object WebPdfExporter {
             val html = HtmlExporter.html(markdown, title)
             val view = WebView(ContextThemeWrapper(context, android.R.style.Theme_DeviceDefault_Light))
             web = view
-            view.settings.javaScriptEnabled = false
-            view.settings.blockNetworkLoads = true
-            view.settings.allowFileAccess = false
-            view.settings.allowContentAccess = false
+            val security = securityConfig()
+            view.settings.javaScriptEnabled = security.javaScriptEnabled
+            view.settings.blockNetworkLoads = security.blockNetworkLoads
+            view.settings.allowFileAccess = security.allowFileAccess
+            view.settings.allowContentAccess = security.allowContentAccess
             view.settings.loadsImagesAutomatically = true
             view.setBackgroundColor(Color.WHITE)
             withTimeout(8_000) {
