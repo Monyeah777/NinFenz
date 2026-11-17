@@ -74,18 +74,35 @@ fn is_table_separator(cells: &[String]) -> bool {
     })
 }
 
+fn cell_paragraph(text: &str, bold: bool) -> String {
+    let rpr = if bold { "<w:rPr><w:b/></w:rPr>" } else { "" };
+    format!(
+        "<w:p><w:r>{rpr}<w:t xml:space=\"preserve\">{}</w:t></w:r></w:p>",
+        esc(text)
+    )
+}
+
 fn table_xml(rows: &[Vec<String>]) -> String {
     if rows.is_empty() {
         return String::new();
     }
     let cols = rows.iter().map(|r| r.len()).max().unwrap_or(1).max(1);
-    let mut out = String::from("<w:tbl><w:tblPr><w:tblW w:w=\"0\" w:type=\"auto\"/></w:tblPr>");
-    for row in rows {
+    let mut out = String::from(
+        "<w:tbl><w:tblPr><w:tblW w:w=\"0\" w:type=\"auto\"/><w:tblBorders>\
+         <w:top w:val=\"single\" w:sz=\"4\" w:space=\"0\" w:color=\"auto\"/>\
+         <w:left w:val=\"single\" w:sz=\"4\" w:space=\"0\" w:color=\"auto\"/>\
+         <w:bottom w:val=\"single\" w:sz=\"4\" w:space=\"0\" w:color=\"auto\"/>\
+         <w:right w:val=\"single\" w:sz=\"4\" w:space=\"0\" w:color=\"auto\"/>\
+         <w:insideH w:val=\"single\" w:sz=\"4\" w:space=\"0\" w:color=\"auto\"/>\
+         <w:insideV w:val=\"single\" w:sz=\"4\" w:space=\"0\" w:color=\"auto\"/>\
+         </w:tblBorders></w:tblPr>",
+    );
+    for (ri, row) in rows.iter().enumerate() {
         out.push_str("<w:tr>");
         for c in 0..cols {
             let cell = row.get(c).map(|s| s.as_str()).unwrap_or("");
             out.push_str("<w:tc><w:tcPr><w:tcW w:w=\"0\" w:type=\"auto\"/></w:tcPr>");
-            out.push_str(&paragraph(&inline_plain(cell), None, false, "1"));
+            out.push_str(&cell_paragraph(&inline_plain(cell), ri == 0));
             out.push_str("</w:tc>");
         }
         out.push_str("</w:tr>");

@@ -382,6 +382,8 @@ fn export_docx_renders_markdown_table() {
         .map(|e| String::from_utf8_lossy(&e.data).to_string())
         .unwrap();
     assert!(doc.contains("<w:tbl>"));
+    assert!(doc.contains("<w:tblBorders>"));
+    assert!(doc.contains("<w:b/>"));
     assert!(doc.contains("列A"));
     assert!(doc.contains("列B"));
 }

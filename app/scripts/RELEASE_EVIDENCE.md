@@ -15,8 +15,8 @@
 
 ### Android
 - assembleDebug：**pass**（2026-11-16，Android SDK 36 / build-tools 36.0.0）
-- app-debug.apk：19,314,723 B；SHA-256 `365a2729b51452e1d82b9fb23403217d0df484e199bd72c066ab274e6d586ef2`
-- assembleRelease（unsigned）：pass；15,498,397 B；SHA-256 `026c806c6286fa84d8ae19e83692f1ed4dd5ac04ba73f6dc1fa73cf04c6ba2ee`
+- app-debug.apk：19,314,115 B；SHA-256 `1c4231b32843cde6f6f0e195eb564fcb166fedb03a14b6939d93f4f68eb6e9cb`
+- assembleRelease（unsigned）：pass；15,497,789 B；SHA-256 `c9b318adaf7333ffeb1aa2105698749a8739b96e8c8f12214a455e447cbd69a2`
 - 16KB 对齐：`zipalign -c -P 16 4` exit 0
 - 签名证书指纹（SHA-256）：—（未签名，OPEN-EXTERNAL）
 - 数据安全表单提交：**未提交**
