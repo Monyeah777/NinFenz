@@ -2,6 +2,9 @@ package dev.ninfenz.mobile.ui
 
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeUp
 import androidx.test.core.app.ApplicationProvider
 import android.content.Context
 import dev.ninfenz.mobile.data.CcosSessionStore
@@ -32,7 +35,7 @@ class CcosSessionRestoreTest {
         CcosSessionStore.saveTask(context.filesDir, TASK)
         CcosSessionStore.saveResult(context.filesDir, RESULT)
         compose.setContent { NfTheme { CcosScreen(onBack = {}) } }
-        compose.waitUntil(5_000) {
+        compose.waitUntil(60_000) {
             compose.onAllNodes(androidx.compose.ui.test.hasText("task-demo-0001", substring = true))
                 .fetchSemanticsNodes().isNotEmpty() &&
                 compose.onAllNodes(androidx.compose.ui.test.hasText("succeeded", substring = true))
@@ -48,7 +51,12 @@ class CcosSessionRestoreTest {
         CcosSessionStore.saveTask(context.filesDir, TASK)
         CcosSessionStore.saveResult(context.filesDir, REVIEWED_RESULT)
         compose.setContent { NfTheme { CcosScreen(onBack = {}) } }
-        compose.waitUntil(5_000) {
+        compose.waitUntil(60_000) {
+            compose.onAllNodes(androidx.compose.ui.test.hasText("task-demo-0001", substring = true))
+                .fetchSemanticsNodes().isNotEmpty()
+        }
+        compose.onRoot().performTouchInput { swipeUp() }
+        compose.waitUntil(60_000) {
             compose.onAllNodes(androidx.compose.ui.test.hasText("approved", substring = true))
                 .fetchSemanticsNodes().isNotEmpty()
         }

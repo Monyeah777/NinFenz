@@ -11,7 +11,7 @@ class ShellStateCodecTest {
             Detail.Import, Detail.Search, Detail.NewProject, Detail.Settings,
             Detail.Protocol, Detail.Graph, Detail.Assembly, Detail.PackUpdate, Detail.ErrorCodes,
             Detail.PackCenter, Detail.Ccos, Detail.Project("p"), Detail.Author("p"),
-            Detail.Delivery("p"), Detail.Pack("demo", "1.0.0")
+            Detail.Delivery("p"), Detail.Flow("p"), Detail.Pack("demo", "1.0.0")
         )
         for (detail in details) {
             val state = ShellState(TopDestination.DELIVER, detail)

@@ -29,8 +29,7 @@ class ShellEnglishLocaleTest {
         compose.setContent { NfTheme { NfMobileApp(prefs, ThemeMode.SYSTEM, {}) } }
         compose.waitForIdle()
         assertTrue(compose.onAllNodesWithText("Library").fetchSemanticsNodes().isNotEmpty())
-        compose.onNodeWithText("Create").assertIsDisplayed()
-        compose.onNodeWithText("Deliver").assertIsDisplayed()
+        compose.onNodeWithText("Flow").assertIsDisplayed()
         compose.onNodeWithText("Me").assertIsDisplayed()
     }
 }

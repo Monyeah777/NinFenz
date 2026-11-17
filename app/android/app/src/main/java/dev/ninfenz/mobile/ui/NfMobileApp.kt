@@ -4,7 +4,12 @@ import dev.ninfenz.mobile.ui.theme.NfMotion
 import dev.ninfenz.mobile.ui.theme.NfSpacing
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.animation.Crossfade
@@ -29,8 +34,8 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationRail
@@ -102,6 +107,8 @@ import dev.ninfenz.mobile.ui.screens.ProjectDetailScreen
 import dev.ninfenz.mobile.ui.screens.ProtocolScreen
 import dev.ninfenz.mobile.ui.screens.SearchScreen
 import dev.ninfenz.mobile.ui.screens.SettingsScreen
+import dev.ninfenz.mobile.ui.screens.WorkflowHubScreen
+import dev.ninfenz.mobile.ui.screens.ProjectFlowScreen
 import dev.ninfenz.mobile.ui.shell.Detail
 import dev.ninfenz.mobile.ui.shell.ShellState
 import dev.ninfenz.mobile.ui.shell.ShellStateCodec
@@ -331,6 +338,15 @@ fun NfMobileApp(
                             onImport = { shell = shell.open(Detail.Import) },
                             onOpenPack = { shell = shell.open(Detail.Pack(it.id, it.version)) },
                             onOpenProject = { shell = shell.open(Detail.Project(it.project.id)) },
+                            onOpenFlow = { shell = shell.open(Detail.Flow(it.project.id)) },
+                            onDeleteProject = { entry ->
+                                scope.launch {
+                                    withContext(Dispatchers.IO) {
+                                        ProjectArchiver.deleteProject(entry.file, context.filesDir)
+                                    }
+                                    refresh()
+                                }
+                            },
                             onSearch = { shell = shell.open(Detail.Search) },
                             onPackCenter = { shell = shell.open(Detail.PackCenter) },
                             onSettings = { shell = shell.open(Detail.Settings) },
@@ -349,6 +365,14 @@ fun NfMobileApp(
                             },
                             refreshing = refreshing,
                             onRefresh = { refresh() }
+                        )
+                        TopDestination.FLOW -> WorkflowHubScreen(
+                            projects = projects,
+                            onOpenProject = { shell = shell.open(Detail.Project(it.project.id)) },
+                            onAuthor = { shell = shell.open(Detail.Author(it.project.id)) },
+                            onDelivery = { shell = shell.open(Detail.Delivery(it.project.id)) },
+                            onNewProject = { shell = shell.open(Detail.NewProject) },
+                            onImport = { shell = shell.open(Detail.Import) }
                         )
                         TopDestination.CREATE -> CreateScreen(
                             projects = projects,
@@ -483,6 +507,44 @@ is Detail.Import -> ImportScreen(
                                 it.id == entry.project.refs.basePackId && it.version == entry.project.refs.basePackVersion
                             }
                             DeliveryScreen(project = entry.project, pack = pack, onBack = { shell = shell.back() ?: shell }, onStatusChanged = { refresh() })
+                        }
+                    }
+                    is Detail.Flow -> {
+                        val entry = projects.firstOrNull { it.project.id == detail.id }
+                        if (entry == null) {
+                            NfEmptyState(
+                                icon = Icons.Filled.Info,
+                                title = stringResource(dev.ninfenz.mobile.R.string.project_missing_title),
+                                message = stringResource(dev.ninfenz.mobile.R.string.project_missing_body),
+                                actionLabel = stringResource(dev.ninfenz.mobile.R.string.back_to_library),
+                                onAction = { shell = shell.back() ?: shell }
+                            )
+                        } else {
+                            ProjectFlowScreen(
+                                project = entry.project,
+                                onBack = { shell = shell.back() ?: shell },
+                                onAuthor = { shell = shell.open(Detail.Author(entry.project.id)) },
+                                onDelivery = { shell = shell.open(Detail.Delivery(entry.project.id)) }
+                            )
+                        }
+                    }
+                    is Detail.Flow -> {
+                        val entry = projects.firstOrNull { it.project.id == detail.id }
+                        if (entry == null) {
+                            NfEmptyState(
+                                icon = Icons.Filled.Info,
+                                title = stringResource(dev.ninfenz.mobile.R.string.project_missing_title),
+                                message = stringResource(dev.ninfenz.mobile.R.string.project_missing_body),
+                                actionLabel = stringResource(dev.ninfenz.mobile.R.string.back_to_library),
+                                onAction = { shell = shell.back() ?: shell }
+                            )
+                        } else {
+                            ProjectFlowScreen(
+                                project = entry.project,
+                                onBack = { shell = shell.back() ?: shell },
+                                onAuthor = { shell = shell.open(Detail.Author(entry.project.id)) },
+                                onDelivery = { shell = shell.open(Detail.Delivery(entry.project.id)) }
+                            )
                         }
                     }
                     is Detail.Assembly -> AssemblyScreen(onBack = { shell = shell.back() ?: shell })
@@ -636,13 +698,6 @@ is Detail.Import -> ImportScreen(
                 NfBottomBar(shell.destination) { shell = shell.select(it) }
             }
         },
-        floatingActionButton = {
-            if (shell.detail == null && shell.destination == TopDestination.LIBRARY) {
-                FloatingActionButton(onClick = { shell = shell.open(Detail.Import) }) {
-                    Icon(Icons.Filled.Add, contentDescription = stringResource(dev.ninfenz.mobile.R.string.action_import))
-                }
-            }
-        }
     ) { padding ->
         Row(modifier = Modifier.fillMaxSize()) {
             if (!compact) {
@@ -766,14 +821,41 @@ private fun CommandPaletteDialog(
     )
 }
 
+private val bottomDestinations = listOf(
+    TopDestination.LIBRARY,
+    TopDestination.FLOW,
+    TopDestination.ME
+)
+
+@Composable
+private fun NfDestinationIcon(destination: TopDestination, selected: Boolean) {
+    if (destination == TopDestination.FLOW) {
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .clip(CircleShape)
+                .background(if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primaryContainer),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                Icons.Filled.Add,
+                contentDescription = stringResource(destination.labelRes),
+                tint = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary
+            )
+        }
+    } else {
+        Icon(destinationIcon(destination), contentDescription = null)
+    }
+}
+
 @Composable
 private fun NfBottomBar(current: TopDestination, onSelect: (TopDestination) -> Unit) {
     NavigationBar {
-        TopDestination.entries.forEach { destination ->
+        bottomDestinations.forEach { destination ->
             NavigationBarItem(
                 selected = destination == current,
                 onClick = { onSelect(destination) },
-                icon = { Icon(destinationIcon(destination), contentDescription = null) },
+                icon = { NfDestinationIcon(destination, destination == current) },
                 label = { Text(stringResource(destination.labelRes)) }
             )
         }
@@ -783,11 +865,11 @@ private fun NfBottomBar(current: TopDestination, onSelect: (TopDestination) -> U
 @Composable
 private fun NfRail(current: TopDestination, onSelect: (TopDestination) -> Unit) {
     NavigationRail {
-        TopDestination.entries.forEach { destination ->
+        bottomDestinations.forEach { destination ->
             NavigationRailItem(
                 selected = destination == current,
                 onClick = { onSelect(destination) },
-                icon = { Icon(destinationIcon(destination), contentDescription = null) },
+                icon = { NfDestinationIcon(destination, destination == current) },
                 label = { Text(stringResource(destination.labelRes)) }
             )
         }
@@ -796,6 +878,7 @@ private fun NfRail(current: TopDestination, onSelect: (TopDestination) -> Unit) 
 
 private fun destinationIcon(destination: TopDestination) = when (destination) {
     TopDestination.LIBRARY -> Icons.Filled.Home
+    TopDestination.FLOW -> Icons.Filled.Add
     TopDestination.CREATE -> Icons.Filled.Edit
     TopDestination.DELIVER -> Icons.AutoMirrored.Filled.List
     TopDestination.ME -> Icons.Filled.Person

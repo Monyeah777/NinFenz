@@ -20,12 +20,14 @@ object ShellStateCodec {
             is Detail.Project -> "Project"
             is Detail.Author -> "Author"
             is Detail.Delivery -> "Delivery"
+            is Detail.Flow -> "Flow"
             is Detail.Pack -> "Pack"
         }
         val arg1 = when (d) {
             is Detail.Project -> d.id
             is Detail.Author -> d.id
             is Detail.Delivery -> d.id
+            is Detail.Flow -> d.id
             is Detail.Pack -> d.id
             else -> ""
         }
@@ -55,6 +57,7 @@ object ShellStateCodec {
             "Project" -> values.getOrNull(2)?.takeIf { it.isNotBlank() }?.let { Detail.Project(it) }
             "Author" -> values.getOrNull(2)?.takeIf { it.isNotBlank() }?.let { Detail.Author(it) }
             "Delivery" -> values.getOrNull(2)?.takeIf { it.isNotBlank() }?.let { Detail.Delivery(it) }
+            "Flow" -> values.getOrNull(2)?.takeIf { it.isNotBlank() }?.let { Detail.Flow(it) }
             "Pack" -> {
                 val id = values.getOrNull(2)?.takeIf { it.isNotBlank() }
                 val version = values.getOrNull(3)?.takeIf { it.isNotBlank() }

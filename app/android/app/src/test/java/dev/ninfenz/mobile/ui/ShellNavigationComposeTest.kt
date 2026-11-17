@@ -21,11 +21,10 @@ private fun prefsForTest(): AppPrefs {
     return AppPrefs(context).apply { onboardingDone = true }
 }
 
-private fun assertFourDestinations(compose: androidx.compose.ui.test.junit4.ComposeContentTestRule) {
+private fun assertThreeDestinations(compose: androidx.compose.ui.test.junit4.ComposeContentTestRule) {
     compose.waitForIdle()
     assertTrue(compose.onAllNodesWithText("库").fetchSemanticsNodes().isNotEmpty())
-    compose.onNodeWithText("创作").assertExists()
-    compose.onNodeWithText("交付").assertExists()
+    compose.onNodeWithText("工作台").assertExists()
     compose.onNodeWithText("我的").assertExists()
 }
 
@@ -39,7 +38,7 @@ class ShellCompactNavigationTest {
     fun compactShowsBottomBarDestinations() {
         val prefs = prefsForTest()
         compose.setContent { NfTheme { NfMobileApp(prefs, ThemeMode.SYSTEM, {}) } }
-        assertFourDestinations(compose)
+        assertThreeDestinations(compose)
     }
 }
 
@@ -53,7 +52,7 @@ class ShellExpandedNavigationTest {
     fun expandedShowsRailDestinations() {
         val prefs = prefsForTest()
         compose.setContent { NfTheme { NfMobileApp(prefs, ThemeMode.SYSTEM, {}) } }
-        assertFourDestinations(compose)
+        assertThreeDestinations(compose)
     }
 }
 
@@ -67,6 +66,6 @@ class ShellMediumNavigationTest {
     fun mediumShowsRailDestinations() {
         val prefs = prefsForTest()
         compose.setContent { NfTheme { NfMobileApp(prefs, ThemeMode.SYSTEM, {}) } }
-        assertFourDestinations(compose)
+        assertThreeDestinations(compose)
     }
 }

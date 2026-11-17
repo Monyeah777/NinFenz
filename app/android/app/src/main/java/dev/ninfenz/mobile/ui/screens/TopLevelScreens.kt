@@ -73,6 +73,7 @@ import dev.ninfenz.mobile.model.ProjectSorter
 import dev.ninfenz.mobile.model.ProjectStatus
 import dev.ninfenz.mobile.share.ShareExporter
 import dev.ninfenz.mobile.ui.components.NfCard
+import dev.ninfenz.mobile.ui.components.SwipeableProjectCard
 import dev.ninfenz.mobile.ui.components.NfEmptyState
 import dev.ninfenz.mobile.ui.components.NfGradientHero
 import dev.ninfenz.mobile.ui.components.NfListRow
@@ -100,6 +101,8 @@ fun LibraryHomeScreen(
     onImport: () -> Unit,
     onOpenPack: (PackEntry) -> Unit,
     onOpenProject: (ProjectEntry) -> Unit,
+    onOpenFlow: (ProjectEntry) -> Unit = {},
+    onDeleteProject: (ProjectEntry) -> Unit = {},
     onSearch: () -> Unit,
     onPackCenter: () -> Unit,
     onSettings: () -> Unit,
@@ -114,6 +117,7 @@ fun LibraryHomeScreen(
     val viewStore = remember(viewFilesDir) { viewFilesDir?.let { LibraryViewStore(it) } }
     val savedView = remember { viewStore?.load() }
     var pendingDeleteArchive by remember { mutableStateOf<File?>(null) }
+    var pendingDeleteProject by remember { mutableStateOf<ProjectEntry?>(null) }
     var statusFilter by rememberSaveable { mutableStateOf(savedView?.status) }
     var sortName by rememberSaveable { mutableStateOf(savedView?.sort ?: ProjectSort.RECENT.name) }
     LaunchedEffect(statusFilter, sortName) {
@@ -228,18 +232,14 @@ fun LibraryHomeScreen(
                 item { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.library_section_projects)) }
                 items(filteredProjects.size) { index ->
                     val entry = filteredProjects[index]
-                    NfCard(
-                        modifier = Modifier.padding(horizontal = NfSpacing.page),
-                        onClick = { onOpenProject(entry) }
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(NfSpacing.m)) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(entry.project.title, style = MaterialTheme.typography.titleMedium)
-                                Text(entry.project.id, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            }
-                            NfStatusChip(projectStatusLabel(entry.project))
-                        }
-                    }
+                    SwipeableProjectCard(
+                        entry = entry,
+                        index = index,
+                        onOpen = { onOpenProject(entry) },
+                        onFlow = { onOpenFlow(entry) },
+                        onDelete = { pendingDeleteProject = entry },
+                        modifier = Modifier.padding(horizontal = NfSpacing.page)
+                    )
                 }
             } else if (projects.isNotEmpty()) {
                 item {
@@ -310,6 +310,23 @@ fun LibraryHomeScreen(
             }
         }
         }
+    }
+
+    pendingDeleteProject?.let { entry ->
+        AlertDialog(
+            onDismissRequest = { pendingDeleteProject = null },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.project_delete_title)) },
+            text = { Text(stringResource(dev.ninfenz.mobile.R.string.project_delete_body, entry.project.title)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    pendingDeleteProject = null
+                    onDeleteProject(entry)
+                }) { Text(stringResource(dev.ninfenz.mobile.R.string.project_delete_confirm)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { pendingDeleteProject = null }) { Text(stringResource(android.R.string.cancel)) }
+            }
+        )
     }
 
     pendingDeleteArchive?.let { file ->

@@ -24,9 +24,9 @@
 
 | 项 | 结果 |
 |---|---|
-| APK | app-debug.apk = 19,386,419 B；sha256 ba49c10b97ebee20077be0acf659e7c73ab2760677826efecd35e42f4248275c |
-| JVM 测试 | 381 条全绿（v1 基线 42 + v0.02 新增 339；含 Robolectric/Compose/Paparazzi） |
-| 构建 | ./gradlew :app:assembleDebug 成功；:app:testDebugUnitTest 381/381；lint 0 warnings |
+| APK | app-debug.apk = 19,462,595 B；sha256 285c3b389a87d2b36d91da04802d5a959fce481b67f6228fd4d3a6a508172837 |
+| JVM 测试 | 383 条全绿（v1 基线 42 + v0.02 新增 341；含 Robolectric/Compose/Paparazzi） |
+| 构建 | ./gradlew :app:assembleDebug 成功；:app:testDebugUnitTest 383/383；lint 0 warnings |
 | i18n | 全部屏主要文案已资源化 + values-en；「我的」zh/en/跟随系统切换；动态取色开关；库/Pack 中心下拉刷新；节点删除 Snackbar 撤销 + 触觉；expanded 双栏（主列表+详情）；导航 Crossfade（NfMotion.MEDIUM_MS）；统一 loading/skeleton 组件；UI 中文硬编码守卫通过 |
 | 适配 | compact/medium/expanded 三档导航 + 9 组窗口尺寸语义矩阵 |
 | a11y | contentDescription/48dp（A11yComposeTest 3）、200% 字号（LargeFont 1）、WCAG AA 对比度（Contrast 3） |
@@ -42,7 +42,7 @@
 ### 0.4 v0.02 收口（2026-11-15）
 
 - 机读门禁：app/gates **7/7 PASS，FAIL=0**（QA0 10 / QA5 5）；仓库 verify **PASS=107 WARN=2 FAIL=0**。
-- 测试/产物：JVM **381/381**；APK 19,386,419 B，sha256 ba49c10b…。
+- 测试/产物：JVM **383/383**；APK 19,462,595 B，sha256 285c3b38…。
 - 结论：**v0.02 实现面 pass-with-open-items**；下方 OPEN 不因收口消失，未跑面不写成 pass。
 
 ### 0.5 v0.02 OPEN（带 owner+next）
@@ -63,7 +63,7 @@
 - 项目包：manifest 完整性校验、嵌套/深层目录、BOM、临时文件过滤、篡改/未列条目拒绝、完整项目分享与导入。
 - 备份：manifest BOM/字段必填/未列条目拒绝/声明与实际大小上限、导出后自检、恢复后刷新库。
 - 其他：最近项目动态快捷方式、错误码目录与使用扫描、清空导出记录、崩溃日志分享、项目复制/归档/恢复的回滚加固。
-- 当前本机：JVM **381/381**、Python **498 passed**、Rust **198/198**、lint 0、verify PASS=107/WARN=2/FAIL=0。
+- 当前本机：JVM **383/383**、Python **498 passed**、Rust **198/198**、lint 0、verify PASS=107/WARN=2/FAIL=0。
 - 真机矩阵与签名/公证仍 OPEN-EXTERNAL/OPEN-TOOLCHAIN，不得据此宣称可发布。
 
 ## 1. 结论（先行）
@@ -186,7 +186,7 @@
 
 | 产物 | 值 | 复跑 |
 |---|---|---|
-| Android APK | 19,386,419 B；含 `lib/{arm64-v8a,x86_64}/libnf_app_core.so`；`zipalign -c -P 16 4` 通过 | `bash app/scripts/build_android.sh debug` |
+| Android APK | 19,462,595 B；含 `lib/{arm64-v8a,x86_64}/libnf_app_core.so`；`zipalign -c -P 16 4` 通过 | `bash app/scripts/build_android.sh debug` |
 | Rust `.so` | arm64 4,478,824 B / x86_64 4,645,976 B（NDK r27，LOAD align 0x4000） | `bash app/scripts/build_core_android.sh` |
 | Windows MSI | 66,573,406 B；app jar 内含 `native/nf_app_core.dll` | `bash app/scripts/build_desktop.sh package`（WIX_PATH） |
 | Rust CLI / cdylib | `nf-app-core.exe` / `nf_app_core.dll` | `bash app/scripts/build_core.sh --release` |

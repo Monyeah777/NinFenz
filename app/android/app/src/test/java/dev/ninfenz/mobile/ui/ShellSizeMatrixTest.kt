@@ -33,8 +33,7 @@ class ShellSizeMatrixTest {
         compose.setContent { NfTheme { NfMobileApp(prefs, ThemeMode.SYSTEM, {}) } }
         compose.waitForIdle()
         assertTrue(compose.onAllNodesWithText("库").fetchSemanticsNodes().isNotEmpty())
-        compose.onNodeWithText("创作").assertIsDisplayed()
-        compose.onNodeWithText("交付").assertIsDisplayed()
+        compose.onNodeWithText("工作台").assertIsDisplayed()
         compose.onNodeWithText("我的").assertIsDisplayed()
     }
 
