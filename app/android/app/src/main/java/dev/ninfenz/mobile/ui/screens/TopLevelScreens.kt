@@ -645,8 +645,8 @@ fun ProjectDetailScreen(
             }
         }.getOrDefault(false)
     }
-    var reviewer by remember { mutableStateOf("") }
-    var reviewNote by remember { mutableStateOf("") }
+    var reviewer by rememberSaveable { mutableStateOf("") }
+    var reviewNote by rememberSaveable { mutableStateOf("") }
     val diffPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: android.net.Uri? ->
         if (uri != null) {
             diffScope.launch {
