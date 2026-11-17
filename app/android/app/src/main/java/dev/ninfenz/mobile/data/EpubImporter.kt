@@ -18,6 +18,7 @@ object EpubImporter {
     }
 
     fun extract(file: File): String {
+        ImportPreflight.check(file)
         ZipFile(file).use { zip ->
             val container = read(zip, "META-INF/container.xml")
                 ?: throw IllegalArgumentException("EPUB 缺 container.xml")
