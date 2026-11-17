@@ -51,7 +51,7 @@
 |---|---|---|---|
 | OPEN-I18N-BODY | closed：全部 UI 文案资源化；中文硬编码守卫通过（仅 CoreCall 无 Context 回退豁免）；应用内 zh/en 切换与系统 per-app locale（localeConfig + LocaleManager）已做 | lead | — |
 | SCREENSHOT | Paparazzi 2.0.0-alpha02 已接入，10 张截图基线随 testDebugUnitTest verify；更新基线用 recordPaparazziDebug | lead | 完成（本提交） |
-| DEVICE (partial) | OnePlus PLF110/Android16 已跑：首启、WebView PDF、杀进程路由/槽位草稿恢复；历史轮已跑导入/创作/装配/L1/md+zip/docx 并修复真机问题；TalkBack/主题/CCOS 提交复测/折叠/性能未跑 | lead | results/app/DEVICE_RESULTS.md |
+| DEVICE (partial) | OnePlus PLF110/Android16 已跑：首启、WebView PDF、杀进程路由/槽位草稿恢复；历史轮已跑导入/创作/装配/L1/md+zip/docx 并修复真机问题；TalkBack 服务已绑定但未做语音手势走查；主题/CCOS 提交复测/折叠/性能未跑 | lead | results/app/DEVICE_RESULTS.md |
 | OPEN-DEVICE | 剩余真机项（TalkBack、主题/语言、CCOS 提交复测、折叠、性能、设备矩阵） | lead | 继续 DEVICE_RESULTS 清单 |
 | OPEN-DRAFT-PROJECT | 导入草稿→项目转换未定义（契约无 import→project 字段） | lead | 需 v1 §15 契约变更评估 |
 | OPEN-REVIEWED | CCOS approve 时 exported 项目回写 reviewed；非 exported 项目跳过（不伪造） | lead | 如需强制 reviewed，补 project-validate 前置条件 |

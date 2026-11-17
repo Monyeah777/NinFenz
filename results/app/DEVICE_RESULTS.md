@@ -371,6 +371,7 @@
 | 安装/冷启动 | pass：adb install -r 成功；冷启动 LaunchState=COLD，TotalTime=525ms，WaitTime=530ms；logcat 无 FATAL EXCEPTION | device_smoke.sh |
 | WebView PDF | pass：交付台导出 result.pdf 31,067 B；界面显示“PDF 结构校验通过（1 页）”“复现检查：两次导出一致”；经 FileProvider 分享到 Edge，页面可见“演示项目 / 开篇 / 正文 / 收束” | result.pdf、pdf-share-edge2.png |
 | 杀进程路由/槽位恢复 | pass：Home 后 run-as kill -9；最近任务重开；交付台路由保留，SLT-01 显示“已恢复上次槽位草稿”且内容恢复 | form-restored.png |
+| TalkBack 服务 | partial/pass（服务层）：开启 TalkBack 后服务已 Bound，APP 前台运行、无 FATAL；未做语音手势逐项走查 | talkback-back.png |
 | device_smoke 脚本 | 已修复：原 echo 中的 ADB 命令被 bash 当成算术展开，真机首跑报 unbound variable；改为普通命令替换 | app/scripts/device_smoke.sh |
 
 ## 5. 复跑入口
