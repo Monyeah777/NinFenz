@@ -3,7 +3,7 @@
 > 设备：OnePlus PLF110，Android 16（SDK 36），1080×2392 / 480dpi；历史真机会话 serial 3B65AR0183V00000。
 > **2026-11-16 当前 `adb devices` 为空**：下表 2026-11-15 行是历史真机证据；本轮新增功能仅有 JVM/构建/门禁证据，真机矩阵仍 OPEN-TOOLCHAIN。
 > APK：0.2.0 / versionCode 2，minSdk 26 / target 36。本件只记实际跑过的项目；未跑项标 OPEN，不写成 pass。
-> 当前本机验证总览：Android JVM **349/349**、Rust core **198/198**、app Python **498 passed**、APP 门禁 QA0–QA6 PASS/gap=0、lint **0 warnings**、`verify.sh --checks-only` PASS=107/WARN=2/FAIL=0。
+> 当前本机验证总览：Android JVM **350/350**、Rust core **198/198**、app Python **498 passed**、APP 门禁 QA0–QA6 PASS/gap=0、lint **0 warnings**、`verify.sh --checks-only` PASS=107/WARN=2/FAIL=0。
 
 ## 1. 已实测（2026-11-15）
 
@@ -37,7 +37,7 @@
 | PDF 表格/代码/引用/行内强调（JVM）：表格列宽加权、代码等宽+浅底、引用斜体+竖线、行内 bold/italic/code span；7 条测试。 |
 | PDF data URI 图片（JVM） | pass（本机）：解析 data:image/*;base64，按内容宽/页高缩放、居中、按高度权重分页；9 条测试。 |
 | DOCX 强调/表格/代码块（Rust）：表格列宽加权、表头重复、嵌套强调、代码浅底；Rust 198。 |
-| PDF HTML/CSS 渲染（JVM 构建） | code-complete（本机）：WebView 离线渲染 HTML/CSS 到 PdfDocument，JS/网络/文件访问关闭；空白或异常回退基础文本 PDF。**真机未验证**。 |
+| PDF HTML/CSS 渲染（JVM 构建） | code-complete（本机）：WebView 离线渲染 HTML/CSS 到 PdfDocument；HtmlExporter.html 与文件一致测试；空白/异常回退。**真机未验证**。 |
 | DOCX 引用/分隔线（Rust） | pass（本机）：引用 Quote 样式、水平线 pBdr；Rust 195。 |
 | DOCX Markdown 表格（Rust） | pass（本机）：生成 w:tbl/w:tr/w:tc、表头加粗、全边框；Rust 194。 |
 | DOCX 参考编号 numId（Rust） | pass（本机）：从 numbering.xml 解析首个 numId，列表 numPr 使用该 ID；Rust 193。 |

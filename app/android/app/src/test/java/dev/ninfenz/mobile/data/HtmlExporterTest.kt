@@ -17,6 +17,14 @@ class HtmlExporterTest {
     }
 
     @Test
+    fun htmlStringMatchesExportedFile() {
+        val dir = Files.createTempDirectory("nf-html-string").toFile()
+        val markdown = "# 标题\n\n正文 **粗**\n"
+        val created = HtmlExporter.export(markdown, "演示", dir)
+        org.junit.Assert.assertEquals(HtmlExporter.html(markdown, "演示"), created.file.readText())
+    }
+
+    @Test
     fun rendersPipeTable() {
         val dir = Files.createTempDirectory("nf-html-table").toFile()
         val created = HtmlExporter.export("| A | B |\n|---|---|\n| 1 | 2 |", "t", dir)
