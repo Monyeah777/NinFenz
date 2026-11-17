@@ -6,6 +6,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.unit.dp
+import dev.ninfenz.mobile.ui.components.NfOverflowButton
 import dev.ninfenz.mobile.ui.components.NfTopAppBar
 import dev.ninfenz.mobile.ui.screens.LibraryHomeScreen
 import dev.ninfenz.mobile.ui.screens.OnboardingScreen
@@ -45,6 +46,12 @@ class A11yComposeTest {
     fun topBarBackMeetsTarget() {
         compose.setContent { NfTheme { NfTopAppBar(title = "详情", onBack = {}) } }
         compose.onNodeWithContentDescription("返回").assertIsDisplayed().assertHeightIsAtLeast(48.dp)
+    }
+
+    @Test
+    fun overflowButtonHasDescriptionAndTarget() {
+        compose.setContent { NfTheme { NfOverflowButton(onClick = {}) } }
+        compose.onNodeWithContentDescription("更多").assertIsDisplayed().assertHeightIsAtLeast(48.dp)
     }
 
     @Test

@@ -291,7 +291,7 @@ fun NfListRow(
 /** 顶部栏溢出菜单按钮（可选；当前用于详情页占位）。 */
 @Composable
 fun NfOverflowButton(onClick: () -> Unit) {
-    IconButton(onClick = onClick) {
+    IconButton(onClick = onClick, modifier = Modifier.size(48.dp)) {
         Icon(Icons.Filled.MoreVert, contentDescription = stringResource(dev.ninfenz.mobile.R.string.common_more))
     }
 }

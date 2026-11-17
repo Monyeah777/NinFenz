@@ -46,6 +46,10 @@ app/android/
 source D:/tmp/app-toolchain/env.sh
 ~~~
 
+## a11y 门禁
+
+`bash app/scripts/a11y_gate.sh`：运行 `A11yComposeTest`（图标 contentDescription + 48dp 触控目标）；任一失败即非零退出。
+
 ## 构建与复跑
 
 ~~~bash
@@ -125,6 +129,7 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 - FileAccessLimitTest（4）：文本限额、目录单文件/总预算。
 - ImportPreflightTest（3）：小 zip 通过、条目过多、压缩比过高。
 - WebPdfExporterTest（2）：A4 缩放页数、空/极小宽度。
+- A11yComposeTest（4）：库页图标/触控目标、返回、引导按钮、溢出菜单 48dp。
 - HtmlExporterTest（13）：单文件 HTML/转义/列表、代码块、管道表格、安全链接、行内代码、水平线、引用块、有序列表、删除线、安全图片、代码语言 class、表格对齐、html() 与导出文件一致。
 - HtmlValidatorTest（2）：导出物结构通过、坏/缺 HTML 拒绝。
 - RtlShellTest（1）：RTL 下四目的地文本仍可见。
@@ -179,7 +184,7 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 - DiagnosticsBundleTest（2）：诊断包仅含 diagnostics/README、文件名唯一。
 - CrashLogStoreTest（2）：最近崩溃写入/清空、栈限制 64 KiB。
 - ExportVerifierTest（2）：manifest bytes/sha256 一致通过；缺文件/错字节/错摘要/manifest 缺失失败。
-- A11yComposeTest（3，Robolectric）：图标 contentDescription、返回/搜索/设置/CTA 触控目标 ≥48dp。
+- A11yComposeTest（4，Robolectric）：图标 contentDescription、返回/搜索/设置/CTA/溢出菜单触控目标 ≥48dp。
 - LargeFontComposeTest（1，Robolectric）：fontScale 200% 下库页主文案/CTA 仍可见。
 - ContrastTest（3）：明暗品牌调色板 WCAG 2.2 AA 对比度（正文 4.5、大字 3.0）。
 - PaparazziScreenshotTest（1）+ PaparazziSizeMatrixTest（9）：10 张 Home 截图基线（360/700/900 × 640/800/900/1000）。
@@ -190,9 +195,9 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 - 真机 smoke：连接并授权后运行 `bash app/scripts/device_smoke.sh`（安装 debug APK、冷启动、前台 Activity、最近崩溃日志）；设 `CAPTURE_DIR=…` 额外拉取 `home.png` 与 `ui.xml`。
 
 - 2026-11-16 当前：`./gradlew :app:assembleDebug` 成功：app-debug.apk = 19,049,108 bytes，
-  sha256 = 05588a0fc36bcf9f897d67932d18daf33d0ea7e863546f4140e8dfc5dc6a0073（含双 ABI 原生库 + 9 个示例 Pack assets）。
+  sha256 = 0a1551922ef23ea18dcabddf0648362ce6001e971bab4e28e9d723dad38f86b4（含双 ABI 原生库 + 9 个示例 Pack assets）。
 - 仓库级门禁在 UTF-8 locale 下运行：`LANG=C.UTF-8 PYTHONUTF8=1 bash verify.sh --checks-only`（GBK 控制台会让 `git ls-files` 解码失败，触发 modeling 检查异常）。
-- `./gradlew :app:testDebugUnitTest` 全绿：360 条 JVM 单测（v1 42 + v0.02 318；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y/大字号/对比度/Paparazzi 截图）。
+- `./gradlew :app:testDebugUnitTest` 全绿：361 条 JVM 单测（v1 42 + v0.02 319；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y/大字号/对比度/Paparazzi 截图）。
 - `zipalign -c -P 16 -v 4 app-debug.apk` → Verification successful（native lib 16KB page 对齐）。
 - `bash app/scripts/build_core_android.sh --clean` 成功：NDK 27.0.12077973 + rustup targets
   （aarch64-linux-android / x86_64-linux-android，经 rsproxy 镜像安装）；两个 .so 的 LOAD align 均为 0x4000。
