@@ -184,6 +184,9 @@ fun CcosScreen(onBack: () -> Unit) {
                     }
                     outcome = base + extra
                     result = reviewed
+                    withContext(Dispatchers.IO) {
+                        CcosSessionStore.saveResult(context.filesDir, CcosModel.resultJson(reviewed).toString())
+                    }
                 } else {
                     error = response.error
                 }
