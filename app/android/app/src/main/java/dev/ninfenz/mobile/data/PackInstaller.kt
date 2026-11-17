@@ -10,6 +10,36 @@ import java.nio.file.StandardOpenOption
  * 失败时恢复旧版本。不静默 copy 覆盖，避免半安装目录。
  */
 object PackInstaller {
+    /**
+     * 卸载已安装 Pack：先原子移到 library/packs-removed，再删注册记录；注册失败可回滚目录。
+     * 调用方必须先确认没有项目引用该 Pack。
+     */
+    fun uninstall(packDir: File, filesDir: File) {
+        val root = File(filesDir, "library/packs").canonicalFile
+        val src = packDir.canonicalFile
+        require(src.parentFile?.parentFile?.canonicalFile == root) { "Pack 不在安装目录：" + src }
+        val id = src.parentFile?.name ?: throw IllegalArgumentException("缺少 Pack id")
+        val version = src.name
+        require(id.isNotBlank() && version.isNotBlank()) { "缺少 Pack id/version" }
+        if (!src.isDirectory) return
+        val removedRoot = File(filesDir, "library/packs-removed").apply { mkdirs() }
+        val dest = File(removedRoot, id + "@" + version + "." + System.currentTimeMillis())
+        java.nio.file.Files.move(
+            src.toPath(),
+            dest.toPath(),
+            java.nio.file.StandardCopyOption.ATOMIC_MOVE
+        )
+        try {
+            PackRegistry.remove(filesDir, id, version)
+        } catch (t: Throwable) {
+            runCatching {
+                java.nio.file.Files.move(dest.toPath(), src.toPath(), java.nio.file.StandardCopyOption.ATOMIC_MOVE)
+            }
+            throw t
+        }
+        runCatching { dest.deleteRecursively() }
+    }
+
     fun install(stage: File, target: File, source: String = "install") {
         require(stage.isDirectory) { "staging 不是目录：$stage" }
         target.parentFile?.mkdirs()

@@ -3,6 +3,7 @@ package dev.ninfenz.mobile.data
 import java.io.File
 import java.nio.file.Files
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -39,6 +40,15 @@ class PackRegistrySqliteTest {
         PackStore(root).scan()
         assertTrue(File(root, "library/pack-registry.db").isFile)
         assertEquals("legacy", PackRegistry.load(root)["old@1.0.0"]?.source)
+    }
+
+    @Test
+    fun removeDropsSqliteAndJsonEntry() {
+        val root = Files.createTempDirectory("nf-pack-registry-remove").toFile()
+        val target = File(root, "library/packs/demo/1.0.0").apply { mkdirs() }
+        PackRegistry.record(target, "sqlite")
+        PackRegistry.remove(root, "demo", "1.0.0")
+        assertFalse(PackRegistry.load(root).containsKey("demo@1.0.0"))
     }
 
     @Test

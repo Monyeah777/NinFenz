@@ -61,6 +61,7 @@ import dev.ninfenz.mobile.data.AppPrefs
 import dev.ninfenz.mobile.data.CommandHistoryStore
 import dev.ninfenz.mobile.data.LibraryStore
 import dev.ninfenz.mobile.data.PackEntry
+import dev.ninfenz.mobile.data.PackInstaller
 import dev.ninfenz.mobile.data.PackSnapshot
 import dev.ninfenz.mobile.data.PackStore
 import dev.ninfenz.mobile.data.CreateProjectResult
@@ -487,6 +488,41 @@ is Detail.Import -> ImportScreen(
                     is Detail.Assembly -> AssemblyScreen(onBack = { shell = shell.back() ?: shell })
                     is Detail.PackCenter -> PackCenterScreen(
                         packs = packs.packs,
+                        projects = projects,
+                        onUninstall = { pack ->
+                            val inUse = projects.count {
+                                it.project.refs.basePackId == pack.id && it.project.refs.basePackVersion == pack.version
+                            }
+                            if (inUse > 0) {
+                                android.widget.Toast.makeText(
+                                    context,
+                                    context.getString(dev.ninfenz.mobile.R.string.packcenter_uninstall_in_use, inUse),
+                                    android.widget.Toast.LENGTH_LONG
+                                ).show()
+                            } else {
+                                scope.launch {
+                                    val result = runCatching {
+                                        withContext(Dispatchers.IO) {
+                                            PackInstaller.uninstall(pack.dir, context.filesDir)
+                                        }
+                                    }
+                                    result.onSuccess {
+                                        refresh()
+                                        android.widget.Toast.makeText(
+                                            context,
+                                            context.getString(dev.ninfenz.mobile.R.string.packcenter_uninstall_done, pack.id, pack.version),
+                                            android.widget.Toast.LENGTH_SHORT
+                                        ).show()
+                                    }.onFailure {
+                                        android.widget.Toast.makeText(
+                                            context,
+                                            context.getString(dev.ninfenz.mobile.R.string.packcenter_uninstall_failed, it.message ?: it.javaClass.simpleName),
+                                            android.widget.Toast.LENGTH_LONG
+                                        ).show()
+                                    }
+                                }
+                            }
+                        },
                         onBack = { shell = shell.back() ?: shell },
                         onOpenPack = { pack -> shell = shell.open(Detail.Pack(pack.id, pack.version)) },
                         onUpdatePlan = { shell = shell.open(Detail.PackUpdate) },

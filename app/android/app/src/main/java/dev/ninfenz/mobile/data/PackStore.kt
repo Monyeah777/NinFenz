@@ -96,6 +96,48 @@ object PackRegistry {
         "id TEXT NOT NULL, version TEXT NOT NULL, installed_at INTEGER NOT NULL, source TEXT NOT NULL, " +
         "PRIMARY KEY(id, version))"
 
+    /** 删除注册记录：SQLite（若存在）+ JSON 镜像同步。 */
+    fun remove(filesDir: File, id: String, version: String) {
+        sqliteRemove(filesDir, id, version)
+        val next = jsonLoad(filesDir).toMutableMap()
+        next.remove(id + "@" + version)
+        writeJson(filesDir, next)
+    }
+
+    private fun sqliteRemove(filesDir: File, id: String, version: String) {
+        val f = dbFile(filesDir)
+        if (!f.isFile) return
+        try {
+            val db = SQLiteDatabase.openDatabase(f.path, null, SQLiteDatabase.OPEN_READWRITE)
+            db.use { database ->
+                database.beginTransaction()
+                try {
+                    database.delete("pack_registry", "id = ? AND version = ?", arrayOf(id, version))
+                    database.setTransactionSuccessful()
+                } finally {
+                    database.endTransaction()
+                }
+            }
+        } catch (t: Throwable) {
+            // 注册表删除失败时保留 JSON 回退，不吞掉 UI 侧错误
+        }
+    }
+
+    private fun writeJson(filesDir: File, entries: Map<String, PackRegistryEntry>) {
+        val obj = buildJsonObject {
+            put("schema", "nf-pack-registry/1")
+            put("packs", buildJsonObject {
+                entries.toSortedMap().forEach { (key, entry) ->
+                    put(key, buildJsonObject {
+                        put("installed_at", entry.installedAt)
+                        put("source", entry.source)
+                    })
+                }
+            })
+        }
+        runCatching { AtomicFiles.writeText(file(filesDir), obj.toString()) }
+    }
+
     fun record(target: File, source: String) {
         val filesDir = target.parentFile?.parentFile?.parentFile?.parentFile ?: return
         val id = target.parentFile?.name ?: return

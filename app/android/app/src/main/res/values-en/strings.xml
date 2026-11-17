@@ -231,6 +231,13 @@
     <string name="packcenter_verify">Verify</string>
     <string name="packcenter_verifying">Verifying…</string>
     <string name="packcenter_detail">Details</string>
+    <string name="packcenter_uninstall">Uninstall</string>
+    <string name="packcenter_uninstall_title">Uninstall pack?</string>
+    <string name="packcenter_uninstall_body">This deletes %1$s · %2$s and all its files; archived projects are unaffected.</string>
+    <string name="packcenter_uninstall_confirm">Uninstall</string>
+    <string name="packcenter_uninstall_in_use">%1$d project(s) still use this pack. Archive them or switch to another pack first.</string>
+    <string name="packcenter_uninstall_done">Uninstalled %1$s · %2$s</string>
+    <string name="packcenter_uninstall_failed">Uninstall failed: %1$s</string>
     <string name="packcenter_verify_pass">Verified · verdict=%1$s</string>
 
     <string name="author_tab_protocol">Protocol</string>

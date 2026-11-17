@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -25,10 +26,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.launch
 import dev.ninfenz.mobile.data.PackEntry
 import dev.ninfenz.mobile.data.PackTrustStore
+import dev.ninfenz.mobile.data.ProjectEntry
 import dev.ninfenz.mobile.data.PackVerifier
 import dev.ninfenz.mobile.ui.components.NfCard
 import dev.ninfenz.mobile.ui.components.NfEmptyState
@@ -49,6 +52,8 @@ private fun formatInstalledAt(at: Long): String = if (at <= 0) {
 @Composable
 fun PackCenterScreen(
     packs: List<PackEntry>,
+    projects: List<ProjectEntry> = emptyList(),
+    onUninstall: (PackEntry) -> Unit = {},
     onBack: () -> Unit,
     onOpenPack: (PackEntry) -> Unit,
     onUpdatePlan: () -> Unit,
@@ -62,6 +67,8 @@ fun PackCenterScreen(
     var verifyingId by remember { mutableStateOf<String?>(null) }
     var results by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
     var errors by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
+    var pendingUninstall by remember { mutableStateOf<PackEntry?>(null) }
+    var uninstallErrors by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
 
     Column(modifier = Modifier.fillMaxSize()) {
         NfTopAppBar(
@@ -134,8 +141,24 @@ fun PackCenterScreen(
                                     }
                                 ) { Text(if (verifyingId == pack.id) stringResource(dev.ninfenz.mobile.R.string.packcenter_verifying) else stringResource(dev.ninfenz.mobile.R.string.packcenter_verify)) }
                                 Button(onClick = { onOpenPack(pack) }) { Text(stringResource(dev.ninfenz.mobile.R.string.packcenter_detail)) }
+                                TextButton(
+                                    onClick = {
+                                        val inUse = projects.count {
+                                            it.project.refs.basePackId == pack.id && it.project.refs.basePackVersion == pack.version
+                                        }
+                                        if (inUse > 0) {
+                                            uninstallErrors = uninstallErrors + (pack.id to context.getString(dev.ninfenz.mobile.R.string.packcenter_uninstall_in_use, inUse))
+                                        } else {
+                                            uninstallErrors = uninstallErrors - pack.id
+                                            pendingUninstall = pack
+                                        }
+                                    }
+                                ) { Text(stringResource(dev.ninfenz.mobile.R.string.packcenter_uninstall)) }
                             }
                             results[pack.id]?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary) }
+                            uninstallErrors[pack.id]?.let { message ->
+                                Text(message, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+                            }
                             errors[pack.id]?.let { message ->
                                 NfErrorCard("NF-VAL-001", message, context.getString(dev.ninfenz.mobile.R.string.view_diag_or_reinstall))
                             }
@@ -144,6 +167,35 @@ fun PackCenterScreen(
                 }
             }
             }
+        }
+        pendingUninstall?.let { pack ->
+            AlertDialog(
+                onDismissRequest = { pendingUninstall = null },
+                title = { Text(stringResource(dev.ninfenz.mobile.R.string.packcenter_uninstall_title)) },
+                text = {
+                    Text(
+                        stringResource(
+                            dev.ninfenz.mobile.R.string.packcenter_uninstall_body,
+                            pack.id,
+                            pack.version
+                        )
+                    )
+                },
+                confirmButton = {
+                    TextButton(
+                        modifier = androidx.compose.ui.Modifier.testTag("packcenter_uninstall_confirm"),
+                        onClick = {
+                            pendingUninstall = null
+                            onUninstall(pack)
+                        }
+                    ) { Text(stringResource(dev.ninfenz.mobile.R.string.packcenter_uninstall_confirm)) }
+                },
+                dismissButton = {
+                    TextButton(onClick = { pendingUninstall = null }) {
+                        Text(stringResource(android.R.string.cancel))
+                    }
+                }
+            )
         }
     }
 }

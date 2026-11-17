@@ -231,6 +231,13 @@
     <string name="packcenter_verify">校验</string>
     <string name="packcenter_verifying">校验中…</string>
     <string name="packcenter_detail">详情</string>
+    <string name="packcenter_uninstall">卸载</string>
+    <string name="packcenter_uninstall_title">卸载 Pack？</string>
+    <string name="packcenter_uninstall_body">将删除 %1$s · %2$s 及其全部文件；已归档项目不受影响。</string>
+    <string name="packcenter_uninstall_confirm">卸载</string>
+    <string name="packcenter_uninstall_in_use">有 %1$d 个项目正在使用该 Pack，先归档或改用其他 Pack。</string>
+    <string name="packcenter_uninstall_done">已卸载 %1$s · %2$s</string>
+    <string name="packcenter_uninstall_failed">卸载失败：%1$s</string>
     <string name="packcenter_verify_pass">校验通过 · verdict=%1$s</string>
 
     <string name="author_tab_protocol">协议</string>
