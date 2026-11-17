@@ -29,7 +29,8 @@ object PdfExporter {
             val mono: Boolean = false,
             val italic: Boolean = false,
             val rule: Boolean = false,
-            val cells: List<String> = emptyList()
+            val cells: List<String> = emptyList(),
+            val table: Boolean = false
         )
 
         val lineHeight = 16f
@@ -43,7 +44,7 @@ object PdfExporter {
                     return@forEach
                 }
                 if (block.table && block.cells.isNotEmpty()) {
-                    add(Line("", 10f, block.tableHeader, cells = block.cells))
+                    add(Line("", 10f, block.tableHeader, cells = block.cells, table = true))
                     return@forEach
                 }
                 val size = if (block.table) 10f else when (block.level) {
@@ -83,6 +84,13 @@ object PdfExporter {
                         }
                         line.cells.forEachIndexed { i, cell ->
                             canvas.drawText(ellipsize(cell, p, colWidth - 6f), margin + i * colWidth, y, p)
+                        }
+                        if (line.table) {
+                            for (i in 1 until line.cells.size) {
+                                val x = margin + i * colWidth
+                                canvas.drawLine(x, y - line.size, x, y + 4f, paint)
+                            }
+                            canvas.drawLine(margin, y + 4f, pageWidth - margin, y + 4f, paint)
                         }
                         y += lineHeight
                         return@forEach
