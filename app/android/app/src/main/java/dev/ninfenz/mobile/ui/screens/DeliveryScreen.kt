@@ -125,6 +125,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
     var exportVerify by remember { mutableStateOf<ExportVerifier.Result?>(null) }
     var reproText by remember { mutableStateOf<String?>(null) }
     var reproOk by remember { mutableStateOf<Boolean?>(null) }
+    var validateRepro by remember { mutableStateOf<String?>(null) }
     var docxStyles by remember { mutableStateOf<String?>(null) }
     val referencePicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) {
@@ -487,13 +488,29 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                             busy = true
                             error = null
                             scope.launch {
-                                val response = safeCall("validate", buildJsonObject {
+                                val validatePayload = buildJsonObject {
                                     put("markdown", md)
                                     put("spec", current.specJson)
                                     put("plan", raw)
                                     put("level", "L1")
-                                })
+                                }
+                                val response = safeCall("validate", validatePayload)
                                 val result = response.resultObject()
+                                if (response.ok && result != null) {
+                                    val second = safeCall("validate", validatePayload)
+                                    val secondResult = second.resultObject()
+                                    if (second.ok && secondResult != null) {
+                                        val offset = dev.ninfenz.mobile.data.ReproChecker.firstDifference(
+                                            result.toString().toByteArray(Charsets.UTF_8),
+                                            secondResult.toString().toByteArray(Charsets.UTF_8)
+                                        )
+                                        validateRepro = if (offset == null) {
+                                            context.getString(dev.ninfenz.mobile.R.string.repro_stable)
+                                        } else {
+                                            context.getString(dev.ninfenz.mobile.R.string.repro_diff, offset)
+                                        }
+                                    }
+                                }
                                 if (result != null) {
                                     try {
                                         report = ReportModel.parse(result)
@@ -524,6 +541,9 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                 }
                 report?.let { r ->
                     Text(ReportModel.line(r), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(horizontal = NfSpacing.page))
+                    validateRepro?.let {
+                        Text(it, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page))
+                    }
                     for (issue in r.issues.take(20)) {
                         Text(
                             issue.code + " " + (issue.path ?: "-") + "：" + issue.message + context.getString(dev.ninfenz.mobile.R.string.error_fix_suffix) + issue.fix,
