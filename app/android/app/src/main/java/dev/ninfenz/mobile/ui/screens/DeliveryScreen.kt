@@ -89,7 +89,7 @@ import kotlinx.serialization.json.put
 
 /**
  * W5 交付台：项目 → graph-compile 计划 → 槽位输入 → assemble → validate L1 → 导出 md/zip/docx → 分享。
- * 项目状态写回已接；PDF 为本地基础文本导出（PdfExporter），复杂排版/平台打印仍 OPEN。
+ * 项目状态写回已接；PDF 优先 WebView HTML/CSS（WebPdfExporter），失败回退本地基础文本（PdfExporter）。
  */
 @Composable
 fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onStatusChanged: () -> Unit = {}) {
@@ -1049,12 +1049,18 @@ private fun PdfExportButton(
             scope.launch {
                 try {
                     val outDir = File(File(context.filesDir, "exports"), "delivery").apply { mkdirs() }
-                    val created = PdfExporter.export(md, project.title, outDir)
+                    val rich = dev.ninfenz.mobile.data.WebPdfExporter.export(context, md, project.title, outDir)
+                    val createdFile: File = rich?.file ?: PdfExporter.export(md, project.title, outDir).file
                     val reproDir = File(context.cacheDir, "repro-pdf").apply { deleteRecursively(); mkdirs() }
-                    val second = PdfExporter.export(md, project.title, reproDir)
-                    val report = dev.ninfenz.mobile.data.ReproChecker.check(created.file, second.file)
+                    val secondFile: File = if (rich != null) {
+                        dev.ninfenz.mobile.data.WebPdfExporter.export(context, md, project.title, reproDir)?.file
+                            ?: PdfExporter.export(md, project.title, reproDir).file
+                    } else {
+                        PdfExporter.export(md, project.title, reproDir).file
+                    }
+                    val report = dev.ninfenz.mobile.data.ReproChecker.check(createdFile, secondFile)
                     reproDir.deleteRecursively()
-                    onDone(created.file, report)
+                    onDone(createdFile, report)
                 } catch (t: Throwable) {
                     setError(CoreError("NF-EXP-002", context.getString(dev.ninfenz.mobile.R.string.export_pdf_failed, t.message ?: t.javaClass.simpleName), context.getString(dev.ninfenz.mobile.R.string.export_failed_fix), null, 1))
                 } finally {

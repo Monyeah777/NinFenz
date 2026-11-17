@@ -9,6 +9,11 @@ object HtmlExporter {
     fun export(markdown: String, title: String, outDir: File): Created {
         outDir.mkdirs()
         val target = File(outDir, "result.html")
+        target.writeText(html(markdown, title), Charsets.UTF_8)
+        return Created(target, target.length())
+    }
+
+    fun html(markdown: String, title: String): String {
         val body = convert(markdown.replace("\r\n", "\n"))
         val html = StringBuilder()
         html.append("<!DOCTYPE html>\n<html lang=\"zh\"><head><meta charset=\"utf-8\"/>")
@@ -18,8 +23,7 @@ object HtmlExporter {
         html.append("</head><body><h1>").append(esc(title)).append("</h1>\n")
         html.append(body)
         html.append("</body></html>\n")
-        target.writeText(html.toString(), Charsets.UTF_8)
-        return Created(target, target.length())
+        return html.toString()
     }
 
     private fun convert(markdown: String): String {

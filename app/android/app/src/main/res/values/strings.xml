@@ -298,7 +298,7 @@
     <string name="delivery_share_md">分享 Markdown</string>
     <string name="delivery_share_file">分享导出文件</string>
     <string name="delivery_open_file">打开</string>
-    <string name="delivery_pdf_note">PDF：本地基础文本导出；复杂排版仍 OPEN。</string>
+    <string name="delivery_pdf_note">PDF：优先本地 HTML/CSS 渲染；失败回退基础文本。</string>
     <string name="docx_reference_pick">选择参考样式 DOCX</string>
     <string name="docx_reference_loaded">已加载参考样式</string>
     <string name="docx_reference_none">未加载参考样式</string>

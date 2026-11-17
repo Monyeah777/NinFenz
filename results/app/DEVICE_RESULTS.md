@@ -37,6 +37,7 @@
 | PDF 表格/代码/引用/行内强调（JVM）：表格列宽加权、代码等宽+浅底、引用斜体+竖线、行内 bold/italic/code span；7 条测试。 |
 | PDF data URI 图片（JVM） | pass（本机）：解析 data:image/*;base64，按内容宽/页高缩放、居中、按高度权重分页；9 条测试。 |
 | DOCX 强调/表格/代码块（Rust）：表格列宽加权、表头重复、嵌套强调、代码浅底；Rust 198。 |
+| PDF HTML/CSS 渲染（JVM 构建） | code-complete（本机）：WebView 离线渲染 HTML/CSS 到 PdfDocument，JS/网络/文件访问关闭；空白或异常回退基础文本 PDF。**真机未验证**。 |
 | DOCX 引用/分隔线（Rust） | pass（本机）：引用 Quote 样式、水平线 pBdr；Rust 195。 |
 | DOCX Markdown 表格（Rust） | pass（本机）：生成 w:tbl/w:tr/w:tc、表头加粗、全边框；Rust 194。 |
 | DOCX 参考编号 numId（Rust） | pass（本机）：从 numbering.xml 解析首个 numId，列表 numPr 使用该 ID；Rust 193。 |
@@ -204,7 +205,7 @@
 | 依赖升级 coroutines（JVM） | pass（本机）：coroutines 1.9.0→1.10.2，243 tests 全绿；lint warnings 3→2；debug APK 因未压缩 dex 增至 24.7MB。真机未复测（adb 无设备） |
 | Clean build（本轮） | pass（本机）：`gradlew clean` + `testDebugUnitTest --rerun-tasks` + assembleDebug；248/248 全绿；clean APK 19,032,264 B sha256 f4501bfe…；zipalign 16KB 通过。增量 APK 24.7MB 为旧构建膨胀，clean 产物为准。 |
 | Rust core 单测（本轮） | pass（本机）：`cargo test` 186 passed / 0 failed；Android 端无 core 改动。 |
-| Release 构建（构建） | pass（本机）：clean 后重建 `:app:assembleRelease` 成功；app-release-unsigned.apk 15,513,101 B sha256 87d1777c…；zipalign 16KB 通过；apksigner 显示未签名（预期，签名 OPEN-EXTERNAL）。 |
+| Release 构建（构建） | pass（本机）：clean 后重建 `:app:assembleRelease` 成功；app-release-unsigned.apk 15,513,105 B sha256 f5674b47…；zipalign 16KB 通过；apksigner 显示未签名（预期，签名 OPEN-EXTERNAL）。 |
 | 16KB 页对齐（构建） | pass（本机）：`zipalign -c -P 16 4 app-debug.apk` exit=0；未真机安装验证。 |
 | APP 门禁（round127） | pass（本机）：QA0–QA6 全 PASS，FAIL=0；covered=14 gap=0 open=2 p0=0；台账刷新到当前 HEAD。 |
 | APP 门禁（本轮） | pass（本机）：QA0–QA6 全部 PASS，FAIL=0；自审计 covered=14 gap=0 open=2 p0=0。 |

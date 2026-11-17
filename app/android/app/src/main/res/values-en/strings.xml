@@ -298,7 +298,7 @@
     <string name="delivery_share_md">Share Markdown</string>
     <string name="delivery_share_file">Share exported file</string>
     <string name="delivery_open_file">Open</string>
-    <string name="delivery_pdf_note">PDF: local basic-text export; rich layout remains OPEN.</string>
+    <string name="delivery_pdf_note">PDF: local HTML/CSS first; falls back to basic text.</string>
     <string name="docx_reference_pick">Choose reference DOCX</string>
     <string name="docx_reference_loaded">Reference styles loaded</string>
     <string name="docx_reference_none">No reference styles</string>
