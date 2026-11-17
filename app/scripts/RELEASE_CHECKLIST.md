@@ -9,6 +9,7 @@
 bash app/scripts/build_core.sh --release --test     # 核心：构建 + 单测
 python app/gates/run_gates.py                       # APP 门禁（QA0–QA6 + S0–S15）
 python -m pytest app/tests -q                       # 控制面/契约/安全/golden/E2E
+bash app/scripts/a11y_gate.sh                       # 图标 contentDescription + 48dp 触控目标
 python tui/nf.py --selftest                         # TUI（复用面）
 ```
 
