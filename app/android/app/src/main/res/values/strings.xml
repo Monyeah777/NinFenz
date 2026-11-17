@@ -337,6 +337,7 @@
     <string name="delivery_status_reviewed">已人审</string>
 
     <string name="ccos_title">CCOS 交接</string>
+    <string name="ccos_interface_notice">接口预留：当前仅在本机交换 ccos-task / ccos-result 文件；APP 不内置 AI OS、不联网、不持密钥。真实 CCOS/Agent 接入沿用同一契约。</string>
     <string name="ccos_step1">1 · 准备（文件交换）</string>
     <string name="ccos_open_task">打开 ccos-task</string>
     <string name="ccos_open_result">打开 ccos-result</string>

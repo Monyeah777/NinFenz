@@ -213,7 +213,7 @@
 | 依赖升级 coroutines（JVM） | pass（本机）：coroutines 1.9.0→1.10.2，243 tests 全绿；lint warnings 3→2；debug APK 因未压缩 dex 增至 24.7MB。真机未复测（adb 无设备） |
 | Clean build（本轮） | pass（本机）：`gradlew clean` + `testDebugUnitTest --rerun-tasks` + assembleDebug；248/248 全绿；clean APK 19,032,264 B sha256 f4501bfe…；zipalign 16KB 通过。增量 APK 24.7MB 为旧构建膨胀，clean 产物为准。 |
 | Rust core 单测（本轮） | pass（本机）：`cargo test` 186 passed / 0 failed；Android 端无 core 改动。 |
-| Release 构建（构建） | pass（本机）：clean 后重建 `:app:assembleRelease` 成功；app-release-unsigned.apk 15,534,733 B sha256 9f80c9f2…；zipalign 16KB 通过；apksigner 显示未签名（预期，签名 OPEN-EXTERNAL）。 |
+| Release 构建（构建） | pass（本机）：clean 后重建 `:app:assembleRelease` 成功；app-release-unsigned.apk 15,535,509 B sha256 de3f4241…；zipalign 16KB 通过；apksigner 显示未签名（预期，签名 OPEN-EXTERNAL）。 |
 | 16KB 页对齐（构建） | pass（本机）：`zipalign -c -P 16 4 app-debug.apk` exit=0；未真机安装验证。 |
 | APP 门禁（round127） | pass（本机）：QA0–QA6 全 PASS，FAIL=0；covered=14 gap=0 open=2 p0=0；台账刷新到当前 HEAD。 |
 | APP 门禁（本轮） | pass（本机）：QA0–QA6 全部 PASS，FAIL=0；自审计 covered=14 gap=0 open=2 p0=0。 |
@@ -357,7 +357,7 @@
 - 撤销复测通过：F-002 由「冷静x」点撤销回到「冷静」；此前失败是键盘未收起时点到了键盘。
 - English 主题标签已资源化（System/Light/Dark）。
 - 新增盲区修复：jniLibs .so 陈旧导致 docx 被误报 NF-EXP-004；重跑 build_core_android.sh 后恢复。
-- CCOS：2026-11-17 真机恢复 task/result 并通过导入前预检；人审提交未完成，仍标待复测。
+- CCOS：2026-11-17 真机恢复 task/result 并通过导入前预检；当前是接口预留，不把本地人审回传当发布阻塞项，真实 CCOS/Agent 后续接入。
 - WebView PDF：2026-11-17 已在真机通过（见第 6 节）。
 - 杀进程恢复：2026-11-17 已用 run-as kill -9 + 最近任务重开验证路由/槽位草稿（见第 6 节）。
 - 分享 chooser 已真机通过（NEW_TASK 修复）。
@@ -375,7 +375,7 @@
 | SQLite 注册表 | pass：预置旧 JSON 后 force-stop/启动，生成 pack-registry.db，查询到 demo-pack/1.0.0/123456/device-migrate-test；随后清理种子数据 | pack-registry.db |
 | Pack 安装 | partial：Pack 中心新增“安装 zip”入口；zip 安装/重复/缺 manifest 数据层测试通过；未在真机文件选择器完成一次安装 | packcenter-install2.png |
 | Pack 卸载 | pass：Pack 中心显示卸载按钮；demo-pack 被 3 个项目引用时阻断并提示，未删除任何文件 | pack-uninstall-guard.png |
-| CCOS 会话/预检 | partial：run-as 预置 task/result 后，CCOS 屏恢复 task-demo-0001、result succeeded、显示“导入前预检通过”；人审提交未完成 | ui-ccos5.xml |
+| CCOS 接口/预检 | partial（接口预留）：run-as 预置 task/result 后，CCOS 屏恢复 task-demo-0001、result succeeded、显示“导入前预检通过”；不把本地人审回传当发布阻塞项，真实 CCOS/Agent 后续接入 | ui-ccos5.xml |
 | 横屏自适应 | pass：旋转到横屏后 NavigationRail 竖排四目的地，内容区重排 | landscape.png |
 | Release 结构 | partial：zipalign 16KB 通过；apksigner 报 Missing META-INF/MANIFEST.MF（未签名，签名仍 OPEN-EXTERNAL） | zipalign/apksigner 输出 |
 | Signed release 内部自测 | pass（非生产）：debug keystore 签 release 后安装成功，冷启动 926ms；release 内导出 PDF 显示结构校验通过（1 页）；生产 upload key 未提供 | release-pdf.png、release-signed-home.png |

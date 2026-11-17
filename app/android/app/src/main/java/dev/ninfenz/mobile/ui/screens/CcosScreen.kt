@@ -221,6 +221,7 @@ fun CcosScreen(onBack: () -> Unit) {
             }
         }
     ) {
+        Notice(stringResource(dev.ninfenz.mobile.R.string.ccos_interface_notice), Tone.INFO)
         CardBox(title = stringResource(dev.ninfenz.mobile.R.string.ccos_step1)) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(onClick = { taskPicker.launch(arrayOf("application/json", "text/plain")) }) { Text(stringResource(dev.ninfenz.mobile.R.string.ccos_open_task)) }

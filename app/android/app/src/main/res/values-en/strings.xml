@@ -337,6 +337,7 @@
     <string name="delivery_status_reviewed">Reviewed</string>
 
     <string name="ccos_title">CCOS handoff</string>
+    <string name="ccos_interface_notice">Interface placeholder: the app only exchanges ccos-task / ccos-result files locally. It does not embed an AI OS, network, or secrets; a real CCOS/agent plugs into the same contract.</string>
     <string name="ccos_step1">1 · Prepare (file exchange)</string>
     <string name="ccos_open_task">Open ccos-task</string>
     <string name="ccos_open_result">Open ccos-result</string>
