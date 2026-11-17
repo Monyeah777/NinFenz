@@ -17,8 +17,24 @@ object FileAccess {
 
     suspend fun readText(context: Context, uri: Uri): String = withContext(Dispatchers.IO) {
         context.contentResolver.openInputStream(uri)?.use { input ->
-            input.bufferedReader(Charsets.UTF_8).readText()
+            String(readLimited(input, MAX_IMPORT_BYTES), Charsets.UTF_8)
         } ?: throw IllegalStateException("无法打开 URI：" + uri)
+    }
+
+    fun readLimited(input: java.io.InputStream, maxBytes: Long): ByteArray {
+        val out = java.io.ByteArrayOutputStream()
+        val buffer = ByteArray(8192)
+        var total = 0L
+        while (true) {
+            val n = input.read(buffer)
+            if (n < 0) break
+            total += n
+            if (total > maxBytes) {
+                throw IllegalStateException("文件超过 " + (maxBytes / (1024 * 1024)) + " MiB 导入上限")
+            }
+            out.write(buffer, 0, n)
+        }
+        return out.toByteArray()
     }
 
     suspend fun meta(context: Context, uri: Uri): FileMeta = withContext(Dispatchers.IO) {
