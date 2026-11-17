@@ -101,8 +101,13 @@ fun CcosScreen(onBack: () -> Unit) {
                 val obj = J.parseObject(text, "ccos-task/1")
                 task = CcosModel.parseTask(obj)
                 rawTask = obj
-                withContext(Dispatchers.IO) { CcosSessionStore.saveTask(context.filesDir, text) }
-                result?.let { precheckFindings = dev.ninfenz.mobile.model.CcosPrecheck.check(it, task) }
+                withContext(Dispatchers.IO) {
+                    CcosSessionStore.saveTask(context.filesDir, text)
+                    CcosSessionStore.clearResult(context.filesDir)
+                }
+                result = null
+                precheckFindings = emptyList()
+                outcome = null
                 error = null
             } catch (e: Exception) {
                 error = CoreResponse.failure(

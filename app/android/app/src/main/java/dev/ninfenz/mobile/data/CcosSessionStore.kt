@@ -14,6 +14,10 @@ object CcosSessionStore {
 
     fun loadResult(filesDir: File): String? = readOrNull(File(dir(filesDir), "result.json"))
 
+    fun clearResult(filesDir: File) {
+        File(dir(filesDir), "result.json").delete()
+    }
+
     private fun readOrNull(file: File): String? =
         if (file.isFile) runCatching { file.readText(Charsets.UTF_8) }.getOrNull() else null
 }
