@@ -59,11 +59,50 @@ fn heading_style(level: usize) -> &'static str {
     }
 }
 
+fn is_table_row(trimmed: &str) -> bool {
+    trimmed.starts_with('|') && trimmed.ends_with('|') && trimmed.len() > 2
+}
+
+fn table_cells(trimmed: &str) -> Vec<String> {
+    trimmed.trim_matches('|').split('|').map(|c| c.trim().to_string()).collect()
+}
+
+fn is_table_separator(cells: &[String]) -> bool {
+    !cells.is_empty() && cells.iter().all(|c| {
+        let t = c.trim_matches(':');
+        t.len() >= 3 && t.chars().all(|ch| ch == '-')
+    })
+}
+
+fn table_xml(rows: &[Vec<String>]) -> String {
+    if rows.is_empty() {
+        return String::new();
+    }
+    let cols = rows.iter().map(|r| r.len()).max().unwrap_or(1).max(1);
+    let mut out = String::from("<w:tbl><w:tblPr><w:tblW w:w=\"0\" w:type=\"auto\"/></w:tblPr>");
+    for row in rows {
+        out.push_str("<w:tr>");
+        for c in 0..cols {
+            let cell = row.get(c).map(|s| s.as_str()).unwrap_or("");
+            out.push_str("<w:tc><w:tcPr><w:tcW w:w=\"0\" w:type=\"auto\"/></w:tcPr>");
+            out.push_str(&paragraph(&inline_plain(cell), None, false, "1"));
+            out.push_str("</w:tc>");
+        }
+        out.push_str("</w:tr>");
+    }
+    out.push_str("</w:tbl>");
+    out
+}
+
 /// Markdown → document.xml 的 body 段落序列（确定性）。
 fn document_body(markdown: &str, numbered: bool, num_id: &str) -> String {
     let mut parts: Vec<String> = Vec::new();
     let mut in_code = false;
-    for raw in markdown.lines() {
+    let lines: Vec<&str> = markdown.lines().collect();
+    let mut i = 0usize;
+    while i < lines.len() {
+        let raw = lines[i];
+        i += 1;
         let line = raw.trim_end_matches('\r');
         let trimmed = line.trim();
         if trimmed.starts_with("~~~") {
@@ -75,6 +114,24 @@ fn document_body(markdown: &str, numbered: bool, num_id: &str) -> String {
             continue;
         }
         if trimmed.is_empty() {
+            continue;
+        }
+        if is_table_row(trimmed) {
+            let mut rows: Vec<Vec<String>> = Vec::new();
+            let mut j = i - 1;
+            while j < lines.len() {
+                let t = lines[j].trim();
+                if !is_table_row(t) {
+                    break;
+                }
+                let cells = table_cells(t);
+                if !is_table_separator(&cells) {
+                    rows.push(cells);
+                }
+                j += 1;
+            }
+            i = j;
+            parts.push(table_xml(&rows));
             continue;
         }
         let hashes = trimmed.chars().take_while(|c| *c == '#').count();

@@ -363,6 +363,30 @@ fn export_docx_reference_header_footer_are_used() {
 }
 
 #[test]
+fn export_docx_renders_markdown_table() {
+    let out = tmpdir("exp_docx_table");
+    run_ok(
+        "export",
+        &json!({
+            "markdown": "| 列A | 列B |\n|---|---|\n| 1 | 2 |\n",
+            "format": "docx",
+            "out_dir": pstr(&out),
+            "title": "表格"
+        }),
+    );
+    let bytes = std::fs::read(out.join("result.docx")).unwrap();
+    let entries = nf_app_core::zipsec::read_zip_bytes(&bytes).unwrap();
+    let doc = entries
+        .iter()
+        .find(|e| e.name == "word/document.xml")
+        .map(|e| String::from_utf8_lossy(&e.data).to_string())
+        .unwrap();
+    assert!(doc.contains("<w:tbl>"));
+    assert!(doc.contains("列A"));
+    assert!(doc.contains("列B"));
+}
+
+#[test]
 fn export_skill_pack_contains_scaffold() {
     let out = tmpdir("exp_skill");
     let r = run_ok(
