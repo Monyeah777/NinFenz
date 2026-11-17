@@ -334,6 +334,8 @@
     <string name="ccos_task_title">2 · Task %1$s</string>
     <string name="ccos_no_task">No ccos-task loaded yet.</string>
     <string name="ccos_result_title">3 · Result %1$s</string>
+    <string name="ccos_precheck_pass">Pre-import check passed</string>
+    <string name="ccos_precheck_failed">Pre-import check failed: issues=%1$d</string>
     <string name="ccos_status">Status</string>
     <string name="ccos_review_done">Decided: state=%1$s · reviewer=%2$s</string>
     <string name="ccos_review_title">4 · Human review (audit required)</string>

@@ -69,6 +69,7 @@ fun CcosScreen(onBack: () -> Unit) {
     var error by remember { mutableStateOf<CoreError?>(null) }
     var outcome by remember { mutableStateOf<String?>(null) }
     var busy by remember { mutableStateOf(false) }
+    var precheckFindings by remember { mutableStateOf<List<dev.ninfenz.mobile.model.CcosPrecheck.Finding>>(emptyList()) }
 
     val taskPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         if (uri == null) return@rememberLauncherForActivityResult
@@ -78,6 +79,7 @@ fun CcosScreen(onBack: () -> Unit) {
                 val obj = J.parseObject(text, "ccos-task/1")
                 task = CcosModel.parseTask(obj)
                 rawTask = obj
+                result?.let { precheckFindings = dev.ninfenz.mobile.model.CcosPrecheck.check(it, task) }
                 error = null
             } catch (e: Exception) {
                 error = CoreResponse.failure(
@@ -95,6 +97,7 @@ fun CcosScreen(onBack: () -> Unit) {
             try {
                 val text = FileAccess.readText(context, uri)
                 result = CcosModel.parseResult(text)
+                precheckFindings = dev.ninfenz.mobile.model.CcosPrecheck.check(result!!, task)
                 error = null
                 outcome = null
             } catch (e: Exception) {
@@ -221,6 +224,14 @@ fun CcosScreen(onBack: () -> Unit) {
                     NfStatusChip(r.status)
                 }
                 KeyValue("task_digest", r.taskDigest.take(24) + "…")
+                if (precheckFindings.isEmpty()) {
+                    Notice(stringResource(dev.ninfenz.mobile.R.string.ccos_precheck_pass), Tone.INFO)
+                } else {
+                    Notice(stringResource(dev.ninfenz.mobile.R.string.ccos_precheck_failed, precheckFindings.size), Tone.ERROR)
+                    for (finding in precheckFindings) {
+                        Notice(finding.field + "：" + finding.message, Tone.WARN)
+                    }
+                }
                 KeyValue("artifacts", r.artifacts.size.toString())
                 for (a in r.artifacts) {
                     Text(a.name + " · " + a.mime + " · " + a.bytes + " bytes", style = MaterialTheme.typography.bodySmall)

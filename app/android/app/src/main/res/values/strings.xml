@@ -334,6 +334,8 @@
     <string name="ccos_task_title">2 · 任务 %1$s</string>
     <string name="ccos_no_task">尚未加载 ccos-task。</string>
     <string name="ccos_result_title">3 · 结果 %1$s</string>
+    <string name="ccos_precheck_pass">导入前预检通过</string>
+    <string name="ccos_precheck_failed">导入前预检发现 %1$d 项问题</string>
     <string name="ccos_status">状态</string>
     <string name="ccos_review_done">已裁决：state=%1$s · reviewer=%2$s</string>
     <string name="ccos_review_title">4 · 人审（必填留痕）</string>
