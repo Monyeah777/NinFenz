@@ -34,7 +34,9 @@ class CcosSessionRestoreTest {
         compose.setContent { NfTheme { CcosScreen(onBack = {}) } }
         compose.waitUntil(5_000) {
             compose.onAllNodes(androidx.compose.ui.test.hasText("task-demo-0001", substring = true))
-                .fetchSemanticsNodes().isNotEmpty()
+                .fetchSemanticsNodes().isNotEmpty() &&
+                compose.onAllNodes(androidx.compose.ui.test.hasText("succeeded", substring = true))
+                    .fetchSemanticsNodes().isNotEmpty()
         }
         compose.onAllNodesWithText("task-demo-0001", substring = true)[0].assertExists()
         compose.onAllNodesWithText("succeeded", substring = true)[0].assertExists()
