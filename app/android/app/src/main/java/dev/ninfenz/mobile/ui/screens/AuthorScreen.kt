@@ -197,12 +197,28 @@ private fun ProtocolAuthorContent(
 ) {
     val protocol = artifacts.protocol
     val context = androidx.compose.ui.platform.LocalContext.current
+    val importPrefill = remember(project.id) {
+        runCatching {
+            val dir = java.io.File(java.io.File(java.io.File(context.filesDir, "projects"), project.id), "authoring")
+            val file = dir.listFiles()?.firstOrNull { it.isFile && it.name.startsWith("import-") } ?: return@runCatching emptyMap()
+            val raw = file.readText(Charsets.UTF_8)
+            val doc = dev.ninfenz.mobile.model.ImportModel.parse(
+                dev.ninfenz.mobile.core.J.parseObject(raw, dev.ninfenz.mobile.model.ImportModel.SCHEMA)
+            )
+            val blocks = dev.ninfenz.mobile.model.MarkdownBlocks.parse(doc.text.orEmpty())
+            doc.mappings.mapNotNull { mapping ->
+                blocks.getOrNull(mapping.fromIndex)?.text?.takeIf { it.isNotBlank() }?.let { text ->
+                    mapping.toId to text
+                }
+            }.toMap()
+        }.getOrDefault(emptyMap())
+    }
     data class Snapshot(val values: Map<String, String>, val enabled: Map<String, Boolean>)
     val draftStore = remember { ProtocolDraftStore(context.filesDir) }
     val draft = remember(project.id, artifacts.protocolJson) { draftStore.load(project.id) }
     var values by remember(artifacts.protocolJson) {
         mutableStateOf(protocol.fields.associate {
-            it.id to (draft?.values?.get(it.id) ?: it.defaultText ?: "")
+            it.id to (draft?.values?.get(it.id) ?: importPrefill[it.id] ?: it.defaultText ?: "")
         })
     }
     var enabled by remember(artifacts.protocolJson) {
