@@ -802,6 +802,7 @@
     <string name="project_detail_review">Review</string>
     <string name="project_detail_share">Share project file</string>
     <string name="project_detail_share_full">Share full project</string>
+    <string name="project_save_template">Save as template candidate</string>
     <string name="project_import_command">Import project package</string>
     <string name="project_import_missing_pack_title">Missing bound pack</string>
     <string name="project_detail_delete">Delete project</string>

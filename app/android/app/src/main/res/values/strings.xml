@@ -798,6 +798,7 @@
     <string name="project_detail_review">评审</string>
     <string name="project_detail_share">分享项目文件</string>
     <string name="project_detail_share_full">分享完整项目</string>
+    <string name="project_save_template">保存为模板候选</string>
     <string name="project_import_command">导入项目包</string>
     <string name="project_import_missing_pack_title">缺少绑定 Pack</string>
     <string name="project_detail_delete">删除项目</string>

@@ -1,5 +1,8 @@
 package dev.ninfenz.mobile.ui
 
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.put
+
 import dev.ninfenz.mobile.ui.theme.NfLayout
 import dev.ninfenz.mobile.ui.theme.NfMotion
 import dev.ninfenz.mobile.ui.theme.NfSpacing
@@ -689,6 +692,37 @@ is Detail.Import -> ImportScreen(
                                         }
                                         val intent = ShareExporter.shareFileIntent(context, zip, "application/zip", entry.project.title)
                                         ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.project_detail_share_full))
+                                    }
+                                },
+                                onSaveAsTemplate = {
+                                    scope.launch {
+                                        val pack = packs.packs.firstOrNull {
+                                            it.id == entry.project.refs.basePackId && it.version == entry.project.refs.basePackVersion
+                                        }
+                                        val specFile = pack?.let { java.io.File(it.dir, "spec/main.nfspec.json") }
+                                        val override = java.io.File(java.io.File(java.io.File(context.filesDir, "projects"), entry.project.id), "authoring/spec-override.json")
+                                        val source = if (override.isFile) override else specFile
+                                        val raw = source?.takeIf { it.isFile }?.readText(Charsets.UTF_8)
+                                        if (raw == null) {
+                                            android.widget.Toast.makeText(context, context.getString(dev.ninfenz.mobile.R.string.project_save_template), android.widget.Toast.LENGTH_LONG).show()
+                                            return@launch
+                                        }
+                                        val spec = runCatching {
+                                            kotlinx.serialization.json.Json.parseToJsonElement(raw).jsonObject
+                                        }.getOrNull()
+                                        if (spec == null) {
+                                            android.widget.Toast.makeText(context, context.getString(dev.ninfenz.mobile.R.string.project_save_template), android.widget.Toast.LENGTH_LONG).show()
+                                            return@launch
+                                        }
+                                        val check = safeCall("spec-validate", kotlinx.serialization.json.buildJsonObject {
+                                            put("spec", spec)
+                                        })
+                                        if (check.ok) {
+                                            val saved = dev.ninfenz.mobile.data.TemplateCandidateStore(context.filesDir).save(spec)
+                                            android.widget.Toast.makeText(context, context.getString(dev.ninfenz.mobile.R.string.project_save_template) + ": " + saved.name, android.widget.Toast.LENGTH_SHORT).show()
+                                        } else {
+                                            android.widget.Toast.makeText(context, check.error?.message ?: context.getString(dev.ninfenz.mobile.R.string.project_save_template), android.widget.Toast.LENGTH_LONG).show()
+                                        }
                                     }
                                 },
                                 onReview = { approve, reviewer, note ->

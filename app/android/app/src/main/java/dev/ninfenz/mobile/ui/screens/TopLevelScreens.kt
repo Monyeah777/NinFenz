@@ -808,6 +808,7 @@ fun ProjectDetailScreen(
     onReview: (Boolean, String, String) -> Unit = { _, _, _ -> },
     onShare: () -> Unit = {},
     onShareFull: () -> Unit = {},
+    onSaveAsTemplate: () -> Unit = {},
     onDelete: () -> Unit = {},
     onFlow: () -> Unit = {},
     compareCandidates: List<ProjectEntry> = emptyList()
@@ -1053,6 +1054,10 @@ fun ProjectDetailScreen(
                 NfListRow(stringResource(dev.ninfenz.mobile.R.string.project_detail_share_full), null, Icons.Filled.Search, "›") {
                     showMoreActions = false
                     onShareFull()
+                }
+                NfListRow(stringResource(dev.ninfenz.mobile.R.string.project_save_template), null, Icons.Filled.Search, "›") {
+                    showMoreActions = false
+                    onSaveAsTemplate()
                 }
                 HorizontalDivider(modifier = Modifier.padding(vertical = NfSpacing.s))
                 Text(stringResource(dev.ninfenz.mobile.R.string.project_actions_danger), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
