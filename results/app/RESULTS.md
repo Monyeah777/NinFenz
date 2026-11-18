@@ -25,7 +25,7 @@
 | 项 | 结果 |
 |---|---|
 | APK | app-debug.apk = 21,910,254 B；sha256 5ff5912ad2a32630d0d0e4869269eede1f19a5e870e9cff69d3e562a831e578a |
-| JVM 测试 | 391 条全绿（v1 基线 42 + v0.02 新增 349；含 Robolectric/Compose/Paparazzi） |
+| JVM 测试 | 392 条全绿（v1 基线 42 + v0.02 新增 350；含 Robolectric/Compose/Paparazzi） |
 | 构建 | ./gradlew :app:assembleDebug 成功；:app:testDebugUnitTest 388/388；lint 0 warnings |
 | i18n | 全部屏主要文案已资源化 + values-en；「我的」zh/en/跟随系统切换；动态取色开关；库/Pack 中心下拉刷新；节点删除 Snackbar 撤销 + 触觉；expanded 双栏（主列表+详情）；导航 Crossfade（NfMotion.MEDIUM_MS）；统一 loading/skeleton 组件；UI 中文硬编码守卫通过 |
 | 适配 | compact/medium/expanded 三档导航 + 9 组窗口尺寸语义矩阵 |
