@@ -102,6 +102,7 @@ fun ImportScreen(
     onAutoClipboardConsumed: () -> Unit = {},
     packs: List<PackEntry> = emptyList(),
     onCreateProjectFromDraft: (PackEntry, String, File) -> Unit = { _, _, _ -> },
+    onQuickProjectFromDraft: (PackEntry, String, File) -> Unit = onCreateProjectFromDraft,
     onProjectImported: (String, String, String) -> Unit = { _, _, _ -> }
 ) {
     val context = LocalContext.current
@@ -724,7 +725,7 @@ fun ImportScreen(
                                 store.saveDraft(base + ".mapping", mappingJson)
                                 savedName = file.name
                                 drafts = DraftLibrary.list(context.filesDir)
-                                onCreateProjectFromDraft(pack, title, file)
+                                onQuickProjectFromDraft(pack, title, file)
                             }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_quick_project)) }
                             Text(
                                 stringResource(dev.ninfenz.mobile.R.string.import_quick_project_note, pack.title),
