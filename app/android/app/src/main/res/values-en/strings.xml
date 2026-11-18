@@ -254,6 +254,7 @@
     <string name="import_templates_saved">%1$d saved candidates</string>
     <string name="import_template_share">Share</string>
     <string name="import_template_import">Import candidate</string>
+    <string name="import_prompt_pack">Share Prompt Pack</string>
     <string name="import_template_delete">Delete</string>
     <string name="import_low_confidence">Low confidence</string>
     <string name="import_source_label">Source: %1$s</string>

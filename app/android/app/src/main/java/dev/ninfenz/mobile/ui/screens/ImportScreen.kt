@@ -65,6 +65,7 @@ import dev.ninfenz.mobile.data.LibraryStore
 import dev.ninfenz.mobile.model.ImportDoc
 import dev.ninfenz.mobile.model.MarkdownBlocks
 import dev.ninfenz.mobile.model.MarkdownSlicer
+import dev.ninfenz.mobile.model.PromptPack
 import dev.ninfenz.mobile.model.TemplateCandidate
 import dev.ninfenz.mobile.model.ImportModel
 import dev.ninfenz.mobile.share.SharePayload
@@ -639,6 +640,13 @@ fun ImportScreen(
                                 )
                                 TextButton(onClick = { importPreviewText = current.text }) {
                                     Text(stringResource(dev.ninfenz.mobile.R.string.import_preview_ready))
+                                }
+                                TextButton(onClick = {
+                                    val pack = PromptPack.from(current.source.name, current.text.orEmpty(), slices)
+                                    val intent = ShareExporter.shareMarkdown(context, "nf-prompt-pack", pack)
+                                    ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.import_prompt_pack))
+                                }) {
+                                    Text(stringResource(dev.ninfenz.mobile.R.string.import_prompt_pack))
                                 }
                                 TextButton(onClick = {
                                     val spec = TemplateCandidate.fromSlices(current.source.name, slices) ?: return@TextButton
