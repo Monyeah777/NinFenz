@@ -142,6 +142,7 @@ fun ImportScreen(
     val sampleStore = remember { PromptSampleStore(context.filesDir) }
     var savedSamples by remember { mutableStateOf(sampleStore.list()) }
     var pendingDeleteSample by remember { mutableStateOf<File?>(null) }
+    var pendingTemplateUse by remember { mutableStateOf<File?>(null) }
     var pendingDeleteTemplate by remember { mutableStateOf<File?>(null) }
     var importPreviewText by remember { mutableStateOf<String?>(null) }
     var promptProfile by remember { mutableStateOf(PromptProfile.GENERIC) }
@@ -773,9 +774,7 @@ fun ImportScreen(
                                                 ShareExporter.launchChooser(context, intent, file.name)
                                             }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_template_share)) }
                                             TextButton(onClick = {
-                                                val pack = packs.firstOrNull() ?: return@TextButton
-                                                val spec = runCatching { file.readText(Charsets.UTF_8) }.getOrNull() ?: return@TextButton
-                                                onCreateProjectFromTemplate(pack, templateStore.titleOf(file), spec)
+                                                pendingTemplateUse = file
                                             }) {
                                                 Text(stringResource(dev.ninfenz.mobile.R.string.import_template_use))
                                             }
@@ -1245,6 +1244,30 @@ fun ImportScreen(
                 }
             }
         }
+    }
+
+    pendingTemplateUse?.let { file ->
+        val pack = packs.firstOrNull()
+        AlertDialog(
+            onDismissRequest = { pendingTemplateUse = null },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.import_template_use_title)) },
+            text = { Text(stringResource(dev.ninfenz.mobile.R.string.import_template_use_body)) },
+            confirmButton = {
+                TextButton(
+                    enabled = pack != null,
+                    onClick = {
+                        val spec = runCatching { file.readText(Charsets.UTF_8) }.getOrNull()
+                        if (pack != null && spec != null) {
+                            onCreateProjectFromTemplate(pack, templateStore.titleOf(file), spec)
+                        }
+                        pendingTemplateUse = null
+                    }
+                ) { Text(stringResource(dev.ninfenz.mobile.R.string.import_template_use)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { pendingTemplateUse = null }) { Text(stringResource(android.R.string.cancel)) }
+            }
+        )
     }
 
     pendingDeleteSample?.let { file ->

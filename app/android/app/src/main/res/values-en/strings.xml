@@ -260,6 +260,8 @@
     <string name="import_template_share">Share</string>
     <string name="import_template_import">Import candidate</string>
     <string name="import_template_use">Use as project</string>
+    <string name="import_template_use_title">Create a project from this template?</string>
+    <string name="import_template_use_body">This creates a project and applies the candidate spec as a project-local override.</string>
     <string name="import_prompt_pack">Share Prompt Pack</string>
     <string name="import_prompt_copy">Copy Prompt Pack</string>
     <string name="import_template_delete">Delete</string>
