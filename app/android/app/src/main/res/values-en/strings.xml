@@ -432,6 +432,7 @@
     <string name="preview_edit_note">Saved edits invalidate the current validation; run validate again.</string>
     <string name="preview_save">Save</string>
     <string name="preview_copy">Copy</string>
+    <string name="preview_undo">Undo</string>
     <string name="delivery_save_sample">Save sample</string>
     <string name="preview_block_up">Up</string>
     <string name="preview_block_down">Down</string>

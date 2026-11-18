@@ -135,6 +135,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
     var editingPreview by remember { mutableStateOf(false) }
     var showResetConfirm by remember { mutableStateOf(false) }
     var previewBlocks by remember { mutableStateOf<List<MarkdownBlock>>(emptyList()) }
+    var previewHistory by remember { mutableStateOf<List<List<MarkdownBlock>>>(emptyList()) }
     var report by remember { mutableStateOf<ValidateReport?>(null) }
     var manifestText by remember { mutableStateOf<String?>(null) }
     var exportedFile by remember { mutableStateOf<File?>(null) }
@@ -955,6 +956,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                             Row {
                                 TextButton(onClick = {
                                     previewBlocks = MarkdownBlocks.parse(md)
+                                    previewHistory = emptyList()
                                     editingPreview = true
                                 }) {
                                     Text(stringResource(dev.ninfenz.mobile.R.string.preview_edit))
@@ -1027,16 +1029,27 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                     modifier = Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(NfSpacing.s)
                 ) {
-                    Text(
-                        stringResource(dev.ninfenz.mobile.R.string.preview_edit_note),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            stringResource(dev.ninfenz.mobile.R.string.preview_edit_note),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.weight(1f)
+                        )
+                        TextButton(
+                            enabled = previewHistory.isNotEmpty(),
+                            onClick = {
+                                previewBlocks = previewHistory.last()
+                                previewHistory = previewHistory.dropLast(1)
+                            }
+                        ) { Text(stringResource(dev.ninfenz.mobile.R.string.preview_undo)) }
+                    }
                     previewBlocks.forEachIndexed { index, block ->
                         Text(block.kind, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         OutlinedTextField(
                             value = block.text,
                             onValueChange = { value ->
+                                previewHistory = previewHistory + listOf(previewBlocks)
                                 previewBlocks = previewBlocks.toMutableList().also { it[index] = block.copy(text = value) }
                             },
                             modifier = Modifier.fillMaxWidth(),
@@ -1046,6 +1059,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                             TextButton(
                                 enabled = index > 0,
                                 onClick = {
+                                    previewHistory = previewHistory + listOf(previewBlocks)
                                     previewBlocks = previewBlocks.toMutableList().also {
                                         val item = it.removeAt(index)
                                         it.add(index - 1, item)
@@ -1055,6 +1069,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                             TextButton(
                                 enabled = index < previewBlocks.lastIndex,
                                 onClick = {
+                                    previewHistory = previewHistory + listOf(previewBlocks)
                                     previewBlocks = previewBlocks.toMutableList().also {
                                         val item = it.removeAt(index)
                                         it.add(index + 1, item)
@@ -1062,11 +1077,13 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                 }
                             ) { Text(stringResource(dev.ninfenz.mobile.R.string.preview_block_down)) }
                             TextButton(onClick = {
+                                previewHistory = previewHistory + listOf(previewBlocks)
                                 previewBlocks = previewBlocks.filterIndexed { i, _ -> i != index }
                             }) { Text(stringResource(dev.ninfenz.mobile.R.string.preview_block_delete)) }
                         }
                     }
                     TextButton(onClick = {
+                        previewHistory = previewHistory + listOf(previewBlocks)
                         previewBlocks = previewBlocks + MarkdownBlock(
                             id = (previewBlocks.maxOfOrNull { it.id } ?: 0) + 1,
                             text = ""
