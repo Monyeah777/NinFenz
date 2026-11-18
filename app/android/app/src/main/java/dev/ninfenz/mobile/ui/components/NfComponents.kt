@@ -237,7 +237,8 @@ fun NfGradientHero(
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
-                        MaterialTheme.colorScheme.primaryContainer,
+                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.55f),
+                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
                         MaterialTheme.colorScheme.surface
                     )
                 ),
@@ -246,7 +247,12 @@ fun NfGradientHero(
             .padding(NfSpacing.xl)
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-            Text(title, style = MaterialTheme.typography.displaySmall)
+            Text(
+                title,
+                style = MaterialTheme.typography.displaySmall,
+                maxLines = 2,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+            )
             Text(subtitle, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             content?.invoke()
         }

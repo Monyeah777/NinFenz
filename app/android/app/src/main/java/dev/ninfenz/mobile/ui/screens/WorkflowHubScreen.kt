@@ -122,10 +122,11 @@ fun WorkflowHubScreen(
                                 }
                                 NfStatusChip(projectStatusLabel(entry.project))
                             }
-                            Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                                TextButton(onClick = { onOpenProject(entry) }) {
-                                    Text(stringResource(dev.ninfenz.mobile.R.string.flow_open_project))
-                                }
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
                                 TextButton(onClick = { if (nextAuthor) onAuthor(entry) else onDelivery(entry) }) {
                                     Text(
                                         stringResource(
@@ -134,6 +135,7 @@ fun WorkflowHubScreen(
                                         )
                                     )
                                 }
+                                Text("›", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                         }
                     }
