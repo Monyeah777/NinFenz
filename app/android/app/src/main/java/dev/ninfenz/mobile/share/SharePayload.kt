@@ -18,7 +18,7 @@ data class SharePayload(
     val count: Int get() = items.size
     val hasText: Boolean get() = processText != null || items.any { it.text != null }
 
-    fun summary(): String {
+    fun summary(itemLabel: String = "条目 " + count, processLabel: String? = processText?.let { "划词 " + it.length + " 字" }): String {
         val head = when (kind) {
             SharePayloadParser.KIND_SEND_MULTIPLE -> "SEND_MULTIPLE"
             SharePayloadParser.KIND_SEND -> "SEND"
@@ -29,9 +29,9 @@ data class SharePayload(
         val types = items.mapNotNull { it.mime }.distinct()
         val parts = mutableListOf<String>()
         parts.add(head)
-        parts.add("条目 " + count)
+        parts.add(itemLabel)
         if (types.isNotEmpty()) parts.add(types.joinToString("/"))
-        if (processText != null) parts.add("划词 " + processText.length + " 字")
+        processLabel?.let { parts.add(it) }
         return parts.joinToString(" · ")
     }
 }

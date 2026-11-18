@@ -98,7 +98,15 @@ private fun ReceiveCard(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(text = stringResource(dev.ninfenz.mobile.R.string.share_receive_title), style = MaterialTheme.typography.headlineSmall)
-        Text(text = payload.summary(), style = MaterialTheme.typography.bodyMedium)
+        Text(
+            text = payload.summary(
+                itemLabel = stringResource(dev.ninfenz.mobile.R.string.share_payload_items, payload.count),
+                processLabel = payload.processText?.let {
+                    stringResource(dev.ninfenz.mobile.R.string.share_payload_process, it.length)
+                }
+            ),
+            style = MaterialTheme.typography.bodyMedium
+        )
         if (payload.count == 0) {
             Text(
                 text = stringResource(dev.ninfenz.mobile.R.string.share_receive_empty, payload.kind),
