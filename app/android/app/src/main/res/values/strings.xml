@@ -338,6 +338,7 @@
     <string name="author_pack_missing_body">项目引用的 %1$s · %2$s 未安装或已移动。</string>
     <string name="author_back">返回</string>
     <string name="author_pack_label">Pack：%1$s · %2$s</string>
+    <string name="template_override_active">正在使用项目内的模板 spec 覆盖。</string>
     <string name="author_preview_note">本地编辑：条款/字段/管线/规格可保存到项目（撤销/重做 + 防抖自动保存）；校验走核心。</string>
     <string name="author_import_prefill">已从导入映射预填 %1$d 个字段。</string>
     <string name="author_go_deliver">去交付</string>
