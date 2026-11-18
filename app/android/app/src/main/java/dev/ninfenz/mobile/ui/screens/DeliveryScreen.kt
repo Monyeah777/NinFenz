@@ -574,6 +574,52 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                         }
                                         is StatusAdvanceResult.Failure -> statusNote = context.getString(dev.ninfenz.mobile.R.string.delivery_status_fail, advanced.message)
                                     }
+                                    val validatePayload = buildJsonObject {
+                                        put("markdown", md)
+                                        put("spec", current.specJson)
+                                        put("plan", raw)
+                                        put("level", "L1")
+                                    }
+                                    val validateResponse = safeCall("validate", validatePayload)
+                                    val validateResult = validateResponse.resultObject()
+                                    if (validateResponse.ok && validateResult != null) {
+                                        val second = safeCall("validate", validatePayload)
+                                        val secondResult = second.resultObject()
+                                        if (second.ok && secondResult != null) {
+                                            val offset = dev.ninfenz.mobile.data.ReproChecker.firstDifference(
+                                                validateResult.toString().toByteArray(Charsets.UTF_8),
+                                                secondResult.toString().toByteArray(Charsets.UTF_8)
+                                            )
+                                            validateRepro = if (offset == null) {
+                                                context.getString(dev.ninfenz.mobile.R.string.repro_stable)
+                                            } else {
+                                                context.getString(dev.ninfenz.mobile.R.string.repro_diff, offset)
+                                            }
+                                        }
+                                    }
+                                    if (validateResult != null) {
+                                        try {
+                                            report = ReportModel.parse(validateResult)
+                                        } catch (t: Throwable) {
+                                            error = CoreResponse.failure(
+                                                "NF-VAL-001",
+                                                context.getString(dev.ninfenz.mobile.R.string.delivery_report_failed, t.message ?: t.javaClass.simpleName),
+                                                context.getString(dev.ninfenz.mobile.R.string.delivery_report_failed_fix),
+                                                1
+                                            ).error
+                                        }
+                                    }
+                                    if (!validateResponse.ok) error = validateResponse.error
+                                    if (report?.verdict == "pass") {
+                                        when (val advanced = statusStore.advance(project, ProjectStatus.VALIDATED)) {
+                                            is StatusAdvanceResult.Advanced -> {
+                                                status = advanced.to
+                                                statusNote = context.getString(dev.ninfenz.mobile.R.string.delivery_status_note, statusText(context, advanced.to))
+                                                onStatusChanged()
+                                            }
+                                            is StatusAdvanceResult.Failure -> statusNote = context.getString(dev.ninfenz.mobile.R.string.delivery_status_fail, advanced.message)
+                                        }
+                                    }
                                 } else {
                                     error = response.error ?: CoreResponse.failure(
                                         "NF-ASM-002",
