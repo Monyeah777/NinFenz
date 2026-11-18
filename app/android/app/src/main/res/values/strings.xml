@@ -17,6 +17,7 @@
     <string name="nav_library">库</string>
     <string name="nav_flow">工作台</string>
     <string name="flow_hero_title">继续你的内容</string>
+    <string name="flow_header_summary">%1$d 个项目 · %2$d 个进行中</string>
     <string name="flow_hero_subtitle">创作、装配、交付，一条工作流</string>
     <string name="flow_filter_active">进行中</string>
     <string name="flow_filter_done">已交付</string>
@@ -133,6 +134,8 @@
         <item quantity="other">有 %1$d 个条目无法读取</item>
     </plurals>
     <string name="library_section_projects">最近项目</string>
+    <string name="library_header_title">内容库</string>
+    <string name="library_header_summary">%1$d 个项目 · %2$d 个 Pack</string>
     <string name="library_project_archived">已移到归档</string>
     <string name="library_project_undo">撤销</string>
     <string name="library_section_packs">已安装 Pack</string>

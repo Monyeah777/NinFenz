@@ -130,7 +130,7 @@ class ComposeSmokeTest {
                 )
             }
         }
-        compose.onNodeWithText("库").assertIsDisplayed()
+        compose.onNodeWithText("内容库").assertIsDisplayed()
         compose.onNodeWithText("还没有内容").assertIsDisplayed()
         compose.onNodeWithText("导入内容").performClick()
         assertTrue(imported)

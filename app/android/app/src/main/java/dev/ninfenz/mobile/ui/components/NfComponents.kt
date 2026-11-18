@@ -48,7 +48,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -221,41 +220,6 @@ fun NfStatusChip(label: String, color: Color = MaterialTheme.colorScheme.primary
             style = MaterialTheme.typography.labelMedium,
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
         )
-    }
-}
-
-@Composable
-fun NfGradientHero(
-    title: String,
-    subtitle: String,
-    modifier: Modifier = Modifier,
-    content: (@Composable () -> Unit)? = null
-) {
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.55f),
-                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
-                        MaterialTheme.colorScheme.surface
-                    )
-                ),
-                shape = MaterialTheme.shapes.extraLarge
-            )
-            .padding(NfSpacing.xl)
-    ) {
-        Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-            Text(
-                title,
-                style = MaterialTheme.typography.displaySmall,
-                maxLines = 2,
-                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
-            )
-            Text(subtitle, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            content?.invoke()
-        }
     }
 }
 

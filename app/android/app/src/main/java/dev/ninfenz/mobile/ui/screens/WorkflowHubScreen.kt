@@ -32,7 +32,7 @@ import dev.ninfenz.mobile.model.ProjectSorter
 import dev.ninfenz.mobile.model.ProjectSort
 import dev.ninfenz.mobile.ui.components.NfCard
 import dev.ninfenz.mobile.ui.components.NfEmptyState
-import dev.ninfenz.mobile.ui.components.NfGradientHero
+
 import dev.ninfenz.mobile.ui.components.NfSectionHeader
 import dev.ninfenz.mobile.ui.components.NfStatusChip
 import dev.ninfenz.mobile.ui.components.NfTopAppBar
@@ -71,11 +71,15 @@ fun WorkflowHubScreen(
             verticalArrangement = Arrangement.spacedBy(NfSpacing.l)
         ) {
             item {
-                NfGradientHero(
-                    title = stringResource(dev.ninfenz.mobile.R.string.flow_hero_title),
-                    subtitle = stringResource(dev.ninfenz.mobile.R.string.flow_hero_subtitle),
-                    modifier = Modifier.padding(horizontal = NfSpacing.page)
+                Column(
+                    modifier = Modifier.padding(horizontal = NfSpacing.page, vertical = NfSpacing.s),
+                    verticalArrangement = Arrangement.spacedBy(NfSpacing.s)
                 ) {
+                    Text(
+                        stringResource(dev.ninfenz.mobile.R.string.flow_header_summary, projects.size, projects.count { it.project.status != dev.ninfenz.mobile.model.ProjectStatus.EXPORTED && it.project.status != dev.ninfenz.mobile.model.ProjectStatus.REVIEWED }),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                     Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                         Button(onClick = onNewProject) { Text(stringResource(dev.ninfenz.mobile.R.string.create_action_new)) }
                         TextButton(onClick = onImport) { Text(stringResource(dev.ninfenz.mobile.R.string.library_import)) }

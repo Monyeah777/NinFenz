@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -79,7 +80,6 @@ import dev.ninfenz.mobile.share.ShareExporter
 import dev.ninfenz.mobile.ui.components.NfCard
 import dev.ninfenz.mobile.ui.components.SwipeableProjectCard
 import dev.ninfenz.mobile.ui.components.NfEmptyState
-import dev.ninfenz.mobile.ui.components.NfGradientHero
 import dev.ninfenz.mobile.ui.components.NfListRow
 import dev.ninfenz.mobile.ui.components.NfSectionHeader
 import dev.ninfenz.mobile.ui.components.NfStatusChip
@@ -103,6 +103,7 @@ fun LibraryHomeScreen(
     seeding: Boolean,
     onSeed: () -> Unit,
     onImport: () -> Unit,
+    onNewProject: () -> Unit = {},
     onOpenPack: (PackEntry) -> Unit,
     onOpenProject: (ProjectEntry) -> Unit,
     onOpenFlow: (ProjectEntry) -> Unit = {},
@@ -135,16 +136,47 @@ fun LibraryHomeScreen(
 
     Box(modifier = Modifier.fillMaxSize()) {
     Column(modifier = Modifier.fillMaxSize()) {
-        NfTopAppBar(
-            title = stringResource(dev.ninfenz.mobile.R.string.nav_library),
-            actions = {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .statusBarsPadding()
+                .padding(horizontal = NfSpacing.page, vertical = NfSpacing.s)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        stringResource(dev.ninfenz.mobile.R.string.library_header_title),
+                        style = MaterialTheme.typography.headlineSmall
+                    )
+                    Text(
+                        stringResource(dev.ninfenz.mobile.R.string.library_header_summary, projects.size, packs.size),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
                 TextButton(onClick = onCommands, modifier = Modifier.heightIn(min = 48.dp)) {
                     Text(stringResource(dev.ninfenz.mobile.R.string.action_commands))
                 }
                 IconButton(onClick = onSearch, modifier = Modifier.size(48.dp)) { Icon(Icons.Filled.Search, contentDescription = stringResource(dev.ninfenz.mobile.R.string.action_search)) }
                 IconButton(onClick = onSettings, modifier = Modifier.size(48.dp)) { Icon(Icons.Filled.Settings, contentDescription = stringResource(dev.ninfenz.mobile.R.string.action_settings)) }
             }
-        )
+            Row(
+                modifier = Modifier.padding(top = NfSpacing.s),
+                horizontalArrangement = Arrangement.spacedBy(NfSpacing.s),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Button(onClick = onNewProject, modifier = Modifier.heightIn(min = 48.dp)) {
+                    Text(stringResource(dev.ninfenz.mobile.R.string.create_action_new))
+                }
+                TextButton(onClick = onImport, modifier = Modifier.heightIn(min = 48.dp)) {
+                    Text(stringResource(dev.ninfenz.mobile.R.string.library_import))
+                }
+                TextButton(onClick = onSeed, enabled = !seeding, modifier = Modifier.heightIn(min = 48.dp)) {
+                    Text(if (seeding) stringResource(dev.ninfenz.mobile.R.string.library_loading_sample) else stringResource(dev.ninfenz.mobile.R.string.library_load_sample))
+                }
+            }
+            SeedLine(seedState)
+        }
         PullToRefreshBox(
             isRefreshing = refreshing,
             onRefresh = onRefresh,
@@ -155,21 +187,6 @@ fun LibraryHomeScreen(
             contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 96.dp),
             verticalArrangement = Arrangement.spacedBy(NfSpacing.l)
         ) {
-            item {
-                NfGradientHero(
-                    title = stringResource(dev.ninfenz.mobile.R.string.library_hero_title),
-                    subtitle = stringResource(dev.ninfenz.mobile.R.string.library_hero_subtitle),
-                    modifier = Modifier.padding(horizontal = NfSpacing.page)
-                ) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                        Button(onClick = onImport, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(dev.ninfenz.mobile.R.string.library_import)) }
-                        TextButton(onClick = onSeed, enabled = !seeding, modifier = Modifier.heightIn(min = 48.dp)) {
-                            Text(if (seeding) stringResource(dev.ninfenz.mobile.R.string.library_loading_sample) else stringResource(dev.ninfenz.mobile.R.string.library_load_sample))
-                        }
-                    }
-                    SeedLine(seedState)
-                }
-            }
             if (projects.isNotEmpty()) {
                 item {
                     LazyRow(

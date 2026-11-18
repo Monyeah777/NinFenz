@@ -39,7 +39,7 @@ class A11yComposeTest {
         compose.onNodeWithContentDescription("搜索").assertIsDisplayed().assertHeightIsAtLeast(48.dp)
         compose.onNodeWithContentDescription("设置").assertIsDisplayed().assertHeightIsAtLeast(48.dp)
         compose.onNodeWithText("导入内容").assertIsDisplayed().assertHeightIsAtLeast(48.dp)
-        compose.onNodeWithText("载入示例 Pack").assertIsDisplayed().assertHeightIsAtLeast(48.dp)
+        compose.onNodeWithText("载入示例").assertIsDisplayed().assertHeightIsAtLeast(48.dp)
     }
 
     @Test

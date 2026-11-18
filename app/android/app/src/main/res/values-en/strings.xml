@@ -17,6 +17,7 @@
     <string name="nav_library">Library</string>
     <string name="nav_flow">Flow</string>
     <string name="flow_hero_title">Keep creating</string>
+    <string name="flow_header_summary">%1$d projects · %2$d active</string>
     <string name="flow_hero_subtitle">Create, assemble, deliver in one flow</string>
     <string name="flow_filter_active">Active</string>
     <string name="flow_filter_done">Delivered</string>
@@ -133,6 +134,8 @@
         <item quantity="other">%1$d items could not be read</item>
     </plurals>
     <string name="library_section_projects">Recent projects</string>
+    <string name="library_header_title">Library</string>
+    <string name="library_header_summary">%1$d projects · %2$d packs</string>
     <string name="library_project_archived">Moved to archive</string>
     <string name="library_project_undo">Undo</string>
     <string name="library_section_packs">Installed packs</string>

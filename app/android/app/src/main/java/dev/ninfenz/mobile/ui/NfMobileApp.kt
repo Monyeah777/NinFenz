@@ -336,6 +336,7 @@ fun NfMobileApp(
                             seeding = seeding,
                             onSeed = ::runSeed,
                             onImport = { shell = shell.open(Detail.Import) },
+                            onNewProject = { shell = shell.open(Detail.NewProject) },
                             onOpenPack = { shell = shell.open(Detail.Pack(it.id, it.version)) },
                             onOpenProject = { shell = shell.open(Detail.Project(it.project.id)) },
                             onOpenFlow = { shell = shell.open(Detail.Flow(it.project.id)) },

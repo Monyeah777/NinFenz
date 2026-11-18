@@ -67,7 +67,7 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 
 | 入口 | 类型 | 要点 |
 |---|---|---|
-| 库 | 顶层 1 | 渐变 hero + 最近项目/已安装 Pack；FAB 导入；顶栏搜索/设置；空态可载入示例；扫描 library/packs 与 projects/*.nfproject.json |
+| 库 | 顶层 1 | 紧凑页头（标题/项目数/Pack 数/主操作）+ 最近项目/已安装 Pack；顶栏搜索/设置；空态可载入示例；扫描 library/packs 与 projects/*.nfproject.json |
 | 创作 | 顶层 2 | 项目列表 + 空态（项目向导 W2 接入）；点项目进详情 |
 | 交付 | 顶层 3 | 项目列表/装配入口 + Pack 更新 / CCOS 快捷入口 |
 | 我的 | 顶层 4 | 主题三态（跟随系统/浅色/深色）+ 存储/诊断/关于；中文默认 |
@@ -204,7 +204,7 @@ bash ../scripts/build_core_android.sh # 交叉编译 libnf_app_core.so（需要 
 - 真机 smoke：连接并授权后运行 `bash app/scripts/device_smoke.sh`（安装 debug APK、冷启动、前台 Activity、最近崩溃日志）；设 `CAPTURE_DIR=…` 额外拉取 `home.png` 与 `ui.xml`。
 
 - 2026-11-16 当前：`./gradlew :app:assembleDebug` 成功：app-debug.apk = 19,049,108 bytes，
-  sha256 = 00f0a1c8439934be6c07a2be5ab958dcc57ce464b4d9a20c1aee09ba0253fdd5（含双 ABI 原生库 + 9 个示例 Pack assets）。
+  sha256 = 57546d0be413a97a1266120062cdff8e76373ca7398aab2e17f4a1d5c2ccf288（含双 ABI 原生库 + 9 个示例 Pack assets）。
 - 仓库级门禁在 UTF-8 locale 下运行：`LANG=C.UTF-8 PYTHONUTF8=1 bash verify.sh --checks-only`（GBK 控制台会让 `git ls-files` 解码失败，触发 modeling 检查异常）。
 - `./gradlew :app:testDebugUnitTest` 全绿：384 条 JVM 单测（v1 42 + v0.02 342；含 Robolectric/Compose 语义/矩阵/英文 locale/a11y/大字号/对比度/Paparazzi 截图）。
 - `zipalign -c -P 16 -v 4 app-debug.apk` → Verification successful（native lib 16KB page 对齐）。
