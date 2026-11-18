@@ -247,8 +247,11 @@
     <string name="import_slice_preamble">Opening</string>
     <string name="import_slice_suggestion_chapter">Suggested template: chapters</string>
     <string name="import_slice_suggestion_free">Suggested template: freeform</string>
+    <string name="import_slice_meta">%1$d blocks · %2$d chars</string>
     <string name="import_save_template">Save template candidate</string>
     <string name="import_template_saved">Template candidate saved: %1$s</string>
+    <string name="import_templates_saved">%1$d saved candidates</string>
+    <string name="import_template_share">Share</string>
     <string name="import_low_confidence">Low confidence</string>
     <string name="import_source_label">Source: %1$s</string>
     <plurals name="import_structure">

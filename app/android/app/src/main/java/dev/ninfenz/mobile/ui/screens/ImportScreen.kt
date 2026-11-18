@@ -66,6 +66,7 @@ import dev.ninfenz.mobile.model.MarkdownSlicer
 import dev.ninfenz.mobile.model.TemplateCandidate
 import dev.ninfenz.mobile.model.ImportModel
 import dev.ninfenz.mobile.share.SharePayload
+import dev.ninfenz.mobile.share.ShareExporter
 import dev.ninfenz.mobile.share.SharedItem
 import dev.ninfenz.mobile.ui.components.NfCard
 import dev.ninfenz.mobile.ui.components.NfEmptyState
@@ -123,6 +124,8 @@ fun ImportScreen(
     var suggestNote by remember { mutableStateOf<String?>(null) }
     val importHistory = remember { ImportHistoryStore(context.filesDir) }
     val importDraftStore = remember { ImportDraftStore(context.filesDir) }
+    val templateStore = remember { TemplateCandidateStore(context.filesDir) }
+    var savedTemplates by remember { mutableStateOf(templateStore.list()) }
     var drafts by remember { mutableStateOf(DraftLibrary.list(context.filesDir)) }
     var recentImports by remember { mutableStateOf(importHistory.recent()) }
     var pendingDeleteDraft by remember { mutableStateOf<File?>(null) }
@@ -605,13 +608,34 @@ fun ImportScreen(
                                     scope.launch {
                                         val response = safeCall("spec-validate", buildJsonObject { put("spec", spec) })
                                         if (response.ok) {
-                                            val file = TemplateCandidateStore(context.filesDir).save(spec)
+                                            val file = templateStore.save(spec)
+                                            savedTemplates = templateStore.list()
                                             notice = context.getString(dev.ninfenz.mobile.R.string.import_template_saved, file.name)
                                         } else {
                                             error = response.error
                                         }
                                     }
                                 }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_save_template)) }
+                                if (savedTemplates.isNotEmpty()) {
+                                    Text(
+                                        stringResource(dev.ninfenz.mobile.R.string.import_templates_saved, savedTemplates.size),
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                    savedTemplates.take(3).forEach { file ->
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Text(
+                                                templateStore.titleOf(file),
+                                                style = MaterialTheme.typography.bodySmall,
+                                                modifier = Modifier.weight(1f)
+                                            )
+                                            TextButton(onClick = {
+                                                val intent = ShareExporter.shareFileIntent(context, file, "application/json", file.name)
+                                                ShareExporter.launchChooser(context, intent, file.name)
+                                            }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_template_share)) }
+                                        }
+                                    }
+                                }
                                 slices.take(6).forEach { slice ->
                                     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                                         Text(
@@ -619,7 +643,7 @@ fun ImportScreen(
                                             style = MaterialTheme.typography.titleMedium
                                         )
                                         Text(
-                                            slice.blocks.size.toString() + " 块 · " + slice.charCount + " 字",
+                                            stringResource(dev.ninfenz.mobile.R.string.import_slice_meta, slice.blocks.size, slice.charCount),
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
