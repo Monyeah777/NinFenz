@@ -196,6 +196,10 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
     }
     val restoredInputs = remember(project.id) { draftStore.load(project.id) }
     val restoredPlan = remember(project.id) { draftStore.loadPlan(project.id) }
+    val restoredMarkdown = remember(project.id) { draftStore.loadMarkdown(project.id) }
+    LaunchedEffect(restoredMarkdown) {
+        if (markdown == null && restoredMarkdown != null) markdown = restoredMarkdown
+    }
     var draftNote by remember(project.id) {
         mutableStateOf(if (restoredInputs.isNotEmpty()) context.getString(dev.ninfenz.mobile.R.string.delivery_draft_restored) else null)
     }
@@ -305,7 +309,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
     LaunchedEffect(project.id, plan, rawPlan, inputs) {
         if (plan != null) {
             delay(500)
-            withContext(Dispatchers.IO) { draftStore.save(project.id, inputs, rawPlan) }
+            withContext(Dispatchers.IO) { draftStore.save(project.id, inputs, rawPlan, markdown) }
         }
     }
     LaunchedEffect(project.id, restoredPlan) {
@@ -1130,6 +1134,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                 TextButton(onClick = {
                     markdown = MarkdownBlocks.render(previewBlocks)
                     previewDirty = false
+                    draftStore.save(project.id, inputs, rawPlan, markdown)
                     report = null
                     validateRepro = null
                     exportedFile = null

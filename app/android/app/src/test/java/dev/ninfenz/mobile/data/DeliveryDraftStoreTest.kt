@@ -30,6 +30,14 @@ class DeliveryDraftStoreTest {
     }
 
     @Test
+    fun savesAndLoadsMarkdown() {
+        val dir = Files.createTempDirectory("nf-delivery-md").toFile()
+        val store = DeliveryDraftStore(dir)
+        store.save("p", mapOf("SLT-01" to "alpha"), null, "# 标题\n\n正文")
+        assertEquals("# 标题\n\n正文", store.loadMarkdown("p"))
+    }
+
+    @Test
     fun emptySlotsDeleteDraftAndCorruptFileIsIgnored() {
         val dir = Files.createTempDirectory("nf-delivery-draft-2").toFile()
         val store = DeliveryDraftStore(dir)
