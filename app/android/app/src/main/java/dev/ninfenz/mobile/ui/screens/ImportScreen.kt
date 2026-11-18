@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
@@ -44,6 +45,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import dev.ninfenz.mobile.core.CoreError
 import dev.ninfenz.mobile.core.CoreResponse
 import dev.ninfenz.mobile.core.J
@@ -71,6 +73,7 @@ import dev.ninfenz.mobile.share.SharedItem
 import dev.ninfenz.mobile.ui.components.NfCard
 import dev.ninfenz.mobile.ui.components.NfEmptyState
 import dev.ninfenz.mobile.ui.components.NfErrorCard
+import dev.ninfenz.mobile.ui.components.MarkdownPreview
 import dev.ninfenz.mobile.ui.components.NfStepStrip
 import dev.ninfenz.mobile.ui.components.NfSectionHeader
 import dev.ninfenz.mobile.ui.components.NfStatusChip
@@ -128,6 +131,7 @@ fun ImportScreen(
     val templateStore = remember { TemplateCandidateStore(context.filesDir) }
     var savedTemplates by remember { mutableStateOf(templateStore.list()) }
     var pendingDeleteTemplate by remember { mutableStateOf<File?>(null) }
+    var importPreviewText by remember { mutableStateOf<String?>(null) }
     var drafts by remember { mutableStateOf(DraftLibrary.list(context.filesDir)) }
     var recentImports by remember { mutableStateOf(importHistory.recent()) }
     var pendingDeleteDraft by remember { mutableStateOf<File?>(null) }
@@ -605,6 +609,9 @@ fun ImportScreen(
                                     style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.primary
                                 )
+                                TextButton(onClick = { importPreviewText = current.text }) {
+                                    Text(stringResource(dev.ninfenz.mobile.R.string.import_preview_ready))
+                                }
                                 TextButton(onClick = {
                                     val spec = TemplateCandidate.fromSlices(current.source.name, slices) ?: return@TextButton
                                     scope.launch {
@@ -1078,6 +1085,22 @@ fun ImportScreen(
                 TextButton(onClick = { pendingDeleteDraft = null }) { Text(stringResource(android.R.string.cancel)) }
             }
         )
+    }
+
+    importPreviewText?.let { text ->
+        Dialog(onDismissRequest = { importPreviewText = null }) {
+            Surface(shape = MaterialTheme.shapes.large, tonalElevation = 6.dp) {
+                Column(modifier = Modifier.fillMaxWidth().padding(NfSpacing.l), verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(stringResource(dev.ninfenz.mobile.R.string.import_preview_ready), style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
+                        TextButton(onClick = { importPreviewText = null }) { Text(stringResource(dev.ninfenz.mobile.R.string.preview_close)) }
+                    }
+                    Column(modifier = Modifier.heightIn(max = 520.dp).verticalScroll(rememberScrollState())) {
+                        MarkdownPreview(text)
+                    }
+                }
+            }
+        }
     }
 
     pendingDeleteTemplate?.let { file ->

@@ -238,6 +238,7 @@
     <string name="import_empty_title">还没有导入内容</string>
     <string name="import_empty_body">从文件、剪贴板或示例内容开始；分享接收也会走这里。</string>
     <string name="import_preview">预览</string>
+    <string name="import_preview_ready">预览成稿</string>
     <string name="import_slices">自动切片</string>
     <string name="import_slices_summary">%1$d 个章节 · %2$d 个块</string>
     <string name="import_slice_preamble">开篇</string>
