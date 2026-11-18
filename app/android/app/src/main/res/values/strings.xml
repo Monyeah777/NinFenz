@@ -16,9 +16,7 @@
 
     <string name="nav_library">库</string>
     <string name="nav_flow">工作台</string>
-    <string name="flow_hero_title">继续你的内容</string>
     <string name="flow_header_summary">%1$d 个项目 · %2$d 个进行中</string>
-    <string name="flow_hero_subtitle">创作、装配、交付，一条工作流</string>
     <string name="flow_filter_active">进行中</string>
     <string name="flow_filter_done">已交付</string>
     <string name="flow_action_continue">继续</string>
@@ -117,8 +115,6 @@
     <string name="new_project_create">创建项目</string>
     <string name="new_project_cancel">取消</string>
 
-    <string name="library_hero_title">把内容写进协议</string>
-    <string name="library_hero_subtitle">本地处理 · 无网络 · 示例已就绪</string>
     <string name="library_import">导入内容</string>
     <string name="library_load_sample">载入示例</string>
     <string name="library_loading_sample">载入中…</string>

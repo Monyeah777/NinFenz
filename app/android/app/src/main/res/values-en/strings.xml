@@ -16,9 +16,7 @@
 
     <string name="nav_library">Library</string>
     <string name="nav_flow">Flow</string>
-    <string name="flow_hero_title">Keep creating</string>
     <string name="flow_header_summary">%1$d projects · %2$d active</string>
-    <string name="flow_hero_subtitle">Create, assemble, deliver in one flow</string>
     <string name="flow_filter_active">Active</string>
     <string name="flow_filter_done">Delivered</string>
     <string name="flow_action_continue">Continue</string>
@@ -117,8 +115,6 @@
     <string name="new_project_create">Create project</string>
     <string name="new_project_cancel">Cancel</string>
 
-    <string name="library_hero_title">Put content into a protocol</string>
-    <string name="library_hero_subtitle">Local-only · No network · Sample ready</string>
     <string name="library_import">Import</string>
     <string name="library_load_sample">Load sample</string>
     <string name="library_loading_sample">Loading…</string>
