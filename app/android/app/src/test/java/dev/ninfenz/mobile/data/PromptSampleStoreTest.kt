@@ -14,5 +14,7 @@ class PromptSampleStoreTest {
         assertTrue(file.isFile)
         assertEquals("# 标题", file.readText())
         assertEquals(listOf(file), store.list())
+        assertTrue(store.delete(file))
+        assertTrue(store.list().isEmpty())
     }
 }

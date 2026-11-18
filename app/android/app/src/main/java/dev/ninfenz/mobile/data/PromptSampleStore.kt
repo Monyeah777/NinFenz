@@ -12,6 +12,8 @@ class PromptSampleStore(private val filesDir: File) {
         return file
     }
 
+    fun delete(file: File): Boolean = runCatching { file.delete() }.getOrDefault(false)
+
     fun list(): List<File> {
         val dir = File(filesDir, "samples")
         if (!dir.isDirectory) return emptyList()

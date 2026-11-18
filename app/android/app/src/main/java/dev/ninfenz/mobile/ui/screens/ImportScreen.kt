@@ -135,6 +135,7 @@ fun ImportScreen(
     var savedTemplates by remember { mutableStateOf(templateStore.list()) }
     val sampleStore = remember { PromptSampleStore(context.filesDir) }
     var savedSamples by remember { mutableStateOf(sampleStore.list()) }
+    var pendingDeleteSample by remember { mutableStateOf<File?>(null) }
     var pendingDeleteTemplate by remember { mutableStateOf<File?>(null) }
     var importPreviewText by remember { mutableStateOf<String?>(null) }
     var drafts by remember { mutableStateOf(DraftLibrary.list(context.filesDir)) }
@@ -681,6 +682,9 @@ fun ImportScreen(
                                                 val intent = ShareExporter.shareMarkdown(context, "nf-sample", text)
                                                 ShareExporter.launchChooser(context, intent, file.name)
                                             }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_template_share)) }
+                                            TextButton(onClick = { pendingDeleteSample = file }) {
+                                                Text(stringResource(dev.ninfenz.mobile.R.string.import_sample_delete))
+                                            }
                                         }
                                     }
                                 }
@@ -1164,6 +1168,24 @@ fun ImportScreen(
                 }
             }
         }
+    }
+
+    pendingDeleteSample?.let { file ->
+        AlertDialog(
+            onDismissRequest = { pendingDeleteSample = null },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.import_sample_delete)) },
+            text = { Text(file.name) },
+            confirmButton = {
+                TextButton(onClick = {
+                    sampleStore.delete(file)
+                    savedSamples = sampleStore.list()
+                    pendingDeleteSample = null
+                }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_sample_delete)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { pendingDeleteSample = null }) { Text(stringResource(android.R.string.cancel)) }
+            }
+        )
     }
 
     pendingDeleteTemplate?.let { file ->
