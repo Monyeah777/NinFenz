@@ -331,6 +331,7 @@
     <string name="author_back">Back</string>
     <string name="author_pack_label">Pack: %1$s · %2$s</string>
     <string name="author_preview_note">Local editing: clauses/fields/pipeline/spec save to the project (undo/redo + debounced autosave); checks run in core.</string>
+    <string name="author_import_prefill">Prefilled %1$d fields from the import mapping.</string>
     <string name="author_go_deliver">Deliver</string>
     <string name="author_load_error">Failed to read project content: %1$s</string>
     <string name="author_load_fix">Reinstall the bound pack, or recreate the project</string>

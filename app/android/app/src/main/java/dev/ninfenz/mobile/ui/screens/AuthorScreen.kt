@@ -201,16 +201,7 @@ private fun ProtocolAuthorContent(
         runCatching {
             val dir = java.io.File(java.io.File(java.io.File(context.filesDir, "projects"), project.id), "authoring")
             val file = dir.listFiles()?.firstOrNull { it.isFile && it.name.startsWith("import-") } ?: return@runCatching emptyMap()
-            val raw = file.readText(Charsets.UTF_8)
-            val doc = dev.ninfenz.mobile.model.ImportModel.parse(
-                dev.ninfenz.mobile.core.J.parseObject(raw, dev.ninfenz.mobile.model.ImportModel.SCHEMA)
-            )
-            val blocks = dev.ninfenz.mobile.model.MarkdownBlocks.parse(doc.text.orEmpty())
-            doc.mappings.mapNotNull { mapping ->
-                blocks.getOrNull(mapping.fromIndex)?.text?.takeIf { it.isNotBlank() }?.let { text ->
-                    mapping.toId to text
-                }
-            }.toMap()
+            dev.ninfenz.mobile.data.ImportPrefill.fromJson(file.readText(Charsets.UTF_8))
         }.getOrDefault(emptyMap())
     }
     data class Snapshot(val values: Map<String, String>, val enabled: Map<String, Boolean>)
@@ -252,6 +243,14 @@ private fun ProtocolAuthorContent(
     }
 
     Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.m)) {
+        if (importPrefill.isNotEmpty()) {
+            Text(
+                stringResource(dev.ninfenz.mobile.R.string.author_import_prefill, importPrefill.size),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(horizontal = NfSpacing.page)
+            )
+        }
         NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.author_clauses, protocol.clauses.size))
         for (clause in protocol.clauses) {
             NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
