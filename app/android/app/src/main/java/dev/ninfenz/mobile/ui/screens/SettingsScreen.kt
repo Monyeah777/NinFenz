@@ -46,9 +46,11 @@ import dev.ninfenz.mobile.share.ShareExporter
 import java.io.File
 import java.util.Locale
 import dev.ninfenz.mobile.ui.components.CardBox
+import dev.ninfenz.mobile.ui.components.NfCollapsibleSection
 import dev.ninfenz.mobile.ui.components.KeyValue
 import dev.ninfenz.mobile.ui.components.MonoText
 import dev.ninfenz.mobile.ui.components.NfScaffold
+import dev.ninfenz.mobile.ui.theme.NfSpacing
 import dev.ninfenz.mobile.ui.components.Notice
 import dev.ninfenz.mobile.ui.components.Tone
 import kotlinx.coroutines.Dispatchers
@@ -205,15 +207,24 @@ fun SettingsScreen(
             }
         }
 
-        CardBox(title = stringResource(dev.ninfenz.mobile.R.string.settings_privacy)) {
-            Text(stringResource(dev.ninfenz.mobile.R.string.settings_privacy_1), style = MaterialTheme.typography.bodySmall)
-            Text(stringResource(dev.ninfenz.mobile.R.string.settings_privacy_2), style = MaterialTheme.typography.bodySmall)
-            Text(stringResource(dev.ninfenz.mobile.R.string.settings_privacy_3), style = MaterialTheme.typography.bodySmall)
-            Text(stringResource(dev.ninfenz.mobile.R.string.settings_privacy_4), style = MaterialTheme.typography.bodySmall)
-            Text(stringResource(dev.ninfenz.mobile.R.string.settings_privacy_5), style = MaterialTheme.typography.bodySmall)
+        NfCollapsibleSection(title = stringResource(dev.ninfenz.mobile.R.string.settings_privacy), initiallyExpanded = false) {
+            Column(
+                modifier = Modifier.padding(horizontal = NfSpacing.page),
+                verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(NfSpacing.xs)
+            ) {
+                Text(stringResource(dev.ninfenz.mobile.R.string.settings_privacy_1), style = MaterialTheme.typography.bodySmall)
+                Text(stringResource(dev.ninfenz.mobile.R.string.settings_privacy_2), style = MaterialTheme.typography.bodySmall)
+                Text(stringResource(dev.ninfenz.mobile.R.string.settings_privacy_3), style = MaterialTheme.typography.bodySmall)
+                Text(stringResource(dev.ninfenz.mobile.R.string.settings_privacy_4), style = MaterialTheme.typography.bodySmall)
+                Text(stringResource(dev.ninfenz.mobile.R.string.settings_privacy_5), style = MaterialTheme.typography.bodySmall)
+            }
         }
 
-        CardBox(title = stringResource(dev.ninfenz.mobile.R.string.settings_diag_info)) {
+        NfCollapsibleSection(title = stringResource(dev.ninfenz.mobile.R.string.settings_diag_info), initiallyExpanded = false) {
+            Column(
+                modifier = Modifier.padding(horizontal = NfSpacing.page),
+                verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(NfSpacing.s)
+            ) {
             MonoText(diagnosticsText)
             Button(onClick = {
                 val manager = context.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
@@ -230,6 +241,7 @@ fun SettingsScreen(
                     backupMessage = context.getString(dev.ninfenz.mobile.R.string.settings_diagnostics_done, humanBytes(created.bytes))
                 }
             }) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_diagnostics_export)) }
+            }
         }
 
         if (crash != null) {
