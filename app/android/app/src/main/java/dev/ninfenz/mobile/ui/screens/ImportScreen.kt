@@ -500,7 +500,15 @@ fun ImportScreen(
                         return@launch
                     }
                     val file = FileAccess.copyToCache(context, uri, meta.name)
-                    importFromFile(file, "saf", meta.name, meta.mime, meta.size)
+                    if (meta.name.orEmpty().lowercase().endsWith(".csv") || (meta.mime ?: "").contains("csv", ignoreCase = true)) {
+                        val markdown = CsvTable.toMarkdown(file.readText(Charsets.UTF_8))
+                        val converted = File(File(context.cacheDir, "imports").apply { mkdirs() }, "csv-table.md")
+                        converted.writeText(markdown, Charsets.UTF_8)
+                        importFromFile(converted, "saf", "csv-table.md", "text/markdown", markdown.toByteArray(Charsets.UTF_8).size.toLong())
+                        file.delete()
+                    } else {
+                        importFromFile(file, "saf", meta.name, meta.mime, meta.size)
+                    }
                 } catch (e: Exception) {
                     error = CoreResponse.failure(
                         "NF-E-004",
