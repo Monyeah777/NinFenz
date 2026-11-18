@@ -111,6 +111,7 @@ fun AuthorScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onAssem
     }
 
     var tab by rememberSaveable { mutableIntStateOf(0) }
+    var saveAndDeliverRequest by remember { mutableIntStateOf(0) }
     var artifacts by remember { mutableStateOf<AuthorArtifacts?>(null) }
     var loadError by remember { mutableStateOf<String?>(null) }
     var loading by remember { mutableStateOf(true) }
@@ -131,7 +132,13 @@ fun AuthorScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onAssem
             title = project.title,
             onBack = onBack,
             actions = {
-                TextButton(onClick = onAssembly, modifier = Modifier.heightIn(min = 48.dp)) {
+                TextButton(
+                    onClick = {
+                        if (AuthorTab.entries[tab] == AuthorTab.PROTOCOL) saveAndDeliverRequest++
+                        else onAssembly()
+                    },
+                    modifier = Modifier.heightIn(min = 48.dp)
+                ) {
                     Text(stringResource(dev.ninfenz.mobile.R.string.author_go_deliver))
                 }
             }
@@ -179,7 +186,7 @@ fun AuthorScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onAssem
             val current = artifacts
             if (current != null) {
                 when (AuthorTab.entries[tab]) {
-                    AuthorTab.PROTOCOL -> ProtocolAuthorContent(current, project, pack, onSaved)
+                    AuthorTab.PROTOCOL -> ProtocolAuthorContent(current, project, pack, onSaved, saveAndDeliverRequest, onAssembly)
                     AuthorTab.GRAPH -> GraphAuthorContent(current, project, onSaved)
                     AuthorTab.SPEC -> SpecAuthorContent(current, project, onSaved)
                 }
@@ -193,7 +200,9 @@ private fun ProtocolAuthorContent(
     artifacts: AuthorArtifacts,
     project: Project,
     pack: PackEntry,
-    onSaved: () -> Unit
+    onSaved: () -> Unit,
+    deliverRequest: Int,
+    onAssembly: () -> Unit
 ) {
     val protocol = artifacts.protocol
     val context = androidx.compose.ui.platform.LocalContext.current
@@ -229,6 +238,30 @@ private fun ProtocolAuthorContent(
     var saveError by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
     val store = remember { AuthorOverlayStore(context.filesDir) }
+
+    fun save(then: () -> Unit = {}) {
+        if (saving) return
+        saving = true
+        saveMessage = null
+        saveError = null
+        scope.launch {
+            val result = store.save(project, pack, enabled, values)
+            when (result) {
+                is SaveOverlayResult.Saved -> {
+                    draftStore.clear(project.id)
+                    saveMessage = context.getString(dev.ninfenz.mobile.R.string.author_saved, result.status.wire, result.overlaySha256.take(12))
+                    onSaved()
+                    then()
+                }
+                is SaveOverlayResult.Failure -> saveError = "[" + result.code + "] " + result.message + context.getString(dev.ninfenz.mobile.R.string.error_fix_suffix) + result.fix
+            }
+            saving = false
+        }
+    }
+
+    LaunchedEffect(deliverRequest) {
+        if (deliverRequest > 0) save { onAssembly() }
+    }
 
     fun pushUndo() {
         undo = UndoStack.push(undo, Snapshot(values, enabled))
@@ -309,23 +342,7 @@ private fun ProtocolAuthorContent(
             ) { Text(stringResource(dev.ninfenz.mobile.R.string.author_undo)) }
             Button(
                 enabled = !saving,
-                onClick = {
-                    saving = true
-                    saveMessage = null
-                    saveError = null
-                    scope.launch {
-                        val result = store.save(project, pack, enabled, values)
-                        when (result) {
-                            is SaveOverlayResult.Saved -> {
-                                draftStore.clear(project.id)
-                                saveMessage = context.getString(dev.ninfenz.mobile.R.string.author_saved, result.status.wire, result.overlaySha256.take(12))
-                                onSaved()
-                            }
-                            is SaveOverlayResult.Failure -> saveError = "[" + result.code + "] " + result.message + context.getString(dev.ninfenz.mobile.R.string.error_fix_suffix) + result.fix
-                        }
-                        saving = false
-                    }
-                }
+                onClick = { save() }
             ) { Text(if (saving) stringResource(dev.ninfenz.mobile.R.string.author_saving) else stringResource(dev.ninfenz.mobile.R.string.author_save)) }
         }
         saveMessage?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
