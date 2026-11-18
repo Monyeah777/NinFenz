@@ -60,6 +60,8 @@ import dev.ninfenz.mobile.data.ImportDraftStore
 import dev.ninfenz.mobile.data.ImportHistoryStore
 import dev.ninfenz.mobile.data.LibraryStore
 import dev.ninfenz.mobile.model.ImportDoc
+import dev.ninfenz.mobile.model.MarkdownBlocks
+import dev.ninfenz.mobile.model.MarkdownSlicer
 import dev.ninfenz.mobile.model.ImportModel
 import dev.ninfenz.mobile.share.SharePayload
 import dev.ninfenz.mobile.share.SharedItem
@@ -570,6 +572,48 @@ fun ImportScreen(
                             current.textDigest?.let { Text(stringResource(dev.ninfenz.mobile.R.string.import_digest, it.take(16)), style = MaterialTheme.typography.bodySmall) }
                             for (note in current.reviewNotes()) {
                                 Text(note, style = MaterialTheme.typography.bodySmall, color = if (current.lowConfidence) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                        }
+                    }
+                }
+                val slices = current.text?.let { MarkdownSlicer.slice(MarkdownBlocks.parse(it)) } ?: emptyList()
+                if (slices.isNotEmpty()) {
+                    item {
+                        NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.import_slices))
+                    }
+                    item {
+                        NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
+                            Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+                                Text(
+                                    stringResource(
+                                        dev.ninfenz.mobile.R.string.import_slices_summary,
+                                        slices.count { it.heading != null },
+                                        slices.sumOf { it.blocks.size }
+                                    ),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Text(
+                                    stringResource(if (slices.count { it.heading != null } >= 2) dev.ninfenz.mobile.R.string.import_slice_suggestion_chapter else dev.ninfenz.mobile.R.string.import_slice_suggestion_free),
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                                slices.take(6).forEach { slice ->
+                                    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                                        Text(
+                                            slice.heading ?: stringResource(dev.ninfenz.mobile.R.string.import_slice_preamble),
+                                            style = MaterialTheme.typography.titleMedium
+                                        )
+                                        Text(
+                                            slice.blocks.size.toString() + " 块 · " + slice.charCount + " 字",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                        slice.blocks.firstOrNull()?.text?.lineSequence()?.firstOrNull()?.take(80)?.let {
+                                            Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        }
+                                    }
+                                }
                             }
                         }
                     }

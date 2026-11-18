@@ -236,6 +236,11 @@
     <string name="import_empty_title">Nothing imported yet</string>
     <string name="import_empty_body">Start from Files, clipboard or sample content; share intake also lands here.</string>
     <string name="import_preview">Preview</string>
+    <string name="import_slices">Auto slices</string>
+    <string name="import_slices_summary">%1$d sections · %2$d blocks</string>
+    <string name="import_slice_preamble">Opening</string>
+    <string name="import_slice_suggestion_chapter">Suggested template: chapters</string>
+    <string name="import_slice_suggestion_free">Suggested template: freeform</string>
     <string name="import_low_confidence">Low confidence</string>
     <string name="import_source_label">Source: %1$s</string>
     <plurals name="import_structure">
