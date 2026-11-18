@@ -1056,6 +1056,16 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                     error = null
                     batchChunks = emptyList()
                     batchNote = null
+                    previewBlocks = emptyList()
+                    previewHistory = emptyList()
+                    previewRedo = emptyList()
+                    previewDirty = false
+                    needsRevalidate = false
+                    draftNote = null
+                    reproOk = null
+                    reproText = null
+                    validateRepro = null
+                    statusNote = null
                     draftStore.clear(project.id)
                     showResetConfirm = false
                 }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_reset)) }
