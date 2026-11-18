@@ -521,25 +521,6 @@ is Detail.Import -> ImportScreen(
                             )
                         }
                     }
-                    is Detail.Flow -> {
-                        val entry = projects.firstOrNull { it.project.id == detail.id }
-                        if (entry == null) {
-                            NfEmptyState(
-                                icon = Icons.Filled.Info,
-                                title = stringResource(dev.ninfenz.mobile.R.string.project_missing_title),
-                                message = stringResource(dev.ninfenz.mobile.R.string.project_missing_body),
-                                actionLabel = stringResource(dev.ninfenz.mobile.R.string.back_to_library),
-                                onAction = { shell = shell.back() ?: shell }
-                            )
-                        } else {
-                            ProjectFlowScreen(
-                                project = entry.project,
-                                onBack = { shell = shell.back() ?: shell },
-                                onAuthor = { shell = shell.open(Detail.Author(entry.project.id)) },
-                                onDelivery = { shell = shell.open(Detail.Delivery(entry.project.id)) }
-                            )
-                        }
-                    }
                     is Detail.Assembly -> AssemblyScreen(onBack = { shell = shell.back() ?: shell })
                     is Detail.PackCenter -> PackCenterScreen(
                         packs = packs.packs,

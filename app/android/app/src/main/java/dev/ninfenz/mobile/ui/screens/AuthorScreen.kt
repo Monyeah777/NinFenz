@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -125,7 +126,15 @@ fun AuthorScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onAssem
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        NfTopAppBar(title = project.title, onBack = onBack)
+        NfTopAppBar(
+            title = project.title,
+            onBack = onBack,
+            actions = {
+                TextButton(onClick = onAssembly, modifier = Modifier.heightIn(min = 48.dp)) {
+                    Text(stringResource(dev.ninfenz.mobile.R.string.author_go_deliver))
+                }
+            }
+        )
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -133,27 +142,25 @@ fun AuthorScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onAssem
                 .padding(bottom = 96.dp),
             verticalArrangement = Arrangement.spacedBy(NfSpacing.m)
         ) {
-            NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
-                Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(project.title, style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
-                        NfStatusChip(projectStatusLabel(project))
-                    }
-                    Text(
-                        stringResource(dev.ninfenz.mobile.R.string.author_pack_label, project.refs.basePackId, project.refs.basePackVersion),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Text(
-                        stringResource(dev.ninfenz.mobile.R.string.author_preview_note),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                        Button(onClick = onAssembly) { Text(stringResource(dev.ninfenz.mobile.R.string.author_go_deliver)) }
-                    }
-                }
+            Row(
+                modifier = Modifier.padding(horizontal = NfSpacing.page),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                NfStatusChip(projectStatusLabel(project))
+                Text(
+                    stringResource(dev.ninfenz.mobile.R.string.author_pack_label, project.refs.basePackId, project.refs.basePackVersion),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.weight(1f),
+                    textAlign = androidx.compose.ui.text.style.TextAlign.End
+                )
             }
+            Text(
+                stringResource(dev.ninfenz.mobile.R.string.author_preview_note),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = NfSpacing.page)
+            )
             TabRow(selectedTabIndex = tab) {
                 AuthorTab.entries.forEachIndexed { index, item ->
                     Tab(selected = tab == index, onClick = { tab = index }, text = { Text(stringResource(item.labelRes)) })

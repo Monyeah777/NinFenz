@@ -200,6 +200,10 @@
 
     <string name="import_title">导入</string>
     <string name="import_source">选择来源</string>
+    <string name="import_step_source">来源</string>
+    <string name="import_step_preview">预览</string>
+    <string name="import_step_mapping">映射</string>
+    <string name="import_step_draft">草稿</string>
     <string name="import_pick_file">选择文件</string>
     <string name="import_clipboard">剪贴板</string>
     <string name="import_sample">示例内容</string>

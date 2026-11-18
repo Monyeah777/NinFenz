@@ -59,6 +59,7 @@ import dev.ninfenz.mobile.share.SharedItem
 import dev.ninfenz.mobile.ui.components.NfCard
 import dev.ninfenz.mobile.ui.components.NfEmptyState
 import dev.ninfenz.mobile.ui.components.NfErrorCard
+import dev.ninfenz.mobile.ui.components.NfStepStrip
 import dev.ninfenz.mobile.ui.components.NfSectionHeader
 import dev.ninfenz.mobile.ui.components.NfStatusChip
 import dev.ninfenz.mobile.ui.components.NfTopAppBar
@@ -390,8 +391,22 @@ fun ImportScreen(
         }
     }
 
+    val importStep = when {
+        savedName != null -> 3
+        doc != null -> 2
+        else -> 0
+    }
     Column(modifier = Modifier.fillMaxSize()) {
         NfTopAppBar(title = stringResource(dev.ninfenz.mobile.R.string.import_title), onBack = onBack)
+        NfStepStrip(
+            steps = listOf(
+                stringResource(dev.ninfenz.mobile.R.string.import_step_source),
+                stringResource(dev.ninfenz.mobile.R.string.import_step_preview),
+                stringResource(dev.ninfenz.mobile.R.string.import_step_mapping),
+                stringResource(dev.ninfenz.mobile.R.string.import_step_draft)
+            ),
+            current = importStep
+        )
         LazyColumn(
             contentPadding = androidx.compose.foundation.layout.PaddingValues(NfSpacing.page),
             verticalArrangement = Arrangement.spacedBy(NfSpacing.m)

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -79,6 +80,7 @@ import dev.ninfenz.mobile.ui.components.NfExpandableText
 import dev.ninfenz.mobile.ui.components.NfErrorCard
 import dev.ninfenz.mobile.ui.components.NfLoadingState
 import dev.ninfenz.mobile.ui.components.NfSectionHeader
+import dev.ninfenz.mobile.ui.components.NfStepStrip
 import dev.ninfenz.mobile.ui.components.NfStatusChip
 import dev.ninfenz.mobile.ui.components.NfTopAppBar
 import dev.ninfenz.mobile.ui.components.MarkdownPreview
@@ -312,8 +314,23 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
         return
     }
 
+    val step = when {
+        exportedFile != null -> 3
+        markdown != null || report != null -> 2
+        plan != null -> 1
+        else -> 0
+    }
     Column(modifier = Modifier.fillMaxSize()) {
         NfTopAppBar(title = stringResource(dev.ninfenz.mobile.R.string.delivery_title, project.title), onBack = onBack)
+        NfStepStrip(
+            steps = listOf(
+                stringResource(dev.ninfenz.mobile.R.string.delivery_plan),
+                stringResource(dev.ninfenz.mobile.R.string.delivery_slots),
+                stringResource(dev.ninfenz.mobile.R.string.delivery_assemble_validate),
+                stringResource(dev.ninfenz.mobile.R.string.delivery_export_section)
+            ),
+            current = step
+        )
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -321,19 +338,21 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                 .padding(bottom = 96.dp),
             verticalArrangement = Arrangement.spacedBy(NfSpacing.m)
         ) {
-            NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
-                Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(project.title, style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
-                        NfStatusChip(statusText(context, status))
-                    }
+            Column(
+                modifier = Modifier.padding(horizontal = NfSpacing.page),
+                verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    NfStatusChip(statusText(context, status))
                     Text(
                         stringResource(dev.ninfenz.mobile.R.string.delivery_pack_label, project.refs.basePackId, project.refs.basePackVersion),
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.weight(1f),
+                        textAlign = androidx.compose.ui.text.style.TextAlign.End
                     )
-                    Text(stringResource(dev.ninfenz.mobile.R.string.delivery_note), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
+                Text(stringResource(dev.ninfenz.mobile.R.string.delivery_note), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             statusNote?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
             if (loading) NfLoadingState()

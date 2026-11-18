@@ -2,6 +2,7 @@ package dev.ninfenz.mobile.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.animation.animateContentSize
@@ -78,6 +79,37 @@ fun NfTopAppBar(
         actions = actions,
         colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
     )
+}
+
+/** 结构型步骤条：用短标签表达当前处于流程第几步，横向可滚动。 */
+@Composable
+fun NfStepStrip(steps: List<String>, current: Int, modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .horizontalScroll(rememberScrollState())
+            .padding(horizontal = NfLayout.pageCompact, vertical = NfSpacing.s),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)
+    ) {
+        steps.forEachIndexed { index, label ->
+            val active = index == current
+            Surface(
+                shape = MaterialTheme.shapes.large,
+                color = if (active) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
+                contentColor = if (active) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
+            ) {
+                Text(
+                    label,
+                    style = MaterialTheme.typography.labelMedium,
+                    modifier = Modifier.padding(horizontal = NfSpacing.s, vertical = 6.dp)
+                )
+            }
+            if (index < steps.lastIndex) {
+                Text("›", color = if (index < current) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline)
+            }
+        }
+    }
 }
 
 @Composable

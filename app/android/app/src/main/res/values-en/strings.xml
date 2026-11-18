@@ -200,6 +200,10 @@
 
     <string name="import_title">Import</string>
     <string name="import_source">Choose a source</string>
+    <string name="import_step_source">Source</string>
+    <string name="import_step_preview">Preview</string>
+    <string name="import_step_mapping">Mapping</string>
+    <string name="import_step_draft">Draft</string>
     <string name="import_pick_file">Choose file</string>
     <string name="import_clipboard">Clipboard</string>
     <string name="import_sample">Sample content</string>
