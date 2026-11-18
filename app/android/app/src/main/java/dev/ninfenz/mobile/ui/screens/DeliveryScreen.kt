@@ -139,6 +139,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
     var previewRedo by remember { mutableStateOf<List<List<MarkdownBlock>>>(emptyList()) }
     var previewDirty by remember { mutableStateOf(false) }
     var showDiscardPreview by remember { mutableStateOf(false) }
+    var assignBlockText by remember { mutableStateOf<String?>(null) }
     var report by remember { mutableStateOf<ValidateReport?>(null) }
     var manifestText by remember { mutableStateOf<String?>(null) }
     var exportedFile by remember { mutableStateOf<File?>(null) }
@@ -1029,6 +1030,28 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
         )
     }
 
+    assignBlockText?.let { text ->
+        AlertDialog(
+            onDismissRequest = { assignBlockText = null },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.preview_assign_title)) },
+            text = {
+                Column(modifier = Modifier.heightIn(max = 360.dp).verticalScroll(rememberScrollState())) {
+                    specMeta?.slots?.forEach { slot ->
+                        TextButton(onClick = {
+                            inputs = inputs + (slot.id to text)
+                            assignBlockText = null
+                        }) {
+                            Text(slot.id + " · " + slot.name)
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { assignBlockText = null }) { Text(stringResource(android.R.string.cancel)) }
+            }
+        )
+    }
+
     if (showDiscardPreview) {
         AlertDialog(
             onDismissRequest = { showDiscardPreview = false },
@@ -1119,6 +1142,9 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                 previewHistory = previewHistory + listOf(previewBlocks)
                                 previewBlocks = previewBlocks.filterIndexed { i, _ -> i != index }
                             }) { Text(stringResource(dev.ninfenz.mobile.R.string.preview_block_delete)) }
+                            TextButton(onClick = { assignBlockText = block.text }) {
+                                Text(stringResource(dev.ninfenz.mobile.R.string.preview_assign_slot))
+                            }
                         }
                     }
                     TextButton(onClick = {

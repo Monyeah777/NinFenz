@@ -430,6 +430,8 @@
     <string name="preview_copy">复制</string>
     <string name="preview_undo">撤销</string>
     <string name="preview_redo">重做</string>
+    <string name="preview_assign_slot">填入槽位</string>
+    <string name="preview_assign_title">用当前块填入槽位</string>
     <string name="preview_discard_title">放弃块编辑？</string>
     <string name="preview_discard_body">未保存的块修改会丢失。先保存再关闭可保留修改。</string>
     <string name="preview_discard">放弃</string>
