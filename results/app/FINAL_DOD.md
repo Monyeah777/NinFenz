@@ -22,7 +22,7 @@
 | 草稿→项目 | partial | 草稿可创建项目壳并把草稿 JSON 作为 authoring 来源副本；导入内容尚未映射进协议字段（OPEN-DRAFT-PROJECT 收窄） |
 | app/gates v0.02 UX 检查 | pass | 7/7 gate PASS、FAIL=0；GATES/SELF_AUDIT 已更新（本提交） |
 
-**收口实测（2026-11-17 更新）**：app/gates 7/7 PASS、FAIL=0；verify.sh --checks-only PASS=107 WARN=2 FAIL=0；JVM 403/403；APK 22,050,279 B sha256 bd1fc40b…；Release unsigned 15,737,909 B sha256 1ea2c1e5…（16KB 对齐通过）。
+**收口实测（2026-11-17 更新）**：app/gates 7/7 PASS、FAIL=0；verify.sh --checks-only PASS=107 WARN=2 FAIL=0；JVM 403/403；APK 21,167,893 B sha256 bb085313…；Release unsigned 15,754,805 B sha256 cc1044bf…（16KB 对齐通过）。
 
 **发布面：仍为 OPEN-EXTERNAL**（签名/公证/真机矩阵/Play 数据安全），不得据此宣称可发布。
 
@@ -33,7 +33,7 @@
 - APP 门禁 `python app/gates/run_gates.py` → **7/7 门 FAIL=0**（QA0–QA6 全部 PASS；无 OPEN 阻塞），`P0=0`；
 - 自审计 S0–S15 → **covered 14 / gap 0 / open 2**，全部 open 带 owner+next（P1=2）；
 - 核心 `cargo test` **198 passed / 0 failed**；控制面 + 契约 + 安全 + golden + E2E：**pytest 498 passed / 0 failed / 0 skipped / 0 xfailed（126s）**；
-- 构建实测：Android debug APK 22,050,279 B、Release unsigned 15,737,909 B（16KB 对齐通过）；Windows MSI 为历史证据（66,573,406 B）。
+- 构建实测：Android debug APK 21,167,893 B、Release unsigned 15,754,805 B（16KB 对齐通过）；Windows MSI 为历史证据（66,573,406 B）。
 - 导出面：**md/zip/json/docx/skill 已实现**（core）；Android 另接 **EPUB/PDF/HTML 本地导出**（PDF 为 WebView HTML/CSS + 基础文本回退、EPUB 轻量 EPUB3、HTML 单文件），并各自带结构自检；复杂 CSS/EPUBCheck 级语义仍 OPEN。
 
 **发布面：未完成（OPEN-EXTERNAL）**——签名/公证/真机矩阵/Play 数据安全未执行，不得宣称「可发布」。
@@ -83,7 +83,7 @@
 | Python 控制面/契约/安全/golden/E2E | **498 passed / 0 failed / 0 skipped / 0 xfailed（126s）** | `python -m pytest app/tests -q` |
 | Android JVM | 42 条（含自适应分档 4 条） | `cd app/android && ./gradlew :app:testDebugUnitTest` |
 | Desktop JVM | 20 条（含真实 JNA FFI） | `cd app/desktop && ./gradlew test` |
-| APK | 22,050,279 B；16KB 对齐通过；双 ABI `.so` | `bash app/scripts/build_android.sh debug` |
+| APK | 21,167,893 B；16KB 对齐通过；双 ABI `.so` | `bash app/scripts/build_android.sh debug` |
 | MSI | 66,573,406 B；jar 内含 `native/nf_app_core.dll` | `bash app/scripts/build_desktop.sh package` |
 
 ## 6. OPEN（不因收口关闭）

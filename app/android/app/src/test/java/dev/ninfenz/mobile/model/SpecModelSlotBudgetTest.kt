@@ -16,7 +16,7 @@ class SpecModelSlotBudgetTest {
           "sections": [{"id":"SEC-01","title":"S","order":1,"required":true,"slots":["SLT-01"]}],
           "slots": [{
             "id":"SLT-01","name":"A","section":"SEC-01","kind":"text","required":true,
-            "constraints":[{"op":"min_chars","value":3}],
+            "constraints":[{"op":"min_chars","value":3},{"op":"pattern","value":"^[A-Z]+$"},{"op":"non_empty"}],
             "examples":["示例正文"],"budget":{"max_chars":10}
           }]
         }
@@ -24,5 +24,7 @@ class SpecModelSlotBudgetTest {
         assertEquals(3, spec.slots.first().minChars)
         assertEquals(10, spec.slots.first().maxChars)
         assertEquals(listOf("示例正文"), spec.slots.first().examples)
+        assertEquals("^[A-Z]+$", spec.slots.first().pattern)
+        assertEquals(true, spec.slots.first().nonEmpty)
     }
 }

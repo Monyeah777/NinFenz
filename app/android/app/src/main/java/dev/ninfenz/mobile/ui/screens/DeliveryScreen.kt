@@ -145,6 +145,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
     val assembleRequester = remember { BringIntoViewRequester() }
     var missingRequired by remember { mutableStateOf<List<String>>(emptyList()) }
     var oversizedSlots by remember { mutableStateOf<List<String>>(emptyList()) }
+    var constraintViolations by remember { mutableStateOf<List<String>>(emptyList()) }
     var showDiscardPreview by remember { mutableStateOf(false) }
     var assignBlockText by remember { mutableStateOf<String?>(null) }
     var report by remember { mutableStateOf<ValidateReport?>(null) }
@@ -439,6 +440,14 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                     val text = inputs[slot.id].orEmpty()
                     (slot.minChars != null && text.isNotBlank() && text.length < slot.minChars) || (slot.maxChars != null && text.length > slot.maxChars)
                 }?.map { it.id }.orEmpty()
+                constraintViolations = specMeta?.slots?.filter { slot ->
+                    val text = inputs[slot.id].orEmpty()
+                    val patternBad = slot.pattern?.let { pattern ->
+                        text.isNotBlank() && runCatching { Regex(pattern).containsMatchIn(text) }.getOrDefault(false).not()
+                    } == true
+                    val nonEmptyBad = slot.nonEmpty && (slot.required || text.isNotBlank()) && text.isBlank()
+                    patternBad || nonEmptyBad
+                }?.map { it.id }.orEmpty()
             }
             val exportMarkdown = if (needsRevalidate || report?.verdict == "fail") null else markdown
             val current = artifacts
@@ -591,7 +600,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                 NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.delivery_assemble_validate))
                 Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                     Button(
-                        enabled = !busy && rawPlan != null && missingRequired.isEmpty() && oversizedSlots.isEmpty(),
+                        enabled = !busy && rawPlan != null && missingRequired.isEmpty() && oversizedSlots.isEmpty() && constraintViolations.isEmpty(),
                         modifier = Modifier.bringIntoViewRequester(assembleRequester),
                         onClick = {
                             val raw = rawPlan ?: return@Button
@@ -696,6 +705,14 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                             }
                         }
                     ) { Text(if (busy) stringResource(dev.ninfenz.mobile.R.string.delivery_assembling) else stringResource(dev.ninfenz.mobile.R.string.delivery_assemble)) }
+                    if (constraintViolations.isNotEmpty()) {
+                        Text(
+                            stringResource(dev.ninfenz.mobile.R.string.delivery_slot_constraint, constraintViolations.joinToString(", ")),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.padding(horizontal = NfSpacing.page)
+                        )
+                    }
                     if (oversizedSlots.isNotEmpty()) {
                         Text(
                             stringResource(dev.ninfenz.mobile.R.string.delivery_slot_over_budget, oversizedSlots.joinToString(", ")),

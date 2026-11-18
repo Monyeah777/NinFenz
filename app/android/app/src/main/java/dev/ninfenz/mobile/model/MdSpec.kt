@@ -16,7 +16,9 @@ data class SpecSlot(
     val required: Boolean,
     val minChars: Int? = null,
     val maxChars: Int? = null,
-    val examples: List<String> = emptyList()
+    val examples: List<String> = emptyList(),
+    val pattern: String? = null,
+    val nonEmpty: Boolean = false
 )
 
 data class MdSpec(
@@ -59,7 +61,9 @@ object SpecModel {
                 required = J.bool(s, "required", p),
                 minChars = constraintInt(s, "min_chars"),
                 maxChars = J.optChild(s, "budget")?.let { J.optInt(it, "max_chars") } ?: constraintInt(s, "max_chars"),
-                examples = J.optArray(s, "examples").mapNotNull { (it as? kotlinx.serialization.json.JsonPrimitive)?.content }
+                examples = J.optArray(s, "examples").mapNotNull { (it as? kotlinx.serialization.json.JsonPrimitive)?.content },
+                pattern = constraintString(s, "pattern"),
+                nonEmpty = J.optArray(s, "constraints").mapNotNull { it as? JsonObject }.any { J.optString(it, "op") == "non_empty" }
             )
         }
         return MdSpec(
@@ -71,6 +75,11 @@ object SpecModel {
             slots = slots
         )
     }
+
+    private fun constraintString(slot: JsonObject, op: String): String? =
+        J.optArray(slot, "constraints").mapNotNull { it as? JsonObject }.firstOrNull {
+            J.optString(it, "op") == op
+        }?.let { J.optString(it, "value") }
 
     private fun constraintInt(slot: JsonObject, op: String): Int? =
         J.optArray(slot, "constraints").mapNotNull { it as? JsonObject }.firstOrNull {
