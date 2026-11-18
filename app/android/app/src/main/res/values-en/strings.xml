@@ -386,6 +386,10 @@
     <string name="preview_edit_title">Edit preview</string>
     <string name="preview_edit_note">Saved edits invalidate the current validation; run validate again.</string>
     <string name="preview_save">Save</string>
+    <string name="preview_block_up">Up</string>
+    <string name="preview_block_down">Down</string>
+    <string name="preview_block_delete">Delete</string>
+    <string name="preview_block_add">Add paragraph</string>
     <string name="preview_more">… %1$d more blocks; open full preview</string>
     <string name="preview_image">Image</string>
     <string name="delivery_not_assembled">Nothing assembled yet. Preview only shows markdown returned by core.</string>

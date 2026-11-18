@@ -66,6 +66,8 @@ import dev.ninfenz.mobile.data.AssemblyArtifact
 import dev.ninfenz.mobile.data.ProjectStatusStore
 import dev.ninfenz.mobile.data.StatusAdvanceResult
 import dev.ninfenz.mobile.model.AssemblyPlan
+import dev.ninfenz.mobile.model.MarkdownBlock
+import dev.ninfenz.mobile.model.MarkdownBlocks
 import dev.ninfenz.mobile.model.PlanModel
 import dev.ninfenz.mobile.model.Project
 import dev.ninfenz.mobile.model.ProjectStatus
@@ -117,7 +119,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
     var markdown by remember { mutableStateOf<String?>(null) }
     var showFullPreview by remember { mutableStateOf(false) }
     var editingPreview by remember { mutableStateOf(false) }
-    var previewDraft by remember { mutableStateOf("") }
+    var previewBlocks by remember { mutableStateOf<List<MarkdownBlock>>(emptyList()) }
     var report by remember { mutableStateOf<ValidateReport?>(null) }
     var manifestText by remember { mutableStateOf<String?>(null) }
     var exportedFile by remember { mutableStateOf<File?>(null) }
@@ -841,7 +843,10 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                         Column(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
                             MarkdownPreview(md, limitBlocks = 8)
                             Row {
-                                TextButton(onClick = { previewDraft = md; editingPreview = true }) {
+                                TextButton(onClick = {
+                                    previewBlocks = MarkdownBlocks.parse(md)
+                                    editingPreview = true
+                                }) {
                                     Text(stringResource(dev.ninfenz.mobile.R.string.preview_edit))
                                 }
                                 TextButton(onClick = { showFullPreview = true }) {
@@ -869,17 +874,50 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    OutlinedTextField(
-                        value = previewDraft,
-                        onValueChange = { previewDraft = it },
-                        modifier = Modifier.fillMaxWidth().heightIn(min = 240.dp),
-                        minLines = 12
-                    )
+                    previewBlocks.forEachIndexed { index, block ->
+                        OutlinedTextField(
+                            value = block.text,
+                            onValueChange = { value ->
+                                previewBlocks = previewBlocks.toMutableList().also { it[index] = block.copy(text = value) }
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            minLines = 2
+                        )
+                        Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+                            TextButton(
+                                enabled = index > 0,
+                                onClick = {
+                                    previewBlocks = previewBlocks.toMutableList().also {
+                                        val item = it.removeAt(index)
+                                        it.add(index - 1, item)
+                                    }
+                                }
+                            ) { Text(stringResource(dev.ninfenz.mobile.R.string.preview_block_up)) }
+                            TextButton(
+                                enabled = index < previewBlocks.lastIndex,
+                                onClick = {
+                                    previewBlocks = previewBlocks.toMutableList().also {
+                                        val item = it.removeAt(index)
+                                        it.add(index + 1, item)
+                                    }
+                                }
+                            ) { Text(stringResource(dev.ninfenz.mobile.R.string.preview_block_down)) }
+                            TextButton(onClick = {
+                                previewBlocks = previewBlocks.filterIndexed { i, _ -> i != index }
+                            }) { Text(stringResource(dev.ninfenz.mobile.R.string.preview_block_delete)) }
+                        }
+                    }
+                    TextButton(onClick = {
+                        previewBlocks = previewBlocks + MarkdownBlock(
+                            id = (previewBlocks.maxOfOrNull { it.id } ?: 0) + 1,
+                            text = ""
+                        )
+                    }) { Text(stringResource(dev.ninfenz.mobile.R.string.preview_block_add)) }
                 }
             },
             confirmButton = {
                 TextButton(onClick = {
-                    markdown = previewDraft
+                    markdown = MarkdownBlocks.render(previewBlocks)
                     report = null
                     validateRepro = null
                     exportedFile = null

@@ -386,6 +386,10 @@
     <string name="preview_edit_title">编辑预览</string>
     <string name="preview_edit_note">保存后当前校验失效，需要重新校验。</string>
     <string name="preview_save">保存</string>
+    <string name="preview_block_up">上移</string>
+    <string name="preview_block_down">下移</string>
+    <string name="preview_block_delete">删除</string>
+    <string name="preview_block_add">添加段落</string>
     <string name="preview_more">… 还有 %1$d 块，打开全屏预览查看</string>
     <string name="preview_image">图片</string>
     <string name="delivery_not_assembled">尚未装配。预览只显示核心返回的 markdown。</string>
