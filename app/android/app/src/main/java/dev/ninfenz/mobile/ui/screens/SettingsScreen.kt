@@ -25,6 +25,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -75,7 +76,7 @@ fun SettingsScreen(
     var pendingDeleteBackup by remember { mutableStateOf<File?>(null) }
     var restoring by remember { mutableStateOf(false) }
     var pendingRestore by remember { mutableStateOf<File?>(null) }
-    var restoreEntries by remember { mutableStateOf(0) }
+    var restoreEntries by remember { mutableIntStateOf(0) }
     var lastSnapshot by remember { mutableStateOf(BackupRestoreService.lastSnapshot(context.filesDir)) }
     val scope = rememberCoroutineScope()
     val restorePicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->

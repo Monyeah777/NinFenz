@@ -35,6 +35,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -129,7 +130,7 @@ fun ImportScreen(
     val shareQueueStore = remember { ShareQueueStore(context.filesDir) }
     val savedQueue = remember { shareQueueStore.load() }
     var shareQueue by remember { mutableStateOf(savedQueue?.items ?: emptyList<SharedItem>()) }
-    var shareCursor by remember { mutableStateOf(savedQueue?.cursor ?: 0) }
+    var shareCursor by remember { mutableIntStateOf(savedQueue?.cursor ?: 0) }
     LaunchedEffect(shareQueue, shareCursor) {
         if (shareQueue.isEmpty()) shareQueueStore.clear() else shareQueueStore.save(shareQueue, shareCursor)
     }

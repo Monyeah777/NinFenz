@@ -34,6 +34,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -152,8 +153,8 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
     var slotImportTarget by remember { mutableStateOf<String?>(null) }
     var slotImportSource by remember { mutableStateOf("") }
     var slotImportFormat by remember { mutableStateOf("text") }
-    var slotImportOriginal by remember { mutableStateOf(0) }
-    var slotImportAdapted by remember { mutableStateOf(0) }
+    var slotImportOriginal by remember { mutableIntStateOf(0) }
+    var slotImportAdapted by remember { mutableIntStateOf(0) }
     var slotImportText by remember { mutableStateOf("") }
     var batchChunks by remember { mutableStateOf<List<SlotBatchImporter.Chunk>>(emptyList()) }
     var batchSource by remember { mutableStateOf("") }

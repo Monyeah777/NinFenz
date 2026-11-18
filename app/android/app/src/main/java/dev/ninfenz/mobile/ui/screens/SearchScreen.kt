@@ -24,6 +24,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -65,7 +66,7 @@ fun SearchScreen(
     val index = remember { SearchIndex(context.filesDir) }
     var all by remember { mutableStateOf<List<SearchHit>>(emptyList()) }
     var query by rememberSaveable { mutableStateOf("") }
-    var selected by remember { mutableStateOf(0) }
+    var selected by remember { mutableIntStateOf(0) }
     val filterStore = remember { SearchFilterStore(context.filesDir) }
     val savedFilter = remember { filterStore.load() }
     var filterName by rememberSaveable { mutableStateOf(savedFilter?.kind) }

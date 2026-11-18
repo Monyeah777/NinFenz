@@ -28,6 +28,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -72,7 +73,7 @@ fun SwipeableProjectCard(
     var visible by remember(entry.project.id) { mutableStateOf(false) }
     val offset = remember(entry.project.id) { Animatable(0f) }
     val scope = rememberCoroutineScope()
-    var width by remember { mutableStateOf(0) }
+    var width by remember { mutableIntStateOf(0) }
     var armed by remember { mutableStateOf(false) }
     val haptic = LocalHapticFeedback.current
 
