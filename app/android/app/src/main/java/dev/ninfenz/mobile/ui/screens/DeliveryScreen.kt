@@ -437,7 +437,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                 missingRequired = specMeta?.slots?.filter { it.required && inputs[it.id].isNullOrBlank() }?.map { it.id }.orEmpty()
                 oversizedSlots = specMeta?.slots?.filter { slot ->
                     val text = inputs[slot.id].orEmpty()
-                    (slot.minChars != null && text.length < slot.minChars) || (slot.maxChars != null && text.length > slot.maxChars)
+                    (slot.minChars != null && text.isNotBlank() && text.length < slot.minChars) || (slot.maxChars != null && text.length > slot.maxChars)
                 }?.map { it.id }.orEmpty()
             }
             val exportMarkdown = if (needsRevalidate || report?.verdict == "fail") null else markdown
