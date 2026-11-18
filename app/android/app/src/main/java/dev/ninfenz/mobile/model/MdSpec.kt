@@ -8,7 +8,15 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
 data class SpecSection(val id: String, val title: String, val order: Int, val required: Boolean, val slots: List<String>)
-data class SpecSlot(val id: String, val name: String, val section: String, val kind: String, val required: Boolean)
+data class SpecSlot(
+    val id: String,
+    val name: String,
+    val section: String,
+    val kind: String,
+    val required: Boolean,
+    val minChars: Int? = null,
+    val maxChars: Int? = null
+)
 
 data class MdSpec(
     val id: String,
@@ -47,7 +55,9 @@ object SpecModel {
                 name = J.string(s, "name", p),
                 section = J.string(s, "section", p),
                 kind = J.string(s, "kind", p),
-                required = J.bool(s, "required", p)
+                required = J.bool(s, "required", p),
+                minChars = constraintInt(s, "min_chars"),
+                maxChars = J.optChild(s, "budget")?.let { J.optInt(it, "max_chars") } ?: constraintInt(s, "max_chars")
             )
         }
         return MdSpec(
@@ -59,6 +69,11 @@ object SpecModel {
             slots = slots
         )
     }
+
+    private fun constraintInt(slot: JsonObject, op: String): Int? =
+        J.optArray(slot, "constraints").mapNotNull { it as? JsonObject }.firstOrNull {
+            J.optString(it, "op") == op
+        }?.let { J.optInt(it, "value") }
 
     /** 本地表单检查（CONTRACT §5.5 的双向一致与 order 连续）。 */
     fun formIssues(spec: MdSpec): List<FormIssue> {

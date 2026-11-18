@@ -404,6 +404,8 @@
     <string name="delivery_assemble_validate">3 · Assemble &amp; validate</string>
     <string name="delivery_assemble">assemble</string>
     <string name="delivery_missing_required">Fill required slots first: %1$s</string>
+    <string name="delivery_slot_over_budget">Slot text exceeds budget: %1$s</string>
+    <string name="delivery_slot_budget">Budget %1$d–%2$d chars</string>
     <string name="delivery_assembling">Assembling…</string>
     <string name="delivery_validate">validate L1</string>
     <string name="delivery_validating">Validating…</string>
