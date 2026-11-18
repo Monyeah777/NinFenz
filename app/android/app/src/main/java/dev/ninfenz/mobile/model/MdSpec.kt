@@ -15,7 +15,8 @@ data class SpecSlot(
     val kind: String,
     val required: Boolean,
     val minChars: Int? = null,
-    val maxChars: Int? = null
+    val maxChars: Int? = null,
+    val examples: List<String> = emptyList()
 )
 
 data class MdSpec(
@@ -57,7 +58,8 @@ object SpecModel {
                 kind = J.string(s, "kind", p),
                 required = J.bool(s, "required", p),
                 minChars = constraintInt(s, "min_chars"),
-                maxChars = J.optChild(s, "budget")?.let { J.optInt(it, "max_chars") } ?: constraintInt(s, "max_chars")
+                maxChars = J.optChild(s, "budget")?.let { J.optInt(it, "max_chars") } ?: constraintInt(s, "max_chars"),
+                examples = J.optArray(s, "examples").mapNotNull { (it as? kotlinx.serialization.json.JsonPrimitive)?.content }
             )
         }
         return MdSpec(

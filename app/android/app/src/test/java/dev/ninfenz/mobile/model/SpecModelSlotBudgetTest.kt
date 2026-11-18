@@ -17,11 +17,12 @@ class SpecModelSlotBudgetTest {
           "slots": [{
             "id":"SLT-01","name":"A","section":"SEC-01","kind":"text","required":true,
             "constraints":[{"op":"min_chars","value":3}],
-            "budget":{"max_chars":10}
+            "examples":["示例正文"],"budget":{"max_chars":10}
           }]
         }
         """.trimIndent())
         assertEquals(3, spec.slots.first().minChars)
         assertEquals(10, spec.slots.first().maxChars)
+        assertEquals(listOf("示例正文"), spec.slots.first().examples)
     }
 }

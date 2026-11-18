@@ -579,6 +579,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                         onDone = { focusManager.clearFocus() },
                                         onNext = { focusManager.moveFocus(FocusDirection.Down) }
                                     ),
+                                    placeholder = { Text(slotMeta?.examples?.firstOrNull().orEmpty(), maxLines = 2) },
                                     supportingText = { Text(pluralStringResource(dev.ninfenz.mobile.R.plurals.delivery_slot_chars, (inputs[slot] ?: "").length, (inputs[slot] ?: "").length)) },
                                     modifier = Modifier.fillMaxWidth()
                                 )
