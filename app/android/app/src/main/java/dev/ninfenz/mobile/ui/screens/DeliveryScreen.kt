@@ -397,48 +397,50 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
             error?.let { err -> NfErrorCard(err.code, err.message, err.fix, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
 
             val current = artifacts
+            suspend fun compilePlan(art: AuthorArtifacts) {
+                busy = true
+                error = null
+                val response = safeCall("graph-compile", buildJsonObject {
+                    put("graph", art.graphJson)
+                    put("spec", art.specJson)
+                })
+                val obj = response.resultObject()
+                if (response.ok && obj != null) {
+                    try {
+                        val parsed = PlanModel.parse(obj)
+                        plan = parsed
+                        rawPlan = obj
+                        inputs = parsed.slots.associate { it to (restoredInputs[it] ?: "") }
+                        draftStore.save(project.id, inputs, obj)
+                        draftNote = if (restoredInputs.isNotEmpty()) context.getString(dev.ninfenz.mobile.R.string.delivery_draft_restored) else null
+                        markdown = null
+                        report = null
+                        exportedFile = null
+                        manifestText = null
+                        batchChunks = emptyList()
+                        batchNote = null
+                    } catch (t: Throwable) {
+                        error = CoreResponse.failure(
+                            "NF-ASM-003",
+                            context.getString(dev.ninfenz.mobile.R.string.delivery_plan_failed, t.message ?: t.javaClass.simpleName),
+                            context.getString(dev.ninfenz.mobile.R.string.delivery_plan_failed_fix),
+                            1
+                        ).error
+                    }
+                } else {
+                    error = response.error
+                }
+                busy = false
+            }
+            LaunchedEffect(current) {
+                if (current != null && plan == null && restoredPlan == null) compilePlan(current)
+            }
             if (current != null) {
                 NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.delivery_plan))
                 Button(
                     enabled = !busy,
                     modifier = Modifier.padding(horizontal = NfSpacing.page),
-                    onClick = {
-                        busy = true
-                        error = null
-                        scope.launch {
-                            val response = safeCall("graph-compile", buildJsonObject {
-                                put("graph", current.graphJson)
-                                put("spec", current.specJson)
-                            })
-                            val obj = response.resultObject()
-                            if (response.ok && obj != null) {
-                                try {
-                                    val parsed = PlanModel.parse(obj)
-                                    plan = parsed
-                                    rawPlan = obj
-                                    inputs = parsed.slots.associate { it to (restoredInputs[it] ?: "") }
-                                    draftStore.save(project.id, inputs, obj)
-                                    draftNote = if (restoredInputs.isNotEmpty()) context.getString(dev.ninfenz.mobile.R.string.delivery_draft_restored) else null
-                                    markdown = null
-                                    report = null
-                                    exportedFile = null
-                                    manifestText = null
-                                    batchChunks = emptyList()
-                                    batchNote = null
-                                } catch (t: Throwable) {
-                                    error = CoreResponse.failure(
-                                        "NF-ASM-003",
-                                        context.getString(dev.ninfenz.mobile.R.string.delivery_plan_failed, t.message ?: t.javaClass.simpleName),
-                                        context.getString(dev.ninfenz.mobile.R.string.delivery_plan_failed_fix),
-                                        1
-                                    ).error
-                                }
-                            } else {
-                                error = response.error
-                            }
-                            busy = false
-                        }
-                    }
+                    onClick = { scope.launch { compilePlan(current) } }
                 ) { Text(if (busy) stringResource(dev.ninfenz.mobile.R.string.delivery_compiling) else stringResource(dev.ninfenz.mobile.R.string.delivery_compile)) }
                 plan?.let { p ->
                     Text(
