@@ -14,6 +14,11 @@ object DraftProjectBinder {
         return target
     }
 
+    fun clearSpec(filesDir: File, projectId: String): Boolean {
+        val dir = File(File(File(filesDir, "projects"), projectId), "authoring")
+        return File(dir, "spec-override.json").delete()
+    }
+
     fun bind(filesDir: File, projectId: String, draft: File): File {
         require(projectId.isNotBlank()) { "项目 ID 为空" }
         require(draft.isFile) { "草稿不存在" }

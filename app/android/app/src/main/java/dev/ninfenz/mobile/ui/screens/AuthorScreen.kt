@@ -118,8 +118,9 @@ fun AuthorScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onAssem
     var artifacts by remember { mutableStateOf<AuthorArtifacts?>(null) }
     var loadError by remember { mutableStateOf<String?>(null) }
     var loading by remember { mutableStateOf(true) }
+    var authorReload by remember { mutableIntStateOf(0) }
 
-    LaunchedEffect(pack.dir.absolutePath, project.id) {
+    LaunchedEffect(pack.dir.absolutePath, project.id, authorReload) {
         loading = true
         loadError = null
         try {
