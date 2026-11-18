@@ -826,6 +826,9 @@ fun ProjectDetailScreen(
     var showReview by remember { mutableStateOf(false) }
     var showMoreActions by remember { mutableStateOf(false) }
     var historyExpanded by rememberSaveable(project.id) { mutableStateOf(false) }
+    val hasSpecOverride = remember(project.id) {
+        java.io.File(java.io.File(java.io.File(context.filesDir, "projects"), project.id), "authoring/spec-override.json").isFile
+    }
     val canApprove = project.status in setOf(ProjectStatus.VALIDATED, ProjectStatus.EXPORTED, ProjectStatus.REVIEWED)
     var reviewStale by remember { mutableStateOf(false) }
     LaunchedEffect(project.id, project.review.state, project.review.subjectDigest) {
@@ -895,6 +898,13 @@ fun ProjectDetailScreen(
                         }
                     }
                     Text(project.id, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    if (hasSpecOverride) {
+                        Text(
+                            stringResource(dev.ninfenz.mobile.R.string.template_override_active),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
                     Text(
                         stringResource(dev.ninfenz.mobile.R.string.project_detail_pack, project.refs.basePackId, project.refs.basePackVersion) +
                             " · " + stringResource(dev.ninfenz.mobile.R.string.project_detail_protocol, project.refs.protocolId.ifBlank { stringResource(dev.ninfenz.mobile.R.string.not_bound) }),
