@@ -619,6 +619,34 @@ fun ImportScreen(
                     item { Text(message, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
                 }
                 item { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.import_draft)) }
+                if (savedName == null && rawResult != null && packs.isNotEmpty()) {
+                    item {
+                        val pack = packs.first()
+                        Column(
+                            modifier = Modifier.padding(horizontal = NfSpacing.page),
+                            verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)
+                        ) {
+                            Button(onClick = {
+                                val raw = rawResult ?: return@Button
+                                val base = store.uniqueDraftBase(current.source.name)
+                                val file = store.saveDraft(base, raw.toString())
+                                val mappingJson = buildJsonObject {
+                                    put("accepted", JsonArray(acceptedMappings.sorted().map { JsonPrimitive(it) }))
+                                    put("unmapped", JsonArray(current.unmapped.map { JsonPrimitive(it) }))
+                                }.toString()
+                                store.saveDraft(base + ".mapping", mappingJson)
+                                savedName = file.name
+                                drafts = DraftLibrary.list(context.filesDir)
+                                onCreateProjectFromDraft(pack, base, file)
+                            }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_quick_project)) }
+                            Text(
+                                stringResource(dev.ninfenz.mobile.R.string.import_quick_project_note, pack.title),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
                 item {
                     if (savedName == null) {
                         Button(

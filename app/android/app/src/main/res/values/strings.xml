@@ -237,6 +237,8 @@
     <string name="import_unmapped">未映射：%1$s</string>
     <string name="import_suggest_done">映射建议来自 core map-suggest</string>
     <string name="import_draft">草稿</string>
+    <string name="import_quick_project">快速建项目</string>
+    <string name="import_quick_project_note">使用 %1$s；映射仍可在项目中调整。</string>
     <string name="import_save">保存导入草稿 + 映射决策</string>
     <string name="import_saved">已保存草稿：%1$s</string>
     <string name="import_saved_note">草稿保存在应用私有目录，未写入项目；W4 再接入「草稿 → 项目」的转换。</string>

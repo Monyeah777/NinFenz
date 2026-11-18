@@ -237,6 +237,8 @@
     <string name="import_unmapped">Unmapped: %1$s</string>
     <string name="import_suggest_done">Suggestions from core map-suggest</string>
     <string name="import_draft">Draft</string>
+    <string name="import_quick_project">Quick create project</string>
+    <string name="import_quick_project_note">Uses %1$s; mapping stays editable in the project.</string>
     <string name="import_save">Save import draft + mapping decisions</string>
     <string name="import_saved">Draft saved: %1$s</string>
     <string name="import_saved_note">Draft stays in app-private storage and is not written into a project; draft → project conversion lands in W4+.</string>
