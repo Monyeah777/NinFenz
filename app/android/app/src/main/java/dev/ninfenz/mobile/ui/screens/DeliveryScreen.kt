@@ -136,6 +136,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
     var showResetConfirm by remember { mutableStateOf(false) }
     var previewBlocks by remember { mutableStateOf<List<MarkdownBlock>>(emptyList()) }
     var previewHistory by remember { mutableStateOf<List<List<MarkdownBlock>>>(emptyList()) }
+    var previewRedo by remember { mutableStateOf<List<List<MarkdownBlock>>>(emptyList()) }
     var report by remember { mutableStateOf<ValidateReport?>(null) }
     var manifestText by remember { mutableStateOf<String?>(null) }
     var exportedFile by remember { mutableStateOf<File?>(null) }
@@ -957,6 +958,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                 TextButton(onClick = {
                                     previewBlocks = MarkdownBlocks.parse(md)
                                     previewHistory = emptyList()
+                                    previewRedo = emptyList()
                                     editingPreview = true
                                 }) {
                                     Text(stringResource(dev.ninfenz.mobile.R.string.preview_edit))
@@ -1039,10 +1041,19 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                         TextButton(
                             enabled = previewHistory.isNotEmpty(),
                             onClick = {
+                                previewRedo = previewRedo + listOf(previewBlocks)
                                 previewBlocks = previewHistory.last()
                                 previewHistory = previewHistory.dropLast(1)
                             }
                         ) { Text(stringResource(dev.ninfenz.mobile.R.string.preview_undo)) }
+                        TextButton(
+                            enabled = previewRedo.isNotEmpty(),
+                            onClick = {
+                                previewHistory = previewHistory + listOf(previewBlocks)
+                                previewBlocks = previewRedo.last()
+                                previewRedo = previewRedo.dropLast(1)
+                            }
+                        ) { Text(stringResource(dev.ninfenz.mobile.R.string.preview_redo)) }
                     }
                     previewBlocks.forEachIndexed { index, block ->
                         Text(block.kind, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -1050,6 +1061,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                             value = block.text,
                             onValueChange = { value ->
                                 previewHistory = previewHistory + listOf(previewBlocks)
+                                previewRedo = emptyList()
                                 previewBlocks = previewBlocks.toMutableList().also { it[index] = block.copy(text = value) }
                             },
                             modifier = Modifier.fillMaxWidth(),
