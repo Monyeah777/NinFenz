@@ -68,6 +68,7 @@ import dev.ninfenz.mobile.data.StatusAdvanceResult
 import dev.ninfenz.mobile.model.AssemblyPlan
 import dev.ninfenz.mobile.model.MarkdownBlock
 import dev.ninfenz.mobile.model.MarkdownBlocks
+import dev.ninfenz.mobile.model.SpecModel
 import dev.ninfenz.mobile.model.PlanModel
 import dev.ninfenz.mobile.model.Project
 import dev.ninfenz.mobile.model.ProjectStatus
@@ -334,6 +335,9 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
         plan != null -> 1
         else -> 0
     }
+    val specMeta = remember(artifacts?.specJson) {
+        artifacts?.let { runCatching { SpecModel.parse(it.specJson) }.getOrNull() }
+    }
     Column(modifier = Modifier.fillMaxSize().imePadding()) {
         NfTopAppBar(title = stringResource(dev.ninfenz.mobile.R.string.delivery_title, project.title), onBack = onBack)
         NfStepStrip(
@@ -457,12 +461,23 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                     } else {
                         for (slot in plan!!.slots) {
                             Column(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
+                                val slotMeta = specMeta?.slots?.firstOrNull { it.id == slot }
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text(slot, style = MaterialTheme.typography.labelLarge)
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(slot, style = MaterialTheme.typography.labelLarge)
+                                        slotMeta?.let {
+                                            Text(it.name, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                            Text(
+                                                stringResource(if (it.required) dev.ninfenz.mobile.R.string.delivery_slot_required else dev.ninfenz.mobile.R.string.delivery_slot_optional),
+                                                style = MaterialTheme.typography.labelSmall,
+                                                color = if (it.required) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                    }
                                     Row {
                                         TextButton(onClick = { pasteSlot(slot) }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_slot_paste)) }
                                         TextButton(onClick = { openSlotPicker(slot) }) { Text(stringResource(dev.ninfenz.mobile.R.string.action_import)) }

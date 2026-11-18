@@ -369,6 +369,8 @@
     <string name="delivery_compiling">Compiling…</string>
     <string name="delivery_plan_summary">plan: steps %1$d · slots %2$d</string>
     <string name="delivery_slots">2 · Slot inputs</string>
+    <string name="delivery_slot_required">Required</string>
+    <string name="delivery_slot_optional">Optional</string>
     <string name="delivery_compile_first">Compile the plan first.</string>
     <string name="delivery_no_slots">This plan needs no slot inputs.</string>
     <string name="delivery_assemble_validate">3 · Assemble &amp; validate</string>

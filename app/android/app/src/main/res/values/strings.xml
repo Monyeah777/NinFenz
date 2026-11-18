@@ -365,6 +365,8 @@
     <string name="delivery_compiling">编译中…</string>
     <string name="delivery_plan_summary">plan：steps %1$d · slots %2$d</string>
     <string name="delivery_slots">2 · 槽位输入</string>
+    <string name="delivery_slot_required">必填</string>
+    <string name="delivery_slot_optional">选填</string>
     <string name="delivery_compile_first">先编译计划。</string>
     <string name="delivery_no_slots">该计划无需槽位输入。</string>
     <string name="delivery_assemble_validate">3 · 装配与校验</string>
