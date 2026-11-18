@@ -71,6 +71,7 @@ import dev.ninfenz.mobile.model.MarkdownSlicer
 import dev.ninfenz.mobile.model.PromptPack
 import dev.ninfenz.mobile.model.PromptProfile
 import dev.ninfenz.mobile.model.TemplateCandidate
+import dev.ninfenz.mobile.model.CsvTable
 import dev.ninfenz.mobile.model.ImportModel
 import dev.ninfenz.mobile.share.SharePayload
 import dev.ninfenz.mobile.share.ShareExporter
@@ -340,6 +341,26 @@ fun ImportScreen(
         busy = false
     }
 
+    fun importCsv() {
+        val manager = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager
+        val text = manager?.primaryClip?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.coerceToText(context)?.toString()
+        if (text.isNullOrBlank()) {
+            error = CoreResponse.failure(
+                "NF-E-003",
+                context.getString(dev.ninfenz.mobile.R.string.import_clipboard_empty),
+                context.getString(dev.ninfenz.mobile.R.string.import_clipboard_empty_fix),
+                2
+            ).error
+            return
+        }
+        val markdown = CsvTable.toMarkdown(text)
+        scope.launch {
+            val file = File(File(context.cacheDir, "imports").apply { mkdirs() }, "csv-table.md")
+            file.writeText(markdown, Charsets.UTF_8)
+            importFromFile(file, "clipboard", "csv-table.md", "text/markdown", markdown.toByteArray(Charsets.UTF_8).size.toLong())
+        }
+    }
+
     fun importClipboard() {
         val manager = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager
         val text = manager?.primaryClip?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.coerceToText(context)?.toString()
@@ -530,6 +551,9 @@ fun ImportScreen(
                         Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                             Button(onClick = { filePicker.launch(arrayOf("*/*")) }, enabled = !busy) { Text(stringResource(dev.ninfenz.mobile.R.string.import_pick_file)) }
                             OutlinedButton(onClick = { importClipboard() }, enabled = !busy) { Text(stringResource(dev.ninfenz.mobile.R.string.import_clipboard)) }
+                        }
+                        Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+                            OutlinedButton(onClick = { importCsv() }, enabled = !busy) { Text(stringResource(dev.ninfenz.mobile.R.string.import_csv)) }
                         }
                         Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                             OutlinedButton(onClick = { importSample() }, enabled = !busy) { Text(stringResource(dev.ninfenz.mobile.R.string.import_sample)) }

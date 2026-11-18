@@ -230,6 +230,7 @@
     <string name="import_step_draft">草稿</string>
     <string name="import_pick_file">选择文件</string>
     <string name="import_clipboard">剪贴板</string>
+    <string name="import_csv">CSV 表格</string>
     <string name="import_sample">示例内容</string>
     <string name="import_share_received">已接收分享载荷</string>
     <string name="import_share_from">来自分享：%1$s</string>
