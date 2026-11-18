@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
@@ -40,6 +42,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import android.content.Context
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -106,6 +111,7 @@ import kotlinx.serialization.json.put
 @Composable
 fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onStatusChanged: () -> Unit = {}) {
     val context = LocalContext.current
+    val focusManager = LocalFocusManager.current
     val scope = rememberCoroutineScope()
     val statusStore = remember { ProjectStatusStore(context.filesDir) }
     var status by remember(project.id) { mutableStateOf(project.status) }
@@ -483,12 +489,20 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                         TextButton(onClick = { openSlotPicker(slot) }) { Text(stringResource(dev.ninfenz.mobile.R.string.action_import)) }
                                     }
                                 }
+                                val lastSlot = plan?.slots?.lastOrNull() == slot
                                 OutlinedTextField(
                                     value = inputs[slot] ?: "",
                                     onValueChange = { inputs = inputs + (slot to it) },
                                     singleLine = false,
                                     minLines = 2,
                                     maxLines = 6,
+                                    keyboardOptions = KeyboardOptions(
+                                        imeAction = if (lastSlot) ImeAction.Done else ImeAction.Next
+                                    ),
+                                    keyboardActions = KeyboardActions(
+                                        onDone = { focusManager.clearFocus() },
+                                        onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                                    ),
                                     supportingText = { Text(pluralStringResource(dev.ninfenz.mobile.R.plurals.delivery_slot_chars, (inputs[slot] ?: "").length, (inputs[slot] ?: "").length)) },
                                     modifier = Modifier.fillMaxWidth()
                                 )

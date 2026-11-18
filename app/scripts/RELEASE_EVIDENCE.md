@@ -15,8 +15,8 @@
 
 ### Android
 - assembleDebug：**pass**（2026-11-16，Android SDK 36 / build-tools 36.0.0）
-- app-debug.apk：21,065,801 B；SHA-256 `869be597441f869c42435e7595007e4e6c673e452d554f0369abb9d21c0d219e`
-- assembleRelease（unsigned）：pass；15,668,445 B；SHA-256 `e97bb09d48e600ba75bf09cdba363c3b81dc6aca37ceb6e93d3bef9f02f08ef9`
+- app-debug.apk：21,871,380 B；SHA-256 `fac01181dccc1486ce500a6524da778c84dbb0d50ce22396ae9e1b28ec1fac66`
+- assembleRelease（unsigned）：pass；15,668,445 B；SHA-256 `96e92124ad8b11623dbf72cd9dcb3abe13dcef02729166453992f0c694a08d34`
 - 16KB 对齐：`zipalign -c -P 16 4` exit 0
 - 签名证书指纹（SHA-256）：—（生产 upload key 未提供，OPEN-EXTERNAL）
 - 签名流程内部自测：`app/scripts/sign_release.sh` 以本机 debug keystore 跑通（仅验证流程，非生产签名）；`apksigner verify` 通过，证书 SHA-256 `8a52a549c3081795cecb0f1424d21684933fb21d3afe76506dab736e688b10fb`；内部 signed APK 安装成功，冷启动 926ms，PDF 1 页校验通过。
