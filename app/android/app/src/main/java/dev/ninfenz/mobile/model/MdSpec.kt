@@ -18,7 +18,9 @@ data class SpecSlot(
     val maxChars: Int? = null,
     val examples: List<String> = emptyList(),
     val pattern: String? = null,
-    val nonEmpty: Boolean = false
+    val nonEmpty: Boolean = false,
+    val startsWith: String? = null,
+    val endsWith: String? = null
 )
 
 data class MdSpec(
@@ -63,7 +65,9 @@ object SpecModel {
                 maxChars = J.optChild(s, "budget")?.let { J.optInt(it, "max_chars") } ?: constraintInt(s, "max_chars"),
                 examples = J.optArray(s, "examples").mapNotNull { (it as? kotlinx.serialization.json.JsonPrimitive)?.content },
                 pattern = constraintString(s, "pattern"),
-                nonEmpty = J.optArray(s, "constraints").mapNotNull { it as? JsonObject }.any { J.optString(it, "op") == "non_empty" }
+                nonEmpty = J.optArray(s, "constraints").mapNotNull { it as? JsonObject }.any { J.optString(it, "op") == "non_empty" },
+                startsWith = constraintString(s, "starts_with"),
+                endsWith = constraintString(s, "ends_with")
             )
         }
         return MdSpec(

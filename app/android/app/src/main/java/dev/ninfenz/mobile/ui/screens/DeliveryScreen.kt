@@ -446,7 +446,9 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                         text.isNotBlank() && runCatching { Regex(pattern).containsMatchIn(text) }.getOrDefault(false).not()
                     } == true
                     val nonEmptyBad = slot.nonEmpty && (slot.required || text.isNotBlank()) && text.isBlank()
-                    patternBad || nonEmptyBad
+                    val prefixBad = slot.startsWith?.let { text.isNotBlank() && !text.startsWith(it) } == true
+                    val suffixBad = slot.endsWith?.let { text.isNotBlank() && !text.endsWith(it) } == true
+                    patternBad || nonEmptyBad || prefixBad || suffixBad
                 }?.map { it.id }.orEmpty()
             }
             val exportMarkdown = if (needsRevalidate || report?.verdict == "fail") null else markdown
