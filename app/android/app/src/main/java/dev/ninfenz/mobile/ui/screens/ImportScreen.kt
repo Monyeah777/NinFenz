@@ -679,7 +679,12 @@ fun ImportScreen(
                                     )
                                     savedSamples.take(3).forEach { file ->
                                         Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Text(file.name, style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
+                                            TextButton(
+                                                onClick = { importPreviewText = runCatching { file.readText(Charsets.UTF_8) }.getOrDefault("") },
+                                                modifier = Modifier.weight(1f)
+                                            ) {
+                                                Text(file.name, style = MaterialTheme.typography.bodySmall, maxLines = 1)
+                                            }
                                             TextButton(onClick = {
                                                 val text = runCatching { file.readText(Charsets.UTF_8) }.getOrDefault("")
                                                 val intent = ShareExporter.shareMarkdown(context, "nf-sample", text)
