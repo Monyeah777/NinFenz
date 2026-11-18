@@ -126,6 +126,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
     var markdown by remember { mutableStateOf<String?>(null) }
     var showFullPreview by remember { mutableStateOf(false) }
     var editingPreview by remember { mutableStateOf(false) }
+    var showResetConfirm by remember { mutableStateOf(false) }
     var previewBlocks by remember { mutableStateOf<List<MarkdownBlock>>(emptyList()) }
     var report by remember { mutableStateOf<ValidateReport?>(null) }
     var manifestText by remember { mutableStateOf<String?>(null) }
@@ -345,7 +346,17 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
         artifacts?.let { runCatching { SpecModel.parse(it.specJson) }.getOrNull() }
     }
     Column(modifier = Modifier.fillMaxSize().imePadding()) {
-        NfTopAppBar(title = stringResource(dev.ninfenz.mobile.R.string.delivery_title, project.title), onBack = onBack)
+        NfTopAppBar(
+            title = stringResource(dev.ninfenz.mobile.R.string.delivery_title, project.title),
+            onBack = onBack,
+            actions = {
+                if (plan != null || inputs.isNotEmpty() || markdown != null || report != null) {
+                    TextButton(onClick = { showResetConfirm = true }) {
+                        Text(stringResource(dev.ninfenz.mobile.R.string.delivery_reset))
+                    }
+                }
+            }
+        )
         NfStepStrip(
             steps = listOf(
                 stringResource(dev.ninfenz.mobile.R.string.delivery_plan),
@@ -887,6 +898,34 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                 }
             }
         }
+    }
+
+    if (showResetConfirm) {
+        AlertDialog(
+            onDismissRequest = { showResetConfirm = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_reset_title)) },
+            text = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_reset_body)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    plan = null
+                    rawPlan = null
+                    inputs = emptyMap()
+                    markdown = null
+                    report = null
+                    exportedFile = null
+                    manifestText = null
+                    exportVerify = null
+                    error = null
+                    batchChunks = emptyList()
+                    batchNote = null
+                    draftStore.clear(project.id)
+                    showResetConfirm = false
+                }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_reset)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showResetConfirm = false }) { Text(stringResource(android.R.string.cancel)) }
+            }
+        )
     }
 
     if (editingPreview) {
