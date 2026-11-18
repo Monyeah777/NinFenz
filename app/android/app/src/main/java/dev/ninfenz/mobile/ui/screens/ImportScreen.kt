@@ -1093,6 +1093,10 @@ fun ImportScreen(
                 Column(modifier = Modifier.fillMaxWidth().padding(NfSpacing.l), verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(stringResource(dev.ninfenz.mobile.R.string.import_preview_ready), style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
+                        TextButton(onClick = {
+                            val intent = ShareExporter.shareMarkdown(context, "nf-import-preview", text)
+                            ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.delivery_share_md))
+                        }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_share_md)) }
                         TextButton(onClick = { importPreviewText = null }) { Text(stringResource(dev.ninfenz.mobile.R.string.preview_close)) }
                     }
                     Column(modifier = Modifier.heightIn(max = 520.dp).verticalScroll(rememberScrollState())) {
