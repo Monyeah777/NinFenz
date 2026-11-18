@@ -400,6 +400,7 @@
     <string name="delivery_export_group_reading">Reading &amp; web</string>
     <string name="delivery_export_group_share">Share</string>
     <string name="delivery_share_md">Share Markdown</string>
+    <string name="delivery_share_fix">Share fix prompt</string>
     <string name="delivery_share_file">Share exported file</string>
     <string name="delivery_open_file">Open</string>
     <string name="delivery_pdf_note">PDF: local HTML/CSS first; falls back to basic text.</string>

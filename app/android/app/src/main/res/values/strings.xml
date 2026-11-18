@@ -396,6 +396,7 @@
     <string name="delivery_export_group_reading">阅读与网页</string>
     <string name="delivery_export_group_share">分享</string>
     <string name="delivery_share_md">分享 Markdown</string>
+    <string name="delivery_share_fix">分享修正 Prompt</string>
     <string name="delivery_share_file">分享导出文件</string>
     <string name="delivery_open_file">打开</string>
     <string name="delivery_pdf_note">PDF：优先本地 HTML/CSS 渲染；失败回退基础文本。</string>

@@ -74,6 +74,7 @@ import dev.ninfenz.mobile.data.ProjectStatusStore
 import dev.ninfenz.mobile.data.StatusAdvanceResult
 import dev.ninfenz.mobile.model.AssemblyPlan
 import dev.ninfenz.mobile.model.MarkdownBlock
+import dev.ninfenz.mobile.model.CorrectionPrompt
 import dev.ninfenz.mobile.model.MarkdownBlocks
 import dev.ninfenz.mobile.model.SpecModel
 import dev.ninfenz.mobile.model.PlanModel
@@ -695,6 +696,15 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                     Text(ReportModel.line(r), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(horizontal = NfSpacing.page))
                     validateRepro?.let {
                         Text(it, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page))
+                    }
+                    if (r.issues.isNotEmpty() && markdown != null) {
+                        TextButton(onClick = {
+                            val prompt = CorrectionPrompt.build(markdown!!, r)
+                            val intent = ShareExporter.shareMarkdown(context, "nf-fix-prompt", prompt)
+                            ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.delivery_share_fix))
+                        }, modifier = Modifier.padding(horizontal = NfSpacing.page)) {
+                            Text(stringResource(dev.ninfenz.mobile.R.string.delivery_share_fix))
+                        }
                     }
                     for (issue in r.issues.take(20)) {
                         Text(
