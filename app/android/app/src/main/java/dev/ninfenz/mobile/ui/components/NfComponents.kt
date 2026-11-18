@@ -138,12 +138,12 @@ fun NfCollapsibleSection(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { expanded = !expanded }
-                .padding(horizontal = NfSpacing.page, vertical = NfSpacing.s),
+                .padding(horizontal = NfLayout.pageCompact, vertical = NfSpacing.s),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(title, style = MaterialTheme.typography.titleLarge, modifier = Modifier.semantics { heading() })
+                Text(title, style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() })
                 subtitle?.let {
                     Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }

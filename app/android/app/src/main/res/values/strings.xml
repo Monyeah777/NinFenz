@@ -344,6 +344,10 @@
     <string name="delivery_status_note">项目状态：%1$s</string>
     <string name="delivery_status_fail">状态写回失败：%1$s</string>
     <string name="delivery_export_section">4 · 导出与分享</string>
+    <string name="delivery_export_group_docs">文档</string>
+    <string name="delivery_export_group_data">数据与迁移</string>
+    <string name="delivery_export_group_reading">阅读与网页</string>
+    <string name="delivery_export_group_share">分享</string>
     <string name="delivery_share_md">分享 Markdown</string>
     <string name="delivery_share_file">分享导出文件</string>
     <string name="delivery_open_file">打开</string>

@@ -596,6 +596,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                 }
 
                 NfCollapsibleSection(title = stringResource(dev.ninfenz.mobile.R.string.delivery_export_section), initiallyExpanded = true) {
+                Text(stringResource(dev.ninfenz.mobile.R.string.delivery_export_group_docs), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(start = NfSpacing.page, end = NfSpacing.page, top = NfSpacing.s))
                 Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                     ExportButton("md", "text/markdown", markdown, project, context, scope, { busy = it }, { error = it }, busy) { file, manifest, report ->
                         exportedFile = file
@@ -641,6 +642,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                         recordExport("docx", file, manifest)
                     }
                 }
+                Text(stringResource(dev.ninfenz.mobile.R.string.delivery_export_group_data), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(start = NfSpacing.page, end = NfSpacing.page, top = NfSpacing.s))
                 Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                     ExportButton("json", "application/json", markdown, project, context, scope, { busy = it }, { error = it }, busy) { file, manifest, report ->
                         exportedFile = file
@@ -665,6 +667,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                         recordExport("skill", file, manifest)
                     }
                 }
+                Text(stringResource(dev.ninfenz.mobile.R.string.delivery_export_group_reading), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(start = NfSpacing.page, end = NfSpacing.page, top = NfSpacing.s))
                 Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                     EpubExportButton(markdown, project, context, scope, { busy = it }, { error = it }, busy) { file, report ->
                         exportedFile = file
