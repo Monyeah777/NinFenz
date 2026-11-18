@@ -284,6 +284,7 @@
         <item quantity="other">Type a keyword; %1$d local items indexed.</item>
     </plurals>
     <string name="search_no_result">No matches</string>
+    <string name="search_clear">Clear search</string>
     <string name="search_kind_project">Projects</string>
     <string name="search_kind_pack">Packs</string>
     <string name="search_kind_clause">Clauses</string>

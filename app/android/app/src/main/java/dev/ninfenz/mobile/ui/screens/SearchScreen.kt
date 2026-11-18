@@ -170,12 +170,16 @@ fun SearchScreen(
                 onPick = { query = it },
                 onClear = { historyStore.clear(); history = emptyList() }
             )
-            filtered.isEmpty() -> Text(
-                stringResource(dev.ninfenz.mobile.R.string.search_no_result),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(NfSpacing.page)
-            )
+            filtered.isEmpty() -> Column(modifier = Modifier.padding(NfSpacing.page)) {
+                Text(
+                    stringResource(dev.ninfenz.mobile.R.string.search_no_result),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                TextButton(onClick = { query = "" }) {
+                    Text(stringResource(dev.ninfenz.mobile.R.string.search_clear))
+                }
+            }
             else -> LazyColumn(
                 state = listState,
                 contentPadding = PaddingValues(bottom = 96.dp),
