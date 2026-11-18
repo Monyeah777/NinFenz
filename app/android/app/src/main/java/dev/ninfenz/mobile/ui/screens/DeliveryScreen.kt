@@ -535,9 +535,20 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                     } else if (plan!!.slots.isEmpty()) {
                         Text(stringResource(dev.ninfenz.mobile.R.string.delivery_no_slots), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page))
                     } else {
+                        var lastSection: String? = null
                         for (slot in plan!!.slots) {
                             Column(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
                                 val slotMeta = specMeta?.slots?.firstOrNull { it.id == slot }
+                                val sectionTitle = slotMeta?.let { meta -> specMeta?.sections?.firstOrNull { it.id == meta.section }?.title }
+                                val sectionId = slotMeta?.section
+                                if (sectionTitle != null && sectionId != null && sectionId != lastSection) {
+                                    Text(
+                                        sectionTitle,
+                                        style = MaterialTheme.typography.titleSmall,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                    lastSection = sectionId
+                                }
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceBetween,
