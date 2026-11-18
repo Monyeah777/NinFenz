@@ -24,8 +24,8 @@
 
 | 项 | 结果 |
 |---|---|
-| APK | app-debug.apk = 21,106,317 B；sha256 1a7e397a48abfed6569e00dec8a98de0c4868577f3172be8875bef0b7d829187 |
-| JVM 测试 | 394 条全绿（v1 基线 42 + v0.02 新增 350；含 Robolectric/Compose/Paparazzi） |
+| APK | app-debug.apk = 21,108,305 B；sha256 3132f87f233ee28ad78d9f621a592897edfbfaa755a46bdf6e6fff99aa927a62 |
+| JVM 测试 | 395 条全绿（v1 基线 42 + v0.02 新增 350；含 Robolectric/Compose/Paparazzi） |
 | 构建 | ./gradlew :app:assembleDebug 成功；:app:testDebugUnitTest 388/388；lint 0 warnings |
 | i18n | 全部屏主要文案已资源化 + values-en；「我的」zh/en/跟随系统切换；动态取色开关；库/Pack 中心下拉刷新；节点删除 Snackbar 撤销 + 触觉；expanded 双栏（主列表+详情）；导航 Crossfade（NfMotion.MEDIUM_MS）；统一 loading/skeleton 组件；UI 中文硬编码守卫通过 |
 | 适配 | compact/medium/expanded 三档导航 + 9 组窗口尺寸语义矩阵 |
@@ -42,7 +42,7 @@
 ### 0.4 v0.02 收口（2026-11-15）
 
 - 机读门禁：app/gates **7/7 PASS，FAIL=0**（QA0 10 / QA5 5）；仓库 verify **PASS=107 WARN=2 FAIL=0**。
-- 测试/产物：JVM **388/388**；APK 21,106,317 B，sha256 1a7e397a…。
+- 测试/产物：JVM **388/388**；APK 21,108,305 B，sha256 3132f87f…。
 - 结论：**v0.02 实现面 pass-with-open-items**；下方 OPEN 不因收口消失，未跑面不写成 pass。
 
 ### 0.5 v0.02 OPEN（带 owner+next）
@@ -186,7 +186,7 @@
 
 | 产物 | 值 | 复跑 |
 |---|---|---|
-| Android APK | 21,106,317 B；含 `lib/{arm64-v8a,x86_64}/libnf_app_core.so`；`zipalign -c -P 16 4` 通过 | `bash app/scripts/build_android.sh debug` |
+| Android APK | 21,108,305 B；含 `lib/{arm64-v8a,x86_64}/libnf_app_core.so`；`zipalign -c -P 16 4` 通过 | `bash app/scripts/build_android.sh debug` |
 | Rust `.so` | arm64 4,478,824 B / x86_64 4,645,976 B（NDK r27，LOAD align 0x4000） | `bash app/scripts/build_core_android.sh` |
 | Windows MSI | 66,573,406 B；app jar 内含 `native/nf_app_core.dll` | `bash app/scripts/build_desktop.sh package`（WIX_PATH） |
 | Rust CLI / cdylib | `nf-app-core.exe` / `nf_app_core.dll` | `bash app/scripts/build_core.sh --release` |

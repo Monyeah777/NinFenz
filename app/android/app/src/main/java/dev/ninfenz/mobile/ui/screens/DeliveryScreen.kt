@@ -116,6 +116,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
     val clipboard = LocalClipboardManager.current
+    val sampleStore = remember { dev.ninfenz.mobile.data.PromptSampleStore(context.filesDir) }
     val scope = rememberCoroutineScope()
     val statusStore = remember { ProjectStatusStore(context.filesDir) }
     var status by remember(project.id) { mutableStateOf(project.status) }
@@ -955,6 +956,17 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                 }
                                 TextButton(onClick = { clipboard.setText(AnnotatedString(md)) }) {
                                     Text(stringResource(dev.ninfenz.mobile.R.string.preview_copy))
+                                }
+                                TextButton(onClick = {
+                                    val saved = runCatching { sampleStore.save("delivery-" + project.id, md) }.getOrNull()
+                                    android.widget.Toast.makeText(
+                                        context,
+                                        if (saved != null) context.getString(dev.ninfenz.mobile.R.string.delivery_save_sample) + ": " + saved.name
+                                        else context.getString(dev.ninfenz.mobile.R.string.delivery_save_sample),
+                                        android.widget.Toast.LENGTH_SHORT
+                                    ).show()
+                                }) {
+                                    Text(stringResource(dev.ninfenz.mobile.R.string.delivery_save_sample))
                                 }
                                 TextButton(onClick = {
                                     val intent = ShareExporter.shareMarkdown(context, "nf-" + project.id, md)
