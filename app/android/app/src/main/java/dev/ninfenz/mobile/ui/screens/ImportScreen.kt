@@ -60,6 +60,7 @@ import dev.ninfenz.mobile.data.ShareQueueStore
 import dev.ninfenz.mobile.data.FileAccess
 import dev.ninfenz.mobile.data.ImportDraftStore
 import dev.ninfenz.mobile.data.ImportHistoryStore
+import dev.ninfenz.mobile.data.PromptSampleStore
 import dev.ninfenz.mobile.data.TemplateCandidateStore
 import dev.ninfenz.mobile.data.LibraryStore
 import dev.ninfenz.mobile.model.ImportDoc
@@ -132,6 +133,8 @@ fun ImportScreen(
     val importDraftStore = remember { ImportDraftStore(context.filesDir) }
     val templateStore = remember { TemplateCandidateStore(context.filesDir) }
     var savedTemplates by remember { mutableStateOf(templateStore.list()) }
+    val sampleStore = remember { PromptSampleStore(context.filesDir) }
+    var savedSamples by remember { mutableStateOf(sampleStore.list()) }
     var pendingDeleteTemplate by remember { mutableStateOf<File?>(null) }
     var importPreviewText by remember { mutableStateOf<String?>(null) }
     var drafts by remember { mutableStateOf(DraftLibrary.list(context.filesDir)) }
@@ -663,6 +666,23 @@ fun ImportScreen(
                                 }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_save_template)) }
                                 TextButton(onClick = { templatePicker.launch(arrayOf("application/json", "text/json", "text/plain")) }) {
                                     Text(stringResource(dev.ninfenz.mobile.R.string.import_template_import))
+                                }
+                                if (savedSamples.isNotEmpty()) {
+                                    Text(
+                                        stringResource(dev.ninfenz.mobile.R.string.import_samples_saved, savedSamples.size),
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                    savedSamples.take(3).forEach { file ->
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Text(file.name, style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
+                                            TextButton(onClick = {
+                                                val text = runCatching { file.readText(Charsets.UTF_8) }.getOrDefault("")
+                                                val intent = ShareExporter.shareMarkdown(context, "nf-sample", text)
+                                                ShareExporter.launchChooser(context, intent, file.name)
+                                            }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_template_share)) }
+                                        }
+                                    }
                                 }
                                 if (savedTemplates.isNotEmpty()) {
                                     Text(
