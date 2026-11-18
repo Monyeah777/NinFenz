@@ -115,6 +115,8 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
     var inputs by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
     var markdown by remember { mutableStateOf<String?>(null) }
     var showFullPreview by remember { mutableStateOf(false) }
+    var editingPreview by remember { mutableStateOf(false) }
+    var previewDraft by remember { mutableStateOf("") }
     var report by remember { mutableStateOf<ValidateReport?>(null) }
     var manifestText by remember { mutableStateOf<String?>(null) }
     var exportedFile by remember { mutableStateOf<File?>(null) }
@@ -832,14 +834,59 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                     markdown?.let { md ->
                         Column(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
                             MarkdownPreview(md, limitBlocks = 8)
-                            TextButton(onClick = { showFullPreview = true }) {
-                                Text(stringResource(dev.ninfenz.mobile.R.string.preview_full))
+                            Row {
+                                TextButton(onClick = { previewDraft = md; editingPreview = true }) {
+                                    Text(stringResource(dev.ninfenz.mobile.R.string.preview_edit))
+                                }
+                                TextButton(onClick = { showFullPreview = true }) {
+                                    Text(stringResource(dev.ninfenz.mobile.R.string.preview_full))
+                                }
                             }
                         }
                     } ?: Text(stringResource(dev.ninfenz.mobile.R.string.delivery_not_assembled), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page))
                 }
             }
         }
+    }
+
+    if (editingPreview) {
+        AlertDialog(
+            onDismissRequest = { editingPreview = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.preview_edit_title)) },
+            text = {
+                Column(
+                    modifier = Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(NfSpacing.s)
+                ) {
+                    Text(
+                        stringResource(dev.ninfenz.mobile.R.string.preview_edit_note),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    OutlinedTextField(
+                        value = previewDraft,
+                        onValueChange = { previewDraft = it },
+                        modifier = Modifier.fillMaxWidth().heightIn(min = 240.dp),
+                        minLines = 12
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    markdown = previewDraft
+                    report = null
+                    validateRepro = null
+                    exportedFile = null
+                    exportVerify = null
+                    editingPreview = false
+                }) { Text(stringResource(dev.ninfenz.mobile.R.string.preview_save)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { editingPreview = false }) {
+                    Text(stringResource(android.R.string.cancel))
+                }
+            }
+        )
     }
 
     slotImportTarget?.let { target ->

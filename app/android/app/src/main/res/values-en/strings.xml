@@ -380,6 +380,10 @@
     <string name="delivery_preview">Preview</string>
     <string name="preview_full">Full preview</string>
     <string name="preview_close">Close preview</string>
+    <string name="preview_edit">Edit</string>
+    <string name="preview_edit_title">Edit preview</string>
+    <string name="preview_edit_note">Saved edits invalidate the current validation; run validate again.</string>
+    <string name="preview_save">Save</string>
     <string name="preview_more">… %1$d more blocks; open full preview</string>
     <string name="preview_image">Image</string>
     <string name="delivery_not_assembled">Nothing assembled yet. Preview only shows markdown returned by core.</string>
