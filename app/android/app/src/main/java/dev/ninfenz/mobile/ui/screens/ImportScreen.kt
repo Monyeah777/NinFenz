@@ -58,10 +58,12 @@ import dev.ninfenz.mobile.data.ShareQueueStore
 import dev.ninfenz.mobile.data.FileAccess
 import dev.ninfenz.mobile.data.ImportDraftStore
 import dev.ninfenz.mobile.data.ImportHistoryStore
+import dev.ninfenz.mobile.data.TemplateCandidateStore
 import dev.ninfenz.mobile.data.LibraryStore
 import dev.ninfenz.mobile.model.ImportDoc
 import dev.ninfenz.mobile.model.MarkdownBlocks
 import dev.ninfenz.mobile.model.MarkdownSlicer
+import dev.ninfenz.mobile.model.TemplateCandidate
 import dev.ninfenz.mobile.model.ImportModel
 import dev.ninfenz.mobile.share.SharePayload
 import dev.ninfenz.mobile.share.SharedItem
@@ -598,6 +600,18 @@ fun ImportScreen(
                                     style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.primary
                                 )
+                                TextButton(onClick = {
+                                    val spec = TemplateCandidate.fromSlices(current.source.name, slices) ?: return@TextButton
+                                    scope.launch {
+                                        val response = safeCall("spec-validate", buildJsonObject { put("spec", spec) })
+                                        if (response.ok) {
+                                            val file = TemplateCandidateStore(context.filesDir).save(spec)
+                                            notice = context.getString(dev.ninfenz.mobile.R.string.import_template_saved, file.name)
+                                        } else {
+                                            error = response.error
+                                        }
+                                    }
+                                }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_save_template)) }
                                 slices.take(6).forEach { slice ->
                                     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                                         Text(
