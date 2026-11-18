@@ -646,7 +646,10 @@ fun ImportScreen(
                                     Text(stringResource(dev.ninfenz.mobile.R.string.import_preview_ready))
                                 }
                                 TextButton(onClick = {
-                                    val pack = PromptPack.from(current.source.name, current.text.orEmpty(), slices)
+                                    val sampleTexts = savedSamples.take(2).mapNotNull { sample ->
+                                        runCatching { sample.readText(Charsets.UTF_8) }.getOrNull()
+                                    }
+                                    val pack = PromptPack.from(current.source.name, current.text.orEmpty(), slices, sampleTexts)
                                     val intent = ShareExporter.shareMarkdown(context, "nf-prompt-pack", pack)
                                     ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.import_prompt_pack))
                                 }) {

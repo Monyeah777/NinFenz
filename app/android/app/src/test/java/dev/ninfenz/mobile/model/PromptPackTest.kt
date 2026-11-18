@@ -7,11 +7,12 @@ class PromptPackTest {
     @Test
     fun includesSampleStructureAndConstraints() {
         val slices = MarkdownSlicer.slice(MarkdownBlocks.parse("# 标题\n\n正文"))
-        val pack = PromptPack.from("source", "# 标题\n\n正文", slices)
+        val pack = PromptPack.from("source", "# 标题\n\n正文", slices, listOf("# 已保存样本"))
         assertTrue(pack.contains("# NF Prompt Pack"))
         assertTrue(pack.contains("## 样本"))
         assertTrue(pack.contains("## 约束"))
         assertTrue(pack.contains("## 验收"))
         assertTrue(pack.contains("标题"))
+        assertTrue(pack.contains("样本库参考"))
     }
 }
