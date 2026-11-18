@@ -1,17 +1,27 @@
 package dev.ninfenz.mobile.ui.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
@@ -24,6 +34,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.data.ProjectEntry
@@ -49,6 +60,7 @@ fun WorkflowHubScreen(
     onImport: () -> Unit
 ) {
     var filter by rememberSaveable { mutableStateOf("active") }
+    var projectsExpanded by rememberSaveable { mutableStateOf(true) }
     val visible = ProjectSorter.sort(
         projects.filter {
             when (filter) {
@@ -109,37 +121,76 @@ fun WorkflowHubScreen(
                     )
                 }
             } else {
-                item { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.library_section_projects)) }
-                items(visible.size) { index ->
-                    val entry = visible[index]
-                    val status = entry.project.status
-                    val nextAuthor = status == ProjectStatus.DRAFT || status == ProjectStatus.AUTHORING
-                    NfCard(
-                        modifier = Modifier.padding(horizontal = NfSpacing.page),
-                        onClick = { onOpenProject(entry) }
-                    ) {
-                        Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(entry.project.title, style = MaterialTheme.typography.titleMedium)
-                                    Text(entry.project.id, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                }
-                                NfStatusChip(projectStatusLabel(entry.project))
-                            }
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
+                item {
+                    val chevron by animateFloatAsState(
+                        targetValue = if (projectsExpanded) 180f else 0f,
+                        animationSpec = tween(durationMillis = 220),
+                        label = "workhub-projects-chevron"
+                    )
+                    NfSectionHeader(
+                        stringResource(dev.ninfenz.mobile.R.string.library_section_projects),
+                        action = {
+                            androidx.compose.material3.IconButton(
+                                onClick = { projectsExpanded = !projectsExpanded },
+                                modifier = Modifier.size(48.dp)
                             ) {
-                                TextButton(onClick = { if (nextAuthor) onAuthor(entry) else onDelivery(entry) }) {
-                                    Text(
-                                        stringResource(
-                                            if (nextAuthor) dev.ninfenz.mobile.R.string.flow_action_author
-                                            else dev.ninfenz.mobile.R.string.flow_action_delivery
-                                        )
-                                    )
+                                androidx.compose.material3.Icon(
+                                    Icons.Filled.KeyboardArrowDown,
+                                    contentDescription = stringResource(
+                                        if (projectsExpanded) dev.ninfenz.mobile.R.string.action_collapse
+                                        else dev.ninfenz.mobile.R.string.action_expand
+                                    ),
+                                    modifier = Modifier.rotate(chevron)
+                                )
+                            }
+                        }
+                    )
+                }
+                item {
+                    AnimatedVisibility(
+                        visible = projectsExpanded,
+                        enter = fadeIn(tween(180)) + expandVertically(
+                            animationSpec = spring(dampingRatio = 0.82f, stiffness = 420f),
+                            expandFrom = Alignment.Top
+                        ),
+                        exit = fadeOut(tween(120)) + shrinkVertically(
+                            animationSpec = spring(dampingRatio = 0.9f, stiffness = 500f),
+                            shrinkTowards = Alignment.Top
+                        )
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(horizontal = NfSpacing.page),
+                            verticalArrangement = Arrangement.spacedBy(NfSpacing.l)
+                        ) {
+                            visible.forEach { entry ->
+                                val status = entry.project.status
+                                val nextAuthor = status == ProjectStatus.DRAFT || status == ProjectStatus.AUTHORING
+                                NfCard(onClick = { onOpenProject(entry) }) {
+                                    Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Column(modifier = Modifier.weight(1f)) {
+                                                Text(entry.project.title, style = MaterialTheme.typography.titleMedium)
+                                                Text(entry.project.id, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                            }
+                                            NfStatusChip(projectStatusLabel(entry.project))
+                                        }
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            TextButton(onClick = { if (nextAuthor) onAuthor(entry) else onDelivery(entry) }) {
+                                                Text(
+                                                    stringResource(
+                                                        if (nextAuthor) dev.ninfenz.mobile.R.string.flow_action_author
+                                                        else dev.ninfenz.mobile.R.string.flow_action_delivery
+                                                    )
+                                                )
+                                            }
+                                            Text("›", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        }
+                                    }
                                 }
-                                Text("›", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                         }
                     }
