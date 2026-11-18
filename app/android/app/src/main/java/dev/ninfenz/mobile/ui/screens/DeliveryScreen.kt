@@ -142,6 +142,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
     var previewDirty by remember { mutableStateOf(false) }
     var needsRevalidate by remember { mutableStateOf(false) }
     val assembleRequester = remember { BringIntoViewRequester() }
+    var missingRequired by remember { mutableStateOf<List<String>>(emptyList()) }
     var showDiscardPreview by remember { mutableStateOf(false) }
     var assignBlockText by remember { mutableStateOf<String?>(null) }
     var report by remember { mutableStateOf<ValidateReport?>(null) }
@@ -429,6 +430,9 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
             }
             error?.let { err -> NfErrorCard(err.code, err.message, err.fix, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
 
+            LaunchedEffect(specMeta, inputs) {
+                missingRequired = specMeta?.slots?.filter { it.required && inputs[it.id].isNullOrBlank() }?.map { it.id }.orEmpty()
+            }
             val exportMarkdown = if (needsRevalidate || report?.verdict == "fail") null else markdown
             val current = artifacts
             suspend fun compilePlan(art: AuthorArtifacts) {
@@ -568,7 +572,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                 NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.delivery_assemble_validate))
                 Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                     Button(
-                        enabled = !busy && rawPlan != null,
+                        enabled = !busy && rawPlan != null && missingRequired.isEmpty(),
                         modifier = Modifier.bringIntoViewRequester(assembleRequester),
                         onClick = {
                             val raw = rawPlan ?: return@Button
@@ -673,6 +677,14 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                             }
                         }
                     ) { Text(if (busy) stringResource(dev.ninfenz.mobile.R.string.delivery_assembling) else stringResource(dev.ninfenz.mobile.R.string.delivery_assemble)) }
+                    if (missingRequired.isNotEmpty()) {
+                        Text(
+                            stringResource(dev.ninfenz.mobile.R.string.delivery_missing_required, missingRequired.joinToString(", ")),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.padding(horizontal = NfSpacing.page)
+                        )
+                    }
                     Button(
                         enabled = !busy && markdown != null && rawPlan != null,
                         onClick = {

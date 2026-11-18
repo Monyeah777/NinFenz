@@ -397,6 +397,7 @@
     <string name="delivery_no_slots">This plan needs no slot inputs.</string>
     <string name="delivery_assemble_validate">3 · Assemble &amp; validate</string>
     <string name="delivery_assemble">assemble</string>
+    <string name="delivery_missing_required">Fill required slots first: %1$s</string>
     <string name="delivery_assembling">Assembling…</string>
     <string name="delivery_validate">validate L1</string>
     <string name="delivery_validating">Validating…</string>

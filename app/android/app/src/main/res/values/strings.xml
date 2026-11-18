@@ -393,6 +393,7 @@
     <string name="delivery_no_slots">该计划无需槽位输入。</string>
     <string name="delivery_assemble_validate">3 · 装配与校验</string>
     <string name="delivery_assemble">assemble</string>
+    <string name="delivery_missing_required">请先填写必填槽位：%1$s</string>
     <string name="delivery_assembling">装配中…</string>
     <string name="delivery_validate">validate L1</string>
     <string name="delivery_validating">校验中…</string>
