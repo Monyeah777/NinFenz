@@ -16,7 +16,6 @@
 
     <string name="nav_library">Library</string>
     <string name="nav_flow">Flow</string>
-    <string name="flow_header_summary">%1$d projects · %2$d active</string>
     <string name="flow_filter_active">Active</string>
     <string name="flow_filter_done">Delivered</string>
     <string name="flow_action_continue">Continue</string>
@@ -134,7 +133,22 @@
     </plurals>
     <string name="library_section_projects">Recent projects</string>
     <string name="library_header_title">Library</string>
-    <string name="library_header_summary">%1$d projects · %2$d packs</string>
+    <plurals name="library_header_projects">
+        <item quantity="one">%d project</item>
+        <item quantity="other">%d projects</item>
+    </plurals>
+    <plurals name="library_header_packs">
+        <item quantity="one">%d pack</item>
+        <item quantity="other">%d packs</item>
+    </plurals>
+    <plurals name="flow_header_projects">
+        <item quantity="one">%d project</item>
+        <item quantity="other">%d projects</item>
+    </plurals>
+    <plurals name="flow_header_active">
+        <item quantity="one">%d active</item>
+        <item quantity="other">%d active</item>
+    </plurals>
     <string name="library_project_archived">Moved to archive</string>
     <string name="library_project_undo">Undo</string>
     <string name="library_section_packs">Installed packs</string>

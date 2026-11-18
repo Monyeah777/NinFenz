@@ -16,7 +16,6 @@
 
     <string name="nav_library">库</string>
     <string name="nav_flow">工作台</string>
-    <string name="flow_header_summary">%1$d 个项目 · %2$d 个进行中</string>
     <string name="flow_filter_active">进行中</string>
     <string name="flow_filter_done">已交付</string>
     <string name="flow_action_continue">继续</string>
@@ -134,7 +133,18 @@
     </plurals>
     <string name="library_section_projects">最近项目</string>
     <string name="library_header_title">内容库</string>
-    <string name="library_header_summary">%1$d 个项目 · %2$d 个 Pack</string>
+    <plurals name="library_header_projects">
+        <item quantity="other">%d 个项目</item>
+    </plurals>
+    <plurals name="library_header_packs">
+        <item quantity="other">%d 个 Pack</item>
+    </plurals>
+    <plurals name="flow_header_projects">
+        <item quantity="other">%d 个项目</item>
+    </plurals>
+    <plurals name="flow_header_active">
+        <item quantity="other">%d 个进行中</item>
+    </plurals>
     <string name="library_project_archived">已移到归档</string>
     <string name="library_project_undo">撤销</string>
     <string name="library_section_packs">已安装 Pack</string>

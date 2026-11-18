@@ -37,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.data.ProjectEntry
@@ -95,7 +96,8 @@ fun WorkflowHubScreen(
                     verticalArrangement = Arrangement.spacedBy(NfSpacing.s)
                 ) {
                     Text(
-                        stringResource(dev.ninfenz.mobile.R.string.flow_header_summary, projects.size, projects.count { it.project.status != dev.ninfenz.mobile.model.ProjectStatus.EXPORTED && it.project.status != dev.ninfenz.mobile.model.ProjectStatus.REVIEWED }),
+                        pluralStringResource(dev.ninfenz.mobile.R.plurals.flow_header_projects, projects.size, projects.size) + " · " +
+                            pluralStringResource(dev.ninfenz.mobile.R.plurals.flow_header_active, projects.count { it.project.status != dev.ninfenz.mobile.model.ProjectStatus.EXPORTED && it.project.status != dev.ninfenz.mobile.model.ProjectStatus.REVIEWED }, projects.count { it.project.status != dev.ninfenz.mobile.model.ProjectStatus.EXPORTED && it.project.status != dev.ninfenz.mobile.model.ProjectStatus.REVIEWED }),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

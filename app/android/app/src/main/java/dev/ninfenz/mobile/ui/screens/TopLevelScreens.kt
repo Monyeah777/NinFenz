@@ -178,7 +178,8 @@ fun LibraryHomeScreen(
                         style = MaterialTheme.typography.headlineSmall
                     )
                     Text(
-                        stringResource(dev.ninfenz.mobile.R.string.library_header_summary, projects.size, packs.size),
+                        pluralStringResource(dev.ninfenz.mobile.R.plurals.library_header_projects, projects.size, projects.size) + " · " +
+                            pluralStringResource(dev.ninfenz.mobile.R.plurals.library_header_packs, packs.size, packs.size),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
