@@ -112,6 +112,7 @@ fun AuthorScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onAssem
 
     var tab by rememberSaveable { mutableIntStateOf(0) }
     var saveAndDeliverRequest by remember { mutableIntStateOf(0) }
+    var saveRequest by remember { mutableIntStateOf(0) }
     var artifacts by remember { mutableStateOf<AuthorArtifacts?>(null) }
     var loadError by remember { mutableStateOf<String?>(null) }
     var loading by remember { mutableStateOf(true) }
@@ -132,6 +133,14 @@ fun AuthorScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onAssem
             title = project.title,
             onBack = onBack,
             actions = {
+                TextButton(
+                    onClick = {
+                        if (AuthorTab.entries[tab] == AuthorTab.PROTOCOL) saveRequest++
+                    },
+                    modifier = Modifier.heightIn(min = 48.dp)
+                ) {
+                    Text(stringResource(dev.ninfenz.mobile.R.string.author_save))
+                }
                 TextButton(
                     onClick = {
                         if (AuthorTab.entries[tab] == AuthorTab.PROTOCOL) saveAndDeliverRequest++
@@ -186,7 +195,7 @@ fun AuthorScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onAssem
             val current = artifacts
             if (current != null) {
                 when (AuthorTab.entries[tab]) {
-                    AuthorTab.PROTOCOL -> ProtocolAuthorContent(current, project, pack, onSaved, saveAndDeliverRequest, onAssembly)
+                    AuthorTab.PROTOCOL -> ProtocolAuthorContent(current, project, pack, onSaved, saveRequest, saveAndDeliverRequest, onAssembly)
                     AuthorTab.GRAPH -> GraphAuthorContent(current, project, onSaved)
                     AuthorTab.SPEC -> SpecAuthorContent(current, project, onSaved)
                 }
@@ -201,6 +210,7 @@ private fun ProtocolAuthorContent(
     project: Project,
     pack: PackEntry,
     onSaved: () -> Unit,
+    saveRequest: Int,
     deliverRequest: Int,
     onAssembly: () -> Unit
 ) {
@@ -257,6 +267,10 @@ private fun ProtocolAuthorContent(
             }
             saving = false
         }
+    }
+
+    LaunchedEffect(saveRequest) {
+        if (saveRequest > 0) save()
     }
 
     LaunchedEffect(deliverRequest) {
