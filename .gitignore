@@ -103,3 +103,6 @@ app/**/__pycache__/
 results/app/device-2026-11-18-*
 results/app/mobbin*.png
 results/app/ref-*.png
+
+# 本地设计研究证据（不推公开仓）
+results/app/design_research/
