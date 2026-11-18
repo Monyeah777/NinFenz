@@ -11,6 +11,9 @@ class MarkdownBlocksTest {
         assertEquals(4, blocks.size)
         assertEquals("段落二", blocks.last().text)
         assertEquals(md, MarkdownBlocks.render(blocks))
+        assertEquals("heading", blocks.first().kind)
+        assertEquals("code", blocks[2].kind)
+        assertEquals("paragraph", blocks.last().kind)
     }
 
     @Test

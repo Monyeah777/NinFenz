@@ -1032,6 +1032,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     previewBlocks.forEachIndexed { index, block ->
+                        Text(block.kind, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         OutlinedTextField(
                             value = block.text,
                             onValueChange = { value ->

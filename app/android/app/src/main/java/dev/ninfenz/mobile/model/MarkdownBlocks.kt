@@ -1,7 +1,7 @@
 package dev.ninfenz.mobile.model
 
 /** 轻量 Markdown 块：按空行切分，代码围栏内的空行不切；用于块级预览编辑。 */
-data class MarkdownBlock(val id: Int, val text: String)
+data class MarkdownBlock(val id: Int, val text: String, val kind: String = "paragraph")
 
 object MarkdownBlocks {
     fun parse(markdown: String): List<MarkdownBlock> {
@@ -32,7 +32,19 @@ object MarkdownBlocks {
             }
         }
         if (inFence) flush() else flush()
-        return blocks.mapIndexed { index, text -> MarkdownBlock(index, text) }
+        return blocks.mapIndexed { index, text -> MarkdownBlock(index, text, kindOf(text)) }
+    }
+
+    private fun kindOf(text: String): String {
+        val first = text.lineSequence().firstOrNull()?.trim().orEmpty()
+        return when {
+            first.startsWith("\u0060\u0060\u0060") -> "code"
+            first.startsWith("#") -> "heading"
+            first.startsWith("|") -> "table"
+            first.startsWith(">") -> "quote"
+            first.startsWith("- ") || first.startsWith("* ") || first.firstOrNull()?.isDigit() == true -> "list"
+            else -> "paragraph"
+        }
     }
 
     fun render(blocks: List<MarkdownBlock>): String =
