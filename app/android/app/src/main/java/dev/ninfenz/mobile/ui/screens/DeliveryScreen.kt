@@ -46,6 +46,7 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -500,6 +501,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                                 style = MaterialTheme.typography.labelSmall,
                                                 color = if (it.required) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                                             )
+                                            Text(it.kind, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                         }
                                     }
                                     Row {
@@ -515,6 +517,11 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                     minLines = 2,
                                     maxLines = 6,
                                     keyboardOptions = KeyboardOptions(
+                                        keyboardType = when (slotMeta?.kind) {
+                                            "number", "int", "integer" -> KeyboardType.Number
+                                            "decimal", "float" -> KeyboardType.Decimal
+                                            else -> KeyboardType.Text
+                                        },
                                         imeAction = if (lastSlot) ImeAction.Done else ImeAction.Next
                                     ),
                                     keyboardActions = KeyboardActions(
