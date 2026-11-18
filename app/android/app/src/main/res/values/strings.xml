@@ -254,6 +254,7 @@
     <string name="import_templates_saved">已保存候选 %1$d 个</string>
     <string name="import_samples_saved">已保存 AI 样本 %1$d 个</string>
     <string name="import_template_share">分享</string>
+    <string name="import_template_copy">复制 JSON</string>
     <string name="import_template_import">导入候选</string>
     <string name="import_template_use">用此模板建项目</string>
     <string name="import_template_use_title">用此模板创建项目？</string>
