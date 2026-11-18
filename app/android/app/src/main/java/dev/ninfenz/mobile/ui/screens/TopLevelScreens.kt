@@ -199,9 +199,6 @@ fun LibraryHomeScreen(
                 TextButton(onClick = onImport, modifier = Modifier.heightIn(min = 48.dp)) {
                     Text(stringResource(dev.ninfenz.mobile.R.string.library_import))
                 }
-                TextButton(onClick = onSeed, enabled = !seeding, modifier = Modifier.heightIn(min = 48.dp)) {
-                    Text(if (seeding) stringResource(dev.ninfenz.mobile.R.string.library_loading_sample) else stringResource(dev.ninfenz.mobile.R.string.library_load_sample))
-                }
             }
             SeedLine(seedState)
         }

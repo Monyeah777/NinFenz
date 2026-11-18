@@ -32,6 +32,5 @@ class LargeFontComposeTest {
         }
         compose.onNodeWithText("内容库").assertIsDisplayed()
         compose.onNodeWithText("导入内容").assertIsDisplayed()
-        compose.onNodeWithText("载入示例").assertIsDisplayed()
     }
 }
