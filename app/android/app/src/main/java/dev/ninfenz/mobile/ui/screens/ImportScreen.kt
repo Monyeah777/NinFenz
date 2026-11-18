@@ -126,6 +126,7 @@ fun ImportScreen(
     val importDraftStore = remember { ImportDraftStore(context.filesDir) }
     val templateStore = remember { TemplateCandidateStore(context.filesDir) }
     var savedTemplates by remember { mutableStateOf(templateStore.list()) }
+    var pendingDeleteTemplate by remember { mutableStateOf<File?>(null) }
     var drafts by remember { mutableStateOf(DraftLibrary.list(context.filesDir)) }
     var recentImports by remember { mutableStateOf(importHistory.recent()) }
     var pendingDeleteDraft by remember { mutableStateOf<File?>(null) }
@@ -633,6 +634,9 @@ fun ImportScreen(
                                                 val intent = ShareExporter.shareFileIntent(context, file, "application/json", file.name)
                                                 ShareExporter.launchChooser(context, intent, file.name)
                                             }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_template_share)) }
+                                            TextButton(onClick = { pendingDeleteTemplate = file }) {
+                                                Text(stringResource(dev.ninfenz.mobile.R.string.import_template_delete))
+                                            }
                                         }
                                     }
                                 }
@@ -1071,6 +1075,24 @@ fun ImportScreen(
             },
             dismissButton = {
                 TextButton(onClick = { pendingDeleteDraft = null }) { Text(stringResource(android.R.string.cancel)) }
+            }
+        )
+    }
+
+    pendingDeleteTemplate?.let { file ->
+        AlertDialog(
+            onDismissRequest = { pendingDeleteTemplate = null },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.import_template_delete)) },
+            text = { Text(templateStore.titleOf(file)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    templateStore.delete(file)
+                    savedTemplates = templateStore.list()
+                    pendingDeleteTemplate = null
+                }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_template_delete)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { pendingDeleteTemplate = null }) { Text(stringResource(android.R.string.cancel)) }
             }
         )
     }

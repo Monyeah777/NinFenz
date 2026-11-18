@@ -248,6 +248,7 @@
     <string name="import_template_saved">模板候选已保存：%1$s</string>
     <string name="import_templates_saved">已保存候选 %1$d 个</string>
     <string name="import_template_share">分享</string>
+    <string name="import_template_delete">删除</string>
     <string name="import_low_confidence">低置信</string>
     <string name="import_source_label">来源：%1$s</string>
     <plurals name="import_structure">

@@ -15,6 +15,8 @@ class TemplateCandidateStore(private val filesDir: File) {
             ?: emptyList()
     }
 
+    fun delete(file: File): Boolean = runCatching { file.delete() }.getOrDefault(false)
+
     fun titleOf(file: File): String {
         return runCatching {
             val root = kotlinx.serialization.json.Json.parseToJsonElement(file.readText(Charsets.UTF_8)).jsonObject

@@ -252,6 +252,7 @@
     <string name="import_template_saved">Template candidate saved: %1$s</string>
     <string name="import_templates_saved">%1$d saved candidates</string>
     <string name="import_template_share">Share</string>
+    <string name="import_template_delete">Delete</string>
     <string name="import_low_confidence">Low confidence</string>
     <string name="import_source_label">Source: %1$s</string>
     <plurals name="import_structure">
