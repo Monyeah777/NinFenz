@@ -179,7 +179,12 @@ fun WorkflowHubScreen(
                                     Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                                         Row(verticalAlignment = Alignment.CenterVertically) {
                                             Column(modifier = Modifier.weight(1f)) {
-                                                Text(entry.project.title, style = MaterialTheme.typography.titleMedium)
+                                                Text(
+                                                    entry.project.title,
+                                                    style = MaterialTheme.typography.titleMedium,
+                                                    maxLines = 2,
+                                                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                                                )
                                                 Text(entry.project.id, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                             }
                                             NfStatusChip(projectStatusLabel(entry.project))

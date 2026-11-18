@@ -171,6 +171,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
         }
     }
     val restoredInputs = remember(project.id) { draftStore.load(project.id) }
+    val restoredPlan = remember(project.id) { draftStore.loadPlan(project.id) }
     var draftNote by remember(project.id) {
         mutableStateOf(if (restoredInputs.isNotEmpty()) context.getString(dev.ninfenz.mobile.R.string.delivery_draft_restored) else null)
     }
@@ -277,10 +278,18 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
 
     val latestInputs by rememberUpdatedState(inputs)
     val latestPlan by rememberUpdatedState(plan)
-    LaunchedEffect(project.id, plan, inputs) {
+    LaunchedEffect(project.id, plan, rawPlan, inputs) {
         if (plan != null) {
             delay(500)
-            withContext(Dispatchers.IO) { draftStore.save(project.id, inputs) }
+            withContext(Dispatchers.IO) { draftStore.save(project.id, inputs, rawPlan) }
+        }
+    }
+    LaunchedEffect(project.id, restoredPlan) {
+        val raw = restoredPlan ?: return@LaunchedEffect
+        runCatching { PlanModel.parse(raw) }.onSuccess { parsed ->
+            rawPlan = raw
+            plan = parsed
+            inputs = parsed.slots.associate { it to (restoredInputs[it] ?: "") }
         }
     }
     DisposableEffect(project.id) {
@@ -382,6 +391,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                     plan = parsed
                                     rawPlan = obj
                                     inputs = parsed.slots.associate { it to (restoredInputs[it] ?: "") }
+                                    draftStore.save(project.id, inputs, obj)
                                     draftNote = if (restoredInputs.isNotEmpty()) context.getString(dev.ninfenz.mobile.R.string.delivery_draft_restored) else null
                                     markdown = null
                                     report = null

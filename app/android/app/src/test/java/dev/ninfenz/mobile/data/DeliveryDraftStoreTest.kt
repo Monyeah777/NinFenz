@@ -4,6 +4,8 @@ import java.nio.file.Files
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 
 class DeliveryDraftStoreTest {
     @Test
@@ -15,6 +17,16 @@ class DeliveryDraftStoreTest {
         assertEquals("alpha", loaded["SLT-01"])
         assertEquals("gamma", loaded["SLT-03"])
         assertTrue(!loaded.containsKey("SLT-02"))
+    }
+
+    @Test
+    fun savesAndLoadsPlan() {
+        val dir = Files.createTempDirectory("nf-delivery-plan").toFile()
+        val store = DeliveryDraftStore(dir)
+        val plan = buildJsonObject { put("steps", 3); put("slots", 2) }
+        store.save("p", mapOf("SLT-01" to "alpha"), plan)
+        assertEquals("alpha", store.load("p")["SLT-01"])
+        assertEquals(3, store.loadPlan("p")?.get("steps")?.toString()?.toIntOrNull())
     }
 
     @Test

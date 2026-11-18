@@ -15,6 +15,17 @@ class DeliveryDraftStore(private val filesDir: File) {
         return File(File(filesDir, "drafts").apply { mkdirs() }, "delivery-" + safe + ".json")
     }
 
+    fun loadPlan(projectId: String): JsonObject? {
+        val f = file(projectId)
+        if (!f.isFile) return null
+        return try {
+            val root = Json.parseToJsonElement(f.readText(Charsets.UTF_8)).jsonObject
+            root["plan"] as? JsonObject
+        } catch (t: Throwable) {
+            null
+        }
+    }
+
     fun load(projectId: String): Map<String, String> {
         val f = file(projectId)
         if (!f.isFile) return emptyMap()
@@ -27,10 +38,10 @@ class DeliveryDraftStore(private val filesDir: File) {
         }
     }
 
-    fun save(projectId: String, slots: Map<String, String>) {
+    fun save(projectId: String, slots: Map<String, String>, plan: JsonObject? = null) {
         val nonBlank = slots.filterValues { it.isNotBlank() }
         val f = file(projectId)
-        if (nonBlank.isEmpty()) {
+        if (nonBlank.isEmpty() && plan == null) {
             f.delete()
             return
         }
@@ -38,6 +49,7 @@ class DeliveryDraftStore(private val filesDir: File) {
             put("schema", "nf-delivery-draft/1")
             put("project_id", projectId)
             put("slots", buildJsonObject { nonBlank.forEach { (k, v) -> put(k, v) } })
+            plan?.let { put("plan", it) }
         }
         AtomicFiles.writeText(f, payload.toString())
     }
