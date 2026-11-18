@@ -88,6 +88,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
@@ -423,6 +424,33 @@ fun ImportScreen(
         importSharedItem(shareQueue[next])
     }
 
+    val templatePicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        scope.launch {
+            try {
+                val file = FileAccess.copyToCache(context, uri, "candidate.json")
+                val raw = file.readText(Charsets.UTF_8)
+                val spec = kotlinx.serialization.json.Json.parseToJsonElement(raw).jsonObject
+                val response = safeCall("spec-validate", buildJsonObject { put("spec", spec) })
+                if (response.ok) {
+                    val saved = templateStore.save(spec)
+                    savedTemplates = templateStore.list()
+                    notice = context.getString(dev.ninfenz.mobile.R.string.import_template_saved, templateStore.titleOf(saved))
+                } else {
+                    error = response.error
+                }
+                file.delete()
+            } catch (t: Throwable) {
+                error = CoreResponse.failure(
+                    "NF-SPC-001",
+                    context.getString(dev.ninfenz.mobile.R.string.import_template_import) + ": " + (t.message ?: t.javaClass.simpleName),
+                    context.getString(dev.ninfenz.mobile.R.string.import_parse_failed_fix),
+                    2
+                ).error
+            }
+        }
+    }
+
     LaunchedEffect(prefill) {
         if (prefill != null) {
             prefillNote = context.getString(dev.ninfenz.mobile.R.string.import_share_from, prefill.summary())
@@ -625,6 +653,9 @@ fun ImportScreen(
                                         }
                                     }
                                 }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_save_template)) }
+                                TextButton(onClick = { templatePicker.launch(arrayOf("application/json", "text/json", "text/plain")) }) {
+                                    Text(stringResource(dev.ninfenz.mobile.R.string.import_template_import))
+                                }
                                 if (savedTemplates.isNotEmpty()) {
                                     Text(
                                         stringResource(dev.ninfenz.mobile.R.string.import_templates_saved, savedTemplates.size),
