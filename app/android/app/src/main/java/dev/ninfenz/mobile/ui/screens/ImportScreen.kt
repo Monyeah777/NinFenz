@@ -67,6 +67,7 @@ import dev.ninfenz.mobile.model.ImportDoc
 import dev.ninfenz.mobile.model.MarkdownBlocks
 import dev.ninfenz.mobile.model.MarkdownSlicer
 import dev.ninfenz.mobile.model.PromptPack
+import dev.ninfenz.mobile.model.PromptProfile
 import dev.ninfenz.mobile.model.TemplateCandidate
 import dev.ninfenz.mobile.model.ImportModel
 import dev.ninfenz.mobile.share.SharePayload
@@ -138,6 +139,7 @@ fun ImportScreen(
     var pendingDeleteSample by remember { mutableStateOf<File?>(null) }
     var pendingDeleteTemplate by remember { mutableStateOf<File?>(null) }
     var importPreviewText by remember { mutableStateOf<String?>(null) }
+    var promptProfile by remember { mutableStateOf(PromptProfile.GENERIC) }
     var drafts by remember { mutableStateOf(DraftLibrary.list(context.filesDir)) }
     var recentImports by remember { mutableStateOf(importHistory.recent()) }
     var pendingDeleteDraft by remember { mutableStateOf<File?>(null) }
@@ -646,10 +648,15 @@ fun ImportScreen(
                                     Text(stringResource(dev.ninfenz.mobile.R.string.import_preview_ready))
                                 }
                                 TextButton(onClick = {
+                                    promptProfile = PromptProfile.entries[(promptProfile.ordinal + 1) % PromptProfile.entries.size]
+                                }) {
+                                    Text(promptProfile.label)
+                                }
+                                TextButton(onClick = {
                                     val sampleTexts = savedSamples.take(2).mapNotNull { sample ->
                                         runCatching { sample.readText(Charsets.UTF_8) }.getOrNull()
                                     }
-                                    val pack = PromptPack.from(current.source.name, current.text.orEmpty(), slices, sampleTexts)
+                                    val pack = PromptPack.from(current.source.name, current.text.orEmpty(), slices, sampleTexts, promptProfile)
                                     val intent = ShareExporter.shareMarkdown(context, "nf-prompt-pack", pack)
                                     ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.import_prompt_pack))
                                 }) {

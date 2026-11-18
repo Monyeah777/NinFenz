@@ -1,8 +1,21 @@
 package dev.ninfenz.mobile.model
 
+enum class PromptProfile(val label: String, val guidance: String) {
+    GENERIC("Generic", "遵循通用长文约束，先结构后正文。"),
+    DEEPSEEK("DeepSeek", "先给结构，再逐节展开；避免空泛总结。"),
+    CLAUDE("Claude", "保持克制，明确不确定信息，不补来源。"),
+    GPT("GPT", "按章节输出，减少套话和重复。")
+}
+
 /** 从导入切片生成可分享给 AI 的 Prompt Pack；只描述样本/结构/约束，不伪造事实。 */
 object PromptPack {
-    fun from(sourceTitle: String, text: String, slices: List<MarkdownSlice>, samples: List<String> = emptyList()): String {
+    fun from(
+        sourceTitle: String,
+        text: String,
+        slices: List<MarkdownSlice>,
+        samples: List<String> = emptyList(),
+        profile: PromptProfile = PromptProfile.GENERIC
+    ): String {
         val title = slices.firstOrNull { it.heading != null }?.heading ?: sourceTitle.ifBlank { "导入稿" }
         val outline = slices.take(12).joinToString("\n") { slice ->
             val h = slice.heading ?: "开篇"
@@ -26,6 +39,9 @@ object PromptPack {
                 }
                 appendLine()
             }
+            appendLine("## 模型 profile")
+            appendLine("- " + profile.label + "：" + profile.guidance)
+            appendLine()
             appendLine("## 约束")
             appendLine("- 保留样本中的事实与数字，不自行补充来源。")
             appendLine("- 缺失信息标记为【待核实】，不编造。")

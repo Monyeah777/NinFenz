@@ -14,5 +14,6 @@ class PromptPackTest {
         assertTrue(pack.contains("## 验收"))
         assertTrue(pack.contains("标题"))
         assertTrue(pack.contains("样本库参考"))
+        assertTrue(pack.contains("模型 profile"))
     }
 }
