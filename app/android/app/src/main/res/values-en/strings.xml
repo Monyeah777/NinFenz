@@ -256,6 +256,7 @@
     <string name="import_template_share">Share</string>
     <string name="import_template_import">Import candidate</string>
     <string name="import_prompt_pack">Share Prompt Pack</string>
+    <string name="import_prompt_copy">Copy Prompt Pack</string>
     <string name="import_template_delete">Delete</string>
     <string name="import_sample_delete">Delete sample</string>
     <string name="import_low_confidence">Low confidence</string>

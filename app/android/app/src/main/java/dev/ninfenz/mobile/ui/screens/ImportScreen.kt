@@ -42,6 +42,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -113,6 +115,7 @@ fun ImportScreen(
     onProjectImported: (String, String, String) -> Unit = { _, _, _ -> }
 ) {
     val context = LocalContext.current
+    val clipboard = LocalClipboardManager.current
     val scope = rememberCoroutineScope()
     var doc by remember { mutableStateOf<ImportDoc?>(null) }
     var rawResult by remember { mutableStateOf<JsonObject?>(null) }
@@ -652,15 +655,21 @@ fun ImportScreen(
                                 }) {
                                     Text(promptProfile.label)
                                 }
-                                TextButton(onClick = {
+                                val buildPromptPack = {
                                     val sampleTexts = savedSamples.take(2).mapNotNull { sample ->
                                         runCatching { sample.readText(Charsets.UTF_8) }.getOrNull()
                                     }
-                                    val pack = PromptPack.from(current.source.name, current.text.orEmpty(), slices, sampleTexts, promptProfile)
+                                    PromptPack.from(current.source.name, current.text.orEmpty(), slices, sampleTexts, promptProfile)
+                                }
+                                TextButton(onClick = {
+                                    val pack = buildPromptPack()
                                     val intent = ShareExporter.shareMarkdown(context, "nf-prompt-pack", pack)
                                     ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.import_prompt_pack))
                                 }) {
                                     Text(stringResource(dev.ninfenz.mobile.R.string.import_prompt_pack))
+                                }
+                                TextButton(onClick = { clipboard.setText(AnnotatedString(buildPromptPack())) }) {
+                                    Text(stringResource(dev.ninfenz.mobile.R.string.import_prompt_copy))
                                 }
                                 TextButton(onClick = {
                                     val spec = TemplateCandidate.fromSlices(current.source.name, slices) ?: return@TextButton

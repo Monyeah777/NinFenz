@@ -252,6 +252,7 @@
     <string name="import_template_share">分享</string>
     <string name="import_template_import">导入候选</string>
     <string name="import_prompt_pack">分享 Prompt Pack</string>
+    <string name="import_prompt_copy">复制 Prompt Pack</string>
     <string name="import_template_delete">删除</string>
     <string name="import_sample_delete">删除样本</string>
     <string name="import_low_confidence">低置信</string>
