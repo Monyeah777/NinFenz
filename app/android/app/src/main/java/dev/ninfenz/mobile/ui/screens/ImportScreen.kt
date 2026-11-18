@@ -672,7 +672,8 @@ fun ImportScreen(
                         ) {
                             Button(onClick = {
                                 val raw = rawResult ?: return@Button
-                                val base = store.uniqueDraftBase(current.source.name)
+                                val title = slices.firstOrNull { it.heading != null }?.heading ?: current.source.name
+                                val base = store.uniqueDraftBase(title)
                                 val file = store.saveDraft(base, raw.toString())
                                 val mappingJson = buildJsonObject {
                                     put("accepted", JsonArray(acceptedMappings.sorted().map { JsonPrimitive(it) }))
@@ -681,7 +682,7 @@ fun ImportScreen(
                                 store.saveDraft(base + ".mapping", mappingJson)
                                 savedName = file.name
                                 drafts = DraftLibrary.list(context.filesDir)
-                                onCreateProjectFromDraft(pack, base, file)
+                                onCreateProjectFromDraft(pack, title, file)
                             }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_quick_project)) }
                             Text(
                                 stringResource(dev.ninfenz.mobile.R.string.import_quick_project_note, pack.title),
