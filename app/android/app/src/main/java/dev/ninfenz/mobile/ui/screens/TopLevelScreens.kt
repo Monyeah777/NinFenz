@@ -29,8 +29,6 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextField
@@ -39,11 +37,9 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
-import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -124,7 +120,7 @@ fun LibraryHomeScreen(
     val viewStore = remember(viewFilesDir) { viewFilesDir?.let { LibraryViewStore(it) } }
     val savedView = remember { viewStore?.load() }
     var pendingDeleteArchive by remember { mutableStateOf<File?>(null) }
-    val snackbar = remember { SnackbarHostState() }
+    var undoArchive by remember { mutableStateOf<File?>(null) }
     val snackbarScope = rememberCoroutineScope()
     var statusFilter by rememberSaveable { mutableStateOf(savedView?.status) }
     var sortName by rememberSaveable { mutableStateOf(savedView?.sort ?: ProjectSort.RECENT.name) }
@@ -252,16 +248,8 @@ fun LibraryHomeScreen(
                                     ProjectArchiver.archive(entry.file, context.filesDir)
                                 }.getOrNull()
                                 if (archived != null) {
+                                    undoArchive = archived
                                     onRefresh()
-                                    val result = snackbar.showSnackbar(
-                                        message = context.getString(dev.ninfenz.mobile.R.string.library_project_archived),
-                                        actionLabel = context.getString(dev.ninfenz.mobile.R.string.library_project_undo),
-                                        duration = SnackbarDuration.Long
-                                    )
-                                    if (result == SnackbarResult.ActionPerformed) {
-                                        runCatching { ProjectArchiver.restore(archived, context.filesDir) }
-                                        onRefresh()
-                                    }
                                 }
                             }
                         },
@@ -338,7 +326,35 @@ fun LibraryHomeScreen(
         }
         }
     }
-    SnackbarHost(snackbar, modifier = Modifier.align(Alignment.BottomCenter))
+    undoArchive?.let { archived ->
+        Surface(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(horizontal = NfSpacing.page, vertical = NfSpacing.m),
+            shape = MaterialTheme.shapes.large,
+            tonalElevation = 6.dp
+        ) {
+            Row(
+                modifier = Modifier.padding(horizontal = NfSpacing.m, vertical = NfSpacing.xs),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)
+            ) {
+                Text(
+                    stringResource(dev.ninfenz.mobile.R.string.library_project_archived),
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.weight(1f)
+                )
+                TextButton(onClick = {
+                    runCatching { ProjectArchiver.restore(archived, context.filesDir) }
+                    undoArchive = null
+                    onRefresh()
+                }) { Text(stringResource(dev.ninfenz.mobile.R.string.library_project_undo)) }
+                TextButton(onClick = { undoArchive = null }) {
+                    Text(stringResource(android.R.string.cancel))
+                }
+            }
+        }
+    }
     }
 
     pendingDeleteArchive?.let { file ->
@@ -637,6 +653,7 @@ fun MeScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProjectDetailScreen(
     project: Project,
@@ -702,62 +719,11 @@ fun ProjectDetailScreen(
             title = project.title,
             onBack = onBack,
             actions = {
-                Box {
-                    IconButton(onClick = { showMoreActions = true }) {
-                        Icon(
-                            Icons.Filled.MoreVert,
-                            contentDescription = stringResource(dev.ninfenz.mobile.R.string.action_more)
-                        )
-                    }
-                    DropdownMenu(expanded = showMoreActions, onDismissRequest = { showMoreActions = false }) {
-                        DropdownMenuItem(text = { Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_duplicate)) }, onClick = {
-                            showMoreActions = false
-                            onDuplicate()
-                        })
-                        DropdownMenuItem(text = { Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_archive)) }, onClick = {
-                            showMoreActions = false
-                            showArchive = true
-                        })
-                        DropdownMenuItem(text = { Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_diff)) }, onClick = {
-                            showMoreActions = false
-                            diffPicker.launch(arrayOf("application/json", "*/*"))
-                        })
-                        if (compareCandidates.isNotEmpty()) {
-                            DropdownMenuItem(text = { Text(stringResource(dev.ninfenz.mobile.R.string.project_diff_library)) }, onClick = {
-                                showMoreActions = false
-                                showComparePicker = true
-                            })
-                        }
-                        DropdownMenuItem(text = { Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_rename)) }, onClick = {
-                            showMoreActions = false
-                            renameText = project.title
-                            showRename = true
-                        })
-                        DropdownMenuItem(text = { Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_review)) }, onClick = {
-                            showMoreActions = false
-                            showReview = true
-                        })
-                        DropdownMenuItem(text = { Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_share)) }, onClick = {
-                            showMoreActions = false
-                            onShare()
-                        })
-                        DropdownMenuItem(text = { Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_share_full)) }, onClick = {
-                            showMoreActions = false
-                            onShareFull()
-                        })
-                        DropdownMenuItem(
-                            text = {
-                                Text(
-                                    stringResource(dev.ninfenz.mobile.R.string.project_detail_delete),
-                                    color = MaterialTheme.colorScheme.error
-                                )
-                            },
-                            onClick = {
-                                showMoreActions = false
-                                showDelete = true
-                            }
-                        )
-                    }
+                IconButton(onClick = { showMoreActions = true }) {
+                    Icon(
+                        Icons.Filled.MoreVert,
+                        contentDescription = stringResource(dev.ninfenz.mobile.R.string.action_more)
+                    )
                 }
             }
         )
@@ -843,6 +809,71 @@ fun ProjectDetailScreen(
             }
             item { NfListRow(stringResource(dev.ninfenz.mobile.R.string.project_detail_author), stringResource(dev.ninfenz.mobile.R.string.project_detail_author_subtitle), Icons.Filled.Edit, "›", onAuthor) }
             item { NfListRow(stringResource(dev.ninfenz.mobile.R.string.project_detail_delivery), stringResource(dev.ninfenz.mobile.R.string.project_detail_delivery_subtitle), Icons.Filled.Info, "›", onAssembly) }
+        }
+    }
+
+    if (showMoreActions) {
+        ModalBottomSheet(onDismissRequest = { showMoreActions = false }) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = NfSpacing.page)
+                    .padding(bottom = NfSpacing.xl),
+                verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)
+            ) {
+                Text(stringResource(dev.ninfenz.mobile.R.string.project_more_actions), style = MaterialTheme.typography.titleLarge)
+                Text(project.title, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                HorizontalDivider(modifier = Modifier.padding(vertical = NfSpacing.s))
+                Text(stringResource(dev.ninfenz.mobile.R.string.project_actions_manage), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                NfListRow(stringResource(dev.ninfenz.mobile.R.string.project_detail_rename), null, Icons.Filled.Edit, "›") {
+                    showMoreActions = false
+                    renameText = project.title
+                    showRename = true
+                }
+                NfListRow(stringResource(dev.ninfenz.mobile.R.string.project_detail_review), null, Icons.Filled.Info, "›") {
+                    showMoreActions = false
+                    showReview = true
+                }
+                NfListRow(stringResource(dev.ninfenz.mobile.R.string.project_detail_duplicate), null, Icons.Filled.Add, "›") {
+                    showMoreActions = false
+                    onDuplicate()
+                }
+                NfListRow(stringResource(dev.ninfenz.mobile.R.string.project_detail_archive), null, Icons.Filled.Info, "›") {
+                    showMoreActions = false
+                    showArchive = true
+                }
+                NfListRow(stringResource(dev.ninfenz.mobile.R.string.project_detail_diff), null, Icons.AutoMirrored.Filled.List, "›") {
+                    showMoreActions = false
+                    diffPicker.launch(arrayOf("application/json", "*/*"))
+                }
+                if (compareCandidates.isNotEmpty()) {
+                    NfListRow(stringResource(dev.ninfenz.mobile.R.string.project_diff_library), null, Icons.AutoMirrored.Filled.List, "›") {
+                        showMoreActions = false
+                        showComparePicker = true
+                    }
+                }
+                HorizontalDivider(modifier = Modifier.padding(vertical = NfSpacing.s))
+                Text(stringResource(dev.ninfenz.mobile.R.string.project_actions_share), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                NfListRow(stringResource(dev.ninfenz.mobile.R.string.project_detail_share), null, Icons.Filled.Search, "›") {
+                    showMoreActions = false
+                    onShare()
+                }
+                NfListRow(stringResource(dev.ninfenz.mobile.R.string.project_detail_share_full), null, Icons.Filled.Search, "›") {
+                    showMoreActions = false
+                    onShareFull()
+                }
+                HorizontalDivider(modifier = Modifier.padding(vertical = NfSpacing.s))
+                Text(stringResource(dev.ninfenz.mobile.R.string.project_actions_danger), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                TextButton(
+                    onClick = {
+                        showMoreActions = false
+                        showDelete = true
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_delete), color = MaterialTheme.colorScheme.error)
+                }
+            }
         }
     }
 

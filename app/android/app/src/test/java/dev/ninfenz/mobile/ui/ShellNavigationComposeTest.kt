@@ -42,7 +42,7 @@ class ShellCompactNavigationTest {
         assertThreeDestinations(compose)
         compose.onNodeWithText("工作台").performClick()
         compose.waitForIdle()
-        compose.onNodeWithText("一个入口，继续内容").assertExists()
+        compose.onNodeWithText("继续你的内容").assertExists()
     }
 }
 

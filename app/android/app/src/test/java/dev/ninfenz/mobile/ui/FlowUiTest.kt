@@ -49,7 +49,7 @@ class FlowUiTest {
                 )
             }
         }
-        compose.onNodeWithText("一个入口，继续内容").assertIsDisplayed()
+        compose.onNodeWithText("继续你的内容").assertIsDisplayed()
         compose.onNodeWithText("演示项目").assertIsDisplayed()
         compose.onAllNodesWithText("继续创作").onFirst().assertIsDisplayed()
     }

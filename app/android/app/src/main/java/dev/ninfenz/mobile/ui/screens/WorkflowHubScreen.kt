@@ -122,15 +122,6 @@ fun WorkflowHubScreen(
                                 }
                                 NfStatusChip(projectStatusLabel(entry.project))
                             }
-                            Text(
-                                stringResource(
-                                    if (nextAuthor) dev.ninfenz.mobile.R.string.flow_action_author
-                                    else if (status == ProjectStatus.REVIEWED) dev.ninfenz.mobile.R.string.flow_action_review
-                                    else dev.ninfenz.mobile.R.string.flow_action_delivery
-                                ),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.primary
-                            )
                             Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                                 TextButton(onClick = { onOpenProject(entry) }) {
                                     Text(stringResource(dev.ninfenz.mobile.R.string.flow_open_project))

@@ -86,8 +86,11 @@ fun SwipeableProjectCard(
                 .matchParentSize()
                 .clip(RoundedCornerShape(24.dp))
                 .background(
-                    if (offset.value >= 0f) MaterialTheme.colorScheme.error
-                    else MaterialTheme.colorScheme.primary
+                    when {
+                        offset.value > 1f -> MaterialTheme.colorScheme.error
+                        offset.value < -1f -> MaterialTheme.colorScheme.primary
+                        else -> androidx.compose.ui.graphics.Color.Transparent
+                    }
                 )
                 .padding(horizontal = NfSpacing.l)
         ) {
