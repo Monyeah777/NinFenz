@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
@@ -331,7 +332,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
         plan != null -> 1
         else -> 0
     }
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = Modifier.fillMaxSize().imePadding()) {
         NfTopAppBar(title = stringResource(dev.ninfenz.mobile.R.string.delivery_title, project.title), onBack = onBack)
         NfStepStrip(
             steps = listOf(
@@ -487,6 +488,11 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                             val raw = rawPlan ?: return@Button
                             busy = true
                             error = null
+                            markdown = null
+                            report = null
+                            exportedFile = null
+                            exportVerify = null
+                            manifestText = null
                             scope.launch {
                                 val assemblePayload = buildJsonObject {
                                     put("plan", raw)
