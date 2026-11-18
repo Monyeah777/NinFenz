@@ -42,9 +42,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import android.content.Context
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -112,6 +114,7 @@ import kotlinx.serialization.json.put
 fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onStatusChanged: () -> Unit = {}) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
+    val clipboard = LocalClipboardManager.current
     val scope = rememberCoroutineScope()
     val statusStore = remember { ProjectStatusStore(context.filesDir) }
     var status by remember(project.id) { mutableStateOf(project.status) }
@@ -893,6 +896,9 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                 }
                                 TextButton(onClick = { showFullPreview = true }) {
                                     Text(stringResource(dev.ninfenz.mobile.R.string.preview_full))
+                                }
+                                TextButton(onClick = { clipboard.setText(AnnotatedString(md)) }) {
+                                    Text(stringResource(dev.ninfenz.mobile.R.string.preview_copy))
                                 }
                                 TextButton(onClick = {
                                     val intent = ShareExporter.shareMarkdown(context, "nf-" + project.id, md)

@@ -421,6 +421,7 @@
     <string name="preview_edit_title">编辑预览</string>
     <string name="preview_edit_note">保存后当前校验失效，需要重新校验。</string>
     <string name="preview_save">保存</string>
+    <string name="preview_copy">复制</string>
     <string name="preview_block_up">上移</string>
     <string name="preview_block_down">下移</string>
     <string name="preview_block_delete">删除</string>
