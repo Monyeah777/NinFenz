@@ -113,15 +113,17 @@ fun AuthorScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onAssem
     var tab by rememberSaveable { mutableIntStateOf(0) }
     var saveAndDeliverRequest by remember { mutableIntStateOf(0) }
     var saveRequest by remember { mutableIntStateOf(0) }
+    val authorContext = androidx.compose.ui.platform.LocalContext.current
+    val specOverride = java.io.File(java.io.File(java.io.File(authorContext.filesDir, "projects"), project.id), "authoring/spec-override.json")
     var artifacts by remember { mutableStateOf<AuthorArtifacts?>(null) }
     var loadError by remember { mutableStateOf<String?>(null) }
     var loading by remember { mutableStateOf(true) }
 
-    LaunchedEffect(pack.dir.absolutePath) {
+    LaunchedEffect(pack.dir.absolutePath, project.id) {
         loading = true
         loadError = null
         try {
-            artifacts = withContext(Dispatchers.IO) { AuthorArtifactsLoader.load(pack) }
+            artifacts = withContext(Dispatchers.IO) { AuthorArtifactsLoader.load(pack, specOverride) }
         } catch (t: Throwable) {
             loadError = t.message ?: t.javaClass.simpleName
         }

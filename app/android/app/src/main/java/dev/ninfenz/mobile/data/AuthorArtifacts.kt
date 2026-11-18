@@ -21,7 +21,7 @@ data class AuthorArtifacts(
 
 /** 从已安装 Pack 读取项目引用的 protocol/pipeline/spec（只读；编辑保存留 W4 后续）。 */
 object AuthorArtifactsLoader {
-    fun load(pack: PackEntry): AuthorArtifacts {
+    fun load(pack: PackEntry, specOverride: File? = null): AuthorArtifacts {
         val protocolFile = File(pack.dir, "protocol/nf-protocol-pack.json")
         val graphFile = File(pack.dir, "pipeline/main.nfg.json")
         val specFile = File(pack.dir, "spec/main.nfspec.json")
@@ -31,7 +31,8 @@ object AuthorArtifactsLoader {
 
         val protocolJson = J.parseObject(protocolFile.readText(Charsets.UTF_8), ProtocolModel.SCHEMA)
         val graphJson = J.parseObject(graphFile.readText(Charsets.UTF_8), GraphModel.SCHEMA)
-        val specJson = J.parseObject(specFile.readText(Charsets.UTF_8), SpecModel.SCHEMA)
+        val specSource = specOverride?.takeIf { it.isFile } ?: specFile
+        val specJson = J.parseObject(specSource.readText(Charsets.UTF_8), SpecModel.SCHEMA)
         return AuthorArtifacts(
             protocol = ProtocolModel.parse(protocolJson),
             protocolJson = protocolJson,

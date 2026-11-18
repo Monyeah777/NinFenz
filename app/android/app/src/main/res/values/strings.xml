@@ -255,6 +255,7 @@
     <string name="import_samples_saved">已保存 AI 样本 %1$d 个</string>
     <string name="import_template_share">分享</string>
     <string name="import_template_import">导入候选</string>
+    <string name="import_template_use">用此模板建项目</string>
     <string name="import_prompt_pack">分享 Prompt Pack</string>
     <string name="import_prompt_copy">复制 Prompt Pack</string>
     <string name="import_template_delete">删除</string>

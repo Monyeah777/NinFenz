@@ -113,6 +113,7 @@ fun ImportScreen(
     packs: List<PackEntry> = emptyList(),
     onCreateProjectFromDraft: (PackEntry, String, File) -> Unit = { _, _, _ -> },
     onQuickProjectFromDraft: (PackEntry, String, File) -> Unit = onCreateProjectFromDraft,
+    onCreateProjectFromTemplate: (PackEntry, String, String) -> Unit = { _, _, _ -> },
     onProjectImported: (String, String, String) -> Unit = { _, _, _ -> }
 ) {
     val context = LocalContext.current
@@ -771,6 +772,13 @@ fun ImportScreen(
                                                 val intent = ShareExporter.shareFileIntent(context, file, "application/json", file.name)
                                                 ShareExporter.launchChooser(context, intent, file.name)
                                             }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_template_share)) }
+                                            TextButton(onClick = {
+                                                val pack = packs.firstOrNull() ?: return@TextButton
+                                                val spec = runCatching { file.readText(Charsets.UTF_8) }.getOrNull() ?: return@TextButton
+                                                onCreateProjectFromTemplate(pack, templateStore.titleOf(file), spec)
+                                            }) {
+                                                Text(stringResource(dev.ninfenz.mobile.R.string.import_template_use))
+                                            }
                                             TextButton(onClick = { pendingDeleteTemplate = file }) {
                                                 Text(stringResource(dev.ninfenz.mobile.R.string.import_template_delete))
                                             }

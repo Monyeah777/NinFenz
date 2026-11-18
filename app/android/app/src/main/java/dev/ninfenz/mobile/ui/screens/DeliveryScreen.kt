@@ -332,11 +332,12 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
         }
     }
 
-    LaunchedEffect(pack?.dir?.absolutePath) {
+    val specOverride = java.io.File(java.io.File(java.io.File(context.filesDir, "projects"), project.id), "authoring/spec-override.json")
+    LaunchedEffect(pack?.dir?.absolutePath, project.id) {
         loading = true
         loadError = null
         try {
-            if (pack != null) artifacts = withContext(Dispatchers.IO) { AuthorArtifactsLoader.load(pack) }
+            if (pack != null) artifacts = withContext(Dispatchers.IO) { AuthorArtifactsLoader.load(pack, specOverride) }
         } catch (t: Throwable) {
             loadError = t.message ?: t.javaClass.simpleName
         }

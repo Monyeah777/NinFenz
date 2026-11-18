@@ -465,6 +465,23 @@ is Detail.Import -> ImportScreen(
                                 }
                             }
                         },
+                        onCreateProjectFromTemplate = { pack, title, spec ->
+                            scope.launch {
+                                when (val result = projectCreator.create(pack, title)) {
+                                    is CreateProjectResult.Success -> {
+                                        runCatching {
+                                            withContext(Dispatchers.IO) {
+                                                DraftProjectBinder.bindSpec(context.filesDir, result.project.id, spec)
+                                            }
+                                        }
+                                        refresh()
+                                        shell = shell.open(Detail.Author(result.project.id))
+                                    }
+                                    is CreateProjectResult.Failure ->
+                                        android.widget.Toast.makeText(context, result.message, android.widget.Toast.LENGTH_LONG).show()
+                                }
+                            }
+                        },
                         onQuickProjectFromDraft = { pack, title, draft ->
                             scope.launch {
                                 when (val result = projectCreator.create(pack, title)) {

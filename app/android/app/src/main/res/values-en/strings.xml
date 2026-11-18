@@ -259,6 +259,7 @@
     <string name="import_samples_saved">%1$d saved AI samples</string>
     <string name="import_template_share">Share</string>
     <string name="import_template_import">Import candidate</string>
+    <string name="import_template_use">Use as project</string>
     <string name="import_prompt_pack">Share Prompt Pack</string>
     <string name="import_prompt_copy">Copy Prompt Pack</string>
     <string name="import_template_delete">Delete</string>
