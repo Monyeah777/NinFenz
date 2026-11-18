@@ -16,6 +16,18 @@ object NfSpacing {
     val page = 16.dp
 }
 
+/** 结构级布局刻度：页面边距、内容宽度、区段节奏、列表密度。 */
+object NfLayout {
+    val pageCompact = 16.dp
+    val pageMedium = 24.dp
+    val pageExpanded = 32.dp
+    val contentMaxWidth = 720.dp
+    val readingMaxWidth = 640.dp
+    val sectionSpacing = 24.dp
+    val listRowMinHeight = 64.dp
+    val compactCardPadding = 12.dp
+}
+
 /** NF 形状：4/8/12/16/24/full（§17.6）。 */
 val NfShapes = Shapes(
     extraSmall = RoundedCornerShape(4.dp),

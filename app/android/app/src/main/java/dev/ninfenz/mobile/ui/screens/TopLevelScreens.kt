@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
@@ -54,6 +55,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
@@ -125,6 +128,7 @@ fun LibraryHomeScreen(
     val snackbarScope = rememberCoroutineScope()
     var statusFilter by rememberSaveable { mutableStateOf(savedView?.status) }
     var sortName by rememberSaveable { mutableStateOf(savedView?.sort ?: ProjectSort.RECENT.name) }
+    var sortMenuOpen by remember { mutableStateOf(false) }
     LaunchedEffect(statusFilter, sortName) {
         viewStore?.save(statusFilter, sortName)
     }
@@ -189,50 +193,67 @@ fun LibraryHomeScreen(
         ) {
             if (projects.isNotEmpty()) {
                 item {
-                    LazyRow(
-                        contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = NfSpacing.page),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        item {
-                            FilterChip(
-                                selected = filterStatus == null,
-                                onClick = { statusFilter = null },
-                                label = { Text(stringResource(dev.ninfenz.mobile.R.string.search_filter_all)) }
-                            )
+                        LazyRow(
+                            modifier = Modifier.weight(1f),
+                            contentPadding = androidx.compose.foundation.layout.PaddingValues(start = NfSpacing.page, end = NfSpacing.s),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            item {
+                                FilterChip(
+                                    selected = filterStatus == null,
+                                    onClick = { statusFilter = null },
+                                    label = { Text(stringResource(dev.ninfenz.mobile.R.string.search_filter_all)) }
+                                )
+                            }
+                            items(ProjectStatus.entries) { status ->
+                                FilterChip(
+                                    selected = filterStatus == status,
+                                    onClick = { statusFilter = status.wire },
+                                    label = { Text(projectStatusLabel(status)) }
+                                )
+                            }
                         }
-                        items(ProjectStatus.entries) { status ->
-                            FilterChip(
-                                selected = filterStatus == status,
-                                onClick = { statusFilter = status.wire },
-                                label = { Text(projectStatusLabel(status)) }
-                            )
-                        }
-                    }
-                }
-            }
-            if (projects.isNotEmpty()) {
-                item {
-                    LazyRow(
-                        contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = NfSpacing.page),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        item {
-                            Text(stringResource(dev.ninfenz.mobile.R.string.library_sort_label), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 12.dp))
-                        }
-                        items(ProjectSort.entries) { mode ->
-                            FilterChip(
-                                selected = filterSort == mode,
-                                onClick = { sortName = mode.name },
-                                label = {
-                                    Text(
-                                        when (mode) {
-                                            ProjectSort.RECENT -> stringResource(dev.ninfenz.mobile.R.string.library_sort_recent)
-                                            ProjectSort.TITLE -> stringResource(dev.ninfenz.mobile.R.string.library_sort_title)
-                                            ProjectSort.STATUS -> stringResource(dev.ninfenz.mobile.R.string.library_sort_status)
+                        val sortLabel = stringResource(dev.ninfenz.mobile.R.string.library_sort_label) + "：" +
+                            when (filterSort) {
+                                ProjectSort.RECENT -> stringResource(dev.ninfenz.mobile.R.string.library_sort_recent)
+                                ProjectSort.TITLE -> stringResource(dev.ninfenz.mobile.R.string.library_sort_title)
+                                ProjectSort.STATUS -> stringResource(dev.ninfenz.mobile.R.string.library_sort_status)
+                            }
+                        Box {
+                            IconButton(
+                                onClick = { sortMenuOpen = true },
+                                modifier = Modifier
+                                    .size(48.dp)
+                                    .semantics { contentDescription = sortLabel }
+                            ) {
+                                Text("⇅", style = MaterialTheme.typography.titleLarge)
+                            }
+                            androidx.compose.material3.DropdownMenu(
+                                expanded = sortMenuOpen,
+                                onDismissRequest = { sortMenuOpen = false }
+                            ) {
+                                ProjectSort.entries.forEach { mode ->
+                                    androidx.compose.material3.DropdownMenuItem(
+                                        text = {
+                                            Text(
+                                                when (mode) {
+                                                    ProjectSort.RECENT -> stringResource(dev.ninfenz.mobile.R.string.library_sort_recent)
+                                                    ProjectSort.TITLE -> stringResource(dev.ninfenz.mobile.R.string.library_sort_title)
+                                                    ProjectSort.STATUS -> stringResource(dev.ninfenz.mobile.R.string.library_sort_status)
+                                                }
+                                            )
+                                        },
+                                        onClick = {
+                                            sortName = mode.name
+                                            sortMenuOpen = false
                                         }
                                     )
                                 }
-                            )
+                            }
                         }
                     }
                 }
@@ -699,6 +720,7 @@ fun ProjectDetailScreen(
     var renameText by remember(project.title) { mutableStateOf(project.title) }
     var showReview by remember { mutableStateOf(false) }
     var showMoreActions by remember { mutableStateOf(false) }
+    var historyExpanded by rememberSaveable(project.id) { mutableStateOf(false) }
     val canApprove = project.status in setOf(ProjectStatus.VALIDATED, ProjectStatus.EXPORTED, ProjectStatus.REVIEWED)
     var reviewStale by remember { mutableStateOf(false) }
     LaunchedEffect(project.id, project.review.state, project.review.subjectDigest) {
@@ -749,29 +771,76 @@ fun ProjectDetailScreen(
             verticalArrangement = Arrangement.spacedBy(NfSpacing.m)
         ) {
             item {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = NfSpacing.page),
+                    verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        NfStatusChip(projectStatusLabel(project))
+                        if (project.historyCount > 0) {
+                            Text(
+                                stringResource(dev.ninfenz.mobile.R.string.project_detail_history, project.historyCount),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.weight(1f),
+                                textAlign = androidx.compose.ui.text.style.TextAlign.End
+                            )
+                        }
+                    }
+                    Text(project.id, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(
+                        stringResource(dev.ninfenz.mobile.R.string.project_detail_pack, project.refs.basePackId, project.refs.basePackVersion) +
+                            " · " + stringResource(dev.ninfenz.mobile.R.string.project_detail_protocol, project.refs.protocolId.ifBlank { stringResource(dev.ninfenz.mobile.R.string.not_bound) }),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+            item {
                 NfCard {
                     Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_status), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
-                            NfStatusChip(projectStatusLabel(project))
+                        Text(
+                            stringResource(dev.ninfenz.mobile.R.string.project_detail_next_step),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        val nextIsAuthor = project.status == ProjectStatus.DRAFT || project.status == ProjectStatus.AUTHORING
+                        Text(
+                            stringResource(if (nextIsAuthor) dev.ninfenz.mobile.R.string.flow_action_author else dev.ninfenz.mobile.R.string.flow_action_delivery),
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                        Text(
+                            stringResource(if (nextIsAuthor) dev.ninfenz.mobile.R.string.project_detail_author_subtitle else dev.ninfenz.mobile.R.string.project_detail_delivery_subtitle),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Button(
+                            onClick = { if (nextIsAuthor) onAuthor() else onAssembly() },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(stringResource(dev.ninfenz.mobile.R.string.flow_action_continue))
                         }
-                        Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_id, project.id), style = MaterialTheme.typography.bodySmall)
-                        Text(
-                            stringResource(dev.ninfenz.mobile.R.string.project_detail_pack, project.refs.basePackId, project.refs.basePackVersion),
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                        Text(
-                            stringResource(dev.ninfenz.mobile.R.string.project_detail_protocol, project.refs.protocolId.ifBlank { stringResource(dev.ninfenz.mobile.R.string.not_bound) }),
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                        Text(
-                            stringResource(
-                                dev.ninfenz.mobile.R.string.project_review_summary,
-                                project.review.state,
-                                project.review.reviewer ?: "-"
-                            ),
-                            style = MaterialTheme.typography.bodySmall
-                        )
+                    }
+                }
+            }
+            item { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.project_detail_info)) }
+            item {
+                NfCard {
+                    Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+                        Row {
+                            Text("Pack", style = MaterialTheme.typography.bodySmall, modifier = Modifier.width(72.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(project.refs.basePackId + " · " + project.refs.basePackVersion, style = MaterialTheme.typography.bodySmall)
+                        }
+                        Row {
+                            Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_protocol_label), style = MaterialTheme.typography.bodySmall, modifier = Modifier.width(72.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(project.refs.protocolId.ifBlank { stringResource(dev.ninfenz.mobile.R.string.not_bound) }, style = MaterialTheme.typography.bodySmall)
+                        }
+                        Row {
+                            Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_review), style = MaterialTheme.typography.bodySmall, modifier = Modifier.width(72.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(project.review.state + " · " + (project.review.reviewer ?: "-"), style = MaterialTheme.typography.bodySmall)
+                        }
                         if (reviewStale) {
                             Text(
                                 stringResource(dev.ninfenz.mobile.R.string.project_review_stale),
@@ -779,22 +848,21 @@ fun ProjectDetailScreen(
                                 color = MaterialTheme.colorScheme.error
                             )
                         }
-                        Text(
-                            stringResource(dev.ninfenz.mobile.R.string.project_detail_history, project.historyCount),
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                        Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                            TextButton(onClick = onFlow) {
-                                Text(stringResource(dev.ninfenz.mobile.R.string.flow_title))
-                            }
-                            TextButton(onClick = { showMoreActions = true }) {
-                                Text(stringResource(dev.ninfenz.mobile.R.string.project_more_actions))
-                            }
-                        }
                     }
                 }
             }
-            if (project.history.isNotEmpty()) {
+            if (project.historyCount > 0 || project.history.isNotEmpty()) {
+            item {
+                NfListRow(
+                    title = stringResource(dev.ninfenz.mobile.R.string.project_history_title),
+                    subtitle = stringResource(dev.ninfenz.mobile.R.string.project_detail_history, project.historyCount),
+                    leading = Icons.AutoMirrored.Filled.List,
+                    trailing = stringResource(if (historyExpanded) dev.ninfenz.mobile.R.string.project_history_collapse else dev.ninfenz.mobile.R.string.project_history_expand),
+                    onClick = { historyExpanded = !historyExpanded }
+                )
+            }
+            }
+            if (historyExpanded && (project.historyCount > 0 || project.history.isNotEmpty())) {
                 item {
                     NfCard {
                         Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
@@ -810,12 +878,16 @@ fun ProjectDetailScreen(
                                     ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.project_history_share))
                                 }) { Text(stringResource(dev.ninfenz.mobile.R.string.project_history_share)) }
                             }
-                            project.history.takeLast(20).forEach { h ->
-                                Text(
-                                    h.op + (h.digest?.let { " · " + it.take(12) } ?: "") + (h.at?.let { " · " + it } ?: ""),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
+                            if (project.history.isEmpty()) {
+                                Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_history, project.historyCount), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            } else {
+                                project.history.takeLast(20).forEach { h ->
+                                    Text(
+                                        h.op + (h.digest?.let { " · " + it.take(12) } ?: "") + (h.at?.let { " · " + it } ?: ""),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
                             }
                         }
                     }
@@ -854,6 +926,10 @@ fun ProjectDetailScreen(
                 NfListRow(stringResource(dev.ninfenz.mobile.R.string.project_detail_duplicate), null, Icons.Filled.Add, "›") {
                     showMoreActions = false
                     onDuplicate()
+                }
+                NfListRow(stringResource(dev.ninfenz.mobile.R.string.flow_title), null, Icons.AutoMirrored.Filled.List, "›") {
+                    showMoreActions = false
+                    onFlow()
                 }
                 NfListRow(stringResource(dev.ninfenz.mobile.R.string.project_detail_archive), null, Icons.Filled.Info, "›") {
                     showMoreActions = false

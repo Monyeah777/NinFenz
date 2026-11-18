@@ -167,9 +167,14 @@
     <string name="me_about_title">About NF / licenses / privacy</string>
     <string name="me_about_subtitle">Local-only · No network permission · No telemetry</string>
     <string name="project_detail_status">Status</string>
+    <string name="project_detail_next_step">Next step</string>
+    <string name="project_detail_info">Project info</string>
+    <string name="project_history_expand">Expand</string>
+    <string name="project_history_collapse">Collapse</string>
     <string name="project_detail_id">Project ID: %1$s</string>
     <string name="project_detail_pack">Pack: %1$s · %2$s</string>
     <string name="project_detail_protocol">Protocol: %1$s</string>
+    <string name="project_detail_protocol_label">Protocol</string>
     <string name="pack_item_count">items=%1$d</string>
     <string name="project_flow_label">Assemble / validate / export</string>
     <string name="project_diff_read_failed">Cannot read the selected project file</string>

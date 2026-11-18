@@ -13,6 +13,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.ui.draw.clip
+import dev.ninfenz.mobile.ui.theme.NfLayout
 import dev.ninfenz.mobile.ui.theme.NfMotion
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -82,11 +83,11 @@ fun NfTopAppBar(
 @Composable
 fun NfSectionHeader(text: String, modifier: Modifier = Modifier, action: (@Composable () -> Unit)? = null) {
     Row(
-        modifier = modifier.fillMaxWidth().padding(horizontal = NfSpacing.page),
+        modifier = modifier.fillMaxWidth().padding(horizontal = NfLayout.pageCompact),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(text, style = MaterialTheme.typography.titleLarge, modifier = Modifier.semantics { heading() })
+        Text(text, style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() })
         action?.invoke()
     }
 }

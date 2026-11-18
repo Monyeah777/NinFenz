@@ -167,9 +167,14 @@
     <string name="me_about_title">关于 NF / 许可 / 隐私</string>
     <string name="me_about_subtitle">本地处理 · 无网络权限 · 无遥测</string>
     <string name="project_detail_status">状态</string>
+    <string name="project_detail_next_step">下一步</string>
+    <string name="project_detail_info">项目信息</string>
+    <string name="project_history_expand">展开</string>
+    <string name="project_history_collapse">收起</string>
     <string name="project_detail_id">项目 ID：%1$s</string>
     <string name="project_detail_pack">Pack：%1$s · %2$s</string>
     <string name="project_detail_protocol">协议：%1$s</string>
+    <string name="project_detail_protocol_label">协议</string>
     <string name="pack_item_count">%1$d 项</string>
     <string name="project_flow_label">装配 / 校验 / 导出</string>
     <string name="project_diff_read_failed">无法读取所选项目文件</string>
