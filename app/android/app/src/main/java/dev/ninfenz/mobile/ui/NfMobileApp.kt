@@ -35,6 +35,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -815,23 +816,7 @@ private val bottomDestinations = listOf(
 
 @Composable
 private fun NfDestinationIcon(destination: TopDestination, selected: Boolean) {
-    if (destination == TopDestination.FLOW) {
-        Box(
-            modifier = Modifier
-                .size(40.dp)
-                .clip(CircleShape)
-                .background(if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primaryContainer),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                Icons.Filled.Add,
-                contentDescription = stringResource(destination.labelRes),
-                tint = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary
-            )
-        }
-    } else {
-        Icon(destinationIcon(destination), contentDescription = null)
-    }
+    Icon(destinationIcon(destination), contentDescription = null)
 }
 
 @Composable
@@ -864,7 +849,7 @@ private fun NfRail(current: TopDestination, onSelect: (TopDestination) -> Unit) 
 
 private fun destinationIcon(destination: TopDestination) = when (destination) {
     TopDestination.LIBRARY -> Icons.Filled.Home
-    TopDestination.FLOW -> Icons.Filled.Add
+    TopDestination.FLOW -> Icons.Filled.PlayArrow
     TopDestination.CREATE -> Icons.Filled.Edit
     TopDestination.DELIVER -> Icons.AutoMirrored.Filled.List
     TopDestination.ME -> Icons.Filled.Person

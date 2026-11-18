@@ -963,11 +963,6 @@ fun ProjectDetailScreen(
                     }
                 }
             }
-            item {
-                NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.project_detail_section_continue))
-            }
-            item { NfListRow(stringResource(dev.ninfenz.mobile.R.string.project_detail_author), stringResource(dev.ninfenz.mobile.R.string.project_detail_author_subtitle), Icons.Filled.Edit, "›", onAuthor) }
-            item { NfListRow(stringResource(dev.ninfenz.mobile.R.string.project_detail_delivery), stringResource(dev.ninfenz.mobile.R.string.project_detail_delivery_subtitle), Icons.Filled.Info, "›", onAssembly) }
         }
     }
 
