@@ -686,6 +686,7 @@
         <item quantity="other">%1$d 字</item>
     </plurals>
     <string name="delivery_slot_paste">粘贴</string>
+    <string name="delivery_slot_example">示例</string>
     <string name="delivery_slot_import_title">导入到 %1$s</string>
     <plurals name="delivery_slot_import_meta">
         <item quantity="one">来源 %1$s · %2$s · %3$d 段 · %4$d 字</item>

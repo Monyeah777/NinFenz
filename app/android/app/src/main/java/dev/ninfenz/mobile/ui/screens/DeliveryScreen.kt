@@ -563,6 +563,11 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                         }
                                     }
                                     Row {
+                                        slotMeta?.examples?.firstOrNull()?.let { example ->
+                                            TextButton(onClick = { inputs = inputs + (slot to example) }) {
+                                                Text(stringResource(dev.ninfenz.mobile.R.string.delivery_slot_example))
+                                            }
+                                        }
                                         TextButton(onClick = { pasteSlot(slot) }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_slot_paste)) }
                                         TextButton(onClick = { openSlotPicker(slot) }) { Text(stringResource(dev.ninfenz.mobile.R.string.action_import)) }
                                     }
