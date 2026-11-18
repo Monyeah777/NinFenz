@@ -82,6 +82,7 @@ import dev.ninfenz.mobile.model.PlanModel
 import dev.ninfenz.mobile.model.Project
 import dev.ninfenz.mobile.model.ProjectStatus
 import dev.ninfenz.mobile.model.ReportModel
+import dev.ninfenz.mobile.model.SlotInput
 import dev.ninfenz.mobile.model.SlotBatchImporter
 import dev.ninfenz.mobile.model.SlotTextAdapter
 import dev.ninfenz.mobile.model.ValidateReport
@@ -512,7 +513,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                 val lastSlot = plan?.slots?.lastOrNull() == slot
                                 OutlinedTextField(
                                     value = inputs[slot] ?: "",
-                                    onValueChange = { inputs = inputs + (slot to it) },
+                                    onValueChange = { inputs = inputs + (slot to SlotInput.sanitize(slotMeta?.kind, it)) },
                                     singleLine = false,
                                     minLines = 2,
                                     maxLines = 6,
