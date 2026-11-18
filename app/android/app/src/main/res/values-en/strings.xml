@@ -372,6 +372,7 @@
 
     <string name="delivery_title">Deliver · %1$s</string>
     <string name="delivery_reset">Reset</string>
+    <string name="delivery_need_revalidate">Content edited — run validate again before export.</string>
     <string name="delivery_reset_title">Reset delivery?</string>
     <string name="delivery_reset_body">This clears the compiled plan, slot inputs, validation, preview, and export state for this session. The project itself is not deleted.</string>
     <string name="delivery_pack_missing_title">Bound pack is not on this device</string>

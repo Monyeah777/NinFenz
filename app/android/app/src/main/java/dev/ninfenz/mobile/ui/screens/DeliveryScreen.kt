@@ -138,6 +138,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
     var previewHistory by remember { mutableStateOf<List<List<MarkdownBlock>>>(emptyList()) }
     var previewRedo by remember { mutableStateOf<List<List<MarkdownBlock>>>(emptyList()) }
     var previewDirty by remember { mutableStateOf(false) }
+    var needsRevalidate by remember { mutableStateOf(false) }
     var showDiscardPreview by remember { mutableStateOf(false) }
     var assignBlockText by remember { mutableStateOf<String?>(null) }
     var report by remember { mutableStateOf<ValidateReport?>(null) }
@@ -406,6 +407,14 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                 Text(stringResource(dev.ninfenz.mobile.R.string.delivery_note), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             statusNote?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
+            if (needsRevalidate) {
+                Text(
+                    stringResource(dev.ninfenz.mobile.R.string.delivery_need_revalidate),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(horizontal = NfSpacing.page)
+                )
+            }
             if (loading) NfLoadingState()
             if (loadError != null) {
                 NfErrorCard("NF-PCK-003", stringResource(dev.ninfenz.mobile.R.string.delivery_load_error, loadError!!), stringResource(dev.ninfenz.mobile.R.string.delivery_load_fix), modifier = Modifier.padding(horizontal = NfSpacing.page))
@@ -431,6 +440,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                         draftNote = if (restoredInputs.isNotEmpty()) context.getString(dev.ninfenz.mobile.R.string.delivery_draft_restored) else null
                         markdown = null
                         report = null
+                        needsRevalidate = false
                         exportedFile = null
                         manifestText = null
                         batchChunks = emptyList()
@@ -585,6 +595,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                     }
                                     markdown = md
                                     report = null
+                                    needsRevalidate = false
                                     when (val advanced = statusStore.advance(project, ProjectStatus.ASSEMBLED, AssemblyArtifact(md.toByteArray(Charsets.UTF_8)))) {
                                         is StatusAdvanceResult.Advanced -> {
                                             status = advanced.to
@@ -630,6 +641,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                     }
                                     if (!validateResponse.ok) error = validateResponse.error
                                     if (report?.verdict == "pass") {
+                                        needsRevalidate = false
                                         when (val advanced = statusStore.advance(project, ProjectStatus.VALIDATED)) {
                                             is StatusAdvanceResult.Advanced -> {
                                                 status = advanced.to
@@ -1160,6 +1172,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                 TextButton(onClick = {
                     markdown = MarkdownBlocks.render(previewBlocks)
                     previewDirty = false
+                    needsRevalidate = true
                     draftStore.save(project.id, inputs, rawPlan, markdown)
                     report = null
                     validateRepro = null

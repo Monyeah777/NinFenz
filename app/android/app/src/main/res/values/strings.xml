@@ -368,6 +368,7 @@
 
     <string name="delivery_title">交付 · %1$s</string>
     <string name="delivery_reset">重置</string>
+    <string name="delivery_need_revalidate">正文已修改，导出前请重新校验。</string>
     <string name="delivery_reset_title">重置交付？</string>
     <string name="delivery_reset_body">会清空本次编译计划、槽位输入、校验、预览和导出状态；不会删除项目。</string>
     <string name="delivery_pack_missing_title">绑定的 Pack 不在本机</string>
