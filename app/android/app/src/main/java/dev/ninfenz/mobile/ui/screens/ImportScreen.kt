@@ -4,7 +4,13 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.net.toUri
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,6 +27,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -67,6 +74,7 @@ import dev.ninfenz.mobile.ui.safeCall
 import dev.ninfenz.mobile.ui.theme.NfSpacing
 import java.io.File
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonArray
@@ -116,6 +124,39 @@ fun ImportScreen(
     var renameDraft by remember { mutableStateOf<File?>(null) }
     var renameDraftText by remember { mutableStateOf("") }
     var duplicatePrompt by remember { mutableStateOf<DuplicatePrompt?>(null) }
+    var showClearConfirm by remember { mutableStateOf(false) }
+    var cleared by remember { mutableStateOf<ImportClearSnapshot?>(null) }
+    LaunchedEffect(cleared) {
+        if (cleared != null) {
+            delay(5000)
+            cleared = null
+        }
+    }
+    fun clearCurrentImport() {
+        cleared = ImportClearSnapshot(
+            doc = doc,
+            rawResult = rawResult,
+            savedName = savedName,
+            acceptedMappings = acceptedMappings,
+            prefillNote = prefillNote,
+            notice = notice,
+            suggestNote = suggestNote,
+            shareQueue = shareQueue,
+            shareCursor = shareCursor
+        )
+        doc = null
+        rawResult = null
+        savedName = null
+        acceptedMappings = emptySet()
+        prefillNote = null
+        notice = null
+        suggestNote = null
+        error = null
+        importDraftStore.clear()
+        shareQueue = emptyList()
+        shareCursor = 0
+        showClearConfirm = false
+    }
     LaunchedEffect(Unit) {
         if (doc == null && rawResult == null && error == null) {
             val raw = withContext(Dispatchers.IO) { importDraftStore.load() }
@@ -396,8 +437,19 @@ fun ImportScreen(
         doc != null -> 2
         else -> 0
     }
+    Box(modifier = Modifier.fillMaxSize()) {
     Column(modifier = Modifier.fillMaxSize()) {
-        NfTopAppBar(title = stringResource(dev.ninfenz.mobile.R.string.import_title), onBack = onBack)
+        NfTopAppBar(
+            title = stringResource(dev.ninfenz.mobile.R.string.import_title),
+            onBack = onBack,
+            actions = {
+                if (doc != null || rawResult != null || savedName != null || shareQueue.isNotEmpty() || prefillNote != null) {
+                    TextButton(onClick = { showClearConfirm = true }, enabled = !busy) {
+                        Text(stringResource(dev.ninfenz.mobile.R.string.import_clear_action))
+                    }
+                }
+            }
+        )
         NfStepStrip(
             steps = listOf(
                 stringResource(dev.ninfenz.mobile.R.string.import_step_source),
@@ -722,6 +774,49 @@ fun ImportScreen(
                 }
             }
         }
+        }
+        AnimatedVisibility(
+            visible = cleared != null,
+            modifier = Modifier.align(Alignment.BottomCenter),
+            enter = fadeIn() + slideInVertically { it / 2 },
+            exit = fadeOut() + slideOutVertically { it / 2 }
+        ) {
+            cleared?.let { snapshot ->
+                Surface(
+                    modifier = Modifier.padding(horizontal = NfSpacing.page, vertical = NfSpacing.m),
+                    shape = MaterialTheme.shapes.large,
+                    tonalElevation = 6.dp
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = NfSpacing.m, vertical = NfSpacing.xs),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)
+                    ) {
+                        Text(
+                            stringResource(dev.ninfenz.mobile.R.string.import_cleared),
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.weight(1f)
+                        )
+                        TextButton(onClick = {
+                            doc = snapshot.doc
+                            rawResult = snapshot.rawResult
+                            savedName = snapshot.savedName
+                            acceptedMappings = snapshot.acceptedMappings
+                            prefillNote = snapshot.prefillNote
+                            notice = snapshot.notice
+                            suggestNote = snapshot.suggestNote
+                            shareQueue = snapshot.shareQueue
+                            shareCursor = snapshot.shareCursor
+                            snapshot.rawResult?.let { importDraftStore.save(it.toString()) }
+                            cleared = null
+                        }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_clear_undo)) }
+                        TextButton(onClick = { cleared = null }) {
+                            Text(stringResource(android.R.string.cancel))
+                        }
+                    }
+                }
+            }
+        }
     }
 
     renameDraft?.let { draft ->
@@ -859,6 +954,36 @@ fun ImportScreen(
             }
         )
     }
+
+    if (showClearConfirm) {
+        AlertDialog(
+            onDismissRequest = { showClearConfirm = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.import_clear_title)) },
+            text = { Text(stringResource(dev.ninfenz.mobile.R.string.import_clear_body)) },
+            confirmButton = {
+                TextButton(onClick = { clearCurrentImport() }) {
+                    Text(stringResource(dev.ninfenz.mobile.R.string.import_clear_action))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showClearConfirm = false }) {
+                    Text(stringResource(android.R.string.cancel))
+                }
+            }
+        )
+    }
 }
+
+private data class ImportClearSnapshot(
+    val doc: ImportDoc?,
+    val rawResult: JsonObject?,
+    val savedName: String?,
+    val acceptedMappings: Set<Int>,
+    val prefillNote: String?,
+    val notice: String?,
+    val suggestNote: String?,
+    val shareQueue: List<SharedItem>,
+    val shareCursor: Int
+)
 
 private data class DuplicatePrompt(val digest: String, val draft: File?)

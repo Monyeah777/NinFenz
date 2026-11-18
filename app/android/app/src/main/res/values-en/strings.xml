@@ -199,6 +199,11 @@
     <string name="pack_detail_update">Pack update</string>
 
     <string name="import_title">Import</string>
+    <string name="import_clear_action">Clear</string>
+    <string name="import_clear_title">Clear this import?</string>
+    <string name="import_clear_body">This clears the current preview, mappings, and unsaved draft. Saved drafts are kept. Undo is available for 5 seconds.</string>
+    <string name="import_cleared">Import cleared</string>
+    <string name="import_clear_undo">Undo</string>
     <string name="import_source">Choose a source</string>
     <string name="import_step_source">Source</string>
     <string name="import_step_preview">Preview</string>
