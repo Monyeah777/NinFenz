@@ -697,6 +697,7 @@
     <string name="error_codes_not_loaded">错误码登记表未打包</string>
     <string name="error_codes_no_result">没有匹配的错误码</string>
     <string name="library_filter_empty">该状态下暂无项目</string>
+    <string name="library_clear_filter">清除筛选</string>
     <string name="author_draft_restored">已恢复上次未保存的协议编辑</string>
     <string name="delivery_recent_exports">最近导出</string>
     <string name="delivery_clear_exports">清空记录</string>

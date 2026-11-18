@@ -387,12 +387,20 @@ fun LibraryHomeScreen(
                 }
             } else if (projects.isNotEmpty()) {
                 item {
-                    Text(
-                        stringResource(dev.ninfenz.mobile.R.string.library_filter_empty),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(horizontal = NfSpacing.page)
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = NfSpacing.page),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            stringResource(dev.ninfenz.mobile.R.string.library_filter_empty),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.weight(1f)
+                        )
+                        TextButton(onClick = { statusFilter = null }) {
+                            Text(stringResource(dev.ninfenz.mobile.R.string.library_clear_filter))
+                        }
+                    }
                 }
             }
             if (packs.isNotEmpty()) {
