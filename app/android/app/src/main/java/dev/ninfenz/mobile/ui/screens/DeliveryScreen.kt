@@ -892,6 +892,12 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                 TextButton(onClick = { showFullPreview = true }) {
                                     Text(stringResource(dev.ninfenz.mobile.R.string.preview_full))
                                 }
+                                TextButton(onClick = {
+                                    val intent = ShareExporter.shareMarkdown(context, "nf-" + project.id, md)
+                                    ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.delivery_share_md))
+                                }) {
+                                    Text(stringResource(dev.ninfenz.mobile.R.string.delivery_share_md))
+                                }
                             }
                         }
                     } ?: Text(stringResource(dev.ninfenz.mobile.R.string.delivery_not_assembled), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page))
