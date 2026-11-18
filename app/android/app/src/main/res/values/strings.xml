@@ -236,7 +236,7 @@
     <string name="import_again">再导入一个</string>
 
     <string name="search_title">搜索</string>
-    <string name="search_placeholder">搜索 Pack、条款、节点、章节、槽位、项目</string>
+    <string name="search_placeholder_short">搜索内容</string>
     <plurals name="search_hint">
         <item quantity="one">输入关键词开始搜索；索引 %1$d 条（本地）。</item>
         <item quantity="other">输入关键词开始搜索；索引 %1$d 条（本地）。</item>

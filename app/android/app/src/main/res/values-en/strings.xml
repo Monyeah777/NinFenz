@@ -236,7 +236,7 @@
     <string name="import_again">Import another</string>
 
     <string name="search_title">Search</string>
-    <string name="search_placeholder">Search packs, clauses, nodes, sections, slots, projects</string>
+    <string name="search_placeholder_short">Search content</string>
     <plurals name="search_hint">
         <item quantity="one">Type a keyword; %1$d local item indexed.</item>
         <item quantity="other">Type a keyword; %1$d local items indexed.</item>

@@ -145,7 +145,7 @@ fun SearchScreen(
                         else -> false
                     }
                 },
-            placeholder = { Text(stringResource(dev.ninfenz.mobile.R.string.search_placeholder)) },
+            placeholder = { Text(stringResource(dev.ninfenz.mobile.R.string.search_placeholder_short)) },
             leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
             singleLine = true
         )
