@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -19,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.MainActivity
 import dev.ninfenz.mobile.ui.theme.NfTheme
@@ -91,20 +93,21 @@ private fun ReceiveCard(
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .statusBarsPadding()
             .padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Text(text = "导入到 NF Mobile", style = MaterialTheme.typography.headlineSmall)
+        Text(text = stringResource(dev.ninfenz.mobile.R.string.share_receive_title), style = MaterialTheme.typography.headlineSmall)
         Text(text = payload.summary(), style = MaterialTheme.typography.bodyMedium)
         if (payload.count == 0) {
             Text(
-                text = "未从 Intent 解析到可导入内容（kind=" + payload.kind + "）。不猜、不造数据。",
+                text = stringResource(dev.ninfenz.mobile.R.string.share_receive_empty, payload.kind),
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodySmall
             )
         } else {
             Text(
-                text = "确认后进入导入预览（nf-import/1 须由核心生成；核心缺失时明确报 NF-E-005）。",
+                text = stringResource(dev.ninfenz.mobile.R.string.share_receive_confirm),
                 style = MaterialTheme.typography.bodySmall
             )
         }
@@ -114,14 +117,14 @@ private fun ReceiveCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             OutlinedButton(onClick = onCancel, modifier = Modifier.width(120.dp)) {
-                Text("取消")
+                Text(stringResource(android.R.string.cancel))
             }
             Button(
                 onClick = onConfirm,
                 enabled = payload.count > 0,
                 modifier = Modifier.width(140.dp).padding(start = 8.dp)
             ) {
-                Text("去导入")
+                Text(stringResource(dev.ninfenz.mobile.R.string.share_receive_go))
             }
         }
     }

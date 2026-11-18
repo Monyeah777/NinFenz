@@ -212,6 +212,10 @@
     <string name="pack_detail_update">Pack 更新</string>
 
     <string name="import_title">导入</string>
+    <string name="share_receive_title">导入到 NF Mobile</string>
+    <string name="share_receive_empty">未从 Intent 解析到可导入内容（kind=%1$s）。不猜、不造数据。</string>
+    <string name="share_receive_confirm">确认后进入导入预览（nf-import/1 须由核心生成）。</string>
+    <string name="share_receive_go">去导入</string>
     <string name="import_clear_action">清空</string>
     <string name="import_clear_title">清空本次导入？</string>
     <string name="import_clear_body">会清空当前预览、映射和未保存草稿；已保存草稿保留。5 秒内可撤销。</string>
