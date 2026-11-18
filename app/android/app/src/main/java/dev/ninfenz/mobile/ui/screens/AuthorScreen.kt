@@ -175,6 +175,23 @@ fun AuthorScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onAssem
                     textAlign = androidx.compose.ui.text.style.TextAlign.End
                 )
             }
+            if (specOverride.isFile) {
+                Row(
+                    modifier = Modifier.padding(horizontal = NfSpacing.page),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        stringResource(dev.ninfenz.mobile.R.string.template_override_active),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.weight(1f)
+                    )
+                    TextButton(onClick = {
+                        dev.ninfenz.mobile.data.DraftProjectBinder.clearSpec(authorContext.filesDir, project.id)
+                        authorReload++
+                    }) { Text(stringResource(dev.ninfenz.mobile.R.string.template_override_remove)) }
+                }
+            }
             Text(
                 stringResource(dev.ninfenz.mobile.R.string.author_preview_note),
                 style = MaterialTheme.typography.bodySmall,

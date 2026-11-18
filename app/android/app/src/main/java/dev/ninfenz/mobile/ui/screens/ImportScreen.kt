@@ -775,6 +775,10 @@ fun ImportScreen(
                                                 ShareExporter.launchChooser(context, intent, file.name)
                                             }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_template_share)) }
                                             TextButton(onClick = {
+                                                val json = runCatching { file.readText(Charsets.UTF_8) }.getOrDefault("")
+                                                clipboard.setText(AnnotatedString(json))
+                                            }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_template_copy)) }
+                                            TextButton(onClick = {
                                                 pendingTemplateUse = file
                                             }) {
                                                 Text(stringResource(dev.ninfenz.mobile.R.string.import_template_use))
