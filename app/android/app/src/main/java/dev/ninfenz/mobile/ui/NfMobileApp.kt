@@ -1,5 +1,6 @@
 package dev.ninfenz.mobile.ui
 
+import dev.ninfenz.mobile.ui.theme.NfLayout
 import dev.ninfenz.mobile.ui.theme.NfMotion
 import dev.ninfenz.mobile.ui.theme.NfSpacing
 
@@ -16,6 +17,7 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.foundation.layout.fillMaxSize
@@ -129,6 +131,15 @@ private val ShellStateSaver = Saver<ShellState, List<String>>(
  * v0.02 应用外壳：四目的地（库/创作/交付/我的）+ 自适应底部栏/rail + FAB 导入 + 单层详情。
  * 旧的 8 个功能页保留在详情层，保证 v1 能力可达；首启示例与引导在 W1 接入。
  */
+@Composable
+private fun NfContentFrame(content: @Composable () -> Unit) {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+        Box(modifier = Modifier.fillMaxHeight().widthIn(max = NfLayout.contentMaxWidth)) {
+            content()
+        }
+    }
+}
+
 @Composable
 fun NfMobileApp(
     prefs: AppPrefs,
@@ -685,7 +696,7 @@ is Detail.Import -> ImportScreen(
                     label = "nf-shell"
                 ) { detail ->
                     if (detail == null) {
-                        topLevelContent()
+                        NfContentFrame { topLevelContent() }
                     } else if (!compact && currentWindowWidthDp() >= 840) {
                         Row(modifier = Modifier.fillMaxSize()) {
                             Box(modifier = Modifier.width(380.dp).fillMaxHeight()) { topLevelContent() }
@@ -693,7 +704,7 @@ is Detail.Import -> ImportScreen(
                             Box(modifier = Modifier.weight(1f)) { detailContent() }
                         }
                     } else {
-                        detailContent()
+                        NfContentFrame { detailContent() }
                     }
                 }
             }
