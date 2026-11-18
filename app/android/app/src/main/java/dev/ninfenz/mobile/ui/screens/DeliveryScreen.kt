@@ -14,6 +14,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
@@ -139,6 +141,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
     var previewRedo by remember { mutableStateOf<List<List<MarkdownBlock>>>(emptyList()) }
     var previewDirty by remember { mutableStateOf(false) }
     var needsRevalidate by remember { mutableStateOf(false) }
+    val assembleRequester = remember { BringIntoViewRequester() }
     var showDiscardPreview by remember { mutableStateOf(false) }
     var assignBlockText by remember { mutableStateOf<String?>(null) }
     var report by remember { mutableStateOf<ValidateReport?>(null) }
@@ -367,6 +370,11 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
             title = stringResource(dev.ninfenz.mobile.R.string.delivery_title, project.title),
             onBack = onBack,
             actions = {
+                if (plan != null) {
+                    TextButton(onClick = {
+                        scope.launch { assembleRequester.bringIntoView() }
+                    }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_assemble)) }
+                }
                 if (plan != null || inputs.isNotEmpty() || markdown != null || report != null) {
                     TextButton(onClick = { showResetConfirm = true }) {
                         Text(stringResource(dev.ninfenz.mobile.R.string.delivery_reset))
@@ -561,6 +569,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                 Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                     Button(
                         enabled = !busy && rawPlan != null,
+                        modifier = Modifier.bringIntoViewRequester(assembleRequester),
                         onClick = {
                             val raw = rawPlan ?: return@Button
                             busy = true
