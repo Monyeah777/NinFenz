@@ -28,16 +28,19 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.data.ProjectEntry
+import dev.ninfenz.mobile.data.RecentProjectStore
 import dev.ninfenz.mobile.model.ProjectStatus
 import dev.ninfenz.mobile.model.ProjectSorter
 import dev.ninfenz.mobile.model.ProjectSort
@@ -61,6 +64,9 @@ fun WorkflowHubScreen(
 ) {
     var filter by rememberSaveable { mutableStateOf("active") }
     var projectsExpanded by rememberSaveable { mutableStateOf(true) }
+    val context = LocalContext.current
+    val recentStore = remember { runCatching { RecentProjectStore(context.filesDir) }.getOrNull() }
+    var recentIds by remember { mutableStateOf(recentStore?.load() ?: emptyList()) }
     val visible = ProjectSorter.sort(
         projects.filter {
             when (filter) {
@@ -72,7 +78,8 @@ fun WorkflowHubScreen(
                     it.project.status == ProjectStatus.VALIDATED
             }
         },
-        ProjectSort.RECENT
+        ProjectSort.RECENT,
+        priorityIds = recentIds
     )
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -165,7 +172,10 @@ fun WorkflowHubScreen(
                             visible.forEach { entry ->
                                 val status = entry.project.status
                                 val nextAuthor = status == ProjectStatus.DRAFT || status == ProjectStatus.AUTHORING
-                                NfCard(onClick = { onOpenProject(entry) }) {
+                                NfCard(onClick = {
+                                    recentIds = recentStore?.record(entry.project.id) ?: recentIds
+                                    onOpenProject(entry)
+                                }) {
                                     Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                                         Row(verticalAlignment = Alignment.CenterVertically) {
                                             Column(modifier = Modifier.weight(1f)) {
