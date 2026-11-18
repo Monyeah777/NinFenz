@@ -410,6 +410,16 @@ fun ImportScreen(
                 try {
                     val uri = item.uri.toUri()
                     val meta = FileAccess.meta(context, uri)
+                    val name = meta.name.orEmpty().lowercase()
+                    if (name.endsWith(".pdf") || (meta.mime ?: "").contains("pdf", ignoreCase = true)) {
+                        error = CoreResponse.failure(
+                            "NF-IMP-004",
+                            context.getString(dev.ninfenz.mobile.R.string.import_pdf_unsupported),
+                            context.getString(dev.ninfenz.mobile.R.string.import_pdf_unsupported_fix),
+                            3
+                        ).error
+                        return@launch
+                    }
                     if (meta.size > FileAccess.MAX_IMPORT_BYTES) {
                         error = CoreResponse.failure("NF-IMP-003", context.getString(dev.ninfenz.mobile.R.string.import_file_too_large), context.getString(dev.ninfenz.mobile.R.string.import_file_too_large_fix), 3).error
                         return@launch
