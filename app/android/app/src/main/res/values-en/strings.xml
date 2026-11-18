@@ -434,6 +434,9 @@
     <string name="preview_copy">Copy</string>
     <string name="preview_undo">Undo</string>
     <string name="preview_redo">Redo</string>
+    <string name="preview_discard_title">Discard block edits?</string>
+    <string name="preview_discard_body">Unsaved block edits will be lost. Save them first if you want to keep the changes.</string>
+    <string name="preview_discard">Discard</string>
     <string name="delivery_save_sample">Save sample</string>
     <string name="preview_block_up">Up</string>
     <string name="preview_block_down">Down</string>

@@ -137,6 +137,8 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
     var previewBlocks by remember { mutableStateOf<List<MarkdownBlock>>(emptyList()) }
     var previewHistory by remember { mutableStateOf<List<List<MarkdownBlock>>>(emptyList()) }
     var previewRedo by remember { mutableStateOf<List<List<MarkdownBlock>>>(emptyList()) }
+    var previewDirty by remember { mutableStateOf(false) }
+    var showDiscardPreview by remember { mutableStateOf(false) }
     var report by remember { mutableStateOf<ValidateReport?>(null) }
     var manifestText by remember { mutableStateOf<String?>(null) }
     var exportedFile by remember { mutableStateOf<File?>(null) }
@@ -959,6 +961,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                     previewBlocks = MarkdownBlocks.parse(md)
                                     previewHistory = emptyList()
                                     previewRedo = emptyList()
+                                    previewDirty = false
                                     editingPreview = true
                                 }) {
                                     Text(stringResource(dev.ninfenz.mobile.R.string.preview_edit))
@@ -1022,9 +1025,28 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
         )
     }
 
+    if (showDiscardPreview) {
+        AlertDialog(
+            onDismissRequest = { showDiscardPreview = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.preview_discard_title)) },
+            text = { Text(stringResource(dev.ninfenz.mobile.R.string.preview_discard_body)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    showDiscardPreview = false
+                    editingPreview = false
+                }) { Text(stringResource(dev.ninfenz.mobile.R.string.preview_discard)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDiscardPreview = false }) { Text(stringResource(android.R.string.cancel)) }
+            }
+        )
+    }
+
     if (editingPreview) {
         AlertDialog(
-            onDismissRequest = { editingPreview = false },
+            onDismissRequest = {
+                if (previewDirty) showDiscardPreview = true else editingPreview = false
+            },
             title = { Text(stringResource(dev.ninfenz.mobile.R.string.preview_edit_title)) },
             text = {
                 Column(
@@ -1062,6 +1084,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                             onValueChange = { value ->
                                 previewHistory = previewHistory + listOf(previewBlocks)
                                 previewRedo = emptyList()
+                                previewDirty = true
                                 previewBlocks = previewBlocks.toMutableList().also { it[index] = block.copy(text = value) }
                             },
                             modifier = Modifier.fillMaxWidth(),
@@ -1106,6 +1129,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
             confirmButton = {
                 TextButton(onClick = {
                     markdown = MarkdownBlocks.render(previewBlocks)
+                    previewDirty = false
                     report = null
                     validateRepro = null
                     exportedFile = null
@@ -1114,7 +1138,9 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                 }) { Text(stringResource(dev.ninfenz.mobile.R.string.preview_save)) }
             },
             dismissButton = {
-                TextButton(onClick = { editingPreview = false }) {
+                TextButton(onClick = {
+                    if (previewDirty) showDiscardPreview = true else editingPreview = false
+                }) {
                     Text(stringResource(android.R.string.cancel))
                 }
             }
