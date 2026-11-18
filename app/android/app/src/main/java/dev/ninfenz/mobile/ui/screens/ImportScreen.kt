@@ -93,6 +93,8 @@ fun ImportScreen(
     store: LibraryStore,
     onBack: () -> Unit,
     onPrefillConsumed: () -> Unit = {},
+    autoClipboard: Boolean = false,
+    onAutoClipboardConsumed: () -> Unit = {},
     packs: List<PackEntry> = emptyList(),
     onCreateProjectFromDraft: (PackEntry, String, File) -> Unit = { _, _, _ -> },
     onProjectImported: (String, String, String) -> Unit = { _, _, _ -> }
@@ -330,6 +332,13 @@ fun ImportScreen(
             val file = File(File(context.cacheDir, "imports").apply { mkdirs() }, "clipboard.md")
             file.writeText(text, Charsets.UTF_8)
             importFromFile(file, "clipboard", "clipboard.md", "text/plain", text.toByteArray(Charsets.UTF_8).size.toLong())
+        }
+    }
+
+    LaunchedEffect(autoClipboard) {
+        if (autoClipboard) {
+            importClipboard()
+            onAutoClipboardConsumed()
         }
     }
 

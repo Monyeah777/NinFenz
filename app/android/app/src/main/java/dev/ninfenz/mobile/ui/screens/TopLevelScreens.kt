@@ -119,6 +119,7 @@ fun LibraryHomeScreen(
     seeding: Boolean,
     onSeed: () -> Unit,
     onImport: () -> Unit,
+    onQuickPaste: () -> Unit = {},
     onNewProject: () -> Unit = {},
     onOpenPack: (PackEntry) -> Unit,
     onOpenProject: (ProjectEntry) -> Unit,
@@ -213,6 +214,33 @@ fun LibraryHomeScreen(
             verticalArrangement = Arrangement.spacedBy(NfSpacing.l)
         ) {
             if (projects.isNotEmpty()) {
+                item {
+                    Surface(
+                        shape = MaterialTheme.shapes.large,
+                        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f),
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = NfSpacing.page)
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(NfSpacing.l),
+                            verticalArrangement = Arrangement.spacedBy(NfSpacing.s)
+                        ) {
+                            Text(
+                                stringResource(dev.ninfenz.mobile.R.string.library_quick_title),
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                            Text(
+                                stringResource(dev.ninfenz.mobile.R.string.library_quick_body),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+                                Button(onClick = onQuickPaste, modifier = Modifier.heightIn(min = 44.dp)) {
+                                    Text(stringResource(dev.ninfenz.mobile.R.string.library_quick_paste))
+                                }
+                            }
+                        }
+                    }
+                }
                 item {
                     Row(
                         modifier = Modifier.fillMaxWidth(),

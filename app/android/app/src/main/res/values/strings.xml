@@ -116,6 +116,9 @@
     <string name="new_project_cancel">取消</string>
 
     <string name="library_import">导入内容</string>
+    <string name="library_quick_title">有现成内容？</string>
+    <string name="library_quick_body">粘贴一段文字，直接进入导入预览。</string>
+    <string name="library_quick_paste">粘贴开始</string>
     <string name="library_load_sample">载入示例</string>
     <string name="library_loading_sample">载入中…</string>
     <string name="library_seed_ready">示例已载入：%1$s · %2$s</string>

@@ -171,6 +171,7 @@ fun NfMobileApp(
     var seeding by remember { mutableStateOf(false) }
     var refreshing by remember { mutableStateOf(false) }
     var sharedPrefill by remember { mutableStateOf<dev.ninfenz.mobile.share.SharePayload?>(null) }
+    var quickPasteImport by remember { mutableStateOf(false) }
     var onboardingDone by remember { mutableStateOf(prefs.onboardingDone) }
     var showAbout by remember { mutableStateOf(false) }
     var showCommands by rememberSaveable { mutableStateOf(false) }
@@ -347,7 +348,8 @@ fun NfMobileApp(
                             seedState = seedState,
                             seeding = seeding,
                             onSeed = ::runSeed,
-                            onImport = { shell = shell.open(Detail.Import) },
+                            onImport = { quickPasteImport = false; shell = shell.open(Detail.Import) },
+                            onQuickPaste = { quickPasteImport = true; shell = shell.open(Detail.Import) },
                             onNewProject = { shell = shell.open(Detail.NewProject) },
                             onOpenPack = { shell = shell.open(Detail.Pack(it.id, it.version)) },
                             onOpenProject = { shell = shell.open(Detail.Project(it.project.id)) },
@@ -377,7 +379,7 @@ fun NfMobileApp(
                             onAuthor = { shell = shell.open(Detail.Author(it.project.id)) },
                             onDelivery = { shell = shell.open(Detail.Delivery(it.project.id)) },
                             onNewProject = { shell = shell.open(Detail.NewProject) },
-                            onImport = { shell = shell.open(Detail.Import) }
+                            onImport = { quickPasteImport = false; shell = shell.open(Detail.Import) }
                         )
                         TopDestination.CREATE -> CreateScreen(
                             projects = projects,
@@ -423,6 +425,8 @@ is Detail.Import -> ImportScreen(
                             shell = shell.back() ?: shell
                         },
                         onPrefillConsumed = { sharedPrefill = null },
+                        autoClipboard = quickPasteImport,
+                        onAutoClipboardConsumed = { quickPasteImport = false },
                         packs = packs.packs,
                         onProjectImported = { id, packId, packVersion ->
                             if (packId.isNotBlank() && packs.packs.none { it.id == packId && it.version == packVersion }) {

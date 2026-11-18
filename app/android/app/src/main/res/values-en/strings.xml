@@ -116,6 +116,9 @@
     <string name="new_project_cancel">Cancel</string>
 
     <string name="library_import">Import</string>
+    <string name="library_quick_title">Have something ready?</string>
+    <string name="library_quick_body">Paste text and go straight to the import preview.</string>
+    <string name="library_quick_paste">Paste to start</string>
     <string name="library_load_sample">Load sample</string>
     <string name="library_loading_sample">Loading…</string>
     <string name="library_seed_ready">Sample loaded: %1$s · %2$s</string>
