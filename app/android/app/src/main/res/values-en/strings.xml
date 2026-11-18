@@ -235,6 +235,7 @@
     <string name="import_pick_file">Choose file</string>
     <string name="import_clipboard">Clipboard</string>
     <string name="import_csv">CSV table</string>
+    <string name="import_csv_copy">Copy as table</string>
     <string name="import_pdf_unsupported">PDF/OCR import is not available in this build. Convert to Markdown, text, DOCX, or EPUB first.</string>
     <string name="import_pdf_unsupported_fix">Use a Markdown/text/DOCX/EPUB file; PDF export is supported, PDF import is not.</string>
     <string name="import_sample">Sample content</string>

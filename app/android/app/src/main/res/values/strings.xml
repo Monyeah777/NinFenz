@@ -231,6 +231,7 @@
     <string name="import_pick_file">选择文件</string>
     <string name="import_clipboard">剪贴板</string>
     <string name="import_csv">CSV 表格</string>
+    <string name="import_csv_copy">复制为表格</string>
     <string name="import_pdf_unsupported">当前构建不支持 PDF/OCR 导入，请先转成 Markdown、文本、DOCX 或 EPUB。</string>
     <string name="import_pdf_unsupported_fix">改用 Markdown/文本/DOCX/EPUB；PDF 导出支持，PDF 导入不支持。</string>
     <string name="import_sample">示例内容</string>

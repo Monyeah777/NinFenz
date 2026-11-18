@@ -1222,6 +1222,9 @@ fun ImportScreen(
                 Column(modifier = Modifier.fillMaxWidth().padding(NfSpacing.l), verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(stringResource(dev.ninfenz.mobile.R.string.import_preview_ready), style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
+                        TextButton(onClick = { clipboard.setText(AnnotatedString(CsvTable.toMarkdown(text))) }) {
+                            Text(stringResource(dev.ninfenz.mobile.R.string.import_csv_copy))
+                        }
                         TextButton(onClick = {
                             val intent = ShareExporter.shareMarkdown(context, "nf-import-preview", text)
                             ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.delivery_share_md))
