@@ -30,4 +30,12 @@ class ProjectSorterTest {
         assertEquals(listOf("b", "a"), ProjectSorter.sort(list, ProjectSort.TITLE).map { it.project.id })
         assertEquals(listOf("b", "a"), ProjectSorter.sort(list, ProjectSort.STATUS).map { it.project.id })
     }
+
+    @Test
+    fun recentPriorityWinsOverModifiedTime() {
+        val a = entry("a", "Bravo", ProjectStatus.EXPORTED, 1000L)
+        val b = entry("b", "alpha", ProjectStatus.DRAFT, 2000L)
+        val list = listOf(a, b)
+        assertEquals(listOf("a", "b"), ProjectSorter.sort(list, ProjectSort.RECENT, priorityIds = listOf("a")).map { it.project.id })
+    }
 }

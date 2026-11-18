@@ -20,7 +20,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -35,23 +34,30 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import dev.ninfenz.mobile.data.ProjectEntry
 import dev.ninfenz.mobile.ui.screens.projectStatusLabel
 import dev.ninfenz.mobile.ui.theme.NfSpacing
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.math.abs
 import kotlin.math.roundToInt
 
 /**
- * 库项目卡片：右滑露出删除，>50% 触发；左滑露出工作流，>50% 打开；点击展开详情；入场上浮淡入。
+ * 库项目卡片：左滑露出归档（DELETE），右滑露出工作流；>50% 触发；点击展开详情；入场上浮淡入。
  */
 @Composable
 fun SwipeableProjectCard(
@@ -71,7 +77,7 @@ fun SwipeableProjectCard(
     val haptic = LocalHapticFeedback.current
 
     LaunchedEffect(entry.project.id) {
-        delay((index.coerceAtMost(8) * 45L))
+        delay((index.coerceAtMost(6) * 35L))
         visible = true
     }
 
@@ -87,30 +93,35 @@ fun SwipeableProjectCard(
                 .clip(RoundedCornerShape(24.dp))
                 .background(
                     when {
-                        offset.value > 1f -> MaterialTheme.colorScheme.error
-                        offset.value < -1f -> MaterialTheme.colorScheme.primary
+                        offset.value > 1f -> MaterialTheme.colorScheme.primary
+                        offset.value < -1f -> MaterialTheme.colorScheme.error
                         else -> androidx.compose.ui.graphics.Color.Transparent
                     }
                 )
                 .padding(horizontal = NfSpacing.l)
         ) {
+            val reveal = (abs(offset.value) / (width * 0.35f).coerceAtLeast(1f)).coerceIn(0f, 1f)
             if (offset.value > 0f) {
                 Row(
-                    modifier = Modifier.align(Alignment.CenterStart),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)
-                ) {
-                    Icon(Icons.Filled.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.onError)
-                    Text(stringResource(dev.ninfenz.mobile.R.string.library_swipe_delete), color = MaterialTheme.colorScheme.onError)
-                }
-            } else if (offset.value < 0f) {
-                Row(
-                    modifier = Modifier.align(Alignment.CenterEnd),
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .alpha(reveal),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)
                 ) {
                     Text(stringResource(dev.ninfenz.mobile.R.string.library_swipe_flow), color = MaterialTheme.colorScheme.onPrimary)
                     Text("→", color = MaterialTheme.colorScheme.onPrimary)
+                }
+            } else if (offset.value < 0f) {
+                Row(
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .alpha(reveal),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)
+                ) {
+                    Icon(Icons.Filled.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.onError)
+                    Text(stringResource(dev.ninfenz.mobile.R.string.library_swipe_delete), color = MaterialTheme.colorScheme.onError)
                 }
             }
         }
@@ -124,29 +135,37 @@ fun SwipeableProjectCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .offset { IntOffset(offset.value.roundToInt(), 0) }
+                    .graphicsLayer {
+                        val dragFraction = (abs(offset.value) / (width * 0.5f).coerceAtLeast(1f)).coerceIn(0f, 1f)
+                        scaleX = 1f - dragFraction * 0.012f
+                        scaleY = 1f - dragFraction * 0.012f
+                    }
                     .pointerInput(entry.project.id) {
                         detectHorizontalDragGestures(
                             onDragEnd = {
                                 scope.launch {
                                     val threshold = width * 0.5f
                                     armed = false
+                                    val settle = spring<Float>(dampingRatio = 0.78f, stiffness = 420f)
                                     when {
                                         offset.value > threshold -> {
-                                            offset.animateTo(0f)
-                                            onDelete()
-                                        }
-                                        offset.value < -threshold -> {
-                                            offset.animateTo(0f)
+                                            offset.animateTo(0f, animationSpec = settle)
                                             onFlow()
                                         }
-                                        else -> offset.animateTo(0f)
+                                        offset.value < -threshold -> {
+                                            offset.animateTo(0f, animationSpec = settle)
+                                            onDelete()
+                                        }
+                                        else -> offset.animateTo(0f, animationSpec = settle)
                                     }
                                 }
                             },
                             onHorizontalDrag = { change, dragAmount ->
                                 change.consume()
                                 scope.launch {
-                                    val next = (offset.value + dragAmount).coerceIn(-width * 0.75f, width * 0.75f)
+                                    val edge = width * 0.75f
+                                    val resistance = 1f - (abs(offset.value) / edge.coerceAtLeast(1f) * 0.45f).coerceIn(0f, 0.45f)
+                                    val next = (offset.value + dragAmount * resistance).coerceIn(-edge, edge)
                                     val crossed = width > 0 && kotlin.math.abs(next) >= width * 0.5f
                                     if (crossed && !armed) {
                                         armed = true
@@ -179,20 +198,32 @@ fun SwipeableProjectCard(
                                     )
                                 }
                                 NfStatusChip(projectStatusLabel(entry.project))
+                                val chevron by animateFloatAsState(
+                                    targetValue = if (expanded) 180f else 0f,
+                                    animationSpec = tween(durationMillis = 220),
+                                    label = "project-chevron"
+                                )
                                 IconButton(onClick = { expanded = !expanded }) {
                                     Icon(
-                                        if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                                        Icons.Filled.KeyboardArrowDown,
                                         contentDescription = stringResource(
                                             if (expanded) dev.ninfenz.mobile.R.string.action_collapse
                                             else dev.ninfenz.mobile.R.string.action_expand
-                                        )
+                                        ),
+                                        modifier = Modifier.rotate(chevron)
                                     )
                                 }
                             }
                             AnimatedVisibility(
                                 visible = expanded,
-                                enter = fadeIn() + expandVertically(),
-                                exit = fadeOut() + shrinkVertically()
+                                enter = fadeIn(tween(180)) + expandVertically(
+                                    animationSpec = spring(dampingRatio = 0.82f, stiffness = 380f),
+                                    expandFrom = Alignment.Top
+                                ),
+                                exit = fadeOut(tween(120)) + shrinkVertically(
+                                    animationSpec = spring(dampingRatio = 0.9f, stiffness = 480f),
+                                    shrinkTowards = Alignment.Top
+                                )
                             ) {
                                 Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
                                     Text(

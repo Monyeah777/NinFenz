@@ -35,7 +35,7 @@
     <string name="flow_stage_current">当前</string>
     <string name="flow_stage_pending">待完成</string>
     <string name="flow_title">项目工作流</string>
-    <string name="library_swipe_delete">DELETE</string>
+    <string name="library_swipe_delete">归档</string>
     <string name="library_swipe_flow">工作流</string>
     <string name="flow_resume_hint">下一步只做一件事：继续当前阶段。</string>
     <string name="nav_create">创作</string>

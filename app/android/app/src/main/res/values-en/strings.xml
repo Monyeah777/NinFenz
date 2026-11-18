@@ -35,7 +35,7 @@
     <string name="flow_stage_current">Current</string>
     <string name="flow_stage_pending">Pending</string>
     <string name="flow_title">Project flow</string>
-    <string name="library_swipe_delete">DELETE</string>
+    <string name="library_swipe_delete">ARCHIVE</string>
     <string name="library_swipe_flow">Flow</string>
     <string name="flow_resume_hint">One next step: continue the current stage.</string>
     <string name="nav_create">Create</string>

@@ -1,6 +1,16 @@
 package dev.ninfenz.mobile.ui.screens
 
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,6 +33,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.MoreVert
@@ -55,6 +66,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -67,6 +79,7 @@ import dev.ninfenz.mobile.data.PackTrustStore
 import dev.ninfenz.mobile.data.PackVerifier
 import dev.ninfenz.mobile.data.ProjectArchiver
 import dev.ninfenz.mobile.data.ProjectEntry
+import dev.ninfenz.mobile.data.RecentProjectStore
 import dev.ninfenz.mobile.data.SeedResult
 import dev.ninfenz.mobile.data.LanguageMode
 import dev.ninfenz.mobile.data.LibraryViewStore
@@ -129,13 +142,24 @@ fun LibraryHomeScreen(
     var statusFilter by rememberSaveable { mutableStateOf(savedView?.status) }
     var sortName by rememberSaveable { mutableStateOf(savedView?.sort ?: ProjectSort.RECENT.name) }
     var sortMenuOpen by remember { mutableStateOf(false) }
+    var projectsExpanded by rememberSaveable { mutableStateOf(true) }
+    val recentStore = remember(viewFilesDir) { viewFilesDir?.let { RecentProjectStore(it) } }
+    var recentIds by remember { mutableStateOf(recentStore?.load() ?: emptyList()) }
     LaunchedEffect(statusFilter, sortName) {
         viewStore?.save(statusFilter, sortName)
     }
     val filterStatus = statusFilter?.let { ProjectStatus.fromWire(it) }
     val filterSort = ProjectSort.entries.firstOrNull { it.name == sortName } ?: ProjectSort.RECENT
-    val filteredProjects = remember(projects, statusFilter, sortName) {
-        ProjectSorter.sort(ProjectFilter.apply(projects, filterStatus), filterSort)
+    val filteredProjects = remember(projects, statusFilter, sortName, recentIds) {
+        ProjectSorter.sort(
+            ProjectFilter.apply(projects, filterStatus),
+            filterSort,
+            priorityIds = if (filterSort == ProjectSort.RECENT) recentIds else emptyList()
+        )
+    }
+    fun openWithPriority(entry: ProjectEntry) {
+        recentIds = recentStore?.record(entry.project.id) ?: recentIds
+        onOpenProject(entry)
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -272,27 +296,68 @@ fun LibraryHomeScreen(
                 }
             }
             if (filteredProjects.isNotEmpty()) {
-                item { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.library_section_projects)) }
-                items(filteredProjects.size) { index ->
-                    val entry = filteredProjects[index]
-                    SwipeableProjectCard(
-                        entry = entry,
-                        index = index,
-                        onOpen = { onOpenProject(entry) },
-                        onFlow = { onOpenFlow(entry) },
-                        onDelete = {
-                            snackbarScope.launch {
-                                val archived = runCatching {
-                                    ProjectArchiver.archive(entry.file, context.filesDir)
-                                }.getOrNull()
-                                if (archived != null) {
-                                    undoArchive = archived
-                                    onRefresh()
-                                }
-                            }
-                        },
-                        modifier = Modifier.padding(horizontal = NfSpacing.page)
+                item {
+                    val projectChevron by animateFloatAsState(
+                        targetValue = if (projectsExpanded) 180f else 0f,
+                        animationSpec = tween(durationMillis = 220),
+                        label = "library-projects-chevron"
                     )
+                    NfSectionHeader(
+                        stringResource(dev.ninfenz.mobile.R.string.library_section_projects),
+                        action = {
+                            IconButton(
+                                onClick = { projectsExpanded = !projectsExpanded },
+                                modifier = Modifier.size(48.dp)
+                            ) {
+                                Icon(
+                                    Icons.Filled.KeyboardArrowDown,
+                                    contentDescription = stringResource(
+                                        if (projectsExpanded) dev.ninfenz.mobile.R.string.action_collapse
+                                        else dev.ninfenz.mobile.R.string.action_expand
+                                    ),
+                                    modifier = Modifier.rotate(projectChevron)
+                                )
+                            }
+                        }
+                    )
+                }
+                item {
+                    androidx.compose.animation.AnimatedVisibility(
+                        visible = projectsExpanded,
+                        enter = fadeIn(tween(180)) + expandVertically(
+                            animationSpec = spring(dampingRatio = 0.82f, stiffness = 420f),
+                            expandFrom = Alignment.Top
+                        ),
+                        exit = fadeOut(tween(120)) + shrinkVertically(
+                            animationSpec = spring(dampingRatio = 0.9f, stiffness = 500f),
+                            shrinkTowards = Alignment.Top
+                        )
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(horizontal = NfSpacing.page),
+                            verticalArrangement = Arrangement.spacedBy(NfSpacing.l)
+                        ) {
+                            filteredProjects.forEachIndexed { index, entry ->
+                                SwipeableProjectCard(
+                                    entry = entry,
+                                    index = index,
+                                    onOpen = { openWithPriority(entry) },
+                                    onFlow = { onOpenFlow(entry) },
+                                    onDelete = {
+                                        snackbarScope.launch {
+                                            val archived = runCatching {
+                                                ProjectArchiver.archive(entry.file, context.filesDir)
+                                            }.getOrNull()
+                                            if (archived != null) {
+                                                undoArchive = archived
+                                                onRefresh()
+                                            }
+                                        }
+                                    }
+                                )
+                            }
+                        }
+                    }
                 }
             } else if (projects.isNotEmpty()) {
                 item {
@@ -364,31 +429,36 @@ fun LibraryHomeScreen(
         }
         }
     }
-    undoArchive?.let { archived ->
-        Surface(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(horizontal = NfSpacing.page, vertical = NfSpacing.m),
-            shape = MaterialTheme.shapes.large,
-            tonalElevation = 6.dp
-        ) {
-            Row(
-                modifier = Modifier.padding(horizontal = NfSpacing.m, vertical = NfSpacing.xs),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)
+    androidx.compose.animation.AnimatedVisibility(
+        visible = undoArchive != null,
+        modifier = Modifier.align(Alignment.BottomCenter),
+        enter = fadeIn(tween(160)) + slideInVertically(tween(240)) { it / 2 },
+        exit = fadeOut(tween(120)) + slideOutVertically(tween(160)) { it / 2 }
+    ) {
+        undoArchive?.let { archived ->
+            Surface(
+                modifier = Modifier.padding(horizontal = NfSpacing.page, vertical = NfSpacing.m),
+                shape = MaterialTheme.shapes.large,
+                tonalElevation = 6.dp
             ) {
-                Text(
-                    stringResource(dev.ninfenz.mobile.R.string.library_project_archived),
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.weight(1f)
-                )
-                TextButton(onClick = {
-                    runCatching { ProjectArchiver.restore(archived, context.filesDir) }
-                    undoArchive = null
-                    onRefresh()
-                }) { Text(stringResource(dev.ninfenz.mobile.R.string.library_project_undo)) }
-                TextButton(onClick = { undoArchive = null }) {
-                    Text(stringResource(android.R.string.cancel))
+                Row(
+                    modifier = Modifier.padding(horizontal = NfSpacing.m, vertical = NfSpacing.xs),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)
+                ) {
+                    Text(
+                        stringResource(dev.ninfenz.mobile.R.string.library_project_archived),
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.weight(1f)
+                    )
+                    TextButton(onClick = {
+                        runCatching { ProjectArchiver.restore(archived, context.filesDir) }
+                        undoArchive = null
+                        onRefresh()
+                    }) { Text(stringResource(dev.ninfenz.mobile.R.string.library_project_undo)) }
+                    TextButton(onClick = { undoArchive = null }) {
+                        Text(stringResource(android.R.string.cancel))
+                    }
                 }
             }
         }
