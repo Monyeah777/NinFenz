@@ -483,6 +483,37 @@ fun ImportScreen(
         }
     }
 
+    suspend fun importDocx(file: File, sourceKind: String, name: String, size: Long) {
+        busy = true
+        error = null
+        notice = null
+        try {
+            val text = withContext(Dispatchers.IO) { dev.ninfenz.mobile.data.DocxTextImporter.extract(file) }
+            if (text.isBlank()) {
+                error = CoreResponse.failure(
+                    "NF-IMP-004",
+                    context.getString(dev.ninfenz.mobile.R.string.import_docx_no_text),
+                    context.getString(dev.ninfenz.mobile.R.string.import_parse_failed_fix),
+                    3
+                ).error
+            } else {
+                val md = File(File(context.cacheDir, "imports").apply { mkdirs() }, "docx-" + System.nanoTime() + ".md")
+                md.writeText(text, Charsets.UTF_8)
+                importFromFile(md, sourceKind, name.substringBeforeLast('.') + ".md", "text/markdown", text.toByteArray(Charsets.UTF_8).size.toLong())
+            }
+        } catch (t: Throwable) {
+            error = CoreResponse.failure(
+                "NF-IMP-004",
+                context.getString(dev.ninfenz.mobile.R.string.import_docx_failed, t.message ?: t.javaClass.simpleName),
+                context.getString(dev.ninfenz.mobile.R.string.import_parse_failed_fix),
+                3
+            ).error
+        } finally {
+            file.delete()
+            busy = false
+        }
+    }
+
     suspend fun importHtml(file: File, sourceKind: String, name: String, size: Long) {
         busy = true
         error = null
@@ -585,6 +616,11 @@ fun ImportScreen(
                     val uri = item.uri.toUri()
                     val meta = FileAccess.meta(context, uri)
                     val name = meta.name.orEmpty().lowercase()
+                    if (name.endsWith(".docx") || (meta.mime ?: "").contains("wordprocessingml", ignoreCase = true)) {
+                        val file = FileAccess.copyToCache(context, uri, meta.name)
+                        importDocx(file, "share", meta.name, meta.size)
+                        return@launch
+                    }
                     if (name.endsWith(".html") || name.endsWith(".htm") || (meta.mime ?: "").contains("html", ignoreCase = true)) {
                         val file = FileAccess.copyToCache(context, uri, meta.name)
                         importHtml(file, "share", meta.name, meta.size)
@@ -685,7 +721,9 @@ fun ImportScreen(
                         return@launch
                     }
                     val file = FileAccess.copyToCache(context, uri, meta.name)
-                    if (meta.name.orEmpty().lowercase().endsWith(".html") || meta.name.orEmpty().lowercase().endsWith(".htm") || (meta.mime ?: "").contains("html", ignoreCase = true)) {
+                    if (meta.name.orEmpty().lowercase().endsWith(".docx") || (meta.mime ?: "").contains("wordprocessingml", ignoreCase = true)) {
+                        importDocx(file, "saf", meta.name, meta.size)
+                    } else if (meta.name.orEmpty().lowercase().endsWith(".html") || meta.name.orEmpty().lowercase().endsWith(".htm") || (meta.mime ?: "").contains("html", ignoreCase = true)) {
                         importHtml(file, "saf", meta.name, meta.size)
                     } else if (meta.name.orEmpty().lowercase().endsWith(".pdf") || (meta.mime ?: "").contains("pdf", ignoreCase = true)) {
                         importPdf(file, "saf", meta.name, meta.size)

@@ -232,6 +232,8 @@
     <string name="import_csv_copy">复制为表格</string>
     <string name="import_pdf_no_text">这个 PDF 没有可提取文字；扫描件需要 OCR。</string>
     <string name="import_html_no_text">这个 HTML 没有可读正文。</string>
+    <string name="import_docx_no_text">这个 DOCX 没有可读正文。</string>
+    
     <string name="import_html_failed">HTML 导入失败：%1$s</string>
     <string name="import_pdf_failed">PDF 文字提取失败：%1$s</string>
     <string name="import_pdf_unsupported_fix">改用 Markdown/文本/DOCX/EPUB；PDF 导出支持，PDF 导入不支持。</string>
@@ -929,7 +931,7 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="pack_install_core_missing">核心缺失（NF-E-005）：安装完成但未做摘要校验</string>
     <string name="import_epub_failed">EPUB 解析失败或无正文</string>
     <string name="import_epub_failed_fix">确认 EPUB 含 container/OPF/XHTML 章节</string>
-    <string name="import_docx_failed">DOCX 解析失败或无正文</string>
+    
     <string name="import_docx_failed_fix">确认 DOCX 含 word/document.xml</string>
     <plurals name="import_project_package_done">
         <item quantity="one">已导入项目包：%1$s（%2$d 个数据文件）</item>
@@ -975,4 +977,5 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
         <item quantity="one">从模板填入 %d 个空槽位</item>
         <item quantity="other">从模板填入 %d 个空槽位</item>
     </plurals>
+<string name="import_docx_failed">DOCX 导入失败：%1$s</string>
 </resources>

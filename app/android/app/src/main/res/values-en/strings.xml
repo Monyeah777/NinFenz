@@ -236,6 +236,8 @@
     <string name="import_csv_copy">Copy as table</string>
     <string name="import_pdf_no_text">No extractable text in this PDF; scanned PDFs need OCR.</string>
     <string name="import_html_no_text">No readable text found in this HTML.</string>
+    <string name="import_docx_no_text">No readable text found in this DOCX.</string>
+    
     <string name="import_html_failed">HTML import failed: %1$s</string>
     <string name="import_pdf_failed">PDF text extraction failed: %1$s</string>
     <string name="import_pdf_unsupported_fix">Use a Markdown/text/DOCX/EPUB file; PDF export is supported, PDF import is not.</string>
@@ -933,7 +935,7 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="pack_install_core_missing">Core missing (NF-E-005): installed but digest not verified</string>
     <string name="import_epub_failed">EPUB parse failed or no text</string>
     <string name="import_epub_failed_fix">Confirm EPUB contains container/OPF/XHTML chapters</string>
-    <string name="import_docx_failed">DOCX parse failed or no text</string>
+    
     <string name="import_docx_failed_fix">Confirm DOCX contains word/document.xml</string>
     <plurals name="import_project_package_done">
         <item quantity="one">Project package imported: %1$s (%2$d data file)</item>
@@ -979,4 +981,5 @@ MIT License · See app/docs/LEGAL.md</string>
         <item quantity="one">Fill %d empty slot from template</item>
         <item quantity="other">Fill %d empty slots from template</item>
     </plurals>
+<string name="import_docx_failed">DOCX import failed: %1$s</string>
 </resources>
