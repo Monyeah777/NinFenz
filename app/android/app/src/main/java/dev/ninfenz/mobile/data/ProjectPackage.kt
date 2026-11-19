@@ -39,7 +39,7 @@ object ProjectPackage {
                 }
             }
         }
-        val target = File(outDir, "nf-project-" + projectFile.name.removeSuffix(".nfproject.json") + ".zip")
+        val target = File(outDir, "nf-project-" + projectFile.name.removeSuffix(".nfproject.json") + "-" + System.nanoTime() + ".zip")
         ZipOutputStream(target.outputStream()).use { out ->
             put(out, MANIFEST, manifest.toString().toByteArray())
             put(out, projectFile.name, projectBytes)
