@@ -24,6 +24,7 @@ object DraftProjectBinder {
 
     fun clearSpec(filesDir: File, projectId: String): Boolean {
         val dir = File(File(File(filesDir, "projects"), projectId), "authoring")
+        File(dir, "template.md").delete()
         return File(dir, "spec-override.json").delete()
     }
 

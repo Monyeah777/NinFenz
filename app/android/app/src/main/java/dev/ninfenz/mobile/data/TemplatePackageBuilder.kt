@@ -104,7 +104,8 @@ object TemplatePackageBuilder {
 
     private fun slug(raw: String): String {
         val base = raw.lowercase().replace(Regex("[^a-z0-9-]+"), "-").trim('-')
-        val safe = if (base.length < 2) "template" else base
+        val withLetter = if (base.firstOrNull()?.isLetter() == true) base else "tpl-" + base
+        val safe = if (withLetter.length < 2) "template" else withLetter
         return safe.take(63)
     }
 }
