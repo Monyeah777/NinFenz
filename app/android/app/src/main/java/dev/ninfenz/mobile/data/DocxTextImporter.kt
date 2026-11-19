@@ -25,6 +25,8 @@ object DocxTextImporter {
                 private var inTable = false
                 private var inCell = false
                 private val cell = StringBuilder()
+                private val rows = mutableListOf<MutableList<String>>()
+                private val row = mutableListOf<String>()
                 override fun startElement(uri: String?, localName: String?, qName: String?, attributes: Attributes?) {
                     val name = localName ?: qName.orEmpty()
                     if (name == "t") inText = true
@@ -58,12 +60,25 @@ object DocxTextImporter {
                         listItem = false
                     }
                     if (name == "tc") {
-                        text.append(cell.toString().trim()).append(" | ")
+                        row.add(cell.toString().trim())
                         inCell = false
                         cell.clear()
                     }
-                    if (name == "tr") text.append('\n')
-                    if (name == "tbl") { text.append('\n'); inTable = false }
+                    if (name == "tr") {
+                        if (row.isNotEmpty()) {
+                            rows.add(row.toMutableList())
+                            row.clear()
+                        }
+                    }
+                    if (name == "tbl") {
+                        rows.forEachIndexed { index, cells ->
+                            text.append("| ").append(cells.joinToString(" | ")).append(" |\n")
+                            if (index == 0) text.append("|").append(" --- |".repeat(cells.size)).append("\n")
+                        }
+                        text.append('\n')
+                        rows.clear()
+                        inTable = false
+                    }
                 }
                 override fun characters(ch: CharArray, start: Int, length: Int) {
                     if (inText) paragraph.append(ch, start, length)

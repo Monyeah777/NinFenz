@@ -25,7 +25,7 @@ class DocxTextImporterTest {
             out.closeEntry()
         }
         val text = DocxTextImporter.extract(file)
-        assertEquals("- Hello DOCX\n\n# Second\n\nA | B |", text)
+        assertEquals("- Hello DOCX\n\n# Second\n\n| A | B |\n| --- | --- |", text)
         file.delete()
     }
 }
