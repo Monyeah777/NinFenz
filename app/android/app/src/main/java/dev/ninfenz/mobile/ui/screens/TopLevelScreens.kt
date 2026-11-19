@@ -1140,6 +1140,11 @@ fun ProjectDetailScreen(
                     showMoreActions = false
                     onExportTemplatePackage()
                 }
+                NfListRow(stringResource(dev.ninfenz.mobile.R.string.project_copy_id), null, Icons.Filled.Search, "›") {
+                    showMoreActions = false
+                    clipboard.setText(androidx.compose.ui.text.AnnotatedString(project.id))
+                    android.widget.Toast.makeText(context, context.getString(dev.ninfenz.mobile.R.string.project_copy_id), android.widget.Toast.LENGTH_SHORT).show()
+                }
                 HorizontalDivider(modifier = Modifier.padding(vertical = NfSpacing.s))
                 Text(stringResource(dev.ninfenz.mobile.R.string.project_actions_danger), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 TextButton(
