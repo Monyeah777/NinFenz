@@ -576,7 +576,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                 progress = { requiredFilled.toFloat() / requiredSlots.size.toFloat() },
                                 modifier = Modifier.fillMaxWidth()
                             )
-                            if (!templateReference.isNullOrBlank()) {
+                            if (!templateReference.isNullOrBlank() && plan!!.slots.any { inputs[it].isNullOrBlank() }) {
                                 TextButton(onClick = {
                                     val parsed = parseTemplateSlots(templateReference)
                                     val next = inputs.toMutableMap()
