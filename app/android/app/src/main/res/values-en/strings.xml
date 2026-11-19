@@ -366,6 +366,7 @@
     <string name="template_override_remove_body">The project returns to the Pack spec, and the local template reference is deleted.</string>
     <string name="author_preview_note">Local editing: clauses/fields/pipeline/spec save to the project (undo/redo + debounced autosave); checks run in core.</string>
     <string name="author_template_ref">Template reference</string>
+    <string name="project_template_ref">View template reference</string>
     <string name="author_template_copy">Copy template</string>
     <string name="author_template_share">Share template</string>
     <plurals name="author_import_prefill">

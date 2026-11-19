@@ -827,6 +827,11 @@ fun ProjectDetailScreen(
     var showReview by remember { mutableStateOf(false) }
     var showMoreActions by remember { mutableStateOf(false) }
     var showRemoveOverride by remember { mutableStateOf(false) }
+    var showTemplateReference by remember { mutableStateOf(false) }
+    val templateReference = remember(project.id) {
+        java.io.File(java.io.File(java.io.File(context.filesDir, "projects"), project.id), "authoring/template.md")
+            .takeIf { it.isFile }?.readText(Charsets.UTF_8)
+    }
     var historyExpanded by rememberSaveable(project.id) { mutableStateOf(false) }
     var hasSpecOverride by remember(project.id) {
         mutableStateOf(java.io.File(java.io.File(java.io.File(context.filesDir, "projects"), project.id), "authoring/spec-override.json").isFile)
@@ -900,6 +905,11 @@ fun ProjectDetailScreen(
                         }
                     }
                     Text(project.id, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    if (templateReference != null) {
+                        NfListRow(stringResource(dev.ninfenz.mobile.R.string.project_template_ref), null, Icons.Filled.Search, "›") {
+                            showTemplateReference = true
+                        }
+                    }
                     if (hasSpecOverride) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
@@ -1017,6 +1027,21 @@ fun ProjectDetailScreen(
                 }
             }
         }
+    }
+
+    if (showTemplateReference && templateReference != null) {
+        AlertDialog(
+            onDismissRequest = { showTemplateReference = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.author_template_ref)) },
+            text = {
+                Column(modifier = Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState())) {
+                    dev.ninfenz.mobile.ui.components.MarkdownPreview(templateReference, limitBlocks = 40)
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showTemplateReference = false }) { Text(stringResource(android.R.string.ok)) }
+            }
+        )
     }
 
     if (showRemoveOverride) {
