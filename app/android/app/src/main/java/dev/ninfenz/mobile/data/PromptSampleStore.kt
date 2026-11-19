@@ -7,7 +7,7 @@ class PromptSampleStore(private val filesDir: File) {
     fun save(title: String, markdown: String): File {
         val dir = File(filesDir, "samples").apply { mkdirs() }
         val safe = title.replace(Regex("[^A-Za-z0-9._-]"), "_").ifBlank { "sample" }.take(40)
-        val file = File(dir, "sample-" + System.currentTimeMillis() + "-" + safe + ".md")
+        val file = File(dir, "sample-" + System.nanoTime() + "-" + safe + ".md")
         file.writeText(markdown, Charsets.UTF_8)
         return file
     }
