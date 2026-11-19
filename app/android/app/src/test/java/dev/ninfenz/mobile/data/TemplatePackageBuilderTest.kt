@@ -19,7 +19,9 @@ class TemplatePackageBuilderTest {
         val pack = PackEntry("demo", "1.0.0", "Demo", "", 0, "tree", packDir)
         val spec = buildJsonObject { put("schema", "nf-md-spec/1"); put("id", "tpl-demo"); put("title", "Demo") }
         val prepared = TemplatePackageBuilder.prepare(root, pack, spec, "Demo")
-        assertTrue(java.io.File(prepared.dir, "template.md").isFile)
+        val template = java.io.File(prepared.dir, "template.md")
+        assertTrue(template.isFile)
+        assertTrue(template.readText().contains("# Demo"))
         val zip = TemplatePackageBuilder.finalize(prepared, "a".repeat(64), 4, java.io.File(root, "out"))
         ZipFile(zip).use { z ->
             assertTrue(z.getEntry("nf-template.json") != null)

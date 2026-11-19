@@ -20,11 +20,7 @@ object TemplatePackageBuilder {
         val protocol = File(pack.dir, "protocol/nf-protocol-pack.json").readBytes()
         val pipeline = File(pack.dir, "pipeline/main.nfg.json").readBytes()
         val specBytes = spec.toString().toByteArray(Charsets.UTF_8)
-        val markdown = buildString {
-            appendLine("# " + title.ifBlank { "模板" })
-            appendLine()
-            appendLine("由 NF 模板候选导出。")
-        }.toByteArray(Charsets.UTF_8)
+        val markdown = renderTemplate(spec, title).toByteArray(Charsets.UTF_8)
         val files = listOf(
             "template.md" to markdown,
             "spec/main.nfspec.json" to specBytes,
@@ -71,6 +67,36 @@ object TemplatePackageBuilder {
         }
         prepared.dir.deleteRecursively()
         return target
+    }
+
+    private fun renderTemplate(spec: JsonObject, title: String): String {
+        val slots = (spec["slots"] as? kotlinx.serialization.json.JsonArray)
+            ?.mapNotNull { it as? JsonObject }
+            ?.associateBy { (it["id"] as? kotlinx.serialization.json.JsonPrimitive)?.content.orEmpty() }
+            .orEmpty()
+        val sections = (spec["sections"] as? kotlinx.serialization.json.JsonArray)
+            ?.mapNotNull { it as? JsonObject }
+            ?.sortedBy { (it["order"] as? kotlinx.serialization.json.JsonPrimitive)?.content?.toIntOrNull() ?: 0 }
+            .orEmpty()
+        return buildString {
+            appendLine("# " + ((spec["title"] as? kotlinx.serialization.json.JsonPrimitive)?.content ?: title.ifBlank { "模板" }))
+            appendLine()
+            sections.forEach { section ->
+                val heading = (section["title"] as? kotlinx.serialization.json.JsonPrimitive)?.content ?: "章节"
+                appendLine("## " + heading)
+                appendLine()
+                val ids = (section["slots"] as? kotlinx.serialization.json.JsonArray)?.mapNotNull { (it as? kotlinx.serialization.json.JsonPrimitive)?.content }.orEmpty()
+                ids.forEach { id ->
+                    val slot = slots[id]
+                    val name = (slot?.get("name") as? kotlinx.serialization.json.JsonPrimitive)?.content ?: id
+                    val example = (slot?.get("examples") as? kotlinx.serialization.json.JsonArray)
+                        ?.mapNotNull { (it as? kotlinx.serialization.json.JsonPrimitive)?.content }
+                        ?.firstOrNull()
+                    appendLine("- " + id + " " + name + if (example != null) "：" + example else "")
+                }
+                appendLine()
+            }
+        }.trimEnd()
     }
 
     fun sha256(bytes: ByteArray): String =
