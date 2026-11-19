@@ -8,6 +8,18 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class TemplatePackageImporterTest {
+    @Test(expected = IllegalArgumentException::class)
+    fun rejectsBadManifestId() {
+        val dir = Files.createTempDirectory("nf-template-bad").toFile()
+        val zip = File(dir, "bad.zip")
+        ZipOutputStream(zip.outputStream()).use { out ->
+            out.putNextEntry(ZipEntry("nf-template.json"))
+            out.write("""{"schema":"nf-template/1","manifest":{"id":"BAD","version":"0.1.0","title":"x"},"compat":{"schema_version":1}}""".toByteArray())
+            out.closeEntry()
+        }
+        TemplatePackageImporter.inspect(zip, dir)
+    }
+
     @Test
     fun readsTemplatePackage() {
         val dir = Files.createTempDirectory("nf-template-import").toFile()
