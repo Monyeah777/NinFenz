@@ -69,6 +69,8 @@ import dev.ninfenz.mobile.ui.components.FormTextField
 import dev.ninfenz.mobile.ui.components.NfErrorCard
 import dev.ninfenz.mobile.ui.components.NfLoadingState
 import dev.ninfenz.mobile.ui.components.NfSectionHeader
+import dev.ninfenz.mobile.ui.components.NfCollapsibleSection
+import dev.ninfenz.mobile.ui.components.MarkdownPreview
 import dev.ninfenz.mobile.ui.components.NfStatusChip
 import dev.ninfenz.mobile.ui.components.NfTopAppBar
 import dev.ninfenz.mobile.ui.safeCall
@@ -116,6 +118,10 @@ fun AuthorScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onAssem
     var saveRequest by remember { mutableIntStateOf(0) }
     val authorContext = androidx.compose.ui.platform.LocalContext.current
     val specOverride = java.io.File(java.io.File(java.io.File(authorContext.filesDir, "projects"), project.id), "authoring/spec-override.json")
+    val templateReference = remember(project.id) {
+        java.io.File(java.io.File(java.io.File(authorContext.filesDir, "projects"), project.id), "authoring/template.md")
+            .takeIf { it.isFile }?.readText(Charsets.UTF_8)
+    }
     var artifacts by remember { mutableStateOf<AuthorArtifacts?>(null) }
     var loadError by remember { mutableStateOf<String?>(null) }
     var loading by remember { mutableStateOf(true) }
@@ -191,6 +197,11 @@ fun AuthorScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onAssem
                         dev.ninfenz.mobile.data.DraftProjectBinder.clearSpec(authorContext.filesDir, project.id)
                         authorReload++
                     }) { Text(stringResource(dev.ninfenz.mobile.R.string.template_override_remove)) }
+                }
+            }
+            templateReference?.takeIf { it.isNotBlank() }?.let { text ->
+                NfCollapsibleSection(title = stringResource(dev.ninfenz.mobile.R.string.author_template_ref), initiallyExpanded = false) {
+                    MarkdownPreview(text, limitBlocks = 24)
                 }
             }
             Text(
