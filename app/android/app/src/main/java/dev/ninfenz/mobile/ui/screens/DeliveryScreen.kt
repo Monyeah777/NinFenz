@@ -559,8 +559,10 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                 val sectionTitle = slotMeta?.let { meta -> specMeta?.sections?.firstOrNull { it.id == meta.section }?.title }
                                 val sectionId = slotMeta?.section
                                 if (sectionTitle != null && sectionId != null && sectionId != lastSection) {
+                                    val sectionSlots = specMeta?.sections?.firstOrNull { it.id == sectionId }?.slots.orEmpty()
+                                    val sectionFilled = sectionSlots.count { !inputs[it].isNullOrBlank() }
                                     Text(
-                                        sectionTitle,
+                                        sectionTitle + "  " + sectionFilled + "/" + sectionSlots.size,
                                         style = MaterialTheme.typography.titleSmall,
                                         color = MaterialTheme.colorScheme.primary
                                     )

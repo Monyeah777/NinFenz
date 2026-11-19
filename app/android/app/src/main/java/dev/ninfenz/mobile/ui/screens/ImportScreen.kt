@@ -1364,7 +1364,12 @@ fun ImportScreen(
                                 Text(section.title, style = MaterialTheme.typography.titleSmall)
                                 section.slots.forEach { id ->
                                     val slot = spec.slots.firstOrNull { it.id == id }
-                                    Text("- " + id + " " + (slot?.name ?: ""), style = MaterialTheme.typography.bodySmall)
+                                    val meta = slot?.let {
+                                        it.kind + (if (it.required) " · required" else "") +
+                                            (it.maxChars?.let { max -> " · max " + max } ?: "") +
+                                            (it.examples.firstOrNull()?.let { example -> " · " + example } ?: "")
+                                    }.orEmpty()
+                                    Text("- " + id + " " + (slot?.name ?: "") + (if (meta.isNotBlank()) "  (" + meta + ")" else ""), style = MaterialTheme.typography.bodySmall)
                                 }
                             }
                         }

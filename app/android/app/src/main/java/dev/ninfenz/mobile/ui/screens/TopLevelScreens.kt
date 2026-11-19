@@ -827,8 +827,8 @@ fun ProjectDetailScreen(
     var showReview by remember { mutableStateOf(false) }
     var showMoreActions by remember { mutableStateOf(false) }
     var historyExpanded by rememberSaveable(project.id) { mutableStateOf(false) }
-    val hasSpecOverride = remember(project.id) {
-        java.io.File(java.io.File(java.io.File(context.filesDir, "projects"), project.id), "authoring/spec-override.json").isFile
+    var hasSpecOverride by remember(project.id) {
+        mutableStateOf(java.io.File(java.io.File(java.io.File(context.filesDir, "projects"), project.id), "authoring/spec-override.json").isFile)
     }
     val canApprove = project.status in setOf(ProjectStatus.VALIDATED, ProjectStatus.EXPORTED, ProjectStatus.REVIEWED)
     var reviewStale by remember { mutableStateOf(false) }
@@ -900,11 +900,18 @@ fun ProjectDetailScreen(
                     }
                     Text(project.id, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     if (hasSpecOverride) {
-                        Text(
-                            stringResource(dev.ninfenz.mobile.R.string.template_override_active),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.primary
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                stringResource(dev.ninfenz.mobile.R.string.template_override_active),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.weight(1f)
+                            )
+                            TextButton(onClick = {
+                                dev.ninfenz.mobile.data.DraftProjectBinder.clearSpec(context.filesDir, project.id)
+                                hasSpecOverride = false
+                            }) { Text(stringResource(dev.ninfenz.mobile.R.string.template_override_remove)) }
+                        }
                     }
                     Text(
                         stringResource(dev.ninfenz.mobile.R.string.project_detail_pack, project.refs.basePackId, project.refs.basePackVersion) +
