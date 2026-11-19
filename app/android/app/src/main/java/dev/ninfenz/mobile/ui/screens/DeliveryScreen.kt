@@ -166,6 +166,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
     var previewDirty by remember { mutableStateOf(false) }
     var needsRevalidate by remember { mutableStateOf(false) }
     val assembleRequester = remember { BringIntoViewRequester() }
+    val validateRequester = remember { BringIntoViewRequester() }
     var missingRequired by remember { mutableStateOf<List<String>>(emptyList()) }
     var oversizedSlots by remember { mutableStateOf<List<String>>(emptyList()) }
     var constraintViolations by remember { mutableStateOf<List<String>>(emptyList()) }
@@ -852,6 +853,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                     }
                     Button(
                         enabled = !busy && markdown != null && rawPlan != null,
+                        modifier = Modifier.bringIntoViewRequester(validateRequester),
                         onClick = {
                             val md = markdown ?: return@Button
                             val raw = rawPlan ?: return@Button
@@ -934,12 +936,20 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                 }
 
                 if (markdown != null && exportMarkdown == null) {
-                    Text(
-                        stringResource(dev.ninfenz.mobile.R.string.delivery_export_blocked),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.error,
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(horizontal = NfSpacing.page)
-                    )
+                    ) {
+                        Text(
+                            stringResource(dev.ninfenz.mobile.R.string.delivery_export_blocked),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.weight(1f)
+                        )
+                        TextButton(onClick = { scope.launch { validateRequester.bringIntoView() } }) {
+                            Text(stringResource(dev.ninfenz.mobile.R.string.delivery_go_validate))
+                        }
+                    }
                 }
                 NfCollapsibleSection(title = stringResource(dev.ninfenz.mobile.R.string.delivery_export_section), initiallyExpanded = true) {
                 Text(stringResource(dev.ninfenz.mobile.R.string.delivery_export_group_docs), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(start = NfSpacing.page, end = NfSpacing.page, top = NfSpacing.s))
