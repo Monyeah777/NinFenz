@@ -585,6 +585,9 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                         if (!next[id].isNullOrBlank() || plan!!.slots.none { it == id }) return@forEach
                                         val meta = specMeta?.slots?.firstOrNull { it.id == id }
                                         val clean = dev.ninfenz.mobile.model.SlotInput.sanitize(meta?.kind, value)
+                                        if (meta?.nonEmpty == true && clean.isBlank()) return@forEach
+                                        if (meta?.startsWith != null && !clean.startsWith(meta.startsWith)) return@forEach
+                                        if (meta?.endsWith != null && !clean.endsWith(meta.endsWith)) return@forEach
                                         if (meta?.minChars != null && clean.length < meta.minChars) return@forEach
                                         if (meta?.maxChars != null && clean.length > meta.maxChars) return@forEach
                                         if (meta?.pattern != null && !runCatching { Regex(meta.pattern).matches(clean) }.getOrDefault(false)) return@forEach
