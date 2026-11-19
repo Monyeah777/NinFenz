@@ -581,7 +581,12 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                     val parsed = parseTemplateSlots(templateReference)
                                     val next = inputs.toMutableMap()
                                     parsed.forEach { (id, value) ->
-                                        if (next[id].isNullOrBlank() && plan!!.slots.any { it == id }) next[id] = value
+                                        if (!next[id].isNullOrBlank() || plan!!.slots.none { it == id }) return@forEach
+                                        val meta = specMeta?.slots?.firstOrNull { it.id == id }
+                                        val clean = dev.ninfenz.mobile.model.SlotInput.sanitize(meta?.kind, value)
+                                        if (meta?.maxChars != null && clean.length > meta.maxChars) return@forEach
+                                        if (meta?.pattern != null && !runCatching { Regex(meta.pattern).matches(clean) }.getOrDefault(false)) return@forEach
+                                        next[id] = clean
                                     }
                                     inputs = next
                                 }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_fill_template)) }
