@@ -54,10 +54,10 @@ object TemplatePackageImporter {
             }
             require(refs.size == 4) { "模板清单缺少必要文件引用" }
             var total = 0L
-            val assets = (manifest["assets"] as? kotlinx.serialization.json.JsonArray)?.mapNotNull { el ->
-                val o = el as? JsonObject ?: return@mapNotNull null
-                val path = o["path"]?.jsonPrimitive?.content ?: return@mapNotNull null
-                val sha = o["sha256"]?.jsonPrimitive?.content ?: return@mapNotNull null
+            val assets = (manifest["assets"] as? kotlinx.serialization.json.JsonArray)?.mapIndexed { index, el ->
+                val o = el as? JsonObject ?: error("assets/" + index + " 不是对象")
+                val path = o["path"]?.jsonPrimitive?.content ?: error("assets/" + index + " 缺 path")
+                val sha = o["sha256"]?.jsonPrimitive?.content ?: error("assets/" + index + " 缺 sha256")
                 path to sha
             }.orEmpty()
             val seen = mutableSetOf<String>()
