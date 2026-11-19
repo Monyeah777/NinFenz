@@ -593,6 +593,9 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                                 Text(stringResource(dev.ninfenz.mobile.R.string.delivery_slot_example))
                                             }
                                         }
+                                        if ((inputs[slot] ?: "").isNotBlank()) {
+                                            TextButton(onClick = { inputs = inputs - slot }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_slot_clear)) }
+                                        }
                                         TextButton(onClick = { pasteSlot(slot) }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_slot_paste)) }
                                         TextButton(onClick = { openSlotPicker(slot) }) { Text(stringResource(dev.ninfenz.mobile.R.string.action_import)) }
                                     }

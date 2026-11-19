@@ -697,6 +697,7 @@
     </plurals>
     <string name="delivery_slot_paste">Paste</string>
     <string name="delivery_slot_example">Example</string>
+    <string name="delivery_slot_clear">Clear</string>
     <string name="delivery_slot_import_title">Import into %1$s</string>
     <plurals name="delivery_slot_import_meta">
         <item quantity="one">Source %1$s · %2$s · %3$d paragraphs · %4$d char</item>
