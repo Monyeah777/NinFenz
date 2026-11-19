@@ -1375,7 +1375,13 @@ fun ImportScreen(
                             }
                         }
                     }
-                    TextButton(onClick = { previewTemplate = null }) { Text(stringResource(android.R.string.cancel)) }
+                    Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+                        TextButton(onClick = { previewTemplate = null }) { Text(stringResource(android.R.string.cancel)) }
+                        TextButton(onClick = {
+                            previewTemplate = null
+                            pendingTemplateUse = file
+                        }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_template_use)) }
+                    }
                 }
             }
         }

@@ -117,6 +117,7 @@ fun AuthorScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onAssem
     var saveAndDeliverRequest by remember { mutableIntStateOf(0) }
     var saveRequest by remember { mutableIntStateOf(0) }
     val authorContext = androidx.compose.ui.platform.LocalContext.current
+    val authorClipboard = androidx.compose.ui.platform.LocalClipboardManager.current
     val specOverride = java.io.File(java.io.File(java.io.File(authorContext.filesDir, "projects"), project.id), "authoring/spec-override.json")
     val templateReference = remember(project.id) {
         java.io.File(java.io.File(java.io.File(authorContext.filesDir, "projects"), project.id), "authoring/template.md")
@@ -201,6 +202,9 @@ fun AuthorScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onAssem
             }
             templateReference?.takeIf { it.isNotBlank() }?.let { text ->
                 NfCollapsibleSection(title = stringResource(dev.ninfenz.mobile.R.string.author_template_ref), initiallyExpanded = false) {
+                    TextButton(onClick = { authorClipboard.setText(androidx.compose.ui.text.AnnotatedString(text)) }) {
+                        Text(stringResource(dev.ninfenz.mobile.R.string.import_template_copy))
+                    }
                     MarkdownPreview(text, limitBlocks = 24)
                 }
             }
