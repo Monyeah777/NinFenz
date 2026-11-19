@@ -65,6 +65,7 @@ import dev.ninfenz.mobile.data.ImportDraftStore
 import dev.ninfenz.mobile.data.ImportHistoryStore
 import dev.ninfenz.mobile.data.PromptSampleStore
 import dev.ninfenz.mobile.data.TemplateCandidateStore
+import dev.ninfenz.mobile.data.TemplatePackageBuilder
 import dev.ninfenz.mobile.data.LibraryStore
 import dev.ninfenz.mobile.model.ImportDoc
 import dev.ninfenz.mobile.model.MarkdownBlocks
@@ -96,6 +97,7 @@ import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
@@ -342,6 +344,48 @@ fun ImportScreen(
         rawResult?.let { importDraftStore.save(it.toString()) }
         if (sourceFile != file) sourceFile.delete()
         busy = false
+    }
+
+    fun exportTemplatePackage(file: File) {
+        val pack = packs.firstOrNull()
+        if (pack == null) {
+            error = CoreResponse.failure(
+                "NF-PCK-002",
+                context.getString(dev.ninfenz.mobile.R.string.import_template_export),
+                context.getString(dev.ninfenz.mobile.R.string.import_template_export),
+                2
+            ).error
+            return
+        }
+        val spec = runCatching {
+            kotlinx.serialization.json.Json.parseToJsonElement(file.readText(Charsets.UTF_8)).jsonObject
+        }.getOrNull()
+        if (spec == null) return
+        scope.launch {
+            busy = true
+            try {
+                val prepared = TemplatePackageBuilder.prepare(context.cacheDir, pack, spec, templateStore.titleOf(file))
+                val response = safeCall("pack-hash", buildJsonObject { put("root", prepared.dir.absolutePath) })
+                val hashes = response.resultObject()?.get("hashes") as? kotlinx.serialization.json.JsonObject
+                val tree = hashes?.get("tree")?.jsonPrimitive?.content
+                val count = hashes?.get("count")?.jsonPrimitive?.content?.toIntOrNull()
+                if (!response.ok || tree == null || count == null) {
+                    error = response.error ?: CoreResponse.failure("NF-PCK-003", "pack-hash 未返回 tree/count", "检查核心", 2).error
+                } else {
+                    val zip = TemplatePackageBuilder.finalize(prepared, tree, count, File(context.cacheDir, "template-export"))
+                    val intent = ShareExporter.shareFileIntent(context, zip, "application/zip", templateStore.titleOf(file))
+                    ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.import_template_export))
+                }
+            } catch (t: Throwable) {
+                error = CoreResponse.failure(
+                    "NF-E-005",
+                    context.getString(dev.ninfenz.mobile.R.string.import_template_export) + ": " + (t.message ?: t.javaClass.simpleName),
+                    context.getString(dev.ninfenz.mobile.R.string.import_parse_failed_fix),
+                    2
+                ).error
+            }
+            busy = false
+        }
     }
 
     fun importCsv() {
@@ -783,6 +827,9 @@ fun ImportScreen(
                                                 pendingTemplateUse = file
                                             }) {
                                                 Text(stringResource(dev.ninfenz.mobile.R.string.import_template_use))
+                                            }
+                                            TextButton(onClick = { exportTemplatePackage(file) }) {
+                                                Text(stringResource(dev.ninfenz.mobile.R.string.import_template_export))
                                             }
                                             TextButton(onClick = { pendingDeleteTemplate = file }) {
                                                 Text(stringResource(dev.ninfenz.mobile.R.string.import_template_delete))
