@@ -74,6 +74,7 @@ import dev.ninfenz.mobile.model.MarkdownBlocks
 import dev.ninfenz.mobile.model.MarkdownSlicer
 import dev.ninfenz.mobile.model.PromptPack
 import dev.ninfenz.mobile.model.PromptProfile
+import dev.ninfenz.mobile.model.SpecModel
 import dev.ninfenz.mobile.model.TemplateCandidate
 import dev.ninfenz.mobile.model.CsvTable
 import dev.ninfenz.mobile.model.ImportModel
@@ -148,6 +149,7 @@ fun ImportScreen(
     var savedSamples by remember { mutableStateOf(sampleStore.list()) }
     var pendingDeleteSample by remember { mutableStateOf<File?>(null) }
     var pendingTemplateUse by remember { mutableStateOf<File?>(null) }
+    var previewTemplate by remember { mutableStateOf<File?>(null) }
     var pendingDeleteTemplate by remember { mutableStateOf<File?>(null) }
     var importPreviewText by remember { mutableStateOf<String?>(null) }
     var promptProfile by remember { mutableStateOf(PromptProfile.GENERIC) }
@@ -848,10 +850,15 @@ fun ImportScreen(
                                     )
                                     savedTemplates.take(3).forEach { file ->
                                         Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
-                                            Text(
-                                                templateStore.titleOf(file),
-                                                style = MaterialTheme.typography.bodySmall
-                                            )
+                                            TextButton(
+                                                onClick = { previewTemplate = file },
+                                                contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)
+                                            ) {
+                                                Text(
+                                                    templateStore.titleOf(file),
+                                                    style = MaterialTheme.typography.bodySmall
+                                                )
+                                            }
                                             Row(
                                                 modifier = Modifier.horizontalScroll(rememberScrollState()),
                                                 horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)
@@ -1334,6 +1341,35 @@ fun ImportScreen(
                     Column(modifier = Modifier.heightIn(max = 520.dp).verticalScroll(rememberScrollState())) {
                         MarkdownPreview(text)
                     }
+                }
+            }
+        }
+    }
+
+    previewTemplate?.let { file ->
+        val spec = remember(file) {
+            runCatching { SpecModel.parse(file.readText(Charsets.UTF_8)) }.getOrNull()
+        }
+        Dialog(onDismissRequest = { previewTemplate = null }) {
+            Surface(shape = MaterialTheme.shapes.large, tonalElevation = 6.dp) {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(NfSpacing.l),
+                    verticalArrangement = Arrangement.spacedBy(NfSpacing.s)
+                ) {
+                    Text(spec?.title ?: file.name, style = MaterialTheme.typography.titleLarge)
+                    if (spec != null) {
+                        Text("v" + spec.version + " · " + spec.sections.size + " sections · " + spec.slots.size + " slots", style = MaterialTheme.typography.bodySmall)
+                        Column(modifier = Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState())) {
+                            spec.sections.forEach { section ->
+                                Text(section.title, style = MaterialTheme.typography.titleSmall)
+                                section.slots.forEach { id ->
+                                    val slot = spec.slots.firstOrNull { it.id == id }
+                                    Text("- " + id + " " + (slot?.name ?: ""), style = MaterialTheme.typography.bodySmall)
+                                }
+                            }
+                        }
+                    }
+                    TextButton(onClick = { previewTemplate = null }) { Text(stringResource(android.R.string.cancel)) }
                 }
             }
         }
