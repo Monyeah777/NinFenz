@@ -20,6 +20,18 @@ class TemplatePackageImporterTest {
         TemplatePackageImporter.inspect(zip, dir)
     }
 
+    @Test(expected = IllegalArgumentException::class)
+    fun rejectsPathTraversal() {
+        val dir = Files.createTempDirectory("nf-template-traversal").toFile()
+        val zip = File(dir, "bad.zip")
+        ZipOutputStream(zip.outputStream()).use { out ->
+            out.putNextEntry(ZipEntry("nf-template.json"))
+            out.write("""{"schema":"nf-template/1","manifest":{"id":"tpl-demo","version":"0.1.0","title":"x"},"compat":{"schema_version":1},"template_md":{"path":"../template.md","sha256":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},"spec":{"path":"../evil","sha256":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},"protocol":{"path":"protocol/nf-protocol-pack.json","sha256":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},"pipeline":{"path":"pipeline/main.nfg.json","sha256":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},"hashes":{"tree":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","count":4}}""".toByteArray())
+            out.closeEntry()
+        }
+        TemplatePackageImporter.inspect(zip, dir)
+    }
+
     @Test
     fun readsTemplatePackage() {
         val dir = Files.createTempDirectory("nf-template-import").toFile()
