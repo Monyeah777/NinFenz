@@ -78,7 +78,7 @@ object EpubImporter {
                 "svg" -> "image/svg+xml"
                 else -> return@replace m.value
             }
-            val bytes = zip.getInputStream(entry).use { it.readBytes() }
+            val bytes = zip.getInputStream(entry).use { readLimited(it, 2L * 1024 * 1024) }
             budget[0] -= bytes.size
             val b64 = java.util.Base64.getEncoder().encodeToString(bytes)
             "<img " + m.groupValues[1] + "src=\"data:" + mime + ";base64," + b64 + "\"" + m.groupValues[3] + ">"
@@ -88,7 +88,21 @@ object EpubImporter {
     private fun read(zip: ZipFile, path: String): String? {
         val entry = zip.getEntry(path) ?: return null
         require(entry.size in 0..(64L * 1024 * 1024)) { "EPUB 条目过大：" + path }
-        return zip.getInputStream(entry).use { String(it.readBytes(), Charsets.UTF_8) }
+        return zip.getInputStream(entry).use { String(readLimited(it, 64L * 1024 * 1024), Charsets.UTF_8) }
+    }
+
+    private fun readLimited(input: java.io.InputStream, max: Long): ByteArray {
+        val out = java.io.ByteArrayOutputStream()
+        val buf = ByteArray(16 * 1024)
+        var read = 0L
+        while (true) {
+            val n = input.read(buf)
+            if (n < 0) break
+            read += n
+            require(read <= max) { "EPUB 条目超限" }
+            out.write(buf, 0, n)
+        }
+        return out.toByteArray()
     }
 
     private fun attr(tag: String, name: String): String? =
