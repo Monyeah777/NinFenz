@@ -9,6 +9,21 @@ import org.junit.Test
 
 class TemplatePackageBuilderTest {
     @Test
+    fun usesProvidedTemplateMarkdown() {
+        val root = Files.createTempDirectory("nf-template-markdown").toFile()
+        val packDir = java.io.File(root, "pack").apply { mkdirs() }
+        java.io.File(packDir, "protocol").mkdirs()
+        java.io.File(packDir, "pipeline").mkdirs()
+        java.io.File(packDir, "protocol/nf-protocol-pack.json").writeText("{}")
+        java.io.File(packDir, "pipeline/main.nfg.json").writeText("{}")
+        val pack = PackEntry("demo", "1.0.0", "Demo", "", 0, "tree", packDir)
+        val spec = buildJsonObject { put("schema", "nf-md-spec/1"); put("id", "demo"); put("version", "1.0.0") }
+        val prepared = TemplatePackageBuilder.prepare(root, pack, spec, "Demo", "# Custom\n")
+        assertTrue(java.io.File(prepared.dir, "template.md").readText() == "# Custom\n")
+        prepared.dir.deleteRecursively()
+    }
+
+    @Test
     fun buildsTemplateZip() {
         val root = Files.createTempDirectory("nf-template-build").toFile()
         val packDir = java.io.File(root, "pack").apply { mkdirs() }
