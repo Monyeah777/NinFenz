@@ -21,7 +21,8 @@ object BackupRestoreService {
         return try {
             ZipFile(file).use { zip ->
                 val manifestEntry = zip.getEntry("manifest.json") ?: return Inspect(emptyList(), false, "缺 manifest.json")
-                val manifestBytes = zip.getInputStream(manifestEntry).use { it.readBytes() }
+                require(manifestEntry.size in 0..(1024L * 1024L)) { "manifest 过大" }
+                val manifestBytes = zip.getInputStream(manifestEntry).use { readLimited(it, 1024L * 1024L) }
                 val manifestText = TextEncoding.decode(manifestBytes)?.text ?: String(manifestBytes, Charsets.UTF_8)
                 val root = Json.parseToJsonElement(manifestText).jsonObject
                 if (root["schema"]?.jsonPrimitive?.content != "nf-backup/1") {
@@ -57,7 +58,7 @@ object BackupRestoreService {
                     if (!safePath(e.path)) return Inspect(entries, false, "非法路径：" + e.path)
                     if (!seen.add(e.path)) return Inspect(entries, false, "重复条目：" + e.path)
                     val ze = zip.getEntry(e.path) ?: return Inspect(entries, false, "缺条目：" + e.path)
-                    val data = zip.getInputStream(ze).use { it.readBytes() }
+                    val data = zip.getInputStream(ze).use { readLimited(it, 256L * 1024 * 1024) }
                     actualTotal += data.size
                     if (data.size > 256L * 1024 * 1024 || actualTotal > 512L * 1024 * 1024) {
                         return Inspect(entries, false, "备份实际内容超限：" + e.path)
@@ -76,6 +77,20 @@ object BackupRestoreService {
         }
     }
 
+    private fun readLimited(input: java.io.InputStream, max: Long): ByteArray {
+        val out = java.io.ByteArrayOutputStream()
+        val buf = ByteArray(16 * 1024)
+        var read = 0L
+        while (true) {
+            val n = input.read(buf)
+            if (n < 0) break
+            read += n
+            require(read <= max) { "备份条目超限" }
+            out.write(buf, 0, n)
+        }
+        return out.toByteArray()
+    }
+
     fun restore(file: File, filesDir: File): Restored {
         val checked = inspect(file)
         require(checked.ok) { checked.error ?: "备份校验失败" }
@@ -91,7 +106,7 @@ object BackupRestoreService {
                 val canonical = target.canonicalFile
                 val root = filesDir.canonicalFile
                 require(canonical.path.startsWith(root.path + File.separator)) { "路径越界：" + e.path }
-                val data = zip.getInputStream(zip.getEntry(e.path)).use { it.readBytes() }
+                val data = zip.getInputStream(zip.getEntry(e.path)).use { readLimited(it, 256L * 1024 * 1024) }
                 AtomicFiles.writeBytes(target, data)
                 restored++
             }
