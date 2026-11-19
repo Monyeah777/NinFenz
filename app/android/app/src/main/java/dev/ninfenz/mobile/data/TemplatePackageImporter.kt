@@ -46,6 +46,12 @@ object TemplatePackageImporter {
             require(title.isNotBlank()) { "模板标题为空" }
             val compat = manifest["compat"] as? JsonObject ?: error("模板缺少 compat")
             require(compat["schema_version"]?.jsonPrimitive?.content == "1") { "模板 schema_version 不支持" }
+            val minApp = compat["min_app_version"]?.jsonPrimitive?.content.orEmpty()
+            if (minApp.isNotBlank()) {
+                require(compareVersion(dev.ninfenz.mobile.BuildConfig.VERSION_NAME, minApp) >= 0) {
+                    "模板需要 App " + minApp + " 或更高版本"
+                }
+            }
             val refs = listOf("template_md", "spec", "protocol", "pipeline").mapNotNull { key ->
                 val obj = manifest[key] as? JsonObject ?: return@mapNotNull null
                 val path = obj["path"]?.jsonPrimitive?.content ?: return@mapNotNull null
@@ -84,6 +90,18 @@ object TemplatePackageImporter {
             val count = hashes["count"]?.jsonPrimitive?.content?.toIntOrNull() ?: error("模板缺少 count")
             return Imported(out, title, specText, templateText, tree, count)
         }
+    }
+
+    private fun compareVersion(current: String, required: String): Int {
+        fun parts(v: String) = v.split(".").map { it.toIntOrNull() ?: 0 }
+        val a = parts(current)
+        val b = parts(required)
+        for (i in 0 until maxOf(a.size, b.size)) {
+            val x = a.getOrElse(i) { 0 }
+            val y = b.getOrElse(i) { 0 }
+            if (x != y) return x.compareTo(y)
+        }
+        return 0
     }
 
     private fun readLimited(input: java.io.InputStream, max: Long): ByteArray {
