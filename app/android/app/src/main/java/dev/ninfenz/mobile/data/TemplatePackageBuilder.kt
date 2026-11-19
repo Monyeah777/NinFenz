@@ -86,6 +86,7 @@ object TemplatePackageBuilder {
             ?.mapNotNull { it as? JsonObject }
             ?.sortedBy { (it["order"] as? kotlinx.serialization.json.JsonPrimitive)?.content?.toIntOrNull() ?: 0 }
             .orEmpty()
+        fun oneLine(text: String): String = text.replace('\r', ' ').replace('\n', ' ').trim()
         return buildString {
             appendLine("# " + ((spec["title"] as? kotlinx.serialization.json.JsonPrimitive)?.content ?: title.ifBlank { "模板" }))
             appendLine()
@@ -93,15 +94,15 @@ object TemplatePackageBuilder {
             appendLine()
             sections.forEach { section ->
                 val heading = (section["title"] as? kotlinx.serialization.json.JsonPrimitive)?.content ?: "章节"
-                appendLine("## " + heading)
+                appendLine("## " + oneLine(heading))
                 appendLine()
                 val ids = (section["slots"] as? kotlinx.serialization.json.JsonArray)?.mapNotNull { (it as? kotlinx.serialization.json.JsonPrimitive)?.content }.orEmpty()
                 ids.forEach { id ->
                     val slot = slots[id]
-                    val name = (slot?.get("name") as? kotlinx.serialization.json.JsonPrimitive)?.content ?: id
+                    val name = oneLine((slot?.get("name") as? kotlinx.serialization.json.JsonPrimitive)?.content ?: id)
                     val example = (slot?.get("examples") as? kotlinx.serialization.json.JsonArray)
                         ?.mapNotNull { (it as? kotlinx.serialization.json.JsonPrimitive)?.content }
-                        ?.firstOrNull()
+                        ?.firstOrNull()?.let { oneLine(it) }
                     val hints = listOfNotNull(
                         if ((slot?.get("required") as? kotlinx.serialization.json.JsonPrimitive)?.content == "true") "required" else null,
                         (slot?.get("minChars") as? kotlinx.serialization.json.JsonPrimitive)?.content?.let { "min " + it },
