@@ -14,7 +14,11 @@ object PdfTextImporter {
         PDDocument.load(file).use { document ->
             require(!document.isEncrypted) { "PDF 已加密" }
             require(document.numberOfPages <= 500) { "PDF 页数超过 500" }
-            return PDFTextStripper().getText(document).trim()
+            return PDFTextStripper().getText(document)
+                .replace("\r\n", "\n")
+                .replace('\u000C', '\n')
+                .replace(Regex("\n{3,}"), "\n\n")
+                .trim()
         }
     }
 }
