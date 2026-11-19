@@ -16,6 +16,8 @@ object TemplatePackageImporter {
         val title: String,
         val specText: String,
         val templateText: String,
+        val packId: String?,
+        val packVersion: String?,
         val tree: String,
         val count: Int
     )
@@ -88,7 +90,13 @@ object TemplatePackageImporter {
             val hashes = manifest["hashes"] as? JsonObject ?: error("模板缺少 hashes")
             val tree = hashes["tree"]?.jsonPrimitive?.content ?: error("模板缺少 tree")
             val count = hashes["count"]?.jsonPrimitive?.content?.toIntOrNull() ?: error("模板缺少 count")
-            return Imported(out, title, specText, templateText, tree, count)
+            val basePack = manifest["base_pack"] as? JsonObject
+            return Imported(
+                out, title, specText, templateText,
+                (basePack?.get("id") as? kotlinx.serialization.json.JsonPrimitive)?.content,
+                (basePack?.get("version") as? kotlinx.serialization.json.JsonPrimitive)?.content,
+                tree, count
+            )
         }
     }
 

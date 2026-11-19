@@ -227,7 +227,10 @@ fun ImportScreen(
                 val hashes = hash.resultObject()?.get("hashes") as? kotlinx.serialization.json.JsonObject
                 val tree = hashes?.get("tree")?.jsonPrimitive?.content
                 val count = hashes?.get("count")?.jsonPrimitive?.content?.toIntOrNull()
-                val pack = packs.firstOrNull()
+                val pack = packs.firstOrNull {
+                    (imported.packId == null || it.id == imported.packId) &&
+                        (imported.packVersion == null || it.version == imported.packVersion)
+                } ?: packs.firstOrNull()
                 if (!hash.ok || tree != imported.tree || count != imported.count) {
                     error = hash.error ?: CoreResponse.failure("NF-PCK-003", "模板包 tree/count 不匹配", "重新导出模板包", 2).error
                 } else {
