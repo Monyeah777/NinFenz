@@ -577,7 +577,8 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                 progress = { requiredFilled.toFloat() / requiredSlots.size.toFloat() },
                                 modifier = Modifier.fillMaxWidth()
                             )
-                            if (parsedTemplateSlots.keys.any { it in plan!!.slots } && plan!!.slots.any { inputs[it].isNullOrBlank() }) {
+                            val fillable = parsedTemplateSlots.keys.count { it in plan!!.slots && inputs[it].isNullOrBlank() }
+                            if (fillable > 0) {
                                 TextButton(onClick = {
                                     val parsed = parsedTemplateSlots
                                     val next = inputs.toMutableMap()
@@ -601,7 +602,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                         context.resources.getQuantityString(dev.ninfenz.mobile.R.plurals.delivery_template_filled, filled, filled),
                                         android.widget.Toast.LENGTH_SHORT
                                     ).show()
-                                }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_fill_template)) }
+                                }) { Text(pluralStringResource(dev.ninfenz.mobile.R.plurals.delivery_fill_template_count, fillable, fillable)) }
                             }
                         }
                         var lastSection: String? = null
