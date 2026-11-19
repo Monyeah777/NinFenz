@@ -120,6 +120,17 @@ import kotlinx.serialization.json.put
  * W5 交付台：项目 → graph-compile 计划 → 槽位输入 → assemble → validate L1 → 导出 md/zip/docx → 分享。
  * 项目状态写回已接；PDF 优先 WebView HTML/CSS（WebPdfExporter），失败回退本地基础文本（PdfExporter）。
  */
+private fun templateValueAllowed(meta: dev.ninfenz.mobile.model.SpecSlot?, value: String): Boolean {
+    val clean = dev.ninfenz.mobile.model.SlotInput.sanitize(meta?.kind, value)
+    if (meta?.nonEmpty == true && clean.isBlank()) return false
+    if (meta?.startsWith != null && !clean.startsWith(meta.startsWith)) return false
+    if (meta?.endsWith != null && !clean.endsWith(meta.endsWith)) return false
+    if (meta?.minChars != null && clean.length < meta.minChars) return false
+    if (meta?.maxChars != null && clean.length > meta.maxChars) return false
+    if (meta?.pattern != null && !runCatching { Regex(meta.pattern).matches(clean) }.getOrDefault(false)) return false
+    return true
+}
+
 private fun parseTemplateSlots(markdown: String): Map<String, String> {
     val result = mutableMapOf<String, String>()
     markdown.lineSequence().forEach { line ->
@@ -578,7 +589,10 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                 progress = { requiredFilled.toFloat() / requiredSlots.size.toFloat() },
                                 modifier = Modifier.fillMaxWidth()
                             )
-                            val fillable = parsedTemplateSlots.keys.count { it in plan!!.slots && inputs[it].isNullOrBlank() }
+                            val fillable = parsedTemplateSlots.count { (id, value) ->
+                                id in plan!!.slots && inputs[id].isNullOrBlank() &&
+                                    templateValueAllowed(specMeta?.slots?.firstOrNull { it.id == id }, value)
+                            }
                             if (fillable > 0) {
                                 TextButton(onClick = {
                                     val parsed = parsedTemplateSlots
@@ -587,14 +601,8 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                     parsed.forEach { (id, value) ->
                                         if (!next[id].isNullOrBlank() || plan!!.slots.none { it == id }) return@forEach
                                         val meta = specMeta?.slots?.firstOrNull { it.id == id }
-                                        val clean = dev.ninfenz.mobile.model.SlotInput.sanitize(meta?.kind, value)
-                                        if (meta?.nonEmpty == true && clean.isBlank()) return@forEach
-                                        if (meta?.startsWith != null && !clean.startsWith(meta.startsWith)) return@forEach
-                                        if (meta?.endsWith != null && !clean.endsWith(meta.endsWith)) return@forEach
-                                        if (meta?.minChars != null && clean.length < meta.minChars) return@forEach
-                                        if (meta?.maxChars != null && clean.length > meta.maxChars) return@forEach
-                                        if (meta?.pattern != null && !runCatching { Regex(meta.pattern).matches(clean) }.getOrDefault(false)) return@forEach
-                                        next[id] = clean
+                                        if (!templateValueAllowed(meta, value)) return@forEach
+                                        next[id] = dev.ninfenz.mobile.model.SlotInput.sanitize(meta?.kind, value)
                                         filled++
                                     }
                                     inputs = next
