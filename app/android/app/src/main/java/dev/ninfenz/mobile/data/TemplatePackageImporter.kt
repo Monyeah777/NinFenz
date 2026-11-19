@@ -15,6 +15,7 @@ object TemplatePackageImporter {
         val dir: File,
         val title: String,
         val specText: String,
+        val templateText: String,
         val tree: String,
         val count: Int
     )
@@ -66,10 +67,12 @@ object TemplatePackageImporter {
             val specPath = refs.first { it.first == "spec" }.second
             val specBytes = File(out, specPath).readBytes()
             val specText = specBytes.toString(Charsets.UTF_8)
+            val templatePath = refs.first { it.first == "template_md" }.second
+            val templateText = File(out, templatePath).readText(Charsets.UTF_8)
             val hashes = manifest["hashes"] as? JsonObject ?: error("模板缺少 hashes")
             val tree = hashes["tree"]?.jsonPrimitive?.content ?: error("模板缺少 tree")
             val count = hashes["count"]?.jsonPrimitive?.content?.toIntOrNull() ?: error("模板缺少 count")
-            return Imported(out, title, specText, tree, count)
+            return Imported(out, title, specText, templateText, tree, count)
         }
     }
 

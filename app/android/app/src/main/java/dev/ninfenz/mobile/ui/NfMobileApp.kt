@@ -468,13 +468,16 @@ is Detail.Import -> ImportScreen(
                                 }
                             }
                         },
-                        onCreateProjectFromTemplate = { pack, title, spec ->
+                        onCreateProjectFromTemplate = { pack, title, spec, templateText ->
                             scope.launch {
                                 when (val result = projectCreator.create(pack, title)) {
                                     is CreateProjectResult.Success -> {
                                         runCatching {
                                             withContext(Dispatchers.IO) {
                                                 DraftProjectBinder.bindSpec(context.filesDir, result.project.id, spec)
+                                                if (templateText.isNotBlank()) {
+                                                    DraftProjectBinder.bindText(context.filesDir, result.project.id, templateText)
+                                                }
                                             }
                                         }
                                         refresh()

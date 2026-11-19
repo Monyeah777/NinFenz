@@ -42,6 +42,7 @@ class TemplatePackageImporterTest {
         val imported = TemplatePackageImporter.inspect(zip, dir)
         assertEquals("Demo", imported.title)
         assertEquals(spec, imported.specText)
+        assertEquals(md, imported.templateText)
         assertEquals(4, imported.count)
     }
 }

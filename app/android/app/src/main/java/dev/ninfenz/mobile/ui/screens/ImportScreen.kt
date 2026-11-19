@@ -117,7 +117,7 @@ fun ImportScreen(
     packs: List<PackEntry> = emptyList(),
     onCreateProjectFromDraft: (PackEntry, String, File) -> Unit = { _, _, _ -> },
     onQuickProjectFromDraft: (PackEntry, String, File) -> Unit = onCreateProjectFromDraft,
-    onCreateProjectFromTemplate: (PackEntry, String, String) -> Unit = { _, _, _ -> },
+    onCreateProjectFromTemplate: (PackEntry, String, String, String) -> Unit = { _, _, _, _ -> },
     onProjectImported: (String, String, String) -> Unit = { _, _, _ -> }
 ) {
     val context = LocalContext.current
@@ -573,7 +573,7 @@ fun ImportScreen(
                                 val check = safeCall("spec-validate", buildJsonObject { put("spec", spec) })
                                 val pack = packs.firstOrNull()
                                 if (check.ok && pack != null) {
-                                    onCreateProjectFromTemplate(pack, imported.title, imported.specText)
+                                    onCreateProjectFromTemplate(pack, imported.title, imported.specText, imported.templateText)
                                 } else if (pack == null) {
                                     error = CoreResponse.failure("NF-PCK-002", context.getString(dev.ninfenz.mobile.R.string.import_template_export), context.getString(dev.ninfenz.mobile.R.string.import_template_export), 2).error
                                 } else {
@@ -1346,7 +1346,7 @@ fun ImportScreen(
                     onClick = {
                         val spec = runCatching { file.readText(Charsets.UTF_8) }.getOrNull()
                         if (pack != null && spec != null) {
-                            onCreateProjectFromTemplate(pack, templateStore.titleOf(file), spec)
+                            onCreateProjectFromTemplate(pack, templateStore.titleOf(file), spec, "")
                         }
                         pendingTemplateUse = null
                     }

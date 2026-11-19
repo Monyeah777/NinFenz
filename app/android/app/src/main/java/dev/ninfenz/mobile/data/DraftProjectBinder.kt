@@ -14,6 +14,14 @@ object DraftProjectBinder {
         return target
     }
 
+    fun bindText(filesDir: File, projectId: String, text: String): File {
+        require(projectId.isNotBlank()) { "项目 ID 为空" }
+        val dir = File(File(File(filesDir, "projects"), projectId), "authoring").apply { mkdirs() }
+        val target = File(dir, "template.md")
+        target.writeText(text, Charsets.UTF_8)
+        return target
+    }
+
     fun clearSpec(filesDir: File, projectId: String): Boolean {
         val dir = File(File(File(filesDir, "projects"), projectId), "authoring")
         return File(dir, "spec-override.json").delete()
