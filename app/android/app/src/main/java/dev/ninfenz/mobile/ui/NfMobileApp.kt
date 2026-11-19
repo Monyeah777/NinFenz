@@ -699,6 +699,7 @@ is Detail.Import -> ImportScreen(
                                     }
                                 },
                                 onSaveAsTemplate = {
+                                    android.widget.Toast.makeText(context, context.getString(dev.ninfenz.mobile.R.string.project_save_template), android.widget.Toast.LENGTH_SHORT).show()
                                     scope.launch {
                                         val pack = packs.packs.firstOrNull {
                                             it.id == entry.project.refs.basePackId && it.version == entry.project.refs.basePackVersion
@@ -730,6 +731,7 @@ is Detail.Import -> ImportScreen(
                                     }
                                 },
                                 onExportTemplatePackage = {
+                                    android.widget.Toast.makeText(context, context.getString(dev.ninfenz.mobile.R.string.project_export_template), android.widget.Toast.LENGTH_SHORT).show()
                                     scope.launch {
                                         val pack = packs.packs.firstOrNull {
                                             it.id == entry.project.refs.basePackId && it.version == entry.project.refs.basePackVersion

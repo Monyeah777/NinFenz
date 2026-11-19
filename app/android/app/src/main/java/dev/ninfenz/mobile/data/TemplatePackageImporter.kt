@@ -78,6 +78,7 @@ object TemplatePackageImporter {
             val specText = specBytes.toString(Charsets.UTF_8)
             val templatePath = refs.first { it.first == "template_md" }.second
             val templateText = File(out, templatePath).readText(Charsets.UTF_8)
+            require(templateText.isNotBlank()) { "模板正文为空" }
             val hashes = manifest["hashes"] as? JsonObject ?: error("模板缺少 hashes")
             val tree = hashes["tree"]?.jsonPrimitive?.content ?: error("模板缺少 tree")
             val count = hashes["count"]?.jsonPrimitive?.content?.toIntOrNull() ?: error("模板缺少 count")
