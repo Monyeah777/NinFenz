@@ -210,6 +210,44 @@ fun ImportScreen(
     }
 
     suspend fun importFromFile(file: File, sourceKind: String, name: String, mime: String?, size: Long) {
+        if (file.name.endsWith(".zip", ignoreCase = true) && TemplatePackageImporter.hasTemplateJson(file)) {
+            busy = true
+            error = null
+            notice = null
+            try {
+                val imported = withContext(Dispatchers.IO) { TemplatePackageImporter.inspect(file, context.cacheDir) }
+                val hash = safeCall("pack-hash", buildJsonObject { put("root", imported.dir.absolutePath) })
+                val hashes = hash.resultObject()?.get("hashes") as? kotlinx.serialization.json.JsonObject
+                val tree = hashes?.get("tree")?.jsonPrimitive?.content
+                val count = hashes?.get("count")?.jsonPrimitive?.content?.toIntOrNull()
+                val pack = packs.firstOrNull()
+                if (!hash.ok || tree != imported.tree || count != imported.count) {
+                    error = hash.error ?: CoreResponse.failure("NF-PCK-003", "模板包 tree/count 不匹配", "重新导出模板包", 2).error
+                } else if (
+                    !safeCall("spec-validate", buildJsonObject {
+                        put("spec", kotlinx.serialization.json.Json.parseToJsonElement(imported.specText).jsonObject)
+                    }).ok
+                ) {
+                    error = safeCall("spec-validate", buildJsonObject {
+                        put("spec", kotlinx.serialization.json.Json.parseToJsonElement(imported.specText).jsonObject)
+                    }).error
+                } else if (pack == null) {
+                    error = CoreResponse.failure("NF-PCK-002", context.getString(dev.ninfenz.mobile.R.string.import_template_export), context.getString(dev.ninfenz.mobile.R.string.import_template_export), 2).error
+                } else {
+                    onCreateProjectFromTemplate(pack, imported.title, imported.specText, imported.templateText)
+                }
+            } catch (t: Throwable) {
+                error = CoreResponse.failure(
+                    "NF-E-005",
+                    context.getString(dev.ninfenz.mobile.R.string.import_template_import) + ": " + (t.message ?: t.javaClass.simpleName),
+                    context.getString(dev.ninfenz.mobile.R.string.import_parse_failed_fix),
+                    2
+                ).error
+            }
+            file.delete()
+            busy = false
+            return
+        }
         if (file.name.endsWith(".zip", ignoreCase = true) && ProjectPackageImporter.hasProjectJson(file)) {
             try {
                 val imported = withContext(Dispatchers.IO) { ProjectPackageImporter.import(context.filesDir, file) }
@@ -559,40 +597,6 @@ fun ImportScreen(
                         return@launch
                     }
                     val file = FileAccess.copyToCache(context, uri, meta.name)
-                    if (meta.name.orEmpty().lowercase().endsWith(".zip")) {
-                        busy = true
-                        try {
-                            val imported = withContext(Dispatchers.IO) { TemplatePackageImporter.inspect(file, context.cacheDir) }
-                            val hash = safeCall("pack-hash", buildJsonObject { put("root", imported.dir.absolutePath) })
-                            val hashes = hash.resultObject()?.get("hashes") as? kotlinx.serialization.json.JsonObject
-                            val tree = hashes?.get("tree")?.jsonPrimitive?.content
-                            val count = hashes?.get("count")?.jsonPrimitive?.content?.toIntOrNull()
-                            if (!hash.ok || tree != imported.tree || count != imported.count) {
-                                error = hash.error ?: CoreResponse.failure("NF-PCK-003", "模板包 tree/count 不匹配", "重新导出模板包", 2).error
-                            } else {
-                                val spec = kotlinx.serialization.json.Json.parseToJsonElement(imported.specText).jsonObject
-                                val check = safeCall("spec-validate", buildJsonObject { put("spec", spec) })
-                                val pack = packs.firstOrNull()
-                                if (check.ok && pack != null) {
-                                    onCreateProjectFromTemplate(pack, imported.title, imported.specText, imported.templateText)
-                                } else if (pack == null) {
-                                    error = CoreResponse.failure("NF-PCK-002", context.getString(dev.ninfenz.mobile.R.string.import_template_export), context.getString(dev.ninfenz.mobile.R.string.import_template_export), 2).error
-                                } else {
-                                    error = check.error
-                                }
-                            }
-                        } catch (t: Throwable) {
-                            error = CoreResponse.failure(
-                                "NF-E-005",
-                                context.getString(dev.ninfenz.mobile.R.string.import_template_import) + ": " + (t.message ?: t.javaClass.simpleName),
-                                context.getString(dev.ninfenz.mobile.R.string.import_parse_failed_fix),
-                                2
-                            ).error
-                        }
-                        busy = false
-                        file.delete()
-                        return@launch
-                    }
                     if (meta.name.orEmpty().lowercase().endsWith(".csv") || (meta.mime ?: "").contains("csv", ignoreCase = true)) {
                         val markdown = CsvTable.toMarkdown(file.readText(Charsets.UTF_8))
                         val converted = File(File(context.cacheDir, "imports").apply { mkdirs() }, "csv-table.md")

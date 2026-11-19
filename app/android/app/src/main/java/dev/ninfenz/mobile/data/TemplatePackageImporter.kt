@@ -23,6 +23,10 @@ object TemplatePackageImporter {
     private const val MAX_BYTES = 64L * 1024 * 1024
     private const val MAX_ENTRIES = 512
 
+    fun hasTemplateJson(zipFile: File): Boolean = runCatching {
+        ZipFile(zipFile).use { it.getEntry("nf-template.json") != null }
+    }.getOrDefault(false)
+
     fun inspect(zipFile: File, cacheDir: File): Imported {
         require(zipFile.isFile) { "模板包不存在" }
         val out = File(cacheDir, "template-import").apply { deleteRecursively(); mkdirs() }
