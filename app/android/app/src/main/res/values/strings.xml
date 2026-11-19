@@ -965,4 +965,8 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="project_archive_restore">恢复</string>
     <string name="project_archive_delete">删除</string>
     <string name="project_archive_delete_body">永久删除归档 %1$s？不可撤销。</string>
+    <plurals name="delivery_template_filled">
+        <item quantity="one">已填入 %d 个空槽位</item>
+        <item quantity="other">已填入 %d 个空槽位</item>
+    </plurals>
 </resources>

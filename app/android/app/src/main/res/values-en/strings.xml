@@ -969,4 +969,8 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="project_archive_restore">Restore</string>
     <string name="project_archive_delete">Delete</string>
     <string name="project_archive_delete_body">Permanently delete archived %1$s? This cannot be undone.</string>
+    <plurals name="delivery_template_filled">
+        <item quantity="one">%d empty slot filled</item>
+        <item quantity="other">%d empty slots filled</item>
+    </plurals>
 </resources>

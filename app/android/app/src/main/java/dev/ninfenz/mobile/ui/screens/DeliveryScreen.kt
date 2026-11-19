@@ -580,6 +580,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                 TextButton(onClick = {
                                     val parsed = parseTemplateSlots(templateReference)
                                     val next = inputs.toMutableMap()
+                                    var filled = 0
                                     parsed.forEach { (id, value) ->
                                         if (!next[id].isNullOrBlank() || plan!!.slots.none { it == id }) return@forEach
                                         val meta = specMeta?.slots?.firstOrNull { it.id == id }
@@ -587,8 +588,14 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                         if (meta?.maxChars != null && clean.length > meta.maxChars) return@forEach
                                         if (meta?.pattern != null && !runCatching { Regex(meta.pattern).matches(clean) }.getOrDefault(false)) return@forEach
                                         next[id] = clean
+                                        filled++
                                     }
                                     inputs = next
+                                    android.widget.Toast.makeText(
+                                        context,
+                                        context.resources.getQuantityString(dev.ninfenz.mobile.R.plurals.delivery_template_filled, filled, filled),
+                                        android.widget.Toast.LENGTH_SHORT
+                                    ).show()
                                 }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_fill_template)) }
                             }
                         }
