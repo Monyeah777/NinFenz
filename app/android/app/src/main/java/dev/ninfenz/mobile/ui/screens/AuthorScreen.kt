@@ -224,6 +224,12 @@ fun AuthorScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onAssem
                     TextButton(onClick = { authorClipboard.setText(androidx.compose.ui.text.AnnotatedString(text)) }) {
                         Text(stringResource(dev.ninfenz.mobile.R.string.author_template_copy))
                     }
+                    TextButton(onClick = {
+                        val intent = dev.ninfenz.mobile.share.ShareExporter.shareMarkdown(authorContext, "nf-template", text)
+                        dev.ninfenz.mobile.share.ShareExporter.launchChooser(authorContext, intent, authorContext.getString(dev.ninfenz.mobile.R.string.author_template_share))
+                    }) {
+                        Text(stringResource(dev.ninfenz.mobile.R.string.author_template_share))
+                    }
                     MarkdownPreview(text, limitBlocks = 24)
                 }
             }

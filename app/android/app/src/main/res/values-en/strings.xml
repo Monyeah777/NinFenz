@@ -367,6 +367,7 @@
     <string name="author_preview_note">Local editing: clauses/fields/pipeline/spec save to the project (undo/redo + debounced autosave); checks run in core.</string>
     <string name="author_template_ref">Template reference</string>
     <string name="author_template_copy">Copy template</string>
+    <string name="author_template_share">Share template</string>
     <plurals name="author_import_prefill">
         <item quantity="one">Prefilled %1$d field from the import mapping.</item>
         <item quantity="other">Prefilled %1$d fields from the import mapping.</item>
