@@ -21,7 +21,6 @@
     <string name="flow_action_continue">Continue</string>
     <string name="flow_action_author">Continue creating</string>
     <string name="flow_action_delivery">Assemble &amp; deliver</string>
-    <string name="flow_action_review">View delivery</string>
     <string name="flow_empty_title">No workflow yet</string>
     <string name="flow_empty_body">Start by importing content or creating a project; continue from here.</string>
     <string name="flow_open_project">Open project</string>
@@ -118,8 +117,6 @@
     <string name="library_quick_title">Have something ready?</string>
     <string name="library_quick_body">Paste text and go straight to the import preview.</string>
     <string name="library_quick_paste">Paste to start</string>
-    <string name="library_load_sample">Load sample</string>
-    <string name="library_loading_sample">Loading…</string>
     <string name="library_seed_ready">Sample loaded: %1$s · %2$s</string>
     <string name="library_seed_exists">Sample present: %1$s · %2$s</string>
     <string name="library_empty_title">Nothing here yet</string>
@@ -183,12 +180,10 @@
     <string name="me_section_about">About</string>
     <string name="me_about_title">About NF / licenses / privacy</string>
     <string name="me_about_subtitle">Local-only · No network permission · No telemetry</string>
-    <string name="project_detail_status">Status</string>
     <string name="project_detail_next_step">Next step</string>
     <string name="project_detail_info">Project info</string>
     <string name="project_history_expand">Expand</string>
     <string name="project_history_collapse">Collapse</string>
-    <string name="project_detail_id">Project ID: %1$s</string>
     <string name="project_detail_pack">Pack: %1$s · %2$s</string>
     <string name="project_detail_protocol">Protocol: %1$s</string>
     <string name="project_detail_protocol_label">Protocol</string>
@@ -205,10 +200,7 @@
     <string name="validate_pack">Validate Pack</string>
     <string name="project_review_stale">Content changed; the review may be stale — re-review recommended</string>
     <string name="project_detail_history">History: %1$d</string>
-    <string name="project_detail_section_continue">Continue</string>
-    <string name="project_detail_author">Author workspace</string>
     <string name="project_detail_author_subtitle">Protocol / pipeline / spec (core checks)</string>
-    <string name="project_detail_delivery">Assemble &amp; deliver</string>
     <string name="project_detail_delivery_subtitle">Preview / validate / export</string>
     <string name="pack_detail_items">Items: %1$d</string>
     <string name="pack_detail_tree">tree: %1$s</string>
@@ -422,7 +414,6 @@
     <string name="delivery_export_group_docs">Documents</string>
     <string name="delivery_export_group_data">Data &amp; migration</string>
     <string name="delivery_export_group_reading">Reading &amp; web</string>
-    <string name="delivery_export_group_share">Share</string>
     <string name="delivery_share_md">Share Markdown</string>
     <string name="delivery_share_fix">Share fix prompt</string>
     <string name="delivery_share_file">Share exported file</string>
@@ -827,7 +818,6 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="project_import_missing_pack_body">The project was imported, but bound pack %1$s@%2$s is not installed; install it to validate/assemble.</string>
     <string name="project_import_missing_pack_action">Go to Pack center</string>
     <string name="project_review_current">Current review: %1$s</string>
-    <string name="project_review_summary">Review: %1$s · reviewer %2$s</string>
     <string name="project_review_need_validate">Validate or export before approving</string>
     <string name="project_review_reviewer">Reviewer</string>
     <string name="project_review_note">Review note</string>

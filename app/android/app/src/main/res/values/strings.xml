@@ -21,7 +21,6 @@
     <string name="flow_action_continue">继续</string>
     <string name="flow_action_author">继续创作</string>
     <string name="flow_action_delivery">装配与交付</string>
-    <string name="flow_action_review">查看交付</string>
     <string name="flow_empty_title">还没有工作流</string>
     <string name="flow_empty_body">从导入内容或新建项目开始，之后都从这里继续。</string>
     <string name="flow_open_project">打开项目</string>
@@ -118,8 +117,6 @@
     <string name="library_quick_title">有现成内容？</string>
     <string name="library_quick_body">粘贴一段文字，直接进入导入预览。</string>
     <string name="library_quick_paste">粘贴开始</string>
-    <string name="library_load_sample">载入示例</string>
-    <string name="library_loading_sample">载入中…</string>
     <string name="library_seed_ready">示例已载入：%1$s · %2$s</string>
     <string name="library_seed_exists">示例已存在：%1$s · %2$s</string>
     <string name="library_empty_title">还没有内容</string>
@@ -179,12 +176,10 @@
     <string name="me_section_about">关于</string>
     <string name="me_about_title">关于 NF / 许可 / 隐私</string>
     <string name="me_about_subtitle">本地处理 · 无网络权限 · 无遥测</string>
-    <string name="project_detail_status">状态</string>
     <string name="project_detail_next_step">下一步</string>
     <string name="project_detail_info">项目信息</string>
     <string name="project_history_expand">展开</string>
     <string name="project_history_collapse">收起</string>
-    <string name="project_detail_id">项目 ID：%1$s</string>
     <string name="project_detail_pack">Pack：%1$s · %2$s</string>
     <string name="project_detail_protocol">协议：%1$s</string>
     <string name="project_detail_protocol_label">协议</string>
@@ -201,10 +196,7 @@
     <string name="validate_pack">校验 Pack</string>
     <string name="project_review_stale">内容已变更，评审结论可能失效，建议重新评审</string>
     <string name="project_detail_history">历史：%1$d 条</string>
-    <string name="project_detail_section_continue">继续</string>
-    <string name="project_detail_author">创作台</string>
     <string name="project_detail_author_subtitle">协议 / 管线 / 规格（核心校验）</string>
-    <string name="project_detail_delivery">装配与交付</string>
     <string name="project_detail_delivery_subtitle">预览 / 校验 / 导出</string>
     <string name="pack_detail_items">条目：%1$d</string>
     <string name="pack_detail_tree">tree：%1$s</string>
@@ -418,7 +410,6 @@
     <string name="delivery_export_group_docs">文档</string>
     <string name="delivery_export_group_data">数据与迁移</string>
     <string name="delivery_export_group_reading">阅读与网页</string>
-    <string name="delivery_export_group_share">分享</string>
     <string name="delivery_share_md">分享 Markdown</string>
     <string name="delivery_share_fix">分享修正 Prompt</string>
     <string name="delivery_share_file">分享导出文件</string>
@@ -823,7 +814,6 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="project_import_missing_pack_body">项目已导入，但绑定的 Pack %1$s@%2$s 未安装；安装后可正常校验/装配。</string>
     <string name="project_import_missing_pack_action">前往 Pack 中心</string>
     <string name="project_review_current">当前评审：%1$s</string>
-    <string name="project_review_summary">评审：%1$s · 评审人 %2$s</string>
     <string name="project_review_need_validate">需先完成校验/导出后才能评审通过</string>
     <string name="project_review_reviewer">评审人</string>
     <string name="project_review_note">评审意见</string>
