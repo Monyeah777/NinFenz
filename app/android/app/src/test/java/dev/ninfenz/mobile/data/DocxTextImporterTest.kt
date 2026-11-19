@@ -18,13 +18,14 @@ class DocxTextImporterTest {
                   <w:body>
                     <w:p><w:pPr><w:numPr/></w:pPr><w:r><w:t>Hello</w:t></w:r><w:r><w:t> DOCX</w:t></w:r></w:p>
                     <w:p><w:pPr><w:pStyle w:val="Heading1"/></w:pPr><w:r><w:t>Second</w:t></w:r></w:p>
+                    <w:tbl><w:tr><w:tc><w:p><w:r><w:t>A</w:t></w:r></w:p></w:tc><w:tc><w:p><w:r><w:t>B</w:t></w:r></w:p></w:tc></w:tr></w:tbl>
                   </w:body>
                 </w:document>""".trimIndent().toByteArray()
             )
             out.closeEntry()
         }
         val text = DocxTextImporter.extract(file)
-        assertEquals("- Hello DOCX\n\n# Second", text)
+        assertEquals("- Hello DOCX\n\n# Second\n\nA | B |", text)
         file.delete()
     }
 }

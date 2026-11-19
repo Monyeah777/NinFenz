@@ -22,9 +22,14 @@ object DocxTextImporter {
                 private val paragraph = StringBuilder()
                 private var heading = 0
                 private var listItem = false
+                private var inTable = false
+                private var inCell = false
+                private val cell = StringBuilder()
                 override fun startElement(uri: String?, localName: String?, qName: String?, attributes: Attributes?) {
                     val name = localName ?: qName.orEmpty()
                     if (name == "t") inText = true
+                    if (name == "tbl") inTable = true
+                    if (name == "tc") { inCell = true; cell.clear() }
                     if (name == "numPr") listItem = true
                     if (name == "pStyle") {
                         val style = attributes?.getValue("w:val") ?: attributes?.getValue("val").orEmpty()
@@ -39,14 +44,26 @@ object DocxTextImporter {
                     if (name == "p") {
                         val value = paragraph.toString().trim()
                         if (value.isNotBlank()) {
-                            if (heading in 1..6) text.append("#".repeat(heading)).append(' ')
-                            if (listItem) text.append("- ")
-                            text.append(value).append("\n\n")
+                            if (inCell) {
+                                if (cell.isNotEmpty()) cell.append(' ')
+                                cell.append(value)
+                            } else {
+                                if (heading in 1..6) text.append("#".repeat(heading)).append(' ')
+                                if (listItem) text.append("- ")
+                                text.append(value).append("\n\n")
+                            }
                         }
                         paragraph.clear()
                         heading = 0
                         listItem = false
                     }
+                    if (name == "tc") {
+                        text.append(cell.toString().trim()).append(" | ")
+                        inCell = false
+                        cell.clear()
+                    }
+                    if (name == "tr") text.append('\n')
+                    if (name == "tbl") { text.append('\n'); inTable = false }
                 }
                 override fun characters(ch: CharArray, start: Int, length: Int) {
                     if (inText) paragraph.append(ch, start, length)
