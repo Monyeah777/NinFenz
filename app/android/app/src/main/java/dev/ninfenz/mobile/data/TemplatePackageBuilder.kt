@@ -88,7 +88,7 @@ object TemplatePackageBuilder {
             .orEmpty()
         fun oneLine(text: String): String = text.replace('\r', ' ').replace('\n', ' ').trim()
         return buildString {
-            appendLine("# " + ((spec["title"] as? kotlinx.serialization.json.JsonPrimitive)?.content ?: title.ifBlank { "模板" }))
+            appendLine("# " + oneLine((spec["title"] as? kotlinx.serialization.json.JsonPrimitive)?.content ?: title.ifBlank { "模板" }))
             appendLine()
             appendLine("> Pack: " + pack.id + " " + pack.version)
             appendLine()
