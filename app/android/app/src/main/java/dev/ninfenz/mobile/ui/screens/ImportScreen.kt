@@ -153,6 +153,7 @@ fun ImportScreen(
     var showAllTemplates by remember { mutableStateOf(false) }
     var showAllSamples by remember { mutableStateOf(false) }
     var showClearSamples by remember { mutableStateOf(false) }
+    var showClearTemplates by remember { mutableStateOf(false) }
     var pendingDeleteTemplate by remember { mutableStateOf<File?>(null) }
     var importPreviewText by remember { mutableStateOf<String?>(null) }
     var promptProfile by remember { mutableStateOf(PromptProfile.GENERIC) }
@@ -919,6 +920,9 @@ fun ImportScreen(
                                             Text(stringResource(if (showAllTemplates) dev.ninfenz.mobile.R.string.import_templates_show_less else dev.ninfenz.mobile.R.string.import_templates_show_all))
                                         }
                                     }
+                                    TextButton(onClick = { showClearTemplates = true }) {
+                                        Text(stringResource(dev.ninfenz.mobile.R.string.import_templates_clear))
+                                    }
                                 }
                                 slices.take(6).forEach { slice ->
                                     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
@@ -1442,6 +1446,24 @@ fun ImportScreen(
             },
             dismissButton = {
                 TextButton(onClick = { pendingTemplateUse = null }) { Text(stringResource(android.R.string.cancel)) }
+            }
+        )
+    }
+
+    if (showClearTemplates) {
+        AlertDialog(
+            onDismissRequest = { showClearTemplates = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.import_templates_clear_title)) },
+            text = { Text(stringResource(dev.ninfenz.mobile.R.string.import_templates_clear_body)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    savedTemplates.forEach { templateStore.delete(it) }
+                    savedTemplates = templateStore.list()
+                    showClearTemplates = false
+                }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_templates_clear)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showClearTemplates = false }) { Text(stringResource(android.R.string.cancel)) }
             }
         )
     }

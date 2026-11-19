@@ -262,6 +262,9 @@
     <string name="import_samples_clear">清空样本</string>
     <string name="import_samples_clear_title">清空本地 AI 样本？</string>
     <string name="import_samples_clear_body">只会删除本地样本 Markdown，不可撤销。</string>
+    <string name="import_templates_clear">清空模板候选</string>
+    <string name="import_templates_clear_title">清空本地模板候选？</string>
+    <string name="import_templates_clear_body">只会删除本地候选 JSON，不可撤销。</string>
     <plurals name="import_templates_saved">
         <item quantity="one">已保存候选 %1$d 个</item>
         <item quantity="other">已保存候选 %1$d 个</item>
