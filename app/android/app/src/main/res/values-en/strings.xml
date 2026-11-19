@@ -246,15 +246,27 @@
     <string name="import_preview">Preview</string>
     <string name="import_preview_ready">Preview draft</string>
     <string name="import_slices">Auto slices</string>
-    <string name="import_slices_summary">%1$d sections · %2$d blocks</string>
+    <plurals name="import_slices_summary">
+        <item quantity="one">%1$d section · %2$d blocks</item>
+        <item quantity="other">%1$d sections · %2$d blocks</item>
+    </plurals>
     <string name="import_slice_preamble">Opening</string>
     <string name="import_slice_suggestion_chapter">Suggested template: chapters</string>
     <string name="import_slice_suggestion_free">Suggested template: freeform</string>
-    <string name="import_slice_meta">%1$d blocks · %2$d chars</string>
+    <plurals name="import_slice_meta">
+        <item quantity="one">%1$d block · %2$d chars</item>
+        <item quantity="other">%1$d blocks · %2$d chars</item>
+    </plurals>
     <string name="import_save_template">Save template candidate</string>
     <string name="import_template_saved">Template candidate saved: %1$s</string>
-    <string name="import_templates_saved">%1$d saved candidates</string>
-    <string name="import_samples_saved">%1$d saved AI samples</string>
+    <plurals name="import_templates_saved">
+        <item quantity="one">%1$d saved candidate</item>
+        <item quantity="other">%1$d saved candidates</item>
+    </plurals>
+    <plurals name="import_samples_saved">
+        <item quantity="one">%1$d saved AI sample</item>
+        <item quantity="other">%1$d saved AI samples</item>
+    </plurals>
     <string name="import_template_share">Share</string>
     <string name="import_template_copy">Copy JSON</string>
     <string name="import_template_import">Import candidate</string>
@@ -331,7 +343,10 @@
     <string name="packcenter_uninstall_title">Uninstall pack?</string>
     <string name="packcenter_uninstall_body">This deletes %1$s · %2$s and all its files; archived projects are unaffected.</string>
     <string name="packcenter_uninstall_confirm">Uninstall</string>
-    <string name="packcenter_uninstall_in_use">%1$d project(s) still use this pack. Archive them or switch to another pack first.</string>
+    <plurals name="packcenter_uninstall_in_use">
+        <item quantity="one">%1$d project still uses this pack. Archive it or switch to another pack first.</item>
+        <item quantity="other">%1$d projects still use this pack. Archive them or switch to another pack first.</item>
+    </plurals>
     <string name="packcenter_uninstall_done">Uninstalled %1$s · %2$s</string>
     <string name="packcenter_uninstall_failed">Uninstall failed: %1$s</string>
     <string name="packcenter_verify_pass">Verified · verdict=%1$s</string>
@@ -346,7 +361,10 @@
     <string name="template_override_active">Using a project-local template spec override.</string>
     <string name="template_override_remove">Remove override</string>
     <string name="author_preview_note">Local editing: clauses/fields/pipeline/spec save to the project (undo/redo + debounced autosave); checks run in core.</string>
-    <string name="author_import_prefill">Prefilled %1$d fields from the import mapping.</string>
+    <plurals name="author_import_prefill">
+        <item quantity="one">Prefilled %1$d field from the import mapping.</item>
+        <item quantity="other">Prefilled %1$d fields from the import mapping.</item>
+    </plurals>
     <string name="author_go_deliver">Deliver</string>
     <string name="author_load_error">Failed to read project content: %1$s</string>
     <string name="author_load_fix">Reinstall the bound pack, or recreate the project</string>
@@ -404,9 +422,9 @@
     <string name="delivery_missing_required">Fill required slots first: %1$s</string>
     <string name="delivery_slot_over_budget">Slot text exceeds budget: %1$s</string>
     <string name="delivery_slot_constraint">Slot pattern/non-empty check failed: %1$s</string>
-    <string name="delivery_slot_budget">Budget %1$d–%2$d chars</string>
-    <string name="delivery_slot_budget_min">Min %1$d chars</string>
-    <string name="delivery_slot_budget_max">Max %1$d chars</string>
+    <string name="delivery_slot_budget">Budget %1$d–%2$d</string>
+    <string name="delivery_slot_budget_min">Min %1$d</string>
+    <string name="delivery_slot_budget_max">Max %1$d</string>
     <string name="delivery_assembling">Assembling…</string>
     <string name="delivery_validate">validate L1</string>
     <string name="delivery_validating">Validating…</string>
@@ -458,7 +476,10 @@
     <string name="preview_block_down">Down</string>
     <string name="preview_block_delete">Delete</string>
     <string name="preview_block_add">Add paragraph</string>
-    <string name="preview_more">… %1$d more blocks; open full preview</string>
+    <plurals name="preview_more">
+        <item quantity="one">… %1$d more block; open full preview</item>
+        <item quantity="other">… %1$d more blocks; open full preview</item>
+    </plurals>
     <string name="preview_image">Image</string>
     <string name="delivery_not_assembled">Nothing assembled yet. Preview only shows markdown returned by core.</string>
     <string name="delivery_export">Export %1$s</string>

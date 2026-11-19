@@ -242,15 +242,27 @@
     <string name="import_preview">预览</string>
     <string name="import_preview_ready">预览成稿</string>
     <string name="import_slices">自动切片</string>
-    <string name="import_slices_summary">%1$d 个章节 · %2$d 个块</string>
+    <plurals name="import_slices_summary">
+        <item quantity="one">%1$d 节 · %2$d 块</item>
+        <item quantity="other">%1$d 节 · %2$d 块</item>
+    </plurals>
     <string name="import_slice_preamble">开篇</string>
     <string name="import_slice_suggestion_chapter">建议模板：章节稿</string>
     <string name="import_slice_suggestion_free">建议模板：自由稿</string>
-    <string name="import_slice_meta">%1$d 块 · %2$d 字</string>
+    <plurals name="import_slice_meta">
+        <item quantity="one">%1$d 块 · %2$d 字</item>
+        <item quantity="other">%1$d 块 · %2$d 字</item>
+    </plurals>
     <string name="import_save_template">保存模板候选</string>
     <string name="import_template_saved">模板候选已保存：%1$s</string>
-    <string name="import_templates_saved">已保存候选 %1$d 个</string>
-    <string name="import_samples_saved">已保存 AI 样本 %1$d 个</string>
+    <plurals name="import_templates_saved">
+        <item quantity="one">已保存候选 %1$d 个</item>
+        <item quantity="other">已保存候选 %1$d 个</item>
+    </plurals>
+    <plurals name="import_samples_saved">
+        <item quantity="one">已保存 AI 样本 %1$d 个</item>
+        <item quantity="other">已保存 AI 样本 %1$d 个</item>
+    </plurals>
     <string name="import_template_share">分享</string>
     <string name="import_template_copy">复制 JSON</string>
     <string name="import_template_import">导入候选</string>
@@ -327,7 +339,10 @@
     <string name="packcenter_uninstall_title">卸载 Pack？</string>
     <string name="packcenter_uninstall_body">将删除 %1$s · %2$s 及其全部文件；已归档项目不受影响。</string>
     <string name="packcenter_uninstall_confirm">卸载</string>
-    <string name="packcenter_uninstall_in_use">有 %1$d 个项目正在使用该 Pack，先归档或改用其他 Pack。</string>
+    <plurals name="packcenter_uninstall_in_use">
+        <item quantity="one">仍有 %1$d 个项目使用此 Pack。请先归档或换 Pack。</item>
+        <item quantity="other">仍有 %1$d 个项目使用此 Pack。请先归档或换 Pack。</item>
+    </plurals>
     <string name="packcenter_uninstall_done">已卸载 %1$s · %2$s</string>
     <string name="packcenter_uninstall_failed">卸载失败：%1$s</string>
     <string name="packcenter_verify_pass">校验通过 · verdict=%1$s</string>
@@ -342,7 +357,10 @@
     <string name="template_override_active">正在使用项目内的模板 spec 覆盖。</string>
     <string name="template_override_remove">移除覆盖</string>
     <string name="author_preview_note">本地编辑：条款/字段/管线/规格可保存到项目（撤销/重做 + 防抖自动保存）；校验走核心。</string>
-    <string name="author_import_prefill">已从导入映射预填 %1$d 个字段。</string>
+    <plurals name="author_import_prefill">
+        <item quantity="one">已从导入映射预填 %1$d 个字段。</item>
+        <item quantity="other">已从导入映射预填 %1$d 个字段。</item>
+    </plurals>
     <string name="author_go_deliver">去交付</string>
     <string name="author_load_error">读取项目内容失败：%1$s</string>
     <string name="author_load_fix">重装绑定的 Pack，或重新创建项目</string>
@@ -454,7 +472,10 @@
     <string name="preview_block_down">下移</string>
     <string name="preview_block_delete">删除</string>
     <string name="preview_block_add">添加段落</string>
-    <string name="preview_more">… 还有 %1$d 块，打开全屏预览查看</string>
+    <plurals name="preview_more">
+        <item quantity="one">… 还有 %1$d 块；打开全文预览</item>
+        <item quantity="other">… 还有 %1$d 块；打开全文预览</item>
+    </plurals>
     <string name="preview_image">图片</string>
     <string name="delivery_not_assembled">尚未装配。预览只显示核心返回的 markdown。</string>
     <string name="delivery_export">导出 %1$s</string>

@@ -598,7 +598,7 @@ is Detail.Import -> ImportScreen(
                             if (inUse > 0) {
                                 android.widget.Toast.makeText(
                                     context,
-                                    context.getString(dev.ninfenz.mobile.R.string.packcenter_uninstall_in_use, inUse),
+                                    context.resources.getQuantityString(dev.ninfenz.mobile.R.plurals.packcenter_uninstall_in_use, inUse, inUse),
                                     android.widget.Toast.LENGTH_LONG
                                 ).show()
                             } else {

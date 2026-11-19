@@ -194,7 +194,7 @@ fun PackCenterScreen(
                                             it.project.refs.basePackId == pack.id && it.project.refs.basePackVersion == pack.version
                                         }
                                         if (inUse > 0) {
-                                            uninstallErrors = uninstallErrors + (pack.id to context.getString(dev.ninfenz.mobile.R.string.packcenter_uninstall_in_use, inUse))
+                                            uninstallErrors = uninstallErrors + (pack.id to context.resources.getQuantityString(dev.ninfenz.mobile.R.plurals.packcenter_uninstall_in_use, inUse, inUse))
                                         } else {
                                             uninstallErrors = uninstallErrors - pack.id
                                             pendingUninstall = pack

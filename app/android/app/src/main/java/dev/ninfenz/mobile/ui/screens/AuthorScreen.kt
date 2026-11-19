@@ -40,6 +40,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.core.CoreError
@@ -312,7 +313,7 @@ private fun ProtocolAuthorContent(
     Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.m)) {
         if (importPrefill.isNotEmpty()) {
             Text(
-                stringResource(dev.ninfenz.mobile.R.string.author_import_prefill, importPrefill.size),
+                pluralStringResource(dev.ninfenz.mobile.R.plurals.author_import_prefill, importPrefill.size, importPrefill.size),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(horizontal = NfSpacing.page)

@@ -679,8 +679,9 @@ fun ImportScreen(
                         NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
                             Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                                 Text(
-                                    stringResource(
-                                        dev.ninfenz.mobile.R.string.import_slices_summary,
+                                    pluralStringResource(
+                                        dev.ninfenz.mobile.R.plurals.import_slices_summary,
+                                        slices.count { it.heading != null },
                                         slices.count { it.heading != null },
                                         slices.sumOf { it.blocks.size }
                                     ),
@@ -734,7 +735,7 @@ fun ImportScreen(
                                 }
                                 if (savedSamples.isNotEmpty()) {
                                     Text(
-                                        stringResource(dev.ninfenz.mobile.R.string.import_samples_saved, savedSamples.size),
+                                        pluralStringResource(dev.ninfenz.mobile.R.plurals.import_samples_saved, savedSamples.size, savedSamples.size),
                                         style = MaterialTheme.typography.labelSmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
@@ -759,7 +760,7 @@ fun ImportScreen(
                                 }
                                 if (savedTemplates.isNotEmpty()) {
                                     Text(
-                                        stringResource(dev.ninfenz.mobile.R.string.import_templates_saved, savedTemplates.size),
+                                        pluralStringResource(dev.ninfenz.mobile.R.plurals.import_templates_saved, savedTemplates.size, savedTemplates.size),
                                         style = MaterialTheme.typography.labelSmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
@@ -796,7 +797,7 @@ fun ImportScreen(
                                             style = MaterialTheme.typography.titleMedium
                                         )
                                         Text(
-                                            stringResource(dev.ninfenz.mobile.R.string.import_slice_meta, slice.blocks.size, slice.charCount),
+                                            pluralStringResource(dev.ninfenz.mobile.R.plurals.import_slice_meta, slice.blocks.size, slice.blocks.size, slice.charCount),
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
