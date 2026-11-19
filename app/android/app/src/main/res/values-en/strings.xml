@@ -269,6 +269,7 @@
     <string name="import_templates_clear">Clear all templates</string>
     <string name="import_templates_clear_title">Clear all local template candidates?</string>
     <string name="import_templates_clear_body">This only deletes local candidate JSON and cannot be undone.</string>
+    <string name="import_sample_copy">Copy</string>
     <plurals name="import_templates_saved">
         <item quantity="one">%1$d saved candidate</item>
         <item quantity="other">%1$d saved candidates</item>

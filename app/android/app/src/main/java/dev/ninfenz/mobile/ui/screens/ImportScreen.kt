@@ -848,20 +848,28 @@ fun ImportScreen(
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                     savedSamples.take(if (showAllSamples) Int.MAX_VALUE else 3).forEach { file ->
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
                                             TextButton(
                                                 onClick = { importPreviewText = runCatching { file.readText(Charsets.UTF_8) }.getOrDefault("") },
-                                                modifier = Modifier.weight(1f)
+                                                contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)
                                             ) {
                                                 Text(file.name, style = MaterialTheme.typography.bodySmall, maxLines = 1)
                                             }
-                                            TextButton(onClick = {
-                                                val text = runCatching { file.readText(Charsets.UTF_8) }.getOrDefault("")
-                                                val intent = ShareExporter.shareMarkdown(context, "nf-sample", text)
-                                                ShareExporter.launchChooser(context, intent, file.name)
-                                            }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_template_share)) }
-                                            TextButton(onClick = { pendingDeleteSample = file }) {
-                                                Text(stringResource(dev.ninfenz.mobile.R.string.import_sample_delete))
+                                            Row(
+                                                modifier = Modifier.horizontalScroll(rememberScrollState()),
+                                                horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)
+                                            ) {
+                                                TextButton(onClick = {
+                                                    clipboard.setText(AnnotatedString(runCatching { file.readText(Charsets.UTF_8) }.getOrDefault("")))
+                                                }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_sample_copy)) }
+                                                TextButton(onClick = {
+                                                    val text = runCatching { file.readText(Charsets.UTF_8) }.getOrDefault("")
+                                                    val intent = ShareExporter.shareMarkdown(context, "nf-sample", text)
+                                                    ShareExporter.launchChooser(context, intent, file.name)
+                                                }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_template_share)) }
+                                                TextButton(onClick = { pendingDeleteSample = file }) {
+                                                    Text(stringResource(dev.ninfenz.mobile.R.string.import_sample_delete))
+                                                }
                                             }
                                         }
                                     }
