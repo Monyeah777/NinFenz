@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -844,30 +845,32 @@ fun ImportScreen(
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                     savedTemplates.take(3).forEach { file ->
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
                                             Text(
                                                 templateStore.titleOf(file),
-                                                style = MaterialTheme.typography.bodySmall,
-                                                modifier = Modifier.weight(1f)
+                                                style = MaterialTheme.typography.bodySmall
                                             )
-                                            TextButton(onClick = {
-                                                val intent = ShareExporter.shareFileIntent(context, file, "application/json", file.name)
-                                                ShareExporter.launchChooser(context, intent, file.name)
-                                            }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_template_share)) }
-                                            TextButton(onClick = {
-                                                val json = runCatching { file.readText(Charsets.UTF_8) }.getOrDefault("")
-                                                clipboard.setText(AnnotatedString(json))
-                                            }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_template_copy)) }
-                                            TextButton(onClick = {
-                                                pendingTemplateUse = file
-                                            }) {
-                                                Text(stringResource(dev.ninfenz.mobile.R.string.import_template_use))
-                                            }
-                                            TextButton(onClick = { exportTemplatePackage(file) }) {
-                                                Text(stringResource(dev.ninfenz.mobile.R.string.import_template_export))
-                                            }
-                                            TextButton(onClick = { pendingDeleteTemplate = file }) {
-                                                Text(stringResource(dev.ninfenz.mobile.R.string.import_template_delete))
+                                            Row(
+                                                modifier = Modifier.horizontalScroll(rememberScrollState()),
+                                                horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)
+                                            ) {
+                                                TextButton(onClick = {
+                                                    val intent = ShareExporter.shareFileIntent(context, file, "application/json", file.name)
+                                                    ShareExporter.launchChooser(context, intent, file.name)
+                                                }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_template_share)) }
+                                                TextButton(onClick = {
+                                                    val json = runCatching { file.readText(Charsets.UTF_8) }.getOrDefault("")
+                                                    clipboard.setText(AnnotatedString(json))
+                                                }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_template_copy)) }
+                                                TextButton(onClick = { pendingTemplateUse = file }) {
+                                                    Text(stringResource(dev.ninfenz.mobile.R.string.import_template_use))
+                                                }
+                                                TextButton(onClick = { exportTemplatePackage(file) }) {
+                                                    Text(stringResource(dev.ninfenz.mobile.R.string.import_template_export))
+                                                }
+                                                TextButton(onClick = { pendingDeleteTemplate = file }) {
+                                                    Text(stringResource(dev.ninfenz.mobile.R.string.import_template_delete))
+                                                }
                                             }
                                         }
                                     }
