@@ -826,6 +826,7 @@ fun ProjectDetailScreen(
     var renameText by remember(project.title) { mutableStateOf(project.title) }
     var showReview by remember { mutableStateOf(false) }
     var showMoreActions by remember { mutableStateOf(false) }
+    var showRemoveOverride by remember { mutableStateOf(false) }
     var historyExpanded by rememberSaveable(project.id) { mutableStateOf(false) }
     var hasSpecOverride by remember(project.id) {
         mutableStateOf(java.io.File(java.io.File(java.io.File(context.filesDir, "projects"), project.id), "authoring/spec-override.json").isFile)
@@ -907,10 +908,9 @@ fun ProjectDetailScreen(
                                 color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.weight(1f)
                             )
-                            TextButton(onClick = {
-                                dev.ninfenz.mobile.data.DraftProjectBinder.clearSpec(context.filesDir, project.id)
-                                hasSpecOverride = false
-                            }) { Text(stringResource(dev.ninfenz.mobile.R.string.template_override_remove)) }
+                            TextButton(onClick = { showRemoveOverride = true }) {
+                                Text(stringResource(dev.ninfenz.mobile.R.string.template_override_remove))
+                            }
                         }
                     }
                     Text(
@@ -1017,6 +1017,24 @@ fun ProjectDetailScreen(
                 }
             }
         }
+    }
+
+    if (showRemoveOverride) {
+        AlertDialog(
+            onDismissRequest = { showRemoveOverride = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.template_override_remove_title)) },
+            text = { Text(stringResource(dev.ninfenz.mobile.R.string.template_override_remove_body)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    dev.ninfenz.mobile.data.DraftProjectBinder.clearSpec(context.filesDir, project.id)
+                    hasSpecOverride = false
+                    showRemoveOverride = false
+                }) { Text(stringResource(dev.ninfenz.mobile.R.string.template_override_remove)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showRemoveOverride = false }) { Text(stringResource(android.R.string.cancel)) }
+            }
+        )
     }
 
     if (showMoreActions) {

@@ -15,6 +15,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -119,6 +120,7 @@ fun AuthorScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onAssem
     val authorContext = androidx.compose.ui.platform.LocalContext.current
     val authorClipboard = androidx.compose.ui.platform.LocalClipboardManager.current
     var authorReload by remember { mutableIntStateOf(0) }
+    var showRemoveOverride by remember { mutableStateOf(false) }
     val specOverride = java.io.File(java.io.File(java.io.File(authorContext.filesDir, "projects"), project.id), "authoring/spec-override.json")
     val templateReference = remember(project.id, authorReload) {
         java.io.File(java.io.File(java.io.File(authorContext.filesDir, "projects"), project.id), "authoring/template.md")
@@ -137,6 +139,24 @@ fun AuthorScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onAssem
             loadError = t.message ?: t.javaClass.simpleName
         }
         loading = false
+    }
+
+    if (showRemoveOverride) {
+        AlertDialog(
+            onDismissRequest = { showRemoveOverride = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.template_override_remove_title)) },
+            text = { Text(stringResource(dev.ninfenz.mobile.R.string.template_override_remove_body)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    dev.ninfenz.mobile.data.DraftProjectBinder.clearSpec(authorContext.filesDir, project.id)
+                    authorReload++
+                    showRemoveOverride = false
+                }) { Text(stringResource(dev.ninfenz.mobile.R.string.template_override_remove)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showRemoveOverride = false }) { Text(stringResource(android.R.string.cancel)) }
+            }
+        )
     }
 
     Column(modifier = Modifier.fillMaxSize().imePadding()) {
@@ -194,10 +214,9 @@ fun AuthorScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onAssem
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.weight(1f)
                     )
-                    TextButton(onClick = {
-                        dev.ninfenz.mobile.data.DraftProjectBinder.clearSpec(authorContext.filesDir, project.id)
-                        authorReload++
-                    }) { Text(stringResource(dev.ninfenz.mobile.R.string.template_override_remove)) }
+                    TextButton(onClick = { showRemoveOverride = true }) {
+                        Text(stringResource(dev.ninfenz.mobile.R.string.template_override_remove))
+                    }
                 }
             }
             templateReference?.takeIf { it.isNotBlank() }?.let { text ->

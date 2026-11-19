@@ -358,6 +358,8 @@
     <string name="author_pack_label">Pack：%1$s · %2$s</string>
     <string name="template_override_active">正在使用项目内的模板 spec 覆盖。</string>
     <string name="template_override_remove">移除覆盖</string>
+    <string name="template_override_remove_title">移除模板 spec 覆盖？</string>
+    <string name="template_override_remove_body">项目会回到 Pack 原 spec，并删除本地模板参考。</string>
     <string name="author_preview_note">本地编辑：条款/字段/管线/规格可保存到项目（撤销/重做 + 防抖自动保存）；校验走核心。</string>
     <string name="author_template_ref">模板参考</string>
     <string name="author_template_copy">复制模板</string>
