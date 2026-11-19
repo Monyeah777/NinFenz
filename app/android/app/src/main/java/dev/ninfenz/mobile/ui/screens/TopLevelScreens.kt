@@ -70,6 +70,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -134,6 +135,7 @@ fun LibraryHomeScreen(
     onRefresh: () -> Unit = {}
 ) {
     val context = LocalContext.current
+    val clipboard = LocalClipboardManager.current
     val viewFilesDir = remember { runCatching { context.filesDir }.getOrNull() }
     val viewStore = remember(viewFilesDir) { viewFilesDir?.let { LibraryViewStore(it) } }
     val savedView = remember { viewStore?.load() }
@@ -815,6 +817,7 @@ fun ProjectDetailScreen(
     compareCandidates: List<ProjectEntry> = emptyList()
 ) {
     val context = LocalContext.current
+    val clipboard = LocalClipboardManager.current
     val diffScope = rememberCoroutineScope()
     var showArchive by remember { mutableStateOf(false) }
     var diffReport by remember { mutableStateOf<ProjectDiff.Report?>(null) }
@@ -1034,8 +1037,21 @@ fun ProjectDetailScreen(
             onDismissRequest = { showTemplateReference = false },
             title = { Text(stringResource(dev.ninfenz.mobile.R.string.author_template_ref)) },
             text = {
-                Column(modifier = Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState())) {
-                    dev.ninfenz.mobile.ui.components.MarkdownPreview(templateReference, limitBlocks = 40)
+                Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+                        TextButton(onClick = { clipboard.setText(androidx.compose.ui.text.AnnotatedString(templateReference)) }) {
+                            Text(stringResource(dev.ninfenz.mobile.R.string.author_template_copy))
+                        }
+                        TextButton(onClick = {
+                            val intent = dev.ninfenz.mobile.share.ShareExporter.shareMarkdown(context, "nf-template", templateReference)
+                            dev.ninfenz.mobile.share.ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.author_template_share))
+                        }) {
+                            Text(stringResource(dev.ninfenz.mobile.R.string.author_template_share))
+                        }
+                    }
+                    Column(modifier = Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState())) {
+                        dev.ninfenz.mobile.ui.components.MarkdownPreview(templateReference, limitBlocks = 40)
+                    }
                 }
             },
             confirmButton = {
