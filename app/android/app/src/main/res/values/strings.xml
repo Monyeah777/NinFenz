@@ -401,6 +401,8 @@
     <string name="delivery_slot_over_budget">槽位文本超出预算：%1$s</string>
     <string name="delivery_slot_constraint">槽位格式/非空校验未通过：%1$s</string>
     <string name="delivery_slot_budget">预算 %1$d–%2$d 字</string>
+    <string name="delivery_slot_budget_min">至少 %1$d 字</string>
+    <string name="delivery_slot_budget_max">最多 %1$d 字</string>
     <string name="delivery_assembling">装配中…</string>
     <string name="delivery_validate">validate L1</string>
     <string name="delivery_validating">校验中…</string>

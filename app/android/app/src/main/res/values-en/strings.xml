@@ -405,6 +405,8 @@
     <string name="delivery_slot_over_budget">Slot text exceeds budget: %1$s</string>
     <string name="delivery_slot_constraint">Slot pattern/non-empty check failed: %1$s</string>
     <string name="delivery_slot_budget">Budget %1$d–%2$d chars</string>
+    <string name="delivery_slot_budget_min">Min %1$d chars</string>
+    <string name="delivery_slot_budget_max">Max %1$d chars</string>
     <string name="delivery_assembling">Assembling…</string>
     <string name="delivery_validate">validate L1</string>
     <string name="delivery_validating">Validating…</string>

@@ -567,7 +567,14 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                             Text(it.kind, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                             if (it.minChars != null || it.maxChars != null) {
                                                 Text(
-                                                    stringResource(dev.ninfenz.mobile.R.string.delivery_slot_budget, it.minChars ?: 0, it.maxChars ?: 0),
+                                                    when {
+                                                        it.minChars != null && it.maxChars != null ->
+                                                            stringResource(dev.ninfenz.mobile.R.string.delivery_slot_budget, it.minChars, it.maxChars)
+                                                        it.maxChars != null ->
+                                                            stringResource(dev.ninfenz.mobile.R.string.delivery_slot_budget_max, it.maxChars)
+                                                        else ->
+                                                            stringResource(dev.ninfenz.mobile.R.string.delivery_slot_budget_min, it.minChars ?: 0)
+                                                    },
                                                     style = MaterialTheme.typography.labelSmall,
                                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                                 )
