@@ -35,7 +35,7 @@ object TemplatePackageBuilder {
             put("schema", "nf-template/1")
             putJsonObject("manifest") {
                 put("id", id)
-                put("version", "0.1.0")
+                put("version", specVersion(spec))
                 put("title", title.ifBlank { id })
             }
             putJsonObject("template_md") { put("path", "template.md"); put("sha256", sha256(markdown)) }
@@ -67,6 +67,11 @@ object TemplatePackageBuilder {
         }
         prepared.dir.deleteRecursively()
         return target
+    }
+
+    private fun specVersion(spec: JsonObject): String {
+        val v = (spec["version"] as? kotlinx.serialization.json.JsonPrimitive)?.content.orEmpty()
+        return if (Regex("^[0-9]+\\.[0-9]+\\.[0-9]+$").matches(v)) v else "0.1.0"
     }
 
     private fun renderTemplate(spec: JsonObject, title: String): String {

@@ -431,6 +431,7 @@
     <string name="delivery_status_note">项目状态：%1$s</string>
     <string name="delivery_status_fail">状态写回失败：%1$s</string>
     <string name="delivery_export_section">4 · 导出与分享</string>
+    <string name="delivery_export_blocked">需通过 L1 校验，或重新校验已编辑正文后才能导出。</string>
     <string name="delivery_export_group_docs">文档</string>
     <string name="delivery_export_group_data">数据与迁移</string>
     <string name="delivery_export_group_reading">阅读与网页</string>

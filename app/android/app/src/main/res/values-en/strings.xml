@@ -435,6 +435,7 @@
     <string name="delivery_status_note">Project status: %1$s</string>
     <string name="delivery_status_fail">Status writeback failed: %1$s</string>
     <string name="delivery_export_section">4 · Export &amp; share</string>
+    <string name="delivery_export_blocked">Validate L1 successfully, or revalidate edited content, before exporting.</string>
     <string name="delivery_export_group_docs">Documents</string>
     <string name="delivery_export_group_data">Data &amp; migration</string>
     <string name="delivery_export_group_reading">Reading &amp; web</string>
