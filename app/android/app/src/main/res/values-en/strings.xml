@@ -413,7 +413,7 @@
     <string name="delivery_compiling">Compiling…</string>
     <string name="delivery_plan_summary">plan: steps %1$d · slots %2$d</string>
     <string name="delivery_slots">2 · Slot inputs</string>
-    <string name="delivery_required_progress">%1$d of %2$d required filled</string>
+    <string name="delivery_required_progress">Required filled %1$d/%2$d</string>
     <string name="delivery_slot_required">Required</string>
     <string name="delivery_slot_optional">Optional</string>
     <string name="delivery_compile_first">Compile the plan first.</string>
