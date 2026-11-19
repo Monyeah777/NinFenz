@@ -9,6 +9,7 @@ import java.io.File
 /** PDF 文字层提取；扫描件没有文字层，明确报空而不是伪造 OCR。 */
 object PdfTextImporter {
     fun extract(context: Context, file: File): String {
+        require(file.isFile && file.length() in 1..(25L * 1024 * 1024)) { "PDF 文件为空或超过 25MB" }
         PDFBoxResourceLoader.init(context.applicationContext)
         PDDocument.load(file).use { document ->
             require(!document.isEncrypted) { "PDF 已加密" }
