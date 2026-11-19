@@ -744,7 +744,9 @@ is Detail.Import -> ImportScreen(
                                             android.widget.Toast.makeText(context, context.getString(dev.ninfenz.mobile.R.string.project_export_template), android.widget.Toast.LENGTH_LONG).show()
                                             return@launch
                                         }
-                                        val prepared = dev.ninfenz.mobile.data.TemplatePackageBuilder.prepare(context.cacheDir, pack, spec, entry.project.title)
+                                        val templateMd = java.io.File(java.io.File(java.io.File(context.filesDir, "projects"), entry.project.id), "authoring/template.md")
+                                            .takeIf { it.isFile }?.readText(Charsets.UTF_8)
+                                        val prepared = dev.ninfenz.mobile.data.TemplatePackageBuilder.prepare(context.cacheDir, pack, spec, entry.project.title, templateMd)
                                         val hash = safeCall("pack-hash", kotlinx.serialization.json.buildJsonObject { put("root", prepared.dir.absolutePath) })
                                         val hashes = hash.resultObject()?.get("hashes") as? kotlinx.serialization.json.JsonObject
                                         val tree = hashes?.get("tree")?.jsonPrimitive?.content
