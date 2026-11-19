@@ -21,9 +21,11 @@ object DocxTextImporter {
                 private var inText = false
                 private val paragraph = StringBuilder()
                 private var heading = 0
+                private var listItem = false
                 override fun startElement(uri: String?, localName: String?, qName: String?, attributes: Attributes?) {
                     val name = localName ?: qName.orEmpty()
                     if (name == "t") inText = true
+                    if (name == "numPr") listItem = true
                     if (name == "pStyle") {
                         val style = attributes?.getValue("w:val") ?: attributes?.getValue("val").orEmpty()
                         heading = Regex("(?i)(?:heading|标题)\\s*([1-6])").find(style)?.groupValues?.get(1)?.toIntOrNull()
@@ -38,10 +40,12 @@ object DocxTextImporter {
                         val value = paragraph.toString().trim()
                         if (value.isNotBlank()) {
                             if (heading in 1..6) text.append("#".repeat(heading)).append(' ')
+                            if (listItem) text.append("- ")
                             text.append(value).append("\n\n")
                         }
                         paragraph.clear()
                         heading = 0
+                        listItem = false
                     }
                 }
                 override fun characters(ch: CharArray, start: Int, length: Int) {
