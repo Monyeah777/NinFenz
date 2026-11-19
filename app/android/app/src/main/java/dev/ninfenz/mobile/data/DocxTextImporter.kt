@@ -10,6 +10,26 @@ import org.xml.sax.helpers.DefaultHandler
 object DocxTextImporter {
     private const val MAX_XML = 20L * 1024 * 1024
 
+    private class LimitedInputStream(private val delegate: java.io.InputStream, private val max: Long) : java.io.FilterInputStream(delegate) {
+        private var read = 0L
+        override fun read(): Int {
+            val value = super.read()
+            if (value >= 0) {
+                read++
+                require(read <= max) { "DOCX 正文过大" }
+            }
+            return value
+        }
+        override fun read(b: ByteArray, off: Int, len: Int): Int {
+            val n = super.read(b, off, len)
+            if (n > 0) {
+                read += n
+                require(read <= max) { "DOCX 正文过大" }
+            }
+            return n
+        }
+    }
+
     fun extract(file: File): String {
         require(file.isFile && file.length() in 1..(25L * 1024 * 1024)) { "DOCX 文件为空或超过 25MB" }
         ZipFile(file).use { zip ->
@@ -17,7 +37,7 @@ object DocxTextImporter {
             require(entry.size in 0..MAX_XML) { "DOCX 正文过大" }
             val text = StringBuilder()
             val factory = SAXParserFactory.newInstance().apply { isNamespaceAware = true }
-            factory.newSAXParser().parse(zip.getInputStream(entry), object : DefaultHandler() {
+            factory.newSAXParser().parse(LimitedInputStream(zip.getInputStream(entry), MAX_XML), object : DefaultHandler() {
                 private var inText = false
                 private val paragraph = StringBuilder()
                 private var heading = 0

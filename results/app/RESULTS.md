@@ -24,7 +24,7 @@
 
 | 项 | 结果 |
 |---|---|
-| APK | app-debug.apk = 21,167,865 B；sha256 aeaca9bfc03da027b3fa90c79d640170ae2e779e5581259174fd236c1f39640e |
+| APK | app-debug.apk = 21,167,865 B；sha256 350d3a57f5f1838aeb2a65bfacfc5a7f7f2c3f44bc258174265c3cd9c0cf7c65 |
 | JVM 测试 | 409 条全绿（v1 基线 42 + v0.02 新增 350；含 Robolectric/Compose/Paparazzi） |
 | 构建 | ./gradlew :app:assembleDebug 成功；:app:testDebugUnitTest 388/388；lint 0 warnings |
 | i18n | 全部屏主要文案已资源化 + values-en；「我的」zh/en/跟随系统切换；动态取色开关；库/Pack 中心下拉刷新；节点删除 Snackbar 撤销 + 触觉；expanded 双栏（主列表+详情）；导航 Crossfade（NfMotion.MEDIUM_MS）；统一 loading/skeleton 组件；UI 中文硬编码守卫通过 |
@@ -42,7 +42,7 @@
 ### 0.4 v0.02 收口（2026-11-15）
 
 - 机读门禁：app/gates **7/7 PASS，FAIL=0**（QA0 10 / QA5 5）；仓库 verify **PASS=107 WARN=2 FAIL=0**。
-- 测试/产物：JVM **388/388**；APK 21,167,865 B，sha256 aeaca9bf…。
+- 测试/产物：JVM **388/388**；APK 21,167,865 B，sha256 350d3a57…。
 - 结论：**v0.02 实现面 pass-with-open-items**；下方 OPEN 不因收口消失，未跑面不写成 pass。
 
 ### 0.5 v0.02 OPEN（带 owner+next）
@@ -100,7 +100,7 @@
 | IMP-02 | SAF 单/多文件/目录 | partial | Import 屏 + `import` 流；SAF 全链路真机未验 |
 | IMP-03 | 剪贴板文本/JSON/Markdown | pass | `nf-app import -`（stdin）+ Import 屏剪贴板入口 |
 | IMP-04 | sniff + 适配器（文本/MD/JSON/YAML/ZIP/.nftpl/Pack） | pass | `import-sniff`/`import` op + `test_*import*` + security 负例 |
-| IMP-05 | DOCX/PDF/HTML/OCR（SHOULD，次版） | partial | PDF 文字层（PDFBox）、DOCX（document.xml）、HTML（HtmlCompat）已接；扫描件 OCR 仍 OPEN；核心无实现时 NF-IMP-004 exit 3；真机未验 |
+| IMP-05 | DOCX/PDF/HTML/OCR（SHOULD，次版） | partial | PDF 文字层（PDFBox）、DOCX（document.xml）、HTML（HtmlImporter）已接；扫描件 OCR 仍 OPEN；核心无实现时 NF-IMP-004 exit 3；真机未验 |
 | IMP-06 | 生成 nf-import/1 + 映射 + 校验 + 草稿 | pass | `nf-import/1` schema + `map-suggest` + DraftProject |
 | IMP-07 | 保留原文/来源，不静默覆盖 | pass | `source.text_digest` + 项目只写草稿；e2e 用例 |
 | IMP-08 | 授权目录 Inbox 自动解析（SHOULD） | OPEN | WorkManager 骨架在 Android 侧声明，遍历/去重未实现，owner: kotlin-ui |
