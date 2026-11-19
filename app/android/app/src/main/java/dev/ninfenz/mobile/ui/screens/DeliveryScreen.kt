@@ -120,6 +120,20 @@ import kotlinx.serialization.json.put
  * W5 交付台：项目 → graph-compile 计划 → 槽位输入 → assemble → validate L1 → 导出 md/zip/docx → 分享。
  * 项目状态写回已接；PDF 优先 WebView HTML/CSS（WebPdfExporter），失败回退本地基础文本（PdfExporter）。
  */
+private fun parseTemplateSlots(markdown: String): Map<String, String> {
+    val result = mutableMapOf<String, String>()
+    markdown.lineSequence().forEach { line ->
+        val trimmed = line.trim()
+        if (!trimmed.startsWith("- SLT-")) return@forEach
+        val rest = trimmed.removePrefix("- ")
+        val id = rest.substringBefore(' ').trim()
+        if (!rest.contains('：') && !rest.contains(':')) return@forEach
+        val body = rest.substringAfter('：', "").ifBlank { rest.substringAfter(':', "") }
+        if (id.startsWith("SLT-") && body.isNotBlank()) result[id] = body.trim()
+    }
+    return result
+}
+
 @Composable
 fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onStatusChanged: () -> Unit = {}) {
     val context = LocalContext.current
@@ -137,6 +151,10 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
     var plan by remember { mutableStateOf<AssemblyPlan?>(null) }
     var rawPlan by remember { mutableStateOf<JsonObject?>(null) }
     var inputs by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
+    val templateReference = remember(project.id) {
+        java.io.File(java.io.File(java.io.File(context.filesDir, "projects"), project.id), "authoring/template.md")
+            .takeIf { it.isFile }?.readText(Charsets.UTF_8)
+    }
     var markdown by remember { mutableStateOf<String?>(null) }
     var showFullPreview by remember { mutableStateOf(false) }
     var editingPreview by remember { mutableStateOf(false) }
@@ -558,6 +576,16 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                 progress = { requiredFilled.toFloat() / requiredSlots.size.toFloat() },
                                 modifier = Modifier.fillMaxWidth()
                             )
+                            if (!templateReference.isNullOrBlank()) {
+                                TextButton(onClick = {
+                                    val parsed = parseTemplateSlots(templateReference)
+                                    val next = inputs.toMutableMap()
+                                    parsed.forEach { (id, value) ->
+                                        if (next[id].isNullOrBlank() && plan!!.slots.any { it == id }) next[id] = value
+                                    }
+                                    inputs = next
+                                }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_fill_template)) }
+                            }
                         }
                         var lastSection: String? = null
                         for (slot in plan!!.slots) {

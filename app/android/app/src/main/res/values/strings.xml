@@ -431,6 +431,7 @@
     <string name="delivery_plan_summary">plan：steps %1$d · slots %2$d</string>
     <string name="delivery_slots">2 · 槽位输入</string>
     <string name="delivery_required_progress">必填已填 %1$d/%2$d</string>
+    <string name="delivery_fill_template">从模板参考填入空槽位</string>
     <string name="delivery_slot_required">必填</string>
     <string name="delivery_slot_optional">选填</string>
     <string name="delivery_compile_first">先编译计划。</string>
