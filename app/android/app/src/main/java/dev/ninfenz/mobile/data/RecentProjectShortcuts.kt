@@ -13,6 +13,12 @@ object RecentProjectShortcuts {
     const val ACTION_OPEN_PROJECT = "dev.ninfenz.mobile.OPEN_PROJECT"
     const val EXTRA_PROJECT_ID = "dev.ninfenz.mobile.EXTRA_PROJECT_ID"
 
+    fun reportUsed(context: Context, projectId: String) {
+        runCatching {
+            context.getSystemService(ShortcutManager::class.java)?.reportShortcutUsed("project:" + projectId)
+        }
+    }
+
     fun publish(context: Context, projects: List<ProjectEntry>) {
         runCatching {
         val manager = context.getSystemService(ShortcutManager::class.java) ?: return

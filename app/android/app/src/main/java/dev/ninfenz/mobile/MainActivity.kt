@@ -38,7 +38,10 @@ class MainActivity : ComponentActivity() {
 
     private fun shortcutFrom(intent: Intent?): String? = when (intent?.action) {
         RecentProjectShortcuts.ACTION_OPEN_PROJECT ->
-            intent.getStringExtra(RecentProjectShortcuts.EXTRA_PROJECT_ID)?.takeIf { it.isNotBlank() }?.let { "project:" + it }
+            intent.getStringExtra(RecentProjectShortcuts.EXTRA_PROJECT_ID)?.takeIf { it.isNotBlank() }?.let { id ->
+                RecentProjectShortcuts.reportUsed(this, id)
+                "project:" + id
+            }
         "dev.ninfenz.mobile.SHORTCUT_IMPORT" -> "import"
         "dev.ninfenz.mobile.SHORTCUT_NEW_PROJECT" -> "new_project"
         "dev.ninfenz.mobile.SHORTCUT_SEARCH" -> "search"
