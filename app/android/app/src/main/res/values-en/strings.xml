@@ -263,6 +263,9 @@
     <string name="import_templates_show_less">Show fewer</string>
     <string name="import_samples_show_all">Show all samples</string>
     <string name="import_samples_show_less">Show fewer</string>
+    <string name="import_samples_clear">Clear all samples</string>
+    <string name="import_samples_clear_title">Clear all local AI samples?</string>
+    <string name="import_samples_clear_body">This only deletes local sample Markdown and cannot be undone.</string>
     <plurals name="import_templates_saved">
         <item quantity="one">%1$d saved candidate</item>
         <item quantity="other">%1$d saved candidates</item>

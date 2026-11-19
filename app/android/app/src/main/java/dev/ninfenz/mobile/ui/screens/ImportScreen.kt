@@ -152,6 +152,7 @@ fun ImportScreen(
     var previewTemplate by remember { mutableStateOf<File?>(null) }
     var showAllTemplates by remember { mutableStateOf(false) }
     var showAllSamples by remember { mutableStateOf(false) }
+    var showClearSamples by remember { mutableStateOf(false) }
     var pendingDeleteTemplate by remember { mutableStateOf<File?>(null) }
     var importPreviewText by remember { mutableStateOf<String?>(null) }
     var promptProfile by remember { mutableStateOf(PromptProfile.GENERIC) }
@@ -868,6 +869,9 @@ fun ImportScreen(
                                             Text(stringResource(if (showAllSamples) dev.ninfenz.mobile.R.string.import_samples_show_less else dev.ninfenz.mobile.R.string.import_samples_show_all))
                                         }
                                     }
+                                    TextButton(onClick = { showClearSamples = true }) {
+                                        Text(stringResource(dev.ninfenz.mobile.R.string.import_samples_clear))
+                                    }
                                 }
                                 if (savedTemplates.isNotEmpty()) {
                                     Text(
@@ -1438,6 +1442,24 @@ fun ImportScreen(
             },
             dismissButton = {
                 TextButton(onClick = { pendingTemplateUse = null }) { Text(stringResource(android.R.string.cancel)) }
+            }
+        )
+    }
+
+    if (showClearSamples) {
+        AlertDialog(
+            onDismissRequest = { showClearSamples = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.import_samples_clear_title)) },
+            text = { Text(stringResource(dev.ninfenz.mobile.R.string.import_samples_clear_body)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    savedSamples.forEach { sampleStore.delete(it) }
+                    savedSamples = sampleStore.list()
+                    showClearSamples = false
+                }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_samples_clear)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showClearSamples = false }) { Text(stringResource(android.R.string.cancel)) }
             }
         )
     }
