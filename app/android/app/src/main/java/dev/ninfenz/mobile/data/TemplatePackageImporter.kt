@@ -31,6 +31,15 @@ object TemplatePackageImporter {
             val manifestText = zip.getInputStream(manifestEntry).use { it.readBytes().toString(Charsets.UTF_8) }
             val manifest = Json.parseToJsonElement(manifestText).jsonObject
             require(manifest["schema"]?.jsonPrimitive?.content == "nf-template/1") { "不是 nf-template/1" }
+            val info = manifest["manifest"] as? JsonObject ?: error("模板缺少 manifest")
+            val id = info["id"]?.jsonPrimitive?.content.orEmpty()
+            val version = info["version"]?.jsonPrimitive?.content.orEmpty()
+            val title = info["title"]?.jsonPrimitive?.content.orEmpty()
+            require(Regex("^[a-z][a-z0-9-]{1,63}$").matches(id)) { "模板 id 非法" }
+            require(Regex("^[0-9]+\\.[0-9]+\\.[0-9]+$").matches(version)) { "模板版本非法" }
+            require(title.isNotBlank()) { "模板标题为空" }
+            val compat = manifest["compat"] as? JsonObject ?: error("模板缺少 compat")
+            require(compat["schema_version"]?.jsonPrimitive?.content == "1") { "模板 schema_version 不支持" }
             val refs = listOf("template_md", "spec", "protocol", "pipeline").mapNotNull { key ->
                 val obj = manifest[key] as? JsonObject ?: return@mapNotNull null
                 val path = obj["path"]?.jsonPrimitive?.content ?: return@mapNotNull null
@@ -39,7 +48,13 @@ object TemplatePackageImporter {
             }
             require(refs.size == 4) { "模板清单缺少必要文件引用" }
             var total = 0L
-            refs.forEach { (_, path, sha) ->
+            val assets = (manifest["assets"] as? kotlinx.serialization.json.JsonArray)?.mapNotNull { el ->
+                val o = el as? JsonObject ?: return@mapNotNull null
+                val path = o["path"]?.jsonPrimitive?.content ?: return@mapNotNull null
+                val sha = o["sha256"]?.jsonPrimitive?.content ?: return@mapNotNull null
+                path to sha
+            }.orEmpty()
+            (refs.map { it.second to it.third } + assets).forEach { (path, sha) ->
                 require(safe(path)) { "非法模板路径：" + path }
                 val entry = zip.getEntry(path) ?: error("模板缺少：" + path)
                 total += entry.size
@@ -51,7 +66,6 @@ object TemplatePackageImporter {
             val specPath = refs.first { it.first == "spec" }.second
             val specBytes = File(out, specPath).readBytes()
             val specText = specBytes.toString(Charsets.UTF_8)
-            val title = (manifest["manifest"] as? JsonObject)?.get("title")?.jsonPrimitive?.content ?: "模板"
             val hashes = manifest["hashes"] as? JsonObject ?: error("模板缺少 hashes")
             val tree = hashes["tree"]?.jsonPrimitive?.content ?: error("模板缺少 tree")
             val count = hashes["count"]?.jsonPrimitive?.content?.toIntOrNull() ?: error("模板缺少 count")
