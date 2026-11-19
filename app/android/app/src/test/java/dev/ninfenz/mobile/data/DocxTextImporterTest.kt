@@ -17,14 +17,14 @@ class DocxTextImporterTest {
                 <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
                   <w:body>
                     <w:p><w:r><w:t>Hello</w:t></w:r><w:r><w:t> DOCX</w:t></w:r></w:p>
-                    <w:p><w:r><w:t>Second</w:t></w:r></w:p>
+                    <w:p><w:pPr><w:pStyle w:val="Heading1"/></w:pPr><w:r><w:t>Second</w:t></w:r></w:p>
                   </w:body>
                 </w:document>""".trimIndent().toByteArray()
             )
             out.closeEntry()
         }
         val text = DocxTextImporter.extract(file)
-        assertEquals("Hello DOCX\n\nSecond", text)
+        assertEquals("Hello DOCX\n\n# Second", text)
         file.delete()
     }
 }

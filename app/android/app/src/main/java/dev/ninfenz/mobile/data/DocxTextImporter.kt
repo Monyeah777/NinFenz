@@ -19,17 +19,33 @@ object DocxTextImporter {
             val factory = SAXParserFactory.newInstance().apply { isNamespaceAware = true }
             factory.newSAXParser().parse(zip.getInputStream(entry), object : DefaultHandler() {
                 private var inText = false
+                private val paragraph = StringBuilder()
+                private var heading = 0
                 override fun startElement(uri: String?, localName: String?, qName: String?, attributes: Attributes?) {
                     val name = localName ?: qName.orEmpty()
                     if (name == "t") inText = true
+                    if (name == "pStyle") {
+                        val style = attributes?.getValue("w:val") ?: attributes?.getValue("val").orEmpty()
+                        heading = Regex("(?i)(?:heading|标题)\\s*([1-6])").find(style)?.groupValues?.get(1)?.toIntOrNull()
+                            ?: Regex("^([1-6])$").find(style)?.groupValues?.get(1)?.toIntOrNull()
+                            ?: 0
+                    }
                 }
                 override fun endElement(uri: String?, localName: String?, qName: String?) {
                     val name = localName ?: qName.orEmpty()
                     if (name == "t") inText = false
-                    if (name == "p") text.append("\n\n")
+                    if (name == "p") {
+                        val value = paragraph.toString().trim()
+                        if (value.isNotBlank()) {
+                            if (heading in 1..6) text.append("#".repeat(heading)).append(' ')
+                            text.append(value).append("\n\n")
+                        }
+                        paragraph.clear()
+                        heading = 0
+                    }
                 }
                 override fun characters(ch: CharArray, start: Int, length: Int) {
-                    if (inText) text.append(ch, start, length)
+                    if (inText) paragraph.append(ch, start, length)
                 }
             })
             return text.toString().replace(Regex("\n{3,}"), "\n\n").trim()
