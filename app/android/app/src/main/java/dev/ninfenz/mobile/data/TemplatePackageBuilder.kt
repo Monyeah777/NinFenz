@@ -56,7 +56,7 @@ object TemplatePackageBuilder {
         )
         File(prepared.dir, "nf-template.json").writeText(manifest.toString(), Charsets.UTF_8)
         outDir.mkdirs()
-        val target = File(outDir, "nf-template-" + System.currentTimeMillis() + ".zip")
+        val target = File(outDir, "nf-template-" + System.nanoTime() + ".zip")
         try {
             ZipOutputStream(target.outputStream()).use { out ->
                 val all = prepared.files + ("nf-template.json" to manifest.toString().toByteArray(Charsets.UTF_8))
