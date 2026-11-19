@@ -1366,7 +1366,7 @@ fun ImportScreen(
                                 section.slots.forEach { id ->
                                     val slot = spec.slots.firstOrNull { it.id == id }
                                     val meta = slot?.let {
-                                        it.kind + (if (it.required) " · required" else "") +
+                                        it.kind + (if (it.required) " · " + stringResource(dev.ninfenz.mobile.R.string.delivery_slot_required) else "") +
                                             (it.maxChars?.let { max -> " · max " + max } ?: "") +
                                             (it.examples.firstOrNull()?.let { example -> " · " + example } ?: "")
                                     }.orEmpty()

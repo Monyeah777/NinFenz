@@ -551,6 +551,10 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
+                            androidx.compose.material3.LinearProgressIndicator(
+                                progress = { requiredFilled.toFloat() / requiredSlots.size.toFloat() },
+                                modifier = Modifier.fillMaxWidth()
+                            )
                         }
                         var lastSection: String? = null
                         for (slot in plan!!.slots) {
