@@ -255,6 +255,8 @@
     </plurals>
     <string name="import_save_template">保存模板候选</string>
     <string name="import_template_saved">模板候选已保存：%1$s</string>
+    <string name="import_templates_show_all">查看全部模板</string>
+    <string name="import_templates_show_less">收起</string>
     <plurals name="import_templates_saved">
         <item quantity="one">已保存候选 %1$d 个</item>
         <item quantity="other">已保存候选 %1$d 个</item>

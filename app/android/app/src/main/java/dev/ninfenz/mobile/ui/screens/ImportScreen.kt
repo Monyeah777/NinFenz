@@ -150,6 +150,7 @@ fun ImportScreen(
     var pendingDeleteSample by remember { mutableStateOf<File?>(null) }
     var pendingTemplateUse by remember { mutableStateOf<File?>(null) }
     var previewTemplate by remember { mutableStateOf<File?>(null) }
+    var showAllTemplates by remember { mutableStateOf(false) }
     var pendingDeleteTemplate by remember { mutableStateOf<File?>(null) }
     var importPreviewText by remember { mutableStateOf<String?>(null) }
     var promptProfile by remember { mutableStateOf(PromptProfile.GENERIC) }
@@ -853,7 +854,7 @@ fun ImportScreen(
                                         style = MaterialTheme.typography.labelSmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
-                                    savedTemplates.take(3).forEach { file ->
+                                    savedTemplates.take(if (showAllTemplates) Int.MAX_VALUE else 3).forEach { file ->
                                         Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
                                             TextButton(
                                                 onClick = { previewTemplate = file },
@@ -886,6 +887,11 @@ fun ImportScreen(
                                                     Text(stringResource(dev.ninfenz.mobile.R.string.import_template_delete))
                                                 }
                                             }
+                                        }
+                                    }
+                                    if (savedTemplates.size > 3) {
+                                        TextButton(onClick = { showAllTemplates = !showAllTemplates }) {
+                                            Text(stringResource(if (showAllTemplates) dev.ninfenz.mobile.R.string.import_templates_show_less else dev.ninfenz.mobile.R.string.import_templates_show_all))
                                         }
                                     }
                                 }
