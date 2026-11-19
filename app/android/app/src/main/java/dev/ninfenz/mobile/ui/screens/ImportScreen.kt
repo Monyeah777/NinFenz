@@ -151,6 +151,7 @@ fun ImportScreen(
     var pendingTemplateUse by remember { mutableStateOf<File?>(null) }
     var previewTemplate by remember { mutableStateOf<File?>(null) }
     var showAllTemplates by remember { mutableStateOf(false) }
+    var showAllSamples by remember { mutableStateOf(false) }
     var pendingDeleteTemplate by remember { mutableStateOf<File?>(null) }
     var importPreviewText by remember { mutableStateOf<String?>(null) }
     var promptProfile by remember { mutableStateOf(PromptProfile.GENERIC) }
@@ -829,7 +830,7 @@ fun ImportScreen(
                                         style = MaterialTheme.typography.labelSmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
-                                    savedSamples.take(3).forEach { file ->
+                                    savedSamples.take(if (showAllSamples) Int.MAX_VALUE else 3).forEach { file ->
                                         Row(verticalAlignment = Alignment.CenterVertically) {
                                             TextButton(
                                                 onClick = { importPreviewText = runCatching { file.readText(Charsets.UTF_8) }.getOrDefault("") },
@@ -845,6 +846,11 @@ fun ImportScreen(
                                             TextButton(onClick = { pendingDeleteSample = file }) {
                                                 Text(stringResource(dev.ninfenz.mobile.R.string.import_sample_delete))
                                             }
+                                        }
+                                    }
+                                    if (savedSamples.size > 3) {
+                                        TextButton(onClick = { showAllSamples = !showAllSamples }) {
+                                            Text(stringResource(if (showAllSamples) dev.ninfenz.mobile.R.string.import_samples_show_less else dev.ninfenz.mobile.R.string.import_samples_show_all))
                                         }
                                     }
                                 }

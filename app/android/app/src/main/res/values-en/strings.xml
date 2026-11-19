@@ -261,6 +261,8 @@
     <string name="import_template_saved">Template candidate saved: %1$s</string>
     <string name="import_templates_show_all">Show all templates</string>
     <string name="import_templates_show_less">Show fewer</string>
+    <string name="import_samples_show_all">Show all samples</string>
+    <string name="import_samples_show_less">Show fewer</string>
     <plurals name="import_templates_saved">
         <item quantity="one">%1$d saved candidate</item>
         <item quantity="other">%1$d saved candidates</item>
