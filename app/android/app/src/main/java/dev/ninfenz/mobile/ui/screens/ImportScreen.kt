@@ -483,6 +483,38 @@ fun ImportScreen(
         }
     }
 
+    suspend fun importHtml(file: File, sourceKind: String, name: String, size: Long) {
+        busy = true
+        error = null
+        notice = null
+        try {
+            val html = withContext(Dispatchers.IO) { file.readText(Charsets.UTF_8) }
+            val text = withContext(Dispatchers.Default) { dev.ninfenz.mobile.data.HtmlTextImporter.extract(html) }
+            if (text.isBlank()) {
+                error = CoreResponse.failure(
+                    "NF-IMP-004",
+                    context.getString(dev.ninfenz.mobile.R.string.import_html_no_text),
+                    context.getString(dev.ninfenz.mobile.R.string.import_parse_failed_fix),
+                    3
+                ).error
+            } else {
+                val md = File(File(context.cacheDir, "imports").apply { mkdirs() }, "html-" + System.nanoTime() + ".md")
+                md.writeText(text, Charsets.UTF_8)
+                importFromFile(md, sourceKind, name.substringBeforeLast('.') + ".md", "text/markdown", text.toByteArray(Charsets.UTF_8).size.toLong())
+            }
+        } catch (t: Throwable) {
+            error = CoreResponse.failure(
+                "NF-IMP-004",
+                context.getString(dev.ninfenz.mobile.R.string.import_html_failed, t.message ?: t.javaClass.simpleName),
+                context.getString(dev.ninfenz.mobile.R.string.import_parse_failed_fix),
+                3
+            ).error
+        } finally {
+            file.delete()
+            busy = false
+        }
+    }
+
     fun importCsv() {
         val manager = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager
         val text = manager?.primaryClip?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.coerceToText(context)?.toString()
@@ -553,6 +585,11 @@ fun ImportScreen(
                     val uri = item.uri.toUri()
                     val meta = FileAccess.meta(context, uri)
                     val name = meta.name.orEmpty().lowercase()
+                    if (name.endsWith(".html") || name.endsWith(".htm") || (meta.mime ?: "").contains("html", ignoreCase = true)) {
+                        val file = FileAccess.copyToCache(context, uri, meta.name)
+                        importHtml(file, "share", meta.name, meta.size)
+                        return@launch
+                    }
                     if (name.endsWith(".pdf") || (meta.mime ?: "").contains("pdf", ignoreCase = true)) {
                         val file = FileAccess.copyToCache(context, uri, meta.name)
                         importPdf(file, "share", meta.name, meta.size)
@@ -648,7 +685,9 @@ fun ImportScreen(
                         return@launch
                     }
                     val file = FileAccess.copyToCache(context, uri, meta.name)
-                    if (meta.name.orEmpty().lowercase().endsWith(".pdf") || (meta.mime ?: "").contains("pdf", ignoreCase = true)) {
+                    if (meta.name.orEmpty().lowercase().endsWith(".html") || meta.name.orEmpty().lowercase().endsWith(".htm") || (meta.mime ?: "").contains("html", ignoreCase = true)) {
+                        importHtml(file, "saf", meta.name, meta.size)
+                    } else if (meta.name.orEmpty().lowercase().endsWith(".pdf") || (meta.mime ?: "").contains("pdf", ignoreCase = true)) {
                         importPdf(file, "saf", meta.name, meta.size)
                     } else if (meta.name.orEmpty().lowercase().endsWith(".csv") || (meta.mime ?: "").contains("csv", ignoreCase = true)) {
                         val markdown = CsvTable.toMarkdown(file.readText(Charsets.UTF_8))
