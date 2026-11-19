@@ -155,6 +155,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
         java.io.File(java.io.File(java.io.File(context.filesDir, "projects"), project.id), "authoring/template.md")
             .takeIf { it.isFile }?.readText(Charsets.UTF_8)
     }
+    val parsedTemplateSlots = remember(templateReference) { parseTemplateSlots(templateReference.orEmpty()) }
     var markdown by remember { mutableStateOf<String?>(null) }
     var showFullPreview by remember { mutableStateOf(false) }
     var editingPreview by remember { mutableStateOf(false) }
@@ -576,9 +577,9 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                 progress = { requiredFilled.toFloat() / requiredSlots.size.toFloat() },
                                 modifier = Modifier.fillMaxWidth()
                             )
-                            if (!templateReference.isNullOrBlank() && plan!!.slots.any { inputs[it].isNullOrBlank() }) {
+                            if (parsedTemplateSlots.isNotEmpty() && plan!!.slots.any { inputs[it].isNullOrBlank() }) {
                                 TextButton(onClick = {
-                                    val parsed = parseTemplateSlots(templateReference)
+                                    val parsed = parsedTemplateSlots
                                     val next = inputs.toMutableMap()
                                     var filled = 0
                                     parsed.forEach { (id, value) ->
