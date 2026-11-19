@@ -32,6 +32,20 @@ object ProjectPackageImporter {
         false
     }
 
+    private fun readLimited(input: java.io.InputStream, max: Long): ByteArray {
+        val out = java.io.ByteArrayOutputStream()
+        val buf = ByteArray(16 * 1024)
+        var read = 0L
+        while (true) {
+            val n = input.read(buf)
+            if (n < 0) break
+            read += n
+            require(read <= max && read <= 512L * 1024 * 1024) { "项目包条目超限" }
+            out.write(buf, 0, n)
+        }
+        return out.toByteArray()
+    }
+
     private fun verifyManifest(
         entries: List<Pair<String, ByteArray>>,
         projectText: String,
@@ -83,7 +97,10 @@ object ProjectPackageImporter {
                 require(entry.size in 0..(512L * 1024 * 1024)) { "条目过大：" + name }
                 total += entry.size.coerceAtLeast(0)
                 require(total <= 512L * 1024 * 1024) { "解压总量超限" }
-                entries.add(name to zip.getInputStream(entry).use { it.readBytes() })
+                val bytes = zip.getInputStream(entry).use { readLimited(it, 512L * 1024 * 1024 - total + entry.size) }
+                total = total - entry.size + bytes.size
+                require(total <= 512L * 1024 * 1024) { "解压总量超限" }
+                entries.add(name to bytes)
             }
         }
         val projectEntries = entries.filter { (name, _) ->
