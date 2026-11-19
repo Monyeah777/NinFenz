@@ -686,6 +686,7 @@ is Detail.Import -> ImportScreen(
                                     }
                                 },
                                 onShareFull = {
+                                    android.widget.Toast.makeText(context, context.getString(dev.ninfenz.mobile.R.string.project_detail_share_full), android.widget.Toast.LENGTH_SHORT).show()
                                     scope.launch {
                                         val zip = withContext(Dispatchers.IO) {
                                             ProjectPackage.create(

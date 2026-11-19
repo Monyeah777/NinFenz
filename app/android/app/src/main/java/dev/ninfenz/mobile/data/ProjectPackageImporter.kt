@@ -67,10 +67,10 @@ object ProjectPackageImporter {
         }
         val dataPrefix = if (prefix.isBlank()) "data/" else prefix + "/data/"
         val listedNames = mutableSetOf<String>()
-        manifest["data"]?.jsonArray?.forEach { item ->
+        manifest["data"]?.jsonArray?.forEachIndexed { index, item ->
             val obj = item.jsonObject
-            val path = obj["path"]?.jsonPrimitive?.content ?: return@forEach
-            val sha = obj["sha256"]?.jsonPrimitive?.content ?: return@forEach
+            val path = obj["path"]?.jsonPrimitive?.content ?: error("manifest data/" + index + " 缺 path")
+            val sha = obj["sha256"]?.jsonPrimitive?.content ?: error("manifest data/" + index + " 缺 sha256")
             val actualName = if (prefix.isBlank()) path else prefix + "/" + path
             listedNames.add(actualName)
             val bytes = entries.firstOrNull { (name, _) -> name == actualName }?.second
