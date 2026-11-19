@@ -14,7 +14,7 @@ object BackupService {
 
     fun create(filesDir: File, stamp: Long = System.currentTimeMillis()): Created {
         val root = File(filesDir, "exports/backups").apply { mkdirs() }
-        val target = File(root, "nf-backup-" + stamp + ".zip")
+        val target = File(root, "nf-backup-" + stamp + "-" + System.nanoTime() + ".zip")
         val sources = mutableListOf<Pair<String, File>>()
         listOf("projects", "projects-archive", "drafts").forEach { name ->
             val dir = File(filesDir, name)
