@@ -223,18 +223,16 @@ fun ImportScreen(
                 val pack = packs.firstOrNull()
                 if (!hash.ok || tree != imported.tree || count != imported.count) {
                     error = hash.error ?: CoreResponse.failure("NF-PCK-003", "模板包 tree/count 不匹配", "重新导出模板包", 2).error
-                } else if (
-                    !safeCall("spec-validate", buildJsonObject {
-                        put("spec", kotlinx.serialization.json.Json.parseToJsonElement(imported.specText).jsonObject)
-                    }).ok
-                ) {
-                    error = safeCall("spec-validate", buildJsonObject {
-                        put("spec", kotlinx.serialization.json.Json.parseToJsonElement(imported.specText).jsonObject)
-                    }).error
-                } else if (pack == null) {
-                    error = CoreResponse.failure("NF-PCK-002", context.getString(dev.ninfenz.mobile.R.string.import_template_export), context.getString(dev.ninfenz.mobile.R.string.import_template_export), 2).error
                 } else {
-                    onCreateProjectFromTemplate(pack, imported.title, imported.specText, imported.templateText)
+                    val specObj = kotlinx.serialization.json.Json.parseToJsonElement(imported.specText).jsonObject
+                    val specCheck = safeCall("spec-validate", buildJsonObject { put("spec", specObj) })
+                    if (!specCheck.ok) {
+                        error = specCheck.error
+                    } else if (pack == null) {
+                        error = CoreResponse.failure("NF-PCK-002", context.getString(dev.ninfenz.mobile.R.string.import_template_export), context.getString(dev.ninfenz.mobile.R.string.import_template_export), 2).error
+                    } else {
+                        onCreateProjectFromTemplate(pack, imported.title, imported.specText, imported.templateText)
+                    }
                 }
             } catch (t: Throwable) {
                 error = CoreResponse.failure(
