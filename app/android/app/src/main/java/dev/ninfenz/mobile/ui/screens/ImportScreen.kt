@@ -520,7 +520,7 @@ fun ImportScreen(
         notice = null
         try {
             val html = withContext(Dispatchers.IO) { file.readText(Charsets.UTF_8) }
-            val text = withContext(Dispatchers.Default) { dev.ninfenz.mobile.data.HtmlTextImporter.extract(html) }
+            val text = withContext(Dispatchers.Default) { dev.ninfenz.mobile.data.HtmlImporter.toMarkdown(html) }
             if (text.isBlank()) {
                 error = CoreResponse.failure(
                     "NF-IMP-004",
