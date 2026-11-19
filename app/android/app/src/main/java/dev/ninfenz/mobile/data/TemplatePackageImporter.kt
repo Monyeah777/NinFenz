@@ -60,7 +60,9 @@ object TemplatePackageImporter {
                 val sha = o["sha256"]?.jsonPrimitive?.content ?: return@mapNotNull null
                 path to sha
             }.orEmpty()
+            val seen = mutableSetOf<String>()
             (refs.map { it.second to it.third } + assets).forEach { (path, sha) ->
+                require(seen.add(path.lowercase())) { "模板路径重复：" + path }
                 require(safe(path)) { "非法模板路径：" + path }
                 val entry = zip.getEntry(path) ?: error("模板缺少：" + path)
                 total += entry.size
@@ -98,7 +100,7 @@ object TemplatePackageImporter {
     }
 
     private fun safe(path: String): Boolean =
-        path.isNotBlank() && !path.startsWith("/") && !path.contains("\\") && !path.split("/").contains("..")
+        path.isNotBlank() && !path.startsWith("/") && !path.contains(":") && !path.contains("\\") && !path.split("/").contains("..")
 
     private fun sha256(bytes: ByteArray): String =
         MessageDigest.getInstance("SHA-256").digest(bytes).joinToString("") { "%02x".format(it) }
