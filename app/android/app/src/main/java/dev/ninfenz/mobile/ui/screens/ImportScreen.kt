@@ -212,7 +212,8 @@ fun ImportScreen(
     }
 
     suspend fun importFromFile(file: File, sourceKind: String, name: String, mime: String?, size: Long) {
-        if (file.name.endsWith(".zip", ignoreCase = true) && TemplatePackageImporter.hasTemplateJson(file)) {
+        val isZip = file.name.endsWith(".zip", ignoreCase = true) || (mime ?: "").contains("zip", ignoreCase = true)
+        if (isZip && TemplatePackageImporter.hasTemplateJson(file)) {
             busy = true
             error = null
             notice = null
@@ -231,7 +232,7 @@ fun ImportScreen(
                     if (!specCheck.ok) {
                         error = specCheck.error
                     } else if (pack == null) {
-                        error = CoreResponse.failure("NF-PCK-002", context.getString(dev.ninfenz.mobile.R.string.import_template_export), context.getString(dev.ninfenz.mobile.R.string.import_template_export), 2).error
+                        error = CoreResponse.failure("NF-PCK-002", context.getString(dev.ninfenz.mobile.R.string.import_template_need_pack), context.getString(dev.ninfenz.mobile.R.string.import_template_need_pack), 2).error
                     } else {
                         onCreateProjectFromTemplate(pack, imported.title, imported.specText, imported.templateText)
                     }
@@ -248,7 +249,7 @@ fun ImportScreen(
             busy = false
             return
         }
-        if (file.name.endsWith(".zip", ignoreCase = true) && ProjectPackageImporter.hasProjectJson(file)) {
+        if (isZip && ProjectPackageImporter.hasProjectJson(file)) {
             try {
                 val imported = withContext(Dispatchers.IO) { ProjectPackageImporter.import(context.filesDir, file) }
                 notice = context.resources.getQuantityString(

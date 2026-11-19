@@ -270,6 +270,7 @@
     <string name="import_template_share">Share</string>
     <string name="import_template_copy">Copy JSON</string>
     <string name="import_template_export">Export template</string>
+    <string name="import_template_need_pack">Install a Pack before importing a template package.</string>
     <string name="import_template_import">Import candidate</string>
     <string name="import_template_use">Use as project</string>
     <string name="import_template_use_title">Create a project from this template?</string>
