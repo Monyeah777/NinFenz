@@ -365,8 +365,8 @@
     <string name="author_tab_graph">管线</string>
     <string name="author_tab_spec">规格</string>
     <string name="author_pack_missing_title">绑定的 Pack 不在本机</string>
+    <string name="pack_open_center">打开 Pack 中心</string>
     <string name="author_pack_missing_body">项目引用的 %1$s · %2$s 未安装或已移动。</string>
-    <string name="author_back">返回</string>
     <string name="author_pack_label">Pack：%1$s · %2$s</string>
     <string name="template_override_active">正在使用项目内的模板 spec 覆盖。</string>
     <string name="template_override_remove">移除覆盖</string>
@@ -420,7 +420,6 @@
     <string name="delivery_reset_body">会清空本次编译计划、槽位输入、校验、预览和导出状态；不会删除项目。</string>
     <string name="delivery_pack_missing_title">绑定的 Pack 不在本机</string>
     <string name="delivery_pack_missing_body">项目引用的 %1$s 未安装，无法装配。</string>
-    <string name="delivery_back">返回</string>
     <string name="delivery_pack_label">Pack：%1$s · %2$s</string>
     <string name="delivery_note">装配/校验走核心；PDF 为本地基础文本导出（非 HTML/CSS 渲染）。</string>
     <string name="delivery_load_error">读取项目内容失败：%1$s</string>

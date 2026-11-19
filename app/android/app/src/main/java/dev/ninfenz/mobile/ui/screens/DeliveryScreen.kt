@@ -135,7 +135,7 @@ private fun parseTemplateSlots(markdown: String): Map<String, String> {
 }
 
 @Composable
-fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onStatusChanged: () -> Unit = {}) {
+fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpenPacks: () -> Unit = onBack, onStatusChanged: () -> Unit = {}) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
     val clipboard = LocalClipboardManager.current
@@ -377,8 +377,8 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                 icon = Icons.Filled.Info,
                 title = stringResource(dev.ninfenz.mobile.R.string.delivery_pack_missing_title),
                 message = stringResource(dev.ninfenz.mobile.R.string.delivery_pack_missing_body, project.refs.basePackId),
-                actionLabel = stringResource(dev.ninfenz.mobile.R.string.delivery_back),
-                onAction = onBack
+                actionLabel = stringResource(dev.ninfenz.mobile.R.string.pack_open_center),
+                onAction = onOpenPacks
             )
         }
         return

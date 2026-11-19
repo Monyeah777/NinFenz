@@ -99,7 +99,7 @@ private enum class AuthorTab(val labelRes: Int) {
  * 编辑保存（写回引用/digest）留 W4 后续；当前明确标「本地预演」。
  */
 @Composable
-fun AuthorScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onAssembly: () -> Unit, onSaved: () -> Unit = {}) {
+fun AuthorScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpenPacks: () -> Unit = onBack, onAssembly: () -> Unit, onSaved: () -> Unit = {}) {
     if (pack == null) {
         Column(modifier = Modifier.fillMaxSize()) {
             NfTopAppBar(title = project.title, onBack = onBack)
@@ -107,8 +107,8 @@ fun AuthorScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onAssem
                 icon = Icons.Filled.Info,
                 title = stringResource(dev.ninfenz.mobile.R.string.author_pack_missing_title),
                 message = stringResource(dev.ninfenz.mobile.R.string.author_pack_missing_body, project.refs.basePackId, project.refs.basePackVersion),
-                actionLabel = stringResource(dev.ninfenz.mobile.R.string.author_back),
-                onAction = onBack
+                actionLabel = stringResource(dev.ninfenz.mobile.R.string.pack_open_center),
+                onAction = onOpenPacks
             )
         }
         return

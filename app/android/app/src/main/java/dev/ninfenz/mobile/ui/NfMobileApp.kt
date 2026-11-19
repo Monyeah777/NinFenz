@@ -548,6 +548,7 @@ is Detail.Import -> ImportScreen(
                                 project = entry.project,
                                 pack = pack,
                                 onBack = { shell = shell.back() ?: shell },
+                                onOpenPacks = { shell = shell.open(Detail.PackCenter) },
                                 onAssembly = { shell = shell.open(Detail.Delivery(entry.project.id)) },
                                 onSaved = { refresh() }
                             )
@@ -569,7 +570,7 @@ is Detail.Import -> ImportScreen(
                             val pack = packs.packs.firstOrNull {
                                 it.id == entry.project.refs.basePackId && it.version == entry.project.refs.basePackVersion
                             }
-                            DeliveryScreen(project = entry.project, pack = pack, onBack = { shell = shell.back() ?: shell }, onStatusChanged = { refresh() })
+                            DeliveryScreen(project = entry.project, pack = pack, onBack = { shell = shell.back() ?: shell }, onOpenPacks = { shell = shell.open(Detail.PackCenter) }, onStatusChanged = { refresh() })
                         }
                     }
                     is Detail.Flow -> {
