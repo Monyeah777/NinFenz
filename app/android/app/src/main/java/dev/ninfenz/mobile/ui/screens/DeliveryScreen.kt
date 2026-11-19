@@ -1330,15 +1330,24 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
             },
             confirmButton = {
                 TextButton(onClick = {
-                    inputs = inputs + (target to slotImportText)
+                    val meta = specMeta?.slots?.firstOrNull { it.id == target }
+                    val clean = SlotInput.sanitize(meta?.kind, slotImportText).let { value ->
+                        meta?.maxChars?.let { value.take(it) } ?: value
+                    }
+                    inputs = inputs + (target to clean)
                     slotImportTarget = null
                 }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_slot_replace)) }
             },
             dismissButton = {
                 Row {
                     TextButton(onClick = {
+                        val meta = specMeta?.slots?.firstOrNull { it.id == target }
                         val old = inputs[target].orEmpty().trim()
-                        inputs = inputs + (target to if (old.isBlank()) slotImportText else old + "\n\n" + slotImportText)
+                        val merged = if (old.isBlank()) slotImportText else old + "\n\n" + slotImportText
+                        val clean = SlotInput.sanitize(meta?.kind, merged).let { value ->
+                            meta?.maxChars?.let { value.take(it) } ?: value
+                        }
+                        inputs = inputs + (target to clean)
                         slotImportTarget = null
                     }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_slot_append)) }
                     TextButton(onClick = { slotImportTarget = null }) { Text(stringResource(android.R.string.cancel)) }
