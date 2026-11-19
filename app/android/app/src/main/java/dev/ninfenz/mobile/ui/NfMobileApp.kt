@@ -1,6 +1,7 @@
 package dev.ninfenz.mobile.ui
 
 import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 
 import dev.ninfenz.mobile.ui.theme.NfLayout
@@ -725,6 +726,35 @@ is Detail.Import -> ImportScreen(
                                             android.widget.Toast.makeText(context, context.getString(dev.ninfenz.mobile.R.string.project_save_template) + ": " + saved.name, android.widget.Toast.LENGTH_SHORT).show()
                                         } else {
                                             android.widget.Toast.makeText(context, check.error?.message ?: context.getString(dev.ninfenz.mobile.R.string.project_save_template), android.widget.Toast.LENGTH_LONG).show()
+                                        }
+                                    }
+                                },
+                                onExportTemplatePackage = {
+                                    scope.launch {
+                                        val pack = packs.packs.firstOrNull {
+                                            it.id == entry.project.refs.basePackId && it.version == entry.project.refs.basePackVersion
+                                        }
+                                        val override = java.io.File(java.io.File(java.io.File(context.filesDir, "projects"), entry.project.id), "authoring/spec-override.json")
+                                        val specFile = pack?.let { java.io.File(it.dir, "spec/main.nfspec.json") }
+                                        val source = if (override.isFile) override else specFile
+                                        val spec = source?.takeIf { it.isFile }?.let { file ->
+                                            runCatching { kotlinx.serialization.json.Json.parseToJsonElement(file.readText(Charsets.UTF_8)).jsonObject }.getOrNull()
+                                        }
+                                        if (pack == null || spec == null) {
+                                            android.widget.Toast.makeText(context, context.getString(dev.ninfenz.mobile.R.string.project_export_template), android.widget.Toast.LENGTH_LONG).show()
+                                            return@launch
+                                        }
+                                        val prepared = dev.ninfenz.mobile.data.TemplatePackageBuilder.prepare(context.cacheDir, pack, spec, entry.project.title)
+                                        val hash = safeCall("pack-hash", kotlinx.serialization.json.buildJsonObject { put("root", prepared.dir.absolutePath) })
+                                        val hashes = hash.resultObject()?.get("hashes") as? kotlinx.serialization.json.JsonObject
+                                        val tree = hashes?.get("tree")?.jsonPrimitive?.content
+                                        val count = hashes?.get("count")?.jsonPrimitive?.content?.toIntOrNull()
+                                        if (!hash.ok || tree == null || count == null) {
+                                            android.widget.Toast.makeText(context, hash.error?.message ?: context.getString(dev.ninfenz.mobile.R.string.project_export_template), android.widget.Toast.LENGTH_LONG).show()
+                                        } else {
+                                            val zip = dev.ninfenz.mobile.data.TemplatePackageBuilder.finalize(prepared, tree, count, java.io.File(context.cacheDir, "template-export"))
+                                            val intent = ShareExporter.shareFileIntent(context, zip, "application/zip", entry.project.title)
+                                            ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.project_export_template))
                                         }
                                     }
                                 },
