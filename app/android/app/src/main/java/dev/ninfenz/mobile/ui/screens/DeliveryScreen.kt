@@ -543,6 +543,15 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                     } else if (plan!!.slots.isEmpty()) {
                         Text(stringResource(dev.ninfenz.mobile.R.string.delivery_no_slots), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page))
                     } else {
+                        val requiredSlots = specMeta?.slots?.filter { it.required }.orEmpty()
+                        val requiredFilled = requiredSlots.count { !inputs[it.id].isNullOrBlank() }
+                        if (requiredSlots.isNotEmpty()) {
+                            Text(
+                                stringResource(dev.ninfenz.mobile.R.string.delivery_required_progress, requiredFilled, requiredSlots.size),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                         var lastSection: String? = null
                         for (slot in plan!!.slots) {
                             Column(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
