@@ -57,16 +57,19 @@ object TemplatePackageBuilder {
         File(prepared.dir, "nf-template.json").writeText(manifest.toString(), Charsets.UTF_8)
         outDir.mkdirs()
         val target = File(outDir, "nf-template-" + System.currentTimeMillis() + ".zip")
-        ZipOutputStream(target.outputStream()).use { out ->
-            val all = prepared.files + ("nf-template.json" to manifest.toString().toByteArray(Charsets.UTF_8))
-            all.sortedBy { it.first }.forEach { (name, bytes) ->
-                out.putNextEntry(ZipEntry(name).apply { time = 0L })
-                out.write(bytes)
-                out.closeEntry()
+        try {
+            ZipOutputStream(target.outputStream()).use { out ->
+                val all = prepared.files + ("nf-template.json" to manifest.toString().toByteArray(Charsets.UTF_8))
+                all.sortedBy { it.first }.forEach { (name, bytes) ->
+                    out.putNextEntry(ZipEntry(name).apply { time = 0L })
+                    out.write(bytes)
+                    out.closeEntry()
+                }
             }
+            return target
+        } finally {
+            prepared.dir.deleteRecursively()
         }
-        prepared.dir.deleteRecursively()
-        return target
     }
 
     private fun specVersion(spec: JsonObject): String {

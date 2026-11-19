@@ -217,8 +217,10 @@ fun ImportScreen(
             busy = true
             error = null
             notice = null
+            var importedDir: File? = null
             try {
                 val imported = withContext(Dispatchers.IO) { TemplatePackageImporter.inspect(file, context.cacheDir) }
+                importedDir = imported.dir
                 val hash = safeCall("pack-hash", buildJsonObject { put("root", imported.dir.absolutePath) })
                 val hashes = hash.resultObject()?.get("hashes") as? kotlinx.serialization.json.JsonObject
                 val tree = hashes?.get("tree")?.jsonPrimitive?.content
@@ -244,6 +246,8 @@ fun ImportScreen(
                     context.getString(dev.ninfenz.mobile.R.string.import_parse_failed_fix),
                     2
                 ).error
+            } finally {
+                importedDir?.deleteRecursively()
             }
             file.delete()
             busy = false
