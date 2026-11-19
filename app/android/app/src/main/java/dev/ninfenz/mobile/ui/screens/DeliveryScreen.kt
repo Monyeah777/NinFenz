@@ -572,6 +572,19 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                                 )
                                             }
+                                            val rules = listOfNotNull(
+                                                it.pattern?.let { pattern -> "pattern: " + pattern },
+                                                it.startsWith?.let { prefix -> "start: " + prefix },
+                                                it.endsWith?.let { suffix -> "end: " + suffix },
+                                                if (it.nonEmpty) "non-empty" else null
+                                            )
+                                            if (rules.isNotEmpty()) {
+                                                Text(
+                                                    rules.joinToString(" · "),
+                                                    style = MaterialTheme.typography.labelSmall,
+                                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                )
+                                            }
                                         }
                                     }
                                     Row {
