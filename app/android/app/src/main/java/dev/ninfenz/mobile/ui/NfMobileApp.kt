@@ -750,16 +750,20 @@ is Detail.Import -> ImportScreen(
                                         val templateMd = java.io.File(java.io.File(java.io.File(context.filesDir, "projects"), entry.project.id), "authoring/template.md")
                                             .takeIf { it.isFile }?.readText(Charsets.UTF_8)
                                         val prepared = dev.ninfenz.mobile.data.TemplatePackageBuilder.prepare(context.cacheDir, pack, spec, entry.project.title, templateMd)
-                                        val hash = safeCall("pack-hash", kotlinx.serialization.json.buildJsonObject { put("root", prepared.dir.absolutePath) })
-                                        val hashes = hash.resultObject()?.get("hashes") as? kotlinx.serialization.json.JsonObject
-                                        val tree = hashes?.get("tree")?.jsonPrimitive?.content
-                                        val count = hashes?.get("count")?.jsonPrimitive?.content?.toIntOrNull()
-                                        if (!hash.ok || tree == null || count == null) {
-                                            android.widget.Toast.makeText(context, hash.error?.message ?: context.getString(dev.ninfenz.mobile.R.string.project_export_template), android.widget.Toast.LENGTH_LONG).show()
-                                        } else {
-                                            val zip = dev.ninfenz.mobile.data.TemplatePackageBuilder.finalize(prepared, tree, count, java.io.File(context.cacheDir, "template-export"))
-                                            val intent = ShareExporter.shareFileIntent(context, zip, "application/zip", entry.project.title)
-                                            ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.project_export_template))
+                                        try {
+                                            val hash = safeCall("pack-hash", kotlinx.serialization.json.buildJsonObject { put("root", prepared.dir.absolutePath) })
+                                            val hashes = hash.resultObject()?.get("hashes") as? kotlinx.serialization.json.JsonObject
+                                            val tree = hashes?.get("tree")?.jsonPrimitive?.content
+                                            val count = hashes?.get("count")?.jsonPrimitive?.content?.toIntOrNull()
+                                            if (!hash.ok || tree == null || count == null) {
+                                                android.widget.Toast.makeText(context, hash.error?.message ?: context.getString(dev.ninfenz.mobile.R.string.project_export_template), android.widget.Toast.LENGTH_LONG).show()
+                                            } else {
+                                                val zip = dev.ninfenz.mobile.data.TemplatePackageBuilder.finalize(prepared, tree, count, java.io.File(context.cacheDir, "template-export"))
+                                                val intent = ShareExporter.shareFileIntent(context, zip, "application/zip", entry.project.title)
+                                                ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.project_export_template))
+                                            }
+                                        } finally {
+                                            prepared.dir.deleteRecursively()
                                         }
                                     }
                                 },

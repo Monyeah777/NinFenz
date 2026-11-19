@@ -831,13 +831,13 @@ fun ProjectDetailScreen(
     var showMoreActions by remember { mutableStateOf(false) }
     var showRemoveOverride by remember { mutableStateOf(false) }
     var showTemplateReference by remember { mutableStateOf(false) }
-    val templateReference = remember(project.id) {
-        java.io.File(java.io.File(java.io.File(context.filesDir, "projects"), project.id), "authoring/template.md")
-            .takeIf { it.isFile }?.readText(Charsets.UTF_8)
-    }
     var historyExpanded by rememberSaveable(project.id) { mutableStateOf(false) }
     var hasSpecOverride by remember(project.id) {
         mutableStateOf(java.io.File(java.io.File(java.io.File(context.filesDir, "projects"), project.id), "authoring/spec-override.json").isFile)
+    }
+    val templateReference = remember(project.id, hasSpecOverride) {
+        java.io.File(java.io.File(java.io.File(context.filesDir, "projects"), project.id), "authoring/template.md")
+            .takeIf { it.isFile }?.readText(Charsets.UTF_8)
     }
     val canApprove = project.status in setOf(ProjectStatus.VALIDATED, ProjectStatus.EXPORTED, ProjectStatus.REVIEWED)
     var reviewStale by remember { mutableStateOf(false) }
