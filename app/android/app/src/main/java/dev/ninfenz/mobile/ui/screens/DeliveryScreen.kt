@@ -49,6 +49,7 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.res.pluralStringResource
@@ -607,6 +608,11 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onSta
                                         onNext = { focusManager.moveFocus(FocusDirection.Down) }
                                     ),
                                     placeholder = { Text(slotMeta?.examples?.firstOrNull().orEmpty(), maxLines = 2) },
+                                    textStyle = if (slotMeta?.kind == "code" || slotMeta?.kind == "json") {
+                                        MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace)
+                                    } else {
+                                        MaterialTheme.typography.bodyMedium
+                                    },
                                     supportingText = { Text(pluralStringResource(dev.ninfenz.mobile.R.plurals.delivery_slot_chars, (inputs[slot] ?: "").length, (inputs[slot] ?: "").length)) },
                                     modifier = Modifier.fillMaxWidth()
                                 )
