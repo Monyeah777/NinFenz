@@ -12,6 +12,7 @@ object PdfTextImporter {
         PDFBoxResourceLoader.init(context.applicationContext)
         PDDocument.load(file).use { document ->
             require(!document.isEncrypted) { "PDF 已加密" }
+            require(document.numberOfPages <= 500) { "PDF 页数超过 500" }
             return PDFTextStripper().getText(document).trim()
         }
     }
