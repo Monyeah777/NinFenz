@@ -100,7 +100,13 @@ object TemplatePackageBuilder {
                     val example = (slot?.get("examples") as? kotlinx.serialization.json.JsonArray)
                         ?.mapNotNull { (it as? kotlinx.serialization.json.JsonPrimitive)?.content }
                         ?.firstOrNull()
-                    appendLine("- " + id + " " + name + if (example != null) "：" + example else "")
+                    val hints = listOfNotNull(
+                        if ((slot?.get("required") as? kotlinx.serialization.json.JsonPrimitive)?.content == "true") "required" else null,
+                        (slot?.get("minChars") as? kotlinx.serialization.json.JsonPrimitive)?.content?.let { "min " + it },
+                        (slot?.get("maxChars") as? kotlinx.serialization.json.JsonPrimitive)?.content?.let { "max " + it },
+                        (slot?.get("pattern") as? kotlinx.serialization.json.JsonPrimitive)?.content?.let { "pattern " + it }
+                    ).joinToString(" · ")
+                    appendLine("- " + id + " " + name + (if (hints.isNotBlank()) "（" + hints + "）" else "") + if (example != null) "：" + example else "")
                 }
                 appendLine()
             }
