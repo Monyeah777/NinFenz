@@ -100,7 +100,7 @@
 | IMP-02 | SAF 单/多文件/目录 | partial | Import 屏 + `import` 流；SAF 全链路真机未验 |
 | IMP-03 | 剪贴板文本/JSON/Markdown | pass | `nf-app import -`（stdin）+ Import 屏剪贴板入口 |
 | IMP-04 | sniff + 适配器（文本/MD/JSON/YAML/ZIP/.nftpl/Pack） | pass | `import-sniff`/`import` op + `test_*import*` + security 负例 |
-| IMP-05 | DOCX/PDF/HTML/OCR（SHOULD，次版） | OPEN | 核心返回 NF-IMP-004 exit 3（不静默降级），owner: lead |
+| IMP-05 | DOCX/PDF/HTML/OCR（SHOULD，次版） | partial | PDF 文字层已接 Android PDFBox（扫描件明确提示 OCR）；DOCX/HTML/OCR 仍 OPEN，核心无实现时 NF-IMP-004 exit 3；真机未验 |
 | IMP-06 | 生成 nf-import/1 + 映射 + 校验 + 草稿 | pass | `nf-import/1` schema + `map-suggest` + DraftProject |
 | IMP-07 | 保留原文/来源，不静默覆盖 | pass | `source.text_digest` + 项目只写草稿；e2e 用例 |
 | IMP-08 | 授权目录 Inbox 自动解析（SHOULD） | OPEN | WorkManager 骨架在 Android 侧声明，遍历/去重未实现，owner: kotlin-ui |
