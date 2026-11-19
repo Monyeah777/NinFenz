@@ -104,6 +104,7 @@ object TemplatePackageBuilder {
                         ?.mapNotNull { (it as? kotlinx.serialization.json.JsonPrimitive)?.content }
                         ?.firstOrNull()?.let { oneLine(it) }
                     val hints = listOfNotNull(
+                        (slot?.get("kind") as? kotlinx.serialization.json.JsonPrimitive)?.content,
                         if ((slot?.get("required") as? kotlinx.serialization.json.JsonPrimitive)?.content == "true") "required" else null,
                         (slot?.get("minChars") as? kotlinx.serialization.json.JsonPrimitive)?.content?.let { "min " + it },
                         (slot?.get("maxChars") as? kotlinx.serialization.json.JsonPrimitive)?.content?.let { "max " + it },
