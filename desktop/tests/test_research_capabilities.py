@@ -15,6 +15,7 @@ from core.research import (
     pbe,
     property_check,
     provenance,
+    smt_constraints,
     solver_policy,
     strings,
     typed_template,
@@ -100,6 +101,21 @@ class TypedTemplateTest(unittest.TestCase):
         self.assertEqual(typed_template.check_record({"x": "v", "y": "v"}, row)
                          .diagnostics[0]["code"], "EXTRA")
 
+
+
+class SmtConstraintTest(unittest.TestCase):
+    def test_sat_or_backtracking(self):
+        out = smt_constraints.assign_sections(
+            ["s1", "s2"], [constraints.Slot("a"), constraints.Slot("b")],
+            {("s1", "a"): 1.0, ("s2", "b"): 1.0})
+        self.assertEqual(out["status"], "sat")
+        self.assertEqual(out["assignment"], {"s1": "a", "s2": "b"})
+
+    def test_unsat(self):
+        out = smt_constraints.assign_sections(
+            ["s1"], [constraints.Slot("a"), constraints.Slot("b")])
+        self.assertEqual(out["status"], "unsat")
+        self.assertTrue(out["core"] or out.get("engine") == "backtracking")
 
 class LineageTest(unittest.TestCase):
     def test_backward(self):
