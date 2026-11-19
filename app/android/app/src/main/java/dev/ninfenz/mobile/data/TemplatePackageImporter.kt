@@ -29,7 +29,7 @@ object TemplatePackageImporter {
 
     fun inspect(zipFile: File, cacheDir: File): Imported {
         require(zipFile.isFile) { "模板包不存在" }
-        val out = File(cacheDir, "template-import").apply { deleteRecursively(); mkdirs() }
+        val out = File(cacheDir, "template-import-" + System.nanoTime()).apply { mkdirs() }
         ZipFile(zipFile).use { zip ->
             require(zip.size() <= MAX_ENTRIES) { "模板包条目过多" }
             val manifestEntry = zip.getEntry("nf-template.json") ?: error("缺少 nf-template.json")

@@ -16,7 +16,7 @@ object TemplatePackageBuilder {
     data class Prepared(val dir: File, val files: List<Pair<String, ByteArray>>, val manifestBase: JsonObject)
 
     fun prepare(cacheDir: File, pack: PackEntry, spec: JsonObject, title: String): Prepared {
-        val dir = File(cacheDir, "template-build").apply { deleteRecursively(); mkdirs() }
+        val dir = File(cacheDir, "template-build-" + System.nanoTime()).apply { mkdirs() }
         val protocol = File(pack.dir, "protocol/nf-protocol-pack.json").readBytes()
         val pipeline = File(pack.dir, "pipeline/main.nfg.json").readBytes()
         val specBytes = spec.toString().toByteArray(Charsets.UTF_8)
