@@ -29,7 +29,8 @@ object TemplatePackageImporter {
         ZipFile(zipFile).use { zip ->
             require(zip.size() <= MAX_ENTRIES) { "模板包条目过多" }
             val manifestEntry = zip.getEntry("nf-template.json") ?: error("缺少 nf-template.json")
-            val manifestText = zip.getInputStream(manifestEntry).use { it.readBytes().toString(Charsets.UTF_8) }
+            require(manifestEntry.size in 0..(1024L * 1024L)) { "模板清单过大" }
+            val manifestText = zip.getInputStream(manifestEntry).use { readLimited(it, 1024L * 1024L).toString(Charsets.UTF_8) }
             val manifest = Json.parseToJsonElement(manifestText).jsonObject
             require(manifest["schema"]?.jsonPrimitive?.content == "nf-template/1") { "不是 nf-template/1" }
             val info = manifest["manifest"] as? JsonObject ?: error("模板缺少 manifest")
@@ -60,7 +61,7 @@ object TemplatePackageImporter {
                 val entry = zip.getEntry(path) ?: error("模板缺少：" + path)
                 total += entry.size
                 require(total <= MAX_BYTES) { "模板包过大" }
-                val bytes = zip.getInputStream(entry).use { it.readBytes() }
+                val bytes = zip.getInputStream(entry).use { readLimited(it, MAX_BYTES - total + entry.size) }
                 require(sha256(bytes) == sha) { "模板文件摘要不匹配：" + path }
                 File(out, path).apply { parentFile?.mkdirs() }.writeBytes(bytes)
             }
@@ -74,6 +75,20 @@ object TemplatePackageImporter {
             val count = hashes["count"]?.jsonPrimitive?.content?.toIntOrNull() ?: error("模板缺少 count")
             return Imported(out, title, specText, templateText, tree, count)
         }
+    }
+
+    private fun readLimited(input: java.io.InputStream, max: Long): ByteArray {
+        val out = java.io.ByteArrayOutputStream()
+        val buf = ByteArray(16 * 1024)
+        var read = 0L
+        while (true) {
+            val n = input.read(buf)
+            if (n < 0) break
+            read += n
+            require(read <= max && read <= MAX_BYTES) { "模板包条目超限" }
+            out.write(buf, 0, n)
+        }
+        return out.toByteArray()
     }
 
     private fun safe(path: String): Boolean =
