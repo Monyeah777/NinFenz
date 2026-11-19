@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.MainActivity
@@ -104,9 +105,9 @@ private fun ReceiveCard(
         Text(text = stringResource(dev.ninfenz.mobile.R.string.share_receive_title), style = MaterialTheme.typography.headlineSmall)
         Text(
             text = payload.summary(
-                itemLabel = stringResource(dev.ninfenz.mobile.R.string.share_payload_items, payload.count),
+                itemLabel = pluralStringResource(dev.ninfenz.mobile.R.plurals.share_payload_items, payload.count, payload.count),
                 processLabel = payload.processText?.let {
-                    stringResource(dev.ninfenz.mobile.R.string.share_payload_process, it.length)
+                    pluralStringResource(dev.ninfenz.mobile.R.plurals.share_payload_process, it.length, it.length)
                 }
             ),
             style = MaterialTheme.typography.bodyMedium
