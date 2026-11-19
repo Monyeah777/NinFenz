@@ -227,10 +227,13 @@ fun ImportScreen(
                 val hashes = hash.resultObject()?.get("hashes") as? kotlinx.serialization.json.JsonObject
                 val tree = hashes?.get("tree")?.jsonPrimitive?.content
                 val count = hashes?.get("count")?.jsonPrimitive?.content?.toIntOrNull()
-                val pack = packs.firstOrNull {
-                    (imported.packId == null || it.id == imported.packId) &&
-                        (imported.packVersion == null || it.version == imported.packVersion)
-                } ?: packs.firstOrNull()
+                val pack = if (imported.packId != null) {
+                    packs.firstOrNull {
+                        it.id == imported.packId && (imported.packVersion == null || it.version == imported.packVersion)
+                    }
+                } else {
+                    packs.firstOrNull()
+                }
                 if (!hash.ok || tree != imported.tree || count != imported.count) {
                     error = hash.error ?: CoreResponse.failure("NF-PCK-003", "模板包 tree/count 不匹配", "重新导出模板包", 2).error
                 } else {
@@ -239,7 +242,16 @@ fun ImportScreen(
                     if (!specCheck.ok) {
                         error = specCheck.error
                     } else if (pack == null) {
-                        error = CoreResponse.failure("NF-PCK-002", context.getString(dev.ninfenz.mobile.R.string.import_template_need_pack), context.getString(dev.ninfenz.mobile.R.string.import_template_need_pack), 2).error
+                        error = CoreResponse.failure(
+                            "NF-PCK-002",
+                            if (imported.packId != null) {
+                                context.getString(dev.ninfenz.mobile.R.string.import_template_pack_missing, imported.packId, imported.packVersion.orEmpty())
+                            } else {
+                                context.getString(dev.ninfenz.mobile.R.string.import_template_need_pack)
+                            },
+                            context.getString(dev.ninfenz.mobile.R.string.import_template_need_pack),
+                            2
+                        ).error
                     } else {
                         onCreateProjectFromTemplate(pack, imported.title, imported.specText, imported.templateText)
                     }
