@@ -1,0 +1,18 @@
+package dev.ninfenz.mobile.data
+
+import android.content.Context
+import com.tom_roush.pdfbox.android.PDFBoxResourceLoader
+import com.tom_roush.pdfbox.pdmodel.PDDocument
+import com.tom_roush.pdfbox.text.PDFTextStripper
+import java.io.File
+
+/** PDF 文字层提取；扫描件没有文字层，明确报空而不是伪造 OCR。 */
+object PdfTextImporter {
+    fun extract(context: Context, file: File): String {
+        PDFBoxResourceLoader.init(context.applicationContext)
+        PDDocument.load(file).use { document ->
+            require(!document.isEncrypted) { "PDF 已加密" }
+            return PDFTextStripper().getText(document).trim()
+        }
+    }
+}

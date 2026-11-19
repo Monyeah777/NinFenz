@@ -102,6 +102,9 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
     // JNA aar：内含 Android ABI 的 libjnidispatch.so（Android 上 JNA 必须用 aar 变体）
     implementation("net.java.dev.jna:jna:5.17.0@aar")
+    implementation("com.tom-roush:pdfbox-android:2.0.27.0") {
+        exclude(group = "org.bouncycastle")
+    }
 
     debugImplementation("androidx.compose.ui:ui-tooling")
 
