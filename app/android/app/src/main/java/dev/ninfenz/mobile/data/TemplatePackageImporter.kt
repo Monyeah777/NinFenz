@@ -62,6 +62,8 @@ object TemplatePackageImporter {
                 total += entry.size
                 require(total <= MAX_BYTES) { "模板包过大" }
                 val bytes = zip.getInputStream(entry).use { readLimited(it, MAX_BYTES - total + entry.size) }
+                total = total - entry.size + bytes.size
+                require(total <= MAX_BYTES) { "模板包过大" }
                 require(sha256(bytes) == sha) { "模板文件摘要不匹配：" + path }
                 File(out, path).apply { parentFile?.mkdirs() }.writeBytes(bytes)
             }
