@@ -118,15 +118,15 @@ fun AuthorScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onAssem
     var saveRequest by remember { mutableIntStateOf(0) }
     val authorContext = androidx.compose.ui.platform.LocalContext.current
     val authorClipboard = androidx.compose.ui.platform.LocalClipboardManager.current
+    var authorReload by remember { mutableIntStateOf(0) }
     val specOverride = java.io.File(java.io.File(java.io.File(authorContext.filesDir, "projects"), project.id), "authoring/spec-override.json")
-    val templateReference = remember(project.id) {
+    val templateReference = remember(project.id, authorReload) {
         java.io.File(java.io.File(java.io.File(authorContext.filesDir, "projects"), project.id), "authoring/template.md")
             .takeIf { it.isFile }?.readText(Charsets.UTF_8)
     }
     var artifacts by remember { mutableStateOf<AuthorArtifacts?>(null) }
     var loadError by remember { mutableStateOf<String?>(null) }
     var loading by remember { mutableStateOf(true) }
-    var authorReload by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(pack.dir.absolutePath, project.id, authorReload) {
         loading = true
@@ -203,7 +203,7 @@ fun AuthorScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onAssem
             templateReference?.takeIf { it.isNotBlank() }?.let { text ->
                 NfCollapsibleSection(title = stringResource(dev.ninfenz.mobile.R.string.author_template_ref), initiallyExpanded = false) {
                     TextButton(onClick = { authorClipboard.setText(androidx.compose.ui.text.AnnotatedString(text)) }) {
-                        Text(stringResource(dev.ninfenz.mobile.R.string.import_template_copy))
+                        Text(stringResource(dev.ninfenz.mobile.R.string.author_template_copy))
                     }
                     MarkdownPreview(text, limitBlocks = 24)
                 }
