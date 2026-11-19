@@ -1425,6 +1425,10 @@ fun ImportScreen(
                     Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                         TextButton(onClick = { previewTemplate = null }) { Text(stringResource(android.R.string.cancel)) }
                         TextButton(onClick = {
+                            val json = runCatching { file.readText(Charsets.UTF_8) }.getOrDefault("")
+                            clipboard.setText(AnnotatedString(json))
+                        }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_template_copy)) }
+                        TextButton(onClick = {
                             previewTemplate = null
                             exportTemplatePackage(file)
                         }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_template_export)) }
