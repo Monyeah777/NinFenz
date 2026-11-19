@@ -20,7 +20,7 @@ object TemplatePackageBuilder {
         val protocol = File(pack.dir, "protocol/nf-protocol-pack.json").readBytes()
         val pipeline = File(pack.dir, "pipeline/main.nfg.json").readBytes()
         val specBytes = spec.toString().toByteArray(Charsets.UTF_8)
-        val markdown = (templateMarkdown?.takeIf { it.isNotBlank() } ?: renderTemplate(spec, title)).toByteArray(Charsets.UTF_8)
+        val markdown = (templateMarkdown?.takeIf { it.isNotBlank() } ?: renderTemplate(spec, title, pack)).toByteArray(Charsets.UTF_8)
         val files = listOf(
             "template.md" to markdown,
             "spec/main.nfspec.json" to specBytes,
@@ -77,7 +77,7 @@ object TemplatePackageBuilder {
         return if (Regex("^[0-9]+\\.[0-9]+\\.[0-9]+$").matches(v)) v else "0.1.0"
     }
 
-    private fun renderTemplate(spec: JsonObject, title: String): String {
+    private fun renderTemplate(spec: JsonObject, title: String, pack: PackEntry): String {
         val slots = (spec["slots"] as? kotlinx.serialization.json.JsonArray)
             ?.mapNotNull { it as? JsonObject }
             ?.associateBy { (it["id"] as? kotlinx.serialization.json.JsonPrimitive)?.content.orEmpty() }
@@ -88,6 +88,8 @@ object TemplatePackageBuilder {
             .orEmpty()
         return buildString {
             appendLine("# " + ((spec["title"] as? kotlinx.serialization.json.JsonPrimitive)?.content ?: title.ifBlank { "模板" }))
+            appendLine()
+            appendLine("> Pack: " + pack.id + " " + pack.version)
             appendLine()
             sections.forEach { section ->
                 val heading = (section["title"] as? kotlinx.serialization.json.JsonPrimitive)?.content ?: "章节"
