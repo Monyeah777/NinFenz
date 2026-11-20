@@ -235,6 +235,8 @@
     <string name="import_csv">CSV table</string>
     <string name="import_csv_copy">Copy as table</string>
     <string name="import_pdf_no_text">No extractable text in this PDF; scanned PDFs need OCR.</string>
+    <string name="import_image_ocr_required">Image OCR is not implemented yet; export text from the image first.</string>
+    <string name="import_image_ocr_required_fix">Use a text/Markdown/DOCX/HTML/EPUB file, or a text-layer PDF.</string>
     <string name="import_pdf_failed">PDF text extraction failed: %1$s</string>
     <string name="import_pdf_unsupported_fix">Use a Markdown/text/DOCX/EPUB file; PDF export is supported, PDF import is not.</string>
     <string name="import_sample">Sample content</string>

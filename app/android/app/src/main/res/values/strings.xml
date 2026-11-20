@@ -231,6 +231,8 @@
     <string name="import_csv">CSV 表格</string>
     <string name="import_csv_copy">复制为表格</string>
     <string name="import_pdf_no_text">这个 PDF 没有可提取文字；扫描件需要 OCR。</string>
+    <string name="import_image_ocr_required">图片 OCR 尚未实现；请先导出图片中的文字。</string>
+    <string name="import_image_ocr_required_fix">改用 Markdown/文本/DOCX/HTML/EPUB，或带文字层的 PDF。</string>
     <string name="import_pdf_failed">PDF 文字提取失败：%1$s</string>
     <string name="import_pdf_unsupported_fix">文字版 PDF 可直接导入；扫描件请先 OCR，或改用 Markdown/文本/DOCX/EPUB。</string>
     <string name="import_sample">示例内容</string>

@@ -302,13 +302,23 @@ fun ImportScreen(
         suggestNote = null
         acceptedMappings = emptySet()
         val isPdf = name.endsWith(".pdf", true) || (mime ?: "").contains("pdf", ignoreCase = true)
+        val isImage = (mime ?: "").startsWith("image/") || listOf(".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp").any { name.endsWith(it, true) }
         val isDocx = name.endsWith(".docx", true) || mime == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         val isEpub = name.endsWith(".epub", true) || mime == "application/epub+zip" ||
             ((name.endsWith(".zip", true) || mime == "application/zip") && EpubImporter.isEpub(file))
         val isHtml = !isEpub && !isDocx && !isPdf && (name.endsWith(".html", true) || name.endsWith(".htm", true) || mime == "text/html")
-        val isText = !isEpub && !isDocx && !isHtml && !isPdf && (name.endsWith(".txt", true) || name.endsWith(".md", true) ||
+        val isText = !isEpub && !isDocx && !isHtml && !isPdf && !isImage && (name.endsWith(".txt", true) || name.endsWith(".md", true) ||
             name.endsWith(".markdown", true) || mime?.startsWith("text/") == true)
         val sourceFile = when {
+            isImage -> {
+                error = CoreResponse.failure(
+                    "NF-IMP-004",
+                    context.getString(dev.ninfenz.mobile.R.string.import_image_ocr_required),
+                    context.getString(dev.ninfenz.mobile.R.string.import_image_ocr_required_fix),
+                    3
+                ).error
+                return
+            }
             isPdf -> {
                 val extraction = runCatching { dev.ninfenz.mobile.data.PdfTextImporter.extract(context, file) }
                 if (extraction.isFailure) {
