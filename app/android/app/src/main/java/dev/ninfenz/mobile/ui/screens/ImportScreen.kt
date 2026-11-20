@@ -301,13 +301,27 @@ fun ImportScreen(
         savedName = null
         suggestNote = null
         acceptedMappings = emptySet()
+        val isPdf = name.endsWith(".pdf", true) || (mime ?: "").contains("pdf", ignoreCase = true)
         val isDocx = name.endsWith(".docx", true) || mime == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         val isEpub = name.endsWith(".epub", true) || mime == "application/epub+zip" ||
             ((name.endsWith(".zip", true) || mime == "application/zip") && EpubImporter.isEpub(file))
-        val isHtml = !isEpub && !isDocx && (name.endsWith(".html", true) || name.endsWith(".htm", true) || mime == "text/html")
-        val isText = !isEpub && !isDocx && !isHtml && (name.endsWith(".txt", true) || name.endsWith(".md", true) ||
+        val isHtml = !isEpub && !isDocx && !isPdf && (name.endsWith(".html", true) || name.endsWith(".htm", true) || mime == "text/html")
+        val isText = !isEpub && !isDocx && !isHtml && !isPdf && (name.endsWith(".txt", true) || name.endsWith(".md", true) ||
             name.endsWith(".markdown", true) || mime?.startsWith("text/") == true)
         val sourceFile = when {
+            isPdf -> {
+                val markdown = runCatching { dev.ninfenz.mobile.data.PdfTextImporter.extract(context, file) }.getOrNull()?.takeIf { it.isNotBlank() }
+                if (markdown == null) {
+                    error = CoreResponse.failure(
+                        "NF-IMP-004",
+                        context.getString(dev.ninfenz.mobile.R.string.import_pdf_no_text),
+                        context.getString(dev.ninfenz.mobile.R.string.import_pdf_unsupported_fix),
+                        3
+                    ).error
+                    return
+                }
+                File(file.parentFile, "pdf-import.md").apply { writeText(markdown, Charsets.UTF_8) }
+            }
             isDocx -> {
                 val markdown = runCatching { DocxImporter.extract(file) }.getOrNull()?.takeIf { it.isNotBlank() }
                 if (markdown == null) {
@@ -452,37 +466,6 @@ fun ImportScreen(
         }
     }
 
-    suspend fun importPdf(file: File, sourceKind: String, name: String, size: Long) {
-        busy = true
-        error = null
-        notice = null
-        try {
-            val text = withContext(Dispatchers.IO) { dev.ninfenz.mobile.data.PdfTextImporter.extract(context, file) }
-            if (text.isBlank()) {
-                error = CoreResponse.failure(
-                    "NF-IMP-004",
-                    context.getString(dev.ninfenz.mobile.R.string.import_pdf_no_text),
-                    context.getString(dev.ninfenz.mobile.R.string.import_pdf_unsupported_fix),
-                    3
-                ).error
-            } else {
-                val md = File(File(context.cacheDir, "imports").apply { mkdirs() }, "pdf-" + System.nanoTime() + ".md")
-                md.writeText(text, Charsets.UTF_8)
-                importFromFile(md, sourceKind, name.removeSuffix(".pdf") + ".md", "text/markdown", text.toByteArray(Charsets.UTF_8).size.toLong())
-            }
-        } catch (t: Throwable) {
-            error = CoreResponse.failure(
-                "NF-IMP-004",
-                context.getString(dev.ninfenz.mobile.R.string.import_pdf_failed, t.message ?: t.javaClass.simpleName),
-                context.getString(dev.ninfenz.mobile.R.string.import_pdf_unsupported_fix),
-                3
-            ).error
-        } finally {
-            file.delete()
-            busy = false
-        }
-    }
-
     fun importCsv() {
         val manager = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager
         val text = manager?.primaryClip?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.coerceToText(context)?.toString()
@@ -553,11 +536,6 @@ fun ImportScreen(
                     val uri = item.uri.toUri()
                     val meta = FileAccess.meta(context, uri)
                     val name = meta.name.orEmpty().lowercase()
-                    if (name.endsWith(".pdf") || (meta.mime ?: "").contains("pdf", ignoreCase = true)) {
-                        val file = FileAccess.copyToCache(context, uri, meta.name)
-                        importPdf(file, "share", meta.name, meta.size)
-                        return@launch
-                    }
                     if (meta.size > FileAccess.MAX_IMPORT_BYTES) {
                         error = CoreResponse.failure("NF-IMP-003", context.getString(dev.ninfenz.mobile.R.string.import_file_too_large), context.getString(dev.ninfenz.mobile.R.string.import_file_too_large_fix), 3).error
                         return@launch
@@ -648,9 +626,7 @@ fun ImportScreen(
                         return@launch
                     }
                     val file = FileAccess.copyToCache(context, uri, meta.name)
-                    if (meta.name.orEmpty().lowercase().endsWith(".pdf") || (meta.mime ?: "").contains("pdf", ignoreCase = true)) {
-                        importPdf(file, "saf", meta.name, meta.size)
-                    } else if (meta.name.orEmpty().lowercase().endsWith(".csv") || (meta.mime ?: "").contains("csv", ignoreCase = true)) {
+                    if (meta.name.orEmpty().lowercase().endsWith(".csv") || (meta.mime ?: "").contains("csv", ignoreCase = true)) {
                         val markdown = CsvTable.toMarkdown(file.readText(Charsets.UTF_8))
                         val converted = File(File(context.cacheDir, "imports").apply { mkdirs() }, "csv-table.md")
                         converted.writeText(markdown, Charsets.UTF_8)
