@@ -288,8 +288,7 @@ private fun ProtocolAuthorContent(
         runCatching {
             val file = java.io.File(java.io.File(java.io.File(context.filesDir, "projects"), project.id), "authoring/template.md")
             if (!file.isFile) return@runCatching emptyMap<String, String>()
-            val byName = Regex("(?m)^- (SLT-\\S+) (.+?)(?:（[^）]*）)?[：:](.+)$").findAll(file.readText(Charsets.UTF_8))
-                .associate { m -> m.groupValues[2].trim() to m.groupValues[3].trim() }
+            val byName = dev.ninfenz.mobile.data.TemplateProtocolPrefill.parse(file.readText(Charsets.UTF_8))
             protocol.fields.mapNotNull { field ->
                 byName[field.label]?.takeIf { it.isNotBlank() }?.let { field.id to it }
             }.toMap()
