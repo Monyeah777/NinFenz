@@ -33,7 +33,7 @@ object HtmlImporter {
             val tag = m.value
             val src = Regex("(?is)src=[\"']([^\"']+)[\"']").find(tag)?.groupValues?.getOrNull(1).orEmpty()
             val alt = Regex("(?is)alt=[\"']([^\"']*)[\"']").find(tag)?.groupValues?.getOrNull(1).orEmpty()
-            if (src.isBlank()) "" else "![" + alt + "](" + src + ")"
+            if (src.isBlank() || !SafeLink.allowedImage(src)) "" else "![" + alt + "](" + src + ")"
         }
         text = lists(text)
         text = Regex("(?is)<h([1-6])[^>]*>(.*?)</h\\1>").replace(text) { m ->

@@ -17,6 +17,13 @@ class HtmlImporterTest {
     }
 
     @Test
+    fun filtersUnsafeImageSources() {
+        val md = HtmlImporter.toMarkdown("<img src=\"javascript:alert(1)\"/><img src=\"data:image/png;base64,AA\"/>")
+        assertTrue(!md.contains("javascript:"))
+        assertTrue(md.contains("data:image/png;base64,AA"))
+    }
+
+    @Test
     fun dropsUnsafeLinkSchemes() {
         val md = HtmlImporter.toMarkdown("<p><a href=\"javascript:alert(1)\">坏</a></p>")
         assertTrue(!md.contains("javascript:"))
