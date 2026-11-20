@@ -115,6 +115,7 @@
 | AUTH-02 | 管线 DAG 增删/重排/分支/并行/回退 | partial | `graph-validate`（DAG/环/端口/模式/必需阶段）+ Graph 屏编辑；「回退边」首版按 DAG 校验（循环不做，与计划 D3 一致） |
 | AUTH-03 | 模块/资产绑定/替换/多选/权重 | pass | graph `module_ref/asset_refs/weights` + 校验（NF-GRF-005/007） |
 | AUTH-04 | MD spec 章节/槽位/约束/示例/验收/预算 | pass | `spec-validate` + `nf-md-spec/1` |
+| J6 | 多项目并行装配 / 结果合并 / 再装配 / 文件夹或 zip 交付 | partial | 多项目 `nf-bundle/1` 导出与回导已接；并行装配、结果合并/再装配未实现 |
 | ASM-01 | 编译 graph→plan；环/端口/必需阶段校验 | pass | `graph-compile` + plan digest 确定性 |
 | ASM-02 | 整篇/阶段预览/槽位生成/块编辑 | pass | `assemble --stage/--block` + meta |
 | ASM-03 | 失败回灌到 stage/slot | pass | issue `path` 指到 `$.inputs.<slot>`/`$.schema` + fix |
