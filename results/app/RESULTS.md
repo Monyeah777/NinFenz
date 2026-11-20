@@ -205,9 +205,9 @@
 
 | id | 内容 | owner | 下一步 |
 |---|---|---|---|
-| OPEN-TOOLCHAIN | 剩余真机矩阵/TalkBack、MSI 安装启动、CMP 交互运行 | lead | 设备已连；矩阵/语音走查未做，不阻断构建结论 |
+| OPEN-TOOLCHAIN | 剩余真机矩阵/TalkBack、MSI 安装启动、CMP 交互运行 | lead | 设备未连（2026-11-20 adb devices 空）；矩阵/语音走查未做，不阻断构建结论 |
 | OPEN-EXTERNAL | 签名/公证/Play 数据安全/macOS 构建 | lead | 证书/平台不在场；`RELEASE_EVIDENCE.md` 留位 |
-| OPEN-DOCXPDF | docx/pdf 导出（首版只 md/zip/json） | lead | 导出器探测；缺即 exit 4 + NF-EXP-004 |
+| OPEN-DOCXPDF | docx/pdf 导出样式与真机验证 | lead | 已有 docx/pdf 导出；参考样式/分页/字体仍待真机验 |
 | OPEN-L2 | L2 仓库协议层校验（依赖 `nf` CLI 子进程） | lead | 缺环境 exit 4 |
 | OPEN-SIGN-PACK | Pack 安装无签名校验（计划 PACK-06/SEC 后续） | lead | 签名格式与信任锚未定 |
 | OPEN-MAP-DECISION | map-suggest 决策仅落 sidecar JSON，未接 core 复算 | python-plane | 接 core `map-suggest` 复算并加用例 |
