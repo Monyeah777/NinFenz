@@ -310,7 +310,17 @@ fun ImportScreen(
             name.endsWith(".markdown", true) || mime?.startsWith("text/") == true)
         val sourceFile = when {
             isPdf -> {
-                val markdown = runCatching { dev.ninfenz.mobile.data.PdfTextImporter.extract(context, file) }.getOrNull()?.takeIf { it.isNotBlank() }
+                val extraction = runCatching { dev.ninfenz.mobile.data.PdfTextImporter.extract(context, file) }
+                if (extraction.isFailure) {
+                    error = CoreResponse.failure(
+                        "NF-IMP-004",
+                        context.getString(dev.ninfenz.mobile.R.string.import_pdf_failed, extraction.exceptionOrNull()?.message ?: "unknown"),
+                        context.getString(dev.ninfenz.mobile.R.string.import_pdf_unsupported_fix),
+                        3
+                    ).error
+                    return
+                }
+                val markdown = extraction.getOrNull()?.takeIf { it.isNotBlank() }
                 if (markdown == null) {
                     error = CoreResponse.failure(
                         "NF-IMP-004",
