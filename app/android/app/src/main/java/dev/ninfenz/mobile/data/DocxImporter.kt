@@ -16,9 +16,9 @@ object DocxImporter {
         ZipFile(file).use { zip ->
             val entry = zip.getEntry("word/document.xml") ?: throw IllegalArgumentException("DOCX 缺 document.xml")
             require(entry.size in 0..(64L * 1024 * 1024)) { "DOCX document.xml 过大" }
-            val xml = zip.getInputStream(entry).use { String(it.readBytes(), Charsets.UTF_8) }
+            val xml = zip.getInputStream(entry).use { String(readLimited(it, 64L * 1024 * 1024), Charsets.UTF_8) }
             val links = zip.getEntry("word/_rels/document.xml.rels")?.let { rel ->
-                val relXml = zip.getInputStream(rel).use { String(it.readBytes(), Charsets.UTF_8) }
+                val relXml = zip.getInputStream(rel).use { String(readLimited(it, 2L * 1024 * 1024), Charsets.UTF_8) }
                 Regex("(?is)<Relationship\\s[^>]*>").findAll(relXml).mapNotNull { m ->
                     val type = attr(m.value, "Type").orEmpty()
                     val id = attr(m.value, "Id") ?: return@mapNotNull null
@@ -42,6 +42,20 @@ object DocxImporter {
             if (text.isBlank()) throw IllegalArgumentException("DOCX 无可读段落")
             return text
         }
+    }
+
+    private fun readLimited(input: java.io.InputStream, max: Long): ByteArray {
+        val out = java.io.ByteArrayOutputStream()
+        val buf = ByteArray(16 * 1024)
+        var read = 0L
+        while (true) {
+            val n = input.read(buf)
+            if (n < 0) break
+            read += n
+            require(read <= max) { "DOCX 条目超限" }
+            out.write(buf, 0, n)
+        }
+        return out.toByteArray()
     }
 
     private fun appendParagraphs(out: StringBuilder, xml: String, links: Map<String, String>) {
