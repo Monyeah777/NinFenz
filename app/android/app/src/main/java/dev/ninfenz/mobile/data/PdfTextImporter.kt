@@ -2,6 +2,7 @@ package dev.ninfenz.mobile.data
 
 import android.content.Context
 import com.tom_roush.pdfbox.android.PDFBoxResourceLoader
+import com.tom_roush.pdfbox.io.MemoryUsageSetting
 import com.tom_roush.pdfbox.pdmodel.PDDocument
 import com.tom_roush.pdfbox.text.PDFTextStripper
 import java.io.File
@@ -21,7 +22,7 @@ object PdfTextImporter {
                 }
             }
         }
-        PDDocument.load(file).use { document ->
+        PDDocument.load(file, MemoryUsageSetting.setupTempFileOnly()).use { document ->
             require(!document.isEncrypted) { "PDF 已加密" }
             require(document.numberOfPages <= 500) { "PDF 页数超过 500" }
             return PDFTextStripper().apply { sortByPosition = true }.getText(document)
