@@ -32,12 +32,14 @@ object ProjectBundleImporter {
                     val obj = item.jsonObject
                     val path = obj["path"]?.jsonPrimitive?.content ?: error("bundle 条目缺 path")
                     val sha = obj["sha256"]?.jsonPrimitive?.content ?: error("bundle 条目缺 sha256")
+                    val expectedBytes = obj["bytes"]?.jsonPrimitive?.content?.toLongOrNull()
                     require(path.isNotBlank() && !path.startsWith("/") && !path.contains("\\") && path.split("/").none { it == ".." }) { "bundle 路径非法" }
                     val entry = zip.getEntry(path) ?: error("bundle 缺条目：" + path)
                     val target = File(staging, "item-" + items.size + ".zip")
                     val copied = copyLimited(zip, entry, target, 256L * 1024 * 1024)
                     total += copied
                     require(total <= 512L * 1024 * 1024) { "bundle 总量超限" }
+                    if (expectedBytes != null) require(copied == expectedBytes) { "bundle 字节数不匹配：" + path }
                     require(ProjectPackage.sha256(target) == sha) { "bundle 摘要不匹配：" + path }
                     items.add(path to target)
                 }
