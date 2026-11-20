@@ -9,6 +9,7 @@ if str(Path(__file__).resolve().parent.parent / "src") not in sys.path:
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
 from core.research import (
+    app_facade,
     app_state,
     app_state_persist,
     collab,
@@ -286,6 +287,34 @@ class TierGateTest(unittest.TestCase):
         self.assertFalse(tier_gate.check("free", "studio_inspect")["allowed"])
 
 
+
+
+class AppFacadeTest(unittest.TestCase):
+    def test_import_edit_export_and_invalid(self):
+        f = app_facade.AppFacade("free")
+        self.assertTrue(f.open_import("t", [{"id": "a", "value": "1"}])["ok"])
+        self.assertTrue(f.edit_slot("a", "2")["ok"])
+        self.assertTrue(f.export()["ok"])
+        f.validate(["bad"])
+        self.assertFalse(f.export()["ok"])
+
+    def test_save_load_and_reset(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d) / "s.json"
+            f = app_facade.AppFacade("free", path)
+            f.open_import("t", [{"id": "a", "value": "1"}])
+            self.assertTrue(f.save()["ok"])
+            g = app_facade.AppFacade("free", path)
+            self.assertEqual(g.state.status, "empty")
+            self.assertTrue(g.load()["ok"])
+            self.assertEqual(g.state.title, "t")
+            g.reset()
+            self.assertEqual(g.state.status, "empty")
+
+    def test_unknown_tier_rejected(self):
+        with self.assertRaises(ValueError):
+            app_facade.AppFacade("vip")
 
 class AppStateTest(unittest.TestCase):
     def test_import_edit_export(self):
