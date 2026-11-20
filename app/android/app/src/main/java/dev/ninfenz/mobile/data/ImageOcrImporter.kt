@@ -6,6 +6,7 @@ import com.google.android.gms.tasks.Tasks
 import android.graphics.Bitmap
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
+import com.google.mlkit.vision.text.TextRecognizer
 import com.google.mlkit.vision.text.chinese.ChineseTextRecognizerOptions
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -14,18 +15,31 @@ import java.util.concurrent.TimeUnit
 object ImageOcrImporter {
     fun extract(context: Context, file: File): String {
         require(file.isFile && file.length() in 1..(25L * 1024 * 1024)) { "图片为空或超过 25MB" }
-        return extract(InputImage.fromFilePath(context, Uri.fromFile(file)))
-    }
-
-    fun extract(bitmap: Bitmap): String = extract(InputImage.fromBitmap(bitmap, 0))
-
-    private fun extract(image: InputImage): String {
-        val recognizer = TextRecognition.getClient(ChineseTextRecognizerOptions.Builder().build())
+        val recognizer = newRecognizer()
         return try {
-            val result = Tasks.await(recognizer.process(image), 60, TimeUnit.SECONDS)
-            result.text.trim()
+            extract(InputImage.fromFilePath(context, Uri.fromFile(file)), recognizer)
         } finally {
             recognizer.close()
         }
+    }
+
+    fun extract(bitmap: Bitmap): String {
+        val recognizer = newRecognizer()
+        return try {
+            extract(bitmap, recognizer)
+        } finally {
+            recognizer.close()
+        }
+    }
+
+    fun newRecognizer(): TextRecognizer =
+        TextRecognition.getClient(ChineseTextRecognizerOptions.Builder().build())
+
+    fun extract(bitmap: Bitmap, recognizer: TextRecognizer): String =
+        extract(InputImage.fromBitmap(bitmap, 0), recognizer)
+
+    private fun extract(image: InputImage, recognizer: TextRecognizer): String {
+        val result = Tasks.await(recognizer.process(image), 60, TimeUnit.SECONDS)
+        return result.text.trim()
     }
 }

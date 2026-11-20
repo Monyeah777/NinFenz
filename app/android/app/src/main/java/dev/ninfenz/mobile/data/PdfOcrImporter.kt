@@ -20,15 +20,20 @@ object PdfOcrImporter {
             val pages = minOf(document.numberOfPages, MAX_PAGES)
             if (pages <= 0) return ""
             val renderer = PDFRenderer(document)
+            val recognizer = ImageOcrImporter.newRecognizer()
             val text = StringBuilder()
+            try {
             for (page in 0 until pages) {
                 val bitmap: Bitmap = renderer.renderImageWithDPI(page, 150f)
                 try {
-                    val pageText = ImageOcrImporter.extract(bitmap)
+                    val pageText = ImageOcrImporter.extract(bitmap, recognizer)
                     if (pageText.isNotBlank()) text.append(pageText).append("\n\n")
                 } finally {
                     bitmap.recycle()
                 }
+            }
+            } finally {
+                recognizer.close()
             }
             return text.toString().trim()
         }
