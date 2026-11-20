@@ -3,6 +3,7 @@ package dev.ninfenz.mobile.data
 import android.content.Context
 import android.net.Uri
 import com.google.android.gms.tasks.Tasks
+import android.graphics.Bitmap
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.chinese.ChineseTextRecognizerOptions
@@ -13,7 +14,12 @@ import java.util.concurrent.TimeUnit
 object ImageOcrImporter {
     fun extract(context: Context, file: File): String {
         require(file.isFile && file.length() in 1..(25L * 1024 * 1024)) { "图片为空或超过 25MB" }
-        val image = InputImage.fromFilePath(context, Uri.fromFile(file))
+        return extract(InputImage.fromFilePath(context, Uri.fromFile(file)))
+    }
+
+    fun extract(bitmap: Bitmap): String = extract(InputImage.fromBitmap(bitmap, 0))
+
+    private fun extract(image: InputImage): String {
         val recognizer = TextRecognition.getClient(ChineseTextRecognizerOptions.Builder().build())
         return try {
             val result = Tasks.await(recognizer.process(image), 60, TimeUnit.SECONDS)

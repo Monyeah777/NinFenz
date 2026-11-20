@@ -326,7 +326,20 @@ fun ImportScreen(
                     ).error
                     return
                 }
-                val markdown = extraction.getOrNull()?.takeIf { it.isNotBlank() }
+                var markdown = extraction.getOrNull()?.takeIf { it.isNotBlank() }
+                if (markdown == null) {
+                    val ocr = runCatching { dev.ninfenz.mobile.data.PdfOcrImporter.extract(context, file) }
+                    if (ocr.isFailure) {
+                        error = CoreResponse.failure(
+                            "NF-IMP-004",
+                            context.getString(dev.ninfenz.mobile.R.string.import_pdf_ocr_failed, ocr.exceptionOrNull()?.message ?: "unknown"),
+                            context.getString(dev.ninfenz.mobile.R.string.import_pdf_unsupported_fix),
+                            3
+                        ).error
+                        return
+                    }
+                    markdown = ocr.getOrNull()?.takeIf { it.isNotBlank() }
+                }
                 if (markdown == null) {
                     error = CoreResponse.failure(
                         "NF-IMP-004",
