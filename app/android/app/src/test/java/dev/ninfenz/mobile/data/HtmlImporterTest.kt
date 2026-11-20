@@ -65,6 +65,7 @@ class HtmlImporterTest {
         val bytes = "<meta charset=\"gbk\"><p>中文</p>".toByteArray(java.nio.charset.Charset.forName("GBK"))
         assertTrue(HtmlImporter.decode(bytes).contains("中文"))
         assertTrue(HtmlImporter.decode("<p>utf8 中文</p>".toByteArray()).contains("utf8 中文"))
+        assertTrue(HtmlImporter.decode("<p>中文无声明</p>".toByteArray(java.nio.charset.Charset.forName("GBK"))).contains("中文无声明"))
     }
 
     @Test
