@@ -535,6 +535,15 @@ fun ImportScreen(
         }
         val markdown = CsvTable.toMarkdown(text)
         scope.launch {
+            if (text.toByteArray(Charsets.UTF_8).size > dev.ninfenz.mobile.data.FileAccess.MAX_IMPORT_BYTES) {
+                error = CoreResponse.failure(
+                    "NF-IMP-003",
+                    context.getString(dev.ninfenz.mobile.R.string.import_file_too_large),
+                    context.getString(dev.ninfenz.mobile.R.string.import_file_too_large_fix),
+                    3
+                ).error
+                return@launch
+            }
             val file = File(File(context.cacheDir, "imports").apply { mkdirs() }, "csv-table.md")
             file.writeText(markdown, Charsets.UTF_8)
             importFromFile(file, "clipboard", "csv-table.md", "text/markdown", markdown.toByteArray(Charsets.UTF_8).size.toLong())
@@ -554,6 +563,15 @@ fun ImportScreen(
             return
         }
         scope.launch {
+            if (text.toByteArray(Charsets.UTF_8).size > dev.ninfenz.mobile.data.FileAccess.MAX_IMPORT_BYTES) {
+                error = CoreResponse.failure(
+                    "NF-IMP-003",
+                    context.getString(dev.ninfenz.mobile.R.string.import_file_too_large),
+                    context.getString(dev.ninfenz.mobile.R.string.import_file_too_large_fix),
+                    3
+                ).error
+                return@launch
+            }
             val file = File(File(context.cacheDir, "imports").apply { mkdirs() }, "clipboard.md")
             file.writeText(text, Charsets.UTF_8)
             importFromFile(file, "clipboard", "clipboard.md", "text/plain", text.toByteArray(Charsets.UTF_8).size.toLong())
