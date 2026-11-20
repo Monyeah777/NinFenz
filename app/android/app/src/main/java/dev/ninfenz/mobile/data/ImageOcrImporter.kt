@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import com.google.android.gms.tasks.Tasks
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.TextRecognizer

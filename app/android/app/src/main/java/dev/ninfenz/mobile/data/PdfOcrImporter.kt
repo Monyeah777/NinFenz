@@ -26,6 +26,7 @@ object PdfOcrImporter {
             try {
             for (page in 0 until pages) {
                 val bitmap: Bitmap = renderer.renderImageWithDPI(page, 150f)
+                require(bitmap.width.toLong() * bitmap.height.toLong() <= 40_000_000L) { "PDF 页面渲染尺寸过大" }
                 try {
                     val pageText = ImageOcrImporter.extract(bitmap, recognizer)
                     if (pageText.isNotBlank()) text.append(pageText).append("\n\n")
