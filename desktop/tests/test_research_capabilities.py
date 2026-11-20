@@ -18,6 +18,7 @@ from core.research import (
     contracts,
     experiment_health,
     feature_gate,
+    import_adapters,
     incremental,
     lineage,
     pbe,
@@ -288,6 +289,34 @@ class TierGateTest(unittest.TestCase):
 
 
 
+
+
+class ImportAdapterTest(unittest.TestCase):
+    def test_markdown_structure(self):
+        doc = import_adapters.normalize("x.md", b"# T\n\n## A\n")
+        self.assertEqual(doc.detected, "markdown")
+        self.assertEqual(doc.structure[0]["title"], "T")
+        self.assertEqual(doc.structure[1]["level"], 2)
+
+    def test_json(self):
+        doc = import_adapters.normalize("x.json", b'{"a": 1}')
+        self.assertEqual(doc.detected, "json")
+        self.assertEqual(doc.structure[0]["kind"], "json")
+
+    def test_pdf_and_docx_are_unsupported(self):
+        pdf = import_adapters.normalize("x.pdf", b"%PDF-1.7")
+        self.assertIn("unsupported_format:pdf", pdf.warnings)
+        docx = import_adapters.normalize("x.docx", b"PK\x03\x04")
+        self.assertIn("unsupported_format:docx", docx.warnings)
+
+    def test_bad_json_warns(self):
+        doc = import_adapters.normalize("x.json", b"{bad")
+        self.assertIn("json_parse_failed", doc.warnings)
+
+    def test_binary(self):
+        doc = import_adapters.normalize("x.bin", b"\xff\xfe")
+        self.assertEqual(doc.detected, "binary")
+        self.assertFalse(doc.text)
 
 class AppFacadeTest(unittest.TestCase):
     def test_import_edit_export_and_invalid(self):

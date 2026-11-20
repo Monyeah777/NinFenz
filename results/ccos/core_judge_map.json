@@ -657,6 +657,10 @@
       "referenced": true
     },
     {
+      "module": "import_adapters",
+      "referenced": true
+    },
+    {
       "module": "import_graph",
       "referenced": true
     },
@@ -1517,9 +1521,9 @@
       "referenced": true
     }
   ],
-  "modules": 379,
+  "modules": 380,
   "note": "粗粒度名字匹配（代理指标），不做导入图分析",
-  "referenced": 349,
+  "referenced": 350,
   "schema": "nf-core-judge-map/1",
   "unreferenced": 30
 }
