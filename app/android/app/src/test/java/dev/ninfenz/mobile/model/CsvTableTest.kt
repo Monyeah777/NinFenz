@@ -9,6 +9,8 @@ class CsvTableTest {
         val semi = CsvTable.toMarkdown("a;b\n1;2")
         assertTrue(semi.startsWith("| a | b |"))
         assertTrue(semi.contains("| 1 | 2 |"))
+        val directive = CsvTable.toMarkdown("sep=;\na;b\n1;2")
+        assertTrue(directive.startsWith("| a | b |"))
         val tab = CsvTable.toMarkdown("a\tb\n1\t2")
         assertTrue(tab.startsWith("| a | b |"))
         assertTrue(tab.contains("| 1 | 2 |"))

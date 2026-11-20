@@ -3,7 +3,12 @@ package dev.ninfenz.mobile.model
 /** 把 CSV 转为 Markdown 表格；只做结构转换，不推断字段语义。 */
 object CsvTable {
     fun toMarkdown(csv: String): String {
-        val rows = parse(csv, detectDelimiter(csv))
+        val cleaned = if (csv.lineSequence().firstOrNull()?.startsWith("sep=", ignoreCase = true) == true) {
+            csv.substringAfter('\n', "")
+        } else {
+            csv
+        }
+        val rows = parse(cleaned, detectDelimiter(cleaned))
         if (rows.isEmpty()) return ""
         val width = rows.maxOf { it.size }
         val normalized = rows.map { row -> row + List(width - row.size) { "" } }
