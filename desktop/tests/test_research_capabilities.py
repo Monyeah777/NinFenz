@@ -10,6 +10,7 @@ if str(Path(__file__).resolve().parent.parent / "src") not in sys.path:
 from core.research import (
     collab,
     constraints,
+    contract_codegen,
     contracts,
     experiment_health,
     feature_gate,
@@ -231,6 +232,35 @@ class ExperimentHealthTest(unittest.TestCase):
             bucketing_changed=True)
         self.assertFalse(experiment_health.health(snap)["can_conclude"])
 
+
+
+class ContractCodegenTest(unittest.TestCase):
+    def test_kotlin_shape(self):
+        out = contract_codegen.kotlin("SlotView")
+        self.assertIn("data class SlotView(", out)
+        self.assertIn("val id: String", out)
+        self.assertIn("val required: Boolean", out)
+
+
+    def test_cli_generates_types(self):
+        import subprocess
+        import sys
+        proc = subprocess.run(
+            [sys.executable, "scripts/contract_codegen.py", "--lang", "kotlin"],
+            cwd=Path(__file__).resolve().parents[2], capture_output=True, text=True,
+            check=False)
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        self.assertIn("data class ImportView", proc.stdout)
+
+    def test_typescript_optional(self):
+        out = contract_codegen.typescript("RecipeRef")
+        self.assertIn("export interface RecipeRef", out)
+        self.assertIn("id: string;", out)
+        self.assertIn("version?: number;", out)
+
+    def test_bad_schema_rejected(self):
+        with self.assertRaises(KeyError):
+            contract_codegen.kotlin("Missing")
 
 class TierGateTest(unittest.TestCase):
     def test_free_daily_path_never_locked(self):

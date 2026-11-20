@@ -78,3 +78,17 @@ class ProjectSummary:
             raise ValueError("bad project summary schema")
         return cls(str(data["project_id"]), str(data["title"]), str(data["state"]),
                    int(data.get("mapped", 0)), data.get("recipe_id"))
+
+
+#: Machine-readable contract shapes for Kotlin/TS code generation.
+SCHEMAS: dict[str, list[tuple[str, str, bool]]] = {
+    "SlotView": [("id", "string", False), ("label", "string", False),
+                 ("value", "string", False), ("required", "bool", False)],
+    "ImportView": [("state", "string", False), ("title", "string", False),
+                   ("slots", "SlotView[]", False), ("issues", "string[]", False),
+                   ("recipe", "RecipeRef", True)],
+    "RecipeRef": [("id", "string", False), ("version", "int", True)],
+    "ProjectSummary": [("project_id", "string", False), ("title", "string", False),
+                       ("state", "string", False), ("mapped", "int", False),
+                       ("recipe_id", "string", True)],
+}

@@ -333,6 +333,10 @@
       "referenced": true
     },
     {
+      "module": "contract_codegen",
+      "referenced": true
+    },
+    {
       "module": "contract_history",
       "referenced": true
     },
@@ -1501,9 +1505,9 @@
       "referenced": true
     }
   ],
-  "modules": 375,
+  "modules": 376,
   "note": "粗粒度名字匹配（代理指标），不做导入图分析",
-  "referenced": 345,
+  "referenced": 346,
   "schema": "nf-core-judge-map/1",
   "unreferenced": 30
 }
