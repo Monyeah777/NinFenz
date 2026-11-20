@@ -88,7 +88,7 @@ object EpubImporter {
     private fun read(zip: ZipFile, path: String): String? {
         val entry = zip.getEntry(path) ?: return null
         require(entry.size in 0..(64L * 1024 * 1024)) { "EPUB 条目过大：" + path }
-        return zip.getInputStream(entry).use { String(readLimited(it, 64L * 1024 * 1024), Charsets.UTF_8) }
+        return zip.getInputStream(entry).use { HtmlImporter.decode(readLimited(it, 64L * 1024 * 1024)) }
     }
 
     private fun readLimited(input: java.io.InputStream, max: Long): ByteArray {

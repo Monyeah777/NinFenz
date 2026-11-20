@@ -7,7 +7,7 @@ object HtmlImporter {
         val head = String(bytes, 0, minOf(bytes.size, 4096), Charsets.ISO_8859_1)
         val charset = Regex("(?i)<meta[^>]+charset=[\"']?([A-Za-z0-9._-]+)").find(head)?.groupValues?.getOrNull(1)
         val cs = charset?.let { runCatching { java.nio.charset.Charset.forName(it) }.getOrNull() }
-        return if (cs != null) String(bytes, cs) else String(bytes, Charsets.UTF_8)
+        return if (cs != null) String(bytes, cs) else TextEncoding.decodeText(bytes)
     }
 
     fun toMarkdown(html: String): String {
