@@ -12,8 +12,7 @@ object PdfTextImporter {
     @Volatile
     private var initialized = false
 
-    fun extract(context: Context, file: File): String {
-        require(file.isFile && file.length() in 1..(25L * 1024 * 1024)) { "PDF 文件为空或超过 25MB" }
+    fun ensureInitialized(context: Context) {
         if (!initialized) {
             synchronized(this) {
                 if (!initialized) {
@@ -22,6 +21,11 @@ object PdfTextImporter {
                 }
             }
         }
+    }
+
+    fun extract(context: Context, file: File): String {
+        require(file.isFile && file.length() in 1..(25L * 1024 * 1024)) { "PDF 文件为空或超过 25MB" }
+        ensureInitialized(context)
         PDDocument.load(file, MemoryUsageSetting.setupTempFileOnly()).use { document ->
             require(!document.isEncrypted) { "PDF 已加密" }
             require(document.numberOfPages <= 500) { "PDF 页数超过 500" }
