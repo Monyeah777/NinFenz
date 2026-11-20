@@ -430,7 +430,7 @@
     <string name="delivery_pack_missing_title">Bound pack is not on this device</string>
     <string name="delivery_pack_missing_body">Project references %1$s, which is not installed; cannot assemble.</string>
     <string name="delivery_pack_label">Pack: %1$s · %2$s</string>
-    <string name="delivery_note">Assemble/validate run in core; PDF is a local basic-text export (not HTML/CSS rendering).</string>
+    <string name="delivery_note">Assembly and validation run in the core; PDF prefers HTML/CSS rendering and falls back to basic text.</string>
     <string name="delivery_load_error">Failed to read project content: %1$s</string>
     <string name="delivery_load_fix">Reinstall the bound pack</string>
     <string name="delivery_plan">1 · Assembly plan</string>

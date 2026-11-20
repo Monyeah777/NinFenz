@@ -236,7 +236,7 @@
 
     <string name="import_html_failed">HTML 导入失败：%1$s</string>
     <string name="import_pdf_failed">PDF 文字提取失败：%1$s</string>
-    <string name="import_pdf_unsupported_fix">改用 Markdown/文本/DOCX/EPUB；PDF 导出支持，PDF 导入不支持。</string>
+    <string name="import_pdf_unsupported_fix">文字版 PDF 可直接导入；扫描件请先 OCR，或改用 Markdown/文本/DOCX/EPUB。</string>
     <string name="import_sample">示例内容</string>
     <string name="import_share_received">已接收分享载荷</string>
     <string name="import_share_from">来自分享：%1$s</string>
@@ -426,7 +426,7 @@
     <string name="delivery_pack_missing_title">绑定的 Pack 不在本机</string>
     <string name="delivery_pack_missing_body">项目引用的 %1$s 未安装，无法装配。</string>
     <string name="delivery_pack_label">Pack：%1$s · %2$s</string>
-    <string name="delivery_note">装配/校验走核心；PDF 为本地基础文本导出（非 HTML/CSS 渲染）。</string>
+    <string name="delivery_note">装配/校验走核心；PDF 优先 HTML/CSS 渲染，失败回退本地基础文本。</string>
     <string name="delivery_load_error">读取项目内容失败：%1$s</string>
     <string name="delivery_load_fix">重装绑定的 Pack</string>
     <string name="delivery_plan">1 · 装配计划</string>
