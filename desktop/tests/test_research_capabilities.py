@@ -10,6 +10,8 @@ if str(Path(__file__).resolve().parent.parent / "src") not in sys.path:
 from core.research import (
     collab,
     constraints,
+    experiment_health,
+    feature_gate,
     incremental,
     lineage,
     pbe,
@@ -167,6 +169,65 @@ class ProvenanceTest(unittest.TestCase):
         out = provenance.verify(doc, "body")
         self.assertTrue(out["verified"])
         self.assertFalse(out["authenticated"])
+
+
+class FeatureGateTest(unittest.TestCase):
+    def test_deterministic_rollout_and_variant(self):
+        flags = [feature_gate.Flag(
+            "f", rollout_percentage=100,
+            variants=(feature_gate.Variant("a", 50), feature_gate.Variant("b", 50)))]
+        gate = feature_gate.FeatureGate(flags, salt="s")
+        first = gate.evaluate("f", "user-1")
+        second = gate.evaluate("f", "user-1")
+        self.assertEqual(first["bucket"], second["bucket"])
+        self.assertEqual(first["variant"], second["variant"])
+        self.assertIn(first["variant"], {"a", "b"})
+        self.assertEqual(len(gate.exposures_for("f")), 2)
+
+    def test_rollout_boundaries_and_unknown(self):
+        off = feature_gate.FeatureGate([feature_gate.Flag("off", rollout_percentage=0)])
+        self.assertFalse(off.evaluate("off", "u")["enabled"])
+        self.assertEqual(off.evaluate("missing", "u")["reason"], "unknown_flag")
+        with self.assertRaises(ValueError):
+            feature_gate.FeatureGate([feature_gate.Flag(
+                "bad", variants=(feature_gate.Variant("a", 101),))])
+
+    def test_duplicate_or_empty_key_rejected(self):
+        with self.assertRaises(ValueError):
+            feature_gate.FeatureGate([feature_gate.Flag("x"), feature_gate.Flag("x")])
+        with self.assertRaises(ValueError):
+            feature_gate.FeatureGate([feature_gate.Flag("")])
+
+
+class ExperimentHealthTest(unittest.TestCase):
+    def test_healthy(self):
+        snap = experiment_health.Snapshot(
+            "e", ("a", "b"), {"a": 100, "b": 100}, metric_events=200)
+        out = experiment_health.health(snap)
+        self.assertEqual(out["status"], "ok")
+        self.assertTrue(out["can_conclude"])
+
+    def test_no_metric_or_empty_arm_blocks(self):
+        snap = experiment_health.Snapshot(
+            "e", ("a", "b"), {"a": 100, "b": 0}, metric_events=0)
+        out = experiment_health.health(snap)
+        self.assertEqual(out["status"], "blocked")
+        codes = {f["code"] for f in out["findings"]}
+        self.assertIn("empty_arm", codes)
+        self.assertIn("no_metric_events", codes)
+
+    def test_imbalance_is_warning_not_blocker(self):
+        snap = experiment_health.Snapshot(
+            "e", ("a", "b"), {"a": 100, "b": 400}, metric_events=500)
+        out = experiment_health.health(snap)
+        self.assertEqual(out["status"], "ok")
+        self.assertIn("imbalanced_arms", {f["code"] for f in out["findings"]})
+
+    def test_changed_bucketing_blocks(self):
+        snap = experiment_health.Snapshot(
+            "e", ("a", "b"), {"a": 100, "b": 100}, metric_events=200,
+            bucketing_changed=True)
+        self.assertFalse(experiment_health.health(snap)["can_conclude"])
 
 class CollabTest(unittest.TestCase):
     def test_confirmation_and_visibility(self):
