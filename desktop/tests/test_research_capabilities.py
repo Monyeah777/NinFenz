@@ -20,6 +20,7 @@ from core.research import (
     smt_constraints,
     solver_policy,
     strings,
+    tier_gate,
     typed_template,
 )
 
@@ -228,6 +229,27 @@ class ExperimentHealthTest(unittest.TestCase):
             "e", ("a", "b"), {"a": 100, "b": 100}, metric_events=200,
             bucketing_changed=True)
         self.assertFalse(experiment_health.health(snap)["can_conclude"])
+
+
+class TierGateTest(unittest.TestCase):
+    def test_free_daily_path_never_locked(self):
+        for cap in ("import", "preview", "edit", "export", "share", "reset"):
+            self.assertTrue(tier_gate.check("free", cap)["allowed"])
+
+    def test_pro_and_ccos_boundaries(self):
+        self.assertFalse(tier_gate.check("free", "protocol_author")["allowed"])
+        self.assertTrue(tier_gate.check("pro", "protocol_author")["allowed"])
+        self.assertFalse(tier_gate.check("pro", "execute_task")["allowed"])
+        self.assertTrue(tier_gate.check("ccos", "execute_task")["allowed"])
+        with self.assertRaises(PermissionError):
+            tier_gate.require("free", "graph_edit")
+        with self.assertRaises(ValueError):
+            tier_gate.check("vip", "import")
+
+    def test_studio_tui_are_hosts(self):
+        self.assertTrue(tier_gate.check("studio", "studio_inspect")["allowed"])
+        self.assertTrue(tier_gate.check("tui", "tui_inspect")["allowed"])
+        self.assertFalse(tier_gate.check("free", "studio_inspect")["allowed"])
 
 class CollabTest(unittest.TestCase):
     def test_confirmation_and_visibility(self):
