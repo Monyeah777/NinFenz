@@ -49,6 +49,10 @@ object ProjectBundleExporter {
                     out.closeEntry()
                 }
             }
+            outDir.listFiles { f -> f.isFile && f.name.startsWith("nf-bundle-") && f.name.endsWith(".zip") }
+                ?.sortedByDescending { it.lastModified() }
+                ?.drop(3)
+                ?.forEach { it.delete() }
             return Created(target, packages.size)
         } finally {
             staging.deleteRecursively()
