@@ -8,6 +8,13 @@ import org.junit.Test
 
 class TextEncodingTest {
     @Test
+    fun decodesUtf8OrGbkText() {
+        val text = "中文,列"
+        assertEquals(text, TextEncoding.decodeText(text.toByteArray(Charsets.UTF_8)))
+        assertEquals(text, TextEncoding.decodeText(text.toByteArray(Charset.forName("GBK"))))
+    }
+
+    @Test
     fun decodesUtf16LeBom() {
         val bytes = byteArrayOf(0xFF.toByte(), 0xFE.toByte()) + "你好".toByteArray(Charset.forName("UTF-16LE"))
         val decoded = TextEncoding.decode(bytes)

@@ -35,6 +35,18 @@ object TextEncoding {
         return null
     }
 
+    fun decodeText(bytes: ByteArray): String {
+        decode(bytes)?.let { return it.text }
+        return try {
+            val decoder = Charsets.UTF_8.newDecoder()
+                .onMalformedInput(java.nio.charset.CodingErrorAction.REPORT)
+                .onUnmappableCharacter(java.nio.charset.CodingErrorAction.REPORT)
+            decoder.decode(java.nio.ByteBuffer.wrap(bytes)).toString()
+        } catch (t: Throwable) {
+            String(bytes, Charset.forName("GB18030"))
+        }
+    }
+
     fun toUtf8(file: File): File? {
         val bytes = runCatching { file.readBytes() }.getOrNull() ?: return null
         val decoded = decode(bytes) ?: return null
