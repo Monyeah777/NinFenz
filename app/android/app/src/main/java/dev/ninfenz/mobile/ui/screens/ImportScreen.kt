@@ -120,7 +120,8 @@ fun ImportScreen(
     onCreateProjectFromDraft: (PackEntry, String, File) -> Unit = { _, _, _ -> },
     onQuickProjectFromDraft: (PackEntry, String, File) -> Unit = onCreateProjectFromDraft,
     onCreateProjectFromTemplate: (PackEntry, String, String, String) -> Unit = { _, _, _, _ -> },
-    onProjectImported: (String, String, String) -> Unit = { _, _, _ -> }
+    onProjectImported: (String, String, String) -> Unit = { _, _, _ -> },
+    onBundleImported: (Int) -> Unit = {}
 ) {
     val context = LocalContext.current
     val clipboard = LocalClipboardManager.current
@@ -217,6 +218,27 @@ fun ImportScreen(
 
     suspend fun importFromFile(file: File, sourceKind: String, name: String, mime: String?, size: Long) {
         val isZip = file.name.endsWith(".zip", ignoreCase = true) || (mime ?: "").contains("zip", ignoreCase = true)
+        if (isZip && dev.ninfenz.mobile.data.ProjectBundleImporter.hasBundle(file)) {
+            busy = true
+            error = null
+            notice = null
+            try {
+                val imported = withContext(Dispatchers.IO) { dev.ninfenz.mobile.data.ProjectBundleImporter.import(context.filesDir, file) }
+                notice = context.resources.getQuantityString(dev.ninfenz.mobile.R.plurals.import_bundle_done, imported.count, imported.count)
+                onBundleImported(imported.count)
+            } catch (t: Throwable) {
+                error = CoreResponse.failure(
+                    "NF-PRJ-001",
+                    context.getString(dev.ninfenz.mobile.R.string.import_project_failed, t.message ?: t.javaClass.simpleName),
+                    context.getString(dev.ninfenz.mobile.R.string.import_project_failed_fix),
+                    2
+                ).error
+            } finally {
+                file.delete()
+                busy = false
+            }
+            return
+        }
         if (isZip && TemplatePackageImporter.hasTemplateJson(file)) {
             busy = true
             error = null

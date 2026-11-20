@@ -445,6 +445,7 @@ is Detail.Import -> ImportScreen(
                         autoClipboard = quickPasteImport,
                         onAutoClipboardConsumed = { quickPasteImport = false },
                         packs = packs.packs,
+                        onBundleImported = { _ -> refresh(); shell = shell.select(dev.ninfenz.mobile.ui.shell.TopDestination.LIBRARY) },
                         onProjectImported = { id, packId, packVersion ->
                             if (packId.isNotBlank() && packs.packs.none { it.id == packId && it.version == packVersion }) {
                                 missingPackWarning = packId to packVersion

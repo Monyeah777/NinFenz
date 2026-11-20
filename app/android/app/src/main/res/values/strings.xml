@@ -269,6 +269,10 @@
     <string name="import_templates_clear_title">清空本地模板候选？</string>
     <string name="import_templates_clear_body">只会删除本地候选 JSON，不可撤销。</string>
     <string name="import_sample_copy">复制</string>
+    <plurals name="import_bundle_done">
+        <item quantity="one">已从组合包导入 %d 个项目</item>
+        <item quantity="other">已从组合包导入 %d 个项目</item>
+    </plurals>
     <plurals name="import_templates_saved">
         <item quantity="one">已保存候选 %1$d 个</item>
         <item quantity="other">已保存候选 %1$d 个</item>

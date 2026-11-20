@@ -31,7 +31,7 @@ object ProjectBundleExporter {
                     packages.forEach { (id, zip) ->
                         add(buildJsonObject {
                             put("id", id)
-                            put("package", "projects/" + zip.name)
+                            put("path", "projects/" + zip.name)
                             put("bytes", zip.length())
                             put("sha256", ProjectPackage.sha256(zip.readBytes()))
                         })
