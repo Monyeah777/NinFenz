@@ -235,10 +235,6 @@
     <string name="import_csv">CSV table</string>
     <string name="import_csv_copy">Copy as table</string>
     <string name="import_pdf_no_text">No extractable text in this PDF; scanned PDFs need OCR.</string>
-    <string name="import_html_no_text">No readable text found in this HTML.</string>
-    <string name="import_docx_no_text">No readable text found in this DOCX.</string>
-
-    <string name="import_html_failed">HTML import failed: %1$s</string>
     <string name="import_pdf_failed">PDF text extraction failed: %1$s</string>
     <string name="import_pdf_unsupported_fix">Use a Markdown/text/DOCX/EPUB file; PDF export is supported, PDF import is not.</string>
     <string name="import_sample">Sample content</string>
