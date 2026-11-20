@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
-  - protocol/code_metrics_baseline.json:f56e93d90a822540cdbb689ec7115bcaa754ddbb9edfd77da7112293f3879ec2
+  - protocol/code_metrics_baseline.json:78a5cc798bbe614bdedb15c99085da62baf1cfb752eccdade45e7776932796e8
 ---
+> 重审（2026-11-20）：原子写/文档数字/json_doc 收口（2026-11-20）
+
 > 重审（2026-11-20）：json_doc 收敛 + 判据文档/登记表重算（2026-11-20）
 
 > 重审（2026-11-14）：重生成派生面：trust WP-00..12 新增 trust 代码/schema/测试，code_metrics 与审计摘要同步重冻。

@@ -5,11 +5,12 @@ unsupported instead of pretending to parse. No network, no OCR.
 """
 from __future__ import annotations
 
-from core import json_doc
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
+
+from core import json_doc
 
 SCHEMA = "nf-import/1"
 _HEADING = re.compile(r"^(#{1,6})\s+(.+)$", re.MULTILINE)

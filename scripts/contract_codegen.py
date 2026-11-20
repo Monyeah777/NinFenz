@@ -15,12 +15,13 @@ def main(argv=None) -> int:
     ap.add_argument("--lang", choices=("kotlin", "ts"), default="kotlin")
     ap.add_argument("--out", default="", help="write file; default stdout")
     args = ap.parse_args(argv)
+    from core import atomic_write
     from core.research import contract_codegen
     text = (contract_codegen.all_kotlin() if args.lang == "kotlin"
             else contract_codegen.all_typescript())
     if args.out:
         Path(args.out).parent.mkdir(parents=True, exist_ok=True)
-        Path(args.out).write_text(text, encoding="utf-8")
+        atomic_write.write_text(args.out, text)
         print("wrote " + args.out)
     else:
         print(text, end="")

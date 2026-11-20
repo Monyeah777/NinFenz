@@ -14,8 +14,10 @@ subjects:
   - scripts/geo_export.py:7a4200761fb7d79f945a37b557882eb8de968081057068d26a7a144d11d1b527
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:f56e93d90a822540cdbb689ec7115bcaa754ddbb9edfd77da7112293f3879ec2
+  - protocol/code_metrics_baseline.json:78a5cc798bbe614bdedb15c99085da62baf1cfb752eccdade45e7776932796e8
 ---
+> 重审（2026-11-20）：原子写/文档数字/json_doc 收口（2026-11-20）
+
 > 重审（2026-11-20）：json_doc 收敛 + 判据文档/登记表重算（2026-11-20）
 
 > 重审（2026-11-14）：重生成派生面：trust WP-00..12 新增 trust 代码/schema/测试，code_metrics 与审计摘要同步重冻。

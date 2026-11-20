@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:f56e93d90a822540cdbb689ec7115bcaa754ddbb9edfd77da7112293f3879ec2
+  - protocol/code_metrics_baseline.json:78a5cc798bbe614bdedb15c99085da62baf1cfb752eccdade45e7776932796e8
 ---
+> 重审（2026-11-20）：原子写/文档数字/json_doc 收口（2026-11-20）
+
 > 重审（2026-11-20）：json_doc 收敛 + 判据文档/登记表重算（2026-11-20）
 
 > 重审（2026-11-14）：重生成派生面：trust WP-00..12 新增 trust 代码/schema/测试，code_metrics 与审计摘要同步重冻。

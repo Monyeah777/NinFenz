@@ -1541,9 +1541,9 @@
       "max_fn_lines": 33
     },
     "scripts/contract_codegen.py": {
-      "lines": 34,
+      "lines": 35,
       "max_fn_cc": 3,
-      "max_fn_lines": 15
+      "max_fn_lines": 16
     },
     "scripts/core_judge_map.py": {
       "lines": 102,
