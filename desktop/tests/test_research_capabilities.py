@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """研究能力模块单测：PBE/字符串/增量/约束/类型/lineage/effi/属性/协作。"""
+import json
 import sys
 import unittest
 from pathlib import Path
@@ -9,6 +10,7 @@ if str(Path(__file__).resolve().parent.parent / "src") not in sys.path:
 
 from core.research import (
     app_state,
+    app_state_persist,
     collab,
     constraints,
     contract_codegen,
@@ -317,6 +319,38 @@ class AppStateTest(unittest.TestCase):
         s = app_state.Snapshot()
         self.assertFalse(app_state.reduce(s, {"type": "bogus"}).accepted)
         self.assertFalse(app_state.reduce(s, {"type": "edit_slot", "id": "x"}).accepted)
+
+
+class AppStatePersistTest(unittest.TestCase):
+    def test_roundtrip(self):
+        import tempfile
+        s = app_state.Snapshot("ready", "t", (app_state.Slot("a", "1"),),
+                               ("issue",), "r1", False, None, True)
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "state.json"
+            app_state_persist.save(p, s)
+            back = app_state_persist.load(p)
+        self.assertEqual(back, s)
+
+    def test_empty_state_persisted(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "state.json"
+            app_state_persist.save(p, app_state.Snapshot())
+            self.assertEqual(app_state_persist.load(p).status, "empty")
+
+    def test_corrupt_or_bad_schema_fails_closed(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "state.json"
+            p.write_text("{bad", encoding="utf-8")
+            with self.assertRaises(json.JSONDecodeError):
+                app_state_persist.load(p)
+            p.write_text(json.dumps({"schema": "bad"}), encoding="utf-8")
+            with self.assertRaises(ValueError):
+                app_state_persist.load(p)
+            with self.assertRaises(FileNotFoundError):
+                app_state_persist.load(Path(d) / "missing.json")
 
 class ContractsTest(unittest.TestCase):
     def test_import_roundtrip(self):
