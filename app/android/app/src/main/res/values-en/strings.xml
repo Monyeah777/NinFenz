@@ -992,4 +992,5 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="import_image_ocr_failed">Image OCR failed: %1$s</string>
     <string name="import_pdf_ocr_failed">Scanned PDF OCR failed: %1$s</string>
     <string name="import_pdf_ocr_truncated">Scanned PDF OCR covered the first 20 pages only.</string>
+    <string name="settings_bundle_empty">No projects to bundle.</string>
 </resources>

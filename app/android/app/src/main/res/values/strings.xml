@@ -988,4 +988,5 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="import_image_ocr_failed">图片 OCR 失败：%1$s</string>
     <string name="import_pdf_ocr_failed">扫描 PDF OCR 失败：%1$s</string>
     <string name="import_pdf_ocr_truncated">扫描 PDF 仅 OCR 了前 20 页。</string>
+    <string name="settings_bundle_empty">没有可打包的项目。</string>
 </resources>

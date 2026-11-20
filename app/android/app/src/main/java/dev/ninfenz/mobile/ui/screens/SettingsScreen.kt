@@ -164,7 +164,7 @@ fun SettingsScreen(
                         runCatching { dev.ninfenz.mobile.data.ProjectBundleExporter.create(context.filesDir, context.cacheDir) }.getOrNull()
                     }
                     if (created == null) {
-                        backupMessage = context.getString(dev.ninfenz.mobile.R.string.settings_backup_verify_failed, context.getString(dev.ninfenz.mobile.R.string.unknown_reason))
+                        backupMessage = context.getString(dev.ninfenz.mobile.R.string.settings_bundle_empty)
                     } else {
                         val intent = ShareExporter.shareFileIntent(context, created.file, "application/zip", created.file.name)
                         ShareExporter.launchChooser(context, intent, created.file.name)
