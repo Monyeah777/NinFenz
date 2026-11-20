@@ -51,6 +51,7 @@ object EpubImporter {
                 read(zip, path)?.let { HtmlImporter.toMarkdown(embedImages(zip, path, it, budget)) }?.takeIf { it.isNotBlank() }
             }
             if (chapters.isEmpty()) throw IllegalArgumentException("EPUB 无可读章节")
+            require(chapters.sumOf { it.toByteArray(Charsets.UTF_8).size.toLong() } <= 256L * 1024 * 1024) { "EPUB 正文总量超限" }
             val body = chapters.joinToString("\n\n")
             val title = Regex("(?is)<dc:title[^>]*>(.*?)</dc:title>").find(opf)
                 ?.groupValues?.getOrNull(1)
