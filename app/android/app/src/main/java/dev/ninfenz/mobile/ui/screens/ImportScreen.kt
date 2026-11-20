@@ -647,7 +647,8 @@ fun ImportScreen(
                     }
                     val file = FileAccess.copyToCache(context, uri, meta.name)
                     if (meta.name.orEmpty().lowercase().endsWith(".csv") || (meta.mime ?: "").contains("csv", ignoreCase = true)) {
-                        val markdown = CsvTable.toMarkdown(file.readText(Charsets.UTF_8))
+                        val csvText = TextEncoding.decode(file.readBytes())?.text ?: file.readText(Charsets.UTF_8)
+                        val markdown = CsvTable.toMarkdown(csvText)
                         val converted = File(File(context.cacheDir, "imports").apply { mkdirs() }, "csv-table.md")
                         converted.writeText(markdown, Charsets.UTF_8)
                         importFromFile(converted, "saf", "csv-table.md", "text/markdown", markdown.toByteArray(Charsets.UTF_8).size.toLong())
