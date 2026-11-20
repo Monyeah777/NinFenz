@@ -80,7 +80,7 @@ object DocxImporter {
         val refs = mutableListOf<String>()
         val withLinks = Regex("(?is)<w:hyperlink[^>]*r:id=\"([^\"]+)\"[^>]*>(.*?)</w:hyperlink>").replace(para) { m ->
             val target = links[m.groupValues[1]]
-            if (target == null) {
+            if (target == null || !SafeLink.allowed(target)) {
                 m.value
             } else {
                 refs.add("[" + runs(m.groupValues[2], links).trim() + "](" + target + ")")

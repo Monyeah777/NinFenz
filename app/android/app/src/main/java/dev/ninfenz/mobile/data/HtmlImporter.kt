@@ -16,7 +16,9 @@ object HtmlImporter {
         text = Regex("(?is)<style.*?</style>").replace(text, " ")
         text = Regex("(?s)<!--.*?-->").replace(text, " ")
         text = Regex("(?is)<a\\s+[^>]*href=[\"']([^\"']+)[\"'][^>]*>(.*?)</a>").replace(text) { m ->
-            "[" + strip(m.groupValues[2]).trim() + "](" + m.groupValues[1] + ")"
+            val target = m.groupValues[1]
+            if (!SafeLink.allowed(target)) strip(m.groupValues[2]).trim()
+            else "[" + strip(m.groupValues[2]).trim() + "](" + target + ")"
         }
         text = Regex("(?is)<(?:b|strong)[^>]*>(.*?)</(?:b|strong)>").replace(text) { m ->
             "**" + strip(m.groupValues[1]).trim() + "**"

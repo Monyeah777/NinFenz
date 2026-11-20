@@ -17,6 +17,13 @@ class HtmlImporterTest {
     }
 
     @Test
+    fun dropsUnsafeLinkSchemes() {
+        val md = HtmlImporter.toMarkdown("<p><a href=\"javascript:alert(1)\">坏</a></p>")
+        assertTrue(!md.contains("javascript:"))
+        assertTrue(md.contains("坏"))
+    }
+
+    @Test
     fun convertsTablesAndLinks() {
         val md = HtmlImporter.toMarkdown(
             "<table><tr><th>A</th><th>B</th></tr><tr><td>1</td><td>2</td></tr></table>" +
