@@ -3,7 +3,7 @@ package dev.ninfenz.mobile.model
 /** 把 CSV 转为 Markdown 表格；只做结构转换，不推断字段语义。 */
 object CsvTable {
     fun toMarkdown(csv: String): String {
-        val rows = parse(csv)
+        val rows = parse(csv, detectDelimiter(csv))
         if (rows.isEmpty()) return ""
         val width = rows.maxOf { it.size }
         val normalized = rows.map { row -> row + List(width - row.size) { "" } }
@@ -21,7 +21,18 @@ object CsvTable {
     private fun escape(value: String): String =
         value.replace("|", "\\|").replace("\n", "<br>").trim()
 
-    private fun parse(csv: String): List<List<String>> {
+    private fun detectDelimiter(csv: String): Char {
+        val line = csv.lineSequence().firstOrNull { it.isNotBlank() }.orEmpty()
+        var quoted = false
+        val counts = mutableMapOf(',' to 0, ';' to 0, '\t' to 0)
+        line.forEach { c ->
+            if (c == '"') quoted = !quoted
+            if (!quoted && counts.containsKey(c)) counts[c] = (counts[c] ?: 0) + 1
+        }
+        return counts.maxByOrNull { it.value }?.takeIf { it.value > 0 }?.key ?: ','
+    }
+
+    private fun parse(csv: String, delimiter: Char): List<List<String>> {
         val rows = mutableListOf<List<String>>()
         val row = mutableListOf<String>()
         val field = StringBuilder()
@@ -35,7 +46,7 @@ object CsvTable {
                     field.append('"'); i++
                 }
                 c == '"' -> quoted = !quoted
-                c == ',' && !quoted -> {
+                c == delimiter && !quoted -> {
                     row.add(field.toString()); field.clear()
                 }
                 c == '\n' && !quoted -> {
