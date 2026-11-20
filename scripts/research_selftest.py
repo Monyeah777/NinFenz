@@ -28,11 +28,11 @@ def main(argv=None) -> int:
     if args.json:
         print(json.dumps(doc, ensure_ascii=False, indent=2, sort_keys=True))
     else:
-        print("== research 入口自检（%d 项）==" % doc["total"])
+        print(f"== research 入口自检（{doc['total']} 项）==")
         for row in doc["rows"]:
-            print("  %s %-18s %s" % ("OK" if row["ok"] else "NG",
-                                     row["module"], row["detail"]))
-        print("  项 %d · 通过 %d · 未通过 %d" % (doc["total"], doc["passed"], doc["failed"]))
+            mark = "OK" if row["ok"] else "NG"
+            print(f"  {mark} {row['module']:<18} {row['detail']}")
+        print(f"  项 {doc['total']} · 通过 {doc['passed']} · 未通过 {doc['failed']}")
     return 1 if (args.check and doc["failed"]) else 0
 
 
