@@ -1,5 +1,5 @@
 {
-  "digest": "6416b74b8335b7431ab12a5801456b3da92ef7c3b3e8feded376f031f45529f8",
+  "digest": "b6039cef7b964ed018882b256b909f025ceaa23bd46375b05c09f0a1b441f882",
   "entries": [
     {
       "doc": "其余 ABI 调用的判定向量：cc_label（IR 校验）→ 期望结论（跨语言可复核）。",
@@ -184,6 +184,15 @@
       "doc": "提交信息机检（Conventional Commits · 纯标准库）。",
       "flags": [],
       "path": "scripts/commit_msg_check.py",
+      "subcommands": []
+    },
+    {
+      "doc": "Generate Kotlin/TypeScript types from NF App view contracts.",
+      "flags": [
+        "--lang",
+        "--out"
+      ],
+      "path": "scripts/contract_codegen.py",
       "subcommands": []
     },
     {
@@ -411,6 +420,20 @@
         "--rule"
       ],
       "path": "scripts/jcs.py",
+      "subcommands": []
+    },
+    {
+      "doc": "judge 校准 CLI：读 labeled JSONL，输出整体/分类别 kappa 与偏差探针。",
+      "flags": [
+        "--gate",
+        "--json",
+        "--kappa-threshold",
+        "--labeled",
+        "--min-category-n",
+        "--pairwise",
+        "--positive-label"
+      ],
+      "path": "scripts/judge_calibrate.py",
       "subcommands": []
     },
     {
@@ -1001,6 +1024,15 @@
       "subcommands": []
     },
     {
+      "doc": "Research 入口自检（生产面）：真调用 App 门面/导入/PBE/约束/灰度/实验健康。",
+      "flags": [
+        "--check",
+        "--json"
+      ],
+      "path": "scripts/research_selftest.py",
+      "subcommands": []
+    },
+    {
       "doc": "机械文本改写（**默认干跑**）：先给「文件:行号 + 改前 → 改后」对照表，人核后再 --write。",
       "flags": [
         "--check",
@@ -1248,8 +1280,8 @@
       "subcommands": []
     }
   ],
-  "flags": 532,
+  "flags": 543,
   "note": "静态接口面（docs/flags/subcommands），不含缺省行为语义",
   "schema": "nf-capability-inventory/1",
-  "scripts": 80
+  "scripts": 83
 }

@@ -3,10 +3,10 @@
     "app": 1467,
     "entry": 26,
     "floor": 5,
-    "prod": 1057,
+    "prod": 1058,
     "projection": 166,
-    "support": 461,
-    "verify": 1316
+    "support": 486,
+    "verify": 1318
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -6365,6 +6365,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "LLM-as-judge 校准：judge 与 human 的一致性、分类别可靠度、位置/长度偏差。",
+      "path": "desktop/src/core/judge_calibration.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "判据接线覆盖（静态可核验 / 架构纯度面 · 顶层化补维）。",
       "path": "desktop/src/core/judgement_coverage.py",
       "role": "verify",
@@ -9191,6 +9197,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "judge 校准单测：整体/分类别 kappa、样本量门、位置/长度偏差、fail-closed。",
+      "path": "desktop/tests/test_judge_calibration.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "判据的时钟纯度：测试里读「此刻」必须登记理由（防跨日假红）。",
       "path": "desktop/tests/test_judge_clock_purity.py",
       "role": "verify",
@@ -10513,6 +10525,12 @@
     {
       "function": "requirements-pins 契约判据：hash 完备、生成可复现、跨文件版本一致（2026-11-11）。",
       "path": "desktop/tests/test_requirements_pins_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "研究能力模块单测：PBE/字符串/增量/约束/类型/lineage/effi/属性/协作。",
+      "path": "desktop/tests/test_research_capabilities.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -14280,17 +14298,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "dcdc343c902d96233eec6c73f8438a47a6e220979acbaf342146bbd242a31e02",
+  "root_digest": "707700beb33954c31fa5a04f2516323b8bef6a3725e36bea9c1fc9d178aa4e31",
   "rule_counts": {
     "R-app": 1467,
-    "R-catch": 309,
+    "R-catch": 334,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 146,
     "R-support": 124,
-    "R-verify": 1190,
-    "auto:R-core": 287
+    "R-verify": 1192,
+    "auto:R-core": 288
   },
   "schema": "nf-role-coordinates/1"
 }

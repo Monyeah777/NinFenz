@@ -18,13 +18,17 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:b8d793a9fcfec426276f177671af4d4f0e65d9b3b024002a9faa73b04e75d50d
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:f99c280da5393b177a6729cdf7067f66a372cbacf9c8603bc1f1ab1955809c31
-  - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
+  - protocol/check12_weights.json:115ffce907f4c27d960e090894fba94aeca8d4861debce80364d3cb43cc9ecfc
+  - protocol/coupling_baseline.json:f2e5039e012c37f0691972e86c14bf36ff613a3bb925b07620a4cb6581d0bb26
   - docs/meta-cockpit/README.md:fa00a7fd014857af56e11f38ced1b7d888be053befaadb10b3dd494d27884316
   - docs/meta-cockpit/功能解析.md:de20c2340d19d541bcfde53f222a3acf22a6e440d8fb3dcf51a37aedf53c0c25
   - results/meta-cockpit-manifest.json:60c0e100798e49d393557ae5066c02d7e057ec27f386ee1a36ca3fc7740150ba
 
 ---
+> 重审（2026-11-20）：research 入口接线后的基线/权重/坐标重算（2026-11-20）
+
+> 重审（2026-11-20）：research 入口接线（runtime/research_selftest）+ 耦合基线重算（2026-11-20）
+
 > 重审（2026-11-14）：WP-11 trust bundle 入仓（机械重绑）
 
 > 重审（2026-11-14）：WP-10 trust canonical/entity 入仓（机械重绑）
