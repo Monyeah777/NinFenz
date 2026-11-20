@@ -320,7 +320,7 @@ fun ImportScreen(
                     ).error
                     return
                 }
-                File(file.parentFile, "pdf-import.md").apply { writeText(markdown, Charsets.UTF_8) }
+                File(file.parentFile, "pdf-import-" + System.nanoTime() + ".md").apply { writeText(markdown, Charsets.UTF_8) }
             }
             isDocx -> {
                 val markdown = runCatching { DocxImporter.extract(file) }.getOrNull()?.takeIf { it.isNotBlank() }
@@ -333,7 +333,7 @@ fun ImportScreen(
                     ).error
                     return
                 }
-                File(file.parentFile, "docx-import.md").apply { writeText(markdown, Charsets.UTF_8) }
+                File(file.parentFile, "docx-import-" + System.nanoTime() + ".md").apply { writeText(markdown, Charsets.UTF_8) }
             }
             isEpub -> {
                 val markdown = runCatching { EpubImporter.extract(file) }.getOrNull()?.takeIf { it.isNotBlank() }
@@ -346,12 +346,12 @@ fun ImportScreen(
                     ).error
                     return
                 }
-                File(file.parentFile, "epub-import.md").apply { writeText(markdown, Charsets.UTF_8) }
+                File(file.parentFile, "epub-import-" + System.nanoTime() + ".md").apply { writeText(markdown, Charsets.UTF_8) }
             }
             isHtml -> {
                 val raw = HtmlImporter.decode(file.readBytes())
                 val markdown = HtmlImporter.toMarkdown(raw)
-                File(file.parentFile, "html-import.md").apply { writeText(markdown, Charsets.UTF_8) }
+                File(file.parentFile, "html-import-" + System.nanoTime() + ".md").apply { writeText(markdown, Charsets.UTF_8) }
             }
             isText -> TextEncoding.toUtf8(file) ?: file
             else -> file
