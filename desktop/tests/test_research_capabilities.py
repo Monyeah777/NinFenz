@@ -10,6 +10,7 @@ if str(Path(__file__).resolve().parent.parent / "src") not in sys.path:
 from core.research import (
     collab,
     constraints,
+    contracts,
     experiment_health,
     feature_gate,
     incremental,
@@ -250,6 +251,25 @@ class TierGateTest(unittest.TestCase):
         self.assertTrue(tier_gate.check("studio", "studio_inspect")["allowed"])
         self.assertTrue(tier_gate.check("tui", "tui_inspect")["allowed"])
         self.assertFalse(tier_gate.check("free", "studio_inspect")["allowed"])
+
+
+class ContractsTest(unittest.TestCase):
+    def test_import_roundtrip(self):
+        view = contracts.ImportView(
+            "ready", "t", (contracts.SlotView("GOAL", "目标", "v"),),
+            ("issue",), "r1", 2)
+        back = contracts.ImportView.from_dict(view.to_dict())
+        self.assertEqual(back, view)
+
+    def test_project_roundtrip(self):
+        p = contracts.ProjectSummary("p1", "t", "ready", 4, "r1")
+        self.assertEqual(contracts.ProjectSummary.from_dict(p.to_dict()), p)
+
+    def test_bad_schema_rejected(self):
+        with self.assertRaises(ValueError):
+            contracts.ImportView.from_dict({"schema": "bad"})
+        with self.assertRaises(ValueError):
+            contracts.ProjectSummary.from_dict({"schema": "bad"})
 
 class CollabTest(unittest.TestCase):
     def test_confirmation_and_visibility(self):

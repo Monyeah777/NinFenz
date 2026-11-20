@@ -345,6 +345,10 @@
       "referenced": false
     },
     {
+      "module": "contracts",
+      "referenced": true
+    },
+    {
       "module": "control",
       "referenced": true
     },
@@ -1497,9 +1501,9 @@
       "referenced": true
     }
   ],
-  "modules": 374,
+  "modules": 375,
   "note": "粗粒度名字匹配（代理指标），不做导入图分析",
-  "referenced": 344,
+  "referenced": 345,
   "schema": "nf-core-judge-map/1",
   "unreferenced": 30
 }
