@@ -9,8 +9,12 @@ subjects:
   - desktop/src/core/io_types.py:09296daf865db85bda582fb646cece708c51f97e190a9e91c0eecd07252475f7
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
   - desktop/src/core/knowledge.py:d0b678c0f1176ce6f16a33b6f6d42a16b663099b4346306fae1ea547305e316b
-  - protocol/code_metrics_baseline.json:fc99d894ab07d8698a9aa8e81206f8fda0dc6937a0560d4f0a6676125525b8a0
+  - protocol/code_metrics_baseline.json:78a5cc798bbe614bdedb15c99085da62baf1cfb752eccdade45e7776932796e8
 ---
+> 重审（2026-11-20）：原子写/文档数字/json_doc 收口（2026-11-20）
+
+> 重审（2026-11-20）：json_doc 收敛 + 判据文档/登记表重算（2026-11-20）
+
 > 重审（2026-11-14）：重生成派生面：trust WP-00..12 新增 trust 代码/schema/测试，code_metrics 与审计摘要同步重冻。
 
 > 重审（2026-11-14）：WP-11 trust bundle 入仓（机械重绑）

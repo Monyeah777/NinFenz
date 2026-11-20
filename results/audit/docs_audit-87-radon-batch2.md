@@ -8,8 +8,12 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:fc99d894ab07d8698a9aa8e81206f8fda0dc6937a0560d4f0a6676125525b8a0
+  - protocol/code_metrics_baseline.json:78a5cc798bbe614bdedb15c99085da62baf1cfb752eccdade45e7776932796e8
 ---
+> 重审（2026-11-20）：原子写/文档数字/json_doc 收口（2026-11-20）
+
+> 重审（2026-11-20）：json_doc 收敛 + 判据文档/登记表重算（2026-11-20）
+
 > 重审（2026-11-14）：重生成派生面：trust WP-00..12 新增 trust 代码/schema/测试，code_metrics 与审计摘要同步重冻。
 
 > 重审（2026-11-14）：WP-11 trust bundle 入仓（机械重绑）
