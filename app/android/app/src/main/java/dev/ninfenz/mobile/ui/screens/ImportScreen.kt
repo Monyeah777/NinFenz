@@ -302,14 +302,19 @@ fun ImportScreen(
         suggestNote = null
         acceptedMappings = emptySet()
         val isPdf = name.endsWith(".pdf", true) || (mime ?: "").contains("pdf", ignoreCase = true)
+        val isCsv = name.endsWith(".csv", true) || name.endsWith(".tsv", true) || (mime ?: "").contains("csv", ignoreCase = true) || (mime ?: "").contains("tab-separated", ignoreCase = true)
         val isImage = (mime ?: "").startsWith("image/") || listOf(".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp").any { name.endsWith(it, true) }
         val isDocx = name.endsWith(".docx", true) || mime == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         val isEpub = name.endsWith(".epub", true) || mime == "application/epub+zip" ||
             ((name.endsWith(".zip", true) || mime == "application/zip") && EpubImporter.isEpub(file))
         val isHtml = !isEpub && !isDocx && !isPdf && (name.endsWith(".html", true) || name.endsWith(".htm", true) || mime == "text/html")
-        val isText = !isEpub && !isDocx && !isHtml && !isPdf && !isImage && (name.endsWith(".txt", true) || name.endsWith(".md", true) ||
+        val isText = !isEpub && !isDocx && !isHtml && !isPdf && !isImage && !isCsv && (name.endsWith(".txt", true) || name.endsWith(".md", true) ||
             name.endsWith(".markdown", true) || mime?.startsWith("text/") == true)
         val sourceFile = when {
+            isCsv -> {
+                val markdown = CsvTable.toMarkdown(TextEncoding.decodeText(file.readBytes()))
+                File(file.parentFile, "csv-import-" + System.nanoTime() + ".md").apply { writeText(markdown, Charsets.UTF_8) }
+            }
             isImage -> {
                 error = CoreResponse.failure(
                     "NF-IMP-004",
@@ -646,16 +651,7 @@ fun ImportScreen(
                         return@launch
                     }
                     val file = FileAccess.copyToCache(context, uri, meta.name)
-                    if (meta.name.orEmpty().lowercase().endsWith(".csv") || (meta.mime ?: "").contains("csv", ignoreCase = true)) {
-                        val csvText = TextEncoding.decodeText(file.readBytes())
-                        val markdown = CsvTable.toMarkdown(csvText)
-                        val converted = File(File(context.cacheDir, "imports").apply { mkdirs() }, "csv-table.md")
-                        converted.writeText(markdown, Charsets.UTF_8)
-                        importFromFile(converted, "saf", "csv-table.md", "text/markdown", markdown.toByteArray(Charsets.UTF_8).size.toLong())
-                        file.delete()
-                    } else {
-                        importFromFile(file, "saf", meta.name, meta.mime, meta.size)
-                    }
+                    importFromFile(file, "saf", meta.name, meta.mime, meta.size)
                 } catch (e: Exception) {
                     error = CoreResponse.failure(
                         "NF-E-004",
