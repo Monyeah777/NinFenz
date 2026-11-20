@@ -1,12 +1,29 @@
 package dev.ninfenz.mobile.data
 
 import java.nio.file.Files
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 import java.util.zip.ZipFile
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class ProjectBundleImporterTest {
+    @Test(expected = IllegalArgumentException::class)
+    fun rejectsTamperedEntry() {
+        val root = Files.createTempDirectory("nf-bundle-bad").toFile()
+        val bundle = java.io.File(root, "bad.zip")
+        ZipOutputStream(bundle.outputStream()).use { out ->
+            out.putNextEntry(ZipEntry("nf-bundle.json"))
+            out.write(("{\"schema\":\"nf-bundle/1\",\"projects\":[{\"path\":\"p.zip\",\"sha256\":\"00\"}]}").toByteArray())
+            out.closeEntry()
+            out.putNextEntry(ZipEntry("p.zip"))
+            out.write(byteArrayOf(1, 2, 3))
+            out.closeEntry()
+        }
+        ProjectBundleImporter.import(root, bundle)
+    }
+
     @Test
     fun importsAllProjects() {
         val source = Files.createTempDirectory("nf-bundle-source").toFile()
