@@ -17,6 +17,13 @@ class CsvTableTest {
     }
 
     @Test
+    fun delimiterDetectionIgnoresQuotedCommas() {
+        val table = CsvTable.toMarkdown("\"a,b\";c\n1;2")
+        assertTrue(table.startsWith("| a,b | c |"))
+        assertTrue(table.contains("| 1 | 2 |"))
+    }
+
+    @Test
     fun convertsQuotedCsv() {
         val table = CsvTable.toMarkdown("name,note\nA,\"x,y\"\nB,z")
         assertTrue(table.startsWith("| name | note |"))
