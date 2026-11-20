@@ -25,6 +25,10 @@
       "referenced": true
     },
     {
+      "module": "app_state",
+      "referenced": true
+    },
+    {
       "module": "approval",
       "referenced": true
     },
@@ -1505,9 +1509,9 @@
       "referenced": true
     }
   ],
-  "modules": 376,
+  "modules": 377,
   "note": "粗粒度名字匹配（代理指标），不做导入图分析",
-  "referenced": 346,
+  "referenced": 347,
   "schema": "nf-core-judge-map/1",
   "unreferenced": 30
 }

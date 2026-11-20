@@ -8,6 +8,7 @@ if str(Path(__file__).resolve().parent.parent / "src") not in sys.path:
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
 from core.research import (
+    app_state,
     collab,
     constraints,
     contract_codegen,
@@ -282,6 +283,40 @@ class TierGateTest(unittest.TestCase):
         self.assertTrue(tier_gate.check("tui", "tui_inspect")["allowed"])
         self.assertFalse(tier_gate.check("free", "studio_inspect")["allowed"])
 
+
+
+class AppStateTest(unittest.TestCase):
+    def test_import_edit_export(self):
+        s = app_state.Snapshot()
+        s = app_state.reduce(s, {"type": "import_succeeded", "title": "t",
+                                 "slots": [{"id": "a", "value": "1"}]}).snapshot
+        self.assertEqual(s.status, "ready")
+        s = app_state.reduce(s, {"type": "edit_slot", "id": "a", "value": "2"}).snapshot
+        self.assertEqual(s.slots[0].value, "2")
+        s = app_state.reduce(s, {"type": "export_requested"}).snapshot
+        self.assertTrue(s.exported)
+
+    def test_invalid_export_rejected(self):
+        s = app_state.Snapshot("ready", "t", (app_state.Slot("a", "1"),),
+                               ("bad",))
+        step = app_state.reduce(s, {"type": "export_requested"})
+        self.assertFalse(step.accepted)
+        self.assertFalse(step.snapshot.exported)
+        self.assertEqual(step.error, "invalid")
+
+    def test_reset_and_undo(self):
+        s = app_state.Snapshot("ready", "t", (app_state.Slot("a", "1"),))
+        s = app_state.reduce(s, {"type": "edit_slot", "id": "a", "value": "2"}).snapshot
+        s = app_state.reduce(s, {"type": "undo"}).snapshot
+        self.assertEqual(s.slots[0].value, "1")
+        s = app_state.reduce(s, {"type": "reset"}).snapshot
+        self.assertEqual(s.status, "empty")
+        self.assertEqual(s.slots, ())
+
+    def test_unknown_events_fail_closed(self):
+        s = app_state.Snapshot()
+        self.assertFalse(app_state.reduce(s, {"type": "bogus"}).accepted)
+        self.assertFalse(app_state.reduce(s, {"type": "edit_slot", "id": "x"}).accepted)
 
 class ContractsTest(unittest.TestCase):
     def test_import_roundtrip(self):
