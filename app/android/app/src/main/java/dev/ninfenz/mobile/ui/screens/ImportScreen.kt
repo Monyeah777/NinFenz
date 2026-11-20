@@ -316,13 +316,27 @@ fun ImportScreen(
                 File(file.parentFile, "csv-import-" + System.nanoTime() + ".md").apply { writeText(markdown, Charsets.UTF_8) }
             }
             isImage -> {
-                error = CoreResponse.failure(
-                    "NF-IMP-004",
-                    context.getString(dev.ninfenz.mobile.R.string.import_image_ocr_required),
-                    context.getString(dev.ninfenz.mobile.R.string.import_image_ocr_required_fix),
-                    3
-                ).error
-                return
+                val extraction = runCatching { dev.ninfenz.mobile.data.ImageOcrImporter.extract(context, file) }
+                if (extraction.isFailure) {
+                    error = CoreResponse.failure(
+                        "NF-IMP-004",
+                        context.getString(dev.ninfenz.mobile.R.string.import_image_ocr_failed, extraction.exceptionOrNull()?.message ?: "unknown"),
+                        context.getString(dev.ninfenz.mobile.R.string.import_image_ocr_required_fix),
+                        3
+                    ).error
+                    return
+                }
+                val markdown = extraction.getOrNull()?.takeIf { it.isNotBlank() }
+                if (markdown == null) {
+                    error = CoreResponse.failure(
+                        "NF-IMP-004",
+                        context.getString(dev.ninfenz.mobile.R.string.import_image_ocr_required),
+                        context.getString(dev.ninfenz.mobile.R.string.import_image_ocr_required_fix),
+                        3
+                    ).error
+                    return
+                }
+                File(file.parentFile, "image-ocr-" + System.nanoTime() + ".md").apply { writeText(markdown, Charsets.UTF_8) }
             }
             isPdf -> {
                 val extraction = runCatching { dev.ninfenz.mobile.data.PdfTextImporter.extract(context, file) }
