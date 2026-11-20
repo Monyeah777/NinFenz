@@ -338,7 +338,10 @@ fun ImportScreen(
                         ).error
                         return
                     }
-                    markdown = ocr.getOrNull()?.takeIf { it.isNotBlank() }
+                    markdown = ocr.getOrNull()?.text?.takeIf { it.isNotBlank() }
+                    if (ocr.getOrNull()?.truncated == true) {
+                        notice = context.getString(dev.ninfenz.mobile.R.string.import_pdf_ocr_truncated)
+                    }
                 }
                 if (markdown == null) {
                     error = CoreResponse.failure(

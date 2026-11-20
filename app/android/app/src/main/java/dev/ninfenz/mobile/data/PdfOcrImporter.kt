@@ -11,14 +11,15 @@ import java.io.File
 /** 扫描 PDF 的兜底 OCR：逐页渲染后识别，限制页数避免无限等待。 */
 object PdfOcrImporter {
     private const val MAX_PAGES = 20
+    data class Result(val text: String, val pages: Int, val truncated: Boolean)
 
-    fun extract(context: Context, file: File): String {
+    fun extract(context: Context, file: File): Result {
         require(file.isFile && file.length() in 1..(25L * 1024 * 1024)) { "PDF 文件为空或超过 25MB" }
         PDFBoxResourceLoader.init(context.applicationContext)
         PDDocument.load(file, MemoryUsageSetting.setupTempFileOnly()).use { document ->
             require(!document.isEncrypted) { "PDF 已加密" }
             val pages = minOf(document.numberOfPages, MAX_PAGES)
-            if (pages <= 0) return ""
+            if (pages <= 0) return Result("", 0, false)
             val renderer = PDFRenderer(document)
             val recognizer = ImageOcrImporter.newRecognizer()
             val text = StringBuilder()
@@ -35,7 +36,7 @@ object PdfOcrImporter {
             } finally {
                 recognizer.close()
             }
-            return text.toString().trim()
+            return Result(text.toString().trim(), pages, document.numberOfPages > MAX_PAGES)
         }
     }
 }
