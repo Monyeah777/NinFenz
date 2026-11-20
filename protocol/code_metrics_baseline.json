@@ -680,6 +680,11 @@
       "max_fn_cc": 10,
       "max_fn_lines": 32
     },
+    "desktop/src/core/judge_calibration.py": {
+      "lines": 143,
+      "max_fn_cc": 6,
+      "max_fn_lines": 49
+    },
     "desktop/src/core/judgement_coverage.py": {
       "lines": 116,
       "max_fn_cc": 11,
@@ -1535,6 +1540,11 @@
       "max_fn_cc": 9,
       "max_fn_lines": 33
     },
+    "scripts/contract_codegen.py": {
+      "lines": 34,
+      "max_fn_cc": 3,
+      "max_fn_lines": 15
+    },
     "scripts/core_judge_map.py": {
       "lines": 102,
       "max_fn_cc": 7,
@@ -1640,13 +1650,18 @@
       "max_fn_cc": 15,
       "max_fn_lines": 42
     },
+    "scripts/judge_calibrate.py": {
+      "lines": 84,
+      "max_fn_cc": 10,
+      "max_fn_lines": 43
+    },
     "scripts/judge_mutation_probe.py": {
       "lines": 249,
       "max_fn_cc": 8,
       "max_fn_lines": 55
     },
     "scripts/judge_red_evidence.py": {
-      "lines": 150,
+      "lines": 151,
       "max_fn_cc": 7,
       "max_fn_lines": 39
     },
@@ -1734,6 +1749,11 @@
       "lines": 1080,
       "max_fn_cc": 60,
       "max_fn_lines": 241
+    },
+    "scripts/research_selftest.py": {
+      "lines": 43,
+      "max_fn_cc": 6,
+      "max_fn_lines": 15
     },
     "scripts/rewrite_text.py": {
       "lines": 136,

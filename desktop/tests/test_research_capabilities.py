@@ -447,5 +447,17 @@ class CollabTest(unittest.TestCase):
         self.assertEqual(s.controlled_autonomy()["interventions"], 1)
 
 
+class SelftestEntryTest(unittest.TestCase):
+    """生产入口：scripts/research_selftest.py 必须可跑通（否则入口=摆设）。"""
+
+    def test_script_check_passes(self):
+        import subprocess
+        root = Path(__file__).resolve().parents[2]
+        proc = subprocess.run(
+            [sys.executable, str(root / "scripts" / "research_selftest.py"), "--check"],
+            cwd=root, capture_output=True, text=True)
+        self.assertEqual(0, proc.returncode, proc.stdout + proc.stderr)
+
+
 if __name__ == "__main__":
     unittest.main()

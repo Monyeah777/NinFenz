@@ -1265,6 +1265,10 @@
       "referenced": true
     },
     {
+      "module": "runtime",
+      "referenced": true
+    },
+    {
       "module": "runtime_executor",
       "referenced": true
     },
@@ -1521,9 +1525,9 @@
       "referenced": true
     }
   ],
-  "modules": 380,
+  "modules": 381,
   "note": "粗粒度名字匹配（代理指标），不做导入图分析",
-  "referenced": 350,
+  "referenced": 351,
   "schema": "nf-core-judge-map/1",
   "unreferenced": 30
 }

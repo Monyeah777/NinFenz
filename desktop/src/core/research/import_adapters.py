@@ -5,7 +5,7 @@ unsupported instead of pretending to parse. No network, no OCR.
 """
 from __future__ import annotations
 
-import json
+from core import json_doc
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -55,9 +55,9 @@ def sniff(name: str, data: bytes) -> dict[str, Any]:
         return {"format": "markdown", "confidence": 0.99, "supported": True}
     if ext == ".json" or text.lstrip().startswith(("{", "[")):
         try:
-            json.loads(text)
+            json_doc.loads(text, (dict, list), what="导入文档")
             return {"format": "json", "confidence": 0.98, "supported": True}
-        except json.JSONDecodeError:
+        except ValueError:
             if ext == ".json":
                 return {"format": "json", "confidence": 0.7,
                         "supported": True, "warning": "json_parse_failed"}
@@ -79,12 +79,12 @@ def normalize(name: str, data: bytes) -> ImportDoc:
         doc.warnings.append(info["warning"])
     try:
         if info["format"] == "json":
-            parsed = json.loads(text)
+            parsed = json_doc.loads(text, (dict, list), what="导入文档")
             doc.structure = [{"kind": "json", "type": type(parsed).__name__}]
         elif info["format"] == "markdown":
             doc.structure = [{"kind": "heading", "level": len(m.group(1)),
                               "title": m.group(2).strip()}
                              for m in _HEADING.finditer(text)]
-    except json.JSONDecodeError:
+    except ValueError:
         doc.warnings.append("json_parse_failed")
     return doc
