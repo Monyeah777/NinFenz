@@ -9,7 +9,7 @@ object EpubImporter {
     fun isEpub(file: File): Boolean = try {
         ZipFile(file).use { zip ->
             val mime = zip.getEntry("mimetype")?.let { entry ->
-                zip.getInputStream(entry).use { String(it.readBytes(), Charsets.US_ASCII).trim() }
+                zip.getInputStream(entry).use { String(readLimited(it, 1024), Charsets.US_ASCII).trim() }
             }
             mime == "application/epub+zip" || zip.getEntry("META-INF/container.xml") != null
         }
