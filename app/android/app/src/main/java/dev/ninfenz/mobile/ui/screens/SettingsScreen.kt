@@ -158,6 +158,20 @@ fun SettingsScreen(
                         else context.getString(dev.ninfenz.mobile.R.string.settings_backup_verify_failed, checked.error ?: context.getString(dev.ninfenz.mobile.R.string.unknown_reason))
                 }
             }) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_backup_export)) }
+            OutlinedButton(onClick = {
+                scope.launch {
+                    val created = withContext(Dispatchers.IO) {
+                        runCatching { dev.ninfenz.mobile.data.ProjectBundleExporter.create(context.filesDir, context.cacheDir) }.getOrNull()
+                    }
+                    if (created == null) {
+                        backupMessage = context.getString(dev.ninfenz.mobile.R.string.settings_backup_verify_failed, context.getString(dev.ninfenz.mobile.R.string.unknown_reason))
+                    } else {
+                        val intent = ShareExporter.shareFileIntent(context, created.file, "application/zip", created.file.name)
+                        ShareExporter.launchChooser(context, intent, created.file.name)
+                        backupMessage = context.resources.getQuantityString(dev.ninfenz.mobile.R.plurals.settings_bundle_done, created.count, created.count)
+                    }
+                }
+            }) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_bundle_export)) }
             backupMessage?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary) }
             OutlinedButton(onClick = {
                 restorePicker.launch(arrayOf("application/zip", "*/*"))

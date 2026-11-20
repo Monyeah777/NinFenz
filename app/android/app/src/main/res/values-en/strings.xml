@@ -809,6 +809,11 @@
     </plurals>
     <string name="project_history_title">Status history</string>
     <string name="settings_backup_export">Export local backup</string>
+    <string name="settings_bundle_export">Export all project packages</string>
+    <plurals name="settings_bundle_done">
+        <item quantity="one">Bundled %d project package</item>
+        <item quantity="other">Bundled %d project packages</item>
+    </plurals>
     <plurals name="settings_backup_done">
         <item quantity="one">Backup created: %1$d file · %2$s</item>
         <item quantity="other">Backup created: %1$d files · %2$s</item>
