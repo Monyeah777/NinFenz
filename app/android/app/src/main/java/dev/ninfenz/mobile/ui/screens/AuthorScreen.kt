@@ -290,7 +290,14 @@ private fun ProtocolAuthorContent(
             if (!file.isFile) return@runCatching emptyMap<String, String>()
             val byName = dev.ninfenz.mobile.data.TemplateProtocolPrefill.parse(file.readText(Charsets.UTF_8))
             protocol.fields.mapNotNull { field ->
-                byName[field.label]?.takeIf { it.isNotBlank() }?.let { field.id to it }
+                val value = byName[field.label]?.takeIf { it.isNotBlank() } ?: return@mapNotNull null
+                val allowed = when {
+                    field.type == "enum" -> value in field.options
+                    field.maxLen != null && value.length > field.maxLen -> false
+                    field.pattern != null && !runCatching { Regex(field.pattern).matches(value) }.getOrDefault(false) -> false
+                    else -> true
+                }
+                if (allowed) field.id to value else null
             }.toMap()
         }.getOrDefault(emptyMap())
     }
