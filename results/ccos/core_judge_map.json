@@ -25,6 +25,18 @@
       "referenced": true
     },
     {
+      "module": "app_facade",
+      "referenced": true
+    },
+    {
+      "module": "app_state",
+      "referenced": true
+    },
+    {
+      "module": "app_state_persist",
+      "referenced": true
+    },
+    {
       "module": "approval",
       "referenced": true
     },
@@ -273,6 +285,10 @@
       "referenced": true
     },
     {
+      "module": "collab",
+      "referenced": true
+    },
+    {
       "module": "commit_title_guard",
       "referenced": true
     },
@@ -317,11 +333,19 @@
       "referenced": true
     },
     {
+      "module": "constraints",
+      "referenced": true
+    },
+    {
       "module": "content_face",
       "referenced": true
     },
     {
       "module": "context_pack",
+      "referenced": true
+    },
+    {
+      "module": "contract_codegen",
       "referenced": true
     },
     {
@@ -335,6 +359,10 @@
     {
       "module": "contract_text",
       "referenced": false
+    },
+    {
+      "module": "contracts",
+      "referenced": true
     },
     {
       "module": "control",
@@ -481,6 +509,10 @@
       "referenced": true
     },
     {
+      "module": "experiment_health",
+      "referenced": true
+    },
+    {
       "module": "export_schema",
       "referenced": true
     },
@@ -494,6 +526,10 @@
     },
     {
       "module": "face_key",
+      "referenced": true
+    },
+    {
+      "module": "feature_gate",
       "referenced": true
     },
     {
@@ -621,7 +657,15 @@
       "referenced": true
     },
     {
+      "module": "import_adapters",
+      "referenced": true
+    },
+    {
       "module": "import_graph",
+      "referenced": true
+    },
+    {
+      "module": "incremental",
       "referenced": true
     },
     {
@@ -705,6 +749,10 @@
       "referenced": true
     },
     {
+      "module": "judge_calibration",
+      "referenced": true
+    },
+    {
       "module": "judgement_coverage",
       "referenced": true
     },
@@ -758,6 +806,10 @@
     },
     {
       "module": "license_gate",
+      "referenced": true
+    },
+    {
+      "module": "lineage",
       "referenced": true
     },
     {
@@ -989,6 +1041,10 @@
       "referenced": true
     },
     {
+      "module": "pbe",
+      "referenced": true
+    },
+    {
       "module": "perf_budget",
       "referenced": true
     },
@@ -1053,6 +1109,10 @@
       "referenced": true
     },
     {
+      "module": "property_check",
+      "referenced": true
+    },
+    {
       "module": "prose_lint",
       "referenced": true
     },
@@ -1066,6 +1126,10 @@
     },
     {
       "module": "protocol_wizard",
+      "referenced": true
+    },
+    {
+      "module": "provenance",
       "referenced": true
     },
     {
@@ -1201,6 +1265,10 @@
       "referenced": true
     },
     {
+      "module": "runtime",
+      "referenced": true
+    },
+    {
       "module": "runtime_executor",
       "referenced": true
     },
@@ -1281,6 +1349,14 @@
       "referenced": true
     },
     {
+      "module": "smt_constraints",
+      "referenced": true
+    },
+    {
+      "module": "solver_policy",
+      "referenced": true
+    },
+    {
       "module": "source_excerpts",
       "referenced": false
     },
@@ -1306,6 +1382,10 @@
     },
     {
       "module": "strict_schema",
+      "referenced": true
+    },
+    {
+      "module": "strings",
       "referenced": true
     },
     {
@@ -1349,6 +1429,10 @@
       "referenced": false
     },
     {
+      "module": "tier_gate",
+      "referenced": true
+    },
+    {
       "module": "timestamp",
       "referenced": true
     },
@@ -1370,6 +1454,10 @@
     },
     {
       "module": "trust_boundary",
+      "referenced": true
+    },
+    {
+      "module": "typed_template",
       "referenced": true
     },
     {
@@ -1437,9 +1525,9 @@
       "referenced": true
     }
   ],
-  "modules": 359,
+  "modules": 381,
   "note": "粗粒度名字匹配（代理指标），不做导入图分析",
-  "referenced": 329,
+  "referenced": 351,
   "schema": "nf-core-judge-map/1",
   "unreferenced": 30
 }
