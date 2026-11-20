@@ -488,7 +488,7 @@ fun ImportScreen(
         error = null
         notice = null
         try {
-            val text = withContext(Dispatchers.IO) { dev.ninfenz.mobile.data.DocxTextImporter.extract(file) }
+            val text = withContext(Dispatchers.IO) { dev.ninfenz.mobile.data.DocxImporter.extract(file) }
             if (text.isBlank()) {
                 error = CoreResponse.failure(
                     "NF-IMP-004",
