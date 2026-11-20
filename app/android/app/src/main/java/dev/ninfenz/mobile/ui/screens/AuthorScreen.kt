@@ -284,12 +284,23 @@ private fun ProtocolAuthorContent(
             dev.ninfenz.mobile.data.ImportPrefill.fromJson(file.readText(Charsets.UTF_8))
         }.getOrDefault(emptyMap())
     }
+    val templatePrefill = remember(project.id, artifacts.protocolJson) {
+        runCatching {
+            val file = java.io.File(java.io.File(java.io.File(context.filesDir, "projects"), project.id), "authoring/template.md")
+            if (!file.isFile) return@runCatching emptyMap<String, String>()
+            val byName = Regex("(?m)^- (SLT-\\S+) (.+?)(?:（[^）]*）)?[：:](.+)$").findAll(file.readText(Charsets.UTF_8))
+                .associate { m -> m.groupValues[2].trim() to m.groupValues[3].trim() }
+            protocol.fields.mapNotNull { field ->
+                byName[field.label]?.takeIf { it.isNotBlank() }?.let { field.id to it }
+            }.toMap()
+        }.getOrDefault(emptyMap())
+    }
     data class Snapshot(val values: Map<String, String>, val enabled: Map<String, Boolean>)
     val draftStore = remember { ProtocolDraftStore(context.filesDir) }
     val draft = remember(project.id, artifacts.protocolJson) { draftStore.load(project.id) }
     var values by remember(artifacts.protocolJson) {
         mutableStateOf(protocol.fields.associate {
-            it.id to (draft?.values?.get(it.id) ?: importPrefill[it.id] ?: it.defaultText ?: "")
+            it.id to (draft?.values?.get(it.id) ?: importPrefill[it.id] ?: templatePrefill[it.id] ?: it.defaultText ?: "")
         })
     }
     var enabled by remember(artifacts.protocolJson) {
