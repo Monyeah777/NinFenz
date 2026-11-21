@@ -100,6 +100,8 @@ import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.intOrNull
+import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
@@ -142,6 +144,7 @@ fun ImportScreen(
     }
     var acceptedMappings by remember { mutableStateOf<Set<Int>>(emptySet()) }
     var suggestNote by remember { mutableStateOf<String?>(null) }
+    var zeroSliceNote by remember { mutableStateOf<String?>(null) }
     val importHistory = remember { ImportHistoryStore(context.filesDir) }
     val importDraftStore = remember { ImportDraftStore(context.filesDir) }
     val templateStore = remember { TemplateCandidateStore(context.filesDir) }
@@ -555,6 +558,34 @@ fun ImportScreen(
         }
     }
 
+    fun runZeroSlice() {
+        val text = doc?.text
+        if (text.isNullOrBlank()) {
+            zeroSliceNote = context.getString(dev.ninfenz.mobile.R.string.import_zero_slice_failed, "无文本")
+            return
+        }
+        scope.launch {
+            val pack = packs.firstOrNull()
+            val spec = pack?.let { entry ->
+                runCatching {
+                    J.parseObject(java.io.File(entry.dir, "spec/main.nfspec.json").readText(Charsets.UTF_8), "nf-md-spec/1")
+                }.getOrNull()
+            }
+            val response = safeCall("zero-slice", buildJsonObject {
+                put("text", text)
+                spec?.let { put("spec", it) }
+            })
+            val obj = response.resultObject()
+            if (response.ok && obj != null) {
+                val coverage = obj["coverage"]?.jsonPrimitive?.intOrNull ?: 0
+                val exceptions = obj["exceptions"]?.jsonArray?.size ?: 0
+                zeroSliceNote = context.getString(dev.ninfenz.mobile.R.string.import_zero_slice_note, coverage, exceptions)
+            } else {
+                zeroSliceNote = context.getString(dev.ninfenz.mobile.R.string.import_zero_slice_failed, response.error?.message ?: "unknown")
+            }
+        }
+    }
+
     fun importText(text: String, sourceKind: String, name: String) {
         scope.launch {
             if (text.toByteArray(Charsets.UTF_8).size > dev.ninfenz.mobile.data.FileAccess.MAX_IMPORT_BYTES) {
@@ -789,6 +820,9 @@ fun ImportScreen(
                         }
                         Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                             OutlinedButton(onClick = { importSample() }, enabled = !busy) { Text(stringResource(dev.ninfenz.mobile.R.string.import_sample)) }
+                            if (doc != null) {
+                                OutlinedButton(onClick = { runZeroSlice() }, enabled = !busy) { Text(stringResource(dev.ninfenz.mobile.R.string.import_zero_slice)) }
+                            }
                             if (prefillNote != null) {
                                 Text(stringResource(dev.ninfenz.mobile.R.string.import_share_received), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
                             }
@@ -796,6 +830,7 @@ fun ImportScreen(
                         if (prefillNote != null) {
                             Text(prefillNote!!, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
+                        zeroSliceNote?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary) }
                         if (shareQueue.isNotEmpty()) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(

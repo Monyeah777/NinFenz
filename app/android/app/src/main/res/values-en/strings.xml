@@ -1037,4 +1037,7 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="nfdoc_merge_edit_blocks">Edit blocks</string>
     <string name="nfdoc_merge_hide_blocks">Hide blocks</string>
     <string name="nfdoc_merge_delete_block">Delete</string>
+    <string name="import_zero_slice">Auto-slice</string>
+    <string name="import_zero_slice_note">Auto-slice: %1$d%% coverage, %2$d exceptions</string>
+    <string name="import_zero_slice_failed">Auto-slice failed: %1$s</string>
 </resources>

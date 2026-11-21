@@ -45,7 +45,7 @@
 - 10 条 Rust 单测：解析/映射/例外/freeform + Session/reset/undo + DraftStore 同源覆盖 + to_project 参考形状。
 - 新 `zero-slice` op：输入 text/spec，输出 title/sections/mappings/exceptions/coverage（0–100 整数）；3 条 op 测试。
 - DraftStore 已落盘（同源覆盖）；**未**移植 to_project FFI/Android 接线。
-- Android 仍走现有 ImportSession/ImportDraftStore，不切换。
+- Android 导入页新增「自动切片」预览：调用 zero-slice，显示 coverage/例外数；仍不切换现有 ImportSession。
 
 ## A0-14 Daily 入口
 
