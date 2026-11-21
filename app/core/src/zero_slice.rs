@@ -198,6 +198,23 @@ pub fn infer(spec: &Spec, doc: &Document) -> Report {
     Report { mappings, exceptions, coverage }
 }
 
+/// 参考转换（不是可入库的完整 nf-project/1）：只用于验证 document+slots 形状。
+pub fn to_project(doc: &Document, report: &Report, draft_id: Option<&str>) -> serde_json::Value {
+    let mut slots = serde_json::Map::new();
+    for mapping in &report.mappings {
+        if let Some(section) = doc.sections.get(mapping.from_index) {
+            slots.insert(mapping.to_id.clone(), serde_json::Value::String(section.text()));
+        }
+    }
+    serde_json::json!({
+        "schema": "nf-project/1",
+        "title": doc.title,
+        "document": document_json(doc),
+        "slots": slots,
+        "draft_id": draft_id,
+    })
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Stage {
     Empty,
@@ -428,6 +445,16 @@ mod tests {
         assert!(report.mappings.is_empty());
         assert_eq!(report.exceptions.len(), 3);
         assert_eq!(report.coverage, 0.0);
+    }
+
+    #[test]
+    fn to_project_reference_shape() {
+        let doc = parse_markdown("# 简\n\n## 背景\n\n甲\n");
+        let report = infer(&spec(), &doc);
+        let project = to_project(&doc, &report, Some("d1"));
+        assert_eq!(project["schema"], "nf-project/1");
+        assert_eq!(project["slots"]["SLT-01"], "甲");
+        assert_eq!(project["draft_id"], "d1");
     }
 
     #[test]

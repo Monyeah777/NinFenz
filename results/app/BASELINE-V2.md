@@ -27,7 +27,7 @@
 
 | 面 | 结果 | 命令 |
 |---|---|---|
-| Rust core | **210 passed / 21 suites / 0 failed** | `cd app/core && cargo test -q` |
+| Rust core | **211 passed / 21 suites / 0 failed** | `cd app/core && cargo test -q` |
 | Python app | **501 passed / 1 warning / 0 failed** | `python -m pytest app/tests -q` |
 | Android JVM | **433/433** | `:app:testDebugUnitTest` |
 | Desktop JVM | **20/20** | `cd app/desktop && ./gradlew test --rerun-tasks` |

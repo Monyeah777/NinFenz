@@ -67,7 +67,7 @@
 - 项目包：manifest 完整性校验、嵌套/深层目录、BOM、临时文件过滤、篡改/未列条目拒绝、完整项目分享与导入。
 - 备份：manifest BOM/字段必填/未列条目拒绝/声明与实际大小上限、导出后自检、恢复后刷新库。
 - 其他：最近项目动态快捷方式、错误码目录与使用扫描、清空导出记录、崩溃日志分享、项目复制/归档/恢复的回滚加固。
-- 当前本机：JVM **433/433**、Python **501 passed**、Rust **210/210**、lint 0、verify PASS=107/WARN=2/FAIL=0。
+- 当前本机：JVM **433/433**、Python **501 passed**、Rust **211/211**、lint 0、verify PASS=107/WARN=2/FAIL=0。
 - 真机矩阵与签名/公证仍 OPEN-EXTERNAL/OPEN-TOOLCHAIN，不得据此宣称可发布。
 
 ## 1. 结论（先行）
