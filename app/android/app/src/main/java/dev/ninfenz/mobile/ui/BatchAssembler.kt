@@ -112,6 +112,10 @@ object BatchAssembler {
                 out.closeEntry()
             }
         }
+        outDir.listFiles { f -> f.isFile && f.name.startsWith("nf-batch-") && f.name.endsWith(".zip") }
+            ?.sortedByDescending { it.lastModified() }
+            ?.drop(3)
+            ?.forEach { it.delete() }
         return target
     }
 }
