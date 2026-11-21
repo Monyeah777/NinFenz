@@ -27,6 +27,16 @@ class BatchAssemblerTest {
     }
 
     @Test
+    fun sanitizesProjectIdInPaths() {
+        val out = Files.createTempDirectory("nf-batch-safe").toFile()
+        val file = BatchAssembler.writeZip(listOf(BatchAssembler.Item("../evil", "E", true, "# E", null)), out)
+        ZipFile(file).use { zip ->
+            assertTrue(zip.entries().asSequence().none { it.name.contains("../") })
+            assertTrue(zip.getEntry("projects/.._evil.md") != null)
+        }
+    }
+
+    @Test
     fun allFailedStillWritesManifest() {
         val out = Files.createTempDirectory("nf-batch-none").toFile()
         val file = BatchAssembler.writeZip(listOf(BatchAssembler.Item("p1", "P1", false, null, "缺草稿")), out)
