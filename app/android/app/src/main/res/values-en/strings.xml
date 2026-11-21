@@ -1055,4 +1055,5 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="patch_save">Save to project draft</string>
     <string name="patch_saved">Saved to project draft</string>
     <string name="patch_undo">Undo application</string>
+    <string name="patch_changes">Changes: %1$d</string>
 </resources>

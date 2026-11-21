@@ -1051,4 +1051,5 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="patch_save">保存到项目稿</string>
     <string name="patch_saved">已保存到项目稿</string>
     <string name="patch_undo">撤销应用</string>
+    <string name="patch_changes">变更预览：%1$d 条</string>
 </resources>

@@ -23,7 +23,8 @@ object NfPatchModel {
 
     data class Patch(val ops: List<Op>)
 
-    data class Result(val markdown: String, val applied: Int, val rejected: List<String>)
+    data class Change(val op: String, val blockId: String?, val before: String?, val after: String?)
+    data class Result(val markdown: String, val applied: Int, val rejected: List<String>, val changes: List<Change> = emptyList())
 
     private data class Entry(val id: String, val block: MarkdownBlock)
 
@@ -57,6 +58,7 @@ object NfPatchModel {
         val entries = MarkdownBlocks.parse(markdown).mapIndexed { i, b -> Entry("b" + (i + 1), b) }.toMutableList()
         var applied = 0
         val rejected = mutableListOf<String>()
+        val changes = mutableListOf<Change>()
         var next = 1
         fun find(id: String?): Int = entries.indexOfFirst { it.id == id }
         patch.ops.forEachIndexed { i, op ->
@@ -65,20 +67,27 @@ object NfPatchModel {
                     val at = find(op.blockId)
                     if (at < 0) rejected += "op " + (i + 1) + "：找不到 " + op.blockId
                     else {
+                        val before = entries[at].block.text
                         entries[at] = entries[at].copy(block = entries[at].block.copy(text = op.text!!))
+                        changes += Change("replace", op.blockId, before, op.text)
                         applied++
                     }
                 }
                 "delete" -> {
                     val at = find(op.blockId)
                     if (at < 0) rejected += "op " + (i + 1) + "：找不到 " + op.blockId
-                    else { entries.removeAt(at); applied++ }
+                    else {
+                        changes += Change("delete", op.blockId, entries[at].block.text, null)
+                        entries.removeAt(at)
+                        applied++
+                    }
                 }
                 "insert" -> {
                     val at = if (op.afterBlockId != null) find(op.afterBlockId) + 1 else (op.index ?: entries.size)
                     if (at < 0) rejected += "op " + (i + 1) + "：找不到 " + op.afterBlockId
                     else {
                         entries.add(at.coerceIn(0, entries.size), Entry("n" + next++, MarkdownBlock(-1, op.text!!)))
+                        changes += Change("insert", op.afterBlockId, null, op.text)
                         applied++
                     }
                 }
@@ -89,12 +98,13 @@ object NfPatchModel {
                         val item = entries.removeAt(at)
                         val target = if (op.afterBlockId != null) find(op.afterBlockId) + 1 else (op.index ?: entries.size)
                         entries.add(target.coerceIn(0, entries.size), item)
+                        changes += Change("move", op.blockId, item.block.text, item.block.text)
                         applied++
                     }
                 }
                 "set-slot" -> rejected += "op " + (i + 1) + "：set-slot 不修改块，需项目槽位"
             }
         }
-        return Result(MarkdownBlocks.render(entries.map { it.block }), applied, rejected)
+        return Result(MarkdownBlocks.render(entries.map { it.block }), applied, rejected, changes)
     }
 }

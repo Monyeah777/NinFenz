@@ -17,6 +17,9 @@ class NfPatchTest {
             {"op":"delete","block_id":"b1"}
         ]}"""))
         assertEquals(4, result.applied)
+        assertEquals(4, result.changes.size)
+        assertEquals("二", result.changes.first { it.op == "replace" }.before)
+        assertEquals("新二", result.changes.first { it.op == "replace" }.after)
         assertTrue(result.rejected.isEmpty())
         assertEquals("三\n\n新二\n\n插入", result.markdown)
     }

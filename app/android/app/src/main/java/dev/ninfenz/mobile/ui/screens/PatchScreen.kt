@@ -108,6 +108,13 @@ fun PatchScreen(filesDir: File, projectId: String?, onBack: () -> Unit) {
             }
             result?.let { r ->
                 Text(stringResource(R.string.patch_result, r.applied, r.rejected.size), style = MaterialTheme.typography.titleSmall)
+                Text(stringResource(R.string.patch_changes, r.changes.size), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
+                r.changes.forEach { c ->
+                    Text(
+                        c.op + " · " + (c.before?.take(60) ?: "∅") + " → " + (c.after?.take(60) ?: "∅"),
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
                 r.rejected.forEach { Text("· " + it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall) }
                 OutlinedTextField(
                     value = r.markdown,
