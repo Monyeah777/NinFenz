@@ -178,6 +178,29 @@
       "status": "open",
       "owner": "lead",
       "next": "本机无 Android 运行时/真机：深链/分享/文件管理器红队 OPEN-EXTERNAL"
+    },
+    {
+      "id": "S18",
+      "title": "Free/Pro/CCOS 分层（不误锁 Free）",
+      "evidence": [
+        "app/docs/FEATURES.md",
+        "app/android/app/src/main/java/dev/ninfenz/mobile/data/FeatureGate.kt",
+        "app/android/app/src/test/java/dev/ninfenz/mobile/data/FeatureGateTest.kt"
+      ],
+      "status": "covered",
+      "note": "FeatureGate 默认 FREE；allows 全开；Pro/CCOS 关闭不锁 Free"
+    },
+    {
+      "id": "S19",
+      "title": "机制采用证据（M1–M42）",
+      "evidence": [
+        "app/docs/DECISIONS.md",
+        "app/prototypes/zero_slice/README.md",
+        "results/app/DELTA_V2.md"
+      ],
+      "status": "open",
+      "owner": "lead",
+      "next": "仅 zero_slice 有原型/测试；Phase M 其余 P0 原型待逐个验收"
     }
   ]
 }

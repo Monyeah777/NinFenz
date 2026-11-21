@@ -1,8 +1,8 @@
 {
-  "approved_at": "2026-11-17",
+  "approved_at": "2026-11-21",
   "approved_by": "Monyeah777",
-  "note": "2026-11-17 CCOS 接口边界说明后重建；用户已授权",
+  "note": "v2 delta utf8 refresh",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "c1aa79e28fcf822fa5cd18d0ff31b746b92a896c35b243a6029128b3bc7e3ada"
+  "subject_digest": "a7f36f98f0e9d33cffb7f2eb85ade67ad74d29658efb18263c32f056a77b3e4b"
 }

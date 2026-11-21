@@ -210,6 +210,32 @@
       "owner": "lead",
       "status": "open",
       "title": "红队（文件管理器/AI 输出/恶意 pack/深链/分享）"
+    },
+    {
+      "evidence": [
+        "app/docs/FEATURES.md",
+        "app/android/app/src/main/java/dev/ninfenz/mobile/data/FeatureGate.kt",
+        "app/android/app/src/test/java/dev/ninfenz/mobile/data/FeatureGateTest.kt"
+      ],
+      "id": "S18",
+      "next": null,
+      "note": "FeatureGate 默认 FREE；allows 全开；Pro/CCOS 关闭不锁 Free",
+      "owner": null,
+      "status": "covered",
+      "title": "Free/Pro/CCOS 分层（不误锁 Free）"
+    },
+    {
+      "evidence": [
+        "app/docs/DECISIONS.md",
+        "app/prototypes/zero_slice/README.md",
+        "results/app/DELTA_V2.md"
+      ],
+      "id": "S19",
+      "next": "仅 zero_slice 有原型/测试；Phase M 其余 P0 原型待逐个验收",
+      "note": null,
+      "owner": "lead",
+      "status": "open",
+      "title": "机制采用证据（M1–M42）"
     }
   ],
   "gates": {
@@ -256,7 +282,7 @@
       "pass": 3
     }
   },
-  "head": "1ff9dd0f12aac65fb16a270d07aea9258544a051",
+  "head": "e70a51edbf0974aa33676e3f3e470bc2965b3333",
   "open_items": [
     {
       "id": "S3",
@@ -269,6 +295,12 @@
       "next": "本机无 Android 运行时/真机：深链/分享/文件管理器红队 OPEN-EXTERNAL",
       "owner": "lead",
       "title": "红队（文件管理器/AI 输出/恶意 pack/深链/分享）"
+    },
+    {
+      "id": "S19",
+      "next": "仅 zero_slice 有原型/测试；Phase M 其余 P0 原型待逐个验收",
+      "owner": "lead",
+      "title": "机制采用证据（M1–M42）"
     }
   ],
   "results": [
@@ -946,12 +978,12 @@
   ],
   "schema": "nf-app-gates/1",
   "self_audit": {
-    "covered": 14,
-    "dimensions": 16,
+    "covered": 15,
+    "dimensions": 18,
     "gap": 0,
-    "open": 2,
+    "open": 3,
     "p0": 0,
-    "p1": 2,
+    "p1": 3,
     "stop_condition": "QA0–QA6 FAIL=0 且 P0=0 且 UNSUPPORTED 全部带 owner+next（连续两轮）"
   }
 }
