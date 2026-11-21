@@ -813,7 +813,7 @@
     </plurals>
     <string name="project_history_title">Status history</string>
     <string name="settings_backup_export">Export local backup</string>
-    <string name="settings_batch_run">Assemble all projects</string>
+    <string name="settings_batch_run">Assemble projects</string>
     <plurals name="settings_batch_done">
         <item quantity="one">Assembled %1$d/%2$d project</item>
         <item quantity="other">Assembled %1$d/%2$d projects</item>
