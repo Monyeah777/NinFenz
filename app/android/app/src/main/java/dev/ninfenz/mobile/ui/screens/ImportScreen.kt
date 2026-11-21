@@ -146,6 +146,8 @@ fun ImportScreen(
     var suggestNote by remember { mutableStateOf<String?>(null) }
     var zeroSliceNote by remember { mutableStateOf<String?>(null) }
     var preserveNote by remember { mutableStateOf<String?>(null) }
+    var preservedMarkdown by remember { mutableStateOf<String?>(null) }
+    var preservedName by remember { mutableStateOf("restored.md") }
     val importHistory = remember { ImportHistoryStore(context.filesDir) }
     val importDraftStore = remember { ImportDraftStore(context.filesDir) }
     val templateStore = remember { TemplateCandidateStore(context.filesDir) }
@@ -760,10 +762,13 @@ fun ImportScreen(
             try {
                 val file = FileAccess.copyToCache(context, uri, "preserve.zip")
                 val result = dev.ninfenz.mobile.data.PreservationVerifier.verify(file)
-                preserveNote = if (result.ok) {
-                    context.getString(dev.ninfenz.mobile.R.string.import_preserve_ok, result.title ?: file.name)
+                if (result.ok) {
+                    preserveNote = context.getString(dev.ninfenz.mobile.R.string.import_preserve_ok, result.title ?: file.name)
+                    preservedMarkdown = dev.ninfenz.mobile.data.PreservationVerifier.extractMarkdown(file)
+                    preservedName = (result.title ?: "restored").replace(Regex("[^A-Za-z0-9._-]"), "_") + ".md"
                 } else {
-                    context.getString(dev.ninfenz.mobile.R.string.import_preserve_fail, result.errors.take(2).joinToString("; "))
+                    preserveNote = context.getString(dev.ninfenz.mobile.R.string.import_preserve_fail, result.errors.take(2).joinToString("; "))
+                    preservedMarkdown = null
                 }
                 file.delete()
             } catch (t: Throwable) {
@@ -851,6 +856,11 @@ fun ImportScreen(
                         }
                         zeroSliceNote?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary) }
                         preserveNote?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary) }
+                        preservedMarkdown?.let { md ->
+                            OutlinedButton(onClick = { importText(md, "preserve", preservedName) }, enabled = !busy) {
+                                Text(stringResource(dev.ninfenz.mobile.R.string.import_restore_archive))
+                            }
+                        }
                         if (shareQueue.isNotEmpty()) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(

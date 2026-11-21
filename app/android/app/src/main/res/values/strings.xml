@@ -1076,4 +1076,5 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="import_verify_preserve">校验归档包</string>
     <string name="import_preserve_ok">归档包通过：%1$s</string>
     <string name="import_preserve_fail">归档包无效：%1$s</string>
+    <string name="import_restore_archive">恢复为导入稿</string>
 </resources>

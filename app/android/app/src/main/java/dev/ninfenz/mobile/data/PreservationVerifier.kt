@@ -15,6 +15,12 @@ object PreservationVerifier {
     private fun sha(bytes: ByteArray): String =
         MessageDigest.getInstance("SHA-256").digest(bytes).joinToString("") { "%02x".format(it) }
 
+    fun extractMarkdown(file: File): String? = runCatching {
+        ZipFile(file).use { zip ->
+            zip.getEntry("document.md")?.let { zip.getInputStream(it).readBytes().decodeToString() }
+        }
+    }.getOrNull()
+
     fun verify(file: File): Result {
         val errors = mutableListOf<String>()
         var title: String? = null
