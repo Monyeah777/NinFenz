@@ -21,6 +21,7 @@ object ProjectBundleImporter {
         val staging = File(filesDir, "bundle-import-" + System.nanoTime()).apply { mkdirs() }
         try {
             val items = mutableListOf<Pair<String, File>>()
+            val seen = mutableSetOf<String>()
             var total = 0L
             ZipFile(bundleFile).use { zip ->
                 val manifestEntry = zip.getEntry("nf-bundle.json") ?: error("缺 nf-bundle.json")
@@ -34,6 +35,7 @@ object ProjectBundleImporter {
                     val sha = obj["sha256"]?.jsonPrimitive?.content ?: error("bundle 条目缺 sha256")
                     val expectedBytes = obj["bytes"]?.jsonPrimitive?.content?.toLongOrNull()
                     require(path.isNotBlank() && !path.startsWith("/") && !path.contains("\\") && path.split("/").none { it == ".." }) { "bundle 路径非法" }
+                    require(seen.add(path)) { "bundle 条目重复：" + path }
                     val entry = zip.getEntry(path) ?: error("bundle 缺条目：" + path)
                     val target = File(staging, "item-" + items.size + ".zip")
                     val copied = copyLimited(zip, entry, target, 256L * 1024 * 1024)
