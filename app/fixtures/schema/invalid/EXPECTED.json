@@ -302,6 +302,20 @@
       "codes": [
         "NF-E-002"
       ]
+    },
+    "invalid/nf-patch/no-ops.json": {
+      "schema": "nf-patch",
+      "violated": "required ops",
+      "codes": [
+        "NF-E-002"
+      ]
+    },
+    "invalid/nf-patch/replace-no-text.json": {
+      "schema": "nf-patch",
+      "violated": "replace requires text",
+      "codes": [
+        "NF-E-002"
+      ]
     }
   }
 }

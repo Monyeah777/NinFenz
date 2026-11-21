@@ -15,8 +15,8 @@
 
 ### Android
 - assembleDebug：**pass**（2026-11-21，Android SDK 36 / build-tools 36.0.0）
-- app-debug.apk：51,492,533 B；SHA-256 `2da4214750c22e7aebf5fe47b741b7c0017dab40dc7217102979cd9da079a433`
-- assembleRelease（unsigned）：pass；44,491,190 B；SHA-256 `008af445081680d29ff250bb45d9153c0d9d0dd3dd818983cea751bd537899a5`
+- app-debug.apk：51,493,473 B；SHA-256 `26b9146078a95b1888e2bf444739a1589d26f97ca80db14bb0f8dd041b502138`
+- assembleRelease（unsigned）：pass；44,508,470 B；SHA-256 `57281e7c002d8fbf7ec71970ed53a102a5372d2f4ecfbf954d24d30590029c2a`
 - debug 签名 APK（仅内部安装）：44,554,405 B；SHA-256 `2873e5a1e843a3edd954dd8fa6169de83dd9a8d6105e8fac48f5300a31e22d96`；证书 CN=Android Debug；**不是 upload key**
 - bundleRelease（unsigned）：pass；28,350,986 B；SHA-256 `c98c34ed410392fb99aa5e5b57bdf31fdb72e0bfa64869112cb1be6f1247430a`；`jarsigner -verify` 显示未签名
 - 16KB 对齐：`zipalign -c -P 16 4` exit 0（APK；AAB 未用 bundletool 复核）

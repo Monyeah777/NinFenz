@@ -38,7 +38,7 @@ def test_valid_fixture_passes_schema(stem: str, path: Path) -> None:
 
 def test_every_schema_has_valid_fixture() -> None:
     stems = sorted(p.name[: -len(".schema.json")] for p in SCHEMA_DIR.glob("*.schema.json"))
-    assert len(stems) == 17, stems  # A0 冻结 13 + 首闭环新增 nf-assemble-result/nf-export-manifest/nf-backup
+    assert len(stems) == 18, stems  # A0 冻结 13 + 首闭环新增 nf-assemble-result/nf-export-manifest/nf-backup
     for stem in stems:
         docs = list((VALID_DIR / stem).glob("*.json"))
         assert docs, f"{stem} 缺正样例"

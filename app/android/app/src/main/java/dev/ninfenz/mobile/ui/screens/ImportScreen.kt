@@ -561,7 +561,7 @@ fun ImportScreen(
     fun runZeroSlice() {
         val text = doc?.text
         if (text.isNullOrBlank()) {
-            zeroSliceNote = context.getString(dev.ninfenz.mobile.R.string.import_zero_slice_failed, "无文本")
+            zeroSliceNote = context.getString(dev.ninfenz.mobile.R.string.import_zero_slice_failed, context.getString(dev.ninfenz.mobile.R.string.import_zero_slice_no_text))
             return
         }
         scope.launch {

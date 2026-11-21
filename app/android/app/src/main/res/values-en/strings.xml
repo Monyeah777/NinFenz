@@ -1040,4 +1040,6 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="import_zero_slice">Auto-slice</string>
     <string name="import_zero_slice_note">Auto-slice: %1$d%% coverage, %2$d exceptions</string>
     <string name="import_zero_slice_failed">Auto-slice failed: %1$s</string>
+    <string name="nfdoc_merged_title">Merged document</string>
+    <string name="import_zero_slice_no_text">No text</string>
 </resources>

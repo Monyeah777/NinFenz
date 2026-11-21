@@ -43,6 +43,7 @@ import kotlinx.coroutines.withContext
 @Composable
 fun NfDocMergeScreen(filesDir: File, onBack: () -> Unit) {
     val context = LocalContext.current
+    val mergedTitle = stringResource(R.string.nfdoc_merged_title)
     val scope = rememberCoroutineScope()
     val outDir = remember(filesDir) { File(File(filesDir, "exports"), "delivery").apply { mkdirs() } }
     var files by remember { mutableStateOf(outDir.listFiles { f -> f.isFile && f.name.endsWith(".nfdoc.json") }?.sortedBy { it.name }.orEmpty()) }
@@ -194,7 +195,7 @@ fun NfDocMergeScreen(filesDir: File, onBack: () -> Unit) {
                             val conflicts = mutableListOf<NfDocMerger.Conflict>()
                             ordered.forEach { doc ->
                                 if (acc == null) acc = doc else {
-                                    val r = NfDocMerger.merge(acc!!, doc, "合并文档")
+                                    val r = NfDocMerger.merge(acc!!, doc, mergedTitle)
                                     acc = r.doc
                                     conflicts += r.conflicts
                                 }

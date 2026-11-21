@@ -1,0 +1,9 @@
+{
+  "schema": "nf-patch/1",
+  "ops": [
+    {
+      "op": "replace",
+      "block_id": "b1"
+    }
+  ]
+}

@@ -26,7 +26,7 @@
 
 - `BatchAssembler` 与 `ImportScreen` 的硬编码中文移入 `strings.xml` / `values-en`。
 - `python -m pytest app/tests/test_ui_strings_localized.py -q` → 1 passed。
-- 全量 `python -m pytest app/tests -q` → **501 passed**。
+- 全量 `python -m pytest app/tests -q` → **516 passed**。
 
 ## J6 nf-doc/1
 
@@ -38,6 +38,12 @@
 - 冲突可逐项选择「保留左/右/双方」；选择后保存/分享。
 - 合并结果可展开块列表、删除单块；删除后保存/分享。
 - 块可上下移动/删除；跨章节拖拽仍 OPEN。
+
+## M4 Semantic Patch（P0 部分）
+
+- 新增 `nf-patch/1` schema（replace/insert/delete/move/set-slot）。
+- Kotlin `NfPatchModel`：解析、blockId 应用、稳定 ID、set-slot 拒绝；4 条单测。
+- **未**做语义 diff UI/逐条接受；目前是协议+模型层。
 
 ## zero_slice Rust 参考
 

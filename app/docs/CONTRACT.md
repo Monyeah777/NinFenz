@@ -13,6 +13,7 @@ APP = 人的控制面（Android/桌面/平板）；CCOS = 执行面；TUI/CLI = 
 | `nf-pack/1` | `nf-pack.json` | Pack 清单（id/version/items/hashes/requires） |
 | `nf-import/1` | `*.nfimport.json` | 导入识别结果（嗅探/结构抽取/映射建议） |
 | `nf-doc/1` | `*.nfdoc.json` | 结构化文档（meta/sources/blocks；再装配输入） |
+| `nf-patch/1` | `*.nfpatch.json` | 语义补丁（blockId 的 replace/insert/delete/move/set-slot） |
 | `nf-protocol-pack/1` | `protocol/nf-protocol-pack.json` | 协议包（条款/字段/规则/示例/兼容/迁移） |
 | `nf-pipeline-graph/1` | `*.nfg.json` | 作者管线图（节点/边/权重/参数/绑定） |
 | `nf-md-spec/1` | `*.nfspec.json` | Markdown 规范（章节/槽位/约束/示例/验收/预算） |

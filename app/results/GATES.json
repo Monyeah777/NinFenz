@@ -282,7 +282,7 @@
       "pass": 3
     }
   },
-  "head": "1f98898fa647d64e21d3c57e9467365e88ac1162",
+  "head": "e749e4fce7b68f466f4021bd34ffaaaa40b7874b",
   "open_items": [
     {
       "id": "S3",
@@ -320,6 +320,7 @@
         "app/schema/nf-overlay.schema.json",
         "app/schema/nf-pack-update.schema.json",
         "app/schema/nf-pack.schema.json",
+        "app/schema/nf-patch.schema.json",
         "app/schema/nf-pipeline-graph.schema.json",
         "app/schema/nf-project.schema.json",
         "app/schema/nf-protocol-pack.schema.json",
@@ -352,6 +353,7 @@
         "app/schema/nf-overlay.schema.json",
         "app/schema/nf-pack-update.schema.json",
         "app/schema/nf-pack.schema.json",
+        "app/schema/nf-patch.schema.json",
         "app/schema/nf-pipeline-graph.schema.json",
         "app/schema/nf-project.schema.json",
         "app/schema/nf-protocol-pack.schema.json",
@@ -441,7 +443,7 @@
           "collected": null,
           "errors": null,
           "failed": null,
-          "passed": 108
+          "passed": 113
         }
       },
       "gate": "QA0",

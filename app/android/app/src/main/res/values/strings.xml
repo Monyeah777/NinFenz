@@ -1036,4 +1036,6 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="import_zero_slice">自动切片</string>
     <string name="import_zero_slice_note">自动切片：覆盖 %1$d%%，例外 %2$d 项</string>
     <string name="import_zero_slice_failed">自动切片失败：%1$s</string>
+    <string name="nfdoc_merged_title">合并文档</string>
+    <string name="import_zero_slice_no_text">无文本</string>
 </resources>

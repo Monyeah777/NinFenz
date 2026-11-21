@@ -47,7 +47,7 @@ object BatchAssembler {
             Item("invalid-" + index, context.getString(dev.ninfenz.mobile.R.string.batch_project_parse_failed), false, null, error)
         }
         require(items.any { it.ok }) { context.getString(dev.ninfenz.mobile.R.string.batch_all_failed) }
-        val file = withContext(Dispatchers.IO) { writeZip(items, outDir) }
+        val file = withContext(Dispatchers.IO) { writeZip(items, outDir, context.getString(dev.ninfenz.mobile.R.string.nfdoc_merged_title)) }
         Created(file, items)
     }
 
@@ -87,7 +87,7 @@ object BatchAssembler {
 
     private fun safeName(id: String): String = id.replace(Regex("[^A-Za-z0-9._-]"), "_").ifBlank { "project" }
 
-    internal fun writeZip(items: List<Item>, outDir: File): File {
+    internal fun writeZip(items: List<Item>, outDir: File, mergedTitle: String = "Merged document"): File {
         outDir.mkdirs()
         val target = File(outDir, "nf-batch-" + System.nanoTime() + ".zip")
         ZipOutputStream(target.outputStream()).use { out ->
@@ -96,7 +96,7 @@ object BatchAssembler {
             var mergedDoc = docs.firstOrNull()
             val conflicts = mutableListOf<NfDocMerger.Conflict>()
             for (doc in docs.drop(1)) {
-                val result = NfDocMerger.merge(mergedDoc ?: doc, doc, "合并文档")
+                val result = NfDocMerger.merge(mergedDoc ?: doc, doc, mergedTitle)
                 mergedDoc = result.doc
                 conflicts += result.conflicts
             }
@@ -153,7 +153,7 @@ object BatchAssembler {
                 out.write(merged.toByteArray(Charsets.UTF_8))
                 out.closeEntry()
                 out.putNextEntry(ZipEntry("merged.nf-doc.json").apply { time = 0L })
-                out.write(NfDocModel.toJson(mergedDoc ?: NfDocModel.append(docs, "合并文档")).toString().toByteArray(Charsets.UTF_8))
+                out.write(NfDocModel.toJson(mergedDoc ?: NfDocModel.append(docs, mergedTitle)).toString().toByteArray(Charsets.UTF_8))
                 out.closeEntry()
             }
         }
