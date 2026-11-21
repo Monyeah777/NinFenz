@@ -56,6 +56,7 @@ fun PatchScreen(filesDir: File, projectId: String?, onBack: () -> Unit) {
     var error by remember { mutableStateOf<String?>(null) }
     var history by remember { mutableStateOf<List<String>>(emptyList()) }
     var validation by remember { mutableStateOf<String?>(null) }
+    var validationIssues by remember { mutableStateOf<List<dev.ninfenz.mobile.model.ReportIssue>>(emptyList()) }
 
     Column(Modifier.fillMaxSize()) {
         NfTopAppBar(title = stringResource(R.string.patch_title), onBack = onBack)
@@ -104,6 +105,8 @@ fun PatchScreen(filesDir: File, projectId: String?, onBack: () -> Unit) {
                             val applied = NfPatchModel.apply(markdown, NfPatchModel.Patch(selected))
                             result = applied
                             validation = null
+                            validationIssues = emptyList()
+                            val issues = mutableListOf<dev.ninfenz.mobile.model.ReportIssue>()
                             if (projectId != null) {
                                 scope.launch {
                                     validation = withContext(Dispatchers.IO) {
@@ -125,10 +128,18 @@ fun PatchScreen(filesDir: File, projectId: String?, onBack: () -> Unit) {
                                                 put("plan", plan)
                                                 put("level", "L1")
                                             })
-                                            if (checked.ok) context.getString(R.string.patch_validation_ok)
-                                            else context.getString(R.string.patch_validation_failed)
+                                            if (checked.ok) {
+                                                context.getString(R.string.patch_validation_ok)
+                                            } else {
+                                                checked.resultObject()?.let { obj ->
+                                                    runCatching { dev.ninfenz.mobile.model.ReportModel.parse(obj) }.getOrNull()
+                                                        ?.issues?.take(3)?.let { issues.addAll(it) }
+                                                }
+                                                context.getString(R.string.patch_validation_failed)
+                                            }
                                         }.getOrElse { context.getString(R.string.patch_validation_failed) }
                                     }
+                                    validationIssues = issues
                                 }
                             }
                         }
@@ -151,6 +162,9 @@ fun PatchScreen(filesDir: File, projectId: String?, onBack: () -> Unit) {
                 Text(stringResource(R.string.patch_result, r.applied, r.rejected.size), style = MaterialTheme.typography.titleSmall)
                 Text(stringResource(R.string.patch_changes, r.changes.size), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
                 validation?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.secondary) }
+                validationIssues.forEach { issue ->
+                    Text(issue.code + " " + (issue.path ?: "-") + "：" + issue.message, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+                }
                 r.changes.forEach { c ->
                     Text(
                         c.op + " · " + (c.before?.take(60) ?: "∅") + " → " + (c.after?.take(60) ?: "∅"),

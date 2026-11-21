@@ -62,7 +62,7 @@
 - 交付台入口带 projectId：自动载入 DeliveryDraftStore 的当前稿，应用后可写回项目稿。
 - 每次应用前入栈，可多步「撤销应用」；保存到项目稿后清空撤销栈。
 - 结果页显示每条 op 的 before→after 变更预览（文本级，不内联高亮）。
-- 有 projectId 时应用后自动 graph-compile + validate L1，显示校验通过/失败。
+- 有 projectId 时应用后自动 graph-compile + validate L1，显示通过/失败；失败展示前 3 条 issue。
 - **未**做内联语义 diff，也未把校验失败逐条映射回补丁。
 
 ## zero_slice Rust 参考
