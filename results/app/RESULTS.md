@@ -2,6 +2,8 @@
 
 > 本件是 APP 实施面的**结果/状态导航**（不是规划件）。开工依据 `NF-APP-Final-方案-2026-11-15.md`；基线 `results/app/BASELINE.md`；收口判据 `app/docs/DOD.md`；机读门禁 `app/results/GATES.json` + `app/results/SELF_AUDIT.json`。
 
+
+> 当前基线：`results/app/BASELINE-V2.md`。
 > v2 delta 应用记录：`results/app/DELTA_V2.md`（D21–D24、Free/Pro/CCOS、zero_slice）。
 > 现场复跑：`python app/gates/run_gates.py`（QA0–QA6 + S0–S15）。本件不给「应该绿」，只给「现在能跑出什么」。
 > 状态：v1（2026-11-15）+ v0.02 增量（2026-11-15）+ v2 delta（2026-11-21）
