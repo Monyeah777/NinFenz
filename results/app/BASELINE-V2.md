@@ -43,6 +43,7 @@
 |---|---|---|---|
 | debug APK | 52,478,774 B | `1126f7f9…` | 双 ABI |
 | release unsigned | 44,489,770 B | `99740671…` | `zipalign -c -P 16` 通过 |
+| release AAB unsigned | 28,350,986 B | `c98c34ed…` | `jarsigner -verify` 未签名；AAB 16KB 未用 bundletool 复核 |
 
 发布签名/公证/Play 材料仍无输入。
 
