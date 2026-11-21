@@ -1030,4 +1030,8 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="nfdoc_merge_share">Share merged nf-doc</string>
     <string name="nfdoc_merge_failed">Merge failed: %1$s</string>
     <string name="settings_nfdoc_merge">Merge nf-doc</string>
+    <string name="nfdoc_merge_keep_left">Keep left</string>
+    <string name="nfdoc_merge_keep_right">Keep right</string>
+    <string name="nfdoc_merge_keep_both">Keep both</string>
+    <string name="nfdoc_merge_save">Save result</string>
 </resources>

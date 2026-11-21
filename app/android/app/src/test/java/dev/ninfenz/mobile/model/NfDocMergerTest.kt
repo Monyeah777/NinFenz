@@ -17,6 +17,17 @@ class NfDocMergerTest {
     }
 
     @Test
+    fun resolvesConflictByKeepingOneSide() {
+        val left = NfDocModel.fromMarkdown("A", "p1", "# 开篇\n\n甲")
+        val right = NfDocModel.fromMarkdown("B", "p2", "# 开篇\n\n乙")
+        val merged = NfDocMerger.merge(left, right, "合并")
+        val conflict = merged.conflicts.first { it.title == "开篇" }
+        val resolved = NfDocMerger.resolve(merged.doc, conflict, NfDocMerger.Keep.LEFT)
+        assertTrue(resolved.blocks.any { it.text.contains("甲") })
+        assertTrue(resolved.blocks.joinToString(" | ") { it.type + ":" + it.text + ":" + it.source }, resolved.blocks.none { it.text.contains("乙") })
+    }
+
+    @Test
     fun deduplicatesIdenticalBlocks() {
         val a = NfDocModel.fromMarkdown("A", "p1", "同一段")
         val b = NfDocModel.fromMarkdown("B", "p2", "同一段")

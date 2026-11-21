@@ -86,14 +86,46 @@ fun NfDocMergeScreen(filesDir: File, onBack: () -> Unit) {
             Column(Modifier.padding(horizontal = NfSpacing.page, vertical = NfSpacing.s), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
                 Text(stringResource(R.string.nfdoc_merge_result, merged.doc.blocks.size, merged.doc.sources.size))
                 Text(stringResource(R.string.nfdoc_merge_conflicts, merged.conflicts.size), color = MaterialTheme.colorScheme.primary)
-                merged.conflicts.take(5).forEach { c ->
-                    Text("· " + c.title + " · " + c.reason, style = MaterialTheme.typography.bodySmall)
+                merged.conflicts.take(8).forEach { c ->
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            c.title + " · " + c.reason,
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.weight(1f)
+                        )
+                        androidx.compose.material3.TextButton(onClick = {
+                            result = merged.copy(doc = NfDocMerger.resolve(merged.doc, c, NfDocMerger.Keep.LEFT))
+                            saved = null
+                        }) { Text(stringResource(R.string.nfdoc_merge_keep_left)) }
+                        androidx.compose.material3.TextButton(onClick = {
+                            result = merged.copy(doc = NfDocMerger.resolve(merged.doc, c, NfDocMerger.Keep.RIGHT))
+                            saved = null
+                        }) { Text(stringResource(R.string.nfdoc_merge_keep_right)) }
+                        androidx.compose.material3.TextButton(onClick = {
+                            result = merged.copy(doc = NfDocMerger.resolve(merged.doc, c, NfDocMerger.Keep.BOTH))
+                            saved = null
+                        }) { Text(stringResource(R.string.nfdoc_merge_keep_both)) }
+                    }
                 }
-                saved?.let { file ->
-                    OutlinedButton(onClick = {
-                        val intent = ShareExporter.shareFileIntent(context, file, "application/json", file.name)
-                        ShareExporter.launchChooser(context, intent, file.name)
-                    }) { Text(stringResource(R.string.nfdoc_merge_share)) }
+                Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+                    Button(onClick = {
+                        val current = result ?: return@Button
+                        scope.launch {
+                            val out = withContext(Dispatchers.IO) {
+                                val file = File(outDir, "merged-" + System.nanoTime() + ".nfdoc.json")
+                                file.writeText(NfDocModel.toJson(current.doc).toString() + "\n", Charsets.UTF_8)
+                                file
+                            }
+                            saved = out
+                            files = outDir.listFiles { f -> f.isFile && f.name.endsWith(".nfdoc.json") }?.sortedBy { it.name }.orEmpty()
+                        }
+                    }) { Text(stringResource(R.string.nfdoc_merge_save)) }
+                    saved?.let { file ->
+                        OutlinedButton(onClick = {
+                            val intent = ShareExporter.shareFileIntent(context, file, "application/json", file.name)
+                            ShareExporter.launchChooser(context, intent, file.name)
+                        }) { Text(stringResource(R.string.nfdoc_merge_share)) }
+                    }
                 }
             }
         }
@@ -119,13 +151,10 @@ fun NfDocMergeScreen(filesDir: File, onBack: () -> Unit) {
                                 }
                             }
                             val final = acc ?: error("empty")
-                            val out = File(outDir, "merged-" + System.nanoTime() + ".nfdoc.json")
-                            out.writeText(NfDocModel.toJson(final).toString() + "\n", Charsets.UTF_8)
-                            NfDocMerger.Result(final, conflicts) to out
+                            NfDocMerger.Result(final, conflicts)
                         }
-                        result = merged.first
-                        saved = merged.second
-                        files = outDir.listFiles { f -> f.isFile && f.name.endsWith(".nfdoc.json") }?.sortedBy { it.name }.orEmpty()
+                        result = merged
+                        saved = null
                     } catch (t: Throwable) {
                         error = context.getString(R.string.nfdoc_merge_failed, t.message ?: t.javaClass.simpleName)
                     }

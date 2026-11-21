@@ -1026,4 +1026,8 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="nfdoc_merge_share">分享合并结果</string>
     <string name="nfdoc_merge_failed">合并失败：%1$s</string>
     <string name="settings_nfdoc_merge">合并 nf-doc</string>
+    <string name="nfdoc_merge_keep_left">保留左</string>
+    <string name="nfdoc_merge_keep_right">保留右</string>
+    <string name="nfdoc_merge_keep_both">保留双方</string>
+    <string name="nfdoc_merge_save">保存结果</string>
 </resources>
