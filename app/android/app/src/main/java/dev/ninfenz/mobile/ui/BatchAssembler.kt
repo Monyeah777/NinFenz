@@ -7,6 +7,7 @@ import dev.ninfenz.mobile.data.DeliveryDraftStore
 import dev.ninfenz.mobile.data.LibraryStore
 import dev.ninfenz.mobile.data.PackEntry
 import dev.ninfenz.mobile.data.PackStore
+import dev.ninfenz.mobile.model.NfDocMerger
 import dev.ninfenz.mobile.model.NfDocModel
 import java.io.File
 import java.util.zip.ZipEntry
@@ -91,11 +92,27 @@ object BatchAssembler {
         val target = File(outDir, "nf-batch-" + System.nanoTime() + ".zip")
         ZipOutputStream(target.outputStream()).use { out ->
             val good = items.filter { it.ok && it.markdown != null }
+            val docs = good.map { NfDocModel.fromMarkdown(it.title, it.projectId, it.markdown!!) }
+            var mergedDoc = docs.firstOrNull()
+            val conflicts = mutableListOf<NfDocMerger.Conflict>()
+            for (doc in docs.drop(1)) {
+                val result = NfDocMerger.merge(mergedDoc ?: doc, doc, "合并文档")
+                mergedDoc = result.doc
+                conflicts += result.conflicts
+            }
             val manifest = buildJsonObject {
                 put("schema", "nf-batch/1")
                 if (good.size >= 2) {
                     put("merged", "merged.md")
                     put("merged_doc", "merged.nf-doc.json")
+                    putJsonArray("doc_conflicts") {
+                        conflicts.forEach { c ->
+                            add(buildJsonObject {
+                                put("title", c.title)
+                                put("reason", c.reason)
+                            })
+                        }
+                    }
                 }
                 putJsonArray("projects") {
                     items.forEach { item ->
@@ -135,9 +152,8 @@ object BatchAssembler {
                 out.putNextEntry(ZipEntry("merged.md").apply { time = 0L })
                 out.write(merged.toByteArray(Charsets.UTF_8))
                 out.closeEntry()
-                val docs = good.map { NfDocModel.fromMarkdown(it.title, it.projectId, it.markdown!!) }
                 out.putNextEntry(ZipEntry("merged.nf-doc.json").apply { time = 0L })
-                out.write(NfDocModel.toJson(NfDocModel.append(docs, "合并文档")).toString().toByteArray(Charsets.UTF_8))
+                out.write(NfDocModel.toJson(mergedDoc ?: NfDocModel.append(docs, "合并文档")).toString().toByteArray(Charsets.UTF_8))
                 out.closeEntry()
             }
         }
