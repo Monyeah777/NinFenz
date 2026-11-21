@@ -29,7 +29,7 @@
 |---|---|---|
 | Rust core | **198 passed / 21 suites / 0 failed** | `cd app/core && cargo test -q` |
 | Python app | **498 passed / 1 warning / 0 failed** | `python -m pytest app/tests -q` |
-| Android JVM | **425/425** | `:app:testDebugUnitTest` |
+| Android JVM | **426/426** | `:app:testDebugUnitTest` |
 | zero_slice 原型 | **14/14** | `python -m unittest -v test_zero_slice.py` |
 | app gates | **QA0–QA6 全 PASS；FAIL=0；P0=0** | `python app/gates/run_gates.py` |
 | 仓库门禁 | **PASS=107 WARN=2 FAIL=0** | `bash verify.sh --checks-only` |
@@ -38,8 +38,8 @@
 
 | 产物 | 大小 | sha256 | 备注 |
 |---|---|---|---|
-| debug APK | 52,402,160 B | `165b0ad9…` | 双 ABI |
-| release unsigned | 44,463,286 B | `7f075b5e…` | `zipalign -c -P 16` 通过 |
+| debug APK | 51,451,229 B | `a43c5cad…` | 双 ABI |
+| release unsigned | 44,465,166 B | `50323e0c…` | `zipalign -c -P 16` 通过 |
 
 发布签名/公证/Play 材料仍无输入。
 
@@ -54,13 +54,13 @@
 | A0-5 键盘遮挡 | pass（代码面） | Author/Delivery `imePadding()` + 滚动/CTA |
 | A0-6 分享页主题 | pass（代码面） | `ShareReceiverActivity` 主题/insets |
 | A0-7 导入清空 | pass | `clearCurrentImport` + `ImportDraftStore.clear` + 5s 撤销 |
-| A0-8 草稿→项目 | partial | 对话框/创建在；导入内容映射进协议字段仍 OPEN |
+| A0-8 草稿→项目 | pass（代码面） | 对话框/创建在；ImportPrefill.bySlotName 按槽位名映射协议 label |
 | A0-9 可编辑预览 | pass | 块级编辑/撤销/重做/上移下移/删除/入槽 |
 | A0-10 槽位裸 ID | pass | 槽位卡显示名称/约束/示例 |
 | A0-11 长标题 | pass（代码面） | 库卡片换行/最大行 |
 | A0-12 i18n | pass | `app/tests/test_ui_strings_localized.py` + 498 全量 |
 | A0-13 空态 CTA | pass | 库/导入/交付空态入口 |
-| A0-14 入口成本 | partial | 库首屏「快速粘贴」+ 导入向导；独立 Daily 首屏尚未拆出 |
+| A0-14 入口成本 | pass（代码面） | 库首屏 Daily 粘贴卡 + 快速粘贴 + 导入向导 |
 
 ## 5. 增量补丁落点
 

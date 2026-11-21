@@ -121,6 +121,7 @@ fun LibraryHomeScreen(
     onSeed: () -> Unit,
     onImport: () -> Unit,
     onQuickPaste: () -> Unit = {},
+    onDailyText: (String) -> Unit = {},
     onNewProject: () -> Unit = {},
     onOpenPack: (PackEntry) -> Unit,
     onOpenProject: (ProjectEntry) -> Unit,
@@ -142,6 +143,7 @@ fun LibraryHomeScreen(
     var pendingDeleteArchive by remember { mutableStateOf<File?>(null) }
     var undoArchive by remember { mutableStateOf<File?>(null) }
     val snackbarScope = rememberCoroutineScope()
+    var dailyText by rememberSaveable { mutableStateOf("") }
     var statusFilter by rememberSaveable { mutableStateOf(savedView?.status) }
     var sortName by rememberSaveable { mutableStateOf(savedView?.sort ?: ProjectSort.RECENT.name) }
     var sortMenuOpen by remember { mutableStateOf(false) }
@@ -216,6 +218,47 @@ fun LibraryHomeScreen(
             contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 96.dp),
             verticalArrangement = Arrangement.spacedBy(NfSpacing.l)
         ) {
+            item {
+                Surface(
+                    shape = MaterialTheme.shapes.large,
+                    color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.35f),
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = NfSpacing.page)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(NfSpacing.l),
+                        verticalArrangement = Arrangement.spacedBy(NfSpacing.s)
+                    ) {
+                        Text(
+                            stringResource(dev.ninfenz.mobile.R.string.daily_title),
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        Text(
+                            stringResource(dev.ninfenz.mobile.R.string.daily_helper),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        OutlinedTextField(
+                            value = dailyText,
+                            onValueChange = { dailyText = it },
+                            modifier = Modifier.fillMaxWidth(),
+                            placeholder = { Text(stringResource(dev.ninfenz.mobile.R.string.daily_hint)) },
+                            minLines = 3,
+                            maxLines = 6
+                        )
+                        Button(
+                            enabled = dailyText.isNotBlank(),
+                            onClick = {
+                                val text = dailyText.trim()
+                                if (text.isNotEmpty()) {
+                                    onDailyText(text)
+                                    dailyText = ""
+                                }
+                            },
+                            modifier = Modifier.heightIn(min = 48.dp)
+                        ) { Text(stringResource(dev.ninfenz.mobile.R.string.daily_action)) }
+                    }
+                }
+            }
             if (projects.isNotEmpty()) {
                 item {
                     Surface(

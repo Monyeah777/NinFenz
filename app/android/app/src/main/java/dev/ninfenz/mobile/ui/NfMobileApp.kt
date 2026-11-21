@@ -367,6 +367,7 @@ fun NfMobileApp(
                             onSeed = ::runSeed,
                             onImport = { quickPasteImport = false; shell = shell.open(Detail.Import) },
                             onQuickPaste = { quickPasteImport = true; shell = shell.open(Detail.Import) },
+                            onDailyText = { text -> dev.ninfenz.mobile.ui.ImportSeed.put(text); quickPasteImport = false; shell = shell.open(Detail.Import) },
                             onNewProject = { shell = shell.open(Detail.NewProject) },
                             onOpenPack = { shell = shell.open(Detail.Pack(it.id, it.version)) },
                             onOpenProject = { shell = shell.open(Detail.Project(it.project.id)) },

@@ -1016,4 +1016,8 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="batch_no_draft">No delivery draft</string>
     <string name="batch_empty_result">Assembly result is empty</string>
     <string name="batch_l1_failed">L1 validation failed</string>
+    <string name="daily_title">Paste a brief</string>
+    <string name="daily_hint">Client brief, chat log, or rough draft</string>
+    <string name="daily_action">Make a draft</string>
+    <string name="daily_helper">Auto-sliced; you can edit the preview next</string>
 </resources>

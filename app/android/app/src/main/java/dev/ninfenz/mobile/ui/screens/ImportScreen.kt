@@ -198,23 +198,6 @@ fun ImportScreen(
         shareCursor = 0
         showClearConfirm = false
     }
-    LaunchedEffect(Unit) {
-        if (doc == null && rawResult == null && error == null) {
-            val raw = withContext(Dispatchers.IO) { importDraftStore.load() }
-            if (raw != null) {
-                try {
-                    val obj = J.parseObject(raw, ImportModel.SCHEMA)
-                    val restored = ImportModel.parse(obj)
-                    rawResult = obj
-                    doc = restored
-                    acceptedMappings = restored.mappings.indices.filter { restored.mappings[it].confidence >= 80 }.toSet()
-                    notice = context.getString(dev.ninfenz.mobile.R.string.import_restored_notice)
-                } catch (t: Throwable) {
-                    importDraftStore.clear()
-                }
-            }
-        }
-    }
 
     suspend fun importFromFile(file: File, sourceKind: String, name: String, mime: String?, size: Long) {
         val isZip = file.name.endsWith(".zip", ignoreCase = true) || (mime ?: "").contains("zip", ignoreCase = true)
@@ -572,6 +555,24 @@ fun ImportScreen(
         }
     }
 
+    fun importText(text: String, sourceKind: String, name: String) {
+        scope.launch {
+            if (text.toByteArray(Charsets.UTF_8).size > dev.ninfenz.mobile.data.FileAccess.MAX_IMPORT_BYTES) {
+                error = CoreResponse.failure(
+                    "NF-IMP-003",
+                    context.getString(dev.ninfenz.mobile.R.string.import_file_too_large),
+                    context.getString(dev.ninfenz.mobile.R.string.import_file_too_large_fix),
+                    3
+                ).error
+                return@launch
+            }
+            val dir = File(context.cacheDir, "imports").apply { mkdirs() }
+            val file = File(dir, name)
+            file.writeText(text, Charsets.UTF_8)
+            importFromFile(file, sourceKind, name, "text/plain", text.toByteArray(Charsets.UTF_8).size.toLong())
+        }
+    }
+
     fun importClipboard() {
         val manager = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager
         val text = manager?.primaryClip?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.coerceToText(context)?.toString()
@@ -584,19 +585,29 @@ fun ImportScreen(
             ).error
             return
         }
-        scope.launch {
-            if (text.toByteArray(Charsets.UTF_8).size > dev.ninfenz.mobile.data.FileAccess.MAX_IMPORT_BYTES) {
-                error = CoreResponse.failure(
-                    "NF-IMP-003",
-                    context.getString(dev.ninfenz.mobile.R.string.import_file_too_large),
-                    context.getString(dev.ninfenz.mobile.R.string.import_file_too_large_fix),
-                    3
-                ).error
-                return@launch
+        importText(text, "clipboard", "clipboard.md")
+    }
+
+    LaunchedEffect(Unit) {
+        val seed = dev.ninfenz.mobile.ui.ImportSeed.consume()
+        if (seed != null) {
+            importText(seed, "daily", "daily-paste.md")
+            return@LaunchedEffect
+        }
+        if (doc == null && rawResult == null && error == null) {
+            val raw = withContext(Dispatchers.IO) { importDraftStore.load() }
+            if (raw != null) {
+                try {
+                    val obj = J.parseObject(raw, ImportModel.SCHEMA)
+                    val restored = ImportModel.parse(obj)
+                    rawResult = obj
+                    doc = restored
+                    acceptedMappings = restored.mappings.indices.filter { restored.mappings[it].confidence >= 80 }.toSet()
+                    notice = context.getString(dev.ninfenz.mobile.R.string.import_restored_notice)
+                } catch (t: Throwable) {
+                    importDraftStore.clear()
+                }
             }
-            val file = File(File(context.cacheDir, "imports").apply { mkdirs() }, "clipboard.md")
-            file.writeText(text, Charsets.UTF_8)
-            importFromFile(file, "clipboard", "clipboard.md", "text/plain", text.toByteArray(Charsets.UTF_8).size.toLong())
         }
     }
 

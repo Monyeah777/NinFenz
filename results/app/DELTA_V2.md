@@ -28,6 +28,12 @@
 - `python -m pytest app/tests/test_ui_strings_localized.py -q` → 1 passed。
 - 全量 `python -m pytest app/tests -q` → **498 passed**。
 
+## A0-14 Daily 入口
+
+- 库首屏常驻「粘贴一段，直接成稿」输入卡；提交后用 `ImportSeed` 一次性交给导入页。
+- 不自动恢复旧预览；进程死亡不保留 seed。
+- 保留快速粘贴（剪贴板）与导入向导。
+
 ## A0-8 草稿→项目映射
 
 - `ImportPrefill.bySlotName` 把导入槽位 ID 映射到 spec 槽位名，再与协议字段 `label` 精确匹配。

@@ -1012,4 +1012,8 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="batch_no_draft">没有交付草稿</string>
     <string name="batch_empty_result">装配结果为空</string>
     <string name="batch_l1_failed">L1 校验未通过</string>
+    <string name="daily_title">粘贴一段，直接成稿</string>
+    <string name="daily_hint">客户简报、聊天记录或草稿</string>
+    <string name="daily_action">开始成稿</string>
+    <string name="daily_helper">自动切片；下一步可编辑预览</string>
 </resources>
