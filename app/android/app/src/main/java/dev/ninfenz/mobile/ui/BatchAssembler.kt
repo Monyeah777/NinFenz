@@ -62,6 +62,13 @@ object BatchAssembler {
         })
         val markdown = assembled.resultObject()?.let { J.optString(it, "markdown") }
         require(assembled.ok && !markdown.isNullOrBlank()) { assembled.error?.message ?: "装配结果为空" }
+        val validated = safeCall("validate", buildJsonObject {
+            put("markdown", markdown)
+            put("spec", artifacts.specJson)
+            put("plan", plan)
+            put("level", "L1")
+        })
+        require(validated.ok) { validated.error?.message ?: "L1 校验未通过" }
         return Item(project.id, project.title, true, markdown, null)
     }
 
@@ -79,7 +86,10 @@ object BatchAssembler {
                             put("id", item.projectId)
                             put("title", item.title)
                             put("ok", item.ok)
-                            if (item.ok) put("markdown", "projects/" + item.projectId + ".md")
+                            if (item.ok) {
+                                put("markdown", "projects/" + item.projectId + ".md")
+                                put("validated", "L1")
+                            }
                             item.error?.let { put("error", it) }
                         })
                     }
