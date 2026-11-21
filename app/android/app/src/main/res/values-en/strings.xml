@@ -1020,4 +1020,5 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="daily_hint">Client brief, chat log, or rough draft</string>
     <string name="daily_action">Make a draft</string>
     <string name="daily_helper">Auto-sliced; you can edit the preview next</string>
+    <string name="export_nfdoc_failed">nf-doc export failed: %1$s</string>
 </resources>

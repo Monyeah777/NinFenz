@@ -32,6 +32,7 @@
 
 - 新增 `app/schema/nf-doc.schema.json` 与 `NfDocModel`（blocks 保留章节/表格/代码/来源）。
 - 批量装配为每个成功项目写 `.nf-doc.json`；多成功另写 `merged.nf-doc.json`。
+- 交付台新增 `nf-doc` 导出按钮（`NfDocExporter`），可直接得到可再装配的结构化文件。
 - `NfDocMerger` 合并：同名章节保留双方、重复块去重、冲突写入 manifest `doc_conflicts`。
 - 这是再装配的结构化输入；UI 的交互式 append/merge-by-section 选择仍 OPEN。
 

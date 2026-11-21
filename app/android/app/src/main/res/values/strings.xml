@@ -1016,4 +1016,5 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="daily_hint">客户简报、聊天记录或草稿</string>
     <string name="daily_action">开始成稿</string>
     <string name="daily_helper">自动切片；下一步可编辑预览</string>
+    <string name="export_nfdoc_failed">nf-doc 导出失败：%1$s</string>
 </resources>

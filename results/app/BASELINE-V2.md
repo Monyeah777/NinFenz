@@ -29,7 +29,7 @@
 |---|---|---|
 | Rust core | **198 passed / 21 suites / 0 failed** | `cd app/core && cargo test -q` |
 | Python app | **501 passed / 1 warning / 0 failed** | `python -m pytest app/tests -q` |
-| Android JVM | **431/431** | `:app:testDebugUnitTest` |
+| Android JVM | **432/432** | `:app:testDebugUnitTest` |
 | zero_slice 原型 | **14/14** | `python -m unittest -v test_zero_slice.py` |
 | app gates | **QA0–QA6 全 PASS；FAIL=0；P0=0** | `python app/gates/run_gates.py` |
 | 仓库门禁 | **PASS=107 WARN=2 FAIL=0** | `bash verify.sh --checks-only` |
@@ -38,8 +38,8 @@
 
 | 产物 | 大小 | sha256 | 备注 |
 |---|---|---|---|
-| debug APK | 51,451,229 B | `dff211c9…` | 双 ABI |
-| release unsigned | 44,465,502 B | `2b9604fa…` | `zipalign -c -P 16` 通过 |
+| debug APK | 51,454,073 B | `8f043844…` | 双 ABI |
+| release unsigned | 44,465,978 B | `bc648739…` | `zipalign -c -P 16` 通过 |
 
 发布签名/公证/Play 材料仍无输入。
 
