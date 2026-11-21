@@ -1058,4 +1058,5 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="patch_changes">Changes: %1$d</string>
     <string name="patch_validation_ok">L1 validation passed</string>
     <string name="patch_validation_failed">L1 validation failed; review before saving</string>
+    <string name="export_preserve_failed">Preservation bundle failed: %1$s</string>
 </resources>

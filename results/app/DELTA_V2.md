@@ -39,6 +39,12 @@
 - 合并结果可展开块列表、删除单块；删除后保存/分享。
 - 块可上下移动/删除；跨章节拖拽仍 OPEN。
 
+## M38 Preservation（P1 部分）
+
+- `PreservationExporter`：document.md + document.nfdoc.json + preservation.json（SHA-256/bytes）。
+- Zip 固定时间，可复算；交付台「preserve」按钮导出。
+- **未**做 OAIS 迁移/版本升级链/外部校验工具对接。
+
 ## M4 Semantic Patch（P0 部分）
 
 - 新增 `nf-patch/1` schema（replace/insert/delete/move/set-slot）。

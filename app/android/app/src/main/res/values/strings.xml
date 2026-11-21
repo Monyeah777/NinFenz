@@ -1054,4 +1054,5 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="patch_changes">变更预览：%1$d 条</string>
     <string name="patch_validation_ok">L1 校验通过</string>
     <string name="patch_validation_failed">L1 校验未通过，保存前请检查</string>
+    <string name="export_preserve_failed">归档包导出失败：%1$s</string>
 </resources>

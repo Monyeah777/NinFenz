@@ -1067,6 +1067,17 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         }
                         recordExport("html", file, null)
                     }
+                    PreservationExportButton(exportMarkdown, project, context, scope, { busy = it }, { error = it }, busy) { file, report ->
+                        exportedFile = file
+                        manifestText = null
+                        reproOk = report.stable
+                        reproText = if (report.stable) {
+                            context.getString(dev.ninfenz.mobile.R.string.repro_stable)
+                        } else {
+                            context.getString(dev.ninfenz.mobile.R.string.repro_diff, report.firstDiff ?: -1)
+                        }
+                        recordExport("preserve", file, null)
+                    }
                     NfDocExportButton(exportMarkdown, project, context, scope, { busy = it }, { error = it }, busy) { file, report ->
                         exportedFile = file
                         manifestText = null
@@ -1664,6 +1675,42 @@ private fun ExportButton(
             }
         }
     ) { Text(context.getString(dev.ninfenz.mobile.R.string.delivery_export, format)) }
+}
+
+@Composable
+private fun PreservationExportButton(
+    markdown: String?,
+    project: Project,
+    context: android.content.Context,
+    scope: kotlinx.coroutines.CoroutineScope,
+    setBusy: (Boolean) -> Unit,
+    setError: (CoreError?) -> Unit,
+    busy: Boolean,
+    onDone: (File, dev.ninfenz.mobile.data.ReproChecker.Report) -> Unit
+) {
+    Button(
+        enabled = markdown != null && !busy,
+        onClick = {
+            val md = markdown ?: return@Button
+            setBusy(true)
+            setError(null)
+            scope.launch {
+                try {
+                    val outDir = File(File(context.filesDir, "exports"), "delivery").apply { mkdirs() }
+                    val created = dev.ninfenz.mobile.data.PreservationExporter.export(md, project.title, project.id, outDir)
+                    val reproDir = File(context.cacheDir, "repro-preserve").apply { deleteRecursively(); mkdirs() }
+                    val second = dev.ninfenz.mobile.data.PreservationExporter.export(md, project.title, project.id, reproDir)
+                    val report = dev.ninfenz.mobile.data.ReproChecker.check(created.file, second.file)
+                    reproDir.deleteRecursively()
+                    onDone(created.file, report)
+                } catch (t: Throwable) {
+                    setError(CoreError("NF-EXP-001", context.getString(dev.ninfenz.mobile.R.string.export_preserve_failed, t.message ?: t.javaClass.simpleName), context.getString(dev.ninfenz.mobile.R.string.export_failed_fix), null, 1))
+                } finally {
+                    setBusy(false)
+                }
+            }
+        }
+    ) { Text(context.getString(dev.ninfenz.mobile.R.string.delivery_export, "preserve")) }
 }
 
 @Composable
