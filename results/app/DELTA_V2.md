@@ -22,6 +22,12 @@
 - 无 spec 自由稿 → 1 节 1 槽，coverage 92.12%（`results/brief-freeform.json`）。
 - 语义：EMPTY→SOURCE→PREVIEW→MAPPING→DRAFT；`reset(current|all)` 后不自动恢复；同源草稿覆盖不生成 `-2`；`undo()` 内存快照；`to_project()` 出 `nf-project/1`。
 
+## i18n 修复（2026-11-21）
+
+- `BatchAssembler` 与 `ImportScreen` 的硬编码中文移入 `strings.xml` / `values-en`。
+- `python -m pytest app/tests/test_ui_strings_localized.py -q` → 1 passed。
+- 全量 `python -m pytest app/tests -q` → **498 passed**。
+
 ## 未完成 / OPEN
 
 | id | 内容 | owner | next |

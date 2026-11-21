@@ -221,7 +221,7 @@ fun SettingsScreen(
                                 batchCandidates = null
                                 scope.launch {
                                     val created = withContext(Dispatchers.IO) {
-                                        runCatching { dev.ninfenz.mobile.ui.BatchAssembler.assembleAll(context.filesDir, context.cacheDir, ids) }.getOrNull()
+                                        runCatching { dev.ninfenz.mobile.ui.BatchAssembler.assembleAll(context, context.filesDir, context.cacheDir, ids) }.getOrNull()
                                     }
                                     if (created == null) {
                                         backupMessage = context.getString(dev.ninfenz.mobile.R.string.settings_batch_failed)

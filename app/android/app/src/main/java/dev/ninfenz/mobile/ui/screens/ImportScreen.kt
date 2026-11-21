@@ -259,7 +259,7 @@ fun ImportScreen(
                     packs.firstOrNull()
                 }
                 if (!hash.ok || tree != imported.tree || count != imported.count) {
-                    error = hash.error ?: CoreResponse.failure("NF-PCK-003", "模板包 tree/count 不匹配", "重新导出模板包", 2).error
+                    error = hash.error ?: CoreResponse.failure("NF-PCK-003", context.getString(dev.ninfenz.mobile.R.string.import_template_tree_mismatch), context.getString(dev.ninfenz.mobile.R.string.import_template_tree_mismatch_fix), 2).error
                 } else {
                     val specObj = kotlinx.serialization.json.Json.parseToJsonElement(imported.specText).jsonObject
                     val specCheck = safeCall("spec-validate", buildJsonObject { put("spec", specObj) })
@@ -525,7 +525,7 @@ fun ImportScreen(
                 val tree = hashes?.get("tree")?.jsonPrimitive?.content
                 val count = hashes?.get("count")?.jsonPrimitive?.content?.toIntOrNull()
                 if (!response.ok || tree == null || count == null) {
-                    error = response.error ?: CoreResponse.failure("NF-PCK-003", "pack-hash 未返回 tree/count", "检查核心", 2).error
+                    error = response.error ?: CoreResponse.failure("NF-PCK-003", context.getString(dev.ninfenz.mobile.R.string.import_pack_hash_missing), context.getString(dev.ninfenz.mobile.R.string.import_pack_hash_missing_fix), 2).error
                 } else {
                     val zip = TemplatePackageBuilder.finalize(prepared, tree, count, File(context.cacheDir, "template-export"))
                     val intent = ShareExporter.shareFileIntent(context, zip, "application/zip", templateStore.titleOf(file))

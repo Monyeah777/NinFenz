@@ -1000,4 +1000,16 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="settings_batch_select_all">全选</string>
     <string name="settings_batch_clear">清空</string>
     <string name="settings_batch_title">装配项目（已选 %1$d）</string>
+    <string name="import_template_tree_mismatch">模板包 tree/count 不匹配</string>
+    <string name="import_template_tree_mismatch_fix">重新导出模板包</string>
+    <string name="import_pack_hash_missing">pack-hash 未返回 tree/count</string>
+    <string name="import_pack_hash_missing_fix">检查核心</string>
+    <string name="batch_no_projects">没有可装配的项目</string>
+    <string name="batch_project_parse_failed">项目解析失败</string>
+    <string name="batch_all_failed">所有项目都未装配成功</string>
+    <string name="batch_missing_pack">缺少 Pack %1$s</string>
+    <string name="batch_plan_failed">计划编译失败</string>
+    <string name="batch_no_draft">没有交付草稿</string>
+    <string name="batch_empty_result">装配结果为空</string>
+    <string name="batch_l1_failed">L1 校验未通过</string>
 </resources>

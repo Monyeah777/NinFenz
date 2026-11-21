@@ -1,5 +1,6 @@
 package dev.ninfenz.mobile.ui
 
+import android.content.Context
 import dev.ninfenz.mobile.core.J
 import dev.ninfenz.mobile.data.AuthorArtifactsLoader
 import dev.ninfenz.mobile.data.DeliveryDraftStore
@@ -23,14 +24,14 @@ object BatchAssembler {
     data class Item(val projectId: String, val title: String, val ok: Boolean, val markdown: String?, val error: String?)
     data class Created(val file: File, val items: List<Item>)
 
-    suspend fun assembleAll(filesDir: File, outDir: File, selectedIds: Set<String>? = null): Created = coroutineScope {
+    suspend fun assembleAll(context: Context, filesDir: File, outDir: File, selectedIds: Set<String>? = null): Created = coroutineScope {
         val snapshot = LibraryStore(filesDir).loadProjects()
         val projects = snapshot.projects.filter { selectedIds == null || it.project.id in selectedIds }
-        require(projects.isNotEmpty() || snapshot.errors.isNotEmpty()) { "没有可装配的项目" }
+        require(projects.isNotEmpty() || snapshot.errors.isNotEmpty()) { context.getString(dev.ninfenz.mobile.R.string.batch_no_projects) }
         val packs = PackStore(filesDir).scan().packs.associateBy { it.id + "/" + it.version }
         val parsed = projects.map { entry ->
             async(Dispatchers.IO) {
-                runCatching { assembleOne(entry.project, packs, filesDir) }.getOrElse { t ->
+                runCatching { assembleOne(entry.project, packs, filesDir, context) }.getOrElse { t ->
                     Item(entry.project.id, entry.project.title, false, null, t.message ?: t.javaClass.simpleName)
                 }
             }
@@ -41,9 +42,9 @@ object BatchAssembler {
             snapshot.errors.filter { error -> selectedIds.any { id -> error.startsWith(id + ".nfproject.json") } }
         }
         val items = parsed + errors.mapIndexed { index, error ->
-            Item("invalid-" + index, "项目解析失败", false, null, error)
+            Item("invalid-" + index, context.getString(dev.ninfenz.mobile.R.string.batch_project_parse_failed), false, null, error)
         }
-        require(items.any { it.ok }) { "所有项目都未装配成功" }
+        require(items.any { it.ok }) { context.getString(dev.ninfenz.mobile.R.string.batch_all_failed) }
         val file = withContext(Dispatchers.IO) { writeZip(items, outDir) }
         Created(file, items)
     }
@@ -51,33 +52,34 @@ object BatchAssembler {
     private suspend fun assembleOne(
         project: dev.ninfenz.mobile.model.Project,
         packs: Map<String, PackEntry>,
-        filesDir: File
+        filesDir: File,
+        context: Context
     ): Item {
         val key = project.refs.basePackId + "/" + project.refs.basePackVersion
-        val pack = packs[key] ?: error("缺少 Pack " + key)
+        val pack = packs[key] ?: error(context.getString(dev.ninfenz.mobile.R.string.batch_missing_pack, key))
         val override = File(File(File(filesDir, "projects"), project.id), "authoring/spec-override.json")
         val artifacts = AuthorArtifactsLoader.load(pack, override)
         val compiled = safeCall("graph-compile", buildJsonObject {
             put("graph", artifacts.graphJson)
             put("spec", artifacts.specJson)
         })
-        val plan = compiled.resultObject() ?: error(compiled.error?.message ?: "计划编译失败")
+        val plan = compiled.resultObject() ?: error(compiled.error?.message ?: context.getString(dev.ninfenz.mobile.R.string.batch_plan_failed))
         val inputs = DeliveryDraftStore(filesDir).load(project.id)
-        require(inputs.isNotEmpty()) { "没有交付草稿" }
+        require(inputs.isNotEmpty()) { context.getString(dev.ninfenz.mobile.R.string.batch_no_draft) }
         val assembled = safeCall("assemble", buildJsonObject {
             put("plan", plan)
             put("spec", artifacts.specJson)
             put("inputs", buildJsonObject { for ((k, v) in inputs) put(k, v) })
         })
         val markdown = assembled.resultObject()?.let { J.optString(it, "markdown") }
-        require(assembled.ok && !markdown.isNullOrBlank()) { assembled.error?.message ?: "装配结果为空" }
+        require(assembled.ok && !markdown.isNullOrBlank()) { assembled.error?.message ?: context.getString(dev.ninfenz.mobile.R.string.batch_empty_result) }
         val validated = safeCall("validate", buildJsonObject {
             put("markdown", markdown)
             put("spec", artifacts.specJson)
             put("plan", plan)
             put("level", "L1")
         })
-        require(validated.ok) { validated.error?.message ?: "L1 校验未通过" }
+        require(validated.ok) { validated.error?.message ?: context.getString(dev.ninfenz.mobile.R.string.batch_l1_failed) }
         return Item(project.id, project.title, true, markdown, null)
     }
 

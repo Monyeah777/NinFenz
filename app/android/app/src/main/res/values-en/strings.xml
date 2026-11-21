@@ -1004,4 +1004,16 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="settings_batch_select_all">Select all</string>
     <string name="settings_batch_clear">Clear</string>
     <string name="settings_batch_title">Assemble projects (%1$d selected)</string>
+    <string name="import_template_tree_mismatch">Template package tree/count mismatch</string>
+    <string name="import_template_tree_mismatch_fix">Re-export the template package</string>
+    <string name="import_pack_hash_missing">pack-hash did not return tree/count</string>
+    <string name="import_pack_hash_missing_fix">Check the core</string>
+    <string name="batch_no_projects">No project to assemble</string>
+    <string name="batch_project_parse_failed">Project parse failed</string>
+    <string name="batch_all_failed">No project assembled successfully</string>
+    <string name="batch_missing_pack">Missing Pack %1$s</string>
+    <string name="batch_plan_failed">Plan compile failed</string>
+    <string name="batch_no_draft">No delivery draft</string>
+    <string name="batch_empty_result">Assembly result is empty</string>
+    <string name="batch_l1_failed">L1 validation failed</string>
 </resources>
