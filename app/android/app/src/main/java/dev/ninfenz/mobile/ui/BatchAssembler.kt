@@ -72,7 +72,7 @@ object BatchAssembler {
         return Item(project.id, project.title, true, markdown, null)
     }
 
-    private fun writeZip(items: List<Item>, outDir: File): File {
+    internal fun writeZip(items: List<Item>, outDir: File): File {
         outDir.mkdirs()
         val target = File(outDir, "nf-batch-" + System.nanoTime() + ".zip")
         ZipOutputStream(target.outputStream()).use { out ->
