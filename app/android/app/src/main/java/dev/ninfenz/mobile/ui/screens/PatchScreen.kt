@@ -54,7 +54,7 @@ fun PatchScreen(filesDir: File, projectId: String?, onBack: () -> Unit) {
     var entries by remember { mutableStateOf<List<Pair<NfPatchModel.Op, Boolean>>>(emptyList()) }
     var result by remember { mutableStateOf<NfPatchModel.Result?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
-    var beforeApply by remember { mutableStateOf<String?>(null) }
+    var history by remember { mutableStateOf<List<String>>(emptyList()) }
     var validation by remember { mutableStateOf<String?>(null) }
 
     Column(Modifier.fillMaxSize()) {
@@ -100,7 +100,7 @@ fun PatchScreen(filesDir: File, projectId: String?, onBack: () -> Unit) {
                         if (selected.isEmpty()) {
                             error = context.getString(R.string.patch_none_selected)
                         } else {
-                            beforeApply = markdown
+                            history = history + markdown
                             val applied = NfPatchModel.apply(markdown, NfPatchModel.Patch(selected))
                             result = applied
                             validation = null
@@ -167,10 +167,10 @@ fun PatchScreen(filesDir: File, projectId: String?, onBack: () -> Unit) {
                     textStyle = MaterialTheme.typography.bodySmall
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                    if (beforeApply != null) {
+                    if (history.isNotEmpty()) {
                         OutlinedButton(onClick = {
-                            markdown = beforeApply!!
-                            beforeApply = null
+                            markdown = history.last()
+                            history = history.dropLast(1)
                             result = null
                         }) { Text(stringResource(R.string.patch_undo)) }
                     }
@@ -183,7 +183,7 @@ fun PatchScreen(filesDir: File, projectId: String?, onBack: () -> Unit) {
                         Button(onClick = {
                             store.save(projectId, store.load(projectId), store.loadPlan(projectId), r.markdown)
                             Toast.makeText(context, context.getString(R.string.patch_saved), Toast.LENGTH_SHORT).show()
-                            beforeApply = null
+                            history = emptyList()
                         }) { Text(stringResource(R.string.patch_save)) }
                     }
                 }
