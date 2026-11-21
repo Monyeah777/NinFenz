@@ -1075,4 +1075,5 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="contract_sign">Sign off</string>
     <string name="contract_signed">Signed off: %1$s</string>
     <string name="contract_blocked">Checklist incomplete; sign-off disabled</string>
+    <string name="contract_artifact">Export sha256: %1$s</string>
 </resources>

@@ -42,8 +42,9 @@
 ## M35 Content Contract（P0 部分）
 
 - 交付台验收清单：L1 通过 / 必填槽位已填 / 至少一次导出。
-- 全绿后可本地签收，`ContractStore` 落盘 accepted + signed_at。
-- **不是**密码学签名；无变更单/异议/多方评审。
+- 全绿后可本地签收，`ContractStore` 落盘 accepted + signed_at + 导出物 sha256。
+- **不是**密码学签名；导出物哈希只绑定一次，重新导出不会自动失效签收。
+- 无变更单/异议/多方评审。
 
 ## M38 Preservation（P1 部分）
 

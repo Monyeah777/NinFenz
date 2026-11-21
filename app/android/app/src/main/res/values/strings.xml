@@ -1071,4 +1071,5 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="contract_sign">签收</string>
     <string name="contract_signed">已签收：%1$s</string>
     <string name="contract_blocked">验收项未全通过，暂不能签收</string>
+    <string name="contract_artifact">导出物 sha256：%1$s</string>
 </resources>

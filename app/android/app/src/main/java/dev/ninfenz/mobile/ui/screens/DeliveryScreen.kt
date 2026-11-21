@@ -961,12 +961,16 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         val signed = signoff
                         if (signed != null) {
                             Text(stringResource(dev.ninfenz.mobile.R.string.contract_signed, signed.signedAt), style = MaterialTheme.typography.bodySmall)
+                            signed.artifactSha256?.let { Text(stringResource(dev.ninfenz.mobile.R.string.contract_artifact, it), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
                         } else {
                             Button(
                                 enabled = checks.all { it.second },
                                 onClick = {
                                     val at = java.time.Instant.now().toString()
-                                    contractStore.sign(project.id, checks.filter { it.second }.map { it.first }, at)
+                                    val digest = exportedFile?.let { f ->
+                                        java.security.MessageDigest.getInstance("SHA-256").digest(f.readBytes()).joinToString("") { "%02x".format(it) }
+                                    }
+                                    contractStore.sign(project.id, checks.filter { it.second }.map { it.first }, at, digest)
                                     signoff = contractStore.load(project.id)
                                 }
                             ) { Text(stringResource(dev.ninfenz.mobile.R.string.contract_sign)) }
