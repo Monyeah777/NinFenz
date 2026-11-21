@@ -1038,4 +1038,14 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="import_zero_slice_failed">自动切片失败：%1$s</string>
     <string name="nfdoc_merged_title">合并文档</string>
     <string name="import_zero_slice_no_text">无文本</string>
+    <string name="patch_title">应用 nf-patch</string>
+    <string name="patch_md_hint">当前 Markdown</string>
+    <string name="patch_json_hint">nf-patch/1 JSON</string>
+    <string name="patch_parse">解析补丁</string>
+    <string name="patch_apply">应用所选</string>
+    <string name="patch_none_selected">至少选择一条操作</string>
+    <string name="patch_result">已应用 %1$d，拒绝 %2$d</string>
+    <string name="patch_copy">复制结果</string>
+    <string name="patch_copied">结果已复制</string>
+    <string name="settings_patch">应用 nf-patch</string>
 </resources>

@@ -1042,4 +1042,14 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="import_zero_slice_failed">Auto-slice failed: %1$s</string>
     <string name="nfdoc_merged_title">Merged document</string>
     <string name="import_zero_slice_no_text">No text</string>
+    <string name="patch_title">Apply nf-patch</string>
+    <string name="patch_md_hint">Current Markdown</string>
+    <string name="patch_json_hint">nf-patch/1 JSON</string>
+    <string name="patch_parse">Parse patch</string>
+    <string name="patch_apply">Apply selected</string>
+    <string name="patch_none_selected">Select at least one operation</string>
+    <string name="patch_result">Applied %1$d, rejected %2$d</string>
+    <string name="patch_copy">Copy result</string>
+    <string name="patch_copied">Result copied</string>
+    <string name="settings_patch">Apply nf-patch</string>
 </resources>

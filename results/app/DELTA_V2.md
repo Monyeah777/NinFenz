@@ -43,7 +43,8 @@
 
 - 新增 `nf-patch/1` schema（replace/insert/delete/move/set-slot）。
 - Kotlin `NfPatchModel`：解析、blockId 应用、稳定 ID、set-slot 拒绝；4 条单测。
-- **未**做语义 diff UI/逐条接受；目前是协议+模型层。
+- 新增 Settings「应用 nf-patch」页：粘贴 Markdown+JSON，逐条勾选，应用/复制结果。
+- **未**接项目当前稿（需手动粘贴）、无语义 diff 高亮、无撤销栈。
 
 ## zero_slice Rust 参考
 

@@ -105,6 +105,7 @@ import dev.ninfenz.mobile.ui.screens.CreateScreen
 import dev.ninfenz.mobile.ui.screens.DeliveryScreen
 import dev.ninfenz.mobile.ui.screens.ErrorCodesScreen
 import dev.ninfenz.mobile.ui.screens.NfDocMergeScreen
+import dev.ninfenz.mobile.ui.screens.PatchScreen
 import dev.ninfenz.mobile.ui.screens.DeliverScreen
 import dev.ninfenz.mobile.ui.screens.GraphScreen
 import dev.ninfenz.mobile.ui.screens.ImportScreen
@@ -531,7 +532,8 @@ is Detail.Import -> ImportScreen(
                         onBack = { shell = shell.back() ?: shell },
                         onErrorCodes = { shell = shell.open(Detail.ErrorCodes) },
                         onDataRestored = { refresh() },
-                        onNfDocMerge = { shell = shell.open(Detail.NfDocMerge) }
+                        onNfDocMerge = { shell = shell.open(Detail.NfDocMerge) },
+                        onPatch = { shell = shell.open(Detail.Patch) }
                     )
                     is Detail.ErrorCodes -> ErrorCodesScreen(onBack = { shell = shell.back() ?: shell })
                     is Detail.Author -> {
@@ -644,6 +646,7 @@ is Detail.Import -> ImportScreen(
                     is Detail.PackUpdate -> PackUpdateScreen(store = library, onBack = { shell = shell.back() ?: shell })
                     is Detail.Ccos -> CcosScreen(onBack = { shell = shell.back() ?: shell })
                     is Detail.NfDocMerge -> NfDocMergeScreen(context.filesDir, onBack = { shell = shell.back() ?: shell })
+                    is Detail.Patch -> PatchScreen(onBack = { shell = shell.back() ?: shell })
                     is Detail.Pack -> {
                         val pack = packs.packs.firstOrNull { it.id == detail.id && it.version == detail.version }
                         if (pack == null) {

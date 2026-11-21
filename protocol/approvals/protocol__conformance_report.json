@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-11-21",
   "approved_by": "Monyeah777",
-  "note": "nf-patch schema model",
+  "note": "nf-patch apply screen",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "1dbcbfbaf41d8d8675fda3f8f049b4143dd72ab3d287689c35836438f1f9b0ca"

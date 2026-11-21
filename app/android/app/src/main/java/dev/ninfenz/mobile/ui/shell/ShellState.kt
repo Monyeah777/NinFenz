@@ -21,6 +21,7 @@ sealed interface Detail {
     data object PackCenter : Detail
     data object Ccos : Detail
     data object NfDocMerge : Detail
+    data object Patch : Detail
     data class Project(val id: String) : Detail
     data class Author(val id: String) : Detail
     data class Delivery(val id: String) : Detail
