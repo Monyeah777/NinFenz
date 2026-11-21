@@ -34,7 +34,8 @@
 - 批量装配为每个成功项目写 `.nf-doc.json`；多成功另写 `merged.nf-doc.json`。
 - 交付台新增 `nf-doc` 导出按钮（`NfDocExporter`），可直接得到可再装配的结构化文件。
 - `NfDocMerger` 合并：同名章节保留双方、重复块去重、冲突写入 manifest `doc_conflicts`。
-- 这是再装配的结构化输入；UI 的交互式 append/merge-by-section 选择仍 OPEN。
+- Settings 新增「合并 nf-doc」：选择 2+ 文件、合并、查看冲突、分享结果。
+- 这是再装配的结构化输入；逐项冲突选择/按章节裁剪仍 OPEN。
 
 ## A0-14 Daily 入口
 

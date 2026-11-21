@@ -38,8 +38,8 @@
 
 | 产物 | 大小 | sha256 | 备注 |
 |---|---|---|---|
-| debug APK | 51,454,073 B | `8f043844…` | 双 ABI |
-| release unsigned | 44,465,978 B | `bc648739…` | `zipalign -c -P 16` 通过 |
+| debug APK | 51,472,825 B | `1eba3be6…` | 双 ABI |
+| release unsigned | 44,486,682 B | `b076d391…` | `zipalign -c -P 16` 通过 |
 
 发布签名/公证/Play 材料仍无输入。
 

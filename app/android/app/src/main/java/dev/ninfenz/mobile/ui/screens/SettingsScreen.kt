@@ -65,7 +65,8 @@ import kotlinx.coroutines.withContext
 fun SettingsScreen(
     onBack: () -> Unit,
     onErrorCodes: () -> Unit = {},
-    onDataRestored: () -> Unit = {}
+    onDataRestored: () -> Unit = {},
+    onNfDocMerge: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val diag = remember { Core.diagnostics() }
@@ -244,6 +245,7 @@ fun SettingsScreen(
             OutlinedButton(onClick = {
                 restorePicker.launch(arrayOf("application/zip", "*/*"))
             }) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_backup_restore)) }
+            OutlinedButton(onClick = onNfDocMerge) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_nfdoc_merge)) }
             OutlinedButton(onClick = {
                 val removed = BackupService.prune(context.filesDir, 5)
                 backups = BackupService.list(context.filesDir)
