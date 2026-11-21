@@ -27,6 +27,18 @@ class BatchAssemblerTest {
     }
 
     @Test
+    fun allFailedStillWritesManifest() {
+        val out = Files.createTempDirectory("nf-batch-none").toFile()
+        val file = BatchAssembler.writeZip(listOf(BatchAssembler.Item("p1", "P1", false, null, "缺草稿")), out)
+        ZipFile(file).use { zip ->
+            assertTrue(zip.getEntry("merged.md") == null)
+            assertTrue(zip.getEntry("projects/p1.md") == null)
+            val manifest = zip.getInputStream(zip.getEntry("nf-batch.json")).readBytes().toString(Charsets.UTF_8)
+            assertTrue(manifest.contains("缺草稿"))
+        }
+    }
+
+    @Test
     fun omitsMergedForSingleSuccess() {
         val out = Files.createTempDirectory("nf-batch-one").toFile()
         val file = BatchAssembler.writeZip(listOf(BatchAssembler.Item("p1", "P1", true, "# P1", null)), out)
