@@ -198,6 +198,117 @@ pub fn infer(spec: &Spec, doc: &Document) -> Report {
     Report { mappings, exceptions, coverage }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Stage {
+    Empty,
+    Source,
+    Preview,
+    Mapping,
+    Draft,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ResetScope {
+    Current,
+    All,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+struct Snapshot {
+    stage: Stage,
+    document: Option<Document>,
+    report: Option<Report>,
+}
+
+/// 最小导入会话：reset 后不自动恢复；undo 只回退内存快照。
+#[derive(Debug, Clone, Default, PartialEq)]
+pub struct Session {
+    stage: Stage,
+    document: Option<Document>,
+    report: Option<Report>,
+    undo: Vec<Snapshot>,
+}
+
+impl Default for Stage {
+    fn default() -> Self {
+        Stage::Empty
+    }
+}
+
+impl Session {
+    pub fn new() -> Self {
+        Self { stage: Stage::Empty, document: None, report: None, undo: Vec::new() }
+    }
+
+    pub fn stage(&self) -> Stage {
+        self.stage
+    }
+
+    pub fn document(&self) -> Option<&Document> {
+        self.document.as_ref()
+    }
+
+    pub fn report(&self) -> Option<&Report> {
+        self.report.as_ref()
+    }
+
+    fn snapshot(&mut self) {
+        self.undo.push(Snapshot {
+            stage: self.stage,
+            document: self.document.clone(),
+            report: self.report.clone(),
+        });
+        if self.undo.len() > 10 {
+            self.undo.remove(0);
+        }
+    }
+
+    pub fn start(&mut self, document: Document) -> Result<(), String> {
+        if document.blocks.is_empty() {
+            return Err("空内容不能开始导入".into());
+        }
+        self.snapshot();
+        self.document = Some(document);
+        self.report = None;
+        self.stage = Stage::Source;
+        self.stage = Stage::Preview;
+        Ok(())
+    }
+
+    pub fn infer(&mut self, spec: &Spec) -> Option<&Report> {
+        let doc = self.document.clone()?;
+        self.snapshot();
+        let report = infer(spec, &doc);
+        self.report = Some(report);
+        self.stage = Stage::Mapping;
+        self.report.as_ref()
+    }
+
+    pub fn accept_draft(&mut self) -> Result<(), String> {
+        if self.report.is_none() {
+            return Err("尚无映射结果".into());
+        }
+        self.snapshot();
+        self.stage = Stage::Draft;
+        Ok(())
+    }
+
+    pub fn reset(&mut self, _scope: ResetScope) {
+        self.undo.clear();
+        self.stage = Stage::Empty;
+        self.document = None;
+        self.report = None;
+    }
+
+    pub fn undo(&mut self) -> bool {
+        let Some(previous) = self.undo.pop() else { return false; };
+        self.stage = previous.stage;
+        self.document = previous.document;
+        self.report = previous.report;
+        true
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -239,6 +350,38 @@ mod tests {
         assert!(report.mappings.is_empty());
         assert_eq!(report.exceptions.len(), 3);
         assert_eq!(report.coverage, 0.0);
+    }
+
+    #[test]
+    fn session_transitions_and_reset() {
+        let mut session = Session::new();
+        let doc = parse_markdown("# 简\n\n## 背景\n\n甲\n");
+        session.start(doc).unwrap();
+        assert_eq!(session.stage(), Stage::Preview);
+        session.infer(&spec()).unwrap();
+        assert_eq!(session.stage(), Stage::Mapping);
+        session.accept_draft().unwrap();
+        assert_eq!(session.stage(), Stage::Draft);
+        session.reset(ResetScope::All);
+        assert_eq!(session.stage(), Stage::Empty);
+        assert!(session.document().is_none());
+        assert!(!session.undo());
+    }
+
+    #[test]
+    fn session_undo_restores_previous_stage() {
+        let mut session = Session::new();
+        session.start(parse_markdown("# 简\n\n## 背景\n\n甲\n")).unwrap();
+        session.infer(&spec()).unwrap();
+        assert!(session.undo());
+        assert_eq!(session.stage(), Stage::Preview);
+        assert!(session.report().is_none());
+    }
+
+    #[test]
+    fn empty_session_start_rejected() {
+        let mut session = Session::new();
+        assert!(session.start(Document { title: "空".into(), sections: vec![], blocks: vec![] }).is_err());
     }
 
     #[test]
