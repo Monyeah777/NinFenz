@@ -183,7 +183,9 @@ fun SettingsScreen(
                         val ok = created.items.count { it.ok }
                         val intent = ShareExporter.shareFileIntent(context, created.file, "application/zip", created.file.name)
                         ShareExporter.launchChooser(context, intent, created.file.name)
-                        backupMessage = context.resources.getQuantityString(dev.ninfenz.mobile.R.plurals.settings_batch_done, ok, ok, created.items.size)
+                        val firstFailure = created.items.firstOrNull { !it.ok }
+                        backupMessage = context.resources.getQuantityString(dev.ninfenz.mobile.R.plurals.settings_batch_done, ok, ok, created.items.size) +
+                            if (firstFailure != null) "\n" + context.getString(dev.ninfenz.mobile.R.string.settings_batch_failed_detail, firstFailure.title) else ""
                     }
                 }
             }) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_batch_run)) }
