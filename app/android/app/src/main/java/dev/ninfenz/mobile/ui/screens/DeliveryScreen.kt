@@ -153,7 +153,9 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
     val sampleStore = remember { dev.ninfenz.mobile.data.PromptSampleStore(context.filesDir) }
     val scope = rememberCoroutineScope()
     val statusStore = remember { ProjectStatusStore(context.filesDir) }
+    val contractStore = remember { dev.ninfenz.mobile.data.ContractStore(context.filesDir) }
     var status by remember(project.id) { mutableStateOf(project.status) }
+    var signoff by remember(project.id) { mutableStateOf(contractStore.load(project.id)) }
     var statusNote by remember { mutableStateOf<String?>(null) }
     var artifacts by remember { mutableStateOf<AuthorArtifacts?>(null) }
     var loadError by remember { mutableStateOf<String?>(null) }
@@ -944,6 +946,36 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                     }
                 }
 
+                if (report?.verdict == "pass" && markdown != null) {
+                    val slotsFilled = plan?.slots?.all { inputs[it].orEmpty().isNotBlank() } ?: false
+                    val checks = listOf(
+                        stringResource(dev.ninfenz.mobile.R.string.contract_l1) to true,
+                        stringResource(dev.ninfenz.mobile.R.string.contract_slots) to slotsFilled,
+                        stringResource(dev.ninfenz.mobile.R.string.contract_export) to (exportedFile != null)
+                    )
+                    Column(Modifier.padding(horizontal = NfSpacing.page, vertical = NfSpacing.s), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                        Text(stringResource(dev.ninfenz.mobile.R.string.contract_title), style = MaterialTheme.typography.titleSmall)
+                        checks.forEach { (label, ok) ->
+                            Text((if (ok) "✓ " else "✗ ") + label, style = MaterialTheme.typography.bodySmall, color = if (ok) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error)
+                        }
+                        val signed = signoff
+                        if (signed != null) {
+                            Text(stringResource(dev.ninfenz.mobile.R.string.contract_signed, signed.signedAt), style = MaterialTheme.typography.bodySmall)
+                        } else {
+                            Button(
+                                enabled = checks.all { it.second },
+                                onClick = {
+                                    val at = java.time.Instant.now().toString()
+                                    contractStore.sign(project.id, checks.filter { it.second }.map { it.first }, at)
+                                    signoff = contractStore.load(project.id)
+                                }
+                            ) { Text(stringResource(dev.ninfenz.mobile.R.string.contract_sign)) }
+                            if (!checks.all { it.second }) {
+                                Text(stringResource(dev.ninfenz.mobile.R.string.contract_blocked), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                        }
+                    }
+                }
                 if (markdown != null && exportMarkdown == null) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,

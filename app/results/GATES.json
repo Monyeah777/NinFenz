@@ -282,7 +282,7 @@
       "pass": 3
     }
   },
-  "head": "d8110b04930b792ad808262094e06cf661008c1b",
+  "head": "48275001c4a1689a9903192a326c33f409ab06c5",
   "open_items": [
     {
       "id": "S3",
@@ -901,10 +901,10 @@
         "app/android/app/src/test/java/dev/ninfenz/mobile/data/BackupServiceTest.kt",
         "app/android/app/src/test/java/dev/ninfenz/mobile/data/CcosSessionStoreTest.kt",
         "app/android/app/src/test/java/dev/ninfenz/mobile/data/CommandHistoryStoreTest.kt",
+        "app/android/app/src/test/java/dev/ninfenz/mobile/data/ContractStoreTest.kt",
         "app/android/app/src/test/java/dev/ninfenz/mobile/data/CrashLogStoreTest.kt",
         "app/android/app/src/test/java/dev/ninfenz/mobile/data/DeliveryDraftStoreTest.kt",
-        "app/android/app/src/test/java/dev/ninfenz/mobile/data/DiagnosticsBundleTest.kt",
-        "app/android/app/src/test/java/dev/ninfenz/mobile/data/DocxImporterTest.kt"
+        "app/android/app/src/test/java/dev/ninfenz/mobile/data/DiagnosticsBundleTest.kt"
       ],
       "gate": "QA5",
       "kind": "glob_min",

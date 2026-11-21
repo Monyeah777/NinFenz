@@ -1068,4 +1068,11 @@ MIT License · See app/docs/LEGAL.md</string>
         <item quantity="one">Auto-slice: %1$d%% coverage, %2$d exceptions</item>
         <item quantity="other">Auto-slice: %1$d%% coverage, %2$d exceptions</item>
     </plurals>
+    <string name="contract_title">Acceptance checklist</string>
+    <string name="contract_l1">L1 validation passed</string>
+    <string name="contract_slots">Required slots filled</string>
+    <string name="contract_export">At least one export</string>
+    <string name="contract_sign">Sign off</string>
+    <string name="contract_signed">Signed off: %1$s</string>
+    <string name="contract_blocked">Checklist incomplete; sign-off disabled</string>
 </resources>

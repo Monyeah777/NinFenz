@@ -1064,4 +1064,11 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
         <item quantity="one">自动切片：覆盖 %1$d%%，例外 %2$d 项</item>
         <item quantity="other">自动切片：覆盖 %1$d%%，例外 %2$d 项</item>
     </plurals>
+    <string name="contract_title">验收清单</string>
+    <string name="contract_l1">L1 校验通过</string>
+    <string name="contract_slots">必填槽位已填</string>
+    <string name="contract_export">至少一次导出</string>
+    <string name="contract_sign">签收</string>
+    <string name="contract_signed">已签收：%1$s</string>
+    <string name="contract_blocked">验收项未全通过，暂不能签收</string>
 </resources>

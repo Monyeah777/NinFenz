@@ -39,6 +39,12 @@
 - 合并结果可展开块列表、删除单块；删除后保存/分享。
 - 块可上下移动/删除；跨章节拖拽仍 OPEN。
 
+## M35 Content Contract（P0 部分）
+
+- 交付台验收清单：L1 通过 / 必填槽位已填 / 至少一次导出。
+- 全绿后可本地签收，`ContractStore` 落盘 accepted + signed_at。
+- **不是**密码学签名；无变更单/异议/多方评审。
+
 ## M38 Preservation（P1 部分）
 
 - `PreservationExporter`：document.md + document.nfdoc.json + preservation.json（SHA-256/bytes）。
