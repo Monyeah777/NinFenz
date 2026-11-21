@@ -309,6 +309,84 @@ impl Session {
     }
 }
 
+/// 极简草稿落盘：同源覆盖（同一 source_id 同一 id），异源新建；不做回收站。
+#[derive(Debug, Clone)]
+pub struct DraftStore {
+    root: std::path::PathBuf,
+}
+
+impl DraftStore {
+    pub fn new(root: impl Into<std::path::PathBuf>) -> Self {
+        Self { root: root.into() }
+    }
+
+    fn id_for(source_id: &str) -> String {
+        use sha2::{Digest, Sha256};
+        let mut hasher = Sha256::new();
+        hasher.update(source_id.as_bytes());
+        hasher.finalize().iter().take(8).map(|b| format!("{b:02x}")).collect()
+    }
+
+    pub fn save(&self, source_id: &str, doc: &Document, report: &Report) -> Result<String, crate::error::CoreError> {
+        let id = Self::id_for(source_id);
+        std::fs::create_dir_all(&self.root)
+            .map_err(|e| crate::fsutil::io_error("draft dir", &self.root, e))?;
+        let path = self.root.join(format!("{id}.json"));
+        let value = serde_json::json!({
+            "schema": "nf-zero-slice-draft/1",
+            "source_id": source_id,
+            "document": document_json(doc),
+            "report": report_json(report),
+        });
+        crate::fsutil::write_json_canonical(&path, &value)?;
+        Ok(id)
+    }
+
+    pub fn load(&self, id: &str) -> Option<serde_json::Value> {
+        let path = self.root.join(format!("{id}.json"));
+        crate::fsutil::load_json_file(&path).ok()
+    }
+
+    pub fn delete(&self, id: &str) -> bool {
+        std::fs::remove_file(self.root.join(format!("{id}.json"))).is_ok()
+    }
+
+    pub fn list(&self) -> Vec<String> {
+        let mut ids: Vec<String> = std::fs::read_dir(&self.root).ok().into_iter().flatten().flatten()
+            .filter_map(|e| e.file_name().to_string_lossy().strip_suffix(".json").map(|s| s.to_string()))
+            .collect();
+        ids.sort();
+        ids
+    }
+}
+
+pub fn document_json(doc: &Document) -> serde_json::Value {
+    serde_json::json!({
+        "title": doc.title,
+        "sections": doc.sections.iter().map(|s| serde_json::json!({
+            "title": s.title,
+            "blocks": s.blocks.iter().map(|b| serde_json::json!({"kind": b.kind, "text": b.text})).collect::<Vec<_>>(),
+        })).collect::<Vec<_>>(),
+    })
+}
+
+pub fn report_json(report: &Report) -> serde_json::Value {
+    serde_json::json!({
+        "mappings": report.mappings.iter().map(|m| serde_json::json!({
+            "from_index": m.from_index,
+            "to_id": m.to_id,
+            "to_name": m.to_name,
+            "confidence": (m.confidence * 100.0).round() as u32,
+        })).collect::<Vec<_>>(),
+        "exceptions": report.exceptions.iter().map(|e| serde_json::json!({
+            "text": e.text,
+            "target": e.target,
+            "reason": e.reason,
+        })).collect::<Vec<_>>(),
+        "coverage": (report.coverage * 100.0).round() as u32,
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -350,6 +428,23 @@ mod tests {
         assert!(report.mappings.is_empty());
         assert_eq!(report.exceptions.len(), 3);
         assert_eq!(report.coverage, 0.0);
+    }
+
+    #[test]
+    fn draft_store_overwrites_same_source() {
+        let root = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("target/nf-test-tmp").join(format!("zero_draft_{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&root);
+        let store = DraftStore::new(&root);
+        let doc = parse_markdown("# 简\n\n## 背景\n\n甲\n");
+        let report = infer(&spec(), &doc);
+        let a = store.save("same.md", &doc, &report).unwrap();
+        let b = store.save("same.md", &doc, &report).unwrap();
+        assert_eq!(a, b);
+        assert_eq!(store.list(), vec![a.clone()]);
+        assert!(store.load(&a).is_some());
+        assert!(store.delete(&a));
+        assert!(store.load(&a).is_none());
+        let _ = std::fs::remove_dir_all(&root);
     }
 
     #[test]
