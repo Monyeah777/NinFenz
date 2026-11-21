@@ -28,6 +28,12 @@
 - `python -m pytest app/tests/test_ui_strings_localized.py -q` → 1 passed。
 - 全量 `python -m pytest app/tests -q` → **498 passed**。
 
+## A0-8 草稿→项目映射
+
+- `ImportPrefill.bySlotName` 把导入槽位 ID 映射到 spec 槽位名，再与协议字段 `label` 精确匹配。
+- 优先级：草稿 → 直接字段 ID → 槽位名 → 模板示例 → 默认值。
+- 单测覆盖；映射仍是精确名匹配，不做相似度猜测。
+
 ## 未完成 / OPEN
 
 | id | 内容 | owner | next |

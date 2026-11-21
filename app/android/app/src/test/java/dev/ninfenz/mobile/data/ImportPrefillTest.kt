@@ -21,6 +21,15 @@ class ImportPrefillTest {
     }
 
     @Test
+    fun mapsSlotIdToProtocolLabel() {
+        val slots = listOf(
+            dev.ninfenz.mobile.model.SpecSlot(id = "SLT-01", name = "主题句", section = "SEC-01", kind = "text", required = true)
+        )
+        val mapped = ImportPrefill.bySlotName(mapOf("SLT-01" to "灯灭之前"), slots)
+        assertEquals("灯灭之前", mapped["主题句"])
+    }
+
+    @Test
     fun invalidJsonReturnsEmpty() {
         assertEquals(emptyMap<String, String>(), ImportPrefill.fromJson("{bad"))
     }

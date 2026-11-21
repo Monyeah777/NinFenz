@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-21",
   "approved_by": "Monyeah777",
-  "note": "v2 delta utf8 refresh",
+  "note": "v2 import label mapping",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "a7f36f98f0e9d33cffb7f2eb85ade67ad74d29658efb18263c32f056a77b3e4b"
+  "subject_digest": "1dbcbfbaf41d8d8675fda3f8f049b4143dd72ab3d287689c35836438f1f9b0ca"
 }
