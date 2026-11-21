@@ -24,16 +24,20 @@ object BatchAssembler {
     data class Created(val file: File, val items: List<Item>)
 
     suspend fun assembleAll(filesDir: File, outDir: File): Created = coroutineScope {
-        val projects = LibraryStore(filesDir).loadProjects().projects
-        require(projects.isNotEmpty()) { "没有可装配的项目" }
+        val snapshot = LibraryStore(filesDir).loadProjects()
+        val projects = snapshot.projects
+        require(projects.isNotEmpty() || snapshot.errors.isNotEmpty()) { "没有可装配的项目" }
         val packs = PackStore(filesDir).scan().packs.associateBy { it.id + "/" + it.version }
-        val items = projects.map { entry ->
+        val parsed = projects.map { entry ->
             async(Dispatchers.IO) {
                 runCatching { assembleOne(entry.project, packs, filesDir) }.getOrElse { t ->
                     Item(entry.project.id, entry.project.title, false, null, t.message ?: t.javaClass.simpleName)
                 }
             }
         }.awaitAll()
+        val items = parsed + snapshot.errors.mapIndexed { index, error ->
+            Item("invalid-" + index, "项目解析失败", false, null, error)
+        }
         require(items.any { it.ok }) { "所有项目都未装配成功" }
         val file = withContext(Dispatchers.IO) { writeZip(items, outDir) }
         Created(file, items)
