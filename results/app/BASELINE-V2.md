@@ -30,6 +30,9 @@
 | Rust core | **198 passed / 21 suites / 0 failed** | `cd app/core && cargo test -q` |
 | Python app | **501 passed / 1 warning / 0 failed** | `python -m pytest app/tests -q` |
 | Android JVM | **433/433** | `:app:testDebugUnitTest` |
+| Desktop JVM | **20/20** | `cd app/desktop && ./gradlew test --rerun-tasks` |
+| TUI selftest | **9/9** | `python tui/nf.py --selftest` |
+| MSI 打包 | **未跑通** | `build_desktop.sh package` 卡在 WiX 下载，已中止 |
 | zero_slice 原型 | **14/14** | `python -m unittest -v test_zero_slice.py` |
 | app gates | **QA0–QA6 全 PASS；FAIL=0；P0=0** | `python app/gates/run_gates.py` |
 | 仓库门禁 | **PASS=107 WARN=2 FAIL=0** | `bash verify.sh --checks-only` |
