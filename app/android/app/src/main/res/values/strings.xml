@@ -997,4 +997,6 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="settings_batch_failed">没有项目装配成功，请检查交付草稿与 Pack。</string>
     <string name="settings_batch_failed_detail">首个失败：%1$s</string>
     <string name="settings_batch_start">装配所选项目</string>
+    <string name="settings_batch_select_all">全选</string>
+    <string name="settings_batch_clear">清空</string>
 </resources>

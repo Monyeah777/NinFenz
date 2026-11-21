@@ -192,6 +192,14 @@ fun SettingsScreen(
                     title = { Text(stringResource(dev.ninfenz.mobile.R.string.settings_batch_run)) },
                     text = {
                         Column(Modifier.heightIn(max = 360.dp).verticalScroll(rememberScrollState())) {
+                            Row {
+                                TextButton(onClick = { batchSelected = candidates.map { it.project.id }.toSet() }) {
+                                    Text(stringResource(dev.ninfenz.mobile.R.string.settings_batch_select_all))
+                                }
+                                TextButton(onClick = { batchSelected = emptySet() }) {
+                                    Text(stringResource(dev.ninfenz.mobile.R.string.settings_batch_clear))
+                                }
+                            }
                             candidates.forEach { entry ->
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Checkbox(
