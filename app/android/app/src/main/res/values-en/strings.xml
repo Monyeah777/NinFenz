@@ -1034,4 +1034,7 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="nfdoc_merge_keep_right">Keep right</string>
     <string name="nfdoc_merge_keep_both">Keep both</string>
     <string name="nfdoc_merge_save">Save result</string>
+    <string name="nfdoc_merge_edit_blocks">Edit blocks</string>
+    <string name="nfdoc_merge_hide_blocks">Hide blocks</string>
+    <string name="nfdoc_merge_delete_block">Delete</string>
 </resources>

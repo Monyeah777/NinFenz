@@ -5,6 +5,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -23,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.R
 import dev.ninfenz.mobile.core.J
 import dev.ninfenz.mobile.model.NfDoc
@@ -46,6 +50,7 @@ fun NfDocMergeScreen(filesDir: File, onBack: () -> Unit) {
     var result by remember { mutableStateOf<NfDocMerger.Result?>(null) }
     var saved by remember { mutableStateOf<File?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
+    var editingBlocks by remember { mutableStateOf(false) }
 
     Column(Modifier.fillMaxSize()) {
         NfTopAppBar(title = stringResource(R.string.nfdoc_merge_title), onBack = onBack)
@@ -105,6 +110,28 @@ fun NfDocMergeScreen(filesDir: File, onBack: () -> Unit) {
                             result = merged.copy(doc = NfDocMerger.resolve(merged.doc, c, NfDocMerger.Keep.BOTH))
                             saved = null
                         }) { Text(stringResource(R.string.nfdoc_merge_keep_both)) }
+                    }
+                }
+                androidx.compose.material3.TextButton(onClick = { editingBlocks = !editingBlocks }) {
+                    Text(stringResource(if (editingBlocks) R.string.nfdoc_merge_hide_blocks else R.string.nfdoc_merge_edit_blocks))
+                }
+                if (editingBlocks) {
+                    Column(Modifier.heightIn(max = 240.dp).verticalScroll(rememberScrollState())) {
+                        merged.doc.blocks.forEachIndexed { index, block ->
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    block.type + " · " + block.text.replace("\n", " ").take(60),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                androidx.compose.material3.TextButton(onClick = {
+                                    val blocks = merged.doc.blocks.filterIndexed { i, _ -> i != index }
+                                        .mapIndexed { i, b -> b.copy(id = "b" + (i + 1)) }
+                                    result = merged.copy(doc = merged.doc.copy(blocks = blocks))
+                                    saved = null
+                                }) { Text(stringResource(R.string.nfdoc_merge_delete_block)) }
+                            }
+                        }
                     }
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {

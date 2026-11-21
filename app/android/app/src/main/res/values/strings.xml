@@ -1030,4 +1030,7 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="nfdoc_merge_keep_right">保留右</string>
     <string name="nfdoc_merge_keep_both">保留双方</string>
     <string name="nfdoc_merge_save">保存结果</string>
+    <string name="nfdoc_merge_edit_blocks">编辑块</string>
+    <string name="nfdoc_merge_hide_blocks">收起块</string>
+    <string name="nfdoc_merge_delete_block">删除</string>
 </resources>
