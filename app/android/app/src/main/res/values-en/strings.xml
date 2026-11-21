@@ -813,6 +813,11 @@
     </plurals>
     <string name="project_history_title">Status history</string>
     <string name="settings_backup_export">Export local backup</string>
+    <string name="settings_batch_run">Assemble all projects</string>
+    <plurals name="settings_batch_done">
+        <item quantity="one">Assembled %1$d/%2$d project</item>
+        <item quantity="other">Assembled %1$d/%2$d projects</item>
+    </plurals>
     <string name="settings_bundle_export">Export all project packages</string>
     <plurals name="settings_bundle_done">
         <item quantity="one">Bundled %d project package</item>
@@ -993,4 +998,5 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="import_pdf_ocr_failed">Scanned PDF OCR failed: %1$s</string>
     <string name="import_pdf_ocr_truncated">Scanned PDF OCR covered the first 20 pages only.</string>
     <string name="settings_bundle_empty">No projects to bundle.</string>
+    <string name="settings_batch_failed">No project could be assembled. Check drafts and Packs.</string>
 </resources>

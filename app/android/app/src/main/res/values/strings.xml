@@ -809,6 +809,11 @@
     </plurals>
     <string name="project_history_title">状态历史</string>
     <string name="settings_backup_export">导出本地备份</string>
+    <string name="settings_batch_run">并行装配全部项目</string>
+    <plurals name="settings_batch_done">
+        <item quantity="one">装配成功 %1$d/%2$d 个项目</item>
+        <item quantity="other">装配成功 %1$d/%2$d 个项目</item>
+    </plurals>
     <string name="settings_bundle_export">导出全部项目包</string>
     <plurals name="settings_bundle_done">
         <item quantity="one">已打包 %d 个项目包</item>
@@ -989,4 +994,5 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="import_pdf_ocr_failed">扫描 PDF OCR 失败：%1$s</string>
     <string name="import_pdf_ocr_truncated">扫描 PDF 仅 OCR 了前 20 页。</string>
     <string name="settings_bundle_empty">没有可打包的项目。</string>
+    <string name="settings_batch_failed">没有项目装配成功，请检查交付草稿与 Pack。</string>
 </resources>
