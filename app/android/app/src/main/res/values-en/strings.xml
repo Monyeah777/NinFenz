@@ -1056,4 +1056,6 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="patch_saved">Saved to project draft</string>
     <string name="patch_undo">Undo application</string>
     <string name="patch_changes">Changes: %1$d</string>
+    <string name="patch_validation_ok">L1 validation passed</string>
+    <string name="patch_validation_failed">L1 validation failed; review before saving</string>
 </resources>

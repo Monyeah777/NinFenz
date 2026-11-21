@@ -1052,4 +1052,6 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="patch_saved">已保存到项目稿</string>
     <string name="patch_undo">撤销应用</string>
     <string name="patch_changes">变更预览：%1$d 条</string>
+    <string name="patch_validation_ok">L1 校验通过</string>
+    <string name="patch_validation_failed">L1 校验未通过，保存前请检查</string>
 </resources>

@@ -41,8 +41,8 @@
 
 | 产物 | 大小 | sha256 | 备注 |
 |---|---|---|---|
-| debug APK | 51,515,825 B | `980cb956…` | 双 ABI |
-| release unsigned | 44,514,718 B | `0544709b…` | `zipalign -c -P 16` 通过 |
+| debug APK | 51,519,517 B | `f7955629…` | 双 ABI |
+| release unsigned | 44,515,686 B | `102b57cf…` | `zipalign -c -P 16` 通过 |
 | debug-signed APK | 44,554,405 B | `2873e5a1…` | 仅内部安装；证书 CN=Android Debug |
 | release AAB unsigned | 28,350,986 B | `c98c34ed…` | `jarsigner -verify` 未签名；AAB 16KB 未用 bundletool 复核 |
 
