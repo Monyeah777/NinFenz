@@ -35,7 +35,12 @@ object BatchAssembler {
                 }
             }
         }.awaitAll()
-        val items = parsed + snapshot.errors.mapIndexed { index, error ->
+        val errors = if (selectedIds == null) {
+            snapshot.errors
+        } else {
+            snapshot.errors.filter { error -> selectedIds.any { id -> error.startsWith(id + ".nfproject.json") } }
+        }
+        val items = parsed + errors.mapIndexed { index, error ->
             Item("invalid-" + index, "项目解析失败", false, null, error)
         }
         require(items.any { it.ok }) { "所有项目都未装配成功" }
