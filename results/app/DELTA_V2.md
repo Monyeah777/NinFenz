@@ -43,7 +43,8 @@
 
 - `app/core/src/zero_slice.rs`：Markdown 解析、标题映射、<0.6 例外、freeform、coverage。
 - 8 条 Rust 单测：解析/映射/例外/freeform + Session 状态机/reset/undo。
-- **未**移植 DraftStore 落盘与 to_project FFI；Android 仍用现有导入会话。
+- 新 `zero-slice` op：输入 text/spec，输出 title/sections/mappings/exceptions/coverage（0–100 整数）；3 条 op 测试。
+- **未**移植 DraftStore 落盘、to_project FFI、Android 接线。
 - Android 仍走现有 ImportSession/ImportDraftStore，不切换。
 
 ## A0-14 Daily 入口

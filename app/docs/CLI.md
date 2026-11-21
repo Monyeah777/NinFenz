@@ -36,6 +36,7 @@ nf-app-core <op> --in <req.json|->   # → stdout: 单行 JSON（响应信封）
 | `import-sniff` | `name`, `mime?`, `file?/bytes_path?` | `{format, confidence, candidates:[{format,confidence}]}` | 未知 → NF-IMP-001 (3)；未实现格式 → NF-IMP-004 (3) |
 | `import` | `file`, `source:{kind,name,mime?,size?,sha256?}` | `nf-import/1` | 低置信 → NF-IMP-002 (warn, exit 0)；未实现格式/超限 → 3 |
 | `map-suggest` | `import`: nf-import/1, `spec?`: nf-md-spec/1 | `nf-import/1`（`suggested` 已填） | 无候选 → NF-MAP-001 (warn) |
+| `zero-slice` | `text`, `spec?` | `{title, sections, mappings, exceptions, coverage}`（0–100 整数） | 空内容 → 2；spec.slots[] 缺 id/name → 2 |
 | `protocol-validate` | `pack`: nf-protocol-pack/1 | `nf-validate-report/1` | 结构/引用 → 1 |
 | `protocol-render` | `pack`, `values`: {field_id: value} | `{clauses:[{id, text}], warnings:[...]}` | 缺必填 → NF-PRT-003 (1)；未知占位符 → NF-PRT-004 (1)；规则不满足 → NF-PRT-005 语义（1） |
 | `graph-validate` | `graph`: nf-pipeline-graph/1 | `nf-validate-report/1`（L0+L1） | 失败 → 1 |

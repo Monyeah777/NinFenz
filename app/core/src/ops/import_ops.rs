@@ -664,3 +664,57 @@ pub fn map_suggest(req: &Value) -> OpOutcome {
 fn ref_id_spec(v: &Value) -> String {
     v.get("id").and_then(|x| x.as_str()).unwrap_or("$").to_string()
 }
+
+
+/// zero-slice：结构化解析 + spec 映射 + 例外；置信度/覆盖率为 0–100 整数。
+pub fn zero_slice(req: &Value) -> OpOutcome {
+    let text = req_str(req, "text")?;
+    let doc = crate::zero_slice::parse_markdown(text);
+    let mut slots = Vec::new();
+    if let Some(spec) = req.get("spec").and_then(|v| v.as_object()) {
+        if let Some(list) = spec.get("slots").and_then(|v| v.as_array()) {
+            for item in list {
+                let Some(obj) = item.as_object() else { continue };
+                let id = obj.get("id").and_then(|v| v.as_str()).unwrap_or("").to_string();
+                let name = obj.get("name").and_then(|v| v.as_str()).unwrap_or("").to_string();
+                if id.is_empty() || name.is_empty() {
+                    return Err(usage("spec.slots[] 必须带 id/name"));
+                }
+                slots.push(crate::zero_slice::SlotSpec {
+                    id,
+                    name,
+                    required: obj.get("required").and_then(|v| v.as_bool()).unwrap_or(false),
+                });
+            }
+        }
+    }
+    let spec = crate::zero_slice::Spec {
+        id: req.get("spec").and_then(|v| v.get("id")).and_then(|v| v.as_str()).unwrap_or("freeform").to_string(),
+        slots,
+    };
+    let report = crate::zero_slice::infer(&spec, &doc);
+    let sections: Vec<Value> = doc.sections.iter().map(|s| json!({
+        "title": s.title,
+        "chars": s.text().chars().count(),
+    })).collect();
+    let mappings: Vec<Value> = report.mappings.iter().map(|m| json!({
+        "from_index": m.from_index,
+        "from_title": m.from_title,
+        "to_id": m.to_id,
+        "to_name": m.to_name,
+        "confidence": (m.confidence * 100.0).round() as u32,
+        "rationale": m.rationale,
+    })).collect();
+    let exceptions: Vec<Value> = report.exceptions.iter().map(|e| json!({
+        "text": e.text,
+        "target": e.target,
+        "reason": e.reason,
+    })).collect();
+    Ok((0, json!({
+        "title": doc.title,
+        "sections": sections,
+        "mappings": mappings,
+        "exceptions": exceptions,
+        "coverage": (report.coverage * 100.0).round() as u32,
+    })))
+}

@@ -176,6 +176,7 @@ pub fn dispatch(op: &str, req: &Value) -> Envelope {
         "import-sniff" => import_ops::import_sniff(req),
         "import" => import_ops::import(req),
         "map-suggest" => import_ops::map_suggest(req),
+        "zero-slice" => import_ops::zero_slice(req),
         "protocol-validate" => maybe_fail(protocol::protocol_validate(req)),
         "protocol-render" => protocol::protocol_render(req),
         "graph-validate" => maybe_fail(graph::graph_validate(req)),
