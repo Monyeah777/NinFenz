@@ -124,6 +124,28 @@ fun NfDocMergeScreen(filesDir: File, onBack: () -> Unit) {
                                     style = MaterialTheme.typography.bodySmall,
                                     modifier = Modifier.weight(1f)
                                 )
+                                androidx.compose.material3.TextButton(
+                                    enabled = index > 0,
+                                    onClick = {
+                                        val blocks = merged.doc.blocks.toMutableList().also {
+                                            val item = it.removeAt(index)
+                                            it.add(index - 1, item)
+                                        }.mapIndexed { i, b -> b.copy(id = "b" + (i + 1)) }
+                                        result = merged.copy(doc = merged.doc.copy(blocks = blocks))
+                                        saved = null
+                                    }
+                                ) { Text(stringResource(R.string.preview_block_up)) }
+                                androidx.compose.material3.TextButton(
+                                    enabled = index < merged.doc.blocks.lastIndex,
+                                    onClick = {
+                                        val blocks = merged.doc.blocks.toMutableList().also {
+                                            val item = it.removeAt(index)
+                                            it.add(index + 1, item)
+                                        }.mapIndexed { i, b -> b.copy(id = "b" + (i + 1)) }
+                                        result = merged.copy(doc = merged.doc.copy(blocks = blocks))
+                                        saved = null
+                                    }
+                                ) { Text(stringResource(R.string.preview_block_down)) }
                                 androidx.compose.material3.TextButton(onClick = {
                                     val blocks = merged.doc.blocks.filterIndexed { i, _ -> i != index }
                                         .mapIndexed { i, b -> b.copy(id = "b" + (i + 1)) }
