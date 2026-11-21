@@ -81,6 +81,8 @@ object BatchAssembler {
         return Item(project.id, project.title, true, markdown, null)
     }
 
+    private fun safeName(id: String): String = id.replace(Regex("[^A-Za-z0-9._-]"), "_").ifBlank { "project" }
+
     internal fun writeZip(items: List<Item>, outDir: File): File {
         outDir.mkdirs()
         val target = File(outDir, "nf-batch-" + System.nanoTime() + ".zip")
@@ -96,7 +98,7 @@ object BatchAssembler {
                             put("title", item.title)
                             put("ok", item.ok)
                             if (item.ok) {
-                                put("markdown", "projects/" + item.projectId + ".md")
+                                put("markdown", "projects/" + safeName(item.projectId) + ".md")
                                 put("validated", "L1")
                             }
                             item.error?.let { put("error", it) }
@@ -108,7 +110,7 @@ object BatchAssembler {
             out.write(manifest.toString().toByteArray(Charsets.UTF_8))
             out.closeEntry()
             good.forEach { item ->
-                out.putNextEntry(ZipEntry("projects/" + item.projectId + ".md").apply { time = 0L })
+                out.putNextEntry(ZipEntry("projects/" + safeName(item.projectId) + ".md").apply { time = 0L })
                 out.write(item.markdown!!.toByteArray(Charsets.UTF_8))
                 out.closeEntry()
             }
