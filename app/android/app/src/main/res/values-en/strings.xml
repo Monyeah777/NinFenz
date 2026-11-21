@@ -1077,4 +1077,7 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="contract_blocked">Checklist incomplete; sign-off disabled</string>
     <string name="contract_artifact">Export sha256: %1$s</string>
     <string name="contract_stale">Export changed; sign-off is stale, please sign again</string>
+    <string name="import_verify_preserve">Verify archive</string>
+    <string name="import_preserve_ok">Archive OK: %1$s</string>
+    <string name="import_preserve_fail">Archive invalid: %1$s</string>
 </resources>

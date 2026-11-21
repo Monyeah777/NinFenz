@@ -1073,4 +1073,7 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="contract_blocked">验收项未全通过，暂不能签收</string>
     <string name="contract_artifact">导出物 sha256：%1$s</string>
     <string name="contract_stale">导出物已变化，签收失效，请重新签收</string>
+    <string name="import_verify_preserve">校验归档包</string>
+    <string name="import_preserve_ok">归档包通过：%1$s</string>
+    <string name="import_preserve_fail">归档包无效：%1$s</string>
 </resources>

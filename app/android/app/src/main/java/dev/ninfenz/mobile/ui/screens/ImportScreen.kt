@@ -145,6 +145,7 @@ fun ImportScreen(
     var acceptedMappings by remember { mutableStateOf<Set<Int>>(emptySet()) }
     var suggestNote by remember { mutableStateOf<String?>(null) }
     var zeroSliceNote by remember { mutableStateOf<String?>(null) }
+    var preserveNote by remember { mutableStateOf<String?>(null) }
     val importHistory = remember { ImportHistoryStore(context.filesDir) }
     val importDraftStore = remember { ImportDraftStore(context.filesDir) }
     val templateStore = remember { TemplateCandidateStore(context.filesDir) }
@@ -753,6 +754,23 @@ fun ImportScreen(
         }
     }
 
+    val preservePicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        scope.launch {
+            try {
+                val file = FileAccess.copyToCache(context, uri, "preserve.zip")
+                val result = dev.ninfenz.mobile.data.PreservationVerifier.verify(file)
+                preserveNote = if (result.ok) {
+                    context.getString(dev.ninfenz.mobile.R.string.import_preserve_ok, result.title ?: file.name)
+                } else {
+                    context.getString(dev.ninfenz.mobile.R.string.import_preserve_fail, result.errors.take(2).joinToString("; "))
+                }
+                file.delete()
+            } catch (t: Throwable) {
+                preserveNote = context.getString(dev.ninfenz.mobile.R.string.import_preserve_fail, t.message ?: t.javaClass.simpleName)
+            }
+        }
+    }
     val filePicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         if (uri != null) {
             scope.launch {
@@ -823,6 +841,7 @@ fun ImportScreen(
                             if (doc != null) {
                                 OutlinedButton(onClick = { runZeroSlice() }, enabled = !busy) { Text(stringResource(dev.ninfenz.mobile.R.string.import_zero_slice)) }
                             }
+                            OutlinedButton(onClick = { preservePicker.launch(arrayOf("application/zip", "application/octet-stream")) }, enabled = !busy) { Text(stringResource(dev.ninfenz.mobile.R.string.import_verify_preserve)) }
                             if (prefillNote != null) {
                                 Text(stringResource(dev.ninfenz.mobile.R.string.import_share_received), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
                             }
@@ -831,6 +850,7 @@ fun ImportScreen(
                             Text(prefillNote!!, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                         zeroSliceNote?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary) }
+                        preserveNote?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary) }
                         if (shareQueue.isNotEmpty()) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(

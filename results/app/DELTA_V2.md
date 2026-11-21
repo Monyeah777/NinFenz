@@ -50,6 +50,7 @@
 
 - `PreservationExporter`：document.md + document.nfdoc.json + preservation.json（SHA-256/bytes）。
 - Zip 固定时间，可复算；交付台「preserve」按钮导出。
+- `PreservationVerifier` 校验 schema/条目/字节数/sha256；导入页「校验归档包」按钮。
 - **未**做 OAIS 迁移/版本升级链/外部校验工具对接。
 
 ## M4 Semantic Patch（P0 部分）

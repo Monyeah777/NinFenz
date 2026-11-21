@@ -29,7 +29,7 @@
 |---|---|---|
 | Rust core | **211 passed / 21 suites / 0 failed** | `cd app/core && cargo test -q` |
 | Python app | **516 passed / 1 warning / 0 failed** | `python -m pytest app/tests -q` |
-| Android JVM | **438/438** | `:app:testDebugUnitTest` |
+| Android JVM | **440/440** | `:app:testDebugUnitTest` |
 | Desktop JVM | **20/20** | `cd app/desktop && ./gradlew test --rerun-tasks` |
 | TUI selftest | **9/9** | `python tui/nf.py --selftest` |
 | MSI 打包 | **未跑通** | `build_desktop.sh package` 卡在 WiX 下载，已中止 |
@@ -41,11 +41,11 @@
 
 | 产物 | 大小 | sha256 | 备注 |
 |---|---|---|---|
-| debug APK | 52,560,937 B | `056ca417…` | 双 ABI |
-| release unsigned | 44,535,822 B | `75e88f68…` | `zipalign -c -P 16` 通过 |
+| debug APK | 51,537,137 B | `5b252dd3…` | 双 ABI |
+| release unsigned | 44,537,210 B | `59f40df9…` | `zipalign -c -P 16` 通过 |
 | lintRelease | pass | 0 errors / 0 warnings |
 | Release manifest | pass | 0.2.0；minSdk 26 / target 36；无 debuggable |
-| debug-signed APK | 44,599,461 B | `f47699ca…` | 仅内部安装；证书 CN=Android Debug |
+| debug-signed APK | 44,599,461 B | `d6954c7f…` | 仅内部安装；证书 CN=Android Debug |
 | release AAB unsigned | 28,372,870 B | `e2c1ce56…` | `jarsigner -verify` 未签名；AAB 16KB 未用 bundletool 复核 |
 
 发布签名/公证/Play 材料仍无输入。
