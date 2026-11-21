@@ -28,14 +28,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import dev.ninfenz.mobile.R
+import dev.ninfenz.mobile.data.DeliveryDraftStore
 import dev.ninfenz.mobile.model.NfPatchModel
 import dev.ninfenz.mobile.ui.components.NfTopAppBar
 import dev.ninfenz.mobile.ui.theme.NfSpacing
+import java.io.File
 
 @Composable
-fun PatchScreen(onBack: () -> Unit) {
+fun PatchScreen(filesDir: File, projectId: String?, onBack: () -> Unit) {
     val context = LocalContext.current
-    var markdown by remember { mutableStateOf("") }
+    val store = remember(projectId) { projectId?.let { DeliveryDraftStore(filesDir) } }
+    var markdown by remember(projectId) { mutableStateOf(projectId?.let { store?.loadMarkdown(it) } ?: "") }
     var json by remember { mutableStateOf("") }
     var entries by remember { mutableStateOf<List<Pair<NfPatchModel.Op, Boolean>>>(emptyList()) }
     var result by remember { mutableStateOf<NfPatchModel.Result?>(null) }
@@ -112,11 +115,19 @@ fun PatchScreen(onBack: () -> Unit) {
                     minLines = 5,
                     textStyle = MaterialTheme.typography.bodySmall
                 )
-                OutlinedButton(onClick = {
-                    val manager = context.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
-                    manager?.setPrimaryClip(ClipData.newPlainText("nf-patch", r.markdown))
-                    Toast.makeText(context, context.getString(R.string.patch_copied), Toast.LENGTH_SHORT).show()
-                }) { Text(stringResource(R.string.patch_copy)) }
+                Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+                    OutlinedButton(onClick = {
+                        val manager = context.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
+                        manager?.setPrimaryClip(ClipData.newPlainText("nf-patch", r.markdown))
+                        Toast.makeText(context, context.getString(R.string.patch_copied), Toast.LENGTH_SHORT).show()
+                    }) { Text(stringResource(R.string.patch_copy)) }
+                    if (store != null && projectId != null) {
+                        Button(onClick = {
+                            store.save(projectId, store.load(projectId), store.loadPlan(projectId), r.markdown)
+                            Toast.makeText(context, context.getString(R.string.patch_saved), Toast.LENGTH_SHORT).show()
+                        }) { Text(stringResource(R.string.patch_save)) }
+                    }
+                }
             }
         }
     }

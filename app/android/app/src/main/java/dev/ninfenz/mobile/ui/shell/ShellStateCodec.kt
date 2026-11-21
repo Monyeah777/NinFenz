@@ -18,7 +18,7 @@ object ShellStateCodec {
             Detail.PackCenter -> "PackCenter"
             Detail.Ccos -> "Ccos"
             Detail.NfDocMerge -> "NfDocMerge"
-            Detail.Patch -> "Patch"
+            is Detail.Patch -> "Patch"
             is Detail.Project -> "Project"
             is Detail.Author -> "Author"
             is Detail.Delivery -> "Delivery"
@@ -31,6 +31,7 @@ object ShellStateCodec {
             is Detail.Delivery -> d.id
             is Detail.Flow -> d.id
             is Detail.Pack -> d.id
+            is Detail.Patch -> d.projectId ?: ""
             else -> ""
         }
         val arg2 = when (d) {
@@ -57,7 +58,7 @@ object ShellStateCodec {
             "PackCenter" -> Detail.PackCenter
             "Ccos" -> Detail.Ccos
             "NfDocMerge" -> Detail.NfDocMerge
-            "Patch" -> Detail.Patch
+            "Patch" -> Detail.Patch(values.getOrNull(2)?.takeIf { it.isNotBlank() })
             "Project" -> values.getOrNull(2)?.takeIf { it.isNotBlank() }?.let { Detail.Project(it) }
             "Author" -> values.getOrNull(2)?.takeIf { it.isNotBlank() }?.let { Detail.Author(it) }
             "Delivery" -> values.getOrNull(2)?.takeIf { it.isNotBlank() }?.let { Detail.Delivery(it) }

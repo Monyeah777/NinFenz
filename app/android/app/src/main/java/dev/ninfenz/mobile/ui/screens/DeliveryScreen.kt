@@ -146,7 +146,7 @@ private fun parseTemplateSlots(markdown: String): Map<String, String> {
 }
 
 @Composable
-fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpenPacks: () -> Unit = onBack, onStatusChanged: () -> Unit = {}) {
+fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpenPacks: () -> Unit = onBack, onPatch: () -> Unit = {}, onStatusChanged: () -> Unit = {}) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
     val clipboard = LocalClipboardManager.current
@@ -420,6 +420,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         Text(stringResource(dev.ninfenz.mobile.R.string.delivery_reset))
                     }
                 }
+                TextButton(onClick = onPatch) { Text(stringResource(dev.ninfenz.mobile.R.string.patch_title)) }
             }
         )
         NfStepStrip(

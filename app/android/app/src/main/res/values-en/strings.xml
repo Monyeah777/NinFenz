@@ -1052,4 +1052,6 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="patch_copy">Copy result</string>
     <string name="patch_copied">Result copied</string>
     <string name="settings_patch">Apply nf-patch</string>
+    <string name="patch_save">Save to project draft</string>
+    <string name="patch_saved">Saved to project draft</string>
 </resources>

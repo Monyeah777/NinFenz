@@ -1048,4 +1048,6 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="patch_copy">复制结果</string>
     <string name="patch_copied">结果已复制</string>
     <string name="settings_patch">应用 nf-patch</string>
+    <string name="patch_save">保存到项目稿</string>
+    <string name="patch_saved">已保存到项目稿</string>
 </resources>

@@ -533,7 +533,7 @@ is Detail.Import -> ImportScreen(
                         onErrorCodes = { shell = shell.open(Detail.ErrorCodes) },
                         onDataRestored = { refresh() },
                         onNfDocMerge = { shell = shell.open(Detail.NfDocMerge) },
-                        onPatch = { shell = shell.open(Detail.Patch) }
+                        onPatch = { shell = shell.open(Detail.Patch()) }
                     )
                     is Detail.ErrorCodes -> ErrorCodesScreen(onBack = { shell = shell.back() ?: shell })
                     is Detail.Author -> {
@@ -576,7 +576,7 @@ is Detail.Import -> ImportScreen(
                             val pack = packs.packs.firstOrNull {
                                 it.id == entry.project.refs.basePackId && it.version == entry.project.refs.basePackVersion
                             }
-                            DeliveryScreen(project = entry.project, pack = pack, onBack = { shell = shell.back() ?: shell }, onOpenPacks = { shell = shell.open(Detail.PackCenter) }, onStatusChanged = { refresh() })
+                            DeliveryScreen(project = entry.project, pack = pack, onBack = { shell = shell.back() ?: shell }, onOpenPacks = { shell = shell.open(Detail.PackCenter) }, onPatch = { shell = shell.open(Detail.Patch(entry.project.id)) }, onStatusChanged = { refresh() })
                         }
                     }
                     is Detail.Flow -> {
@@ -646,7 +646,7 @@ is Detail.Import -> ImportScreen(
                     is Detail.PackUpdate -> PackUpdateScreen(store = library, onBack = { shell = shell.back() ?: shell })
                     is Detail.Ccos -> CcosScreen(onBack = { shell = shell.back() ?: shell })
                     is Detail.NfDocMerge -> NfDocMergeScreen(context.filesDir, onBack = { shell = shell.back() ?: shell })
-                    is Detail.Patch -> PatchScreen(onBack = { shell = shell.back() ?: shell })
+                    is Detail.Patch -> PatchScreen(context.filesDir, detail.projectId, onBack = { shell = shell.back() ?: shell })
                     is Detail.Pack -> {
                         val pack = packs.packs.firstOrNull { it.id == detail.id && it.version == detail.version }
                         if (pack == null) {
