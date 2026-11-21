@@ -120,6 +120,9 @@ import kotlinx.serialization.json.put
  * W5 交付台：项目 → graph-compile 计划 → 槽位输入 → assemble → validate L1 → 导出 md/zip/docx → 分享。
  * 项目状态写回已接；PDF 优先 WebView HTML/CSS（WebPdfExporter），失败回退本地基础文本（PdfExporter）。
  */
+private fun sha256File(file: File): String =
+    java.security.MessageDigest.getInstance("SHA-256").digest(file.readBytes()).joinToString("") { "%02x".format(it) }
+
 private fun templateValueAllowed(meta: dev.ninfenz.mobile.model.SpecSlot?, value: String): Boolean {
     val clean = dev.ninfenz.mobile.model.SlotInput.sanitize(meta?.kind, value)
     if (meta?.nonEmpty == true && clean.isBlank()) return false
@@ -959,17 +962,20 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                             Text((if (ok) "✓ " else "✗ ") + label, style = MaterialTheme.typography.bodySmall, color = if (ok) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error)
                         }
                         val signed = signoff
-                        if (signed != null) {
+                        val currentDigest = exportedFile?.let { sha256File(it) }
+                        val stale = signed != null && (signed.artifactSha256 == null || signed.artifactSha256 != currentDigest)
+                        if (signed != null && !stale) {
                             Text(stringResource(dev.ninfenz.mobile.R.string.contract_signed, signed.signedAt), style = MaterialTheme.typography.bodySmall)
                             signed.artifactSha256?.let { Text(stringResource(dev.ninfenz.mobile.R.string.contract_artifact, it), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
                         } else {
+                            if (stale) {
+                                Text(stringResource(dev.ninfenz.mobile.R.string.contract_stale), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+                            }
                             Button(
                                 enabled = checks.all { it.second },
                                 onClick = {
                                     val at = java.time.Instant.now().toString()
-                                    val digest = exportedFile?.let { f ->
-                                        java.security.MessageDigest.getInstance("SHA-256").digest(f.readBytes()).joinToString("") { "%02x".format(it) }
-                                    }
+                                    val digest = exportedFile?.let { sha256File(it) }
                                     contractStore.sign(project.id, checks.filter { it.second }.map { it.first }, at, digest)
                                     signoff = contractStore.load(project.id)
                                 }
