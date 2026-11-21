@@ -69,8 +69,10 @@ object BatchAssembler {
         outDir.mkdirs()
         val target = File(outDir, "nf-batch-" + System.nanoTime() + ".zip")
         ZipOutputStream(target.outputStream()).use { out ->
+            val good = items.filter { it.ok && it.markdown != null }
             val manifest = buildJsonObject {
                 put("schema", "nf-batch/1")
+                if (good.size >= 2) put("merged", "merged.md")
                 putJsonArray("projects") {
                     items.forEach { item ->
                         add(buildJsonObject {
@@ -86,9 +88,17 @@ object BatchAssembler {
             out.putNextEntry(ZipEntry("nf-batch.json").apply { time = 0L })
             out.write(manifest.toString().toByteArray(Charsets.UTF_8))
             out.closeEntry()
-            items.filter { it.ok && it.markdown != null }.forEach { item ->
+            good.forEach { item ->
                 out.putNextEntry(ZipEntry("projects/" + item.projectId + ".md").apply { time = 0L })
                 out.write(item.markdown!!.toByteArray(Charsets.UTF_8))
+                out.closeEntry()
+            }
+            if (good.size >= 2) {
+                val merged = good.joinToString("\n\n---\n\n") { item ->
+                    "<!-- project: " + item.projectId + " | " + item.title + " -->\n\n" + item.markdown
+                }
+                out.putNextEntry(ZipEntry("merged.md").apply { time = 0L })
+                out.write(merged.toByteArray(Charsets.UTF_8))
                 out.closeEntry()
             }
         }
