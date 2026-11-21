@@ -15,10 +15,11 @@
 
 ### Android
 - assembleDebug：**pass**（2026-11-21，Android SDK 36 / build-tools 36.0.0）
-- app-debug.apk：51,522,909 B；SHA-256 `8b56efbb4ea6da6b56340eff9088aaac1b4ad08a5cc4b05142f9157778ee3733`
-- assembleRelease（unsigned）：pass；44,516,174 B；SHA-256 `9036945a26484316ed308e0d5a72b5fe1b88922dbf24f65a2c96d1a427928936`
-- debug 签名 APK（仅内部安装）：44,578,981 B；SHA-256 `3f3844ac3665f46e8abe8e927b29428008ae1494ecec76db69a2cd082b4b5a77`；证书 CN=Android Debug；**不是 upload key**
+- app-debug.apk：51,522,385 B；SHA-256 `15495bcb046b3d54f12c05eea43a6e0093629388e9dc84a705fffae6e9c503ce`
+- assembleRelease（unsigned）：pass；44,531,686 B；SHA-256 `049909b4f4a447dee5d90ed6685268ca56e4407841ad1b92f792e781685b6982`
+- debug 签名 APK（仅内部安装）：44,595,365 B；SHA-256 `6712559525bbf6bac2fef7a8b5dbc7e118944dbcf6ddb764a1873ded9130353f`；证书 CN=Android Debug；**不是 upload key**
 - bundleRelease（unsigned）：pass；28,350,986 B；SHA-256 `c98c34ed410392fb99aa5e5b57bdf31fdb72e0bfa64869112cb1be6f1247430a`；`jarsigner -verify` 显示未签名
+- lintRelease：**0 errors / 0 warnings（No issues found）**
 - Release manifest：package `dev.ninfenz.mobile`、versionName `0.2.0`、minSdk 26、target/compileSdk 36、`extractNativeLibs=false`、无 `android:debuggable`（apkanalyzer manifest print）
 - 16KB 对齐：`zipalign -c -P 16 4` exit 0（APK；AAB 未用 bundletool 复核）
 - 签名证书指纹（SHA-256）：—（生产 upload key 未提供，OPEN-EXTERNAL）

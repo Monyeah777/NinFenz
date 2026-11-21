@@ -579,7 +579,7 @@ fun ImportScreen(
             if (response.ok && obj != null) {
                 val coverage = obj["coverage"]?.jsonPrimitive?.intOrNull ?: 0
                 val exceptions = obj["exceptions"]?.jsonArray?.size ?: 0
-                zeroSliceNote = context.getString(dev.ninfenz.mobile.R.string.import_zero_slice_note, coverage, exceptions)
+                zeroSliceNote = context.resources.getQuantityString(dev.ninfenz.mobile.R.plurals.import_zero_slice_note, exceptions, coverage, exceptions)
             } else {
                 zeroSliceNote = context.getString(dev.ninfenz.mobile.R.string.import_zero_slice_failed, response.error?.message ?: "unknown")
             }

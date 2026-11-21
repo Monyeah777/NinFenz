@@ -1003,7 +1003,6 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="settings_batch_start">Assemble selected</string>
     <string name="settings_batch_select_all">Select all</string>
     <string name="settings_batch_clear">Clear</string>
-    <string name="settings_batch_title">Assemble projects (%1$d selected)</string>
     <string name="import_template_tree_mismatch">Template package tree/count mismatch</string>
     <string name="import_template_tree_mismatch_fix">Re-export the template package</string>
     <string name="import_pack_hash_missing">pack-hash did not return tree/count</string>
@@ -1025,7 +1024,6 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="nfdoc_merge_hint">Select two or more .nfdoc.json files; conflicts are kept visible.</string>
     <string name="nfdoc_merge_empty">Need at least 2 nf-doc files (found %1$d). Export nf-doc from Delivery first.</string>
     <string name="nfdoc_merge_action">Merge selected</string>
-    <string name="nfdoc_merge_result">Merged: %1$d blocks, %2$d sources</string>
     <string name="nfdoc_merge_conflicts">Conflicts: %1$d</string>
     <string name="nfdoc_merge_share">Share merged nf-doc</string>
     <string name="nfdoc_merge_failed">Merge failed: %1$s</string>
@@ -1038,7 +1036,6 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="nfdoc_merge_hide_blocks">Hide blocks</string>
     <string name="nfdoc_merge_delete_block">Delete</string>
     <string name="import_zero_slice">Auto-slice</string>
-    <string name="import_zero_slice_note">Auto-slice: %1$d%% coverage, %2$d exceptions</string>
     <string name="import_zero_slice_failed">Auto-slice failed: %1$s</string>
     <string name="nfdoc_merged_title">Merged document</string>
     <string name="import_zero_slice_no_text">No text</string>
@@ -1059,4 +1056,16 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="patch_validation_ok">L1 validation passed</string>
     <string name="patch_validation_failed">L1 validation failed; review before saving</string>
     <string name="export_preserve_failed">Preservation bundle failed: %1$s</string>
+    <plurals name="settings_batch_title">
+        <item quantity="one">Assemble projects (%1$d selected)</item>
+        <item quantity="other">Assemble projects (%1$d selected)</item>
+    </plurals>
+    <plurals name="nfdoc_merge_result">
+        <item quantity="one">Merged: %1$d blocks, %2$d sources</item>
+        <item quantity="other">Merged: %1$d blocks, %2$d sources</item>
+    </plurals>
+    <plurals name="import_zero_slice_note">
+        <item quantity="one">Auto-slice: %1$d%% coverage, %2$d exceptions</item>
+        <item quantity="other">Auto-slice: %1$d%% coverage, %2$d exceptions</item>
+    </plurals>
 </resources>

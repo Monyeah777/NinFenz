@@ -25,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.R
@@ -90,7 +91,7 @@ fun NfDocMergeScreen(filesDir: File, onBack: () -> Unit) {
         }
         result?.let { merged ->
             Column(Modifier.padding(horizontal = NfSpacing.page, vertical = NfSpacing.s), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
-                Text(stringResource(R.string.nfdoc_merge_result, merged.doc.blocks.size, merged.doc.sources.size))
+                Text(pluralStringResource(R.plurals.nfdoc_merge_result, merged.doc.blocks.size, merged.doc.blocks.size, merged.doc.sources.size))
                 Text(stringResource(R.string.nfdoc_merge_conflicts, merged.conflicts.size), color = MaterialTheme.colorScheme.primary)
                 merged.conflicts.take(8).forEach { c ->
                     Row(verticalAlignment = Alignment.CenterVertically) {
