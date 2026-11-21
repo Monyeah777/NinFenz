@@ -181,7 +181,7 @@ fun PatchScreen(filesDir: File, projectId: String?, onBack: () -> Unit) {
                     }) { Text(stringResource(R.string.patch_copy)) }
                     if (store != null && projectId != null) {
                         Button(onClick = {
-                            store.save(projectId, store.load(projectId), store.loadPlan(projectId), r.markdown)
+                            store.save(projectId, store.load(projectId) + r.slots, store.loadPlan(projectId), r.markdown)
                             Toast.makeText(context, context.getString(R.string.patch_saved), Toast.LENGTH_SHORT).show()
                             history = emptyList()
                         }) { Text(stringResource(R.string.patch_save)) }

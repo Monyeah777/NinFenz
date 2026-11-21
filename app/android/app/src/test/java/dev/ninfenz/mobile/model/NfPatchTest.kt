@@ -35,13 +35,14 @@ class NfPatchTest {
     }
 
     @Test
-    fun setSlotRejectedButOtherOpsApply() {
+    fun setSlotUpdatesMapAndOtherOpsApply() {
         val result = NfPatchModel.apply("一\n\n二", patch("""{"schema":"nf-patch/1","ops":[
             {"op":"set-slot","slot":"SLT-01","text":"甲"},
             {"op":"replace","block_id":"b1","text":"新一"}
         ]}"""))
-        assertEquals(1, result.applied)
-        assertEquals(1, result.rejected.size)
+        assertEquals(2, result.applied)
+        assertEquals(0, result.rejected.size)
+        assertEquals("甲", result.slots["SLT-01"])
         assertEquals("新一\n\n二", result.markdown)
     }
 

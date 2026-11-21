@@ -57,7 +57,7 @@
 ## M4 Semantic Patch（P0 部分）
 
 - 新增 `nf-patch/1` schema（replace/insert/delete/move/set-slot）。
-- Kotlin `NfPatchModel`：解析、blockId 应用、稳定 ID、set-slot 拒绝；4 条单测。
+- Kotlin `NfPatchModel`：解析、blockId 应用、稳定 ID；set-slot 写入槽位映射；4 条单测。
 - 新增 Settings「应用 nf-patch」页：粘贴 Markdown+JSON，逐条勾选，应用/复制结果。
 - 交付台入口带 projectId：自动载入 DeliveryDraftStore 的当前稿，应用后可写回项目稿。
 - 每次应用前入栈，可多步「撤销应用」；保存到项目稿后清空撤销栈。

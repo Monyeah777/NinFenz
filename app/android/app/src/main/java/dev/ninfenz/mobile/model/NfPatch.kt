@@ -24,7 +24,13 @@ object NfPatchModel {
     data class Patch(val ops: List<Op>)
 
     data class Change(val op: String, val blockId: String?, val before: String?, val after: String?)
-    data class Result(val markdown: String, val applied: Int, val rejected: List<String>, val changes: List<Change> = emptyList())
+    data class Result(
+        val markdown: String,
+        val applied: Int,
+        val rejected: List<String>,
+        val changes: List<Change> = emptyList(),
+        val slots: Map<String, String> = emptyMap()
+    )
 
     private data class Entry(val id: String, val block: MarkdownBlock)
 
@@ -59,6 +65,7 @@ object NfPatchModel {
         var applied = 0
         val rejected = mutableListOf<String>()
         val changes = mutableListOf<Change>()
+        val slots = mutableMapOf<String, String>()
         var next = 1
         fun find(id: String?): Int = entries.indexOfFirst { it.id == id }
         patch.ops.forEachIndexed { i, op ->
@@ -102,9 +109,13 @@ object NfPatchModel {
                         applied++
                     }
                 }
-                "set-slot" -> rejected += "op " + (i + 1) + "：set-slot 不修改块，需项目槽位"
+                "set-slot" -> {
+                    slots[op.slot!!] = op.text!!
+                    changes += Change("set-slot", op.slot, null, op.text)
+                    applied++
+                }
             }
         }
-        return Result(MarkdownBlocks.render(entries.map { it.block }), applied, rejected, changes)
+        return Result(MarkdownBlocks.render(entries.map { it.block }), applied, rejected, changes, slots)
     }
 }
