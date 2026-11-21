@@ -46,7 +46,7 @@
 | lintRelease | pass | 0 errors / 0 warnings |
 | Release manifest | pass | 0.2.0；minSdk 26 / target 36；无 debuggable |
 | debug-signed APK | 44,595,365 B | `67125595…` | 仅内部安装；证书 CN=Android Debug |
-| release AAB unsigned | 28,350,986 B | `c98c34ed…` | `jarsigner -verify` 未签名；AAB 16KB 未用 bundletool 复核 |
+| release AAB unsigned | 28,372,870 B | `e2c1ce56…` | `jarsigner -verify` 未签名；AAB 16KB 未用 bundletool 复核 |
 
 发布签名/公证/Play 材料仍无输入。
 
