@@ -1000,4 +1000,5 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="settings_bundle_empty">No projects to bundle.</string>
     <string name="settings_batch_failed">No project could be assembled. Check drafts and Packs.</string>
     <string name="settings_batch_failed_detail">First failure: %1$s</string>
+    <string name="settings_batch_start">Assemble selected</string>
 </resources>

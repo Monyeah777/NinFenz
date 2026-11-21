@@ -23,9 +23,9 @@ object BatchAssembler {
     data class Item(val projectId: String, val title: String, val ok: Boolean, val markdown: String?, val error: String?)
     data class Created(val file: File, val items: List<Item>)
 
-    suspend fun assembleAll(filesDir: File, outDir: File): Created = coroutineScope {
+    suspend fun assembleAll(filesDir: File, outDir: File, selectedIds: Set<String>? = null): Created = coroutineScope {
         val snapshot = LibraryStore(filesDir).loadProjects()
-        val projects = snapshot.projects
+        val projects = snapshot.projects.filter { selectedIds == null || it.project.id in selectedIds }
         require(projects.isNotEmpty() || snapshot.errors.isNotEmpty()) { "没有可装配的项目" }
         val packs = PackStore(filesDir).scan().packs.associateBy { it.id + "/" + it.version }
         val parsed = projects.map { entry ->

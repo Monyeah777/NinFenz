@@ -10,13 +10,16 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Button
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -78,6 +81,8 @@ fun SettingsScreen(
     var pendingRestore by remember { mutableStateOf<File?>(null) }
     var restoreEntries by remember { mutableIntStateOf(0) }
     var lastSnapshot by remember { mutableStateOf(BackupRestoreService.lastSnapshot(context.filesDir)) }
+    var batchCandidates by remember { mutableStateOf<List<dev.ninfenz.mobile.data.ProjectEntry>?>(null) }
+    var batchSelected by remember { mutableStateOf<Set<String>>(emptySet()) }
     val scope = rememberCoroutineScope()
     val restorePicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         if (uri == null) return@rememberLauncherForActivityResult
@@ -173,22 +178,60 @@ fun SettingsScreen(
                 }
             }) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_bundle_export)) }
             OutlinedButton(onClick = {
-                scope.launch {
-                    val created = withContext(Dispatchers.IO) {
-                        runCatching { dev.ninfenz.mobile.ui.BatchAssembler.assembleAll(context.filesDir, context.cacheDir) }.getOrNull()
-                    }
-                    if (created == null) {
-                        backupMessage = context.getString(dev.ninfenz.mobile.R.string.settings_batch_failed)
-                    } else {
-                        val ok = created.items.count { it.ok }
-                        val intent = ShareExporter.shareFileIntent(context, created.file, "application/zip", created.file.name)
-                        ShareExporter.launchChooser(context, intent, created.file.name)
-                        val firstFailure = created.items.firstOrNull { !it.ok }
-                        backupMessage = context.resources.getQuantityString(dev.ninfenz.mobile.R.plurals.settings_batch_done, ok, ok, created.items.size) +
-                            if (firstFailure != null) "\n" + context.getString(dev.ninfenz.mobile.R.string.settings_batch_failed_detail, firstFailure.title) else ""
-                    }
+                val list = runCatching { dev.ninfenz.mobile.data.LibraryStore(context.filesDir).loadProjects().projects }.getOrDefault(emptyList())
+                if (list.isEmpty()) {
+                    backupMessage = context.getString(dev.ninfenz.mobile.R.string.settings_batch_failed)
+                } else {
+                    batchSelected = list.map { it.project.id }.toSet()
+                    batchCandidates = list
                 }
             }) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_batch_run)) }
+            batchCandidates?.let { candidates ->
+                AlertDialog(
+                    onDismissRequest = { batchCandidates = null },
+                    title = { Text(stringResource(dev.ninfenz.mobile.R.string.settings_batch_run)) },
+                    text = {
+                        Column(Modifier.heightIn(max = 360.dp).verticalScroll(rememberScrollState())) {
+                            candidates.forEach { entry ->
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Checkbox(
+                                        checked = entry.project.id in batchSelected,
+                                        onCheckedChange = { checked ->
+                                            batchSelected = if (checked) batchSelected + entry.project.id else batchSelected - entry.project.id
+                                        }
+                                    )
+                                    Text(entry.project.title)
+                                }
+                            }
+                        }
+                    },
+                    confirmButton = {
+                        TextButton(
+                            enabled = batchSelected.isNotEmpty(),
+                            onClick = {
+                                val ids = batchSelected
+                                batchCandidates = null
+                                scope.launch {
+                                    val created = withContext(Dispatchers.IO) {
+                                        runCatching { dev.ninfenz.mobile.ui.BatchAssembler.assembleAll(context.filesDir, context.cacheDir, ids) }.getOrNull()
+                                    }
+                                    if (created == null) {
+                                        backupMessage = context.getString(dev.ninfenz.mobile.R.string.settings_batch_failed)
+                                    } else {
+                                        val ok = created.items.count { it.ok }
+                                        val intent = ShareExporter.shareFileIntent(context, created.file, "application/zip", created.file.name)
+                                        ShareExporter.launchChooser(context, intent, created.file.name)
+                                        val firstFailure = created.items.firstOrNull { !it.ok }
+                                        backupMessage = context.resources.getQuantityString(dev.ninfenz.mobile.R.plurals.settings_batch_done, ok, ok, created.items.size) +
+                                            if (firstFailure != null) "\n" + context.getString(dev.ninfenz.mobile.R.string.settings_batch_failed_detail, firstFailure.title) else ""
+                                    }
+                                }
+                            }
+                        ) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_batch_start)) }
+                    },
+                    dismissButton = { TextButton(onClick = { batchCandidates = null }) { Text(stringResource(dev.ninfenz.mobile.R.string.new_project_cancel)) } }
+                )
+            }
             backupMessage?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary) }
             OutlinedButton(onClick = {
                 restorePicker.launch(arrayOf("application/zip", "*/*"))
