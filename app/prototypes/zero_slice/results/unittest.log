@@ -1,0 +1,19 @@
+test_exact_spec_maps_all (test_zero_slice.MappingTests.test_exact_spec_maps_all) ... ok
+test_freeform_spec (test_zero_slice.MappingTests.test_freeform_spec) ... ok
+test_low_confidence_goes_to_exceptions (test_zero_slice.MappingTests.test_low_confidence_goes_to_exceptions) ... ok
+test_unmatched_source_is_kept (test_zero_slice.MappingTests.test_unmatched_source_is_kept) ... ok
+test_empty_rejected (test_zero_slice.ParseTests.test_empty_rejected) ... ok
+test_headings_become_sections (test_zero_slice.ParseTests.test_headings_become_sections) ... ok
+test_no_headings_freeform (test_zero_slice.ParseTests.test_no_headings_freeform) ... ok
+test_table_and_code (test_zero_slice.ParseTests.test_table_and_code) ... ok
+test_different_source_creates_second_draft (test_zero_slice.SessionTests.test_different_source_creates_second_draft) ... ok
+test_empty_source_rejected (test_zero_slice.SessionTests.test_empty_source_rejected) ... ok
+test_reset_all_deletes_draft (test_zero_slice.SessionTests.test_reset_all_deletes_draft) ... ok
+test_reset_current_clears_and_can_undo (test_zero_slice.SessionTests.test_reset_current_clears_and_can_undo) ... ok
+test_save_draft_overwrites_same_source (test_zero_slice.SessionTests.test_save_draft_overwrites_same_source) ... ok
+test_toggle_accept_and_project (test_zero_slice.SessionTests.test_toggle_accept_and_project) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 0.022s
+
+OK

@@ -1,0 +1,18 @@
+{
+  "schema": "nf-md-spec/1",
+  "id": "brief-spec",
+  "title": "客户简报结构",
+  "sections": [
+    {"id": "SEC-BG", "title": "背景", "order": 1, "slots": ["SLOT-BG"]},
+    {"id": "SEC-GOAL", "title": "目标", "order": 2, "slots": ["SLOT-GOAL"]},
+    {"id": "SEC-MUST", "title": "必须包含", "order": 3, "slots": ["SLOT-MUST"]},
+    {"id": "SEC-NO", "title": "不要写", "order": 4, "slots": ["SLOT-NO"]}
+  ],
+  "slots": [
+    {"id": "SLOT-BG", "name": "背景", "section": "SEC-BG", "required": true, "type": "text"},
+    {"id": "SLOT-GOAL", "name": "目标", "section": "SEC-GOAL", "required": true, "type": "list"},
+    {"id": "SLOT-MUST", "name": "必须包含", "section": "SEC-MUST", "required": true, "type": "list"},
+    {"id": "SLOT-NO", "name": "不要写", "section": "SEC-NO", "required": true, "type": "list"}
+  ]
+}
+

@@ -1,0 +1,41 @@
+{
+  "title": "客户简报：社区书店冬季活动",
+  "sections": [
+    {
+      "id": "SEC-01",
+      "title": "背景",
+      "chars": 43
+    },
+    {
+      "id": "SEC-02",
+      "title": "目标",
+      "chars": 50
+    },
+    {
+      "id": "SEC-03",
+      "title": "必须包含",
+      "chars": 41
+    },
+    {
+      "id": "SEC-04",
+      "title": "不要写",
+      "chars": 31
+    }
+  ],
+  "spec": "freeform",
+  "coverage": 0.9212,
+  "mappings": [
+    {
+      "source_id": "ALL",
+      "source_title": "客户简报：社区书店冬季活动",
+      "source_text": "一家社区独立书店，想在 12 月做一次“冬夜读书”活动，面向附近居民和大学生。\n\n- 让更多人知道活动\n- 招募 30 位参与者\n- 建立书店的温暖、克制、有文学感的品牌印象\n\n- 活动时间与地点\n- 三场主题分享\n- 报名方式\n- 一句话品牌主张\n\n- 夸张促销\n- “全网最低”“史上最强”这类广告语",
+      "target_slot": "SLOT-FREEFORM",
+      "target_name": "正文",
+      "confidence": 0.9,
+      "reason": "freeform/single-slot: whole document mapped",
+      "accepted": false
+    }
+  ],
+  "exceptions": [],
+  "missing_required": []
+}

@@ -1,0 +1,111 @@
+{
+  "title": "客户简报：社区书店冬季活动",
+  "sections": [
+    {
+      "id": "SEC-01",
+      "title": "背景",
+      "chars": 43
+    },
+    {
+      "id": "SEC-02",
+      "title": "目标",
+      "chars": 50
+    },
+    {
+      "id": "SEC-03",
+      "title": "必须包含",
+      "chars": 41
+    },
+    {
+      "id": "SEC-04",
+      "title": "不要写",
+      "chars": 31
+    }
+  ],
+  "spec": "demo-spec",
+  "coverage": 1.0,
+  "mappings": [],
+  "exceptions": [
+    {
+      "source_id": "",
+      "source_title": "",
+      "source_text": "",
+      "target_slot": "SLT-01",
+      "target_name": "主题句",
+      "confidence": 0.15000000000000002,
+      "reason": "distributed across section slots",
+      "accepted": false
+    },
+    {
+      "source_id": "",
+      "source_title": "",
+      "source_text": "",
+      "target_slot": "SLT-02",
+      "target_name": "读者设定",
+      "confidence": 0.15000000000000002,
+      "reason": "distributed across section slots",
+      "accepted": false
+    },
+    {
+      "source_id": "",
+      "source_title": "",
+      "source_text": "",
+      "target_slot": "SLT-03",
+      "target_name": "正文段落",
+      "confidence": 0.2,
+      "reason": "single slot; whole section mapped",
+      "accepted": false
+    },
+    {
+      "source_id": "",
+      "source_title": "",
+      "source_text": "",
+      "target_slot": "SLT-04",
+      "target_name": "补充",
+      "confidence": 0.2,
+      "reason": "single slot; whole section mapped",
+      "accepted": false
+    },
+    {
+      "source_id": "SEC-01",
+      "source_title": "背景",
+      "source_text": "一家社区独立书店，想在 12 月做一次“冬夜读书”活动，面向附近居民和大学生。",
+      "target_slot": null,
+      "target_name": "附加内容",
+      "confidence": 0.3,
+      "reason": "source section not matched to spec; kept as extra",
+      "accepted": false
+    },
+    {
+      "source_id": "SEC-02",
+      "source_title": "目标",
+      "source_text": "- 让更多人知道活动\n- 招募 30 位参与者\n- 建立书店的温暖、克制、有文学感的品牌印象",
+      "target_slot": null,
+      "target_name": "附加内容",
+      "confidence": 0.3,
+      "reason": "source section not matched to spec; kept as extra",
+      "accepted": false
+    },
+    {
+      "source_id": "SEC-03",
+      "source_title": "必须包含",
+      "source_text": "- 活动时间与地点\n- 三场主题分享\n- 报名方式\n- 一句话品牌主张",
+      "target_slot": null,
+      "target_name": "附加内容",
+      "confidence": 0.3,
+      "reason": "source section not matched to spec; kept as extra",
+      "accepted": false
+    },
+    {
+      "source_id": "SEC-04",
+      "source_title": "不要写",
+      "source_text": "- 夸张促销\n- “全网最低”“史上最强”这类广告语",
+      "target_slot": null,
+      "target_name": "附加内容",
+      "confidence": 0.3,
+      "reason": "source section not matched to spec; kept as extra",
+      "accepted": false
+    }
+  ],
+  "missing_required": []
+}

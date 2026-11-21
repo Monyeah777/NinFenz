@@ -1,8 +1,10 @@
 # NF APP 实施结果（RESULTS）
 
 > 本件是 APP 实施面的**结果/状态导航**（不是规划件）。开工依据 `NF-APP-Final-方案-2026-11-15.md`；基线 `results/app/BASELINE.md`；收口判据 `app/docs/DOD.md`；机读门禁 `app/results/GATES.json` + `app/results/SELF_AUDIT.json`。
+
+> v2 delta 应用记录：`results/app/DELTA_V2.md`（D21–D24、Free/Pro/CCOS、zero_slice）。
 > 现场复跑：`python app/gates/run_gates.py`（QA0–QA6 + S0–S15）。本件不给「应该绿」，只给「现在能跑出什么」。
-> 状态：v1（2026-11-15）+ v0.02 增量（2026-11-15）
+> 状态：v1（2026-11-15）+ v0.02 增量（2026-11-15）+ v2 delta（2026-11-21）
 
 ## 0. v0.02 增量（2026-11-15，Android 端）
 
@@ -24,8 +26,8 @@
 
 | 项 | 结果 |
 |---|---|
-| APK | app-debug.apk = 21,167,865 B；sha256 a1e96e462549b17b7c3467091cbf0853e2ef3185cdc71819db2c9ff18d69047f |
-| JVM 测试 | 422 条全绿（v1 基线 42 + v0.02 新增 350；含 Robolectric/Compose/Paparazzi） |
+| APK | app-debug.apk = 21,167,865 B；sha256 5f336d37f594548355ca5ea822ff600b37426542ce83d2fb506530be5ab96313 |
+| JVM 测试 | 424 条全绿（v1 基线 42 + v0.02 新增 350；含 Robolectric/Compose/Paparazzi） |
 | 构建 | ./gradlew :app:assembleDebug 成功；:app:testDebugUnitTest 388/388；lint 0 warnings |
 | i18n | 全部屏主要文案已资源化 + values-en；「我的」zh/en/跟随系统切换；动态取色开关；库/Pack 中心下拉刷新；节点删除 Snackbar 撤销 + 触觉；expanded 双栏（主列表+详情）；导航 Crossfade（NfMotion.MEDIUM_MS）；统一 loading/skeleton 组件；UI 中文硬编码守卫通过 |
 | 适配 | compact/medium/expanded 三档导航 + 9 组窗口尺寸语义矩阵 |
@@ -42,7 +44,7 @@
 ### 0.4 v0.02 收口（2026-11-15）
 
 - 机读门禁：app/gates **7/7 PASS，FAIL=0**（QA0 10 / QA5 5）；仓库 verify **PASS=107 WARN=2 FAIL=0**。
-- 测试/产物：JVM **388/388**；APK 21,167,865 B，sha256 a1e96e46…。
+- 测试/产物：JVM **388/388**；APK 21,167,865 B，sha256 5f336d37…。
 - 结论：**v0.02 实现面 pass-with-open-items**；下方 OPEN 不因收口消失，未跑面不写成 pass。
 
 ### 0.5 v0.02 OPEN（带 owner+next）
