@@ -7,6 +7,7 @@ import dev.ninfenz.mobile.data.DeliveryDraftStore
 import dev.ninfenz.mobile.data.LibraryStore
 import dev.ninfenz.mobile.data.PackEntry
 import dev.ninfenz.mobile.data.PackStore
+import dev.ninfenz.mobile.model.NfDocModel
 import java.io.File
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
@@ -92,7 +93,10 @@ object BatchAssembler {
             val good = items.filter { it.ok && it.markdown != null }
             val manifest = buildJsonObject {
                 put("schema", "nf-batch/1")
-                if (good.size >= 2) put("merged", "merged.md")
+                if (good.size >= 2) {
+                    put("merged", "merged.md")
+                    put("merged_doc", "merged.nf-doc.json")
+                }
                 putJsonArray("projects") {
                     items.forEach { item ->
                         add(buildJsonObject {
@@ -101,6 +105,7 @@ object BatchAssembler {
                             put("ok", item.ok)
                             if (item.ok) {
                                 put("markdown", "projects/" + safeName(item.projectId) + ".md")
+                                put("doc", "projects/" + safeName(item.projectId) + ".nf-doc.json")
                                 put("validated", "L1")
                             }
                             item.error?.let { put("error", it) }
@@ -112,8 +117,15 @@ object BatchAssembler {
             out.write(manifest.toString().toByteArray(Charsets.UTF_8))
             out.closeEntry()
             good.forEach { item ->
-                out.putNextEntry(ZipEntry("projects/" + safeName(item.projectId) + ".md").apply { time = 0L })
+                val safe = safeName(item.projectId)
+                out.putNextEntry(ZipEntry("projects/" + safe + ".md").apply { time = 0L })
                 out.write(item.markdown!!.toByteArray(Charsets.UTF_8))
+                out.closeEntry()
+                out.putNextEntry(ZipEntry("projects/" + safe + ".nf-doc.json").apply { time = 0L })
+                out.write(
+                    NfDocModel.toJson(NfDocModel.fromMarkdown(item.title, item.projectId, item.markdown!!))
+                        .toString().toByteArray(Charsets.UTF_8)
+                )
                 out.closeEntry()
             }
             if (good.size >= 2) {
@@ -122,6 +134,10 @@ object BatchAssembler {
                 }
                 out.putNextEntry(ZipEntry("merged.md").apply { time = 0L })
                 out.write(merged.toByteArray(Charsets.UTF_8))
+                out.closeEntry()
+                val docs = good.map { NfDocModel.fromMarkdown(it.title, it.projectId, it.markdown!!) }
+                out.putNextEntry(ZipEntry("merged.nf-doc.json").apply { time = 0L })
+                out.write(NfDocModel.toJson(NfDocModel.append(docs, "合并文档")).toString().toByteArray(Charsets.UTF_8))
                 out.closeEntry()
             }
         }

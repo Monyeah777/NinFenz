@@ -1,0 +1,14 @@
+{
+  "schema": "nf-doc/1",
+  "meta": {
+    "title": "坏类型",
+    "sources": []
+  },
+  "blocks": [
+    {
+      "id": "b1",
+      "type": "unknown",
+      "text": "x"
+    }
+  ]
+}

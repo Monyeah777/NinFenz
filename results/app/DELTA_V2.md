@@ -26,7 +26,13 @@
 
 - `BatchAssembler` 与 `ImportScreen` 的硬编码中文移入 `strings.xml` / `values-en`。
 - `python -m pytest app/tests/test_ui_strings_localized.py -q` → 1 passed。
-- 全量 `python -m pytest app/tests -q` → **498 passed**。
+- 全量 `python -m pytest app/tests -q` → **501 passed**。
+
+## J6 nf-doc/1
+
+- 新增 `app/schema/nf-doc.schema.json` 与 `NfDocModel`（blocks 保留章节/表格/代码/来源）。
+- 批量装配为每个成功项目写 `.nf-doc.json`；多成功另写 `merged.nf-doc.json`。
+- 这是再装配的结构化输入；UI 的 append/merge-by-section 操作仍 OPEN。
 
 ## A0-14 Daily 入口
 

@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/app/schema/nf-doc.schema.json",
+  "title": "NF 结构化文档（nf-doc/1）",
+  "description": "再装配的结构化产物：blocks 保留章节/槽位/表格/代码/段落，不靠重新猜标题。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "meta", "blocks"],
+  "properties": {
+    "schema": {"const": "nf-doc/1"},
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "sources"],
+      "properties": {
+        "title": {"type": "string", "minLength": 1},
+        "sources": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "blocks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "type", "text"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "type": {"enum": ["section", "slot", "paragraph", "list", "table", "code", "quote"]},
+          "text": {"type": "string"},
+          "title": {"type": "string"},
+          "slot": {"type": "string"},
+          "source": {"type": "string"}
+        }
+      }
+    }
+  }
+}

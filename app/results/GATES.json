@@ -282,7 +282,7 @@
       "pass": 3
     }
   },
-  "head": "6ebfed2bff1f26709c03ba2bd6db2cebeac9a498",
+  "head": "f57ae592aac6a39507284759a49c9619f7b88af4",
   "open_items": [
     {
       "id": "S3",
@@ -313,6 +313,7 @@
         "app/schema/nf-assemble-result.schema.json",
         "app/schema/nf-assembly-plan.schema.json",
         "app/schema/nf-backup.schema.json",
+        "app/schema/nf-doc.schema.json",
         "app/schema/nf-export-manifest.schema.json",
         "app/schema/nf-import.schema.json",
         "app/schema/nf-md-spec.schema.json",
@@ -344,6 +345,7 @@
         "app/schema/nf-assemble-result.schema.json",
         "app/schema/nf-assembly-plan.schema.json",
         "app/schema/nf-backup.schema.json",
+        "app/schema/nf-doc.schema.json",
         "app/schema/nf-export-manifest.schema.json",
         "app/schema/nf-import.schema.json",
         "app/schema/nf-md-spec.schema.json",
@@ -439,7 +441,7 @@
           "collected": null,
           "errors": null,
           "failed": null,
-          "passed": 103
+          "passed": 108
         }
       },
       "gate": "QA0",

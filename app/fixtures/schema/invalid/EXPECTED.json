@@ -288,6 +288,20 @@
         "NF-PCK-007"
       ],
       "violated": "files[].path minLength 1"
+    },
+    "invalid/nf-doc/missing-blocks.json": {
+      "schema": "nf-doc",
+      "violated": "required blocks",
+      "codes": [
+        "NF-E-002"
+      ]
+    },
+    "invalid/nf-doc/bad-type.json": {
+      "schema": "nf-doc",
+      "violated": "blocks[0].type enum",
+      "codes": [
+        "NF-E-002"
+      ]
     }
   }
 }

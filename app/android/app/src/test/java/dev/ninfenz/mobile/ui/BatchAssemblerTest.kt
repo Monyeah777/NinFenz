@@ -18,6 +18,8 @@ class BatchAssemblerTest {
         ZipFile(file).use { zip ->
             assertTrue(zip.getEntry("merged.md") != null)
             assertTrue(zip.getEntry("projects/p1.md") != null)
+            assertTrue(zip.getEntry("projects/p1.nf-doc.json") != null)
+            assertTrue(zip.getEntry("merged.nf-doc.json") != null)
             assertTrue(zip.getEntry("projects/p2.md") != null)
             assertTrue(zip.getEntry("projects/p3.md") == null)
             val manifest = zip.getInputStream(zip.getEntry("nf-batch.json")).readBytes().toString(Charsets.UTF_8)

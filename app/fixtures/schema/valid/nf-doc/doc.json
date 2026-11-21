@@ -1,0 +1,29 @@
+{
+  "schema": "nf-doc/1",
+  "meta": {
+    "title": "示例文档",
+    "sources": [
+      "p1"
+    ]
+  },
+  "blocks": [
+    {
+      "id": "b1",
+      "type": "section",
+      "text": "# 开篇",
+      "title": "开篇",
+      "source": "p1"
+    },
+    {
+      "id": "b2",
+      "type": "paragraph",
+      "text": "正文",
+      "source": "p1"
+    },
+    {
+      "id": "b3",
+      "type": "table",
+      "text": "|a|b|\n|-|-|\n|1|2|"
+    }
+  ]
+}
