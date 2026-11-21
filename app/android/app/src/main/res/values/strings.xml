@@ -1050,4 +1050,5 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="settings_patch">应用 nf-patch</string>
     <string name="patch_save">保存到项目稿</string>
     <string name="patch_saved">已保存到项目稿</string>
+    <string name="patch_undo">撤销应用</string>
 </resources>

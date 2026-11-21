@@ -43,6 +43,7 @@ fun PatchScreen(filesDir: File, projectId: String?, onBack: () -> Unit) {
     var entries by remember { mutableStateOf<List<Pair<NfPatchModel.Op, Boolean>>>(emptyList()) }
     var result by remember { mutableStateOf<NfPatchModel.Result?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
+    var beforeApply by remember { mutableStateOf<String?>(null) }
 
     Column(Modifier.fillMaxSize()) {
         NfTopAppBar(title = stringResource(R.string.patch_title), onBack = onBack)
@@ -87,6 +88,7 @@ fun PatchScreen(filesDir: File, projectId: String?, onBack: () -> Unit) {
                         if (selected.isEmpty()) {
                             error = context.getString(R.string.patch_none_selected)
                         } else {
+                            beforeApply = markdown
                             result = NfPatchModel.apply(markdown, NfPatchModel.Patch(selected))
                         }
                     }
@@ -116,6 +118,13 @@ fun PatchScreen(filesDir: File, projectId: String?, onBack: () -> Unit) {
                     textStyle = MaterialTheme.typography.bodySmall
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+                    if (beforeApply != null) {
+                        OutlinedButton(onClick = {
+                            markdown = beforeApply!!
+                            beforeApply = null
+                            result = null
+                        }) { Text(stringResource(R.string.patch_undo)) }
+                    }
                     OutlinedButton(onClick = {
                         val manager = context.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
                         manager?.setPrimaryClip(ClipData.newPlainText("nf-patch", r.markdown))
@@ -125,6 +134,7 @@ fun PatchScreen(filesDir: File, projectId: String?, onBack: () -> Unit) {
                         Button(onClick = {
                             store.save(projectId, store.load(projectId), store.loadPlan(projectId), r.markdown)
                             Toast.makeText(context, context.getString(R.string.patch_saved), Toast.LENGTH_SHORT).show()
+                            beforeApply = null
                         }) { Text(stringResource(R.string.patch_save)) }
                     }
                 }

@@ -1054,4 +1054,5 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="settings_patch">Apply nf-patch</string>
     <string name="patch_save">Save to project draft</string>
     <string name="patch_saved">Saved to project draft</string>
+    <string name="patch_undo">Undo application</string>
 </resources>

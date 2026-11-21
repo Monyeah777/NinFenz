@@ -45,7 +45,8 @@
 - Kotlin `NfPatchModel`：解析、blockId 应用、稳定 ID、set-slot 拒绝；4 条单测。
 - 新增 Settings「应用 nf-patch」页：粘贴 Markdown+JSON，逐条勾选，应用/复制结果。
 - 交付台入口带 projectId：自动载入 DeliveryDraftStore 的当前稿，应用后可写回项目稿。
-- **未**做语义 diff 高亮/撤销栈/应用后自动重校验。
+- 应用前保存快照，可「撤销应用」（保存到项目稿后清空）。
+- **未**做语义 diff 高亮/应用后自动重校验。
 
 ## zero_slice Rust 参考
 
