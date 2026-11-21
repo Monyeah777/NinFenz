@@ -1,6 +1,7 @@
 //! nf-app-core：NF APP 共享核心（A0–A5 参考实现）。
 //! 规范：app/docs/CONTRACT.md、app/docs/CLI.md；schema/limits/错误码均在编译期内嵌。
 
+pub mod zero_slice;
 pub mod backup;
 pub mod canonical;
 pub mod docx;

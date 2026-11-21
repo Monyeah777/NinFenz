@@ -25,7 +25,7 @@
       "owner": null,
       "probes": {
         "hits": [],
-        "scanned_files": 57,
+        "scanned_files": 58,
         "void_hits": 0
       },
       "status": "covered",
@@ -238,7 +238,7 @@
       "title": "机制采用证据（M1–M42）"
     }
   ],
-  "head": "21afe490962b77fcfa5f3d55f2c6630ba309e0d0",
+  "head": "e58f5b53838fd3c84527bc879357e3539dfabadb",
   "open_items": [
     {
       "id": "S3",

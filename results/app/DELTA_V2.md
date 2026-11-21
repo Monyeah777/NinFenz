@@ -39,6 +39,12 @@
 - 合并结果可展开块列表、删除单块；删除后保存/分享。
 - 块可上下移动/删除；跨章节拖拽仍 OPEN。
 
+## zero_slice Rust 参考
+
+- `app/core/src/zero_slice.rs`：Markdown 解析、标题映射、<0.6 例外、freeform、coverage。
+- 5 条 Rust 单测；**未**移植 session/reset/undo/DraftStore。
+- Android 仍走现有 ImportSession/ImportDraftStore，不切换。
+
 ## A0-14 Daily 入口
 
 - 库首屏常驻「粘贴一段，直接成稿」输入卡；提交后用 `ImportSeed` 一次性交给导入页。

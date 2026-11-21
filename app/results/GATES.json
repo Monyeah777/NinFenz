@@ -25,7 +25,7 @@
       "owner": null,
       "probes": {
         "hits": [],
-        "scanned_files": 57,
+        "scanned_files": 58,
         "void_hits": 0
       },
       "status": "covered",
@@ -282,7 +282,7 @@
       "pass": 3
     }
   },
-  "head": "21afe490962b77fcfa5f3d55f2c6630ba309e0d0",
+  "head": "e58f5b53838fd3c84527bc879357e3539dfabadb",
   "open_items": [
     {
       "id": "S3",
@@ -521,10 +521,10 @@
         "exit": 0,
         "log": "app/results/logs/cargo_test.log",
         "summary": {
-          "collected": 0,
+          "collected": 5,
           "errors": null,
           "failed": 0,
-          "passed": 0
+          "passed": 5
         }
       },
       "gate": "QA1",
