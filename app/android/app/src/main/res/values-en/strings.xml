@@ -1003,4 +1003,5 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="settings_batch_start">Assemble selected</string>
     <string name="settings_batch_select_all">Select all</string>
     <string name="settings_batch_clear">Clear</string>
+    <string name="settings_batch_title">Assemble projects (%1$d selected)</string>
 </resources>

@@ -189,7 +189,7 @@ fun SettingsScreen(
             batchCandidates?.let { candidates ->
                 AlertDialog(
                     onDismissRequest = { batchCandidates = null },
-                    title = { Text(stringResource(dev.ninfenz.mobile.R.string.settings_batch_run)) },
+                    title = { Text(stringResource(dev.ninfenz.mobile.R.string.settings_batch_title, batchSelected.size)) },
                     text = {
                         Column(Modifier.heightIn(max = 360.dp).verticalScroll(rememberScrollState())) {
                             Row {

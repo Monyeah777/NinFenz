@@ -999,4 +999,5 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="settings_batch_start">装配所选项目</string>
     <string name="settings_batch_select_all">全选</string>
     <string name="settings_batch_clear">清空</string>
+    <string name="settings_batch_title">装配项目（已选 %1$d）</string>
 </resources>
