@@ -81,6 +81,7 @@ fun SettingsScreen(
     var chainFirst by remember { mutableStateOf<File?>(null) }
     var chainSecond by remember { mutableStateOf<File?>(null) }
     var chainNote by remember { mutableStateOf<String?>(null) }
+    var upgradeNote by remember { mutableStateOf<String?>(null) }
     var stats by remember { mutableStateOf(StorageStats.scan(context.filesDir, context.cacheDir)) }
     var cleaned by remember { mutableStateOf<String?>(null) }
     var backupMessage by remember { mutableStateOf<String?>(null) }
@@ -98,6 +99,21 @@ fun SettingsScreen(
         if (uri != null) scope.launch {
             chainFirst = withContext(Dispatchers.IO) { dev.ninfenz.mobile.data.FileAccess.copyToCache(context, uri, "chain-first.zip") }
             chainNote = null
+        }
+    }
+    val upgradePicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+        if (uri != null) scope.launch {
+            upgradeNote = null
+            runCatching {
+                val file = withContext(Dispatchers.IO) {
+                    val cached = dev.ninfenz.mobile.data.FileAccess.copyToCache(context, uri, "upgrade.zip")
+                    val out = File(File(context.filesDir, "exports"), "upgrade").apply { mkdirs() }
+                    dev.ninfenz.mobile.data.PreservationUpgrader.upgrade(cached, out).file
+                }
+                upgradeNote = context.getString(dev.ninfenz.mobile.R.string.settings_upgrade_done, file.name)
+            }.onFailure {
+                upgradeNote = context.getString(dev.ninfenz.mobile.R.string.settings_upgrade_fail, it.message ?: it.javaClass.simpleName)
+            }
         }
     }
     val chainSecondPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
@@ -153,6 +169,20 @@ fun SettingsScreen(
             )
             OutlinedButton(onClick = onErrorCodes) {
                 Text(stringResource(dev.ninfenz.mobile.R.string.error_codes_title))
+            }
+        }
+
+        CardBox(title = stringResource(dev.ninfenz.mobile.R.string.settings_upgrade_title)) {
+            Text(
+                stringResource(dev.ninfenz.mobile.R.string.settings_upgrade_desc),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            OutlinedButton(onClick = { upgradePicker.launch(arrayOf("application/zip", "application/octet-stream")) }) {
+                Text(stringResource(dev.ninfenz.mobile.R.string.settings_upgrade_pick))
+            }
+            upgradeNote?.let {
+                Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
             }
         }
 

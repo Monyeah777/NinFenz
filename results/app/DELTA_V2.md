@@ -56,7 +56,7 @@
 
 - `FeaturePolicy` 规则表：Free 能力、Pro 能力、CCOS 能力；按 tier 判定。
 - `FeatureGate` 委托规则；默认 Free，Free 永远放行，未知能力默认 Free。
-- 5 条 Kotlin 单测；JVM 494。
+- 5 条 Kotlin 单测；JVM 495。
 - `FeatureGate.setTierForDebug`：调试构建可在 Settings「功能层级」切 Free/Pro/CCOS。
 - 发布构建只显示层级与规则数，不含购买/授权入口；默认 Free。
 - **未**接计费/真实 entitlement。
@@ -133,6 +133,7 @@
 - verifier 校验 lineage 摘要格式及 oais/preservation 一致。
 - `PreservationVerifier.chain`：校验 next 的 predecessor 等于 previous 文件摘要；Settings「归档迁移链」可选两包校验。
 - 导出文件名带内容摘要，避免覆盖前包。
+- `PreservationUpgrader` 把旧 preservation 包升级为当前 oais/grant 格式，并接 predecessor；Settings「归档升级」入口。
 - **未**做自动升级/外部校验工具对接。
 
 ## M4 Semantic Patch（P0 部分）

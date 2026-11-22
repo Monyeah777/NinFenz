@@ -40,6 +40,22 @@ object PreservationVerifier {
         return Result(errors.isEmpty(), nxt.title, errors)
     }
 
+    fun title(file: File): String? = runCatching {
+        ZipFile(file).use { zip ->
+            val entry = zip.getEntry("preservation.json") ?: return null
+            Json.parseToJsonElement(zip.getInputStream(entry).readBytes().decodeToString())
+                .jsonObject["title"]?.jsonPrimitive?.content
+        }
+    }.getOrNull()
+
+    fun extractEntry(file: File, name: String, maxBytes: Long = MAX_ENTRY_BYTES): String? = runCatching {
+        ZipFile(file).use { zip ->
+            val entry = zip.getEntry(name) ?: return null
+            if (entry.size > maxBytes) return null
+            zip.getInputStream(entry).readBytes().decodeToString()
+        }
+    }.getOrNull()
+
     fun extractMarkdown(file: File): String? = runCatching {
         ZipFile(file).use { zip ->
             val entry = zip.getEntry("document.md") ?: return null

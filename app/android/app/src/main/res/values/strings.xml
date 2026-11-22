@@ -1177,4 +1177,9 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="settings_chain_verify">校验链</string>
     <string name="settings_chain_ok">链通过</string>
     <string name="settings_chain_fail">链失败：%1$s</string>
+    <string name="settings_upgrade_title">归档升级</string>
+    <string name="settings_upgrade_desc">给旧 preservation 包补 oais/grant 与 predecessor</string>
+    <string name="settings_upgrade_pick">选择旧包</string>
+    <string name="settings_upgrade_done">已升级到 %1$s</string>
+    <string name="settings_upgrade_fail">升级失败：%1$s</string>
 </resources>

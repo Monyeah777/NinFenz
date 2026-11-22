@@ -1181,4 +1181,9 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="settings_chain_verify">Verify chain</string>
     <string name="settings_chain_ok">Chain OK</string>
     <string name="settings_chain_fail">Chain failed: %1$s</string>
+    <string name="settings_upgrade_title">Upgrade legacy archive</string>
+    <string name="settings_upgrade_desc">Add oais/grant and predecessor to an old preservation zip</string>
+    <string name="settings_upgrade_pick">Pick archive</string>
+    <string name="settings_upgrade_done">Upgraded to %1$s</string>
+    <string name="settings_upgrade_fail">Upgrade failed: %1$s</string>
 </resources>
