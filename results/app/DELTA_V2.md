@@ -48,7 +48,7 @@
 
 - `app/prototypes/flash_fill/flash_fill.py`：前缀/后缀/去前缀/去后缀/替换/截断白名单。
 - 9 条 unittest；pytest wrapper 纳入全量。
-- 预览块编辑器新增「批量变换」：一组 find/replace 应用于全部块，可撤销/重做。
+- 预览块编辑器新增「批量变换」：replace/加前缀/加后缀/截断 四种模式，可撤销/重做。
 - **未**进 Kotlin/Rust 推理引擎；UI 只覆盖 replace 一种白名单变换。
 
 ## M25 Capability-Scoped Sharing（P0 部分）

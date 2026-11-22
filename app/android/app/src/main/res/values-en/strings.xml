@@ -1095,4 +1095,10 @@ MIT License · See app/docs/LEGAL.md</string>
         <item quantity="one">Affects %1$d blocks</item>
         <item quantity="other">Affects %1$d blocks</item>
     </plurals>
+    <string name="preview_bulk_replace">Replace</string>
+    <string name="preview_bulk_prefix">Add prefix</string>
+    <string name="preview_bulk_suffix">Add suffix</string>
+    <string name="preview_bulk_truncate">Truncate</string>
+    <string name="preview_bulk_value">Value</string>
+    <string name="preview_bulk_length">Length</string>
 </resources>

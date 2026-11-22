@@ -20,6 +20,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -184,6 +185,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
     var bulkFrom by remember { mutableStateOf("") }
     var bulkTo by remember { mutableStateOf("") }
     var bulkError by remember { mutableStateOf<String?>(null) }
+    var bulkMode by remember { mutableStateOf("replace") }
     var needsRevalidate by remember { mutableStateOf(false) }
     val assembleRequester = remember { BringIntoViewRequester() }
     val validateRequester = remember { BringIntoViewRequester() }
@@ -1378,26 +1380,41 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
         )
     }
 
+    fun bulkApply(text: String): String = when (bulkMode) {
+        "replace" -> text.replace(bulkFrom, bulkTo)
+        "prefix" -> bulkFrom + text
+        "suffix" -> text + bulkFrom
+        "truncate" -> text.take(bulkFrom.toIntOrNull() ?: text.length)
+        else -> text
+    }
     if (showBulk) {
         AlertDialog(
             onDismissRequest = { showBulk = false },
             title = { Text(stringResource(dev.ninfenz.mobile.R.string.preview_bulk)) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                    OutlinedTextField(value = bulkFrom, onValueChange = { bulkFrom = it; bulkError = null }, label = { Text(stringResource(dev.ninfenz.mobile.R.string.preview_bulk_from)) }, modifier = Modifier.fillMaxWidth())
-                    OutlinedTextField(value = bulkTo, onValueChange = { bulkTo = it }, label = { Text(stringResource(dev.ninfenz.mobile.R.string.preview_bulk_to)) }, modifier = Modifier.fillMaxWidth())
-                    Text(pluralStringResource(dev.ninfenz.mobile.R.plurals.preview_bulk_count, previewBlocks.count { it.text.contains(bulkFrom) }, previewBlocks.count { it.text.contains(bulkFrom) }), style = MaterialTheme.typography.bodySmall)
+                    Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+                        listOf("replace" to dev.ninfenz.mobile.R.string.preview_bulk_replace, "prefix" to dev.ninfenz.mobile.R.string.preview_bulk_prefix, "suffix" to dev.ninfenz.mobile.R.string.preview_bulk_suffix, "truncate" to dev.ninfenz.mobile.R.string.preview_bulk_truncate).forEach { (mode, label) ->
+                            FilterChip(selected = bulkMode == mode, onClick = { bulkMode = mode; bulkError = null }, label = { Text(stringResource(label)) })
+                        }
+                    }
+                    OutlinedTextField(value = bulkFrom, onValueChange = { bulkFrom = it; bulkError = null }, label = { Text(stringResource(if (bulkMode == "replace") dev.ninfenz.mobile.R.string.preview_bulk_from else if (bulkMode == "truncate") dev.ninfenz.mobile.R.string.preview_bulk_length else dev.ninfenz.mobile.R.string.preview_bulk_value)) }, modifier = Modifier.fillMaxWidth())
+                    if (bulkMode == "replace") {
+                        OutlinedTextField(value = bulkTo, onValueChange = { bulkTo = it }, label = { Text(stringResource(dev.ninfenz.mobile.R.string.preview_bulk_to)) }, modifier = Modifier.fillMaxWidth())
+                    }
+                    Text(pluralStringResource(dev.ninfenz.mobile.R.plurals.preview_bulk_count, previewBlocks.count { bulkApply(it.text) != it.text }, previewBlocks.count { bulkApply(it.text) != it.text }), style = MaterialTheme.typography.bodySmall)
                     bulkError?.let { Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall) }
                 }
             },
             confirmButton = {
                 TextButton(onClick = {
-                    if (bulkFrom.isBlank()) {
+                    val bad = bulkFrom.isBlank() || (bulkMode == "truncate" && (bulkFrom.toIntOrNull() ?: 0) <= 0)
+                    if (bad) {
                         bulkError = context.getString(dev.ninfenz.mobile.R.string.preview_bulk_empty)
                     } else {
                         previewHistory = previewHistory + listOf(previewBlocks)
                         previewRedo = emptyList()
-                        previewBlocks = previewBlocks.map { it.copy(text = it.text.replace(bulkFrom, bulkTo)) }
+                        previewBlocks = previewBlocks.map { it.copy(text = bulkApply(it.text)) }
                         previewDirty = true
                         showBulk = false
                     }
