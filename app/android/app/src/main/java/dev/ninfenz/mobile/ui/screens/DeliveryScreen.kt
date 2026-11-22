@@ -1171,6 +1171,8 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         }
                         recordExport("html", file, null)
                     }
+                }
+                Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                     PreservationExportButton(exportMarkdown, project, context, scope, { busy = it }, { error = it }, busy, grant) { file, report ->
                         exportedFile = file
                         manifestText = null
