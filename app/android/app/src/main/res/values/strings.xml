@@ -1079,4 +1079,7 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="import_restore_archive">恢复为导入稿</string>
     <string name="preview_share_redacted">脱敏分享</string>
     <string name="patch_unknown_slot">未知槽位：%1$s</string>
+    <string name="patch_save_assemble">保存并重新装配</string>
+    <string name="patch_assemble_failed">重新装配失败：%1$s</string>
+    <string name="patch_assemble_hint">请检查槽位、plan 与 pack</string>
 </resources>

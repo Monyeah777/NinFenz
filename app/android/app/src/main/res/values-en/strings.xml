@@ -1083,4 +1083,7 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="import_restore_archive">Restore as import draft</string>
     <string name="preview_share_redacted">Share redacted</string>
     <string name="patch_unknown_slot">Unknown slot: %1$s</string>
+    <string name="patch_save_assemble">Save + reassemble</string>
+    <string name="patch_assemble_failed">Reassemble failed: %1$s</string>
+    <string name="patch_assemble_hint">check slots, plan and pack</string>
 </resources>

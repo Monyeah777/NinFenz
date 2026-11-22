@@ -206,6 +206,40 @@ fun PatchScreen(filesDir: File, projectId: String?, onBack: () -> Unit) {
                                 history = emptyList()
                             }
                         }) { Text(stringResource(R.string.patch_save)) }
+                        if (r.slots.isNotEmpty()) {
+                            OutlinedButton(onClick = {
+                                scope.launch {
+                                    val outcome = withContext(Dispatchers.IO) {
+                                        runCatching {
+                                            val entry = LibraryStore(filesDir).loadProjects().projects.firstOrNull { it.project.id == projectId }
+                                                ?: return@runCatching null
+                                            val pack = PackStore(filesDir).scan().packs.firstOrNull {
+                                                it.id == entry.project.refs.basePackId && it.version == entry.project.refs.basePackVersion
+                                            } ?: return@runCatching null
+                                            val art = AuthorArtifactsLoader.load(pack)
+                                            val rawPlan = store.loadPlan(projectId) ?: return@runCatching null
+                                            val merged = store.load(projectId) + r.slots
+                                            val response = safeCall("assemble", buildJsonObject {
+                                                put("plan", rawPlan)
+                                                put("spec", art.specJson)
+                                                put("inputs", buildJsonObject { merged.forEach { (k, v) -> put(k, v) } })
+                                            })
+                                            if (!response.ok) return@runCatching false
+                                            val md = (response.resultObject()?.get("markdown") as? kotlinx.serialization.json.JsonPrimitive)?.content
+                                                ?: return@runCatching false
+                                            store.save(projectId, merged, rawPlan, md)
+                                            true
+                                        }.getOrNull()
+                                    }
+                                    if (outcome == true) {
+                                        Toast.makeText(context, context.getString(R.string.patch_saved), Toast.LENGTH_SHORT).show()
+                                        history = emptyList()
+                                    } else {
+                                        error = context.getString(R.string.patch_assemble_failed, context.getString(R.string.patch_assemble_hint))
+                                    }
+                                }
+                            }) { Text(stringResource(R.string.patch_save_assemble)) }
+                        }
                     }
                 }
             }
