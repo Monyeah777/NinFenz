@@ -185,6 +185,10 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
     var previewBaseline by remember { mutableStateOf<List<MarkdownBlock>>(emptyList()) }
     var ignoredHints by remember { mutableStateOf<Set<Int>>(emptySet()) }
     var inferredTransform by remember { mutableStateOf<dev.ninfenz.mobile.model.FlashFillModel.Transform?>(null) }
+    var showManualTransform by remember { mutableStateOf(false) }
+    var manualKind by remember { mutableStateOf("lower") }
+    var manualA by remember { mutableStateOf("") }
+    var manualB by remember { mutableStateOf("") }
     var savedTransform by remember(project.id) { mutableStateOf(dev.ninfenz.mobile.data.TransformStore(context.filesDir).load(project.id)) }
     var previewHistory by remember { mutableStateOf<List<List<MarkdownBlock>>>(emptyList()) }
     var previewRedo by remember { mutableStateOf<List<List<MarkdownBlock>>>(emptyList()) }
@@ -1551,6 +1555,64 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
         )
     }
 
+    if (showManualTransform) {
+        AlertDialog(
+            onDismissRequest = { showManualTransform = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.preview_manual_transform)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                    Text(stringResource(dev.ninfenz.mobile.R.string.preview_manual_hint), style = MaterialTheme.typography.bodySmall)
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(NfSpacing.xs),
+                        modifier = Modifier.horizontalScroll(rememberScrollState())
+                    ) {
+                        listOf("lower", "upper", "trim", "collapse", "prefix", "suffix", "replace", "truncate").forEach { kind ->
+                            FilterChip(
+                                selected = manualKind == kind,
+                                onClick = { manualKind = kind },
+                                label = { Text(dev.ninfenz.mobile.model.FlashFillModel.Transform(kind).describe()) }
+                            )
+                        }
+                    }
+                    if (manualKind in listOf("truncate", "prefix", "suffix", "replace")) {
+                        OutlinedTextField(
+                            value = manualA,
+                            onValueChange = { manualA = it },
+                            label = {
+                                Text(
+                                    if (manualKind == "truncate") "N" else stringResource(dev.ninfenz.mobile.R.string.preview_bulk_value)
+                                )
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                    if (manualKind == "replace") {
+                        OutlinedTextField(
+                            value = manualB,
+                            onValueChange = { manualB = it },
+                            label = { Text(stringResource(dev.ninfenz.mobile.R.string.preview_bulk_to)) },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    val transform = dev.ninfenz.mobile.model.FlashFillModel.Transform(manualKind, manualA, manualB)
+                    previewHistory = previewHistory + listOf(previewBlocks)
+                    previewRedo = emptyList()
+                    previewBlocks = previewBlocks.map { it.copy(text = transform.apply(it.text)) }
+                    previewDirty = true
+                    inferredTransform = transform
+                    showManualTransform = false
+                }) { Text(stringResource(dev.ninfenz.mobile.R.string.preview_manual_apply)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showManualTransform = false }) { Text(stringResource(android.R.string.cancel)) }
+            }
+        )
+    }
+
     assignBlockText?.let { text ->
         AlertDialog(
             onDismissRequest = { assignBlockText = null },
@@ -1689,6 +1751,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                             }
                         ) { Text(stringResource(dev.ninfenz.mobile.R.string.preview_redo)) }
                         TextButton(onClick = { showBulk = true }) { Text(stringResource(dev.ninfenz.mobile.R.string.preview_bulk)) }
+                        TextButton(onClick = { showManualTransform = true }) { Text(stringResource(dev.ninfenz.mobile.R.string.preview_manual_transform)) }
                         TextButton(onClick = {
                             val base = previewBaseline
                             val changed = if (base.size == previewBlocks.size) {
