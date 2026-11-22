@@ -178,6 +178,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
     var editingPreview by remember { mutableStateOf(false) }
     var showResetConfirm by remember { mutableStateOf(false) }
     var previewBlocks by remember { mutableStateOf<List<MarkdownBlock>>(emptyList()) }
+    var previewBaseline by remember { mutableStateOf<List<MarkdownBlock>>(emptyList()) }
     var previewHistory by remember { mutableStateOf<List<List<MarkdownBlock>>>(emptyList()) }
     var previewRedo by remember { mutableStateOf<List<List<MarkdownBlock>>>(emptyList()) }
     var previewDirty by remember { mutableStateOf(false) }
@@ -1259,7 +1260,9 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                             MarkdownPreview(md, limitBlocks = 8)
                             Row {
                                 TextButton(onClick = {
-                                    previewBlocks = MarkdownBlocks.parse(md)
+                                    val parsed = MarkdownBlocks.parse(md)
+                                    previewBlocks = parsed
+                                    previewBaseline = parsed
                                     previewHistory = emptyList()
                                     previewRedo = emptyList()
                                     previewDirty = false
@@ -1460,6 +1463,25 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                             }
                         ) { Text(stringResource(dev.ninfenz.mobile.R.string.preview_redo)) }
                         TextButton(onClick = { showBulk = true }) { Text(stringResource(dev.ninfenz.mobile.R.string.preview_bulk)) }
+                        TextButton(onClick = {
+                            val base = previewBaseline
+                            val changed = if (base.size == previewBlocks.size) {
+                                base.indices.filter { base[it].text != previewBlocks[it].text }
+                            } else emptyList()
+                            val transform = if (changed.size == 1) {
+                                val i = changed.first()
+                                dev.ninfenz.mobile.model.FlashFillModel.infer(base[i].text, previewBlocks[i].text)
+                            } else null
+                            if (transform == null) {
+                                android.widget.Toast.makeText(context, context.getString(dev.ninfenz.mobile.R.string.preview_infer_failed), android.widget.Toast.LENGTH_SHORT).show()
+                            } else {
+                                previewHistory = previewHistory + listOf(previewBlocks)
+                                previewRedo = emptyList()
+                                previewBlocks = previewBlocks.map { it.copy(text = transform.apply(it.text)) }
+                                previewDirty = true
+                                android.widget.Toast.makeText(context, context.getString(dev.ninfenz.mobile.R.string.preview_infer_done, transform.describe()), android.widget.Toast.LENGTH_SHORT).show()
+                            }
+                        }) { Text(stringResource(dev.ninfenz.mobile.R.string.preview_infer)) }
                     }
                     previewBlocks.forEachIndexed { index, block ->
                         Text(block.kind, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)

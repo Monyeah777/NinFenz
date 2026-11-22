@@ -1101,4 +1101,7 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="preview_bulk_truncate">Truncate</string>
     <string name="preview_bulk_value">Value</string>
     <string name="preview_bulk_length">Length</string>
+    <string name="preview_infer">Infer from edit</string>
+    <string name="preview_infer_failed">Cannot infer a transform; edit exactly one block first</string>
+    <string name="preview_infer_done">Applied: %1$s</string>
 </resources>
