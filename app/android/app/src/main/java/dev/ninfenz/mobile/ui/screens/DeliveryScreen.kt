@@ -388,7 +388,10 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
         runCatching { PlanModel.parse(raw) }.onSuccess { parsed ->
             rawPlan = raw
             plan = parsed
-            inputs = parsed.slots.associate { it to (restoredInputs[it] ?: zeroPrefill[it] ?: "") }
+            inputs = parsed.slots.associate { slot ->
+                val restored = restoredInputs[slot]
+                slot to (if (!restored.isNullOrBlank()) restored else zeroPrefill[slot] ?: "")
+            }
         }
     }
     DisposableEffect(project.id) {
