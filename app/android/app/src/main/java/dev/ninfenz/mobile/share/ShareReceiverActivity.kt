@@ -53,7 +53,7 @@ class ShareReceiverActivity : ComponentActivity() {
                             if (current != null && current.count > 0) {
                                 ShareHandoff.offer(current)
                                 startActivity(Intent(this, MainActivity::class.java).apply {
-                                    addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
                                 })
                             }
                             finish()
