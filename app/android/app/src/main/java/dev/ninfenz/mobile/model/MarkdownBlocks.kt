@@ -42,7 +42,7 @@ object MarkdownBlocks {
             first.startsWith("#") -> "heading"
             first.startsWith("|") -> "table"
             first.startsWith(">") -> "quote"
-            first.startsWith("- ") || first.startsWith("* ") || first.firstOrNull()?.isDigit() == true -> "list"
+            first.startsWith("- ") || first.startsWith("* ") || Regex("^\\d+[.)]\\s").containsMatchIn(first) -> "list"
             else -> "paragraph"
         }
     }

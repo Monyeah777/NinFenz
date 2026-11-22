@@ -39,6 +39,11 @@
 - 合并结果可展开块列表、删除单块；删除后保存/分享。
 - 块可上下移动/删除；跨章节拖拽仍 OPEN。
 
+## Markdown 块类型修正
+
+- 有序列表只认 `1. `/`1) `，不再把「2026 年…」误判为 list。
+- Kotlin + Rust 同步；各加一条回归测试。
+
 ## M1 Flash Fill（P0 原型）
 
 - `app/prototypes/flash_fill/flash_fill.py`：前缀/后缀/去前缀/去后缀/替换/截断白名单。

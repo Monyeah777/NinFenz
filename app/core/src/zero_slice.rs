@@ -64,13 +64,23 @@ pub struct Report {
     pub coverage: f64,
 }
 
+fn is_ordered_list(first: &str) -> bool {
+    let mut chars = first.chars().peekable();
+    let mut digits = 0;
+    while chars.peek().is_some_and(|c| c.is_ascii_digit()) {
+        chars.next();
+        digits += 1;
+    }
+    digits > 0 && matches!(chars.next(), Some('.') | Some(')')) && chars.next().is_some_and(|c| c == ' ' || c == '\t')
+}
+
 fn kind_of(text: &str) -> &'static str {
     let first = text.lines().next().unwrap_or("").trim();
     if first.starts_with("\u{60}\u{60}\u{60}") { "code" }
     else if first.starts_with('#') { "heading" }
     else if first.starts_with('|') { "table" }
     else if first.starts_with('>') { "quote" }
-    else if first.starts_with("- ") || first.starts_with("* ") || first.chars().next().is_some_and(|c| c.is_ascii_digit()) { "list" }
+    else if first.starts_with("- ") || first.starts_with("* ") || is_ordered_list(first) { "list" }
     else { "paragraph" }
 }
 
@@ -420,6 +430,14 @@ mod tests {
         let doc = parse_markdown("# 简报\n\n## 背景\n\n正文\n\n## 目标\n\n- 一点\n");
         assert_eq!(doc.title, "简报");
         assert_eq!(doc.sections.iter().map(|s| s.title.as_str()).collect::<Vec<_>>(), vec!["背景", "目标"]);
+    }
+
+    #[test]
+    fn year_is_not_a_list() {
+        let doc = parse_markdown("2026 年计划\n\n1. 第一项\n\n2) 第二项");
+        assert_eq!(doc.blocks[0].kind, "paragraph");
+        assert_eq!(doc.blocks[1].kind, "list");
+        assert_eq!(doc.blocks[2].kind, "list");
     }
 
     #[test]

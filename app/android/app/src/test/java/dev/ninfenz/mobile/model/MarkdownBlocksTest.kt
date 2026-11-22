@@ -17,6 +17,14 @@ class MarkdownBlocksTest {
     }
 
     @Test
+    fun yearIsParagraphButOrderedListIsList() {
+        val blocks = MarkdownBlocks.parse("2026 年计划\n\n1. 第一项\n\n2) 第二项")
+        assertEquals("paragraph", blocks[0].kind)
+        assertEquals("list", blocks[1].kind)
+        assertEquals("list", blocks[2].kind)
+    }
+
+    @Test
     fun emptyInputRendersEmpty() {
         assertEquals(emptyList<MarkdownBlock>(), MarkdownBlocks.parse("  "))
         assertEquals("", MarkdownBlocks.render(emptyList()))

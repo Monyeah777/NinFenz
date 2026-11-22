@@ -282,7 +282,7 @@
       "pass": 3
     }
   },
-  "head": "96b7d9396069efa70bbd95235dcd0f779967b448",
+  "head": "3b38974c4328dcbf6084462f63242d6976a93749",
   "open_items": [
     {
       "id": "S3",
@@ -523,10 +523,10 @@
         "exit": 0,
         "log": "app/results/logs/cargo_test.log",
         "summary": {
-          "collected": 10,
+          "collected": 11,
           "errors": null,
           "failed": 0,
-          "passed": 10
+          "passed": 11
         }
       },
       "gate": "QA1",
