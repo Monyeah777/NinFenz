@@ -259,6 +259,13 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
         }
     }
     val restoredInputs = remember(project.id) { draftStore.load(project.id) }
+    val zeroPrefill = remember(project.id) {
+        val file = java.io.File(
+            java.io.File(java.io.File(context.filesDir, "projects"), project.id),
+            "authoring/zero-slice.json"
+        )
+        dev.ninfenz.mobile.data.ZeroSliceStore(context.filesDir).read(file)?.slotValues ?: emptyMap()
+    }
     val restoredPlan = remember(project.id) { draftStore.loadPlan(project.id) }
     val restoredMarkdown = remember(project.id) { draftStore.loadMarkdown(project.id) }
     LaunchedEffect(restoredMarkdown) {
@@ -381,7 +388,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
         runCatching { PlanModel.parse(raw) }.onSuccess { parsed ->
             rawPlan = raw
             plan = parsed
-            inputs = parsed.slots.associate { it to (restoredInputs[it] ?: "") }
+            inputs = parsed.slots.associate { it to (restoredInputs[it] ?: zeroPrefill[it] ?: "") }
         }
     }
     DisposableEffect(project.id) {
