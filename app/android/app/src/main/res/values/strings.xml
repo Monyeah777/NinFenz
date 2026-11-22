@@ -1082,4 +1082,13 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="patch_save_assemble">保存并重新装配</string>
     <string name="patch_assemble_failed">重新装配失败：%1$s</string>
     <string name="patch_assemble_hint">请检查槽位、plan 与 pack</string>
+    <string name="preview_bulk">批量变换</string>
+    <string name="preview_bulk_from">查找</string>
+    <string name="preview_bulk_to">替换为</string>
+    <string name="preview_bulk_apply">应用到块</string>
+    <string name="preview_bulk_empty">查找内容为空</string>
+    <plurals name="preview_bulk_count">
+        <item quantity="one">将影响 %1$d 块</item>
+        <item quantity="other">将影响 %1$d 块</item>
+    </plurals>
 </resources>

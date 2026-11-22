@@ -1086,4 +1086,13 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="patch_save_assemble">Save + reassemble</string>
     <string name="patch_assemble_failed">Reassemble failed: %1$s</string>
     <string name="patch_assemble_hint">check slots, plan and pack</string>
+    <string name="preview_bulk">Bulk transform</string>
+    <string name="preview_bulk_from">Find</string>
+    <string name="preview_bulk_to">Replace with</string>
+    <string name="preview_bulk_apply">Apply to blocks</string>
+    <string name="preview_bulk_empty">Find text is empty</string>
+    <plurals name="preview_bulk_count">
+        <item quantity="one">Affects %1$d blocks</item>
+        <item quantity="other">Affects %1$d blocks</item>
+    </plurals>
 </resources>

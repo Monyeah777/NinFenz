@@ -180,6 +180,10 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
     var previewHistory by remember { mutableStateOf<List<List<MarkdownBlock>>>(emptyList()) }
     var previewRedo by remember { mutableStateOf<List<List<MarkdownBlock>>>(emptyList()) }
     var previewDirty by remember { mutableStateOf(false) }
+    var showBulk by remember { mutableStateOf(false) }
+    var bulkFrom by remember { mutableStateOf("") }
+    var bulkTo by remember { mutableStateOf("") }
+    var bulkError by remember { mutableStateOf<String?>(null) }
     var needsRevalidate by remember { mutableStateOf(false) }
     val assembleRequester = remember { BringIntoViewRequester() }
     val validateRequester = remember { BringIntoViewRequester() }
@@ -1374,6 +1378,36 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
         )
     }
 
+    if (showBulk) {
+        AlertDialog(
+            onDismissRequest = { showBulk = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.preview_bulk)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+                    OutlinedTextField(value = bulkFrom, onValueChange = { bulkFrom = it; bulkError = null }, label = { Text(stringResource(dev.ninfenz.mobile.R.string.preview_bulk_from)) }, modifier = Modifier.fillMaxWidth())
+                    OutlinedTextField(value = bulkTo, onValueChange = { bulkTo = it }, label = { Text(stringResource(dev.ninfenz.mobile.R.string.preview_bulk_to)) }, modifier = Modifier.fillMaxWidth())
+                    Text(pluralStringResource(dev.ninfenz.mobile.R.plurals.preview_bulk_count, previewBlocks.count { it.text.contains(bulkFrom) }, previewBlocks.count { it.text.contains(bulkFrom) }), style = MaterialTheme.typography.bodySmall)
+                    bulkError?.let { Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall) }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    if (bulkFrom.isBlank()) {
+                        bulkError = context.getString(dev.ninfenz.mobile.R.string.preview_bulk_empty)
+                    } else {
+                        previewHistory = previewHistory + listOf(previewBlocks)
+                        previewRedo = emptyList()
+                        previewBlocks = previewBlocks.map { it.copy(text = it.text.replace(bulkFrom, bulkTo)) }
+                        previewDirty = true
+                        showBulk = false
+                    }
+                }) { Text(stringResource(dev.ninfenz.mobile.R.string.preview_bulk_apply)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showBulk = false }) { Text(stringResource(android.R.string.cancel)) }
+            }
+        )
+    }
     if (editingPreview) {
         AlertDialog(
             onDismissRequest = {
@@ -1408,6 +1442,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                 previewRedo = previewRedo.dropLast(1)
                             }
                         ) { Text(stringResource(dev.ninfenz.mobile.R.string.preview_redo)) }
+                        TextButton(onClick = { showBulk = true }) { Text(stringResource(dev.ninfenz.mobile.R.string.preview_bulk)) }
                     }
                     previewBlocks.forEachIndexed { index, block ->
                         Text(block.kind, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
