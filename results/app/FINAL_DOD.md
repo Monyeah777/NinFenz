@@ -19,7 +19,7 @@
 | i18n/主题切换（全部屏主要文案） | pass | values-en + 资源化；我的支持 zh/en/system + 动态取色；系统 per-app locale 已声明并同步；UI 中文硬编码守卫通过（仅 CoreCall 无 Context 回退豁免） |
 | 像素截图矩阵 | pass（本机） | Paparazzi 10 张基线（360/700/900 × 640/800/900/1000），testDebugUnitTest verify |
 | 真机/模拟器 | partial | OnePlus Android16：首启、WebView PDF、杀进程路由/槽位草稿恢复已通过；TalkBack 语音走查、主题、设备矩阵仍 OPEN；CCOS 为接口预留、真实 AI OS/Agent 后续接入（DEVICE_RESULTS.md §6） |
-| 草稿→项目 | partial | 草稿可创建项目壳并把草稿 JSON 作为 authoring 来源副本；导入内容尚未映射进协议字段（OPEN-DRAFT-PROJECT 收窄） |
+| 草稿→项目 | pass（zero-slice 路径） | 真机：分享 Markdown→切片 100%→「用切片建项目」→创作台预填 6 字段→交付 3/3；通用导入草稿映射仍为 partial |
 | app/gates v0.02 UX 检查 | pass | 7/7 gate PASS、FAIL=0；GATES/SELF_AUDIT 已更新（本提交） |
 
 **收口实测（2026-11-17 更新）**：app/gates 7/7 PASS、FAIL=0；verify.sh --checks-only PASS=107 WARN=2 FAIL=0；JVM 502/502；APK 55,483,749 B sha256 2bde7f98…；Release unsigned 44,733,774 B sha256 d5fffa4b…（16KB 对齐通过）。
@@ -49,7 +49,7 @@
 | QA2 | 协议/管线/装配/校验/导出；golden | **PASS** | golden + oracle 对账 31 条；首闭环 E2E 6 条 |
 | QA3 | 分享/回填/Pack 更新/冲突/回滚；负例 | **PASS** | 更新/冲突/回滚 E2E；分享脱敏 5 条 |
 | QA4 | 桌面/TUI/CCOS 交接；跨端一致 | **PASS** | TUI selftest 全绿；CCOS 相关 E2E；Android/Desktop 工程与构建证据 |
-| QA5 | 安全/性能/无障碍/16KB/设备矩阵 | **PASS（含 OPEN）** | 解析安全负例全绿；设备矩阵/性能预算文档在位；自适应三档布局（紧凑单页/中等/扩展 NavigationRail）与无障碍可读标签代码侧落地（JVM 42 条，含分档边界）；真机首启/PDF/杀进程恢复已实测，TalkBack/设备矩阵仍 OPEN-TOOLCHAIN |
+| QA5 | 安全/性能/无障碍/16KB/设备矩阵 | **PASS（含 OPEN）** | 解析安全负例全绿；设备矩阵/性能预算文档在位；自适应三档布局（紧凑单页/中等/扩展 NavigationRail）与无障碍可读标签代码侧落地（JVM 502 条，含分档边界）；真机首启/PDF/杀进程恢复已实测，TalkBack/设备矩阵仍 OPEN-TOOLCHAIN |
 | QA6 | 发布/签名/公证/数据安全/许可；P0=0 | **PASS（含 OPEN）** | 脚本/文档在位；签名证据 OPEN-EXTERNAL；SELF_AUDIT p0=0 |
 
 ## 3. 自审计（S0–S15）
@@ -58,7 +58,7 @@
 |---|---|
 | covered（13） | S0 需求覆盖、S1 代码空洞、S2 默认放行、S4 链/序、S5 类型兼容、S6 测试缺口/变异、S7 文档过度声明、S8 依赖/供应链、S9 路径/DoS、S10 隐私/秘密、S12 导入矩阵、S13 Pack diff/merge/回滚、S14 APP/CCOS 边界 |
 | gap（0） | S11 已关闭：shell/导入/槽位/协议草稿 + crash 日志覆盖关键进程死亡恢复；2026-11-17 真机验证交付台路由/槽位恢复；设备矩阵仍 OPEN-TOOLCHAIN |
-| open（2，带 owner+next） | S3 密码学（仅完整性摘要，无签名/加密）、S15 红队（无 Android 运行时/真机） |
+| open（2，带 owner+next） | S3 密码学（设备 Keystore ECDSA 签收已真机通过；仍无 CA/TSA/身份）、S15 红队（有真机但无红队/对抗测试） |
 
 停止条件（计划 §15.3）：QA0–QA6 FAIL=0 ✔；P0=0 ✔；UNSUPPORTED 全带 owner+next ✔；**「连续两轮」已达成**（Round2 与 Round3 各跑一轮 run_gates.py，均 FAIL=0 / P0=0，证据见两轮 GATES 现场输出）。
 
@@ -72,7 +72,7 @@
 | DOD-04 | 无遥测/密钥不入 APP；分享/导入负例 | **pass（本机可证面）** | manifest 权限面 + PRIVACY.md + 解析/分享负例 |
 | DOD-05 | 桌面签名/公证；手机发布材料 | **OPEN-EXTERNAL** | 无证书/无 macOS；`RELEASE_EVIDENCE.md` 留位 |
 | DOD-06 | 文档 claims 对应代码/测试；开放项登记 | **pass** | `SELF_AUDIT.open_items` + 各文档 OPEN 段 |
-| DOD-07 | 首闭环（§18.2 七步） | **pass（控制面核心面）** | `test_e2e_first_loop.py` 6 条；Android 真机首启、PDF 导出、杀进程恢复已实测（DEVICE_RESULTS §6） |
+| DOD-07 | 首闭环（§18.2 七步） | **pass（控制面核心面 + zero-slice 真机链）** | `test_e2e_first_loop.py` 6 条；真机：分享→切片 100%→建项目→预填→交付 3/3→L1 pass→md 导出→签收→两份 preserve 通过；M25 最近归档 read/reassemble/export 已真机 |
 | DOD-08 | 确定性（同输入同字节） | **pass** | canonical/determinism/golden 用例 + zip 固定 mtime |
 
 ## 5. 测试与构建实测
