@@ -1015,16 +1015,16 @@ fun ImportScreen(
                                     val raw = rawResult ?: return@TextButton
                                     val pack = packs.first()
                                     val title = current?.source?.name ?: "zero-slice"
-                                    val base = store.uniqueDraftBase(title)
-                                    val file = store.saveDraft(base, raw.toString())
-                                    zeroSliceStore.saveDraft(file, report)
-                                    val mappingJson = buildJsonObject {
-                                        put("accepted", JsonArray(acceptedMappings.sorted().map { JsonPrimitive(it) }))
-                                        put("unmapped", JsonArray(current?.unmapped.orEmpty().map { JsonPrimitive(it) }))
-                                    }.toString()
-                                    store.saveDraft(base + ".mapping", mappingJson)
-                                    savedName = file.name
-                                    onQuickProjectFromDraft(pack, title, file)
+                                    val prepared = dev.ninfenz.mobile.data.ZeroSliceProjectDraft.prepare(
+                                        context.filesDir,
+                                        raw.toString(),
+                                        report,
+                                        acceptedMappings,
+                                        current?.unmapped.orEmpty(),
+                                        title
+                                    )
+                                    savedName = prepared.file.name
+                                    onQuickProjectFromDraft(pack, title, prepared.file)
                                 }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_zero_slice_create)) }
                             }
                             TextButton(onClick = {

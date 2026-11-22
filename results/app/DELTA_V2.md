@@ -56,7 +56,7 @@
 
 - `FeaturePolicy` 规则表：Free 能力、Pro 能力、CCOS 能力；按 tier 判定。
 - `FeatureGate` 委托规则；默认 Free，Free 永远放行，未知能力默认 Free。
-- 5 条 Kotlin 单测；JVM 499。
+- 5 条 Kotlin 单测；JVM 500。
 - `FeatureGate.setTierForDebug`：调试构建可在 Settings「功能层级」切 Free/Pro/CCOS。
 - 发布构建只显示层级与规则数，不含购买/授权入口；默认 Free。
 - **未**接计费/真实 entitlement。
@@ -165,6 +165,7 @@
 - Android 包内 `libnf_app_core.so` 已重编译并含 `zero-slice` op；分享导入不再报「未知 op」。
 - `zero-slice` 响应新增 `project`（`nf-project/1`）；Kotlin 解析 `project.slots` 并优先用于 `slotValues` 预填。
 - 切片会话卡新增「用切片建项目」：保存草稿+sidecar 后直接走快速建项目。
+- 该落盘逻辑抽到 `ZeroSliceProjectDraft`，单测覆盖主草稿/sidecar/mapping。
 - 仍是 nf-import/1 会话；未切到 nf-zero-slice-draft/to_project，也未替换核心 map-suggest。
 
 ## A0-14 Daily 入口
