@@ -1594,10 +1594,27 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
+                    val valid = when (manualKind) {
+                        "truncate" -> (manualA.toIntOrNull() ?: 0) > 0
+                        "prefix", "suffix", "replace" -> manualA.isNotEmpty()
+                        else -> true
+                    }
+                    if (!valid) {
+                        Text(
+                            stringResource(dev.ninfenz.mobile.R.string.preview_manual_invalid),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
                 }
             },
             confirmButton = {
-                TextButton(onClick = {
+                val valid = when (manualKind) {
+                    "truncate" -> (manualA.toIntOrNull() ?: 0) > 0
+                    "prefix", "suffix", "replace" -> manualA.isNotEmpty()
+                    else -> true
+                }
+                TextButton(enabled = valid, onClick = {
                     val transform = dev.ninfenz.mobile.model.FlashFillModel.Transform(manualKind, manualA, manualB)
                     previewHistory = previewHistory + listOf(previewBlocks)
                     previewRedo = emptyList()

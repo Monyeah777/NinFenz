@@ -1198,4 +1198,5 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="preview_manual_transform">Manual transform</string>
     <string name="preview_manual_hint">Pick a transform and apply to all blocks</string>
     <string name="preview_manual_apply">Apply</string>
+    <string name="preview_manual_invalid">Fill valid parameters first</string>
 </resources>

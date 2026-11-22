@@ -1194,4 +1194,5 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="preview_manual_transform">手动变换</string>
     <string name="preview_manual_hint">选择变换并应用到全部块</string>
     <string name="preview_manual_apply">应用</string>
+    <string name="preview_manual_invalid">请先填写有效参数</string>
 </resources>
