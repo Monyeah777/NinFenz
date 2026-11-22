@@ -63,6 +63,8 @@ import dev.ninfenz.mobile.data.TextEncoding
 import dev.ninfenz.mobile.data.ShareQueueStore
 import dev.ninfenz.mobile.data.FileAccess
 import dev.ninfenz.mobile.data.ImportDraftStore
+import dev.ninfenz.mobile.data.ZeroSliceReport
+import dev.ninfenz.mobile.data.ZeroSliceStore
 import dev.ninfenz.mobile.data.ImportHistoryStore
 import dev.ninfenz.mobile.data.PromptSampleStore
 import dev.ninfenz.mobile.data.TemplateCandidateStore
@@ -145,6 +147,8 @@ fun ImportScreen(
     var acceptedMappings by remember { mutableStateOf<Set<Int>>(emptySet()) }
     var suggestNote by remember { mutableStateOf<String?>(null) }
     var zeroSliceNote by remember { mutableStateOf<String?>(null) }
+    val zeroSliceStore = remember { ZeroSliceStore(context.filesDir) }
+    var zeroSlice by remember { mutableStateOf<ZeroSliceReport?>(null) }
     var preserveNote by remember { mutableStateOf<String?>(null) }
     var preservedMarkdown by remember { mutableStateOf<String?>(null) }
     var preservedName by remember { mutableStateOf("restored.md") }
@@ -206,6 +210,9 @@ fun ImportScreen(
     }
 
     suspend fun importFromFile(file: File, sourceKind: String, name: String, mime: String?, size: Long) {
+        zeroSlice = null
+        zeroSliceNote = null
+        zeroSliceStore.clear()
         val isZip = file.name.endsWith(".zip", ignoreCase = true) || (mime ?: "").contains("zip", ignoreCase = true)
         if (isZip && dev.ninfenz.mobile.data.ProjectBundleImporter.hasBundle(file)) {
             busy = true
@@ -580,9 +587,18 @@ fun ImportScreen(
             })
             val obj = response.resultObject()
             if (response.ok && obj != null) {
-                val coverage = obj["coverage"]?.jsonPrimitive?.intOrNull ?: 0
-                val exceptions = obj["exceptions"]?.jsonArray?.size ?: 0
-                zeroSliceNote = context.resources.getQuantityString(dev.ninfenz.mobile.R.plurals.import_zero_slice_note, exceptions, coverage, exceptions)
+                val report = dev.ninfenz.mobile.data.ZeroSliceModel.parse(obj)
+                zeroSlice = report
+                val currentDoc = doc
+                if (currentDoc != null) {
+                    val digest = currentDoc.source.sha256 ?: currentDoc.textDigest.orEmpty()
+                    if (digest.isNotBlank()) zeroSliceStore.save(digest, report)
+                    val matched = currentDoc.mappings.indices.filter { i ->
+                        report.mappings.any { it.toId == currentDoc.mappings[i].toId && it.confidence >= 60 }
+                    }.toSet()
+                    acceptedMappings = acceptedMappings + matched
+                }
+                zeroSliceNote = context.resources.getQuantityString(dev.ninfenz.mobile.R.plurals.import_zero_slice_note, report.exceptions.size, report.coverage, report.exceptions.size)
             } else {
                 zeroSliceNote = context.getString(dev.ninfenz.mobile.R.string.import_zero_slice_failed, response.error?.message ?: "unknown")
             }
@@ -637,12 +653,23 @@ fun ImportScreen(
                     rawResult = obj
                     doc = restored
                     acceptedMappings = restored.mappings.indices.filter { restored.mappings[it].confidence >= 80 }.toSet()
+                    val digest = restored.source.sha256 ?: restored.textDigest.orEmpty()
+                    zeroSliceStore.load(digest)?.let { report ->
+                        zeroSlice = report
+                        acceptedMappings = acceptedMappings + restored.mappings.indices.filter { i ->
+                            report.mappings.any { it.toId == restored.mappings[i].toId && it.confidence >= 60 }
+                        }.toSet()
+                    }
                     notice = context.getString(dev.ninfenz.mobile.R.string.import_restored_notice)
                 } catch (t: Throwable) {
                     importDraftStore.clear()
                 }
             }
         }
+    }
+
+    LaunchedEffect(doc?.textDigest, packs.size) {
+        if (doc != null && zeroSlice == null && packs.isNotEmpty()) runZeroSlice()
     }
 
     LaunchedEffect(autoClipboard) {
@@ -915,6 +942,49 @@ fun ImportScreen(
                         secondaryLabel = context.getString(dev.ninfenz.mobile.R.string.import_sample_content),
                         onSecondary = { importSample() }
                     )
+                }
+            }
+            zeroSlice?.let { report ->
+                item { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.import_zero_slice_session_title)) }
+                item {
+                    NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
+                        Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                            Text(
+                                stringResource(dev.ninfenz.mobile.R.string.import_zero_slice_coverage, report.coverage),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Text(
+                                pluralStringResource(dev.ninfenz.mobile.R.plurals.import_zero_slice_mappings, report.mappings.size, report.mappings.size) +
+                                    " · " +
+                                    pluralStringResource(dev.ninfenz.mobile.R.plurals.import_zero_slice_exceptions, report.exceptions.size, report.exceptions.size),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            report.mappings.take(6).forEach { mapping ->
+                                Text(
+                                    stringResource(dev.ninfenz.mobile.R.string.import_zero_slice_mapping, mapping.fromIndex, mapping.toName.ifBlank { mapping.toId }, mapping.confidence),
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
+                            report.exceptions.firstOrNull()?.let { exception ->
+                                Text(exception.reason, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                            TextButton(onClick = {
+                                val currentMappings = current?.mappings.orEmpty()
+                                val matched = currentMappings.indices.filter { i ->
+                                    val m = currentMappings[i]
+                                    report.mappings.any { it.toId == m.toId && it.confidence >= 60 }
+                                }.toSet()
+                                if (matched.isEmpty()) {
+                                    zeroSliceNote = context.getString(dev.ninfenz.mobile.R.string.import_zero_slice_no_match)
+                                } else {
+                                    acceptedMappings = acceptedMappings + matched
+                                    zeroSliceNote = context.getString(dev.ninfenz.mobile.R.string.import_zero_slice_applied)
+                                }
+                            }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_zero_slice_apply)) }
+                        }
+                    }
                 }
             }
             if (current != null) {

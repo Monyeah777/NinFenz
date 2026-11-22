@@ -1119,4 +1119,18 @@ MIT License · See app/docs/LEGAL.md</string>
     </plurals>
     <string name="slot_pattern">must match %1$s</string>
     <string name="contract_key">Device key %1$s</string>
+    <string name="import_zero_slice_session_title">Auto-slice session</string>
+    <string name="import_zero_slice_coverage">Coverage %1$d%%</string>
+    <string name="import_zero_slice_apply">Use slice mappings</string>
+    <string name="import_zero_slice_applied">Slice mappings applied</string>
+    <string name="import_zero_slice_mapping">§%1$d → %2$s · %3$d%%</string>
+    <string name="import_zero_slice_no_match">No slice mapping matches current suggestions</string>
+    <plurals name="import_zero_slice_mappings">
+        <item quantity="one">%d mapping</item>
+        <item quantity="other">%d mappings</item>
+    </plurals>
+    <plurals name="import_zero_slice_exceptions">
+        <item quantity="one">%d exception</item>
+        <item quantity="other">%d exceptions</item>
+    </plurals>
 </resources>

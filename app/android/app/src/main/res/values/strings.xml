@@ -1115,4 +1115,18 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     </plurals>
     <string name="slot_pattern">需匹配 %1$s</string>
     <string name="contract_key">设备密钥 %1$s</string>
+    <string name="import_zero_slice_session_title">自动切片会话</string>
+    <string name="import_zero_slice_coverage">覆盖 %1$d%%</string>
+    <string name="import_zero_slice_apply">采用切片映射</string>
+    <string name="import_zero_slice_applied">已采用切片映射</string>
+    <string name="import_zero_slice_mapping">§%1$d → %2$s · %3$d%%</string>
+    <string name="import_zero_slice_no_match">没有与当前建议匹配的切片映射</string>
+    <plurals name="import_zero_slice_mappings">
+        <item quantity="one">%d 条映射</item>
+        <item quantity="other">%d 条映射</item>
+    </plurals>
+    <plurals name="import_zero_slice_exceptions">
+        <item quantity="one">%d 个例外</item>
+        <item quantity="other">%d 个例外</item>
+    </plurals>
 </resources>

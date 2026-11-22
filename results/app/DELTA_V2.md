@@ -56,7 +56,7 @@
 
 - `FeaturePolicy` 规则表：Free 能力、Pro 能力、CCOS 能力；按 tier 判定。
 - `FeatureGate` 委托规则；默认 Free，Free 永远放行，未知能力默认 Free。
-- 5 条 Kotlin 单测；JVM 458。
+- 5 条 Kotlin 单测；JVM 460。
 - **未**接购买/授权/Pro/CCOS UI；无计费。
 
 ## M25 Capability-Scoped Sharing（P0 原型）
@@ -136,7 +136,10 @@
 - 10 条 Rust 单测：解析/映射/例外/freeform + Session/reset/undo + DraftStore 同源覆盖 + to_project 参考形状。
 - 新 `zero-slice` op：输入 text/spec，输出 title/sections/mappings/exceptions/coverage（0–100 整数）；3 条 op 测试。
 - DraftStore 已落盘（同源覆盖）；**未**移植 to_project FFI/Android 接线。
-- Android 导入页新增「自动切片」预览：调用 zero-slice，显示 coverage/例外数；仍不切换现有 ImportSession。
+- Android 导入页在 doc 变化时自动调用 zero-slice；显示 coverage/映射/例外卡。
+- 置信度 ≥60 且 to_id 命中的切片映射自动加入 acceptedMappings；另有「采用切片映射」手动入口。
+- zero-slice 结果按 source digest 落盘，进程恢复时还原；新导入/清空时清除。
+- 仍是 nf-import/1 会话，**未**切到 nf-zero-slice-draft/to_project，也未替换核心 map-suggest。
 
 ## A0-14 Daily 入口
 
