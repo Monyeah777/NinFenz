@@ -56,7 +56,7 @@
 
 - `FeaturePolicy` 规则表：Free 能力、Pro 能力、CCOS 能力；按 tier 判定。
 - `FeatureGate` 委托规则；默认 Free，Free 永远放行，未知能力默认 Free。
-- 5 条 Kotlin 单测；JVM 488。
+- 5 条 Kotlin 单测；JVM 490。
 - **未**接购买/授权/Pro/CCOS UI；无计费。
 
 ## M25 Capability-Scoped Sharing（P0 原型）
@@ -75,6 +75,7 @@
 - `app/prototypes/property_test`：对 canonical 生成 100 个确定性值做 roundtrip/稳定性性质检查。
 - 覆盖浮点拒绝、键序无关、Unicode 码点保留。
 - 4 条 unittest；pytest wrapper 纳入全量。
+- Kotlin `PropertyHarness` + `AppSelfCheck`：Settings「属性自检」跑 150 条确定性 property（M1 推断/M12 MUS/M25 到期）。
 - **未**做跨实现差分/模型比较。
 
 ## M12 Constraint Satisfiability/MUS（P0 原型）

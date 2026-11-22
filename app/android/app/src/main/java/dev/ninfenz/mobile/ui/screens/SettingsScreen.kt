@@ -73,6 +73,7 @@ fun SettingsScreen(
     val diag = remember { Core.diagnostics() }
     var crash by remember { mutableStateOf(CrashLogStore(context.filesDir).read()) }
     var copied by remember { mutableStateOf(false) }
+    var selfCheck by remember { mutableStateOf<dev.ninfenz.mobile.data.PropertyHarness.Report?>(null) }
     var stats by remember { mutableStateOf(StorageStats.scan(context.filesDir, context.cacheDir)) }
     var cleaned by remember { mutableStateOf<String?>(null) }
     var backupMessage by remember { mutableStateOf<String?>(null) }
@@ -133,6 +134,28 @@ fun SettingsScreen(
             )
             OutlinedButton(onClick = onErrorCodes) {
                 Text(stringResource(dev.ninfenz.mobile.R.string.error_codes_title))
+            }
+        }
+
+        CardBox(title = stringResource(dev.ninfenz.mobile.R.string.settings_selfcheck_title)) {
+            Text(
+                stringResource(dev.ninfenz.mobile.R.string.settings_selfcheck_desc),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Button(onClick = { selfCheck = dev.ninfenz.mobile.data.AppSelfCheck.run() }) {
+                Text(stringResource(dev.ninfenz.mobile.R.string.settings_selfcheck_run))
+            }
+            selfCheck?.let { report ->
+                Text(
+                    if (report.ok) {
+                        stringResource(dev.ninfenz.mobile.R.string.settings_selfcheck_pass, report.checked)
+                    } else {
+                        stringResource(dev.ninfenz.mobile.R.string.settings_selfcheck_fail, report.failures.size, report.failures.first().seed)
+                    },
+                    style = MaterialTheme.typography.bodySmall,
+                    color = if (report.ok) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                )
             }
         }
 

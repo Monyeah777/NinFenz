@@ -1159,4 +1159,9 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="grant_cap_reassemble">可再装配</string>
     <string name="grant_cap_export">可导出</string>
     <string name="grant_cap_share">可分享</string>
+    <string name="settings_selfcheck_title">属性自检</string>
+    <string name="settings_selfcheck_run">运行自检</string>
+    <string name="settings_selfcheck_desc">M1 / M12 / M25 确定性 property</string>
+    <string name="settings_selfcheck_pass">PASS %1$d</string>
+    <string name="settings_selfcheck_fail">FAIL %1$d（seed %2$d）</string>
 </resources>
