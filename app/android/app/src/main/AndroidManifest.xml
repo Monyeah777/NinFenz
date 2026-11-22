@@ -32,8 +32,9 @@
             android:name=".share.ShareReceiverActivity"
             android:excludeFromRecents="true"
             android:exported="true"
+            android:launchMode="standard"
             android:noHistory="true"
-            android:taskAffinity=""
+            android:taskAffinity="dev.ninfenz.mobile.share"
             android:theme="@style/Theme.NfShareReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
