@@ -29,7 +29,7 @@
 |---|---|---|
 | Rust core | **212 passed / 21 suites / 0 failed** | `cd app/core && cargo test -q` |
 | Python app | **524 passed / 1 warning / 0 failed** | `python -m pytest app/tests -q` |
-| Android JVM | **497/497** | `:app:testDebugUnitTest` |
+| Android JVM | **498/498** | `:app:testDebugUnitTest` |
 | Desktop JVM | **20/20** | `cd app/desktop && ./gradlew test --rerun-tasks` |
 | TUI selftest | **9/9** | `python tui/nf.py --selftest` |
 | Desktop app-image | pass | `NFStudio.exe` 551,936 B；目录 137,150,938 B；启动存活 10s |

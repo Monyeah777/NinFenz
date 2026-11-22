@@ -12,7 +12,7 @@
 >
 > **2026-11-22 真机重新连接并实测**：OnePlus PLF110 / Android 16 / 1080×2392 / 480dpi，serial `3B65AR0183V00000`。debug 签名 APK 安装成功；冷启动 `am start -W` TotalTime 573ms（首装）/320ms（升级后）/188ms（force-stop 后）。首启引导、示例 Pack、演示项目、创作台、交付 graph-compile、必填槽位、assemble、L1 pass（error=0 warn=0 info=3）、导出 md、契约三项全绿、签收、SEND text/plain 分享导入预览均通过；logcat 无 FATAL/ANR。详见第 0 节。
 >
-> 当前本机验证总览：Android JVM **497/497**、Rust core **212/212**、app Python **524 passed**、APP 门禁 QA0–QA6 PASS/gap=0、lint **0 warnings**、`verify.sh --checks-only` PASS=107/WARN=2/FAIL=0。
+> 当前本机验证总览：Android JVM **498/498**、Rust core **212/212**、app Python **524 passed**、APP 门禁 QA0–QA6 PASS/gap=0、lint **0 warnings**、`verify.sh --checks-only` PASS=107/WARN=2/FAIL=0。
 
 ## 0. 2026-11-22 真机实测（本轮）
 

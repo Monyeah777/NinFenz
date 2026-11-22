@@ -25,6 +25,18 @@ class ZeroSliceSessionTest {
     }
 
     @Test
+    fun draftSidecarRoundTrip() {
+        val dir = java.nio.file.Files.createTempDirectory("nf-zero-draft").toFile()
+        val draft = java.io.File(dir, "draft.json").apply { writeText("{}") }
+        val report = ZeroSliceModel.parse(Json.parseToJsonElement(json).jsonObject)
+            .copy(slotValues = mapOf("SLT-01" to "主题正文"))
+        val store = ZeroSliceStore(dir)
+        store.saveDraft(draft, report)
+        val loaded = store.loadDraft(draft)
+        assertEquals("主题正文", loaded?.slotValues?.get("SLT-01"))
+    }
+
+    @Test
     fun slotValuesRoundTrip() {
         val report = ZeroSliceModel.parse(Json.parseToJsonElement(json).jsonObject)
             .copy(slotValues = mapOf("SLT-01" to "主题正文"))
