@@ -1103,4 +1103,7 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="preview_save_transform">保存为变换</string>
     <string name="preview_transform_saved">变换已保存</string>
     <string name="preview_apply_saved">应用已保存变换</string>
+    <string name="preview_formalize_hint">这像主题句，要变成槽位吗？</string>
+    <string name="preview_formalize">形式化</string>
+    <string name="preview_ignore">忽略</string>
 </resources>

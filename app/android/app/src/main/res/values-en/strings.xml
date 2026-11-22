@@ -1107,4 +1107,7 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="preview_save_transform">Save transform</string>
     <string name="preview_transform_saved">Transform saved</string>
     <string name="preview_apply_saved">Apply saved transform</string>
+    <string name="preview_formalize_hint">Looks like a key sentence; formalize as a slot?</string>
+    <string name="preview_formalize">Formalize</string>
+    <string name="preview_ignore">Ignore</string>
 </resources>

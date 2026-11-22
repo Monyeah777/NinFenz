@@ -179,6 +179,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
     var showResetConfirm by remember { mutableStateOf(false) }
     var previewBlocks by remember { mutableStateOf<List<MarkdownBlock>>(emptyList()) }
     var previewBaseline by remember { mutableStateOf<List<MarkdownBlock>>(emptyList()) }
+    var ignoredHints by remember { mutableStateOf<Set<Int>>(emptySet()) }
     var inferredTransform by remember { mutableStateOf<dev.ninfenz.mobile.model.FlashFillModel.Transform?>(null) }
     var savedTransform by remember(project.id) { mutableStateOf(dev.ninfenz.mobile.data.TransformStore(context.filesDir).load(project.id)) }
     var previewHistory by remember { mutableStateOf<List<List<MarkdownBlock>>>(emptyList()) }
@@ -1514,6 +1515,22 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                             modifier = Modifier.fillMaxWidth(),
                             minLines = 2
                         )
+                        if (block.kind in setOf("paragraph", "quote") && block.text.isNotBlank() && block.text.length <= 80 && index !in ignoredHints) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    stringResource(dev.ninfenz.mobile.R.string.preview_formalize_hint),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                TextButton(onClick = { assignBlockText = block.text }) {
+                                    Text(stringResource(dev.ninfenz.mobile.R.string.preview_formalize))
+                                }
+                                TextButton(onClick = { ignoredHints = ignoredHints + index }) {
+                                    Text(stringResource(dev.ninfenz.mobile.R.string.preview_ignore))
+                                }
+                            }
+                        }
                         Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                             TextButton(
                                 enabled = index > 0,
