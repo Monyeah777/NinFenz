@@ -42,27 +42,36 @@ object FlashFillModel {
         return out
     }
 
-    fun infer(before: String, after: String): Transform? {
-        if (before == after) return null
+    fun infer(before: String, after: String): Transform? = infer(listOf(before to after))
 
+    /** 多例推断：候选变换必须同时解释所有 before→after。 */
+    fun infer(examples: List<Pair<String, String>>): Transform? {
+        val changed = examples.filter { it.first != it.second }
+        if (changed.isEmpty()) return null
+        val first = changed.first()
+        return candidates(first.first, first.second)
+            .firstOrNull { transform -> changed.all { transform.apply(it.first) == it.second } }
+    }
+
+    private fun candidates(before: String, after: String): List<Transform> = buildList {
         if (after.startsWith(before) && after.length > before.length) {
             val s = after.removePrefix(before)
-            if (s.isNotEmpty()) return Transform("suffix", s)
+            if (s.isNotEmpty()) add(Transform("suffix", s))
         }
         if (after.endsWith(before) && after.length > before.length) {
             val p = after.removeSuffix(before)
-            if (p.isNotEmpty()) return Transform("prefix", p)
+            if (p.isNotEmpty()) add(Transform("prefix", p))
         }
         if (before.endsWith(after) && before.length > after.length) {
             val p = before.removeSuffix(after)
-            if (p.isNotEmpty()) return Transform("strip_prefix", p)
+            if (p.isNotEmpty()) add(Transform("strip_prefix", p))
         }
         if (before.startsWith(after) && before.length > after.length) {
             val s = before.removePrefix(after)
-            if (s.isNotEmpty()) return Transform("strip_suffix", s)
+            if (s.isNotEmpty()) add(Transform("strip_suffix", s))
         }
         if (before.startsWith(after) && after.isNotEmpty()) {
-            return Transform("truncate", after.length.toString())
+            add(Transform("truncate", after.length.toString()))
         }
 
         var n = 0
@@ -71,7 +80,6 @@ object FlashFillModel {
         while (m < minOf(before.length, after.length) - n && before[before.length - 1 - m] == after[after.length - 1 - m]) m++
         val old = if (m > 0) before.substring(n, before.length - m) else before.substring(n)
         val new = if (m > 0) after.substring(n, after.length - m) else after.substring(n)
-        if (old.length >= 2 && before.replace(old, new) == after) return Transform("replace", old, new)
-        return null
-    }
+        if (old.length >= 2 && before.replace(old, new) == after) add(Transform("replace", old, new))
+    }.distinct()
 }

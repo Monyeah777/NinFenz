@@ -36,6 +36,35 @@ class FlashFillModelTest {
     }
 
     @Test
+    fun multiExamplePrefix() {
+        assertEquals(
+            FlashFillModel.Transform("prefix", "【"),
+            FlashFillModel.infer(listOf("文" to "【文", "章" to "【章"))
+        )
+    }
+
+    @Test
+    fun multiExampleReplace() {
+        assertEquals(
+            FlashFillModel.Transform("replace", "报名", "登记"),
+            FlashFillModel.infer(listOf("请报名" to "请登记", "报名截止" to "登记截止"))
+        )
+    }
+
+    @Test
+    fun multiExampleDisambiguatesTruncate() {
+        assertEquals(
+            FlashFillModel.Transform("truncate", "3"),
+            FlashFillModel.infer(listOf("abcdef" to "abc", "xyz123" to "xyz"))
+        )
+    }
+
+    @Test
+    fun multiExampleInconsistent() {
+        assertNull(FlashFillModel.infer(listOf("a" to "【a", "b" to "b】")))
+    }
+
+    @Test
     fun noRule() {
         assertNull(FlashFillModel.infer("a", "b"))
     }

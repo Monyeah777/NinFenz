@@ -1585,9 +1585,10 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                             val changed = if (base.size == previewBlocks.size) {
                                 base.indices.filter { base[it].text != previewBlocks[it].text }
                             } else emptyList()
-                            val transform = if (changed.size == 1) {
-                                val i = changed.first()
-                                dev.ninfenz.mobile.model.FlashFillModel.infer(base[i].text, previewBlocks[i].text)
+                            val transform = if (changed.isNotEmpty()) {
+                                dev.ninfenz.mobile.model.FlashFillModel.infer(
+                                    changed.map { i -> base[i].text to previewBlocks[i].text }
+                                )
                             } else null
                             if (transform == null) {
                                 android.widget.Toast.makeText(context, context.getString(dev.ninfenz.mobile.R.string.preview_infer_failed), android.widget.Toast.LENGTH_SHORT).show()
