@@ -9,7 +9,7 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
 
-/** 长期保存包：原文 + nf-doc + 文件摘要清单；固定 Zip 时间以便复算。 */
+/** 长期保存包：原文 + nf-doc + OAIS 风格信息包；固定 Zip 时间以便复算。 */
 object PreservationExporter {
     data class Created(val file: File)
 
@@ -23,18 +23,51 @@ object PreservationExporter {
         val md = markdown.toByteArray(Charsets.UTF_8)
         val doc = NfDocModel.toJson(NfDocModel.fromMarkdown(title, projectId, markdown)).toString().toByteArray(Charsets.UTF_8)
         val contract = contractJson?.toByteArray(Charsets.UTF_8)
+
+        val content = buildList {
+            add("document.md" to md)
+            add("document.nfdoc.json" to doc)
+            contract?.let { add("contract.json" to it) }
+        }
+
+        val oais = buildJsonObject {
+            put("schema", "nf-oais/1")
+            put("package_id", projectId)
+            put("title", title)
+            put("agent", buildJsonObject {
+                put("name", "NF Mobile")
+                put("version", "0.2.0")
+            })
+            put("rights", buildJsonObject {
+                put("basis", "user-provided")
+                put("license", "unknown")
+            })
+            putJsonArray("fixity") {
+                content.forEach { (name, bytes) ->
+                    add(buildJsonObject { put("path", name); put("sha256", sha(bytes)); put("bytes", bytes.size) })
+                }
+            }
+            putJsonArray("events") {
+                add(buildJsonObject {
+                    put("type", "export")
+                    put("detail", "local deterministic package")
+                })
+            }
+        }.toString().toByteArray(Charsets.UTF_8)
+
         val manifest = buildJsonObject {
             put("schema", "nf-preservation/1")
             put("project_id", projectId)
             put("title", title)
             putJsonArray("files") {
-                add(buildJsonObject { put("path", "document.md"); put("sha256", sha(md)); put("bytes", md.size) })
-                add(buildJsonObject { put("path", "document.nfdoc.json"); put("sha256", sha(doc)); put("bytes", doc.size) })
-                contract?.let { add(buildJsonObject { put("path", "contract.json"); put("sha256", sha(it)); put("bytes", it.size) }) }
+                (content + ("oais.json" to oais)).forEach { (name, bytes) ->
+                    add(buildJsonObject { put("path", name); put("sha256", sha(bytes)); put("bytes", bytes.size) })
+                }
             }
         }.toString().toByteArray(Charsets.UTF_8)
+
         ZipOutputStream(file.outputStream()).use { out ->
-            (listOf("document.md" to md, "document.nfdoc.json" to doc) + listOfNotNull(contract?.let { "contract.json" to it }) + listOf("preservation.json" to manifest)).forEach { (name, bytes) ->
+            (content + ("oais.json" to oais) + ("preservation.json" to manifest)).forEach { (name, bytes) ->
                 out.putNextEntry(ZipEntry(name).apply { time = 0L })
                 out.write(bytes)
                 out.closeEntry()

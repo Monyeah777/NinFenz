@@ -35,6 +35,23 @@ class PreservationVerifierTest {
     }
 
     @Test
+    fun rejectsMissingOais() {
+        val dir = Files.createTempDirectory("verify-no-oais").toFile()
+        val created = PreservationExporter.export("# 标题\n\n正文", "标题", "p1", dir)
+        val bad = File(dir, "no-oais.preserve.zip")
+        ZipFile(created.file).use { zip ->
+            ZipOutputStream(bad.outputStream()).use { out ->
+                zip.entries().asSequence().filter { it.name != "oais.json" }.forEach { entry ->
+                    out.putNextEntry(ZipEntry(entry.name).apply { time = 0L })
+                    out.write(zip.getInputStream(entry).readBytes())
+                    out.closeEntry()
+                }
+            }
+        }
+        assertFalse(PreservationVerifier.verify(bad).ok)
+    }
+
+    @Test
     fun rejectsTamperedDocument() {
         val dir = Files.createTempDirectory("verify-bad").toFile()
         val created = PreservationExporter.export("# 标题\n\n正文", "标题", "p1", dir)

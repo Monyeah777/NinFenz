@@ -22,6 +22,9 @@ class PreservationExporterTest {
             assertTrue(manifest.contains("document.md"))
             assertTrue(manifest.contains("document.nfdoc.json"))
             assertTrue(manifest.contains("contract.json"))
+            assertTrue(manifest.contains("oais.json"))
+            val oais = zip.getInputStream(zip.getEntry("oais.json")).readBytes().decodeToString()
+            assertTrue(oais.contains("nf-oais/1"))
         }
     }
 }

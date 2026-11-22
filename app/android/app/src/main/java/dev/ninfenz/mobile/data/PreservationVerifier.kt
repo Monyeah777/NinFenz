@@ -42,6 +42,7 @@ object PreservationVerifier {
                     errors += "未知 preservation schema"
                 }
                 title = manifest["title"]?.jsonPrimitive?.content
+                val packageId = manifest["project_id"]?.jsonPrimitive?.content
                 val files = manifest["files"]?.jsonArray
                 if (files == null || files.isEmpty()) errors += "manifest.files 为空"
                 files?.forEach { item ->
@@ -67,7 +68,33 @@ object PreservationVerifier {
                     if (expectedBytes >= 0 && bytes.size.toLong() != expectedBytes) errors += path + " 字节数不符"
                     if (sha(bytes) != expectedSha) errors += path + " sha256 不符"
                 }
-                listOf("document.md", "document.nfdoc.json").forEach { required ->
+                val oaisEntry = zip.getEntry("oais.json")
+                if (oaisEntry == null) {
+                    errors += "缺 oais.json"
+                } else if (oaisEntry.size > 1024 * 1024) {
+                    errors += "oais.json 过大"
+                } else {
+                    val oais = Json.parseToJsonElement(zip.getInputStream(oaisEntry).readBytes().decodeToString()).jsonObject
+                    if (oais["schema"]?.jsonPrimitive?.content != "nf-oais/1") errors += "未知 oais schema"
+                    if (packageId != null && oais["package_id"]?.jsonPrimitive?.content != packageId) errors += "oais package_id 不符"
+                    val fixity = oais["fixity"]?.jsonArray
+                    if (fixity == null || fixity.isEmpty()) {
+                        errors += "oais.fixity 为空"
+                    } else {
+                        fixity.forEach { item ->
+                            val obj = item.jsonObject
+                            val path = obj["path"]?.jsonPrimitive?.content ?: return@forEach
+                            val expectedSha = obj["sha256"]?.jsonPrimitive?.content ?: ""
+                            val entry = zip.getEntry(path)
+                            if (entry == null) {
+                                errors += "oais 缺 " + path
+                            } else if (sha(zip.getInputStream(entry).readBytes()) != expectedSha) {
+                                errors += "oais fixity 不符 " + path
+                            }
+                        }
+                    }
+                }
+                listOf("document.md", "document.nfdoc.json", "oais.json").forEach { required ->
                     if (zip.getEntry(required) == null) errors += "缺 " + required
                 }
             }

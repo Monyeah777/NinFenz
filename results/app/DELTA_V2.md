@@ -56,7 +56,7 @@
 
 - `FeaturePolicy` 规则表：Free 能力、Pro 能力、CCOS 能力；按 tier 判定。
 - `FeatureGate` 委托规则；默认 Free，Free 永远放行，未知能力默认 Free。
-- 5 条 Kotlin 单测；JVM 460。
+- 5 条 Kotlin 单测；JVM 461。
 - **未**接购买/授权/Pro/CCOS UI；无计费。
 
 ## M25 Capability-Scoped Sharing（P0 原型）
@@ -112,9 +112,10 @@
 
 ## M38 Preservation（P1 部分）
 
-- `PreservationExporter`：document.md + document.nfdoc.json + preservation.json（SHA-256/bytes）。
+- `PreservationExporter`：document.md + document.nfdoc.json + oais.json + preservation.json（SHA-256/bytes）。
+- oais.json：`nf-oais/1` 信息包，含 package_id/title/agent/rights/fixity/events；fixity 覆盖内容文件。
 - Zip 固定时间，可复算；交付台「preserve」按钮导出。
-- `PreservationVerifier` 校验 schema/条目/字节数/sha256；导入页「校验归档包」按钮。
+- `PreservationVerifier` 校验 schema/条目/字节数/sha256，并校验 oais schema/package_id/fixity；导入页「校验归档包」按钮。
 - 解压前限制条目数/单文件 20MB/总量 40MB，防 zip 炸弹。
 - 校验通过后可「恢复为导入稿」（document.md → ImportScreen），不直接写项目。
 - **未**做 OAIS 迁移/版本升级链/外部校验工具对接。
