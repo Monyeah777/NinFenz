@@ -980,6 +980,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         if (signed != null && !stale) {
                             Text(stringResource(dev.ninfenz.mobile.R.string.contract_signed, signed.signedAt), style = MaterialTheme.typography.bodySmall)
                             signed.artifactSha256?.let { Text(stringResource(dev.ninfenz.mobile.R.string.contract_artifact, it), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                            signed.keyFingerprint?.let { Text(stringResource(dev.ninfenz.mobile.R.string.contract_key, it.take(16)), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
                         } else {
                             if (stale) {
                                 Text(stringResource(dev.ninfenz.mobile.R.string.contract_stale), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
@@ -989,7 +990,9 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                 onClick = {
                                     val at = java.time.Instant.now().toString()
                                     val digest = exportedFile?.let { sha256File(it) }
-                                    contractStore.sign(project.id, checks.filter { it.second }.map { it.first }, at, digest)
+                                    runCatching {
+                                        contractStore.sign(project.id, checks.filter { it.second }.map { it.first }, at, digest)
+                                    }.onFailure { statusNote = it.message ?: it.javaClass.simpleName }
                                     signoff = contractStore.load(project.id)
                                 }
                             ) { Text(stringResource(dev.ninfenz.mobile.R.string.contract_sign)) }

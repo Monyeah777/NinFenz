@@ -1118,4 +1118,5 @@ MIT License · See app/docs/LEGAL.md</string>
         <item quantity="other">min %1$d chars</item>
     </plurals>
     <string name="slot_pattern">must match %1$s</string>
+    <string name="contract_key">Device key %1$s</string>
 </resources>

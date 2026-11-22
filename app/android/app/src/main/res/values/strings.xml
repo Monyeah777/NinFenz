@@ -1114,4 +1114,5 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
         <item quantity="other">至少 %1$d 字</item>
     </plurals>
     <string name="slot_pattern">需匹配 %1$s</string>
+    <string name="contract_key">设备密钥 %1$s</string>
 </resources>

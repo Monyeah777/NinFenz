@@ -47,7 +47,7 @@
 ## 真机收口（2026-11-22）
 
 - OnePlus PLF110 / Android 16 安装 debug 签名 APK；冷启动 573/320/188ms。
-- 完整闭环通过：示例 Pack → 项目 → 创作台 → graph-compile → 槽位 → assemble → L1 pass → 导出 md → 契约三项 → 签收。
+- 完整闭环通过：示例 Pack → 项目 → 创作台 → graph-compile → 槽位 → assemble → L1 pass → 导出 md → 契约三项 → 签收（当版 hash 签收；M35 ECDSA 版本只跑 JVM）。
 - 分享 SEND text/plain 导入预览通过。
 - 真机修复：验收「必填槽位已填」只应由 spec.required 槽位决定，不能把选填 SLT-04 算进去。
 - 仍未测：中文长文/完整输入法、PDF/EPUB/DOCX/HTML 导出、分享文件、杀进程恢复、TalkBack、横屏、AAB 上传签名。
@@ -56,7 +56,7 @@
 
 - `FeaturePolicy` 规则表：Free 能力、Pro 能力、CCOS 能力；按 tier 判定。
 - `FeatureGate` 委托规则；默认 Free，Free 永远放行，未知能力默认 Free。
-- 5 条 Kotlin 单测；JVM 456。
+- 5 条 Kotlin 单测；JVM 458。
 - **未**接购买/授权/Pro/CCOS UI；无计费。
 
 ## M25 Capability-Scoped Sharing（P0 原型）
@@ -100,15 +100,15 @@
 - 预览块编辑器新增「批量变换」：replace/加前缀/加后缀/截断 四种模式，可撤销/重做。
 - 「从本次修改推断」：只改一个块时合成前后缀/去前后缀/替换/截断，并批量应用。
 - 可「保存为变换」到项目；再次进入可「应用已保存变换」。
-- **未**进 Kotlin/Rust 推理引擎；UI 只覆盖 replace 一种白名单变换。
+- 未进独立推理引擎；UI 已有四模式 + 单例推断 + 项目级保存/复用。
 
 ## M35 Content Contract（P0 部分）
 
 - 交付台验收清单：L1 通过 / 必填槽位已填 / 至少一次导出。
-- 全绿后可本地签收，`ContractStore` 落盘 accepted + signed_at + 导出物 sha256。
-- 归档包存在签收时附带 `contract.json` 并纳入 manifest。
-- **不是**密码学签名；导出物哈希变化时页面显示签收失效并要求重签。
-- 无变更单/异议/多方评审。
+- 全绿后可签收；`ContractStore` 用 Android Keystore 的 EC P-256 设备密钥对验收载荷做 SHA256withECDSA。
+- 载荷含 schema/project_id/accepted/signed_at/artifact_sha256；`load` 重新验签，篡改或换密钥即返回空。
+- 归档包存在签收时附带 `contract.json` 并纳入 manifest；页面显示设备密钥指纹。
+- **不是** CA/时间戳/实名身份；卸载/清密钥后旧签收失效；无变更单/异议/多方评审。
 
 ## M38 Preservation（P1 部分）
 
