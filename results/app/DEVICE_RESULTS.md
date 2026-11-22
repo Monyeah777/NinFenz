@@ -6,13 +6,13 @@
 > APK：0.2.0 / versionCode 2，minSdk 26 / target 36。本件只记实际跑过的项目；未跑项标 OPEN，不写成 pass。
 > 2026-11-21 `adb devices`：空列表（本机无真机/模拟器）。
 >
-> 当前本机验证总览：Android JVM **449/449**、Rust core **212/212**、app Python **522 passed**、APP 门禁 QA0–QA6 PASS/gap=0、lint **0 warnings**、`verify.sh --checks-only` PASS=107/WARN=2/FAIL=0。
+> 当前本机验证总览：Android JVM **449/449**、Rust core **212/212**、app Python **524 passed**、APP 门禁 QA0–QA6 PASS/gap=0、lint **0 warnings**、`verify.sh --checks-only` PASS=107/WARN=2/FAIL=0。
 
 ## 1. 已实测（2026-11-15）
 
 | 项目 | 结果 | 证据 |
 |---|---|---|
-| 全仓门报复核（2026-11-17） | pass（本机）：app/gates QA0–QA6 7/7 PASS、gap=0；pytest **522 passed**；`verify.sh --checks-only` PASS=107/WARN=2/FAIL=0。 | 本机命令输出 |
+| 全仓门报复核（2026-11-17） | pass（本机）：app/gates QA0–QA6 7/7 PASS、gap=0；pytest **524 passed**；`verify.sh --checks-only` PASS=107/WARN=2/FAIL=0。 | 本机命令输出 |
 | 全新安装 + 冷启动 | pass：LaunchState COLD，TotalTime 438ms（修复前）/471ms | adb am start -W |
 | 首启 3 步引导 | pass：跳过/上一步/下一步/开始使用可用；示例 Pack 载入显示 demo-pack · 1.0.0（9 个文件） | 截图 02–05 |
 | 库首页 | pass：示例 Pack、演示项目、状态草稿、管理入口均显示 | 截图 05 |

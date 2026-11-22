@@ -26,7 +26,7 @@
 
 - `BatchAssembler` 与 `ImportScreen` 的硬编码中文移入 `strings.xml` / `values-en`。
 - `python -m pytest app/tests/test_ui_strings_localized.py -q` → 1 passed。
-- 全量 `python -m pytest app/tests -q` → **522 passed**。
+- 全量 `python -m pytest app/tests -q` → **524 passed**。
 
 ## J6 nf-doc/1
 
@@ -43,6 +43,14 @@
 
 - 有序列表只认 `1. `/`1) `，不再把「2026 年…」误判为 list。
 - Kotlin + Rust 同步；各加一条回归测试。
+
+## M25 Capability-Scoped Sharing（P0 原型）
+
+- `app/prototypes/capability`：read/comment/reassemble/export/share 与 admin。
+- 到期、撤销、未知能力/未知 cap 的判定。
+- 8 条 unittest；pytest wrapper 纳入全量。
+- APP 已有 `ShareRedactor` 脱敏分享；不是权限/期限控制。
+- **未**接 APP 分享/网络/密码学。
 
 ## M15 Property/Differential Testing（P0 原型）
 
@@ -78,11 +86,6 @@
 - 「从本次修改推断」：只改一个块时合成前后缀/去前后缀/替换/截断，并批量应用。
 - 可「保存为变换」到项目；再次进入可「应用已保存变换」。
 - **未**进 Kotlin/Rust 推理引擎；UI 只覆盖 replace 一种白名单变换。
-
-## M25 Capability-Scoped Sharing（P0 部分）
-
-- `ShareRedactor`：分享前移除 HTML 注释与 source/来源 行。
-- 交付台「脱敏分享」按钮；不是权限/期限控制。
 
 ## M35 Content Contract（P0 部分）
 
