@@ -26,6 +26,10 @@ class PreservationExporterTest {
             assertTrue(manifest.contains("grant.json"))
             val grant = zip.getInputStream(zip.getEntry("grant.json")).readBytes().decodeToString()
             assertTrue(grant.contains("nf-capability/1"))
+            val lineage = PreservationExporter.export("# 标题\n\n正文", "标题", "p1", File(dir, "lineage").apply { mkdirs() }, null, null, "b".repeat(64))
+            ZipFile(lineage.file).use { z ->
+                assertTrue(z.getInputStream(z.getEntry("preservation.json")).readBytes().decodeToString().contains("predecessor_sha256"))
+            }
             val oais = zip.getInputStream(zip.getEntry("oais.json")).readBytes().decodeToString()
             assertTrue(oais.contains("nf-oais/1"))
         }

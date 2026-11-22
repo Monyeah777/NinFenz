@@ -43,6 +43,8 @@ object PreservationVerifier {
                 }
                 title = manifest["title"]?.jsonPrimitive?.content
                 val packageId = manifest["project_id"]?.jsonPrimitive?.content
+                val predecessor = manifest["predecessor_sha256"]?.jsonPrimitive?.content
+                if (predecessor != null && !predecessor.matches(Regex("[0-9a-f]{64}"))) errors += "predecessor_sha256 非法"
                 val files = manifest["files"]?.jsonArray
                 if (files == null || files.isEmpty()) errors += "manifest.files 为空"
                 files?.forEach { item ->
@@ -87,6 +89,8 @@ object PreservationVerifier {
                     val oais = Json.parseToJsonElement(zip.getInputStream(oaisEntry).readBytes().decodeToString()).jsonObject
                     if (oais["schema"]?.jsonPrimitive?.content != "nf-oais/1") errors += "未知 oais schema"
                     if (packageId != null && oais["package_id"]?.jsonPrimitive?.content != packageId) errors += "oais package_id 不符"
+                    val oaisLineage = oais["lineage"]?.jsonObject?.get("predecessor_sha256")?.jsonPrimitive?.content
+                    if (predecessor != null && oaisLineage != predecessor) errors += "oais lineage 不符"
                     val fixity = oais["fixity"]?.jsonArray
                     if (fixity == null || fixity.isEmpty()) {
                         errors += "oais.fixity 为空"

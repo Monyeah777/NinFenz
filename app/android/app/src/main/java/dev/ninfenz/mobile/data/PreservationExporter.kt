@@ -16,7 +16,7 @@ object PreservationExporter {
     private fun sha(bytes: ByteArray): String =
         MessageDigest.getInstance("SHA-256").digest(bytes).joinToString("") { "%02x".format(it) }
 
-    fun export(markdown: String, title: String, projectId: String, outDir: File, contractJson: String? = null, grantJson: String? = null): Created {
+    fun export(markdown: String, title: String, projectId: String, outDir: File, contractJson: String? = null, grantJson: String? = null, predecessorSha256: String? = null): Created {
         val safe = projectId.replace(Regex("[^A-Za-z0-9._-]"), "_").ifBlank { "project" }
         outDir.mkdirs()
         val file = File(outDir, safe + ".preserve.zip")
@@ -61,6 +61,7 @@ object PreservationExporter {
             put("schema", "nf-preservation/1")
             put("project_id", projectId)
             put("title", title)
+            predecessorSha256?.let { put("predecessor_sha256", it) }
             putJsonArray("files") {
                 (content + ("oais.json" to oais)).forEach { (name, bytes) ->
                     add(buildJsonObject { put("path", name); put("sha256", sha(bytes)); put("bytes", bytes.size) })

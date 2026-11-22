@@ -2042,11 +2042,17 @@ private fun PreservationExportButton(
             scope.launch {
                 try {
                     val outDir = File(File(context.filesDir, "exports"), "delivery").apply { mkdirs() }
-                    val created = dev.ninfenz.mobile.data.PreservationExporter.export(md, project.title, project.id, outDir, dev.ninfenz.mobile.data.ContractStore(context.filesDir).raw(project.id), grant.toJson().toString())
+                    val lineageStore = dev.ninfenz.mobile.data.PreservationLineageStore(context.filesDir)
+                    val predecessor = lineageStore.load(project.id)
+                    val created = dev.ninfenz.mobile.data.PreservationExporter.export(md, project.title, project.id, outDir, dev.ninfenz.mobile.data.ContractStore(context.filesDir).raw(project.id), grant.toJson().toString(), predecessor)
                     val reproDir = File(context.cacheDir, "repro-preserve").apply { deleteRecursively(); mkdirs() }
-                    val second = dev.ninfenz.mobile.data.PreservationExporter.export(md, project.title, project.id, reproDir, dev.ninfenz.mobile.data.ContractStore(context.filesDir).raw(project.id), grant.toJson().toString())
+                    val second = dev.ninfenz.mobile.data.PreservationExporter.export(md, project.title, project.id, reproDir, dev.ninfenz.mobile.data.ContractStore(context.filesDir).raw(project.id), grant.toJson().toString(), predecessor)
                     val report = dev.ninfenz.mobile.data.ReproChecker.check(created.file, second.file)
                     reproDir.deleteRecursively()
+                    val digest = java.security.MessageDigest.getInstance("SHA-256")
+                        .digest(created.file.readBytes())
+                        .joinToString("") { "%02x".format(it.toInt() and 0xff) }
+                    lineageStore.save(project.id, digest)
                     onDone(created.file, report)
                 } catch (t: Throwable) {
                     setError(CoreError("NF-EXP-001", context.getString(dev.ninfenz.mobile.R.string.export_preserve_failed, t.message ?: t.javaClass.simpleName), context.getString(dev.ninfenz.mobile.R.string.export_failed_fix), null, 1))

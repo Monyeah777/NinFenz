@@ -56,7 +56,7 @@
 
 - `FeaturePolicy` 规则表：Free 能力、Pro 能力、CCOS 能力；按 tier 判定。
 - `FeatureGate` 委托规则；默认 Free，Free 永远放行，未知能力默认 Free。
-- 5 条 Kotlin 单测；JVM 490。
+- 5 条 Kotlin 单测；JVM 491。
 - **未**接购买/授权/Pro/CCOS UI；无计费。
 
 ## M25 Capability-Scoped Sharing（P0 原型）
@@ -126,7 +126,9 @@
 - `PreservationVerifier` 校验 schema/条目/字节数/sha256，并校验 oais schema/package_id/fixity；导入页「校验归档包」按钮。
 - 解压前限制条目数/单文件 20MB/总量 40MB，防 zip 炸弹。
 - 校验通过后可「恢复为导入稿」（document.md → ImportScreen），不直接写项目。
-- **未**做 OAIS 迁移/版本升级链/外部校验工具对接。
+- `PreservationLineageStore` 记录上次包 sha；再次 preserve 会写入 `predecessor_sha256` 到 preservation/oais，形成本地产线。
+- verifier 校验 lineage 摘要格式及 oais/preservation 一致。
+- **未**做跨设备迁移/版本升级链/外部校验工具对接。
 
 ## M4 Semantic Patch（P0 部分）
 
