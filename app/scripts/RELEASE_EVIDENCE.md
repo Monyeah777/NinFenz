@@ -18,7 +18,7 @@
 - app-debug.apk：51,573,489 B；SHA-256 `0725562778f7839b3c9da78deede895e4eb857f520e20181d49cd588743a4e08`
 - assembleRelease（unsigned）：pass；44,564,194 B；SHA-256 `14f2a7105c569cedc931883527b831b5a36f4d78c6ddd3dc19c713fbc06d8265`
 - debug 签名 APK（仅内部安装）：44,628,133 B；SHA-256 `286a4783b4723293507ac4e6d92774b1ed511775dadcd5bbd18021693cb5d13f`；证书 CN=Android Debug；**不是 upload key**
-- bundleRelease（unsigned）：pass；28,397,553 B；SHA-256 `81944d23d224397a8f89020b8e48997be26701073be4db786f390afd9e592a96`；`jarsigner -verify` 显示未签名
+- bundleRelease（unsigned）：pass；28,399,130 B；SHA-256 `b70683f5778880f1d022d958ce97720fddb9e5f58cf9f5e7e3dbf9715e8a9834`；`jarsigner -verify` 显示未签名
 - lintRelease：**0 errors / 0 warnings（No issues found）**
 - Release manifest：package `dev.ninfenz.mobile`、versionName `0.2.0`、minSdk 26、target/compileSdk 36、`extractNativeLibs=false`、无 `android:debuggable`（apkanalyzer manifest print）
 - 16KB 对齐：`zipalign -c -P 16 4` exit 0（APK；AAB 未用 bundletool 复核）
