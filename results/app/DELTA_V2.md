@@ -50,7 +50,7 @@
 - 完整闭环通过：示例 Pack → 项目 → 创作台 → graph-compile → 槽位 → assemble → L1 pass → 导出 md → 契约三项 → 签收。
 - 分享 SEND text/plain 导入预览通过。
 - 真机修复：验收「必填槽位已填」只应由 spec.required 槽位决定，不能把选填 SLT-04 算进去。
-- 仍未测：长文本/中文输入法、PDF/EPUB/DOCX/HTML 导出、分享文件、杀进程恢复、TalkBack、横屏、AAB 上传签名。
+- 仍未测：中文长文/完整输入法、PDF/EPUB/DOCX/HTML 导出、分享文件、杀进程恢复、TalkBack、横屏、AAB 上传签名。
 
 ## M25 Capability-Scoped Sharing（P0 原型）
 
