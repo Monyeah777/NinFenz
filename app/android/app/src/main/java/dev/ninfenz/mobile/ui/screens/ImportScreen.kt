@@ -1010,6 +1010,23 @@ fun ImportScreen(
                             report.exceptions.firstOrNull()?.let { exception ->
                                 Text(exception.reason, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
+                            if (rawResult != null && packs.isNotEmpty() && current != null) {
+                                TextButton(onClick = {
+                                    val raw = rawResult ?: return@TextButton
+                                    val pack = packs.first()
+                                    val title = current?.source?.name ?: "zero-slice"
+                                    val base = store.uniqueDraftBase(title)
+                                    val file = store.saveDraft(base, raw.toString())
+                                    zeroSliceStore.saveDraft(file, report)
+                                    val mappingJson = buildJsonObject {
+                                        put("accepted", JsonArray(acceptedMappings.sorted().map { JsonPrimitive(it) }))
+                                        put("unmapped", JsonArray(current?.unmapped.orEmpty().map { JsonPrimitive(it) }))
+                                    }.toString()
+                                    store.saveDraft(base + ".mapping", mappingJson)
+                                    savedName = file.name
+                                    onQuickProjectFromDraft(pack, title, file)
+                                }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_zero_slice_create)) }
+                            }
                             TextButton(onClick = {
                                 val currentMappings = current?.mappings.orEmpty()
                                 val matched = currentMappings.indices.filter { i ->

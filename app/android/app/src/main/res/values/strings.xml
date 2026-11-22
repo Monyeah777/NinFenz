@@ -1188,4 +1188,5 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="import_preserve_preview">只读预览</string>
     <string name="import_preserve_export">导出归档内容</string>
     <string name="import_preserve_exported">已导出 %1$s</string>
+    <string name="import_zero_slice_create">用切片建项目</string>
 </resources>

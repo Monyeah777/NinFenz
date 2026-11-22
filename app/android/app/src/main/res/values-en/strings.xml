@@ -1192,4 +1192,5 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="import_preserve_preview">Preview only</string>
     <string name="import_preserve_export">Export archive content</string>
     <string name="import_preserve_exported">Exported %1$s</string>
+    <string name="import_zero_slice_create">Create project from slices</string>
 </resources>

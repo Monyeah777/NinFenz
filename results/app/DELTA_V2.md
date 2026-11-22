@@ -164,6 +164,7 @@
 - 创作台合并 zero-slice slotValues，项目字段可被切片结果直接预填。
 - Android 包内 `libnf_app_core.so` 已重编译并含 `zero-slice` op；分享导入不再报「未知 op」。
 - `zero-slice` 响应新增 `project`（`nf-project/1`）；Kotlin 解析 `project.slots` 并优先用于 `slotValues` 预填。
+- 切片会话卡新增「用切片建项目」：保存草稿+sidecar 后直接走快速建项目。
 - 仍是 nf-import/1 会话；未切到 nf-zero-slice-draft/to_project，也未替换核心 map-suggest。
 
 ## A0-14 Daily 入口
