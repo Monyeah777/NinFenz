@@ -716,5 +716,6 @@ pub fn zero_slice(req: &Value) -> OpOutcome {
         "mappings": mappings,
         "exceptions": exceptions,
         "coverage": (report.coverage * 100.0).round() as u32,
+        "project": crate::zero_slice::to_project(&doc, &report, None),
     })))
 }

@@ -15,6 +15,8 @@ fn zero_slice_maps_exact_titles() {
     assert_eq!(out["coverage"], 100);
     assert_eq!(out["mappings"].as_array().unwrap().len(), 2);
     assert_eq!(out["exceptions"].as_array().unwrap().len(), 0);
+    assert_eq!(out["project"]["schema"], "nf-project/1");
+    assert_eq!(out["project"]["slots"]["SLT-01"], "甲");
 }
 
 #[test]
