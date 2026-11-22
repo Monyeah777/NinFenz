@@ -914,6 +914,20 @@ fun ImportScreen(
                             OutlinedButton(onClick = { importPreviewText = md }, enabled = !busy) {
                                 Text(stringResource(dev.ninfenz.mobile.R.string.import_preserve_preview))
                             }
+                            if (preserveGrant?.allows(dev.ninfenz.mobile.data.CapabilityGrant.EXPORT, System.currentTimeMillis()) == true) {
+                                OutlinedButton(onClick = {
+                                    runCatching {
+                                        val outDir = File(File(context.filesDir, "exports"), "preserve").apply { mkdirs() }
+                                        val out = File(outDir, preservedName)
+                                        out.writeText(md, Charsets.UTF_8)
+                                        preserveNote = context.getString(dev.ninfenz.mobile.R.string.import_preserve_exported, out.name)
+                                    }.onFailure {
+                                        preserveNote = context.getString(dev.ninfenz.mobile.R.string.import_preserve_fail, it.message ?: it.javaClass.simpleName)
+                                    }
+                                }, enabled = !busy) {
+                                    Text(stringResource(dev.ninfenz.mobile.R.string.import_preserve_export))
+                                }
+                            }
                         }
                         if (shareQueue.isNotEmpty()) {
                             Row(verticalAlignment = Alignment.CenterVertically) {

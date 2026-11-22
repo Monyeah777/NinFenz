@@ -73,6 +73,7 @@
 - `PreservationVerifier` 返回 grant；导入页仅在 `read` 可用时允许恢复归档。
 - 分享授权对话框显示当前到期日；重新打开按剩余天数回显 7/30 天。
 - 默认 grant 改为 read+reassemble+export；恢复归档要求 reassemble，只有 read 时仅允许只读预览。
+- 导入页新增「导出归档内容」，仅 `export` 可用时显示；写入 exports/preserve。
 - **未**接网络/密码学身份；授权仍是随包声明。
 
 ## M15 Property/Differential Testing（P0 原型）

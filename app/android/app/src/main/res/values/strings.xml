@@ -1186,4 +1186,6 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="grant_until">到 %1$s</string>
     <string name="import_preserve_readonly">只读：未授予再装配能力</string>
     <string name="import_preserve_preview">只读预览</string>
+    <string name="import_preserve_export">导出归档内容</string>
+    <string name="import_preserve_exported">已导出 %1$s</string>
 </resources>

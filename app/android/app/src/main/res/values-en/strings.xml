@@ -1190,4 +1190,6 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="grant_until">until %1$s</string>
     <string name="import_preserve_readonly">Read-only: reassemble capability not granted</string>
     <string name="import_preserve_preview">Preview only</string>
+    <string name="import_preserve_export">Export archive content</string>
+    <string name="import_preserve_exported">Exported %1$s</string>
 </resources>
