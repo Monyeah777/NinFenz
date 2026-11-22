@@ -543,7 +543,10 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         val parsed = PlanModel.parse(obj)
                         plan = parsed
                         rawPlan = obj
-                        inputs = parsed.slots.associate { it to (restoredInputs[it] ?: "") }
+                        inputs = parsed.slots.associate { slot ->
+                            val restored = restoredInputs[slot]
+                            slot to (if (!restored.isNullOrBlank()) restored else zeroPrefill[slot] ?: "")
+                        }
                         draftStore.save(project.id, inputs, obj)
                         draftNote = if (restoredInputs.isNotEmpty()) context.getString(dev.ninfenz.mobile.R.string.delivery_draft_restored) else null
                         markdown = null
