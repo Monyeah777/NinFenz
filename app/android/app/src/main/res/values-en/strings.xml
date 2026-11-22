@@ -1082,4 +1082,5 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="import_preserve_fail">Archive invalid: %1$s</string>
     <string name="import_restore_archive">Restore as import draft</string>
     <string name="preview_share_redacted">Share redacted</string>
+    <string name="patch_unknown_slot">Unknown slot: %1$s</string>
 </resources>

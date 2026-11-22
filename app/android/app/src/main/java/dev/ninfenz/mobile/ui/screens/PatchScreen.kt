@@ -195,9 +195,16 @@ fun PatchScreen(filesDir: File, projectId: String?, onBack: () -> Unit) {
                     }) { Text(stringResource(R.string.patch_copy)) }
                     if (store != null && projectId != null) {
                         Button(onClick = {
-                            store.save(projectId, store.load(projectId) + r.slots, store.loadPlan(projectId), r.markdown)
-                            Toast.makeText(context, context.getString(R.string.patch_saved), Toast.LENGTH_SHORT).show()
-                            history = emptyList()
+                            val rawPlan = store.loadPlan(projectId)
+                            val allowed = rawPlan?.let { runCatching { dev.ninfenz.mobile.model.PlanModel.parse(it).slots.toSet() }.getOrNull() } ?: emptySet()
+                            val unknown = r.slots.keys.filter { it !in allowed }
+                            if (unknown.isNotEmpty()) {
+                                error = context.getString(R.string.patch_unknown_slot, unknown.joinToString())
+                            } else {
+                                store.save(projectId, store.load(projectId) + r.slots, rawPlan, r.markdown)
+                                Toast.makeText(context, context.getString(R.string.patch_saved), Toast.LENGTH_SHORT).show()
+                                history = emptyList()
+                            }
                         }) { Text(stringResource(R.string.patch_save)) }
                     }
                 }
