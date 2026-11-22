@@ -1169,4 +1169,9 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="settings_selfcheck_pass">PASS %1$d</string>
     <string name="settings_selfcheck_fail">FAIL %1$d (seed %2$d)</string>
     <string name="import_preserve_no_read">Archive does not grant read capability</string>
+    <string name="settings_tier_title">Feature tiers</string>
+    <string name="settings_tier_current">current</string>
+    <string name="settings_tier_free">Free: all open</string>
+    <string name="settings_tier_debug">Debug tier switch</string>
+    <string name="settings_tier_release_note">Release has no purchase/entitlement entry; defaults to Free</string>
 </resources>

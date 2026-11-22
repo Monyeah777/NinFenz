@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -42,6 +43,8 @@ import dev.ninfenz.mobile.core.CoreBridgeNative
 import dev.ninfenz.mobile.core.ErrorCatalog
 import dev.ninfenz.mobile.data.AppPrefs
 import dev.ninfenz.mobile.data.BackupRestoreService
+import dev.ninfenz.mobile.data.FeatureGate
+import dev.ninfenz.mobile.data.FeaturePolicy
 import dev.ninfenz.mobile.data.CrashLogStore
 import dev.ninfenz.mobile.data.DiagnosticsBundle
 import dev.ninfenz.mobile.data.BackupService
@@ -74,6 +77,7 @@ fun SettingsScreen(
     var crash by remember { mutableStateOf(CrashLogStore(context.filesDir).read()) }
     var copied by remember { mutableStateOf(false) }
     var selfCheck by remember { mutableStateOf<dev.ninfenz.mobile.data.PropertyHarness.Report?>(null) }
+    var tier by remember { mutableStateOf(FeatureGate.tier()) }
     var stats by remember { mutableStateOf(StorageStats.scan(context.filesDir, context.cacheDir)) }
     var cleaned by remember { mutableStateOf<String?>(null) }
     var backupMessage by remember { mutableStateOf<String?>(null) }
@@ -134,6 +138,36 @@ fun SettingsScreen(
             )
             OutlinedButton(onClick = onErrorCodes) {
                 Text(stringResource(dev.ninfenz.mobile.R.string.error_codes_title))
+            }
+        }
+
+        CardBox(title = stringResource(dev.ninfenz.mobile.R.string.settings_tier_title)) {
+            val proCount = FeaturePolicy.rules.values.count { it.minTier == FeaturePolicy.Tier.PRO }
+            val ccosCount = FeaturePolicy.rules.values.count { it.minTier == FeaturePolicy.Tier.CCOS }
+            KeyValue(stringResource(dev.ninfenz.mobile.R.string.settings_tier_current), tier.name)
+            KeyValue("Free", stringResource(dev.ninfenz.mobile.R.string.settings_tier_free))
+            KeyValue("Pro rules", proCount.toString())
+            KeyValue("CCOS rules", ccosCount.toString())
+            if (BuildConfig.DEBUG) {
+                Text(stringResource(dev.ninfenz.mobile.R.string.settings_tier_debug), style = MaterialTheme.typography.bodySmall)
+                Row(horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(NfSpacing.s)) {
+                    FeatureGate.Tier.values().forEach { option ->
+                        FilterChip(
+                            selected = tier == option,
+                            onClick = {
+                                FeatureGate.setTierForDebug(option)
+                                tier = option
+                            },
+                            label = { Text(option.name) }
+                        )
+                    }
+                }
+            } else {
+                Text(
+                    stringResource(dev.ninfenz.mobile.R.string.settings_tier_release_note),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
 

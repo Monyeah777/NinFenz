@@ -4,7 +4,15 @@ package dev.ninfenz.mobile.data
 object FeatureGate {
     enum class Tier { FREE, PRO, CCOS }
 
-    fun tier(): Tier = Tier.FREE
+    @Volatile
+    private var activeTier: Tier = Tier.FREE
+
+    fun tier(): Tier = activeTier
+
+    /** 仅用于调试/自检切换；发布版没有购买入口，仍默认 Free。 */
+    fun setTierForDebug(tier: Tier) {
+        activeTier = tier
+    }
 
     fun isProEnabled(): Boolean = tier() != Tier.FREE
 

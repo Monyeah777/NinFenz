@@ -1165,4 +1165,9 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="settings_selfcheck_pass">PASS %1$d</string>
     <string name="settings_selfcheck_fail">FAIL %1$d（seed %2$d）</string>
     <string name="import_preserve_no_read">归档未授予只读权限</string>
+    <string name="settings_tier_title">功能层级</string>
+    <string name="settings_tier_current">当前</string>
+    <string name="settings_tier_free">Free：全部开放</string>
+    <string name="settings_tier_debug">调试切换</string>
+    <string name="settings_tier_release_note">发布版不含购买/授权入口；默认 Free</string>
 </resources>

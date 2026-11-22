@@ -56,8 +56,10 @@
 
 - `FeaturePolicy` 规则表：Free 能力、Pro 能力、CCOS 能力；按 tier 判定。
 - `FeatureGate` 委托规则；默认 Free，Free 永远放行，未知能力默认 Free。
-- 5 条 Kotlin 单测；JVM 492。
-- **未**接购买/授权/Pro/CCOS UI；无计费。
+- 5 条 Kotlin 单测；JVM 493。
+- `FeatureGate.setTierForDebug`：调试构建可在 Settings「功能层级」切 Free/Pro/CCOS。
+- 发布构建只显示层级与规则数，不含购买/授权入口；默认 Free。
+- **未**接计费/真实 entitlement。
 
 ## M25 Capability-Scoped Sharing（P0 原型）
 
