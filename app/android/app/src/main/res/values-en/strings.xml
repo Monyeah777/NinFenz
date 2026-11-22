@@ -1135,4 +1135,9 @@ MIT License · See app/docs/LEGAL.md</string>
     </plurals>
     <string name="preview_suggest_slot">Suggest → %1$s %2$s</string>
     <string name="preview_suggest_apply">Fill</string>
+    <string name="delivery_constraint_conflict_detail">%1$s</string>
+    <plurals name="delivery_constraint_conflict">
+        <item quantity="one">Constraint self-check: %d conflict</item>
+        <item quantity="other">Constraint self-check: %d conflicts</item>
+    </plurals>
 </resources>

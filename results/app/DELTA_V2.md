@@ -56,7 +56,7 @@
 
 - `FeaturePolicy` 规则表：Free 能力、Pro 能力、CCOS 能力；按 tier 判定。
 - `FeatureGate` 委托规则；默认 Free，Free 永远放行，未知能力默认 Free。
-- 5 条 Kotlin 单测；JVM 466。
+- 5 条 Kotlin 单测；JVM 476。
 - **未**接购买/授权/Pro/CCOS UI；无计费。
 
 ## M25 Capability-Scoped Sharing（P0 原型）
@@ -79,7 +79,8 @@
 - `app/prototypes/mus/mus.py`：min/max、required/forbidden_empty、must_include/must_avoid 的不可满足判定。
 - 穷举最小不可满足子集（MUS），不返回非最小超集。
 - 8 条 unittest；pytest wrapper 纳入全量。
-- **未**进 Rust/Kotlin/UI。
+- `ConstraintMUS` Kotlin 引擎 + `SpecConstraintAudit`：交付台显示约束自检冲突（min>max、required+max0）。
+- **未**进 Rust；未覆盖任意表达式/引用图。
 
 ## M6 Constraint Lens（P0 部分）
 

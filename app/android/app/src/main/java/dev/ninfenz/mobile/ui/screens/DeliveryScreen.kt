@@ -420,6 +420,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
     val specMeta = remember(artifacts?.specJson) {
         artifacts?.let { runCatching { SpecModel.parse(it.specJson) }.getOrNull() }
     }
+    val constraintConflicts = remember(specMeta) { dev.ninfenz.mobile.model.SpecConstraintAudit.conflicts(specMeta?.slots.orEmpty()) }
     Column(modifier = Modifier.fillMaxSize().imePadding()) {
         NfTopAppBar(
             title = stringResource(dev.ninfenz.mobile.R.string.delivery_title, project.title),
@@ -563,6 +564,27 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.padding(horizontal = NfSpacing.page)
                     )
+                }
+
+                if (constraintConflicts.isNotEmpty()) {
+                    NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
+                        Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                            Text(
+                                pluralStringResource(dev.ninfenz.mobile.R.plurals.delivery_constraint_conflict, constraintConflicts.size, constraintConflicts.size),
+                                style = MaterialTheme.typography.titleSmall,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                            constraintConflicts.take(2).forEach { conflict ->
+                                Text(
+                                    stringResource(
+                                        dev.ninfenz.mobile.R.string.delivery_constraint_conflict_detail,
+                                        conflict.joinToString(" + ") { it.id }
+                                    ),
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
+                        }
+                    }
                 }
 
                 NfCollapsibleSection(
