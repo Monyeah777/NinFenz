@@ -56,7 +56,7 @@
 
 - `FeaturePolicy` 规则表：Free 能力、Pro 能力、CCOS 能力；按 tier 判定。
 - `FeatureGate` 委托规则；默认 Free，Free 永远放行，未知能力默认 Free。
-- 5 条 Kotlin 单测；JVM 487。
+- 5 条 Kotlin 单测；JVM 488。
 - **未**接购买/授权/Pro/CCOS UI；无计费。
 
 ## M25 Capability-Scoped Sharing（P0 原型）
@@ -67,7 +67,8 @@
 - APP 已有 `ShareRedactor` 脱敏分享；不是权限/期限控制。
 - Kotlin `CapabilityGrant`：read/comment/reassemble/export/share + admin；到期/撤销判定。
 - preservation.zip 携带 `grant.json`（默认 read+export），verifier 校验 schema/caps。
-- **未**接分享授权选择 UI、网络或密码学身份。
+- `CapabilityGrantStore` 按项目保存；交付台「分享授权」可选 5 类能力与 0/7/30 天期限，preserve 时写入 grant.json。
+- **未**接接收方强制、网络或密码学身份。
 
 ## M15 Property/Differential Testing（P0 原型）
 

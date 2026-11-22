@@ -16,14 +16,14 @@ object PreservationExporter {
     private fun sha(bytes: ByteArray): String =
         MessageDigest.getInstance("SHA-256").digest(bytes).joinToString("") { "%02x".format(it) }
 
-    fun export(markdown: String, title: String, projectId: String, outDir: File, contractJson: String? = null): Created {
+    fun export(markdown: String, title: String, projectId: String, outDir: File, contractJson: String? = null, grantJson: String? = null): Created {
         val safe = projectId.replace(Regex("[^A-Za-z0-9._-]"), "_").ifBlank { "project" }
         outDir.mkdirs()
         val file = File(outDir, safe + ".preserve.zip")
         val md = markdown.toByteArray(Charsets.UTF_8)
         val doc = NfDocModel.toJson(NfDocModel.fromMarkdown(title, projectId, markdown)).toString().toByteArray(Charsets.UTF_8)
         val contract = contractJson?.toByteArray(Charsets.UTF_8)
-        val grant = CapabilityGrant.defaultForPackage().toJson().toString().toByteArray(Charsets.UTF_8)
+        val grant = (grantJson ?: CapabilityGrant.defaultForPackage().toJson().toString()).toByteArray(Charsets.UTF_8)
 
         val content = buildList {
             add("document.md" to md)

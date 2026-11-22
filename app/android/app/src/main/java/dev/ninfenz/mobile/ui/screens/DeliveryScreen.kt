@@ -21,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -158,6 +159,9 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
     val scope = rememberCoroutineScope()
     val statusStore = remember { ProjectStatusStore(context.filesDir) }
     val contractStore = remember { dev.ninfenz.mobile.data.ContractStore(context.filesDir) }
+    val grantStore = remember { dev.ninfenz.mobile.data.CapabilityGrantStore(context.filesDir) }
+    var grant by remember(project.id) { mutableStateOf(grantStore.load(project.id) ?: dev.ninfenz.mobile.data.CapabilityGrant.defaultForPackage()) }
+    var showGrant by remember { mutableStateOf(false) }
     var status by remember(project.id) { mutableStateOf(project.status) }
     var signoff by remember(project.id) { mutableStateOf(contractStore.load(project.id)) }
     var statusNote by remember { mutableStateOf<String?>(null) }
@@ -1153,7 +1157,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         }
                         recordExport("html", file, null)
                     }
-                    PreservationExportButton(exportMarkdown, project, context, scope, { busy = it }, { error = it }, busy) { file, report ->
+                    PreservationExportButton(exportMarkdown, project, context, scope, { busy = it }, { error = it }, busy, grant) { file, report ->
                         exportedFile = file
                         manifestText = null
                         reproOk = report.stable
@@ -1164,6 +1168,10 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         }
                         recordExport("preserve", file, null)
                     }
+                    OutlinedButton(
+                        onClick = { showGrant = true },
+                        modifier = Modifier.padding(horizontal = NfSpacing.page)
+                    ) { Text(stringResource(dev.ninfenz.mobile.R.string.grant_button)) }
                     NfDocExportButton(exportMarkdown, project, context, scope, { busy = it }, { error = it }, busy) { file, report ->
                         exportedFile = file
                         manifestText = null
@@ -1438,6 +1446,55 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                 TextButton(onClick = { showConstraintLens = false }) {
                     Text(stringResource(android.R.string.ok))
                 }
+            }
+        )
+    }
+
+    if (showGrant) {
+        var caps by remember(grant) { mutableStateOf(grant.caps) }
+        var days by remember(grant) { mutableIntStateOf(0) }
+        AlertDialog(
+            onDismissRequest = { showGrant = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.grant_title)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                    Text(stringResource(dev.ninfenz.mobile.R.string.grant_caps), style = MaterialTheme.typography.titleSmall)
+                    listOf(
+                        dev.ninfenz.mobile.data.CapabilityGrant.READ to dev.ninfenz.mobile.R.string.grant_cap_read,
+                        dev.ninfenz.mobile.data.CapabilityGrant.COMMENT to dev.ninfenz.mobile.R.string.grant_cap_comment,
+                        dev.ninfenz.mobile.data.CapabilityGrant.REASSEMBLE to dev.ninfenz.mobile.R.string.grant_cap_reassemble,
+                        dev.ninfenz.mobile.data.CapabilityGrant.EXPORT to dev.ninfenz.mobile.R.string.grant_cap_export,
+                        dev.ninfenz.mobile.data.CapabilityGrant.SHARE to dev.ninfenz.mobile.R.string.grant_cap_share
+                    ).forEach { (cap, label) ->
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Checkbox(
+                                checked = cap in caps,
+                                onCheckedChange = { checked ->
+                                    caps = if (checked) caps + cap else caps - cap
+                                }
+                            )
+                            Text(stringResource(label))
+                        }
+                    }
+                    Text(stringResource(dev.ninfenz.mobile.R.string.grant_expiry), style = MaterialTheme.typography.titleSmall)
+                    Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+                        listOf(0 to dev.ninfenz.mobile.R.string.grant_never, 7 to dev.ninfenz.mobile.R.string.grant_7d, 30 to dev.ninfenz.mobile.R.string.grant_30d).forEach { (option, label) ->
+                            FilterChip(selected = days == option, onClick = { days = option }, label = { Text(stringResource(label)) })
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    val expiresAt = if (days == 0) null else System.currentTimeMillis() + days * 86_400_000L
+                    val next = dev.ninfenz.mobile.data.CapabilityGrant(caps, expiresAt)
+                    grantStore.save(project.id, next)
+                    grant = next
+                    showGrant = false
+                }) { Text(stringResource(dev.ninfenz.mobile.R.string.grant_save)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showGrant = false }) { Text(stringResource(android.R.string.cancel)) }
             }
         )
     }
@@ -1973,6 +2030,7 @@ private fun PreservationExportButton(
     setBusy: (Boolean) -> Unit,
     setError: (CoreError?) -> Unit,
     busy: Boolean,
+    grant: dev.ninfenz.mobile.data.CapabilityGrant,
     onDone: (File, dev.ninfenz.mobile.data.ReproChecker.Report) -> Unit
 ) {
     Button(
@@ -1984,9 +2042,9 @@ private fun PreservationExportButton(
             scope.launch {
                 try {
                     val outDir = File(File(context.filesDir, "exports"), "delivery").apply { mkdirs() }
-                    val created = dev.ninfenz.mobile.data.PreservationExporter.export(md, project.title, project.id, outDir, dev.ninfenz.mobile.data.ContractStore(context.filesDir).raw(project.id))
+                    val created = dev.ninfenz.mobile.data.PreservationExporter.export(md, project.title, project.id, outDir, dev.ninfenz.mobile.data.ContractStore(context.filesDir).raw(project.id), grant.toJson().toString())
                     val reproDir = File(context.cacheDir, "repro-preserve").apply { deleteRecursively(); mkdirs() }
-                    val second = dev.ninfenz.mobile.data.PreservationExporter.export(md, project.title, project.id, reproDir, dev.ninfenz.mobile.data.ContractStore(context.filesDir).raw(project.id))
+                    val second = dev.ninfenz.mobile.data.PreservationExporter.export(md, project.title, project.id, reproDir, dev.ninfenz.mobile.data.ContractStore(context.filesDir).raw(project.id), grant.toJson().toString())
                     val report = dev.ninfenz.mobile.data.ReproChecker.check(created.file, second.file)
                     reproDir.deleteRecursively()
                     onDone(created.file, report)
