@@ -32,7 +32,7 @@
 | Android JVM | **442/442** | `:app:testDebugUnitTest` |
 | Desktop JVM | **20/20** | `cd app/desktop && ./gradlew test --rerun-tasks` |
 | TUI selftest | **9/9** | `python tui/nf.py --selftest` |
-| Desktop app-image | pass | `NFStudio.exe` 551,936 B；目录 137,150,938 B；未启动 |
+| Desktop app-image | pass | `NFStudio.exe` 551,936 B；目录 137,150,938 B；启动存活 10s |
 | MSI 打包 | **未跑通** | `build_desktop.sh package` 卡在 WiX 下载，已中止 |
 | zero_slice 原型 | **14/14** | `python -m unittest -v test_zero_slice.py` |
 | app gates | **QA0–QA6 全 PASS；FAIL=0；P0=0** | `python app/gates/run_gates.py` |
