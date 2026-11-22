@@ -4,9 +4,30 @@
 > **2026-11-17 深夜设备已断开，以下真机结果为断开前记录；新 UI 重构未真机验收**
 > **2026-11-17 真机已连接**：本轮新增安装/冷启动、WebView PDF、杀进程路由与槽位恢复、SQLite 迁移、CCOS 会话/预检、TalkBack 服务、横屏自适应实测（见第 6 节）；其余未跑项仍标 OPEN。
 > APK：0.2.0 / versionCode 2，minSdk 26 / target 36。本件只记实际跑过的项目；未跑项标 OPEN，不写成 pass。
-> 2026-11-21 `adb devices`：空列表（本机无真机/模拟器）。
+> **2026-11-22 真机重新连接并实测**：OnePlus PLF110 / Android 16 / 1080×2392 / 480dpi，serial `3B65AR0183V00000`。debug 签名 APK 安装成功；冷启动 `am start -W` TotalTime 573ms（首装）/320ms（升级后）/188ms（force-stop 后）。首启引导、示例 Pack、演示项目、创作台、交付 graph-compile、必填槽位、assemble、L1 pass（error=0 warn=0 info=3）、导出 md、契约三项全绿、签收、SEND text/plain 分享导入预览均通过；logcat 无 FATAL/ANR。详见第 0 节。
 >
 > 当前本机验证总览：Android JVM **449/449**、Rust core **212/212**、app Python **524 passed**、APP 门禁 QA0–QA6 PASS/gap=0、lint **0 warnings**、`verify.sh --checks-only` PASS=107/WARN=2/FAIL=0。
+
+## 0. 2026-11-22 真机实测（本轮）
+
+| 项目 | 结果 | 证据 |
+|---|---|---|
+| 设备 | OnePlus PLF110，Android 16（SDK 36），1080×2392 / 480dpi | `adb shell getprop` / `wm size` |
+| 安装 | pass：debug 签名 APK `adb install -r` Success | 终端输出 |
+| 冷启动 | pass：COLD 573ms（首装）/320ms（升级后）/188ms（force-stop 后） | `am start -W` |
+| 首启引导 | pass：跳过进入内容库 | 截图 device_home3.png |
+| 示例 Pack | pass：载入 demo-pack 1.0.0，1 项目 / 1 Pack | 截图 device_sample.png |
+| 项目与创作台 | pass：演示项目 → 继续 → 协议 3 条；缺必填提示可见 | 截图 device_project/device_author.png |
+| 交付计划 | pass：graph-compile 返回 steps 2 · slots 4 | 截图 device_delivery.png |
+| 槽位与装配 | pass：必填 3/3；assemble 后 L1 pass（error=0 warn=0 info=3） | 截图 device_assembled.png |
+| 导出 md | pass：最近导出 result.md「通过」；契约「至少一次导出」转绿 | 截图 device_exported/device_contract4.png |
+| 契约与签收 | pass：L1 / 必填 / 至少一次导出 三项全绿；签收写入 signed_at 与导出物 sha256 | 截图 device_signoff.png |
+| 分享导入 | pass：SEND text/plain 打开「导入到 NF Mobile」，去导入后生成 shared-text.md 预览（markdown 85%） | 截图 device_share2/device_share3.png |
+| 崩溃 | pass：logcat 无 FATAL EXCEPTION / ANR in dev.ninfenz.mobile | `adb logcat -d` |
+
+**真机发现并修复**：验收清单「必填槽位已填」原先把 `plan.slots` 全部当必填（含选填 SLT-04），填满 3 个必填后仍显示 ✗。改为只按 `specMeta.slots.required` 过滤后，三项验收全绿。修复后重新构建/安装并复测通过。
+
+**本轮未测**：长文本/中文输入法（`adb input text` 只落入首字符 R/C，槽位内容仅 1 字）、PDF/EPUB/DOCX/HTML 导出、分享文件、杀进程恢复、TalkBack、横屏、上传签名 AAB。这些不写成 pass。
 
 ## 1. 已实测（2026-11-15）
 
@@ -216,7 +237,7 @@
 | 依赖升级 coroutines（JVM） | pass（本机）：coroutines 1.9.0→1.10.2，243 tests 全绿；lint warnings 3→2；debug APK 因未压缩 dex 增至 24.7MB。真机未复测（adb 无设备） |
 | Clean build（本轮） | pass（本机）：`gradlew clean` + `testDebugUnitTest --rerun-tasks` + assembleDebug；248/248 全绿；clean APK 19,032,264 B sha256 f4501bfe…；zipalign 16KB 通过。增量 APK 24.7MB 为旧构建膨胀，clean 产物为准。 |
 | Rust core 单测（本轮） | pass（本机）：`cargo test` 186 passed / 0 failed；Android 端无 core 改动。 |
-| Release 构建（构建） | pass（本机）：clean 后重建 `:app:assembleRelease` 成功；app-release-unsigned.apk 44,567,446 B sha256 58b3f806…；zipalign 16KB 通过；apksigner 显示未签名（预期，签名 OPEN-EXTERNAL）。 |
+| Release 构建（构建） | pass（本机）：clean 后重建 `:app:assembleRelease` 成功；app-release-unsigned.apk 44,567,446 B sha256 7f568aa8…；zipalign 16KB 通过；apksigner 显示未签名（预期，签名 OPEN-EXTERNAL）。 |
 | 16KB 页对齐（构建） | pass（本机）：`zipalign -c -P 16 4 app-debug.apk` exit=0；未真机安装验证。 |
 | APP 门禁（round127） | pass（本机）：QA0–QA6 全 PASS，FAIL=0；covered=14 gap=0 open=2 p0=0；台账刷新到当前 HEAD。 |
 | APP 门禁（本轮） | pass（本机）：QA0–QA6 全部 PASS，FAIL=0；自审计 covered=14 gap=0 open=2 p0=0。 |

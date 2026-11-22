@@ -14,16 +14,20 @@
 ## 明细
 
 ### Android
-- assembleDebug：**pass**（2026-11-21，Android SDK 36 / build-tools 36.0.0）
-- app-debug.apk：51,580,313 B；SHA-256 `b225af12d2eadba846975e4ed63d5339e50f341a99e520e7af932affe109400c`
-- assembleRelease（unsigned）：pass；44,567,446 B；SHA-256 `58b3f806bf64cadee900f8252eb7216e6c096a4d36db0760373dcf8f45c87711`
-- debug 签名 APK（仅内部安装）：44,632,229 B；SHA-256 `a702149223b49e7fd5382a5076cd5a3c0c937a45c4c137f66b532edcb6fc1fcd`；证书 CN=Android Debug；**不是 upload key**
-- bundleRelease（unsigned）：pass；28,402,285 B；SHA-256 `a9c4445015782a20a20b3c81a739f0c9195df1a27795e36d9789fb35ae8cc4e5`；`jarsigner -verify` 显示未签名
+- assembleDebug：**pass**（2026-11-22，Android SDK 36 / build-tools 36.0.0）
+- app-debug.apk：52,638,817 B；SHA-256 `ff45bd74037c2727cd899c6474fdb19495472c00756c6a3b7610104299279431`
+- assembleRelease（unsigned）：pass；44,567,446 B；SHA-256 `7f568aa85f5724c18f4057c4a1de3a457d0de315420d7524ec52c2fb1ed7ee7c`
+- debug 签名 APK（仅内部安装）：44,632,229 B；SHA-256 `04b27a6a7e1601174ab8f6020ba5a8cf67c45904eb459a3438ebe41bf6317d29`；证书 CN=Android Debug；**不是 upload key**
+- bundleRelease（unsigned）：pass；28,402,681 B；SHA-256 `fc213a103fd97f9c1229cb628698e07f744579c200d1cb3b2b04a95d40015bfc`；`jarsigner -verify` 显示未签名
 - lintRelease：**0 errors / 0 warnings（No issues found）**
 - Release manifest：package `dev.ninfenz.mobile`、versionName `0.2.0`、minSdk 26、target/compileSdk 36、`extractNativeLibs=false`、无 `android:debuggable`（apkanalyzer manifest print）
 - 16KB 对齐：`zipalign -c -P 16 4` exit 0（APK；AAB 未用 bundletool 复核）
 - 签名证书指纹（SHA-256）：—（生产 upload key 未提供，OPEN-EXTERNAL）
-- 签名流程内部自测：`app/scripts/sign_release.sh` 以本机 debug keystore 跑通（仅验证流程，非生产签名）；`apksigner verify` 通过，证书 SHA-256 `8a52a549c3081795cecb0f1424d21684933fb21d3afe76506dab736e688b10fb`；本机 `adb devices` 为空，**未安装、未测冷启动**。
+- 签名流程内部自测：`app/scripts/sign_release.sh` 以本机 debug keystore 跑通（仅验证流程，非生产签名）；`apksigner verify` 通过，证书 SHA-256 `8a52a549c3081795cecb0f1424d21684933fb21d3afe76506dab736e688b10fb`。
+- 真机安装（2026-11-22）：OnePlus PLF110 / Android 16 / 1080×2392；`adb install -r` Success。冷启动 `am start -W` COLD 573ms（首装）/320ms（升级后）/188ms（force-stop 后）。
+- 真机闭环：示例 Pack → 演示项目 → 创作台 → graph-compile（steps 2 · slots 4）→ 必填 3/3 → assemble → L1 pass（error=0 warn=0 info=3）→ 导出 md → 契约三项全绿 → 签收（signed_at + 导出物 sha256）；SEND text/plain 分享导入预览通过；logcat 无 FATAL/ANR。
+- 真机修复：契约「必填槽位已填」曾把选填 SLT-04 也当必填，导致 3/3 仍 ✗；改为按 spec slot.required 过滤后复测三项全绿。
+- 真机未测：长文本/中文输入法、PDF/EPUB/DOCX/HTML 导出、分享文件、杀进程恢复、TalkBack、横屏、AAB 上传签名。
 - 数据安全表单提交：**未提交**
 
 ### Windows

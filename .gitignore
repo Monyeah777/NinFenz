@@ -101,6 +101,8 @@ app/**/__pycache__/
 
 # 本地真机/外部参考截图（验证证据，不入库）
 results/app/device-2026-11-18-*
+results/app/device_*.png
+results/app/device_ui*.xml
 results/app/mobbin*.png
 results/app/ref-*.png
 

@@ -960,7 +960,10 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                 }
 
                 if (report?.verdict == "pass" && markdown != null) {
-                    val slotsFilled = plan?.slots?.all { inputs[it].orEmpty().isNotBlank() } ?: false
+                    val requiredSlots = plan?.slots?.filter { id ->
+                        specMeta?.slots?.firstOrNull { it.id == id }?.required == true
+                    }.orEmpty()
+                    val slotsFilled = requiredSlots.isEmpty() || requiredSlots.all { inputs[it].orEmpty().isNotBlank() }
                     val checks = listOf(
                         stringResource(dev.ninfenz.mobile.R.string.contract_l1) to true,
                         stringResource(dev.ninfenz.mobile.R.string.contract_slots) to slotsFilled,

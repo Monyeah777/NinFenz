@@ -1,4 +1,4 @@
-# NF APP 基线（v2 Complete + delta，2026-11-21）
+# NF APP 基线（v2 Complete + delta，2026-11-22）
 
 > 本件是当前检出的事实基线，替代 `BASELINE.md` 中“APP 面此前为零”的历史快照；旧件保留作历史。
 > 输入：`NF-APP-Final-方案-v2-Complete-SelfContained-2026-11-.md` + `NF-APP-v2-增量补丁-SelfContained-2026-11-19.md`。
@@ -7,10 +7,10 @@
 
 | 项 | 值 |
 |---|---|
-| 分支 / HEAD | `work/l4-floors` / `aed9013c0` |
-| 工作树 | clean；无未跟踪交付件 |
+| 分支 / HEAD | `work/l4-floors` / 本提交 |
+| 工作树 | clean；真机截图在 `results/app/device_*.png` |
 | 输入文档 | 不在仓（作者本地） |
-| 设备 | `adb devices` 空；无模拟器 |
+| 设备 | OnePlus PLF110 / Android 16 / 1080×2392；serial `3B65AR0183V00000` |
 
 ## 1. 环境
 
@@ -37,17 +37,18 @@
 | zero_slice 原型 | **14/14** | `python -m unittest -v test_zero_slice.py` |
 | app gates | **QA0–QA6 全 PASS；FAIL=0；P0=0** | `python app/gates/run_gates.py` |
 | 仓库门禁 | **PASS=107 WARN=2 FAIL=0** | `bash verify.sh --checks-only` |
+| 真机闭环 | **pass**：安装、冷启动、交付、L1、导出 md、契约三项、签收、分享导入 | `adb` / 截图 `device_*.png` |
 
 ## 3. 构建
 
 | 产物 | 大小 | sha256 | 备注 |
 |---|---|---|---|
-| debug APK | 51,580,313 B | `b225af12…` | 双 ABI |
-| release unsigned | 44,567,446 B | `58b3f806…` | `zipalign -c -P 16` 通过 |
+| debug APK | 52,638,817 B | `ff45bd74…` | 双 ABI |
+| release unsigned | 44,567,446 B | `7f568aa8…` | `zipalign -c -P 16` 通过 |
 | lintRelease | pass | 0 errors / 0 warnings |
 | Release manifest | pass | 0.2.0；minSdk 26 / target 36；无 debuggable |
-| debug-signed APK | 44,632,229 B | `a7021492…` | 仅内部安装；证书 CN=Android Debug |
-| release AAB unsigned | 28,402,285 B | `a9c44450…` | `jarsigner -verify` 未签名；AAB 16KB 未用 bundletool 复核 |
+| debug-signed APK | 44,632,229 B | `04b27a6a…` | 仅内部安装；证书 CN=Android Debug |
+| release AAB unsigned | 28,402,681 B | `fc213a10…` | `jarsigner -verify` 未签名；AAB 16KB 未用 bundletool 复核 |
 
 发布签名/公证/Play 材料仍无输入。
 
