@@ -68,7 +68,8 @@
 - Kotlin `CapabilityGrant`：read/comment/reassemble/export/share + admin；到期/撤销判定。
 - preservation.zip 携带 `grant.json`（默认 read+export），verifier 校验 schema/caps。
 - `CapabilityGrantStore` 按项目保存；交付台「分享授权」可选 5 类能力与 0/7/30 天期限，preserve 时写入 grant.json。
-- **未**接接收方强制、网络或密码学身份。
+- `PreservationVerifier` 返回 grant；导入页仅在 `read` 可用时允许恢复归档。
+- **未**接网络/密码学身份；授权仍是随包声明。
 
 ## M15 Property/Differential Testing（P0 原型）
 

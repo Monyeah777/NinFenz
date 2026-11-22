@@ -1168,4 +1168,5 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="settings_selfcheck_desc">M1 / M12 / M25 deterministic properties</string>
     <string name="settings_selfcheck_pass">PASS %1$d</string>
     <string name="settings_selfcheck_fail">FAIL %1$d (seed %2$d)</string>
+    <string name="import_preserve_no_read">Archive does not grant read capability</string>
 </resources>

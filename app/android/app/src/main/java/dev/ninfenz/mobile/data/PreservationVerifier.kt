@@ -14,7 +14,7 @@ object PreservationVerifier {
     private const val MAX_ENTRY_BYTES = 20L * 1024 * 1024
     private const val MAX_TOTAL_BYTES = 40L * 1024 * 1024
 
-    data class Result(val ok: Boolean, val title: String?, val errors: List<String>)
+    data class Result(val ok: Boolean, val title: String?, val errors: List<String>, val grant: CapabilityGrant? = null)
 
     private fun sha(bytes: ByteArray): String =
         MessageDigest.getInstance("SHA-256").digest(bytes).joinToString("") { "%02x".format(it) }
@@ -30,6 +30,7 @@ object PreservationVerifier {
     fun verify(file: File): Result {
         val errors = mutableListOf<String>()
         var title: String? = null
+        var grant: CapabilityGrant? = null
         try {
             ZipFile(file).use { zip ->
                 if (zip.size() > MAX_ENTRIES) return Result(false, null, listOf("zip 条目过多"))
@@ -78,7 +79,8 @@ object PreservationVerifier {
                 } else {
                     runCatching {
                         CapabilityGrant.parse(Json.parseToJsonElement(zip.getInputStream(grantEntry).readBytes().decodeToString()).jsonObject)
-                    }.onFailure { errors += "grant.json 非法：" + (it.message ?: it.javaClass.simpleName) }
+                    }.onSuccess { grant = it }
+                        .onFailure { errors += "grant.json 非法：" + (it.message ?: it.javaClass.simpleName) }
                 }
                 val oaisEntry = zip.getEntry("oais.json")
                 if (oaisEntry == null) {
@@ -115,6 +117,6 @@ object PreservationVerifier {
         } catch (t: Throwable) {
             errors += t.message ?: t.javaClass.simpleName
         }
-        return Result(errors.isEmpty(), title, errors)
+        return Result(errors.isEmpty(), title, errors, grant)
     }
 }

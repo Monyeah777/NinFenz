@@ -15,10 +15,10 @@
 
 ### Android
 - assembleDebug：**pass**（2026-11-22，Android SDK 36 / build-tools 36.0.0）
-- app-debug.apk：52,725,507 B；SHA-256 `bcc6c922b378f6b9036c78f3c2bc79e8bbefbc9a527c6fd2f07316d68caa4bd6`
-- assembleRelease（unsigned）：pass；44,634,290 B；SHA-256 `ee6c54b47a12abeaa717b2c397395ed7b909607d3d5ea940784ed086dbfc378b`
-- debug 签名 APK（仅内部安装）：44,697,765 B；SHA-256 `dc16443907a15635d5e5f06f5e1669ec5daddbf26519b4215b9867360cb74e5c`；证书 CN=Android Debug；**不是 upload key**
-- bundleRelease（unsigned）：pass；28,447,841 B；SHA-256 `cfacd58a2c10fece8823bf003f707896fff66772a3359b78f4b8292a9efb9ded`；`jarsigner -verify` 显示未签名
+- app-debug.apk：51,634,457 B；SHA-256 `1f7b0a9eeafedf51a5b4685e39cc342b306977a234de4cc44a5d95a702c92f8e`
+- assembleRelease（unsigned）：pass；44,634,782 B；SHA-256 `c9c34d4b1fb685bd042b4a3b5ba858fc22f4179093eca07fca489bb6f9824115`
+- debug 签名 APK（仅内部安装）：44,697,765 B；SHA-256 `527af64b522087289f6c76dbe3d7bdbe5f40e48b4df2bc2d2370b9cbf9faa054`；证书 CN=Android Debug；**不是 upload key**
+- bundleRelease（unsigned）：pass；28,448,498 B；SHA-256 `f4efdcaa19d9c4be930afe91c2994bc9423bb19d6878a2bd1b2a034841debcee`；`jarsigner -verify` 显示未签名
 - lintRelease：**0 errors / 0 warnings（No issues found）**
 - Release manifest：package `dev.ninfenz.mobile`、versionName `0.2.0`、minSdk 26、target/compileSdk 36、`extractNativeLibs=false`、无 `android:debuggable`（apkanalyzer manifest print）
 - 16KB 对齐：`zipalign -c -P 16 4` exit 0（APK；AAB 未用 bundletool 复核）

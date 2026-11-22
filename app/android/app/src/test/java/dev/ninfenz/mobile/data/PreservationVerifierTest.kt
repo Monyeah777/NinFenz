@@ -17,6 +17,7 @@ class PreservationVerifierTest {
         val result = PreservationVerifier.verify(created.file)
         assertTrue(result.errors.toString(), result.ok)
         assertTrue(result.title == "标题")
+        assertTrue(result.grant?.allows(CapabilityGrant.READ, 0) == true)
         assertTrue(PreservationVerifier.extractMarkdown(created.file)!!.contains("正文"))
     }
 

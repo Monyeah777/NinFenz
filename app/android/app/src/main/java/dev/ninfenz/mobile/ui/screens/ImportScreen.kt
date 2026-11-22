@@ -798,10 +798,13 @@ fun ImportScreen(
             try {
                 val file = FileAccess.copyToCache(context, uri, "preserve.zip")
                 val result = dev.ninfenz.mobile.data.PreservationVerifier.verify(file)
-                if (result.ok) {
+                if (result.ok && result.grant?.allows(dev.ninfenz.mobile.data.CapabilityGrant.READ, System.currentTimeMillis()) == true) {
                     preserveNote = context.getString(dev.ninfenz.mobile.R.string.import_preserve_ok, result.title ?: file.name)
                     preservedMarkdown = dev.ninfenz.mobile.data.PreservationVerifier.extractMarkdown(file)
                     preservedName = (result.title ?: "restored").replace(Regex("[^A-Za-z0-9._-]"), "_") + ".md"
+                } else if (result.ok) {
+                    preserveNote = context.getString(dev.ninfenz.mobile.R.string.import_preserve_no_read)
+                    preservedMarkdown = null
                 } else {
                     preserveNote = context.getString(dev.ninfenz.mobile.R.string.import_preserve_fail, result.errors.take(2).joinToString("; "))
                     preservedMarkdown = null
