@@ -162,6 +162,7 @@
 - zero-slice 结果按 source digest 落盘，进程恢复时还原；新导入/清空时清除。
 - 草稿旁写 zero-slice sidecar；DraftProjectBinder 把它带进项目 authoring/zero-slice.json。
 - 创作台合并 zero-slice slotValues，项目字段可被切片结果直接预填。
+- Android 包内 `libnf_app_core.so` 已重编译并含 `zero-slice` op；分享导入不再报「未知 op」。
 - 仍是 nf-import/1 会话；未切到 nf-zero-slice-draft/to_project，也未替换核心 map-suggest。
 
 ## A0-14 Daily 入口

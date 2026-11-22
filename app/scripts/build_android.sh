@@ -19,6 +19,10 @@ if [ -z "${ANDROID_HOME:-}" ] && [ -z "${ANDROID_SDK_ROOT:-}" ] && [ ! -d "${LOC
   echo "Android SDK 不在场（修复指引：设 ANDROID_HOME，或按 app/results/TOOLCHAIN.md 安装 cmdline-tools）" >&2
   exit 4
 fi
+if [ "${NF_SKIP_CORE:-0}" != "1" ]; then
+  echo "[build-android] 先重建核心 .so（NF_SKIP_CORE=1 可跳过）"
+  bash "$ROOT/app/scripts/build_core_android.sh"
+fi
 cd "$APP_DIR"
 if [ -x ./gradlew ]; then GRADLE=./gradlew; elif command -v gradle >/dev/null 2>&1; then GRADLE=gradle; else
   echo "无 gradle wrapper 且 PATH 无 gradle（修复指引：生成 wrapper 或安装 Gradle 8.11+）" >&2; exit 4

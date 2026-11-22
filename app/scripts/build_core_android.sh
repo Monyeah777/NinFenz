@@ -43,6 +43,9 @@ if [ -z "$NDK" ]; then
     fi
   done
 fi
+if [ -n "$NDK" ] && command -v cygpath >/dev/null 2>&1; then
+  NDK="$(cygpath -m "$NDK")"
+fi
 if [ -z "$NDK" ] || [ ! -d "$NDK" ]; then
   fail_env "未找到 Android NDK" "sdkmanager --sdk_root=\$ANDROID_HOME 'ndk;27.0.12077973'；或设 ANDROID_NDK_HOME 指向 NDK 根目录"
 fi
