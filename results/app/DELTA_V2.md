@@ -26,7 +26,7 @@
 
 - `BatchAssembler` 与 `ImportScreen` 的硬编码中文移入 `strings.xml` / `values-en`。
 - `python -m pytest app/tests/test_ui_strings_localized.py -q` → 1 passed。
-- 全量 `python -m pytest app/tests -q` → **518 passed**。
+- 全量 `python -m pytest app/tests -q` → **520 passed**。
 
 ## J6 nf-doc/1
 
@@ -43,6 +43,13 @@
 
 - 有序列表只认 `1. `/`1) `，不再把「2026 年…」误判为 list。
 - Kotlin + Rust 同步；各加一条回归测试。
+
+## M12 Constraint Satisfiability/MUS（P0 原型）
+
+- `app/prototypes/mus/mus.py`：min/max、required/forbidden_empty、must_include/must_avoid 的不可满足判定。
+- 穷举最小不可满足子集（MUS），不返回非最小超集。
+- 8 条 unittest；pytest wrapper 纳入全量。
+- **未**进 Rust/Kotlin/UI。
 
 ## M6 Constraint Lens（P0 部分）
 
