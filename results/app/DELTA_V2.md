@@ -26,7 +26,7 @@
 
 - `BatchAssembler` 与 `ImportScreen` 的硬编码中文移入 `strings.xml` / `values-en`。
 - `python -m pytest app/tests/test_ui_strings_localized.py -q` → 1 passed。
-- 全量 `python -m pytest app/tests -q` → **516 passed**。
+- 全量 `python -m pytest app/tests -q` → **518 passed**。
 
 ## J6 nf-doc/1
 
@@ -38,6 +38,12 @@
 - 冲突可逐项选择「保留左/右/双方」；选择后保存/分享。
 - 合并结果可展开块列表、删除单块；删除后保存/分享。
 - 块可上下移动/删除；跨章节拖拽仍 OPEN。
+
+## M1 Flash Fill（P0 原型）
+
+- `app/prototypes/flash_fill/flash_fill.py`：前缀/后缀/去前缀/去后缀/替换/截断白名单。
+- 9 条 unittest；pytest wrapper 纳入全量。
+- **未**进 Kotlin/Rust，也未接编辑 UI；只作为算法参考。
 
 ## M25 Capability-Scoped Sharing（P0 部分）
 

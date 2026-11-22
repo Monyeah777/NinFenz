@@ -67,7 +67,7 @@
 - 项目包：manifest 完整性校验、嵌套/深层目录、BOM、临时文件过滤、篡改/未列条目拒绝、完整项目分享与导入。
 - 备份：manifest BOM/字段必填/未列条目拒绝/声明与实际大小上限、导出后自检、恢复后刷新库。
 - 其他：最近项目动态快捷方式、错误码目录与使用扫描、清空导出记录、崩溃日志分享、项目复制/归档/恢复的回滚加固。
-- 当前本机：JVM **442/442**、Python **516 passed**、Rust **211/211**、lint 0、verify PASS=107/WARN=2/FAIL=0。
+- 当前本机：JVM **442/442**、Python **518 passed**、Rust **211/211**、lint 0、verify PASS=107/WARN=2/FAIL=0。
 - 真机矩阵与签名/公证仍 OPEN-EXTERNAL/OPEN-TOOLCHAIN，不得据此宣称可发布。
 
 ## 1. 结论（先行）
@@ -196,7 +196,7 @@
 | Windows MSI | 66,573,406 B；app jar 内含 `native/nf_app_core.dll` | `bash app/scripts/build_desktop.sh package`（WIX_PATH） |
 | Rust CLI / cdylib | `nf-app-core.exe` / `nf_app_core.dll` | `bash app/scripts/build_core.sh --release` |
 | 工具链定版 | Gradle 8.11.1 / AGP 8.10.1 / Kotlin 2.1.20 / CMP 1.7.3 / compileSdk 36 / NDK r27 | `app/results/TOOLCHAIN.md` |
-| Python 测试 | **516 passed / 0 failed / 0 skipped / 0 xfailed（126s）** | `python -m pytest app/tests -q` |
+| Python 测试 | **518 passed / 0 failed / 0 skipped / 0 xfailed（126s）** | `python -m pytest app/tests -q` |
 | Rust 测试 | **182 断言 / 21 二进制 / 0 failed** | `cd app/core && cargo test` |
 | 两端 JVM 测试 | Android 42（含自适应分档 4 条）/ Desktop 20（含真实 JNA FFI） | `./gradlew test` / `:app:testDebugUnitTest` |
 
