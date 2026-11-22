@@ -23,7 +23,8 @@ data class ZeroSliceReport(
     val mappings: List<ZeroSliceMapping>,
     val exceptions: List<ZeroSliceException>,
     val coverage: Int,
-    val slotValues: Map<String, String> = emptyMap()
+    val slotValues: Map<String, String> = emptyMap(),
+    val projectSlots: Map<String, String> = emptyMap()
 )
 
 object ZeroSliceModel {
@@ -46,7 +47,9 @@ object ZeroSliceModel {
             )
         }.orEmpty(),
         coverage = o["coverage"]?.jsonPrimitive?.content?.toIntOrNull() ?: 0,
-        slotValues = o["slot_values"]?.jsonObject?.mapValues { it.value.jsonPrimitive.content }.orEmpty()
+        slotValues = o["slot_values"]?.jsonObject?.mapValues { it.value.jsonPrimitive.content }.orEmpty(),
+        projectSlots = o["project"]?.jsonObject?.get("slots")?.jsonObject
+            ?.mapValues { it.value.jsonPrimitive.content }.orEmpty()
     )
 
     fun toJson(report: ZeroSliceReport): JsonObject = buildJsonObject {
@@ -71,6 +74,7 @@ object ZeroSliceModel {
         }
         put("coverage", report.coverage)
         put("slot_values", buildJsonObject { report.slotValues.forEach { (k, v) -> put(k, v) } })
+        put("project_slots", buildJsonObject { report.projectSlots.forEach { (k, v) -> put(k, v) } })
     }
 }
 

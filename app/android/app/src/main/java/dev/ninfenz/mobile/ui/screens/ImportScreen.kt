@@ -591,14 +591,13 @@ fun ImportScreen(
                 val parsedReport = dev.ninfenz.mobile.data.ZeroSliceModel.parse(obj)
                 val currentDoc = doc
                 val sections = currentDoc?.text?.let { MarkdownSlicer.slice(MarkdownBlocks.parse(it)) } ?: emptyList()
-                val report = parsedReport.copy(
-                    slotValues = parsedReport.mappings.mapNotNull { mapping ->
-                        sections.getOrNull(mapping.fromIndex)
-                            ?.blocks?.joinToString("\n\n") { it.text }
-                            ?.takeIf { it.isNotBlank() }
-                            ?.let { mapping.toId to it }
-                    }.toMap()
-                )
+                val computed = parsedReport.mappings.mapNotNull { mapping ->
+                    sections.getOrNull(mapping.fromIndex)
+                        ?.blocks?.joinToString("\n\n") { it.text }
+                        ?.takeIf { it.isNotBlank() }
+                        ?.let { mapping.toId to it }
+                }.toMap()
+                val report = parsedReport.copy(slotValues = parsedReport.projectSlots + computed)
                 zeroSlice = report
                 if (currentDoc != null) {
                     val digest = currentDoc.source.sha256 ?: currentDoc.textDigest.orEmpty()

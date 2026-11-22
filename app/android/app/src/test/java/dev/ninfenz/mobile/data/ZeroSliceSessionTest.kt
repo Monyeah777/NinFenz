@@ -25,6 +25,14 @@ class ZeroSliceSessionTest {
     }
 
     @Test
+    fun parsesProjectSlots() {
+        val report = ZeroSliceModel.parse(Json.parseToJsonElement(
+            """{"mappings":[],"exceptions":[],"coverage":100,"project":{"schema":"nf-project/1","slots":{"SLT-01":"甲"}}}"""
+        ).jsonObject)
+        assertEquals("甲", report.projectSlots["SLT-01"])
+    }
+
+    @Test
     fun draftSidecarRoundTrip() {
         val dir = java.nio.file.Files.createTempDirectory("nf-zero-draft").toFile()
         val draft = java.io.File(dir, "draft.json").apply { writeText("{}") }
