@@ -96,7 +96,8 @@
 - 槽位分配时显示当前字数/maxChars；超长/必填/最小字数/前后缀/pattern 不满足则标红并禁用。
 - 分配前按 kind 清洗并截到 maxChars。
 - 新增「约束面板」：逐槽位显示当前值、必填/可选、长度、前后缀、pattern 与问题列表。
-- 面板只读；就地编辑仍走槽位输入框/约束守卫。
+- 面板内可直接编辑每个槽位；写入走同一 `inputs` 与 kind/maxChars 收敛。
+- 约束问题随输入实时刷新。
 
 ## M2 Progressive Formalization（P0 部分）
 

@@ -1149,7 +1149,6 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="delivery_constraint_issue_prefix">missing prefix</string>
     <string name="delivery_constraint_issue_suffix">missing suffix</string>
     <string name="delivery_constraint_issue_pattern">pattern mismatch</string>
-    <string name="delivery_constraint_value">current: %1$s</string>
     <string name="grant_button">Sharing grant</string>
     <string name="grant_title">Sharing grant</string>
     <string name="grant_caps">Capabilities</string>

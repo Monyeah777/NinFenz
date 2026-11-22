@@ -1145,7 +1145,6 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="delivery_constraint_issue_prefix">缺前缀</string>
     <string name="delivery_constraint_issue_suffix">缺后缀</string>
     <string name="delivery_constraint_issue_pattern">pattern 不匹配</string>
-    <string name="delivery_constraint_value">当前：%1$s</string>
     <string name="grant_button">分享授权</string>
     <string name="grant_title">分享授权</string>
     <string name="grant_caps">能力范围</string>

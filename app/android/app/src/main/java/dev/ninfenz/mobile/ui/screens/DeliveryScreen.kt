@@ -1411,12 +1411,18 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                        if (view.value.isNotBlank()) {
-                            Text(
-                                stringResource(dev.ninfenz.mobile.R.string.delivery_constraint_value, view.value.take(80)),
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                        }
+                        OutlinedTextField(
+                            value = inputs[view.id].orEmpty(),
+                            onValueChange = { value ->
+                                val clean = dev.ninfenz.mobile.model.SlotInput.sanitize(view.kind, value)
+                                val limited = view.maxChars?.let { clean.take(it) } ?: clean
+                                inputs = inputs + (view.id to limited)
+                            },
+                            label = { Text(view.name) },
+                            modifier = Modifier.fillMaxWidth(),
+                            minLines = 1,
+                            maxLines = 3
+                        )
                         if (view.issues.isEmpty()) {
                             Text(
                                 stringResource(dev.ninfenz.mobile.R.string.delivery_constraint_ok),
