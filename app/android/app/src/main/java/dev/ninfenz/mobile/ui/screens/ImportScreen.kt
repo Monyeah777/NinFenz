@@ -151,6 +151,7 @@ fun ImportScreen(
     var zeroSlice by remember { mutableStateOf<ZeroSliceReport?>(null) }
     var preserveNote by remember { mutableStateOf<String?>(null) }
     var preservedMarkdown by remember { mutableStateOf<String?>(null) }
+    var preserveGrant by remember { mutableStateOf<dev.ninfenz.mobile.data.CapabilityGrant?>(null) }
     var preservedName by remember { mutableStateOf("restored.md") }
     val importHistory = remember { ImportHistoryStore(context.filesDir) }
     val importDraftStore = remember { ImportDraftStore(context.filesDir) }
@@ -801,13 +802,16 @@ fun ImportScreen(
                 if (result.ok && result.grant?.allows(dev.ninfenz.mobile.data.CapabilityGrant.READ, System.currentTimeMillis()) == true) {
                     preserveNote = context.getString(dev.ninfenz.mobile.R.string.import_preserve_ok, result.title ?: file.name)
                     preservedMarkdown = dev.ninfenz.mobile.data.PreservationVerifier.extractMarkdown(file)
+                    preserveGrant = result.grant
                     preservedName = (result.title ?: "restored").replace(Regex("[^A-Za-z0-9._-]"), "_") + ".md"
                 } else if (result.ok) {
                     preserveNote = context.getString(dev.ninfenz.mobile.R.string.import_preserve_no_read)
                     preservedMarkdown = null
+                    preserveGrant = null
                 } else {
                     preserveNote = context.getString(dev.ninfenz.mobile.R.string.import_preserve_fail, result.errors.take(2).joinToString("; "))
                     preservedMarkdown = null
+                    preserveGrant = null
                 }
                 file.delete()
             } catch (t: Throwable) {
@@ -896,8 +900,19 @@ fun ImportScreen(
                         zeroSliceNote?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary) }
                         preserveNote?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary) }
                         preservedMarkdown?.let { md ->
-                            OutlinedButton(onClick = { importText(md, "preserve", preservedName) }, enabled = !busy) {
-                                Text(stringResource(dev.ninfenz.mobile.R.string.import_restore_archive))
+                            if (preserveGrant?.allows(dev.ninfenz.mobile.data.CapabilityGrant.REASSEMBLE, System.currentTimeMillis()) == true) {
+                                OutlinedButton(onClick = { importText(md, "preserve", preservedName) }, enabled = !busy) {
+                                    Text(stringResource(dev.ninfenz.mobile.R.string.import_restore_archive))
+                                }
+                            } else {
+                                Text(
+                                    stringResource(dev.ninfenz.mobile.R.string.import_preserve_readonly),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            }
+                            OutlinedButton(onClick = { importPreviewText = md }, enabled = !busy) {
+                                Text(stringResource(dev.ninfenz.mobile.R.string.import_preserve_preview))
                             }
                         }
                         if (shareQueue.isNotEmpty()) {

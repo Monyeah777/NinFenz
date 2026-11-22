@@ -13,6 +13,7 @@ class CapabilityGrantTest {
         val grant = CapabilityGrant.defaultForPackage()
         assertTrue(grant.allows(CapabilityGrant.READ, 0))
         assertTrue(grant.allows(CapabilityGrant.EXPORT, 0))
+        assertTrue(grant.allows(CapabilityGrant.REASSEMBLE, 0))
         assertFalse(grant.allows(CapabilityGrant.COMMENT, 0))
     }
 

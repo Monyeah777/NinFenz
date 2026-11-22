@@ -36,7 +36,7 @@ data class CapabilityGrant(
         const val SHARE = "share"
         val CAPS = setOf(READ, COMMENT, REASSEMBLE, EXPORT, SHARE)
 
-        fun defaultForPackage(): CapabilityGrant = CapabilityGrant(setOf(READ, EXPORT))
+        fun defaultForPackage(): CapabilityGrant = CapabilityGrant(setOf(READ, REASSEMBLE, EXPORT))
 
         fun parse(o: JsonObject): CapabilityGrant {
             require(o["schema"]?.jsonPrimitive?.content == SCHEMA) { "未知能力授权 schema" }

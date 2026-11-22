@@ -1185,4 +1185,6 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="grant_current">当前：%1$s</string>
     <string name="grant_no_expiry">不过期</string>
     <string name="grant_until">到 %1$s</string>
+    <string name="import_preserve_readonly">只读：未授予再装配能力</string>
+    <string name="import_preserve_preview">只读预览</string>
 </resources>
