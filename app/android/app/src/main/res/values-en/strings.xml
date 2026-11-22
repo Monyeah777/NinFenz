@@ -1194,4 +1194,5 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="import_preserve_exported">Exported %1$s</string>
     <string name="import_zero_slice_create">Create project from slices</string>
     <string name="import_verify_latest">Latest archive</string>
+    <string name="grant_revoked">Revoke this grant</string>
 </resources>

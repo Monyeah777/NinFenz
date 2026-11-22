@@ -1190,4 +1190,5 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="import_preserve_exported">已导出 %1$s</string>
     <string name="import_zero_slice_create">用切片建项目</string>
     <string name="import_verify_latest">最近归档</string>
+    <string name="grant_revoked">撤销此授权</string>
 </resources>

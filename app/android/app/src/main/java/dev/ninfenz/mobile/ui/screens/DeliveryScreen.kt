@@ -1480,6 +1480,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
 
     if (showGrant) {
         var caps by remember(grant) { mutableStateOf(grant.caps) }
+        var revoked by remember(grant) { mutableStateOf(grant.revoked) }
         var days by remember(grant) {
             val exp = grant.expiresAt
             mutableIntStateOf(
@@ -1523,6 +1524,10 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                             Text(stringResource(label))
                         }
                     }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Checkbox(checked = revoked, onCheckedChange = { revoked = it })
+                        Text(stringResource(dev.ninfenz.mobile.R.string.grant_revoked))
+                    }
                     Text(stringResource(dev.ninfenz.mobile.R.string.grant_expiry), style = MaterialTheme.typography.titleSmall)
                     Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                         listOf(0 to dev.ninfenz.mobile.R.string.grant_never, 7 to dev.ninfenz.mobile.R.string.grant_7d, 30 to dev.ninfenz.mobile.R.string.grant_30d).forEach { (option, label) ->
@@ -1534,7 +1539,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
             confirmButton = {
                 TextButton(onClick = {
                     val expiresAt = if (days == 0) null else System.currentTimeMillis() + days * 86_400_000L
-                    val next = dev.ninfenz.mobile.data.CapabilityGrant(caps, expiresAt)
+                    val next = dev.ninfenz.mobile.data.CapabilityGrant(caps, expiresAt, revoked)
                     grantStore.save(project.id, next)
                     grant = next
                     showGrant = false
