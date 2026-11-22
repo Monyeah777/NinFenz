@@ -167,6 +167,7 @@
 - 切片会话卡新增「用切片建项目」：保存草稿+sidecar 后直接走快速建项目。
 - 该落盘逻辑抽到 `ZeroSliceProjectDraft`，单测覆盖主草稿/sidecar/mapping。
 - 仍是 nf-import/1 会话；未切到 nf-zero-slice-draft/to_project，也未替换核心 map-suggest。
+- **2026-11-23 真机端到端**：分享 3 heading Markdown → 自动切片 100% / 3 映射 / 0 例外 → 「用切片建项目」→ 创作台「已从导入映射预填 6 个字段」→ 交付 3/3 → L1 pass（error=0 warn=0 info=3）→ 导出 md 173 B（sha256 `b4542200…`）→ 签收（设备密钥 `4408787f9108b2a9`）→ 连续两份 preserve.zip 均通过。
 
 ## A0-14 Daily 入口
 
