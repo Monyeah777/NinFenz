@@ -1117,4 +1117,5 @@ MIT License · See app/docs/LEGAL.md</string>
         <item quantity="one">min %1$d chars</item>
         <item quantity="other">min %1$d chars</item>
     </plurals>
+    <string name="slot_pattern">must match %1$s</string>
 </resources>

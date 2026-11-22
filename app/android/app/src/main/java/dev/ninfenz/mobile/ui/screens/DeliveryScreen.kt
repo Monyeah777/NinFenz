@@ -1362,6 +1362,10 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                             if (slot.minChars != null && clean.length < slot.minChars) add(context.resources.getQuantityString(dev.ninfenz.mobile.R.plurals.slot_min_chars, slot.minChars, slot.minChars))
                             slot.startsWith?.let { if (!clean.startsWith(it)) add(context.getString(dev.ninfenz.mobile.R.string.slot_prefix, it)) }
                             slot.endsWith?.let { if (!clean.endsWith(it)) add(context.getString(dev.ninfenz.mobile.R.string.slot_suffix, it)) }
+                            slot.pattern?.let { p ->
+                                val matches = runCatching { Regex(p).matches(clean) }.getOrDefault(false)
+                                if (!matches) add(context.getString(dev.ninfenz.mobile.R.string.slot_pattern, p))
+                            }
                         }
                         TextButton(
                             enabled = issues.isEmpty(),
