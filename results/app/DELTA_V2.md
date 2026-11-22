@@ -56,7 +56,7 @@
 
 - `FeaturePolicy` 规则表：Free 能力、Pro 能力、CCOS 能力；按 tier 判定。
 - `FeatureGate` 委托规则；默认 Free，Free 永远放行，未知能力默认 Free。
-- 5 条 Kotlin 单测；JVM 495。
+- 5 条 Kotlin 单测；JVM 496。
 - `FeatureGate.setTierForDebug`：调试构建可在 Settings「功能层级」切 Free/Pro/CCOS。
 - 发布构建只显示层级与规则数，不含购买/授权入口；默认 Free。
 - **未**接计费/真实 entitlement。
@@ -105,7 +105,7 @@
 - 预览块编辑器对短段落/引用给「这像主题句，要变成槽位吗？」提示。
 - 可「形式化」进入现有槽位分配，或「忽略」。
 - 新增 `FormalizationSuggester`：按槽位名/标题/正文的字符与词重叠给候选，可在块内直接「填入」。
-- 仍是本地关键词/标题启发式，不是语义模型；导出不要求先形式化。
+- 叠加 spec 槽位 examples 的字符重叠；仍是本地关键词/标题/示例启发式，不是语义模型。
 
 ## M1 Flash Fill（P0 原型）
 

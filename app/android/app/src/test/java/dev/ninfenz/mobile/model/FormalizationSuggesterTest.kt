@@ -29,6 +29,16 @@ class FormalizationSuggesterTest {
     }
 
     @Test
+    fun exampleTextAddsScore() {
+        val result = FormalizationSuggester.suggest(
+            "读者是第一次接触这个主题。",
+            null,
+            listOf(SpecSlot("SLT-02", "受众", "s", "text", true, examples = listOf("读者是第一次接触")))
+        )
+        assertEquals("SLT-02", result?.slotId)
+    }
+
+    @Test
     fun takenSlotSkipped() {
         val slots = listOf(slot("SLT-01", "主题句"), slot("SLT-02", "读者设定"))
         val result = FormalizationSuggester.suggest("读者设定如下", null, slots, setOf("SLT-02"))

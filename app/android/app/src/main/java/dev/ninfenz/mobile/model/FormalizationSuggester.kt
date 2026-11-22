@@ -44,6 +44,11 @@ object FormalizationSuggester {
                 score += 3
                 reasons += "标题相关"
             }
+            val exampleOverlap = slot.examples.maxOfOrNull { overlap(body, it) } ?: 0
+            if (exampleOverlap > 0) {
+                score += minOf(exampleOverlap, 2) * 2
+                reasons += "示例相关"
+            }
             if (slot.required) score += 1
             if (score >= 3) {
                 val current = Suggestion(slot.id, slot.name, score, reasons.joinToString("；"))
