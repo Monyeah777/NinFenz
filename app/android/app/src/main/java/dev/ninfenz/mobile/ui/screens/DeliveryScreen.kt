@@ -1268,6 +1268,11 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                     Text(stringResource(dev.ninfenz.mobile.R.string.preview_copy))
                                 }
                                 TextButton(onClick = {
+                                    val safe = dev.ninfenz.mobile.data.ShareRedactor.redact(md)
+                                    val intent = ShareExporter.shareMarkdown(context, "nf-redacted", safe)
+                                    ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.preview_share_redacted))
+                                }) { Text(stringResource(dev.ninfenz.mobile.R.string.preview_share_redacted)) }
+                                TextButton(onClick = {
                                     val saved = runCatching { sampleStore.save("delivery-" + project.id, md) }.getOrNull()
                                     android.widget.Toast.makeText(
                                         context,

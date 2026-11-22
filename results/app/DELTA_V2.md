@@ -39,6 +39,11 @@
 - 合并结果可展开块列表、删除单块；删除后保存/分享。
 - 块可上下移动/删除；跨章节拖拽仍 OPEN。
 
+## M25 Capability-Scoped Sharing（P0 部分）
+
+- `ShareRedactor`：分享前移除 HTML 注释与 source/来源 行。
+- 交付台「脱敏分享」按钮；不是权限/期限控制。
+
 ## M35 Content Contract（P0 部分）
 
 - 交付台验收清单：L1 通过 / 必填槽位已填 / 至少一次导出。
