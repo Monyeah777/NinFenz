@@ -1744,9 +1744,9 @@ private fun PreservationExportButton(
             scope.launch {
                 try {
                     val outDir = File(File(context.filesDir, "exports"), "delivery").apply { mkdirs() }
-                    val created = dev.ninfenz.mobile.data.PreservationExporter.export(md, project.title, project.id, outDir)
+                    val created = dev.ninfenz.mobile.data.PreservationExporter.export(md, project.title, project.id, outDir, dev.ninfenz.mobile.data.ContractStore(context.filesDir).raw(project.id))
                     val reproDir = File(context.cacheDir, "repro-preserve").apply { deleteRecursively(); mkdirs() }
-                    val second = dev.ninfenz.mobile.data.PreservationExporter.export(md, project.title, project.id, reproDir)
+                    val second = dev.ninfenz.mobile.data.PreservationExporter.export(md, project.title, project.id, reproDir, dev.ninfenz.mobile.data.ContractStore(context.filesDir).raw(project.id))
                     val report = dev.ninfenz.mobile.data.ReproChecker.check(created.file, second.file)
                     reproDir.deleteRecursively()
                     onDone(created.file, report)

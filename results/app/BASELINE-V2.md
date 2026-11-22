@@ -41,11 +41,11 @@
 
 | 产物 | 大小 | sha256 | 备注 |
 |---|---|---|---|
-| debug APK | 51,548,013 B | `de0724fc…` | 双 ABI |
-| release unsigned | 44,540,010 B | `11d2d24c…` | `zipalign -c -P 16` 通过 |
+| debug APK | 52,585,059 B | `c982ad9e…` | 双 ABI |
+| release unsigned | 44,540,010 B | `dfdc3ca8…` | `zipalign -c -P 16` 通过 |
 | lintRelease | pass | 0 errors / 0 warnings |
 | Release manifest | pass | 0.2.0；minSdk 26 / target 36；无 debuggable |
-| debug-signed APK | 44,603,557 B | `4836df65…` | 仅内部安装；证书 CN=Android Debug |
+| debug-signed APK | 44,603,557 B | `657698d8…` | 仅内部安装；证书 CN=Android Debug |
 | release AAB unsigned | 28,372,870 B | `e2c1ce56…` | `jarsigner -verify` 未签名；AAB 16KB 未用 bundletool 复核 |
 
 发布签名/公证/Play 材料仍无输入。

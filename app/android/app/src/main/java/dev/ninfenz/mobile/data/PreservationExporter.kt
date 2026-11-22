@@ -16,12 +16,13 @@ object PreservationExporter {
     private fun sha(bytes: ByteArray): String =
         MessageDigest.getInstance("SHA-256").digest(bytes).joinToString("") { "%02x".format(it) }
 
-    fun export(markdown: String, title: String, projectId: String, outDir: File): Created {
+    fun export(markdown: String, title: String, projectId: String, outDir: File, contractJson: String? = null): Created {
         val safe = projectId.replace(Regex("[^A-Za-z0-9._-]"), "_").ifBlank { "project" }
         outDir.mkdirs()
         val file = File(outDir, safe + ".preserve.zip")
         val md = markdown.toByteArray(Charsets.UTF_8)
         val doc = NfDocModel.toJson(NfDocModel.fromMarkdown(title, projectId, markdown)).toString().toByteArray(Charsets.UTF_8)
+        val contract = contractJson?.toByteArray(Charsets.UTF_8)
         val manifest = buildJsonObject {
             put("schema", "nf-preservation/1")
             put("project_id", projectId)
@@ -29,10 +30,11 @@ object PreservationExporter {
             putJsonArray("files") {
                 add(buildJsonObject { put("path", "document.md"); put("sha256", sha(md)); put("bytes", md.size) })
                 add(buildJsonObject { put("path", "document.nfdoc.json"); put("sha256", sha(doc)); put("bytes", doc.size) })
+                contract?.let { add(buildJsonObject { put("path", "contract.json"); put("sha256", sha(it)); put("bytes", it.size) }) }
             }
         }.toString().toByteArray(Charsets.UTF_8)
         ZipOutputStream(file.outputStream()).use { out ->
-            listOf("document.md" to md, "document.nfdoc.json" to doc, "preservation.json" to manifest).forEach { (name, bytes) ->
+            (listOf("document.md" to md, "document.nfdoc.json" to doc) + listOfNotNull(contract?.let { "contract.json" to it }) + listOf("preservation.json" to manifest)).forEach { (name, bytes) ->
                 out.putNextEntry(ZipEntry(name).apply { time = 0L })
                 out.write(bytes)
                 out.closeEntry()

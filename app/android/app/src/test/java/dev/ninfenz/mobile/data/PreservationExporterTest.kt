@@ -11,8 +11,9 @@ class PreservationExporterTest {
     @Test
     fun bundleHasManifestAndIsReproducible() {
         val dir = Files.createTempDirectory("preserve").toFile()
-        val a = PreservationExporter.export("# 标题\n\n正文", "标题", "p1", dir)
-        val b = PreservationExporter.export("# 标题\n\n正文", "标题", "p1", File(dir, "b").apply { mkdirs() })
+        val contract = "{\"schema\":\"nf-contract-signoff/1\"}"
+        val a = PreservationExporter.export("# 标题\n\n正文", "标题", "p1", dir, contract)
+        val b = PreservationExporter.export("# 标题\n\n正文", "标题", "p1", File(dir, "b").apply { mkdirs() }, contract)
         assertTrue(a.file.isFile)
         assertTrue(a.file.readBytes().contentEquals(b.file.readBytes()))
         ZipFile(a.file).use { zip ->
@@ -20,6 +21,7 @@ class PreservationExporterTest {
             assertTrue(manifest.contains("nf-preservation/1"))
             assertTrue(manifest.contains("document.md"))
             assertTrue(manifest.contains("document.nfdoc.json"))
+            assertTrue(manifest.contains("contract.json"))
         }
     }
 }

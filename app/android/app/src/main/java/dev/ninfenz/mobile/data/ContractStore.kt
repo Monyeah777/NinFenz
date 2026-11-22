@@ -18,6 +18,8 @@ class ContractStore(private val filesDir: File) {
         return File(File(filesDir, "contracts").apply { mkdirs() }, safe + ".json")
     }
 
+    fun raw(projectId: String): String? = file(projectId).takeIf { it.isFile }?.readText(Charsets.UTF_8)
+
     fun load(projectId: String): Signoff? {
         val f = file(projectId)
         if (!f.isFile) return null
