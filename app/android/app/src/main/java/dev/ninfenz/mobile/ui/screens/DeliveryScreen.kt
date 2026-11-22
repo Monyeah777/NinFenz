@@ -603,7 +603,11 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(stringResource(dev.ninfenz.mobile.R.string.delivery_slot_batch_hint), style = MaterialTheme.typography.bodySmall)
+                            Text(
+                                stringResource(dev.ninfenz.mobile.R.string.delivery_slot_batch_hint),
+                                style = MaterialTheme.typography.bodySmall,
+                                modifier = Modifier.weight(1f)
+                            )
                             Row {
                                 TextButton(onClick = { showConstraintLens = true }) {
                                     Text(stringResource(dev.ninfenz.mobile.R.string.delivery_constraint_panel))
