@@ -1140,4 +1140,14 @@ MIT License · See app/docs/LEGAL.md</string>
         <item quantity="one">Constraint self-check: %d conflict</item>
         <item quantity="other">Constraint self-check: %d conflicts</item>
     </plurals>
+    <string name="delivery_constraint_panel">Constraints</string>
+    <string name="delivery_constraint_panel_title">Constraint panel</string>
+    <string name="delivery_constraint_ok">No issues</string>
+    <string name="delivery_constraint_issue_required">missing required</string>
+    <string name="delivery_constraint_issue_min">below min</string>
+    <string name="delivery_constraint_issue_max">above max</string>
+    <string name="delivery_constraint_issue_prefix">missing prefix</string>
+    <string name="delivery_constraint_issue_suffix">missing suffix</string>
+    <string name="delivery_constraint_issue_pattern">pattern mismatch</string>
+    <string name="delivery_constraint_value">current: %1$s</string>
 </resources>

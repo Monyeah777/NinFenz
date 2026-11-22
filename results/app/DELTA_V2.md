@@ -56,7 +56,7 @@
 
 - `FeaturePolicy` 规则表：Free 能力、Pro 能力、CCOS 能力；按 tier 判定。
 - `FeatureGate` 委托规则；默认 Free，Free 永远放行，未知能力默认 Free。
-- 5 条 Kotlin 单测；JVM 476。
+- 5 条 Kotlin 单测；JVM 479。
 - **未**接购买/授权/Pro/CCOS UI；无计费。
 
 ## M25 Capability-Scoped Sharing（P0 原型）
@@ -86,7 +86,8 @@
 
 - 槽位分配时显示当前字数/maxChars；超长/必填/最小字数/前后缀/pattern 不满足则标红并禁用。
 - 分配前按 kind 清洗并截到 maxChars。
-- 未做就地编辑/约束面板联动。
+- 新增「约束面板」：逐槽位显示当前值、必填/可选、长度、前后缀、pattern 与问题列表。
+- 面板只读；就地编辑仍走槽位输入框/约束守卫。
 
 ## M2 Progressive Formalization（P0 部分）
 

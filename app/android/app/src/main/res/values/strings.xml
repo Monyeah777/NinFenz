@@ -1136,4 +1136,14 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
         <item quantity="one">约束自检：%d 组冲突</item>
         <item quantity="other">约束自检：%d 组冲突</item>
     </plurals>
+    <string name="delivery_constraint_panel">约束面板</string>
+    <string name="delivery_constraint_panel_title">约束面板</string>
+    <string name="delivery_constraint_ok">无问题</string>
+    <string name="delivery_constraint_issue_required">缺必填</string>
+    <string name="delivery_constraint_issue_min">低于最小字数</string>
+    <string name="delivery_constraint_issue_max">超过最大字数</string>
+    <string name="delivery_constraint_issue_prefix">缺前缀</string>
+    <string name="delivery_constraint_issue_suffix">缺后缀</string>
+    <string name="delivery_constraint_issue_pattern">pattern 不匹配</string>
+    <string name="delivery_constraint_value">当前：%1$s</string>
 </resources>

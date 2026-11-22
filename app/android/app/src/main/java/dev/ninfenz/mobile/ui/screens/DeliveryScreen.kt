@@ -197,6 +197,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
     var oversizedSlots by remember { mutableStateOf<List<String>>(emptyList()) }
     var constraintViolations by remember { mutableStateOf<List<String>>(emptyList()) }
     var showDiscardPreview by remember { mutableStateOf(false) }
+    var showConstraintLens by remember { mutableStateOf(false) }
     var assignBlockText by remember { mutableStateOf<String?>(null) }
     var report by remember { mutableStateOf<ValidateReport?>(null) }
     var manifestText by remember { mutableStateOf<String?>(null) }
@@ -599,8 +600,13 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(stringResource(dev.ninfenz.mobile.R.string.delivery_slot_batch_hint), style = MaterialTheme.typography.bodySmall)
-                            TextButton(onClick = { batchPicker.launch(arrayOf("*/*")) }) {
-                                Text(stringResource(dev.ninfenz.mobile.R.string.delivery_slot_batch_import))
+                            Row {
+                                TextButton(onClick = { showConstraintLens = true }) {
+                                    Text(stringResource(dev.ninfenz.mobile.R.string.delivery_constraint_panel))
+                                }
+                                TextButton(onClick = { batchPicker.launch(arrayOf("*/*")) }) {
+                                    Text(stringResource(dev.ninfenz.mobile.R.string.delivery_slot_batch_import))
+                                }
                             }
                         }
                         batchNote?.let {
@@ -1371,6 +1377,67 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
             },
             dismissButton = {
                 TextButton(onClick = { showResetConfirm = false }) { Text(stringResource(android.R.string.cancel)) }
+            }
+        )
+    }
+
+    if (showConstraintLens) {
+        AlertDialog(
+            onDismissRequest = { showConstraintLens = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_constraint_panel_title)) },
+            text = {
+                Column(
+                    modifier = Modifier.heightIn(max = 520.dp).verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(NfSpacing.s)
+                ) {
+                    val views = dev.ninfenz.mobile.model.ConstraintLens.view(specMeta?.slots.orEmpty(), inputs)
+                    if (views.isEmpty()) {
+                        Text(stringResource(dev.ninfenz.mobile.R.string.delivery_no_slots), style = MaterialTheme.typography.bodySmall)
+                    }
+                    views.forEach { view ->
+                        Text(view.id + " · " + view.name, style = MaterialTheme.typography.titleSmall)
+                        Text(
+                            view.kind + " · " + stringResource(
+                                if (view.required) dev.ninfenz.mobile.R.string.delivery_slot_required else dev.ninfenz.mobile.R.string.delivery_slot_optional
+                            ),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        if (view.value.isNotBlank()) {
+                            Text(
+                                stringResource(dev.ninfenz.mobile.R.string.delivery_constraint_value, view.value.take(80)),
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+                        if (view.issues.isEmpty()) {
+                            Text(
+                                stringResource(dev.ninfenz.mobile.R.string.delivery_constraint_ok),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        } else {
+                            Text(
+                                view.issues.map { issue ->
+                                    when (issue) {
+                                        dev.ninfenz.mobile.model.ConstraintLens.Issue.REQUIRED -> stringResource(dev.ninfenz.mobile.R.string.delivery_constraint_issue_required)
+                                        dev.ninfenz.mobile.model.ConstraintLens.Issue.MIN -> stringResource(dev.ninfenz.mobile.R.string.delivery_constraint_issue_min)
+                                        dev.ninfenz.mobile.model.ConstraintLens.Issue.MAX -> stringResource(dev.ninfenz.mobile.R.string.delivery_constraint_issue_max)
+                                        dev.ninfenz.mobile.model.ConstraintLens.Issue.PREFIX -> stringResource(dev.ninfenz.mobile.R.string.delivery_constraint_issue_prefix)
+                                        dev.ninfenz.mobile.model.ConstraintLens.Issue.SUFFIX -> stringResource(dev.ninfenz.mobile.R.string.delivery_constraint_issue_suffix)
+                                        dev.ninfenz.mobile.model.ConstraintLens.Issue.PATTERN -> stringResource(dev.ninfenz.mobile.R.string.delivery_constraint_issue_pattern)
+                                    }
+                                }.joinToString("；"),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showConstraintLens = false }) {
+                    Text(stringResource(android.R.string.ok))
+                }
             }
         )
     }
