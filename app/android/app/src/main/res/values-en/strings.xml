@@ -1174,4 +1174,11 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="settings_tier_free">Free: all open</string>
     <string name="settings_tier_debug">Debug tier switch</string>
     <string name="settings_tier_release_note">Release has no purchase/entitlement entry; defaults to Free</string>
+    <string name="settings_chain_title">Archive migration chain</string>
+    <string name="settings_chain_desc">Verify next archive predecessor equals previous archive SHA-256</string>
+    <string name="settings_chain_first">Pick previous</string>
+    <string name="settings_chain_second">Pick next</string>
+    <string name="settings_chain_verify">Verify chain</string>
+    <string name="settings_chain_ok">Chain OK</string>
+    <string name="settings_chain_fail">Chain failed: %1$s</string>
 </resources>

@@ -19,6 +19,27 @@ object PreservationVerifier {
     private fun sha(bytes: ByteArray): String =
         MessageDigest.getInstance("SHA-256").digest(bytes).joinToString("") { "%02x".format(it) }
 
+    fun predecessor(file: File): String? = runCatching {
+        ZipFile(file).use { zip ->
+            val entry = zip.getEntry("preservation.json") ?: return null
+            Json.parseToJsonElement(zip.getInputStream(entry).readBytes().decodeToString())
+                .jsonObject["predecessor_sha256"]?.jsonPrimitive?.content
+        }
+    }.getOrNull()
+
+    /** 跨包迁移链：next 的 predecessor 必须等于 previous 的文件摘要。 */
+    fun chain(previous: File, next: File): Result {
+        val prev = verify(previous)
+        val nxt = verify(next)
+        val errors = (prev.errors + nxt.errors).toMutableList()
+        if (errors.isEmpty()) {
+            val prevSha = sha(previous.readBytes())
+            val declared = predecessor(next)
+            if (declared != prevSha) errors += "next predecessor 与 previous 摘要不符"
+        }
+        return Result(errors.isEmpty(), nxt.title, errors)
+    }
+
     fun extractMarkdown(file: File): String? = runCatching {
         ZipFile(file).use { zip ->
             val entry = zip.getEntry("document.md") ?: return null

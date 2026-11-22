@@ -78,6 +78,9 @@ fun SettingsScreen(
     var copied by remember { mutableStateOf(false) }
     var selfCheck by remember { mutableStateOf<dev.ninfenz.mobile.data.PropertyHarness.Report?>(null) }
     var tier by remember { mutableStateOf(FeatureGate.tier()) }
+    var chainFirst by remember { mutableStateOf<File?>(null) }
+    var chainSecond by remember { mutableStateOf<File?>(null) }
+    var chainNote by remember { mutableStateOf<String?>(null) }
     var stats by remember { mutableStateOf(StorageStats.scan(context.filesDir, context.cacheDir)) }
     var cleaned by remember { mutableStateOf<String?>(null) }
     var backupMessage by remember { mutableStateOf<String?>(null) }
@@ -91,6 +94,18 @@ fun SettingsScreen(
     var batchCandidates by remember { mutableStateOf<List<dev.ninfenz.mobile.data.ProjectEntry>?>(null) }
     var batchSelected by remember { mutableStateOf<Set<String>>(emptySet()) }
     val scope = rememberCoroutineScope()
+    val chainFirstPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+        if (uri != null) scope.launch {
+            chainFirst = withContext(Dispatchers.IO) { dev.ninfenz.mobile.data.FileAccess.copyToCache(context, uri, "chain-first.zip") }
+            chainNote = null
+        }
+    }
+    val chainSecondPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+        if (uri != null) scope.launch {
+            chainSecond = withContext(Dispatchers.IO) { dev.ninfenz.mobile.data.FileAccess.copyToCache(context, uri, "chain-second.zip") }
+            chainNote = null
+        }
+    }
     val restorePicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         if (uri == null) return@rememberLauncherForActivityResult
         scope.launch {
@@ -138,6 +153,42 @@ fun SettingsScreen(
             )
             OutlinedButton(onClick = onErrorCodes) {
                 Text(stringResource(dev.ninfenz.mobile.R.string.error_codes_title))
+            }
+        }
+
+        CardBox(title = stringResource(dev.ninfenz.mobile.R.string.settings_chain_title)) {
+            Text(
+                stringResource(dev.ninfenz.mobile.R.string.settings_chain_desc),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Row(horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(NfSpacing.s)) {
+                OutlinedButton(onClick = { chainFirstPicker.launch(arrayOf("application/zip", "application/octet-stream")) }) {
+                    Text(stringResource(dev.ninfenz.mobile.R.string.settings_chain_first))
+                }
+                OutlinedButton(onClick = { chainSecondPicker.launch(arrayOf("application/zip", "application/octet-stream")) }) {
+                    Text(stringResource(dev.ninfenz.mobile.R.string.settings_chain_second))
+                }
+            }
+            chainFirst?.let { Text(it.name, style = MaterialTheme.typography.bodySmall) }
+            chainSecond?.let { Text(it.name, style = MaterialTheme.typography.bodySmall) }
+            Button(
+                enabled = chainFirst != null && chainSecond != null,
+                onClick = {
+                    val previous = chainFirst ?: return@Button
+                    val next = chainSecond ?: return@Button
+                    scope.launch {
+                        val result = withContext(Dispatchers.IO) { dev.ninfenz.mobile.data.PreservationVerifier.chain(previous, next) }
+                        chainNote = if (result.ok) {
+                            context.getString(dev.ninfenz.mobile.R.string.settings_chain_ok)
+                        } else {
+                            context.getString(dev.ninfenz.mobile.R.string.settings_chain_fail, result.errors.take(2).joinToString("; "))
+                        }
+                    }
+                }
+            ) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_chain_verify)) }
+            chainNote?.let {
+                Text(it, style = MaterialTheme.typography.bodySmall, color = if (it == context.getString(dev.ninfenz.mobile.R.string.settings_chain_ok)) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error)
             }
         }
 

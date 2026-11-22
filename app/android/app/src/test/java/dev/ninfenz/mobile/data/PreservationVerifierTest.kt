@@ -22,6 +22,18 @@ class PreservationVerifierTest {
     }
 
     @Test
+    fun verifiesChain() {
+        val dir = Files.createTempDirectory("verify-chain").toFile()
+        val first = PreservationExporter.export("# 一\n\n甲", "一", "p1", dir)
+        val sha = java.security.MessageDigest.getInstance("SHA-256").digest(first.file.readBytes())
+            .joinToString("") { "%02x".format(it.toInt() and 0xff) }
+        val second = PreservationExporter.export("# 二\n\n乙", "二", "p1", dir, null, null, sha)
+        assertTrue(PreservationVerifier.chain(first.file, second.file).errors.toString(), PreservationVerifier.chain(first.file, second.file).ok)
+        val bad = PreservationExporter.export("# 三\n\n丙", "三", "p1", dir, null, null, "0".repeat(64))
+        assertFalse(PreservationVerifier.chain(first.file, bad.file).ok)
+    }
+
+    @Test
     fun rejectsTooManyEntries() {
         val dir = Files.createTempDirectory("verify-many").toFile()
         val bad = File(dir, "many.zip")

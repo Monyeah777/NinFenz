@@ -19,7 +19,6 @@ object PreservationExporter {
     fun export(markdown: String, title: String, projectId: String, outDir: File, contractJson: String? = null, grantJson: String? = null, predecessorSha256: String? = null): Created {
         val safe = projectId.replace(Regex("[^A-Za-z0-9._-]"), "_").ifBlank { "project" }
         outDir.mkdirs()
-        val file = File(outDir, safe + ".preserve.zip")
         val md = markdown.toByteArray(Charsets.UTF_8)
         val doc = NfDocModel.toJson(NfDocModel.fromMarkdown(title, projectId, markdown)).toString().toByteArray(Charsets.UTF_8)
         val contract = contractJson?.toByteArray(Charsets.UTF_8)
@@ -31,6 +30,8 @@ object PreservationExporter {
             add("grant.json" to grant)
             contract?.let { add("contract.json" to it) }
         }
+        val seed = md + doc + grant + (contract ?: ByteArray(0)) + (predecessorSha256?.toByteArray(Charsets.UTF_8) ?: ByteArray(0))
+        val file = File(outDir, safe + "-" + sha(seed).take(12) + ".preserve.zip")
 
         val oais = buildJsonObject {
             put("schema", "nf-oais/1")
@@ -54,6 +55,9 @@ object PreservationExporter {
                     put("type", "export")
                     put("detail", "local deterministic package")
                 })
+            }
+            predecessorSha256?.let {
+                put("lineage", buildJsonObject { put("predecessor_sha256", it) })
             }
         }.toString().toByteArray(Charsets.UTF_8)
 

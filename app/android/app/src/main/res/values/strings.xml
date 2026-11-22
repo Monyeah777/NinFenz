@@ -1170,4 +1170,11 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="settings_tier_free">Free：全部开放</string>
     <string name="settings_tier_debug">调试切换</string>
     <string name="settings_tier_release_note">发布版不含购买/授权入口；默认 Free</string>
+    <string name="settings_chain_title">归档迁移链</string>
+    <string name="settings_chain_desc">校验后包的 predecessor 是否等于前包 SHA-256</string>
+    <string name="settings_chain_first">选择前包</string>
+    <string name="settings_chain_second">选择后包</string>
+    <string name="settings_chain_verify">校验链</string>
+    <string name="settings_chain_ok">链通过</string>
+    <string name="settings_chain_fail">链失败：%1$s</string>
 </resources>
