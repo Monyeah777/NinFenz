@@ -4,7 +4,7 @@
 > **2026-11-17 深夜设备已断开，以下真机结果为断开前记录；新 UI 重构未真机验收**
 > **2026-11-17 真机已连接**：本轮新增安装/冷启动、WebView PDF、杀进程路由与槽位恢复、SQLite 迁移、CCOS 会话/预检、TalkBack 服务、横屏自适应实测（见第 6 节）；其余未跑项仍标 OPEN。
 > APK：0.2.0 / versionCode 2，minSdk 26 / target 36。本件只记实际跑过的项目；未跑项标 OPEN，不写成 pass。
-> **2026-11-23 Wi-Fi 真机复测**：通过 `adb mdns services` 找到 `10.76.202.254:5555`，`adb connect` 成功；安装当前签名 APK，冷启动 **379ms**。实测约束面板打开、槽位内联编辑写回；发现「约束面板/批量导入」按钮被挤成竖排，已修正 Row 权重。修复后的构建未再真机复跑。
+> **2026-11-23 Wi-Fi 真机复测**：通过 `adb mdns services` 找到 `10.76.202.254:5555`，`adb connect` 成功；安装当前签名 APK，冷启动 **379ms**。实测约束面板打开、槽位内联编辑写回；发现「约束面板/批量导入」按钮被挤成竖排，已修正 Row 权重。修复后重装最新 APK，冷启动 **298ms**，确认两个按钮恢复横排，槽位草稿仍回填。
 >
 > **2026-11-22 真机重新连接并实测**：OnePlus PLF110 / Android 16 / 1080×2392 / 480dpi，serial `3B65AR0183V00000`。debug 签名 APK 安装成功；冷启动 `am start -W` TotalTime 573ms（首装）/320ms（升级后）/188ms（force-stop 后）。首启引导、示例 Pack、演示项目、创作台、交付 graph-compile、必填槽位、assemble、L1 pass（error=0 warn=0 info=3）、导出 md、契约三项全绿、签收、SEND text/plain 分享导入预览均通过；logcat 无 FATAL/ANR。详见第 0 节。
 >
