@@ -68,6 +68,16 @@ object PreservationVerifier {
                     if (expectedBytes >= 0 && bytes.size.toLong() != expectedBytes) errors += path + " 字节数不符"
                     if (sha(bytes) != expectedSha) errors += path + " sha256 不符"
                 }
+                val grantEntry = zip.getEntry("grant.json")
+                if (grantEntry == null) {
+                    errors += "缺 grant.json"
+                } else if (grantEntry.size > 64 * 1024) {
+                    errors += "grant.json 过大"
+                } else {
+                    runCatching {
+                        CapabilityGrant.parse(Json.parseToJsonElement(zip.getInputStream(grantEntry).readBytes().decodeToString()).jsonObject)
+                    }.onFailure { errors += "grant.json 非法：" + (it.message ?: it.javaClass.simpleName) }
+                }
                 val oaisEntry = zip.getEntry("oais.json")
                 if (oaisEntry == null) {
                     errors += "缺 oais.json"
@@ -94,7 +104,7 @@ object PreservationVerifier {
                         }
                     }
                 }
-                listOf("document.md", "document.nfdoc.json", "oais.json").forEach { required ->
+                listOf("document.md", "document.nfdoc.json", "grant.json", "oais.json").forEach { required ->
                     if (zip.getEntry(required) == null) errors += "缺 " + required
                 }
             }

@@ -23,10 +23,12 @@ object PreservationExporter {
         val md = markdown.toByteArray(Charsets.UTF_8)
         val doc = NfDocModel.toJson(NfDocModel.fromMarkdown(title, projectId, markdown)).toString().toByteArray(Charsets.UTF_8)
         val contract = contractJson?.toByteArray(Charsets.UTF_8)
+        val grant = CapabilityGrant.defaultForPackage().toJson().toString().toByteArray(Charsets.UTF_8)
 
         val content = buildList {
             add("document.md" to md)
             add("document.nfdoc.json" to doc)
+            add("grant.json" to grant)
             contract?.let { add("contract.json" to it) }
         }
 

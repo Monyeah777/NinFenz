@@ -23,6 +23,9 @@ class PreservationExporterTest {
             assertTrue(manifest.contains("document.nfdoc.json"))
             assertTrue(manifest.contains("contract.json"))
             assertTrue(manifest.contains("oais.json"))
+            assertTrue(manifest.contains("grant.json"))
+            val grant = zip.getInputStream(zip.getEntry("grant.json")).readBytes().decodeToString()
+            assertTrue(grant.contains("nf-capability/1"))
             val oais = zip.getInputStream(zip.getEntry("oais.json")).readBytes().decodeToString()
             assertTrue(oais.contains("nf-oais/1"))
         }

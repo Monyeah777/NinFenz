@@ -14,7 +14,7 @@
 | 项目态创作台/交付台 | pass（工程面，含核心校验/导出） | 6ac657b52/86191976e；Delivery/Author 测试与构建 |
 | 作者覆盖保存/状态写回 | pass（工程面） | a14456833/902789796；Overlay/Status 测试 |
 | Pack 中心/CCOS/Pack zip 更新/卸载 | pass（工程面；卸载有项目引用保护） | 1dc695125/4d816f3c5/6c30f241e |
-| JVM 测试 | pass | 483/483（含 Robolectric/Compose/Paparazzi） |
+| JVM 测试 | pass | 487/487（含 Robolectric/Compose/Paparazzi） |
 | 自适应/9 组尺寸语义矩阵 | pass（语义层） | ShellNavigation/ShellSizeMatrix 测试 |
 | i18n/主题切换（全部屏主要文案） | pass | values-en + 资源化；我的支持 zh/en/system + 动态取色；系统 per-app locale 已声明并同步；UI 中文硬编码守卫通过（仅 CoreCall 无 Context 回退豁免） |
 | 像素截图矩阵 | pass（本机） | Paparazzi 10 张基线（360/700/900 × 640/800/900/1000），testDebugUnitTest verify |
@@ -22,7 +22,7 @@
 | 草稿→项目 | partial | 草稿可创建项目壳并把草稿 JSON 作为 authoring 来源副本；导入内容尚未映射进协议字段（OPEN-DRAFT-PROJECT 收窄） |
 | app/gates v0.02 UX 检查 | pass | 7/7 gate PASS、FAIL=0；GATES/SELF_AUDIT 已更新（本提交） |
 
-**收口实测（2026-11-17 更新）**：app/gates 7/7 PASS、FAIL=0；verify.sh --checks-only PASS=107 WARN=2 FAIL=0；JVM 483/483；APK 21,167,865 B sha256 71fda4d6…；Release unsigned 15,750,309 B sha256 0305439f…（16KB 对齐通过）。
+**收口实测（2026-11-17 更新）**：app/gates 7/7 PASS、FAIL=0；verify.sh --checks-only PASS=107 WARN=2 FAIL=0；JVM 487/487；APK 21,167,865 B sha256 eff67e3a…；Release unsigned 15,750,309 B sha256 c1e7bd86…（16KB 对齐通过）。
 
 **发布面：仍为 OPEN-EXTERNAL**（签名/公证/真机矩阵/Play 数据安全），不得据此宣称可发布。
 
