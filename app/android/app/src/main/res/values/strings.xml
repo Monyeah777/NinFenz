@@ -1129,4 +1129,6 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
         <item quantity="one">%d 个例外</item>
         <item quantity="other">%d 个例外</item>
     </plurals>
+    <string name="preview_suggest_slot">建议 → %1$s %2$s</string>
+    <string name="preview_suggest_apply">填入</string>
 </resources>

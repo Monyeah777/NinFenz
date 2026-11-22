@@ -1541,13 +1541,29 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                             minLines = 2
                         )
                         if (block.kind in setOf("paragraph", "quote") && block.text.isNotBlank() && block.text.length <= 80 && index !in ignoredHints) {
+                            val heading = previewBlocks.take(index).lastOrNull { it.kind == "heading" }?.text
+                            val suggestion = dev.ninfenz.mobile.model.FormalizationSuggester.suggest(
+                                block.text,
+                                heading,
+                                specMeta?.slots.orEmpty(),
+                                inputs.filterValues { it.isNotBlank() }.keys
+                            )
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
-                                    stringResource(dev.ninfenz.mobile.R.string.preview_formalize_hint),
+                                    if (suggestion != null) {
+                                        stringResource(dev.ninfenz.mobile.R.string.preview_suggest_slot, suggestion.slotId, suggestion.slotName)
+                                    } else {
+                                        stringResource(dev.ninfenz.mobile.R.string.preview_formalize_hint)
+                                    },
                                     style = MaterialTheme.typography.labelSmall,
                                     color = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.weight(1f)
                                 )
+                                if (suggestion != null) {
+                                    TextButton(onClick = { inputs = inputs + (suggestion.slotId to block.text) }) {
+                                        Text(stringResource(dev.ninfenz.mobile.R.string.preview_suggest_apply))
+                                    }
+                                }
                                 TextButton(onClick = { assignBlockText = block.text }) {
                                     Text(stringResource(dev.ninfenz.mobile.R.string.preview_formalize))
                                 }
