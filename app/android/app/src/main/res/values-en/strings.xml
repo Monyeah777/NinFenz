@@ -1104,4 +1104,7 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="preview_infer">Infer from edit</string>
     <string name="preview_infer_failed">Cannot infer a transform; edit exactly one block first</string>
     <string name="preview_infer_done">Applied: %1$s</string>
+    <string name="preview_save_transform">Save transform</string>
+    <string name="preview_transform_saved">Transform saved</string>
+    <string name="preview_apply_saved">Apply saved transform</string>
 </resources>

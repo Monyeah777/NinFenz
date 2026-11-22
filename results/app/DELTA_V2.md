@@ -50,6 +50,7 @@
 - 9 条 unittest；pytest wrapper 纳入全量。
 - 预览块编辑器新增「批量变换」：replace/加前缀/加后缀/截断 四种模式，可撤销/重做。
 - 「从本次修改推断」：只改一个块时合成前后缀/去前后缀/替换/截断，并批量应用。
+- 可「保存为变换」到项目；再次进入可「应用已保存变换」。
 - **未**进 Kotlin/Rust 推理引擎；UI 只覆盖 replace 一种白名单变换。
 
 ## M25 Capability-Scoped Sharing（P0 部分）

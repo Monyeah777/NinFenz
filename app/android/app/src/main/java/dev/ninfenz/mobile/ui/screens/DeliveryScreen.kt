@@ -179,6 +179,8 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
     var showResetConfirm by remember { mutableStateOf(false) }
     var previewBlocks by remember { mutableStateOf<List<MarkdownBlock>>(emptyList()) }
     var previewBaseline by remember { mutableStateOf<List<MarkdownBlock>>(emptyList()) }
+    var inferredTransform by remember { mutableStateOf<dev.ninfenz.mobile.model.FlashFillModel.Transform?>(null) }
+    var savedTransform by remember(project.id) { mutableStateOf(dev.ninfenz.mobile.data.TransformStore(context.filesDir).load(project.id)) }
     var previewHistory by remember { mutableStateOf<List<List<MarkdownBlock>>>(emptyList()) }
     var previewRedo by remember { mutableStateOf<List<List<MarkdownBlock>>>(emptyList()) }
     var previewDirty by remember { mutableStateOf(false) }
@@ -1479,9 +1481,25 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                 previewRedo = emptyList()
                                 previewBlocks = previewBlocks.map { it.copy(text = transform.apply(it.text)) }
                                 previewDirty = true
+                                inferredTransform = transform
                                 android.widget.Toast.makeText(context, context.getString(dev.ninfenz.mobile.R.string.preview_infer_done, transform.describe()), android.widget.Toast.LENGTH_SHORT).show()
                             }
                         }) { Text(stringResource(dev.ninfenz.mobile.R.string.preview_infer)) }
+                        inferredTransform?.let { t ->
+                            TextButton(onClick = {
+                                dev.ninfenz.mobile.data.TransformStore(context.filesDir).save(project.id, t)
+                                savedTransform = t
+                                android.widget.Toast.makeText(context, context.getString(dev.ninfenz.mobile.R.string.preview_transform_saved), android.widget.Toast.LENGTH_SHORT).show()
+                            }) { Text(stringResource(dev.ninfenz.mobile.R.string.preview_save_transform)) }
+                        }
+                        savedTransform?.let { t ->
+                            TextButton(onClick = {
+                                previewHistory = previewHistory + listOf(previewBlocks)
+                                previewRedo = emptyList()
+                                previewBlocks = previewBlocks.map { it.copy(text = t.apply(it.text)) }
+                                previewDirty = true
+                            }) { Text(stringResource(dev.ninfenz.mobile.R.string.preview_apply_saved)) }
+                        }
                     }
                     previewBlocks.forEachIndexed { index, block ->
                         Text(block.kind, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)

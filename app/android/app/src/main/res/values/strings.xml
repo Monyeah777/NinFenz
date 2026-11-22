@@ -1100,4 +1100,7 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="preview_infer">从本次修改推断</string>
     <string name="preview_infer_failed">无法推断；请只修改一个块</string>
     <string name="preview_infer_done">已应用：%1$s</string>
+    <string name="preview_save_transform">保存为变换</string>
+    <string name="preview_transform_saved">变换已保存</string>
+    <string name="preview_apply_saved">应用已保存变换</string>
 </resources>
