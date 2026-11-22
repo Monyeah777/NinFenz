@@ -1354,17 +1354,25 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
             text = {
                 Column(modifier = Modifier.heightIn(max = 360.dp).verticalScroll(rememberScrollState())) {
                     specMeta?.slots?.forEach { slot ->
-                        TextButton(onClick = {
-                            val clean = dev.ninfenz.mobile.model.SlotInput.sanitize(slot.kind, text).let { v ->
-                                slot.maxChars?.let { v.take(it) } ?: v
+                        val clean = dev.ninfenz.mobile.model.SlotInput.sanitize(slot.kind, text).let { v ->
+                            slot.maxChars?.let { v.take(it) } ?: v
+                        }
+                        val issues = buildList {
+                            if (slot.nonEmpty && clean.isBlank()) add(context.getString(dev.ninfenz.mobile.R.string.slot_required))
+                            if (slot.minChars != null && clean.length < slot.minChars) add(context.resources.getQuantityString(dev.ninfenz.mobile.R.plurals.slot_min_chars, slot.minChars, slot.minChars))
+                            slot.startsWith?.let { if (!clean.startsWith(it)) add(context.getString(dev.ninfenz.mobile.R.string.slot_prefix, it)) }
+                            slot.endsWith?.let { if (!clean.endsWith(it)) add(context.getString(dev.ninfenz.mobile.R.string.slot_suffix, it)) }
+                        }
+                        TextButton(
+                            enabled = issues.isEmpty(),
+                            onClick = {
+                                inputs = inputs + (slot.id to clean)
+                                assignBlockText = null
                             }
-                            inputs = inputs + (slot.id to clean)
-                            assignBlockText = null
-                        }) {
-                            val over = slot.maxChars?.let { text.length > it } == true
+                        ) {
                             Text(
-                                slot.id + " · " + slot.name + (slot.maxChars?.let { " · " + text.length + "/" + it } ?: ""),
-                                color = if (over) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
+                                slot.id + " · " + slot.name + (slot.maxChars?.let { " · " + text.length + "/" + it } ?: "") + (if (issues.isEmpty()) "" else " · " + issues.joinToString("；")),
+                                color = if (issues.isEmpty()) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.error
                             )
                         }
                     }

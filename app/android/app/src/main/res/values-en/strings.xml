@@ -1110,4 +1110,11 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="preview_formalize_hint">Looks like a key sentence; formalize as a slot?</string>
     <string name="preview_formalize">Formalize</string>
     <string name="preview_ignore">Ignore</string>
+    <string name="slot_required">required</string>
+    <string name="slot_prefix">prefix %1$s</string>
+    <string name="slot_suffix">suffix %1$s</string>
+    <plurals name="slot_min_chars">
+        <item quantity="one">min %1$d chars</item>
+        <item quantity="other">min %1$d chars</item>
+    </plurals>
 </resources>

@@ -1106,4 +1106,11 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="preview_formalize_hint">这像主题句，要变成槽位吗？</string>
     <string name="preview_formalize">形式化</string>
     <string name="preview_ignore">忽略</string>
+    <string name="slot_required">必填</string>
+    <string name="slot_prefix">需前缀 %1$s</string>
+    <string name="slot_suffix">需后缀 %1$s</string>
+    <plurals name="slot_min_chars">
+        <item quantity="one">至少 %1$d 字</item>
+        <item quantity="other">至少 %1$d 字</item>
+    </plurals>
 </resources>
