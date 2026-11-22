@@ -28,7 +28,7 @@
 | 面 | 结果 | 命令 |
 |---|---|---|
 | Rust core | **212 passed / 21 suites / 0 failed** | `cd app/core && cargo test -q` |
-| Python app | **520 passed / 1 warning / 0 failed** | `python -m pytest app/tests -q` |
+| Python app | **522 passed / 1 warning / 0 failed** | `python -m pytest app/tests -q` |
 | Android JVM | **449/449** | `:app:testDebugUnitTest` |
 | Desktop JVM | **20/20** | `cd app/desktop && ./gradlew test --rerun-tasks` |
 | TUI selftest | **9/9** | `python tui/nf.py --selftest` |

@@ -26,7 +26,7 @@
 
 - `BatchAssembler` 与 `ImportScreen` 的硬编码中文移入 `strings.xml` / `values-en`。
 - `python -m pytest app/tests/test_ui_strings_localized.py -q` → 1 passed。
-- 全量 `python -m pytest app/tests -q` → **520 passed**。
+- 全量 `python -m pytest app/tests -q` → **522 passed**。
 
 ## J6 nf-doc/1
 
@@ -43,6 +43,13 @@
 
 - 有序列表只认 `1. `/`1) `，不再把「2026 年…」误判为 list。
 - Kotlin + Rust 同步；各加一条回归测试。
+
+## M15 Property/Differential Testing（P0 原型）
+
+- `app/prototypes/property_test`：对 canonical 生成 100 个确定性值做 roundtrip/稳定性性质检查。
+- 覆盖浮点拒绝、键序无关、Unicode 码点保留。
+- 4 条 unittest；pytest wrapper 纳入全量。
+- **未**做跨实现差分/模型比较。
 
 ## M12 Constraint Satisfiability/MUS（P0 原型）
 
