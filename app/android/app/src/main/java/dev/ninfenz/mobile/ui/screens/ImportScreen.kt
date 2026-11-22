@@ -792,26 +792,36 @@ fun ImportScreen(
         }
     }
 
+    fun handlePreserve(file: File) {
+        val result = dev.ninfenz.mobile.data.PreservationVerifier.verify(file)
+        if (result.ok && result.grant?.allows(dev.ninfenz.mobile.data.CapabilityGrant.READ, System.currentTimeMillis()) == true) {
+            preserveNote = context.getString(dev.ninfenz.mobile.R.string.import_preserve_ok, result.title ?: file.name)
+            preservedMarkdown = dev.ninfenz.mobile.data.PreservationVerifier.extractMarkdown(file)
+            preserveGrant = result.grant
+            preservedName = (result.title ?: "restored").replace(Regex("[^A-Za-z0-9._-]"), "_") + ".md"
+        } else if (result.ok) {
+            preserveNote = context.getString(dev.ninfenz.mobile.R.string.import_preserve_no_read)
+            preservedMarkdown = null
+            preserveGrant = null
+        } else {
+            preserveNote = context.getString(dev.ninfenz.mobile.R.string.import_preserve_fail, result.errors.take(2).joinToString("; "))
+            preservedMarkdown = null
+            preserveGrant = null
+        }
+    }
+
+    val latestPreserve = remember {
+        File(File(context.filesDir, "exports"), "delivery")
+            .listFiles { f -> f.isFile && f.name.endsWith(".preserve.zip") }
+            ?.maxByOrNull { it.lastModified() }
+    }
+
     val preservePicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         if (uri == null) return@rememberLauncherForActivityResult
         scope.launch {
             try {
                 val file = FileAccess.copyToCache(context, uri, "preserve.zip")
-                val result = dev.ninfenz.mobile.data.PreservationVerifier.verify(file)
-                if (result.ok && result.grant?.allows(dev.ninfenz.mobile.data.CapabilityGrant.READ, System.currentTimeMillis()) == true) {
-                    preserveNote = context.getString(dev.ninfenz.mobile.R.string.import_preserve_ok, result.title ?: file.name)
-                    preservedMarkdown = dev.ninfenz.mobile.data.PreservationVerifier.extractMarkdown(file)
-                    preserveGrant = result.grant
-                    preservedName = (result.title ?: "restored").replace(Regex("[^A-Za-z0-9._-]"), "_") + ".md"
-                } else if (result.ok) {
-                    preserveNote = context.getString(dev.ninfenz.mobile.R.string.import_preserve_no_read)
-                    preservedMarkdown = null
-                    preserveGrant = null
-                } else {
-                    preserveNote = context.getString(dev.ninfenz.mobile.R.string.import_preserve_fail, result.errors.take(2).joinToString("; "))
-                    preservedMarkdown = null
-                    preserveGrant = null
-                }
+                handlePreserve(file)
                 file.delete()
             } catch (t: Throwable) {
                 preserveNote = context.getString(dev.ninfenz.mobile.R.string.import_preserve_fail, t.message ?: t.javaClass.simpleName)
@@ -891,6 +901,11 @@ fun ImportScreen(
                             OutlinedButton(onClick = { preservePicker.launch(arrayOf("application/zip", "application/octet-stream")) }, enabled = !busy) { Text(stringResource(dev.ninfenz.mobile.R.string.import_verify_preserve)) }
                             if (prefillNote != null) {
                                 Text(stringResource(dev.ninfenz.mobile.R.string.import_share_received), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
+                            }
+                        }
+                        latestPreserve?.let { archive ->
+                            OutlinedButton(onClick = { handlePreserve(archive) }, enabled = !busy) {
+                                Text(stringResource(dev.ninfenz.mobile.R.string.import_verify_latest))
                             }
                         }
                         if (prefillNote != null) {
