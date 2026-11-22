@@ -294,13 +294,15 @@ fun NfMobileApp(
         }
     }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(Unit) { refresh() }
+
+    // singleTop 再分享：观察 ShareHandoff.pending，而不是只在首次组合时消费。
+    LaunchedEffect(ShareHandoff.pending) {
         val pending = ShareHandoff.consume()
         if (pending != null) {
             sharedPrefill = pending
             shell = shell.open(Detail.Import)
         }
-        refresh()
     }
 
     // 示例载入且核心可用时，自动生成演示项目（失败不阻断，库页仍可手动新建）。

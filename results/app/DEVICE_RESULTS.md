@@ -4,7 +4,7 @@
 > **2026-11-17 深夜设备已断开，以下真机结果为断开前记录；新 UI 重构未真机验收**
 > **2026-11-17 真机已连接**：本轮新增安装/冷启动、WebView PDF、杀进程路由与槽位恢复、SQLite 迁移、CCOS 会话/预检、TalkBack 服务、横屏自适应实测（见第 6 节）；其余未跑项仍标 OPEN。
 > APK：0.2.0 / versionCode 2，minSdk 26 / target 36。本件只记实际跑过的项目；未跑项标 OPEN，不写成 pass。
-> **2026-11-23 Wi-Fi 真机复测（zero-slice 高覆盖）**：冷启动后分享 3 个 heading 的 Markdown，导入页显示「自动切片：覆盖 100%，例外 0 项」，逐条 `§0→主题句 100%`、`§1→读者设定 100%`、`§2→正文段落 100%`。说明 `zero-slice` op 与 spec 映射在真机均生效；继续到「草稿」步显示「已采纳 3/6」，确认高置信映射已自动采纳。另发现：导入页已在前台时再次分享，新的 payload 未替换当前内容；冷启动分享正常，属 singleTop 场景未复验/未修。
+> **2026-11-23 Wi-Fi 真机复测（zero-slice 高覆盖）**：冷启动后分享 3 个 heading 的 Markdown，导入页显示「自动切片：覆盖 100%，例外 0 项」，逐条 `§0→主题句 100%`、`§1→读者设定 100%`、`§2→正文段落 100%`。说明 `zero-slice` op 与 spec 映射在真机均生效；继续到「草稿」步显示「已采纳 3/6」，确认高置信映射已自动采纳。另发现：导入页已在前台时再次分享，新的 payload 未替换当前内容；冷启动分享正常。已把 `LaunchedEffect(Unit)` 改为观察 `ShareHandoff.pending`，代码层修复 singleTop 再分享；真机修复后未完成可判读的二次分享复验。
 >
 > **2026-11-23 Wi-Fi 真机复测（含核心 .so）**：分享 `hello` → 导入页自动切片从「未知 op zero-slice」变为「自动切片会话 覆盖 0% · 0 映射 · 4 例外」，不再报错。此前 Android 包内 `libnf_app_core.so` 仍是旧构建，未含 `zero-slice` op；已重交叉编译 arm64-v8a / x86_64（4,675,552 / 4,855,896 B，LOAD 0x4000），重装验证。
 >
@@ -243,7 +243,7 @@
 | 依赖升级 coroutines（JVM） | pass（本机）：coroutines 1.9.0→1.10.2，243 tests 全绿；lint warnings 3→2；debug APK 因未压缩 dex 增至 24.7MB。真机未复测（adb 无设备） |
 | Clean build（本轮） | pass（本机）：`gradlew clean` + `testDebugUnitTest --rerun-tasks` + assembleDebug；248/248 全绿；clean APK 19,032,264 B sha256 f4501bfe…；zipalign 16KB 通过。增量 APK 24.7MB 为旧构建膨胀，clean 产物为准。 |
 | Rust core 单测（本轮） | pass（本机）：`cargo test` 186 passed / 0 failed；Android 端无 core 改动。 |
-| Release 构建（构建） | pass（本机）：clean 后重建 `:app:assembleRelease` 成功；app-release-unsigned.apk 44,724,754 B sha256 bed8f87f…；zipalign 16KB 通过；apksigner 显示未签名（预期，签名 OPEN-EXTERNAL）。 |
+| Release 构建（构建） | pass（本机）：clean 后重建 `:app:assembleRelease` 成功；app-release-unsigned.apk 44,724,754 B sha256 53dd57f4…；zipalign 16KB 通过；apksigner 显示未签名（预期，签名 OPEN-EXTERNAL）。 |
 | 16KB 页对齐（构建） | pass（本机）：`zipalign -c -P 16 4 app-debug.apk` exit=0；未真机安装验证。 |
 | APP 门禁（round127） | pass（本机）：QA0–QA6 全 PASS，FAIL=0；covered=14 gap=0 open=2 p0=0；台账刷新到当前 HEAD。 |
 | APP 门禁（本轮） | pass（本机）：QA0–QA6 全部 PASS，FAIL=0；自审计 covered=14 gap=0 open=2 p0=0。 |
