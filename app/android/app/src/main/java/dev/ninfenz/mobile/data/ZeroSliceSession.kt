@@ -22,7 +22,8 @@ data class ZeroSliceException(val text: String, val target: String?, val reason:
 data class ZeroSliceReport(
     val mappings: List<ZeroSliceMapping>,
     val exceptions: List<ZeroSliceException>,
-    val coverage: Int
+    val coverage: Int,
+    val slotValues: Map<String, String> = emptyMap()
 )
 
 object ZeroSliceModel {
@@ -44,7 +45,8 @@ object ZeroSliceModel {
                 reason = e["reason"]?.jsonPrimitive?.content.orEmpty()
             )
         }.orEmpty(),
-        coverage = o["coverage"]?.jsonPrimitive?.content?.toIntOrNull() ?: 0
+        coverage = o["coverage"]?.jsonPrimitive?.content?.toIntOrNull() ?: 0,
+        slotValues = o["slot_values"]?.jsonObject?.mapValues { it.value.jsonPrimitive.content }.orEmpty()
     )
 
     fun toJson(report: ZeroSliceReport): JsonObject = buildJsonObject {
@@ -68,6 +70,7 @@ object ZeroSliceModel {
             }
         }
         put("coverage", report.coverage)
+        put("slot_values", buildJsonObject { report.slotValues.forEach { (k, v) -> put(k, v) } })
     }
 }
 
@@ -95,5 +98,26 @@ class ZeroSliceStore(private val filesDir: File) {
 
     fun clear() {
         file().delete()
+    }
+
+    private fun draftFile(draft: File): File =
+        File(draft.parentFile, draft.name.removeSuffix(".json") + ".zero-slice.json")
+
+    fun saveDraft(draft: File, report: ZeroSliceReport) {
+        val root = buildJsonObject {
+            put("source_digest", draft.name)
+            put("report", ZeroSliceModel.toJson(report))
+        }
+        AtomicFiles.writeText(draftFile(draft), root.toString())
+    }
+
+    fun loadDraft(draft: File): ZeroSliceReport? = read(draftFile(draft))
+
+    fun read(file: File): ZeroSliceReport? {
+        if (!file.isFile) return null
+        return runCatching {
+            val root = Json.parseToJsonElement(file.readText(Charsets.UTF_8)).jsonObject
+            ZeroSliceModel.parse(root["report"]?.jsonObject ?: return null)
+        }.getOrNull()
     }
 }

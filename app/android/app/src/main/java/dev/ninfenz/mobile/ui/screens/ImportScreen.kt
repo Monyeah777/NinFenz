@@ -587,9 +587,18 @@ fun ImportScreen(
             })
             val obj = response.resultObject()
             if (response.ok && obj != null) {
-                val report = dev.ninfenz.mobile.data.ZeroSliceModel.parse(obj)
-                zeroSlice = report
+                val parsedReport = dev.ninfenz.mobile.data.ZeroSliceModel.parse(obj)
                 val currentDoc = doc
+                val sections = currentDoc?.text?.let { MarkdownSlicer.slice(MarkdownBlocks.parse(it)) } ?: emptyList()
+                val report = parsedReport.copy(
+                    slotValues = parsedReport.mappings.mapNotNull { mapping ->
+                        sections.getOrNull(mapping.fromIndex)
+                            ?.blocks?.joinToString("\n\n") { it.text }
+                            ?.takeIf { it.isNotBlank() }
+                            ?.let { mapping.toId to it }
+                    }.toMap()
+                )
+                zeroSlice = report
                 if (currentDoc != null) {
                     val digest = currentDoc.source.sha256 ?: currentDoc.textDigest.orEmpty()
                     if (digest.isNotBlank()) zeroSliceStore.save(digest, report)
@@ -1247,6 +1256,7 @@ fun ImportScreen(
                                 val title = slices.firstOrNull { it.heading != null }?.heading ?: current.source.name
                                 val base = store.uniqueDraftBase(title)
                                 val file = store.saveDraft(base, raw.toString())
+                                zeroSlice?.let { zeroSliceStore.saveDraft(file, it) }
                                 val mappingJson = buildJsonObject {
                                     put("accepted", JsonArray(acceptedMappings.sorted().map { JsonPrimitive(it) }))
                                     put("unmapped", JsonArray(current.unmapped.map { JsonPrimitive(it) }))
@@ -1279,6 +1289,7 @@ fun ImportScreen(
                                 } else {
                                     val base = store.uniqueDraftBase(current.source.name)
                                     val file = store.saveDraft(base, raw.toString())
+                                zeroSlice?.let { zeroSliceStore.saveDraft(file, it) }
                                     val mappingJson = buildJsonObject {
                                         put("accepted", JsonArray(acceptedMappings.sorted().map { JsonPrimitive(it) }))
                                         put("unmapped", JsonArray(current.unmapped.map { JsonPrimitive(it) }))

@@ -284,8 +284,16 @@ private fun ProtocolAuthorContent(
             dev.ninfenz.mobile.data.ImportPrefill.fromJson(file.readText(Charsets.UTF_8))
         }.getOrDefault(emptyMap())
     }
-    val importPrefillByLabel = remember(importPrefill, artifacts.spec) {
-        dev.ninfenz.mobile.data.ImportPrefill.bySlotName(importPrefill, artifacts.spec.slots)
+    val zeroSlicePrefill = remember(project.id) {
+        runCatching {
+            val dir = java.io.File(java.io.File(java.io.File(context.filesDir, "projects"), project.id), "authoring")
+            val file = java.io.File(dir, "zero-slice.json")
+            dev.ninfenz.mobile.data.ZeroSliceStore(context.filesDir).read(file)?.slotValues ?: emptyMap()
+        }.getOrDefault(emptyMap())
+    }
+    val mergedPrefill = importPrefill + zeroSlicePrefill
+    val importPrefillByLabel = remember(mergedPrefill, artifacts.spec) {
+        dev.ninfenz.mobile.data.ImportPrefill.bySlotName(mergedPrefill, artifacts.spec.slots)
     }
     val templatePrefill = remember(project.id, artifacts.protocolJson) {
         runCatching {
@@ -309,7 +317,7 @@ private fun ProtocolAuthorContent(
     val draft = remember(project.id, artifacts.protocolJson) { draftStore.load(project.id) }
     var values by remember(artifacts.protocolJson) {
         mutableStateOf(protocol.fields.associate {
-            it.id to (draft?.values?.get(it.id) ?: importPrefill[it.id] ?: importPrefillByLabel[it.label] ?: templatePrefill[it.id] ?: it.defaultText ?: "")
+            it.id to (draft?.values?.get(it.id) ?: mergedPrefill[it.id] ?: importPrefillByLabel[it.label] ?: templatePrefill[it.id] ?: it.defaultText ?: "")
         })
     }
     var enabled by remember(artifacts.protocolJson) {
@@ -371,9 +379,9 @@ private fun ProtocolAuthorContent(
     }
 
     Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.m)) {
-        if (importPrefill.isNotEmpty()) {
+        if (mergedPrefill.isNotEmpty()) {
             Text(
-                pluralStringResource(dev.ninfenz.mobile.R.plurals.author_import_prefill, importPrefill.size, importPrefill.size),
+                pluralStringResource(dev.ninfenz.mobile.R.plurals.author_import_prefill, mergedPrefill.size, mergedPrefill.size),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(horizontal = NfSpacing.page)

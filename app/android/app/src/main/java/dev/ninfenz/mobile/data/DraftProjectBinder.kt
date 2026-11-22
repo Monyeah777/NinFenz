@@ -37,6 +37,10 @@ object DraftProjectBinder {
         val safe = draft.name.replace(Regex("[^A-Za-z0-9._-]"), "_")
         val target = File(dir, "import-" + safe)
         target.writeBytes(draft.readBytes())
+        val sidecar = File(draft.parentFile, draft.name.removeSuffix(".json") + ".zero-slice.json")
+        if (sidecar.isFile) {
+            File(dir, "zero-slice.json").writeBytes(sidecar.readBytes())
+        }
         return target
     }
 }

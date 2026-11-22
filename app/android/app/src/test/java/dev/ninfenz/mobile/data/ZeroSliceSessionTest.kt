@@ -25,6 +25,14 @@ class ZeroSliceSessionTest {
     }
 
     @Test
+    fun slotValuesRoundTrip() {
+        val report = ZeroSliceModel.parse(Json.parseToJsonElement(json).jsonObject)
+            .copy(slotValues = mapOf("SLT-01" to "主题正文"))
+        val parsed = ZeroSliceModel.parse(ZeroSliceModel.toJson(report))
+        assertEquals("主题正文", parsed.slotValues["SLT-01"])
+    }
+
+    @Test
     fun savesAndRestoresByDigest() {
         val dir = Files.createTempDirectory("zero-slice").toFile()
         val store = ZeroSliceStore(dir)
