@@ -4,7 +4,7 @@
 > **2026-11-17 深夜设备已断开，以下真机结果为断开前记录；新 UI 重构未真机验收**
 > **2026-11-17 真机已连接**：本轮新增安装/冷启动、WebView PDF、杀进程路由与槽位恢复、SQLite 迁移、CCOS 会话/预检、TalkBack 服务、横屏自适应实测（见第 6 节）；其余未跑项仍标 OPEN。
 > APK：0.2.0 / versionCode 2，minSdk 26 / target 36。本件只记实际跑过的项目；未跑项标 OPEN，不写成 pass。
-> **2026-11-23 02:38 zero-slice 建项目整链**：分享三 heading Markdown → 自动切片覆盖 100% → 点「用切片建项目」→ 进入创作台，显示「已从导入映射预填 6 个字段」，F-001 主题句已带入正文。说明 `ZeroSliceProjectDraft` + `DraftProjectBinder` + 创作台预填在真机跑通。补 DeliveryScreen 读取 `authoring/zero-slice.json` 后，交付页显示「必填已填 3/3」，SLT-01 为分享正文「读者第一次接触这个主题，需要一个清楚的入口。」。再修复空草稿遮蔽后，重开项目仍为 3/3，点 assemble 后出现「复现检查：两次导出一致」；validate L1 显示 **L1 pass（error=0 warn=0 info=3）**，并列出 3 条人工复核 info。
+> **2026-11-23 02:38 zero-slice 建项目整链**：分享三 heading Markdown → 自动切片覆盖 100% → 点「用切片建项目」→ 进入创作台，显示「已从导入映射预填 6 个字段」，F-001 主题句已带入正文。说明 `ZeroSliceProjectDraft` + `DraftProjectBinder` + 创作台预填在真机跑通。补 DeliveryScreen 读取 `authoring/zero-slice.json` 后，交付页显示「必填已填 3/3」，SLT-01 为分享正文「读者第一次接触这个主题，需要一个清楚的入口。」。再修复空草稿遮蔽后，重开项目仍为 3/3，点 assemble 后出现「复现检查：两次导出一致」；validate L1 显示 **L1 pass（error=0 warn=0 info=3）**，并列出 3 条人工复核 info。导出 md 成功：`result.md` 173 B，sha256 `b45422003a0d4ff6fd91688d92984016dc25924ea78f5c7755c96b3cb12b72d1`。点「签收」成功：签收时间 `2026-11-22T19:30:02.941716Z`，设备密钥指纹 `4408787f9108b2a9`。
 >
 > **2026-11-23 Wi-Fi 真机复测（zero-slice 高覆盖）**：冷启动后分享 3 个 heading 的 Markdown，导入页显示「自动切片：覆盖 100%，例外 0 项」，逐条 `§0→主题句 100%`、`§1→读者设定 100%`、`§2→正文段落 100%`。说明 `zero-slice` op 与 spec 映射在真机均生效；继续到「草稿」步显示「已采纳 3/6」，确认高置信映射已自动采纳。另发现：导入页已在前台时再次分享，新的 payload 未替换当前内容；冷启动分享正常。已把 `LaunchedEffect(Unit)` 改为观察 `ShareHandoff.pending`，并给 `ShareReceiverActivity` 补 `onNewIntent` 更新卡片；`ShareReceiverActivity` 改独立 taskAffinity 后，真机二次分享已触发「重复导入」对话框，说明新 payload 已被消费；接收卡片本身是否显示仍未单独判读。
 >
