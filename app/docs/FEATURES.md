@@ -1,6 +1,6 @@
 # Free / Pro / CCOS 分层
 
-> 依据 v2 增量补丁 §2/§3（D21–D24）。当前不写计费，`FeatureGate` 为空实现，默认 Free 全开。
+> 依据 v2 增量补丁 §2/§3（D21–D24）。当前不写计费；`FeaturePolicy` 是策略即代码的规则表，`FeatureGate` 默认 Free 全开，未接 Pro/CCOS 购买入口。
 
 ## Free 永不锁
 
@@ -20,7 +20,9 @@ API/Provider/Agent/工具/批量/调度、重 OCR/LLM/检索/核查、运行时�
 - 不强制云账号；
 - Pro 关闭后 Free 仍可用；
 - CCOS 关闭后本地仍工作；
-- `FeatureGate` 默认 `FREE`，`allows()` 全开；未来 Pro/CCOS 只加层，不回锁 Free。
+- `FeatureGate` 默认 `FREE`；Free 永远放行，Pro/CCOS 规则只在对应 tier 放行。
+- 未知能力默认 Free，避免误锁；已知 Pro/CCOS 能力默认锁定。
+- 目前没有购买/授权 UI，Pro/CCOS 仍不可达。
 
 ## 机制 backlog
 

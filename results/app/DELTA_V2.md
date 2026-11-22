@@ -52,6 +52,13 @@
 - 真机修复：验收「必填槽位已填」只应由 spec.required 槽位决定，不能把选填 SLT-04 算进去。
 - 仍未测：中文长文/完整输入法、PDF/EPUB/DOCX/HTML 导出、分享文件、杀进程恢复、TalkBack、横屏、AAB 上传签名。
 
+## M24 Policy-as-Code（P0 部分）
+
+- `FeaturePolicy` 规则表：Free 能力、Pro 能力、CCOS 能力；按 tier 判定。
+- `FeatureGate` 委托规则；默认 Free，Free 永远放行，未知能力默认 Free。
+- 5 条 Kotlin 单测；JVM 456。
+- **未**接购买/授权/Pro/CCOS UI；无计费。
+
 ## M25 Capability-Scoped Sharing（P0 原型）
 
 - `app/prototypes/capability`：read/comment/reassemble/export/share 与 admin。
