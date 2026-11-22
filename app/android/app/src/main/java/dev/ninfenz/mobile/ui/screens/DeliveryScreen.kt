@@ -1355,10 +1355,17 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                 Column(modifier = Modifier.heightIn(max = 360.dp).verticalScroll(rememberScrollState())) {
                     specMeta?.slots?.forEach { slot ->
                         TextButton(onClick = {
-                            inputs = inputs + (slot.id to text)
+                            val clean = dev.ninfenz.mobile.model.SlotInput.sanitize(slot.kind, text).let { v ->
+                                slot.maxChars?.let { v.take(it) } ?: v
+                            }
+                            inputs = inputs + (slot.id to clean)
                             assignBlockText = null
                         }) {
-                            Text(slot.id + " · " + slot.name)
+                            val over = slot.maxChars?.let { text.length > it } == true
+                            Text(
+                                slot.id + " · " + slot.name + (slot.maxChars?.let { " · " + text.length + "/" + it } ?: ""),
+                                color = if (over) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
+                            )
                         }
                     }
                 }

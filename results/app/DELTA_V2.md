@@ -44,6 +44,12 @@
 - 有序列表只认 `1. `/`1) `，不再把「2026 年…」误判为 list。
 - Kotlin + Rust 同步；各加一条回归测试。
 
+## M6 Constraint Lens（P0 部分）
+
+- 槽位分配时显示当前字数/maxChars；超长标红。
+- 分配前按 kind 清洗并截到 maxChars。
+- 未做就地编辑/约束面板联动。
+
 ## M2 Progressive Formalization（P0 部分）
 
 - 预览块编辑器对短段落/引用给「这像主题句，要变成槽位吗？」提示。
