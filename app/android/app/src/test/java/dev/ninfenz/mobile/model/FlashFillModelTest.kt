@@ -6,6 +6,12 @@ import org.junit.Test
 
 class FlashFillModelTest {
     @Test
+    fun infersUpperAndTrim() {
+        assertEquals("upper", FlashFillModel.infer("Hello", "HELLO")?.kind)
+        assertEquals("trim", FlashFillModel.infer("  Hi  ", "Hi")?.kind)
+    }
+
+    @Test
     fun suffix() {
         assertEquals(FlashFillModel.Transform("suffix", "！"), FlashFillModel.infer("标题", "标题！"))
     }

@@ -10,6 +10,10 @@ object FlashFillModel {
             "strip_suffix" -> if (a.isNotEmpty() && text.endsWith(a)) text.removeSuffix(a) else text
             "replace" -> if (a.isNotEmpty()) text.replace(a, b) else text
             "truncate" -> a.toIntOrNull()?.let { text.take(it) } ?: text
+            "lower" -> text.lowercase()
+            "upper" -> text.uppercase()
+            "trim" -> text.trim()
+            "collapse" -> text.replace(Regex("\\s+"), " ").trim()
             else -> text
         }
 
@@ -20,6 +24,10 @@ object FlashFillModel {
             "strip_suffix" -> "去后缀「" + a + "」"
             "replace" -> "把「" + a + "」替换为「" + b + "」"
             "truncate" -> "截断到 " + a + " 字"
+            "lower" -> "转小写"
+            "upper" -> "转大写"
+            "trim" -> "去首尾空白"
+            "collapse" -> "空白折叠为单空格"
             else -> kind
         }
     }
@@ -54,6 +62,10 @@ object FlashFillModel {
     }
 
     private fun candidates(before: String, after: String): List<Transform> = buildList {
+        if (after != before && after == before.lowercase()) add(Transform("lower"))
+        if (after != before && after == before.uppercase()) add(Transform("upper"))
+        if (after != before && after == before.trim()) add(Transform("trim"))
+        if (after != before && after == before.replace(Regex("\\s+"), " ").trim()) add(Transform("collapse"))
         if (after.startsWith(before) && after.length > before.length) {
             val s = after.removePrefix(before)
             if (s.isNotEmpty()) add(Transform("suffix", s))

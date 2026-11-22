@@ -56,7 +56,7 @@
 
 - `FeaturePolicy` 规则表：Free 能力、Pro 能力、CCOS 能力；按 tier 判定。
 - `FeatureGate` 委托规则；默认 Free，Free 永远放行，未知能力默认 Free。
-- 5 条 Kotlin 单测；JVM 500。
+- 5 条 Kotlin 单测；JVM 502。
 - `FeatureGate.setTierForDebug`：调试构建可在 Settings「功能层级」切 Free/Pro/CCOS。
 - 发布构建只显示层级与规则数，不含购买/授权入口；默认 Free。
 - **未**接计费/真实 entitlement。
@@ -112,6 +112,7 @@
 - `app/prototypes/flash_fill/flash_fill.py`：前缀/后缀/去前缀/去后缀/替换/截断白名单。
 - 9 条 unittest；pytest wrapper 纳入全量。
 - 预览块编辑器新增「批量变换」：replace/加前缀/加后缀/截断 四种模式，可撤销/重做。
+- 推断白名单新增：转小写、转大写、去首尾空白、空白折叠为单空格。
 - 「从本次修改推断」：只改一个块时合成前后缀/去前后缀/替换/截断，并批量应用。
 - 可「保存为变换」到项目；再次进入可「应用已保存变换」。
 - 多例推断：同一变换必须解释多个 before→after；块编辑器可一次处理多个已改块。
