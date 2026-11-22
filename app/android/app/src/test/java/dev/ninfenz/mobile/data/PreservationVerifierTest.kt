@@ -21,6 +21,20 @@ class PreservationVerifierTest {
     }
 
     @Test
+    fun rejectsTooManyEntries() {
+        val dir = Files.createTempDirectory("verify-many").toFile()
+        val bad = File(dir, "many.zip")
+        ZipOutputStream(bad.outputStream()).use { out ->
+            repeat(40) { i ->
+                out.putNextEntry(ZipEntry("f" + i).apply { time = 0L })
+                out.write("x".toByteArray())
+                out.closeEntry()
+            }
+        }
+        assertFalse(PreservationVerifier.verify(bad).ok)
+    }
+
+    @Test
     fun rejectsTamperedDocument() {
         val dir = Files.createTempDirectory("verify-bad").toFile()
         val created = PreservationExporter.export("# 标题\n\n正文", "标题", "p1", dir)

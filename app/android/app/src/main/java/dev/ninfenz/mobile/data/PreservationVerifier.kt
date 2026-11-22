@@ -10,6 +10,10 @@ import kotlinx.serialization.json.jsonPrimitive
 
 /** 复核 preservation.zip 的三个条目、字节数与 sha256；不修改文件。 */
 object PreservationVerifier {
+    private const val MAX_ENTRIES = 32
+    private const val MAX_ENTRY_BYTES = 20L * 1024 * 1024
+    private const val MAX_TOTAL_BYTES = 40L * 1024 * 1024
+
     data class Result(val ok: Boolean, val title: String?, val errors: List<String>)
 
     private fun sha(bytes: ByteArray): String =
@@ -17,7 +21,9 @@ object PreservationVerifier {
 
     fun extractMarkdown(file: File): String? = runCatching {
         ZipFile(file).use { zip ->
-            zip.getEntry("document.md")?.let { zip.getInputStream(it).readBytes().decodeToString() }
+            val entry = zip.getEntry("document.md") ?: return null
+            if (entry.size > MAX_ENTRY_BYTES) return null
+            zip.getInputStream(entry).readBytes().decodeToString()
         }
     }.getOrNull()
 
@@ -26,8 +32,11 @@ object PreservationVerifier {
         var title: String? = null
         try {
             ZipFile(file).use { zip ->
+                if (zip.size() > MAX_ENTRIES) return Result(false, null, listOf("zip 条目过多"))
+                var total = 0L
                 val manifestEntry = zip.getEntry("preservation.json")
                     ?: return Result(false, null, listOf("缺 preservation.json"))
+                if (manifestEntry.size > 1024 * 1024) return Result(false, null, listOf("preservation.json 过大"))
                 val manifest = Json.parseToJsonElement(zip.getInputStream(manifestEntry).readBytes().decodeToString()).jsonObject
                 if (manifest["schema"]?.jsonPrimitive?.content != "nf-preservation/1") {
                     errors += "未知 preservation schema"
@@ -43,6 +52,15 @@ object PreservationVerifier {
                     val entry = zip.getEntry(path)
                     if (entry == null) {
                         errors += "缺 " + path
+                        return@forEach
+                    }
+                    if (entry.size > MAX_ENTRY_BYTES) {
+                        errors += path + " 过大"
+                        return@forEach
+                    }
+                    total += entry.size
+                    if (total > MAX_TOTAL_BYTES) {
+                        errors += "zip 解压总量过大"
                         return@forEach
                     }
                     val bytes = zip.getInputStream(entry).readBytes()
