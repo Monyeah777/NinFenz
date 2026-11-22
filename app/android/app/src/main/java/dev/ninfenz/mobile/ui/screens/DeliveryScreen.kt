@@ -1452,12 +1452,31 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
 
     if (showGrant) {
         var caps by remember(grant) { mutableStateOf(grant.caps) }
-        var days by remember(grant) { mutableIntStateOf(0) }
+        var days by remember(grant) {
+            val exp = grant.expiresAt
+            mutableIntStateOf(
+                when {
+                    exp == null -> 0
+                    exp - System.currentTimeMillis() <= 7L * 86_400_000L -> 7
+                    else -> 30
+                }
+            )
+        }
         AlertDialog(
             onDismissRequest = { showGrant = false },
             title = { Text(stringResource(dev.ninfenz.mobile.R.string.grant_title)) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                    Text(
+                        stringResource(
+                            dev.ninfenz.mobile.R.string.grant_current,
+                            grant.expiresAt?.let {
+                                stringResource(dev.ninfenz.mobile.R.string.grant_until, java.text.DateFormat.getDateInstance().format(java.util.Date(it)))
+                            } ?: stringResource(dev.ninfenz.mobile.R.string.grant_no_expiry)
+                        ),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                     Text(stringResource(dev.ninfenz.mobile.R.string.grant_caps), style = MaterialTheme.typography.titleSmall)
                     listOf(
                         dev.ninfenz.mobile.data.CapabilityGrant.READ to dev.ninfenz.mobile.R.string.grant_cap_read,

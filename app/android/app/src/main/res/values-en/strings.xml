@@ -1186,4 +1186,7 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="settings_upgrade_pick">Pick archive</string>
     <string name="settings_upgrade_done">Upgraded to %1$s</string>
     <string name="settings_upgrade_fail">Upgrade failed: %1$s</string>
+    <string name="grant_current">Current: %1$s</string>
+    <string name="grant_no_expiry">never expires</string>
+    <string name="grant_until">until %1$s</string>
 </resources>
