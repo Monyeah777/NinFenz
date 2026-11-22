@@ -18,9 +18,9 @@ python tui/nf.py --selftest                         # TUI（复用面）
 | # | 项 | 命令/证据 | 状态 |
 |---|---|---|---|
 | A1 | target 36 / compile 36 / minSdk 26 | `app/android/app/build.gradle.kts` | 见工程 |
-| A2 | 16KB page / ABI（arm64-v8a, x86_64） | `android { defaultConfig { ndk { abiFilters } } }` + `zipalign -c -P 16` 证据 | OPEN-TOOLCHAIN |
-| A3 | assembleDebug/Release | `bash app/scripts/build_android.sh release` | OPEN-TOOLCHAIN |
-| A4 | 签名（Play App Signing / upload key） | `keystore` 不入库；CI secret；本地流程：`NF_KEYSTORE=… NF_KEYSTORE_PASS=… NF_KEY_ALIAS=… NF_KEY_PASS=… bash app/scripts/sign_release.sh` | OPEN-EXTERNAL（流程脚本已自测，生产 key 未提供） |
+| A2 | 16KB page / ABI（arm64-v8a, x86_64） | `zipalign -c -P 16 4` exit 0；ELF LOAD 0x4000（两 ABI） | **pass（APK）**；AAB 未 bundletool 复核 |
+| A3 | assembleDebug/Release | `:app:assembleDebug` / `:app:assembleRelease` 成功；AAB 28,457,858 B | **pass** |
+| A4 | 签名（Play App Signing / upload key） | `keystore` 不入库；CI secret；本地流程：`NF_KEYSTORE=… NF_KEYSTORE_PASS=… NF_KEY_ALIAS=… NF_KEY_PASS=… bash app/scripts/sign_release.sh` | **OPEN-EXTERNAL**（仅 debug keystore 自测，生产 upload key 未提供） |
 | A5 | 数据安全表单 | Play Console 提交材料 | OPEN-EXTERNAL |
 | A6 | 分层发布（staged rollout） | Play Console 截图/记录 | OPEN-EXTERNAL |
 | A7 | 中国渠道 flavor（无 GMS） | `productFlavors { cn }` | OPEN-TOOLCHAIN |

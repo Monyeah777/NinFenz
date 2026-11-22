@@ -1,5 +1,7 @@
 # NF APP 设备与平台矩阵（Android / Windows / macOS）
 
+> **2026-11-22 状态更正**：Android SDK/Gradle/真机均已就绪；下表“SDK 不在场/无真机”等是 2026-11-15 历史快照，不再代表当前环境。当前真机证据以 `results/app/DEVICE_RESULTS.md` 为准；M-01 已在 OnePlus PLF110 / Android 16 实测，M-02 模拟器仍未跑，M-03 APK 16KB 已过、AAB 未用 bundletool 复核。
+
 > ⛔ 操作指令：本件是设备覆盖与**证据状态**登记表。每格只有两种写法：**本机可实测**（附命令与产物路径）或 **OPEN + owner + 下一步**。禁止把「计划支持」写成「已验证支持」；无真机/无 SDK 的平台一律 `OPEN-TOOLCHAIN` / `OPEN-EXTERNAL`。改本件必须同步 `app/scripts/RELEASE_CHECKLIST.md`（发布判据）与 `app/docs/PERF_BUDGET.md`（性能口径）。
 > 状态：v1（2026-11-15）· 性质：设备/平台覆盖登记 · 取证时刻：2026-11-15 16:1x（本机实测，见 §0）。
 > 依据：`app/docs/CONTRACT.md`（格式/安全/隐私）、ADR-APP-009（16KB/target36/ABI 进 CI）、ADR-APP-010（Apple Silicon 优先）、`app/scripts/RELEASE_CHECKLIST.md`；基线环境见 `results/app/BASELINE.md` §2.1。
