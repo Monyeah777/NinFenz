@@ -351,6 +351,9 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
             format == "epub" -> EpubValidator.inspect(file).let { ExportVerifier.Result(it.ok, it.message) }
             format == "pdf" -> PdfValidator.inspect(file).let { ExportVerifier.Result(it.ok, it.message) }
             format == "html" -> HtmlValidator.inspect(file).let { ExportVerifier.Result(it.ok, it.message) }
+            format == "preserve" -> dev.ninfenz.mobile.data.PreservationVerifier.verify(file).let {
+                ExportVerifier.Result(it.ok, if (it.ok) "" else it.errors.firstOrNull() ?: "归档校验失败")
+            }
             else -> ExportVerifier.verify(file, manifest)
         }
         exportVerify = verdict

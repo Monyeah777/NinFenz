@@ -4,7 +4,9 @@
 > **2026-11-17 深夜设备已断开，以下真机结果为断开前记录；新 UI 重构未真机验收**
 > **2026-11-17 真机已连接**：本轮新增安装/冷启动、WebView PDF、杀进程路由与槽位恢复、SQLite 迁移、CCOS 会话/预检、TalkBack 服务、横屏自适应实测（见第 6 节）；其余未跑项仍标 OPEN。
 > APK：0.2.0 / versionCode 2，minSdk 26 / target 36。本件只记实际跑过的项目；未跑项标 OPEN，不写成 pass。
-> **2026-11-23 02:38 zero-slice 建项目整链**：分享三 heading Markdown → 自动切片覆盖 100% → 点「用切片建项目」→ 进入创作台，显示「已从导入映射预填 6 个字段」，F-001 主题句已带入正文。说明 `ZeroSliceProjectDraft` + `DraftProjectBinder` + 创作台预填在真机跑通。补 DeliveryScreen 读取 `authoring/zero-slice.json` 后，交付页显示「必填已填 3/3」，SLT-01 为分享正文「读者第一次接触这个主题，需要一个清楚的入口。」。再修复空草稿遮蔽后，重开项目仍为 3/3，点 assemble 后出现「复现检查：两次导出一致」；validate L1 显示 **L1 pass（error=0 warn=0 info=3）**，并列出 3 条人工复核 info。导出 md 成功：`result.md` 173 B，sha256 `b45422003a0d4ff6fd91688d92984016dc25924ea78f5c7755c96b3cb12b72d1`。点「签收」成功：签收时间 `2026-11-22T19:30:02.941716Z`，设备密钥指纹 `4408787f9108b2a9`。
+> **2026-11-23 02:38 zero-slice 建项目整链**：分享三 heading Markdown → 自动切片覆盖 100% → 点「用切片建项目」→ 进入创作台，显示「已从导入映射预填 6 个字段」，F-001 主题句已带入正文。说明 `ZeroSliceProjectDraft` + `DraftProjectBinder` + 创作台预填在真机跑通。补 DeliveryScreen 读取 `authoring/zero-slice.json` 后，交付页显示「必填已填 3/3」，SLT-01 为分享正文「读者第一次接触这个主题，需要一个清楚的入口。」。再修复空草稿遮蔽后，重开项目仍为 3/3，点 assemble 后出现「复现检查：两次导出一致」；validate L1 显示 **L1 pass（error=0 warn=0 info=3）**，并列出 3 条人工复核 info。preserve 入口拆行后真机可见；首次点击报「缺少导出 manifest」，已改为 `PreservationVerifier.verify`，待复验。
+
+> 导出 md 成功：`result.md` 173 B，sha256 `b45422003a0d4ff6fd91688d92984016dc25924ea78f5c7755c96b3cb12b72d1`。点「签收」成功：签收时间 `2026-11-22T19:30:02.941716Z`，设备密钥指纹 `4408787f9108b2a9`。
 >
 > **2026-11-23 Wi-Fi 真机复测（zero-slice 高覆盖）**：冷启动后分享 3 个 heading 的 Markdown，导入页显示「自动切片：覆盖 100%，例外 0 项」，逐条 `§0→主题句 100%`、`§1→读者设定 100%`、`§2→正文段落 100%`。说明 `zero-slice` op 与 spec 映射在真机均生效；继续到「草稿」步显示「已采纳 3/6」，确认高置信映射已自动采纳。另发现：导入页已在前台时再次分享，新的 payload 未替换当前内容；冷启动分享正常。已把 `LaunchedEffect(Unit)` 改为观察 `ShareHandoff.pending`，并给 `ShareReceiverActivity` 补 `onNewIntent` 更新卡片；`ShareReceiverActivity` 改独立 taskAffinity 后，真机二次分享已触发「重复导入」对话框，说明新 payload 已被消费；接收卡片本身是否显示仍未单独判读。
 >
@@ -245,7 +247,7 @@
 | 依赖升级 coroutines（JVM） | pass（本机）：coroutines 1.9.0→1.10.2，243 tests 全绿；lint warnings 3→2；debug APK 因未压缩 dex 增至 24.7MB。真机未复测（adb 无设备） |
 | Clean build（本轮） | pass（本机）：`gradlew clean` + `testDebugUnitTest --rerun-tasks` + assembleDebug；248/248 全绿；clean APK 19,032,264 B sha256 f4501bfe…；zipalign 16KB 通过。增量 APK 24.7MB 为旧构建膨胀，clean 产物为准。 |
 | Rust core 单测（本轮） | pass（本机）：`cargo test` 186 passed / 0 failed；Android 端无 core 改动。 |
-| Release 构建（构建） | pass（本机）：clean 后重建 `:app:assembleRelease` 成功；app-release-unsigned.apk 44,733,774 B sha256 2a555758…；zipalign 16KB 通过；apksigner 显示未签名（预期，签名 OPEN-EXTERNAL）。 |
+| Release 构建（构建） | pass（本机）：clean 后重建 `:app:assembleRelease` 成功；app-release-unsigned.apk 44,733,774 B sha256 10baa7f4…；zipalign 16KB 通过；apksigner 显示未签名（预期，签名 OPEN-EXTERNAL）。 |
 | 16KB 页对齐（构建） | pass（本机）：`zipalign -c -P 16 4 app-debug.apk` exit=0；未真机安装验证。 |
 | APP 门禁（round127） | pass（本机）：QA0–QA6 全 PASS，FAIL=0；covered=14 gap=0 open=2 p0=0；台账刷新到当前 HEAD。 |
 | APP 门禁（本轮） | pass（本机）：QA0–QA6 全部 PASS，FAIL=0；自审计 covered=14 gap=0 open=2 p0=0。 |
