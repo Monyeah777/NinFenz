@@ -26,7 +26,7 @@
 - bundleRelease（upload 签名）：**pass**；28,605,921 B；SHA-256 `494dbb03a957dd5120b8fe449175838b8020ec8c73627f613993378566dd02b3`；`jarsigner -verify` 通过
 - 签名材料：`<KEY_DIR>\nf-upload.jks`（仓库外，ACL 仅当前用户）；口令文件与 PEM 同目录，未入库
 - Play 配置：`app/android/fastlane/` + `app/android/play/README.md`；service account JSON 与 Play Console 应用未创建
-- 签名流程内部自测：`app/scripts/sign_release.sh` 以本机 debug keystore 跑通（仅验证流程，非生产签名）；`apksigner verify` 通过，证书 SHA-256 `8a52a549c3081795cecb0f1424d21684933fb21d3afe76506dab736e688b10fb`。
+- 签名流程内部自测：`app/scripts/sign_release.sh` 以本机 debug keystore 跑通（仅验证流程，非生产签名）；`apksigner verify` 通过，证书 SHA-256 `8a52a549c3081795cecb0f1424d21684933fb21d3afe76508dab736e688b10fb`。
 - 真机安装（2026-11-22）：OnePlus PLF110 / Android 16 / 1080×2392；`adb install -r` Success。冷启动 `am start -W` COLD 573ms（首装）/320ms（升级后）/188ms（force-stop 后）。
 - 真机闭环：示例 Pack → 演示项目 → 创作台 → graph-compile（steps 2 · slots 4）→ 必填 3/3 → assemble → L1 pass（error=0 warn=0 info=3）→ 导出 md → 契约三项全绿 → 签收（当版 hash 签收；ECDSA 版本仅 JVM 测试）；SEND text/plain 分享导入预览通过；logcat 无 FATAL/ANR。
 - 真机修复：契约「必填槽位已填」曾把选填 SLT-04 也当必填，导致 3/3 仍 ✗；改为按 spec slot.required 过滤后复测三项全绿。

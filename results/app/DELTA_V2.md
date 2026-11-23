@@ -56,7 +56,7 @@
 
 - `FeaturePolicy` 规则表：Free 能力、Pro 能力、CCOS 能力；按 tier 判定。
 - `FeatureGate` 委托规则；默认 Free，Free 永远放行，未知能力默认 Free。
-- 5 条 Kotlin 单测；JVM 506。
+- 5 条 Kotlin 单测；JVM 508。
 - `FeatureGate.setTierForDebug`：调试构建可在 Settings「功能层级」切 Free/Pro/CCOS。
 - 发布构建只显示层级与规则数，不含购买/授权入口；默认 Free。
 - **未**接计费/真实 entitlement。
@@ -182,11 +182,12 @@
 - 新增 `ProtocolSlotPrefill`：协议字段按同名/规范化名映射到 spec 槽位，交付页合并进预填并显示带入数量。
 - 文件选择器从 `*/*` 改为显式 markdown/text/csv/json/zip MIME。
 - Pack 回滚改为优先恢复更新前备份；无备份时禁用并说明，不再走缺 size 的反向 merge。
-- Android JVM 506 条；Rust zero_slice 15 条 + op 3 条。
+- Android JVM 508 条；Rust zero_slice 15 条 + op 3 条。
 - 搜索索引项目正文（authoring/import-* + zero-slice slots），命中显示片段。
 - 导出历史增加 bytes；交付台显示最近一次导出回执（格式/文件名/大小/sha 前 12 位 + 打开/分享）。
 - 项目评审成功提示「评审已保存」；CCOS reviewer 字段资源化并 trim。
 - NF-E-004 显示「重新选择文件」CTA。
+- 新增 UxFeedbackComposeTest：错误卡人话+原始详情、步骤条 n/4 可见。
 - 步骤条显示「第 n/4 步」；NF-IMP-001/NF-E-004/NF-PCK-001/NF-REV-002 错误卡增加人话提示，原始技术信息保留在下方。
 
 ## A0-14 Daily 入口

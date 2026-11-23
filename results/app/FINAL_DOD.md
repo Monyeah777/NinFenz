@@ -14,7 +14,7 @@
 | 项目态创作台/交付台 | pass（工程面，含核心校验/导出） | 6ac657b52/86191976e；Delivery/Author 测试与构建 |
 | 作者覆盖保存/状态写回 | pass（工程面） | a14456833/902789796；Overlay/Status 测试 |
 | Pack 中心/CCOS/Pack zip 更新/卸载 | pass（工程面；卸载有项目引用保护） | 1dc695125/4d816f3c5/6c30f241e |
-| JVM 测试 | pass | 506/506（含 Robolectric/Compose/Paparazzi） |
+| JVM 测试 | pass | 508/508（含 Robolectric/Compose/Paparazzi） |
 | 自适应/9 组尺寸语义矩阵 | pass（语义层） | ShellNavigation/ShellSizeMatrix 测试 |
 | i18n/主题切换（全部屏主要文案） | pass | values-en + 资源化；我的支持 zh/en/system + 动态取色；系统 per-app locale 已声明并同步；UI 中文硬编码守卫通过（仅 CoreCall 无 Context 回退豁免） |
 | 像素截图矩阵 | pass（本机） | Paparazzi 10 张基线（360/700/900 × 640/800/900/1000），testDebugUnitTest verify |
@@ -22,7 +22,7 @@
 | 草稿→项目 | pass（zero-slice 路径） | 真机：分享 Markdown→切片 100%→「用切片建项目」→创作台预填 6 字段→交付 3/3；通用导入草稿映射仍为 partial |
 | app/gates v0.02 UX 检查 | pass | 7/7 gate PASS、FAIL=0；GATES/SELF_AUDIT 已更新（本提交） |
 
-**收口实测（2026-11-17 更新）**：app/gates 7/7 PASS、FAIL=0；verify.sh --checks-only PASS=107 WARN=2 FAIL=0；JVM 506/506；APK 55,483,749 B sha256 eca0b383…；Release unsigned 44,733,774 B sha256 e1786841…（16KB 对齐通过）。
+**收口实测（2026-11-17 更新）**：app/gates 7/7 PASS、FAIL=0；verify.sh --checks-only PASS=107 WARN=2 FAIL=0；JVM 508/508；APK 55,483,749 B sha256 eca0b383…；Release unsigned 44,733,774 B sha256 e1786841…（16KB 对齐通过）。
 
 **发布面：仍为 OPEN-EXTERNAL**（签名/公证/真机矩阵/Play 数据安全），不得据此宣称可发布。
 
@@ -49,7 +49,7 @@
 | QA2 | 协议/管线/装配/校验/导出；golden | **PASS** | golden + oracle 对账 31 条；首闭环 E2E 6 条 |
 | QA3 | 分享/回填/Pack 更新/冲突/回滚；负例 | **PASS** | 更新/冲突/回滚 E2E；分享脱敏 5 条 |
 | QA4 | 桌面/TUI/CCOS 交接；跨端一致 | **PASS** | TUI selftest 全绿；CCOS 相关 E2E；Android/Desktop 工程与构建证据 |
-| QA5 | 安全/性能/无障碍/16KB/设备矩阵 | **PASS（含 OPEN）** | 解析安全负例全绿；设备矩阵/性能预算文档在位；自适应三档布局（紧凑单页/中等/扩展 NavigationRail）与无障碍可读标签代码侧落地（JVM 506 条，含分档边界）；真机首启/PDF/杀进程恢复已实测，TalkBack/设备矩阵仍 OPEN-TOOLCHAIN |
+| QA5 | 安全/性能/无障碍/16KB/设备矩阵 | **PASS（含 OPEN）** | 解析安全负例全绿；设备矩阵/性能预算文档在位；自适应三档布局（紧凑单页/中等/扩展 NavigationRail）与无障碍可读标签代码侧落地（JVM 508 条，含分档边界）；真机首启/PDF/杀进程恢复已实测，TalkBack/设备矩阵仍 OPEN-TOOLCHAIN |
 | QA6 | 发布/签名/公证/数据安全/许可；P0=0 | **PASS（含 OPEN）** | 脚本/文档在位；签名证据 OPEN-EXTERNAL；SELF_AUDIT p0=0 |
 
 ## 3. 自审计（S0–S15）
@@ -81,7 +81,7 @@
 |---|---|---|
 | Rust 核心 | 212 断言 / 21 二进制 / 0 failed | `cd app/core && cargo test` |
 | Python 控制面/契约/安全/golden/E2E | **524 passed / 0 failed / 0 skipped / 0 xfailed（126s）** | `python -m pytest app/tests -q` |
-| Android JVM | 506 条（含自适应分档 4 条） | `cd app/android && ./gradlew :app:testDebugUnitTest` |
+| Android JVM | 508 条（含自适应分档 4 条） | `cd app/android && ./gradlew :app:testDebugUnitTest` |
 | Desktop JVM | 20 条（含真实 JNA FFI） | `cd app/desktop && ./gradlew test` |
 | APK | 55,483,749 B；16KB 对齐通过；双 ABI `.so` | `bash app/scripts/build_android.sh debug` |
 | MSI | 66,573,406 B；jar 内含 `native/nf_app_core.dll` | `bash app/scripts/build_desktop.sh package` |
