@@ -1207,4 +1207,5 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="error_hint_file_read">无法读取这个文件，请重新选择文件。</string>
     <string name="error_hint_pack_update">Pack 数据不完整，操作已停止；现有 Pack 未被改动。</string>
     <string name="error_hint_review">当前状态还不能评审，请先完成校验或导出。</string>
+    <string name="delivery_last_export">本次导出</string>
 </resources>

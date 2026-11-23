@@ -1269,7 +1269,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                     NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
                         Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
                             Text(
-                                stringResource(dev.ninfenz.mobile.R.string.delivery_recent_exports) + " · " + latest.format,
+                                stringResource(dev.ninfenz.mobile.R.string.delivery_last_export) + " · " + latest.format,
                                 style = MaterialTheme.typography.titleSmall
                             )
                             val meta = buildList {
