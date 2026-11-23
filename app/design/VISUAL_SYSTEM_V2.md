@@ -183,6 +183,18 @@ NF 的覆盖条用长度；信任等级用位置+文字；状态用色相+形状
 - **blocked**：对比或截断失败直接阻断发布。
 - 分数只用于同一套证据内比较，不跨设备比。
 
+
+## 15. 组件契约
+
+`ComponentContract.kt` 把 7 态与组件尺寸变成数据：
+
+- 7 态：empty / loading / error / offline / partial / signed / expired
+- 每态必须有标题、动作（loading 除外）、语气；error/partial/signed/expired 必须有证据
+- 组件：顶栏 64、按钮 40/触控 48、输入 56、列表 56/72、chip 32/触控 48、导航 80
+- 全在 4dp 栅格；full 圆角为 999 哨兵
+
+这补上了“闭合性”和“组件状态”的可测部分。
+
 ## 12. 下一步
 
 1. 用 2.0 令牌替换默认主题（只换 token，不换布局）
