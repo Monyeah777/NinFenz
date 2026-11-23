@@ -15,15 +15,15 @@
 
 ### Android
 - assembleDebug：**pass**（2026-11-22，Android SDK 36 / build-tools 36.0.0）
-- app-debug.apk：52,687,317 B；SHA-256 `a5082f82034487a472697a03d34eab945b6bb67f747a682062475cfdc562439d`
-- assembleRelease（unsigned）：pass；44,776,418 B；SHA-256 `608ecf9b416166ddab37ae9ade7c7088754a5fb7838c80675fd573d6769f517c`
-- debug 签名 APK（仅内部安装）：52,687,317 B；SHA-256 `a5082f82034487a472697a03d34eab945b6bb67f747a682062475cfdc562439d`；证书 CN=Android Debug；**不是 upload key**
+- app-debug.apk：52,687,317 B；SHA-256 `1d95b766ce4e5b15867f5941fda4177ac6e9f44a08e9b5b0d581198d497109d0`
+- assembleRelease（unsigned）：pass；44,779,102 B；SHA-256 `f70070dc707e520868e48a1c8c1dd0160500c24273b717c89397573a11184376`
+- debug 签名 APK（仅内部安装）：52,687,317 B；SHA-256 `1d95b766ce4e5b15867f5941fda4177ac6e9f44a08e9b5b0d581198d497109d0`；证书 CN=Android Debug；**不是 upload key**
 - bundleRelease（unsigned）：pass；28,549,355 B；SHA-256 `37fc8201b7e654055751a2a874a30dae864a4983b943a32d90e9aa558dc3fe08`；`jarsigner -verify` 显示未签名
 - lintRelease：**0 errors / 0 warnings（No issues found）**
 - Release manifest：package `dev.ninfenz.mobile`、versionName `0.2.0`、minSdk 26、target/compileSdk 36、`extractNativeLibs=false`、无 `android:debuggable`（apkanalyzer manifest print）
 - 16KB 对齐：`zipalign -c -P 16 4` exit 0（APK；AAB 未用 bundletool 复核）
 - 签名证书指纹（SHA-256）：`F8:54:EF:94:3D:F5:F7:52:9F:BA:B6:40:6E:3C:5E:5F:8E:1B:74:F4:27:D2:DC:BD:B8:5E:2D:79:35:89:69:CA`（CN=NF Mobile Upload；upload key，非 Play app signing key）
-- bundleRelease（upload 签名）：**pass**；28,604,920 B；SHA-256 `244338f449cd6a71ec863c683e13bfd654d3a082aacd54835124e48d1082186e`；`jarsigner -verify` 通过
+- bundleRelease（upload 签名）：**pass**；28,605,755 B；SHA-256 `f7681554041970fa00d5eacdafa5b74ecfe688b49613ab8e9d707cd91cd71c7b`；`jarsigner -verify` 通过
 - 签名材料：`<KEY_DIR>\nf-upload.jks`（仓库外，ACL 仅当前用户）；口令文件与 PEM 同目录，未入库
 - Play 配置：`app/android/fastlane/` + `app/android/play/README.md`；service account JSON 与 Play Console 应用未创建
 - 签名流程内部自测：`app/scripts/sign_release.sh` 以本机 debug keystore 跑通（仅验证流程，非生产签名）；`apksigner verify` 通过，证书 SHA-256 `8a52a549c3081795cecb0f1424d21684933fb21d3afe76506dab736e688b10fb`。

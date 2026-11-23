@@ -109,6 +109,12 @@ fun NfStepStrip(steps: List<String>, current: Int, modifier: Modifier = Modifier
                 Text("›", color = if (index < current) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline)
             }
         }
+        Text(
+            stringResource(dev.ninfenz.mobile.R.string.step_progress, current + 1, steps.size),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(start = NfSpacing.s)
+        )
     }
 }
 
@@ -319,7 +325,17 @@ fun NfErrorCard(code: String, message: String, fix: String, modifier: Modifier =
         color = MaterialTheme.colorScheme.errorContainer
     ) {
         Column(modifier = Modifier.padding(NfSpacing.m), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
-            Text("[" + code + "] " + message, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onErrorContainer)
+            val hint = when (code) {
+                "NF-IMP-001" -> stringResource(dev.ninfenz.mobile.R.string.error_hint_import_source)
+                "NF-E-004" -> stringResource(dev.ninfenz.mobile.R.string.error_hint_file_read)
+                "NF-PCK-001" -> stringResource(dev.ninfenz.mobile.R.string.error_hint_pack_update)
+                "NF-REV-002" -> stringResource(dev.ninfenz.mobile.R.string.error_hint_review)
+                else -> null
+            }
+            Text("[" + code + "] " + (hint ?: message), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onErrorContainer)
+            if (hint != null) {
+                Text(message, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onErrorContainer)
+            }
             Text(stringResource(dev.ninfenz.mobile.R.string.error_fix_prefix, fix), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onErrorContainer)
         }
     }

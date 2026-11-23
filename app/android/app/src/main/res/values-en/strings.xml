@@ -1206,4 +1206,9 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="project_review_saved">Review saved</string>
     <string name="ccos_reviewer_label">Reviewer</string>
     <string name="import_reselect_file">Choose another file</string>
+    <string name="step_progress">Step %1$d/%2$d</string>
+    <string name="error_hint_import_source">The import source type is invalid. Choose a file or paste text again.</string>
+    <string name="error_hint_file_read">This file could not be read. Choose it again with the system picker.</string>
+    <string name="error_hint_pack_update">Pack data is incomplete; the operation stopped and the existing Pack was not changed.</string>
+    <string name="error_hint_review">This project is not ready for review. Validate or export it first.</string>
 </resources>

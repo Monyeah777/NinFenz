@@ -1202,4 +1202,9 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="project_review_saved">评审已保存</string>
     <string name="ccos_reviewer_label">评审人</string>
     <string name="import_reselect_file">重新选择文件</string>
+    <string name="step_progress">第 %1$d/%2$d 步</string>
+    <string name="error_hint_import_source">导入来源类型不正确，请重新选择文件或粘贴文本。</string>
+    <string name="error_hint_file_read">无法读取这个文件，请重新选择文件。</string>
+    <string name="error_hint_pack_update">Pack 数据不完整，操作已停止；现有 Pack 未被改动。</string>
+    <string name="error_hint_review">当前状态还不能评审，请先完成校验或导出。</string>
 </resources>
