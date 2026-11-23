@@ -223,7 +223,6 @@
     <string name="import_clear_action">Clear</string>
     <string name="import_clear_title">Clear this import?</string>
     <string name="import_clear_body">This clears the current preview, mappings, and unsaved draft. Saved drafts are kept. Undo is available for 5 seconds.</string>
-    <string name="import_cleared">Import cleared</string>
     <string name="import_clear_undo">Undo</string>
     <string name="import_source">Choose a source</string>
     <string name="import_step_source">Source</string>
@@ -1215,4 +1214,6 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="import_csv_clipboard">CSV clipboard</string>
     <string name="error_hint_clipboard_empty">The clipboard is empty. Copy some text first.</string>
     <string name="error_hint_file_too_large">This file is over the import limit. Choose a smaller file.</string>
+    <string name="delivery_export_notice">Exported %1$s · %2$s (%3$s)</string>
+    <string name="import_cleared_countdown">Cleared. Undo within %1$ds.</string>
 </resources>

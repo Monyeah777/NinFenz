@@ -219,7 +219,6 @@
     <string name="import_clear_action">清空</string>
     <string name="import_clear_title">清空本次导入？</string>
     <string name="import_clear_body">会清空当前预览、映射和未保存草稿；已保存草稿保留。5 秒内可撤销。</string>
-    <string name="import_cleared">已清空本次导入</string>
     <string name="import_clear_undo">撤销</string>
     <string name="import_source">选择来源</string>
     <string name="import_step_source">来源</string>
@@ -1211,4 +1210,6 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="import_csv_clipboard">CSV 剪贴板</string>
     <string name="error_hint_clipboard_empty">剪贴板为空，请先复制文本再重试。</string>
     <string name="error_hint_file_too_large">文件超过导入上限，请换一个更小的文件。</string>
+    <string name="delivery_export_notice">已导出 %1$s · %2$s（%3$s）</string>
+    <string name="import_cleared_countdown">已清空，%1$d 秒内可撤销</string>
 </resources>

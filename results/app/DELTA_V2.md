@@ -191,6 +191,7 @@
 - 新增 UxFeedbackComposeTest：错误卡人话+原始详情、步骤条 n/4 可见。
 - 无障碍：错误卡加 polite liveRegion，步骤条加 stateDescription；测试断言第 2/4 步语义。
 - CSV 文件入口走 SAF，转换后导入；旧剪贴板入口仍在。
+- 每次导出立即显示「已导出 格式 · 文件名（大小）」；清空导入的 5 秒撤销增加可见倒计时。
 - 步骤条显示「第 n/4 步」；NF-IMP-001/NF-E-004/NF-PCK-001/NF-REV-002 错误卡增加人话提示，原始技术信息保留在下方。
 
 ## A0-14 Daily 入口

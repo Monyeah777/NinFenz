@@ -180,10 +180,15 @@ fun ImportScreen(
     var duplicatePrompt by remember { mutableStateOf<DuplicatePrompt?>(null) }
     var showClearConfirm by remember { mutableStateOf(false) }
     var cleared by remember { mutableStateOf<ImportClearSnapshot?>(null) }
+    var clearSeconds by remember { mutableIntStateOf(5) }
     LaunchedEffect(cleared) {
         if (cleared != null) {
-            delay(5000)
-            cleared = null
+            clearSeconds = 5
+            while (clearSeconds > 0 && cleared != null) {
+                delay(1000)
+                clearSeconds -= 1
+            }
+            if (cleared != null) cleared = null
         }
     }
     fun clearCurrentImport() {
@@ -1552,7 +1557,7 @@ fun ImportScreen(
                         horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)
                     ) {
                         Text(
-                            stringResource(dev.ninfenz.mobile.R.string.import_cleared),
+                            stringResource(dev.ninfenz.mobile.R.string.import_cleared_countdown, clearSeconds),
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.weight(1f)
                         )

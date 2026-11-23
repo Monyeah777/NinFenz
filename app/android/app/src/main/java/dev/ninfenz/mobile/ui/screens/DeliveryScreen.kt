@@ -223,6 +223,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
     val draftStore = remember { DeliveryDraftStore(context.filesDir) }
     val exportHistory = remember { ExportHistoryStore(context.filesDir) }
     var exportEntries by remember { mutableStateOf(exportHistory.load()) }
+    var exportNotice by remember { mutableStateOf<String?>(null) }
     var exportVerify by remember { mutableStateOf<ExportVerifier.Result?>(null) }
     var reproText by remember { mutableStateOf<String?>(null) }
     var reproOk by remember { mutableStateOf<Boolean?>(null) }
@@ -377,6 +378,9 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
         exportVerify = verdict
         exportHistory.record(format, file, sha, verdict?.ok, verdict?.message)
         exportEntries = exportHistory.load()
+        exportNotice = if (file != null) {
+            context.getString(dev.ninfenz.mobile.R.string.delivery_export_notice, format, file.name, formatBytes(file.length()))
+        } else null
     }
 
     fun applyBatch(onlyEmpty: Boolean) {
@@ -1265,6 +1269,14 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                     )
                 }
                 Text(stringResource(dev.ninfenz.mobile.R.string.delivery_pdf_note), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page))
+                exportNotice?.let { notice ->
+                    Text(
+                        notice,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.padding(horizontal = NfSpacing.page)
+                    )
+                }
                 exportEntries.firstOrNull()?.let { latest ->
                     NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
                         Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
