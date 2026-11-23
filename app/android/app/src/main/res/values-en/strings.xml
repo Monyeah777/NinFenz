@@ -1213,4 +1213,6 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="delivery_last_export">This export</string>
     <string name="import_csv_file">CSV file</string>
     <string name="import_csv_clipboard">CSV clipboard</string>
+    <string name="error_hint_clipboard_empty">The clipboard is empty. Copy some text first.</string>
+    <string name="error_hint_file_too_large">This file is over the import limit. Choose a smaller file.</string>
 </resources>

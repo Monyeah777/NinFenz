@@ -332,6 +332,8 @@ fun NfErrorCard(code: String, message: String, fix: String, modifier: Modifier =
         Column(modifier = Modifier.padding(NfSpacing.m), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
             val hint = when (code) {
                 "NF-IMP-001" -> stringResource(dev.ninfenz.mobile.R.string.error_hint_import_source)
+                "NF-IMP-003" -> stringResource(dev.ninfenz.mobile.R.string.error_hint_file_too_large)
+                "NF-E-003" -> stringResource(dev.ninfenz.mobile.R.string.error_hint_clipboard_empty)
                 "NF-E-004" -> stringResource(dev.ninfenz.mobile.R.string.error_hint_file_read)
                 "NF-PCK-001" -> stringResource(dev.ninfenz.mobile.R.string.error_hint_pack_update)
                 "NF-REV-002" -> stringResource(dev.ninfenz.mobile.R.string.error_hint_review)

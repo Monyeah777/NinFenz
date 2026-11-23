@@ -1209,4 +1209,6 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="delivery_last_export">本次导出</string>
     <string name="import_csv_file">CSV 文件</string>
     <string name="import_csv_clipboard">CSV 剪贴板</string>
+    <string name="error_hint_clipboard_empty">剪贴板为空，请先复制文本再重试。</string>
+    <string name="error_hint_file_too_large">文件超过导入上限，请换一个更小的文件。</string>
 </resources>
