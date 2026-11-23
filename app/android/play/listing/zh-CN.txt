@@ -1,0 +1,35 @@
+Play 商店文案（复制到 Play Console）
+
+应用名（≤30）：
+NF Mobile
+
+简短说明（≤80）：
+本地优先的 Markdown 创作、协议装配与交付工具，不联网。
+
+完整说明（≤4000）：
+NF Mobile 是一个本地优先的写作与交付工具，适合把零散草稿、客户 brief、聊天记录整理成可交付的结构化内容。
+
+你可以：
+• 粘贴文本、导入 Markdown/CSV/JSON/PDF/EPUB/DOCX，或从分享菜单接收内容
+• 用协议与切片把内容映射到主题句、读者设定、正文和补充
+• 在创作台编辑字段、运行检查、保存项目
+• 装配并校验 L1，导出 Markdown、HTML、PDF、EPUB、DOCX 或 preserve 包
+• 搜索项目正文，查看历史导出的大小与校验信息
+
+所有内容只保存在本机，应用没有网络权限，不上传、不收集、不共享。
+
+分类：效率 / Productivity
+标签：写作、Markdown、导出、本地优先
+联系邮箱：<YOUR_SUPPORT_EMAIL>
+隐私政策：<YOUR_PRIVACY_POLICY_URL>
+
+Data safety 建议：
+- 是否收集或共享用户数据：否
+- 是否使用广告/分析 SDK：否
+- 数据传输是否加密：不适用（不传输）
+- 用户能否删除数据：应用内删除项目/清空；卸载清除
+
+素材：
+- icon-512.png
+- feature-graphic-1024x500.png
+- phone-1-library.png / phone-2-onboarding.png / phone-3-author.png
