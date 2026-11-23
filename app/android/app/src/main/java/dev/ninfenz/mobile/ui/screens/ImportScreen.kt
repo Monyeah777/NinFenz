@@ -1,5 +1,7 @@
 package dev.ninfenz.mobile.ui.screens
 
+import dev.ninfenz.mobile.data.ImportSource
+
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -565,7 +567,7 @@ fun ImportScreen(
             }
             val file = File(File(context.cacheDir, "imports").apply { mkdirs() }, "csv-table.md")
             file.writeText(markdown, Charsets.UTF_8)
-            importFromFile(file, "clipboard", "csv-table.md", "text/markdown", markdown.toByteArray(Charsets.UTF_8).size.toLong())
+            importFromFile(file, ImportSource.CLIPBOARD, "csv-table.md", "text/markdown", markdown.toByteArray(Charsets.UTF_8).size.toLong())
         }
     }
 
@@ -644,13 +646,13 @@ fun ImportScreen(
             ).error
             return
         }
-        importText(text, "clipboard", "clipboard.md")
+        importText(text, ImportSource.CLIPBOARD, "clipboard.md")
     }
 
     LaunchedEffect(Unit) {
         val seed = dev.ninfenz.mobile.ui.ImportSeed.consume()
         if (seed != null) {
-            importText(seed, "daily", "daily-paste.md")
+            importText(seed, ImportSource.CLIPBOARD, "daily-paste.md")
             return@LaunchedEffect
         }
         if (doc == null && rawResult == null && error == null) {
@@ -694,7 +696,7 @@ fun ImportScreen(
                 val text = context.assets.open("sample-pack/docs/sample.md").bufferedReader(Charsets.UTF_8).use { it.readText() }
                 val file = File(File(context.cacheDir, "imports").apply { mkdirs() }, "sample.md")
                 file.writeText(text, Charsets.UTF_8)
-                importFromFile(file, "file", "sample.md", "text/markdown", text.toByteArray(Charsets.UTF_8).size.toLong())
+                importFromFile(file, ImportSource.FILE, "sample.md", "text/markdown", text.toByteArray(Charsets.UTF_8).size.toLong())
             } catch (t: Throwable) {
                 error = CoreResponse.failure("NF-E-004", context.getString(dev.ninfenz.mobile.R.string.import_sample_read_failed, t.message ?: t.javaClass.simpleName), context.getString(dev.ninfenz.mobile.R.string.import_sample_read_failed_fix), 2).error
             }
@@ -706,7 +708,7 @@ fun ImportScreen(
             if (item.text != null) {
                 val file = File(File(context.cacheDir, "imports").apply { mkdirs() }, "shared-text.md")
                 file.writeText(item.text, Charsets.UTF_8)
-                importFromFile(file, "share", "shared-text.md", item.mime ?: "text/plain", item.text.toByteArray(Charsets.UTF_8).size.toLong())
+                importFromFile(file, ImportSource.SHARE, "shared-text.md", item.mime ?: "text/plain", item.text.toByteArray(Charsets.UTF_8).size.toLong())
             } else if (item.uri != null) {
                 try {
                     val uri = item.uri.toUri()
@@ -717,7 +719,7 @@ fun ImportScreen(
                         return@launch
                     }
                     val file = FileAccess.copyToCache(context, uri, meta.name)
-                    importFromFile(file, "share", meta.name, meta.mime ?: item.mime, meta.size)
+                    importFromFile(file, ImportSource.SHARE, meta.name, meta.mime ?: item.mime, meta.size)
                 } catch (e: Exception) {
                     error = if (e is SecurityException) {
                         CoreResponse.failure(
@@ -838,7 +840,7 @@ fun ImportScreen(
                         return@launch
                     }
                     val file = FileAccess.copyToCache(context, uri, meta.name)
-                    importFromFile(file, "saf", meta.name, meta.mime, meta.size)
+                    importFromFile(file, ImportSource.SAF, meta.name, meta.mime, meta.size)
                 } catch (e: Exception) {
                     error = CoreResponse.failure(
                         "NF-E-004",
@@ -887,7 +889,7 @@ fun ImportScreen(
                     Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                         Text(stringResource(dev.ninfenz.mobile.R.string.import_source), style = MaterialTheme.typography.titleLarge)
                         Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                            Button(onClick = { filePicker.launch(arrayOf("*/*")) }, enabled = !busy) { Text(stringResource(dev.ninfenz.mobile.R.string.import_pick_file)) }
+                            Button(onClick = { filePicker.launch(arrayOf("text/markdown", "text/plain", "text/csv", "application/json", "application/zip", "application/octet-stream")) }, enabled = !busy) { Text(stringResource(dev.ninfenz.mobile.R.string.import_pick_file)) }
                             OutlinedButton(onClick = { importClipboard() }, enabled = !busy) { Text(stringResource(dev.ninfenz.mobile.R.string.import_clipboard)) }
                         }
                         Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
@@ -915,7 +917,7 @@ fun ImportScreen(
                         preserveNote?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary) }
                         preservedMarkdown?.let { md ->
                             if (preserveGrant?.allows(dev.ninfenz.mobile.data.CapabilityGrant.REASSEMBLE, System.currentTimeMillis()) == true) {
-                                OutlinedButton(onClick = { importText(md, "preserve", preservedName) }, enabled = !busy) {
+                                OutlinedButton(onClick = { importText(md, ImportSource.SAF, preservedName) }, enabled = !busy) {
                                     Text(stringResource(dev.ninfenz.mobile.R.string.import_restore_archive))
                                 }
                             } else {
@@ -993,7 +995,7 @@ fun ImportScreen(
                         title = stringResource(dev.ninfenz.mobile.R.string.import_empty_title),
                         message = stringResource(dev.ninfenz.mobile.R.string.import_empty_body),
                         actionLabel = context.getString(dev.ninfenz.mobile.R.string.import_pick_file_action),
-                        onAction = { filePicker.launch(arrayOf("*/*")) },
+                        onAction = { filePicker.launch(arrayOf("text/markdown", "text/plain", "text/csv", "application/json", "application/zip", "application/octet-stream")) },
                         secondaryLabel = context.getString(dev.ninfenz.mobile.R.string.import_sample_content),
                         onSecondary = { importSample() }
                     )

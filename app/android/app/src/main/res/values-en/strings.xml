@@ -601,7 +601,6 @@
     <string name="packupdate_applying">Applying…</string>
     <string name="packupdate_rollback">Rollback</string>
     <string name="packupdate_rolling">Rolling back…</string>
-    <string name="packupdate_result">Rollback result: %1$s</string>
     <string name="packupdate_pre_backup">Pre-migration backup: %1$s</string>
     <string name="packupdate_restore_backup">Roll back to pre-migration backup</string>
     <string name="packupdate_restore_backup_body">This overwrites local projects/drafts with the backup. Continue?</string>
@@ -1199,4 +1198,9 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="preview_manual_hint">Pick a transform and apply to all blocks</string>
     <string name="preview_manual_apply">Apply</string>
     <string name="preview_manual_invalid">Fill valid parameters first</string>
+    <string name="packupdate_rollback_no_backup">No pre-update backup in this session; rollback unavailable. Re-open the update after applying.</string>
+    <plurals name="delivery_protocol_prefill">
+        <item quantity="one">Filled %1$d slot from protocol fields</item>
+        <item quantity="other">Filled %1$d slots from protocol fields</item>
+    </plurals>
 </resources>

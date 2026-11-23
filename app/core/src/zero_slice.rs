@@ -32,17 +32,27 @@ pub struct SlotSpec {
     pub id: String,
     pub name: String,
     pub required: bool,
+    pub max_chars: Option<usize>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SectionSpec {
+    pub id: String,
+    pub title: String,
+    pub slots: Vec<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Spec {
     pub id: String,
     pub slots: Vec<SlotSpec>,
+    pub sections: Vec<SectionSpec>,
 }
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Mapping {
     pub from_index: usize,
+    pub from_block: Option<usize>,
     pub from_title: String,
     pub to_id: String,
     pub to_name: String,
@@ -166,13 +176,49 @@ pub fn infer(spec: &Spec, doc: &Document) -> Report {
     if spec.slots.is_empty() {
         let text = doc.sections.iter().map(|s| s.text()).collect::<Vec<_>>().join("\n\n");
         return Report {
-            mappings: vec![Mapping { from_index: 0, from_title: doc.title.clone(), to_id: "freeform".into(), to_name: "自由稿".into(), confidence: 1.0, rationale: "无 spec，全文映射".into() }],
+            mappings: vec![Mapping { from_index: 0, from_block: None, from_title: doc.title.clone(), to_id: "freeform".into(), to_name: "自由稿".into(), confidence: 1.0, rationale: "无 spec，全文映射".into() }],
             exceptions: if text.is_empty() { vec![Exception { text: "".into(), target: None, reason: "空文档".into() }] } else { vec![] },
             coverage: if text.is_empty() { 0.0 } else { 1.0 },
         };
     }
     let mut used = vec![false; spec.slots.len()];
     for (index, section) in doc.sections.iter().enumerate() {
+        // 先按 spec 章节标题匹配，再把章节块落到其槽位；没有章节命中才回退到槽位名匹配。
+        let mut section_best: Option<(usize, f64)> = None;
+        for (ssi, sec) in spec.sections.iter().enumerate() {
+            let score = title_score(&section.title, &sec.title);
+            if section_best.map_or(true, |(_, s)| score > s) { section_best = Some((ssi, score)); }
+        }
+        if let Some((ssi, score)) = section_best {
+            if score >= 0.6 {
+                let mut mapped_any = false;
+                for (bi, slot_id) in spec.sections[ssi].slots.iter().enumerate() {
+                    if section.blocks.get(bi).is_none() { break; }
+                    let Some(si) = spec.slots.iter().enumerate()
+                        .find(|(i, slot)| &slot.id == slot_id && !used[*i])
+                        .map(|(i, _)| i) else { continue };
+                    used[si] = true;
+                    mapped_any = true;
+                    mappings.push(Mapping {
+                        from_index: index,
+                        from_block: Some(bi),
+                        from_title: section.title.clone(),
+                        to_id: spec.slots[si].id.clone(),
+                        to_name: spec.slots[si].name.clone(),
+                        confidence: (score * 100.0).round() / 100.0,
+                        rationale: "章节标题匹配".into(),
+                    });
+                }
+                for (_bi, block) in section.blocks.iter().enumerate().skip(spec.sections[ssi].slots.len()) {
+                    exceptions.push(Exception {
+                        text: block.text.clone(),
+                        target: None,
+                        reason: "章节槽位已满，保留为附加内容".into(),
+                    });
+                }
+                if mapped_any { continue; }
+            }
+        }
         let mut best: Option<(usize, f64)> = None;
         for (si, slot) in spec.slots.iter().enumerate() {
             if used[si] { continue; }
@@ -184,6 +230,7 @@ pub fn infer(spec: &Spec, doc: &Document) -> Report {
                 used[si] = true;
                 mappings.push(Mapping {
                     from_index: index,
+                    from_block: None,
                     from_title: section.title.clone(),
                     to_id: spec.slots[si].id.clone(),
                     to_name: spec.slots[si].name.clone(),
@@ -198,12 +245,35 @@ pub fn infer(spec: &Spec, doc: &Document) -> Report {
             }),
         }
     }
+    // 自由稿兜底：无标题命中且只有一个 section 时，把全文放入第一个必填（或第一个）槽位。
+    if mappings.is_empty() && doc.sections.len() == 1 && total > 0 && doc.blocks.iter().filter(|b| b.kind == "heading").count() <= 1 {
+        if let Some(si) = spec.slots.iter().position(|s| s.required).or(if spec.slots.is_empty() { None } else { Some(0) }) {
+            let section = &doc.sections[0];
+            let fits = spec.slots[si].max_chars.map_or(true, |max| total <= max);
+            if fits {
+                used[si] = true;
+                mappings.push(Mapping {
+                    from_index: 0,
+                    from_block: None,
+                    from_title: section.title.clone(),
+                    to_id: spec.slots[si].id.clone(),
+                    to_name: spec.slots[si].name.clone(),
+                    confidence: 0.6,
+                    rationale: "自由稿：无标题匹配，放入该槽位，请复核".into(),
+                });
+                exceptions.clear();
+            }
+        }
+    }
     for (index, slot) in spec.slots.iter().enumerate() {
         if !used[index] && slot.required {
             exceptions.push(Exception { text: "".into(), target: Some(slot.id.clone()), reason: "必填槽位无匹配".into() });
         }
     }
-    let mapped: usize = mappings.iter().filter_map(|m| doc.sections.get(m.from_index)).map(|s| s.text().chars().count()).sum();
+    let mapped: usize = mappings.iter().filter_map(|m| {
+        let section = doc.sections.get(m.from_index)?;
+        Some(m.from_block.and_then(|bi| section.blocks.get(bi)).map(|b| b.text.chars().count()).unwrap_or_else(|| section.text().chars().count()))
+    }).sum();
     let coverage = if total == 0 { 0.0 } else { (mapped as f64 / total as f64 * 10000.0).round() / 10000.0 };
     Report { mappings, exceptions, coverage }
 }
@@ -213,7 +283,8 @@ pub fn to_project(doc: &Document, report: &Report, draft_id: Option<&str>) -> se
     let mut slots = serde_json::Map::new();
     for mapping in &report.mappings {
         if let Some(section) = doc.sections.get(mapping.from_index) {
-            slots.insert(mapping.to_id.clone(), serde_json::Value::String(section.text()));
+            let text = mapping.from_block.and_then(|bi| section.blocks.get(bi)).map(|b| b.text.clone()).unwrap_or_else(|| section.text());
+            slots.insert(mapping.to_id.clone(), serde_json::Value::String(text));
         }
     }
     serde_json::json!({
@@ -419,9 +490,9 @@ mod tests {
     use super::*;
 
     fn spec() -> Spec {
-        Spec { id: "demo".into(), slots: vec![
-            SlotSpec { id: "SLT-01".into(), name: "背景".into(), required: true },
-            SlotSpec { id: "SLT-02".into(), name: "目标".into(), required: true },
+        Spec { id: "demo".into(), sections: vec![], slots: vec![
+            SlotSpec { id: "SLT-01".into(), name: "背景".into(), required: true, max_chars: None },
+            SlotSpec { id: "SLT-02".into(), name: "目标".into(), required: true, max_chars: None },
         ]}
     }
 
@@ -430,6 +501,38 @@ mod tests {
         let doc = parse_markdown("# 简报\n\n## 背景\n\n正文\n\n## 目标\n\n- 一点\n");
         assert_eq!(doc.title, "简报");
         assert_eq!(doc.sections.iter().map(|s| s.title.as_str()).collect::<Vec<_>>(), vec!["背景", "目标"]);
+    }
+
+    #[test]
+    fn section_blocks_fill_slots() {
+        let spec = Spec {
+            id: "demo".into(),
+            slots: vec![
+                SlotSpec { id: "SLT-01".into(), name: "主题句".into(), required: true, max_chars: None },
+                SlotSpec { id: "SLT-02".into(), name: "读者设定".into(), required: true, max_chars: None },
+            ],
+            sections: vec![SectionSpec { id: "SEC-01".into(), title: "开篇".into(), slots: vec!["SLT-01".into(), "SLT-02".into()] }],
+        };
+        let doc = parse_markdown("# 示例\n\n## 开篇\n\n甲段\n\n乙段\n");
+        let report = infer(&spec, &doc);
+        assert_eq!(report.mappings.len(), 2);
+        assert_eq!(report.mappings[0].from_block, Some(0));
+        assert_eq!(report.mappings[1].from_block, Some(1));
+        let project = to_project(&doc, &report, None);
+        assert_eq!(project["slots"]["SLT-01"], "甲段");
+        assert_eq!(project["slots"]["SLT-02"], "乙段");
+    }
+
+    #[test]
+    fn freeform_single_section_falls_back() {
+        let doc = parse_markdown("# 自由稿\n\n雨夜的边境小镇，主角必须在一个时辰内找到落脚点。\n");
+        let report = infer(&spec(), &doc);
+        assert_eq!(report.mappings.len(), 1);
+        assert_eq!(report.mappings[0].to_id, "SLT-01");
+        assert_eq!(report.mappings[0].confidence, 0.6);
+        assert_eq!(report.coverage, 1.0);
+        assert_eq!(report.exceptions.len(), 1);
+        assert_eq!(report.exceptions[0].target.as_deref(), Some("SLT-02"));
     }
 
     #[test]
@@ -527,7 +630,7 @@ mod tests {
     #[test]
     fn freeform_without_spec() {
         let doc = parse_markdown("标题\n\n正文");
-        let report = infer(&Spec { id: "free".into(), slots: vec![] }, &doc);
+        let report = infer(&Spec { id: "free".into(), slots: vec![], sections: vec![] }, &doc);
         assert_eq!(report.mappings[0].to_id, "freeform");
         assert_eq!(report.coverage, 1.0);
     }

@@ -56,7 +56,7 @@
 
 - `FeaturePolicy` 规则表：Free 能力、Pro 能力、CCOS 能力；按 tier 判定。
 - `FeatureGate` 委托规则；默认 Free，Free 永远放行，未知能力默认 Free。
-- 5 条 Kotlin 单测；JVM 502。
+- 5 条 Kotlin 单测；JVM 505。
 - `FeatureGate.setTierForDebug`：调试构建可在 Settings「功能层级」切 Free/Pro/CCOS。
 - 发布构建只显示层级与规则数，不含购买/授权入口；默认 Free。
 - **未**接计费/真实 entitlement。
@@ -158,7 +158,7 @@
 ## zero_slice Rust 参考
 
 - `app/core/src/zero_slice.rs`：Markdown 解析、标题映射、<0.6 例外、freeform、coverage。
-- 10 条 Rust 单测：解析/映射/例外/freeform + Session/reset/undo + DraftStore 同源覆盖 + to_project 参考形状。
+- 15 条 Rust 单测：解析/章节块映射/例外/freeform + Session/reset/undo + DraftStore 同源覆盖 + to_project 参考形状。
 - 新 `zero-slice` op：输入 text/spec，输出 title/sections/mappings/exceptions/coverage（0–100 整数）；3 条 op 测试。
 - DraftStore 已落盘（同源覆盖）；**未**移植 to_project FFI/Android 接线。
 - Android 导入页在 doc 变化时自动调用 zero-slice；显示 coverage/映射/例外卡。
@@ -172,6 +172,17 @@
 - 该落盘逻辑抽到 `ZeroSliceProjectDraft`，单测覆盖主草稿/sidecar/mapping。
 - 仍是 nf-import/1 会话；未切到 nf-zero-slice-draft/to_project，也未替换核心 map-suggest。
 - **2026-11-23 真机端到端**：分享 3 heading Markdown → 自动切片 100% / 3 映射 / 0 例外 → 「用切片建项目」→ 创作台「已从导入映射预填 6 个字段」→ 交付 3/3 → L1 pass（error=0 warn=0 info=3）→ 导出 md 173 B（sha256 `b4542200…`）→ 签收（设备密钥 `4408787f9108b2a9`）→ 连续两份 preserve.zip 均通过。
+
+## UX P0 修复（2026-11-23）
+
+- `ImportSource` 常量对齐 `nf-import/1`：快捷粘贴从非法 `daily` 改为 `clipboard`，归档恢复从非法 `preserve` 改为 `saf`；实测快捷粘贴进入预览，无 NF-IMP-001，自动切片覆盖 100%。
+- 示例 `sample.md` 标题改为 `开篇/正文/收束`，与 spec 章节对齐；核心 CLI 输出 4 条映射、0 例外、coverage 99、SLT-01/02/03 均填入。
+- zero_slice 增加章节标题 → 章节槽位映射，并把 section 内多个 block 按槽位顺序填入；`to_project` 按 block 文本落槽，不再整段重复。
+- 无标题单段文本走自由稿：映射到第一个必填槽（confidence 60，标注请复核），超预算保留 exception。
+- 新增 `ProtocolSlotPrefill`：协议字段按同名/规范化名映射到 spec 槽位，交付页合并进预填并显示带入数量。
+- 文件选择器从 `*/*` 改为显式 markdown/text/csv/json/zip MIME。
+- Pack 回滚改为优先恢复更新前备份；无备份时禁用并说明，不再走缺 size 的反向 merge。
+- Android JVM 505 条；Rust zero_slice 15 条 + op 3 条。
 
 ## A0-14 Daily 入口
 

@@ -270,13 +270,27 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
         )
         dev.ninfenz.mobile.data.ZeroSliceStore(context.filesDir).read(file)?.slotValues ?: emptyMap()
     }
+    val protocolPrefill = remember(project.id, artifacts?.protocol, artifacts?.spec) {
+        val art = artifacts
+        if (art == null) emptyMap() else {
+            val params = dev.ninfenz.mobile.data.ProtocolSlotPrefill.loadParams(context.filesDir, project.id)
+            dev.ninfenz.mobile.data.ProtocolSlotPrefill.bind(art.protocol.fields, art.spec.slots, params)
+        }
+    }
+    val slotPrefill = zeroPrefill + protocolPrefill
     val restoredPlan = remember(project.id) { draftStore.loadPlan(project.id) }
     val restoredMarkdown = remember(project.id) { draftStore.loadMarkdown(project.id) }
     LaunchedEffect(restoredMarkdown) {
         if (markdown == null && restoredMarkdown != null) markdown = restoredMarkdown
     }
     var draftNote by remember(project.id) {
-        mutableStateOf(if (restoredInputs.isNotEmpty()) context.getString(dev.ninfenz.mobile.R.string.delivery_draft_restored) else null)
+        mutableStateOf(
+            when {
+                restoredInputs.isNotEmpty() -> context.getString(dev.ninfenz.mobile.R.string.delivery_draft_restored)
+                protocolPrefill.isNotEmpty() -> context.resources.getQuantityString(dev.ninfenz.mobile.R.plurals.delivery_protocol_prefill, protocolPrefill.size, protocolPrefill.size)
+                else -> null
+            }
+        )
     }
 
     fun pasteSlot(slot: String) {
@@ -397,7 +411,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
             plan = parsed
             inputs = parsed.slots.associate { slot ->
                 val restored = restoredInputs[slot]
-                slot to (if (!restored.isNullOrBlank()) restored else zeroPrefill[slot] ?: "")
+                slot to (if (!restored.isNullOrBlank()) restored else slotPrefill[slot] ?: "")
             }
         }
     }
@@ -549,7 +563,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         rawPlan = obj
                         inputs = parsed.slots.associate { slot ->
                             val restored = restoredInputs[slot]
-                            slot to (if (!restored.isNullOrBlank()) restored else zeroPrefill[slot] ?: "")
+                            slot to (if (!restored.isNullOrBlank()) restored else slotPrefill[slot] ?: "")
                         }
                         draftStore.save(project.id, inputs, obj)
                         draftNote = if (restoredInputs.isNotEmpty()) context.getString(dev.ninfenz.mobile.R.string.delivery_draft_restored) else null

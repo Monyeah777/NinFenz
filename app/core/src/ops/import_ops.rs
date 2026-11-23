@@ -671,6 +671,7 @@ pub fn zero_slice(req: &Value) -> OpOutcome {
     let text = req_str(req, "text")?;
     let doc = crate::zero_slice::parse_markdown(text);
     let mut slots = Vec::new();
+    let mut sections = Vec::new();
     if let Some(spec) = req.get("spec").and_then(|v| v.as_object()) {
         if let Some(list) = spec.get("slots").and_then(|v| v.as_array()) {
             for item in list {
@@ -684,13 +685,28 @@ pub fn zero_slice(req: &Value) -> OpOutcome {
                     id,
                     name,
                     required: obj.get("required").and_then(|v| v.as_bool()).unwrap_or(false),
+                    max_chars: obj.get("budget").and_then(|b| b.get("max_chars")).and_then(|v| v.as_u64()).map(|v| v as usize),
                 });
+            }
+        }
+        if let Some(list) = spec.get("sections").and_then(|v| v.as_array()) {
+            for item in list {
+                let Some(obj) = item.as_object() else { continue };
+                let id = obj.get("id").and_then(|v| v.as_str()).unwrap_or("").to_string();
+                let title = obj.get("title").and_then(|v| v.as_str()).unwrap_or("").to_string();
+                let slot_ids = obj.get("slots").and_then(|v| v.as_array())
+                    .map(|a| a.iter().filter_map(|v| v.as_str().map(|s| s.to_string())).collect())
+                    .unwrap_or_default();
+                if !id.is_empty() && !title.is_empty() {
+                    sections.push(crate::zero_slice::SectionSpec { id, title, slots: slot_ids });
+                }
             }
         }
     }
     let spec = crate::zero_slice::Spec {
         id: req.get("spec").and_then(|v| v.get("id")).and_then(|v| v.as_str()).unwrap_or("freeform").to_string(),
         slots,
+        sections,
     };
     let report = crate::zero_slice::infer(&spec, &doc);
     let sections: Vec<Value> = doc.sections.iter().map(|s| json!({

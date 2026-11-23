@@ -281,36 +281,16 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit) {
                     ) { Text(if (busy) stringResource(dev.ninfenz.mobile.R.string.packupdate_applying) else stringResource(dev.ninfenz.mobile.R.string.packupdate_apply)) }
 
                     OutlinedButton(
-                        enabled = !busy && base.exists() && target.exists(),
-                        onClick = {
-                            val raw = rawUpdate ?: return@OutlinedButton
-                            scope.launch {
-                                busy = true
-                                error = null
-                                resultText = null
-                                try {
-                                    // 回滚 = 反向 update（base=新版目录，new=旧版目录），仍走同一 pack-merge op
-                                    val reversed = PackUpdateModel.reversed(PackUpdateModel.parse(raw))
-                                    val rawReversed = PackUpdateModel.toJson(reversed)
-                                    val outDir = File(context.filesDir, "library/applied-rollback").apply { mkdirs() }
-                                    val payload = buildJsonObject {
-                                        put("update", rawReversed)
-                                        put("base_root", target.absolutePath)
-                                        put("new_root", base.absolutePath)
-                                        put("out_dir", outDir.absolutePath)
-                                    }
-                                    val response = safeCall("pack-merge", payload)
-                                    if (response.ok) {
-                                        resultText = context.getString(dev.ninfenz.mobile.R.string.packupdate_result, response.result?.toString() ?: "")
-                                    } else {
-                                        error = response.error
-                                    }
-                                } finally {
-                                    busy = false
-                                }
-                            }
-                        }
+                        enabled = !busy && preUpdateBackup != null,
+                        onClick = { showRollbackBackup = true }
                     ) { Text(if (busy) stringResource(dev.ninfenz.mobile.R.string.packupdate_rolling) else stringResource(dev.ninfenz.mobile.R.string.packupdate_rollback)) }
+                    if (preUpdateBackup == null) {
+                        Text(
+                            stringResource(dev.ninfenz.mobile.R.string.packupdate_rollback_no_backup),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
                 resultText?.let { MonoText(it) }
                 preUpdateBackup?.let {

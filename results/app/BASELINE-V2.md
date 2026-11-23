@@ -29,7 +29,7 @@
 |---|---|---|
 | Rust core | **212 passed / 21 suites / 0 failed** | `cd app/core && cargo test -q` |
 | Python app | **524 passed / 1 warning / 0 failed** | `python -m pytest app/tests -q` |
-| Android JVM | **502/502** | `:app:testDebugUnitTest` |
+| Android JVM | **505/505** | `:app:testDebugUnitTest` |
 | Desktop JVM | **20/20** | `cd app/desktop && ./gradlew test --rerun-tasks` |
 | TUI selftest | **9/9** | `python tui/nf.py --selftest` |
 | Desktop app-image | pass | `NFStudio.exe` 551,936 B；目录 137,150,938 B；启动存活 10s |
@@ -43,13 +43,13 @@
 
 | 产物 | 大小 | sha256 | 备注 |
 |---|---|---|---|
-| debug APK | 55,483,749 B | `468ea83d…` | 双 ABI |
-| release unsigned | 44,752,926 B | `e1786841…` | `zipalign -c -P 16` 通过 |
+| debug APK | 52,687,317 B | `ae7a3b2a…` | 双 ABI |
+| release unsigned | 44,775,094 B | `fbffe49b…` | `zipalign -c -P 16` 通过 |
 | lintRelease | pass | 0 errors / 0 warnings |
 | Release manifest | pass | 0.2.0；minSdk 26 / target 36；无 debuggable |
-| debug-signed APK | 44,697,765 B | `972ad0c8…` | 仅内部安装；证书 CN=Android Debug |
+| debug-signed APK | 52,687,317 B | `ae7a3b2a…` | 仅内部安装；证书 CN=Android Debug |
 | release AAB unsigned | 28,549,355 B | `37fc8201…` | 旧产物；`jarsigner -verify` 未签名 |
-| upload AAB signed | 28,591,207 B | `600b540d…` | upload key `F8:54:EF:94…`；`jarsigner -verify` 通过；Play Console 未创建 |
+| upload AAB signed | 28,602,775 B | `625b64b6…` | upload key `F8:54:EF:94…`；`jarsigner -verify` 通过；Play Console 未创建 |
 
 upload key 与签名 AAB 已落地；Play Console/服务账号、公证与商店素材仍无输入。
 

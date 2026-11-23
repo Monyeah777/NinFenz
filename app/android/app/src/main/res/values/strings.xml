@@ -597,7 +597,6 @@
     <string name="packupdate_applying">应用中…</string>
     <string name="packupdate_rollback">回滚</string>
     <string name="packupdate_rolling">回滚中…</string>
-    <string name="packupdate_result">回滚结果：%1$s</string>
     <string name="packupdate_pre_backup">迁移前备份：%1$s</string>
     <string name="packupdate_restore_backup">回滚到迁移前备份</string>
     <string name="packupdate_restore_backup_body">将用该备份覆盖 projects/drafts 等本地数据，确定继续？</string>
@@ -1195,4 +1194,9 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="preview_manual_hint">选择变换并应用到全部块</string>
     <string name="preview_manual_apply">应用</string>
     <string name="preview_manual_invalid">请先填写有效参数</string>
+    <string name="packupdate_rollback_no_backup">本次会话没有更新前备份，无法回滚；应用更新后请在同一会话内回滚。</string>
+    <plurals name="delivery_protocol_prefill">
+        <item quantity="one">已从协议字段带入 %1$d 个槽位</item>
+        <item quantity="other">已从协议字段带入 %1$d 个槽位</item>
+    </plurals>
 </resources>

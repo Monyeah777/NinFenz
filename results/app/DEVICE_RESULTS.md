@@ -16,7 +16,7 @@
 >
 > **2026-11-22 真机重新连接并实测**：OnePlus PLF110 / Android 16 / 1080×2392 / 480dpi，serial `3B65AR0183V00000`。debug 签名 APK 安装成功；冷启动 `am start -W` TotalTime 573ms（首装）/320ms（升级后）/188ms（force-stop 后）。首启引导、示例 Pack、演示项目、创作台、交付 graph-compile、必填槽位、assemble、L1 pass（error=0 warn=0 info=3）、导出 md、契约三项全绿、签收、SEND text/plain 分享导入预览均通过；logcat 无 FATAL/ANR。详见第 0 节。
 >
-> 当前本机验证总览：Android JVM **502/502**、Rust core **212/212**、app Python **524 passed**、APP 门禁 QA0–QA6 PASS/gap=0、lint **0 warnings**、`verify.sh --checks-only` PASS=107/WARN=2/FAIL=0。
+> 当前本机验证总览：Android JVM **505/505**、Rust core **212/212**、app Python **524 passed**、APP 门禁 QA0–QA6 PASS/gap=0、lint **0 warnings**、`verify.sh --checks-only` PASS=107/WARN=2/FAIL=0。
 
 ## 0. 2026-11-22 真机实测（本轮）
 
@@ -428,3 +428,9 @@
 - 重新 preserve 生成 `shared-text-md-54fee9fe5b9a.preserve.zip`，sha256 `cf9b9aa6…`；包内 `grant.json` 为 `revoked:true`，caps 仍 `export/read/reassemble`。
 - 导入页「最近归档」选中该包：显示 **归档未授予只读权限**，不显示恢复/只读预览/导出归档内容。
 - 随后取消撤销并保存，grant 恢复 `revoked:false`。
+
+### UX P0 真机 / 核心复核（2026-11-23 12:12）
+
+- 首页“粘贴一段，直接成稿”输入英文短句 → 导入页预览；不再出现 `NF-IMP-001`；自动切片卡片显示覆盖 100%、2 个例外（必填槽提示）。
+- 示例 `sample.md` 经 `nf-app-core zero-slice` 核心 CLI 复核：4 条映射、0 例外、coverage 99；SLT-01/SLT-02/SLT-03 均有内容，SLT-04 补充。
+- 说明：设备端 zero-slice 卡片仍受导入重复弹窗/滚动状态影响，未在本轮完整点到「用切片建项目」；该路径的既有真机证据仍是上一轮 3 映射/3 必填。
