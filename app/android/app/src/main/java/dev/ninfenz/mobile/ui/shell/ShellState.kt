@@ -13,6 +13,7 @@ sealed interface Detail {
     data object Search : Detail
     data object NewProject : Detail
     data object Settings : Detail
+    data object DesignSystem : Detail
     data object ErrorCodes : Detail
     data object Protocol : Detail
     data object Graph : Detail

@@ -9,6 +9,7 @@ import android.content.ContextWrapper
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -70,7 +71,8 @@ fun SettingsScreen(
     onErrorCodes: () -> Unit = {},
     onDataRestored: () -> Unit = {},
     onNfDocMerge: () -> Unit = {},
-    onPatch: () -> Unit = {}
+    onPatch: () -> Unit = {},
+    onDesignSystem: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val diag = remember { Core.diagnostics() }
@@ -167,8 +169,13 @@ fun SettingsScreen(
                 text = stringResource(dev.ninfenz.mobile.R.string.settings_error_hint, ErrorCatalog.all().size),
                 style = MaterialTheme.typography.bodySmall
             )
-            OutlinedButton(onClick = onErrorCodes) {
-                Text(stringResource(dev.ninfenz.mobile.R.string.error_codes_title))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedButton(onClick = onErrorCodes) {
+                    Text(stringResource(dev.ninfenz.mobile.R.string.error_codes_title))
+                }
+                OutlinedButton(onClick = onDesignSystem) {
+                    Text("设计系统")
+                }
             }
         }
 

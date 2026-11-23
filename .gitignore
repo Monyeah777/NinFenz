@@ -126,3 +126,7 @@ results/app/n[0-9]*.xml
 .wrangler/
 results/app/rel[0-9]*.png
 results/app/rel[0-9]*.xml
+results/app/d[0-9]*.xml
+results/app/d[0-9]*.png
+results/app/ds[0-9]*.xml
+results/app/ds[0-9]*.png

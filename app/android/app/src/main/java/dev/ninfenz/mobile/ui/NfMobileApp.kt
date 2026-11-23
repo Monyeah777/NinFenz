@@ -120,6 +120,7 @@ import dev.ninfenz.mobile.ui.screens.ProjectDetailScreen
 import dev.ninfenz.mobile.ui.screens.ProtocolScreen
 import dev.ninfenz.mobile.ui.screens.SearchScreen
 import dev.ninfenz.mobile.ui.screens.SettingsScreen
+import dev.ninfenz.mobile.ui.screens.DesignSystemScreen
 import dev.ninfenz.mobile.ui.screens.WorkflowHubScreen
 import dev.ninfenz.mobile.ui.screens.ProjectFlowScreen
 import dev.ninfenz.mobile.ui.shell.Detail
@@ -530,12 +531,14 @@ is Detail.Import -> ImportScreen(
                         onOpenProject = { id -> shell = shell.open(Detail.Project(id)) },
                         packIds = packs.packs.map { it.id }.distinct().sorted()
                     )
+                    is Detail.DesignSystem -> DesignSystemScreen(onBack = { shell = shell.back() ?: shell })
                     is Detail.Settings -> SettingsScreen(
                         onBack = { shell = shell.back() ?: shell },
                         onErrorCodes = { shell = shell.open(Detail.ErrorCodes) },
                         onDataRestored = { refresh() },
                         onNfDocMerge = { shell = shell.open(Detail.NfDocMerge) },
-                        onPatch = { shell = shell.open(Detail.Patch()) }
+                        onPatch = { shell = shell.open(Detail.Patch()) },
+                        onDesignSystem = { shell = shell.open(Detail.DesignSystem) }
                     )
                     is Detail.ErrorCodes -> ErrorCodesScreen(onBack = { shell = shell.back() ?: shell })
                     is Detail.Author -> {

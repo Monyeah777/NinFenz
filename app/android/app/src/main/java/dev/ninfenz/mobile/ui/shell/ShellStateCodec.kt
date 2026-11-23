@@ -10,6 +10,7 @@ object ShellStateCodec {
             Detail.Search -> "Search"
             Detail.NewProject -> "NewProject"
             Detail.Settings -> "Settings"
+            Detail.DesignSystem -> "DesignSystem"
             Detail.ErrorCodes -> "ErrorCodes"
             Detail.Protocol -> "Protocol"
             Detail.Graph -> "Graph"
@@ -50,6 +51,7 @@ object ShellStateCodec {
             "Search" -> Detail.Search
             "NewProject" -> Detail.NewProject
             "Settings" -> Detail.Settings
+            "DesignSystem" -> Detail.DesignSystem
             "ErrorCodes" -> Detail.ErrorCodes
             "Protocol" -> Detail.Protocol
             "Graph" -> Detail.Graph

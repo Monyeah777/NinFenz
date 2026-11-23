@@ -457,3 +457,10 @@
 - 在 API36 Pixel 7 模拟器卸载 debug 后安装该 APK，启动进入 onboarding，`Load sample pack` 可用。
 - APK 大小 44,849,313 B，sha256 2ec54779395122219f42aef16dd3785a3409050602b67bcf5094d8980340bbe6。
 - 该 APK 已作为 GitHub pre-release 资产 `mobile-v0.2.0` 发布，官网下载页直链。
+
+### 视觉体系演示屏（2026-11-23 23:00）
+
+- 设置 → Storage & diagnostics → 设计系统 已可达。
+- 演示屏显示 4 级字阶（22/28、16/24、16/24、14/20、12/20）、浅/深切换、100/130/200% 缩放控制、状态色与组件样例。
+- 该屏使用 opt-in `NfDesignTheme`；默认应用主题尚未逐屏迁移，避免破坏现有截图基线。
+- `DesignTokensTest` 通过；`design_lint.py` 当前仍报 14 条旧主题硬编码（迁移待办）。
