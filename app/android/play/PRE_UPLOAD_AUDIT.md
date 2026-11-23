@@ -42,7 +42,8 @@
 | app gates | QA0–QA6 27/27 PASS |
 | verify.sh | PASS=107 WARN=2 FAIL=0 |
 | zipalign 16KB | Verification successful |
-| release APK | 44,781,530 B |
+| release APK（unsigned） | 44,781,530 B |
+| 直装 APK（signed） | 44,849,313 B，sha256 `2ec54779…` |
 | debug APK | 52,687,317 B |
 
 ## 5. 商店素材

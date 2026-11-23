@@ -450,3 +450,10 @@
 - 首页粘贴英文短句 → 导入页：Auto-slice coverage 100%，无 NF-IMP-001。
 - Create project from slices → 创作台 Prefilled 1 field from the import mapping（自由稿单段，预期 1 槽）。
 - 该矩阵验证了 API36 + x86_64 + 首启/粘贴/切片建项目主路径；未在模拟器上逐项测试导出/评审/CCOS。
+
+### 签名直装 APK（2026-11-23 21:20）
+
+- `dist/nf-mobile-0.2.0.apk` 用 upload key 签名，apksigner 验证通过。
+- 在 API36 Pixel 7 模拟器卸载 debug 后安装该 APK，启动进入 onboarding，`Load sample pack` 可用。
+- APK 大小 44,849,313 B，sha256 2ec54779395122219f42aef16dd3785a3409050602b67bcf5094d8980340bbe6。
+- 该 APK 已作为 GitHub pre-release 资产 `mobile-v0.2.0` 发布，官网下载页直链。

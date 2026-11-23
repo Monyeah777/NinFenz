@@ -22,6 +22,9 @@
 | 文件 | 给谁 | 说明 |
 |---|---|---|
 | index.html / en/index.html | 人 | 主页：定义 / 事实 / 三种接法 / 上手 / 对比 / FAQ / 引用段 |
+| download/index.html | 人 | Android 直装 APK、校验、安装说明 |
+| cooperation/index.html | 人 | 商业合作范围与发起方式 |
+| geo/index.html | 人/检索 | GEO 标准目录检索（370 条） |
 | use/index.html / en/use/index.html | 人 | 「让 AI 用起来」：三种接法 + 一键复制块 + 每步期望输出 |
 | llms.txt | AI（索引） | 有哪些面可读（llms.txt 惯例的清单面） |
 | llms-full.txt | AI（完整） | 一文件读全：定义 / 事实 / 术语 / 上手 / FAQ / 引用 / 机器面清单 |
@@ -30,7 +33,7 @@
 | facts.json | AI（机读） | 事实清单：每条带真源与锚点；scale.values 与 repo_stats.json 机检对齐 |
 | run.sh | agent | 免安装引导（默认 clone + 只读体检；--full 追加全量门禁；逐条先打印再执行） |
 | robots.txt | 爬虫 | 显式欢迎 AI 检索/引用/训练取用 + Content-Signal + sitemap |
-| sitemap.xml | 爬虫 | 四页（/ · /en/ · /use/ · /en/use/）+ hreflang 互指 |
+| sitemap.xml | 爬虫 | 七页（/ · /download/ · /cooperation/ · /geo/ · /en/ · /use/ · /en/use/） |
 | _headers | 边缘 | 安全头 + 缓存策略 + 机器面 CORS/类型 + 首页 Vary: Accept |
 | worker.js | 边缘 | www -> 裸域 301；首页 Accept: text/markdown 时回 llms-full.txt |
 | 404.html · CNAME · .nojekyll · .assetsignore | 平台 | 站内 404 / Pages 域 / Jekyll 关 / 上传排除 |

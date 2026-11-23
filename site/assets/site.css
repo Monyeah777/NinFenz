@@ -35,3 +35,17 @@ footer{margin-top:44px;padding-top:16px;border-top:1px solid var(--line);color:v
 .block{margin:14px 0}
 .tbl-narrow td:first-child{white-space:nowrap}
 @media (max-width:560px){h1{font-size:22px}.wrap{padding:20px 14px 56px}}
+
+/* distribution + internal pages */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin:14px 0}
+.grid .card{margin:0}
+.btn{display:inline-block;background:var(--acc);color:#061014;border-radius:8px;padding:9px 16px;font-weight:700;margin:6px 0}
+.btn:hover{text-decoration:none;filter:brightness(1.08)}
+.btn.ghost{background:transparent;color:var(--acc);border:1px solid var(--acc)}
+.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:1px 9px;font-size:12px;color:var(--dim);margin-right:6px}
+.kv{display:grid;grid-template-columns:7em 1fr;gap:4px 12px;font-size:14px}
+.kv b{color:var(--dim);font-weight:500}
+input[type=search]{width:100%;background:#0a0e14;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:10px 12px;font:15px inherit}
+.result{border-bottom:1px solid var(--line);padding:10px 0}
+.result:last-child{border-bottom:0}
+.result .m{color:var(--dim);font-size:12px}

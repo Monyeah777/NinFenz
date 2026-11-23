@@ -123,3 +123,6 @@ results/app/ref-*.png
 results/app/design_research/
 results/app/n[0-9]*.png
 results/app/n[0-9]*.xml
+.wrangler/
+results/app/rel[0-9]*.png
+results/app/rel[0-9]*.xml

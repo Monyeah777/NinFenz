@@ -86,7 +86,7 @@ if (OFFLINE) {
   check('robots 内容信号', rb.includes('Content-Signal:'), 'Content-Signal');
   check('robots 指向 sitemap', rb.includes('Sitemap: ' + origin + '/sitemap.xml'), 'sitemap');
   const sm = read('sitemap.xml');
-  check('sitemap 覆盖四页', ['/', '/en/', '/use/', '/en/use/'].every((p) => sm.includes('<loc>' + origin + p + '</loc>')), '4 个 loc');
+  check('sitemap 覆盖七页', ['/', '/download/', '/cooperation/', '/geo/', '/en/', '/use/', '/en/use/'].every((p) => sm.includes('<loc>' + origin + p + '</loc>')), '7 个 loc');
   check('run.sh 是脚本', read('run.sh').startsWith('#!'), read('run.sh').split('\n')[0]);
   // worker.js 的**行为**判据移到 site/tools/worker-check.mjs（真跑模块 + 桩 ASSETS，16 条）。
   // 此处原先的两条字符串包含判据（`includes('text/markdown')` / `includes('301')`）已删除：

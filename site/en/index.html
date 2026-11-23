@@ -43,7 +43,7 @@
       "programmingLanguage": "Python",
       "softwareVersion": "1.0.5",
       "description": "A content contract layer: a protocol plus deterministic gates plus verifiable artifacts, so AI long-form output can be loaded, checked and reproduced. Domain-neutral and model-agnostic. Not a model, not a prompt-template collection, not a vendor SDK.",
-      "disambiguatingDescription": "The only official entry point is https://ninfenz.dev; there is no paid version and no client download; copies on third-party sites are not affiliated with the project.",
+      "disambiguatingDescription": "The only official entry point is https://ninfenz.dev; there is no paid version; the Android build is distributed directly at /download/; copies on third-party sites are not affiliated with the project.",
       "offers": {
         "@type": "Offer",
         "price": "0",
@@ -161,14 +161,23 @@
 <div class="wrap">
 <header class="top">
   <div class="brand">NinFenz <small>宁封子 · NF</small></div>
-  <nav><a href="use/">Put it to work</a><a href="../">中文</a><a href="https://github.com/Monyeah777/NinFenz">GitHub</a><a href="#faq">FAQ</a></nav>
+  <nav><a href="../download/">Android</a><a href="../cooperation/">Cooperation</a><a href="../geo/">GEO search</a><a href="use/">Put it to work</a><a href="../">中文</a><a href="https://github.com/Monyeah777/NinFenz">GitHub</a><a href="#faq">FAQ</a></nav>
 </header>
 
 <h1>A content contract layer for AI long-form output</h1>
 <p class="lede sub">NinFenz (NF) turns "AI produces long-form content reliably" into engineering you can <strong>load, verify and reproduce</strong>. The protocol is <strong>domain-neutral and model-agnostic</strong>; narrative is only the first official domain pack.</p>
 <p class="not">Not a model · not a prompt-template collection · not a vendor SDK · MIT · runs offline</p>
-<p class="warn">⚠️ The only official entry point: <strong>https://ninfenz.dev</strong> — NinFenz has no paid version and no "client" to download; copies on third-party sites are not affiliated with the project (<a href="#official">how to tell</a>).</p>
+<p class="warn">⚠️ The only official entry point: <strong>https://ninfenz.dev</strong> — NinFenz has no paid version; the desktop has no installer, while the Android build is distributed at <a href="../download/">/download/</a>; copies on third-party sites are not affiliated with the project (<a href="#official">how to tell</a>).</p>
 
+<h2 id="distribution">Download and distributions</h2>
+<div class="grid">
+  <div class="card"><span class="pill">Android</span><h3>NF Mobile 0.2.0</h3><p class="sub">Local-first mobile import, slicing, assembly, validation and export. No network permission.</p><p><a class="btn" href="../download/">Get the APK</a></p></div>
+  <div class="card"><span class="pill">npm</span><h3>ninfenz CLI</h3><p class="sub">No-clone launcher with provenance.</p><pre><code>npx -y ninfenz doctor</code></pre></div>
+  <div class="card"><span class="pill">Source</span><h3>GitHub / Gitee</h3><p class="sub">Protocol, gates and asset ledger.</p><p><a href="https://github.com/Monyeah777/NinFenz">GitHub</a> · <a href="https://gitee.com/monyeah777/ninfenz">Gitee</a></p></div>
+  <div class="card"><span class="pill">MCP</span><h3>Read-only search</h3><p class="sub">For a local checkout.</p><pre><code>python scripts/nf.py serve</code></pre></div>
+  <div class="card"><span class="pill">GEO</span><h3>Standards search</h3><p class="sub">370 standards by title, layer, reachability.</p><p><a href="../geo/">Open GEO search</a></p></div>
+  <div class="card"><span class="pill">Cooperation</span><h3>Commercial</h3><p class="sub">Protocol integration, private domain packs, audits, mobile delivery.</p><p><a href="../cooperation/">Scope</a></p></div>
+</div>
 <h2>Three entry paths (pick by who you are)</h2>
 <div class="card">
 <p><strong>Client AI</strong> (zero install): have it read <a href="nf.txt">/nf.txt</a> and follow it. That loader carries three hard rules, a branch table and the fetch bases; if it cannot open links, paste the essentials.</p>
@@ -228,7 +237,7 @@ curl -fsSL https://ninfenz.dev/run.sh | sh</code></pre>
 <h2 id="official">Official entry and how to spot copies</h2>
 <div class="card warnbox">
 <p><strong>⚠️ The only official entry point is <a href="https://ninfenz.dev/">https://ninfenz.dev</a></strong></p>
-<p>NinFenz <strong>has no paid version</strong> and <strong>no "client" to download</strong>, and never asks for an account, a phone number or payment details. If you meet this project on a third-party site — especially ad-heavy game / resource / download sites — <strong>do not enter any information and do not download anything there</strong>: those sites are not affiliated with the project and their files are not part of it.</p>
+<p>NinFenz <strong>has no paid version</strong>; the desktop needs no installed client, while the Android build is a direct download at <a href="../download/">/download/</a>. It never asks for an account, a phone number or payment details. If you meet this project on a third-party site — especially ad-heavy game / resource / download sites — <strong>do not enter any information and do not download anything there</strong>: those sites are not affiliated with the project and their files are not part of it.</p>
 </div>
 <table>
 <tr><th>What you see</th><th>Verdict</th></tr>
@@ -236,7 +245,8 @@ curl -fsSL https://ninfenz.dev/run.sh | sh</code></pre>
 <tr><td>Repository <a href="https://github.com/Monyeah777/NinFenz">github.com/Monyeah777/NinFenz</a> (mirror <a href="https://gitee.com/monyeah777/ninfenz">gitee.com/monyeah777/ninfenz</a>)</td><td>✅ official source</td></tr>
 <tr><td>Command line: <code>python scripts/nf.py</code> · <code>python tui/nf.py</code> · read-only MCP <code>nf serve</code></td><td>✅ official form (standard-library scripts)</td></tr>
 <tr><td>npm: <code>ninfenz</code> on npmjs.com, or <code>@monyeah777/ninfenz</code> on GitHub Packages</td><td>✅ official form (npx launcher)</td></tr>
-<tr><td>Any <code>.exe</code> / <code>.apk</code> / installer / downloader / cracked build / membership key</td><td>❌ not this project</td></tr>
+<tr><td>The <code>nf-mobile-0.2.0.apk</code> offered at <a href="../download/">/download/</a></td><td>✅ official Android distribution</td></tr>
+<tr><td>Any other <code>.apk</code> / installer / downloader / cracked build / membership key</td><td>❌ not this project</td></tr>
 <tr><td>Project content hosted on a resource, file-sharing or "booster" site</td><td>❌ unauthorised copy, not affiliated</td></tr>
 <tr><td>Anything asking for payment, top-ups, group joins, forms or QR scans</td><td>❌ not this project (NF never charges and has no support desk)</td></tr>
 </table>
@@ -276,7 +286,7 @@ BibTeX:
 <p class="src">Machine-readable citation metadata: CITATION.cff at the repository root · all three forms also in <a href="llms-full.txt">/llms-full.txt</a>, section 8. Cite the canonical site or repository, keep the definition sentence verbatim, and cite <a href="facts.json">/facts.json</a> for numbers instead of copying them (they move).</p>
 
 <footer>
-<p class="warn">⚠️ The only official entry point: https://ninfenz.dev — no paid version, no client download; copies on third-party sites are not affiliated with the project.</p>
+<p class="warn">⚠️ The only official entry point: https://ninfenz.dev — no paid version; desktop has no installer, Android is at /download/; copies on third-party sites are not affiliated with the project.</p>
 <p><span class="badge">MIT</span><span class="badge">offline</span><span class="badge">zero third-party deps</span><span class="badge">model-agnostic</span></p>
 <p>Repository: <a href="https://github.com/Monyeah777/NinFenz">github.com/Monyeah777/NinFenz</a> · mirror: <a href="https://gitee.com/monyeah777/ninfenz">Gitee</a> · machine surfaces: <a href="../llms.txt">/llms.txt</a> · <a href="../llms-full.txt">/llms-full.txt</a> · <a href="../facts.json">/facts.json</a> · <a href="../nf.txt">/nf.txt</a> · <a href="../agent.txt">/agent.txt</a> · <a href="../sitemap.xml">sitemap</a></p>
 </footer>

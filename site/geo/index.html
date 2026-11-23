@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GEO 检索 · NinFenz 标准目录</title>
+<meta name="description" content="NinFenz GEO 标准目录检索：370 条标准、可达性与分层，支持标题、ID、正文与层过滤。">
+<link rel="canonical" href="https://ninfenz.dev/geo/">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <div class="brand">宁封子 <small>NinFenz · NF</small></div>
+  <nav><a href="../">首页</a><a href="../download/">下载</a><a href="../cooperation/">商业合作</a><a href="../en/">English</a></nav>
+</header>
+
+<h1>GEO 检索</h1>
+<p class="lede sub">NinFenz 标准目录的本地检索：370 条标准，按标题、ID、正文与层过滤。数据来自 <code>protocol/geo_export.json</code>，页面不联网检索。</p>
+
+<div class="card">
+  <input id="q" type="search" placeholder="搜索标准标题 / ID / 正文，例如 markdown、HTTP、json" autocomplete="off">
+  <p class="src" id="meta">加载中…</p>
+  <div id="layers"></div>
+  <div id="results" aria-live="polite"></div>
+</div>
+
+<h2>怎么读</h2>
+<ul>
+<li><b>layer</b>：form / data / iface / eng / gov，对应标准目录的分层。</li>
+<li><b>可达</b>：最近一次探针 HTTP 200；不可达不等于标准失效，只代表该 URL 当时不可取。</li>
+<li><b>bound</b>：协议件对该标准的绑定数量；0 表示当前未绑定。</li>
+</ul>
+<p class="src">原始数据：<a href="standards.json">/geo/standards.json</a> · 机读事实：<a href="../facts.json">/facts.json</a></p>
+
+<footer><p><a href="../">返回 NinFenz</a> · <a href="../download/">下载 NF Mobile</a> · <a href="https://github.com/Monyeah777/NinFenz">GitHub</a></p></footer>
+</div>
+<script>
+(async function(){
+  const q=document.getElementById('q'), out=document.getElementById('results'), meta=document.getElementById('meta'), layers=document.getElementById('layers');
+  let data;
+  try { data=await (await fetch('standards.json',{cache:'no-store'})).json(); }
+  catch(e){ meta.textContent='标准目录加载失败：'+e.message; return; }
+  const all=data.standards||[]; let layer='';
+  meta.textContent='共 '+all.length+' 条 · 可达 '+(data.coverage?.reachable??'?')+' · 不可达 '+(data.coverage?.unreachable??'?');
+  const counts=Object.entries(data.coverage?.by_layer||{});
+  const mk=(label,value)=>{const b=document.createElement('button');b.className='copy';b.textContent=label;b.onclick=()=>{layer=value;render()};return b};
+  layers.append(mk('全部',''));
+  counts.forEach(([k,v])=>layers.append(mk(k+' '+v,k)));
+  function render(){
+    const term=q.value.trim().toLowerCase(); const hits=all.filter(s=>{
+      if(layer && s.layer!==layer) return false;
+      if(!term) return true;
+      return [s.title,s.id,s.body,s.layer,s.url].some(x=>String(x||'').toLowerCase().includes(term));
+    });
+    out.textContent='';
+    const head=document.createElement('p'); head.className='src'; head.textContent='命中 '+hits.length+' 条'+(layer?' · layer='+layer:''); out.append(head);
+    hits.slice(0,40).forEach(s=>{
+      const d=document.createElement('div'); d.className='result';
+      const a=document.createElement('a'); a.href=s.url||'#'; a.target='_blank'; a.rel='noopener'; a.textContent=s.title||s.id;
+      const m=document.createElement('div'); m.className='m';
+      m.textContent=[s.id,s.layer,s.reachable?'可达':'不可达','bound '+(s.bound_main?s.bound_main:0),s.body].filter(Boolean).join(' · ');
+      d.append(a,m); out.append(d);
+    });
+    if(hits.length>40){const p=document.createElement('p');p.className='src';p.textContent='仅显示前 40 条，请细化关键词。';out.append(p)}
+  }
+  q.addEventListener('input',render); render();
+})();
+</script>
+</body>
+</html>

@@ -33,7 +33,7 @@
         "NF"
       ],
       "applicationCategory": "DeveloperApplication",
-      "operatingSystem": "Windows, macOS, Linux",
+      "operatingSystem": "Windows, macOS, Linux, Android",
       "license": "https://opensource.org/license/mit",
       "codeRepository": "https://github.com/Monyeah777/NinFenz",
       "sameAs": [
@@ -43,7 +43,7 @@
       "programmingLanguage": "Python",
       "softwareVersion": "1.0.5",
       "description": "内容契约层：用「协议 + 确定性门禁 + 可验证产物」把「AI 稳定产出长内容」变成可装载、可质检、可复现的工程。协议域中立、模型无关。不是模型、不是提示词模板集、不是厂商 SDK。",
-      "disambiguatingDescription": "官方唯一指定入口是 https://ninfenz.dev；没有付费版，也没有客户端下载；第三方站点上的本项目内容与官方无关。",
+      "disambiguatingDescription": "官方唯一指定入口是 https://ninfenz.dev；没有付费版；Android 版在 /download/ 直接分发；第三方站点上的本项目内容与官方无关。",
       "offers": {
         "@type": "Offer",
         "price": "0",
@@ -161,13 +161,26 @@
 <div class="wrap">
 <header class="top">
   <div class="brand">宁封子 <small>NinFenz · NF</small></div>
-  <nav><a href="use/">让 AI 用</a><a href="en/">English</a><a href="https://github.com/Monyeah777/NinFenz">GitHub</a><a href="#faq">FAQ</a></nav>
+  <nav><a href="download/">下载</a><a href="cooperation/">商业合作</a><a href="geo/">GEO 检索</a><a href="use/">让 AI 用</a><a href="en/">English</a><a href="https://github.com/Monyeah777/NinFenz">GitHub</a></nav>
 </header>
 
 <h1>内容契约层：让 AI 长内容可装载、可质检、可复现</h1>
 <p class="lede sub">宁封子（NinFenz，简称 NF）是<strong>内容契约层（content contract layer）</strong>：把「AI 稳定产出长内容」变成工程。协议本体<strong>域中立、模型无关</strong>；叙事只是官方第一个域包。</p>
 <p class="not">不是模型 · 不是提示词模板集 · 不是某厂商 SDK · MIT · 可离线</p>
-<p class="warn">⚠️ 官方唯一指定入口：<strong>https://ninfenz.dev</strong> —— NinFenz 没有付费版，也不需要下载任何「客户端」；第三方站点上的本项目内容与官方无关（<a href="#official">怎么辨识</a>）。</p>
+<p><a class="btn" href="download/">下载 Android APK</a> <a class="btn ghost" href="#distribution">全部分发入口</a> <a class="btn ghost" href="cooperation/">商业合作</a></p>
+<p class="warn">⚠️ 官方唯一指定入口：<strong>https://ninfenz.dev</strong> —— NinFenz 没有付费版；桌面端无安装器，Android 版从 <a href="download/">/download/</a> 直接分发。第三方站点上的本项目内容与官方无关（<a href="#official">怎么辨识</a>）。</p>
+
+
+<h2 id="distribution">下载与分发</h2>
+<p class="sub">按你想要的形态进入；所有入口都在官方域名或官方仓库/镜像下。</p>
+<div class="grid">
+  <div class="card"><span class="pill">Android</span><h3>NF Mobile 0.2.0</h3><p class="sub">本地优先的移动端：导入、切片、装配、校验、导出。无网络权限。</p><p><a class="btn" href="download/">获取 APK</a></p></div>
+  <div class="card"><span class="pill">npm</span><h3>ninfenz CLI</h3><p class="sub">免 clone 启动器，带 provenance。</p><pre><code>npx -y ninfenz doctor</code></pre></div>
+  <div class="card"><span class="pill">源码</span><h3>GitHub / Gitee</h3><p class="sub">完整协议、门禁与资产台账。</p><p><a href="https://github.com/Monyeah777/NinFenz">GitHub</a> · <a href="https://gitee.com/monyeah777/ninfenz">Gitee</a></p></div>
+  <div class="card"><span class="pill">MCP</span><h3>只读检索</h3><p class="sub">本地检出后给 AI 客户端用。</p><pre><code>python scripts/nf.py serve</code></pre></div>
+  <div class="card"><span class="pill">GEO</span><h3>标准目录检索</h3><p class="sub">370 条标准的标题/层/可达性。</p><p><a href="geo/">打开 GEO 检索</a></p></div>
+  <div class="card"><span class="pill">合作</span><h3>商业合作</h3><p class="sub">协议接入、私有域包、内容工程审计、移动端定制。</p><p><a href="cooperation/">合作范围</a></p></div>
+</div>
 
 <h2>三种接法（按你的身份选）</h2>
 <div class="card">
@@ -229,7 +242,7 @@ curl -fsSL https://ninfenz.dev/run.sh | sh</code></pre>
 <h2 id="official">官方唯一入口与防伪</h2>
 <div class="card warnbox">
 <p><strong>⚠️ 官方唯一指定入口：<a href="https://ninfenz.dev/">https://ninfenz.dev</a></strong></p>
-<p>NinFenz（宁封子）<strong>没有付费版</strong>，<strong>不需要下载任何「客户端」</strong>，也从不索取账号、手机号或支付信息。若你在第三方网站——尤其是带大量广告的游戏 / 资源 / 软件下载站——看到本项目的内容，请<strong>不要在该站输入任何信息、不要下载任何文件</strong>：那些站点与官方无关，其文件不属于本项目。</p>
+<p>NinFenz（宁封子）<strong>没有付费版</strong>；桌面端<strong>不需要安装客户端</strong>，Android 版从 <a href="download/">/download/</a> 直接下载。也从不索取账号、手机号或支付信息。若你在第三方网站——尤其是带大量广告的游戏 / 资源 / 软件下载站——看到本项目的内容，请<strong>不要在该站输入任何信息、不要下载任何文件</strong>：那些站点与官方无关，其文件不属于本项目。</p>
 </div>
 <table>
 <tr><th>你看到的东西</th><th>判定</th></tr>
@@ -237,7 +250,8 @@ curl -fsSL https://ninfenz.dev/run.sh | sh</code></pre>
 <tr><td>仓库 <a href="https://github.com/Monyeah777/NinFenz">github.com/Monyeah777/NinFenz</a>（镜像 <a href="https://gitee.com/monyeah777/ninfenz">gitee.com/monyeah777/ninfenz</a>）</td><td>✅ 官方来源</td></tr>
 <tr><td>命令行：<code>python scripts/nf.py</code> · <code>python tui/nf.py</code> · 只读 MCP <code>nf serve</code></td><td>✅ 官方形态（纯标准库脚本）</td></tr>
 <tr><td>npm 包：npmjs.com 上的 <code>ninfenz</code>，或 GitHub Packages 的 <code>@monyeah777/ninfenz</code></td><td>✅ 官方形态（npx 启动器）</td></tr>
-<tr><td>任何 <code>.exe</code> / <code>.apk</code> / 安装器 / 下载器 / 破解版 / 会员激活码</td><td>❌ 不是本项目</td></tr>
+<tr><td>本页 <a href="download/">/download/</a> 提供的 <code>nf-mobile-0.2.0.apk</code></td><td>✅ 官方 Android 分发</td></tr>
+<tr><td>其他站点的 <code>.apk</code> / 安装器 / 破解版 / 会员激活码</td><td>❌ 不是本项目</td></tr>
 <tr><td>资源站 / 网盘 / 加速器页面上的本项目内容</td><td>❌ 未获官方维护的转载，与官方无关</td></tr>
 <tr><td>任何要求付款、充值、加群、填表、扫码的行为</td><td>❌ 不是本项目（NF 从不收费，也没有客服渠道）</td></tr>
 </table>
@@ -277,8 +291,9 @@ BibTeX：
 <p class="src">机读引用元数据：仓库根 CITATION.cff · 三种形态同见 <a href="llms-full.txt">/llms-full.txt</a> 第八节。引用请指向 canonical 站点或仓库，并保持定义句逐字一致；量化事实请引 <a href="facts.json">/facts.json</a>，别手抄数字（会过期）。</p>
 
 <footer>
-<p class="warn">⚠️ 官方唯一指定入口：https://ninfenz.dev —— 没有付费版、没有客户端下载；第三方站点上的本项目内容与官方无关。</p>
+<p class="warn">⚠️ 官方唯一指定入口：https://ninfenz.dev —— 没有付费版；桌面端无安装器，Android 版从 /download/ 分发；第三方站点上的本项目内容与官方无关。</p>
 <p><span class="badge">MIT</span><span class="badge">离线可跑</span><span class="badge">零第三方依赖</span><span class="badge">模型无关</span></p>
+<p><a href="download/">下载 NF Mobile</a> · <a href="cooperation/">商业合作</a> · <a href="geo/">GEO 检索</a></p>
 <p>仓库：<a href="https://github.com/Monyeah777/NinFenz">github.com/Monyeah777/NinFenz</a> · 镜像：<a href="https://gitee.com/monyeah777/ninfenz">Gitee</a> · 机器面：<a href="llms.txt">/llms.txt</a> · <a href="llms-full.txt">/llms-full.txt</a> · <a href="facts.json">/facts.json</a> · <a href="nf.txt">/nf.txt</a> · <a href="agent.txt">/agent.txt</a> · <a href="sitemap.xml">sitemap</a></p>
 </footer>
 </div>
