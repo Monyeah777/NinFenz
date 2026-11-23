@@ -39,6 +39,7 @@ import dev.ninfenz.mobile.ui.design.Radius
 import dev.ninfenz.mobile.ui.design.Sizes
 import dev.ninfenz.mobile.ui.design.Space
 import dev.ninfenz.mobile.ui.design.TypeScale
+import dev.ninfenz.mobile.ui.design.VisualTheory
 import dev.ninfenz.mobile.ui.design.components.NfBody
 import dev.ninfenz.mobile.ui.design.components.NfEmptyState
 import dev.ninfenz.mobile.ui.design.components.NfErrorBlock
