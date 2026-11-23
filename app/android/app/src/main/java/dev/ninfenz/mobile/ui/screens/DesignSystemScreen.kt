@@ -44,6 +44,7 @@ import dev.ninfenz.mobile.ui.design.Proximity
 import dev.ninfenz.mobile.ui.design.GroundLadder
 import dev.ninfenz.mobile.ui.design.Density as NfDensity
 import dev.ninfenz.mobile.ui.design.Feedback
+import dev.ninfenz.mobile.ui.design.StateContracts
 import dev.ninfenz.mobile.ui.design.components.NfBody
 import dev.ninfenz.mobile.ui.design.components.NfEmptyState
 import dev.ninfenz.mobile.ui.design.components.NfErrorBlock
@@ -185,18 +186,21 @@ fun DesignSystemScreen(onBack: () -> Unit) {
                 NfEmptyState(text = "尚无项目。新建或导入一段内容开始。", actionLabel = "新建项目", onAction = {})
                 NfPrimaryAction(label = "开始成稿", onClick = {})
 
-                NfSectionHeader("7 态")
-                NfMeta("空 / 加载 / 错误 / 离线 / 部分成功 / 已签 / 已过期")
-                Row(horizontalArrangement = Arrangement.spacedBy(Space.gap.dp)) {
-                    NfStatusChip("空", tone = NfStatusTone.NEUTRAL)
-                    NfStatusChip("加载中", tone = NfStatusTone.INFO)
-                    NfStatusChip("错误", tone = NfStatusTone.ERROR)
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(Space.gap.dp)) {
-                    NfStatusChip("离线", tone = NfStatusTone.WARNING)
-                    NfStatusChip("部分成功", tone = NfStatusTone.WARNING)
-                    NfStatusChip("已签", tone = NfStatusTone.SUCCESS)
-                    NfStatusChip("已过期", tone = NfStatusTone.NEUTRAL)
+                NfSectionHeader("7 态（契约驱动）")
+                StateContracts.all.forEach { state ->
+                    Row(horizontalArrangement = Arrangement.spacedBy(Space.gap.dp), verticalAlignment = Alignment.CenterVertically) {
+                        NfStatusChip(
+                            state.title,
+                            tone = when (state.tone) {
+                                "success" -> NfStatusTone.SUCCESS
+                                "warning" -> NfStatusTone.WARNING
+                                "error" -> NfStatusTone.ERROR
+                                "info" -> NfStatusTone.INFO
+                                else -> NfStatusTone.NEUTRAL
+                            }
+                        )
+                        NfMeta(state.action ?: "无动作")
+                    }
                 }
 
                 NfSectionHeader("尺寸")
