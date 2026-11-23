@@ -8,6 +8,23 @@
 //
 // 配合 wrangler.jsonc 的 assets.run_worker_first = true 与 assets.binding = "ASSETS"。
 
+
+const APK_PATH = '/download/nf-mobile-0.2.0.apk';
+const APK_UPSTREAM = 'https://github.com/Monyeah777/NinFenz/releases/download/mobile-v0.2.0/nf-mobile-0.2.0.apk';
+
+async function proxyApk() {
+  const res = await fetch(APK_UPSTREAM, { redirect: 'follow', headers: { accept: 'application/octet-stream' } });
+  if (!res.ok) return new Response('APK temporarily unavailable', { status: 502, headers: { 'content-type': 'text/plain; charset=utf-8' } });
+  const headers = new Headers();
+  headers.set('content-type', 'application/vnd.android.package-archive');
+  headers.set('content-disposition', 'attachment; filename="nf-mobile-0.2.0.apk"');
+  headers.set('cache-control', 'public, max-age=300');
+  headers.set('access-control-allow-origin', '*');
+  const len = res.headers.get('content-length');
+  if (len) headers.set('content-length', len);
+  return new Response(res.body, { status: 200, headers });
+}
+
 const MARKDOWN_ROUTES = new Set(['/', '/en/', '/en']);
 
 // 客户端是否**明确**点名 markdown（2026-10-08 修）：
@@ -32,6 +49,9 @@ export default {
     if (url.hostname.startsWith('www.')) {
       url.hostname = url.hostname.slice(4);
       return Response.redirect(url.toString(), 301);
+    }
+    if (request.method === 'GET' && url.pathname === APK_PATH) {
+      return proxyApk();
     }
     if (request.method === 'GET' && MARKDOWN_ROUTES.has(url.pathname)) {
       const accept = request.headers.get('accept') || '';
