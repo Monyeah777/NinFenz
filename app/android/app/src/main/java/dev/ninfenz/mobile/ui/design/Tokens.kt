@@ -208,8 +208,8 @@ data class ColorToken(
 object Palette {
     val background = ColorToken("surface.base", 0xFFF7FAF9.toInt(), 0xFF0F1413.toInt(), Sources.NF_BRAND_NEUTRAL)
     val surface = ColorToken("surface.card", 0xFFFFFFFF.toInt(), 0xFF1B2725.toInt(), Sources.NF_BRAND_NEUTRAL)
-    val surfaceRaised = ColorToken("surface.raised", 0xFFFFFFFF.toInt(), 0xFF232F2D.toInt(), Sources.NF_BRAND_NEUTRAL)
-    val surfaceVariant = ColorToken("surface.variant", 0xFFE6EDEB.toInt(), 0xFF253230.toInt(), Sources.NF_BRAND_NEUTRAL)
+    val surfaceRaised = ColorToken("surface.raised", 0xFFFFFFFF.toInt(), 0xFF2A3734.toInt(), Sources.NF_BRAND_NEUTRAL)
+    val surfaceVariant = ColorToken("surface.variant", 0xFFE6EDEB.toInt(), 0xFF34433F.toInt(), Sources.NF_BRAND_NEUTRAL)
     val onSurface = ColorToken("text.primary", 0xFF14181A.toInt(), 0xFFE3E9E7.toInt(), Sources.WCAG_CONTRAST)
     val onSurfaceVariant = ColorToken("text.secondary", 0xFF46524F.toInt(), 0xFFA9B6B3.toInt(), Sources.WCAG_CONTRAST)
     val outline = ColorToken("outline", 0xFF6B7A77.toInt(), 0xFF6E7B78.toInt(), Sources.WCAG_NONTEXT)
