@@ -157,6 +157,18 @@ PTECH / PATS / Terra 等业界模型作为问题类型参考；本仓不复制�
 | Peak-End | 导出成功给可核对回执 | `X-PEAK` |
 | Tufte 数据墨水比 | 证据区去装饰，哈希/状态直读 | `X-DATAINK` |
 
+
+## 15. 视觉文化 / 修辞（可执行部分）
+
+| 理论 | NF 规则 | 规则 ID |
+|---|---|---|
+| 中文排版文化 | tracking=0、行距 1.5–1.75、禁则 | `C-CN` |
+| RTL/多语 | 用信息角色替代绝对左右，RTL 镜像方向 | `C-RTL` |
+| 颜色文化 | 状态必须文字+形状+颜色 | `C-SEM` |
+| Ethos | 可信来自哈希/时间/来源 | `R-ETHOS` |
+| Pathos | 不用倒计时/恐吓制造紧迫感 | `R-PATHOS` |
+| Logos | 结构/门禁/数字可回指 | `R-LOGOS` |
+
 ## 9. 参考
 
 - Wertheimer, M. (1923). Untersuchungen zur Lehre von der Gestalt.

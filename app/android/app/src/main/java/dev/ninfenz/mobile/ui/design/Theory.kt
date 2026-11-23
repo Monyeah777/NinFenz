@@ -165,6 +165,39 @@ object VisualTheory {
     )
 
 
+
+    // ---- 视觉文化 / 视觉修辞 ----
+    val cjkTypography = TheoryRule(
+        "C-CN", "Visual Culture", "cjk-typography", "NfType lineBreak/tracking",
+        "中文 tracking=0、行距 1.5–1.75、行首行尾禁则；不套拉丁字距。",
+        "W3C clreq; Lupton 2010"
+    )
+    val rtlMirror = TheoryRule(
+        "C-RTL", "Visual Culture", "rtl-mirror", "Layout roles, not left/right",
+        "信息角色替代绝对左右；RTL 时镜像方向，不镜像语义。",
+        "Kress & van Leeuwen 2006"
+    )
+    val colorMeaning = TheoryRule(
+        "C-SEM", "Visual Culture", "color-meaning", "status + text + shape",
+        "颜色含义因文化而异；状态必须配文字/形状，不能只靠色。",
+        "WCAG 1.4.1"
+    )
+    val ethos = TheoryRule(
+        "R-ETHOS", "Visual Rhetoric", "ethos", "hash/time/source",
+        "可信来自可核对证据：哈希、时间、来源，不来自权威口吻。",
+        "Aristotle, Rhetoric"
+    )
+    val pathos = TheoryRule(
+        "R-PATHOS", "Visual Rhetoric", "pathos", "no urgency/fear",
+        "不用倒计时/恐吓/红色紧迫感操纵；情绪让位于任务。",
+        "Aristotle, Rhetoric"
+    )
+    val logos = TheoryRule(
+        "R-LOGOS", "Visual Rhetoric", "logos", "gates + structure",
+        "论证靠结构、门禁、数字；每屏可回答“为什么这样”。",
+        "Aristotle, Rhetoric"
+    )
+
     // ---- 补充：认知/交互/信息设计 ----
     val fitts = TheoryRule("X-FITTS", "Fitts", "fitts-law", "Sizes.touchTarget + button",
         "目标越大越近越易点；主操作靠拇指区，触控 ≥48dp。", "Fitts 1954")
@@ -227,6 +260,7 @@ object VisualTheory {
         informationValue, salience, framing,
         hierarchy, grid, rhythm, scale, modularity, transparency, luptonFraming, luptonFigureGround, timeMotion,
         useful, usable, desirable, findable, accessible, credible, valuable,
+        cjkTypography, rtlMirror, colorMeaning, ethos, pathos, logos,
         fitts, hick, miller, sweller, doherty, jakob, peakEnd, dataInk,
         happiness, engagement, adoption, retention, taskSuccess,
         strategy, scope, structure, skeleton, surface
@@ -239,6 +273,7 @@ object VisualTheory {
         "information-value", "salience", "framing",
         "hierarchy", "grid", "rhythm-balance", "scale", "modularity", "transparency", "time-motion",
         "useful", "usable", "desirable", "findable", "accessible", "credible", "valuable",
+        "cjk-typography", "rtl-mirror", "color-meaning", "ethos", "pathos", "logos",
         "fitts-law", "hick-law", "chunking", "extraneous-load", "feedback-threshold", "consistency", "peak-end", "data-ink",
         "happiness", "engagement", "adoption", "retention", "task-success",
         "strategy", "scope", "structure", "skeleton", "surface"
