@@ -108,10 +108,12 @@ app/**/__pycache__/
 results/app/device-2026-11-18-*
 results/app/device_*.png
 results/app/device_ui*.xml
-results/app/[e-h-tuvwxy][0-9]*.xml
-results/app/[e-h-tuvwxy][0-9]*.png
+results/app/[e-h-q-s-tuvwxy][0-9]*.xml
+results/app/[e-h-q-s-tuvwxy][0-9]*.png
 results/app/ux_*.png
 results/app/em[0-9]*.xml
+results/app/[qrs][0-9]*.xml
+results/app/[qrs][0-9]*.png
 results/app/em[0-9]*.png
 results/app/[uvwxy][0-9]*.png
 results/app/mobbin*.png
