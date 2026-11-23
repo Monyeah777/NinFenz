@@ -58,6 +58,7 @@ class DeepVisualSystemTest {
         assertTrue("brand hue=$h", h in 158.0..178.0)
         val sim = ColorVision.simulate(Palette.error.light)
         assertTrue(ColorVision.deltaE76(Palette.error.light, sim) > 0.0)
+        assertTrue("status colors must remain separated under deuteranopia", ColorVision.statusSeparated())
     }
 
     @Test

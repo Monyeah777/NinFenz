@@ -148,6 +148,7 @@ NF 的覆盖条用长度；信任等级用位置+文字；状态用色相+形状
 | 深色图底阶梯 | 3/3 步 ≥0.01 | `GroundLadder` + `DeepVisualSystemTest` |
 | 间距/圆角/字阶/动效 | 全在栅格 | `spacingAndScaleStayOnTheGrid` |
 | 显著性预算 | 可计算 | `SalienceBudget` |
+| 色觉分离 | 状态色在 deuteranopia 下仍分离 | `ColorVision.statusSeparated` |
 | 通道选择 | 按数据类型 | `ChannelRanking` |
 | 构图角色 | 1 PRIMARY / ACTION last | `Composition.validate` |
 | 响应式密度 | 大字回 1.0 | `Density.factor` |
