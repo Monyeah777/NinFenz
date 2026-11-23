@@ -6,7 +6,7 @@
 - versionName：`0.2.0`
 - versionCode：`2`
 - AAB：`app/build/outputs/bundle/release/app-release.aab`
-- 当前签名 AAB：`28,608,911 B`，sha256 `93a1d5b1ed5db3d5ceb5fae7004990f6f2a45564c38cefc568bdea97bc1f0fe3`
+- 当前签名 AAB：`28,608,831 B`，sha256 `25b8b96a281dd094deac1e91625244320abd75464525d543d39e1b6ff2967ce0`
 - upload key：仓库外 `<KEY_DIR>\nf-upload.jks`（不要提交/外发）
 - 证书 SHA-256：`F8:54:EF:94:3D:F5:F7:52:9F:BA:B6:40:6E:3C:5E:5F:8E:1B:74:F4:27:D2:DC:BD:B8:5E:2D:79:35:89:69:CA`
 

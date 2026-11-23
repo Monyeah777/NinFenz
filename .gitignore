@@ -121,3 +121,5 @@ results/app/ref-*.png
 
 # 本地设计研究证据（不推公开仓）
 results/app/design_research/
+results/app/n[0-9]*.png
+results/app/n[0-9]*.xml

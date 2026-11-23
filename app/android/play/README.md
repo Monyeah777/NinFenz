@@ -10,6 +10,12 @@
 
 这四件都在仓库外；不要提交、不要上传到聊天。
 
+## 上传前必读
+
+- [手动上传教程](MANUAL_UPLOAD.md)
+- [上传前审计（Go/No-Go）](PRE_UPLOAD_AUDIT.md)
+- 商店素材：`listing/`
+
 ## 本机构建签名 AAB
 
 ```powershell

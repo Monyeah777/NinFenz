@@ -22,7 +22,7 @@
 | 草稿→项目 | pass（zero-slice 路径） | 真机：分享 Markdown→切片 100%→「用切片建项目」→创作台预填 6 字段→交付 3/3；通用导入草稿映射仍为 partial |
 | app/gates v0.02 UX 检查 | pass | 7/7 gate PASS、FAIL=0；GATES/SELF_AUDIT 已更新（本提交） |
 
-**收口实测（2026-11-17 更新）**：app/gates 7/7 PASS、FAIL=0；verify.sh --checks-only PASS=107 WARN=2 FAIL=0；JVM 508/508；APK 55,483,749 B sha256 eb2d48ad…；Release unsigned 44,733,774 B sha256 e1786841…（16KB 对齐通过）。
+**收口实测（2026-11-17 更新）**：app/gates 7/7 PASS、FAIL=0；verify.sh --checks-only PASS=107 WARN=2 FAIL=0；JVM 508/508；APK 55,483,749 B sha256 078f8841…；Release unsigned 44,733,774 B sha256 e1786841…（16KB 对齐通过）。
 
 **发布面：仍为 OPEN-EXTERNAL**（签名/公证/真机矩阵/Play 数据安全），不得据此宣称可发布。
 
@@ -33,7 +33,7 @@
 - APP 门禁 `python app/gates/run_gates.py` → **7/7 门 FAIL=0**（QA0–QA6 全部 PASS；无 OPEN 阻塞），`P0=0`；
 - 自审计 S0–S15 → **covered 14 / gap 0 / open 2**，全部 open 带 owner+next（P1=2）；
 - 核心 `cargo test` **212 passed / 0 failed**；控制面 + 契约 + 安全 + golden + E2E：**pytest 524 passed / 0 failed / 0 skipped / 0 xfailed（126s）**；
-- 构建实测：Android debug APK 52,687,317 B、Release unsigned 44,781,598 B、upload AAB 28,608,911 B（16KB 对齐通过）；Windows MSI 为历史证据（66,573,406 B）。
+- 构建实测：Android debug APK 52,687,317 B、Release unsigned 44,781,530 B、upload AAB 28,608,831 B（16KB 对齐通过）；Windows MSI 为历史证据（66,573,406 B）。
 - 导出面：**md/zip/json/docx/skill 已实现**（core）；Android 另接 **EPUB/PDF/HTML 本地导出**（PDF 为 WebView HTML/CSS + 基础文本回退、EPUB 轻量 EPUB3、HTML 单文件），并各自带结构自检；复杂 CSS/EPUBCheck 级语义仍 OPEN。
 
 **发布面：未完成（OPEN-EXTERNAL）**——upload key 已生成并签 AAB；Play Console/公证/真机矩阵/数据安全未完成，不得宣称「可发布」。
