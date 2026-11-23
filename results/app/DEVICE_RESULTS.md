@@ -425,6 +425,6 @@
 ### M25 撤销授权真机（2026-11-23 09:04）
 
 - 分享授权勾选「撤销此授权」→ 保存；`files/grants/shared-text-md.json` 为 `revoked:true`。
-- 重新 preserve 生成 `shared-text-md-54fee9fe5b9a.preserve.zip`。
+- 重新 preserve 生成 `shared-text-md-54fee9fe5b9a.preserve.zip`，sha256 `cf9b9aa6…`；包内 `grant.json` 为 `revoked:true`，caps 仍 `export/read/reassemble`。
 - 导入页「最近归档」选中该包：显示 **归档未授予只读权限**，不显示恢复/只读预览/导出归档内容。
 - 随后取消撤销并保存，grant 恢复 `revoked:false`。
