@@ -133,7 +133,7 @@ NF 的覆盖条用长度；信任等级用位置+文字；状态用色相+形状
 ## 11. 仍不冒充
 
 - 默认 App 主题未迁移；当前是 `NfDesignTheme` opt-in
-- `design_lint` 仍报旧 `Theme.kt` 14 条迁移债
+- 系统层 `design_lint --scope system` 0 违规；`--scope app` 仍报旧 `Theme.kt` 14 条迁移债
 - 没有逐屏 6 张截图矩阵
 - 没有 TalkBack/横屏/200% 真机证据
 - HEART 的留存/时长未埋点
@@ -152,7 +152,8 @@ NF 的覆盖条用长度；信任等级用位置+文字；状态用色相+形状
 | 构图角色 | 1 PRIMARY / ACTION last | `Composition.validate` |
 | 响应式密度 | 大字回 1.0 | `Density.factor` |
 | 反馈预算 | <400ms | `Feedback` |
-| 旧 App 主题 | **14 条迁移债** | `design_lint.py` |
+| 系统层 lint | **0 违规** | `python app/scripts/design_lint.py` |
+| 旧 App 主题 | **14 条迁移债** | `python app/scripts/design_lint.py --scope app` |
 
 **未得分项**：逐屏评分、200%/横屏/TalkBack、真实 HEART 指标。没有这些，不写“屏幕层完美”。
 

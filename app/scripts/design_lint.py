@@ -2,8 +2,9 @@
 """NF 视觉令牌 lint：硬编码、栅格、色相、动作预算。
 
 用法：
-  python3 app/scripts/design_lint.py            # 报告
-  python3 app/scripts/design_lint.py --strict   # 有违规即退出 1
+  python3 app/scripts/design_lint.py                  # 系统层（design + 演示屏）
+  python3 app/scripts/design_lint.py --scope app      # 全 App，迁移债可见
+  python3 app/scripts/design_lint.py --scope system --strict  # 系统层违规即退出 1
 
 扫描范围：app/android/app/src/main/java/**/*.kt
 豁免：ui/design/**（令牌实现本身）
@@ -29,8 +30,12 @@ BRAND_HUE = 168.0
 HUE_WINDOW = 10.0
 
 
-def kotlin_files() -> list[Path]:
-    return sorted(SRC.rglob("*.kt"))
+def kotlin_files(scope: str) -> list[Path]:
+    all_files = sorted(SRC.rglob("*.kt"))
+    if scope == "app":
+        return all_files
+    demo = SRC / "dev" / "ninfenz" / "mobile" / "ui" / "screens" / "DesignSystemScreen.kt"
+    return [p for p in all_files if DESIGN in p.parents or p == demo]
 
 
 def is_design(path: Path) -> bool:
@@ -48,13 +53,14 @@ def hue_of(argb: int) -> tuple[float, float, float]:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--strict", action="store_true")
+    parser.add_argument("--scope", choices=["system", "app"], default="system")
     args = parser.parse_args()
 
     violations: list[str] = []
     warnings: list[str] = []
     button_counts: dict[str, int] = {}
 
-    files = kotlin_files()
+    files = kotlin_files(args.scope)
     for path in files:
         rel = path.relative_to(ROOT)
         text = path.read_text(encoding="utf-8", errors="replace")
@@ -83,7 +89,7 @@ def main() -> int:
     for name, count in sorted(crowded.items()):
         warnings.append(f"{name}: {count} 个填充按钮（一屏只允许 1 个主操作）")
 
-    print("== NF 视觉令牌 lint ==")
+    print(f"== NF 视觉令牌 lint（scope={args.scope}）==")
     print(f"扫描 Kotlin 文件：{len(files)}")
     print(f"违规：{len(violations)}")
     for item in violations:
