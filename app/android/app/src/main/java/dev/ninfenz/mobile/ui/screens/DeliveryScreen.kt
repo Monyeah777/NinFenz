@@ -1304,7 +1304,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(entry.format + " · " + entry.name, style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
+                            Text(entry.format + " · " + entry.name + (entry.bytes?.let { " · " + formatBytes(it) } ?: ""), style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
                             entry.ok?.let { ok ->
                                 Text(
                                     stringResource(if (ok) dev.ninfenz.mobile.R.string.export_verified else dev.ninfenz.mobile.R.string.export_verify_failed),
@@ -2358,6 +2358,12 @@ private fun HtmlExportButton(
             }
         }
     ) { Text(context.getString(dev.ninfenz.mobile.R.string.delivery_export, "html")) }
+}
+
+private fun formatBytes(bytes: Long): String = when {
+    bytes < 1024 -> bytes.toString() + " B"
+    bytes < 1024 * 1024 -> (bytes / 1024).toString() + " KB"
+    else -> String.format(java.util.Locale.US, "%.1f MB", bytes / 1024.0 / 1024.0)
 }
 
 private fun mimeFor(format: String): String = when (format) {

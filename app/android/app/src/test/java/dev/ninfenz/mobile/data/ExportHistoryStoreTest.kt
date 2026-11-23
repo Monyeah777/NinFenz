@@ -22,6 +22,7 @@ class ExportHistoryStoreTest {
         assertEquals("sha3", entries.first().sha256)
         assertEquals(false, entries.first().ok)
         assertEquals("bad", entries.first().message)
+        assertEquals(1L, entries.first().bytes)
     }
 
     @Test

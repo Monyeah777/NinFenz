@@ -1203,4 +1203,6 @@ MIT License · See app/docs/LEGAL.md</string>
         <item quantity="one">Filled %1$d slot from protocol fields</item>
         <item quantity="other">Filled %1$d slots from protocol fields</item>
     </plurals>
+    <string name="project_review_saved">Review saved</string>
+    <string name="ccos_reviewer_label">Reviewer</string>
 </resources>

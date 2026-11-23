@@ -138,12 +138,14 @@ fun CcosScreen(onBack: () -> Unit) {
     fun submitReview(approve: Boolean) {
         val current = result ?: return
         val rawT = rawTask
-        val decision = CcosModel.review(current, approve, reviewer, note)
+        val who = reviewer.trim()
+        val why = note.trim()
+        val decision = CcosModel.review(current, approve, who, why)
         if (!decision.ok) {
             outcome = context.getString(dev.ninfenz.mobile.R.string.ccos_outcome_not_submitted, decision.message)
             return
         }
-        val reviewed = CcosModel.withReview(current, decision.state, reviewer, note)
+        val reviewed = CcosModel.withReview(current, decision.state, who, why)
         if (rawT == null) {
             outcome = context.getString(dev.ninfenz.mobile.R.string.ccos_outcome_no_task)
             return
@@ -298,7 +300,7 @@ fun CcosScreen(onBack: () -> Unit) {
                 if (r.reviewState != "pending") {
                     EmptyState(stringResource(dev.ninfenz.mobile.R.string.ccos_review_closed))
                 } else {
-                    FormTextField(label = "reviewer", value = reviewer, onValueChange = { reviewer = it })
+                    FormTextField(label = stringResource(dev.ninfenz.mobile.R.string.ccos_reviewer_label), value = reviewer, onValueChange = { reviewer = it })
                     FormTextField(label = stringResource(dev.ninfenz.mobile.R.string.ccos_note_field), value = note, onValueChange = { note = it }, singleLine = false)
                     Notice(stringResource(dev.ninfenz.mobile.R.string.ccos_review_notice), Tone.INFO)
                 }

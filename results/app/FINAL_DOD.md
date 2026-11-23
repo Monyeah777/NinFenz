@@ -14,7 +14,7 @@
 | 项目态创作台/交付台 | pass（工程面，含核心校验/导出） | 6ac657b52/86191976e；Delivery/Author 测试与构建 |
 | 作者覆盖保存/状态写回 | pass（工程面） | a14456833/902789796；Overlay/Status 测试 |
 | Pack 中心/CCOS/Pack zip 更新/卸载 | pass（工程面；卸载有项目引用保护） | 1dc695125/4d816f3c5/6c30f241e |
-| JVM 测试 | pass | 505/505（含 Robolectric/Compose/Paparazzi） |
+| JVM 测试 | pass | 506/506（含 Robolectric/Compose/Paparazzi） |
 | 自适应/9 组尺寸语义矩阵 | pass（语义层） | ShellNavigation/ShellSizeMatrix 测试 |
 | i18n/主题切换（全部屏主要文案） | pass | values-en + 资源化；我的支持 zh/en/system + 动态取色；系统 per-app locale 已声明并同步；UI 中文硬编码守卫通过（仅 CoreCall 无 Context 回退豁免） |
 | 像素截图矩阵 | pass（本机） | Paparazzi 10 张基线（360/700/900 × 640/800/900/1000），testDebugUnitTest verify |
@@ -22,7 +22,7 @@
 | 草稿→项目 | pass（zero-slice 路径） | 真机：分享 Markdown→切片 100%→「用切片建项目」→创作台预填 6 字段→交付 3/3；通用导入草稿映射仍为 partial |
 | app/gates v0.02 UX 检查 | pass | 7/7 gate PASS、FAIL=0；GATES/SELF_AUDIT 已更新（本提交） |
 
-**收口实测（2026-11-17 更新）**：app/gates 7/7 PASS、FAIL=0；verify.sh --checks-only PASS=107 WARN=2 FAIL=0；JVM 505/505；APK 55,483,749 B sha256 ae7a3b2a…；Release unsigned 44,733,774 B sha256 e1786841…（16KB 对齐通过）。
+**收口实测（2026-11-17 更新）**：app/gates 7/7 PASS、FAIL=0；verify.sh --checks-only PASS=107 WARN=2 FAIL=0；JVM 506/506；APK 55,483,749 B sha256 0f71c2c6…；Release unsigned 44,733,774 B sha256 e1786841…（16KB 对齐通过）。
 
 **发布面：仍为 OPEN-EXTERNAL**（签名/公证/真机矩阵/Play 数据安全），不得据此宣称可发布。
 
@@ -33,7 +33,7 @@
 - APP 门禁 `python app/gates/run_gates.py` → **7/7 门 FAIL=0**（QA0–QA6 全部 PASS；无 OPEN 阻塞），`P0=0`；
 - 自审计 S0–S15 → **covered 14 / gap 0 / open 2**，全部 open 带 owner+next（P1=2）；
 - 核心 `cargo test` **212 passed / 0 failed**；控制面 + 契约 + 安全 + golden + E2E：**pytest 524 passed / 0 failed / 0 skipped / 0 xfailed（126s）**；
-- 构建实测：Android debug APK 52,687,317 B、Release unsigned 44,775,094 B、upload AAB 28,602,775 B（16KB 对齐通过）；Windows MSI 为历史证据（66,573,406 B）。
+- 构建实测：Android debug APK 52,687,317 B、Release unsigned 44,775,954 B、upload AAB 28,603,544 B（16KB 对齐通过）；Windows MSI 为历史证据（66,573,406 B）。
 - 导出面：**md/zip/json/docx/skill 已实现**（core）；Android 另接 **EPUB/PDF/HTML 本地导出**（PDF 为 WebView HTML/CSS + 基础文本回退、EPUB 轻量 EPUB3、HTML 单文件），并各自带结构自检；复杂 CSS/EPUBCheck 级语义仍 OPEN。
 
 **发布面：未完成（OPEN-EXTERNAL）**——upload key 已生成并签 AAB；Play Console/公证/真机矩阵/数据安全未完成，不得宣称「可发布」。
@@ -49,7 +49,7 @@
 | QA2 | 协议/管线/装配/校验/导出；golden | **PASS** | golden + oracle 对账 31 条；首闭环 E2E 6 条 |
 | QA3 | 分享/回填/Pack 更新/冲突/回滚；负例 | **PASS** | 更新/冲突/回滚 E2E；分享脱敏 5 条 |
 | QA4 | 桌面/TUI/CCOS 交接；跨端一致 | **PASS** | TUI selftest 全绿；CCOS 相关 E2E；Android/Desktop 工程与构建证据 |
-| QA5 | 安全/性能/无障碍/16KB/设备矩阵 | **PASS（含 OPEN）** | 解析安全负例全绿；设备矩阵/性能预算文档在位；自适应三档布局（紧凑单页/中等/扩展 NavigationRail）与无障碍可读标签代码侧落地（JVM 505 条，含分档边界）；真机首启/PDF/杀进程恢复已实测，TalkBack/设备矩阵仍 OPEN-TOOLCHAIN |
+| QA5 | 安全/性能/无障碍/16KB/设备矩阵 | **PASS（含 OPEN）** | 解析安全负例全绿；设备矩阵/性能预算文档在位；自适应三档布局（紧凑单页/中等/扩展 NavigationRail）与无障碍可读标签代码侧落地（JVM 506 条，含分档边界）；真机首启/PDF/杀进程恢复已实测，TalkBack/设备矩阵仍 OPEN-TOOLCHAIN |
 | QA6 | 发布/签名/公证/数据安全/许可；P0=0 | **PASS（含 OPEN）** | 脚本/文档在位；签名证据 OPEN-EXTERNAL；SELF_AUDIT p0=0 |
 
 ## 3. 自审计（S0–S15）
@@ -81,7 +81,7 @@
 |---|---|---|
 | Rust 核心 | 212 断言 / 21 二进制 / 0 failed | `cd app/core && cargo test` |
 | Python 控制面/契约/安全/golden/E2E | **524 passed / 0 failed / 0 skipped / 0 xfailed（126s）** | `python -m pytest app/tests -q` |
-| Android JVM | 505 条（含自适应分档 4 条） | `cd app/android && ./gradlew :app:testDebugUnitTest` |
+| Android JVM | 506 条（含自适应分档 4 条） | `cd app/android && ./gradlew :app:testDebugUnitTest` |
 | Desktop JVM | 20 条（含真实 JNA FFI） | `cd app/desktop && ./gradlew test` |
 | APK | 55,483,749 B；16KB 对齐通过；双 ABI `.so` | `bash app/scripts/build_android.sh debug` |
 | MSI | 66,573,406 B；jar 内含 `native/nf_app_core.dll` | `bash app/scripts/build_desktop.sh package` |

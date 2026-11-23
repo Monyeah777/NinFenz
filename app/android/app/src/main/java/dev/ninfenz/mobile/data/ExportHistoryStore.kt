@@ -19,6 +19,7 @@ class ExportHistoryStore(private val filesDir: File) {
         val path: String,
         val sha256: String,
         val at: Long,
+        val bytes: Long? = null,
         val ok: Boolean? = null,
         val message: String? = null
     )
@@ -37,6 +38,7 @@ class ExportHistoryStore(private val filesDir: File) {
                     path = o.text("path"),
                     sha256 = o.text("sha256"),
                     at = o["at"]?.jsonPrimitive?.long ?: 0L,
+                    bytes = o["bytes"]?.jsonPrimitive?.long,
                     ok = o["ok"]?.jsonPrimitive?.content?.toBooleanStrictOrNull(),
                     message = o.optText("message")
                 )
@@ -49,7 +51,7 @@ class ExportHistoryStore(private val filesDir: File) {
     fun record(format: String, file: File, sha256: String, ok: Boolean? = null, message: String? = null) {
         val name = file.name
         val next = (listOf(
-            Entry(format, name, file.absolutePath, sha256, System.currentTimeMillis(), ok, message)
+            Entry(format, name, file.absolutePath, sha256, System.currentTimeMillis(), file.length(), ok, message)
         ) + load().filterNot { it.path == file.absolutePath }).take(20)
         val arr = buildJsonArray {
             next.forEach { e ->
@@ -59,6 +61,7 @@ class ExportHistoryStore(private val filesDir: File) {
                     put("path", e.path)
                     put("sha256", e.sha256)
                     put("at", e.at)
+                    e.bytes?.let { put("bytes", it) }
                     e.ok?.let { put("ok", it) }
                     e.message?.let { put("message", it) }
                 })

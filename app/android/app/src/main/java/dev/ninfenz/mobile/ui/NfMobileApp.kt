@@ -781,7 +781,10 @@ is Detail.Import -> ImportScreen(
                                 onReview = { approve, reviewer, note ->
                                     scope.launch {
                                         when (val result = ProjectReviewStore(context.filesDir).review(entry.project, approve, reviewer, note)) {
-                                            is dev.ninfenz.mobile.data.ReviewResult.Reviewed -> refresh()
+                                            is dev.ninfenz.mobile.data.ReviewResult.Reviewed -> {
+                                                refresh()
+                                                android.widget.Toast.makeText(context, context.getString(dev.ninfenz.mobile.R.string.project_review_saved), android.widget.Toast.LENGTH_SHORT).show()
+                                            }
                                             is dev.ninfenz.mobile.data.ReviewResult.Failure ->
                                                 android.widget.Toast.makeText(context, result.message, android.widget.Toast.LENGTH_LONG).show()
                                         }

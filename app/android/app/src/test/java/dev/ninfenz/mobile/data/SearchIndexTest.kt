@@ -40,6 +40,18 @@ class SearchIndexTest {
     }
 
     @Test
+    fun searchesProjectBody() {
+        val root = Files.createTempDirectory("nf-search-body")
+        setup(root)
+        write(root.resolve("projects/demo-project/authoring/import-1.md"), "# 正文\n\n暴雨后的城市亮起灯。")
+        val index = SearchIndex(root.toFile())
+        val hits = index.search(index.build(), "暴雨")
+        assertEquals(1, hits.size)
+        assertTrue(hits[0].detail.contains("暴雨后的城市"))
+        assertTrue(hits[0].body.contains("暴雨后的城市"))
+    }
+
+    @Test
     fun blankQueryReturnsEmpty() {
         val root = Files.createTempDirectory("nf-search-blank")
         setup(root)

@@ -1199,4 +1199,6 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
         <item quantity="one">已从协议字段带入 %1$d 个槽位</item>
         <item quantity="other">已从协议字段带入 %1$d 个槽位</item>
     </plurals>
+    <string name="project_review_saved">评审已保存</string>
+    <string name="ccos_reviewer_label">评审人</string>
 </resources>

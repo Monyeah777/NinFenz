@@ -23,7 +23,8 @@ data class SearchHit(
     val detail: String,
     val packId: String? = null,
     val packVersion: String? = null,
-    val projectId: String? = null
+    val projectId: String? = null,
+    val body: String = ""
 )
 
 /** 本地内存索引（v0.02）：Pack 元数据/条款/字段/节点/章节/槽位 + 项目标题/ID。 */
@@ -69,7 +70,18 @@ class SearchIndex(private val filesDir: File) {
             .map { hit -> hit to rank(hit, q) }
             .filter { it.second >= 0 }
             .sortedWith(compareByDescending<Pair<SearchHit, Int>> { it.second }.thenBy { it.first.title })
-            .map { it.first }
+            .map { (hit, _) ->
+                if (q !in hit.title.lowercase() && q !in hit.detail.lowercase() && q in hit.body.lowercase()) {
+                    hit.copy(detail = snippet(hit.body, q))
+                } else hit
+            }
+    }
+
+    private fun snippet(body: String, q: String): String {
+        val at = body.lowercase().indexOf(q).coerceAtLeast(0)
+        val start = (at - 24).coerceAtLeast(0)
+        val end = (at + q.length + 48).coerceAtMost(body.length)
+        return "正文：" + body.substring(start, end).replace('\n', ' ').trim()
     }
 
     private fun rank(hit: SearchHit, q: String): Int {
@@ -78,7 +90,7 @@ class SearchIndex(private val filesDir: File) {
         return when {
             title.startsWith(q) -> 3
             q in title -> 2
-            q in detail -> 1
+            q in detail || q in hit.body.lowercase() -> 1
             else -> -1
         }
     }
@@ -89,8 +101,28 @@ class SearchIndex(private val filesDir: File) {
         return files.mapNotNull { file ->
             val obj = readJson(file) ?: return@mapNotNull null
             val id = text(obj, "id")
-            SearchHit(SearchKind.PROJECT, text(obj, "title"), id + " · " + text(obj, "status"), projectId = id)
+            SearchHit(SearchKind.PROJECT, text(obj, "title"), id + " · " + text(obj, "status"), projectId = id, body = projectBody(id))
         }
+    }
+
+    private fun projectBody(projectId: String): String {
+        if (projectId.contains("..") || projectId.contains('/') || projectId.contains('\\')) return ""
+        val dir = File(File(filesDir, "projects"), projectId)
+        if (!dir.isDirectory) return ""
+        val parts = mutableListOf<String>()
+        File(dir, "authoring").listFiles()?.filter { it.isFile && it.name.startsWith("import-") }?.sortedBy { it.name }?.forEach { file ->
+            parts += file.readText(Charsets.UTF_8).take(MAX_BODY)
+        }
+        File(dir, "authoring/zero-slice.json").takeIf { it.isFile }?.let { file ->
+            runCatching {
+                val root = Json.parseToJsonElement(file.readText(Charsets.UTF_8)).jsonObject
+                root["slot_values"]?.jsonObject?.values?.forEach { value ->
+                    val text = value.jsonPrimitive.content
+                    if (text.isNotBlank()) parts += text
+                }
+            }
+        }
+        return parts.joinToString("\n\n").take(MAX_BODY)
     }
 
     private fun readJson(file: File): JsonObject? = try {
@@ -100,4 +132,8 @@ class SearchIndex(private val filesDir: File) {
     }
 
     private fun text(obj: JsonObject, key: String): String = obj[key]?.jsonPrimitive?.content ?: ""
+
+    private companion object {
+        const val MAX_BODY = 256 * 1024
+    }
 }
