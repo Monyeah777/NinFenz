@@ -1272,8 +1272,13 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                 stringResource(dev.ninfenz.mobile.R.string.delivery_recent_exports) + " · " + latest.format,
                                 style = MaterialTheme.typography.titleSmall
                             )
+                            val meta = buildList {
+                                add(latest.name)
+                                latest.bytes?.let { add(formatBytes(it)) }
+                                latest.sha256.take(12).takeIf { it.isNotBlank() }?.let { add(it) }
+                            }.joinToString(" · ")
                             Text(
-                                latest.name + " · " + (latest.bytes?.let { formatBytes(it) } ?: "-") + " · " + latest.sha256.take(12),
+                                meta,
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
