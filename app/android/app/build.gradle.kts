@@ -5,6 +5,13 @@ plugins {
     id("app.cash.paparazzi") version "2.0.0-alpha02"
 }
 
+val uploadStore = System.getenv("NF_UPLOAD_STORE_FILE")
+val uploadStorePass = System.getenv("NF_UPLOAD_STORE_PASSWORD")
+val uploadKeyAlias = System.getenv("NF_UPLOAD_KEY_ALIAS")
+val uploadKeyPass = System.getenv("NF_UPLOAD_KEY_PASSWORD")
+val hasUploadSigning = !uploadStore.isNullOrBlank() && !uploadStorePass.isNullOrBlank() &&
+    !uploadKeyAlias.isNullOrBlank() && !uploadKeyPass.isNullOrBlank()
+
 android {
     namespace = "dev.ninfenz.mobile"
     compileSdk = 36
@@ -21,6 +28,23 @@ android {
             abiFilters.addAll(listOf("arm64-v8a", "x86_64"))
         }
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        if (hasUploadSigning) {
+            create("upload") {
+                storeFile = file(uploadStore!!)
+                storePassword = uploadStorePass
+                keyAlias = uploadKeyAlias
+                keyPassword = uploadKeyPass
+            }
+        }
+    }
+
+    buildTypes {
+        getByName("release") {
+            if (hasUploadSigning) signingConfig = signingConfigs.getByName("upload")
+        }
     }
 
     buildFeatures {

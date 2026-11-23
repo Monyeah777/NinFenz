@@ -44,13 +44,14 @@
 | 产物 | 大小 | sha256 | 备注 |
 |---|---|---|---|
 | debug APK | 55,483,749 B | `468ea83d…` | 双 ABI |
-| release unsigned | 44,733,774 B | `e1786841…` | `zipalign -c -P 16` 通过 |
+| release unsigned | 44,752,926 B | `e1786841…` | `zipalign -c -P 16` 通过 |
 | lintRelease | pass | 0 errors / 0 warnings |
 | Release manifest | pass | 0.2.0；minSdk 26 / target 36；无 debuggable |
 | debug-signed APK | 44,697,765 B | `972ad0c8…` | 仅内部安装；证书 CN=Android Debug |
-| release AAB unsigned | 28,549,355 B | `37fc8201…` | `jarsigner -verify` 未签名；AAB 16KB 未用 bundletool 复核 |
+| release AAB unsigned | 28,549,355 B | `37fc8201…` | 旧产物；`jarsigner -verify` 未签名 |
+| upload AAB signed | 28,591,207 B | `600b540d…` | upload key `F8:54:EF:94…`；`jarsigner -verify` 通过；Play Console 未创建 |
 
-发布签名/公证/Play 材料仍无输入。
+upload key 与签名 AAB 已落地；Play Console/服务账号、公证与商店素材仍无输入。
 
 ## 4. Phase 0 P0 代码面复核
 

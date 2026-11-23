@@ -7,7 +7,7 @@
 
 | 平台 | 构建 | 签名 | 公证/上架 | 结论 |
 |---|---|---|---|---|
-| Android | 构建 pass（debug/release unsigned） | OPEN-EXTERNAL | OPEN-EXTERNAL | 未发布 |
+| Android | 构建 pass（debug/release；upload AAB 已签） | upload key 已生成；Play Console 未创建 | 未上架 | 未发布 |
 | Windows | OPEN-TOOLCHAIN | OPEN-EXTERNAL | — | 未发布 |
 | macOS | OPEN-EXTERNAL | OPEN-EXTERNAL | OPEN-EXTERNAL | 未发布 |
 
@@ -16,18 +16,21 @@
 ### Android
 - assembleDebug：**pass**（2026-11-22，Android SDK 36 / build-tools 36.0.0）
 - app-debug.apk：55,483,749 B；SHA-256 `468ea83d8366fc8eecff9f445d51b4ef5a82603d5e76dc3e814509d623573eb3`
-- assembleRelease（unsigned）：pass；44,733,774 B；SHA-256 `e17868414448bffdd0de3914f735af40f81057fd6b41ec64066cd4c074003480`
+- assembleRelease（unsigned）：pass；44,752,926 B；SHA-256 `e17868414448bffdd0de3914f735af40f81057fd6b41ec64066cd4c074003480`
 - debug 签名 APK（仅内部安装）：44,697,765 B；SHA-256 `972ad0c8185977e5da1347289454cdb9f3e3a7bb94ebdc99299fe8ba4f3b5266`；证书 CN=Android Debug；**不是 upload key**
 - bundleRelease（unsigned）：pass；28,549,355 B；SHA-256 `37fc8201b7e654055751a2a874a30dae864a4983b943a32d90e9aa558dc3fe08`；`jarsigner -verify` 显示未签名
 - lintRelease：**0 errors / 0 warnings（No issues found）**
 - Release manifest：package `dev.ninfenz.mobile`、versionName `0.2.0`、minSdk 26、target/compileSdk 36、`extractNativeLibs=false`、无 `android:debuggable`（apkanalyzer manifest print）
 - 16KB 对齐：`zipalign -c -P 16 4` exit 0（APK；AAB 未用 bundletool 复核）
-- 签名证书指纹（SHA-256）：—（生产 upload key 未提供，OPEN-EXTERNAL）
+- 签名证书指纹（SHA-256）：`F8:54:EF:94:3D:F5:F7:52:9F:BA:B6:40:6E:3C:5E:5F:8E:1B:74:F4:27:D2:DC:BD:B8:5E:2D:79:35:89:69:CA`（CN=NF Mobile Upload；upload key，非 Play app signing key）
+- bundleRelease（upload 签名）：**pass**；28,591,207 B；SHA-256 `600b540d03e08a2cd73841827d2fa60587129ab9a91081132623f715a91d2bae`；`jarsigner -verify` 通过
+- 签名材料：`<KEY_DIR>\nf-upload.jks`（仓库外，ACL 仅当前用户）；口令文件与 PEM 同目录，未入库
+- Play 配置：`app/android/fastlane/` + `app/android/play/README.md`；service account JSON 与 Play Console 应用未创建
 - 签名流程内部自测：`app/scripts/sign_release.sh` 以本机 debug keystore 跑通（仅验证流程，非生产签名）；`apksigner verify` 通过，证书 SHA-256 `8a52a549c3081795cecb0f1424d21684933fb21d3afe76506dab736e688b10fb`。
 - 真机安装（2026-11-22）：OnePlus PLF110 / Android 16 / 1080×2392；`adb install -r` Success。冷启动 `am start -W` COLD 573ms（首装）/320ms（升级后）/188ms（force-stop 后）。
 - 真机闭环：示例 Pack → 演示项目 → 创作台 → graph-compile（steps 2 · slots 4）→ 必填 3/3 → assemble → L1 pass（error=0 warn=0 info=3）→ 导出 md → 契约三项全绿 → 签收（当版 hash 签收；ECDSA 版本仅 JVM 测试）；SEND text/plain 分享导入预览通过；logcat 无 FATAL/ANR。
 - 真机修复：契约「必填槽位已填」曾把选填 SLT-04 也当必填，导致 3/3 仍 ✗；改为按 spec slot.required 过滤后复测三项全绿。
-- 真机未测：长文本/中文输入法（未做完整输入法验收）、PDF/EPUB/DOCX/HTML 导出、分享文件、杀进程恢复、TalkBack、横屏、AAB 上传签名。
+- 真机未测：长文本/中文输入法（未做完整输入法验收）、PDF/EPUB/DOCX/HTML 导出、分享文件、杀进程恢复、TalkBack、横屏、Play 上传。
 - 数据安全表单提交：**未提交**
 
 ### Windows
@@ -48,4 +51,4 @@
 1. Android SDK 36 + build-tools + 真机/模拟器（ANDROID_HOME）。
 2. Windows Authenticode 证书（EV/OV）+ Windows SDK signtool。
 3. macOS 机器 + Apple Developer Program（Developer ID Application）+ `NOTARY_PROFILE`。
-4. Play Console / App Store Connect 账号与数据安全材料。
+4. Play Console 账号、service account JSON、商店素材与数据安全材料。

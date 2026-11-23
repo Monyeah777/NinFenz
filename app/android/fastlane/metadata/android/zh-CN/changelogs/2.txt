@@ -1,0 +1,1 @@
+0.2.0（2）：zero_slice 导入、交付 L1 校验、preservation 归档与接收方校验。
