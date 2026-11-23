@@ -146,11 +146,42 @@ object VisualTheory {
         "透明度只用于遮罩/叠加层；正文不透明，避免语义漂移。",
         "Lupton 2010"
     )
+
+    val luptonFraming = TheoryRule(
+        "L-FRAME", "Lupton", "framing", "Space.section + card boundary",
+        "边界只表达范畴：卡片切对象，留白切组，分割线切行；三种不同时用。",
+        "Lupton 2010"
+    )
+    val luptonFigureGround = TheoryRule(
+        "L-FG", "Lupton", "figure-ground", "Palette.surface ladder",
+        "图底作为构图策略：先定主体，再压背景；背景不抢正文对比。",
+        "Lupton 2010"
+    )
+
     val timeMotion = TheoryRule(
         "L-TIME", "Lupton", "time-motion", "Motion 150/250/300",
         "动效只表达状态变化与因果，150/250/300ms；不用装饰性弹跳。",
         "Lupton 2010; M3 motion"
     )
+
+
+    // ---- 补充：认知/交互/信息设计 ----
+    val fitts = TheoryRule("X-FITTS", "Fitts", "fitts-law", "Sizes.touchTarget + button",
+        "目标越大越近越易点；主操作靠拇指区，触控 ≥48dp。", "Fitts 1954")
+    val hick = TheoryRule("X-HICK", "Hick", "hick-law", "one primary + <=5 nav",
+        "选择越多决策越慢；一屏一个主操作，导航 ≤5。", "Hick 1952; Hyman 1953")
+    val miller = TheoryRule("X-MILLER", "Miller", "chunking", "4-level type + groups",
+        "以 4 级层级和分组块降低记忆负担；不堆 7 个以上同级项。", "Miller 1956")
+    val sweller = TheoryRule("X-SWELLER", "Cognitive Load", "extraneous-load", "one task per screen",
+        "去掉与任务无关的装饰/说明；必要说明放帮助层。", "Sweller 1988")
+    val doherty = TheoryRule("X-DOHERTY", "Doherty", "feedback-threshold", "Motion.fast + progress",
+        "操作反馈 <400ms；长任务必须有进度/骨架。", "Doherty & Keller 1982")
+    val jakob = TheoryRule("X-JAKOB", "Jakob", "consistency", "tokens + fixed nav",
+        "沿用用户已会的模式；不创新导航/手势。", "Nielsen 2000")
+    val peakEnd = TheoryRule("X-PEAK", "Peak-End", "peak-end", "export receipt",
+        "结束体验决定记忆：导出成功必须有可核对回执。", "Kahneman 1993")
+    val dataInk = TheoryRule("X-DATAINK", "Tufte", "data-ink", "hash/status rows",
+        "证据区提高数据墨水比；去掉无信息装饰。", "Tufte 1983")
 
     // ---- Morville / HEART / Garrett / EDF：体验层 ----
     val useful = TheoryRule("M-USE", "Morville", "useful", "task model",
@@ -194,8 +225,9 @@ object VisualTheory {
         proximity, similarity, continuity, closure, figureGround, commonFate,
         position, size, shape, value, hue, orientation, texture,
         informationValue, salience, framing,
-        hierarchy, grid, rhythm, scale, modularity, transparency, timeMotion,
+        hierarchy, grid, rhythm, scale, modularity, transparency, luptonFraming, luptonFigureGround, timeMotion,
         useful, usable, desirable, findable, accessible, credible, valuable,
+        fitts, hick, miller, sweller, doherty, jakob, peakEnd, dataInk,
         happiness, engagement, adoption, retention, taskSuccess,
         strategy, scope, structure, skeleton, surface
     )
@@ -207,6 +239,7 @@ object VisualTheory {
         "information-value", "salience", "framing",
         "hierarchy", "grid", "rhythm-balance", "scale", "modularity", "transparency", "time-motion",
         "useful", "usable", "desirable", "findable", "accessible", "credible", "valuable",
+        "fitts-law", "hick-law", "chunking", "extraneous-load", "feedback-threshold", "consistency", "peak-end", "data-ink",
         "happiness", "engagement", "adoption", "retention", "task-success",
         "strategy", "scope", "structure", "skeleton", "surface"
     )

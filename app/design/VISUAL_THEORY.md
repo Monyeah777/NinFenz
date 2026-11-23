@@ -143,6 +143,20 @@ PTECH / PATS / Terra 等业界模型作为问题类型参考；本仓不复制�
 - 修辞：证据优先（哈希、时间、来源），而不是用渐变/阴影制造“高级感”。
 - 对受众：专业创作者要可核对、可恢复、可导出；不用营销式大图压过任务。
 
+
+## 14. 补充理论（只收能落成规则的）
+
+| 理论 | NF 规则 | 规则 ID |
+|---|---|---|
+| Fitts 定律 | 主操作在拇指区，触控 ≥48dp | `X-FITTS` |
+| Hick/Hyman 定律 | 一屏一个主操作，导航 ≤5 | `X-HICK` |
+| Miller 分块 | 4 级层级 + 分组，不堆同级项 | `X-MILLER` |
+| 认知负荷（Sweller） | 去掉与任务无关的装饰/说明 | `X-SWELLER` |
+| Doherty 阈值 | 反馈 <400ms；长任务有进度/骨架 | `X-DOHERTY` |
+| Jakob 定律 | 沿用已会模式，不创新导航 | `X-JAKOB` |
+| Peak-End | 导出成功给可核对回执 | `X-PEAK` |
+| Tufte 数据墨水比 | 证据区去装饰，哈希/状态直读 | `X-DATAINK` |
+
 ## 9. 参考
 
 - Wertheimer, M. (1923). Untersuchungen zur Lehre von der Gestalt.
