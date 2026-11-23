@@ -54,6 +54,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.style.TextOverflow as NfTextOverflow
@@ -84,10 +87,12 @@ fun NfTopAppBar(
 /** 结构型步骤条：用短标签表达当前处于流程第几步，横向可滚动。 */
 @Composable
 fun NfStepStrip(steps: List<String>, current: Int, modifier: Modifier = Modifier) {
+    val progressText = stringResource(dev.ninfenz.mobile.R.string.step_progress, current + 1, steps.size)
     Row(
         modifier = modifier
             .fillMaxWidth()
             .horizontalScroll(rememberScrollState())
+            .semantics { stateDescription = progressText }
             .padding(horizontal = NfLayout.pageCompact, vertical = NfSpacing.s),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)
@@ -320,7 +325,7 @@ fun NfHint(text: String) {
 @Composable
 fun NfErrorCard(code: String, message: String, fix: String, modifier: Modifier = Modifier) {
     Surface(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth().semantics { liveRegion = LiveRegionMode.Polite },
         shape = MaterialTheme.shapes.medium,
         color = MaterialTheme.colorScheme.errorContainer
     ) {

@@ -2,6 +2,8 @@ package dev.ninfenz.mobile.ui
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.onNodeWithText
 import dev.ninfenz.mobile.ui.components.NfErrorCard
 import dev.ninfenz.mobile.ui.components.NfStepStrip
@@ -37,5 +39,8 @@ class UxFeedbackComposeTest {
             }
         }
         compose.onNodeWithText("第 2/4 步", substring = true).assertIsDisplayed()
+        compose.onNode(
+            SemanticsMatcher.expectValue(SemanticsProperties.StateDescription, "第 2/4 步")
+        ).assertExists()
     }
 }

@@ -228,7 +228,6 @@
     <string name="import_step_draft">草稿</string>
     <string name="import_pick_file">选择文件</string>
     <string name="import_clipboard">剪贴板</string>
-    <string name="import_csv">CSV 表格</string>
     <string name="import_csv_copy">复制为表格</string>
     <string name="import_pdf_no_text">这个 PDF 没有可提取文字；扫描件需要 OCR。</string>
     <string name="import_image_ocr_required">图片里没有识别到文字。</string>
@@ -1208,4 +1207,6 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="error_hint_pack_update">Pack 数据不完整，操作已停止；现有 Pack 未被改动。</string>
     <string name="error_hint_review">当前状态还不能评审，请先完成校验或导出。</string>
     <string name="delivery_last_export">本次导出</string>
+    <string name="import_csv_file">CSV 文件</string>
+    <string name="import_csv_clipboard">CSV 剪贴板</string>
 </resources>

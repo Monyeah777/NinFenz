@@ -181,6 +181,7 @@
 - 无标题单段文本走自由稿：映射到第一个必填槽（confidence 60，标注请复核），超预算保留 exception。
 - 新增 `ProtocolSlotPrefill`：协议字段按同名/规范化名映射到 spec 槽位，交付页合并进预填并显示带入数量。
 - 文件选择器从 `*/*` 改为显式 markdown/text/csv/json/zip MIME。
+- CSV 改为「CSV 文件」选择器；原剪贴板 CSV 保留为次级入口。
 - Pack 回滚改为优先恢复更新前备份；无备份时禁用并说明，不再走缺 size 的反向 merge。
 - Android JVM 508 条；Rust zero_slice 15 条 + op 3 条。
 - 搜索索引项目正文（authoring/import-* + zero-slice slots），命中显示片段。
@@ -188,6 +189,8 @@
 - 项目评审成功提示「评审已保存」；CCOS reviewer 字段资源化并 trim。
 - NF-E-004 显示「重新选择文件」CTA。
 - 新增 UxFeedbackComposeTest：错误卡人话+原始详情、步骤条 n/4 可见。
+- 无障碍：错误卡加 polite liveRegion，步骤条加 stateDescription；测试断言第 2/4 步语义。
+- CSV 文件入口走 SAF，转换后导入；旧剪贴板入口仍在。
 - 步骤条显示「第 n/4 步」；NF-IMP-001/NF-E-004/NF-PCK-001/NF-REV-002 错误卡增加人话提示，原始技术信息保留在下方。
 
 ## A0-14 Daily 入口

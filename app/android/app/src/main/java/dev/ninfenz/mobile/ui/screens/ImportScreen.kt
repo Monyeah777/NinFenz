@@ -830,6 +830,25 @@ fun ImportScreen(
             }
         }
     }
+    val csvPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        scope.launch {
+            try {
+                val meta = FileAccess.meta(context, uri)
+                if (meta.size > FileAccess.MAX_IMPORT_BYTES) {
+                    error = CoreResponse.failure("NF-IMP-003", context.getString(dev.ninfenz.mobile.R.string.import_file_too_large), context.getString(dev.ninfenz.mobile.R.string.import_file_too_large_fix), 3).error
+                    return@launch
+                }
+                val text = FileAccess.readText(context, uri)
+                val file = File(File(context.cacheDir, "imports").apply { mkdirs() }, "csv-table.md")
+                file.writeText(CsvTable.toMarkdown(text), Charsets.UTF_8)
+                importFromFile(file, ImportSource.SAF, meta.name, meta.mime ?: "text/csv", text.toByteArray(Charsets.UTF_8).size.toLong())
+            } catch (t: Throwable) {
+                error = CoreResponse.failure("NF-E-004", context.getString(dev.ninfenz.mobile.R.string.import_read_failed, t.message ?: t.javaClass.simpleName), context.getString(dev.ninfenz.mobile.R.string.import_reselect_file), 3).error
+            }
+        }
+    }
+
     val filePicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         if (uri != null) {
             scope.launch {
@@ -893,7 +912,8 @@ fun ImportScreen(
                             OutlinedButton(onClick = { importClipboard() }, enabled = !busy) { Text(stringResource(dev.ninfenz.mobile.R.string.import_clipboard)) }
                         }
                         Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                            OutlinedButton(onClick = { importCsv() }, enabled = !busy) { Text(stringResource(dev.ninfenz.mobile.R.string.import_csv)) }
+                            OutlinedButton(onClick = { csvPicker.launch(arrayOf("text/csv", "text/comma-separated-values", "text/plain")) }, enabled = !busy) { Text(stringResource(dev.ninfenz.mobile.R.string.import_csv_file)) }
+                            OutlinedButton(onClick = { importCsv() }, enabled = !busy) { Text(stringResource(dev.ninfenz.mobile.R.string.import_csv_clipboard)) }
                         }
                         Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                             OutlinedButton(onClick = { importSample() }, enabled = !busy) { Text(stringResource(dev.ninfenz.mobile.R.string.import_sample)) }

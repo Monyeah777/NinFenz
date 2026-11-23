@@ -232,7 +232,6 @@
     <string name="import_step_draft">Draft</string>
     <string name="import_pick_file">Choose file</string>
     <string name="import_clipboard">Clipboard</string>
-    <string name="import_csv">CSV table</string>
     <string name="import_csv_copy">Copy as table</string>
     <string name="import_pdf_no_text">No extractable text in this PDF; scanned PDFs need OCR.</string>
     <string name="import_image_ocr_required">No text recognized in this image.</string>
@@ -1212,4 +1211,6 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="error_hint_pack_update">Pack data is incomplete; the operation stopped and the existing Pack was not changed.</string>
     <string name="error_hint_review">This project is not ready for review. Validate or export it first.</string>
     <string name="delivery_last_export">This export</string>
+    <string name="import_csv_file">CSV file</string>
+    <string name="import_csv_clipboard">CSV clipboard</string>
 </resources>
