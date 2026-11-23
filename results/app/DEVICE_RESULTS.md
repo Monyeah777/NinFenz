@@ -442,3 +442,11 @@
 - 点「用切片建项目」→ 创作台显示「已从导入映射预填 10 个字段」→ 去交付 → **必填已填 3/3**。
 - 交付台可见「最近导出 · html」回执卡与最近导出列表；旧历史记录缺 bytes，回执显示 result.html · - ·，已改为空字段不拼接。
 - 搜索正文、错误卡、步骤进度未逐项截图取证。
+
+### 模拟器矩阵（2026-11-23 17:10）
+
+- 安装 Android 36 Google APIs x86_64（Pixel 7 AVD）模拟器并完成首次启动。
+- 首启 onboarding 英文，Load sample pack 后进入 Library：1 project / 1 pack。
+- 首页粘贴英文短句 → 导入页：Auto-slice coverage 100%，无 NF-IMP-001。
+- Create project from slices → 创作台 Prefilled 1 field from the import mapping（自由稿单段，预期 1 槽）。
+- 该矩阵验证了 API36 + x86_64 + 首启/粘贴/切片建项目主路径；未在模拟器上逐项测试导出/评审/CCOS。
