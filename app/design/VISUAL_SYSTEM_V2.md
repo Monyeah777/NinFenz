@@ -138,6 +138,24 @@ NF 的覆盖条用长度；信任等级用位置+文字；状态用色相+形状
 - 没有 TalkBack/横屏/200% 真机证据
 - HEART 的留存/时长未埋点
 
+
+## 13. 系统层自评（不冒充屏幕层）
+
+| 项 | 结果 | 证据 |
+|---|---|---|
+| 理论构造覆盖 | 50/50 | `VisualTheoryTest.everyRequiredTheoryConstructHasARule` |
+| 明暗对比对 | 19/19 × 2 | `VisualTheoryTest.allContrastPairsPassTheirMinimum` |
+| 深色图底阶梯 | 3/3 步 ≥0.01 | `GroundLadder` + `DeepVisualSystemTest` |
+| 间距/圆角/字阶/动效 | 全在栅格 | `spacingAndScaleStayOnTheGrid` |
+| 显著性预算 | 可计算 | `SalienceBudget` |
+| 通道选择 | 按数据类型 | `ChannelRanking` |
+| 构图角色 | 1 PRIMARY / ACTION last | `Composition.validate` |
+| 响应式密度 | 大字回 1.0 | `Density.factor` |
+| 反馈预算 | <400ms | `Feedback` |
+| 旧 App 主题 | **14 条迁移债** | `design_lint.py` |
+
+**未得分项**：逐屏评分、200%/横屏/TalkBack、真实 HEART 指标。没有这些，不写“屏幕层完美”。
+
 ## 12. 下一步
 
 1. 用 2.0 令牌替换默认主题（只换 token，不换布局）

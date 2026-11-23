@@ -56,8 +56,10 @@ class VisualTheoryTest {
     fun allContrastPairsPassTheirMinimum() {
         assertTrue(ContrastPairs.all.size >= 18)
         ContrastPairs.all.forEach { pair ->
-            val ratio = Contrast.ratio(pair.fg.light, pair.bg.light)
-            assertTrue("${pair.name} light ratio $ratio < ${pair.min}", ratio >= pair.min)
+            val light = Contrast.ratio(pair.fg.light, pair.bg.light)
+            val dark = Contrast.ratio(pair.fg.dark, pair.bg.dark)
+            assertTrue("${pair.name} light ratio $light < ${pair.min}", light >= pair.min)
+            assertTrue("${pair.name} dark ratio $dark < ${pair.min}", dark >= pair.min)
         }
     }
 
