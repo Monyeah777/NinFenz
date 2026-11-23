@@ -4,6 +4,7 @@ import dev.ninfenz.mobile.ui.design.Breakpoint
 import dev.ninfenz.mobile.ui.design.Channel
 import dev.ninfenz.mobile.ui.design.ChannelRanking
 import dev.ninfenz.mobile.ui.design.ColorVision
+import dev.ninfenz.mobile.ui.design.ColorScience
 import dev.ninfenz.mobile.ui.design.Composition
 import dev.ninfenz.mobile.ui.design.CompositionSlot
 import dev.ninfenz.mobile.ui.design.DataType
@@ -59,6 +60,8 @@ class DeepVisualSystemTest {
         val sim = ColorVision.simulate(Palette.error.light)
         assertTrue(ColorVision.deltaE76(Palette.error.light, sim) > 0.0)
         assertTrue("status colors must remain separated under deuteranopia", ColorVision.statusSeparated())
+        assertEquals(0.0, ColorScience.deltaE2000(0xFF1E5F5B.toInt(), 0xFF1E5F5B.toInt()), 0.001)
+        assertTrue(ColorScience.deltaE2000(0xFF000000.toInt(), 0xFFFFFFFF.toInt()) > 90)
     }
 
     @Test

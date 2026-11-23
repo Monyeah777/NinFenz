@@ -75,7 +75,7 @@ object ColorVision {
         )
         return colors.indices.all { i ->
             colors.indices.all { j ->
-                i >= j || (deltaE76(colors[i], colors[j]) >= 24 || deltaE76(simulate(colors[i]), simulate(colors[j])) >= 24)
+                i >= j || (ColorScience.deltaE2000(colors[i], colors[j]) >= 12 || ColorScience.deltaE2000(simulate(colors[i]), simulate(colors[j])) >= 12)
             }
         }
     }
