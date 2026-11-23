@@ -69,10 +69,14 @@ import dev.ninfenz.mobile.ui.theme.NfDesignTheme
  * 深浅与缩放都在这屏内模拟，不改系统设置。
  */
 @Composable
-fun DesignSystemScreen(onBack: () -> Unit) {
+fun DesignSystemScreen(
+    onBack: () -> Unit,
+    initialDark: Boolean? = null,
+    initialScale: Float = 1f
+) {
     val systemDark = isSystemInDarkTheme()
-    var dark by remember { mutableStateOf(systemDark) }
-    var fontScale by remember { mutableStateOf(1f) }
+    var dark by remember { mutableStateOf(initialDark ?: systemDark) }
+    var fontScale by remember { mutableStateOf(initialScale) }
     val base = LocalDensity.current
 
     NfDesignTheme(darkTheme = dark) {
@@ -92,9 +96,21 @@ fun DesignSystemScreen(onBack: () -> Unit) {
                 NfMeta("当前：${if (dark) "深色" else "浅色"} · 缩放 ${(fontScale * 100).toInt()}%")
 
                 NfSectionHeader("体系 2.0 约束")
-                NfMeta("理论规则 ${VisualTheory.rules.size} 条 · 组内/组间 ${Proximity.INTRA}/${Proximity.INTER} = ${"%.1f".format(Proximity.ratio())}")
-                NfMeta("图底阶梯最小 ΔL ${GroundLadder.MIN_STEP} · 反馈预算 ${Feedback.MAX_LATENCY_MS}ms")
-                NfMeta("密度 320dp=${NfDensity.factor(320, 1f)} · 500dp=${NfDensity.factor(500, 1f)} · 900dp=${NfDensity.factor(900, 1f)}")
+                Text(
+                    "理论规则 ${VisualTheory.rules.size} 条\n组内/组间 ${Proximity.INTRA}/${Proximity.INTER} = ${"%.1f".format(Proximity.ratio())}",
+                    style = NfType.meta,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    "图底阶梯最小 ΔL ${GroundLadder.MIN_STEP}\n反馈预算 ${Feedback.MAX_LATENCY_MS}ms",
+                    style = NfType.meta,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    "密度 320dp=${NfDensity.factor(320, 1f)}\n500dp=${NfDensity.factor(500, 1f)}\n900dp=${NfDensity.factor(900, 1f)}",
+                    style = NfType.meta,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
 
                 NfSectionHeader("字阶（4 级）")
                 TypeScale.all.forEach { token ->
