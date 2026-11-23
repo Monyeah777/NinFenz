@@ -1265,6 +1265,37 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                     )
                 }
                 Text(stringResource(dev.ninfenz.mobile.R.string.delivery_pdf_note), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page))
+                exportEntries.firstOrNull()?.let { latest ->
+                    NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
+                        Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                            Text(
+                                stringResource(dev.ninfenz.mobile.R.string.delivery_recent_exports) + " · " + latest.format,
+                                style = MaterialTheme.typography.titleSmall
+                            )
+                            Text(
+                                latest.name + " · " + (latest.bytes?.let { formatBytes(it) } ?: "-") + " · " + latest.sha256.take(12),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+                                TextButton(onClick = {
+                                    val file = File(latest.path)
+                                    if (file.isFile) {
+                                        val intent = ShareExporter.shareFileIntent(context, file, mimeFor(latest.format), latest.name)
+                                        ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.delivery_share_file))
+                                    }
+                                }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_share_file)) }
+                                TextButton(onClick = {
+                                    val file = File(latest.path)
+                                    if (file.isFile) {
+                                        val intent = ShareExporter.viewFileIntent(context, file, mimeFor(latest.format))
+                                        ShareExporter.launchView(context, intent, context.getString(dev.ninfenz.mobile.R.string.delivery_open_file))
+                                    }
+                                }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_open_file)) }
+                            }
+                        }
+                    }
+                }
                 manifestText?.let { Text(it, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
                 exportVerify?.let {
                     Text(

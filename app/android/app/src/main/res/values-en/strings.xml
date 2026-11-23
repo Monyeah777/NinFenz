@@ -1205,4 +1205,5 @@ MIT License · See app/docs/LEGAL.md</string>
     </plurals>
     <string name="project_review_saved">Review saved</string>
     <string name="ccos_reviewer_label">Reviewer</string>
+    <string name="import_reselect_file">Choose another file</string>
 </resources>

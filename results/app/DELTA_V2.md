@@ -183,6 +183,10 @@
 - 文件选择器从 `*/*` 改为显式 markdown/text/csv/json/zip MIME。
 - Pack 回滚改为优先恢复更新前备份；无备份时禁用并说明，不再走缺 size 的反向 merge。
 - Android JVM 506 条；Rust zero_slice 15 条 + op 3 条。
+- 搜索索引项目正文（authoring/import-* + zero-slice slots），命中显示片段。
+- 导出历史增加 bytes；交付台显示最近一次导出回执（格式/文件名/大小/sha 前 12 位 + 打开/分享）。
+- 项目评审成功提示「评审已保存」；CCOS reviewer 字段资源化并 trim。
+- NF-E-004 显示「重新选择文件」CTA。
 
 ## A0-14 Daily 入口
 

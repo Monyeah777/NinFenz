@@ -981,7 +981,16 @@ fun ImportScreen(
                 item { Text(stringResource(dev.ninfenz.mobile.R.string.import_busy), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
             }
             if (error != null) {
-                item { NfErrorCard(error!!.code, error!!.message, error!!.fix, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
+                item {
+                    Column(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
+                        NfErrorCard(error!!.code, error!!.message, error!!.fix)
+                        if (error!!.code == "NF-E-004") {
+                            TextButton(onClick = { filePicker.launch(arrayOf("text/markdown", "text/plain", "text/csv", "application/json", "application/zip", "application/octet-stream")) }) {
+                                Text(stringResource(dev.ninfenz.mobile.R.string.import_reselect_file))
+                            }
+                        }
+                    }
+                }
             }
             notice?.let { message ->
                 item { Text(message, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }

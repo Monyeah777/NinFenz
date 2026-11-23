@@ -43,13 +43,13 @@
 
 | 产物 | 大小 | sha256 | 备注 |
 |---|---|---|---|
-| debug APK | 52,687,317 B | `0f71c2c6…` | 双 ABI |
-| release unsigned | 44,775,954 B | `65312458…` | `zipalign -c -P 16` 通过 |
+| debug APK | 52,687,317 B | `a5082f82…` | 双 ABI |
+| release unsigned | 44,776,418 B | `608ecf9b…` | `zipalign -c -P 16` 通过 |
 | lintRelease | pass | 0 errors / 0 warnings |
 | Release manifest | pass | 0.2.0；minSdk 26 / target 36；无 debuggable |
-| debug-signed APK | 52,687,317 B | `0f71c2c6…` | 仅内部安装；证书 CN=Android Debug |
+| debug-signed APK | 52,687,317 B | `a5082f82…` | 仅内部安装；证书 CN=Android Debug |
 | release AAB unsigned | 28,549,355 B | `37fc8201…` | 旧产物；`jarsigner -verify` 未签名 |
-| upload AAB signed | 28,603,544 B | `73575169…` | upload key `F8:54:EF:94…`；`jarsigner -verify` 通过；Play Console 未创建 |
+| upload AAB signed | 28,604,920 B | `244338f4…` | upload key `F8:54:EF:94…`；`jarsigner -verify` 通过；Play Console 未创建 |
 
 upload key 与签名 AAB 已落地；Play Console/服务账号、公证与商店素材仍无输入。
 
