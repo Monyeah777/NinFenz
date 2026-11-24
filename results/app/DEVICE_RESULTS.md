@@ -520,3 +520,5 @@
 - EPUB 仍无可用渲染器；NF 导入适配器缺失。
 - EPUB 实际渲染：F-Droid 安装 Librera Reader（com.foobnix.pro.pdf.reader），打开 result.epub 成功；显示开篇/正文/收束，排版与章节正常。
 - 已安装工具：Librera Reader from F-Droid；Accessibility Scanner 尚未安装。
+- EPUB 实际渲染：F-Droid 安装 Librera Reader；打开 result.epub 成功显示开篇/正文/收束，页面排版正常。
+- Accessibility Scanner：F-Droid 无该应用；Play Store 仅 stub/无 launcher，未能安装。
