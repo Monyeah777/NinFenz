@@ -513,3 +513,5 @@
 - 更新/回滚终验：应用后回滚显示“已回滚，移除更新版本 1.1.0”，adb 确认只剩 1.0.0。
 - EPUB：阅读器可选择 Download 文件夹，但未进入原始 EPUB 渲染；DOCX 未生成。
 - TalkBack 全屏：焦点可从标题进入粘贴输入框并唤起键盘；继续右滑仍停留在输入框，Tab 仅清空提示/聚焦输入，未完成逐项顺序与控件激活。
+- EPUB 导入 NF：报 [NF-IMP-004] 格式 epub 的适配器本版本未实现；首版适配器仅 text/markdown/json/yaml/zip/nfptl/nfpack。
+- PDF 导入 NF 同样报 [NF-IMP-004]；PDF 仅能外部 Edge 渲染。
