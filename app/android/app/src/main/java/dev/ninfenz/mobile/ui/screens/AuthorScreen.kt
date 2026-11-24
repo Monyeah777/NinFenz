@@ -1,5 +1,12 @@
 package dev.ninfenz.mobile.ui.screens
 
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.ui.platform.LocalDensity
+
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 
@@ -15,6 +22,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -165,22 +174,28 @@ fun AuthorScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpenP
             title = project.title,
             onBack = onBack,
             actions = {
-                TextButton(
-                    onClick = {
-                        if (AuthorTab.entries[tab] == AuthorTab.PROTOCOL) saveRequest++
-                    },
-                    modifier = Modifier.heightIn(min = 48.dp)
-                ) {
-                    Text(stringResource(dev.ninfenz.mobile.R.string.author_save))
+                val compact = LocalDensity.current.fontScale >= 1.4f
+                val onSave: () -> Unit = {
+                    if (AuthorTab.entries[tab] == AuthorTab.PROTOCOL) saveRequest++
                 }
-                TextButton(
-                    onClick = {
-                        if (AuthorTab.entries[tab] == AuthorTab.PROTOCOL) saveAndDeliverRequest++
-                        else onAssembly()
-                    },
-                    modifier = Modifier.heightIn(min = 48.dp)
-                ) {
-                    Text(stringResource(dev.ninfenz.mobile.R.string.author_go_deliver))
+                val onDeliver: () -> Unit = {
+                    if (AuthorTab.entries[tab] == AuthorTab.PROTOCOL) saveAndDeliverRequest++
+                    else onAssembly()
+                }
+                if (compact) {
+                    IconButton(onClick = onSave, modifier = Modifier.size(48.dp)) {
+                        Icon(Icons.Filled.Check, contentDescription = stringResource(dev.ninfenz.mobile.R.string.author_save))
+                    }
+                    IconButton(onClick = onDeliver, modifier = Modifier.size(48.dp)) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = stringResource(dev.ninfenz.mobile.R.string.author_go_deliver))
+                    }
+                } else {
+                    TextButton(onClick = onSave, modifier = Modifier.heightIn(min = 48.dp)) {
+                        Text(stringResource(dev.ninfenz.mobile.R.string.author_save))
+                    }
+                    TextButton(onClick = onDeliver, modifier = Modifier.heightIn(min = 48.dp)) {
+                        Text(stringResource(dev.ninfenz.mobile.R.string.author_go_deliver))
+                    }
                 }
             }
         )
