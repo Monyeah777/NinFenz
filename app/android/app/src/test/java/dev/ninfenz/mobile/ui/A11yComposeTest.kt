@@ -1,12 +1,16 @@
 package dev.ninfenz.mobile.ui
 
 import androidx.compose.ui.test.assertHeightIsAtLeast
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.ui.components.NfOverflowButton
+import dev.ninfenz.mobile.ui.components.NfScaffold
 import dev.ninfenz.mobile.ui.components.NfTopAppBar
 import dev.ninfenz.mobile.ui.screens.LibraryHomeScreen
 import dev.ninfenz.mobile.ui.screens.OnboardingScreen
@@ -39,6 +43,12 @@ class A11yComposeTest {
         compose.onNodeWithContentDescription("搜索").assertIsDisplayed().assertHeightIsAtLeast(48.dp)
         compose.onNodeWithContentDescription("设置").assertIsDisplayed().assertHeightIsAtLeast(48.dp)
         compose.onNodeWithText("导入内容").assertIsDisplayed().assertHeightIsAtLeast(48.dp)
+    }
+
+    @Test
+    fun scaffoldTitleIsHeading() {
+        compose.setContent { NfTheme { NfScaffold(title = "标题", onBack = {}) { } } }
+        compose.onNodeWithText("标题").assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.Heading))
     }
 
     @Test
