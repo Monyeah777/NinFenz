@@ -53,10 +53,10 @@ jobs:
       # init 与 analyze 必须钉**同一个** codeql-action SHA（版本错位会让 init 的输出
       # 与 analyze 的读取格式不一致）；升级时两行一起换，dependabot 会把它们当成一个依赖跟进。
       - name: 初始化 CodeQL（固定 SHA）
-        uses: github/codeql-action/init@33d7b85da1a04171e211befe2c739303b9a4c066  # v4
+        uses: github/codeql-action/init@1bd86f2fdb4b86187fa4059f16f31a3202acc9ea  # v4
         with:
           languages: ${{ matrix.language }}
       - name: 分析并上传 SARIF（category 用语言区分，防两语言结果互相覆盖）
-        uses: github/codeql-action/analyze@33d7b85da1a04171e211befe2c739303b9a4c066  # v4
+        uses: github/codeql-action/analyze@1bd86f2fdb4b86187fa4059f16f31a3202acc9ea  # v4
         with:
           category: /language:${{ matrix.language }}
