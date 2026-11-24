@@ -502,3 +502,4 @@
 - 微信实际发送：result.html（803 B）发送给置顶 Mon.，聊天显示 17:06 [文件] result.html。
 - QQ 实际发送：result.html 发送给 Mon.，聊天显示 17:07 803B / 已发送。
 - PDF 实际渲染：系统 chooser 可达 NF/阅读/Edge 等；NF 导入报 [NF-IMP-004] 当前版本无 pdf 适配器；Edge 渲染未取得证据。
+- 深色全屏抽查：Library/Workbench/Me/Settings/Import 背景、卡片、主次文字、选中态均正常；禁用态对比度偏低但可辨识，未发现白底或错误反色。
