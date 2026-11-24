@@ -601,6 +601,8 @@
     <string name="packupdate_restore_backup_confirm">恢复</string>
     <string name="packupdate_restore_backup_done">已恢复 %1$d 个文件</string>
     <string name="packupdate_restore_backup_failed">恢复失败：%1$s</string>
+    <string name="packupdate_install_fail">安装更新失败</string>
+    <string name="packupdate_install_fix">请检查 storage 与 Pack 目录，然后重试。</string>
     <string name="packupdate_notice">应用/回滚均为原子替换 + 复验；失败时核心返回错误码（NF-PCK-00x）而不是静默部分写入。</string>
     <string name="packupdate_breaking_yes">是（删除/结构变更）</string>
     <string name="packupdate_breaking_no">否</string>

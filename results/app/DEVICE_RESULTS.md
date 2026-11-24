@@ -503,3 +503,5 @@
 - QQ 实际发送：result.html 发送给 Mon.，聊天显示 17:07 803B / 已发送。
 - PDF 实际渲染：系统 chooser 可达 NF/阅读/Edge 等；NF 导入报 [NF-IMP-004] 当前版本无 pdf 适配器；Edge 渲染未取得证据。
 - 深色全屏抽查：Library/Workbench/Me/Settings/Import 背景、卡片、主次文字、选中态均正常；禁用态对比度偏低但可辨识，未发现白底或错误反色。
+- PackUpdate 真实更新：1.0.0→1.1.0 差异 modified docs/sample.md；修复前“应用更新”只写 library/applied，已安装仍 1.0.0。修复后落盘 1.1.0，Pack Center 显示 1.0.0/1.1.0 两条（tree 分别为 4cb…/a472…）。
+- Pack 回滚：未完成；当前回滚入口仍是整应用备份恢复，不是版本级回滚。

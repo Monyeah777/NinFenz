@@ -277,7 +277,24 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit) {
                                     }
                                     val response = safeCall("pack-merge", payload)
                                     if (response.ok) {
+                                        val installed = withContext(Dispatchers.IO) {
+                                            runCatching {
+                                                val target = packDir(u.to.id, u.to.version)
+                                                if (target.exists()) target.deleteRecursively()
+                                                outDir.copyRecursively(target, overwrite = true)
+                                                dev.ninfenz.mobile.data.PackStore(context.filesDir).invalidate()
+                                                target.isDirectory
+                                            }.getOrDefault(false)
+                                        }
                                         resultText = response.result?.toString()
+                                        if (!installed) {
+                                            error = CoreResponse.failure(
+                                                "NF-PCK-005",
+                                                context.getString(dev.ninfenz.mobile.R.string.packupdate_install_fail),
+                                                context.getString(dev.ninfenz.mobile.R.string.packupdate_install_fix),
+                                                3
+                                            ).error
+                                        }
                                     } else {
                                         error = response.error
                                     }

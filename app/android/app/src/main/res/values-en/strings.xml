@@ -605,6 +605,8 @@
     <string name="packupdate_restore_backup_confirm">Restore</string>
     <string name="packupdate_restore_backup_done">Restored files=%1$d</string>
     <string name="packupdate_restore_backup_failed">Restore failed: %1$s</string>
+    <string name="packupdate_install_fail">Install update failed</string>
+    <string name="packupdate_install_fix">Check storage and the pack directory, then retry.</string>
     <string name="packupdate_notice">Apply/rollback are atomic replace + re-verify; on failure core returns an error code (NF-PCK-00x) instead of silently writing partially.</string>
     <string name="packupdate_breaking_yes">yes (deletion/structure change)</string>
     <string name="packupdate_breaking_no">no</string>
