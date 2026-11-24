@@ -200,8 +200,14 @@ fun LibraryHomeScreen(
                 horizontalArrangement = Arrangement.spacedBy(NfSpacing.s),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Button(onClick = onNewProject, modifier = Modifier.heightIn(min = 48.dp)) {
-                    Text(stringResource(dev.ninfenz.mobile.R.string.create_action_new))
+                if (projects.isEmpty()) {
+                    OutlinedButton(onClick = onNewProject, modifier = Modifier.heightIn(min = 48.dp)) {
+                        Text(stringResource(dev.ninfenz.mobile.R.string.create_action_new))
+                    }
+                } else {
+                    Button(onClick = onNewProject, modifier = Modifier.heightIn(min = 48.dp)) {
+                        Text(stringResource(dev.ninfenz.mobile.R.string.create_action_new))
+                    }
                 }
                 TextButton(onClick = onImport, modifier = Modifier.heightIn(min = 48.dp)) {
                     Text(stringResource(dev.ninfenz.mobile.R.string.library_import))
