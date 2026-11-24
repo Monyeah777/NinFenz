@@ -172,7 +172,7 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit) {
                         selected = selected?.id == pack.id && selected?.version == pack.version,
                         onClick = { selected = pack; update = null; rawUpdate = null; resultText = null },
                         label = { Text(pack.id + " · " + pack.version) },
-                        modifier = Modifier.padding(end = 6.dp)
+                        modifier = Modifier.padding(end = 8.dp)
                     )
                 }
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -219,7 +219,7 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit) {
                             Text(conflict.id + " · " + conflict.kind + " · " + conflict.path, style = MaterialTheme.typography.bodyMedium)
                             Text("options=" + conflict.options.joinToString("/") + " · default=" + conflict.defaultOption,
                                 style = MaterialTheme.typography.bodySmall)
-                            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                 for (option in conflict.options) {
                                     FilterChip(
                                         selected = (decisions[conflict.id] ?: conflict.defaultOption) == option,

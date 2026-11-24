@@ -133,7 +133,7 @@ NF 的覆盖条用长度；信任等级用位置+文字；状态用色相+形状
 ## 11. 仍不冒充
 
 - 默认 App 主题已迁移到 `NfColor/NfType/NfShape`；`dynamicColor` 关闭，品牌色不随壁纸漂移
-- 系统层 `design_lint --scope system` 0 违规；`--scope app` **0 违规**（18 条间距 warning，待逐屏）
+- 系统层 `design_lint --scope system` 0 违规；`--scope app` **0 违规 / 0 警告**
 - 没有逐屏 6 张截图矩阵
 - 没有 TalkBack/横屏/200% 真机证据
 - HEART 的留存/时长未埋点

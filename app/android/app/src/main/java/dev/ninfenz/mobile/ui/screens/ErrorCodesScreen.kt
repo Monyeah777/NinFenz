@@ -82,7 +82,7 @@ private fun ErrorCodeRow(entry: ErrorCodeEntry, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(horizontal = NfSpacing.page, vertical = 10.dp),
+            .padding(horizontal = NfSpacing.page, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
         Text(entry.code + " · " + entry.severity + " · exit=" + entry.exit, style = MaterialTheme.typography.titleMedium)

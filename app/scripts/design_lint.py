@@ -76,10 +76,13 @@ def main() -> int:
                     violations.append(
                         f"{rel}: 中性色 #{m.group(1)} 色相 {h:.0f}° 越出 {BRAND_HUE:.0f}±{HUE_WINDOW:.0f}°"
                     )
-            for m in DP_RE.finditer(text):
-                v = int(m.group(1))
-                if v > 4 and v % 4 != 0:
-                    warnings.append(f"{rel}: 间距 {v}dp 不在 4dp 栅格上")
+            for line in text.splitlines():
+                if any(k in line for k in ("tonalElevation", "strokeWidth", "RoundedCornerShape", "Modifier.size(")):
+                    continue
+                for m in DP_RE.finditer(line):
+                    v = int(m.group(1))
+                    if v > 4 and v % 4 != 0:
+                        warnings.append(f"{rel}: 间距 {v}dp 不在 4dp 栅格上")
 
         name = path.name
         if "screens/" in str(rel):

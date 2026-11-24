@@ -307,7 +307,7 @@ private fun ResultRow(hit: SearchHit, selected: Boolean, onClick: () -> Unit) {
             .fillMaxWidth()
             .background(if (selected) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surface)
             .clickable(onClick = onClick)
-            .padding(horizontal = NfSpacing.page, vertical = 10.dp)
+            .padding(horizontal = NfSpacing.page, vertical = 12.dp)
     ) {
         Text(hit.title, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
         Text(

@@ -148,8 +148,8 @@ private fun MarkdownTable(rows: List<PdfMarkdown.Block>) {
                     .background(
                         if (header) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surfaceVariant
                     )
-                    .padding(vertical = 4.dp, horizontal = 6.dp),
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    .padding(vertical = 4.dp, horizontal = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 row.cells.forEach { cell ->

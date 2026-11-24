@@ -68,17 +68,17 @@ fun OnboardingScreen(
             StepDots(step)
             when (step) {
                 0 -> Step(
-                    icon = { Icon(Icons.Filled.Home, contentDescription = null, modifier = Modifier.size(56.dp), tint = MaterialTheme.colorScheme.primary) },
+                    icon = { Icon(Icons.Filled.Home, contentDescription = null, modifier = Modifier.size(58.dp), tint = MaterialTheme.colorScheme.primary) },
                     title = stringResource(dev.ninfenz.mobile.R.string.onboarding_step0_title),
                     body = stringResource(dev.ninfenz.mobile.R.string.onboarding_step0_body)
                 )
                 1 -> Step(
-                    icon = { Icon(Icons.AutoMirrored.Filled.List, contentDescription = null, modifier = Modifier.size(56.dp), tint = MaterialTheme.colorScheme.primary) },
+                    icon = { Icon(Icons.AutoMirrored.Filled.List, contentDescription = null, modifier = Modifier.size(58.dp), tint = MaterialTheme.colorScheme.primary) },
                     title = stringResource(dev.ninfenz.mobile.R.string.onboarding_step1_title),
                     body = stringResource(dev.ninfenz.mobile.R.string.onboarding_step1_body)
                 )
                 else -> Step(
-                    icon = { Icon(Icons.Filled.Check, contentDescription = null, modifier = Modifier.size(56.dp), tint = MaterialTheme.colorScheme.primary) },
+                    icon = { Icon(Icons.Filled.Check, contentDescription = null, modifier = Modifier.size(58.dp), tint = MaterialTheme.colorScheme.primary) },
                     title = stringResource(dev.ninfenz.mobile.R.string.onboarding_step2_title),
                     body = stringResource(dev.ninfenz.mobile.R.string.onboarding_step2_body)
                 )
@@ -106,7 +106,7 @@ fun OnboardingScreen(
 
 @Composable
 private fun StepDots(step: Int) {
-    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         repeat(3) { index ->
             val color = if (index == step) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline.copy(alpha = 0.35f)
             Spacer(

@@ -107,7 +107,7 @@ fun NfStepStrip(steps: List<String>, current: Int, modifier: Modifier = Modifier
                 Text(
                     label,
                     style = MaterialTheme.typography.labelMedium,
-                    modifier = Modifier.padding(horizontal = NfSpacing.s, vertical = 6.dp)
+                    modifier = Modifier.padding(horizontal = NfSpacing.s, vertical = 8.dp)
                 )
             }
             if (index < steps.lastIndex) {
@@ -258,11 +258,11 @@ fun NfCard(
 
 @Composable
 fun NfStatusChip(label: String, color: Color = MaterialTheme.colorScheme.primary) {
-    Surface(shape = RoundedCornerShape(999.dp), color = color.copy(alpha = 0.12f), contentColor = color) {
+    Surface(shape = RoundedCornerShape(percent = 50), color = color.copy(alpha = 0.12f), contentColor = color) {
         Text(
             text = label,
             style = MaterialTheme.typography.labelMedium,
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
         )
     }
 }
@@ -279,7 +279,7 @@ fun NfListRow(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(horizontal = NfSpacing.page, vertical = 14.dp),
+            .padding(horizontal = NfSpacing.page, vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(NfSpacing.m)
     ) {

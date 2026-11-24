@@ -184,11 +184,11 @@ fun GraphScreen(store: LibraryStore, onBack: () -> Unit) {
                         OutlinedButton(onClick = { graph = GraphModel.withoutEdge(g, edge.id) }) { Text(stringResource(dev.ninfenz.mobile.R.string.graph_delete)) }
                     }
                 }
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     FormTextField(label = "from", value = edgeFrom, onValueChange = { edgeFrom = it })
                     FormTextField(label = "to", value = edgeTo, onValueChange = { edgeTo = it })
                 }
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     FormTextField(label = "from_port", value = edgeFromPort, onValueChange = { edgeFromPort = it })
                     FormTextField(label = "to_port", value = edgeToPort, onValueChange = { edgeToPort = it })
                 }
