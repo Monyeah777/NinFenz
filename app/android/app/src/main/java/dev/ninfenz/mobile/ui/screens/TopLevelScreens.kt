@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
@@ -102,6 +103,7 @@ import dev.ninfenz.mobile.ui.components.NfSectionHeader
 import dev.ninfenz.mobile.ui.components.NfStatusChip
 import dev.ninfenz.mobile.ui.components.NfTopAppBar
 import dev.ninfenz.mobile.ui.theme.NfSpacing
+import dev.ninfenz.mobile.ui.theme.NfLayout
 import dev.ninfenz.mobile.ui.design.NfType
 import java.io.File
 import java.text.SimpleDateFormat
@@ -168,8 +170,8 @@ fun LibraryHomeScreen(
         onOpenProject(entry)
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-    Column(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+    Column(modifier = Modifier.fillMaxSize().widthIn(max = NfLayout.contentMaxWidth)) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
