@@ -3,12 +3,15 @@ package dev.ninfenz.mobile.ui.components
 import dev.ninfenz.mobile.ui.design.NfType
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -39,6 +42,7 @@ import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.paneTitle
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import dev.ninfenz.mobile.ui.theme.NfLayout
 import dev.ninfenz.mobile.ui.theme.NfSpacing
 
 /** v0.02 视觉壳：旧功能屏复用同一 TopAppBar/卡片/错误视觉，避免开发面板感。 */
@@ -69,16 +73,20 @@ fun NfScaffold(
             )
         }
     ) { padding ->
-        Column(
-            modifier = Modifier
-                .padding(padding)
-                .fillMaxWidth()
-                .imePadding()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = NfSpacing.page, vertical = NfSpacing.m),
-            verticalArrangement = Arrangement.spacedBy(NfSpacing.m)
+        Box(
+            modifier = Modifier.fillMaxSize().padding(padding).imePadding(),
+            contentAlignment = Alignment.TopCenter
         ) {
-            content(padding)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .widthIn(max = NfLayout.contentMaxWidth)
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = NfSpacing.page, vertical = NfSpacing.m),
+                verticalArrangement = Arrangement.spacedBy(NfSpacing.m)
+            ) {
+                content(padding)
+            }
         }
     }
 }
