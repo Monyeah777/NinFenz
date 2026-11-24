@@ -34,6 +34,7 @@ import dev.ninfenz.mobile.model.ValidateReport
 import dev.ninfenz.mobile.model.ReportModel
 import dev.ninfenz.mobile.ui.safeCall
 import dev.ninfenz.mobile.ui.components.CardBox
+import dev.ninfenz.mobile.ui.design.NfType
 import dev.ninfenz.mobile.ui.components.EmptyState
 import dev.ninfenz.mobile.ui.components.ErrorNotice
 import dev.ninfenz.mobile.ui.components.FormTextField
@@ -132,9 +133,9 @@ fun GraphScreen(store: LibraryStore, onBack: () -> Unit) {
                 for (node in g.nodes) {
                     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
                         Column(modifier = Modifier.weight(1f)) {
-                            Text(node.id + " · " + node.kind + " · " + node.title, style = MaterialTheme.typography.bodyMedium)
+                            Text(node.id + " · " + node.kind + " · " + node.title, style = NfType.secondary)
                             Text(stringResource(dev.ninfenz.mobile.R.string.graph_ports, node.portsIn.joinToString(","), node.portsOut.joinToString(",")),
-                                style = MaterialTheme.typography.bodySmall)
+                                style = NfType.meta)
                         }
                         FormTextField(
                             label = context.getString(dev.ninfenz.mobile.R.string.graph_weight),
@@ -178,8 +179,8 @@ fun GraphScreen(store: LibraryStore, onBack: () -> Unit) {
                     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
                         Column(modifier = Modifier.weight(1f)) {
                             Text(edge.id + " · " + edge.from + "(" + edge.fromPort + ") -> " + edge.to + "(" + edge.toPort + ")",
-                                style = MaterialTheme.typography.bodySmall)
-                            Text(stringResource(dev.ninfenz.mobile.R.string.graph_type, edge.type), style = MaterialTheme.typography.labelSmall)
+                                style = NfType.meta)
+                            Text(stringResource(dev.ninfenz.mobile.R.string.graph_type, edge.type), style = NfType.meta)
                         }
                         OutlinedButton(onClick = { graph = GraphModel.withoutEdge(g, edge.id) }) { Text(stringResource(dev.ninfenz.mobile.R.string.graph_delete)) }
                     }

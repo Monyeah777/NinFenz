@@ -51,6 +51,7 @@ import dev.ninfenz.mobile.model.SearchFilter
 import dev.ninfenz.mobile.model.SearchKeyboard
 import dev.ninfenz.mobile.ui.components.NfTopAppBar
 import dev.ninfenz.mobile.ui.theme.NfSpacing
+import dev.ninfenz.mobile.ui.design.NfType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -159,7 +160,7 @@ fun SearchScreen(
             }
             Text(
                 stringResource(dev.ninfenz.mobile.R.string.search_keyboard_hint),
-                style = MaterialTheme.typography.bodySmall,
+                style = NfType.meta,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = NfSpacing.page, vertical = 4.dp)
             )
@@ -174,7 +175,7 @@ fun SearchScreen(
             filtered.isEmpty() -> Column(modifier = Modifier.padding(NfSpacing.page)) {
                 Text(
                     stringResource(dev.ninfenz.mobile.R.string.search_no_result),
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = NfType.secondary,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 TextButton(onClick = { query = "" }) {
@@ -246,7 +247,7 @@ private fun SearchHistoryPanel(
     Column(modifier = Modifier.fillMaxWidth().padding(NfSpacing.page)) {
         Text(
             pluralStringResource(dev.ninfenz.mobile.R.plurals.search_hint, total, total),
-            style = MaterialTheme.typography.bodyMedium,
+            style = NfType.secondary,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         if (history.isNotEmpty()) {
@@ -255,7 +256,7 @@ private fun SearchHistoryPanel(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
             ) {
-                Text(stringResource(dev.ninfenz.mobile.R.string.search_history_title), style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(dev.ninfenz.mobile.R.string.search_history_title), style = NfType.itemTitle)
                 TextButton(onClick = onClear) { Text(stringResource(dev.ninfenz.mobile.R.string.search_history_clear)) }
             }
             LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -295,7 +296,7 @@ private fun SearchFilterRow(selected: SearchKind?, onPick: (SearchKind?) -> Unit
 private fun SectionLabel(text: String) {
     Text(
         text,
-        style = MaterialTheme.typography.titleMedium,
+        style = NfType.itemTitle,
         modifier = Modifier.padding(start = NfSpacing.page, end = NfSpacing.page, top = NfSpacing.m, bottom = NfSpacing.xs)
     )
 }
@@ -309,10 +310,10 @@ private fun ResultRow(hit: SearchHit, selected: Boolean, onClick: () -> Unit) {
             .clickable(onClick = onClick)
             .padding(horizontal = NfSpacing.page, vertical = 12.dp)
     ) {
-        Text(hit.title, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Text(hit.title, style = NfType.itemTitle, maxLines = 1, overflow = TextOverflow.Ellipsis)
         Text(
             hit.detail,
-            style = MaterialTheme.typography.bodySmall,
+            style = NfType.meta,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis

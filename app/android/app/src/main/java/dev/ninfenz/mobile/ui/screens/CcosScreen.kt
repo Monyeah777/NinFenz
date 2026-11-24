@@ -47,6 +47,7 @@ import dev.ninfenz.mobile.model.ProjectModel
 import dev.ninfenz.mobile.model.ProjectStatus
 import dev.ninfenz.mobile.ui.safeCall
 import dev.ninfenz.mobile.ui.components.CardBox
+import dev.ninfenz.mobile.ui.design.NfType
 import dev.ninfenz.mobile.ui.components.EmptyState
 import dev.ninfenz.mobile.ui.components.ErrorNotice
 import dev.ninfenz.mobile.ui.components.FormTextField
@@ -263,7 +264,7 @@ fun CcosScreen(onBack: () -> Unit) {
         if (r != null) {
             CardBox(title = stringResource(dev.ninfenz.mobile.R.string.ccos_result_title, r.taskId)) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(stringResource(dev.ninfenz.mobile.R.string.ccos_status), style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(dev.ninfenz.mobile.R.string.ccos_status), style = NfType.meta)
                     NfStatusChip(r.status)
                 }
                 KeyValue("task_digest", r.taskDigest.take(24) + "…")
@@ -277,17 +278,17 @@ fun CcosScreen(onBack: () -> Unit) {
                 }
                 KeyValue("artifacts", r.artifacts.size.toString())
                 for (a in r.artifacts) {
-                    Text(a.name + " · " + a.mime + " · " + a.bytes + " bytes", style = MaterialTheme.typography.bodySmall)
-                    Text("  sha256=" + a.sha256.take(24) + "…", style = MaterialTheme.typography.labelSmall)
+                    Text(a.name + " · " + a.mime + " · " + a.bytes + " bytes", style = NfType.meta)
+                    Text("  sha256=" + a.sha256.take(24) + "…", style = NfType.meta)
                 }
                 KeyValue("evidence", r.evidence.size.toString())
                 for (e in r.evidence) {
-                    Text(e.kind + " · " + e.ref + " · " + e.digest.take(16) + "…", style = MaterialTheme.typography.bodySmall)
+                    Text(e.kind + " · " + e.ref + " · " + e.digest.take(16) + "…", style = NfType.meta)
                 }
                 KeyValue("report", r.reportSummary)
                 for (issue in r.issues) Notice(issue.code + "：" + issue.message, Tone.WARN)
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("human_review", style = MaterialTheme.typography.bodySmall)
+                    Text("human_review", style = NfType.meta)
                     NfStatusChip(r.reviewState)
                 }
                 KeyValue("required", r.reviewRequired.toString())
@@ -323,7 +324,7 @@ fun CcosReviewActions(
     Surface(tonalElevation = 3.dp, modifier = Modifier.navigationBarsPadding()) {
         Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
             outcome?.let {
-                Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
+                Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary)
             }
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(enabled = !busy, onClick = onApprove) {
