@@ -76,6 +76,7 @@ import dev.ninfenz.mobile.ui.components.NfStatusChip
 import dev.ninfenz.mobile.ui.components.NfTopAppBar
 import dev.ninfenz.mobile.ui.safeCall
 import dev.ninfenz.mobile.ui.theme.NfSpacing
+import dev.ninfenz.mobile.ui.design.NfType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -197,7 +198,7 @@ fun AuthorScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpenP
                 NfStatusChip(projectStatusLabel(project))
                 Text(
                     stringResource(dev.ninfenz.mobile.R.string.author_pack_label, project.refs.basePackId, project.refs.basePackVersion),
-                    style = MaterialTheme.typography.bodySmall,
+                    style = NfType.meta,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.weight(1f),
                     textAlign = androidx.compose.ui.text.style.TextAlign.End
@@ -210,7 +211,7 @@ fun AuthorScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpenP
                 ) {
                     Text(
                         stringResource(dev.ninfenz.mobile.R.string.template_override_active),
-                        style = MaterialTheme.typography.bodySmall,
+                        style = NfType.meta,
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.weight(1f)
                     )
@@ -235,7 +236,7 @@ fun AuthorScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpenP
             }
             Text(
                 stringResource(dev.ninfenz.mobile.R.string.author_preview_note),
-                style = MaterialTheme.typography.bodySmall,
+                style = NfType.meta,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = NfSpacing.page)
             )
@@ -382,7 +383,7 @@ private fun ProtocolAuthorContent(
         if (mergedPrefill.isNotEmpty()) {
             Text(
                 pluralStringResource(dev.ninfenz.mobile.R.plurals.author_import_prefill, mergedPrefill.size, mergedPrefill.size),
-                style = MaterialTheme.typography.bodySmall,
+                style = NfType.meta,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(horizontal = NfSpacing.page)
             )
@@ -392,11 +393,11 @@ private fun ProtocolAuthorContent(
             NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
                 Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(clause.id + " · " + clause.title, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+                        Text(clause.id + " · " + clause.title, style = NfType.itemTitle, modifier = Modifier.weight(1f))
                         NfStatusChip(clause.level)
                     }
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(stringResource(dev.ninfenz.mobile.R.string.author_enable), style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
+                        Text(stringResource(dev.ninfenz.mobile.R.string.author_enable), style = NfType.meta, modifier = Modifier.weight(1f))
                         Switch(
                             checked = enabled[clause.id] ?: clause.enabled,
                             onCheckedChange = { checked ->
@@ -405,15 +406,15 @@ private fun ProtocolAuthorContent(
                             }
                         )
                     }
-                    Text(clause.text, style = MaterialTheme.typography.bodyMedium)
+                    Text(clause.text, style = NfType.secondary)
                     val check = ProtocolModel.checkClause(protocol, clause, values)
                     if (!check.ok) {
-                        if (check.missing.isNotEmpty()) Text(stringResource(dev.ninfenz.mobile.R.string.author_missing, check.missing.joinToString(", ")), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
-                        if (check.unknown.isNotEmpty()) Text(stringResource(dev.ninfenz.mobile.R.string.author_unknown, check.unknown.joinToString(", ")), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+                        if (check.missing.isNotEmpty()) Text(stringResource(dev.ninfenz.mobile.R.string.author_missing, check.missing.joinToString(", ")), style = NfType.meta, color = MaterialTheme.colorScheme.error)
+                        if (check.unknown.isNotEmpty()) Text(stringResource(dev.ninfenz.mobile.R.string.author_unknown, check.unknown.joinToString(", ")), style = NfType.meta, color = MaterialTheme.colorScheme.error)
                     }
                     for (field in protocol.fields.filter { it.clause == clause.id }) {
                         Column {
-                            Text(field.id + " · " + field.label + (if (field.required) stringResource(dev.ninfenz.mobile.R.string.author_required) else ""), style = MaterialTheme.typography.labelLarge)
+                            Text(field.id + " · " + field.label + (if (field.required) stringResource(dev.ninfenz.mobile.R.string.author_required) else ""), style = NfType.label)
                             OutlinedTextField(
                                 value = values[field.id] ?: "",
                                 onValueChange = { text ->
@@ -448,7 +449,7 @@ private fun ProtocolAuthorContent(
                 onClick = { save() }
             ) { Text(if (saving) stringResource(dev.ninfenz.mobile.R.string.author_saving) else stringResource(dev.ninfenz.mobile.R.string.author_save)) }
         }
-        saveMessage?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
+        saveMessage?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
         saveError?.let { message ->
             NfErrorCard("NF-PCK-003", message, stringResource(dev.ninfenz.mobile.R.string.author_diag_fix), modifier = Modifier.padding(horizontal = NfSpacing.page))
         }
@@ -482,7 +483,7 @@ private fun ProtocolAuthorContent(
         rendered?.let { lines ->
             NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.author_render_results, lines.size))
             for (line in lines) {
-                Text(line, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(horizontal = NfSpacing.page))
+                Text(line, style = NfType.secondary, modifier = Modifier.padding(horizontal = NfSpacing.page))
             }
         }
     }
@@ -559,7 +560,7 @@ private fun GraphAuthorContent(artifacts: AuthorArtifacts, project: Project, onS
             NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
                 Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(node.id + " · " + node.title, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+                        Text(node.id + " · " + node.title, style = NfType.itemTitle, modifier = Modifier.weight(1f))
                         NfStatusChip(node.kind)
                         TextButton(onClick = { deleteNode(node) }) { Text(stringResource(dev.ninfenz.mobile.R.string.author_delete)) }
                     }
@@ -570,10 +571,10 @@ private fun GraphAuthorContent(artifacts: AuthorArtifacts, project: Project, onS
                             node.portsIn.joinToString(","),
                             node.portsOut.joinToString(",")
                         ),
-                        style = MaterialTheme.typography.bodySmall,
+                        style = NfType.meta,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    graph.weights[node.id]?.let { Text(stringResource(dev.ninfenz.mobile.R.string.author_weight, it), style = MaterialTheme.typography.bodySmall) }
+                    graph.weights[node.id]?.let { Text(stringResource(dev.ninfenz.mobile.R.string.author_weight, it), style = NfType.meta) }
                 }
             }
         }
@@ -582,7 +583,7 @@ private fun GraphAuthorContent(artifacts: AuthorArtifacts, project: Project, onS
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = NfSpacing.page)) {
                 Text(
                     edge.from + "." + edge.fromPort + " → " + edge.to + "." + edge.toPort + "（" + edge.type + "）",
-                    style = MaterialTheme.typography.bodySmall,
+                    style = NfType.meta,
                     modifier = Modifier.weight(1f)
                 )
                 TextButton(onClick = { apply(graph.copy(edges = graph.edges.filter { it.id != edge.id })) }) {
@@ -687,8 +688,8 @@ private fun GraphAuthorContent(artifacts: AuthorArtifacts, project: Project, onS
             }
         ) { Text(if (busy) stringResource(dev.ninfenz.mobile.R.string.author_saving_artifact) else stringResource(dev.ninfenz.mobile.R.string.author_save_graph)) }
 
-        report?.let { text -> Text(text, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
-        savedMsg?.let { text -> Text(text, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
+        report?.let { text -> Text(text, style = NfType.secondary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
+        savedMsg?.let { text -> Text(text, style = NfType.secondary, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
         error?.let { err -> NfErrorCard(err.code, err.message, err.fix, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
         SnackbarHost(hostState = snackbar, modifier = Modifier.padding(horizontal = NfSpacing.page))
     }
@@ -732,7 +733,7 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
         for (section in spec.sections) {
             NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
                 Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
-                    Text(section.id + " · order=" + section.order, style = MaterialTheme.typography.bodySmall)
+                    Text(section.id + " · order=" + section.order, style = NfType.meta)
                     FormTextField(
                         label = stringResource(dev.ninfenz.mobile.R.string.author_section_title),
                         value = section.title,
@@ -747,7 +748,7 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
                             if (section.required) stringResource(dev.ninfenz.mobile.R.string.author_required_label) else stringResource(dev.ninfenz.mobile.R.string.author_optional_label),
                             section.slots.joinToString(",")
                         ),
-                        style = MaterialTheme.typography.bodySmall,
+                        style = NfType.meta,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -757,7 +758,7 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
         for (slot in spec.slots) {
             NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
                 Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
-                    Text(slot.id + " · " + slot.kind + (if (slot.required) " · " + stringResource(dev.ninfenz.mobile.R.string.author_required_label) else ""), style = MaterialTheme.typography.bodySmall)
+                    Text(slot.id + " · " + slot.kind + (if (slot.required) " · " + stringResource(dev.ninfenz.mobile.R.string.author_required_label) else ""), style = NfType.meta)
                     FormTextField(
                         label = stringResource(dev.ninfenz.mobile.R.string.author_slot_name),
                         value = slot.name,
@@ -813,8 +814,8 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
                 }
             }
         ) { Text(if (busy) stringResource(dev.ninfenz.mobile.R.string.author_saving_artifact) else stringResource(dev.ninfenz.mobile.R.string.author_save_spec)) }
-        report?.let { text -> Text(text, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
-        savedMsg?.let { text -> Text(text, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
+        report?.let { text -> Text(text, style = NfType.secondary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
+        savedMsg?.let { text -> Text(text, style = NfType.secondary, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
         error?.let { err -> NfErrorCard(err.code, err.message, err.fix, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
     }
 }
