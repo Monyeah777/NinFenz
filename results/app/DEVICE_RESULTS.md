@@ -491,3 +491,4 @@
 - 横屏：用 cmd window user-rotation lock 1 真正旋转到 2392x1080；左侧导航 rail（库/工作台/我的），Library 标题/动作/卡片横向不溢出，内容通过纵向滚动承接。
 - Me 100%：外观/语言/存储与诊断/关于，诊断行进入 Settings；无横向溢出。
 - ErrorCodes 100%：搜索框 + 65 条错误码列表，code/级别/说明/修复分行可读，长文本自动换行。
+- Delivery 导出分享：系统分享面板打开，显示 result.html 803 B 与一加互传/DSH Go/微信/DeepSeek/QQ/邮件/浏览器目标；未实际发送。“打开”目标未验证。
