@@ -751,6 +751,7 @@ fun DeliverScreen(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MeScreen(
     themeMode: ThemeMode,
@@ -771,7 +772,7 @@ fun MeScreen(
             contentPadding = androidx.compose.foundation.layout.PaddingValues(vertical = NfSpacing.l),
             verticalArrangement = Arrangement.spacedBy(NfSpacing.m)
         ) {
-            item { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.me_section_appearance)) }
+            stickyHeader(key = "me-appearance") { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.me_section_appearance)) }
             item {
                 Row(
                     modifier = Modifier.padding(horizontal = NfSpacing.page),
@@ -798,7 +799,7 @@ fun MeScreen(
                     )
                 }
             }
-            item { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.me_section_language)) }
+            stickyHeader(key = "me-language") { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.me_section_language)) }
             item {
                 Row(
                     modifier = Modifier.padding(horizontal = NfSpacing.page),
@@ -821,7 +822,7 @@ fun MeScreen(
                     }
                 }
             }
-            item { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.me_section_storage)) }
+            stickyHeader(key = "me-storage") { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.me_section_storage)) }
             item {
                 NfListRow(
                     title = stringResource(dev.ninfenz.mobile.R.string.me_storage_title),
@@ -840,7 +841,7 @@ fun MeScreen(
                     onClick = onSettings
                 )
             }
-            item { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.me_section_about)) }
+            stickyHeader(key = "me-about") { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.me_section_about)) }
             item {
                 NfListRow(
                     title = stringResource(dev.ninfenz.mobile.R.string.me_about_title),
