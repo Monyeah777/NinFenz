@@ -461,7 +461,7 @@ fun LibraryHomeScreen(
                 }
             }
             if (packs.isNotEmpty()) {
-                item {
+                stickyHeader(key = "library-packs-header") {
                     NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.library_section_packs), action = {
                         TextButton(onClick = onPackCenter) { Text(stringResource(dev.ninfenz.mobile.R.string.library_manage)) }
                     })
@@ -487,7 +487,7 @@ fun LibraryHomeScreen(
                 }
             }
             if (archived.isNotEmpty()) {
-                item { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.library_section_archive)) }
+                stickyHeader(key = "library-archive-header") { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.library_section_archive)) }
                 items(archived.size) { index ->
                     val file = archived[index]
                     NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
@@ -597,6 +597,7 @@ private fun SeedLine(seed: SeedResult?) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CreateScreen(
     projects: List<ProjectEntry>,
@@ -655,7 +656,7 @@ fun CreateScreen(
                         )
                     }
                 } else {
-                    item { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.create_section_projects)) }
+                    stickyHeader(key = "create-projects-header") { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.create_section_projects)) }
                     items(projects.size) { index ->
                         val entry = projects[index]
                         NfCard(
@@ -681,6 +682,7 @@ fun CreateScreen(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DeliverScreen(
     projects: List<ProjectEntry>,
@@ -707,7 +709,7 @@ fun DeliverScreen(
                 contentPadding = androidx.compose.foundation.layout.PaddingValues(vertical = NfSpacing.l),
                 verticalArrangement = Arrangement.spacedBy(NfSpacing.m)
             ) {
-                item { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.create_section_projects)) }
+                stickyHeader(key = "deliver-projects-header") { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.create_section_projects)) }
                 items(projects.size) { index ->
                     val entry = projects[index]
                     NfCard(
