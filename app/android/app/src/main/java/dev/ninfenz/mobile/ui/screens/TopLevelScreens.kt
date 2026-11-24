@@ -1,5 +1,7 @@
 package dev.ninfenz.mobile.ui.screens
 
+import androidx.compose.ui.platform.LocalDensity
+
 import androidx.compose.ui.text.style.TextOverflow
 
 import dev.ninfenz.mobile.ui.theme.NfMotion
@@ -184,8 +186,8 @@ fun LibraryHomeScreen(
                 .statusBarsPadding()
                 .padding(horizontal = NfSpacing.page, vertical = NfSpacing.s)
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Column(modifier = Modifier.weight(1f)) {
+            val titleBlock: @Composable () -> Unit = {
+                Column {
                     Text(
                         stringResource(dev.ninfenz.mobile.R.string.library_header_title),
                         style = NfType.screenTitle,
@@ -199,11 +201,24 @@ fun LibraryHomeScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
+            }
+            val actions: @Composable () -> Unit = {
                 TextButton(onClick = onCommands, modifier = Modifier.heightIn(min = 48.dp)) {
                     Text(stringResource(dev.ninfenz.mobile.R.string.action_commands))
                 }
                 IconButton(onClick = onSearch, modifier = Modifier.size(48.dp)) { Icon(Icons.Filled.Search, contentDescription = stringResource(dev.ninfenz.mobile.R.string.action_search)) }
                 IconButton(onClick = onSettings, modifier = Modifier.size(48.dp)) { Icon(Icons.Filled.Settings, contentDescription = stringResource(dev.ninfenz.mobile.R.string.action_settings)) }
+            }
+            if (LocalDensity.current.fontScale >= 1.4f) {
+                Column {
+                    titleBlock()
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) { actions() }
+                }
+            } else {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(modifier = Modifier.weight(1f)) { titleBlock() }
+                    Row(horizontalArrangement = Arrangement.End) { actions() }
+                }
             }
             Row(
                 modifier = Modifier.padding(top = NfSpacing.s),
