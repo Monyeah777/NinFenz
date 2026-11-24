@@ -445,7 +445,7 @@ fun LibraryHomeScreen(
                     ) {
                         Text(
                             stringResource(dev.ninfenz.mobile.R.string.library_filter_empty),
-                            style = MaterialTheme.typography.bodyMedium,
+                            style = NfType.secondary,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.weight(1f)
                         )
@@ -469,10 +469,10 @@ fun LibraryHomeScreen(
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(NfSpacing.m)) {
                             Column(modifier = Modifier.weight(1f)) {
-                                Text(pack.title, style = MaterialTheme.typography.titleMedium)
+                                Text(pack.title, style = NfType.itemTitle)
                                 Text(
                                     pack.id + " · " + pack.version + " · " + context.getString(dev.ninfenz.mobile.R.string.pack_item_count, pack.itemCount),
-                                    style = MaterialTheme.typography.bodySmall,
+                                    style = NfType.meta,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
@@ -487,7 +487,7 @@ fun LibraryHomeScreen(
                     val file = archived[index]
                     NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(file.name, style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
+                            Text(file.name, style = NfType.meta, modifier = Modifier.weight(1f))
                             TextButton(onClick = { onRestoreArchive(file) }) {
                                 Text(stringResource(dev.ninfenz.mobile.R.string.project_archive_restore))
                             }
@@ -506,8 +506,8 @@ fun LibraryHomeScreen(
                         modifier = Modifier.padding(horizontal = NfSpacing.page)
                     ) {
                         Column(modifier = Modifier.padding(NfSpacing.m)) {
-                            Text(pluralStringResource(dev.ninfenz.mobile.R.plurals.library_errors, errors.size, errors.size), style = MaterialTheme.typography.titleMedium)
-                            errors.take(3).forEach { Text(it, style = MaterialTheme.typography.bodySmall) }
+                            Text(pluralStringResource(dev.ninfenz.mobile.R.plurals.library_errors, errors.size, errors.size), style = NfType.itemTitle)
+                            errors.take(3).forEach { Text(it, style = NfType.meta) }
                         }
                     }
                 }
@@ -534,7 +534,7 @@ fun LibraryHomeScreen(
                 ) {
                     Text(
                         stringResource(dev.ninfenz.mobile.R.string.library_project_archived),
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = NfType.secondary,
                         modifier = Modifier.weight(1f)
                     )
                     TextButton(onClick = {
@@ -575,17 +575,17 @@ private fun SeedLine(seed: SeedResult?) {
     when (seed) {
         is SeedResult.Installed -> Text(
             stringResource(dev.ninfenz.mobile.R.string.library_seed_ready, seed.id, seed.version),
-            style = MaterialTheme.typography.bodySmall,
+            style = NfType.meta,
             color = MaterialTheme.colorScheme.primary
         )
         is SeedResult.AlreadyPresent -> Text(
             stringResource(dev.ninfenz.mobile.R.string.library_seed_exists, seed.id, seed.version),
-            style = MaterialTheme.typography.bodySmall,
+            style = NfType.meta,
             color = MaterialTheme.colorScheme.primary
         )
         is SeedResult.Failed -> Text(
             seed.message,
-            style = MaterialTheme.typography.bodySmall,
+            style = NfType.meta,
             color = MaterialTheme.colorScheme.error
         )
         null -> Unit
@@ -627,10 +627,10 @@ fun CreateScreen(
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(NfSpacing.m)) {
                             Icon(Icons.Filled.Add, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                             Column(modifier = Modifier.weight(1f)) {
-                                Text(stringResource(dev.ninfenz.mobile.R.string.create_from_pack), style = MaterialTheme.typography.titleMedium)
+                                Text(stringResource(dev.ninfenz.mobile.R.string.create_from_pack), style = NfType.itemTitle)
                                 Text(
                                     stringResource(dev.ninfenz.mobile.R.string.create_from_pack_subtitle),
-                                    style = MaterialTheme.typography.bodySmall,
+                                    style = NfType.meta,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
@@ -659,12 +659,12 @@ fun CreateScreen(
                         ) {
                             Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Text(entry.project.title, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+                                    Text(entry.project.title, style = NfType.itemTitle, modifier = Modifier.weight(1f))
                                     NfStatusChip(projectStatusLabel(entry.project))
                                 }
                                 Text(
                                     "Pack " + entry.project.refs.basePackId + " · " + entry.project.refs.basePackVersion,
-                                    style = MaterialTheme.typography.bodySmall,
+                                    style = NfType.meta,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
@@ -711,10 +711,10 @@ fun DeliverScreen(
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Column(modifier = Modifier.weight(1f)) {
-                                Text(entry.project.title, style = MaterialTheme.typography.titleMedium)
+                                Text(entry.project.title, style = NfType.itemTitle)
                                 Text(
                                     stringResource(dev.ninfenz.mobile.R.string.project_flow_label),
-                                    style = MaterialTheme.typography.bodySmall,
+                                    style = NfType.meta,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
@@ -950,14 +950,14 @@ fun ProjectDetailScreen(
                         if (project.historyCount > 0) {
                             Text(
                                 stringResource(dev.ninfenz.mobile.R.string.project_detail_history, project.historyCount),
-                                style = MaterialTheme.typography.labelSmall,
+                                style = NfType.meta,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.weight(1f),
                                 textAlign = androidx.compose.ui.text.style.TextAlign.End
                             )
                         }
                     }
-                    Text(project.id, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(project.id, style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     if (templateReference != null) {
                         NfListRow(stringResource(dev.ninfenz.mobile.R.string.project_template_ref), null, Icons.Filled.Search, "›") {
                             showTemplateReference = true
@@ -967,7 +967,7 @@ fun ProjectDetailScreen(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
                                 stringResource(dev.ninfenz.mobile.R.string.template_override_active),
-                                style = MaterialTheme.typography.bodySmall,
+                                style = NfType.meta,
                                 color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.weight(1f)
                             )
@@ -979,7 +979,7 @@ fun ProjectDetailScreen(
                     Text(
                         stringResource(dev.ninfenz.mobile.R.string.project_detail_pack, project.refs.basePackId, project.refs.basePackVersion) +
                             " · " + stringResource(dev.ninfenz.mobile.R.string.project_detail_protocol, project.refs.protocolId.ifBlank { stringResource(dev.ninfenz.mobile.R.string.not_bound) }),
-                        style = MaterialTheme.typography.bodySmall,
+                        style = NfType.meta,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -999,7 +999,7 @@ fun ProjectDetailScreen(
                         )
                         Text(
                             stringResource(if (nextIsAuthor) dev.ninfenz.mobile.R.string.project_detail_author_subtitle else dev.ninfenz.mobile.R.string.project_detail_delivery_subtitle),
-                            style = MaterialTheme.typography.bodySmall,
+                            style = NfType.meta,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Button(
@@ -1016,21 +1016,21 @@ fun ProjectDetailScreen(
                 NfCard {
                     Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                         Row {
-                            Text("Pack", style = MaterialTheme.typography.bodySmall, modifier = Modifier.width(72.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            Text(project.refs.basePackId + " · " + project.refs.basePackVersion, style = MaterialTheme.typography.bodySmall)
+                            Text("Pack", style = NfType.meta, modifier = Modifier.width(72.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(project.refs.basePackId + " · " + project.refs.basePackVersion, style = NfType.meta)
                         }
                         Row {
-                            Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_protocol_label), style = MaterialTheme.typography.bodySmall, modifier = Modifier.width(72.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            Text(project.refs.protocolId.ifBlank { stringResource(dev.ninfenz.mobile.R.string.not_bound) }, style = MaterialTheme.typography.bodySmall)
+                            Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_protocol_label), style = NfType.meta, modifier = Modifier.width(72.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(project.refs.protocolId.ifBlank { stringResource(dev.ninfenz.mobile.R.string.not_bound) }, style = NfType.meta)
                         }
                         Row {
-                            Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_review), style = MaterialTheme.typography.bodySmall, modifier = Modifier.width(72.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            Text(project.review.state + " · " + (project.review.reviewer ?: "-"), style = MaterialTheme.typography.bodySmall)
+                            Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_review), style = NfType.meta, modifier = Modifier.width(72.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(project.review.state + " · " + (project.review.reviewer ?: "-"), style = NfType.meta)
                         }
                         if (reviewStale) {
                             Text(
                                 stringResource(dev.ninfenz.mobile.R.string.project_review_stale),
-                                style = MaterialTheme.typography.bodySmall,
+                                style = NfType.meta,
                                 color = MaterialTheme.colorScheme.error
                             )
                         }
@@ -1055,7 +1055,7 @@ fun ProjectDetailScreen(
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
                                     stringResource(dev.ninfenz.mobile.R.string.project_history_title),
-                                    style = MaterialTheme.typography.titleMedium,
+                                    style = NfType.itemTitle,
                                     modifier = Modifier.weight(1f)
                                 )
                                 TextButton(onClick = {
@@ -1065,12 +1065,12 @@ fun ProjectDetailScreen(
                                 }) { Text(stringResource(dev.ninfenz.mobile.R.string.project_history_share)) }
                             }
                             if (project.history.isEmpty()) {
-                                Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_history, project.historyCount), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_history, project.historyCount), style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             } else {
                                 project.history.takeLast(20).forEach { h ->
                                     Text(
                                         h.op + (h.digest?.let { " · " + it.take(12) } ?: "") + (h.at?.let { " · " + it } ?: ""),
-                                        style = MaterialTheme.typography.bodySmall,
+                                        style = NfType.meta,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
@@ -1138,7 +1138,7 @@ fun ProjectDetailScreen(
                 verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)
             ) {
                 Text(stringResource(dev.ninfenz.mobile.R.string.project_more_actions), style = MaterialTheme.typography.titleLarge)
-                Text(project.title, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(project.title, style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 HorizontalDivider(modifier = Modifier.padding(vertical = NfSpacing.s))
                 Text(stringResource(dev.ninfenz.mobile.R.string.project_actions_manage), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 NfListRow(stringResource(dev.ninfenz.mobile.R.string.project_detail_rename), null, Icons.Filled.Edit, "›") {
@@ -1233,7 +1233,7 @@ fun ProjectDetailScreen(
             title = { Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_review)) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                    Text(stringResource(dev.ninfenz.mobile.R.string.project_review_current, project.review.state), style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(dev.ninfenz.mobile.R.string.project_review_current, project.review.state), style = NfType.meta)
                     OutlinedTextField(
                         value = reviewer,
                         onValueChange = { reviewer = it },
@@ -1248,7 +1248,7 @@ fun ProjectDetailScreen(
                     if (!canApprove) {
                         Text(
                             stringResource(dev.ninfenz.mobile.R.string.project_review_need_validate),
-                            style = MaterialTheme.typography.bodySmall,
+                            style = NfType.meta,
                             color = MaterialTheme.colorScheme.error
                         )
                     }
@@ -1365,10 +1365,10 @@ fun ProjectDetailScreen(
                         Text(stringResource(dev.ninfenz.mobile.R.string.project_diff_same))
                     } else {
                         report.changes.forEach { change ->
-                            Text(change.field + ": " + change.before + " → " + change.after, style = MaterialTheme.typography.bodySmall)
+                            Text(change.field + ": " + change.before + " → " + change.after, style = NfType.meta)
                         }
-                        report.historyOnlyBefore.forEach { Text("history -: " + it, style = MaterialTheme.typography.bodySmall) }
-                        report.historyOnlyAfter.forEach { Text("history +: " + it, style = MaterialTheme.typography.bodySmall) }
+                        report.historyOnlyBefore.forEach { Text("history -: " + it, style = NfType.meta) }
+                        report.historyOnlyAfter.forEach { Text("history +: " + it, style = NfType.meta) }
                     }
                 }
             },
@@ -1414,11 +1414,11 @@ fun PackDetailScreen(pack: PackEntry, onBack: () -> Unit, onUpdate: () -> Unit) 
             item {
                 NfCard {
                     Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                        Text(pack.id + " · " + pack.version, style = MaterialTheme.typography.titleMedium)
-                        Text(pack.description, style = MaterialTheme.typography.bodyMedium)
-                        Text(stringResource(dev.ninfenz.mobile.R.string.pack_detail_items, pack.itemCount), style = MaterialTheme.typography.bodySmall)
-                        Text(stringResource(dev.ninfenz.mobile.R.string.pack_detail_tree, pack.tree.take(16) + "…"), style = MaterialTheme.typography.bodySmall)
-                        Text(stringResource(dev.ninfenz.mobile.R.string.pack_detail_dir, pack.dir.absolutePath), style = MaterialTheme.typography.bodySmall)
+                        Text(pack.id + " · " + pack.version, style = NfType.itemTitle)
+                        Text(pack.description, style = NfType.secondary)
+                        Text(stringResource(dev.ninfenz.mobile.R.string.pack_detail_items, pack.itemCount), style = NfType.meta)
+                        Text(stringResource(dev.ninfenz.mobile.R.string.pack_detail_tree, pack.tree.take(16) + "…"), style = NfType.meta)
+                        Text(stringResource(dev.ninfenz.mobile.R.string.pack_detail_dir, pack.dir.absolutePath), style = NfType.meta)
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
                                 when {
@@ -1426,7 +1426,7 @@ fun PackDetailScreen(pack: PackEntry, onBack: () -> Unit, onUpdate: () -> Unit) 
                                     trustMatches -> stringResource(dev.ninfenz.mobile.R.string.pack_trust_pinned)
                                     else -> stringResource(dev.ninfenz.mobile.R.string.pack_trust_mismatch)
                                 },
-                                style = MaterialTheme.typography.bodySmall,
+                                style = NfType.meta,
                                 color = when {
                                     pinnedTree == null -> MaterialTheme.colorScheme.onSurfaceVariant
                                     trustMatches -> MaterialTheme.colorScheme.primary
@@ -1489,14 +1489,14 @@ fun PackDetailScreen(pack: PackEntry, onBack: () -> Unit, onUpdate: () -> Unit) 
             if (report != null) {
                 item {
                     Surface(color = MaterialTheme.colorScheme.primaryContainer, shape = MaterialTheme.shapes.medium) {
-                        Text(report!!, modifier = Modifier.padding(NfSpacing.m), style = MaterialTheme.typography.bodySmall)
+                        Text(report!!, modifier = Modifier.padding(NfSpacing.m), style = NfType.meta)
                     }
                 }
             }
             if (errorText != null) {
                 item {
                     Surface(color = MaterialTheme.colorScheme.errorContainer, shape = MaterialTheme.shapes.medium) {
-                        Text(errorText!!, modifier = Modifier.padding(NfSpacing.m), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onErrorContainer)
+                        Text(errorText!!, modifier = Modifier.padding(NfSpacing.m), style = NfType.meta, color = MaterialTheme.colorScheme.onErrorContainer)
                     }
                 }
             }

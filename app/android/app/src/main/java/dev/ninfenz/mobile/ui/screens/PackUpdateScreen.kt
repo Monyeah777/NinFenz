@@ -49,6 +49,7 @@ import dev.ninfenz.mobile.ui.components.MonoText
 import dev.ninfenz.mobile.ui.components.NfScaffold
 import dev.ninfenz.mobile.ui.components.Notice
 import dev.ninfenz.mobile.ui.components.Tone
+import dev.ninfenz.mobile.ui.design.NfType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -166,7 +167,7 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit) {
             if (packs.isEmpty()) {
                 EmptyState(stringResource(dev.ninfenz.mobile.R.string.packupdate_no_packs))
             } else {
-                Text(stringResource(dev.ninfenz.mobile.R.string.packupdate_select_base), style = MaterialTheme.typography.bodySmall)
+                Text(stringResource(dev.ninfenz.mobile.R.string.packupdate_select_base), style = NfType.meta)
                 for (pack in packs) {
                     FilterChip(
                         selected = selected?.id == pack.id && selected?.version == pack.version,
@@ -181,8 +182,8 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit) {
                     }
                     OutlinedButton(onClick = { picker.launch(arrayOf("application/json", "text/plain")) }) { Text(stringResource(dev.ninfenz.mobile.R.string.pack_update_open_plan)) }
                 }
-                selected?.let { Text(stringResource(dev.ninfenz.mobile.R.string.packupdate_base, it.id, it.version, it.dir.absolutePath), style = MaterialTheme.typography.bodySmall) }
-                newRoot?.let { Text(stringResource(dev.ninfenz.mobile.R.string.packupdate_new, it.absolutePath), style = MaterialTheme.typography.bodySmall) }
+                selected?.let { Text(stringResource(dev.ninfenz.mobile.R.string.packupdate_base, it.id, it.version, it.dir.absolutePath), style = NfType.meta) }
+                newRoot?.let { Text(stringResource(dev.ninfenz.mobile.R.string.packupdate_new, it.absolutePath), style = NfType.meta) }
                 if (selected != null && newRoot == null) {
                     Notice(stringResource(dev.ninfenz.mobile.R.string.packupdate_hint), Tone.INFO)
                 }
@@ -204,9 +205,9 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit) {
         val u = update
         if (u != null) {
             CardBox(title = stringResource(dev.ninfenz.mobile.R.string.packupdate_changes)) {
-                for (c in u.added) Text("+ " + c.path, style = MaterialTheme.typography.bodySmall)
-                for (c in u.removed) Text("- " + c.path, style = MaterialTheme.typography.bodySmall)
-                for (c in u.modified) Text("~ " + c.path, style = MaterialTheme.typography.bodySmall)
+                for (c in u.added) Text("+ " + c.path, style = NfType.meta)
+                for (c in u.removed) Text("- " + c.path, style = NfType.meta)
+                for (c in u.modified) Text("~ " + c.path, style = NfType.meta)
                 if (u.totalChanges == 0) EmptyState(stringResource(dev.ninfenz.mobile.R.string.packupdate_no_changes))
             }
 
@@ -216,9 +217,9 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit) {
                 } else {
                     for (conflict in u.conflicts) {
                         Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Text(conflict.id + " · " + conflict.kind + " · " + conflict.path, style = MaterialTheme.typography.bodyMedium)
+                            Text(conflict.id + " · " + conflict.kind + " · " + conflict.path, style = NfType.secondary)
                             Text("options=" + conflict.options.joinToString("/") + " · default=" + conflict.defaultOption,
-                                style = MaterialTheme.typography.bodySmall)
+                                style = NfType.meta)
                             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                 for (option in conflict.options) {
                                     FilterChip(
@@ -287,7 +288,7 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit) {
                     if (preUpdateBackup == null) {
                         Text(
                             stringResource(dev.ninfenz.mobile.R.string.packupdate_rollback_no_backup),
-                            style = MaterialTheme.typography.bodySmall,
+                            style = NfType.meta,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -296,13 +297,13 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit) {
                 preUpdateBackup?.let {
                     Text(
                         stringResource(dev.ninfenz.mobile.R.string.packupdate_pre_backup, it.absolutePath),
-                        style = MaterialTheme.typography.bodySmall
+                        style = NfType.meta
                     )
                     TextButton(enabled = !busy, onClick = { showRollbackBackup = true }) {
                         Text(stringResource(dev.ninfenz.mobile.R.string.packupdate_restore_backup))
                     }
                 }
-                backupRollbackMessage?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
+                backupRollbackMessage?.let { Text(it, style = NfType.meta) }
                 Notice(stringResource(dev.ninfenz.mobile.R.string.packupdate_notice), Tone.INFO)
             }
         }
