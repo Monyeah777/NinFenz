@@ -62,6 +62,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.style.TextOverflow as NfTextOverflow
 import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.ui.theme.NfSpacing
+import dev.ninfenz.mobile.ui.design.NfType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,7 +72,7 @@ fun NfTopAppBar(
     actions: @Composable RowScope.() -> Unit = {}
 ) {
     TopAppBar(
-        title = { Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.semantics { heading() }) },
+        title = { Text(title, style = NfType.screenTitle, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.semantics { heading() }) },
         navigationIcon = {
             if (onBack != null) {
                 IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
@@ -106,7 +107,7 @@ fun NfStepStrip(steps: List<String>, current: Int, modifier: Modifier = Modifier
             ) {
                 Text(
                     label,
-                    style = MaterialTheme.typography.labelMedium,
+                    style = NfType.label,
                     modifier = Modifier.padding(horizontal = NfSpacing.s, vertical = 8.dp)
                 )
             }
@@ -130,7 +131,7 @@ fun NfSectionHeader(text: String, modifier: Modifier = Modifier, action: (@Compo
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(text, style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() })
+        Text(text, style = NfType.sectionTitle, modifier = Modifier.semantics { heading() })
         action?.invoke()
     }
 }
@@ -261,8 +262,8 @@ fun NfStatusChip(label: String, color: Color = MaterialTheme.colorScheme.primary
     Surface(shape = RoundedCornerShape(percent = 50), color = color.copy(alpha = 0.12f), contentColor = color) {
         Text(
             text = label,
-            style = MaterialTheme.typography.labelMedium,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
+            style = NfType.label,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
         )
     }
 }
@@ -339,7 +340,7 @@ fun NfErrorCard(code: String, message: String, fix: String, modifier: Modifier =
                 "NF-REV-002" -> stringResource(dev.ninfenz.mobile.R.string.error_hint_review)
                 else -> null
             }
-            Text("[" + code + "] " + (hint ?: message), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onErrorContainer)
+            Text("[" + code + "] " + (hint ?: message), style = NfType.itemTitle, color = MaterialTheme.colorScheme.onErrorContainer)
             if (hint != null) {
                 Text(message, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onErrorContainer)
             }
