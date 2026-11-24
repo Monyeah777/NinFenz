@@ -1,5 +1,7 @@
 package dev.ninfenz.mobile.ui.screens
 
+import dev.ninfenz.mobile.ui.design.NfType
+
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -114,7 +116,7 @@ fun ProtocolScreen(onBack: () -> Unit) {
                 val clauseEnabled = enabled[clause.id] ?: clause.enabled
                 CardBox(title = clause.id + " · " + clause.title + " [" + clause.level + "]") {
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text(stringResource(dev.ninfenz.mobile.R.string.protocol_enable), style = MaterialTheme.typography.bodyMedium)
+                        Text(stringResource(dev.ninfenz.mobile.R.string.protocol_enable), style = NfType.secondary)
                         Switch(
                             checked = clauseEnabled,
                             onCheckedChange = { checked -> enabled = enabled + (clause.id to checked) }
@@ -138,10 +140,10 @@ fun ProtocolScreen(onBack: () -> Unit) {
                             value = values[field.id] ?: "",
                             onValueChange = { v -> values = values + (field.id to v) }
                         )
-                        field.maxLen?.let { Text("max_len=" + it, style = MaterialTheme.typography.labelSmall) }
-                        field.pattern?.let { Text("pattern=" + it, style = MaterialTheme.typography.labelSmall) }
+                        field.maxLen?.let { Text("max_len=" + it, style = NfType.meta) }
+                        field.pattern?.let { Text("pattern=" + it, style = NfType.meta) }
                     }
-                    Text(stringResource(dev.ninfenz.mobile.R.string.protocol_rules, p.rules.joinToString { it.id + "(" + it.severity + ")" }), style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(dev.ninfenz.mobile.R.string.protocol_rules, p.rules.joinToString { it.id + "(" + it.severity + ")" }), style = NfType.meta)
                 }
             }
 
@@ -195,10 +197,10 @@ fun ProtocolScreen(onBack: () -> Unit) {
                     Text(stringResource(dev.ninfenz.mobile.R.string.protocol_explain))
                 }
                 if (explainLines.isNotEmpty()) {
-                    Text(stringResource(dev.ninfenz.mobile.R.string.protocol_explain_trace), style = MaterialTheme.typography.titleSmall)
+                    Text(stringResource(dev.ninfenz.mobile.R.string.protocol_explain_trace), style = NfType.itemTitle)
                     for (line in explainLines) MonoText(line)
                 }
-                Text(stringResource(dev.ninfenz.mobile.R.string.protocol_note), style = MaterialTheme.typography.bodySmall)
+                Text(stringResource(dev.ninfenz.mobile.R.string.protocol_note), style = NfType.meta)
                 renderError?.let { ErrorNotice(it) }
                 rendered?.let { list ->
                     if (list.isEmpty()) {

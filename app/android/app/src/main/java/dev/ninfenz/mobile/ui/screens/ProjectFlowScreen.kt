@@ -1,5 +1,7 @@
 package dev.ninfenz.mobile.ui.screens
 
+import dev.ninfenz.mobile.ui.design.NfType
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -62,11 +64,11 @@ fun ProjectFlowScreen(
             item {
                 NfCard {
                     Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                        Text(project.title, style = MaterialTheme.typography.headlineSmall)
-                        Text(project.id, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(project.title, style = NfType.screenTitle)
+                        Text(project.id, style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Text(
                             stringResource(dev.ninfenz.mobile.R.string.flow_resume_hint),
-                            style = MaterialTheme.typography.bodyMedium,
+                            style = NfType.secondary,
                             color = MaterialTheme.colorScheme.primary
                         )
                     }
@@ -122,12 +124,12 @@ private fun FlowRow(index: Int, label: String, done: Boolean, current: Boolean) 
         ) {
             Text(
                 (index + 1).toString(),
-                style = MaterialTheme.typography.labelSmall,
+                style = NfType.meta,
                 color = if (current || done) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
         Column(modifier = Modifier.weight(1f)) {
-            Text(label, style = MaterialTheme.typography.titleMedium)
+            Text(label, style = NfType.itemTitle)
             Text(
                 stringResource(
                     when {
@@ -136,7 +138,7 @@ private fun FlowRow(index: Int, label: String, done: Boolean, current: Boolean) 
                         else -> dev.ninfenz.mobile.R.string.flow_stage_pending
                     }
                 ),
-                style = MaterialTheme.typography.bodySmall,
+                style = NfType.meta,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }

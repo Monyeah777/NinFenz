@@ -615,7 +615,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
                             Text(
                                 pluralStringResource(dev.ninfenz.mobile.R.plurals.delivery_constraint_conflict, constraintConflicts.size, constraintConflicts.size),
-                                style = MaterialTheme.typography.titleSmall,
+                                style = NfType.itemTitle,
                                 color = MaterialTheme.colorScheme.error
                             )
                             constraintConflicts.take(2).forEach { conflict ->
@@ -716,7 +716,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                     val sectionFilled = sectionSlots.count { !inputs[it].isNullOrBlank() }
                                     Text(
                                         sectionTitle + "  " + sectionFilled + "/" + sectionSlots.size,
-                                        style = MaterialTheme.typography.titleSmall,
+                                        style = NfType.itemTitle,
                                         color = MaterialTheme.colorScheme.primary,
                                         modifier = Modifier.semantics { heading() }
                                     )
@@ -1045,7 +1045,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         stringResource(dev.ninfenz.mobile.R.string.contract_export) to (exportedFile != null)
                     )
                     Column(Modifier.padding(horizontal = NfSpacing.page, vertical = NfSpacing.s), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
-                        Text(stringResource(dev.ninfenz.mobile.R.string.contract_title), style = MaterialTheme.typography.titleSmall)
+                        Text(stringResource(dev.ninfenz.mobile.R.string.contract_title), style = NfType.itemTitle)
                         checks.forEach { (label, ok) ->
                             Text((if (ok) "✓ " else "✗ ") + label, style = NfType.meta, color = if (ok) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error)
                         }
@@ -1283,7 +1283,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
                             Text(
                                 stringResource(dev.ninfenz.mobile.R.string.delivery_last_export) + " · " + latest.format,
-                                style = MaterialTheme.typography.titleSmall
+                                style = NfType.itemTitle
                             )
                             val meta = buildList {
                                 add(latest.name)
@@ -1339,7 +1339,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                     ) {
                         Text(
                             stringResource(dev.ninfenz.mobile.R.string.delivery_recent_exports),
-                            style = MaterialTheme.typography.titleSmall
+                            style = NfType.itemTitle
                         )
                         TextButton(onClick = {
                             exportHistory.clear()
@@ -1492,7 +1492,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         Text(stringResource(dev.ninfenz.mobile.R.string.delivery_no_slots), style = NfType.meta)
                     }
                     views.forEach { view ->
-                        Text(view.id + " · " + view.name, style = MaterialTheme.typography.titleSmall)
+                        Text(view.id + " · " + view.name, style = NfType.itemTitle)
                         Text(
                             view.kind + " · " + stringResource(
                                 if (view.required) dev.ninfenz.mobile.R.string.delivery_slot_required else dev.ninfenz.mobile.R.string.delivery_slot_optional
@@ -1573,7 +1573,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         style = NfType.meta,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    Text(stringResource(dev.ninfenz.mobile.R.string.grant_caps), style = MaterialTheme.typography.titleSmall)
+                    Text(stringResource(dev.ninfenz.mobile.R.string.grant_caps), style = NfType.itemTitle)
                     listOf(
                         dev.ninfenz.mobile.data.CapabilityGrant.READ to dev.ninfenz.mobile.R.string.grant_cap_read,
                         dev.ninfenz.mobile.data.CapabilityGrant.COMMENT to dev.ninfenz.mobile.R.string.grant_cap_comment,
@@ -1595,7 +1595,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         Checkbox(checked = revoked, onCheckedChange = { revoked = it })
                         Text(stringResource(dev.ninfenz.mobile.R.string.grant_revoked))
                     }
-                    Text(stringResource(dev.ninfenz.mobile.R.string.grant_expiry), style = MaterialTheme.typography.titleSmall)
+                    Text(stringResource(dev.ninfenz.mobile.R.string.grant_expiry), style = NfType.itemTitle)
                     Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                         listOf(0 to dev.ninfenz.mobile.R.string.grant_never, 7 to dev.ninfenz.mobile.R.string.grant_7d, 30 to dev.ninfenz.mobile.R.string.grant_30d).forEach { (option, label) ->
                             FilterChip(selected = days == option, onClick = { days = option }, label = { Text(stringResource(label)) })
@@ -2088,7 +2088,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         ) {
                             Text(
                                 stringResource(dev.ninfenz.mobile.R.string.delivery_preview),
-                                style = MaterialTheme.typography.titleLarge,
+                                style = NfType.screenTitle,
                                 modifier = Modifier.weight(1f)
                             )
                             TextButton(onClick = { showFullPreview = false }) {

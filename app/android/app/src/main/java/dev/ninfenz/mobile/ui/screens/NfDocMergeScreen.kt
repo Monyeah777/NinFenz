@@ -1,5 +1,7 @@
 package dev.ninfenz.mobile.ui.screens
 
+import dev.ninfenz.mobile.ui.design.NfType
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -67,7 +69,7 @@ fun NfDocMergeScreen(filesDir: File, onBack: () -> Unit) {
         Text(
             stringResource(R.string.nfdoc_merge_hint),
             modifier = Modifier.padding(horizontal = NfSpacing.page),
-            style = MaterialTheme.typography.bodySmall,
+            style = NfType.meta,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         LazyColumn(Modifier.weight(1f).fillMaxWidth()) {
@@ -97,7 +99,7 @@ fun NfDocMergeScreen(filesDir: File, onBack: () -> Unit) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             c.title + " · " + c.reason,
-                            style = MaterialTheme.typography.bodySmall,
+                            style = NfType.meta,
                             modifier = Modifier.weight(1f)
                         )
                         androidx.compose.material3.TextButton(onClick = {
@@ -123,7 +125,7 @@ fun NfDocMergeScreen(filesDir: File, onBack: () -> Unit) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
                                     block.type + " · " + block.text.replace("\n", " ").take(60),
-                                    style = MaterialTheme.typography.bodySmall,
+                                    style = NfType.meta,
                                     modifier = Modifier.weight(1f)
                                 )
                                 androidx.compose.material3.TextButton(

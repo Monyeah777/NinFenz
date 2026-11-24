@@ -1,5 +1,7 @@
 package dev.ninfenz.mobile.ui.components
 
+import dev.ninfenz.mobile.ui.design.NfType
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -85,7 +87,7 @@ fun CardBox(title: String?, modifier: Modifier = Modifier, content: @Composable 
             verticalArrangement = Arrangement.spacedBy(NfSpacing.s),
             content = {
                 if (title != null) {
-                    Text(title, style = MaterialTheme.typography.titleLarge)
+                    Text(title, style = NfType.screenTitle)
                 }
                 content()
             }
@@ -104,21 +106,21 @@ fun ErrorNotice(error: dev.ninfenz.mobile.core.CoreError, modifier: Modifier = M
         Column(modifier = Modifier.padding(NfSpacing.m), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
             Text(
                 "[" + error.code + "] " + error.message,
-                style = MaterialTheme.typography.titleSmall,
+                style = NfType.itemTitle,
                 color = MaterialTheme.colorScheme.onErrorContainer
             )
             if (error.path != null) {
-                Text("path: " + error.path, style = MaterialTheme.typography.bodySmall, fontFamily = FontFamily.Monospace)
+                Text("path: " + error.path, style = NfType.meta, fontFamily = FontFamily.Monospace)
             }
             Text(
                 stringResource(dev.ninfenz.mobile.R.string.error_fix_prefix, entry?.fix?.takeIf { it.isNotBlank() } ?: error.fix),
-                style = MaterialTheme.typography.bodySmall,
+                style = NfType.meta,
                 color = MaterialTheme.colorScheme.onErrorContainer
             )
             Text(
                 "exit=" + error.exit + " · severity=" + (entry?.severity ?: "unknown") + " · backend=" +
                     dev.ninfenz.mobile.core.Core.bridge.backendName,
-                style = MaterialTheme.typography.labelSmall
+                style = NfType.meta
             )
         }
     }
@@ -132,7 +134,7 @@ fun Notice(text: String, tone: Tone = Tone.INFO) {
         Tone.ERROR -> MaterialTheme.colorScheme.errorContainer to MaterialTheme.colorScheme.onErrorContainer
     }
     Surface(shape = MaterialTheme.shapes.medium, color = colors.first, contentColor = colors.second, modifier = Modifier.fillMaxWidth()) {
-        Text(text = text, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(NfSpacing.m))
+        Text(text = text, style = NfType.meta, modifier = Modifier.padding(NfSpacing.m))
     }
 }
 
@@ -141,22 +143,22 @@ enum class Tone { INFO, WARN, ERROR }
 @Composable
 fun KeyValue(label: String, value: String) {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-        Text(text = label, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Text(text = value, style = MaterialTheme.typography.bodySmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
+        Text(text = label, style = NfType.label, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(text = value, style = NfType.meta, maxLines = 2, overflow = TextOverflow.Ellipsis)
     }
 }
 
 @Composable
 fun MonoText(text: String) {
     Surface(shape = MaterialTheme.shapes.small, color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f), modifier = Modifier.fillMaxWidth()) {
-        Text(text = text, style = MaterialTheme.typography.bodySmall, fontFamily = FontFamily.Monospace, modifier = Modifier.padding(NfSpacing.m))
+        Text(text = text, style = NfType.meta, fontFamily = FontFamily.Monospace, modifier = Modifier.padding(NfSpacing.m))
     }
 }
 
 @Composable
 fun EmptyState(text: String) {
     Surface(shape = MaterialTheme.shapes.medium, color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f), modifier = Modifier.fillMaxWidth()) {
-        Text(text = text, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(NfSpacing.l))
+        Text(text = text, style = NfType.secondary, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(NfSpacing.l))
     }
 }
 

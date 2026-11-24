@@ -332,7 +332,7 @@ fun LibraryHomeScreen(
                                     .size(48.dp)
                                     .semantics { contentDescription = sortLabel }
                             ) {
-                                Text("⇅", style = MaterialTheme.typography.titleLarge)
+                                Text("⇅", style = NfType.screenTitle)
                             }
                             androidx.compose.material3.DropdownMenu(
                                 expanded = sortMenuOpen,
@@ -989,13 +989,13 @@ fun ProjectDetailScreen(
                     Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                         Text(
                             stringResource(dev.ninfenz.mobile.R.string.project_detail_next_step),
-                            style = MaterialTheme.typography.labelMedium,
+                            style = NfType.label,
                             color = MaterialTheme.colorScheme.primary
                         )
                         val nextIsAuthor = project.status == ProjectStatus.DRAFT || project.status == ProjectStatus.AUTHORING
                         Text(
                             stringResource(if (nextIsAuthor) dev.ninfenz.mobile.R.string.flow_action_author else dev.ninfenz.mobile.R.string.flow_action_delivery),
-                            style = MaterialTheme.typography.titleLarge
+                            style = NfType.screenTitle
                         )
                         Text(
                             stringResource(if (nextIsAuthor) dev.ninfenz.mobile.R.string.project_detail_author_subtitle else dev.ninfenz.mobile.R.string.project_detail_delivery_subtitle),
@@ -1137,10 +1137,10 @@ fun ProjectDetailScreen(
                     .padding(bottom = NfSpacing.xl),
                 verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)
             ) {
-                Text(stringResource(dev.ninfenz.mobile.R.string.project_more_actions), style = MaterialTheme.typography.titleLarge)
+                Text(stringResource(dev.ninfenz.mobile.R.string.project_more_actions), style = NfType.screenTitle)
                 Text(project.title, style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 HorizontalDivider(modifier = Modifier.padding(vertical = NfSpacing.s))
-                Text(stringResource(dev.ninfenz.mobile.R.string.project_actions_manage), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(dev.ninfenz.mobile.R.string.project_actions_manage), style = NfType.label, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 NfListRow(stringResource(dev.ninfenz.mobile.R.string.project_detail_rename), null, Icons.Filled.Edit, "›") {
                     showMoreActions = false
                     renameText = project.title
@@ -1173,7 +1173,7 @@ fun ProjectDetailScreen(
                     }
                 }
                 HorizontalDivider(modifier = Modifier.padding(vertical = NfSpacing.s))
-                Text(stringResource(dev.ninfenz.mobile.R.string.project_actions_share), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(dev.ninfenz.mobile.R.string.project_actions_share), style = NfType.label, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 NfListRow(stringResource(dev.ninfenz.mobile.R.string.project_detail_share), null, Icons.Filled.Search, "›") {
                     showMoreActions = false
                     onShare()
@@ -1196,7 +1196,7 @@ fun ProjectDetailScreen(
                     android.widget.Toast.makeText(context, context.getString(dev.ninfenz.mobile.R.string.project_copy_id), android.widget.Toast.LENGTH_SHORT).show()
                 }
                 HorizontalDivider(modifier = Modifier.padding(vertical = NfSpacing.s))
-                Text(stringResource(dev.ninfenz.mobile.R.string.project_actions_danger), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(dev.ninfenz.mobile.R.string.project_actions_danger), style = NfType.label, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 TextButton(
                     onClick = {
                         showMoreActions = false

@@ -1,5 +1,7 @@
 package dev.ninfenz.mobile.ui.screens
 
+import dev.ninfenz.mobile.ui.design.NfType
+
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -114,7 +116,7 @@ fun HomeScreen(store: LibraryStore, onOpen: (Screen) -> Unit) {
 
     NfScaffold(title = "NF Mobile · Home", onBack = null) {
         CardBox(title = context.getString(dev.ninfenz.mobile.R.string.home_control_plane)) {
-            Text(context.getString(dev.ninfenz.mobile.R.string.home_local_only), style = MaterialTheme.typography.bodySmall)
+            Text(context.getString(dev.ninfenz.mobile.R.string.home_local_only), style = NfType.meta)
             val diag = remember { Core.diagnostics() }
             KeyValue(
                 context.getString(dev.ninfenz.mobile.R.string.home_core_bridge),
@@ -173,15 +175,15 @@ fun HomeScreen(store: LibraryStore, onOpen: (Screen) -> Unit) {
                 for (entry in snap.projects) {
                     Card(modifier = Modifier.fillMaxWidth()) {
                         Column(modifier = Modifier.padding(8.dp)) {
-                            Text(entry.project.title + " · " + entry.project.status.wire, style = MaterialTheme.typography.titleSmall)
-                            Text(entry.project.id + " · base " + entry.project.refs.basePackId + " " + entry.project.refs.basePackVersion, style = MaterialTheme.typography.bodySmall)
+                            Text(entry.project.title + " · " + entry.project.status.wire, style = NfType.itemTitle)
+                            Text(entry.project.id + " · base " + entry.project.refs.basePackId + " " + entry.project.refs.basePackVersion, style = NfType.meta)
                             Text(
                                 context.getString(
                                     dev.ninfenz.mobile.R.string.home_review_summary,
                                     entry.project.review.state,
                                     entry.project.historyCount
                                 ),
-                                style = MaterialTheme.typography.bodySmall
+                                style = NfType.meta
                             )
                         }
                     }

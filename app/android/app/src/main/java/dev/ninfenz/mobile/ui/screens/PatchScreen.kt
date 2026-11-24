@@ -1,5 +1,7 @@
 package dev.ninfenz.mobile.ui.screens
 
+import dev.ninfenz.mobile.ui.design.NfType
+
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -64,21 +66,21 @@ fun PatchScreen(filesDir: File, projectId: String?, onBack: () -> Unit) {
             Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(NfSpacing.page),
             verticalArrangement = Arrangement.spacedBy(NfSpacing.s)
         ) {
-            Text(stringResource(R.string.patch_md_hint), style = MaterialTheme.typography.bodySmall)
+            Text(stringResource(R.string.patch_md_hint), style = NfType.meta)
             OutlinedTextField(
                 value = markdown,
                 onValueChange = { markdown = it },
                 modifier = Modifier.fillMaxWidth(),
                 minLines = 5,
-                textStyle = MaterialTheme.typography.bodySmall
+                textStyle = NfType.meta
             )
-            Text(stringResource(R.string.patch_json_hint), style = MaterialTheme.typography.bodySmall)
+            Text(stringResource(R.string.patch_json_hint), style = NfType.meta)
             OutlinedTextField(
                 value = json,
                 onValueChange = { json = it },
                 modifier = Modifier.fillMaxWidth(),
                 minLines = 5,
-                textStyle = MaterialTheme.typography.bodySmall
+                textStyle = NfType.meta
             )
             error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
             Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
@@ -153,32 +155,32 @@ fun PatchScreen(filesDir: File, projectId: String?, onBack: () -> Unit) {
                     })
                     Text(
                         op.kind + " · " + (op.blockId ?: op.slot ?: "") + " · " + (op.text ?: ""),
-                        style = MaterialTheme.typography.bodySmall,
+                        style = NfType.meta,
                         modifier = Modifier.weight(1f)
                     )
                 }
             }
             result?.let { r ->
-                Text(stringResource(R.string.patch_result, r.applied, r.rejected.size), style = MaterialTheme.typography.titleSmall)
-                Text(stringResource(R.string.patch_changes, r.changes.size), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
-                validation?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.secondary) }
+                Text(stringResource(R.string.patch_result, r.applied, r.rejected.size), style = NfType.itemTitle)
+                Text(stringResource(R.string.patch_changes, r.changes.size), style = NfType.meta, color = MaterialTheme.colorScheme.primary)
+                validation?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.secondary) }
                 validationIssues.forEach { issue ->
-                    Text(issue.code + " " + (issue.path ?: "-") + "：" + issue.message, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+                    Text(issue.code + " " + (issue.path ?: "-") + "：" + issue.message, style = NfType.meta, color = MaterialTheme.colorScheme.error)
                 }
                 r.changes.forEach { c ->
                     Text(
                         c.op + " · " + (c.before?.take(60) ?: "∅") + " → " + (c.after?.take(60) ?: "∅"),
-                        style = MaterialTheme.typography.bodySmall
+                        style = NfType.meta
                     )
                 }
-                r.rejected.forEach { Text("· " + it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall) }
+                r.rejected.forEach { Text("· " + it, color = MaterialTheme.colorScheme.error, style = NfType.meta) }
                 OutlinedTextField(
                     value = r.markdown,
                     onValueChange = {},
                     readOnly = true,
                     modifier = Modifier.fillMaxWidth(),
                     minLines = 5,
-                    textStyle = MaterialTheme.typography.bodySmall
+                    textStyle = NfType.meta
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                     if (history.isNotEmpty()) {

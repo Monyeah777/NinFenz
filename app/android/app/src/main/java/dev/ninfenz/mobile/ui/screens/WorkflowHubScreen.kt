@@ -1,5 +1,7 @@
 package dev.ninfenz.mobile.ui.screens
 
+import dev.ninfenz.mobile.ui.design.NfType
+
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -98,7 +100,7 @@ fun WorkflowHubScreen(
                     Text(
                         pluralStringResource(dev.ninfenz.mobile.R.plurals.flow_header_projects, projects.size, projects.size) + " · " +
                             pluralStringResource(dev.ninfenz.mobile.R.plurals.flow_header_active, projects.count { it.project.status != dev.ninfenz.mobile.model.ProjectStatus.EXPORTED && it.project.status != dev.ninfenz.mobile.model.ProjectStatus.REVIEWED }, projects.count { it.project.status != dev.ninfenz.mobile.model.ProjectStatus.EXPORTED && it.project.status != dev.ninfenz.mobile.model.ProjectStatus.REVIEWED }),
-                        style = MaterialTheme.typography.bodySmall,
+                        style = NfType.meta,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
@@ -183,11 +185,11 @@ fun WorkflowHubScreen(
                                             Column(modifier = Modifier.weight(1f)) {
                                                 Text(
                                                     entry.project.title,
-                                                    style = MaterialTheme.typography.titleMedium,
+                                                    style = NfType.itemTitle,
                                                     maxLines = 2,
                                                     overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                                                 )
-                                                Text(entry.project.id, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                                Text(entry.project.id, style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                             }
                                             NfStatusChip(projectStatusLabel(entry.project))
                                         }
@@ -204,7 +206,7 @@ fun WorkflowHubScreen(
                                                     )
                                                 )
                                             }
-                                            Text("›", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                            Text("›", style = NfType.screenTitle, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                         }
                                     }
                                 }

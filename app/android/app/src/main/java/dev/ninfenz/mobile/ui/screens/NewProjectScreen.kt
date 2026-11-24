@@ -1,5 +1,7 @@
 package dev.ninfenz.mobile.ui.screens
 
+import dev.ninfenz.mobile.ui.design.NfType
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -70,10 +72,10 @@ fun NewProjectScreen(
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                             RadioButton(selected = selected?.id == pack.id && selected?.version == pack.version, onClick = { selectedKey = pack.id + "@" + pack.version })
                             Column(modifier = Modifier.weight(1f)) {
-                                Text(pack.title, style = MaterialTheme.typography.titleMedium)
+                                Text(pack.title, style = NfType.itemTitle)
                                 Text(
                                     pack.id + " · " + pack.version + " · " + stringResource(dev.ninfenz.mobile.R.string.pack_item_count, pack.itemCount),
-                                    style = MaterialTheme.typography.bodySmall,
+                                    style = NfType.meta,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
@@ -96,7 +98,7 @@ fun NewProjectScreen(
                             Text(
                                 error,
                                 modifier = Modifier.padding(NfSpacing.m),
-                                style = MaterialTheme.typography.bodySmall,
+                                style = NfType.meta,
                                 color = MaterialTheme.colorScheme.onErrorContainer
                             )
                         }

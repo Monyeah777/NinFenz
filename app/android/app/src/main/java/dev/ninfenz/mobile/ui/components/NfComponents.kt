@@ -117,7 +117,7 @@ fun NfStepStrip(steps: List<String>, current: Int, modifier: Modifier = Modifier
         }
         Text(
             stringResource(dev.ninfenz.mobile.R.string.step_progress, current + 1, steps.size),
-            style = MaterialTheme.typography.labelSmall,
+            style = NfType.meta,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(start = NfSpacing.s)
         )
@@ -155,9 +155,9 @@ fun NfCollapsibleSection(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(title, style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() })
+                Text(title, style = NfType.itemTitle, modifier = Modifier.semantics { heading() })
                 subtitle?.let {
-                    Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
             Icon(
@@ -192,7 +192,7 @@ fun NfExpandableText(
         ) {
             Text(
                 text = text,
-                style = MaterialTheme.typography.bodyMedium,
+                style = NfType.secondary,
                 maxLines = if (expanded) Int.MAX_VALUE else collapsedLines,
                 overflow = NfTextOverflow.Ellipsis
             )
@@ -227,10 +227,10 @@ fun NfEmptyState(
             tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(48.dp)
         )
-        Text(title, style = MaterialTheme.typography.titleLarge, textAlign = androidx.compose.ui.text.style.TextAlign.Center, modifier = Modifier.semantics { heading() })
+        Text(title, style = NfType.screenTitle, textAlign = androidx.compose.ui.text.style.TextAlign.Center, modifier = Modifier.semantics { heading() })
         Text(
             message,
-            style = MaterialTheme.typography.bodyMedium,
+            style = NfType.secondary,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center
         )
@@ -288,18 +288,18 @@ fun NfListRow(
             Icon(leading, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
         }
         Column(modifier = Modifier.weight(1f)) {
-            Text(title, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(title, style = NfType.itemTitle, maxLines = 1, overflow = TextOverflow.Ellipsis)
             if (subtitle != null) {
                 Text(
                     subtitle,
-                    style = MaterialTheme.typography.bodySmall,
+                    style = NfType.meta,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
             }
         }
-        if (trailing != null) Text(trailing, style = MaterialTheme.typography.bodyLarge)
+        if (trailing != null) Text(trailing, style = NfType.body)
     }
 }
 
@@ -317,7 +317,7 @@ fun NfHint(text: String) {
     Spacer(modifier = Modifier.height(NfSpacing.s))
     Text(
         text = text,
-        style = MaterialTheme.typography.bodySmall,
+        style = NfType.meta,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.padding(horizontal = NfSpacing.page)
     )
@@ -342,9 +342,9 @@ fun NfErrorCard(code: String, message: String, fix: String, modifier: Modifier =
             }
             Text("[" + code + "] " + (hint ?: message), style = NfType.itemTitle, color = MaterialTheme.colorScheme.onErrorContainer)
             if (hint != null) {
-                Text(message, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onErrorContainer)
+                Text(message, style = NfType.meta, color = MaterialTheme.colorScheme.onErrorContainer)
             }
-            Text(stringResource(dev.ninfenz.mobile.R.string.error_fix_prefix, fix), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onErrorContainer)
+            Text(stringResource(dev.ninfenz.mobile.R.string.error_fix_prefix, fix), style = NfType.meta, color = MaterialTheme.colorScheme.onErrorContainer)
         }
     }
 }
@@ -359,7 +359,7 @@ fun NfLoadingState(message: String? = null) {
     ) {
         CircularProgressIndicator()
         message?.let {
-            Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }

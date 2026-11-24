@@ -1,5 +1,7 @@
 package dev.ninfenz.mobile.ui.components
 
+import dev.ninfenz.mobile.ui.design.NfType
+
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -193,13 +195,13 @@ fun SwipeableProjectCard(
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(
                                         entry.project.title,
-                                        style = MaterialTheme.typography.titleMedium,
+                                        style = NfType.itemTitle,
                                         maxLines = 2,
                                         overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                                     )
                                     Text(
                                         entry.project.id,
-                                        style = MaterialTheme.typography.bodySmall,
+                                        style = NfType.meta,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
@@ -234,12 +236,12 @@ fun SwipeableProjectCard(
                                 Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
                                     Text(
                                         entry.project.refs.basePackId + " · " + entry.project.refs.basePackVersion,
-                                        style = MaterialTheme.typography.bodySmall,
+                                        style = NfType.meta,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                     Text(
                                         stringResource(dev.ninfenz.mobile.R.string.project_detail_history, entry.project.historyCount),
-                                        style = MaterialTheme.typography.bodySmall,
+                                        style = NfType.meta,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                     Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {

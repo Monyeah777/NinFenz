@@ -1,5 +1,7 @@
 package dev.ninfenz.mobile.ui.components
 
+import dev.ninfenz.mobile.ui.design.NfType
+
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -62,7 +64,7 @@ fun MarkdownPreview(
         if (limitBlocks != null && all.size > blocks.size) {
             Text(
                 pluralStringResource(dev.ninfenz.mobile.R.plurals.preview_more, all.size - blocks.size, all.size - blocks.size),
-                style = MaterialTheme.typography.bodySmall,
+                style = NfType.meta,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
@@ -89,10 +91,10 @@ private fun MarkdownBlock(block: PdfMarkdown.Block) {
         block.level > 0 -> Text(
             text = annotated(block),
             style = when (block.level) {
-                1 -> MaterialTheme.typography.headlineSmall
-                2 -> MaterialTheme.typography.titleLarge
-                3 -> MaterialTheme.typography.titleMedium
-                else -> MaterialTheme.typography.titleSmall
+                1 -> NfType.screenTitle
+                2 -> NfType.screenTitle
+                3 -> NfType.itemTitle
+                else -> NfType.itemTitle
             },
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.padding(top = if (block.level == 1) NfSpacing.s else 0.dp)
@@ -103,7 +105,7 @@ private fun MarkdownBlock(block: PdfMarkdown.Block) {
                 .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
                 .padding(NfSpacing.s)
         ) {
-            Text(block.text, fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.bodySmall)
+            Text(block.text, fontFamily = FontFamily.Monospace, style = NfType.meta)
         }
         block.quote -> Row(
             modifier = Modifier.fillMaxWidth(),
@@ -117,7 +119,7 @@ private fun MarkdownBlock(block: PdfMarkdown.Block) {
             )
             Text(
                 text = annotated(block),
-                style = MaterialTheme.typography.bodyMedium,
+                style = NfType.secondary,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
@@ -125,10 +127,10 @@ private fun MarkdownBlock(block: PdfMarkdown.Block) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)
         ) {
-            Text("•", style = MaterialTheme.typography.bodyLarge)
-            Text(annotated(block), style = MaterialTheme.typography.bodyLarge)
+            Text("•", style = NfType.body)
+            Text(annotated(block), style = NfType.body)
         }
-        else -> Text(annotated(block), style = MaterialTheme.typography.bodyLarge)
+        else -> Text(annotated(block), style = NfType.body)
     }
 }
 
@@ -156,7 +158,7 @@ private fun MarkdownTable(rows: List<PdfMarkdown.Block>) {
                     Text(
                         cell,
                         modifier = Modifier.weight(1f),
-                        style = MaterialTheme.typography.bodySmall,
+                        style = NfType.meta,
                         fontWeight = if (header) FontWeight.SemiBold else FontWeight.Normal
                     )
                 }

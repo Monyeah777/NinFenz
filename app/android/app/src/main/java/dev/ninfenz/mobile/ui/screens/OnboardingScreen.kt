@@ -1,5 +1,7 @@
 package dev.ninfenz.mobile.ui.screens
 
+import dev.ninfenz.mobile.ui.design.NfType
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -125,10 +127,10 @@ private fun Step(icon: @Composable () -> Unit, title: String, body: String) {
         verticalArrangement = Arrangement.spacedBy(NfSpacing.m)
     ) {
         icon()
-        Text(title, style = MaterialTheme.typography.headlineSmall, textAlign = TextAlign.Center)
+        Text(title, style = NfType.screenTitle, textAlign = TextAlign.Center)
         Text(
             body,
-            style = MaterialTheme.typography.bodyLarge,
+            style = NfType.body,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
         )
@@ -138,20 +140,20 @@ private fun Step(icon: @Composable () -> Unit, title: String, body: String) {
 @Composable
 private fun SeedStatus(seedState: SeedResult?, seeding: Boolean, onSeed: () -> Unit) {
     when {
-        seeding -> Text(stringResource(dev.ninfenz.mobile.R.string.onboarding_seed_loading), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        seeding -> Text(stringResource(dev.ninfenz.mobile.R.string.onboarding_seed_loading), style = NfType.secondary, color = MaterialTheme.colorScheme.onSurfaceVariant)
         seedState is SeedResult.Installed -> Text(
             pluralStringResource(dev.ninfenz.mobile.R.plurals.onboarding_seed_ready, seedState.files, seedState.id, seedState.version, seedState.files),
-            style = MaterialTheme.typography.bodyMedium,
+            style = NfType.secondary,
             color = MaterialTheme.colorScheme.primary
         )
         seedState is SeedResult.AlreadyPresent -> Text(
             stringResource(dev.ninfenz.mobile.R.string.onboarding_seed_exists, seedState.id, seedState.version),
-            style = MaterialTheme.typography.bodyMedium,
+            style = NfType.secondary,
             color = MaterialTheme.colorScheme.primary
         )
         seedState is SeedResult.Failed -> Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(seedState.message, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error, textAlign = TextAlign.Center)
-            Text(seedState.fix, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
+            Text(seedState.message, style = NfType.meta, color = MaterialTheme.colorScheme.error, textAlign = TextAlign.Center)
+            Text(seedState.fix, style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
             TextButton(onClick = onSeed, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(dev.ninfenz.mobile.R.string.onboarding_retry)) }
         }
         else -> Button(onClick = onSeed, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(dev.ninfenz.mobile.R.string.onboarding_load_sample)) }

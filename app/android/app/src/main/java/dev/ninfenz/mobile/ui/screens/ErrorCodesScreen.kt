@@ -1,5 +1,7 @@
 package dev.ninfenz.mobile.ui.screens
 
+import dev.ninfenz.mobile.ui.design.NfType
+
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -51,14 +53,14 @@ fun ErrorCodesScreen(onBack: () -> Unit) {
         if (all.isEmpty()) {
             Text(
                 stringResource(dev.ninfenz.mobile.R.string.error_codes_not_loaded),
-                style = MaterialTheme.typography.bodyMedium,
+                style = NfType.secondary,
                 color = MaterialTheme.colorScheme.error,
                 modifier = Modifier.padding(NfSpacing.page)
             )
         } else if (filtered.isEmpty()) {
             Text(
                 stringResource(dev.ninfenz.mobile.R.string.error_codes_no_result),
-                style = MaterialTheme.typography.bodyMedium,
+                style = NfType.secondary,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(NfSpacing.page)
             )
@@ -85,8 +87,8 @@ private fun ErrorCodeRow(entry: ErrorCodeEntry, onClick: () -> Unit) {
             .padding(horizontal = NfSpacing.page, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
-        Text(entry.code + " · " + entry.severity + " · exit=" + entry.exit, style = MaterialTheme.typography.titleMedium)
-        Text(entry.message, style = MaterialTheme.typography.bodyMedium)
-        Text(entry.fix, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(entry.code + " · " + entry.severity + " · exit=" + entry.exit, style = NfType.itemTitle)
+        Text(entry.message, style = NfType.secondary)
+        Text(entry.fix, style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }

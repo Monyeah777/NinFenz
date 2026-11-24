@@ -1,5 +1,7 @@
 package dev.ninfenz.mobile.ui.screens
 
+import dev.ninfenz.mobile.ui.design.NfType
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -146,26 +148,26 @@ fun PackCenterScreen(
                         Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Column(modifier = Modifier.weight(1f)) {
-                                    Text(pack.title, style = MaterialTheme.typography.titleMedium)
+                                    Text(pack.title, style = NfType.itemTitle)
                                     Text(
                                         pack.id + " · " + pack.version + " · " + context.getString(dev.ninfenz.mobile.R.string.pack_item_count, pack.itemCount),
-                                        style = MaterialTheme.typography.bodySmall,
+                                        style = NfType.meta,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
                                 NfStatusChip(stringResource(dev.ninfenz.mobile.R.string.packcenter_installed))
                             }
-                            Text(stringResource(dev.ninfenz.mobile.R.string.packcenter_tree, pack.tree.take(16)), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(stringResource(dev.ninfenz.mobile.R.string.packcenter_tree, pack.tree.take(16)), style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             Text(
                                 stringResource(dev.ninfenz.mobile.R.string.packcenter_installed_at, formatInstalledAt(pack.installedAt)),
-                                style = MaterialTheme.typography.bodySmall,
+                                style = NfType.meta,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             val pinned = trust[pack.id + "@" + pack.version]?.tree
                             if (pinned != null && pinned != pack.tree) {
                                 Text(
                                     stringResource(dev.ninfenz.mobile.R.string.packcenter_trust_mismatch),
-                                    style = MaterialTheme.typography.bodySmall,
+                                    style = NfType.meta,
                                     color = MaterialTheme.colorScheme.error
                                 )
                             }
@@ -202,9 +204,9 @@ fun PackCenterScreen(
                                     }
                                 ) { Text(stringResource(dev.ninfenz.mobile.R.string.packcenter_uninstall)) }
                             }
-                            results[pack.id]?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary) }
+                            results[pack.id]?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary) }
                             uninstallErrors[pack.id]?.let { message ->
-                                Text(message, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+                                Text(message, style = NfType.meta, color = MaterialTheme.colorScheme.error)
                             }
                             errors[pack.id]?.let { message ->
                                 NfErrorCard("NF-VAL-001", message, context.getString(dev.ninfenz.mobile.R.string.view_diag_or_reinstall))

@@ -1191,7 +1191,7 @@ fun ImportScreen(
                                 if (savedSamples.isNotEmpty()) {
                                     Text(
                                         pluralStringResource(dev.ninfenz.mobile.R.plurals.import_samples_saved, savedSamples.size, savedSamples.size),
-                                        style = MaterialTheme.typography.labelSmall,
+                                        style = NfType.meta,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                     savedSamples.take(if (showAllSamples) Int.MAX_VALUE else 3).forEach { file ->
@@ -1232,7 +1232,7 @@ fun ImportScreen(
                                 if (savedTemplates.isNotEmpty()) {
                                     Text(
                                         pluralStringResource(dev.ninfenz.mobile.R.plurals.import_templates_saved, savedTemplates.size, savedTemplates.size),
-                                        style = MaterialTheme.typography.labelSmall,
+                                        style = NfType.meta,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                     savedTemplates.take(if (showAllTemplates) Int.MAX_VALUE else 3).forEach { file ->
@@ -1283,7 +1283,7 @@ fun ImportScreen(
                                     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                                         Text(
                                             slice.heading ?: stringResource(dev.ninfenz.mobile.R.string.import_slice_preamble),
-                                            style = MaterialTheme.typography.titleMedium
+                                            style = NfType.itemTitle
                                         )
                                         Text(
                                             pluralStringResource(dev.ninfenz.mobile.R.plurals.import_slice_meta, slice.blocks.size, slice.blocks.size, slice.charCount),
@@ -1301,7 +1301,7 @@ fun ImportScreen(
                 }
                 item { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.import_mapping, current.mappings.size)) }
                 if (current.mappings.isEmpty()) {
-                    item { Text(stringResource(dev.ninfenz.mobile.R.string.import_no_mapping), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
+                    item { Text(stringResource(dev.ninfenz.mobile.R.string.import_no_mapping), style = NfType.secondary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
                 } else {
                     item {
                         Row(modifier = Modifier.fillMaxWidth().padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
@@ -1320,7 +1320,7 @@ fun ImportScreen(
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
                                     mapping.fromKind + "[" + mapping.fromIndex + "] → " + mapping.toKind + " " + mapping.toId,
-                                    style = MaterialTheme.typography.bodyMedium
+                                    style = NfType.secondary
                                 )
                                 Text(
                                     "confidence " + mapping.confidence + " · " + mapping.rationale,
@@ -1404,7 +1404,7 @@ fun ImportScreen(
                     } else {
                         NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
                             Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                                Text(stringResource(dev.ninfenz.mobile.R.string.import_saved, savedName ?: ""), style = MaterialTheme.typography.titleMedium)
+                                Text(stringResource(dev.ninfenz.mobile.R.string.import_saved, savedName ?: ""), style = NfType.itemTitle)
                                 Text(stringResource(dev.ninfenz.mobile.R.string.import_saved_note), style = NfType.meta)
                                 Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                                     Button(onClick = onBack) { Text(stringResource(dev.ninfenz.mobile.R.string.import_done)) }
@@ -1559,7 +1559,7 @@ fun ImportScreen(
                     ) {
                         Text(
                             stringResource(dev.ninfenz.mobile.R.string.import_cleared_countdown, clearSeconds),
-                            style = MaterialTheme.typography.bodyMedium,
+                            style = NfType.secondary,
                             modifier = Modifier.weight(1f)
                         )
                         TextButton(onClick = {
@@ -1725,7 +1725,7 @@ fun ImportScreen(
             Surface(shape = MaterialTheme.shapes.large, tonalElevation = 6.dp) {
                 Column(modifier = Modifier.fillMaxWidth().padding(NfSpacing.l), verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(stringResource(dev.ninfenz.mobile.R.string.import_preview_ready), style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
+                        Text(stringResource(dev.ninfenz.mobile.R.string.import_preview_ready), style = NfType.screenTitle, modifier = Modifier.weight(1f))
                         TextButton(onClick = { clipboard.setText(AnnotatedString(CsvTable.toMarkdown(text))) }) {
                             Text(stringResource(dev.ninfenz.mobile.R.string.import_csv_copy))
                         }
@@ -1753,12 +1753,12 @@ fun ImportScreen(
                     modifier = Modifier.fillMaxWidth().padding(NfSpacing.l),
                     verticalArrangement = Arrangement.spacedBy(NfSpacing.s)
                 ) {
-                    Text(spec?.title ?: file.name, style = MaterialTheme.typography.titleLarge)
+                    Text(spec?.title ?: file.name, style = NfType.screenTitle)
                     if (spec != null) {
                         Text("v" + spec.version + " · " + spec.sections.size + " sections · " + spec.slots.size + " slots", style = NfType.meta)
                         Column(modifier = Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState())) {
                             spec.sections.forEach { section ->
-                                Text(section.title, style = MaterialTheme.typography.titleSmall)
+                                Text(section.title, style = NfType.itemTitle)
                                 section.slots.forEach { id ->
                                     val slot = spec.slots.firstOrNull { it.id == id }
                                     val meta = slot?.let {
