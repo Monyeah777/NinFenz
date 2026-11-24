@@ -505,3 +505,4 @@
 - 深色全屏抽查：Library/Workbench/Me/Settings/Import 背景、卡片、主次文字、选中态均正常；禁用态对比度偏低但可辨识，未发现白底或错误反色。
 - PackUpdate 真实更新：1.0.0→1.1.0 差异 modified docs/sample.md；修复前“应用更新”只写 library/applied，已安装仍 1.0.0。修复后落盘 1.1.0，Pack Center 显示 1.0.0/1.1.0 两条（tree 分别为 4cb…/a472…）。
 - Pack 回滚：未完成；当前回滚入口仍是整应用备份恢复，不是版本级回滚。
+- PackUpdate 安装修复后：1.1.0 真实落盘；Pack Center 显示 1.0.0/1.1.0 两版，计数 2。整应用备份回滚仍存在；新增“版本回滚删除 1.1.0”代码，但 UI 流程未取得最终截图。

@@ -76,6 +76,7 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit) {
     var newRoot by remember { mutableStateOf<File?>(null) }
     var diffBusy by remember { mutableStateOf(false) }
     var preUpdateBackup by remember { mutableStateOf<File?>(null) }
+    var installedUpdateTarget by remember { mutableStateOf<File?>(null) }
     var showRollbackBackup by remember { mutableStateOf(false) }
     var backupRollbackMessage by remember { mutableStateOf<String?>(null) }
 
@@ -283,17 +284,19 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit) {
                                                 if (target.exists()) target.deleteRecursively()
                                                 outDir.copyRecursively(target, overwrite = true)
                                                 dev.ninfenz.mobile.data.PackStore(context.filesDir).invalidate()
-                                                target.isDirectory
-                                            }.getOrDefault(false)
+                                                target
+                                            }.getOrNull()
                                         }
                                         resultText = response.result?.toString()
-                                        if (!installed) {
+                                        if (installed == null || !installed.isDirectory) {
                                             error = CoreResponse.failure(
                                                 "NF-PCK-005",
                                                 context.getString(dev.ninfenz.mobile.R.string.packupdate_install_fail),
                                                 context.getString(dev.ninfenz.mobile.R.string.packupdate_install_fix),
                                                 3
                                             ).error
+                                        } else {
+                                            installedUpdateTarget = installed
                                         }
                                     } else {
                                         error = response.error
@@ -306,8 +309,36 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit) {
                     ) { Text(if (busy) stringResource(dev.ninfenz.mobile.R.string.packupdate_applying) else stringResource(dev.ninfenz.mobile.R.string.packupdate_apply)) }
 
                     OutlinedButton(
-                        enabled = !busy && preUpdateBackup != null,
-                        onClick = { showRollbackBackup = true }
+                        enabled = !busy && (installedUpdateTarget != null || preUpdateBackup != null),
+                        onClick = {
+                            val target = installedUpdateTarget
+                            if (target != null) {
+                                scope.launch {
+                                    busy = true
+                                    error = null
+                                    val removed = withContext(Dispatchers.IO) {
+                                        runCatching {
+                                            target.deleteRecursively()
+                                            dev.ninfenz.mobile.data.PackStore(context.filesDir).invalidate()
+                                        }.isSuccess
+                                    }
+                                    if (removed) {
+                                        installedUpdateTarget = null
+                                        resultText = context.getString(dev.ninfenz.mobile.R.string.packupdate_rollback_done, target.name)
+                                    } else {
+                                        error = CoreResponse.failure(
+                                            "NF-PCK-005",
+                                            context.getString(dev.ninfenz.mobile.R.string.packupdate_rollback_fail),
+                                            context.getString(dev.ninfenz.mobile.R.string.packupdate_install_fix),
+                                            3
+                                        ).error
+                                    }
+                                    busy = false
+                                }
+                            } else {
+                                showRollbackBackup = true
+                            }
+                        }
                     ) { Text(if (busy) stringResource(dev.ninfenz.mobile.R.string.packupdate_rolling) else stringResource(dev.ninfenz.mobile.R.string.packupdate_rollback)) }
                     if (preUpdateBackup == null) {
                         Text(
