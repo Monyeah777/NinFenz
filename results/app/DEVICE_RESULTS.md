@@ -495,3 +495,4 @@
 - Delivery 打开导出：系统打开 chooser 出现 DeepSeek/Edge/QQ/邮件/浏览器等；选 Edge 后通过 content://dev.ninfenz.mobile.fileprovider 成功渲染 result.html 正文。
 - DesignSystem 100%：主题/缩放原全为描边，选中态不可见；改为选中填充、其余描边。
 - DesignSystem 200%：200% 按钮原先竖排成“20/0/%”；两组控件改 FlowRow 后自动换行，选项单行显示。
+- TalkBack 复查：启用后系统 7 页引导再次出现，返回未能稳定关闭；仅保留“内容库”焦点框证据，未完成全屏逐项播报。
