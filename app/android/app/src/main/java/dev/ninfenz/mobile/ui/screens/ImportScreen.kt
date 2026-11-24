@@ -12,6 +12,8 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -115,6 +117,7 @@ import kotlinx.serialization.json.put
  * W3 导入向导：来源（文件/剪贴板/示例/分享）→ 预览（sniff/structure）→ 映射建议（core map-suggest）
  * → 保存草稿 + 映射决策 sidecar。核心失败只显示错误码/fix，不伪造预览。
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ImportScreen(
     prefill: SharePayload?,
@@ -913,23 +916,22 @@ fun ImportScreen(
                 NfCard {
                     Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                         Text(stringResource(dev.ninfenz.mobile.R.string.import_source), style = NfType.sectionTitle)
-                        Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+                        FlowRow(
+                            horizontalArrangement = Arrangement.spacedBy(NfSpacing.s),
+                            verticalArrangement = Arrangement.spacedBy(NfSpacing.s)
+                        ) {
                             Button(onClick = { filePicker.launch(arrayOf("text/markdown", "text/plain", "text/csv", "application/json", "application/zip", "application/octet-stream")) }, enabled = !busy) { Text(stringResource(dev.ninfenz.mobile.R.string.import_pick_file)) }
                             OutlinedButton(onClick = { importClipboard() }, enabled = !busy) { Text(stringResource(dev.ninfenz.mobile.R.string.import_clipboard)) }
-                        }
-                        Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                             OutlinedButton(onClick = { csvPicker.launch(arrayOf("text/csv", "text/comma-separated-values", "text/plain")) }, enabled = !busy) { Text(stringResource(dev.ninfenz.mobile.R.string.import_csv_file)) }
                             OutlinedButton(onClick = { importCsv() }, enabled = !busy) { Text(stringResource(dev.ninfenz.mobile.R.string.import_csv_clipboard)) }
-                        }
-                        Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                             OutlinedButton(onClick = { importSample() }, enabled = !busy) { Text(stringResource(dev.ninfenz.mobile.R.string.import_sample)) }
                             if (doc != null) {
                                 OutlinedButton(onClick = { runZeroSlice() }, enabled = !busy) { Text(stringResource(dev.ninfenz.mobile.R.string.import_zero_slice)) }
                             }
                             OutlinedButton(onClick = { preservePicker.launch(arrayOf("application/zip", "application/octet-stream")) }, enabled = !busy) { Text(stringResource(dev.ninfenz.mobile.R.string.import_verify_preserve)) }
-                            if (prefillNote != null) {
-                                Text(stringResource(dev.ninfenz.mobile.R.string.import_share_received), style = NfType.meta, color = MaterialTheme.colorScheme.primary)
-                            }
+                        }
+                        if (prefillNote != null) {
+                            Text(stringResource(dev.ninfenz.mobile.R.string.import_share_received), style = NfType.meta, color = MaterialTheme.colorScheme.primary)
                         }
                         latestPreserve?.let { archive ->
                             OutlinedButton(onClick = { handlePreserve(archive) }, enabled = !busy) {
