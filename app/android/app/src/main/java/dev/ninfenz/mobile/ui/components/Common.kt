@@ -33,7 +33,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.paneTitle
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
@@ -105,7 +107,7 @@ fun CardBox(title: String?, modifier: Modifier = Modifier, content: @Composable 
 fun ErrorNotice(error: dev.ninfenz.mobile.core.CoreError, modifier: Modifier = Modifier) {
     val entry = dev.ninfenz.mobile.core.ErrorCatalog.find(error.code)
     Surface(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth().semantics { liveRegion = LiveRegionMode.Assertive },
         shape = MaterialTheme.shapes.medium,
         color = MaterialTheme.colorScheme.errorContainer
     ) {
@@ -139,7 +141,7 @@ fun Notice(text: String, tone: Tone = Tone.INFO) {
         Tone.WARN -> MaterialTheme.colorScheme.tertiaryContainer to MaterialTheme.colorScheme.onTertiaryContainer
         Tone.ERROR -> MaterialTheme.colorScheme.errorContainer to MaterialTheme.colorScheme.onErrorContainer
     }
-    Surface(shape = MaterialTheme.shapes.medium, color = colors.first, contentColor = colors.second, modifier = Modifier.fillMaxWidth()) {
+    Surface(shape = MaterialTheme.shapes.medium, color = colors.first, contentColor = colors.second, modifier = Modifier.fillMaxWidth().semantics { liveRegion = LiveRegionMode.Polite }) {
         Text(text = text, style = NfType.meta, modifier = Modifier.padding(NfSpacing.m))
     }
 }
