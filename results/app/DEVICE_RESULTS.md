@@ -493,3 +493,5 @@
 - ErrorCodes 100%：搜索框 + 65 条错误码列表，code/级别/说明/修复分行可读，长文本自动换行。
 - Delivery 导出分享：系统分享面板打开，显示 result.html 803 B 与一加互传/DSH Go/微信/DeepSeek/QQ/邮件/浏览器目标；未实际发送。“打开”目标未验证。
 - Delivery 打开导出：系统打开 chooser 出现 DeepSeek/Edge/QQ/邮件/浏览器等；选 Edge 后通过 content://dev.ninfenz.mobile.fileprovider 成功渲染 result.html 正文。
+- DesignSystem 100%：主题/缩放原全为描边，选中态不可见；改为选中填充、其余描边。
+- DesignSystem 200%：200% 按钮原先竖排成“20/0/%”；两组控件改 FlowRow 后自动换行，选项单行显示。

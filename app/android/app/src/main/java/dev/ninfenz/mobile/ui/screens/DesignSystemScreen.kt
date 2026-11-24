@@ -1,9 +1,13 @@
 package dev.ninfenz.mobile.ui.screens
 
+import androidx.compose.material3.Button
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -68,6 +72,7 @@ import dev.ninfenz.mobile.ui.theme.NfDesignTheme
  * 设计系统演示屏（debug 入口）：令牌、字阶、间距、色卡（实算对比度）、组件、缩放矩阵。
  * 深浅与缩放都在这屏内模拟，不改系统设置。
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun DesignSystemScreen(
     onBack: () -> Unit,
@@ -84,14 +89,25 @@ fun DesignSystemScreen(
             LocalDensity provides Density(density = base.density, fontScale = base.fontScale * fontScale)
         ) {
             NfScaffold(title = "设计系统", onBack = onBack) {
-                Row(horizontalArrangement = Arrangement.spacedBy(Space.gap.dp)) {
-                    OutlinedButton(onClick = { dark = false }) { Text("浅色") }
-                    OutlinedButton(onClick = { dark = true }) { Text("深色") }
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(Space.gap.dp),
+                    verticalArrangement = Arrangement.spacedBy(Space.gap.dp)
+                ) {
+                    if (!dark) Button(onClick = { dark = false }) { Text("浅色") }
+                    else OutlinedButton(onClick = { dark = false }) { Text("浅色") }
+                    if (dark) Button(onClick = { dark = true }) { Text("深色") }
+                    else OutlinedButton(onClick = { dark = true }) { Text("深色") }
                 }
-                Row(horizontalArrangement = Arrangement.spacedBy(Space.gap.dp)) {
-                    OutlinedButton(onClick = { fontScale = 1f }) { Text("100%") }
-                    OutlinedButton(onClick = { fontScale = 1.3f }) { Text("130%") }
-                    OutlinedButton(onClick = { fontScale = 2f }) { Text("200%") }
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(Space.gap.dp),
+                    verticalArrangement = Arrangement.spacedBy(Space.gap.dp)
+                ) {
+                    if (fontScale == 1f) Button(onClick = { fontScale = 1f }) { Text("100%") }
+                    else OutlinedButton(onClick = { fontScale = 1f }) { Text("100%") }
+                    if (fontScale == 1.3f) Button(onClick = { fontScale = 1.3f }) { Text("130%") }
+                    else OutlinedButton(onClick = { fontScale = 1.3f }) { Text("130%") }
+                    if (fontScale == 2f) Button(onClick = { fontScale = 2f }) { Text("200%") }
+                    else OutlinedButton(onClick = { fontScale = 2f }) { Text("200%") }
                 }
                 NfMeta("当前：${if (dark) "深色" else "浅色"} · 缩放 ${(fontScale * 100).toInt()}%")
 
