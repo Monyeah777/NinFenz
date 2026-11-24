@@ -1,5 +1,13 @@
 package dev.ninfenz.mobile.ui.screens
 
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+
 import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -462,22 +470,36 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
         artifacts?.let { runCatching { SpecModel.parse(it.specJson) }.getOrNull() }
     }
     val constraintConflicts = remember(specMeta) { dev.ninfenz.mobile.model.SpecConstraintAudit.conflicts(specMeta?.slots.orEmpty()) }
+    var deliveryMenu by remember { mutableStateOf(false) }
     Column(modifier = Modifier.fillMaxSize().imePadding()) {
         NfTopAppBar(
             title = stringResource(dev.ninfenz.mobile.R.string.delivery_title, project.title),
             onBack = onBack,
             actions = {
-                if (plan != null) {
-                    TextButton(onClick = {
-                        scope.launch { assembleRequester.bringIntoView() }
-                    }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_assemble)) }
+                IconButton(onClick = { deliveryMenu = true }, modifier = Modifier.size(48.dp)) {
+                    Icon(Icons.Filled.MoreVert, contentDescription = stringResource(dev.ninfenz.mobile.R.string.common_more))
                 }
-                if (plan != null || inputs.isNotEmpty() || markdown != null || report != null) {
-                    TextButton(onClick = { showResetConfirm = true }) {
-                        Text(stringResource(dev.ninfenz.mobile.R.string.delivery_reset))
+                DropdownMenu(expanded = deliveryMenu, onDismissRequest = { deliveryMenu = false }) {
+                    if (plan != null) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_assemble)) },
+                            onClick = {
+                                deliveryMenu = false
+                                scope.launch { assembleRequester.bringIntoView() }
+                            }
+                        )
                     }
+                    if (plan != null || inputs.isNotEmpty() || markdown != null || report != null) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_reset)) },
+                            onClick = { deliveryMenu = false; showResetConfirm = true }
+                        )
+                    }
+                    DropdownMenuItem(
+                        text = { Text(stringResource(dev.ninfenz.mobile.R.string.patch_title)) },
+                        onClick = { deliveryMenu = false; onPatch() }
+                    )
                 }
-                TextButton(onClick = onPatch) { Text(stringResource(dev.ninfenz.mobile.R.string.patch_title)) }
             }
         )
         NfStepStrip(
@@ -674,11 +696,12 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                             Text(
                                 stringResource(dev.ninfenz.mobile.R.string.delivery_required_progress, requiredFilled, requiredSlots.size),
                                 style = NfType.meta,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(horizontal = NfSpacing.page)
                             )
                             androidx.compose.material3.LinearProgressIndicator(
                                 progress = { requiredFilled.toFloat() / requiredSlots.size.toFloat() },
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = NfSpacing.page)
                             )
                             val fillable = parsedTemplateSlots.count { (id, value) ->
                                 id in plan!!.slots && inputs[id].isNullOrBlank() &&
@@ -722,12 +745,8 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                     )
                                     lastSection = sectionId
                                 }
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Column(modifier = Modifier.weight(1f)) {
+                                Column(modifier = Modifier.fillMaxWidth()) {
+                                    Column(modifier = Modifier.fillMaxWidth()) {
                                         Text(slot, style = NfType.label)
                                         slotMeta?.let {
                                             Text(it.name, style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -766,7 +785,10 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                             }
                                         }
                                     }
-                                    Row {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth().padding(top = NfSpacing.xs),
+                                        horizontalArrangement = Arrangement.End
+                                    ) {
                                         slotMeta?.examples?.firstOrNull()?.let { example ->
                                             TextButton(onClick = { inputs = inputs + (slot to example) }) {
                                                 Text(stringResource(dev.ninfenz.mobile.R.string.delivery_slot_example))
