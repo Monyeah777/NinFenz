@@ -518,3 +518,5 @@
 - DOCX 实际渲染：result.docx（3057 B，文件头 PK）在“文档”App 打开，开篇/正文/收束与标题层级正确。
 - TalkBack 控件激活：在新建项目页，焦点依次到返回键、项目标题输入；点击“创建项目”真实创建 project-2（未命名项目）并进入详情页，焦点落回返回键。
 - EPUB 仍无可用渲染器；NF 导入适配器缺失。
+- EPUB 实际渲染：F-Droid 安装 Librera Reader（com.foobnix.pro.pdf.reader），打开 result.epub 成功；显示开篇/正文/收束，排版与章节正常。
+- 已安装工具：Librera Reader from F-Droid；Accessibility Scanner 尚未安装。
