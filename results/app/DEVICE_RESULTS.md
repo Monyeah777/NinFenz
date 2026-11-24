@@ -516,3 +516,5 @@
 - EPUB 导入 NF：报 [NF-IMP-004] 格式 epub 的适配器本版本未实现；首版适配器仅 text/markdown/json/yaml/zip/nfptl/nfpack。
 - PDF 导入 NF 同样报 [NF-IMP-004]；PDF 仅能外部 Edge 渲染。
 - DOCX 实际渲染：result.docx（3057 B，文件头 PK）在“文档”App 打开，开篇/正文/收束与标题层级正确。
+- TalkBack 控件激活：在新建项目页，焦点依次到返回键、项目标题输入；点击“创建项目”真实创建 project-2（未命名项目）并进入详情页，焦点落回返回键。
+- EPUB 仍无可用渲染器；NF 导入适配器缺失。
