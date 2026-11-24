@@ -498,3 +498,7 @@
 - TalkBack 复查：启用后系统 7 页引导再次出现，返回未能稳定关闭；仅保留“内容库”焦点框证据，未完成全屏逐项播报。
 - TalkBack 焦点遍历：完成 7 页引导后，焦点从“内容库”标题可移动到粘贴输入框；输入框获得焦点并唤起键盘。未完成逐项顺序与控制激活。
 - PDF 打开：系统 chooser 出现 NF/Edge/DeepSeek/QQ/邮件/阅读/浏览器/学习通；选“阅读”进入保存书籍文件夹对话框，未完成 PDF 渲染验证。
+- 横屏：Import/Author/Delivery 均走通；左侧 rail、内容 720dp、步骤条四项完整、无横向溢出。
+- 微信实际发送：result.html（803 B）发送给置顶 Mon.，聊天显示 17:06 [文件] result.html。
+- QQ 实际发送：result.html 发送给 Mon.，聊天显示 17:07 803B / 已发送。
+- PDF 实际渲染：系统 chooser 可达 NF/阅读/Edge 等；NF 导入报 [NF-IMP-004] 当前版本无 pdf 适配器；Edge 渲染未取得证据。
