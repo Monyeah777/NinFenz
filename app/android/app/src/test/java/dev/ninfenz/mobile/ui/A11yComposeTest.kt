@@ -1,6 +1,7 @@
 package dev.ninfenz.mobile.ui
 
 import androidx.compose.ui.test.assertHeightIsAtLeast
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
@@ -10,6 +11,8 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.ui.components.NfOverflowButton
+import dev.ninfenz.mobile.ui.components.Notice
+import dev.ninfenz.mobile.ui.components.Tone
 import dev.ninfenz.mobile.ui.components.NfScaffold
 import dev.ninfenz.mobile.ui.components.NfTopAppBar
 import dev.ninfenz.mobile.ui.screens.LibraryHomeScreen
@@ -49,6 +52,24 @@ class A11yComposeTest {
     fun scaffoldTitleIsHeading() {
         compose.setContent { NfTheme { NfScaffold(title = "标题", onBack = {}) { } } }
         compose.onNodeWithText("标题").assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.Heading))
+    }
+
+    @Test
+    fun scaffoldAnnouncesPaneTitle() {
+        compose.setContent { NfTheme { NfScaffold(title = "标题", onBack = {}) { } } }
+        compose.onNode(
+            SemanticsMatcher.expectValue(SemanticsProperties.PaneTitle, "标题"),
+            useUnmergedTree = true
+        ).assertExists()
+    }
+
+    @Test
+    fun noticeIsPoliteLiveRegion() {
+        compose.setContent { NfTheme { Notice("已保存", Tone.INFO) } }
+        compose.onNode(
+            SemanticsMatcher.expectValue(SemanticsProperties.LiveRegion, LiveRegionMode.Polite),
+            useUnmergedTree = true
+        ).assertExists()
     }
 
     @Test
