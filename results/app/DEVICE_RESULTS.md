@@ -492,3 +492,4 @@
 - Me 100%：外观/语言/存储与诊断/关于，诊断行进入 Settings；无横向溢出。
 - ErrorCodes 100%：搜索框 + 65 条错误码列表，code/级别/说明/修复分行可读，长文本自动换行。
 - Delivery 导出分享：系统分享面板打开，显示 result.html 803 B 与一加互传/DSH Go/微信/DeepSeek/QQ/邮件/浏览器目标；未实际发送。“打开”目标未验证。
+- Delivery 打开导出：系统打开 chooser 出现 DeepSeek/Edge/QQ/邮件/浏览器等；选 Edge 后通过 content://dev.ninfenz.mobile.fileprovider 成功渲染 result.html 正文。
