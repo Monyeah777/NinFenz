@@ -1,5 +1,7 @@
 package dev.ninfenz.mobile.ui.screens
 
+import androidx.compose.ui.text.style.TextOverflow
+
 import dev.ninfenz.mobile.ui.theme.NfMotion
 
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -185,7 +187,9 @@ fun LibraryHomeScreen(
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         stringResource(dev.ninfenz.mobile.R.string.library_header_title),
-                        style = NfType.screenTitle
+                        style = NfType.screenTitle,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                     Text(
                         pluralStringResource(dev.ninfenz.mobile.R.plurals.library_header_projects, projects.size, projects.size) + " · " +

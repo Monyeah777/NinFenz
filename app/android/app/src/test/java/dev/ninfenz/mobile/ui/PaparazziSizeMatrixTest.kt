@@ -81,3 +81,8 @@ class PaparazziFontScale200Test {
         }
     }
 }
+
+class PaparazziNarrowWidthTest {
+    @get:Rule val paparazzi = Paparazzi(deviceConfig = shotConfig(400, 900))
+    @Test fun home() { paparazzi.snapshot { LibraryHomeForShot() } }
+}
