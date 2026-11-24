@@ -32,6 +32,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.ui.theme.NfSpacing
 
@@ -49,7 +51,7 @@ fun NfScaffold(
         bottomBar = bottomBar,
         topBar = {
             TopAppBar(
-                title = { Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                title = { Text(title, style = NfType.screenTitle, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.semantics { heading() }) },
                 navigationIcon = {
                     if (onBack != null) {
                         IconButton(onClick = onBack) {
