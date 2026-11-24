@@ -102,6 +102,7 @@ import dev.ninfenz.mobile.ui.components.NfSectionHeader
 import dev.ninfenz.mobile.ui.components.NfStatusChip
 import dev.ninfenz.mobile.ui.components.NfTopAppBar
 import dev.ninfenz.mobile.ui.theme.NfSpacing
+import dev.ninfenz.mobile.ui.design.NfType
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -179,12 +180,12 @@ fun LibraryHomeScreen(
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         stringResource(dev.ninfenz.mobile.R.string.library_header_title),
-                        style = MaterialTheme.typography.headlineSmall
+                        style = NfType.screenTitle
                     )
                     Text(
                         pluralStringResource(dev.ninfenz.mobile.R.plurals.library_header_projects, projects.size, projects.size) + " · " +
                             pluralStringResource(dev.ninfenz.mobile.R.plurals.library_header_packs, packs.size, packs.size),
-                        style = MaterialTheme.typography.bodySmall,
+                        style = NfType.meta,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -230,11 +231,11 @@ fun LibraryHomeScreen(
                     ) {
                         Text(
                             stringResource(dev.ninfenz.mobile.R.string.daily_title),
-                            style = MaterialTheme.typography.titleMedium
+                            style = NfType.sectionTitle
                         )
                         Text(
                             stringResource(dev.ninfenz.mobile.R.string.daily_helper),
-                            style = MaterialTheme.typography.bodySmall,
+                            style = NfType.secondary,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         OutlinedTextField(
@@ -245,7 +246,7 @@ fun LibraryHomeScreen(
                             minLines = 3,
                             maxLines = 6
                         )
-                        Button(
+                        OutlinedButton(
                             enabled = dailyText.isNotBlank(),
                             onClick = {
                                 val text = dailyText.trim()
@@ -272,15 +273,15 @@ fun LibraryHomeScreen(
                         ) {
                             Text(
                                 stringResource(dev.ninfenz.mobile.R.string.library_quick_title),
-                                style = MaterialTheme.typography.titleMedium
+                                style = NfType.sectionTitle
                             )
                             Text(
                                 stringResource(dev.ninfenz.mobile.R.string.library_quick_body),
-                                style = MaterialTheme.typography.bodySmall,
+                                style = NfType.secondary,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                                Button(onClick = onQuickPaste, modifier = Modifier.heightIn(min = 44.dp)) {
+                                OutlinedButton(onClick = onQuickPaste, modifier = Modifier.heightIn(min = 48.dp)) {
                                     Text(stringResource(dev.ninfenz.mobile.R.string.library_quick_paste))
                                 }
                             }
