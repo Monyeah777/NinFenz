@@ -2,6 +2,8 @@ package dev.ninfenz.mobile.ui.theme
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.dp
+import dev.ninfenz.mobile.ui.design.NfShape
+import dev.ninfenz.mobile.ui.design.NfType
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -18,22 +20,24 @@ class DesignTokenTest {
 
     @Test
     fun shapesUseTokenScale() {
-        assertEquals(RoundedCornerShape(4.dp), NfShapes.extraSmall)
-        assertEquals(RoundedCornerShape(8.dp), NfShapes.small)
-        assertEquals(RoundedCornerShape(12.dp), NfShapes.medium)
-        assertEquals(RoundedCornerShape(16.dp), NfShapes.large)
-        assertEquals(RoundedCornerShape(24.dp), NfShapes.extraLarge)
+        assertEquals(RoundedCornerShape(4.dp), NfShape.shapes.extraSmall)
+        assertEquals(RoundedCornerShape(8.dp), NfShape.shapes.small)
+        assertEquals(RoundedCornerShape(12.dp), NfShape.shapes.medium)
+        assertEquals(RoundedCornerShape(16.dp), NfShape.shapes.large)
+        assertEquals(RoundedCornerShape(28.dp), NfShape.shapes.extraLarge)
     }
 
     @Test
-    fun typographyUsesSevenStepScale() {
-        assertEquals(32f, NfTypography.displaySmall.fontSize.value)
-        assertEquals(40f, NfTypography.displaySmall.lineHeight.value)
-        assertEquals(24f, NfTypography.headlineSmall.fontSize.value)
-        assertEquals(20f, NfTypography.titleLarge.fontSize.value)
-        assertEquals(16f, NfTypography.titleMedium.fontSize.value)
-        assertEquals(14f, NfTypography.bodyMedium.fontSize.value)
-        assertEquals(23f, NfTypography.bodyMedium.lineHeight.value)
-        assertEquals(11f, NfTypography.labelSmall.fontSize.value)
+    fun typographyUsesFourStepScale() {
+        assertEquals(22f, NfType.screenTitle.fontSize.value)
+        assertEquals(28f, NfType.screenTitle.lineHeight.value)
+        assertEquals(16f, NfType.itemTitle.fontSize.value)
+        assertEquals(24f, NfType.itemTitle.lineHeight.value)
+        assertEquals(16f, NfType.body.fontSize.value)
+        assertEquals(24f, NfType.body.lineHeight.value)
+        assertEquals(14f, NfType.secondary.fontSize.value)
+        assertEquals(20f, NfType.secondary.lineHeight.value)
+        assertEquals(12f, NfType.meta.fontSize.value)
+        assertEquals(20f, NfType.meta.lineHeight.value)
     }
 }

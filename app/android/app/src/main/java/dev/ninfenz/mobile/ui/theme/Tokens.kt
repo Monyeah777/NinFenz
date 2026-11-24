@@ -34,7 +34,7 @@ val NfShapes = Shapes(
     small = RoundedCornerShape(8.dp),
     medium = RoundedCornerShape(12.dp),
     large = RoundedCornerShape(16.dp),
-    extraLarge = RoundedCornerShape(24.dp)
+    extraLarge = RoundedCornerShape(28.dp)
 )
 
 /** 动效 token（§17.2/§17.13）：只暴露实现需要的值。 */

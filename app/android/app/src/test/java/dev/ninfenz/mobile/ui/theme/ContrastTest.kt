@@ -1,11 +1,12 @@
 package dev.ninfenz.mobile.ui.theme
 
 import androidx.compose.ui.graphics.Color
+import dev.ninfenz.mobile.ui.design.NfColor
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import kotlin.math.pow
 
-/** DoD 对比度：正文/大字按 WCAG 2.2 AA 阈值校验品牌调色板。 */
+/** DoD 对比度：正文/大字按 WCAG 2.2 AA 阈值校验新主题。 */
 class ContrastTest {
 
     private fun channel(c: Float): Double {
@@ -36,23 +37,25 @@ class ContrastTest {
 
     @Test
     fun lightPaletteMeetsWcagAa() {
-        assertBody("light onBackground", NfPalette.LightOnBackground, NfPalette.LightBackground)
-        assertBody("light onSurface", NfPalette.LightOnSurface, NfPalette.LightSurface)
-        assertBody("light onPrimary", NfPalette.LightOnPrimary, NfPalette.LightPrimary)
-        assertBody("light onError", NfPalette.LightOnError, NfPalette.LightError)
+        val c = NfColor.light()
+        assertBody("light onBackground", c.onBackground, c.background)
+        assertBody("light onSurface", c.onSurface, c.surface)
+        assertBody("light onPrimary", c.onPrimary, c.primary)
+        assertBody("light onError", c.onError, c.error)
     }
 
     @Test
     fun darkPaletteMeetsWcagAa() {
-        assertBody("dark onBackground", NfPalette.DarkOnBackground, NfPalette.DarkBackground)
-        assertBody("dark onSurface", NfPalette.DarkOnSurface, NfPalette.DarkSurface)
-        assertBody("dark onPrimary", NfPalette.DarkOnPrimary, NfPalette.DarkPrimary)
-        assertBody("dark onError", NfPalette.DarkOnError, NfPalette.DarkError)
+        val c = NfColor.dark()
+        assertBody("dark onBackground", c.onBackground, c.background)
+        assertBody("dark onSurface", c.onSurface, c.surface)
+        assertBody("dark onPrimary", c.onPrimary, c.primary)
+        assertBody("dark onError", c.onError, c.error)
     }
 
     @Test
     fun primaryButtonLargeTextMeetsAaLarge() {
-        assertLarge("light primary/bg", NfPalette.LightPrimary, NfPalette.LightBackground)
-        assertLarge("dark primary/bg", NfPalette.DarkPrimary, NfPalette.DarkBackground)
+        assertLarge("light primary/bg", NfColor.light().primary, NfColor.light().background)
+        assertLarge("dark primary/bg", NfColor.dark().primary, NfColor.dark().background)
     }
 }
