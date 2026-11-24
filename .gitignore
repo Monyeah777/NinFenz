@@ -130,3 +130,6 @@ results/app/d[0-9]*.xml
 results/app/d[0-9]*.png
 results/app/ds[0-9]*.xml
 results/app/ds[0-9]*.png
+results/app/device[0-9]*.png
+results/app/dev[0-9]*.png
+results/app/dev*.png
