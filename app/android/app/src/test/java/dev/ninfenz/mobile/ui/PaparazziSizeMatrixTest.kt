@@ -1,6 +1,7 @@
 package dev.ninfenz.mobile.ui
 
 import app.cash.paparazzi.DeviceConfig
+import com.android.resources.ScreenOrientation
 import app.cash.paparazzi.Paparazzi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -84,5 +85,16 @@ class PaparazziFontScale200Test {
 
 class PaparazziNarrowWidthTest {
     @get:Rule val paparazzi = Paparazzi(deviceConfig = shotConfig(400, 900))
+    @Test fun home() { paparazzi.snapshot { LibraryHomeForShot() } }
+}
+
+class PaparazziLandscapeOrientationTest {
+    @get:Rule val paparazzi = Paparazzi(
+        deviceConfig = DeviceConfig.PIXEL_5.copy(
+            screenWidth = 900,
+            screenHeight = 400,
+            orientation = ScreenOrientation.LANDSCAPE
+        )
+    )
     @Test fun home() { paparazzi.snapshot { LibraryHomeForShot() } }
 }
