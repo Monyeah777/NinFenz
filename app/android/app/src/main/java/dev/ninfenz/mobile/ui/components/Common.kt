@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -33,6 +34,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.paneTitle
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.ui.theme.NfSpacing
@@ -48,6 +50,7 @@ fun NfScaffold(
     content: @Composable (PaddingValues) -> Unit
 ) {
     Scaffold(
+        modifier = Modifier.semantics { paneTitle = title },
         bottomBar = bottomBar,
         topBar = {
             TopAppBar(
@@ -68,6 +71,7 @@ fun NfScaffold(
             modifier = Modifier
                 .padding(padding)
                 .fillMaxWidth()
+                .imePadding()
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = NfSpacing.page, vertical = NfSpacing.m),
             verticalArrangement = Arrangement.spacedBy(NfSpacing.m)
