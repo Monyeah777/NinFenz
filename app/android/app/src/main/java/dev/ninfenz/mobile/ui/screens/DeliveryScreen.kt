@@ -109,6 +109,7 @@ import dev.ninfenz.mobile.ui.components.NfTopAppBar
 import dev.ninfenz.mobile.ui.components.MarkdownPreview
 import dev.ninfenz.mobile.ui.safeCall
 import dev.ninfenz.mobile.ui.theme.NfSpacing
+import dev.ninfenz.mobile.ui.design.NfType
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -503,7 +504,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                     NfStatusChip(statusText(context, status))
                     Text(
                         stringResource(dev.ninfenz.mobile.R.string.delivery_pack_label, project.refs.basePackId, project.refs.basePackVersion),
-                        style = MaterialTheme.typography.bodySmall,
+                        style = NfType.meta,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.weight(1f),
                         textAlign = androidx.compose.ui.text.style.TextAlign.End
@@ -512,17 +513,17 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                 specMeta?.let { meta ->
                     Text(
                         meta.title + " · v" + meta.version,
-                        style = MaterialTheme.typography.labelSmall,
+                        style = NfType.meta,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                Text(stringResource(dev.ninfenz.mobile.R.string.delivery_note), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(dev.ninfenz.mobile.R.string.delivery_note), style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
-            statusNote?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
+            statusNote?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
             if (needsRevalidate) {
                 Text(
                     stringResource(dev.ninfenz.mobile.R.string.delivery_need_revalidate),
-                    style = MaterialTheme.typography.bodySmall,
+                    style = NfType.meta,
                     color = MaterialTheme.colorScheme.error,
                     modifier = Modifier.padding(horizontal = NfSpacing.page)
                 )
@@ -604,7 +605,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                 plan?.let { p ->
                     Text(
                         stringResource(dev.ninfenz.mobile.R.string.delivery_plan_summary, p.steps.size, p.slots.size),
-                        style = MaterialTheme.typography.bodySmall,
+                        style = NfType.meta,
                         modifier = Modifier.padding(horizontal = NfSpacing.page)
                     )
                 }
@@ -623,7 +624,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                         dev.ninfenz.mobile.R.string.delivery_constraint_conflict_detail,
                                         conflict.joinToString(" + ") { it.id }
                                     ),
-                                    style = MaterialTheme.typography.bodySmall
+                                    style = NfType.meta
                                 )
                             }
                         }
@@ -643,7 +644,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         ) {
                             Text(
                                 stringResource(dev.ninfenz.mobile.R.string.delivery_slot_batch_hint),
-                                style = MaterialTheme.typography.bodySmall,
+                                style = NfType.meta,
                                 modifier = Modifier.weight(1f)
                             )
                             Row {
@@ -656,23 +657,23 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                             }
                         }
                         batchNote?.let {
-                            Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page))
+                            Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page))
                         }
                         draftNote?.let {
-                            Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(horizontal = NfSpacing.page))
+                            Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(horizontal = NfSpacing.page))
                         }
                     }
                     if (plan == null) {
-                        Text(stringResource(dev.ninfenz.mobile.R.string.delivery_compile_first), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page))
+                        Text(stringResource(dev.ninfenz.mobile.R.string.delivery_compile_first), style = NfType.meta, modifier = Modifier.padding(horizontal = NfSpacing.page))
                     } else if (plan!!.slots.isEmpty()) {
-                        Text(stringResource(dev.ninfenz.mobile.R.string.delivery_no_slots), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page))
+                        Text(stringResource(dev.ninfenz.mobile.R.string.delivery_no_slots), style = NfType.meta, modifier = Modifier.padding(horizontal = NfSpacing.page))
                     } else {
                         val requiredSlots = specMeta?.slots?.filter { it.required }.orEmpty()
                         val requiredFilled = requiredSlots.count { !inputs[it.id].isNullOrBlank() }
                         if (requiredSlots.isNotEmpty()) {
                             Text(
                                 stringResource(dev.ninfenz.mobile.R.string.delivery_required_progress, requiredFilled, requiredSlots.size),
-                                style = MaterialTheme.typography.bodySmall,
+                                style = NfType.meta,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             androidx.compose.material3.LinearProgressIndicator(
@@ -727,15 +728,15 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Column(modifier = Modifier.weight(1f)) {
-                                        Text(slot, style = MaterialTheme.typography.labelLarge)
+                                        Text(slot, style = NfType.label)
                                         slotMeta?.let {
-                                            Text(it.name, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                            Text(it.name, style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                             Text(
                                                 stringResource(if (it.required) dev.ninfenz.mobile.R.string.delivery_slot_required else dev.ninfenz.mobile.R.string.delivery_slot_optional),
-                                                style = MaterialTheme.typography.labelSmall,
+                                                style = NfType.meta,
                                                 color = if (it.required) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                                             )
-                                            Text(it.kind, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                            Text(it.kind, style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                             if (it.minChars != null || it.maxChars != null) {
                                                 Text(
                                                     when {
@@ -746,7 +747,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                                         else ->
                                                             stringResource(dev.ninfenz.mobile.R.string.delivery_slot_budget_min, it.minChars ?: 0)
                                                     },
-                                                    style = MaterialTheme.typography.labelSmall,
+                                                    style = NfType.meta,
                                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                                 )
                                             }
@@ -759,7 +760,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                             if (rules.isNotEmpty()) {
                                                 Text(
                                                     rules.joinToString(" · "),
-                                                    style = MaterialTheme.typography.labelSmall,
+                                                    style = NfType.meta,
                                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                                 )
                                             }
@@ -803,9 +804,9 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                     ),
                                     placeholder = { Text(slotMeta?.examples?.firstOrNull().orEmpty(), maxLines = 2) },
                                     textStyle = if (slotMeta?.kind == "code" || slotMeta?.kind == "json") {
-                                        MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace)
+                                        NfType.secondary.copy(fontFamily = FontFamily.Monospace)
                                     } else {
-                                        MaterialTheme.typography.bodyMedium
+                                        NfType.secondary
                                     },
                                     supportingText = { Text(pluralStringResource(dev.ninfenz.mobile.R.plurals.delivery_slot_chars, (inputs[slot] ?: "").length, (inputs[slot] ?: "").length)) },
                                     modifier = Modifier.fillMaxWidth().semantics {
@@ -928,7 +929,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                     if (constraintViolations.isNotEmpty()) {
                         Text(
                             stringResource(dev.ninfenz.mobile.R.string.delivery_slot_constraint, constraintViolations.joinToString(", ")),
-                            style = MaterialTheme.typography.bodySmall,
+                            style = NfType.meta,
                             color = MaterialTheme.colorScheme.error,
                             modifier = Modifier.padding(horizontal = NfSpacing.page)
                         )
@@ -936,7 +937,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                     if (oversizedSlots.isNotEmpty()) {
                         Text(
                             stringResource(dev.ninfenz.mobile.R.string.delivery_slot_over_budget, oversizedSlots.joinToString(", ")),
-                            style = MaterialTheme.typography.bodySmall,
+                            style = NfType.meta,
                             color = MaterialTheme.colorScheme.error,
                             modifier = Modifier.padding(horizontal = NfSpacing.page)
                         )
@@ -944,7 +945,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                     if (missingRequired.isNotEmpty()) {
                         Text(
                             stringResource(dev.ninfenz.mobile.R.string.delivery_missing_required, missingRequired.joinToString(", ")),
-                            style = MaterialTheme.typography.bodySmall,
+                            style = NfType.meta,
                             color = MaterialTheme.colorScheme.error,
                             modifier = Modifier.padding(horizontal = NfSpacing.page)
                         )
@@ -1010,9 +1011,9 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                     ) { Text(if (busy) stringResource(dev.ninfenz.mobile.R.string.delivery_validating) else stringResource(dev.ninfenz.mobile.R.string.delivery_validate)) }
                 }
                 report?.let { r ->
-                    Text(ReportModel.line(r), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(horizontal = NfSpacing.page))
+                    Text(ReportModel.line(r), style = NfType.secondary, modifier = Modifier.padding(horizontal = NfSpacing.page))
                     validateRepro?.let {
-                        Text(it, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page))
+                        Text(it, style = NfType.meta, modifier = Modifier.padding(horizontal = NfSpacing.page))
                     }
                     if (r.issues.isNotEmpty() && markdown != null) {
                         TextButton(onClick = {
@@ -1026,7 +1027,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                     for (issue in r.issues.take(20)) {
                         Text(
                             issue.code + " " + (issue.path ?: "-") + "：" + issue.message + context.getString(dev.ninfenz.mobile.R.string.error_fix_suffix) + issue.fix,
-                            style = MaterialTheme.typography.bodySmall,
+                            style = NfType.meta,
                             color = if (issue.severity == "error") MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(horizontal = NfSpacing.page)
                         )
@@ -1046,18 +1047,18 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                     Column(Modifier.padding(horizontal = NfSpacing.page, vertical = NfSpacing.s), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
                         Text(stringResource(dev.ninfenz.mobile.R.string.contract_title), style = MaterialTheme.typography.titleSmall)
                         checks.forEach { (label, ok) ->
-                            Text((if (ok) "✓ " else "✗ ") + label, style = MaterialTheme.typography.bodySmall, color = if (ok) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error)
+                            Text((if (ok) "✓ " else "✗ ") + label, style = NfType.meta, color = if (ok) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error)
                         }
                         val signed = signoff
                         val currentDigest = exportedFile?.let { sha256File(it) }
                         val stale = signed != null && (signed.artifactSha256 == null || signed.artifactSha256 != currentDigest)
                         if (signed != null && !stale) {
-                            Text(stringResource(dev.ninfenz.mobile.R.string.contract_signed, signed.signedAt), style = MaterialTheme.typography.bodySmall)
-                            signed.artifactSha256?.let { Text(stringResource(dev.ninfenz.mobile.R.string.contract_artifact, it), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
-                            signed.keyFingerprint?.let { Text(stringResource(dev.ninfenz.mobile.R.string.contract_key, it.take(16)), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                            Text(stringResource(dev.ninfenz.mobile.R.string.contract_signed, signed.signedAt), style = NfType.meta)
+                            signed.artifactSha256?.let { Text(stringResource(dev.ninfenz.mobile.R.string.contract_artifact, it), style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                            signed.keyFingerprint?.let { Text(stringResource(dev.ninfenz.mobile.R.string.contract_key, it.take(16)), style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant) }
                         } else {
                             if (stale) {
-                                Text(stringResource(dev.ninfenz.mobile.R.string.contract_stale), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+                                Text(stringResource(dev.ninfenz.mobile.R.string.contract_stale), style = NfType.meta, color = MaterialTheme.colorScheme.error)
                             }
                             Button(
                                 enabled = checks.all { it.second },
@@ -1071,7 +1072,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                 }
                             ) { Text(stringResource(dev.ninfenz.mobile.R.string.contract_sign)) }
                             if (!checks.all { it.second }) {
-                                Text(stringResource(dev.ninfenz.mobile.R.string.contract_blocked), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(stringResource(dev.ninfenz.mobile.R.string.contract_blocked), style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                         }
                     }
@@ -1083,7 +1084,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                     ) {
                         Text(
                             stringResource(dev.ninfenz.mobile.R.string.delivery_export_blocked),
-                            style = MaterialTheme.typography.bodySmall,
+                            style = NfType.meta,
                             color = MaterialTheme.colorScheme.error,
                             modifier = Modifier.weight(1f)
                         )
@@ -1093,7 +1094,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                     }
                 }
                 NfCollapsibleSection(title = stringResource(dev.ninfenz.mobile.R.string.delivery_export_section), initiallyExpanded = true) {
-                Text(stringResource(dev.ninfenz.mobile.R.string.delivery_export_group_docs), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(start = NfSpacing.page, end = NfSpacing.page, top = NfSpacing.s))
+                Text(stringResource(dev.ninfenz.mobile.R.string.delivery_export_group_docs), style = NfType.label, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(start = NfSpacing.page, end = NfSpacing.page, top = NfSpacing.s))
                 Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                     ExportButton("md", "text/markdown", exportMarkdown, project, context, scope, { busy = it }, { error = it }, busy) { file, manifest, report ->
                         exportedFile = file
@@ -1139,7 +1140,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         recordExport("docx", file, manifest)
                     }
                 }
-                Text(stringResource(dev.ninfenz.mobile.R.string.delivery_export_group_data), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(start = NfSpacing.page, end = NfSpacing.page, top = NfSpacing.s))
+                Text(stringResource(dev.ninfenz.mobile.R.string.delivery_export_group_data), style = NfType.label, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(start = NfSpacing.page, end = NfSpacing.page, top = NfSpacing.s))
                 Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                     ExportButton("json", "application/json", exportMarkdown, project, context, scope, { busy = it }, { error = it }, busy) { file, manifest, report ->
                         exportedFile = file
@@ -1164,7 +1165,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         recordExport("skill", file, manifest)
                     }
                 }
-                Text(stringResource(dev.ninfenz.mobile.R.string.delivery_export_group_reading), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(start = NfSpacing.page, end = NfSpacing.page, top = NfSpacing.s))
+                Text(stringResource(dev.ninfenz.mobile.R.string.delivery_export_group_reading), style = NfType.label, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(start = NfSpacing.page, end = NfSpacing.page, top = NfSpacing.s))
                 Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                     EpubExportButton(exportMarkdown, project, context, scope, { busy = it }, { error = it }, busy) { file, report ->
                         exportedFile = file
@@ -1265,14 +1266,14 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                             if (docxStyles != null) dev.ninfenz.mobile.R.string.docx_reference_loaded
                             else dev.ninfenz.mobile.R.string.docx_reference_none
                         ),
-                        style = MaterialTheme.typography.bodySmall
+                        style = NfType.meta
                     )
                 }
-                Text(stringResource(dev.ninfenz.mobile.R.string.delivery_pdf_note), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page))
+                Text(stringResource(dev.ninfenz.mobile.R.string.delivery_pdf_note), style = NfType.meta, modifier = Modifier.padding(horizontal = NfSpacing.page))
                 exportNotice?.let { notice ->
                     Text(
                         notice,
-                        style = MaterialTheme.typography.bodySmall,
+                        style = NfType.meta,
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.padding(horizontal = NfSpacing.page)
                     )
@@ -1291,7 +1292,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                             }.joinToString(" · ")
                             Text(
                                 meta,
-                                style = MaterialTheme.typography.bodySmall,
+                                style = NfType.meta,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
@@ -1313,11 +1314,11 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         }
                     }
                 }
-                manifestText?.let { Text(it, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
+                manifestText?.let { Text(it, style = NfType.meta, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
                 exportVerify?.let {
                     Text(
                         it.message,
-                        style = MaterialTheme.typography.bodySmall,
+                        style = NfType.meta,
                         color = if (it.ok) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
                         modifier = Modifier.padding(horizontal = NfSpacing.page)
                     )
@@ -1325,7 +1326,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                 reproText?.let {
                     Text(
                         it,
-                        style = MaterialTheme.typography.bodySmall,
+                        style = NfType.meta,
                         color = if (reproOk == true) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
                         modifier = Modifier.padding(horizontal = NfSpacing.page)
                     )
@@ -1352,11 +1353,11 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(entry.format + " · " + entry.name + (entry.bytes?.let { " · " + formatBytes(it) } ?: ""), style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
+                            Text(entry.format + " · " + entry.name + (entry.bytes?.let { " · " + formatBytes(it) } ?: ""), style = NfType.meta, modifier = Modifier.weight(1f))
                             entry.ok?.let { ok ->
                                 Text(
                                     stringResource(if (ok) dev.ninfenz.mobile.R.string.export_verified else dev.ninfenz.mobile.R.string.export_verify_failed),
-                                    style = MaterialTheme.typography.bodySmall,
+                                    style = NfType.meta,
                                     color = if (ok) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
                                 )
                             }
@@ -1378,7 +1379,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         entry.message?.takeIf { entry.ok != true }?.let { message ->
                             Text(
                                 message,
-                                style = MaterialTheme.typography.bodySmall,
+                                style = NfType.meta,
                                 color = MaterialTheme.colorScheme.error
                             )
                         }
@@ -1433,7 +1434,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                 }
                             }
                         }
-                    } ?: Text(stringResource(dev.ninfenz.mobile.R.string.delivery_not_assembled), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page))
+                    } ?: Text(stringResource(dev.ninfenz.mobile.R.string.delivery_not_assembled), style = NfType.meta, modifier = Modifier.padding(horizontal = NfSpacing.page))
                 }
             }
         }
@@ -1488,7 +1489,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                 ) {
                     val views = dev.ninfenz.mobile.model.ConstraintLens.view(specMeta?.slots.orEmpty(), inputs)
                     if (views.isEmpty()) {
-                        Text(stringResource(dev.ninfenz.mobile.R.string.delivery_no_slots), style = MaterialTheme.typography.bodySmall)
+                        Text(stringResource(dev.ninfenz.mobile.R.string.delivery_no_slots), style = NfType.meta)
                     }
                     views.forEach { view ->
                         Text(view.id + " · " + view.name, style = MaterialTheme.typography.titleSmall)
@@ -1496,7 +1497,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                             view.kind + " · " + stringResource(
                                 if (view.required) dev.ninfenz.mobile.R.string.delivery_slot_required else dev.ninfenz.mobile.R.string.delivery_slot_optional
                             ),
-                            style = MaterialTheme.typography.bodySmall,
+                            style = NfType.meta,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         OutlinedTextField(
@@ -1514,7 +1515,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         if (view.issues.isEmpty()) {
                             Text(
                                 stringResource(dev.ninfenz.mobile.R.string.delivery_constraint_ok),
-                                style = MaterialTheme.typography.bodySmall,
+                                style = NfType.meta,
                                 color = MaterialTheme.colorScheme.primary
                             )
                         } else {
@@ -1529,7 +1530,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                         dev.ninfenz.mobile.model.ConstraintLens.Issue.PATTERN -> stringResource(dev.ninfenz.mobile.R.string.delivery_constraint_issue_pattern)
                                     }
                                 }.joinToString("；"),
-                                style = MaterialTheme.typography.bodySmall,
+                                style = NfType.meta,
                                 color = MaterialTheme.colorScheme.error
                             )
                         }
@@ -1569,7 +1570,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                 stringResource(dev.ninfenz.mobile.R.string.grant_until, java.text.DateFormat.getDateInstance().format(java.util.Date(it)))
                             } ?: stringResource(dev.ninfenz.mobile.R.string.grant_no_expiry)
                         ),
-                        style = MaterialTheme.typography.bodySmall,
+                        style = NfType.meta,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(stringResource(dev.ninfenz.mobile.R.string.grant_caps), style = MaterialTheme.typography.titleSmall)
@@ -1623,7 +1624,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
             title = { Text(stringResource(dev.ninfenz.mobile.R.string.preview_manual_transform)) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
-                    Text(stringResource(dev.ninfenz.mobile.R.string.preview_manual_hint), style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(dev.ninfenz.mobile.R.string.preview_manual_hint), style = NfType.meta)
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(NfSpacing.xs),
                         modifier = Modifier.horizontalScroll(rememberScrollState())
@@ -1664,7 +1665,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                     if (!valid) {
                         Text(
                             stringResource(dev.ninfenz.mobile.R.string.preview_manual_invalid),
-                            style = MaterialTheme.typography.bodySmall,
+                            style = NfType.meta,
                             color = MaterialTheme.colorScheme.error
                         )
                     }
@@ -1772,8 +1773,8 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                     if (bulkMode == "replace") {
                         OutlinedTextField(value = bulkTo, onValueChange = { bulkTo = it }, label = { Text(stringResource(dev.ninfenz.mobile.R.string.preview_bulk_to)) }, modifier = Modifier.fillMaxWidth())
                     }
-                    Text(pluralStringResource(dev.ninfenz.mobile.R.plurals.preview_bulk_count, previewBlocks.count { bulkApply(it.text) != it.text }, previewBlocks.count { bulkApply(it.text) != it.text }), style = MaterialTheme.typography.bodySmall)
-                    bulkError?.let { Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall) }
+                    Text(pluralStringResource(dev.ninfenz.mobile.R.plurals.preview_bulk_count, previewBlocks.count { bulkApply(it.text) != it.text }, previewBlocks.count { bulkApply(it.text) != it.text }), style = NfType.meta)
+                    bulkError?.let { Text(it, color = MaterialTheme.colorScheme.error, style = NfType.meta) }
                 }
             },
             confirmButton = {
@@ -1809,7 +1810,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             stringResource(dev.ninfenz.mobile.R.string.preview_edit_note),
-                            style = MaterialTheme.typography.bodySmall,
+                            style = NfType.meta,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.weight(1f)
                         )
@@ -1869,7 +1870,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         }
                     }
                     previewBlocks.forEachIndexed { index, block ->
-                        Text(block.kind, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(block.kind, style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         OutlinedTextField(
                             value = block.text,
                             onValueChange = { value ->
@@ -1896,7 +1897,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                     } else {
                                         stringResource(dev.ninfenz.mobile.R.string.preview_formalize_hint)
                                     },
-                                    style = MaterialTheme.typography.labelSmall,
+                                    style = NfType.meta,
                                     color = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.weight(1f)
                                 )
@@ -1994,7 +1995,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                             slotImportOriginal,
                             slotImportAdapted
                         ),
-                        style = MaterialTheme.typography.bodySmall
+                        style = NfType.meta
                     )
                     NfExpandableText(slotImportText, collapsedLines = 10)
                 }
@@ -2040,18 +2041,18 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                 ) {
                     Text(
                         stringResource(dev.ninfenz.mobile.R.string.delivery_slot_batch_meta, batchSource),
-                        style = MaterialTheme.typography.bodySmall
+                        style = NfType.meta
                     )
                     slots.forEachIndexed { index, slot ->
                         val chunk = batchChunks.getOrNull(index)
                         if (chunk != null) {
-                            Text("$slot ← " + chunk.text.replace('\n', ' ').take(48), style = MaterialTheme.typography.bodySmall)
+                            Text("$slot ← " + chunk.text.replace('\n', ' ').take(48), style = NfType.meta)
                         }
                     }
                     if (batchChunks.size > slots.size) {
                         Text(
                             pluralStringResource(dev.ninfenz.mobile.R.plurals.delivery_slot_batch_overflow, batchChunks.size - slots.size, batchChunks.size - slots.size),
-                            style = MaterialTheme.typography.bodySmall,
+                            style = NfType.meta,
                             color = MaterialTheme.colorScheme.error
                         )
                     }
