@@ -1,5 +1,13 @@
 package dev.ninfenz.mobile.ui.screens
 
+import androidx.compose.ui.unit.dp
+
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.ui.platform.LocalDensity
+
 import dev.ninfenz.mobile.ui.design.NfType
 
 import androidx.compose.foundation.layout.Arrangement
@@ -121,10 +129,21 @@ fun PackCenterScreen(
             title = stringResource(dev.ninfenz.mobile.R.string.packcenter_title),
             onBack = onBack,
             actions = {
-                TextButton(onClick = { zipPicker.launch(arrayOf("application/zip", "application/octet-stream", "*/*")) }) {
-                    Text(stringResource(dev.ninfenz.mobile.R.string.packcenter_install_zip))
+                val compact = LocalDensity.current.fontScale >= 1.4f
+                val installZip = { zipPicker.launch(arrayOf("application/zip", "application/octet-stream", "*/*")) }
+                if (compact) {
+                    IconButton(onClick = installZip, modifier = Modifier.size(48.dp)) {
+                        Icon(Icons.Filled.Add, contentDescription = stringResource(dev.ninfenz.mobile.R.string.packcenter_install_zip))
+                    }
+                    IconButton(onClick = onUpdatePlan, modifier = Modifier.size(48.dp)) {
+                        Icon(Icons.Filled.Refresh, contentDescription = stringResource(dev.ninfenz.mobile.R.string.packcenter_update_plan))
+                    }
+                } else {
+                    TextButton(onClick = installZip) {
+                        Text(stringResource(dev.ninfenz.mobile.R.string.packcenter_install_zip))
+                    }
+                    TextButton(onClick = onUpdatePlan) { Text(stringResource(dev.ninfenz.mobile.R.string.packcenter_update_plan)) }
                 }
-                TextButton(onClick = onUpdatePlan) { Text(stringResource(dev.ninfenz.mobile.R.string.packcenter_update_plan)) }
             }
         )
         if (packs.isEmpty()) {

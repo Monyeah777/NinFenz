@@ -130,7 +130,7 @@ fun NfStepStrip(steps: List<String>, current: Int, modifier: Modifier = Modifier
 @Composable
 fun NfSectionHeader(text: String, modifier: Modifier = Modifier, action: (@Composable () -> Unit)? = null) {
     Row(
-        modifier = modifier.fillMaxWidth().padding(horizontal = NfLayout.pageCompact),
+        modifier = modifier.fillMaxWidth().background(MaterialTheme.colorScheme.background).padding(horizontal = NfLayout.pageCompact),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
