@@ -484,3 +484,4 @@
 - Library 200% 吸顶头原为透明，滚动时“最近项目”与卡片文字重叠；给 section header 增加主题背景色后修复。
 - CCOS 100%：打开 ccos-task / 打开 ccos-result 原为两个填充主操作；改为 task 填充、result 描边并 FlowRow 换行。
 - CCOS 200%：两个打开动作和清除会话单列排列；底部通过并回传/驳回仍可见。
+- PackUpdate 100%：打开更新计划原被挤成两行；FlowRow 后与选择新版 zip 分行，按钮文字完整。

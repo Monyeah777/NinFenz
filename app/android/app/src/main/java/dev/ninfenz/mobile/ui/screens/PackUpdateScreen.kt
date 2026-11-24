@@ -4,6 +4,8 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -58,6 +60,7 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import java.io.File
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit) {
     val context = LocalContext.current
@@ -176,7 +179,11 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit) {
                         modifier = Modifier.padding(end = 8.dp)
                     )
                 }
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
                     Button(onClick = { zipPicker.launch(arrayOf("application/zip", "application/octet-stream", "*/*")) }, enabled = !diffBusy) {
                         Text(if (diffBusy) stringResource(dev.ninfenz.mobile.R.string.packupdate_compare) else stringResource(dev.ninfenz.mobile.R.string.packupdate_choose_zip))
                     }
