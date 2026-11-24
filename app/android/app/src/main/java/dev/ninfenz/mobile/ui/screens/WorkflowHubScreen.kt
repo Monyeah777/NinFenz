@@ -1,5 +1,7 @@
 package dev.ninfenz.mobile.ui.screens
 
+import dev.ninfenz.mobile.ui.theme.NfMotion
+
 import dev.ninfenz.mobile.ui.design.NfType
 
 import androidx.compose.animation.AnimatedVisibility
@@ -135,7 +137,7 @@ fun WorkflowHubScreen(
                 item {
                     val chevron by animateFloatAsState(
                         targetValue = if (projectsExpanded) 180f else 0f,
-                        animationSpec = tween(durationMillis = 220),
+                        animationSpec = tween(durationMillis = NfMotion.MEDIUM_MS),
                         label = "workhub-projects-chevron"
                     )
                     NfSectionHeader(
@@ -160,11 +162,11 @@ fun WorkflowHubScreen(
                 item {
                     AnimatedVisibility(
                         visible = projectsExpanded,
-                        enter = fadeIn(tween(180)) + expandVertically(
+                        enter = fadeIn(tween(NfMotion.SHORT_MS)) + expandVertically(
                             animationSpec = spring(dampingRatio = 0.82f, stiffness = 420f),
                             expandFrom = Alignment.Top
                         ),
-                        exit = fadeOut(tween(120)) + shrinkVertically(
+                        exit = fadeOut(tween(NfMotion.SHORT_MS)) + shrinkVertically(
                             animationSpec = spring(dampingRatio = 0.9f, stiffness = 500f),
                             shrinkTowards = Alignment.Top
                         )

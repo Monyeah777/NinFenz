@@ -1,5 +1,7 @@
 package dev.ninfenz.mobile.ui.screens
 
+import dev.ninfenz.mobile.ui.theme.NfMotion
+
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
@@ -379,7 +381,7 @@ fun LibraryHomeScreen(
                 item {
                     val projectChevron by animateFloatAsState(
                         targetValue = if (projectsExpanded) 180f else 0f,
-                        animationSpec = tween(durationMillis = 220),
+                        animationSpec = tween(durationMillis = NfMotion.MEDIUM_MS),
                         label = "library-projects-chevron"
                     )
                     NfSectionHeader(
@@ -404,11 +406,11 @@ fun LibraryHomeScreen(
                 item {
                     androidx.compose.animation.AnimatedVisibility(
                         visible = projectsExpanded,
-                        enter = fadeIn(tween(180)) + expandVertically(
+                        enter = fadeIn(tween(NfMotion.SHORT_MS)) + expandVertically(
                             animationSpec = spring(dampingRatio = 0.82f, stiffness = 420f),
                             expandFrom = Alignment.Top
                         ),
-                        exit = fadeOut(tween(120)) + shrinkVertically(
+                        exit = fadeOut(tween(NfMotion.SHORT_MS)) + shrinkVertically(
                             animationSpec = spring(dampingRatio = 0.9f, stiffness = 500f),
                             shrinkTowards = Alignment.Top
                         )
@@ -520,8 +522,8 @@ fun LibraryHomeScreen(
     androidx.compose.animation.AnimatedVisibility(
         visible = undoArchive != null,
         modifier = Modifier.align(Alignment.BottomCenter),
-        enter = fadeIn(tween(160)) + slideInVertically(tween(240)) { it / 2 },
-        exit = fadeOut(tween(120)) + slideOutVertically(tween(160)) { it / 2 }
+        enter = fadeIn(tween(NfMotion.SHORT_MS)) + slideInVertically(tween(NfMotion.MEDIUM_MS)) { it / 2 },
+        exit = fadeOut(tween(NfMotion.SHORT_MS)) + slideOutVertically(tween(NfMotion.SHORT_MS)) { it / 2 }
     ) {
         undoArchive?.let { archived ->
             Surface(
