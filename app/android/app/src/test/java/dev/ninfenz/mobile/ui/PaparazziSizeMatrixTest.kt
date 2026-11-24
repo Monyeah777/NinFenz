@@ -3,6 +3,9 @@ package dev.ninfenz.mobile.ui
 import app.cash.paparazzi.DeviceConfig
 import app.cash.paparazzi.Paparazzi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
 import dev.ninfenz.mobile.ui.screens.LibraryHomeScreen
 import dev.ninfenz.mobile.ui.theme.NfTheme
 import org.junit.Rule
@@ -66,4 +69,15 @@ class Paparazzi900x900Test {
 class Paparazzi900x1000Test {
     @get:Rule val paparazzi = Paparazzi(deviceConfig = shotConfig(900, 1000))
     @Test fun home() { paparazzi.snapshot { LibraryHomeForShot() } }
+}
+
+class PaparazziFontScale200Test {
+    @get:Rule val paparazzi = Paparazzi(deviceConfig = DeviceConfig.PIXEL_5)
+    @Test fun home200() {
+        paparazzi.snapshot {
+            CompositionLocalProvider(LocalDensity provides Density(1f, 2f)) {
+                LibraryHomeForShot()
+            }
+        }
+    }
 }
