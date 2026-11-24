@@ -59,6 +59,7 @@ import dev.ninfenz.mobile.ui.components.KeyValue
 import dev.ninfenz.mobile.ui.components.MonoText
 import dev.ninfenz.mobile.ui.components.NfScaffold
 import dev.ninfenz.mobile.ui.theme.NfSpacing
+import dev.ninfenz.mobile.ui.design.NfType
 import dev.ninfenz.mobile.ui.components.Notice
 import dev.ninfenz.mobile.ui.components.Tone
 import kotlinx.coroutines.Dispatchers
@@ -167,7 +168,7 @@ fun SettingsScreen(
             }
             Text(
                 text = stringResource(dev.ninfenz.mobile.R.string.settings_error_hint, ErrorCatalog.all().size),
-                style = MaterialTheme.typography.bodySmall
+                style = NfType.meta
             )
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedButton(onClick = onErrorCodes) {
@@ -182,21 +183,21 @@ fun SettingsScreen(
         CardBox(title = stringResource(dev.ninfenz.mobile.R.string.settings_upgrade_title)) {
             Text(
                 stringResource(dev.ninfenz.mobile.R.string.settings_upgrade_desc),
-                style = MaterialTheme.typography.bodySmall,
+                style = NfType.meta,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             OutlinedButton(onClick = { upgradePicker.launch(arrayOf("application/zip", "application/octet-stream")) }) {
                 Text(stringResource(dev.ninfenz.mobile.R.string.settings_upgrade_pick))
             }
             upgradeNote?.let {
-                Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
+                Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary)
             }
         }
 
         CardBox(title = stringResource(dev.ninfenz.mobile.R.string.settings_chain_title)) {
             Text(
                 stringResource(dev.ninfenz.mobile.R.string.settings_chain_desc),
-                style = MaterialTheme.typography.bodySmall,
+                style = NfType.meta,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Row(horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(NfSpacing.s)) {
@@ -207,8 +208,8 @@ fun SettingsScreen(
                     Text(stringResource(dev.ninfenz.mobile.R.string.settings_chain_second))
                 }
             }
-            chainFirst?.let { Text(it.name, style = MaterialTheme.typography.bodySmall) }
-            chainSecond?.let { Text(it.name, style = MaterialTheme.typography.bodySmall) }
+            chainFirst?.let { Text(it.name, style = NfType.meta) }
+            chainSecond?.let { Text(it.name, style = NfType.meta) }
             Button(
                 enabled = chainFirst != null && chainSecond != null,
                 onClick = {
@@ -225,7 +226,7 @@ fun SettingsScreen(
                 }
             ) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_chain_verify)) }
             chainNote?.let {
-                Text(it, style = MaterialTheme.typography.bodySmall, color = if (it == context.getString(dev.ninfenz.mobile.R.string.settings_chain_ok)) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error)
+                Text(it, style = NfType.meta, color = if (it == context.getString(dev.ninfenz.mobile.R.string.settings_chain_ok)) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error)
             }
         }
 
@@ -237,7 +238,7 @@ fun SettingsScreen(
             KeyValue("Pro rules", proCount.toString())
             KeyValue("CCOS rules", ccosCount.toString())
             if (BuildConfig.DEBUG) {
-                Text(stringResource(dev.ninfenz.mobile.R.string.settings_tier_debug), style = MaterialTheme.typography.bodySmall)
+                Text(stringResource(dev.ninfenz.mobile.R.string.settings_tier_debug), style = NfType.meta)
                 Row(horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(NfSpacing.s)) {
                     FeatureGate.Tier.values().forEach { option ->
                         FilterChip(
@@ -253,7 +254,7 @@ fun SettingsScreen(
             } else {
                 Text(
                     stringResource(dev.ninfenz.mobile.R.string.settings_tier_release_note),
-                    style = MaterialTheme.typography.bodySmall,
+                    style = NfType.meta,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
@@ -262,7 +263,7 @@ fun SettingsScreen(
         CardBox(title = stringResource(dev.ninfenz.mobile.R.string.settings_selfcheck_title)) {
             Text(
                 stringResource(dev.ninfenz.mobile.R.string.settings_selfcheck_desc),
-                style = MaterialTheme.typography.bodySmall,
+                style = NfType.meta,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Button(onClick = { selfCheck = dev.ninfenz.mobile.data.AppSelfCheck.run() }) {
@@ -275,7 +276,7 @@ fun SettingsScreen(
                     } else {
                         stringResource(dev.ninfenz.mobile.R.string.settings_selfcheck_fail, report.failures.size, report.failures.first().seed)
                     },
-                    style = MaterialTheme.typography.bodySmall,
+                    style = NfType.meta,
                     color = if (report.ok) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
                 )
             }
@@ -294,7 +295,7 @@ fun SettingsScreen(
                 stats = StorageStats.scan(context.filesDir, context.cacheDir)
                 cleaned = context.resources.getQuantityString(dev.ninfenz.mobile.R.plurals.settings_storage_cleaned, removed, removed)
             }) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_storage_clear)) }
-            cleaned?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary) }
+            cleaned?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary) }
             OutlinedButton(onClick = {
                 scope.launch {
                     val created = withContext(Dispatchers.IO) {
@@ -387,7 +388,7 @@ fun SettingsScreen(
                     dismissButton = { TextButton(onClick = { batchCandidates = null }) { Text(stringResource(dev.ninfenz.mobile.R.string.new_project_cancel)) } }
                 )
             }
-            backupMessage?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary) }
+            backupMessage?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary) }
             OutlinedButton(onClick = {
                 restorePicker.launch(arrayOf("application/zip", "*/*"))
             }) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_backup_restore)) }
@@ -408,7 +409,7 @@ fun SettingsScreen(
                 Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
                     Text(
                         backup.name + " · " + humanBytes(backup.length()),
-                        style = MaterialTheme.typography.bodySmall,
+                        style = NfType.meta,
                         modifier = Modifier.weight(1f)
                     )
                     TextButton(onClick = {
@@ -444,11 +445,11 @@ fun SettingsScreen(
                 modifier = Modifier.padding(horizontal = NfSpacing.page),
                 verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(NfSpacing.xs)
             ) {
-                Text(stringResource(dev.ninfenz.mobile.R.string.settings_privacy_1), style = MaterialTheme.typography.bodySmall)
-                Text(stringResource(dev.ninfenz.mobile.R.string.settings_privacy_2), style = MaterialTheme.typography.bodySmall)
-                Text(stringResource(dev.ninfenz.mobile.R.string.settings_privacy_3), style = MaterialTheme.typography.bodySmall)
-                Text(stringResource(dev.ninfenz.mobile.R.string.settings_privacy_4), style = MaterialTheme.typography.bodySmall)
-                Text(stringResource(dev.ninfenz.mobile.R.string.settings_privacy_5), style = MaterialTheme.typography.bodySmall)
+                Text(stringResource(dev.ninfenz.mobile.R.string.settings_privacy_1), style = NfType.meta)
+                Text(stringResource(dev.ninfenz.mobile.R.string.settings_privacy_2), style = NfType.meta)
+                Text(stringResource(dev.ninfenz.mobile.R.string.settings_privacy_3), style = NfType.meta)
+                Text(stringResource(dev.ninfenz.mobile.R.string.settings_privacy_4), style = NfType.meta)
+                Text(stringResource(dev.ninfenz.mobile.R.string.settings_privacy_5), style = NfType.meta)
             }
         }
 
@@ -505,7 +506,7 @@ fun SettingsScreen(
                         Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
                             Text(
                                 backup.name + " · " + humanBytes(backup.length()),
-                                style = MaterialTheme.typography.bodySmall,
+                                style = NfType.meta,
                                 modifier = Modifier.weight(1f)
                             )
                             TextButton(onClick = {
