@@ -95,6 +95,7 @@ import dev.ninfenz.mobile.ui.components.NfStatusChip
 import dev.ninfenz.mobile.ui.components.NfTopAppBar
 import dev.ninfenz.mobile.ui.safeCall
 import dev.ninfenz.mobile.ui.theme.NfSpacing
+import dev.ninfenz.mobile.ui.design.NfType
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -911,7 +912,7 @@ fun ImportScreen(
             item {
                 NfCard {
                     Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                        Text(stringResource(dev.ninfenz.mobile.R.string.import_source), style = MaterialTheme.typography.titleLarge)
+                        Text(stringResource(dev.ninfenz.mobile.R.string.import_source), style = NfType.sectionTitle)
                         Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                             Button(onClick = { filePicker.launch(arrayOf("text/markdown", "text/plain", "text/csv", "application/json", "application/zip", "application/octet-stream")) }, enabled = !busy) { Text(stringResource(dev.ninfenz.mobile.R.string.import_pick_file)) }
                             OutlinedButton(onClick = { importClipboard() }, enabled = !busy) { Text(stringResource(dev.ninfenz.mobile.R.string.import_clipboard)) }
@@ -927,7 +928,7 @@ fun ImportScreen(
                             }
                             OutlinedButton(onClick = { preservePicker.launch(arrayOf("application/zip", "application/octet-stream")) }, enabled = !busy) { Text(stringResource(dev.ninfenz.mobile.R.string.import_verify_preserve)) }
                             if (prefillNote != null) {
-                                Text(stringResource(dev.ninfenz.mobile.R.string.import_share_received), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
+                                Text(stringResource(dev.ninfenz.mobile.R.string.import_share_received), style = NfType.meta, color = MaterialTheme.colorScheme.primary)
                             }
                         }
                         latestPreserve?.let { archive ->
@@ -936,10 +937,10 @@ fun ImportScreen(
                             }
                         }
                         if (prefillNote != null) {
-                            Text(prefillNote!!, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(prefillNote!!, style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
-                        zeroSliceNote?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary) }
-                        preserveNote?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary) }
+                        zeroSliceNote?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary) }
+                        preserveNote?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary) }
                         preservedMarkdown?.let { md ->
                             if (preserveGrant?.allows(dev.ninfenz.mobile.data.CapabilityGrant.REASSEMBLE, System.currentTimeMillis()) == true) {
                                 OutlinedButton(onClick = { importText(md, ImportSource.SAF, preservedName) }, enabled = !busy) {
@@ -948,7 +949,7 @@ fun ImportScreen(
                             } else {
                                 Text(
                                     stringResource(dev.ninfenz.mobile.R.string.import_preserve_readonly),
-                                    style = MaterialTheme.typography.bodySmall,
+                                    style = NfType.meta,
                                     color = MaterialTheme.colorScheme.error
                                 )
                             }
@@ -974,7 +975,7 @@ fun ImportScreen(
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
                                     pluralStringResource(dev.ninfenz.mobile.R.plurals.import_share_queue, shareQueue.size, shareQueue.size, shareCursor + 1),
-                                    style = MaterialTheme.typography.bodySmall,
+                                    style = NfType.meta,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier.weight(1f)
                                 )
@@ -995,7 +996,7 @@ fun ImportScreen(
                         }
                         Text(
                             stringResource(dev.ninfenz.mobile.R.string.import_explain),
-                            style = MaterialTheme.typography.bodySmall,
+                            style = NfType.meta,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -1003,7 +1004,7 @@ fun ImportScreen(
             }
             if (busy) {
                 item { LinearProgressIndicator(modifier = Modifier.fillMaxWidth().padding(horizontal = NfSpacing.page)) }
-                item { Text(stringResource(dev.ninfenz.mobile.R.string.import_busy), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
+                item { Text(stringResource(dev.ninfenz.mobile.R.string.import_busy), style = NfType.meta, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
             }
             if (error != null) {
                 item {
@@ -1018,7 +1019,7 @@ fun ImportScreen(
                 }
             }
             notice?.let { message ->
-                item { Text(message, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
+                item { Text(message, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
             }
 
             val current = doc
@@ -1042,24 +1043,24 @@ fun ImportScreen(
                         Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
                             Text(
                                 stringResource(dev.ninfenz.mobile.R.string.import_zero_slice_coverage, report.coverage),
-                                style = MaterialTheme.typography.bodySmall,
+                                style = NfType.meta,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Text(
                                 pluralStringResource(dev.ninfenz.mobile.R.plurals.import_zero_slice_mappings, report.mappings.size, report.mappings.size) +
                                     " · " +
                                     pluralStringResource(dev.ninfenz.mobile.R.plurals.import_zero_slice_exceptions, report.exceptions.size, report.exceptions.size),
-                                style = MaterialTheme.typography.bodySmall,
+                                style = NfType.meta,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             report.mappings.take(6).forEach { mapping ->
                                 Text(
                                     stringResource(dev.ninfenz.mobile.R.string.import_zero_slice_mapping, mapping.fromIndex, mapping.toName.ifBlank { mapping.toId }, mapping.confidence),
-                                    style = MaterialTheme.typography.bodySmall
+                                    style = NfType.meta
                                 )
                             }
                             report.exceptions.firstOrNull()?.let { exception ->
-                                Text(exception.reason, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(exception.reason, style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                             if (rawResult != null && packs.isNotEmpty() && current != null) {
                                 TextButton(onClick = {
@@ -1105,7 +1106,7 @@ fun ImportScreen(
                                 if (current.lowConfidence) NfStatusChip(stringResource(dev.ninfenz.mobile.R.string.import_low_confidence), MaterialTheme.colorScheme.error)
                                 NfStatusChip(current.source.kind)
                             }
-                            Text(stringResource(dev.ninfenz.mobile.R.string.import_source_label, current.source.name), style = MaterialTheme.typography.bodySmall)
+                            Text(stringResource(dev.ninfenz.mobile.R.string.import_source_label, current.source.name), style = NfType.meta)
                             Text(
                                 pluralStringResource(
                                     dev.ninfenz.mobile.R.plurals.import_structure,
@@ -1115,11 +1116,11 @@ fun ImportScreen(
                                     current.structure.codeBlocks.size,
                                     current.structure.tables.size
                                 ),
-                                style = MaterialTheme.typography.bodySmall
+                                style = NfType.meta
                             )
-                            current.textDigest?.let { Text(stringResource(dev.ninfenz.mobile.R.string.import_digest, it.take(16)), style = MaterialTheme.typography.bodySmall) }
+                            current.textDigest?.let { Text(stringResource(dev.ninfenz.mobile.R.string.import_digest, it.take(16)), style = NfType.meta) }
                             for (note in current.reviewNotes()) {
-                                Text(note, style = MaterialTheme.typography.bodySmall, color = if (current.lowConfidence) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(note, style = NfType.meta, color = if (current.lowConfidence) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                         }
                     }
@@ -1139,12 +1140,12 @@ fun ImportScreen(
                                         slices.count { it.heading != null },
                                         slices.sumOf { it.blocks.size }
                                     ),
-                                    style = MaterialTheme.typography.bodySmall,
+                                    style = NfType.meta,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                                 Text(
                                     stringResource(if (slices.count { it.heading != null } >= 2) dev.ninfenz.mobile.R.string.import_slice_suggestion_chapter else dev.ninfenz.mobile.R.string.import_slice_suggestion_free),
-                                    style = MaterialTheme.typography.labelMedium,
+                                    style = NfType.label,
                                     color = MaterialTheme.colorScheme.primary
                                 )
                                 TextButton(onClick = { importPreviewText = current.text }) {
@@ -1199,7 +1200,7 @@ fun ImportScreen(
                                                 onClick = { importPreviewText = runCatching { file.readText(Charsets.UTF_8) }.getOrDefault("") },
                                                 contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)
                                             ) {
-                                                Text(file.name, style = MaterialTheme.typography.bodySmall, maxLines = 1)
+                                                Text(file.name, style = NfType.meta, maxLines = 1)
                                             }
                                             Row(
                                                 modifier = Modifier.horizontalScroll(rememberScrollState()),
@@ -1242,7 +1243,7 @@ fun ImportScreen(
                                             ) {
                                                 Text(
                                                     templateStore.titleOf(file),
-                                                    style = MaterialTheme.typography.bodySmall
+                                                    style = NfType.meta
                                                 )
                                             }
                                             Row(
@@ -1286,11 +1287,11 @@ fun ImportScreen(
                                         )
                                         Text(
                                             pluralStringResource(dev.ninfenz.mobile.R.plurals.import_slice_meta, slice.blocks.size, slice.blocks.size, slice.charCount),
-                                            style = MaterialTheme.typography.bodySmall,
+                                            style = NfType.meta,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
                                         slice.blocks.firstOrNull()?.text?.lineSequence()?.firstOrNull()?.take(80)?.let {
-                                            Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                            Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                         }
                                     }
                                 }
@@ -1304,7 +1305,7 @@ fun ImportScreen(
                 } else {
                     item {
                         Row(modifier = Modifier.fillMaxWidth().padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                            Text(stringResource(dev.ninfenz.mobile.R.string.import_accepted, acceptedMappings.size, current.mappings.size), style = MaterialTheme.typography.bodySmall)
+                            Text(stringResource(dev.ninfenz.mobile.R.string.import_accepted, acceptedMappings.size, current.mappings.size), style = NfType.meta)
                             TextButton(onClick = {
                                 acceptedMappings = if (acceptedMappings.size == current.mappings.size) emptySet() else current.mappings.indices.toSet()
                             }) { Text(if (acceptedMappings.size == current.mappings.size) stringResource(dev.ninfenz.mobile.R.string.import_accept_none) else stringResource(dev.ninfenz.mobile.R.string.import_accept_all)) }
@@ -1323,7 +1324,7 @@ fun ImportScreen(
                                 )
                                 Text(
                                     "confidence " + mapping.confidence + " · " + mapping.rationale,
-                                    style = MaterialTheme.typography.bodySmall,
+                                    style = NfType.meta,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
@@ -1337,10 +1338,10 @@ fun ImportScreen(
                     }
                 }
                 if (current.unmapped.isNotEmpty()) {
-                    item { Text(stringResource(dev.ninfenz.mobile.R.string.import_unmapped, current.unmapped.joinToString("；")), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
+                    item { Text(stringResource(dev.ninfenz.mobile.R.string.import_unmapped, current.unmapped.joinToString("；")), style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
                 }
                 suggestNote?.let { message ->
-                    item { Text(message, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
+                    item { Text(message, style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
                 }
                 item { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.import_draft)) }
                 if (savedName == null && rawResult != null && packs.isNotEmpty()) {
@@ -1367,7 +1368,7 @@ fun ImportScreen(
                             }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_quick_project)) }
                             Text(
                                 stringResource(dev.ninfenz.mobile.R.string.import_quick_project_note, pack.title),
-                                style = MaterialTheme.typography.bodySmall,
+                                style = NfType.meta,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
@@ -1404,7 +1405,7 @@ fun ImportScreen(
                         NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
                             Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                                 Text(stringResource(dev.ninfenz.mobile.R.string.import_saved, savedName ?: ""), style = MaterialTheme.typography.titleMedium)
-                                Text(stringResource(dev.ninfenz.mobile.R.string.import_saved_note), style = MaterialTheme.typography.bodySmall)
+                                Text(stringResource(dev.ninfenz.mobile.R.string.import_saved_note), style = NfType.meta)
                                 Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                                     Button(onClick = onBack) { Text(stringResource(dev.ninfenz.mobile.R.string.import_done)) }
                                     TextButton(onClick = {
@@ -1427,7 +1428,7 @@ fun ImportScreen(
                         item {
                             NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Text(draft.name, style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
+                                    Text(draft.name, style = NfType.meta, modifier = Modifier.weight(1f))
                                     TextButton(onClick = {
                                         val raw = DraftLibrary.read(draft)
                                         if (raw == null) {
@@ -1485,7 +1486,7 @@ fun ImportScreen(
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Text(
                                             entry.name + " · " + entry.digest.take(10),
-                                            style = MaterialTheme.typography.bodySmall,
+                                            style = NfType.meta,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                                             modifier = Modifier.weight(1f)
                                         )
@@ -1514,7 +1515,7 @@ fun ImportScreen(
                                                 }
                                             }) { Text(stringResource(dev.ninfenz.mobile.R.string.import_open_draft)) }
                                         } else {
-                                            Text(stringResource(dev.ninfenz.mobile.R.string.import_draft_missing), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                            Text(stringResource(dev.ninfenz.mobile.R.string.import_draft_missing), style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                         }
                                     }
                                 }
@@ -1530,7 +1531,7 @@ fun ImportScreen(
                     if (current.text != null || current.textPath != null) {
                         Text(
                             (current.text ?: current.textPath ?: "").take(400),
-                            style = MaterialTheme.typography.bodySmall,
+                            style = NfType.meta,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(horizontal = NfSpacing.page)
                         )
@@ -1754,7 +1755,7 @@ fun ImportScreen(
                 ) {
                     Text(spec?.title ?: file.name, style = MaterialTheme.typography.titleLarge)
                     if (spec != null) {
-                        Text("v" + spec.version + " · " + spec.sections.size + " sections · " + spec.slots.size + " slots", style = MaterialTheme.typography.bodySmall)
+                        Text("v" + spec.version + " · " + spec.sections.size + " sections · " + spec.slots.size + " slots", style = NfType.meta)
                         Column(modifier = Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState())) {
                             spec.sections.forEach { section ->
                                 Text(section.title, style = MaterialTheme.typography.titleSmall)
@@ -1765,7 +1766,7 @@ fun ImportScreen(
                                             (it.maxChars?.let { max -> " · max " + max } ?: "") +
                                             (it.examples.firstOrNull()?.let { example -> " · " + example } ?: "")
                                     }.orEmpty()
-                                    Text("- " + id + " " + (slot?.name ?: "") + (if (meta.isNotBlank()) "  (" + meta + ")" else ""), style = MaterialTheme.typography.bodySmall)
+                                    Text("- " + id + " " + (slot?.name ?: "") + (if (meta.isNotBlank()) "  (" + meta + ")" else ""), style = NfType.meta)
                                 }
                             }
                         }
