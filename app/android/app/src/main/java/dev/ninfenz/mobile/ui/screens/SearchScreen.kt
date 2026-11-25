@@ -200,6 +200,13 @@ fun SearchScreen(
                 TextButton(onClick = { query = "" }) {
                     Text(stringResource(dev.ninfenz.mobile.R.string.search_clear))
                 }
+                if (filterName != null || selectedPackId != null || selectedProjectId != null) {
+                    TextButton(onClick = {
+                        filterName = null
+                        selectedPackId = null
+                        selectedProjectId = null
+                    }) { Text(stringResource(dev.ninfenz.mobile.R.string.search_clear_filters)) }
+                }
             }
             else -> LazyColumn(
                 state = listState,

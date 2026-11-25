@@ -1324,4 +1324,5 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="new_project_error_kept">已保留所选 Pack 与标题，修正后可直接重试。</string>
     <string name="project_pack_other_versions">已安装其他版本：%1$s</string>
     <string name="author_retry_save">重试保存</string>
+    <string name="search_clear_filters">清除筛选</string>
 </resources>

@@ -1328,4 +1328,5 @@ MIT License · See app/docs/LEGAL.md···⟧</string>
     <string name="new_project_error_kept">⟦The selected Pack and title are kept; fix the issue and retry.···⟧</string>
     <string name="project_pack_other_versions">⟦Other installed versions: %1$s···⟧</string>
     <string name="author_retry_save">⟦Retry save···⟧</string>
+    <string name="search_clear_filters">⟦Clear filters···⟧</string>
 </resources>
