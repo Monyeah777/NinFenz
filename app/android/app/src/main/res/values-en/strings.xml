@@ -1319,4 +1319,10 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="delivery_leave_confirm">Leave</string>
     <string name="delivery_leave_stay">Stay</string>
     <string name="author_autosave_saving">Autosaving…</string>
+    <string name="delivery_summary_assembled">Assembled</string>
+    <string name="delivery_summary_unassembled">Not assembled</string>
+    <string name="delivery_summary_validated">Validated</string>
+    <string name="delivery_summary_unvalidated">Not validated</string>
+    <string name="delivery_summary_exported">Exported</string>
+    <string name="delivery_summary_unexported">Not exported</string>
 </resources>

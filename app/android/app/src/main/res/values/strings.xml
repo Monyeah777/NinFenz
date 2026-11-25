@@ -1315,4 +1315,10 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="delivery_leave_confirm">离开</string>
     <string name="delivery_leave_stay">留下</string>
     <string name="author_autosave_saving">自动保存中…</string>
+    <string name="delivery_summary_assembled">已装配</string>
+    <string name="delivery_summary_unassembled">未装配</string>
+    <string name="delivery_summary_validated">校验通过</string>
+    <string name="delivery_summary_unvalidated">未校验</string>
+    <string name="delivery_summary_exported">已导出</string>
+    <string name="delivery_summary_unexported">未导出</string>
 </resources>

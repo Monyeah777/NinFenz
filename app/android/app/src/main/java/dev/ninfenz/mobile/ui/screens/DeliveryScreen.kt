@@ -1258,6 +1258,12 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                 }
                 if (activeStep == 3) {
                 NfCollapsibleSection(title = stringResource(dev.ninfenz.mobile.R.string.delivery_export_section), initiallyExpanded = true) {
+                val summary = buildList {
+                    add(stringResource(if (markdown != null) dev.ninfenz.mobile.R.string.delivery_summary_assembled else dev.ninfenz.mobile.R.string.delivery_summary_unassembled))
+                    if (audit) add(stringResource(if (report?.verdict == "pass") dev.ninfenz.mobile.R.string.delivery_summary_validated else dev.ninfenz.mobile.R.string.delivery_summary_unvalidated))
+                    add(stringResource(if (exportedFile != null) dev.ninfenz.mobile.R.string.delivery_summary_exported else dev.ninfenz.mobile.R.string.delivery_summary_unexported))
+                }.joinToString(" · ")
+                Text(summary, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page))
                 Text(stringResource(dev.ninfenz.mobile.R.string.delivery_export_group_docs), style = NfType.label, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(start = NfSpacing.page, end = NfSpacing.page, top = NfSpacing.s))
                 OutlinedButton(
                     enabled = exportMarkdown != null && !busy,
