@@ -156,7 +156,9 @@ fun PackCenterScreen(
                 title = stringResource(dev.ninfenz.mobile.R.string.packcenter_empty_title),
                 message = stringResource(dev.ninfenz.mobile.R.string.packcenter_empty_body),
                 actionLabel = stringResource(dev.ninfenz.mobile.R.string.packcenter_load_sample),
-                onAction = onLoadSample
+                onAction = onLoadSample,
+                secondaryLabel = stringResource(dev.ninfenz.mobile.R.string.packcenter_install_zip),
+                onSecondary = { zipPicker.launch(arrayOf("application/zip", "application/octet-stream", "*/*")) }
             )
         } else {
             PullToRefreshBox(isRefreshing = refreshing, onRefresh = onRefresh, modifier = Modifier.fillMaxSize()) {
