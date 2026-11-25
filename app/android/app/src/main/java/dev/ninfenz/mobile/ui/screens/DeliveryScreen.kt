@@ -13,6 +13,8 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -190,6 +192,7 @@ private fun parseTemplateSlots(markdown: String): Map<String, String> {
 }
 
 @Composable
+@OptIn(ExperimentalLayoutApi::class)
 fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpenPacks: () -> Unit = onBack, onPatch: () -> Unit = {}, onStatusChanged: () -> Unit = {}) {
     val context = LocalContext.current
     val audit = dev.ninfenz.mobile.data.FeatureGate.auditEnabled()
@@ -971,7 +974,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                     }
                 }
                 NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.delivery_assemble_validate))
-                Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+                FlowRow(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
                     Button(
                         enabled = !busy && rawPlan != null && missingRequired.isEmpty() && oversizedSlots.isEmpty() && constraintViolations.isEmpty(),
                         modifier = Modifier.bringIntoViewRequester(assembleRequester),
@@ -1369,7 +1372,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                     Text(files.joinToString(" · ") { it.name }, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page))
                 }
                 exportBatchNote?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
-                Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+                FlowRow(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
                     ExportButton("md", "text/markdown", exportMarkdown, project, context, scope, { busy = it }, { error = it }, busy) { file, manifest, report ->
                         exportedFile = file
                         manifestText = manifest
@@ -1415,7 +1418,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                     }
                 }
                 Text(stringResource(dev.ninfenz.mobile.R.string.delivery_export_group_data), style = NfType.label, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(start = NfSpacing.page, end = NfSpacing.page, top = NfSpacing.s))
-                Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+                FlowRow(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
                     ExportButton("json", "application/json", exportMarkdown, project, context, scope, { busy = it }, { error = it }, busy) { file, manifest, report ->
                         exportedFile = file
                         manifestText = manifest
@@ -1440,7 +1443,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                     }
                 }
                 Text(stringResource(dev.ninfenz.mobile.R.string.delivery_export_group_reading), style = NfType.label, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(start = NfSpacing.page, end = NfSpacing.page, top = NfSpacing.s))
-                Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+                FlowRow(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
                     EpubExportButton(exportMarkdown, project, epubAuthor, epubLanguage, context, scope, { busy = it }, { error = it }, busy) { file, report ->
                         exportedFile = file
                         manifestText = null
@@ -1482,7 +1485,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         recordExport("html", file, null)
                     }
                 }
-                Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+                FlowRow(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
                     if (audit) PreservationExportButton(exportMarkdown, project, context, scope, { busy = it }, { error = it }, busy, grant) { file, report ->
                         exportedFile = file
                         manifestText = null
@@ -1510,7 +1513,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         recordExport("nf-doc", file, null)
                     }
                 }
-                Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+                FlowRow(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
                     OutlinedButton(
                         enabled = markdown != null && !busy,
                         onClick = {
@@ -1550,7 +1553,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         style = NfType.meta
                     )
                 }
-                Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+                FlowRow(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
                     TextButton(enabled = docxStyles != null, onClick = { showSaveExportProfile = true }) {
                         Text(stringResource(dev.ninfenz.mobile.R.string.export_profile_save))
                     }
@@ -1558,7 +1561,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         Text(stringResource(dev.ninfenz.mobile.R.string.export_profiles))
                     }
                 }
-                Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+                FlowRow(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
                     OutlinedTextField(
                         value = epubAuthor,
                         onValueChange = { epubAuthor = it },
