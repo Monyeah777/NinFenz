@@ -14,8 +14,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.OutlinedTextField
@@ -156,6 +158,13 @@ fun SearchScreen(
                 },
             placeholder = { Text(stringResource(dev.ninfenz.mobile.R.string.search_placeholder_short)) },
             leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
+            trailingIcon = {
+                if (query.isNotEmpty()) {
+                    IconButton(onClick = { query = "" }) {
+                        Icon(Icons.Filled.Close, contentDescription = stringResource(dev.ninfenz.mobile.R.string.search_clear))
+                    }
+                }
+            },
             singleLine = true
         )
         if (query.isNotBlank() && results.isNotEmpty()) {
