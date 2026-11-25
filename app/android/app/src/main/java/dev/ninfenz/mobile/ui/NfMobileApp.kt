@@ -720,7 +720,7 @@ is Detail.Inbox -> InboxScreen(
                         refreshing = refreshing,
                         onRefresh = { refresh() }
                     )
-                    is Detail.PackUpdate -> PackUpdateScreen(store = library, onBack = { shell = shell.back() ?: shell })
+                    is Detail.PackUpdate -> PackUpdateScreen(store = library, onBack = { shell = shell.back() ?: shell }, onOpenProject = { id -> shell = shell.open(Detail.Project(id)) })
                     is Detail.Ccos -> CcosScreen(onBack = { shell = shell.back() ?: shell })
                     is Detail.NfDocMerge -> NfDocMergeScreen(context.filesDir, onBack = { shell = shell.back() ?: shell })
                     is Detail.Patch -> PatchScreen(context.filesDir, detail.projectId, onBack = { shell = shell.back() ?: shell })

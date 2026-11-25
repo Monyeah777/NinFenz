@@ -62,7 +62,7 @@ import java.io.File
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit) {
+fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit, onOpenProject: (String) -> Unit = {}) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var update by remember { mutableStateOf<PackUpdate?>(null) }
@@ -203,6 +203,20 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit) {
                 KeyValue("changes", "added " + u.added.size + " · removed " + u.removed.size + " · modified " + u.modified.size)
                 KeyValue("breaking", if (u.breaking) stringResource(dev.ninfenz.mobile.R.string.packupdate_breaking_yes) else stringResource(dev.ninfenz.mobile.R.string.packupdate_breaking_no))
                 KeyValue(stringResource(dev.ninfenz.mobile.R.string.pack_update_affected_projects), if (u.affectedProjects.isEmpty()) stringResource(dev.ninfenz.mobile.R.string.packupdate_none) else u.affectedProjects.joinToString(","))
+                if (u.breaking && u.affectedProjects.isNotEmpty()) {
+                    Notice(stringResource(dev.ninfenz.mobile.R.string.packupdate_affected_warning, u.affectedProjects.size), Tone.WARN)
+                }
+                if (u.affectedProjects.isNotEmpty()) {
+                    FlowRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        for (projectId in u.affectedProjects) {
+                            OutlinedButton(onClick = { onOpenProject(projectId) }) { Text(projectId) }
+                        }
+                    }
+                }
                 KeyValue(stringResource(dev.ninfenz.mobile.R.string.pack_update_overlay_keys), if (u.overlayKeys.isEmpty()) stringResource(dev.ninfenz.mobile.R.string.packupdate_none) else u.overlayKeys.joinToString(","))
                 for (note in u.notes) Notice(note, Tone.WARN)
             }

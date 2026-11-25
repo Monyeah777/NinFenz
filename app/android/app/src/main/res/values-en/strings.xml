@@ -1313,4 +1313,5 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="delivery_trash_body">The file moves to exports/trash and can be restored from Trash; the record alone is not permanently deleted.</string>
     <string name="delivery_trash_confirm">Move to trash</string>
     <string name="search_filter_all_projects">All projects</string>
+    <string name="packupdate_affected_warning">Breaking change affects %1$d projects; open them before applying.</string>
 </resources>
