@@ -1097,6 +1097,21 @@ fun ProjectDetailScreen(
                             Text("Pack", style = NfType.meta, modifier = Modifier.width(72.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
                             Text(project.refs.basePackId + " · " + project.refs.basePackVersion, style = NfType.meta)
                         }
+                        val otherVersions = packs.filter {
+                            it.id == project.refs.basePackId && it.version != project.refs.basePackVersion
+                        }.map { it.version }.distinct().sorted()
+                        Text(
+                            stringResource(dev.ninfenz.mobile.R.string.project_change_pack_note),
+                            style = NfType.meta,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        if (otherVersions.isNotEmpty()) {
+                            Text(
+                                stringResource(dev.ninfenz.mobile.R.string.project_pack_other_versions, otherVersions.joinToString(", ")),
+                                style = NfType.meta,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
                         Row {
                             Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_protocol_label), style = NfType.meta, modifier = Modifier.width(72.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
                             Text(project.refs.protocolId.ifBlank { stringResource(dev.ninfenz.mobile.R.string.not_bound) }, style = NfType.meta)
