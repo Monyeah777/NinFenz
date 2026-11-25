@@ -1,0 +1,18 @@
+{
+  "schema": "nf-budget/1",
+  "name": "x",
+  "limits": {
+    "seconds": 1,
+    "peak_mb": 1,
+    "pages": 1,
+    "blocks": 1
+  },
+  "observed": {
+    "seconds": 1,
+    "peak_mb": 1,
+    "pages": 1,
+    "blocks": 1
+  },
+  "ok": true,
+  "policy": "ignore"
+}

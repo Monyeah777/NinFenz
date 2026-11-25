@@ -1,0 +1,12 @@
+{
+  "node": "C8-07",
+  "name": "自适应",
+  "state": "implemented",
+  "owner": "kotlin-ui",
+  "hard_ids": [],
+  "evidence": [
+    "app tests + Android unit tests"
+  ],
+  "acceptance": "baseline regression",
+  "validation": "Android 558/558 + Python 203 passed"
+}

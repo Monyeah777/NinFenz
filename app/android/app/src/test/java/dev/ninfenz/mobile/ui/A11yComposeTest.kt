@@ -1,6 +1,9 @@
 package dev.ninfenz.mobile.ui
 
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.test.assertHeightIsAtLeast
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
@@ -15,7 +18,9 @@ import dev.ninfenz.mobile.ui.components.Notice
 import dev.ninfenz.mobile.ui.components.Tone
 import dev.ninfenz.mobile.ui.components.NfScaffold
 import dev.ninfenz.mobile.ui.components.NfTopAppBar
+import dev.ninfenz.mobile.ui.screens.InboxScreen
 import dev.ninfenz.mobile.ui.screens.LibraryHomeScreen
+import dev.ninfenz.mobile.ui.screens.PackBuilderScreen
 import dev.ninfenz.mobile.ui.screens.OnboardingScreen
 import dev.ninfenz.mobile.ui.theme.NfTheme
 import org.junit.Rule
@@ -49,6 +54,28 @@ class A11yComposeTest {
     }
 
     @Test
+    fun inboxEmptyStateIsReadable() {
+        compose.setContent { NfTheme { InboxScreen(onBack = {}, onImport = {}) } }
+        compose.onNodeWithText("还没有分享内容").assertIsDisplayed()
+    }
+
+    @Test
+    fun inboxRtlRenders() {
+        compose.setContent {
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                NfTheme { InboxScreen(onBack = {}, onImport = {}) }
+            }
+        }
+        compose.onNodeWithText("还没有分享内容").assertIsDisplayed()
+    }
+
+    @Test
+    fun packBuilderMissingDraftIsReadable() {
+        compose.setContent { NfTheme { PackBuilderScreen("missing", onBack = {}, onInstalled = {}) } }
+        compose.onNodeWithText("Pack draft not found").assertIsDisplayed()
+    }
+
+    @Test
     fun scaffoldTitleIsHeading() {
         compose.setContent { NfTheme { NfScaffold(title = "标题", onBack = {}) { } } }
         compose.onNodeWithText("标题").assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.Heading))
@@ -59,6 +86,19 @@ class A11yComposeTest {
         compose.setContent { NfTheme { NfScaffold(title = "标题", onBack = {}) { } } }
         compose.onNode(
             SemanticsMatcher.expectValue(SemanticsProperties.PaneTitle, "标题"),
+            useUnmergedTree = true
+        ).assertExists()
+    }
+
+    @Test
+    fun scaffoldHasStableTraversalIndex() {
+        compose.setContent { NfTheme { NfScaffold(title = "标题", onBack = {}) { } } }
+        compose.onNode(
+            SemanticsMatcher.expectValue(SemanticsProperties.TraversalIndex, 0f),
+            useUnmergedTree = true
+        ).assertExists()
+        compose.onNode(
+            SemanticsMatcher.expectValue(SemanticsProperties.TraversalIndex, 1f),
             useUnmergedTree = true
         ).assertExists()
     }

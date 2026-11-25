@@ -1,0 +1,9 @@
+{
+  "schema": "nf-preset/1",
+  "id": "x",
+  "name": "X",
+  "version": 1,
+  "settings": {
+    "theme": "BLUE"
+  }
+}

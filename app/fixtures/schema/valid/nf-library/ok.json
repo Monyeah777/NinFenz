@@ -1,0 +1,20 @@
+{
+  "schema": "nf-library/1",
+  "tags": [
+    {
+      "id": "t1",
+      "name": "客户"
+    }
+  ],
+  "views": [
+    {
+      "id": "v1",
+      "name": "草稿",
+      "query": "status:draft"
+    }
+  ],
+  "favorites": [
+    "p1"
+  ],
+  "updated_at": 1
+}

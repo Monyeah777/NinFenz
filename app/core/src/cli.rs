@@ -56,6 +56,13 @@ pub fn help_text() -> &'static str {
      ops: canonical pack-hash pack-verify import-sniff import map-suggest\n\
           protocol-validate protocol-render graph-validate graph-compile\n\
           spec-validate assemble validate export pack-diff pack-merge\n\
+          pack-update pack-release-create pack-release-verify pack-release-freeze\n\
           overlay-apply ccos-build-task ccos-import-result project-validate\n\
+          layout-import sdir-import sdir-validate sdir-diff sdir-merge sdir-repair\n\
+          build-plan build-run build-incremental block-plan block-incremental\n\
+          graph-typecheck schema-induce sdir-fuse template-induce template-migrate compose-run\n\
+          evidence-create evidence-verify evidence-pack evidence-verify-package evidence-freeze evidence-keygen\n\
+          plan-solve plan-explain reuse-index reuse-impact\n\
+          export-profile export-accessible\n\
      契约：app/docs/CLI.md；请求/响应见 §3；退出码 0/1/2/3/4。\n"
 }

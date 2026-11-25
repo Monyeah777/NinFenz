@@ -1,0 +1,11 @@
+{
+  "node": "C9-05",
+  "name": "数据可携带/退出",
+  "state": "implemented",
+  "ops": "portable-export/import/exit",
+  "tests": "test_portable_zip_roundtrip",
+  "validation": "Android 558/558 + Python 203 passed",
+  "evidence": [
+    "android-tests.txt"
+  ]
+}

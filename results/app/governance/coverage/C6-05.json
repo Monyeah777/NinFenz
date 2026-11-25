@@ -1,0 +1,12 @@
+{
+  "node": "C6-05",
+  "name": "分享/打开/复制",
+  "state": "implemented",
+  "owner": "kotlin-ui",
+  "hard_ids": [],
+  "evidence": [
+    "app tests + Android unit tests"
+  ],
+  "acceptance": "baseline regression",
+  "validation": "Android 558/558 + Python 203 passed"
+}

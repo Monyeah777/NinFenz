@@ -19,7 +19,7 @@
 | conftest.py | 路径/子进程 CLI 工具/错误码/核心探活；core_in_tmp 把核心复制到临时目录（ENV-01 沙箱外写限制）并设 NF_APP_CORE |
 | helpers.py | sample-pack 工作区、项目/overlay/ccos-result 夹具（不实现校验语义） |
 | oracle.py | 独立重写 canonical / tree / 拓扑序 / verdict（不 import nf_app） |
-| test_schema_valid.py | fixtures/schema/valid/<schema>/*.json 通过对应 schema（16 个 schema：A0 13 + 首闭环 3，各 ≥1） |
+| test_schema_valid.py | fixtures/schema/valid/<schema>/*.json 通过对应 schema（22 个 schema：A0 13 + 首闭环 3 + 硬技术 4，各 ≥1） |
 | test_schema_negative.py | invalid 夹具被拒 + 与 invalid/EXPECTED.json 映射一致（每个 schema ≥2 反例、码已登记） |
 | test_security_negative.py | zip slip / zip bomb / symlink / 嵌套 / YAML alias bomb / JSON 深度 / 路径穿越 / 分享脱敏（tmp_path 真实构造 zip） |
 | test_oracle_parity.py | 本地层：oracle vs nf_app 实现 vs 入仓 manifest；对账层：canonical / pack tree / 拓扑序 / plan steps / verdict 与核心逐项对账 |

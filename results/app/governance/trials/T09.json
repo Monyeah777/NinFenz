@@ -1,0 +1,25 @@
+{
+  "trial": "T09",
+  "ok": true,
+  "n": 100,
+  "groups": 10,
+  "recall": 1.0,
+  "propagated_projects": 10,
+  "stale_blocks": 0,
+  "failure_isolated": true,
+  "compose_valid": 12,
+  "compose_failed_recovered": true,
+  "compose_dirs_isolated": true,
+  "compose_recoverable": true,
+  "template_f1": 1.0,
+  "template_migration": true,
+  "criteria": {
+    "recall": ">=90%",
+    "propagation": "100%",
+    "stale": 0,
+    "isolation": true,
+    "compose": true,
+    "template_f1": ">=0.85",
+    "migration": true
+  }
+}

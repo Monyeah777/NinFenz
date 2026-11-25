@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/app/schema/nf-audit.schema.json",
+  "title": "NF 审计/溯源日志",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "records", "head"],
+  "properties": {
+    "schema": {"const": "nf-audit/1"},
+    "records": {"type": "array", "items": {"$ref": "#/$defs/record"}},
+    "head": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "$defs": {
+    "record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["seq", "at", "actor", "action", "subject_sha256", "prev_hash", "hash"],
+      "properties": {
+        "seq": {"type": "integer", "minimum": 0},
+        "at": {"type": "string", "minLength": 1},
+        "actor": {"type": "string", "minLength": 1},
+        "action": {"type": "string", "minLength": 1},
+        "subject_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "prev_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "reason": {"type": "string"},
+        "before": {"type": ["object", "array", "string", "number", "boolean", "null"]},
+        "after": {"type": ["object", "array", "string", "number", "boolean", "null"]},
+        "undoable": {"type": "boolean"}
+      }
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "benchmark": "H1.1",
+  "ok": true,
+  "docs": 30,
+  "pages": 150,
+  "reading_order": 1.0,
+  "table_precision": 1.0,
+  "table_recall": 1.0,
+  "table_f1": 1.0,
+  "footnote_recall": 1.0,
+  "seconds": 8.15,
+  "oom": 0,
+  "criteria": {
+    "order": ">=98%",
+    "table_f1": ">=95%",
+    "footnote": ">=95%",
+    "seconds": "<60",
+    "oom": 0
+  }
+}

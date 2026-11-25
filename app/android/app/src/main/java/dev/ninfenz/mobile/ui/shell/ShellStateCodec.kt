@@ -7,10 +7,12 @@ object ShellStateCodec {
         val type = when (d) {
             null -> "none"
             Detail.Import -> "Import"
+            Detail.Inbox -> "Inbox"
             Detail.Search -> "Search"
             Detail.NewProject -> "NewProject"
             Detail.Settings -> "Settings"
             Detail.DesignSystem -> "DesignSystem"
+            Detail.DecisionLog -> "DecisionLog"
             Detail.ErrorCodes -> "ErrorCodes"
             Detail.Protocol -> "Protocol"
             Detail.Graph -> "Graph"
@@ -23,6 +25,8 @@ object ShellStateCodec {
             is Detail.Project -> "Project"
             is Detail.Author -> "Author"
             is Detail.Delivery -> "Delivery"
+            is Detail.Review -> "Review"
+            is Detail.PackBuilder -> "PackBuilder"
             is Detail.Flow -> "Flow"
             is Detail.Pack -> "Pack"
         }
@@ -30,6 +34,8 @@ object ShellStateCodec {
             is Detail.Project -> d.id
             is Detail.Author -> d.id
             is Detail.Delivery -> d.id
+            is Detail.Review -> d.id
+            is Detail.PackBuilder -> d.id
             is Detail.Flow -> d.id
             is Detail.Pack -> d.id
             is Detail.Patch -> d.projectId ?: ""
@@ -48,10 +54,12 @@ object ShellStateCodec {
         } ?: TopDestination.LIBRARY
         val detail = when (values.getOrNull(1)) {
             "Import" -> Detail.Import
+            "Inbox" -> Detail.Inbox
             "Search" -> Detail.Search
             "NewProject" -> Detail.NewProject
             "Settings" -> Detail.Settings
             "DesignSystem" -> Detail.DesignSystem
+            "DecisionLog" -> Detail.DecisionLog
             "ErrorCodes" -> Detail.ErrorCodes
             "Protocol" -> Detail.Protocol
             "Graph" -> Detail.Graph
@@ -64,6 +72,8 @@ object ShellStateCodec {
             "Project" -> values.getOrNull(2)?.takeIf { it.isNotBlank() }?.let { Detail.Project(it) }
             "Author" -> values.getOrNull(2)?.takeIf { it.isNotBlank() }?.let { Detail.Author(it) }
             "Delivery" -> values.getOrNull(2)?.takeIf { it.isNotBlank() }?.let { Detail.Delivery(it) }
+            "Review" -> values.getOrNull(2)?.takeIf { it.isNotBlank() }?.let { Detail.Review(it) }
+            "PackBuilder" -> values.getOrNull(2)?.takeIf { it.isNotBlank() }?.let { Detail.PackBuilder(it) }
             "Flow" -> values.getOrNull(2)?.takeIf { it.isNotBlank() }?.let { Detail.Flow(it) }
             "Pack" -> {
                 val id = values.getOrNull(2)?.takeIf { it.isNotBlank() }

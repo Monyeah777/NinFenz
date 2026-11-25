@@ -1,0 +1,22 @@
+{
+  "trial": "T01",
+  "ok": true,
+  "pages": 500,
+  "elapsed_seconds": 2.23,
+  "page_cover": true,
+  "reading_order": 1.0,
+  "table_f1": 1.0,
+  "footnote_recall": 1.0,
+  "epubcheck_errors": 0,
+  "openxml_valid": true,
+  "pdfua_pass": true,
+  "oom": 0,
+  "criteria": {
+    "pages": 500,
+    "order": ">=98%",
+    "table_f1": ">=95%",
+    "footnote": ">=95%",
+    "seconds": "<60",
+    "validators": 0
+  }
+}

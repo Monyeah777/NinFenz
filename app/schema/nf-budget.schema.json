@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/app/schema/nf-budget.schema.json",
+  "title": "NF 性能与资源预算",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "name", "limits", "observed", "ok", "policy"],
+  "properties": {
+    "schema": {"const": "nf-budget/1"},
+    "name": {"type": "string", "minLength": 1},
+    "limits": {"$ref": "#/$defs/metrics"},
+    "observed": {"$ref": "#/$defs/metrics"},
+    "ok": {"type": "boolean"},
+    "policy": {"enum": ["fail", "warn"]},
+    "reason": {"type": "string"}
+  },
+  "$defs": {
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["seconds", "peak_mb", "pages", "blocks"],
+      "properties": {
+        "seconds": {"type": "number", "minimum": 0},
+        "peak_mb": {"type": "number", "minimum": 0},
+        "pages": {"type": "integer", "minimum": 0},
+        "blocks": {"type": "integer", "minimum": 0}
+      }
+    }
+  }
+}

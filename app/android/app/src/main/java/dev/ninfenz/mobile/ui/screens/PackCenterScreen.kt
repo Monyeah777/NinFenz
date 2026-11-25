@@ -75,17 +75,20 @@ fun PackCenterScreen(
     onOpenPack: (PackEntry) -> Unit,
     onUpdatePlan: () -> Unit,
     onLoadSample: () -> Unit,
+    onNewPackDraft: () -> Unit = {},
     refreshing: Boolean = false,
     onRefresh: () -> Unit = {}
 ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    val audit = dev.ninfenz.mobile.data.FeatureGate.auditEnabled()
     val trust = remember { PackTrustStore(context.filesDir).load() }
     var verifyingId by remember { mutableStateOf<String?>(null) }
     var results by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
     var errors by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
     var pendingUninstall by remember { mutableStateOf<PackEntry?>(null) }
     var uninstallErrors by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
+    var packQuery by remember { mutableStateOf("") }
 
     val zipPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         if (uri == null) return@rememberLauncherForActivityResult
@@ -131,18 +134,19 @@ fun PackCenterScreen(
             actions = {
                 val compact = LocalDensity.current.fontScale >= 1.4f
                 val installZip = { zipPicker.launch(arrayOf("application/zip", "application/octet-stream", "*/*")) }
+                if (audit) TextButton(onClick = onNewPackDraft) { Text("New Pack") }
                 if (compact) {
                     IconButton(onClick = installZip, modifier = Modifier.size(48.dp)) {
                         Icon(Icons.Filled.Add, contentDescription = stringResource(dev.ninfenz.mobile.R.string.packcenter_install_zip))
                     }
-                    IconButton(onClick = onUpdatePlan, modifier = Modifier.size(48.dp)) {
+                    if (audit) IconButton(onClick = onUpdatePlan, modifier = Modifier.size(48.dp)) {
                         Icon(Icons.Filled.Refresh, contentDescription = stringResource(dev.ninfenz.mobile.R.string.packcenter_update_plan))
                     }
                 } else {
                     TextButton(onClick = installZip) {
                         Text(stringResource(dev.ninfenz.mobile.R.string.packcenter_install_zip))
                     }
-                    TextButton(onClick = onUpdatePlan) { Text(stringResource(dev.ninfenz.mobile.R.string.packcenter_update_plan)) }
+                    if (audit) TextButton(onClick = onUpdatePlan) { Text(stringResource(dev.ninfenz.mobile.R.string.packcenter_update_plan)) }
                 }
             }
         )
@@ -161,8 +165,18 @@ fun PackCenterScreen(
                 verticalArrangement = Arrangement.spacedBy(NfSpacing.m)
             ) {
                 item { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.packcenter_installed_count, packs.size)) }
-                items(packs.size) { index ->
-                    val pack = packs[index]
+                item {
+                    androidx.compose.material3.OutlinedTextField(
+                        value = packQuery,
+                        onValueChange = { packQuery = it },
+                        label = { Text(stringResource(dev.ninfenz.mobile.R.string.pack_search)) },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                val filteredPacks = packs.filter { packQuery.isBlank() || it.title.contains(packQuery, true) || it.id.contains(packQuery, true) }
+                items(filteredPacks.size) { index ->
+                    val pack = filteredPacks[index]
                     NfCard(modifier = Modifier.fillMaxWidth()) {
                         Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -183,7 +197,7 @@ fun PackCenterScreen(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             val pinned = trust[pack.id + "@" + pack.version]?.tree
-                            if (pinned != null && pinned != pack.tree) {
+                            if (audit && pinned != null && pinned != pack.tree) {
                                 Text(
                                     stringResource(dev.ninfenz.mobile.R.string.packcenter_trust_mismatch),
                                     style = NfType.meta,
@@ -191,7 +205,7 @@ fun PackCenterScreen(
                                 )
                             }
                             Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                                OutlinedButton(
+                                if (audit) OutlinedButton(
                                     enabled = verifyingId == null,
                                     onClick = {
                                         verifyingId = pack.id

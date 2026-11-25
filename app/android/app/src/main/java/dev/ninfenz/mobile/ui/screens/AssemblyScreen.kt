@@ -7,10 +7,14 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -65,6 +69,13 @@ fun AssemblyScreen(onBack: () -> Unit) {
     var busy by remember { mutableStateOf(false) }
     var assembleRepro by remember { mutableStateOf<String?>(null) }
     var validateRepro by remember { mutableStateOf<String?>(null) }
+    var extraSlots by remember { mutableStateOf<List<String>>(emptyList()) }
+    var newSlot by remember { mutableStateOf("") }
+    var showBrowse by remember { mutableStateOf(false) }
+    val reqInput = remember { BringIntoViewRequester() }
+    val reqSlots = remember { BringIntoViewRequester() }
+    val reqAssemble = remember { BringIntoViewRequester() }
+    val reqExport = remember { BringIntoViewRequester() }
 
     val planPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         if (uri == null) return@rememberLauncherForActivityResult
@@ -107,13 +118,48 @@ fun AssemblyScreen(onBack: () -> Unit) {
     }
 
     NfScaffold(title = stringResource(dev.ninfenz.mobile.R.string.assembly_title), onBack = onBack) {
-        CardBox(title = stringResource(dev.ninfenz.mobile.R.string.assembly_input)) {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+            val steps = listOf(
+                stringResource(dev.ninfenz.mobile.R.string.assembly_input),
+                stringResource(dev.ninfenz.mobile.R.string.assembly_slots),
+                stringResource(dev.ninfenz.mobile.R.string.assembly_assemble),
+                stringResource(dev.ninfenz.mobile.R.string.assembly_export)
+            )
+            val reqs = listOf(reqInput, reqSlots, reqAssemble, reqExport)
+            steps.forEachIndexed { i, label ->
+                TextButton(onClick = { scope.launch { reqs[i].bringIntoView() } }) {
+                    Text((i + 1).toString() + " · " + label, style = MaterialTheme.typography.labelMedium)
+                }
+            }
+        }
+        if (showBrowse) {
+            AlertDialog(
+                onDismissRequest = { showBrowse = false },
+                title = { Text(stringResource(dev.ninfenz.mobile.R.string.assembly_browse)) },
+                text = {
+                    androidx.compose.foundation.layout.Column(
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text("plan: " + (plan?.pipelineId ?: "-") + " · " + (plan?.steps?.size ?: 0) + " steps", style = MaterialTheme.typography.labelMedium)
+                        plan?.steps?.forEach { s -> Text("• " + s.id + " · " + s.node + " · " + s.module, style = MaterialTheme.typography.bodySmall) }
+                        Text("spec: " + (spec?.id ?: "-") + " · " + (spec?.sections?.size ?: 0) + " sections", style = MaterialTheme.typography.labelMedium)
+                        spec?.sections?.forEach { s -> Text("• " + s.title + " · " + s.slots.size + " slots", style = MaterialTheme.typography.bodySmall) }
+                        Text("slots: " + (plan?.slots?.size ?: 0) + " + temp " + extraSlots.size, style = MaterialTheme.typography.labelMedium)
+                    }
+                },
+                confirmButton = { TextButton(onClick = { showBrowse = false }) { Text(stringResource(android.R.string.ok)) } }
+            )
+        }
+        CardBox(title = stringResource(dev.ninfenz.mobile.R.string.assembly_input), modifier = Modifier.bringIntoViewRequester(reqInput)) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedButton(onClick = { planPicker.launch(arrayOf("application/json", "text/plain")) }) { Text(stringResource(dev.ninfenz.mobile.R.string.assembly_open_plan)) }
                 OutlinedButton(onClick = { specPicker.launch(arrayOf("application/json", "text/plain")) }) { Text(stringResource(dev.ninfenz.mobile.R.string.assembly_open_spec)) }
             }
             KeyValue("plan", plan?.let { it.pipelineId + " · steps " + it.steps.size + " · slots " + it.slots.size } ?: context.getString(dev.ninfenz.mobile.R.string.assembly_not_loaded))
             KeyValue("spec", spec?.let { it.id + " · sections " + it.sections.size + " · slots " + it.slots.size } ?: context.getString(dev.ninfenz.mobile.R.string.assembly_not_loaded))
+            TextButton(onClick = { showBrowse = true }, enabled = plan != null || spec != null) {
+                Text(stringResource(dev.ninfenz.mobile.R.string.assembly_browse))
+            }
             spec?.let { s ->
                 val issues = SpecModel.formIssues(s)
                 if (issues.isEmpty()) Notice(context.getString(dev.ninfenz.mobile.R.string.assembly_spec_local_ok), Tone.INFO)
@@ -133,19 +179,46 @@ fun AssemblyScreen(onBack: () -> Unit) {
         if (p == null || s == null) {
             EmptyState(stringResource(dev.ninfenz.mobile.R.string.assembly_need_plan))
         } else {
-            CardBox(title = stringResource(dev.ninfenz.mobile.R.string.assembly_slots)) {
-                if (p.slots.isEmpty()) EmptyState(stringResource(dev.ninfenz.mobile.R.string.assembly_no_slots))
-                for (slot in p.slots) {
+            CardBox(title = stringResource(dev.ninfenz.mobile.R.string.assembly_slots), modifier = Modifier.bringIntoViewRequester(reqSlots)) {
+                val allSlots = p.slots + extraSlots
+                if (allSlots.isEmpty()) EmptyState(stringResource(dev.ninfenz.mobile.R.string.assembly_no_slots))
+                for (slot in allSlots) {
+                    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                        FormTextField(
+                            label = slot,
+                            value = inputs[slot] ?: "",
+                            onValueChange = { v -> inputs = inputs + (slot to v) },
+                            singleLine = false,
+                            modifier = Modifier.weight(1f)
+                        )
+                        if (slot in extraSlots) {
+                            TextButton(onClick = {
+                                extraSlots = extraSlots - slot
+                                inputs = inputs - slot
+                            }) { Text(stringResource(dev.ninfenz.mobile.R.string.assembly_remove_slot)) }
+                        }
+                    }
+                }
+                Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
                     FormTextField(
-                        label = slot,
-                        value = inputs[slot] ?: "",
-                        onValueChange = { v -> inputs = inputs + (slot to v) },
-                        singleLine = false
+                        label = stringResource(dev.ninfenz.mobile.R.string.assembly_new_slot),
+                        value = newSlot,
+                        onValueChange = { newSlot = it },
+                        singleLine = true,
+                        modifier = Modifier.weight(1f)
                     )
+                    OutlinedButton(onClick = {
+                        val name = newSlot.trim()
+                        if (name.isNotEmpty() && name !in allSlots) {
+                            extraSlots = extraSlots + name
+                            inputs = inputs + (name to "")
+                            newSlot = ""
+                        }
+                    }) { Text(stringResource(dev.ninfenz.mobile.R.string.assembly_add_slot)) }
                 }
             }
 
-            CardBox(title = stringResource(dev.ninfenz.mobile.R.string.assembly_assemble)) {
+            CardBox(title = stringResource(dev.ninfenz.mobile.R.string.assembly_assemble), modifier = Modifier.bringIntoViewRequester(reqAssemble)) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Button(enabled = !busy, onClick = {
                         val rawP = rawPlan ?: return@Button
@@ -243,7 +316,7 @@ fun AssemblyScreen(onBack: () -> Unit) {
                 validateRepro?.let { MonoText(it) }
             }
 
-            CardBox(title = stringResource(dev.ninfenz.mobile.R.string.assembly_export)) {
+            CardBox(title = stringResource(dev.ninfenz.mobile.R.string.assembly_export), modifier = Modifier.bringIntoViewRequester(reqExport)) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Button(enabled = !busy && markdown != null, onClick = {
                         val md = markdown ?: return@Button

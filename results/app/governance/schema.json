@@ -1,0 +1,349 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/schema/nf-hardtech-governance/1",
+  "title": "NF Hard-Tech Governance Registry",
+  "type": "object",
+  "required": [
+    "schema",
+    "generated_at",
+    "mode",
+    "coverage",
+    "hard_capabilities",
+    "trials",
+    "summary"
+  ],
+  "properties": {
+    "schema": {
+      "const": "nf-hardtech-governance/1"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date"
+    },
+    "mode": {
+      "const": "hardtech"
+    },
+    "coverage": {
+      "type": "object",
+      "required": [
+        "baseline_nodes",
+        "gap_nodes",
+        "open_nodes",
+        "total_nodes",
+        "baseline_ids",
+        "new_ids",
+        "nodes"
+      ],
+      "properties": {
+        "baseline_nodes": {
+          "const": 92
+        },
+        "gap_nodes": {
+          "const": 12
+        },
+        "open_nodes": {
+          "const": 8
+        },
+        "total_nodes": {
+          "const": 112
+        },
+        "baseline_ids": {
+          "type": "array",
+          "minItems": 92,
+          "maxItems": 92,
+          "items": {
+            "type": "string"
+          }
+        },
+        "new_ids": {
+          "type": "array",
+          "minItems": 20,
+          "maxItems": 20,
+          "items": {
+            "type": "string"
+          }
+        },
+        "nodes": {
+          "type": "array",
+          "minItems": 112,
+          "maxItems": 112,
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "layer",
+              "name",
+              "source",
+              "current_state",
+              "priority",
+              "hard_ids",
+              "owner",
+              "next"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^C[0-9]-[0-9]{2}$"
+              },
+              "layer": {
+                "type": "string",
+                "pattern": "^C[0-9]$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "source": {
+                "enum": [
+                  "baseline",
+                  "gap",
+                  "open"
+                ]
+              },
+              "current_state": {
+                "enum": [
+                  "absent",
+                  "partial",
+                  "conformant",
+                  "benchmarked",
+                  "leading"
+                ]
+              },
+              "priority": {
+                "enum": [
+                  "P0",
+                  "P1",
+                  "P2",
+                  "P3"
+                ]
+              },
+              "hard_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^H[1-6]\\.[1-4]$"
+                }
+              },
+              "owner": {
+                "type": "string",
+                "minLength": 1
+              },
+              "next": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "hard_capabilities": {
+      "type": "array",
+      "minItems": 24,
+      "maxItems": 24,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "layer",
+          "name",
+          "hardness",
+          "moat",
+          "current_stage",
+          "target_stage",
+          "benchmark",
+          "threshold",
+          "corpus",
+          "node_ids",
+          "trial_ids",
+          "risks",
+          "next"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^H[1-6]\\.[1-4]$"
+          },
+          "layer": {
+            "type": "string",
+            "pattern": "^H[1-6]$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "hardness": {
+            "enum": [
+              "H1",
+              "H2",
+              "H3"
+            ]
+          },
+          "moat": {
+            "type": "string",
+            "minLength": 20
+          },
+          "current_stage": {
+            "enum": [
+              "not-started",
+              "research",
+              "prototype",
+              "product",
+              "proven"
+            ]
+          },
+          "target_stage": {
+            "const": "proven"
+          },
+          "benchmark": {
+            "type": "string",
+            "minLength": 1
+          },
+          "threshold": {
+            "type": "string",
+            "minLength": 1
+          },
+          "corpus": {
+            "type": "string",
+            "minLength": 1
+          },
+          "node_ids": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "pattern": "^C[0-9]-[0-9]{2}$"
+            }
+          },
+          "trial_ids": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "pattern": "^T[0-9]{2}$"
+            }
+          },
+          "evidence": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "result_path",
+              "result_sha256",
+              "run_at",
+              "n"
+            ],
+            "properties": {
+              "kind": {
+                "enum": [
+                  "trial",
+                  "benchmark"
+                ]
+              },
+              "benchmark": {
+                "type": "string",
+                "minLength": 1
+              },
+              "trial_id": {
+                "type": "string",
+                "pattern": "^T[0-9]{2}$"
+              },
+              "result_path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "result_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "run_at": {
+                "type": "string",
+                "minLength": 1
+              },
+              "n": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "summary": {
+                "type": "string"
+              }
+            }
+          },
+          "risks": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          },
+          "next": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "trials": {
+      "type": "array",
+      "minItems": 10,
+      "maxItems": 10,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "hard_ids",
+          "pass_conditions",
+          "corpus",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^T[0-9]{2}$"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "hard_ids": {
+            "type": "array",
+            "minItems": 2,
+            "items": {
+              "type": "string",
+              "pattern": "^H[1-6]\\.[1-4]$"
+            }
+          },
+          "pass_conditions": {
+            "type": "string",
+            "minLength": 1
+          },
+          "corpus": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "enum": [
+              "planned",
+              "running",
+              "passed",
+              "failed"
+            ]
+          },
+          "result_path": {
+            "type": "string"
+          },
+          "result_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "run_at": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "summary": {
+      "type": "object"
+    }
+  }
+}

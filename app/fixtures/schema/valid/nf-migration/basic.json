@@ -1,0 +1,16 @@
+{
+  "schema": "nf-migration/1",
+  "from_schema": "nf-doc/1",
+  "to_schema": "nf-sdir/1",
+  "steps": [
+    {
+      "id": "s1",
+      "kind": "adapter",
+      "from": "nf-doc/1",
+      "to": "nf-sdir/1",
+      "reversible": false
+    }
+  ],
+  "losses": [],
+  "reversible": false
+}

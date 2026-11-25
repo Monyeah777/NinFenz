@@ -1,0 +1,12 @@
+{
+  "node": "C0-03",
+  "name": "本地数据与原子写",
+  "state": "implemented",
+  "owner": "core",
+  "hard_ids": [],
+  "evidence": [
+    "app tests + Android unit tests"
+  ],
+  "acceptance": "baseline regression",
+  "validation": "Android 558/558 + Python 203 passed"
+}

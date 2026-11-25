@@ -10,7 +10,7 @@ import kotlinx.serialization.json.put
 
 enum class ThemeMode { SYSTEM, LIGHT, DARK }
 
-enum class LanguageMode(val tag: String?) { SYSTEM(null), ZH("zh"), EN("en") }
+enum class LanguageMode(val tag: String?) { SYSTEM(null), ZH("zh"), EN("en"), PSEUDO("en-XA") }
 
 /** 本地设置（v0.02 先用 SharedPreferences；DataStore 迁移列入后续波次）。 */
 class AppPrefs(context: Context) {

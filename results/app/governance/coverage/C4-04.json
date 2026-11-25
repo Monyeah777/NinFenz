@@ -1,0 +1,12 @@
+{
+  "node": "C4-04",
+  "name": "约束面板",
+  "state": "implemented",
+  "owner": "core",
+  "hard_ids": [],
+  "evidence": [
+    "app tests + Android unit tests"
+  ],
+  "acceptance": "baseline regression",
+  "validation": "Android 558/558 + Python 203 passed"
+}

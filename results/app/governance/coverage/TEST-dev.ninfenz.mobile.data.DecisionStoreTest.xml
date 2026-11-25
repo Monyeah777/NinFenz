@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.ninfenz.mobile.data.DecisionStoreTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-11-25T04:30:43" hostname="流念" time="0.053">
+  <properties/>
+  <testcase name="appendReversePersist" classname="dev.ninfenz.mobile.data.DecisionStoreTest" time="0.051"/>
+  <testcase name="missingFileIsEmpty" classname="dev.ninfenz.mobile.data.DecisionStoreTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

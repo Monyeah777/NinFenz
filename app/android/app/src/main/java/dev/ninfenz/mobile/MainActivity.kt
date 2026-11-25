@@ -17,6 +17,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
 import dev.ninfenz.mobile.data.AppPrefs
 import dev.ninfenz.mobile.data.CrashLogStore
 import dev.ninfenz.mobile.data.RecentProjectShortcuts
@@ -123,6 +125,7 @@ class MainActivity : ComponentActivity() {
             CompositionLocalProvider(
                 LocalContext provides localizedContext,
                 LocalConfiguration provides localizedContext.resources.configuration,
+                LocalLayoutDirection provides if (languageMode == LanguageMode.PSEUDO) LayoutDirection.Rtl else LayoutDirection.Ltr,
                 LocalActivityResultRegistryOwner provides this@MainActivity
             ) {
                 NfTheme(darkTheme = dark, dynamicColor = dynamicColor) {

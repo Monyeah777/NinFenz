@@ -10,10 +10,12 @@ enum class TopDestination(val labelRes: Int) {
 
 sealed interface Detail {
     data object Import : Detail
+    data object Inbox : Detail
     data object Search : Detail
     data object NewProject : Detail
     data object Settings : Detail
     data object DesignSystem : Detail
+    data object DecisionLog : Detail
     data object ErrorCodes : Detail
     data object Protocol : Detail
     data object Graph : Detail
@@ -26,6 +28,8 @@ sealed interface Detail {
     data class Project(val id: String) : Detail
     data class Author(val id: String) : Detail
     data class Delivery(val id: String) : Detail
+    data class Review(val id: String) : Detail
+    data class PackBuilder(val id: String) : Detail
     data class Flow(val id: String) : Detail
     data class Pack(val id: String, val version: String) : Detail
 }

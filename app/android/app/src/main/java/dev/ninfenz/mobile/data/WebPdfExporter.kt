@@ -43,11 +43,9 @@ object WebPdfExporter {
         allowContentAccess = false
     )
 
-    fun pageCount(contentHeight: Int, width: Int): Int {
+    fun pageCount(contentHeight: Int, width: Int, pageWidth: Int = 595, pageHeight: Int = 842): Int {
         require(width > 0) { "width 必须为正" }
         if (contentHeight <= 0) return 1
-        val pageWidth = 595
-        val pageHeight = 842
         val scale = pageWidth.toFloat() / width
         val perPage = pageHeight / scale
         return ceil(contentHeight / perPage).toInt().coerceIn(1, 200)
@@ -57,7 +55,9 @@ object WebPdfExporter {
         context: Context,
         markdown: String,
         title: String,
-        outDir: File
+        outDir: File,
+        pageWidth: Int = 595,
+        pageHeight: Int = 842
     ): Created? = withContext(Dispatchers.Main) {
         var web: WebView? = null
         try {
@@ -95,11 +95,9 @@ object WebPdfExporter {
             view.layout(0, 0, width, height)
             if (isBlank(view, width, height)) return@withContext null
 
-            val pageWidth = 595
-            val pageHeight = 842
             val scale = pageWidth.toFloat() / width
             val perPage = pageHeight / scale
-            val pageCount = pageCount(height, width)
+            val pageCount = pageCount(height, width, pageWidth, pageHeight)
             outDir.mkdirs()
             val target = File(outDir, "result.pdf")
             val doc = PdfDocument()

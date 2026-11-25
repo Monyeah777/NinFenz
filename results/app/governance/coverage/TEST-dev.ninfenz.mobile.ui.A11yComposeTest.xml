@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.ninfenz.mobile.ui.A11yComposeTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-11-25T04:30:43" hostname="流念" time="5.218">
+  <properties/>
+  <testcase name="scaffoldHasStableTraversalIndex" classname="dev.ninfenz.mobile.ui.A11yComposeTest" time="4.115"/>
+  <testcase name="scaffoldTitleIsHeading" classname="dev.ninfenz.mobile.ui.A11yComposeTest" time="0.093"/>
+  <testcase name="scaffoldAnnouncesPaneTitle" classname="dev.ninfenz.mobile.ui.A11yComposeTest" time="0.077"/>
+  <testcase name="noticeIsPoliteLiveRegion" classname="dev.ninfenz.mobile.ui.A11yComposeTest" time="0.074"/>
+  <testcase name="overflowButtonHasDescriptionAndTarget" classname="dev.ninfenz.mobile.ui.A11yComposeTest" time="0.09"/>
+  <testcase name="topBarBackMeetsTarget" classname="dev.ninfenz.mobile.ui.A11yComposeTest" time="0.082"/>
+  <testcase name="libraryIconActionsHaveDescriptionsAndTargets" classname="dev.ninfenz.mobile.ui.A11yComposeTest" time="0.572"/>
+  <testcase name="onboardingActionsMeetTarget" classname="dev.ninfenz.mobile.ui.A11yComposeTest" time="0.113"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

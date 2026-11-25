@@ -668,6 +668,7 @@ private fun GraphAuthorContent(artifacts: AuthorArtifacts, project: Project, onS
             }) { Text(stringResource(dev.ninfenz.mobile.R.string.author_redo)) }
         }
 
+        if (dev.ninfenz.mobile.data.FeatureGate.auditEnabled()) {
         Button(
             enabled = !busy,
             modifier = Modifier.padding(horizontal = NfSpacing.page),
@@ -682,6 +683,7 @@ private fun GraphAuthorContent(artifacts: AuthorArtifacts, project: Project, onS
                 }
             }
         ) { Text(if (busy) stringResource(dev.ninfenz.mobile.R.string.author_validating) else stringResource(dev.ninfenz.mobile.R.string.author_validate_graph)) }
+        }
 
         Button(
             enabled = !busy,
@@ -796,6 +798,7 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
                 spec = next
             }) { Text(stringResource(dev.ninfenz.mobile.R.string.author_redo)) }
         }
+        if (dev.ninfenz.mobile.data.FeatureGate.auditEnabled()) {
         Button(
             enabled = !busy,
             modifier = Modifier.padding(horizontal = NfSpacing.page),
@@ -810,6 +813,7 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
                 }
             }
         ) { Text(if (busy) stringResource(dev.ninfenz.mobile.R.string.author_validating) else stringResource(dev.ninfenz.mobile.R.string.author_validate_spec)) }
+        }
         Button(
             enabled = !busy,
             modifier = Modifier.padding(horizontal = NfSpacing.page),

@@ -1,0 +1,31 @@
+{
+  "benchmark": "H5.3",
+  "ok": true,
+  "docs": 3,
+  "opens": 27,
+  "expected_opens": 27,
+  "text_checks": 12,
+  "missing_text": 0,
+  "apps": {
+    "docx": [
+      "LibreOffice",
+      "Calibre",
+      "ONLYOFFICE"
+    ],
+    "epub": [
+      "Calibre",
+      "ONLYOFFICE",
+      "SumatraPDF"
+    ],
+    "pdf": [
+      "LibreOffice(Draw)",
+      "Calibre",
+      "ONLYOFFICE"
+    ]
+  },
+  "criteria": {
+    "opens": "27/27",
+    "missing_text": 0,
+    "repair_prompts": 0
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "benchmark": "H4.4",
+  "ok": true,
+  "docs": 10,
+  "profiles": [
+    "default",
+    "accessible",
+    "print",
+    "mobile",
+    "large-print"
+  ],
+  "cases": 50,
+  "semantic_parity": 1.0,
+  "epubcheck_errors": 0,
+  "docx_structural_ok": 50,
+  "html_structural_ok": 50,
+  "epubcheck_jar": "D:\\tmp\\epubcheck\\epubcheck-5.1.0\\epubcheck.jar",
+  "criteria": {
+    "parity": ">=98%",
+    "epubcheck": 0,
+    "docx": "100%",
+    "html": "100%"
+  }
+}

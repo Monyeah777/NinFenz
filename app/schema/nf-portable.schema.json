@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/app/schema/nf-portable.schema.json",
+  "title": "NF 可携带退出包",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "created_at", "projects", "prefs", "packs", "trust", "audit", "manifest_sha256"],
+  "properties": {
+    "schema": {"const": "nf-portable/1"},
+    "created_at": {"type": "string", "minLength": 1},
+    "projects": {"type": "array", "items": {"$ref": "#/$defs/file"}},
+    "prefs": {"type": "object"},
+    "packs": {"type": "array", "items": {"$ref": "#/$defs/file"}},
+    "trust": {"type": ["object", "null"]},
+    "audit": {"type": ["object", "null"]},
+    "manifest_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "$defs": {
+    "file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "bytes"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "bytes": {"type": "integer", "minimum": 0}
+      }
+    }
+  }
+}

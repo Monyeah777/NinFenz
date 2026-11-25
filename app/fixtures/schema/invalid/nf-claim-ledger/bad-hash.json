@@ -1,0 +1,7 @@
+{
+  "schema": "nf-claim-ledger/1",
+  "ledger_id": "demo",
+  "created_at": "2026-01-01T00:00:00Z",
+  "claims": [],
+  "ledger_sha256": "bad"
+}

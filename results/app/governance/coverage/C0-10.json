@@ -1,0 +1,11 @@
+{
+  "node": "C0-10",
+  "name": "migration",
+  "state": "implemented",
+  "ops": "migrate-plan/apply",
+  "tests": "tests/test_coverage_wave1.py::test_migration_nf_doc_to_sdir",
+  "evidence": [
+    "tests/test_coverage_wave1.py"
+  ],
+  "validation": "Android 558/558 + Python 203 passed"
+}

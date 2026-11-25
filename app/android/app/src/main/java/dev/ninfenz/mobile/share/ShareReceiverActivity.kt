@@ -51,6 +51,7 @@ class ShareReceiverActivity : ComponentActivity() {
                         onConfirm = {
                             val current = payloadState
                             if (current != null && current.count > 0) {
+                                runCatching { InboxStore(filesDir).enqueue(this, current) }
                                 ShareHandoff.offer(current)
                                 startActivity(Intent(this, MainActivity::class.java).apply {
                                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)

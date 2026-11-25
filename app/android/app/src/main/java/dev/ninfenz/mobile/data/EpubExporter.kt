@@ -11,7 +11,7 @@ object EpubExporter {
     data class Chapter(val title: String, val body: String)
     data class Created(val file: File, val chapters: Int, val bytes: Long)
 
-    fun export(markdown: String, title: String, outDir: File): Created {
+    fun export(markdown: String, title: String, outDir: File, author: String = "", language: String = "zh"): Created {
         outDir.mkdirs()
         val target = File(outDir, "result.epub")
         val chapters = chapters(markdown)
@@ -26,7 +26,7 @@ object EpubExporter {
             out.write(mimetype)
             out.closeEntry()
             put(out, "META-INF/container.xml", container())
-            put(out, "OEBPS/content.opf", opf(title, id, files))
+            put(out, "OEBPS/content.opf", opf(title, id, files, author, language))
             put(out, "OEBPS/nav.xhtml", nav(title, chapters, files))
             put(out, "OEBPS/style.css", "body{font-family:serif;line-height:1.6;margin:1em}pre{white-space:pre-wrap}")
             chapters.forEachIndexed { i, c -> put(out, "OEBPS/" + files[i], chapterXhtml(c)) }
@@ -227,13 +227,15 @@ object EpubExporter {
     private fun esc(s: String): String = s
         .replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;")
 
-    private fun opf(title: String, id: String, files: List<String>): String {
+    private fun opf(title: String, id: String, files: List<String>, author: String, language: String): String {
         val sb = StringBuilder()
         sb.append("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n")
         sb.append("<package xmlns=\"http://www.idpf.org/2007/opf\" version=\"3.0\" unique-identifier=\"uid\">")
         sb.append("<metadata xmlns:dc=\"http://purl.org/dc/elements/1.1/\">")
         sb.append("<dc:identifier id=\"uid\">").append(esc(id)).append("</dc:identifier>")
-        sb.append("<dc:title>").append(esc(title)).append("</dc:title><dc:language>zh</dc:language>")
+        sb.append("<dc:title>").append(esc(title)).append("</dc:title><dc:language>")
+            .append(esc(language.ifBlank { "zh" })).append("</dc:language>")
+        if (author.isNotBlank()) sb.append("<dc:creator>").append(esc(author)).append("</dc:creator>")
         sb.append("<meta property=\"dcterms:modified\">1970-01-01T00:00:00Z</meta></metadata><manifest>")
         sb.append("<item id=\"nav\" href=\"nav.xhtml\" media-type=\"application/xhtml+xml\" properties=\"nav\"/>")
         sb.append("<item id=\"css\" href=\"style.css\" media-type=\"text/css\"/>")

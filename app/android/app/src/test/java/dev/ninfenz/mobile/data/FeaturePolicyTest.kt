@@ -22,6 +22,14 @@ class FeaturePolicyTest {
     }
 
     @Test
+    fun auditIsProOnly() {
+        for (feature in listOf("audit.validate", "audit.review", "audit.preservation", "audit.pdfua", "audit.ccos")) {
+            assertFalse(FeaturePolicy.allows(feature, FeaturePolicy.Tier.FREE))
+            assertTrue(FeaturePolicy.allows(feature, FeaturePolicy.Tier.PRO))
+        }
+    }
+
+    @Test
     fun ccosOnlyOnCcos() {
         assertFalse(FeaturePolicy.allows("ccos.task", FeaturePolicy.Tier.FREE))
         assertFalse(FeaturePolicy.allows("ccos.task", FeaturePolicy.Tier.PRO))

@@ -151,6 +151,7 @@ fun ImportScreen(
         if (shareQueue.isEmpty()) shareQueueStore.clear() else shareQueueStore.save(shareQueue, shareCursor)
     }
     var acceptedMappings by remember { mutableStateOf<Set<Int>>(emptySet()) }
+    var lowConfidenceOnly by remember { mutableStateOf(false) }
     var suggestNote by remember { mutableStateOf<String?>(null) }
     var zeroSliceNote by remember { mutableStateOf<String?>(null) }
     val zeroSliceStore = remember { ZeroSliceStore(context.filesDir) }
@@ -1308,12 +1309,21 @@ fun ImportScreen(
                     item {
                         Row(modifier = Modifier.fillMaxWidth().padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                             Text(stringResource(dev.ninfenz.mobile.R.string.import_accepted, acceptedMappings.size, current.mappings.size), style = NfType.meta)
-                            TextButton(onClick = {
-                                acceptedMappings = if (acceptedMappings.size == current.mappings.size) emptySet() else current.mappings.indices.toSet()
-                            }) { Text(if (acceptedMappings.size == current.mappings.size) stringResource(dev.ninfenz.mobile.R.string.import_accept_none) else stringResource(dev.ninfenz.mobile.R.string.import_accept_all)) }
+                            Row {
+                                TextButton(onClick = { lowConfidenceOnly = !lowConfidenceOnly }) {
+                                    Text(stringResource(if (lowConfidenceOnly) dev.ninfenz.mobile.R.string.import_show_all else dev.ninfenz.mobile.R.string.import_low_only))
+                                }
+                                TextButton(onClick = {
+                                    acceptedMappings = if (acceptedMappings.size == current.mappings.size) emptySet() else current.mappings.indices.toSet()
+                                }) { Text(if (acceptedMappings.size == current.mappings.size) stringResource(dev.ninfenz.mobile.R.string.import_accept_none) else stringResource(dev.ninfenz.mobile.R.string.import_accept_all)) }
+                            }
                         }
                     }
-                    items(current.mappings.size) { index ->
+                    val visibleMappings = current.mappings.indices.filter { index ->
+                        !lowConfidenceOnly || current.mappings[index].confidence < 80
+                    }
+                    items(visibleMappings.size) { at ->
+                        val index = visibleMappings[at]
                         val mapping = current.mappings[index]
                         Row(
                             modifier = Modifier.fillMaxWidth().padding(horizontal = NfSpacing.page, vertical = 4.dp),

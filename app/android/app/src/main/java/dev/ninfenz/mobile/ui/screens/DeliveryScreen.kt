@@ -24,6 +24,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
@@ -35,6 +36,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Switch
 import androidx.compose.material3.TextButton
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -75,7 +77,10 @@ import dev.ninfenz.mobile.core.CoreResponse
 import dev.ninfenz.mobile.core.J
 import dev.ninfenz.mobile.data.AuthorArtifacts
 import dev.ninfenz.mobile.data.AuthorArtifactsLoader
+import dev.ninfenz.mobile.data.AssemblyPresetStore
 import dev.ninfenz.mobile.data.DeliveryDraftStore
+import dev.ninfenz.mobile.data.DeliveryVersionStore
+import dev.ninfenz.mobile.data.ExportProfileStore
 import dev.ninfenz.mobile.data.DocxReferenceStyles
 import dev.ninfenz.mobile.data.EpubExporter
 import dev.ninfenz.mobile.data.FileAccess
@@ -83,6 +88,7 @@ import dev.ninfenz.mobile.data.EpubValidator
 import dev.ninfenz.mobile.data.HtmlExporter
 import dev.ninfenz.mobile.data.HtmlValidator
 import dev.ninfenz.mobile.data.PdfExporter
+import dev.ninfenz.mobile.data.PdfUaExporter
 import dev.ninfenz.mobile.data.PdfValidator
 import dev.ninfenz.mobile.data.ExportHistoryStore
 import dev.ninfenz.mobile.data.ExportVerifier
@@ -162,6 +168,7 @@ private fun parseTemplateSlots(markdown: String): Map<String, String> {
 @Composable
 fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpenPacks: () -> Unit = onBack, onPatch: () -> Unit = {}, onStatusChanged: () -> Unit = {}) {
     val context = LocalContext.current
+    val audit = dev.ninfenz.mobile.data.FeatureGate.auditEnabled()
     val focusManager = LocalFocusManager.current
     val clipboard = LocalClipboardManager.current
     val sampleStore = remember { dev.ninfenz.mobile.data.PromptSampleStore(context.filesDir) }
@@ -219,6 +226,8 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
     var report by remember { mutableStateOf<ValidateReport?>(null) }
     var manifestText by remember { mutableStateOf<String?>(null) }
     var exportedFile by remember { mutableStateOf<File?>(null) }
+    var batchFiles by remember { mutableStateOf<List<File>>(emptyList()) }
+    var exportBatchNote by remember { mutableStateOf<String?>(null) }
     var error by remember { mutableStateOf<CoreError?>(null) }
     var slotImportTarget by remember { mutableStateOf<String?>(null) }
     var slotImportSource by remember { mutableStateOf("") }
@@ -230,13 +239,47 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
     var batchSource by remember { mutableStateOf("") }
     var batchNote by remember { mutableStateOf<String?>(null) }
     val draftStore = remember { DeliveryDraftStore(context.filesDir) }
+    val versionStore = remember { DeliveryVersionStore(context.filesDir) }
+    val presetStore = remember { AssemblyPresetStore(context.filesDir) }
+    var showVersions by remember { mutableStateOf(false) }
+    var showPresets by remember { mutableStateOf(false) }
+    var showSavePreset by remember { mutableStateOf(false) }
+    var presetName by remember { mutableStateOf("") }
     val exportHistory = remember { ExportHistoryStore(context.filesDir) }
     var exportEntries by remember { mutableStateOf(exportHistory.load()) }
+    var recentExpanded by remember { mutableStateOf(true) }
+    var showAllExports by remember { mutableStateOf(false) }
+    var showTrash by remember { mutableStateOf(false) }
+    fun trashAndRemove(entry: dev.ninfenz.mobile.data.ExportHistoryStore.Entry) {
+        runCatching {
+            val source = File(entry.path)
+            if (source.isFile) {
+                val trash = File(File(context.filesDir, "exports"), "trash").apply { mkdirs() }
+                val target = File(trash, System.currentTimeMillis().toString() + "-" + source.name)
+                if (source.renameTo(target)) {
+                    File(target.absolutePath + ".restore").writeText(entry.path, Charsets.UTF_8)
+                }
+            }
+        }
+        exportHistory.remove(entry.path)
+        exportEntries = exportHistory.load()
+    }
     var exportNotice by remember { mutableStateOf<String?>(null) }
+    var evidenceBusy by remember { mutableStateOf(false) }
+    var evidenceNote by remember { mutableStateOf<String?>(null) }
     var exportVerify by remember { mutableStateOf<ExportVerifier.Result?>(null) }
     var reproText by remember { mutableStateOf<String?>(null) }
     var reproOk by remember { mutableStateOf<Boolean?>(null) }
     var validateRepro by remember { mutableStateOf<String?>(null) }
+    val exportProfileStore = remember { ExportProfileStore(context.filesDir) }
+    var exportProfiles by remember { mutableStateOf(exportProfileStore.load()) }
+    var showExportProfiles by remember { mutableStateOf(false) }
+    var showSaveExportProfile by remember { mutableStateOf(false) }
+    var exportProfileName by remember { mutableStateOf("") }
+    var pdfPageSize by remember { mutableStateOf("A4") }
+    var pdfIncludeTitle by remember { mutableStateOf(true) }
+    var epubAuthor by remember { mutableStateOf("") }
+    var epubLanguage by remember { mutableStateOf("zh") }
     var docxStyles by remember { mutableStateOf<String?>(null) }
     var docxSectPr by remember { mutableStateOf<String?>(null) }
     var docxTheme by remember { mutableStateOf<String?>(null) }
@@ -462,7 +505,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
 
     val step = when {
         exportedFile != null -> 3
-        markdown != null || report != null -> 2
+        markdown != null || report != null -> if (audit) 2 else 3
         plan != null -> 1
         else -> 0
     }
@@ -471,6 +514,12 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
     }
     val constraintConflicts = remember(specMeta) { dev.ninfenz.mobile.model.SpecConstraintAudit.conflicts(specMeta?.slots.orEmpty()) }
     var deliveryMenu by remember { mutableStateOf(false) }
+    var showBrowsePlan by remember { mutableStateOf(false) }
+    var activeStep by remember(project.id) { mutableStateOf(step) }
+    BackHandler(enabled = activeStep > 0) {
+        activeStep = if (!audit && activeStep == 3) 1 else activeStep - 1
+    }
+    val deliveryScroll = rememberScrollState()
     Column(modifier = Modifier.fillMaxSize().imePadding()) {
         NfTopAppBar(
             title = stringResource(dev.ninfenz.mobile.R.string.delivery_title, project.title),
@@ -502,19 +551,27 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                 }
             }
         )
+        val stepLabels = if (audit) listOf(
+            stringResource(dev.ninfenz.mobile.R.string.delivery_plan),
+            stringResource(dev.ninfenz.mobile.R.string.delivery_slots),
+            stringResource(dev.ninfenz.mobile.R.string.delivery_assemble_validate),
+            stringResource(dev.ninfenz.mobile.R.string.delivery_export_section)
+        ) else listOf(
+            stringResource(dev.ninfenz.mobile.R.string.delivery_plan),
+            stringResource(dev.ninfenz.mobile.R.string.delivery_slots),
+            stringResource(dev.ninfenz.mobile.R.string.delivery_export_section)
+        )
         NfStepStrip(
-            steps = listOf(
-                stringResource(dev.ninfenz.mobile.R.string.delivery_plan),
-                stringResource(dev.ninfenz.mobile.R.string.delivery_slots),
-                stringResource(dev.ninfenz.mobile.R.string.delivery_assemble_validate),
-                stringResource(dev.ninfenz.mobile.R.string.delivery_export_section)
-            ),
-            current = step
+            steps = stepLabels,
+            current = if (!audit && activeStep >= 3) 2 else activeStep,
+            onStepClick = { i ->
+                activeStep = if (!audit && i == 2) 3 else i
+            }
         )
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(deliveryScroll)
                 .padding(bottom = 96.dp),
             verticalArrangement = Arrangement.spacedBy(NfSpacing.m)
         ) {
@@ -539,10 +596,10 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                Text(stringResource(dev.ninfenz.mobile.R.string.delivery_note), style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(if (audit) dev.ninfenz.mobile.R.string.delivery_note else dev.ninfenz.mobile.R.string.delivery_note_daily), style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             statusNote?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
-            if (needsRevalidate) {
+            if (audit && needsRevalidate) {
                 Text(
                     stringResource(dev.ninfenz.mobile.R.string.delivery_need_revalidate),
                     style = NfType.meta,
@@ -557,7 +614,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
             error?.let { err -> NfErrorCard(err.code, err.message, err.fix, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
 
             LaunchedEffect(specMeta, inputs) {
-                missingRequired = specMeta?.slots?.filter { it.required && inputs[it.id].isNullOrBlank() }?.map { it.id }.orEmpty()
+                missingRequired = specMeta?.slots?.filter { it.required && (it.visibleIf?.let { c -> inputs[c.slot] == c.equals } ?: true) && inputs[it.id].isNullOrBlank() }?.map { it.id }.orEmpty()
                 oversizedSlots = specMeta?.slots?.filter { slot ->
                     val text = inputs[slot.id].orEmpty()
                     (slot.minChars != null && text.isNotBlank() && text.length < slot.minChars) || (slot.maxChars != null && text.length > slot.maxChars)
@@ -573,7 +630,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                     patternBad || nonEmptyBad || prefixBad || suffixBad
                 }?.map { it.id }.orEmpty()
             }
-            val exportMarkdown = if (needsRevalidate || report?.verdict == "fail") null else markdown
+            val exportMarkdown = if (audit && (needsRevalidate || report?.verdict == "fail")) null else markdown
             val current = artifacts
             suspend fun compilePlan(art: AuthorArtifacts) {
                 busy = true
@@ -618,7 +675,15 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                 if (current != null && plan == null && restoredPlan == null) compilePlan(current)
             }
             if (current != null) {
-                NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.delivery_plan))
+                if (activeStep == 0) {
+                NfSectionHeader(
+                    stringResource(dev.ninfenz.mobile.R.string.delivery_plan),
+                    action = {
+                        TextButton(onClick = { showBrowsePlan = true }) {
+                            Text(stringResource(dev.ninfenz.mobile.R.string.delivery_browse_plan))
+                        }
+                    }
+                )
                 Button(
                     enabled = !busy,
                     modifier = Modifier.padding(horizontal = NfSpacing.page),
@@ -653,6 +718,8 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                     }
                 }
 
+                }
+                if (activeStep == 1) {
                 NfCollapsibleSection(
                     title = stringResource(dev.ninfenz.mobile.R.string.delivery_slots),
                     subtitle = plan?.let { stringResource(dev.ninfenz.mobile.R.string.delivery_plan_summary, it.steps.size, it.slots.size) },
@@ -676,6 +743,9 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                 TextButton(onClick = { batchPicker.launch(arrayOf("*/*")) }) {
                                     Text(stringResource(dev.ninfenz.mobile.R.string.delivery_slot_batch_import))
                                 }
+                                TextButton(onClick = { showPresets = true }) {
+                                    Text(stringResource(dev.ninfenz.mobile.R.string.delivery_presets))
+                                }
                             }
                         }
                         batchNote?.let {
@@ -690,7 +760,11 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                     } else if (plan!!.slots.isEmpty()) {
                         Text(stringResource(dev.ninfenz.mobile.R.string.delivery_no_slots), style = NfType.meta, modifier = Modifier.padding(horizontal = NfSpacing.page))
                     } else {
-                        val requiredSlots = specMeta?.slots?.filter { it.required }.orEmpty()
+                        fun slotVisible(meta: dev.ninfenz.mobile.model.SpecSlot?): Boolean {
+                            val cond = meta?.visibleIf ?: return true
+                            return inputs[cond.slot] == cond.equals
+                        }
+                        val requiredSlots = specMeta?.slots?.filter { it.required && slotVisible(it) }.orEmpty()
                         val requiredFilled = requiredSlots.count { !inputs[it.id].isNullOrBlank() }
                         if (requiredSlots.isNotEmpty()) {
                             Text(
@@ -730,8 +804,9 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         }
                         var lastSection: String? = null
                         for (slot in plan!!.slots) {
+                            val slotMeta = specMeta?.slots?.firstOrNull { it.id == slot }
+                            if (!slotVisible(slotMeta)) continue
                             Column(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
-                                val slotMeta = specMeta?.slots?.firstOrNull { it.id == slot }
                                 val sectionTitle = slotMeta?.let { meta -> specMeta?.sections?.firstOrNull { it.id == meta.section }?.title }
                                 val sectionId = slotMeta?.section
                                 if (sectionTitle != null && sectionId != null && sectionId != lastSection) {
@@ -840,6 +915,16 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                     }
                 }
 
+                }
+                if (audit && activeStep == 2) {
+                if (needsRevalidate) {
+                    NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
+                        Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                            Text(stringResource(dev.ninfenz.mobile.R.string.delivery_dirty_title), style = NfType.itemTitle, color = MaterialTheme.colorScheme.error)
+                            Text(stringResource(dev.ninfenz.mobile.R.string.delivery_dirty_body), style = NfType.meta)
+                        }
+                    }
+                }
                 NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.delivery_assemble_validate))
                 Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                     Button(
@@ -879,6 +964,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                         }
                                     }
                                     markdown = md
+                                    versionStore.save(project.id, md)
                                     report = null
                                     needsRevalidate = false
                                     when (val advanced = statusStore.advance(project, ProjectStatus.ASSEMBLED, AssemblyArtifact(md.toByteArray(Charsets.UTF_8)))) {
@@ -1115,8 +1201,129 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         }
                     }
                 }
+                }
+                if (activeStep == 3) {
                 NfCollapsibleSection(title = stringResource(dev.ninfenz.mobile.R.string.delivery_export_section), initiallyExpanded = true) {
                 Text(stringResource(dev.ninfenz.mobile.R.string.delivery_export_group_docs), style = NfType.label, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(start = NfSpacing.page, end = NfSpacing.page, top = NfSpacing.s))
+                OutlinedButton(
+                    enabled = exportMarkdown != null && !busy,
+                    onClick = {
+                        val md = exportMarkdown ?: return@OutlinedButton
+                        busy = true
+                        error = null
+                        batchFiles = emptyList()
+                        exportBatchNote = null
+                        scope.launch {
+                            try {
+                                val dir = File(File(context.filesDir, "exports/delivery"), "batch-" + System.currentTimeMillis()).apply { mkdirs() }
+                                val failures = mutableListOf<String>()
+                                val docxFile = runCatching {
+                                    val payload = buildJsonObject {
+                                        put("markdown", md)
+                                        put("format", "docx")
+                                        put("out_dir", dir.absolutePath)
+                                        put("manifest", true)
+                                        put("title", project.title)
+                                        put("project_id", project.id)
+                                        docxStyles?.let { put("docx_styles", it) }
+                                        docxSectPr?.let { put("docx_sect_pr", it) }
+                                        docxTheme?.let { put("docx_theme", it) }
+                                        docxNumbering?.let { put("docx_numbering", it) }
+                                        docxHeader?.let { put("docx_header", it) }
+                                        docxFooter?.let { put("docx_footer", it) }
+                                    }
+                                    val response = safeCall("export", payload)
+                                    if (!response.ok) throw IllegalStateException(response.error?.message ?: "export failed")
+                                    val raw = response.resultObject()?.get("files")?.toString().orEmpty()
+                                    val name = Regex("\"name\":\"([^\"]+)\"").find(raw)?.groupValues?.getOrNull(1) ?: "result.docx"
+                                    File(dir, name)
+                                }.onFailure { failures += "docx:" + (it.message ?: it.javaClass.simpleName) }.getOrNull()
+                                val zipFile = runCatching {
+                                    val payload = buildJsonObject {
+                                        put("markdown", md)
+                                        put("format", "zip")
+                                        put("out_dir", dir.absolutePath)
+                                        put("manifest", true)
+                                        put("title", project.title)
+                                        put("project_id", project.id)
+                                    }
+                                    val response = safeCall("export", payload)
+                                    if (!response.ok) throw IllegalStateException(response.error?.message ?: "export failed")
+                                    val raw = response.resultObject()?.get("files")?.toString().orEmpty()
+                                    val name = Regex("\"name\":\"([^\"]+)\"").find(raw)?.groupValues?.getOrNull(1) ?: "result.zip"
+                                    File(dir, name)
+                                }.onFailure { failures += "zip:" + (it.message ?: it.javaClass.simpleName) }.getOrNull()
+                                val skillFile = runCatching {
+                                    val payload = buildJsonObject {
+                                        put("markdown", md)
+                                        put("format", "skill")
+                                        put("out_dir", dir.absolutePath)
+                                        put("manifest", true)
+                                        put("title", project.title)
+                                        put("project_id", project.id)
+                                    }
+                                    val response = safeCall("export", payload)
+                                    if (!response.ok) throw IllegalStateException(response.error?.message ?: "export failed")
+                                    val raw = response.resultObject()?.get("files")?.toString().orEmpty()
+                                    val name = Regex("\"name\":\"([^\"]+)\"").find(raw)?.groupValues?.getOrNull(1) ?: "result-skill.zip"
+                                    File(dir, name)
+                                }.onFailure { failures += "skill:" + (it.message ?: it.javaClass.simpleName) }.getOrNull()
+                                val preserveFile = if (!audit) null else runCatching {
+                                    val lineage = dev.ninfenz.mobile.data.PreservationLineageStore(context.filesDir)
+                                    val created = dev.ninfenz.mobile.data.PreservationExporter.export(
+                                        md, project.title, project.id, dir,
+                                        dev.ninfenz.mobile.data.ContractStore(context.filesDir).raw(project.id),
+                                        grant.toJson().toString(),
+                                        lineage.load(project.id)
+                                    )
+                                    val reproDir = File(context.cacheDir, "repro-preserve-batch").apply { deleteRecursively(); mkdirs() }
+                                    val second = dev.ninfenz.mobile.data.PreservationExporter.export(
+                                        md, project.title, project.id, reproDir,
+                                        dev.ninfenz.mobile.data.ContractStore(context.filesDir).raw(project.id),
+                                        grant.toJson().toString(),
+                                        lineage.load(project.id)
+                                    )
+                                    val report = dev.ninfenz.mobile.data.ReproChecker.check(created.file, second.file)
+                                    reproDir.deleteRecursively()
+                                    if (!report.stable) throw IllegalStateException("repro diff " + (report.firstDiff ?: -1))
+                                    val digest = java.security.MessageDigest.getInstance("SHA-256")
+                                        .digest(created.file.readBytes())
+                                        .joinToString("") { "%02x".format(it.toInt() and 0xff) }
+                                    lineage.save(project.id, digest)
+                                    created.file
+                                }.onFailure { failures += "preservation:" + (it.message ?: it.javaClass.simpleName) }.getOrNull()
+                                val files = buildList {
+                                    fun attempt(label: String, block: () -> File) {
+                                        runCatching { add(block()) }.onFailure { failures += label + ":" + (it.message ?: it.javaClass.simpleName) }
+                                    }
+                                    val mdFile = File(dir, "result.md").apply { writeText(md, Charsets.UTF_8) }
+                                    add(mdFile)
+                                    docxFile?.let { add(it) }
+                                    zipFile?.let { add(it) }
+                                    skillFile?.let { add(it) }
+                                    preserveFile?.let { add(it) }
+                                    attempt("epub") { dev.ninfenz.mobile.data.EpubExporter.export(md, project.title, dir, epubAuthor, epubLanguage).file }
+                                    attempt("html") { dev.ninfenz.mobile.data.HtmlExporter.export(md, project.title, dir).file }
+                                    attempt("pdf") { dev.ninfenz.mobile.data.PdfExporter.export(md, project.title, dir, pdfPageSize, pdfIncludeTitle).file }
+                                    attempt("nfdoc") { dev.ninfenz.mobile.data.NfDocExporter.export(md, project.title, project.id, dir).file }
+                                }
+                                batchFiles = files
+                                exportBatchNote = if (failures.isEmpty()) null else "未生成: " + failures.joinToString(",")
+                                exportedFile = files.firstOrNull()
+                                recordExport("batch", files.first(), null)
+                            } catch (t: Throwable) {
+                                error = CoreError("NF-EXP-002", context.getString(dev.ninfenz.mobile.R.string.export_pdf_failed, t.message ?: t.javaClass.simpleName), context.getString(dev.ninfenz.mobile.R.string.export_failed_fix), null, 1)
+                            } finally {
+                                busy = false
+                            }
+                        }
+                    },
+                    modifier = Modifier.padding(horizontal = NfSpacing.page)
+                ) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_export_all)) }
+                batchFiles.takeIf { it.isNotEmpty() }?.let { files ->
+                    Text(files.joinToString(" · ") { it.name }, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page))
+                }
+                exportBatchNote?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
                 Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                     ExportButton("md", "text/markdown", exportMarkdown, project, context, scope, { busy = it }, { error = it }, busy) { file, manifest, report ->
                         exportedFile = file
@@ -1129,7 +1336,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         }
                         recordExport("md", file, manifest)
                         scope.launch {
-                            when (val advanced = statusStore.advance(project, ProjectStatus.EXPORTED)) {
+                            when (val advanced = statusStore.advance(project, ProjectStatus.EXPORTED, allowAuditSkip = !audit)) {
                                 is StatusAdvanceResult.Advanced -> {
                                     status = advanced.to
                                     statusNote = context.getString(dev.ninfenz.mobile.R.string.delivery_status_note, statusText(context, advanced.to))
@@ -1189,7 +1396,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                 }
                 Text(stringResource(dev.ninfenz.mobile.R.string.delivery_export_group_reading), style = NfType.label, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(start = NfSpacing.page, end = NfSpacing.page, top = NfSpacing.s))
                 Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                    EpubExportButton(exportMarkdown, project, context, scope, { busy = it }, { error = it }, busy) { file, report ->
+                    EpubExportButton(exportMarkdown, project, epubAuthor, epubLanguage, context, scope, { busy = it }, { error = it }, busy) { file, report ->
                         exportedFile = file
                         manifestText = null
                         reproOk = report.stable
@@ -1200,7 +1407,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         }
                         recordExport("epub", file, null)
                     }
-                    PdfExportButton(exportMarkdown, project, context, scope, { busy = it }, { error = it }, busy) { file, report ->
+                    PdfExportButton(exportMarkdown, project, pdfPageSize, pdfIncludeTitle, context, scope, { busy = it }, { error = it }, busy) { file, report ->
                         exportedFile = file
                         manifestText = null
                         reproOk = report.stable
@@ -1210,6 +1417,13 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                             context.getString(dev.ninfenz.mobile.R.string.repro_diff, report.firstDiff ?: -1)
                         }
                         recordExport("pdf", file, null)
+                    }
+                    if (audit) PdfUaExportButton(exportMarkdown, project, context, scope, { busy = it }, { error = it }, busy) { file, report ->
+                        exportedFile = file
+                        manifestText = null
+                        reproOk = report.stable
+                        reproText = context.getString(dev.ninfenz.mobile.R.string.delivery_pdfua_note)
+                        recordExport("pdf-ua", file, null)
                     }
                     HtmlExportButton(exportMarkdown, project, context, scope, { busy = it }, { error = it }, busy) { file, report ->
                         exportedFile = file
@@ -1224,7 +1438,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                     }
                 }
                 Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                    PreservationExportButton(exportMarkdown, project, context, scope, { busy = it }, { error = it }, busy, grant) { file, report ->
+                    if (audit) PreservationExportButton(exportMarkdown, project, context, scope, { busy = it }, { error = it }, busy, grant) { file, report ->
                         exportedFile = file
                         manifestText = null
                         reproOk = report.stable
@@ -1235,7 +1449,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         }
                         recordExport("preserve", file, null)
                     }
-                    OutlinedButton(
+                    if (audit) OutlinedButton(
                         onClick = { showGrant = true },
                         modifier = Modifier.padding(horizontal = NfSpacing.page)
                     ) { Text(stringResource(dev.ninfenz.mobile.R.string.grant_button)) }
@@ -1291,6 +1505,41 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         style = NfType.meta
                     )
                 }
+                Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+                    TextButton(enabled = docxStyles != null, onClick = { showSaveExportProfile = true }) {
+                        Text(stringResource(dev.ninfenz.mobile.R.string.export_profile_save))
+                    }
+                    TextButton(onClick = { exportProfiles = exportProfileStore.load(); showExportProfiles = true }) {
+                        Text(stringResource(dev.ninfenz.mobile.R.string.export_profiles))
+                    }
+                }
+                Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+                    OutlinedTextField(
+                        value = epubAuthor,
+                        onValueChange = { epubAuthor = it },
+                        label = { Text("EPUB author") },
+                        singleLine = true,
+                        modifier = Modifier.weight(1f)
+                    )
+                    OutlinedTextField(
+                        value = epubLanguage,
+                        onValueChange = { epubLanguage = it },
+                        label = { Text("EPUB lang") },
+                        singleLine = true,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s), verticalAlignment = Alignment.CenterVertically) {
+                    OutlinedTextField(
+                        value = pdfPageSize,
+                        onValueChange = { pdfPageSize = it },
+                        label = { Text("PDF page") },
+                        singleLine = true,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Text("title", style = NfType.meta)
+                    Switch(checked = pdfIncludeTitle, onCheckedChange = { pdfIncludeTitle = it })
+                }
                 Text(stringResource(dev.ninfenz.mobile.R.string.delivery_pdf_note), style = NfType.meta, modifier = Modifier.padding(horizontal = NfSpacing.page))
                 exportNotice?.let { notice ->
                     Text(
@@ -1333,6 +1582,31 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                     }
                                 }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_open_file)) }
                             }
+                            if (markdown != null && latest.format.lowercase() in setOf("md", "html", "epub", "docx", "json")) {
+                                OutlinedButton(
+                                    enabled = !evidenceBusy,
+                                    onClick = {
+                                        val md = markdown ?: return@OutlinedButton
+                                        evidenceBusy = true
+                                        evidenceNote = null
+                                        scope.launch {
+                                            val result = dev.ninfenz.mobile.data.HardTechEvidence.pack(context, md, File(latest.path))
+                                            evidenceNote = result.message
+                                            evidenceBusy = false
+                                        }
+                                    }
+                                ) {
+                                    Text(
+                                        stringResource(
+                                            if (evidenceBusy) dev.ninfenz.mobile.R.string.delivery_evidence_pack_busy
+                                            else dev.ninfenz.mobile.R.string.delivery_evidence_pack
+                                        )
+                                    )
+                                }
+                            }
+                            evidenceNote?.let { note ->
+                                Text(note, style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
                         }
                     }
                 }
@@ -1359,16 +1633,29 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            stringResource(dev.ninfenz.mobile.R.string.delivery_recent_exports),
-                            style = NfType.itemTitle
-                        )
-                        TextButton(onClick = {
-                            exportHistory.clear()
-                            exportEntries = emptyList()
-                        }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_clear_exports)) }
+                        TextButton(onClick = { recentExpanded = !recentExpanded }) {
+                            Text(
+                                stringResource(dev.ninfenz.mobile.R.string.delivery_recent_exports) +
+                                    (if (recentExpanded) " ▾" else " ▸"),
+                                style = NfType.itemTitle
+                            )
+                        }
+                        Row {
+                            TextButton(onClick = { showTrash = true }) {
+                                Text(stringResource(dev.ninfenz.mobile.R.string.delivery_trash))
+                            }
+                            if (exportEntries.size > 5) {
+                                TextButton(onClick = { showAllExports = true }) {
+                                    Text(stringResource(dev.ninfenz.mobile.R.string.delivery_all_exports))
+                                }
+                            }
+                            TextButton(onClick = {
+                                exportHistory.clear()
+                                exportEntries = emptyList()
+                            }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_clear_exports)) }
+                        }
                     }
-                    exportEntries.take(5).forEach { entry ->
+                    if (recentExpanded) exportEntries.take(5).forEach { entry ->
                         Column(modifier = Modifier.fillMaxWidth().padding(horizontal = NfSpacing.page)) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -1397,6 +1684,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                     ShareExporter.launchView(context, intent, context.getString(dev.ninfenz.mobile.R.string.delivery_open_file))
                                 }
                             }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_open_file)) }
+                            TextButton(onClick = { trashAndRemove(entry) }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_remove_export)) }
                         }
                         entry.message?.takeIf { entry.ok != true }?.let { message ->
                             Text(
@@ -1411,6 +1699,9 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                 }
 
                 NfCollapsibleSection(title = stringResource(dev.ninfenz.mobile.R.string.delivery_preview), initiallyExpanded = true) {
+                    TextButton(onClick = { showVersions = true }) {
+                        Text(stringResource(dev.ninfenz.mobile.R.string.delivery_versions))
+                    }
                     markdown?.let { md ->
                         Column(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
                             MarkdownPreview(md, limitBlocks = 8)
@@ -1458,8 +1749,215 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         }
                     } ?: Text(stringResource(dev.ninfenz.mobile.R.string.delivery_not_assembled), style = NfType.meta, modifier = Modifier.padding(horizontal = NfSpacing.page))
                 }
+                }
             }
         }
+    }
+
+    if (showSaveExportProfile) {
+        AlertDialog(
+            onDismissRequest = { showSaveExportProfile = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.export_profile_save)) },
+            text = {
+                OutlinedTextField(
+                    value = exportProfileName,
+                    onValueChange = { exportProfileName = it },
+                    label = { Text(stringResource(dev.ninfenz.mobile.R.string.export_profile_name)) },
+                    singleLine = true
+                )
+            },
+            confirmButton = {
+                TextButton(enabled = exportProfileName.isNotBlank(), onClick = {
+                    exportProfiles = exportProfileStore.save(exportProfileName, docxStyles, docxSectPr, docxTheme, docxNumbering, docxHeader, docxFooter, epubAuthor, epubLanguage, pdfPageSize, pdfIncludeTitle)
+                    exportProfileName = ""
+                    showSaveExportProfile = false
+                }) { Text(stringResource(android.R.string.ok)) }
+            },
+            dismissButton = { TextButton(onClick = { showSaveExportProfile = false }) { Text(stringResource(android.R.string.cancel)) } }
+        )
+    }
+
+    if (showExportProfiles) {
+        AlertDialog(
+            onDismissRequest = { showExportProfiles = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.export_profiles)) },
+            text = {
+                Column(modifier = Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                    if (exportProfiles.isEmpty()) Text(stringResource(dev.ninfenz.mobile.R.string.export_profiles_empty), style = NfType.meta)
+                    exportProfiles.forEach { profile ->
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                            Text(profile.name, style = NfType.meta)
+                            Row {
+                                TextButton(onClick = {
+                                    docxStyles = profile.styles
+                                    docxSectPr = profile.sectPr
+                                    docxTheme = profile.theme
+                                    docxNumbering = profile.numbering
+                                    docxHeader = profile.header
+                                    docxFooter = profile.footer
+                                    profile.epubAuthor?.let { epubAuthor = it }
+                                    profile.epubLanguage?.let { epubLanguage = it }
+                                    profile.pdfPageSize?.let { pdfPageSize = it }
+                                    profile.pdfIncludeTitle?.let { pdfIncludeTitle = it }
+                                    showExportProfiles = false
+                                }) { Text(stringResource(dev.ninfenz.mobile.R.string.export_profile_apply)) }
+                                TextButton(onClick = { exportProfileStore.remove(profile.id); exportProfiles = exportProfileStore.load() }) {
+                                    Text(stringResource(dev.ninfenz.mobile.R.string.inbox_remove))
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { showExportProfiles = false }) { Text(stringResource(android.R.string.ok)) } }
+        )
+    }
+
+    if (showSavePreset) {
+        AlertDialog(
+            onDismissRequest = { showSavePreset = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_save_preset)) },
+            text = {
+                OutlinedTextField(
+                    value = presetName,
+                    onValueChange = { presetName = it },
+                    label = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_preset_name)) },
+                    singleLine = true
+                )
+            },
+            confirmButton = {
+                TextButton(enabled = presetName.isNotBlank(), onClick = {
+                    presetStore.save(project.id, presetName, inputs)
+                    presetName = ""
+                    showSavePreset = false
+                }) { Text(stringResource(android.R.string.ok)) }
+            },
+            dismissButton = { TextButton(onClick = { showSavePreset = false }) { Text(stringResource(android.R.string.cancel)) } }
+        )
+    }
+
+    if (showPresets) {
+        val presets = remember(showPresets) { presetStore.load(project.id) }
+        AlertDialog(
+            onDismissRequest = { showPresets = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_presets)) },
+            text = {
+                Column(modifier = Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                    if (presets.isEmpty()) Text(stringResource(dev.ninfenz.mobile.R.string.delivery_presets_empty), style = NfType.meta)
+                    presets.forEach { preset ->
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                            Text(preset.name + " · " + preset.inputs.size, style = NfType.meta)
+                            Row {
+                                TextButton(onClick = {
+                                    inputs = inputs + preset.inputs
+                                    showPresets = false
+                                }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_apply_preset)) }
+                                TextButton(onClick = { presetStore.remove(project.id, preset.id); showPresets = false }) { Text(stringResource(dev.ninfenz.mobile.R.string.inbox_remove)) }
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { showSavePreset = true; showPresets = false }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_save_preset)) } },
+            dismissButton = { TextButton(onClick = { showPresets = false }) { Text(stringResource(android.R.string.cancel)) } }
+        )
+    }
+
+    if (showVersions) {
+        val versions = remember(showVersions) { versionStore.load(project.id) }
+        AlertDialog(
+            onDismissRequest = { showVersions = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_versions)) },
+            text = {
+                Column(modifier = Modifier.heightIn(max = 480.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                    if (versions.isEmpty()) Text(stringResource(dev.ninfenz.mobile.R.string.delivery_versions_empty), style = NfType.meta)
+                    versions.forEachIndexed { index, version ->
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                "#" + (versions.size - index) + " · " + java.text.SimpleDateFormat("MM-dd HH:mm", java.util.Locale.getDefault()).format(java.util.Date(version.at)),
+                                style = NfType.meta
+                            )
+                            TextButton(onClick = {
+                                markdown = version.markdown
+                                needsRevalidate = true
+                                activeStep = if (audit) 2 else 3
+                                showVersions = false
+                            }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_restore_version)) }
+                        }
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { showVersions = false }) { Text(stringResource(android.R.string.ok)) } }
+        )
+    }
+
+    if (showTrash) {
+        val trashDir = File(File(context.filesDir, "exports"), "trash")
+        val items = remember(showTrash) {
+            trashDir.listFiles()?.filter { it.isFile && !it.name.endsWith(".restore") }?.sortedByDescending { it.lastModified() }.orEmpty()
+        }
+        AlertDialog(
+            onDismissRequest = { showTrash = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_trash)) },
+            text = {
+                Column(modifier = Modifier.heightIn(max = 480.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                    if (items.isEmpty()) {
+                        Text(stringResource(dev.ninfenz.mobile.R.string.delivery_trash_empty), style = NfType.meta)
+                    }
+                    items.forEach { file ->
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                            Text(file.name, style = NfType.meta, modifier = Modifier.weight(1f))
+                            TextButton(onClick = {
+                                val sidecar = File(file.absolutePath + ".restore")
+                                val original = sidecar.takeIf { it.isFile }?.readText(Charsets.UTF_8)
+                                    ?: File(File(File(context.filesDir, "exports"), "delivery"), file.name.substringAfter('-')).absolutePath
+                                val target = File(original)
+                                target.parentFile?.mkdirs()
+                                if (file.renameTo(target)) sidecar.delete()
+                            }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_restore)) }
+                        }
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { showTrash = false }) { Text(stringResource(android.R.string.ok)) } }
+        )
+    }
+
+    if (showAllExports) {
+        AlertDialog(
+            onDismissRequest = { showAllExports = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_all_exports)) },
+            text = {
+                Column(
+                    modifier = Modifier.heightIn(max = 520.dp).verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)
+                ) {
+                    exportEntries.forEach { entry ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(entry.format + " · " + entry.name, style = NfType.meta, modifier = Modifier.weight(1f))
+                            TextButton(onClick = {
+                                val file = File(entry.path)
+                                if (file.isFile) {
+                                    ShareExporter.launchChooser(
+                                        context,
+                                        ShareExporter.shareFileIntent(context, file, mimeFor(entry.format), entry.name),
+                                        context.getString(dev.ninfenz.mobile.R.string.delivery_share_file)
+                                    )
+                                }
+                            }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_share_file)) }
+                            TextButton(onClick = { trashAndRemove(entry) }) {
+                                Text(stringResource(dev.ninfenz.mobile.R.string.delivery_remove_export))
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { showAllExports = false }) { Text(stringResource(android.R.string.ok)) } }
+        )
     }
 
     if (showResetConfirm) {
@@ -1497,6 +1995,23 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
             dismissButton = {
                 TextButton(onClick = { showResetConfirm = false }) { Text(stringResource(android.R.string.cancel)) }
             }
+        )
+    }
+
+    if (showBrowsePlan) {
+        AlertDialog(
+            onDismissRequest = { showBrowsePlan = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_browse_plan)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text("plan: " + (plan?.pipelineId ?: "-") + " · " + (plan?.steps?.size ?: 0) + " steps", style = NfType.label)
+                    plan?.steps?.forEach { s -> Text("• " + s.id + " · " + s.node + " · " + s.module, style = NfType.meta) }
+                    Text("spec: " + (specMeta?.id ?: "-") + " · " + (specMeta?.sections?.size ?: 0) + " sections", style = NfType.label)
+                    specMeta?.sections?.forEach { s -> Text("• " + s.title + " · " + s.slots.size + " slots", style = NfType.meta) }
+                    Text("slots: " + inputs.count { it.value.isNotBlank() } + "/" + inputs.size, style = NfType.label)
+                }
+            },
+            confirmButton = { TextButton(onClick = { showBrowsePlan = false }) { Text(stringResource(android.R.string.ok)) } }
         )
     }
 
@@ -1978,8 +2493,10 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
             confirmButton = {
                 TextButton(onClick = {
                     markdown = MarkdownBlocks.render(previewBlocks)
+                    versionStore.save(project.id, markdown ?: "")
                     previewDirty = false
                     needsRevalidate = true
+                    activeStep = if (audit) 2 else 3
                     draftStore.save(project.id, inputs, rawPlan, markdown)
                     report = null
                     validateRepro = null
@@ -2321,6 +2838,8 @@ private fun NfDocExportButton(
 private fun EpubExportButton(
     markdown: String?,
     project: Project,
+    author: String,
+    language: String,
     context: android.content.Context,
     scope: kotlinx.coroutines.CoroutineScope,
     setBusy: (Boolean) -> Unit,
@@ -2337,9 +2856,9 @@ private fun EpubExportButton(
             scope.launch {
                 try {
                     val outDir = File(File(context.filesDir, "exports"), "delivery").apply { mkdirs() }
-                    val created = EpubExporter.export(md, project.title, outDir)
+                    val created = EpubExporter.export(md, project.title, outDir, author, language)
                     val reproDir = File(context.cacheDir, "repro-epub").apply { deleteRecursively(); mkdirs() }
-                    val second = EpubExporter.export(md, project.title, reproDir)
+                    val second = EpubExporter.export(md, project.title, reproDir, author, language)
                     val report = dev.ninfenz.mobile.data.ReproChecker.check(created.file, second.file)
                     reproDir.deleteRecursively()
                     onDone(created.file, report)
@@ -2355,6 +2874,51 @@ private fun EpubExportButton(
 
 @Composable
 private fun PdfExportButton(
+    markdown: String?,
+    project: Project,
+    pageSize: String,
+    includeTitle: Boolean,
+    context: android.content.Context,
+    scope: kotlinx.coroutines.CoroutineScope,
+    setBusy: (Boolean) -> Unit,
+    setError: (CoreError?) -> Unit,
+    busy: Boolean,
+    onDone: (File, dev.ninfenz.mobile.data.ReproChecker.Report) -> Unit
+) {
+    Button(
+        enabled = markdown != null && !busy,
+        onClick = {
+            val md = markdown ?: return@Button
+            setBusy(true)
+            setError(null)
+            scope.launch {
+                try {
+                    val outDir = File(File(context.filesDir, "exports"), "delivery").apply { mkdirs() }
+                    val rich = dev.ninfenz.mobile.data.WebPdfExporter.export(context, md, project.title, outDir, if (pageSize.equals("Letter", true)) 612 else 595, if (pageSize.equals("Letter", true)) 792 else 842)
+                    val createdFile: File = rich?.file ?: PdfExporter.export(md, project.title, outDir, pageSize, includeTitle).file
+                    val reproDir = File(context.cacheDir, "repro-pdf").apply { deleteRecursively(); mkdirs() }
+                    val secondFile: File = if (rich != null) {
+                        dev.ninfenz.mobile.data.WebPdfExporter.export(context, md, project.title, reproDir, if (pageSize.equals("Letter", true)) 612 else 595, if (pageSize.equals("Letter", true)) 792 else 842)?.file
+                            ?: PdfExporter.export(md, project.title, reproDir, pageSize, includeTitle).file
+                    } else {
+                        PdfExporter.export(md, project.title, reproDir, pageSize, includeTitle).file
+                    }
+                    val report = dev.ninfenz.mobile.data.ReproChecker.check(createdFile, secondFile)
+                    reproDir.deleteRecursively()
+                    if (dev.ninfenz.mobile.data.FeatureGate.auditEnabled()) dev.ninfenz.mobile.data.DecisionStore(context.filesDir).append("export-pdf", context.getString(dev.ninfenz.mobile.R.string.decision_export_pdf), undoable = false)
+                    onDone(createdFile, report)
+                } catch (t: Throwable) {
+                    setError(CoreError("NF-EXP-002", context.getString(dev.ninfenz.mobile.R.string.export_pdf_failed, t.message ?: t.javaClass.simpleName), context.getString(dev.ninfenz.mobile.R.string.export_failed_fix), null, 1))
+                } finally {
+                    setBusy(false)
+                }
+            }
+        }
+    ) { Text(context.getString(dev.ninfenz.mobile.R.string.delivery_export, "pdf")) }
+}
+
+@Composable
+private fun PdfUaExportButton(
     markdown: String?,
     project: Project,
     context: android.content.Context,
@@ -2373,18 +2937,9 @@ private fun PdfExportButton(
             scope.launch {
                 try {
                     val outDir = File(File(context.filesDir, "exports"), "delivery").apply { mkdirs() }
-                    val rich = dev.ninfenz.mobile.data.WebPdfExporter.export(context, md, project.title, outDir)
-                    val createdFile: File = rich?.file ?: PdfExporter.export(md, project.title, outDir).file
-                    val reproDir = File(context.cacheDir, "repro-pdf").apply { deleteRecursively(); mkdirs() }
-                    val secondFile: File = if (rich != null) {
-                        dev.ninfenz.mobile.data.WebPdfExporter.export(context, md, project.title, reproDir)?.file
-                            ?: PdfExporter.export(md, project.title, reproDir).file
-                    } else {
-                        PdfExporter.export(md, project.title, reproDir).file
-                    }
-                    val report = dev.ninfenz.mobile.data.ReproChecker.check(createdFile, secondFile)
-                    reproDir.deleteRecursively()
-                    onDone(createdFile, report)
+                    val created = PdfUaExporter.export(context, md, project.title, outDir)
+                    if (dev.ninfenz.mobile.data.FeatureGate.auditEnabled()) dev.ninfenz.mobile.data.DecisionStore(context.filesDir).append("export-pdfua", context.getString(dev.ninfenz.mobile.R.string.delivery_pdfua_note), undoable = false)
+                    onDone(created.file, dev.ninfenz.mobile.data.ReproChecker.check(created.file, created.file))
                 } catch (t: Throwable) {
                     setError(CoreError("NF-EXP-002", context.getString(dev.ninfenz.mobile.R.string.export_pdf_failed, t.message ?: t.javaClass.simpleName), context.getString(dev.ninfenz.mobile.R.string.export_failed_fix), null, 1))
                 } finally {
@@ -2392,7 +2947,7 @@ private fun PdfExportButton(
                 }
             }
         }
-    ) { Text(context.getString(dev.ninfenz.mobile.R.string.delivery_export, "pdf")) }
+    ) { Text(context.getString(dev.ninfenz.mobile.R.string.delivery_export_pdfua)) }
 }
 
 @Composable

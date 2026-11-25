@@ -46,7 +46,8 @@ class ProjectStatusStore(
     suspend fun advance(
         project: Project,
         target: ProjectStatus,
-        assembly: AssemblyArtifact? = null
+        assembly: AssemblyArtifact? = null,
+        allowAuditSkip: Boolean = false
     ): StatusAdvanceResult = withContext(Dispatchers.IO) {
         val core = bridge() ?: return@withContext StatusAdvanceResult.Failure(
             "NF-E-005", "原生核心不可用，无法写回项目状态", "重装原生库并运行诊断"
@@ -63,7 +64,9 @@ class ProjectStatusStore(
             val from = current
             var cursor = current
             val path = mutableListOf<ProjectStatus>()
-            while (cursor != target) {
+            if (allowAuditSkip && target == ProjectStatus.EXPORTED && current == ProjectStatus.ASSEMBLED) {
+                path.add(ProjectStatus.EXPORTED)
+            } else while (cursor != target) {
                 val next = ProjectModel.next(cursor)
                     ?: return@withContext StatusAdvanceResult.Failure("NF-VAL-001", "无法从 " + cursor.wire + " 前进到 " + target.wire, "检查项目状态机")
                 path.add(next)

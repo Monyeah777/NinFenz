@@ -1,0 +1,11 @@
+{
+  "node": "C2-09",
+  "name": "correction eval",
+  "state": "implemented",
+  "ops": "eval_corrections.py",
+  "tests": "benchmarks/C2.json",
+  "evidence": [
+    "tests/test_coverage_wave1.py"
+  ],
+  "validation": "Android 558/558 + Python 203 passed"
+}

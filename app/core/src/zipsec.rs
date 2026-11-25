@@ -70,6 +70,15 @@ fn central_dir_names(bytes: &[u8]) -> Option<Vec<String>> {
 }
 
 pub fn read_zip_bytes(bytes: &[u8]) -> Result<Vec<ZipEntry>, CoreError> {
+    read_zip_bytes_with(bytes, false)
+}
+
+/// 证据包专用：允许 artifact/ 下携带 zip 容器（EPUB/DOCX），但不解包、不递归。
+pub fn read_zip_bytes_allow_artifact(bytes: &[u8]) -> Result<Vec<ZipEntry>, CoreError> {
+    read_zip_bytes_with(bytes, true)
+}
+
+fn read_zip_bytes_with(bytes: &[u8], allow_artifact_nested: bool) -> Result<Vec<ZipEntry>, CoreError> {
     let l = limits();
     let cursor = Cursor::new(bytes.to_vec());
     let mut archive = ZipArchive::new(cursor).map_err(|e| zip_err("zip 解析失败", e))?;
@@ -172,7 +181,7 @@ pub fn read_zip_bytes(bytes: &[u8]) -> Result<Vec<ZipEntry>, CoreError> {
                 format!("zip entry {name} 实际字节 {} 与声明 {size} 不符", data.len()),
             ));
         }
-        if is_nested_zip(&data) {
+        if is_nested_zip(&data) && !(allow_artifact_nested && name.starts_with("artifact/")) {
             // 嵌套层数上限 = 1：容器 zip 本身算第 1 层，里面再套 zip 即第 2 层 → 拒绝。
             return Err(sec(
                 "NF-SEC-003",
@@ -196,6 +205,14 @@ fn fixed_options() -> SimpleFileOptions {
         .large_file(false)
 }
 
+fn stored_options() -> SimpleFileOptions {
+    SimpleFileOptions::default()
+        .compression_method(CompressionMethod::Stored)
+        .last_modified_time(DateTime::from_date_and_time(1980, 1, 1, 0, 0, 0).expect("固定 mtime"))
+        .unix_permissions(0o644)
+        .large_file(false)
+}
+
 /// 确定性 zip 字节（entry 顺序由调用方按 path 升序给定；重名由调用方先查）。
 pub fn zip_bytes(entries: &[(String, Vec<u8>)]) -> Result<Vec<u8>, CoreError> {
     let mut cursor = Cursor::new(Vec::new());
@@ -203,8 +220,13 @@ pub fn zip_bytes(entries: &[(String, Vec<u8>)]) -> Result<Vec<u8>, CoreError> {
         let mut writer = ZipWriter::new(&mut cursor);
         for (name, data) in entries {
             validate_rel_path(name).map_err(|e| sec("NF-EXP-002", e.message))?;
+            let opts = if name == "mimetype" {
+                stored_options()
+            } else {
+                fixed_options()
+            };
             writer
-                .start_file(name, fixed_options())
+                .start_file(name, opts)
                 .map_err(|e| zip_err("写 zip entry 失败", e))?;
             writer
                 .write_all(data)

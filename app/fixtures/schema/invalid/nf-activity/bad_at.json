@@ -1,0 +1,10 @@
+{
+  "schema": "nf-activity/1",
+  "events": [
+    {
+      "id": "e1",
+      "at": "now",
+      "kind": "other"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "node": "C7-15",
+  "name": "audit chain",
+  "state": "implemented",
+  "ops": "audit-append/verify",
+  "tests": "tests/test_coverage_wave1.py::test_audit_chain_and_tamper",
+  "evidence": [
+    "tests/test_coverage_wave1.py"
+  ],
+  "validation": "Android 558/558 + Python 203 passed"
+}

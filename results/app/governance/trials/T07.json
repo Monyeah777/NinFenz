@@ -1,0 +1,24 @@
+{
+  "trial": "T07",
+  "ok": true,
+  "n": 100,
+  "verified": 200,
+  "verify_checks": 200,
+  "frozen_verified": 100,
+  "artifact_tamper_detected": 100,
+  "evidence_tamper_detected": 100,
+  "package_tamper_detected": 100,
+  "freeze_tamper_detected": 100,
+  "rollback_blocked": 100,
+  "missing_artifact_detected": 100,
+  "offline_env": "HTTP_PROXY/HTTPS_PROXY 指向不可达 127.0.0.1:1",
+  "criteria": {
+    "verified": "100%",
+    "frozen": "100%",
+    "tamper": "100%",
+    "freeze": "100%",
+    "rollback": "100%",
+    "missing": "100%",
+    "network": "0"
+  }
+}

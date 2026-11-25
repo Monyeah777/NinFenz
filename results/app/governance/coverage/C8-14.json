@@ -1,0 +1,13 @@
+{
+  "node": "C8-14",
+  "name": "辅助输入与读屏遍历",
+  "state": "implemented",
+  "ops": "NfScaffold semantics + A11yComposeTest + ScreenAudit",
+  "evidence": [
+    "C8-14.md",
+    "TEST-dev.ninfenz.mobile.ui.A11yComposeTest.xml",
+    "android-tests.txt"
+  ],
+  "tests": "A11yComposeTest.kt / scaffold traversal index",
+  "validation": "A11yComposeTest 8/8; Android 558/558; screen matrix C8-14.md"
+}

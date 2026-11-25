@@ -1,0 +1,9 @@
+{
+  "benchmark": "C2.09",
+  "ok": true,
+  "cases": 60,
+  "precision": 1.0,
+  "recall": 1.0,
+  "f1": 1.0,
+  "unrecoverable": 0
+}

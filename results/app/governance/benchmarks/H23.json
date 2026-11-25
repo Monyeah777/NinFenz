@@ -1,0 +1,13 @@
+{
+  "benchmark": "H2.3",
+  "ok": true,
+  "cases": 50,
+  "repaired": 50,
+  "unrecoverable": 0,
+  "reversible": true,
+  "criteria": {
+    "success": ">=90%",
+    "unrecoverable": 0,
+    "revocable": true
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "schema": "nf-preset/1",
+  "id": "default",
+  "name": "Default",
+  "version": 1,
+  "settings": {
+    "theme": "SYSTEM",
+    "language": "en",
+    "density": "standard",
+    "profile": "default",
+    "typeScale": 1
+  },
+  "extensions": []
+}

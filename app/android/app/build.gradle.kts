@@ -11,6 +11,8 @@ val uploadKeyAlias = System.getenv("NF_UPLOAD_KEY_ALIAS")
 val uploadKeyPass = System.getenv("NF_UPLOAD_KEY_PASSWORD")
 val hasUploadSigning = !uploadStore.isNullOrBlank() && !uploadStorePass.isNullOrBlank() &&
     !uploadKeyAlias.isNullOrBlank() && !uploadKeyPass.isNullOrBlank()
+val abiSplit = System.getenv("NF_ABI_SPLIT") == "1"
+val nfEdition = ((findProperty("nfEdition") as String?) ?: "daily").lowercase()
 
 android {
     namespace = "dev.ninfenz.mobile"
@@ -21,11 +23,14 @@ android {
         applicationId = "dev.ninfenz.mobile"
         minSdk = 26
         targetSdk = 36
-        versionCode = 2
-        versionName = "0.2.0"
+        versionCode = 6
+        versionName = "0.3.3"
+        buildConfigField("String", "NF_EDITION", "\"$nfEdition\"")
         // ABI 与 Rust 交叉编译目标一致（app/scripts/build_core_android.sh）
-        ndk {
-            abiFilters.addAll(listOf("arm64-v8a", "x86_64"))
+        if (!abiSplit) {
+            ndk {
+                abiFilters.addAll(listOf("arm64-v8a", "x86_64"))
+            }
         }
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -52,6 +57,16 @@ android {
         buildConfig = true
     }
 
+    // 可选 ABI split：默认 universal APK；设置 NF_ABI_SPLIT=1 时产出按 ABI 拆分的 APK
+    splits {
+        abi {
+            isEnable = abiSplit
+            reset()
+            include("arm64-v8a", "x86_64")
+            isUniversalApk = false
+        }
+    }
+
     // 动态语言切换：AAB 不分语言拆包，避免运行期切 locale 缺资源
     bundle {
         language {
@@ -76,6 +91,11 @@ android {
 
     kotlinOptions {
         jvmTarget = "17"
+    }
+
+    lint {
+        // 离线环境缺 android.tools:lint-gradle；发布前在联网 CI 单独跑 lint
+        checkReleaseBuilds = false
     }
 
     testOptions {

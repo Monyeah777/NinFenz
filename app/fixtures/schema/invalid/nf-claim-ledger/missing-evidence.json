@@ -1,0 +1,15 @@
+{
+  "schema": "nf-claim-ledger/1",
+  "ledger_id": "demo",
+  "created_at": "x",
+  "claims": [
+    {
+      "id": "c1",
+      "statement": "x",
+      "status": "verified",
+      "source": "s",
+      "created_at": "x"
+    }
+  ],
+  "ledger_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+}

@@ -30,6 +30,17 @@ class EpubExporterTest {
     }
 
     @Test
+    fun writesCreatorAndLanguage() {
+        val dir = Files.createTempDirectory("nf-epub-meta").toFile()
+        val created = EpubExporter.export("# 章" + "\n" + "\n" + "正文", "书", dir, "作者", "en")
+        ZipFile(created.file).use { zip ->
+            val opf = zip.getInputStream(zip.getEntry("OEBPS/content.opf")).bufferedReader().readText()
+            assertTrue(opf.contains("<dc:creator>作者</dc:creator>"))
+            assertTrue(opf.contains("<dc:language>en</dc:language>"))
+        }
+    }
+
+    @Test
     fun rendersPipeTableInChapter() {
         val dir = Files.createTempDirectory("nf-epub-table").toFile()
         val created = EpubExporter.export("# 表\n\n| A | B |\n|---|---|\n| 1 | 2 |", "表", dir)

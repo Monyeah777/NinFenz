@@ -1,0 +1,13 @@
+{
+  "benchmark": "H1.2",
+  "ok": true,
+  "docs": 30,
+  "features_exact": 30,
+  "no_silent_loss": 30,
+  "page_bbox_full": 30,
+  "criteria": {
+    "features": "100%",
+    "loss": 0,
+    "page_bbox": "100%"
+  }
+}

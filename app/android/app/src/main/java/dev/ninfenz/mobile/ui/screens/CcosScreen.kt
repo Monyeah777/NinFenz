@@ -12,9 +12,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Button
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Surface
@@ -38,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.core.CoreError
 import dev.ninfenz.mobile.core.CoreResponse
 import dev.ninfenz.mobile.core.J
+import dev.ninfenz.mobile.data.CcosQueueStore
 import dev.ninfenz.mobile.data.CcosSessionStore
 import dev.ninfenz.mobile.data.FileAccess
 import dev.ninfenz.mobile.data.ProjectStatusStore
@@ -91,6 +94,10 @@ fun CcosScreen(onBack: () -> Unit) {
     var outcome by remember { mutableStateOf<String?>(null) }
     var busy by remember { mutableStateOf(false) }
     var precheckFindings by remember { mutableStateOf(restored.findings) }
+    val queueStore = remember { CcosQueueStore(context.filesDir) }
+    var queue by remember { mutableStateOf(queueStore.load()) }
+    var showQueue by remember { mutableStateOf(false) }
+    var queueNote by remember { mutableStateOf<String?>(null) }
 
     val taskPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         if (uri == null) return@rememberLauncherForActivityResult
@@ -231,6 +238,15 @@ fun CcosScreen(onBack: () -> Unit) {
             ) {
                 Button(onClick = { taskPicker.launch(arrayOf("application/json", "text/plain")) }) { Text(stringResource(dev.ninfenz.mobile.R.string.ccos_open_task)) }
                 OutlinedButton(onClick = { resultPicker.launch(arrayOf("application/json", "text/plain")) }) { Text(stringResource(dev.ninfenz.mobile.R.string.ccos_open_result)) }
+                if (rawTask != null) {
+                    OutlinedButton(onClick = {
+                        queue = queueStore.add(rawTask!!)
+                        queueNote = "queued"
+                    }) { Text(stringResource(dev.ninfenz.mobile.R.string.ccos_queue_add)) }
+                }
+                OutlinedButton(onClick = { queue = queueStore.load(); showQueue = true }) {
+                    Text(stringResource(dev.ninfenz.mobile.R.string.ccos_queue) + " (" + queue.size + ")")
+                }
                 if (task != null || result != null) {
                     OutlinedButton(enabled = !busy, onClick = {
                         scope.launch {
@@ -318,6 +334,40 @@ fun CcosScreen(onBack: () -> Unit) {
             EmptyState(stringResource(dev.ninfenz.mobile.R.string.ccos_no_result))
         }
     }
+    if (showQueue) {
+        AlertDialog(
+            onDismissRequest = { showQueue = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.ccos_queue)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    if (queue.isEmpty()) Text(stringResource(dev.ninfenz.mobile.R.string.ccos_queue_empty), style = NfType.meta)
+                    queue.forEach { item ->
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                            Text(item.id, style = NfType.meta)
+                            Row {
+                                TextButton(onClick = {
+                                    runCatching {
+                                        val obj = item.task
+                                        task = CcosModel.parseTask(obj)
+                                        rawTask = obj
+                                        CcosSessionStore.saveTask(context.filesDir, obj.toString())
+                                        result = null
+                                        precheckFindings = emptyList()
+                                        showQueue = false
+                                    }.onFailure { queueNote = it.message }
+                                }) { Text(stringResource(dev.ninfenz.mobile.R.string.ccos_queue_load)) }
+                                TextButton(onClick = { queueStore.remove(item.id); queue = queueStore.load() }) {
+                                    Text(stringResource(dev.ninfenz.mobile.R.string.inbox_remove))
+                                }
+                            }
+                        }
+                    }
+                    queueNote?.let { Text(it, style = NfType.meta) }
+                }
+            },
+            confirmButton = { TextButton(onClick = { showQueue = false }) { Text(stringResource(android.R.string.ok)) } }
+        )
+    }
 }
 
 /** 固定底部人审操作区：与滚动列表解耦，避免按钮被输入框/滚动遮挡。 */
@@ -343,6 +393,7 @@ fun CcosReviewActions(
             }
         }
     }
+
 }
 
 private data class RestoredCcos(

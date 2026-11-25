@@ -1,0 +1,9 @@
+{
+  "node": "C9-06",
+  "name": "用户控制/可逆/可解释",
+  "state": "implemented",
+  "ops": "audit reason + DecisionStore + DecisionLogScreen + DeliveryScreen export record",
+  "evidence": "TEST-dev.ninfenz.mobile.data.DecisionStoreTest.xml",
+  "tests": "DecisionStoreTest.kt / DecisionLogScreen",
+  "validation": "DecisionStoreTest 2/2 pass; DecisionLogScreen"
+}

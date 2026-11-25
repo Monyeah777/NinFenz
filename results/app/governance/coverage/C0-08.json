@@ -1,0 +1,11 @@
+{
+  "node": "C0-08",
+  "name": "claim ledger",
+  "state": "implemented",
+  "ops": "claim-add/claim-verify",
+  "tests": "tests/test_coverage_wave1.py::test_claim_add_and_verify_tamper",
+  "evidence": [
+    "tests/test_coverage_wave1.py"
+  ],
+  "validation": "Android 558/558 + Python 203 passed"
+}

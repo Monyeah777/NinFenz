@@ -1,0 +1,11 @@
+{
+  "schema": "nf-report/1",
+  "kind": "a11y",
+  "subject_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "ok": true,
+  "summary": {
+    "blockers": 0
+  },
+  "items": [],
+  "markdown": "ok"
+}

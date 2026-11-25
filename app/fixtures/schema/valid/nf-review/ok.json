@@ -1,0 +1,19 @@
+{
+  "schema": "nf-review/1",
+  "project_id": "p1",
+  "subject_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+  "comments": [
+    {
+      "id": "c1",
+      "block_id": "b1",
+      "block_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "author": "r",
+      "body": "fix",
+      "status": "unresolved",
+      "created_at": 1
+    }
+  ],
+  "verdict": "pending",
+  "reviewer": "r",
+  "note": ""
+}

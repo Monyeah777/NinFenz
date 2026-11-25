@@ -1,0 +1,14 @@
+{
+  "schema": "nf-migration/1",
+  "from_schema": "a",
+  "to_schema": "b",
+  "steps": [
+    {
+      "id": "s",
+      "kind": "k",
+      "from": "a",
+      "to": "b",
+      "reversible": true
+    }
+  ]
+}

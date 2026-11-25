@@ -80,6 +80,7 @@ import dev.ninfenz.mobile.data.PackEntry
 import dev.ninfenz.mobile.data.PackInstaller
 import dev.ninfenz.mobile.data.PackSnapshot
 import dev.ninfenz.mobile.data.PackStore
+import dev.ninfenz.mobile.data.BackupService
 import dev.ninfenz.mobile.data.CreateProjectResult
 import dev.ninfenz.mobile.data.ProjectCreator
 import dev.ninfenz.mobile.data.ProjectArchiver
@@ -114,18 +115,24 @@ import dev.ninfenz.mobile.ui.screens.MeScreen
 import dev.ninfenz.mobile.ui.screens.NewProjectScreen
 import dev.ninfenz.mobile.ui.screens.OnboardingScreen
 import dev.ninfenz.mobile.ui.screens.PackCenterScreen
+import dev.ninfenz.mobile.ui.screens.InboxScreen
 import dev.ninfenz.mobile.ui.screens.PackDetailScreen
 import dev.ninfenz.mobile.ui.screens.PackUpdateScreen
 import dev.ninfenz.mobile.ui.screens.ProjectDetailScreen
 import dev.ninfenz.mobile.ui.screens.ProtocolScreen
 import dev.ninfenz.mobile.ui.screens.SearchScreen
 import dev.ninfenz.mobile.ui.screens.SettingsScreen
+import dev.ninfenz.mobile.ui.screens.DecisionLogScreen
 import dev.ninfenz.mobile.ui.screens.DesignSystemScreen
 import dev.ninfenz.mobile.ui.screens.WorkflowHubScreen
 import dev.ninfenz.mobile.ui.screens.ProjectFlowScreen
+import dev.ninfenz.mobile.ui.screens.PackBuilderScreen
+import dev.ninfenz.mobile.ui.screens.ProjectReviewScreen
 import dev.ninfenz.mobile.ui.shell.Detail
 import dev.ninfenz.mobile.ui.shell.ShellState
 import dev.ninfenz.mobile.ui.shell.ShellStateCodec
+import dev.ninfenz.mobile.data.EditionRoutePolicy
+import dev.ninfenz.mobile.data.FeatureGate
 import dev.ninfenz.mobile.ui.shell.TopDestination
 import java.io.File
 import java.util.Locale
@@ -174,6 +181,10 @@ fun NfMobileApp(
     var recentCommands by remember { mutableStateOf(commandHistory.load()) }
 
     var shell by rememberSaveable(stateSaver = ShellStateSaver) { mutableStateOf(ShellState()) }
+    LaunchedEffect(shell.detail, FeatureGate.tier()) {
+        val safe = EditionRoutePolicy.sanitize(shell)
+        if (safe != shell) shell = safe
+    }
     var packs by remember { mutableStateOf<PackSnapshot>(PackSnapshot(emptyList(), emptyList())) }
     var projects by remember { mutableStateOf<List<ProjectEntry>>(emptyList()) }
     var archivedProjects by remember { mutableStateOf<List<File>>(emptyList()) }
@@ -266,6 +277,7 @@ fun NfMobileApp(
         recentCommands = commandHistory.load()
         when (id) {
             "import" -> shell = shell.open(Detail.Import)
+            "inbox" -> shell = shell.open(Detail.Inbox)
             "new_project" -> shell = shell.open(Detail.NewProject)
             "search" -> shell = shell.open(Detail.Search)
             "pack_center" -> shell = shell.open(Detail.PackCenter)
@@ -344,6 +356,7 @@ fun NfMobileApp(
             } else {
                 when (shortcut) {
                     "import" -> shell = shell.open(Detail.Import)
+            "inbox" -> shell = shell.open(Detail.Inbox)
                     "new_project" -> shell = shell.open(Detail.NewProject)
                     "search" -> shell = shell.open(Detail.Search)
                 }
@@ -440,7 +453,14 @@ fun NfMobileApp(
     val detailContent: @Composable () -> Unit = {
         when (val detail = shell.detail) {
             null -> Unit
-is Detail.Import -> ImportScreen(
+is Detail.Inbox -> InboxScreen(
+                        onBack = { shell = shell.back() ?: shell },
+                        onImport = { payload ->
+                            sharedPrefill = payload
+                            shell = shell.open(Detail.Import)
+                        }
+                    )
+                    is Detail.Import -> ImportScreen(
                         prefill = sharedPrefill,
                         store = library,
                         onBack = {
@@ -532,13 +552,15 @@ is Detail.Import -> ImportScreen(
                         packIds = packs.packs.map { it.id }.distinct().sorted()
                     )
                     is Detail.DesignSystem -> DesignSystemScreen(onBack = { shell = shell.back() ?: shell })
+                    is Detail.DecisionLog -> DecisionLogScreen(onBack = { shell = shell.back() ?: shell })
                     is Detail.Settings -> SettingsScreen(
                         onBack = { shell = shell.back() ?: shell },
                         onErrorCodes = { shell = shell.open(Detail.ErrorCodes) },
                         onDataRestored = { refresh() },
                         onNfDocMerge = { shell = shell.open(Detail.NfDocMerge) },
                         onPatch = { shell = shell.open(Detail.Patch()) },
-                        onDesignSystem = { shell = shell.open(Detail.DesignSystem) }
+                        onDesignSystem = { shell = shell.open(Detail.DesignSystem) },
+                        onDecisionLog = { shell = shell.open(Detail.DecisionLog) }
                     )
                     is Detail.ErrorCodes -> ErrorCodesScreen(onBack = { shell = shell.back() ?: shell })
                     is Detail.Author -> {
@@ -584,6 +606,25 @@ is Detail.Import -> ImportScreen(
                             DeliveryScreen(project = entry.project, pack = pack, onBack = { shell = shell.back() ?: shell }, onOpenPacks = { shell = shell.open(Detail.PackCenter) }, onPatch = { shell = shell.open(Detail.Patch(entry.project.id)) }, onStatusChanged = { refresh() })
                         }
                     }
+                    is Detail.PackBuilder -> PackBuilderScreen(
+                        draftId = detail.id,
+                        onBack = { shell = shell.back() ?: shell },
+                        onInstalled = { refresh() }
+                    )
+                    is Detail.Review -> {
+                        val entry = projects.firstOrNull { it.project.id == detail.id }
+                        if (entry == null) {
+                            NfEmptyState(
+                                icon = Icons.Filled.Info,
+                                title = stringResource(dev.ninfenz.mobile.R.string.project_missing_title),
+                                message = stringResource(dev.ninfenz.mobile.R.string.project_missing_body),
+                                actionLabel = stringResource(dev.ninfenz.mobile.R.string.back_to_library),
+                                onAction = { shell = shell.back() ?: shell }
+                            )
+                        } else {
+                            ProjectReviewScreen(project = entry.project, onBack = { shell = shell.back() ?: shell })
+                        }
+                    }
                     is Detail.Flow -> {
                         val entry = projects.firstOrNull { it.project.id == detail.id }
                         if (entry == null) {
@@ -619,6 +660,13 @@ is Detail.Import -> ImportScreen(
                                 ).show()
                             } else {
                                 scope.launch {
+                                    val snapshot = withContext(Dispatchers.IO) {
+                                        runCatching { BackupService.create(context.filesDir) }.getOrNull()
+                                    }
+                                    if (snapshot == null) {
+                                        android.widget.Toast.makeText(context, context.getString(dev.ninfenz.mobile.R.string.backup_snapshot_blocked), android.widget.Toast.LENGTH_LONG).show()
+                                        return@launch
+                                    }
                                     val result = runCatching {
                                         withContext(Dispatchers.IO) {
                                             PackInstaller.uninstall(pack.dir, context.filesDir)
@@ -645,6 +693,29 @@ is Detail.Import -> ImportScreen(
                         onOpenPack = { pack -> shell = shell.open(Detail.Pack(pack.id, pack.version)) },
                         onUpdatePlan = { shell = shell.open(Detail.PackUpdate) },
                         onLoadSample = ::runSeed,
+                        onNewPackDraft = {
+                            val source = packs.packs.firstOrNull()
+                            if (source == null) {
+                                android.widget.Toast.makeText(context, context.getString(dev.ninfenz.mobile.R.string.new_project_no_pack_title), android.widget.Toast.LENGTH_LONG).show()
+                            } else {
+                                scope.launch {
+                                    val result = runCatching {
+                                        withContext(Dispatchers.IO) {
+                                            dev.ninfenz.mobile.data.PackDraftStore(context.filesDir).createFrom(
+                                                source,
+                                                source.id + "-draft",
+                                                source.version,
+                                                source.title + " draft"
+                                            )
+                                        }
+                                    }
+                                    result.onSuccess { shell = shell.open(Detail.PackBuilder(it.id)) }
+                                    result.onFailure {
+                                        android.widget.Toast.makeText(context, it.message ?: "draft failed", android.widget.Toast.LENGTH_LONG).show()
+                                    }
+                                }
+                            }
+                        },
                         refreshing = refreshing,
                         onRefresh = { refresh() }
                     )
@@ -683,6 +754,8 @@ is Detail.Import -> ImportScreen(
                                 onAuthor = { shell = shell.open(Detail.Author(entry.project.id)) },
                                 onAssembly = { shell = shell.open(Detail.Delivery(entry.project.id)) },
                                 onFlow = { shell = shell.open(Detail.Flow(entry.project.id)) },
+                                onReviewBlocks = { shell = shell.open(Detail.Review(entry.project.id)) },
+                                onFavoriteChanged = { refresh() },
                                 compareCandidates = projects,
                                 onShare = {
                                     val text = runCatching { entry.file.readText(Charsets.UTF_8) }.getOrNull()
@@ -694,6 +767,13 @@ is Detail.Import -> ImportScreen(
                                 },
                                 onDelete = {
                                     scope.launch {
+                                        val snapshot = withContext(Dispatchers.IO) {
+                                            runCatching { BackupService.create(context.filesDir) }.getOrNull()
+                                        }
+                                        if (snapshot == null) {
+                                            android.widget.Toast.makeText(context, context.getString(dev.ninfenz.mobile.R.string.backup_snapshot_blocked), android.widget.Toast.LENGTH_LONG).show()
+                                            return@launch
+                                        }
                                         withContext(Dispatchers.IO) { ProjectArchiver.deleteProject(entry.file, context.filesDir) }
                                         refresh()
                                         shell = shell.select(TopDestination.LIBRARY)
@@ -814,6 +894,41 @@ is Detail.Import -> ImportScreen(
                                         refresh()
                                         shell = shell.open(Detail.Project(copy.name.removeSuffix(".nfproject.json")))
                                     }
+                                },
+                                packs = packs.packs,
+                                onChangePack = { pack ->
+                                    scope.launch {
+                                        val result = withContext(Dispatchers.IO) {
+                                            projectCreator.create(pack, entry.project.title + " · " + pack.id)
+                                        }
+                                        when (result) {
+                                            is CreateProjectResult.Success -> {
+                                                withContext(Dispatchers.IO) {
+                                                    val oldDir = java.io.File(java.io.File(context.filesDir, "projects"), entry.project.id)
+                                                    val newDir = java.io.File(java.io.File(context.filesDir, "projects"), result.project.id)
+                                                    oldDir.listFiles()?.filter { it.name != ".nfproject.json" }?.forEach { child ->
+                                                        child.copyRecursively(java.io.File(newDir, child.name), overwrite = false)
+                                                    }
+                                                    val oldDraft = java.io.File(java.io.File(context.filesDir, "drafts"), "delivery-" + entry.project.id + ".json")
+                                                    if (oldDraft.isFile) {
+                                                        oldDraft.copyTo(
+                                                            java.io.File(java.io.File(context.filesDir, "drafts"), "delivery-" + result.project.id + ".json"),
+                                                            overwrite = true
+                                                        )
+                                                    }
+                                                }
+                                                refresh()
+                                                shell = shell.open(Detail.Project(result.project.id))
+                                            }
+                                            is CreateProjectResult.Failure -> {
+                                                android.widget.Toast.makeText(
+                                                    context,
+                                                    result.code + " · " + result.message,
+                                                    android.widget.Toast.LENGTH_LONG
+                                                ).show()
+                                            }
+                                        }
+                                    }
                                 }
                             )
                         }
@@ -891,17 +1006,20 @@ is Detail.Import -> ImportScreen(
     }
 
     if (showCommands) {
-        val items = listOf(
-            CommandPalette.Item("import", stringResource(dev.ninfenz.mobile.R.string.action_import)),
-            CommandPalette.Item("new_project", stringResource(dev.ninfenz.mobile.R.string.new_project_title)),
-            CommandPalette.Item("search", stringResource(dev.ninfenz.mobile.R.string.search_title)),
-            CommandPalette.Item("pack_center", stringResource(dev.ninfenz.mobile.R.string.deliver_pack_center_title)),
-            CommandPalette.Item("pack_update", stringResource(dev.ninfenz.mobile.R.string.pack_detail_update)),
-            CommandPalette.Item("ccos", stringResource(dev.ninfenz.mobile.R.string.ccos_title)),
-            CommandPalette.Item("settings", stringResource(dev.ninfenz.mobile.R.string.settings_title)),
-            CommandPalette.Item("error_codes", stringResource(dev.ninfenz.mobile.R.string.error_codes_title)),
-            CommandPalette.Item("project_import", stringResource(dev.ninfenz.mobile.R.string.project_import_command))
-        )
+        val items = buildList {
+            add(CommandPalette.Item("import", stringResource(dev.ninfenz.mobile.R.string.action_import)))
+            add(CommandPalette.Item("inbox", stringResource(dev.ninfenz.mobile.R.string.inbox_title)))
+            add(CommandPalette.Item("new_project", stringResource(dev.ninfenz.mobile.R.string.new_project_title)))
+            add(CommandPalette.Item("search", stringResource(dev.ninfenz.mobile.R.string.search_title)))
+            add(CommandPalette.Item("pack_center", stringResource(dev.ninfenz.mobile.R.string.deliver_pack_center_title)))
+            if (FeatureGate.auditEnabled()) {
+                add(CommandPalette.Item("pack_update", stringResource(dev.ninfenz.mobile.R.string.pack_detail_update)))
+                add(CommandPalette.Item("ccos", stringResource(dev.ninfenz.mobile.R.string.ccos_title)))
+            }
+            add(CommandPalette.Item("settings", stringResource(dev.ninfenz.mobile.R.string.settings_title)))
+            add(CommandPalette.Item("error_codes", stringResource(dev.ninfenz.mobile.R.string.error_codes_title)))
+            add(CommandPalette.Item("project_import", stringResource(dev.ninfenz.mobile.R.string.project_import_command)))
+        }
         CommandPaletteDialog(CommandPalette.order(items, recentCommands), onDismiss = { showCommands = false }, onRun = ::runCommand)
     }
 }

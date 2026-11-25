@@ -1,0 +1,14 @@
+{
+  "node": "C1-08",
+  "name": "接入治理",
+  "state": "implemented",
+  "owner": "kotlin-ui",
+  "hard_ids": [
+    "H1.2"
+  ],
+  "evidence": [
+    "app tests + Android unit tests"
+  ],
+  "acceptance": "baseline regression",
+  "validation": "Android 558/558 + Python 203 passed"
+}

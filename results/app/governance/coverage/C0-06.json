@@ -1,0 +1,12 @@
+{
+  "node": "C0-06",
+  "name": "诊断与崩溃",
+  "state": "implemented",
+  "owner": "core",
+  "hard_ids": [],
+  "evidence": [
+    "app tests + Android unit tests"
+  ],
+  "acceptance": "baseline regression",
+  "validation": "Android 558/558 + Python 203 passed"
+}

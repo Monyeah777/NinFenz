@@ -20,6 +20,12 @@ class WebPdfExporterTest {
     }
 
     @Test
+    fun pageCountUsesLetterSize() {
+        assertEquals(1, WebPdfExporter.pageCount(1000, 794, 612, 792))
+        assertEquals(2, WebPdfExporter.pageCount(1800, 794, 612, 792))
+    }
+
+    @Test
     fun pageCountHandlesEmptyAndTinyWidth() {
         assertEquals(1, WebPdfExporter.pageCount(0, 794))
         assertEquals(1, WebPdfExporter.pageCount(1, 1))

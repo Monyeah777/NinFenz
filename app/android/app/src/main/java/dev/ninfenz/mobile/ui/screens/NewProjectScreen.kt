@@ -49,6 +49,7 @@ fun NewProjectScreen(
     var selectedKey by rememberSaveable { mutableStateOf<String?>(null) }
     val selected = packs.firstOrNull { selectedKey == it.id + "@" + it.version } ?: packs.firstOrNull()
     var title by rememberSaveable { mutableStateOf("") }
+    var packQuery by rememberSaveable { mutableStateOf("") }
 
     Column(modifier = Modifier.fillMaxSize()) {
         NfTopAppBar(title = stringResource(dev.ninfenz.mobile.R.string.new_project_title), onBack = onBack)
@@ -66,8 +67,18 @@ fun NewProjectScreen(
                 verticalArrangement = Arrangement.spacedBy(NfSpacing.m)
             ) {
                 item { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.new_project_select_pack)) }
-                items(packs.size) { index ->
-                    val pack = packs[index]
+                item {
+                    OutlinedTextField(
+                        value = packQuery,
+                        onValueChange = { packQuery = it },
+                        label = { Text(stringResource(dev.ninfenz.mobile.R.string.pack_search)) },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                val filteredPacks = packs.filter { packQuery.isBlank() || it.title.contains(packQuery, true) || it.id.contains(packQuery, true) }
+                items(filteredPacks.size) { index ->
+                    val pack = filteredPacks[index]
                     NfCard(onClick = { selectedKey = pack.id + "@" + pack.version }) {
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                             RadioButton(selected = selected?.id == pack.id && selected?.version == pack.version, onClick = { selectedKey = pack.id + "@" + pack.version })

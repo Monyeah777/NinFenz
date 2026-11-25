@@ -40,7 +40,7 @@ class StateRestorationTest {
                 )
             }
         }
-        compose.onNode(hasSetTextAction()).performTextInput("我的项目")
+        compose.onAllNodes(hasSetTextAction())[1].performTextInput("我的项目")
         tester.emulateSavedInstanceStateRestore()
         compose.onNodeWithText("我的项目").assertExists()
     }

@@ -1,0 +1,8 @@
+{
+  "node": "C8-16",
+  "name": "本地化/RTL/pseudolocale",
+  "state": "implemented",
+  "ops": "LanguageMode.PSEUDO + values-en-rXA + RTL",
+  "evidence": "TEST-dev.ninfenz.mobile.ui.PseudoLocaleTest.xml",
+  "validation": "PseudoLocaleTest 1/1 pass"
+}

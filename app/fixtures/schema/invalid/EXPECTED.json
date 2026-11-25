@@ -316,6 +316,230 @@
       "codes": [
         "NF-E-002"
       ]
+    },
+    "invalid/nf-sdir/missing-provenance.json": {
+      "schema": "nf-sdir",
+      "violated": "required provenance 缺失（无溯源不能进 SDIR）",
+      "codes": [
+        "NF-SDIR-001"
+      ]
+    },
+    "invalid/nf-sdir/bad-block-type.json": {
+      "schema": "nf-sdir",
+      "violated": "block.type 不在 enum（未知类型 fail-closed）",
+      "codes": [
+        "NF-SDIR-001"
+      ]
+    },
+    "invalid/nf-build-graph/missing-environment.json": {
+      "schema": "nf-build-graph",
+      "violated": "required environment 缺失（环境指纹必须完整）",
+      "codes": [
+        "NF-BLD-001"
+      ]
+    },
+    "invalid/nf-build-graph/bad-node-kind.json": {
+      "schema": "nf-build-graph",
+      "violated": "node.kind 不在 enum（未知节点类型 fail-closed）",
+      "codes": [
+        "NF-BLD-001"
+      ]
+    },
+    "invalid/nf-evidence/missing-signature.json": {
+      "schema": "nf-evidence",
+      "violated": "required signature 缺失（未签名证据不得通过）",
+      "codes": [
+        "NF-EVD-001"
+      ]
+    },
+    "invalid/nf-evidence/bad-artifact-sha.json": {
+      "schema": "nf-evidence",
+      "violated": "artifact.sha256 不是 64 位小写十六进制",
+      "codes": [
+        "NF-EVD-001"
+      ]
+    },
+    "invalid/nf-extension/missing-compat.json": {
+      "schema": "nf-extension",
+      "violated": "required compat 缺失（版本兼容必须声明）",
+      "codes": [
+        "NF-EXT-001"
+      ]
+    },
+    "invalid/nf-extension/bad-type.json": {
+      "schema": "nf-extension",
+      "violated": "type 不在 enum（扩展类型 fail-closed）",
+      "codes": [
+        "NF-EXT-001"
+      ]
+    },
+    "invalid/nf-claim-ledger/bad-hash.json": {
+      "schema": "nf-claim-ledger",
+      "codes": [
+        "NF-CLM-001"
+      ],
+      "violated": "ledger_sha256/evidence_sha256 非 64 位 hex"
+    },
+    "invalid/nf-claim-ledger/missing-evidence.json": {
+      "schema": "nf-claim-ledger",
+      "codes": [
+        "NF-CLM-001"
+      ],
+      "violated": "claim 缺 evidence_sha256"
+    },
+    "invalid/nf-budget/missing-observed.json": {
+      "schema": "nf-budget",
+      "codes": [
+        "NF-BUD-001"
+      ],
+      "violated": "缺 observed"
+    },
+    "invalid/nf-budget/bad-policy.json": {
+      "schema": "nf-budget",
+      "codes": [
+        "NF-BUD-001"
+      ],
+      "violated": "policy 非 fail/warn"
+    },
+    "invalid/nf-migration/empty-steps.json": {
+      "schema": "nf-migration",
+      "codes": [
+        "NF-MIG-001"
+      ],
+      "violated": "steps 为空"
+    },
+    "invalid/nf-migration/missing-losses.json": {
+      "schema": "nf-migration",
+      "codes": [
+        "NF-MIG-001"
+      ],
+      "violated": "缺 losses"
+    },
+    "invalid/nf-audit/bad-seq.json": {
+      "schema": "nf-audit",
+      "codes": [
+        "NF-AUD-001"
+      ],
+      "violated": "seq 为负"
+    },
+    "invalid/nf-audit/missing-head.json": {
+      "schema": "nf-audit",
+      "codes": [
+        "NF-AUD-001"
+      ],
+      "violated": "缺 head"
+    },
+    "invalid/nf-trust-root/bad-key.json": {
+      "schema": "nf-trust-root",
+      "codes": [
+        "NF-TRUST-001"
+      ],
+      "violated": "public_key 非 64 位 hex"
+    },
+    "invalid/nf-trust-root/bad-status.json": {
+      "schema": "nf-trust-root",
+      "codes": [
+        "NF-TRUST-001"
+      ],
+      "violated": "status 非 active/retired/revoked"
+    },
+    "invalid/nf-report/bad-kind.json": {
+      "schema": "nf-report",
+      "codes": [
+        "NF-A11Y-001"
+      ],
+      "violated": "kind 非 fidelity/a11y/coverage"
+    },
+    "invalid/nf-report/missing-items.json": {
+      "schema": "nf-report",
+      "codes": [
+        "NF-A11Y-001"
+      ],
+      "violated": "缺 items"
+    },
+    "invalid/nf-preset/bad-theme.json": {
+      "schema": "nf-preset",
+      "codes": [
+        "NF-PRESET-001"
+      ],
+      "violated": "theme 非 SYSTEM/LIGHT/DARK"
+    },
+    "invalid/nf-preset/bad-id.json": {
+      "schema": "nf-preset",
+      "codes": [
+        "NF-PRESET-001"
+      ],
+      "violated": "id 含空格"
+    },
+    "invalid/nf-portable/bad-manifest.json": {
+      "schema": "nf-portable",
+      "codes": [
+        "NF-PORT-001"
+      ],
+      "violated": "manifest_sha256 非 64 hex"
+    },
+    "invalid/nf-portable/missing-prefs.json": {
+      "schema": "nf-portable",
+      "codes": [
+        "NF-PORT-001"
+      ],
+      "violated": "缺 prefs"
+    },
+    "invalid/nf-review/bad_missing_digest.json": {
+      "schema": "nf-review",
+      "violated": "required/const/type/pattern/minItems",
+      "codes": [
+        "NF-PRJ-001"
+      ]
+    },
+    "invalid/nf-review/bad_verdict.json": {
+      "schema": "nf-review",
+      "violated": "required/const/type/pattern/minItems",
+      "codes": [
+        "NF-PRJ-001"
+      ]
+    },
+    "invalid/nf-handoff/bad_empty_files.json": {
+      "schema": "nf-handoff",
+      "violated": "required/const/type/pattern/minItems",
+      "codes": [
+        "NF-PRJ-001"
+      ]
+    },
+    "invalid/nf-handoff/bad_sha.json": {
+      "schema": "nf-handoff",
+      "violated": "required/const/type/pattern/minItems",
+      "codes": [
+        "NF-PRJ-001"
+      ]
+    },
+    "invalid/nf-library/bad_tags.json": {
+      "schema": "nf-library",
+      "violated": "required/const/type/pattern/minItems",
+      "codes": [
+        "NF-PRJ-001"
+      ]
+    },
+    "invalid/nf-library/bad_view.json": {
+      "schema": "nf-library",
+      "violated": "required/const/type/pattern/minItems",
+      "codes": [
+        "NF-PRJ-001"
+      ]
+    },
+    "invalid/nf-activity/bad_empty.json": {
+      "schema": "nf-activity",
+      "violated": "required/const/type/pattern/minItems",
+      "codes": [
+        "NF-PRJ-001"
+      ]
+    },
+    "invalid/nf-activity/bad_at.json": {
+      "schema": "nf-activity",
+      "violated": "required/const/type/pattern/minItems",
+      "codes": [
+        "NF-PRJ-001"
+      ]
     }
   }
 }

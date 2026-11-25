@@ -1,0 +1,26 @@
+{
+  "trial": "T10",
+  "ok": true,
+  "pages": 500,
+  "resume_points": [
+    125,
+    250,
+    375,
+    500
+  ],
+  "full_pages": 500,
+  "resumed_pages": 500,
+  "sdir_same": true,
+  "full_sha": "b0d02f95a8d70869b63a43e1b9cfa049bcd8bdf632e18334a2b28304fdbd1f87",
+  "resumed_sha": "b0d02f95a8d70869b63a43e1b9cfa049bcd8bdf632e18334a2b28304fdbd1f87",
+  "page_cover": true,
+  "build_reproducible": true,
+  "peak_mb": 13.7,
+  "full_parse_seconds": 0.6,
+  "criteria": {
+    "recovery": "100%",
+    "loss": 0,
+    "peak_mb": "<=300",
+    "build": "same sha"
+  }
+}

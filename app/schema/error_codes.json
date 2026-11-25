@@ -164,6 +164,13 @@
       "fix": "权重限 0..100 且只挂 stage/module"
     },
     {
+      "code": "NF-GRF-008",
+      "severity": "error",
+      "exit": 1,
+      "message": "端口类型不匹配或非法扇入",
+      "fix": "让 data 边 from_port=to_port；多入边改用 merge 节点"
+    },
+    {
       "code": "NF-SPC-001",
       "severity": "error",
       "exit": 1,
@@ -348,6 +355,27 @@
     {
       "code": "NF-PCK-007",
       "severity": "error",
+      "exit": 1,
+      "message": "Pack 发布清单/签名非法",
+      "fix": "按 nf-pack-release/1 重签"
+    },
+    {
+      "code": "NF-PCK-008",
+      "severity": "error",
+      "exit": 1,
+      "message": "发布树/清单与 Pack 不一致",
+      "fix": "重新发布或恢复原 Pack"
+    },
+    {
+      "code": "NF-PCK-009",
+      "severity": "error",
+      "exit": 1,
+      "message": "Pack 回滚/冻结冲突",
+      "fix": "拒绝该发布；降级需显式 allow_rollback 并记录"
+    },
+    {
+      "code": "NF-PCK-007",
+      "severity": "error",
       "exit": 2,
       "message": "回滚失败（备份缺失/摘要不符）",
       "fix": "从备份手工恢复并登记"
@@ -456,6 +484,189 @@
       "exit": 1,
       "message": "canonical 输入非法（float/NaN/非字符串键）",
       "fix": "改用 int/字符串"
+    },
+    {
+      "code": "NF-SDIR-001",
+      "severity": "error",
+      "exit": 1,
+      "message": "SDIR 结构/schema 非法",
+      "fix": "按报告 path 修复块/关系/溯源"
+    },
+    {
+      "code": "NF-SDIR-002",
+      "severity": "error",
+      "exit": 1,
+      "message": "SDIR 块 id/hash/关系闭包不一致",
+      "fix": "重算块 hash 或补齐关系"
+    },
+    {
+      "code": "NF-SDIR-003",
+      "severity": "error",
+      "exit": 3,
+      "message": "SDIR 源格式不支持或解析失败",
+      "fix": "改用 markdown/nf-doc/docx/epub 已声明格式"
+    },
+    {
+      "code": "NF-SDIR-004",
+      "severity": "error",
+      "exit": 1,
+      "message": "SDIR 三方合并存在未裁决冲突",
+      "fix": "按冲突 id 选择 ours/theirs/manual"
+    },
+    {
+      "code": "NF-SDIR-005",
+      "severity": "error",
+      "exit": 1,
+      "message": "SDIR 修复后仍不合法",
+      "fix": "按报告 path 手工修，或撤销本轮修复"
+    },
+    {
+      "code": "NF-BLD-001",
+      "severity": "error",
+      "exit": 1,
+      "message": "构建图非法（节点/边/输出/环境）",
+      "fix": "按报告 path 修图"
+    },
+    {
+      "code": "NF-BLD-002",
+      "severity": "error",
+      "exit": 3,
+      "message": "构建缓存/环境指纹不匹配",
+      "fix": "清缓存或用同环境重建"
+    },
+    {
+      "code": "NF-BLD-003",
+      "severity": "error",
+      "exit": 1,
+      "message": "增量构建输出过期或缺失",
+      "fix": "重跑受影响节点"
+    },
+    {
+      "code": "NF-EVD-001",
+      "severity": "error",
+      "exit": 1,
+      "message": "证据/产物摘要不一致（篡改或缺件）",
+      "fix": "从可信源重建证据包"
+    },
+    {
+      "code": "NF-EVD-002",
+      "severity": "error",
+      "exit": 3,
+      "message": "证据签名算法/密钥不可用",
+      "fix": "使用 ed25519 签名并用对应公钥验证"
+    },
+    {
+      "code": "NF-EVD-003",
+      "severity": "error",
+      "exit": 1,
+      "message": "证据签名验证失败",
+      "fix": "核对公钥/指纹与签名覆盖字段"
+    },
+    {
+      "code": "NF-EVD-004",
+      "severity": "error",
+      "exit": 1,
+      "message": "证据包回滚/冻结冲突（版本降低或同版本换包）",
+      "fix": "拒绝该包；需要降级时显式 allow_rollback 并记录"
+    },
+    {
+      "code": "NF-EVD-005",
+      "severity": "error",
+      "exit": 1,
+      "message": "信任库/包清单非法",
+      "fix": "按 nf-trust-store/1 修复或从可信源重建"
+    },
+    {
+      "code": "NF-EXT-001",
+      "severity": "error",
+      "exit": 1,
+      "message": "扩展清单非法或声明了越权能力",
+      "fix": "按 nf-extension/1 修清单"
+    },
+    {
+      "code": "NF-EXT-002",
+      "severity": "error",
+      "exit": 3,
+      "message": "严格模式拒绝未签名扩展",
+      "fix": "签名扩展或切到普通模式并标注"
+    },
+    {
+      "code": "NF-SOLVE-001",
+      "severity": "error",
+      "exit": 1,
+      "message": "规划约束不可满足（unsat）",
+      "fix": "看 unsat_core 放宽约束或补资产"
+    },
+    {
+      "code": "NF-SOLVE-002",
+      "severity": "error",
+      "exit": 1,
+      "message": "规划搜索超时/超预算",
+      "fix": "缩小候选或提高预算"
+    },
+    {
+      "code": "NF-REUSE-001",
+      "severity": "error",
+      "exit": 1,
+      "message": "复用索引/影响查询非法",
+      "fix": "按报告 path 修索引"
+    },
+    {
+      "code": "NF-PROF-001",
+      "severity": "error",
+      "exit": 1,
+      "message": "导出 Profile 不支持或产出验证失败",
+      "fix": "改用已声明 profile 或修复内容"
+    },
+    {
+      "code": "NF-CLM-001", "severity": "error", "exit": 1,
+      "message": "claim ledger 非法或 evidence 不匹配",
+      "fix": "按 claim id/evidence sha 修复"
+    },
+    {
+      "code": "NF-BUD-001", "severity": "error", "exit": 1,
+      "message": "资源预算超限或预算结构非法",
+      "fix": "降低输入规模或调整 policy"
+    },
+    {
+      "code": "NF-MIG-001", "severity": "error", "exit": 1,
+      "message": "迁移路径不存在/不可逆未确认/迁移失败",
+      "fix": "提供合法路径或 confirm=true"
+    },
+    {
+      "code": "NF-AUD-001", "severity": "error", "exit": 1,
+      "message": "审计链非法或断链",
+      "fix": "从首个断点重建审计"
+    },
+    {
+      "code": "NF-TRUST-001", "severity": "error", "exit": 1,
+      "message": "信任根非法/已吊销/签名不符",
+      "fix": "添加合法根或更新签名"
+    },
+    {
+      "code": "NF-FID-001", "severity": "error", "exit": 1,
+      "message": "保真账本缺失或特征无法对账",
+      "fix": "重新导入并检查 fidelity"
+    },
+    {
+      "code": "NF-A11Y-001", "severity": "error", "exit": 1,
+      "message": "可访问性 blocker（lang/标题/表头/alt/顺序）",
+      "fix": "按 items 的 path/fix 修复"
+    },
+    {
+      "code": "NF-EXT-003", "severity": "error", "exit": 1,
+      "message": "扩展 manifest 非法/签名不符/未知 capability",
+      "fix": "修 manifest 或用 strict=false 仅本地查看"
+    },
+    {
+      "code": "NF-PRESET-001", "severity": "error", "exit": 1,
+      "message": "预设非法或不可应用",
+      "fix": "检查 id/settings/version"
+    },
+    {
+      "code": "NF-PORT-001", "severity": "error", "exit": 1,
+      "message": "可携带包非法/清单不符/冲突",
+      "fix": "重新导出或按冲突预览合并"
     }
   ]
 }

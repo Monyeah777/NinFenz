@@ -1,0 +1,27 @@
+{
+  "trial": "T04",
+  "ok": true,
+  "n": 100,
+  "parity": 100,
+  "parity_ratio": 1.0,
+  "p95_ms": 15.79,
+  "median_ms": 13.95,
+  "max_ms": 16.3,
+  "byte_identical_twice": true,
+  "identical_builds": 100,
+  "cache_hits": 100,
+  "cache_hit_ratio": 1.0,
+  "stale_outputs": 0,
+  "reused_outputs": 0,
+  "block_parity": 100,
+  "block_p95_ms": 24.76,
+  "criteria": {
+    "parity": "100%",
+    "p95_ms": "<300",
+    "identical_builds": 100,
+    "cache_hit": ">=80%",
+    "stale": 0,
+    "block_parity": "100%",
+    "block_p95_ms": "<300"
+  }
+}

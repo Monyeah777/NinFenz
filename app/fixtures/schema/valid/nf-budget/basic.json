@@ -1,0 +1,18 @@
+{
+  "schema": "nf-budget/1",
+  "name": "import",
+  "limits": {
+    "seconds": 60,
+    "peak_mb": 300,
+    "pages": 500,
+    "blocks": 100000
+  },
+  "observed": {
+    "seconds": 2,
+    "peak_mb": 13,
+    "pages": 500,
+    "blocks": 50000
+  },
+  "ok": true,
+  "policy": "fail"
+}

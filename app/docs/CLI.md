@@ -47,10 +47,55 @@ nf-app-core <op> --in <req.json|->   # → stdout: 单行 JSON（响应信封）
 | `export` | `markdown`/`result`, `plan_digest?`, `spec_digest?`, `project_id?`, `title?`, `format`: md/zip/json/**docx**/**skill**（pdf=平台打印）, `out_dir`, `manifest?: bool` | `nf-export-manifest/1` | 越界 → NF-EXP-002 (3)；重名 → NF-EXP-003 (1)；pdf → NF-EXP-004 (4，平台打印) |
 | `pack-diff` | `old_root`, `new_root`, `projects?: [nf-project/1]` | `nf-pack-update/1` | 清单不符 → 1 |
 | `pack-merge` | `update`, `base_root`, `new_root`, `overlay?`, `decisions?: {conflict_id: option}`, `out_dir` | `{applied: bool, conflicts:[...], result_tree: sha256}` | 冲突未裁决 → NF-PCK-006 (1)；摘要不符 → NF-PCK-004 (3) |
+| `pack-update` | `release`, `trust_path?`, `pack_root?` + `pack-merge` 入参 | 同 `pack-merge` | 未签名/树不符/回滚 → 1 |
+| `pack-release-create` | `pack_root`, `release_version`, `created_at`, `private_key`, `channel?` | `nf-pack-release/1` | 清单/树非法 → 1 |
+| `pack-release-verify` | `release`, `pack_root?`, `trust_path?` | `nf-pack-release-verify/1` | 签名/树/回滚 → 1 |
+| `pack-release-freeze` | `release`, `trust_path`, `created_at?`, `allow_rollback?` | `nf-trust-store/1` | 回滚/同版本换树 → 1（NF-PCK-009） |
 | `overlay-apply` | `base_root`, `overlay`, `out_dir` | `{tree: sha256, base: ref}` | base 不符 → NF-PCK-002 (1) |
 | `ccos-build-task` | `project`, `task_id`（调用方生成，确定性）, `created_at`（显式）, `budget`, `variables?` | `ccos-task/1` | 项目未 validated → NF-CCOS-001 (1)；含密钥形状 → NF-CCOS-003 (3) |
 | `ccos-import-result` | `task`, `result` | `{status, review:{state}, issues}` | digest 不符 → NF-CCOS-002 (1)；缺人审 → NF-CCOS-004 (warn) |
 | `project-validate` | `project` | `nf-validate-report/1` | 引用失配/状态非法 → 1 |
+| `sdir-import` | `markdown` / `doc` / `docx_path` / `epub_path`, `source:{name,mime,bytes_sha?}?`, `created_at`, `title?`, `lang?` | `nf-sdir/1` | 源/摘要不符 → 1；不支持格式 → 3 |
+| `layout-import` | `source:{name,mime,bytes_sha,size}`, `created_at`, `pages:[{number,width,height,words}]`, `lang?` | `nf-sdir/1`（page/bbox/fidelity） | 无词/摘要非法 → 1/3 |
+| `sdir-repair` | `sdir` | `nf-sdir-repair/1` | 修复后仍非法 → 1（NF-SDIR-005） |
+| `sdir-validate` | `sdir` | `nf-validate-report/1` | 结构/关系/溯源/可访问性失败 → 1 |
+| `sdir-diff` | `from`, `to` | `nf-sdir-diff/1` | 输入非法 → 2 |
+| `sdir-merge` | `base`, `ours`, `theirs` | `nf-sdir-merge/1` | 未裁决冲突 → 1（NF-SDIR-004） |
+| `build-plan` | `sdir`, `outputs:[{path,format,profile?}]`, `plan_sha?`, `locale?`, `font_hashes?` | `nf-build-graph/1` | 输出非法 → 1；不安全路径 → 3 |
+| `build-run` | `sdir`, `graph?`, `outputs?`, `out_dir` | `nf-build-result/1` | 图/缓存不符 → 1/3；IO → 2 |
+| `build-incremental` | `old_graph`, `new_graph`, `out_dir?` | `nf-incremental-plan/1` | 输入非法 → 2 |
+| `evidence-create` | `artifact_path`, `sdir`, `graph`, `created_at`, `private_key`, `profile?` | `nf-evidence/1` | 摘要/签名失败 → 1/3 |
+| `evidence-verify` | `evidence`, `artifact_path?` | `nf-evidence-verify/1` | 摘要/签名失败 → 1 |
+| `evidence-pack` | `artifact_path`, `evidence`, `out_path`, `version?` | `nf-evidence-package/1` | 摘要不符 → 1；IO → 2 |
+| `evidence-verify-package` | `package_path`, `trust_path?` | `nf-evidence-verify/1` | 包/摘要/签名/冻结失败 → 1 |
+| `evidence-freeze` | `package_path`, `trust_path`, `created_at?`, `allow_rollback?` | `nf-trust-store/1` | 回滚/同版本换包 → 1（NF-EVD-004） |
+| `evidence-keygen` | `seed` | `nf-evidence-key/1` | 非法种子 → 3 |
+| `plan-solve` | `slots`, `modules:[{id,provides,requires?,cost?,conflicts?}]`, `budget?`, `assets?` | `nf-plan-result/1` | 不可满足 → satisfiable=false + unsat_core |
+| `plan-explain` | `result?` 或 solve 入参 | `nf-plan-explain/1` | 同上 |
+| `reuse-index` | `projects:[{id,sdir}]` | `nf-reuse-index/1` | SDIR 非法 → 1 |
+| `reuse-impact` | `index`, `changed:[hash]` | `nf-reuse-impact/1` | 参数缺失 → 2 |
+| `export-profile` | `sdir`, `profile`, `formats?`, `out_dir` | `nf-build-result/1` + `profile` | 未知 profile → 1；路径/IO → 3/2 |
+| `export-accessible` | `sdir`, `formats?`, `out_dir` | `nf-build-result/1` + `accessibility` | 缺 alt/表头/顺序 → 1 |
+| `block-plan` | `sdir` | `nf-block-plan/1`（块 hash + 渲染摘要 + output） | SDIR 非法 → 1 |
+| `block-incremental` | `sdir`, `old_blocks` | `nf-block-plan/1` + recompute/reuse/stale | 参数缺失 → 2 |
+| `graph-typecheck` | `graph` | `nf-validate-report/1` | 类型/扇入错误 → 1（NF-GRF-008） |
+| `schema-induce` | `docs:[sdir]`, `min_support?`, `id?`, `title?` | `nf-md-spec/1` | 归纳/校验失败 → 1 |
+| `sdir-fuse` | `sources:[sdir]` | `nf-sdir-fusion/1` | 多源差异未裁决 → 1（NF-SDIR-004） |
+| `template-induce` | `docs:[sdir]`, `min_support?` | `nf-template-induction/1` | 输入非法 → 1 |
+| `template-migrate` | `template`, `sdir` | `nf-template-migration/1` | 迁移后校验失败 → 1 |
+| `compose-run` | `out_dir`, `jobs:[{id,sdir,outputs}]` | `nf-compose-result/1` | 单 job 失败隔离，不拖垮其他 job |
+| `claim-add` / `claim-verify` | `ledger?`, `claim` / `ledger`, `evidence_dir?` | `nf-claim-ledger/1` / `nf-claim-report/1` | evidence 不符 → 1 |
+| `budget-check` | `budget` | `nf-budget/1` | 超限 fail → 1 |
+| `migrate-plan` / `migrate-apply` | `from_schema,to_schema` / `plan,doc,created_at,confirm?` | `nf-migration/1` / `nf-migration-result/1` | 不可逆未确认 → 1 |
+| `audit-append` / `audit-verify` | `audit?,at,actor,action,subject_sha256` / `audit` | `nf-audit/1` / `nf-audit-report/1` | 断链 → 1 |
+| `trust-root-add/rotate/verify/revoke` | `trust,root,fingerprint?,old_id?` | `nf-trust-root/1` / `nf-trust-report/1` | 签名/吊销 → 1 |
+| `report-fidelity` / `report-a11y` | `sdir` | `nf-report/1` | blocker → 1 |
+| `extension-list/verify/apply` | `dir` / `manifest,strict?` | `nf-extension-list/1` / report | 非法/未签名 strict → 1 |
+| `preset-list` / `preset-apply` | `presets?` / `preset,prefs?` | `nf-preset-list/1` / apply | 预设非法 → 1 |
+| `portable-export/import/exit` | `created_at,projects,prefs,packs,contents?,out_path?` / `zip_path?` | `nf-portable/1` | 清单/冲突 → 1 |
+| `sdir-export` / `sdir-load` | `sdir` | `nf-sdir/1` JSON | 非法 → 1 |
+
+> 硬技术 op 是**加法**：ABI 仍为 `nf-app-core/1`，旧 op 语义不变；新消费者按 op 名探测能力。
 
 ## 4. 退出码
 

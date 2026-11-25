@@ -1,17 +1,33 @@
 package dev.ninfenz.mobile.data
 
-/** Free/Pro/CCOS 分层：默认 Free 全开，不因 Pro/CCOS 关闭而锁日常能力。 */
+import dev.ninfenz.mobile.BuildConfig
+
+/** Daily/Pro/CCOS 分层：默认 Daily 全开日常能力，审计面只在 Pro/CCOS。 */
 object FeatureGate {
     enum class Tier { FREE, PRO, CCOS }
 
+    private val initialTier: Tier = when (BuildConfig.NF_EDITION) {
+        "pro" -> Tier.PRO
+        "ccos" -> Tier.CCOS
+        else -> Tier.FREE
+    }
+
     @Volatile
-    private var activeTier: Tier = Tier.FREE
+    private var activeTier: Tier = initialTier
+
+    fun edition(): String = BuildConfig.NF_EDITION
 
     fun tier(): Tier = activeTier
 
-    /** 仅用于调试/自检切换；发布版没有购买入口，仍默认 Free。 */
+    fun defaultTier(): Tier = initialTier
+
+    /** 仅用于调试/自检切换；发布版没有购买入口，仍默认 Daily。 */
     fun setTierForDebug(tier: Tier) {
         activeTier = tier
+    }
+
+    fun resetForTest() {
+        activeTier = initialTier
     }
 
     fun isProEnabled(): Boolean = tier() != Tier.FREE
@@ -30,4 +46,8 @@ object FeatureGate {
                 Tier.CCOS -> FeaturePolicy.Tier.CCOS
             }
         )
+
+    fun require(feature: String): Boolean = allows(feature)
+
+    fun auditEnabled(): Boolean = allows("audit.validate")
 }

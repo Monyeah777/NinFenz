@@ -1,0 +1,26 @@
+{
+  "trial": "T03",
+  "ok": true,
+  "n": 50,
+  "satisfiable_cases": 40,
+  "legal": 40,
+  "legal_ratio": 1.0,
+  "unsat_cases": 10,
+  "unsat_explained": 10,
+  "graphs_valid": 50,
+  "type_errors": 50,
+  "schema_precision": 1.0,
+  "schema_recall": 1.0,
+  "schema_f1": 1.0,
+  "schema_ece": 0.0,
+  "spec_valid": true,
+  "worst_ms": 1050.41,
+  "median_ms": 11.84,
+  "criteria": {
+    "legal": ">=95%",
+    "unsat": "100%",
+    "graphs": "50/50",
+    "type_errors": "50/50",
+    "worst_ms": "<2000"
+  }
+}

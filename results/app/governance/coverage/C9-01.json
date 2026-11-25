@@ -1,0 +1,8 @@
+{
+  "node": "C9-01",
+  "name": "覆盖矩阵",
+  "state": "implemented",
+  "ops": "coverage_audit.py + COVERAGE_MATRIX.md",
+  "evidence": "COVERAGE_MATRIX.md",
+  "validation": "Android 558/558 + Python 203 passed"
+}

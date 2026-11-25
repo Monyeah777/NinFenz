@@ -1,0 +1,13 @@
+{
+  "schema": "nf-activity/1",
+  "events": [
+    {
+      "id": "e1",
+      "at": 1,
+      "kind": "project.create",
+      "project_id": "p1",
+      "message": "created"
+    }
+  ],
+  "cursor": 1
+}

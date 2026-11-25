@@ -1,0 +1,15 @@
+{
+  "node": "C7-07",
+  "name": "项目生命周期",
+  "state": "implemented",
+  "owner": "kotlin-ui",
+  "hard_ids": [
+    "H1.3",
+    "H6.3"
+  ],
+  "evidence": [
+    "app tests + Android unit tests"
+  ],
+  "acceptance": "baseline regression",
+  "validation": "Android 558/558 + Python 203 passed"
+}

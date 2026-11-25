@@ -26,6 +26,18 @@ class ExportHistoryStoreTest {
     }
 
     @Test
+    fun removeOnlyOneRecord() {
+        val dir = Files.createTempDirectory("nf-export-history-remove").toFile()
+        val store = ExportHistoryStore(dir)
+        val f1 = File(dir, "a.md").apply { writeText("a") }
+        val f2 = File(dir, "b.md").apply { writeText("b") }
+        store.record("md", f1, "s1")
+        store.record("md", f2, "s2")
+        store.remove(f1.absolutePath)
+        assertEquals(listOf("b.md"), store.load().map { it.name })
+    }
+
+    @Test
     fun clearRemovesHistory() {
         val dir = Files.createTempDirectory("nf-export-history-clear").toFile()
         val store = ExportHistoryStore(dir)

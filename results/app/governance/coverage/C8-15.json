@@ -1,0 +1,8 @@
+{
+  "node": "C8-15",
+  "name": "搜索质量与排序",
+  "state": "implemented",
+  "ops": "SearchIndex NFKC/CJK/fuzzy/ranking",
+  "evidence": "TEST-dev.ninfenz.mobile.data.SearchRankingTest.xml",
+  "validation": "SearchRankingTest 5/5 pass"
+}

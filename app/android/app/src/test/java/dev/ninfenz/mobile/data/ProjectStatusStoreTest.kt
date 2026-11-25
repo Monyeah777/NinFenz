@@ -74,6 +74,28 @@ class ProjectStatusStoreTest {
     }
 
     @Test
+    fun dailyExportSkipsValidatedHistory() = runBlocking {
+        val filesDir = Files.createTempDirectory("nf-status-daily").toFile()
+        val project = setup(filesDir)
+        val bridge = FakeCoreBridge()
+            .enqueue(CoreResponse.ok(buildJsonObject { put("digest", hex) }))
+            .enqueue(CoreResponse.ok(buildJsonObject { put("verdict", "pass") }))
+            .enqueue(CoreResponse.ok(buildJsonObject { put("verdict", "pass") }))
+        val store = ProjectStatusStore(filesDir, bridge)
+        val assembled = store.advance(project, ProjectStatus.ASSEMBLED, AssemblyArtifact("markdown".toByteArray()))
+        assertTrue(assembled is StatusAdvanceResult.Advanced)
+        val exported = store.advance((assembled as StatusAdvanceResult.Advanced).project, ProjectStatus.EXPORTED, allowAuditSkip = true)
+        assertTrue(exported is StatusAdvanceResult.Advanced)
+        val raw = kotlinx.serialization.json.Json.parseToJsonElement(
+            File(filesDir, "projects/p.nfproject.json").readText(Charsets.UTF_8)
+        ).jsonObject
+        assertEquals("exported", raw["status"]?.jsonPrimitive?.content)
+        val ops = Regex("\"op\":\"([^\"]+)\"").findAll(raw["history"].toString()).map { it.groupValues[1] }.toList()
+        assertTrue(ops.contains("export"))
+        assertTrue(!ops.contains("status:assembled->validated"))
+    }
+
+    @Test
     fun coreFailureLeavesProjectUntouched() = runBlocking {
         val filesDir = Files.createTempDirectory("nf-status-fail").toFile()
         val project = setup(filesDir)

@@ -1,0 +1,17 @@
+{
+  "node": "C6-10",
+  "name": "可访问导出",
+  "state": "implemented",
+  "ops": "export-accessible + pdfua_export.py + Android PdfUaExporter",
+  "evidence": [
+    "C6-10.pdf",
+    "C6-10-vera.txt",
+    "C6-10-device.pdf",
+    "C6-10-device-vera.txt"
+  ],
+  "tests": "H51.json / PdfUaExporter.kt",
+  "validation": "veraPDF ua1 PASS",
+  "sha256": "dd172761baa0a8e4a464a632bea95163ffddc08b84abe5a6c1e5becc61074f8d",
+  "device_validation": "veraPDF ua1 PASS (PLF110 Android 16)",
+  "device_sha256": "a9745ba177151995e295a4dc48a98b3672bd83c4fe6e396897931ec70fb03823"
+}

@@ -11,6 +11,7 @@ use std::sync::OnceLock;
 pub const SCHEMA_NAMES: &[&str] = &[
     "nf-pack",
     "nf-import",
+    "nf-doc",
     "nf-md-spec",
     "nf-pipeline-graph",
     "nf-protocol-pack",
@@ -25,6 +26,22 @@ pub const SCHEMA_NAMES: &[&str] = &[
     "nf-project",
     "ccos-task",
     "ccos-result",
+    "nf-sdir",
+    "nf-build-graph",
+    "nf-evidence",
+    "nf-extension",
+    "nf-claim-ledger",
+    "nf-budget",
+    "nf-migration",
+    "nf-audit",
+    "nf-trust-root",
+    "nf-report",
+    "nf-preset",
+    "nf-portable",
+    "nf-review",
+    "nf-handoff",
+    "nf-library",
+    "nf-activity",
 ];
 
 macro_rules! embed_schemas {
@@ -43,6 +60,7 @@ pub fn schemas() -> &'static BTreeMap<&'static str, Value> {
         embed_schemas!(
             "nf-pack" => "../../schema/nf-pack.schema.json",
             "nf-import" => "../../schema/nf-import.schema.json",
+            "nf-doc" => "../../schema/nf-doc.schema.json",
             "nf-md-spec" => "../../schema/nf-md-spec.schema.json",
             "nf-pipeline-graph" => "../../schema/nf-pipeline-graph.schema.json",
             "nf-protocol-pack" => "../../schema/nf-protocol-pack.schema.json",
@@ -57,6 +75,22 @@ pub fn schemas() -> &'static BTreeMap<&'static str, Value> {
             "nf-project" => "../../schema/nf-project.schema.json",
             "ccos-task" => "../../schema/ccos-task.schema.json",
             "ccos-result" => "../../schema/ccos-result.schema.json",
+            "nf-sdir" => "../../schema/nf-sdir.schema.json",
+            "nf-build-graph" => "../../schema/nf-build-graph.schema.json",
+            "nf-evidence" => "../../schema/nf-evidence.schema.json",
+            "nf-extension" => "../../schema/nf-extension.schema.json",
+            "nf-claim-ledger" => "../../schema/nf-claim-ledger.schema.json",
+            "nf-budget" => "../../schema/nf-budget.schema.json",
+            "nf-migration" => "../../schema/nf-migration.schema.json",
+            "nf-audit" => "../../schema/nf-audit.schema.json",
+            "nf-trust-root" => "../../schema/nf-trust-root.schema.json",
+            "nf-report" => "../../schema/nf-report.schema.json",
+            "nf-preset" => "../../schema/nf-preset.schema.json",
+            "nf-portable" => "../../schema/nf-portable.schema.json",
+            "nf-review" => "../../schema/nf-review.schema.json",
+            "nf-handoff" => "../../schema/nf-handoff.schema.json",
+            "nf-library" => "../../schema/nf-library.schema.json",
+            "nf-activity" => "../../schema/nf-activity.schema.json",
         )
     })
 }

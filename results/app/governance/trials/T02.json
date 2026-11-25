@@ -1,0 +1,21 @@
+{
+  "trial": "T02",
+  "ok": true,
+  "n": 30,
+  "clean_merges": 10,
+  "conflict_merges": 10,
+  "delete_merges": 10,
+  "merged_valid": 30,
+  "table_cells_ok": 10,
+  "silent_loss": 0,
+  "fusion_ok": 10,
+  "criteria": {
+    "clean": "100%",
+    "conflict": "100%",
+    "delete": "100%",
+    "refs": "100%",
+    "cells": "100%",
+    "fusion": "10/10",
+    "silent_loss": 0
+  }
+}

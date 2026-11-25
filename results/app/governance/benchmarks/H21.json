@@ -1,0 +1,16 @@
+{
+  "benchmark": "H2.1",
+  "ok": true,
+  "docs": 30,
+  "by_format": {
+    "md": 10,
+    "docx": 10,
+    "epub": 5,
+    "pdf": 5
+  },
+  "roundtrip_parity": 1.0,
+  "criteria": {
+    "docs": 30,
+    "parity": ">=98%"
+  }
+}

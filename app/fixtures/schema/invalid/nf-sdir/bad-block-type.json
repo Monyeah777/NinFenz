@@ -1,0 +1,43 @@
+{
+  "schema": "nf-sdir/1",
+  "meta": {
+    "title": "x",
+    "created_at": "2026-01-01T00:00:00Z"
+  },
+  "sources": [
+    {
+      "id": "s1",
+      "name": "x.md",
+      "mime": "text/markdown",
+      "bytes_sha": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "blocks": [
+    {
+      "id": "b0",
+      "type": "bogus",
+      "text": "",
+      "hash": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "relations": [],
+  "accessibility": [
+    {
+      "block": "b0",
+      "missing": [],
+      "reading_order": 0
+    }
+  ],
+  "provenance": [
+    {
+      "block": "b0",
+      "source_id": "s1",
+      "transform": [
+        "x/1"
+      ],
+      "input_hashes": [
+        "0000000000000000000000000000000000000000000000000000000000000000"
+      ]
+    }
+  ]
+}

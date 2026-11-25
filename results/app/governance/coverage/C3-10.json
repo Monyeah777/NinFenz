@@ -1,0 +1,12 @@
+{
+  "node": "C3-10",
+  "name": "模板覆盖/引用",
+  "state": "implemented",
+  "owner": "core",
+  "hard_ids": [],
+  "evidence": [
+    "app tests + Android unit tests"
+  ],
+  "acceptance": "baseline regression",
+  "validation": "Android 558/558 + Python 203 passed"
+}

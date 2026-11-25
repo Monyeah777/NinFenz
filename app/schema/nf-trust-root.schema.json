@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/app/schema/nf-trust-root.schema.json",
+  "title": "NF 信任根",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "roots", "revoked"],
+  "properties": {
+    "schema": {"const": "nf-trust-root/1"},
+    "roots": {"type": "array", "items": {"$ref": "#/$defs/root"}},
+    "revoked": {"type": "array", "items": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}
+  },
+  "$defs": {
+    "root": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "alg", "public_key", "fingerprint", "not_before", "not_after", "status"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "alg": {"const": "ed25519"},
+        "public_key": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "not_before": {"type": "string", "minLength": 1},
+        "not_after": {"type": "string", "minLength": 1},
+        "status": {"enum": ["active", "retired", "revoked"]}
+      }
+    }
+  }
+}

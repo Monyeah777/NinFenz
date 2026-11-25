@@ -57,6 +57,10 @@ bash app/scripts/build_desktop.sh package    # 需 WIX_PATH + -Pcompose.desktop.
 5. **Android NDK + Rust linker**：Windows 上 rustc 不能执行 NDK 的 `*.cmd`；linker 要指到 `.../toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe`，并加 `-C link-arg=--target=aarch64-linux-android21`（x86_64 同理）。模板：`D:\tmp\app-toolchain\rust-android-demo/.cargo/config.toml`；本仓 `app/scripts/build_core_android.sh` 按其实现。
 6. **cargo 镜像**：crates.io 直连被死代理拦截；本机用 `rsproxy.cn` sparse 镜像（模板 `app/core/.cargo/config.toml.example`，真文件 gitignored；**CI 用默认 crates.io**，供应链纪律见 `app/docs/DEPENDENCIES.md`）。
 
+## 3.5 Android 单测
+
+本机 Gradle 缺 `com.android.tools.layoutlib:layoutlib-resources:15.2.3` 的 jar，在线解析会卡住。运行 `python app/scripts/setup_android_tests.py` 会把 SDK 的 `platforms/android-*/data/res` 打成 jar 放入 mavenLocal，配合 `settings.gradle.kts` 的 `mavenLocal()` 可跑 Robolectric + Paparazzi；无 SDK 时回退空 jar（只能跑非渲染测试）。
+
 ## 4. 证据哈希（本机）
 
 | 产物 | 大小 | sha256（前缀） |

@@ -1,0 +1,12 @@
+{
+  "node": "C3-02",
+  "name": "协议渲染/规则",
+  "state": "implemented",
+  "owner": "core",
+  "hard_ids": [],
+  "evidence": [
+    "app tests + Android unit tests"
+  ],
+  "acceptance": "baseline regression",
+  "validation": "Android 558/558 + Python 203 passed"
+}

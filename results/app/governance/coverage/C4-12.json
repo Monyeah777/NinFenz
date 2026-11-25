@@ -1,0 +1,15 @@
+{
+  "node": "C4-12",
+  "name": "多项目批量装配",
+  "state": "implemented",
+  "owner": "core",
+  "hard_ids": [
+    "H3.3",
+    "H3.4"
+  ],
+  "evidence": [
+    "app tests + Android unit tests"
+  ],
+  "acceptance": "baseline regression",
+  "validation": "Android 558/558 + Python 203 passed"
+}

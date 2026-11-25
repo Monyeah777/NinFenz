@@ -1,0 +1,20 @@
+{
+  "trial": "T08",
+  "ok": true,
+  "n": 20,
+  "release_deterministic": true,
+  "release_verified": true,
+  "unsigned_rejected": true,
+  "tamper_rejected": true,
+  "rollback_blocked": true,
+  "latest_verified": true,
+  "applied_scenarios": 20,
+  "project_damage": 0,
+  "criteria": {
+    "scenarios": "100%",
+    "project_damage": 0,
+    "unsigned": "reject",
+    "rollback": "reject",
+    "freeze": "reject"
+  }
+}

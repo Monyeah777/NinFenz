@@ -1,0 +1,178 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/app/schema/nf-build-graph.schema.json",
+  "title": "NF 内容寻址构建图（nf-build-graph/1）",
+  "description": "节点/边/输出 + 完整环境指纹；同输入同环境同版本 → 同输出。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "plan_sha",
+    "environment",
+    "nodes",
+    "edges",
+    "outputs"
+  ],
+  "properties": {
+    "schema": {
+      "const": "nf-build-graph/1"
+    },
+    "plan_sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "core_version",
+        "schema_version",
+        "font_hashes",
+        "locale",
+        "fixed_mtime"
+      ],
+      "properties": {
+        "core_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "schema_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "font_hashes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "locale": {
+          "type": "string",
+          "minLength": 1
+        },
+        "fixed_mtime": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "kind",
+          "input_hashes",
+          "cache_key"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "enum": [
+              "input",
+              "transform",
+              "output"
+            ]
+          },
+          "op": {
+            "type": "string",
+            "minLength": 1
+          },
+          "input_hashes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "output_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "cache_key": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "params": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "from",
+          "to",
+          "port"
+        ],
+        "properties": {
+          "from": {
+            "type": "string",
+            "minLength": 1
+          },
+          "to": {
+            "type": "string",
+            "minLength": 1
+          },
+          "port": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "outputs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "node",
+          "path",
+          "sha256",
+          "bytes",
+          "format"
+        ],
+        "properties": {
+          "node": {
+            "type": "string",
+            "minLength": 1
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "format": {
+            "enum": [
+              "md",
+              "html",
+              "json",
+              "docx",
+              "epub"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

@@ -73,7 +73,8 @@ fun SettingsScreen(
     onDataRestored: () -> Unit = {},
     onNfDocMerge: () -> Unit = {},
     onPatch: () -> Unit = {},
-    onDesignSystem: () -> Unit = {}
+    onDesignSystem: () -> Unit = {},
+    onDecisionLog: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val diag = remember { Core.diagnostics() }
@@ -81,6 +82,7 @@ fun SettingsScreen(
     var copied by remember { mutableStateOf(false) }
     var selfCheck by remember { mutableStateOf<dev.ninfenz.mobile.data.PropertyHarness.Report?>(null) }
     var tier by remember { mutableStateOf(FeatureGate.tier()) }
+    val audit = FeatureGate.auditEnabled()
     var chainFirst by remember { mutableStateOf<File?>(null) }
     var chainSecond by remember { mutableStateOf<File?>(null) }
     var chainNote by remember { mutableStateOf<String?>(null) }
@@ -175,7 +177,10 @@ fun SettingsScreen(
                     Text(stringResource(dev.ninfenz.mobile.R.string.error_codes_title))
                 }
                 OutlinedButton(onClick = onDesignSystem) {
-                    Text("设计系统")
+                    Text(stringResource(dev.ninfenz.mobile.R.string.settings_design_system))
+                }
+                if (audit) OutlinedButton(onClick = onDecisionLog) {
+                    Text(stringResource(dev.ninfenz.mobile.R.string.settings_decision_log))
                 }
             }
         }
@@ -194,7 +199,7 @@ fun SettingsScreen(
             }
         }
 
-        CardBox(title = stringResource(dev.ninfenz.mobile.R.string.settings_chain_title)) {
+        if (audit) CardBox(title = stringResource(dev.ninfenz.mobile.R.string.settings_chain_title)) {
             Text(
                 stringResource(dev.ninfenz.mobile.R.string.settings_chain_desc),
                 style = NfType.meta,
@@ -260,7 +265,7 @@ fun SettingsScreen(
             }
         }
 
-        CardBox(title = stringResource(dev.ninfenz.mobile.R.string.settings_selfcheck_title)) {
+        if (audit) CardBox(title = stringResource(dev.ninfenz.mobile.R.string.settings_selfcheck_title)) {
             Text(
                 stringResource(dev.ninfenz.mobile.R.string.settings_selfcheck_desc),
                 style = NfType.meta,

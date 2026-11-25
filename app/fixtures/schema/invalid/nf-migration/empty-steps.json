@@ -1,0 +1,7 @@
+{
+  "schema": "nf-migration/1",
+  "from_schema": "a",
+  "to_schema": "b",
+  "steps": [],
+  "losses": []
+}

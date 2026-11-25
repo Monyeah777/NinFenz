@@ -1,0 +1,15 @@
+{
+  "node": "C3-04",
+  "name": "管线校验",
+  "state": "implemented",
+  "owner": "core",
+  "hard_ids": [
+    "H3.1",
+    "H3.2"
+  ],
+  "evidence": [
+    "app tests + Android unit tests"
+  ],
+  "acceptance": "baseline regression",
+  "validation": "Android 558/558 + Python 203 passed"
+}

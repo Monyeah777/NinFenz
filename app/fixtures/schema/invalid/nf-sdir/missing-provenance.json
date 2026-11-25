@@ -1,0 +1,18 @@
+{
+  "schema": "nf-sdir/1",
+  "meta": {
+    "title": "x",
+    "created_at": "2026-01-01T00:00:00Z"
+  },
+  "sources": [
+    {
+      "id": "s1",
+      "name": "x.md",
+      "mime": "text/markdown",
+      "bytes_sha": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "blocks": [],
+  "relations": [],
+  "accessibility": []
+}

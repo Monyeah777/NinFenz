@@ -1,0 +1,10 @@
+{
+  "trial": "T06",
+  "ok": true,
+  "docs": 20,
+  "epubcheck_errors": 0,
+  "openxml_invalid": 0,
+  "pdfua_fail": 0,
+  "wcag_blockers": 0,
+  "source": "results/app/governance/benchmarks/H51.json"
+}

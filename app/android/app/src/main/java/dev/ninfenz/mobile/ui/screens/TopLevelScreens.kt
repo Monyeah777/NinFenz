@@ -46,6 +46,8 @@ import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Star as StarOutlined
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
@@ -92,6 +94,7 @@ import dev.ninfenz.mobile.data.ProjectEntry
 import dev.ninfenz.mobile.data.RecentProjectStore
 import dev.ninfenz.mobile.data.SeedResult
 import dev.ninfenz.mobile.data.LanguageMode
+import dev.ninfenz.mobile.data.LibraryMetaStore
 import dev.ninfenz.mobile.data.LibraryViewStore
 import dev.ninfenz.mobile.data.ThemeMode
 import dev.ninfenz.mobile.model.Project
@@ -156,6 +159,12 @@ fun LibraryHomeScreen(
     val snackbarScope = rememberCoroutineScope()
     var dailyText by rememberSaveable { mutableStateOf("") }
     var statusFilter by rememberSaveable { mutableStateOf(savedView?.status) }
+    var favoritesOnly by rememberSaveable { mutableStateOf(false) }
+    val audit = dev.ninfenz.mobile.data.FeatureGate.auditEnabled()
+    val metaStore = remember(viewFilesDir) { viewFilesDir?.let { LibraryMetaStore(it) } }
+    val favoriteIds = remember(projects) { metaStore?.favorites() ?: emptySet() }
+    val allTags = remember(projects) { metaStore?.allTags() ?: emptySet() }
+    var tagFilter by rememberSaveable { mutableStateOf<String?>(null) }
     var sortName by rememberSaveable { mutableStateOf(savedView?.sort ?: ProjectSort.RECENT.name) }
     var sortMenuOpen by remember { mutableStateOf(false) }
     var projectsExpanded by rememberSaveable { mutableStateOf(true) }
@@ -166,9 +175,11 @@ fun LibraryHomeScreen(
     }
     val filterStatus = statusFilter?.let { ProjectStatus.fromWire(it) }
     val filterSort = ProjectSort.entries.firstOrNull { it.name == sortName } ?: ProjectSort.RECENT
-    val filteredProjects = remember(projects, statusFilter, sortName, recentIds) {
+    val filteredProjects = remember(projects, statusFilter, sortName, recentIds, favoritesOnly, favoriteIds) {
+        var base = if (favoritesOnly) projects.filter { it.project.id in favoriteIds } else projects
+        if (tagFilter != null) base = base.filter { tagFilter in (metaStore?.tags(it.project.id) ?: emptySet()) }
         ProjectSorter.sort(
-            ProjectFilter.apply(projects, filterStatus),
+            ProjectFilter.apply(base, filterStatus),
             filterSort,
             priorityIds = if (filterSort == ProjectSort.RECENT) recentIds else emptyList()
         )
@@ -331,12 +342,26 @@ fun LibraryHomeScreen(
                         ) {
                             item {
                                 FilterChip(
+                                    selected = favoritesOnly,
+                                    onClick = { favoritesOnly = !favoritesOnly },
+                                    label = { Text(stringResource(dev.ninfenz.mobile.R.string.library_favorites)) }
+                                )
+                            }
+                            items(allTags.sorted()) { tag ->
+                                FilterChip(
+                                    selected = tagFilter == tag,
+                                    onClick = { tagFilter = if (tagFilter == tag) null else tag },
+                                    label = { Text("#" + tag) }
+                                )
+                            }
+                            item {
+                                FilterChip(
                                     selected = filterStatus == null,
                                     onClick = { statusFilter = null },
                                     label = { Text(stringResource(dev.ninfenz.mobile.R.string.search_filter_all)) }
                                 )
                             }
-                            items(ProjectStatus.entries) { status ->
+                            items(ProjectStatus.entries.filter { audit || (it != ProjectStatus.VALIDATED && it != ProjectStatus.REVIEWED) }) { status ->
                                 FilterChip(
                                     selected = filterStatus == status,
                                     onClick = { statusFilter = status.wire },
@@ -835,6 +860,7 @@ fun MeScreen(
                                         LanguageMode.SYSTEM -> stringResource(dev.ninfenz.mobile.R.string.me_language_system)
                                         LanguageMode.ZH -> stringResource(dev.ninfenz.mobile.R.string.me_language_zh)
                                         LanguageMode.EN -> stringResource(dev.ninfenz.mobile.R.string.me_language_en)
+                                        LanguageMode.PSEUDO -> stringResource(dev.ninfenz.mobile.R.string.me_language_pseudo)
                                     }
                                 )
                             }
@@ -883,9 +909,13 @@ fun ProjectDetailScreen(
     onAuthor: () -> Unit,
     onAssembly: () -> Unit,
     onDuplicate: () -> Unit = {},
+    onChangePack: (PackEntry) -> Unit = {},
+    packs: List<PackEntry> = emptyList(),
     onArchive: () -> Unit = {},
     onRename: (String) -> Unit = {},
     onReview: (Boolean, String, String) -> Unit = { _, _, _ -> },
+    onReviewBlocks: () -> Unit = {},
+    onFavoriteChanged: () -> Unit = {},
     onShare: () -> Unit = {},
     onShareFull: () -> Unit = {},
     onSaveAsTemplate: () -> Unit = {},
@@ -897,6 +927,12 @@ fun ProjectDetailScreen(
     val context = LocalContext.current
     val clipboard = LocalClipboardManager.current
     val diffScope = rememberCoroutineScope()
+    val showAudit = dev.ninfenz.mobile.data.FeatureGate.auditEnabled()
+    val metaStore = remember { LibraryMetaStore(context.filesDir) }
+    var isFavorite by remember(project.id) { mutableStateOf(metaStore.isFavorite(project.id)) }
+    var tags by remember(project.id) { mutableStateOf(metaStore.tags(project.id)) }
+    var showTags by remember { mutableStateOf(false) }
+    var tagText by remember { mutableStateOf("") }
     var showArchive by remember { mutableStateOf(false) }
     var diffReport by remember { mutableStateOf<ProjectDiff.Report?>(null) }
     var diffError by remember { mutableStateOf<String?>(null) }
@@ -907,6 +943,8 @@ fun ProjectDetailScreen(
     var renameText by remember(project.title) { mutableStateOf(project.title) }
     var showReview by remember { mutableStateOf(false) }
     var showMoreActions by remember { mutableStateOf(false) }
+    var showChangePack by remember { mutableStateOf(false) }
+    var packQuery by remember { mutableStateOf("") }
     var showRemoveOverride by remember { mutableStateOf(false) }
     var showTemplateReference by remember { mutableStateOf(false) }
     var historyExpanded by rememberSaveable(project.id) { mutableStateOf(false) }
@@ -954,6 +992,15 @@ fun ProjectDetailScreen(
             title = project.title,
             onBack = onBack,
             actions = {
+                IconButton(onClick = {
+                    isFavorite = metaStore.toggle(project.id)
+                    onFavoriteChanged()
+                }) {
+                    Icon(
+                        if (isFavorite) Icons.Filled.Star else Icons.Outlined.StarOutlined,
+                        contentDescription = stringResource(if (isFavorite) dev.ninfenz.mobile.R.string.library_unfavorite else dev.ninfenz.mobile.R.string.library_favorite)
+                    )
+                }
                 IconButton(onClick = { showMoreActions = true }) {
                     Icon(
                         Icons.Filled.MoreVert,
@@ -986,6 +1033,9 @@ fun ProjectDetailScreen(
                         }
                     }
                     Text(project.id, style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    if (tags.isNotEmpty()) {
+                        Text("#" + tags.sorted().joinToString(" #"), style = NfType.meta, color = MaterialTheme.colorScheme.primary)
+                    }
                     if (templateReference != null) {
                         NfListRow(stringResource(dev.ninfenz.mobile.R.string.project_template_ref), null, Icons.Filled.Search, "›") {
                             showTemplateReference = true
@@ -1051,11 +1101,13 @@ fun ProjectDetailScreen(
                             Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_protocol_label), style = NfType.meta, modifier = Modifier.width(72.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
                             Text(project.refs.protocolId.ifBlank { stringResource(dev.ninfenz.mobile.R.string.not_bound) }, style = NfType.meta)
                         }
+                        if (showAudit) {
                         Row {
                             Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_review), style = NfType.meta, modifier = Modifier.width(72.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
                             Text(project.review.state + " · " + (project.review.reviewer ?: "-"), style = NfType.meta)
                         }
-                        if (reviewStale) {
+                        }
+                        if (showAudit && reviewStale) {
                             Text(
                                 stringResource(dev.ninfenz.mobile.R.string.project_review_stale),
                                 style = NfType.meta,
@@ -1065,7 +1117,7 @@ fun ProjectDetailScreen(
                     }
                 }
             }
-            if (project.historyCount > 0 || project.history.isNotEmpty()) {
+            if (showAudit && (project.historyCount > 0 || project.history.isNotEmpty())) {
             item {
                 NfListRow(
                     title = stringResource(dev.ninfenz.mobile.R.string.project_history_title),
@@ -1174,13 +1226,30 @@ fun ProjectDetailScreen(
                     renameText = project.title
                     showRename = true
                 }
-                NfListRow(stringResource(dev.ninfenz.mobile.R.string.project_detail_review), null, Icons.Filled.Info, "›") {
+                if (showAudit) {
+                    NfListRow(stringResource(dev.ninfenz.mobile.R.string.project_detail_review), null, Icons.Filled.Info, "›") {
+                        showMoreActions = false
+                        showReview = true
+                    }
+                    NfListRow(stringResource(dev.ninfenz.mobile.R.string.review_blocks_title), null, Icons.Filled.Search, "›") {
+                        showMoreActions = false
+                        onReviewBlocks()
+                    }
+                }
+                NfListRow(stringResource(dev.ninfenz.mobile.R.string.project_tags), null, Icons.Filled.Search, "›") {
                     showMoreActions = false
-                    showReview = true
+                    tagText = ""
+                    showTags = true
                 }
                 NfListRow(stringResource(dev.ninfenz.mobile.R.string.project_detail_duplicate), null, Icons.Filled.Add, "›") {
                     showMoreActions = false
                     onDuplicate()
+                }
+                if (packs.isNotEmpty()) {
+                    NfListRow(stringResource(dev.ninfenz.mobile.R.string.project_change_pack), null, Icons.Filled.Add, "›") {
+                        showMoreActions = false
+                        showChangePack = true
+                    }
                 }
                 NfListRow(stringResource(dev.ninfenz.mobile.R.string.flow_title), null, Icons.AutoMirrored.Filled.List, "›") {
                     showMoreActions = false
@@ -1238,6 +1307,72 @@ fun ProjectDetailScreen(
         }
     }
 
+    if (showTags) {
+        AlertDialog(
+            onDismissRequest = { showTags = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.project_tags)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    if (tags.isEmpty()) Text(stringResource(dev.ninfenz.mobile.R.string.project_tag_empty), style = NfType.meta)
+                    tags.sorted().forEach { tag ->
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                            Text("#" + tag, style = NfType.meta)
+                            TextButton(onClick = { tags = metaStore.removeTag(project.id, tag); onFavoriteChanged() }) {
+                                Text(stringResource(dev.ninfenz.mobile.R.string.inbox_remove))
+                            }
+                        }
+                    }
+                    OutlinedTextField(
+                        value = tagText,
+                        onValueChange = { tagText = it },
+                        label = { Text(stringResource(dev.ninfenz.mobile.R.string.project_tag_hint)) },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(enabled = tagText.isNotBlank(), onClick = {
+                    tags = metaStore.addTag(project.id, tagText)
+                    tagText = ""
+                    onFavoriteChanged()
+                }) { Text(stringResource(dev.ninfenz.mobile.R.string.project_tag_add)) }
+            },
+            dismissButton = { TextButton(onClick = { showTags = false }) { Text(stringResource(android.R.string.ok)) } }
+        )
+    }
+
+    if (showChangePack) {
+        ModalBottomSheet(onDismissRequest = { showChangePack = false }) {
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = NfSpacing.page).padding(bottom = NfSpacing.xl),
+                verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)
+            ) {
+                Text(stringResource(dev.ninfenz.mobile.R.string.project_change_pack), style = NfType.screenTitle)
+                Text(stringResource(dev.ninfenz.mobile.R.string.project_change_pack_note), style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                OutlinedTextField(
+                    value = packQuery,
+                    onValueChange = { packQuery = it },
+                    label = { Text(stringResource(dev.ninfenz.mobile.R.string.pack_search)) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                HorizontalDivider(modifier = Modifier.padding(vertical = NfSpacing.s))
+                packs.filter { packQuery.isBlank() || it.title.contains(packQuery, true) || it.id.contains(packQuery, true) }.forEach { pack ->
+                    NfListRow(
+                        pack.title,
+                        pack.id + " · " + pack.version + " · " + pack.itemCount + " items",
+                        Icons.Filled.Add,
+                        "›"
+                    ) {
+                        showChangePack = false
+                        onChangePack(pack)
+                    }
+                }
+            }
+        }
+    }
+
     if (showDelete) {
         AlertDialog(
             onDismissRequest = { showDelete = false },
@@ -1255,7 +1390,7 @@ fun ProjectDetailScreen(
         )
     }
 
-    if (showReview) {
+    if (showAudit && showReview) {
         AlertDialog(
             onDismissRequest = { showReview = false },
             title = { Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_review)) },
@@ -1540,9 +1675,13 @@ fun projectStatusLabel(status: dev.ninfenz.mobile.model.ProjectStatus): String =
     dev.ninfenz.mobile.model.ProjectStatus.DRAFT -> stringResource(dev.ninfenz.mobile.R.string.status_draft)
     dev.ninfenz.mobile.model.ProjectStatus.AUTHORING -> stringResource(dev.ninfenz.mobile.R.string.status_authoring)
     dev.ninfenz.mobile.model.ProjectStatus.ASSEMBLED -> stringResource(dev.ninfenz.mobile.R.string.status_assembled)
-    dev.ninfenz.mobile.model.ProjectStatus.VALIDATED -> stringResource(dev.ninfenz.mobile.R.string.status_validated)
+    dev.ninfenz.mobile.model.ProjectStatus.VALIDATED ->
+        if (dev.ninfenz.mobile.data.FeatureGate.auditEnabled()) stringResource(dev.ninfenz.mobile.R.string.status_validated)
+        else stringResource(dev.ninfenz.mobile.R.string.status_exported)
     dev.ninfenz.mobile.model.ProjectStatus.EXPORTED -> stringResource(dev.ninfenz.mobile.R.string.status_exported)
-    dev.ninfenz.mobile.model.ProjectStatus.REVIEWED -> stringResource(dev.ninfenz.mobile.R.string.status_reviewed)
+    dev.ninfenz.mobile.model.ProjectStatus.REVIEWED ->
+        if (dev.ninfenz.mobile.data.FeatureGate.auditEnabled()) stringResource(dev.ninfenz.mobile.R.string.status_reviewed)
+        else stringResource(dev.ninfenz.mobile.R.string.status_exported)
 }
 
 @Composable

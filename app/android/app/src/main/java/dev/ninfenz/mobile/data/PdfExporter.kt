@@ -14,11 +14,11 @@ import java.io.File
 object PdfExporter {
     data class Created(val file: File, val pages: Int, val bytes: Long)
 
-    fun export(markdown: String, title: String, outDir: File): Created {
+    fun export(markdown: String, title: String, outDir: File, pageSize: String = "A4", includeTitle: Boolean = true): Created {
         outDir.mkdirs()
         val target = File(outDir, "result.pdf")
-        val pageWidth = 595
-        val pageHeight = 842
+        val pageWidth = if (pageSize.equals("Letter", true)) 612 else 595
+        val pageHeight = if (pageSize.equals("Letter", true)) 792 else 842
         val margin = 48f
         val paint = Paint().apply {
             color = Color.BLACK
@@ -71,8 +71,8 @@ object PdfExporter {
             return out
         }
         val lines = buildList {
-            add(Line(title, 18f, true))
-            add(Line("", 11f, false))
+            if (includeTitle) add(Line(title, 18f, true))
+            if (includeTitle) add(Line("", 11f, false))
             blockList.forEach { block ->
                 if (block.rule) {
                     add(Line("", 11f, false, rule = true))

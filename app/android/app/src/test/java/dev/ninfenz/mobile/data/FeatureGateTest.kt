@@ -1,13 +1,23 @@
 package dev.ninfenz.mobile.data
 
+import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class FeatureGateTest {
+    @After
+    fun resetTier() {
+        FeatureGate.resetForTest()
+    }
+
     @Test
-    fun proAndCcosDisabledByDefault() {
-        assertTrue(!FeatureGate.isProEnabled())
-        assertTrue(!FeatureGate.isCcosEnabled())
+    fun defaultTierMatchesEdition() {
+        assertEquals(FeatureGate.defaultTier(), FeatureGate.tier())
+        if (FeatureGate.defaultTier() == FeatureGate.Tier.FREE) {
+            assertTrue(!FeatureGate.isProEnabled())
+            assertTrue(!FeatureGate.isCcosEnabled())
+        }
     }
 
     @Test

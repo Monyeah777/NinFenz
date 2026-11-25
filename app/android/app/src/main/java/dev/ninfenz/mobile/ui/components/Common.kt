@@ -41,6 +41,7 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.paneTitle
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.ui.theme.NfLayout
 import dev.ninfenz.mobile.ui.theme.NfSpacing
@@ -56,7 +57,7 @@ fun NfScaffold(
     content: @Composable (PaddingValues) -> Unit
 ) {
     Scaffold(
-        modifier = Modifier.semantics { paneTitle = title },
+        modifier = Modifier.semantics { paneTitle = title; traversalIndex = 0f },
         bottomBar = bottomBar,
         topBar = {
             TopAppBar(
@@ -74,7 +75,7 @@ fun NfScaffold(
         }
     ) { padding ->
         Box(
-            modifier = Modifier.fillMaxSize().padding(padding).imePadding(),
+            modifier = Modifier.fillMaxSize().padding(padding).imePadding().semantics { traversalIndex = 1f },
             contentAlignment = Alignment.TopCenter
         ) {
             Column(
@@ -179,13 +180,19 @@ fun EmptyState(text: String) {
 }
 
 @Composable
-fun FormTextField(label: String, value: String, onValueChange: (String) -> Unit, singleLine: Boolean = true) {
+fun FormTextField(
+    label: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    singleLine: Boolean = true,
+    modifier: Modifier = Modifier
+) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
         label = { Text(label) },
         singleLine = singleLine,
-        modifier = Modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth()
     )
 }
 

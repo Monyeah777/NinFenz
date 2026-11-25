@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.ninfenz.mobile.data.SearchRankingTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-25T04:30:22" hostname="流念" time="0.037">
+  <properties/>
+  <testcase name="fullWidthAndCaseAreNormalized" classname="dev.ninfenz.mobile.data.SearchRankingTest" time="0.015"/>
+  <testcase name="allTermsRequired" classname="dev.ninfenz.mobile.data.SearchRankingTest" time="0.019"/>
+  <testcase name="blankAndUnrelatedReturnEmpty" classname="dev.ninfenz.mobile.data.SearchRankingTest" time="0.001"/>
+  <testcase name="fuzzyOneEditMatchesLongWord" classname="dev.ninfenz.mobile.data.SearchRankingTest" time="0.001"/>
+  <testcase name="cjkTermsMatchAndRankTitleFirst" classname="dev.ninfenz.mobile.data.SearchRankingTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -7,13 +7,16 @@ object FeaturePolicy {
     data class Rule(val id: String, val minTier: Tier)
 
     private val free = setOf(
-        "import", "share", "preview", "undo", "templates", "validation",
+        "import", "share", "preview", "undo", "templates",
         "export.md", "export.zip", "export.docx", "export.pdf", "export.epub",
         "export.html", "export.json", "export.skill", "draft.project",
         "ocr", "history", "settings"
     )
 
     private val pro = setOf(
+        "audit.validate", "audit.review", "audit.handoff", "audit.signoff",
+        "audit.preservation", "audit.repro", "audit.pdfua", "audit.decision",
+        "audit.pack.trust", "audit.pack.studio", "audit.ccos",
         "graph.author", "batch.assemble", "contract.sign", "policy.code",
         "capability.share", "prompt.compile", "cross.corpus", "audit.trace"
     )

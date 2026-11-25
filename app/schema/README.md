@@ -22,6 +22,10 @@
 | `nf-backup.schema.json` | `nf-backup/1` | 更新备份清单（本地备份，时间戳仅此处允许） |
 | `ccos-task.schema.json` | `ccos-task/1` | CCOS 任务（输入/约束/验收/预算/策略/来源） |
 | `ccos-result.schema.json` | `ccos-result/1` | CCOS 结果（artifacts/evidence/report/provenance/人审） |
+| `nf-sdir.schema.json` | `nf-sdir/1` | 语义文档 IR（类型化块/关系/可访问性/块级溯源） |
+| `nf-build-graph.schema.json` | `nf-build-graph/1` | 内容寻址构建图（节点/边/输出/环境指纹） |
+| `nf-evidence.schema.json` | `nf-evidence/1` | 证据随包（产物/输入/校验/谱系/Ed25519 签名） |
+| `nf-extension.schema.json` | `nf-extension/1` | 声明式扩展（adapter/renderer/validator/theme/preset） |
 | `limits.json` | `nf-app-limits/1` | 解析/解包上限（实现必须读取，不得散落字面量） |
 | `error_codes.json` | `nf-app-error-codes/1` | 错误码登记（code/severity/exit/message/fix） |
 

@@ -211,6 +211,14 @@ fn section_slot_ids(sec: &Value) -> Vec<String> {
         .unwrap_or_default()
 }
 
+fn slot_visible(slot: &Value, inputs: &Map<String, Value>) -> bool {
+    let Some(cond) = slot.get("visible_if") else { return true };
+    let field = cond.get("slot").and_then(|v| v.as_str()).unwrap_or("");
+    let equals = cond.get("equals").and_then(|v| v.as_str()).unwrap_or("");
+    if field.is_empty() { return true }
+    inputs.get(field).and_then(|v| v.as_str()) == Some(equals)
+}
+
 fn render_section(
     sec: &Value,
     slot_map: &BTreeMap<String, Value>,
@@ -229,6 +237,10 @@ fn render_section(
             Some(s) => s,
             None => continue,
         };
+        if !slot_visible(slot, inputs) {
+            slots.push(json!({"id": slot_id, "section": sid, "chars": 0}));
+            continue;
+        }
         let raw = inputs.get(&slot_id).and_then(|v| v.as_str());
         match raw {
             Some(v) => match render_slot(slot, v) {

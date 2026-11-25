@@ -1,0 +1,15 @@
+{
+  "node": "C2-04",
+  "name": "映射建议",
+  "state": "implemented",
+  "owner": "kotlin-ui",
+  "hard_ids": [
+    "H1.3",
+    "H2.2"
+  ],
+  "evidence": [
+    "app tests + Android unit tests"
+  ],
+  "acceptance": "baseline regression",
+  "validation": "Android 558/558 + Python 203 passed"
+}

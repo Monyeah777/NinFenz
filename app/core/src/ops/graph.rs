@@ -378,6 +378,49 @@ pub fn validate_graph(graph: &Value) -> Report {
     report
 }
 
+pub fn graph_typecheck(req: &Value) -> OpOutcome {
+    let graph = req_value(req, "graph")?;
+    let mut report = validate_graph(graph);
+    let nodes = graph.get("nodes").and_then(|v| v.as_array()).cloned().unwrap_or_default();
+    let edges = graph.get("edges").and_then(|v| v.as_array()).cloned().unwrap_or_default();
+    let mut fanin: BTreeMap<(String, String), usize> = BTreeMap::new();
+    for (i, e) in edges.iter().enumerate() {
+        let ty = e.get("type").and_then(|v| v.as_str()).unwrap_or("data");
+        if ty != "data" {
+            continue;
+        }
+        let from_port = e.get("from_port").and_then(|v| v.as_str()).unwrap_or("");
+        let to_port = e.get("to_port").and_then(|v| v.as_str()).unwrap_or("");
+        let to = e.get("to").and_then(|v| v.as_str()).unwrap_or("").to_string();
+        if from_port != to_port {
+            report.error(
+                "NF-GRF-008",
+                &format!("$.edges[{i}]"),
+                &format!("端口类型不匹配：{from_port} -> {to_port}"),
+            );
+        }
+        *fanin.entry((to, to_port.to_string())).or_insert(0) += 1;
+    }
+    for ((to, port), count) in fanin {
+        if count > 1 {
+            let kind = nodes
+                .iter()
+                .find(|n| n.get("id").and_then(|v| v.as_str()) == Some(to.as_str()))
+                .and_then(|n| n.get("kind"))
+                .and_then(|v| v.as_str())
+                .unwrap_or("");
+            if kind != "merge" {
+                report.error(
+                    "NF-GRF-008",
+                    &format!("$.nodes[{to}].ports.in"),
+                    &format!("输入端口 {port} 有 {count} 条 data 入边，非 merge 节点不允许非法扇入"),
+                );
+            }
+        }
+    }
+    Ok((0, report.to_value()))
+}
+
 pub fn graph_validate(req: &Value) -> OpOutcome {
     let graph = req_value(req, "graph")?;
     let report = validate_graph(graph);

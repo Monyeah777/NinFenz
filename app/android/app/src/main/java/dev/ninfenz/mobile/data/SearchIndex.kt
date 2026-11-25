@@ -1,6 +1,7 @@
 package dev.ninfenz.mobile.data
 
 import java.io.File
+import java.text.Normalizer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonArray
@@ -64,35 +65,82 @@ class SearchIndex(private val filesDir: File) {
     }
 
     fun search(hits: List<SearchHit>, query: String): List<SearchHit> {
-        val q = query.trim().lowercase()
-        if (q.isEmpty()) return emptyList()
+        val q = normalize(query)
+        if (q.isBlank()) return emptyList()
+        val terms = q.split(Regex("\\s+")).filter { it.isNotBlank() }
         return hits
-            .map { hit -> hit to rank(hit, q) }
+            .map { hit -> hit to rank(hit, q, terms) }
             .filter { it.second >= 0 }
             .sortedWith(compareByDescending<Pair<SearchHit, Int>> { it.second }.thenBy { it.first.title })
             .map { (hit, _) ->
-                if (q !in hit.title.lowercase() && q !in hit.detail.lowercase() && q in hit.body.lowercase()) {
-                    hit.copy(detail = snippet(hit.body, q))
+                if (!contains(hit.title, terms) && !contains(hit.detail, terms) && contains(hit.body, terms)) {
+                    hit.copy(detail = snippet(hit.body, terms.first()))
                 } else hit
             }
     }
 
-    private fun snippet(body: String, q: String): String {
-        val at = body.lowercase().indexOf(q).coerceAtLeast(0)
+    private fun normalize(s: String): String =
+        Normalizer.normalize(s, Normalizer.Form.NFKC).trim().lowercase()
+
+    private fun contains(text: String, terms: List<String>): Boolean {
+        val t = normalize(text)
+        return terms.all { term ->
+            t.contains(term) || fuzzyWord(t, term)
+        }
+    }
+
+    private fun fuzzyWord(text: String, term: String): Boolean {
+        if (term.length < 3) return false
+        val words = Regex("[\\p{L}\\p{N}]+").findAll(text).map { it.value }.take(400)
+        return words.any { w -> Math.abs(w.length - term.length) <= 1 && distance(w, term) <= 1 }
+    }
+
+    private fun distance(a: String, b: String): Int {
+        if (a == b) return 0
+        val n = a.length
+        val m = b.length
+        if (Math.abs(n - m) > 1) return 2
+        val d = Array(n + 1) { IntArray(m + 1) }
+        for (i in 0..n) d[i][0] = i
+        for (j in 0..m) d[0][j] = j
+        for (i in 1..n) {
+            for (j in 1..m) {
+                val cost = if (a[i - 1] == b[j - 1]) 0 else 1
+                d[i][j] = minOf(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + cost)
+                if (i > 1 && j > 1 && a[i - 1] == b[j - 2] && a[i - 2] == b[j - 1]) {
+                    d[i][j] = minOf(d[i][j], d[i - 2][j - 2] + 1)
+                }
+            }
+        }
+        return d[n][m]
+    }
+
+    private fun snippet(body: String, term: String): String {
+        val norm = normalize(body)
+        val at = norm.indexOf(term).coerceAtLeast(0)
         val start = (at - 24).coerceAtLeast(0)
-        val end = (at + q.length + 48).coerceAtMost(body.length)
+        val end = (at + term.length + 48).coerceAtMost(norm.length)
         return "正文：" + body.substring(start, end).replace('\n', ' ').trim()
     }
 
-    private fun rank(hit: SearchHit, q: String): Int {
-        val title = hit.title.lowercase()
-        val detail = hit.detail.lowercase()
-        return when {
-            title.startsWith(q) -> 3
-            q in title -> 2
-            q in detail || q in hit.body.lowercase() -> 1
-            else -> -1
+    private fun rank(hit: SearchHit, q: String, terms: List<String>): Int {
+        val title = normalize(hit.title)
+        val detail = normalize(hit.detail)
+        val body = normalize(hit.body)
+        var score = 0
+        if (title == q) score += 120
+        if (title.startsWith(q)) score += 90
+        if (title.contains(q)) score += 60
+        if (detail.contains(q)) score += 35
+        if (body.contains(q)) score += 12
+        for (term in terms) {
+            if (title.contains(term)) score += 20
+            else if (detail.contains(term)) score += 8
+            else if (body.contains(term)) score += 3
+            else if (fuzzyWord(title + " " + detail + " " + body, term)) score += 1
+            else return -1
         }
+        return score
     }
 
     private fun projects(): List<SearchHit> {

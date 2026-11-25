@@ -1,0 +1,12 @@
+{
+  "node": "C0-05",
+  "name": "安全与隐私边界",
+  "state": "implemented",
+  "owner": "security",
+  "hard_ids": [],
+  "evidence": [
+    "app tests + Android unit tests"
+  ],
+  "acceptance": "baseline regression",
+  "validation": "Android 558/558 + Python 203 passed"
+}

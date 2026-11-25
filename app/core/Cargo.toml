@@ -18,3 +18,4 @@ serde_json = "=1.0.151"
 sha2 = "=0.10.9"
 zip = { version = "=2.6.1", default-features = false, features = ["deflate"] }
 regex = "=1.13.1"
+ed25519-compact = { path = "vendor/ed25519-compact", default-features = false, features = ["std"] }

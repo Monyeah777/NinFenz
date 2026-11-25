@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/app/schema/nf-report.schema.json",
+  "title": "NF 可复算报告",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "subject_sha256", "ok", "summary", "items"],
+  "properties": {
+    "schema": {"const": "nf-report/1"},
+    "kind": {"enum": ["fidelity", "a11y", "coverage"]},
+    "subject_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "ok": {"type": "boolean"},
+    "summary": {"type": "object"},
+    "items": {"type": "array", "items": {"$ref": "#/$defs/item"}},
+    "markdown": {"type": "string"}
+  },
+  "$defs": {
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "severity", "path", "message"],
+      "properties": {
+        "code": {"type": "string", "minLength": 1},
+        "severity": {"enum": ["info", "warn", "error"]},
+        "path": {"type": "string"},
+        "message": {"type": "string"},
+        "fix": {"type": "string"}
+      }
+    }
+  }
+}

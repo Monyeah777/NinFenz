@@ -3,7 +3,9 @@ package dev.ninfenz.mobile.ui
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import dev.ninfenz.mobile.ui.screens.InboxScreen
 import dev.ninfenz.mobile.ui.screens.LibraryHomeScreen
+import dev.ninfenz.mobile.ui.screens.PackBuilderScreen
 import dev.ninfenz.mobile.ui.theme.NfTheme
 import org.junit.Rule
 import org.junit.Test
@@ -32,5 +34,17 @@ class LargeFontComposeTest {
         }
         compose.onNodeWithText("内容库").assertIsDisplayed()
         compose.onNodeWithText("导入内容").assertIsDisplayed()
+    }
+
+    @Test
+    fun inboxAt200PercentStillShowsEmptyState() {
+        compose.setContent { NfTheme { InboxScreen(onBack = {}, onImport = {}) } }
+        compose.onNodeWithText("还没有分享内容").assertIsDisplayed()
+    }
+
+    @Test
+    fun packBuilderAt200PercentStillShowsEmptyState() {
+        compose.setContent { NfTheme { PackBuilderScreen("missing", onBack = {}, onInstalled = {}) } }
+        compose.onNodeWithText("Pack draft not found").assertIsDisplayed()
     }
 }

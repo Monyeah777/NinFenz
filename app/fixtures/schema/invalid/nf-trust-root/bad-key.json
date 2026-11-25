@@ -1,0 +1,15 @@
+{
+  "schema": "nf-trust-root/1",
+  "roots": [
+    {
+      "id": "root1",
+      "alg": "ed25519",
+      "public_key": "bad",
+      "fingerprint": "0000000000000000000000000000000000000000000000000000000000000000",
+      "not_before": "x",
+      "not_after": "y",
+      "status": "active"
+    }
+  ],
+  "revoked": []
+}

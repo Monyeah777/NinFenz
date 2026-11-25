@@ -1,0 +1,68 @@
+{
+  "trial": "T05",
+  "ok": true,
+  "docs": 10,
+  "opens": 90,
+  "expected_opens": 90,
+  "text_checks": 40,
+  "missing_text": 0,
+  "min_pdf_parity": 1.0,
+  "roundtrip": [
+    {
+      "doc": 0,
+      "pdf_parity": 1.0,
+      "epub_parity": 1.0
+    },
+    {
+      "doc": 1,
+      "pdf_parity": 1.0,
+      "epub_parity": 1.0
+    },
+    {
+      "doc": 2,
+      "pdf_parity": 1.0,
+      "epub_parity": 1.0
+    },
+    {
+      "doc": 3,
+      "pdf_parity": 1.0,
+      "epub_parity": 1.0
+    },
+    {
+      "doc": 4,
+      "pdf_parity": 1.0,
+      "epub_parity": 1.0
+    },
+    {
+      "doc": 5,
+      "pdf_parity": 1.0,
+      "epub_parity": 1.0
+    },
+    {
+      "doc": 6,
+      "pdf_parity": 1.0,
+      "epub_parity": 1.0
+    },
+    {
+      "doc": 7,
+      "pdf_parity": 1.0,
+      "epub_parity": 1.0
+    },
+    {
+      "doc": 8,
+      "pdf_parity": 1.0,
+      "epub_parity": 1.0
+    },
+    {
+      "doc": 9,
+      "pdf_parity": 1.0,
+      "epub_parity": 1.0
+    }
+  ],
+  "details": [],
+  "criteria": {
+    "parity": ">=98%",
+    "opens": "90/90",
+    "missing_text": 0
+  }
+}

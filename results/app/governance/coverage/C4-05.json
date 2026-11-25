@@ -1,0 +1,14 @@
+{
+  "node": "C4-05",
+  "name": "装配",
+  "state": "implemented",
+  "owner": "core",
+  "hard_ids": [
+    "H4.1"
+  ],
+  "evidence": [
+    "app tests + Android unit tests"
+  ],
+  "acceptance": "baseline regression",
+  "validation": "Android 558/558 + Python 203 passed"
+}

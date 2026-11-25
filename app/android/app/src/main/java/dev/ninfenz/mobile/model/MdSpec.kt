@@ -8,6 +8,7 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
 data class SpecSection(val id: String, val title: String, val order: Int, val required: Boolean, val slots: List<String>)
+data class SpecVisibleIf(val slot: String, val equals: String)
 data class SpecSlot(
     val id: String,
     val name: String,
@@ -20,7 +21,8 @@ data class SpecSlot(
     val pattern: String? = null,
     val nonEmpty: Boolean = false,
     val startsWith: String? = null,
-    val endsWith: String? = null
+    val endsWith: String? = null,
+    val visibleIf: SpecVisibleIf? = null
 )
 
 data class MdSpec(
@@ -67,7 +69,13 @@ object SpecModel {
                 pattern = constraintString(s, "pattern"),
                 nonEmpty = J.optArray(s, "constraints").mapNotNull { it as? JsonObject }.any { J.optString(it, "op") == "non_empty" },
                 startsWith = constraintString(s, "starts_with"),
-                endsWith = constraintString(s, "ends_with")
+                endsWith = constraintString(s, "ends_with"),
+                visibleIf = J.optChild(s, "visible_if")?.let { c ->
+                    SpecVisibleIf(
+                        slot = J.optString(c, "slot") ?: "",
+                        equals = J.optString(c, "equals") ?: ""
+                    )
+                }
             )
         }
         return MdSpec(
@@ -143,6 +151,7 @@ object SpecModel {
                 put("section", slot.section)
                 put("kind", slot.kind)
                 put("required", slot.required)
+                slot.visibleIf?.let { v -> put("visible_if", buildJsonObject { put("slot", v.slot); put("equals", v.equals) }) }
             })
         })
     }

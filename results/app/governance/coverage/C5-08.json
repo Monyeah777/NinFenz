@@ -1,0 +1,14 @@
+{
+  "node": "C5-08",
+  "name": "设备签收",
+  "state": "implemented",
+  "owner": "core",
+  "hard_ids": [
+    "H5.2"
+  ],
+  "evidence": [
+    "app tests + Android unit tests"
+  ],
+  "acceptance": "baseline regression",
+  "validation": "Android 558/558 + Python 203 passed"
+}

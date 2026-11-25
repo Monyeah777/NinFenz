@@ -1,0 +1,16 @@
+{
+  "node": "C4-11",
+  "name": "nf-doc 合并",
+  "state": "implemented",
+  "owner": "core",
+  "hard_ids": [
+    "H2.1",
+    "H4.2",
+    "H6.1"
+  ],
+  "evidence": [
+    "app tests + Android unit tests"
+  ],
+  "acceptance": "baseline regression",
+  "validation": "Android 558/558 + Python 203 passed"
+}

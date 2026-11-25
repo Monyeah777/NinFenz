@@ -90,7 +90,7 @@ fun NfTopAppBar(
 
 /** 结构型步骤条：用短标签表达当前处于流程第几步，横向可滚动。 */
 @Composable
-fun NfStepStrip(steps: List<String>, current: Int, modifier: Modifier = Modifier) {
+fun NfStepStrip(steps: List<String>, current: Int, modifier: Modifier = Modifier, onStepClick: ((Int) -> Unit)? = null) {
     val progressText = stringResource(dev.ninfenz.mobile.R.string.step_progress, current + 1, steps.size)
     Row(
         modifier = modifier
@@ -104,6 +104,7 @@ fun NfStepStrip(steps: List<String>, current: Int, modifier: Modifier = Modifier
         steps.forEachIndexed { index, label ->
             val active = index == current
             Surface(
+                modifier = if (onStepClick != null) Modifier.clickable { onStepClick(index) } else Modifier,
                 shape = MaterialTheme.shapes.large,
                 color = if (active) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
                 contentColor = if (active) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant

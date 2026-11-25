@@ -70,6 +70,25 @@ class ExportHistoryStore(private val filesDir: File) {
         AtomicFiles.writeText(file(), arr.toString())
     }
 
+    fun remove(path: String) {
+        val next = load().filterNot { it.path == path }
+        val arr = buildJsonArray {
+            next.forEach { e ->
+                add(buildJsonObject {
+                    put("format", e.format)
+                    put("name", e.name)
+                    put("path", e.path)
+                    put("sha256", e.sha256)
+                    put("at", e.at)
+                    e.bytes?.let { put("bytes", it) }
+                    e.ok?.let { put("ok", it) }
+                    e.message?.let { put("message", it) }
+                })
+            }
+        }
+        AtomicFiles.writeText(file(), arr.toString())
+    }
+
     fun clear(): Boolean = file().delete()
 
     private fun JsonObject.text(key: String): String =
