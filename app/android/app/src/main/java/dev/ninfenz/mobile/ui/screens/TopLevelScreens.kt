@@ -1576,6 +1576,7 @@ fun ProjectDetailScreen(
 fun PackDetailScreen(pack: PackEntry, onBack: () -> Unit, onUpdate: () -> Unit) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    val clipboard = LocalClipboardManager.current
     val audit = dev.ninfenz.mobile.data.FeatureGate.auditEnabled()
     val trustStore = remember { PackTrustStore(context.filesDir) }
     var pinnedTree by remember { mutableStateOf(trustStore.pinnedTree(pack.id, pack.version)) }
@@ -1595,6 +1596,9 @@ fun PackDetailScreen(pack: PackEntry, onBack: () -> Unit, onUpdate: () -> Unit) 
                     Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                         Text(pack.id + " · " + pack.version, style = NfType.itemTitle)
                         Text(pack.description, style = NfType.secondary)
+                        TextButton(onClick = {
+                            clipboard.setText(androidx.compose.ui.text.AnnotatedString(pack.id))
+                        }) { Text(stringResource(dev.ninfenz.mobile.R.string.pack_detail_copy_id)) }
                         Text(stringResource(dev.ninfenz.mobile.R.string.pack_detail_items, pack.itemCount), style = NfType.meta)
                         Text(stringResource(dev.ninfenz.mobile.R.string.pack_detail_tree, pack.tree.take(16) + "…"), style = NfType.meta)
                         Text(stringResource(dev.ninfenz.mobile.R.string.pack_detail_dir, pack.dir.absolutePath), style = NfType.meta)

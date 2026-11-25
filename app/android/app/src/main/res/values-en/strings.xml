@@ -1334,4 +1334,5 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="delivery_done_body">The file is ready; return to the project or share/open it above.</string>
     <string name="delivery_done_back">Back to project</string>
     <string name="packupdate_more_changes">%1$d more changes not shown</string>
+    <string name="pack_detail_copy_id">Copy Pack ID</string>
 </resources>
