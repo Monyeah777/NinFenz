@@ -1314,4 +1314,8 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="delivery_trash_confirm">Move to trash</string>
     <string name="search_filter_all_projects">All projects</string>
     <string name="packupdate_affected_warning">Breaking change affects %1$d projects; open them before applying.</string>
+    <string name="delivery_leave_title">Leave delivery?</string>
+    <string name="delivery_leave_body">Your assembly and slots remain in the local draft; nothing is deleted. Unexported results can be resumed later.</string>
+    <string name="delivery_leave_confirm">Leave</string>
+    <string name="delivery_leave_stay">Stay</string>
 </resources>

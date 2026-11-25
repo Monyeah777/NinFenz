@@ -547,14 +547,20 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
     var deliveryMenu by remember { mutableStateOf(false) }
     var showBrowsePlan by remember { mutableStateOf(false) }
     var activeStep by remember(project.id) { mutableStateOf(step) }
-    BackHandler(enabled = activeStep > 0) {
-        activeStep = if (!audit && activeStep == 3) 1 else activeStep - 1
+    var showLeaveConfirm by remember { mutableStateOf(false) }
+    val hasWork = exportedFile == null && (plan != null || markdown != null || inputs.values.any { it.isNotBlank() })
+    BackHandler {
+        when {
+            activeStep > 0 -> activeStep = if (!audit && activeStep == 3) 1 else activeStep - 1
+            hasWork -> showLeaveConfirm = true
+            else -> onBack()
+        }
     }
     val deliveryScroll = rememberScrollState()
     Column(modifier = Modifier.fillMaxSize().imePadding()) {
         NfTopAppBar(
             title = stringResource(dev.ninfenz.mobile.R.string.delivery_title, project.title),
-            onBack = onBack,
+            onBack = { if (hasWork) showLeaveConfirm = true else onBack() },
             actions = {
                 IconButton(onClick = { deliveryMenu = true }, modifier = Modifier.size(48.dp)) {
                     Icon(Icons.Filled.MoreVert, contentDescription = stringResource(dev.ninfenz.mobile.R.string.common_more))
@@ -1936,6 +1942,24 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                 }
             },
             confirmButton = { TextButton(onClick = { showVersions = false }) { Text(stringResource(android.R.string.ok)) } }
+        )
+    }
+
+    if (showLeaveConfirm) {
+        AlertDialog(
+            onDismissRequest = { showLeaveConfirm = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_leave_title)) },
+            text = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_leave_body)) },
+            confirmButton = {
+                TextButton(onClick = { showLeaveConfirm = false; onBack() }) {
+                    Text(stringResource(dev.ninfenz.mobile.R.string.delivery_leave_confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showLeaveConfirm = false }) {
+                    Text(stringResource(dev.ninfenz.mobile.R.string.delivery_leave_stay))
+                }
+            }
         )
     }
 
