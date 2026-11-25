@@ -1325,4 +1325,5 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="project_pack_other_versions">已安装其他版本：%1$s</string>
     <string name="author_retry_save">重试保存</string>
     <string name="search_clear_filters">清除筛选</string>
+    <string name="settings_backup_empty">还没有备份；先创建一次备份。</string>
 </resources>

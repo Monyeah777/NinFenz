@@ -1329,4 +1329,5 @@ MIT License · See app/docs/LEGAL.md···⟧</string>
     <string name="project_pack_other_versions">⟦Other installed versions: %1$s···⟧</string>
     <string name="author_retry_save">⟦Retry save···⟧</string>
     <string name="search_clear_filters">⟦Clear filters···⟧</string>
+    <string name="settings_backup_empty">⟦No backups yet; create one first.···⟧</string>
 </resources>

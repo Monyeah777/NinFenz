@@ -405,6 +405,9 @@ fun SettingsScreen(
                 stats = StorageStats.scan(context.filesDir, context.cacheDir)
                 cleaned = context.resources.getQuantityString(dev.ninfenz.mobile.R.plurals.settings_backup_pruned, removed, removed)
             }) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_backup_prune)) }
+            if (backups.isEmpty()) {
+                Text(stringResource(dev.ninfenz.mobile.R.string.settings_backup_empty), style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
             if (backups.size > 3) {
                 OutlinedButton(onClick = { showAllBackups = true }) {
                     Text(stringResource(dev.ninfenz.mobile.R.string.settings_backup_all, backups.size))
