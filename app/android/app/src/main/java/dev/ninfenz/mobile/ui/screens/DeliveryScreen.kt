@@ -262,6 +262,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
     var batchChunks by remember { mutableStateOf<List<SlotBatchImporter.Chunk>>(emptyList()) }
     var batchSource by remember { mutableStateOf("") }
     var batchNote by remember { mutableStateOf<String?>(null) }
+    var batchUndo by remember { mutableStateOf<Map<String, String>?>(null) }
     val draftStore = remember { DeliveryDraftStore(context.filesDir) }
     val versionStore = remember { DeliveryVersionStore(context.filesDir) }
     val presetStore = remember { AssemblyPresetStore(context.filesDir) }
@@ -462,7 +463,9 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
     fun applyBatch(onlyEmpty: Boolean) {
         val slots = plan?.slots ?: return
         if (slots.isEmpty() || batchChunks.isEmpty()) return
+        val before = inputs
         val result = SlotBatchImporter.apply(batchChunks, slots, inputs, onlyEmpty)
+        batchUndo = before
         inputs = result.values
         batchNote = context.getString(
             dev.ninfenz.mobile.R.string.delivery_slot_batch_done,
@@ -774,6 +777,16 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         }
                         batchNote?.let {
                             Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page))
+                        }
+                        batchUndo?.let { snapshot ->
+                            TextButton(
+                                onClick = {
+                                    inputs = snapshot
+                                    batchUndo = null
+                                    batchNote = context.getString(dev.ninfenz.mobile.R.string.delivery_slot_batch_undo_done)
+                                },
+                                modifier = Modifier.padding(horizontal = NfSpacing.page)
+                            ) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_slot_batch_undo)) }
                         }
                         draftNote?.let {
                             Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(horizontal = NfSpacing.page))
@@ -2613,10 +2626,24 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         stringResource(dev.ninfenz.mobile.R.string.delivery_slot_batch_meta, batchSource),
                         style = NfType.meta
                     )
+                    Text(
+                        stringResource(dev.ninfenz.mobile.R.string.delivery_slot_batch_preview_note),
+                        style = NfType.meta,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                     slots.forEachIndexed { index, slot ->
                         val chunk = batchChunks.getOrNull(index)
                         if (chunk != null) {
+                            val existing = inputs[slot].orEmpty()
                             Text("$slot ← " + chunk.text.replace('\n', ' ').take(48), style = NfType.meta)
+                            Text(
+                                stringResource(
+                                    if (existing.isBlank()) dev.ninfenz.mobile.R.string.delivery_slot_batch_preview_fill
+                                    else dev.ninfenz.mobile.R.string.delivery_slot_batch_preview_overwrite
+                                ),
+                                style = NfType.meta,
+                                color = if (existing.isBlank()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                            )
                         }
                     }
                     if (batchChunks.size > slots.size) {

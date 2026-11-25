@@ -1304,4 +1304,9 @@ MIT License · See app/docs/LEGAL.md···⟧</string>
     <string name="decision_log_final_filter">⟦Final···⟧</string>
     <string name="decision_log_reversed_filter">⟦Reversed···⟧</string>
     <string name="decision_log_no_match">⟦No records match this filter···⟧</string>
+    <string name="delivery_slot_batch_undo">⟦Undo batch import···⟧</string>
+    <string name="delivery_slot_batch_undo_done">⟦Restored slots before batch import···⟧</string>
+    <string name="delivery_slot_batch_preview_fill">⟦Will fill···⟧</string>
+    <string name="delivery_slot_batch_preview_overwrite">⟦Will overwrite···⟧</string>
+    <string name="delivery_slot_batch_preview_note">⟦Preview only; you can undo after applying.···⟧</string>
 </resources>
