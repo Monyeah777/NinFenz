@@ -26,6 +26,14 @@ class SearchFilterTest {
     }
 
     @Test
+    fun filtersByProjectId() {
+        val a = SearchHit(SearchKind.PROJECT, "a", "", projectId = "p1")
+        val b = SearchHit(SearchKind.PROJECT, "b", "", projectId = "p2")
+        assertEquals(listOf(a), SearchFilter.apply(listOf(a, b), null, null, "p1"))
+        assertEquals(0, SearchFilter.apply(listOf(a), SearchKind.PACK, null, "p1").size)
+    }
+
+    @Test
     fun filtersByKind() {
         val all = listOf(hit(SearchKind.PROJECT), hit(SearchKind.PACK), hit(SearchKind.PROJECT))
         assertEquals(2, SearchFilter.apply(all, SearchKind.PROJECT).size)

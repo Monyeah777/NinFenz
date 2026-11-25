@@ -549,7 +549,8 @@ is Detail.Inbox -> InboxScreen(
                         onBack = { shell = shell.back() ?: shell },
                         onOpenPack = { id, version -> shell = shell.open(Detail.Pack(id, version)) },
                         onOpenProject = { id -> shell = shell.open(Detail.Project(id)) },
-                        packIds = packs.packs.map { it.id }.distinct().sorted()
+                        packIds = packs.packs.map { it.id }.distinct().sorted(),
+                        projects = projects
                     )
                     is Detail.DesignSystem -> DesignSystemScreen(onBack = { shell = shell.back() ?: shell })
                     is Detail.DecisionLog -> DecisionLogScreen(onBack = { shell = shell.back() ?: shell })

@@ -42,6 +42,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import dev.ninfenz.mobile.data.ProjectEntry
 import dev.ninfenz.mobile.data.SearchHit
 import dev.ninfenz.mobile.data.SearchHistoryStore
 import dev.ninfenz.mobile.data.SearchFilterStore
@@ -61,7 +62,8 @@ fun SearchScreen(
     onBack: () -> Unit,
     onOpenPack: (packId: String, version: String) -> Unit,
     onOpenProject: (projectId: String) -> Unit,
-    packIds: List<String> = emptyList()
+    packIds: List<String> = emptyList(),
+    projects: List<ProjectEntry> = emptyList()
 ) {
     val context = LocalContext.current
     val index = remember { SearchIndex(context.filesDir) }
@@ -74,6 +76,9 @@ fun SearchScreen(
     var selectedPackId by rememberSaveable {
         mutableStateOf(savedFilter?.packId?.takeIf { it in packIds })
     }
+    var selectedProjectId by rememberSaveable {
+        mutableStateOf(savedFilter?.projectId?.takeIf { id -> projects.any { it.project.id == id } })
+    }
     val filterKind = filterName?.let { name -> SearchKind.entries.firstOrNull { it.name == name } }
     val historyStore = remember { SearchHistoryStore(context.filesDir) }
     var history by remember { mutableStateOf(historyStore.load()) }
@@ -83,14 +88,16 @@ fun SearchScreen(
     LaunchedEffect(Unit) {
         all = withContext(Dispatchers.IO) { index.build() }
     }
-    LaunchedEffect(filterName, selectedPackId) {
-        filterStore.save(filterName, selectedPackId)
+    LaunchedEffect(filterName, selectedPackId, selectedProjectId) {
+        filterStore.save(filterName, selectedPackId, selectedProjectId)
     }
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
     }
     val results = remember(query, all) { index.search(all, query) }
-    val filtered = remember(results, filterName, selectedPackId) { SearchFilter.apply(results, filterKind, selectedPackId) }
+    val filtered = remember(results, filterName, selectedPackId, selectedProjectId) {
+        SearchFilter.apply(results, filterKind, selectedPackId, selectedProjectId)
+    }
     LaunchedEffect(filtered) { selected = 0 }
     val rows = remember(filtered) {
         val out = mutableListOf<SearchRow>()
@@ -158,6 +165,9 @@ fun SearchScreen(
             if (packIds.isNotEmpty()) {
                 PackFilterRow(packIds, selectedPackId) { selectedPackId = it }
             }
+            if (projects.isNotEmpty()) {
+                ProjectFilterRow(projects, selectedProjectId) { selectedProjectId = it }
+            }
             Text(
                 stringResource(dev.ninfenz.mobile.R.string.search_keyboard_hint),
                 style = NfType.meta,
@@ -221,6 +231,30 @@ private fun PackFilterRow(packIds: List<String>, selected: String?, onPick: (Str
         }
         items(packIds) { id ->
             FilterChip(selected = selected == id, onClick = { onPick(id) }, label = { Text(id) })
+        }
+    }
+}
+
+@Composable
+private fun ProjectFilterRow(projects: List<ProjectEntry>, selected: String?, onPick: (String?) -> Unit) {
+    LazyRow(
+        contentPadding = PaddingValues(horizontal = NfSpacing.page),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        item {
+            FilterChip(
+                selected = selected == null,
+                onClick = { onPick(null) },
+                label = { Text(stringResource(dev.ninfenz.mobile.R.string.search_filter_all_projects)) }
+            )
+        }
+        items(projects) { entry ->
+            val id = entry.project.id
+            FilterChip(
+                selected = selected == id,
+                onClick = { onPick(id) },
+                label = { Text(entry.project.title.ifBlank { id }, maxLines = 1, overflow = TextOverflow.Ellipsis) }
+            )
         }
     }
 }

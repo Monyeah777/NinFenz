@@ -1308,4 +1308,5 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="delivery_trash_title">移除这条导出记录？</string>
     <string name="delivery_trash_body">文件会移到 exports/trash，可在“回收站”恢复；仅记录不会永久删除文件。</string>
     <string name="delivery_trash_confirm">移到回收站</string>
+    <string name="search_filter_all_projects">全部项目</string>
 </resources>
