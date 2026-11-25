@@ -275,6 +275,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
     var recentExpanded by remember { mutableStateOf(true) }
     var showAllExports by remember { mutableStateOf(false) }
     var showTrash by remember { mutableStateOf(false) }
+    var pendingTrash by remember { mutableStateOf<dev.ninfenz.mobile.data.ExportHistoryStore.Entry?>(null) }
     fun trashAndRemove(entry: dev.ninfenz.mobile.data.ExportHistoryStore.Entry) {
         runCatching {
             val source = File(entry.path)
@@ -1728,7 +1729,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                     ShareExporter.launchView(context, intent, context.getString(dev.ninfenz.mobile.R.string.delivery_open_file))
                                 }
                             }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_open_file)) }
-                            TextButton(onClick = { trashAndRemove(entry) }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_remove_export)) }
+                            TextButton(onClick = { pendingTrash = entry }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_remove_export)) }
                         }
                         entry.message?.takeIf { entry.ok != true }?.let { message ->
                             Text(
@@ -1932,6 +1933,27 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                 }
             },
             confirmButton = { TextButton(onClick = { showVersions = false }) { Text(stringResource(android.R.string.ok)) } }
+        )
+    }
+
+    if (pendingTrash != null) {
+        val entry = pendingTrash!!
+        AlertDialog(
+            onDismissRequest = { pendingTrash = null },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_trash_title)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                    Text(entry.name, style = NfType.meta)
+                    Text(stringResource(dev.ninfenz.mobile.R.string.delivery_trash_body), style = NfType.meta)
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    trashAndRemove(entry)
+                    pendingTrash = null
+                }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_trash_confirm)) }
+            },
+            dismissButton = { TextButton(onClick = { pendingTrash = null }) { Text(stringResource(android.R.string.cancel)) } }
         )
     }
 

@@ -1309,4 +1309,7 @@ MIT License · See app/docs/LEGAL.md···⟧</string>
     <string name="delivery_slot_batch_preview_fill">⟦Will fill···⟧</string>
     <string name="delivery_slot_batch_preview_overwrite">⟦Will overwrite···⟧</string>
     <string name="delivery_slot_batch_preview_note">⟦Preview only; you can undo after applying.···⟧</string>
+    <string name="delivery_trash_title">⟦Remove this export record?···⟧</string>
+    <string name="delivery_trash_body">⟦The file moves to exports/trash and can be restored from Trash; the record alone is not permanently deleted.···⟧</string>
+    <string name="delivery_trash_confirm">⟦Move to trash···⟧</string>
 </resources>
