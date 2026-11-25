@@ -106,12 +106,18 @@ fun NewProjectScreen(
                 if (error != null) {
                     item {
                         Surface(color = MaterialTheme.colorScheme.errorContainer, shape = MaterialTheme.shapes.medium) {
-                            Text(
-                                error,
-                                modifier = Modifier.padding(NfSpacing.m),
-                                style = NfType.meta,
-                                color = MaterialTheme.colorScheme.onErrorContainer
-                            )
+                            Column(modifier = Modifier.padding(NfSpacing.m), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                                Text(
+                                    error,
+                                    style = NfType.meta,
+                                    color = MaterialTheme.colorScheme.onErrorContainer
+                                )
+                                Text(
+                                    stringResource(dev.ninfenz.mobile.R.string.new_project_error_kept),
+                                    style = NfType.meta,
+                                    color = MaterialTheme.colorScheme.onErrorContainer
+                                )
+                            }
                         }
                     }
                 }
