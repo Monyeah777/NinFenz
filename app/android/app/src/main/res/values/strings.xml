@@ -1295,4 +1295,9 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="delivery_slot_rule_pattern">格式不匹配：%1$s</string>
     <string name="delivery_slot_rule_prefix">需以「%1$s」开头</string>
     <string name="delivery_slot_rule_suffix">需以「%1$s」结尾</string>
+    <string name="decision_log_all">全部</string>
+    <string name="decision_log_undoable_filter">可撤销</string>
+    <string name="decision_log_final_filter">已定</string>
+    <string name="decision_log_reversed_filter">已撤销</string>
+    <string name="decision_log_no_match">当前筛选没有记录</string>
 </resources>

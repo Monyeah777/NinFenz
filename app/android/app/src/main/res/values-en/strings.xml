@@ -1299,4 +1299,9 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="delivery_slot_rule_pattern">Pattern mismatch: %1$s</string>
     <string name="delivery_slot_rule_prefix">Must start with “%1$s”</string>
     <string name="delivery_slot_rule_suffix">Must end with “%1$s”</string>
+    <string name="decision_log_all">All</string>
+    <string name="decision_log_undoable_filter">Undoable</string>
+    <string name="decision_log_final_filter">Final</string>
+    <string name="decision_log_reversed_filter">Reversed</string>
+    <string name="decision_log_no_match">No records match this filter</string>
 </resources>
