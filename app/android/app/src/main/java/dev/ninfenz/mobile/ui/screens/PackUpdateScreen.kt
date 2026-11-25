@@ -227,9 +227,16 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit, onOpenProject: (St
         val u = update
         if (u != null) {
             CardBox(title = stringResource(dev.ninfenz.mobile.R.string.packupdate_changes)) {
-                for (c in u.added) Text("+ " + c.path, style = NfType.meta)
-                for (c in u.removed) Text("- " + c.path, style = NfType.meta)
-                for (c in u.modified) Text("~ " + c.path, style = NfType.meta)
+                val limit = 50
+                for (c in u.added.take(limit)) Text("+ " + c.path, style = NfType.meta)
+                for (c in u.removed.take(limit)) Text("- " + c.path, style = NfType.meta)
+                for (c in u.modified.take(limit)) Text("~ " + c.path, style = NfType.meta)
+                val hidden = (u.added.size - limit).coerceAtLeast(0) +
+                    (u.removed.size - limit).coerceAtLeast(0) +
+                    (u.modified.size - limit).coerceAtLeast(0)
+                if (hidden > 0) {
+                    Text(stringResource(dev.ninfenz.mobile.R.string.packupdate_more_changes, hidden), style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
                 if (u.totalChanges == 0) EmptyState(stringResource(dev.ninfenz.mobile.R.string.packupdate_no_changes))
             }
 

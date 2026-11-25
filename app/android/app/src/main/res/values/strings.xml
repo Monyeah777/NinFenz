@@ -1329,4 +1329,5 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="delivery_done_title">导出完成</string>
     <string name="delivery_done_body">文件已生成；可以返回项目继续处理，或在上方分享/打开。</string>
     <string name="delivery_done_back">返回项目</string>
+    <string name="packupdate_more_changes">还有 %1$d 条变更未展开</string>
 </resources>
