@@ -1314,4 +1314,5 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="delivery_leave_body">当前装配/槽位仍在本地草稿中，离开不会删除草稿；未导出的结果需要稍后继续。</string>
     <string name="delivery_leave_confirm">离开</string>
     <string name="delivery_leave_stay">留下</string>
+    <string name="author_autosave_saving">自动保存中…</string>
 </resources>

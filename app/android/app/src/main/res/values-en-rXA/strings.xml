@@ -1318,4 +1318,5 @@ MIT License · See app/docs/LEGAL.md···⟧</string>
     <string name="delivery_leave_body">⟦Your assembly and slots remain in the local draft; nothing is deleted. Unexported results can be resumed later.···⟧</string>
     <string name="delivery_leave_confirm">⟦Leave···⟧</string>
     <string name="delivery_leave_stay">⟦Stay···⟧</string>
+    <string name="author_autosave_saving">⟦Autosaving…···⟧</string>
 </resources>

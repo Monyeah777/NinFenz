@@ -554,10 +554,12 @@ private fun GraphAuthorContent(artifacts: AuthorArtifacts, project: Project, onS
     val scope = rememberCoroutineScope()
     val store = remember { AuthorArtifactStore(context.filesDir) }
     var autoSavePrimed by remember { mutableStateOf(false) }
+    var autoSaving by remember { mutableStateOf(false) }
     LaunchedEffect(graph) {
         if (!autoSavePrimed) {
             autoSavePrimed = true
         } else {
+            autoSaving = true
             delay(900)
             when (val result = store.saveGraph(project, graph)) {
                 is SaveArtifactResult.Saved -> {
@@ -566,6 +568,7 @@ private fun GraphAuthorContent(artifacts: AuthorArtifacts, project: Project, onS
                 }
                 is SaveArtifactResult.Failure -> error = CoreError(result.code, result.message, result.fix, null, 1)
             }
+            autoSaving = false
         }
     }
 
@@ -706,6 +709,9 @@ private fun GraphAuthorContent(artifacts: AuthorArtifacts, project: Project, onS
         ) { Text(if (busy) stringResource(dev.ninfenz.mobile.R.string.author_saving_artifact) else stringResource(dev.ninfenz.mobile.R.string.author_save_graph)) }
 
         report?.let { text -> Text(text, style = NfType.secondary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
+        if (autoSaving) {
+            Text(stringResource(dev.ninfenz.mobile.R.string.author_autosave_saving), style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page))
+        }
         savedMsg?.let { text -> Text(text, style = NfType.secondary, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
         error?.let { err -> NfErrorCard(err.code, err.message, err.fix, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
         SnackbarHost(hostState = snackbar, modifier = Modifier.padding(horizontal = NfSpacing.page))
@@ -730,10 +736,12 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
     val scope = rememberCoroutineScope()
     val store = remember { AuthorArtifactStore(context.filesDir) }
     var autoSavePrimed by remember { mutableStateOf(false) }
+    var autoSaving by remember { mutableStateOf(false) }
     LaunchedEffect(spec) {
         if (!autoSavePrimed) {
             autoSavePrimed = true
         } else {
+            autoSaving = true
             delay(900)
             when (val result = store.saveSpec(project, spec)) {
                 is SaveArtifactResult.Saved -> {
@@ -742,6 +750,7 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
                 }
                 is SaveArtifactResult.Failure -> error = CoreError(result.code, result.message, result.fix, null, 1)
             }
+            autoSaving = false
         }
     }
 
@@ -834,6 +843,9 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
             }
         ) { Text(if (busy) stringResource(dev.ninfenz.mobile.R.string.author_saving_artifact) else stringResource(dev.ninfenz.mobile.R.string.author_save_spec)) }
         report?.let { text -> Text(text, style = NfType.secondary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
+        if (autoSaving) {
+            Text(stringResource(dev.ninfenz.mobile.R.string.author_autosave_saving), style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page))
+        }
         savedMsg?.let { text -> Text(text, style = NfType.secondary, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
         error?.let { err -> NfErrorCard(err.code, err.message, err.fix, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
     }
