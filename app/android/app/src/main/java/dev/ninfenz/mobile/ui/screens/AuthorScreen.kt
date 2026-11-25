@@ -555,7 +555,8 @@ private fun GraphAuthorContent(artifacts: AuthorArtifacts, project: Project, onS
     val store = remember { AuthorArtifactStore(context.filesDir) }
     var autoSavePrimed by remember { mutableStateOf(false) }
     var autoSaving by remember { mutableStateOf(false) }
-    LaunchedEffect(graph) {
+    var retrySave by remember { mutableIntStateOf(0) }
+    LaunchedEffect(graph, retrySave) {
         if (!autoSavePrimed) {
             autoSavePrimed = true
         } else {
@@ -713,7 +714,12 @@ private fun GraphAuthorContent(artifacts: AuthorArtifacts, project: Project, onS
             Text(stringResource(dev.ninfenz.mobile.R.string.author_autosave_saving), style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page))
         }
         savedMsg?.let { text -> Text(text, style = NfType.secondary, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
-        error?.let { err -> NfErrorCard(err.code, err.message, err.fix, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
+        error?.let { err ->
+            NfErrorCard(err.code, err.message, err.fix, modifier = Modifier.padding(horizontal = NfSpacing.page))
+            TextButton(onClick = { retrySave++ }, modifier = Modifier.padding(horizontal = NfSpacing.page)) {
+                Text(stringResource(dev.ninfenz.mobile.R.string.author_retry_save))
+            }
+        }
         SnackbarHost(hostState = snackbar, modifier = Modifier.padding(horizontal = NfSpacing.page))
     }
 }
@@ -737,7 +743,8 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
     val store = remember { AuthorArtifactStore(context.filesDir) }
     var autoSavePrimed by remember { mutableStateOf(false) }
     var autoSaving by remember { mutableStateOf(false) }
-    LaunchedEffect(spec) {
+    var retrySave by remember { mutableIntStateOf(0) }
+    LaunchedEffect(spec, retrySave) {
         if (!autoSavePrimed) {
             autoSavePrimed = true
         } else {
@@ -847,7 +854,12 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
             Text(stringResource(dev.ninfenz.mobile.R.string.author_autosave_saving), style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page))
         }
         savedMsg?.let { text -> Text(text, style = NfType.secondary, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
-        error?.let { err -> NfErrorCard(err.code, err.message, err.fix, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
+        error?.let { err ->
+            NfErrorCard(err.code, err.message, err.fix, modifier = Modifier.padding(horizontal = NfSpacing.page))
+            TextButton(onClick = { retrySave++ }, modifier = Modifier.padding(horizontal = NfSpacing.page)) {
+                Text(stringResource(dev.ninfenz.mobile.R.string.author_retry_save))
+            }
+        }
     }
 }
 

@@ -1327,4 +1327,5 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="delivery_summary_unexported">Not exported</string>
     <string name="new_project_error_kept">The selected Pack and title are kept; fix the issue and retry.</string>
     <string name="project_pack_other_versions">Other installed versions: %1$s</string>
+    <string name="author_retry_save">Retry save</string>
 </resources>
