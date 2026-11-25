@@ -1330,4 +1330,7 @@ MIT License · See app/docs/LEGAL.md···⟧</string>
     <string name="author_retry_save">⟦Retry save···⟧</string>
     <string name="search_clear_filters">⟦Clear filters···⟧</string>
     <string name="settings_backup_empty">⟦No backups yet; create one first.···⟧</string>
+    <string name="delivery_done_title">⟦Export complete···⟧</string>
+    <string name="delivery_done_body">⟦The file is ready; return to the project or share/open it above.···⟧</string>
+    <string name="delivery_done_back">⟦Back to project···⟧</string>
 </resources>

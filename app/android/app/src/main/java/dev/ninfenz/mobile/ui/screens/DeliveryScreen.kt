@@ -1609,6 +1609,17 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         modifier = Modifier.padding(horizontal = NfSpacing.page)
                     )
                 }
+                exportedFile?.let {
+                    NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
+                        Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                            Text(stringResource(dev.ninfenz.mobile.R.string.delivery_done_title), style = NfType.itemTitle)
+                            Text(stringResource(dev.ninfenz.mobile.R.string.delivery_done_body), style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            TextButton(onClick = onBack) {
+                                Text(stringResource(dev.ninfenz.mobile.R.string.delivery_done_back))
+                            }
+                        }
+                    }
+                }
                 exportEntries.firstOrNull()?.let { latest ->
                     NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
                         Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
