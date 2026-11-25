@@ -1292,4 +1292,7 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="project_tag_empty">还没有标签</string>
     <string name="delivery_export_all">导出全部</string>
     <string name="delivery_note_daily">装配走核心；PDF 优先 HTML/CSS 渲染，失败回退本地基础文本。</string>
+    <string name="delivery_slot_rule_pattern">格式不匹配：%1$s</string>
+    <string name="delivery_slot_rule_prefix">需以「%1$s」开头</string>
+    <string name="delivery_slot_rule_suffix">需以「%1$s」结尾</string>
 </resources>

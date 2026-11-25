@@ -151,6 +151,30 @@ private fun templateValueAllowed(meta: dev.ninfenz.mobile.model.SpecSlot?, value
     return true
 }
 
+private fun slotIssue(context: Context, meta: dev.ninfenz.mobile.model.SpecSlot?, value: String): String? {
+    if (meta == null) return null
+    val clean = dev.ninfenz.mobile.model.SlotInput.sanitize(meta.kind, value)
+    if (clean.isBlank() && (meta.required || meta.nonEmpty)) {
+        return context.getString(dev.ninfenz.mobile.R.string.delivery_slot_required)
+    }
+    if (meta.minChars != null && clean.isNotBlank() && clean.length < meta.minChars) {
+        return context.getString(dev.ninfenz.mobile.R.string.delivery_slot_budget_min, meta.minChars)
+    }
+    if (meta.maxChars != null && clean.length > meta.maxChars) {
+        return context.getString(dev.ninfenz.mobile.R.string.delivery_slot_budget_max, meta.maxChars)
+    }
+    if (meta.startsWith != null && clean.isNotBlank() && !clean.startsWith(meta.startsWith)) {
+        return context.getString(dev.ninfenz.mobile.R.string.delivery_slot_rule_prefix, meta.startsWith)
+    }
+    if (meta.endsWith != null && clean.isNotBlank() && !clean.endsWith(meta.endsWith)) {
+        return context.getString(dev.ninfenz.mobile.R.string.delivery_slot_rule_suffix, meta.endsWith)
+    }
+    if (meta.pattern != null && clean.isNotBlank() && !runCatching { Regex(meta.pattern).matches(clean) }.getOrDefault(false)) {
+        return context.getString(dev.ninfenz.mobile.R.string.delivery_slot_rule_pattern, meta.pattern)
+    }
+    return null
+}
+
 private fun parseTemplateSlots(markdown: String): Map<String, String> {
     val result = mutableMapOf<String, String>()
     markdown.lineSequence().forEach { line ->
@@ -905,7 +929,14 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                     } else {
                                         NfType.secondary
                                     },
-                                    supportingText = { Text(pluralStringResource(dev.ninfenz.mobile.R.plurals.delivery_slot_chars, (inputs[slot] ?: "").length, (inputs[slot] ?: "").length)) },
+                                    supportingText = {
+                                        val issue = slotIssue(context, slotMeta, inputs[slot].orEmpty())
+                                        if (issue != null) {
+                                            Text(issue, color = MaterialTheme.colorScheme.error)
+                                        } else {
+                                            Text(pluralStringResource(dev.ninfenz.mobile.R.plurals.delivery_slot_chars, (inputs[slot] ?: "").length, (inputs[slot] ?: "").length))
+                                        }
+                                    },
                                     modifier = Modifier.fillMaxWidth().semantics {
                                         contentDescription = slot + " " + (slotMeta?.name ?: "")
                                     }

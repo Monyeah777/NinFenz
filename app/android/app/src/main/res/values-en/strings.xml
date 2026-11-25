@@ -1296,4 +1296,7 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="project_tag_empty">No tags yet</string>
     <string name="delivery_export_all">Export all</string>
     <string name="delivery_note_daily">Assembly runs in the core; PDF prefers HTML/CSS rendering and falls back to basic text.</string>
+    <string name="delivery_slot_rule_pattern">Pattern mismatch: %1$s</string>
+    <string name="delivery_slot_rule_prefix">Must start with “%1$s”</string>
+    <string name="delivery_slot_rule_suffix">Must end with “%1$s”</string>
 </resources>
