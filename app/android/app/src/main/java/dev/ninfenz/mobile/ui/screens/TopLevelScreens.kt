@@ -1561,6 +1561,7 @@ fun ProjectDetailScreen(
 fun PackDetailScreen(pack: PackEntry, onBack: () -> Unit, onUpdate: () -> Unit) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    val audit = dev.ninfenz.mobile.data.FeatureGate.auditEnabled()
     val trustStore = remember { PackTrustStore(context.filesDir) }
     var pinnedTree by remember { mutableStateOf(trustStore.pinnedTree(pack.id, pack.version)) }
     val trustMatches = pinnedTree == null || pinnedTree == pack.tree
@@ -1582,6 +1583,7 @@ fun PackDetailScreen(pack: PackEntry, onBack: () -> Unit, onUpdate: () -> Unit) 
                         Text(stringResource(dev.ninfenz.mobile.R.string.pack_detail_items, pack.itemCount), style = NfType.meta)
                         Text(stringResource(dev.ninfenz.mobile.R.string.pack_detail_tree, pack.tree.take(16) + "…"), style = NfType.meta)
                         Text(stringResource(dev.ninfenz.mobile.R.string.pack_detail_dir, pack.dir.absolutePath), style = NfType.meta)
+                        if (audit) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
                                 when {
@@ -1616,10 +1618,12 @@ fun PackDetailScreen(pack: PackEntry, onBack: () -> Unit, onUpdate: () -> Unit) 
                                 )
                             }
                         }
+                        }
                     }
                 }
             }
             item {
+                if (audit) {
                 Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                     Button(
                         onClick = {
@@ -1647,6 +1651,7 @@ fun PackDetailScreen(pack: PackEntry, onBack: () -> Unit, onUpdate: () -> Unit) 
                         enabled = !verifying
                     ) { Text(if (verifying) context.getString(dev.ninfenz.mobile.R.string.validating) else context.getString(dev.ninfenz.mobile.R.string.validate_pack)) }
                     Button(onClick = onUpdate) { Text(stringResource(dev.ninfenz.mobile.R.string.pack_detail_update)) }
+                }
                 }
             }
             if (report != null) {
