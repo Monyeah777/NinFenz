@@ -1,0 +1,1 @@
+{ "schema": "nf-validation-policy/1", "mode": "sometimes", "block_export": false, "record_skips": true }

@@ -3,7 +3,7 @@ package dev.ninfenz.mobile.data
 import dev.ninfenz.mobile.ui.shell.Detail
 import dev.ninfenz.mobile.ui.shell.ShellState
 
-/** Daily/Pro 路由策略：Daily 不暴露 Pro 审计详情，进程恢复/深链也走这里。 */
+/** Daily/Pro 路由策略 + 用户模块门；Daily 不暴露 Pro 审计详情，模块关闭时也不放行。 */
 object EditionRoutePolicy {
     fun detailFeature(detail: Detail?): String? = when (detail) {
         is Detail.Review -> "audit.review"
@@ -14,10 +14,19 @@ object EditionRoutePolicy {
         else -> null
     }
 
-    fun isAllowed(detail: Detail?): Boolean {
-        val feature = detailFeature(detail) ?: return true
-        return FeatureGate.allows(feature)
+    fun detailCapability(detail: Detail?): Capability? = when (detail) {
+        Detail.Search -> Capability.SEARCH
+        Detail.NfDocMerge -> Capability.MERGE
+        else -> null
     }
+
+    fun isAllowed(detail: Detail?): Boolean {
+        val feature = detailFeature(detail) ?: return capabilityAllowed(detail)
+        return FeatureGate.allows(feature) && capabilityAllowed(detail)
+    }
+
+    private fun capabilityAllowed(detail: Detail?): Boolean =
+        detailCapability(detail)?.let { CapabilityRegistry.isEnabled(it) } ?: true
 
     /** 被拒绝时回退到安全落点：评审退回项目，Pack Studio 退回 Pack 中心，其余回根。 */
     fun sanitize(state: ShellState): ShellState {

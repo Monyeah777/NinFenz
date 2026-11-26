@@ -58,6 +58,7 @@ import dev.ninfenz.mobile.core.CoreResponse
 import dev.ninfenz.mobile.core.J
 import dev.ninfenz.mobile.data.AuthorArtifactStore
 import dev.ninfenz.mobile.data.ExtensionStore
+import dev.ninfenz.mobile.data.GraphSnapshotStore
 import dev.ninfenz.mobile.data.SpecSnapshotStore
 import dev.ninfenz.mobile.data.AuthorArtifacts
 import dev.ninfenz.mobile.data.SaveArtifactResult
@@ -610,6 +611,10 @@ private fun GraphAuthorContent(artifacts: AuthorArtifacts, project: Project, onS
         graph = next
     }
     val graphRecipes = remember { ExtensionStore(context.filesDir).contributions(setOf("graph_recipe")) }
+    val graphSnapshotStore = remember { GraphSnapshotStore(context.filesDir, project.id) }
+    var graphSnapshots by remember { mutableStateOf(graphSnapshotStore.list()) }
+    var showGraphSnapshots by remember { mutableStateOf(false) }
+    var graphSnapshotNote by remember { mutableStateOf<String?>(null) }
     var showGraphRecipes by remember { mutableStateOf(false) }
     var graphRecipeNote by remember { mutableStateOf<String?>(null) }
     val snackbar = remember { SnackbarHostState() }
@@ -678,8 +683,13 @@ private fun GraphAuthorContent(artifacts: AuthorArtifacts, project: Project, onS
                     Text(stringResource(dev.ninfenz.mobile.R.string.author_graph_recipe))
                 }
             }
+            TextButton(onClick = {
+                graphSnapshots = graphSnapshotStore.list()
+                showGraphSnapshots = true
+            }) { Text(stringResource(dev.ninfenz.mobile.R.string.author_graph_snapshot)) }
         }
         graphRecipeNote?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
+        graphSnapshotNote?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
         for (node in graph.nodes) {
             NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
                 Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
@@ -882,6 +892,51 @@ private fun GraphAuthorContent(artifacts: AuthorArtifacts, project: Project, onS
                 }
             },
             confirmButton = { TextButton(onClick = { showGraphRecipes = false }) { Text(stringResource(android.R.string.cancel)) } }
+        )
+    }
+
+    if (showGraphSnapshots) {
+        AlertDialog(
+            onDismissRequest = { showGraphSnapshots = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.author_graph_snapshot)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                    TextButton(onClick = {
+                        graphSnapshots = graphSnapshotStore.save(graph)
+                        graphSnapshotNote = context.getString(dev.ninfenz.mobile.R.string.author_graph_snapshot_saved)
+                    }) { Text(stringResource(dev.ninfenz.mobile.R.string.author_graph_snapshot_save)) }
+                    if (graphSnapshots.isEmpty()) {
+                        Text(
+                            stringResource(dev.ninfenz.mobile.R.string.author_graph_snapshot_empty),
+                            style = NfType.meta,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    graphSnapshots.forEach { snapshot ->
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                stringResource(
+                                    dev.ninfenz.mobile.R.string.author_graph_snapshot_meta,
+                                    snapshot.nodes,
+                                    snapshot.edges
+                                ),
+                                style = NfType.meta,
+                                modifier = Modifier.weight(1f)
+                            )
+                            TextButton(onClick = {
+                                graph = graphSnapshotStore.restore(snapshot)
+                                showGraphSnapshots = false
+                                graphSnapshotNote = context.getString(dev.ninfenz.mobile.R.string.author_graph_snapshot_restored)
+                            }) { Text(stringResource(dev.ninfenz.mobile.R.string.author_graph_snapshot_restore)) }
+                            TextButton(onClick = {
+                                graphSnapshotStore.remove(snapshot.id)
+                                graphSnapshots = graphSnapshotStore.list()
+                            }) { Text(stringResource(dev.ninfenz.mobile.R.string.author_graph_snapshot_delete)) }
+                        }
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { showGraphSnapshots = false }) { Text(stringResource(android.R.string.ok)) } }
         )
     }
 }

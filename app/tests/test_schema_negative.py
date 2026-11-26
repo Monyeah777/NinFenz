@@ -62,7 +62,7 @@ def test_expected_covers_exactly_all_invalid_fixtures() -> None:
 
 def test_each_schema_has_at_least_two_negatives() -> None:
     stems = sorted(p.name[: -len(".schema.json")] for p in SCHEMA_DIR.glob("*.schema.json"))
-    assert len(stems) == 34
+    assert len(stems) == 38
     for stem in stems:
         files = list((INVALID_DIR / stem).glob("*.json"))
         assert len(files) >= 2, f"{stem} 反样例少于 2 个: {files}"

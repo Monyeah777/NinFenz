@@ -26,6 +26,10 @@
 | `nf-build-graph.schema.json` | `nf-build-graph/1` | 内容寻址构建图（节点/边/输出/环境指纹） |
 | `nf-evidence.schema.json` | `nf-evidence/1` | 证据随包（产物/输入/校验/谱系/Ed25519 签名） |
 | `nf-extension.schema.json` | `nf-extension/1` | 声明式扩展（adapter/renderer/validator/theme/preset） |
+| `nf-prefs.schema.json` | `nf-prefs/1` | 单文件设置（模块/UI/语言/动作/校验/工作流） |
+| `nf-workflow.schema.json` | `nf-workflow/1` | 工作流预设（只改视图与默认值） |
+| `nf-action-policy.schema.json` | `nf-action-policy/1` | 动作策略（AI/合并/Pack/宏） |
+| `nf-validation-policy.schema.json` | `nf-validation-policy/1` | 校验策略（off/on_demand/delivery/strict） |
 | `limits.json` | `nf-app-limits/1` | 解析/解包上限（实现必须读取，不得散落字面量） |
 | `error_codes.json` | `nf-app-error-codes/1` | 错误码登记（code/severity/exit/message/fix） |
 

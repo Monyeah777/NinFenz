@@ -78,6 +78,8 @@ import dev.ninfenz.mobile.data.TemplateCandidateStore
 import dev.ninfenz.mobile.data.TemplatePackageBuilder
 import dev.ninfenz.mobile.data.TemplatePackageImporter
 import dev.ninfenz.mobile.data.LibraryStore
+import dev.ninfenz.mobile.model.ImportBatchState
+import dev.ninfenz.mobile.model.ImportBatchStatus
 import dev.ninfenz.mobile.model.ImportDoc
 import dev.ninfenz.mobile.model.MarkdownBlocks
 import dev.ninfenz.mobile.model.MarkdownSlicer
@@ -144,6 +146,7 @@ fun ImportScreen(
     var error by remember { mutableStateOf<CoreError?>(null) }
     var notice by remember { mutableStateOf<String?>(null) }
     var busy by remember { mutableStateOf(false) }
+    var batch by remember { mutableStateOf<ImportBatchState?>(null) }
     var savedName by remember { mutableStateOf<String?>(null) }
     var prefillNote by remember { mutableStateOf<String?>(null) }
     val shareQueueStore = remember { ShareQueueStore(context.filesDir) }
@@ -891,27 +894,53 @@ fun ImportScreen(
         }
     }
 
+    suspend fun runBatchIndex(index: Int) {
+        val state = batch ?: return
+        val item = state.items.getOrNull(index) ?: return
+        batch = state.markRunning(index)
+        try {
+            val uri = Uri.parse(item.uri)
+            val meta = FileAccess.meta(context, uri)
+            if (meta.size > FileAccess.MAX_IMPORT_BYTES) {
+                batch = batch?.markFailure(index, context.getString(dev.ninfenz.mobile.R.string.import_file_too_large))
+                return
+            }
+            error = null
+            val file = FileAccess.copyToCache(context, uri, meta.name)
+            importFromFile(file, ImportSource.SAF, meta.name, meta.mime, meta.size)
+            val failure = error
+            batch = if (failure == null) {
+                batch?.markSuccess(index)
+            } else {
+                batch?.markFailure(index, failure.message)
+            }
+        } catch (t: Throwable) {
+            batch = batch?.markFailure(index, t.message ?: t.javaClass.simpleName)
+        }
+    }
+
     val multiPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris: List<Uri> ->
         if (uris.isNotEmpty()) {
+            val truncated = uris.size > 50
+            val picked = uris.take(50).map { uri ->
+                uri.toString() to (uri.lastPathSegment?.substringAfterLast('/') ?: "file")
+            }
+            batch = ImportBatchState.start(picked)
             scope.launch {
-                var ok = 0
-                var failed = 0
-                for (uri in uris) {
-                    try {
-                        val meta = FileAccess.meta(context, uri)
-                        if (meta.size > FileAccess.MAX_IMPORT_BYTES) {
-                            failed++
-                            continue
-                        }
-                        error = null
-                        val file = FileAccess.copyToCache(context, uri, meta.name)
-                        importFromFile(file, ImportSource.SAF, meta.name, meta.mime, meta.size)
-                        if (error == null) ok++ else failed++
-                    } catch (e: Exception) {
-                        failed++
-                    }
+                var index = 0
+                while (index < picked.size && batch?.cancelled != true) {
+                    runBatchIndex(index)
+                    index += 1
                 }
-                notice = context.getString(dev.ninfenz.mobile.R.string.import_multi_done, ok, failed)
+                val finalState = batch
+                val suffix = if (truncated) {
+                    " · " + context.getString(dev.ninfenz.mobile.R.string.import_batch_limit, uris.size)
+                } else ""
+                notice = (if (finalState?.cancelled == true) {
+                    context.getString(dev.ninfenz.mobile.R.string.import_batch_cancelled)
+                } else {
+                    context.getString(dev.ninfenz.mobile.R.string.import_multi_done, finalState?.success ?: 0, finalState?.failed ?: 0)
+                }) + suffix
             }
         }
     }
@@ -927,7 +956,10 @@ fun ImportScreen(
             title = stringResource(dev.ninfenz.mobile.R.string.import_title),
             onBack = onBack,
             actions = {
-                TextButton(onClick = { multiPicker.launch(arrayOf("*/*")) }, enabled = !busy) {
+                TextButton(
+                    onClick = { multiPicker.launch(arrayOf("*/*")) },
+                    enabled = !busy && dev.ninfenz.mobile.data.CapabilityRegistry.isEnabled(dev.ninfenz.mobile.data.Capability.BATCH)
+                ) {
                     Text(stringResource(dev.ninfenz.mobile.R.string.import_multi))
                 }
                 if (doc != null || rawResult != null || savedName != null || shareQueue.isNotEmpty() || prefillNote != null) {
@@ -967,6 +999,27 @@ fun ImportScreen(
                                 OutlinedButton(onClick = { runZeroSlice() }, enabled = !busy) { Text(stringResource(dev.ninfenz.mobile.R.string.import_zero_slice)) }
                             }
                             OutlinedButton(onClick = { preservePicker.launch(arrayOf("application/zip", "application/octet-stream")) }, enabled = !busy) { Text(stringResource(dev.ninfenz.mobile.R.string.import_verify_preserve)) }
+                        }
+                        batch?.let { state ->
+                            ImportBatchPanel(
+                                state = state,
+                                onCancel = { batch = batch?.cancel() },
+                                onRetry = {
+                                    scope.launch {
+                                        val indices = batch?.failedIndices().orEmpty()
+                                        for (index in indices) {
+                                            if (batch?.cancelled == true) break
+                                            runBatchIndex(index)
+                                        }
+                                        val finalState = batch
+                                        notice = context.getString(
+                                            dev.ninfenz.mobile.R.string.import_multi_done,
+                                            finalState?.success ?: 0,
+                                            finalState?.failed ?: 0
+                                        )
+                                    }
+                                }
+                            )
                         }
                         if (prefillNote != null) {
                             Text(stringResource(dev.ninfenz.mobile.R.string.import_share_received), style = NfType.meta, color = MaterialTheme.colorScheme.primary)
@@ -2009,6 +2062,49 @@ fun ImportScreen(
                 }
             }
         )
+    }
+}
+
+@Composable
+private fun ImportBatchPanel(
+    state: ImportBatchState,
+    onCancel: () -> Unit,
+    onRetry: () -> Unit
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)
+    ) {
+        Text(stringResource(dev.ninfenz.mobile.R.string.import_batch_title), style = NfType.sectionTitle)
+        if (state.running || state.items.any { it.status == ImportBatchStatus.PENDING }) {
+            LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+        }
+        Text(
+            stringResource(
+                dev.ninfenz.mobile.R.string.import_batch_progress,
+                state.processed,
+                state.total,
+                state.success,
+                state.failed
+            ),
+            style = NfType.meta,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        state.items.filter { it.status == ImportBatchStatus.FAILED }.take(5).forEach { item ->
+            Text(
+                stringResource(dev.ninfenz.mobile.R.string.import_batch_failed_item, item.name, item.error.orEmpty()),
+                style = NfType.meta,
+                color = MaterialTheme.colorScheme.error
+            )
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+            if (state.running || state.items.any { it.status == ImportBatchStatus.PENDING }) {
+                TextButton(onClick = onCancel) { Text(stringResource(dev.ninfenz.mobile.R.string.import_batch_cancel)) }
+            }
+            if (state.failed > 0) {
+                TextButton(onClick = onRetry) { Text(stringResource(dev.ninfenz.mobile.R.string.import_batch_retry)) }
+            }
+        }
     }
 }
 

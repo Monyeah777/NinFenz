@@ -79,7 +79,9 @@ object BackupService {
         "search-filter.json",
         "command-history.json",
         "library-view.json",
-        "app-prefs.json"
+        "app-prefs.json",
+        "nf-prefs.json",
+        "extension-trust.json"
     )
 
     private fun sha256(file: File): String {

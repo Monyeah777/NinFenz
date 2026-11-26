@@ -667,6 +667,16 @@
       "code": "NF-PORT-001", "severity": "error", "exit": 1,
       "message": "可携带包非法/清单不符/冲突",
       "fix": "重新导出或按冲突预览合并"
+    },
+    {
+      "code": "NF-PREF-001", "severity": "error", "exit": 1,
+      "message": "本地设置/工作流/策略 schema 非法",
+      "fix": "按报告 path 修字段；不静默修复"
+    },
+    {
+      "code": "NF-PREF-002", "severity": "error", "exit": 3,
+      "message": "本地设置值越界（如字号不在 80–200）",
+      "fix": "改回允许区间后重试"
     }
   ]
 }

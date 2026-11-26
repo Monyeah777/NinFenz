@@ -102,7 +102,9 @@ import dev.ninfenz.mobile.data.StatusAdvanceResult
 import dev.ninfenz.mobile.model.AssemblyPlan
 import dev.ninfenz.mobile.model.MarkdownBlock
 import dev.ninfenz.mobile.model.CorrectionPrompt
+import dev.ninfenz.mobile.model.DiffKind
 import dev.ninfenz.mobile.model.MarkdownBlocks
+import dev.ninfenz.mobile.model.TextDiff
 import dev.ninfenz.mobile.model.SpecModel
 import dev.ninfenz.mobile.model.PlanModel
 import dev.ninfenz.mobile.model.Project
@@ -2072,6 +2074,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                             val outDir = File(File(context.filesDir, "exports"), "variants").apply { mkdirs() }
                             var ok = 0
                             var failed = 0
+                            var missingFormats = 0
                             for (variant in extensionVariants) {
                                 val variantInputs = inputs.toMutableMap()
                                 (variant.config["inputs"] as? JsonObject)?.forEach { (key, value) ->
@@ -2088,13 +2091,39 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                 if (response?.ok == true && !md.isNullOrBlank()) {
                                     val safe = variant.id.replace(Regex("[^A-Za-z0-9._-]"), "_")
                                     File(outDir, safe + ".md").writeText(md, Charsets.UTF_8)
-                                    runCatching { dev.ninfenz.mobile.data.HtmlExporter.export(md, project.title, outDir, safe + ".html") }
+                                    runCatching {
+                                        dev.ninfenz.mobile.data.HtmlExporter.export(md, project.title, outDir, safe + ".html")
+                                    }.onFailure { missingFormats++ }
+                                    runCatching {
+                                        dev.ninfenz.mobile.data.EpubExporter.export(
+                                            md, project.title, outDir, epubAuthor, epubLanguage, safe + ".epub"
+                                        )
+                                    }.onFailure { missingFormats++ }
+                                    runCatching {
+                                        dev.ninfenz.mobile.data.PdfExporter.export(
+                                            md, project.title, outDir, pdfPageSize, pdfIncludeTitle, safe + ".pdf"
+                                        )
+                                    }.onFailure { missingFormats++ }
+                                    runCatching {
+                                        val doc = dev.ninfenz.mobile.model.NfDocModel.fromMarkdown(
+                                            project.title + " · " + variant.id,
+                                            project.id + "/" + variant.id,
+                                            md
+                                        )
+                                        File(outDir, safe + ".nfdoc.json").writeText(
+                                            dev.ninfenz.mobile.model.NfDocModel.toJson(doc).toString() + "\n",
+                                            Charsets.UTF_8
+                                        )
+                                    }.onFailure { missingFormats++ }
                                     ok++
                                 } else {
                                     failed++
                                 }
                             }
-                            variantNote = context.getString(dev.ninfenz.mobile.R.string.delivery_batch_export_done, ok, failed)
+                            val suffix = if (missingFormats > 0) {
+                                context.getString(dev.ninfenz.mobile.R.string.delivery_batch_export_partial, missingFormats)
+                            } else ""
+                            variantNote = context.getString(dev.ninfenz.mobile.R.string.delivery_batch_export_done, ok, failed) + suffix
                             busy = false
                         }
                     }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_batch_export)) }
@@ -2231,28 +2260,50 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
     }
 
     compareVersionText?.let { oldText ->
-        val currentText = markdown.orEmpty()
-        val oldLines = oldText.lines().filter { it.isNotBlank() }
-        val currentLines = currentText.lines().filter { it.isNotBlank() }
-        val oldSet = oldLines.toSet()
-        val currentSet = currentLines.toSet()
-        val removed = oldLines.filter { it !in currentSet }.take(20)
-        val added = currentLines.filter { it !in oldSet }.take(20)
+        val report = TextDiff.diff(oldText, markdown.orEmpty())
+        val visible = report.lines.take(400)
         AlertDialog(
             onDismissRequest = { compareVersionText = null },
             title = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_compare) + " " + compareVersionLabel) },
             text = {
                 Column(modifier = Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
-                    if (removed.isEmpty() && added.isEmpty()) {
+                    if (report.changed == 0) {
                         Text(stringResource(dev.ninfenz.mobile.R.string.delivery_compare_empty), style = NfType.meta)
                     }
-                    if (added.isNotEmpty()) {
-                        Text(stringResource(dev.ninfenz.mobile.R.string.delivery_compare_added) + " (" + added.size + ")", style = NfType.meta, color = MaterialTheme.colorScheme.primary)
-                        added.forEach { Text("+ " + it, style = NfType.meta) }
+                    Text(
+                        stringResource(dev.ninfenz.mobile.R.string.delivery_compare_summary, report.added, report.removed),
+                        style = NfType.meta,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    if (report.degraded) {
+                        Text(
+                            stringResource(dev.ninfenz.mobile.R.string.delivery_compare_degraded),
+                            style = NfType.meta,
+                            color = MaterialTheme.colorScheme.error
+                        )
                     }
-                    if (removed.isNotEmpty()) {
-                        Text(stringResource(dev.ninfenz.mobile.R.string.delivery_compare_removed) + " (" + removed.size + ")", style = NfType.meta, color = MaterialTheme.colorScheme.error)
-                        removed.forEach { Text("- " + it, style = NfType.meta) }
+                    visible.forEach { line ->
+                        val prefix = when (line.kind) {
+                            DiffKind.ADD -> "+ "
+                            DiffKind.REMOVE -> "- "
+                            DiffKind.EQUAL -> "  "
+                        }
+                        Text(
+                            prefix + line.text,
+                            style = NfType.meta,
+                            color = when (line.kind) {
+                                DiffKind.ADD -> MaterialTheme.colorScheme.primary
+                                DiffKind.REMOVE -> MaterialTheme.colorScheme.error
+                                DiffKind.EQUAL -> MaterialTheme.colorScheme.onSurfaceVariant
+                            }
+                        )
+                    }
+                    if (report.lines.size > visible.size) {
+                        Text(
+                            stringResource(dev.ninfenz.mobile.R.string.delivery_compare_truncated, visible.size),
+                            style = NfType.meta,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
                 }
             },

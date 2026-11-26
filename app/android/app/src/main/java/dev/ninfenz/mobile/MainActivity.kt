@@ -20,7 +20,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import dev.ninfenz.mobile.data.AppPrefs
+import dev.ninfenz.mobile.data.CapabilityRegistry
 import dev.ninfenz.mobile.data.CrashLogStore
+import dev.ninfenz.mobile.data.PrefsStore
+import dev.ninfenz.mobile.data.PrefsTheme
 import dev.ninfenz.mobile.data.RecentProjectShortcuts
 import dev.ninfenz.mobile.data.LanguageMode
 import dev.ninfenz.mobile.data.ThemeMode
@@ -99,12 +102,22 @@ class MainActivity : ComponentActivity() {
         dev.ninfenz.mobile.ui.installCoreCallContext(this)
         pendingShortcut = shortcutFrom(intent)
         val prefs = AppPrefs(this)
-        if (prefs.languageMode != LanguageMode.SYSTEM) {
-            syncSystemLocale(prefs.languageMode)
+        val nfPrefs = PrefsStore(filesDir, prefs).load()
+        CapabilityRegistry.install(nfPrefs)
+        if (nfPrefs.language != LanguageMode.SYSTEM) {
+            syncSystemLocale(nfPrefs.language)
         }
         setContent {
-            var themeMode by remember { mutableStateOf(prefs.themeMode) }
-            var languageMode by remember { mutableStateOf(prefs.languageMode) }
+            var themeMode by remember {
+                mutableStateOf(
+                    when (nfPrefs.ui.theme) {
+                        PrefsTheme.LIGHT -> ThemeMode.LIGHT
+                        PrefsTheme.DARK, PrefsTheme.HIGH_CONTRAST -> ThemeMode.DARK
+                        PrefsTheme.SYSTEM -> ThemeMode.SYSTEM
+                    }
+                )
+            }
+            var languageMode by remember { mutableStateOf(nfPrefs.language) }
             var dynamicColor by remember { mutableStateOf(prefs.dynamicColor) }
             val dark = when (themeMode) {
                 ThemeMode.SYSTEM -> isSystemInDarkTheme()

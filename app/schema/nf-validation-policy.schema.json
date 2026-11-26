@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/app/schema/nf-validation-policy.schema.json",
+  "title": "NF 校验策略（nf-validation-policy/1）",
+  "description": "默认 on_demand；只有 delivery/strict 阻断导出；跳过必须留痕。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "mode", "block_export", "record_skips"],
+  "properties": {
+    "schema": { "const": "nf-validation-policy/1" },
+    "mode": { "enum": ["off", "on_demand", "delivery", "strict"] },
+    "block_export": { "type": "boolean" },
+    "record_skips": { "type": "boolean" }
+  }
+}

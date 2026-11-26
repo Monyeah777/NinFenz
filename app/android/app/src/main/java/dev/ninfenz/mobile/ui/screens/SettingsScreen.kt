@@ -44,6 +44,7 @@ import dev.ninfenz.mobile.core.CoreBridgeNative
 import dev.ninfenz.mobile.core.ErrorCatalog
 import dev.ninfenz.mobile.data.AppPrefs
 import dev.ninfenz.mobile.data.ExtensionStore
+import dev.ninfenz.mobile.data.PrefsStore
 import dev.ninfenz.mobile.data.LanguageMode
 import dev.ninfenz.mobile.data.ThemeMode
 import dev.ninfenz.mobile.data.BackupRestoreService
@@ -281,6 +282,8 @@ fun SettingsScreen(
             }
         }
 
+        SettingsFreeLayer(onThemeMode = onThemeMode, onLanguageMode = onLanguageMode)
+
         if (audit) CardBox(title = stringResource(dev.ninfenz.mobile.R.string.settings_selfcheck_title)) {
             Text(
                 stringResource(dev.ninfenz.mobile.R.string.settings_selfcheck_desc),
@@ -341,6 +344,7 @@ fun SettingsScreen(
                 scope.launch {
                     val created = withContext(Dispatchers.IO) {
                         File(context.filesDir, "app-prefs.json").writeText(AppPrefs(context).snapshot())
+                        File(context.filesDir, "nf-prefs.json").writeText(PrefsStore(context).exportJson())
                         BackupService.create(context.filesDir)
                     }
                     val checked = withContext(Dispatchers.IO) { BackupRestoreService.inspect(created.file) }

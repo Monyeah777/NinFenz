@@ -540,6 +540,46 @@
       "codes": [
         "NF-PRJ-001"
       ]
+    },
+    "invalid/nf-prefs/inv-module.json": {
+      "schema": "nf-prefs",
+      "violated": "modules.contract 必须是 boolean",
+      "codes": ["NF-PREF-001"]
+    },
+    "invalid/nf-prefs/inv-font-scale.json": {
+      "schema": "nf-prefs",
+      "violated": "ui.font_scale_percent 必须在 80..200",
+      "codes": ["NF-PREF-002"]
+    },
+    "invalid/nf-workflow/inv-source.json": {
+      "schema": "nf-workflow",
+      "violated": "source 只允许 builtin/user",
+      "codes": ["NF-PREF-001"]
+    },
+    "invalid/nf-workflow/inv-missing-modules.json": {
+      "schema": "nf-workflow",
+      "violated": "顶层 required 缺 modules",
+      "codes": ["NF-PREF-001"]
+    },
+    "invalid/nf-action-policy/inv-enum.json": {
+      "schema": "nf-action-policy",
+      "violated": "ai_result 只允许 draft/ask/auto",
+      "codes": ["NF-PREF-001"]
+    },
+    "invalid/nf-action-policy/inv-extra.json": {
+      "schema": "nf-action-policy",
+      "violated": "additionalProperties=false 拒绝 network",
+      "codes": ["NF-PREF-001"]
+    },
+    "invalid/nf-validation-policy/inv-mode.json": {
+      "schema": "nf-validation-policy",
+      "violated": "mode 只允许 off/on_demand/delivery/strict",
+      "codes": ["NF-PREF-001"]
+    },
+    "invalid/nf-validation-policy/inv-type.json": {
+      "schema": "nf-validation-policy",
+      "violated": "block_export 必须是 boolean",
+      "codes": ["NF-PREF-001"]
     }
   }
 }

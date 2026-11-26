@@ -90,6 +90,7 @@ import dev.ninfenz.mobile.data.ProjectRenamer
 import dev.ninfenz.mobile.data.ProjectPackage
 import dev.ninfenz.mobile.data.ProjectPackageImporter
 import dev.ninfenz.mobile.data.ProjectReviewStore
+import dev.ninfenz.mobile.data.TemplateProjectCreator
 import dev.ninfenz.mobile.data.RecentProjectShortcuts
 import dev.ninfenz.mobile.share.ShareExporter
 import dev.ninfenz.mobile.data.ProjectEntry
@@ -183,7 +184,7 @@ fun NfMobileApp(
     var recentCommands by remember { mutableStateOf(commandHistory.load()) }
 
     var shell by rememberSaveable(stateSaver = ShellStateSaver) { mutableStateOf(ShellState()) }
-    LaunchedEffect(shell.detail, FeatureGate.tier()) {
+    LaunchedEffect(shell.detail, FeatureGate.tier(), dev.ninfenz.mobile.data.CapabilityRegistry.revision) {
         val safe = EditionRoutePolicy.sanitize(shell)
         if (safe != shell) shell = safe
     }
@@ -572,7 +573,33 @@ is Detail.Inbox -> InboxScreen(
                     )
                     is Detail.ErrorCodes -> ErrorCodesScreen(onBack = { shell = shell.back() ?: shell })
                     is Detail.Extensions -> ExtensionCenterScreen(onBack = { shell = shell.back() ?: shell })
-                    is Detail.Templates -> TemplateGalleryScreen(onBack = { shell = shell.back() ?: shell })
+                    is Detail.Templates -> TemplateGalleryScreen(
+                        onBack = { shell = shell.back() ?: shell },
+                        packs = packs.packs,
+                        onUse = { file, pack, title ->
+                            scope.launch {
+                                val result = withContext(Dispatchers.IO) {
+                                    TemplateProjectCreator(context.filesDir).create(pack, title, file)
+                                }
+                                when (result) {
+                                    is CreateProjectResult.Success -> {
+                                        refresh()
+                                        shell = shell.open(Detail.Project(result.project.id))
+                                    }
+                                    is CreateProjectResult.Failure -> {
+                                        android.widget.Toast.makeText(
+                                            context,
+                                            context.getString(
+                                                dev.ninfenz.mobile.R.string.template_gallery_create_failed,
+                                                result.message
+                                            ),
+                                            android.widget.Toast.LENGTH_LONG
+                                        ).show()
+                                    }
+                                }
+                            }
+                        }
+                    )
                     is Detail.Author -> {
                         val entry = projects.firstOrNull { it.project.id == detail.id }
                         if (entry == null) {

@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/app/schema/nf-prefs.schema.json",
+  "title": "NF 本地偏好（nf-prefs/1）",
+  "description": "单文件设置信封：模块开关、UI、语言、动作策略、校验策略与工作流预设。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "version",
+    "revision",
+    "modules",
+    "ui",
+    "language",
+    "action_policy",
+    "validation_policy"
+  ],
+  "properties": {
+    "schema": { "const": "nf-prefs/1" },
+    "version": { "const": 1 },
+    "revision": { "type": "integer", "minimum": 0 },
+    "modules": { "$ref": "#/$defs/modules" },
+    "ui": { "$ref": "#/$defs/ui" },
+    "language": { "enum": ["system", "zh", "en", "pseudo"] },
+    "action_policy": { "$ref": "#/$defs/action_policy" },
+    "validation_policy": { "$ref": "#/$defs/validation_policy" },
+    "workflows": {
+      "type": "array",
+      "maxItems": 20,
+      "items": { "$ref": "#/$defs/workflow" }
+    }
+  },
+  "$defs": {
+    "modules": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract",
+        "builddiag",
+        "fragments",
+        "matrix",
+        "style",
+        "ai",
+        "merge",
+        "network",
+        "sources",
+        "macros",
+        "batch",
+        "search"
+      ],
+      "properties": {
+        "contract": { "type": "boolean" },
+        "builddiag": { "type": "boolean" },
+        "fragments": { "type": "boolean" },
+        "matrix": { "type": "boolean" },
+        "style": { "type": "boolean" },
+        "ai": { "type": "boolean" },
+        "merge": { "type": "boolean" },
+        "network": { "type": "boolean" },
+        "sources": { "type": "boolean" },
+        "macros": { "type": "boolean" },
+        "batch": { "type": "boolean" },
+        "search": { "type": "boolean" }
+      }
+    },
+    "ui": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["density", "font_scale_percent", "theme", "motion"],
+      "properties": {
+        "density": { "enum": ["comfortable", "compact"] },
+        "font_scale_percent": { "type": "integer", "minimum": 80, "maximum": 200 },
+        "theme": { "enum": ["system", "light", "dark", "high_contrast"] },
+        "motion": { "type": "boolean" }
+      }
+    },
+    "action_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ai_result", "merge_conflict", "pack_update", "macro_replay"],
+      "properties": {
+        "ai_result": { "enum": ["draft", "ask", "auto"] },
+        "merge_conflict": { "enum": ["manual", "auto"] },
+        "pack_update": { "enum": ["manual", "ask", "auto"] },
+        "macro_replay": { "enum": ["dry_run", "run"] }
+      }
+    },
+    "validation_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "block_export", "record_skips"],
+      "properties": {
+        "mode": { "enum": ["off", "on_demand", "delivery", "strict"] },
+        "block_export": { "type": "boolean" },
+        "record_skips": { "type": "boolean" }
+      }
+    },
+    "workflow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "source", "modules", "ui", "action_policy", "validation_policy"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]{1,63}$" },
+        "name": { "type": "string", "minLength": 1 },
+        "source": { "enum": ["builtin", "user"] },
+        "modules": { "$ref": "#/$defs/modules" },
+        "ui": { "$ref": "#/$defs/ui" },
+        "action_policy": { "$ref": "#/$defs/action_policy" },
+        "validation_policy": { "$ref": "#/$defs/validation_policy" }
+      }
+    }
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "schema": "nf-prefs/1",
+  "version": 1,
+  "revision": 1,
+  "modules": {
+  "contract": true,
+  "builddiag": false,
+  "fragments": true,
+  "matrix": true,
+  "style": false,
+  "ai": false,
+  "merge": true,
+  "network": false,
+  "sources": true,
+  "macros": false,
+  "batch": true,
+  "search": true
+},
+  "ui": { "density": "comfortable", "font_scale_percent": 50, "theme": "system", "motion": true },
+  "language": "system",
+  "action_policy": { "ai_result": "draft", "merge_conflict": "manual", "pack_update": "manual", "macro_replay": "dry_run" },
+  "validation_policy": { "mode": "on_demand", "block_export": false, "record_skips": true },
+  "workflows": [
+    {
+      "id": "standard",
+      "name": "标准",
+      "source": "builtin",
+      "modules": {
+  "contract": true,
+  "builddiag": false,
+  "fragments": true,
+  "matrix": true,
+  "style": false,
+  "ai": false,
+  "merge": true,
+  "network": false,
+  "sources": true,
+  "macros": false,
+  "batch": true,
+  "search": true
+},
+      "ui": { "density": "comfortable", "font_scale_percent": 100, "theme": "system", "motion": true },
+      "action_policy": { "ai_result": "draft", "merge_conflict": "manual", "pack_update": "manual", "macro_replay": "dry_run" },
+      "validation_policy": { "mode": "on_demand", "block_export": false, "record_skips": true }
+    }
+  ]
+}

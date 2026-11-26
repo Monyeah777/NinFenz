@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/app/schema/nf-action-policy.schema.json",
+  "title": "NF 动作策略（nf-action-policy/1）",
+  "description": "定义结果、冲突、Pack 更新与宏回放的默认动作；不包含校验模式。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "ai_result", "merge_conflict", "pack_update", "macro_replay"],
+  "properties": {
+    "schema": { "const": "nf-action-policy/1" },
+    "ai_result": { "enum": ["draft", "ask", "auto"] },
+    "merge_conflict": { "enum": ["manual", "auto"] },
+    "pack_update": { "enum": ["manual", "ask", "auto"] },
+    "macro_replay": { "enum": ["dry_run", "run"] }
+  }
+}

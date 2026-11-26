@@ -13,6 +13,18 @@ class EditionPolicyTest {
     @After
     fun resetTier() {
         FeatureGate.resetForTest()
+        CapabilityRegistry.resetForTest()
+    }
+
+    @Test
+    fun moduleOffBlocksModuleRoutes() {
+        val modules = ModuleToggles.standard()
+            .with(Capability.SEARCH, false)
+            .with(Capability.MERGE, false)
+        CapabilityRegistry.install(NfPrefs(modules = modules))
+        assertFalse(EditionRoutePolicy.isAllowed(Detail.Search))
+        assertFalse(EditionRoutePolicy.isAllowed(Detail.NfDocMerge))
+        assertEquals(null, EditionRoutePolicy.sanitize(ShellState(TopDestination.LIBRARY, Detail.Search)).detail)
     }
 
     @Test
