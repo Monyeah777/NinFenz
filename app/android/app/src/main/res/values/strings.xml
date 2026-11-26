@@ -1384,4 +1384,8 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="author_snapshot_empty">还没有快照。</string>
     <string name="author_snapshot_restored">已恢复快照</string>
     <string name="author_snapshot_meta">%1$d 节 · %2$d 槽 · %3$s</string>
+    <string name="inbox_select">选择</string>
+    <string name="inbox_select_all">全选</string>
+    <string name="inbox_select_none">取消全选</string>
+    <string name="inbox_delete_selected">删除选中</string>
 </resources>

@@ -1388,4 +1388,8 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="author_snapshot_empty">No snapshots yet.</string>
     <string name="author_snapshot_restored">Snapshot restored</string>
     <string name="author_snapshot_meta">%1$d sections · %2$d slots · %3$s</string>
+    <string name="inbox_select">Select</string>
+    <string name="inbox_select_all">Select all</string>
+    <string name="inbox_select_none">Clear selection</string>
+    <string name="inbox_delete_selected">Delete selected</string>
 </resources>
