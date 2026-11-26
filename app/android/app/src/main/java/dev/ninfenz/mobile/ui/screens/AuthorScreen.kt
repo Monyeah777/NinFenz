@@ -61,6 +61,8 @@ import dev.ninfenz.mobile.core.CoreResponse
 import dev.ninfenz.mobile.core.J
 import dev.ninfenz.mobile.data.AiRunStore
 import dev.ninfenz.mobile.data.AuthorArtifactStore
+import dev.ninfenz.mobile.data.Capability
+import dev.ninfenz.mobile.data.CapabilityRegistry
 import dev.ninfenz.mobile.data.FileAccess
 import dev.ninfenz.mobile.data.ExtensionStore
 import dev.ninfenz.mobile.data.ContractIrStore
@@ -1036,7 +1038,7 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
             TextButton(onClick = { snapshots = snapshotStore.list(); showSnapshots = true }) {
                 Text(stringResource(dev.ninfenz.mobile.R.string.author_snapshot))
             }
-            TextButton(enabled = !busy, onClick = {
+            if (CapabilityRegistry.isEnabled(Capability.CONTRACT)) TextButton(enabled = !busy, onClick = {
                 scope.launch {
                     busy = true
                     contractStore.compile(artifacts.specJson, artifacts.protocolJson)
@@ -1055,11 +1057,11 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
                     busy = false
                 }
             }) { Text(stringResource(dev.ninfenz.mobile.R.string.author_contract)) }
-            TextButton(onClick = {
+            if (CapabilityRegistry.isEnabled(Capability.SOURCES)) TextButton(onClick = {
                 sources = sourceStore.list()
                 showSources = true
             }) { Text(stringResource(dev.ninfenz.mobile.R.string.author_sources)) }
-            TextButton(onClick = {
+            if (CapabilityRegistry.isEnabled(Capability.AI)) TextButton(onClick = {
                 aiRuns = aiRunStore.list()
                 showAiRuns = true
             }) { Text(stringResource(dev.ninfenz.mobile.R.string.author_ai_plan)) }
