@@ -82,6 +82,7 @@ import dev.ninfenz.mobile.data.AuthorArtifactsLoader
 import dev.ninfenz.mobile.data.AssemblyPresetStore
 import dev.ninfenz.mobile.data.DeliveryDraftStore
 import dev.ninfenz.mobile.data.DeliveryVersionStore
+import dev.ninfenz.mobile.data.ExtensionStore
 import dev.ninfenz.mobile.data.ExportProfileStore
 import dev.ninfenz.mobile.data.DocxReferenceStyles
 import dev.ninfenz.mobile.data.EpubExporter
@@ -271,6 +272,9 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
     val presetStore = remember { AssemblyPresetStore(context.filesDir) }
     var showVersions by remember { mutableStateOf(false) }
     var showPresets by remember { mutableStateOf(false) }
+    val extensionVariants = remember { ExtensionStore(context.filesDir).contributions(setOf("delivery_variant")) }
+    var showVariants by remember { mutableStateOf(false) }
+    var variantNote by remember { mutableStateOf<String?>(null) }
     var showSavePreset by remember { mutableStateOf(false) }
     var presetName by remember { mutableStateOf("") }
     val exportHistory = remember { ExportHistoryStore(context.filesDir) }
@@ -783,9 +787,17 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                 TextButton(onClick = { showPresets = true }) {
                                     Text(stringResource(dev.ninfenz.mobile.R.string.delivery_presets))
                                 }
+                                if (extensionVariants.isNotEmpty()) {
+                                    TextButton(onClick = { showVariants = true }) {
+                                        Text(stringResource(dev.ninfenz.mobile.R.string.delivery_variants))
+                                    }
+                                }
                             }
                         }
                         batchNote?.let {
+                            Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page))
+                        }
+                        variantNote?.let {
                             Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page))
                         }
                         batchUndo?.let { snapshot ->
@@ -1907,6 +1919,42 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
         )
     }
 
+    if (showVariants) {
+        AlertDialog(
+            onDismissRequest = { showVariants = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_variants)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                    extensionVariants.forEach { variant ->
+                        TextButton(onClick = {
+                            val objectInputs = variant.config["inputs"] as? JsonObject
+                            val before = inputs
+                            val next = inputs.toMutableMap()
+                            var applied = 0
+                            var skipped = 0
+                            objectInputs?.forEach { (key, value) ->
+                                val text = value.jsonPrimitive.content
+                                if (plan?.slots?.contains(key) == true) {
+                                    next[key] = text
+                                    applied++
+                                } else {
+                                    skipped++
+                                }
+                            }
+                            if (applied > 0) {
+                                batchUndo = before
+                                inputs = next
+                                variantNote = context.getString(dev.ninfenz.mobile.R.string.delivery_variant_applied, variant.id) +
+                                    if (skipped > 0) " · skipped=" + skipped else ""
+                                showVariants = false
+                            }
+                        }) { Text(variant.id) }
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { showVariants = false }) { Text(stringResource(android.R.string.cancel)) } }
+        )
+    }
     if (showPresets) {
         val presets = remember(showPresets) { presetStore.load(project.id) }
         AlertDialog(

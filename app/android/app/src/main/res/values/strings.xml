@@ -1364,4 +1364,6 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="author_snippet_applied">已插入片段：%1$s</string>
     <string name="author_clause_library">条款库</string>
     <string name="author_clause_applied">已应用条款库：%1$s</string>
+    <string name="delivery_variants">变体</string>
+    <string name="delivery_variant_applied">已应用变体：%1$s</string>
 </resources>
