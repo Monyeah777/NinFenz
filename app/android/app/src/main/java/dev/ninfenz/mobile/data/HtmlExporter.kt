@@ -6,9 +6,9 @@ import java.io.File
 object HtmlExporter {
     data class Created(val file: File, val bytes: Long)
 
-    fun export(markdown: String, title: String, outDir: File): Created {
+    fun export(markdown: String, title: String, outDir: File, fileName: String = "result.html"): Created {
         outDir.mkdirs()
-        val target = File(outDir, "result.html")
+        val target = File(outDir, fileName)
         target.writeText(html(markdown, title), Charsets.UTF_8)
         return Created(target, target.length())
     }

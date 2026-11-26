@@ -57,7 +57,8 @@ object WebPdfExporter {
         title: String,
         outDir: File,
         pageWidth: Int = 595,
-        pageHeight: Int = 842
+        pageHeight: Int = 842,
+        fileName: String = "result.pdf"
     ): Created? = withContext(Dispatchers.Main) {
         var web: WebView? = null
         try {
@@ -99,7 +100,7 @@ object WebPdfExporter {
             val perPage = pageHeight / scale
             val pageCount = pageCount(height, width, pageWidth, pageHeight)
             outDir.mkdirs()
-            val target = File(outDir, "result.pdf")
+            val target = File(outDir, fileName)
             val doc = PdfDocument()
             val footer = Paint().apply {
                 color = Color.GRAY

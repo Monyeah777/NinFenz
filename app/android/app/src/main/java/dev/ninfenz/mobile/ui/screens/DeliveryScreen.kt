@@ -333,6 +333,10 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
     var showExportProfiles by remember { mutableStateOf(false) }
     var showSaveExportProfile by remember { mutableStateOf(false) }
     var exportProfileName by remember { mutableStateOf("") }
+    val outputRules = remember { ExtensionStore(context.filesDir).contributions(setOf("output_rule")) }
+    var selectedOutputTemplate by remember { mutableStateOf<String?>(null) }
+    var showOutputRules by remember { mutableStateOf(false) }
+    var outputRuleNote by remember { mutableStateOf<String?>(null) }
     var pdfPageSize by remember { mutableStateOf("A4") }
     var pdfIncludeTitle by remember { mutableStateOf(true) }
     var epubAuthor by remember { mutableStateOf("") }
@@ -1403,9 +1407,9 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                     zipFile?.let { add(it) }
                                     skillFile?.let { add(it) }
                                     preserveFile?.let { add(it) }
-                                    attempt("epub") { dev.ninfenz.mobile.data.EpubExporter.export(md, project.title, dir, epubAuthor, epubLanguage).file }
-                                    attempt("html") { dev.ninfenz.mobile.data.HtmlExporter.export(md, project.title, dir).file }
-                                    attempt("pdf") { dev.ninfenz.mobile.data.PdfExporter.export(md, project.title, dir, pdfPageSize, pdfIncludeTitle).file }
+                                    attempt("epub") { dev.ninfenz.mobile.data.EpubExporter.export(md, project.title, dir, epubAuthor, epubLanguage, dev.ninfenz.mobile.data.OutputNaming.resolve(selectedOutputTemplate, project.title, "epub")).file }
+                                    attempt("html") { dev.ninfenz.mobile.data.HtmlExporter.export(md, project.title, dir, dev.ninfenz.mobile.data.OutputNaming.resolve(selectedOutputTemplate, project.title, "html")).file }
+                                    attempt("pdf") { dev.ninfenz.mobile.data.PdfExporter.export(md, project.title, dir, pdfPageSize, pdfIncludeTitle, dev.ninfenz.mobile.data.OutputNaming.resolve(selectedOutputTemplate, project.title, "pdf")).file }
                                     attempt("nfdoc") { dev.ninfenz.mobile.data.NfDocExporter.export(md, project.title, project.id, dir).file }
                                 }
                                 batchFiles = files
@@ -1497,7 +1501,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                 }
                 Text(stringResource(dev.ninfenz.mobile.R.string.delivery_export_group_reading), style = NfType.label, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(start = NfSpacing.page, end = NfSpacing.page, top = NfSpacing.s))
                 FlowRow(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
-                    EpubExportButton(exportMarkdown, project, epubAuthor, epubLanguage, context, scope, { busy = it }, { error = it }, busy) { file, report ->
+                    EpubExportButton(exportMarkdown, project, epubAuthor, epubLanguage, context, scope, { busy = it }, { error = it }, busy, outputTemplate = selectedOutputTemplate) { file, report ->
                         exportedFile = file
                         manifestText = null
                         reproOk = report.stable
@@ -1508,7 +1512,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         }
                         recordExport("epub", file, null)
                     }
-                    PdfExportButton(exportMarkdown, project, pdfPageSize, pdfIncludeTitle, context, scope, { busy = it }, { error = it }, busy) { file, report ->
+                    PdfExportButton(exportMarkdown, project, pdfPageSize, pdfIncludeTitle, context, scope, { busy = it }, { error = it }, busy, outputTemplate = selectedOutputTemplate) { file, report ->
                         exportedFile = file
                         manifestText = null
                         reproOk = report.stable
@@ -1526,7 +1530,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         reproText = context.getString(dev.ninfenz.mobile.R.string.delivery_pdfua_note)
                         recordExport("pdf-ua", file, null)
                     }
-                    HtmlExportButton(exportMarkdown, project, context, scope, { busy = it }, { error = it }, busy) { file, report ->
+                    HtmlExportButton(exportMarkdown, project, context, scope, { busy = it }, { error = it }, busy, outputTemplate = selectedOutputTemplate) { file, report ->
                         exportedFile = file
                         manifestText = null
                         reproOk = report.stable
@@ -1613,7 +1617,11 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                     TextButton(onClick = { exportProfiles = exportProfileStore.load(); showExportProfiles = true }) {
                         Text(stringResource(dev.ninfenz.mobile.R.string.export_profiles))
                     }
+                    TextButton(onClick = { showOutputRules = true }) {
+                        Text(stringResource(dev.ninfenz.mobile.R.string.delivery_output_rule))
+                    }
                 }
+                outputRuleNote?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
                 FlowRow(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
                     OutlinedTextField(
                         value = epubAuthor,
@@ -1928,6 +1936,33 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
         )
     }
 
+    if (showOutputRules) {
+        AlertDialog(
+            onDismissRequest = { showOutputRules = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_output_rule)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                    TextButton(onClick = {
+                        selectedOutputTemplate = null
+                        outputRuleNote = context.getString(dev.ninfenz.mobile.R.string.delivery_output_rule_default)
+                        showOutputRules = false
+                    }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_output_rule_default)) }
+                    if (outputRules.isEmpty()) {
+                        Text(stringResource(dev.ninfenz.mobile.R.string.delivery_output_rule_empty), style = NfType.meta)
+                    }
+                    outputRules.forEach { rule ->
+                        val template = rule.config["template"]?.toString()?.trim('"')?.takeIf { it.isNotBlank() }
+                        TextButton(onClick = {
+                            selectedOutputTemplate = template
+                            outputRuleNote = rule.id
+                            showOutputRules = false
+                        }) { Text(rule.id + " · " + (template ?: "")) }
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { showOutputRules = false }) { Text(stringResource(android.R.string.cancel)) } }
+        )
+    }
     if (showSavePreset) {
         AlertDialog(
             onDismissRequest = { showSavePreset = false },
@@ -3114,6 +3149,7 @@ private fun EpubExportButton(
     setBusy: (Boolean) -> Unit,
     setError: (CoreError?) -> Unit,
     busy: Boolean,
+    outputTemplate: String? = null,
     onDone: (File, dev.ninfenz.mobile.data.ReproChecker.Report) -> Unit
 ) {
     Button(
@@ -3125,9 +3161,10 @@ private fun EpubExportButton(
             scope.launch {
                 try {
                     val outDir = File(File(context.filesDir, "exports"), "delivery").apply { mkdirs() }
-                    val created = EpubExporter.export(md, project.title, outDir, author, language)
+                    val fileName = dev.ninfenz.mobile.data.OutputNaming.resolve(outputTemplate, project.title, "epub")
+                    val created = EpubExporter.export(md, project.title, outDir, author, language, fileName)
                     val reproDir = File(context.cacheDir, "repro-epub").apply { deleteRecursively(); mkdirs() }
-                    val second = EpubExporter.export(md, project.title, reproDir, author, language)
+                    val second = EpubExporter.export(md, project.title, reproDir, author, language, fileName)
                     val report = dev.ninfenz.mobile.data.ReproChecker.check(created.file, second.file)
                     reproDir.deleteRecursively()
                     onDone(created.file, report)
@@ -3152,6 +3189,7 @@ private fun PdfExportButton(
     setBusy: (Boolean) -> Unit,
     setError: (CoreError?) -> Unit,
     busy: Boolean,
+    outputTemplate: String? = null,
     onDone: (File, dev.ninfenz.mobile.data.ReproChecker.Report) -> Unit
 ) {
     Button(
@@ -3163,14 +3201,15 @@ private fun PdfExportButton(
             scope.launch {
                 try {
                     val outDir = File(File(context.filesDir, "exports"), "delivery").apply { mkdirs() }
-                    val rich = dev.ninfenz.mobile.data.WebPdfExporter.export(context, md, project.title, outDir, if (pageSize.equals("Letter", true)) 612 else 595, if (pageSize.equals("Letter", true)) 792 else 842)
-                    val createdFile: File = rich?.file ?: PdfExporter.export(md, project.title, outDir, pageSize, includeTitle).file
+                    val fileName = dev.ninfenz.mobile.data.OutputNaming.resolve(outputTemplate, project.title, "pdf")
+                    val rich = dev.ninfenz.mobile.data.WebPdfExporter.export(context, md, project.title, outDir, if (pageSize.equals("Letter", true)) 612 else 595, if (pageSize.equals("Letter", true)) 792 else 842, fileName)
+                    val createdFile: File = rich?.file ?: PdfExporter.export(md, project.title, outDir, pageSize, includeTitle, fileName).file
                     val reproDir = File(context.cacheDir, "repro-pdf").apply { deleteRecursively(); mkdirs() }
                     val secondFile: File = if (rich != null) {
-                        dev.ninfenz.mobile.data.WebPdfExporter.export(context, md, project.title, reproDir, if (pageSize.equals("Letter", true)) 612 else 595, if (pageSize.equals("Letter", true)) 792 else 842)?.file
-                            ?: PdfExporter.export(md, project.title, reproDir, pageSize, includeTitle).file
+                        dev.ninfenz.mobile.data.WebPdfExporter.export(context, md, project.title, reproDir, if (pageSize.equals("Letter", true)) 612 else 595, if (pageSize.equals("Letter", true)) 792 else 842, fileName)?.file
+                            ?: PdfExporter.export(md, project.title, reproDir, pageSize, includeTitle, fileName).file
                     } else {
-                        PdfExporter.export(md, project.title, reproDir, pageSize, includeTitle).file
+                        PdfExporter.export(md, project.title, reproDir, pageSize, includeTitle, fileName).file
                     }
                     val report = dev.ninfenz.mobile.data.ReproChecker.check(createdFile, secondFile)
                     reproDir.deleteRecursively()
@@ -3228,6 +3267,7 @@ private fun HtmlExportButton(
     setBusy: (Boolean) -> Unit,
     setError: (CoreError?) -> Unit,
     busy: Boolean,
+    outputTemplate: String? = null,
     onDone: (File, dev.ninfenz.mobile.data.ReproChecker.Report) -> Unit
 ) {
     Button(
@@ -3239,9 +3279,10 @@ private fun HtmlExportButton(
             scope.launch {
                 try {
                     val outDir = File(File(context.filesDir, "exports"), "delivery").apply { mkdirs() }
-                    val created = HtmlExporter.export(md, project.title, outDir)
+                    val fileName = dev.ninfenz.mobile.data.OutputNaming.resolve(outputTemplate, project.title, "html")
+                    val created = HtmlExporter.export(md, project.title, outDir, fileName)
                     val reproDir = File(context.cacheDir, "repro-html").apply { deleteRecursively(); mkdirs() }
-                    val second = HtmlExporter.export(md, project.title, reproDir)
+                    val second = HtmlExporter.export(md, project.title, reproDir, fileName)
                     val report = dev.ninfenz.mobile.data.ReproChecker.check(created.file, second.file)
                     reproDir.deleteRecursively()
                     onDone(created.file, report)

@@ -11,9 +11,9 @@ object EpubExporter {
     data class Chapter(val title: String, val body: String)
     data class Created(val file: File, val chapters: Int, val bytes: Long)
 
-    fun export(markdown: String, title: String, outDir: File, author: String = "", language: String = "zh"): Created {
+    fun export(markdown: String, title: String, outDir: File, author: String = "", language: String = "zh", fileName: String = "result.epub"): Created {
         outDir.mkdirs()
-        val target = File(outDir, "result.epub")
+        val target = File(outDir, fileName)
         val chapters = chapters(markdown)
         val id = "urn:nf:" + sha256(title.toByteArray()).take(16)
         val files = chapters.indices.map { "chapter-" + (it + 1).toString().padStart(3, '0') + ".xhtml" }

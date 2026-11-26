@@ -1409,4 +1409,7 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="delivery_compare_added">Added lines</string>
     <string name="delivery_compare_removed">Removed lines</string>
     <string name="delivery_compare_empty">No line-level difference from current assembly</string>
+    <string name="delivery_output_rule">Output naming</string>
+    <string name="delivery_output_rule_empty">Enable an extension with output_rule to see naming rules.</string>
+    <string name="delivery_output_rule_default">Default (result)</string>
 </resources>

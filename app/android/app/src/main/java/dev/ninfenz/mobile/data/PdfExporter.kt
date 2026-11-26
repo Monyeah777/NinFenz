@@ -14,9 +14,9 @@ import java.io.File
 object PdfExporter {
     data class Created(val file: File, val pages: Int, val bytes: Long)
 
-    fun export(markdown: String, title: String, outDir: File, pageSize: String = "A4", includeTitle: Boolean = true): Created {
+    fun export(markdown: String, title: String, outDir: File, pageSize: String = "A4", includeTitle: Boolean = true, fileName: String = "result.pdf"): Created {
         outDir.mkdirs()
-        val target = File(outDir, "result.pdf")
+        val target = File(outDir, fileName)
         val pageWidth = if (pageSize.equals("Letter", true)) 612 else 595
         val pageHeight = if (pageSize.equals("Letter", true)) 792 else 842
         val margin = 48f

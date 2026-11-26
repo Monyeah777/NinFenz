@@ -1405,4 +1405,7 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="delivery_compare_added">新增行</string>
     <string name="delivery_compare_removed">删除行</string>
     <string name="delivery_compare_empty">与当前装配无行级差异</string>
+    <string name="delivery_output_rule">输出命名</string>
+    <string name="delivery_output_rule_empty">启用带 output_rule 的扩展后会显示命名规则。</string>
+    <string name="delivery_output_rule_default">默认（result）</string>
 </resources>
