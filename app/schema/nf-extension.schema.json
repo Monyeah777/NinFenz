@@ -26,7 +26,8 @@
         "renderer",
         "validator",
         "theme",
-        "preset"
+        "preset",
+        "bundle"
       ]
     },
     "compat": {
@@ -83,6 +84,70 @@
         "key_fingerprint": {
           "type": "string",
           "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "targets": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "import",
+          "library",
+          "author",
+          "delivery",
+          "export",
+          "settings",
+          "review",
+          "inbox",
+          "ccos",
+          "pack"
+        ]
+      }
+    },
+    "contributions": {
+      "type": "array",
+      "maxItems": 50,
+      "items": {
+        "$ref": "#/$defs/contribution"
+      }
+    }
+  },
+  "$defs": {
+    "contribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "id",
+        "config"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "import_recipe",
+            "saved_view",
+            "smart_collection",
+            "spec_snippet",
+            "clause_library",
+            "graph_recipe",
+            "delivery_variant",
+            "slot_transform",
+            "export_profile",
+            "output_rule",
+            "preflight_profile",
+            "workspace_preset",
+            "review_checklist"
+          ]
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9._-]+$"
+        },
+        "config": {
+          "type": "object",
+          "additionalProperties": true
         }
       }
     }

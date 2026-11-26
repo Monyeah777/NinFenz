@@ -24,6 +24,19 @@ fn check(manifest: &Value, strict: bool) -> Result<Value, CoreError> {
             }
         }
     }
+    let mut ids = std::collections::BTreeSet::new();
+    let mut kinds = std::collections::BTreeSet::new();
+    if let Some(cs) = manifest.get("contributions").and_then(|v| v.as_array()) {
+        for c in cs {
+            let id = c.get("id").and_then(|v| v.as_str()).unwrap_or("");
+            if !ids.insert(id.to_string()) {
+                return Err(CoreError::new("NF-EXT-003").with_message(format!("contribution id 重复：{id}")).with_exit(1));
+            }
+            if let Some(kind) = c.get("kind").and_then(|v| v.as_str()) {
+                kinds.insert(kind.to_string());
+            }
+        }
+    }
     let sig = manifest.get("signature");
     if sig.is_none() && strict {
         return Err(CoreError::new("NF-EXT-003").with_message("strict 模式拒绝未签名扩展").with_exit(1));
@@ -34,7 +47,15 @@ fn check(manifest: &Value, strict: bool) -> Result<Value, CoreError> {
         crate::evidence::verify_payload(sig, &canonical_bytes(&unsigned)?)
             .map_err(|_| CoreError::new("NF-EXT-003").with_message("扩展签名不符").with_exit(1))?;
     }
-    Ok(json!({"id": manifest.get("id"), "type": manifest.get("type"), "capabilities": manifest.get("capabilities"), "signed": sig.is_some()}))
+    Ok(json!({
+        "id": manifest.get("id"),
+        "type": manifest.get("type"),
+        "capabilities": manifest.get("capabilities"),
+        "targets": manifest.get("targets").cloned().unwrap_or_else(|| json!([])),
+        "contributions": manifest.get("contributions").map(|v| v.as_array().map(|a| a.len()).unwrap_or(0)).unwrap_or(0),
+        "kinds": kinds.into_iter().collect::<Vec<_>>(),
+        "signed": sig.is_some()
+    }))
 }
 
 pub fn extension_list(req: &Value) -> OpOutcome {
@@ -74,7 +95,8 @@ pub fn extension_apply(req: &Value) -> OpOutcome {
     let strict = req.get("strict").and_then(|v| v.as_bool()).unwrap_or(true);
     let info = check(manifest, strict)?;
     let config = manifest.get("config").cloned().unwrap_or_else(|| json!({}));
-    Ok((0, json!({"schema": "nf-extension-apply/1", "ok": true, "info": info, "config": config})))
+    let contributions = manifest.get("contributions").cloned().unwrap_or_else(|| json!([]));
+    Ok((0, json!({"schema": "nf-extension-apply/1", "ok": true, "info": info, "config": config, "contributions": contributions})))
 }
 
 pub fn extension_list_op(req: &Value) -> OpOutcome { extension_list(req) }

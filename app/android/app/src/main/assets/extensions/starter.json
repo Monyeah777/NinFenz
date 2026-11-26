@@ -1,0 +1,55 @@
+{
+  "schema": "nf-extension/1",
+  "id": "nf.starter",
+  "type": "bundle",
+  "compat": {
+    "min_app_version": "0.3.5",
+    "schema_version": "nf-extension/1"
+  },
+  "capabilities": [
+    "preset"
+  ],
+  "targets": [
+    "import",
+    "library",
+    "settings",
+    "export"
+  ],
+  "contributions": [
+    {
+      "kind": "import_recipe",
+      "id": "brief",
+      "config": {
+        "source_kind": "clipboard",
+        "prompt_profile": "generic",
+        "low_confidence_only": false
+      }
+    },
+    {
+      "kind": "saved_view",
+      "id": "recent",
+      "config": {
+        "name": "最近可交付",
+        "status": "assembled",
+        "sort": "RECENT",
+        "favorites_only": false
+      }
+    },
+    {
+      "kind": "workspace_preset",
+      "id": "focus",
+      "config": {
+        "theme": "DARK",
+        "language": "zh",
+        "dynamic_color": true
+      }
+    },
+    {
+      "kind": "output_rule",
+      "id": "date-name",
+      "config": {
+        "template": "{project}-{date}-{format}"
+      }
+    }
+  ]
+}

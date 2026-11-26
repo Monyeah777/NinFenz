@@ -1335,4 +1335,19 @@ MIT License · See app/docs/LEGAL.md···⟧</string>
     <string name="delivery_done_back">⟦Back to project···⟧</string>
     <string name="packupdate_more_changes">⟦%1$d more changes not shown···⟧</string>
     <string name="pack_detail_copy_id">⟦Copy Pack ID···⟧</string>
+    <string name="extensions_title">⟦Extensions···⟧</string>
+    <string name="extensions_import">⟦Import extension JSON···⟧</string>
+    <string name="extensions_load_starter">⟦Load built-in example···⟧</string>
+    <string name="extensions_empty">⟦No extensions yet. Import JSON or load the built-in example.···⟧</string>
+    <string name="extensions_signed">⟦Signed···⟧</string>
+    <string name="extensions_unsigned">⟦Unsigned···⟧</string>
+    <string name="extensions_enabled">⟦Enabled···⟧</string>
+    <string name="extensions_delete">⟦Delete extension···⟧</string>
+    <string name="extensions_starter_missing">⟦Built-in example is missing···⟧</string>
+    <plurals name="extensions_contributions">
+        <item quantity="other">⟦%1$d capabilities···⟧</item>
+    </plurals>
+    <string name="settings_workspace_title">⟦Workspace presets···⟧</string>
+    <string name="settings_workspace_empty">⟦Enable an extension with a workspace_preset to see it here.···⟧</string>
+    <string name="settings_workspace_apply">⟦Apply···⟧</string>
 </resources>

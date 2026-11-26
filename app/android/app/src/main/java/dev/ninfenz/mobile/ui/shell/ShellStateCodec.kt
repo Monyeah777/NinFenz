@@ -14,6 +14,7 @@ object ShellStateCodec {
             Detail.DesignSystem -> "DesignSystem"
             Detail.DecisionLog -> "DecisionLog"
             Detail.ErrorCodes -> "ErrorCodes"
+            Detail.Extensions -> "Extensions"
             Detail.Protocol -> "Protocol"
             Detail.Graph -> "Graph"
             Detail.Assembly -> "Assembly"
@@ -61,6 +62,7 @@ object ShellStateCodec {
             "DesignSystem" -> Detail.DesignSystem
             "DecisionLog" -> Detail.DecisionLog
             "ErrorCodes" -> Detail.ErrorCodes
+            "Extensions" -> Detail.Extensions
             "Protocol" -> Detail.Protocol
             "Graph" -> Detail.Graph
             "Assembly" -> Detail.Assembly

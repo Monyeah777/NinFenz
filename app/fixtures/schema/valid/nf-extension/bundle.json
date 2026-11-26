@@ -1,0 +1,40 @@
+{
+  "schema": "nf-extension/1",
+  "id": "starter",
+  "type": "bundle",
+  "compat": {
+    "min_app_version": "0.3.5",
+    "schema_version": "nf-extension/1"
+  },
+  "capabilities": [
+    "preset"
+  ],
+  "targets": [
+    "import",
+    "library",
+    "settings"
+  ],
+  "contributions": [
+    {
+      "kind": "import_recipe",
+      "id": "brief",
+      "config": {
+        "source_kind": "clipboard"
+      }
+    },
+    {
+      "kind": "saved_view",
+      "id": "recent",
+      "config": {
+        "name": "Recent"
+      }
+    },
+    {
+      "kind": "workspace_preset",
+      "id": "focus",
+      "config": {
+        "theme": "DARK"
+      }
+    }
+  ]
+}

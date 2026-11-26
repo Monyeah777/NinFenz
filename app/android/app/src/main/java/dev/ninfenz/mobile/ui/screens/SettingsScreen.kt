@@ -43,6 +43,9 @@ import dev.ninfenz.mobile.core.Core
 import dev.ninfenz.mobile.core.CoreBridgeNative
 import dev.ninfenz.mobile.core.ErrorCatalog
 import dev.ninfenz.mobile.data.AppPrefs
+import dev.ninfenz.mobile.data.ExtensionStore
+import dev.ninfenz.mobile.data.LanguageMode
+import dev.ninfenz.mobile.data.ThemeMode
 import dev.ninfenz.mobile.data.BackupRestoreService
 import dev.ninfenz.mobile.data.FeatureGate
 import dev.ninfenz.mobile.data.FeaturePolicy
@@ -74,7 +77,11 @@ fun SettingsScreen(
     onNfDocMerge: () -> Unit = {},
     onPatch: () -> Unit = {},
     onDesignSystem: () -> Unit = {},
-    onDecisionLog: () -> Unit = {}
+    onDecisionLog: () -> Unit = {},
+    onExtensions: () -> Unit = {},
+    onThemeMode: (ThemeMode) -> Unit = {},
+    onLanguageMode: (LanguageMode) -> Unit = {},
+    onDynamicColor: (Boolean) -> Unit = {}
 ) {
     val context = LocalContext.current
     val diag = remember { Core.diagnostics() }
@@ -83,6 +90,8 @@ fun SettingsScreen(
     var selfCheck by remember { mutableStateOf<dev.ninfenz.mobile.data.PropertyHarness.Report?>(null) }
     var tier by remember { mutableStateOf(FeatureGate.tier()) }
     val audit = FeatureGate.auditEnabled()
+    val extensionStore = remember { ExtensionStore(context.filesDir) }
+    val workspacePresets = remember { extensionStore.contributions(setOf("workspace_preset")) }
     var chainFirst by remember { mutableStateOf<File?>(null) }
     var chainSecond by remember { mutableStateOf<File?>(null) }
     var chainNote by remember { mutableStateOf<String?>(null) }
@@ -178,6 +187,9 @@ fun SettingsScreen(
                 }
                 OutlinedButton(onClick = onDesignSystem) {
                     Text(stringResource(dev.ninfenz.mobile.R.string.settings_design_system))
+                }
+                OutlinedButton(onClick = onExtensions) {
+                    Text(stringResource(dev.ninfenz.mobile.R.string.extensions_title))
                 }
                 if (audit) OutlinedButton(onClick = onDecisionLog) {
                     Text(stringResource(dev.ninfenz.mobile.R.string.settings_decision_log))
@@ -284,6 +296,26 @@ fun SettingsScreen(
                     style = NfType.meta,
                     color = if (report.ok) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
                 )
+            }
+        }
+
+        CardBox(title = stringResource(dev.ninfenz.mobile.R.string.settings_workspace_title)) {
+            if (workspacePresets.isEmpty()) {
+                Text(stringResource(dev.ninfenz.mobile.R.string.settings_workspace_empty), style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            } else {
+                workspacePresets.forEach { contribution ->
+                    val theme = contribution.config["theme"]?.toString()?.trim('"')?.let { name -> ThemeMode.entries.firstOrNull { it.name == name } }
+                    val language = contribution.config["language"]?.toString()?.trim('"')?.let { tag -> LanguageMode.entries.firstOrNull { it.name.equals(tag, true) || it.tag == tag } }
+                    val dynamic = contribution.config["dynamic_color"]?.toString()?.toBooleanStrictOrNull()
+                    Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                        Text(contribution.id, style = NfType.meta, modifier = Modifier.weight(1f))
+                        TextButton(onClick = {
+                            theme?.let(onThemeMode)
+                            language?.let(onLanguageMode)
+                            dynamic?.let(onDynamicColor)
+                        }) { Text(stringResource(dev.ninfenz.mobile.R.string.settings_workspace_apply)) }
+                    }
+                }
             }
         }
 
