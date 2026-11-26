@@ -1370,4 +1370,7 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="author_clause_applied">Applied clause library: %1$s</string>
     <string name="delivery_variants">Variants</string>
     <string name="delivery_variant_applied">Applied variant: %1$s</string>
+    <string name="author_graph_recipe">Graph recipe</string>
+    <string name="author_graph_recipe_conflict">Recipe node/edge ID conflict or invalid format</string>
+    <string name="author_graph_recipe_applied">Inserted graph recipe: %1$s</string>
 </resources>

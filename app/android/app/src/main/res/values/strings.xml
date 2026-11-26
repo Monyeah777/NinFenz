@@ -1366,4 +1366,7 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="author_clause_applied">已应用条款库：%1$s</string>
     <string name="delivery_variants">变体</string>
     <string name="delivery_variant_applied">已应用变体：%1$s</string>
+    <string name="author_graph_recipe">管线配方</string>
+    <string name="author_graph_recipe_conflict">配方节点/边 ID 冲突或格式无效</string>
+    <string name="author_graph_recipe_applied">已插入管线配方：%1$s</string>
 </resources>

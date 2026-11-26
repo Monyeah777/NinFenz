@@ -560,6 +560,9 @@ private fun GraphAuthorContent(artifacts: AuthorArtifacts, project: Project, onS
         redo.clear()
         graph = next
     }
+    val graphRecipes = remember { ExtensionStore(context.filesDir).contributions(setOf("graph_recipe")) }
+    var showGraphRecipes by remember { mutableStateOf(false) }
+    var graphRecipeNote by remember { mutableStateOf<String?>(null) }
     val snackbar = remember { SnackbarHostState() }
     val haptics = LocalHapticFeedback.current
     val snackbarScope = rememberCoroutineScope()
@@ -619,7 +622,15 @@ private fun GraphAuthorContent(artifacts: AuthorArtifacts, project: Project, onS
     }
 
     Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.m)) {
-        NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.author_nodes, graph.nodes.size))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.author_nodes, graph.nodes.size))
+            if (graphRecipes.isNotEmpty()) {
+                TextButton(onClick = { showGraphRecipes = true }) {
+                    Text(stringResource(dev.ninfenz.mobile.R.string.author_graph_recipe))
+                }
+            }
+        }
+        graphRecipeNote?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
         for (node in graph.nodes) {
             NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
                 Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
@@ -766,6 +777,63 @@ private fun GraphAuthorContent(artifacts: AuthorArtifacts, project: Project, onS
             }
         }
         SnackbarHost(hostState = snackbar, modifier = Modifier.padding(horizontal = NfSpacing.page))
+    }
+
+    if (showGraphRecipes) {
+        AlertDialog(
+            onDismissRequest = { showGraphRecipes = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.author_graph_recipe)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                    graphRecipes.forEach { recipe ->
+                        TextButton(onClick = {
+                            val nodes = J.optArray(recipe.config, "nodes").mapNotNull { el ->
+                                val o = el as? JsonObject ?: return@mapNotNull null
+                                val id = J.optString(o, "id").orEmpty()
+                                if (!GraphModel.NODE_ID.matches(id)) return@mapNotNull null
+                                val ports = J.optChild(o, "ports")
+                                val ref = J.optChild(o, "module_ref")
+                                GraphNode(
+                                    id = id,
+                                    kind = J.optString(o, "kind").orEmpty().ifBlank { "process" },
+                                    title = J.optString(o, "title").orEmpty().ifBlank { id },
+                                    portsIn = ports?.let { J.optStringList(it, "in") }.orEmpty(),
+                                    portsOut = ports?.let { J.optStringList(it, "out") }.orEmpty(),
+                                    moduleId = ref?.let { J.optString(it, "id") },
+                                    moduleVersion = ref?.let { J.optString(it, "version") },
+                                    moduleDigest = ref?.let { J.optString(it, "digest") }
+                                )
+                            }
+                            val edges = J.optArray(recipe.config, "edges").mapNotNull { el ->
+                                val o = el as? JsonObject ?: return@mapNotNull null
+                                val id = J.optString(o, "id").orEmpty()
+                                if (!GraphModel.EDGE_ID.matches(id)) return@mapNotNull null
+                                GraphEdge(
+                                    id = id,
+                                    from = J.optString(o, "from").orEmpty(),
+                                    to = J.optString(o, "to").orEmpty(),
+                                    fromPort = J.optString(o, "from_port").orEmpty(),
+                                    toPort = J.optString(o, "to_port").orEmpty(),
+                                    type = J.optString(o, "type").orEmpty().ifBlank { "data" }
+                                )
+                            }
+                            val conflict = nodes.isEmpty() || nodes.any { n -> graph.nodes.any { it.id == n.id } } ||
+                                edges.any { e -> graph.edges.any { it.id == e.id } } ||
+                                edges.any { e -> nodes.none { it.id == e.from } && graph.nodes.none { it.id == e.from } } ||
+                                edges.any { e -> nodes.none { it.id == e.to } && graph.nodes.none { it.id == e.to } }
+                            if (conflict) {
+                                graphRecipeNote = context.getString(dev.ninfenz.mobile.R.string.author_graph_recipe_conflict)
+                            } else {
+                                apply(graph.copy(nodes = graph.nodes + nodes, edges = graph.edges + edges))
+                                graphRecipeNote = context.getString(dev.ninfenz.mobile.R.string.author_graph_recipe_applied, recipe.id)
+                                showGraphRecipes = false
+                            }
+                        }) { Text(recipe.id) }
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { showGraphRecipes = false }) { Text(stringResource(android.R.string.cancel)) } }
+        )
     }
 }
 
