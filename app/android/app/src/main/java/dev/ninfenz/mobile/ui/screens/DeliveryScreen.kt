@@ -555,6 +555,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
     }
 
     var busy by remember { mutableStateOf(false) }
+    val exportBlocked = busy || contractUnsatisfiable
 
     val latestInputs by rememberUpdatedState(inputs)
     val latestPlan by rememberUpdatedState(plan)
@@ -1524,7 +1525,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                 }
                 exportBatchNote?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
                 FlowRow(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
-                    ExportButton("md", "text/markdown", exportMarkdown, project, context, scope, { busy = it }, { error = it }, busy) { file, manifest, report ->
+                    ExportButton("md", "text/markdown", exportMarkdown, project, context, scope, { busy = it }, { error = it }, exportBlocked) { file, manifest, report ->
                         exportedFile = file
                         manifestText = manifest
                         reproOk = report?.stable
@@ -1545,7 +1546,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                             }
                         }
                     }
-                    ExportButton("zip", "application/zip", exportMarkdown, project, context, scope, { busy = it }, { error = it }, busy) { file, manifest, report ->
+                    ExportButton("zip", "application/zip", exportMarkdown, project, context, scope, { busy = it }, { error = it }, exportBlocked) { file, manifest, report ->
                         exportedFile = file
                         manifestText = manifest
                         reproOk = report?.stable
@@ -1556,7 +1557,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         }
                         recordExport("zip", file, manifest)
                     }
-                    ExportButton("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", exportMarkdown, project, context, scope, { busy = it }, { error = it }, busy, docxStyles = docxStyles, docxSectPr = docxSectPr, docxTheme = docxTheme, docxNumbering = docxNumbering, docxHeader = docxHeader, docxFooter = docxFooter) { file, manifest, report ->
+                    ExportButton("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", exportMarkdown, project, context, scope, { busy = it }, { error = it }, exportBlocked, docxStyles = docxStyles, docxSectPr = docxSectPr, docxTheme = docxTheme, docxNumbering = docxNumbering, docxHeader = docxHeader, docxFooter = docxFooter) { file, manifest, report ->
                         exportedFile = file
                         manifestText = manifest
                         reproOk = report?.stable
@@ -1571,7 +1572,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                 }
                 Text(stringResource(dev.ninfenz.mobile.R.string.delivery_export_group_data), style = NfType.label, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(start = NfSpacing.page, end = NfSpacing.page, top = NfSpacing.s))
                 FlowRow(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
-                    ExportButton("json", "application/json", exportMarkdown, project, context, scope, { busy = it }, { error = it }, busy) { file, manifest, report ->
+                    ExportButton("json", "application/json", exportMarkdown, project, context, scope, { busy = it }, { error = it }, exportBlocked) { file, manifest, report ->
                         exportedFile = file
                         manifestText = manifest
                         reproOk = report?.stable
@@ -1582,7 +1583,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         }
                         recordExport("json", file, manifest)
                     }
-                    ExportButton("skill", "application/zip", exportMarkdown, project, context, scope, { busy = it }, { error = it }, busy) { file, manifest, report ->
+                    ExportButton("skill", "application/zip", exportMarkdown, project, context, scope, { busy = it }, { error = it }, exportBlocked) { file, manifest, report ->
                         exportedFile = file
                         manifestText = manifest
                         reproOk = report?.stable
@@ -1596,7 +1597,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                 }
                 Text(stringResource(dev.ninfenz.mobile.R.string.delivery_export_group_reading), style = NfType.label, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(start = NfSpacing.page, end = NfSpacing.page, top = NfSpacing.s))
                 FlowRow(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
-                    EpubExportButton(exportMarkdown, project, epubAuthor, epubLanguage, context, scope, { busy = it }, { error = it }, busy, outputTemplate = selectedOutputTemplate) { file, report ->
+                    EpubExportButton(exportMarkdown, project, epubAuthor, epubLanguage, context, scope, { busy = it }, { error = it }, exportBlocked, outputTemplate = selectedOutputTemplate) { file, report ->
                         exportedFile = file
                         manifestText = null
                         reproOk = report.stable
@@ -1607,7 +1608,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         }
                         recordExport("epub", file, null)
                     }
-                    PdfExportButton(exportMarkdown, project, pdfPageSize, pdfIncludeTitle, context, scope, { busy = it }, { error = it }, busy, outputTemplate = selectedOutputTemplate) { file, report ->
+                    PdfExportButton(exportMarkdown, project, pdfPageSize, pdfIncludeTitle, context, scope, { busy = it }, { error = it }, exportBlocked, outputTemplate = selectedOutputTemplate) { file, report ->
                         exportedFile = file
                         manifestText = null
                         reproOk = report.stable
@@ -1618,14 +1619,14 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         }
                         recordExport("pdf", file, null)
                     }
-                    if (audit) PdfUaExportButton(exportMarkdown, project, context, scope, { busy = it }, { error = it }, busy) { file, report ->
+                    if (audit) PdfUaExportButton(exportMarkdown, project, context, scope, { busy = it }, { error = it }, exportBlocked) { file, report ->
                         exportedFile = file
                         manifestText = null
                         reproOk = report.stable
                         reproText = context.getString(dev.ninfenz.mobile.R.string.delivery_pdfua_note)
                         recordExport("pdf-ua", file, null)
                     }
-                    HtmlExportButton(exportMarkdown, project, context, scope, { busy = it }, { error = it }, busy, outputTemplate = selectedOutputTemplate) { file, report ->
+                    HtmlExportButton(exportMarkdown, project, context, scope, { busy = it }, { error = it }, exportBlocked, outputTemplate = selectedOutputTemplate) { file, report ->
                         exportedFile = file
                         manifestText = null
                         reproOk = report.stable
@@ -1638,7 +1639,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                     }
                 }
                 FlowRow(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
-                    if (audit) PreservationExportButton(exportMarkdown, project, context, scope, { busy = it }, { error = it }, busy, grant) { file, report ->
+                    if (audit) PreservationExportButton(exportMarkdown, project, context, scope, { busy = it }, { error = it }, exportBlocked, grant) { file, report ->
                         exportedFile = file
                         manifestText = null
                         reproOk = report.stable
@@ -1653,7 +1654,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         onClick = { showGrant = true },
                         modifier = Modifier.padding(horizontal = NfSpacing.page)
                     ) { Text(stringResource(dev.ninfenz.mobile.R.string.grant_button)) }
-                    NfDocExportButton(exportMarkdown, project, context, scope, { busy = it }, { error = it }, busy) { file, report ->
+                    NfDocExportButton(exportMarkdown, project, context, scope, { busy = it }, { error = it }, exportBlocked) { file, report ->
                         exportedFile = file
                         manifestText = null
                         reproOk = report.stable
