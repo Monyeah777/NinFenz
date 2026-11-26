@@ -31,6 +31,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Slider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
@@ -153,6 +154,7 @@ fun ImportScreen(
     }
     var acceptedMappings by remember { mutableStateOf<Set<Int>>(emptySet()) }
     var lowConfidenceOnly by remember { mutableStateOf(false) }
+    var mappingThreshold by remember { mutableStateOf(80) }
     var suggestNote by remember { mutableStateOf<String?>(null) }
     var zeroSliceNote by remember { mutableStateOf<String?>(null) }
     val zeroSliceStore = remember { ZeroSliceStore(context.filesDir) }
@@ -479,7 +481,7 @@ fun ImportScreen(
                     }
                     rawResult = obj
                     doc = imported
-                    acceptedMappings = imported.mappings.indices.filter { imported.mappings[it].confidence >= 80 }.toSet()
+                    acceptedMappings = imported.mappings.indices.filter { imported.mappings[it].confidence >= mappingThreshold }.toSet()
                     // 映射建议：core map-suggest（可选；失败不阻断预览，只提示）
                     val suggest = safeCall("map-suggest", buildJsonObject { put("import", obj) })
                     if (suggest.ok) {
@@ -487,7 +489,7 @@ fun ImportScreen(
                         if (suggestedObj != null) {
                             doc = ImportModel.parse(suggestedObj)
                             rawResult = suggestedObj
-                            acceptedMappings = doc!!.mappings.indices.filter { doc!!.mappings[it].confidence >= 80 }.toSet()
+                            acceptedMappings = doc!!.mappings.indices.filter { doc!!.mappings[it].confidence >= mappingThreshold }.toSet()
                             suggestNote = context.getString(dev.ninfenz.mobile.R.string.import_suggest_done)
                         }
                     } else {
@@ -676,7 +678,7 @@ fun ImportScreen(
                     val restored = ImportModel.parse(obj)
                     rawResult = obj
                     doc = restored
-                    acceptedMappings = restored.mappings.indices.filter { restored.mappings[it].confidence >= 80 }.toSet()
+                    acceptedMappings = restored.mappings.indices.filter { restored.mappings[it].confidence >= mappingThreshold }.toSet()
                     val digest = restored.source.sha256 ?: restored.textDigest.orEmpty()
                     zeroSliceStore.load(digest)?.let { report ->
                         zeroSlice = report
@@ -1164,9 +1166,11 @@ fun ImportScreen(
                                             val profile = recipe.config["prompt_profile"]?.toString()?.trim('"')
                                                 ?.let { name -> PromptProfile.entries.firstOrNull { it.name.equals(name, true) } }
                                             val low = recipe.config["low_confidence_only"]?.toString()?.toBooleanStrictOrNull() ?: false
+                                            val threshold = recipe.config["mapping_threshold"]?.toString()?.toIntOrNull()?.coerceIn(0, 100)
                                             TextButton(onClick = {
                                                 profile?.let { promptProfile = it }
                                                 lowConfidenceOnly = low
+                                                threshold?.let { mappingThreshold = it }
                                                 notice = context.getString(dev.ninfenz.mobile.R.string.import_recipe_applied, recipe.id)
                                             }) { Text(recipe.id) }
                                         }
@@ -1325,6 +1329,17 @@ fun ImportScreen(
                     item { Text(stringResource(dev.ninfenz.mobile.R.string.import_no_mapping), style = NfType.secondary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
                 } else {
                     item {
+                        Column(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
+                            Text(stringResource(dev.ninfenz.mobile.R.string.import_mapping_threshold, mappingThreshold), style = NfType.meta)
+                            Slider(
+                                value = mappingThreshold.toFloat(),
+                                onValueChange = { mappingThreshold = it.toInt().coerceIn(0, 100) },
+                                valueRange = 0f..100f,
+                                steps = 19
+                            )
+                        }
+                    }
+                    item {
                         Row(modifier = Modifier.fillMaxWidth().padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                             Text(stringResource(dev.ninfenz.mobile.R.string.import_accepted, acceptedMappings.size, current.mappings.size), style = NfType.meta)
                             Row {
@@ -1338,7 +1353,7 @@ fun ImportScreen(
                         }
                     }
                     val visibleMappings = current.mappings.indices.filter { index ->
-                        !lowConfidenceOnly || current.mappings[index].confidence < 80
+                        !lowConfidenceOnly || current.mappings[index].confidence < mappingThreshold
                     }
                     items(visibleMappings.size) { at ->
                         val index = visibleMappings[at]
@@ -1475,7 +1490,7 @@ fun ImportScreen(
                                                 rawResult = obj
                                                 doc = parsed
                                                 acceptedMappings = DraftLibrary.acceptedMappings(draft)
-                                                    ?: parsed.mappings.indices.filter { parsed.mappings[it].confidence >= 80 }.toSet()
+                                                    ?: parsed.mappings.indices.filter { parsed.mappings[it].confidence >= mappingThreshold }.toSet()
                                                 savedName = draft.name.removeSuffix(".json")
                                                 error = null
                                                 importDraftStore.save(raw)
@@ -1530,7 +1545,7 @@ fun ImportScreen(
                                                         rawResult = obj
                                                         doc = parsed
                                                         acceptedMappings = DraftLibrary.acceptedMappings(matched)
-                                                            ?: parsed.mappings.indices.filter { parsed.mappings[it].confidence >= 80 }.toSet()
+                                                            ?: parsed.mappings.indices.filter { parsed.mappings[it].confidence >= mappingThreshold }.toSet()
                                                         savedName = matched.name.removeSuffix(".json")
                                                         error = null
                                                         importDraftStore.save(raw)
@@ -1696,7 +1711,7 @@ fun ImportScreen(
                                 val parsed = ImportModel.parse(obj)
                                 rawResult = obj
                                 doc = parsed
-                                acceptedMappings = parsed.mappings.indices.filter { parsed.mappings[it].confidence >= 80 }.toSet()
+                                acceptedMappings = parsed.mappings.indices.filter { parsed.mappings[it].confidence >= mappingThreshold }.toSet()
                                 importDraftStore.save(raw)
                                 notice = context.getString(dev.ninfenz.mobile.R.string.import_duplicate_updated)
                             } catch (t: Throwable) {

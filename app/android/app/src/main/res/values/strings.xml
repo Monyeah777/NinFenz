@@ -1352,4 +1352,5 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="library_save_view">保存视图</string>
     <string name="library_view_name">视图名称</string>
     <string name="library_view_saved">已保存视图</string>
+    <string name="import_mapping_threshold">自动采纳阈值 ≥ %1$d%%</string>
 </resources>
