@@ -1405,4 +1405,8 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="review_checklist">Review checklist</string>
     <string name="delivery_transforms">Transform recipes</string>
     <string name="delivery_transform_applied">Applied transform: %1$s</string>
+    <string name="delivery_compare">Compare</string>
+    <string name="delivery_compare_added">Added lines</string>
+    <string name="delivery_compare_removed">Removed lines</string>
+    <string name="delivery_compare_empty">No line-level difference from current assembly</string>
 </resources>

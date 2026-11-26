@@ -1401,4 +1401,8 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="review_checklist">评审清单</string>
     <string name="delivery_transforms">变换配方</string>
     <string name="delivery_transform_applied">已应用变换：%1$s</string>
+    <string name="delivery_compare">对比</string>
+    <string name="delivery_compare_added">新增行</string>
+    <string name="delivery_compare_removed">删除行</string>
+    <string name="delivery_compare_empty">与当前装配无行级差异</string>
 </resources>

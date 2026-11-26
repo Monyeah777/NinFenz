@@ -271,6 +271,8 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
     val versionStore = remember { DeliveryVersionStore(context.filesDir) }
     val presetStore = remember { AssemblyPresetStore(context.filesDir) }
     var showVersions by remember { mutableStateOf(false) }
+    var compareVersionText by remember { mutableStateOf<String?>(null) }
+    var compareVersionLabel by remember { mutableStateOf("") }
     var showPresets by remember { mutableStateOf(false) }
     val extensionVariants = remember { ExtensionStore(context.filesDir).contributions(setOf("delivery_variant")) }
     val extensionTransforms = remember { ExtensionStore(context.filesDir).contributions(setOf("slot_transform")) }
@@ -2054,17 +2056,54 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                 "#" + (versions.size - index) + " · " + java.text.SimpleDateFormat("MM-dd HH:mm", java.util.Locale.getDefault()).format(java.util.Date(version.at)),
                                 style = NfType.meta
                             )
-                            TextButton(onClick = {
-                                markdown = version.markdown
-                                needsRevalidate = true
-                                activeStep = if (audit) 2 else 3
-                                showVersions = false
-                            }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_restore_version)) }
+                            Row {
+                                TextButton(onClick = {
+                                    compareVersionText = version.markdown
+                                    compareVersionLabel = "#" + (versions.size - index)
+                                    showVersions = false
+                                }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_compare)) }
+                                TextButton(onClick = {
+                                    markdown = version.markdown
+                                    needsRevalidate = true
+                                    activeStep = if (audit) 2 else 3
+                                    showVersions = false
+                                }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_restore_version)) }
+                            }
                         }
                     }
                 }
             },
             confirmButton = { TextButton(onClick = { showVersions = false }) { Text(stringResource(android.R.string.ok)) } }
+        )
+    }
+
+    compareVersionText?.let { oldText ->
+        val currentText = markdown.orEmpty()
+        val oldLines = oldText.lines().filter { it.isNotBlank() }
+        val currentLines = currentText.lines().filter { it.isNotBlank() }
+        val oldSet = oldLines.toSet()
+        val currentSet = currentLines.toSet()
+        val removed = oldLines.filter { it !in currentSet }.take(20)
+        val added = currentLines.filter { it !in oldSet }.take(20)
+        AlertDialog(
+            onDismissRequest = { compareVersionText = null },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_compare) + " " + compareVersionLabel) },
+            text = {
+                Column(modifier = Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                    if (removed.isEmpty() && added.isEmpty()) {
+                        Text(stringResource(dev.ninfenz.mobile.R.string.delivery_compare_empty), style = NfType.meta)
+                    }
+                    if (added.isNotEmpty()) {
+                        Text(stringResource(dev.ninfenz.mobile.R.string.delivery_compare_added) + " (" + added.size + ")", style = NfType.meta, color = MaterialTheme.colorScheme.primary)
+                        added.forEach { Text("+ " + it, style = NfType.meta) }
+                    }
+                    if (removed.isNotEmpty()) {
+                        Text(stringResource(dev.ninfenz.mobile.R.string.delivery_compare_removed) + " (" + removed.size + ")", style = NfType.meta, color = MaterialTheme.colorScheme.error)
+                        removed.forEach { Text("- " + it, style = NfType.meta) }
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { compareVersionText = null }) { Text(stringResource(android.R.string.ok)) } }
         )
     }
 
