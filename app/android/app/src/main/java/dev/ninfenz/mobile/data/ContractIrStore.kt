@@ -42,9 +42,12 @@ class ContractIrStore(private val filesDir: File, private val projectId: String)
     fun valuesFile(): File = File(File(File(filesDir, "projects"), projectId), "contract/values.json")
 
     fun saveValues(values: Map<String, String>) {
+        // 空值不覆盖已保存值：求解空 inputs 时只补默认/非空 assignment。
+        val merged = loadValues().toMutableMap()
+        values.forEach { (key, value) -> if (value.isNotBlank()) merged[key] = value }
         AtomicFiles.writeText(
             valuesFile(),
-            JsonObject(values.mapValues { (_, value) -> JsonPrimitive(value) }).toString()
+            JsonObject(merged.mapValues { (_, value) -> JsonPrimitive(value) }).toString()
         )
     }
 

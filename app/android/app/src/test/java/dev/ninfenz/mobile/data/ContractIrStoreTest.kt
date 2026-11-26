@@ -28,5 +28,8 @@ class ContractIrStoreTest {
         store.saveValues(mapOf("slot_a" to "hello", "slot_b" to "world"))
         assertEquals("hello", store.loadValues()["slot_a"])
         assertEquals("world", store.loadValues()["slot_b"])
+        store.saveValues(mapOf("slot_a" to "", "slot_c" to "new"))
+        assertEquals("hello", store.loadValues()["slot_a"])
+        assertEquals("new", store.loadValues()["slot_c"])
     }
 }
