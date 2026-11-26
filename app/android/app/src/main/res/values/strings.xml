@@ -1424,4 +1424,10 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="author_protocol_snapshot_meta">%1$d 字段 · %2$d 条款启用</string>
     <string name="delivery_batch_assemble">批量装配</string>
     <string name="delivery_batch_assemble_done">批量装配完成：成功 %1$d，失败 %2$d</string>
+    <string name="template_gallery_title">项目模板库</string>
+    <string name="template_gallery_empty">还没有模板。导入并保存模板候选后会出现在这里。</string>
+    <string name="template_gallery_copy">复制 JSON</string>
+    <string name="template_gallery_copied">模板 JSON 已复制</string>
+    <string name="template_gallery_delete">删除模板</string>
+    <string name="template_gallery_meta">%1$d 节 · %2$d 槽</string>
 </resources>

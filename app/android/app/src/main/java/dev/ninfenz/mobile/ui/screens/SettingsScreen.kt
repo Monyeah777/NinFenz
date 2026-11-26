@@ -79,6 +79,7 @@ fun SettingsScreen(
     onDesignSystem: () -> Unit = {},
     onDecisionLog: () -> Unit = {},
     onExtensions: () -> Unit = {},
+    onTemplates: () -> Unit = {},
     onThemeMode: (ThemeMode) -> Unit = {},
     onLanguageMode: (LanguageMode) -> Unit = {},
     onDynamicColor: (Boolean) -> Unit = {}
@@ -190,6 +191,9 @@ fun SettingsScreen(
                 }
                 OutlinedButton(onClick = onExtensions) {
                     Text(stringResource(dev.ninfenz.mobile.R.string.extensions_title))
+                }
+                OutlinedButton(onClick = onTemplates) {
+                    Text(stringResource(dev.ninfenz.mobile.R.string.template_gallery_title))
                 }
                 if (audit) OutlinedButton(onClick = onDecisionLog) {
                     Text(stringResource(dev.ninfenz.mobile.R.string.settings_decision_log))

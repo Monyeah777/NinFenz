@@ -18,6 +18,7 @@ sealed interface Detail {
     data object DecisionLog : Detail
     data object ErrorCodes : Detail
     data object Extensions : Detail
+    data object Templates : Detail
     data object Protocol : Detail
     data object Graph : Detail
     data object Assembly : Detail

@@ -124,6 +124,7 @@ import dev.ninfenz.mobile.ui.screens.SearchScreen
 import dev.ninfenz.mobile.ui.screens.SettingsScreen
 import dev.ninfenz.mobile.ui.screens.DecisionLogScreen
 import dev.ninfenz.mobile.ui.screens.ExtensionCenterScreen
+import dev.ninfenz.mobile.ui.screens.TemplateGalleryScreen
 import dev.ninfenz.mobile.ui.screens.DesignSystemScreen
 import dev.ninfenz.mobile.ui.screens.WorkflowHubScreen
 import dev.ninfenz.mobile.ui.screens.ProjectFlowScreen
@@ -564,12 +565,14 @@ is Detail.Inbox -> InboxScreen(
                         onDesignSystem = { shell = shell.open(Detail.DesignSystem) },
                         onDecisionLog = { shell = shell.open(Detail.DecisionLog) },
                         onExtensions = { shell = shell.open(Detail.Extensions) },
+                        onTemplates = { shell = shell.open(Detail.Templates) },
                         onThemeMode = onThemeMode,
                         onLanguageMode = onLanguageMode,
                         onDynamicColor = onDynamicColor
                     )
                     is Detail.ErrorCodes -> ErrorCodesScreen(onBack = { shell = shell.back() ?: shell })
                     is Detail.Extensions -> ExtensionCenterScreen(onBack = { shell = shell.back() ?: shell })
+                    is Detail.Templates -> TemplateGalleryScreen(onBack = { shell = shell.back() ?: shell })
                     is Detail.Author -> {
                         val entry = projects.firstOrNull { it.project.id == detail.id }
                         if (entry == null) {
