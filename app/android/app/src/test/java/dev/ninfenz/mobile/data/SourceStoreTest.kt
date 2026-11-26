@@ -19,6 +19,9 @@ class SourceStoreTest {
         assertEquals(1, store.list().size)
         assertEquals("[[src:" + first.id + "]]", store.citation(first.id))
         assertTrue(store.appendix().contains("https://example.com"))
+        val rendered = store.renderCitations("正文 [[" + "src:" + first.id + "]]")
+        assertTrue(rendered.contains("[^" + first.id + "]"))
+        assertTrue(rendered.contains("## 来源"))
         store.remove(first.id)
         assertTrue(store.list().isEmpty())
     }

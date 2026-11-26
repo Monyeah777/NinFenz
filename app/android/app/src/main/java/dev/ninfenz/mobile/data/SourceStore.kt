@@ -77,7 +77,35 @@ class SourceStore(private val filesDir: File, private val projectId: String) {
         File(dir(), id + ".json").delete()
     }
 
-    fun citation(id: String): String = "[[src:$id]]"
+    fun citation(id: String): String = "[[src:" + id + "]]"
+
+    /** 把 [[src:ID]] 转成 Markdown 脚注引用，并追加来源附录；只追加，不改正文其他内容。 */
+    fun renderCitations(markdown: String): String {
+        val regex = Regex("\\[\\[src:([a-z][a-z0-9-]{1,63})\\]\\]")
+        val ids = regex.findAll(markdown).map { it.groupValues[1] }.toSet()
+        if (ids.isEmpty()) return markdown
+        var out = markdown
+        for (id in ids) {
+            out = out.replace("[[src:" + id + "]]", "[^" + id + "]")
+        }
+        val known = list().associateBy { it.id }
+        val entries = ids.mapNotNull { known[it] }
+        if (entries.isEmpty()) return out
+        return out.trimEnd() + "\n\n" + buildString {
+            appendLine("## 来源")
+            entries.forEach { source ->
+                append("[^")
+                append(source.id)
+                append("]: ")
+                append(source.title)
+                if (source.url.isNotBlank()) {
+                    append(" — ")
+                    append(source.url)
+                }
+                appendLine()
+            }
+        }
+    }
 
     fun appendix(): String {
         val items = list()

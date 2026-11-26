@@ -96,6 +96,7 @@ import dev.ninfenz.mobile.data.PdfValidator
 import dev.ninfenz.mobile.data.ExportHistoryStore
 import dev.ninfenz.mobile.data.ExportVerifier
 import dev.ninfenz.mobile.data.PackEntry
+import dev.ninfenz.mobile.data.SourceStore
 import dev.ninfenz.mobile.data.AssemblyArtifact
 import dev.ninfenz.mobile.data.ProjectStatusStore
 import dev.ninfenz.mobile.data.StatusAdvanceResult
@@ -628,6 +629,21 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                             onClick = { deliveryMenu = false; showResetConfirm = true }
                         )
                     }
+                    DropdownMenuItem(
+                        text = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_sources_appendix)) },
+                        onClick = {
+                            deliveryMenu = false
+                            val base = markdown.orEmpty()
+                            val next = SourceStore(context.filesDir, project.id).renderCitations(base)
+                            if (next == base) {
+                                variantNote = context.getString(dev.ninfenz.mobile.R.string.delivery_sources_none)
+                            } else {
+                                markdown = next
+                                needsRevalidate = true
+                                variantNote = context.getString(dev.ninfenz.mobile.R.string.delivery_sources_appended)
+                            }
+                        }
+                    )
                     DropdownMenuItem(
                         text = { Text(stringResource(dev.ninfenz.mobile.R.string.patch_title)) },
                         onClick = { deliveryMenu = false; onPatch() }
