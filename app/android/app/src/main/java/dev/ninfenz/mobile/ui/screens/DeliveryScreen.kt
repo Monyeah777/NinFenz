@@ -136,6 +136,7 @@ import dev.ninfenz.mobile.ui.components.NfSectionHeader
 import dev.ninfenz.mobile.ui.components.NfStepStrip
 import dev.ninfenz.mobile.ui.components.NfStatusChip
 import dev.ninfenz.mobile.ui.components.NfTopAppBar
+import dev.ninfenz.mobile.ui.rememberCapabilityRevision
 import dev.ninfenz.mobile.ui.components.MarkdownPreview
 import dev.ninfenz.mobile.ui.safeCall
 import dev.ninfenz.mobile.ui.theme.NfSpacing
@@ -612,6 +613,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
     var showMacros by remember { mutableStateOf(false) }
     var macroItems by remember { mutableStateOf(emptyList<MacroStore.Macro>()) }
     var macroResult by remember { mutableStateOf<MacroRunResult?>(null) }
+    val capabilityRevision = rememberCapabilityRevision()
     var showBrowsePlan by remember { mutableStateOf(false) }
     var activeStep by remember(project.id) { mutableStateOf(step) }
     var showLeaveConfirm by remember { mutableStateOf(false) }
@@ -642,7 +644,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                             }
                         )
                     }
-                    if (CapabilityRegistry.isEnabled(Capability.MACROS)) {
+                    if (capabilityRevision >= 0 && CapabilityRegistry.isEnabled(Capability.MACROS)) {
                         DropdownMenuItem(
                             text = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_run_macro)) },
                             onClick = {
@@ -658,7 +660,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                             onClick = { deliveryMenu = false; showResetConfirm = true }
                         )
                     }
-                    if (CapabilityRegistry.isEnabled(Capability.SOURCES)) {
+                    if (capabilityRevision >= 0 && CapabilityRegistry.isEnabled(Capability.SOURCES)) {
                         DropdownMenuItem(
                             text = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_sources_appendix)) },
                             onClick = {
@@ -1678,7 +1680,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                     OutlinedButton(onClick = {
                         referencePicker.launch(arrayOf("application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
                     }) { Text(stringResource(dev.ninfenz.mobile.R.string.docx_reference_pick)) }
-                    if (CapabilityRegistry.isEnabled(Capability.STYLE)) {
+                    if (capabilityRevision >= 0 && CapabilityRegistry.isEnabled(Capability.STYLE)) {
                         TextButton(onClick = {
                             styleTemplates = styleStore.list()
                             showStyleTemplates = true

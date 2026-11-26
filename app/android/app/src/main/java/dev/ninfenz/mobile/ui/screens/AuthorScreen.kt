@@ -98,6 +98,7 @@ import dev.ninfenz.mobile.ui.components.NfCollapsibleSection
 import dev.ninfenz.mobile.ui.components.MarkdownPreview
 import dev.ninfenz.mobile.ui.components.NfStatusChip
 import dev.ninfenz.mobile.ui.components.NfTopAppBar
+import dev.ninfenz.mobile.ui.rememberCapabilityRevision
 import dev.ninfenz.mobile.ui.safeCall
 import dev.ninfenz.mobile.ui.theme.NfSpacing
 import dev.ninfenz.mobile.ui.design.NfType
@@ -972,6 +973,7 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
     val snippets = remember { ExtensionStore(context.filesDir).contributions(setOf("spec_snippet")) }
     val snapshotStore = remember { SpecSnapshotStore(context.filesDir, project.id) }
     val contractStore = remember { ContractIrStore(context.filesDir, project.id) }
+    val capabilityRevision = rememberCapabilityRevision()
     val sourceStore = remember { SourceStore(context.filesDir, project.id) }
     val aiRunStore = remember { AiRunStore(context.filesDir) }
     val clipboard = androidx.compose.ui.platform.LocalClipboardManager.current
@@ -1038,7 +1040,7 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
             TextButton(onClick = { snapshots = snapshotStore.list(); showSnapshots = true }) {
                 Text(stringResource(dev.ninfenz.mobile.R.string.author_snapshot))
             }
-            if (CapabilityRegistry.isEnabled(Capability.CONTRACT)) TextButton(enabled = !busy, onClick = {
+            if (capabilityRevision >= 0 && CapabilityRegistry.isEnabled(Capability.CONTRACT)) TextButton(enabled = !busy, onClick = {
                 scope.launch {
                     busy = true
                     contractStore.compile(artifacts.specJson, artifacts.protocolJson)
@@ -1057,11 +1059,11 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
                     busy = false
                 }
             }) { Text(stringResource(dev.ninfenz.mobile.R.string.author_contract)) }
-            if (CapabilityRegistry.isEnabled(Capability.SOURCES)) TextButton(onClick = {
+            if (capabilityRevision >= 0 && CapabilityRegistry.isEnabled(Capability.SOURCES)) TextButton(onClick = {
                 sources = sourceStore.list()
                 showSources = true
             }) { Text(stringResource(dev.ninfenz.mobile.R.string.author_sources)) }
-            if (CapabilityRegistry.isEnabled(Capability.AI)) TextButton(onClick = {
+            if (capabilityRevision >= 0 && CapabilityRegistry.isEnabled(Capability.AI)) TextButton(onClick = {
                 aiRuns = aiRunStore.list()
                 showAiRuns = true
             }) { Text(stringResource(dev.ninfenz.mobile.R.string.author_ai_plan)) }

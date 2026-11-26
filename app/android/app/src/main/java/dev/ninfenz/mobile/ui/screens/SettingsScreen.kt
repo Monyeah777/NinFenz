@@ -59,6 +59,7 @@ import dev.ninfenz.mobile.data.StorageStats
 import dev.ninfenz.mobile.share.ShareExporter
 import java.io.File
 import java.util.Locale
+import dev.ninfenz.mobile.ui.rememberCapabilityRevision
 import dev.ninfenz.mobile.ui.components.CardBox
 import dev.ninfenz.mobile.ui.components.NfCollapsibleSection
 import dev.ninfenz.mobile.ui.components.KeyValue
@@ -91,6 +92,7 @@ fun SettingsScreen(
     val diag = remember { Core.diagnostics() }
     var crash by remember { mutableStateOf(CrashLogStore(context.filesDir).read()) }
     var moduleVersion by remember { mutableIntStateOf(0) }
+    val capabilityRevision = rememberCapabilityRevision()
     var copied by remember { mutableStateOf(false) }
     var selfCheck by remember { mutableStateOf<dev.ninfenz.mobile.data.PropertyHarness.Report?>(null) }
     var tier by remember { mutableStateOf(FeatureGate.tier()) }
@@ -290,10 +292,10 @@ fun SettingsScreen(
             onLanguageMode = onLanguageMode,
             onModulesChanged = { moduleVersion++ }
         )
-        if (moduleVersion >= 0 && CapabilityRegistry.isEnabled(Capability.MACROS)) {
+        if (capabilityRevision >= 0 && CapabilityRegistry.isEnabled(Capability.MACROS)) {
             SettingsMacroSection()
         }
-        if (moduleVersion >= 0 && CapabilityRegistry.isEnabled(Capability.STYLE)) {
+        if (capabilityRevision >= 0 && CapabilityRegistry.isEnabled(Capability.STYLE)) {
             SettingsStyleSection()
         }
 

@@ -9,9 +9,18 @@ object CapabilityRegistry {
     var revision: Int = -1
         private set
 
+    private val listeners = java.util.concurrent.CopyOnWriteArraySet<() -> Unit>()
+
+    /** 注册模块变更监听；返回取消函数。 */
+    fun observe(listener: () -> Unit): () -> Unit {
+        listeners += listener
+        return { listeners -= listener }
+    }
+
     fun install(next: NfPrefs) {
         prefs = next
         revision = next.revision
+        listeners.forEach { it() }
     }
 
     fun current(): NfPrefs = prefs
