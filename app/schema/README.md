@@ -33,6 +33,8 @@
 | `nf-contract-ir.schema.json` | `nf-contract-ir/1` | 合同 IR（槽位/类型/约束/依赖图/digest） |
 | `nf-contract-result.schema.json` | `nf-contract-result/1` | 合同求解结果（assignments/issues/unsat_core） |
 | `nf-build.schema.json` | `nf-build/1` | 构建 journal（节点/产物/跳过/verdict） |
+| `nf-fragment.schema.json` | `nf-fragment/1` | 可复用片段（blocks/slots/tags/digest） |
+| `nf-composition.schema.json` | `nf-composition/1` | 片段组合旁车（roots/fragments id+digest） |
 | `limits.json` | `nf-app-limits/1` | 解析/解包上限（实现必须读取，不得散落字面量） |
 | `error_codes.json` | `nf-app-error-codes/1` | 错误码登记（code/severity/exit/message/fix） |
 

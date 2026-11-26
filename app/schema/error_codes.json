@@ -692,6 +692,21 @@
       "code": "NF-CON-003", "severity": "error", "exit": 1,
       "message": "合同反编译歧义/样本不足",
       "fix": "补样稿或逐条处理歧义清单"
+    },
+    {
+      "code": "NF-CMP-001", "severity": "error", "exit": 1,
+      "message": "片段/组合 schema 非法或块 id 重复",
+      "fix": "按报告 path 修 fragment/composition"
+    },
+    {
+      "code": "NF-CMP-002", "severity": "error", "exit": 1,
+      "message": "组合引用缺失/摘要不符/循环依赖",
+      "fix": "补齐片段或修 roots/引用"
+    },
+    {
+      "code": "NF-CMP-003", "severity": "error", "exit": 1,
+      "message": "组合渲染占位符/条件无法解析",
+      "fix": "检查 values 与模板语法"
     }
   ]
 }

@@ -1,0 +1,12 @@
+{
+  "schema": "nf-fragment/1",
+  "id": "opening",
+  "title": "开场",
+  "kind": "section",
+  "blocks": [
+    { "id": "b1", "type": "paragraph", "text": "你好，{{SLT-01}}。" }
+  ],
+  "slots": ["SLT-01"],
+  "tags": ["demo"],
+  "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+}

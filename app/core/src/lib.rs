@@ -10,6 +10,7 @@ pub mod contract;
 pub mod canonical;
 pub mod claim;
 pub mod compose;
+pub mod composition;
 pub mod evidence;
 pub mod extension;
 pub mod docx;

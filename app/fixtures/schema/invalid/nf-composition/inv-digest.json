@@ -1,0 +1,9 @@
+{
+  "schema": "nf-composition/1",
+  "id": "demo-composition",
+  "roots": ["opening"],
+  "fragments": [
+    { "id": "opening", "digest": "short" }
+  ],
+  "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+}

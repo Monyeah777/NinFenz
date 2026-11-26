@@ -610,6 +610,26 @@
       "schema": "nf-build",
       "violated": "verdict 只允许 verified/unverified",
       "codes": ["NF-BLD-001"]
+    },
+    "invalid/nf-fragment/inv-kind.json": {
+      "schema": "nf-fragment",
+      "violated": "kind 不在 section/paragraph/table/code",
+      "codes": ["NF-CMP-001"]
+    },
+    "invalid/nf-fragment/inv-block.json": {
+      "schema": "nf-fragment",
+      "violated": "block.text 必须是 string",
+      "codes": ["NF-CMP-001"]
+    },
+    "invalid/nf-composition/inv-root.json": {
+      "schema": "nf-composition",
+      "violated": "roots minItems=1",
+      "codes": ["NF-CMP-001"]
+    },
+    "invalid/nf-composition/inv-digest.json": {
+      "schema": "nf-composition",
+      "violated": "digest 必须是 64 位十六进制",
+      "codes": ["NF-CMP-001"]
     }
   }
 }

@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/app/schema/nf-composition.schema.json",
+  "title": "NF 组合旁车（nf-composition/1）",
+  "description": "引用片段 id+digest 与根片段；不复制片段内容，不改 nf-doc/1。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "id", "roots", "fragments", "digest"],
+  "properties": {
+    "schema": { "const": "nf-composition/1" },
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]{1,63}$" },
+    "roots": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "pattern": "^[a-z][a-z0-9-]{1,63}$" }
+    },
+    "fragments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "digest"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]{1,63}$" },
+          "digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+        }
+      }
+    },
+    "values": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/app/schema/nf-fragment.schema.json",
+  "title": "NF 片段（nf-fragment/1）",
+  "description": "可复用内容块；插入生成新 block id，不直接改 nf-doc/1。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "id", "title", "kind", "blocks", "slots", "tags", "digest"],
+  "properties": {
+    "schema": { "const": "nf-fragment/1" },
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]{1,63}$" },
+    "title": { "type": "string", "minLength": 1 },
+    "kind": { "enum": ["section", "paragraph", "table", "code"] },
+    "blocks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "type", "text"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "type": { "enum": ["heading", "paragraph", "table", "code", "quote", "slot"] },
+          "text": { "type": "string" },
+          "slot": { "type": "string", "pattern": "^SLT-[0-9]{2,3}$" }
+        }
+      }
+    },
+    "slots": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^SLT-[0-9]{2,3}$" }
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+  }
+}

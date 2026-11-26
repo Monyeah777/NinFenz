@@ -62,6 +62,7 @@ pub fn help_text() -> &'static str {
           contract-compile contract-solve contract-explain\n          build-journal build-why
           build-plan build-run build-incremental block-plan block-incremental\n\
           graph-typecheck schema-induce sdir-fuse template-induce template-migrate compose-run\n\
+          fragment-validate compose-validate compose-render\n\
           evidence-create evidence-verify evidence-pack evidence-verify-package evidence-freeze evidence-keygen\n\
           plan-solve plan-explain reuse-index reuse-impact\n\
           export-profile export-accessible\n\
