@@ -1466,6 +1466,11 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="delivery_transform_applied">已应用变换：%1$s</string>
     <string name="delivery_compare">对比</string>
     <string name="delivery_sources_appendix">追加来源附录</string>
+    <string name="delivery_fidelity">保真对账</string>
+    <string name="delivery_fidelity_score">匹配 %1$d%% · %2$d/%3$d 章节</string>
+    <string name="delivery_fidelity_missing">缺失：%1$s</string>
+    <string name="delivery_fidelity_extra">多出：%1$s</string>
+    <string name="delivery_fidelity_none">没有可对账的 Markdown 或 spec</string>
     <string name="delivery_sources_none">没有可追加的来源</string>
     <string name="delivery_sources_appended">已追加来源附录</string>
     <string name="delivery_compare_added">新增行</string>

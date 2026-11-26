@@ -106,6 +106,8 @@ import dev.ninfenz.mobile.model.AssemblyPlan
 import dev.ninfenz.mobile.model.MarkdownBlock
 import dev.ninfenz.mobile.model.CorrectionPrompt
 import dev.ninfenz.mobile.model.DiffKind
+import dev.ninfenz.mobile.model.FidelityReconcile
+import dev.ninfenz.mobile.model.FidelityReconciler
 import dev.ninfenz.mobile.model.MarkdownBlocks
 import dev.ninfenz.mobile.model.TextDiff
 import dev.ninfenz.mobile.model.SpecModel
@@ -278,6 +280,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
     var showVersions by remember { mutableStateOf(false) }
     var compareVersionText by remember { mutableStateOf<String?>(null) }
     var compareVersionLabel by remember { mutableStateOf("") }
+    var fidelityResult by remember { mutableStateOf<FidelityReconcile?>(null) }
     var showPresets by remember { mutableStateOf(false) }
     val extensionVariants = remember { ExtensionStore(context.filesDir).contributions(setOf("delivery_variant")) }
     val extensionTransforms = remember { ExtensionStore(context.filesDir).contributions(setOf("slot_transform")) }
@@ -646,6 +649,19 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                 markdown = next
                                 needsRevalidate = true
                                 variantNote = context.getString(dev.ninfenz.mobile.R.string.delivery_sources_appended)
+                            }
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_fidelity)) },
+                        onClick = {
+                            deliveryMenu = false
+                            val currentMarkdown = markdown.orEmpty()
+                            val spec = specMeta
+                            if (currentMarkdown.isBlank() || spec == null) {
+                                variantNote = context.getString(dev.ninfenz.mobile.R.string.delivery_fidelity_none)
+                            } else {
+                                fidelityResult = FidelityReconciler.fromSpec(spec, currentMarkdown)
                             }
                         }
                     )
@@ -2379,6 +2395,29 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                 }
             },
             confirmButton = { TextButton(onClick = { compareVersionText = null }) { Text(stringResource(android.R.string.ok)) } }
+        )
+    }
+
+    fidelityResult?.let { result ->
+        AlertDialog(
+            onDismissRequest = { fidelityResult = null },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_fidelity)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                    Text(
+                        stringResource(dev.ninfenz.mobile.R.string.delivery_fidelity_score, result.score, result.matched, result.expected),
+                        style = NfType.meta,
+                        color = if (result.score == 100) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                    )
+                    if (result.missing.isNotEmpty()) {
+                        Text(stringResource(dev.ninfenz.mobile.R.string.delivery_fidelity_missing, result.missing.joinToString("、")), style = NfType.meta)
+                    }
+                    if (result.extra.isNotEmpty()) {
+                        Text(stringResource(dev.ninfenz.mobile.R.string.delivery_fidelity_extra, result.extra.joinToString("、")), style = NfType.meta)
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { fidelityResult = null }) { Text(stringResource(android.R.string.ok)) } }
         )
     }
 

@@ -1470,6 +1470,11 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="delivery_transform_applied">Applied transform: %1$s</string>
     <string name="delivery_compare">Compare</string>
     <string name="delivery_sources_appendix">Append sources</string>
+    <string name="delivery_fidelity">Fidelity check</string>
+    <string name="delivery_fidelity_score">%1$d%% match · %2$d/%3$d sections</string>
+    <string name="delivery_fidelity_missing">Missing: %1$s</string>
+    <string name="delivery_fidelity_extra">Extra: %1$s</string>
+    <string name="delivery_fidelity_none">No Markdown or spec to check</string>
     <string name="delivery_sources_none">No sources to append</string>
     <string name="delivery_sources_appended">Sources appended</string>
     <string name="delivery_compare_added">Added lines</string>
