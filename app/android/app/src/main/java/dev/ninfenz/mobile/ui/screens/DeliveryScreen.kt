@@ -94,6 +94,8 @@ import dev.ninfenz.mobile.data.PdfExporter
 import dev.ninfenz.mobile.data.PdfUaExporter
 import dev.ninfenz.mobile.data.PdfValidator
 import dev.ninfenz.mobile.data.ExportHistoryStore
+import dev.ninfenz.mobile.data.Capability
+import dev.ninfenz.mobile.data.CapabilityRegistry
 import dev.ninfenz.mobile.data.ExportVerifier
 import dev.ninfenz.mobile.data.ImportDraftStore
 import dev.ninfenz.mobile.data.MacroStore
@@ -640,35 +642,39 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                             }
                         )
                     }
-                    DropdownMenuItem(
-                        text = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_run_macro)) },
-                        onClick = {
-                            deliveryMenu = false
-                            macroItems = MacroStore(context.filesDir).list()
-                            showMacros = true
-                        }
-                    )
+                    if (CapabilityRegistry.isEnabled(Capability.MACROS)) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_run_macro)) },
+                            onClick = {
+                                deliveryMenu = false
+                                macroItems = MacroStore(context.filesDir).list()
+                                showMacros = true
+                            }
+                        )
+                    }
                     if (plan != null || inputs.isNotEmpty() || markdown != null || report != null) {
                         DropdownMenuItem(
                             text = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_reset)) },
                             onClick = { deliveryMenu = false; showResetConfirm = true }
                         )
                     }
-                    DropdownMenuItem(
-                        text = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_sources_appendix)) },
-                        onClick = {
-                            deliveryMenu = false
-                            val base = markdown.orEmpty()
-                            val next = SourceStore(context.filesDir, project.id).renderCitations(base)
-                            if (next == base) {
-                                variantNote = context.getString(dev.ninfenz.mobile.R.string.delivery_sources_none)
-                            } else {
-                                markdown = next
-                                needsRevalidate = true
-                                variantNote = context.getString(dev.ninfenz.mobile.R.string.delivery_sources_appended)
+                    if (CapabilityRegistry.isEnabled(Capability.SOURCES)) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_sources_appendix)) },
+                            onClick = {
+                                deliveryMenu = false
+                                val base = markdown.orEmpty()
+                                val next = SourceStore(context.filesDir, project.id).renderCitations(base)
+                                if (next == base) {
+                                    variantNote = context.getString(dev.ninfenz.mobile.R.string.delivery_sources_none)
+                                } else {
+                                    markdown = next
+                                    needsRevalidate = true
+                                    variantNote = context.getString(dev.ninfenz.mobile.R.string.delivery_sources_appended)
+                                }
                             }
-                        }
-                    )
+                        )
+                    }
                     DropdownMenuItem(
                         text = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_fidelity)) },
                         onClick = {
@@ -1672,10 +1678,12 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                     OutlinedButton(onClick = {
                         referencePicker.launch(arrayOf("application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
                     }) { Text(stringResource(dev.ninfenz.mobile.R.string.docx_reference_pick)) }
-                    TextButton(onClick = {
-                        styleTemplates = styleStore.list()
-                        showStyleTemplates = true
-                    }) { Text(stringResource(dev.ninfenz.mobile.R.string.docx_style_from_library)) }
+                    if (CapabilityRegistry.isEnabled(Capability.STYLE)) {
+                        TextButton(onClick = {
+                            styleTemplates = styleStore.list()
+                            showStyleTemplates = true
+                        }) { Text(stringResource(dev.ninfenz.mobile.R.string.docx_style_from_library)) }
+                    }
                     Text(
                         stringResource(
                             if (docxStyles != null) dev.ninfenz.mobile.R.string.docx_reference_loaded
