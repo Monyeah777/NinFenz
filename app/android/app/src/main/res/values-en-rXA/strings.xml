@@ -1416,4 +1416,7 @@ MIT License · See app/docs/LEGAL.md···⟧</string>
     <string name="extensions_trusted">⟦Signature trusted···⟧</string>
     <string name="extensions_trust_revoke">⟦Revoke trust···⟧</string>
     <string name="extensions_verify_failed">⟦Signature verification failed···⟧</string>
+    <string name="delivery_preflight">⟦Preflight profile···⟧</string>
+    <string name="delivery_preflight_default">⟦Default checks···⟧</string>
+    <string name="delivery_preflight_empty">⟦Enable a Pro extension with preflight_profile to see profiles.···⟧</string>
 </resources>

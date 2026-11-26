@@ -337,6 +337,11 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
     var selectedOutputTemplate by remember { mutableStateOf<String?>(null) }
     var showOutputRules by remember { mutableStateOf(false) }
     var outputRuleNote by remember { mutableStateOf<String?>(null) }
+    val preflightProfiles = remember {
+        if (audit) ExtensionStore(context.filesDir).contributions(setOf("preflight_profile")) else emptyList()
+    }
+    var selectedPreflight by remember { mutableStateOf<dev.ninfenz.mobile.data.ExtensionStore.Contribution?>(null) }
+    var showPreflight by remember { mutableStateOf(false) }
     var pdfPageSize by remember { mutableStateOf("A4") }
     var pdfIncludeTitle by remember { mutableStateOf(true) }
     var epubAuthor by remember { mutableStateOf("") }
@@ -475,11 +480,18 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
         }
     }
 
+    fun shouldVerify(format: String): Boolean {
+        val profile = selectedPreflight ?: return true
+        val flag = profile.config[format]?.toString()?.trim('"')?.toBooleanStrictOrNull() ?: return true
+        return flag
+    }
+
     fun recordExport(format: String, file: File?, manifest: String?, verify: Boolean = true) {
         if (file == null) return
         val sha = manifest?.let { Regex("\"sha256\":\"([^\"]+)\"").find(it)?.groupValues?.getOrNull(1) }.orEmpty()
+        val doVerify = verify && shouldVerify(format)
         val verdict = when {
-            !verify -> null
+            !doVerify -> null
             format == "epub" -> EpubValidator.inspect(file).let { ExportVerifier.Result(it.ok, it.message) }
             format == "pdf" -> PdfValidator.inspect(file).let { ExportVerifier.Result(it.ok, it.message) }
             format == "html" -> HtmlValidator.inspect(file).let { ExportVerifier.Result(it.ok, it.message) }
@@ -1620,6 +1632,11 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                     TextButton(onClick = { showOutputRules = true }) {
                         Text(stringResource(dev.ninfenz.mobile.R.string.delivery_output_rule))
                     }
+                    if (audit) {
+                        TextButton(onClick = { showPreflight = true }) {
+                            Text(stringResource(dev.ninfenz.mobile.R.string.delivery_preflight))
+                        }
+                    }
                 }
                 outputRuleNote?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
                 FlowRow(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
@@ -1963,6 +1980,29 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
             confirmButton = { TextButton(onClick = { showOutputRules = false }) { Text(stringResource(android.R.string.cancel)) } }
         )
     }
+    if (showPreflight) {
+        AlertDialog(
+            onDismissRequest = { showPreflight = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_preflight)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                    TextButton(onClick = { selectedPreflight = null; showPreflight = false }) {
+                        Text(stringResource(dev.ninfenz.mobile.R.string.delivery_preflight_default))
+                    }
+                    if (preflightProfiles.isEmpty()) {
+                        Text(stringResource(dev.ninfenz.mobile.R.string.delivery_preflight_empty), style = NfType.meta)
+                    }
+                    preflightProfiles.forEach { profile ->
+                        TextButton(onClick = { selectedPreflight = profile; showPreflight = false }) {
+                            Text(profile.id)
+                        }
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { showPreflight = false }) { Text(stringResource(android.R.string.cancel)) } }
+        )
+    }
+
     if (showSavePreset) {
         AlertDialog(
             onDismissRequest = { showSavePreset = false },

@@ -1412,4 +1412,7 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="extensions_trusted">已信任签名</string>
     <string name="extensions_trust_revoke">撤销信任</string>
     <string name="extensions_verify_failed">签名验证失败</string>
+    <string name="delivery_preflight">预检配置</string>
+    <string name="delivery_preflight_default">默认全检</string>
+    <string name="delivery_preflight_empty">启用带 preflight_profile 的 Pro 扩展后会显示预检配置。</string>
 </resources>
