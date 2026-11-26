@@ -1,0 +1,5 @@
+fbb9871f087189d66144fcc61ad212b7ddc58510ef46abc6472dde4352afb3fe *app/android/app/build/outputs/apk/debug/app-daily-0.3.6.apk
+9c114d3f8997c3f18c5124670dd8885fb69ff4e35ca5ac27b53dfefa518d4b4a *app/android/app/build/outputs/apk/debug/app-pro-0.3.6.apk
+fbd259b3fbe0eee4d1ca0fc9c68aebee93695e546dff5082e7f6409760442393 *app/android/app/build/outputs/bundle/debug/app-debug.aab
+aef38de4d7ea93db02c340e627c01e3e58db5f1b2d472126f55f4b9f93297d86 *app/android/app/build/outputs/bundle/release/app-release.aab
+826cf86130e3a43921301b8165ae0eca2fbd4ad86b6865a5dc519e7e51a1d61b *results/app/NinFenz-0.3.6-source-r35.zip
