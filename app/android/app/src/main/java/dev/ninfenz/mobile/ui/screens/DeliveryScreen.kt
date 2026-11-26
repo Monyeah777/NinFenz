@@ -95,6 +95,7 @@ import dev.ninfenz.mobile.data.PdfUaExporter
 import dev.ninfenz.mobile.data.PdfValidator
 import dev.ninfenz.mobile.data.ExportHistoryStore
 import dev.ninfenz.mobile.data.ExportVerifier
+import dev.ninfenz.mobile.data.MacroStore
 import dev.ninfenz.mobile.data.PackEntry
 import dev.ninfenz.mobile.data.SourceStore
 import dev.ninfenz.mobile.data.StyleMatch
@@ -108,6 +109,8 @@ import dev.ninfenz.mobile.model.CorrectionPrompt
 import dev.ninfenz.mobile.model.DiffKind
 import dev.ninfenz.mobile.model.FidelityReconcile
 import dev.ninfenz.mobile.model.FidelityReconciler
+import dev.ninfenz.mobile.model.MacroRunResult
+import dev.ninfenz.mobile.model.MacroRunner
 import dev.ninfenz.mobile.model.MarkdownBlocks
 import dev.ninfenz.mobile.model.TextDiff
 import dev.ninfenz.mobile.model.SpecModel
@@ -601,6 +604,9 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
     }
     val constraintConflicts = remember(specMeta) { dev.ninfenz.mobile.model.SpecConstraintAudit.conflicts(specMeta?.slots.orEmpty()) }
     var deliveryMenu by remember { mutableStateOf(false) }
+    var showMacros by remember { mutableStateOf(false) }
+    var macroItems by remember { mutableStateOf(emptyList<MacroStore.Macro>()) }
+    var macroResult by remember { mutableStateOf<MacroRunResult?>(null) }
     var showBrowsePlan by remember { mutableStateOf(false) }
     var activeStep by remember(project.id) { mutableStateOf(step) }
     var showLeaveConfirm by remember { mutableStateOf(false) }
@@ -631,6 +637,14 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                             }
                         )
                     }
+                    DropdownMenuItem(
+                        text = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_run_macro)) },
+                        onClick = {
+                            deliveryMenu = false
+                            macroItems = MacroStore(context.filesDir).list()
+                            showMacros = true
+                        }
+                    )
                     if (plan != null || inputs.isNotEmpty() || markdown != null || report != null) {
                         DropdownMenuItem(
                             text = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_reset)) },
@@ -2396,6 +2410,91 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                 }
             },
             confirmButton = { TextButton(onClick = { compareVersionText = null }) { Text(stringResource(android.R.string.ok)) } }
+        )
+    }
+
+    if (showMacros) {
+        AlertDialog(
+            onDismissRequest = { showMacros = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_run_macro)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                    if (macroItems.isEmpty()) {
+                        Text(
+                            stringResource(dev.ninfenz.mobile.R.string.delivery_macro_none),
+                            style = NfType.meta,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    macroItems.forEach { macro ->
+                        TextButton(onClick = {
+                            scope.launch {
+                                val plan = MacroStore(context.filesDir).plan(macro.json).getOrNull()
+                                if (plan == null) {
+                                    macroResult = MacroRunResult("failed", emptyList(), 1)
+                                } else {
+                                    macroResult = MacroRunner.run(plan) { action, _ ->
+                                        when (action) {
+                                            "assemble" -> {
+                                                val raw = rawPlan
+                                                val spec = artifacts?.specJson
+                                                if (raw == null || spec == null) {
+                                                    Result.failure(IllegalStateException(context.getString(dev.ninfenz.mobile.R.string.delivery_macro_failed, "缺少计划/spec")))
+                                                } else {
+                                                    val response = safeCall("assemble", buildJsonObject {
+                                                        put("plan", raw)
+                                                        put("spec", spec)
+                                                        put("inputs", buildJsonObject { inputs.forEach { (k, v) -> put(k, v) } })
+                                                    })
+                                                    val md = response.resultObject()?.let { J.optString(it, "markdown") }
+                                                    if (response.ok && !md.isNullOrBlank()) {
+                                                        markdown = md
+                                                        needsRevalidate = true
+                                                        Result.success("assembled")
+                                                    } else {
+                                                        Result.failure(IllegalStateException(response.error?.message ?: "assemble failed"))
+                                                    }
+                                                }
+                                            }
+                                            "validate" -> {
+                                                val md = markdown
+                                                val spec = artifacts?.specJson
+                                                val raw = rawPlan
+                                                if (md.isNullOrBlank() || spec == null || raw == null) {
+                                                    Result.failure(IllegalStateException(context.getString(dev.ninfenz.mobile.R.string.delivery_macro_failed, "缺少 markdown/spec/plan")))
+                                                } else {
+                                                    val response = safeCall("validate", buildJsonObject {
+                                                        put("markdown", md)
+                                                        put("spec", spec)
+                                                        put("plan", raw)
+                                                        put("level", "L1")
+                                                    })
+                                                    if (response.ok) Result.success("validated")
+                                                    else Result.failure(IllegalStateException(response.error?.message ?: "validate failed"))
+                                                }
+                                            }
+                                            else -> Result.failure(
+                                                IllegalStateException(
+                                                    context.getString(dev.ninfenz.mobile.R.string.delivery_macro_unwired, action)
+                                                )
+                                            )
+                                        }
+                                    }
+                                }
+                                showMacros = false
+                            }
+                        }) { Text(macro.title.ifBlank { macro.id }) }
+                    }
+                    macroResult?.let { run ->
+                        Text(
+                            stringResource(dev.ninfenz.mobile.R.string.delivery_macro_done, run.status, run.failures),
+                            style = NfType.meta,
+                            color = if (run.failures == 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                        )
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { showMacros = false }) { Text(stringResource(android.R.string.cancel)) } }
         )
     }
 

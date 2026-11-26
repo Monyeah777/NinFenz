@@ -1472,6 +1472,11 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="delivery_compare">Compare</string>
     <string name="delivery_sources_appendix">Append sources</string>
     <string name="delivery_fidelity">Fidelity check</string>
+    <string name="delivery_run_macro">Run macro</string>
+    <string name="delivery_macro_none">No macros yet; import one in Settings.</string>
+    <string name="delivery_macro_done">Macro %1$s · %2$d failed</string>
+    <string name="delivery_macro_unwired">Action not wired: %1$s</string>
+    <string name="delivery_macro_failed">Macro step failed: %1$s</string>
     <string name="delivery_fidelity_score">%1$d%% match · %2$d/%3$d sections</string>
     <string name="delivery_fidelity_missing">Missing: %1$s</string>
     <string name="delivery_fidelity_extra">Extra: %1$s</string>
