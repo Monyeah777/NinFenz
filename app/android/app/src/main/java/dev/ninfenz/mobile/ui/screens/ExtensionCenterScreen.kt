@@ -23,8 +23,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.res.stringResource
 import dev.ninfenz.mobile.R
 import dev.ninfenz.mobile.core.ModelException
@@ -39,19 +41,24 @@ import dev.ninfenz.mobile.ui.design.NfType
 import dev.ninfenz.mobile.ui.safeCall
 import dev.ninfenz.mobile.ui.theme.NfSpacing
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 
 /** 本地声明式扩展中心：导入、启停、删除；不执行扩展代码。 */
 @Composable
 fun ExtensionCenterScreen(onBack: () -> Unit) {
     val context = LocalContext.current
+    val clipboard = LocalClipboardManager.current
     val scope = rememberCoroutineScope()
     val store = remember { ExtensionStore(context.filesDir) }
     val trustStore = remember { ExtensionTrustStore(context.filesDir) }
     var trustNonce by remember { mutableStateOf(0) }
     var items by remember { mutableStateOf(store.load()) }
     var error by remember { mutableStateOf<String?>(null) }
+    var trustNote by remember { mutableStateOf<String?>(null) }
     var busy by remember { mutableStateOf(false) }
 
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
@@ -65,6 +72,23 @@ fun ExtensionCenterScreen(onBack: () -> Unit) {
                 items = store.load()
             } catch (e: Exception) {
                 error = (e as? ModelException)?.message ?: (e.message ?: e.javaClass.simpleName)
+            } finally {
+                busy = false
+            }
+        }
+    }
+
+    val trustPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        scope.launch {
+            busy = true
+            try {
+                trustStore.importJson(FileAccess.readText(context, uri))
+                trustNonce += 1
+                trustNote = context.getString(R.string.extensions_trust_imported)
+                error = null
+            } catch (e: Exception) {
+                error = context.getString(R.string.extensions_trust_invalid, e.message ?: e.javaClass.simpleName)
             } finally {
                 busy = false
             }
@@ -87,6 +111,21 @@ fun ExtensionCenterScreen(onBack: () -> Unit) {
                 }
             }) { Text(stringResource(R.string.extensions_load_starter)) }
         }
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+            TextButton(enabled = !busy, onClick = {
+                clipboard.setText(AnnotatedString(trustStore.exportJson()))
+                trustNote = context.getString(R.string.extensions_trust_exported)
+            }) { Text(stringResource(R.string.extensions_trust_export)) }
+            TextButton(enabled = !busy, onClick = { trustPicker.launch(arrayOf("application/json", "text/plain")) }) {
+                Text(stringResource(R.string.extensions_trust_import))
+            }
+            TextButton(enabled = !busy, onClick = {
+                trustStore.revokeAll()
+                trustNonce += 1
+                trustNote = context.getString(R.string.extensions_trust_revoked_all)
+            }) { Text(stringResource(R.string.extensions_trust_revoke_all)) }
+        }
+        trustNote?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary) }
         error?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.error) }
         if (items.isEmpty()) {
             EmptyState(stringResource(R.string.extensions_empty))
@@ -94,7 +133,8 @@ fun ExtensionCenterScreen(onBack: () -> Unit) {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                 items(items, key = { it.id }) { ext ->
                     val digest = store.manifestDigest(ext.id)
-                    val trusted = trustNonce.let { digest != null && trustStore.isTrusted(ext.id, digest) }
+                    val trustedEntry = trustNonce.let { trustStore.entry(ext.id) }
+                    val trusted = digest != null && trustedEntry?.digest == digest
                     CardBox(title = ext.id) {
                         Text(ext.type, style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Text(
@@ -110,6 +150,13 @@ fun ExtensionCenterScreen(onBack: () -> Unit) {
                                         Text(stringResource(R.string.extensions_trust_revoke))
                                     }
                                 }
+                                trustedEntry?.fingerprint?.takeIf { it.isNotBlank() }?.let { fingerprint ->
+                                    Text(
+                                        stringResource(R.string.extensions_trust_fingerprint, fingerprint.take(16)),
+                                        style = NfType.meta,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
                             } else {
                                 TextButton(onClick = {
                                     scope.launch {
@@ -122,7 +169,11 @@ fun ExtensionCenterScreen(onBack: () -> Unit) {
                                                 put("strict", true)
                                             })
                                             if (response.ok) {
-                                                trustStore.trust(ext.id, digestNow)
+                                                val fingerprint = runCatching {
+                                                    Json.parseToJsonElement(raw).jsonObject["signature"]
+                                                        ?.jsonObject?.get("public_key")?.jsonPrimitive?.content
+                                                }.getOrNull()?.let { ExtensionTrustStore.fingerprint(it) }.orEmpty()
+                                                trustStore.trust(ext.id, digestNow, fingerprint)
                                                 trustNonce++
                                             } else {
                                                 error = response.error?.message ?: context.getString(R.string.extensions_verify_failed)

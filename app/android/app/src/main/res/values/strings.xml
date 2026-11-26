@@ -1429,6 +1429,14 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="extensions_trust">验证并信任</string>
     <string name="extensions_trusted">已信任签名</string>
     <string name="extensions_trust_revoke">撤销信任</string>
+    <string name="extensions_trust_fingerprint">公钥指纹 %1$s</string>
+    <string name="extensions_trust_export">导出信任台账</string>
+    <string name="extensions_trust_import">导入信任台账</string>
+    <string name="extensions_trust_exported">信任台账已复制</string>
+    <string name="extensions_trust_imported">信任台账已导入</string>
+    <string name="extensions_trust_revoke_all">撤销全部</string>
+    <string name="extensions_trust_revoked_all">已撤销全部信任</string>
+    <string name="extensions_trust_invalid">信任台账非法：%1$s</string>
     <string name="extensions_verify_failed">签名验证失败</string>
     <string name="delivery_preflight">预检配置</string>
     <string name="delivery_preflight_default">默认全检</string>

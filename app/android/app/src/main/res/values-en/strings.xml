@@ -1433,6 +1433,14 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="extensions_trust">Verify and trust</string>
     <string name="extensions_trusted">Signature trusted</string>
     <string name="extensions_trust_revoke">Revoke trust</string>
+    <string name="extensions_trust_fingerprint">Key fingerprint %1$s</string>
+    <string name="extensions_trust_export">Export trust ledger</string>
+    <string name="extensions_trust_import">Import trust ledger</string>
+    <string name="extensions_trust_exported">Trust ledger copied</string>
+    <string name="extensions_trust_imported">Trust ledger imported</string>
+    <string name="extensions_trust_revoke_all">Revoke all</string>
+    <string name="extensions_trust_revoked_all">All trust revoked</string>
+    <string name="extensions_trust_invalid">Invalid trust ledger: %1$s</string>
     <string name="extensions_verify_failed">Signature verification failed</string>
     <string name="delivery_preflight">Preflight profile</string>
     <string name="delivery_preflight_default">Default checks</string>
