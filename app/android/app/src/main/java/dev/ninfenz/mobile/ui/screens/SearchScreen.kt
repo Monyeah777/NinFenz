@@ -44,6 +44,8 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import dev.ninfenz.mobile.data.Capability
+import dev.ninfenz.mobile.data.CapabilityRegistry
 import dev.ninfenz.mobile.data.LibraryMetaStore
 import dev.ninfenz.mobile.data.ProjectEntry
 import dev.ninfenz.mobile.data.SearchHit
@@ -55,6 +57,7 @@ import dev.ninfenz.mobile.data.SearchKind
 import dev.ninfenz.mobile.model.SearchFilter
 import dev.ninfenz.mobile.model.SearchKeyboard
 import dev.ninfenz.mobile.ui.components.NfTopAppBar
+import dev.ninfenz.mobile.ui.rememberCapabilityRevision
 import dev.ninfenz.mobile.ui.theme.NfSpacing
 import dev.ninfenz.mobile.ui.design.NfType
 import kotlinx.coroutines.Dispatchers
@@ -70,6 +73,18 @@ fun SearchScreen(
     projects: List<ProjectEntry> = emptyList()
 ) {
     val context = LocalContext.current
+    val capabilityRevision = rememberCapabilityRevision()
+    if (capabilityRevision >= 0 && !CapabilityRegistry.isEnabled(Capability.SEARCH)) {
+        Column(Modifier.fillMaxSize()) {
+            NfTopAppBar(title = stringResource(dev.ninfenz.mobile.R.string.search_title), onBack = onBack)
+            Text(
+                stringResource(dev.ninfenz.mobile.R.string.search_module_disabled),
+                modifier = Modifier.padding(NfSpacing.page),
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        return
+    }
     val index = remember { SearchIndex(context.filesDir) }
     val fts = remember { SearchIndexStore(context) }
     var all by remember { mutableStateOf<List<SearchHit>>(emptyList()) }

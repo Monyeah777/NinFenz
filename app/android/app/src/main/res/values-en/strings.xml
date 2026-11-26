@@ -1352,6 +1352,8 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="author_retry_save">Retry save</string>
     <string name="search_clear_filters">Clear filters</string>
     <string name="search_show_more">Show more (%1$d remaining)</string>
+    <string name="search_module_disabled">Search module is off. Enable it in Settings.</string>
+    <string name="merge_module_disabled">Merge module is off. Enable it in Settings.</string>
     <string name="settings_backup_empty">No backups yet; create one first.</string>
     <string name="delivery_done_title">Export complete</string>
     <string name="delivery_done_body">The file is ready; return to the project or share/open it above.</string>

@@ -33,11 +33,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.R
 import dev.ninfenz.mobile.core.J
+import dev.ninfenz.mobile.data.Capability
+import dev.ninfenz.mobile.data.CapabilityRegistry
 import dev.ninfenz.mobile.model.NfDoc
 import dev.ninfenz.mobile.model.NfDocMerger
 import dev.ninfenz.mobile.model.NfDocModel
 import dev.ninfenz.mobile.share.ShareExporter
 import dev.ninfenz.mobile.ui.components.NfTopAppBar
+import dev.ninfenz.mobile.ui.rememberCapabilityRevision
 import dev.ninfenz.mobile.ui.theme.NfSpacing
 import java.io.File
 import kotlinx.coroutines.Dispatchers
@@ -47,6 +50,18 @@ import kotlinx.coroutines.withContext
 @Composable
 fun NfDocMergeScreen(filesDir: File, onBack: () -> Unit) {
     val context = LocalContext.current
+    val capabilityRevision = rememberCapabilityRevision()
+    if (capabilityRevision >= 0 && !CapabilityRegistry.isEnabled(Capability.MERGE)) {
+        Column(Modifier.fillMaxSize()) {
+            NfTopAppBar(title = stringResource(R.string.nfdoc_merge_title), onBack = onBack)
+            Text(
+                stringResource(R.string.merge_module_disabled),
+                modifier = Modifier.padding(NfSpacing.page),
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        return
+    }
     val mergedTitle = stringResource(R.string.nfdoc_merged_title)
     val scope = rememberCoroutineScope()
     val outDir = remember(filesDir) { File(File(filesDir, "exports"), "delivery").apply { mkdirs() } }
