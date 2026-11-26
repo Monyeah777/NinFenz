@@ -1350,4 +1350,6 @@ MIT License · See app/docs/LEGAL.md···⟧</string>
     <string name="settings_workspace_title">⟦Workspace presets···⟧</string>
     <string name="settings_workspace_empty">⟦Enable an extension with a workspace_preset to see it here.···⟧</string>
     <string name="settings_workspace_apply">⟦Apply···⟧</string>
+    <string name="import_recipes">⟦Recipes···⟧</string>
+    <string name="import_recipe_applied">⟦Applied import recipe: %1$s···⟧</string>
 </resources>

@@ -65,6 +65,7 @@ import dev.ninfenz.mobile.data.HtmlImporter
 import dev.ninfenz.mobile.data.ProjectPackageImporter
 import dev.ninfenz.mobile.data.TextEncoding
 import dev.ninfenz.mobile.data.ShareQueueStore
+import dev.ninfenz.mobile.data.ExtensionStore
 import dev.ninfenz.mobile.data.FileAccess
 import dev.ninfenz.mobile.data.ImportDraftStore
 import dev.ninfenz.mobile.data.ZeroSliceReport
@@ -176,6 +177,8 @@ fun ImportScreen(
     var pendingDeleteTemplate by remember { mutableStateOf<File?>(null) }
     var importPreviewText by remember { mutableStateOf<String?>(null) }
     var promptProfile by remember { mutableStateOf(PromptProfile.GENERIC) }
+    val extensionStore = remember { ExtensionStore(context.filesDir) }
+    val importRecipes = remember { extensionStore.contributions(setOf("import_recipe")) }
     var drafts by remember { mutableStateOf(DraftLibrary.list(context.filesDir)) }
     var recentImports by remember { mutableStateOf(importHistory.recent()) }
     var pendingDeleteDraft by remember { mutableStateOf<File?>(null) }
@@ -1153,6 +1156,21 @@ fun ImportScreen(
                                 )
                                 TextButton(onClick = { importPreviewText = current.text }) {
                                     Text(stringResource(dev.ninfenz.mobile.R.string.import_preview_ready))
+                                }
+                                if (importRecipes.isNotEmpty()) {
+                                    Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
+                                        Text(stringResource(dev.ninfenz.mobile.R.string.import_recipes), style = NfType.meta, modifier = Modifier.padding(end = 8.dp))
+                                        importRecipes.forEach { recipe ->
+                                            val profile = recipe.config["prompt_profile"]?.toString()?.trim('"')
+                                                ?.let { name -> PromptProfile.entries.firstOrNull { it.name.equals(name, true) } }
+                                            val low = recipe.config["low_confidence_only"]?.toString()?.toBooleanStrictOrNull() ?: false
+                                            TextButton(onClick = {
+                                                profile?.let { promptProfile = it }
+                                                lowConfidenceOnly = low
+                                                notice = context.getString(dev.ninfenz.mobile.R.string.import_recipe_applied, recipe.id)
+                                            }) { Text(recipe.id) }
+                                        }
+                                    }
                                 }
                                 TextButton(onClick = {
                                     promptProfile = PromptProfile.entries[(promptProfile.ordinal + 1) % PromptProfile.entries.size]
