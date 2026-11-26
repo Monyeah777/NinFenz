@@ -677,6 +677,21 @@
       "code": "NF-PREF-002", "severity": "error", "exit": 3,
       "message": "本地设置值越界（如字号不在 80–200）",
       "fix": "改回允许区间后重试"
+    },
+    {
+      "code": "NF-CON-001", "severity": "error", "exit": 1,
+      "message": "合同 IR 非法或编译输入不完整",
+      "fix": "按报告 path 修 spec/protocol"
+    },
+    {
+      "code": "NF-CON-002", "severity": "error", "exit": 1,
+      "message": "合同不可满足或槽位约束不通过",
+      "fix": "按 issues 填槽或改约束"
+    },
+    {
+      "code": "NF-CON-003", "severity": "error", "exit": 1,
+      "message": "合同反编译歧义/样本不足",
+      "fix": "补样稿或逐条处理歧义清单"
     }
   ]
 }

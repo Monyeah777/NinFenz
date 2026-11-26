@@ -580,6 +580,26 @@
       "schema": "nf-validation-policy",
       "violated": "block_export 必须是 boolean",
       "codes": ["NF-PREF-001"]
+    },
+    "invalid/nf-contract-ir/inv-version.json": {
+      "schema": "nf-contract-ir",
+      "violated": "contract_version 必须是 1",
+      "codes": ["NF-CON-001"]
+    },
+    "invalid/nf-contract-ir/inv-type.json": {
+      "schema": "nf-contract-ir",
+      "violated": "slot.type 不在允许类型",
+      "codes": ["NF-CON-001"]
+    },
+    "invalid/nf-contract-result/inv-sat.json": {
+      "schema": "nf-contract-result",
+      "violated": "satisfiable 必须是 boolean",
+      "codes": ["NF-CON-002"]
+    },
+    "invalid/nf-contract-result/inv-issue.json": {
+      "schema": "nf-contract-result",
+      "violated": "issue 缺 code/message/fix",
+      "codes": ["NF-CON-002"]
     }
   }
 }

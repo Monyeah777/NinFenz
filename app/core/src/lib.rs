@@ -6,6 +6,7 @@ pub mod backup;
 pub mod audit;
 pub mod budget;
 pub mod build;
+pub mod contract;
 pub mod canonical;
 pub mod claim;
 pub mod compose;

@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/app/schema/nf-contract-ir.schema.json",
+  "title": "NF 合同 IR（nf-contract-ir/1）",
+  "description": "由 nf-md-spec/1 与可选 nf-protocol-pack/1 编译出的槽位/类型/约束/依赖图；digest 为去掉 digest 后的 canonical 摘要。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "contract_version", "source", "slots", "graph", "digest"],
+  "properties": {
+    "schema": { "const": "nf-contract-ir/1" },
+    "contract_version": { "const": 1 },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["spec_digest"],
+      "properties": {
+        "spec_digest": { "$ref": "#/$defs/digest" },
+        "protocol_digest": { "$ref": "#/$defs/digest" }
+      }
+    },
+    "slots": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/slot" }
+    },
+    "graph": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["edges"],
+      "properties": {
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["from", "to", "kind"],
+            "properties": {
+              "from": { "type": "string", "minLength": 1 },
+              "to": { "type": "string", "minLength": 1 },
+              "kind": { "enum": ["depends_on", "visible_if", "cross_field"] }
+            }
+          }
+        }
+      }
+    },
+    "digest": { "$ref": "#/$defs/digest" }
+  },
+  "$defs": {
+    "digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "slot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "required", "section", "label", "constraints"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^SLT-[0-9]{2,3}$" },
+        "type": { "enum": ["string", "int", "decimal", "date", "enum", "list", "table", "ref"] },
+        "required": { "type": "boolean" },
+        "section": { "type": "string", "pattern": "^SEC-[0-9]{2}$" },
+        "label": { "type": "string", "minLength": 1 },
+        "constraints": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/constraint" }
+        },
+        "enum_values": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "protocol_field": { "type": "string", "pattern": "^F-[0-9]{3}$" },
+        "default": { "type": "string" },
+        "depends_on": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^SLT-[0-9]{2,3}$" }
+        }
+      }
+    },
+    "constraint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["op"],
+      "properties": {
+        "op": {
+          "enum": ["required", "enum", "min", "max", "len", "pattern", "equals", "sum", "one_of", "unique", "depends_on", "cross_field"]
+        },
+        "value": {
+          "oneOf": [
+            { "type": "integer" },
+            { "type": "string" }
+          ]
+        },
+        "ref": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

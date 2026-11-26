@@ -59,7 +59,7 @@ pub fn help_text() -> &'static str {
           pack-update pack-release-create pack-release-verify pack-release-freeze\n\
           overlay-apply ccos-build-task ccos-import-result project-validate\n\
           layout-import sdir-import sdir-validate sdir-diff sdir-merge sdir-repair\n\
-          build-plan build-run build-incremental block-plan block-incremental\n\
+          contract-compile contract-solve contract-explain\n          build-plan build-run build-incremental block-plan block-incremental\n\
           graph-typecheck schema-induce sdir-fuse template-induce template-migrate compose-run\n\
           evidence-create evidence-verify evidence-pack evidence-verify-package evidence-freeze evidence-keygen\n\
           plan-solve plan-explain reuse-index reuse-impact\n\

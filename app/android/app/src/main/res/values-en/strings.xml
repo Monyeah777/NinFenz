@@ -1396,6 +1396,9 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="author_graph_snapshot_meta">%1$d nodes · %2$d edges</string>
     <string name="author_graph_snapshot_saved">Graph snapshot saved</string>
     <string name="author_graph_snapshot_restored">Graph snapshot restored</string>
+    <string name="author_contract">Contract</string>
+    <string name="author_contract_done">Contract compiled: %1$d slots</string>
+    <string name="author_contract_failed">Contract compile failed: %1$s</string>
     <string name="inbox_select">Select</string>
     <string name="inbox_select_all">Select all</string>
     <string name="inbox_select_none">Clear selection</string>

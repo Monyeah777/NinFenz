@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/app/schema/nf-contract-result.schema.json",
+  "title": "NF 合同求解结果（nf-contract-result/1）",
+  "description": "只做校验/默认值/有限域提示，不生成自由文本。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "contract_digest", "satisfiable", "assignments", "issues", "unsat_core"],
+  "properties": {
+    "schema": { "const": "nf-contract-result/1" },
+    "contract_digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "satisfiable": { "type": "boolean" },
+    "assignments": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["slot", "code", "message", "fix"],
+        "properties": {
+          "slot": { "type": "string" },
+          "code": { "type": "string", "pattern": "^NF-CON-[0-9]{3}$" },
+          "message": { "type": "string", "minLength": 1 },
+          "fix": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "unsat_core": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}

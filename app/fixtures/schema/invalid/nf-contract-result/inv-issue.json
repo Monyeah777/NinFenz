@@ -1,0 +1,10 @@
+{
+  "schema": "nf-contract-result/1",
+  "contract_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "satisfiable": false,
+  "assignments": { "SLT-01": "" },
+  "issues": [ { "slot": "SLT-01" },
+    { "slot": "SLT-01", "code": "NF-CON-002", "message": "必填槽位为空", "fix": "填写 SLT-01" }
+  ],
+  "unsat_core": [ "SLT-01" ]
+}

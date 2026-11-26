@@ -30,6 +30,8 @@
 | `nf-workflow.schema.json` | `nf-workflow/1` | 工作流预设（只改视图与默认值） |
 | `nf-action-policy.schema.json` | `nf-action-policy/1` | 动作策略（AI/合并/Pack/宏） |
 | `nf-validation-policy.schema.json` | `nf-validation-policy/1` | 校验策略（off/on_demand/delivery/strict） |
+| `nf-contract-ir.schema.json` | `nf-contract-ir/1` | 合同 IR（槽位/类型/约束/依赖图/digest） |
+| `nf-contract-result.schema.json` | `nf-contract-result/1` | 合同求解结果（assignments/issues/unsat_core） |
 | `limits.json` | `nf-app-limits/1` | 解析/解包上限（实现必须读取，不得散落字面量） |
 | `error_codes.json` | `nf-app-error-codes/1` | 错误码登记（code/severity/exit/message/fix） |
 

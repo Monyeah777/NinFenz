@@ -58,6 +58,7 @@ import dev.ninfenz.mobile.core.CoreResponse
 import dev.ninfenz.mobile.core.J
 import dev.ninfenz.mobile.data.AuthorArtifactStore
 import dev.ninfenz.mobile.data.ExtensionStore
+import dev.ninfenz.mobile.data.ContractIrStore
 import dev.ninfenz.mobile.data.GraphSnapshotStore
 import dev.ninfenz.mobile.data.SpecSnapshotStore
 import dev.ninfenz.mobile.data.AuthorArtifacts
@@ -960,6 +961,8 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
     val store = remember { AuthorArtifactStore(context.filesDir) }
     val snippets = remember { ExtensionStore(context.filesDir).contributions(setOf("spec_snippet")) }
     val snapshotStore = remember { SpecSnapshotStore(context.filesDir, project.id) }
+    val contractStore = remember { ContractIrStore(context.filesDir, project.id) }
+    var contractNote by remember { mutableStateOf<String?>(null) }
     var snapshots by remember { mutableStateOf(snapshotStore.list()) }
     var showSnapshots by remember { mutableStateOf(false) }
     var snapshotNote by remember { mutableStateOf<String?>(null) }
@@ -996,8 +999,28 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
             TextButton(onClick = { snapshots = snapshotStore.list(); showSnapshots = true }) {
                 Text(stringResource(dev.ninfenz.mobile.R.string.author_snapshot))
             }
+            TextButton(enabled = !busy, onClick = {
+                scope.launch {
+                    busy = true
+                    contractStore.compile(artifacts.specJson, artifacts.protocolJson)
+                        .onSuccess { compiled ->
+                            val slots = compiled.contract["slots"]?.let { element ->
+                                (element as? kotlinx.serialization.json.JsonArray)?.size ?: 0
+                            } ?: 0
+                            contractNote = context.getString(dev.ninfenz.mobile.R.string.author_contract_done, slots)
+                        }
+                        .onFailure {
+                            contractNote = context.getString(
+                                dev.ninfenz.mobile.R.string.author_contract_failed,
+                                it.message ?: it.javaClass.simpleName
+                            )
+                        }
+                    busy = false
+                }
+            }) { Text(stringResource(dev.ninfenz.mobile.R.string.author_contract)) }
         }
         snapshotNote?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
+        contractNote?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
         snippetNote?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
         for (section in spec.sections) {
             NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {

@@ -1,0 +1,17 @@
+{
+  "schema": "nf-contract-ir/1",
+  "contract_version": 1,
+  "source": { "spec_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" },
+  "slots": [
+    {
+      "id": "SLT-01",
+      "type": "string",
+      "required": true,
+      "section": "SEC-01",
+      "label": "标题",
+      "constraints": [ { "op": "required" }, { "op": "max", "value": 80 } ]
+    }
+  ],
+  "graph": { "edges": [] },
+  "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+}

@@ -1392,6 +1392,9 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="author_graph_snapshot_meta">%1$d 节点 · %2$d 边</string>
     <string name="author_graph_snapshot_saved">已保存管线快照</string>
     <string name="author_graph_snapshot_restored">已恢复管线快照</string>
+    <string name="author_contract">合同</string>
+    <string name="author_contract_done">合同已编译：%1$d 个槽位</string>
+    <string name="author_contract_failed">合同编译失败：%1$s</string>
     <string name="inbox_select">选择</string>
     <string name="inbox_select_all">全选</string>
     <string name="inbox_select_none">取消全选</string>
