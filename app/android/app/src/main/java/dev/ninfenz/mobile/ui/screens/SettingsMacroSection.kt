@@ -229,6 +229,24 @@ fun SettingsMacroSection() {
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
+                    TextButton(onClick = {
+                        scope.launch {
+                            val plan = store.plan(macro.json).getOrNull()
+                            if (plan == null) {
+                                note = context.getString(R.string.settings_macros_failed, "plan failed")
+                            } else {
+                                runCatching { store.saveBound(macro, MacroRunner.bind(macro.json, paramValues)) }
+                                    .onSuccess {
+                                        items = store.list()
+                                        note = context.getString(R.string.settings_macros_saved_copy)
+                                    }
+                                    .onFailure {
+                                        note = context.getString(R.string.settings_macros_failed, it.message ?: it.javaClass.simpleName)
+                                    }
+                            }
+                            paramMacro = null
+                        }
+                    }) { Text(stringResource(R.string.settings_macros_save_copy)) }
                 }
             },
             confirmButton = {

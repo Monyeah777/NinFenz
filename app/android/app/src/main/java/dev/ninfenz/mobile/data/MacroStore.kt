@@ -7,6 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
@@ -40,6 +41,18 @@ class MacroStore(private val filesDir: File) {
         val safe = id.replace(Regex("[^A-Za-z0-9._-]"), "_")
         AtomicFiles.writeText(File(dir(), safe + ".json"), json.toString())
         return Macro(id, json["title"]?.jsonPrimitive?.content.orEmpty(), json["steps"]?.jsonArray?.size ?: 0, json)
+    }
+
+    /** 保存参数化副本；id/title 加后缀，避免覆盖原宏。 */
+    fun saveBound(base: Macro, bound: JsonObject): Macro {
+        val suffix = "_p" + System.currentTimeMillis().toString().takeLast(6)
+        val copy = JsonObject(
+            bound + mapOf(
+                "id" to JsonPrimitive(base.id + suffix),
+                "title" to JsonPrimitive(base.title.ifBlank { base.id } + " (params)")
+            )
+        )
+        return save(copy)
     }
 
     fun delete(id: String) {

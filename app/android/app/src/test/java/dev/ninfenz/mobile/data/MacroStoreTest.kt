@@ -29,7 +29,13 @@ class MacroStoreTest {
         store.save(macro)
         assertEquals(1, store.list().size)
         assertEquals(2, store.list().first().steps)
+        val base = store.save(macro)
+        val bound = store.saveBound(base, macro)
+        assertEquals(2, store.list().size)
+        assertTrue(bound.id.startsWith("demo_p"))
+        assertTrue(bound.title.contains("params"))
         store.delete("demo")
+        store.delete(bound.id)
         assertTrue(store.list().isEmpty())
     }
 }
