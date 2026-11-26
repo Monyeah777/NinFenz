@@ -1354,4 +1354,7 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="library_view_saved">已保存视图</string>
     <string name="import_mapping_threshold">自动采纳阈值 ≥ %1$d%%</string>
     <string name="import_slice_min_chars">最小章节字数：%1$d</string>
+    <string name="import_recent_filter">筛选最近导入</string>
+    <string name="import_recent_all">显示全部</string>
+    <string name="import_recent_less">收起</string>
 </resources>

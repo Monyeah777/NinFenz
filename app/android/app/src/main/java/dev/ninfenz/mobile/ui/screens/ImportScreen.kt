@@ -44,6 +44,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -184,6 +185,8 @@ fun ImportScreen(
     val importRecipes = remember { extensionStore.contributions(setOf("import_recipe")) }
     var drafts by remember { mutableStateOf(DraftLibrary.list(context.filesDir)) }
     var recentImports by remember { mutableStateOf(importHistory.recent()) }
+    var historyQuery by rememberSaveable { mutableStateOf("") }
+    var historyShowAll by rememberSaveable { mutableStateOf(false) }
     var pendingDeleteDraft by remember { mutableStateOf<File?>(null) }
     var convertDraft by remember { mutableStateOf<File?>(null) }
     var renameDraft by remember { mutableStateOf<File?>(null) }
@@ -1540,7 +1543,18 @@ fun ImportScreen(
                     item {
                         NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
                             Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
-                                recentImports.take(5).forEach { entry ->
+                                OutlinedTextField(
+                                    value = historyQuery,
+                                    onValueChange = { historyQuery = it },
+                                    label = { Text(stringResource(dev.ninfenz.mobile.R.string.import_recent_filter)) },
+                                    singleLine = true,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                                val visibleHistory = recentImports.filter {
+                                    historyQuery.isBlank() || it.name.contains(historyQuery, true) || it.digest.contains(historyQuery, true)
+                                }
+                                val shownHistory = if (historyShowAll) visibleHistory else visibleHistory.take(5)
+                                shownHistory.forEach { entry ->
                                     val matched = DraftLibrary.findByDigest(context.filesDir, entry.digest)
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Text(
@@ -1576,6 +1590,11 @@ fun ImportScreen(
                                         } else {
                                             Text(stringResource(dev.ninfenz.mobile.R.string.import_draft_missing), style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                         }
+                                    }
+                                }
+                                if (visibleHistory.size > 5) {
+                                    TextButton(onClick = { historyShowAll = !historyShowAll }) {
+                                        Text(stringResource(if (historyShowAll) dev.ninfenz.mobile.R.string.import_recent_less else dev.ninfenz.mobile.R.string.import_recent_all))
                                     }
                                 }
                                 TextButton(onClick = {
