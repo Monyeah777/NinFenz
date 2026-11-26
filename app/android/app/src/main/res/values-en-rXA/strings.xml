@@ -1392,4 +1392,9 @@ MIT License · See app/docs/LEGAL.md···⟧</string>
     <string name="inbox_select_all">⟦Select all···⟧</string>
     <string name="inbox_select_none">⟦Clear selection···⟧</string>
     <string name="inbox_delete_selected">⟦Delete selected···⟧</string>
+    <string name="library_bulk_select">⟦Select···⟧</string>
+    <string name="library_bulk_cancel">⟦Exit selection···⟧</string>
+    <string name="library_bulk_favorite">⟦Favorite / unfavorite···⟧</string>
+    <string name="library_bulk_archive">⟦Archive selected···⟧</string>
+    <string name="library_bulk_selected">⟦%1$d selected···⟧</string>
 </resources>

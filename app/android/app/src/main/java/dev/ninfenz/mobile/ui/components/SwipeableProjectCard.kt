@@ -25,6 +25,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -71,7 +72,9 @@ fun SwipeableProjectCard(
     onOpen: () -> Unit,
     onFlow: () -> Unit,
     onDelete: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    selectable: Boolean = false,
+    selected: Boolean = false
 ) {
     var expanded by remember(entry.project.id) { mutableStateOf(false) }
     var visible by remember(entry.project.id) { mutableStateOf(false) }
@@ -194,6 +197,9 @@ fun SwipeableProjectCard(
                                     .clickable { onOpen() },
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
+                                if (selectable) {
+                                    Checkbox(checked = selected, onCheckedChange = { onOpen() })
+                                }
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(
                                         entry.project.title,

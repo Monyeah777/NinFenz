@@ -70,6 +70,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -186,13 +187,16 @@ fun LibraryHomeScreen(
     var showSaveView by remember { mutableStateOf(false) }
     var viewName by rememberSaveable { mutableStateOf("") }
     val metaStore = remember(viewFilesDir) { viewFilesDir?.let { LibraryMetaStore(it) } }
-    val favoriteIds = remember(projects) { metaStore?.favorites() ?: emptySet() }
+    var metaVersion by remember { mutableIntStateOf(0) }
+    val favoriteIds = remember(projects, metaVersion) { metaStore?.favorites() ?: emptySet() }
     val allTags = remember(projects) { metaStore?.allTags() ?: emptySet() }
     var tagFilter by rememberSaveable { mutableStateOf<String?>(null) }
     var sortName by rememberSaveable { mutableStateOf(savedView?.sort ?: ProjectSort.RECENT.name) }
     var sortMenuOpen by remember { mutableStateOf(false) }
     var projectsExpanded by rememberSaveable { mutableStateOf(true) }
     var groupMode by rememberSaveable { mutableStateOf("none") }
+    var selectionMode by rememberSaveable { mutableStateOf(false) }
+    var selectedIds by remember { mutableStateOf<Set<String>>(emptySet()) }
     val recentStore = remember(viewFilesDir) { viewFilesDir?.let { RecentProjectStore(it) } }
     var recentIds by remember { mutableStateOf(recentStore?.load() ?: emptyList()) }
     LaunchedEffect(statusFilter, sortName) {
@@ -516,6 +520,12 @@ fun LibraryHomeScreen(
                     NfSectionHeader(
                         stringResource(dev.ninfenz.mobile.R.string.library_section_projects),
                         action = {
+                            TextButton(onClick = {
+                                selectionMode = !selectionMode
+                                if (!selectionMode) selectedIds = emptySet()
+                            }) {
+                                Text(stringResource(if (selectionMode) dev.ninfenz.mobile.R.string.library_bulk_cancel else dev.ninfenz.mobile.R.string.library_bulk_select))
+                            }
                             IconButton(
                                 onClick = { projectsExpanded = !projectsExpanded },
                                 modifier = Modifier.size(48.dp)
@@ -548,6 +558,28 @@ fun LibraryHomeScreen(
                             modifier = Modifier.padding(horizontal = NfSpacing.page),
                             verticalArrangement = Arrangement.spacedBy(NfSpacing.l)
                         ) {
+                            if (selectionMode) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(
+                                        stringResource(dev.ninfenz.mobile.R.string.library_bulk_selected, selectedIds.size),
+                                        style = NfType.meta,
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                    TextButton(enabled = selectedIds.isNotEmpty(), onClick = {
+                                        selectedIds.forEach { metaStore?.toggle(it) }
+                                        metaVersion++
+                                    }) { Text(stringResource(dev.ninfenz.mobile.R.string.library_bulk_favorite)) }
+                                    TextButton(enabled = selectedIds.isNotEmpty(), onClick = {
+                                        val chosen = projects.filter { it.project.id in selectedIds }
+                                        snackbarScope.launch {
+                                            chosen.forEach { runCatching { ProjectArchiver.archive(it.file, context.filesDir) } }
+                                            selectedIds = emptySet()
+                                            selectionMode = false
+                                            onRefresh()
+                                        }
+                                    }) { Text(stringResource(dev.ninfenz.mobile.R.string.library_bulk_archive)) }
+                                }
+                            }
                             var renderIndex = 0
                             groupedProjects.forEach { (label, entries) ->
                                 if (groupMode != "none" && label.isNotBlank()) {
@@ -557,7 +589,15 @@ fun LibraryHomeScreen(
                                     SwipeableProjectCard(
                                         entry = entry,
                                         index = renderIndex++,
-                                        onOpen = { openWithPriority(entry) },
+                                        selectable = selectionMode,
+                                        selected = entry.project.id in selectedIds,
+                                        onOpen = {
+                                            if (selectionMode) {
+                                                selectedIds = if (entry.project.id in selectedIds) selectedIds - entry.project.id else selectedIds + entry.project.id
+                                            } else {
+                                                openWithPriority(entry)
+                                            }
+                                        },
                                         onFlow = { onOpenFlow(entry) },
                                         onDelete = {
                                             snackbarScope.launch {

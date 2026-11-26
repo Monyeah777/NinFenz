@@ -1388,4 +1388,9 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="inbox_select_all">全选</string>
     <string name="inbox_select_none">取消全选</string>
     <string name="inbox_delete_selected">删除选中</string>
+    <string name="library_bulk_select">选择</string>
+    <string name="library_bulk_cancel">退出选择</string>
+    <string name="library_bulk_favorite">收藏/取消收藏</string>
+    <string name="library_bulk_archive">归档选中</string>
+    <string name="library_bulk_selected">已选 %1$d</string>
 </resources>
