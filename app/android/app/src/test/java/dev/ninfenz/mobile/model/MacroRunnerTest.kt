@@ -39,6 +39,26 @@ class MacroRunnerTest {
     }
 
     @Test
+    fun bindsPlaceholdersInParams() {
+        val plan = buildJsonObject {
+            put("steps", buildJsonArray {
+                add(buildJsonObject {
+                    put("id", "S01")
+                    put("action", "export")
+                    put("params", buildJsonObject {
+                        put("title", "{{project}}")
+                        put("count", 1)
+                    })
+                })
+            })
+        }
+        val bound = MacroRunner.bind(plan, mapOf("project" to "Alpha"))
+        val text = bound.toString()
+        assertTrue(text.contains("Alpha"))
+        assertTrue(!text.contains("{{project}}"))
+    }
+
+    @Test
     fun batchIsolatesFailuresAcrossPlans() {
         val one = buildJsonObject {
             put("steps", buildJsonArray {

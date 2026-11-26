@@ -1,6 +1,9 @@
 package dev.ninfenz.mobile.model
 
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 
@@ -60,6 +63,23 @@ object MacroRunner {
             else -> "partial"
         }
         return MacroRunResult(status, results, failures)
+    }
+
+    /** 参数化：把字符串里的 {{key}} 替换为 values[key]，数组/对象递归。 */
+    fun bind(plan: JsonObject, values: Map<String, String>): JsonObject =
+        bindElement(plan, values) as JsonObject
+
+    private fun bindElement(element: JsonElement, values: Map<String, String>): JsonElement = when (element) {
+        is JsonObject -> JsonObject(element.mapValues { (_, value) -> bindElement(value, values) })
+        is JsonArray -> JsonArray(element.map { bindElement(it, values) })
+        is JsonPrimitive -> {
+            if (!element.isString) element
+            else {
+                var text = element.content
+                values.forEach { (key, value) -> text = text.replace("{{" + key + "}}", value) }
+                JsonPrimitive(text)
+            }
+        }
     }
 
     /** 批量重放：每个 plan 独立执行，失败不跨 plan 传播。 */
