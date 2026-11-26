@@ -1001,6 +1001,9 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
         }
     }
     var contractNote by remember { mutableStateOf<String?>(null) }
+    var contractJson by remember { mutableStateOf(contractStore.load()) }
+    var contractExplain by remember { mutableStateOf<List<String>>(emptyList()) }
+    var showContractExplain by remember { mutableStateOf(false) }
     var sources by remember { mutableStateOf(sourceStore.list()) }
     var showSources by remember { mutableStateOf(false) }
     var sourceNote by remember { mutableStateOf<String?>(null) }
@@ -1045,6 +1048,7 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
                     busy = true
                     contractStore.compile(artifacts.specJson, artifacts.protocolJson)
                         .onSuccess { compiled ->
+                            contractJson = compiled.contract
                             val slots = compiled.contract["slots"]?.let { element ->
                                 (element as? kotlinx.serialization.json.JsonArray)?.size ?: 0
                             } ?: 0
@@ -1059,6 +1063,31 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
                     busy = false
                 }
             }) { Text(stringResource(dev.ninfenz.mobile.R.string.author_contract)) }
+            if (capabilityRevision >= 0 && CapabilityRegistry.isEnabled(Capability.CONTRACT)) TextButton(enabled = !busy, onClick = {
+                scope.launch {
+                    busy = true
+                    val contract = contractJson ?: contractStore.load()
+                    if (contract == null) {
+                        contractNote = context.getString(dev.ninfenz.mobile.R.string.author_contract_missing)
+                    } else {
+                        val solved = safeCall("contract-solve", buildJsonObject { put("contract", contract) })
+                        val result = solved.resultObject()
+                        if (!solved.ok || result == null) {
+                            contractNote = context.getString(
+                                dev.ninfenz.mobile.R.string.author_contract_failed,
+                                solved.error?.message ?: "contract-solve failed"
+                            )
+                        } else {
+                            val explained = safeCall("contract-explain", buildJsonObject { put("result", result) })
+                            contractExplain = explained.resultObject()?.get("lines")?.jsonArray
+                                ?.map { it.jsonPrimitive.content }
+                                .orEmpty()
+                            showContractExplain = true
+                        }
+                    }
+                    busy = false
+                }
+            }) { Text(stringResource(dev.ninfenz.mobile.R.string.author_contract_solve)) }
             if (capabilityRevision >= 0 && CapabilityRegistry.isEnabled(Capability.SOURCES)) TextButton(onClick = {
                 sources = sourceStore.list()
                 showSources = true
@@ -1253,6 +1282,22 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
                 }
             },
             confirmButton = { TextButton(onClick = { showSnapshots = false }) { Text(stringResource(android.R.string.cancel)) } }
+        )
+    }
+
+    if (showContractExplain) {
+        AlertDialog(
+            onDismissRequest = { showContractExplain = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.author_contract_explain_title)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                    if (contractExplain.isEmpty()) {
+                        Text(stringResource(dev.ninfenz.mobile.R.string.author_contract_explain_empty), style = NfType.meta)
+                    }
+                    contractExplain.forEach { line -> Text(line, style = NfType.meta) }
+                }
+            },
+            confirmButton = { TextButton(onClick = { showContractExplain = false }) { Text(stringResource(android.R.string.ok)) } }
         )
     }
 

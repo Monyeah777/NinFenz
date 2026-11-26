@@ -1422,6 +1422,10 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="author_graph_snapshot_saved">Graph snapshot saved</string>
     <string name="author_graph_snapshot_restored">Graph snapshot restored</string>
     <string name="author_contract">Contract</string>
+    <string name="author_contract_solve">Solve contract</string>
+    <string name="author_contract_missing">No contract yet; compile first</string>
+    <string name="author_contract_explain_title">Contract explanation</string>
+    <string name="author_contract_explain_empty">No explanation lines</string>
     <string name="author_contract_done">Contract compiled: %1$d slots</string>
     <string name="author_contract_failed">Contract compile failed: %1$s</string>
     <string name="author_sources">Sources</string>
