@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/app/schema/nf-style-template.schema.json",
+  "title": "NF 样式模板（nf-style-template/1）",
+  "description": "从 DOCX/PDF 抽取的样式载体；首版保存 OOXML 片段与摘要，不声称语义完整。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "id", "name", "source_format", "styles_xml", "digest"],
+  "properties": {
+    "schema": { "const": "nf-style-template/1" },
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]{1,63}$" },
+    "name": { "type": "string", "minLength": 1 },
+    "source_format": { "enum": ["docx", "pdf"] },
+    "styles_xml": { "type": "string", "minLength": 1 },
+    "sect_pr": { "type": "string" },
+    "theme_xml": { "type": "string" },
+    "numbering_xml": { "type": "string" },
+    "digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+  }
+}

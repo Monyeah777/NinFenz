@@ -1526,6 +1526,14 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="settings_macros_delete">Delete</string>
     <string name="settings_macros_imported">Macro imported</string>
     <string name="settings_macros_steps">%1$d steps</string>
+    <string name="settings_styles_title">Style templates</string>
+    <string name="settings_styles_hint">Extract DOCX styles/sectPr/theme/numbering; this version stores OOXML fragments, not full semantic reverse.</string>
+    <string name="settings_styles_import">Import DOCX style</string>
+    <string name="settings_styles_empty">No style templates yet.</string>
+    <string name="settings_styles_meta">%1$s · %2$s</string>
+    <string name="settings_styles_delete">Delete</string>
+    <string name="settings_styles_imported">Style imported: %1$s</string>
+    <string name="settings_styles_failed">Style import failed: %1$s</string>
     <string name="settings_module_contract">Contract</string>
     <string name="settings_module_builddiag">Build diagnostics</string>
     <string name="settings_module_fragments">Fragments</string>

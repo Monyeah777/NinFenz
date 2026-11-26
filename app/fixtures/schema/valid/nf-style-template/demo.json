@@ -1,0 +1,8 @@
+{
+  "schema": "nf-style-template/1",
+  "id": "style-demo",
+  "name": "Demo",
+  "source_format": "docx",
+  "styles_xml": "<w:styles/>",
+  "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+}

@@ -690,6 +690,16 @@
       "schema": "nf-ai-run",
       "violated": "additionalProperties=false 拒绝 api_key",
       "codes": ["NF-AI-001"]
+    },
+    "invalid/nf-style-template/inv-format.json": {
+      "schema": "nf-style-template",
+      "violated": "source_format 只允许 docx/pdf",
+      "codes": ["NF-STY-001"]
+    },
+    "invalid/nf-style-template/inv-xml.json": {
+      "schema": "nf-style-template",
+      "violated": "styles_xml 不能为空",
+      "codes": ["NF-STY-001"]
     }
   }
 }
