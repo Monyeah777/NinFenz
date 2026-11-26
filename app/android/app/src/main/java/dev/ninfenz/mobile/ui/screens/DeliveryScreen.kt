@@ -1465,6 +1465,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                     attempt("nfdoc") { dev.ninfenz.mobile.data.NfDocExporter.export(md, project.title, project.id, dir).file }
                                 }
                                 batchFiles = files
+                                specMeta?.let { spec -> fidelityResult = FidelityReconciler.fromSpec(spec, md) }
                                 exportBatchNote = if (failures.isEmpty()) null else "未生成: " + failures.joinToString(",")
                                 exportedFile = files.firstOrNull()
                                 recordExport("batch", files.first(), null)
