@@ -1403,4 +1403,6 @@ MIT License · See app/docs/LEGAL.md···⟧</string>
     <string name="import_multi">⟦Batch import···⟧</string>
     <string name="import_multi_done">⟦Batch import done: %1$d succeeded, %2$d failed···⟧</string>
     <string name="review_checklist">⟦Review checklist···⟧</string>
+    <string name="delivery_transforms">⟦Transform recipes···⟧</string>
+    <string name="delivery_transform_applied">⟦Applied transform: %1$s···⟧</string>
 </resources>

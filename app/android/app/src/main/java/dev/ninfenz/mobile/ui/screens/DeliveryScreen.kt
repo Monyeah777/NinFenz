@@ -273,7 +273,9 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
     var showVersions by remember { mutableStateOf(false) }
     var showPresets by remember { mutableStateOf(false) }
     val extensionVariants = remember { ExtensionStore(context.filesDir).contributions(setOf("delivery_variant")) }
+    val extensionTransforms = remember { ExtensionStore(context.filesDir).contributions(setOf("slot_transform")) }
     var showVariants by remember { mutableStateOf(false) }
+    var showTransforms by remember { mutableStateOf(false) }
     var variantNote by remember { mutableStateOf<String?>(null) }
     var showSavePreset by remember { mutableStateOf(false) }
     var presetName by remember { mutableStateOf("") }
@@ -810,6 +812,11 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                 if (extensionVariants.isNotEmpty()) {
                                     TextButton(onClick = { showVariants = true }) {
                                         Text(stringResource(dev.ninfenz.mobile.R.string.delivery_variants))
+                                    }
+                                }
+                                if (extensionTransforms.isNotEmpty()) {
+                                    TextButton(onClick = { showTransforms = true }) {
+                                        Text(stringResource(dev.ninfenz.mobile.R.string.delivery_transforms))
                                     }
                                 }
                             }
@@ -1978,6 +1985,34 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
             confirmButton = { TextButton(onClick = { showVariants = false }) { Text(stringResource(android.R.string.cancel)) } }
         )
     }
+    if (showTransforms) {
+        AlertDialog(
+            onDismissRequest = { showTransforms = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_transforms)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                    extensionTransforms.forEach { recipe ->
+                        TextButton(onClick = {
+                            val kind = recipe.config["kind"]?.jsonPrimitive?.content.orEmpty()
+                            val a = recipe.config["a"]?.jsonPrimitive?.content.orEmpty()
+                            val b = recipe.config["b"]?.jsonPrimitive?.content.orEmpty()
+                            val transform = dev.ninfenz.mobile.model.FlashFillModel.Transform(kind, a, b)
+                            val before = inputs
+                            val next = inputs.mapValues { (_, value) -> if (value.isNotBlank()) transform.apply(value) else value }
+                            if (next != before) {
+                                batchUndo = before
+                                inputs = next
+                                variantNote = context.getString(dev.ninfenz.mobile.R.string.delivery_transform_applied, recipe.id)
+                                showTransforms = false
+                            }
+                        }) { Text(recipe.id) }
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { showTransforms = false }) { Text(stringResource(android.R.string.cancel)) } }
+        )
+    }
+
     if (showPresets) {
         val presets = remember(showPresets) { presetStore.load(project.id) }
         AlertDialog(

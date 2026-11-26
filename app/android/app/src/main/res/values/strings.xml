@@ -1399,4 +1399,6 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="import_multi">批量导入</string>
     <string name="import_multi_done">批量导入完成：成功 %1$d，失败 %2$d</string>
     <string name="review_checklist">评审清单</string>
+    <string name="delivery_transforms">变换配方</string>
+    <string name="delivery_transform_applied">已应用变换：%1$s</string>
 </resources>
