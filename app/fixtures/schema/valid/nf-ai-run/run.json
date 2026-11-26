@@ -1,0 +1,16 @@
+{
+  "schema": "nf-ai-run/1",
+  "id": "run-demo",
+  "project_id": "demo",
+  "status": "queued",
+  "model": "ccos-task",
+  "params": { "concurrency": 2 },
+  "seed": 42,
+  "elapsed_ms": 0,
+  "usage": { "input_tokens": 0, "output_tokens": 0 },
+  "tasks": [
+    { "id": "T01", "title": "开场", "status": "planned" },
+    { "id": "T02", "title": "推进", "status": "planned" }
+  ],
+  "created_at": 0
+}

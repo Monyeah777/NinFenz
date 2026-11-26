@@ -732,6 +732,16 @@
       "code": "NF-MAC-002", "severity": "error", "exit": 1,
       "message": "宏回放失败/某步无法执行",
       "fix": "看失败步骤并只重放该步"
+    },
+    {
+      "code": "NF-AI-001", "severity": "error", "exit": 1,
+      "message": "AI 运行记录 schema 非法/状态未知",
+      "fix": "按报告 path 修 nf-ai-run"
+    },
+    {
+      "code": "NF-AI-002", "severity": "error", "exit": 3,
+      "message": "AI 记录出现密钥/token/authorization 字段",
+      "fix": "删除密钥字段；密钥只属于 CCOS"
     }
   ]
 }

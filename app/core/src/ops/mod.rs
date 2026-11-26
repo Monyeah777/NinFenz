@@ -237,6 +237,8 @@ pub fn dispatch(op: &str, req: &Value) -> Envelope {
         "fragment-validate" => crate::composition::fragment_validate_op(req),
         "compose-validate" => crate::composition::composition_validate_op(req),
         "compose-render" => crate::composition::compose_render_op(req),
+        "ai-plan" => crate::ai::plan_op(req),
+        "ai-run-verify" => crate::ai::verify_op(req),
         "macro-validate" => crate::macros::validate_op(req),
         "macro-plan" => crate::macros::plan_op(req),
         "source-add" => crate::source::add_op(req),

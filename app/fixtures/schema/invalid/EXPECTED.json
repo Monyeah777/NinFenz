@@ -680,6 +680,16 @@
       "schema": "nf-macro",
       "violated": "step.id 必须是 S + 两位/三位",
       "codes": ["NF-MAC-001"]
+    },
+    "invalid/nf-ai-run/inv-status.json": {
+      "schema": "nf-ai-run",
+      "violated": "status 不在 queued/running/partial/done/failed/cancelled",
+      "codes": ["NF-AI-001"]
+    },
+    "invalid/nf-ai-run/inv-secret.json": {
+      "schema": "nf-ai-run",
+      "violated": "additionalProperties=false 拒绝 api_key",
+      "codes": ["NF-AI-001"]
     }
   }
 }

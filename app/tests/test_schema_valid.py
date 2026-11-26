@@ -38,7 +38,7 @@ def test_valid_fixture_passes_schema(stem: str, path: Path) -> None:
 
 def test_every_schema_has_valid_fixture() -> None:
     stems = sorted(p.name[: -len(".schema.json")] for p in SCHEMA_DIR.glob("*.schema.json"))
-    assert len(stems) == 48, stems  # 34 + 4 0.3.6 free-layer contracts
+    assert len(stems) == 49, stems  # 34 + 4 0.3.6 free-layer contracts
     for stem in stems:
         docs = list((VALID_DIR / stem).glob("*.json"))
         assert docs, f"{stem} 缺正样例"

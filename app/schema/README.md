@@ -39,6 +39,7 @@
 | `nf-source-chain.schema.json` | `nf-source-chain/1` | 来源哈希链（entries/head/digest） |
 | `nf-fidelity.schema.json` | `nf-fidelity/1` | 保真报告（mapped/unmapped/lost/score） |
 | `nf-macro.schema.json` | `nf-macro/1` | 语义宏（steps/actions/params/digest） |
+| `nf-ai-run.schema.json` | `nf-ai-run/1` | AI 运行记录（tasks/usage/status，无密钥） |
 | `limits.json` | `nf-app-limits/1` | 解析/解包上限（实现必须读取，不得散落字面量） |
 | `error_codes.json` | `nf-app-error-codes/1` | 错误码登记（code/severity/exit/message/fix） |
 
