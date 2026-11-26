@@ -1412,4 +1412,8 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="delivery_output_rule">Output naming</string>
     <string name="delivery_output_rule_empty">Enable an extension with output_rule to see naming rules.</string>
     <string name="delivery_output_rule_default">Default (result)</string>
+    <string name="extensions_trust">Verify and trust</string>
+    <string name="extensions_trusted">Signature trusted</string>
+    <string name="extensions_trust_revoke">Revoke trust</string>
+    <string name="extensions_verify_failed">Signature verification failed</string>
 </resources>

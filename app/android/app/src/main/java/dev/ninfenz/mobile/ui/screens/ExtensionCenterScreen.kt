@@ -29,13 +29,18 @@ import androidx.compose.ui.res.stringResource
 import dev.ninfenz.mobile.R
 import dev.ninfenz.mobile.core.ModelException
 import dev.ninfenz.mobile.data.ExtensionStore
+import dev.ninfenz.mobile.data.ExtensionTrustStore
+import dev.ninfenz.mobile.core.J
 import dev.ninfenz.mobile.data.FileAccess
 import dev.ninfenz.mobile.ui.components.CardBox
 import dev.ninfenz.mobile.ui.components.EmptyState
 import dev.ninfenz.mobile.ui.components.NfScaffold
 import dev.ninfenz.mobile.ui.design.NfType
+import dev.ninfenz.mobile.ui.safeCall
 import dev.ninfenz.mobile.ui.theme.NfSpacing
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 
 /** 本地声明式扩展中心：导入、启停、删除；不执行扩展代码。 */
 @Composable
@@ -43,6 +48,8 @@ fun ExtensionCenterScreen(onBack: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val store = remember { ExtensionStore(context.filesDir) }
+    val trustStore = remember { ExtensionTrustStore(context.filesDir) }
+    var trustNonce by remember { mutableStateOf(0) }
     var items by remember { mutableStateOf(store.load()) }
     var error by remember { mutableStateOf<String?>(null) }
     var busy by remember { mutableStateOf(false) }
@@ -86,6 +93,8 @@ fun ExtensionCenterScreen(onBack: () -> Unit) {
         } else {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                 items(items, key = { it.id }) { ext ->
+                    val digest = store.manifestDigest(ext.id)
+                    val trusted = trustNonce.let { digest != null && trustStore.isTrusted(ext.id, digest) }
                     CardBox(title = ext.id) {
                         Text(ext.type, style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Text(
@@ -93,6 +102,38 @@ fun ExtensionCenterScreen(onBack: () -> Unit) {
                                 " · " + pluralStringResource(R.plurals.extensions_contributions, ext.contributions.size, ext.contributions.size),
                             style = NfType.meta
                         )
+                        if (ext.signed) {
+                            if (trusted) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(stringResource(R.string.extensions_trusted), style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.weight(1f))
+                                    TextButton(onClick = { trustStore.revoke(ext.id); trustNonce++ }) {
+                                        Text(stringResource(R.string.extensions_trust_revoke))
+                                    }
+                                }
+                            } else {
+                                TextButton(onClick = {
+                                    scope.launch {
+                                        val raw = store.rawManifest(ext.id)
+                                        val digestNow = digest
+                                        if (raw == null || digestNow == null) return@launch
+                                        try {
+                                            val response = safeCall("extension-verify", buildJsonObject {
+                                                put("manifest", J.parseObject(raw, "nf-extension/1"))
+                                                put("strict", true)
+                                            })
+                                            if (response.ok) {
+                                                trustStore.trust(ext.id, digestNow)
+                                                trustNonce++
+                                            } else {
+                                                error = response.error?.message ?: context.getString(R.string.extensions_verify_failed)
+                                            }
+                                        } catch (e: Exception) {
+                                            error = e.message ?: context.getString(R.string.extensions_verify_failed)
+                                        }
+                                    }
+                                }) { Text(stringResource(R.string.extensions_trust)) }
+                            }
+                        }
                         if (ext.targets.isNotEmpty()) Text(ext.targets.joinToString(" · "), style = NfType.meta)
                         if (ext.warnings.isNotEmpty()) {
                             Text(ext.warnings.joinToString("; "), style = NfType.meta, color = MaterialTheme.colorScheme.error)

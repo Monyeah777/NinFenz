@@ -1408,4 +1408,8 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="delivery_output_rule">输出命名</string>
     <string name="delivery_output_rule_empty">启用带 output_rule 的扩展后会显示命名规则。</string>
     <string name="delivery_output_rule_default">默认（result）</string>
+    <string name="extensions_trust">验证并信任</string>
+    <string name="extensions_trusted">已信任签名</string>
+    <string name="extensions_trust_revoke">撤销信任</string>
+    <string name="extensions_verify_failed">签名验证失败</string>
 </resources>

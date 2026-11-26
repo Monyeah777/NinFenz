@@ -77,6 +77,15 @@ class ExtensionStore(private val filesDir: File) {
         return parse(o, true, file(id).absolutePath)
     }
 
+    fun rawManifest(id: String): String? = runCatching { file(id).readText(Charsets.UTF_8) }.getOrNull()
+
+    fun manifestDigest(id: String): String? {
+        val text = rawManifest(id) ?: return null
+        return java.security.MessageDigest.getInstance("SHA-256")
+            .digest(text.toByteArray(Charsets.UTF_8))
+            .joinToString("") { "%02x".format(it.toInt() and 0xff) }
+    }
+
     fun remove(id: String) {
         File(root(), id).deleteRecursively()
         saveEnabled(enabledIds() - id)
