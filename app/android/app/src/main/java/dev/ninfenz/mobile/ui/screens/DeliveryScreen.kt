@@ -96,6 +96,7 @@ import dev.ninfenz.mobile.data.PdfValidator
 import dev.ninfenz.mobile.data.ExportHistoryStore
 import dev.ninfenz.mobile.data.Capability
 import dev.ninfenz.mobile.data.CapabilityRegistry
+import dev.ninfenz.mobile.data.ContractGate
 import dev.ninfenz.mobile.data.ContractIrStore
 import dev.ninfenz.mobile.data.DocxStyleAudit
 import dev.ninfenz.mobile.data.DocxStyleAuditResult
@@ -370,8 +371,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
     var docxStyles by remember { mutableStateOf<String?>(null) }
     var docxStyleAudit by remember { mutableStateOf<DocxStyleAuditResult?>(null) }
     val contractUnsatisfiable = remember(project.id) {
-        ContractIrStore(context.filesDir, project.id).loadSolve()
-            ?.get("satisfiable")?.jsonPrimitive?.content == "false"
+        ContractGate.blocked(ContractIrStore(context.filesDir, project.id).loadSolve())
     }
     val contractValues = remember(project.id) {
         ContractIrStore(context.filesDir, project.id).loadValues()
