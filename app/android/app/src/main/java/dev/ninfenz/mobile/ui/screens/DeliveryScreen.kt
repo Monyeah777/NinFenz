@@ -2446,7 +2446,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                 if (plan == null) {
                                     macroResult = MacroRunResult("failed", emptyList(), 1)
                                 } else {
-                                    macroResult = MacroRunner.run(plan) { action, _ ->
+                                    macroResult = MacroRunner.run(plan) { action, params ->
                                         when (action) {
                                             "assemble" -> {
                                                 val raw = rawPlan
@@ -2484,6 +2484,16 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                                     })
                                                     if (response.ok) Result.success("validated")
                                                     else Result.failure(IllegalStateException(response.error?.message ?: "validate failed"))
+                                                }
+                                            }
+                                            "import" -> {
+                                                val file = params["file"]?.jsonPrimitive?.content
+                                                if (file.isNullOrBlank()) {
+                                                    Result.failure(IllegalStateException(context.getString(dev.ninfenz.mobile.R.string.delivery_macro_failed, "import 步骤缺 params.file")))
+                                                } else {
+                                                    val response = safeCall("import", buildJsonObject { put("file", file) })
+                                                    if (response.ok) Result.success("imported")
+                                                    else Result.failure(IllegalStateException(response.error?.message ?: "import failed"))
                                                 }
                                             }
                                             "map" -> {
