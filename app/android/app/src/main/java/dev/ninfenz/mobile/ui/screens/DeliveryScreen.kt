@@ -306,6 +306,26 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
     var validateRepro by remember { mutableStateOf<String?>(null) }
     val exportProfileStore = remember { ExportProfileStore(context.filesDir) }
     var exportProfiles by remember { mutableStateOf(exportProfileStore.load()) }
+    val extensionProfiles = remember {
+        ExtensionStore(context.filesDir).contributions(setOf("export_profile")).mapNotNull { c ->
+            val cfg = c.config
+            ExportProfileStore.Profile(
+                id = "ext:" + c.id,
+                name = cfg["name"]?.jsonPrimitive?.content?.ifBlank { c.id } ?: c.id,
+                at = 0L,
+                styles = cfg["docx_styles"]?.jsonPrimitive?.content?.takeIf { it.isNotBlank() },
+                sectPr = cfg["docx_sect_pr"]?.jsonPrimitive?.content?.takeIf { it.isNotBlank() },
+                theme = cfg["docx_theme"]?.jsonPrimitive?.content?.takeIf { it.isNotBlank() },
+                numbering = cfg["docx_numbering"]?.jsonPrimitive?.content?.takeIf { it.isNotBlank() },
+                header = cfg["docx_header"]?.jsonPrimitive?.content?.takeIf { it.isNotBlank() },
+                footer = cfg["docx_footer"]?.jsonPrimitive?.content?.takeIf { it.isNotBlank() },
+                epubAuthor = cfg["epub_author"]?.jsonPrimitive?.content?.takeIf { it.isNotBlank() },
+                epubLanguage = cfg["epub_language"]?.jsonPrimitive?.content?.takeIf { it.isNotBlank() },
+                pdfPageSize = cfg["pdf_page_size"]?.jsonPrimitive?.content?.takeIf { it.isNotBlank() },
+                pdfIncludeTitle = cfg["pdf_include_title"]?.jsonPrimitive?.content?.toBooleanStrictOrNull()
+            )
+        }
+    }
     var showExportProfiles by remember { mutableStateOf(false) }
     var showSaveExportProfile by remember { mutableStateOf(false) }
     var exportProfileName by remember { mutableStateOf("") }
@@ -1866,8 +1886,9 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
             title = { Text(stringResource(dev.ninfenz.mobile.R.string.export_profiles)) },
             text = {
                 Column(modifier = Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
-                    if (exportProfiles.isEmpty()) Text(stringResource(dev.ninfenz.mobile.R.string.export_profiles_empty), style = NfType.meta)
-                    exportProfiles.forEach { profile ->
+                    val allProfiles = exportProfiles + extensionProfiles
+                    if (allProfiles.isEmpty()) Text(stringResource(dev.ninfenz.mobile.R.string.export_profiles_empty), style = NfType.meta)
+                    allProfiles.forEach { profile ->
                         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                             Text(profile.name, style = NfType.meta)
                             Row {
@@ -1884,8 +1905,10 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                     profile.pdfIncludeTitle?.let { pdfIncludeTitle = it }
                                     showExportProfiles = false
                                 }) { Text(stringResource(dev.ninfenz.mobile.R.string.export_profile_apply)) }
-                                TextButton(onClick = { exportProfileStore.remove(profile.id); exportProfiles = exportProfileStore.load() }) {
-                                    Text(stringResource(dev.ninfenz.mobile.R.string.inbox_remove))
+                                if (!profile.id.startsWith("ext:")) {
+                                    TextButton(onClick = { exportProfileStore.remove(profile.id); exportProfiles = exportProfileStore.load() }) {
+                                        Text(stringResource(dev.ninfenz.mobile.R.string.inbox_remove))
+                                    }
                                 }
                             }
                         }
