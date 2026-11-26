@@ -1704,9 +1704,11 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                     horizontalArrangement = Arrangement.spacedBy(NfSpacing.s),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    OutlinedButton(onClick = {
-                        referencePicker.launch(arrayOf("application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
-                    }) { Text(stringResource(dev.ninfenz.mobile.R.string.docx_reference_pick)) }
+                    if (capabilityRevision >= 0 && CapabilityRegistry.isEnabled(Capability.STYLE)) {
+                        OutlinedButton(onClick = {
+                            referencePicker.launch(arrayOf("application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
+                        }) { Text(stringResource(dev.ninfenz.mobile.R.string.docx_reference_pick)) }
+                    }
                     if (capabilityRevision >= 0 && CapabilityRegistry.isEnabled(Capability.STYLE)) {
                         TextButton(onClick = {
                             styleTemplates = styleStore.list()
