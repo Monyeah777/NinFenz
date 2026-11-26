@@ -50,6 +50,7 @@ import dev.ninfenz.mobile.data.SearchHit
 import dev.ninfenz.mobile.data.SearchHistoryStore
 import dev.ninfenz.mobile.data.SearchFilterStore
 import dev.ninfenz.mobile.data.SearchIndex
+import dev.ninfenz.mobile.data.SearchIndexStore
 import dev.ninfenz.mobile.data.SearchKind
 import dev.ninfenz.mobile.model.SearchFilter
 import dev.ninfenz.mobile.model.SearchKeyboard
@@ -70,7 +71,9 @@ fun SearchScreen(
 ) {
     val context = LocalContext.current
     val index = remember { SearchIndex(context.filesDir) }
+    val fts = remember { SearchIndexStore(context) }
     var all by remember { mutableStateOf<List<SearchHit>>(emptyList()) }
+    var ftsResults by remember { mutableStateOf<List<SearchHit>>(emptyList()) }
     var query by rememberSaveable { mutableStateOf("") }
     var selected by remember { mutableIntStateOf(0) }
     var visibleCount by rememberSaveable { mutableIntStateOf(200) }
@@ -94,6 +97,12 @@ fun SearchScreen(
 
     LaunchedEffect(Unit) {
         all = withContext(Dispatchers.IO) { index.build() }
+        withContext(Dispatchers.IO) { fts.rebuild(all) }
+    }
+    LaunchedEffect(query, all) {
+        ftsResults = if (query.isBlank()) emptyList() else withContext(Dispatchers.IO) {
+            fts.search(query).ifEmpty { index.search(all, query) }
+        }
     }
     LaunchedEffect(filterName, selectedPackId, selectedProjectId) {
         filterStore.save(filterName, selectedPackId, selectedProjectId)
@@ -101,7 +110,7 @@ fun SearchScreen(
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
     }
-    val results = remember(query, all) { index.search(all, query) }
+    val results = remember(query, all, ftsResults) { if (query.isBlank()) emptyList() else ftsResults }
     val filtered = remember(results, filterName, selectedPackId, selectedProjectId, favoritesOnly, scopeTag) {
         var scoped = SearchFilter.apply(results, filterKind, selectedPackId, selectedProjectId)
         if (favoritesOnly) scoped = scoped.filter { hit -> hit.projectId?.let { metaStore.isFavorite(it) } == true }
