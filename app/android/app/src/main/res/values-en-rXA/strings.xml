@@ -1373,4 +1373,9 @@ MIT License · See app/docs/LEGAL.md···⟧</string>
     <string name="author_graph_recipe">⟦Graph recipe···⟧</string>
     <string name="author_graph_recipe_conflict">⟦Recipe node/edge ID conflict or invalid format···⟧</string>
     <string name="author_graph_recipe_applied">⟦Inserted graph recipe: %1$s···⟧</string>
+    <string name="library_group_none">⟦No grouping···⟧</string>
+    <string name="library_group_pack">⟦By Pack···⟧</string>
+    <string name="library_group_status">⟦By status···⟧</string>
+    <string name="library_group_tag">⟦By tag···⟧</string>
+    <string name="library_untagged">⟦Untagged···⟧</string>
 </resources>

@@ -192,6 +192,7 @@ fun LibraryHomeScreen(
     var sortName by rememberSaveable { mutableStateOf(savedView?.sort ?: ProjectSort.RECENT.name) }
     var sortMenuOpen by remember { mutableStateOf(false) }
     var projectsExpanded by rememberSaveable { mutableStateOf(true) }
+    var groupMode by rememberSaveable { mutableStateOf("none") }
     val recentStore = remember(viewFilesDir) { viewFilesDir?.let { RecentProjectStore(it) } }
     var recentIds by remember { mutableStateOf(recentStore?.load() ?: emptyList()) }
     LaunchedEffect(statusFilter, sortName) {
@@ -211,6 +212,18 @@ fun LibraryHomeScreen(
             filterSort,
             priorityIds = if (filterSort == ProjectSort.RECENT) recentIds else emptyList()
         )
+    }
+    val statusLabels = ProjectStatus.entries.associateWith { projectStatusLabel(it) }
+    val groupedProjects = remember(filteredProjects, groupMode, statusLabels) {
+        when (groupMode) {
+            "pack" -> filteredProjects.groupBy { it.project.refs.basePackId }.toList()
+            "status" -> filteredProjects.groupBy { statusLabels[it.project.status] ?: it.project.status.wire }.toList()
+            "tag" -> filteredProjects.groupBy { entry ->
+                metaStore?.tags(entry.project.id)?.sorted()?.firstOrNull()
+                    ?: context.getString(dev.ninfenz.mobile.R.string.library_untagged)
+            }.toList()
+            else -> listOf("" to filteredProjects)
+        }
     }
     fun openWithPriority(entry: ProjectEntry) {
         recentIds = recentStore?.record(entry.project.id) ?: recentIds
@@ -424,6 +437,21 @@ fun LibraryHomeScreen(
                                 Text(stringResource(dev.ninfenz.mobile.R.string.library_save_view))
                             }
                         }
+                        TextButton(onClick = {
+                            groupMode = when (groupMode) {
+                                "none" -> "pack"
+                                "pack" -> "status"
+                                "status" -> "tag"
+                                else -> "none"
+                            }
+                        }) {
+                            Text(stringResource(when (groupMode) {
+                                "pack" -> dev.ninfenz.mobile.R.string.library_group_pack
+                                "status" -> dev.ninfenz.mobile.R.string.library_group_status
+                                "tag" -> dev.ninfenz.mobile.R.string.library_group_tag
+                                else -> dev.ninfenz.mobile.R.string.library_group_none
+                            }))
+                        }
                         val sortLabel = stringResource(dev.ninfenz.mobile.R.string.library_sort_label) + "：" +
                             when (filterSort) {
                                 ProjectSort.RECENT -> stringResource(dev.ninfenz.mobile.R.string.library_sort_recent)
@@ -520,24 +548,30 @@ fun LibraryHomeScreen(
                             modifier = Modifier.padding(horizontal = NfSpacing.page),
                             verticalArrangement = Arrangement.spacedBy(NfSpacing.l)
                         ) {
-                            filteredProjects.forEachIndexed { index, entry ->
-                                SwipeableProjectCard(
-                                    entry = entry,
-                                    index = index,
-                                    onOpen = { openWithPriority(entry) },
-                                    onFlow = { onOpenFlow(entry) },
-                                    onDelete = {
-                                        snackbarScope.launch {
-                                            val archived = runCatching {
-                                                ProjectArchiver.archive(entry.file, context.filesDir)
-                                            }.getOrNull()
-                                            if (archived != null) {
-                                                undoArchive = archived
-                                                onRefresh()
+                            var renderIndex = 0
+                            groupedProjects.forEach { (label, entries) ->
+                                if (groupMode != "none" && label.isNotBlank()) {
+                                    NfSectionHeader(label)
+                                }
+                                entries.forEach { entry ->
+                                    SwipeableProjectCard(
+                                        entry = entry,
+                                        index = renderIndex++,
+                                        onOpen = { openWithPriority(entry) },
+                                        onFlow = { onOpenFlow(entry) },
+                                        onDelete = {
+                                            snackbarScope.launch {
+                                                val archived = runCatching {
+                                                    ProjectArchiver.archive(entry.file, context.filesDir)
+                                                }.getOrNull()
+                                                if (archived != null) {
+                                                    undoArchive = archived
+                                                    onRefresh()
+                                                }
                                             }
                                         }
-                                    }
-                                )
+                                    )
+                                }
                             }
                         }
                     }

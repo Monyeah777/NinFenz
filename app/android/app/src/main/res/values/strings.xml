@@ -1369,4 +1369,9 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="author_graph_recipe">管线配方</string>
     <string name="author_graph_recipe_conflict">配方节点/边 ID 冲突或格式无效</string>
     <string name="author_graph_recipe_applied">已插入管线配方：%1$s</string>
+    <string name="library_group_none">不分组</string>
+    <string name="library_group_pack">按 Pack</string>
+    <string name="library_group_status">按状态</string>
+    <string name="library_group_tag">按标签</string>
+    <string name="library_untagged">未打标签</string>
 </resources>
