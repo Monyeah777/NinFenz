@@ -478,6 +478,7 @@
     <string name="docx_style_audit">Style check %1$d/%2$d · missing %3$s</string>
     <string name="docx_style_audit_ok">Style check %1$d/%2$d all present</string>
     <string name="docx_style_unused">%1$d/%2$d styles defined but not referenced</string>
+    <string name="docx_heading_audit">Heading styles %1$d/%2$d</string>
     <string name="docx_reference_none">No reference styles</string>
     <string name="docx_reference_failed">Failed to read reference styles</string>
     <string name="docx_reference_failed_fix">Confirm the DOCX contains word/styles.xml</string>

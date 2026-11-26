@@ -98,6 +98,8 @@ import dev.ninfenz.mobile.data.Capability
 import dev.ninfenz.mobile.data.CapabilityRegistry
 import dev.ninfenz.mobile.data.ContractGate
 import dev.ninfenz.mobile.data.ContractIrStore
+import dev.ninfenz.mobile.data.DocxHeadingAudit
+import dev.ninfenz.mobile.data.DocxHeadingAuditResult
 import dev.ninfenz.mobile.data.DocxStyleAudit
 import dev.ninfenz.mobile.data.DocxStyleAuditResult
 import dev.ninfenz.mobile.data.ExportVerifier
@@ -370,6 +372,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
     var epubLanguage by remember { mutableStateOf("zh") }
     var docxStyles by remember { mutableStateOf<String?>(null) }
     var docxStyleAudit by remember { mutableStateOf<DocxStyleAuditResult?>(null) }
+    var docxHeadingAudit by remember { mutableStateOf<DocxHeadingAuditResult?>(null) }
     val contractUnsatisfiable = remember(project.id) {
         ContractGate.blocked(ContractIrStore(context.filesDir, project.id).loadSolve())
     }
@@ -1570,7 +1573,10 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                             else -> context.getString(dev.ninfenz.mobile.R.string.repro_diff, report.firstDiff ?: -1)
                         }
                         recordExport("docx", file, manifest)
-                        file?.let { exported -> docxStyles?.let { applied -> docxStyleAudit = DocxStyleAudit.check(applied, exported) } }
+                        file?.let { exported ->
+                            docxStyles?.let { applied -> docxStyleAudit = DocxStyleAudit.check(applied, exported) }
+                            docxHeadingAudit = DocxHeadingAudit.check(exportMarkdown.orEmpty(), exported)
+                        }
                     }
                 }
                 Text(stringResource(dev.ninfenz.mobile.R.string.delivery_export_group_data), style = NfType.label, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(start = NfSpacing.page, end = NfSpacing.page, top = NfSpacing.s))
@@ -1914,6 +1920,18 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                             audit.ok -> stringResource(dev.ninfenz.mobile.R.string.docx_style_audit_ok, audit.found, audit.checked)
                             else -> stringResource(dev.ninfenz.mobile.R.string.docx_style_audit, audit.found, audit.checked, audit.missing.joinToString("、"))
                         },
+                        style = NfType.meta,
+                        color = if (audit.ok) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(horizontal = NfSpacing.page)
+                    )
+                }
+                docxHeadingAudit?.let { audit ->
+                    Text(
+                        stringResource(
+                            dev.ninfenz.mobile.R.string.docx_heading_audit,
+                            audit.styledHeadings,
+                            audit.markdownHeadings
+                        ),
                         style = NfType.meta,
                         color = if (audit.ok) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
                         modifier = Modifier.padding(horizontal = NfSpacing.page)

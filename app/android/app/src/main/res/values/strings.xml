@@ -474,6 +474,7 @@
     <string name="docx_style_audit">样式核对 %1$d/%2$d · 缺失 %3$s</string>
     <string name="docx_style_audit_ok">样式核对 %1$d/%2$d 全命中</string>
     <string name="docx_style_unused">样式已定义 %1$d/%2$d，但文档未引用</string>
+    <string name="docx_heading_audit">标题样式 %1$d/%2$d</string>
     <string name="docx_reference_none">未加载参考样式</string>
     <string name="docx_reference_failed">参考样式读取失败</string>
     <string name="docx_reference_failed_fix">确认 DOCX 含 word/styles.xml</string>
