@@ -71,6 +71,7 @@ import dev.ninfenz.mobile.data.ProtocolDraftStore
 import dev.ninfenz.mobile.data.ProtocolSnapshotStore
 import dev.ninfenz.mobile.data.PackEntry
 import dev.ninfenz.mobile.data.SaveOverlayResult
+import dev.ninfenz.mobile.model.ContextBudget
 import dev.ninfenz.mobile.model.GraphEdge
 import dev.ninfenz.mobile.model.GraphModel
 import dev.ninfenz.mobile.model.GraphNode
@@ -1281,6 +1282,22 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
             title = { Text(stringResource(dev.ninfenz.mobile.R.string.author_ai_plan)) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                    val aiContext = remember(spec.sections, sources) {
+                        ContextBudget.pack(
+                            sections = spec.sections.map { it.id to it.title },
+                            sources = sources.map { it.excerpt },
+                            budgetTokens = 2000
+                        )
+                    }
+                    Text(
+                        stringResource(
+                            dev.ninfenz.mobile.R.string.author_ai_budget,
+                            aiContext.usedTokens,
+                            aiContext.budgetTokens
+                        ),
+                        style = NfType.meta,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                     TextButton(enabled = !busy, onClick = {
                         scope.launch {
                             busy = true
@@ -1288,6 +1305,11 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
                                 val response = safeCall("ai-plan", buildJsonObject {
                                     put("project_id", project.id)
                                     put("model", "ccos-task")
+                                    put("params", buildJsonObject {
+                                        put("budget_tokens", aiContext.budgetTokens)
+                                        put("context_tokens", aiContext.usedTokens)
+                                        put("trimmed", aiContext.trimmed)
+                                    })
                                     put("sections", kotlinx.serialization.json.buildJsonArray {
                                         spec.sections.forEach { section ->
                                             add(buildJsonObject { put("title", section.title) })
