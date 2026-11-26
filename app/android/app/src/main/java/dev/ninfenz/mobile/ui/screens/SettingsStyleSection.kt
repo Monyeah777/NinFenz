@@ -48,7 +48,7 @@ fun SettingsStyleSection() {
                 val name = meta.name.substringBeforeLast('.')
                 val saved = withContext(Dispatchers.IO) {
                     if (meta.mime == "application/pdf" || meta.name.endsWith(".pdf", ignoreCase = true)) {
-                        store.fromPdf(file, name)
+                        store.fromPdf(file, name, context)
                     } else {
                         store.fromDocx(file, name)
                     }

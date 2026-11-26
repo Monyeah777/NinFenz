@@ -1,5 +1,7 @@
 package dev.ninfenz.mobile.data
 
+import android.content.Context
+import com.tom_roush.pdfbox.android.PDFBoxResourceLoader
 import com.tom_roush.pdfbox.pdmodel.PDDocument
 import com.tom_roush.pdfbox.text.PDFTextStripper
 import com.tom_roush.pdfbox.text.TextPosition
@@ -34,7 +36,8 @@ data class PdfStyle(
 }
 
 object PdfStyleExtractor {
-    fun extract(file: File): PdfStyle {
+    fun extract(file: File, context: Context? = null): PdfStyle {
+        context?.let { PDFBoxResourceLoader.init(it.applicationContext) }
         val collector = object : PDFTextStripper() {
             val fonts = mutableSetOf<String>()
             val sizes = mutableMapOf<Int, Int>()

@@ -81,8 +81,8 @@ class StyleTemplateStore(private val filesDir: File) {
         )
     }
 
-    fun fromPdf(file: File, name: String): StyleTemplate {
-        val style = PdfStyleExtractor.extract(file)
+    fun fromPdf(file: File, name: String, context: android.content.Context): StyleTemplate {
+        val style = PdfStyleExtractor.extract(file, context)
         return save(name = name, sourceFormat = "pdf", stylesXml = style.toStyleXml())
     }
 
