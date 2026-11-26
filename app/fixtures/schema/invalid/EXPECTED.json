@@ -630,6 +630,16 @@
       "schema": "nf-composition",
       "violated": "digest 必须是 64 位十六进制",
       "codes": ["NF-CMP-001"]
+    },
+    "invalid/nf-pack-lock/inv-version.json": {
+      "schema": "nf-pack-lock",
+      "violated": "version 必须是 x.y.z",
+      "codes": ["NF-PLG-001"]
+    },
+    "invalid/nf-pack-lock/inv-tree.json": {
+      "schema": "nf-pack-lock",
+      "violated": "tree 必须是 64 位十六进制",
+      "codes": ["NF-PLG-001"]
     }
   }
 }

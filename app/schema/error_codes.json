@@ -707,6 +707,11 @@
       "code": "NF-CMP-003", "severity": "error", "exit": 1,
       "message": "组合渲染占位符/条件无法解析",
       "fix": "检查 values 与模板语法"
+    },
+    {
+      "code": "NF-PLG-001", "severity": "error", "exit": 1,
+      "message": "项目 Pack 锁缺失/版本不符/摘要不符",
+      "fix": "重新锁定 Pack，或恢复锁定的版本"
     }
   ]
 }

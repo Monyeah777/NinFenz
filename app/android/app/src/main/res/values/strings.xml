@@ -1327,6 +1327,16 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="delivery_summary_unexported">未导出</string>
     <string name="new_project_error_kept">已保留所选 Pack 与标题，修正后可直接重试。</string>
     <string name="project_pack_other_versions">已安装其他版本：%1$s</string>
+    <string name="project_pack_lock">Pack 锁</string>
+    <string name="project_pack_lock_missing">未锁定</string>
+    <string name="project_pack_lock_ok">已验证</string>
+    <string name="project_pack_lock_changed">项目引用已变化</string>
+    <string name="project_pack_lock_pack_missing">锁定 Pack 未安装</string>
+    <string name="project_pack_lock_mismatch">摘要不符</string>
+    <string name="project_pack_lock_now">锁定当前 Pack</string>
+    <string name="project_pack_lock_clear">解除锁</string>
+    <string name="project_pack_locked">已锁定 Pack</string>
+    <string name="project_pack_unlocked">已解除 Pack 锁</string>
     <string name="author_retry_save">重试保存</string>
     <string name="search_clear_filters">清除筛选</string>
     <string name="settings_backup_empty">还没有备份；先创建一次备份。</string>

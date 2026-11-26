@@ -1,0 +1,8 @@
+{
+  "schema": "nf-pack-lock/1",
+  "project_id": "demo",
+  "pack_id": "demo-pack",
+  "version": "1.0",
+  "tree": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "locked_at": 1700000000
+}

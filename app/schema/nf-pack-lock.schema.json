@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/app/schema/nf-pack-lock.schema.json",
+  "title": "NF 项目 Pack 锁（nf-pack-lock/1）",
+  "description": "项目锁 Pack id/version/tree；构建/装配前可 fail-closed 校验。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "project_id", "pack_id", "version", "tree", "locked_at"],
+  "properties": {
+    "schema": { "const": "nf-pack-lock/1" },
+    "project_id": { "type": "string", "minLength": 1 },
+    "pack_id": { "type": "string", "minLength": 1 },
+    "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "tree": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "locked_at": { "type": "integer", "minimum": 0 }
+  }
+}

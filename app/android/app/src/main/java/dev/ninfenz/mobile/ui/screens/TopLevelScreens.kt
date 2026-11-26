@@ -88,6 +88,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.data.PackEntry
+import dev.ninfenz.mobile.data.PackLockStore
 import dev.ninfenz.mobile.data.PackTrustStore
 import dev.ninfenz.mobile.data.PackVerifier
 import dev.ninfenz.mobile.data.ProjectArchiver
@@ -1088,6 +1089,9 @@ fun ProjectDetailScreen(
     val diffScope = rememberCoroutineScope()
     val showAudit = dev.ninfenz.mobile.data.FeatureGate.auditEnabled()
     val metaStore = remember { LibraryMetaStore(context.filesDir) }
+    val packLockStore = remember(project.id) { PackLockStore(context.filesDir) }
+    var packLock by remember(project.id) { mutableStateOf(packLockStore.load(project.id)) }
+    var packLockNote by remember(project.id) { mutableStateOf<String?>(null) }
     var isFavorite by remember(project.id) { mutableStateOf(metaStore.isFavorite(project.id)) }
     var tags by remember(project.id) { mutableStateOf(metaStore.tags(project.id)) }
     var showTags by remember { mutableStateOf(false) }
@@ -1270,6 +1274,36 @@ fun ProjectDetailScreen(
                                 style = NfType.meta,
                                 color = MaterialTheme.colorScheme.primary
                             )
+                        }
+                        val lockCheck = packLockStore.verify(project, packs)
+                        val lockStatus = when (lockCheck.status) {
+                            PackLockStore.Status.OK -> stringResource(dev.ninfenz.mobile.R.string.project_pack_lock_ok)
+                            PackLockStore.Status.MISSING -> stringResource(dev.ninfenz.mobile.R.string.project_pack_lock_missing)
+                            PackLockStore.Status.PROJECT_CHANGED -> stringResource(dev.ninfenz.mobile.R.string.project_pack_lock_changed)
+                            PackLockStore.Status.PACK_MISSING -> stringResource(dev.ninfenz.mobile.R.string.project_pack_lock_pack_missing)
+                            PackLockStore.Status.TREE_MISMATCH -> stringResource(dev.ninfenz.mobile.R.string.project_pack_lock_mismatch)
+                        }
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                stringResource(dev.ninfenz.mobile.R.string.project_pack_lock) + " · " + lockStatus,
+                                style = NfType.meta,
+                                color = if (lockCheck.status == PackLockStore.Status.OK) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.weight(1f)
+                            )
+                            TextButton(onClick = {
+                                packLock = packLockStore.lock(project)
+                                packLockNote = context.getString(dev.ninfenz.mobile.R.string.project_pack_locked)
+                            }) { Text(stringResource(dev.ninfenz.mobile.R.string.project_pack_lock_now)) }
+                            if (packLock != null) {
+                                TextButton(onClick = {
+                                    packLockStore.unlock(project.id)
+                                    packLock = null
+                                    packLockNote = context.getString(dev.ninfenz.mobile.R.string.project_pack_unlocked)
+                                }) { Text(stringResource(dev.ninfenz.mobile.R.string.project_pack_lock_clear)) }
+                            }
+                        }
+                        packLockNote?.let {
+                            Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary)
                         }
                         Row {
                             Text(stringResource(dev.ninfenz.mobile.R.string.project_detail_protocol_label), style = NfType.meta, modifier = Modifier.width(72.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)

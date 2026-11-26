@@ -1331,6 +1331,16 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="delivery_summary_unexported">Not exported</string>
     <string name="new_project_error_kept">The selected Pack and title are kept; fix the issue and retry.</string>
     <string name="project_pack_other_versions">Other installed versions: %1$s</string>
+    <string name="project_pack_lock">Pack lock</string>
+    <string name="project_pack_lock_missing">Not locked</string>
+    <string name="project_pack_lock_ok">Verified</string>
+    <string name="project_pack_lock_changed">Project refs changed</string>
+    <string name="project_pack_lock_pack_missing">Locked Pack not installed</string>
+    <string name="project_pack_lock_mismatch">Tree digest mismatch</string>
+    <string name="project_pack_lock_now">Lock current Pack</string>
+    <string name="project_pack_lock_clear">Unlock</string>
+    <string name="project_pack_locked">Pack locked</string>
+    <string name="project_pack_unlocked">Pack lock removed</string>
     <string name="author_retry_save">Retry save</string>
     <string name="search_clear_filters">Clear filters</string>
     <string name="settings_backup_empty">No backups yet; create one first.</string>
