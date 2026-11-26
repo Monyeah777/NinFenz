@@ -660,6 +660,16 @@
       "schema": "nf-source-chain",
       "violated": "prev 必须是空或 64 位十六进制",
       "codes": ["NF-SRC-001"]
+    },
+    "invalid/nf-fidelity/inv-score.json": {
+      "schema": "nf-fidelity",
+      "violated": "score 必须在 0..100",
+      "codes": ["NF-FID-001"]
+    },
+    "invalid/nf-fidelity/inv-mapped.json": {
+      "schema": "nf-fidelity",
+      "violated": "mapped 缺 code/tables",
+      "codes": ["NF-FID-001"]
     }
   }
 }

@@ -303,6 +303,8 @@
         <item quantity="other">Structure: %1$d headings · %2$d paragraphs · %3$d code blocks · %4$d tables</item>
     </plurals>
     <string name="import_digest">digest: %1$s…</string>
+    <string name="import_fidelity">Fidelity %1$d%% · unmapped %2$d</string>
+    <string name="import_fidelity_lost">Lost/warnings: %1$s</string>
     <string name="import_mapping">Mapping suggestions (%1$d)</string>
     <string name="import_no_mapping">No mapping candidates (NF-MAP-001): content goes to assets/unclassified.</string>
     <string name="import_accepted">Accepted %1$d/%2$d</string>

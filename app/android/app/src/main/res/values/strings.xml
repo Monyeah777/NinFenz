@@ -299,6 +299,8 @@
         <item quantity="other">结构：标题 %1$d · 段落 %2$d · 代码块 %3$d · 表格 %4$d</item>
     </plurals>
     <string name="import_digest">digest：%1$s…</string>
+    <string name="import_fidelity">保真 %1$d%% · 未映射 %2$d</string>
+    <string name="import_fidelity_lost">丢失/警告：%1$s</string>
     <string name="import_mapping">映射建议（%1$d 条）</string>
     <string name="import_no_mapping">无映射候选（NF-MAP-001）：内容会归入素材/未分类。</string>
     <string name="import_accepted">已采纳 %1$d/%2$d</string>

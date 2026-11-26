@@ -1,0 +1,9 @@
+{
+  "schema": "nf-fidelity/1",
+  "source_format": "docx",
+  "mapped": { "headings": 2, "paragraphs": 8, "code": 0, "tables": 1 },
+  "unmapped": 1,
+  "lost": ["图片 1 张"],
+  "score": 101,
+  "notes": ["标题层级已映射"]
+}

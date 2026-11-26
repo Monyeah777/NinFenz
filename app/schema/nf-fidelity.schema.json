@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/app/schema/nf-fidelity.schema.json",
+  "title": "NF 保真报告（nf-fidelity/1）",
+  "description": "导入/导出保真：已映射/未映射/丢失元素/round-trip 整数分。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "source_format", "mapped", "unmapped", "lost", "score", "notes"],
+  "properties": {
+    "schema": { "const": "nf-fidelity/1" },
+    "source_format": { "type": "string", "minLength": 1 },
+    "mapped": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["headings", "paragraphs", "code", "tables"],
+      "properties": {
+        "headings": { "type": "integer", "minimum": 0 },
+        "paragraphs": { "type": "integer", "minimum": 0 },
+        "code": { "type": "integer", "minimum": 0 },
+        "tables": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "unmapped": { "type": "integer", "minimum": 0 },
+    "lost": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "score": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "notes": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+  }
+}

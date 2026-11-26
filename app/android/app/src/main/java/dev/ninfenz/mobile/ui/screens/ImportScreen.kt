@@ -78,6 +78,7 @@ import dev.ninfenz.mobile.data.TemplateCandidateStore
 import dev.ninfenz.mobile.data.TemplatePackageBuilder
 import dev.ninfenz.mobile.data.TemplatePackageImporter
 import dev.ninfenz.mobile.data.LibraryStore
+import dev.ninfenz.mobile.model.FidelityReport
 import dev.ninfenz.mobile.model.ImportBatchState
 import dev.ninfenz.mobile.model.ImportBatchStatus
 import dev.ninfenz.mobile.model.ImportDoc
@@ -1211,6 +1212,19 @@ fun ImportScreen(
                                 ),
                                 style = NfType.meta
                             )
+                            val fidelity = remember(current) { FidelityReport.from(current) }
+                            Text(
+                                stringResource(dev.ninfenz.mobile.R.string.import_fidelity, fidelity.score, fidelity.unmapped),
+                                style = NfType.meta,
+                                color = if (fidelity.unmapped > 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            if (fidelity.lost.isNotEmpty()) {
+                                Text(
+                                    stringResource(dev.ninfenz.mobile.R.string.import_fidelity_lost, fidelity.lost.take(3).joinToString("；")),
+                                    style = NfType.meta,
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            }
                             current.textDigest?.let { Text(stringResource(dev.ninfenz.mobile.R.string.import_digest, it.take(16)), style = NfType.meta) }
                             for (note in current.reviewNotes()) {
                                 Text(note, style = NfType.meta, color = if (current.lowConfidence) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant)
