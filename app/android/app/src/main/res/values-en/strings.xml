@@ -1435,6 +1435,10 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="author_ai_meta">%1$s · %2$d tasks</string>
     <string name="author_ai_empty_result">AI plan is empty</string>
     <string name="author_ai_budget">Context budget %1$d/%2$d tokens</string>
+    <string name="author_ai_import_result">Import CCOS result</string>
+    <string name="author_ai_no_run">No AI run yet; generate a plan first</string>
+    <string name="author_ai_result_applied">CCOS result applied</string>
+    <string name="author_ai_result_failed">Could not apply result: %1$s</string>
     <string name="inbox_select">Select</string>
     <string name="inbox_select_all">Select all</string>
     <string name="inbox_select_none">Clear selection</string>

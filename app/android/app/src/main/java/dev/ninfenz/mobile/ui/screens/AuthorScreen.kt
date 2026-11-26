@@ -38,6 +38,9 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.TextButton
 import android.content.Context
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -58,6 +61,7 @@ import dev.ninfenz.mobile.core.CoreResponse
 import dev.ninfenz.mobile.core.J
 import dev.ninfenz.mobile.data.AiRunStore
 import dev.ninfenz.mobile.data.AuthorArtifactStore
+import dev.ninfenz.mobile.data.FileAccess
 import dev.ninfenz.mobile.data.ExtensionStore
 import dev.ninfenz.mobile.data.ContractIrStore
 import dev.ninfenz.mobile.data.GraphSnapshotStore
@@ -71,6 +75,7 @@ import dev.ninfenz.mobile.data.ProtocolDraftStore
 import dev.ninfenz.mobile.data.ProtocolSnapshotStore
 import dev.ninfenz.mobile.data.PackEntry
 import dev.ninfenz.mobile.data.SaveOverlayResult
+import dev.ninfenz.mobile.model.CcosModel
 import dev.ninfenz.mobile.model.ContextBudget
 import dev.ninfenz.mobile.model.GraphEdge
 import dev.ninfenz.mobile.model.GraphModel
@@ -971,6 +976,26 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
     var aiRuns by remember { mutableStateOf(aiRunStore.list()) }
     var showAiRuns by remember { mutableStateOf(false) }
     var aiNote by remember { mutableStateOf<String?>(null) }
+    val aiResultPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+        if (uri != null) {
+            scope.launch {
+                runCatching {
+                    val text = FileAccess.readText(context, uri)
+                    val result = CcosModel.parseResult(text)
+                    val latest = aiRuns.firstOrNull()
+                        ?: throw IllegalStateException(context.getString(dev.ninfenz.mobile.R.string.author_ai_no_run))
+                    aiRunStore.save(aiRunStore.applyResult(latest.json, result))
+                    aiRuns = aiRunStore.list()
+                    aiNote = context.getString(dev.ninfenz.mobile.R.string.author_ai_result_applied)
+                }.onFailure {
+                    aiNote = context.getString(
+                        dev.ninfenz.mobile.R.string.author_ai_result_failed,
+                        it.message ?: it.javaClass.simpleName
+                    )
+                }
+            }
+        }
+    }
     var contractNote by remember { mutableStateOf<String?>(null) }
     var sources by remember { mutableStateOf(sourceStore.list()) }
     var showSources by remember { mutableStateOf(false) }
@@ -1332,6 +1357,9 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
                             }
                         }
                     }) { Text(stringResource(dev.ninfenz.mobile.R.string.author_ai_generate)) }
+                    TextButton(onClick = { aiResultPicker.launch(arrayOf("application/json", "text/plain")) }) {
+                        Text(stringResource(dev.ninfenz.mobile.R.string.author_ai_import_result))
+                    }
                     if (aiRuns.isEmpty()) {
                         Text(
                             stringResource(dev.ninfenz.mobile.R.string.author_ai_empty),

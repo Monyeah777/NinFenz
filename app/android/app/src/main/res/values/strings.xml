@@ -1431,6 +1431,10 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="author_ai_meta">%1$s · %2$d 任务</string>
     <string name="author_ai_empty_result">AI 计划为空</string>
     <string name="author_ai_budget">上下文预算 %1$d/%2$d tokens</string>
+    <string name="author_ai_import_result">导入 CCOS 结果</string>
+    <string name="author_ai_no_run">还没有 AI 运行记录，先生成计划</string>
+    <string name="author_ai_result_applied">已回写 CCOS 结果</string>
+    <string name="author_ai_result_failed">回写结果失败：%1$s</string>
     <string name="inbox_select">选择</string>
     <string name="inbox_select_all">全选</string>
     <string name="inbox_select_none">取消全选</string>

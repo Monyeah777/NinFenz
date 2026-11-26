@@ -1,5 +1,6 @@
 package dev.ninfenz.mobile.data
 
+import dev.ninfenz.mobile.model.CcosResult
 import java.io.File
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
@@ -39,5 +40,31 @@ class AiRunStore(private val filesDir: File) {
 
     fun delete(id: String) {
         File(dir(), id.replace(Regex("[^A-Za-z0-9._-]"), "_") + ".json").delete()
+    }
+
+    /** 把 CCOS result 的终态回写到 AI 运行记录；只改状态/模型，不改本地任务标题。 */
+    fun applyResult(run: JsonObject, result: CcosResult): JsonObject {
+        val status = when (result.status) {
+            "succeeded" -> "done"
+            "partial" -> "partial"
+            else -> "failed"
+        }
+        val taskStatus = when (status) {
+            "done" -> "done"
+            "partial" -> "partial"
+            else -> "failed"
+        }
+        val tasks = run["tasks"]?.jsonArray?.map { element ->
+            val task = element.jsonObject.toMutableMap()
+            task["status"] = kotlinx.serialization.json.JsonPrimitive(taskStatus)
+            JsonObject(task)
+        } ?: emptyList()
+        val map = run.toMutableMap()
+        map["status"] = kotlinx.serialization.json.JsonPrimitive(status)
+        map["tasks"] = kotlinx.serialization.json.JsonArray(tasks)
+        if (!result.model.isNullOrBlank()) {
+            map["model"] = kotlinx.serialization.json.JsonPrimitive(result.model)
+        }
+        return JsonObject(map)
     }
 }
