@@ -1538,6 +1538,8 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="settings_macros_delete">Delete</string>
     <string name="settings_macros_imported">Macro imported</string>
     <string name="settings_macros_steps">%1$d steps</string>
+    <string name="settings_macros_plan_steps">Planned steps (%1$d)</string>
+    <string name="settings_macros_dry_run_note">dry-run: no execution, no file writes.</string>
     <string name="settings_styles_title">Style templates</string>
     <string name="settings_styles_hint">Extract DOCX styles/sectPr/theme/numbering; this version stores OOXML fragments, not full semantic reverse.</string>
     <string name="settings_styles_import">Import DOCX style</string>

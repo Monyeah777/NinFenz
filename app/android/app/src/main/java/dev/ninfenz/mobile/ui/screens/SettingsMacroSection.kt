@@ -39,6 +39,7 @@ fun SettingsMacroSection() {
     val store = remember { MacroStore(context.filesDir) }
     var items by remember { mutableStateOf(store.list()) }
     var note by remember { mutableStateOf<String?>(null) }
+    var lastPlan by remember { mutableStateOf<kotlinx.serialization.json.JsonObject?>(null) }
 
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         if (uri == null) return@rememberLauncherForActivityResult
@@ -94,6 +95,7 @@ fun SettingsMacroSection() {
                     scope.launch {
                         store.plan(macro.json)
                             .onSuccess { plan ->
+                                lastPlan = plan
                                 val count = plan["steps"]?.jsonArray?.size ?: 0
                                 note = context.getString(R.string.settings_macros_planned, count)
                             }
@@ -112,5 +114,25 @@ fun SettingsMacroSection() {
             }
         }
         note?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary) }
+        lastPlan?.let { plan ->
+            val steps = plan["steps"]?.jsonArray.orEmpty()
+            Text(
+                context.getString(R.string.settings_macros_plan_steps, steps.size),
+                style = NfType.meta,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            steps.forEach { step ->
+                val obj = step as? kotlinx.serialization.json.JsonObject ?: return@forEach
+                Text(
+                    (obj["id"]?.toString()?.trim('"') ?: "") + " · " + (obj["action"]?.toString()?.trim('"') ?: ""),
+                    style = NfType.meta
+                )
+            }
+            Text(
+                context.getString(R.string.settings_macros_dry_run_note),
+                style = NfType.meta,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
     }
 }
