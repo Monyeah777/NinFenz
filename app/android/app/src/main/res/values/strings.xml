@@ -1417,4 +1417,9 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="delivery_preflight_empty">启用带 preflight_profile 的 Pro 扩展后会显示预检配置。</string>
     <string name="delivery_assembly_recipes">装配配方</string>
     <string name="delivery_assembly_recipe_saved">已保存为预设：%1$s</string>
+    <string name="author_protocol_snapshot">协议快照</string>
+    <string name="author_protocol_snapshot_save">保存当前填写</string>
+    <string name="author_protocol_snapshot_restore">恢复</string>
+    <string name="author_protocol_snapshot_empty">还没有协议快照。</string>
+    <string name="author_protocol_snapshot_meta">%1$d 字段 · %2$d 条款启用</string>
 </resources>

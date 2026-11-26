@@ -64,6 +64,7 @@ import dev.ninfenz.mobile.data.SaveArtifactResult
 import dev.ninfenz.mobile.data.AuthorArtifactsLoader
 import dev.ninfenz.mobile.data.AuthorOverlayStore
 import dev.ninfenz.mobile.data.ProtocolDraftStore
+import dev.ninfenz.mobile.data.ProtocolSnapshotStore
 import dev.ninfenz.mobile.data.PackEntry
 import dev.ninfenz.mobile.data.SaveOverlayResult
 import dev.ninfenz.mobile.model.GraphEdge
@@ -358,6 +359,9 @@ private fun ProtocolAuthorContent(
     val clauseLibraries = remember { ExtensionStore(context.filesDir).contributions(setOf("clause_library")) }
     var showClauseLibrary by remember { mutableStateOf(false) }
     var clauseNote by remember { mutableStateOf<String?>(null) }
+    val protocolSnapshotStore = remember { ProtocolSnapshotStore(context.filesDir, project.id) }
+    var protocolSnapshots by remember { mutableStateOf(protocolSnapshotStore.list()) }
+    var showProtocolSnapshots by remember { mutableStateOf(false) }
 
     fun save(then: () -> Unit = {}) {
         if (saving) return
@@ -414,6 +418,9 @@ private fun ProtocolAuthorContent(
                 TextButton(onClick = { showClauseLibrary = true }) {
                     Text(stringResource(dev.ninfenz.mobile.R.string.author_clause_library))
                 }
+            }
+            TextButton(onClick = { protocolSnapshots = protocolSnapshotStore.list(); showProtocolSnapshots = true }) {
+                Text(stringResource(dev.ninfenz.mobile.R.string.author_protocol_snapshot))
             }
         }
         clauseNote?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
@@ -546,6 +553,47 @@ private fun ProtocolAuthorContent(
                 }
             },
             confirmButton = { TextButton(onClick = { showClauseLibrary = false }) { Text(stringResource(android.R.string.cancel)) } }
+        )
+    }
+
+    if (showProtocolSnapshots) {
+        AlertDialog(
+            onDismissRequest = { showProtocolSnapshots = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.author_protocol_snapshot)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                    TextButton(onClick = {
+                        protocolSnapshots = protocolSnapshotStore.save(values, enabled)
+                    }) { Text(stringResource(dev.ninfenz.mobile.R.string.author_protocol_snapshot_save)) }
+                    if (protocolSnapshots.isEmpty()) {
+                        Text(stringResource(dev.ninfenz.mobile.R.string.author_protocol_snapshot_empty), style = NfType.meta)
+                    }
+                    protocolSnapshots.take(10).forEach { snapshot ->
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                stringResource(
+                                    dev.ninfenz.mobile.R.string.author_protocol_snapshot_meta,
+                                    snapshot.values.size,
+                                    snapshot.enabled.count { it.value }
+                                ) + " · " + java.text.SimpleDateFormat("MM-dd HH:mm", java.util.Locale.getDefault()).format(java.util.Date(snapshot.at)),
+                                style = NfType.meta,
+                                modifier = Modifier.weight(1f)
+                            )
+                            TextButton(onClick = {
+                                pushUndo()
+                                values = snapshot.values
+                                enabled = snapshot.enabled
+                                showProtocolSnapshots = false
+                            }) { Text(stringResource(dev.ninfenz.mobile.R.string.author_protocol_snapshot_restore)) }
+                            TextButton(onClick = {
+                                protocolSnapshotStore.remove(snapshot.id)
+                                protocolSnapshots = protocolSnapshotStore.list()
+                            }) { Text(stringResource(dev.ninfenz.mobile.R.string.inbox_remove)) }
+                        }
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { showProtocolSnapshots = false }) { Text(stringResource(android.R.string.cancel)) } }
         )
     }
 }
