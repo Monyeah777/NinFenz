@@ -227,6 +227,8 @@ pub fn dispatch(op: &str, req: &Value) -> Envelope {
         "contract-compile" => crate::contract::compile_op(req),
         "contract-solve" => crate::contract::solve_op(req),
         "contract-explain" => crate::contract::explain_op(req),
+        "build-journal" => crate::build::journal_op(req),
+        "build-why" => crate::build::why_op(req),
         "build-plan" => crate::build::build_plan_op(req),
         "build-run" => crate::build::build_run_op(req),
         "build-incremental" => crate::build::build_incremental_op(req),

@@ -421,7 +421,53 @@ pub fn run(req: &Value) -> OpOutcome {
     }
     let mut graph_out = graph.clone();
     graph_out.as_object_mut().unwrap().insert("outputs".into(), Value::Array(new_outputs));
-    Ok((0, json!({"schema": "nf-build-result/1", "graph": graph_out, "artifacts": artifacts, "plan_sha": graph_out.get("plan_sha")})))
+    let plan_sha = graph_out.get("plan_sha").and_then(|v| v.as_str()).unwrap_or("").to_string();
+    let verdict = match req.get("verdict").and_then(|v| v.as_str()) {
+        Some("verified") => "verified",
+        _ => "unverified",
+    };
+    let skipped: Vec<String> = req
+        .get("skipped")
+        .and_then(|v| v.as_array())
+        .map(|a| a.iter().filter_map(|v| v.as_str().map(ToString::to_string)).collect())
+        .unwrap_or_default();
+    let mut journal_nodes = Vec::new();
+    for node in graph_out.get("nodes").and_then(|v| v.as_array()).into_iter().flatten() {
+        journal_nodes.push(json!({
+            "id": node.get("id").and_then(|v| v.as_str()).unwrap_or("node"),
+            "kind": node.get("kind").and_then(|v| v.as_str()).unwrap_or("node"),
+            "status": "run",
+            "key": node.get("cache_key").and_then(|v| v.as_str()).filter(|s| !s.is_empty()).unwrap_or("n/a")
+        }));
+    }
+    let mut journal = json!({
+        "schema": "nf-build/1",
+        "plan_sha": plan_sha,
+        "nodes": journal_nodes,
+        "artifacts": artifacts,
+        "skipped": skipped,
+        "verdict": verdict
+    });
+    if let Some(project_id) = req.get("project_id").and_then(|v| v.as_str()) {
+        journal.as_object_mut().unwrap().insert("project_id".into(), json!(project_id));
+    }
+    let run_id = digest_value(&json!({
+        "plan_sha": journal.get("plan_sha"),
+        "nodes": journal.get("nodes"),
+        "artifacts": journal.get("artifacts")
+    }))?;
+    journal.as_object_mut().unwrap().insert("run_id".into(), json!(run_id));
+    let issues = validate("nf-build", &journal);
+    if !issues.is_empty() {
+        return Err(CoreError::new("NF-BLD-001").with_message(crate::schema::first_issue_text(&issues)).with_exit(1));
+    }
+    Ok((0, json!({
+        "schema": "nf-build-result/1",
+        "graph": graph_out,
+        "artifacts": journal.get("artifacts").cloned().unwrap_or_else(|| json!([])),
+        "plan_sha": journal.get("plan_sha"),
+        "journal": journal
+    })))
 }
 
 fn transform_key(graph: &Value, output_node: &str) -> String {
@@ -731,6 +777,75 @@ pub fn block_incremental(req: &Value) -> OpOutcome {
     plan.as_object_mut().unwrap().insert("stale".into(), Value::Array(vec![]));
     plan.as_object_mut().unwrap().insert("summary".into(), json!({"recompute": recompute.len() as u64, "reuse": reuse.len() as u64, "removed": removed.len() as u64, "stale": 0}));
     Ok((0, plan))
+}
+
+pub fn journal_op(req: &Value) -> OpOutcome {
+    let journal = req
+        .get("journal")
+        .or_else(|| req.get("result").and_then(|r| r.get("journal")))
+        .cloned()
+        .ok_or_else(|| usage("build-journal 需要 journal 或 result.journal"))?;
+    let issues = validate("nf-build", &journal);
+    if !issues.is_empty() {
+        return Err(CoreError::new("NF-BLD-001").with_message(crate::schema::first_issue_text(&issues)).with_exit(1));
+    }
+    Ok((0, journal))
+}
+
+pub fn why_op(req: &Value) -> OpOutcome {
+    let old = req_value(req, "old_graph")?;
+    let new = req_value(req, "new_graph")?;
+    let old_report = validate_graph(old);
+    if old_report.has_error() {
+        return Ok((1, old_report.to_value()));
+    }
+    let new_report = validate_graph(new);
+    if new_report.has_error() {
+        return Ok((1, new_report.to_value()));
+    }
+    let old_outputs: BTreeMap<String, Value> = old
+        .get("outputs")
+        .and_then(|v| v.as_array())
+        .map(|a| a.iter().map(|o| (o.get("path").and_then(|v| v.as_str()).unwrap_or("").to_string(), o.clone())).collect())
+        .unwrap_or_default();
+    let new_outputs: BTreeMap<String, Value> = new
+        .get("outputs")
+        .and_then(|v| v.as_array())
+        .map(|a| a.iter().map(|o| (o.get("path").and_then(|v| v.as_str()).unwrap_or("").to_string(), o.clone())).collect())
+        .unwrap_or_default();
+    let mut rebuild = Vec::new();
+    let mut reasons = Vec::new();
+    for (path, output) in &new_outputs {
+        let old_output = match old_outputs.get(path) {
+            Some(value) => value,
+            None => {
+                rebuild.push(path.clone());
+                reasons.push(json!({"path": path, "reason": "new-output"}));
+                continue;
+            }
+        };
+        let old_key = transform_key(old, old_output.get("node").and_then(|v| v.as_str()).unwrap_or(""));
+        let new_key = transform_key(new, output.get("node").and_then(|v| v.as_str()).unwrap_or(""));
+        if old_key.is_empty() || old_key != new_key {
+            rebuild.push(path.clone());
+            reasons.push(json!({"path": path, "reason": "cache-key", "old_key": old_key, "new_key": new_key}));
+        } else if old_output.get("sha256") != output.get("sha256") {
+            rebuild.push(path.clone());
+            reasons.push(json!({"path": path, "reason": "content"}));
+        }
+    }
+    for path in old_outputs.keys().filter(|path| !new_outputs.contains_key(*path)) {
+        reasons.push(json!({"path": path, "reason": "removed"}));
+    }
+    let plan_changed = old.get("plan_sha") != new.get("plan_sha");
+    let environment_changed = old.get("environment") != new.get("environment");
+    Ok((0, json!({
+        "schema": "nf-build-why/1",
+        "rebuild": rebuild,
+        "reasons": reasons,
+        "plan_changed": plan_changed,
+        "environment_changed": environment_changed
+    })))
 }
 
 pub fn block_plan_op(req: &Value) -> OpOutcome { block_plan(req) }

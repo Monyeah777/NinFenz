@@ -600,6 +600,16 @@
       "schema": "nf-contract-result",
       "violated": "issue 缺 code/message/fix",
       "codes": ["NF-CON-002"]
+    },
+    "invalid/nf-build/inv-status.json": {
+      "schema": "nf-build",
+      "violated": "node.status 不在 hit/run/failed/skipped",
+      "codes": ["NF-BLD-001"]
+    },
+    "invalid/nf-build/inv-verdict.json": {
+      "schema": "nf-build",
+      "violated": "verdict 只允许 verified/unverified",
+      "codes": ["NF-BLD-001"]
     }
   }
 }

@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/app/schema/nf-build.schema.json",
+  "title": "NF 构建 journal（nf-build/1）",
+  "description": "一次构建的节点/产物/跳过检查/verdict；本地记录，不作为内容真源。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "run_id", "plan_sha", "nodes", "artifacts", "skipped", "verdict"],
+  "properties": {
+    "schema": { "const": "nf-build/1" },
+    "run_id": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "project_id": { "type": "string", "minLength": 1 },
+    "plan_sha": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "kind", "status", "key"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "kind": { "type": "string", "minLength": 1 },
+          "status": { "enum": ["hit", "run", "failed", "skipped"] },
+          "key": { "type": "string", "minLength": 1 },
+          "ms": { "type": "integer", "minimum": 0 },
+          "reason": { "type": "string" }
+        }
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "sha256", "bytes", "format"],
+        "properties": {
+          "path": { "type": "string", "minLength": 1 },
+          "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "bytes": { "type": "integer", "minimum": 0 },
+          "format": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "skipped": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "verdict": { "enum": ["verified", "unverified"] }
+  }
+}

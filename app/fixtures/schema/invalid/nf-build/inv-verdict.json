@@ -1,0 +1,14 @@
+{
+  "schema": "nf-build/1",
+  "run_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "plan_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "nodes": [
+    { "id": "in:0", "kind": "input", "status": "run", "key": "in-key" },
+    { "id": "t:0", "kind": "transform", "status": "run", "key": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" }
+  ],
+  "artifacts": [
+    { "path": "result.md", "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "bytes": 12, "format": "md" }
+  ],
+  "skipped": [ "delivery-check" ],
+  "verdict": "maybe"
+}
