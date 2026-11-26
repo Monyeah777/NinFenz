@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Button
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -98,6 +99,7 @@ fun CcosScreen(onBack: () -> Unit) {
     var queue by remember { mutableStateOf(queueStore.load()) }
     var showQueue by remember { mutableStateOf(false) }
     var queueNote by remember { mutableStateOf<String?>(null) }
+    var selectedQueue by remember { mutableStateOf<Set<String>>(emptySet()) }
 
     val taskPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         if (uri == null) return@rememberLauncherForActivityResult
@@ -341,9 +343,27 @@ fun CcosScreen(onBack: () -> Unit) {
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     if (queue.isEmpty()) Text(stringResource(dev.ninfenz.mobile.R.string.ccos_queue_empty), style = NfType.meta)
+                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        TextButton(onClick = {
+                            selectedQueue = if (selectedQueue.size == queue.size) emptySet() else queue.map { it.id }.toSet()
+                        }) { Text(stringResource(if (selectedQueue.size == queue.size) dev.ninfenz.mobile.R.string.ccos_queue_select_none else dev.ninfenz.mobile.R.string.ccos_queue_select_all)) }
+                        TextButton(enabled = selectedQueue.isNotEmpty(), onClick = {
+                            selectedQueue.forEach { queueStore.remove(it) }
+                            selectedQueue = emptySet()
+                            queue = queueStore.load()
+                        }) { Text(stringResource(dev.ninfenz.mobile.R.string.ccos_queue_remove_selected)) }
+                    }
                     queue.forEach { item ->
                         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                            Text(item.id, style = NfType.meta)
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Checkbox(
+                                    checked = item.id in selectedQueue,
+                                    onCheckedChange = { on ->
+                                        selectedQueue = if (on) selectedQueue + item.id else selectedQueue - item.id
+                                    }
+                                )
+                                Text(item.id, style = NfType.meta)
+                            }
                             Row {
                                 TextButton(onClick = {
                                     runCatching {
