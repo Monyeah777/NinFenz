@@ -1404,7 +1404,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                 Text(summary, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page))
                 Text(stringResource(dev.ninfenz.mobile.R.string.delivery_export_group_docs), style = NfType.label, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(start = NfSpacing.page, end = NfSpacing.page, top = NfSpacing.s))
                 OutlinedButton(
-                    enabled = exportMarkdown != null && !busy,
+                    enabled = exportMarkdown != null && !busy && !contractUnsatisfiable,
                     onClick = {
                         val md = exportMarkdown ?: return@OutlinedButton
                         busy = true
