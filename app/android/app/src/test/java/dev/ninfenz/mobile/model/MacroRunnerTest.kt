@@ -39,6 +39,18 @@ class MacroRunnerTest {
     }
 
     @Test
+    fun listsPlaceholders() {
+        val plan = buildJsonObject {
+            put("steps", buildJsonArray {
+                add(buildJsonObject { put("params", buildJsonObject { put("title", "{{project}}") }) })
+                add(buildJsonObject { put("params", buildJsonObject { put("sub", "{{section}}") }) })
+                add(buildJsonObject { put("params", buildJsonObject { put("again", "{{project}}") }) })
+            })
+        }
+        assertEquals(listOf("project", "section"), MacroRunner.placeholders(plan))
+    }
+
+    @Test
     fun bindsPlaceholdersInParams() {
         val plan = buildJsonObject {
             put("steps", buildJsonArray {

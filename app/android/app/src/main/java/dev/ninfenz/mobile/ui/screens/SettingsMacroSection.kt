@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -47,6 +49,24 @@ fun SettingsMacroSection() {
     var note by remember { mutableStateOf<String?>(null) }
     var lastPlan by remember { mutableStateOf<JsonObject?>(null) }
     var lastRun by remember { mutableStateOf<MacroRunResult?>(null) }
+    var paramMacro by remember { mutableStateOf<MacroStore.Macro?>(null) }
+    var paramValues by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
+
+    val validateHandler: suspend (String, JsonObject) -> Result<String> = { action, params ->
+        when (action) {
+            "validate" -> {
+                val spec = params["spec"] as? JsonObject
+                if (spec == null) {
+                    Result.failure(IllegalStateException(context.getString(R.string.settings_macros_validate_missing)))
+                } else {
+                    val response = safeCall("spec-validate", buildJsonObject { put("spec", spec) })
+                    if (response.ok) Result.success("validated")
+                    else Result.failure(IllegalStateException(response.error?.message ?: "validate failed"))
+                }
+            }
+            else -> Result.failure(IllegalStateException(context.getString(R.string.settings_macros_unwired, action)))
+        }
+    }
 
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         if (uri == null) return@rememberLauncherForActivityResult
@@ -117,28 +137,13 @@ fun SettingsMacroSection() {
                 TextButton(enabled = lastPlan != null, onClick = {
                     scope.launch {
                         val plan = lastPlan ?: return@launch
-                        lastRun = MacroRunner.run(plan) { action, params ->
-                            when (action) {
-                                "validate" -> {
-                                    val spec = params["spec"] as? JsonObject
-                                    if (spec == null) {
-                                        Result.failure(IllegalStateException(context.getString(R.string.settings_macros_validate_missing)))
-                                    } else {
-                                        val response = safeCall("spec-validate", buildJsonObject { put("spec", spec) })
-                                        if (response.ok) {
-                                            Result.success("validated")
-                                        } else {
-                                            Result.failure(IllegalStateException(response.error?.message ?: "validate failed"))
-                                        }
-                                    }
-                                }
-                                else -> Result.failure(
-                                    IllegalStateException(context.getString(R.string.settings_macros_unwired, action))
-                                )
-                            }
-                        }
+                        lastRun = MacroRunner.run(plan, validateHandler)
                     }
                 }) { Text(stringResource(R.string.settings_macros_run)) }
+                TextButton(onClick = {
+                    paramValues = MacroRunner.placeholders(macro.json).associateWith { "" }
+                    paramMacro = macro
+                }) { Text(stringResource(R.string.settings_macros_params)) }
                 TextButton(onClick = {
                     store.delete(macro.id)
                     items = store.list()
@@ -179,5 +184,44 @@ fun SettingsMacroSection() {
                 )
             }
         }
+    }
+
+    paramMacro?.let { macro ->
+        AlertDialog(
+            onDismissRequest = { paramMacro = null },
+            title = { Text(stringResource(R.string.settings_macros_params_title)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                    if (paramValues.isEmpty()) {
+                        Text(stringResource(R.string.settings_macros_params_empty), style = NfType.meta)
+                    }
+                    paramValues.keys.forEach { key ->
+                        OutlinedTextField(
+                            value = paramValues[key].orEmpty(),
+                            onValueChange = { value -> paramValues = paramValues + (key to value) },
+                            label = { Text(key) },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    scope.launch {
+                        val plan = store.plan(macro.json).getOrNull()
+                        if (plan == null) {
+                            note = context.getString(R.string.settings_macros_failed, "plan failed")
+                        } else {
+                            lastRun = MacroRunner.run(MacroRunner.bind(plan, paramValues), validateHandler)
+                        }
+                        paramMacro = null
+                    }
+                }) { Text(stringResource(R.string.settings_macros_run)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { paramMacro = null }) { Text(stringResource(android.R.string.cancel)) }
+            }
+        )
     }
 }

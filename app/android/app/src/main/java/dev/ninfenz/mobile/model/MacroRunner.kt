@@ -65,6 +65,12 @@ object MacroRunner {
         return MacroRunResult(status, results, failures)
     }
 
+    fun placeholders(plan: JsonObject): List<String> =
+        Regex("\\{\\{([^}]+)\\}\\}").findAll(plan.toString())
+            .map { it.groupValues[1] }
+            .distinct()
+            .toList()
+
     /** 参数化：把字符串里的 {{key}} 替换为 values[key]，数组/对象递归。 */
     fun bind(plan: JsonObject, values: Map<String, String>): JsonObject =
         bindElement(plan, values) as JsonObject
