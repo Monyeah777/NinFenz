@@ -2033,6 +2033,37 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
             title = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_variants)) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                    TextButton(enabled = rawPlan != null && !busy, onClick = {
+                        val raw = rawPlan ?: return@TextButton
+                        val specJson = artifacts?.specJson ?: return@TextButton
+                        busy = true
+                        scope.launch {
+                            var ok = 0
+                            var failed = 0
+                            for (variant in extensionVariants) {
+                                val variantInputs = inputs.toMutableMap()
+                                (variant.config["inputs"] as? JsonObject)?.forEach { (key, value) ->
+                                    if (plan?.slots?.contains(key) == true) variantInputs[key] = value.jsonPrimitive.content
+                                }
+                                val response = runCatching {
+                                    safeCall("assemble", buildJsonObject {
+                                        put("plan", raw)
+                                        put("spec", specJson)
+                                        put("inputs", buildJsonObject { for ((k, v) in variantInputs) put(k, v) })
+                                    })
+                                }.getOrNull()
+                                val md = response?.resultObject()?.let { J.optString(it, "markdown") }
+                                if (response?.ok == true && !md.isNullOrBlank()) {
+                                    versionStore.save(project.id, md)
+                                    ok++
+                                } else {
+                                    failed++
+                                }
+                            }
+                            variantNote = context.getString(dev.ninfenz.mobile.R.string.delivery_batch_assemble_done, ok, failed)
+                            busy = false
+                        }
+                    }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_batch_assemble)) }
                     extensionVariants.forEach { variant ->
                         TextButton(onClick = {
                             val objectInputs = variant.config["inputs"] as? JsonObject

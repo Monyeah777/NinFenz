@@ -1422,4 +1422,6 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="author_protocol_snapshot_restore">恢复</string>
     <string name="author_protocol_snapshot_empty">还没有协议快照。</string>
     <string name="author_protocol_snapshot_meta">%1$d 字段 · %2$d 条款启用</string>
+    <string name="delivery_batch_assemble">批量装配</string>
+    <string name="delivery_batch_assemble_done">批量装配完成：成功 %1$d，失败 %2$d</string>
 </resources>

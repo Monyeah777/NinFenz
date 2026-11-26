@@ -1426,4 +1426,6 @@ MIT License · See app/docs/LEGAL.md···⟧</string>
     <string name="author_protocol_snapshot_restore">⟦Restore···⟧</string>
     <string name="author_protocol_snapshot_empty">⟦No protocol snapshots yet.···⟧</string>
     <string name="author_protocol_snapshot_meta">⟦%1$d fields · %2$d clauses enabled···⟧</string>
+    <string name="delivery_batch_assemble">⟦Batch assemble···⟧</string>
+    <string name="delivery_batch_assemble_done">⟦Batch assemble done: %1$d succeeded, %2$d failed···⟧</string>
 </resources>
