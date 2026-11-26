@@ -1374,4 +1374,8 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="library_group_status">按状态</string>
     <string name="library_group_tag">按标签</string>
     <string name="library_untagged">未打标签</string>
+    <string name="pack_matrix_title">Pack 兼容矩阵</string>
+    <string name="pack_matrix_line">%1$s · %2$s · %3$d 个项目</string>
+    <string name="pack_matrix_empty">暂无 Pack，无法生成矩阵。</string>
+    <string name="pack_matrix_projects">引用项目</string>
 </resources>

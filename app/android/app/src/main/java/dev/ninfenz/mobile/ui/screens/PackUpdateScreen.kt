@@ -72,6 +72,7 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit, onOpenProject: (St
     var resultText by remember { mutableStateOf<String?>(null) }
     var busy by remember { mutableStateOf(false) }
     var packs by remember { mutableStateOf<List<PackEntry>>(emptyList()) }
+    var matrixProjects by remember { mutableStateOf<List<dev.ninfenz.mobile.data.ProjectEntry>>(emptyList()) }
     var selected by remember { mutableStateOf<PackEntry?>(null) }
     var newRoot by remember { mutableStateOf<File?>(null) }
     var diffBusy by remember { mutableStateOf(false) }
@@ -82,6 +83,7 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit, onOpenProject: (St
 
     LaunchedEffect(Unit) {
         packs = withContext(Dispatchers.IO) { PackStore(context.filesDir).scan().packs }
+        matrixProjects = withContext(Dispatchers.IO) { store.loadProjects().projects }
         selected = packs.firstOrNull()
     }
 
@@ -167,6 +169,32 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit, onOpenProject: (St
     fun packDir(id: String, version: String): File = File(File(File(context.filesDir, "library/packs"), id), version)
 
     NfScaffold(title = stringResource(dev.ninfenz.mobile.R.string.packupdate_title), onBack = onBack) {
+        CardBox(title = stringResource(dev.ninfenz.mobile.R.string.pack_matrix_title)) {
+            if (packs.isEmpty()) {
+                Text(stringResource(dev.ninfenz.mobile.R.string.pack_matrix_empty), style = NfType.meta)
+            } else {
+                packs.groupBy { it.id }.toSortedMap().forEach { (packId, versions) ->
+                    versions.sortedByDescending { it.version }.forEach { pack ->
+                        val refs = matrixProjects.filter {
+                            it.project.refs.basePackId == packId && it.project.refs.basePackVersion == pack.version
+                        }
+                        Text(
+                            stringResource(dev.ninfenz.mobile.R.string.pack_matrix_line, packId, pack.version, refs.size),
+                            style = NfType.secondary
+                        )
+                        if (refs.isNotEmpty()) {
+                            Text(stringResource(dev.ninfenz.mobile.R.string.pack_matrix_projects), style = NfType.meta)
+                            for (entry in refs) {
+                                TextButton(onClick = { onOpenProject(entry.project.id) }) {
+                                    Text(entry.project.title)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         CardBox(title = stringResource(dev.ninfenz.mobile.R.string.packupdate_step1)) {
             if (packs.isEmpty()) {
                 EmptyState(stringResource(dev.ninfenz.mobile.R.string.packupdate_no_packs))

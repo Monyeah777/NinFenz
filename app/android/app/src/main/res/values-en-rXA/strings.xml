@@ -1378,4 +1378,8 @@ MIT License · See app/docs/LEGAL.md···⟧</string>
     <string name="library_group_status">⟦By status···⟧</string>
     <string name="library_group_tag">⟦By tag···⟧</string>
     <string name="library_untagged">⟦Untagged···⟧</string>
+    <string name="pack_matrix_title">⟦Pack compatibility matrix···⟧</string>
+    <string name="pack_matrix_line">⟦%1$s · %2$s · %3$d projects···⟧</string>
+    <string name="pack_matrix_empty">⟦No Packs yet; nothing to map.···⟧</string>
+    <string name="pack_matrix_projects">⟦Referenced projects···⟧</string>
 </resources>
