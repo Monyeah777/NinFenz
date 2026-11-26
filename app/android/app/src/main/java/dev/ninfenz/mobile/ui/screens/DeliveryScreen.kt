@@ -97,6 +97,7 @@ import dev.ninfenz.mobile.data.ExportHistoryStore
 import dev.ninfenz.mobile.data.ExportVerifier
 import dev.ninfenz.mobile.data.PackEntry
 import dev.ninfenz.mobile.data.SourceStore
+import dev.ninfenz.mobile.data.StyleMatch
 import dev.ninfenz.mobile.data.StyleTemplateStore
 import dev.ninfenz.mobile.data.AssemblyArtifact
 import dev.ninfenz.mobile.data.ProjectStatusStore
@@ -1676,6 +1677,16 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                             style = NfType.meta,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
+                                        docxStyles?.let { current ->
+                                            Text(
+                                                stringResource(
+                                                    dev.ninfenz.mobile.R.string.docx_style_match,
+                                                    StyleMatch.score(current, template.stylesXml)
+                                                ),
+                                                style = NfType.meta,
+                                                color = MaterialTheme.colorScheme.primary
+                                            )
+                                        }
                                     }
                                 }
                             }

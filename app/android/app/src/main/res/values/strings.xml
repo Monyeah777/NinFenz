@@ -470,6 +470,7 @@
     <string name="docx_style_from_library">样式模板</string>
     <string name="docx_style_library_empty">还没有样式模板；先在设置导入 DOCX。</string>
     <string name="docx_style_meta">%1$s · %2$s</string>
+    <string name="docx_style_match">与当前样式匹配 %1$d%%</string>
     <string name="docx_reference_none">未加载参考样式</string>
     <string name="docx_reference_failed">参考样式读取失败</string>
     <string name="docx_reference_failed_fix">确认 DOCX 含 word/styles.xml</string>
