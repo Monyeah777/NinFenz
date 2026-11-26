@@ -1361,4 +1361,6 @@ MIT License · See app/docs/LEGAL.md···⟧</string>
     <string name="import_recent_filter">⟦Filter recent imports···⟧</string>
     <string name="import_recent_all">⟦Show all···⟧</string>
     <string name="import_recent_less">⟦Show less···⟧</string>
+    <string name="search_scope_favorites">⟦Favorites only···⟧</string>
+    <string name="search_scope_all_tags">⟦All tags···⟧</string>
 </resources>

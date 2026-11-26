@@ -44,6 +44,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import dev.ninfenz.mobile.data.LibraryMetaStore
 import dev.ninfenz.mobile.data.ProjectEntry
 import dev.ninfenz.mobile.data.SearchHit
 import dev.ninfenz.mobile.data.SearchHistoryStore
@@ -81,6 +82,9 @@ fun SearchScreen(
     var selectedProjectId by rememberSaveable {
         mutableStateOf(savedFilter?.projectId?.takeIf { id -> projects.any { it.project.id == id } })
     }
+    var favoritesOnly by rememberSaveable { mutableStateOf(false) }
+    var scopeTag by rememberSaveable { mutableStateOf<String?>(null) }
+    val metaStore = remember { LibraryMetaStore(context.filesDir) }
     val filterKind = filterName?.let { name -> SearchKind.entries.firstOrNull { it.name == name } }
     val historyStore = remember { SearchHistoryStore(context.filesDir) }
     var history by remember { mutableStateOf(historyStore.load()) }
@@ -97,8 +101,11 @@ fun SearchScreen(
         focusRequester.requestFocus()
     }
     val results = remember(query, all) { index.search(all, query) }
-    val filtered = remember(results, filterName, selectedPackId, selectedProjectId) {
-        SearchFilter.apply(results, filterKind, selectedPackId, selectedProjectId)
+    val filtered = remember(results, filterName, selectedPackId, selectedProjectId, favoritesOnly, scopeTag) {
+        var scoped = SearchFilter.apply(results, filterKind, selectedPackId, selectedProjectId)
+        if (favoritesOnly) scoped = scoped.filter { hit -> hit.projectId?.let { metaStore.isFavorite(it) } == true }
+        if (scopeTag != null) scoped = scoped.filter { hit -> hit.projectId?.let { scopeTag in metaStore.tags(it) } == true }
+        scoped
     }
     LaunchedEffect(filtered) { selected = 0 }
     val rows = remember(filtered) {
@@ -176,6 +183,35 @@ fun SearchScreen(
             }
             if (projects.isNotEmpty()) {
                 ProjectFilterRow(projects, selectedProjectId) { selectedProjectId = it }
+            }
+            val scopeTags = metaStore.allTags().sorted()
+            if (all.any { it.projectId != null }) {
+                LazyRow(
+                    contentPadding = PaddingValues(horizontal = NfSpacing.page),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    item {
+                        FilterChip(
+                            selected = favoritesOnly,
+                            onClick = { favoritesOnly = !favoritesOnly },
+                            label = { Text(stringResource(dev.ninfenz.mobile.R.string.search_scope_favorites)) }
+                        )
+                    }
+                    item {
+                        FilterChip(
+                            selected = scopeTag == null,
+                            onClick = { scopeTag = null },
+                            label = { Text(stringResource(dev.ninfenz.mobile.R.string.search_scope_all_tags)) }
+                        )
+                    }
+                    items(scopeTags) { tag ->
+                        FilterChip(
+                            selected = scopeTag == tag,
+                            onClick = { scopeTag = if (scopeTag == tag) null else tag },
+                            label = { Text("#" + tag) }
+                        )
+                    }
+                }
             }
             Text(
                 stringResource(dev.ninfenz.mobile.R.string.search_keyboard_hint),
