@@ -2473,6 +2473,17 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                                     else Result.failure(IllegalStateException(response.error?.message ?: "validate failed"))
                                                 }
                                             }
+                                            "export" -> {
+                                                val md = markdown
+                                                if (md.isNullOrBlank()) {
+                                                    Result.failure(IllegalStateException(context.getString(dev.ninfenz.mobile.R.string.delivery_macro_failed, "缺少 markdown")))
+                                                } else {
+                                                    val dir = File(File(context.filesDir, "exports"), "macro").apply { mkdirs() }
+                                                    val file = File(dir, "macro-" + System.currentTimeMillis() + ".md")
+                                                    file.writeText(md, Charsets.UTF_8)
+                                                    Result.success(file.name)
+                                                }
+                                            }
                                             else -> Result.failure(
                                                 IllegalStateException(
                                                     context.getString(dev.ninfenz.mobile.R.string.delivery_macro_unwired, action)
