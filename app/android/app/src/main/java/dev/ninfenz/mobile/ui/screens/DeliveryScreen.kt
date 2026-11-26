@@ -373,6 +373,9 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
         ContractIrStore(context.filesDir, project.id).loadSolve()
             ?.get("satisfiable")?.jsonPrimitive?.content == "false"
     }
+    val contractValues = remember(project.id) {
+        ContractIrStore(context.filesDir, project.id).loadValues()
+    }
     var docxSectPr by remember { mutableStateOf<String?>(null) }
     var docxTheme by remember { mutableStateOf<String?>(null) }
     var docxNumbering by remember { mutableStateOf<String?>(null) }
@@ -572,7 +575,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
             plan = parsed
             inputs = parsed.slots.associate { slot ->
                 val restored = restoredInputs[slot]
-                slot to (if (!restored.isNullOrBlank()) restored else slotPrefill[slot] ?: "")
+                slot to (if (!restored.isNullOrBlank()) restored else contractValues[slot] ?: slotPrefill[slot] ?: "")
             }
         }
     }
@@ -810,7 +813,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         rawPlan = obj
                         inputs = parsed.slots.associate { slot ->
                             val restored = restoredInputs[slot]
-                            slot to (if (!restored.isNullOrBlank()) restored else slotPrefill[slot] ?: "")
+                            slot to (if (!restored.isNullOrBlank()) restored else contractValues[slot] ?: slotPrefill[slot] ?: "")
                         }
                         draftStore.save(project.id, inputs, obj)
                         draftNote = if (restoredInputs.isNotEmpty()) context.getString(dev.ninfenz.mobile.R.string.delivery_draft_restored) else null

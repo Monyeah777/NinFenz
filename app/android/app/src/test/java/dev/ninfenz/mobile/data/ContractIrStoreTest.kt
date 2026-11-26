@@ -21,4 +21,12 @@ class ContractIrStoreTest {
         store.saveSolve(result)
         assertEquals("true", store.loadSolve()?.get("satisfiable")?.toString())
     }
+
+    @Test
+    fun savesAndLoadsContractValues() {
+        val store = ContractIrStore(tmp.root, "p1")
+        store.saveValues(mapOf("slot_a" to "hello", "slot_b" to "world"))
+        assertEquals("hello", store.loadValues()["slot_a"])
+        assertEquals("world", store.loadValues()["slot_b"])
+    }
 }

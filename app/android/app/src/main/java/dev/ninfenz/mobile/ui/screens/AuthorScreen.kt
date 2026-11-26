@@ -1079,6 +1079,9 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
                             )
                         } else {
                             contractStore.saveSolve(result)
+                            (result["assignments"] as? JsonObject)?.let { assignments ->
+                                contractStore.saveValues(assignments.mapValues { (_, value) -> value.jsonPrimitive.content })
+                            }
                             contractNote = context.getString(dev.ninfenz.mobile.R.string.author_contract_solved)
                             val explained = safeCall("contract-explain", buildJsonObject { put("result", result) })
                             contractExplain = explained.resultObject()?.get("lines")?.jsonArray
