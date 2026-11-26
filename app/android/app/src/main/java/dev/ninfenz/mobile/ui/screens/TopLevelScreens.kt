@@ -97,6 +97,7 @@ import dev.ninfenz.mobile.data.LanguageMode
 import dev.ninfenz.mobile.data.ExtensionStore
 import dev.ninfenz.mobile.data.LibraryMetaStore
 import dev.ninfenz.mobile.data.SavedViewStore
+import dev.ninfenz.mobile.data.SmartCollectionStore
 import dev.ninfenz.mobile.data.LibraryViewStore
 import dev.ninfenz.mobile.data.ThemeMode
 import dev.ninfenz.mobile.model.Project
@@ -173,6 +174,15 @@ fun LibraryHomeScreen(
         }.getOrDefault(emptyList())
     }
     val allViews = savedViews + extensionViews
+    val smartStore = remember(viewFilesDir) { viewFilesDir?.let { SmartCollectionStore(it) } }
+    val smartCollections = remember {
+        (smartStore?.load() ?: emptyList()) + runCatching {
+            ExtensionStore(context.filesDir).contributions(setOf("smart_collection")).mapNotNull { c ->
+                smartStore?.fromExtension(c.id, c.config)
+            }
+        }.getOrDefault(emptyList())
+    }
+    var activeCollection by remember { mutableStateOf<SmartCollectionStore.Collection?>(null) }
     var showSaveView by remember { mutableStateOf(false) }
     var viewName by rememberSaveable { mutableStateOf("") }
     val metaStore = remember(viewFilesDir) { viewFilesDir?.let { LibraryMetaStore(it) } }
@@ -189,9 +199,13 @@ fun LibraryHomeScreen(
     }
     val filterStatus = statusFilter?.let { ProjectStatus.fromWire(it) }
     val filterSort = ProjectSort.entries.firstOrNull { it.name == sortName } ?: ProjectSort.RECENT
-    val filteredProjects = remember(projects, statusFilter, sortName, recentIds, favoritesOnly, favoriteIds) {
+    val filteredProjects = remember(projects, statusFilter, sortName, recentIds, favoritesOnly, favoriteIds, activeCollection, allTags) {
         var base = if (favoritesOnly) projects.filter { it.project.id in favoriteIds } else projects
         if (tagFilter != null) base = base.filter { tagFilter in (metaStore?.tags(it.project.id) ?: emptySet()) }
+        val collection = activeCollection
+        if (collection != null && smartStore != null && metaStore != null) {
+            base = base.filter { smartStore.matches(collection, it, metaStore) }
+        }
         ProjectSorter.sort(
             ProjectFilter.apply(base, filterStatus),
             filterSort,
@@ -381,6 +395,13 @@ fun LibraryHomeScreen(
                                         sortName = view.sort
                                     },
                                     label = { Text(view.name) }
+                                )
+                            }
+                            items(smartCollections, key = { it.id }) { collection ->
+                                FilterChip(
+                                    selected = activeCollection?.id == collection.id,
+                                    onClick = { activeCollection = if (activeCollection?.id == collection.id) null else collection },
+                                    label = { Text(collection.name) }
                                 )
                             }
                             item {
