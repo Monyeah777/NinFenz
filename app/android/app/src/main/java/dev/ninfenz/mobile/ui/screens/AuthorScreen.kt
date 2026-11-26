@@ -56,6 +56,7 @@ import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.core.CoreError
 import dev.ninfenz.mobile.core.CoreResponse
 import dev.ninfenz.mobile.core.J
+import dev.ninfenz.mobile.data.AiRunStore
 import dev.ninfenz.mobile.data.AuthorArtifactStore
 import dev.ninfenz.mobile.data.ExtensionStore
 import dev.ninfenz.mobile.data.ContractIrStore
@@ -964,7 +965,11 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
     val snapshotStore = remember { SpecSnapshotStore(context.filesDir, project.id) }
     val contractStore = remember { ContractIrStore(context.filesDir, project.id) }
     val sourceStore = remember { SourceStore(context.filesDir, project.id) }
+    val aiRunStore = remember { AiRunStore(context.filesDir) }
     val clipboard = androidx.compose.ui.platform.LocalClipboardManager.current
+    var aiRuns by remember { mutableStateOf(aiRunStore.list()) }
+    var showAiRuns by remember { mutableStateOf(false) }
+    var aiNote by remember { mutableStateOf<String?>(null) }
     var contractNote by remember { mutableStateOf<String?>(null) }
     var sources by remember { mutableStateOf(sourceStore.list()) }
     var showSources by remember { mutableStateOf(false) }
@@ -1028,9 +1033,14 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
                 sources = sourceStore.list()
                 showSources = true
             }) { Text(stringResource(dev.ninfenz.mobile.R.string.author_sources)) }
+            TextButton(onClick = {
+                aiRuns = aiRunStore.list()
+                showAiRuns = true
+            }) { Text(stringResource(dev.ninfenz.mobile.R.string.author_ai_plan)) }
         }
         snapshotNote?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
         sourceNote?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
+        aiNote?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
         contractNote?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
         snippetNote?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
         for (section in spec.sections) {
@@ -1262,6 +1272,67 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
                 }
             },
             confirmButton = { TextButton(onClick = { showSources = false }) { Text(stringResource(android.R.string.ok)) } }
+        )
+    }
+
+    if (showAiRuns) {
+        AlertDialog(
+            onDismissRequest = { showAiRuns = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.author_ai_plan)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                    TextButton(enabled = !busy, onClick = {
+                        scope.launch {
+                            busy = true
+                            try {
+                                val response = safeCall("ai-plan", buildJsonObject {
+                                    put("project_id", project.id)
+                                    put("model", "ccos-task")
+                                    put("sections", kotlinx.serialization.json.buildJsonArray {
+                                        spec.sections.forEach { section ->
+                                            add(buildJsonObject { put("title", section.title) })
+                                        }
+                                    })
+                                })
+                                if (!response.ok) throw IllegalStateException(response.error?.message ?: "ai-plan failed")
+                                val run = response.resultObject() ?: throw IllegalStateException(context.getString(dev.ninfenz.mobile.R.string.author_ai_empty_result))
+                                aiRunStore.save(run)
+                                aiRuns = aiRunStore.list()
+                                val count = (run["tasks"] as? kotlinx.serialization.json.JsonArray)?.size ?: 0
+                                aiNote = context.getString(dev.ninfenz.mobile.R.string.author_ai_planned, count)
+                            } catch (t: Throwable) {
+                                aiNote = context.getString(
+                                    dev.ninfenz.mobile.R.string.author_ai_failed,
+                                    t.message ?: t.javaClass.simpleName
+                                )
+                            } finally {
+                                busy = false
+                            }
+                        }
+                    }) { Text(stringResource(dev.ninfenz.mobile.R.string.author_ai_generate)) }
+                    if (aiRuns.isEmpty()) {
+                        Text(
+                            stringResource(dev.ninfenz.mobile.R.string.author_ai_empty),
+                            style = NfType.meta,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    aiRuns.forEach { run ->
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                stringResource(dev.ninfenz.mobile.R.string.author_ai_meta, run.status, run.tasks),
+                                style = NfType.meta,
+                                modifier = Modifier.weight(1f)
+                            )
+                            TextButton(onClick = {
+                                aiRunStore.delete(run.id)
+                                aiRuns = aiRunStore.list()
+                            }) { Text(stringResource(dev.ninfenz.mobile.R.string.author_source_delete)) }
+                        }
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { showAiRuns = false }) { Text(stringResource(android.R.string.ok)) } }
         )
     }
 }

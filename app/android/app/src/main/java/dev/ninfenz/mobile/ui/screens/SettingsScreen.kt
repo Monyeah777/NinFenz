@@ -283,6 +283,7 @@ fun SettingsScreen(
         }
 
         SettingsFreeLayer(onThemeMode = onThemeMode, onLanguageMode = onLanguageMode)
+        SettingsMacroSection()
 
         if (audit) CardBox(title = stringResource(dev.ninfenz.mobile.R.string.settings_selfcheck_title)) {
             Text(
