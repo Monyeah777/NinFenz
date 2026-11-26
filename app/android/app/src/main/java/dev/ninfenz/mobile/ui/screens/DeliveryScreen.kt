@@ -95,6 +95,7 @@ import dev.ninfenz.mobile.data.PdfUaExporter
 import dev.ninfenz.mobile.data.PdfValidator
 import dev.ninfenz.mobile.data.ExportHistoryStore
 import dev.ninfenz.mobile.data.ExportVerifier
+import dev.ninfenz.mobile.data.ImportDraftStore
 import dev.ninfenz.mobile.data.MacroStore
 import dev.ninfenz.mobile.data.PackEntry
 import dev.ninfenz.mobile.data.SourceStore
@@ -141,8 +142,10 @@ import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 
@@ -2473,6 +2476,21 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                                     else Result.failure(IllegalStateException(response.error?.message ?: "validate failed"))
                                                 }
                                             }
+                                            "map" -> {
+                                                val raw = ImportDraftStore(context.filesDir).load()
+                                                if (raw.isNullOrBlank()) {
+                                                    Result.failure(IllegalStateException(context.getString(dev.ninfenz.mobile.R.string.delivery_macro_failed, "没有最近导入草稿")))
+                                                } else {
+                                                    val input = runCatching { Json.parseToJsonElement(raw).jsonObject }.getOrNull()
+                                                    if (input == null) {
+                                                        Result.failure(IllegalStateException(context.getString(dev.ninfenz.mobile.R.string.delivery_macro_failed, "草稿不是 JSON")))
+                                                    } else {
+                                                        val response = safeCall("map-suggest", buildJsonObject { put("import", input) })
+                                                        if (response.ok) Result.success("mapped")
+                                                        else Result.failure(IllegalStateException(response.error?.message ?: "map failed"))
+                                                    }
+                                                }
+                                            }
                                             "export" -> {
                                                 val md = markdown
                                                 if (md.isNullOrBlank()) {
@@ -2502,6 +2520,14 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                             style = NfType.meta,
                             color = if (run.failures == 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
                         )
+                        run.steps.forEach { step ->
+                            Text(
+                                step.id + " " + step.action + " · " + step.status +
+                                    (if (step.message.isBlank()) "" else " · " + step.message),
+                                style = NfType.meta,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
                 }
             },
