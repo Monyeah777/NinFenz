@@ -891,6 +891,31 @@ fun ImportScreen(
         }
     }
 
+    val multiPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris: List<Uri> ->
+        if (uris.isNotEmpty()) {
+            scope.launch {
+                var ok = 0
+                var failed = 0
+                for (uri in uris) {
+                    try {
+                        val meta = FileAccess.meta(context, uri)
+                        if (meta.size > FileAccess.MAX_IMPORT_BYTES) {
+                            failed++
+                            continue
+                        }
+                        error = null
+                        val file = FileAccess.copyToCache(context, uri, meta.name)
+                        importFromFile(file, ImportSource.SAF, meta.name, meta.mime, meta.size)
+                        if (error == null) ok++ else failed++
+                    } catch (e: Exception) {
+                        failed++
+                    }
+                }
+                notice = context.getString(dev.ninfenz.mobile.R.string.import_multi_done, ok, failed)
+            }
+        }
+    }
+
     val importStep = when {
         savedName != null -> 3
         doc != null -> 2
@@ -902,6 +927,9 @@ fun ImportScreen(
             title = stringResource(dev.ninfenz.mobile.R.string.import_title),
             onBack = onBack,
             actions = {
+                TextButton(onClick = { multiPicker.launch(arrayOf("*/*")) }, enabled = !busy) {
+                    Text(stringResource(dev.ninfenz.mobile.R.string.import_multi))
+                }
                 if (doc != null || rawResult != null || savedName != null || shareQueue.isNotEmpty() || prefillNote != null) {
                     TextButton(onClick = { showClearConfirm = true }, enabled = !busy) {
                         Text(stringResource(dev.ninfenz.mobile.R.string.import_clear_action))
