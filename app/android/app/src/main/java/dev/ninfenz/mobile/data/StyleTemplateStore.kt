@@ -81,6 +81,11 @@ class StyleTemplateStore(private val filesDir: File) {
         )
     }
 
+    fun fromPdf(file: File, name: String): StyleTemplate {
+        val style = PdfStyleExtractor.extract(file)
+        return save(name = name, sourceFormat = "pdf", stylesXml = style.toStyleXml())
+    }
+
     fun delete(id: String) {
         File(dir(), id.replace(Regex("[^A-Za-z0-9._-]"), "_") + ".json").delete()
     }

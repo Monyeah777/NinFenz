@@ -45,7 +45,14 @@ fun SettingsStyleSection() {
             runCatching {
                 val meta = FileAccess.meta(context, uri)
                 val file = withContext(Dispatchers.IO) { FileAccess.copyToCache(context, uri, meta.name) }
-                val saved = withContext(Dispatchers.IO) { store.fromDocx(file, meta.name.substringBeforeLast('.')) }
+                val name = meta.name.substringBeforeLast('.')
+                val saved = withContext(Dispatchers.IO) {
+                    if (meta.mime == "application/pdf" || meta.name.endsWith(".pdf", ignoreCase = true)) {
+                        store.fromPdf(file, name)
+                    } else {
+                        store.fromDocx(file, name)
+                    }
+                }
                 items = store.list()
                 note = context.getString(R.string.settings_styles_imported, saved.name)
             }.onFailure {
@@ -61,7 +68,14 @@ fun SettingsStyleSection() {
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-            TextButton(onClick = { picker.launch(arrayOf("application/vnd.openxmlformats-officedocument.wordprocessingml.document")) }) {
+            TextButton(onClick = {
+                picker.launch(
+                    arrayOf(
+                        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                        "application/pdf"
+                    )
+                )
+            }) {
                 Text(stringResource(R.string.settings_styles_import))
             }
         }
