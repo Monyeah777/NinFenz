@@ -3,6 +3,7 @@ package dev.ninfenz.mobile.model
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -23,9 +24,11 @@ class MacroRunnerTest {
     @Test
     fun isolatesFailedStepAndContinues() {
         val seen = mutableListOf<String>()
-        val result = MacroRunner.run(plan()) { _, _ ->
-            seen += "step"
-            if (seen.size == 2) Result.failure(IllegalStateException("boom")) else Result.success("ok")
+        val result = runBlocking {
+            MacroRunner.run(plan()) { _, _ ->
+                seen += "step"
+                if (seen.size == 2) Result.failure(IllegalStateException("boom")) else Result.success("ok")
+            }
         }
         assertEquals("partial", result.status)
         assertEquals(3, result.steps.size)
@@ -37,7 +40,9 @@ class MacroRunnerTest {
 
     @Test
     fun allFailedIsFailed() {
-        val result = MacroRunner.run(plan()) { _, _ -> Result.failure(IllegalStateException("x")) }
+        val result = runBlocking {
+            MacroRunner.run(plan()) { _, _ -> Result.failure(IllegalStateException("x")) }
+        }
         assertEquals("failed", result.status)
         assertEquals(3, result.failures)
     }

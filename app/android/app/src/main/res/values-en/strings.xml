@@ -1547,6 +1547,11 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="settings_macros_steps">%1$d steps</string>
     <string name="settings_macros_plan_steps">Planned steps (%1$d)</string>
     <string name="settings_macros_dry_run_note">dry-run: no execution, no file writes.</string>
+    <string name="settings_macros_run">Run</string>
+    <string name="settings_macros_run_status">Run %1$s · %2$d failed</string>
+    <string name="settings_macros_step_status">%1$s %2$s · %3$s</string>
+    <string name="settings_macros_validate_missing">validate step needs params.spec</string>
+    <string name="settings_macros_unwired">Action not wired: %1$s</string>
     <string name="settings_styles_title">Style templates</string>
     <string name="settings_styles_hint">Extract DOCX styles/sectPr/theme/numbering; this version stores OOXML fragments, not full semantic reverse.</string>
     <string name="settings_styles_import">Import DOCX style</string>

@@ -23,13 +23,19 @@ import androidx.compose.ui.res.stringResource
 import dev.ninfenz.mobile.R
 import dev.ninfenz.mobile.data.FileAccess
 import dev.ninfenz.mobile.data.MacroStore
+import dev.ninfenz.mobile.model.MacroRunResult
+import dev.ninfenz.mobile.model.MacroRunner
+import dev.ninfenz.mobile.ui.safeCall
 import dev.ninfenz.mobile.ui.components.CardBox
 import dev.ninfenz.mobile.ui.design.NfType
 import dev.ninfenz.mobile.ui.theme.NfSpacing
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.put
 
 /** W7 语义宏：导入/列表/dry-run；不录坐标，不直接写文件。 */
 @Composable
@@ -39,7 +45,8 @@ fun SettingsMacroSection() {
     val store = remember { MacroStore(context.filesDir) }
     var items by remember { mutableStateOf(store.list()) }
     var note by remember { mutableStateOf<String?>(null) }
-    var lastPlan by remember { mutableStateOf<kotlinx.serialization.json.JsonObject?>(null) }
+    var lastPlan by remember { mutableStateOf<JsonObject?>(null) }
+    var lastRun by remember { mutableStateOf<MacroRunResult?>(null) }
 
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         if (uri == null) return@rememberLauncherForActivityResult
@@ -107,6 +114,31 @@ fun SettingsMacroSection() {
                             }
                     }
                 }) { Text(stringResource(R.string.settings_macros_plan)) }
+                TextButton(enabled = lastPlan != null, onClick = {
+                    scope.launch {
+                        val plan = lastPlan ?: return@launch
+                        lastRun = MacroRunner.run(plan) { action, params ->
+                            when (action) {
+                                "validate" -> {
+                                    val spec = params["spec"] as? JsonObject
+                                    if (spec == null) {
+                                        Result.failure(IllegalStateException(context.getString(R.string.settings_macros_validate_missing)))
+                                    } else {
+                                        val response = safeCall("spec-validate", buildJsonObject { put("spec", spec) })
+                                        if (response.ok) {
+                                            Result.success("validated")
+                                        } else {
+                                            Result.failure(IllegalStateException(response.error?.message ?: "validate failed"))
+                                        }
+                                    }
+                                }
+                                else -> Result.failure(
+                                    IllegalStateException(context.getString(R.string.settings_macros_unwired, action))
+                                )
+                            }
+                        }
+                    }
+                }) { Text(stringResource(R.string.settings_macros_run)) }
                 TextButton(onClick = {
                     store.delete(macro.id)
                     items = store.list()
@@ -133,6 +165,19 @@ fun SettingsMacroSection() {
                 style = NfType.meta,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+        }
+        lastRun?.let { run ->
+            Text(
+                context.getString(R.string.settings_macros_run_status, run.status, run.failures),
+                style = NfType.meta,
+                color = if (run.failures == 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+            )
+            run.steps.forEach { step ->
+                Text(
+                    context.getString(R.string.settings_macros_step_status, step.id, step.action, step.status),
+                    style = NfType.meta
+                )
+            }
         }
     }
 }

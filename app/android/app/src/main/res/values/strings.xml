@@ -1543,6 +1543,11 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="settings_macros_steps">%1$d 步</string>
     <string name="settings_macros_plan_steps">计划步骤（%1$d）</string>
     <string name="settings_macros_dry_run_note">dry-run：不执行、不写文件。</string>
+    <string name="settings_macros_run">运行</string>
+    <string name="settings_macros_run_status">运行 %1$s · 失败 %2$d</string>
+    <string name="settings_macros_step_status">%1$s %2$s · %3$s</string>
+    <string name="settings_macros_validate_missing">validate 步骤缺 params.spec</string>
+    <string name="settings_macros_unwired">动作未接线：%1$s</string>
     <string name="settings_styles_title">样式模板</string>
     <string name="settings_styles_hint">从 DOCX 抽取 styles/sectPr/theme/numbering；首版保存 OOXML 片段，不做完整语义逆向。</string>
     <string name="settings_styles_import">导入 DOCX 样式</string>

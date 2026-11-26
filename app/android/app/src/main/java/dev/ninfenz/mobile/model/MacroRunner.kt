@@ -19,9 +19,9 @@ data class MacroRunResult(
 )
 
 object MacroRunner {
-    fun run(
+    suspend fun run(
         plan: JsonObject,
-        handler: (action: String, params: JsonObject) -> Result<String>
+        handler: suspend (action: String, params: JsonObject) -> Result<String>
     ): MacroRunResult {
         val steps = plan["steps"]?.jsonArray.orEmpty()
         val results = mutableListOf<MacroStepResult>()
