@@ -35,6 +35,7 @@ pub mod preset;
 pub mod portable;
 pub mod schema;
 pub mod solve;
+pub mod source;
 pub mod sdir;
 pub mod sdir_io;
 pub mod template;

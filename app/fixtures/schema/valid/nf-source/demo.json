@@ -1,0 +1,11 @@
+{
+  "schema": "nf-source/1",
+  "id": "src-demo",
+  "title": "示例来源",
+  "url": "https://example.com/a",
+  "fetched_at": 1700000000,
+  "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "status": "live",
+  "excerpt": "摘录内容",
+  "license": "CC-BY-4.0"
+}

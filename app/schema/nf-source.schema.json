@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/app/schema/nf-source.schema.json",
+  "title": "NF 来源（nf-source/1）",
+  "description": "本地来源条目；只存摘录与摘要，不存整页镜像。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "id", "title", "fetched_at", "sha256", "status", "excerpt"],
+  "properties": {
+    "schema": { "const": "nf-source/1" },
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]{1,63}$" },
+    "title": { "type": "string", "minLength": 1 },
+    "url": { "type": "string", "minLength": 1 },
+    "fetched_at": { "type": "integer", "minimum": 0 },
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "status": { "enum": ["live", "stale", "dead", "unverified"] },
+    "excerpt": { "type": "string", "minLength": 1, "maxLength": 4096 },
+    "license": { "type": "string" }
+  }
+}

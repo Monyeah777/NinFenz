@@ -1413,6 +1413,15 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="author_contract">Contract</string>
     <string name="author_contract_done">Contract compiled: %1$d slots</string>
     <string name="author_contract_failed">Contract compile failed: %1$s</string>
+    <string name="author_sources">Sources</string>
+    <string name="author_source_add">Add from clipboard</string>
+    <string name="author_source_empty">No sources yet.</string>
+    <string name="author_source_cite">Copy citation</string>
+    <string name="author_source_cited">Citation copied</string>
+    <string name="author_source_added">Source added</string>
+    <string name="author_source_meta">%1$s · %2$s</string>
+    <string name="author_source_delete">Delete</string>
+    <string name="author_source_deleted">Source deleted</string>
     <string name="inbox_select">Select</string>
     <string name="inbox_select_all">Select all</string>
     <string name="inbox_select_none">Clear selection</string>

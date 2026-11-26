@@ -60,6 +60,7 @@ import dev.ninfenz.mobile.data.AuthorArtifactStore
 import dev.ninfenz.mobile.data.ExtensionStore
 import dev.ninfenz.mobile.data.ContractIrStore
 import dev.ninfenz.mobile.data.GraphSnapshotStore
+import dev.ninfenz.mobile.data.SourceStore
 import dev.ninfenz.mobile.data.SpecSnapshotStore
 import dev.ninfenz.mobile.data.AuthorArtifacts
 import dev.ninfenz.mobile.data.SaveArtifactResult
@@ -962,7 +963,12 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
     val snippets = remember { ExtensionStore(context.filesDir).contributions(setOf("spec_snippet")) }
     val snapshotStore = remember { SpecSnapshotStore(context.filesDir, project.id) }
     val contractStore = remember { ContractIrStore(context.filesDir, project.id) }
+    val sourceStore = remember { SourceStore(context.filesDir, project.id) }
+    val clipboard = androidx.compose.ui.platform.LocalClipboardManager.current
     var contractNote by remember { mutableStateOf<String?>(null) }
+    var sources by remember { mutableStateOf(sourceStore.list()) }
+    var showSources by remember { mutableStateOf(false) }
+    var sourceNote by remember { mutableStateOf<String?>(null) }
     var snapshots by remember { mutableStateOf(snapshotStore.list()) }
     var showSnapshots by remember { mutableStateOf(false) }
     var snapshotNote by remember { mutableStateOf<String?>(null) }
@@ -1018,8 +1024,13 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
                     busy = false
                 }
             }) { Text(stringResource(dev.ninfenz.mobile.R.string.author_contract)) }
+            TextButton(onClick = {
+                sources = sourceStore.list()
+                showSources = true
+            }) { Text(stringResource(dev.ninfenz.mobile.R.string.author_sources)) }
         }
         snapshotNote?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
+        sourceNote?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
         contractNote?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
         snippetNote?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
         for (section in spec.sections) {
@@ -1202,6 +1213,55 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
                 }
             },
             confirmButton = { TextButton(onClick = { showSnapshots = false }) { Text(stringResource(android.R.string.cancel)) } }
+        )
+    }
+
+    if (showSources) {
+        AlertDialog(
+            onDismissRequest = { showSources = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.author_sources)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                    TextButton(onClick = {
+                        val text = clipboard.getText()?.text.orEmpty()
+                        if (text.isNotBlank()) {
+                            val title = text.lineSequence().firstOrNull { it.isNotBlank() }?.trim()?.take(80).orEmpty()
+                            sourceStore.add(title, text)
+                            sources = sourceStore.list()
+                            sourceNote = context.getString(dev.ninfenz.mobile.R.string.author_source_added)
+                        }
+                    }) { Text(stringResource(dev.ninfenz.mobile.R.string.author_source_add)) }
+                    if (sources.isEmpty()) {
+                        Text(
+                            stringResource(dev.ninfenz.mobile.R.string.author_source_empty),
+                            style = NfType.meta,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    sources.forEach { source ->
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(source.title, style = NfType.body)
+                                Text(
+                                    stringResource(dev.ninfenz.mobile.R.string.author_source_meta, source.status, source.sha256.take(12)),
+                                    style = NfType.meta,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            TextButton(onClick = {
+                                clipboard.setText(androidx.compose.ui.text.AnnotatedString(sourceStore.citation(source.id)))
+                                sourceNote = context.getString(dev.ninfenz.mobile.R.string.author_source_cited)
+                            }) { Text(stringResource(dev.ninfenz.mobile.R.string.author_source_cite)) }
+                            TextButton(onClick = {
+                                sourceStore.remove(source.id)
+                                sources = sourceStore.list()
+                                sourceNote = context.getString(dev.ninfenz.mobile.R.string.author_source_deleted)
+                            }) { Text(stringResource(dev.ninfenz.mobile.R.string.author_source_delete)) }
+                        }
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { showSources = false }) { Text(stringResource(android.R.string.ok)) } }
         )
     }
 }

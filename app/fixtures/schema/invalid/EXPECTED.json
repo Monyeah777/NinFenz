@@ -640,6 +640,26 @@
       "schema": "nf-pack-lock",
       "violated": "tree 必须是 64 位十六进制",
       "codes": ["NF-PLG-001"]
+    },
+    "invalid/nf-source/inv-status.json": {
+      "schema": "nf-source",
+      "violated": "status 不在 live/stale/dead/unverified",
+      "codes": ["NF-SRC-001"]
+    },
+    "invalid/nf-source/inv-excerpt.json": {
+      "schema": "nf-source",
+      "violated": "excerpt 不能为空",
+      "codes": ["NF-SRC-001"]
+    },
+    "invalid/nf-source-chain/inv-head.json": {
+      "schema": "nf-source-chain",
+      "violated": "head 必须是空或 64 位十六进制",
+      "codes": ["NF-SRC-001"]
+    },
+    "invalid/nf-source-chain/inv-prev.json": {
+      "schema": "nf-source-chain",
+      "violated": "prev 必须是空或 64 位十六进制",
+      "codes": ["NF-SRC-001"]
     }
   }
 }

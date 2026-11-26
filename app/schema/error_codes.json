@@ -712,6 +712,16 @@
       "code": "NF-PLG-001", "severity": "error", "exit": 1,
       "message": "项目 Pack 锁缺失/版本不符/摘要不符",
       "fix": "重新锁定 Pack，或恢复锁定的版本"
+    },
+    {
+      "code": "NF-SRC-001", "severity": "error", "exit": 1,
+      "message": "来源条目 schema 非法或重复",
+      "fix": "按报告 path 修来源 JSON"
+    },
+    {
+      "code": "NF-SRC-002", "severity": "error", "exit": 1,
+      "message": "来源链断裂/摘要不符",
+      "fix": "按断点重放或重建来源链"
     }
   ]
 }
