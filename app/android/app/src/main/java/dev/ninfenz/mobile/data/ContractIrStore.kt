@@ -26,6 +26,17 @@ class ContractIrStore(private val filesDir: File, private val projectId: String)
         AtomicFiles.writeText(file(), contract.toString())
     }
 
+    fun solveFile(): File = File(File(File(filesDir, "projects"), projectId), "contract/solve.json")
+
+    fun saveSolve(result: JsonObject) {
+        AtomicFiles.writeText(solveFile(), result.toString())
+    }
+
+    fun loadSolve(): JsonObject? = runCatching {
+        val f = solveFile()
+        if (!f.isFile) null else Json.parseToJsonElement(f.readText(Charsets.UTF_8)).jsonObject
+    }.getOrNull()
+
     suspend fun compile(spec: JsonObject, protocol: JsonObject?): Result<Compiled> = withContext(Dispatchers.IO) {
         runCatching {
             val bridge = Core.bridge

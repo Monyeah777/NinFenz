@@ -1078,6 +1078,8 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
                                 solved.error?.message ?: "contract-solve failed"
                             )
                         } else {
+                            contractStore.saveSolve(result)
+                            contractNote = context.getString(dev.ninfenz.mobile.R.string.author_contract_solved)
                             val explained = safeCall("contract-explain", buildJsonObject { put("result", result) })
                             contractExplain = explained.resultObject()?.get("lines")?.jsonArray
                                 ?.map { it.jsonPrimitive.content }
