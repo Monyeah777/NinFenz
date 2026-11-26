@@ -20,6 +20,18 @@ class PerformanceBudgetTest {
     }
 
     @Test
+    fun parsesTenThousandBlocksUnderMemoryBudget() {
+        val runtime = Runtime.getRuntime()
+        val before = runtime.totalMemory() - runtime.freeMemory()
+        val text = (1..10_000).joinToString("\n\n") { "段落 " + it }
+        val blocks = MarkdownBlocks.parse(text)
+        val after = runtime.totalMemory() - runtime.freeMemory()
+        val deltaMb = (after - before) / (1024 * 1024)
+        assertTrue("blocks=" + blocks.size, blocks.size >= 10_000)
+        assertTrue("delta=" + deltaMb + "MB", deltaMb < 200)
+    }
+
+    @Test
     fun searchesTenThousandHitsUnderBudget() {
         val hits = (1..10_000).map { index ->
             SearchHit(
