@@ -1003,6 +1003,7 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
     var contractNote by remember { mutableStateOf<String?>(null) }
     var contractJson by remember { mutableStateOf(contractStore.load()) }
     var contractExplain by remember { mutableStateOf<List<String>>(emptyList()) }
+    var contractAssignments by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
     var showContractExplain by remember { mutableStateOf(false) }
     var sources by remember { mutableStateOf(sourceStore.list()) }
     var showSources by remember { mutableStateOf(false) }
@@ -1079,9 +1080,9 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
                             )
                         } else {
                             contractStore.saveSolve(result)
-                            (result["assignments"] as? JsonObject)?.let { assignments ->
-                                contractStore.saveValues(assignments.mapValues { (_, value) -> value.jsonPrimitive.content })
-                            }
+                            val assignments = (result["assignments"] as? JsonObject)?.mapValues { (_, value) -> value.jsonPrimitive.content }.orEmpty()
+                            contractAssignments = assignments
+                            if (assignments.isNotEmpty()) contractStore.saveValues(assignments)
                             contractNote = context.getString(dev.ninfenz.mobile.R.string.author_contract_solved)
                             val explained = safeCall("contract-explain", buildJsonObject { put("result", result) })
                             contractExplain = explained.resultObject()?.get("lines")?.jsonArray
@@ -1296,6 +1297,12 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
             title = { Text(stringResource(dev.ninfenz.mobile.R.string.author_contract_explain_title)) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                    if (contractAssignments.isNotEmpty()) {
+                        Text(stringResource(dev.ninfenz.mobile.R.string.author_contract_assignments), style = NfType.label)
+                        contractAssignments.toSortedMap().forEach { (key, value) ->
+                            Text(key + " = " + value, style = NfType.meta)
+                        }
+                    }
                     if (contractExplain.isEmpty()) {
                         Text(stringResource(dev.ninfenz.mobile.R.string.author_contract_explain_empty), style = NfType.meta)
                     }

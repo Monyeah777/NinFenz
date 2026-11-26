@@ -1424,6 +1424,7 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="author_contract_solved">合同求解已保存</string>
     <string name="author_contract_explain_title">合同解释</string>
     <string name="author_contract_explain_empty">合同解释为空</string>
+    <string name="author_contract_assignments">求解赋值</string>
     <string name="author_contract_done">合同已编译：%1$d 个槽位</string>
     <string name="author_contract_failed">合同编译失败：%1$s</string>
     <string name="author_sources">来源</string>
