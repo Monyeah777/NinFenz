@@ -1345,6 +1345,7 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="project_pack_unlocked">已解除 Pack 锁</string>
     <string name="author_retry_save">重试保存</string>
     <string name="search_clear_filters">清除筛选</string>
+    <string name="search_show_more">显示更多（剩余 %1$d）</string>
     <string name="settings_backup_empty">还没有备份；先创建一次备份。</string>
     <string name="delivery_done_title">导出完成</string>
     <string name="delivery_done_body">文件已生成；可以返回项目继续处理，或在上方分享/打开。</string>

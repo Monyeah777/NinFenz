@@ -73,6 +73,7 @@ fun SearchScreen(
     var all by remember { mutableStateOf<List<SearchHit>>(emptyList()) }
     var query by rememberSaveable { mutableStateOf("") }
     var selected by remember { mutableIntStateOf(0) }
+    var visibleCount by rememberSaveable { mutableIntStateOf(200) }
     val filterStore = remember { SearchFilterStore(context.filesDir) }
     val savedFilter = remember { filterStore.load() }
     var filterName by rememberSaveable { mutableStateOf(savedFilter?.kind) }
@@ -107,12 +108,13 @@ fun SearchScreen(
         if (scopeTag != null) scoped = scoped.filter { hit -> hit.projectId?.let { scopeTag in metaStore.tags(it) } == true }
         scoped
     }
-    LaunchedEffect(filtered) { selected = 0 }
-    val rows = remember(filtered) {
+    LaunchedEffect(filtered) { selected = 0; visibleCount = 200 }
+    val displayed = remember(filtered, visibleCount) { filtered.take(visibleCount) }
+    val rows = remember(displayed) {
         val out = mutableListOf<SearchRow>()
         var flat = 0
         SearchKind.entries.forEach { kind ->
-            val hits = filtered.filter { it.kind == kind }
+            val hits = displayed.filter { it.kind == kind }
             if (hits.isNotEmpty()) {
                 out.add(SearchRow(kind = kind))
                 hits.forEach { hit ->
@@ -132,7 +134,7 @@ fun SearchScreen(
         }
     }
     fun select(delta: Int) {
-        selected = SearchKeyboard.move(selected, filtered.size, delta)
+        selected = SearchKeyboard.move(selected, displayed.size, delta)
     }
     LaunchedEffect(selected, rows) {
         val itemIndex = rows.indexOfFirst { it.hit != null && it.flatIndex == selected }
@@ -255,6 +257,13 @@ fun SearchScreen(
                     when {
                         kind != null -> SectionLabel(kindLabel(kind))
                         hit != null -> ResultRow(hit, selected == row.flatIndex) { openHit(hit) }
+                    }
+                }
+                if (filtered.size > visibleCount) {
+                    item {
+                        TextButton(onClick = { visibleCount += 200 }) {
+                            Text(stringResource(dev.ninfenz.mobile.R.string.search_show_more, filtered.size - visibleCount))
+                        }
                     }
                 }
             }
