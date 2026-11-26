@@ -41,6 +41,58 @@ object NfDocMerger {
         return Result(doc, conflicts)
     }
 
+    /** 三方合并：base/local/remote；同块双改进冲突，单边改动直接取。 */
+    private fun sameContent(a: NfDocBlock?, b: NfDocBlock?): Boolean =
+        if (a == null || b == null) a == null && b == null
+        else a.type == b.type && a.text == b.text && a.title == b.title && a.slot == b.slot
+
+    fun merge3(base: NfDoc, left: NfDoc, right: NfDoc, title: String): Result {
+        val baseMap = base.blocks.associateBy { it.id }
+        val leftMap = left.blocks.associateBy { it.id }
+        val rightMap = right.blocks.associateBy { it.id }
+        val ids = LinkedHashSet<String>()
+        base.blocks.forEach { ids.add(it.id) }
+        left.blocks.forEach { ids.add(it.id) }
+        right.blocks.forEach { ids.add(it.id) }
+
+        val conflicts = mutableListOf<Conflict>()
+        val chosen = linkedMapOf<String, NfDocBlock>()
+        for (id in ids) {
+            val b = baseMap[id]
+            val l = leftMap[id]
+            val r = rightMap[id]
+            when {
+                sameContent(l, r) -> l?.let { chosen[id] = it }
+                sameContent(l, b) -> r?.let { chosen[id] = it }
+                sameContent(r, b) -> l?.let { chosen[id] = it }
+                else -> {
+                    val fallback = l ?: r ?: b
+                    if (fallback != null) {
+                        chosen[id] = fallback
+                        conflicts += Conflict(
+                            title = fallback.title ?: fallback.text.take(40),
+                            reason = if (b == null) "双方新增不同内容" else "同块双改",
+                            leftSources = l?.source?.let { listOf(it) } ?: emptyList(),
+                            rightSources = r?.source?.let { listOf(it) } ?: emptyList()
+                        )
+                    }
+                }
+            }
+        }
+        val ordered = linkedSetOf<String>()
+        base.blocks.forEach { ordered.add(it.id) }
+        left.blocks.forEach { ordered.add(it.id) }
+        right.blocks.forEach { ordered.add(it.id) }
+        val blocks = ordered.mapNotNull { chosen[it] }
+            .mapIndexed { index, block -> block.copy(id = "b" + (index + 1)) }
+        val doc = NfDoc(
+            title = title.ifBlank { "合并文档" },
+            sources = (base.sources + left.sources + right.sources).distinct(),
+            blocks = blocks
+        )
+        return Result(doc, conflicts)
+    }
+
     /** 逐项消解：只移除冲突章节及其后续块，不碰其他章节。 */
     fun resolve(doc: NfDoc, conflict: Conflict, keep: Keep): NfDoc {
         if (keep == Keep.BOTH) return doc

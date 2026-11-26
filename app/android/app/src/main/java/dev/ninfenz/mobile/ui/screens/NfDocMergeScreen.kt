@@ -18,6 +18,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -51,6 +52,7 @@ fun NfDocMergeScreen(filesDir: File, onBack: () -> Unit) {
     val outDir = remember(filesDir) { File(File(filesDir, "exports"), "delivery").apply { mkdirs() } }
     var files by remember { mutableStateOf(outDir.listFiles { f -> f.isFile && f.name.endsWith(".nfdoc.json") }?.sortedBy { it.name }.orEmpty()) }
     var selected by remember { mutableStateOf<Set<File>>(emptySet()) }
+    var base by remember { mutableStateOf<File?>(null) }
     var result by remember { mutableStateOf<NfDocMerger.Result?>(null) }
     var saved by remember { mutableStateOf<File?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
@@ -72,6 +74,14 @@ fun NfDocMergeScreen(filesDir: File, onBack: () -> Unit) {
             style = NfType.meta,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
+        base?.let { file ->
+            Text(
+                stringResource(R.string.nfdoc_merge_base_label, file.name),
+                modifier = Modifier.padding(horizontal = NfSpacing.page),
+                style = NfType.meta,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
         LazyColumn(Modifier.weight(1f).fillMaxWidth()) {
             items(files, key = { it.absolutePath }) { file ->
                 Row(
@@ -84,7 +94,17 @@ fun NfDocMergeScreen(filesDir: File, onBack: () -> Unit) {
                             selected = if (on) selected + file else selected - file
                         }
                     )
-                    Text(file.name, modifier = Modifier.padding(start = NfSpacing.s))
+                    Text(file.name, modifier = Modifier.padding(start = NfSpacing.s).weight(1f))
+                    TextButton(onClick = {
+                        if (base == file) {
+                            base = null
+                        } else {
+                            base = file
+                            selected = selected - file
+                        }
+                    }) {
+                        Text(stringResource(if (base == file) R.string.nfdoc_merge_base_clear else R.string.nfdoc_merge_base_set))
+                    }
                 }
             }
         }
@@ -193,18 +213,29 @@ fun NfDocMergeScreen(filesDir: File, onBack: () -> Unit) {
                             val docs = selected.map { file ->
                                 NfDocModel.parse(J.parseObject(file.readText(Charsets.UTF_8), NfDocModel.SCHEMA))
                             }
-                            val ordered = docs.sortedBy { it.title }
-                            var acc: NfDoc? = null
-                            val conflicts = mutableListOf<NfDocMerger.Conflict>()
-                            ordered.forEach { doc ->
-                                if (acc == null) acc = doc else {
-                                    val r = NfDocMerger.merge(acc!!, doc, mergedTitle)
-                                    acc = r.doc
-                                    conflicts += r.conflicts
+                            if (base != null) {
+                                val ordered = selected.sortedBy { it.name }.take(2).map { file ->
+                                    NfDocModel.parse(J.parseObject(file.readText(Charsets.UTF_8), NfDocModel.SCHEMA))
                                 }
+                                val baseDoc = NfDocModel.parse(
+                                    J.parseObject(base!!.readText(Charsets.UTF_8), NfDocModel.SCHEMA)
+                                )
+                                if (ordered.size < 2) error(context.getString(R.string.nfdoc_merge_need_two))
+                                NfDocMerger.merge3(baseDoc, ordered[0], ordered[1], mergedTitle)
+                            } else {
+                                val ordered = docs.sortedBy { it.title }
+                                var acc: NfDoc? = null
+                                val conflicts = mutableListOf<NfDocMerger.Conflict>()
+                                ordered.forEach { doc ->
+                                    if (acc == null) acc = doc else {
+                                        val r = NfDocMerger.merge(acc!!, doc, mergedTitle)
+                                        acc = r.doc
+                                        conflicts += r.conflicts
+                                    }
+                                }
+                                val final = acc ?: error("empty")
+                                NfDocMerger.Result(final, conflicts)
                             }
-                            val final = acc ?: error("empty")
-                            NfDocMerger.Result(final, conflicts)
                         }
                         result = merged
                         saved = null

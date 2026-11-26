@@ -1066,7 +1066,11 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="daily_helper">Auto-sliced; you can edit the preview next</string>
     <string name="export_nfdoc_failed">nf-doc export failed: %1$s</string>
     <string name="nfdoc_merge_title">Merge nf-doc</string>
-    <string name="nfdoc_merge_hint">Select two or more .nfdoc.json files; conflicts are kept visible.</string>
+    <string name="nfdoc_merge_hint">Select two or more .nfdoc.json files; optionally pick a base for three-way merge. Conflicts are kept visible.</string>
+    <string name="nfdoc_merge_base_set">Set base</string>
+    <string name="nfdoc_merge_base_clear">Clear base</string>
+    <string name="nfdoc_merge_base_label">Base: %1$s</string>
+    <string name="nfdoc_merge_need_two">Three-way merge needs two comparison documents</string>
     <string name="nfdoc_merge_empty">Need at least 2 nf-doc files (found %1$d). Export nf-doc from Delivery first.</string>
     <string name="nfdoc_merge_action">Merge selected</string>
     <string name="nfdoc_merge_conflicts">Conflicts: %1$d</string>

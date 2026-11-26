@@ -1062,7 +1062,11 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="daily_helper">自动切片；下一步可编辑预览</string>
     <string name="export_nfdoc_failed">nf-doc 导出失败：%1$s</string>
     <string name="nfdoc_merge_title">合并 nf-doc</string>
-    <string name="nfdoc_merge_hint">选择两个以上 .nfdoc.json；同名章节冲突会保留并列出。</string>
+    <string name="nfdoc_merge_hint">选择两个以上 .nfdoc.json；可选一个基准做三方合并，同名章节冲突会保留并列出。</string>
+    <string name="nfdoc_merge_base_set">设为基准</string>
+    <string name="nfdoc_merge_base_clear">取消基准</string>
+    <string name="nfdoc_merge_base_label">基准：%1$s</string>
+    <string name="nfdoc_merge_need_two">三方合并需要两个对照文档</string>
     <string name="nfdoc_merge_empty">至少需要 2 个 nf-doc（当前 %1$d 个）。请先在交付台导出 nf-doc。</string>
     <string name="nfdoc_merge_action">合并所选</string>
     <string name="nfdoc_merge_conflicts">冲突：%1$d</string>
