@@ -475,6 +475,8 @@
     <string name="docx_style_library_empty">No style templates yet; import DOCX in Settings first.</string>
     <string name="docx_style_meta">%1$s · %2$s</string>
     <string name="docx_style_match">%1$d%% style match with current</string>
+    <string name="docx_style_audit">Style check %1$d/%2$d · missing %3$s</string>
+    <string name="docx_style_audit_ok">Style check %1$d/%2$d all present</string>
     <string name="docx_reference_none">No reference styles</string>
     <string name="docx_reference_failed">Failed to read reference styles</string>
     <string name="docx_reference_failed_fix">Confirm the DOCX contains word/styles.xml</string>

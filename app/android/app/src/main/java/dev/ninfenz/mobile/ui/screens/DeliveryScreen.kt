@@ -96,6 +96,8 @@ import dev.ninfenz.mobile.data.PdfValidator
 import dev.ninfenz.mobile.data.ExportHistoryStore
 import dev.ninfenz.mobile.data.Capability
 import dev.ninfenz.mobile.data.CapabilityRegistry
+import dev.ninfenz.mobile.data.DocxStyleAudit
+import dev.ninfenz.mobile.data.DocxStyleAuditResult
 import dev.ninfenz.mobile.data.ExportVerifier
 import dev.ninfenz.mobile.data.ImportDraftStore
 import dev.ninfenz.mobile.data.MacroStore
@@ -365,6 +367,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
     var epubAuthor by remember { mutableStateOf("") }
     var epubLanguage by remember { mutableStateOf("zh") }
     var docxStyles by remember { mutableStateOf<String?>(null) }
+    var docxStyleAudit by remember { mutableStateOf<DocxStyleAuditResult?>(null) }
     var docxSectPr by remember { mutableStateOf<String?>(null) }
     var docxTheme by remember { mutableStateOf<String?>(null) }
     var docxNumbering by remember { mutableStateOf<String?>(null) }
@@ -1550,6 +1553,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                             else -> context.getString(dev.ninfenz.mobile.R.string.repro_diff, report.firstDiff ?: -1)
                         }
                         recordExport("docx", file, manifest)
+                        file?.let { exported -> docxStyles?.let { applied -> docxStyleAudit = DocxStyleAudit.check(applied, exported) } }
                     }
                 }
                 Text(stringResource(dev.ninfenz.mobile.R.string.delivery_export_group_data), style = NfType.label, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(start = NfSpacing.page, end = NfSpacing.page, top = NfSpacing.s))
@@ -1879,6 +1883,18 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                         it,
                         style = NfType.meta,
                         color = if (reproOk == true) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(horizontal = NfSpacing.page)
+                    )
+                }
+                docxStyleAudit?.let { audit ->
+                    Text(
+                        if (audit.ok) {
+                            stringResource(dev.ninfenz.mobile.R.string.docx_style_audit_ok, audit.found, audit.checked)
+                        } else {
+                            stringResource(dev.ninfenz.mobile.R.string.docx_style_audit, audit.found, audit.checked, audit.missing.joinToString("、"))
+                        },
+                        style = NfType.meta,
+                        color = if (audit.ok) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
                         modifier = Modifier.padding(horizontal = NfSpacing.page)
                     )
                 }
