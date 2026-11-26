@@ -1735,20 +1735,30 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                     )
                                 }
                                 styleTemplates.forEach { template ->
+                                    val docxCompatible = template.sourceFormat.equals("docx", ignoreCase = true)
                                     Column {
-                                        TextButton(onClick = {
-                                            docxStyles = template.stylesXml
-                                            docxSectPr = template.sectPr.takeIf { it.isNotBlank() }
-                                            docxTheme = template.themeXml.takeIf { it.isNotBlank() }
-                                            docxNumbering = template.numberingXml.takeIf { it.isNotBlank() }
-                                            showStyleTemplates = false
+                                        TextButton(enabled = docxCompatible, onClick = {
+                                            if (docxCompatible) {
+                                                docxStyles = template.stylesXml
+                                                docxSectPr = template.sectPr.takeIf { it.isNotBlank() }
+                                                docxTheme = template.themeXml.takeIf { it.isNotBlank() }
+                                                docxNumbering = template.numberingXml.takeIf { it.isNotBlank() }
+                                                showStyleTemplates = false
+                                            }
                                         }) { Text(template.name) }
                                         Text(
                                             stringResource(dev.ninfenz.mobile.R.string.docx_style_meta, template.sourceFormat, template.digest.take(12)),
                                             style = NfType.meta,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
-                                        docxStyles?.let { current ->
+                                        if (!docxCompatible) {
+                                            Text(
+                                                stringResource(dev.ninfenz.mobile.R.string.docx_pdf_not_applicable),
+                                                style = NfType.meta,
+                                                color = MaterialTheme.colorScheme.error
+                                            )
+                                        }
+                                        if (docxCompatible) docxStyles?.let { current ->
                                             Text(
                                                 stringResource(
                                                     dev.ninfenz.mobile.R.string.docx_style_match,

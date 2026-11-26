@@ -475,6 +475,7 @@
     <string name="docx_style_library_empty">No style templates yet; import DOCX in Settings first.</string>
     <string name="docx_style_meta">%1$s · %2$s</string>
     <string name="docx_style_match">%1$d%% style match with current</string>
+    <string name="docx_pdf_not_applicable">PDF style cannot be applied to DOCX</string>
     <string name="docx_style_audit">Style check %1$d/%2$d · missing %3$s</string>
     <string name="docx_style_audit_ok">Style check %1$d/%2$d all present</string>
     <string name="docx_style_unused">%1$d/%2$d styles defined but not referenced</string>

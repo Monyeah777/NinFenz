@@ -471,6 +471,7 @@
     <string name="docx_style_library_empty">还没有样式模板；先在设置导入 DOCX。</string>
     <string name="docx_style_meta">%1$s · %2$s</string>
     <string name="docx_style_match">与当前样式匹配 %1$d%%</string>
+    <string name="docx_pdf_not_applicable">PDF 样式不能套用到 DOCX</string>
     <string name="docx_style_audit">样式核对 %1$d/%2$d · 缺失 %3$s</string>
     <string name="docx_style_audit_ok">样式核对 %1$d/%2$d 全命中</string>
     <string name="docx_style_unused">样式已定义 %1$d/%2$d，但文档未引用</string>
