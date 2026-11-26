@@ -1434,4 +1434,6 @@ MIT License · See app/docs/LEGAL.md···⟧</string>
     <string name="template_gallery_copied">⟦Template JSON copied···⟧</string>
     <string name="template_gallery_delete">⟦Delete template···⟧</string>
     <string name="template_gallery_meta">⟦%1$d sections · %2$d slots···⟧</string>
+    <string name="delivery_batch_export">⟦Batch export variants···⟧</string>
+    <string name="delivery_batch_export_done">⟦Batch export done: %1$d succeeded, %2$d failed···⟧</string>
 </resources>
