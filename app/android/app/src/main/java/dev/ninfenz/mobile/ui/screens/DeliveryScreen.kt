@@ -96,6 +96,7 @@ import dev.ninfenz.mobile.data.PdfValidator
 import dev.ninfenz.mobile.data.ExportHistoryStore
 import dev.ninfenz.mobile.data.Capability
 import dev.ninfenz.mobile.data.CapabilityRegistry
+import dev.ninfenz.mobile.data.ContractIrStore
 import dev.ninfenz.mobile.data.DocxStyleAudit
 import dev.ninfenz.mobile.data.DocxStyleAuditResult
 import dev.ninfenz.mobile.data.ExportVerifier
@@ -368,6 +369,10 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
     var epubLanguage by remember { mutableStateOf("zh") }
     var docxStyles by remember { mutableStateOf<String?>(null) }
     var docxStyleAudit by remember { mutableStateOf<DocxStyleAuditResult?>(null) }
+    val contractUnsatisfiable = remember(project.id) {
+        ContractIrStore(context.filesDir, project.id).loadSolve()
+            ?.get("satisfiable")?.jsonPrimitive?.content == "false"
+    }
     var docxSectPr by remember { mutableStateOf<String?>(null) }
     var docxTheme by remember { mutableStateOf<String?>(null) }
     var docxNumbering by remember { mutableStateOf<String?>(null) }
@@ -751,6 +756,14 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
             if (audit && needsRevalidate) {
                 Text(
                     stringResource(dev.ninfenz.mobile.R.string.delivery_need_revalidate),
+                    style = NfType.meta,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(horizontal = NfSpacing.page)
+                )
+            }
+            if (contractUnsatisfiable) {
+                Text(
+                    stringResource(dev.ninfenz.mobile.R.string.delivery_contract_unsat),
                     style = NfType.meta,
                     color = MaterialTheme.colorScheme.error,
                     modifier = Modifier.padding(horizontal = NfSpacing.page)

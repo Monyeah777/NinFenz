@@ -1477,6 +1477,7 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="delivery_compare">对比</string>
     <string name="delivery_sources_appendix">追加来源附录</string>
     <string name="delivery_fidelity">保真对账</string>
+    <string name="delivery_contract_unsat">合同求解不可满足，导出前请先处理。</string>
     <string name="delivery_run_macro">运行宏</string>
     <string name="delivery_macro_none">还没有宏；先在设置导入。</string>
     <string name="delivery_macro_done">宏完成：%1$s · 失败 %2$d</string>

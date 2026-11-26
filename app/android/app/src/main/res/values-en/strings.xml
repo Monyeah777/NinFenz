@@ -1481,6 +1481,7 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="delivery_compare">Compare</string>
     <string name="delivery_sources_appendix">Append sources</string>
     <string name="delivery_fidelity">Fidelity check</string>
+    <string name="delivery_contract_unsat">Contract solve is unsatisfiable; fix before export.</string>
     <string name="delivery_run_macro">Run macro</string>
     <string name="delivery_macro_none">No macros yet; import one in Settings.</string>
     <string name="delivery_macro_done">Macro %1$s · %2$d failed</string>
