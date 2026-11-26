@@ -94,7 +94,9 @@ import dev.ninfenz.mobile.data.ProjectEntry
 import dev.ninfenz.mobile.data.RecentProjectStore
 import dev.ninfenz.mobile.data.SeedResult
 import dev.ninfenz.mobile.data.LanguageMode
+import dev.ninfenz.mobile.data.ExtensionStore
 import dev.ninfenz.mobile.data.LibraryMetaStore
+import dev.ninfenz.mobile.data.SavedViewStore
 import dev.ninfenz.mobile.data.LibraryViewStore
 import dev.ninfenz.mobile.data.ThemeMode
 import dev.ninfenz.mobile.model.Project
@@ -161,6 +163,18 @@ fun LibraryHomeScreen(
     var statusFilter by rememberSaveable { mutableStateOf(savedView?.status) }
     var favoritesOnly by rememberSaveable { mutableStateOf(false) }
     val audit = dev.ninfenz.mobile.data.FeatureGate.auditEnabled()
+    val savedViewStore = remember(viewFilesDir) { viewFilesDir?.let { SavedViewStore(it) } }
+    var savedViews by remember { mutableStateOf(savedViewStore?.load() ?: emptyList()) }
+    val extensionViews = remember {
+        runCatching {
+            ExtensionStore(context.filesDir).contributions(setOf("saved_view")).mapNotNull { c ->
+                savedViewStore?.fromExtension(c.id, c.config)
+            }
+        }.getOrDefault(emptyList())
+    }
+    val allViews = savedViews + extensionViews
+    var showSaveView by remember { mutableStateOf(false) }
+    var viewName by rememberSaveable { mutableStateOf("") }
     val metaStore = remember(viewFilesDir) { viewFilesDir?.let { LibraryMetaStore(it) } }
     val favoriteIds = remember(projects) { metaStore?.favorites() ?: emptySet() }
     val allTags = remember(projects) { metaStore?.allTags() ?: emptySet() }
@@ -354,6 +368,21 @@ fun LibraryHomeScreen(
                                     label = { Text("#" + tag) }
                                 )
                             }
+                            items(allViews, key = { it.id }) { view ->
+                                FilterChip(
+                                    selected = favoritesOnly == view.favoritesOnly &&
+                                        tagFilter == view.tag &&
+                                        statusFilter == view.status &&
+                                        sortName == view.sort,
+                                    onClick = {
+                                        favoritesOnly = view.favoritesOnly
+                                        tagFilter = view.tag
+                                        statusFilter = view.status
+                                        sortName = view.sort
+                                    },
+                                    label = { Text(view.name) }
+                                )
+                            }
                             item {
                                 FilterChip(
                                     selected = filterStatus == null,
@@ -367,6 +396,11 @@ fun LibraryHomeScreen(
                                     onClick = { statusFilter = status.wire },
                                     label = { Text(projectStatusLabel(status)) }
                                 )
+                            }
+                        }
+                        if (savedViewStore != null) {
+                            TextButton(onClick = { viewName = ""; showSaveView = true }) {
+                                Text(stringResource(dev.ninfenz.mobile.R.string.library_save_view))
                             }
                         }
                         val sortLabel = stringResource(dev.ninfenz.mobile.R.string.library_sort_label) + "：" +
@@ -599,6 +633,36 @@ fun LibraryHomeScreen(
             }
         }
     }
+    }
+
+    if (showSaveView) {
+        AlertDialog(
+            onDismissRequest = { showSaveView = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.library_save_view)) },
+            text = {
+                OutlinedTextField(
+                    value = viewName,
+                    onValueChange = { viewName = it },
+                    label = { Text(stringResource(dev.ninfenz.mobile.R.string.library_view_name)) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            confirmButton = {
+                TextButton(enabled = viewName.isNotBlank() && savedViewStore != null, onClick = {
+                    savedViews = savedViewStore?.save(SavedViewStore.View(
+                        id = "v-" + System.nanoTime(),
+                        name = viewName,
+                        status = statusFilter,
+                        sort = sortName,
+                        favoritesOnly = favoritesOnly,
+                        tag = tagFilter
+                    )) ?: savedViews
+                    showSaveView = false
+                }) { Text(stringResource(dev.ninfenz.mobile.R.string.library_view_saved)) }
+            },
+            dismissButton = { TextButton(onClick = { showSaveView = false }) { Text(stringResource(android.R.string.cancel)) } }
+        )
     }
 
     pendingDeleteArchive?.let { file ->

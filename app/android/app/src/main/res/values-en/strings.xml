@@ -1352,4 +1352,8 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="settings_workspace_apply">Apply</string>
     <string name="import_recipes">Recipes</string>
     <string name="import_recipe_applied">Applied import recipe: %1$s</string>
+    <string name="library_saved_views">Views</string>
+    <string name="library_save_view">Save view</string>
+    <string name="library_view_name">View name</string>
+    <string name="library_view_saved">View saved</string>
 </resources>

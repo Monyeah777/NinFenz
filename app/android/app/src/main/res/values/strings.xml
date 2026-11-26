@@ -1348,4 +1348,8 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="settings_workspace_apply">应用</string>
     <string name="import_recipes">配方</string>
     <string name="import_recipe_applied">已应用导入配方：%1$s</string>
+    <string name="library_saved_views">视图</string>
+    <string name="library_save_view">保存视图</string>
+    <string name="library_view_name">视图名称</string>
+    <string name="library_view_saved">已保存视图</string>
 </resources>
