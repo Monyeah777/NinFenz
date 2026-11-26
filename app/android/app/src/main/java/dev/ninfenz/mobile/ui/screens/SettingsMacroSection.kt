@@ -25,6 +25,7 @@ import androidx.compose.ui.res.stringResource
 import dev.ninfenz.mobile.R
 import dev.ninfenz.mobile.data.FileAccess
 import dev.ninfenz.mobile.data.MacroStore
+import dev.ninfenz.mobile.model.MacroBatchResult
 import dev.ninfenz.mobile.model.MacroRunResult
 import dev.ninfenz.mobile.model.MacroRunner
 import dev.ninfenz.mobile.ui.safeCall
@@ -49,6 +50,7 @@ fun SettingsMacroSection() {
     var note by remember { mutableStateOf<String?>(null) }
     var lastPlan by remember { mutableStateOf<JsonObject?>(null) }
     var lastRun by remember { mutableStateOf<MacroRunResult?>(null) }
+    var lastBatch by remember { mutableStateOf<MacroBatchResult?>(null) }
     var paramMacro by remember { mutableStateOf<MacroStore.Macro?>(null) }
     var paramValues by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
 
@@ -95,6 +97,16 @@ fun SettingsMacroSection() {
             TextButton(onClick = { picker.launch(arrayOf("application/json", "text/plain")) }) {
                 Text(stringResource(R.string.settings_macros_import))
             }
+            TextButton(enabled = items.isNotEmpty(), onClick = {
+                scope.launch {
+                    val plans = items.mapNotNull { store.plan(it.json).getOrNull() }
+                    if (plans.isEmpty()) {
+                        note = context.getString(R.string.settings_macros_batch_empty)
+                    } else {
+                        lastBatch = MacroRunner.runBatch(plans, validateHandler)
+                    }
+                }
+            }) { Text(stringResource(R.string.settings_macros_batch)) }
         }
         if (items.isEmpty()) {
             Text(
@@ -180,6 +192,19 @@ fun SettingsMacroSection() {
             run.steps.forEach { step ->
                 Text(
                     context.getString(R.string.settings_macros_step_status, step.id, step.action, step.status),
+                    style = NfType.meta
+                )
+            }
+        }
+        lastBatch?.let { batch ->
+            Text(
+                context.getString(R.string.settings_macros_batch_status, batch.status, batch.failures),
+                style = NfType.meta,
+                color = if (batch.failures == 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+            )
+            batch.runs.forEachIndexed { index, run ->
+                Text(
+                    "#" + (index + 1) + " · " + run.status + " · " + run.failures,
                     style = NfType.meta
                 )
             }

@@ -1564,6 +1564,9 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="settings_macros_dry_run_note">dry-run: no execution, no file writes.</string>
     <string name="settings_macros_run">Run</string>
     <string name="settings_macros_params">Params</string>
+    <string name="settings_macros_batch">Run batch</string>
+    <string name="settings_macros_batch_empty">No macros to plan</string>
+    <string name="settings_macros_batch_status">Batch %1$s · %2$d failed</string>
     <string name="settings_macros_params_title">Macro parameters</string>
     <string name="settings_macros_params_empty">This macro has no {{key}} placeholders</string>
     <string name="settings_macros_run_status">Run %1$s · %2$d failed</string>

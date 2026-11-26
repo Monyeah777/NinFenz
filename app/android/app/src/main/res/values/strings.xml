@@ -1560,6 +1560,9 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="settings_macros_dry_run_note">dry-run：不执行、不写文件。</string>
     <string name="settings_macros_run">运行</string>
     <string name="settings_macros_params">参数</string>
+    <string name="settings_macros_batch">批量运行</string>
+    <string name="settings_macros_batch_empty">没有可计划的宏</string>
+    <string name="settings_macros_batch_status">批量 %1$s · 失败 %2$d</string>
     <string name="settings_macros_params_title">宏参数</string>
     <string name="settings_macros_params_empty">该宏没有 {{key}} 占位符</string>
     <string name="settings_macros_run_status">运行 %1$s · 失败 %2$d</string>
