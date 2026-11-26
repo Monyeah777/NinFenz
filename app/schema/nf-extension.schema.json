@@ -137,7 +137,8 @@
             "output_rule",
             "preflight_profile",
             "workspace_preset",
-            "review_checklist"
+            "review_checklist",
+            "assembly_recipe"
           ]
         },
         "id": {

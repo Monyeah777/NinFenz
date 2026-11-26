@@ -1415,4 +1415,6 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="delivery_preflight">预检配置</string>
     <string name="delivery_preflight_default">默认全检</string>
     <string name="delivery_preflight_empty">启用带 preflight_profile 的 Pro 扩展后会显示预检配置。</string>
+    <string name="delivery_assembly_recipes">装配配方</string>
+    <string name="delivery_assembly_recipe_saved">已保存为预设：%1$s</string>
 </resources>

@@ -276,6 +276,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
     var showPresets by remember { mutableStateOf(false) }
     val extensionVariants = remember { ExtensionStore(context.filesDir).contributions(setOf("delivery_variant")) }
     val extensionTransforms = remember { ExtensionStore(context.filesDir).contributions(setOf("slot_transform")) }
+    val assemblyRecipes = remember { ExtensionStore(context.filesDir).contributions(setOf("assembly_recipe")) }
     var showVariants by remember { mutableStateOf(false) }
     var showTransforms by remember { mutableStateOf(false) }
     var variantNote by remember { mutableStateOf<String?>(null) }
@@ -2097,6 +2098,18 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
             title = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_presets)) },
             text = {
                 Column(modifier = Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                    if (assemblyRecipes.isNotEmpty()) {
+                        Text(stringResource(dev.ninfenz.mobile.R.string.delivery_assembly_recipes), style = NfType.meta)
+                        assemblyRecipes.forEach { recipe ->
+                            val name = recipe.config["name"]?.toString()?.trim('"')?.ifBlank { recipe.id } ?: recipe.id
+                            val recipeInputs = (recipe.config["inputs"] as? JsonObject)?.mapValues { it.value.jsonPrimitive.content }.orEmpty()
+                            TextButton(onClick = {
+                                presetStore.save(project.id, name, recipeInputs)
+                                showPresets = false
+                                variantNote = context.getString(dev.ninfenz.mobile.R.string.delivery_assembly_recipe_saved, name)
+                            }) { Text(recipe.id) }
+                        }
+                    }
                     if (presets.isEmpty()) Text(stringResource(dev.ninfenz.mobile.R.string.delivery_presets_empty), style = NfType.meta)
                     presets.forEach { preset ->
                         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {

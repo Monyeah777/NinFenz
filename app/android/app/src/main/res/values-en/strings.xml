@@ -1419,4 +1419,6 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="delivery_preflight">Preflight profile</string>
     <string name="delivery_preflight_default">Default checks</string>
     <string name="delivery_preflight_empty">Enable a Pro extension with preflight_profile to see profiles.</string>
+    <string name="delivery_assembly_recipes">Assembly recipes</string>
+    <string name="delivery_assembly_recipe_saved">Saved as preset: %1$s</string>
 </resources>

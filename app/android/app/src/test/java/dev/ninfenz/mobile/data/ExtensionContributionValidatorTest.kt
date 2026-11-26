@@ -13,6 +13,7 @@ class ExtensionContributionValidatorTest {
         assertTrue(ExtensionContributionValidator.validate("smart_collection", buildJsonObject { }) != null)
         assertTrue(ExtensionContributionValidator.validate("slot_transform", buildJsonObject { put("kind", "nope") }) != null)
         assertTrue(ExtensionContributionValidator.validate("review_checklist", buildJsonObject { }) != null)
+        assertTrue(ExtensionContributionValidator.validate("assembly_recipe", buildJsonObject { }) != null)
     }
 
     @Test

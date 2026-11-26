@@ -19,6 +19,7 @@ object ExtensionContributionValidator {
         "clause_library" -> if (array(config, "clauses").isEmpty()) "clause_library 需要 clauses" else null
         "graph_recipe" -> if (array(config, "nodes").isEmpty()) "graph_recipe 需要 nodes" else null
         "delivery_variant" -> if (child(config, "inputs")?.isEmpty() != false) "delivery_variant 需要 inputs" else null
+        "assembly_recipe" -> if (text(config, "name").isBlank() || child(config, "inputs")?.isEmpty() != false) "assembly_recipe 需要 name 和 inputs" else null
         "slot_transform" -> {
             val kindName = text(config, "kind")
             if (kindName !in transforms) "slot_transform 的 kind 不受支持" else null
