@@ -97,6 +97,7 @@ import dev.ninfenz.mobile.data.ExportHistoryStore
 import dev.ninfenz.mobile.data.ExportVerifier
 import dev.ninfenz.mobile.data.PackEntry
 import dev.ninfenz.mobile.data.SourceStore
+import dev.ninfenz.mobile.data.StyleTemplateStore
 import dev.ninfenz.mobile.data.AssemblyArtifact
 import dev.ninfenz.mobile.data.ProjectStatusStore
 import dev.ninfenz.mobile.data.StatusAdvanceResult
@@ -356,6 +357,9 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
     var docxNumbering by remember { mutableStateOf<String?>(null) }
     var docxHeader by remember { mutableStateOf<String?>(null) }
     var docxFooter by remember { mutableStateOf<String?>(null) }
+    val styleStore = remember { StyleTemplateStore(context.filesDir) }
+    var styleTemplates by remember { mutableStateOf(emptyList<StyleTemplateStore.StyleTemplate>()) }
+    var showStyleTemplates by remember { mutableStateOf(false) }
     val referencePicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) {
             scope.launch {
@@ -1633,12 +1637,52 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                     OutlinedButton(onClick = {
                         referencePicker.launch(arrayOf("application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
                     }) { Text(stringResource(dev.ninfenz.mobile.R.string.docx_reference_pick)) }
+                    TextButton(onClick = {
+                        styleTemplates = styleStore.list()
+                        showStyleTemplates = true
+                    }) { Text(stringResource(dev.ninfenz.mobile.R.string.docx_style_from_library)) }
                     Text(
                         stringResource(
                             if (docxStyles != null) dev.ninfenz.mobile.R.string.docx_reference_loaded
                             else dev.ninfenz.mobile.R.string.docx_reference_none
                         ),
                         style = NfType.meta
+                    )
+                }
+                if (showStyleTemplates) {
+                    AlertDialog(
+                        onDismissRequest = { showStyleTemplates = false },
+                        title = { Text(stringResource(dev.ninfenz.mobile.R.string.docx_style_from_library)) },
+                        text = {
+                            Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                                if (styleTemplates.isEmpty()) {
+                                    Text(
+                                        stringResource(dev.ninfenz.mobile.R.string.docx_style_library_empty),
+                                        style = NfType.meta,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                                styleTemplates.forEach { template ->
+                                    Column {
+                                        TextButton(onClick = {
+                                            docxStyles = template.stylesXml
+                                            docxSectPr = template.sectPr.takeIf { it.isNotBlank() }
+                                            docxTheme = template.themeXml.takeIf { it.isNotBlank() }
+                                            docxNumbering = template.numberingXml.takeIf { it.isNotBlank() }
+                                            showStyleTemplates = false
+                                        }) { Text(template.name) }
+                                        Text(
+                                            stringResource(dev.ninfenz.mobile.R.string.docx_style_meta, template.sourceFormat, template.digest.take(12)),
+                                            style = NfType.meta,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                }
+                            }
+                        },
+                        confirmButton = {
+                            TextButton(onClick = { showStyleTemplates = false }) { Text(stringResource(android.R.string.cancel)) }
+                        }
                     )
                 }
                 FlowRow(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
