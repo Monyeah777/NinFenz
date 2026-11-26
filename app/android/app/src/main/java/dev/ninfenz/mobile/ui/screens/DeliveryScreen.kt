@@ -1905,10 +1905,14 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                 }
                 docxStyleAudit?.let { audit ->
                     Text(
-                        if (audit.ok) {
-                            stringResource(dev.ninfenz.mobile.R.string.docx_style_audit_ok, audit.found, audit.checked)
-                        } else {
-                            stringResource(dev.ninfenz.mobile.R.string.docx_style_audit, audit.found, audit.checked, audit.missing.joinToString("、"))
+                        when {
+                            audit.definedButUnused -> stringResource(
+                                dev.ninfenz.mobile.R.string.docx_style_unused,
+                                audit.found,
+                                audit.checked
+                            )
+                            audit.ok -> stringResource(dev.ninfenz.mobile.R.string.docx_style_audit_ok, audit.found, audit.checked)
+                            else -> stringResource(dev.ninfenz.mobile.R.string.docx_style_audit, audit.found, audit.checked, audit.missing.joinToString("、"))
                         },
                         style = NfType.meta,
                         color = if (audit.ok) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,

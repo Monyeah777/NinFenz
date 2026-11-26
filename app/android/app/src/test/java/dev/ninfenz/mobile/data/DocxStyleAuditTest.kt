@@ -14,12 +14,17 @@ class DocxStyleAuditTest {
     @get:Rule
     val tmp = TemporaryFolder()
 
-    private fun docx(styles: String): File {
+    private fun docx(styles: String, document: String = ""): File {
         val file = File(tmp.root, "a.docx")
         ZipOutputStream(file.outputStream()).use { zip ->
             zip.putNextEntry(ZipEntry("word/styles.xml"))
             zip.write(styles.toByteArray(Charsets.UTF_8))
             zip.closeEntry()
+            if (document.isNotEmpty()) {
+                zip.putNextEntry(ZipEntry("word/document.xml"))
+                zip.write(document.toByteArray(Charsets.UTF_8))
+                zip.closeEntry()
+            }
         }
         return file
     }
@@ -27,9 +32,11 @@ class DocxStyleAuditTest {
     @Test
     fun findsAppliedStyleIdsInExportedDocx() {
         val styles = "<w:styles><w:style w:styleId=\"Heading1\"/></w:styles>"
-        val result = DocxStyleAudit.check(styles, docx(styles))
+        val document = "<w:document><w:p><w:pPr><w:pStyle w:val=\"Heading1\"/></w:pPr></w:p></w:document>"
+        val result = DocxStyleAudit.check(styles, docx(styles, document))
         assertEquals(1, result.checked)
         assertEquals(1, result.found)
+        assertEquals(1, result.referenced)
         assertTrue(result.ok)
     }
 
@@ -39,6 +46,8 @@ class DocxStyleAuditTest {
         val result = DocxStyleAudit.check(applied, docx("<w:styles><w:style w:styleId=\"Heading1\"/></w:styles>"))
         assertEquals(2, result.checked)
         assertEquals(listOf("Quote"), result.missing)
+        assertEquals(0, result.referenced)
+        assertTrue(result.definedButUnused)
         assertFalse(result.ok)
     }
 }

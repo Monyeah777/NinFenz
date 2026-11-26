@@ -6,9 +6,12 @@ import java.io.File
 data class DocxStyleAuditResult(
     val checked: Int,
     val found: Int,
-    val missing: List<String>
+    val missing: List<String>,
+    val referenced: Int = 0
 ) {
     val ok: Boolean get() = missing.isEmpty()
+    /** 样式已定义但没有在文档里引用，版式可能没生效。 */
+    val definedButUnused: Boolean get() = checked > 0 && referenced == 0
 }
 
 object DocxStyleAudit {
@@ -17,6 +20,11 @@ object DocxStyleAudit {
         if (expected.isEmpty()) return DocxStyleAuditResult(0, 0, emptyList())
         val actual = StyleMatch.styleIds(DocxReferenceStyles.extract(exported))
         val missing = expected.filter { it !in actual }
-        return DocxStyleAuditResult(expected.size, expected.size - missing.size, missing)
+        val used = Regex("w:(?:p|r)Style w:val=\"([^\"]+)\"")
+            .findAll(DocxReferenceStyles.extractDocument(exported).orEmpty())
+            .map { it.groupValues[1] }
+            .toSet()
+        val referenced = expected.count { it in used }
+        return DocxStyleAuditResult(expected.size, expected.size - missing.size, missing, referenced)
     }
 }
