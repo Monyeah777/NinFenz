@@ -722,6 +722,16 @@
       "code": "NF-SRC-002", "severity": "error", "exit": 1,
       "message": "来源链断裂/摘要不符",
       "fix": "按断点重放或重建来源链"
+    },
+    {
+      "code": "NF-MAC-001", "severity": "error", "exit": 1,
+      "message": "宏 schema 非法/步骤 id 重复/动作未知",
+      "fix": "按报告 path 修宏"
+    },
+    {
+      "code": "NF-MAC-002", "severity": "error", "exit": 1,
+      "message": "宏回放失败/某步无法执行",
+      "fix": "看失败步骤并只重放该步"
     }
   ]
 }

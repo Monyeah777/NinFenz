@@ -670,6 +670,16 @@
       "schema": "nf-fidelity",
       "violated": "mapped 缺 code/tables",
       "codes": ["NF-FID-001"]
+    },
+    "invalid/nf-macro/inv-action.json": {
+      "schema": "nf-macro",
+      "violated": "action 不在 import/map/assemble/export/validate",
+      "codes": ["NF-MAC-001"]
+    },
+    "invalid/nf-macro/inv-step.json": {
+      "schema": "nf-macro",
+      "violated": "step.id 必须是 S + 两位/三位",
+      "codes": ["NF-MAC-001"]
     }
   }
 }

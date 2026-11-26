@@ -49,6 +49,7 @@ pub const SCHEMA_NAMES: &[&str] = &[
     "nf-composition",
     "nf-source",
     "nf-source-chain",
+    "nf-macro",
 ];
 
 macro_rules! embed_schemas {
@@ -105,6 +106,7 @@ pub fn schemas() -> &'static BTreeMap<&'static str, Value> {
             "nf-composition" => "../../schema/nf-composition.schema.json",
             "nf-source" => "../../schema/nf-source.schema.json",
             "nf-source-chain" => "../../schema/nf-source-chain.schema.json",
+            "nf-macro" => "../../schema/nf-macro.schema.json",
         )
     })
 }

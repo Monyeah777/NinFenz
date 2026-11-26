@@ -1,0 +1,11 @@
+{
+  "schema": "nf-macro/1",
+  "id": "demo-macro",
+  "title": "导入并导出",
+  "steps": [
+    { "id": "S01", "action": "click", "params": { "format": "md" } },
+    { "id": "S02", "action": "assemble", "params": {} },
+    { "id": "S03", "action": "export", "params": { "format": "md" } }
+  ],
+  "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+}

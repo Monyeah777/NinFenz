@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/app/schema/nf-macro.schema.json",
+  "title": "NF 语义宏（nf-macro/1）",
+  "description": "语义动作序列，不是坐标点击；默认 dry-run，回放不得静默覆盖用户文件。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "id", "title", "steps", "digest"],
+  "properties": {
+    "schema": { "const": "nf-macro/1" },
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]{1,63}$" },
+    "title": { "type": "string", "minLength": 1 },
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "action", "params"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^S[0-9]{2,3}$" },
+          "action": { "enum": ["import", "map", "assemble", "export", "validate"] },
+          "params": { "type": "object" }
+        }
+      }
+    },
+    "digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+  }
+}

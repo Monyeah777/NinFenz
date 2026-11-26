@@ -64,6 +64,7 @@ pub fn help_text() -> &'static str {
           graph-typecheck schema-induce sdir-fuse template-induce template-migrate compose-run\n\
           fragment-validate compose-validate compose-render\n\
           source-add source-verify source-chain-build source-chain-verify\n\
+          macro-validate macro-plan\n\
           evidence-create evidence-verify evidence-pack evidence-verify-package evidence-freeze evidence-keygen\n\
           plan-solve plan-explain reuse-index reuse-impact\n\
           export-profile export-accessible\n\

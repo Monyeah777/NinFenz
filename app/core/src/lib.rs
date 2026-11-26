@@ -23,6 +23,8 @@ pub mod fsutil;
 pub mod golden;
 pub mod layout;
 pub mod limits;
+#[path = "macro.rs"]
+pub mod macros;
 pub mod markdown;
 pub mod migration;
 pub mod ops;

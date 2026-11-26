@@ -1,0 +1,9 @@
+{
+  "schema": "nf-macro/1",
+  "id": "demo-macro",
+  "title": "导入并导出",
+  "steps": [
+    { "id": "S2", "action": "import", "params": {} }
+  ],
+  "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+}
