@@ -43,6 +43,8 @@ import dev.ninfenz.mobile.core.Core
 import dev.ninfenz.mobile.core.CoreBridgeNative
 import dev.ninfenz.mobile.core.ErrorCatalog
 import dev.ninfenz.mobile.data.AppPrefs
+import dev.ninfenz.mobile.data.Capability
+import dev.ninfenz.mobile.data.CapabilityRegistry
 import dev.ninfenz.mobile.data.ExtensionStore
 import dev.ninfenz.mobile.data.PrefsStore
 import dev.ninfenz.mobile.data.LanguageMode
@@ -88,6 +90,7 @@ fun SettingsScreen(
     val context = LocalContext.current
     val diag = remember { Core.diagnostics() }
     var crash by remember { mutableStateOf(CrashLogStore(context.filesDir).read()) }
+    var moduleVersion by remember { mutableIntStateOf(0) }
     var copied by remember { mutableStateOf(false) }
     var selfCheck by remember { mutableStateOf<dev.ninfenz.mobile.data.PropertyHarness.Report?>(null) }
     var tier by remember { mutableStateOf(FeatureGate.tier()) }
@@ -282,9 +285,17 @@ fun SettingsScreen(
             }
         }
 
-        SettingsFreeLayer(onThemeMode = onThemeMode, onLanguageMode = onLanguageMode)
-        SettingsMacroSection()
-        SettingsStyleSection()
+        SettingsFreeLayer(
+            onThemeMode = onThemeMode,
+            onLanguageMode = onLanguageMode,
+            onModulesChanged = { moduleVersion++ }
+        )
+        if (moduleVersion >= 0 && CapabilityRegistry.isEnabled(Capability.MACROS)) {
+            SettingsMacroSection()
+        }
+        if (moduleVersion >= 0 && CapabilityRegistry.isEnabled(Capability.STYLE)) {
+            SettingsStyleSection()
+        }
 
         if (audit) CardBox(title = stringResource(dev.ninfenz.mobile.R.string.settings_selfcheck_title)) {
             Text(

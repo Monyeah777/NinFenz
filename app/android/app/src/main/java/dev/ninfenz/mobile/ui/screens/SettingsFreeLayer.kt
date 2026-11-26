@@ -48,7 +48,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun SettingsFreeLayer(
     onThemeMode: (ThemeMode) -> Unit = {},
-    onLanguageMode: (LanguageMode) -> Unit = {}
+    onLanguageMode: (LanguageMode) -> Unit = {},
+    onModulesChanged: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val clipboard = LocalClipboardManager.current
@@ -63,6 +64,7 @@ fun SettingsFreeLayer(
     fun install(next: NfPrefs) {
         prefs = store.save(next)
         CapabilityRegistry.install(prefs)
+        onModulesChanged()
     }
 
     fun applyTheme(theme: PrefsTheme) {
@@ -86,6 +88,7 @@ fun SettingsFreeLayer(
                         .onSuccess { imported ->
                             prefs = imported
                             CapabilityRegistry.install(imported)
+                            onModulesChanged()
                             applyTheme(imported.ui.theme)
                             applyLanguage(imported.language)
                             note = context.getString(R.string.settings_prefs_imported)
@@ -111,6 +114,7 @@ fun SettingsFreeLayer(
                     val next = store.applyWorkflow(preset.id)
                     prefs = next
                     CapabilityRegistry.install(next)
+                    onModulesChanged()
                     applyTheme(next.ui.theme)
                     note = context.getString(R.string.settings_workflow_applied, label)
                 }) { Text(label) }
@@ -232,6 +236,7 @@ fun SettingsFreeLayer(
                     val reset = store.resetAll()
                     prefs = reset
                     CapabilityRegistry.install(reset)
+                    onModulesChanged()
                     applyTheme(reset.ui.theme)
                     applyLanguage(reset.language)
                     showReset = false
