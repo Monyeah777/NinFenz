@@ -1382,4 +1382,10 @@ MIT License · See app/docs/LEGAL.md···⟧</string>
     <string name="pack_matrix_line">⟦%1$s · %2$s · %3$d projects···⟧</string>
     <string name="pack_matrix_empty">⟦No Packs yet; nothing to map.···⟧</string>
     <string name="pack_matrix_projects">⟦Referenced projects···⟧</string>
+    <string name="author_snapshot">⟦Spec snapshots···⟧</string>
+    <string name="author_snapshot_save">⟦Save current snapshot···⟧</string>
+    <string name="author_snapshot_restore">⟦Restore···⟧</string>
+    <string name="author_snapshot_empty">⟦No snapshots yet.···⟧</string>
+    <string name="author_snapshot_restored">⟦Snapshot restored···⟧</string>
+    <string name="author_snapshot_meta">⟦%1$d sections · %2$d slots · %3$s···⟧</string>
 </resources>

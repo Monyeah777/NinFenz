@@ -1378,4 +1378,10 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="pack_matrix_line">%1$s · %2$s · %3$d 个项目</string>
     <string name="pack_matrix_empty">暂无 Pack，无法生成矩阵。</string>
     <string name="pack_matrix_projects">引用项目</string>
+    <string name="author_snapshot">规格快照</string>
+    <string name="author_snapshot_save">保存当前快照</string>
+    <string name="author_snapshot_restore">恢复</string>
+    <string name="author_snapshot_empty">还没有快照。</string>
+    <string name="author_snapshot_restored">已恢复快照</string>
+    <string name="author_snapshot_meta">%1$d 节 · %2$d 槽 · %3$s</string>
 </resources>

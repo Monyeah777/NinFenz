@@ -58,6 +58,7 @@ import dev.ninfenz.mobile.core.CoreResponse
 import dev.ninfenz.mobile.core.J
 import dev.ninfenz.mobile.data.AuthorArtifactStore
 import dev.ninfenz.mobile.data.ExtensionStore
+import dev.ninfenz.mobile.data.SpecSnapshotStore
 import dev.ninfenz.mobile.data.AuthorArtifacts
 import dev.ninfenz.mobile.data.SaveArtifactResult
 import dev.ninfenz.mobile.data.AuthorArtifactsLoader
@@ -855,6 +856,10 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
     val scope = rememberCoroutineScope()
     val store = remember { AuthorArtifactStore(context.filesDir) }
     val snippets = remember { ExtensionStore(context.filesDir).contributions(setOf("spec_snippet")) }
+    val snapshotStore = remember { SpecSnapshotStore(context.filesDir, project.id) }
+    var snapshots by remember { mutableStateOf(snapshotStore.list()) }
+    var showSnapshots by remember { mutableStateOf(false) }
+    var snapshotNote by remember { mutableStateOf<String?>(null) }
     var showSnippets by remember { mutableStateOf(false) }
     var snippetNote by remember { mutableStateOf<String?>(null) }
     var autoSavePrimed by remember { mutableStateOf(false) }
@@ -885,7 +890,11 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
                     Text(stringResource(dev.ninfenz.mobile.R.string.author_snippet))
                 }
             }
+            TextButton(onClick = { snapshots = snapshotStore.list(); showSnapshots = true }) {
+                Text(stringResource(dev.ninfenz.mobile.R.string.author_snapshot))
+            }
         }
+        snapshotNote?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
         snippetNote?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
         for (section in spec.sections) {
             NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
@@ -1024,6 +1033,49 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
                 }
             },
             confirmButton = { TextButton(onClick = { showSnippets = false }) { Text(stringResource(android.R.string.cancel)) } }
+        )
+    }
+
+    if (showSnapshots) {
+        AlertDialog(
+            onDismissRequest = { showSnapshots = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.author_snapshot)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                    TextButton(onClick = {
+                        snapshots = snapshotStore.save(spec)
+                        snapshotNote = context.getString(dev.ninfenz.mobile.R.string.author_snapshot_save)
+                    }) { Text(stringResource(dev.ninfenz.mobile.R.string.author_snapshot_save)) }
+                    if (snapshots.isEmpty()) {
+                        Text(stringResource(dev.ninfenz.mobile.R.string.author_snapshot_empty), style = NfType.meta)
+                    } else {
+                        snapshots.take(10).forEach { snapshot ->
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    stringResource(
+                                        dev.ninfenz.mobile.R.string.author_snapshot_meta,
+                                        snapshot.sections,
+                                        snapshot.slots,
+                                        java.text.SimpleDateFormat("MM-dd HH:mm", java.util.Locale.getDefault()).format(java.util.Date(snapshot.at))
+                                    ),
+                                    style = NfType.meta,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                TextButton(onClick = {
+                                    apply(snapshotStore.restore(snapshot))
+                                    snapshotNote = context.getString(dev.ninfenz.mobile.R.string.author_snapshot_restored)
+                                    showSnapshots = false
+                                }) { Text(stringResource(dev.ninfenz.mobile.R.string.author_snapshot_restore)) }
+                                TextButton(onClick = {
+                                    snapshotStore.remove(snapshot.id)
+                                    snapshots = snapshotStore.list()
+                                }) { Text(stringResource(dev.ninfenz.mobile.R.string.inbox_remove)) }
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { showSnapshots = false }) { Text(stringResource(android.R.string.cancel)) } }
         )
     }
 }
