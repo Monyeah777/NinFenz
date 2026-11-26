@@ -1362,4 +1362,6 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="author_snippet">插入规格片段</string>
     <string name="author_snippet_conflict">片段 ID 与现有章节/槽位冲突</string>
     <string name="author_snippet_applied">已插入片段：%1$s</string>
+    <string name="author_clause_library">条款库</string>
+    <string name="author_clause_applied">已应用条款库：%1$s</string>
 </resources>

@@ -354,6 +354,9 @@ private fun ProtocolAuthorContent(
     var saveError by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
     val store = remember { AuthorOverlayStore(context.filesDir) }
+    val clauseLibraries = remember { ExtensionStore(context.filesDir).contributions(setOf("clause_library")) }
+    var showClauseLibrary by remember { mutableStateOf(false) }
+    var clauseNote by remember { mutableStateOf<String?>(null) }
 
     fun save(then: () -> Unit = {}) {
         if (saving) return
@@ -404,7 +407,15 @@ private fun ProtocolAuthorContent(
                 modifier = Modifier.padding(horizontal = NfSpacing.page)
             )
         }
-        NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.author_clauses, protocol.clauses.size))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.author_clauses, protocol.clauses.size))
+            if (clauseLibraries.isNotEmpty()) {
+                TextButton(onClick = { showClauseLibrary = true }) {
+                    Text(stringResource(dev.ninfenz.mobile.R.string.author_clause_library))
+                }
+            }
+        }
+        clauseNote?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
         for (clause in protocol.clauses) {
             NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
                 Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
@@ -502,6 +513,39 @@ private fun ProtocolAuthorContent(
                 Text(line, style = NfType.secondary, modifier = Modifier.padding(horizontal = NfSpacing.page))
             }
         }
+    }
+
+    if (showClauseLibrary) {
+        AlertDialog(
+            onDismissRequest = { showClauseLibrary = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.author_clause_library)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                    clauseLibraries.forEach { library ->
+                        TextButton(onClick = {
+                            val ids = J.optArray(library.config, "clauses")
+                                .mapNotNull { (it as? kotlinx.serialization.json.JsonPrimitive)?.content }
+                                .filter { id -> protocol.clauses.any { it.id == id } }
+                            val presetValues = J.optChild(library.config, "values")?.let { obj ->
+                                protocol.fields.mapNotNull { field ->
+                                    J.optString(obj, field.id)?.let { field.id to it }
+                                }.toMap()
+                            }.orEmpty()
+                            if (ids.isEmpty() && presetValues.isEmpty()) {
+                                clauseNote = context.getString(dev.ninfenz.mobile.R.string.author_snippet_conflict)
+                            } else {
+                                pushUndo()
+                                enabled = enabled + ids.associateWith { true }
+                                values = values + presetValues
+                                clauseNote = context.getString(dev.ninfenz.mobile.R.string.author_clause_applied, library.id)
+                                showClauseLibrary = false
+                            }
+                        }) { Text(library.id) }
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { showClauseLibrary = false }) { Text(stringResource(android.R.string.cancel)) } }
+        )
     }
 }
 
