@@ -94,6 +94,9 @@ fun ExtensionCenterScreen(onBack: () -> Unit) {
                             style = NfType.meta
                         )
                         if (ext.targets.isNotEmpty()) Text(ext.targets.joinToString(" · "), style = NfType.meta)
+                        if (ext.warnings.isNotEmpty()) {
+                            Text(ext.warnings.joinToString("; "), style = NfType.meta, color = MaterialTheme.colorScheme.error)
+                        }
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(stringResource(R.string.extensions_enabled), style = NfType.meta, modifier = Modifier.weight(1f))
                             Switch(

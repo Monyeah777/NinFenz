@@ -22,7 +22,8 @@ class ExtensionStore(private val filesDir: File) {
         val contributions: List<Contribution>,
         val signed: Boolean,
         val enabled: Boolean,
-        val path: String
+        val path: String,
+        val warnings: List<String> = emptyList()
     )
 
     private fun root(): File = File(filesDir, "extensions").apply { mkdirs() }
@@ -105,6 +106,9 @@ class ExtensionStore(private val filesDir: File) {
                 config = c["config"] as? JsonObject ?: buildJsonObject { }
             )
         }.orEmpty()
+        val warnings = contributions.mapNotNull { c ->
+            ExtensionContributionValidator.validate(c.kind, c.config)?.let { c.id + "：" + it }
+        }
         return Installed(
             id = o["id"]?.jsonPrimitive?.content.orEmpty(),
             type = o["type"]?.jsonPrimitive?.content.orEmpty(),
@@ -112,7 +116,8 @@ class ExtensionStore(private val filesDir: File) {
             contributions = contributions,
             signed = o["signature"] != null,
             enabled = enabled,
-            path = path
+            path = path,
+            warnings = warnings
         )
     }
 }
