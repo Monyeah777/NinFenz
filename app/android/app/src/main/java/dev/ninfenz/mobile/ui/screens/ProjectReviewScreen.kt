@@ -13,6 +13,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -27,6 +28,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.data.DeliveryDraftStore
+import dev.ninfenz.mobile.data.ExtensionStore
+import dev.ninfenz.mobile.data.FeatureGate
 import dev.ninfenz.mobile.data.HandoffService
 import dev.ninfenz.mobile.data.ReviewStore
 import dev.ninfenz.mobile.model.MarkdownBlocks
@@ -50,6 +53,14 @@ fun ProjectReviewScreen(project: Project, onBack: () -> Unit) {
         ReviewStore.sha256(if (projectFile.isFile) projectFile.readText(Charsets.UTF_8) else project.id)
     }
     var doc by remember(project.id) { mutableStateOf(store.load(project.id, subjectDigest)) }
+    val checklists = remember {
+        if (FeatureGate.auditEnabled()) {
+            ExtensionStore(context.filesDir).contributions(setOf("review_checklist"))
+        } else {
+            emptyList()
+        }
+    }
+    var checkedItems by remember { mutableStateOf<Set<String>>(emptySet()) }
     var commentBlock by remember { mutableStateOf<Int?>(null) }
     var commentText by remember { mutableStateOf("") }
     var imported by remember { mutableStateOf<HandoffService.Inspect?>(null) }
@@ -91,6 +102,28 @@ fun ProjectReviewScreen(project: Project, onBack: () -> Unit) {
             }) { Text(stringResource(dev.ninfenz.mobile.R.string.review_export_handoff)) }
             TextButton(onClick = { handoffPicker.launch(arrayOf("application/zip", "*/*")) }) {
                 Text(stringResource(dev.ninfenz.mobile.R.string.review_import_handoff))
+            }
+        }
+        checklists.forEach { checklist ->
+            val title = checklist.config["title"]?.toString()?.trim('"')?.ifBlank { null }
+                ?: stringResource(dev.ninfenz.mobile.R.string.review_checklist)
+            val items = (checklist.config["items"] as? kotlinx.serialization.json.JsonArray)
+                ?.mapNotNull { (it as? kotlinx.serialization.json.JsonPrimitive)?.content }.orEmpty()
+            if (items.isNotEmpty()) {
+                CardBox(title = title) {
+                    items.forEachIndexed { index, item ->
+                        Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                            Checkbox(
+                                checked = (checklist.id + ":" + index) in checkedItems,
+                                onCheckedChange = { on ->
+                                    val key = checklist.id + ":" + index
+                                    checkedItems = if (on) checkedItems + key else checkedItems - key
+                                }
+                            )
+                            Text(item, style = NfType.secondary)
+                        }
+                    }
+                }
             }
         }
         if (blocks.isEmpty()) {

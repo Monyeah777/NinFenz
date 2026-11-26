@@ -1402,4 +1402,5 @@ MIT License · See app/docs/LEGAL.md···⟧</string>
     <string name="ccos_queue_remove_selected">⟦Delete selected···⟧</string>
     <string name="import_multi">⟦Batch import···⟧</string>
     <string name="import_multi_done">⟦Batch import done: %1$d succeeded, %2$d failed···⟧</string>
+    <string name="review_checklist">⟦Review checklist···⟧</string>
 </resources>
