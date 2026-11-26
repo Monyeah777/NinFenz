@@ -79,6 +79,24 @@ class SourceStore(private val filesDir: File, private val projectId: String) {
 
     fun citation(id: String): String = "[[src:" + id + "]]"
 
+    data class ChainEntry(val id: String, val sha256: String, val prev: String)
+
+    fun chain(): List<ChainEntry> {
+        var prev = ""
+        return list().sortedBy { it.id }.map { source ->
+            ChainEntry(source.id, source.sha256, prev).also { prev = source.sha256 }
+        }
+    }
+
+    fun chainOk(): Boolean {
+        var prev = ""
+        for (entry in chain()) {
+            if (entry.prev != prev) return false
+            prev = entry.sha256
+        }
+        return true
+    }
+
     /** 把 [[src:ID]] 转成 Markdown 脚注引用，并追加来源附录；只追加，不改正文其他内容。 */
     fun renderCitations(markdown: String): String {
         val regex = Regex("\\[\\[src:([a-z][a-z0-9-]{1,63})\\]\\]")

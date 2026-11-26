@@ -1267,6 +1267,23 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
                             sourceNote = context.getString(dev.ninfenz.mobile.R.string.author_source_added)
                         }
                     }) { Text(stringResource(dev.ninfenz.mobile.R.string.author_source_add)) }
+                    val chain = sourceStore.chain()
+                    Text(
+                        stringResource(
+                            dev.ninfenz.mobile.R.string.author_source_chain,
+                            chain.size,
+                            if (sourceStore.chainOk()) stringResource(dev.ninfenz.mobile.R.string.author_source_chain_ok)
+                            else stringResource(dev.ninfenz.mobile.R.string.author_source_chain_bad)
+                        ),
+                        style = NfType.meta,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    TextButton(onClick = {
+                        sourceNote = context.getString(
+                            if (sourceStore.chainOk()) dev.ninfenz.mobile.R.string.author_source_chain_ok
+                            else dev.ninfenz.mobile.R.string.author_source_chain_bad
+                        )
+                    }) { Text(stringResource(dev.ninfenz.mobile.R.string.author_source_chain_verify)) }
                     if (sources.isEmpty()) {
                         Text(
                             stringResource(dev.ninfenz.mobile.R.string.author_source_empty),

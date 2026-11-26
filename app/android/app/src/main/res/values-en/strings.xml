@@ -1427,6 +1427,10 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="author_source_meta">%1$s · %2$s</string>
     <string name="author_source_delete">Delete</string>
     <string name="author_source_deleted">Source deleted</string>
+    <string name="author_source_chain">Source chain %1$d links · %2$s</string>
+    <string name="author_source_chain_ok">verified</string>
+    <string name="author_source_chain_bad">broken</string>
+    <string name="author_source_chain_verify">Verify source chain</string>
     <string name="author_ai_plan">AI plan</string>
     <string name="author_ai_generate">Generate section tasks</string>
     <string name="author_ai_empty">No AI runs yet.</string>

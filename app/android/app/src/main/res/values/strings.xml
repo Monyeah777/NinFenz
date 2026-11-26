@@ -1423,6 +1423,10 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="author_source_meta">%1$s · %2$s</string>
     <string name="author_source_delete">删除</string>
     <string name="author_source_deleted">来源已删除</string>
+    <string name="author_source_chain">来源链 %1$d 环 · %2$s</string>
+    <string name="author_source_chain_ok">已校验</string>
+    <string name="author_source_chain_bad">断链</string>
+    <string name="author_source_chain_verify">校验来源链</string>
     <string name="author_ai_plan">AI 计划</string>
     <string name="author_ai_generate">生成分节计划</string>
     <string name="author_ai_empty">还没有 AI 运行记录。</string>

@@ -22,7 +22,14 @@ class SourceStoreTest {
         val rendered = store.renderCitations("正文 [[" + "src:" + first.id + "]]")
         assertTrue(rendered.contains("[^" + first.id + "]"))
         assertTrue(rendered.contains("## 来源"))
+        val third = store.add("B", "world")
+        val chain = store.chain()
+        assertEquals(2, chain.size)
+        assertEquals("", chain[0].prev)
+        assertEquals(chain[0].sha256, chain[1].prev)
+        assertTrue(store.chainOk())
         store.remove(first.id)
+        store.remove(third.id)
         assertTrue(store.list().isEmpty())
     }
 
