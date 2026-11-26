@@ -155,6 +155,7 @@ fun ImportScreen(
     var acceptedMappings by remember { mutableStateOf<Set<Int>>(emptySet()) }
     var lowConfidenceOnly by remember { mutableStateOf(false) }
     var mappingThreshold by remember { mutableStateOf(80) }
+    var sliceMinChars by remember { mutableStateOf(0) }
     var suggestNote by remember { mutableStateOf<String?>(null) }
     var zeroSliceNote by remember { mutableStateOf<String?>(null) }
     val zeroSliceStore = remember { ZeroSliceStore(context.filesDir) }
@@ -607,7 +608,7 @@ fun ImportScreen(
             if (response.ok && obj != null) {
                 val parsedReport = dev.ninfenz.mobile.data.ZeroSliceModel.parse(obj)
                 val currentDoc = doc
-                val sections = currentDoc?.text?.let { MarkdownSlicer.slice(MarkdownBlocks.parse(it)) } ?: emptyList()
+                val sections = currentDoc?.text?.let { MarkdownSlicer.slice(MarkdownBlocks.parse(it), sliceMinChars) } ?: emptyList()
                 val computed = parsedReport.mappings.mapNotNull { mapping ->
                     sections.getOrNull(mapping.fromIndex)
                         ?.blocks?.joinToString("\n\n") { it.text }
@@ -1133,10 +1134,21 @@ fun ImportScreen(
                         }
                     }
                 }
-                val slices = current.text?.let { MarkdownSlicer.slice(MarkdownBlocks.parse(it)) } ?: emptyList()
+                val slices = current.text?.let { MarkdownSlicer.slice(MarkdownBlocks.parse(it), sliceMinChars) } ?: emptyList()
                 if (slices.isNotEmpty()) {
                     item {
                         NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.import_slices))
+                    }
+                    item {
+                        Column(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
+                            Text(stringResource(dev.ninfenz.mobile.R.string.import_slice_min_chars, sliceMinChars), style = NfType.meta)
+                            Slider(
+                                value = sliceMinChars.toFloat(),
+                                onValueChange = { sliceMinChars = it.toInt().coerceIn(0, 2000) },
+                                valueRange = 0f..2000f,
+                                steps = 19
+                            )
+                        }
                     }
                     item {
                         NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
@@ -1167,10 +1179,12 @@ fun ImportScreen(
                                                 ?.let { name -> PromptProfile.entries.firstOrNull { it.name.equals(name, true) } }
                                             val low = recipe.config["low_confidence_only"]?.toString()?.toBooleanStrictOrNull() ?: false
                                             val threshold = recipe.config["mapping_threshold"]?.toString()?.toIntOrNull()?.coerceIn(0, 100)
+                                            val sliceMin = recipe.config["slice_min_chars"]?.toString()?.toIntOrNull()?.coerceIn(0, 2000)
                                             TextButton(onClick = {
                                                 profile?.let { promptProfile = it }
                                                 lowConfidenceOnly = low
                                                 threshold?.let { mappingThreshold = it }
+                                                sliceMin?.let { sliceMinChars = it }
                                                 notice = context.getString(dev.ninfenz.mobile.R.string.import_recipe_applied, recipe.id)
                                             }) { Text(recipe.id) }
                                         }

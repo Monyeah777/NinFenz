@@ -1357,4 +1357,5 @@ MIT License · See app/docs/LEGAL.md···⟧</string>
     <string name="library_view_name">⟦View name···⟧</string>
     <string name="library_view_saved">⟦View saved···⟧</string>
     <string name="import_mapping_threshold">⟦Auto-accept threshold ≥ %1$d%%···⟧</string>
+    <string name="import_slice_min_chars">⟦Minimum section chars: %1$d···⟧</string>
 </resources>

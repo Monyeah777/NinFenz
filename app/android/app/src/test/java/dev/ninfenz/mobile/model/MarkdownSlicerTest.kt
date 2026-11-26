@@ -16,6 +16,15 @@ class MarkdownSlicerTest {
     }
 
     @Test
+    fun mergesSectionsBelowMinimum() {
+        val md = "# A\n\nshort\n\n# B\n\nshort too"
+        val slices = MarkdownSlicer.slice(MarkdownBlocks.parse(md), minChars = 50)
+        assertEquals(1, slices.size)
+        assertEquals("A", slices[0].heading)
+        assertEquals(2, slices[0].blocks.size)
+    }
+
+    @Test
     fun preambleWithoutHeadingStaysOneSlice() {
         val slices = MarkdownSlicer.slice(MarkdownBlocks.parse("开头段落\n\n第二段"))
         assertEquals(1, slices.size)

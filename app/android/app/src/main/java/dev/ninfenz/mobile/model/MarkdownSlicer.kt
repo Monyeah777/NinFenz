@@ -10,7 +10,26 @@ data class MarkdownSlice(
 }
 
 object MarkdownSlicer {
-    fun slice(blocks: List<MarkdownBlock>): List<MarkdownSlice> {
+    fun slice(blocks: List<MarkdownBlock>, minChars: Int = 0): List<MarkdownSlice> {
+        val raw = sliceRaw(blocks)
+        if (minChars <= 0 || raw.size <= 1) return raw
+        val merged = mutableListOf<MarkdownSlice>()
+        for (slice in raw) {
+            val last = merged.lastOrNull()
+            if (last != null && (last.charCount < minChars || slice.charCount < minChars)) {
+                merged[merged.lastIndex] = MarkdownSlice(
+                    heading = last.heading ?: slice.heading,
+                    level = if (last.heading == null) slice.level else last.level,
+                    blocks = last.blocks + slice.blocks
+                )
+            } else {
+                merged.add(slice)
+            }
+        }
+        return merged
+    }
+
+    private fun sliceRaw(blocks: List<MarkdownBlock>): List<MarkdownSlice> {
         val out = mutableListOf<MarkdownSlice>()
         var heading: String? = null
         var level = 0
