@@ -18,6 +18,12 @@ data class MacroRunResult(
     val failures: Int
 )
 
+data class MacroBatchResult(
+    val status: String,
+    val runs: List<MacroRunResult>,
+    val failures: Int
+)
+
 object MacroRunner {
     suspend fun run(
         plan: JsonObject,
@@ -54,5 +60,21 @@ object MacroRunner {
             else -> "partial"
         }
         return MacroRunResult(status, results, failures)
+    }
+
+    /** 批量重放：每个 plan 独立执行，失败不跨 plan 传播。 */
+    suspend fun runBatch(
+        plans: List<JsonObject>,
+        handler: suspend (action: String, params: JsonObject) -> Result<String>
+    ): MacroBatchResult {
+        val runs = plans.map { run(it, handler) }
+        val failures = runs.sumOf { it.failures }
+        val status = when {
+            plans.isEmpty() -> "done"
+            failures == 0 -> "done"
+            runs.all { it.status == "failed" } -> "failed"
+            else -> "partial"
+        }
+        return MacroBatchResult(status, runs, failures)
     }
 }

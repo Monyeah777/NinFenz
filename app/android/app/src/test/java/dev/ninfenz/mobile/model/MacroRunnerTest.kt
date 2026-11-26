@@ -39,6 +39,29 @@ class MacroRunnerTest {
     }
 
     @Test
+    fun batchIsolatesFailuresAcrossPlans() {
+        val one = buildJsonObject {
+            put("steps", buildJsonArray {
+                add(buildJsonObject {
+                    put("id", "S01")
+                    put("action", "validate")
+                    put("params", buildJsonObject {})
+                })
+            })
+        }
+        var calls = 0
+        val result = runBlocking {
+            MacroRunner.runBatch(listOf(one, one)) { _, _ ->
+                calls += 1
+                if (calls == 2) Result.failure(IllegalStateException("second fails")) else Result.success("ok")
+            }
+        }
+        assertEquals("partial", result.status)
+        assertEquals(2, result.runs.size)
+        assertEquals(1, result.failures)
+    }
+
+    @Test
     fun allFailedIsFailed() {
         val result = runBlocking {
             MacroRunner.run(plan()) { _, _ -> Result.failure(IllegalStateException("x")) }
