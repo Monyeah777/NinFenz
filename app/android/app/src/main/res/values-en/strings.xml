@@ -1363,4 +1363,7 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="import_recent_less">Show less</string>
     <string name="search_scope_favorites">Favorites only</string>
     <string name="search_scope_all_tags">All tags</string>
+    <string name="author_snippet">Insert spec snippet</string>
+    <string name="author_snippet_conflict">Snippet IDs conflict with existing sections/slots</string>
+    <string name="author_snippet_applied">Inserted snippet: %1$s</string>
 </resources>

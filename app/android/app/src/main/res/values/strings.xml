@@ -1359,4 +1359,7 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="import_recent_less">收起</string>
     <string name="search_scope_favorites">仅收藏</string>
     <string name="search_scope_all_tags">全部标签</string>
+    <string name="author_snippet">插入规格片段</string>
+    <string name="author_snippet_conflict">片段 ID 与现有章节/槽位冲突</string>
+    <string name="author_snippet_applied">已插入片段：%1$s</string>
 </resources>

@@ -57,6 +57,7 @@ import dev.ninfenz.mobile.core.CoreError
 import dev.ninfenz.mobile.core.CoreResponse
 import dev.ninfenz.mobile.core.J
 import dev.ninfenz.mobile.data.AuthorArtifactStore
+import dev.ninfenz.mobile.data.ExtensionStore
 import dev.ninfenz.mobile.data.AuthorArtifacts
 import dev.ninfenz.mobile.data.SaveArtifactResult
 import dev.ninfenz.mobile.data.AuthorArtifactsLoader
@@ -741,6 +742,9 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
     var savedMsg by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
     val store = remember { AuthorArtifactStore(context.filesDir) }
+    val snippets = remember { ExtensionStore(context.filesDir).contributions(setOf("spec_snippet")) }
+    var showSnippets by remember { mutableStateOf(false) }
+    var snippetNote by remember { mutableStateOf<String?>(null) }
     var autoSavePrimed by remember { mutableStateOf(false) }
     var autoSaving by remember { mutableStateOf(false) }
     var retrySave by remember { mutableIntStateOf(0) }
@@ -762,7 +766,15 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
     }
 
     Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.m)) {
-        NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.author_sections, spec.sections.size))
+        Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+            NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.author_sections, spec.sections.size))
+            if (snippets.isNotEmpty()) {
+                TextButton(onClick = { showSnippets = true }) {
+                    Text(stringResource(dev.ninfenz.mobile.R.string.author_snippet))
+                }
+            }
+        }
+        snippetNote?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
         for (section in spec.sections) {
             NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
                 Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
@@ -860,6 +872,47 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
                 Text(stringResource(dev.ninfenz.mobile.R.string.author_retry_save))
             }
         }
+    }
+
+    if (showSnippets) {
+        AlertDialog(
+            onDismissRequest = { showSnippets = false },
+            title = { Text(stringResource(dev.ninfenz.mobile.R.string.author_snippet)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                    snippets.forEach { snippet ->
+                        TextButton(onClick = {
+                            val sec = J.optChild(snippet.config, "section")
+                            val id = sec?.let { J.optString(it, "id") }.orEmpty()
+                            val slotIds = sec?.let { J.optArray(it, "slots") }
+                                ?.mapNotNull { (it as? kotlinx.serialization.json.JsonPrimitive)?.content }.orEmpty()
+                            val newSlots = J.optArray(snippet.config, "slots").mapNotNull { el ->
+                                val o = el as? JsonObject ?: return@mapNotNull null
+                                val sid = J.optString(o, "id").orEmpty()
+                                if (sid.isBlank()) return@mapNotNull null
+                                SpecSlot(
+                                    id = sid,
+                                    name = J.optString(o, "name").orEmpty().ifBlank { sid },
+                                    section = id,
+                                    kind = J.optString(o, "kind").orEmpty().ifBlank { "text" },
+                                    required = o["required"]?.jsonPrimitive?.content?.toBooleanStrictOrNull() ?: false
+                                )
+                            }
+                            if (id.isBlank() || slotIds.isEmpty() || spec.sections.any { it.id == id } || newSlots.any { ns -> spec.slots.any { it.id == ns.id } }) {
+                                snippetNote = context.getString(dev.ninfenz.mobile.R.string.author_snippet_conflict)
+                            } else {
+                                val nextOrder = (spec.sections.maxOfOrNull { it.order } ?: 0) + 1
+                                val section = SpecSection(id, sec?.let { J.optString(it, "title") } ?: id, nextOrder, true, slotIds)
+                                apply(spec.copy(sections = spec.sections + section, slots = spec.slots + newSlots))
+                                snippetNote = context.getString(dev.ninfenz.mobile.R.string.author_snippet_applied, id)
+                                showSnippets = false
+                            }
+                        }) { Text(snippet.id) }
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { showSnippets = false }) { Text(stringResource(android.R.string.cancel)) } }
+        )
     }
 }
 
