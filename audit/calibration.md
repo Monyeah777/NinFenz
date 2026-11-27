@@ -33,6 +33,7 @@
 | B-004 | UI 层不得直接 import data 层（任何 import 都命中） | UI 层不得直接做平台 IO（ContentResolver/SharedPreferences/SQLite/文件句柄）；平台 IO 走 data 层 | ARCHITECTURE.md §4.1：端壳层→控制面→核心，本 app 无独立领域层；data 包即平台集成层，UI 调 Store 是既定设计。真实风险是 UI 自己碰 IO——实扫 7 处 `contentResolver.openInputStream` 已全部收敛到 `UriIo` | 规则本意「UI 不做持久化」保留可机检；UI→data 的 import 改为人工架构评审（0.4 领域层拆分时再收紧） |
 | D-005 | 测试文件重复 8 行块每文件 >15 处 | 阈值提到 >40（收敛后仍保留机检） | 阈值前 37 个文件命中，计数分布 16–37；最大来源是 203 个 docs-contract 测试各自手写的 `load_text`/frontmatter/反引号解析样板（每个文件的错误文案/默认路径不同，逐字重复窗口来自通用行）；把共享 workflow helper 抽出后计数不变（剩余是通用 loader 样板，不是复制的用例） | 测试 harness 抽取属 0.4 基建改造；先按 40 守住「真复制用例」，owner: 审计组；到期 2027-03 |
 | J-010 | desktop/tests 下所有 .py 必须 test_*.py | 共享 helper 模块（非测试文件）加入 exclude_names | 新增 desktop/tests/workflow_helpers.py 被 22 个 workflow 契约测试复用；该文件不是测试用例 | 与既有 cli_harness.py 排除同例；owner: 审计组；到期 2027-03 |
+| C-010 | Python 单文件 ≤800 行，超限即命中 | 存量豁免清单（10 个 desktop/src/core 真源模块）+ 棘轮：allow_files 之外的新文件仍 ≤800 | 10 个超限模块为 1,100–2,423 行真源（terminal/domain_pack/evidence/mcp_runtime/output_forms/asset_contract/pack_combo/conformance_scan/interop_export/daemon），与 Rust 侧逐条对账、按模块级 parity 测试钉住；拆分需同步 Rust 侧与 parity 测试，属 0.4 架构批次 | 棘轮保留回归保护：新增文件超限立即命中；owner: 审计组；到期 2027-06（0.4 重审） |
 
 ## 校准后的门禁含义
 

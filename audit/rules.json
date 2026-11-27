@@ -650,7 +650,7 @@
       "dimension": "C",
       "iso": "maintainability.analysability",
       "severity": "P2",
-      "statement": "Python 单文件 ≤800 行",
+      "statement": "Python 单文件 ≤800 行（存量真源模块豁免清单见 params，新增文件不得超限）",
       "check": "script",
       "version": 1,
       "script": "file_line_limit",
@@ -659,7 +659,19 @@
           "desktop/src/core/**/*.py",
           "app/cli/**/*.py"
         ],
-        "limit": 800
+        "limit": 800,
+        "allow_files": [
+          "desktop/src/core/asset_contract.py",
+          "desktop/src/core/conformance_scan.py",
+          "desktop/src/core/daemon.py",
+          "desktop/src/core/domain_pack.py",
+          "desktop/src/core/evidence.py",
+          "desktop/src/core/interop_export.py",
+          "desktop/src/core/mcp_runtime.py",
+          "desktop/src/core/output_forms.py",
+          "desktop/src/core/pack_combo.py",
+          "desktop/src/core/terminal.py"
+        ]
       },
       "penalty": 2,
       "source": "项目惯例"

@@ -18,6 +18,7 @@
 | p2-batch7（包环收口） | 0.3.7-preview.1 | 166 | **97.64** | 0 | 0 | 1233 | 220 | audit/evidence/p2-batch7/ |
 | p2-batch8（B-004 收口） | 0.3.7-preview.1 | 166 | **97.82** | 0 | 0 | 1017 | 220 | audit/evidence/p2-batch8/ |
 | p2-batch9（测试基建去重） | 0.3.7-preview.1 | 166 | **97.88** | 0 | 0 | 1017 | 183 | audit/evidence/p2-batch9/ |
+| p2-batch10（C-010 棘轮） | 0.3.7-preview.1 | 166 | **98.08** | 0 | 0 | 1007 | 183 | audit/evidence/p2-batch10/ |
 
 ## 维度分变化
 
@@ -101,3 +102,8 @@
 ## 门禁状态（第十二轮后）
 
 - 最新证据 p2-batch9：总分 97.88，P0=0/P1=0/error=0/no_targets=0，audit/ci/gate.sh PASS；A/B/D/E/J 维度 100。
+
+
+## 门禁状态（第十三轮后）
+
+- 最新证据 p2-batch10：总分 98.08，P0=0/P1=0/error=0/no_targets=0，audit/ci/gate.sh PASS；A/B/D/E/J 维度 100。

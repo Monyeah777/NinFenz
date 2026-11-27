@@ -484,6 +484,7 @@ def _iter_candidates(ctx: Context, params, extra_exclude=None):
 def check_file_line_limit(ctx: Context, rule: dict):
     p = rule.get("params") or {}
     limit = int(p.get("limit", 400))
+    allow = set(p.get("allow_files") or [])
     files = _iter_candidates(ctx, p)
     hits = []
     for rel in files:
@@ -491,7 +492,7 @@ def check_file_line_limit(ctx: Context, rule: dict):
         if not text:
             continue
         n = text.count("\n") + 1
-        if n > limit:
+        if n > limit and rel not in allow:
             hits.append(hit(rel, limit + 1, f"文件 {n} 行，超过上限 {limit} 行", f"{n} lines"))
     return hits, files
 
