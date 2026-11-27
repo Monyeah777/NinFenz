@@ -8,4 +8,4 @@ versionName: 0.3.7-preview.1
 510cd8a8a72785b550a9451450a7d4369141593b780fba792c469a27657ea04a  app-release.aab
 199f50afcdec29e3d131f4dbd136c9d354e355304f9ab1f547b2d379b829d947  results/app/0.3.7-preview.1-internal-debugsigned.apk
 
-备注：AAB 未签名；base APK 18MB；AAB 31MB（on-demand OCR feature）。
+备注：AAB 未签名；base APK 18MB；AAB 31MB（on-demand OCR feature）；bundletool base 下载 8.9–9.1MB。
