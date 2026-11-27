@@ -1,0 +1,89 @@
+# NF 审计工具配置：detekt（Kotlin 静态分析）
+# 状态：未接入（离线环境无 detekt jar / 无网络拉取依赖），由 CI 执行。
+# 接入方式（CI）：
+#   curl -sSL https://github.com/detekt/detekt/releases/download/v<VER>/detekt-cli-<VER>-all.jar -o detekt.jar
+#   java -jar detekt.jar --config audit/tools/detekt.yml --input app/android/app/src/main/java --baseline /dev/null
+# 规则口径与 audit/rules.json 对齐：C-003 函数行数、C-004 圈复杂度、C-007 参数个数、C-008 嵌套、C-012 Rust 另行 rustfmt/clippy。
+
+build:
+  maxIssues: 0
+  excludeCorrectable: false
+
+complexity:
+  active: true
+  LongMethod:
+    active: true
+    threshold: 60
+  CyclomaticComplexMethod:
+    active: true
+    threshold: 10
+  LongParameterList:
+    active: true
+    functionThreshold: 6
+    constructorThreshold: 6
+  NestedBlockDepth:
+    active: true
+    threshold: 8
+  TooManyFunctions:
+    active: true
+    thresholdInFiles: 20
+    thresholdInClasses: 15
+    thresholdInInterfaces: 15
+    thresholdInObjects: 15
+  ComplexCondition:
+    active: true
+    threshold: 4
+  LargeClass:
+    active: true
+    threshold: 600
+
+style:
+  active: true
+  MaxLineLength:
+    active: true
+    maxLineLength: 160
+  MagicNumber:
+    active: false
+  ForbiddenComment:
+    active: true
+    comments:
+      - 'TODO:'
+      - 'FIXME:'
+      - 'STOPSHIP:'
+  ReturnCount:
+    active: true
+    max: 4
+  WildcardImport:
+    active: true
+
+naming:
+  active: true
+  FunctionNaming:
+    active: true
+    functionPattern: '[a-z][a-zA-Z0-9]*'
+    excludeClassPattern: '$^'
+  ClassNaming:
+    active: true
+    classPattern: '[A-Z][a-zA-Z0-9]*'
+  TopLevelPropertyNaming:
+    active: true
+    constantPattern: '[A-Z][A-Z0-9_]*'
+    propertyPattern: '[A-Za-z][_A-Za-z0-9]*'
+
+exceptions:
+  active: true
+  TooGenericExceptionCaught:
+    active: true
+    exceptionNames:
+      - 'Exception'
+      - 'Throwable'
+      - 'Error'
+  SwallowedException:
+    active: true
+  EmptyCatchBlock:
+    active: true
+
+coroutines:
+  active: true
+  GlobalCoroutineUsage:
+    active: true

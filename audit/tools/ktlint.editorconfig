@@ -1,0 +1,25 @@
+# NF 审计工具配置：ktlint / editorconfig
+# 状态：未接入（离线环境无 ktlint 可执行文件），由 CI 执行。
+# 接入方式（CI）：
+#   ktlint --editorconfig=audit/tools/ktlint.editorconfig "app/android/app/src/**/*.kt"
+# 口径：4 空格缩进、行宽 160、LF、文件末尾换行；与 .editorconfig 全仓基线兼容。
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+max_line_length = 160
+
+[*.{kt,kts}]
+ktlint_code_style = android_studio
+ktlint_standard_function-naming = default
+ktlint_standard_class-naming = default
+ktlint_standard_package-name = default
+ktlint_standard_no-wildcard-imports = disabled
+ktlint_standard_filename = default
+ktlint_function_naming_ignore_when_annotated_with = Composable

@@ -1,0 +1,3119 @@
+{
+  "version": 2,
+  "baseline_commit": "aeae36b11",
+  "object": "NF 0.3.6 源码（mobile 0.3.6 / 内核 1.0.5）",
+  "scoring": "audit/scoring.json",
+  "runner": "audit/runner.py",
+  "count": 166,
+  "dimension_counts": {
+    "A": 10,
+    "B": 10,
+    "C": 13,
+    "D": 6,
+    "E": 12,
+    "F": 10,
+    "G": 10,
+    "H": 16,
+    "I": 12,
+    "J": 15,
+    "K": 15,
+    "L": 11,
+    "M": 13,
+    "N": 13
+  },
+  "check_counts": {
+    "script": 135,
+    "tool": 14,
+    "manual": 17
+  },
+  "rules": [
+    {
+      "id": "ARCH-001",
+      "dimension": "A",
+      "iso": "maintainability.modularity",
+      "severity": "P1",
+      "statement": "core 包不得 import android.*",
+      "check": "script",
+      "version": 1,
+      "script": "import_boundary",
+      "params": {
+        "path_glob": [
+          "app/android/app/src/main/java/**/*.kt"
+        ],
+        "file_must_contain": "/core/",
+        "forbid_import_prefix": [
+          "android.",
+          "androidx."
+        ]
+      },
+      "penalty": 4,
+      "source": "Android 架构指南"
+    },
+    {
+      "id": "ARCH-002",
+      "dimension": "A",
+      "iso": "maintainability.modularity",
+      "severity": "P1",
+      "statement": "model 层不得 import data 层",
+      "check": "script",
+      "version": 1,
+      "script": "import_boundary",
+      "params": {
+        "path_glob": [
+          "app/android/app/src/main/java/**/*.kt"
+        ],
+        "file_must_contain": "/model/",
+        "forbid_import_prefix": [
+          "dev.ninfenz.mobile.data."
+        ]
+      },
+      "penalty": 4,
+      "source": "Android 架构指南"
+    },
+    {
+      "id": "ARCH-003",
+      "dimension": "A",
+      "iso": "maintainability.modularity",
+      "severity": "P1",
+      "statement": "data 层不得 import ui / MainActivity",
+      "check": "script",
+      "version": 1,
+      "script": "import_boundary",
+      "params": {
+        "path_glob": [
+          "app/android/app/src/main/java/**/*.kt"
+        ],
+        "file_must_contain": "/data/",
+        "forbid_import_prefix": [
+          "dev.ninfenz.mobile.ui.",
+          "dev.ninfenz.mobile.MainActivity"
+        ]
+      },
+      "penalty": 4,
+      "source": "Android 架构指南"
+    },
+    {
+      "id": "ARCH-004",
+      "dimension": "A",
+      "iso": "maintainability.modularity",
+      "severity": "P2",
+      "statement": "Kotlin 包间不得成环",
+      "check": "script",
+      "version": 1,
+      "script": "import_cycle",
+      "params": {
+        "globs": [
+          "app/android/app/src/main/java/**/*.kt",
+          "app/desktop/src/main/kotlin/**/*.kt"
+        ],
+        "internal_prefix": "dev.ninfenz"
+      },
+      "penalty": 3,
+      "source": "Konsist/依赖分析 + 脚本近似"
+    },
+    {
+      "id": "ARCH-005",
+      "dimension": "A",
+      "iso": "maintainability.modularity",
+      "severity": "P2",
+      "statement": "Activity 只做装配与路由（MainActivity ≤300 行）",
+      "check": "script",
+      "version": 1,
+      "script": "file_line_limit",
+      "params": {
+        "globs": [
+          "app/android/**/MainActivity.kt"
+        ],
+        "limit": 300
+      },
+      "penalty": 2,
+      "source": "项目惯例"
+    },
+    {
+      "id": "ARCH-006",
+      "dimension": "A",
+      "iso": "maintainability.modularity",
+      "severity": "P2",
+      "statement": "UI 层不得直接使用 JNA 原生调用",
+      "check": "script",
+      "version": 1,
+      "script": "forbid_text",
+      "params": {
+        "globs": [
+          "app/android/app/src/main/java/dev/ninfenz/mobile/ui/**/*.kt"
+        ],
+        "patterns": [
+          "com\\.sun\\.jna",
+          "Native\\.load",
+          "jnidispatch"
+        ],
+        "strip_comments": true
+      },
+      "penalty": 3,
+      "source": "分层约束"
+    },
+    {
+      "id": "ARCH-007",
+      "dimension": "A",
+      "iso": "maintainability.modularity",
+      "severity": "P3",
+      "statement": "动态特性代码只允许经桥接层访问",
+      "check": "script",
+      "version": 1,
+      "script": "forbid_text",
+      "params": {
+        "globs": [
+          "app/android/app/src/main/java/**/*.kt"
+        ],
+        "patterns": [
+          "dev\\.ninfenz\\.mobile\\.ocr\\."
+        ],
+        "strip_comments": true
+      },
+      "penalty": 2,
+      "source": "D1a 设计"
+    },
+    {
+      "id": "ARCH-008",
+      "dimension": "A",
+      "iso": "maintainability.modularity",
+      "severity": "P2",
+      "statement": "app/desktop 不得 import Android framework（Compose Desktop 的 androidx.compose 除外）",
+      "check": "script",
+      "version": 1,
+      "script": "import_boundary",
+      "params": {
+        "path_glob": [
+          "app/desktop/src/main/kotlin/**/*.kt"
+        ],
+        "forbid_import_prefix": [
+          "android."
+        ]
+      },
+      "penalty": 2,
+      "source": "薄客户端分层"
+    },
+    {
+      "id": "ARCH-009",
+      "dimension": "A",
+      "iso": "maintainability.modularity",
+      "severity": "P2",
+      "statement": "engine/rust 不得反向依赖 app/core crate",
+      "check": "script",
+      "version": 1,
+      "script": "forbid_text",
+      "params": {
+        "globs": [
+          "engine/rust/Cargo.toml",
+          "engine/rust/*/Cargo.toml"
+        ],
+        "patterns": [
+          "nf-app-core"
+        ]
+      },
+      "penalty": 2,
+      "source": "引擎分层"
+    },
+    {
+      "id": "ARCH-010",
+      "dimension": "A",
+      "iso": "maintainability.modularity",
+      "severity": "P3",
+      "statement": "Gradle 依赖与 imports 未用启发式检查",
+      "check": "script",
+      "version": 1,
+      "script": "unused_gradle_dependency",
+      "params": {
+        "file": "app/android/app/build.gradle.kts",
+        "dependency_package_map": {
+          "androidx.compose": "androidx.compose",
+          "androidx.activity": "androidx.activity",
+          "androidx.core": "androidx.core",
+          "kotlinx-serialization-json": "kotlinx.serialization",
+          "kotlinx-coroutines-android": "kotlinx.coroutines",
+          "net.java.dev.jna": "com.sun.jna",
+          "pdfbox-android": "com.tom_roush.pdfbox",
+          "text-recognition-chinese": "com.google.mlkit",
+          "junit": "org.junit",
+          "robolectric": "org.robolectric",
+          "androidx.test": "androidx.test"
+        },
+        "source_globs": [
+          "app/android/app/src/main/java/**/*.kt",
+          "app/android/app/src/test/java/**/*.kt"
+        ]
+      },
+      "penalty": 2,
+      "source": "依赖分析启发式"
+    },
+    {
+      "id": "B-001",
+      "dimension": "B",
+      "iso": "maintainability.modifiability",
+      "severity": "P2",
+      "statement": "Composable 不直接读写文件",
+      "check": "script",
+      "version": 1,
+      "script": "forbid_text",
+      "params": {
+        "globs": [
+          "app/android/app/src/main/java/dev/ninfenz/mobile/ui/**/*.kt"
+        ],
+        "patterns": [
+          "java\\.io\\.File\\(",
+          "FileInputStream",
+          "openOutputStream"
+        ],
+        "strip_comments": true
+      },
+      "penalty": 3,
+      "source": "架构指南 UDF"
+    },
+    {
+      "id": "B-002",
+      "dimension": "B",
+      "iso": "maintainability.modifiability",
+      "severity": "P2",
+      "statement": "单目录 Python 模块数 ≤200（超出需分包）",
+      "check": "script",
+      "version": 1,
+      "script": "max_files_per_dir",
+      "params": {
+        "globs": [
+          "desktop/src/core/**/*.py"
+        ],
+        "limit": 200
+      },
+      "penalty": 2,
+      "source": "模块内聚"
+    },
+    {
+      "id": "B-003",
+      "dimension": "B",
+      "iso": "maintainability.modifiability",
+      "severity": "P3",
+      "statement": "单目录测试文件数 ≤400（超出需分组）",
+      "check": "script",
+      "version": 1,
+      "script": "max_files_per_dir",
+      "params": {
+        "globs": [
+          "desktop/tests/**/*.py"
+        ],
+        "limit": 400
+      },
+      "penalty": 1,
+      "source": "测试组织"
+    },
+    {
+      "id": "B-004",
+      "dimension": "B",
+      "iso": "maintainability.modifiability",
+      "severity": "P2",
+      "statement": "UI 层不得直接 import data 层",
+      "check": "script",
+      "version": 1,
+      "script": "import_boundary",
+      "params": {
+        "path_glob": [
+          "app/android/app/src/main/java/dev/ninfenz/mobile/ui/**/*.kt"
+        ],
+        "forbid_import_prefix": [
+          "dev.ninfenz.mobile.data."
+        ]
+      },
+      "penalty": 3,
+      "source": "MVVM 分层"
+    },
+    {
+      "id": "B-005",
+      "dimension": "B",
+      "iso": "maintainability.modifiability",
+      "severity": "P2",
+      "statement": "desktop core 不得 import Qt/PySide（core 保持无 UI 依赖）",
+      "check": "script",
+      "version": 1,
+      "script": "import_boundary",
+      "params": {
+        "path_glob": [
+          "desktop/src/core/**/*.py"
+        ],
+        "forbid_import_prefix": [
+          "PySide6",
+          "PyQt5",
+          "PyQt6",
+          "shiboken"
+        ]
+      },
+      "penalty": 2,
+      "source": "core 纯度"
+    },
+    {
+      "id": "B-006",
+      "dimension": "B",
+      "iso": "maintainability.modifiability",
+      "severity": "P3",
+      "statement": "CLI/TUI 必须复用同一 core 入口",
+      "check": "script",
+      "version": 1,
+      "script": "required_file_presence",
+      "params": {
+        "files": [
+          "desktop/src/core/__init__.py",
+          "tui/nf.py",
+          "scripts/nf.py"
+        ]
+      },
+      "penalty": 1,
+      "source": "单一真源"
+    },
+    {
+      "id": "B-007",
+      "dimension": "B",
+      "iso": "maintainability.modifiability",
+      "severity": "P3",
+      "statement": "Kotlin 文件命名 PascalCase",
+      "check": "script",
+      "version": 1,
+      "script": "file_naming",
+      "params": {
+        "globs": [
+          "app/android/app/src/main/java/**/*.kt"
+        ],
+        "pattern": "[A-Z][A-Za-z0-9_]*\\.kt"
+      },
+      "penalty": 1,
+      "source": "Kotlin 惯例"
+    },
+    {
+      "id": "B-008",
+      "dimension": "B",
+      "iso": "maintainability.modifiability",
+      "severity": "P3",
+      "statement": "Python 模块命名 snake_case",
+      "check": "script",
+      "version": 1,
+      "script": "file_naming",
+      "params": {
+        "globs": [
+          "desktop/src/core/**/*.py"
+        ],
+        "pattern": "_*[a-z][a-z0-9_]*\\.py"
+      },
+      "penalty": 1,
+      "source": "PEP8"
+    },
+    {
+      "id": "B-009",
+      "dimension": "B",
+      "iso": "maintainability.modifiability",
+      "severity": "P3",
+      "statement": "Rust 模块命名 snake_case",
+      "check": "script",
+      "version": 1,
+      "script": "file_naming",
+      "params": {
+        "globs": [
+          "engine/rust/**/src/**/*.rs"
+        ],
+        "pattern": "[a-z][a-z0-9_]*\\.rs"
+      },
+      "penalty": 1,
+      "source": "Rust 惯例"
+    },
+    {
+      "id": "B-010",
+      "dimension": "B",
+      "iso": "maintainability.modifiability",
+      "severity": "P2",
+      "statement": "state 层不得 import UI 层",
+      "check": "script",
+      "version": 1,
+      "script": "import_boundary",
+      "params": {
+        "path_glob": [
+          "app/android/app/src/main/java/dev/ninfenz/mobile/state/**/*.kt"
+        ],
+        "forbid_import_prefix": [
+          "dev.ninfenz.mobile.ui."
+        ]
+      },
+      "penalty": 2,
+      "source": "单向依赖"
+    },
+    {
+      "id": "C-001",
+      "dimension": "C",
+      "iso": "maintainability.analysability",
+      "severity": "P2",
+      "statement": "单文件 ≤400 行（生产源码）",
+      "check": "script",
+      "version": 1,
+      "script": "file_line_limit",
+      "params": {
+        "globs": [
+          "app/android/app/src/main/java/**/*.kt",
+          "desktop/src/core/**/*.py",
+          "engine/rust/**/src/**/*.rs",
+          "app/core/src/**/*.rs"
+        ],
+        "limit": 400,
+        "exclude": [
+          "**/vendor/**",
+          "**/*_gen.rs",
+          "**/generated/**"
+        ]
+      },
+      "penalty": 3,
+      "source": "CISQ"
+    },
+    {
+      "id": "C-002",
+      "dimension": "C",
+      "iso": "maintainability.analysability",
+      "severity": "P3",
+      "statement": "Composable ≤120 行",
+      "check": "script",
+      "version": 1,
+      "script": "function_line_limit",
+      "params": {
+        "globs": [
+          "app/android/app/src/main/java/dev/ninfenz/mobile/ui/**/*.kt"
+        ],
+        "limit": 120,
+        "marker": "@Composable"
+      },
+      "penalty": 2,
+      "source": "项目惯例"
+    },
+    {
+      "id": "C-003",
+      "dimension": "C",
+      "iso": "maintainability.analysability",
+      "severity": "P2",
+      "statement": "Kotlin 函数 ≤60 行",
+      "check": "script",
+      "version": 1,
+      "script": "function_line_limit",
+      "params": {
+        "globs": [
+          "app/android/app/src/main/java/**/*.kt"
+        ],
+        "limit": 60
+      },
+      "penalty": 2,
+      "source": "CISQ"
+    },
+    {
+      "id": "C-004",
+      "dimension": "C",
+      "iso": "maintainability.analysability",
+      "severity": "P2",
+      "statement": "圈复杂度 ≤10（detekt）",
+      "check": "tool",
+      "version": 1,
+      "tool": "detekt",
+      "note": "离线不可用（缺 detekt jar）；CI 跑 audit/tools/detekt.yml",
+      "penalty": 3,
+      "source": "CISQ"
+    },
+    {
+      "id": "C-005",
+      "dimension": "C",
+      "iso": "maintainability.analysability",
+      "severity": "P2",
+      "statement": "圈复杂度近似 ≤10（脚本统计 if/for/while/when/catch/&&/||）",
+      "check": "script",
+      "version": 1,
+      "script": "cyclomatic_proxy",
+      "params": {
+        "globs": [
+          "app/android/app/src/main/java/**/*.kt",
+          "desktop/src/core/**/*.py",
+          "engine/rust/**/src/**/*.rs"
+        ],
+        "limit": 10,
+        "exclude": [
+          "**/vendor/**",
+          "**/*_gen.rs",
+          "**/generated/**"
+        ]
+      },
+      "penalty": 3,
+      "source": "CISQ 近似"
+    },
+    {
+      "id": "C-006",
+      "dimension": "C",
+      "iso": "maintainability.analysability",
+      "severity": "P3",
+      "statement": "TODO/FIXME/HACK 全仓 ≤20 处",
+      "check": "script",
+      "version": 1,
+      "script": "todo_markers",
+      "params": {
+        "globs": [
+          "app/android/app/src/main/java/**/*.kt",
+          "desktop/src/core/**/*.py",
+          "desktop/tests/**/*.py",
+          "app/cli/**/*.py",
+          "scripts/**/*.py",
+          "engine/rust/**/src/**/*.rs"
+        ],
+        "limit": 20
+      },
+      "penalty": 2,
+      "source": "项目惯例"
+    },
+    {
+      "id": "C-007",
+      "dimension": "C",
+      "iso": "maintainability.analysability",
+      "severity": "P3",
+      "statement": "单个函数参数 ≤6 个",
+      "check": "script",
+      "version": 1,
+      "script": "max_function_params",
+      "params": {
+        "globs": [
+          "app/android/app/src/main/java/**/*.kt",
+          "desktop/src/core/**/*.py"
+        ],
+        "limit": 6
+      },
+      "penalty": 1,
+      "source": "CISQ"
+    },
+    {
+      "id": "C-008",
+      "dimension": "C",
+      "iso": "maintainability.analysability",
+      "severity": "P3",
+      "statement": "控制流嵌套深度 ≤8",
+      "check": "script",
+      "version": 1,
+      "script": "nesting_depth",
+      "params": {
+        "globs": [
+          "app/android/app/src/main/java/**/*.kt",
+          "desktop/src/core/**/*.py"
+        ],
+        "limit": 8
+      },
+      "penalty": 2,
+      "source": "CISQ"
+    },
+    {
+      "id": "C-009",
+      "dimension": "C",
+      "iso": "maintainability.analysability",
+      "severity": "P2",
+      "statement": "Rust 单文件 ≤1000 行",
+      "check": "script",
+      "version": 1,
+      "script": "file_line_limit",
+      "params": {
+        "globs": [
+          "engine/rust/**/src/**/*.rs",
+          "app/core/src/**/*.rs"
+        ],
+        "limit": 1000,
+        "exclude": [
+          "**/vendor/**",
+          "**/*_gen.rs",
+          "**/generated/**"
+        ]
+      },
+      "penalty": 2,
+      "source": "项目惯例"
+    },
+    {
+      "id": "C-010",
+      "dimension": "C",
+      "iso": "maintainability.analysability",
+      "severity": "P2",
+      "statement": "Python 单文件 ≤800 行",
+      "check": "script",
+      "version": 1,
+      "script": "file_line_limit",
+      "params": {
+        "globs": [
+          "desktop/src/core/**/*.py",
+          "app/cli/**/*.py"
+        ],
+        "limit": 800
+      },
+      "penalty": 2,
+      "source": "项目惯例"
+    },
+    {
+      "id": "C-011",
+      "dimension": "C",
+      "iso": "maintainability.analysability",
+      "severity": "P3",
+      "statement": "Kotlin 非空断言 !! 每文件 ≤2 处",
+      "check": "script",
+      "version": 1,
+      "script": "non_null_assertion",
+      "params": {
+        "globs": [
+          "app/android/app/src/main/java/**/*.kt",
+          "app/desktop/src/main/kotlin/**/*.kt"
+        ],
+        "per_file_limit": 2
+      },
+      "penalty": 2,
+      "source": "Kotlin 惯例"
+    },
+    {
+      "id": "C-012",
+      "dimension": "C",
+      "iso": "maintainability.analysability",
+      "severity": "P3",
+      "statement": "Rust 函数 ≤100 行",
+      "check": "script",
+      "version": 1,
+      "script": "function_line_limit",
+      "params": {
+        "globs": [
+          "engine/rust/**/src/**/*.rs"
+        ],
+        "limit": 100
+      },
+      "penalty": 2,
+      "source": "CISQ"
+    },
+    {
+      "id": "C-013",
+      "dimension": "C",
+      "iso": "maintainability.analysability",
+      "severity": "P3",
+      "statement": "C# 单文件 ≤800 行",
+      "check": "script",
+      "version": 1,
+      "script": "file_line_limit",
+      "params": {
+        "globs": [
+          "engine/dotnet/**/*.cs"
+        ],
+        "limit": 800
+      },
+      "penalty": 1,
+      "source": "项目惯例"
+    },
+    {
+      "id": "D-001",
+      "dimension": "D",
+      "iso": "maintainability.reusability",
+      "severity": "P2",
+      "statement": "重复 8 行块占比 ≤3%（jscpd）",
+      "check": "tool",
+      "version": 1,
+      "tool": "jscpd",
+      "note": "离线不可用（缺 node 依赖）；CI 跑 jscpd",
+      "penalty": 3,
+      "source": "CISQ"
+    },
+    {
+      "id": "D-002",
+      "dimension": "D",
+      "iso": "maintainability.reusability",
+      "severity": "P2",
+      "statement": "Kotlin 单文件重复 8 行块 >5 处需抽象",
+      "check": "script",
+      "version": 1,
+      "script": "duplicate_block",
+      "params": {
+        "globs": [
+          "app/android/app/src/main/java/**/*.kt"
+        ],
+        "window": 8,
+        "per_file_limit": 5
+      },
+      "penalty": 2,
+      "source": "CISQ"
+    },
+    {
+      "id": "D-003",
+      "dimension": "D",
+      "iso": "maintainability.reusability",
+      "severity": "P2",
+      "statement": "Python 单文件重复 8 行块 >5 处需抽象",
+      "check": "script",
+      "version": 1,
+      "script": "duplicate_block",
+      "params": {
+        "globs": [
+          "desktop/src/core/**/*.py"
+        ],
+        "window": 8,
+        "per_file_limit": 5
+      },
+      "penalty": 2,
+      "source": "CISQ"
+    },
+    {
+      "id": "D-004",
+      "dimension": "D",
+      "iso": "maintainability.reusability",
+      "severity": "P3",
+      "statement": "Rust 单文件重复 8 行块 >5 处需抽象",
+      "check": "script",
+      "version": 1,
+      "script": "duplicate_block",
+      "params": {
+        "globs": [
+          "engine/rust/**/src/**/*.rs"
+        ],
+        "window": 8,
+        "per_file_limit": 5
+      },
+      "penalty": 1,
+      "source": "CISQ"
+    },
+    {
+      "id": "D-005",
+      "dimension": "D",
+      "iso": "maintainability.reusability",
+      "severity": "P3",
+      "statement": "测试代码重复 8 行块每文件 >15 处需收敛",
+      "check": "script",
+      "version": 1,
+      "script": "duplicate_block",
+      "params": {
+        "globs": [
+          "desktop/tests/**/*.py"
+        ],
+        "window": 8,
+        "per_file_limit": 15
+      },
+      "penalty": 1,
+      "source": "测试维护性"
+    },
+    {
+      "id": "D-006",
+      "dimension": "D",
+      "iso": "maintainability.reusability",
+      "severity": "P2",
+      "statement": "重复代码人工抽样复核（jscpd 之外）",
+      "check": "manual",
+      "version": 1,
+      "penalty": 2,
+      "source": "人工抽样 + jscpd 对照"
+    },
+    {
+      "id": "E-001",
+      "dimension": "E",
+      "iso": "reliability.fault-tolerance",
+      "severity": "P1",
+      "statement": "用户可见路径禁止 getOrNull() 吞错",
+      "check": "script",
+      "version": 1,
+      "script": "forbid_text",
+      "params": {
+        "globs": [
+          "app/android/app/src/main/java/dev/ninfenz/mobile/ui/**/*.kt"
+        ],
+        "patterns": [
+          "getOrNull\\(\\)"
+        ],
+        "strip_comments": true
+      },
+      "penalty": 4,
+      "source": "项目惯例"
+    },
+    {
+      "id": "E-002",
+      "dimension": "E",
+      "iso": "reliability.fault-tolerance",
+      "severity": "P1",
+      "statement": "catch/except 不得为空（必须恢复或上报）",
+      "check": "script",
+      "version": 1,
+      "script": "empty_catch",
+      "params": {
+        "globs": [
+          "app/android/app/src/main/java/**/*.kt",
+          "desktop/src/core/**/*.py",
+          "app/cli/**/*.py"
+        ]
+      },
+      "penalty": 4,
+      "source": "CISQ"
+    },
+    {
+      "id": "E-003",
+      "dimension": "E",
+      "iso": "reliability.fault-tolerance",
+      "severity": "P1",
+      "statement": "错误码必须在 app/schema/error_codes.json 在册",
+      "check": "script",
+      "version": 1,
+      "script": "error_code_registry",
+      "params": {
+        "schema": "app/schema/error_codes.json",
+        "globs": [
+          "app/android/app/src/main/java/**/*.kt",
+          "app/android/app/src/test/java/**/*.kt",
+          "desktop/src/core/**/*.py",
+          "app/cli/**/*.py",
+          "scripts/**/*.py",
+          "engine/rust/**/src/**/*.rs",
+          "app/core/src/**/*.rs"
+        ]
+      },
+      "penalty": 4,
+      "source": "错误码契约"
+    },
+    {
+      "id": "E-004",
+      "dimension": "E",
+      "iso": "reliability.fault-tolerance",
+      "severity": "P2",
+      "statement": "Rust 生产路径 unwrap/expect 总量 ≤200",
+      "check": "script",
+      "version": 1,
+      "script": "rust_unwrap",
+      "params": {
+        "globs": [
+          "engine/rust/**/src/**/*.rs",
+          "app/core/src/**/*.rs"
+        ],
+        "exclude": [
+          "**/vendor/**",
+          "**/*_gen.rs",
+          "**/generated/**"
+        ],
+        "aggregate_limit": 200
+      },
+      "penalty": 3,
+      "source": "Rust 惯例"
+    },
+    {
+      "id": "E-005",
+      "dimension": "E",
+      "iso": "reliability.fault-tolerance",
+      "severity": "P2",
+      "statement": "Python 不得裸 except:",
+      "check": "script",
+      "version": 1,
+      "script": "python_bare_except",
+      "params": {
+        "globs": [
+          "desktop/src/core/**/*.py",
+          "app/cli/**/*.py",
+          "scripts/**/*.py"
+        ]
+      },
+      "penalty": 2,
+      "source": "PEP8"
+    },
+    {
+      "id": "E-006",
+      "dimension": "E",
+      "iso": "reliability.fault-tolerance",
+      "severity": "P2",
+      "statement": "C# 不得空 catch",
+      "check": "script",
+      "version": 1,
+      "script": "empty_catch",
+      "params": {
+        "globs": [
+          "engine/dotnet/**/*.cs"
+        ]
+      },
+      "penalty": 2,
+      "source": "C# 惯例"
+    },
+    {
+      "id": "E-007",
+      "dimension": "E",
+      "iso": "reliability.fault-tolerance",
+      "severity": "P2",
+      "statement": "Python 异常不得静默吞掉（仅 pass/continue/return None）",
+      "check": "script",
+      "version": 1,
+      "script": "python_swallow_exception",
+      "params": {
+        "globs": [
+          "desktop/src/core/**/*.py",
+          "app/cli/**/*.py",
+          "scripts/**/*.py"
+        ]
+      },
+      "penalty": 2,
+      "source": "CISQ"
+    },
+    {
+      "id": "E-008",
+      "dimension": "E",
+      "iso": "reliability.fault-tolerance",
+      "severity": "P2",
+      "statement": "Rust 生产路径不得 panic!/todo!/unimplemented!",
+      "check": "script",
+      "version": 1,
+      "script": "rust_panic",
+      "params": {
+        "globs": [
+          "engine/rust/**/src/**/*.rs",
+          "app/core/src/**/*.rs"
+        ],
+        "exclude": [
+          "**/vendor/**",
+          "**/*_gen.rs",
+          "**/generated/**"
+        ]
+      },
+      "penalty": 2,
+      "source": "Rust 惯例"
+    },
+    {
+      "id": "E-009",
+      "dimension": "E",
+      "iso": "reliability.fault-tolerance",
+      "severity": "P1",
+      "statement": "错误码 schema 结构完整（code/severity/exit/message/fix，唯一）",
+      "check": "script",
+      "version": 1,
+      "script": "error_codes_shape",
+      "params": {
+        "schema": "app/schema/error_codes.json",
+        "allowed_exit": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "allowed_severity": [
+          "error",
+          "warn",
+          "info"
+        ]
+      },
+      "penalty": 3,
+      "source": "错误码契约"
+    },
+    {
+      "id": "E-010",
+      "dimension": "E",
+      "iso": "reliability.fault-tolerance",
+      "severity": "P2",
+      "statement": "Rust 单文件 unwrap/expect >15 处需改造",
+      "check": "script",
+      "version": 1,
+      "script": "rust_unwrap",
+      "params": {
+        "globs": [
+          "engine/rust/**/src/**/*.rs"
+        ],
+        "exclude": [
+          "**/vendor/**",
+          "**/*_gen.rs",
+          "**/generated/**"
+        ],
+        "per_file_limit": 15
+      },
+      "penalty": 2,
+      "source": "Rust 惯例"
+    },
+    {
+      "id": "E-011",
+      "dimension": "E",
+      "iso": "reliability.fault-tolerance",
+      "severity": "P3",
+      "statement": "生产代码不得用 assert 做输入校验",
+      "check": "script",
+      "version": 1,
+      "script": "forbid_text",
+      "params": {
+        "globs": [
+          "desktop/src/core/**/*.py",
+          "app/cli/**/*.py"
+        ],
+        "patterns": [
+          "^\\s*assert\\s+"
+        ],
+        "strip_comments": true
+      },
+      "penalty": 1,
+      "source": "Python 惯例"
+    },
+    {
+      "id": "E-012",
+      "dimension": "E",
+      "iso": "reliability.fault-tolerance",
+      "severity": "P2",
+      "statement": "错误文案必须含可执行修复指引（人工抽样）",
+      "check": "manual",
+      "version": 1,
+      "penalty": 2,
+      "source": "方案 6.6"
+    },
+    {
+      "id": "F-001",
+      "dimension": "F",
+      "iso": "performance.resource-utilization",
+      "severity": "P1",
+      "statement": "主线程零磁盘/网络（StrictMode 真机 + 人工评审）",
+      "check": "manual",
+      "version": 1,
+      "penalty": 4,
+      "source": "StrictMode + 人工"
+    },
+    {
+      "id": "F-002",
+      "dimension": "F",
+      "iso": "performance.resource-utilization",
+      "severity": "P2",
+      "statement": "协程必须结构化（禁止 GlobalScope）",
+      "check": "script",
+      "version": 1,
+      "script": "forbid_text",
+      "params": {
+        "globs": [
+          "app/android/app/src/main/java/**/*.kt",
+          "app/desktop/src/main/kotlin/**/*.kt"
+        ],
+        "patterns": [
+          "GlobalScope"
+        ],
+        "strip_comments": true
+      },
+      "penalty": 3,
+      "source": "Kotlin 惯例"
+    },
+    {
+      "id": "F-003",
+      "dimension": "F",
+      "iso": "performance.resource-utilization",
+      "severity": "P2",
+      "statement": "C# 禁止 sync-over-async（.Result/.Wait()/GetAwaiter().GetResult()）",
+      "check": "script",
+      "version": 1,
+      "script": "forbid_text",
+      "params": {
+        "globs": [
+          "engine/dotnet/**/*.cs"
+        ],
+        "patterns": [
+          "\\.Result\\b",
+          "\\.Wait\\(\\)",
+          "GetAwaiter\\(\\)\\.GetResult\\(\\)"
+        ],
+        "strip_comments": true
+      },
+      "penalty": 3,
+      "source": "并发惯例"
+    },
+    {
+      "id": "F-004",
+      "dimension": "F",
+      "iso": "performance.resource-utilization",
+      "severity": "P2",
+      "statement": "生产 Kotlin 禁止 runBlocking",
+      "check": "script",
+      "version": 1,
+      "script": "forbid_text",
+      "params": {
+        "globs": [
+          "app/android/app/src/main/java/**/*.kt",
+          "app/desktop/src/main/kotlin/**/*.kt"
+        ],
+        "patterns": [
+          "runBlocking"
+        ],
+        "strip_comments": true
+      },
+      "penalty": 2,
+      "source": "Kotlin 惯例"
+    },
+    {
+      "id": "F-005",
+      "dimension": "F",
+      "iso": "performance.resource-utilization",
+      "severity": "P2",
+      "statement": "Python 生产代码 subprocess 必须设置 timeout",
+      "check": "script",
+      "version": 1,
+      "script": "python_subprocess_timeout",
+      "params": {
+        "globs": [
+          "desktop/src/core/**/*.py",
+          "app/cli/**/*.py",
+          "app/scripts/**/*.py"
+        ]
+      },
+      "penalty": 3,
+      "source": "资源纪律"
+    },
+    {
+      "id": "F-006",
+      "dimension": "F",
+      "iso": "performance.resource-utilization",
+      "severity": "P2",
+      "statement": "Python 文本写文件必须使用上下文管理器",
+      "check": "script",
+      "version": 1,
+      "script": "python_open_context",
+      "params": {
+        "globs": [
+          "desktop/src/core/**/*.py",
+          "app/cli/**/*.py"
+        ]
+      },
+      "penalty": 2,
+      "source": "资源纪律"
+    },
+    {
+      "id": "F-007",
+      "dimension": "F",
+      "iso": "performance.resource-utilization",
+      "severity": "P2",
+      "statement": "Rust unsafe 每文件 ≤3 处",
+      "check": "script",
+      "version": 1,
+      "script": "rust_unsafe",
+      "params": {
+        "globs": [
+          "engine/rust/**/src/**/*.rs",
+          "app/core/src/**/*.rs"
+        ],
+        "exclude": [
+          "**/vendor/**",
+          "**/*_gen.rs",
+          "**/generated/**"
+        ],
+        "per_file_limit": 3
+      },
+      "penalty": 2,
+      "source": "Rust 安全惯例"
+    },
+    {
+      "id": "F-008",
+      "dimension": "F",
+      "iso": "performance.resource-utilization",
+      "severity": "P2",
+      "statement": "线程池/监听器必须有界且可关闭（人工抽样）",
+      "check": "manual",
+      "version": 1,
+      "penalty": 2,
+      "source": "并发纪律"
+    },
+    {
+      "id": "F-009",
+      "dimension": "F",
+      "iso": "performance.resource-utilization",
+      "severity": "P2",
+      "statement": "主线程磁盘/网络真机复核（工具未接入）",
+      "check": "tool",
+      "version": 1,
+      "tool": "android-strictmode",
+      "note": "离线不可用，需真机 StrictMode 报告",
+      "penalty": 2,
+      "source": "StrictMode 未接入，CI/真机跑"
+    },
+    {
+      "id": "F-010",
+      "dimension": "F",
+      "iso": "performance.resource-utilization",
+      "severity": "P2",
+      "statement": "Android lint 无阻塞级告警",
+      "check": "tool",
+      "version": 1,
+      "tool": "android-lint",
+      "note": "离线缺 android.tools:lint-gradle，CI 跑",
+      "penalty": 2,
+      "source": "发布纪律"
+    },
+    {
+      "id": "G-001",
+      "dimension": "G",
+      "iso": "reliability.recoverability",
+      "severity": "P1",
+      "statement": "关键状态可序列化、可恢复（人工评审 + 测试映射）",
+      "check": "manual",
+      "version": 1,
+      "penalty": 3,
+      "source": "方案 6.6"
+    },
+    {
+      "id": "G-002",
+      "dimension": "G",
+      "iso": "reliability.recoverability",
+      "severity": "P2",
+      "statement": "备份/迁移/偏好 schema 在册",
+      "check": "script",
+      "version": 1,
+      "script": "required_file_presence",
+      "params": {
+        "files": [
+          "app/schema/nf-backup.schema.json",
+          "app/schema/nf-migration.schema.json",
+          "app/schema/nf-prefs.schema.json"
+        ]
+      },
+      "penalty": 2,
+      "source": "状态契约"
+    },
+    {
+      "id": "G-003",
+      "dimension": "G",
+      "iso": "reliability.recoverability",
+      "severity": "P2",
+      "statement": "原子写与崩溃边界测试存在",
+      "check": "script",
+      "version": 1,
+      "script": "required_file_presence",
+      "params": {
+        "files": [
+          "desktop/tests/test_atomic_write.py",
+          "desktop/tests/test_atomic_write_boundaries.py",
+          "desktop/tests/test_core_atomic_writes.py"
+        ]
+      },
+      "penalty": 2,
+      "source": "恢复纪律"
+    },
+    {
+      "id": "G-004",
+      "dimension": "G",
+      "iso": "reliability.recoverability",
+      "severity": "P2",
+      "statement": "原子写工具被广泛复用（atomic_write 引用 ≥100）",
+      "check": "script",
+      "version": 1,
+      "script": "pattern_count_min",
+      "params": {
+        "globs": [
+          "desktop/src/core/**/*.py"
+        ],
+        "pattern": "atomic_write\\.",
+        "min_count": 100,
+        "label": "desktop/src/core"
+      },
+      "penalty": 2,
+      "source": "单一真源"
+    },
+    {
+      "id": "G-005",
+      "dimension": "G",
+      "iso": "reliability.recoverability",
+      "severity": "P2",
+      "statement": "core 不得绕过 atomic_write 直接写文本文件",
+      "check": "script",
+      "version": 1,
+      "script": "python_open_context",
+      "params": {
+        "globs": [
+          "desktop/src/core/**/*.py"
+        ],
+        "exclude": [
+          "desktop/src/core/atomic_write.py"
+        ]
+      },
+      "penalty": 3,
+      "source": "恢复纪律"
+    },
+    {
+      "id": "G-006",
+      "dimension": "G",
+      "iso": "reliability.recoverability",
+      "severity": "P2",
+      "statement": "SBOM 证据包含 digest/materials/count 摘要锚",
+      "check": "script",
+      "version": 1,
+      "script": "require_json_keys",
+      "params": {
+        "file": "results/ccos/sbom.json",
+        "keys": [
+          "digest",
+          "materials",
+          "count"
+        ]
+      },
+      "penalty": 2,
+      "source": "证据链"
+    },
+    {
+      "id": "G-007",
+      "dimension": "G",
+      "iso": "reliability.recoverability",
+      "severity": "P3",
+      "statement": "迁移指引有契约测试",
+      "check": "script",
+      "version": 1,
+      "script": "required_file_presence",
+      "params": {
+        "files": [
+          "desktop/tests/test_migration_guide_doc_contract.py"
+        ]
+      },
+      "penalty": 1,
+      "source": "恢复纪律"
+    },
+    {
+      "id": "G-008",
+      "dimension": "G",
+      "iso": "reliability.recoverability",
+      "severity": "P3",
+      "statement": "JSON Schema 文件均带 $schema 声明",
+      "check": "script",
+      "version": 1,
+      "script": "schema_dollar_schema",
+      "params": {
+        "globs": [
+          "app/schema/*.schema.json"
+        ],
+        "any_keys": [
+          "$schema"
+        ]
+      },
+      "penalty": 1,
+      "source": "schema 契约"
+    },
+    {
+      "id": "G-009",
+      "dimension": "G",
+      "iso": "reliability.recoverability",
+      "severity": "P2",
+      "statement": "删除/回滚必须可复原（人工抽样）",
+      "check": "manual",
+      "version": 1,
+      "penalty": 2,
+      "source": "恢复纪律"
+    },
+    {
+      "id": "G-010",
+      "dimension": "G",
+      "iso": "reliability.recoverability",
+      "severity": "P2",
+      "statement": "中断/断电恢复演练有记录（人工，外部实测封存）",
+      "check": "manual",
+      "version": 1,
+      "penalty": 2,
+      "source": "恢复纪律"
+    },
+    {
+      "id": "H-001",
+      "dimension": "H",
+      "iso": "security.confidentiality",
+      "severity": "P0",
+      "statement": "Manifest 不得声明 INTERNET/网络状态权限（移除式声明不算）",
+      "check": "script",
+      "version": 1,
+      "script": "no_internet_permission",
+      "params": {
+        "globs": [
+          "app/android/app/src/main/AndroidManifest.xml"
+        ]
+      },
+      "penalty": 5,
+      "source": "CONTRACT §6"
+    },
+    {
+      "id": "H-002",
+      "dimension": "H",
+      "iso": "security.confidentiality",
+      "severity": "P0",
+      "statement": "仓库不得出现私钥/口令明文",
+      "check": "script",
+      "version": 1,
+      "script": "secret_scan",
+      "params": {
+        "globs": [
+          "app/**/*.py",
+          "app/**/*.kt",
+          "app/**/*.rs",
+          "app/android/**/*.properties",
+          "desktop/src/**/*.py",
+          "engine/**/*.rs",
+          "engine/**/*.cs",
+          "**/*.env"
+        ],
+        "exclude": [
+          "**/test/**",
+          "**/tests/**",
+          "**/vendor/**",
+          "**/fixtures/**"
+        ],
+        "patterns": [
+          "-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----\\s*$",
+          "storePassword\\s*=\\s*[\"'][^\"']+[\"']",
+          "(?i)(?:api[_-]?key|secret|password)\\s*[:=]\\s*[\"'][A-Za-z0-9+/=_-]{16,}[\"']"
+        ]
+      },
+      "penalty": 5,
+      "source": "AGENTS 安全纪律"
+    },
+    {
+      "id": "H-003",
+      "dimension": "H",
+      "iso": "security.confidentiality",
+      "severity": "P2",
+      "statement": "无遥测/统计 SDK",
+      "check": "script",
+      "version": 1,
+      "script": "forbid_text",
+      "params": {
+        "globs": [
+          "app/android/app/build.gradle.kts"
+        ],
+        "patterns": [
+          "firebase-analytics",
+          "sentry",
+          "umeng",
+          "bugly"
+        ]
+      },
+      "penalty": 4,
+      "source": "CONTRACT §6"
+    },
+    {
+      "id": "H-004",
+      "dimension": "H",
+      "iso": "security.confidentiality",
+      "severity": "P1",
+      "statement": "禁止不安全反序列化（yaml.load/pickle/marshal）",
+      "check": "script",
+      "version": 1,
+      "script": "python_security_sink",
+      "params": {
+        "globs": [
+          "desktop/src/core/**/*.py",
+          "app/cli/**/*.py",
+          "scripts/**/*.py",
+          "app/scripts/**/*.py"
+        ],
+        "sinks": [
+          "yaml_load",
+          "pickle",
+          "marshal"
+        ]
+      },
+      "penalty": 4,
+      "source": "安全惯例"
+    },
+    {
+      "id": "H-005",
+      "dimension": "H",
+      "iso": "security.confidentiality",
+      "severity": "P1",
+      "statement": "禁止 shell=True / os.system 执行外部命令",
+      "check": "script",
+      "version": 1,
+      "script": "python_security_sink",
+      "params": {
+        "globs": [
+          "desktop/src/core/**/*.py",
+          "app/cli/**/*.py",
+          "scripts/**/*.py",
+          "app/scripts/**/*.py"
+        ],
+        "sinks": [
+          "shell"
+        ]
+      },
+      "penalty": 3,
+      "source": "安全惯例"
+    },
+    {
+      "id": "H-006",
+      "dimension": "H",
+      "iso": "security.confidentiality",
+      "severity": "P3",
+      "statement": "Android 不得引入网络客户端库（本地优先）",
+      "check": "script",
+      "version": 1,
+      "script": "forbid_text",
+      "params": {
+        "globs": [
+          "app/android/app/build.gradle.kts"
+        ],
+        "patterns": [
+          "okhttp",
+          "retrofit",
+          "ktor-client",
+          "volley",
+          "cronet"
+        ],
+        "strip_comments": true
+      },
+      "penalty": 2,
+      "source": "CONTRACT §6"
+    },
+    {
+      "id": "H-007",
+      "dimension": "H",
+      "iso": "security.confidentiality",
+      "severity": "P2",
+      "statement": "日志不得输出 token/password/secret（人工抽样）",
+      "check": "manual",
+      "version": 1,
+      "penalty": 2,
+      "source": "安全纪律"
+    },
+    {
+      "id": "H-008",
+      "dimension": "H",
+      "iso": "security.confidentiality",
+      "severity": "P2",
+      "statement": "exported Activity 必须在允许清单",
+      "check": "script",
+      "version": 1,
+      "script": "manifest_exported_allowlist",
+      "params": {
+        "file": "app/android/app/src/main/AndroidManifest.xml",
+        "allowlist": [
+          ".MainActivity",
+          ".share.ShareReceiverActivity"
+        ]
+      },
+      "penalty": 2,
+      "source": "Android 安全"
+    },
+    {
+      "id": "H-009",
+      "dimension": "H",
+      "iso": "security.confidentiality",
+      "severity": "P1",
+      "statement": "Manifest 必须 allowBackup=false 且 supportsRtl=true",
+      "check": "script",
+      "version": 1,
+      "script": "manifest_attrs",
+      "params": {
+        "file": "app/android/app/src/main/AndroidManifest.xml",
+        "required": [
+          {
+            "name": "android:allowBackup",
+            "value": "false",
+            "why": "本地数据不得入云备份"
+          },
+          {
+            "name": "android:supportsRtl",
+            "value": "true",
+            "why": "RTL 支持声明"
+          }
+        ]
+      },
+      "penalty": 3,
+      "source": "Android 安全/无障碍"
+    },
+    {
+      "id": "H-010",
+      "dimension": "H",
+      "iso": "security.confidentiality",
+      "severity": "P2",
+      "statement": "FileProvider 只暴露受限路径（cache/files，禁止 root-path）",
+      "check": "script",
+      "version": 1,
+      "script": "file_provider_paths",
+      "params": {
+        "file": "app/android/app/src/main/res/xml/file_paths.xml",
+        "required_tags": [
+          "cache-path",
+          "files-path"
+        ],
+        "forbid_root_path": true
+      },
+      "penalty": 2,
+      "source": "Android 安全"
+    },
+    {
+      "id": "H-011",
+      "dimension": "H",
+      "iso": "security.confidentiality",
+      "severity": "P1",
+      "statement": "Gradle 签名口令不得硬编码",
+      "check": "script",
+      "version": 1,
+      "script": "forbid_text",
+      "params": {
+        "globs": [
+          "app/android/app/build.gradle.kts"
+        ],
+        "patterns": [
+          "storePassword\\s*=\\s*\"[^\"]+\""
+        ],
+        "strip_comments": true
+      },
+      "penalty": 3,
+      "source": "发布纪律"
+    },
+    {
+      "id": "H-012",
+      "dimension": "H",
+      "iso": "security.confidentiality",
+      "severity": "P2",
+      "statement": "禁止 WebView+JS 桥接面",
+      "check": "script",
+      "version": 1,
+      "script": "forbid_text",
+      "params": {
+        "globs": [
+          "app/android/app/src/main/java/**/*.kt"
+        ],
+        "patterns": [
+          "addJavascriptInterface",
+          "WebView\\("
+        ],
+        "strip_comments": true
+      },
+      "penalty": 3,
+      "source": "安全纪律"
+    },
+    {
+      "id": "H-013",
+      "dimension": "H",
+      "iso": "security.confidentiality",
+      "severity": "P2",
+      "statement": "Python 依赖漏洞扫描（pip-audit）",
+      "check": "tool",
+      "version": 1,
+      "tool": "pip-audit",
+      "note": "离线不可用，CI 跑",
+      "penalty": 2,
+      "source": "SLSA"
+    },
+    {
+      "id": "H-014",
+      "dimension": "H",
+      "iso": "security.confidentiality",
+      "severity": "P1",
+      "statement": "静态应用安全测试（CodeQL）",
+      "check": "tool",
+      "version": 1,
+      "tool": "codeql",
+      "note": "离线不可用，CI 跑 .github/workflows/codeql.yml",
+      "penalty": 4,
+      "source": "GitHub 安全"
+    },
+    {
+      "id": "H-015",
+      "dimension": "H",
+      "iso": "security.confidentiality",
+      "severity": "P1",
+      "statement": "密钥历史扫描（gitleaks）",
+      "check": "tool",
+      "version": 1,
+      "tool": "gitleaks",
+      "note": "离线不可用，CI 跑",
+      "penalty": 4,
+      "source": "供应链安全"
+    },
+    {
+      "id": "H-016",
+      "dimension": "H",
+      "iso": "security.confidentiality",
+      "severity": "P3",
+      "statement": "动态执行代码（eval/exec）需白名单并审计",
+      "check": "script",
+      "version": 1,
+      "script": "python_security_sink",
+      "params": {
+        "globs": [
+          "desktop/src/core/**/*.py",
+          "app/cli/**/*.py",
+          "scripts/**/*.py",
+          "app/scripts/**/*.py"
+        ],
+        "sinks": [
+          "eval",
+          "exec"
+        ]
+      },
+      "penalty": 2,
+      "source": "安全惯例"
+    },
+    {
+      "id": "I-001",
+      "dimension": "I",
+      "iso": "performance.time-behaviour",
+      "severity": "P1",
+      "statement": "启动/卡顿/内存达标（macrobenchmark）",
+      "check": "tool",
+      "version": 1,
+      "tool": "macrobenchmark",
+      "note": "真机 macrobenchmark 尚被测试 APK 混淆冲突阻断，未接入",
+      "penalty": 4,
+      "source": "Part 1 口径"
+    },
+    {
+      "id": "I-002",
+      "dimension": "I",
+      "iso": "performance.time-behaviour",
+      "severity": "P2",
+      "statement": "性能基准脚本成体系存在（≥5 个）",
+      "check": "script",
+      "version": 1,
+      "script": "min_file_count",
+      "params": {
+        "globs": [
+          "scripts/bench_*.py",
+          "app/scripts/bench_*.py"
+        ],
+        "min_count": 5
+      },
+      "penalty": 2,
+      "source": "Part 1 口径"
+    },
+    {
+      "id": "I-003",
+      "dimension": "I",
+      "iso": "performance.time-behaviour",
+      "severity": "P2",
+      "statement": "性能基准结果证据存在",
+      "check": "script",
+      "version": 1,
+      "script": "required_any_file",
+      "params": {
+        "files": [
+          "results/app/governance/benchmarks/H11.json",
+          "results/ccos/watermark_bench.json"
+        ]
+      },
+      "penalty": 2,
+      "source": "Part 1 口径"
+    },
+    {
+      "id": "I-004",
+      "dimension": "I",
+      "iso": "performance.time-behaviour",
+      "severity": "P3",
+      "statement": "禁止无界缓存 lru_cache(maxsize=None)",
+      "check": "script",
+      "version": 1,
+      "script": "python_unbounded_cache",
+      "params": {
+        "globs": [
+          "desktop/src/core/**/*.py",
+          "app/cli/**/*.py",
+          "scripts/**/*.py"
+        ]
+      },
+      "penalty": 1,
+      "source": "资源纪律"
+    },
+    {
+      "id": "I-005",
+      "dimension": "I",
+      "iso": "performance.time-behaviour",
+      "severity": "P3",
+      "statement": "APK 单资产/原生库 ≤3MB",
+      "check": "script",
+      "version": 1,
+      "script": "large_file",
+      "params": {
+        "globs": [
+          "app/android/app/src/main/assets/**/*",
+          "app/android/app/src/main/jniLibs/**/*"
+        ],
+        "limit_bytes": 3145728
+      },
+      "penalty": 1,
+      "source": "包体纪律"
+    },
+    {
+      "id": "I-006",
+      "dimension": "I",
+      "iso": "performance.time-behaviour",
+      "severity": "P3",
+      "statement": "协议生成 JSON 单文件 ≤2MB",
+      "check": "script",
+      "version": 1,
+      "script": "large_file",
+      "params": {
+        "globs": [
+          "protocol/generated/**/*.json"
+        ],
+        "limit_bytes": 2097152
+      },
+      "penalty": 1,
+      "source": "包体纪律"
+    },
+    {
+      "id": "I-007",
+      "dimension": "I",
+      "iso": "performance.time-behaviour",
+      "severity": "P2",
+      "statement": "Rayon/并行度受控（人工抽样）",
+      "check": "manual",
+      "version": 1,
+      "penalty": 2,
+      "source": "性能纪律"
+    },
+    {
+      "id": "I-008",
+      "dimension": "I",
+      "iso": "performance.time-behaviour",
+      "severity": "P2",
+      "statement": "启动/帧率/内存真机数据（未接入）",
+      "check": "tool",
+      "version": 1,
+      "tool": "macrobenchmark",
+      "note": "同 I-001，未接入",
+      "penalty": 2,
+      "source": "Part 1 口径"
+    },
+    {
+      "id": "I-009",
+      "dimension": "I",
+      "iso": "performance.time-behaviour",
+      "severity": "P2",
+      "statement": "列表分页/内存上限有界（人工抽样）",
+      "check": "manual",
+      "version": 1,
+      "penalty": 2,
+      "source": "性能纪律"
+    },
+    {
+      "id": "I-010",
+      "dimension": "I",
+      "iso": "performance.time-behaviour",
+      "severity": "P3",
+      "statement": "性能基准说明文档存在",
+      "check": "script",
+      "version": 1,
+      "script": "required_file_presence",
+      "params": {
+        "files": [
+          "results/app/governance/benchmarks/README.md"
+        ]
+      },
+      "penalty": 1,
+      "source": "证据链"
+    },
+    {
+      "id": "I-011",
+      "dimension": "I",
+      "iso": "performance.time-behaviour",
+      "severity": "P2",
+      "statement": "资源上限在 limits.json 登记",
+      "check": "script",
+      "version": 1,
+      "script": "require_json_keys",
+      "params": {
+        "file": "app/schema/limits.json",
+        "keys": [
+          "json",
+          "yaml",
+          "xml",
+          "zip",
+          "pack",
+          "import",
+          "text",
+          "markdown"
+        ]
+      },
+      "penalty": 2,
+      "source": "契约"
+    },
+    {
+      "id": "I-012",
+      "dimension": "I",
+      "iso": "performance.time-behaviour",
+      "severity": "P3",
+      "statement": "sleep/轮询等待必须可中断且有上限（人工抽样）",
+      "check": "manual",
+      "version": 1,
+      "penalty": 1,
+      "source": "性能纪律"
+    },
+    {
+      "id": "J-001",
+      "dimension": "J",
+      "iso": "maintainability.testability",
+      "severity": "P1",
+      "statement": "core 覆盖率 ≥90%（jacoco）",
+      "check": "tool",
+      "version": 1,
+      "tool": "jacoco",
+      "note": "离线不可用，CI 跑",
+      "penalty": 4,
+      "source": "方案 5.2"
+    },
+    {
+      "id": "J-002",
+      "dimension": "J",
+      "iso": "maintainability.testability",
+      "severity": "P2",
+      "statement": "Android 测试文件数/源文件数 ≥0.5",
+      "check": "script",
+      "version": 1,
+      "script": "test_file_ratio",
+      "params": {
+        "source_globs": [
+          "app/android/app/src/main/java/**/*.kt"
+        ],
+        "test_globs": [
+          "app/android/app/src/test/java/**/*.kt"
+        ],
+        "min_ratio": 0.5,
+        "label": "android"
+      },
+      "penalty": 2,
+      "source": "项目惯例"
+    },
+    {
+      "id": "J-003",
+      "dimension": "J",
+      "iso": "maintainability.testability",
+      "severity": "P2",
+      "statement": "desktop 测试文件数/源文件数 ≥0.5",
+      "check": "script",
+      "version": 1,
+      "script": "test_file_ratio",
+      "params": {
+        "source_globs": [
+          "desktop/src/core/**/*.py"
+        ],
+        "test_globs": [
+          "desktop/tests/**/*.py"
+        ],
+        "min_ratio": 0.5,
+        "label": "desktop"
+      },
+      "penalty": 2,
+      "source": "项目惯例"
+    },
+    {
+      "id": "J-004",
+      "dimension": "J",
+      "iso": "maintainability.testability",
+      "severity": "P2",
+      "statement": "engine/rust 含测试标记文件占比 ≥0.3",
+      "check": "script",
+      "version": 1,
+      "script": "rust_test_presence",
+      "params": {
+        "source_globs": [
+          "engine/rust/**/src/**/*.rs"
+        ],
+        "marker_pattern": "#\\[(?:test|cfg\\(test\\))\\]",
+        "min_ratio": 0.3,
+        "label": "engine/rust"
+      },
+      "penalty": 2,
+      "source": "Rust 测试惯例"
+    },
+    {
+      "id": "J-005",
+      "dimension": "J",
+      "iso": "maintainability.testability",
+      "severity": "P3",
+      "statement": "app/core 有独立集成测试",
+      "check": "script",
+      "version": 1,
+      "script": "required_file_presence",
+      "params": {
+        "files": [
+          "app/core/tests/ffi.rs"
+        ]
+      },
+      "penalty": 1,
+      "source": "Rust 测试惯例"
+    },
+    {
+      "id": "J-006",
+      "dimension": "J",
+      "iso": "maintainability.testability",
+      "severity": "P2",
+      "statement": ".NET 引擎有独立测试项目",
+      "check": "script",
+      "version": 1,
+      "script": "dotnet_test_presence",
+      "params": {
+        "source_globs": [
+          "engine/dotnet/**/*.cs"
+        ],
+        "test_globs": [
+          "engine/dotnet/tests/**/*.cs",
+          "engine/dotnet/**/*.Tests.csproj"
+        ],
+        "label": "engine/dotnet"
+      },
+      "penalty": 2,
+      "source": "测试充分性"
+    },
+    {
+      "id": "J-007",
+      "dimension": "J",
+      "iso": "maintainability.testability",
+      "severity": "P3",
+      "statement": "每个 Go 包有测试文件",
+      "check": "script",
+      "version": 1,
+      "script": "go_test_presence",
+      "params": {
+        "globs": [
+          "clients/go/**/*.go"
+        ]
+      },
+      "penalty": 1,
+      "source": "Go 测试惯例"
+    },
+    {
+      "id": "J-008",
+      "dimension": "J",
+      "iso": "maintainability.testability",
+      "severity": "P2",
+      "statement": "跳过测试标记 ≤20 处",
+      "check": "script",
+      "version": 1,
+      "script": "skip_markers",
+      "params": {
+        "globs": [
+          "desktop/tests/**/*.py"
+        ],
+        "patterns": [
+          "@unittest\\.skip",
+          "pytest\\.mark\\.skip",
+          "self\\.skipTest\\("
+        ],
+        "limit": 20
+      },
+      "penalty": 2,
+      "source": "测试充分性"
+    },
+    {
+      "id": "J-009",
+      "dimension": "J",
+      "iso": "maintainability.testability",
+      "severity": "P3",
+      "statement": "测试文件必须含断言",
+      "check": "script",
+      "version": 1,
+      "script": "test_assertions",
+      "params": {
+        "globs": [
+          "desktop/tests/test_*.py"
+        ]
+      },
+      "penalty": 1,
+      "source": "测试充分性"
+    },
+    {
+      "id": "J-010",
+      "dimension": "J",
+      "iso": "maintainability.testability",
+      "severity": "P3",
+      "statement": "测试文件命名 test_*.py",
+      "check": "script",
+      "version": 1,
+      "script": "test_naming",
+      "params": {
+        "globs": [
+          "desktop/tests/*.py"
+        ],
+        "pattern": "test_.*\\.py",
+        "exclude_names": [
+          "__init__.py",
+          "cli_harness.py"
+        ]
+      },
+      "penalty": 1,
+      "source": "测试组织"
+    },
+    {
+      "id": "J-011",
+      "dimension": "J",
+      "iso": "maintainability.testability",
+      "severity": "P3",
+      "statement": "UI 快照测试存在",
+      "check": "script",
+      "version": 1,
+      "script": "min_file_count",
+      "params": {
+        "globs": [
+          "app/android/app/src/test/snapshots/images/*.png"
+        ],
+        "min_count": 1
+      },
+      "penalty": 1,
+      "source": "回归纪律"
+    },
+    {
+      "id": "J-012",
+      "dimension": "J",
+      "iso": "maintainability.testability",
+      "severity": "P2",
+      "statement": "CI 主门禁运行 verify.sh",
+      "check": "script",
+      "version": 1,
+      "script": "require_text",
+      "params": {
+        "file": ".github/workflows/ci-verify.yml",
+        "patterns": [
+          "verify\\.sh"
+        ]
+      },
+      "penalty": 2,
+      "source": "CI 纪律"
+    },
+    {
+      "id": "J-013",
+      "dimension": "J",
+      "iso": "maintainability.testability",
+      "severity": "P3",
+      "statement": "变异测试（PIT）",
+      "check": "tool",
+      "version": 1,
+      "tool": "pit",
+      "note": "离线不可用，CI 跑",
+      "penalty": 2,
+      "source": "测试充分性"
+    },
+    {
+      "id": "J-014",
+      "dimension": "J",
+      "iso": "maintainability.testability",
+      "severity": "P3",
+      "statement": "覆盖率 workflow 存在",
+      "check": "script",
+      "version": 1,
+      "script": "require_text",
+      "params": {
+        "file": ".github/workflows/coverage.yml",
+        "patterns": [
+          "coverage"
+        ]
+      },
+      "penalty": 1,
+      "source": "CI 纪律"
+    },
+    {
+      "id": "J-015",
+      "dimension": "J",
+      "iso": "maintainability.testability",
+      "severity": "P2",
+      "statement": "测试不得依赖真实外网（CI 隔离，人工核查）",
+      "check": "manual",
+      "version": 1,
+      "penalty": 2,
+      "source": "测试纪律"
+    },
+    {
+      "id": "K-001",
+      "dimension": "K",
+      "iso": "security.authenticity",
+      "severity": "P2",
+      "statement": "依赖锁文件存在且非空",
+      "check": "script",
+      "version": 1,
+      "script": "lockfile_presence",
+      "params": {
+        "files": [
+          "app/core/Cargo.lock",
+          "engine/rust/Cargo.lock",
+          "requirements.txt",
+          ".github/requirements-ci.txt"
+        ]
+      },
+      "penalty": 2,
+      "source": "SLSA"
+    },
+    {
+      "id": "K-002",
+      "dimension": "K",
+      "iso": "security.authenticity",
+      "severity": "P2",
+      "statement": "Go 模块有外部依赖时必须有 go.sum",
+      "check": "script",
+      "version": 1,
+      "script": "conditional_required_file",
+      "params": {
+        "file": "clients/go/go.mod",
+        "condition_pattern": "require\\s*\\(",
+        "require_files": [
+          "clients/go/go.sum"
+        ]
+      },
+      "penalty": 2,
+      "source": "Go 供应链惯例"
+    },
+    {
+      "id": "K-003",
+      "dimension": "K",
+      "iso": "security.authenticity",
+      "severity": "P2",
+      "statement": "SBOM 产物或生成器存在",
+      "check": "script",
+      "version": 1,
+      "script": "required_any_file",
+      "params": {
+        "files": [
+          "results/ccos/sbom.json",
+          "scripts/sbom.py"
+        ]
+      },
+      "penalty": 2,
+      "source": "SLSA/SPDX"
+    },
+    {
+      "id": "K-004",
+      "dimension": "K",
+      "iso": "security.authenticity",
+      "severity": "P2",
+      "statement": "第三方声明覆盖 requirements 依赖",
+      "check": "script",
+      "version": 1,
+      "script": "third_party_notice_coverage",
+      "params": {
+        "file": "THIRD-PARTY-NOTICES.md",
+        "requirement_globs": [
+          ".github/requirements-*.txt"
+        ]
+      },
+      "penalty": 2,
+      "source": "合规"
+    },
+    {
+      "id": "K-005",
+      "dimension": "K",
+      "iso": "security.authenticity",
+      "severity": "P2",
+      "statement": "GitHub Actions 全部钉 commit SHA",
+      "check": "script",
+      "version": 1,
+      "script": "workflow_action_pinning",
+      "params": {
+        "globs": [
+          ".github/workflows/*.yml"
+        ]
+      },
+      "penalty": 2,
+      "source": "SLSA"
+    },
+    {
+      "id": "K-006",
+      "dimension": "K",
+      "iso": "security.authenticity",
+      "severity": "P2",
+      "statement": "requirements 全部精确 pin 且带 hash",
+      "check": "script",
+      "version": 1,
+      "script": "dependency_pins",
+      "params": {
+        "globs": [
+          ".github/requirements-*.txt"
+        ]
+      },
+      "penalty": 2,
+      "source": "SLSA"
+    },
+    {
+      "id": "K-007",
+      "dimension": "K",
+      "iso": "security.authenticity",
+      "severity": "P2",
+      "statement": "Dockerfile 基础镜像钉 digest",
+      "check": "script",
+      "version": 1,
+      "script": "require_text",
+      "params": {
+        "file": "Dockerfile",
+        "patterns": [
+          "FROM\\s+\\S+@sha256:[0-9a-f]{64}"
+        ]
+      },
+      "penalty": 2,
+      "source": "SLSA L3"
+    },
+    {
+      "id": "K-008",
+      "dimension": "K",
+      "iso": "security.authenticity",
+      "severity": "P2",
+      "statement": "Gradle wrapper 校验和固定",
+      "check": "script",
+      "version": 1,
+      "script": "require_text",
+      "params": {
+        "file": "app/android/gradle/wrapper/gradle-wrapper.properties",
+        "patterns": [
+          "distributionSha256Sum=[0-9a-f]{64}"
+        ]
+      },
+      "penalty": 2,
+      "source": "供应链"
+    },
+    {
+      "id": "K-009",
+      "dimension": "K",
+      "iso": "security.authenticity",
+      "severity": "P2",
+      "statement": "依赖漏洞/SAST workflow 存在",
+      "check": "script",
+      "version": 1,
+      "script": "required_file_presence",
+      "params": {
+        "files": [
+          ".github/workflows/dependency-audit.yml",
+          ".github/workflows/sast.yml"
+        ]
+      },
+      "penalty": 2,
+      "source": "CI 纪律"
+    },
+    {
+      "id": "K-010",
+      "dimension": "K",
+      "iso": "security.authenticity",
+      "severity": "P3",
+      "statement": "Dependabot 配置存在",
+      "check": "script",
+      "version": 1,
+      "script": "required_file_presence",
+      "params": {
+        "files": [
+          ".github/dependabot.yml"
+        ]
+      },
+      "penalty": 1,
+      "source": "供应链"
+    },
+    {
+      "id": "K-011",
+      "dimension": "K",
+      "iso": "security.authenticity",
+      "severity": "P3",
+      "statement": "vendor 依赖保留上游来源记录",
+      "check": "script",
+      "version": 1,
+      "script": "required_any_file",
+      "params": {
+        "files": [
+          "app/core/vendor/ed25519-compact/Cargo.toml.orig"
+        ]
+      },
+      "penalty": 1,
+      "source": "供应链"
+    },
+    {
+      "id": "K-012",
+      "dimension": "K",
+      "iso": "security.authenticity",
+      "severity": "P2",
+      "statement": "Gradle 依赖不得使用浮动版本",
+      "check": "script",
+      "version": 1,
+      "script": "dynamic_versions",
+      "params": {
+        "globs": [
+          "app/android/**/*.gradle.kts",
+          "app/desktop/**/*.gradle.kts"
+        ],
+        "patterns": [
+          "latest\\.release",
+          "\\bSNAPSHOT\\b",
+          "[0-9]\\+"
+        ]
+      },
+      "penalty": 2,
+      "source": "构建可复现"
+    },
+    {
+      "id": "K-013",
+      "dimension": "K",
+      "iso": "security.authenticity",
+      "severity": "P3",
+      "statement": "npm 包无运行时第三方依赖",
+      "check": "script",
+      "version": 1,
+      "script": "forbid_text",
+      "params": {
+        "globs": [
+          "packaging/npm/package.json"
+        ],
+        "patterns": [
+          "\"dependencies\"\\s*:\\s*\\{"
+        ]
+      },
+      "penalty": 1,
+      "source": "供应链"
+    },
+    {
+      "id": "K-014",
+      "dimension": "K",
+      "iso": "security.authenticity",
+      "severity": "P2",
+      "statement": "SBOM 生成（cyclonedx）",
+      "check": "tool",
+      "version": 1,
+      "tool": "cyclonedx",
+      "note": "离线不可用，CI 跑",
+      "penalty": 2,
+      "source": "SLSA"
+    },
+    {
+      "id": "K-015",
+      "dimension": "K",
+      "iso": "security.authenticity",
+      "severity": "P2",
+      "statement": "Rust 依赖漏洞扫描（cargo-audit）",
+      "check": "tool",
+      "version": 1,
+      "tool": "cargo-audit",
+      "note": "离线不可用，CI 跑",
+      "penalty": 2,
+      "source": "供应链"
+    },
+    {
+      "id": "L-001",
+      "dimension": "L",
+      "iso": "maintainability.analysability",
+      "severity": "P2",
+      "statement": "同源二次构建字节一致",
+      "check": "tool",
+      "version": 1,
+      "tool": "reproducible-build",
+      "note": "需两次构建+比对，CI 跑",
+      "penalty": 3,
+      "source": "SLSA L3"
+    },
+    {
+      "id": "L-002",
+      "dimension": "L",
+      "iso": "maintainability.analysability",
+      "severity": "P2",
+      "statement": "release 构建开启 R8 + 资源压缩",
+      "check": "script",
+      "version": 1,
+      "script": "gradle_flag",
+      "params": {
+        "file": "app/android/app/build.gradle.kts",
+        "patterns": [
+          "isMinifyEnabled\\s*=\\s*true",
+          "isShrinkResources\\s*=\\s*true"
+        ]
+      },
+      "penalty": 2,
+      "source": "发布纪律"
+    },
+    {
+      "id": "L-003",
+      "dimension": "L",
+      "iso": "maintainability.analysability",
+      "severity": "P2",
+      "statement": "release 不得 debuggable",
+      "check": "script",
+      "version": 1,
+      "script": "forbid_text",
+      "params": {
+        "globs": [
+          "app/android/app/src/main/AndroidManifest.xml"
+        ],
+        "patterns": [
+          "android:debuggable=\"true\""
+        ]
+      },
+      "penalty": 3,
+      "source": "发布纪律"
+    },
+    {
+      "id": "L-004",
+      "dimension": "L",
+      "iso": "maintainability.analysability",
+      "severity": "P3",
+      "statement": "Rust release profile 固定 lto/codegen-units",
+      "check": "script",
+      "version": 1,
+      "script": "require_text",
+      "params": {
+        "file": "engine/rust/Cargo.toml",
+        "patterns": [
+          "lto\\s*=\\s*true",
+          "codegen-units\\s*=\\s*1"
+        ]
+      },
+      "penalty": 2,
+      "source": "可复现构建"
+    },
+    {
+      "id": "L-005",
+      "dimension": "L",
+      "iso": "maintainability.analysability",
+      "severity": "P3",
+      "statement": "app/core release profile 显式固定",
+      "check": "script",
+      "version": 1,
+      "script": "require_text",
+      "params": {
+        "file": "app/core/Cargo.toml",
+        "patterns": [
+          "\\[profile\\.release\\]"
+        ]
+      },
+      "penalty": 1,
+      "source": "可复现构建"
+    },
+    {
+      "id": "L-006",
+      "dimension": "L",
+      "iso": "maintainability.analysability",
+      "severity": "P2",
+      "statement": "C# 确定性构建（Deterministic + PathMap）",
+      "check": "script",
+      "version": 1,
+      "script": "require_text",
+      "params": {
+        "file": "engine/dotnet/Directory.Build.props",
+        "patterns": [
+          "<Deterministic>true</Deterministic>",
+          "<PathMap>"
+        ]
+      },
+      "penalty": 2,
+      "source": "可复现构建"
+    },
+    {
+      "id": "L-007",
+      "dimension": "L",
+      "iso": "maintainability.analysability",
+      "severity": "P3",
+      "statement": "Python 版本下限固定",
+      "check": "script",
+      "version": 1,
+      "script": "require_text",
+      "params": {
+        "file": "pyproject.toml",
+        "patterns": [
+          "requires-python\\s*=\\s*\">=3\\.11\""
+        ]
+      },
+      "penalty": 1,
+      "source": "可复现构建"
+    },
+    {
+      "id": "L-008",
+      "dimension": "L",
+      "iso": "maintainability.analysability",
+      "severity": "P3",
+      "statement": "Gradle wrapper 版本钉住",
+      "check": "script",
+      "version": 1,
+      "script": "require_text",
+      "params": {
+        "file": "app/android/gradle/wrapper/gradle-wrapper.properties",
+        "patterns": [
+          "distributionUrl=.*gradle-\\d+\\.\\d+(?:\\.\\d+)?-bin\\.zip"
+        ]
+      },
+      "penalty": 1,
+      "source": "可复现构建"
+    },
+    {
+      "id": "L-009",
+      "dimension": "L",
+      "iso": "maintainability.analysability",
+      "severity": "P3",
+      "statement": "构建/工具脚本不得硬编码本机绝对路径",
+      "check": "script",
+      "version": 1,
+      "script": "absolute_path_literal",
+      "params": {
+        "globs": [
+          "app/scripts/**/*.py"
+        ],
+        "patterns": [
+          "[A-Za-z]:[\\\\/]{1,2}(?:Users|tmp|d)[\\\\/]"
+        ]
+      },
+      "penalty": 1,
+      "source": "可移植性"
+    },
+    {
+      "id": "L-010",
+      "dimension": "L",
+      "iso": "maintainability.analysability",
+      "severity": "P2",
+      "statement": ".gitignore 覆盖构建产物",
+      "check": "script",
+      "version": 1,
+      "script": "require_text",
+      "params": {
+        "file": ".gitignore",
+        "patterns": [
+          "build/",
+          "\\.gradle/"
+        ]
+      },
+      "penalty": 2,
+      "source": "仓库卫生"
+    },
+    {
+      "id": "L-011",
+      "dimension": "L",
+      "iso": "maintainability.analysability",
+      "severity": "P2",
+      "statement": "Dockerfile 禁止 latest 基础镜像",
+      "check": "script",
+      "version": 1,
+      "script": "forbid_text",
+      "params": {
+        "globs": [
+          "Dockerfile"
+        ],
+        "patterns": [
+          "FROM\\s+\\S+:latest"
+        ]
+      },
+      "penalty": 2,
+      "source": "发布纪律"
+    },
+    {
+      "id": "M-001",
+      "dimension": "M",
+      "iso": "maintainability.analysability",
+      "severity": "P2",
+      "statement": "文档 claims 对应代码/测试（人工抽样+双人复核）",
+      "check": "manual",
+      "version": 1,
+      "penalty": 2,
+      "source": "方案 6.6"
+    },
+    {
+      "id": "M-002",
+      "dimension": "M",
+      "iso": "maintainability.analysability",
+      "severity": "P3",
+      "statement": "CHANGELOG 覆盖审计基线版本 0.3.6",
+      "check": "script",
+      "version": 1,
+      "script": "changelog_version",
+      "params": {
+        "file": "CHANGELOG.md",
+        "versions": [
+          "0.3.6"
+        ]
+      },
+      "penalty": 1,
+      "source": "项目惯例"
+    },
+    {
+      "id": "M-003",
+      "dimension": "M",
+      "iso": "maintainability.analysability",
+      "severity": "P3",
+      "statement": "CHANGELOG 覆盖仓库版本 1.0.5",
+      "check": "script",
+      "version": 1,
+      "script": "changelog_version",
+      "params": {
+        "file": "CHANGELOG.md",
+        "versions": [
+          "1.0.5"
+        ]
+      },
+      "penalty": 1,
+      "source": "项目惯例"
+    },
+    {
+      "id": "M-004",
+      "dimension": "M",
+      "iso": "maintainability.analysability",
+      "severity": "P3",
+      "statement": "文档本地相对链接可解析",
+      "check": "script",
+      "version": 1,
+      "script": "doc_local_links",
+      "params": {
+        "globs": [
+          "docs/**/*.md",
+          "README*.md",
+          "A11Y.md",
+          "I18N.md",
+          "SECURITY.md",
+          "PRIVACY.md",
+          "CONTRIBUTING.md",
+          "THIRD-PARTY-NOTICES.md",
+          "SUPPORT.md",
+          "GOVERNANCE.md"
+        ]
+      },
+      "penalty": 2,
+      "source": "文档质量"
+    },
+    {
+      "id": "M-005",
+      "dimension": "M",
+      "iso": "maintainability.analysability",
+      "severity": "P3",
+      "statement": "README 引用的脚本真实存在",
+      "check": "script",
+      "version": 1,
+      "script": "doc_command_refs",
+      "params": {
+        "file": "README.md"
+      },
+      "penalty": 1,
+      "source": "文档质量"
+    },
+    {
+      "id": "M-006",
+      "dimension": "M",
+      "iso": "maintainability.analysability",
+      "severity": "P2",
+      "statement": "译件 source_sha256 锚与源件一致",
+      "check": "script",
+      "version": 1,
+      "script": "locale_anchor_sha",
+      "params": {
+        "registry": "protocol/locales.json"
+      },
+      "penalty": 2,
+      "source": "I18N 契约"
+    },
+    {
+      "id": "M-007",
+      "dimension": "M",
+      "iso": "maintainability.analysability",
+      "severity": "P2",
+      "statement": "a11y 登记的证据路径真实存在",
+      "check": "script",
+      "version": 1,
+      "script": "a11y_evidence_paths",
+      "params": {
+        "registry": "protocol/accessibility.json"
+      },
+      "penalty": 2,
+      "source": "A11Y 契约"
+    },
+    {
+      "id": "M-008",
+      "dimension": "M",
+      "iso": "maintainability.analysability",
+      "severity": "P3",
+      "statement": "JSON Schema 文件均带 $schema 声明",
+      "check": "script",
+      "version": 1,
+      "script": "schema_dollar_schema",
+      "params": {
+        "globs": [
+          "app/schema/*.schema.json"
+        ],
+        "any_keys": [
+          "$schema"
+        ]
+      },
+      "penalty": 1,
+      "source": "schema 契约"
+    },
+    {
+      "id": "M-009",
+      "dimension": "M",
+      "iso": "maintainability.analysability",
+      "severity": "P2",
+      "statement": "包版本声明跨文件一致（1.0.5）",
+      "check": "script",
+      "version": 1,
+      "script": "version_consistency",
+      "params": {
+        "expected": "1.0.5",
+        "files": {
+          "pyproject.toml": "version\\s*=\\s*\"1\\.0\\.5\"",
+          "codemeta.json": "\"version\"\\s*:\\s*\"1\\.0\\.5\"",
+          "packaging/npm/package.json": "\"version\"\\s*:\\s*\"1\\.0\\.5\""
+        }
+      },
+      "penalty": 2,
+      "source": "发布纪律"
+    },
+    {
+      "id": "M-010",
+      "dimension": "M",
+      "iso": "maintainability.analysability",
+      "severity": "P2",
+      "statement": "CITATION.cff 必须声明软件 version 字段",
+      "check": "script",
+      "version": 1,
+      "script": "require_text",
+      "params": {
+        "file": "CITATION.cff",
+        "patterns": [
+          "^version:\\s*\\d+\\.\\d+\\.\\d+"
+        ]
+      },
+      "penalty": 2,
+      "source": "引用元数据"
+    },
+    {
+      "id": "M-011",
+      "dimension": "M",
+      "iso": "maintainability.analysability",
+      "severity": "P3",
+      "statement": "A11Y 声明的适用面与仓内图形 UI 并存需说明",
+      "check": "script",
+      "version": 1,
+      "script": "doc_scope_claim",
+      "params": {
+        "file": "A11Y.md",
+        "claim": "无图形 UI",
+        "contradict_globs": [
+          "app/android/app/src/main/java/dev/ninfenz/mobile/ui/**/*.kt",
+          "app/desktop/src/main/kotlin/dev/ninfenz/studio/ui/**/*.kt"
+        ]
+      },
+      "penalty": 1,
+      "source": "文档一致性"
+    },
+    {
+      "id": "M-012",
+      "dimension": "M",
+      "iso": "maintainability.analysability",
+      "severity": "P3",
+      "statement": "协议 JSON 均可解析",
+      "check": "script",
+      "version": 1,
+      "script": "json_validity",
+      "params": {
+        "globs": [
+          "protocol/*.json"
+        ]
+      },
+      "penalty": 1,
+      "source": "契约"
+    },
+    {
+      "id": "M-013",
+      "dimension": "M",
+      "iso": "maintainability.analysability",
+      "severity": "P3",
+      "statement": "schema 说明文档存在",
+      "check": "script",
+      "version": 1,
+      "script": "required_file_presence",
+      "params": {
+        "files": [
+          "app/schema/README.md"
+        ]
+      },
+      "penalty": 1,
+      "source": "契约"
+    },
+    {
+      "id": "N-001",
+      "dimension": "N",
+      "iso": "usability.accessibility",
+      "severity": "P1",
+      "statement": "UI 源码硬编码中文字面量 0（对齐项目守卫白名单）",
+      "check": "script",
+      "version": 1,
+      "script": "chinese_literal",
+      "params": {
+        "globs": [
+          "app/android/app/src/main/java/dev/ninfenz/mobile/ui/**/*.kt"
+        ],
+        "exclude_segments": [
+          "/ui/design/"
+        ],
+        "allowlist_basenames": [
+          "CoreCall.kt",
+          "DesignSystemScreen.kt",
+          "DeliveryScreen.kt"
+        ],
+        "limit": 0
+      },
+      "penalty": 4,
+      "source": "项目测试 test_ui_strings_localized"
+    },
+    {
+      "id": "N-002",
+      "dimension": "N",
+      "iso": "usability.accessibility",
+      "severity": "P2",
+      "statement": "对比度 AA、200% 字号无截断（人工/真机）",
+      "check": "manual",
+      "version": 1,
+      "penalty": 2,
+      "source": "WCAG 2.2"
+    },
+    {
+      "id": "N-003",
+      "dimension": "N",
+      "iso": "usability.accessibility",
+      "severity": "P3",
+      "statement": "RTL 布局渲染测试（当前无 RTL locale，人工）",
+      "check": "manual",
+      "version": 1,
+      "penalty": 1,
+      "source": "WCAG/i18n"
+    },
+    {
+      "id": "N-004",
+      "dimension": "N",
+      "iso": "usability.accessibility",
+      "severity": "P3",
+      "statement": "字符串资源 key 统一 snake_case",
+      "check": "script",
+      "version": 1,
+      "script": "string_key_naming",
+      "params": {
+        "globs": [
+          "app/android/app/src/main/res/values*/strings.xml"
+        ],
+        "pattern": "[a-z][a-z0-9_]*"
+      },
+      "penalty": 1,
+      "source": "i18n 契约"
+    },
+    {
+      "id": "N-005",
+      "dimension": "N",
+      "iso": "usability.accessibility",
+      "severity": "P2",
+      "statement": "默认/en 资源 key 完全对齐",
+      "check": "script",
+      "version": 1,
+      "script": "i18n_parity",
+      "params": {
+        "base_file": "app/android/app/src/main/res/values/strings.xml",
+        "compare_files": [
+          "app/android/app/src/main/res/values-en/strings.xml"
+        ],
+        "flag_extra": false
+      },
+      "penalty": 2,
+      "source": "i18n 契约"
+    },
+    {
+      "id": "N-006",
+      "dimension": "N",
+      "iso": "usability.accessibility",
+      "severity": "P3",
+      "statement": "伪 locale（en-XA）资源 key 覆盖率需完整",
+      "check": "script",
+      "version": 1,
+      "script": "i18n_parity",
+      "params": {
+        "base_file": "app/android/app/src/main/res/values/strings.xml",
+        "compare_files": [
+          "app/android/app/src/main/res/values-en-rXA/strings.xml"
+        ],
+        "flag_extra": false
+      },
+      "penalty": 2,
+      "source": "i18n 契约"
+    },
+    {
+      "id": "N-007",
+      "dimension": "N",
+      "iso": "usability.accessibility",
+      "severity": "P2",
+      "statement": "每个 Icon 必须提供 contentDescription",
+      "check": "script",
+      "version": 1,
+      "script": "compose_icon_content_description",
+      "params": {
+        "globs": [
+          "app/android/app/src/main/java/dev/ninfenz/mobile/ui/**/*.kt"
+        ],
+        "window_lines": 6
+      },
+      "penalty": 2,
+      "source": "A11Y"
+    },
+    {
+      "id": "N-008",
+      "dimension": "N",
+      "iso": "usability.accessibility",
+      "severity": "P3",
+      "statement": "禁止硬编码颜色值（应使用设计 token，token 定义文件除外）",
+      "check": "script",
+      "version": 1,
+      "script": "hardcoded_color",
+      "params": {
+        "globs": [
+          "app/android/app/src/main/java/dev/ninfenz/mobile/ui/**/*.kt",
+          "app/desktop/src/main/kotlin/**/*.kt"
+        ],
+        "exclude": [
+          "**/ui/design/**"
+        ],
+        "pattern": "Color\\s*\\(\\s*0x[0-9A-Fa-f]{8}\\s*\\)"
+      },
+      "penalty": 1,
+      "source": "A11Y"
+    },
+    {
+      "id": "N-009",
+      "dimension": "N",
+      "iso": "usability.accessibility",
+      "severity": "P2",
+      "statement": "locale 配置与 strings 资源目录一致",
+      "check": "script",
+      "version": 1,
+      "script": "locale_config_consistency",
+      "params": {
+        "config": "app/android/app/src/main/res/xml/locales_config.xml",
+        "mapping": {
+          "zh-CN": "app/android/app/src/main/res/values",
+          "en": "app/android/app/src/main/res/values-en",
+          "en-XA": "app/android/app/src/main/res/values-en-rXA"
+        }
+      },
+      "penalty": 2,
+      "source": "i18n 契约"
+    },
+    {
+      "id": "N-010",
+      "dimension": "N",
+      "iso": "usability.accessibility",
+      "severity": "P2",
+      "statement": "状态不得只用颜色表达（人工，语义须有文字）",
+      "check": "manual",
+      "version": 1,
+      "penalty": 2,
+      "source": "WCAG 1.4.1"
+    },
+    {
+      "id": "N-011",
+      "dimension": "N",
+      "iso": "usability.accessibility",
+      "severity": "P3",
+      "statement": "安全时间戳统一 UTC ISO-8601（人工/契约测试）",
+      "check": "manual",
+      "version": 1,
+      "penalty": 1,
+      "source": "I18N 契约"
+    },
+    {
+      "id": "N-012",
+      "dimension": "N",
+      "iso": "usability.accessibility",
+      "severity": "P2",
+      "statement": "A11Y/I18N 机读真源存在",
+      "check": "script",
+      "version": 1,
+      "script": "required_file_presence",
+      "params": {
+        "files": [
+          "protocol/accessibility.json",
+          "protocol/locales.json",
+          "A11Y.md",
+          "I18N.md"
+        ]
+      },
+      "penalty": 2,
+      "source": "A11Y/I18N 契约"
+    },
+    {
+      "id": "N-013",
+      "dimension": "N",
+      "iso": "usability.accessibility",
+      "severity": "P3",
+      "statement": "A11Y/I18N QA 报告存在",
+      "check": "script",
+      "version": 1,
+      "script": "required_file_presence",
+      "params": {
+        "files": [
+          "docs/a11y/A11Y_QA.md",
+          "docs/i18n/I18N_QA.md"
+        ]
+      },
+      "penalty": 1,
+      "source": "A11Y/I18N 契约"
+    }
+  ]
+}

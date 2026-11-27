@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "dimensions": {
+    "A": { "name": "架构与依赖方向", "iso": "maintainability.modularity", "weight": 0.10 },
+    "B": { "name": "模块边界与内聚", "iso": "maintainability.modifiability", "weight": 0.06 },
+    "C": { "name": "规模与复杂度", "iso": "maintainability.analysability", "weight": 0.10 },
+    "D": { "name": "重复与抽象", "iso": "maintainability.reusability", "weight": 0.06 },
+    "E": { "name": "错误处理与失败语义", "iso": "reliability.fault-tolerance", "weight": 0.10 },
+    "F": { "name": "并发与资源", "iso": "performance.resource-utilization", "weight": 0.06 },
+    "G": { "name": "状态与恢复", "iso": "reliability.recoverability", "weight": 0.06 },
+    "H": { "name": "安全与隐私", "iso": "security.confidentiality", "weight": 0.12 },
+    "I": { "name": "性能与规模", "iso": "performance.time-behaviour", "weight": 0.08 },
+    "J": { "name": "测试充分性", "iso": "maintainability.testability", "weight": 0.08 },
+    "K": { "name": "依赖与供应链", "iso": "security.authenticity", "weight": 0.05 },
+    "L": { "name": "构建与可复现", "iso": "maintainability.analysability", "weight": 0.05 },
+    "M": { "name": "文档一致性", "iso": "maintainability.analysability", "weight": 0.04 },
+    "N": { "name": "可访问性与 i18n", "iso": "usability.accessibility", "weight": 0.04 }
+  },
+  "penalty_cap_per_rule": 5,
+  "reproducibility_tolerance_pct": 2
+}

@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "note": "NF 0.3.7 预览门禁目标：总分≥95、单维度≥80、P0=0、规则执行异常=0、no_targets=0。基线 0.3.6（aeae36b11）证据预计不达标，作为整改起点；P2/P3 不单独设总阈值，由维度分承载。",
+  "total_min": 95.0,
+  "dimension_min": 80,
+  "p0_max": 0,
+  "rule_error_max": 0,
+  "no_targets_max": 0,
+  "not_run_policy": "tool/manual 未执行项不参与扣分；接入后改为可执行检查，再按新证据调整阈值"
+}
