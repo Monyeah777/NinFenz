@@ -821,7 +821,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
             }
             if (loading) NfLoadingState()
             if (loadError != null) {
-                NfErrorCard("NF-PCK-003", stringResource(dev.ninfenz.mobile.R.string.delivery_load_error, loadError!!), stringResource(dev.ninfenz.mobile.R.string.delivery_load_fix), modifier = Modifier.padding(horizontal = NfSpacing.page))
+                NfErrorCard("NF-PCK-003", stringResource(dev.ninfenz.mobile.R.string.delivery_load_error, requireNotNull(loadError)), stringResource(dev.ninfenz.mobile.R.string.delivery_load_fix), modifier = Modifier.padding(horizontal = NfSpacing.page))
             }
             error?.let { err -> NfErrorCard(err.code, err.message, err.fix, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
 
@@ -992,7 +992,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                     }
                     if (plan == null) {
                         Text(stringResource(dev.ninfenz.mobile.R.string.delivery_compile_first), style = NfType.meta, modifier = Modifier.padding(horizontal = NfSpacing.page))
-                    } else if (plan!!.slots.isEmpty()) {
+                    } else if (requireNotNull(plan).slots.isEmpty()) {
                         Text(stringResource(dev.ninfenz.mobile.R.string.delivery_no_slots), style = NfType.meta, modifier = Modifier.padding(horizontal = NfSpacing.page))
                     } else {
                         fun slotVisible(meta: dev.ninfenz.mobile.model.SpecSlot?): Boolean {
@@ -1013,7 +1013,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                 modifier = Modifier.fillMaxWidth().padding(horizontal = NfSpacing.page)
                             )
                             val fillable = parsedTemplateSlots.count { (id, value) ->
-                                id in plan!!.slots && inputs[id].isNullOrBlank() &&
+                                id in requireNotNull(plan).slots && inputs[id].isNullOrBlank() &&
                                     templateValueAllowed(specMeta?.slots?.firstOrNull { it.id == id }, value)
                             }
                             if (fillable > 0) {
@@ -1022,7 +1022,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                     val next = inputs.toMutableMap()
                                     var filled = 0
                                     parsed.forEach { (id, value) ->
-                                        if (!next[id].isNullOrBlank() || plan!!.slots.none { it == id }) return@forEach
+                                        if (!next[id].isNullOrBlank() || requireNotNull(plan).slots.none { it == id }) return@forEach
                                         val meta = specMeta?.slots?.firstOrNull { it.id == id }
                                         if (!templateValueAllowed(meta, value)) return@forEach
                                         next[id] = dev.ninfenz.mobile.model.SlotInput.sanitize(meta?.kind, value)
@@ -1038,7 +1038,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                             }
                         }
                         var lastSection: String? = null
-                        for (slot in plan!!.slots) {
+                        for (slot in requireNotNull(plan).slots) {
                             val slotMeta = specMeta?.slots?.firstOrNull { it.id == slot }
                             if (!slotVisible(slotMeta)) continue
                             Column(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
@@ -1367,7 +1367,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                     }
                     if (r.issues.isNotEmpty() && markdown != null) {
                         TextButton(onClick = {
-                            val prompt = CorrectionPrompt.build(markdown!!, r)
+                            val prompt = CorrectionPrompt.build(requireNotNull(markdown), r)
                             val intent = ShareExporter.shareMarkdown(context, "nf-fix-prompt", prompt)
                             ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.delivery_share_fix))
                         }, modifier = Modifier.padding(horizontal = NfSpacing.page)) {
@@ -2693,7 +2693,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
     }
 
     if (pendingTrash != null) {
-        val entry = pendingTrash!!
+        val entry = requireNotNull(pendingTrash)
         AlertDialog(
             onDismissRequest = { pendingTrash = null },
             title = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_trash_title)) },

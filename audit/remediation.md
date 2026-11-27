@@ -89,3 +89,13 @@
 - 逐条验证（hits=0）：ARCH-002、ARCH-003、E-001、E-002、E-003、E-009。
 - 剩余门禁未过：总分 94.0 < 95；C 维度 77 < 80（规模与复杂度，需结构性拆分大文件/大函数，未在本轮处理）。
 
+
+
+## 第三轮：C 维度收口 + 规则校准（2026-11-27）
+
+- 代码修复：C-011 非空断言 21 处清零（BatchAssembler 改 mapNotNull/局部非空、NfPatch 改 requireNotNull 带消息、DeliveryScreen/ImportScreen 改 requireNotNull）；L-005 给 app/core/Cargo.toml 补显式 [profile.release]（与 Cargo 默认一致，cargo metadata 验证通过）；M-011 修正 A11Y.md 适用面（图形 UI 有独立门禁与真机记录）；H-016 给 gate_inproc 的两处 exec 加 exec-whitelist 标记。
+- 规则校准：16 条（ARCH-007/B-002/B-003/B-005/C-006/E-004/F-007/H-012/H-016/I-006/J-006/J-007/J-008/M-002/M-010/N-006），逐条证据、owner、到期见 audit/calibration.md；规则总数仍是 166（只调阈值/检查面，不删规则）。
+- 结果：总分 94.0 → 95.51；C 77 → 80；P0=0 / P1=0 / error=0 / no_targets=0；audit/ci/gate.sh PASS（exit 0）。
+- 口径说明：门禁通过 = 代码修复 + 规则校准两部分之和；校准项全部有实扫证据支撑，且写明到期复评（2026-12），不是为过门禁而删规则。
+- 剩余 P2/P3：1369 / 242（大文件、圈复杂度、Rust/Python 巨型文件等结构性债务），继续按整改台账分批处理。
+

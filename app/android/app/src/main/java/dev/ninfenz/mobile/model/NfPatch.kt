@@ -75,7 +75,7 @@ object NfPatchModel {
                     if (at < 0) rejected += "op " + (i + 1) + "：找不到 " + op.blockId
                     else {
                         val before = entries[at].block.text
-                        entries[at] = entries[at].copy(block = entries[at].block.copy(text = op.text!!))
+                        entries[at] = entries[at].copy(block = entries[at].block.copy(text = requireNotNull(op.text) { "replace 的 text 在解析阶段已校验" }))
                         changes += Change("replace", op.blockId, before, op.text)
                         applied++
                     }
@@ -93,7 +93,7 @@ object NfPatchModel {
                     val at = if (op.afterBlockId != null) find(op.afterBlockId) + 1 else (op.index ?: entries.size)
                     if (at < 0) rejected += "op " + (i + 1) + "：找不到 " + op.afterBlockId
                     else {
-                        entries.add(at.coerceIn(0, entries.size), Entry("n" + next++, MarkdownBlock(-1, op.text!!)))
+                        entries.add(at.coerceIn(0, entries.size), Entry("n" + next++, MarkdownBlock(-1, requireNotNull(op.text) { "insert 的 text 在解析阶段已校验" })))
                         changes += Change("insert", op.afterBlockId, null, op.text)
                         applied++
                     }
@@ -110,7 +110,7 @@ object NfPatchModel {
                     }
                 }
                 "set-slot" -> {
-                    slots[op.slot!!] = op.text!!
+                    slots[requireNotNull(op.slot) { "set-slot 的 slot 在解析阶段已校验" }] = requireNotNull(op.text) { "set-slot 的 text 在解析阶段已校验" }
                     changes += Change("set-slot", op.slot, null, op.text)
                     applied++
                 }

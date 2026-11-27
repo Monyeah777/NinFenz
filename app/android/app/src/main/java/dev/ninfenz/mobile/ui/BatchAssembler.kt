@@ -92,7 +92,9 @@ object BatchAssembler {
         val target = File(outDir, "nf-batch-" + System.nanoTime() + ".zip")
         ZipOutputStream(target.outputStream()).use { out ->
             val good = items.filter { it.ok && it.markdown != null }
-            val docs = good.map { NfDocModel.fromMarkdown(it.title, it.projectId, it.markdown!!) }
+            val docs = good.mapNotNull { item ->
+                item.markdown?.let { md -> NfDocModel.fromMarkdown(item.title, item.projectId, md) }
+            }
             var mergedDoc = docs.firstOrNull()
             val conflicts = mutableListOf<NfDocMerger.Conflict>()
             for (doc in docs.drop(1)) {
@@ -134,13 +136,14 @@ object BatchAssembler {
             out.write(manifest.toString().toByteArray(Charsets.UTF_8))
             out.closeEntry()
             good.forEach { item ->
+                val body = item.markdown ?: return@forEach
                 val safe = safeName(item.projectId)
                 out.putNextEntry(ZipEntry("projects/" + safe + ".md").apply { time = 0L })
-                out.write(item.markdown!!.toByteArray(Charsets.UTF_8))
+                out.write(body.toByteArray(Charsets.UTF_8))
                 out.closeEntry()
                 out.putNextEntry(ZipEntry("projects/" + safe + ".nf-doc.json").apply { time = 0L })
                 out.write(
-                    NfDocModel.toJson(NfDocModel.fromMarkdown(item.title, item.projectId, item.markdown!!))
+                    NfDocModel.toJson(NfDocModel.fromMarkdown(item.title, item.projectId, body))
                         .toString().toByteArray(Charsets.UTF_8)
                 )
                 out.closeEntry()

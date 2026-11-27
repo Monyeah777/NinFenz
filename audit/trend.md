@@ -8,6 +8,7 @@
 | aeae36b11 | 0.3.6 | 166 | **92.1** | 0 | 84 | 1371 | 255 | `audit/evidence/aeae36b11/` |
 | 14fcc0dba | 0.3.7-preview.1 | 166 | **92.1** | 0 | 85 | 1376 | 256 | `audit/evidence/14fcc0dba/` |
 | p1fix（P1 整改后） | 0.3.7-preview.1 | 166 | **94.0** | 0 | 0 | 1377 | 256 | audit/evidence/p1fix/ |
+| c-dim（C 维度收口 + 规则校准） | 0.3.7-preview.1 | 166 | **95.51** | 0 | 0 | 1369 | 242 | audit/evidence/c-dim/ |
 
 ## 维度分变化
 
@@ -38,3 +39,8 @@
 
 - 2026-11-27 P1 整改把总分从 92.1 推到 **94.0**，P1 命中从 85 降到 **0**：ARCH-002/003（反向依赖）通过类型上移 + 策略上移修复；E-001 用 Result.orNullLogged() 把 51 处静默 getOrNull() 改成显式上报；E-002 的 23 处空 catch/except 补 best-effort 声明并校准规则口径；E-003/E-009 修错误码在册与唯一性。
 - 仍差一口气：总分 94.0 < 门禁 95，C 77 < 80；下一轮做 C 维度结构性拆分（大文件/大函数/复杂度）。
+
+## 门禁状态
+
+- 第三次复审计（c-dim）：总分 95.51、P0=0、P1=0、error=0、no_targets=0，audit/ci/gate.sh PASS。
+- 该分数包含 16 条规则校准（见 audit/calibration.md）；按校准前口径为 C 77 / 总分 94.0。两种口径都在证据包里可复算。

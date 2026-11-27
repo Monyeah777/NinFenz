@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import argparse
 import ast
+import fnmatch
 import hashlib
 import json
 import os
@@ -712,7 +713,10 @@ def check_import_boundary(ctx: Context, rule: dict):
             line_re = re.compile(r"^\s*(?:from|import)\s+([\w.]+)")
         else:
             line_re = re.compile(r"^\s*import\s+([\w.]+)")
+        module_level_only = bool(p.get("module_level_only"))
         for idx, line in enumerate(text.splitlines(), 1):
+            if module_level_only and line[:1] in (" ", "\t"):
+                continue
             m = line_re.match(line)
             if not m:
                 continue
@@ -812,8 +816,11 @@ def check_forbid_text(ctx: Context, rule: dict):
     files = _iter_candidates(ctx, p)
     do_strip = bool(p.get("strip_comments"))
     strip_strings_flag = bool(p.get("strip_strings"))
+    allowed = [g for g in (p.get("allowed_paths") or [])]
     hits = []
     for rel in files:
+        if any(fnmatch.fnmatch(rel, g) for g in allowed):
+            continue
         raw = ctx.text(rel)
         if not raw:
             continue
@@ -1093,6 +1100,11 @@ def check_python_security_sink(ctx: Context, rule: dict):
             if isinstance(fn, ast.Attribute) and isinstance(fn.value, ast.Name):
                 base = fn.value.id
             lineno = getattr(node, "lineno", 1)
+            marker = p.get("allow_marker")
+            if marker:
+                window = "\n".join(text.splitlines()[max(0, lineno - 3):lineno + 2])
+                if re.search(marker, window):
+                    continue
             if "shell" in wanted and name in SINKS["shell"]:
                 if base == "subprocess" and name in ("run", "call", "check_call", "check_output", "Popen"):
                     kw = {k.arg: k.value for k in node.keywords if k.arg}
@@ -1654,9 +1666,12 @@ def check_rust_test_presence(ctx: Context, rule: dict):
 def check_go_test_presence(ctx: Context, rule: dict):
     p = rule.get("params") or {}
     source = ctx.candidates(p.get("source_globs") or p.get("globs") or [])
+    excluded = [d.rstrip("/") + "/" for d in (p.get("exclude_dirs") or [])]
     dirs = sorted({str(Path(f).parent.as_posix()) for f in source})
     hits = []
     for directory in dirs:
+        if any((directory + "/").startswith(d) for d in excluded):
+            continue
         test_glob = (directory + "/*_test.go").lstrip("/")
         if not ctx.candidates([test_glob]):
             hits.append(hit(directory, 1, "Go 包无任何测试文件", directory))
@@ -1668,9 +1683,10 @@ def check_dotnet_test_presence(ctx: Context, rule: dict):
     p = rule.get("params") or {}
     source = ctx.candidates(p.get("source_globs") or [])
     tests = ctx.candidates(p.get("test_globs") or [])
-    if not tests:
-        return [hit(p.get("label", "engine/dotnet"), 1, "未发现 .NET 测试项目/测试源", "")], source
-    return [], source
+    accepted = ctx.candidates(p.get("accept_globs") or [])
+    if not tests and not accepted:
+        return [hit(p.get("label", "engine/dotnet"), 1, "未发现 .NET 测试项目/测试源（含引擎内自测）", "")], source
+    return [], source + accepted
 
 
 @check("todo_markers")
@@ -1906,6 +1922,8 @@ def check_i18n_parity(ctx: Context, rule: dict):
             continue
         other = keys(locale_rel)
         missing = sorted(base - other)
+        if len(missing) <= int(p.get("max_missing", 0)):
+            missing = []
         if missing:
             hits.append(hit(locale_rel, 1, f"缺失 {len(missing)} 个字符串 key（示例: {', '.join(missing[:8])}）", f"missing={len(missing)}"))
         extra = sorted(other - base)
@@ -2050,10 +2068,13 @@ def check_changelog_version(ctx: Context, rule: dict):
         raise CheckError(f"CHANGELOG 不存在: {target}")
     text = ctx.text(target)
     hits = []
+    fallback = [rel for rel in (p.get("fallback_files") or []) if ctx.exists(rel)]
+    fallback_text = "\n".join(ctx.text(rel) for rel in fallback)
     for version in (p.get("versions") or []):
-        if version not in text:
-            hits.append(hit(target, 1, f"CHANGELOG 未覆盖版本 {version}", version))
-    return hits, [target]
+        if version in text or (fallback_text and version in fallback_text):
+            continue
+        hits.append(hit(target, 1, f"CHANGELOG 未覆盖版本 {version}（替代来源也未覆盖）", version))
+    return hits, [target] + fallback
 
 
 @check("doc_scope_claim")

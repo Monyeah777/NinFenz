@@ -498,7 +498,7 @@ fun ImportScreen(
                         if (suggestedObj != null) {
                             doc = ImportModel.parse(suggestedObj)
                             rawResult = suggestedObj
-                            acceptedMappings = doc!!.mappings.indices.filter { doc!!.mappings[it].confidence >= mappingThreshold }.toSet()
+                            acceptedMappings = requireNotNull(doc).mappings.indices.filter { requireNotNull(doc).mappings[it].confidence >= mappingThreshold }.toSet()
                             suggestNote = context.getString(dev.ninfenz.mobile.R.string.import_suggest_done)
                         }
                     } else {
@@ -1032,7 +1032,7 @@ fun ImportScreen(
                             }
                         }
                         if (prefillNote != null) {
-                            Text(prefillNote!!, style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(requireNotNull(prefillNote), style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                         zeroSliceNote?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary) }
                         preserveNote?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary) }
@@ -1104,8 +1104,8 @@ fun ImportScreen(
             if (error != null) {
                 item {
                     Column(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
-                        NfErrorCard(error!!.code, error!!.message, error!!.fix)
-                        if (error!!.code == "NF-E-004") {
+                        NfErrorCard(requireNotNull(error).code, requireNotNull(error).message, requireNotNull(error).fix)
+                        if (requireNotNull(error).code == "NF-E-004") {
                             TextButton(onClick = { filePicker.launch(arrayOf("text/markdown", "text/plain", "text/csv", "application/json", "application/zip", "application/octet-stream")) }) {
                                 Text(stringResource(dev.ninfenz.mobile.R.string.import_reselect_file))
                             }

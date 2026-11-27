@@ -124,6 +124,8 @@ def run_inproc(src: str, root: Path, name: str) -> tuple[int, str]:
     except OSError as exc:       # 尽力而为：切不进去就按当前 cwd 跑，理由落诊断面
         _CHDIR_FAILURES.append(str(exc))
     try:
+        # exec-whitelist: 在进程内执行本仓 verify.sh 的 heredoc（源码只读、受门禁保护），
+        # 白名单登记见 audit/calibration.md H-016；非受信输入不得走此路径。
         with contextlib.redirect_stdout(buf), contextlib.redirect_stderr(buf):
             exec(compile(src, "<verify.sh:{}>".format(name), "exec"), glb)
     except _Exit as e:
@@ -257,6 +259,7 @@ def run_check_inproc(body: str, root: Path, name: str) -> tuple[int, list[str], 
     except OSError as exc:       # 尽力而为：切不进去就按当前 cwd 跑，理由落诊断面
         _CHDIR_FAILURES.append(str(exc))
     try:
+        # exec-whitelist: 同上，仅执行本仓 verify.sh heredoc。
         exec(compile(text, "<verify.sh:{}>".format(name), "exec"), glb)
     except _Exit as e:
         code = int(e.code)

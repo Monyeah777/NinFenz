@@ -19,3 +19,10 @@ sha2 = "=0.10.9"
 zip = { version = "=2.6.1", default-features = false, features = ["deflate"] }
 regex = "=1.13.1"
 ed25519-compact = { path = "vendor/ed25519-compact", default-features = false, features = ["std"] }
+
+# release profile 显式固定（审计规则 L-005）：与 Cargo 默认值一致，避免跨工具链隐式漂移。
+[profile.release]
+opt-level = 3
+lto = false
+codegen-units = 16
+panic = "unwind"
