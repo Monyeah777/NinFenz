@@ -127,3 +127,14 @@
 - 结果：总分 96.52 → 96.82；B 94→97、D 96→98；P0=0/P1=0；Android 全量单测 BUILD SUCCESSFUL。
 - 仍开：D-002 剩 1（TopLevelScreens 参数表重复）、D-004 Rust 重复、D-005 测试重复；C 维度大文件/复杂度未动。
 
+
+## 第七轮：Rust/Kotlin 重复块收口（2026-11-27）
+
+- D-004（Rust 重复 5 文件 → 0）：
+  1) 新增 engine/rust/src/subject_docs.rs——handover/postmortem 共用 Entry/decl/entries/check_ids/is_dated/is_check 与 check_frontmatter（必填字段/status 词表/date/正文章节齐），两门禁只保留各自判据；
+  2) 新增 engine/rust/src/jsonx.rs——obj_get/arr_of/str_list/s_of 此前在 pack_combo、pack_combo_core、output_forms_verify 各写一份，统一为共享模块（调用点零改动）；
+  3) 验证：cargo check 通过；handover/postmortem/pack_combo/output_forms 针对性测试 3+3+1+12 全绿。
+- D-002（Kotlin 重复最后一处 → 0）：新增 ui/components/NfSurfaceKit.kt（nfExpandableEnter/nfExpandableExit/NfActionBarSurface），TopLevelScreens/WorkflowHubScreen/ImportScreen 共用展开动画与底部动作条。
+- 结果：总分 96.82 → 96.94；D 98→99；Android 编译+全量单测 BUILD SUCCESSFUL。
+- 已知遗留（非本轮引入）：engine/rust 全量 cargo test 有 4 个 truth-source 清单测试失败（asset_contract 3 + quality_depth_scan 1，实际 files=1260 与 protocol/generated 期望值不一致）——属仓库工作区新增文件导致的清单漂移，与本次重构无关；评估：需按仓库生成器流程重算 truth source，已挂 OPEN-TRUTH-DRIFT。
+

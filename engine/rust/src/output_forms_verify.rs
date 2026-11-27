@@ -13,30 +13,13 @@ use crate::output_forms as of;
 use crate::output_forms_checks as oc;
 use crate::output_forms_gen::{dispatch, gen_id, GenOut};
 use crate::pyjson::Json;
+use crate::jsonx::{obj_get, arr_of, s_of};
 use crate::pyval;
 use std::collections::BTreeMap;
 use std::path::Path;
 
-fn obj_get<'a>(v: &'a Json, k: &str) -> Option<&'a Json> {
-    match v {
-        Json::Object(o) => o.iter().find(|(kk, _)| kk == k).map(|(_, vv)| vv),
-        _ => None,
-    }
-}
 
-fn arr_of(v: Option<&Json>) -> Vec<Json> {
-    match v {
-        Some(Json::Array(a)) => a.clone(),
-        _ => Vec::new(),
-    }
-}
 
-fn s_of(v: Option<&Json>) -> String {
-    match v {
-        None | Some(Json::Null) => String::new(),
-        Some(x) => pyval::plain_str(x),
-    }
-}
 
 /// 真源 `output_forms._pack_dirs`：有 `community/<包>/outputs/INDEX.json` 的包目录名（有序）。
 ///

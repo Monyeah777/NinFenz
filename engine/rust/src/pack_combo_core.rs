@@ -4,34 +4,14 @@
 
 use crate::pack_combo as pc;
 use crate::pyjson::Json;
+use crate::jsonx::{obj_get, arr_of, str_list, s_of};
 use crate::pyval;
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::Path;
 
-fn obj_get<'a>(v: &'a Json, k: &str) -> Option<&'a Json> {
-    match v {
-        Json::Object(o) => o.iter().find(|(kk, _)| kk == k).map(|(_, vv)| vv),
-        _ => None,
-    }
-}
 
-fn arr_of(v: Option<&Json>) -> Vec<Json> {
-    match v {
-        Some(Json::Array(a)) => a.clone(),
-        _ => Vec::new(),
-    }
-}
 
-fn str_list(v: Option<&Json>) -> Vec<String> {
-    arr_of(v).iter().map(pyval::plain_str).collect()
-}
 
-fn s_of(v: Option<&Json>) -> String {
-    match v {
-        None | Some(Json::Null) => String::new(),
-        Some(x) => pyval::plain_str(x),
-    }
-}
 
 /// 用到的那几个索引（一次构建、全程共用）。
 pub struct Ctx {

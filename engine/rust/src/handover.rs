@@ -3,10 +3,10 @@
 //! 判据：声明五段齐 / 交接件 frontmatter 必填齐、status 在词表、date 格式、五段齐、
 //! **「未决项」非空且每条带「判据」**、`refs` 可解析到真实件或 `checkN`。
 
-use crate::jsonread;
 use crate::mdblocks;
 use crate::pyjson::Json;
-use crate::pyval::{arr_items, get, obj_is_empty, plain_str, plain_str_opt, py_str, py_truthy};
+use crate::subject_docs::{self, Entry};
+use crate::pyval::{arr_items, get, plain_str, plain_str_opt, py_str, py_truthy};
 use std::path::Path;
 
 pub const DECL_REL: &str = "protocol/handover.json";
@@ -21,58 +21,10 @@ pub struct HandoverScan {
     pub pending: usize,
 }
 
-struct Entry {
-    file: String,
-    fm: Json,
-    body: String,
-}
-
-fn decl(root: &Path) -> Option<Json> {
-    if !root.join(DECL_REL).is_file() {
-        return None;
-    }
-    jsonread::read_file(root, DECL_REL).filter(|d| !obj_is_empty(d))
-}
-
-fn entries(root: &Path) -> Vec<Entry> {
-    crate::glob::expand(root, GLOB)
-        .into_iter()
-        .map(|rel| {
-            let text = std::fs::read_to_string(root.join(&rel)).unwrap_or_default();
-            let (fm, body) = mdblocks::parse_frontmatter(&text);
-            let file = rel.rsplit('/').next().unwrap_or(&rel).to_string();
-            Entry { file, fm, body }
-        })
-        .collect()
-}
-
-fn check_ids(root: &Path) -> std::collections::BTreeSet<String> {
-    static RE: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
-    let re = RE.get_or_init(|| {
-        regex::Regex::new(r"(?m)^check(\d+)\(\)\{").expect("check 定义正则固定合法")
-    });
-    std::fs::read_to_string(root.join("verify.sh"))
-        .map(|t| re.captures_iter(&t).map(|c| c[1].to_string()).collect())
-        .unwrap_or_default()
-}
-
-fn is_dated(s: &str) -> bool {
-    static RE: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
-    let re =
-        RE.get_or_init(|| regex::Regex::new(r"^\d{4}-\d{2}-\d{2}$").expect("日期正则固定合法"));
-    re.is_match(s)
-}
-
 fn is_adr(s: &str) -> bool {
     static RE: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
     let re = RE.get_or_init(|| regex::Regex::new(r"^ADR-\d{4}$").expect("ADR 正则固定合法"));
     re.is_match(s)
-}
-
-fn is_check(s: &str) -> Option<String> {
-    static RE: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
-    let re = RE.get_or_init(|| regex::Regex::new(r"^check(\d+)$").expect("判据引用正则固定合法"));
-    re.captures(s).map(|c| c[1].to_string())
 }
 
 /// 真源 `check_doc` → `(issues, pending 条数)`。
@@ -86,42 +38,7 @@ fn check_doc(
     let fm = &e.fm;
     let body = &e.body;
 
-    let fields = arr_items(get(d, "required_fields"));
-    let field_names: Vec<String> = if fields.is_empty() {
-        DEFAULT_FIELDS.iter().map(|s| (*s).to_string()).collect()
-    } else {
-        fields.iter().map(|v| plain_str(v)).collect()
-    };
-    for k in field_names {
-        if !py_truthy(get(fm, &k).unwrap_or(&Json::Null)) {
-            issues.push(format!("缺必填字段：{}", k));
-        }
-    }
-    let vocab: Vec<String> = {
-        let v = crate::pyval::str_list(get(d, "status_vocabulary"));
-        if v.is_empty() {
-            vec!["open".to_string(), "closed".to_string()]
-        } else {
-            v
-        }
-    };
-    if !vocab.contains(&plain_str_opt(get(fm, "status"))) {
-        issues.push(format!(
-            "status 越词表：{}",
-            plain_str_opt(get(fm, "status"))
-        ));
-    }
-    if !is_dated(&py_str(get(fm, "date"))) {
-        issues.push(format!(
-            "date 非 YYYY-MM-DD：{}",
-            plain_str_opt(get(fm, "date"))
-        ));
-    }
-    for sec in SECTIONS {
-        if !body.contains(sec) {
-            issues.push(format!("正文缺段落：{}", sec));
-        }
-    }
+    issues.extend(subject_docs::check_frontmatter(d, e, &DEFAULT_FIELDS, &SECTIONS));
     let pending_text = if body.contains("## 未决项") {
         body.splitn(2, "## 未决项").nth(1).unwrap_or("").to_string()
     } else {
@@ -151,7 +68,7 @@ fn check_doc(
         if s.starts_with('[') && s.ends_with(']') {
             s = s.trim_matches(|c| c == '[' || c == ']').trim().to_string();
         }
-        if let Some(n) = is_check(&s) {
+        if let Some(n) = subject_docs::is_check(&s) {
             if !checks.contains(&n) {
                 issues.push(format!("refs 指向不存在的 check：{}", s));
             }
@@ -170,7 +87,7 @@ fn check_doc(
 /// 真源 `scan`。
 pub fn scan(root: &Path) -> HandoverScan {
     let mut issues: Vec<String> = Vec::new();
-    let Some(d) = decl(root) else {
+    let Some(d) = subject_docs::decl(root, DECL_REL) else {
         return HandoverScan {
             issues: vec![format!("缺交接协议声明 {}", DECL_REL)],
             handovers: 0,
@@ -187,8 +104,8 @@ pub fn scan(root: &Path) -> HandoverScan {
     if arr_items(get(&d, "rules")).is_empty() {
         issues.push("rules 不得为空（交接纪律必须成文）".to_string());
     }
-    let checks = check_ids(root);
-    let rows = entries(root);
+    let checks = subject_docs::check_ids(root);
+    let rows = subject_docs::entries(root, GLOB);
     let mut pending_total = 0usize;
     for e in &rows {
         let (i, pending) = check_doc(root, e, &d, &checks);

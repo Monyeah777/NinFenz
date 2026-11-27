@@ -7,7 +7,8 @@
 use crate::jsonread;
 use crate::mdblocks;
 use crate::pyjson::Json;
-use crate::pyval::{arr_items, get, obj_is_empty, plain_str, plain_str_opt, py_str, py_truthy};
+use crate::subject_docs::{self, Entry};
+use crate::pyval::{arr_items, get, plain_str, plain_str_opt, py_str, py_truthy};
 use std::collections::BTreeSet;
 use std::path::Path;
 
@@ -24,53 +25,6 @@ pub struct PostmortemScan {
     pub actions: usize,
 }
 
-struct Entry {
-    path: String,
-    file: String,
-    fm: Json,
-    body: String,
-}
-
-fn decl(root: &Path) -> Option<Json> {
-    if !root.join(DECL_REL).is_file() {
-        return None;
-    }
-    jsonread::read_file(root, DECL_REL).filter(|d| !obj_is_empty(d))
-}
-
-fn entries(root: &Path) -> Vec<Entry> {
-    crate::glob::expand(root, GLOB)
-        .into_iter()
-        .map(|rel| {
-            let text = std::fs::read_to_string(root.join(&rel)).unwrap_or_default();
-            let (fm, body) = mdblocks::parse_frontmatter(&text);
-            let file = rel.rsplit('/').next().unwrap_or(&rel).to_string();
-            Entry {
-                path: rel,
-                file,
-                fm,
-                body,
-            }
-        })
-        .collect()
-}
-
-fn check_ids(root: &Path) -> BTreeSet<String> {
-    static RE: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
-    let re = RE.get_or_init(|| {
-        regex::Regex::new(r"(?m)^check(\d+)\(\)\{").expect("check 定义正则固定合法")
-    });
-    std::fs::read_to_string(root.join("verify.sh"))
-        .map(|t| re.captures_iter(&t).map(|c| c[1].to_string()).collect())
-        .unwrap_or_default()
-}
-
-fn is_dated(s: &str) -> bool {
-    static RE: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
-    let re =
-        RE.get_or_init(|| regex::Regex::new(r"^\d{4}-\d{2}-\d{2}$").expect("日期正则固定合法"));
-    re.is_match(s)
-}
 
 /// 真源 `_refs_ok`。
 fn refs_ok(root: &Path, refs: Option<&Json>, checks: &BTreeSet<String>) -> Vec<String> {
@@ -82,7 +36,7 @@ fn refs_ok(root: &Path, refs: Option<&Json>, checks: &BTreeSet<String>) -> Vec<S
     };
     for r in list {
         let s = r.trim().to_string();
-        if let Some(n) = is_check(&s) {
+        if let Some(n) = subject_docs::is_check(&s) {
             if !checks.contains(&n) {
                 issues.push(format!("引用指向不存在的 check：{}", s));
             }
@@ -93,12 +47,6 @@ fn refs_ok(root: &Path, refs: Option<&Json>, checks: &BTreeSet<String>) -> Vec<S
         }
     }
     issues
-}
-
-fn is_check(s: &str) -> Option<String> {
-    static RE: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
-    let re = RE.get_or_init(|| regex::Regex::new(r"^check(\d+)$").expect("判据引用正则固定合法"));
-    re.captures(s).map(|c| c[1].to_string())
 }
 
 fn check_doc(
@@ -112,42 +60,7 @@ fn check_doc(
     let fm = &e.fm;
     let body = &e.body;
 
-    let fields = arr_items(get(d, "required_fields"));
-    let names: Vec<String> = if fields.is_empty() {
-        DEFAULT_FIELDS.iter().map(|s| (*s).to_string()).collect()
-    } else {
-        fields.iter().map(|v| plain_str(v)).collect()
-    };
-    for k in names {
-        if !py_truthy(get(fm, &k).unwrap_or(&Json::Null)) {
-            issues.push(format!("缺必填字段：{}", k));
-        }
-    }
-    let vocab: Vec<String> = {
-        let v = crate::pyval::str_list(get(d, "status_vocabulary"));
-        if v.is_empty() {
-            vec!["open".to_string(), "closed".to_string()]
-        } else {
-            v
-        }
-    };
-    if !vocab.contains(&plain_str_opt(get(fm, "status"))) {
-        issues.push(format!(
-            "status 越词表：{}",
-            plain_str_opt(get(fm, "status"))
-        ));
-    }
-    if !is_dated(&py_str(get(fm, "date"))) {
-        issues.push(format!(
-            "date 非 YYYY-MM-DD：{}",
-            plain_str_opt(get(fm, "date"))
-        ));
-    }
-    for sec in SECTIONS {
-        if !body.contains(sec) {
-            issues.push(format!("正文缺段落：{}", sec));
-        }
-    }
+    issues.extend(subject_docs::check_frontmatter(d, e, &DEFAULT_FIELDS, &SECTIONS));
     for tok in arr_items(get(d, "blame_tokens")) {
         let t = plain_str(tok);
         if !t.is_empty() && body.contains(&t) {
@@ -210,7 +123,7 @@ fn check_doc(
 /// 真源 `scan`。
 pub fn scan(root: &Path) -> PostmortemScan {
     let mut issues: Vec<String> = Vec::new();
-    let Some(d) = decl(root) else {
+    let Some(d) = subject_docs::decl(root, DECL_REL) else {
         return PostmortemScan {
             issues: vec![format!("缺复盘协议声明 {}", DECL_REL)],
             postmortems: 0,
@@ -229,7 +142,7 @@ pub fn scan(root: &Path) -> PostmortemScan {
             issues.push(format!("{} 不得为空（无指责与根因判据必须成文）", k));
         }
     }
-    let checks = check_ids(root);
+    let checks = subject_docs::check_ids(root);
     let receipts: Option<BTreeSet<String>> = if root.join(RECEIPTS_REL).is_file() {
         jsonread::read_file(root, RECEIPTS_REL).map(|doc| {
             arr_items(get(&doc, "entries"))
@@ -240,7 +153,7 @@ pub fn scan(root: &Path) -> PostmortemScan {
     } else {
         None
     };
-    let rows = entries(root);
+    let rows = subject_docs::entries(root, GLOB);
     let mut actions = 0usize;
     for e in &rows {
         let (i, n) = check_doc(root, e, &d, &checks, &receipts);

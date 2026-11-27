@@ -94,6 +94,7 @@ import dev.ninfenz.mobile.model.ImportModel
 import dev.ninfenz.mobile.share.SharePayload
 import dev.ninfenz.mobile.share.ShareExporter
 import dev.ninfenz.mobile.share.SharedItem
+import dev.ninfenz.mobile.ui.components.NfActionBarSurface
 import dev.ninfenz.mobile.ui.components.NfCard
 import dev.ninfenz.mobile.ui.components.NfEmptyState
 import dev.ninfenz.mobile.ui.components.NfErrorCard
@@ -1721,16 +1722,7 @@ fun ImportScreen(
             exit = fadeOut() + slideOutVertically { it / 2 }
         ) {
             cleared?.let { snapshot ->
-                Surface(
-                    modifier = Modifier.padding(horizontal = NfSpacing.page, vertical = NfSpacing.m),
-                    shape = MaterialTheme.shapes.large,
-                    tonalElevation = 6.dp
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = NfSpacing.m, vertical = NfSpacing.xs),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)
-                    ) {
+                NfActionBarSurface {
                         Text(
                             stringResource(dev.ninfenz.mobile.R.string.import_cleared_countdown, clearSeconds),
                             style = NfType.secondary,
@@ -1752,7 +1744,6 @@ fun ImportScreen(
                         TextButton(onClick = { cleared = null }) {
                             Text(stringResource(android.R.string.cancel))
                         }
-                    }
                 }
             }
         }

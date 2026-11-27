@@ -12,6 +12,7 @@
 | p2-batch1（小批量 P2 + 交付面） | 0.3.7-preview.1 | 166 | **95.88** | 0 | 0 | 1369 | 229 | audit/evidence/p2-batch1/ |
 | p2-batch2（重复代码 + 错误处理） | 0.3.7-preview.1 | 166 | **96.52** | 0 | 0 | 1294 | 229 | audit/evidence/p2-batch2/ |
 | p2-batch3（报告样板 + UI 路径） | 0.3.7-preview.1 | 166 | **96.82** | 0 | 0 | 1264 | 229 | audit/evidence/p2-batch3/ |
+| p2-batch4（Rust/Kotlin 重复块） | 0.3.7-preview.1 | 166 | **96.94** | 0 | 0 | 1261 | 221 | audit/evidence/p2-batch4/ |
 
 ## 维度分变化
 
@@ -63,3 +64,9 @@
 
 - 最新证据 p2-batch3：总分 96.82，P0=0/P1=0/error=0/no_targets=0，audit/ci/gate.sh PASS。
 - 本轮收益：D-003 4→0（共享 report_module）、B-001 25→0（ProjectPaths 单一构造点）。
+
+
+## 门禁状态（第七轮后）
+
+- 最新证据 p2-batch4：总分 96.94，P0=0/P1=0/error=0/no_targets=0，audit/ci/gate.sh PASS。
+- 本轮收益：D-004 5→0（subject_docs + jsonx 共享模块）、D-002 1→0（NfSurfaceKit）。

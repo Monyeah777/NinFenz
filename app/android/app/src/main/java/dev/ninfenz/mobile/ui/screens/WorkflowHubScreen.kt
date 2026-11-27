@@ -45,6 +45,8 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import dev.ninfenz.mobile.ui.components.nfExpandableEnter
+import dev.ninfenz.mobile.ui.components.nfExpandableExit
 import dev.ninfenz.mobile.data.ProjectEntry
 import dev.ninfenz.mobile.data.RecentProjectStore
 import dev.ninfenz.mobile.model.ProjectStatus
@@ -163,14 +165,8 @@ fun WorkflowHubScreen(
                 item {
                     AnimatedVisibility(
                         visible = projectsExpanded,
-                        enter = fadeIn(tween(NfMotion.SHORT_MS)) + expandVertically(
-                            animationSpec = spring(dampingRatio = 0.82f, stiffness = 420f),
-                            expandFrom = Alignment.Top
-                        ),
-                        exit = fadeOut(tween(NfMotion.SHORT_MS)) + shrinkVertically(
-                            animationSpec = spring(dampingRatio = 0.9f, stiffness = 500f),
-                            shrinkTowards = Alignment.Top
-                        )
+                        enter = nfExpandableEnter(),
+                        exit = nfExpandableExit()
                     ) {
                         Column(
                             modifier = Modifier.padding(horizontal = NfSpacing.page),

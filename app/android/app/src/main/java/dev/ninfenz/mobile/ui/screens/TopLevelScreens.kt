@@ -112,7 +112,10 @@ import dev.ninfenz.mobile.model.ProjectSort
 import dev.ninfenz.mobile.model.ProjectSorter
 import dev.ninfenz.mobile.model.ProjectStatus
 import dev.ninfenz.mobile.share.ShareExporter
+import dev.ninfenz.mobile.ui.components.NfActionBarSurface
 import dev.ninfenz.mobile.ui.components.NfCard
+import dev.ninfenz.mobile.ui.components.nfExpandableEnter
+import dev.ninfenz.mobile.ui.components.nfExpandableExit
 import dev.ninfenz.mobile.ui.components.SwipeableProjectCard
 import dev.ninfenz.mobile.ui.components.NfEmptyState
 import dev.ninfenz.mobile.ui.components.NfListRow
@@ -547,14 +550,8 @@ fun LibraryHomeScreen(
                 item {
                     androidx.compose.animation.AnimatedVisibility(
                         visible = projectsExpanded,
-                        enter = fadeIn(tween(NfMotion.SHORT_MS)) + expandVertically(
-                            animationSpec = spring(dampingRatio = 0.82f, stiffness = 420f),
-                            expandFrom = Alignment.Top
-                        ),
-                        exit = fadeOut(tween(NfMotion.SHORT_MS)) + shrinkVertically(
-                            animationSpec = spring(dampingRatio = 0.9f, stiffness = 500f),
-                            shrinkTowards = Alignment.Top
-                        )
+                        enter = nfExpandableEnter(),
+                        exit = nfExpandableExit()
                     ) {
                         Column(
                             modifier = Modifier.padding(horizontal = NfSpacing.page),
@@ -703,16 +700,7 @@ fun LibraryHomeScreen(
         exit = fadeOut(tween(NfMotion.SHORT_MS)) + slideOutVertically(tween(NfMotion.SHORT_MS)) { it / 2 }
     ) {
         undoArchive?.let { archived ->
-            Surface(
-                modifier = Modifier.padding(horizontal = NfSpacing.page, vertical = NfSpacing.m),
-                shape = MaterialTheme.shapes.large,
-                tonalElevation = 6.dp
-            ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = NfSpacing.m, vertical = NfSpacing.xs),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)
-                ) {
+            NfActionBarSurface {
                     Text(
                         stringResource(dev.ninfenz.mobile.R.string.library_project_archived),
                         style = NfType.secondary,
@@ -726,7 +714,6 @@ fun LibraryHomeScreen(
                     TextButton(onClick = { undoArchive = null }) {
                         Text(stringResource(android.R.string.cancel))
                     }
-                }
             }
         }
     }

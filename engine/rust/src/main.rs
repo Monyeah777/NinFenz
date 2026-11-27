@@ -38,6 +38,8 @@ mod drill_fidelity;
 mod endpoint;
 mod glob;
 mod handover;
+mod subject_docs;
+mod jsonx;
 mod instruction_step_audit;
 mod intake;
 mod io_types;
