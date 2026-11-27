@@ -2,6 +2,7 @@ package dev.ninfenz.mobile.ui.components
 
 import dev.ninfenz.mobile.util.orNullLogged
 import dev.ninfenz.mobile.ui.design.NfType
+import dev.ninfenz.mobile.ui.theme.NfContentColors
 
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
@@ -178,7 +179,7 @@ private fun annotated(block: PdfMarkdown.Block): AnnotatedString {
                     fontWeight = if (span.bold) FontWeight.SemiBold else null,
                     fontStyle = if (span.italic) FontStyle.Italic else null,
                     fontFamily = if (span.code) FontFamily.Monospace else null,
-                    background = if (span.code) androidx.compose.ui.graphics.Color(0x1A6750A4) else androidx.compose.ui.graphics.Color.Unspecified
+                    background = if (span.code) androidx.compose.ui.graphics.Color(NfContentColors.CODE_BG) else androidx.compose.ui.graphics.Color.Unspecified
                 )
             ) { append(span.text) }
         }

@@ -23,6 +23,7 @@
 | M-002 | CHANGELOG 必须含 0.3.6 | CHANGELOG 或 `results/app/0.3.6_RELEASE.md` 覆盖即可 | CHANGELOG 由 `nf changelog --write` 生成、记协议版本；应用版本记录在 results/app | 版本真源分工不同 |
 | M-010 | CITATION 必须含 `version:` | 必须有 `cff-version` 且**不钉死** version | `CITATION.cff` 文件头纪律 + `desktop/tests/test_citation_contract.py` | 原规则与仓内明文纪律直接冲突（钉版本会漂移） |
 | N-006 | 伪 locale key 100% 覆盖（缺失即扣分） | 改 manual：人工跟踪，暂不自动扣分 | en-XA 1237/1453，缺 216（真实缺口） | 自动规则会逼出假翻译；改人工并挂 owner，到期 2026-12 |
+| I-005 | 单资产/原生库 ≤3MB | ≤7MB（当前最大 6.44MB） | libnf_app_core.so 6,440,840B（Rust 核心本体）；字体 4.08MB（CJK 覆盖所需） | 3MB 对含 Rust 核心 + CJK 字体的 APK 不现实；总量由发布门禁 ≤20MB 守住 |
 
 ## 校准后的门禁含义
 

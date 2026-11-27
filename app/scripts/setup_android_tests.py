@@ -20,7 +20,11 @@ POM = """<?xml version="1.0" encoding="UTF-8"?>
 
 
 def sdk_res() -> Path | None:
-    home = Path(os.environ.get("ANDROID_HOME", "D:/tmp/app-toolchain/android-sdk"))
+    # 不内置本机绝对路径：必须由 ANDROID_HOME 指定，未设置时退回空 res jar。
+    raw = os.environ.get("ANDROID_HOME") or os.environ.get("ANDROID_SDK_ROOT")
+    if not raw:
+        return None
+    home = Path(raw)
     candidates = sorted((home / "platforms").glob("android-*/data/res"))
     return candidates[-1] if candidates else None
 

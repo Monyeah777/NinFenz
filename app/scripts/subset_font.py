@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import os
 import subprocess
+import tempfile
 import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
@@ -52,7 +53,7 @@ def main() -> int:
     ap.add_argument("--source", required=True, help="完整 Noto Sans SC TTF")
     ap.add_argument("--out", default=str(OUT))
     args = ap.parse_args()
-    text = Path("D:/tmp/nf-subset-chars.txt")
+    text = Path(tempfile.gettempdir()) / "nf-subset-chars.txt"
     text.write_text(chars(), encoding="utf-8")
     cmd = [
         sys.executable, "-m", "fontTools.subset", args.source,

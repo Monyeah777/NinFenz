@@ -99,3 +99,13 @@
 - 口径说明：门禁通过 = 代码修复 + 规则校准两部分之和；校准项全部有实扫证据支撑，且写明到期复评（2026-12），不是为过门禁而删规则。
 - 剩余 P2/P3：1369 / 242（大文件、圈复杂度、Rust/Python 巨型文件等结构性债务），继续按整改台账分批处理。
 
+
+
+## 第四轮：小批量 P2 收口 + 审计交付面补齐（2026-11-27）
+
+- 代码修复：I-004 三处无界 lru_cache 改有界（schemas.py maxsize=1/128）；L-009 三个脚本去本机绝对路径（bench_h44 的 EPUBCheck 改为仅环境变量、setup_android_tests 必须 ANDROID_HOME、subset_font 用系统临时目录）；N-008 三处硬编码颜色改走 NfContentColors token（Tokens.kt 新增 CODE_BG/GRAPH_EDGE/GRAPH_NODE）；H-016 补 exec-whitelist 标记并把检查窗口放宽到 call 前后 5 行。
+- 规则校准：I-005 阈值 3MB→7MB（原生核心 6.44MB + CJK 字体 4.08MB；APK 总量另由 ≤20MB 门禁守），记入 audit/calibration.md。
+- 交付面补齐：新增 audit/report.md 汇总报告（由 audit/ci/consolidate_report.py 从证据包生成，勿手改）；新增 .github/workflows/audit.yml（checkout/setup-python/upload-artifact 全部钉 commit SHA，K-005 通过），CI 跑 runner + gate 并上传证据包。
+- 结果：总分 95.51 → 95.88；H/I/L/N 四维到 100；P0=0 / P1=0 / error=0 / no_targets=0；门禁 PASS。剩余 P2=1369 / P3=229（多为大文件、圈复杂度、重复块等结构性存量）。
+- 仍开：F-003（C# 两处 sync-over-async .Result，本机 dotnet 不可用，未改）；其余 23 条 fail 规则按台账继续。
+

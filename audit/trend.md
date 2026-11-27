@@ -9,6 +9,7 @@
 | 14fcc0dba | 0.3.7-preview.1 | 166 | **92.1** | 0 | 85 | 1376 | 256 | `audit/evidence/14fcc0dba/` |
 | p1fix（P1 整改后） | 0.3.7-preview.1 | 166 | **94.0** | 0 | 0 | 1377 | 256 | audit/evidence/p1fix/ |
 | c-dim（C 维度收口 + 规则校准） | 0.3.7-preview.1 | 166 | **95.51** | 0 | 0 | 1369 | 242 | audit/evidence/c-dim/ |
+| p2-batch1（小批量 P2 + 交付面） | 0.3.7-preview.1 | 166 | **95.88** | 0 | 0 | 1369 | 229 | audit/evidence/p2-batch1/ |
 
 ## 维度分变化
 
@@ -44,3 +45,9 @@
 
 - 第三次复审计（c-dim）：总分 95.51、P0=0、P1=0、error=0、no_targets=0，audit/ci/gate.sh PASS。
 - 该分数包含 16 条规则校准（见 audit/calibration.md）；按校准前口径为 C 77 / 总分 94.0。两种口径都在证据包里可复算。
+
+## 门禁状态（第四轮后）
+
+- 最新证据 p2-batch1：总分 95.88，P0=0/P1=0/error=0/no_targets=0，audit/ci/gate.sh PASS。
+- 维度：A97 B94 C80 D94 E92 F95 G100 H100 I100 J100 K100 L100 M100 N100。
+- CI：.github/workflows/audit.yml 在 push/PR 跑同一套 runner + gate 并上传证据包（actions 钉 SHA）。

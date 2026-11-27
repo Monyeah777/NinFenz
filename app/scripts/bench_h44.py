@@ -25,7 +25,8 @@ if SOURCE_CORE.exists():
 OUT = REPO / "results" / "app" / "governance" / "benchmarks"
 CREATED = "2026-01-01T00:00:00Z"
 PROFILES = ["default", "accessible", "print", "mobile", "large-print"]
-EPUBCHECK = Path(os.environ.get("EPUBCHECK_JAR", "D:/tmp/epubcheck/epubcheck-5.1.0/epubcheck.jar"))
+# 不内置本机绝对路径：未设置 EPUBCHECK_JAR 时跳过 EPUBCheck（结果里如实记 null）。
+EPUBCHECK = Path(os.environ["EPUBCHECK_JAR"]) if os.environ.get("EPUBCHECK_JAR") else None
 
 
 def run(op: str, req: dict) -> tuple[int, dict]:
@@ -68,8 +69,8 @@ def make_doc(i: int) -> tuple[str, dict]:
 
 
 def epubcheck(path: Path) -> tuple[int, str]:
-    if not EPUBCHECK.is_file():
-        return 1, "EPUBCheck jar missing"
+    if EPUBCHECK is None or not EPUBCHECK.is_file():
+        return 1, "EPUBCheck jar missing（设置 EPUBCHECK_JAR 后重跑）"
     p = subprocess.run(["java", "-jar", str(EPUBCHECK), str(path)], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=120)
     out = p.stdout.decode("utf-8", errors="replace")
     m = re.search(r"Messages:\s*(\d+)\s+fatals\s*/\s*(\d+)\s+errors", out)
@@ -128,7 +129,7 @@ def main() -> int:
         "epubcheck_errors": epub_errors,
         "docx_structural_ok": docx_ok,
         "html_structural_ok": html_ok,
-        "epubcheck_jar": str(EPUBCHECK),
+        "epubcheck_jar": str(EPUBCHECK) if EPUBCHECK else None,
         "criteria": {"parity": ">=98%", "epubcheck": 0, "docx": "100%", "html": "100%"},
     }
     path = OUT / "H44.json"

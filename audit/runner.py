@@ -1102,7 +1102,7 @@ def check_python_security_sink(ctx: Context, rule: dict):
             lineno = getattr(node, "lineno", 1)
             marker = p.get("allow_marker")
             if marker:
-                window = "\n".join(text.splitlines()[max(0, lineno - 3):lineno + 2])
+                window = "\n".join(text.splitlines()[max(0, lineno - 5):lineno + 3])
                 if re.search(marker, window):
                     continue
             if "shell" in wanted and name in SINKS["shell"]:

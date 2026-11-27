@@ -15,7 +15,7 @@ from jsonschema import Draft202012Validator
 from .paths import schema_dir
 
 
-@lru_cache(maxsize=None)
+@lru_cache(maxsize=1)
 def schema_names() -> tuple[str, ...]:
     return tuple(sorted(p.name[: -len(".schema.json")] for p in schema_dir().glob("*.schema.json")))
 
@@ -24,7 +24,7 @@ def _file_for(stem: str):
     return schema_dir() / f"{stem}.schema.json"
 
 
-@lru_cache(maxsize=None)
+@lru_cache(maxsize=128)
 def load_schema(stem: str) -> dict:
     path = _file_for(stem)
     if not path.is_file():
@@ -32,7 +32,7 @@ def load_schema(stem: str) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-@lru_cache(maxsize=None)
+@lru_cache(maxsize=128)
 def validator(stem: str) -> Draft202012Validator:
     return Draft202012Validator(load_schema(stem))
 

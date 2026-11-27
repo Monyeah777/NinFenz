@@ -43,3 +43,10 @@ object NfStatusColors {
     const val WARN = 0xFFB26A00
     const val INFO = 0xFF1565C0
 }
+
+/** 内容/图形色 token：代码高亮底色与 Pack Builder 图可视化（N-008：禁止散落硬编码颜色）。 */
+object NfContentColors {
+    const val CODE_BG: Long = 0x1A6750A4L
+    const val GRAPH_EDGE: Long = 0xFF8AA6A0L
+    const val GRAPH_NODE: Long = 0xFF00695CL
+}

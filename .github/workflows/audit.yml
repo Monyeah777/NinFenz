@@ -1,0 +1,40 @@
+name: audit
+# 全仓审计门禁（Part2 体系）：离线规则库 + 评分 + 阈值判定。
+# 口径见 audit/README.md；规则 166 条、A–N 十四维；tool/manual 规则在无工具环境下记 not-run（不计分、不写成通过）。
+# 说明：本 workflow 只跑离线执行器与门禁，不安装 detekt/ktlint/CodeQL 等重型工具；工具接入后
+# 在 audit/ci/gate.sh 前追加对应步骤，并把 rules.json 里对应规则从 tool 改为可复现命令。
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6
+        with:
+          python-version: "3.11"
+      - name: 离线审计（全量 script 规则）
+        run: |
+          short="${GITHUB_SHA::9}"
+          python audit/runner.py --root . --commit "$short" --out "audit/evidence/$short"
+      - name: 门禁判定
+        run: |
+          short="${GITHUB_SHA::9}"
+          bash audit/ci/gate.sh --evidence "audit/evidence/$short"
+      - name: 上传证据包
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7
+        with:
+          name: nf-audit-evidence
+          path: audit/evidence/
+          retention-days: 30

@@ -47,6 +47,10 @@
 - 命中数按规则实际条数统计（issues.json 单规则最多保留 200 条用于防超大文件，截断不影响评分/门禁，完整数字见 meta.json 的 rule_status.hits）；
 - tool / manual / no_targets / error 均不计扣分，也不写成通过；error 与 no_targets 由门禁单独拦。
 
+| `audit/report.md` | 汇总报告（由 `audit/ci/consolidate_report.py` 从最新证据包生成） |
+| `audit/ci/` | 门禁脚本 gate.sh + 阈值 + 汇总报告生成器 |
+| `.github/workflows/audit.yml` | CI：跑审计 + 门禁 + 上传证据包（actions 钉 commit SHA） |
+
 ## 跑法
 
     python audit/runner.py --root D:/d/tmp/nf-036 --commit aeae36b11 --out audit/evidence/aeae36b11

@@ -42,6 +42,7 @@ import dev.ninfenz.mobile.ui.components.EmptyState
 import dev.ninfenz.mobile.ui.components.FormTextField
 import dev.ninfenz.mobile.ui.components.NfScaffold
 import dev.ninfenz.mobile.ui.design.NfType
+import dev.ninfenz.mobile.ui.theme.NfContentColors
 import dev.ninfenz.mobile.ui.theme.NfSpacing
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
@@ -342,7 +343,7 @@ private fun GraphMap(nodes: List<kotlinx.serialization.json.JsonElement>, edges:
             val to = edge["to"]?.jsonPrimitive?.content.orEmpty()
             if (from.isNotBlank() && to.isNotBlank()) {
                 drawLine(
-                    color = androidx.compose.ui.graphics.Color(0xFF8AA6A0),
+                    color = androidx.compose.ui.graphics.Color(NfContentColors.GRAPH_EDGE),
                     start = pos(from),
                     end = pos(to),
                     strokeWidth = 4f
@@ -351,7 +352,7 @@ private fun GraphMap(nodes: List<kotlinx.serialization.json.JsonElement>, edges:
         }
         ids.forEach { id ->
             drawCircle(
-                color = androidx.compose.ui.graphics.Color(0xFF00695C),
+                color = androidx.compose.ui.graphics.Color(NfContentColors.GRAPH_NODE),
                 radius = 22f,
                 center = pos(id)
             )
