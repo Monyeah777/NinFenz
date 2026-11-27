@@ -383,13 +383,13 @@ def load(tag: str, ckey: str,
     try:
         got = json_doc.load(_path(tag, ckey), None, what=ckey)
     except Exception:                                  # noqa: BLE001 - 缺件/半截/不可读
-        return None
+        return None  # best-effort 显式忽略（不可读/不可用属预期，由上层门禁另行报出）
     if validate is not None:
         try:
             if not validate(got):
                 return None
         except Exception:                              # noqa: BLE001 - 校验器自己炸也算不可信
-            return None
+            return None  # best-effort 显式忽略（不可读/不可用属预期，由上层门禁另行报出）
     return got
 
 
@@ -440,4 +440,4 @@ def prune(tag: str, keep: int = KEEP) -> None:
         for old in entries[keep:]:
             old.unlink()
     except Exception:                                  # noqa: BLE001 - 裁剪失败不影响结果
-        return
+        return  # best-effort 显式忽略（不可读/不可用属预期，由上层门禁另行报出）

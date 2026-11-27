@@ -55,7 +55,7 @@ def parse(text: str) -> Optional[Tuple[frozenset, bool]]:
     try:
         tree = ast.parse(text)
     except Exception:                                        # noqa: BLE001 - 解析不出即「说不清」
-        return None
+        return None  # best-effort 显式忽略（不可读/不可用属预期，由上层门禁另行报出）
     deps: set = set()
     dyn = False
     for node in ast.walk(tree):

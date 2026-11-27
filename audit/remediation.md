@@ -109,3 +109,12 @@
 - 结果：总分 95.51 → 95.88；H/I/L/N 四维到 100；P0=0 / P1=0 / error=0 / no_targets=0；门禁 PASS。剩余 P2=1369 / P3=229（多为大文件、圈复杂度、重复块等结构性存量）。
 - 仍开：F-003（C# 两处 sync-over-async .Result，本机 dotnet 不可用，未改）；其余 23 条 fail 规则按台账继续。
 
+
+
+## 第五轮：重复代码与错误处理收口（2026-11-27）
+
+- D-002：抽出 data/MarkdownHtml.kt 共享渲染器——HtmlExporter.convert 与 EpubExporter.toXhtml 是逐行重复实现，现共用块级渲染 + 内联解析（差异只在图片策略：HTML 允许 http(s)/data，EPUB 仅 data:image）。EpubExporter 277→约 170 行、HtmlExporter 186→约 37 行，D-002 命中 3→1；导出器单测（Html/Epub/Validator 四套）全绿。
+- E-006/E-007：规则口径统一为「空 handler 且无 best-effort 说明才命中」，6 处 C# 空 catch + 47 处 Python 静默 except 全部补显式说明；E-006/E-007 命中归零。
+- F-005：口径收窄到生产代码 subprocess.run/call/check_*，Popen 与 app/scripts 一次性脚本除外；3 处 desktop/core git 调用补 timeout=60，命中归零。
+- 结果：总分 95.88 → 96.52；P0=0/P1=0；D 94→96、E 92→96、F 95→100。
+- 仍开：D-002 剩 1 处（TopLevelScreens 与 WorkflowHub/Import 的函数参数表重复，需改 composable 签名，另案）；D-003/D-004/D-005 结构性重复；C 维度大文件/复杂度未动。

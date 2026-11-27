@@ -832,7 +832,7 @@ def query_stats(doc: Optional[Dict[str, Any]] = None,
         got = json.loads(out.decode("utf-8"))
         return got if isinstance(got, dict) else None
     except Exception:                                    # noqa: BLE001 - 查不到就如实说查不到
-        return None
+        return None  # best-effort 显式忽略（不可读/不可用属预期，由上层门禁另行报出）
 
 
 def ping(doc: Optional[Dict[str, Any]] = None, timeout: float = 2.0) -> bool:

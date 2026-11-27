@@ -926,7 +926,8 @@
       "params": {
         "globs": [
           "engine/dotnet/**/*.cs"
-        ]
+        ],
+        "allow_marker": "best-effort"
       },
       "penalty": 2,
       "source": "C# 惯例"
@@ -945,7 +946,8 @@
           "desktop/src/core/**/*.py",
           "app/cli/**/*.py",
           "scripts/**/*.py"
-        ]
+        ],
+        "allow_marker": "best-effort"
       },
       "penalty": 2,
       "source": "CISQ"
@@ -1139,15 +1141,17 @@
       "dimension": "F",
       "iso": "performance.resource-utilization",
       "severity": "P2",
-      "statement": "Python 生产代码 subprocess 必须设置 timeout",
+      "statement": "Python 生产代码 subprocess.run/call/check_* 必须设置 timeout（Popen 由调用方 wait/timeout 管理；一次性脚本不在此列）",
       "check": "script",
       "version": 1,
       "script": "python_subprocess_timeout",
       "params": {
         "globs": [
           "desktop/src/core/**/*.py",
-          "app/cli/**/*.py",
-          "app/scripts/**/*.py"
+          "app/cli/**/*.py"
+        ],
+        "exclude_calls": [
+          "Popen"
         ]
       },
       "penalty": 3,

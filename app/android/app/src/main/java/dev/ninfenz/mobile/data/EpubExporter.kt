@@ -62,180 +62,22 @@ object EpubExporter {
         val sb = StringBuilder()
         sb.append("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n")
         sb.append("<!DOCTYPE html>\n<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"zh\"><head><meta charset=\"utf-8\"/><title>")
-        sb.append(esc(c.title)).append("</title><link rel=\"stylesheet\" href=\"style.css\"/></head><body><h1>")
-        sb.append(esc(c.title)).append("</h1>\n").append(toXhtml(c.body)).append("</body></html>\n")
+        sb.append(MarkdownHtml.esc(c.title)).append("</title><link rel=\"stylesheet\" href=\"style.css\"/></head><body><h1>")
+        sb.append(MarkdownHtml.esc(c.title)).append("</h1>\n")
+        sb.append(MarkdownHtml.body(c.body, MarkdownHtml.ImagePolicy.DATA_ONLY))
+        sb.append("</body></html>\n")
         return sb.toString()
     }
-
-    private fun toXhtml(markdown: String): String {
-        val out = StringBuilder()
-        var inCode = false
-        var inList = false
-        var inQuote = false
-        var inOrdered = false
-        var codeLang = ""
-        val code = StringBuilder()
-        val table = mutableListOf<List<String>>()
-        var tableAlign = emptyList<String>()
-        fun closeQuote() {
-            if (inQuote) { out.append("</blockquote>"); inQuote = false }
-        }
-        fun closeLists() {
-            if (inList) { out.append("</ul>\n"); inList = false }
-            if (inOrdered) { out.append("</ol>\n"); inOrdered = false }
-        }
-        fun flushTable() {
-            if (table.isEmpty()) return
-            out.append("<table>")
-            table.forEachIndexed { index, cells ->
-                val tag = if (index == 0) "th" else "td"
-                if (index == 0) out.append("<thead>")
-                if (index == 1) out.append("<tbody>")
-                out.append("<tr>")
-                cells.forEachIndexed { i, cell ->
-                    val align = tableAlign.getOrNull(i).orEmpty()
-                    val style = if (align.isBlank()) "" else " style=\"text-align:" + align + "\""
-                    out.append("<").append(tag).append(style).append(">").append(inline(cell)).append("</").append(tag).append(">")
-                }
-                out.append("</tr>")
-                if (index == 0) out.append("</thead>")
-            }
-            if (table.size > 1) out.append("</tbody>")
-            out.append("</table>")
-            table.clear()
-            tableAlign = emptyList()
-        }
-        markdown.replace("\r\n", "\n").split('\n').forEach { line ->
-            val fence = line.trimStart().startsWith("\u0060\u0060\u0060")
-            if (fence) {
-                if (inCode) {
-                    val cls = if (codeLang.isNotBlank()) " class=\"language-" + codeLang + "\"" else ""
-                    out.append("<pre><code").append(cls).append(">").append(esc(code.toString().trimEnd())).append("</code></pre>\n")
-                    code.clear()
-                    codeLang = ""
-                } else {
-                    codeLang = line.trimStart().removePrefix("\u0060\u0060\u0060").trim().takeWhile { it.isLetterOrDigit() || it == '_' || it == '-' }
-                }
-                inCode = !inCode
-                return@forEach
-            }
-            if (inCode) { code.append(line).append('\n'); return@forEach }
-            if (line.isBlank()) {
-                closeLists()
-                flushTable()
-                closeQuote()
-                return@forEach
-            }
-            val trimmed = line.trim()
-            if (trimmed.startsWith("> ")) {
-                flushTable()
-                closeLists()
-                if (!inQuote) { out.append("<blockquote>"); inQuote = true }
-                out.append("<p>").append(inline(trimmed.removePrefix("> "))).append("</p>")
-                return@forEach
-            }
-            val ordered = Regex("^\\s*\\d+\\.\\s+(.+)$").find(trimmed)
-            if (ordered != null) {
-                flushTable()
-                closeQuote()
-                if (inList) { out.append("</ul>\n"); inList = false }
-                if (!inOrdered) { out.append("<ol>"); inOrdered = true }
-                out.append("<li>").append(inline(ordered.groupValues[1])).append("</li>")
-                return@forEach
-            }
-            if (trimmed.startsWith("|") && trimmed.endsWith("|")) {
-                closeQuote()
-                closeLists()
-                val cells = trimmed.trim('|').split('|').map { it.trim() }
-                val separator = cells.isNotEmpty() && cells.all { Regex("^:?-{2,}:?$").matches(it) }
-                if (separator) {
-                    tableAlign = cells.map {
-                        when {
-                            it.startsWith(":") && it.endsWith(":") -> "center"
-                            it.startsWith(":") -> "left"
-                            it.endsWith(":") -> "right"
-                            else -> ""
-                        }
-                    }
-                } else {
-                    table.add(cells)
-                }
-                return@forEach
-            }
-            if (Regex("^-{3,}$").matches(trimmed)) {
-                flushTable()
-                closeQuote()
-                closeLists()
-                out.append("<hr/>")
-                return@forEach
-            }
-            val heading = Regex("^(#{1,6})\\s+(.+)$").find(line)
-            if (heading != null) {
-                flushTable()
-                closeQuote()
-                closeLists()
-                val level = heading.groupValues[1].length
-                out.append("<h").append(level).append(">").append(inline(heading.groupValues[2]))
-                    .append("</h").append(level).append(">\n")
-                return@forEach
-            }
-            if (line.trimStart().startsWith("- ")) {
-                flushTable()
-                closeQuote()
-                if (inOrdered) closeLists()
-                if (!inList) { out.append("<ul>\n"); inList = true }
-                out.append("<li>").append(inline(line.trimStart().removePrefix("- "))).append("</li>\n")
-                return@forEach
-            }
-            closeLists()
-            flushTable()
-            closeQuote()
-            out.append("<p>").append(inline(line)).append("</p>\n")
-        }
-        flushTable()
-        closeQuote()
-        closeLists()
-        if (inCode && code.isNotEmpty()) out.append("<pre><code>").append(esc(code.toString().trimEnd())).append("</code></pre>\n")
-        return out.toString()
-    }
-
-    private fun inline(s: String): String {
-        var text = esc(s)
-        text = Regex("\\u0060([^\\u0060]+)\\u0060").replace(text, "<code>$1</code>")
-        text = Regex("\\*\\*([^*]+)\\*\\*").replace(text, "<strong>$1</strong>")
-        text = Regex("\\*([^*]+)\\*").replace(text, "<em>$1</em>")
-        text = Regex("~~([^~]+)~~").replace(text, "<del>$1</del>")
-        text = Regex("!\\[([^\\]]*)\\]\\(([^)]+)\\)").replace(text) { match ->
-            val src = match.groupValues[2]
-            if (src.startsWith("data:image/")) {
-                "<img src=\"" + src + "\" alt=\"" + match.groupValues[1] + "\"/>"
-            } else {
-                match.value
-            }
-        }
-        text = Regex("\\[([^\\]]+)\\]\\(([^)]+)\\)").replace(text) { match ->
-            val href = match.groupValues[2]
-            if (href.startsWith("http://") || href.startsWith("https://") || href.startsWith("mailto:") || href.startsWith("#")) {
-                "<a href=\"" + href + "\">" + match.groupValues[1] + "</a>"
-            } else {
-                match.value
-            }
-        }
-        return text
-    }
-
-    private fun esc(s: String): String = s
-        .replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;")
 
     private fun opf(title: String, id: String, files: List<String>, author: String, language: String): String {
         val sb = StringBuilder()
         sb.append("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n")
         sb.append("<package xmlns=\"http://www.idpf.org/2007/opf\" version=\"3.0\" unique-identifier=\"uid\">")
         sb.append("<metadata xmlns:dc=\"http://purl.org/dc/elements/1.1/\">")
-        sb.append("<dc:identifier id=\"uid\">").append(esc(id)).append("</dc:identifier>")
-        sb.append("<dc:title>").append(esc(title)).append("</dc:title><dc:language>")
-            .append(esc(language.ifBlank { "zh" })).append("</dc:language>")
-        if (author.isNotBlank()) sb.append("<dc:creator>").append(esc(author)).append("</dc:creator>")
+        sb.append("<dc:identifier id=\"uid\">").append(MarkdownHtml.esc(id)).append("</dc:identifier>")
+        sb.append("<dc:title>").append(MarkdownHtml.esc(title)).append("</dc:title><dc:language>")
+            .append(MarkdownHtml.esc(language.ifBlank { "zh" })).append("</dc:language>")
+        if (author.isNotBlank()) sb.append("<dc:creator>").append(MarkdownHtml.esc(author)).append("</dc:creator>")
         sb.append("<meta property=\"dcterms:modified\">1970-01-01T00:00:00Z</meta></metadata><manifest>")
         sb.append("<item id=\"nav\" href=\"nav.xhtml\" media-type=\"application/xhtml+xml\" properties=\"nav\"/>")
         sb.append("<item id=\"css\" href=\"style.css\" media-type=\"text/css\"/>")
@@ -253,10 +95,10 @@ object EpubExporter {
         val sb = StringBuilder()
         sb.append("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n")
         sb.append("<!DOCTYPE html>\n<html xmlns=\"http://www.w3.org/1999/xhtml\" xmlns:epub=\"http://www.idpf.org/2007/ops\" lang=\"zh\">")
-        sb.append("<head><meta charset=\"utf-8\"/><title>").append(esc(title)).append("</title></head>")
-        sb.append("<body><nav epub:type=\"toc\"><h1>").append(esc(title)).append("</h1><ol>")
+        sb.append("<head><meta charset=\"utf-8\"/><title>").append(MarkdownHtml.esc(title)).append("</title></head>")
+        sb.append("<body><nav epub:type=\"toc\"><h1>").append(MarkdownHtml.esc(title)).append("</h1><ol>")
         chapters.forEachIndexed { i, c ->
-            sb.append("<li><a href=\"").append(files[i]).append("\">").append(esc(c.title)).append("</a></li>")
+            sb.append("<li><a href=\"").append(files[i]).append("\">").append(MarkdownHtml.esc(c.title)).append("</a></li>")
         }
         sb.append("</ol></nav></body></html>\n")
         return sb.toString()

@@ -71,7 +71,7 @@ def _git(root: Path, *args: str) -> Optional[str]:
         return None
     try:
         p = subprocess.run([git, *args], cwd=str(root), capture_output=True, text=True,  # noqa: S603
-                           encoding="utf-8", errors="replace")  # nosec B603/B607 —— argv 列表、无 shell
+                           encoding="utf-8", errors="replace", timeout=60)  # nosec B603/B607 —— argv 列表、无 shell
     except OSError:
         return None
     return p.stdout if p.returncode == 0 else None

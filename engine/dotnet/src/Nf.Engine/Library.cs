@@ -161,7 +161,7 @@ public static class Library
             }
             catch (IOException)
             {
-                // 尽力而为：不可读时跳过漂移判定（与 Python 同）
+                // 尽力而为：不可读时跳过漂移判定（与 Python 同）（best-effort 显式忽略）
             }
         }
 

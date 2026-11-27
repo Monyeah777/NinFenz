@@ -33,6 +33,7 @@ def _git(root: Path, *args: str) -> tuple[int, bytes]:
         cwd=str(root),
         capture_output=True,
         check=False,
+        timeout=60,
     )
     return proc.returncode, proc.stdout
 

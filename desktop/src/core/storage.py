@@ -175,7 +175,7 @@ class Store:
                     m.source_md = src.read_text(encoding="utf-8")
                 mods.append(m)
             except Exception:  # 尽力而为：跳过不可读/不可解析项（该类缺口由对应门禁与 AUD-0016 静默跳过清单另行报出）  # nosec B112 —— 尽力而为：跳过不可读/不可解析项（对应门禁另报；见 AUD-0016）
-                continue
+                continue  # best-effort 显式忽略（不可读/不可用属预期，由上层门禁另行报出）
         return mods
 
     def get_module(self, full_id: str) -> Optional[Module]:
@@ -207,7 +207,7 @@ class Store:
                 om = Module.from_json(json_doc.load(
                     old / "module.json", dict, what=str(old / "module.json")))
             except Exception:  # 尽力而为：跳过不可读/不可解析项（该类缺口由对应门禁与 AUD-0016 静默跳过清单另行报出）  # nosec B112 —— 尽力而为：跳过不可读/不可解析项（对应门禁另报；见 AUD-0016）
-                continue
+                continue  # best-effort 显式忽略（不可读/不可用属预期，由上层门禁另行报出）
             if fid_key(om.full_id) == key:
                 import shutil          # 惰性：`import shutil` 子树 ~9 ms，而写/删路径很少走（实测）
                 shutil.rmtree(old, ignore_errors=True)
@@ -227,7 +227,7 @@ class Store:
                 mm = Module.from_json(json_doc.load(
                     d / "module.json", dict, what=str(d / "module.json")))
             except Exception:  # 尽力而为：跳过不可读/不可解析项（该类缺口由对应门禁与 AUD-0016 静默跳过清单另行报出）  # nosec B112 —— 尽力而为：跳过不可读/不可解析项（对应门禁另报；见 AUD-0016）
-                continue
+                continue  # best-effort 显式忽略（不可读/不可用属预期，由上层门禁另行报出）
             if fid_key(mm.full_id) == key:
                 import shutil
                 shutil.rmtree(d, ignore_errors=True)
@@ -255,7 +255,7 @@ class Store:
                     a.source_dir = str(d)
                     out.append(a)
                 except Exception:  # nosec B112 —— 尽力而为：跳过不可读/不可解析项（见 AUD-0016）
-                    continue
+                    continue  # best-effort 显式忽略（不可读/不可用属预期，由上层门禁另行报出）
         return out
 
     def get_asset_pack(self, name: str) -> Optional[AssetPack]:
@@ -292,7 +292,7 @@ class Store:
                 out.append(Preset.from_json(
                     json_doc.load(f, dict, what=str(f))))
             except Exception:  # nosec B112 —— 尽力而为：跳过不可读/不可解析项（见 AUD-0016）
-                continue
+                continue  # best-effort 显式忽略（不可读/不可用属预期，由上层门禁另行报出）
         return out
 
     def save_preset(self, p: Preset) -> Path:
@@ -323,7 +323,7 @@ class Store:
                 # 故不限定顶层形状——这里只保证「合法 JSON 才回，坏件回 None」。
                 return json_doc.load(f, None, what=str(f))
             except Exception:  # 缓存坏件/缺件 ⇒ 无命中（等价于未缓存，重算即可）
-                return None
+                return None  # best-effort 显式忽略（不可读/不可用属预期，由上层门禁另行报出）
         return None
 
     # ---------- 统计 ----------

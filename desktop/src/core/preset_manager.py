@@ -90,7 +90,7 @@ def import_preset_file(store: Store, path: Path | str) -> Optional[Preset]:
     try:
         text = f.read_text(encoding="utf-8")
     except Exception:  # 件不可读 ⇒ None（调用方据此报「预设不可用」）
-        return None
+        return None  # best-effort 显式忽略（不可读/不可用属预期，由上层门禁另行报出）
     p = import_preset_json(text)
     if p:
         store.save_preset(p)

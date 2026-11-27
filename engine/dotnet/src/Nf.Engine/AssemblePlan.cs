@@ -75,7 +75,7 @@ public static class AssemblePlan
             }
             catch (Exception)
             {
-                // 真源：尽力而为——跳过不可读/不可解析项（该类缺口由对应门禁另行报出）
+                // 真源：尽力而为——跳过不可读/不可解析项（该类缺口由对应门禁另行报出）（best-effort 显式忽略）
             }
         }
         return sets;

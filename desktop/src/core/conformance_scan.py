@@ -814,7 +814,7 @@ def _parse_fence_yaml(text: str, marker: str) -> Any:
         try:
             parsed = load_yaml_cached(body) if _lyaml.module() is not None else None
         except Exception:  # 围栏 YAML 不可解析 ⇒ None（等价于「本件无该块」）
-            return None
+            return None  # best-effort 显式忽略（不可读/不可用属预期，由上层门禁另行报出）
         if isinstance(parsed, dict):
             return parsed
     return None

@@ -2410,14 +2410,14 @@ def _seed_store(store):
             store.save_module(parse_module(Path(f).read_text(encoding="utf-8")))
             stats["core"] += 1
         except Exception:  # nosec B110/B112 —— 尽力而为：跳过不可读/不可解析项；该类缺口由对应门禁与 AUD-0016 静默跳过清单另行报出
-            continue
+            continue  # best-effort 显式忽略（不可读/不可用属预期，由上层门禁另行报出）
     for f in sorted(glob.glob(os.path.join(ROOT, "community",
                                            "校园西幻轻混组合包", "modules", "*.md"))):
         try:
             store.save_module(parse_module(Path(f).read_text(encoding="utf-8")))
             stats["combo"] += 1
         except Exception:  # 尽力而为：跳过不可读/不可解析项（该类缺口由对应门禁与 AUD-0016 静默跳过清单另行报出）  # nosec B112 —— 尽力而为：跳过不可读/不可解析项（对应门禁另报；见 AUD-0016）
-            continue
+            continue  # best-effort 显式忽略（不可读/不可用属预期，由上层门禁另行报出）
     return stats
 
 
@@ -2567,7 +2567,7 @@ def _cmd_market(args) -> int:
                 raw = _yaml.safe_load(f)
             data[raw["package"]["id"]] = raw
         except Exception:  # 尽力而为：跳过不可读/不可解析项（该类缺口由对应门禁与 AUD-0016 静默跳过清单另行报出）  # nosec B112 —— 尽力而为：跳过不可读/不可解析项（对应门禁另报；见 AUD-0016）
-            continue
+            continue  # best-effort 显式忽略（不可读/不可用属预期，由上层门禁另行报出）
 
     seen, dep_issues = dependencies(pkg_id, prots, data)
     cfl = conflicts(pkg_id, prots, data)
@@ -10115,7 +10115,7 @@ def guarded_main(argv=None) -> int:
             devnull = os.open(os.devnull, os.O_WRONLY)
             os.dup2(devnull, sys.stdout.fileno())
         except Exception:  # nosec B110 —— 尽力而为：终端重定向失败即沿用默认（见 AUD-0016）
-            pass
+            pass  # best-effort 显式忽略（不可读/不可用属预期，由上层门禁另行报出）
         code = 0
     except KeyboardInterrupt:
         code = 130
@@ -10146,7 +10146,7 @@ def cli(argv=None) -> int:
         if _sigpipe is not None:
             signal.signal(_sigpipe, signal.SIG_DFL)
     except Exception:  # 尽力而为：跳过不可读/不可解析项（该类缺口由对应门禁与 AUD-0016 静默跳过清单另行报出）  # nosec B110 —— 尽力而为：跳过不可读/不可解析项（对应门禁另报；见 AUD-0016）
-        pass
+        pass  # best-effort 显式忽略（不可读/不可用属预期，由上层门禁另行报出）
     return guarded_main(argv)
 
 

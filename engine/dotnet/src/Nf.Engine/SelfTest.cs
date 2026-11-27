@@ -108,7 +108,7 @@ public static class SelfTest
         }
         finally
         {
-            try { Directory.Delete(work, recursive: true); } catch (IOException) { /* 临时目录清理失败不影响判定 */ }
+            try { Directory.Delete(work, recursive: true); } catch (IOException) { /* 临时目录清理失败不影响判定（best-effort 显式忽略） */ }
         }
         return NormalizeTempPaths(checks);
     }
@@ -4302,9 +4302,9 @@ public static class SelfTest
             missing.Any(x => x.Contains("protocol.yaml 缺失")) && noPkg.Any(x => x.Contains("缺 package 段"))
             && notRegistered.Any(x => x.Contains("不在 02 §8 在册")),
             $"缺件={missing.Count} · 缺段={noPkg.Count} · 未在册={notRegistered.Count} 条问题"));
-        try { Directory.Delete(tmp, recursive: true); } catch (IOException) { /* 清理失败不影响判定 */ }
+        try { Directory.Delete(tmp, recursive: true); } catch (IOException) { /* 清理失败不影响判定（best-effort 显式忽略） */ }
 
-        // ① 分级：官方 13 件比**完整 id**（事件:M22 官方 vs 情感:M22 社区同号段）；M91-M99 按裸号判实验
+        // ① 分级：官方 13 件比**完整 id**（事件:M22 官方 vs 情感:M22 社区同号段）；M91-M99 按裸号判实验（best-effort 显式忽略）
         var grades = new (string Id, string Want)[]
         {
             ("M50", "official"), ("事件:M22", "official"), ("情感:M22", "community"),

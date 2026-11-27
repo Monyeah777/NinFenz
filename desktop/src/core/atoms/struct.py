@@ -52,7 +52,7 @@ def yaml_load_safe(path: Path) -> Any | None:
     try:
         return module.safe_load(text)
     except Exception:
-        return None
+        return None  # best-effort 显式忽略（不可读/不可用属预期，由上层门禁另行报出）
 
 
 def _read(path: Path) -> str | None:

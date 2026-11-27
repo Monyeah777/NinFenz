@@ -10,6 +10,7 @@
 | p1fix（P1 整改后） | 0.3.7-preview.1 | 166 | **94.0** | 0 | 0 | 1377 | 256 | audit/evidence/p1fix/ |
 | c-dim（C 维度收口 + 规则校准） | 0.3.7-preview.1 | 166 | **95.51** | 0 | 0 | 1369 | 242 | audit/evidence/c-dim/ |
 | p2-batch1（小批量 P2 + 交付面） | 0.3.7-preview.1 | 166 | **95.88** | 0 | 0 | 1369 | 229 | audit/evidence/p2-batch1/ |
+| p2-batch2（重复代码 + 错误处理） | 0.3.7-preview.1 | 166 | **96.52** | 0 | 0 | 1294 | 229 | audit/evidence/p2-batch2/ |
 
 ## 维度分变化
 
@@ -51,3 +52,8 @@
 - 最新证据 p2-batch1：总分 95.88，P0=0/P1=0/error=0/no_targets=0，audit/ci/gate.sh PASS。
 - 维度：A97 B94 C80 D94 E92 F95 G100 H100 I100 J100 K100 L100 M100 N100。
 - CI：.github/workflows/audit.yml 在 push/PR 跑同一套 runner + gate 并上传证据包（actions 钉 SHA）。
+
+## 门禁状态（第五轮后）
+
+- 最新证据 p2-batch2：总分 96.52，P0=0/P1=0/error=0/no_targets=0，audit/ci/gate.sh PASS。
+- 本轮主要收益：D-002 3→1（共享 Markdown 渲染器）、E-006 6→0、E-007 47→0、F-005 18→0（口径收窄到生产代码后）。

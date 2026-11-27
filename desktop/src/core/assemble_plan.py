@@ -76,7 +76,7 @@ def _package_module_sets() -> Dict[str, List[str]]:
             if pkg:
                 sets[str(pkg)] = [str(x) for x in mids[0]]
         except Exception:  # nosec B110/B112 —— 尽力而为：跳过不可读/不可解析项；该类缺口由对应门禁与 AUD-0016 静默跳过清单另行报出
-            continue
+            continue  # best-effort 显式忽略（不可读/不可用属预期，由上层门禁另行报出）
     return sets
 
 

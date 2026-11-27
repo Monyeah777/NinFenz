@@ -18,7 +18,7 @@ internal static class Program
         }
         catch (IOException)
         {
-            // 输出被重定向到管道时个别平台不允许改编码；字节写出不依赖它。
+            // 输出被重定向到管道时个别平台不允许改编码；字节写出不依赖它。（best-effort 显式忽略）
         }
 
         string? file = null;

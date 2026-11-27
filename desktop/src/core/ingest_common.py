@@ -178,7 +178,7 @@ def injection_probe(text):
         from core import trust_boundary as tb  # noqa: PLC0415
         return tb.detect(text)
     except Exception:                                    # noqa: BLE001 - 扫描不可用时如实降级
-        return None
+        return None  # best-effort 显式忽略（不可读/不可用属预期，由上层门禁另行报出）
 
 #: 模板残留说明短语（**单一真源**）：投稿人 = 蠢用户，机器兜底。
 #: 2026-10-14 取并集——此前 GitHub 侧 8 条 / Gitee 侧 10 条，两句模板占位句只在 Gitee 侧生效。
@@ -218,7 +218,7 @@ def run_git(args, secret=None, dry=False):
     if dry:
         return
     proc = subprocess.run(['git', *args], capture_output=True, text=True,
-                          encoding='utf-8', errors='replace')
+                          encoding='utf-8', errors='replace', timeout=60)
     for stream in (proc.stdout, proc.stderr):
         if stream:
             print(redact(stream, secret), end='')

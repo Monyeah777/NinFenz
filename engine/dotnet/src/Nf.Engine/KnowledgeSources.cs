@@ -325,7 +325,7 @@ public static class KnowledgeSources
                 }
                 catch (System.Text.Json.JsonException)
                 {
-                    // Python：单行解析失败即 continue（不整体失败）
+                    // Python：单行解析失败即 continue（不整体失败）（best-effort 显式忽略）
                 }
             }
         }

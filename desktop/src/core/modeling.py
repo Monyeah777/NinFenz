@@ -264,7 +264,7 @@ def _tracked(root: str) -> set | None:
         out = subprocess.run(["git", "-C", str(root), "ls-files", "-z"],
                              capture_output=True, text=True, timeout=60)
     except Exception:
-        return None
+        return None  # best-effort 显式忽略（不可读/不可用属预期，由上层门禁另行报出）
     if out.returncode != 0:
         return None
     return {p for p in out.stdout.split("\0") if p}

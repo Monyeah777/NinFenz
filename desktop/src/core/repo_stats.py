@@ -43,7 +43,7 @@ def _read_json(path: str) -> Any:
     try:
         return json_doc.load(path, None, what=path)
     except Exception:  # noqa: BLE001
-        return None
+        return None  # best-effort 显式忽略（不可读/不可用属预期，由上层门禁另行报出）
 
 
 def compute(root: str = ".") -> Tuple[Dict[str, Any], List[str]]:

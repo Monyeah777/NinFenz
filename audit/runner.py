@@ -1211,6 +1211,8 @@ def check_python_subprocess_timeout(ctx: Context, rule: dict):
                 continue
             if fn.attr not in ("run", "call", "check_call", "check_output", "Popen"):
                 continue
+            if fn.attr in (p.get("exclude_calls") or []):
+                continue
             if any(kw.arg == "timeout" for kw in node.keywords):
                 continue
             lineno = getattr(node, "lineno", 1)
@@ -1258,6 +1260,11 @@ def check_python_swallow_exception(ctx: Context, rule: dict):
                 return False
 
             if all(swallows(stmt) for stmt in body):
+                marker = p.get("allow_marker")
+                if marker:
+                    window = "\n".join(text.splitlines()[node.lineno - 1:getattr(node, "end_lineno", node.lineno)])
+                    if re.search(marker, window):
+                        continue
                 hits.append(hit(rel, node.lineno, "异常被静默吞掉（仅 pass/continue/return None）", line_at(text, node.lineno)))
     return hits, files
 

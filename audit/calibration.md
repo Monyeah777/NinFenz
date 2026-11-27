@@ -24,6 +24,9 @@
 | M-010 | CITATION 必须含 `version:` | 必须有 `cff-version` 且**不钉死** version | `CITATION.cff` 文件头纪律 + `desktop/tests/test_citation_contract.py` | 原规则与仓内明文纪律直接冲突（钉版本会漂移） |
 | N-006 | 伪 locale key 100% 覆盖（缺失即扣分） | 改 manual：人工跟踪，暂不自动扣分 | en-XA 1237/1453，缺 216（真实缺口） | 自动规则会逼出假翻译；改人工并挂 owner，到期 2026-12 |
 | I-005 | 单资产/原生库 ≤3MB | ≤7MB（当前最大 6.44MB） | libnf_app_core.so 6,440,840B（Rust 核心本体）；字体 4.08MB（CJK 覆盖所需） | 3MB 对含 Rust 核心 + CJK 字体的 APK 不现实；总量由发布门禁 ≤20MB 守住 |
+| E-006 | C# 空 catch 一律命中 | 体为空且无 best-effort 说明才命中 | engine/dotnet 6 处空 catch 全部补 best-effort 注释 | 与 E-002 同口径：显式忽略需可搜索声明 |
+| E-007 | Python 兜底 except 静默吞掉一律命中 | 体为空且无 best-effort 说明才命中 | 47 处补 best-effort 说明（不可读/不可用属预期，由上层门禁另报） | 与 E-002/E-006 同口径 |
+| F-005 | Python 所有 subprocess 调用必须 timeout | 仅生产代码 subprocess.run/call/check_* 必须 timeout；Popen 与 app/scripts 一次性脚本除外 | Popen 由调用方 wait/timeout 管理（daemon/rust_engine）；bench/一次性脚本非生产运行路径 | 收窄到规则本意「生产代码不挂死」 |
 
 ## 校准后的门禁含义
 

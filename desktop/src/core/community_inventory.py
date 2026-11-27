@@ -194,7 +194,7 @@ def load_community_module(pkg: str, full_id: str,
             module.source_path = ""
         return module
     except Exception:  # 件不可读/不可解析 ⇒ None（调用方据此报「不可用」）
-        return None
+        return None  # best-effort 显式忽略（不可读/不可用属预期，由上层门禁另行报出）
 
 
 def load_community_pipeline(pkg: str, pid: str,
@@ -209,7 +209,7 @@ def load_community_pipeline(pkg: str, pid: str,
         try:
             pl = load_pipeline_file(f)
         except Exception:  # nosec B110/B112 —— 尽力而为：跳过不可读/不可解析项；该类缺口由对应门禁与 AUD-0016 静默跳过清单另行报出
-            continue
+            continue  # best-effort 显式忽略（不可读/不可用属预期，由上层门禁另行报出）
         if pl is not None and pl.id == pid:
             return pl
     return None

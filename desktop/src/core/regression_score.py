@@ -53,7 +53,7 @@ def _count(root: str, module: str, fn: str) -> Optional[int]:
         mod = __import__("core.%s" % module, fromlist=[fn])
         issues = getattr(mod, fn)(root)
     except Exception:  # 计数面算不出 ⇒ None（调用方按「该项缺失」如实呈现）
-        return None
+        return None  # best-effort 显式忽略（不可读/不可用属预期，由上层门禁另行报出）
     if isinstance(issues, tuple):
         issues = issues[0]
     return len(issues or [])
@@ -139,7 +139,7 @@ def _markers(root: str) -> Optional[list]:
         from core import doc_hygiene
         return doc_hygiene.check_markers(root)
     except Exception:  # 标记面算不出 ⇒ None（调用方按「该项缺失」如实呈现）
-        return None
+        return None  # best-effort 显式忽略（不可读/不可用属预期，由上层门禁另行报出）
 
 
 def compare(current: Dict[str, Any], baseline: Dict[str, Any],
