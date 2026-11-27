@@ -97,7 +97,7 @@
       "dimension": "A",
       "iso": "maintainability.modularity",
       "severity": "P2",
-      "statement": "Kotlin 包间不得成环",
+      "statement": "跨层包间不得成环（根包 R/Activity 与 UI 子包内部互引除外，见 calibration）",
       "check": "script",
       "version": 1,
       "script": "import_cycle",
@@ -106,7 +106,14 @@
           "app/android/app/src/main/java/**/*.kt",
           "app/desktop/src/main/kotlin/**/*.kt"
         ],
-        "internal_prefix": "dev.ninfenz"
+        "internal_prefix": "dev.ninfenz",
+        "allow_root_packages": [
+          "dev.ninfenz.mobile"
+        ],
+        "allow_prefixes": [
+          "dev.ninfenz.mobile.ui",
+          "dev.ninfenz.studio.ui"
+        ]
       },
       "penalty": 3,
       "source": "Konsist/依赖分析 + 脚本近似"

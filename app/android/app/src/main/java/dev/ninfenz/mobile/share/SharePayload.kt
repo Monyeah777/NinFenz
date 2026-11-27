@@ -1,12 +1,7 @@
 package dev.ninfenz.mobile.share
 
-/** 单个分享条目：content/file URI 或纯文本（二选一，可并存）。 */
-data class SharedItem(
-    val uri: String?,
-    val text: String?,
-    val mime: String?,
-    val name: String?
-)
+/** 单个分享条目已下沉到 data 包；这里保留别名兼容既有 import（data -> share 回引会成环）。 */
+typealias SharedItem = dev.ninfenz.mobile.data.SharedItem
 
 /** 分享/打开/划词入口的统一载荷（ShareReceiverActivity → 主界面导入流程）。 */
 data class SharePayload(

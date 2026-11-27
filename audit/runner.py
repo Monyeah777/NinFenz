@@ -773,11 +773,22 @@ def check_import_cycle(ctx: Context, rule: dict):
     for pkg in sorted(clean):
         if color.get(pkg, 0) == 0:
             dfs(pkg, [])
+    allow_root = set(p.get("allow_root_packages") or [])
+    allow_prefixes = tuple(p.get("allow_prefixes") or [])
     seen = set()
     hits = []
     for cyc in cycles:
         key = tuple(sorted(cyc))
         if key in seen:
+            continue
+        pkgs = set(cyc)
+        # 根包（R/BuildConfig/MainActivity）与 UI 子包内部的相互引用是单模块 Android/Compose
+        # 的固有结构；规则只追究跨层成环。
+        if pkgs & allow_root:
+            continue
+        if allow_prefixes and all(
+            any(pkg == pre or pkg.startswith(pre + ".") for pre in allow_prefixes) for pkg in pkgs
+        ):
             continue
         seen.add(key)
         chain = " -> ".join(cyc)

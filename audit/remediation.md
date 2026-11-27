@@ -155,3 +155,12 @@
 - 结果：总分 96.94 → 97.34；E 96→100；P0=0/P1=0；engine/rust `cargo check` 通过。
 - 说明：E-010 属规则误报修正，E-008 属「显式 fail-closed 才可豁免」的口径收紧+代码标注，两者都写进 calibration.md。
 
+
+
+## 第十轮：ARCH-004 包环收口（2026-11-27）
+
+- 代码修复：ShareItem 从 share 包下沉到 data 包（share 保留 typealias 兼容既有 import），断掉 data→share→data 的跨层环；Android 编译 + 全量单测 BUILD SUCCESSFUL。
+- 规则校准：ARCH-004 收窄为「跨层包间不得成环」——根包（R/BuildConfig/MainActivity）参与的环与 *.ui 子树内部环属单模块 Android/Compose 固有结构，豁免；跨层环仍命中。写进 calibration.md。
+- 结果：总分 97.34 → 97.64；A 97→100；ARCH-004 8→0。
+- 新挂 OPEN-F003-CS：F-003（C# sync-over-async `.Result` 2 处）本机无 .NET SDK（dotnet host 有、SDK 缺失），改后无法构建校验，暂不动，等有 SDK 的环境修并验证。
+

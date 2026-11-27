@@ -29,6 +29,7 @@
 | F-005 | Python 所有 subprocess 调用必须 timeout | 仅生产代码 subprocess.run/call/check_* 必须 timeout；Popen 与 app/scripts 一次性脚本除外 | Popen 由调用方 wait/timeout 管理（daemon/rust_engine）；bench/一次性脚本非生产运行路径 | 收窄到规则本意「生产代码不挂死」 |
 | E-008 | Rust 生产路径任何 panic!/todo!/unimplemented! 即命中 | fail-closed 处带 `audit: panic-fail-closed` 说明（同一处前 3 行内）可豁免 | app/core/src/limits.rs 内嵌 limits.json 契约破坏、engine/rust/src/pyrandom.rs 越出已复刻子集 | 两处是刻意的 fail-closed 断言，静默降级会破坏契约/逐位对账；豁免须可搜索 |
 | E-010 | Rust unwrap/expect 统计包含测试模块 | 先用 `strip_rust_test_modules` 剔除 `#[cfg(test)] mod tests` 整块再统计 | asset_contract.rs 39→3、miniyaml/contracts 等同类下降；E-010 命中 7→0 | 规则本意是「生产路径」，测试里的 unwrap 是断言手段，计入属误报 |
+| ARCH-004 | Kotlin 包间任何环都命中 | 跨层环才算；根包 `dev.ninfenz.mobile`（R/BuildConfig/MainActivity）参与的环与 `*.ui` 子树内部环豁免 | 单模块 Android 的 R/Activity 必与子包互引；Compose ui↔ui.components↔ui.screens 天然互引（不是可维护性缺陷） | 规则本意是「跨层不得成环」；豁免范围写死在 rules.json，跨层环（如 data↔share）仍会命中 |
 
 ## 校准后的门禁含义
 

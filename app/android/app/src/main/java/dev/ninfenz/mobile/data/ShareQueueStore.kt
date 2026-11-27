@@ -1,6 +1,5 @@
 package dev.ninfenz.mobile.data
 
-import dev.ninfenz.mobile.share.SharedItem
 import java.io.File
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonArray
