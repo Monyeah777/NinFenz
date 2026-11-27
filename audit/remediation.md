@@ -171,7 +171,7 @@
 |---|---|---|
 | P0 / P1 | 全部清零 | 本轮证据包：P0=0、P1=0 |
 | 审计总分 | **98.80**（基线 92.1 → +6.70） | C=88，其余 13 维 100 |
-| 门禁 | PASS（exit 0） | `bash audit/ci/gate.sh --evidence audit/evidence/<本轮 commit>` |
+| 门禁 | PASS（exit 0） | `bash audit/ci/gate.sh --evidence audit/evidence/73a7d17ce` |
 | 规则库 | 166 条（A–N 全覆盖） | 校准 27 条均附证据/owner/到期（calibration.md；C-010 条目已随清零删除） |
 | 测试面 | Rust 249/249、app/core 全绿；Android 全量单测 667/0；C# 3 工程 0 warn/0 error；Python 分层 478 passed + 7 条既存红 | 本轮复跑 |
 | B-004（UI 平台 IO） | DONE | 7 处 contentResolver 收口 data/UriIo |

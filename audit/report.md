@@ -1,12 +1,12 @@
 # NF 审计报告（汇总）
 
 > 本文件由 audit/ci/consolidate_report.py 生成，勿手改；明细见证据包与 remediation/calibration/trend。
-> 证据：audit/evidence/6878a19f4；commit：6878a19f4；扫描根：D:/NinFenz
+> 证据：audit/evidence/73a7d17ce；commit：73a7d17ce；扫描根：D:/NinFenz
 
 ## 结论
 
-- 总分 **98.7**（满分 100，口径 = 14 维加权）
-- 问题：P0=0 / P1=0 / P2=899 / P3=165
+- 总分 **98.8**（满分 100，口径 = 14 维加权）
+- 问题：P0=0 / P1=0 / P2=892 / P3=76
 - 规则：166 条（script 134 / tool 14 / manual 18）；pass=128 fail=6 error=0 no_targets=0 not-run=32
 
 ## 维度分
@@ -15,7 +15,7 @@
 |---|---|---|---|---|---|
 | A | 架构与依赖方向 | 0.1 | 100 | 0 | 0 |
 | B | 模块边界与内聚 | 0.06 | 100 | 0 | 0 |
-| C | 规模与复杂度 | 0.1 | 87 | 13 | 1064 |
+| C | 规模与复杂度 | 0.1 | 88 | 12 | 968 |
 | D | 重复与抽象 | 0.06 | 100 | 0 | 0 |
 | E | 错误处理与失败语义 | 0.1 | 100 | 0 | 0 |
 | F | 并发与资源 | 0.06 | 100 | 0 | 0 |
@@ -30,7 +30,7 @@
 
 ## 门禁
 
-- 命令：bash audit/ci/gate.sh --evidence audit/evidence/6878a19f4
+- 命令：bash audit/ci/gate.sh --evidence audit/evidence/73a7d17ce
 - 阈值：audit/ci/thresholds.json（总分 / 单维 / P0 / error / no_targets）
 
 ## 交付物索引

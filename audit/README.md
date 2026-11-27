@@ -94,10 +94,10 @@ tool/manual 未执行 31 条不计分，也不作为"通过"。
 
 ## 当前状态（2026-11-28，第十四轮后）
 
-- 最新证据：`audit/evidence/6878a19f4/`（同 commit 连跑两次 issues/report 逐字节一致、meta 全等，见 trend.md）。
-- 总分 **98.70**；维度 A100 B100 C87 D100 E100 F100 G–N 全 100；P0=0 / P1=0 / P2=899 / P3=165。
-- 门禁：`bash audit/ci/gate.sh --evidence audit/evidence/6878a19f4` → PASS（总分≥95、维度≥80、P0=0、error=0、no_targets=0）。
-- 测试面：engine/rust 249/249 green、app/core 全绿；Android 全量单测 BUILD SUCCESSFUL；C# 3 csproj 0 warn 0 error；Python 分层 327 passed + 2 skipped。
-- 残留债务（见 remediation.md 与 calibration.md，均有 owner/到期）：C-001（98 文件 >400 行）、C-005（792 函数圈复杂度 >10）、C-007（88 处 >6 参数）、C-008（14 处嵌套 >8）、C-009（9 个 Rust 文件 >1000 行，含生成块）、C-012（63 个 Rust 函数 >100 行）、C-010（剩 6 个 Python 真源模块 allow_files）。
-- 已知红（基线存量、非本轮引入）：Python 全量 pytest 的 test_reverse_coupling / test_style_ratchet / test_json_shape_contracts / test_freshness_check / test_dead_code 等，待基线 rebind 批次。
+- 最新证据：`audit/evidence/73a7d17ce/`（同 commit 连跑两次 issues/report 逐字节一致、meta 全等，见 trend.md）。
+- 总分 **98.80**；维度 A100 B100 C88 D100 E100 F100 G–N 全 100；P0=0 / P1=0 / P2=892 / P3=76。
+- 门禁：`bash audit/ci/gate.sh --evidence audit/evidence/73a7d17ce` → PASS（总分≥95、维度≥80、P0=0、error=0、no_targets=0）。
+- 测试面：engine/rust 249/249 green、app/core 全绿；Android 全量单测 667/0；C# 3 csproj 0 warn 0 error；Python 分层 478 passed + 7 条既存红。
+- 残留债务（见 remediation.md 与 calibration.md，均有 owner/到期）：C-001（82：kt 1 DeliveryScreen / rs 46 / py 35）、C-005（800 函数圈复杂度 >10）、C-007（59 处 >6 参数，全在 Python）、C-008（1 处嵌套 >8，DeliveryScreen）、C-009（10 个 Rust 文件 >1000 行，含生成块）、C-012（16 个 Rust 函数 >100 行，全在生成区/测试）。
+- 已知红（基线存量、非本轮引入）：Python 全量 pytest 的 test_reverse_coupling / test_style_ratchet / test_json_shape_contracts / test_freshness_check / test_dead_code 等；另有 sast/style/coupling baseline 因拆分新增文件键需按官方入口重冻（rebind 批次）。
 - 外部阻断（不在本仓能力内）：Play 上传（无 Google 账号）、真机 macrobenchmark（设备未接入 ADB）、on-demand OCR 触发（URI 授权）。
