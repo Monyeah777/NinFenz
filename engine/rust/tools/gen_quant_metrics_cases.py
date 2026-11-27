@@ -17,6 +17,7 @@ ROOT = pathlib.Path('.').resolve()
 sys.path.insert(0, str(ROOT / 'desktop' / 'src'))
 sys.path.insert(0, str(ROOT / 'engine' / 'rust' / 'tools'))
 from _rustlit import raw as rr  # noqa: E402
+from _gen_target import ensure_mount, write_gen_block  # noqa: E402
 from core import output_forms as of  # noqa: E402
 from core import quant_metrics as qm  # noqa: E402
 
@@ -46,7 +47,7 @@ for f in sorted(glob.glob('community/*/outputs/INDEX.json')):
         if err:
             print('# 真语料 %s 读取失败: %s' % (pkg, err))
             continue
-        got = qm.performance_report(series, **params)
+        got = qm.performance_report(series, qm.ReportOptions(**params))
         reals.append((pkg, src, params, got))
 print('# 真语料 performance-report 条目 %d 条' % len(reals))
 
@@ -96,13 +97,13 @@ variants = [
                     'as_of': '2026-02-01', 'benchmark_id': 'SPX'}),
 ]
 for name, kw in variants:
-    got = qm.performance_report(series_good, **kw)
+    got = qm.performance_report(series_good, qm.ReportOptions(**kw))
     rep_cases.append((name, kw, got))
     print('# report %-10s → cumulative=%s sharpe=%s benchmark=%s'
           % (name, got['gross']['cumulative'], got['gross']['sharpe'],
              'yes' if got['benchmark'] else 'no'))
 try:
-    qm.performance_report(series_good, **BASE, frequency='hourly')
+    qm.performance_report(series_good, qm.ReportOptions(**BASE, frequency='hourly'))
     print('# !! hourly 未报错')
 except ValueError as exc:
     err_freq = str(exc)
@@ -294,27 +295,44 @@ TEMPLATE = r'''
     /// （spearman + pearson + **错口径必须报错**）/ `turnover`（单边与双边）/ 以及
     /// `annualized_return`/`annualized_volatility`/`max_drawdown`/`sharpe`（含 mdd=0）/
     /// `tracking_error`（样本不足）/ `information_ratio`（零标准差）/ `log_returns` 等边界。
-    #[test]
-    fn quant_metrics_family_helpers_match_truth() {
-        let want: Json = crate::jsonread::convert(
+    ///
+    /// 判据体按「一族一组断言」抽成模块级 helper（每个 ≤100 行，满足 C-012）；
+    /// 断言文案与次序逐条不变（纯抽取，不改判定）。
+    fn quant_helpers_want() -> Json {
+        crate::jsonread::convert(
             &serde_json::from_str::<serde_json::Value>(@@HELP@@).unwrap(),
         )
-        .unwrap();
-        let get = |k: &str| -> Json {
-            match &want {
-                Json::Object(o) => o.iter().find(|(kk, _)| kk == k).map(|(_, v)| v.clone()),
-                _ => None,
-            }
-            .unwrap_or(Json::Null)
-        };
+        .unwrap()
+    }
+
+    fn quant_geom_want() -> Json {
+        crate::jsonread::convert(
+            &serde_json::from_str::<serde_json::Value>(@@GEOM@@).unwrap(),
+        )
+        .unwrap()
+    }
+
+    fn quant_helpers_get(want: &Json, k: &str) -> Json {
+        match want {
+            Json::Object(o) => o.iter().find(|(kk, _)| kk == k).map(|(_, v)| v.clone()),
+            _ => None,
+        }
+        .unwrap_or(Json::Null)
+    }
+
+    fn quant_helpers_arr(want: &Json, k: &str) -> Vec<Json> {
+        match quant_helpers_get(want, k) {
+            Json::Array(a) => a,
+            _ => Vec::new(),
+        }
+    }
+
+    /// `rank`（含并列/单元素/空表）与 `pearson`（含样本不足/零方差）的期望值断言。
+    fn assert_quant_rank_pearson(want: &Json) {
         let factor = [0.1f64, 0.5, 0.2, 0.9, 0.4, 0.7];
         let fwd = [0.02f64, 0.11, 0.05, 0.2, 0.09, 0.15];
         let tied = [1.0f64, 2.0, 2.0, 3.0, 3.0, 3.0];
-        let jf = |v: &[f64]| Json::Array(v.iter().map(|x| Json::Float(*x)).collect());
-        let ranks = match get("rank") {
-            Json::Array(a) => a,
-            _ => Vec::new(),
-        };
+        let ranks = quant_helpers_arr(want, "rank");
         assert_eq!(
             Json::Array(rank(&factor).iter().map(|x| r6(*x)).collect()),
             ranks[0], "rank(factor)");
@@ -327,19 +345,20 @@ TEMPLATE = r'''
         assert_eq!(
             Json::Array(rank(&[]).iter().map(|x| r6(*x)).collect()),
             ranks[3], "rank(空表)");
-        let ps = match get("pearson") {
-            Json::Array(a) => a,
-            _ => Vec::new(),
-        };
+        let ps = quant_helpers_arr(want, "pearson");
         for (i, (x, y)) in [(&factor[..], &fwd[..]), (&tied[..], &factor[..])].iter().enumerate() {
             assert_eq!(r6(pearson(x, y)), ps[i], "pearson 第 {} 例", i);
         }
         assert_eq!(r6(pearson(&[1.0], &[2.0])), ps[2], "pearson 样本不足");
         assert_eq!(r6(pearson(&[1.0, 1.0], &[2.0, 3.0])), ps[3], "pearson 零方差");
-        let ics = match get("ic_spearman") {
-            Json::Array(a) => a,
-            _ => Vec::new(),
-        };
+    }
+
+    /// `information_coefficient`：spearman / pearson 两口径与错口径报错文本。
+    fn assert_quant_ic(want: &Json) {
+        let factor = [0.1f64, 0.5, 0.2, 0.9, 0.4, 0.7];
+        let fwd = [0.02f64, 0.11, 0.05, 0.2, 0.09, 0.15];
+        let tied = [1.0f64, 2.0, 2.0, 3.0, 3.0, 3.0];
+        let ics = quant_helpers_arr(want, "ic_spearman");
         assert_eq!(
             r6(information_coefficient(&factor, &fwd, "spearman").unwrap()),
             ics[0],
@@ -350,10 +369,7 @@ TEMPLATE = r'''
             ics[1],
             "IC spearman（并列）"
         );
-        let icp = match get("ic_pearson") {
-            Json::Array(a) => a,
-            _ => Vec::new(),
-        };
+        let icp = quant_helpers_arr(want, "ic_pearson");
         assert_eq!(
             r6(information_coefficient(&factor, &fwd, "pearson").unwrap()),
             icp[0],
@@ -363,27 +379,25 @@ TEMPLATE = r'''
             Ok(_) => panic!("IC 错口径竟然成功"),
             Err(e) => assert_eq!(e, @@ICERR@@, "IC 错口径报错文本"),
         }
+    }
+
+    /// `turnover`：单边（含空表/单期）与双边。
+    fn assert_quant_turnover(want: &Json) {
         let w1 = vec![vec![0.5, 0.5], vec![0.6, 0.4], vec![0.3, 0.7], vec![0.3, 0.7]];
-        let ts = match get("turnover_single") {
-            Json::Array(a) => a,
-            _ => Vec::new(),
-        };
+        let ts = quant_helpers_arr(want, "turnover_single");
         let jv = |v: &[f64]| Json::Array(v.iter().map(|x| r6(*x)).collect());
         assert_eq!(jv(&turnover(&w1, true)), ts[0], "turnover 单边");
         assert_eq!(jv(&turnover(&[], true)), ts[1], "turnover 空");
         assert_eq!(jv(&turnover(&[vec![1.0]], true)), ts[2], "turnover 单期");
-        let td = match get("turnover_double") {
-            Json::Array(a) => a,
-            _ => Vec::new(),
-        };
+        let td = quant_helpers_arr(want, "turnover_double");
         assert_eq!(jv(&turnover(&w1, false)), td[0], "turnover 双边");
+    }
 
-        let geom: Json = crate::jsonread::convert(
-            &serde_json::from_str::<serde_json::Value>(@@GEOM@@).unwrap(),
-        )
-        .unwrap();
+    /// 几何口径：`annualized_*` / `max_drawdown` / `sharpe` / `calmar` / `tracking_error` /
+    /// `information_ratio` / `log_returns` / `cumulative_return`，以及 `returns` 错口径报错。
+    fn assert_quant_geom(geom: &Json) {
         let g = |k: &str| -> Json {
-            match &geom {
+            match geom {
                 Json::Object(o) => o.iter().find(|(kk, _)| kk == k).map(|(_, v)| v.clone()),
                 _ => None,
             }
@@ -418,6 +432,15 @@ TEMPLATE = r'''
             Err(e) => assert_eq!(e, @@TYPEERR@@, "returns 错口径报错文本"),
         }
     }
+
+    #[test]
+    fn quant_metrics_family_helpers_match_truth() {
+        let want = quant_helpers_want();
+        assert_quant_rank_pearson(&want);
+        assert_quant_ic(&want);
+        assert_quant_turnover(&want);
+        assert_quant_geom(&quant_geom_want());
+    }
     // <<< GENERATED
 '''
 text = (TEMPLATE
@@ -442,15 +465,7 @@ BEGIN = '    // >>> GENERATED by tools/gen_quant_metrics_cases.py（勿手改；
 END = '    // <<< GENERATED\n'
 block = BEGIN + text.split(BEGIN, 1)[1]
 
-path = ROOT / 'engine' / 'rust' / 'src' / 'quant_metrics.rs'
-t = path.read_text(encoding='utf-8')
-if BEGIN in t:
-    a = t.index(BEGIN)
-    b = t.index(END, a) + len(END)
-    t = t[:a] + block + t[b:]
-else:
-    t = t.rstrip() + '\n\n#[cfg(test)]\nmod tests {\n    use super::*;\n}\n'
-    t = t.rstrip()[:-1].rstrip() + '\n' + block + '}\n'
-path.write_text(t, encoding='utf-8', newline='')
+ensure_mount(ROOT, 'quant_metrics')
+write_gen_block(ROOT, 'quant_metrics', BEGIN, END, block)
 print('# 已写入 quant_metrics 判据（真语料 %d / 装载 %d / 参数 %d）'
       % (len(reals), len(load_cases), len(rep_cases)))

@@ -3,10 +3,13 @@
 用法：python engine/rust/tools/gen_decisions_branches.py
 """
 import json
-from _rustlit import rs  # noqa: E402
 import pathlib
+import re
 import shutil
 import sys
+
+from _rustlit import rs  # noqa: E402
+from _gen_target import ensure_mount, gen_text, norm, write_gen_block  # noqa: E402
 
 ROOT = pathlib.Path('.').resolve()
 sys.path.insert(0, str(ROOT / 'desktop' / 'src'))
@@ -150,18 +153,37 @@ text = (TEMPLATE
         .replace('@@NC@@', str(stats['chains'])))
 block = BEGIN + text + END
 
-path = ROOT / 'engine' / 'rust' / 'src' / 'decisions.rs'
-t = path.read_text(encoding='utf-8')
-if BEGIN in t:
-    a = t.index(BEGIN)
-    b = t.index(END, a) + len(END)
-    path.write_text(t[:a] + block + t[b:], encoding='utf-8', newline='')
-    print('# 已刷新标记区间')
-elif '#[cfg(test)]' in t:
-    idx = t.rstrip().rfind('\n}')
-    path.write_text(t[:idx] + block + t[idx:], encoding='utf-8', newline='')
-    print('# 已插入标记区间（原有 tests 模块）')
-else:
-    path.write_text(t.rstrip() + '\n\n#[cfg(test)]\nmod tests {\n    use super::*;\n'
-                    + block + '}\n', encoding='utf-8', newline='')
-    print('# 已追加标记区间')
+ensure_mount(ROOT, 'decisions')
+
+
+def _block_summary(blk):
+    """从盘块/重算块里读「期望条数 + 三项统计」，只用于漂移告警的差异摘要。"""
+    n = re.search(r'const WANT_DEC_ISSUES: \[&str; (\d+)\]', blk)
+    st = re.search(r'assert_eq!\(\(decisions, accepted, chains\), \(([^)]*)\)', blk)
+    return (n.group(1) if n else '?', st.group(1) if st else '?')
+
+
+# 漂移保护（2026-11-28）：真源 decisions.scan 目前**领先于** Rust 端口（ADR030 对
+# 「evidence: []」误报空槽；ADR042–046 supersedes/superseded_by 互指规则、成环去重与
+# evidence 文案改动未移植）。此时若照常重生成，会把「Rust 尚不满足的新期望」写进判据、
+# 使 cargo test 全红（38→51 条 / stats (10,2,3)→(10,2,1)）。
+# 口径（task-19/task-23）：测试内容不得改变 ⇒ 盘块 token 与重算结果不一致时**保留盘块**，
+# 显式告警并 exit 0；等 Rust 端口同步后再重跑会自动写入。两轮重跑不写盘 ⇒ git status 无变化。
+existing = gen_text(ROOT, 'decisions')
+if BEGIN in existing:
+    a = existing.index(BEGIN)
+    b = existing.index(END, a) + len(END)
+    old_block = existing[a:b]
+    if norm(old_block) != norm(block):
+        old_n, old_st = _block_summary(old_block)
+        new_n, new_st = _block_summary(block)
+        print('# !! 真源已漂移：decisions 期望值与盘块不一致，**保留盘块不写**'
+              '（需另立任务把 Rust 端口同步到真源）')
+        print('#    重算 issues=%s stats=(%s)；盘块 issues=%s stats=(%s)'
+              % (new_n, new_st, old_n, old_st))
+        print('#    差异要点：ADR030 对 evidence: [] 误报空槽 / ADR042–046 互指规则 /'
+              ' 成环去重与 evidence 文案')
+        print('# 已跳过 decisions 判据写入（盘块未变）')
+        sys.exit(0)
+write_gen_block(ROOT, 'decisions', BEGIN, END, block)
+print('# 已写入 decisions 判据')
