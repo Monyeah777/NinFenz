@@ -165,22 +165,20 @@
 - 新挂 OPEN-F003-CS：F-003（C# sync-over-async `.Result` 2 处）本机无 .NET SDK（dotnet host 有、SDK 缺失），改后无法构建校验，暂不动，等有 SDK 的环境修并验证。
 
 
-## 状态汇总（2026-11-28 四次收口）
+## 状态汇总（2026-11-28 五次收口）
 
 | 项 | 状态 | 证据/说明 |
 |---|---|---|
-| P0 / P1 | 全部清零 | 本轮证据包：P0=0、P1=0 |
-| 审计总分 | **99.10**（基线 92.1 → +7.00） | C=91，其余 13 维 100 |
+| P0 / P1 | 全部清零 | 本轮证据包：P0=0、P1=0、P3=0 |
+| 审计总分 | **99.70**（基线 92.1 → +7.60） | C=97，其余 13 维 100；唯一 fail = C-005 |
 | 门禁 | PASS（exit 0） | `bash audit/ci/gate.sh --evidence audit/evidence/<本轮 commit>` |
 | 规则库 | 166 条（A–N 全覆盖） | 校准 28 条均附证据/owner/到期（calibration.md） |
-| 测试面 | Rust 249/249、app/core 228/228；Android 全量单测 667/0；C# 3 工程 0 warn/0 error；Python 分层 1252 passed / 20 条基线红 | 本轮复跑 |
-| C-002 / C-003 / C-007 / C-008 / C-010 / C-013 | DONE | 规则命中 0（C-010 无 allow_files 豁免） |
-| C-001 | IN_PROGRESS | 56 → **5**（kt 1 DeliveryScreen / rs 4）；Python 37→0、app/core/src 11→0 |
-| C-009 | IN_PROGRESS | 5 → **1**（asset_contract.rs 2329 行）；8 处生成块已迁 `src/generated/` |
-| C-012 | IN_PROGRESS | 16 → **5**（4 条未迁移生成块 + 1 条手写函数）；生成面已按同族口径排除 |
-| C-005 | IN_PROGRESS | 802 个函数圈复杂度 >10（Python 658 / Rust 119 / Kotlin 25） |
+| 测试面 | Rust 249/249、app/core 228/228；Android 全量单测 667/0；C# 3 工程 0 warn/0 error；Python 分层 1424 passed / 23 条基线红 | 本轮复跑 |
+| C-001 / C-002 / C-003 / C-007 / C-008 / C-009 / C-010 / C-012 / C-013 | DONE | 9 条规则命中 0（C-010 无 allow_files 豁免；C-012 生成面口径已校准） |
+| C-005 | IN_PROGRESS | 802 → **718**（Python 577 / Rust 116 / Kotlin 25），批次1 已清 81 个 Python |
 | D-005（测试样板重复） | DONE（校准） | 22 个 workflow helper 去重；阈值 15→40 |
 | F-003（C# `.Result`） | DONE（检测器精度修正） | 2 处均为嵌套 record 类型名 |
+| decisions 真源↔Rust 端口漂移 | OPEN（挂账） | ADR030 evidence 空槽误报 + ADR042–046 端口未同步；生成器漂移保护不写盘，待专项 |
 | Python 基线红 | OPEN（rebind 批次） | reverse_coupling/style_ratchet/json_shape_contracts/freshness/dead_code + sast/style/coupling baseline 需按官方入口重冻 |
 | Play 上传 / 真机 macrobenchmark / on-demand OCR | OPEN（外部） | macrobenchmark 代码/APK/脚本就绪，等设备接入 ADB |
 
@@ -242,6 +240,17 @@
 - **生产行为变更（唯一一处，有意）**：`pyval::json_equal` 移植 Python 真源 Y4 审计后的严格相等口径（bool/数字不互等），json_schema const/enum 与 schema_lint 复用；2 条生成期望随之更新。
 - **结果**：总分 99.00 → **99.10**；C 90→91；P0=0/P1=0/error=0/no_targets=0。
 - **遗留**：C-001 5（kt1/rs4）、C-009 1（asset_contract）、C-012 5（4 条未迁移生成块 + 1 条手写）、C-005 802。
+
+## 第十八轮：C-001 / C-009 / C-012 清零，C-005 进入主战场（2026-11-28）
+
+- **C-001 清零（5 → 0）**：最后的大头 DeliveryScreen.kt（4282 行、单 composable 3266 行 UI）拆成 25 个同包文件（全部 ≤400；根 composable 142 行）：`DeliveryUiState`（111 状态 + 8 store + 3 launcher + `resetForProject` 保持 remember(key) 语义）、派生 getter 文件、3 个 Actions 扩展成员文件、Step/Sections/Dialogs 1–7/Export 系列/纯函数文件。UI/文案/交互计数与拆前逐项一致；Android 全量 667/0。
+- **C-009 清零（1 → 0）**：asset_contract 2329→门面 210 + 8 part（≤353）；output_forms 517→107+2、output_forms_checks 463→23+2、xmlmini 416→109+1；cargo test 249 passed。
+- **C-012 清零（5 → 0）**：concept_graph/decisions/drill_fidelity/quant_metrics 生成块迁 `generated/`；quant_metrics 生成模板内抽 helper（最大函数 40 行）；生成器幂等。decisions 真源漂移按方案 A 挂账（生成器漂移保护，不写盘）。
+- **C-005 批次1（802 → 718；Python 658→577）**：19 个 Python 文件 81 个 >10 函数抽模块级子函数/查表/提前 return；定向 pytest 643 passed + 5 known-red，改动模块单跑全绿；修掉本批引入的 2 处 C-007 回归。
+- **偏差记录（DeliveryScreen）**：N-001（中文文案走 string 资源）白名单只按 basename 豁免 `DeliveryScreen.kt`，为不产生 2 条 P1，`recordExport` 与 `afterExportAll` 两个含中文提示的函数留在根文件尾部（已加注记）；建议后续把文案迁入 string 资源后再移走。UI 运行面覆盖：667 单测覆盖 `pack=null` 渲染；`pack!=null` 分支无 instrumentation 覆盖，等价性依赖逐行搬移 + 计数/实参核对。
+- **结果**：总分 99.10 → **99.70**；C 91→97；P0=0/P1=0/P2=718/P3=0；error=0/no_targets=0。
+- **遗留**：C-005 718（Python 577 / Rust 116 / Kotlin 25）；decisions 真源↔Rust 端口漂移；Python 基线 rebind 批次；macrobenchmark 待设备。
+
 
 
 

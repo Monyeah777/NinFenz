@@ -5,8 +5,8 @@
     "floor": 5,
     "prod": 1079,
     "projection": 540,
-    "support": 2170,
-    "verify": 1559
+    "support": 2197,
+    "verify": 1576
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -13673,6 +13673,54 @@
       "rule": "R-verify"
     },
     {
+      "function": "",
+      "path": "engine/rust/src/asset_contract/part1.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/asset_contract/part2.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/asset_contract/part3.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/asset_contract/part4.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/asset_contract/part5.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/asset_contract/part6.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/asset_contract/part7.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/asset_contract/part8.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "[derive(Default, Clone, Debug, PartialEq)]",
       "path": "engine/rust/src/asset_density.rs",
       "role": "verify",
@@ -13938,7 +13986,25 @@
     },
     {
       "function": "[test]",
+      "path": "engine/rust/src/generated/concept_graph_gen.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "背景",
+      "path": "engine/rust/src/generated/decisions_gen.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "[test]",
       "path": "engine/rust/src/generated/domain_metrics_gen.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "[test]",
+      "path": "engine/rust/src/generated/drill_fidelity_gen.rs",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -13969,6 +14035,12 @@
     {
       "function": "[test]",
       "path": "engine/rust/src/generated/pyrandom_gen.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "[test]",
+      "path": "engine/rust/src/generated/quant_metrics_gen.rs",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -14225,8 +14297,32 @@
       "rule": "R-verify"
     },
     {
+      "function": "",
+      "path": "engine/rust/src/output_forms/part1.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/output_forms/part2.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "[cfg(test)]",
       "path": "engine/rust/src/output_forms_checks.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/output_forms_checks/part1.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/output_forms_checks/part2.rs",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -14641,6 +14737,12 @@
     {
       "function": "[derive(Debug, Clone)]",
       "path": "engine/rust/src/xmlmini.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/xmlmini/part1.rs",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -15870,16 +15972,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "58fc28db1f33ceaca21544f97f455077de893ac73fd862cd2686db8855d687ed",
+  "root_digest": "2dd0af768e5d0b39ad7fe5d8b1a153b2ffdd80084b9b39de457cb46ceca82b71",
   "rule_counts": {
     "R-app": 1512,
-    "R-catch": 2008,
+    "R-catch": 2035,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 513,
     "R-support": 130,
-    "R-verify": 1431,
+    "R-verify": 1448,
     "auto:R-core": 322
   },
   "schema": "nf-role-coordinates/1"
