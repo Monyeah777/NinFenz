@@ -22,6 +22,7 @@ import subprocess
 import tempfile
 import urllib.request
 from collections.abc import Callable
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -156,11 +157,27 @@ def _extract_target(body_bytes: bytes) -> str:
     return str(value) if isinstance(value, str) else ""
 
 
-def verify_public_anchor(doc: Any, verifier: Callable[[bytes, bytes], bool],
-                         expected_log_id: str, target_digest: str = "",
-                         schema: dict | None = None, root: str = ".",
-                         require_target: bool = True) -> dict:
+@dataclass(frozen=True)
+class PublicAnchorOptions:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    schema: dict | None = None
+    root: str = '.'
+    require_target: bool = True
+
+
+def verify_public_anchor(
+    doc: Any,
+    verifier: Callable[[bytes, bytes], bool],
+    expected_log_id: str,
+    target_digest: str = '',
+    opts: PublicAnchorOptions | None = None,
+) -> dict:
     """离线验证公共锚：结构 → 日志钉住 → inclusion → SET → 目标绑定。"""
+
+    opts = opts if opts is not None else PublicAnchorOptions()
+    schema = opts.schema
+    root = opts.root
+    require_target = opts.require_target
     check_schema = schema if schema is not None else load_schema(root)
     problems = json_schema.json_schema_check(doc, check_schema)
     if problems:

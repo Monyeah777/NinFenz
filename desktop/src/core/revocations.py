@@ -10,12 +10,11 @@
 **边界**：本模块不做分发（没有服务器/订阅），也不解决「签发方撤销了但你没收到」这件事；它只把手头
 这份表变成「来源可证、回滚可察」。仍未签名时只给 warning（形状可判、来源不可判）。
 """
-from __future__ import annotations
-
 import hashlib
 import hmac
 import re
 from collections.abc import Iterable, Sequence
+from dataclasses import dataclass
 from datetime import timedelta
 from typing import Any
 
@@ -145,16 +144,36 @@ def _shape_issues(doc: dict[str, Any]) -> list[str]:
     return issues
 
 
-def sign(table: dict[str, Any], key: bytes, issuer: str = "", seq: int = 1,
-         prev: dict[str, Any] | None = None, issued_at: str = "",
-         expires_at: str = "", ttl: int | None = None,
-         status_uri: str = "", scheme: str = ALG) -> dict[str, Any]:
+@dataclass(frozen=True)
+class SignOptions:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    issuer: str = ''
+    seq: int = 1
+    prev: dict[str, Any] | None = None
+    issued_at: str = ''
+    expires_at: str = ''
+    ttl: int | None = None
+    status_uri: str = ''
+    scheme: str = ALG
+
+
+def sign(table: dict[str, Any], key: bytes, opts: SignOptions | None = None) -> dict[str, Any]:
     """把表包成签名 feed（seq 单调递增；prev 给出上一份 feed 以接链）。
 
     `expires_at` / `ttl` / `status_uri` 是**可选**新鲜度与分发指针字段：只在给出时写入
     （不写 null，免得无谓改变 digest）。签名体仍是「除 signature 外全部字段」，故它们
     自动进签名、改一个字节即破签名；本模块**不**根据 status_uri 联网取任何东西。
     """
+
+    opts = opts if opts is not None else SignOptions()
+    issuer = opts.issuer
+    seq = opts.seq
+    prev = opts.prev
+    issued_at = opts.issued_at
+    expires_at = opts.expires_at
+    ttl = opts.ttl
+    status_uri = opts.status_uri
+    scheme = opts.scheme
     if not isinstance(key, bytes) or not key:
         raise ValueError("签名需要密钥（" + GUIDE + "请用 --key-file 指一个非空密钥文件）")
     if scheme not in (ALG, ALG_ED25519):

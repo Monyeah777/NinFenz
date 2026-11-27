@@ -16,6 +16,7 @@ from __future__ import annotations
 import json
 import os
 import re
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
@@ -186,14 +187,31 @@ def evidence(root: str, row: Dict[str, Any]) -> str:
     return ""
 
 
-def review(root: str = ".", adapter: str = "stub", endpoint: str = "",
-           limit: int = 0, batch: int = 8, timeout: float = 120.0,
-           classes: Tuple[str, ...] = ()) -> Dict[str, Any]:
+@dataclass(frozen=True)
+class ReviewOptions:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    adapter: str = 'stub'
+    endpoint: str = ''
+    limit: int = 0
+    batch: int = 8
+    timeout: float = 120.0
+    classes: Tuple[str, ...] = ()
+
+
+def review(root: str = '.', opts: ReviewOptions | None = None) -> Dict[str, Any]:
     """模型逐行判定 + 证据复核 → fixable / suspected 两张清单。
 
     `classes` 限定候选类别（空 = 全类）——2026-10-01 修：CLI 的 `--scope` 此前**只是算了
     一个没人用的局部变量**，报告永远是全类（用户按类筛也拿到全量，属「文档写了却做不到」）。
     """
+
+    opts = opts if opts is not None else ReviewOptions()
+    adapter = opts.adapter
+    endpoint = opts.endpoint
+    limit = opts.limit
+    batch = opts.batch
+    timeout = opts.timeout
+    classes = opts.classes
     missing = missing_inputs(root)
     rows = candidates(root, classes=classes)
     if limit:
@@ -214,8 +232,10 @@ def review(root: str = ".", adapter: str = "stub", endpoint: str = "",
             questions["sev:%d" % i] = {
                 "type": "score", "levels": ["低", "中", "高"],
                 "instructions": "第 %d 条若成立，严重度如何" % i}
-        out = dl.decide({"state": state, "questions": questions},
-                        adapter=adapter, endpoint=endpoint, timeout=timeout, root=root)
+        out = dl.decide(
+            {'state': state, 'questions': questions},
+            opts=dl.DecideOptions(adapter=adapter, endpoint=endpoint, timeout=timeout, root=root),
+        )
         for i, r in enumerate(chunk):
             row = dict(r)
             if out.get("status") == "ok":

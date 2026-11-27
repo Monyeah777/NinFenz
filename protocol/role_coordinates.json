@@ -5,8 +5,8 @@
     "floor": 5,
     "prod": 1071,
     "projection": 542,
-    "support": 2023,
-    "verify": 1496
+    "support": 2027,
+    "verify": 1556
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -13637,6 +13637,24 @@
       "rule": "R-verify"
     },
     {
+      "function": "",
+      "path": "engine/rust/src/asset_code/part1.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/asset_code/part2.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/asset_code/part3.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "[cfg(test)]",
       "path": "engine/rust/src/asset_contract.rs",
       "role": "verify",
@@ -13703,6 +13721,18 @@
       "rule": "R-verify"
     },
     {
+      "function": "",
+      "path": "engine/rust/src/concept_graph/part1.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/concept_graph/part2.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "[derive(Clone, Debug, PartialEq)]",
       "path": "engine/rust/src/conformance.rs",
       "role": "verify",
@@ -13763,8 +13793,14 @@
       "rule": "R-verify"
     },
     {
-      "function": "[allow(dead_code)]",
+      "function": "[cfg(test)]",
       "path": "engine/rust/src/coupling_metrics.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "[allow(dead_code)]",
+      "path": "engine/rust/src/coupling_metrics/part1.rs",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -13775,8 +13811,20 @@
       "rule": "R-verify"
     },
     {
+      "function": "",
+      "path": "engine/rust/src/decisions/part1.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "[cfg(test)]",
       "path": "engine/rust/src/declaration.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/declaration/part1.rs",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -13805,8 +13853,38 @@
       "rule": "R-verify"
     },
     {
+      "function": "",
+      "path": "engine/rust/src/domain_metrics/part1.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/domain_metrics/part2.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/domain_metrics/part3.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "[cfg(test)]",
       "path": "engine/rust/src/domain_pack.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/domain_pack/part1.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/domain_pack/part2.rs",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -13817,14 +13895,38 @@
       "rule": "R-verify"
     },
     {
+      "function": "",
+      "path": "engine/rust/src/drill_fidelity/part1.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/drill_fidelity/part2.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/drill_fidelity/part3.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "[cfg(test)]",
       "path": "engine/rust/src/endpoint.rs",
       "role": "verify",
       "rule": "R-verify"
     },
     {
-      "function": "[derive(Default)]",
+      "function": "[cfg(test)]",
       "path": "engine/rust/src/glob.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "[derive(Default)]",
+      "path": "engine/rust/src/glob/part1.rs",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -13847,14 +13949,32 @@
       "rule": "R-verify"
     },
     {
-      "function": "[allow(dead_code)]",
+      "function": "[cfg(test)]",
       "path": "engine/rust/src/io_types.rs",
       "role": "verify",
       "rule": "R-verify"
     },
     {
-      "function": "[allow(clippy::too_many_arguments)]",
+      "function": "[allow(dead_code)]",
+      "path": "engine/rust/src/io_types/part1.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "[cfg(test)]",
       "path": "engine/rust/src/json_schema.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "[allow(clippy::too_many_arguments)]",
+      "path": "engine/rust/src/json_schema/part1.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/json_schema/part2.rs",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -13895,8 +14015,32 @@
       "rule": "R-verify"
     },
     {
+      "function": "",
+      "path": "engine/rust/src/knowledge/part1.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/knowledge/part2.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "[cfg(test)]",
       "path": "engine/rust/src/layers.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/layers/part1.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/layers/part2.rs",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -13909,6 +14053,18 @@
     {
       "function": "[cfg(test)]",
       "path": "engine/rust/src/library.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/library/part1.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/library/part2.rs",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -13967,8 +14123,32 @@
       "rule": "R-verify"
     },
     {
+      "function": "",
+      "path": "engine/rust/src/miniyaml/part1.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/miniyaml/part2.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "[cfg(test)]",
       "path": "engine/rust/src/modeling.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/modeling/part1.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/modeling/part2.rs",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -14003,20 +14183,68 @@
       "rule": "R-verify"
     },
     {
+      "function": "",
+      "path": "engine/rust/src/output_forms_verify/part1.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/output_forms_verify/part2.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/output_forms_verify/part3.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "[rustfmt::skip]",
       "path": "engine/rust/src/output_tables.rs",
       "role": "verify",
       "rule": "R-verify"
     },
     {
-      "function": "[derive(Clone, Debug, Default)]",
+      "function": "",
       "path": "engine/rust/src/pack_combo.rs",
       "role": "verify",
       "rule": "R-verify"
     },
     {
-      "function": "[allow(clippy::type_complexity)]",
+      "function": "[derive(Clone, Debug, Default)]",
+      "path": "engine/rust/src/pack_combo/part1.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/pack_combo/part2.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "[cfg(test)]",
       "path": "engine/rust/src/pack_combo_core.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/pack_combo_core/part1.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "[allow(clippy::type_complexity)]",
+      "path": "engine/rust/src/pack_combo_core/part2.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/pack_combo_core/part3.rs",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -14051,8 +14279,20 @@
       "rule": "R-verify"
     },
     {
-      "function": "[derive(Clone)]",
+      "function": "[cfg(test)]",
       "path": "engine/rust/src/pipelinerun.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "[derive(Clone)]",
+      "path": "engine/rust/src/pipelinerun/part1.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/pipelinerun/part2.rs",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -14075,6 +14315,18 @@
       "rule": "R-verify"
     },
     {
+      "function": "",
+      "path": "engine/rust/src/purity/part1.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/purity/part2.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "[rustfmt::skip]",
       "path": "engine/rust/src/py_stdlib.rs",
       "role": "verify",
@@ -14083,6 +14335,24 @@
     {
       "function": "",
       "path": "engine/rust/src/pyast.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/pyast/part1.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/pyast/part2.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/pyast/part3.rs",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -14135,6 +14405,18 @@
       "rule": "R-verify"
     },
     {
+      "function": "",
+      "path": "engine/rust/src/quant_metrics/part1.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/quant_metrics/part2.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "[cfg(test)]",
       "path": "engine/rust/src/rating_gate.rs",
       "role": "verify",
@@ -14143,6 +14425,18 @@
     {
       "function": "[cfg(test)]",
       "path": "engine/rust/src/receipts.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/receipts/part1.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/receipts/part2.rs",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -14165,26 +14459,62 @@
       "rule": "R-verify"
     },
     {
-      "function": "[derive(Default, Clone, Debug, PartialEq)]",
+      "function": "[cfg(test)]",
       "path": "engine/rust/src/schema_lint.rs",
       "role": "verify",
       "rule": "R-verify"
     },
     {
-      "function": "[derive(Default, Clone)]",
+      "function": "",
+      "path": "engine/rust/src/schema_lint/part1.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "[derive(Default, Clone, Debug, PartialEq)]",
+      "path": "engine/rust/src/schema_lint/part2.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "[cfg(test)]",
       "path": "engine/rust/src/score.rs",
       "role": "verify",
       "rule": "R-verify"
     },
     {
-      "function": "[cfg(unix)]",
+      "function": "[derive(Default, Clone)]",
+      "path": "engine/rust/src/score/part1.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "[cfg(test)]",
       "path": "engine/rust/src/serve.rs",
       "role": "verify",
       "rule": "R-verify"
     },
     {
-      "function": "[derive(Default, Clone, Debug)]",
+      "function": "[cfg(unix)]",
+      "path": "engine/rust/src/serve/part1.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "[cfg(test)]",
       "path": "engine/rust/src/stats.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "[derive(Default, Clone, Debug)]",
+      "path": "engine/rust/src/stats/part1.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/stats/part2.rs",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -14201,8 +14531,20 @@
       "rule": "R-verify"
     },
     {
-      "function": "[derive(Clone)]",
+      "function": "[cfg(test)]",
       "path": "engine/rust/src/verify_report.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "[derive(Clone)]",
+      "path": "engine/rust/src/verify_report/part1.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/verify_report/part2.rs",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -14215,6 +14557,24 @@
     {
       "function": "[cfg(test)]",
       "path": "engine/rust/src/world_model.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/world_model/part1.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/world_model/part2.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/world_model/part3.rs",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -15444,16 +15804,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "7fd11cd23f5d803c9e5f16912964af2d7d780eb5aac61821455473df1dfdee28",
+  "root_digest": "405097686b1b88d897c1f326fe4643670d7a8723d0e31299f867fceec3ac9f2b",
   "rule_counts": {
     "R-app": 1512,
-    "R-catch": 1861,
+    "R-catch": 1865,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 513,
     "R-support": 130,
-    "R-verify": 1362,
+    "R-verify": 1422,
     "auto:R-core": 322
   },
   "schema": "nf-role-coordinates/1"

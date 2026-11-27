@@ -281,8 +281,15 @@ class VerifyIntegrationTest(unittest.TestCase):
         anchor = ta.build_anchor_set(tc.digest_of(self.bundle),
                                      [{"kind": "git-commit", "repo": str(ROOT),
                                        "commit": "0" * 40}])
-        result = tv.verify(self.bundle, _policy(), str(ROOT), anchor=anchor,
-                           anchor_verifiers={"git-commit": lambda i, d: {"ok": True}})
+        result = tv.verify(
+            self.bundle,
+            _policy(),
+            str(ROOT),
+            opts=tv.TrustVerifyOptions(
+                anchor=anchor,
+                anchor_verifiers={'git-commit': lambda i, d: {'ok': True}},
+            ),
+        )
         ids = [c["id"] for c in result["report"]["checks"]]
         self.assertIn("A2-anchor-facts", ids)
         detail = " ".join(c["detail"] for c in result["report"]["checks"])
@@ -292,8 +299,15 @@ class VerifyIntegrationTest(unittest.TestCase):
     def test_anchor_target_mismatch_exits_invalid(self):
         anchor = ta.build_anchor_set("f" * 64, [{"kind": "git-commit", "repo": str(ROOT),
                                                  "commit": "0" * 40}])
-        result = tv.verify(self.bundle, _policy(), str(ROOT), anchor=anchor,
-                           anchor_verifiers={"git-commit": lambda i, d: {"ok": True}})
+        result = tv.verify(
+            self.bundle,
+            _policy(),
+            str(ROOT),
+            opts=tv.TrustVerifyOptions(
+                anchor=anchor,
+                anchor_verifiers={'git-commit': lambda i, d: {'ok': True}},
+            ),
+        )
         self.assertEqual(1, result["exit_code"], result)
         self.assertTrue(any(i["code"] == "ANCHOR-TARGET-MISMATCH"
                             for i in result["report"]["issues"]))
@@ -302,8 +316,15 @@ class VerifyIntegrationTest(unittest.TestCase):
         anchor = ta.build_anchor_set(tc.digest_of(self.bundle),
                                      [{"kind": "git-commit", "repo": str(ROOT),
                                        "commit": "0" * 40}])
-        result = tv.verify(self.bundle, _policy(required="T2"), str(ROOT), anchor=anchor,
-                           anchor_verifiers={"git-commit": lambda i, d: {"ok": True}})
+        result = tv.verify(
+            self.bundle,
+            _policy(required='T2'),
+            str(ROOT),
+            opts=tv.TrustVerifyOptions(
+                anchor=anchor,
+                anchor_verifiers={'git-commit': lambda i, d: {'ok': True}},
+            ),
+        )
         self.assertEqual(2, result["exit_code"], result)
         codes = [i["code"] for i in result["report"]["issues"]]
         self.assertIn("SIGNATURE-MISSING", codes)

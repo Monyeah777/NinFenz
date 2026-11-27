@@ -150,9 +150,19 @@ def _verify_sh() -> str | None:
         return None
 
 
-def _delegate(num: int, title: str, module: str, func: str,
-              reads: Sequence[str], labels: Labels,
-              show_stats: bool = False) -> Callable[[Path], Verdict]:
+@dataclass(frozen=True)
+class _DelegateSpec:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    num: int
+    title: str
+    module: str
+    func: str
+    reads: Sequence[str]
+    labels: Labels
+    show_stats: bool = False
+
+
+def _delegate(opts: _DelegateSpec) -> Callable[[Path], Verdict]:
     """通用委托：调 `core.<module>.<func>(root)` → (issues, stats) → verdict 行。
 
     与 verify.sh 的语义逐条对齐：
@@ -160,6 +170,13 @@ def _delegate(num: int, title: str, module: str, func: str,
       - 无论上面结果如何，err==0 时再补一条 `ok(总结)`（verify.sh 的 `if [ $err -eq 0 ]` 分支）；
       - 退出码/统计行不进 verdict 面，只做统计信息。
     """
+
+    num = opts.num
+    title = opts.title
+    module = opts.module
+    func = opts.func
+    labels = opts.labels
+    show_stats = opts.show_stats
 
     def run(root: Path) -> Verdict:
         v = Verdict(name="check%d" % num, title=title, status=PASS)
@@ -404,8 +421,17 @@ def _register_delegated() -> None:
         labels = gate_labels.parse_labels(text, num)
         REGISTRY[num] = CheckSpec(
             num=num, title=gate_labels.banner(text, num), reads=(), kind="delegated",
-            impl=_delegate(num, gate_labels.banner(text, num), module, func, (), labels,
-                           show_stats=(num in STATS_WHITELIST)),
+            impl=_delegate(
+                opts=_DelegateSpec(
+                    num=num,
+                    title=gate_labels.banner(text, num),
+                    module=module,
+                    func=func,
+                    reads=(),
+                    labels=labels,
+                    show_stats=num in STATS_WHITELIST,
+                ),
+            ),
         )
 
 

@@ -33,8 +33,10 @@ from __future__ import annotations
 import re
 import time
 from collections import deque
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
+
 from core import json_doc
 
 SCHEMA = "nf-orchestration/1"
@@ -320,13 +322,22 @@ def _skip_remaining(states: Dict[str, str], queue: deque) -> None:
         states[rest] = "skipped"
 
 
-def dispatch(order: List[str], steps: Dict[str, Dict[str, Any]],
-             call: Callable[[str, Dict[str, Any]], Any], *,
-             max_seconds: Optional[float] = None,
-             max_step_seconds: Optional[float] = None,
-             breaker_key: str = "",
-             failure_threshold: int = 3,
-             cooldown_seconds: float = 60.0) -> Dict[str, Any]:
+@dataclass(frozen=True)
+class DispatchOptions:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    max_seconds: Optional[float] = None
+    max_step_seconds: Optional[float] = None
+    breaker_key: str = ''
+    failure_threshold: int = 3
+    cooldown_seconds: float = 60.0
+
+
+def dispatch(
+    order: List[str],
+    steps: Dict[str, Dict[str, Any]],
+    call: Callable[[str, Dict[str, Any]], Any],
+    opts: DispatchOptions | None = None,
+) -> Dict[str, Any]:
     """按编译出的序派发：**首个失败即停**（fail-closed），如实回执已执行 / 停在 / 未执行。
 
     每步若声明了 `expects`，则在**派发时**按此验收：返回值不是对象、或缺任一字段即视为失败
@@ -339,6 +350,13 @@ def dispatch(order: List[str], steps: Dict[str, Dict[str, Any]],
       `status=circuit_open`，冷却后放行一次半开探测；
     - `states`：pending / running / done / failed / skipped 两阶段状态。
     """
+
+    opts = opts if opts is not None else DispatchOptions()
+    max_seconds = opts.max_seconds
+    max_step_seconds = opts.max_step_seconds
+    breaker_key = opts.breaker_key
+    failure_threshold = opts.failure_threshold
+    cooldown_seconds = opts.cooldown_seconds
     results: List[Dict[str, Any]] = []
     states: Dict[str, str] = {sid: "pending" for sid in order}
     started = time.perf_counter()

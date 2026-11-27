@@ -8,8 +8,8 @@ from __future__ import annotations
 
 import json
 import re
+from dataclasses import dataclass, replace
 from typing import Any, List, Optional
-
 
 _JSON_TYPES = {
     "object": dict, "array": list, "string": str, "boolean": bool,
@@ -98,16 +98,40 @@ def _collect_unsupported(schema: dict, path: str, unsupported: List[str]) -> Non
                 unsupported.append(tag)
 
 
-def _check_ref(instance: Any, schema: dict, path: str, root_schema: dict,
-               unsupported: List[str], depth: int, errors: List[str]) -> None:
+@dataclass(frozen=True)
+class _Ctx:
+    """校验上下文（审计 C-007：同一调用链共享的 path/root_schema/unsupported/depth/errors 收口）。
+
+    只装「往下递归时整体平移」的那一簇参数；instance/schema 等逐层不同的值仍走位置参数。
+    """
+
+    path: str
+    root_schema: dict
+    unsupported: List[str]
+    depth: int
+    errors: List[str]
+
+    def at(self, path: str) -> "_Ctx":
+        return replace(self, path=path)
+
+    def child(self, path: str) -> "_Ctx":
+        return replace(self, path=path, depth=self.depth + 1)
+
+
+def _run(instance: Any, schema: dict, ctx: "_Ctx") -> List[str]:
+    """按上下文调公开入口 _check（path/depth 显式下传，深度闸门不失效）。"""
+    return _check(instance, schema, ctx.path, ctx.root_schema, ctx.unsupported, ctx.depth)
+
+
+def _check_ref(instance: Any, schema: dict, ctx: "_Ctx") -> None:
     """$ref：可解析即递归；远程/悬空进 unsupported（不假装通过）。"""
     if "$ref" not in schema:
         return
-    target = _resolve_ref(str(schema["$ref"]), root_schema)
+    target = _resolve_ref(str(schema["$ref"]), ctx.root_schema)
     if target is None:
-        unsupported.append("远程/悬空 $ref %s@%s" % (schema["$ref"], path))
+        ctx.unsupported.append("远程/悬空 $ref %s@%s" % (schema["$ref"], ctx.path))
         return
-    errors += _check(instance, target, path, root_schema, unsupported, depth + 1)
+    ctx.errors.extend(_run(instance, target, ctx.child(ctx.path)))
 
 
 def _check_type(instance: Any, schema: dict, path: str, errors: List[str]) -> None:
@@ -187,42 +211,36 @@ def _check_unique_items(instance: list, path: str, errors: List[str]) -> None:
         errors.append("%s: uniqueItems 被违反" % path)
 
 
-def _check_prefix_items(instance: list, prefix: list, path: str, root_schema: dict,
-                        unsupported: List[str], depth: int, errors: List[str]) -> None:
+def _check_prefix_items(instance: list, prefix: list, ctx: "_Ctx") -> None:
     """prefixItems：逐位子 schema（超出实例长度即止）。"""
     for i, sub in enumerate(prefix):
         if i < len(instance):
-            errors += _check(instance[i], sub, "%s[%d]" % (path, i),
-                             root_schema, unsupported, depth + 1)
+            ctx.errors.extend(_run(instance[i], sub, ctx.child("%s[%d]" % (ctx.path, i))))
 
 
-def _check_items(instance: list, items: dict, prefix: Any, path: str,
-                 root_schema: dict, unsupported: List[str], depth: int,
-                 errors: List[str]) -> None:
+def _check_items(instance: list, items: dict, prefix: Any, ctx: "_Ctx") -> None:
     """items：prefixItems 之后的元素都按同一子 schema 校验。"""
     start = len(prefix) if isinstance(prefix, list) else 0
     for i in range(start, len(instance)):
-        errors += _check(instance[i], items, "%s[%d]" % (path, i),
-                         root_schema, unsupported, depth + 1)
+        ctx.errors.extend(_run(instance[i], items, ctx.child("%s[%d]" % (ctx.path, i))))
 
 
-def _check_array(instance: Any, schema: dict, path: str, root_schema: dict,
-                 unsupported: List[str], depth: int, errors: List[str]) -> None:
+def _check_array(instance: Any, schema: dict, ctx: "_Ctx") -> None:
     """数组关键字：元素数 / uniqueItems / prefixItems / items。"""
     if not isinstance(instance, list):
         return
     if "minItems" in schema and len(instance) < schema["minItems"]:
-        errors.append("%s: 元素数 < %s" % (path, schema["minItems"]))
+        ctx.errors.append("%s: 元素数 < %s" % (ctx.path, schema["minItems"]))
     if "maxItems" in schema and len(instance) > schema["maxItems"]:
-        errors.append("%s: 元素数 > %s" % (path, schema["maxItems"]))
+        ctx.errors.append("%s: 元素数 > %s" % (ctx.path, schema["maxItems"]))
     if schema.get("uniqueItems"):
-        _check_unique_items(instance, path, errors)
+        _check_unique_items(instance, ctx.path, ctx.errors)
     prefix = schema.get("prefixItems")
     if isinstance(prefix, list):
-        _check_prefix_items(instance, prefix, path, root_schema, unsupported, depth, errors)
+        _check_prefix_items(instance, prefix, ctx)
     items = schema.get("items")
     if isinstance(items, dict):
-        _check_items(instance, items, prefix, path, root_schema, unsupported, depth, errors)
+        _check_items(instance, items, prefix, ctx)
 
 
 def _check_required_fields(instance: dict, schema: dict, path: str,
@@ -239,57 +257,48 @@ def _check_required_fields(instance: dict, schema: dict, path: str,
 
 
 def _check_property(value: Any, key: str, props: dict, pats: dict, schema: dict,
-                    path: str, root_schema: dict, unsupported: List[str],
-                    depth: int, errors: List[str]) -> None:
+                    ctx: "_Ctx") -> None:
     """单键：properties 命中 / patternProperties 命中 / additionalProperties 兜底。"""
     matched = False
     if key in props:
         matched = True
-        errors += _check(value, props[key], "%s.%s" % (path, key),
-                         root_schema, unsupported, depth + 1)
+        ctx.errors.extend(_run(value, props[key], ctx.child("%s.%s" % (ctx.path, key))))
     for pat, sub in pats.items():
-        why = pattern_issue(pat, path)
+        why = pattern_issue(pat, ctx.path)
         if why:
-            errors.append(why)          # 形态闸门：不拿投稿者的表达式去跑匹配
+            ctx.errors.append(why)          # 形态闸门：不拿投稿者的表达式去跑匹配
             continue
         if re.search(pat, key):
             matched = True
-            errors += _check(value, sub, "%s.%s" % (path, key),
-                             root_schema, unsupported, depth + 1)
+            ctx.errors.extend(_run(value, sub, ctx.child("%s.%s" % (ctx.path, key))))
     if matched:
         return
     ap = schema.get("additionalProperties", True)
     if ap is False:
-        errors.append("%s: 多余字段 %s（additionalProperties=false）" % (path, key))
+        ctx.errors.append("%s: 多余字段 %s（additionalProperties=false）" % (ctx.path, key))
     elif isinstance(ap, dict):
-        errors += _check(value, ap, "%s.%s" % (path, key),
-                         root_schema, unsupported, depth + 1)
+        ctx.errors.extend(_run(value, ap, ctx.child("%s.%s" % (ctx.path, key))))
 
 
-def _check_property_names(instance: dict, schema: dict, path: str, root_schema: dict,
-                          unsupported: List[str], depth: int,
-                          errors: List[str]) -> None:
+def _check_property_names(instance: dict, schema: dict, ctx: "_Ctx") -> None:
     """propertyNames：键本身也按子 schema 校验。"""
     pn = schema.get("propertyNames")
     if not isinstance(pn, dict):
         return
     for key in instance:
-        errors += _check(key, pn, "%s<键:%s>" % (path, key),
-                         root_schema, unsupported, depth + 1)
+        ctx.errors.extend(_run(key, pn, ctx.child("%s<键:%s>" % (ctx.path, key))))
 
 
-def _check_object(instance: Any, schema: dict, path: str, root_schema: dict,
-                  unsupported: List[str], depth: int, errors: List[str]) -> None:
+def _check_object(instance: Any, schema: dict, ctx: "_Ctx") -> None:
     """对象关键字：必填 / 逐键 / propertyNames。"""
     if not isinstance(instance, dict):
         return
     props = _obj(schema.get("properties"))
     pats = _obj(schema.get("patternProperties"))
-    _check_required_fields(instance, schema, path, errors)
+    _check_required_fields(instance, schema, ctx.path, ctx.errors)
     for key, value in instance.items():
-        _check_property(value, key, props, pats, schema, path, root_schema,
-                        unsupported, depth, errors)
-    _check_property_names(instance, schema, path, root_schema, unsupported, depth, errors)
+        _check_property(value, key, props, pats, schema, ctx)
+    _check_property_names(instance, schema, ctx)
 
 
 def _report_combinator(mode: str, ok: int, subs: list, path: str,
@@ -303,26 +312,22 @@ def _report_combinator(mode: str, ok: int, subs: list, path: str,
         errors.append("%s: oneOf 命中 %d 个（须恰 1）" % (path, ok))
 
 
-def _check_combinators(instance: Any, schema: dict, path: str, root_schema: dict,
-                       unsupported: List[str], depth: int,
-                       errors: List[str]) -> None:
+def _check_combinators(instance: Any, schema: dict, ctx: "_Ctx") -> None:
     """allOf / anyOf / oneOf 三组合子。"""
     for kw, mode in (("allOf", "all"), ("anyOf", "any"), ("oneOf", "one")):
         subs = schema.get(kw)
         if not isinstance(subs, list):
             continue
-        results = [_check(instance, s, path, root_schema, unsupported, depth + 1)
-                   for s in subs]
+        results = [_run(instance, s, ctx.child(ctx.path)) for s in subs]
         ok = sum(1 for r in results if not r)
-        _report_combinator(mode, ok, subs, path, errors)
+        _report_combinator(mode, ok, subs, ctx.path, ctx.errors)
 
 
-def _check_not(instance: Any, schema: dict, path: str, root_schema: dict,
-               unsupported: List[str], depth: int, errors: List[str]) -> None:
+def _check_not(instance: Any, schema: dict, ctx: "_Ctx") -> None:
     """not：子式被满足即报错。"""
-    if isinstance(schema.get("not"), dict) and not _check(
-            instance, schema["not"], path, root_schema, unsupported, depth + 1):
-        errors.append("%s: not 子式被满足" % path)
+    if isinstance(schema.get("not"), dict) and not _run(
+            instance, schema["not"], ctx.child(ctx.path)):
+        ctx.errors.append("%s: not 子式被满足" % ctx.path)
 
 
 def _check(instance: Any, schema: dict, path: str = "$",
@@ -347,15 +352,16 @@ def _check(instance: Any, schema: dict, path: str = "$",
         return ["%s: schema 节点非对象" % path]
     errors: List[str] = []
     _collect_unsupported(schema, path, unsupported)
-    _check_ref(instance, schema, path, root_schema, unsupported, _depth, errors)
+    ctx = _Ctx(path, root_schema, unsupported, _depth, errors)
+    _check_ref(instance, schema, ctx)
     _check_type(instance, schema, path, errors)
     _check_const_enum(instance, schema, path, errors)
     _check_string(instance, schema, path, errors)
     _check_number(instance, schema, path, errors)
-    _check_array(instance, schema, path, root_schema, unsupported, _depth, errors)
-    _check_object(instance, schema, path, root_schema, unsupported, _depth, errors)
-    _check_combinators(instance, schema, path, root_schema, unsupported, _depth, errors)
-    _check_not(instance, schema, path, root_schema, unsupported, _depth, errors)
+    _check_array(instance, schema, ctx)
+    _check_object(instance, schema, ctx)
+    _check_combinators(instance, schema, ctx)
+    _check_not(instance, schema, ctx)
     return errors
 
 

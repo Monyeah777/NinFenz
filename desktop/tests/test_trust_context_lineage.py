@@ -150,8 +150,12 @@ class BindingTest(unittest.TestCase):
         card = _card()
         lineage = _lineage(card_digest=tmc.identity_digest(card))
         card["prompt_context_digest"] = lineage["head"]
-        result = tcl.check_context_binding(_evidence(card, lineage), card, lineage,
-                                           root=str(ROOT))
+        result = tcl.check_context_binding(
+            _evidence(card, lineage),
+            card,
+            lineage,
+            opts=tcl.LineageOptions(root=str(ROOT)),
+        )
         self.assertTrue(result["ok"], result)
         self.assertEqual(lineage["lineage_digest"], result["lineage_digest"])
 

@@ -24,13 +24,14 @@ import ast
 import hashlib
 import os
 import re
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
-from core import json_doc
-from core import role_model as _roles
+
+from core import atomic_write, json_doc
 from core import conformance_scan as csc
 from core import face_key as _fk
-from core import atomic_write
+from core import role_model as _roles
 
 # 导入闭包指纹：由调用方算（持久层不再反向依赖解析层，见 2026-09-29 拆环）
 
@@ -308,9 +309,24 @@ def _rule_l3(root: str, tiers: list, faces: Dict[str, set], derived: set, cache:
                           % (tid, "、".join(stray[:3])))
 
 
-def _walk_cycle(tid: str, stack: list, graph: Dict[str, list], order: Dict[str, int],
-                walked: set, reported_cycles: set, issues: List[str]) -> None:
+@dataclass(frozen=True)
+class _WalkContext:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    graph: Dict[str, list]
+    order: Dict[str, int]
+    walked: set
+    reported_cycles: set
+    issues: List[str]
+
+
+def _walk_cycle(tid: str, stack: list, opts: _WalkContext) -> None:
     """依赖图 DFS：成环即报（同一路径只报一次）。"""
+
+    graph = opts.graph
+    order = opts.order
+    walked = opts.walked
+    reported_cycles = opts.reported_cycles
+    issues = opts.issues
     if tid in stack:
         path = " → ".join(list(stack) + [tid])
         if path not in reported_cycles:
@@ -321,7 +337,17 @@ def _walk_cycle(tid: str, stack: list, graph: Dict[str, list], order: Dict[str, 
         return
     for dep in graph.get(tid, []):
         if dep in order:
-            _walk_cycle(dep, stack + [tid], graph, order, walked, reported_cycles, issues)
+            _walk_cycle(
+                dep,
+                stack + [tid],
+                opts=_WalkContext(
+                    graph=graph,
+                    order=order,
+                    walked=walked,
+                    reported_cycles=reported_cycles,
+                    issues=issues,
+                ),
+            )
     walked.add(tid)
 
 
@@ -344,7 +370,17 @@ def _rule_l4(root: str, tiers: list, tier_ids: List[str], issues: List[str]) -> 
     walked: set = set()
     reported_cycles: set = set()
     for tid in tier_ids:
-        _walk_cycle(tid, [], graph, order, walked, reported_cycles, issues)
+        _walk_cycle(
+            tid,
+            [],
+            opts=_WalkContext(
+                graph=graph,
+                order=order,
+                walked=walked,
+                reported_cycles=reported_cycles,
+                issues=issues,
+            ),
+        )
 
 
 def _rule_l5(doc: Dict[str, Any], tier_ids: List[str], issues: List[str]) -> None:
@@ -617,8 +653,14 @@ def scan(root: str = ".", _fp: Optional[str] = None) -> Tuple[List[str], Dict[st
     指纹比直接算更贵」——实测不成立（冷进程本来就要为别的站点读整棵语料，摘要共享 ⇒ 指纹近乎白拿）；
     实测数字见 `quality_depth_scan.scan`。
     """
-    return csc.memo_pair("layer-model", patterns(root), _scan_impl, root,
-                         code_modules=("core.layer_model",), fp=_fp)
+    return csc.memo_pair(
+        'layer-model',
+        patterns(root),
+        _scan_impl,
+        root,
+        code_modules=('core.layer_model',),
+        opts=csc.MemoOptions(fp=_fp),
+    )
 
 
 def _scan_impl(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:

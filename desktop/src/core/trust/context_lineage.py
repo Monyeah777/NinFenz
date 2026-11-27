@@ -13,6 +13,7 @@
 from __future__ import annotations
 
 import hashlib
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -165,12 +166,29 @@ def _refs(entity: dict, kind: str) -> list:
             if isinstance(ref, dict) and str(ref.get("kind")) == kind]
 
 
-def check_context_binding(entity: Any, card: dict, lineage: dict,
-                          schema: dict | None = None, card_schema: dict | None = None,
-                          lineage_schema: dict | None = None,
-                          expected_type: str = AI_EVIDENCE_TYPE,
-                          root: str = ".") -> dict:
+@dataclass(frozen=True)
+class LineageOptions:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    schema: dict | None = None
+    card_schema: dict | None = None
+    lineage_schema: dict | None = None
+    expected_type: str = AI_EVIDENCE_TYPE
+    root: str = '.'
+
+
+def check_context_binding(
+    entity: Any,
+    card: dict,
+    lineage: dict,
+    opts: LineageOptions | None = None,
+) -> dict:
     """AI 证据 ↔ 模型卡 ↔ 上下文血缘 三方绑定。"""
+
+    opts = opts if opts is not None else LineageOptions()
+    card_schema = opts.card_schema
+    lineage_schema = opts.lineage_schema
+    expected_type = opts.expected_type
+    root = opts.root
     result = verify_lineage(lineage, card, lineage_schema, card_schema, root)
     if not result.get("ok"):
         issue = result["issues"][0]

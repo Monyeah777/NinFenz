@@ -442,8 +442,10 @@ class ConfirmGateTest(unittest.TestCase):
 
     def test_assume_yes_opens_all(self):
         seen = []
-        session = term.Session(lambda argv: seen.append(list(argv)) or 0,
-                               assume_yes=True)
+        session = term.Session(
+            lambda argv: seen.append(list(argv)) or 0,
+            opts=term.SessionOptions(assume_yes=True),
+        )
         self.assertEqual(session.dispatch("register --apply")["exit"], 0)
         self.assertEqual(seen, [["register", "--apply"]])
 
@@ -514,7 +516,7 @@ class SessionTest(unittest.TestCase):
     def test_run_session_loop_with_scripted_input(self):
         stdin = io.StringIO("0\n/quit\n")
         stdout = io.StringIO()
-        code = term.run_session(self._fake, stdin, stdout, show_banner=False)
+        code = term.run_session(self._fake, stdin, stdout, opts=term.RunOptions(show_banner=False))
         self.assertEqual(code, 0)
         out = stdout.getvalue()
         self.assertIn("nf> ", out)
@@ -524,8 +526,12 @@ class SessionTest(unittest.TestCase):
         calls = []
         stdin = io.StringIO("nf stats --write\nno\n")
         stdout = io.StringIO()
-        code = term.run_session(lambda argv: calls.append(list(argv)) or 0,
-                                stdin, stdout, show_banner=False)
+        code = term.run_session(
+            lambda argv: calls.append(list(argv)) or 0,
+            stdin,
+            stdout,
+            opts=term.RunOptions(show_banner=False),
+        )
         self.assertEqual(calls, [])
         self.assertEqual(code, 2)
         self.assertIn("已取消", stdout.getvalue())
@@ -534,8 +540,12 @@ class SessionTest(unittest.TestCase):
         calls = []
         stdin = io.StringIO("nf stats --write\nyes\n")
         stdout = io.StringIO()
-        code = term.run_session(lambda argv: calls.append(list(argv)) or 0,
-                                stdin, stdout, show_banner=False)
+        code = term.run_session(
+            lambda argv: calls.append(list(argv)) or 0,
+            stdin,
+            stdout,
+            opts=term.RunOptions(show_banner=False),
+        )
         self.assertEqual(calls, [["stats", "--write"]])
         self.assertEqual(code, 0)
 
@@ -856,8 +866,10 @@ class FormTest(unittest.TestCase):
 
     def test_session_form_flow_executes_after_confirm(self):
         calls = []
-        session = term.Session(lambda argv: calls.append(list(argv)) or 0,
-                               index=[{"path": "module", "summary": "", "flags": []}])
+        session = term.Session(
+            lambda argv: calls.append(list(argv)) or 0,
+            opts=term.SessionOptions(index=[{'path': 'module', 'summary': '', 'flags': []}]),
+        )
         kind, code, text = session.handle("/form deprecate-module")
         self.assertEqual((kind, code), ("form", 0))
         self.assertIn("请回答 file", text)
@@ -897,7 +909,7 @@ class FormTest(unittest.TestCase):
         fd, path = tempfile.mkstemp(suffix=".json")
         os.close(fd)
         try:
-            session = term.Session(lambda argv: 0, session_path=path, width=None)
+            session = term.Session(lambda argv: 0, opts=term.SessionOptions(width=None, session_path=path))
             session.dispatch("/set width=120 limit=7 color=never")
             session.last_zone = "5"
             self.assertTrue(term.save_session_state(path, session))
@@ -977,7 +989,7 @@ class OutputExperienceTest(unittest.TestCase):
         self.assertIn("\x1b[", colored)
 
     def test_session_set_changes_settings(self):
-        session = term.Session(lambda argv: 0, index=self._index())
+        session = term.Session(lambda argv: 0, opts=term.SessionOptions(index=self._index()))
         kind, code, text = session.handle("/set width=120 limit=2 color=never")
         self.assertEqual((kind, code), ("set", 0))
         self.assertIn("width = 120", text)
@@ -1088,8 +1100,12 @@ class CompletionHistoryTest(unittest.TestCase):
     def test_tab_line_lists_candidates(self):
         stdin = io.StringIO("nf lay\t\nquit\n")
         stdout = io.StringIO()
-        code = term.run_session(lambda argv: 0, stdin, stdout, show_banner=False,
-                                index=self._index())
+        code = term.run_session(
+            lambda argv: 0,
+            stdin,
+            stdout,
+            opts=term.RunOptions(show_banner=False, index=self._index()),
+        )
         self.assertEqual(code, 0)
         out = stdout.getvalue()
         self.assertIn("补全：「nf lay」", out)
@@ -1117,8 +1133,12 @@ class CompletionHistoryTest(unittest.TestCase):
         try:
             term.run_lines(["nf doctor"], lambda argv: 0)
             self.assertEqual(term.load_history(path), [])
-            term.run_session(lambda argv: 0, io.StringIO("nf doctor\nquit\n"),
-                             io.StringIO(), show_banner=False, history_path=path)
+            term.run_session(
+                lambda argv: 0,
+                io.StringIO('nf doctor\nquit\n'),
+                io.StringIO(),
+                opts=term.RunOptions(show_banner=False, history_path=path),
+            )
             self.assertEqual(term.load_history(path), ["nf doctor"])
         finally:
             os.remove(path)
@@ -1173,7 +1193,7 @@ class ResilienceTest(unittest.TestCase):
     def test_ctrl_c_cancels_line_not_session(self):
         stdin = self._KbStdin(["quit\n"])
         stdout = io.StringIO()
-        code = term.run_session(lambda argv: 0, stdin, stdout, show_banner=False)
+        code = term.run_session(lambda argv: 0, stdin, stdout, opts=term.RunOptions(show_banner=False))
         self.assertEqual(code, 0)
         self.assertIn("已取消当前输入", stdout.getvalue())
 
@@ -1181,9 +1201,15 @@ class ResilienceTest(unittest.TestCase):
         seen = []
         stdin = io.StringIO("nf layers \\\n--verify\nquit\n")
         stdout = io.StringIO()
-        code = term.run_session(lambda argv: seen.append(list(argv)) or 0,
-                                stdin, stdout, show_banner=False,
-                                index=[{"path": "layers", "summary": "", "flags": []}])
+        code = term.run_session(
+            lambda argv: seen.append(list(argv)) or 0,
+            stdin,
+            stdout,
+            opts=term.RunOptions(
+                show_banner=False,
+                index=[{'path': 'layers', 'summary': '', 'flags': []}],
+            ),
+        )
         self.assertEqual(code, 0)
         self.assertEqual(seen, [["layers", "--verify"]])
         self.assertIn("... ", stdout.getvalue())
@@ -1372,8 +1398,10 @@ class TerminalEfficiencyTest(unittest.TestCase):
 
     def test_unique_prefix_is_resolved(self):
         calls = []
-        session = term.Session(lambda argv: calls.append(list(argv)) or 0,
-                               index=self._index())
+        session = term.Session(
+            lambda argv: calls.append(list(argv)) or 0,
+            opts=term.SessionOptions(index=self._index()),
+        )
         rec = session.dispatch("nf scor")
         self.assertEqual(rec["argv"], ["score"], "唯一前缀应自动补全")
         self.assertIn("唯一前缀补全", rec["note"])
@@ -1381,8 +1409,10 @@ class TerminalEfficiencyTest(unittest.TestCase):
 
     def test_ambiguous_prefix_is_not_guessed(self):
         calls = []
-        session = term.Session(lambda argv: calls.append(list(argv)) or 0,
-                               index=self._index())
+        session = term.Session(
+            lambda argv: calls.append(list(argv)) or 0,
+            opts=term.SessionOptions(index=self._index()),
+        )
         rec = session.dispatch("nf stat")            # stats 与 state-front 两候选
         self.assertEqual(rec["exit"], 2)
         self.assertIn("未知命令", rec["note"])
@@ -1653,8 +1683,11 @@ class DeepCheckTest(unittest.TestCase):
             return 0
 
         tree = nf._collect_cli_tree()
-        issues, stats = term.deep_check(self._index(), tree["commands"],
-                                        tree["root_flags"], live_runner=_live)
+        issues, stats = term.deep_check(
+            self._index(),
+            tree['commands'],
+            opts=term.DeepCheckOptions(root_flags=tree['root_flags'], live_runner=_live),
+        )
         self.assertEqual(issues, [])
         self.assertEqual(calls[0], ["layers", "--verify"])
         self.assertEqual(len(calls), 1 + len(tree["commands"]),
@@ -1669,16 +1702,21 @@ class DeepCheckTest(unittest.TestCase):
             return 1 if list(argv) == ["doctor", "--help"] else 0
 
         tree = nf._collect_cli_tree()
-        issues, stats = term.deep_check(self._index(), tree["commands"],
-                                        tree["root_flags"], live_runner=_live)
+        issues, stats = term.deep_check(
+            self._index(),
+            tree['commands'],
+            opts=term.DeepCheckOptions(root_flags=tree['root_flags'], live_runner=_live),
+        )
         self.assertEqual(stats["help_sweep_failed"], ["doctor"])
         self.assertTrue(any("全命令可调用性失败" in i for i in issues), issues)
 
     def test_deep_check_reports_live_failure(self):
         tree = nf._collect_cli_tree()
-        issues, stats = term.deep_check(self._index(), tree["commands"],
-                                        tree["root_flags"],
-                                        live_runner=lambda argv: 1)
+        issues, stats = term.deep_check(
+            self._index(),
+            tree['commands'],
+            opts=term.DeepCheckOptions(root_flags=tree['root_flags'], live_runner=lambda argv: 1),
+        )
         self.assertEqual(stats["live_code"], 1)
         self.assertTrue(any("活体自检失败" in i for i in issues), issues)
 
@@ -1687,10 +1725,15 @@ class DeepCheckTest(unittest.TestCase):
         fd, path = tempfile.mkstemp(suffix=".txt")
         os.close(fd)
         try:
-            issues, _ = term.deep_check(self._index(), tree["commands"],
-                                        tree["root_flags"],
-                                        live_runner=lambda argv: 0,
-                                        history_path=path)
+            issues, _ = term.deep_check(
+                self._index(),
+                tree['commands'],
+                opts=term.DeepCheckOptions(
+                    root_flags=tree['root_flags'],
+                    live_runner=lambda argv: 0,
+                    history_path=path,
+                ),
+            )
             self.assertEqual(issues, [], "可写落点不该报错")
         finally:
             os.remove(path)

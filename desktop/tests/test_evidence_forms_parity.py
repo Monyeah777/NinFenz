@@ -87,7 +87,7 @@ class TestReceiptsFormParity(_Base):
 
     def test_receipts_form_verdict_level_root_agree(self):
         doc, path = self._write_receipts()
-        core = evidence.verify_any(str(path), root=str(self.tmp))
+        core = evidence.verify_any(str(path), opts=evidence.BatchVerifyOptions(root=str(self.tmp)))
         rc, standalone, err = self._standalone_receipts(path)
         self.assertEqual(0, rc, err[-300:])
         self.assertEqual("ok", core["verdict"], core["issues"])
@@ -99,7 +99,7 @@ class TestReceiptsFormParity(_Base):
 
         # 篡改成员实体：两边都必须判 invalid（且 level/root 仍同口径）
         (self.tmp / "docs" / "a.md").write_text("# A\n\n正文被改\n", encoding="utf-8")
-        core_bad = evidence.verify_any(str(path), root=str(self.tmp))
+        core_bad = evidence.verify_any(str(path), opts=evidence.BatchVerifyOptions(root=str(self.tmp)))
         rc_bad, standalone_bad, err_bad = self._standalone_receipts(path)
         self.assertEqual(1, rc_bad, err_bad[-300:])
         self.assertEqual("invalid", core_bad["verdict"])
@@ -122,7 +122,10 @@ class TestAttestFormParity(_Base):
 
     def test_attest_form_verdict_level_agree(self):
         envs, path = self._write_attest_set()
-        core = evidence.verify_any(str(path), root=str(self.tmp), key=self.key)
+        core = evidence.verify_any(
+            str(path),
+            opts=evidence.BatchVerifyOptions(key=self.key, root=str(self.tmp)),
+        )
         rc, standalone, err = self._standalone(
             "--evidence", str(path), "--root", str(self.tmp), "--kind", "attest",
             "--key-file", str(self.key_file), "--json")
@@ -134,7 +137,7 @@ class TestAttestFormParity(_Base):
                                   "attest 形态 ok（带 key）")
 
         # 缺 key：hmac 级信封两边都必须 fail-closed，绝不静默降级
-        core_nokey = evidence.verify_any(str(path), root=str(self.tmp))
+        core_nokey = evidence.verify_any(str(path), opts=evidence.BatchVerifyOptions(root=str(self.tmp)))
         rc_nokey, standalone_nokey, err_nokey = self._standalone(
             "--evidence", str(path), "--root", str(self.tmp), "--kind", "attest",
             "--json")
@@ -153,8 +156,11 @@ class TestOutOfRepoStandalone(_Base):
         self.outside.mkdir()
         self.copied = self.outside / "nf_verify.py"
         shutil.copy(str(SCRIPT), str(self.copied))
-        self.data, _info = evidence.build(str(self.tmp), ["docs/a.md", "docs/b.md"],
-                                          created_at=PIN)
+        self.data, _info = evidence.build(
+            str(self.tmp),
+            ['docs/a.md', 'docs/b.md'],
+            opts=evidence.BuildOptions(created_at=PIN),
+        )
         self.good = self.outside / "bundle.zip"
         self.good.write_bytes(self.data)
         self.bad = self.outside / "bad.zip"

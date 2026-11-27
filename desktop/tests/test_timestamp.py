@@ -140,8 +140,11 @@ class EvidenceTimeAnchorTest(unittest.TestCase):
         root = self.tmp / "repo"
         (root / "docs").mkdir(parents=True)
         (root / "docs" / "a.md").write_text("# A\n", encoding="utf-8")
-        data, _info = evidence.build(str(root), ["docs/a.md"],
-                                     created_at="2026-01-01T00:00:00Z")
+        data, _info = evidence.build(
+            str(root),
+            ['docs/a.md'],
+            opts=evidence.BuildOptions(created_at='2026-01-01T00:00:00Z'),
+        )
         self.bundle = self.tmp / "b.zip"
         self.bundle.write_bytes(data)
         self.q, self.r, ca = _issue(self.tmp, self.bundle)
@@ -152,7 +155,10 @@ class EvidenceTimeAnchorTest(unittest.TestCase):
 
     def test_verify_with_token_sets_time_proof_tsa(self):
         rec = dict(self.record)
-        res = evidence.verify(str(self.bundle), time_record=rec, time_ca=str(self.ca))
+        res = evidence.verify(
+            str(self.bundle),
+            opts=evidence.VerifyOptions(time_record=rec, time_ca=str(self.ca)),
+        )
         self.assertEqual("ok", res["verdict"], res["issues"])
         self.assertEqual("tsa", res["time_proof"])
         self.assertRegex(res["time_basis"], r"^\d{4}-\d{2}-\d{2}T")
@@ -161,7 +167,10 @@ class EvidenceTimeAnchorTest(unittest.TestCase):
         other = self.tmp / "other.zip"
         other.write_bytes(self.bundle.read_bytes() + b"x")
         rec = dict(self.record)
-        res = evidence.verify(str(other), time_record=rec, time_ca=str(self.ca))
+        res = evidence.verify(
+            str(other),
+            opts=evidence.VerifyOptions(time_record=rec, time_ca=str(self.ca)),
+        )
         self.assertEqual("invalid", res["verdict"])
         self.assertTrue(any("时间锚与被证对象不符" in i for i in res["issues"]))
 

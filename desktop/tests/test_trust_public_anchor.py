@@ -185,27 +185,33 @@ class T4IntegrationTest(unittest.TestCase):
     def run_verify(self, with_public=True):
         bundle, policy = _bundle_and_policy("T4")
         digest = tc.digest_of(bundle)
-        head = tsig.sign_head("bundle", digest,
-                              [{"keyid": KEYID,
-                                "sign": lambda data: dsse.hmac_sign(KEY, data)}],
-                              root=str(ROOT))
+        head = tsig.sign_head(
+            'bundle',
+            digest,
+            [{'keyid': KEYID, 'sign': lambda data: dsse.hmac_sign(KEY, data)}],
+            opts=tsig.SignHeadOptions(root=str(ROOT)),
+        )
         anchor_doc = ta.build_anchor_set(digest, _anchors(digest), root=str(ROOT))
         verifiers = {"rfc3161": lambda item, d: {"ok": True, "gen_time": NOW},
                      "transparency-sth": ta.make_sth_verifier({"nf:log:test": self._checker}),
                      "witness": ta.make_witness_verifier({KEYID: self._checker})}
         public = _entry(target=digest) if with_public else None
-        return tv.verify(bundle, policy, str(ROOT), anchor=anchor_doc,
-                         anchor_verifiers=verifiers, head_signature=head,
-                         registry={"schema": "nf-issuer-registry/1",
-                                   "issuers": [{"id": ISSUER, "kind": "service",
-                                                "keys": [{"keyid": KEYID,
-                                                          "alg": "hmac-sha256",
-                                                          "status": "active",
-                                                          "not_before": "2026-01-01T00:00:00Z",
-                                                          "not_after": "2027-01-01T00:00:00Z"}]}]},
-                         material={KEYID: {"hex": KEY.hex()}}, now=NOW,
-                         public_anchor=public, public_anchor_verifier=_verifier(),
-                         public_log_id=LOG_ID)
+        return tv.verify(
+            bundle,
+            policy,
+            str(ROOT),
+            opts=tv.TrustVerifyOptions(
+                anchor=anchor_doc,
+                anchor_verifiers=verifiers,
+                head_signature=head,
+                registry={'schema': 'nf-issuer-registry/1', 'issuers': [{'id': ISSUER, 'kind': 'service', 'keys': [{'keyid': KEYID, 'alg': 'hmac-sha256', 'status': 'active', 'not_before': '2026-01-01T00:00:00Z', 'not_after': '2027-01-01T00:00:00Z'}]}]},
+                material={KEYID: {'hex': KEY.hex()}},
+                now=NOW,
+                public_anchor=public,
+                public_anchor_verifier=_verifier(),
+                public_log_id=LOG_ID,
+            ),
+        )
 
     def test_t4_achieved_with_public_anchor(self):
         result = self.run_verify(True)

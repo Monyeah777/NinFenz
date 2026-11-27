@@ -20,11 +20,11 @@ core.library_entries 取（core.library 是 I 更高的转发面，反向依赖�
 from __future__ import annotations
 
 import re
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, Iterable, List
-from core import json_doc
 
-from core import atomic_write
+from core import atomic_write, json_doc
 from core.library_entries import parse_frontmatter
 
 VERIFY_REL = "verify.sh"
@@ -122,9 +122,26 @@ def write_index(root: str, *, index_rel: str, header: str, begin: str, end: str,
     return {"changed": changed, "path": index_rel}
 
 
-def check_index(root: str, *, index_rel: str, begin: str, end: str, block: str,
-                missing_hint: str, mismatch: str) -> List[str]:
+@dataclass(frozen=True)
+class IndexOptions:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    index_rel: str
+    begin: str
+    end: str
+    block: str
+    missing_hint: str
+    mismatch: str
+
+
+def check_index(root: str, opts: IndexOptions) -> List[str]:
     """校验生成投影与实时重算一致（缺件 / 缺生成区 / 漂移各给修复指引）。"""
+
+    index_rel = opts.index_rel
+    begin = opts.begin
+    end = opts.end
+    block = opts.block
+    missing_hint = opts.missing_hint
+    mismatch = opts.mismatch
     p = Path(root) / index_rel
     if not p.is_file():
         return ["缺 %s（修复指引：%s）" % (index_rel, missing_hint)]

@@ -86,8 +86,17 @@ def _decision_rows(tmp: str, digest_a: str) -> list:
 
 def _build(tmp: str, targets: list, key: bytes | None = None, anchor=None,
            decision: dict | None = None) -> bytes:
-    data, _info = evidence.build(tmp, targets, issuer="vectors", created_at=PIN,
-                                 key=key, anchor=anchor, decision=decision)
+    data, _info = evidence.build(
+        tmp,
+        targets,
+        opts=evidence.BuildOptions(
+            issuer='vectors',
+            key=key,
+            created_at=PIN,
+            anchor=anchor,
+            decision=decision,
+        ),
+    )
     return data
 
 
@@ -186,7 +195,9 @@ def _build_vectors() -> dict:
                           bundle=_write_members(os.path.join(tmp, "nochain.zip"), m)))
 
         head2 = {"count": 2, "head": evidence.verify(
-            os.path.join(tmp, "base.zip") if False else _dump(tmp, base), key=None)["head"]}
+            os.path.join(tmp, 'base.zip') if False else _dump(tmp, base),
+            opts=evidence.VerifyOptions(key=None),
+        )["head"]}
         v3 = _build(tmp, ["d/a.md", "d/b.md", "d/c.md"], anchor=head2)
         rows.append(_case("anchor_ok", "锚点对得上（正常追加）", "ok",
                           bundle=v3, anchor=head2))
@@ -197,8 +208,15 @@ def _build_vectors() -> dict:
         rev = {"schema": evidence.REVOCATION_SCHEMA,
                "revoked": [{"digest": digest_a, "revoked_at": PIN, "reason": "vectors"}]}
         rows.append(_case("revoked", "吊销表命中", "revoked", bundle=base, revocations=rev))
-        expired, _ei = evidence.build(tmp, ["d/a.md"], issuer="vectors", created_at=PIN,
-                                      expires_at="2020-01-01T00:00:00Z")
+        expired, _ei = evidence.build(
+            tmp,
+            ['d/a.md'],
+            opts=evidence.BuildOptions(
+                issuer='vectors',
+                expires_at='2020-01-01T00:00:00Z',
+                created_at=PIN,
+            ),
+        )
         rows.append(_case("expired", "有效期已过（expires_at 早于判定时点）", "expired",
                           bundle=expired, at="2030-01-01T00:00:00Z"))
         m = _members(base)

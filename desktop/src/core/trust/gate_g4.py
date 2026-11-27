@@ -86,27 +86,57 @@ def _composition(root: str, issues: list, stats: dict) -> None:
                              copy.deepcopy(CLAIMS))
     digest = tc.digest_of(bundle)
     signers = [{"keyid": KEYID, "sign": lambda data: dsse.hmac_sign(HMAC_KEY, data)}]
-    envelope = tsig.sign_head("bundle", digest, signers, root=root)
+    envelope = tsig.sign_head('bundle', digest, signers, opts=tsig.SignHeadOptions(root=root))
     anchor_doc = ta.build_anchor_set(digest, _anchors(digest), root=root)
-    result = tv.verify(bundle, _policy("T3"), root, anchor=anchor_doc,
-                       anchor_verifiers=_verifiers(), head_signature=envelope,
-                       registry=_registry(), material=_material(), now=NOW)
+    result = tv.verify(
+        bundle,
+        _policy('T3'),
+        root,
+        opts=tv.TrustVerifyOptions(
+            anchor=anchor_doc,
+            anchor_verifiers=_verifiers(),
+            head_signature=envelope,
+            registry=_registry(),
+            material=_material(),
+            now=NOW,
+        ),
+    )
     stats["t3"] = result["report"]["level"]["achieved"]
     stats["t3_exit"] = result["exit_code"]
     if result["exit_code"] != 0 or stats["t3"] != "T3":
         issues.append(f"T3 组合未达成：exit={result['exit_code']} achieved={stats['t3']} "
                       f"issues={[i['code'] for i in result['report']['issues']][:4]}"
                       f"（{GUIDE}signature/time_token/STH+witness 任一断链）")
-    t4 = tv.verify(bundle, _policy("T4"), root, anchor=anchor_doc,
-                   anchor_verifiers=_verifiers(), head_signature=envelope,
-                   registry=_registry(), material=_material(), now=NOW)
+    t4 = tv.verify(
+        bundle,
+        _policy('T4'),
+        root,
+        opts=tv.TrustVerifyOptions(
+            anchor=anchor_doc,
+            anchor_verifiers=_verifiers(),
+            head_signature=envelope,
+            registry=_registry(),
+            material=_material(),
+            now=NOW,
+        ),
+    )
     stats["t4"] = t4["report"]["level"]["achieved"]
     codes = [i["code"] for i in t4["report"]["issues"]]
     if t4["exit_code"] != 2 or "PUBLIC-ANCHOR-MISSING" not in codes:
         issues.append(f"required=T4 未按缺公共锚 exit 2：exit={t4['exit_code']} codes={codes}")
-    short = tv.verify(bundle, _policy("T3", threshold=2), root, anchor=anchor_doc,
-                      anchor_verifiers=_verifiers(), head_signature=envelope,
-                      registry=_registry(), material=_material(), now=NOW)
+    short = tv.verify(
+        bundle,
+        _policy('T3', threshold=2),
+        root,
+        opts=tv.TrustVerifyOptions(
+            anchor=anchor_doc,
+            anchor_verifiers=_verifiers(),
+            head_signature=envelope,
+            registry=_registry(),
+            material=_material(),
+            now=NOW,
+        ),
+    )
     if short["exit_code"] == 0 or short["report"]["level"]["achieved"] == "T3":
         issues.append("witness 阈值不足仍达 T3（阈值判据失效）")
     for detail in ta.verify_anchor_set(anchor_doc, digest, _policy("T3"),
@@ -196,10 +226,18 @@ def scan(root: str = ".") -> tuple:
                                  copy.deepcopy(CLAIMS))
         digest = tc.digest_of(bundle)
         signers = [{"keyid": KEYID, "sign": lambda data: dsse.hmac_sign(HMAC_KEY, data)}]
-        head = tsig.sign_head("bundle", digest, signers, root=root)
-        doc = ta.auto_anchor(digest, [{"kind": "git-commit", "repo": ".", "commit": "0" * 40}],
-                             root=root, head=head, registry=_registry(),
-                             material=_material(), now=NOW)
+        head = tsig.sign_head('bundle', digest, signers, opts=tsig.SignHeadOptions(root=root))
+        doc = ta.auto_anchor(
+            digest,
+            [{'kind': 'git-commit', 'repo': '.', 'commit': '0' * 40}],
+            opts=ta.AnchorOptions(
+                root=root,
+                head=head,
+                registry=_registry(),
+                material=_material(),
+                now=NOW,
+            ),
+        )
         if doc.get("target_digest") != digest or len(doc.get("anchors") or []) != 1:
             issues.append("auto-anchor 编排产物形状不符（target/anchors）")
         stats["auto_anchor"] = 1

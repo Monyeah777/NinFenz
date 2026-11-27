@@ -43,8 +43,11 @@ def _fixture(tmp, key=None, ssh_key="", ssh_identity=""):
     (d / "NF-9.md").write_text(ENTRY, encoding="utf-8")
     lib.write_projection(tmp)
     if key or ssh_key:
-        lib.set_attestation(tmp, "NF-9", key=key, ssh_key=ssh_key,
-                            ssh_identity=ssh_identity)
+        lib.set_attestation(
+            tmp,
+            'NF-9',
+            opts=lib.AttestationOptions(key=key, ssh_key=ssh_key, ssh_identity=ssh_identity),
+        )
     else:
         rc.write(tmp)
     return tmp

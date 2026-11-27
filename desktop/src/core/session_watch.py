@@ -125,8 +125,12 @@ def run_session(runner, stdin, stdout, watch_root=None, **kw) -> int:
     """`terminal.run_session` 的**带会话缓存**包装（`nf shell` 走这条）。"""
     from core import terminal as _term
     with _attached(watch_root) as ok:
-        return _term.run_session(_wrap(runner, watch_root) if ok else runner,
-                                 stdin, stdout, **kw)
+        return _term.run_session(
+            _wrap(runner, watch_root) if ok else runner,
+            stdin,
+            stdout,
+            opts=_term.RunOptions(**kw),
+        )
 
 
 def run_script(script, runner, watch_root=None, **kw) -> tuple:

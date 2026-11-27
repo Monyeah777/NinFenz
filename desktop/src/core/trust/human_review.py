@@ -15,6 +15,7 @@ decision 必须是 approve。缺失记录 = PENDING，**永远不得读成通过
 """
 from __future__ import annotations
 
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -50,9 +51,29 @@ def load_schema(root: str = ".", rel: str = SCHEMA_REL) -> dict:
     return doc
 
 
-def build_statement(subject_kind: str, subject_digest: str, decision: str,
-                    issuer_id: str, keyid: str, rationale: str, reviewed_at: str,
-                    schema: dict | None = None, root: str = ".") -> dict:
+@dataclass(frozen=True)
+class ReviewStatementOptions:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    issuer_id: str
+    keyid: str
+    rationale: str
+    reviewed_at: str
+    schema: dict | None = None
+    root: str = '.'
+
+
+def build_statement(
+    subject_kind: str,
+    subject_digest: str,
+    decision: str,
+    opts: ReviewStatementOptions,
+) -> dict:
+    issuer_id = opts.issuer_id
+    keyid = opts.keyid
+    rationale = opts.rationale
+    reviewed_at = opts.reviewed_at
+    schema = opts.schema
+    root = opts.root
     if subject_kind not in SUBJECT_KINDS:
         raise ValueError(f"subject_kind 越界：{subject_kind!r}（{GUIDE}取 {SUBJECT_KINDS}）")
     if decision not in DECISIONS:
@@ -85,12 +106,30 @@ def review_state(result: dict | None) -> str:
     return STATE_APPROVED
 
 
-def verify_review(envelope: Any, expected_kind: str, expected_digest: str,
-                  registry: dict, material: dict,
-                  schema_envelope: dict | None = None,
-                  schema_statement: dict | None = None,
-                  now: str | None = None, root: str = ".") -> dict:
+@dataclass(frozen=True)
+class ReviewVerifyOptions:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    schema_envelope: dict | None = None
+    schema_statement: dict | None = None
+    now: str | None = None
+    root: str = '.'
+
+
+def verify_review(
+    envelope: Any,
+    expected_kind: str,
+    expected_digest: str,
+    registry: dict,
+    material: dict,
+    opts: ReviewVerifyOptions | None = None,
+) -> dict:
     """验复核信封：DSSE + registry 生命周期 + reviewer human kind + 对象绑定 + decision。"""
+
+    opts = opts if opts is not None else ReviewVerifyOptions()
+    schema_envelope = opts.schema_envelope
+    schema_statement = opts.schema_statement
+    now = opts.now
+    root = opts.root
     if not isinstance(envelope, dict):
         return {"ok": False, "state": STATE_INVALID, "reason": REASON_INVALID}
     if envelope.get("payloadType") != PAYLOAD_TYPE:

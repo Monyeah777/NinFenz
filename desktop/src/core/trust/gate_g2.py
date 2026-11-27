@@ -82,20 +82,58 @@ def _check_signature(root: str, schemas: dict, issues: list, stats: dict) -> dic
     digest = tc.digest_of(bundle)
     stats["bundle_digest"] = digest
     signers = [{"keyid": KEYID, "sign": lambda data: dsse.hmac_sign(HMAC_KEY, data)}]
-    envelope = tsig.sign_head("bundle", digest, signers, schema=head_schema, root=root)
+    envelope = tsig.sign_head(
+        'bundle',
+        digest,
+        signers,
+        opts=tsig.SignHeadOptions(schema=head_schema, root=root),
+    )
     stats["signature_envelope"] = 1
-    good = tsig.verify_head(envelope, "bundle", digest, _registry(), _material(),
-                            dsse_schema, head_schema, now=NOW, root=root)
+    good = tsig.verify_head(
+        envelope,
+        'bundle',
+        digest,
+        _registry(),
+        _material(),
+        opts=tsig.VerifyHeadOptions(
+            schema_envelope=dsse_schema,
+            schema_statement=head_schema,
+            now=NOW,
+            root=root,
+        ),
+    )
     if not good.get("ok"):
         issues.append(f"合法链头签名未通过：{good.get('reason')}（{GUIDE}签名/registry 接线断裂）")
     stats["signature_verified"] = 1 if good.get("ok") else 0
-    wrong = tsig.verify_head(envelope, "bundle", "f" * 64, _registry(), _material(),
-                             dsse_schema, head_schema, now=NOW, root=root)
+    wrong = tsig.verify_head(
+        envelope,
+        'bundle',
+        'f' * 64,
+        _registry(),
+        _material(),
+        opts=tsig.VerifyHeadOptions(
+            schema_envelope=dsse_schema,
+            schema_statement=head_schema,
+            now=NOW,
+            root=root,
+        ),
+    )
     if wrong.get("ok"):
         issues.append(f"错摘要的链头签名未被拒（{GUIDE}语句绑定失效）")
     revoked = _registry(status="revoked", revoked_at=NOW, revocation_reason="gate probe")
-    if tsig.verify_head(envelope, "bundle", digest, revoked, _material(),
-                        dsse_schema, head_schema, now=NOW, root=root).get("ok"):
+    if tsig.verify_head(
+        envelope,
+        'bundle',
+        digest,
+        revoked,
+        _material(),
+        opts=tsig.VerifyHeadOptions(
+            schema_envelope=dsse_schema,
+            schema_statement=head_schema,
+            now=NOW,
+            root=root,
+        ),
+    ).get("ok"):
         issues.append(f"吊销 key 的签名未被拒（{GUIDE}registry 生命周期未接线）")
     return {"bundle": bundle, "digest": digest, "envelope": envelope}
 
@@ -123,8 +161,17 @@ def _check_anchor(anchor_digest: str, issues: list, stats: dict) -> None:
 
 def _check_composition(bundle: dict, envelope: dict, issues: list, stats: dict) -> None:
     for required in ("T0", "T1"):
-        result = tv.verify(bundle, _policy(required), ".", head_signature=envelope,
-                           registry=_registry(), material=_material(), now=NOW)
+        result = tv.verify(
+            bundle,
+            _policy(required),
+            '.',
+            opts=tv.TrustVerifyOptions(
+                head_signature=envelope,
+                registry=_registry(),
+                material=_material(),
+                now=NOW,
+            ),
+        )
         if result["exit_code"] != 0:
             issues.append(f"required={required} 时签名链未达等级：exit={result['exit_code']} "
                           f"{[i['code'] for i in result['report']['issues']]}"
@@ -136,8 +183,17 @@ def _check_composition(bundle: dict, envelope: dict, issues: list, stats: dict) 
         if tv.LEVELS.index(achieved) > current_rank:
             stats["achieved"] = achieved
     revoked = _registry(status="revoked", revoked_at=NOW, revocation_reason="gate probe")
-    broken = tv.verify(bundle, _policy("T1"), ".", head_signature=envelope,
-                       registry=revoked, material=_material(), now=NOW)
+    broken = tv.verify(
+        bundle,
+        _policy('T1'),
+        '.',
+        opts=tv.TrustVerifyOptions(
+            head_signature=envelope,
+            registry=revoked,
+            material=_material(),
+            now=NOW,
+        ),
+    )
     if broken["exit_code"] != 1:
         issues.append(f"吊销 registry 的 T1 验证未判 invalid："
                       f"exit={broken['exit_code']}（{GUIDE}吊销必须 fail-closed）")

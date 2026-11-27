@@ -229,7 +229,10 @@ def plan(root: str = ".", adapter: str = "stub", top: int = 5, endpoint: str = "
                         "where": it["where_hint"]} for it in picked],
     }, ensure_ascii=False, sort_keys=True)
     req = {"state": state_text, "questions": qs}
-    out = dl.decide(req, adapter=adapter, endpoint=endpoint, timeout=timeout, root=root)
+    out = dl.decide(
+        req,
+        opts=dl.DecideOptions(adapter=adapter, endpoint=endpoint, timeout=timeout, root=root),
+    )
     if out.get("status") != "ok":
         return {"schema": "nf-workorder/1", "status": "abstained",
                 "reason": out.get("reason"), "state": st,

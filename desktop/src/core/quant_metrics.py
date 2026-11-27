@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import csv
 import math
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Sequence, Tuple
 
@@ -239,14 +240,38 @@ def _block(prices: Sequence[float], annual_factor: int, risk_free_annual: float,
     }
 
 
-def performance_report(series: Dict[str, Any], *, period_start: str, period_end: str,
-                       currency: str = "CNY", return_basis: str = "simple",
-                       frequency: str = "daily", risk_free_rate_annual: float = 0.0,
-                       benchmark_id: str = "", cost_bps_fee: float = 0.0,
-                       cost_bps_slippage: float = 0.0, fill_rule: str = "next_open",
-                       single_side_turnover: bool = True,
-                       as_of: str = "") -> Dict[str, Any]:
+@dataclass(frozen=True)
+class ReportOptions:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    period_start: str
+    period_end: str
+    currency: str = 'CNY'
+    return_basis: str = 'simple'
+    frequency: str = 'daily'
+    risk_free_rate_annual: float = 0.0
+    benchmark_id: str = ''
+    cost_bps_fee: float = 0.0
+    cost_bps_slippage: float = 0.0
+    fill_rule: str = 'next_open'
+    single_side_turnover: bool = True
+    as_of: str = ''
+
+
+def performance_report(series: Dict[str, Any], opts: ReportOptions) -> Dict[str, Any]:
     """GIPS 对齐的绩效报告（口径 + 披露面显式）；纯函数，可逐字节复算。"""
+
+    period_start = opts.period_start
+    period_end = opts.period_end
+    currency = opts.currency
+    return_basis = opts.return_basis
+    frequency = opts.frequency
+    risk_free_rate_annual = opts.risk_free_rate_annual
+    benchmark_id = opts.benchmark_id
+    cost_bps_fee = opts.cost_bps_fee
+    cost_bps_slippage = opts.cost_bps_slippage
+    fill_rule = opts.fill_rule
+    single_side_turnover = opts.single_side_turnover
+    as_of = opts.as_of
     if frequency not in ANNUAL_FACTORS:
         raise ValueError("频率须在 %s 中，实为 %r" % (sorted(ANNUAL_FACTORS), frequency))
     af = ANNUAL_FACTORS[frequency]

@@ -19,6 +19,8 @@
 """
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 # ruff: noqa: F401 — 门面按原模块面重新导出（re-export 是职责，不是未使用）
 from typing import Any
 
@@ -122,16 +124,12 @@ from ._terminal._script import (
     run_lines,
     run_script,
 )
-from ._terminal._session import (
-    Session,
-)
+from ._terminal._session import Session, SessionOptions
 from ._terminal._session_io import (
     load_session_state,
     save_session_state,
 )
-from ._terminal._session_run import (
-    run_session,
-)
+from ._terminal._session_run import RunOptions, run_session
 from ._terminal._surface import (
     _surface_params,
     render_surface,
@@ -160,15 +158,32 @@ from ._terminal._ui import (
 )
 
 
-def deep_check(index, commands, root_flags=(), live_runner=None,
-               history_path=None, session_path=None, stream=None,
-               pager_ok=None) -> tuple:
+@dataclass(frozen=True)
+class DeepCheckOptions:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    root_flags: object = ()
+    live_runner: object = None
+    history_path: object = None
+    session_path: object = None
+    stream: object = None
+    pager_ok: object = None
+
+
+def deep_check(index, commands, opts: DeepCheckOptions | None = None) -> tuple:
     """活体自检 → (issues, stats)：静态面之上再核**本机环境**与**真跑一条只读命令**。
 
     `nf shell --verify`（静态）与 `--verify --deep`（活体）共用本函数；调用方注入
     `live_runner(argv) -> int`（真实执行一条只读命令）与 `pager_ok`（分页器是否在场）。
     判据只读、不落件：可写性用祖先目录探测，不写探针文件。
     """
+
+    opts = opts if opts is not None else DeepCheckOptions()
+    root_flags = opts.root_flags
+    live_runner = opts.live_runner
+    history_path = opts.history_path
+    session_path = opts.session_path
+    stream = opts.stream
+    pager_ok = opts.pager_ok
     issues, stats = self_check(index, commands, root_flags)
     # 说明：`live_runner` 可能内部走 argparse 的 --help（SystemExit(0)）——统一在此归一，
     # 否则一次 help 就把整个深检打断（实测踩过）。

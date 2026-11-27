@@ -42,9 +42,12 @@ def _material():
 
 
 def _head(digest):
-    return tsig.sign_head("bundle", digest,
-                          [{"keyid": KEYID, "sign": lambda data: dsse.hmac_sign(KEY, data)}],
-                          root=str(ROOT))
+    return tsig.sign_head(
+        'bundle',
+        digest,
+        [{'keyid': KEYID, 'sign': lambda data: dsse.hmac_sign(KEY, data)}],
+        opts=tsig.SignHeadOptions(root=str(ROOT)),
+    )
 
 
 def _components():
@@ -55,8 +58,17 @@ class AutoAnchorTest(unittest.TestCase):
     def test_auto_anchor_with_verified_head(self):
         bundle = _bundle()
         digest = tc.digest_of(bundle)
-        doc = ta.auto_anchor(digest, _components(), root=str(ROOT), head=_head(digest),
-                             registry=_registry(), material=_material(), now=NOW)
+        doc = ta.auto_anchor(
+            digest,
+            _components(),
+            opts=ta.AnchorOptions(
+                root=str(ROOT),
+                head=_head(digest),
+                registry=_registry(),
+                material=_material(),
+                now=NOW,
+            ),
+        )
         self.assertEqual(digest, doc["target_digest"])
         self.assertEqual(1, len(doc["anchors"]))
         self.assertEqual([], ta.load_schema(str(ROOT)).get("problems") or [])
@@ -65,23 +77,35 @@ class AutoAnchorTest(unittest.TestCase):
         bundle = _bundle()
         digest = tc.digest_of(bundle)
         with self.assertRaises(ValueError) as ctx:
-            ta.auto_anchor(digest, _components(), root=str(ROOT),
-                           head=_head("f" * 64), registry=_registry(),
-                           material=_material(), now=NOW)
+            ta.auto_anchor(
+                digest,
+                _components(),
+                opts=ta.AnchorOptions(
+                    root=str(ROOT),
+                    head=_head('f' * 64),
+                    registry=_registry(),
+                    material=_material(),
+                    now=NOW,
+                ),
+            )
         self.assertIn("AUTO-ANCHOR-HEAD-INVALID", str(ctx.exception))
 
     def test_head_without_context_refused(self):
         digest = tc.digest_of(_bundle())
         with self.assertRaises(ValueError) as ctx:
-            ta.auto_anchor(digest, _components(), root=str(ROOT), head=_head(digest))
+            ta.auto_anchor(
+                digest,
+                _components(),
+                opts=ta.AnchorOptions(root=str(ROOT), head=_head(digest)),
+            )
         self.assertIn("AUTO-ANCHOR-HEAD-CONTEXT-MISSING", str(ctx.exception))
 
     def test_empty_or_invalid_components_refused(self):
         digest = tc.digest_of(_bundle())
         with self.assertRaises(ValueError):
-            ta.auto_anchor(digest, [], root=str(ROOT))
+            ta.auto_anchor(digest, [], opts=ta.AnchorOptions(root=str(ROOT)))
         with self.assertRaises(ValueError):
-            ta.auto_anchor(digest, [{"kind": "magic"}], root=str(ROOT))
+            ta.auto_anchor(digest, [{'kind': 'magic'}], opts=ta.AnchorOptions(root=str(ROOT)))
 
     def test_cli_auto_anchor(self):
         bundle = _bundle()

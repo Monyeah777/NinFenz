@@ -14,33 +14,83 @@
 
 from __future__ import annotations
 
+import copy
+import os
+
 # ruff: noqa: F401 — 门面按原模块面重新导出（re-export 是职责，不是未使用）
 import sys as _sys
 import types as _types
-import copy
-import os
+from dataclasses import dataclass
+
+# 导入闭包指纹：由调用方算（持久层不再反向依赖解析层，见 2026-09-29 拆环）
+from typing import Any, Dict, List, Tuple
+
+from core import (
+    atomic_write,
+    disk_cache,
+    json_doc,
+)
+from core import (
+    content_face as _cf,
+)
+from core import (
+    import_graph as _ig,
+)
 
 # 依赖面：逐字保留原模块 import 面（含函数内 core import 的边）——
 # 耦合图/纯度面按模块级 import 计算，勿删（见 re-export 说明）。
 from core import (
     lazy_yaml as _lyaml,
-    atomic_write,
-    json_doc,
-    import_graph as _ig,
-    content_face as _cf,
-    disk_cache,
 )
-# 导入闭包指纹：由调用方算（持久层不再反向依赖解析层，见 2026-09-29 拆环）
 
-from typing import List, Dict, Tuple, Any
+# 活状态/可 patch 面：读取与赋值一律转发到真实持有模块（实现见 core/_facades）。
+from core._facades import install as _install_live_facade
 
+from ._conformance import _fence, _memo, _resident
+from ._conformance._export import (
+    _GATE_FAIL_TOKENS,
+    _gate_calls,
+    _gate_defs,
+    export_manifest_issues,
+)
+from ._conformance._fence import (
+    _BODY_CACHE,
+    _BODY_CACHE_BYTES,
+    _BODY_CACHE_MAX,
+    _BODY_CACHE_MAX_BYTES,
+    _FENCE_CACHE,
+    _FENCE_CACHE_MAX,
+    _FENCE_CACHE_MAX_BYTES,
+    _T,
+    FENCE,
+    _evidence_ids,
+    _fence_yaml,
+    _fence_yaml_cached,
+    _fence_yaml_opt,
+    _parse_fence_yaml,
+    _read_json,
+    load_yaml,
+    load_yaml_cached,
+)
+from ._conformance._memo import (
+    read_memo,
+)
+from ._conformance._read import (
+    _decode_text,
+    _payload_digest,
+    _raw_bytes,
+    content_fingerprint,
+    fingerprint_of,
+    read_bytes_cached,
+    read_text_cached,
+)
 from ._conformance._resident import (
-    _Entry,
     _KEY_CACHE,
     _KEY_CACHE_MAX,
     _RESIDENT_DIR_MAX,
     _RESIDENT_RAW_MAX_BYTES,
     _RESIDENT_TEXT_MAX,
+    _Entry,
     _resident_key,
     _resident_under,
     adopt_resident,
@@ -54,8 +104,8 @@ from ._conformance._resident import (
     resident_stats,
     take_resident,
 )
-from ._conformance._memo import (
-    read_memo,
+from ._conformance._scan import (
+    scan,
 )
 from ._conformance._walk import (
     NON_REPO_DIRS,
@@ -73,47 +123,6 @@ from ._conformance._walk import (
     matches_any,
     tree_files,
 )
-from ._conformance._read import (
-    _decode_text,
-    _payload_digest,
-    _raw_bytes,
-    content_fingerprint,
-    fingerprint_of,
-    read_bytes_cached,
-    read_text_cached,
-)
-from ._conformance._fence import (
-    FENCE,
-    _BODY_CACHE,
-    _BODY_CACHE_BYTES,
-    _BODY_CACHE_MAX,
-    _BODY_CACHE_MAX_BYTES,
-    _FENCE_CACHE,
-    _FENCE_CACHE_MAX,
-    _FENCE_CACHE_MAX_BYTES,
-    _T,
-    _evidence_ids,
-    _fence_yaml,
-    _fence_yaml_cached,
-    _fence_yaml_opt,
-    _parse_fence_yaml,
-    _read_json,
-    load_yaml,
-    load_yaml_cached,
-)
-from ._conformance._export import (
-    _GATE_FAIL_TOKENS,
-    _gate_calls,
-    _gate_defs,
-    export_manifest_issues,
-)
-from ._conformance._scan import (
-    scan,
-)
-from ._conformance import _fence, _memo, _resident
-
-# 活状态/可 patch 面：读取与赋值一律转发到真实持有模块（实现见 core/_facades）。
-from core._facades import install as _install_live_facade
 
 
 def _FACADE_GETATTR(name):
@@ -217,8 +226,21 @@ def result_pair_ok(value) -> bool:
 _DERIVED_MEMO: Dict[str, Dict[str, Any]] = {}
 
 
-def memo_pair(tag: str, patterns, impl, root: str = ".",
-              keep: int = 8, code_modules=None, fp: Optional[str] = None):
+@dataclass(frozen=True)
+class MemoOptions:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    keep: int = 8
+    fp: Optional[str] = None
+
+
+def memo_pair(
+    tag: str,
+    patterns,
+    impl,
+    root: str = '.',
+    code_modules = None,
+    opts: MemoOptions | None = None,
+):
     """`(issues, stats)` 形状的派生结果缓存（**进程内 + 持久**两层；键即内容）。
 
     纪律与 `scan()` 一致：输入面（`patterns`，须穷举）变 ⇒ 指纹变 ⇒ 必重算；持久层键另含代码面 +
@@ -235,6 +257,10 @@ def memo_pair(tag: str, patterns, impl, root: str = ".",
     只读作用域内共享），指纹近乎白拿，而重算派生账贵得多。删掉后冷进程首跑 **4481 → 2188 ms**、
     稳态 **1585 → 1183 ms**（结论逐位相同）。
     """
+
+    opts = opts if opts is not None else MemoOptions()
+    keep = opts.keep
+    fp = opts.fp
     if fp is None:
         # 走**面指纹**（带「确知没变就复用」）：各站点的面宽窄不一，这一改把「确知变更面」这条
         # 信息铺到**所有** `memo_pair` 站点，而不只是逐包键那一处。

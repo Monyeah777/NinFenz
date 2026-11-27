@@ -15,6 +15,7 @@
 """
 from __future__ import annotations
 
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -75,11 +76,28 @@ def validate_steps(steps: Any, schema: dict | None = None) -> list:
     return issues
 
 
-def append_step(steps: list, process_id: str, actor: dict, authorization: dict,
-                state_digest: str, type_: str,
-                input_refs: list | None = None,
-                output_refs: list | None = None) -> dict:
+@dataclass(frozen=True)
+class StepOptions:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    state_digest: str
+    type_: str
+    input_refs: list | None = None
+    output_refs: list | None = None
+
+
+def append_step(
+    steps: list,
+    process_id: str,
+    actor: dict,
+    authorization: dict,
+    opts: StepOptions,
+) -> dict:
     """向合法链追加一步：自动封 seq = len+1 与 prev = 当前链头。"""
+
+    state_digest = opts.state_digest
+    type_ = opts.type_
+    input_refs = opts.input_refs
+    output_refs = opts.output_refs
     if not isinstance(steps, list):
         raise ValueError(f"steps 必须是数组（{GUIDE}从 [] 开始）")
     head = chain_head(steps)

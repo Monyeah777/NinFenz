@@ -25,6 +25,7 @@ import tempfile
 import warnings
 import zipfile
 from collections.abc import Sequence
+from dataclasses import dataclass
 from typing import Any
 
 # 依赖面：实现在 _evidence 子包；本行履约原模块对 core 的 import 边（勿删）。
@@ -33,12 +34,14 @@ from core import revocations as revoc
 from core.transparency_log import NODE_PREFIX
 
 from ._evidence._batch import (
+    BatchVerifyOptions,
     _verify_single_json,
     batch_paths,
     verify_any,
     verify_batch,
 )
 from ._evidence._build import (
+    BuildOptions,
     _decision_target,
     _envelope,
     _manifest,
@@ -127,6 +130,7 @@ from ._evidence._verify_core import (
     _one_envelope,
 )
 from ._evidence._verify_forms import (
+    VerifyOptions,
     _check_extras,
     _detect_container,
     _dir_read,
@@ -139,15 +143,35 @@ from ._evidence._verify_forms import (
 )
 
 
-def write(root: str, out: str, targets: Sequence[str], issuer: str = "",
-          key: bytes | None = None, expires_at: str = "", created_at: str = "",
-          revocations: dict[str, Any] | None = None,
-          anchor: dict[str, Any] | None = None,
-          decision: dict[str, Any] | None = None) -> tuple[str, dict[str, Any]]:
+def write(
+    root: str,
+    out: str,
+    targets: Sequence[str],
+    opts: BuildOptions | None = None,
+) -> tuple[str, dict[str, Any]]:
     """打包并落盘（单一写出处；调用方负责输出路径口径）。"""
-    data, info = build(root, targets, issuer=issuer, key=key, created_at=created_at,
-                       expires_at=expires_at, revocations=revocations, anchor=anchor,
-                       decision=decision)
+
+    opts = opts if opts is not None else BuildOptions()
+    issuer = opts.issuer
+    key = opts.key
+    expires_at = opts.expires_at
+    created_at = opts.created_at
+    revocations = opts.revocations
+    anchor = opts.anchor
+    decision = opts.decision
+    data, info = build(
+        root,
+        targets,
+        opts=BuildOptions(
+            issuer=issuer,
+            key=key,
+            expires_at=expires_at,
+            created_at=created_at,
+            revocations=revocations,
+            anchor=anchor,
+            decision=decision,
+        ),
+    )
     dest = out if os.path.isabs(out) else os.path.join(root, out)
     parent = os.path.dirname(dest)
     if parent:
@@ -205,14 +229,32 @@ def _bench_write(tmp: str, name: str, data: bytes) -> str:
 
 
 
-def _bench_run(rows: list[dict[str, Any]], cid: str, desc: str, expected: str,
-               path: str, key: bytes | None = BENCH_KEY,
-               revocations: dict[str, Any] | None = None, at: str = "",
-               anchor: dict[str, Any] | None = None) -> None:
+@dataclass(frozen=True)
+class _BenchOptions:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    key: bytes | None = BENCH_KEY
+    revocations: dict[str, Any] | None = None
+    at: str = ''
+    anchor: dict[str, Any] | None = None
+
+
+def _bench_run(
+    rows: list[dict[str, Any]],
+    cid: str,
+    desc: str,
+    expected: str,
+    path: str,
+    opts: _BenchOptions | None = None,
+) -> None:
     """跑一条用例并记账（认不出形态也记 invalid——判定面外不算通过）。"""
+
+    opts = opts if opts is not None else _BenchOptions()
+    key = opts.key
+    revocations = opts.revocations
+    at = opts.at
+    anchor = opts.anchor
     try:
-        actual = verify(path, key=key, revocations=revocations, at=at,
-                        anchor=anchor)["verdict"]
+        actual = verify(path, opts=VerifyOptions(key=key, revocations=revocations, at=at, anchor=anchor))["verdict"]
     except ValueError:
         actual = "invalid"
     rows.append({"id": cid, "desc": desc, "expected": expected,
@@ -286,8 +328,11 @@ def bench() -> dict[str, Any]:
                            ("c.md", "# C\n\n丙\n")):
             with open(os.path.join(tmp, "d", name), "wb") as fh:
                 fh.write(body.encode())
-        base, _info = build(tmp, ["d/a.md", "d/b.md"], issuer="bench",
-                            created_at=BENCH_PIN, key=BENCH_KEY)
+        base, _info = build(
+            tmp,
+            ['d/a.md', 'd/b.md'],
+            opts=BuildOptions(issuer='bench', key=BENCH_KEY, created_at=BENCH_PIN),
+        )
         members = _members(base)
         digest_a = _sha256(members[PAYLOAD_DIR + "d/a.md"])
         base_path = _bench_write(tmp, "base.zip", base)
@@ -358,8 +403,11 @@ def bench() -> dict[str, Any]:
         dec = {"syscall": "cc_check",
                "policy_digest": _sha256(b"nf-check-policy/1:bench"),
                "verdict": "ok", "object_sha256": digest_a}
-        dec_bundle, _dec_info = build(tmp, ["d/a.md", "d/b.md"], issuer="bench",
-                                      created_at=BENCH_PIN, decision=dec)
+        dec_bundle, _dec_info = build(
+            tmp,
+            ['d/a.md', 'd/b.md'],
+            opts=BuildOptions(issuer='bench', created_at=BENCH_PIN, decision=dec),
+        )
         _bench_run(rows, "decision_ok", "决策证据自洽（digest_only → declared）", "ok",
                    _bench_write(tmp, "decbase.zip", dec_bundle))
         _bench_run(rows, "decision_policy_swap", "换策略摘要（声明面与绑定面不一致）", "invalid",
@@ -398,10 +446,10 @@ def bench() -> dict[str, Any]:
                    _bench_write(tmp, "asub.zip", _mut_attest(base, _bump_subject)))
         _bench_run(rows, "attest_mac", "hmac 签名被改", "invalid",
                    _bench_write(tmp, "amac.zip", _mut_attest(base, _bump_mac)))
-        _bench_run(rows, "no_key", "hmac 级缺密钥（不降级）", "invalid", base_path,
-                   key=None)
-        _bench_run(rows, "wrong_key", "hmac 级错密钥", "invalid", base_path,
-                   key=b"wrong-key-wrong-key-wrong-key")
+        _bench_run(rows, 'no_key', 'hmac 级缺密钥（不降级）', 'invalid',
+                   base_path, opts=_BenchOptions(key=None))
+        _bench_run(rows, 'wrong_key', 'hmac 级错密钥', 'invalid', base_path,
+                   opts=_BenchOptions(key=b'wrong-key-wrong-key-wrong-key'))
         _bench_run(rows, "schema_bumped", "包版本被改", "invalid",
                    _bench_write(tmp, "schema.zip", _mut_meta(
                        base, lambda meta: meta.__setitem__("schema", "nf-evidence/99"))))
@@ -413,27 +461,37 @@ def bench() -> dict[str, Any]:
         rev = {"schema": REVOCATION_SCHEMA,
                "revoked": [{"digest": digest_a, "revoked_at": BENCH_PIN,
                              "reason": "bench"}]}
-        _bench_run(rows, "revoked", "吊销表命中必须压过 ok", "revoked", base_path,
-                   revocations=rev)
-        expired, _x = build(tmp, ["d/a.md", "d/b.md"], issuer="bench",
-                            created_at=BENCH_PIN, key=BENCH_KEY,
-                            expires_at="2020-01-01T00:00:00Z")
+        _bench_run(rows, 'revoked', '吊销表命中必须压过 ok', 'revoked',
+                   base_path, opts=_BenchOptions(revocations=rev))
+        expired, _x = build(
+            tmp,
+            ['d/a.md', 'd/b.md'],
+            opts=BuildOptions(
+                issuer='bench',
+                key=BENCH_KEY,
+                expires_at='2020-01-01T00:00:00Z',
+                created_at=BENCH_PIN,
+            ),
+        )
         _bench_run(rows, "expired", "有效期已过", "expired",
                    _bench_write(tmp, "expired.zip", expired))
         # 外部锚点（G1：防整链截断）
-        head2 = {"count": 2, "head": verify(base_path, key=BENCH_KEY)["head"]}
-        v3, _i3 = build(tmp, ["d/a.md", "d/b.md", "d/c.md"], issuer="bench",
-                        created_at=BENCH_PIN, key=BENCH_KEY, anchor=head2)
+        head2 = {"count": 2, "head": verify(base_path, opts=VerifyOptions(key=BENCH_KEY))["head"]}
+        v3, _i3 = build(
+            tmp,
+            ['d/a.md', 'd/b.md', 'd/c.md'],
+            opts=BuildOptions(issuer='bench', key=BENCH_KEY, created_at=BENCH_PIN, anchor=head2),
+        )
         v3_path = _bench_write(tmp, "v3.zip", v3)
-        _bench_run(rows, "anchor_ok", "锚点对得上（正常追加，不得误杀）", "ok", v3_path,
-                   anchor=head2)
-        head3 = {"count": 3, "head": verify(v3_path, key=BENCH_KEY)["head"]}
-        _bench_run(rows, "anchor_truncated", "用更早的包冒充现在（整链截断）", "invalid",
-                   base_path, anchor=head3)
-        _bench_run(rows, "anchor_forked", "锚点来自另一条链（历史被改写）", "invalid",
-                   v3_path, anchor={"count": 2, "head": "0" * 64})
-        _bench_run(rows, "anchor_bad_shape", "锚点材料形状不对", "invalid", v3_path,
-                   anchor={"count": "two", "head": ""})
+        _bench_run(rows, 'anchor_ok', '锚点对得上（正常追加，不得误杀）', 'ok',
+                   v3_path, opts=_BenchOptions(anchor=head2))
+        head3 = {"count": 3, "head": verify(v3_path, opts=VerifyOptions(key=BENCH_KEY))["head"]}
+        _bench_run(rows, 'anchor_truncated', '用更早的包冒充现在（整链截断）', 'invalid',
+                   base_path, opts=_BenchOptions(anchor=head3))
+        _bench_run(rows, 'anchor_forked', '锚点来自另一条链（历史被改写）', 'invalid',
+                   v3_path, opts=_BenchOptions(anchor={'count': 2, 'head': '0' * 64}))
+        _bench_run(rows, 'anchor_bad_shape', '锚点材料形状不对', 'invalid',
+                   v3_path, opts=_BenchOptions(anchor={'count': 'two', 'head': ''}))
     passed = sum(1 for r in rows if r["ok"])
     return {"schema": BENCH_SCHEMA, "cases": rows, "passed": passed,
             "failed": len(rows) - passed, "total": len(rows),

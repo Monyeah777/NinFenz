@@ -4,6 +4,7 @@ from __future__ import annotations
 import os
 import tempfile
 from collections.abc import Sequence
+from dataclasses import dataclass
 from typing import Any
 
 from core import attest, json_doc
@@ -48,19 +49,24 @@ from ._verify_core import (
 )
 
 
-def _verify_uncosted(bundle: str, key: bytes | None = None,
-                     revocations: dict[str, Any] | None = None,
-                     at: str = "", anchor: dict[str, Any] | None = None,
-                     expected_policy_digest: str = "",
-                     require_fresh_revocations: bool = False,
-                     time_record: dict[str, Any] | None = None,
-                     time_ca: str = "", time_untrusted: str = "") -> dict[str, Any]:
+def _verify_uncosted(bundle: str, opts: VerifyOptions | None = None) -> dict[str, Any]:
     """校验证据包 → {verdict, level, root, head, issues, ...}。
 
     判定顺序固定（fail-closed，先失败先返回；**不**允许「证据弱就放行」）：
     结构 → 成员摘要 → 根 → 包含证明 → 链 → 信封 → 吊销 → 时效 → 吊销新鲜度。
     最后两段互相独立：`revoked > expired > 新鲜度不足(invalid) > ok`。
     """
+
+    opts = opts if opts is not None else VerifyOptions()
+    key = opts.key
+    revocations = opts.revocations
+    at = opts.at
+    anchor = opts.anchor
+    expected_policy_digest = opts.expected_policy_digest
+    require_fresh_revocations = opts.require_fresh_revocations
+    time_record = opts.time_record
+    time_ca = opts.time_ca
+    time_untrusted = opts.time_untrusted
     res = _empty_result()
     rd = _Reader(bundle)
     try:
@@ -310,26 +316,54 @@ def _verify_attest(doc: dict[str, Any], read: Any, key: bytes | None = None,
 
 
 
-def verify(bundle: str, key: bytes | None = None,
-           revocations: dict[str, Any] | None = None,
-           at: str = "", anchor: dict[str, Any] | None = None,
-           expected_policy_digest: str = "",
-           require_fresh_revocations: bool = False,
-           time_record: dict[str, Any] | None = None,
-           time_ca: str = "", time_untrusted: str = "") -> dict[str, Any]:
+@dataclass(frozen=True)
+class VerifyOptions:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    key: bytes | None = None
+    revocations: dict[str, Any] | None = None
+    at: str = ''
+    anchor: dict[str, Any] | None = None
+    expected_policy_digest: str = ''
+    require_fresh_revocations: bool = False
+    time_record: dict[str, Any] | None = None
+    time_ca: str = ''
+    time_untrusted: str = ''
+
+
+def verify(bundle: str, opts: VerifyOptions | None = None) -> dict[str, Any]:
     """校验证据包 → 判定（同 `_verify_uncosted`），并附 `cost_ms`（本次判定耗时）。
 
     为什么加成本（第 91 轮）：资源层同构缺的是「验证侧记账」——认知侧有 `budget.steps_used`，
     契约侧此前没有任何「这次判定花了多少」的记录。`cost_ms` 只记**本机实测耗时**（整数毫秒），
     不参与判定、不进任何质量分；跨机器不可比，只作同一环境下的相对成本。
     """
+
+    opts = opts if opts is not None else VerifyOptions()
+    key = opts.key
+    revocations = opts.revocations
+    at = opts.at
+    anchor = opts.anchor
+    expected_policy_digest = opts.expected_policy_digest
+    require_fresh_revocations = opts.require_fresh_revocations
+    time_record = opts.time_record
+    time_ca = opts.time_ca
+    time_untrusted = opts.time_untrusted
     import time
 
     started = time.perf_counter()
-    res = _verify_uncosted(bundle, key=key, revocations=revocations, at=at, anchor=anchor,
-                           expected_policy_digest=expected_policy_digest,
-                           require_fresh_revocations=require_fresh_revocations,
-                           time_record=time_record, time_ca=time_ca,
-                           time_untrusted=time_untrusted)
+    res = _verify_uncosted(
+        bundle,
+        opts=VerifyOptions(
+            key=key,
+            revocations=revocations,
+            at=at,
+            anchor=anchor,
+            expected_policy_digest=expected_policy_digest,
+            require_fresh_revocations=require_fresh_revocations,
+            time_record=time_record,
+            time_ca=time_ca,
+            time_untrusted=time_untrusted,
+        ),
+    )
     res["cost_ms"] = max(0, int((time.perf_counter() - started) * 1000))
     return res

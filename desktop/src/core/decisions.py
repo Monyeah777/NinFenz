@@ -518,6 +518,13 @@ def write_projection(root: str = ".") -> dict[str, object]:
 
 def check_projection(root: str = ".") -> list[str]:
     return doc_family.check_index(
-        root, index_rel=INDEX_REL, begin=BEGIN, end=END, block=render_index(root),
-        missing_hint="nf decisions reindex",
-        mismatch="决策登记表与实时重算不一致（跑 nf decisions reindex）")
+        root,
+        opts=doc_family.IndexOptions(
+            index_rel=INDEX_REL,
+            begin=BEGIN,
+            end=END,
+            block=render_index(root),
+            missing_hint='nf decisions reindex',
+            mismatch='决策登记表与实时重算不一致（跑 nf decisions reindex）',
+        ),
+    )

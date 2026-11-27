@@ -6,6 +6,7 @@ import copy
 import hashlib
 import json
 import uuid
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -218,22 +219,36 @@ def ensure(
     return doc, "new"
 
 
-def append_turn(
-    path: Path,
-    goal: str,
-    before_state: dict,
-    after_state: dict,
-    cluster: list[str],
-    kind: str,
-    predicted: list[str],
-    resolved: list[str],
-    changed_keys: list[str],
-    atom_trace: list[dict],
-    decision: dict,
-    calibration_before_digest: str | None = None,
-    calibration_after_digest: str | None = None,
-    observations: list[str] | None = None,
-) -> tuple[dict | None, str]:
+@dataclass(frozen=True)
+class TurnOptions:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    before_state: dict
+    after_state: dict
+    cluster: list[str]
+    kind: str
+    predicted: list[str]
+    resolved: list[str]
+    changed_keys: list[str]
+    atom_trace: list[dict]
+    decision: dict
+    calibration_before_digest: str | None = None
+    calibration_after_digest: str | None = None
+    observations: list[str] | None = None
+
+
+def append_turn(path: Path, goal: str, opts: TurnOptions) -> tuple[dict | None, str]:
+    before_state = opts.before_state
+    after_state = opts.after_state
+    cluster = opts.cluster
+    kind = opts.kind
+    predicted = opts.predicted
+    resolved = opts.resolved
+    changed_keys = opts.changed_keys
+    atom_trace = opts.atom_trace
+    decision = opts.decision
+    calibration_before_digest = opts.calibration_before_digest
+    calibration_after_digest = opts.calibration_after_digest
+    observations = opts.observations
     revision = _file_revision(Path(path))
     doc, status = load(path)
     if doc is None:

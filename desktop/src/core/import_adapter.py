@@ -342,9 +342,28 @@ def _skip_entry(full_id: str, seen: set) -> bool:
     return not full_id or full_id in seen
 
 
-def _ingest_entries(entries: list, seen: set, warnings: list, layer_map: dict,
-                    layers: list, extra: list, asset_refs: dict, dedupe: bool) -> None:
+@dataclass(frozen=True)
+class _IngestContext:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    seen: set
+    warnings: list
+    layer_map: dict
+    layers: list
+    extra: list
+    asset_refs: dict
+    dedupe: bool
+
+
+def _ingest_entries(entries: list, opts: _IngestContext) -> None:
     """把一批条目归层/记资产（chara 与 world 两处同构；dedupe=True 时按 full_id 去重）。"""
+
+    seen = opts.seen
+    warnings = opts.warnings
+    layer_map = opts.layer_map
+    layers = opts.layers
+    extra = opts.extra
+    asset_refs = opts.asset_refs
+    dedupe = opts.dedupe
     for e in entries:
         keys = e.get("keys") or []
         full_id = str(keys[0]) if keys else str(e.get("name") or "")
@@ -399,15 +418,35 @@ def parse_ccv3(chara: dict, world: Optional[dict] = None) -> Ccv3ParseResult:
     layer_map: dict = {}
 
     # chara entries
-    _ingest_entries(entries, seen, warnings, layer_map, layers, extra, asset_refs,
-                    dedupe=False)
+    _ingest_entries(
+        entries,
+        opts=_IngestContext(
+            seen=seen,
+            warnings=warnings,
+            layer_map=layer_map,
+            layers=layers,
+            extra=extra,
+            asset_refs=asset_refs,
+            dedupe=False,
+        ),
+    )
     # world entries 补充（chara 内嵌 character_book 与独立 world 通常同源，
     # 重复条目按 full_id 去重——不重复入 IR）
     if world is not None:
         if not isinstance(world, dict):
             raise ValueError("world 应为 dict")
-        _ingest_entries(list((world.get("entries") or [])), seen, warnings, layer_map,
-                        layers, extra, asset_refs, dedupe=True)
+        _ingest_entries(
+            list(world.get('entries') or []),
+            opts=_IngestContext(
+                seen=seen,
+                warnings=warnings,
+                layer_map=layer_map,
+                layers=layers,
+                extra=extra,
+                asset_refs=asset_refs,
+                dedupe=True,
+            ),
+        )
 
     if not name:
         warnings.append("chara 缺少 name，IR title 留空")

@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import concurrent.futures as cf
 import time
+from dataclasses import dataclass
 from pathlib import Path
 
 from core import gate_select as gs
@@ -77,10 +78,29 @@ def failed(result: dict) -> list:
     return sorted(mod for mod, rc in result["results"].items() if rc != 0)
 
 
-def check(changed, invoke, root: str = ".", workers: int = 6, timeout: int = 600,
-          faces=None, tests_dir=None, quick_only: bool = True,
-          use_cache: bool = True) -> dict:
+@dataclass(frozen=True)
+class CheckOptions:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    root: str = '.'
+    workers: int = 6
+    timeout: int = 600
+    faces: object = None
+    tests_dir: object = None
+    quick_only: bool = True
+    use_cache: bool = True
+
+
+def check(changed, invoke, opts: CheckOptions | None = None) -> dict:
     """一步式：计划 → 执行 → 汇总。"""
+
+    opts = opts if opts is not None else CheckOptions()
+    root = opts.root
+    workers = opts.workers
+    timeout = opts.timeout
+    faces = opts.faces
+    tests_dir = opts.tests_dir
+    quick_only = opts.quick_only
+    use_cache = opts.use_cache
     plan_doc = plan(changed, root=root, faces=faces, tests_dir=tests_dir,
                     quick_only=quick_only, use_cache=use_cache)
     result = execute(plan_doc, invoke, workers=workers, timeout=timeout)

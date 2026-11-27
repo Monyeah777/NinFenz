@@ -19,6 +19,7 @@ import subprocess  # nosec B404 - 只跑仓库内测试（argv 列表、无 shel
 import sys
 import tempfile
 import time
+from dataclasses import dataclass
 from pathlib import Path
 
 from core import atomic_write, disk_cache, json_doc
@@ -188,10 +189,29 @@ def save_doc(doc: dict, path: Path | None = None) -> Path:
     return p
 
 
-def run_all(root: str, mods=None, workers: int = 5, timeout: int = 600,
-            force: bool = False, cwd: str | None = None, path: Path | None = None,
-            on_progress=None) -> dict:
+@dataclass(frozen=True)
+class ObserveOptions:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    mods: object = None
+    workers: int = 5
+    timeout: int = 600
+    force: bool = False
+    cwd: str | None = None
+    path: Path | None = None
+    on_progress: object = None
+
+
+def run_all(root: str, opts: ObserveOptions | None = None) -> dict:
     """并行观测（可续跑）：已观测且未 force 的模块直接跳过。"""
+
+    opts = opts if opts is not None else ObserveOptions()
+    mods = opts.mods
+    workers = opts.workers
+    timeout = opts.timeout
+    force = opts.force
+    cwd = opts.cwd
+    path = opts.path
+    on_progress = opts.on_progress
     tdir = Path(cwd or os.path.join(root, "desktop")) / "tests"
     todo = sorted(mods) if mods else sorted(p.stem for p in tdir.glob("test_*.py"))
     doc = {"schema": SCHEMA, "modules": {}} if force else load_doc(path)

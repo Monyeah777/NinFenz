@@ -112,9 +112,16 @@ class FeedTrustTest(unittest.TestCase):
 
     def _feed(self):
         table = revocations.make_table([{"digest": "a" * 64, "reason": "demo"}])
-        return revocations.sign(table, ORG_SEED, issuer="org-a", seq=1,
-                                scheme=revocations.ALG_ED25519,
-                                issued_at="2026-11-07T00:00:00Z")
+        return revocations.sign(
+            table,
+            ORG_SEED,
+            opts=revocations.SignOptions(
+                issuer='org-a',
+                seq=1,
+                issued_at='2026-11-07T00:00:00Z',
+                scheme=revocations.ALG_ED25519,
+            ),
+        )
 
     def test_feed_verifies_and_reports_root_when_trusted(self):
         trust = trust_anchor.make_manifest([_pub(ROOT_SEED)], [_delegation(ROOT_SEED, ORG_SEED)])

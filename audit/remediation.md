@@ -165,24 +165,23 @@
 - 新挂 OPEN-F003-CS：F-003（C# sync-over-async `.Result` 2 处）本机无 .NET SDK（dotnet host 有、SDK 缺失），改后无法构建校验，暂不动，等有 SDK 的环境修并验证。
 
 
-## 状态汇总（2026-11-28 二次收口）
+## 状态汇总（2026-11-28 三次收口）
 
 | 项 | 状态 | 证据/说明 |
 |---|---|---|
 | P0 / P1 | 全部清零 | 本轮证据包：P0=0、P1=0 |
-| 审计总分 | **98.80**（基线 92.1 → +6.70） | C=88，其余 13 维 100 |
-| 门禁 | PASS（exit 0） | `bash audit/ci/gate.sh --evidence audit/evidence/73a7d17ce` |
-| 规则库 | 166 条（A–N 全覆盖） | 校准 27 条均附证据/owner/到期（calibration.md；C-010 条目已随清零删除） |
-| 测试面 | Rust 249/249、app/core 全绿；Android 全量单测 667/0；C# 3 工程 0 warn/0 error；Python 分层 478 passed + 7 条既存红 | 本轮复跑 |
+| 审计总分 | **98.90**（基线 92.1 → +6.80） | C=90，其余 13 维 100 |
+| 门禁 | PASS（exit 0） | `bash audit/ci/gate.sh --evidence audit/evidence/<本轮 commit>` |
+| 规则库 | 166 条（A–N 全覆盖） | 校准 27 条均附证据/owner/到期（calibration.md） |
+| 测试面 | Rust 249/249、app/core 全绿；Android 全量单测 667/0；C# 3 工程 0 warn/0 error；Python 分层 1382 passed / 20 条基线红 | 本轮复跑 |
 | B-004（UI 平台 IO） | DONE | 7 处 contentResolver 收口 data/UriIo |
-| C-002 / C-003 / C-013 | DONE | Composable/Kotlin 函数/C# 大文件拆分，规则命中 0 |
-| C-010 | DONE（规则回归原判据） | 10 个 Python 真源模块全部拆分，`allow_files` 清空，≤800 无豁免仍 0 |
-| C-008 | IN_PROGRESS | 14 → 1，仅 DeliveryScreen（与 C-001 同处） |
-| C-007 | IN_PROGRESS | 88 → 59；Kotlin 已清零，Python 59 处待做 |
-| C-012 | IN_PROGRESS | 63 → 16；生产路径 47 处已清零，剩 16 条在生成区/测试函数（需生成器分块） |
-| C-001 / C-009 / C-005 | IN_PROGRESS | C-001 82（kt1/rs46/py35）；C-009 10 个 Rust 大文件（生成块）；C-005 800 函数 |
+| C-002 / C-003 / C-007 / C-008 / C-010 / C-013 | DONE | 规则命中 0（C-010 无 allow_files 豁免） |
+| C-001 | IN_PROGRESS | 82 → 56（kt1 DeliveryScreen / rs18 / py37）；Rust 30 文件已拆、app/core/src 11 个待拆 |
+| C-009 | IN_PROGRESS | 10 → 5；剩 5 个 GENERATED 巨型测试块（需生成器分块） |
+| C-012 | IN_PROGRESS | 16 条，全部在 GENERATED/测试函数（需生成器分块） |
+| C-005 | IN_PROGRESS | 801 个函数圈复杂度 >10（Python 656 / Rust 120 / Kotlin 25） |
 | D-005（测试样板重复） | DONE（校准） | 22 个 workflow helper 去重；阈值 15→40 守住真复制用例 |
-| F-003（C# `.Result`） | DONE（检测器精度修正） | 2 处均为嵌套 record 类型名；修正后真实 sync-over-async 仍命中 |
+| F-003（C# `.Result`） | DONE（检测器精度修正） | 2 处均为嵌套 record 类型名 |
 | Python 基线红 | OPEN（rebind 批次） | reverse_coupling/style_ratchet/json_shape_contracts/freshness/dead_code + sast/style/coupling baseline 需按官方入口重冻 |
 | Play 上传 / 真机 macrobenchmark / on-demand OCR | OPEN（外部） | macrobenchmark 代码/APK/脚本就绪，等设备接入 ADB |
 
@@ -222,6 +221,18 @@
 - **结果**：总分 98.70 → **98.80**；C 87→88（C-010 2 分已在本轮前生效，本轮规则回归不改变分数；C-011 回归修复抵消后净 +0.10）；P0=0/P1=0，error=0，no_targets=0。
 - **测试**：engine/rust 249 passed；app/core 全绿；Android 全量单测 667/0；Python 分层 478 passed + 既有红 7 条（与本轮前 known-red 同集）。
 - **遗留**：DeliveryScreen 单文件（C-001 1 / C-008 1）；Python C-007 59 处；Rust C-001 46 文件；C-009/C-012 生成块分块（需改 4+ 个生成器）；C-005 800 函数。
+
+## 第十六轮：C-007/C-008 清零，C-001/C-009 继续推进（2026-11-28）
+
+- **C-007 清零（59 → 0）**：`desktop/src/core` 59 处 >6 参数函数全部参数对象化（48 个 dataclass/NamedTuple 对象，`VerifyOptions`/`TrustVerifyOptions`/`BuildOptions` 等），调用点（含 34 个测试、6 个 scripts）机械适配；97 个文件 +3021/−1185；行为/异常/文案零改动。分层 pytest 20 failed / 1382 passed，失败 id 集合与改动前基线完全相同（0 新增）；known-red 三件套同为基线 3 条。
+- **C-008 清零（1 → 0）**：DeliveryScreen 深嵌套 14 → 8（只做嵌套收敛、不拆文件）：抽 46 个文件级声明 + 30 个局部函数（Plan/Slots/Assemble/Export 四步 Section、SlotsToolbar/SlotMetaBlock/SlotActionRow/Export 各子 section、reproTextFor 等），原最深链（when→if→let→for→Column×5）整体移出；remember/mutableStateOf/LaunchedEffect/launcher/scope.launch 计数与 HEAD 逐项一致；C-002/C-003/C-011 保持 0；Android 667/0。
+- **C-001（82 → 56）**：Rust 30 个非生成大文件拆成「门面 + partN 子模块」（99 → 159 个 .rs，每个 ≤400；`pub(crate) use` 保原路径；测试块与 GENERATED 标记原地不动）；C-001 Rust 46→18。Kotlin 仍 1（DeliveryScreen 4277 行，另案）；Python 35→37（参数对象 dataclass 使个别文件越过 400，C-001 尚在推进）。残余 Rust 大文件：domain_metrics 777 / json_schema 541（其余部分为 GENERATED 巨型测试函数，需生成器分块）+ app/core/src 11 个。
+- **C-009（10 → 5）**：随上条拆分，engine/rust 非生成 >1000 行文件清零；剩 5 个生成块巨件（output_forms 13280 / pyrandom ~6900 / output_forms_checks 6349 / xmlmini 3910 / asset_contract）留生成器批次。
+- **回归修复**：DeliveryScreen 收敛时引入 `runCatching{...}.getOrNull()` 触发 E-001（P1）——已改回显式 try/catch 并保留 failures 记录文案；修后 E-001=0、E=100。
+- **生成物**：`gen_asset_code_cases.py` 重算 engine-rust 文件计数（99→159，聚合 1293→1353）；`nf layers --write` 重投影 role_coordinates。
+- **结果**：总分 98.80 → **98.90**；C 88→90；P0=0/P1=0/error=0/no_targets=0。
+- **遗留**：C-001 56（kt1/rs18/py37）、C-005 801、C-009 5（生成块）、C-012 16（生成区测试函数）、app/core/src 11 个 Rust 大文件；C-010 无豁免仍 0。
+
 
 
 ## 第十四轮：C 维度结构拆分第一批 + 检测器修正 + macrobenchmark 推进（2026-11-28）

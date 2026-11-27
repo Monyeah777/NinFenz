@@ -387,8 +387,12 @@ class DispatchResilienceTest(unittest.TestCase):
             time.sleep(0.02)
             return {"ok": True}
 
-        out = orch.dispatch(self.PLAN["order"], self.PLAN["steps"], call,
-                            max_step_seconds=0.001)
+        out = orch.dispatch(
+            self.PLAN['order'],
+            self.PLAN['steps'],
+            call,
+            opts=orch.DispatchOptions(max_step_seconds=0.001),
+        )
         self.assertEqual("timeout", out["stopped_reason"])
         self.assertEqual("failed", out["states"]["a"])
         self.assertEqual("skipped", out["states"]["b"])
@@ -399,8 +403,12 @@ class DispatchResilienceTest(unittest.TestCase):
                 time.sleep(0.01)
             return {"ok": True}
 
-        out = orch.dispatch(self.PLAN["order"], self.PLAN["steps"], call,
-                            max_seconds=0.001)
+        out = orch.dispatch(
+            self.PLAN['order'],
+            self.PLAN['steps'],
+            call,
+            opts=orch.DispatchOptions(max_seconds=0.001),
+        )
         self.assertEqual("timeout", out["stopped_reason"])
         self.assertEqual("done", out["states"]["a"])
         self.assertEqual("skipped", out["states"]["b"])
@@ -412,19 +420,28 @@ class DispatchResilienceTest(unittest.TestCase):
         def bad(_tool, _args):
             raise RuntimeError("boom")
 
-        first = orch.dispatch(self.PLAN["order"][:1], self.PLAN["steps"], bad,
-                              breaker_key=key, failure_threshold=1,
-                              cooldown_seconds=0.05)
+        first = orch.dispatch(
+            self.PLAN['order'][:1],
+            self.PLAN['steps'],
+            bad,
+            opts=orch.DispatchOptions(breaker_key=key, failure_threshold=1, cooldown_seconds=0.05),
+        )
         self.assertTrue(first["circuit_open"])
-        second = orch.dispatch(self.PLAN["order"][:1], self.PLAN["steps"], bad,
-                               breaker_key=key, failure_threshold=1,
-                               cooldown_seconds=0.05)
+        second = orch.dispatch(
+            self.PLAN['order'][:1],
+            self.PLAN['steps'],
+            bad,
+            opts=orch.DispatchOptions(breaker_key=key, failure_threshold=1, cooldown_seconds=0.05),
+        )
         self.assertEqual("circuit_open", second["status"])
         self.assertEqual([], second["executed"])
         time.sleep(0.06)
-        third = orch.dispatch(self.PLAN["order"][:1], self.PLAN["steps"], bad,
-                              breaker_key=key, failure_threshold=1,
-                              cooldown_seconds=0.05)
+        third = orch.dispatch(
+            self.PLAN['order'][:1],
+            self.PLAN['steps'],
+            bad,
+            opts=orch.DispatchOptions(breaker_key=key, failure_threshold=1, cooldown_seconds=0.05),
+        )
         self.assertEqual("stopped", third["status"], "半开探测仍失败应再次停")
 
 

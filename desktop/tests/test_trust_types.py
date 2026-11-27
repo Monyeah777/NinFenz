@@ -71,10 +71,16 @@ def _ref(kind="evidence", digest=DIGEST2):
 
 
 def _admit(entity, types=None, policy=None, issuers=None):
-    return te.typed_admissibility(entity, types or _types(), policy or _policy(),
-                                  issuers or _issuer_registry(),
-                                  te.load_schema(str(ROOT)),
-                                  te.load_type_schema(str(ROOT)))
+    return te.typed_admissibility(
+        entity,
+        types or _types(),
+        policy or _policy(),
+        issuers or _issuer_registry(),
+        opts=te.AdmissibilityOptions(
+            schema=te.load_schema(str(ROOT)),
+            type_schema=te.load_type_schema(str(ROOT)),
+        ),
+    )
 
 
 class RegistryTest(unittest.TestCase):
@@ -182,8 +188,12 @@ class TypedAdmissibilityTest(unittest.TestCase):
         weakened["$defs"]["type"]["required"] = [
             k for k in weakened["$defs"]["type"]["required"] if k != "allowed_ref_kinds"]
         self.assertTrue(te.typed_admissibility(
-            bad, registry, _policy(), _issuer_registry(),
-            te.load_schema(str(ROOT)), weakened)["admissible"])
+            bad,
+            registry,
+            _policy(),
+            _issuer_registry(),
+            opts=te.AdmissibilityOptions(schema=te.load_schema(str(ROOT)), type_schema=weakened),
+        )["admissible"])
 
 
 class CompositionTest(unittest.TestCase):

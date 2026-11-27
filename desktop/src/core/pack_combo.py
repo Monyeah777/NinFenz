@@ -20,48 +20,28 @@
 
 from __future__ import annotations
 
-# ruff: noqa: F401 — 门面按原模块面重新导出（re-export 是职责，不是未使用）
-import sys as _sys
-import types as _types
-
-# 依赖面：逐字保留原模块 import 面（含函数内 core import 的边）——
-# 耦合图/纯度面按模块级 import 计算，勿删（见 re-export 说明）。
-from core import atomic_write, json_doc, official_core
-from core import conformance_scan as csc
-# 导入闭包指纹：由调用方算（持久层不再反向依赖解析层，见 2026-09-29 拆环）
-from core import import_graph as _ig
-from core import conformance_scan as _csc
-from core import domain_pack as dpk
-from core import json_schema as _js  # 只取叶子校验器：不再 import output_forms（断双向对）
-from core import disk_cache
-
 import copy
 import itertools
 import random
 import re
-from pathlib import Path
-from core import atomic_write
-from core import conformance_scan as csc
-from core import import_graph as _ig
 
-from ._pack_combo._const import (
-    CERT_REL,
-    CERT_SCHEMA,
-    CORE13,
-    CORE_CONTRACT_PATTERNS,
-    INPUT_PATTERNS,
-    MODULE_CONTRACT_PATTERNS,
-    PROFILE_PATTERNS,
-    SCAN_INPUTS,
-    _CACHE,
-    _CACHE_MAX,
-    _COMBO_CACHE,
-    _COMBO_CACHE_MAX,
-    _CONTENT_CACHE,
-    _CONTENT_CACHE_MAX,
-    _CONTRACTS_CACHE,
-    _CONTRACTS_CACHE_MAX,
-)
+# ruff: noqa: F401 — 门面按原模块面重新导出（re-export 是职责，不是未使用）
+import sys as _sys
+import types as _types
+from dataclasses import dataclass
+from pathlib import Path
+
+# 依赖面：逐字保留原模块 import 面（含函数内 core import 的边）——
+# 耦合图/纯度面按模块级 import 计算，勿删（见 re-export 说明）。
+from core import atomic_write, disk_cache, json_doc, official_core
+from core import conformance_scan as _csc
+from core import conformance_scan as csc
+from core import domain_pack as dpk
+
+# 导入闭包指纹：由调用方算（持久层不再反向依赖解析层，见 2026-09-29 拆环）
+from core import import_graph as _ig
+from core import json_schema as _js  # 只取叶子校验器：不再 import output_forms（断双向对）
+
 from ._pack_combo._base import (
     _asset_index,
     _cache_key,
@@ -94,11 +74,23 @@ from ._pack_combo._cert import (
     declared,
     verify_certificate,
 )
-from ._pack_combo._readme import (
-    combo_assets_readme,
-    combo_pipeline,
-    combo_readme,
-    combo_register,
+from ._pack_combo._const import (
+    _CACHE,
+    _CACHE_MAX,
+    _COMBO_CACHE,
+    _COMBO_CACHE_MAX,
+    _CONTENT_CACHE,
+    _CONTENT_CACHE_MAX,
+    _CONTRACTS_CACHE,
+    _CONTRACTS_CACHE_MAX,
+    CERT_REL,
+    CERT_SCHEMA,
+    CORE13,
+    CORE_CONTRACT_PATTERNS,
+    INPUT_PATTERNS,
+    MODULE_CONTRACT_PATTERNS,
+    PROFILE_PATTERNS,
+    SCAN_INPUTS,
 )
 from ._pack_combo._materialize import (
     _combo_borrow,
@@ -108,42 +100,13 @@ from ._pack_combo._materialize import (
     combo_outputs,
     prof_get_module,
 )
-from ._pack_combo._base import (
-    _asset_index,
-    _cache_key,
-    _content_store,
-    _core_ids,
-    _digest,
-    _inputs_fingerprint,
-    _module_contracts,
-    _read_json,
-    _root_cache,
-    indexes,
-    profiles,
-)
-from ._pack_combo._cert import (
-    _certificate_lines,
-    _combo_witness,
-    _verdict_cached,
-    declared,
-)
-from ._pack_combo._const import (
-    CORE13,
-    SCAN_INPUTS,
-    _CACHE,
-    _CONTENT_CACHE,
-)
-from ._pack_combo._materialize import (
-    _flatten_sources,
-    combo_outputs,
-    prof_get_module,
-)
 from ._pack_combo._readme import (
+    ComboSpec,
     combo_assets_readme,
     combo_pipeline,
     combo_readme,
+    combo_register,
 )
-
 
 
 def combine(root: str = ".", packs: Sequence[str] = (), extra_modules: Sequence[str] = (),
@@ -293,9 +256,18 @@ def combine(root: str = ".", packs: Sequence[str] = (), extra_modules: Sequence[
     return cert
 
 
-def breadth(root: str = ".", triple_sample: int = 400, quad_sample: int = 200,
-            quint_sample: int = 120, sext_sample: int = 60,
-            seed: int = 20260923, _witness: Optional[str] = None) -> Dict[str, Any]:
+@dataclass(frozen=True)
+class BreadthOptions:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    triple_sample: int = 400
+    quad_sample: int = 200
+    quint_sample: int = 120
+    sext_sample: int = 60
+    seed: int = 20260923
+    _witness: Optional[str] = None
+
+
+def breadth(root: str = '.', opts: BreadthOptions | None = None) -> Dict[str, Any]:
     """广度证明：全部两两 + 定种子抽样三元 / 四元 / 五元 / 六元，跑同一套不变量。
 
     参与面 = `community/` 下全部已登记协议包（域包 + 组合包 + 既有社区包）——
@@ -305,6 +277,14 @@ def breadth(root: str = ".", triple_sample: int = 400, quad_sample: int = 200,
     结果按**输入内容指纹 + 抽样参数**缓存（`_CONTENT_CACHE`）：广度证明是诸输入的纯函数，
     输入没变就不必重跑 6910 次组合（实测 ~0.92 s）；输入一变指纹就变，无陈旧风险。
     """
+
+    opts = opts if opts is not None else BreadthOptions()
+    triple_sample = opts.triple_sample
+    quad_sample = opts.quad_sample
+    quint_sample = opts.quint_sample
+    sext_sample = opts.sext_sample
+    seed = opts.seed
+    _witness = opts._witness
     fp = _inputs_fingerprint(root)          # 只算一遍：进程内键与落盘键共用（过去算两遍，白花 57 ms）
     content_key = ("breadth", fp, triple_sample, quad_sample,
                    quint_sample, sext_sample, seed)
@@ -514,7 +494,7 @@ def _scan_impl(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     witness = _combo_witness(root, profiles(root), _module_contracts(root))
     for cert in certs:
         issues += _certificate_lines(root, cert, witness)
-    br = breadth(root, _witness=witness)
+    br = breadth(root, opts=BreadthOptions(_witness=witness))
     if not br["all_legal"]:
         issues.append("广度证明不成立：两两 %d/%d · 三元 %d/%d · 四元 %d/%d · 五元 %d/%d · "
                       "六元 %d/%d（样本 %s）"

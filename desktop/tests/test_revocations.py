@@ -50,7 +50,7 @@ class TestSignVerify(unittest.TestCase):
     def setUp(self):
         self.rv = _rv()
         self.t1 = self.rv.make_table([_row()])
-        self.f1 = self.rv.sign(self.t1, KEY, issuer="acme", seq=1)
+        self.f1 = self.rv.sign(self.t1, KEY, opts=self.rv.SignOptions(issuer='acme', seq=1))
 
     def test_roundtrip_ok(self):
         res = self.rv.verify(self.f1, key=KEY)
@@ -99,9 +99,9 @@ class TestSignVerify(unittest.TestCase):
 class TestChain(unittest.TestCase):
     def setUp(self):
         self.rv = _rv()
-        self.f1 = self.rv.sign(self.rv.make_table([_row()]), KEY, seq=1)
+        self.f1 = self.rv.sign(self.rv.make_table([_row()]), KEY, opts=self.rv.SignOptions(seq=1))
         t2 = self.rv.make_table([_row(), _row("b" * 64)])
-        self.f2 = self.rv.sign(t2, KEY, seq=2, prev=self.f1)
+        self.f2 = self.rv.sign(t2, KEY, opts=self.rv.SignOptions(seq=2, prev=self.f1))
 
     def test_chain_ok(self):
         self.assertEqual("ok", self.rv.verify(self.f2, key=KEY, prev=self.f1)["verdict"])
@@ -112,7 +112,7 @@ class TestChain(unittest.TestCase):
         self.assertIn("序号不连续", " ".join(res["issues"]))
 
     def test_fork_detected(self):
-        other = self.rv.sign(self.rv.make_table([_row("c" * 64)]), KEY, seq=2)
+        other = self.rv.sign(self.rv.make_table([_row('c' * 64)]), KEY, opts=self.rv.SignOptions(seq=2))
         res = self.rv.verify(other, key=KEY, prev=self.f1)
         self.assertEqual("invalid", res["verdict"])
         self.assertIn("前序摘要", " ".join(res["issues"]))
@@ -121,9 +121,9 @@ class TestChain(unittest.TestCase):
 class TestMerge(unittest.TestCase):
     def setUp(self):
         self.rv = _rv()
-        self.f1 = self.rv.sign(self.rv.make_table([_row()]), KEY, seq=1)
+        self.f1 = self.rv.sign(self.rv.make_table([_row()]), KEY, opts=self.rv.SignOptions(seq=1))
         t2 = self.rv.make_table([_row(), _row("b" * 64)])
-        self.f2 = self.rv.sign(t2, KEY, seq=2, prev=self.f1)
+        self.f2 = self.rv.sign(t2, KEY, opts=self.rv.SignOptions(seq=2, prev=self.f1))
 
     def test_merge_union_sorted(self):
         res = self.rv.merge([self.f2, self.f1], key=KEY)
@@ -191,7 +191,7 @@ class TestFreshnessFields(unittest.TestCase):
 
     def test_fresh_feed_reports_fresh(self):
         """T1：未过期 feed → freshness=fresh，verdict 仍是 ok。"""
-        f = self.rv.sign(self.t1, KEY, seq=1, expires_at=FUTURE)
+        f = self.rv.sign(self.t1, KEY, opts=self.rv.SignOptions(seq=1, expires_at=FUTURE))
         res = self.rv.verify(f, key=KEY)
         self.assertEqual("fresh", res["freshness"]["state"])
         self.assertEqual("expires_at", res["freshness"]["basis"])
@@ -200,7 +200,7 @@ class TestFreshnessFields(unittest.TestCase):
 
     def test_no_validity_is_unknown_not_fatal(self):
         """T2：无新字段的 feed / 裸表 → unknown，但**不判死**。"""
-        f = self.rv.sign(self.t1, KEY, seq=1)
+        f = self.rv.sign(self.t1, KEY, opts=self.rv.SignOptions(seq=1))
         self.assertNotIn("expires_at", f, "未给出有效期时不得写 null/空值")
         self.assertNotIn("ttl", f)
         res = self.rv.verify(f, key=KEY)
@@ -213,7 +213,7 @@ class TestFreshnessFields(unittest.TestCase):
 
     def test_ttl_expiry_is_issued_at_plus_ttl(self):
         """§4：ttl 换算成 expires_at（issued_at + ttl 秒），basis=ttl。"""
-        f = self.rv.sign(self.t1, KEY, seq=1, issued_at=STALE_FROM, ttl=86400)
+        f = self.rv.sign(self.t1, KEY, opts=self.rv.SignOptions(seq=1, issued_at=STALE_FROM, ttl=86400))
         at = "2026-01-01T12:00:00Z"
         res = self.rv.verify(f, key=KEY, at=at)
         self.assertEqual("fresh", res["freshness"]["state"])
@@ -225,11 +225,9 @@ class TestFreshnessFields(unittest.TestCase):
     def test_expires_before_issued_invalid(self):
         """T4：expires_at 早于 issued_at → sign 与 verify 同判 invalid。"""
         with self.assertRaises(ValueError) as ctx:
-            self.rv.sign(self.t1, KEY, seq=1, issued_at="2026-06-01T00:00:00Z",
-                         expires_at="2026-05-01T00:00:00Z")
+            self.rv.sign(self.t1, KEY, opts=self.rv.SignOptions(seq=1, issued_at='2026-06-01T00:00:00Z', expires_at='2026-05-01T00:00:00Z'))
         self.assertIn("早于 issued_at", str(ctx.exception))
-        f = self.rv.sign(self.t1, KEY, seq=1, issued_at="2026-06-01T00:00:00Z",
-                         expires_at="2026-07-01T00:00:00Z")
+        f = self.rv.sign(self.t1, KEY, opts=self.rv.SignOptions(seq=1, issued_at='2026-06-01T00:00:00Z', expires_at='2026-07-01T00:00:00Z'))
         f["expires_at"] = "2026-05-01T00:00:00Z"
         res = self.rv.verify(f, key=KEY)
         self.assertEqual("invalid", res["verdict"])
@@ -237,19 +235,18 @@ class TestFreshnessFields(unittest.TestCase):
 
     def test_bad_ttl_invalid(self):
         """T5：ttl 为 0 / 负数 / 字符串 → invalid（形状段在签名之前就拦下）。"""
-        f = self.rv.sign(self.t1, KEY, seq=1, ttl=86400)
+        f = self.rv.sign(self.t1, KEY, opts=self.rv.SignOptions(seq=1, ttl=86400))
         for bad in (0, -1, "86400"):
             res = self.rv.verify(dict(f, ttl=bad), key=KEY)
             self.assertEqual("invalid", res["verdict"], f"ttl={bad!r}")
             self.assertIn("ttl", " ".join(res["issues"]))
         with self.assertRaises(ValueError) as ctx:
-            self.rv.sign(self.t1, KEY, ttl=31536001)
+            self.rv.sign(self.t1, KEY, opts=self.rv.SignOptions(ttl=31536001))
         self.assertIn("--ttl", str(ctx.exception))
 
     def test_tampered_expires_at_breaks_signature(self):
         """T6：改 expires_at 一个字节 → 签名不匹配，且 digest 变化（新字段进签名体）。"""
-        f = self.rv.sign(self.t1, KEY, seq=1, issued_at="2026-11-06T00:00:00Z",
-                         expires_at="2026-12-06T00:00:00Z")
+        f = self.rv.sign(self.t1, KEY, opts=self.rv.SignOptions(seq=1, issued_at='2026-11-06T00:00:00Z', expires_at='2026-12-06T00:00:00Z'))
         bad = dict(f, expires_at="2026-12-07T00:00:00Z")
         res = self.rv.verify(bad, key=KEY)
         self.assertEqual("invalid", res["verdict"])
@@ -259,10 +256,10 @@ class TestFreshnessFields(unittest.TestCase):
 
     def test_status_uri_only_recorded(self):
         """status_uri 只在给出时写入、只记录（不联网、不验可达性）。"""
-        f = self.rv.sign(self.t1, KEY, seq=1, status_uri="https://example.invalid/r.json")
+        f = self.rv.sign(self.t1, KEY, opts=self.rv.SignOptions(seq=1, status_uri='https://example.invalid/r.json'))
         self.assertEqual("https://example.invalid/r.json", f["status_uri"])
         self.assertEqual("ok", self.rv.verify(f, key=KEY)["verdict"])
-        signed = self.rv.sign(self.t1, KEY, seq=1)
+        signed = self.rv.sign(self.t1, KEY, opts=self.rv.SignOptions(seq=1))
         self.assertNotIn("status_uri", signed)
 
 
@@ -281,13 +278,13 @@ class TestFreshnessEvidence(unittest.TestCase):
         self.hit_table = self.rv.make_table([{"path": "docs/a.md", "reason": "下架"}])
 
     def _bundle(self, **kw):
-        data, _info = self.ev.build(str(self.tmp), ["docs/a.md"], **kw)
+        data, _info = self.ev.build(str(self.tmp), ['docs/a.md'], opts=self.ev.BuildOptions(**kw))
         out = Path(self._td.name) / "bundle.zip"
         out.write_bytes(data)
         return out
 
     def _feed(self, table, name, **kw):
-        doc = self.rv.sign(table, KEY, **kw)
+        doc = self.rv.sign(table, KEY, opts=self.rv.SignOptions(**kw))
         out = Path(self._td.name) / name
         out.write_text(json.dumps(doc), encoding="utf-8")
         return doc, out
@@ -295,13 +292,12 @@ class TestFreshnessEvidence(unittest.TestCase):
     def test_table_source_freshness_unknown_only_warns(self):
         """T2（证据侧）：吊销来源在场但没给有效期 → unknown + WARN，verdict 不变。"""
         path = self._bundle()
-        res = self.ev.verify(str(path), revocations=self.table)
+        res = self.ev.verify(str(path), opts=self.ev.VerifyOptions(revocations=self.table))
         self.assertEqual("ok", res["verdict"])
         self.assertEqual("unknown", res["revocations_fresh"])
         self.assertEqual("external", res["revocations_source"])
         self.assertTrue(any("未给有效期" in w for w in res["warnings"]), res["warnings"])
-        strict = self.ev.verify(str(path), revocations=self.table,
-                                require_fresh_revocations=True)
+        strict = self.ev.verify(str(path), opts=self.ev.VerifyOptions(revocations=self.table, require_fresh_revocations=True))
         self.assertEqual("invalid", strict["verdict"], "严格开关下 unknown 也必须判死")
         self.assertTrue(any("未给有效期" in i for i in strict["issues"]), strict["issues"])
 
@@ -310,9 +306,9 @@ class TestFreshnessEvidence(unittest.TestCase):
         path = self._bundle()
         feed, _out = self._feed(self.table, "stale.json", seq=1,
                                 issued_at=STALE_FROM, expires_at=STALE_TO)
-        self.assertEqual("ok", self.ev.verify(str(path), revocations=feed)["verdict"],
+        self.assertEqual("ok", self.ev.verify(str(path), opts=self.ev.VerifyOptions(revocations=feed))["verdict"],
                          "默认只 WARN，不改四词判定")
-        res = self.ev.verify(str(path), revocations=feed, require_fresh_revocations=True)
+        res = self.ev.verify(str(path), opts=self.ev.VerifyOptions(revocations=feed, require_fresh_revocations=True))
         self.assertEqual("invalid", res["verdict"])
         self.assertTrue(any("吊销表已过期" in i for i in res["issues"]), res["issues"])
 
@@ -335,7 +331,7 @@ class TestFreshnessEvidence(unittest.TestCase):
         path = self._bundle()
         feed, _out = self._feed(self.hit_table, "hit-stale.json", seq=1,
                                 issued_at=STALE_FROM, expires_at=STALE_TO)
-        res = self.ev.verify(str(path), revocations=feed, require_fresh_revocations=True)
+        res = self.ev.verify(str(path), opts=self.ev.VerifyOptions(revocations=feed, require_fresh_revocations=True))
         self.assertEqual("revoked", res["verdict"])
         self.assertTrue(res["revoked_by"], "revoked_by 必须给出命中条目")
 
@@ -344,14 +340,14 @@ class TestFreshnessEvidence(unittest.TestCase):
         path = self._bundle(expires_at="2020-01-01T00:00:00Z")
         feed, _out = self._feed(self.table, "stale2.json", seq=1,
                                 issued_at=STALE_FROM, expires_at=STALE_TO)
-        res = self.ev.verify(str(path), revocations=feed, require_fresh_revocations=True)
+        res = self.ev.verify(str(path), opts=self.ev.VerifyOptions(revocations=feed, require_fresh_revocations=True))
         self.assertEqual("expired", res["verdict"])
 
     def test_feed_accepted_as_revocations_source(self):
         """B 组缺陷：--revocations 传签名 feed 必须命中（此前静默不命中判 ok）。"""
         path = self._bundle()
         feed, out = self._feed(self.hit_table, "hit.json", seq=1, expires_at=FUTURE)
-        res = self.ev.verify(str(path), revocations=feed)
+        res = self.ev.verify(str(path), opts=self.ev.VerifyOptions(revocations=feed))
         self.assertEqual("revoked", res["verdict"])
         self.assertEqual("fresh", res["revocations_fresh"], "吃 feed 时要读它的有效期")
         proc = subprocess.run(
@@ -364,7 +360,7 @@ class TestFreshnessEvidence(unittest.TestCase):
     def test_bad_revocations_shape_fails_closed(self):
         """M11：--revocations 形状坏 → invalid（不许静默不命中）。"""
         path = self._bundle()
-        res = self.ev.verify(str(path), revocations={"schema": "nf-other/1"})
+        res = self.ev.verify(str(path), opts=self.ev.VerifyOptions(revocations={'schema': 'nf-other/1'}))
         self.assertEqual("invalid", res["verdict"])
         self.assertIn("既不是 nf-revocation/1 表也不是 nf-revocation-feed/1",
                       " ".join(res["issues"]))
@@ -372,7 +368,7 @@ class TestFreshnessEvidence(unittest.TestCase):
     def test_no_source_never_fails_strict(self):
         """完全没有吊销来源 ≠ unknown：严格开关下也不得判死。"""
         path = self._bundle()
-        res = self.ev.verify(str(path), require_fresh_revocations=True)
+        res = self.ev.verify(str(path), opts=self.ev.VerifyOptions(require_fresh_revocations=True))
         self.assertEqual("ok", res["verdict"])
         self.assertEqual("none", res["revocations_source"])
         self.assertEqual("unknown", res["revocations_fresh"])
@@ -399,17 +395,13 @@ class TestFreshnessEvidence(unittest.TestCase):
         feed, _p = self._feed(self.table, "stale_feed2.json", seq=1,
                               issued_at=STALE_FROM, expires_at=STALE_TO)
         receipts_path = self._receipts()
-        early = self.ev.verify_any(str(receipts_path), root=str(self.tmp),
-                                   revocations=feed, at=STALE_FROM)
+        early = self.ev.verify_any(str(receipts_path), opts=self.ev.BatchVerifyOptions(revocations=feed, at=STALE_FROM, root=str(self.tmp)))
         self.assertEqual("fresh", early["revocations_fresh"], early)
         self.assertEqual("ok", early["verdict"], early["issues"])
-        late = self.ev.verify_any(str(receipts_path), root=str(self.tmp),
-                                  revocations=feed, at="2026-03-01T00:00:00Z")
+        late = self.ev.verify_any(str(receipts_path), opts=self.ev.BatchVerifyOptions(revocations=feed, at='2026-03-01T00:00:00Z', root=str(self.tmp)))
         self.assertEqual("stale", late["revocations_fresh"])
         self.assertEqual("ok", late["verdict"], "默认只 WARN，不判死")
-        strict = self.ev.verify_any(str(receipts_path), root=str(self.tmp),
-                                    revocations=feed, at="2026-03-01T00:00:00Z",
-                                    require_fresh_revocations=True)
+        strict = self.ev.verify_any(str(receipts_path), opts=self.ev.BatchVerifyOptions(revocations=feed, at='2026-03-01T00:00:00Z', root=str(self.tmp), require_fresh_revocations=True))
         self.assertEqual("invalid", strict["verdict"])
 
 
@@ -417,10 +409,8 @@ class TestMergeFreshness(unittest.TestCase):
     def test_merge_freshness_takes_strictest(self):
         """T8：一份 fresh + 一份 stale → 汇总 stale，逐份状态可查。"""
         rv = _rv()
-        f1 = rv.sign(rv.make_table([_row()]), KEY, seq=1,
-                     issued_at=STALE_FROM, expires_at=STALE_TO)
-        f2 = rv.sign(rv.make_table([_row(), _row("b" * 64)]), KEY, seq=2, prev=f1,
-                     expires_at=FUTURE)
+        f1 = rv.sign(rv.make_table([_row()]), KEY, opts=rv.SignOptions(seq=1, issued_at=STALE_FROM, expires_at=STALE_TO))
+        f2 = rv.sign(rv.make_table([_row(), _row('b' * 64)]), KEY, opts=rv.SignOptions(seq=2, prev=f1, expires_at=FUTURE))
         res = rv.merge([f2, f1], key=KEY)
         self.assertTrue(res["ok"])
         self.assertEqual("stale", res["freshness"]["state"])
@@ -442,8 +432,7 @@ class Ed25519FeedTest(unittest.TestCase):
 
     def _feed(self, **kw):
         table = self.rv.make_table([{"digest": "a" * 64, "reason": "文案违规"}])
-        return self.rv.sign(table, self.SEED, issuer="org-a", seq=1, scheme=self.rv.ALG_ED25519,
-                       issued_at="2026-11-07T00:00:00Z", **kw)
+        return self.rv.sign(table, self.SEED, opts=self.rv.SignOptions(issuer='org-a', seq=1, issued_at='2026-11-07T00:00:00Z', scheme=self.rv.ALG_ED25519, **kw))
 
     def test_sign_then_verify_with_public_key(self):
         from core import ed25519
@@ -483,13 +472,13 @@ class Ed25519FeedTest(unittest.TestCase):
     def test_scheme_must_be_known(self):
         table = self.rv.make_table([{"digest": "a" * 64}])
         with self.assertRaises(ValueError) as ctx:
-            self.rv.sign(table, self.SEED, scheme="rsa-2048")
+            self.rv.sign(table, self.SEED, opts=self.rv.SignOptions(scheme='rsa-2048'))
         self.assertIn("不支持", str(ctx.exception))
 
     def test_ed25519_requires_32_byte_seed(self):
         table = self.rv.make_table([{"digest": "a" * 64}])
         with self.assertRaises(ValueError) as ctx:
-            self.rv.sign(table, b"short", scheme=self.rv.ALG_ED25519)
+            self.rv.sign(table, b'short', opts=self.rv.SignOptions(scheme=self.rv.ALG_ED25519))
         self.assertIn("32 字节", str(ctx.exception))
 
     def test_hmac_path_unchanged(self):
@@ -502,14 +491,10 @@ class Ed25519FeedTest(unittest.TestCase):
         from core import ed25519
         pub = ed25519.public_key(self.SEED)
         first = self._feed()
-        second = self.rv.sign(self.rv.make_table([{"digest": "c" * 64}]), self.SEED, issuer="org-a",
-                         seq=2, prev=first, scheme=self.rv.ALG_ED25519,
-                         issued_at="2026-11-08T00:00:00Z")
+        second = self.rv.sign(self.rv.make_table([{'digest': 'c' * 64}]), self.SEED, opts=self.rv.SignOptions(issuer='org-a', seq=2, prev=first, issued_at='2026-11-08T00:00:00Z', scheme=self.rv.ALG_ED25519))
         self.assertTrue(self.rv.verify(second, key=pub, prev=first)["ok"])
         # 跳号：第三份必须紧接第二份，接在第一份后面判死（链检查对 ed25519 同样生效）
-        third = self.rv.sign(self.rv.make_table([{"digest": "d" * 64}]), self.SEED,
-                             issuer="org-a", seq=3, prev=first, scheme=self.rv.ALG_ED25519,
-                             issued_at="2026-11-09T00:00:00Z")
+        third = self.rv.sign(self.rv.make_table([{'digest': 'd' * 64}]), self.SEED, opts=self.rv.SignOptions(issuer='org-a', seq=3, prev=first, issued_at='2026-11-09T00:00:00Z', scheme=self.rv.ALG_ED25519))
         res = self.rv.verify(third, key=pub, prev=first)
         self.assertFalse(res["ok"], "跳号仍须判死")
         self.assertTrue(any("序号不连续" in i for i in res["issues"]), res["issues"])

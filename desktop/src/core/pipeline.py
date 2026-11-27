@@ -18,11 +18,11 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import List, Optional
 
-from .models import Pipeline
-from .storage import Store
 from .generator import render_ir
-from .quality_gate import GateResult, run_gate
 from .ir import IRDocument
+from .models import Pipeline
+from .quality_gate import GateResult, run_gate
+from .storage import Store
 
 
 @dataclass
@@ -35,15 +35,22 @@ class PipeResult:
     warnings: List[str] = field(default_factory=list)
 
 
-def pipe(store: Store, pipeline: Pipeline,
-         selected: List[str],
-         *,
-         include_references: bool = True,
-         fmt: str = "ccv3",
-         dest_dir=None,
-         fail_on_gate: bool = True,
-         doc_semantics: Optional[str] = None,
-         ) -> PipeResult:
+@dataclass(frozen=True)
+class PipeOptions:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    include_references: bool = True
+    fmt: str = 'ccv3'
+    dest_dir: object = None
+    fail_on_gate: bool = True
+    doc_semantics: Optional[str] = None
+
+
+def pipe(
+    store: Store,
+    pipeline: Pipeline,
+    selected: List[str],
+    opts: PipeOptions | None = None,
+) -> PipeResult:
     """全链单命令：selected(full_id) → 装配+引用合并 → IR → 质检 → 导出。
 
     - selected：模块 full_id 列表；本地缺失项跳过并记入 warnings（不崩）。
@@ -53,6 +60,13 @@ def pipe(store: Store, pipeline: Pipeline,
     - doc_semantics（v2.3.0 A3）：显式声明产物语义（project_rules/skill），
       透传 render_ir → IR.meta（classify 声明优先）。None = 不写（兼容现状）。
     """
+
+    opts = opts if opts is not None else PipeOptions()
+    include_references = opts.include_references
+    fmt = opts.fmt
+    dest_dir = opts.dest_dir
+    fail_on_gate = opts.fail_on_gate
+    doc_semantics = opts.doc_semantics
     warnings: List[str] = []
 
     # ---- ① selected full_id → Module（跳过本地缺失，同 zone_d._collect_modules）----

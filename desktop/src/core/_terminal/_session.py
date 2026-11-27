@@ -4,6 +4,7 @@ from __future__ import annotations
 import io
 import sys
 from contextlib import redirect_stderr, redirect_stdout
+from dataclasses import dataclass
 from typing import Any
 
 from ._completion import (
@@ -49,6 +50,20 @@ from ._ui import (
 )
 
 
+@dataclass(frozen=True)
+class SessionOptions:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    assume_yes: bool = False
+    index: object = None
+    history_path: object = None
+    color: object = False
+    width: object = None
+    limit: object = 0
+    color_mode: object = 'never'
+    stream: object = None
+    session_path: object = None
+
+
 class Session:
     """终端会话状态机：解析 → 闸门 → 分派，I/O 全部由调用方注入（可离线单测）。
 
@@ -56,9 +71,17 @@ class Session:
     「该不该跑 / 跑完怎么记」——保证 core 层不依赖 scripts/nf.py。
     """
 
-    def __init__(self, runner, assume_yes: bool = False, index=None,
-                 history_path=None, color=False, width=None, limit=0,
-                 color_mode="never", stream=None, session_path=None):
+    def __init__(self, runner, opts: SessionOptions | None = None):
+        opts = opts if opts is not None else SessionOptions()
+        assume_yes = opts.assume_yes
+        index = opts.index
+        history_path = opts.history_path
+        color = opts.color
+        width = opts.width
+        limit = opts.limit
+        color_mode = opts.color_mode
+        stream = opts.stream
+        session_path = opts.session_path
         if not callable(runner):
             raise ValueError("Session 需要可调用的 runner(argv) -> int；"
                              "请传入 scripts/nf.py 的 main（终端不自己执行命令）")

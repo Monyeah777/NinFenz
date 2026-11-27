@@ -133,8 +133,11 @@ class EndToEndT3Test(unittest.TestCase):
         cls.ca, cls.query, cls.token = _issue(cls.tmp, cls.data)
         cls.ca_digest = hashlib.sha256(cls.ca.read_bytes()).hexdigest()
         cls.envelope = tsig.sign_head(
-            "bundle", cls.digest,
-            [{"keyid": KEYID, "sign": lambda data: dsse.hmac_sign(KEY, data)}], root=str(ROOT))
+            'bundle',
+            cls.digest,
+            [{'keyid': KEYID, 'sign': lambda data: dsse.hmac_sign(KEY, data)}],
+            opts=tsig.SignHeadOptions(root=str(ROOT)),
+        )
         cls.anchor = cls._anchors()
 
     @classmethod
@@ -167,11 +170,19 @@ class EndToEndT3Test(unittest.TestCase):
                 "witness": ta.make_witness_verifier({KEYID: _checker(KEY)})}
 
     def run_verify(self, required="T3", threshold=1, anchor=None, verifiers=None):
-        return tv.verify(self.bundle, self.policy(required, threshold), str(ROOT),
-                         anchor=anchor or self.anchor,
-                         anchor_verifiers=verifiers or self.verifiers(),
-                         head_signature=self.envelope, registry=_registry(),
-                         material=_material(), now=NOW)
+        return tv.verify(
+            self.bundle,
+            self.policy(required, threshold),
+            str(ROOT),
+            opts=tv.TrustVerifyOptions(
+                anchor=anchor or self.anchor,
+                anchor_verifiers=verifiers or self.verifiers(),
+                head_signature=self.envelope,
+                registry=_registry(),
+                material=_material(),
+                now=NOW,
+            ),
+        )
 
     def test_t3_achieved(self):
         result = self.run_verify()

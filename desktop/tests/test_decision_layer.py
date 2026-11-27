@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """决策层端口单测（typed-decision：三原语 / schema / 确定性 / fail-closed / 拉取脚手架）。"""
+import contextlib
 import importlib.util
 import io
-import contextlib
 import json
 import os
 import shutil
@@ -61,8 +61,8 @@ class DecisionLayerTest(unittest.TestCase):
                         "至少保留未拉取候选：拉取是按模型逐个显式授权的动作")
 
     def test_stub_is_deterministic_and_uncalibrated(self):
-        a = dl.decide(REQ, adapter="stub", root=str(ROOT))
-        b = dl.decide(REQ, adapter="stub", root=str(ROOT))
+        a = dl.decide(REQ, opts=dl.DecideOptions(adapter='stub', root=str(ROOT)))
+        b = dl.decide(REQ, opts=dl.DecideOptions(adapter='stub', root=str(ROOT)))
         self.assertEqual(a["status"], "ok")
         # 比「决策内容视图」：只排除墙钟 `latency_ms`，`meta` 的其余字段仍逐一比
         self.assertEqual(dl.decision_view(a), dl.decision_view(b),
@@ -102,7 +102,7 @@ class DecisionLayerTest(unittest.TestCase):
         self.assertIn("缺 state", dl.request_issue({"questions": {"q": {"type": "noul"}}}))
 
     def test_response_shape_rules(self):
-        ok = dl.decide(REQ, adapter="stub", root=str(ROOT))
+        ok = dl.decide(REQ, opts=dl.DecideOptions(adapter='stub', root=str(ROOT)))
         self.assertEqual(dl.response_issue(ok, REQ), "")
         good_answers = dict(ok["answers"])
         bad_sum = {"schema": dl.RESPONSE_SCHEMA, "status": "ok",
@@ -132,15 +132,15 @@ class DecisionLayerTest(unittest.TestCase):
             ("openai 缺 model", {"adapter": "openai-json", "endpoint": "http://x"}, "model"),
         )
         for label, kwargs, hint in cases:
-            out = dl.decide(REQ, root=str(ROOT), **kwargs)
+            out = dl.decide(REQ, opts=dl.DecideOptions(root=str(ROOT), **kwargs))
             self.assertEqual(out["status"], "abstained", label)
             self.assertIn(hint, out["reason"], label)
-        bad_req = dl.decide({"questions": {}}, adapter="stub", root=str(ROOT))
+        bad_req = dl.decide({'questions': {}}, opts=dl.DecideOptions(adapter='stub', root=str(ROOT)))
         self.assertEqual(bad_req["status"], "abstained")
         self.assertIn("请求不合规", bad_req["reason"])
 
     def test_unknown_adapter_without_declaration_abstains(self):
-        out = dl.decide(REQ, adapter="systemone-http", root=str(ROOT))
+        out = dl.decide(REQ, opts=dl.DecideOptions(adapter='systemone-http', root=str(ROOT)))
         self.assertEqual(out["status"], "abstained")
         self.assertIs(out["meta"]["non_gate"], True)
 

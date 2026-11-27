@@ -16,6 +16,7 @@ import io
 import os
 import sys
 from contextlib import redirect_stderr, redirect_stdout
+from dataclasses import dataclass
 from typing import Any, Dict, Optional, Sequence, Tuple
 
 #: 观测计数（`nf daemon status` 显示；单测**就地清零**，故必须是同一个字典对象）。
@@ -61,9 +62,22 @@ def lookup(argv: Sequence[Any], gen: Optional[int], allowed: bool,
     return None
 
 
-def store(argv: Sequence[Any], gen: Optional[int], allowed: bool, code: int,
-          out: bytes, err: bytes, cwd: Optional[str] = None) -> None:
+@dataclass(frozen=True)
+class Response:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    code: int
+    out: bytes
+    err: bytes
+    cwd: Optional[str] = None
+
+
+def store(argv: Sequence[Any], gen: Optional[int], allowed: bool, opts: Response) -> None:
     """只存「准入 + 成功」的响应；非准入/失败请调 `note_uncacheable()`。"""
+
+    code = opts.code
+    out = opts.out
+    err = opts.err
+    cwd = opts.cwd
     if gen is None or not allowed or code != 0:
         return
     if len(_CACHE) >= MAX_ENTRIES:
@@ -150,7 +164,7 @@ def wrap_runner(base, decide, sync=None):
             err_txt.flush()
             out, err = out_buf.getvalue(), err_buf.getvalue()
             _replay(out, err)
-        store(argv, gen, allowed, code, out, err)
+        store(argv, gen, allowed, opts=Response(code=code, out=out, err=err))
         return code
 
     return runner

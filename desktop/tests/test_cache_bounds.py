@@ -7,11 +7,10 @@
 判据两面：① 行为面——响应缓存真到上限就整批作废（且**先证它确实在存**，防「永不命中⇒永远不超」）；
 ② 声明面——已知的每个常驻容器都带着正的容量上限常量（新增常驻容器须在这里登记）。
 """
+import sys
 import unittest
 from pathlib import Path
 from unittest import mock
-
-import sys
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "desktop" / "src"))
@@ -67,11 +66,21 @@ class CacheBoundsTest(unittest.TestCase):
         self.addCleanup(rc.clear)
         gen = 1
         for i in range(10):                       # 先证「确实在存」（否则下面的断言是空转）
-            rc.store(["stats", "--json", "--case=%d" % i], gen, True, 0, b"{}", b"")
+            rc.store(
+                ['stats', '--json', '--case=%d' % i],
+                gen,
+                True,
+                opts=rc.Response(code=0, out=b'{}', err=b''),
+            )
         self.assertEqual(10, rc.entries(), "响应缓存没在存 ⇒ 本判据空转")
 
         for i in range(rc.MAX_ENTRIES + 50):
-            rc.store(["stats", "--json", "--bulk=%d" % i], gen, True, 0, b"{}", b"")
+            rc.store(
+                ['stats', '--json', '--bulk=%d' % i],
+                gen,
+                True,
+                opts=rc.Response(code=0, out=b'{}', err=b''),
+            )
         self.assertLessEqual(rc.entries(), rc.MAX_ENTRIES,
                              "响应缓存超上限（长驻守护会无界增长）")
 

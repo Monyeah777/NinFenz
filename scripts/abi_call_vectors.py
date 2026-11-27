@@ -189,8 +189,11 @@ def build_replay_vectors() -> dict:
         # 字节写入：文本模式在 Windows 会把 \n 换成 \r\n，同输入跨平台字节不同（合并自 main）
         atomic_write.write_bytes(root / "d" / "a.md", b"# A\n")
         atomic_write.write_bytes(root / "d" / "b.md", b"# B\n")
-        data, _info = evidence.build(str(root), ["d/a.md", "d/b.md"],
-                                     created_at="2026-01-01T00:00:00Z")
+        data, _info = evidence.build(
+            str(root),
+            ['d/a.md', 'd/b.md'],
+            opts=evidence.BuildOptions(created_at='2026-01-01T00:00:00Z'),
+        )
         bundle = Path(tmp) / "b.zip"
         atomic_write.write_bytes(str(bundle), data)
         live = evidence.replay(str(bundle))

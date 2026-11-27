@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import os
 import zipfile
+from dataclasses import dataclass
 from typing import Any
 
 from core import json_doc
@@ -18,6 +19,7 @@ from ._reader import (
     _Reader,
 )
 from ._verify_forms import (
+    VerifyOptions,
     _detect_container,
     _dir_read,
     _verify_attest,
@@ -72,8 +74,16 @@ def verify_batch(target: str, key: bytes | None = None,
     counts: dict[str, int] = {}
     for path in paths:
         try:
-            res = verify_any(path, key=key, revocations=revocations, at=at, root=root,
-                             anchor=anchor)
+            res = verify_any(
+                path,
+                opts=BatchVerifyOptions(
+                    key=key,
+                    revocations=revocations,
+                    at=at,
+                    root=root,
+                    anchor=anchor,
+                ),
+            )
         except (OSError, ValueError) as exc:      # 用法级错误只影响这一件，不炸整批
             res = {"verdict": "invalid", "issues": [str(exc)], "level": "none", "root": ""}
         verdict = str(res.get("verdict") or "invalid")
@@ -88,34 +98,74 @@ def verify_batch(target: str, key: bytes | None = None,
 
 
 
-def verify_any(path: str, key: bytes | None = None,
-               revocations: dict[str, Any] | None = None, at: str = "",
-               root: str = "", kind: str = "",
-               anchor: dict[str, Any] | None = None,
-               expected_policy_digest: str = "",
-               require_fresh_revocations: bool = False,
-               time_record: dict[str, Any] | None = None,
-               time_ca: str = "", time_untrusted: str = "") -> dict[str, Any]:
+@dataclass(frozen=True)
+class BatchVerifyOptions:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    key: bytes | None = None
+    revocations: dict[str, Any] | None = None
+    at: str = ''
+    root: str = ''
+    kind: str = ''
+    anchor: dict[str, Any] | None = None
+    expected_policy_digest: str = ''
+    require_fresh_revocations: bool = False
+    time_record: dict[str, Any] | None = None
+    time_ca: str = ''
+    time_untrusted: str = ''
+
+
+def verify_any(path: str, opts: BatchVerifyOptions | None = None) -> dict[str, Any]:
     """cc_verify 的统一入口：自动判三种形态并给出同一套四词判定。
 
     - 容器（.zip / 目录）按内容判形态；单 JSON 按 schema 判形态，成员从 `root` 找
       （缺省 = 该 JSON 所在目录）。
     - 判定词表与退出码对所有形态一致：ok / revoked / expired / invalid。
     """
+
+    opts = opts if opts is not None else BatchVerifyOptions()
+    key = opts.key
+    revocations = opts.revocations
+    at = opts.at
+    root = opts.root
+    kind = opts.kind
+    anchor = opts.anchor
+    expected_policy_digest = opts.expected_policy_digest
+    require_fresh_revocations = opts.require_fresh_revocations
+    time_record = opts.time_record
+    time_ca = opts.time_ca
+    time_untrusted = opts.time_untrusted
     if os.path.isfile(path) and not zipfile.is_zipfile(path):
-        res = _verify_single_json(path, key, revocations, at, root, kind,
-                                  require_fresh_revocations)
+        res = _verify_single_json(
+            path,
+            opts=BatchVerifyOptions(
+                key=key,
+                revocations=revocations,
+                at=at,
+                root=root,
+                kind=kind,
+                require_fresh_revocations=require_fresh_revocations,
+            ),
+        )
         form = "bundle" if str(res.get("kind") or "") == "bundle" else "other"
     else:
         rd = _Reader(path)
         try:
             form, doc = _detect_container(rd, kind)
             if form == "bundle":
-                return verify(path, key=key, revocations=revocations, at=at, anchor=anchor,
-                              expected_policy_digest=expected_policy_digest,
-                              require_fresh_revocations=require_fresh_revocations,
-                              time_record=time_record, time_ca=time_ca,
-                              time_untrusted=time_untrusted)
+                return verify(
+                    path,
+                    opts=VerifyOptions(
+                        key=key,
+                        revocations=revocations,
+                        at=at,
+                        anchor=anchor,
+                        expected_policy_digest=expected_policy_digest,
+                        require_fresh_revocations=require_fresh_revocations,
+                        time_record=time_record,
+                        time_ca=time_ca,
+                        time_untrusted=time_untrusted,
+                    ),
+                )
             if form == "receipts":
                 res = _verify_receipts(doc, rd.read, revocations,
                                        require_fresh_revocations, at)
@@ -131,9 +181,13 @@ def verify_any(path: str, key: bytes | None = None,
 
 
 
-def _verify_single_json(path: str, key: bytes | None, revocations: dict[str, Any] | None,
-                        at: str, root: str, kind: str,
-                        require_fresh_revocations: bool = False) -> dict[str, Any]:
+def _verify_single_json(path: str, opts: BatchVerifyOptions) -> dict[str, Any]:
+    key = opts.key
+    revocations = opts.revocations
+    at = opts.at
+    root = opts.root
+    kind = opts.kind
+    require_fresh_revocations = opts.require_fresh_revocations
     with open(path, "rb") as fh:
         raw = fh.read()
     try:

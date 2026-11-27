@@ -45,7 +45,7 @@ class IgnoredCopyNotReadTest(AssetLedgerTestBase):
         os.makedirs(base, exist_ok=True)
         with open(os.path.join(base, "A1.md"), "w", encoding="utf-8") as fh:
             fh.write("# 资产 A1\n内容\n")
-        al.add_asset(base, "A1.md", "A1", source="测试源 v1", module="M00")
+        al.add_asset(base, 'A1.md', 'A1', source='测试源 v1', opts=al.AssetOptions(module='M00'))
         return base
 
     def _gitignore(self, pattern):
@@ -78,8 +78,13 @@ class IgnoredCopyNotReadTest(AssetLedgerTestBase):
 class AddAssetTest(AssetLedgerTestBase):
     def test_add_creates_ledger_header_and_entry(self):
         self._make_asset()
-        entry = al.add_asset(self.root, "A1.md", "A1", source="测试源 v1",
-                             module="M00", version="1.0")
+        entry = al.add_asset(
+            self.root,
+            'A1.md',
+            'A1',
+            source='测试源 v1',
+            opts=al.AssetOptions(module='M00', version='1.0'),
+        )
         self.assertEqual(entry["status"], al.STATUS_ACTIVE)
         self.assertTrue(os.path.isfile(self._ledger_path()))
         with open(os.path.join(self.root, "A1.md"), encoding="utf-8") as f:
@@ -162,12 +167,12 @@ class EntryValidationTest(unittest.TestCase):
         with self.assertRaises(al.AssetLedgerError):
             al.make_entry("f.md", "K", "")
         with self.assertRaises(al.AssetLedgerError):
-            al.make_entry("f.md", "K", "s", version="")
+            al.make_entry('f.md', 'K', 's', opts=al.EntryOptions(version=''))
         with self.assertRaises(al.AssetLedgerError):
-            al.make_entry("f.md", "K", "s", status="bogus")
+            al.make_entry('f.md', 'K', 's', opts=al.EntryOptions(status='bogus'))
 
     def test_valid_entry_fields(self):
-        e = al.make_entry("f.md", "K", "s", module="M93", version="2.1")
+        e = al.make_entry('f.md', 'K', 's', opts=al.EntryOptions(module='M93', version='2.1'))
         self.assertEqual(e["module"], "M93")
         self.assertTrue(e["added"])
 
@@ -175,7 +180,7 @@ class EntryValidationTest(unittest.TestCase):
 class VerifyLedgerTest(AssetLedgerTestBase):
     def test_clean_ledger_no_issues(self):
         self._make_asset()
-        al.add_asset(self.root, "A1.md", "A1", source="s1", module="M00")
+        al.add_asset(self.root, 'A1.md', 'A1', source='s1', opts=al.AssetOptions(module='M00'))
         issues, stats = al.verify_ledger_dir(self.root)
         self.assertEqual(issues, [])
         self.assertEqual(stats["assets"], 1)
@@ -249,7 +254,13 @@ class RootScanTest(AssetLedgerTestBase):
         os.makedirs(sub)
         with open(os.path.join(sub, "X.md"), "w", encoding="utf-8") as f:
             f.write("# X\n")
-        al.add_asset(sub, "X.md", "X", source="s1", tier="community", package="demo")
+        al.add_asset(
+            sub,
+            'X.md',
+            'X',
+            source='s1',
+            opts=al.AssetOptions(tier='community', package='demo'),
+        )
         issues, stats = al.verify_root(self.root)
         self.assertEqual(issues, [])
         self.assertEqual(stats["ledgers"], 1)
@@ -264,7 +275,13 @@ class RootScanTest(AssetLedgerTestBase):
         os.makedirs(sub)
         with open(os.path.join(sub, "X.md"), "w", encoding="utf-8") as f:
             f.write("# X\n")
-        al.add_asset(sub, "X.md", "X", source="s1", tier="community", package="demo")
+        al.add_asset(
+            sub,
+            'X.md',
+            'X',
+            source='s1',
+            opts=al.AssetOptions(tier='community', package='demo'),
+        )
         rows = al.iter_assets(self.root)
         self.assertEqual(len(rows), 1)
         self.assertEqual(al.filter_rows(rows, tier="community")[0]["key"], "X")

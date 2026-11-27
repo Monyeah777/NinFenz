@@ -3123,10 +3123,19 @@ def _cmd_asset(args) -> int:
             if not args.root:
                 print("  ✗ add 需要 --root（台账所在资产根目录，如 05_资产库）", file=sys.stderr)
                 return 2
-            entry = al.add_asset(args.root, args.file, args.key, args.source,
-                                 module=args.module, version=args.version,
-                                 status=args.status, tier=args.tier,
-                                 package=args.package)
+            entry = al.add_asset(
+                args.root,
+                args.file,
+                args.key,
+                args.source,
+                opts=al.AssetOptions(
+                    module=args.module,
+                    version=args.version,
+                    status=args.status,
+                    tier=args.tier,
+                    package=args.package,
+                ),
+            )
             print("== nf asset add ==")
             print("  ✓ 已入库：%s（key=%s · version=%s · status=%s）"
                   % (entry["file"], entry["key"], entry["version"], entry["status"]))
@@ -3604,7 +3613,7 @@ def _cmd_demo(args) -> int:
     import tempfile
     import time
 
-    from core.pipeline import pipe
+    from core.pipeline import PipeOptions, pipe
     from core.pipeline_loader import load_pipeline_file
     pipeline_path = os.path.join(ROOT, "community", "校园西幻轻混组合包",
                                  "pipelines", "P04_轻混装配流管线.md")
@@ -3625,8 +3634,12 @@ def _cmd_demo(args) -> int:
                   "产物文件名由本命令决定）" % dest, 2)
     t0 = time.time()
     selected = ["通用类:M00", "轻混类:M91", "轻混类:M92", "通用类:M80"]
-    r = pipe(store, pipeline, selected, include_references=True,
-             fmt="ccv3", dest_dir=dest)
+    r = pipe(
+        store,
+        pipeline,
+        selected,
+        opts=PipeOptions(include_references=True, fmt='ccv3', dest_dir=dest),
+    )
     elapsed = time.time() - t0
     print("== nf demo（一键演示世界 · P04 轻混）==")
     print("  seed 装载：官方核心 %d 件 + 轻混组合包 %d 件"
@@ -4667,9 +4680,19 @@ def _revocations_sign(args):
         else:
             key = attest.read_key_file(_rel_out(args.key_file))
         scheme = args.scheme or rv.ALG
-        feed = rv.sign(table, key, issuer=args.issuer, seq=args.seq, prev=prev,
-                       expires_at=args.expires_at, ttl=args.ttl, status_uri=args.status_uri,
-                       scheme=scheme)
+        feed = rv.sign(
+            table,
+            key,
+            opts=rv.SignOptions(
+                issuer=args.issuer,
+                seq=args.seq,
+                prev=prev,
+                expires_at=args.expires_at,
+                ttl=args.ttl,
+                status_uri=args.status_uri,
+                scheme=scheme,
+            ),
+        )
     except (OSError, ValueError) as exc:
         return _machine_fail(args, str(exc), 4)
     shown = _revocations_write(args, feed, args.out)
@@ -4934,14 +4957,22 @@ def _evidence_verify(args):
             if not getattr(args, "time_ca", ""):
                 return _machine_fail(args, "给了 --time-record 就必须给 --time-ca（信任锚）"
                                            "（修复指引：TSA 根证书 PEM）", 4)
-        res = evidence.verify_any(path, key=key, revocations=rev, at=args.at,
-                                  root=root, kind=args.kind, anchor=anc,
-                                  expected_policy_digest=getattr(args, "policy_digest", ""),
-                                  require_fresh_revocations=bool(args.require_fresh_revocations),
-                                  time_record=time_record,
-                                  time_ca=_rel_out(args.time_ca) if args.time_ca else "",
-                                  time_untrusted=(_rel_out(args.time_untrusted)
-                                                  if args.time_untrusted else ""))
+        res = evidence.verify_any(
+            path,
+            opts=evidence.BatchVerifyOptions(
+                key=key,
+                revocations=rev,
+                at=args.at,
+                root=root,
+                kind=args.kind,
+                anchor=anc,
+                expected_policy_digest=getattr(args, 'policy_digest', ''),
+                require_fresh_revocations=bool(args.require_fresh_revocations),
+                time_record=time_record,
+                time_ca=_rel_out(args.time_ca) if args.time_ca else '',
+                time_untrusted=_rel_out(args.time_untrusted) if args.time_untrusted else '',
+            ),
+        )
     except (OSError, ValueError) as exc:
         return _machine_fail(args, str(exc), 4)
     if args.json:
@@ -5182,9 +5213,19 @@ def _evidence_pack(args):
         dec = (json_doc.load(_rel_out(args.decision), dict, what=args.decision)
                if getattr(args, "decision", "") else None)
         out = _rel_out(args.out) if args.out else evidence.default_out()
-        dest, info = evidence.write(ROOT, out, rels, issuer=args.issuer,
-                                    key=key, expires_at=args.expires_at, revocations=rev,
-                                    anchor=anc, decision=dec)
+        dest, info = evidence.write(
+            ROOT,
+            out,
+            rels,
+            opts=evidence.BuildOptions(
+                issuer=args.issuer,
+                key=key,
+                expires_at=args.expires_at,
+                revocations=rev,
+                anchor=anc,
+                decision=dec,
+            ),
+        )
     except (OSError, ValueError) as exc:
         return _machine_fail(args, str(exc))
     if args.json:
@@ -5847,9 +5888,17 @@ def _cmd_review(args):
               "（修复指引：--scope 只收这些类别，逗号分隔；不带 --scope 即全类）"
               % ("、".join(bad), " / ".join(gr.CLASSES)), file=sys.stderr)
         return 2
-    doc = gr.review(ROOT, adapter=args.adapter, endpoint=args.endpoint,
-                    limit=args.limit, batch=max(1, args.batch), timeout=args.timeout,
-                    classes=scope)
+    doc = gr.review(
+        ROOT,
+        opts=gr.ReviewOptions(
+            adapter=args.adapter,
+            endpoint=args.endpoint,
+            limit=args.limit,
+            batch=max(1, args.batch),
+            timeout=args.timeout,
+            classes=scope,
+        ),
+    )
     if args.json:
         print(_json.dumps({"kind": "review", **doc},
                           ensure_ascii=False, indent=2, sort_keys=True))
@@ -5963,8 +6012,16 @@ def _cmd_decide(args):
             if not issues:
                 print("  ✓ 决策层面体检通过（%s）" % dl.summary(stats))
         return 1 if issues else 0
-    out = dl.decide(req, adapter=args.adapter, endpoint=args.endpoint,
-                    model=args.model, timeout=args.timeout, root=ROOT)
+    out = dl.decide(
+        req,
+        opts=dl.DecideOptions(
+            adapter=args.adapter,
+            endpoint=args.endpoint,
+            model=args.model,
+            timeout=args.timeout,
+            root=ROOT,
+        ),
+    )
     if args.json:
         print(_json.dumps({"kind": "decide", **out},
                           ensure_ascii=False, indent=2, sort_keys=True))
@@ -5998,8 +6055,15 @@ def _cmd_combine(args):
 
     sub = getattr(args, "combine_cmd", "") or "plan"
     if sub == "breadth":
-        stats = pc.breadth(ROOT, triple_sample=args.triples, quad_sample=args.quads,
-                           quint_sample=args.quints, sext_sample=args.sexts)
+        stats = pc.breadth(
+            ROOT,
+            opts=pc.BreadthOptions(
+                triple_sample=args.triples,
+                quad_sample=args.quads,
+                quint_sample=args.quints,
+                sext_sample=args.sexts,
+            ),
+        )
         if args.json:
             print(_json.dumps({"kind": "combine-breadth", **stats},
                               ensure_ascii=False, indent=2, sort_keys=True))
@@ -6046,9 +6110,17 @@ def _cmd_combine(args):
             return 1
         reg = {"02": False, "dom": False, "protocols": ""}
         if args.write:
-            r = pc.combo_register(ROOT, out["package"], out["category"], out["pipeline"],
-                                  [x.strip() for x in args.packs.split(",") if x.strip()],
-                                  out["references"], out["certificate"])
+            r = pc.combo_register(
+                ROOT,
+                opts=pc.ComboSpec(
+                    name=out['package'],
+                    category=out['category'],
+                    pipeline=out['pipeline'],
+                    packages=[x.strip() for x in args.packs.split(',') if x.strip()],
+                    refs=out['references'],
+                    cert=out['certificate'],
+                ),
+            )
             reg = {"02": r["section02"], "dom": r["domain_list"],
                    "protocols": r["protocols"]}
         if args.json:
@@ -7622,9 +7694,14 @@ def _cmd_library(args):
         try:
             key = _att.read_key_file(_rel_out(args.key_file)) if args.key_file else None
             out = nflib2.set_attestation(
-                ROOT, args.entry, key=key,
-                ssh_key=getattr(args, "ssh_key", ""),
-                ssh_identity=getattr(args, "ssh_identity", ""))
+                ROOT,
+                args.entry,
+                opts=nflib2.AttestationOptions(
+                    key=key,
+                    ssh_key=getattr(args, 'ssh_key', ''),
+                    ssh_identity=getattr(args, 'ssh_identity', ''),
+                ),
+            )
         except (OSError, ValueError) as exc:
             # 凭证类输入问题（私钥路径不存在等）不得冒成「内部错误」（文档示例真跑抓到）。
             return _machine_fail(args, str(exc), 1)
@@ -8432,11 +8509,17 @@ def _cmd_shell(args) -> int:
                 return code
 
             issues, stats = term.deep_check(
-                index, tree["commands"], tree["root_flags"],
-                live_runner=_live,
-                history_path=history_path, session_path=args.session_path or None,
-                stream=sys.stdout,
-                pager_ok=bool(shutil.which("less") or shutil.which("more")))
+                index,
+                tree['commands'],
+                opts=term.DeepCheckOptions(
+                    root_flags=tree['root_flags'],
+                    live_runner=_live,
+                    history_path=history_path,
+                    session_path=args.session_path or None,
+                    stream=sys.stdout,
+                    pager_ok=bool(shutil.which('less') or shutil.which('more')),
+                ),
+            )
             stats["live_output"] = term.clip(live_buf.getvalue().strip(), 300)
         else:
             issues, stats = term.self_check(index, tree["commands"], tree["root_flags"])
@@ -10014,7 +10097,7 @@ def main(argv=None) -> int:
     # 属**错误归因**且无修复指引；`nf pipeline dryrun` 的同类参数则明写「管线 md 路径」）。
     import glob as _glob
 
-    from core.pipeline import pipe
+    from core.pipeline import PipeOptions, pipe
     from core.pipeline_loader import load_pipeline_file
     _pl_arg = str(args.pipeline)
     _pl_path = _pl_arg if os.path.isfile(_pl_arg) else ""
@@ -10062,11 +10145,18 @@ def main(argv=None) -> int:
         print(f"  [变体] selected {args.modules.split(',')} → {selected}"
               + (f"（移除 {args.variant_remove}）" if args.variant_remove else ""))
     dest = args.dest
-    r = pipe(store, pipeline, selected,
-             include_references=not args.no_include_refs,
-             fmt=args.fmt, dest_dir=dest,
-             fail_on_gate=not args.force_export,
-             doc_semantics=args.doc_semantics)
+    r = pipe(
+        store,
+        pipeline,
+        selected,
+        opts=PipeOptions(
+            include_references=not args.no_include_refs,
+            fmt=args.fmt,
+            dest_dir=dest,
+            fail_on_gate=not args.force_export,
+            doc_semantics=args.doc_semantics,
+        ),
+    )
 
     print(f"\n== 质量门 ==\n  PASS {r.gate.n_pass} · WARN {r.gate.n_warn}"
           f" · FAIL {r.gate.n_fail}" + ("（可产出）" if r.ok else "（存在 FAIL）"))

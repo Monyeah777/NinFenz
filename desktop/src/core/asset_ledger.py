@@ -15,9 +15,9 @@ import glob
 import json
 import os
 import re
+from dataclasses import dataclass
 
-from core import atomic_write
-from core import paths
+from core import atomic_write, paths
 from core import repo_face as _repo_face
 
 LEDGER_SCHEMA_VERSION = "1"
@@ -89,10 +89,23 @@ def save_ledger(ledger: dict, ledger_path: str) -> None:
                             json.dumps(ledger, ensure_ascii=False, indent=2) + "\n")
 
 
-def make_entry(file_rel: str, key: str, source: str, module: str = "",
-               version: str = "1.0", status: str = STATUS_ACTIVE,
-                 added: str | None = None) -> dict:
+@dataclass(frozen=True)
+class EntryOptions:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    module: str = ''
+    version: str = '1.0'
+    status: str = STATUS_ACTIVE
+    added: str | None = None
+
+
+def make_entry(file_rel: str, key: str, source: str, opts: EntryOptions | None = None) -> dict:
     """构造条目并做字段级校验（源头拦截，CLI/测试共用）。"""
+
+    opts = opts if opts is not None else EntryOptions()
+    module = opts.module
+    version = opts.version
+    status = opts.status
+    added = opts.added
     if not key or not str(key).strip():
         raise AssetLedgerError("溯源键 key 不能为空——请先填溯源键再入库")
     if not file_rel or not str(file_rel).strip():
@@ -154,14 +167,38 @@ def parse_header(text: str):
     return {"key": m.group(1), "version": m.group(2), "status": m.group(3)}
 
 
-def add_asset(assets_root: str, file_rel: str, key: str, source: str,
-              module: str = "", version: str = "1.0", status: str = STATUS_ACTIVE,
-                 tier: str | None = None, package: str = "", added: str | None = None,
-                 ledger_path: str | None = None) -> dict:
+@dataclass(frozen=True)
+class AssetOptions:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    module: str = ''
+    version: str = '1.0'
+    status: str = STATUS_ACTIVE
+    tier: str | None = None
+    package: str = ''
+    added: str | None = None
+    ledger_path: str | None = None
+
+
+def add_asset(
+    assets_root: str,
+    file_rel: str,
+    key: str,
+    source: str,
+    opts: AssetOptions | None = None,
+) -> dict:
     """入库：资产文件头部写 nf-asset 头 + 台账 append 条目。
 
     幂等判定 = 同键/同文件已托管 → 拒绝（键唯一 + 文件唯一）。tier 在首次建档时落台账级。
     """
+
+    opts = opts if opts is not None else AssetOptions()
+    module = opts.module
+    version = opts.version
+    status = opts.status
+    tier = opts.tier
+    package = opts.package
+    added = opts.added
+    ledger_path = opts.ledger_path
     full = _safe_join(assets_root, file_rel)
     if not os.path.isfile(full):
         raise AssetLedgerError("资产文件不存在：%s" % full)
@@ -181,8 +218,12 @@ def add_asset(assets_root: str, file_rel: str, key: str, source: str,
         raise AssetLedgerError(
             "资产文件已带 %s 头（key=%s）——文件级唯一，禁止双托管"
             % (HEADER_MARK, existing.get("key")))
-    entry = make_entry(file_rel.replace("\\", "/"), key, source,
-                       module=module, version=version, status=status, added=added)
+    entry = make_entry(
+        file_rel.replace('\\', '/'),
+        key,
+        source,
+        opts=EntryOptions(module=module, version=version, status=status, added=added),
+    )
     atomic_write.write_text(full, render_header(entry) + text)   # 资产件也原子落盘
     # 台账读-改-写加锁（2026-10-01）：与 registry 同形——原子写只保证「读者不见半截」，
     # 并发 add 会**丢条目**（同形探针实测：两个 RMW 写者最终只剩一条）。锁内**重读 + 复查**

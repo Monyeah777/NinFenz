@@ -28,7 +28,7 @@ def _fixture(root: Path) -> None:
 
 
 def _bundle(root: Path, rels: list, name: str) -> Path:
-    data, _info = evidence.build(str(root), rels, created_at=STAMP)
+    data, _info = evidence.build(str(root), rels, opts=evidence.BuildOptions(created_at=STAMP))
     out = root / name
     out.write_bytes(data)
     return out

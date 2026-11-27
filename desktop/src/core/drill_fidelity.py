@@ -32,11 +32,10 @@ from __future__ import annotations
 import hashlib
 import json
 import re
-
-from core import atomic_write
 from pathlib import Path
 from typing import Any
-from core import json_doc
+
+from core import atomic_write, json_doc
 
 EXEC_GLOB = "desktop/tests/fixtures/execution/p*_drill_cases.json"
 ROUND_GLOB = "desktop/tests/fixtures/execution/rounds/*.json"
@@ -72,7 +71,17 @@ def _exec_sets(root: Path) -> list[dict[str, Any]]:
         lexicon = data.get("lexicon") or {}
         n = ok = 0
         for case in data.get("cases", []):
-            hits = ed.run_case(case, real, sem, src, other, keys, lexicon)
+            hits = ed.run_case(
+                case,
+                real,
+                opts=ed.CaseOptions(
+                    semantics=sem,
+                    source_text=src,
+                    other_ids=other,
+                    asset_keys=keys,
+                    lexicon=lexicon,
+                ),
+            )
             expect = set(case.get("expect_captured") or [])
             good = (not expect and not hits) or expect <= set(hits)
             n += 1
@@ -183,7 +192,7 @@ def _corpus_live_hits(nonblank: list[tuple[int, str]], real_ids: list[str]
 
     live: list[tuple[int, str]] = []
     for line_no, line in nonblank:
-        for rule in ed.run_case({"output": line}, real_ids, {}):
+        for rule in ed.run_case({'output': line}, real_ids, opts=ed.CaseOptions(semantics={})):
             live.append((line_no, rule))
     return live
 

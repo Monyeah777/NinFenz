@@ -101,15 +101,17 @@ def run(args: argparse.Namespace) -> int:
         if args.command == "preregister":
             experiment = cockpit_ab.preregister(
                 _load(args.experiment),
-                min_pairs=args.min_pairs,
-                min_effect=args.min_effect,
-                alpha=args.alpha,
-                min_judges=args.min_judges,
-                min_agreement=args.min_agreement,
-                min_pairs_per_model=args.min_pairs_per_model,
-                target_power=args.target_power,
-                max_pairs=args.max_pairs,
-                planned_pairs=args.planned_pairs,
+                opts=cockpit_ab.PreregisterOptions(
+                    min_pairs=args.min_pairs,
+                    min_effect=args.min_effect,
+                    alpha=args.alpha,
+                    min_judges=args.min_judges,
+                    min_agreement=args.min_agreement,
+                    min_pairs_per_model=args.min_pairs_per_model,
+                    target_power=args.target_power,
+                    max_pairs=args.max_pairs,
+                    planned_pairs=args.planned_pairs,
+                ),
             )
             _write_json(args.out, experiment)
             print(args.out)

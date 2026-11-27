@@ -205,6 +205,7 @@ class ProfileInputFaceTest(unittest.TestCase):
     def test_reads_stay_inside_declared_face(self):
         import fnmatch
         import os
+
         from core import conformance_scan as csc
         seen = set()
         orig = csc.read_text_cached
@@ -256,6 +257,7 @@ class ContractEnumerationTest(unittest.TestCase):
 
     def test_faces_match_pathlib_glob(self):
         from pathlib import Path
+
         from core import conformance_scan as csc
         for pattern in ("community/*/modules/*.md", "04_模块库/*/*.md"):
             want = sorted(p.relative_to(ROOT).as_posix()
@@ -462,7 +464,7 @@ class CombineTest(unittest.TestCase):
             self.assertTrue(st["legal"], cert.get("label"))
 
     def test_breadth_sample_all_legal(self):
-        stats = pc.breadth(ROOT, triple_sample=30, quad_sample=15)
+        stats = pc.breadth(ROOT, opts=pc.BreadthOptions(triple_sample=30, quad_sample=15))
         self.assertTrue(stats["all_legal"], stats["failures"][:2])
         self.assertEqual(stats["pairs"], stats["pairs_legal"])
 

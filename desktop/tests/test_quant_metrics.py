@@ -30,8 +30,10 @@ class FormulaTest(unittest.TestCase):
     def test_annual_factor_table(self):
         self.assertEqual(qm.ANNUAL_FACTORS, {"daily": 252, "weekly": 52, "monthly": 12})
         with self.assertRaises(ValueError):
-            qm.performance_report({"equity": [1, 2, 3], "dates": ["a", "b", "c"]},
-                                  period_start="x", period_end="y", frequency="hourly")
+            qm.performance_report(
+                {'equity': [1, 2, 3], 'dates': ['a', 'b', 'c']},
+                opts=qm.ReportOptions(period_start='x', period_end='y', frequency='hourly'),
+            )
 
     def test_max_drawdown_and_series(self):
         prices = [1.0, 1.25, 0.75, 1.0]
@@ -76,8 +78,8 @@ class ReportTest(unittest.TestCase):
                   currency="CNY", frequency="daily", risk_free_rate_annual=0.015,
                   benchmark_id="NF-SAMPLE-INDEX", cost_bps_fee=3.0,
                   cost_bps_slippage=5.0, fill_rule="next_open", as_of="2026-08-21")
-        a = qm.performance_report(series, **kw)
-        b = qm.performance_report(series, **kw)
+        a = qm.performance_report(series, opts=qm.ReportOptions(**kw))
+        b = qm.performance_report(series, opts=qm.ReportOptions(**kw))
         self.assertEqual(a, b, "同一输入两次装配必须逐字段一致（T4 复算前提）")
         self.assertEqual(a["annual_factor"], 252)
         for key in ("cumulative", "annualized", "volatility_annualized", "sharpe",

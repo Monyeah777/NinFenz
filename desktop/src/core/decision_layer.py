@@ -27,6 +27,7 @@ import os
 import time
 import urllib.error
 import urllib.request
+from dataclasses import dataclass
 from typing import Any, Dict, List, Tuple
 
 from core import json_doc
@@ -309,10 +310,27 @@ def openai_json_decide(req: Dict[str, Any], endpoint: str, model: str,
                      "model": model}}
 
 
-def decide(req: Dict[str, Any], adapter: str = "stub", endpoint: str = "",
-           model: str = "", api_key: str = "", timeout: float = 30.0,
-           root: str = ".") -> Dict[str, Any]:
+@dataclass(frozen=True)
+class DecideOptions:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    adapter: str = 'stub'
+    endpoint: str = ''
+    model: str = ''
+    api_key: str = ''
+    timeout: float = 30.0
+    root: str = '.'
+
+
+def decide(req: Dict[str, Any], opts: DecideOptions | None = None) -> Dict[str, Any]:
     """统一入口：形状校验 → 适配器 → 应答校验；任一环节失败 → abstained（fail-closed）。"""
+
+    opts = opts if opts is not None else DecideOptions()
+    adapter = opts.adapter
+    endpoint = opts.endpoint
+    model = opts.model
+    api_key = opts.api_key
+    timeout = opts.timeout
+    root = opts.root
     bad = request_issue(req)
     if bad:
         return {"schema": RESPONSE_SCHEMA, "status": "abstained",
@@ -433,8 +451,8 @@ def scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
                "risk": {"type": "score", "levels": ["低", "中", "高"]}}}
     if request_issue(req):
         issues.append("内部样例请求不合规：%s" % request_issue(req))
-    a1 = decide(req, adapter="stub", root=root)
-    a2 = decide(req, adapter="stub", root=root)
+    a1 = decide(req, opts=DecideOptions(adapter='stub', root=root))
+    a2 = decide(req, opts=DecideOptions(adapter='stub', root=root))
     # 比「决策内容视图」而非整份应答：`meta.latency_ms` 是墙钟观测，差值 ≥1 ms 就判死人
     # （2026-09-29 实测假红，见 decision_view 的说明）。
     if decision_view(a1) != decision_view(a2):
@@ -450,10 +468,10 @@ def scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     cases: List[Tuple[str, Dict[str, Any]]] = [("未登记适配器", {"adapter": "ghost"}),
                                              ("缺 endpoint", {"adapter": "systemone-http"})]
     for label, kwargs in cases:
-        out = decide(req, root=root, **kwargs)
+        out = decide(req, opts=DecideOptions(root=root, **kwargs))
         if out.get("status") != "abstained" or not out.get("reason"):
             issues.append("%s 未 fail-closed（应 abstained + reason）" % label)
-    bad = decide({"questions": {}}, adapter="stub", root=root)
+    bad = decide({'questions': {}}, opts=DecideOptions(adapter='stub', root=root))
     if bad.get("status") != "abstained":
         issues.append("不合规请求未 fail-closed")
     if response_issue({"schema": RESPONSE_SCHEMA, "status": "ok",

@@ -128,9 +128,9 @@ class DocTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = _make_pkg(tmp)
             p = Path(tmp) / "faces.json"
-            first = go.run_all(str(root), mods=["test_probe"], workers=2, path=p)
+            first = go.run_all(str(root), opts=go.ObserveOptions(mods=['test_probe'], workers=2, path=p))
             self.assertIn("test_probe", first["modules"])
-            again = go.run_all(str(root), mods=["test_probe"], workers=2, path=p)
+            again = go.run_all(str(root), opts=go.ObserveOptions(mods=['test_probe'], workers=2, path=p))
             self.assertEqual(again["modules"]["test_probe"]["status"], "ok")
 
 

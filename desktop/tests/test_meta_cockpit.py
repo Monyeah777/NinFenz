@@ -266,7 +266,7 @@ class CognitiveCockpitTest(unittest.TestCase):
             run = constrained_loop.run(
                 self.PROMPT,
                 constrained_loop.first_policy,
-                journal_path=path,
+                opts=constrained_loop.LoopOptions(journal_path=path),
             )
             self.assertEqual("pass", run["status"])
             document, status = session_journal.load(path)

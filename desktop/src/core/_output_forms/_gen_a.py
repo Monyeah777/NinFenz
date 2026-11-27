@@ -8,7 +8,6 @@ from ._registry import _read_json, _rel
 from ._util import _pkg_rel
 
 
-
 def _gen_performance_report(root: str, entry: dict):
     """由净值数据用本仓引擎装配绩效报告（GIPS 对齐披露面）。"""
     from core import quant_metrics as qm
@@ -23,7 +22,7 @@ def _gen_performance_report(root: str, entry: dict):
         return None, ["输入 %s %s" % (src, err)]
     params = dict(spec.get("params") or {})
     try:
-        return qm.performance_report(series, **params), []
+        return qm.performance_report(series, opts=qm.ReportOptions(**params)), []
     except Exception as exc:  # 参数口径错误必须可见，不得静默兜底
         return None, ["复算异常 %s: %s" % (type(exc).__name__, exc)]
 

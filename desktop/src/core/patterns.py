@@ -13,8 +13,8 @@ NF 的 `community/` 是**内容域包**（世界/角色/事件），没有"实�
 """
 from __future__ import annotations
 
-import glob as _glob
 import fnmatch as _fnmatch
+import glob as _glob
 import os
 import re
 from pathlib import Path
@@ -167,9 +167,16 @@ def write_projection(root: str = ".") -> Dict[str, Any]:
 
 def check_projection(root: str = ".") -> List[str]:
     return doc_family.check_index(
-        root, index_rel=INDEX_REL, begin=BEGIN, end=END, block=render_index(root),
-        missing_hint="nf patterns reindex",
-        mismatch="patterns 登记表与实时重算不一致（跑 nf patterns reindex）")
+        root,
+        opts=doc_family.IndexOptions(
+            index_rel=INDEX_REL,
+            begin=BEGIN,
+            end=END,
+            block=render_index(root),
+            missing_hint='nf patterns reindex',
+            mismatch='patterns 登记表与实时重算不一致（跑 nf patterns reindex）',
+        ),
+    )
 
 
 def for_path(root: str, target: str) -> List[Dict[str, str]]:

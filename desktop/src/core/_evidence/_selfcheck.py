@@ -8,23 +8,18 @@ import tempfile
 import zipfile
 from typing import Any
 
-from ._build import (
-    _zip_bytes,
-    build,
-)
+from ._build import BuildOptions, _zip_bytes, build
 from ._const import (
     GUIDE,
     PAYLOAD_DIR,
     REVOCATION_SCHEMA,
 )
-from ._verify_forms import (
-    verify,
-)
+from ._verify_forms import VerifyOptions, verify
 
 # ------------------------------------------------------------------ 机制自检
 
 def _selfcheck_bundle(tmp: str, pin: str, **kw: Any) -> bytes:
-    data, _info = build(tmp, ["d/subject.md"], issuer="selfcheck", created_at=pin, **kw)
+    data, _info = build(tmp, ['d/subject.md'], opts=BuildOptions(issuer='selfcheck', created_at=pin, **kw))
     return data
 
 
@@ -50,7 +45,7 @@ def _selfcheck_revoked(tmp: str, digest: str) -> str:
     rev = {"schema": REVOCATION_SCHEMA,
            "revoked": [{"digest": digest, "revoked_at": "2026-01-01T00:00:00Z",
                         "reason": "selfcheck"}]}
-    return verify(os.path.join(tmp, "b.zip"), revocations=rev)["verdict"]
+    return verify(os.path.join(tmp, 'b.zip'), opts=VerifyOptions(revocations=rev))["verdict"]
 
 
 

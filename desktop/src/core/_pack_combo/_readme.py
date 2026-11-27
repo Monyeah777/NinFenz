@@ -5,10 +5,10 @@
 from __future__ import annotations
 
 import re
+from dataclasses import dataclass
 from pathlib import Path
 
 from core import conformance_scan as csc
-
 
 
 def combo_readme(name: str, packs: Sequence[str], cert: Dict[str, Any],
@@ -125,13 +125,30 @@ def combo_pipeline(name: str, pid: str, layers: Dict[str, List[str]],
 
 
 
-def combo_register(root: str, name: str, category: str, pipeline: str,
-                   packages: Sequence[str], refs: int, cert: Dict[str, Any]) -> Dict[str, Any]:
+@dataclass(frozen=True)
+class ComboSpec:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    name: str
+    category: str
+    pipeline: str
+    packages: Sequence[str]
+    refs: int
+    cert: Dict[str, Any]
+
+
+def combo_register(root: str, opts: ComboSpec) -> Dict[str, Any]:
     """登记组合包（三要件）：02 §8 段（**模块（0）**）+ verify.sh DOMAIN + registry protocols[]。
 
     组合包不走 `domain_pack._append_section02`（那条路径假设自有 2 模块 → 空 module_ids 会 IndexError，
     实测 2026-09-23），这里给组合专用段。
     """
+
+    name = opts.name
+    category = opts.category
+    pipeline = opts.pipeline
+    packages = opts.packages
+    refs = opts.refs
+    cert = opts.cert
     from core import domain_pack as dpk
 
     doc_path = Path(root) / dpk.DOC02_REL

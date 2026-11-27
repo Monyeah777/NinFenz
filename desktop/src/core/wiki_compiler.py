@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -51,10 +52,27 @@ def _dir_digest(root: str, rel: str) -> str:
     return _sha("\n".join(entries).encode("utf-8"))
 
 
-def _page(page_id: str, ptype: str, summary: str, spec_ref: str, source: str,
-          digest: str, relations: Optional[List[Dict[str, str]]] = None,
-          citations: Optional[List[Dict[str, str]]] = None,
-          machine_contract: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+@dataclass(frozen=True)
+class PageOptions:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    digest: str
+    relations: Optional[List[Dict[str, str]]] = None
+    citations: Optional[List[Dict[str, str]]] = None
+    machine_contract: Optional[Dict[str, Any]] = None
+
+
+def _page(
+    page_id: str,
+    ptype: str,
+    summary: str,
+    spec_ref: str,
+    source: str,
+    opts: PageOptions,
+) -> Dict[str, Any]:
+    digest = opts.digest
+    relations = opts.relations
+    citations = opts.citations
+    machine_contract = opts.machine_contract
     return {"schema": "nf-wiki-page/1", "id": page_id, "type": ptype,
             "summary": summary, "spec_ref": {"id": spec_ref},
             "machine_contract": machine_contract or {},
@@ -117,9 +135,17 @@ def build(root: str = ".") -> Tuple[Dict[str, Any], Dict[str, Any]]:
         schema = json.loads(data)
         sid = str(schema.get("$id") or schema.get("const") or Path(rel).stem)
         pid = "wiki:protocol:%s/%s" % (sub, Path(rel).name.replace(".schema.json", ""))
-        pages.append(_page(pid, "protocol", "%s 契约（%s）" % (Path(rel).name, sid),
-                           rel, rel, _sha(data),
-                           machine_contract={"required": schema.get("required") or []}))
+        pages.append(_page(
+            pid,
+            'protocol',
+            '%s 契约（%s）' % (Path(rel).name, sid),
+            rel,
+            rel,
+            opts=PageOptions(
+                digest=_sha(data),
+                machine_contract={'required': schema.get('required') or []},
+            ),
+        ))
     expected["protocol"] = len(pages)
     # module 页
     modules = _registry_modules(root)
@@ -129,13 +155,18 @@ def build(root: str = ".") -> Tuple[Dict[str, Any], Dict[str, Any]]:
         mid = str(mod.get("id"))
         if not mid or any(ch.isspace() for ch in mid):
             continue
-        pages.append(_page("wiki:module:" + mid, "module",
-                           "%s（%s / 来源 %s）" % (mod.get("name"), mod.get("category"),
-                                                mod.get("source")),
-                           "%s#modules/%s" % (REGISTRY_REL, mid), REGISTRY_REL,
-                           _sha(registry_bytes),
-                           relations=[{"kind": "implements", "target": module_proto}],
-                           machine_contract={"mounts": mod.get("mounts") or []}))
+        pages.append(_page(
+            'wiki:module:' + mid,
+            'module',
+            '%s（%s / 来源 %s）' % (mod.get('name'), mod.get('category'), mod.get('source')),
+            '%s#modules/%s' % (REGISTRY_REL, mid),
+            REGISTRY_REL,
+            opts=PageOptions(
+                digest=_sha(registry_bytes),
+                relations=[{'kind': 'implements', 'target': module_proto}],
+                machine_contract={'mounts': mod.get('mounts') or []},
+            ),
+        ))
     expected["module"] = len(modules)
     # pipeline 页
     assembly_proto = "wiki:protocol:production/assembly"
@@ -143,9 +174,17 @@ def build(root: str = ".") -> Tuple[Dict[str, Any], Dict[str, Any]]:
     for rel in pipes:
         data = _read_bytes(root, rel)
         pid = "wiki:pipeline:" + Path(rel).stem
-        pages.append(_page(pid, "pipeline", Path(rel).stem + " 管线",
-                           rel, rel, _sha(data),
-                           relations=[{"kind": "implements", "target": assembly_proto}]))
+        pages.append(_page(
+            pid,
+            'pipeline',
+            Path(rel).stem + ' 管线',
+            rel,
+            rel,
+            opts=PageOptions(
+                digest=_sha(data),
+                relations=[{'kind': 'implements', 'target': assembly_proto}],
+            ),
+        ))
     expected["pipeline"] = len(pipes)
     # domain 页
     contract_proto = "wiki:protocol:production/contract"
@@ -154,11 +193,18 @@ def build(root: str = ".") -> Tuple[Dict[str, Any], Dict[str, Any]]:
         spec = json.loads(data)
         code = str(spec.get("code") or Path(rel).parent.parent.name)
         pid = "wiki:domain:" + code
-        pages.append(_page(pid, "domain", "%s（%s/%s）" % (
-            spec.get("domain") or code, spec.get("section") or "-",
-            spec.get("content_tier") or "-"), rel, rel, _sha(data),
-            relations=[{"kind": "references", "target": contract_proto}],
-            machine_contract={"subdivisions": len(spec.get("subdivisions") or [])}))
+        pages.append(_page(
+            pid,
+            'domain',
+            '%s（%s/%s）' % (spec.get('domain') or code, spec.get('section') or '-', spec.get('content_tier') or '-'),
+            rel,
+            rel,
+            opts=PageOptions(
+                digest=_sha(data),
+                relations=[{'kind': 'references', 'target': contract_proto}],
+                machine_contract={'subdivisions': len(spec.get('subdivisions') or [])},
+            ),
+        ))
     expected["domain"] = len(_domain_specs(root))
     # asset 页
     assets = _asset_entries(root)
@@ -166,9 +212,17 @@ def build(root: str = ".") -> Tuple[Dict[str, Any], Dict[str, Any]]:
         path = Path(root) / rel
         digest = _sha(path.read_bytes()) if path.is_file() else _dir_digest(root, rel)
         pid = "wiki:asset:" + rel.replace("05_资产库/", "").replace("/", "-")
-        pages.append(_page(pid, "asset", rel.replace("05_资产库/", ""), rel, rel, digest,
-                           relations=[{"kind": "references",
-                                       "target": "wiki:protocol:schema/asset_contracts"}]))
+        pages.append(_page(
+            pid,
+            'asset',
+            rel.replace('05_资产库/', ''),
+            rel,
+            rel,
+            opts=PageOptions(
+                digest=digest,
+                relations=[{'kind': 'references', 'target': 'wiki:protocol:schema/asset_contracts'}],
+            ),
+        ))
     expected["asset"] = len(assets)
     pages.sort(key=lambda p: p["id"])
     index = {"schema": SCHEMA_INDEX,

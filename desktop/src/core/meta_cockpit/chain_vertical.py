@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 import re
+from dataclasses import dataclass
 
 from .criteria_lexicon import (
     ARROW,
@@ -161,7 +162,21 @@ def metrics(subs, claims, causal, attacks, role_aware: bool, req_terms=None) -> 
     }
 
 
-def verdict(name, m, n_subs, n_deliv, n_req, n_rec, n_atk) -> bool:
+@dataclass(frozen=True)
+class VerdictCounts:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    n_subs: object
+    n_deliv: object
+    n_req: object
+    n_rec: object
+    n_atk: object
+
+
+def verdict(name, m, opts: VerdictCounts) -> bool:
+    n_deliv = opts.n_deliv
+    n_req = opts.n_req
+    n_rec = opts.n_rec
+    n_atk = opts.n_atk
     def miss(rate, n):
         return round((1 - rate) * n)
 
@@ -197,22 +212,26 @@ if __name__ == "__main__":
     n_deliv = sum(1 for s in base if s["role"] == "deliverable")
     print("REAL_IDS", len(REAL_IDS), "M99_present", "M99" in REAL_IDS)
     verdict(
-        "BASELINE-ROLE-BLIND",
+        'BASELINE-ROLE-BLIND',
         metrics(base, claims, causal, attacks, False),
-        len(base),
-        len(base),
-        len(REQ),
-        len(claims["claims"]),
-        len(attacks["attacks"]),
+        opts=VerdictCounts(
+            n_subs=len(base),
+            n_deliv=len(base),
+            n_req=len(REQ),
+            n_rec=len(claims['claims']),
+            n_atk=len(attacks['attacks']),
+        ),
     )
     verdict(
-        "BASELINE-ROLE-AWARE",
+        'BASELINE-ROLE-AWARE',
         metrics(base, claims, causal, attacks, True),
-        len(base),
-        n_deliv,
-        len(REQ),
-        len(claims["claims"]),
-        len(attacks["attacks"]),
+        opts=VerdictCounts(
+            n_subs=len(base),
+            n_deliv=n_deliv,
+            n_req=len(REQ),
+            n_rec=len(claims['claims']),
+            n_atk=len(attacks['attacks']),
+        ),
     )
 
     mut = [dict(s) for s in base]
@@ -220,13 +239,15 @@ if __name__ == "__main__":
         s["covers"] = [c for c in s["covers"] if c not in ("遗憾", "校园情感")]
     cm, cc, ca = build(mut)
     verdict(
-        "MUT-COVERAGE",
+        'MUT-COVERAGE',
         metrics(mut, cm, cc, ca, True),
-        len(mut),
-        sum(1 for s in mut if s["role"] == "deliverable"),
-        len(REQ),
-        len(cm["claims"]),
-        len(ca["attacks"]),
+        opts=VerdictCounts(
+            n_subs=len(mut),
+            n_deliv=sum((1 for s in mut if s['role'] == 'deliverable')),
+            n_req=len(REQ),
+            n_rec=len(cm['claims']),
+            n_atk=len(ca['attacks']),
+        ),
     )
 
     mut2 = [dict(s) for s in base]
@@ -236,35 +257,41 @@ if __name__ == "__main__":
             break
     cm2, cc2, ca2 = build(mut2)
     verdict(
-        "MUT-DELIVERABLE",
+        'MUT-DELIVERABLE',
         metrics(mut2, cm2, cc2, ca2, True),
-        len(mut2),
-        sum(1 for s in mut2 if s["role"] == "deliverable"),
-        len(REQ),
-        len(cm2["claims"]),
-        len(ca2["attacks"]),
+        opts=VerdictCounts(
+            n_subs=len(mut2),
+            n_deliv=sum((1 for s in mut2 if s['role'] == 'deliverable')),
+            n_req=len(REQ),
+            n_rec=len(cm2['claims']),
+            n_atk=len(ca2['attacks']),
+        ),
     )
 
     _, _, at3 = build(base)
     at3["attacks"][0]["check"] = "M99"
     verdict(
-        "MUT-FABRICATED-ID",
+        'MUT-FABRICATED-ID',
         metrics(base, claims, causal, at3, True),
-        len(base),
-        n_deliv,
-        len(REQ),
-        len(claims["claims"]),
-        len(at3["attacks"]),
+        opts=VerdictCounts(
+            n_subs=len(base),
+            n_deliv=n_deliv,
+            n_req=len(REQ),
+            n_rec=len(claims['claims']),
+            n_atk=len(at3['attacks']),
+        ),
     )
 
     _, _, at4 = build(base)
     at4["attacks"][0]["evidence"] = ""
     verdict(
-        "MUT-NO-EVIDENCE",
+        'MUT-NO-EVIDENCE',
         metrics(base, claims, causal, at4, True),
-        len(base),
-        n_deliv,
-        len(REQ),
-        len(claims["claims"]),
-        len(at4["attacks"]),
+        opts=VerdictCounts(
+            n_subs=len(base),
+            n_deliv=n_deliv,
+            n_req=len(REQ),
+            n_rec=len(claims['claims']),
+            n_atk=len(at4['attacks']),
+        ),
     )

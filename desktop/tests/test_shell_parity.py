@@ -78,8 +78,7 @@ class TestCrossEntryParity(unittest.TestCase):
         cls.policy_path.write_text(
             json.dumps(_policy(), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         # 证据包落临时文件；固定 created_at 保证 root/count/level 可复算。
-        bundle_bytes, cls.info = evidence.build(
-            str(cls.root), ["d/obj.md"], created_at=_PIN)
+        bundle_bytes, cls.info = evidence.build(str(cls.root), ['d/obj.md'], opts=evidence.BuildOptions(created_at=_PIN))
         cls.bundle = cls.root / "evidence.zip"
         cls.bundle.write_bytes(bundle_bytes)
         cls.srv = http_api.make_server("127.0.0.1", 0, str(cls.root))

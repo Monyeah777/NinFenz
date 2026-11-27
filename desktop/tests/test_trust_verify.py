@@ -102,9 +102,12 @@ class VerifyScenarioTest(unittest.TestCase):
 
     def test_report_cannot_be_built_without_required(self):
         with self.assertRaises(ValueError):
-            tv.build_report("bundle", "a" * 64,
-                             {"required": "T0", "achieved": "T0", "exit_code": 0,
-                              "missing": []}, [], [], {})
+            tv.build_report(
+                'bundle',
+                'a' * 64,
+                {'required': 'T0', 'achieved': 'T0', 'exit_code': 0, 'missing': []},
+                opts=tv.TrustReportOptions(checks=[], issues=[], trust_roots={}),
+            )
 
 
 class ScriptContractTest(unittest.TestCase):

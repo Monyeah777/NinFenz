@@ -31,15 +31,57 @@
 
 from __future__ import annotations
 
-# ruff: noqa: F401 — 门面按原模块面重新导出（re-export 是职责，不是未使用）
-import sys as _sys
-import types as _types
 import contextlib
 import hmac
 import io
 import json
 import os
 import sys
+
+# ruff: noqa: F401 — 门面按原模块面重新导出（re-export 是职责，不是未使用）
+import sys as _sys
+import types as _types
+from pathlib import Path
+
+from core import (
+    asset_contract,
+    atomic_write,
+    disk_cache,
+    json_doc,
+    pack_combo,
+    registry_loader,
+    storage,
+)
+from core import (
+    conformance_scan as _csc,
+)
+from core import (
+    conformance_scan as _csc_new,
+)
+from core import (
+    conformance_scan as _csc_old,
+)
+from core import (
+    conformance_scan as csc,
+)
+from core import (
+    disk_cache as _dc,
+)
+from core import (
+    import_graph as _igr,
+)
+
+#: 响应缓存（**只在守护进程内、只在树没变时**复用整条命令的 stdout/stderr/退出码）。
+#: 判据与账本在 `core.response_cache`（会话 `session_watch` 与守护共用同一套 ⇒ 只有一种说法）。
+from core import (
+    response_cache as _rc,
+)
+from core import (
+    watch as _watch,
+)
+
+# 活状态/可 patch 面：读取与赋值一律转发到真实持有模块（实现见 core/_facades）。
+from core._facades import install as _install_live_facade
 
 # 依赖面：逐字保留原模块 import 面（含函数内 core import 的边）——
 # 耦合图/纯度面按模块级 import 计算，勿删（见 re-export 说明）。
@@ -49,33 +91,28 @@ import sys
 #: 长驻/自指命令（见 `REFUSED_COMMANDS`）与「无参」一律直落 python 入口（与守护拒绝面一致）。
 # 兼容转发面：CLI 与测试读 dm.SHELL_INIT_BASH（模板真源已迁 core.daemon_shell，见其 docstring）。
 from core.daemon_shell import SHELL_INIT_BASH  # noqa: E402,F401
-#: 响应缓存（**只在守护进程内、只在树没变时**复用整条命令的 stdout/stderr/退出码）。
-#: 判据与账本在 `core.response_cache`（会话 `session_watch` 与守护共用同一套 ⇒ 只有一种说法）。
-from core import (
-    response_cache as _rc,
-    storage,
-    atomic_write,
-    json_doc,
-    conformance_scan as csc,
-    conformance_scan as _csc,
-    disk_cache as _dc,
-    pack_combo,
-    registry_loader,
-    asset_contract,
-    disk_cache,
-    import_graph as _igr,
-    conformance_scan as _csc_old,
-    watch as _watch,
-    conformance_scan as _csc_new,
-)
-#: 观测计数由 `response_cache.STATS` 提供（上面 `_CACHE_STATS` 即同一个字典对象）。
 
+#: 观测计数由 `response_cache.STATS` 提供（上面 `_CACHE_STATS` 即同一个字典对象）。
 # 兼容转发面：测试读 dm.CACHEABLE_COMMANDS / dm._WRITE_FLAG_PREFIXES；cacheable 本模块自用。
 # 真源已迁 core.response_cache（准入表 + 闸门旗标前缀），此处只做对外再导出。
-from core.response_cache import CACHEABLE_COMMANDS, _WRITE_FLAG_PREFIXES, cacheable
+from core.response_cache import _WRITE_FLAG_PREFIXES, CACHEABLE_COMMANDS, cacheable
 
-from pathlib import Path
-
+from ._daemon import _cache, _server
+from ._daemon._cache import (
+    _CACHE_STATS,
+    _CLI_CACHE,
+    _WATCH_LOCK,
+    _load_cli,
+    _sync_resident,
+    _watch_generation,
+    cache_stats,
+    reset_process_caches,
+    reset_response_cache,
+    set_watcher,
+)
+from ._daemon._cli import (
+    _cli_module,
+)
 from ._daemon._const import (
     BIND_HOST,
     HANDSHAKE_TIMEOUT,
@@ -90,21 +127,13 @@ from ._daemon._const import (
     SOCKET_TIMEOUT,
     STATE_NAME,
 )
-from ._daemon._state import (
-    _STATE_WRITE_LOCK,
-    _harden_perms,
-    clear_state,
-    read_state,
-    state_path,
-    write_state,
-)
 from ._daemon._proto import (
     _BoundedBytesIO,
-    _LineReader,
     _check_argv_size,
     _check_json_nesting,
     _configure_server_socket,
     _decode_frame,
+    _LineReader,
     _parse_json_request,
     _parse_request,
     _strict_json_object,
@@ -112,21 +141,6 @@ from ._daemon._proto import (
     read_framed,
     run_request,
     send_framed,
-)
-from ._daemon._cli import (
-    _cli_module,
-)
-from ._daemon._cache import (
-    _CACHE_STATS,
-    _CLI_CACHE,
-    _WATCH_LOCK,
-    _load_cli,
-    _sync_resident,
-    _watch_generation,
-    cache_stats,
-    reset_process_caches,
-    reset_response_cache,
-    set_watcher,
 )
 from ._daemon._server import (
     _internal_error_frame,
@@ -139,12 +153,14 @@ from ._daemon._server import (
     start,
     stop,
 )
-
-from ._daemon import _cache, _server
-
-# 活状态/可 patch 面：读取与赋值一律转发到真实持有模块（实现见 core/_facades）。
-from core._facades import install as _install_live_facade
-
+from ._daemon._state import (
+    _STATE_WRITE_LOCK,
+    _harden_perms,
+    clear_state,
+    read_state,
+    state_path,
+    write_state,
+)
 
 _install_live_facade(__name__, {
     "_WATCHER": _cache,
@@ -207,7 +223,7 @@ def _sync_code(root: Path) -> None:
     _CLI_CACHE["fp"] = fp
     if saved is not None:
         try:
-            from core import conformance_scan as _csc_new       # 重新导入 → 新模块对象
+            from core import conformance_scan as _csc_new  # 重新导入 → 新模块对象
             _csc_new.adopt_resident(saved)
         except Exception:                                    # noqa: BLE001 - 搬不回去就下次重读
             pass  # best-effort 显式忽略（清理/探测失败不影响主流程）
@@ -265,7 +281,7 @@ def execute(argv: List[str], root: Path, cwd: Optional[str] = None
         except Exception:                 #  # 几条命令之后会让键层复用退化成全量重算——实测踩过）
             pass  # best-effort 显式忽略（清理/探测失败不影响主流程）
     code, out, err = int(code), out_buf.getvalue(), err_buf.getvalue()
-    _rc.store(argv, gen, allowed, code, out, err, cwd)
+    _rc.store(argv, gen, allowed, opts=_rc.Response(code=code, out=out, err=err, cwd=cwd))
     # **非准入命令 = 无法证明只读**（可能写仓库）⇒ 立刻整批作废，不等监听线程异步察觉（写在
     # `note_uncacheable` 里：脚本里 `nf conformance --write; nf score` 连跑曾吃到写之前的旧响应）。
     _rc.note_uncacheable(allowed, code, gen)

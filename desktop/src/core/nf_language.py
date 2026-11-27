@@ -22,8 +22,10 @@
 from __future__ import annotations
 
 import re
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
+
 from core import json_doc
 
 REGISTRY_REL = "desktop/src/core/registry.json"
@@ -103,8 +105,24 @@ def module_meta(path: Path) -> Tuple[str, str]:
     return mid, name
 
 
-def _symbol(kind: str, name: str, detail: str, doc: str, rel: str,
-            line: int = 0, aliases: Optional[List[str]] = None) -> Dict[str, Any]:
+@dataclass(frozen=True)
+class SymbolOptions:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    line: int = 0
+    aliases: Optional[List[str]] = None
+
+
+def _symbol(
+    kind: str,
+    name: str,
+    detail: str,
+    doc: str,
+    rel: str,
+    opts: SymbolOptions | None = None,
+) -> Dict[str, Any]:
+    opts = opts if opts is not None else SymbolOptions()
+    line = opts.line
+    aliases = opts.aliases
     return {"kind": kind, "name": name, "detail": detail, "doc": doc,
             "path": rel, "line": line, "aliases": sorted(set(aliases or []))}
 
@@ -240,12 +258,13 @@ def _layers(reg: Dict[str, Any], out: List[Dict[str, Any]]) -> None:
         default = ", ".join(str(x) for x in (mp.get("default") or [])) or "无"
         alias = [str(mp.get("name") or "")]
         out.append(_symbol(
-            "layer", str(lid),
-            "%s（%s）" % (mp.get("name") or "", "optional" if mp.get("optional") else "required"),
-            "挂载层 %s · 默认模块：%s · 可用：%s" % (
-                mp.get("name") or lid, default,
-                ", ".join(str(x) for x in (mp.get("available") or [])) or "无"),
-            "02_联动注册表.md", aliases=alias))
+            'layer',
+            str(lid),
+            '%s（%s）' % (mp.get('name') or '', 'optional' if mp.get('optional') else 'required'),
+            '挂载层 %s · 默认模块：%s · 可用：%s' % (mp.get('name') or lid, default, ', '.join((str(x) for x in mp.get('available') or [])) or '无'),
+            '02_联动注册表.md',
+            opts=SymbolOptions(aliases=alias),
+        ))
 
 
 def _events(reg: Dict[str, Any], root: Path, out: List[Dict[str, Any]]) -> None:
@@ -359,7 +378,7 @@ def _modules(root: Path, reg: Dict[str, Any], out: List[Dict[str, Any]]) -> None
         doc = "模块 %s · %s · 归属：%s%s" % (
             mid, name, pkg,
             (" · " + mount_doc[mid]) if pkg == "官方核心" and mid in mount_doc else "")
-        out.append(_symbol("module", mid, detail, doc, rel, aliases=_bare_alias(mid)))
+        out.append(_symbol('module', mid, detail, doc, rel, opts=SymbolOptions(aliases=_bare_alias(mid))))
 
 
 def _user_assets(root: Path, out: List[Dict[str, Any]]) -> None:

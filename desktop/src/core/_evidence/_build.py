@@ -6,6 +6,7 @@ import os
 import tempfile
 import zipfile
 from collections.abc import Sequence
+from dataclasses import dataclass
 from typing import Any
 
 from core import attest, receipts
@@ -28,11 +29,23 @@ from ._primitives import (
 
 # ------------------------------------------------------------------ 打包
 
-def build(root: str, targets: Sequence[str], issuer: str = "",
-          key: bytes | None = None, expires_at: str = "", created_at: str = "",
-          revocations: dict[str, Any] | None = None,
-          anchor: dict[str, Any] | None = None,
-          decision: dict[str, Any] | None = None) -> tuple[bytes, dict[str, Any]]:
+@dataclass(frozen=True)
+class BuildOptions:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    issuer: str = ''
+    key: bytes | None = None
+    expires_at: str = ''
+    created_at: str = ''
+    revocations: dict[str, Any] | None = None
+    anchor: dict[str, Any] | None = None
+    decision: dict[str, Any] | None = None
+
+
+def build(
+    root: str,
+    targets: Sequence[str],
+    opts: BuildOptions | None = None,
+) -> tuple[bytes, dict[str, Any]]:
     """把目标文件打成自包含证据包 → (zip 字节, 摘要信息)。
 
     - 回执与根：receipts.build_scope（本模块只排序去重，公式不复制）
@@ -41,6 +54,15 @@ def build(root: str, targets: Sequence[str], issuer: str = "",
     - decision（可选，Q0）：绑定「过过哪条策略」；声明面放 bundle.json，
       绑定面放进 object_sha256 相符的那份信封（纳入信封摘要；旧包无此键不受影响）
     """
+
+    opts = opts if opts is not None else BuildOptions()
+    issuer = opts.issuer
+    key = opts.key
+    expires_at = opts.expires_at
+    created_at = opts.created_at
+    revocations = opts.revocations
+    anchor = opts.anchor
+    decision = opts.decision
     rels = _targets(root, targets)
     target = _decision_target(root, rels, decision)
     doc = receipts.build_scope(root, rels, scope="evidence")
@@ -55,8 +77,20 @@ def build(root: str, targets: Sequence[str], issuer: str = "",
         atts.append(name)
     if revocations is not None:
         members.append((REVOCATIONS_ENTRY, _json_bytes(revocations)))
-    meta = _manifest(doc["root"], entries, atts, created_at, issuer, key,
-                     str(expires_at or ""), revocations is not None, anchor, decision)
+    meta = _manifest(
+        doc['root'],
+        entries,
+        atts,
+        opts=ManifestOptions(
+            created_at=created_at,
+            issuer=issuer,
+            key=key,
+            expires_at=str(expires_at or ''),
+            has_rev=revocations is not None,
+            anchor=anchor,
+            decision=decision,
+        ),
+    )
     members.append((BUNDLE_ENTRY, _json_bytes(meta)))
     info = {"root": meta["root"], "count": meta["count"], "head": meta["chain"]["head"],
             "level": meta["level"], "attestations": len(atts),
@@ -123,10 +157,31 @@ def _envelope(root: str, rel: str, issuer: str, key: bytes | None,
 
 
 
-def _manifest(root_digest: str, entries: Sequence[dict[str, Any]], atts: list[str],
-              created_at: str, issuer: str, key: bytes | None, expires_at: str,
-              has_rev: bool, anchor: dict[str, Any] | None = None,
-              decision: dict[str, Any] | None = None) -> dict[str, Any]:
+@dataclass(frozen=True)
+class ManifestOptions:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    created_at: str
+    issuer: str
+    key: bytes | None
+    expires_at: str
+    has_rev: bool
+    anchor: dict[str, Any] | None = None
+    decision: dict[str, Any] | None = None
+
+
+def _manifest(
+    root_digest: str,
+    entries: Sequence[dict[str, Any]],
+    atts: list[str],
+    opts: ManifestOptions,
+) -> dict[str, Any]:
+    created_at = opts.created_at
+    issuer = opts.issuer
+    key = opts.key
+    expires_at = opts.expires_at
+    has_rev = opts.has_rev
+    anchor = opts.anchor
+    decision = opts.decision
     doc: dict[str, Any] = {
         "schema": SCHEMA,
         "created_at": created_at or attest.issue_stamp(),

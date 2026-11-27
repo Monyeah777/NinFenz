@@ -21,6 +21,7 @@ import binascii
 import hashlib
 import tempfile
 from collections.abc import Callable
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -72,22 +73,46 @@ def _b64d(text: Any) -> bytes:
         raise ValueError(f"base64 解码失败：{exc}（{GUIDE}用严格 base64 重编）") from exc
 
 
-def auto_anchor(target_digest: str, components: Any, schema: dict | None = None,
-                root: str = ".", head: dict | None = None, registry: dict | None = None,
-                material: dict | None = None, expected_kind: str = "bundle",
-                now: str | None = None) -> dict:
+@dataclass(frozen=True)
+class AnchorOptions:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    schema: dict | None = None
+    root: str = '.'
+    head: dict | None = None
+    registry: dict | None = None
+    material: dict | None = None
+    expected_kind: str = 'bundle'
+    now: str | None = None
+
+
+def auto_anchor(target_digest: str, components: Any, opts: AnchorOptions | None = None) -> dict:
     """一键编排：可选先验链头签名，再把 TSA/STH/witness/git-commit 组件组装成 nf-anchor/1。
 
     纪律：给了 head 就必须先验签（target=target_digest）；组件至少 1 条；结构不过即抛。
     不猜、不补默认锚；缺件/坏件一律 AUTO-ANCHOR-* 错误码。
     """
+
+    opts = opts if opts is not None else AnchorOptions()
+    schema = opts.schema
+    root = opts.root
+    head = opts.head
+    registry = opts.registry
+    material = opts.material
+    expected_kind = opts.expected_kind
+    now = opts.now
     if head is not None:
         from core.trust import signature as tsig
         if not registry or not isinstance(material, dict):
             raise ValueError("AUTO-ANCHOR-HEAD-CONTEXT-MISSING：验链头需要 registry/material"
                              f"（{GUIDE}补齐或去掉 head）")
-        verified = tsig.verify_head(head, expected_kind, target_digest, registry, material,
-                                    now=now, root=root)
+        verified = tsig.verify_head(
+            head,
+            expected_kind,
+            target_digest,
+            registry,
+            material,
+            opts=tsig.VerifyHeadOptions(now=now, root=root),
+        )
         if not verified.get("ok"):
             raise ValueError(f"AUTO-ANCHOR-HEAD-INVALID：{verified.get('reason')}"
                              f"（{GUIDE}先修链头签名/绑定）")

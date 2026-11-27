@@ -6,9 +6,7 @@ import json
 from ._const import (
     SHELL_VERSION,
 )
-from ._session import (
-    Session,
-)
+from ._session import Session, SessionOptions
 
 
 def _statements(lines) -> list:
@@ -30,7 +28,7 @@ def run_lines(lines, runner, assume_yes: bool = False, as_json: bool = False,
 
     记录逐条含 line/kind/exit/argv/out/err —— 既是 CI 判据也是机器面（`--json`）。
     """
-    session = Session(runner, assume_yes=assume_yes, index=index)
+    session = Session(runner, opts=SessionOptions(assume_yes=assume_yes, index=index))
     records = []
     worst = 0
     for raw in _statements(lines):

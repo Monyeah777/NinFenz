@@ -106,11 +106,17 @@ class SignVerifyTest(unittest.TestCase):
 
     def verify(self, envelope, kind="bundle", digest="a" * 64, registry=None,
                now=NOW):
-        return tsig.verify_head(envelope, kind, digest, registry or _registry(),
-                                _material(), now=now)
+        return tsig.verify_head(
+            envelope,
+            kind,
+            digest,
+            registry or _registry(),
+            _material(),
+            opts=tsig.VerifyHeadOptions(now=now),
+        )
 
     def test_sign_and_verify(self):
-        envelope = tsig.sign_head("bundle", "a" * 64, _signer(), schema=self.schema)
+        envelope = tsig.sign_head('bundle', 'a' * 64, _signer(), opts=tsig.SignHeadOptions(schema=self.schema))
         self.assertEqual(tsig.PAYLOAD_TYPE, envelope["payloadType"])
         result = self.verify(envelope)
         self.assertTrue(result["ok"], result)
@@ -119,23 +125,23 @@ class SignVerifyTest(unittest.TestCase):
 
     def test_all_subject_kinds(self):
         for kind in tsig.KINDS:
-            envelope = tsig.sign_head(kind, "b" * 64, _signer(), schema=self.schema)
+            envelope = tsig.sign_head(kind, 'b' * 64, _signer(), opts=tsig.SignHeadOptions(schema=self.schema))
             self.assertTrue(self.verify(envelope, kind=kind, digest="b" * 64)["ok"], kind)
 
     def test_digest_and_kind_binding(self):
-        envelope = tsig.sign_head("bundle", "a" * 64, _signer(), schema=self.schema)
+        envelope = tsig.sign_head('bundle', 'a' * 64, _signer(), opts=tsig.SignHeadOptions(schema=self.schema))
         self.assertEqual("SUBJECT-DIGEST-MISMATCH",
                          self.verify(envelope, digest="f" * 64)["reason"])
         self.assertEqual("SUBJECT-KIND-MISMATCH",
                          self.verify(envelope, kind="card")["reason"])
 
     def test_wrong_payload_type(self):
-        envelope = tsig.sign_head("bundle", "a" * 64, _signer(), schema=self.schema)
+        envelope = tsig.sign_head('bundle', 'a' * 64, _signer(), opts=tsig.SignHeadOptions(schema=self.schema))
         envelope["payloadType"] = "application/vnd.nf.other"
         self.assertEqual("PAYLOAD-TYPE-MISMATCH", self.verify(envelope)["reason"])
 
     def test_tampered_payload_is_invalid(self):
-        envelope = tsig.sign_head("bundle", "a" * 64, _signer(), schema=self.schema)
+        envelope = tsig.sign_head('bundle', 'a' * 64, _signer(), opts=tsig.SignHeadOptions(schema=self.schema))
         payload = json.loads(base64.b64decode(envelope["payload"]))
         payload["subject_digest"] = "f" * 64
         envelope["payload"] = base64.b64encode(
@@ -144,23 +150,29 @@ class SignVerifyTest(unittest.TestCase):
                       ("SUBJECT-DIGEST-MISMATCH", "SIGNATURE-INVALID"))
 
     def test_revoked_key_breaks_t1(self):
-        envelope = tsig.sign_head("bundle", "a" * 64, _signer(), schema=self.schema)
+        envelope = tsig.sign_head('bundle', 'a' * 64, _signer(), opts=tsig.SignHeadOptions(schema=self.schema))
         revoked = _registry(status="revoked", revoked_at=NOW,
                             revocation_reason="key compromise")
-        result = tsig.verify_head(envelope, "bundle", "a" * 64, revoked,
-                                  _material(), now=NOW)
+        result = tsig.verify_head(
+            envelope,
+            'bundle',
+            'a' * 64,
+            revoked,
+            _material(),
+            opts=tsig.VerifyHeadOptions(now=NOW),
+        )
         self.assertFalse(result["ok"], result)
         self.assertEqual("KEY-REVOKED", result["reason"])
 
     def test_expired_key_rejected(self):
-        envelope = tsig.sign_head("bundle", "a" * 64, _signer(), schema=self.schema)
+        envelope = tsig.sign_head('bundle', 'a' * 64, _signer(), opts=tsig.SignHeadOptions(schema=self.schema))
         result = self.verify(envelope, now="2028-01-01T00:00:00Z")
         self.assertEqual("KEY-EXPIRED", result["reason"])
 
     def test_cli_verifies_t1(self):
         bundle = _bundle()
         digest = tc.digest_of(bundle)
-        envelope = tsig.sign_head("bundle", digest, _signer(), schema=self.schema)
+        envelope = tsig.sign_head('bundle', digest, _signer(), opts=tsig.SignHeadOptions(schema=self.schema))
         with tempfile.TemporaryDirectory() as tmp:
             base = Path(tmp)
             files = {
@@ -255,7 +267,12 @@ class EndToEndT2Test(unittest.TestCase):
         cls.anchor = ta.build_anchor_set(cls.digest, [{
             "kind": "rfc3161", "tsa": "nf:test:tsa",
             "token": base64.b64encode(cls.token.read_bytes()).decode()}])
-        cls.envelope = tsig.sign_head("bundle", cls.digest, _signer(), schema=cls.schema)
+        cls.envelope = tsig.sign_head(
+            'bundle',
+            cls.digest,
+            _signer(),
+            opts=tsig.SignHeadOptions(schema=cls.schema),
+        )
 
     @classmethod
     def tearDownClass(cls):
@@ -264,10 +281,19 @@ class EndToEndT2Test(unittest.TestCase):
     def run_verify(self, required):
         verifier = ta.make_timestamp_verifier(str(self.query), str(self.ca),
                                               subject_path=str(self.data))
-        return tv.verify(self.bundle, _policy(required, self.root), str(ROOT),
-                         anchor=self.anchor, anchor_verifiers={"rfc3161": verifier},
-                         head_signature=self.envelope, registry=_registry(),
-                         material=_material(), now=NOW)
+        return tv.verify(
+            self.bundle,
+            _policy(required, self.root),
+            str(ROOT),
+            opts=tv.TrustVerifyOptions(
+                anchor=self.anchor,
+                anchor_verifiers={'rfc3161': verifier},
+                head_signature=self.envelope,
+                registry=_registry(),
+                material=_material(),
+                now=NOW,
+            ),
+        )
 
     def test_reaches_t2(self):
         result = self.run_verify("T2")
@@ -286,10 +312,19 @@ class EndToEndT2Test(unittest.TestCase):
                             revocation_reason="key compromise")
         verifier = ta.make_timestamp_verifier(str(self.query), str(self.ca),
                                               subject_path=str(self.data))
-        result = tv.verify(self.bundle, _policy("T2", self.root), str(ROOT),
-                           anchor=self.anchor, anchor_verifiers={"rfc3161": verifier},
-                           head_signature=self.envelope, registry=revoked,
-                           material=_material(), now=NOW)
+        result = tv.verify(
+            self.bundle,
+            _policy('T2', self.root),
+            str(ROOT),
+            opts=tv.TrustVerifyOptions(
+                anchor=self.anchor,
+                anchor_verifiers={'rfc3161': verifier},
+                head_signature=self.envelope,
+                registry=revoked,
+                material=_material(),
+                now=NOW,
+            ),
+        )
         self.assertEqual(1, result["exit_code"], result)
 
 

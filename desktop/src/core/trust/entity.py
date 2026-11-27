@@ -9,6 +9,7 @@
 """
 from __future__ import annotations
 
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -207,16 +208,33 @@ def _issuer_kind(issuer_registry: dict, issuer_id: str) -> str:
     return str((resolved.get("issuer") or {}).get("kind") or "")
 
 
-def typed_admissibility(entity: Any, type_registry: dict, policy: Any,
-                        issuer_registry: dict, schema: dict | None = None,
-                        type_schema: dict | None = None,
-                        issuer_schema: dict | None = None,
-                        root: str = ".") -> dict:
+@dataclass(frozen=True)
+class AdmissibilityOptions:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    schema: dict | None = None
+    type_schema: dict | None = None
+    issuer_schema: dict | None = None
+    root: str = '.'
+
+
+def typed_admissibility(
+    entity: Any,
+    type_registry: dict,
+    policy: Any,
+    issuer_registry: dict,
+    opts: AdmissibilityOptions | None = None,
+) -> dict:
     """类型化准入：在既有 issuer/type 准入之上叠加类型注册表 + issuer registry 规则。
 
     顺序固定（fail-closed）：结构 → policy/issuer/type → 类型注册表有效 → issuer 注册 →
     type 存在 → issuer kind 授权 → issuer 显式授权 → 有效期窗 → refs（数量/类别/重复/自引）。
     """
+
+    opts = opts if opts is not None else AdmissibilityOptions()
+    schema = opts.schema
+    type_schema = opts.type_schema
+    issuer_schema = opts.issuer_schema
+    root = opts.root
     from core.trust import keys as tk
     if schema is None:
         schema = load_schema(root)

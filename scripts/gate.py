@@ -174,8 +174,14 @@ def _observe_all(mods, workers, as_json):
         print(f"  [{done}/{total}] {mod:<34} {rec['status']:<12} reads={len(rec['reads'])}",
               flush=True)
 
-    doc = go.run_all(ROOT, mods=list(mods) if mods else None, workers=workers,
-                     on_progress=progress)
+    doc = go.run_all(
+        ROOT,
+        opts=go.ObserveOptions(
+            mods=list(mods) if mods else None,
+            workers=workers,
+            on_progress=progress,
+        ),
+    )
     modules = doc.get("modules") or {}
     ok = sum(1 for v in modules.values() if v.get("status") == "ok")
     _emit("gate-observe", {"observed": len(modules), "ok": ok,

@@ -12,6 +12,7 @@
 """
 from __future__ import annotations
 
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -72,24 +73,61 @@ def statement_bytes(statement: dict) -> bytes:
     return tc.canonical_bytes(statement)
 
 
-def sign_head(subject_kind: str, subject_digest: str, signers: list,
-              issued_at: str = "", note: str = "",
-              schema: dict | None = None, root: str = ".") -> dict:
+@dataclass(frozen=True)
+class SignHeadOptions:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    issued_at: str = ''
+    note: str = ''
+    schema: dict | None = None
+    root: str = '.'
+
+
+def sign_head(
+    subject_kind: str,
+    subject_digest: str,
+    signers: list,
+    opts: SignHeadOptions | None = None,
+) -> dict:
     """签一条链头/卡/事件语句 → nf-dsse/1 信封（payloadType 固定）。"""
+
+    opts = opts if opts is not None else SignHeadOptions()
+    issued_at = opts.issued_at
+    note = opts.note
+    schema = opts.schema
+    root = opts.root
     statement = build_statement(subject_kind, subject_digest, issued_at, note,
                                 schema, root)
     return dsse.sign_envelope(PAYLOAD_TYPE, statement_bytes(statement), signers)
 
 
-def verify_head(envelope: Any, expected_kind: str, expected_digest: str,
-                registry: dict, material: dict, schema_envelope: dict | None = None,
-                schema_statement: dict | None = None, now: str | None = None,
-                root: str = ".") -> dict:
+@dataclass(frozen=True)
+class VerifyHeadOptions:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    schema_envelope: dict | None = None
+    schema_statement: dict | None = None
+    now: str | None = None
+    root: str = '.'
+
+
+def verify_head(
+    envelope: Any,
+    expected_kind: str,
+    expected_digest: str,
+    registry: dict,
+    material: dict,
+    opts: VerifyHeadOptions | None = None,
+) -> dict:
     """验链头签名：registry 生命周期 + DSSE 签名 + 语句 kind/digest 绑定。
 
     返回 {ok, reason?, subject_kind?, subject_digest?, signers?, issuers?, statement?}。
     expected_kind/digest 必须由调用方给出（不信任载荷自述——否则「签了别的对象」也算过）。
     """
+
+    opts = opts if opts is not None else VerifyHeadOptions()
+    schema_envelope = opts.schema_envelope
+    schema_statement = opts.schema_statement
+    now = opts.now
+    root = opts.root
     if not isinstance(envelope, dict):
         return {"ok": False, "reason": "ENVELOPE-NOT-OBJECT"}
     if envelope.get("payloadType") != PAYLOAD_TYPE:

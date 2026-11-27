@@ -24,9 +24,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
 ROOT = Path(__file__).resolve().parent.parent.parent  # 仓库根
 
-from core.parser import parse_module         # noqa: E402
-from core.storage import Store               # noqa: E402
+from core.parser import parse_module  # noqa: E402
+from core.pipeline import PipeOptions  # noqa: E402
 from core.pipeline_loader import load_pipeline_file  # noqa: E402
+from core.storage import Store  # noqa: E402
 
 
 def _mk_env():
@@ -60,8 +61,8 @@ class TestPipe(unittest.TestCase):
         self.store, self.p04, self.selected = _mk_env()
 
     def _pipe(self, **kw):
-        from core.pipeline import pipe
-        return pipe(self.store, self.p04, list(self.selected), **kw)
+        from core.pipeline import PipeOptions, pipe
+        return pipe(self.store, self.p04, list(self.selected), opts=PipeOptions(**kw))
 
     def test_full_chain_exports_ccv3(self):
         dest = tempfile.mkdtemp(prefix="nf_pipe_out_")
@@ -89,15 +90,14 @@ class TestPipe(unittest.TestCase):
         dest = tempfile.mkdtemp(prefix="nf_pipe_out_")
         sel = self.selected + ["不存在类:M999"]
         from core.pipeline import pipe
-        r = pipe(self.store, self.p04, sel, fmt="ccv3", dest_dir=dest)
+        r = pipe(self.store, self.p04, sel, opts=PipeOptions(fmt='ccv3', dest_dir=dest))
         self.assertTrue(r.ok)
         self.assertTrue(any("M999" in w for w in r.warnings),
                         f"warnings={r.warnings}")
 
     def test_empty_selection_gate_fail_no_export(self):
         from core.pipeline import pipe
-        r = pipe(self.store, self.p04, [], fmt="ccv3",
-                 dest_dir=tempfile.mkdtemp())
+        r = pipe(self.store, self.p04, [], opts=PipeOptions(fmt='ccv3', dest_dir=tempfile.mkdtemp()))
         self.assertFalse(r.ok)
         self.assertIsNone(r.export)
         self.assertIsNotNone(r.ir)
@@ -107,8 +107,12 @@ class TestPipe(unittest.TestCase):
     def test_force_export_despite_gate_fail(self):
         from core.pipeline import pipe
         dest = tempfile.mkdtemp(prefix="nf_pipe_out_")
-        r = pipe(self.store, self.p04, [], fmt="ccv3", dest_dir=dest,
-                 fail_on_gate=False)
+        r = pipe(
+            self.store,
+            self.p04,
+            [],
+            opts=PipeOptions(fmt='ccv3', dest_dir=dest, fail_on_gate=False),
+        )
         self.assertFalse(r.ok, "可信任度不变量：fail 时 ok 仍 False")
         self.assertIsNotNone(r.export, "force 导出应产出文件")
 
@@ -140,7 +144,7 @@ class TestDocSemanticsPassthrough(unittest.TestCase):
     def test_default_no_declaration_classify_skill(self):
         from core.pipeline import pipe
         store, p90, sel = self._techdoc_env()
-        r = pipe(store, p90, sel, fmt="ccv3", dest_dir=tempfile.mkdtemp())
+        r = pipe(store, p90, sel, opts=PipeOptions(fmt='ccv3', dest_dir=tempfile.mkdtemp()))
         self.assertTrue(r.ok, f"P90 锚点装配应 gate ok：{r.gate}")
         from core.semantics import classify_doc_semantics
         self.assertEqual(classify_doc_semantics(r.ir), "skill",
@@ -148,11 +152,15 @@ class TestDocSemanticsPassthrough(unittest.TestCase):
 
     def test_project_rules_declaration_reaches_agents_export(self):
         from core.pipeline import pipe
-        from core.semantics import classify_doc_semantics, PROJECT_RULES
+        from core.semantics import PROJECT_RULES, classify_doc_semantics
         store, p90, sel = self._techdoc_env()
         dest = tempfile.mkdtemp(prefix="nf_a3p_out_")
-        r = pipe(store, p90, sel, fmt="agents",
-                 doc_semantics="project_rules", dest_dir=dest)
+        r = pipe(
+            store,
+            p90,
+            sel,
+            opts=PipeOptions(fmt='agents', dest_dir=dest, doc_semantics='project_rules'),
+        )
         self.assertTrue(r.ok, f"gate 应 ok：{r.gate}")
         # 声明透传到 IR.meta → classify 判 project_rules（不再回退 skill）
         self.assertEqual(r.ir.meta.get("doc_semantics"), "project_rules")
@@ -165,15 +173,23 @@ class TestDocSemanticsPassthrough(unittest.TestCase):
     def test_skill_declaration_writes_meta(self):
         from core.pipeline import pipe
         store, p90, sel = self._techdoc_env()
-        r = pipe(store, p90, sel, fmt="ccv3", dest_dir=tempfile.mkdtemp(),
-                 doc_semantics="skill")
+        r = pipe(
+            store,
+            p90,
+            sel,
+            opts=PipeOptions(fmt='ccv3', dest_dir=tempfile.mkdtemp(), doc_semantics='skill'),
+        )
         self.assertEqual(r.ir.meta.get("doc_semantics"), "skill")
 
     def test_invalid_value_ignored_not_crash(self):
         from core.pipeline import pipe
         store, p90, sel = self._techdoc_env()
-        r = pipe(store, p90, sel, fmt="ccv3", dest_dir=tempfile.mkdtemp(),
-                 doc_semantics="bogus")  # 值域外 → 不写 meta，不崩
+        r = pipe(
+            store,
+            p90,
+            sel,
+            opts=PipeOptions(fmt='ccv3', dest_dir=tempfile.mkdtemp(), doc_semantics='bogus'),
+        )  # 值域外 → 不写 meta，不崩
         self.assertTrue(r.ok)
         self.assertNotIn("doc_semantics", r.ir.meta)
 

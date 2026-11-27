@@ -106,7 +106,7 @@ def run(root: str, target: str, key: bytes | None = None) -> dict:
                   "digest": digests["attest"], "ok": ok and digests["attest"] == digests["check"],
                   "detail": f"level={level}" + ("" if ok else "；" + "；".join(issues[:2]))})
 
-    data, info = evidence.build(root, [rel], issuer="ccos-chain", key=key)
+    data, info = evidence.build(root, [rel], opts=evidence.BuildOptions(issuer='ccos-chain', key=key))
     with tempfile.TemporaryDirectory(prefix="nf_ccos_chain_") as tmp_dir:
         bundle = os.path.join(tmp_dir, "chain.zip")
         with open(bundle, "wb") as fh:
@@ -114,7 +114,7 @@ def run(root: str, target: str, key: bytes | None = None) -> dict:
         with zipfile.ZipFile(bundle) as zf:
             meta = json_doc.loads(zf.read("bundle.json").decode(), dict, what="bundle.json")
         member = str(((meta.get("entries") or [{}])[0]).get("digest") or "")
-        vres = evidence.verify(bundle, key=key)
+        vres = evidence.verify(bundle, opts=evidence.VerifyOptions(key=key))
         links.append({"link": "cc_verify", "verdict": vres["verdict"], "digest": member,
                       "ok": vres["verdict"] == "ok" and member == digests["check"],
                       "detail": f"level={vres['level']} root={info['root'][:16]}"})

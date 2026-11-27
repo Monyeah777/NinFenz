@@ -46,10 +46,18 @@ class PlanExecuteTest(unittest.TestCase):
                 calls.append(mod)
                 return 0, 0.01
 
-            r1 = gck.check(["src/x.py"], invoke, root=tmp, faces=faces, tests_dir=tdir)
+            r1 = gck.check(
+                ['src/x.py'],
+                invoke,
+                opts=gck.CheckOptions(root=tmp, faces=faces, tests_dir=tdir),
+            )
             self.assertEqual(len(r1["fresh"]), 2)
             self.assertEqual(r1["failed"], [])
-            r2 = gck.check(["src/x.py"], invoke, root=tmp, faces=faces, tests_dir=tdir)
+            r2 = gck.check(
+                ['src/x.py'],
+                invoke,
+                opts=gck.CheckOptions(root=tmp, faces=faces, tests_dir=tdir),
+            )
             self.assertEqual(r2["fresh"], [], "第二次应全命中")
             self.assertEqual(len(calls), 2)
 
@@ -61,8 +69,16 @@ class PlanExecuteTest(unittest.TestCase):
             def invoke(_mod, _timeout):
                 return 1, 0.01
 
-            r1 = gck.check(["src/x.py"], invoke, root=tmp, faces=faces, tests_dir=tdir)
-            r2 = gck.check(["src/x.py"], invoke, root=tmp, faces=faces, tests_dir=tdir)
+            r1 = gck.check(
+                ['src/x.py'],
+                invoke,
+                opts=gck.CheckOptions(root=tmp, faces=faces, tests_dir=tdir),
+            )
+            r2 = gck.check(
+                ['src/x.py'],
+                invoke,
+                opts=gck.CheckOptions(root=tmp, faces=faces, tests_dir=tdir),
+            )
             self.assertEqual(r1["failed"], [mod])
             self.assertEqual(r2["failed"], [mod], "缓存的红必须仍是红")
             self.assertEqual(r2["fresh"], [])
@@ -76,8 +92,16 @@ class PlanExecuteTest(unittest.TestCase):
                 calls.append(mod)
                 return 0, 0.01
 
-            gck.check(["src/x.py"], invoke, root=tmp, faces=faces, tests_dir=tdir)
-            gck.check(["src/x.py"], invoke, root=tmp, faces=faces, tests_dir=tdir)
+            gck.check(
+                ['src/x.py'],
+                invoke,
+                opts=gck.CheckOptions(root=tmp, faces=faces, tests_dir=tdir),
+            )
+            gck.check(
+                ['src/x.py'],
+                invoke,
+                opts=gck.CheckOptions(root=tmp, faces=faces, tests_dir=tdir),
+            )
             self.assertEqual(len(calls), 2, "原生工具节点不得走缓存")
 
     def test_slow_lane_is_deferred_not_run(self):
@@ -91,7 +115,11 @@ class PlanExecuteTest(unittest.TestCase):
                 calls.append(mod)
                 return 0, 0.01
 
-            res = gck.check(["src/x.py"], invoke, root=tmp, faces=faces, tests_dir=tdir)
+            res = gck.check(
+                ['src/x.py'],
+                invoke,
+                opts=gck.CheckOptions(root=tmp, faces=faces, tests_dir=tdir),
+            )
             self.assertIn(slow, res["deferred"])
             self.assertNotIn(slow, calls, "慢车道只让位，不执行——但名单要打印")
 
@@ -104,10 +132,16 @@ class PlanExecuteTest(unittest.TestCase):
                 calls.append(1)
                 return 0, 0.01
 
-            gck.check(["src/x.py"], invoke, root=tmp, faces=faces, tests_dir=tdir,
-                      use_cache=False)
-            gck.check(["src/x.py"], invoke, root=tmp, faces=faces, tests_dir=tdir,
-                      use_cache=False)
+            gck.check(
+                ['src/x.py'],
+                invoke,
+                opts=gck.CheckOptions(root=tmp, faces=faces, tests_dir=tdir, use_cache=False),
+            )
+            gck.check(
+                ['src/x.py'],
+                invoke,
+                opts=gck.CheckOptions(root=tmp, faces=faces, tests_dir=tdir, use_cache=False),
+            )
             self.assertEqual(len(calls), 2)
 
 
@@ -132,8 +166,11 @@ class RealInvokerTest(unittest.TestCase):
                         "import unittest\n\n\nclass T(unittest.TestCase):\n"
                         "    def test_red(self):\n        self.assertTrue(False)\n",
                         encoding="utf-8", newline="\n")
-            res = gck.check(["src/x.py"], self._invoke(Path(tmp)), root=tmp, faces=faces,
-                            tests_dir=tdir, timeout=120)
+            res = gck.check(
+                ['src/x.py'],
+                self._invoke(Path(tmp)),
+                opts=gck.CheckOptions(root=tmp, timeout=120, faces=faces, tests_dir=tdir),
+            )
             self.assertEqual(res["failed"], [red])
 
 

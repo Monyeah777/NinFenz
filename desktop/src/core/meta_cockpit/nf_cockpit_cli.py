@@ -85,13 +85,15 @@ def run(args: argparse.Namespace) -> int:
     try:
         result = cockpit_service.produce(
             prompt,
-            adapter=adapter,
-            store_path=args.store,
-            journal_path=args.journal,
-            max_turns=args.max_turns,
-            max_seconds=args.max_seconds,
-            max_context_units=args.max_context_units,
-            injections=injections,
+            opts=cockpit_service.ProduceOptions(
+                adapter=adapter,
+                store_path=args.store,
+                journal_path=args.journal,
+                max_turns=args.max_turns,
+                max_seconds=args.max_seconds,
+                max_context_units=args.max_context_units,
+                injections=injections,
+            ),
         )
     except ValueError as exc:
         print(str(exc), file=sys.stderr)

@@ -98,7 +98,7 @@ class TestValidationNegative(unittest.TestCase):
             lib.write_projection(tmp)
             before = lib.entry_digest(tmp, "library/NF-9.md")
             key = b"k" * 32
-            out = lib.set_attestation(tmp, "NF-9", key=key)
+            out = lib.set_attestation(tmp, 'NF-9', opts=lib.AttestationOptions(key=key))
             self.assertEqual(out["level"], "hmac-sha256")
             self.assertEqual(lib.entry_digest(tmp, "library/NF-9.md"), before,
                              "落锚不得改变规范摘要（自指避免）")
@@ -115,7 +115,7 @@ class TestValidationNegative(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             _tree(tmp, {"NF-9": GOOD.format(eid="NF-9", status="active", extra="")})
             lib.write_projection(tmp)
-            lib.set_attestation(tmp, "NF-9", key=b"k" * 32)
+            lib.set_attestation(tmp, 'NF-9', opts=lib.AttestationOptions(key=b'k' * 32))
             self.assertTrue(lib.entries(tmp)[0]["fm"].get("anchor_scheme"))
             lib.set_attestation(tmp, "NF-9")
             fm = lib.entries(tmp)[0]["fm"]
@@ -129,7 +129,7 @@ class TestValidationNegative(unittest.TestCase):
             lib.write_projection(tmp)
             from core import receipts as rc
             root_before = rc.build(tmp)["root"]
-            lib.set_attestation(tmp, "NF-9", key=b"k" * 32)
+            lib.set_attestation(tmp, 'NF-9', opts=lib.AttestationOptions(key=b'k' * 32))
             doc = rc.build(tmp)
             self.assertEqual(doc["root"], root_before)
             self.assertEqual(doc["entries"][0]["anchor"]["scheme"], "hmac-sha256")

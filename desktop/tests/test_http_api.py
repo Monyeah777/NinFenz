@@ -54,8 +54,11 @@ class _Server(unittest.TestCase):
             return exc.code, json.loads(exc.read().decode())
 
     def _bundle(self, key=None, tamper=False):
-        data, _info = evidence.build(str(self.root), ["d/a.md"], key=key,
-                                     created_at="2026-01-01T00:00:00Z")
+        data, _info = evidence.build(
+            str(self.root),
+            ['d/a.md'],
+            opts=evidence.BuildOptions(key=key, created_at='2026-01-01T00:00:00Z'),
+        )
         if not tamper:
             return data
         import zipfile

@@ -217,6 +217,1144 @@ private fun parseTemplateSlots(markdown: String): Map<String, String> {
     return result
 }
 
+private fun reproTextFor(report: dev.ninfenz.mobile.data.ReproChecker.Report?, context: Context): String? =
+    when {
+        report == null -> null
+        report.stable -> context.getString(dev.ninfenz.mobile.R.string.repro_stable)
+        else -> context.getString(dev.ninfenz.mobile.R.string.repro_diff, report.firstDiff ?: -1)
+    }
+
+private fun reproTextStable(report: dev.ninfenz.mobile.data.ReproChecker.Report, context: Context): String =
+    if (report.stable) {
+        context.getString(dev.ninfenz.mobile.R.string.repro_stable)
+    } else {
+        context.getString(dev.ninfenz.mobile.R.string.repro_diff, report.firstDiff ?: -1)
+    }
+
+@Composable
+private fun DeliveryPreflightButton(onShow: () -> Unit) {
+    TextButton(onClick = onShow) {
+        Text(stringResource(dev.ninfenz.mobile.R.string.delivery_preflight))
+    }
+}
+
+private class DeliveryExportArgs(
+    val project: Project,
+    val markdown: String?,
+    val exportMarkdown: String?,
+    val report: ValidateReport?,
+    val exportedFile: File?,
+    val busy: Boolean,
+    val contractUnsatisfiable: Boolean,
+    val exportBlocked: Boolean,
+    val batchFiles: List<File>,
+    val exportBatchNote: String?,
+    val docxStyles: String?,
+    val docxSectPr: String?,
+    val docxTheme: String?,
+    val docxNumbering: String?,
+    val docxHeader: String?,
+    val docxFooter: String?,
+    val epubAuthor: String,
+    val epubLanguage: String,
+    val pdfPageSize: String,
+    val pdfIncludeTitle: Boolean,
+    val selectedOutputTemplate: String?,
+    val audit: Boolean,
+    val grant: dev.ninfenz.mobile.data.CapabilityGrant,
+    val capabilityRevision: Int,
+    val styleTemplates: List<StyleTemplateStore.StyleTemplate>,
+    val showStyleTemplates: Boolean,
+    val docxStyleAudit: DocxStyleAuditResult?,
+    val docxHeadingAudit: DocxHeadingAuditResult?,
+    val outputRuleNote: String?,
+    val exportNotice: String?,
+    val exportEntries: List<ExportHistoryStore.Entry>,
+    val manifestText: String?,
+    val exportVerify: ExportVerifier.Result?,
+    val reproText: String?,
+    val reproOk: Boolean?,
+    val recentExpanded: Boolean,
+    val evidenceBusy: Boolean,
+    val evidenceNote: String?,
+    val scope: kotlinx.coroutines.CoroutineScope,
+    val onBusy: (Boolean) -> Unit,
+    val onError: (CoreError?) -> Unit,
+    val onExportAll: () -> Unit,
+    val onExportDone: (String, File?, String?, dev.ninfenz.mobile.data.ReproChecker.Report?) -> Unit,
+    val onShowGrant: () -> Unit,
+    val onOpenStyleTemplates: () -> Unit,
+    val onDismissStyleTemplates: () -> Unit,
+    val onPickStyleTemplate: (StyleTemplateStore.StyleTemplate) -> Unit,
+    val onShowSaveExportProfile: () -> Unit,
+    val onShowExportProfiles: () -> Unit,
+    val onShowOutputRules: () -> Unit,
+    val onShowPreflight: () -> Unit,
+    val onEpubAuthor: (String) -> Unit,
+    val onEpubLanguage: (String) -> Unit,
+    val onPdfPageSize: (String) -> Unit,
+    val onPdfIncludeTitle: (Boolean) -> Unit,
+    val onPickReference: () -> Unit,
+    val onBack: () -> Unit,
+    val onToggleRecent: () -> Unit,
+    val onShowTrash: () -> Unit,
+    val onShowAllExports: () -> Unit,
+    val onClearExports: () -> Unit,
+    val onPendingTrash: (ExportHistoryStore.Entry) -> Unit,
+    val onEvidence: (ExportHistoryStore.Entry) -> Unit
+)
+
+@Composable
+private fun DeliveryExportSection(a: DeliveryExportArgs) {
+    NfCollapsibleSection(title = stringResource(dev.ninfenz.mobile.R.string.delivery_export_section), initiallyExpanded = true) {
+        ExportSummary(a)
+        ExportAllBlock(a)
+        ExportDocsRow(a)
+        ExportDataRow(a)
+        ExportReadingRow(a)
+        ExportPreserveRow(a)
+        ExportShareRow(a)
+        ExportStyleRow(a)
+        ExportToolsRow(a)
+        ExportFieldsRow(a)
+        ExportNoticeText(a)
+        if (a.exportedFile != null) ExportDoneCard(a.onBack)
+        a.exportEntries.firstOrNull()?.let { latest -> LatestExportCard(a, latest) }
+        ExportResultLines(a)
+        DocxAuditLines(a)
+        ExportRecentBlock(a)
+    }
+}
+
+@Composable
+private fun ExportSummary(a: DeliveryExportArgs) {
+    val summary = buildList {
+        add(stringResource(if (a.markdown != null) dev.ninfenz.mobile.R.string.delivery_summary_assembled else dev.ninfenz.mobile.R.string.delivery_summary_unassembled))
+        if (a.audit) add(stringResource(if (a.report?.verdict == "pass") dev.ninfenz.mobile.R.string.delivery_summary_validated else dev.ninfenz.mobile.R.string.delivery_summary_unvalidated))
+        add(stringResource(if (a.exportedFile != null) dev.ninfenz.mobile.R.string.delivery_summary_exported else dev.ninfenz.mobile.R.string.delivery_summary_unexported))
+    }.joinToString(" · ")
+    Text(summary, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page))
+    Text(stringResource(dev.ninfenz.mobile.R.string.delivery_export_group_docs), style = NfType.label, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(start = NfSpacing.page, end = NfSpacing.page, top = NfSpacing.s))
+}
+
+@Composable
+private fun ExportAllBlock(a: DeliveryExportArgs) {
+    OutlinedButton(
+        enabled = a.exportMarkdown != null && !a.busy && !a.contractUnsatisfiable,
+        onClick = a.onExportAll,
+        modifier = Modifier.padding(horizontal = NfSpacing.page)
+    ) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_export_all)) }
+    a.batchFiles.takeIf { it.isNotEmpty() }?.let { files ->
+        Text(files.joinToString(" · ") { it.name }, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page))
+    }
+    a.exportBatchNote?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
+}
+
+@Composable
+private fun ExportDocsRow(a: DeliveryExportArgs) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    FlowRow(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+        ExportButton(ExportButtonArgs("md", "text/markdown", a.exportMarkdown, a.project, context, a.scope, { a.onBusy(it) }, { a.onError(it) }, a.exportBlocked, onDone = { file, manifest, report -> a.onExportDone("md", file, manifest, report) }))
+        ExportButton(ExportButtonArgs("zip", "application/zip", a.exportMarkdown, a.project, context, a.scope, { a.onBusy(it) }, { a.onError(it) }, a.exportBlocked, onDone = { file, manifest, report -> a.onExportDone("zip", file, manifest, report) }))
+        ExportButton(ExportButtonArgs("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", a.exportMarkdown, a.project, context, a.scope, { a.onBusy(it) }, { a.onError(it) }, a.exportBlocked, docxStyles = a.docxStyles, docxSectPr = a.docxSectPr, docxTheme = a.docxTheme, docxNumbering = a.docxNumbering, docxHeader = a.docxHeader, docxFooter = a.docxFooter, onDone = { file, manifest, report -> a.onExportDone("docx", file, manifest, report) }))
+    }
+}
+
+@Composable
+private fun ExportDataRow(a: DeliveryExportArgs) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    Text(stringResource(dev.ninfenz.mobile.R.string.delivery_export_group_data), style = NfType.label, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(start = NfSpacing.page, end = NfSpacing.page, top = NfSpacing.s))
+    FlowRow(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+        ExportButton(ExportButtonArgs("json", "application/json", a.exportMarkdown, a.project, context, a.scope, { a.onBusy(it) }, { a.onError(it) }, a.exportBlocked, onDone = { file, manifest, report -> a.onExportDone("json", file, manifest, report) }))
+        ExportButton(ExportButtonArgs("skill", "application/zip", a.exportMarkdown, a.project, context, a.scope, { a.onBusy(it) }, { a.onError(it) }, a.exportBlocked, onDone = { file, manifest, report -> a.onExportDone("skill", file, manifest, report) }))
+    }
+}
+
+@Composable
+private fun ExportReadingRow(a: DeliveryExportArgs) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    Text(stringResource(dev.ninfenz.mobile.R.string.delivery_export_group_reading), style = NfType.label, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(start = NfSpacing.page, end = NfSpacing.page, top = NfSpacing.s))
+    FlowRow(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+        EpubExportButton(EpubExportButtonArgs(a.exportMarkdown, a.project, a.epubAuthor, a.epubLanguage, context, a.scope, { a.onBusy(it) }, { a.onError(it) }, a.exportBlocked, outputTemplate = a.selectedOutputTemplate, onDone = { file, report -> a.onExportDone("epub", file, null, report) }))
+        PdfExportButton(PdfExportButtonArgs(a.exportMarkdown, a.project, a.pdfPageSize, a.pdfIncludeTitle, context, a.scope, { a.onBusy(it) }, { a.onError(it) }, a.exportBlocked, outputTemplate = a.selectedOutputTemplate, onDone = { file, report -> a.onExportDone("pdf", file, null, report) }))
+        if (a.audit) PdfUaExportButton(a.exportMarkdown, a.project, context, a.scope, { a.onBusy(it) }, { a.onError(it) }, a.exportBlocked) { file, report -> a.onExportDone("pdf-ua", file, null, report) }
+        HtmlExportButton(a.exportMarkdown, a.project, context, a.scope, { a.onBusy(it) }, { a.onError(it) }, a.exportBlocked, outputTemplate = a.selectedOutputTemplate) { file, report -> a.onExportDone("html", file, null, report) }
+    }
+}
+
+@Composable
+private fun ExportPreserveRow(a: DeliveryExportArgs) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    FlowRow(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+        if (a.audit) PreservationExportButton(a.exportMarkdown, a.project, context, a.scope, { a.onBusy(it) }, { a.onError(it) }, a.exportBlocked, a.grant) { file, report -> a.onExportDone("preserve", file, null, report) }
+        if (a.audit) OutlinedButton(
+            onClick = a.onShowGrant,
+            modifier = Modifier.padding(horizontal = NfSpacing.page)
+        ) { Text(stringResource(dev.ninfenz.mobile.R.string.grant_button)) }
+        NfDocExportButton(a.exportMarkdown, a.project, context, a.scope, { a.onBusy(it) }, { a.onError(it) }, a.exportBlocked) { file, report -> a.onExportDone("nf-doc", file, null, report) }
+    }
+}
+
+@Composable
+private fun ExportShareRow(a: DeliveryExportArgs) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    FlowRow(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+        OutlinedButton(
+            enabled = a.markdown != null && !a.busy,
+            onClick = {
+                val md = a.markdown ?: return@OutlinedButton
+                val intent = ShareExporter.shareMarkdown(context, "nf-" + a.project.id, md)
+                ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.delivery_share_md))
+            }
+        ) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_share_md)) }
+        OutlinedButton(
+            enabled = a.exportedFile != null,
+            onClick = {
+                val file = a.exportedFile ?: return@OutlinedButton
+                val mime = when (file.extension.lowercase()) {
+                    "md" -> "text/markdown"
+                    "zip" -> "application/zip"
+                    "docx" -> "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                    else -> "application/octet-stream"
+                }
+                val intent = ShareExporter.shareFileIntent(context, file, mime, a.project.title)
+                ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.delivery_share_file))
+            }
+        ) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_share_file)) }
+    }
+}
+
+@Composable
+private fun ExportStyleRow(a: DeliveryExportArgs) {
+    Row(
+        modifier = Modifier.padding(horizontal = NfSpacing.page),
+        horizontalArrangement = Arrangement.spacedBy(NfSpacing.s),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        if (a.capabilityRevision >= 0 && CapabilityRegistry.isEnabled(Capability.STYLE)) {
+            OutlinedButton(onClick = a.onPickReference) {
+                Text(stringResource(dev.ninfenz.mobile.R.string.docx_reference_pick))
+            }
+        }
+        if (a.capabilityRevision >= 0 && CapabilityRegistry.isEnabled(Capability.STYLE)) {
+            TextButton(onClick = a.onOpenStyleTemplates) {
+                Text(stringResource(dev.ninfenz.mobile.R.string.docx_style_from_library))
+            }
+        }
+        Text(
+            stringResource(
+                if (a.docxStyles != null) dev.ninfenz.mobile.R.string.docx_reference_loaded
+                else dev.ninfenz.mobile.R.string.docx_reference_none
+            ),
+            style = NfType.meta
+        )
+    }
+    if (a.showStyleTemplates) StyleTemplatesDialog(a)
+}
+
+@Composable
+private fun StyleTemplatesDialog(a: DeliveryExportArgs) {
+    AlertDialog(
+        onDismissRequest = a.onDismissStyleTemplates,
+        title = { Text(stringResource(dev.ninfenz.mobile.R.string.docx_style_from_library)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                if (a.styleTemplates.isEmpty()) {
+                    Text(
+                        stringResource(dev.ninfenz.mobile.R.string.docx_style_library_empty),
+                        style = NfType.meta,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                a.styleTemplates.forEach { template -> StyleTemplateRow(template, a.docxStyles, a.onPickStyleTemplate) }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = a.onDismissStyleTemplates) { Text(stringResource(android.R.string.cancel)) }
+        }
+    )
+}
+
+@Composable
+private fun StyleTemplateRow(
+    template: StyleTemplateStore.StyleTemplate,
+    docxStyles: String?,
+    onPick: (StyleTemplateStore.StyleTemplate) -> Unit
+) {
+    val docxCompatible = template.sourceFormat.equals("docx", ignoreCase = true)
+    Column {
+        TextButton(enabled = docxCompatible, onClick = { onPick(template) }) { Text(template.name) }
+        Text(
+            stringResource(dev.ninfenz.mobile.R.string.docx_style_meta, template.sourceFormat, template.digest.take(12)),
+            style = NfType.meta,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        if (!docxCompatible) {
+            Text(
+                stringResource(dev.ninfenz.mobile.R.string.docx_pdf_not_applicable),
+                style = NfType.meta,
+                color = MaterialTheme.colorScheme.error
+            )
+        }
+        if (docxCompatible) docxStyles?.let { currentStyle ->
+            Text(
+                stringResource(dev.ninfenz.mobile.R.string.docx_style_match, StyleMatch.score(currentStyle, template.stylesXml)),
+                style = NfType.meta,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+    }
+}
+
+@Composable
+private fun ExportToolsRow(a: DeliveryExportArgs) {
+    FlowRow(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+        TextButton(enabled = a.docxStyles != null, onClick = a.onShowSaveExportProfile) {
+            Text(stringResource(dev.ninfenz.mobile.R.string.export_profile_save))
+        }
+        TextButton(onClick = a.onShowExportProfiles) {
+            Text(stringResource(dev.ninfenz.mobile.R.string.export_profiles))
+        }
+        TextButton(onClick = a.onShowOutputRules) {
+            Text(stringResource(dev.ninfenz.mobile.R.string.delivery_output_rule))
+        }
+        if (a.audit) DeliveryPreflightButton(a.onShowPreflight)
+    }
+    a.outputRuleNote?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
+}
+
+@Composable
+private fun ExportFieldsRow(a: DeliveryExportArgs) {
+    FlowRow(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+        OutlinedTextField(
+            value = a.epubAuthor,
+            onValueChange = a.onEpubAuthor,
+            label = { Text("EPUB author") },
+            singleLine = true,
+            modifier = Modifier.weight(1f)
+        )
+        OutlinedTextField(
+            value = a.epubLanguage,
+            onValueChange = a.onEpubLanguage,
+            label = { Text("EPUB lang") },
+            singleLine = true,
+            modifier = Modifier.weight(1f)
+        )
+    }
+    Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s), verticalAlignment = Alignment.CenterVertically) {
+        OutlinedTextField(
+            value = a.pdfPageSize,
+            onValueChange = a.onPdfPageSize,
+            label = { Text("PDF page") },
+            singleLine = true,
+            modifier = Modifier.weight(1f)
+        )
+        Text("title", style = NfType.meta)
+        Switch(checked = a.pdfIncludeTitle, onCheckedChange = a.onPdfIncludeTitle)
+    }
+    Text(stringResource(dev.ninfenz.mobile.R.string.delivery_pdf_note), style = NfType.meta, modifier = Modifier.padding(horizontal = NfSpacing.page))
+}
+
+@Composable
+private fun ExportNoticeText(a: DeliveryExportArgs) {
+    a.exportNotice?.let { notice ->
+        Text(
+            notice,
+            style = NfType.meta,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(horizontal = NfSpacing.page)
+        )
+    }
+}
+
+@Composable
+private fun ExportDoneCard(onBack: () -> Unit) {
+    NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
+        Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+            Text(stringResource(dev.ninfenz.mobile.R.string.delivery_done_title), style = NfType.itemTitle)
+            Text(stringResource(dev.ninfenz.mobile.R.string.delivery_done_body), style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            TextButton(onClick = onBack) {
+                Text(stringResource(dev.ninfenz.mobile.R.string.delivery_done_back))
+            }
+        }
+    }
+}
+
+@Composable
+private fun LatestExportCard(a: DeliveryExportArgs, latest: ExportHistoryStore.Entry) {
+    NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
+        Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+            Text(
+                stringResource(dev.ninfenz.mobile.R.string.delivery_last_export) + " · " + latest.format,
+                style = NfType.itemTitle
+            )
+            val meta = buildList {
+                add(latest.name)
+                latest.bytes?.let { add(formatBytes(it)) }
+                latest.sha256.take(12).takeIf { it.isNotBlank() }?.let { add(it) }
+            }.joinToString(" · ")
+            Text(
+                meta,
+                style = NfType.meta,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            LatestExportActions(latest)
+            if (a.markdown != null && latest.format.lowercase() in setOf("md", "html", "epub", "docx", "json")) {
+                LatestEvidenceButton(a, latest)
+            }
+            a.evidenceNote?.let { note ->
+                Text(note, style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
+    }
+}
+
+@Composable
+private fun LatestExportActions(latest: ExportHistoryStore.Entry) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+        TextButton(onClick = {
+            val file = File(latest.path)
+            if (file.isFile) {
+                val intent = ShareExporter.shareFileIntent(context, file, mimeFor(latest.format), latest.name)
+                ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.delivery_share_file))
+            }
+        }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_share_file)) }
+        TextButton(onClick = {
+            val file = File(latest.path)
+            if (file.isFile) {
+                val intent = ShareExporter.viewFileIntent(context, file, mimeFor(latest.format))
+                ShareExporter.launchView(context, intent, context.getString(dev.ninfenz.mobile.R.string.delivery_open_file))
+            }
+        }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_open_file)) }
+    }
+}
+
+@Composable
+private fun LatestEvidenceButton(a: DeliveryExportArgs, latest: ExportHistoryStore.Entry) {
+    OutlinedButton(
+        enabled = !a.evidenceBusy,
+        onClick = { a.onEvidence(latest) }
+    ) {
+        Text(
+            stringResource(
+                if (a.evidenceBusy) dev.ninfenz.mobile.R.string.delivery_evidence_pack_busy
+                else dev.ninfenz.mobile.R.string.delivery_evidence_pack
+            )
+        )
+    }
+}
+
+@Composable
+private fun ExportResultLines(a: DeliveryExportArgs) {
+    a.manifestText?.let { Text(it, style = NfType.meta, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
+    a.exportVerify?.let {
+        Text(
+            it.message,
+            style = NfType.meta,
+            color = if (it.ok) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+            modifier = Modifier.padding(horizontal = NfSpacing.page)
+        )
+    }
+    a.reproText?.let {
+        Text(
+            it,
+            style = NfType.meta,
+            color = if (a.reproOk == true) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+            modifier = Modifier.padding(horizontal = NfSpacing.page)
+        )
+    }
+}
+
+@Composable
+private fun DocxAuditLines(a: DeliveryExportArgs) {
+    a.docxStyleAudit?.let { auditState ->
+        Text(
+            when {
+                auditState.definedButUnused -> stringResource(
+                    dev.ninfenz.mobile.R.string.docx_style_unused,
+                    auditState.found,
+                    auditState.checked
+                )
+                auditState.ok -> stringResource(dev.ninfenz.mobile.R.string.docx_style_audit_ok, auditState.found, auditState.checked)
+                else -> stringResource(dev.ninfenz.mobile.R.string.docx_style_audit, auditState.found, auditState.checked, auditState.missing.joinToString("、"))
+            },
+            style = NfType.meta,
+            color = if (auditState.ok) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+            modifier = Modifier.padding(horizontal = NfSpacing.page)
+        )
+    }
+    a.docxHeadingAudit?.let { auditState ->
+        Text(
+            stringResource(
+                dev.ninfenz.mobile.R.string.docx_heading_audit,
+                auditState.styledHeadings,
+                auditState.markdownHeadings
+            ),
+            style = NfType.meta,
+            color = if (auditState.ok) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+            modifier = Modifier.padding(horizontal = NfSpacing.page)
+        )
+    }
+}
+
+@Composable
+private fun ExportRecentBlock(a: DeliveryExportArgs) {
+    if (a.exportEntries.isEmpty()) return
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = NfSpacing.page),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        TextButton(onClick = a.onToggleRecent) {
+            Text(
+                stringResource(dev.ninfenz.mobile.R.string.delivery_recent_exports) +
+                    (if (a.recentExpanded) " ▾" else " ▸"),
+                style = NfType.itemTitle
+            )
+        }
+        Row {
+            TextButton(onClick = a.onShowTrash) {
+                Text(stringResource(dev.ninfenz.mobile.R.string.delivery_trash))
+            }
+            if (a.exportEntries.size > 5) {
+                TextButton(onClick = a.onShowAllExports) {
+                    Text(stringResource(dev.ninfenz.mobile.R.string.delivery_all_exports))
+                }
+            }
+            TextButton(onClick = a.onClearExports) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_clear_exports)) }
+        }
+    }
+    if (a.recentExpanded) a.exportEntries.take(5).forEach { entry -> RecentExportRow(entry, a.onPendingTrash) }
+}
+
+@Composable
+private fun RecentExportRow(entry: ExportHistoryStore.Entry, onRemove: (ExportHistoryStore.Entry) -> Unit) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = NfSpacing.page)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(entry.format + " · " + entry.name + (entry.bytes?.let { " · " + formatBytes(it) } ?: ""), style = NfType.meta, modifier = Modifier.weight(1f))
+            entry.ok?.let { ok ->
+                Text(
+                    stringResource(if (ok) dev.ninfenz.mobile.R.string.export_verified else dev.ninfenz.mobile.R.string.export_verify_failed),
+                    style = NfType.meta,
+                    color = if (ok) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                )
+            }
+            TextButton(onClick = {
+                val file = File(entry.path)
+                if (file.isFile) {
+                    val intent = ShareExporter.shareFileIntent(context, file, mimeFor(entry.format), entry.name)
+                    ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.delivery_share_file))
+                }
+            }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_share_file)) }
+            TextButton(onClick = {
+                val file = File(entry.path)
+                if (file.isFile) {
+                    val intent = ShareExporter.viewFileIntent(context, file, mimeFor(entry.format))
+                    ShareExporter.launchView(context, intent, context.getString(dev.ninfenz.mobile.R.string.delivery_open_file))
+                }
+            }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_open_file)) }
+            TextButton(onClick = { onRemove(entry) }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_remove_export)) }
+        }
+        entry.message?.takeIf { entry.ok != true }?.let { message ->
+            Text(
+                message,
+                style = NfType.meta,
+                color = MaterialTheme.colorScheme.error
+            )
+        }
+    }
+}
+
+private class DeliveryPreviewArgs(
+    val markdown: String?,
+    val project: Project,
+    val sampleStore: dev.ninfenz.mobile.data.PromptSampleStore,
+    val copyMarkdown: (String) -> Unit,
+    val onShowVersions: () -> Unit,
+    val onEditPreview: (String) -> Unit,
+    val onFullPreview: () -> Unit
+)
+
+@Composable
+private fun DeliveryPreviewSection(a: DeliveryPreviewArgs) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    NfCollapsibleSection(title = stringResource(dev.ninfenz.mobile.R.string.delivery_preview), initiallyExpanded = true) {
+        TextButton(onClick = a.onShowVersions) {
+            Text(stringResource(dev.ninfenz.mobile.R.string.delivery_versions))
+        }
+        val md = a.markdown
+        if (md == null) {
+            Text(stringResource(dev.ninfenz.mobile.R.string.delivery_not_assembled), style = NfType.meta, modifier = Modifier.padding(horizontal = NfSpacing.page))
+        } else {
+            Column(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
+                MarkdownPreview(md, limitBlocks = 8)
+                Row {
+                    TextButton(onClick = { a.onEditPreview(md) }) {
+                        Text(stringResource(dev.ninfenz.mobile.R.string.preview_edit))
+                    }
+                    TextButton(onClick = a.onFullPreview) {
+                        Text(stringResource(dev.ninfenz.mobile.R.string.preview_full))
+                    }
+                    TextButton(onClick = { a.copyMarkdown(md) }) {
+                        Text(stringResource(dev.ninfenz.mobile.R.string.preview_copy))
+                    }
+                    TextButton(onClick = {
+                        val safe = dev.ninfenz.mobile.data.ShareRedactor.redact(md)
+                        val intent = ShareExporter.shareMarkdown(context, "nf-redacted", safe)
+                        ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.preview_share_redacted))
+                    }) { Text(stringResource(dev.ninfenz.mobile.R.string.preview_share_redacted)) }
+                    TextButton(onClick = {
+                        val saved = runCatching { a.sampleStore.save("delivery-" + a.project.id, md) }.orNullLogged("DeliveryScreen")
+                        android.widget.Toast.makeText(
+                            context,
+                            if (saved != null) context.getString(dev.ninfenz.mobile.R.string.delivery_save_sample) + ": " + saved.name
+                            else context.getString(dev.ninfenz.mobile.R.string.delivery_save_sample),
+                            android.widget.Toast.LENGTH_SHORT
+                        ).show()
+                    }) {
+                        Text(stringResource(dev.ninfenz.mobile.R.string.delivery_save_sample))
+                    }
+                    TextButton(onClick = {
+                        val intent = ShareExporter.shareMarkdown(context, "nf-" + a.project.id, md)
+                        ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.delivery_share_md))
+                    }) {
+                        Text(stringResource(dev.ninfenz.mobile.R.string.delivery_share_md))
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ExportProfileRow(
+    profile: dev.ninfenz.mobile.data.ExportProfileStore.Profile,
+    onApply: (dev.ninfenz.mobile.data.ExportProfileStore.Profile) -> Unit,
+    onRemove: (dev.ninfenz.mobile.data.ExportProfileStore.Profile) -> Unit
+) {
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+        Text(profile.name, style = NfType.meta)
+        Row {
+            TextButton(onClick = { onApply(profile) }) {
+                Text(stringResource(dev.ninfenz.mobile.R.string.export_profile_apply))
+            }
+            if (!profile.id.startsWith("ext:")) {
+                TextButton(onClick = { onRemove(profile) }) {
+                    Text(stringResource(dev.ninfenz.mobile.R.string.inbox_remove))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PreviewSuggestionApplyButton(slotId: String, text: String, onApply: (String, String) -> Unit) {
+    TextButton(onClick = { onApply(slotId, text) }) {
+        Text(stringResource(dev.ninfenz.mobile.R.string.preview_suggest_apply))
+    }
+}
+
+private fun slotVisible(meta: dev.ninfenz.mobile.model.SpecSlot?, inputs: Map<String, String>): Boolean {
+    val cond = meta?.visibleIf ?: return true
+    return inputs[cond.slot] == cond.equals
+}
+
+private class DeliveryAssembleArgs(
+    val needsRevalidate: Boolean,
+    val busy: Boolean,
+    val canAssemble: Boolean,
+    val canValidate: Boolean,
+    val missingRequired: List<String>,
+    val oversizedSlots: List<String>,
+    val constraintViolations: List<String>,
+    val markdown: String?,
+    val exportMarkdown: String?,
+    val report: ValidateReport?,
+    val validateRepro: String?,
+    val signoff: dev.ninfenz.mobile.data.ContractStore.Signoff?,
+    val exportedFile: File?,
+    val plan: AssemblyPlan?,
+    val specMeta: dev.ninfenz.mobile.model.MdSpec?,
+    val inputs: Map<String, String>,
+    val assembleRequester: BringIntoViewRequester,
+    val validateRequester: BringIntoViewRequester,
+    val onAssemble: () -> Unit,
+    val onValidate: () -> Unit,
+    val onShareFix: (ValidateReport) -> Unit,
+    val onSign: (List<Pair<String, Boolean>>) -> Unit,
+    val onGoValidate: () -> Unit
+)
+
+@Composable
+private fun DeliveryAssembleSection(a: DeliveryAssembleArgs) {
+    if (a.needsRevalidate) {
+        NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
+            Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                Text(stringResource(dev.ninfenz.mobile.R.string.delivery_dirty_title), style = NfType.itemTitle, color = MaterialTheme.colorScheme.error)
+                Text(stringResource(dev.ninfenz.mobile.R.string.delivery_dirty_body), style = NfType.meta)
+            }
+        }
+    }
+    NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.delivery_assemble_validate))
+    DeliveryAssembleButtons(a)
+    a.report?.let { r -> DeliveryReportBlock(r, a.markdown, a.validateRepro, a.onShareFix) }
+    if (a.report?.verdict == "pass" && a.markdown != null) DeliveryContractBlock(a)
+    if (a.markdown != null && a.exportMarkdown == null) DeliveryExportBlockedRow(a.onGoValidate)
+}
+
+@Composable
+private fun DeliveryAssembleButtons(a: DeliveryAssembleArgs) {
+    FlowRow(
+        modifier = Modifier.padding(horizontal = NfSpacing.page),
+        horizontalArrangement = Arrangement.spacedBy(NfSpacing.s),
+        verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)
+    ) {
+        Button(
+            enabled = a.canAssemble,
+            modifier = Modifier.bringIntoViewRequester(a.assembleRequester),
+            onClick = a.onAssemble
+        ) { Text(if (a.busy) stringResource(dev.ninfenz.mobile.R.string.delivery_assembling) else stringResource(dev.ninfenz.mobile.R.string.delivery_assemble)) }
+        if (a.constraintViolations.isNotEmpty()) {
+            Text(
+                stringResource(dev.ninfenz.mobile.R.string.delivery_slot_constraint, a.constraintViolations.joinToString(", ")),
+                style = NfType.meta,
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.padding(horizontal = NfSpacing.page)
+            )
+        }
+        if (a.oversizedSlots.isNotEmpty()) {
+            Text(
+                stringResource(dev.ninfenz.mobile.R.string.delivery_slot_over_budget, a.oversizedSlots.joinToString(", ")),
+                style = NfType.meta,
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.padding(horizontal = NfSpacing.page)
+            )
+        }
+        if (a.missingRequired.isNotEmpty()) {
+            Text(
+                stringResource(dev.ninfenz.mobile.R.string.delivery_missing_required, a.missingRequired.joinToString(", ")),
+                style = NfType.meta,
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.padding(horizontal = NfSpacing.page)
+            )
+        }
+        Button(
+            enabled = a.canValidate,
+            modifier = Modifier.bringIntoViewRequester(a.validateRequester),
+            onClick = a.onValidate
+        ) { Text(if (a.busy) stringResource(dev.ninfenz.mobile.R.string.delivery_validating) else stringResource(dev.ninfenz.mobile.R.string.delivery_validate)) }
+    }
+}
+
+@Composable
+private fun DeliveryReportBlock(
+    r: ValidateReport,
+    markdown: String?,
+    validateRepro: String?,
+    onShareFix: (ValidateReport) -> Unit
+) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    Text(ReportModel.line(r), style = NfType.secondary, modifier = Modifier.padding(horizontal = NfSpacing.page))
+    validateRepro?.let {
+        Text(it, style = NfType.meta, modifier = Modifier.padding(horizontal = NfSpacing.page))
+    }
+    if (r.issues.isNotEmpty() && markdown != null) {
+        TextButton(onClick = { onShareFix(r) }, modifier = Modifier.padding(horizontal = NfSpacing.page)) {
+            Text(stringResource(dev.ninfenz.mobile.R.string.delivery_share_fix))
+        }
+    }
+    for (issue in r.issues.take(20)) {
+        Text(
+            issue.code + " " + (issue.path ?: "-") + "：" + issue.message + context.getString(dev.ninfenz.mobile.R.string.error_fix_suffix) + issue.fix,
+            style = NfType.meta,
+            color = if (issue.severity == "error") MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(horizontal = NfSpacing.page)
+        )
+    }
+}
+
+@Composable
+private fun DeliveryContractBlock(a: DeliveryAssembleArgs) {
+    val requiredSlots = a.plan?.slots?.filter { id ->
+        a.specMeta?.slots?.firstOrNull { it.id == id }?.required == true
+    }.orEmpty()
+    val slotsFilled = requiredSlots.isEmpty() || requiredSlots.all { a.inputs[it].orEmpty().isNotBlank() }
+    val checks = listOf(
+        stringResource(dev.ninfenz.mobile.R.string.contract_l1) to true,
+        stringResource(dev.ninfenz.mobile.R.string.contract_slots) to slotsFilled,
+        stringResource(dev.ninfenz.mobile.R.string.contract_export) to (a.exportedFile != null)
+    )
+    Column(Modifier.padding(horizontal = NfSpacing.page, vertical = NfSpacing.s), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+        Text(stringResource(dev.ninfenz.mobile.R.string.contract_title), style = NfType.itemTitle)
+        checks.forEach { (label, ok) ->
+            Text((if (ok) "✓ " else "✗ ") + label, style = NfType.meta, color = if (ok) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error)
+        }
+        val signed = a.signoff
+        val currentDigest = a.exportedFile?.let { sha256File(it) }
+        val stale = signed != null && (signed.artifactSha256 == null || signed.artifactSha256 != currentDigest)
+        if (signed != null && !stale) {
+            Text(stringResource(dev.ninfenz.mobile.R.string.contract_signed, signed.signedAt), style = NfType.meta)
+            signed.artifactSha256?.let { Text(stringResource(dev.ninfenz.mobile.R.string.contract_artifact, it), style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+            signed.keyFingerprint?.let { Text(stringResource(dev.ninfenz.mobile.R.string.contract_key, it.take(16)), style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+        } else {
+            if (stale) {
+                Text(stringResource(dev.ninfenz.mobile.R.string.contract_stale), style = NfType.meta, color = MaterialTheme.colorScheme.error)
+            }
+            Button(
+                enabled = checks.all { it.second },
+                onClick = { a.onSign(checks) }
+            ) { Text(stringResource(dev.ninfenz.mobile.R.string.contract_sign)) }
+            if (!checks.all { it.second }) {
+                Text(stringResource(dev.ninfenz.mobile.R.string.contract_blocked), style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
+    }
+}
+
+@Composable
+private fun DeliveryExportBlockedRow(onGoValidate: () -> Unit) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.padding(horizontal = NfSpacing.page)
+    ) {
+        Text(
+            stringResource(dev.ninfenz.mobile.R.string.delivery_export_blocked),
+            style = NfType.meta,
+            color = MaterialTheme.colorScheme.error,
+            modifier = Modifier.weight(1f)
+        )
+        TextButton(onClick = onGoValidate) {
+            Text(stringResource(dev.ninfenz.mobile.R.string.delivery_go_validate))
+        }
+    }
+}
+
+@Composable
+private fun DeliveryPlanSection(
+    plan: AssemblyPlan?,
+    busy: Boolean,
+    constraintConflicts: List<List<dev.ninfenz.mobile.model.ConstraintMUS.Rule>>,
+    onBrowsePlan: () -> Unit,
+    onCompile: () -> Unit
+) {
+    NfSectionHeader(
+        stringResource(dev.ninfenz.mobile.R.string.delivery_plan),
+        action = {
+            TextButton(onClick = onBrowsePlan) {
+                Text(stringResource(dev.ninfenz.mobile.R.string.delivery_browse_plan))
+            }
+        }
+    )
+    Button(
+        enabled = !busy,
+        modifier = Modifier.padding(horizontal = NfSpacing.page),
+        onClick = onCompile
+    ) { Text(if (busy) stringResource(dev.ninfenz.mobile.R.string.delivery_compiling) else stringResource(dev.ninfenz.mobile.R.string.delivery_compile)) }
+    plan?.let { p ->
+        Text(
+            stringResource(dev.ninfenz.mobile.R.string.delivery_plan_summary, p.steps.size, p.slots.size),
+            style = NfType.meta,
+            modifier = Modifier.padding(horizontal = NfSpacing.page)
+        )
+    }
+    if (constraintConflicts.isNotEmpty()) {
+        NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
+            Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                Text(
+                    pluralStringResource(dev.ninfenz.mobile.R.plurals.delivery_constraint_conflict, constraintConflicts.size, constraintConflicts.size),
+                    style = NfType.itemTitle,
+                    color = MaterialTheme.colorScheme.error
+                )
+                constraintConflicts.take(2).forEach { conflict ->
+                    Text(
+                        stringResource(
+                            dev.ninfenz.mobile.R.string.delivery_constraint_conflict_detail,
+                            conflict.joinToString(" + ") { it.id }
+                        ),
+                        style = NfType.meta
+                    )
+                }
+            }
+        }
+    }
+}
+
+private class DeliverySlotsArgs(
+    val plan: AssemblyPlan?,
+    val specMeta: dev.ninfenz.mobile.model.MdSpec?,
+    val inputs: Map<String, String>,
+    val parsedTemplateSlots: Map<String, String>,
+    val batchNote: String?,
+    val variantNote: String?,
+    val draftNote: String?,
+    val batchUndo: Map<String, String>?,
+    val hasVariants: Boolean,
+    val hasTransforms: Boolean,
+    val onShowConstraintLens: () -> Unit,
+    val onBatchImport: () -> Unit,
+    val onShowPresets: () -> Unit,
+    val onShowVariants: () -> Unit,
+    val onShowTransforms: () -> Unit,
+    val onUndoBatch: (Map<String, String>) -> Unit,
+    val onInputsChange: (Map<String, String>) -> Unit,
+    val onPaste: (String) -> Unit,
+    val onOpenPicker: (String) -> Unit,
+    val onFillTemplate: () -> Unit
+)
+
+@Composable
+private fun DeliverySlotsSection(a: DeliverySlotsArgs) {
+    NfCollapsibleSection(
+        title = stringResource(dev.ninfenz.mobile.R.string.delivery_slots),
+        subtitle = a.plan?.let { stringResource(dev.ninfenz.mobile.R.string.delivery_plan_summary, it.steps.size, it.slots.size) },
+        initiallyExpanded = true
+    ) {
+        a.plan?.let { SlotsToolbar(a) }
+        val p = a.plan
+        if (p == null) {
+            Text(stringResource(dev.ninfenz.mobile.R.string.delivery_compile_first), style = NfType.meta, modifier = Modifier.padding(horizontal = NfSpacing.page))
+        } else if (p.slots.isEmpty()) {
+            Text(stringResource(dev.ninfenz.mobile.R.string.delivery_no_slots), style = NfType.meta, modifier = Modifier.padding(horizontal = NfSpacing.page))
+        } else {
+            val requiredSlots = a.specMeta?.slots?.filter { it.required && slotVisible(it, a.inputs) }.orEmpty()
+            if (requiredSlots.isNotEmpty()) SlotsProgressBlock(a, requiredSlots)
+            var lastSection: String? = null
+            for (slot in p.slots) {
+                val slotMeta = a.specMeta?.slots?.firstOrNull { it.id == slot }
+                if (!slotVisible(slotMeta, a.inputs)) continue
+                Column(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
+                    val sectionTitle = slotMeta?.let { meta -> a.specMeta?.sections?.firstOrNull { it.id == meta.section }?.title }
+                    val sectionId = slotMeta?.section
+                    if (sectionTitle != null && sectionId != null && sectionId != lastSection) {
+                        val sectionSlots = a.specMeta?.sections?.firstOrNull { it.id == sectionId }?.slots.orEmpty()
+                        val sectionFilled = sectionSlots.count { !a.inputs[it].isNullOrBlank() }
+                        SlotsSectionHeader(sectionTitle, sectionFilled, sectionSlots.size)
+                        lastSection = sectionId
+                    }
+                    SlotMetaBlock(slot, slotMeta)
+                    SlotActionRow(slot, slotMeta, a.inputs, a.onInputsChange, a.onPaste, a.onOpenPicker)
+                    SlotEditorField(slot, slotMeta, a.inputs, a.onInputsChange, p.slots.lastOrNull() == slot)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SlotsToolbar(a: DeliverySlotsArgs) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = NfSpacing.page),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            stringResource(dev.ninfenz.mobile.R.string.delivery_slot_batch_hint),
+            style = NfType.meta,
+            modifier = Modifier.weight(1f)
+        )
+        Row {
+            TextButton(onClick = a.onShowConstraintLens) {
+                Text(stringResource(dev.ninfenz.mobile.R.string.delivery_constraint_panel))
+            }
+            TextButton(onClick = a.onBatchImport) {
+                Text(stringResource(dev.ninfenz.mobile.R.string.delivery_slot_batch_import))
+            }
+            TextButton(onClick = a.onShowPresets) {
+                Text(stringResource(dev.ninfenz.mobile.R.string.delivery_presets))
+            }
+            if (a.hasVariants) {
+                TextButton(onClick = a.onShowVariants) {
+                    Text(stringResource(dev.ninfenz.mobile.R.string.delivery_variants))
+                }
+            }
+            if (a.hasTransforms) {
+                TextButton(onClick = a.onShowTransforms) {
+                    Text(stringResource(dev.ninfenz.mobile.R.string.delivery_transforms))
+                }
+            }
+        }
+    }
+    a.batchNote?.let {
+        Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page))
+    }
+    a.variantNote?.let {
+        Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page))
+    }
+    a.batchUndo?.let { snapshot ->
+        TextButton(
+            onClick = { a.onUndoBatch(snapshot) },
+            modifier = Modifier.padding(horizontal = NfSpacing.page)
+        ) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_slot_batch_undo)) }
+    }
+    a.draftNote?.let {
+        Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(horizontal = NfSpacing.page))
+    }
+}
+
+@Composable
+private fun SlotsSectionHeader(title: String, filled: Int, total: Int) {
+    Text(
+        title + "  " + filled + "/" + total,
+        style = NfType.itemTitle,
+        color = MaterialTheme.colorScheme.primary,
+        modifier = Modifier.semantics { heading() }
+    )
+}
+
+@Composable
+private fun SlotsProgressBlock(a: DeliverySlotsArgs, requiredSlots: List<dev.ninfenz.mobile.model.SpecSlot>) {
+    val plan = a.plan ?: return
+    val requiredFilled = requiredSlots.count { !a.inputs[it.id].isNullOrBlank() }
+    Text(
+        stringResource(dev.ninfenz.mobile.R.string.delivery_required_progress, requiredFilled, requiredSlots.size),
+        style = NfType.meta,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.padding(horizontal = NfSpacing.page)
+    )
+    androidx.compose.material3.LinearProgressIndicator(
+        progress = { requiredFilled.toFloat() / requiredSlots.size.toFloat() },
+        modifier = Modifier.fillMaxWidth().padding(horizontal = NfSpacing.page)
+    )
+    val fillable = a.parsedTemplateSlots.count { (id, value) ->
+        id in plan.slots && a.inputs[id].isNullOrBlank() &&
+            templateValueAllowed(a.specMeta?.slots?.firstOrNull { it.id == id }, value)
+    }
+    if (fillable > 0) {
+        TextButton(onClick = a.onFillTemplate) {
+            Text(pluralStringResource(dev.ninfenz.mobile.R.plurals.delivery_fill_template_count, fillable, fillable))
+        }
+    }
+}
+
+@Composable
+private fun SlotMetaBlock(slot: String, slotMeta: dev.ninfenz.mobile.model.SpecSlot?) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Text(slot, style = NfType.label)
+            slotMeta?.let {
+                Text(it.name, style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(
+                    stringResource(if (it.required) dev.ninfenz.mobile.R.string.delivery_slot_required else dev.ninfenz.mobile.R.string.delivery_slot_optional),
+                    style = NfType.meta,
+                    color = if (it.required) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(it.kind, style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                if (it.minChars != null || it.maxChars != null) {
+                    Text(
+                        when {
+                            it.minChars != null && it.maxChars != null ->
+                                stringResource(dev.ninfenz.mobile.R.string.delivery_slot_budget, it.minChars, it.maxChars)
+                            it.maxChars != null ->
+                                stringResource(dev.ninfenz.mobile.R.string.delivery_slot_budget_max, it.maxChars)
+                            else ->
+                                stringResource(dev.ninfenz.mobile.R.string.delivery_slot_budget_min, it.minChars ?: 0)
+                        },
+                        style = NfType.meta,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                val rules = listOfNotNull(
+                    it.pattern?.let { pattern -> "pattern: " + pattern },
+                    it.startsWith?.let { prefix -> "start: " + prefix },
+                    it.endsWith?.let { suffix -> "end: " + suffix },
+                    if (it.nonEmpty) "non-empty" else null
+                )
+                if (rules.isNotEmpty()) {
+                    Text(
+                        rules.joinToString(" · "),
+                        style = NfType.meta,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SlotActionRow(
+    slot: String,
+    slotMeta: dev.ninfenz.mobile.model.SpecSlot?,
+    inputs: Map<String, String>,
+    onInputsChange: (Map<String, String>) -> Unit,
+    onPaste: (String) -> Unit,
+    onOpenPicker: (String) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(top = NfSpacing.xs),
+        horizontalArrangement = Arrangement.End
+    ) {
+        slotMeta?.examples?.firstOrNull()?.let { example ->
+            TextButton(onClick = { onInputsChange(inputs + (slot to example)) }) {
+                Text(stringResource(dev.ninfenz.mobile.R.string.delivery_slot_example))
+            }
+        }
+        if ((inputs[slot] ?: "").isNotBlank()) {
+            TextButton(onClick = { onInputsChange(inputs - slot) }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_slot_clear)) }
+        }
+        TextButton(onClick = { onPaste(slot) }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_slot_paste)) }
+        TextButton(onClick = { onOpenPicker(slot) }) { Text(stringResource(dev.ninfenz.mobile.R.string.action_import)) }
+    }
+}
+
+@Composable
+private fun SlotEditorField(
+    slot: String,
+    slotMeta: dev.ninfenz.mobile.model.SpecSlot?,
+    inputs: Map<String, String>,
+    onInputsChange: (Map<String, String>) -> Unit,
+    lastSlot: Boolean
+) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
+    OutlinedTextField(
+        value = inputs[slot] ?: "",
+        onValueChange = { value ->
+            val clean = SlotInput.sanitize(slotMeta?.kind, value)
+            val limited = slotMeta?.maxChars?.let { clean.take(it) } ?: clean
+            onInputsChange(inputs + (slot to limited))
+        },
+        singleLine = false,
+        minLines = 2,
+        maxLines = 6,
+        keyboardOptions = KeyboardOptions(
+            keyboardType = when (slotMeta?.kind) {
+                "number", "int", "integer" -> KeyboardType.Number
+                "decimal", "float" -> KeyboardType.Decimal
+                else -> KeyboardType.Text
+            },
+            imeAction = if (lastSlot) ImeAction.Done else ImeAction.Next
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = { focusManager.clearFocus() },
+            onNext = { focusManager.moveFocus(FocusDirection.Down) }
+        ),
+        placeholder = { Text(slotMeta?.examples?.firstOrNull().orEmpty(), maxLines = 2) },
+        textStyle = if (slotMeta?.kind == "code" || slotMeta?.kind == "json") {
+            NfType.secondary.copy(fontFamily = FontFamily.Monospace)
+        } else {
+            NfType.secondary
+        },
+        supportingText = {
+            val issue = slotIssue(context, slotMeta, inputs[slot].orEmpty())
+            if (issue != null) {
+                Text(issue, color = MaterialTheme.colorScheme.error)
+            } else {
+                Text(pluralStringResource(dev.ninfenz.mobile.R.plurals.delivery_slot_chars, (inputs[slot] ?: "").length, (inputs[slot] ?: "").length))
+            }
+        },
+        modifier = Modifier.fillMaxWidth().semantics {
+            contentDescription = slot + " " + (slotMeta?.name ?: "")
+        }
+    )
+}
+
 @Composable
 @OptIn(ExperimentalLayoutApi::class)
 fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpenPacks: () -> Unit = onBack, onPatch: () -> Unit = {}, onStatusChanged: () -> Unit = {}) {
@@ -624,8 +1762,512 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
         artifacts?.let { runCatching { SpecModel.parse(it.specJson) }.orNullLogged("DeliveryScreen") }
     }
     val constraintConflicts = remember(specMeta) { dev.ninfenz.mobile.model.SpecConstraintAudit.conflicts(specMeta?.slots.orEmpty()) }
+
+    fun fillTemplateSlots() {
+        val parsed = parsedTemplateSlots
+        val next = inputs.toMutableMap()
+        var filled = 0
+        parsed.forEach { (id, value) ->
+            if (!next[id].isNullOrBlank() || requireNotNull(plan).slots.none { it == id }) return@forEach
+            val meta = specMeta?.slots?.firstOrNull { it.id == id }
+            if (!templateValueAllowed(meta, value)) return@forEach
+            next[id] = dev.ninfenz.mobile.model.SlotInput.sanitize(meta?.kind, value)
+            filled++
+        }
+        inputs = next
+        android.widget.Toast.makeText(
+            context,
+            context.resources.getQuantityString(dev.ninfenz.mobile.R.plurals.delivery_template_filled, filled, filled),
+            android.widget.Toast.LENGTH_SHORT
+        ).show()
+    }
+
+    fun assemblePayloadOf(raw: JsonObject, current: AuthorArtifacts): JsonObject = buildJsonObject {
+        put("plan", raw)
+        put("spec", current.specJson)
+        put("inputs", buildJsonObject { for ((k, v) in inputs) put(k, v) })
+    }
+
+    suspend fun advanceStatus(target: ProjectStatus, assembly: AssemblyArtifact? = null, allowAuditSkip: Boolean = false) {
+        when (val advanced = statusStore.advance(project, target, assembly, allowAuditSkip)) {
+            is StatusAdvanceResult.Advanced -> {
+                status = advanced.to
+                statusNote = context.getString(dev.ninfenz.mobile.R.string.delivery_status_note, statusText(context, advanced.to))
+                onStatusChanged()
+            }
+            is StatusAdvanceResult.Failure -> statusNote = context.getString(dev.ninfenz.mobile.R.string.delivery_status_fail, advanced.message)
+        }
+    }
+
+    suspend fun assembleRepro(md: String, payload: JsonObject) {
+        val second = safeCall("assemble", payload)
+        val secondMd = second.resultObject()?.let { J.optString(it, "markdown") }
+        if (second.ok && !secondMd.isNullOrBlank()) {
+            val offset = dev.ninfenz.mobile.data.ReproChecker.firstDifference(
+                md.toByteArray(Charsets.UTF_8),
+                secondMd.toByteArray(Charsets.UTF_8)
+            )
+            reproOk = offset == null
+            reproText = if (offset == null) {
+                context.getString(dev.ninfenz.mobile.R.string.repro_stable)
+            } else {
+                context.getString(dev.ninfenz.mobile.R.string.repro_diff, offset)
+            }
+        }
+    }
+
+    fun parseReport(result: JsonObject) {
+        try {
+            report = ReportModel.parse(result)
+        } catch (t: Throwable) {
+            error = CoreResponse.failure(
+                "NF-VAL-001",
+                context.getString(dev.ninfenz.mobile.R.string.delivery_report_failed, t.message ?: t.javaClass.simpleName),
+                context.getString(dev.ninfenz.mobile.R.string.delivery_report_failed_fix),
+                1
+            ).error
+        }
+    }
+
+    suspend fun validateForAssemble(md: String, raw: JsonObject, current: AuthorArtifacts) {
+        val validatePayload = buildJsonObject {
+            put("markdown", md)
+            put("spec", current.specJson)
+            put("plan", raw)
+            put("level", "L1")
+        }
+        val response = safeCall("validate", validatePayload)
+        val result = response.resultObject()
+        if (response.ok && result != null) {
+            val second = safeCall("validate", validatePayload)
+            val secondResult = second.resultObject()
+            if (second.ok && secondResult != null) {
+                val offset = dev.ninfenz.mobile.data.ReproChecker.firstDifference(
+                    result.toString().toByteArray(Charsets.UTF_8),
+                    secondResult.toString().toByteArray(Charsets.UTF_8)
+                )
+                validateRepro = if (offset == null) {
+                    context.getString(dev.ninfenz.mobile.R.string.repro_stable)
+                } else {
+                    context.getString(dev.ninfenz.mobile.R.string.repro_diff, offset)
+                }
+            }
+        }
+        if (result != null) parseReport(result)
+        if (!response.ok) error = response.error
+        if (report?.verdict == "pass") {
+            needsRevalidate = false
+            advanceStatus(ProjectStatus.VALIDATED)
+        }
+    }
+
+    suspend fun runAssemble(raw: JsonObject, current: AuthorArtifacts) {
+        val payload = assemblePayloadOf(raw, current)
+        val response = safeCall("assemble", payload)
+        val result = response.resultObject()
+        val md = result?.let { J.optString(it, "markdown") }
+        if (response.ok && !md.isNullOrBlank()) {
+            assembleRepro(md, payload)
+            markdown = md
+            versionStore.save(project.id, md)
+            report = null
+            needsRevalidate = false
+            advanceStatus(ProjectStatus.ASSEMBLED, AssemblyArtifact(md.toByteArray(Charsets.UTF_8)))
+            validateForAssemble(md, raw, current)
+        } else {
+            error = response.error ?: CoreResponse.failure(
+                "NF-ASM-002",
+                context.getString(dev.ninfenz.mobile.R.string.delivery_no_markdown),
+                context.getString(dev.ninfenz.mobile.R.string.delivery_no_markdown_fix),
+                1
+            ).error
+        }
+        busy = false
+    }
+
+    fun startAssemble(current: AuthorArtifacts) {
+        val raw = rawPlan ?: return
+        busy = true
+        error = null
+        markdown = null
+        report = null
+        exportedFile = null
+        exportVerify = null
+        manifestText = null
+        scope.launch { runAssemble(raw, current) }
+    }
+
+    suspend fun runValidate(md: String, raw: JsonObject, current: AuthorArtifacts) {
+        val validatePayload = buildJsonObject {
+            put("markdown", md)
+            put("spec", current.specJson)
+            put("plan", raw)
+            put("level", "L1")
+        }
+        val response = safeCall("validate", validatePayload)
+        val result = response.resultObject()
+        if (response.ok && result != null) {
+            val second = safeCall("validate", validatePayload)
+            val secondResult = second.resultObject()
+            if (second.ok && secondResult != null) {
+                val offset = dev.ninfenz.mobile.data.ReproChecker.firstDifference(
+                    result.toString().toByteArray(Charsets.UTF_8),
+                    secondResult.toString().toByteArray(Charsets.UTF_8)
+                )
+                validateRepro = if (offset == null) {
+                    context.getString(dev.ninfenz.mobile.R.string.repro_stable)
+                } else {
+                    context.getString(dev.ninfenz.mobile.R.string.repro_diff, offset)
+                }
+            }
+        }
+        if (result != null) parseReport(result)
+        if (!response.ok) error = response.error
+        if (report?.verdict == "pass") advanceStatus(ProjectStatus.VALIDATED)
+        busy = false
+    }
+
+    fun startValidate(current: AuthorArtifacts) {
+        val md = markdown ?: return
+        val raw = rawPlan ?: return
+        busy = true
+        error = null
+        scope.launch { runValidate(md, raw, current) }
+    }
+
+    fun shareFixPrompt(r: ValidateReport) {
+        val md = markdown ?: return
+        val prompt = CorrectionPrompt.build(md, r)
+        val intent = ShareExporter.shareMarkdown(context, "nf-fix-prompt", prompt)
+        ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.delivery_share_fix))
+    }
+
+    fun signContract(checks: List<Pair<String, Boolean>>) {
+        val at = java.time.Instant.now().toString()
+        val digest = exportedFile?.let { sha256File(it) }
+        runCatching {
+            contractStore.sign(project.id, checks.filter { it.second }.map { it.first }, at, digest)
+        }.onFailure { statusNote = it.message ?: it.javaClass.simpleName }
+        signoff = contractStore.load(project.id)
+    }
+
+    fun exportPayload(md: String, dir: File, format: String): JsonObject = buildJsonObject {
+        put("markdown", md)
+        put("format", format)
+        put("out_dir", dir.absolutePath)
+        put("manifest", true)
+        put("title", project.title)
+        put("project_id", project.id)
+        if (format == "docx") {
+            docxStyles?.let { put("docx_styles", it) }
+            docxSectPr?.let { put("docx_sect_pr", it) }
+            docxTheme?.let { put("docx_theme", it) }
+            docxNumbering?.let { put("docx_numbering", it) }
+            docxHeader?.let { put("docx_header", it) }
+            docxFooter?.let { put("docx_footer", it) }
+        }
+    }
+
+    suspend fun exportViaCore(md: String, dir: File, format: String, failures: MutableList<String>, fallbackName: String): File? =
+        runCatching {
+            val response = safeCall("export", exportPayload(md, dir, format))
+            if (!response.ok) throw IllegalStateException(response.error?.message ?: "export failed")
+            val raw = response.resultObject()?.get("files")?.toString().orEmpty()
+            val name = Regex("\"name\":\"([^\"]+)\"").find(raw)?.groupValues?.getOrNull(1) ?: fallbackName
+            File(dir, name)
+        }.onFailure { failures += format + ":" + (it.message ?: it.javaClass.simpleName) }.orNullLogged("DeliveryScreen")
+
+    suspend fun exportPreservation(md: String, dir: File, failures: MutableList<String>): File? {
+        if (!audit) return null
+        return runCatching {
+            val lineage = dev.ninfenz.mobile.data.PreservationLineageStore(context.filesDir)
+            val created = dev.ninfenz.mobile.data.PreservationExporter.export(
+                md, project.title, project.id, dir,
+                dev.ninfenz.mobile.data.PreservationOptions(
+                    dev.ninfenz.mobile.data.ContractStore(context.filesDir).raw(project.id),
+                    grant.toJson().toString(),
+                    lineage.load(project.id)
+                )
+            )
+            val reproDir = File(context.cacheDir, "repro-preserve-batch").apply { deleteRecursively(); mkdirs() }
+            val second = dev.ninfenz.mobile.data.PreservationExporter.export(
+                md, project.title, project.id, reproDir,
+                dev.ninfenz.mobile.data.PreservationOptions(
+                    dev.ninfenz.mobile.data.ContractStore(context.filesDir).raw(project.id),
+                    grant.toJson().toString(),
+                    lineage.load(project.id)
+                )
+            )
+            val reproReport = dev.ninfenz.mobile.data.ReproChecker.check(created.file, second.file)
+            reproDir.deleteRecursively()
+            if (!reproReport.stable) throw IllegalStateException("repro diff " + (reproReport.firstDiff ?: -1))
+            val digest = java.security.MessageDigest.getInstance("SHA-256")
+                .digest(created.file.readBytes())
+                .joinToString("") { "%02x".format(it.toInt() and 0xff) }
+            lineage.save(project.id, digest)
+            created.file
+        }.onFailure { failures += "preservation:" + (it.message ?: it.javaClass.simpleName) }.orNullLogged("DeliveryScreen")
+    }
+
+    fun attemptExport(failures: MutableList<String>, label: String, block: () -> File): File? =
+        try {
+            block()
+        } catch (t: Throwable) {
+            failures += label + ":" + (t.message ?: t.javaClass.simpleName)
+            null
+        }
+
+    fun afterExportAll(files: List<File>, failures: List<String>, md: String) {
+        batchFiles = files
+        specMeta?.let { spec -> fidelityResult = FidelityReconciler.fromSpec(spec, md) }
+        exportBatchNote = if (failures.isEmpty()) null else "未生成: " + failures.joinToString(",")
+        exportedFile = files.firstOrNull()
+        recordExport("batch", files.firstOrNull(), null)
+    }
+
+    suspend fun runExportAll(md: String) {
+        try {
+            val dir = File(File(context.filesDir, "exports/delivery"), "batch-" + System.currentTimeMillis()).apply { mkdirs() }
+            val failures = mutableListOf<String>()
+            val docxFile = exportViaCore(md, dir, "docx", failures, "result.docx")
+            val zipFile = exportViaCore(md, dir, "zip", failures, "result.zip")
+            val skillFile = exportViaCore(md, dir, "skill", failures, "result-skill.zip")
+            val preserveFile = exportPreservation(md, dir, failures)
+            val files = buildList {
+                add(File(dir, "result.md").apply { writeText(md, Charsets.UTF_8) })
+                docxFile?.let { add(it) }
+                zipFile?.let { add(it) }
+                skillFile?.let { add(it) }
+                preserveFile?.let { add(it) }
+                attemptExport(failures, "epub") { dev.ninfenz.mobile.data.EpubExporter.export(md, project.title, dir, epubAuthor, epubLanguage, dev.ninfenz.mobile.data.OutputNaming.resolve(selectedOutputTemplate, project.title, "epub")).file }?.let { add(it) }
+                attemptExport(failures, "html") { dev.ninfenz.mobile.data.HtmlExporter.export(md, project.title, dir, dev.ninfenz.mobile.data.OutputNaming.resolve(selectedOutputTemplate, project.title, "html")).file }?.let { add(it) }
+                attemptExport(failures, "pdf") { dev.ninfenz.mobile.data.PdfExporter.export(md, project.title, dir, pdfPageSize, pdfIncludeTitle, dev.ninfenz.mobile.data.OutputNaming.resolve(selectedOutputTemplate, project.title, "pdf")).file }?.let { add(it) }
+                attemptExport(failures, "nfdoc") { dev.ninfenz.mobile.data.NfDocExporter.export(md, project.title, project.id, dir).file }?.let { add(it) }
+            }
+            afterExportAll(files, failures, md)
+        } catch (t: Throwable) {
+            error = CoreError("NF-EXP-002", context.getString(dev.ninfenz.mobile.R.string.export_pdf_failed, t.message ?: t.javaClass.simpleName), context.getString(dev.ninfenz.mobile.R.string.export_failed_fix), null, 1)
+        } finally {
+            busy = false
+        }
+    }
+
+    fun startExportAll(md: String) {
+        busy = true
+        error = null
+        batchFiles = emptyList()
+        exportBatchNote = null
+        scope.launch { runExportAll(md) }
+    }
+
+    fun handleExportDone(format: String, file: File?, manifest: String?, report: dev.ninfenz.mobile.data.ReproChecker.Report?, exportMarkdown: String?) {
+        exportedFile = file
+        val manifestDirect = format in setOf("epub", "pdf", "html", "preserve", "nf-doc", "pdf-ua")
+        if (format == "pdf-ua") {
+            manifestText = null
+            reproOk = report?.stable
+            reproText = context.getString(dev.ninfenz.mobile.R.string.delivery_pdfua_note)
+        } else if (manifestDirect) {
+            manifestText = null
+            reproOk = report?.stable
+            reproText = report?.let { reproTextStable(it, context) }
+        } else {
+            manifestText = manifest
+            reproOk = report?.stable
+            reproText = reproTextFor(report, context)
+        }
+        recordExport(format, file, if (manifestDirect) null else manifest)
+        if (format == "docx") {
+            file?.let { exported ->
+                docxStyles?.let { applied -> docxStyleAudit = DocxStyleAudit.check(applied, exported) }
+                docxHeadingAudit = DocxHeadingAudit.check(exportMarkdown.orEmpty(), exported)
+            }
+        }
+        if (format == "md") {
+            scope.launch { advanceStatus(ProjectStatus.EXPORTED, allowAuditSkip = !audit) }
+        }
+    }
+
+    fun openStyleTemplates() {
+        styleTemplates = styleStore.list()
+        showStyleTemplates = true
+    }
+
+    fun pickStyleTemplate(template: StyleTemplateStore.StyleTemplate) {
+        if (!template.sourceFormat.equals("docx", ignoreCase = true)) return
+        docxStyles = template.stylesXml
+        docxSectPr = template.sectPr.takeIf { it.isNotBlank() }
+        docxTheme = template.themeXml.takeIf { it.isNotBlank() }
+        docxNumbering = template.numberingXml.takeIf { it.isNotBlank() }
+        showStyleTemplates = false
+    }
+
+    fun packEvidence(latest: ExportHistoryStore.Entry) {
+        val md = markdown ?: return
+        evidenceBusy = true
+        evidenceNote = null
+        scope.launch {
+            val result = dev.ninfenz.mobile.data.HardTechEvidence.pack(context, md, File(latest.path))
+            evidenceNote = result.message
+            evidenceBusy = false
+        }
+    }
+
+    fun openPreviewEditor(md: String) {
+        val parsed = MarkdownBlocks.parse(md)
+        previewBlocks = parsed
+        previewBaseline = parsed
+        previewHistory = emptyList()
+        previewRedo = emptyList()
+        previewDirty = false
+        editingPreview = true
+    }
     var deliveryMenu by remember { mutableStateOf(false) }
     var showMacros by remember { mutableStateOf(false) }
+
+    fun applyExportProfile(profile: dev.ninfenz.mobile.data.ExportProfileStore.Profile) {
+        docxStyles = profile.styles
+        docxSectPr = profile.sectPr
+        docxTheme = profile.theme
+        docxNumbering = profile.numbering
+        docxHeader = profile.header
+        docxFooter = profile.footer
+        profile.epubAuthor?.let { epubAuthor = it }
+        profile.epubLanguage?.let { epubLanguage = it }
+        profile.pdfPageSize?.let { pdfPageSize = it }
+        profile.pdfIncludeTitle?.let { pdfIncludeTitle = it }
+        showExportProfiles = false
+    }
+
+    fun removeExportProfile(profile: dev.ninfenz.mobile.data.ExportProfileStore.Profile) {
+        exportProfileStore.remove(profile.id)
+        exportProfiles = exportProfileStore.load()
+    }
+
+    fun assembleAllVariants() {
+        val raw = rawPlan ?: return
+        val specJson = artifacts?.specJson ?: return
+        busy = true
+        scope.launch {
+            var ok = 0
+            var failed = 0
+            for (variant in extensionVariants) {
+                val variantInputs = inputs.toMutableMap()
+                (variant.config["inputs"] as? JsonObject)?.forEach { (key, value) ->
+                    if (plan?.slots?.contains(key) == true) variantInputs[key] = value.jsonPrimitive.content
+                }
+                val response = runCatching {
+                    safeCall("assemble", buildJsonObject {
+                        put("plan", raw)
+                        put("spec", specJson)
+                        put("inputs", buildJsonObject { for ((k, v) in variantInputs) put(k, v) })
+                    })
+                }.orNullLogged("DeliveryScreen")
+                val md = response?.resultObject()?.let { J.optString(it, "markdown") }
+                if (response?.ok == true && !md.isNullOrBlank()) {
+                    versionStore.save(project.id, md)
+                    ok++
+                } else {
+                    failed++
+                }
+            }
+            variantNote = context.getString(dev.ninfenz.mobile.R.string.delivery_batch_assemble_done, ok, failed)
+            busy = false
+        }
+    }
+
+    fun exportVariantFormats(md: String, outDir: File, safe: String, variantId: String): Int {
+        var missing = 0
+        runCatching {
+            dev.ninfenz.mobile.data.HtmlExporter.export(md, project.title, outDir, safe + ".html")
+        }.onFailure { missing++ }
+        runCatching {
+            dev.ninfenz.mobile.data.EpubExporter.export(
+                md, project.title, outDir, epubAuthor, epubLanguage, safe + ".epub"
+            )
+        }.onFailure { missing++ }
+        runCatching {
+            dev.ninfenz.mobile.data.PdfExporter.export(
+                md, project.title, outDir, pdfPageSize, pdfIncludeTitle, safe + ".pdf"
+            )
+        }.onFailure { missing++ }
+        runCatching {
+            val doc = dev.ninfenz.mobile.model.NfDocModel.fromMarkdown(
+                project.title + " · " + variantId,
+                project.id + "/" + variantId,
+                md
+            )
+            File(outDir, safe + ".nfdoc.json").writeText(
+                dev.ninfenz.mobile.model.NfDocModel.toJson(doc).toString() + "\n",
+                Charsets.UTF_8
+            )
+        }.onFailure { missing++ }
+        return missing
+    }
+
+    fun exportAllVariants() {
+        val raw = rawPlan ?: return
+        val specJson = artifacts?.specJson ?: return
+        busy = true
+        scope.launch {
+            val outDir = File(File(context.filesDir, "exports"), "variants").apply { mkdirs() }
+            var ok = 0
+            var failed = 0
+            var missingFormats = 0
+            for (variant in extensionVariants) {
+                val variantInputs = inputs.toMutableMap()
+                (variant.config["inputs"] as? JsonObject)?.forEach { (key, value) ->
+                    if (plan?.slots?.contains(key) == true) variantInputs[key] = value.jsonPrimitive.content
+                }
+                val response = runCatching {
+                    safeCall("assemble", buildJsonObject {
+                        put("plan", raw)
+                        put("spec", specJson)
+                        put("inputs", buildJsonObject { for ((k, v) in variantInputs) put(k, v) })
+                    })
+                }.orNullLogged("DeliveryScreen")
+                val md = response?.resultObject()?.let { J.optString(it, "markdown") }
+                if (response?.ok == true && !md.isNullOrBlank()) {
+                    val safe = variant.id.replace(Regex("[^A-Za-z0-9._-]"), "_")
+                    File(outDir, safe + ".md").writeText(md, Charsets.UTF_8)
+                    missingFormats += exportVariantFormats(md, outDir, safe, variant.id)
+                    ok++
+                } else {
+                    failed++
+                }
+            }
+            val suffix = if (missingFormats > 0) {
+                context.getString(dev.ninfenz.mobile.R.string.delivery_batch_export_partial, missingFormats)
+            } else ""
+            variantNote = context.getString(dev.ninfenz.mobile.R.string.delivery_batch_export_done, ok, failed) + suffix
+            busy = false
+        }
+    }
+
+
+    fun applyVariant(variant: dev.ninfenz.mobile.data.ExtensionStore.Contribution) {
+        val objectInputs = variant.config["inputs"] as? JsonObject
+        val before = inputs
+        val next = inputs.toMutableMap()
+        var applied = 0
+        var skipped = 0
+        objectInputs?.forEach { (key, value) ->
+            val text = value.jsonPrimitive.content
+            if (plan?.slots?.contains(key) == true) {
+                next[key] = text
+                applied++
+            } else {
+                skipped++
+            }
+        }
+        if (applied > 0) {
+            batchUndo = before
+            inputs = next
+            variantNote = context.getString(dev.ninfenz.mobile.R.string.delivery_variant_applied, variant.id) +
+                if (skipped > 0) " · skipped=" + skipped else ""
+            showVariants = false
+        }
+    }
     var macroItems by remember { mutableStateOf(emptyList<MacroStore.Macro>()) }
     var macroResult by remember { mutableStateOf<MacroRunResult?>(null) }
     var macroBatchResult by remember { mutableStateOf<MacroBatchResult?>(null) }
@@ -886,1236 +2528,152 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
             }
             if (current != null) {
                 if (activeStep == 0) {
-                NfSectionHeader(
-                    stringResource(dev.ninfenz.mobile.R.string.delivery_plan),
-                    action = {
-                        TextButton(onClick = { showBrowsePlan = true }) {
-                            Text(stringResource(dev.ninfenz.mobile.R.string.delivery_browse_plan))
-                        }
-                    }
-                )
-                Button(
-                    enabled = !busy,
-                    modifier = Modifier.padding(horizontal = NfSpacing.page),
-                    onClick = { scope.launch { compilePlan(current) } }
-                ) { Text(if (busy) stringResource(dev.ninfenz.mobile.R.string.delivery_compiling) else stringResource(dev.ninfenz.mobile.R.string.delivery_compile)) }
-                plan?.let { p ->
-                    Text(
-                        stringResource(dev.ninfenz.mobile.R.string.delivery_plan_summary, p.steps.size, p.slots.size),
-                        style = NfType.meta,
-                        modifier = Modifier.padding(horizontal = NfSpacing.page)
+                    DeliveryPlanSection(
+                        plan = plan,
+                        busy = busy,
+                        constraintConflicts = constraintConflicts,
+                        onBrowsePlan = { showBrowsePlan = true },
+                        onCompile = { scope.launch { compilePlan(current) } }
                     )
-                }
-
-                if (constraintConflicts.isNotEmpty()) {
-                    NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
-                        Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
-                            Text(
-                                pluralStringResource(dev.ninfenz.mobile.R.plurals.delivery_constraint_conflict, constraintConflicts.size, constraintConflicts.size),
-                                style = NfType.itemTitle,
-                                color = MaterialTheme.colorScheme.error
-                            )
-                            constraintConflicts.take(2).forEach { conflict ->
-                                Text(
-                                    stringResource(
-                                        dev.ninfenz.mobile.R.string.delivery_constraint_conflict_detail,
-                                        conflict.joinToString(" + ") { it.id }
-                                    ),
-                                    style = NfType.meta
-                                )
-                            }
-                        }
-                    }
-                }
-
                 }
                 if (activeStep == 1) {
-                NfCollapsibleSection(
-                    title = stringResource(dev.ninfenz.mobile.R.string.delivery_slots),
-                    subtitle = plan?.let { stringResource(dev.ninfenz.mobile.R.string.delivery_plan_summary, it.steps.size, it.slots.size) },
-                    initiallyExpanded = true
-                ) {
-                    plan?.let { p ->
-                        Row(
-                            modifier = Modifier.fillMaxWidth().padding(horizontal = NfSpacing.page),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                stringResource(dev.ninfenz.mobile.R.string.delivery_slot_batch_hint),
-                                style = NfType.meta,
-                                modifier = Modifier.weight(1f)
-                            )
-                            Row {
-                                TextButton(onClick = { showConstraintLens = true }) {
-                                    Text(stringResource(dev.ninfenz.mobile.R.string.delivery_constraint_panel))
-                                }
-                                TextButton(onClick = { batchPicker.launch(arrayOf("*/*")) }) {
-                                    Text(stringResource(dev.ninfenz.mobile.R.string.delivery_slot_batch_import))
-                                }
-                                TextButton(onClick = { showPresets = true }) {
-                                    Text(stringResource(dev.ninfenz.mobile.R.string.delivery_presets))
-                                }
-                                if (extensionVariants.isNotEmpty()) {
-                                    TextButton(onClick = { showVariants = true }) {
-                                        Text(stringResource(dev.ninfenz.mobile.R.string.delivery_variants))
-                                    }
-                                }
-                                if (extensionTransforms.isNotEmpty()) {
-                                    TextButton(onClick = { showTransforms = true }) {
-                                        Text(stringResource(dev.ninfenz.mobile.R.string.delivery_transforms))
-                                    }
-                                }
-                            }
-                        }
-                        batchNote?.let {
-                            Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page))
-                        }
-                        variantNote?.let {
-                            Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page))
-                        }
-                        batchUndo?.let { snapshot ->
-                            TextButton(
-                                onClick = {
-                                    inputs = snapshot
-                                    batchUndo = null
-                                    batchNote = context.getString(dev.ninfenz.mobile.R.string.delivery_slot_batch_undo_done)
-                                },
-                                modifier = Modifier.padding(horizontal = NfSpacing.page)
-                            ) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_slot_batch_undo)) }
-                        }
-                        draftNote?.let {
-                            Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(horizontal = NfSpacing.page))
-                        }
-                    }
-                    if (plan == null) {
-                        Text(stringResource(dev.ninfenz.mobile.R.string.delivery_compile_first), style = NfType.meta, modifier = Modifier.padding(horizontal = NfSpacing.page))
-                    } else if (requireNotNull(plan).slots.isEmpty()) {
-                        Text(stringResource(dev.ninfenz.mobile.R.string.delivery_no_slots), style = NfType.meta, modifier = Modifier.padding(horizontal = NfSpacing.page))
-                    } else {
-                        fun slotVisible(meta: dev.ninfenz.mobile.model.SpecSlot?): Boolean {
-                            val cond = meta?.visibleIf ?: return true
-                            return inputs[cond.slot] == cond.equals
-                        }
-                        val requiredSlots = specMeta?.slots?.filter { it.required && slotVisible(it) }.orEmpty()
-                        val requiredFilled = requiredSlots.count { !inputs[it.id].isNullOrBlank() }
-                        if (requiredSlots.isNotEmpty()) {
-                            Text(
-                                stringResource(dev.ninfenz.mobile.R.string.delivery_required_progress, requiredFilled, requiredSlots.size),
-                                style = NfType.meta,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(horizontal = NfSpacing.page)
-                            )
-                            androidx.compose.material3.LinearProgressIndicator(
-                                progress = { requiredFilled.toFloat() / requiredSlots.size.toFloat() },
-                                modifier = Modifier.fillMaxWidth().padding(horizontal = NfSpacing.page)
-                            )
-                            val fillable = parsedTemplateSlots.count { (id, value) ->
-                                id in requireNotNull(plan).slots && inputs[id].isNullOrBlank() &&
-                                    templateValueAllowed(specMeta?.slots?.firstOrNull { it.id == id }, value)
-                            }
-                            if (fillable > 0) {
-                                TextButton(onClick = {
-                                    val parsed = parsedTemplateSlots
-                                    val next = inputs.toMutableMap()
-                                    var filled = 0
-                                    parsed.forEach { (id, value) ->
-                                        if (!next[id].isNullOrBlank() || requireNotNull(plan).slots.none { it == id }) return@forEach
-                                        val meta = specMeta?.slots?.firstOrNull { it.id == id }
-                                        if (!templateValueAllowed(meta, value)) return@forEach
-                                        next[id] = dev.ninfenz.mobile.model.SlotInput.sanitize(meta?.kind, value)
-                                        filled++
-                                    }
-                                    inputs = next
-                                    android.widget.Toast.makeText(
-                                        context,
-                                        context.resources.getQuantityString(dev.ninfenz.mobile.R.plurals.delivery_template_filled, filled, filled),
-                                        android.widget.Toast.LENGTH_SHORT
-                                    ).show()
-                                }) { Text(pluralStringResource(dev.ninfenz.mobile.R.plurals.delivery_fill_template_count, fillable, fillable)) }
-                            }
-                        }
-                        var lastSection: String? = null
-                        for (slot in requireNotNull(plan).slots) {
-                            val slotMeta = specMeta?.slots?.firstOrNull { it.id == slot }
-                            if (!slotVisible(slotMeta)) continue
-                            Column(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
-                                val sectionTitle = slotMeta?.let { meta -> specMeta?.sections?.firstOrNull { it.id == meta.section }?.title }
-                                val sectionId = slotMeta?.section
-                                if (sectionTitle != null && sectionId != null && sectionId != lastSection) {
-                                    val sectionSlots = specMeta?.sections?.firstOrNull { it.id == sectionId }?.slots.orEmpty()
-                                    val sectionFilled = sectionSlots.count { !inputs[it].isNullOrBlank() }
-                                    Text(
-                                        sectionTitle + "  " + sectionFilled + "/" + sectionSlots.size,
-                                        style = NfType.itemTitle,
-                                        color = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.semantics { heading() }
-                                    )
-                                    lastSection = sectionId
-                                }
-                                Column(modifier = Modifier.fillMaxWidth()) {
-                                    Column(modifier = Modifier.fillMaxWidth()) {
-                                        Text(slot, style = NfType.label)
-                                        slotMeta?.let {
-                                            Text(it.name, style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                            Text(
-                                                stringResource(if (it.required) dev.ninfenz.mobile.R.string.delivery_slot_required else dev.ninfenz.mobile.R.string.delivery_slot_optional),
-                                                style = NfType.meta,
-                                                color = if (it.required) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-                                            )
-                                            Text(it.kind, style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                            if (it.minChars != null || it.maxChars != null) {
-                                                Text(
-                                                    when {
-                                                        it.minChars != null && it.maxChars != null ->
-                                                            stringResource(dev.ninfenz.mobile.R.string.delivery_slot_budget, it.minChars, it.maxChars)
-                                                        it.maxChars != null ->
-                                                            stringResource(dev.ninfenz.mobile.R.string.delivery_slot_budget_max, it.maxChars)
-                                                        else ->
-                                                            stringResource(dev.ninfenz.mobile.R.string.delivery_slot_budget_min, it.minChars ?: 0)
-                                                    },
-                                                    style = NfType.meta,
-                                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                                )
-                                            }
-                                            val rules = listOfNotNull(
-                                                it.pattern?.let { pattern -> "pattern: " + pattern },
-                                                it.startsWith?.let { prefix -> "start: " + prefix },
-                                                it.endsWith?.let { suffix -> "end: " + suffix },
-                                                if (it.nonEmpty) "non-empty" else null
-                                            )
-                                            if (rules.isNotEmpty()) {
-                                                Text(
-                                                    rules.joinToString(" · "),
-                                                    style = NfType.meta,
-                                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                                )
-                                            }
-                                        }
-                                    }
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth().padding(top = NfSpacing.xs),
-                                        horizontalArrangement = Arrangement.End
-                                    ) {
-                                        slotMeta?.examples?.firstOrNull()?.let { example ->
-                                            TextButton(onClick = { inputs = inputs + (slot to example) }) {
-                                                Text(stringResource(dev.ninfenz.mobile.R.string.delivery_slot_example))
-                                            }
-                                        }
-                                        if ((inputs[slot] ?: "").isNotBlank()) {
-                                            TextButton(onClick = { inputs = inputs - slot }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_slot_clear)) }
-                                        }
-                                        TextButton(onClick = { pasteSlot(slot) }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_slot_paste)) }
-                                        TextButton(onClick = { openSlotPicker(slot) }) { Text(stringResource(dev.ninfenz.mobile.R.string.action_import)) }
-                                    }
-                                }
-                                val lastSlot = plan?.slots?.lastOrNull() == slot
-                                OutlinedTextField(
-                                    value = inputs[slot] ?: "",
-                                    onValueChange = { value ->
-                                        val clean = SlotInput.sanitize(slotMeta?.kind, value)
-                                        val limited = slotMeta?.maxChars?.let { clean.take(it) } ?: clean
-                                        inputs = inputs + (slot to limited)
-                                    },
-                                    singleLine = false,
-                                    minLines = 2,
-                                    maxLines = 6,
-                                    keyboardOptions = KeyboardOptions(
-                                        keyboardType = when (slotMeta?.kind) {
-                                            "number", "int", "integer" -> KeyboardType.Number
-                                            "decimal", "float" -> KeyboardType.Decimal
-                                            else -> KeyboardType.Text
-                                        },
-                                        imeAction = if (lastSlot) ImeAction.Done else ImeAction.Next
-                                    ),
-                                    keyboardActions = KeyboardActions(
-                                        onDone = { focusManager.clearFocus() },
-                                        onNext = { focusManager.moveFocus(FocusDirection.Down) }
-                                    ),
-                                    placeholder = { Text(slotMeta?.examples?.firstOrNull().orEmpty(), maxLines = 2) },
-                                    textStyle = if (slotMeta?.kind == "code" || slotMeta?.kind == "json") {
-                                        NfType.secondary.copy(fontFamily = FontFamily.Monospace)
-                                    } else {
-                                        NfType.secondary
-                                    },
-                                    supportingText = {
-                                        val issue = slotIssue(context, slotMeta, inputs[slot].orEmpty())
-                                        if (issue != null) {
-                                            Text(issue, color = MaterialTheme.colorScheme.error)
-                                        } else {
-                                            Text(pluralStringResource(dev.ninfenz.mobile.R.plurals.delivery_slot_chars, (inputs[slot] ?: "").length, (inputs[slot] ?: "").length))
-                                        }
-                                    },
-                                    modifier = Modifier.fillMaxWidth().semantics {
-                                        contentDescription = slot + " " + (slotMeta?.name ?: "")
-                                    }
-                                )
-                            }
-                        }
-                    }
-                }
-
+                    DeliverySlotsSection(
+                        DeliverySlotsArgs(
+                            plan = plan,
+                            specMeta = specMeta,
+                            inputs = inputs,
+                            parsedTemplateSlots = parsedTemplateSlots,
+                            batchNote = batchNote,
+                            variantNote = variantNote,
+                            draftNote = draftNote,
+                            batchUndo = batchUndo,
+                            hasVariants = extensionVariants.isNotEmpty(),
+                            hasTransforms = extensionTransforms.isNotEmpty(),
+                            onShowConstraintLens = { showConstraintLens = true },
+                            onBatchImport = { batchPicker.launch(arrayOf("*/*")) },
+                            onShowPresets = { showPresets = true },
+                            onShowVariants = { showVariants = true },
+                            onShowTransforms = { showTransforms = true },
+                            onUndoBatch = { snapshot ->
+                                inputs = snapshot
+                                batchUndo = null
+                                batchNote = context.getString(dev.ninfenz.mobile.R.string.delivery_slot_batch_undo_done)
+                            },
+                            onInputsChange = { inputs = it },
+                            onPaste = { pasteSlot(it) },
+                            onOpenPicker = { openSlotPicker(it) },
+                            onFillTemplate = { fillTemplateSlots() }
+                        )
+                    )
                 }
                 if (audit && activeStep == 2) {
-                if (needsRevalidate) {
-                    NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
-                        Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
-                            Text(stringResource(dev.ninfenz.mobile.R.string.delivery_dirty_title), style = NfType.itemTitle, color = MaterialTheme.colorScheme.error)
-                            Text(stringResource(dev.ninfenz.mobile.R.string.delivery_dirty_body), style = NfType.meta)
-                        }
-                    }
-                }
-                NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.delivery_assemble_validate))
-                FlowRow(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
-                    Button(
-                        enabled = !busy && rawPlan != null && missingRequired.isEmpty() && oversizedSlots.isEmpty() && constraintViolations.isEmpty(),
-                        modifier = Modifier.bringIntoViewRequester(assembleRequester),
-                        onClick = {
-                            val raw = rawPlan ?: return@Button
-                            busy = true
-                            error = null
-                            markdown = null
-                            report = null
-                            exportedFile = null
-                            exportVerify = null
-                            manifestText = null
-                            scope.launch {
-                                val assemblePayload = buildJsonObject {
-                                    put("plan", raw)
-                                    put("spec", current.specJson)
-                                    put("inputs", buildJsonObject { for ((k, v) in inputs) put(k, v) })
-                                }
-                                val response = safeCall("assemble", assemblePayload)
-                                val result = response.resultObject()
-                                val md = result?.let { J.optString(it, "markdown") }
-                                if (response.ok && !md.isNullOrBlank()) {
-                                    val second = safeCall("assemble", assemblePayload)
-                                    val secondMd = second.resultObject()?.let { J.optString(it, "markdown") }
-                                    if (second.ok && !secondMd.isNullOrBlank()) {
-                                        val offset = dev.ninfenz.mobile.data.ReproChecker.firstDifference(
-                                            md.toByteArray(Charsets.UTF_8),
-                                            secondMd.toByteArray(Charsets.UTF_8)
-                                        )
-                                        reproOk = offset == null
-                                        reproText = if (offset == null) {
-                                            context.getString(dev.ninfenz.mobile.R.string.repro_stable)
-                                        } else {
-                                            context.getString(dev.ninfenz.mobile.R.string.repro_diff, offset)
-                                        }
-                                    }
-                                    markdown = md
-                                    versionStore.save(project.id, md)
-                                    report = null
-                                    needsRevalidate = false
-                                    when (val advanced = statusStore.advance(project, ProjectStatus.ASSEMBLED, AssemblyArtifact(md.toByteArray(Charsets.UTF_8)))) {
-                                        is StatusAdvanceResult.Advanced -> {
-                                            status = advanced.to
-                                            statusNote = context.getString(dev.ninfenz.mobile.R.string.delivery_status_note, statusText(context, advanced.to))
-                                            onStatusChanged()
-                                        }
-                                        is StatusAdvanceResult.Failure -> statusNote = context.getString(dev.ninfenz.mobile.R.string.delivery_status_fail, advanced.message)
-                                    }
-                                    val validatePayload = buildJsonObject {
-                                        put("markdown", md)
-                                        put("spec", current.specJson)
-                                        put("plan", raw)
-                                        put("level", "L1")
-                                    }
-                                    val validateResponse = safeCall("validate", validatePayload)
-                                    val validateResult = validateResponse.resultObject()
-                                    if (validateResponse.ok && validateResult != null) {
-                                        val second = safeCall("validate", validatePayload)
-                                        val secondResult = second.resultObject()
-                                        if (second.ok && secondResult != null) {
-                                            val offset = dev.ninfenz.mobile.data.ReproChecker.firstDifference(
-                                                validateResult.toString().toByteArray(Charsets.UTF_8),
-                                                secondResult.toString().toByteArray(Charsets.UTF_8)
-                                            )
-                                            validateRepro = if (offset == null) {
-                                                context.getString(dev.ninfenz.mobile.R.string.repro_stable)
-                                            } else {
-                                                context.getString(dev.ninfenz.mobile.R.string.repro_diff, offset)
-                                            }
-                                        }
-                                    }
-                                    if (validateResult != null) {
-                                        try {
-                                            report = ReportModel.parse(validateResult)
-                                        } catch (t: Throwable) {
-                                            error = CoreResponse.failure(
-                                                "NF-VAL-001",
-                                                context.getString(dev.ninfenz.mobile.R.string.delivery_report_failed, t.message ?: t.javaClass.simpleName),
-                                                context.getString(dev.ninfenz.mobile.R.string.delivery_report_failed_fix),
-                                                1
-                                            ).error
-                                        }
-                                    }
-                                    if (!validateResponse.ok) error = validateResponse.error
-                                    if (report?.verdict == "pass") {
-                                        needsRevalidate = false
-                                        when (val advanced = statusStore.advance(project, ProjectStatus.VALIDATED)) {
-                                            is StatusAdvanceResult.Advanced -> {
-                                                status = advanced.to
-                                                statusNote = context.getString(dev.ninfenz.mobile.R.string.delivery_status_note, statusText(context, advanced.to))
-                                                onStatusChanged()
-                                            }
-                                            is StatusAdvanceResult.Failure -> statusNote = context.getString(dev.ninfenz.mobile.R.string.delivery_status_fail, advanced.message)
-                                        }
-                                    }
-                                } else {
-                                    error = response.error ?: CoreResponse.failure(
-                                        "NF-ASM-002",
-                                        context.getString(dev.ninfenz.mobile.R.string.delivery_no_markdown),
-                                        context.getString(dev.ninfenz.mobile.R.string.delivery_no_markdown_fix),
-                                        1
-                                    ).error
-                                }
-                                busy = false
-                            }
-                        }
-                    ) { Text(if (busy) stringResource(dev.ninfenz.mobile.R.string.delivery_assembling) else stringResource(dev.ninfenz.mobile.R.string.delivery_assemble)) }
-                    if (constraintViolations.isNotEmpty()) {
-                        Text(
-                            stringResource(dev.ninfenz.mobile.R.string.delivery_slot_constraint, constraintViolations.joinToString(", ")),
-                            style = NfType.meta,
-                            color = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.padding(horizontal = NfSpacing.page)
+                    DeliveryAssembleSection(
+                        DeliveryAssembleArgs(
+                            needsRevalidate = needsRevalidate,
+                            busy = busy,
+                            canAssemble = !busy && rawPlan != null && missingRequired.isEmpty() && oversizedSlots.isEmpty() && constraintViolations.isEmpty(),
+                            canValidate = !busy && markdown != null && rawPlan != null,
+                            missingRequired = missingRequired,
+                            oversizedSlots = oversizedSlots,
+                            constraintViolations = constraintViolations,
+                            markdown = markdown,
+                            exportMarkdown = exportMarkdown,
+                            report = report,
+                            validateRepro = validateRepro,
+                            signoff = signoff,
+                            exportedFile = exportedFile,
+                            plan = plan,
+                            specMeta = specMeta,
+                            inputs = inputs,
+                            assembleRequester = assembleRequester,
+                            validateRequester = validateRequester,
+                            onAssemble = { startAssemble(current) },
+                            onValidate = { startValidate(current) },
+                            onShareFix = { r -> shareFixPrompt(r) },
+                            onSign = { checks -> signContract(checks) },
+                            onGoValidate = { scope.launch { validateRequester.bringIntoView() } }
                         )
-                    }
-                    if (oversizedSlots.isNotEmpty()) {
-                        Text(
-                            stringResource(dev.ninfenz.mobile.R.string.delivery_slot_over_budget, oversizedSlots.joinToString(", ")),
-                            style = NfType.meta,
-                            color = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.padding(horizontal = NfSpacing.page)
-                        )
-                    }
-                    if (missingRequired.isNotEmpty()) {
-                        Text(
-                            stringResource(dev.ninfenz.mobile.R.string.delivery_missing_required, missingRequired.joinToString(", ")),
-                            style = NfType.meta,
-                            color = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.padding(horizontal = NfSpacing.page)
-                        )
-                    }
-                    Button(
-                        enabled = !busy && markdown != null && rawPlan != null,
-                        modifier = Modifier.bringIntoViewRequester(validateRequester),
-                        onClick = {
-                            val md = markdown ?: return@Button
-                            val raw = rawPlan ?: return@Button
-                            busy = true
-                            error = null
-                            scope.launch {
-                                val validatePayload = buildJsonObject {
-                                    put("markdown", md)
-                                    put("spec", current.specJson)
-                                    put("plan", raw)
-                                    put("level", "L1")
-                                }
-                                val response = safeCall("validate", validatePayload)
-                                val result = response.resultObject()
-                                if (response.ok && result != null) {
-                                    val second = safeCall("validate", validatePayload)
-                                    val secondResult = second.resultObject()
-                                    if (second.ok && secondResult != null) {
-                                        val offset = dev.ninfenz.mobile.data.ReproChecker.firstDifference(
-                                            result.toString().toByteArray(Charsets.UTF_8),
-                                            secondResult.toString().toByteArray(Charsets.UTF_8)
-                                        )
-                                        validateRepro = if (offset == null) {
-                                            context.getString(dev.ninfenz.mobile.R.string.repro_stable)
-                                        } else {
-                                            context.getString(dev.ninfenz.mobile.R.string.repro_diff, offset)
-                                        }
-                                    }
-                                }
-                                if (result != null) {
-                                    try {
-                                        report = ReportModel.parse(result)
-                                    } catch (t: Throwable) {
-                                        error = CoreResponse.failure(
-                                            "NF-VAL-001",
-                                            context.getString(dev.ninfenz.mobile.R.string.delivery_report_failed, t.message ?: t.javaClass.simpleName),
-                                            context.getString(dev.ninfenz.mobile.R.string.delivery_report_failed_fix),
-                                            1
-                                        ).error
-                                    }
-                                }
-                                if (!response.ok) error = response.error
-                                if (report?.verdict == "pass") {
-                                    when (val advanced = statusStore.advance(project, ProjectStatus.VALIDATED)) {
-                                        is StatusAdvanceResult.Advanced -> {
-                                            status = advanced.to
-                                            statusNote = context.getString(dev.ninfenz.mobile.R.string.delivery_status_note, statusText(context, advanced.to))
-                                            onStatusChanged()
-                                        }
-                                        is StatusAdvanceResult.Failure -> statusNote = context.getString(dev.ninfenz.mobile.R.string.delivery_status_fail, advanced.message)
-                                    }
-                                }
-                                busy = false
-                            }
-                        }
-                    ) { Text(if (busy) stringResource(dev.ninfenz.mobile.R.string.delivery_validating) else stringResource(dev.ninfenz.mobile.R.string.delivery_validate)) }
-                }
-                report?.let { r ->
-                    Text(ReportModel.line(r), style = NfType.secondary, modifier = Modifier.padding(horizontal = NfSpacing.page))
-                    validateRepro?.let {
-                        Text(it, style = NfType.meta, modifier = Modifier.padding(horizontal = NfSpacing.page))
-                    }
-                    if (r.issues.isNotEmpty() && markdown != null) {
-                        TextButton(onClick = {
-                            val prompt = CorrectionPrompt.build(requireNotNull(markdown), r)
-                            val intent = ShareExporter.shareMarkdown(context, "nf-fix-prompt", prompt)
-                            ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.delivery_share_fix))
-                        }, modifier = Modifier.padding(horizontal = NfSpacing.page)) {
-                            Text(stringResource(dev.ninfenz.mobile.R.string.delivery_share_fix))
-                        }
-                    }
-                    for (issue in r.issues.take(20)) {
-                        Text(
-                            issue.code + " " + (issue.path ?: "-") + "：" + issue.message + context.getString(dev.ninfenz.mobile.R.string.error_fix_suffix) + issue.fix,
-                            style = NfType.meta,
-                            color = if (issue.severity == "error") MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(horizontal = NfSpacing.page)
-                        )
-                    }
-                }
-
-                if (report?.verdict == "pass" && markdown != null) {
-                    val requiredSlots = plan?.slots?.filter { id ->
-                        specMeta?.slots?.firstOrNull { it.id == id }?.required == true
-                    }.orEmpty()
-                    val slotsFilled = requiredSlots.isEmpty() || requiredSlots.all { inputs[it].orEmpty().isNotBlank() }
-                    val checks = listOf(
-                        stringResource(dev.ninfenz.mobile.R.string.contract_l1) to true,
-                        stringResource(dev.ninfenz.mobile.R.string.contract_slots) to slotsFilled,
-                        stringResource(dev.ninfenz.mobile.R.string.contract_export) to (exportedFile != null)
                     )
-                    Column(Modifier.padding(horizontal = NfSpacing.page, vertical = NfSpacing.s), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
-                        Text(stringResource(dev.ninfenz.mobile.R.string.contract_title), style = NfType.itemTitle)
-                        checks.forEach { (label, ok) ->
-                            Text((if (ok) "✓ " else "✗ ") + label, style = NfType.meta, color = if (ok) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error)
-                        }
-                        val signed = signoff
-                        val currentDigest = exportedFile?.let { sha256File(it) }
-                        val stale = signed != null && (signed.artifactSha256 == null || signed.artifactSha256 != currentDigest)
-                        if (signed != null && !stale) {
-                            Text(stringResource(dev.ninfenz.mobile.R.string.contract_signed, signed.signedAt), style = NfType.meta)
-                            signed.artifactSha256?.let { Text(stringResource(dev.ninfenz.mobile.R.string.contract_artifact, it), style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant) }
-                            signed.keyFingerprint?.let { Text(stringResource(dev.ninfenz.mobile.R.string.contract_key, it.take(16)), style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant) }
-                        } else {
-                            if (stale) {
-                                Text(stringResource(dev.ninfenz.mobile.R.string.contract_stale), style = NfType.meta, color = MaterialTheme.colorScheme.error)
-                            }
-                            Button(
-                                enabled = checks.all { it.second },
-                                onClick = {
-                                    val at = java.time.Instant.now().toString()
-                                    val digest = exportedFile?.let { sha256File(it) }
-                                    runCatching {
-                                        contractStore.sign(project.id, checks.filter { it.second }.map { it.first }, at, digest)
-                                    }.onFailure { statusNote = it.message ?: it.javaClass.simpleName }
-                                    signoff = contractStore.load(project.id)
-                                }
-                            ) { Text(stringResource(dev.ninfenz.mobile.R.string.contract_sign)) }
-                            if (!checks.all { it.second }) {
-                                Text(stringResource(dev.ninfenz.mobile.R.string.contract_blocked), style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            }
-                        }
-                    }
-                }
-                if (markdown != null && exportMarkdown == null) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(horizontal = NfSpacing.page)
-                    ) {
-                        Text(
-                            stringResource(dev.ninfenz.mobile.R.string.delivery_export_blocked),
-                            style = NfType.meta,
-                            color = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.weight(1f)
-                        )
-                        TextButton(onClick = { scope.launch { validateRequester.bringIntoView() } }) {
-                            Text(stringResource(dev.ninfenz.mobile.R.string.delivery_go_validate))
-                        }
-                    }
-                }
                 }
                 if (activeStep == 3) {
-                NfCollapsibleSection(title = stringResource(dev.ninfenz.mobile.R.string.delivery_export_section), initiallyExpanded = true) {
-                val summary = buildList {
-                    add(stringResource(if (markdown != null) dev.ninfenz.mobile.R.string.delivery_summary_assembled else dev.ninfenz.mobile.R.string.delivery_summary_unassembled))
-                    if (audit) add(stringResource(if (report?.verdict == "pass") dev.ninfenz.mobile.R.string.delivery_summary_validated else dev.ninfenz.mobile.R.string.delivery_summary_unvalidated))
-                    add(stringResource(if (exportedFile != null) dev.ninfenz.mobile.R.string.delivery_summary_exported else dev.ninfenz.mobile.R.string.delivery_summary_unexported))
-                }.joinToString(" · ")
-                Text(summary, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page))
-                Text(stringResource(dev.ninfenz.mobile.R.string.delivery_export_group_docs), style = NfType.label, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(start = NfSpacing.page, end = NfSpacing.page, top = NfSpacing.s))
-                OutlinedButton(
-                    enabled = exportMarkdown != null && !busy && !contractUnsatisfiable,
-                    onClick = {
-                        val md = exportMarkdown ?: return@OutlinedButton
-                        busy = true
-                        error = null
-                        batchFiles = emptyList()
-                        exportBatchNote = null
-                        scope.launch {
-                            try {
-                                val dir = File(File(context.filesDir, "exports/delivery"), "batch-" + System.currentTimeMillis()).apply { mkdirs() }
-                                val failures = mutableListOf<String>()
-                                val docxFile = runCatching {
-                                    val payload = buildJsonObject {
-                                        put("markdown", md)
-                                        put("format", "docx")
-                                        put("out_dir", dir.absolutePath)
-                                        put("manifest", true)
-                                        put("title", project.title)
-                                        put("project_id", project.id)
-                                        docxStyles?.let { put("docx_styles", it) }
-                                        docxSectPr?.let { put("docx_sect_pr", it) }
-                                        docxTheme?.let { put("docx_theme", it) }
-                                        docxNumbering?.let { put("docx_numbering", it) }
-                                        docxHeader?.let { put("docx_header", it) }
-                                        docxFooter?.let { put("docx_footer", it) }
-                                    }
-                                    val response = safeCall("export", payload)
-                                    if (!response.ok) throw IllegalStateException(response.error?.message ?: "export failed")
-                                    val raw = response.resultObject()?.get("files")?.toString().orEmpty()
-                                    val name = Regex("\"name\":\"([^\"]+)\"").find(raw)?.groupValues?.getOrNull(1) ?: "result.docx"
-                                    File(dir, name)
-                                }.onFailure { failures += "docx:" + (it.message ?: it.javaClass.simpleName) }.orNullLogged("DeliveryScreen")
-                                val zipFile = runCatching {
-                                    val payload = buildJsonObject {
-                                        put("markdown", md)
-                                        put("format", "zip")
-                                        put("out_dir", dir.absolutePath)
-                                        put("manifest", true)
-                                        put("title", project.title)
-                                        put("project_id", project.id)
-                                    }
-                                    val response = safeCall("export", payload)
-                                    if (!response.ok) throw IllegalStateException(response.error?.message ?: "export failed")
-                                    val raw = response.resultObject()?.get("files")?.toString().orEmpty()
-                                    val name = Regex("\"name\":\"([^\"]+)\"").find(raw)?.groupValues?.getOrNull(1) ?: "result.zip"
-                                    File(dir, name)
-                                }.onFailure { failures += "zip:" + (it.message ?: it.javaClass.simpleName) }.orNullLogged("DeliveryScreen")
-                                val skillFile = runCatching {
-                                    val payload = buildJsonObject {
-                                        put("markdown", md)
-                                        put("format", "skill")
-                                        put("out_dir", dir.absolutePath)
-                                        put("manifest", true)
-                                        put("title", project.title)
-                                        put("project_id", project.id)
-                                    }
-                                    val response = safeCall("export", payload)
-                                    if (!response.ok) throw IllegalStateException(response.error?.message ?: "export failed")
-                                    val raw = response.resultObject()?.get("files")?.toString().orEmpty()
-                                    val name = Regex("\"name\":\"([^\"]+)\"").find(raw)?.groupValues?.getOrNull(1) ?: "result-skill.zip"
-                                    File(dir, name)
-                                }.onFailure { failures += "skill:" + (it.message ?: it.javaClass.simpleName) }.orNullLogged("DeliveryScreen")
-                                val preserveFile = if (!audit) null else runCatching {
-                                    val lineage = dev.ninfenz.mobile.data.PreservationLineageStore(context.filesDir)
-                                    val created = dev.ninfenz.mobile.data.PreservationExporter.export(
-                                        md, project.title, project.id, dir,
-                                        dev.ninfenz.mobile.data.PreservationOptions(
-                                            dev.ninfenz.mobile.data.ContractStore(context.filesDir).raw(project.id),
-                                            grant.toJson().toString(),
-                                            lineage.load(project.id)
-                                        )
-                                    )
-                                    val reproDir = File(context.cacheDir, "repro-preserve-batch").apply { deleteRecursively(); mkdirs() }
-                                    val second = dev.ninfenz.mobile.data.PreservationExporter.export(
-                                        md, project.title, project.id, reproDir,
-                                        dev.ninfenz.mobile.data.PreservationOptions(
-                                            dev.ninfenz.mobile.data.ContractStore(context.filesDir).raw(project.id),
-                                            grant.toJson().toString(),
-                                            lineage.load(project.id)
-                                        )
-                                    )
-                                    val report = dev.ninfenz.mobile.data.ReproChecker.check(created.file, second.file)
-                                    reproDir.deleteRecursively()
-                                    if (!report.stable) throw IllegalStateException("repro diff " + (report.firstDiff ?: -1))
-                                    val digest = java.security.MessageDigest.getInstance("SHA-256")
-                                        .digest(created.file.readBytes())
-                                        .joinToString("") { "%02x".format(it.toInt() and 0xff) }
-                                    lineage.save(project.id, digest)
-                                    created.file
-                                }.onFailure { failures += "preservation:" + (it.message ?: it.javaClass.simpleName) }.orNullLogged("DeliveryScreen")
-                                val files = buildList {
-                                    fun attempt(label: String, block: () -> File) {
-                                        runCatching { add(block()) }.onFailure { failures += label + ":" + (it.message ?: it.javaClass.simpleName) }
-                                    }
-                                    val mdFile = File(dir, "result.md").apply { writeText(md, Charsets.UTF_8) }
-                                    add(mdFile)
-                                    docxFile?.let { add(it) }
-                                    zipFile?.let { add(it) }
-                                    skillFile?.let { add(it) }
-                                    preserveFile?.let { add(it) }
-                                    attempt("epub") { dev.ninfenz.mobile.data.EpubExporter.export(md, project.title, dir, epubAuthor, epubLanguage, dev.ninfenz.mobile.data.OutputNaming.resolve(selectedOutputTemplate, project.title, "epub")).file }
-                                    attempt("html") { dev.ninfenz.mobile.data.HtmlExporter.export(md, project.title, dir, dev.ninfenz.mobile.data.OutputNaming.resolve(selectedOutputTemplate, project.title, "html")).file }
-                                    attempt("pdf") { dev.ninfenz.mobile.data.PdfExporter.export(md, project.title, dir, pdfPageSize, pdfIncludeTitle, dev.ninfenz.mobile.data.OutputNaming.resolve(selectedOutputTemplate, project.title, "pdf")).file }
-                                    attempt("nfdoc") { dev.ninfenz.mobile.data.NfDocExporter.export(md, project.title, project.id, dir).file }
-                                }
-                                batchFiles = files
-                                specMeta?.let { spec -> fidelityResult = FidelityReconciler.fromSpec(spec, md) }
-                                exportBatchNote = if (failures.isEmpty()) null else "未生成: " + failures.joinToString(",")
-                                exportedFile = files.firstOrNull()
-                                recordExport("batch", files.first(), null)
-                            } catch (t: Throwable) {
-                                error = CoreError("NF-EXP-002", context.getString(dev.ninfenz.mobile.R.string.export_pdf_failed, t.message ?: t.javaClass.simpleName), context.getString(dev.ninfenz.mobile.R.string.export_failed_fix), null, 1)
-                            } finally {
-                                busy = false
-                            }
-                        }
-                    },
-                    modifier = Modifier.padding(horizontal = NfSpacing.page)
-                ) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_export_all)) }
-                batchFiles.takeIf { it.isNotEmpty() }?.let { files ->
-                    Text(files.joinToString(" · ") { it.name }, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page))
-                }
-                exportBatchNote?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
-                FlowRow(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
-                    ExportButton(ExportButtonArgs("md", "text/markdown", exportMarkdown, project, context, scope, { busy = it }, { error = it }, exportBlocked, onDone = { file, manifest, report ->
-                        exportedFile = file
-                        manifestText = manifest
-                        reproOk = report?.stable
-                        reproText = when {
-                            report == null -> null
-                            report.stable -> context.getString(dev.ninfenz.mobile.R.string.repro_stable)
-                            else -> context.getString(dev.ninfenz.mobile.R.string.repro_diff, report.firstDiff ?: -1)
-                        }
-                        recordExport("md", file, manifest)
-                        scope.launch {
-                            when (val advanced = statusStore.advance(project, ProjectStatus.EXPORTED, allowAuditSkip = !audit)) {
-                                is StatusAdvanceResult.Advanced -> {
-                                    status = advanced.to
-                                    statusNote = context.getString(dev.ninfenz.mobile.R.string.delivery_status_note, statusText(context, advanced.to))
-                                    onStatusChanged()
-                                }
-                                is StatusAdvanceResult.Failure -> statusNote = context.getString(dev.ninfenz.mobile.R.string.delivery_status_fail, advanced.message)
-                            }
-                        }
-                    }))
-                    ExportButton(ExportButtonArgs("zip", "application/zip", exportMarkdown, project, context, scope, { busy = it }, { error = it }, exportBlocked, onDone = { file, manifest, report ->
-                        exportedFile = file
-                        manifestText = manifest
-                        reproOk = report?.stable
-                        reproText = when {
-                            report == null -> null
-                            report.stable -> context.getString(dev.ninfenz.mobile.R.string.repro_stable)
-                            else -> context.getString(dev.ninfenz.mobile.R.string.repro_diff, report.firstDiff ?: -1)
-                        }
-                        recordExport("zip", file, manifest)
-                    }))
-                    ExportButton(ExportButtonArgs("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", exportMarkdown, project, context, scope, { busy = it }, { error = it }, exportBlocked, docxStyles = docxStyles, docxSectPr = docxSectPr, docxTheme = docxTheme, docxNumbering = docxNumbering, docxHeader = docxHeader, docxFooter = docxFooter, onDone = { file, manifest, report ->
-                        exportedFile = file
-                        manifestText = manifest
-                        reproOk = report?.stable
-                        reproText = when {
-                            report == null -> null
-                            report.stable -> context.getString(dev.ninfenz.mobile.R.string.repro_stable)
-                            else -> context.getString(dev.ninfenz.mobile.R.string.repro_diff, report.firstDiff ?: -1)
-                        }
-                        recordExport("docx", file, manifest)
-                        file?.let { exported ->
-                            docxStyles?.let { applied -> docxStyleAudit = DocxStyleAudit.check(applied, exported) }
-                            docxHeadingAudit = DocxHeadingAudit.check(exportMarkdown.orEmpty(), exported)
-                        }
-                    }))
-                }
-                Text(stringResource(dev.ninfenz.mobile.R.string.delivery_export_group_data), style = NfType.label, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(start = NfSpacing.page, end = NfSpacing.page, top = NfSpacing.s))
-                FlowRow(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
-                    ExportButton(ExportButtonArgs("json", "application/json", exportMarkdown, project, context, scope, { busy = it }, { error = it }, exportBlocked, onDone = { file, manifest, report ->
-                        exportedFile = file
-                        manifestText = manifest
-                        reproOk = report?.stable
-                        reproText = when {
-                            report == null -> null
-                            report.stable -> context.getString(dev.ninfenz.mobile.R.string.repro_stable)
-                            else -> context.getString(dev.ninfenz.mobile.R.string.repro_diff, report.firstDiff ?: -1)
-                        }
-                        recordExport("json", file, manifest)
-                    }))
-                    ExportButton(ExportButtonArgs("skill", "application/zip", exportMarkdown, project, context, scope, { busy = it }, { error = it }, exportBlocked, onDone = { file, manifest, report ->
-                        exportedFile = file
-                        manifestText = manifest
-                        reproOk = report?.stable
-                        reproText = when {
-                            report == null -> null
-                            report.stable -> context.getString(dev.ninfenz.mobile.R.string.repro_stable)
-                            else -> context.getString(dev.ninfenz.mobile.R.string.repro_diff, report.firstDiff ?: -1)
-                        }
-                        recordExport("skill", file, manifest)
-                    }))
-                }
-                Text(stringResource(dev.ninfenz.mobile.R.string.delivery_export_group_reading), style = NfType.label, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(start = NfSpacing.page, end = NfSpacing.page, top = NfSpacing.s))
-                FlowRow(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
-                    EpubExportButton(EpubExportButtonArgs(exportMarkdown, project, epubAuthor, epubLanguage, context, scope, { busy = it }, { error = it }, exportBlocked, outputTemplate = selectedOutputTemplate, onDone = { file, report ->
-                        exportedFile = file
-                        manifestText = null
-                        reproOk = report.stable
-                        reproText = if (report.stable) {
-                            context.getString(dev.ninfenz.mobile.R.string.repro_stable)
-                        } else {
-                            context.getString(dev.ninfenz.mobile.R.string.repro_diff, report.firstDiff ?: -1)
-                        }
-                        recordExport("epub", file, null)
-                    }))
-                    PdfExportButton(PdfExportButtonArgs(exportMarkdown, project, pdfPageSize, pdfIncludeTitle, context, scope, { busy = it }, { error = it }, exportBlocked, outputTemplate = selectedOutputTemplate, onDone = { file, report ->
-                        exportedFile = file
-                        manifestText = null
-                        reproOk = report.stable
-                        reproText = if (report.stable) {
-                            context.getString(dev.ninfenz.mobile.R.string.repro_stable)
-                        } else {
-                            context.getString(dev.ninfenz.mobile.R.string.repro_diff, report.firstDiff ?: -1)
-                        }
-                        recordExport("pdf", file, null)
-                    }))
-                    if (audit) PdfUaExportButton(exportMarkdown, project, context, scope, { busy = it }, { error = it }, exportBlocked) { file, report ->
-                        exportedFile = file
-                        manifestText = null
-                        reproOk = report.stable
-                        reproText = context.getString(dev.ninfenz.mobile.R.string.delivery_pdfua_note)
-                        recordExport("pdf-ua", file, null)
-                    }
-                    HtmlExportButton(exportMarkdown, project, context, scope, { busy = it }, { error = it }, exportBlocked, outputTemplate = selectedOutputTemplate) { file, report ->
-                        exportedFile = file
-                        manifestText = null
-                        reproOk = report.stable
-                        reproText = if (report.stable) {
-                            context.getString(dev.ninfenz.mobile.R.string.repro_stable)
-                        } else {
-                            context.getString(dev.ninfenz.mobile.R.string.repro_diff, report.firstDiff ?: -1)
-                        }
-                        recordExport("html", file, null)
-                    }
-                }
-                FlowRow(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
-                    if (audit) PreservationExportButton(exportMarkdown, project, context, scope, { busy = it }, { error = it }, exportBlocked, grant) { file, report ->
-                        exportedFile = file
-                        manifestText = null
-                        reproOk = report.stable
-                        reproText = if (report.stable) {
-                            context.getString(dev.ninfenz.mobile.R.string.repro_stable)
-                        } else {
-                            context.getString(dev.ninfenz.mobile.R.string.repro_diff, report.firstDiff ?: -1)
-                        }
-                        recordExport("preserve", file, null)
-                    }
-                    if (audit) OutlinedButton(
-                        onClick = { showGrant = true },
-                        modifier = Modifier.padding(horizontal = NfSpacing.page)
-                    ) { Text(stringResource(dev.ninfenz.mobile.R.string.grant_button)) }
-                    NfDocExportButton(exportMarkdown, project, context, scope, { busy = it }, { error = it }, exportBlocked) { file, report ->
-                        exportedFile = file
-                        manifestText = null
-                        reproOk = report.stable
-                        reproText = if (report.stable) {
-                            context.getString(dev.ninfenz.mobile.R.string.repro_stable)
-                        } else {
-                            context.getString(dev.ninfenz.mobile.R.string.repro_diff, report.firstDiff ?: -1)
-                        }
-                        recordExport("nf-doc", file, null)
-                    }
-                }
-                FlowRow(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
-                    OutlinedButton(
-                        enabled = markdown != null && !busy,
-                        onClick = {
-                            val md = markdown ?: return@OutlinedButton
-                            val intent = ShareExporter.shareMarkdown(context, "nf-" + project.id, md)
-                            ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.delivery_share_md))
-                        }
-                    ) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_share_md)) }
-                    OutlinedButton(
-                        enabled = exportedFile != null,
-                        onClick = {
-                            val file = exportedFile ?: return@OutlinedButton
-                            val mime = when (file.extension.lowercase()) {
-                                "md" -> "text/markdown"
-                                "zip" -> "application/zip"
-                                "docx" -> "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                                else -> "application/octet-stream"
-                            }
-                            val intent = ShareExporter.shareFileIntent(context, file, mime, project.title)
-                            ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.delivery_share_file))
-                        }
-                    ) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_share_file)) }
-                }
-                Row(
-                    modifier = Modifier.padding(horizontal = NfSpacing.page),
-                    horizontalArrangement = Arrangement.spacedBy(NfSpacing.s),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    if (capabilityRevision >= 0 && CapabilityRegistry.isEnabled(Capability.STYLE)) {
-                        OutlinedButton(onClick = {
-                            referencePicker.launch(arrayOf("application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
-                        }) { Text(stringResource(dev.ninfenz.mobile.R.string.docx_reference_pick)) }
-                    }
-                    if (capabilityRevision >= 0 && CapabilityRegistry.isEnabled(Capability.STYLE)) {
-                        TextButton(onClick = {
-                            styleTemplates = styleStore.list()
-                            showStyleTemplates = true
-                        }) { Text(stringResource(dev.ninfenz.mobile.R.string.docx_style_from_library)) }
-                    }
-                    Text(
-                        stringResource(
-                            if (docxStyles != null) dev.ninfenz.mobile.R.string.docx_reference_loaded
-                            else dev.ninfenz.mobile.R.string.docx_reference_none
-                        ),
-                        style = NfType.meta
+                    DeliveryExportSection(
+                        DeliveryExportArgs(
+                            project = project,
+                            markdown = markdown,
+                            exportMarkdown = exportMarkdown,
+                            report = report,
+                            exportedFile = exportedFile,
+                            busy = busy,
+                            contractUnsatisfiable = contractUnsatisfiable,
+                            exportBlocked = exportBlocked,
+                            batchFiles = batchFiles,
+                            exportBatchNote = exportBatchNote,
+                            docxStyles = docxStyles,
+                            docxSectPr = docxSectPr,
+                            docxTheme = docxTheme,
+                            docxNumbering = docxNumbering,
+                            docxHeader = docxHeader,
+                            docxFooter = docxFooter,
+                            epubAuthor = epubAuthor,
+                            epubLanguage = epubLanguage,
+                            pdfPageSize = pdfPageSize,
+                            pdfIncludeTitle = pdfIncludeTitle,
+                            selectedOutputTemplate = selectedOutputTemplate,
+                            audit = audit,
+                            grant = grant,
+                            capabilityRevision = capabilityRevision,
+                            styleTemplates = styleTemplates,
+                            showStyleTemplates = showStyleTemplates,
+                            docxStyleAudit = docxStyleAudit,
+                            docxHeadingAudit = docxHeadingAudit,
+                            outputRuleNote = outputRuleNote,
+                            exportNotice = exportNotice,
+                            exportEntries = exportEntries,
+                            manifestText = manifestText,
+                            exportVerify = exportVerify,
+                            reproText = reproText,
+                            reproOk = reproOk,
+                            recentExpanded = recentExpanded,
+                            evidenceBusy = evidenceBusy,
+                            evidenceNote = evidenceNote,
+                            scope = scope,
+                            onBusy = { busy = it },
+                            onError = { error = it },
+                            onExportAll = { exportMarkdown?.let { md -> startExportAll(md) } },
+                            onExportDone = { format, file, manifest, report -> handleExportDone(format, file, manifest, report, exportMarkdown) },
+                            onShowGrant = { showGrant = true },
+                            onOpenStyleTemplates = { openStyleTemplates() },
+                            onDismissStyleTemplates = { showStyleTemplates = false },
+                            onPickStyleTemplate = { template -> pickStyleTemplate(template) },
+                            onShowSaveExportProfile = { showSaveExportProfile = true },
+                            onShowExportProfiles = { exportProfiles = exportProfileStore.load(); showExportProfiles = true },
+                            onShowOutputRules = { showOutputRules = true },
+                            onShowPreflight = { showPreflight = true },
+                            onEpubAuthor = { epubAuthor = it },
+                            onEpubLanguage = { epubLanguage = it },
+                            onPdfPageSize = { pdfPageSize = it },
+                            onPdfIncludeTitle = { pdfIncludeTitle = it },
+                            onPickReference = { referencePicker.launch(arrayOf("application/vnd.openxmlformats-officedocument.wordprocessingml.document")) },
+                            onBack = onBack,
+                            onToggleRecent = { recentExpanded = !recentExpanded },
+                            onShowTrash = { showTrash = true },
+                            onShowAllExports = { showAllExports = true },
+                            onClearExports = { exportHistory.clear(); exportEntries = emptyList() },
+                            onPendingTrash = { pendingTrash = it },
+                            onEvidence = { latest -> packEvidence(latest) }
+                        )
                     )
-                }
-                if (showStyleTemplates) {
-                    AlertDialog(
-                        onDismissRequest = { showStyleTemplates = false },
-                        title = { Text(stringResource(dev.ninfenz.mobile.R.string.docx_style_from_library)) },
-                        text = {
-                            Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
-                                if (styleTemplates.isEmpty()) {
-                                    Text(
-                                        stringResource(dev.ninfenz.mobile.R.string.docx_style_library_empty),
-                                        style = NfType.meta,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                                styleTemplates.forEach { template ->
-                                    val docxCompatible = template.sourceFormat.equals("docx", ignoreCase = true)
-                                    Column {
-                                        TextButton(enabled = docxCompatible, onClick = {
-                                            if (docxCompatible) {
-                                                docxStyles = template.stylesXml
-                                                docxSectPr = template.sectPr.takeIf { it.isNotBlank() }
-                                                docxTheme = template.themeXml.takeIf { it.isNotBlank() }
-                                                docxNumbering = template.numberingXml.takeIf { it.isNotBlank() }
-                                                showStyleTemplates = false
-                                            }
-                                        }) { Text(template.name) }
-                                        Text(
-                                            stringResource(dev.ninfenz.mobile.R.string.docx_style_meta, template.sourceFormat, template.digest.take(12)),
-                                            style = NfType.meta,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                        if (!docxCompatible) {
-                                            Text(
-                                                stringResource(dev.ninfenz.mobile.R.string.docx_pdf_not_applicable),
-                                                style = NfType.meta,
-                                                color = MaterialTheme.colorScheme.error
-                                            )
-                                        }
-                                        if (docxCompatible) docxStyles?.let { current ->
-                                            Text(
-                                                stringResource(
-                                                    dev.ninfenz.mobile.R.string.docx_style_match,
-                                                    StyleMatch.score(current, template.stylesXml)
-                                                ),
-                                                style = NfType.meta,
-                                                color = MaterialTheme.colorScheme.primary
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        confirmButton = {
-                            TextButton(onClick = { showStyleTemplates = false }) { Text(stringResource(android.R.string.cancel)) }
-                        }
+                    DeliveryPreviewSection(
+                        DeliveryPreviewArgs(
+                            markdown = markdown,
+                            project = project,
+                            sampleStore = sampleStore,
+                            copyMarkdown = { clipboard.setText(AnnotatedString(it)) },
+                            onShowVersions = { showVersions = true },
+                            onEditPreview = { openPreviewEditor(it) },
+                            onFullPreview = { showFullPreview = true }
+                        )
                     )
-                }
-                FlowRow(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
-                    TextButton(enabled = docxStyles != null, onClick = { showSaveExportProfile = true }) {
-                        Text(stringResource(dev.ninfenz.mobile.R.string.export_profile_save))
-                    }
-                    TextButton(onClick = { exportProfiles = exportProfileStore.load(); showExportProfiles = true }) {
-                        Text(stringResource(dev.ninfenz.mobile.R.string.export_profiles))
-                    }
-                    TextButton(onClick = { showOutputRules = true }) {
-                        Text(stringResource(dev.ninfenz.mobile.R.string.delivery_output_rule))
-                    }
-                    if (audit) {
-                        TextButton(onClick = { showPreflight = true }) {
-                            Text(stringResource(dev.ninfenz.mobile.R.string.delivery_preflight))
-                        }
-                    }
-                }
-                outputRuleNote?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
-                FlowRow(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
-                    OutlinedTextField(
-                        value = epubAuthor,
-                        onValueChange = { epubAuthor = it },
-                        label = { Text("EPUB author") },
-                        singleLine = true,
-                        modifier = Modifier.weight(1f)
-                    )
-                    OutlinedTextField(
-                        value = epubLanguage,
-                        onValueChange = { epubLanguage = it },
-                        label = { Text("EPUB lang") },
-                        singleLine = true,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-                Row(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s), verticalAlignment = Alignment.CenterVertically) {
-                    OutlinedTextField(
-                        value = pdfPageSize,
-                        onValueChange = { pdfPageSize = it },
-                        label = { Text("PDF page") },
-                        singleLine = true,
-                        modifier = Modifier.weight(1f)
-                    )
-                    Text("title", style = NfType.meta)
-                    Switch(checked = pdfIncludeTitle, onCheckedChange = { pdfIncludeTitle = it })
-                }
-                Text(stringResource(dev.ninfenz.mobile.R.string.delivery_pdf_note), style = NfType.meta, modifier = Modifier.padding(horizontal = NfSpacing.page))
-                exportNotice?.let { notice ->
-                    Text(
-                        notice,
-                        style = NfType.meta,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.padding(horizontal = NfSpacing.page)
-                    )
-                }
-                exportedFile?.let {
-                    NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
-                        Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
-                            Text(stringResource(dev.ninfenz.mobile.R.string.delivery_done_title), style = NfType.itemTitle)
-                            Text(stringResource(dev.ninfenz.mobile.R.string.delivery_done_body), style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            TextButton(onClick = onBack) {
-                                Text(stringResource(dev.ninfenz.mobile.R.string.delivery_done_back))
-                            }
-                        }
-                    }
-                }
-                exportEntries.firstOrNull()?.let { latest ->
-                    NfCard(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
-                        Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
-                            Text(
-                                stringResource(dev.ninfenz.mobile.R.string.delivery_last_export) + " · " + latest.format,
-                                style = NfType.itemTitle
-                            )
-                            val meta = buildList {
-                                add(latest.name)
-                                latest.bytes?.let { add(formatBytes(it)) }
-                                latest.sha256.take(12).takeIf { it.isNotBlank() }?.let { add(it) }
-                            }.joinToString(" · ")
-                            Text(
-                                meta,
-                                style = NfType.meta,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                                TextButton(onClick = {
-                                    val file = File(latest.path)
-                                    if (file.isFile) {
-                                        val intent = ShareExporter.shareFileIntent(context, file, mimeFor(latest.format), latest.name)
-                                        ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.delivery_share_file))
-                                    }
-                                }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_share_file)) }
-                                TextButton(onClick = {
-                                    val file = File(latest.path)
-                                    if (file.isFile) {
-                                        val intent = ShareExporter.viewFileIntent(context, file, mimeFor(latest.format))
-                                        ShareExporter.launchView(context, intent, context.getString(dev.ninfenz.mobile.R.string.delivery_open_file))
-                                    }
-                                }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_open_file)) }
-                            }
-                            if (markdown != null && latest.format.lowercase() in setOf("md", "html", "epub", "docx", "json")) {
-                                OutlinedButton(
-                                    enabled = !evidenceBusy,
-                                    onClick = {
-                                        val md = markdown ?: return@OutlinedButton
-                                        evidenceBusy = true
-                                        evidenceNote = null
-                                        scope.launch {
-                                            val result = dev.ninfenz.mobile.data.HardTechEvidence.pack(context, md, File(latest.path))
-                                            evidenceNote = result.message
-                                            evidenceBusy = false
-                                        }
-                                    }
-                                ) {
-                                    Text(
-                                        stringResource(
-                                            if (evidenceBusy) dev.ninfenz.mobile.R.string.delivery_evidence_pack_busy
-                                            else dev.ninfenz.mobile.R.string.delivery_evidence_pack
-                                        )
-                                    )
-                                }
-                            }
-                            evidenceNote?.let { note ->
-                                Text(note, style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            }
-                        }
-                    }
-                }
-                manifestText?.let { Text(it, style = NfType.meta, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
-                exportVerify?.let {
-                    Text(
-                        it.message,
-                        style = NfType.meta,
-                        color = if (it.ok) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
-                        modifier = Modifier.padding(horizontal = NfSpacing.page)
-                    )
-                }
-                reproText?.let {
-                    Text(
-                        it,
-                        style = NfType.meta,
-                        color = if (reproOk == true) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
-                        modifier = Modifier.padding(horizontal = NfSpacing.page)
-                    )
-                }
-                docxStyleAudit?.let { audit ->
-                    Text(
-                        when {
-                            audit.definedButUnused -> stringResource(
-                                dev.ninfenz.mobile.R.string.docx_style_unused,
-                                audit.found,
-                                audit.checked
-                            )
-                            audit.ok -> stringResource(dev.ninfenz.mobile.R.string.docx_style_audit_ok, audit.found, audit.checked)
-                            else -> stringResource(dev.ninfenz.mobile.R.string.docx_style_audit, audit.found, audit.checked, audit.missing.joinToString("、"))
-                        },
-                        style = NfType.meta,
-                        color = if (audit.ok) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
-                        modifier = Modifier.padding(horizontal = NfSpacing.page)
-                    )
-                }
-                docxHeadingAudit?.let { audit ->
-                    Text(
-                        stringResource(
-                            dev.ninfenz.mobile.R.string.docx_heading_audit,
-                            audit.styledHeadings,
-                            audit.markdownHeadings
-                        ),
-                        style = NfType.meta,
-                        color = if (audit.ok) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
-                        modifier = Modifier.padding(horizontal = NfSpacing.page)
-                    )
-                }
-                if (exportEntries.isNotEmpty()) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = NfSpacing.page),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        TextButton(onClick = { recentExpanded = !recentExpanded }) {
-                            Text(
-                                stringResource(dev.ninfenz.mobile.R.string.delivery_recent_exports) +
-                                    (if (recentExpanded) " ▾" else " ▸"),
-                                style = NfType.itemTitle
-                            )
-                        }
-                        Row {
-                            TextButton(onClick = { showTrash = true }) {
-                                Text(stringResource(dev.ninfenz.mobile.R.string.delivery_trash))
-                            }
-                            if (exportEntries.size > 5) {
-                                TextButton(onClick = { showAllExports = true }) {
-                                    Text(stringResource(dev.ninfenz.mobile.R.string.delivery_all_exports))
-                                }
-                            }
-                            TextButton(onClick = {
-                                exportHistory.clear()
-                                exportEntries = emptyList()
-                            }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_clear_exports)) }
-                        }
-                    }
-                    if (recentExpanded) exportEntries.take(5).forEach { entry ->
-                        Column(modifier = Modifier.fillMaxWidth().padding(horizontal = NfSpacing.page)) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(entry.format + " · " + entry.name + (entry.bytes?.let { " · " + formatBytes(it) } ?: ""), style = NfType.meta, modifier = Modifier.weight(1f))
-                            entry.ok?.let { ok ->
-                                Text(
-                                    stringResource(if (ok) dev.ninfenz.mobile.R.string.export_verified else dev.ninfenz.mobile.R.string.export_verify_failed),
-                                    style = NfType.meta,
-                                    color = if (ok) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
-                                )
-                            }
-                            TextButton(onClick = {
-                                val file = File(entry.path)
-                                if (file.isFile) {
-                                    val intent = ShareExporter.shareFileIntent(context, file, mimeFor(entry.format), entry.name)
-                                    ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.delivery_share_file))
-                                }
-                            }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_share_file)) }
-                            TextButton(onClick = {
-                                val file = File(entry.path)
-                                if (file.isFile) {
-                                    val intent = ShareExporter.viewFileIntent(context, file, mimeFor(entry.format))
-                                    ShareExporter.launchView(context, intent, context.getString(dev.ninfenz.mobile.R.string.delivery_open_file))
-                                }
-                            }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_open_file)) }
-                            TextButton(onClick = { pendingTrash = entry }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_remove_export)) }
-                        }
-                        entry.message?.takeIf { entry.ok != true }?.let { message ->
-                            Text(
-                                message,
-                                style = NfType.meta,
-                                color = MaterialTheme.colorScheme.error
-                            )
-                        }
-                        }
-                    }
-                }
-                }
-
-                NfCollapsibleSection(title = stringResource(dev.ninfenz.mobile.R.string.delivery_preview), initiallyExpanded = true) {
-                    TextButton(onClick = { showVersions = true }) {
-                        Text(stringResource(dev.ninfenz.mobile.R.string.delivery_versions))
-                    }
-                    markdown?.let { md ->
-                        Column(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
-                            MarkdownPreview(md, limitBlocks = 8)
-                            Row {
-                                TextButton(onClick = {
-                                    val parsed = MarkdownBlocks.parse(md)
-                                    previewBlocks = parsed
-                                    previewBaseline = parsed
-                                    previewHistory = emptyList()
-                                    previewRedo = emptyList()
-                                    previewDirty = false
-                                    editingPreview = true
-                                }) {
-                                    Text(stringResource(dev.ninfenz.mobile.R.string.preview_edit))
-                                }
-                                TextButton(onClick = { showFullPreview = true }) {
-                                    Text(stringResource(dev.ninfenz.mobile.R.string.preview_full))
-                                }
-                                TextButton(onClick = { clipboard.setText(AnnotatedString(md)) }) {
-                                    Text(stringResource(dev.ninfenz.mobile.R.string.preview_copy))
-                                }
-                                TextButton(onClick = {
-                                    val safe = dev.ninfenz.mobile.data.ShareRedactor.redact(md)
-                                    val intent = ShareExporter.shareMarkdown(context, "nf-redacted", safe)
-                                    ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.preview_share_redacted))
-                                }) { Text(stringResource(dev.ninfenz.mobile.R.string.preview_share_redacted)) }
-                                TextButton(onClick = {
-                                    val saved = runCatching { sampleStore.save("delivery-" + project.id, md) }.orNullLogged("DeliveryScreen")
-                                    android.widget.Toast.makeText(
-                                        context,
-                                        if (saved != null) context.getString(dev.ninfenz.mobile.R.string.delivery_save_sample) + ": " + saved.name
-                                        else context.getString(dev.ninfenz.mobile.R.string.delivery_save_sample),
-                                        android.widget.Toast.LENGTH_SHORT
-                                    ).show()
-                                }) {
-                                    Text(stringResource(dev.ninfenz.mobile.R.string.delivery_save_sample))
-                                }
-                                TextButton(onClick = {
-                                    val intent = ShareExporter.shareMarkdown(context, "nf-" + project.id, md)
-                                    ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.delivery_share_md))
-                                }) {
-                                    Text(stringResource(dev.ninfenz.mobile.R.string.delivery_share_md))
-                                }
-                            }
-                        }
-                    } ?: Text(stringResource(dev.ninfenz.mobile.R.string.delivery_not_assembled), style = NfType.meta, modifier = Modifier.padding(horizontal = NfSpacing.page))
-                }
                 }
             }
         }
@@ -2153,29 +2711,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                     val allProfiles = exportProfiles + extensionProfiles
                     if (allProfiles.isEmpty()) Text(stringResource(dev.ninfenz.mobile.R.string.export_profiles_empty), style = NfType.meta)
                     allProfiles.forEach { profile ->
-                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                            Text(profile.name, style = NfType.meta)
-                            Row {
-                                TextButton(onClick = {
-                                    docxStyles = profile.styles
-                                    docxSectPr = profile.sectPr
-                                    docxTheme = profile.theme
-                                    docxNumbering = profile.numbering
-                                    docxHeader = profile.header
-                                    docxFooter = profile.footer
-                                    profile.epubAuthor?.let { epubAuthor = it }
-                                    profile.epubLanguage?.let { epubLanguage = it }
-                                    profile.pdfPageSize?.let { pdfPageSize = it }
-                                    profile.pdfIncludeTitle?.let { pdfIncludeTitle = it }
-                                    showExportProfiles = false
-                                }) { Text(stringResource(dev.ninfenz.mobile.R.string.export_profile_apply)) }
-                                if (!profile.id.startsWith("ext:")) {
-                                    TextButton(onClick = { exportProfileStore.remove(profile.id); exportProfiles = exportProfileStore.load() }) {
-                                        Text(stringResource(dev.ninfenz.mobile.R.string.inbox_remove))
-                                    }
-                                }
-                            }
-                        }
+                        ExportProfileRow(profile, onApply = { applyExportProfile(it) }, onRemove = { removeExportProfile(it) })
                     }
                 }
             },
@@ -2262,122 +2798,10 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
             title = { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_variants)) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
-                    TextButton(enabled = rawPlan != null && !busy, onClick = {
-                        val raw = rawPlan ?: return@TextButton
-                        val specJson = artifacts?.specJson ?: return@TextButton
-                        busy = true
-                        scope.launch {
-                            var ok = 0
-                            var failed = 0
-                            for (variant in extensionVariants) {
-                                val variantInputs = inputs.toMutableMap()
-                                (variant.config["inputs"] as? JsonObject)?.forEach { (key, value) ->
-                                    if (plan?.slots?.contains(key) == true) variantInputs[key] = value.jsonPrimitive.content
-                                }
-                                val response = runCatching {
-                                    safeCall("assemble", buildJsonObject {
-                                        put("plan", raw)
-                                        put("spec", specJson)
-                                        put("inputs", buildJsonObject { for ((k, v) in variantInputs) put(k, v) })
-                                    })
-                                }.orNullLogged("DeliveryScreen")
-                                val md = response?.resultObject()?.let { J.optString(it, "markdown") }
-                                if (response?.ok == true && !md.isNullOrBlank()) {
-                                    versionStore.save(project.id, md)
-                                    ok++
-                                } else {
-                                    failed++
-                                }
-                            }
-                            variantNote = context.getString(dev.ninfenz.mobile.R.string.delivery_batch_assemble_done, ok, failed)
-                            busy = false
-                        }
-                    }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_batch_assemble)) }
-                    TextButton(enabled = rawPlan != null && !busy, onClick = {
-                        val raw = rawPlan ?: return@TextButton
-                        val specJson = artifacts?.specJson ?: return@TextButton
-                        busy = true
-                        scope.launch {
-                            val outDir = File(File(context.filesDir, "exports"), "variants").apply { mkdirs() }
-                            var ok = 0
-                            var failed = 0
-                            var missingFormats = 0
-                            for (variant in extensionVariants) {
-                                val variantInputs = inputs.toMutableMap()
-                                (variant.config["inputs"] as? JsonObject)?.forEach { (key, value) ->
-                                    if (plan?.slots?.contains(key) == true) variantInputs[key] = value.jsonPrimitive.content
-                                }
-                                val response = runCatching {
-                                    safeCall("assemble", buildJsonObject {
-                                        put("plan", raw)
-                                        put("spec", specJson)
-                                        put("inputs", buildJsonObject { for ((k, v) in variantInputs) put(k, v) })
-                                    })
-                                }.orNullLogged("DeliveryScreen")
-                                val md = response?.resultObject()?.let { J.optString(it, "markdown") }
-                                if (response?.ok == true && !md.isNullOrBlank()) {
-                                    val safe = variant.id.replace(Regex("[^A-Za-z0-9._-]"), "_")
-                                    File(outDir, safe + ".md").writeText(md, Charsets.UTF_8)
-                                    runCatching {
-                                        dev.ninfenz.mobile.data.HtmlExporter.export(md, project.title, outDir, safe + ".html")
-                                    }.onFailure { missingFormats++ }
-                                    runCatching {
-                                        dev.ninfenz.mobile.data.EpubExporter.export(
-                                            md, project.title, outDir, epubAuthor, epubLanguage, safe + ".epub"
-                                        )
-                                    }.onFailure { missingFormats++ }
-                                    runCatching {
-                                        dev.ninfenz.mobile.data.PdfExporter.export(
-                                            md, project.title, outDir, pdfPageSize, pdfIncludeTitle, safe + ".pdf"
-                                        )
-                                    }.onFailure { missingFormats++ }
-                                    runCatching {
-                                        val doc = dev.ninfenz.mobile.model.NfDocModel.fromMarkdown(
-                                            project.title + " · " + variant.id,
-                                            project.id + "/" + variant.id,
-                                            md
-                                        )
-                                        File(outDir, safe + ".nfdoc.json").writeText(
-                                            dev.ninfenz.mobile.model.NfDocModel.toJson(doc).toString() + "\n",
-                                            Charsets.UTF_8
-                                        )
-                                    }.onFailure { missingFormats++ }
-                                    ok++
-                                } else {
-                                    failed++
-                                }
-                            }
-                            val suffix = if (missingFormats > 0) {
-                                context.getString(dev.ninfenz.mobile.R.string.delivery_batch_export_partial, missingFormats)
-                            } else ""
-                            variantNote = context.getString(dev.ninfenz.mobile.R.string.delivery_batch_export_done, ok, failed) + suffix
-                            busy = false
-                        }
-                    }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_batch_export)) }
+                    TextButton(enabled = rawPlan != null && !busy, onClick = { assembleAllVariants() }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_batch_assemble)) }
+                    TextButton(enabled = rawPlan != null && !busy, onClick = { exportAllVariants() }) { Text(stringResource(dev.ninfenz.mobile.R.string.delivery_batch_export)) }
                     extensionVariants.forEach { variant ->
-                        TextButton(onClick = {
-                            val objectInputs = variant.config["inputs"] as? JsonObject
-                            val before = inputs
-                            val next = inputs.toMutableMap()
-                            var applied = 0
-                            var skipped = 0
-                            objectInputs?.forEach { (key, value) ->
-                                val text = value.jsonPrimitive.content
-                                if (plan?.slots?.contains(key) == true) {
-                                    next[key] = text
-                                    applied++
-                                } else {
-                                    skipped++
-                                }
-                            }
-                            if (applied > 0) {
-                                batchUndo = before
-                                inputs = next
-                                variantNote = context.getString(dev.ninfenz.mobile.R.string.delivery_variant_applied, variant.id) +
-                                    if (skipped > 0) " · skipped=" + skipped else ""
-                                showVariants = false
-                            }
-                        }) { Text(variant.id) }
+                        TextButton(onClick = { applyVariant(variant) }) { Text(variant.id) }
                     }
                 }
             },
@@ -3251,6 +3675,8 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                 specMeta?.slots.orEmpty(),
                                 inputs.filterValues { it.isNotBlank() }.keys
                             )
+
+                            val applySuggestion: (String, String) -> Unit = { slotId, text -> inputs = inputs + (slotId to text) }
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
                                     if (suggestion != null) {
@@ -3262,11 +3688,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                     color = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.weight(1f)
                                 )
-                                if (suggestion != null) {
-                                    TextButton(onClick = { inputs = inputs + (suggestion.slotId to block.text) }) {
-                                        Text(stringResource(dev.ninfenz.mobile.R.string.preview_suggest_apply))
-                                    }
-                                }
+                                if (suggestion != null) PreviewSuggestionApplyButton(suggestion.slotId, block.text, applySuggestion)
                                 TextButton(onClick = { assignBlockText = block.text }) {
                                     Text(stringResource(dev.ninfenz.mobile.R.string.preview_formalize))
                                 }

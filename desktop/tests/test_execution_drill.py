@@ -31,12 +31,17 @@ class ExecutionDrillTest(unittest.TestCase):
 
     def _hits(self, data, case):
         # lexicon：多语集（p07_en）由 fixture 声明判定词表；缺省仍中文内置词表。
-        return drill.run_case(case, data["real_ids"],
-                              data.get("semantics") or {},
-                              data.get("source_text", ""),
-                              data.get("other_ids") or [],
-                              data.get("asset_keys") or [],
-                              data.get("lexicon") or {})
+        return drill.run_case(
+            case,
+            data['real_ids'],
+            opts=drill.CaseOptions(
+                semantics=data.get('semantics') or {},
+                source_text=data.get('source_text', ''),
+                other_ids=data.get('other_ids') or [],
+                asset_keys=data.get('asset_keys') or [],
+                lexicon=data.get('lexicon') or {},
+            ),
+        )
 
     def test_deviation_capture_all(self):
         """失范样本须全部被硬断言捕获（无漏报）。"""
@@ -95,8 +100,15 @@ class RealCorpusRegressionTest(unittest.TestCase):
     def test_cross_pipeline_by_tail(self):
         """其它管线真实编号按尾段识别 ⇒ 判跨管线串号（不是「编造」）。"""
         self.assertEqual(["cross_pipeline_id"],
-                         drill.run_case({"output": "由 M65 完成。"}, ["M00"],
-                                        {}, "", ["情感:M65"]))
+                         drill.run_case(
+                             {'output': '由 M65 完成。'},
+                             ['M00'],
+                             opts=drill.CaseOptions(
+                                 semantics={},
+                                 source_text='',
+                                 other_ids=['情感:M65'],
+                             ),
+                         ))
         self.assertEqual(["fabricated_id"],
                          drill.run_case({"output": "由 M65 完成。"}, ["M00"]),
                          "未给 other_ids 时无从判跨管线，仍应落回编造")

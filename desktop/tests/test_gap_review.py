@@ -4,8 +4,8 @@
 补齐既有覆盖缺口（逐模块覆盖率门禁实测 `gap_review.py` 0.0%——AUD-0015 落地时无随行单测；
 本波把它顶上 ≥30%）。判据只用**离线 stub**（真模型不进单测，避免不确定性进 CI）。
 """
-import sys
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -74,7 +74,7 @@ class EvidenceTest(unittest.TestCase):
 
     def test_rows_without_evidence_are_the_suspected_class(self):
         """无证据行不得进修复清单——按类归到 suspected（双轨纪律的机检面）。"""
-        doc = gr.review(ROOT, adapter="stub", limit=0)
+        doc = gr.review(ROOT, opts=gr.ReviewOptions(adapter='stub', limit=0))
         for row in doc.get("fixable", []):
             self.assertTrue(str(row.get("evidence", "")).strip(),
                             "fixable 行必须带确定性证据：%r" % row)
@@ -82,7 +82,7 @@ class EvidenceTest(unittest.TestCase):
 
 class ReviewTest(unittest.TestCase):
     def test_stub_review_shape_and_double_track(self):
-        doc = gr.review(ROOT, adapter="stub", limit=6, batch=3)
+        doc = gr.review(ROOT, opts=gr.ReviewOptions(adapter='stub', limit=6, batch=3))
         self.assertEqual(doc.get("schema"), "nf-gap-review/1")
         self.assertIn("fixable", doc)
         self.assertIn("suspected", doc)
@@ -107,7 +107,7 @@ class ScopeTest(unittest.TestCase):
 
     def test_scope_filters_the_review(self):
         everything = gr.review(ROOT)
-        only = gr.review(ROOT, classes=("payload-no-evidence",))
+        only = gr.review(ROOT, opts=gr.ReviewOptions(classes=('payload-no-evidence',)))
         self.assertLessEqual(only["scanned"], everything["scanned"])
         self.assertEqual({"payload-no-evidence"}, set(only["by_class"]))
         self.assertEqual(len(gr.candidates(ROOT, classes=("payload-no-evidence",))),
@@ -134,15 +134,15 @@ class ScopeTest(unittest.TestCase):
 
 class ReviewLimitTest(unittest.TestCase):
     def test_limit_zero_means_all_rows(self):
-        all_rows = gr.review(ROOT, adapter="stub", limit=0)
-        few = gr.review(ROOT, adapter="stub", limit=2)
+        all_rows = gr.review(ROOT, opts=gr.ReviewOptions(adapter='stub', limit=0))
+        few = gr.review(ROOT, opts=gr.ReviewOptions(adapter='stub', limit=2))
         self.assertGreaterEqual(all_rows["scanned"], few["scanned"])
         self.assertEqual(few["scanned"], 2)
         self.assertTrue(gr.summary(all_rows))
 
     def test_limit_two_caps_rows(self):
-        all_rows = gr.review(ROOT, adapter="stub", limit=0)
-        few = gr.review(ROOT, adapter="stub", limit=2)
+        all_rows = gr.review(ROOT, opts=gr.ReviewOptions(adapter='stub', limit=0))
+        few = gr.review(ROOT, opts=gr.ReviewOptions(adapter='stub', limit=2))
         self.assertGreaterEqual(all_rows["scanned"], few["scanned"])
         self.assertEqual(few["scanned"], 2)
 

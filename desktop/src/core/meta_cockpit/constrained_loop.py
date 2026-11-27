@@ -5,6 +5,7 @@ from __future__ import annotations
 import copy
 import re
 import time
+from dataclasses import dataclass
 from pathlib import Path
 
 from . import calibration_ledger as cl
@@ -114,17 +115,27 @@ class ContextualResponse(dict):
 # validation, selection, execution, calibration and journal commit visible in
 # one state machine preserves fail-closed ordering; lower-level logic is
 # delegated to tested helpers and modules.
-def run(
-    prompt: str,
-    policy,
-    store_path: str | Path | None = None,
-    max_turns: int = 8,
-    state: dict | None = None,
-    journal_path: str | Path | None = None,
-    max_seconds: float | None = None,
-    max_context_units: int | None = None,
-    injections: dict[int, list[str]] | None = None,
-) -> dict:
+@dataclass(frozen=True)
+class LoopOptions:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    store_path: str | Path | None = None
+    max_turns: int = 8
+    state: dict | None = None
+    journal_path: str | Path | None = None
+    max_seconds: float | None = None
+    max_context_units: int | None = None
+    injections: dict[int, list[str]] | None = None
+
+
+def run(prompt: str, policy, opts: LoopOptions | None = None) -> dict:
+    opts = opts if opts is not None else LoopOptions()
+    store_path = opts.store_path
+    max_turns = opts.max_turns
+    state = opts.state
+    journal_path = opts.journal_path
+    max_seconds = opts.max_seconds
+    max_context_units = opts.max_context_units
+    injections = opts.injections
     prompt_secrets = secret_guard.find(prompt, "$.prompt")
     if prompt_secrets:
         return {
@@ -547,18 +558,20 @@ def run(
             _, commit_status = journal.append_turn(
                 Path(journal_path),
                 prompt,
-                s,
-                committed_state,
-                c["cluster"],
-                c.get("kind", "unknown"),
-                c["resolves"],
-                sorted(actual),
-                result.get("changed_keys", []),
-                result.get("atom_trace", []),
-                decision_payload,
-                calibration_before_digest,
-                calibration_after_digest,
-                observations,
+                opts=journal.TurnOptions(
+                    before_state=s,
+                    after_state=committed_state,
+                    cluster=c['cluster'],
+                    kind=c.get('kind', 'unknown'),
+                    predicted=c['resolves'],
+                    resolved=sorted(actual),
+                    changed_keys=result.get('changed_keys', []),
+                    atom_trace=result.get('atom_trace', []),
+                    decision=decision_payload,
+                    calibration_before_digest=calibration_before_digest,
+                    calibration_after_digest=calibration_after_digest,
+                    observations=observations,
+                ),
             )
             if commit_status != "appended":
                 trace.append(

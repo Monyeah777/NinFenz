@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import re
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 
 from core import json_doc
@@ -221,11 +222,17 @@ def _check_semantic_misalignment(output: str, semantics: dict[str, list]) -> str
     return ""
 
 
-def run_case(case: dict, real_ids: list[str],
-                 semantics: dict[str, list] | None = None,
-             source_text: str = "", other_ids: list[str] | None = None,
-             asset_keys: list[str] | None = None,
-             lexicon: dict[str, list] | None = None) -> list[str]:
+@dataclass(frozen=True)
+class CaseOptions:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    semantics: dict[str, list] | None = None
+    source_text: str = ''
+    other_ids: list[str] | None = None
+    asset_keys: list[str] | None = None
+    lexicon: dict[str, list] | None = None
+
+
+def run_case(case: dict, real_ids: list[str], opts: CaseOptions | None = None) -> list[str]:
     """对单样本输出跑全部硬断言 → 返回命中的失范规则名列表。
 
     other_ids = 其它管线真实编号集（判跨管线串号）；asset_keys = 本装配允许的资产键集
@@ -233,6 +240,13 @@ def run_case(case: dict, real_ids: list[str],
     lexicon = 判定词表（decision/progress 为字面子串，citation 为 regex 源串列表）；
     缺省沿用中文内置词表——多语用例在 fixture 里声明自己的词表，引擎不硬编码语言。
     """
+
+    opts = opts if opts is not None else CaseOptions()
+    semantics = opts.semantics
+    source_text = opts.source_text
+    other_ids = opts.other_ids
+    asset_keys = opts.asset_keys
+    lexicon = opts.lexicon
     lex = lexicon or {}
     decision = tuple(lex.get("decision") or _DECISION_WORDS)
     progress = tuple(lex.get("progress") or _PROGRESS)
@@ -267,8 +281,17 @@ def run_file(path: str) -> dict:
     lexicon = data.get("lexicon") or {}
     results = []
     for case in data.get("cases", []):
-        hits = run_case(case, real_ids, semantics, source_text, other_ids, asset_keys,
-                        lexicon)
+        hits = run_case(
+            case,
+            real_ids,
+            opts=CaseOptions(
+                semantics=semantics,
+                source_text=source_text,
+                other_ids=other_ids,
+                asset_keys=asset_keys,
+                lexicon=lexicon,
+            ),
+        )
         expected = set(case.get("expect_captured") or [])
         results.append({
             "id": case.get("id"),
@@ -295,8 +318,17 @@ def main(argv: list[str] | None = None) -> int:
     bad = 0
     print("== execution_drill（%s · %s）==" % (data.get("schema"), data.get("pipeline")))
     for case in data.get("cases", []):
-        hits = run_case(case, real_ids, semantics, source_text, other_ids, asset_keys,
-                        lexicon)
+        hits = run_case(
+            case,
+            real_ids,
+            opts=CaseOptions(
+                semantics=semantics,
+                source_text=source_text,
+                other_ids=other_ids,
+                asset_keys=asset_keys,
+                lexicon=lexicon,
+            ),
+        )
         expected = set(case.get("expect_captured") or [])
         ok = (not expected and not hits) or expected <= set(hits)
         bad += 0 if ok else 1

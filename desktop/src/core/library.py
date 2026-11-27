@@ -15,17 +15,22 @@ from __future__ import annotations
 
 import os
 import re
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 # 条目读取迁到叶子件（见 core/library_entries.py）；此处兼容转发，调用点零改动。
 from core import atomic_write
-from core.library_entries import entries, entry_digest
+
 # `parse_frontmatter` 是**对外转发面**（audit / decisions / handover / patterns /
 # postmortem 与本仓测试都 `from core.library import parse_frontmatter`）：本文件里确实
 # 没有调用点，删掉会破兼容（2026-10-01 实测：删后 test_library.TestFrontmatter 两例 ERROR）。
 # `ENTRY_GLOB` / `read_entry` 同样是旧转发，但全仓**零消费者** ⇒ 2026-10-01 已删。
-from core.library_entries import parse_frontmatter  # noqa: F401  （对外转发面，见上）
+from core.library_entries import (
+    entries,
+    entry_digest,
+    parse_frontmatter,  # noqa: F401  （对外转发面，见上）
+)
 
 INDEX_REL = "library/INDEX.md"
 ALIAS_REL = "library/ALIAS.md"
@@ -416,16 +421,34 @@ def set_status(root: str, entry_id: str, status: str,
     return hit["path"]
 
 
-def set_attestation(root: str, entry_id: str, issuer: str = "nf library",
-                    key: Optional[bytes] = None, ssh_key: str = "",
-                    ssh_identity: str = "",
-                    ssh_ns: str = "") -> Dict[str, Any]:
+@dataclass(frozen=True)
+class AttestationOptions:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    issuer: str = 'nf library'
+    key: Optional[bytes] = None
+    ssh_key: str = ''
+    ssh_identity: str = ''
+    ssh_ns: str = ''
+
+
+def set_attestation(
+    root: str,
+    entry_id: str,
+    opts: AttestationOptions | None = None,
+) -> Dict[str, Any]:
     """把规范摘要写进条目 frontmatter；给了密钥就一并落 **hmac 签名锚**。
 
     锚字段（扁平键，frontmatter 解析器友好）：
     `anchor_scheme` / `anchor_mac` / `anchor_key_id` / `anchor_issuer`。
     不给密钥时清掉旧锚——避免"降级后残留旧锚"造成假可信。
     """
+
+    opts = opts if opts is not None else AttestationOptions()
+    issuer = opts.issuer
+    key = opts.key
+    ssh_key = opts.ssh_key
+    ssh_identity = opts.ssh_identity
+    ssh_ns = opts.ssh_ns
     from core import attest as _attest
     hit = None
     for e in entries(root):

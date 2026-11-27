@@ -218,8 +218,13 @@ def main(argv=None) -> int:
         try:
             doc = pua.load_public_anchor(args.verify_public_anchor)
             verifier = pua.make_openssl_verifier(args.public_log_pubkey)
-            resolved = pua.verify_public_anchor(doc, verifier, args.public_log_id,
-                                                args.subject_digest, root=args.root)
+            resolved = pua.verify_public_anchor(
+                doc,
+                verifier,
+                args.public_log_id,
+                args.subject_digest,
+                opts=pua.PublicAnchorOptions(root=args.root),
+            )
         except (OSError, ValueError) as exc:
             print(f"不可判定：{exc}", file=sys.stderr)
             return tv.EXIT_UNDECIDABLE
@@ -263,9 +268,14 @@ def main(argv=None) -> int:
         except (OSError, ValueError) as exc:
             print(f"不可判定：{exc}", file=sys.stderr)
             return tv.EXIT_UNDECIDABLE
-        result = hrev.verify_review(envelope, args.subject_kind, args.subject_digest,
-                                    registry_doc, material_doc, now=args.now,
-                                    root=args.root)
+        result = hrev.verify_review(
+            envelope,
+            args.subject_kind,
+            args.subject_digest,
+            registry_doc,
+            material_doc,
+            opts=hrev.ReviewVerifyOptions(now=args.now, root=args.root),
+        )
         state = hrev.review_state(result)
         print(f"human review state: {state}"
               + (f"（{result.get('reason')}）" if result.get("reason") else ""))
@@ -317,7 +327,12 @@ def main(argv=None) -> int:
             return tv.EXIT_UNDECIDABLE
         if args.context_lineage:
             lineage = tcl.load_lineage(args.context_lineage)
-            result = tcl.check_context_binding(evidence, bound, lineage, root=args.root)
+            result = tcl.check_context_binding(
+                evidence,
+                bound,
+                lineage,
+                opts=tcl.LineageOptions(root=args.root),
+            )
             label = "model-card + context-lineage"
         else:
             result = tmc.check_binding(evidence, bound, current, schema)
@@ -344,9 +359,13 @@ def main(argv=None) -> int:
             type_schema = te.load_type_schema(args.root)
             issues = []
             for index, entity in enumerate(entities):
-                result = te.typed_admissibility(entity, type_registry, policy_doc,
-                                                issuer_registry, entity_schema,
-                                                type_schema)
+                result = te.typed_admissibility(
+                    entity,
+                    type_registry,
+                    policy_doc,
+                    issuer_registry,
+                    opts=te.AdmissibilityOptions(schema=entity_schema, type_schema=type_schema),
+                )
                 if not result.get("admissible"):
                     issues.append(f"entities[{index}]: {result.get('reason')}")
             composed = te.composition_check(entities, type_registry, type_schema,
@@ -372,9 +391,17 @@ def main(argv=None) -> int:
             registry_doc = tk.load_registry(args.issuer_registry) if args.issuer_registry else None
             material_doc = (json_doc.load(Path(args.key_material), dict, what="key material")
                             if args.key_material else None)
-            doc = ta.auto_anchor(args.subject_digest, raw, root=args.root, head=head,
-                                 registry=registry_doc, material=material_doc,
-                                 now=args.now or None)
+            doc = ta.auto_anchor(
+                args.subject_digest,
+                raw,
+                opts=ta.AnchorOptions(
+                    root=args.root,
+                    head=head,
+                    registry=registry_doc,
+                    material=material_doc,
+                    now=args.now or None,
+                ),
+            )
             atomic_write.write_text(Path(args.auto_anchor),
                                     json.dumps(doc, ensure_ascii=False, indent=2) + "\n")
         except (OSError, ValueError) as exc:
@@ -410,13 +437,22 @@ def main(argv=None) -> int:
         public_doc = pua.load_public_anchor(args.public_anchor) if args.public_anchor else None
         public_verifier = (pua.make_openssl_verifier(args.public_log_pubkey)
                            if public_doc and args.public_log_pubkey else None)
-        result = tv.verify(bundle, policy, root=args.root, anchor=anchor_doc,
-                           anchor_verifiers=_anchor_verifiers(args) if anchor_doc else None,
-                           head_signature=head, registry=registry_doc,
-                           material=material_doc, now=args.now or None,
-                           public_anchor=public_doc,
-                           public_anchor_verifier=public_verifier,
-                           public_log_id=args.public_log_id)
+        result = tv.verify(
+            bundle,
+            policy,
+            root=args.root,
+            opts=tv.TrustVerifyOptions(
+                anchor=anchor_doc,
+                anchor_verifiers=_anchor_verifiers(args) if anchor_doc else None,
+                head_signature=head,
+                registry=registry_doc,
+                material=material_doc,
+                now=args.now or None,
+                public_anchor=public_doc,
+                public_anchor_verifier=public_verifier,
+                public_log_id=args.public_log_id,
+            ),
+        )
     except (OSError, ValueError) as exc:
         print(f"不可判定：{exc}", file=sys.stderr)
         return tv.EXIT_UNDECIDABLE

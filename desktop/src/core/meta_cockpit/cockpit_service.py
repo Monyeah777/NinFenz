@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+from dataclasses import dataclass
 from pathlib import Path
 
 from . import cockpit_handoff, context_pack, json_asset, runtime_executor, session_journal
@@ -14,18 +15,31 @@ MANIFEST_SCHEMA = json_asset.load(Path(__file__).parent / "cockpit_manifest.sche
 MANIFEST_VALIDATOR = jsonschema.Draft202012Validator(MANIFEST_SCHEMA)
 
 
-def produce(
-    prompt: str,
-    adapter=None,
-    policy=None,
-    store_path: str | Path | None = None,
-    journal_path: str | Path | None = None,
-    max_turns: int = 8,
-    providers: list | None = None,
-    max_seconds: float | None = None,
-    max_context_units: int | None = 36_000,
-    injections: dict[int, list[str]] | None = None,
-) -> dict:
+@dataclass(frozen=True)
+class ProduceOptions:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    adapter: object = None
+    policy: object = None
+    store_path: str | Path | None = None
+    journal_path: str | Path | None = None
+    max_turns: int = 8
+    providers: list | None = None
+    max_seconds: float | None = None
+    max_context_units: int | None = 36000
+    injections: dict[int, list[str]] | None = None
+
+
+def produce(prompt: str, opts: ProduceOptions | None = None) -> dict:
+    opts = opts if opts is not None else ProduceOptions()
+    adapter = opts.adapter
+    policy = opts.policy
+    store_path = opts.store_path
+    journal_path = opts.journal_path
+    max_turns = opts.max_turns
+    providers = opts.providers
+    max_seconds = opts.max_seconds
+    max_context_units = opts.max_context_units
+    injections = opts.injections
     if not isinstance(prompt, str) or not prompt.strip():
         raise ValueError("prompt must be non-empty")
     if len(prompt) > MAX_PROMPT_CHARS:
@@ -40,12 +54,14 @@ def produce(
     run = loop.run(
         prompt,
         effective_policy,
-        store_path=store_path,
-        journal_path=journal_path,
-        max_turns=max_turns,
-        max_seconds=max_seconds,
-        max_context_units=max_context_units,
-        injections=injections,
+        opts=loop.LoopOptions(
+            store_path=store_path,
+            max_turns=max_turns,
+            journal_path=journal_path,
+            max_seconds=max_seconds,
+            max_context_units=max_context_units,
+            injections=injections,
+        ),
     )
     handoff = cockpit_handoff.build_handoff(run["state"], termination=run["termination"])
     journal_digest = None

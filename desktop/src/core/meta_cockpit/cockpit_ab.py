@@ -6,6 +6,7 @@ import hashlib
 import json
 import math
 from collections import Counter
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -79,18 +80,31 @@ def power_analysis(
     raise ValueError("required sample exceeds max_pairs")
 
 
-def preregister(
-    document: dict,
-    min_pairs: int = 8,
-    min_effect: float = 0.10,
-    alpha: float = 0.05,
-    min_judges: int = 2,
-    min_agreement: float = 0.60,
-    min_pairs_per_model: int = 3,
-    target_power: float | None = None,
-    max_pairs: int = 500,
-    planned_pairs: int | None = None,
-) -> dict:
+@dataclass(frozen=True)
+class PreregisterOptions:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    min_pairs: int = 8
+    min_effect: float = 0.1
+    alpha: float = 0.05
+    min_judges: int = 2
+    min_agreement: float = 0.6
+    min_pairs_per_model: int = 3
+    target_power: float | None = None
+    max_pairs: int = 500
+    planned_pairs: int | None = None
+
+
+def preregister(document: dict, opts: PreregisterOptions | None = None) -> dict:
+    opts = opts if opts is not None else PreregisterOptions()
+    min_pairs = opts.min_pairs
+    min_effect = opts.min_effect
+    alpha = opts.alpha
+    min_judges = opts.min_judges
+    min_agreement = opts.min_agreement
+    min_pairs_per_model = opts.min_pairs_per_model
+    target_power = opts.target_power
+    max_pairs = opts.max_pairs
+    planned_pairs = opts.planned_pairs
     result = json_asset.roundtrip(document)
     actual_pairs = len({_pair_key(trial) for trial in document["trials"]})
     planned_pairs = actual_pairs if planned_pairs is None else planned_pairs
@@ -253,16 +267,25 @@ def _sign_test_p(k: int, n: int) -> float:
     return min(1.0, 2 * tail / (2**n))
 
 
-def analyze(
-    document: dict,
-    ballots: list[dict],
-    min_pairs: int | None = None,
-    min_effect: float | None = None,
-    alpha: float | None = None,
-    min_judges: int | None = None,
-    min_agreement: float | None = None,
-    min_pairs_per_model: int | None = None,
-) -> dict:
+@dataclass(frozen=True)
+class AnalyzeOptions:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    min_pairs: int | None = None
+    min_effect: float | None = None
+    alpha: float | None = None
+    min_judges: int | None = None
+    min_agreement: float | None = None
+    min_pairs_per_model: int | None = None
+
+
+def analyze(document: dict, ballots: list[dict], opts: AnalyzeOptions | None = None) -> dict:
+    opts = opts if opts is not None else AnalyzeOptions()
+    min_pairs = opts.min_pairs
+    min_effect = opts.min_effect
+    alpha = opts.alpha
+    min_judges = opts.min_judges
+    min_agreement = opts.min_agreement
+    min_pairs_per_model = opts.min_pairs_per_model
     issues = validate_experiment(document)
     if issues:
         raise ValueError("invalid experiment: " + "; ".join(issues))

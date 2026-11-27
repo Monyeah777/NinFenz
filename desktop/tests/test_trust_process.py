@@ -32,8 +32,13 @@ def _process_vectors():
 def _chain(count=3):
     steps = []
     for index in range(count):
-        steps.append(tp.append_step(steps, "proc-test", ACTOR, AUTH, STATE[index % 3],
-                                    "task-step"))
+        steps.append(tp.append_step(
+            steps,
+            'proc-test',
+            ACTOR,
+            AUTH,
+            opts=tp.StepOptions(state_digest=STATE[index % 3], type_='task-step'),
+        ))
     return steps
 
 
@@ -79,10 +84,22 @@ class ChainBuildTest(unittest.TestCase):
     def test_append_step_guards(self):
         steps = _chain(1)
         with self.assertRaises(ValueError):
-            tp.append_step(steps, "proc-test", ACTOR, AUTH, "bad", "task-step")
+            tp.append_step(
+                steps,
+                'proc-test',
+                ACTOR,
+                AUTH,
+                opts=tp.StepOptions(state_digest='bad', type_='task-step'),
+            )
         steps[0]["prev"] = "ABC"
         with self.assertRaises(ValueError) as ctx:
-            tp.append_step(steps, "proc-test", ACTOR, AUTH, "1" * 64, "task-step")
+            tp.append_step(
+                steps,
+                'proc-test',
+                ACTOR,
+                AUTH,
+                opts=tp.StepOptions(state_digest='1' * 64, type_='task-step'),
+            )
         self.assertIn("修复指引", str(ctx.exception))
 
 
@@ -150,7 +167,13 @@ class TamperMatrixTest(unittest.TestCase):
         steps = _chain(1)
         steps[0]["state_digest"] = "9" * 64
         self.assertTrue(tp.verify_chain(steps)["valid"])
-        extended = [steps[0], tp.append_step(steps, "p", ACTOR, AUTH, "2" * 64, "task-step")]
+        extended = [steps[0], tp.append_step(
+            steps,
+            'p',
+            ACTOR,
+            AUTH,
+            opts=tp.StepOptions(state_digest='2' * 64, type_='task-step'),
+        )]
         self.assertTrue(tp.verify_chain(extended)["valid"])
 
 

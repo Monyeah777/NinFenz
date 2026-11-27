@@ -13,6 +13,7 @@ T4 公共锚仍未建（G4）。缺材料一律记 "none" 并如实报缺项，�
 """
 from __future__ import annotations
 
+from dataclasses import dataclass
 from pathlib import Path
 
 from core import json_doc, json_schema
@@ -85,10 +86,27 @@ def skeleton_facts(hash_ok: bool) -> dict:
             "time_token": "none", "transparency_sth": "none", "public_anchor": "none"}
 
 
-def build_report(subject_kind: str, subject_digest: str, decision: dict,
-                 checks: list, issues: list, trust_roots: dict,
-                 root: str = ".") -> dict:
+@dataclass(frozen=True)
+class TrustReportOptions:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    checks: list
+    issues: list
+    trust_roots: dict
+    root: str = '.'
+
+
+def build_report(
+    subject_kind: str,
+    subject_digest: str,
+    decision: dict,
+    opts: TrustReportOptions,
+) -> dict:
     """组装 nf-verify/1 报告；结构不过 schema 即抛（不产出半截报告）。"""
+
+    checks = opts.checks
+    issues = opts.issues
+    trust_roots = opts.trust_roots
+    root = opts.root
     report = {
         "schema": SCHEMA,
         "subject": {"kind": subject_kind, "digest": subject_digest},
@@ -115,18 +133,45 @@ def _missing_issues(codes: list) -> list:
     return out
 
 
-def verify(bundle: dict, policy: dict, root: str = ".", anchor: dict | None = None,
-           anchor_verifiers: dict | None = None, head_signature: dict | None = None,
-           registry: dict | None = None, material: dict | None = None,
-           now: str | None = None, human_review: dict | None = None,
-           public_anchor: dict | None = None,
-           public_anchor_verifier=None, public_log_id: str = "") -> dict:
+@dataclass(frozen=True)
+class TrustVerifyOptions:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    anchor: dict | None = None
+    anchor_verifiers: dict | None = None
+    head_signature: dict | None = None
+    registry: dict | None = None
+    material: dict | None = None
+    now: str | None = None
+    human_review: dict | None = None
+    public_anchor: dict | None = None
+    public_anchor_verifier: object = None
+    public_log_id: str = ''
+
+
+def verify(
+    bundle: dict,
+    policy: dict,
+    root: str = '.',
+    opts: TrustVerifyOptions | None = None,
+) -> dict:
     """验证 claim bundle：返回 {"report","decision","exit_code"}（不打印、不退出）。
 
     head_signature 给了就核链头签名（nf-chain-head/1 + DSSE + registry）→ signature 事实；
     anchor 给了就核 nf-anchor/1 → time_token/transparency_sth 事实，target = subject_digest
     （bundle 的规范摘要；锚必须绑这个对象）。缺 registry/material/verifier 记 none，不假装验过。
     """
+
+    opts = opts if opts is not None else TrustVerifyOptions()
+    anchor = opts.anchor
+    anchor_verifiers = opts.anchor_verifiers
+    head_signature = opts.head_signature
+    registry = opts.registry
+    material = opts.material
+    now = opts.now
+    human_review = opts.human_review
+    public_anchor = opts.public_anchor
+    public_anchor_verifier = opts.public_anchor_verifier
+    public_log_id = opts.public_log_id
     policy_schema = load_schema(root, POLICY_SCHEMA_REL)
     bundle_schema = tb.load_schema(root)
     policy_problems = json_schema.json_schema_check(policy, policy_schema)
@@ -171,9 +216,14 @@ def verify(bundle: dict, policy: dict, root: str = ".", anchor: dict | None = No
                     what="dsse schema")
             except (OSError, ValueError):
                 envelope_schema = None
-            verified = tsig.verify_head(head_signature, "bundle", subject_digest,
-                                        registry, material, envelope_schema,
-                                        now=now, root=root)
+            verified = tsig.verify_head(
+                head_signature,
+                'bundle',
+                subject_digest,
+                registry,
+                material,
+                opts=tsig.VerifyHeadOptions(schema_envelope=envelope_schema, now=now, root=root),
+            )
             if verified.get("ok"):
                 facts["signature"] = "ok"
                 checks.append({"id": "A1-head-signature", "ok": True,
@@ -195,8 +245,13 @@ def verify(bundle: dict, policy: dict, root: str = ".", anchor: dict | None = No
                        "detail": "未提供链头签名；T1 及以上只报缺项，不冒充等级"})
     public_issues: list = []
     if public_anchor is not None:
-        resolved = pua.verify_public_anchor(public_anchor, public_anchor_verifier,
-                                            public_log_id, subject_digest, root=root)
+        resolved = pua.verify_public_anchor(
+            public_anchor,
+            public_anchor_verifier,
+            public_log_id,
+            subject_digest,
+            opts=pua.PublicAnchorOptions(root=root),
+        )
         if resolved.get("ok"):
             facts["public_anchor"] = "ok"
             checks.append({"id": "A5-public-anchor", "ok": True,
@@ -220,8 +275,14 @@ def verify(bundle: dict, policy: dict, root: str = ".", anchor: dict | None = No
                 Path(root) / "protocol/trust/dsse.schema.json", dict, what="dsse schema")
         except (OSError, ValueError):
             envelope_schema = None
-        reviewed = hrev.verify_review(human_review, "bundle", subject_digest, registry,
-                                      material, envelope_schema, now=now, root=root)
+        reviewed = hrev.verify_review(
+            human_review,
+            'bundle',
+            subject_digest,
+            registry,
+            material,
+            opts=hrev.ReviewVerifyOptions(schema_envelope=envelope_schema, now=now, root=root),
+        )
         review_state = hrev.review_state(reviewed)
         review_detail = f"human review state={review_state}"
         if reviewed.get("reason"):
@@ -255,6 +316,10 @@ def verify(bundle: dict, policy: dict, root: str = ".", anchor: dict | None = No
         "tsa": [str(item.get("id")) for item in (policy or {}).get("tsa_roots") or []
                 if isinstance(item, dict)],
     }
-    report = build_report("bundle", subject_digest, decision, checks, issues, trust_roots,
-                          root=root)
+    report = build_report(
+        'bundle',
+        subject_digest,
+        decision,
+        opts=TrustReportOptions(checks=checks, issues=issues, trust_roots=trust_roots, root=root),
+    )
     return {"report": report, "decision": decision, "exit_code": decision["exit_code"]}

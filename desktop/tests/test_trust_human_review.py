@@ -43,8 +43,17 @@ def _signer():
 
 
 def _statement(decision="approve", subject_kind="bundle", digest=SUBJECT):
-    return hrev.build_statement(subject_kind, digest, decision, ISSUER, KEYID,
-                                "spot-checked evidence and reproduction steps", NOW)
+    return hrev.build_statement(
+        subject_kind,
+        digest,
+        decision,
+        opts=hrev.ReviewStatementOptions(
+            issuer_id=ISSUER,
+            keyid=KEYID,
+            rationale='spot-checked evidence and reproduction steps',
+            reviewed_at=NOW,
+        ),
+    )
 
 
 def _envelope(statement=None):
@@ -52,8 +61,14 @@ def _envelope(statement=None):
 
 
 def _verify(envelope, kind="bundle", digest=SUBJECT, registry=None, now=NOW):
-    return hrev.verify_review(envelope, kind, digest, registry or _registry(),
-                              _material(), now=now)
+    return hrev.verify_review(
+        envelope,
+        kind,
+        digest,
+        registry or _registry(),
+        _material(),
+        opts=hrev.ReviewVerifyOptions(now=now),
+    )
 
 
 class StatementTest(unittest.TestCase):
@@ -68,11 +83,41 @@ class StatementTest(unittest.TestCase):
 
     def test_statement_rejections(self):
         with self.assertRaises(ValueError):
-            hrev.build_statement("bundle", SUBJECT, "pending", ISSUER, KEYID, "x", NOW)
+            hrev.build_statement(
+                'bundle',
+                SUBJECT,
+                'pending',
+                opts=hrev.ReviewStatementOptions(
+                    issuer_id=ISSUER,
+                    keyid=KEYID,
+                    rationale='x',
+                    reviewed_at=NOW,
+                ),
+            )
         with self.assertRaises(ValueError):
-            hrev.build_statement("planet", SUBJECT, "approve", ISSUER, KEYID, "x", NOW)
+            hrev.build_statement(
+                'planet',
+                SUBJECT,
+                'approve',
+                opts=hrev.ReviewStatementOptions(
+                    issuer_id=ISSUER,
+                    keyid=KEYID,
+                    rationale='x',
+                    reviewed_at=NOW,
+                ),
+            )
         with self.assertRaises(ValueError):
-            hrev.build_statement("bundle", "ABC", "approve", ISSUER, KEYID, "x", NOW)
+            hrev.build_statement(
+                'bundle',
+                'ABC',
+                'approve',
+                opts=hrev.ReviewStatementOptions(
+                    issuer_id=ISSUER,
+                    keyid=KEYID,
+                    rationale='x',
+                    reviewed_at=NOW,
+                ),
+            )
 
 
 class VerifyTest(unittest.TestCase):
@@ -125,8 +170,14 @@ class VerifyTest(unittest.TestCase):
         statement = _statement()
         statement["decision"] = "pending"
         self.assertEqual([], json_schema.json_schema_check(statement, weakened))
-        result = hrev.verify_review(_envelope(statement), "bundle", SUBJECT,
-                                    _registry(), _material(), None, weakened, NOW)
+        result = hrev.verify_review(
+            _envelope(statement),
+            'bundle',
+            SUBJECT,
+            _registry(),
+            _material(),
+            opts=hrev.ReviewVerifyOptions(schema_envelope=None, schema_statement=weakened, now=NOW),
+        )
         self.assertFalse(result["ok"])
         self.assertEqual("REVIEW-NOT-APPROVED", result["reason"])
 
@@ -175,8 +226,17 @@ class VerifyIntegrationTest(unittest.TestCase):
 
     def _verify(self, review):
         from core.trust import verify as tv
-        return tv.verify(self.bundle, self._policy(), str(ROOT), registry=_registry(),
-                         material=_material(), now=NOW, human_review=review)
+        return tv.verify(
+            self.bundle,
+            self._policy(),
+            str(ROOT),
+            opts=tv.TrustVerifyOptions(
+                registry=_registry(),
+                material=_material(),
+                now=NOW,
+                human_review=review,
+            ),
+        )
 
     def test_approved_review_check(self):
         result = self._verify(_envelope(_statement(digest=self.digest)))

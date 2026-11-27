@@ -36,7 +36,7 @@ class _Base(unittest.TestCase):
         self.key = b"0123456789abcdef0123456789abcdef"
 
     def _pack(self, targets=("docs/a.md", "docs/b.md"), **kw):
-        data, info = evidence.build(str(self.tmp), list(targets), **kw)
+        data, info = evidence.build(str(self.tmp), list(targets), opts=evidence.BuildOptions(**kw))
         out = Path(self._tmp.name) / "bundle.zip"
         out.write_bytes(data)
         return str(out), info, data
@@ -70,10 +70,16 @@ class TestVerdicts(_Base):
 
     def test_deterministic_bytes(self):
         """固定签发时刻时，两次打包逐字节一致（固定时间戳 + 成员排序 + 不压缩）。"""
-        d1, _ = evidence.build(str(self.tmp), ["docs/a.md", "docs/b.md"],
-                               created_at="2026-01-01T00:00:00Z")
-        d2, _ = evidence.build(str(self.tmp), ["docs/a.md", "docs/b.md"],
-                               created_at="2026-01-01T00:00:00Z")
+        d1, _ = evidence.build(
+            str(self.tmp),
+            ['docs/a.md', 'docs/b.md'],
+            opts=evidence.BuildOptions(created_at='2026-01-01T00:00:00Z'),
+        )
+        d2, _ = evidence.build(
+            str(self.tmp),
+            ['docs/a.md', 'docs/b.md'],
+            opts=evidence.BuildOptions(created_at='2026-01-01T00:00:00Z'),
+        )
         self.assertEqual(d1, d2)
 
     def test_tampered_payload_invalid(self):
@@ -121,7 +127,7 @@ class TestVerdicts(_Base):
         rev = {"schema": evidence.REVOCATION_SCHEMA,
                "revoked": [{"digest": hashlib.sha256(payload).hexdigest(),
                             "revoked_at": "2026-01-01T00:00:00Z", "reason": "错签"}]}
-        res = evidence.verify(path, revocations=rev)
+        res = evidence.verify(path, opts=evidence.VerifyOptions(revocations=rev))
         self.assertEqual(res["verdict"], "revoked")
         self.assertEqual((res["revoked_by"] or {}).get("reason"), "错签")
 
@@ -130,7 +136,7 @@ class TestVerdicts(_Base):
         rev = {"schema": evidence.REVOCATION_SCHEMA,
                "revoked": [{"path": "docs/b.md", "revoked_at": "2026-01-01T00:00:00Z",
                             "reason": "下架"}]}
-        self.assertEqual(evidence.verify(path, revocations=rev)["verdict"], "revoked")
+        self.assertEqual(evidence.verify(path, opts=evidence.VerifyOptions(revocations=rev))["verdict"], "revoked")
 
     def test_revocation_ignored_when_tampered(self):
         """篡改优先于吊销：先判 invalid，不把坏证据说成「只是被吊销」。"""
@@ -142,7 +148,7 @@ class TestVerdicts(_Base):
         members["payload/docs/a.md"] = b"tampered"
         bad = Path(self._tmp.name, "t.zip")
         bad.write_bytes(evidence._zip_bytes(list(members.items())))
-        self.assertEqual(evidence.verify(str(bad), revocations=rev)["verdict"], "invalid")
+        self.assertEqual(evidence.verify(str(bad), opts=evidence.VerifyOptions(revocations=rev))["verdict"], "invalid")
 
     def test_expired(self):
         path, _info, _ = self._pack(expires_at="2020-01-01T00:00:00Z")
@@ -157,7 +163,7 @@ class TestVerdicts(_Base):
         path, _info, _ = self._pack(expires_at="2020-01-01T00:00:00Z")
         rev = {"schema": evidence.REVOCATION_SCHEMA,
                "revoked": [{"path": "docs/a.md", "reason": "x"}]}
-        self.assertEqual(evidence.verify(path, revocations=rev)["verdict"], "revoked")
+        self.assertEqual(evidence.verify(path, opts=evidence.VerifyOptions(revocations=rev))["verdict"], "revoked")
 
     def test_not_a_bundle(self):
         bad = Path(self._tmp.name, "x.zip")
@@ -194,13 +200,13 @@ class TestStrength(_Base):
 
     def test_hmac_with_key_ok(self):
         path, _info, _ = self._pack(key=self.key)
-        res = evidence.verify(path, key=self.key)
+        res = evidence.verify(path, opts=evidence.VerifyOptions(key=self.key))
         self.assertEqual(res["verdict"], "ok", res["issues"])
         self.assertEqual(res["level"], "hmac-sha256")
 
     def test_hmac_wrong_key_invalid(self):
         path, _info, _ = self._pack(key=self.key)
-        res = evidence.verify(path, key=b"wrong-key-wrong-key-wrong-key")
+        res = evidence.verify(path, opts=evidence.VerifyOptions(key=b'wrong-key-wrong-key-wrong-key'))
         self.assertEqual(res["verdict"], "invalid")
 
     def test_no_attestation_invalid(self):
@@ -257,7 +263,7 @@ class TestForms(_Base):
         doc = self._receipts_doc()
         path = Path(self._tmp.name, "RECEIPTS.json")
         path.write_text(json.dumps(doc, ensure_ascii=False, indent=2), encoding="utf-8")
-        res = evidence.verify_any(str(path), root=str(self.tmp))
+        res = evidence.verify_any(str(path), opts=evidence.BatchVerifyOptions(root=str(self.tmp)))
         self.assertEqual(res["verdict"], "ok", res["issues"])
         self.assertEqual(res["level"], "receipts_only")
         self.assertEqual(res["count"], 2)
@@ -268,7 +274,7 @@ class TestForms(_Base):
         path = Path(self._tmp.name, "RECEIPTS.json")
         path.write_text(json.dumps(doc, ensure_ascii=False, indent=2), encoding="utf-8")
         self.a.write_text("# A\n\n被改\n", encoding="utf-8")
-        res = evidence.verify_any(str(path), root=str(self.tmp))
+        res = evidence.verify_any(str(path), opts=evidence.BatchVerifyOptions(root=str(self.tmp)))
         self.assertEqual(res["verdict"], "invalid")
         self.assertTrue(any("成员摘要不符" in i for i in res["issues"]), res["issues"])
 
@@ -277,7 +283,7 @@ class TestForms(_Base):
         path = Path(self._tmp.name, "RECEIPTS.json")
         path.write_text(json.dumps(doc, ensure_ascii=False, indent=2), encoding="utf-8")
         self.b.unlink()
-        res = evidence.verify_any(str(path), root=str(self.tmp))
+        res = evidence.verify_any(str(path), opts=evidence.BatchVerifyOptions(root=str(self.tmp)))
         self.assertEqual(res["verdict"], "invalid")
         self.assertTrue(any("缺成员实体" in i for i in res["issues"]), res["issues"])
 
@@ -288,7 +294,10 @@ class TestForms(_Base):
         path = Path(self._tmp.name, "ATTEST.json")
         path.write_text(json.dumps({"schema": "nf-attest-set/1", "attestations": envs},
                                    ensure_ascii=False), encoding="utf-8")
-        res = evidence.verify_any(str(path), root=str(self.tmp), key=self.key)
+        res = evidence.verify_any(
+            str(path),
+            opts=evidence.BatchVerifyOptions(key=self.key, root=str(self.tmp)),
+        )
         self.assertEqual(res["verdict"], "ok", res["issues"])
         self.assertEqual(res["level"], "hmac-sha256")
 
@@ -297,7 +306,7 @@ class TestForms(_Base):
         path = Path(self._tmp.name, "ATTEST.json")
         path.write_text(json.dumps({"schema": "nf-attest-set/1", "attestations": envs},
                                    ensure_ascii=False), encoding="utf-8")
-        self.assertEqual(evidence.verify_any(str(path), root=str(self.tmp))["verdict"],
+        self.assertEqual(evidence.verify_any(str(path), opts=evidence.BatchVerifyOptions(root=str(self.tmp)))["verdict"],
                          "invalid")
 
     def test_attest_subject_edit_invalid(self):
@@ -305,7 +314,7 @@ class TestForms(_Base):
         env["subject"]["sha256"] = "0" * 64
         path = Path(self._tmp.name, "A.json")
         path.write_text(json.dumps(env, ensure_ascii=False), encoding="utf-8")
-        res = evidence.verify_any(str(path), root=str(self.tmp))
+        res = evidence.verify_any(str(path), opts=evidence.BatchVerifyOptions(root=str(self.tmp)))
         self.assertEqual(res["verdict"], "invalid")
 
     def test_container_auto_detect_receipts(self):
@@ -393,7 +402,7 @@ class TestStandaloneParity(_Base):
         path, _info, data = self._pack(key=self.key)
         kf = self._key_file()
         self.assertEqual(self._verdict(path, key_file=kf),
-                         evidence.verify_any(path, key=self.key)["verdict"])
+                         evidence.verify_any(path, opts=evidence.BatchVerifyOptions(key=self.key))["verdict"])
         self.assertEqual(self._verdict(path),
                          evidence.verify_any(path)["verdict"])
         with zipfile.ZipFile(path) as zf:
@@ -402,20 +411,26 @@ class TestStandaloneParity(_Base):
         bad = Path(self._tmp.name, "bad.zip")
         bad.write_bytes(evidence._zip_bytes(list(members.items())))
         self.assertEqual(self._verdict(str(bad), key_file=kf),
-                         evidence.verify_any(str(bad), key=self.key)["verdict"])
+                         evidence.verify_any(
+                             str(bad),
+                             opts=evidence.BatchVerifyOptions(key=self.key),
+                         )["verdict"])
 
     def test_revoked_and_expired_agree(self):
         path, _info, _data = self._pack(key=self.key, expires_at="2020-01-01T00:00:00Z")
         kf = self._key_file()
         self.assertEqual(self._verdict(path, key_file=kf),
-                         evidence.verify_any(path, key=self.key)["verdict"])
+                         evidence.verify_any(path, opts=evidence.BatchVerifyOptions(key=self.key))["verdict"])
         ok_path, _i2, _d2 = self._pack(key=self.key)
         rev = {"schema": evidence.REVOCATION_SCHEMA,
                "revoked": [{"path": "docs/a.md", "reason": "x"}]}
         rev_file = Path(self._tmp.name, "rev.json")
         rev_file.write_text(json.dumps(rev), encoding="utf-8")
         self.assertEqual(self._verdict(str(ok_path), key_file=kf, revocations=rev_file),
-                         evidence.verify_any(str(ok_path), key=self.key, revocations=rev)
+                         evidence.verify_any(
+                             str(ok_path),
+                             opts=evidence.BatchVerifyOptions(key=self.key, revocations=rev),
+                         )
                          ["verdict"])
 
     def test_anchor_verdicts_agree(self):
@@ -425,17 +440,22 @@ class TestStandaloneParity(_Base):
         tmp = Path(self._tmp.name)
         for n in ("a.md", "b.md", "c.md"):
             (tmp / "docs" / n).write_text(f"# {n}\n\nx\n", encoding="utf-8")
-        b2, _i2 = evidence.build(str(self.tmp), ["docs/a.md", "docs/b.md"],
-                                 created_at="2026-01-01T00:00:00Z", key=self.key)
+        b2, _i2 = evidence.build(
+            str(self.tmp),
+            ['docs/a.md', 'docs/b.md'],
+            opts=evidence.BuildOptions(key=self.key, created_at='2026-01-01T00:00:00Z'),
+        )
         v2 = tmp / "v2.zip"
         v2.write_bytes(b2)
-        head2 = {"count": 2, "head": evidence.verify(str(v2), key=self.key)["head"]}
-        b3, _i3 = evidence.build(str(self.tmp), ["docs/a.md", "docs/b.md", "docs/c.md"],
-                                 created_at="2026-01-02T00:00:00Z", key=self.key,
-                                 anchor=head2)
+        head2 = {"count": 2, "head": evidence.verify(str(v2), opts=evidence.VerifyOptions(key=self.key))["head"]}
+        b3, _i3 = evidence.build(
+            str(self.tmp),
+            ['docs/a.md', 'docs/b.md', 'docs/c.md'],
+            opts=evidence.BuildOptions(key=self.key, created_at='2026-01-02T00:00:00Z', anchor=head2),
+        )
         v3 = tmp / "v3.zip"
         v3.write_bytes(b3)
-        head3 = {"count": 3, "head": evidence.verify(str(v3), key=self.key)["head"]}
+        head3 = {"count": 3, "head": evidence.verify(str(v3), opts=evidence.VerifyOptions(key=self.key))["head"]}
 
         def standalone(path, anchor):
             af = Path(self._tmp.name, "anchor.json")
@@ -449,15 +469,18 @@ class TestStandaloneParity(_Base):
         cases = [(v3, head2, "ok"), (v2, head3, "invalid"),
                  (v3, {"count": 2, "head": "0" * 64}, "invalid")]
         for path, anchor, want in cases:
-            core = evidence.verify(str(path), key=self.key, anchor=anchor)["verdict"]
+            core = evidence.verify(str(path), opts=evidence.VerifyOptions(key=self.key, anchor=anchor))["verdict"]
             self.assertEqual(want, core, str(path))
             self.assertEqual(core, standalone(path, anchor), str(path))
     def test_container_attacks_agree(self):
         """双实现必须同判容器面攻击（遍历 / 重名）——第三方复验也吃同一口径。"""
         import subprocess
         tmp = str(self._tmp.name)
-        base, _info = evidence.build(str(self.tmp), ["docs/a.md"],
-                                     created_at="2026-01-01T00:00:00Z")
+        base, _info = evidence.build(
+            str(self.tmp),
+            ['docs/a.md'],
+            opts=evidence.BuildOptions(created_at='2026-01-01T00:00:00Z'),
+        )
         members = _bundle_members(base)
         meta = json.loads(members["bundle.json"].decode())
         meta["entries"][0].update({"path": "../escape.md", "id": "../escape.md"})
@@ -486,7 +509,10 @@ class TestStandaloneParity(_Base):
         rec = Path(self._tmp.name, "RECEIPTS.json")
         rec.write_text(json.dumps(doc, ensure_ascii=False), encoding="utf-8")
         self.assertEqual(self._verdict(str(rec), root=str(self.tmp)),
-                         evidence.verify_any(str(rec), root=str(self.tmp))["verdict"])
+                         evidence.verify_any(
+                             str(rec),
+                             opts=evidence.BatchVerifyOptions(root=str(self.tmp)),
+                         )["verdict"])
         envs = [attest.sign_hmac(attest.build(rel, str(self.tmp)), self.key)
                 for rel in ("docs/a.md", "docs/b.md")]
         aset = Path(self._tmp.name, "ATTEST.json")
@@ -494,7 +520,10 @@ class TestStandaloneParity(_Base):
                                    ensure_ascii=False), encoding="utf-8")
         kf = self._key_file()
         self.assertEqual(self._verdict(str(aset), key_file=kf, root=str(self.tmp)),
-                         evidence.verify_any(str(aset), key=self.key, root=str(self.tmp))
+                         evidence.verify_any(
+                             str(aset),
+                             opts=evidence.BatchVerifyOptions(key=self.key, root=str(self.tmp)),
+                         )
                          ["verdict"])
 
 
@@ -584,7 +613,7 @@ class TestReplay(_Base):
         import subprocess
         for name, fn in cases:
             bad = mutate(name, fn)
-            core = evidence.verify(bad, key=self.key)["verdict"]
+            core = evidence.verify(bad, opts=evidence.VerifyOptions(key=self.key))["verdict"]
             self.assertEqual(core, "invalid", name)
             proc = subprocess.run([sys.executable, str(TestStandaloneParity.SCRIPT),
                                    "--evidence", bad, "--json", "--key-file", str(kf)],
@@ -599,28 +628,44 @@ class TestReplay(_Base):
         (tmp / "d").mkdir(exist_ok=True)
         for n in ("a.md", "b.md", "c.md"):
             (tmp / "d" / n).write_text(f"# {n}\n\nx\n", encoding="utf-8")
-        b2, _i2 = evidence.build(str(tmp), ["d/a.md", "d/b.md"],
-                                 created_at="2026-01-01T00:00:00Z", key=self.key)
+        b2, _i2 = evidence.build(
+            str(tmp),
+            ['d/a.md', 'd/b.md'],
+            opts=evidence.BuildOptions(key=self.key, created_at='2026-01-01T00:00:00Z'),
+        )
         v2 = tmp / "v2.zip"
         v2.write_bytes(b2)
-        head2 = evidence.verify(str(v2), key=self.key)["head"]
-        b3, _i3 = evidence.build(str(tmp), ["d/a.md", "d/b.md", "d/c.md"],
-                                 created_at="2026-01-02T00:00:00Z", key=self.key,
-                                 anchor={"count": 2, "head": head2})
+        head2 = evidence.verify(str(v2), opts=evidence.VerifyOptions(key=self.key))["head"]
+        b3, _i3 = evidence.build(
+            str(tmp),
+            ['d/a.md', 'd/b.md', 'd/c.md'],
+            opts=evidence.BuildOptions(
+                key=self.key,
+                created_at='2026-01-02T00:00:00Z',
+                anchor={'count': 2, 'head': head2},
+            ),
+        )
         v3 = tmp / "v3.zip"
         v3.write_bytes(b3)
-        good = evidence.verify(str(v3), key=self.key,
-                               anchor={"count": 2, "head": head2})
+        good = evidence.verify(
+            str(v3),
+            opts=evidence.VerifyOptions(key=self.key, anchor={'count': 2, 'head': head2}),
+        )
         self.assertEqual("ok", good["verdict"])
         self.assertTrue(good["anchor_verified"])
-        head3 = evidence.verify(str(v3), key=self.key)["head"]
-        cut = evidence.verify(str(v2), key=self.key, anchor={"count": 3, "head": head3})
+        head3 = evidence.verify(str(v3), opts=evidence.VerifyOptions(key=self.key))["head"]
+        cut = evidence.verify(
+            str(v2),
+            opts=evidence.VerifyOptions(key=self.key, anchor={'count': 3, 'head': head3}),
+        )
         self.assertEqual("invalid", cut["verdict"])
         self.assertIn("截断", " ".join(cut["issues"]))
-        fork = evidence.verify(str(v3), key=self.key,
-                               anchor={"count": 2, "head": "0" * 64})
+        fork = evidence.verify(
+            str(v3),
+            opts=evidence.VerifyOptions(key=self.key, anchor={'count': 2, 'head': '0' * 64}),
+        )
         self.assertEqual("invalid", fork["verdict"])
-        noisy = evidence.verify(str(v3), key=self.key)
+        noisy = evidence.verify(str(v3), opts=evidence.VerifyOptions(key=self.key))
         self.assertEqual("ok", noisy["verdict"], "缺锚点材料不判死")
         self.assertFalse(noisy["anchor_verified"], "缺锚点材料不得声称已核对")
         self.assertTrue(noisy["warnings"], "缺锚点材料必须留下 warning")
@@ -639,7 +684,11 @@ class TestContainerHardening(unittest.TestCase):
         for name, body in (("a.md", "# A\n"),):
             (Path(tmp) / "d").mkdir(parents=True, exist_ok=True)
             (Path(tmp) / "d" / name).write_text(body, encoding="utf-8")
-        return evidence.build(str(tmp), ["d/a.md"], created_at="2026-01-01T00:00:00Z")[0]
+        return evidence.build(
+            str(tmp),
+            ['d/a.md'],
+            opts=evidence.BuildOptions(created_at='2026-01-01T00:00:00Z'),
+        )[0]
 
     def _members(self, data):
         with zipfile.ZipFile(io.BytesIO(data)) as zf:
@@ -735,7 +784,7 @@ class TestDecisionBinding(_Base):
 
     def test_bound_with_hmac(self):
         path, _info, _data = self._pack(decision=self._decision(), key=self.key)
-        res = evidence.verify(path, key=self.key)
+        res = evidence.verify(path, opts=evidence.VerifyOptions(key=self.key))
         self.assertEqual(("ok", "bound"),
                          (res["verdict"], res["decision_status"]), res["issues"])
 
@@ -777,25 +826,28 @@ class TestDecisionBinding(_Base):
         dec = self._decision()
         dec["policy_digest"] = "not-hex"
         with self.assertRaises(ValueError) as ctx:
-            evidence.build(str(self.tmp), ["docs/a.md"], decision=dec)
+            evidence.build(str(self.tmp), ['docs/a.md'], opts=evidence.BuildOptions(decision=dec))
         self.assertIn("修复指引", str(ctx.exception))
 
     def test_expected_policy_matches(self):
         dec = self._decision()
         path, _info, _data = self._pack(decision=dec)
-        res = evidence.verify(path, expected_policy_digest=dec["policy_digest"])
+        res = evidence.verify(
+            path,
+            opts=evidence.VerifyOptions(expected_policy_digest=dec['policy_digest']),
+        )
         self.assertEqual("ok", res["verdict"], res["issues"])
         self.assertTrue(res["policy_verified"])
 
     def test_expected_policy_mismatch_is_invalid(self):
         path, _info, _data = self._pack(decision=self._decision())
-        res = evidence.verify(path, expected_policy_digest="1" * 64)
+        res = evidence.verify(path, opts=evidence.VerifyOptions(expected_policy_digest='1' * 64))
         self.assertEqual("invalid", res["verdict"])
         self.assertIn("不符", " ".join(res["issues"]))
 
     def test_expected_without_decision_warns_not_fails(self):
         path, _info, _data = self._pack()
-        res = evidence.verify(path, expected_policy_digest="1" * 64)
+        res = evidence.verify(path, opts=evidence.VerifyOptions(expected_policy_digest='1' * 64))
         self.assertEqual("ok", res["verdict"], res["issues"])
         self.assertFalse(res["policy_verified"])
         self.assertTrue(any("无法比对" in w for w in res["warnings"]), res["warnings"])
@@ -815,8 +867,11 @@ class TestDecisionBinding(_Base):
 
         self.assertEqual((0, "ok"), run(dec["policy_digest"]))
         self.assertEqual((1, "invalid"), run("1" * 64))
-        core_ok = evidence.verify(path, expected_policy_digest=dec["policy_digest"])
-        core_bad = evidence.verify(path, expected_policy_digest="1" * 64)
+        core_ok = evidence.verify(
+            path,
+            opts=evidence.VerifyOptions(expected_policy_digest=dec['policy_digest']),
+        )
+        core_bad = evidence.verify(path, opts=evidence.VerifyOptions(expected_policy_digest='1' * 64))
         self.assertEqual(("ok", "invalid"), (core_ok["verdict"], core_bad["verdict"]))
 
 class TimeProofTest(unittest.TestCase):
@@ -827,11 +882,14 @@ class TimeProofTest(unittest.TestCase):
             root = Path(tmp)
             (root / "docs").mkdir()
             (root / "docs" / "a.md").write_text("# A\n", encoding="utf-8")
-            data, _info = evidence.build(str(root), ["docs/a.md"],
-                                     created_at="2026-01-01T00:00:00Z")
+            data, _info = evidence.build(
+                str(root),
+                ['docs/a.md'],
+                opts=evidence.BuildOptions(created_at='2026-01-01T00:00:00Z'),
+            )
             bundle = Path(tmp) / "b.zip"
             bundle.write_bytes(data)
-            res = evidence.verify(str(bundle), at="2030-01-01T00:00:00Z")
+            res = evidence.verify(str(bundle), opts=evidence.VerifyOptions(at='2030-01-01T00:00:00Z'))
             self.assertEqual("pinned", res["time_proof"])
             self.assertIn("2030-01-01", res["time_basis"])
 
@@ -840,8 +898,11 @@ class TimeProofTest(unittest.TestCase):
             root = Path(tmp)
             (root / "docs").mkdir()
             (root / "docs" / "a.md").write_text("# A\n", encoding="utf-8")
-            data, _info = evidence.build(str(root), ["docs/a.md"],
-                                     created_at="2026-01-01T00:00:00Z")
+            data, _info = evidence.build(
+                str(root),
+                ['docs/a.md'],
+                opts=evidence.BuildOptions(created_at='2026-01-01T00:00:00Z'),
+            )
             bundle = Path(tmp) / "b.zip"
             bundle.write_bytes(data)
             # 无有效期 = 时间没参与判定：标 none 但不必警告
@@ -849,9 +910,14 @@ class TimeProofTest(unittest.TestCase):
             self.assertEqual("none", res["time_proof"])
             self.assertFalse(any("G3" in w for w in res["warnings"]))
             # 带有效期 = 时间参与了判定：必须给 G3 warning（不假装时间可信）
-            data2, _ = evidence.build(str(root), ["docs/a.md"],
-                                      created_at="2026-01-01T00:00:00Z",
-                                      expires_at="2099-01-01T00:00:00Z")
+            data2, _ = evidence.build(
+                str(root),
+                ['docs/a.md'],
+                opts=evidence.BuildOptions(
+                    expires_at='2099-01-01T00:00:00Z',
+                    created_at='2026-01-01T00:00:00Z',
+                ),
+            )
             bundle2 = Path(tmp) / "b2.zip"
             bundle2.write_bytes(data2)
             res2 = evidence.verify(str(bundle2))
@@ -864,9 +930,14 @@ class TimeProofTest(unittest.TestCase):
             root = Path(tmp)
             (root / "docs").mkdir()
             (root / "docs" / "a.md").write_text("# A\n", encoding="utf-8")
-            data, _info = evidence.build(str(root), ["docs/a.md"],
-                                         created_at="2026-01-01T00:00:00Z",
-                                         expires_at="2099-01-01T00:00:00Z")
+            data, _info = evidence.build(
+                str(root),
+                ['docs/a.md'],
+                opts=evidence.BuildOptions(
+                    expires_at='2099-01-01T00:00:00Z',
+                    created_at='2026-01-01T00:00:00Z',
+                ),
+            )
             bundle = Path(tmp) / "b.zip"
             bundle.write_bytes(data)
             script = Path(__file__).resolve().parent.parent.parent / "scripts" / "nf_verify.py"

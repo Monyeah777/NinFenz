@@ -480,14 +480,26 @@ def scan(root: str = ".") -> tuple:
         from core import layer_model as _lm
         layer_fp = _lm.face_fingerprint(root)
     except Exception:                                    # noqa: BLE001 - 取不出就退回整面
-        return csc.memo_pair("purity-scan", patterns(root), _scan_impl, root,
-                             code_modules=("core.purity_scan",),
-                             fp=_cache_key(csc.face_fingerprint(root, patterns(root)),
-                                           _env_fingerprint(root)))
+        return csc.memo_pair(
+            'purity-scan',
+            patterns(root),
+            _scan_impl,
+            root,
+            code_modules=('core.purity_scan',),
+            opts=csc.MemoOptions(
+                fp=_cache_key(csc.face_fingerprint(root, patterns(root)), _env_fingerprint(root)),
+            ),
+        )
     own_fp = csc.face_fingerprint(root, OWN_PATTERNS)
     fp = _cache_key(own_fp, layer_fp, _env_fingerprint(root))
-    return csc.memo_pair("purity-scan", patterns(root), lambda r: _scan_impl(r, layer_fp), root,
-                         code_modules=("core.purity_scan",), fp=fp)
+    return csc.memo_pair(
+        'purity-scan',
+        patterns(root),
+        lambda r: _scan_impl(r, layer_fp),
+        root,
+        code_modules=('core.purity_scan',),
+        opts=csc.MemoOptions(fp=fp),
+    )
 
 
 def _scan_impl(root: str = ".", _layer_fp: Optional[str] = None) -> tuple:

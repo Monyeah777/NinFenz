@@ -1,6 +1,8 @@
 """terminal · _session_run（自 terminal.py 拆出；只移动代码，行为/文案不变）。"""
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 from ._completion import (
     complete,
     render_completions,
@@ -20,19 +22,29 @@ from ._parse import (
 from ._render import (
     banner,
 )
-from ._session import (
-    Session,
-)
+from ._session import Session, SessionOptions
 from ._session_io import (
     load_session_state,
     save_session_state,
 )
 
 
-def run_session(runner, stdin, stdout, assume_yes: bool = False,
-                show_banner: bool = True, baseline: str = "", index=None,
-                history_path=None, color=False, width=None, limit=0,
-                color_mode="never", session_path=None) -> int:
+@dataclass(frozen=True)
+class RunOptions:
+    """参数对象（审计 C-007：把成组参数收成不可变对象）。"""
+    assume_yes: bool = False
+    show_banner: bool = True
+    baseline: str = ''
+    index: object = None
+    history_path: object = None
+    color: object = False
+    width: object = None
+    limit: object = 0
+    color_mode: object = 'never'
+    session_path: object = None
+
+
+def run_session(runner, stdin, stdout, opts: RunOptions | None = None) -> int:
     r"""交互会话主循环：读一行 → 分派 → 打印 → 直到 quit / EOF。
 
     写入类命令在交互态**就地追问**（读到 yes 才放行本次）；非交互态仍须 `--yes`。
@@ -41,11 +53,33 @@ def run_session(runner, stdin, stdout, assume_yes: bool = False,
     健壮性（对标顶尖 CLI 终端）：Ctrl-C 只取消当前行、不杀会话；行尾 `\` 续行（多行命令）；
     行尾 Tab = 补全候选；`history_path` 启用跨会话历史（`--exec`/`--file` 不写，保确定性）。
     """
+
+    opts = opts if opts is not None else RunOptions()
+    assume_yes = opts.assume_yes
+    show_banner = opts.show_banner
+    baseline = opts.baseline
+    index = opts.index
+    history_path = opts.history_path
+    color = opts.color
+    width = opts.width
+    limit = opts.limit
+    color_mode = opts.color_mode
+    session_path = opts.session_path
     state, warn = load_session_state(session_path)
-    session = Session(runner, assume_yes=assume_yes, index=index,
-                      history_path=history_path, color=color, width=width,
-                      limit=limit, color_mode=color_mode, stream=stdout,
-                      session_path=session_path)
+    session = Session(
+        runner,
+        opts=SessionOptions(
+            assume_yes=assume_yes,
+            index=index,
+            history_path=history_path,
+            color=color,
+            width=width,
+            limit=limit,
+            color_mode=color_mode,
+            stream=stdout,
+            session_path=session_path,
+        ),
+    )
     session.last_zone = str(state.get("last_zone") or "")
     if show_banner:
         stdout.write(banner(baseline, color) + "\n")
