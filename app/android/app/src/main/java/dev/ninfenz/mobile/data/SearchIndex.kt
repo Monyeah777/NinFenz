@@ -85,8 +85,17 @@ class SearchIndex(private val filesDir: File) {
         val m = b.length
         if (Math.abs(n - m) > 1) return 2
         val d = Array(n + 1) { IntArray(m + 1) }
+        initDistanceBounds(d, n, m)
+        fillDistance(d, a, b, n, m)
+        return d[n][m]
+    }
+
+    private fun initDistanceBounds(d: Array<IntArray>, n: Int, m: Int) {
         for (i in 0..n) d[i][0] = i
         for (j in 0..m) d[0][j] = j
+    }
+
+    private fun fillDistance(d: Array<IntArray>, a: String, b: String, n: Int, m: Int) {
         for (i in 1..n) {
             for (j in 1..m) {
                 val cost = if (a[i - 1] == b[j - 1]) 0 else 1
@@ -96,7 +105,6 @@ class SearchIndex(private val filesDir: File) {
                 }
             }
         }
-        return d[n][m]
     }
 
     private fun snippet(body: String, term: String): String {
@@ -111,20 +119,31 @@ class SearchIndex(private val filesDir: File) {
         val title = normalize(hit.title)
         val detail = normalize(hit.detail)
         val body = normalize(hit.body)
+        var score = baseScore(title, detail, body, q)
+        for (term in terms) {
+            val delta = termScore(title, detail, body, term)
+            if (delta < 0) return -1
+            score += delta
+        }
+        return score
+    }
+
+    private fun baseScore(title: String, detail: String, body: String, q: String): Int {
         var score = 0
         if (title == q) score += 120
         if (title.startsWith(q)) score += 90
         if (title.contains(q)) score += 60
         if (detail.contains(q)) score += 35
         if (body.contains(q)) score += 12
-        for (term in terms) {
-            if (title.contains(term)) score += 20
-            else if (detail.contains(term)) score += 8
-            else if (body.contains(term)) score += 3
-            else if (fuzzyWord(title + " " + detail + " " + body, term)) score += 1
-            else return -1
-        }
         return score
+    }
+
+    private fun termScore(title: String, detail: String, body: String, term: String): Int {
+        if (title.contains(term)) return 20
+        if (detail.contains(term)) return 8
+        if (body.contains(term)) return 3
+        if (fuzzyWord(title + " " + detail + " " + body, term)) return 1
+        return -1
     }
 
     private fun projects(): List<SearchHit> {

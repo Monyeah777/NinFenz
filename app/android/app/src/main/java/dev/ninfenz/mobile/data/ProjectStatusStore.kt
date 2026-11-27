@@ -43,6 +43,12 @@ class ProjectStatusStore(
 ) {
     private fun bridge(): CoreBridge? = injectedBridge ?: runCatching { Core.bridge }.getOrNull()
 
+    private sealed interface StepOutcome
+
+    private data class StepApplied(val raw: JsonObject) : StepOutcome
+
+    private data class StepFailed(val failure: StatusAdvanceResult.Failure) : StepOutcome
+
     suspend fun advance(
         project: Project,
         target: ProjectStatus,
@@ -62,32 +68,18 @@ class ProjectStatusStore(
                 return@withContext StatusAdvanceResult.Advanced(ProjectModel.parse(raw.toString()), current, current)
             }
             val from = current
-            var cursor = current
-            val path = mutableListOf<ProjectStatus>()
-            if (allowAuditSkip && target == ProjectStatus.EXPORTED && current == ProjectStatus.ASSEMBLED) {
-                path.add(ProjectStatus.EXPORTED)
-            } else while (cursor != target) {
-                val next = ProjectModel.next(cursor)
-                    ?: return@withContext StatusAdvanceResult.Failure("NF-VAL-001", "无法从 " + cursor.wire + " 前进到 " + target.wire, "检查项目状态机")
-                path.add(next)
-                cursor = next
+            val forward = forwardPath(current, target, allowAuditSkip)
+            val stuckAt = forward.second
+            if (stuckAt != null) {
+                return@withContext StatusAdvanceResult.Failure(
+                    "NF-VAL-001", "无法从 " + stuckAt.wire + " 前进到 " + target.wire, "检查项目状态机"
+                )
             }
-            for (step in path) {
-                if (step == ProjectStatus.ASSEMBLED && raw["refs"]?.jsonObject?.get("assembly") == null) {
-                    val artifact = assembly ?: return@withContext StatusAdvanceResult.Failure(
-                        "NF-VAL-001",
-                        "进入 assembled 前必须提供 assembly 引用",
-                        "先装配并写入 assembly.md 再写回状态"
-                    )
-                    raw = withAssembly(core, raw, project.id, artifact)
-                        ?: return@withContext StatusAdvanceResult.Failure("NF-E-005", "assembly 摘要计算失败", "检查核心 canonical")
-                }
-                if (step == ProjectStatus.EXPORTED) {
-                    raw = withHistory(raw, "export", sha256(("export:" + project.id).toByteArray(Charsets.UTF_8)))
-                }
-                raw = withStatus(raw, current, step)
+            for (step in forward.first) {
+                val outcome = applyStep(core, raw, project.id, current, step, assembly)
+                if (outcome is StepFailed) return@withContext outcome.failure
+                raw = (outcome as StepApplied).raw
                 current = step
-                cursor = step
             }
             val validate = core.call("project-validate", buildJsonObject { put("project", raw) })
             if (!validate.ok) {
@@ -101,6 +93,51 @@ class ProjectStatusStore(
         } catch (t: Throwable) {
             StatusAdvanceResult.Failure("NF-E-005", "状态写回失败：" + (t.message ?: t.javaClass.simpleName), "检查项目文件与核心桥")
         }
+    }
+
+    private fun forwardPath(
+        current: ProjectStatus,
+        target: ProjectStatus,
+        allowAuditSkip: Boolean
+    ): Pair<List<ProjectStatus>, ProjectStatus?> {
+        val path = mutableListOf<ProjectStatus>()
+        if (allowAuditSkip && target == ProjectStatus.EXPORTED && current == ProjectStatus.ASSEMBLED) {
+            path.add(ProjectStatus.EXPORTED)
+            return path to null
+        }
+        var cursor = current
+        while (cursor != target) {
+            val next = ProjectModel.next(cursor) ?: return path to cursor
+            path.add(next)
+            cursor = next
+        }
+        return path to null
+    }
+
+    private suspend fun applyStep(
+        core: CoreBridge,
+        raw: JsonObject,
+        projectId: String,
+        from: ProjectStatus,
+        step: ProjectStatus,
+        assembly: AssemblyArtifact?
+    ): StepOutcome {
+        var next = raw
+        if (step == ProjectStatus.ASSEMBLED && raw["refs"]?.jsonObject?.get("assembly") == null) {
+            val artifact = assembly ?: return StepFailed(
+                StatusAdvanceResult.Failure(
+                    "NF-VAL-001",
+                    "进入 assembled 前必须提供 assembly 引用",
+                    "先装配并写入 assembly.md 再写回状态"
+                )
+            )
+            next = withAssembly(core, raw, projectId, artifact)
+                ?: return StepFailed(StatusAdvanceResult.Failure("NF-E-005", "assembly 摘要计算失败", "检查核心 canonical"))
+        }
+        if (step == ProjectStatus.EXPORTED) {
+            next = withHistory(next, "export", sha256(("export:" + projectId).toByteArray(Charsets.UTF_8)))
+        }
+        return StepApplied(withStatus(next, from, step))
     }
 
     private suspend fun withAssembly(core: CoreBridge, raw: JsonObject, projectId: String, artifact: AssemblyArtifact): JsonObject? {

@@ -62,36 +62,62 @@ object FlashFillModel {
     }
 
     private fun candidates(before: String, after: String): List<Transform> = buildList {
-        if (after != before && after == before.lowercase()) add(Transform("lower"))
-        if (after != before && after == before.uppercase()) add(Transform("upper"))
-        if (after != before && after == before.trim()) add(Transform("trim"))
-        if (after != before && after == before.replace(Regex("\\s+"), " ").trim()) add(Transform("collapse"))
+        addSimpleCandidates(this, before, after)
+        addAffixCandidates(this, before, after)
+        addStripCandidates(this, before, after)
+        addReplaceCandidate(this, before, after)
+    }.distinct()
+
+    private fun addSimpleCandidates(target: MutableList<Transform>, before: String, after: String) {
+        if (after != before && after == before.lowercase()) target.add(Transform("lower"))
+        if (after != before && after == before.uppercase()) target.add(Transform("upper"))
+        if (after != before && after == before.trim()) target.add(Transform("trim"))
+        if (after != before && after == before.replace(Regex("\\s+"), " ").trim()) target.add(Transform("collapse"))
+    }
+
+    private fun addAffixCandidates(target: MutableList<Transform>, before: String, after: String) {
         if (after.startsWith(before) && after.length > before.length) {
             val s = after.removePrefix(before)
-            if (s.isNotEmpty()) add(Transform("suffix", s))
+            if (s.isNotEmpty()) target.add(Transform("suffix", s))
         }
         if (after.endsWith(before) && after.length > before.length) {
             val p = after.removeSuffix(before)
-            if (p.isNotEmpty()) add(Transform("prefix", p))
+            if (p.isNotEmpty()) target.add(Transform("prefix", p))
         }
+    }
+
+    private fun addStripCandidates(target: MutableList<Transform>, before: String, after: String) {
         if (before.endsWith(after) && before.length > after.length) {
             val p = before.removeSuffix(after)
-            if (p.isNotEmpty()) add(Transform("strip_prefix", p))
+            if (p.isNotEmpty()) target.add(Transform("strip_prefix", p))
         }
         if (before.startsWith(after) && before.length > after.length) {
             val s = before.removePrefix(after)
-            if (s.isNotEmpty()) add(Transform("strip_suffix", s))
+            if (s.isNotEmpty()) target.add(Transform("strip_suffix", s))
         }
         if (before.startsWith(after) && after.isNotEmpty()) {
-            add(Transform("truncate", after.length.toString()))
+            target.add(Transform("truncate", after.length.toString()))
         }
+    }
 
+    private fun addReplaceCandidate(target: MutableList<Transform>, before: String, after: String) {
+        val prefix = commonPrefixLength(before, after)
+        val room = minOf(before.length, after.length) - prefix
+        val suffix = commonSuffixLength(before, after, room)
+        val old = if (suffix > 0) before.substring(prefix, before.length - suffix) else before.substring(prefix)
+        val new = if (suffix > 0) after.substring(prefix, after.length - suffix) else after.substring(prefix)
+        if (old.length >= 2 && before.replace(old, new) == after) target.add(Transform("replace", old, new))
+    }
+
+    private fun commonPrefixLength(before: String, after: String): Int {
         var n = 0
         while (n < minOf(before.length, after.length) && before[n] == after[n]) n++
+        return n
+    }
+
+    private fun commonSuffixLength(before: String, after: String, room: Int): Int {
         var m = 0
-        while (m < minOf(before.length, after.length) - n && before[before.length - 1 - m] == after[after.length - 1 - m]) m++
-        val old = if (m > 0) before.substring(n, before.length - m) else before.substring(n)
-        val new = if (m > 0) after.substring(n, after.length - m) else after.substring(n)
-        if (old.length >= 2 && before.replace(old, new) == after) add(Transform("replace", old, new))
-    }.distinct()
+        while (m < room && before[before.length - 1 - m] == after[after.length - 1 - m]) m++
+        return m
+    }
 }

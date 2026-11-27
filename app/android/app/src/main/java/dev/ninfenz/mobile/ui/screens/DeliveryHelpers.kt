@@ -10,37 +10,84 @@ internal fun sha256File(file: File): String =
 
 internal fun templateValueAllowed(meta: dev.ninfenz.mobile.model.SpecSlot?, value: String): Boolean {
     val clean = dev.ninfenz.mobile.model.SlotInput.sanitize(meta?.kind, value)
-    if (meta?.nonEmpty == true && clean.isBlank()) return false
-    if (meta?.startsWith != null && !clean.startsWith(meta.startsWith)) return false
-    if (meta?.endsWith != null && !clean.endsWith(meta.endsWith)) return false
-    if (meta?.minChars != null && clean.length < meta.minChars) return false
-    if (meta?.maxChars != null && clean.length > meta.maxChars) return false
-    if (meta?.pattern != null && !runCatching { Regex(meta.pattern).matches(clean) }.getOrDefault(false)) return false
-    return true
+    return requiredAllowed(meta, clean) && startsAllowed(meta, clean) && endsAllowed(meta, clean) &&
+        minAllowed(meta, clean) && maxAllowed(meta, clean) && patternAllowed(meta, clean)
 }
 
 internal fun slotIssue(context: Context, meta: dev.ninfenz.mobile.model.SpecSlot?, value: String): String? {
     if (meta == null) return null
     val clean = dev.ninfenz.mobile.model.SlotInput.sanitize(meta.kind, value)
-    if (clean.isBlank() && (meta.required || meta.nonEmpty)) {
-        return context.getString(dev.ninfenz.mobile.R.string.delivery_slot_required)
-    }
-    if (meta.minChars != null && clean.isNotBlank() && clean.length < meta.minChars) {
-        return context.getString(dev.ninfenz.mobile.R.string.delivery_slot_budget_min, meta.minChars)
-    }
-    if (meta.maxChars != null && clean.length > meta.maxChars) {
-        return context.getString(dev.ninfenz.mobile.R.string.delivery_slot_budget_max, meta.maxChars)
-    }
-    if (meta.startsWith != null && clean.isNotBlank() && !clean.startsWith(meta.startsWith)) {
-        return context.getString(dev.ninfenz.mobile.R.string.delivery_slot_rule_prefix, meta.startsWith)
-    }
-    if (meta.endsWith != null && clean.isNotBlank() && !clean.endsWith(meta.endsWith)) {
-        return context.getString(dev.ninfenz.mobile.R.string.delivery_slot_rule_suffix, meta.endsWith)
-    }
-    if (meta.pattern != null && clean.isNotBlank() && !runCatching { Regex(meta.pattern).matches(clean) }.getOrDefault(false)) {
-        return context.getString(dev.ninfenz.mobile.R.string.delivery_slot_rule_pattern, meta.pattern)
-    }
-    return null
+    return blankIssue(context, meta, clean)
+        ?: minIssue(context, meta, clean)
+        ?: maxIssue(context, meta, clean)
+        ?: prefixIssue(context, meta, clean)
+        ?: suffixIssue(context, meta, clean)
+        ?: patternIssue(context, meta, clean)
+}
+
+private fun requiredAllowed(meta: dev.ninfenz.mobile.model.SpecSlot?, clean: String): Boolean {
+    if (meta?.nonEmpty != true) return true
+    return clean.isNotBlank()
+}
+
+private fun startsAllowed(meta: dev.ninfenz.mobile.model.SpecSlot?, clean: String): Boolean {
+    val prefix = meta?.startsWith ?: return true
+    return clean.startsWith(prefix)
+}
+
+private fun endsAllowed(meta: dev.ninfenz.mobile.model.SpecSlot?, clean: String): Boolean {
+    val suffix = meta?.endsWith ?: return true
+    return clean.endsWith(suffix)
+}
+
+private fun minAllowed(meta: dev.ninfenz.mobile.model.SpecSlot?, clean: String): Boolean {
+    val min = meta?.minChars ?: return true
+    return clean.length >= min
+}
+
+private fun maxAllowed(meta: dev.ninfenz.mobile.model.SpecSlot?, clean: String): Boolean {
+    val max = meta?.maxChars ?: return true
+    return clean.length <= max
+}
+
+private fun patternAllowed(meta: dev.ninfenz.mobile.model.SpecSlot?, clean: String): Boolean {
+    val pattern = meta?.pattern ?: return true
+    return runCatching { Regex(pattern).matches(clean) }.getOrDefault(false)
+}
+
+private fun blankIssue(context: Context, meta: dev.ninfenz.mobile.model.SpecSlot, clean: String): String? {
+    if (!(clean.isBlank() && (meta.required || meta.nonEmpty))) return null
+    return context.getString(dev.ninfenz.mobile.R.string.delivery_slot_required)
+}
+
+private fun minIssue(context: Context, meta: dev.ninfenz.mobile.model.SpecSlot, clean: String): String? {
+    val min = meta.minChars ?: return null
+    if (!(clean.isNotBlank() && clean.length < min)) return null
+    return context.getString(dev.ninfenz.mobile.R.string.delivery_slot_budget_min, min)
+}
+
+private fun maxIssue(context: Context, meta: dev.ninfenz.mobile.model.SpecSlot, clean: String): String? {
+    val max = meta.maxChars ?: return null
+    if (clean.length <= max) return null
+    return context.getString(dev.ninfenz.mobile.R.string.delivery_slot_budget_max, max)
+}
+
+private fun prefixIssue(context: Context, meta: dev.ninfenz.mobile.model.SpecSlot, clean: String): String? {
+    val prefix = meta.startsWith ?: return null
+    if (!(clean.isNotBlank() && !clean.startsWith(prefix))) return null
+    return context.getString(dev.ninfenz.mobile.R.string.delivery_slot_rule_prefix, prefix)
+}
+
+private fun suffixIssue(context: Context, meta: dev.ninfenz.mobile.model.SpecSlot, clean: String): String? {
+    val suffix = meta.endsWith ?: return null
+    if (!(clean.isNotBlank() && !clean.endsWith(suffix))) return null
+    return context.getString(dev.ninfenz.mobile.R.string.delivery_slot_rule_suffix, suffix)
+}
+
+private fun patternIssue(context: Context, meta: dev.ninfenz.mobile.model.SpecSlot, clean: String): String? {
+    val pattern = meta.pattern ?: return null
+    if (!(clean.isNotBlank() && !runCatching { Regex(pattern).matches(clean) }.getOrDefault(false))) return null
+    return context.getString(dev.ninfenz.mobile.R.string.delivery_slot_rule_pattern, pattern)
 }
 
 internal fun parseTemplateSlots(markdown: String): Map<String, String> {

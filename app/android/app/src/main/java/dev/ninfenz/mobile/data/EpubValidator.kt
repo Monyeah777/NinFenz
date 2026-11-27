@@ -15,36 +15,46 @@ object EpubValidator {
         val issues = mutableListOf<String>()
         try {
             ZipFile(file).use { zip ->
-                val entries = zip.entries().toList()
-                if (entries.isEmpty() || entries.first().name != "mimetype") issues.add("mimetype 不是第一个条目")
-                val mime = zip.getEntry("mimetype")
-                if (mime == null) issues.add("缺少 mimetype")
-                else {
-                    if (mime.method != ZipEntry.STORED) issues.add("mimetype 未使用 STORED")
-                    val text = zip.getInputStream(mime).bufferedReader().readText()
-                    if (text != "application/epub+zip") issues.add("mimetype 内容错误")
-                }
-                val container = zip.getEntry("META-INF/container.xml")
-                if (container == null) issues.add("缺少 container.xml")
-                else {
-                    val doc = parse(zip, container)
-                    if (doc == null) issues.add("container.xml 不是合法 XML")
-                    else {
-                        val roots = doc.getElementsByTagName("rootfile")
-                        if (roots.length == 0) issues.add("container 无 rootfile")
-                        else {
-                            val path = (roots.item(0) as Element).getAttribute("full-path")
-                            val opf = zip.getEntry(path)
-                            if (opf == null) issues.add("OPF 不存在：" + path)
-                            else checkOpf(zip, opf, issues)
-                        }
-                    }
-                }
+                checkMimetype(zip, issues)
+                checkContainer(zip, issues)
             }
         } catch (t: Throwable) {
             return Result(false, "EPUB 解析失败：" + (t.message ?: t.javaClass.simpleName), issues + t.javaClass.simpleName)
         }
         return Result(issues.isEmpty(), if (issues.isEmpty()) "EPUB 结构校验通过" else issues.first(), issues)
+    }
+
+    private fun checkMimetype(zip: ZipFile, issues: MutableList<String>) {
+        val entries = zip.entries().toList()
+        if (entries.isEmpty() || entries.first().name != "mimetype") issues.add("mimetype 不是第一个条目")
+        val mime = zip.getEntry("mimetype")
+        if (mime == null) issues.add("缺少 mimetype")
+        else {
+            if (mime.method != ZipEntry.STORED) issues.add("mimetype 未使用 STORED")
+            val text = zip.getInputStream(mime).bufferedReader().readText()
+            if (text != "application/epub+zip") issues.add("mimetype 内容错误")
+        }
+    }
+
+    private fun checkContainer(zip: ZipFile, issues: MutableList<String>) {
+        val container = zip.getEntry("META-INF/container.xml")
+        if (container == null) issues.add("缺少 container.xml")
+        else {
+            val doc = parse(zip, container)
+            if (doc == null) issues.add("container.xml 不是合法 XML")
+            else checkRootfile(zip, doc, issues)
+        }
+    }
+
+    private fun checkRootfile(zip: ZipFile, doc: org.w3c.dom.Document, issues: MutableList<String>) {
+        val roots = doc.getElementsByTagName("rootfile")
+        if (roots.length == 0) issues.add("container 无 rootfile")
+        else {
+            val path = (roots.item(0) as Element).getAttribute("full-path")
+            val opf = zip.getEntry(path)
+            if (opf == null) issues.add("OPF 不存在：" + path)
+            else checkOpf(zip, opf, issues)
+        }
     }
 
     private fun checkOpf(zip: ZipFile, opf: ZipEntry, issues: MutableList<String>) {
@@ -56,28 +66,43 @@ object EpubValidator {
         var nav = false
         for (i in 0 until items.length) {
             val e = items.item(i) as Element
-            val id = e.getAttribute("id")
-            val href = e.getAttribute("href")
-            ids.add(id)
-            hrefs.add(href)
-            if (e.getAttribute("properties").split(' ').contains("nav")) nav = true
-            if (href.isBlank() || href.contains("..") || href.startsWith("/")) {
-                issues.add("OPF 非法 href：" + href)
-            } else if (zip.getEntry("OEBPS/" + href) == null) {
-                issues.add("OPF 引用不存在：" + href)
-            } else {
-                val entry = zip.getEntry("OEBPS/" + href)
-                if (href.endsWith(".xhtml") && parse(zip, entry) == null) issues.add("XHTML 解析失败：" + href)
-            }
+            if (checkOpfItem(zip, e, issues, ids, hrefs)) nav = true
         }
         if (!nav) issues.add("OPF 缺少 nav 项")
+        checkSpine(doc, issues, ids)
+        if (hrefs.isEmpty()) issues.add("manifest 为空")
+    }
+
+    private fun checkOpfItem(
+        zip: ZipFile,
+        e: Element,
+        issues: MutableList<String>,
+        ids: MutableSet<String>,
+        hrefs: MutableSet<String>
+    ): Boolean {
+        val id = e.getAttribute("id")
+        val href = e.getAttribute("href")
+        ids.add(id)
+        hrefs.add(href)
+        val nav = e.getAttribute("properties").split(' ').contains("nav")
+        if (href.isBlank() || href.contains("..") || href.startsWith("/")) {
+            issues.add("OPF 非法 href：" + href)
+        } else if (zip.getEntry("OEBPS/" + href) == null) {
+            issues.add("OPF 引用不存在：" + href)
+        } else {
+            val entry = zip.getEntry("OEBPS/" + href)
+            if (href.endsWith(".xhtml") && parse(zip, entry) == null) issues.add("XHTML 解析失败：" + href)
+        }
+        return nav
+    }
+
+    private fun checkSpine(doc: org.w3c.dom.Document, issues: MutableList<String>, ids: MutableSet<String>) {
         val refs = doc.getElementsByTagName("itemref")
         if (refs.length == 0) issues.add("spine 为空")
         for (i in 0 until refs.length) {
             val idref = (refs.item(i) as Element).getAttribute("idref")
             if (idref !in ids) issues.add("spine 引用不存在：" + idref)
         }
-        if (hrefs.isEmpty()) issues.add("manifest 为空")
     }
 
     private fun parse(zip: ZipFile, entry: ZipEntry) = try {

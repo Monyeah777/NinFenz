@@ -61,7 +61,6 @@ import dev.ninfenz.mobile.core.J
 import dev.ninfenz.mobile.data.DraftLibrary
 import dev.ninfenz.mobile.data.PackEntry
 import dev.ninfenz.mobile.data.DocxImporter
-import dev.ninfenz.mobile.data.EpubImporter
 import dev.ninfenz.mobile.data.HtmlImporter
 import dev.ninfenz.mobile.data.ProjectPackageImporter
 import dev.ninfenz.mobile.data.TextEncoding
@@ -267,29 +266,6 @@ internal data class ImportClearSnapshot(
 )
 
 internal data class DuplicatePrompt(val digest: String, val draft: File?)
-
-internal class ImportKind(
-    val isCsv: Boolean,
-    val isImage: Boolean,
-    val isPdf: Boolean,
-    val isDocx: Boolean,
-    val isEpub: Boolean,
-    val isHtml: Boolean,
-    val isText: Boolean
-)
-
-internal fun classifyImport(name: String, mime: String?, file: File): ImportKind {
-    val isPdf = name.endsWith(".pdf", true) || (mime ?: "").contains("pdf", ignoreCase = true)
-    val isCsv = name.endsWith(".csv", true) || name.endsWith(".tsv", true) || (mime ?: "").contains("csv", ignoreCase = true) || (mime ?: "").contains("tab-separated", ignoreCase = true)
-    val isImage = (mime ?: "").startsWith("image/") || listOf(".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp").any { name.endsWith(it, true) }
-    val isDocx = name.endsWith(".docx", true) || mime == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-    val isEpub = name.endsWith(".epub", true) || mime == "application/epub+zip" ||
-        ((name.endsWith(".zip", true) || mime == "application/zip") && EpubImporter.isEpub(file))
-    val isHtml = !isEpub && !isDocx && !isPdf && (name.endsWith(".html", true) || name.endsWith(".htm", true) || mime == "text/html")
-    val isText = !isEpub && !isDocx && !isHtml && !isPdf && !isImage && !isCsv && (name.endsWith(".txt", true) || name.endsWith(".md", true) ||
-        name.endsWith(".markdown", true) || mime?.startsWith("text/") == true)
-    return ImportKind(isCsv, isImage, isPdf, isDocx, isEpub, isHtml, isText)
-}
 
 internal suspend fun prepareImportSource(
     context: android.content.Context,

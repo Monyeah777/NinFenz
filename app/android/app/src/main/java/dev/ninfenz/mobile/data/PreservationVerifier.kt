@@ -5,6 +5,7 @@ import java.security.MessageDigest
 import java.util.zip.ZipFile
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -147,25 +148,33 @@ object PreservationVerifier {
             errors += "oais.json 过大"
         } else {
             val oais = Json.parseToJsonElement(zip.getInputStream(oaisEntry).readBytes().decodeToString()).jsonObject
-            if (oais["schema"]?.jsonPrimitive?.content != "nf-oais/1") errors += "未知 oais schema"
-            if (packageId != null && oais["package_id"]?.jsonPrimitive?.content != packageId) errors += "oais package_id 不符"
-            val oaisLineage = oais["lineage"]?.jsonObject?.get("predecessor_sha256")?.jsonPrimitive?.content
-            if (predecessor != null && oaisLineage != predecessor) errors += "oais lineage 不符"
+            verifyOaisHeader(oais, packageId, predecessor, errors)
             val fixity = oais["fixity"]?.jsonArray
             if (fixity == null || fixity.isEmpty()) {
                 errors += "oais.fixity 为空"
             } else {
-                fixity.forEach { item ->
-                    val obj = item.jsonObject
-                    val path = obj["path"]?.jsonPrimitive?.content ?: return@forEach
-                    val expectedSha = obj["sha256"]?.jsonPrimitive?.content ?: ""
-                    val entry = zip.getEntry(path)
-                    if (entry == null) {
-                        errors += "oais 缺 " + path
-                    } else if (sha(zip.getInputStream(entry).readBytes()) != expectedSha) {
-                        errors += "oais fixity 不符 " + path
-                    }
-                }
+                verifyOaisFixity(zip, fixity, errors)
+            }
+        }
+    }
+
+    private fun verifyOaisHeader(oais: JsonObject, packageId: String?, predecessor: String?, errors: MutableList<String>) {
+        if (oais["schema"]?.jsonPrimitive?.content != "nf-oais/1") errors += "未知 oais schema"
+        if (packageId != null && oais["package_id"]?.jsonPrimitive?.content != packageId) errors += "oais package_id 不符"
+        val oaisLineage = oais["lineage"]?.jsonObject?.get("predecessor_sha256")?.jsonPrimitive?.content
+        if (predecessor != null && oaisLineage != predecessor) errors += "oais lineage 不符"
+    }
+
+    private fun verifyOaisFixity(zip: ZipFile, fixity: JsonArray, errors: MutableList<String>) {
+        fixity.forEach { item ->
+            val obj = item.jsonObject
+            val path = obj["path"]?.jsonPrimitive?.content ?: return@forEach
+            val expectedSha = obj["sha256"]?.jsonPrimitive?.content ?: ""
+            val entry = zip.getEntry(path)
+            if (entry == null) {
+                errors += "oais 缺 " + path
+            } else if (sha(zip.getInputStream(entry).readBytes()) != expectedSha) {
+                errors += "oais fixity 不符 " + path
             }
         }
     }

@@ -8,29 +8,46 @@ object TextEncoding {
     data class Decoded(val text: String, val encoding: String)
 
     fun decode(bytes: ByteArray): Decoded? {
-        if (bytes.size >= 3 && bytes[0] == 0xEF.toByte() && bytes[1] == 0xBB.toByte() && bytes[2] == 0xBF.toByte()) {
+        bomDecoded(bytes)?.let { return it }
+        if (bytes.size < 8) return null
+        return utf16WithoutBom(bytes)
+    }
+
+    private fun bomDecoded(bytes: ByteArray): Decoded? {
+        if (hasUtf8Bom(bytes)) {
             return Decoded(String(bytes, 3, bytes.size - 3, Charsets.UTF_8), "UTF-8")
         }
-        if (bytes.size >= 2 && bytes[0] == 0xFF.toByte() && bytes[1] == 0xFE.toByte()) {
+        if (hasUtf16LeBom(bytes)) {
             return Decoded(String(bytes, 2, bytes.size - 2, Charset.forName("UTF-16LE")), "UTF-16LE")
         }
-        if (bytes.size >= 2 && bytes[0] == 0xFE.toByte() && bytes[1] == 0xFF.toByte()) {
+        if (hasUtf16BeBom(bytes)) {
             return Decoded(String(bytes, 2, bytes.size - 2, Charset.forName("UTF-16BE")), "UTF-16BE")
         }
-        if (bytes.size >= 8) {
-            var oddZero = 0
-            var evenZero = 0
-            for (i in bytes.indices) {
-                if (bytes[i] == 0.toByte()) {
-                    if (i % 2 == 0) evenZero++ else oddZero++
-                }
+        return null
+    }
+
+    private fun hasUtf8Bom(bytes: ByteArray): Boolean =
+        bytes.size >= 3 && bytes[0] == 0xEF.toByte() && bytes[1] == 0xBB.toByte() && bytes[2] == 0xBF.toByte()
+
+    private fun hasUtf16LeBom(bytes: ByteArray): Boolean =
+        bytes.size >= 2 && bytes[0] == 0xFF.toByte() && bytes[1] == 0xFE.toByte()
+
+    private fun hasUtf16BeBom(bytes: ByteArray): Boolean =
+        bytes.size >= 2 && bytes[0] == 0xFE.toByte() && bytes[1] == 0xFF.toByte()
+
+    private fun utf16WithoutBom(bytes: ByteArray): Decoded? {
+        var oddZero = 0
+        var evenZero = 0
+        for (i in bytes.indices) {
+            if (bytes[i] == 0.toByte()) {
+                if (i % 2 == 0) evenZero++ else oddZero++
             }
-            if (oddZero > bytes.size / 3 && evenZero < bytes.size / 10) {
-                return Decoded(String(bytes, Charset.forName("UTF-16LE")), "UTF-16LE")
-            }
-            if (evenZero > bytes.size / 3 && oddZero < bytes.size / 10) {
-                return Decoded(String(bytes, Charset.forName("UTF-16BE")), "UTF-16BE")
-            }
+        }
+        if (oddZero > bytes.size / 3 && evenZero < bytes.size / 10) {
+            return Decoded(String(bytes, Charset.forName("UTF-16LE")), "UTF-16LE")
+        }
+        if (evenZero > bytes.size / 3 && oddZero < bytes.size / 10) {
+            return Decoded(String(bytes, Charset.forName("UTF-16BE")), "UTF-16BE")
         }
         return null
     }

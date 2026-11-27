@@ -27,34 +27,48 @@ object FormalizationSuggester {
         var best: Suggestion? = null
         for (slot in slots) {
             if (slot.id in taken) continue
-            val name = normalize(slot.name)
-            if (name.isBlank()) continue
-            var score = 0
-            val reasons = mutableListOf<String>()
-            if (name.length >= 2 && body.contains(name)) {
-                score += 5
-                reasons += "正文含槽位名"
-            }
-            val shared = overlap(body, name)
-            if (shared > 0) {
-                score += minOf(shared, 3) * 2
-                reasons += "词重叠 " + shared
-            }
-            if (headingNorm.isNotBlank() && (headingNorm.contains(name) || overlap(headingNorm, name) > 0)) {
-                score += 3
-                reasons += "标题相关"
-            }
-            val exampleOverlap = slot.examples.maxOfOrNull { overlap(body, it) } ?: 0
-            if (exampleOverlap > 0) {
-                score += minOf(exampleOverlap, 2) * 2
-                reasons += "示例相关"
-            }
-            if (slot.required) score += 1
-            if (score >= 3) {
-                val current = Suggestion(slot.id, slot.name, score, reasons.joinToString("；"))
-                if (best == null || current.score > best.score) best = current
-            }
+            val current = suggestFor(slot, body, headingNorm) ?: continue
+            if (best == null || current.score > best.score) best = current
         }
         return best
+    }
+
+    private fun suggestFor(slot: SpecSlot, body: String, headingNorm: String): Suggestion? {
+        val name = normalize(slot.name)
+        if (name.isBlank()) return null
+        val reasons = mutableListOf<String>()
+        var score = nameScore(name, body, reasons) + headingScore(headingNorm, name, reasons) +
+            exampleScore(slot, body, reasons)
+        if (slot.required) score += 1
+        if (score < 3) return null
+        return Suggestion(slot.id, slot.name, score, reasons.joinToString("；"))
+    }
+
+    private fun nameScore(name: String, body: String, reasons: MutableList<String>): Int {
+        var score = 0
+        if (name.length >= 2 && body.contains(name)) {
+            score += 5
+            reasons += "正文含槽位名"
+        }
+        val shared = overlap(body, name)
+        if (shared > 0) {
+            score += minOf(shared, 3) * 2
+            reasons += "词重叠 " + shared
+        }
+        return score
+    }
+
+    private fun headingScore(headingNorm: String, name: String, reasons: MutableList<String>): Int {
+        if (headingNorm.isBlank()) return 0
+        if (!headingNorm.contains(name) && overlap(headingNorm, name) <= 0) return 0
+        reasons += "标题相关"
+        return 3
+    }
+
+    private fun exampleScore(slot: SpecSlot, body: String, reasons: MutableList<String>): Int {
+        val exampleOverlap = slot.examples.maxOfOrNull { overlap(body, it) } ?: 0
+        if (exampleOverlap <= 0) return 0
+        reasons += "示例相关"
+        return minOf(exampleOverlap, 2) * 2
     }
 }

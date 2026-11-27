@@ -3,6 +3,7 @@ package dev.ninfenz.mobile.model
 import dev.ninfenz.mobile.core.J
 import dev.ninfenz.mobile.core.ModelException
 import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.intOrNull
@@ -39,25 +40,47 @@ object NfPatchModel {
         J.schema(o, SCHEMA)
         val ops = o["ops"] as? JsonArray ?: throw ModelException("NF-E-002", "/ops", "ops 必须是数组", "按 nf-patch/1 修正")
         if (ops.isEmpty()) throw ModelException("NF-E-002", "/ops", "ops 不能为空", "至少一条补丁")
-        return Patch(ops.mapIndexed { i, el ->
-            val op = el as? JsonObject ?: throw ModelException("NF-E-002", "/ops/" + i, "op 必须是对象", "按 nf-patch/1 修正")
-            val kind = op["op"]?.jsonPrimitive?.contentOrNull
-                ?: throw ModelException("NF-E-002", "/ops/" + i + "/op", "缺 op", "replace/insert/delete/move/set-slot")
-            val blockId = op["block_id"]?.jsonPrimitive?.contentOrNull
-            val afterBlockId = op["after_block_id"]?.jsonPrimitive?.contentOrNull
-            val index = op["index"]?.jsonPrimitive?.intOrNull
-            val text = op["text"]?.jsonPrimitive?.contentOrNull
-            val slot = op["slot"]?.jsonPrimitive?.contentOrNull
-            when (kind) {
-                "replace" -> if (blockId == null || text == null) throw ModelException("NF-E-002", "/ops/" + i, "replace 需要 block_id + text", "补齐字段")
-                "insert" -> if (text == null) throw ModelException("NF-E-002", "/ops/" + i, "insert 需要 text", "补齐 text")
-                "delete" -> if (blockId == null) throw ModelException("NF-E-002", "/ops/" + i, "delete 需要 block_id", "补齐 block_id")
-                "move" -> if (blockId == null || (afterBlockId == null && index == null)) throw ModelException("NF-E-002", "/ops/" + i, "move 需要 block_id + after_block_id/index", "补齐目标")
-                "set-slot" -> if (slot == null || text == null) throw ModelException("NF-E-002", "/ops/" + i, "set-slot 需要 slot + text", "补齐字段")
-                else -> throw ModelException("NF-E-002", "/ops/" + i + "/op", "未知 op " + kind, "见 app/schema/nf-patch.schema.json")
-            }
-            Op(kind, blockId, afterBlockId, index, text, slot)
-        })
+        return Patch(ops.mapIndexed { i, el -> parseOp(el, i) })
+    }
+
+    private fun parseOp(el: JsonElement, i: Int): Op {
+        val op = el as? JsonObject ?: throw ModelException("NF-E-002", "/ops/" + i, "op 必须是对象", "按 nf-patch/1 修正")
+        val kind = op["op"]?.jsonPrimitive?.contentOrNull
+            ?: throw ModelException("NF-E-002", "/ops/" + i + "/op", "缺 op", "replace/insert/delete/move/set-slot")
+        val parsed = Op(
+            kind,
+            op["block_id"]?.jsonPrimitive?.contentOrNull,
+            op["after_block_id"]?.jsonPrimitive?.contentOrNull,
+            op["index"]?.jsonPrimitive?.intOrNull,
+            op["text"]?.jsonPrimitive?.contentOrNull,
+            op["slot"]?.jsonPrimitive?.contentOrNull
+        )
+        validateOp(parsed, i)
+        return parsed
+    }
+
+    private fun validateOp(op: Op, i: Int) {
+        when (op.kind) {
+            "replace", "insert", "delete", "set-slot" -> validateSimpleOp(op, i)
+            "move" -> validateMove(op, i)
+            else -> throw ModelException("NF-E-002", "/ops/" + i + "/op", "未知 op " + op.kind, "见 app/schema/nf-patch.schema.json")
+        }
+    }
+
+    private fun validateSimpleOp(op: Op, i: Int) {
+        when (op.kind) {
+            "replace" -> if (op.blockId == null || op.text == null) throw ModelException("NF-E-002", "/ops/" + i, "replace 需要 block_id + text", "补齐字段")
+            "insert" -> if (op.text == null) throw ModelException("NF-E-002", "/ops/" + i, "insert 需要 text", "补齐 text")
+            "delete" -> if (op.blockId == null) throw ModelException("NF-E-002", "/ops/" + i, "delete 需要 block_id", "补齐 block_id")
+            "set-slot" -> if (op.slot == null || op.text == null) throw ModelException("NF-E-002", "/ops/" + i, "set-slot 需要 slot + text", "补齐字段")
+            else -> Unit
+        }
+    }
+
+    private fun validateMove(op: Op, i: Int) {
+        if (op.blockId == null || (op.afterBlockId == null && op.index == null)) {
+            throw ModelException("NF-E-002", "/ops/" + i, "move 需要 block_id + after_block_id/index", "补齐目标")
+        }
     }
 
     fun apply(markdown: String, patch: Patch): Result {

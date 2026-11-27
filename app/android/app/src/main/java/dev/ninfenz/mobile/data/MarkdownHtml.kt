@@ -7,33 +7,41 @@ package dev.ninfenz.mobile.data
 internal object MarkdownHtml {
     enum class ImagePolicy { REMOTE_AND_DATA, DATA_ONLY }
 
+    private val codeRe = Regex("\u0060([^\u0060]+)\u0060")
+    private val boldRe = Regex("\\*\\*([^*]+)\\*\\*")
+    private val italicRe = Regex("\\*([^*]+)\\*")
+    private val delRe = Regex("~~([^~]+)~~")
+    private val imageRe = Regex("!\\[([^\\]]*)\\]\\(([^)]+)\\)")
+    private val linkRe = Regex("\\[([^\\]]+)\\]\\(([^)]+)\\)")
+
     fun esc(s: String): String = s
         .replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;")
 
     fun inline(s: String, policy: ImagePolicy): String {
         var text = esc(s)
-        text = Regex("\u0060([^\u0060]+)\u0060").replace(text, "<code>$1</code>")
-        text = Regex("\\*\\*([^*]+)\\*\\*").replace(text, "<strong>$1</strong>")
-        text = Regex("\\*([^*]+)\\*").replace(text, "<em>$1</em>")
-        text = Regex("~~([^~]+)~~").replace(text, "<del>$1</del>")
-        text = Regex("!\\[([^\\]]*)\\]\\(([^)]+)\\)").replace(text) { match ->
-            val src = match.groupValues[2]
-            if (imageAllowed(src, policy)) {
-                "<img src=\"" + src + "\" alt=\"" + match.groupValues[1] + "\"/>"
-            } else {
-                match.value
-            }
-        }
-        text = Regex("\\[([^\\]]+)\\]\\(([^)]+)\\)").replace(text) { match ->
-            val href = match.groupValues[2]
-            if (href.startsWith("http://") || href.startsWith("https://") || href.startsWith("mailto:") || href.startsWith("#")) {
-                "<a href=\"" + href + "\">" + match.groupValues[1] + "</a>"
-            } else {
-                match.value
-            }
-        }
+        text = codeRe.replace(text, "<code>$1</code>")
+        text = boldRe.replace(text, "<strong>$1</strong>")
+        text = italicRe.replace(text, "<em>$1</em>")
+        text = delRe.replace(text, "<del>$1</del>")
+        text = imageRe.replace(text) { match -> replaceImage(match, policy) }
+        text = linkRe.replace(text) { match -> replaceLink(match) }
         return text
     }
+
+    private fun replaceImage(match: MatchResult, policy: ImagePolicy): String {
+        val src = match.groupValues[2]
+        if (!imageAllowed(src, policy)) return match.value
+        return "<img src=\"" + src + "\" alt=\"" + match.groupValues[1] + "\"/>"
+    }
+
+    private fun replaceLink(match: MatchResult): String {
+        val href = match.groupValues[2]
+        if (!linkAllowed(href)) return match.value
+        return "<a href=\"" + href + "\">" + match.groupValues[1] + "</a>"
+    }
+
+    private fun linkAllowed(href: String): Boolean =
+        href.startsWith("http://") || href.startsWith("https://") || href.startsWith("mailto:") || href.startsWith("#")
 
     private fun imageAllowed(src: String, policy: ImagePolicy): Boolean =
         if (policy == ImagePolicy.DATA_ONLY) {

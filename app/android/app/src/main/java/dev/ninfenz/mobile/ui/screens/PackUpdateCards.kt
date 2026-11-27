@@ -95,60 +95,75 @@ internal fun PackUpdateMatrixCard(s: PackUpdateState, onOpenProject: (String) ->
 
 @Composable
 internal fun PackUpdatePlanCard(s: PackUpdateState, onOpenProject: (String) -> Unit, onPickZip: () -> Unit, onPickPlan: () -> Unit) {
-        CardBox(title = stringResource(dev.ninfenz.mobile.R.string.packupdate_step1)) {
-            if (s.packs.isEmpty()) {
-                EmptyState(stringResource(dev.ninfenz.mobile.R.string.packupdate_no_packs))
-            } else {
-                Text(stringResource(dev.ninfenz.mobile.R.string.packupdate_select_base), style = NfType.meta)
-                for (pack in s.packs) {
-                    FilterChip(
-                        selected = s.selected?.id == pack.id && s.selected?.version == pack.version,
-                        onClick = { s.selected = pack; s.update = null; s.rawUpdate = null; s.resultText = null },
-                        label = { Text(pack.id + " · " + pack.version) },
-                        modifier = Modifier.padding(end = 8.dp)
-                    )
-                }
-                FlowRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Button(onClick = { onPickZip() }, enabled = !s.diffBusy) {
-                        Text(if (s.diffBusy) stringResource(dev.ninfenz.mobile.R.string.packupdate_compare) else stringResource(dev.ninfenz.mobile.R.string.packupdate_choose_zip))
-                    }
-                    OutlinedButton(onClick = { onPickPlan() }) { Text(stringResource(dev.ninfenz.mobile.R.string.pack_update_open_plan)) }
-                }
-                s.selected?.let { Text(stringResource(dev.ninfenz.mobile.R.string.packupdate_base, it.id, it.version, it.dir.absolutePath), style = NfType.meta) }
-                s.newRoot?.let { Text(stringResource(dev.ninfenz.mobile.R.string.packupdate_new, it.absolutePath), style = NfType.meta) }
-                if (s.selected != null && s.newRoot == null) {
-                    Notice(stringResource(dev.ninfenz.mobile.R.string.packupdate_hint), Tone.INFO)
-                }
+    CardBox(title = stringResource(dev.ninfenz.mobile.R.string.packupdate_step1)) {
+        PackUpdatePlanPicker(s, onPickZip, onPickPlan)
+        PackUpdatePlanDetails(s, onOpenProject)
+    }
+}
+
+@Composable
+private fun PackUpdatePlanPicker(s: PackUpdateState, onPickZip: () -> Unit, onPickPlan: () -> Unit) {
+    if (s.packs.isEmpty()) {
+        EmptyState(stringResource(dev.ninfenz.mobile.R.string.packupdate_no_packs))
+    } else {
+        Text(stringResource(dev.ninfenz.mobile.R.string.packupdate_select_base), style = NfType.meta)
+        for (pack in s.packs) {
+            FilterChip(
+                selected = s.selected?.id == pack.id && s.selected?.version == pack.version,
+                onClick = { s.selected = pack; s.update = null; s.rawUpdate = null; s.resultText = null },
+                label = { Text(pack.id + " · " + pack.version) },
+                modifier = Modifier.padding(end = 8.dp)
+            )
+        }
+        FlowRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Button(onClick = { onPickZip() }, enabled = !s.diffBusy) {
+                Text(if (s.diffBusy) stringResource(dev.ninfenz.mobile.R.string.packupdate_compare) else stringResource(dev.ninfenz.mobile.R.string.packupdate_choose_zip))
             }
-            val u = s.update
-            if (u != null) {
-                KeyValue("from", u.from.id + " " + u.from.version)
-                KeyValue("to", u.to.id + " " + u.to.version)
-                KeyValue("changes", "added " + u.added.size + " · removed " + u.removed.size + " · modified " + u.modified.size)
-                KeyValue("breaking", if (u.breaking) stringResource(dev.ninfenz.mobile.R.string.packupdate_breaking_yes) else stringResource(dev.ninfenz.mobile.R.string.packupdate_breaking_no))
-                KeyValue(stringResource(dev.ninfenz.mobile.R.string.pack_update_affected_projects), if (u.affectedProjects.isEmpty()) stringResource(dev.ninfenz.mobile.R.string.packupdate_none) else u.affectedProjects.joinToString(","))
-                if (u.breaking && u.affectedProjects.isNotEmpty()) {
-                    Notice(stringResource(dev.ninfenz.mobile.R.string.packupdate_affected_warning, u.affectedProjects.size), Tone.WARN)
-                }
-                if (u.affectedProjects.isNotEmpty()) {
-                    FlowRow(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        for (projectId in u.affectedProjects) {
-                            OutlinedButton(onClick = { onOpenProject(projectId) }) { Text(projectId) }
-                        }
-                    }
-                }
-                KeyValue(stringResource(dev.ninfenz.mobile.R.string.pack_update_overlay_keys), if (u.overlayKeys.isEmpty()) stringResource(dev.ninfenz.mobile.R.string.packupdate_none) else u.overlayKeys.joinToString(","))
-                for (note in u.notes) Notice(note, Tone.WARN)
+            OutlinedButton(onClick = { onPickPlan() }) { Text(stringResource(dev.ninfenz.mobile.R.string.pack_update_open_plan)) }
+        }
+        s.selected?.let { Text(stringResource(dev.ninfenz.mobile.R.string.packupdate_base, it.id, it.version, it.dir.absolutePath), style = NfType.meta) }
+        s.newRoot?.let { Text(stringResource(dev.ninfenz.mobile.R.string.packupdate_new, it.absolutePath), style = NfType.meta) }
+        if (s.selected != null && s.newRoot == null) {
+            Notice(stringResource(dev.ninfenz.mobile.R.string.packupdate_hint), Tone.INFO)
+        }
+    }
+}
+
+@Composable
+private fun PackUpdatePlanDetails(s: PackUpdateState, onOpenProject: (String) -> Unit) {
+    val u = s.update
+    if (u != null) {
+        KeyValue("from", u.from.id + " " + u.from.version)
+        KeyValue("to", u.to.id + " " + u.to.version)
+        KeyValue("changes", "added " + u.added.size + " · removed " + u.removed.size + " · modified " + u.modified.size)
+        KeyValue("breaking", if (u.breaking) stringResource(dev.ninfenz.mobile.R.string.packupdate_breaking_yes) else stringResource(dev.ninfenz.mobile.R.string.packupdate_breaking_no))
+        KeyValue(stringResource(dev.ninfenz.mobile.R.string.pack_update_affected_projects), if (u.affectedProjects.isEmpty()) stringResource(dev.ninfenz.mobile.R.string.packupdate_none) else u.affectedProjects.joinToString(","))
+        PackUpdateAffectedProjects(u, onOpenProject)
+        KeyValue(stringResource(dev.ninfenz.mobile.R.string.pack_update_overlay_keys), if (u.overlayKeys.isEmpty()) stringResource(dev.ninfenz.mobile.R.string.packupdate_none) else u.overlayKeys.joinToString(","))
+        for (note in u.notes) Notice(note, Tone.WARN)
+    }
+}
+
+@Composable
+private fun PackUpdateAffectedProjects(u: PackUpdate, onOpenProject: (String) -> Unit) {
+    if (u.breaking && u.affectedProjects.isNotEmpty()) {
+        Notice(stringResource(dev.ninfenz.mobile.R.string.packupdate_affected_warning, u.affectedProjects.size), Tone.WARN)
+    }
+    if (u.affectedProjects.isNotEmpty()) {
+        FlowRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            for (projectId in u.affectedProjects) {
+                OutlinedButton(onClick = { onOpenProject(projectId) }) { Text(projectId) }
             }
         }
+    }
 }
 
 @Composable
