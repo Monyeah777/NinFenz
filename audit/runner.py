@@ -950,6 +950,7 @@ def check_empty_catch(ctx: Context, rule: dict):
     p = rule.get("params") or {}
     files = _iter_candidates(ctx, p)
     hits = []
+    marker = (p.get("allow_marker") or "").strip()
     for rel in files:
         raw = ctx.text(rel)
         if not raw:
@@ -971,14 +972,19 @@ def check_empty_catch(ctx: Context, rule: dict):
                         isinstance(x, ast.Name) and x.id in ("Exception", "BaseException") for x in handled.elts):
                     generic = True
                 if generic and all(isinstance(stmt, ast.Pass) for stmt in node.body):
+                    if marker and re.search(marker, "\n".join(raw.splitlines()[node.lineno - 1:node.end_lineno])):
+                        continue
                     hits.append(hit(rel, node.lineno, "空 except（仅 pass，兜底异常被吞）", line_at(raw, node.lineno)))
             continue
-        text = strip_comments(raw, "c")
-        for m in re.finditer(r"catch\s*(?:\([^)]*\))?\s*\{", text):
-            brace = text.find("{", m.start())
-            body, _end, _line = _brace_body(text, brace)
-            if not body.strip():
-                hits.append(hit(rel, line_no(text, m.start()), "空 catch（无恢复/上报）", line_at(raw, line_no(text, m.start()))))
+        for m in re.finditer(r"catch\s*(?:\([^)]*\))?\s*\{", raw):
+            brace = raw.find("{", m.start())
+            body, _end, _line = _brace_body(raw, brace)
+            stripped = strip_comments(body, "c").strip()
+            if stripped:
+                continue
+            if marker and re.search(marker, body):
+                continue
+            hits.append(hit(rel, line_no(raw, m.start()), "空 catch（无恢复/上报或无 best-effort 说明）", line_at(raw, line_no(raw, m.start()))))
     return hits, files
 
 

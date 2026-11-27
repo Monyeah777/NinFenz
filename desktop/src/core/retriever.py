@@ -98,7 +98,7 @@ def _protocol_hits(q: str, limit: int) -> List[Hit]:
             if len(out) >= limit:
                 break
     except Exception:  # nosec B110/B112 —— 尽力而为：跳过不可读/不可解析项；该类缺口由对应门禁与 AUD-0016 静默跳过清单另行报出
-        pass    # registry 缺失/损坏：protocol 源空（不阻断其它源检索）
+        pass    # registry 缺失/损坏：protocol 源空（不阻断其它源检索）；best-effort 显式忽略
     return out
 
 
@@ -125,7 +125,7 @@ def _community_hits(store: Store, kind: str, q: str, limit: int) -> List[Hit]:
             if len(out) >= limit:
                 break
     except Exception:  # 尽力而为：跳过不可读/不可解析项（该类缺口由对应门禁与 AUD-0016 静默跳过清单另行报出）  # nosec B110 —— 尽力而为：跳过不可读/不可解析项（对应门禁另报；见 AUD-0016）
-        pass    # 盘点失败（仓库缺 community/）：社区源空（不阻断其它源）
+        pass    # 盘点失败（仓库缺 community/）：社区源空（不阻断其它源）；best-effort 显式忽略
     return out
 
 

@@ -1,5 +1,6 @@
 package dev.ninfenz.mobile.ui.components
 
+import dev.ninfenz.mobile.util.orNullLogged
 import dev.ninfenz.mobile.ui.design.NfType
 
 import android.graphics.BitmapFactory
@@ -77,7 +78,7 @@ private fun MarkdownBlock(block: PdfMarkdown.Block) {
         block.rule -> HorizontalDivider()
         block.image != null -> {
             val bitmap = remember(block.image) {
-                runCatching { BitmapFactory.decodeByteArray(block.image, 0, block.image.size) }.getOrNull()
+                runCatching { BitmapFactory.decodeByteArray(block.image, 0, block.image.size) }.orNullLogged("MarkdownPreview")
             }
             if (bitmap != null) {
                 Image(

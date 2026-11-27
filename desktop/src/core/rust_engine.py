@@ -74,7 +74,7 @@ def _reap_child() -> None:
         # 短超时：worker 常驻时应继续活着（wait 超时即放弃）；若已被测试 taskkill 回收则立即返回。
         _CHILD.wait(timeout=0.3)
     except Exception:                                    # noqa: BLE001 - 回收失败不影响结果
-        pass
+        pass  # best-effort 显式忽略（清理/探测失败不影响主流程）
     _CHILD = None
 
 

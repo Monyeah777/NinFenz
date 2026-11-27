@@ -52,7 +52,7 @@ object FileAccess {
                 }
             }
         } catch (t: Throwable) {
-            // 元数据可用性不影响导入；名称回退到 lastPathSegment
+            // 元数据可用性不影响导入；名称回退到 lastPathSegment（best-effort 显式忽略）
         }
         FileMeta(name, size, context.contentResolver.getType(uri))
     }

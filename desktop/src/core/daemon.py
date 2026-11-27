@@ -178,17 +178,17 @@ def reset_process_caches() -> None:
         from core import pack_combo
         pack_combo.cache_clear()
     except Exception:                                    # noqa: BLE001 - 缓存清理不得影响命令
-        pass
+        pass  # best-effort 显式忽略（清理/探测失败不影响主流程）
     try:
         from core import registry_loader
         registry_loader.load_registry.cache_clear()
     except Exception:                                    # noqa: BLE001
-        pass
+        pass  # best-effort 显式忽略（清理/探测失败不影响主流程）
     try:
         from core import asset_contract
         asset_contract.clear_repo_files_cache()
     except Exception:                                    # noqa: BLE001
-        pass
+        pass  # best-effort 显式忽略（清理/探测失败不影响主流程）
 
 
 class _LineReader:
@@ -547,7 +547,7 @@ def _sync_code(root: Path) -> None:
         from core import import_graph as _igr
         _igr.reset_code_scope(str(root))
     except Exception:                                    # noqa: BLE001 - 清不掉不影响重载
-        pass
+        pass  # best-effort 显式忽略（清理/探测失败不影响主流程）
     # 常驻语料层跨代码换版**保住**：它装的是仓库事实（正文/目录/逐件摘要），与代码无关；
     # 而 `core.*` 被整块摘掉重载时，新模块会是个**空层**——不搬回来，改一行代码就得让下一条
     # 重命令把整棵语料重读一遍（实测 ~2 s）。
@@ -568,7 +568,7 @@ def _sync_code(root: Path) -> None:
             from core import conformance_scan as _csc_new       # 重新导入 → 新模块对象
             _csc_new.adopt_resident(saved)
         except Exception:                                    # noqa: BLE001 - 搬不回去就下次重读
-            pass
+            pass  # best-effort 显式忽略（清理/探测失败不影响主流程）
 
 
 def _load_cli(root: Path):
@@ -629,7 +629,7 @@ def execute(argv: List[str], root: Path, cwd: Optional[str] = None
             from core import conformance_scan as _csc
             _csc.clear_changes()          # 确知变更面**只在当次请求内有效**（否则它单调增长、
         except Exception:                 #  # 几条命令之后会让键层复用退化成全量重算——实测踩过）
-            pass
+            pass  # best-effort 显式忽略（清理/探测失败不影响主流程）
     code, out, err = int(code), out_buf.getvalue(), err_buf.getvalue()
     _rc.store(argv, gen, allowed, code, out, err, cwd)
     # **非准入命令 = 无法证明只读**（可能写仓库）⇒ 立刻整批作废，不等监听线程异步察觉（写在
@@ -719,7 +719,7 @@ def _handle_conn(conn: socket.socket, token: str, root: Path) -> bool:
     try:
         _dc.defer_flush()
     except Exception:                                    # noqa: BLE001 - 落盘尽力而为
-        pass
+        pass  # best-effort 显式忽略（清理/探测失败不影响主流程）
     return False
 
 
@@ -886,7 +886,7 @@ def _reap_child() -> None:
     try:
         _CHILD.wait(timeout=5)
     except Exception:                                    # noqa: BLE001 - 回收失败不影响结果
-        pass
+        pass  # best-effort 显式忽略（清理/探测失败不影响主流程）
     _CHILD = None
 
 

@@ -1,5 +1,6 @@
 package dev.ninfenz.mobile.ui.screens
 
+import dev.ninfenz.mobile.util.orNullLogged
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -360,7 +361,7 @@ private fun GraphMap(nodes: List<kotlinx.serialization.json.JsonElement>, edges:
 
 @Composable
 private fun StructuredGraphCard(label: String, value: String, onChange: (String) -> Unit, dir: File) {
-    val root = remember(value) { runCatching { Json.parseToJsonElement(value).jsonObject }.getOrNull() }
+    val root = remember(value) { runCatching { Json.parseToJsonElement(value).jsonObject }.orNullLogged("PackBuilderScreen") }
     var saved by remember { mutableStateOf<String?>(null) }
     CardBox(title = label) {
         if (root == null) {
@@ -454,7 +455,7 @@ private fun StructuredGraphCard(label: String, value: String, onChange: (String)
 
 @Composable
 private fun StructuredProtocolCard(label: String, value: String, onChange: (String) -> Unit, dir: File) {
-    val root = remember(value) { runCatching { Json.parseToJsonElement(value).jsonObject }.getOrNull() }
+    val root = remember(value) { runCatching { Json.parseToJsonElement(value).jsonObject }.orNullLogged("PackBuilderScreen") }
     var saved by remember { mutableStateOf<String?>(null) }
     CardBox(title = label) {
         if (root == null) {
@@ -522,7 +523,7 @@ private fun StructuredProtocolCard(label: String, value: String, onChange: (Stri
 
 @Composable
 private fun StructuredSpecCard(label: String, value: String, onChange: (String) -> Unit, dir: File) {
-    val spec = remember(value) { runCatching { SpecModel.parse(value) }.getOrNull() }
+    val spec = remember(value) { runCatching { SpecModel.parse(value) }.orNullLogged("PackBuilderScreen") }
     var saved by remember { mutableStateOf<String?>(null) }
     CardBox(title = label) {
         if (spec == null) {

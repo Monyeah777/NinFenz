@@ -5,7 +5,6 @@ import android.content.Intent
 import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
 import android.graphics.drawable.Icon
-import dev.ninfenz.mobile.MainActivity
 import dev.ninfenz.mobile.R
 
 /** 最近项目动态快捷方式（最多 3 个）；失败静默，不影响主流程。 */
@@ -19,7 +18,7 @@ object RecentProjectShortcuts {
         }
     }
 
-    fun publish(context: Context, projects: List<ProjectEntry>) {
+    fun publish(context: Context, projects: List<ProjectEntry>, targetClass: Class<*>) {
         runCatching {
         val manager = context.getSystemService(ShortcutManager::class.java) ?: return
         val shortcuts = projects.take(3).map { entry ->
@@ -29,7 +28,7 @@ object RecentProjectShortcuts {
                 .setLongLabel(title.take(40))
                 .setIcon(Icon.createWithResource(context, R.drawable.ic_launcher_foreground))
                 .setIntent(
-                    Intent(context, MainActivity::class.java)
+                    Intent(context, targetClass)
                         .setAction(ACTION_OPEN_PROJECT)
                         .putExtra(EXTRA_PROJECT_ID, entry.project.id)
                 )

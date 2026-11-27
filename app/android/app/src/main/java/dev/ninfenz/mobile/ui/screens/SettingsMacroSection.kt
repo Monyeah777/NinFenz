@@ -1,5 +1,6 @@
 package dev.ninfenz.mobile.ui.screens
 
+import dev.ninfenz.mobile.util.orNullLogged
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -99,7 +100,7 @@ fun SettingsMacroSection() {
             }
             TextButton(enabled = items.isNotEmpty(), onClick = {
                 scope.launch {
-                    val plans = items.mapNotNull { store.plan(it.json).getOrNull() }
+                    val plans = items.mapNotNull { store.plan(it.json).orNullLogged("SettingsMacroSection") }
                     if (plans.isEmpty()) {
                         note = context.getString(R.string.settings_macros_batch_empty)
                     } else {
@@ -231,7 +232,7 @@ fun SettingsMacroSection() {
                     }
                     TextButton(onClick = {
                         scope.launch {
-                            val plan = store.plan(macro.json).getOrNull()
+                            val plan = store.plan(macro.json).orNullLogged("SettingsMacroSection")
                             if (plan == null) {
                                 note = context.getString(R.string.settings_macros_failed, "plan failed")
                             } else {
@@ -252,7 +253,7 @@ fun SettingsMacroSection() {
             confirmButton = {
                 TextButton(onClick = {
                     scope.launch {
-                        val plan = store.plan(macro.json).getOrNull()
+                        val plan = store.plan(macro.json).orNullLogged("SettingsMacroSection")
                         if (plan == null) {
                             note = context.getString(R.string.settings_macros_failed, "plan failed")
                         } else {

@@ -1,6 +1,7 @@
 package dev.ninfenz.mobile.data
 
 import dev.ninfenz.mobile.ui.shell.Detail
+import dev.ninfenz.mobile.ui.shell.EditionRoutePolicy
 import dev.ninfenz.mobile.ui.shell.ShellState
 import dev.ninfenz.mobile.ui.shell.TopDestination
 import org.junit.After

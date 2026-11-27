@@ -4,7 +4,8 @@ import dev.ninfenz.mobile.model.Project
 import dev.ninfenz.mobile.model.ProjectModel
 import java.io.File
 
-data class ProjectEntry(val project: Project, val file: File)
+/* 类型已上移到 model（避免 model -> data 反向依赖）；这里保留 data 包别名兼容既有 import。 */
+typealias ProjectEntry = dev.ninfenz.mobile.model.ProjectEntry
 
 data class LibrarySnapshot(val projects: List<ProjectEntry>, val errors: List<String>)
 

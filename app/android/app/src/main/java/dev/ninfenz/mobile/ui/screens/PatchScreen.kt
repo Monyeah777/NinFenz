@@ -1,5 +1,6 @@
 package dev.ninfenz.mobile.ui.screens
 
+import dev.ninfenz.mobile.util.orNullLogged
 import dev.ninfenz.mobile.ui.design.NfType
 
 import android.content.ClipData
@@ -134,7 +135,7 @@ fun PatchScreen(filesDir: File, projectId: String?, onBack: () -> Unit) {
                                                 context.getString(R.string.patch_validation_ok)
                                             } else {
                                                 checked.resultObject()?.let { obj ->
-                                                    runCatching { dev.ninfenz.mobile.model.ReportModel.parse(obj) }.getOrNull()
+                                                    runCatching { dev.ninfenz.mobile.model.ReportModel.parse(obj) }.orNullLogged("PatchScreen")
                                                         ?.issues?.take(3)?.let { issues.addAll(it) }
                                                 }
                                                 context.getString(R.string.patch_validation_failed)
@@ -198,7 +199,7 @@ fun PatchScreen(filesDir: File, projectId: String?, onBack: () -> Unit) {
                     if (store != null && projectId != null) {
                         Button(onClick = {
                             val rawPlan = store.loadPlan(projectId)
-                            val allowed = rawPlan?.let { runCatching { dev.ninfenz.mobile.model.PlanModel.parse(it).slots.toSet() }.getOrNull() } ?: emptySet()
+                            val allowed = rawPlan?.let { runCatching { dev.ninfenz.mobile.model.PlanModel.parse(it).slots.toSet() }.orNullLogged("PatchScreen") } ?: emptySet()
                             val unknown = r.slots.keys.filter { it !in allowed }
                             if (unknown.isNotEmpty()) {
                                 error = context.getString(R.string.patch_unknown_slot, unknown.joinToString())
@@ -231,7 +232,7 @@ fun PatchScreen(filesDir: File, projectId: String?, onBack: () -> Unit) {
                                                 ?: return@runCatching false
                                             store.save(projectId, merged, rawPlan, md)
                                             true
-                                        }.getOrNull()
+                                        }.orNullLogged("PatchScreen")
                                     }
                                     if (outcome == true) {
                                         Toast.makeText(context, context.getString(R.string.patch_saved), Toast.LENGTH_SHORT).show()

@@ -374,7 +374,7 @@
       "fix": "拒绝该发布；降级需显式 allow_rollback 并记录"
     },
     {
-      "code": "NF-PCK-007",
+      "code": "NF-PCK-010",
       "severity": "error",
       "exit": 2,
       "message": "回滚失败（备份缺失/摘要不符）",

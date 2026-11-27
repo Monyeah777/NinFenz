@@ -29,7 +29,7 @@ def site_dirs() -> list:
             dirs.append(getuser())
         # 拿不到 user site 就少挂一条目录，不影响主流程；下面这行同时向 ruff 与 bandit 声明
         except Exception:  # nosec B110  # noqa: BLE001, S110 - 少挂一条目录不影响主流程
-            pass
+            pass  # best-effort 显式忽略（清理/探测失败不影响主流程）
     return [d for d in dirs if d and os.path.isdir(d)]
 
 

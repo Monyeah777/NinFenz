@@ -72,7 +72,7 @@ object PackInstaller {
         try {
             FileChannel.open(dir.toPath(), StandardOpenOption.READ).use { it.force(true) }
         } catch (t: Throwable) {
-            // 目录 fsync 在个别文件系统不可用；文件本身已 fsync，保留最优努力。
+            // 目录 fsync 在个别文件系统不可用；文件本身已 fsync，保留最优努力。（best-effort 显式忽略）
         }
     }
 }

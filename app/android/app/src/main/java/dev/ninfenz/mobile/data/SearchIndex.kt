@@ -8,25 +8,9 @@ import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
-enum class SearchKind(val label: String) {
-    PROJECT("项目"),
-    PACK("Pack"),
-    CLAUSE("条款"),
-    FIELD("字段"),
-    NODE("管线节点"),
-    SECTION("规格章节"),
-    SLOT("规格槽位")
-}
-
-data class SearchHit(
-    val kind: SearchKind,
-    val title: String,
-    val detail: String,
-    val packId: String? = null,
-    val packVersion: String? = null,
-    val projectId: String? = null,
-    val body: String = ""
-)
+/* 类型已上移到 model（避免 model -> data 反向依赖）；这里保留 data 包别名兼容既有 import。 */
+typealias SearchKind = dev.ninfenz.mobile.model.SearchKind
+typealias SearchHit = dev.ninfenz.mobile.model.SearchHit
 
 /** 本地内存索引（v0.02）：Pack 元数据/条款/字段/节点/章节/槽位 + 项目标题/ID。 */
 class SearchIndex(private val filesDir: File) {

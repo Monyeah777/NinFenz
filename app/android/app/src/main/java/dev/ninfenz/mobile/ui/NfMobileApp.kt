@@ -1,5 +1,6 @@
 package dev.ninfenz.mobile.ui
 
+import dev.ninfenz.mobile.util.orNullLogged
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
@@ -134,7 +135,8 @@ import dev.ninfenz.mobile.ui.screens.ProjectReviewScreen
 import dev.ninfenz.mobile.ui.shell.Detail
 import dev.ninfenz.mobile.ui.shell.ShellState
 import dev.ninfenz.mobile.ui.shell.ShellStateCodec
-import dev.ninfenz.mobile.data.EditionRoutePolicy
+import dev.ninfenz.mobile.MainActivity
+import dev.ninfenz.mobile.ui.shell.EditionRoutePolicy
 import dev.ninfenz.mobile.data.FeatureGate
 import dev.ninfenz.mobile.ui.shell.TopDestination
 import java.io.File
@@ -217,10 +219,10 @@ fun NfMobileApp(
             val packSnapshot = withContext(Dispatchers.IO) { packStore.scan() }
             val projectSnapshot = withContext(Dispatchers.IO) { library.loadProjects() }
             val size = withContext(Dispatchers.IO) { dirSize(context.filesDir) }
-            val diag = runCatching { withContext(Dispatchers.IO) { Core.diagnostics() } }.getOrNull()
+            val diag = runCatching { withContext(Dispatchers.IO) { Core.diagnostics() } }.orNullLogged("NfMobileApp")
             packs = packSnapshot
             projects = projectSnapshot.projects
-            RecentProjectShortcuts.publish(context, dev.ninfenz.mobile.model.ProjectSorter.sort(projectSnapshot.projects, dev.ninfenz.mobile.model.ProjectSort.RECENT))
+            RecentProjectShortcuts.publish(context, dev.ninfenz.mobile.model.ProjectSorter.sort(projectSnapshot.projects, dev.ninfenz.mobile.model.ProjectSort.RECENT), MainActivity::class.java)
             archivedProjects = withContext(Dispatchers.IO) { ProjectArchiver.list(context.filesDir) }
             projectErrors = projectSnapshot.errors
             storageText = humanSize(size)
@@ -698,7 +700,7 @@ is Detail.Inbox -> InboxScreen(
                             } else {
                                 scope.launch {
                                     val snapshot = withContext(Dispatchers.IO) {
-                                        runCatching { BackupService.create(context.filesDir) }.getOrNull()
+                                        runCatching { BackupService.create(context.filesDir) }.orNullLogged("NfMobileApp")
                                     }
                                     if (snapshot == null) {
                                         android.widget.Toast.makeText(context, context.getString(dev.ninfenz.mobile.R.string.backup_snapshot_blocked), android.widget.Toast.LENGTH_LONG).show()
@@ -795,7 +797,7 @@ is Detail.Inbox -> InboxScreen(
                                 onFavoriteChanged = { refresh() },
                                 compareCandidates = projects,
                                 onShare = {
-                                    val text = runCatching { entry.file.readText(Charsets.UTF_8) }.getOrNull()
+                                    val text = runCatching { entry.file.readText(Charsets.UTF_8) }.orNullLogged("NfMobileApp")
                                     if (text != null) {
                                         val shared = ShareExporter.writeSharedFile(context, "nf-project-" + entry.project.id, "json", text)
                                         val intent = ShareExporter.shareFileIntent(context, shared, "application/json", entry.project.title)
@@ -805,7 +807,7 @@ is Detail.Inbox -> InboxScreen(
                                 onDelete = {
                                     scope.launch {
                                         val snapshot = withContext(Dispatchers.IO) {
-                                            runCatching { BackupService.create(context.filesDir) }.getOrNull()
+                                            runCatching { BackupService.create(context.filesDir) }.orNullLogged("NfMobileApp")
                                         }
                                         if (snapshot == null) {
                                             android.widget.Toast.makeText(context, context.getString(dev.ninfenz.mobile.R.string.backup_snapshot_blocked), android.widget.Toast.LENGTH_LONG).show()
@@ -846,7 +848,7 @@ is Detail.Inbox -> InboxScreen(
                                         }
                                         val spec = runCatching {
                                             kotlinx.serialization.json.Json.parseToJsonElement(raw).jsonObject
-                                        }.getOrNull()
+                                        }.orNullLogged("NfMobileApp")
                                         if (spec == null) {
                                             android.widget.Toast.makeText(context, context.getString(dev.ninfenz.mobile.R.string.project_save_template), android.widget.Toast.LENGTH_LONG).show()
                                             return@launch
@@ -872,7 +874,7 @@ is Detail.Inbox -> InboxScreen(
                                         val specFile = pack?.let { java.io.File(it.dir, "spec/main.nfspec.json") }
                                         val source = if (override.isFile) override else specFile
                                         val spec = source?.takeIf { it.isFile }?.let { file ->
-                                            runCatching { kotlinx.serialization.json.Json.parseToJsonElement(file.readText(Charsets.UTF_8)).jsonObject }.getOrNull()
+                                            runCatching { kotlinx.serialization.json.Json.parseToJsonElement(file.readText(Charsets.UTF_8)).jsonObject }.orNullLogged("NfMobileApp")
                                         }
                                         if (pack == null || spec == null) {
                                             android.widget.Toast.makeText(context, context.getString(dev.ninfenz.mobile.R.string.project_export_template), android.widget.Toast.LENGTH_LONG).show()

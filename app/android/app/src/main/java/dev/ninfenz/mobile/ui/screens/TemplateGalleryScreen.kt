@@ -1,5 +1,6 @@
 package dev.ninfenz.mobile.ui.screens
 
+import dev.ninfenz.mobile.util.orNullLogged
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -56,8 +57,8 @@ fun TemplateGalleryScreen(
             note?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
             LazyColumn(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                 items(items, key = { it.absolutePath }) { file ->
-                    val raw = remember(file) { runCatching { file.readText(Charsets.UTF_8) }.getOrNull() }
-                    val obj = remember(raw) { raw?.let { runCatching { Json.parseToJsonElement(it).jsonObject }.getOrNull() } }
+                    val raw = remember(file) { runCatching { file.readText(Charsets.UTF_8) }.orNullLogged("TemplateGalleryScreen") }
+                    val obj = remember(raw) { raw?.let { runCatching { Json.parseToJsonElement(it).jsonObject }.orNullLogged("TemplateGalleryScreen") } }
                     val sections = obj?.get("sections")?.jsonArray?.size ?: 0
                     val slots = obj?.get("slots")?.jsonArray?.size ?: 0
                     CardBox(title = store.titleOf(file)) {

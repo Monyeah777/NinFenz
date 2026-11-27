@@ -98,7 +98,7 @@ def _ir_module_ids(ir: IRDocument) -> List[str]:
                     text = fn() or ""
                     break
                 except Exception:  # nosec B110/B112 —— 尽力而为：跳过不可读/不可解析项；该类缺口由对应门禁与 AUD-0016 静默跳过清单另行报出
-                    pass
+                    pass  # best-effort 显式忽略（清理/探测失败不影响主流程）
         text = text or str(ir)
         ids = list(dict.fromkeys(re.findall(r"M\d{2,3}", text)))
     return ids

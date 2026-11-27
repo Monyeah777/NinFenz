@@ -836,10 +836,12 @@
           "app/android/app/src/main/java/**/*.kt",
           "desktop/src/core/**/*.py",
           "app/cli/**/*.py"
-        ]
+        ],
+        "allow_marker": "best-effort"
       },
       "penalty": 4,
-      "source": "CISQ"
+      "source": "CISQ",
+      "note": "显式 best-effort 注释视为已声明忽略（可审计、可搜索）；无注释的空 catch/except 仍判失败。"
     },
     {
       "id": "E-003",

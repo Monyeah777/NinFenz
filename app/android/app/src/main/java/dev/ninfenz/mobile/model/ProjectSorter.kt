@@ -1,7 +1,5 @@
 package dev.ninfenz.mobile.model
 
-import dev.ninfenz.mobile.data.ProjectEntry
-
 enum class ProjectSort { RECENT, TITLE, STATUS }
 
 /** 项目列表排序：最近修改 / 标题 / 状态。 */

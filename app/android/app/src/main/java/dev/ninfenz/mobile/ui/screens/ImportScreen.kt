@@ -1,5 +1,6 @@
 package dev.ninfenz.mobile.ui.screens
 
+import dev.ninfenz.mobile.util.orNullLogged
 import dev.ninfenz.mobile.data.ImportSource
 
 import android.net.Uri
@@ -370,7 +371,7 @@ fun ImportScreen(
                     ).error
                     return
                 }
-                var markdown = extraction.getOrNull()?.takeIf { it.isNotBlank() }
+                var markdown = extraction.orNullLogged("ImportScreen")?.takeIf { it.isNotBlank() }
                 if (markdown == null) {
                     val ocr = runCatching { dev.ninfenz.mobile.data.PdfOcrImporter.extract(context, file) }
                     if (ocr.isFailure) {
@@ -382,8 +383,8 @@ fun ImportScreen(
                         ).error
                         return
                     }
-                    markdown = ocr.getOrNull()?.text?.takeIf { it.isNotBlank() }
-                    if (ocr.getOrNull()?.truncated == true) {
+                    markdown = ocr.orNullLogged("ImportScreen")?.text?.takeIf { it.isNotBlank() }
+                    if (ocr.orNullLogged("ImportScreen")?.truncated == true) {
                         notice = context.getString(dev.ninfenz.mobile.R.string.import_pdf_ocr_truncated)
                     }
                 }
@@ -409,7 +410,7 @@ fun ImportScreen(
                     ).error
                     return
                 }
-                val markdown = extraction.getOrNull()?.takeIf { it.isNotBlank() }
+                val markdown = extraction.orNullLogged("ImportScreen")?.takeIf { it.isNotBlank() }
                 if (markdown == null) {
                     error = CoreResponse.failure(
                         "NF-IMP-004",
@@ -422,7 +423,7 @@ fun ImportScreen(
                 File(file.parentFile, "pdf-import-" + System.nanoTime() + ".md").apply { writeText(markdown, Charsets.UTF_8) }
             }
             isDocx -> {
-                val markdown = runCatching { DocxImporter.extract(file) }.getOrNull()?.takeIf { it.isNotBlank() }
+                val markdown = runCatching { DocxImporter.extract(file) }.orNullLogged("ImportScreen")?.takeIf { it.isNotBlank() }
                 if (markdown == null) {
                     error = CoreResponse.failure(
                         "NF-IMP-008",
@@ -435,7 +436,7 @@ fun ImportScreen(
                 File(file.parentFile, "docx-import-" + System.nanoTime() + ".md").apply { writeText(markdown, Charsets.UTF_8) }
             }
             isEpub -> {
-                val markdown = runCatching { EpubImporter.extract(file) }.getOrNull()?.takeIf { it.isNotBlank() }
+                val markdown = runCatching { EpubImporter.extract(file) }.orNullLogged("ImportScreen")?.takeIf { it.isNotBlank() }
                 if (markdown == null) {
                     error = CoreResponse.failure(
                         "NF-IMP-007",
@@ -536,7 +537,7 @@ fun ImportScreen(
         }
         val spec = runCatching {
             kotlinx.serialization.json.Json.parseToJsonElement(file.readText(Charsets.UTF_8)).jsonObject
-        }.getOrNull()
+        }.orNullLogged("ImportScreen")
         if (spec == null) return
         scope.launch {
             busy = true
@@ -605,7 +606,7 @@ fun ImportScreen(
             val spec = pack?.let { entry ->
                 runCatching {
                     J.parseObject(java.io.File(entry.dir, "spec/main.nfspec.json").readText(Charsets.UTF_8), "nf-md-spec/1")
-                }.getOrNull()
+                }.orNullLogged("ImportScreen")
             }
             val response = safeCall("zero-slice", buildJsonObject {
                 put("text", text)
@@ -1295,7 +1296,7 @@ fun ImportScreen(
                                 }
                                 val buildPromptPack = {
                                     val sampleTexts = savedSamples.take(2).mapNotNull { sample ->
-                                        runCatching { sample.readText(Charsets.UTF_8) }.getOrNull()
+                                        runCatching { sample.readText(Charsets.UTF_8) }.orNullLogged("ImportScreen")
                                     }
                                     PromptPack.from(current.source.name, current.text.orEmpty(), slices, sampleTexts, promptProfile)
                                 }
@@ -1918,7 +1919,7 @@ fun ImportScreen(
 
     previewTemplate?.let { file ->
         val spec = remember(file) {
-            runCatching { SpecModel.parse(file.readText(Charsets.UTF_8)) }.getOrNull()
+            runCatching { SpecModel.parse(file.readText(Charsets.UTF_8)) }.orNullLogged("ImportScreen")
         }
         Dialog(onDismissRequest = { previewTemplate = null }) {
             Surface(shape = MaterialTheme.shapes.large, tonalElevation = 6.dp) {
@@ -1974,7 +1975,7 @@ fun ImportScreen(
                 TextButton(
                     enabled = pack != null,
                     onClick = {
-                        val spec = runCatching { file.readText(Charsets.UTF_8) }.getOrNull()
+                        val spec = runCatching { file.readText(Charsets.UTF_8) }.orNullLogged("ImportScreen")
                         if (pack != null && spec != null) {
                             onCreateProjectFromTemplate(pack, templateStore.titleOf(file), spec, "")
                         }

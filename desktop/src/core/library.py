@@ -90,7 +90,7 @@ def verify(root: str = ".", key: Optional[bytes] = None,
             if lic and lic not in ALLOWED:
                 issues.append("%s license 不在词表：%s" % (eid, lic))
         except Exception:  # nosec B110/B112 —— 尽力而为：跳过不可读/不可解析项；该类缺口由对应门禁与 AUD-0016 静默跳过清单另行报出
-            pass
+            pass  # best-effort 显式忽略（清理/探测失败不影响主流程）
         st = str(fm.get("status") or "active")
         if st not in STATUSES:
             issues.append("%s status 不在词表：%s（%s）" % (eid, st, "/".join(STATUSES)))

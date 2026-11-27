@@ -1,5 +1,6 @@
 package dev.ninfenz.mobile.ui.screens
 
+import dev.ninfenz.mobile.util.orNullLogged
 import android.content.Context
 import dev.ninfenz.mobile.core.CoreResponse
 import dev.ninfenz.mobile.core.J
@@ -79,7 +80,7 @@ class DeliveryMacroExecutor(
             if (raw.isNullOrBlank()) {
                 Result.failure(IllegalStateException(context.getString(dev.ninfenz.mobile.R.string.delivery_macro_no_import_draft)))
             } else {
-                val input = runCatching { Json.parseToJsonElement(raw).jsonObject }.getOrNull()
+                val input = runCatching { Json.parseToJsonElement(raw).jsonObject }.orNullLogged("DeliveryMacroExecutor")
                 if (input == null) {
                     Result.failure(IllegalStateException(context.getString(dev.ninfenz.mobile.R.string.delivery_macro_draft_not_json)))
                 } else {

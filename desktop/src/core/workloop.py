@@ -141,7 +141,7 @@ def capability_gaps(root: str = ".") -> List[Dict[str, Any]]:
         from core import interop_export as _ie
         interop_decl = sorted(_ie.KINDS)
     except Exception:  # pragma: no cover —— 导出面声明不可读：本轮不产 innovate 候选（不静默：候选缺失即结果为少一条）  # nosec B110/B112 —— 尽力而为：跳过不可读/不可解析项；该类缺口由对应门禁与 AUD-0016 静默跳过清单另行报出
-        pass
+        pass  # best-effort 显式忽略（清理/探测失败不影响主流程）
     cli_kinds: List[str] = []
     if cmds:
         with open(nf_path, encoding="utf-8") as fh:

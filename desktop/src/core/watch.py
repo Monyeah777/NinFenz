@@ -345,4 +345,4 @@ class DirWatcher:
             kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
             kernel32.CancelIoEx(self._handle, None)
         except Exception:                                  # noqa: BLE001 - 取消失败不影响停止
-            pass
+            pass  # best-effort 显式忽略（清理/探测失败不影响主流程）

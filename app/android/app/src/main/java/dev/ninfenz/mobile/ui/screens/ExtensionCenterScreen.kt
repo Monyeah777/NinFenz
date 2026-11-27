@@ -1,5 +1,6 @@
 package dev.ninfenz.mobile.ui.screens
 
+import dev.ninfenz.mobile.util.orNullLogged
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -172,7 +173,7 @@ fun ExtensionCenterScreen(onBack: () -> Unit) {
                                                 val fingerprint = runCatching {
                                                     Json.parseToJsonElement(raw).jsonObject["signature"]
                                                         ?.jsonObject?.get("public_key")?.jsonPrimitive?.content
-                                                }.getOrNull()?.let { ExtensionTrustStore.fingerprint(it) }.orEmpty()
+                                                }.orNullLogged("ExtensionCenterScreen")?.let { ExtensionTrustStore.fingerprint(it) }.orEmpty()
                                                 trustStore.trust(ext.id, digestNow, fingerprint)
                                                 trustNonce++
                                             } else {

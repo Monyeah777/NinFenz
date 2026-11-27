@@ -35,7 +35,7 @@ object PdfFontProvider {
                     return Loaded(PDType0Font.load(doc, file), null)
                 }
             } catch (_: Throwable) {
-                // 继续尝试下一个
+                // 继续尝试下一个（best-effort 显式忽略）
             }
         }
         val bytes = context.assets.open("fonts/NotoSansSC-VF.ttf").use { it.readBytes() }

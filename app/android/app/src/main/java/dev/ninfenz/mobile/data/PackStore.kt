@@ -88,7 +88,7 @@ object PackRegistry {
                 }
             }
         } catch (t: Throwable) {
-            // 迁移失败保留 JSON 回退，不阻断扫描
+            // 迁移失败保留 JSON 回退，不阻断扫描（best-effort 显式忽略）
         }
     }
 
@@ -119,7 +119,7 @@ object PackRegistry {
                 }
             }
         } catch (t: Throwable) {
-            // 注册表删除失败时保留 JSON 回退，不吞掉 UI 侧错误
+            // 注册表删除失败时保留 JSON 回退，不吞掉 UI 侧错误（best-effort 显式忽略）
         }
     }
 

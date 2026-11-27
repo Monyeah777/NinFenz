@@ -1,5 +1,6 @@
 package dev.ninfenz.mobile.ui.screens
 
+import dev.ninfenz.mobile.util.orNullLogged
 import java.io.File
 
 import android.net.Uri
@@ -76,9 +77,9 @@ fun CcosScreen(onBack: () -> Unit) {
     val restored = remember(context.filesDir) {
         val taskText = CcosSessionStore.loadTask(context.filesDir)
         val resultText = CcosSessionStore.loadResult(context.filesDir)
-        val taskObj = taskText?.let { runCatching { J.parseObject(it, "ccos-task/1") }.getOrNull() }
-        val parsedTask = taskObj?.let { runCatching { CcosModel.parseTask(it) }.getOrNull() }
-        val parsedResult = resultText?.let { runCatching { CcosModel.parseResult(it) }.getOrNull() }
+        val taskObj = taskText?.let { runCatching { J.parseObject(it, "ccos-task/1") }.orNullLogged("CcosScreen") }
+        val parsedTask = taskObj?.let { runCatching { CcosModel.parseTask(it) }.orNullLogged("CcosScreen") }
+        val parsedResult = resultText?.let { runCatching { CcosModel.parseResult(it) }.orNullLogged("CcosScreen") }
         RestoredCcos(
             task = parsedTask,
             result = parsedResult,

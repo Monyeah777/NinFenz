@@ -1,5 +1,6 @@
 package dev.ninfenz.mobile.ui.screens
 
+import dev.ninfenz.mobile.util.orNullLogged
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.net.Uri
@@ -374,7 +375,7 @@ fun SettingsScreen(
             OutlinedButton(onClick = {
                 scope.launch {
                     val created = withContext(Dispatchers.IO) {
-                        runCatching { dev.ninfenz.mobile.data.ProjectBundleExporter.create(context.filesDir, context.cacheDir) }.getOrNull()
+                        runCatching { dev.ninfenz.mobile.data.ProjectBundleExporter.create(context.filesDir, context.cacheDir) }.orNullLogged("SettingsScreen")
                     }
                     if (created == null) {
                         backupMessage = context.getString(dev.ninfenz.mobile.R.string.settings_bundle_empty)
@@ -429,7 +430,7 @@ fun SettingsScreen(
                                 batchCandidates = null
                                 scope.launch {
                                     val created = withContext(Dispatchers.IO) {
-                                        runCatching { dev.ninfenz.mobile.ui.BatchAssembler.assembleAll(context, context.filesDir, context.cacheDir, ids) }.getOrNull()
+                                        runCatching { dev.ninfenz.mobile.ui.BatchAssembler.assembleAll(context, context.filesDir, context.cacheDir, ids) }.orNullLogged("SettingsScreen")
                                     }
                                     if (created == null) {
                                         backupMessage = context.getString(dev.ninfenz.mobile.R.string.settings_batch_failed)

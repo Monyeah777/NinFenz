@@ -1,5 +1,6 @@
 package dev.ninfenz.mobile.ui.screens
 
+import dev.ninfenz.mobile.util.orNullLogged
 import androidx.compose.ui.platform.LocalDensity
 
 import androidx.compose.ui.text.style.TextOverflow
@@ -156,7 +157,7 @@ fun LibraryHomeScreen(
 ) {
     val context = LocalContext.current
     val clipboard = LocalClipboardManager.current
-    val viewFilesDir = remember { runCatching { context.filesDir }.getOrNull() }
+    val viewFilesDir = remember { runCatching { context.filesDir }.orNullLogged("TopLevelScreens") }
     val viewStore = remember(viewFilesDir) { viewFilesDir?.let { LibraryViewStore(it) } }
     val savedView = remember { viewStore?.load() }
     var pendingDeleteArchive by remember { mutableStateOf<File?>(null) }
@@ -604,7 +605,7 @@ fun LibraryHomeScreen(
                                             snackbarScope.launch {
                                                 val archived = runCatching {
                                                     ProjectArchiver.archive(entry.file, context.filesDir)
-                                                }.getOrNull()
+                                                }.orNullLogged("TopLevelScreens")
                                                 if (archived != null) {
                                                     undoArchive = archived
                                                     onRefresh()

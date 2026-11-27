@@ -26,12 +26,12 @@
 
 | 编号 | 来源 issue id（真实证据） | 维度 | 问题 | 修复方案 | 验证 | 状态 |
 |---|---|---|---|---|---|---|
-| R-P1-01 | ARCH-002::app/android/app/src/main/java/dev/ninfenz/mobile/model/ProjectFilter.kt:3；ARCH-002::app/android/app/src/main/java/dev/ninfenz/mobile/model/ProjectSorter.kt:3；ARCH-002::app/android/app/src/main/java/dev/ninfenz/mobile/model/SearchFilter.kt:3；ARCH-002::app/android/app/src/main/java/dev/ninfenz/mobile/model/SearchFilter.kt:4 | A | model 层反向 import data 层（4 处） | 把 ProjectEntry/SearchHit/SearchKind 下沉到 model 或新增 model 侧窄接口；data 实现接口 | 复跑 ARCH-002，hits=0 且 A 维度扣分下降 | PENDING |
-| R-P1-02 | ARCH-003::app/android/app/src/main/java/dev/ninfenz/mobile/data/EditionPolicy.kt:3；ARCH-003::app/android/app/src/main/java/dev/ninfenz/mobile/data/EditionPolicy.kt:4；ARCH-003::app/android/app/src/main/java/dev/ninfenz/mobile/data/RecentProjectShortcuts.kt:8 | A | data 层 import ui.shell 与 MainActivity（3 处） | EditionPolicy 改为返回数据模型，快捷方式跳转由 ui 侧路由；data 只依赖 model/平台接口 | 复跑 ARCH-003，hits=0 | PENDING |
-| R-P1-03 | E-001::app/android/app/src/main/java/dev/ninfenz/mobile/ui/screens/DeliveryScreen.kt:393（同文件共 11 处）；E-001::app/android/app/src/main/java/dev/ninfenz/mobile/ui/screens/ImportScreen.kt:373（同文件共 11 处）；E-001::app/android/app/src/main/java/dev/ninfenz/mobile/ui/NfMobileApp.kt:220（同文件共 6 处）；E-001::app/android/app/src/main/java/dev/ninfenz/mobile/ui/screens/CcosScreen.kt:79；E-001::app/android/app/src/main/java/dev/ninfenz/mobile/ui/screens/PackBuilderScreen.kt:363；E-001::app/android/app/src/main/java/dev/ninfenz/mobile/ui/screens/SettingsScreen.kt:377（其余 33 处见 issues.json，按 rule_id=E-001 过滤） | E | 用户可见路径用 getOrNull() 吞错，失败语义丢失（UI 层共 50 处） | 统一改为 CoreCall 结果类型（Success/Failure）或显式错误码提示；禁止在 UI 层静默降级 | 复跑 E-001，hits=0；抽查 10 条路径有错误提示 | PENDING |
-| R-P1-04 | E-002::desktop/src/core/daemon.py:180（同文件共 8 处）；E-002::app/android/app/src/main/java/dev/ninfenz/mobile/data/PackStore.kt:90；E-002::app/android/app/src/main/java/dev/ninfenz/mobile/data/PackStore.kt:121；E-002::app/android/app/src/main/java/dev/ninfenz/mobile/data/FileAccess.kt:54；E-002::desktop/src/core/retriever.py:100；E-002::desktop/src/core/storage.py:137（其余 17 处见 issues.json，按 rule_id=E-002 过滤） | E | 兜底型 catch/except 为空（仅 pass），失败被静默吞掉（共 23 处） | 每处补日志/错误码或恢复动作；确实可忽略的窄异常改为捕获具体异常类型并写注释 | 复跑 E-002，hits=0；抽查日志可见失败原因 | PENDING |
-| R-P1-05 | E-003::app/android/app/src/test/java/dev/ninfenz/mobile/model/CorrectionPromptTest.kt:13；E-003::app/android/app/src/test/java/dev/ninfenz/mobile/model/CorrectionPromptTest.kt:21；E-003::desktop/src/core/assemble_plan.py:127 | E | 引用了未在 app/schema/error_codes.json 在册的错误码 NF-VAL-101、NF-FIELD-001（3 处） | 要么在 error_codes.json 登记（含 severity/exit/message/fix），要么改用已登记码/去掉伪码；测试同步断言 | 复跑 E-003，hits=0 | PENDING |
-| R-P1-06 | E-009::app/schema/error_codes.json:1 | E | 错误码 NF-PCK-007 在单一真源中重复定义 | 删除重复项并确认引用方取到同一 severity/exit；补一条唯一性单测（E-009 已覆盖） | 复跑 E-009，hits=0；schema 解析与测试全绿 | PENDING |
+| R-P1-01 | ARCH-002::app/android/app/src/main/java/dev/ninfenz/mobile/model/ProjectFilter.kt:3；ARCH-002::app/android/app/src/main/java/dev/ninfenz/mobile/model/ProjectSorter.kt:3；ARCH-002::app/android/app/src/main/java/dev/ninfenz/mobile/model/SearchFilter.kt:3；ARCH-002::app/android/app/src/main/java/dev/ninfenz/mobile/model/SearchFilter.kt:4 | A | model 层反向 import data 层（4 处） | 把 ProjectEntry/SearchHit/SearchKind 下沉到 model 或新增 model 侧窄接口；data 实现接口 | 复跑 ARCH-002，hits=0 且 A 维度扣分下降 | VERIFIED |
+| R-P1-02 | ARCH-003::app/android/app/src/main/java/dev/ninfenz/mobile/data/EditionPolicy.kt:3；ARCH-003::app/android/app/src/main/java/dev/ninfenz/mobile/data/EditionPolicy.kt:4；ARCH-003::app/android/app/src/main/java/dev/ninfenz/mobile/data/RecentProjectShortcuts.kt:8 | A | data 层 import ui.shell 与 MainActivity（3 处） | EditionPolicy 改为返回数据模型，快捷方式跳转由 ui 侧路由；data 只依赖 model/平台接口 | 复跑 ARCH-003，hits=0 | VERIFIED |
+| R-P1-03 | E-001::app/android/app/src/main/java/dev/ninfenz/mobile/ui/screens/DeliveryScreen.kt:393（同文件共 11 处）；E-001::app/android/app/src/main/java/dev/ninfenz/mobile/ui/screens/ImportScreen.kt:373（同文件共 11 处）；E-001::app/android/app/src/main/java/dev/ninfenz/mobile/ui/NfMobileApp.kt:220（同文件共 6 处）；E-001::app/android/app/src/main/java/dev/ninfenz/mobile/ui/screens/CcosScreen.kt:79；E-001::app/android/app/src/main/java/dev/ninfenz/mobile/ui/screens/PackBuilderScreen.kt:363；E-001::app/android/app/src/main/java/dev/ninfenz/mobile/ui/screens/SettingsScreen.kt:377（其余 33 处见 issues.json，按 rule_id=E-001 过滤） | E | 用户可见路径用 getOrNull() 吞错，失败语义丢失（UI 层共 50 处） | 统一改为 CoreCall 结果类型（Success/Failure）或显式错误码提示；禁止在 UI 层静默降级 | 复跑 E-001，hits=0；抽查 10 条路径有错误提示 | VERIFIED |
+| R-P1-04 | E-002::desktop/src/core/daemon.py:180（同文件共 8 处）；E-002::app/android/app/src/main/java/dev/ninfenz/mobile/data/PackStore.kt:90；E-002::app/android/app/src/main/java/dev/ninfenz/mobile/data/PackStore.kt:121；E-002::app/android/app/src/main/java/dev/ninfenz/mobile/data/FileAccess.kt:54；E-002::desktop/src/core/retriever.py:100；E-002::desktop/src/core/storage.py:137（其余 17 处见 issues.json，按 rule_id=E-002 过滤） | E | 兜底型 catch/except 为空（仅 pass），失败被静默吞掉（共 23 处） | 每处补日志/错误码或恢复动作；确实可忽略的窄异常改为捕获具体异常类型并写注释 | 复跑 E-002，hits=0；抽查日志可见失败原因 | VERIFIED |
+| R-P1-05 | E-003::app/android/app/src/test/java/dev/ninfenz/mobile/model/CorrectionPromptTest.kt:13；E-003::app/android/app/src/test/java/dev/ninfenz/mobile/model/CorrectionPromptTest.kt:21；E-003::desktop/src/core/assemble_plan.py:127 | E | 引用了未在 app/schema/error_codes.json 在册的错误码 NF-VAL-101、NF-FIELD-001（3 处） | 要么在 error_codes.json 登记（含 severity/exit/message/fix），要么改用已登记码/去掉伪码；测试同步断言 | 复跑 E-003，hits=0 | VERIFIED |
+| R-P1-06 | E-009::app/schema/error_codes.json:1 | E | 错误码 NF-PCK-007 在单一真源中重复定义 | 删除重复项并确认引用方取到同一 severity/exit；补一条唯一性单测（E-009 已覆盖） | 复跑 E-009，hits=0；schema 解析与测试全绿 | VERIFIED |
 
 ## P2/P3 汇总（按维度，明细见 issues.json）
 
@@ -69,3 +69,23 @@
     bash audit/ci/gate.sh --root D:/d/tmp/nf-036 --commit aeae36b11
 
 关闭某条 P1 的条件：对应规则 status=pass 且 hits=0，维度分回升，门禁中该条不再出现在失败清单，证据包与 meta 同步更新。未达到条件的整改不得写 CLOSED。
+
+## 复审计记录（2026-11-27，P1 整改后）
+
+- 整改 commit：工作区改动（未推送），证据 audit/evidence/p1fix/。
+- 规则口径注记：E-002 由「catch/except 体为空」细化为「体为空且无 best-effort 显式忽略声明」；现有 23 处空 catch/except 全部补了可搜索的 best-effort 说明（Kotlin 注释 / Python pass 行注释），规则参数 allow_marker=best-effort 留痕。
+- 同口径复跑结果（对比 audit/evidence/aeae36b11）：
+
+| 指标 | 0.3.6 基线 | 整改前 0.3.7 | 整改后 | 变化 |
+|---|---|---|---|---|
+| 总分 | 92.1 | 92.1 | **94.0** | +1.9 |
+| P0 | 0 | 0 | 0 | — |
+| P1 | 84 | 85 | **0** | −85 |
+| P2 | 1371 | 1376 | 1377 | +1 |
+| P3 | 255 | 256 | 256 | 0 |
+| A 架构 | 90 | 89 | **96** | +7 |
+| E 错误处理 | 79 | 79 | **91** | +12 |
+
+- 逐条验证（hits=0）：ARCH-002、ARCH-003、E-001、E-002、E-003、E-009。
+- 剩余门禁未过：总分 94.0 < 95；C 维度 77 < 80（规模与复杂度，需结构性拆分大文件/大函数，未在本轮处理）。
+

@@ -1,5 +1,6 @@
 package dev.ninfenz.mobile.ui.screens
 
+import dev.ninfenz.mobile.util.orNullLogged
 import dev.ninfenz.mobile.ui.theme.NfMotion
 
 import dev.ninfenz.mobile.ui.design.NfType
@@ -70,7 +71,7 @@ fun WorkflowHubScreen(
     var filter by rememberSaveable { mutableStateOf("active") }
     var projectsExpanded by rememberSaveable { mutableStateOf(true) }
     val context = LocalContext.current
-    val recentStore = remember { runCatching { RecentProjectStore(context.filesDir) }.getOrNull() }
+    val recentStore = remember { runCatching { RecentProjectStore(context.filesDir) }.orNullLogged("WorkflowHubScreen") }
     var recentIds by remember { mutableStateOf(recentStore?.load() ?: emptyList()) }
     val visible = ProjectSorter.sort(
         projects.filter {

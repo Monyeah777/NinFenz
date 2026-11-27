@@ -905,7 +905,7 @@ def _check_slsa(sl: dict, rec: dict, root: str, issues: List[str]) -> None:
             issues.append("SLSA 派生面基线句与 quality_baseline 期望值不一致：%s"
                           "（修复指引：两处须同源）" % declared)
     except Exception:  # pragma: no cover  # nosec B110/B112 —— 尽力而为：跳过不可读/不可解析项；该类缺口由对应门禁与 AUD-0016 静默跳过清单另行报出
-        pass
+        pass  # best-effort 显式忽略（清理/探测失败不影响主流程）
 
 
 def _check_a2a(card: dict, contract: dict, issues: List[str]) -> None:

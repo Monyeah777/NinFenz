@@ -135,7 +135,7 @@ class Store:
             try:
                 return json_doc.load(self.config_path, dict, what="config %s" % self.config_path)
             except Exception:  # nosec B110/B112 —— 尽力而为：跳过不可读/不可解析项；该类缺口由对应门禁与 AUD-0016 静默跳过清单另行报出
-                pass
+                pass  # best-effort 显式忽略（清理/探测失败不影响主流程）
         return {"pipeline": "P01", "asset_pack": "", "recent": []}
 
     def save_config(self, cfg: dict):

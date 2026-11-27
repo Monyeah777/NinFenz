@@ -1,5 +1,6 @@
 package dev.ninfenz.mobile.ui.screens
 
+import dev.ninfenz.mobile.util.orNullLogged
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -391,7 +392,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
     val referencePicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) {
             scope.launch {
-                val file = runCatching { FileAccess.copyToCache(context, uri, "reference.docx") }.getOrNull()
+                val file = runCatching { FileAccess.copyToCache(context, uri, "reference.docx") }.orNullLogged("DeliveryScreen")
                 val styles = file?.let { DocxReferenceStyles.extract(it) }
                 val sectPr = file?.let { DocxReferenceStyles.extractSectPr(it) }
                 val theme = file?.let { DocxReferenceStyles.extractTheme(it) }
@@ -622,7 +623,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
         else -> 0
     }
     val specMeta = remember(artifacts?.specJson) {
-        artifacts?.let { runCatching { SpecModel.parse(it.specJson) }.getOrNull() }
+        artifacts?.let { runCatching { SpecModel.parse(it.specJson) }.orNullLogged("DeliveryScreen") }
     }
     val constraintConflicts = remember(specMeta) { dev.ninfenz.mobile.model.SpecConstraintAudit.conflicts(specMeta?.slots.orEmpty()) }
     var deliveryMenu by remember { mutableStateOf(false) }
@@ -651,7 +652,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
 
     suspend fun executeMacro(macro: MacroStore.Macro, values: Map<String, String>) {
         val bound = MacroRunner.bind(macro.json, values)
-        val plan = MacroStore(context.filesDir).plan(bound).getOrNull()
+        val plan = MacroStore(context.filesDir).plan(bound).orNullLogged("DeliveryScreen")
         macroBatchResult = null
         macroResult = if (plan == null) {
             MacroRunResult("failed", emptyList(), 1)
@@ -662,7 +663,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
     }
 
     suspend fun executeMacroBatch() {
-        val plans = macroItems.mapNotNull { macro -> MacroStore(context.filesDir).plan(macro.json).getOrNull() }
+        val plans = macroItems.mapNotNull { macro -> MacroStore(context.filesDir).plan(macro.json).orNullLogged("DeliveryScreen") }
         macroResult = null
         macroBatchResult = if (plans.isEmpty()) {
             MacroBatchResult("failed", emptyList(), 1)
@@ -1484,7 +1485,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                     val raw = response.resultObject()?.get("files")?.toString().orEmpty()
                                     val name = Regex("\"name\":\"([^\"]+)\"").find(raw)?.groupValues?.getOrNull(1) ?: "result.docx"
                                     File(dir, name)
-                                }.onFailure { failures += "docx:" + (it.message ?: it.javaClass.simpleName) }.getOrNull()
+                                }.onFailure { failures += "docx:" + (it.message ?: it.javaClass.simpleName) }.orNullLogged("DeliveryScreen")
                                 val zipFile = runCatching {
                                     val payload = buildJsonObject {
                                         put("markdown", md)
@@ -1499,7 +1500,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                     val raw = response.resultObject()?.get("files")?.toString().orEmpty()
                                     val name = Regex("\"name\":\"([^\"]+)\"").find(raw)?.groupValues?.getOrNull(1) ?: "result.zip"
                                     File(dir, name)
-                                }.onFailure { failures += "zip:" + (it.message ?: it.javaClass.simpleName) }.getOrNull()
+                                }.onFailure { failures += "zip:" + (it.message ?: it.javaClass.simpleName) }.orNullLogged("DeliveryScreen")
                                 val skillFile = runCatching {
                                     val payload = buildJsonObject {
                                         put("markdown", md)
@@ -1514,7 +1515,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                     val raw = response.resultObject()?.get("files")?.toString().orEmpty()
                                     val name = Regex("\"name\":\"([^\"]+)\"").find(raw)?.groupValues?.getOrNull(1) ?: "result-skill.zip"
                                     File(dir, name)
-                                }.onFailure { failures += "skill:" + (it.message ?: it.javaClass.simpleName) }.getOrNull()
+                                }.onFailure { failures += "skill:" + (it.message ?: it.javaClass.simpleName) }.orNullLogged("DeliveryScreen")
                                 val preserveFile = if (!audit) null else runCatching {
                                     val lineage = dev.ninfenz.mobile.data.PreservationLineageStore(context.filesDir)
                                     val created = dev.ninfenz.mobile.data.PreservationExporter.export(
@@ -1538,7 +1539,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                         .joinToString("") { "%02x".format(it.toInt() and 0xff) }
                                     lineage.save(project.id, digest)
                                     created.file
-                                }.onFailure { failures += "preservation:" + (it.message ?: it.javaClass.simpleName) }.getOrNull()
+                                }.onFailure { failures += "preservation:" + (it.message ?: it.javaClass.simpleName) }.orNullLogged("DeliveryScreen")
                                 val files = buildList {
                                     fun attempt(label: String, block: () -> File) {
                                         runCatching { add(block()) }.onFailure { failures += label + ":" + (it.message ?: it.javaClass.simpleName) }
@@ -2093,7 +2094,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                     ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.preview_share_redacted))
                                 }) { Text(stringResource(dev.ninfenz.mobile.R.string.preview_share_redacted)) }
                                 TextButton(onClick = {
-                                    val saved = runCatching { sampleStore.save("delivery-" + project.id, md) }.getOrNull()
+                                    val saved = runCatching { sampleStore.save("delivery-" + project.id, md) }.orNullLogged("DeliveryScreen")
                                     android.widget.Toast.makeText(
                                         context,
                                         if (saved != null) context.getString(dev.ninfenz.mobile.R.string.delivery_save_sample) + ": " + saved.name
@@ -2277,7 +2278,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                         put("spec", specJson)
                                         put("inputs", buildJsonObject { for ((k, v) in variantInputs) put(k, v) })
                                     })
-                                }.getOrNull()
+                                }.orNullLogged("DeliveryScreen")
                                 val md = response?.resultObject()?.let { J.optString(it, "markdown") }
                                 if (response?.ok == true && !md.isNullOrBlank()) {
                                     versionStore.save(project.id, md)
@@ -2310,7 +2311,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                         put("spec", specJson)
                                         put("inputs", buildJsonObject { for ((k, v) in variantInputs) put(k, v) })
                                     })
-                                }.getOrNull()
+                                }.orNullLogged("DeliveryScreen")
                                 val md = response?.resultObject()?.let { J.optString(it, "markdown") }
                                 if (response?.ok == true && !md.isNullOrBlank()) {
                                     val safe = variant.id.replace(Regex("[^A-Za-z0-9._-]"), "_")

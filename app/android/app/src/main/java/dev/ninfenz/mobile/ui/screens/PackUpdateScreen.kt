@@ -1,5 +1,6 @@
 package dev.ninfenz.mobile.ui.screens
 
+import dev.ninfenz.mobile.util.orNullLogged
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -340,7 +341,7 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit, onOpenProject: (St
                                                 outDir.copyRecursively(target, overwrite = true)
                                                 dev.ninfenz.mobile.data.PackStore(context.filesDir).invalidate()
                                                 target
-                                            }.getOrNull()
+                                            }.orNullLogged("PackUpdateScreen")
                                         }
                                         resultText = response.result?.toString()
                                         if (installed == null || !installed.isDirectory) {
