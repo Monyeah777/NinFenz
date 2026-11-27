@@ -42,6 +42,7 @@
 - 16KB：`zipalign -c -P 16 4` exit 0（release base APK）；AAB 未用 bundletool 复核。
 - 权限：aapt 仅 `dev.ninfenz.mobile.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`，无 INTERNET。
 - 签名：**OPEN-SIGN**；`NF_UPLOAD_*` 未设置；无 upload AAB。
+- 内部可审阅 APK：`results/app/0.3.7-preview.1-internal-debugsigned.apk`；18MB；debug 证书 SHA-256 `8a52a549c3081795cecb0f1424d21684933fb21d3afe76506dab736e688b10fb`；**不是 upload key**。
 - 真机：**OPEN-PERF-DEVICE**；当前 adb 无设备，未做安装/启动/TalkBack/RTL/10k。
 - Play：未上传；未做 staged rollout/rollback 演练。
 
