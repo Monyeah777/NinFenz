@@ -119,3 +119,9 @@
 - 最新证据：audit/evidence/73a7d17ce（同 commit 连跑两次 issues/report 逐字节一致、meta 全等）；总分 98.80，P0=0/P1=0/error=0/no_targets=0，audit/ci/gate.sh PASS。
 - 维度：A100 B100 C88 D100 E100 F100 G–N 全 100。
 - C 维度规则清零进度：C-002 / C-003 / C-010 / C-013 已清零；本轮 C-007（Kotlin 部分）、C-008（除 DeliveryScreen）、C-001（Kotlin/Python 部分）、C-012（生产路径）推进。
+
+## 门禁状态（第十六轮后）
+
+- 最新证据：audit/evidence/79b61a71b（同 commit 连跑两次 issues/report 逐字节一致、meta 全等）；总分 99.00，P0=0/P1=0/error=0/no_targets=0，audit/ci/gate.sh PASS。
+- 维度：A100 B100 C90 D100 E100 F100 G–N 全 100。
+- C 维度规则清零进度：C-002 / C-003 / C-007 / C-008 / C-010 / C-013 已清零；剩 C-001（56）/ C-005（801）/ C-009（5 生成块）/ C-012（16 生成区）。
