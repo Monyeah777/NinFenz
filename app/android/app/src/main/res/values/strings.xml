@@ -1424,6 +1424,9 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="author_contract_solve">合同求解</string>
     <string name="author_contract_missing">还没有合同，先编译</string>
     <string name="author_contract_solved">合同求解已保存</string>
+    <string name="author_contract_value">合同值（交付预填）</string>
+    <string name="author_contract_values_save">保存合同值</string>
+    <string name="author_contract_values_saved">合同值已保存</string>
     <string name="author_contract_explain_title">合同解释</string>
     <string name="author_contract_explain_empty">合同解释为空</string>
     <string name="author_contract_assignments">求解赋值</string>
@@ -1485,6 +1488,11 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="delivery_run_macro">运行宏</string>
     <string name="delivery_macro_none">还没有宏；先在设置导入。</string>
     <string name="delivery_macro_done">宏完成：%1$s · 失败 %2$d</string>
+    <string name="delivery_macro_no_params">该宏没有 {{key}} 参数</string>
+    <string name="delivery_macro_run_selected">运行</string>
+    <string name="delivery_macro_batch_run">运行全部宏</string>
+    <string name="delivery_macro_batch_confirm">批量运行会依次执行所有宏；assemble/import/export 可能改变当前内容或写文件。确认继续？</string>
+    <string name="delivery_macro_batch_status">批量 %1$s · 失败 %2$d</string>
     <string name="delivery_macro_unwired">动作未接线：%1$s</string>
     <string name="delivery_macro_failed">宏步骤失败：%1$s</string>
     <string name="delivery_fidelity_score">匹配 %1$d%% · %2$d/%3$d 章节</string>

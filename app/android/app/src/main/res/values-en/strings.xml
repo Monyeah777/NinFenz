@@ -1428,6 +1428,9 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="author_contract_solve">Solve contract</string>
     <string name="author_contract_missing">No contract yet; compile first</string>
     <string name="author_contract_solved">Contract solution saved</string>
+    <string name="author_contract_value">Contract value (delivery prefill)</string>
+    <string name="author_contract_values_save">Save contract value</string>
+    <string name="author_contract_values_saved">Contract values saved</string>
     <string name="author_contract_explain_title">Contract explanation</string>
     <string name="author_contract_explain_empty">No explanation lines</string>
     <string name="author_contract_assignments">Solved assignments</string>
@@ -1489,6 +1492,11 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="delivery_run_macro">Run macro</string>
     <string name="delivery_macro_none">No macros yet; import one in Settings.</string>
     <string name="delivery_macro_done">Macro %1$s · %2$d failed</string>
+    <string name="delivery_macro_no_params">This macro has no {{key}} parameters</string>
+    <string name="delivery_macro_run_selected">Run</string>
+    <string name="delivery_macro_batch_run">Run all macros</string>
+    <string name="delivery_macro_batch_confirm">Batch run executes every macro in order; assemble/import/export may change content or write files. Continue?</string>
+    <string name="delivery_macro_batch_status">Batch %1$s · %2$d failed</string>
     <string name="delivery_macro_unwired">Action not wired: %1$s</string>
     <string name="delivery_macro_failed">Macro step failed: %1$s</string>
     <string name="delivery_fidelity_score">%1$d%% match · %2$d/%3$d sections</string>

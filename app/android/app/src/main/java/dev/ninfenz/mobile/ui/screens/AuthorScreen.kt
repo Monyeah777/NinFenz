@@ -973,6 +973,7 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
     val snippets = remember { ExtensionStore(context.filesDir).contributions(setOf("spec_snippet")) }
     val snapshotStore = remember { SpecSnapshotStore(context.filesDir, project.id) }
     val contractStore = remember { ContractIrStore(context.filesDir, project.id) }
+    var contractValues by remember { mutableStateOf(contractStore.loadValues()) }
     val capabilityRevision = rememberCapabilityRevision()
     val sourceStore = remember { SourceStore(context.filesDir, project.id) }
     val aiRunStore = remember { AiRunStore(context.filesDir) }
@@ -1082,7 +1083,10 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
                             contractStore.saveSolve(result)
                             val assignments = (result["assignments"] as? JsonObject)?.mapValues { (_, value) -> value.jsonPrimitive.content }.orEmpty()
                             contractAssignments = assignments
-                            if (assignments.isNotEmpty()) contractStore.saveValues(assignments)
+                            if (assignments.isNotEmpty()) {
+                                contractStore.saveValues(assignments)
+                                contractValues = contractStore.loadValues()
+                            }
                             contractNote = context.getString(dev.ninfenz.mobile.R.string.author_contract_solved)
                             val explained = safeCall("contract-explain", buildJsonObject { put("result", result) })
                             contractExplain = explained.resultObject()?.get("lines")?.jsonArray
@@ -1144,6 +1148,18 @@ private fun SpecAuthorContent(artifacts: AuthorArtifacts, project: Project, onSa
                             apply(spec.copy(slots = spec.slots.map { if (it.id == slot.id) it.copy(name = newName) else it }))
                         }
                     )
+                    if (capabilityRevision >= 0 && CapabilityRegistry.isEnabled(Capability.CONTRACT)) {
+                        FormTextField(
+                            label = stringResource(dev.ninfenz.mobile.R.string.author_contract_value),
+                            value = contractValues[slot.id].orEmpty(),
+                            onValueChange = { value -> contractValues = contractValues + (slot.id to value) }
+                        )
+                        TextButton(onClick = {
+                            contractStore.saveValues(contractValues)
+                            contractValues = contractStore.loadValues()
+                            contractNote = context.getString(dev.ninfenz.mobile.R.string.author_contract_values_saved)
+                        }) { Text(stringResource(dev.ninfenz.mobile.R.string.author_contract_values_save)) }
+                    }
                 }
             }
         }

@@ -32,6 +32,8 @@ import androidx.compose.ui.unit.dp
 import dev.ninfenz.mobile.core.CoreError
 import dev.ninfenz.mobile.core.CoreResponse
 import dev.ninfenz.mobile.core.J
+import dev.ninfenz.mobile.data.Capability
+import dev.ninfenz.mobile.data.CapabilityRegistry
 import dev.ninfenz.mobile.data.FileAccess
 import dev.ninfenz.mobile.data.LibraryStore
 import dev.ninfenz.mobile.data.BackupRestoreService
@@ -50,6 +52,7 @@ import dev.ninfenz.mobile.ui.components.KeyValue
 import dev.ninfenz.mobile.ui.components.MonoText
 import dev.ninfenz.mobile.ui.components.NfScaffold
 import dev.ninfenz.mobile.ui.components.Notice
+import dev.ninfenz.mobile.ui.rememberCapabilityRevision
 import dev.ninfenz.mobile.ui.components.Tone
 import dev.ninfenz.mobile.ui.design.NfType
 import kotlinx.coroutines.Dispatchers
@@ -64,6 +67,7 @@ import java.io.File
 @Composable
 fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit, onOpenProject: (String) -> Unit = {}) {
     val context = LocalContext.current
+    val capabilityRevision = rememberCapabilityRevision()
     val scope = rememberCoroutineScope()
     var update by remember { mutableStateOf<PackUpdate?>(null) }
     var rawUpdate by remember { mutableStateOf<JsonObject?>(null) }
@@ -169,6 +173,7 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit, onOpenProject: (St
     fun packDir(id: String, version: String): File = File(File(File(context.filesDir, "library/packs"), id), version)
 
     NfScaffold(title = stringResource(dev.ninfenz.mobile.R.string.packupdate_title), onBack = onBack) {
+        if (capabilityRevision >= 0 && CapabilityRegistry.isEnabled(Capability.MATRIX)) {
         CardBox(title = stringResource(dev.ninfenz.mobile.R.string.pack_matrix_title)) {
             if (packs.isEmpty()) {
                 Text(stringResource(dev.ninfenz.mobile.R.string.pack_matrix_empty), style = NfType.meta)
@@ -193,6 +198,7 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit, onOpenProject: (St
                     }
                 }
             }
+        }
         }
 
         CardBox(title = stringResource(dev.ninfenz.mobile.R.string.packupdate_step1)) {
