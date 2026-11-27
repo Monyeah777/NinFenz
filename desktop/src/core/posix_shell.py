@@ -38,25 +38,40 @@ def _usable(cand: str) -> bool:
     return result["code"] == 0
 
 
+def _probe_shell_names() -> str:
+    """按 PATH 找 bash/sh → 第一个可用的。"""
+    for name in ("bash", "sh"):
+        cand = shutil.which(name)
+        if cand and _usable(cand):
+            return cand
+    return ""
+
+
+def _git_for_windows_bash() -> str:
+    """Git for Windows 布局：<root>/cmd/git.exe + <root>/bin/bash.exe。"""
+    git = shutil.which("git")
+    if not git:
+        return ""
+    return os.path.join(os.path.dirname(os.path.dirname(git)), "bin", "bash.exe")
+
+
+def _first_usable(candidates) -> str:
+    """候选里第一个可用的 shell。"""
+    for cand in candidates:
+        if _usable(cand):
+            return cand
+    return ""
+
+
 def find_posix_shell() -> str:
     """→ 可用 POSIX shell 路径；找不到返回空串（供测试/调用方自行跳过）。"""
     env = os.environ.get("NF_BASH") or ""
     found = env if _usable(env) else ""
     if not found:
-        for name in ("bash", "sh"):
-            cand = shutil.which(name)
-            if cand and _usable(cand):
-                found = cand
-                break
+        found = _probe_shell_names()
     if not found and os.name == "nt":
-        git = shutil.which("git")
-        if git:
-            # Git for Windows 布局：<root>/cmd/git.exe + <root>/bin/bash.exe
-            found = os.path.join(os.path.dirname(os.path.dirname(git)), "bin", "bash.exe")
-    for cand in (found,) + UNIX_FALLBACKS:
-        if _usable(cand):
-            return cand
-    return ""
+        found = _git_for_windows_bash()
+    return _first_usable((found,) + UNIX_FALLBACKS)
 
 
 def posix_shell() -> str:

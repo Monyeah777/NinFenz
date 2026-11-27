@@ -46,34 +46,53 @@ def read_text_cached(path) -> str:
 
 
 
+def _memo_hit(key: str) -> bytes | None:
+    """读出 memo 里缓存的原始字节；无 memo 或未命中返回 None。"""
+    if _memo._READ_MEMO is None:
+        return None
+    return _memo._READ_MEMO.get("b:" + key)
+
+
+def _resident_hit(key: str) -> bytes | None:
+    """常驻层原始字节命中（顺带回填 memo）；没有返回 None。"""
+    if _rs._RESIDENT is None:
+        return None
+    hit = _rs._RESIDENT["raw"].get(key)
+    if hit is None:
+        return None
+    if _memo._READ_MEMO is not None:
+        _memo._READ_MEMO["b:" + key] = hit
+    return hit
+
+
+def _remember_raw(key: str, raw: bytes) -> None:
+    """原始字节写入 memo 与常驻层（常驻层受件数与字节预算约束）。"""
+    if _memo._READ_MEMO is not None:
+        _memo._READ_MEMO["b:" + key] = raw
+    if _rs._RESIDENT is not None and _resident_under(key) and len(_rs._RESIDENT["raw"]) < _RESIDENT_TEXT_MAX:
+        used = int(_rs._RESIDENT.get("raw_bytes") or 0)
+        if used + len(raw) <= _RESIDENT_RAW_MAX_BYTES:
+            _rs._RESIDENT["raw"][key] = raw
+            _rs._RESIDENT["raw_bytes"] = used + len(raw)
+
+
 def _raw_bytes(path, key: str) -> bytes:
     """取**原始字节**（作用域 + 常驻层优先）：一次物理读之后，文本/字节/摘要三种口径都从这里出。
 
     读法（实测 2799 件 18.9 MB）：`buffering=0`（裸 FileIO）357 ms 最快，pathlib 408 / 缓冲 532 /
     `os.open` 510 ms。字节进 `_READ_MEMO["b:"+key]` ⇒ 摘要与文本**共用同一次物理读**。
     """
-    if _memo._READ_MEMO is not None:
-        hit = _memo._READ_MEMO.get("b:" + key)
-        if hit is not None:
-            return hit
-    if _rs._RESIDENT is not None:
-        hit = _rs._RESIDENT["raw"].get(key)
-        if hit is not None:
-            if _memo._READ_MEMO is not None:
-                _memo._READ_MEMO["b:" + key] = hit
-            return hit
+    hit = _memo_hit(key)
+    if hit is not None:
+        return hit
+    hit = _resident_hit(key)
+    if hit is not None:
+        return hit
     # 读侧短重试（2026-09-30）：并发原子写（`os.replace`）下 Windows 读者会瞬时拿到
     # PermissionError（WinError 5/32）——实测 119 万次读里 1055 次（≈0.09%）。这里是全仓
     # 语料的**唯一物理读**入口，故重试接在这里即可覆盖 purity / layer_model / 各 check。
     raw = atomic_write.read_bytes(path)
-    if _memo._READ_MEMO is not None:
-        _memo._READ_MEMO["b:" + key] = raw
-    if _rs._RESIDENT is not None and _resident_under(key)\
-            and len(_rs._RESIDENT["raw"]) < _RESIDENT_TEXT_MAX:
-        used = int(_rs._RESIDENT.get("raw_bytes") or 0)
-        if used + len(raw) <= _RESIDENT_RAW_MAX_BYTES:
-            _rs._RESIDENT["raw"][key] = raw
-            _rs._RESIDENT["raw_bytes"] = used + len(raw)
+    _remember_raw(key, raw)
     return raw
 
 
@@ -150,6 +169,43 @@ def fingerprint_of(root: str, rels) -> str:
 
 
 
+def _digest_hit(key: str) -> bytes | None:
+    """读出 memo 里缓存的内容摘要；无 memo 或未命中返回 None。"""
+    if _memo._DIGEST_MEMO is None:
+        return None
+    return _memo._DIGEST_MEMO.get(key)
+
+
+def _resident_digest_hit(key: str) -> bytes | None:
+    """常驻层摘要命中（顺带回填 memo）；没有返回 None。"""
+    if _rs._RESIDENT is None:
+        return None
+    hit = _rs._RESIDENT["digest"].get(key)
+    if hit is None:
+        return None
+    if _memo._DIGEST_MEMO is not None:
+        _memo._DIGEST_MEMO[key] = hit
+    return hit
+
+
+def _normalized_cr(raw: bytes) -> bytes:
+    """含 CR 时做通用换行翻译后再编码；非 UTF-8（图片等）按原始字节。"""
+    if b"\r" not in raw:
+        return raw
+    try:
+        return _decode_text(raw).encode("utf-8")  # 有 CR 才需要通用换行翻译后再编码
+    except UnicodeDecodeError:
+        return raw  # 非 UTF-8（图片等）按**字节**取指纹：多放个二进制附件不该让命令失败
+
+
+def _remember_digest(key: str, digest: bytes) -> None:
+    """摘要写入 memo 与常驻层。"""
+    if _memo._DIGEST_MEMO is not None:
+        _memo._DIGEST_MEMO[key] = digest
+    if _rs._RESIDENT is not None and _resident_under(key):
+        _rs._RESIDENT["digest"][key] = digest
+
+
 def _payload_digest(root: str, rel: str) -> bytes:
     """单件的**内容摘要**（`sha256` 的 raw digest）；键＝文件，随监听变更逐件失效。
 
@@ -159,25 +215,13 @@ def _payload_digest(root: str, rel: str) -> bytes:
     """
     path = os.path.join(str(root), *rel.split("/"))
     key = _resident_key(path)
-    if _memo._DIGEST_MEMO is not None:
-        hit = _memo._DIGEST_MEMO.get(key)
-        if hit is not None:
-            return hit
-    if _rs._RESIDENT is not None:
-        hit = _rs._RESIDENT["digest"].get(key)
-        if hit is not None:
-            if _memo._DIGEST_MEMO is not None:
-                _memo._DIGEST_MEMO[key] = hit
-            return hit
+    hit = _digest_hit(key)
+    if hit is not None:
+        return hit
+    hit = _resident_digest_hit(key)
+    if hit is not None:
+        return hit
     raw = _raw_bytes(path, key)                     # 一次物理读：文本口径也从这份字节解出
-    if b"\r" in raw:
-        try:
-            raw = _decode_text(raw).encode("utf-8")  # 有 CR 才需要通用换行翻译后再编码
-        except UnicodeDecodeError:
-            pass       # 非 UTF-8（图片等）按**字节**取指纹：多放个二进制附件不该让命令失败
-    digest = hashlib.sha256(raw).digest()
-    if _memo._DIGEST_MEMO is not None:
-        _memo._DIGEST_MEMO[key] = digest
-    if _rs._RESIDENT is not None and _resident_under(key):
-        _rs._RESIDENT["digest"][key] = digest
+    digest = hashlib.sha256(_normalized_cr(raw)).digest()
+    _remember_digest(key, digest)
     return digest

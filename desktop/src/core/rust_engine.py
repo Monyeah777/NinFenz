@@ -100,12 +100,16 @@ def _close_persistent() -> None:
 atexit.register(_close_persistent)
 
 
+def _endpoint_bad(port, token) -> bool:
+    return not isinstance(port, int) or not isinstance(token, str) or not token
+
+
 def _persistent(doc: Dict[str, Any], timeout: float) -> Optional[Dict[str, Any]]:
     """取/建持久连接（调用方持 `_PERSIST_LOCK`）。"""
     global _PERSIST
     port = doc.get("port")
     token = doc.get("token")
-    if not isinstance(port, int) or not isinstance(token, str) or not token:
+    if _endpoint_bad(port, token):
         return None
     if (_PERSIST is not None and _PERSIST.get("port") == port
             and _PERSIST.get("token") == token):
@@ -189,10 +193,9 @@ def _load_state(sp: Path) -> Optional[Dict[str, Any]]:
     return doc if isinstance(doc, dict) else None
 
 
-def _read_frame(fh) -> tuple[int, bytes]:
-    """读取 Rust worker 三行头 + 载荷；负数/超长/截断一律拒绝。"""
-    head = [fh.readline(64) for _ in range(3)]
-    if any(not line or not line.strip() or not line.endswith(b"\n") for line in head):
+def _parsed_head(head):
+    """三行头校验并解析 → (code, out_len, err_len)；格式/整数/越界即 ValueError。"""
+    if not all(line and line.strip() and line.endswith(b"\n") for line in head):
         raise ValueError("响应头缺失或超长")
     try:
         code, out_len, err_len = (int(line.strip()) for line in head)
@@ -200,6 +203,13 @@ def _read_frame(fh) -> tuple[int, bytes]:
         raise ValueError("响应头不是整数") from exc
     if out_len < 0 or err_len < 0 or out_len + err_len > MAX_RESPONSE_BYTES:
         raise ValueError("响应长度越界")
+    return code, out_len, err_len
+
+
+def _read_frame(fh) -> tuple[int, bytes]:
+    """读取 Rust worker 三行头 + 载荷；负数/超长/截断一律拒绝。"""
+    head = [fh.readline(64) for _ in range(3)]
+    code, out_len, err_len = _parsed_head(head)
     out = fh.read(out_len) if out_len else b""
     _err = fh.read(err_len) if err_len else b""
     if len(out) != out_len:
@@ -245,14 +255,7 @@ def _kill_pid(pid: int) -> None:
         pass
 
 
-def _start(root: Path, sp: Path) -> bool:
-    """非阻塞拉起常驻 worker，并**有界**等待状态文件出现。"""
-    global _CHILD
-    _close_persistent()          # 旧连接随旧 worker 失效
-    exe = binary(root)
-    if exe is None:
-        return False
-    # 重启前先回收旧 worker（state 文件里的 pid）：否则每次超时重启都会留下一只孤儿。
+def _reap_and_clear(sp: Path) -> bool:
     old_doc = _load_state(sp)
     if old_doc:
         old_pid = old_doc.get("pid")
@@ -264,6 +267,19 @@ def _start(root: Path, sp: Path) -> bool:
             sp.unlink()
     except OSError:
         # 状态目录不可写时 worker 不可启动，由调用方回退 Python 真源。
+        return False
+    return True
+
+
+def _start(root: Path, sp: Path) -> bool:
+    """非阻塞拉起常驻 worker，并**有界**等待状态文件出现。"""
+    global _CHILD
+    _close_persistent()          # 旧连接随旧 worker 失效
+    exe = binary(root)
+    if exe is None:
+        return False
+    # 重启前先回收旧 worker（state 文件里的 pid）：否则每次超时重启都会留下一只孤儿。
+    if not _reap_and_clear(sp):
         return False
     cmd = [str(exe), "serve", "--state", str(sp), "--root", str(root)]
     flags = 0
@@ -303,6 +319,12 @@ def _run_cli(exe: Path, root: Path, argv: List[str], timeout: float) -> Optional
     return (proc.returncode, proc.stdout)
 
 
+def _talk_ready(doc, base: Path, argv: List[str], timeout: float) -> Optional[Tuple[int, bytes]]:
+    if not (doc and doc.get("proto") == PROTO and doc.get("root") == str(base)):
+        return None
+    return _talk(doc, argv, timeout)
+
+
 def run_face(argv: List[str], root: Optional[Path] = None,
              timeout: float = _READ_TIMEOUT) -> Optional[Tuple[int, bytes]]:
     """跑一条只读判据面 → (exit_code, stdout 字节)；完全不可用 → None（调用方回退 Python）。
@@ -318,17 +340,13 @@ def run_face(argv: List[str], root: Optional[Path] = None,
         return None
     sp = state_path()
 
-    doc = _load_state(sp)
-    if doc and doc.get("proto") == PROTO and doc.get("root") == str(base):
-        res = _talk(doc, argv, timeout)
+    res = _talk_ready(_load_state(sp), base, argv, timeout)
+    if res is not None:
+        return res
+    if _start(base, sp):
+        res = _talk_ready(_load_state(sp), base, argv, timeout)
         if res is not None:
             return res
-    if _start(base, sp):
-        doc = _load_state(sp)
-        if doc:
-            res = _talk(doc, argv, timeout)
-            if res is not None:
-                return res
     return _run_cli(exe, base, argv, timeout)
 
 

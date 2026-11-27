@@ -20,6 +20,7 @@ import sys
 import tempfile
 import time
 from dataclasses import dataclass
+from functools import partial
 from pathlib import Path
 
 from core import atomic_write, disk_cache, json_doc
@@ -130,6 +131,26 @@ def _run_child(mod: str, cwd: str, out_path: str, capture_children: bool,
                    env=env, capture_output=True, check=False, timeout=timeout)  # nosec B603
 
 
+def _prepare_site(tmp: str) -> str:
+    """写子进程 sitecustomize（读面采集钩子）→ site 目录。"""
+    site_dir = os.path.join(tmp, "site")
+    os.makedirs(site_dir, exist_ok=True)
+    with open(os.path.join(site_dir, "sitecustomize.py"), "w",
+              encoding="utf-8", newline="\n") as fh:
+        fh.write(SITE)
+    return site_dir
+
+
+def _load_observation(out_path: str) -> tuple:
+    """观测件 → (status, parent_reads)；缺失/半截一律「说不清」。"""
+    try:
+        got = json_doc.loads(Path(out_path).read_text(encoding="utf-8"), dict,
+                             what="观测结果")
+    except (OSError, ValueError):
+        return "unknown", []           # 观测件缺失/半截：一律「说不清」
+    return str(got.get("status") or "unknown"), list(got.get("reads") or [])
+
+
 def observe_one(mod: str, root: str, cwd: str | None = None, timeout: int = 600,
                 capture_children: bool = True) -> dict:
     """跑一个模块 → 读面记录（含子进程读面与观测状态）。"""
@@ -138,13 +159,7 @@ def observe_one(mod: str, root: str, cwd: str | None = None, timeout: int = 600,
     status, parent_reads, child_lines = "timeout", [], []
     with tempfile.TemporaryDirectory(prefix="nf-face-") as tmp:
         out_path = os.path.join(tmp, "faces.json")
-        site_dir = None
-        if capture_children:
-            site_dir = os.path.join(tmp, "site")
-            os.makedirs(site_dir, exist_ok=True)
-            with open(os.path.join(site_dir, "sitecustomize.py"), "w",
-                      encoding="utf-8", newline="\n") as fh:
-                fh.write(SITE)
+        site_dir = _prepare_site(tmp) if capture_children else None
         try:
             _run_child(mod, workdir, out_path, capture_children, site_dir, timeout)
         except subprocess.TimeoutExpired:
@@ -152,13 +167,7 @@ def observe_one(mod: str, root: str, cwd: str | None = None, timeout: int = 600,
         except OSError:
             status = "import_error"          # 起不来进程：同样如实记
         else:
-            try:
-                got = json_doc.loads(Path(out_path).read_text(encoding="utf-8"), dict,
-                                     what="观测结果")
-                status = str(got.get("status") or "unknown")
-                parent_reads = list(got.get("reads") or [])
-            except (OSError, ValueError):
-                status = "unknown"           # 观测件缺失/半截：一律「说不清」
+            status, parent_reads = _load_observation(out_path)
         child_log = Path(out_path + ".child")
         if child_log.is_file():
             child_lines = child_log.read_text(encoding="utf-8", errors="replace").splitlines()
@@ -201,6 +210,30 @@ class ObserveOptions:
     on_progress: object = None
 
 
+def _todo_modules(mods, tdir: Path) -> list:
+    """待观测模块：显式清单优先，否则枚举 tests/test_*.py。"""
+    if mods:
+        return sorted(mods)
+    return sorted(p.stem for p in tdir.glob("test_*.py"))
+
+
+def _pending_modules(todo: list, doc: dict, force: bool) -> list:
+    """force 时全跑；否则跳过已观测模块。"""
+    if force:
+        return todo
+    known = doc["modules"]
+    return [m for m in todo if m not in known]
+
+
+def _observe_guarded(mod: str, root: str, cwd=None, timeout: float = 600):
+    """单模块观测；异常 ⇒ 如实记「说不清」，不崩整轮。"""
+    try:
+        return mod, observe_one(mod, root, cwd=cwd, timeout=timeout)
+    except Exception as exc:              # 单模块异常 ⇒ 如实记「说不清」，不崩整轮
+        return mod, {"status": "observe_error", "reads": [], "seconds": 0,
+                     "child_reads_captured": 0, "error": type(exc).__name__}
+
+
 def run_all(root: str, opts: ObserveOptions | None = None) -> dict:
     """并行观测（可续跑）：已观测且未 force 的模块直接跳过。"""
 
@@ -213,23 +246,17 @@ def run_all(root: str, opts: ObserveOptions | None = None) -> dict:
     path = opts.path
     on_progress = opts.on_progress
     tdir = Path(cwd or os.path.join(root, "desktop")) / "tests"
-    todo = sorted(mods) if mods else sorted(p.stem for p in tdir.glob("test_*.py"))
+    todo = _todo_modules(mods, tdir)
     doc = {"schema": SCHEMA, "modules": {}} if force else load_doc(path)
     doc["schema"] = SCHEMA
-    todo = [m for m in todo if force or m not in doc["modules"]]
+    todo = _pending_modules(todo, doc, force)
     if not todo:
         return doc
 
-    def one(mod):
-        try:
-            return mod, observe_one(mod, root, cwd=cwd, timeout=timeout)
-        except Exception as exc:              # 单模块异常 ⇒ 如实记「说不清」，不崩整轮
-            return mod, {"status": "observe_error", "reads": [], "seconds": 0,
-                         "child_reads_captured": 0, "error": type(exc).__name__}
-
     done = 0
+    runner = partial(_observe_guarded, root=root, cwd=cwd, timeout=timeout)
     with cf.ThreadPoolExecutor(max_workers=max(1, int(workers))) as pool:
-        for mod, rec in pool.map(one, todo):
+        for mod, rec in pool.map(runner, todo):
             done += 1
             doc["modules"][mod] = rec
             save_doc(doc, path)

@@ -102,14 +102,8 @@ class EntryOptions:
     added: str | None = None
 
 
-def make_entry(file_rel: str, key: str, source: str, opts: EntryOptions | None = None) -> dict:
-    """构造条目并做字段级校验（源头拦截，CLI/测试共用）。"""
-
-    opts = opts if opts is not None else EntryOptions()
-    module = opts.module
-    version = opts.version
-    status = opts.status
-    added = opts.added
+def _require_entry_fields(key, file_rel, source, version, status) -> None:
+    """条目必填字段校验（源头拦截，CLI/测试共用）；不合法即抛 AssetLedgerError。"""
     if not key or not str(key).strip():
         raise AssetLedgerError("溯源键 key 不能为空——请先填溯源键再入库")
     if not file_rel or not str(file_rel).strip():
@@ -120,6 +114,17 @@ def make_entry(file_rel: str, key: str, source: str, opts: EntryOptions | None =
         raise AssetLedgerError("version 不能为空——资产版本位必填")
     if status not in VALID_STATUS:
         raise AssetLedgerError("status 非法：%s（应为 %s）" % (status, "/".join(VALID_STATUS)))
+
+
+def make_entry(file_rel: str, key: str, source: str, opts: EntryOptions | None = None) -> dict:
+    """构造条目并做字段级校验（源头拦截，CLI/测试共用）。"""
+
+    opts = opts if opts is not None else EntryOptions()
+    module = opts.module
+    version = opts.version
+    status = opts.status
+    added = opts.added
+    _require_entry_fields(key, file_rel, source, version, status)
     entry = {"file": str(file_rel), "key": str(key), "source": str(source),
              "version": str(version), "status": status}
     if module:
@@ -183,6 +188,30 @@ class AssetOptions:
     ledger_path: str | None = None
 
 
+def _initial_ledger(lp: str, package, tier) -> dict:
+    """已有台账 → 读入（tier 非空时校验并落级）；没有 → 空白台账。"""
+    if not os.path.isfile(lp):
+        return blank_ledger(package=package, tier=tier or "official")
+    ledger = load_ledger(lp)
+    if tier is not None:
+        _guard_tier(ledger, tier)
+        ledger["tier"] = tier
+    return ledger
+
+
+def _append_locked(lp: str, package, tier, key: str, file_rel: str, entry: dict) -> None:
+    """台账读-改-写加锁：锁内重读复查（键/文件唯一 + tier），并发窗口不丢条目。"""
+    with atomic_write.lock_file(lp, what="资产台账（nf asset add）"):
+        fresh = load_ledger(lp) if os.path.isfile(lp) else \
+            blank_ledger(package=package, tier=tier or "official")
+        _guard_tier(fresh, tier)
+        _guard_duplicates(fresh, key, file_rel)
+        if tier:
+            fresh["tier"] = tier
+        fresh["assets"].append(entry)
+        save_ledger(fresh, lp)
+
+
 def add_asset(
     assets_root: str,
     file_rel: str,
@@ -207,13 +236,7 @@ def add_asset(
     if not os.path.isfile(full):
         raise AssetLedgerError("资产文件不存在：%s" % full)
     lp = ledger_path or default_ledger_path(assets_root)
-    if os.path.isfile(lp):
-        ledger = load_ledger(lp)
-        if tier is not None:
-            _guard_tier(ledger, tier)
-            ledger["tier"] = tier
-    else:
-        ledger = blank_ledger(package=package, tier=tier or "official")
+    ledger = _initial_ledger(lp, package, tier)
     _guard_duplicates(ledger, key, file_rel)
     with open(full, encoding="utf-8") as f:
         text = f.read()
@@ -232,15 +255,7 @@ def add_asset(
     # 台账读-改-写加锁（2026-10-01）：与 registry 同形——原子写只保证「读者不见半截」，
     # 并发 add 会**丢条目**（同形探针实测：两个 RMW 写者最终只剩一条）。锁内**重读 + 复查**
     # （键/文件唯一 + tier 冲突），把并发窗口里刚写进去的那条如实并进来或如实拒掉。
-    with atomic_write.lock_file(lp, what="资产台账（nf asset add）"):
-        fresh = load_ledger(lp) if os.path.isfile(lp) else \
-            blank_ledger(package=package, tier=tier or "official")
-        _guard_tier(fresh, tier)
-        _guard_duplicates(fresh, key, file_rel)
-        if tier:
-            fresh["tier"] = tier
-        fresh["assets"].append(entry)
-        save_ledger(fresh, lp)
+    _append_locked(lp, package, tier, key, file_rel, entry)
     return entry
 
 

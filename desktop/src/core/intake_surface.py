@@ -80,24 +80,37 @@ def _check_templates(root: str, tpl_list: list[str], issues: list[str],
                 "（修复指引：机读契约读这些键，缺则投稿人无法声明）")
 
 
+def _banned_attributions(sub: dict) -> list[str]:
+    """声明的被禁长度归因（统一转 str）。"""
+    return [str(x) for x in (sub.get("forbidden_attributions") or [])]
+
+
+def _limit_line_issues(rel: str, text: str, label: str, banned: list[str],
+                       limit_chars: int) -> list[str]:
+    """单件的长度口径标签 + 被禁归因检查。"""
+    issues: list[str] = []
+    if label and label not in text:
+        issues.append(
+            f"{rel} 未写明正文硬上限标签「{label}」"
+            f"（修复指引：口径须与 {INTAKE_REL} 的 body_limit_chars={limit_chars} 对齐）")
+    for bad in banned:
+        if bad in text:
+            issues.append(
+                f"{rel} 出现被禁的长度归因「{bad}」"
+                "（修复指引：硬上限以声明件为准，不得伪装成平台限制）")
+    return issues
+
+
 def _check_limits(root: str, sub: dict, tpl_list: list[str], issues: list[str]) -> None:
     """C2：长度口径须出现声明标签，且不得出现被禁的错误归因。"""
     label = str(sub.get("body_limit_label") or "")
-    banned = [str(x) for x in (sub.get("forbidden_attributions") or [])]
+    banned = _banned_attributions(sub)
     limit_chars = int(sub.get("body_limit_chars") or 0)
     for rel in [*tpl_list, INDEX_REL]:
         text = _read(root, rel)
         if not text:
             continue
-        if label and label not in text:
-            issues.append(
-                f"{rel} 未写明正文硬上限标签「{label}」"
-                f"（修复指引：口径须与 {INTAKE_REL} 的 body_limit_chars={limit_chars} 对齐）")
-        for bad in banned:
-            if bad in text:
-                issues.append(
-                    f"{rel} 出现被禁的长度归因「{bad}」"
-                    "（修复指引：硬上限以声明件为准，不得伪装成平台限制）")
+        issues += _limit_line_issues(rel, text, label, banned, limit_chars)
 
 
 def _check_gate_refs(root: str, sub: dict, tpl_list: list[str], issues: list[str]) -> None:
@@ -141,6 +154,21 @@ def _check_gate_impl(root: str, doc: dict, sub: dict, issues: list[str],
                     f"通道 {chan} 的闸门「{gate}」指向的实现件不在场：{str(where)[5:]}")
 
 
+def _gitee_empty_by_design(root: str, gdir: str, d: Path, templates: dict,
+                           issues: list[str]) -> None:
+    """empty-by-design 档：目录须在场且空 + 入口文档须指向 Gitee 模板件。"""
+    if not d.is_dir():
+        issues.append(f"gitee_surface.dir 不存在：{gdir}（empty-by-design 须目录在场且为空）")
+    elif any(p.name != ".gitkeep" for p in d.iterdir()):
+        issues.append(f"gitee_surface.dir 声明 empty-by-design，但目录非空：{gdir}")
+    routes = _read(root, ROUTES_REL)
+    for rel in (templates.get("gitee") or []):
+        if Path(str(rel)).name not in routes:
+            issues.append(
+                f"{ROUTES_REL} 未指向 Gitee 模板件 {rel}"
+                "——Gitee 侧无选择器时，入口只能靠文档")
+
+
 def _check_gitee(root: str, sub: dict, templates: dict, issues: list[str]) -> None:
     """C6：Gitee 面声明状态须与磁盘一致，且入口文档须指向模板件。"""
     gs = sub.get("gitee_surface") or {}
@@ -150,16 +178,7 @@ def _check_gitee(root: str, sub: dict, templates: dict, issues: list[str]) -> No
         return
     d = Path(root) / gdir
     if state == "empty-by-design":
-        if not d.is_dir():
-            issues.append(f"gitee_surface.dir 不存在：{gdir}（empty-by-design 须目录在场且为空）")
-        elif any(p.name != ".gitkeep" for p in d.iterdir()):
-            issues.append(f"gitee_surface.dir 声明 empty-by-design，但目录非空：{gdir}")
-        routes = _read(root, ROUTES_REL)
-        for rel in (templates.get("gitee") or []):
-            if Path(str(rel)).name not in routes:
-                issues.append(
-                    f"{ROUTES_REL} 未指向 Gitee 模板件 {rel}"
-                    "——Gitee 侧无选择器时，入口只能靠文档")
+        _gitee_empty_by_design(root, gdir, d, templates, issues)
     elif state == "file-backed":
         if not d.is_dir() or not any(d.iterdir()):
             issues.append(f"gitee_surface.state=file-backed，但目录为空：{gdir}")
@@ -167,11 +186,16 @@ def _check_gitee(root: str, sub: dict, templates: dict, issues: list[str]) -> No
         issues.append(f"gitee_surface.state 非法：{state!r}（取值 empty-by-design / file-backed）")
 
 
+def _code_surface_decl(sub: dict) -> tuple[list, str, str]:
+    """代码面声明 → (surfaces, 模板相对路径, 路径前缀)。"""
+    return ([str(x) for x in (sub.get("code_surfaces") or [])],
+            str(sub.get("code_surface_template") or ""),
+            str(sub.get("code_surface_prefix") or ""))
+
+
 def _check_code_surfaces(root: str, sub: dict, issues: list[str]) -> None:
     """C7：代码面分类单一真源（本轮漂移的直因：模板里手写一份、仓里演进另一份）。"""
-    surfaces = [str(x) for x in (sub.get("code_surfaces") or [])]
-    cst = str(sub.get("code_surface_template") or "")
-    prefix = str(sub.get("code_surface_prefix") or "")
+    surfaces, cst, prefix = _code_surface_decl(sub)
     if not (surfaces and cst and prefix):
         return
     want = f"{prefix}（{' · '.join(surfaces)}）"
@@ -182,18 +206,29 @@ def _check_code_surfaces(root: str, sub: dict, issues: list[str]) -> None:
             issues.append(f"code_surfaces 声明的路径不存在：{s}")
 
 
+def _anchor_entry(a) -> tuple[str, str]:
+    """锚点声明 → (file, 口径行文本)。"""
+    return str((a or {}).get("file") or ""), str((a or {}).get("text") or "")
+
+
+def _anchor_issues(root: str, a, rel: str, want: str) -> list[str]:
+    """锚点行内容一致性 + 引用路径存在性。"""
+    issues: list[str] = []
+    if want not in _read(root, rel):
+        issues.append(f"{rel} 的口径锚点行与声明不一致（声明以「{want[:40]}…」开头）")
+    for p in (a or {}).get("check_paths") or []:
+        if not (Path(root) / str(p)).exists():
+            issues.append(f"锚点行引用的路径不存在：{p} ← {rel}")
+    return issues
+
+
 def _check_anchors(root: str, sub: dict, issues: list[str]) -> None:
     """C8：口径锚点行须跨文件逐字一致（防「模板改了、声明没改」）。"""
     for a in (sub.get("anchor_lines") or []):
-        rel = str((a or {}).get("file") or "")
-        want = str((a or {}).get("text") or "")
+        rel, want = _anchor_entry(a)
         if not rel or not want:
             continue
-        if want not in _read(root, rel):
-            issues.append(f"{rel} 的口径锚点行与声明不一致（声明以「{want[:40]}…」开头）")
-        for p in (a or {}).get("check_paths") or []:
-            if not (Path(root) / str(p)).exists():
-                issues.append(f"锚点行引用的路径不存在：{p} ← {rel}")
+        issues += _anchor_issues(root, a, rel, want)
 
 
 def scan(root: str = ".") -> tuple[list[str], dict[str, Any]]:

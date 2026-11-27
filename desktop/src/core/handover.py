@@ -34,6 +34,22 @@ def entries(root: str = ".") -> List[Dict[str, Any]]:
     return doc_family.entries(root, GLOB)
 
 
+def _content_issues(body: str):
+    """正文段落齐全 + 未决项非空且带判据 → (issues, 未决项条目)。"""
+    issues: List[str] = []
+    for sec in SECTIONS:
+        if sec not in body:
+            issues.append("正文缺段落：%s" % sec)
+    pending = body.split("## 未决项", 1)[1] if "## 未决项" in body else ""
+    items = _bullet_blocks(pending)
+    if not items:
+        issues.append("未决项为空——空未决 = 不合格交接（没有未决就是没交接）")
+    for it in items:
+        if "判据" not in it:
+            issues.append("未决项缺判据（怎样算完成）：%s" % it[:40])
+    return issues, items
+
+
 def check_doc(root: str, rel: str) -> Tuple[List[str], Dict[str, Any]]:
     """单件机检 → (issues, stats)。"""
     p = Path(root) / rel
@@ -48,19 +64,23 @@ def check_doc(root: str, rel: str) -> Tuple[List[str], Dict[str, Any]]:
         fm, d, required=("id", "date", "from", "to", "status", "refs"),
         vocab_key="status_vocabulary", field="status",
         default_vocab=("open", "closed"))
-    for sec in SECTIONS:
-        if sec not in body:
-            issues.append("正文缺段落：%s" % sec)
-    pending = body.split("## 未决项", 1)[1] if "## 未决项" in body else ""
-    items = _bullet_blocks(pending)
-    if not items:
-        issues.append("未决项为空——空未决 = 不合格交接（没有未决就是没交接）")
-    for it in items:
-        if "判据" not in it:
-            issues.append("未决项缺判据（怎样算完成）：%s" % it[:40])
+    content_issues, items = _content_issues(body)
+    issues += content_issues
     issues += doc_family.refs_issues(root, fm.get("refs"), doc_family.check_numbers(root),
                                      label="refs", allow_adr=True, strip_brackets=True)
     return issues, {"pending": len(items), "sections": sum(1 for s in SECTIONS if s in body)}
+
+
+def _decl_issues(d) -> List[str]:
+    """交接协议声明面校验（schema / 五段 / 纪律非空）。"""
+    issues: List[str] = []
+    if str(d.get("schema") or "") != SCHEMA:
+        issues.append("交接协议 schema 不匹配（期望 %s）" % SCHEMA)
+    if tuple(d.get("sections") or ()) != ("情境", "背景", "评估", "建议", "未决项"):
+        issues.append("sections 必须是五段（情境/背景/评估/建议/未决项）")
+    if not (d.get("rules") or []):
+        issues.append("rules 不得为空（交接纪律必须成文）")
+    return issues
 
 
 def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
@@ -70,12 +90,7 @@ def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
     d = decl(root)
     if not d:
         return ["缺交接协议声明 %s" % DECL_REL], warns, {}
-    if str(d.get("schema") or "") != SCHEMA:
-        issues.append("交接协议 schema 不匹配（期望 %s）" % SCHEMA)
-    if tuple(d.get("sections") or ()) != ("情境", "背景", "评估", "建议", "未决项"):
-        issues.append("sections 必须是五段（情境/背景/评估/建议/未决项）")
-    if not (d.get("rules") or []):
-        issues.append("rules 不得为空（交接纪律必须成文）")
+    issues += _decl_issues(d)
     rows = entries(root)
     pending_total = 0
     for e in rows:

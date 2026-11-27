@@ -15,6 +15,14 @@ from ._const import (
 )
 
 
+def _drain_long_line(buf) -> None:
+    """超长帧读透丢弃（保持行对齐，后续消息不受污染）。"""
+    while True:
+        rest = buf.readline(MAX_MESSAGE_BYTES + 1)
+        if not rest or rest.endswith(b"\n"):
+            break
+
+
 def _iter_lines(stream: TextIO):
     """逐行读 stdio：**行级严格 UTF-8 解码**，解码失败吐哨兵而不抛。
 
@@ -34,10 +42,7 @@ def _iter_lines(stream: TextIO):
         if not raw:
             return
         if len(raw) > MAX_MESSAGE_BYTES and not raw.endswith(b"\n"):
-            while True:
-                rest = buf.readline(MAX_MESSAGE_BYTES + 1)
-                if not rest or rest.endswith(b"\n"):
-                    break
+            _drain_long_line(buf)
             yield _TOO_LONG
             continue
         try:

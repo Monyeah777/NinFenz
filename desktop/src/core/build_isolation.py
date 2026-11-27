@@ -69,12 +69,35 @@ def network_hits(paths: list[Path]) -> list[str]:
     return hits
 
 
+def _dockerfiles(root: Path) -> list:
+    """构建面里的 Dockerfile 清单（去重排序）。"""
+    return sorted({p for pattern in DOCKER_GLOBS for p in root.glob(pattern)
+                   if p.is_file()})
+
+
+def _from_line_check(dockerfile, line: str, args: dict) -> tuple:
+    """单行 FROM → (issues, 是否计入基座引用数)。"""
+    m = re.match(r"(?m)^FROM\s+(\S+)", line)
+    if not m:
+        return [], False
+    ref = m.group(1)
+    var = re.fullmatch(r"\$\{?([A-Za-z_][A-Za-z0-9_]*)\}?", ref)
+    if var:
+        ref = args.get(var.group(1), "")
+        if not ref:
+            return (["%s：FROM 引用了未声明的构建变量 %s（修复指引：用 ARG 声明"
+                     "带 @sha256 的镜像）" % (dockerfile.name, m.group(1))], False)
+    if ":latest" in ref or not _DIGEST_RE.search(ref.split(" AS ")[0].strip()):
+        return (["%s：基座 %s 未按 digest 钉（修复指引：改成 name:tag@sha256:<64hex>；"
+                 ":latest 一律拒）" % (dockerfile.name, ref)], True)
+    return [], True
+
+
 def base_image_issues(root: Path) -> tuple[list[str], int]:
     """容器基座 → (issues, 镜像引用数)。变量化 FROM 由同名 ARG 的取值判定。"""
     issues: list[str] = []
     seen = 0
-    for dockerfile in sorted({p for pattern in DOCKER_GLOBS for p in root.glob(pattern)
-                              if p.is_file()}):
+    for dockerfile in _dockerfiles(root):
         try:
             text = dockerfile.read_text(encoding="utf-8")
         except (OSError, UnicodeDecodeError):
@@ -83,57 +106,56 @@ def base_image_issues(root: Path) -> tuple[list[str], int]:
             continue
         args = dict(re.findall(r"(?m)^ARG\s+([A-Za-z_][A-Za-z0-9_]*)=(\S+)", text))
         for line in text.splitlines():
-            m = re.match(r"(?m)^FROM\s+(\S+)", line)
-            if not m:
-                continue
-            ref = m.group(1)
-            var = re.fullmatch(r"\$\{?([A-Za-z_][A-Za-z0-9_]*)\}?", ref)
-            if var:
-                ref = args.get(var.group(1), "")
-                if not ref:
-                    issues.append("%s：FROM 引用了未声明的构建变量 %s（修复指引：用 ARG 声明"
-                                  "带 @sha256 的镜像）" % (dockerfile.name, m.group(1)))
-                    continue
-            seen += 1
-            if ":latest" in ref or not _DIGEST_RE.search(ref.split(" AS ")[0].strip()):
-                issues.append("%s：基座 %s 未按 digest 钉（修复指引：改成 name:tag@sha256:<64hex>；"
-                              ":latest 一律拒）" % (dockerfile.name, ref))
+            line_issues, counted = _from_line_check(dockerfile, line, args)
+            issues += line_issues
+            if counted:
+                seen += 1
     return issues, seen
+
+
+def _npm_engines_issues(pkg: Path) -> list[str]:
+    """package.json 的 engines.node 声明面。"""
+    if not pkg.is_file():
+        return ["缺 packaging/npm/package.json（修复指引：构建入口必须声明自身依赖面）"]
+    try:
+        doc = json.loads(pkg.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        doc = {}
+    engines = (doc.get("engines") if isinstance(doc, dict) else {}) or {}
+    if not str(engines.get("node") or "").strip():
+        return ["packaging/npm/package.json 未声明 engines.node（修复指引：写明支持的"
+                " node 版本范围，构建期工具链才可固定）"]
+    return []
+
+
+def _workflow_version_issues(wf: Path) -> list[str]:
+    """单个 workflow：setup-* 必须给具体 X.Y 版本号。"""
+    try:
+        text = wf.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError):
+        # 非 UTF-8 的 workflow 读不出 setup-* 面，跳过而不是判红：workflow 语法本身
+        # 由 CI 的前置 lint 面管，本判据只核「给了版本号没有」。
+        return []
+    issues = []
+    for kind in ("python", "node"):
+        if not re.search(r"uses:\s*actions/setup-\s*%s@" % kind, text):
+            continue
+        if not re.search(r"(?m)^\s*%s-version:\s*'?\d+\.\d+" % kind, text):
+            issues.append(".github/workflows/%s：setup-%s 未给具体版本号（修复指引：写"
+                          " python-version/node-version 的 X.Y，不留浮动 major）"
+                          % (wf.name, kind))
+    return issues
 
 
 def toolchain_issues(root: Path) -> list[str]:
     """工具链定版：node engines / Cargo.lock / CI 版本号。"""
-    issues: list[str] = []
-    pkg = root / "packaging" / "npm" / "package.json"
-    if not pkg.is_file():
-        issues.append("缺 packaging/npm/package.json（修复指引：构建入口必须声明自身依赖面）")
-    else:
-        try:
-            doc = json.loads(pkg.read_text(encoding="utf-8"))
-        except (OSError, ValueError):
-            doc = {}
-        engines = (doc.get("engines") if isinstance(doc, dict) else {}) or {}
-        if not str(engines.get("node") or "").strip():
-            issues.append("packaging/npm/package.json 未声明 engines.node（修复指引：写明支持的"
-                          " node 版本范围，构建期工具链才可固定）")
+    issues: list[str] = _npm_engines_issues(root / "packaging" / "npm" / "package.json")
     if not (root / "engine" / "rust" / "Cargo.lock").is_file():
         issues.append("缺 engine/rust/Cargo.lock（修复指引：锁文件是依赖定版的证据，必须入仓）")
     workflows = root / ".github" / "workflows"
     if workflows.is_dir():
         for wf in sorted(workflows.glob("*.yml")):
-            try:
-                text = wf.read_text(encoding="utf-8")
-            except (OSError, UnicodeDecodeError):
-                # 非 UTF-8 的 workflow 读不出 setup-* 面，跳过而不是判红：workflow 语法本身
-                # 由 CI 的前置 lint 面管，本判据只核「给了版本号没有」。
-                continue
-            for kind in ("python", "node"):
-                if not re.search(r"uses:\s*actions/setup-\s*%s@" % kind, text):
-                    continue
-                if not re.search(r"(?m)^\s*%s-version:\s*'?\d+\.\d+" % kind, text):
-                    issues.append(".github/workflows/%s：setup-%s 未给具体版本号（修复指引：写"
-                                  " python-version/node-version 的 X.Y，不留浮动 major）"
-                                  % (wf.name, kind))
+            issues += _workflow_version_issues(wf)
     return issues
 
 

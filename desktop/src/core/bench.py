@@ -85,13 +85,28 @@ def _selfcheck(artifact: str) -> float:
     return round(min(1.0, marks / 7.0), 4)
 
 
+def _resolve_path(root: str, value: str) -> Path:
+    """相对路径 → Path(root, value)；绝对路径原样。"""
+    path = Path(value)
+    if path.is_absolute():
+        return path
+    return Path(root, value)
+
+
+def _verdict(total: float, floor: float) -> str:
+    """总分 → 三态判定：pass / warn（落后 15 分以内）/ fail。"""
+    if total >= floor:
+        return "pass"
+    if total >= floor - 15:
+        return "warn"
+    return "fail"
+
+
 def evaluate(root: str, case_path: str, artifact_path: str,
              model: str = "", run_id: str = "") -> Dict[str, Any]:
     """对一件产物跑分 → run 记录（确定性：同输入同分）。"""
-    case = load_case(Path(root, case_path) if not Path(case_path).is_absolute()
-                     else Path(case_path))
-    apath = Path(root, artifact_path) if not Path(artifact_path).is_absolute() \
-        else Path(artifact_path)
+    case = load_case(_resolve_path(root, case_path))
+    apath = _resolve_path(root, artifact_path)
     text = apath.read_text(encoding="utf-8")
     digest = hashlib.sha256(apath.read_bytes()).hexdigest()
     structure, trace, segs, issues = _structure_and_trace(text, case.get("requirement", ""))
@@ -104,7 +119,7 @@ def evaluate(root: str, case_path: str, artifact_path: str,
     floor = float((case.get("expected") or {}).get("min_total", 60))
     min_seg = int((case.get("expected") or {}).get("min_segments", 0) or 0)
     meets_seg = (segs >= min_seg) if min_seg else True
-    verdict = "pass" if total >= floor else ("warn" if total >= floor - 15 else "fail")
+    verdict = _verdict(total, floor)
     if not meets_seg:                                 # 声明的下限也是判据，不是装饰
         verdict = "fail"
     return {"schema": SCHEMA, "case": case.get("case", Path(case_path).parent.name),
@@ -115,6 +130,19 @@ def evaluate(root: str, case_path: str, artifact_path: str,
             "verdict": verdict,
             "detail": {"segments": int(segs), "prose_findings": prose_n,
                        "issues": issues[:8]}}
+
+
+def _regressions(ranking: List[Dict[str, Any]], best: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """相对最佳跑逐维回落项（<=20 条由调用方截断）。"""
+    regressions = []
+    for r in ranking[1:]:
+        for k in WEIGHTS:
+            b = float((best.get("scores") or {}).get(k, 0))
+            c = float((r.get("scores") or {}).get(k, 0))
+            if c < b:
+                regressions.append({"run": r.get("run_id"), "dim": k,
+                                    "from": round(b, 4), "to": round(c, 4)})
+    return regressions
 
 
 def compare(runs: List[Dict[str, Any]]) -> Dict[str, Any]:
@@ -129,14 +157,7 @@ def compare(runs: List[Dict[str, Any]]) -> Dict[str, Any]:
                    "spread": round(max(vals) - min(vals), 4)}
     ranking = sorted(runs, key=lambda r: -float(r.get("total", 0.0)))
     best = ranking[0]
-    regressions = []
-    for r in ranking[1:]:
-        for k in WEIGHTS:
-            b = float((best.get("scores") or {}).get(k, 0))
-            c = float((r.get("scores") or {}).get(k, 0))
-            if c < b:
-                regressions.append({"run": r.get("run_id"), "dim": k,
-                                    "from": round(b, 4), "to": round(c, 4)})
+    regressions = _regressions(ranking, best)
     return {"schema": "nf-bench-compare/1", "runs": len(runs), "dims": dims,
             "ranking": [{"run": r.get("run_id"), "model": r.get("model"),
                          "total": r.get("total"), "verdict": r.get("verdict")}

@@ -52,14 +52,23 @@ TOP_KEYS = (
 PRESENT_WHEN_EMPTY = {"audit", "anomalies", "check"}
 
 
-def available_keys(s: dict) -> set[str]:
+def _artifact_keys(s: dict) -> set:
+    """artifact 面里「在场」的键（空值但属 PRESENT_WHEN_EMPTY 也算）。"""
     keys = set()
     for k, v in s["artifact"].items():
         if v not in ("", [], False, None) or k in PRESENT_WHEN_EMPTY:
             keys.add(k)
-    for k in TOP_KEYS:
-        if k in s and s[k] not in (None, "", [], False):
-            keys.add(k)
+    return keys
+
+
+def _top_keys(s: dict) -> set:
+    """顶层键里非空的那些。"""
+    return {k for k in TOP_KEYS if k in s and s[k] not in (None, "", [], False)}
+
+
+def available_keys(s: dict) -> set[str]:
+    keys = _artifact_keys(s)
+    keys.update(_top_keys(s))
     # 驾驶舱把 goal 投影为执行器可读的 target；参考面由 NF 资产适配层
     # 提供，不是模型可自由伪造的输入。
     if s.get("goal"):
@@ -111,6 +120,26 @@ def _compatible(chain: tuple[str, ...], atom_id: str) -> bool:
     return True
 
 
+def _expand_atom(parent: dict, atom_id: str, c: dict, avail: set, before: set):
+    """单个原子 → 候选记录；自环/不兼容/前置缺失返回 None。"""
+    chain = parent["chain"]
+    if atom_id in chain or not _compatible(chain, atom_id):
+        return None
+    if not set(c["requires"]) <= avail:
+        return None
+    after = set(avail)
+    after.update(c["adds"])
+    after.difference_update(c["removes"])
+    return {
+        "chain": chain + (atom_id,),
+        "cost": parent["cost"] + c["cost"],
+        "avail": after,
+        "resolves": [need for need in NEEDS
+                     if not need_met(need, before) and need_met(need, after)],
+        "effect": {"adds": sorted(after - before), "removes": sorted(before - after)},
+    }
+
+
 def _bounded_search(s: dict, max_len: int, beam_width: int) -> list[dict]:
     """枚举 1-3 原子链，并按结构增量裁剪下一层搜索面。"""
     before = available_keys(s)
@@ -126,37 +155,18 @@ def _bounded_search(s: dict, max_len: int, beam_width: int) -> list[dict]:
             expansions += 1
             if expansions > MAX_SEARCH_EXPANSIONS:
                 raise ValueError("candidate search expansion budget exceeded")
-            chain, avail = parent["chain"], parent["avail"]
+            avail = parent["avail"]
             for atom_id, c in CONTRACTS.items():
-                if atom_id in chain or not _compatible(chain, atom_id):
+                record = _expand_atom(parent, atom_id, c, avail, before)
+                if record is None:
                     continue
-                nc = chain + (atom_id,)
-                if nc in seen or not set(c["requires"]) <= avail:
+                if record["chain"] in seen:
                     continue
-                seen.add(nc)
+                seen.add(record["chain"])
                 generated += 1
                 if generated > MAX_SEARCH_GENERATED:
                     raise ValueError("candidate search generation budget exceeded")
-                after = set(avail)
-                after.update(c["adds"])
-                after.difference_update(c["removes"])
-                cost = parent["cost"] + c["cost"]
-                level.append(
-                    {
-                        "chain": nc,
-                        "cost": cost,
-                        "avail": after,
-                        "resolves": [
-                            need
-                            for need in NEEDS
-                            if not need_met(need, before) and need_met(need, after)
-                        ],
-                        "effect": {
-                            "adds": sorted(after - before),
-                            "removes": sorted(before - after),
-                        },
-                    }
-                )
+                level.append(record)
         records.extend(level)
         level.sort(
             key=lambda x: (

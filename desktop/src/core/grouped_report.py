@@ -20,6 +20,26 @@ GUIDE = "修复指引："
 SCHEMA = "nf-grouped-report/1"
 
 
+def _row_value(row, i: int, group_key: str, metric: str) -> float:
+    """行校验 + 取指标值（非法行 / 非数值 → ValueError）。"""
+    if not isinstance(row, dict) or group_key not in row or metric not in row:
+        raise ValueError("第 " + str(i) + " 行缺字段（" + GUIDE + "需要 " + group_key
+                         + " 与 " + metric + "）")
+    try:
+        return float(row[metric])
+    except (TypeError, ValueError) as exc:
+        raise ValueError("第 " + str(i) + " 行的 " + metric + " 不是数字（" + GUIDE
+                         + "别混入字符串/空值）") from exc
+
+
+def _group_stats(values: list) -> dict:
+    """一组取值 → {n, mean, sd}（n=1 时 sd 为 None）。"""
+    n = len(values)
+    mean = sum(values) / n
+    sd = (sum((v - mean) ** 2 for v in values) / (n - 1)) ** 0.5 if n > 1 else None
+    return {"n": n, "mean": round(mean, 6), "sd": None if sd is None else round(sd, 6)}
+
+
 def summarize(rows: Sequence[dict[str, Any]], group_key: str,
               metric: str) -> dict[str, Any]:
     """按 group_key 分组 → 每组 {n, mean, sd}（总体也一并给出，但仅作对照）。"""
@@ -27,22 +47,8 @@ def summarize(rows: Sequence[dict[str, Any]], group_key: str,
         raise ValueError("行为空（" + GUIDE + "至少给一行 {分组键, 指标}）")
     groups: dict[str, list[float]] = {}
     for i, row in enumerate(rows):
-        if not isinstance(row, dict) or group_key not in row or metric not in row:
-            raise ValueError("第 " + str(i) + " 行缺字段（" + GUIDE + "需要 " + group_key
-                             + " 与 " + metric + "）")
-        try:
-            value = float(row[metric])
-        except (TypeError, ValueError) as exc:
-            raise ValueError("第 " + str(i) + " 行的 " + metric + " 不是数字（" + GUIDE
-                             + "别混入字符串/空值）") from exc
-        groups.setdefault(str(row[group_key]), []).append(value)
-    out = {}
-    for name, values in sorted(groups.items()):
-        n = len(values)
-        mean = sum(values) / n
-        sd = (sum((v - mean) ** 2 for v in values) / (n - 1)) ** 0.5 if n > 1 else None
-        out[name] = {"n": n, "mean": round(mean, 6),
-                     "sd": None if sd is None else round(sd, 6)}
+        groups.setdefault(str(row[group_key]), []).append(_row_value(row, i, group_key, metric))
+    out = {name: _group_stats(values) for name, values in sorted(groups.items())}
     all_values = [float(row[metric]) for row in rows]
     overall_mean = sum(all_values) / len(all_values)
     return {"schema": SCHEMA, "group_key": group_key, "metric": metric,

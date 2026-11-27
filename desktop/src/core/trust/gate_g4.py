@@ -81,6 +81,58 @@ def _verifiers() -> dict:
             "witness": ta.make_witness_verifier({KEYID: _checker})}
 
 
+def _verify_bundle(bundle: dict, policy: dict, root: str, anchor_doc: dict,
+                   envelope: dict) -> dict:
+    """以统一 TrustVerifyOptions 跑一次 tv.verify。"""
+    return tv.verify(
+        bundle, policy, root,
+        opts=tv.TrustVerifyOptions(
+            anchor=anchor_doc,
+            anchor_verifiers=_verifiers(),
+            head_signature=envelope,
+            registry=_registry(),
+            material=_material(),
+            now=NOW,
+        ),
+    )
+
+
+def _t3_issues(result: dict, stats: dict) -> list:
+    """T3 组合判定 → issue；同时回填 stats。"""
+    stats["t3"] = result["report"]["level"]["achieved"]
+    stats["t3_exit"] = result["exit_code"]
+    if result["exit_code"] != 0 or stats["t3"] != "T3":
+        return [f"T3 组合未达成：exit={result['exit_code']} achieved={stats['t3']} "
+                f"issues={[i['code'] for i in result['report']['issues']][:4]}"
+                f"（{GUIDE}signature/time_token/STH+witness 任一断链）"]
+    return []
+
+
+def _t4_issues(t4: dict) -> list:
+    """required=T4 在缺公共锚下应 exit 2。"""
+    codes = [i["code"] for i in t4["report"]["issues"]]
+    if t4["exit_code"] != 2 or "PUBLIC-ANCHOR-MISSING" not in codes:
+        return [f"required=T4 未按缺公共锚 exit 2：exit={t4['exit_code']} codes={codes}"]
+    return []
+
+
+def _short_issues(short: dict) -> list:
+    """witness 阈值不足时不得仍达 T3。"""
+    if short["exit_code"] == 0 or short["report"]["level"]["achieved"] == "T3":
+        return ["witness 阈值不足仍达 T3（阈值判据失效）"]
+    return []
+
+
+def _anchor_detail_issues(anchor_doc: dict, digest: str) -> list:
+    """锚集明细：合规 STH 不得判 invalid。"""
+    issues = []
+    for detail in ta.verify_anchor_set(anchor_doc, digest, _policy("T3"),
+                                       _verifiers())["details"]:
+        if detail["kind"] == "transparency-sth" and detail["status"] == "invalid":
+            issues.append("合规 STH 被判 invalid（组合判定断裂）")
+    return issues
+
+
 def _composition(root: str, issues: list, stats: dict) -> None:
     bundle = tb.build_bundle("e" * 64, "protocol/trust/claim-bundle.schema.json",
                              copy.deepcopy(CLAIMS))
@@ -88,61 +140,14 @@ def _composition(root: str, issues: list, stats: dict) -> None:
     signers = [{"keyid": KEYID, "sign": lambda data: dsse.hmac_sign(HMAC_KEY, data)}]
     envelope = tsig.sign_head('bundle', digest, signers, opts=tsig.SignHeadOptions(root=root))
     anchor_doc = ta.build_anchor_set(digest, _anchors(digest), root=root)
-    result = tv.verify(
-        bundle,
-        _policy('T3'),
-        root,
-        opts=tv.TrustVerifyOptions(
-            anchor=anchor_doc,
-            anchor_verifiers=_verifiers(),
-            head_signature=envelope,
-            registry=_registry(),
-            material=_material(),
-            now=NOW,
-        ),
-    )
-    stats["t3"] = result["report"]["level"]["achieved"]
-    stats["t3_exit"] = result["exit_code"]
-    if result["exit_code"] != 0 or stats["t3"] != "T3":
-        issues.append(f"T3 组合未达成：exit={result['exit_code']} achieved={stats['t3']} "
-                      f"issues={[i['code'] for i in result['report']['issues']][:4]}"
-                      f"（{GUIDE}signature/time_token/STH+witness 任一断链）")
-    t4 = tv.verify(
-        bundle,
-        _policy('T4'),
-        root,
-        opts=tv.TrustVerifyOptions(
-            anchor=anchor_doc,
-            anchor_verifiers=_verifiers(),
-            head_signature=envelope,
-            registry=_registry(),
-            material=_material(),
-            now=NOW,
-        ),
-    )
+    result = _verify_bundle(bundle, _policy('T3'), root, anchor_doc, envelope)
+    issues += _t3_issues(result, stats)
+    t4 = _verify_bundle(bundle, _policy('T4'), root, anchor_doc, envelope)
     stats["t4"] = t4["report"]["level"]["achieved"]
-    codes = [i["code"] for i in t4["report"]["issues"]]
-    if t4["exit_code"] != 2 or "PUBLIC-ANCHOR-MISSING" not in codes:
-        issues.append(f"required=T4 未按缺公共锚 exit 2：exit={t4['exit_code']} codes={codes}")
-    short = tv.verify(
-        bundle,
-        _policy('T3', threshold=2),
-        root,
-        opts=tv.TrustVerifyOptions(
-            anchor=anchor_doc,
-            anchor_verifiers=_verifiers(),
-            head_signature=envelope,
-            registry=_registry(),
-            material=_material(),
-            now=NOW,
-        ),
-    )
-    if short["exit_code"] == 0 or short["report"]["level"]["achieved"] == "T3":
-        issues.append("witness 阈值不足仍达 T3（阈值判据失效）")
-    for detail in ta.verify_anchor_set(anchor_doc, digest, _policy("T3"),
-                                       _verifiers())["details"]:
-        if detail["kind"] == "transparency-sth" and detail["status"] == "invalid":
-            issues.append("合规 STH 被判 invalid（组合判定断裂）")
+    issues += _t4_issues(t4)
+    short = _verify_bundle(bundle, _policy('T3', threshold=2), root, anchor_doc, envelope)
+    issues += _short_issues(short)
+    issues += _anchor_detail_issues(anchor_doc, digest)
 
 
 def _check_artifacts(root: str, issues: list, stats: dict) -> None:

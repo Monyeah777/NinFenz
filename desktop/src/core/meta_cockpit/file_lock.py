@@ -8,6 +8,46 @@ from contextlib import contextmanager
 from pathlib import Path
 
 
+def _try_lock(handle) -> None:
+    if os.name == "nt":
+        import msvcrt
+
+        msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, 1)
+    else:
+        import fcntl
+
+        fcntl.flock(  # type: ignore[attr-defined]
+            handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB
+        )  # type: ignore[attr-defined]
+
+
+def _acquire_lock(handle, timeout: float) -> None:
+    """非阻塞重试直到拿到独占锁；超时抛 TimeoutError。"""
+    started = time.monotonic()
+    while True:
+        try:
+            _try_lock(handle)
+            return
+        except OSError as exc:
+            if time.monotonic() - started >= timeout:
+                raise TimeoutError("lock timeout") from exc
+            time.sleep(0.01)
+
+
+def _unlock(handle) -> None:
+    handle.seek(0)
+    if os.name == "nt":
+        import msvcrt
+
+        msvcrt.locking(handle.fileno(), msvcrt.LK_UNLCK, 1)
+    else:
+        import fcntl
+
+        fcntl.flock(  # type: ignore[attr-defined]
+            handle.fileno(), fcntl.LOCK_UN
+        )  # type: ignore[attr-defined]
+
+
 @contextmanager
 def locked(path: str | Path, timeout: float = 5.0):
     target = Path(path)
@@ -18,47 +58,12 @@ def locked(path: str | Path, timeout: float = 5.0):
         handle.write(b"\0")
         handle.flush()
     handle.seek(0)
-    started = time.monotonic()
     acquired = False
     try:
-        if os.name == "nt":
-            import msvcrt
-
-            while True:
-                try:
-                    msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, 1)
-                    acquired = True
-                    break
-                except OSError as exc:
-                    if time.monotonic() - started >= timeout:
-                        raise TimeoutError("lock timeout") from exc
-                    time.sleep(0.01)
-        else:
-            import fcntl
-
-            while True:
-                try:
-                    fcntl.flock(  # type: ignore[attr-defined]
-                        handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB
-                    )  # type: ignore[attr-defined]
-                    acquired = True
-                    break
-                except OSError as exc:
-                    if time.monotonic() - started >= timeout:
-                        raise TimeoutError("lock timeout") from exc
-                    time.sleep(0.01)
+        _acquire_lock(handle, timeout)
+        acquired = True
         yield
     finally:
         if acquired:
-            handle.seek(0)
-            if os.name == "nt":
-                import msvcrt
-
-                msvcrt.locking(handle.fileno(), msvcrt.LK_UNLCK, 1)
-            else:
-                import fcntl
-
-                fcntl.flock(  # type: ignore[attr-defined]
-                    handle.fileno(), fcntl.LOCK_UN
-                )  # type: ignore[attr-defined]
+            _unlock(handle)
         handle.close()

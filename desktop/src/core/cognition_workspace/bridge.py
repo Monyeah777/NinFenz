@@ -46,6 +46,16 @@ def _cc_verdict(cc_result: Any) -> str:
     return verdict
 
 
+def _optional_int(value) -> Any:
+    """缺值（None）保持 None，不填 0；有值转 int。"""
+    return None if value is None else int(value)
+
+
+def _prev_digest(bundle: dict[str, Any]) -> str:
+    """上一份 commitment 的 digest（无档给空串）。"""
+    return str((bundle.get("commitments") or [{}])[-1].get("digest") or "")
+
+
 def commit(bundle: dict[str, Any], claim_doc: dict[str, Any], cc_result: dict[str, Any],
            roles: list[str] | None = None) -> dict[str, Any]:
     """生成 commitment（不改认知侧状态）。任一侧不合法即抛错（fail-closed）。"""
@@ -64,8 +74,8 @@ def commit(bundle: dict[str, Any], claim_doc: dict[str, Any], cc_result: dict[st
     # 资源层记账（第 92 轮）：两本账**并列记、不合并**——认知侧记步数、契约侧记毫秒成本。
     # 合并成一个分数就等于把「预算」变成「评分」，本仓禁止。
     # 缺值用 None，不填 0（0 会被误读为「没花」）。
-    steps = (state.get("budget") or {}).get("steps_used")
-    cost = cc_result.get("cost_ms")
+    steps = _optional_int((state.get("budget") or {}).get("steps_used"))
+    cost = _optional_int(cc_result.get("cost_ms"))
     payload = {"schema": COMMIT_SCHEMA, "bridge_version": BRIDGE_VERSION,
                "cog_digest": str(state["digest"]),
                "claim_digest": str(claim_doc["digest"]),
@@ -74,12 +84,35 @@ def commit(bundle: dict[str, Any], claim_doc: dict[str, Any], cc_result: dict[st
                                        "ts_digest": ts_digest}),
                "cc_verdict": verdict,
                "ts_digest": ts_digest,
-               "cost": {"cog_steps": None if steps is None else int(steps),
-                        "cc_cost_ms": None if cost is None else int(cost)},
+               "cost": {"cog_steps": steps,
+                        "cc_cost_ms": cost},
                "roles": list(roles or ["local-trusted"]),
-               "prev": str((bundle.get("commitments") or [{}])[-1].get("digest") or "")}
+               "prev": _prev_digest(bundle)}
     payload["digest"] = digest_of(payload)
     return payload
+
+
+def _commitment_field_issues(commitment: dict[str, Any], bundle: dict[str, Any],
+                            claim_doc: dict[str, Any], cc_result: dict[str, Any],
+                            verdict: str) -> list[str]:
+    """认知侧 / 主张 / 契约侧 / 时点 四面对账。"""
+    issues: list[str] = []
+    state = bundle.get("state") or {}
+    if str(commitment.get("cog_digest")) != str(state.get("digest")):
+        issues.append("认知侧 digest 不匹配——commitment 之后 discourse 又变了")
+    if str(commitment.get("claim_digest")) != str(claim_doc.get("digest")):
+        issues.append("主张 digest 不匹配——commitment 之后 claim 变了")
+    expected = digest_of({"verdict": verdict, "subject": cc_result.get("subject"),
+                          "detail": cc_result.get("detail"),
+                          "ts_digest": str(commitment.get("ts_digest") or "")})
+    if str(commitment.get("cc_digest")) != expected:
+        issues.append("契约侧 digest 不匹配——cc 结果变了")
+    if str(commitment.get("cc_verdict")) != verdict:
+        issues.append("commitment 记录的判定与当前 cc 结果不同")
+    ts_now = str(cc_result.get("ts_digest") or "")
+    if str(commitment.get("ts_digest") or "") != ts_now:
+        issues.append("时点引用不匹配——两侧没有指向同一 token")
+    return issues
 
 
 def verify_commitment(commitment: Any, bundle: dict[str, Any], claim_doc: dict[str, Any],
@@ -93,22 +126,8 @@ def verify_commitment(commitment: Any, bundle: dict[str, Any], claim_doc: dict[s
     if digest_of(body) != commitment.get("digest"):
         res["issues"].append("commitment 自身 digest 不符（" + GUIDE + "被改过）")
         return res
-    state = bundle.get("state") or {}
-    if str(commitment.get("cog_digest")) != str(state.get("digest")):
-        res["issues"].append("认知侧 digest 不匹配——commitment 之后 discourse 又变了")
-    if str(commitment.get("claim_digest")) != str(claim_doc.get("digest")):
-        res["issues"].append("主张 digest 不匹配——commitment 之后 claim 变了")
     verdict = _cc_verdict(cc_result)
-    expected = digest_of({"verdict": verdict, "subject": cc_result.get("subject"),
-                          "detail": cc_result.get("detail"),
-                          "ts_digest": str(commitment.get("ts_digest") or "")})
-    if str(commitment.get("cc_digest")) != expected:
-        res["issues"].append("契约侧 digest 不匹配——cc 结果变了")
-    if str(commitment.get("cc_verdict")) != verdict:
-        res["issues"].append("commitment 记录的判定与当前 cc 结果不同")
-    ts_now = str(cc_result.get("ts_digest") or "")
-    if str(commitment.get("ts_digest") or "") != ts_now:
-        res["issues"].append("时点引用不匹配——两侧没有指向同一 token")
+    res["issues"].extend(_commitment_field_issues(commitment, bundle, claim_doc, cc_result, verdict))
     # 资源层（第 105 轮）：核对时顺带核两本账的形状——判据必须被生产路径调用才有用。
     res["issues"].extend(resource_accounting_issues(commitment))
     res["ok"] = not res["issues"]
@@ -190,6 +209,21 @@ def resource_accounting_issues(commitment: Any) -> list[str]:
     return issues
 
 
+def _obligation_want(obligation_doc: dict[str, Any]) -> list:
+    """回灌消息里的失败 + 未知集（同序拼接）。"""
+    return list(obligation_doc.get("failed") or []) + list(obligation_doc.get("unknown") or [])
+
+
+def _obligation_got(record: dict[str, Any]) -> list:
+    """回灌记录里证人给出的证据集。"""
+    return list((record.get("witness") or {}).get("evidence") or [])
+
+
+def _witness_digest_ok(record: dict[str, Any]) -> bool:
+    """证人 digest 是否可复算。"""
+    return str(record.get("witness_digest") or "") == digest_of(record.get("witness") or {})
+
+
 def obligation_record_issues(record: dict[str, Any], obligation_doc: dict[str, Any],
                              ) -> list[str]:
     """核对「回灌记录」与「回灌消息」是否逐项对应（同构判据 #3 的可复用核）。
@@ -202,11 +236,11 @@ def obligation_record_issues(record: dict[str, Any], obligation_doc: dict[str, A
         return ["记录不是对象（" + GUIDE + "用 apply_obligation 的产出）"]
     if str(record.get("trigger") or "") != "bridge-obligation":
         issues.append("来源标记不是 bridge-obligation（" + GUIDE + "回灌必须写明来自桥）")
-    want = list(obligation_doc.get("failed") or []) + list(obligation_doc.get("unknown") or [])
-    got = list((record.get("witness") or {}).get("evidence") or [])
+    want = _obligation_want(obligation_doc)
+    got = _obligation_got(record)
     if [str(x) for x in got] != [str(x) for x in want]:
         issues.append("失败集与回灌消息不一致（" + GUIDE + "两侧必须逐项同序）")
-    if str(record.get("witness_digest") or "") != digest_of(record.get("witness") or {}):
+    if not _witness_digest_ok(record):
         issues.append("证人 digest 不可复算（" + GUIDE + "记录被改过）")
     return issues
 
@@ -243,6 +277,29 @@ VERIFY_FAIL = ("revoked", "expired", "invalid")
 VERIFY_WORDS = VERIFY_PASS + VERIFY_FAIL
 
 
+def _verdict_from_error(verify_doc: dict[str, Any]) -> tuple:
+    """真 CLI 的 error 对象 → (invalid, 补了 issues/root/head 的 doc)。"""
+    if not str(verify_doc.get("error") or ""):
+        return "", verify_doc
+    return "invalid", dict(verify_doc, issues=[str(verify_doc["error"])],
+                           root=verify_doc.get("root"), head=verify_doc.get("head"))
+
+
+def _verify_detail(verify_doc: dict[str, Any]) -> dict[str, Any]:
+    """cc 结果的 detail 面（root/level/count/issues）。"""
+    return {"root": verify_doc.get("root"), "level": verify_doc.get("level"),
+            "count": verify_doc.get("count"),
+            "issues": list(verify_doc.get("issues") or [])}
+
+
+def _first_text(*values) -> str:
+    """取第一个非空值的 str（都空则空串）。"""
+    for v in values:
+        if v:
+            return str(v)
+    return ""
+
+
 def cc_result_from_verify(verify_doc: dict[str, Any]) -> dict[str, Any]:
     """把 nf evidence verify --json 的真实输出转成桥认的 cc 结果。
 
@@ -251,25 +308,20 @@ def cc_result_from_verify(verify_doc: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(verify_doc, dict):
         raise ValueError("verify 输出必须是对象（" + GUIDE + "nf evidence verify --json）")
     verdict = str(verify_doc.get("verdict") or "").lower()
-    if not verdict and str(verify_doc.get("error") or ""):
+    if not verdict:
         # 真 CLI 在「包读不开/结构坏」时给的是 error 对象，不是四词判定：
         # 桥必须把它当 invalid（fail-closed），而不是抛错或当没看见。
-        verdict = "invalid"
-        verify_doc = dict(verify_doc, issues=[str(verify_doc["error"])],
-                          root=verify_doc.get("root"), head=verify_doc.get("head"))
+        verdict, verify_doc = _verdict_from_error(verify_doc)
     if verdict not in VERIFY_WORDS:
         raise ValueError("未知证据判定：" + verdict
                          + "（" + GUIDE + "四词判定：ok/revoked/expired/invalid）")
     # 时点引用（同构判据 #1 的契约侧来源）：verify 输出若带时间戳 token 摘要，就带进 cc 结果；
     # 没有就留空串——**不伪造时点**。字段恒定，便于 bridge 侧按「两侧是否指向同一 token」判定。
-    detail = {"root": verify_doc.get("root"), "level": verify_doc.get("level"),
-              "count": verify_doc.get("count"),
-              "issues": list(verify_doc.get("issues") or [])}
-    ts = verify_doc.get("ts_digest") or verify_doc.get("timestamp_digest") or ""
     return {"verdict": verdict,
-            "subject": str(verify_doc.get("head") or verify_doc.get("root") or ""),
-            "ts_digest": str(ts),
-            "detail": detail}
+            "subject": _first_text(verify_doc.get("head"), verify_doc.get("root")),
+            "ts_digest": _first_text(verify_doc.get("ts_digest"),
+                                     verify_doc.get("timestamp_digest")),
+            "detail": _verify_detail(verify_doc)}
 
 
 def commit_from_verify(bundle: dict[str, Any], claim_doc: dict[str, Any],

@@ -120,6 +120,25 @@ def build(path: str, root: str = ".", issuer: str = "",
     return att
 
 
+def _policy_digest_issues(decision: dict) -> list[str]:
+    """policy_digest 须为 64 位小写十六进制。"""
+    if re.fullmatch(r"[0-9a-f]{64}", str(decision.get("policy_digest") or "")):
+        return []
+    return ["decision.policy_digest 须为 64 位小写十六进制（修复指引：用 "
+            "nf check --json 的 policy_digest）"]
+
+
+def _object_digest_issues(decision: dict, member_digests) -> list[str]:
+    """object_sha256 形状 +（给了成员摘要时）是否绑定到包内实体。"""
+    obj = str(decision.get("object_sha256") or "")
+    if not re.fullmatch(r"[0-9a-f]{64}", obj):
+        return ["decision.object_sha256 须为 64 位小写十六进制"
+                "（修复指引：用成员实体的 sha256）"]
+    if member_digests is not None and obj not in set(member_digests):
+        return ["decision.object_sha256 不在成员摘要里（决策未绑定到包内实体）"]
+    return []
+
+
 def decision_issues(decision: Any, member_digests: Any = None) -> list[str]:
     """决策证据块形状校验（fail-closed）；给 member_digests 时校验 object 在成员里。"""
     if not isinstance(decision, dict) or not decision:
@@ -131,17 +150,10 @@ def decision_issues(decision: Any, member_digests: Any = None) -> list[str]:
                       f"（修复指引：只允许 {'/'.join(DECISION_FIELDS)}）")
     if decision.get("syscall") != "cc_check":
         issues.append("decision.syscall 只支持 cc_check（v0）（修复指引：换支持的调用）")
-    if not re.fullmatch(r"[0-9a-f]{64}", str(decision.get("policy_digest") or "")):
-        issues.append("decision.policy_digest 须为 64 位小写十六进制（修复指引：用 "
-                      "nf check --json 的 policy_digest）")
+    issues += _policy_digest_issues(decision)
     if decision.get("verdict") not in ("ok",):
         issues.append("decision.verdict 只允许 ok（v0 只记录通过的判定）")
-    obj = str(decision.get("object_sha256") or "")
-    if not re.fullmatch(r"[0-9a-f]{64}", obj):
-        issues.append("decision.object_sha256 须为 64 位小写十六进制"
-                      "（修复指引：用成员实体的 sha256）")
-    elif member_digests is not None and obj not in set(member_digests):
-        issues.append("decision.object_sha256 不在成员摘要里（决策未绑定到包内实体）")
+    issues += _object_digest_issues(decision, member_digests)
     return issues
 
 
@@ -197,32 +209,25 @@ def verify_external(att: Dict[str, Any], tool: str = "cosign") -> Tuple[bool, Li
     return True, []
 
 
-def verify(att: Dict[str, Any], root: str = ".",
-           key: Optional[bytes] = None) -> Tuple[bool, List[str], str]:
-    """校验 attestation → (ok, issues, level)。
-
-    ok=False 一律表示「不可信」，绝不因缺证据而放行——本函数判的是**证据强度**，
-    不是内容质量：「可复现」不等于「诚实」。
-    """
-    issues: List[str] = []
-    if not isinstance(att, dict) or att.get("schema") != SCHEMA:
-        return False, ["attestation schema 不匹配（期望 %s）" % SCHEMA], "invalid"
-    subj = att.get("subject") or {}
+def _subject_issues(subj: dict, root: str) -> Tuple[list, str]:
+    """主体面校验 → (issues, level)；issues 为空表示无漂移。"""
     path = subj.get("path")
     if not path:
-        return False, ["attestation 缺 subject.path"], "invalid"
+        return ["attestation 缺 subject.path"], "invalid"
     try:
         live = subject_of(path, root)
     except OSError as exc:
-        return False, ["主体不可读：%s（%s）" % (path, exc)], "invalid"
+        return ["主体不可读：%s（%s）" % (path, exc)], "invalid"
+    issues: List[str] = []
     for field in ("sha256", "bytes", "line_count"):
         if live.get(field) != subj.get(field):
             issues.append("主体漂移：%s 记录=%s 实测=%s"
                           % (field, subj.get(field), live.get(field)))
-    if issues:
-        return False, issues, "digest_only"
-    if att.get("envelope_digest") != envelope_digest(att):
-        return False, ["信封摘要不一致（attestation 自身被改动）"], "digest_only"
+    return issues, "digest_only"
+
+
+def _signature_issues(att: Dict[str, Any], key) -> Tuple[bool, List[str], str]:
+    """签名面校验 → (ok, issues, level)。"""
     sig = att.get("signature")
     if not sig:
         return True, [], "digest_only"
@@ -240,6 +245,25 @@ def verify(att: Dict[str, Any], root: str = ".",
         return ok, ext_issues, "sigstore-keyless"
     return False, ["未知签名方案：%s（支持：%s / %s）"
                    % (scheme, SCHEME_HMAC, SCHEME_SIGSTORE)], "unsupported"
+
+
+def verify(att: Dict[str, Any], root: str = ".",
+           key: Optional[bytes] = None) -> Tuple[bool, List[str], str]:
+    """校验 attestation → (ok, issues, level)。
+
+    ok=False 一律表示「不可信」，绝不因缺证据而放行——本函数判的是**证据强度**，
+    不是内容质量：「可复现」不等于「诚实」。
+    """
+    issues: List[str] = []
+    if not isinstance(att, dict) or att.get("schema") != SCHEMA:
+        return False, ["attestation schema 不匹配（期望 %s）" % SCHEMA], "invalid"
+    subj = att.get("subject") or {}
+    drift, level = _subject_issues(subj, root)
+    if drift:
+        return False, drift, level
+    if att.get("envelope_digest") != envelope_digest(att):
+        return False, ["信封摘要不一致（attestation 自身被改动）"], "digest_only"
+    return _signature_issues(att, key)
 
 
 def sign_digest_hmac(subject_digest: str, key: bytes, issuer: str = "") -> Dict[str, Any]:

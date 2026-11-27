@@ -80,13 +80,17 @@ def _gen_mermaid(_root: str, entry: dict):
 
 
 
+def _render_spec(entry: dict) -> tuple[list, dict]:
+    """render/recompute 段 → (inputs, params 副本)。"""
+    spec = entry.get("recompute") or entry.get("render") or {}
+    return spec.get("inputs") or [], dict(spec.get("params") or {})
+
+
 def _gen_domain_report(root: str, entry: dict):
     """域包 T4 面：由样例夹具按声明度量族重算域报告（core/domain_metrics）。"""
     from core import domain_metrics as dm
 
-    spec = entry.get("recompute") or entry.get("render") or {}
-    inputs = spec.get("inputs") or []
-    params = dict(spec.get("params") or {})
+    inputs, params = _render_spec(entry)
     family = str(params.pop("family", ""))
     if not inputs or not family:
         return None, ["域报告缺 inputs 或 family（无源/无族即无功能）"]
@@ -110,6 +114,20 @@ def _gen_domain_report(root: str, entry: dict):
 
 
 
+def _metric_values(data: dict) -> list:
+    """报告 metrics 里的标量 → 条形图 values（按 key 排序，bool 不算标量）。"""
+    vals = []
+    for k, v in sorted((data.get("metrics") or {}).items()):
+        if isinstance(v, (int, float)) and not isinstance(v, bool):
+            vals.append({"metric": k, "value": float(v)})
+    return vals
+
+
+def _vega_title(spec: dict) -> str:
+    """图表标题：params.title，缺省「域指标」。"""
+    return str(spec.get("params", {}).get("title") or "域指标")
+
+
 def _gen_vega_metrics(root: str, entry: dict):
     """指标条形图：由域报告里的标量指标确定性生成 Vega-Lite 规格。"""
     spec = entry.get("render") or entry.get("recompute") or {}
@@ -119,15 +137,12 @@ def _gen_vega_metrics(root: str, entry: dict):
     data, err = _read_json(_rel(root, _pkg_rel(entry, inputs[0])))
     if err:
         return None, ["输入 %s %s" % (inputs[0], err)]
-    vals = []
-    for k, v in sorted((data.get("metrics") or {}).items()):
-        if isinstance(v, (int, float)) and not isinstance(v, bool):
-            vals.append({"metric": k, "value": float(v)})
+    vals = _metric_values(data)
     if not vals:
         return None, ["报告里没有可画的标量指标"]
     return {
         "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-        "description": str(spec.get("params", {}).get("title") or "域指标"),
+        "description": _vega_title(spec),
         "data": {"values": vals},
         "mark": {"type": "bar"},
         "encoding": {

@@ -205,14 +205,8 @@ def _scan_bandit(root: str) -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
     return {"files": 1, "issues": len(rows), "severity_counts": counts}, findings
 
 
-def _scan_radon(root: str) -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
-    if not shutil.which("radon"):
-        return {"status": "blocked", "blocked_reason": "radon 不在场", "issues": 0}, []
-    res = _run(["radon", "cc", "desktop/src/core", "-s", "-j"], timeout=180, cwd=root)
-    try:
-        doc = json.loads(res["out"] or "{}")
-    except ValueError:
-        return {"status": "blocked", "blocked_reason": "radon 输出不可解析", "issues": 0}, []
+def _radon_blocks(doc: dict) -> tuple:
+    """radon JSON → (max_cc, 超阈值数, 热点列表)。"""
     max_cc = 0
     over = 0
     hotspots = []
@@ -226,6 +220,18 @@ def _scan_radon(root: str) -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
                 hotspots.append({"file": path, "name": block.get("name"),
                                  "complexity": cc, "lineno": block.get("lineno")})
     hotspots.sort(key=lambda x: (-x["complexity"], x["file"]))
+    return max_cc, over, hotspots
+
+
+def _scan_radon(root: str) -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
+    if not shutil.which("radon"):
+        return {"status": "blocked", "blocked_reason": "radon 不在场", "issues": 0}, []
+    res = _run(["radon", "cc", "desktop/src/core", "-s", "-j"], timeout=180, cwd=root)
+    try:
+        doc = json.loads(res["out"] or "{}")
+    except ValueError:
+        return {"status": "blocked", "blocked_reason": "radon 输出不可解析", "issues": 0}, []
+    max_cc, over, hotspots = _radon_blocks(doc)
     findings = [_finding("radon-cc", "P2", "函数 CC=%s 超阈值 15" % h["complexity"],
                          h["file"], int(h["lineno"] or 0), "拆分/降低复杂度") for h in hotspots[:50]]
     return {"files": len(doc), "issues": over, "max_cc": max_cc,
@@ -242,9 +248,28 @@ def _scan_vulture(root: str) -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
     return {"files": 1, "issues": len(lines)}, findings
 
 
+def _claim_targets(files: List[str]) -> List[str]:
+    """README + docs 一级 .md（过度声明扫描面）。"""
+    return [f for f in files
+            if f == "README.md"
+            or (f.startswith("docs/") and f.endswith(".md") and f.count("/") == 1)]
+
+
+def _claim_line_findings(rel: str, lineno: int, line: str) -> List[Dict[str, Any]]:
+    """单行的过度声明命中（benign 短语整行豁免）。"""
+    if any(p in line for p in BENIGN_PHRASES):
+        return []
+    out = []
+    for word in FORBIDDEN_WORDS:
+        if word in line and not any(m in line for m in NEGATION):
+            out.append(_finding("claims-words", "P2",
+                                "疑似过度声明：%s" % word, rel, lineno,
+                                "改否定语境或删除声明"))
+    return out
+
+
 def _scan_claims(root: str, files: List[str]) -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
-    targets = [f for f in files if f == "README.md" or f.startswith("docs/")
-               and f.endswith(".md") and f.count("/") == 1]
+    targets = _claim_targets(files)
     findings = []
     for rel in targets:
         try:
@@ -252,13 +277,7 @@ def _scan_claims(root: str, files: List[str]) -> Tuple[Dict[str, Any], List[Dict
         except (OSError, UnicodeDecodeError):
             continue
         for lineno, line in enumerate(text.splitlines(), 1):
-            if any(p in line for p in BENIGN_PHRASES):
-                continue
-            for word in FORBIDDEN_WORDS:
-                if word in line and not any(m in line for m in NEGATION):
-                    findings.append(_finding("claims-words", "P2",
-                                             "疑似过度声明：%s" % word, rel, lineno,
-                                             "改否定语境或删除声明"))
+            findings.extend(_claim_line_findings(rel, lineno, line))
     return {"files": len(targets), "issues": len(findings)}, findings
 
 

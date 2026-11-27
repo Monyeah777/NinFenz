@@ -95,6 +95,16 @@ def _decode_frame(raw: bytes, what: str) -> str:
 
 
 
+def _translate_msys_cwd(cwd: str) -> str:
+    """MSYS 风格 /d/repo → D:\\repo；非该形态原样返回。"""
+    import re
+    match = re.match(r"^/([A-Za-z])/(.*)$", cwd)
+    if not match:
+        return cwd
+    tail = match.group(2).replace("/", "\\")
+    return f"{match.group(1).upper()}:\\{tail}"
+
+
 def _validated_cwd(root: Path, cwd: str | None) -> str | None:
     """规范化客户端 cwd；空值表示使用守护自身 cwd。"""
     if cwd is None:
@@ -107,11 +117,7 @@ def _validated_cwd(root: Path, cwd: str | None) -> str | None:
         raise ValueError("cwd 含控制字符（修复指引：路径里不得含 \x00-\x1f）")
     if os.name == "nt":
         # Git Bash/MSYS 的原生客户端会送 `/d/repo`；显式映射，避免 isdir 失败后静默回退。
-        import re
-        match = re.match(r"^/([A-Za-z])/(.*)$", cwd)
-        if match:
-            tail = match.group(2).replace("/", "\\")
-            cwd = f"{match.group(1).upper()}:\\{tail}"
+        cwd = _translate_msys_cwd(cwd)
     safe = os.path.realpath(cwd)
     if not os.path.isdir(safe):
         raise ValueError(f"cwd 不是现存目录：{safe}（修复指引：传仓库根的绝对路径，或省略 cwd）")
@@ -166,6 +172,23 @@ def _parse_json_request(text: str):
 
 
 
+def _parse_nfreq_request(reader: "_LineReader", head: str) -> Dict[str, Any]:
+    """NFREQ 明文请求框 → 请求 dict（头 + cwd + 条数 + 逐行 argv）。"""
+    parts = head.split()
+    if len(parts) != 3 or parts[1] != str(PROTO):
+        raise ValueError("NFREQ 头格式错（期望 `NFREQ %d <token>`）" % PROTO)
+    cwd = _decode_frame(reader.readline(), "NFREQ cwd")
+    try:
+        n = int(_decode_frame(reader.readline(), "NFREQ 条数").strip() or "0")
+    except ValueError as exc:
+        raise ValueError("NFREQ argv 条数不可解析：%s" % exc) from exc
+    if n < 0 or n > 4096:
+        raise ValueError("NFREQ argv 条数越界：%d" % n)
+    argv = [_decode_frame(reader.readline(), "NFREQ argv") for _ in range(n)]
+    _check_argv_size(argv)
+    return {"proto": PROTO, "token": parts[2], "cwd": cwd, "argv": argv}
+
+
 def _parse_request(reader: "_LineReader") -> Dict[str, Any]:
     """解析请求框——两种形态，一种语义：
 
@@ -176,19 +199,7 @@ def _parse_request(reader: "_LineReader") -> Dict[str, Any]:
     """
     head = _decode_frame(reader.readline(), "请求头")
     if head.startswith("NFREQ"):
-        parts = head.split()
-        if len(parts) != 3 or parts[1] != str(PROTO):
-            raise ValueError("NFREQ 头格式错（期望 `NFREQ %d <token>`）" % PROTO)
-        cwd = _decode_frame(reader.readline(), "NFREQ cwd")
-        try:
-            n = int(_decode_frame(reader.readline(), "NFREQ 条数").strip() or "0")
-        except ValueError as exc:
-            raise ValueError("NFREQ argv 条数不可解析：%s" % exc) from exc
-        if n < 0 or n > 4096:
-            raise ValueError("NFREQ argv 条数越界：%d" % n)
-        argv = [_decode_frame(reader.readline(), "NFREQ argv") for _ in range(n)]
-        _check_argv_size(argv)
-        return {"proto": PROTO, "token": parts[2], "cwd": cwd, "argv": argv}
+        return _parse_nfreq_request(reader, head)
     req = _parse_json_request(head or "{}")
     if not isinstance(req, dict):
         raise ValueError("请求不是 JSON 对象")
@@ -210,39 +221,43 @@ def send_framed(sock: socket.socket, exit_code: int, out: bytes, err: bytes) -> 
 
 
 
+def _read_frame_length(fh, label: str) -> int:
+    """响应帧长度行 → int；缺失/非整数/越界均抛 ValueError。"""
+    raw = fh.readline(64)
+    if not raw or not raw.endswith(b"\n"):
+        raise ValueError(f"响应帧 {label} 缺失或超长")
+    try:
+        value = int(raw.strip())
+    except ValueError as exc:
+        raise ValueError(f"响应帧 {label} 不是整数") from exc
+    if value < 0 or value > MAX_RESPONSE_BYTES:
+        raise ValueError(f"响应帧 {label} 越界：{value}")
+    return value
+
+
+def _read_frame_exact(fh, n: int) -> bytes:
+    """精确读 n 字节；提前 EOF 抛 ValueError。"""
+    chunks, left = [], n
+    while left:
+        chunk = fh.read(left)
+        if not chunk:
+            raise ValueError(f"响应载荷提前结束（缺 {left} 字节）")
+        chunks.append(chunk)
+        left -= len(chunk)
+    return b"".join(chunks)
+
+
 def read_framed(sock: socket.socket) -> Tuple[int, bytes, bytes]:
     """按协议读响应（客户端侧）：返回 (exit, stdout 字节, stderr 字节)。"""
     fh = sock.makefile("rb")
-    def _length_line(label: str) -> int:
-        raw = fh.readline(64)
-        if not raw or not raw.endswith(b"\n"):
-            raise ValueError(f"响应帧 {label} 缺失或超长")
-        try:
-            value = int(raw.strip())
-        except ValueError as exc:
-            raise ValueError(f"响应帧 {label} 不是整数") from exc
-        if value < 0 or value > MAX_RESPONSE_BYTES:
-            raise ValueError(f"响应帧 {label} 越界：{value}")
-        return value
-
-    def _exact(n: int) -> bytes:
-        chunks, left = [], n
-        while left:
-            chunk = fh.read(left)
-            if not chunk:
-                raise ValueError(f"响应载荷提前结束（缺 {left} 字节）")
-            chunks.append(chunk)
-            left -= len(chunk)
-        return b"".join(chunks)
-
     try:
-        code = _length_line("exit")
-        out_len = _length_line("stdout 长度")
-        err_len = _length_line("stderr 长度")
+        code = _read_frame_length(fh, "exit")
+        out_len = _read_frame_length(fh, "stdout 长度")
+        err_len = _read_frame_length(fh, "stderr 长度")
         if out_len + err_len > MAX_RESPONSE_BYTES:
             raise ValueError(f"响应载荷越界：{out_len} + {err_len} 字节")
-        out = _exact(out_len) if out_len else b""
-        err = _exact(err_len) if err_len else b""
+        out = _read_frame_exact(fh, out_len) if out_len else b""
+        err = _read_frame_exact(fh, err_len) if err_len else b""
     finally:
         fh.close()
     return code, out, err

@@ -22,6 +22,47 @@ from ._part1 import (
 )
 
 
+def _write_ssh_payload(subject_digest: str, base: str) -> str:
+    """把待签载荷写进 workdir → 载荷路径。"""
+    payload_path = os.path.join(base, "payload.txt")
+    with open(payload_path, "wb") as fh:
+        fh.write(ssh_payload(subject_digest))
+    return payload_path
+
+
+def _run_ssh_sign(key_path: str, ns: str, payload_path: str) -> None:
+    """ssh-keygen -Y sign 签载荷；超时/非零退出 → ValueError。"""
+    # stdin=DEVNULL：密钥若带口令，ssh-keygen 会等输入（实测会挂住）——
+    # 这里让它**快速失败**而不是阻塞调用方。
+    try:
+        proc = subprocess.run([_which("ssh-keygen", "ssh-sig 签名"),  # nosec B404/B603/B607 —— 调用 ssh-keygen/git/hf（argv 列表、无 shell、路径经 which 解析）
+                               "-Y", "sign", "-f", key_path, "-n", ns,
+                               payload_path], capture_output=True, text=True,
+                              stdin=subprocess.DEVNULL, timeout=TOOL_TIMEOUT_S)
+    except subprocess.TimeoutExpired as exc:
+        raise ValueError("ssh-keygen 签名超时（%d s 未返回；修复指引：确认私钥可用、不带交互口令，"
+                         "或改用 --key-file 的 hmac 级）" % TOOL_TIMEOUT_S) from exc
+    if proc.returncode != 0:
+        raise ValueError("ssh-keygen 签名失败：%s"
+                         % (proc.stderr or proc.stdout).strip()[:200])
+
+
+def _ssh_fingerprint(pub: str) -> str:
+    """公钥指纹（信息字段：取不到留空，不拖挂签名流程）。"""
+    if not os.path.isfile(pub):
+        return ""
+    try:
+        fp = subprocess.run([_which("ssh-keygen", "ssh-sig 指纹"), "-lf", pub],  # nosec B404/B603/B607 —— 调用 ssh-keygen/git/hf（argv 列表、无 shell、路径经 which 解析）
+                            capture_output=True, text=True, timeout=TOOL_TIMEOUT_S)
+    except subprocess.TimeoutExpired:
+        # 指纹是**信息字段**（签名本体已产出并可分发）：超时即留空，不因它拖挂整条签名
+        # 流程——但也不假装取到了（字段留空本身即如实表达「未取到」）。
+        return ""
+    if fp.returncode == 0 and fp.stdout.split():
+        return fp.stdout.split()[1]
+    return ""
+
+
 def sign_digest_ssh(subject_digest: str, key_path: str, identity: str,
                     ns: str = SSH_NAMESPACE, workdir: str = "") -> Dict[str, Any]:
     """用 `ssh-keygen -Y sign` 对摘要载荷签名（真实非对称签名，读者侧只需 ssh-keygen）。"""
@@ -40,41 +81,42 @@ def sign_digest_ssh(subject_digest: str, key_path: str, identity: str,
 
     base = workdir or tempfile.mkdtemp(prefix="nf_ssh_")
     os.makedirs(base, exist_ok=True)
-    payload_path = os.path.join(base, "payload.txt")
-    with open(payload_path, "wb") as fh:
-        fh.write(ssh_payload(subject_digest))
-    # stdin=DEVNULL：密钥若带口令，ssh-keygen 会等输入（实测会挂住）——
-    # 这里让它**快速失败**而不是阻塞调用方。
-    try:
-        proc = subprocess.run([_which("ssh-keygen", "ssh-sig 签名"),  # nosec B404/B603/B607 —— 调用 ssh-keygen/git/hf（argv 列表、无 shell、路径经 which 解析）
-                               "-Y", "sign", "-f", key_path, "-n", ns,
-                               payload_path], capture_output=True, text=True,
-                              stdin=subprocess.DEVNULL, timeout=TOOL_TIMEOUT_S)
-    except subprocess.TimeoutExpired as exc:
-        raise ValueError("ssh-keygen 签名超时（%d s 未返回；修复指引：确认私钥可用、不带交互口令，"
-                         "或改用 --key-file 的 hmac 级）" % TOOL_TIMEOUT_S) from exc
-    if proc.returncode != 0:
-        raise ValueError("ssh-keygen 签名失败：%s"
-                         % (proc.stderr or proc.stdout).strip()[:200])
+    payload_path = _write_ssh_payload(subject_digest, base)
+    _run_ssh_sign(key_path, ns, payload_path)
     sig = payload_path + ".sig"
     if not os.path.isfile(sig):
         raise ValueError("ssh-keygen 未产出签名文件（修复指引：检查 ssh-keygen 版本 ≥8.9）")
-    pub = key_path + ".pub"
-    fingerprint = ""
-    if os.path.isfile(pub):
-        fp = None
-        try:
-            fp = subprocess.run([_which("ssh-keygen", "ssh-sig 指纹"), "-lf", pub],  # nosec B404/B603/B607 —— 调用 ssh-keygen/git/hf（argv 列表、无 shell、路径经 which 解析）
-                                capture_output=True, text=True, timeout=TOOL_TIMEOUT_S)
-        except subprocess.TimeoutExpired:
-            # 指纹是**信息字段**（签名本体已产出并可分发）：超时即留空，不因它拖挂整条签名
-            # 流程——但也不假装取到了（字段留空本身即如实表达「未取到」）。
-            fp = None
-        if fp is not None and fp.returncode == 0 and fp.stdout.split():
-            fingerprint = fp.stdout.split()[1]
+    fingerprint = _ssh_fingerprint(key_path + ".pub")
     return {"scheme": SCHEME_SSH, "ns": ns, "identity": identity.strip(),
             "sig_file": sig, "fingerprint": fingerprint,
             "payload_sha256": _sha256(ssh_payload(subject_digest))}
+
+
+def _ssh_anchor_targets(anchor: Dict[str, Any], allowed_signers: str, identity: str) -> tuple:
+    """→ (sig_file, ns, ident, issues)；issues 非空即不可校验。"""
+    if not allowed_signers or not os.path.isfile(allowed_signers):
+        return "", "", "", ["缺 allowed_signers（修复指引：--ssh-allowed-signers <文件>；"
+                            "格式 `<身份> <公钥>`）"]
+    sig_file = anchor.get("sig_file") or ""
+    if not sig_file or not os.path.isfile(sig_file):
+        return "", "", "", ["缺签名文件实体：%s（修复指引：随锚一并分发 .sig 文件）" % sig_file]
+    ns = str(anchor.get("ns") or SSH_NAMESPACE)
+    ident = identity or str(anchor.get("identity") or "")
+    if not ident:
+        return "", "", "", ["缺验签身份（修复指引：--ssh-identity <principal>）"]
+    return sig_file, ns, ident, []
+
+
+def _run_ssh_verify(exe: str, allowed_signers: str, ident: str, ns: str,
+                    sig_file: str, subject_digest: str):
+    """ssh-keygen -Y verify；超时返回 None。"""
+    try:
+        return subprocess.run([exe, "-Y", "verify", "-f", allowed_signers,  # nosec B404/B603/B607 —— 调用 ssh-keygen/git/hf（argv 列表、无 shell、路径经 which 解析）
+                               "-I", ident, "-n", ns, "-s", sig_file],
+                              input=ssh_payload(subject_digest),
+                              capture_output=True, timeout=TOOL_TIMEOUT_S)
+    except subprocess.TimeoutExpired:
+        return None
 
 
 def verify_ssh_anchor(subject_digest: str, anchor: Dict[str, Any],
@@ -82,33 +124,34 @@ def verify_ssh_anchor(subject_digest: str, anchor: Dict[str, Any],
     """`ssh-keygen -Y verify` 校验 ssh-sig 锚；缺验证器/缺 allowed_signers 一律拒绝。"""
     if not have_external_verifier("ssh-keygen"):
         return False, ["缺 ssh-keygen → ssh-sig 锚不可校验（fail-closed）"]
-    if not allowed_signers or not os.path.isfile(allowed_signers):
-        return False, ["缺 allowed_signers（修复指引：--ssh-allowed-signers <文件>；"
-                       "格式 `<身份> <公钥>`）"]
-    sig_file = anchor.get("sig_file") or ""
-    if not sig_file or not os.path.isfile(sig_file):
-        return False, ["缺签名文件实体：%s（修复指引：随锚一并分发 .sig 文件）" % sig_file]
-    ns = str(anchor.get("ns") or SSH_NAMESPACE)
-    ident = identity or str(anchor.get("identity") or "")
-    if not ident:
-        return False, ["缺验签身份（修复指引：--ssh-identity <principal>）"]
+    sig_file, ns, ident, bad = _ssh_anchor_targets(anchor, allowed_signers, identity)
+    if bad:
+        return False, bad
     # 注意：必须按**字节**喂 stdin——Windows 文本模式会把 \n 翻成 \r\n，
     # 导致验签载荷与签名时不一致（实测踩过：incorrect signature）。
     try:
         exe = _which("ssh-keygen", "ssh-sig 验签")
     except ValueError as exc:
         return False, [str(exc)]
-    try:
-        proc = subprocess.run([exe, "-Y", "verify", "-f", allowed_signers,  # nosec B404/B603/B607 —— 调用 ssh-keygen/git/hf（argv 列表、无 shell、路径经 which 解析）
-                               "-I", ident, "-n", ns, "-s", sig_file],
-                              input=ssh_payload(subject_digest),
-                              capture_output=True, timeout=TOOL_TIMEOUT_S)
-    except subprocess.TimeoutExpired:
+    proc = _run_ssh_verify(exe, allowed_signers, ident, ns, sig_file, subject_digest)
+    if proc is None:
         return False, ["ssh-sig 校验超时（%d s，ssh-keygen 未返回）→ fail-closed 拒绝"
                        "（修复指引：确认 ssh-keygen 可用后重试）" % TOOL_TIMEOUT_S]
     out = (proc.stderr or proc.stdout or b"").decode("utf-8", "replace").strip()[:200]
     if proc.returncode != 0:
         return False, ["ssh-sig 校验失败：%s" % out]
+    return True, []
+
+
+def _verify_hmac_anchor(subject_digest: str, anchor: Dict[str, Any], key) -> Tuple[bool, List[str]]:
+    """hmac 锚校验：缺密钥/不匹配均拒绝（fail-closed）。"""
+    if key is None:
+        return False, ["锚为 hmac 级但未提供密钥 → 无法校验"
+                       "（修复指引：--key-file <同一密钥>）"]
+    expect = hmac.new(key, (subject_digest or "").strip().lower().encode("utf-8"),
+                      hashlib.sha256).hexdigest()
+    if not hmac.compare_digest(expect, str(anchor.get("mac") or "")):
+        return False, ["hmac 锚不匹配（密钥不符，或内容/摘要已改）"]
     return True, []
 
 
@@ -124,14 +167,8 @@ def verify_digest_anchor(subject_digest: str, anchor: Dict[str, Any],
     if not scheme:
         return False, ["锚缺 scheme（修复指引：nf library attest <编号> --key-file <密钥>）"], "none"
     if scheme == SCHEME_HMAC:
-        if key is None:
-            return False, ["锚为 hmac 级但未提供密钥 → 无法校验"
-                           "（修复指引：--key-file <同一密钥>）"], "hmac-sha256"
-        expect = hmac.new(key, (subject_digest or "").strip().lower().encode("utf-8"),
-                          hashlib.sha256).hexdigest()
-        if not hmac.compare_digest(expect, str(anchor.get("mac") or "")):
-            return False, ["hmac 锚不匹配（密钥不符，或内容/摘要已改）"], "hmac-sha256"
-        return True, [], "hmac-sha256"
+        ok, issues = _verify_hmac_anchor(subject_digest, anchor, key)
+        return ok, issues, "hmac-sha256"
     if scheme == SCHEME_SSH:
         ctx = ssh_ctx or {}
         ok, issues = verify_ssh_anchor(subject_digest, anchor,

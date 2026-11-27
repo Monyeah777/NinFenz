@@ -78,6 +78,30 @@ def frontmatter_issues(fm: Dict[str, Any], decl: Dict[str, Any], *,
     return out
 
 
+def _ref_text(ref, strip_brackets: bool) -> str:
+    """引用原文 → 去空白（可选去方括号）。"""
+    s = str(ref).strip()
+    if not strip_brackets:
+        return s
+    if s.startswith("[") and s.endswith("]"):
+        return s.strip("[]").strip()
+    return s
+
+
+def _ref_issue(r: Path, s: str, checks: set, label: str, allow_adr: bool) -> str:
+    """单条引用 → 问题文案；解析通过返回空串。"""
+    c = _CHECK.match(s)
+    if c:
+        if c.group(1) not in checks:
+            return "%s 指向不存在的 check：%s" % (label, s)
+        return ""
+    if allow_adr and _ADR.match(s):
+        return ""
+    if not (r / s.replace("\\", "/")).exists():
+        return "%s 无法解析：%s" % (label, s)
+    return ""
+
+
 def refs_issues(root: str, refs: Any, checks: set, *, label: str = "引用",
                 allow_adr: bool = False, strip_brackets: bool = False) -> List[str]:
     """引用解析：checkN（须在册）/ 仓库真实件路径 /（可选）ADR-N 放行。
@@ -89,18 +113,9 @@ def refs_issues(root: str, refs: Any, checks: set, *, label: str = "引用",
         refs = [refs]
     r = Path(root)
     for ref in (refs or []):
-        s = str(ref).strip()
-        if strip_brackets and s.startswith("[") and s.endswith("]"):
-            s = s.strip("[]").strip()
-        c = _CHECK.match(s)
-        if c:
-            if c.group(1) not in checks:
-                out.append("%s 指向不存在的 check：%s" % (label, s))
-            continue
-        if allow_adr and _ADR.match(s):
-            continue
-        if not (r / s.replace("\\", "/")).exists():
-            out.append("%s 无法解析：%s" % (label, s))
+        issue = _ref_issue(r, _ref_text(ref, strip_brackets), checks, label, allow_adr)
+        if issue:
+            out.append(issue)
     return out
 
 

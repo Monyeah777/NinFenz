@@ -76,6 +76,31 @@ def _tile_slots(img) -> int:
     return TILE * TILE * 3
 
 
+def _write_tile(px, bits: list, need: int, tx: int, ty: int) -> None:
+    """把一个 TILE×TILE 块的最低位写成 bits[0:need]（块内按行序填）。"""
+    idx = 0
+    for y in range(ty * TILE, (ty + 1) * TILE):
+        for x in range(tx * TILE, (tx + 1) * TILE):
+            r, g, b = px[x, y]
+            for chan, val in enumerate((r, g, b)):
+                if idx >= need:
+                    break
+                bit = bits[idx]
+                val = (val & 0xFE) | bit
+                if chan == 0:
+                    r = val
+                elif chan == 1:
+                    g = val
+                else:
+                    b = val
+                idx += 1
+            px[x, y] = (r, g, b)
+            if idx >= need:
+                break
+        if idx >= need:
+            break
+
+
 def embed(data: bytes, payload: bytes) -> tuple[bytes, dict[str, Any]]:
     """把 payload 冗余写进 PNG 每个 48×48 块的最低位 → (新 PNG 字节, 信息)。"""
     frame = _frame(payload)
@@ -88,27 +113,7 @@ def embed(data: bytes, payload: bytes) -> tuple[bytes, dict[str, Any]]:
     bits = list(_bits(frame))
     for ty in range(rows):
         for tx in range(cols):
-            idx = 0
-            for y in range(ty * TILE, (ty + 1) * TILE):
-                for x in range(tx * TILE, (tx + 1) * TILE):
-                    r, g, b = px[x, y]
-                    for chan, val in enumerate((r, g, b)):
-                        if idx >= need:
-                            break
-                        bit = bits[idx]
-                        val = (val & 0xFE) | bit
-                        if chan == 0:
-                            r = val
-                        elif chan == 1:
-                            g = val
-                        else:
-                            b = val
-                        idx += 1
-                    px[x, y] = (r, g, b)
-                    if idx >= need:
-                        break
-                if idx >= need:
-                    break
+            _write_tile(px, bits, need, tx, ty)
     out = io.BytesIO()
     img.save(out, format="PNG", optimize=True)
     return out.getvalue(), {"schema": SCHEMA, "tile": TILE, "frame_bytes": len(frame),
@@ -116,12 +121,10 @@ def embed(data: bytes, payload: bytes) -> tuple[bytes, dict[str, Any]]:
                             "redundancy": cols * rows, "payload_bytes": len(payload)}
 
 
-def _read_frame_at(px, width: int, height: int, ox: int, oy: int, nbits: int):
-    """按给定网格偏移读 nbits 位并做多数表决 → (frame 或 None, 置信度)。"""
+def _collect_votes(px, width: int, height: int, ox: int, oy: int, nbits: int):
+    """按网格偏移收各块逐位票数 → (votes, 参与的块数)。"""
     cols = (width - ox) // TILE
     rows = (height - oy) // TILE
-    if cols < 2 or rows < 2:
-        return None, 0.0
     votes = [0] * nbits
     total = 0
     for ty in range(rows):
@@ -140,8 +143,11 @@ def _read_frame_at(px, width: int, height: int, ox: int, oy: int, nbits: int):
                 if idx >= nbits:
                     break
             total += 1
-    if total == 0:
-        return None, 0.0
+    return votes, total
+
+
+def _vote_to_frame(votes, total: int):
+    """多数表决 → (frame 字节, 置信度)。"""
     agree = 0
     frame = bytearray()
     cur = 0
@@ -154,6 +160,18 @@ def _read_frame_at(px, width: int, height: int, ox: int, oy: int, nbits: int):
             cur = 0
     conf = agree / float(len(votes) * total) if total else 0.0
     return bytes(frame), conf
+
+
+def _read_frame_at(px, width: int, height: int, ox: int, oy: int, nbits: int):
+    """按给定网格偏移读 nbits 位并做多数表决 → (frame 或 None, 置信度)。"""
+    cols = (width - ox) // TILE
+    rows = (height - oy) // TILE
+    if cols < 2 or rows < 2:
+        return None, 0.0
+    votes, total = _collect_votes(px, width, height, ox, oy, nbits)
+    if total == 0:
+        return None, 0.0
+    return _vote_to_frame(votes, total)
 
 
 def _unpack(frame: bytes):
@@ -241,6 +259,27 @@ def extract(data: bytes) -> dict[str, Any]:
     return res
 
 
+def _best_frame(px, width: int, height: int) -> tuple:
+    """扫全部网格偏移，取置信度最高的可解码帧 → (payload, conf, offset, diff, bits)。"""
+    best = (None, 0.0, None, 0, 0)
+    for oy in range(TILE):
+        for ox in range(TILE):
+            length = _probe_prefix(px, width, height, ox, oy)
+            if length is None:
+                continue
+            nbits = (len(MAGIC) + 2 + length + 4) * 8
+            frame, conf = _read_frame_at(px, width, height, ox, oy, nbits)
+            if frame is None:
+                continue
+            payload = _unpack(frame)
+            if payload is not None and conf > best[1]:
+                # 逐位比较：读出的帧 vs 用同一 payload 重建的帧
+                want = _frame(payload)
+                diff = sum(bin(a ^ b).count("1") for a, b in zip(frame, want, strict=True))
+                best = (payload, conf, (ox, oy), diff, len(want) * 8)
+    return best
+
+
 def extract_with_bits(data: bytes) -> dict[str, Any]:
     """带误码统计的读回：给基准用（BER 是鲁棒性的唯一可同口径指标）。
 
@@ -258,22 +297,7 @@ def extract_with_bits(data: bytes) -> dict[str, Any]:
         return res
     px = img.load()
     width, height = img.size
-    best = (None, 0.0, None, 0, 0)
-    for oy in range(TILE):
-        for ox in range(TILE):
-            length = _probe_prefix(px, width, height, ox, oy)
-            if length is None:
-                continue
-            nbits = (len(MAGIC) + 2 + length + 4) * 8
-            frame, conf = _read_frame_at(px, width, height, ox, oy, nbits)
-            if frame is None:
-                continue
-            payload = _unpack(frame)
-            if payload is not None and conf > best[1]:
-                # 逐位比较：读出的帧 vs 用同一 payload 重建的帧
-                want = _frame(payload)
-                diff = sum(bin(a ^ b).count("1") for a, b in zip(frame, want, strict=True))
-                best = (payload, conf, (ox, oy), diff, len(want) * 8)
+    best = _best_frame(px, width, height)
     if best[0] is None:
         res["issues"].append("读不回转录帧（修复指引：有损变换/缩放会毁掉低位；见鲁棒性基准）")
         return res
@@ -284,17 +308,26 @@ def extract_with_bits(data: bytes) -> dict[str, Any]:
     return res
 
 
+def _frame_item_names(items) -> list:
+    """条目 id/kind → 去重排序的名字列表（跳过空条目）。"""
+    return sorted({str(it.get("id") or it.get("kind") or "") for it in items if it})
+
+
+def _frame_core(ir: dict[str, Any], obj: dict, items: list) -> dict:
+    """水印帧只写关键面（schema/standard/object 摘要/条目名），不写整份 IR。"""
+    digest = str(obj.get("sha256") or obj.get("digest") or "")
+    return {"v": 1, "schema": str(ir.get("schema") or ""),
+            "standard": str(ir.get("standard") or ""),
+            "object_sha256": digest[:32], "level": str(ir.get("level") or ""),
+            "items": _frame_item_names(items)[:8], "items_n": len(items)}
+
+
 def _frame_for_ir(ir: dict[str, Any]) -> bytes:
     """IR → 水印帧：只写关键面（schema/standard/object 摘要/条目名），不写整份 IR。"""
     import json as _json
     obj = ir.get("object") or {}
     items = list(ir.get("explicit") or []) + list(ir.get("implicit") or []) + list(
         ir.get("items") or [])
-    names = sorted({str(it.get("id") or it.get("kind") or "") for it in items if it})
-    digest = str(obj.get("sha256") or obj.get("digest") or "")
-    core = {"v": 1, "schema": str(ir.get("schema") or ""),
-            "standard": str(ir.get("standard") or ""),
-            "object_sha256": digest[:32], "level": str(ir.get("level") or ""),
-            "items": names[:8], "items_n": len(items)}
+    core = _frame_core(ir, obj, items)
     body = _json.dumps(core, sort_keys=True, ensure_ascii=False, separators=(",", ":")).encode()
     return body[:FRAME_MAX]

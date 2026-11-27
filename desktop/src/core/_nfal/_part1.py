@@ -97,6 +97,33 @@ def _io_kinds(text: str) -> Dict[str, str]:
         return {}
 
 
+def _wanted_sets(module_refs) -> tuple:
+    """模块引用 → (限定名集, 裸号集)。"""
+    wanted = {str(x) for x in (module_refs or [])}
+    bare = {x.split(":")[-1] for x in wanted}
+    return wanted, bare
+
+
+def _module_contract(doc) -> Optional[tuple]:
+    """模块文档 → (machine_contract id, io_kinds, outputs)；不可用返回 None。"""
+    try:
+        text = Path(doc).read_text(encoding="utf-8")
+    except OSError:  # 该模块文档读不到 ⇒ 跳过它（不臆造其 outputs；缺件如实少给 token）
+        return None
+    parsed = csc._fence_yaml(text, "machine_contract")
+    mc = parsed.get("machine_contract") if isinstance(parsed, dict) else None
+    if not isinstance(mc, dict):
+        return None
+    return str(mc.get("id") or ""), _io_kinds(text), list(mc.get("outputs") or [])
+
+
+def _token_wanted(mid: str, wanted: set, bare: set) -> bool:
+    """模块是否在本次 token 面范围内（限定名或裸号匹配）。"""
+    if not wanted:
+        return True
+    return mid in wanted or mid.split(":")[-1] in bare
+
+
 def _load_tokens(root: Path, module_refs: Optional[List[str]]) -> Dict[str, str]:
     """token 面 = 模块 machine_contract 的 outputs + io_types。
 
@@ -107,23 +134,16 @@ def _load_tokens(root: Path, module_refs: Optional[List[str]]) -> Dict[str, str]
         from core import conformance_scan as csc
     except Exception:  # noqa: BLE001 —— 围栏解析不可用 ⇒ 无 token 面（如实缺口，不伪造）
         return {}
-    wanted = {str(x) for x in (module_refs or [])}
-    bare = {x.split(":")[-1] for x in wanted}
+    wanted, bare = _wanted_sets(module_refs)
     tokens: Dict[str, str] = {}
     for doc in csc._module_docs(str(root)):
-        try:
-            text = Path(doc).read_text(encoding="utf-8")
-        except OSError:  # 该模块文档读不到 ⇒ 跳过它（不臆造其 outputs；缺件如实少给 token）
+        parsed = _module_contract(doc)
+        if parsed is None:
             continue
-        parsed = csc._fence_yaml(text, "machine_contract")
-        mc = parsed.get("machine_contract") if isinstance(parsed, dict) else None
-        if not isinstance(mc, dict):
+        mid, kinds, outputs = parsed
+        if not _token_wanted(mid, wanted, bare):
             continue
-        mid = str(mc.get("id") or "")
-        if wanted and mid not in wanted and mid.split(":")[-1] not in bare:
-            continue
-        kinds = _io_kinds(text)
-        for tok in mc.get("outputs") or []:
+        for tok in outputs:
             tokens.setdefault(str(tok), str(kinds.get(str(tok)) or "untyped"))
     return tokens
 
@@ -207,11 +227,19 @@ def _infer_cmp(node: Dict[str, Any], lt: str, rt: str, diags: List[Dict[str, Any
     return _rel_result(lt, rt)
 
 
-def _infer_arith(op: str, lt: str, rt: str, pos: int, diags: List[Dict[str, Any]]) -> str:
+def _concat_type(op: str, lt: str, rt: str) -> str:
+    """+ 的字符串/列表拼接类型；不适用返回空串。"""
     if op == "+" and lt == "string" and rt == "string":
         return "string"
     if op == "+" and lt == "list" and rt == "list":
         return "list"
+    return ""
+
+
+def _infer_arith(op: str, lt: str, rt: str, pos: int, diags: List[Dict[str, Any]]) -> str:
+    concat = _concat_type(op, lt, rt)
+    if concat:
+        return concat
     if "unknown" in (lt, rt):
         return "unknown"
     if "untyped" in (lt, rt):

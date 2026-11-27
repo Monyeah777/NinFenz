@@ -27,6 +27,12 @@ def _nonempty(v: Any) -> bool:
     return isinstance(v, str) and bool(v.strip())
 
 
+def _matches_array(value: Any, item_kind: str | None) -> bool:
+    if not isinstance(value, list):
+        return False
+    return item_kind is None or all(_matches(v, item_kind) for v in value)
+
+
 def _matches(value: Any, kind: str, item_kind: str | None = None) -> bool:
     if kind == "integer":
         return isinstance(value, int) and not isinstance(value, bool)
@@ -37,9 +43,7 @@ def _matches(value: Any, kind: str, item_kind: str | None = None) -> bool:
     if kind == "boolean":
         return isinstance(value, bool)
     if kind == "array":
-        if not isinstance(value, list):
-            return False
-        return item_kind is None or all(_matches(v, item_kind) for v in value)
+        return _matches_array(value, item_kind)
     return False
 
 

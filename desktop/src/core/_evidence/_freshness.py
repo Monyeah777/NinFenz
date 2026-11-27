@@ -12,6 +12,30 @@ from ._const import (
 )
 
 
+def _fresh_warnings(res: dict[str, Any], state: str, exp: str) -> None:
+    """非严格档：只 WARN，不动判定。"""
+    if state == "stale":
+        res["warnings"].append(f"吊销表已过期（expires_at={exp}）：未开 "
+                               "--require-fresh-revocations，本次判定不受影响（" + GUIDE +
+                               "需要「新鲜」保证时加上该开关）")
+    else:
+        res["warnings"].append("吊销表未给有效期，无法判新鲜（" + GUIDE +
+                               "签发时加 --expires-at/--ttl；本次判定不受影响）")
+
+
+def _fresh_strict_issues(res: dict[str, Any], state: str, exp: str, now: str) -> None:
+    """严格档：stale / unknown 均定案 invalid 并写具体 issue。"""
+    if state == "stale":
+        res["issues"].append(f"吊销表已过期（expires_at={exp}，判定时点={now}）：无法证明"
+                             "「当前未吊销」（" + GUIDE + "向签发方取 seq 更大的新 feed 重跑；"
+                             "或去掉 --require-fresh-revocations 接受「新鲜度未知」）")
+    else:
+        res["issues"].append("吊销表未给有效期（无 expires_at/ttl）："
+                             "--require-fresh-revocations 下无法证明新鲜（" + GUIDE +
+                             "签发方补 --expires-at 或 --ttl 重签；或去掉开关）")
+    res["verdict"] = "invalid"
+
+
 def _apply_freshness(res: dict[str, Any], require_fresh: bool, at: str,
                      fresh: dict[str, Any]) -> bool:
     """吊销表新鲜度：默认只 WARN；`--require-fresh-revocations` 才把 stale/unknown 定案。
@@ -30,27 +54,38 @@ def _apply_freshness(res: dict[str, Any], require_fresh: bool, at: str,
         return False
     exp = str(fresh.get("expires_at") or "")
     if not require_fresh:
-        if state == "stale":
-            res["warnings"].append(f"吊销表已过期（expires_at={exp}）：未开 "
-                                   "--require-fresh-revocations，本次判定不受影响（" + GUIDE +
-                                   "需要「新鲜」保证时加上该开关）")
-        else:
-            res["warnings"].append("吊销表未给有效期，无法判新鲜（" + GUIDE +
-                                   "签发时加 --expires-at/--ttl；本次判定不受影响）")
+        _fresh_warnings(res, state, exp)
         return False
     now = at or attest.issue_stamp()
-    if state == "stale":
-        res["issues"].append(f"吊销表已过期（expires_at={exp}，判定时点={now}）：无法证明"
-                             "「当前未吊销」（" + GUIDE + "向签发方取 seq 更大的新 feed 重跑；"
-                             "或去掉 --require-fresh-revocations 接受「新鲜度未知」）")
-    else:
-        res["issues"].append("吊销表未给有效期（无 expires_at/ttl）："
-                             "--require-fresh-revocations 下无法证明新鲜（" + GUIDE +
-                             "签发方补 --expires-at 或 --ttl 重签；或去掉开关）")
-    res["verdict"] = "invalid"
+    _fresh_strict_issues(res, state, exp, now)
     return True
 
 
+
+
+def _time_record_ok(record, ts) -> bool:
+    """时间锚记录的 schema 是否匹配。"""
+    return isinstance(record, dict) and str(record.get("schema") or "") == ts.SCHEMA
+
+
+def _bundle_digest(bundle: str, res: dict[str, Any]) -> str | None:
+    """被证证据包的字节摘要；读不到时写 issue 并返回 None。"""
+    from core import timestamp as ts
+    try:
+        with open(bundle, "rb") as fh:
+            return ts.subject_digest(fh.read())
+    except OSError as exc:
+        res["issues"].append(f"读不到证据包：{exc}（{GUIDE}确认路径）")
+        return None
+
+
+def _token_paths(record: dict[str, Any], bundle: str) -> tuple[str, str]:
+    """记录里的 token / query 路径（缺省落在证据包同目录）。"""
+    base = os.path.dirname(os.path.abspath(bundle))
+    record_dir = str(record.get("_dir") or base)
+    token = os.path.join(record_dir, str((record.get("token") or {}).get("path") or ""))
+    query = os.path.join(record_dir, str((record.get("query") or {}).get("path") or ""))
+    return token, query
 
 
 def _apply_time_token(res: dict[str, Any], bundle: str, record: dict[str, Any],
@@ -62,26 +97,20 @@ def _apply_time_token(res: dict[str, Any], bundle: str, record: dict[str, Any],
     我们仍然不知道「现在」的真实时间，只把「已过期」上的时钟依赖换成可验证的锚点。
     """
     from core import timestamp as ts
-    if not isinstance(record, dict) or str(record.get("schema") or "") != ts.SCHEMA:
+    if not _time_record_ok(record, ts):
         res["issues"].append("时间锚记录 schema 不匹配（" + GUIDE
                              + "给 nf-time-token/1 记录 JSON）")
         return None
     subject = record.get("subject") or {}
-    try:
-        with open(bundle, "rb") as fh:
-            want = ts.subject_digest(fh.read())
-    except OSError as exc:
-        res["issues"].append(f"读不到证据包：{exc}（{GUIDE}确认路径）")
+    want = _bundle_digest(bundle, res)
+    if want is None:
         return None
     got = str(subject.get("sha256") or "")
     if got != want:
         res["issues"].append(f"时间锚与被证对象不符（记录={got[:16]} 实测={want[:16]}）"
                              f"（{GUIDE}token 必须盖在同一份字节上——换包必须重新申请）")
         return None
-    base = os.path.dirname(os.path.abspath(bundle))
-    record_dir = str(record.get("_dir") or base)
-    token = os.path.join(record_dir, str((record.get("token") or {}).get("path") or ""))
-    query = os.path.join(record_dir, str((record.get("query") or {}).get("path") or ""))
+    token, query = _token_paths(record, bundle)
     checked = ts.verify(token, query, ca_file=ca_file, untrusted=untrusted)
     if not checked["ok"]:
         res["issues"].extend(["时间锚不可信：" + i for i in checked["issues"]])

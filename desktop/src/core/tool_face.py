@@ -14,6 +14,19 @@ from typing import Any, Dict, List, Tuple
 _ROOT = Path(__file__).resolve().parents[3]
 
 
+def _candidate_issues(c) -> List[str]:
+    """单个候选：对象 / 仓库链接 / license。"""
+    if not isinstance(c, dict):
+        return ["candidate 非对象"]
+    issues = []
+    repo = str(c.get("repo") or "")
+    if not re.match(r"^https?://", repo):
+        issues.append("candidate 缺合法 https 链接")
+    if not str(c.get("license") or "").strip():
+        issues.append("candidate 缺 license（有链接必须有出处）")
+    return issues
+
+
 def validate_entry(entry: Dict[str, Any]) -> List[str]:
     issues = []
     if not isinstance(entry.get("purpose"), str) or not entry["purpose"].strip():
@@ -22,14 +35,7 @@ def validate_entry(entry: Dict[str, Any]) -> List[str]:
     if not isinstance(guidance, dict) or not guidance:
         issues.append("tool_face 条目缺 guidance（指导段是验收硬核）")
     for c in (entry.get("candidates") or []):
-        if not isinstance(c, dict):
-            issues.append("candidate 非对象")
-            continue
-        repo = str(c.get("repo") or "")
-        if not re.match(r"^https?://", repo):
-            issues.append("candidate 缺合法 https 链接")
-        if not str(c.get("license") or "").strip():
-            issues.append("candidate 缺 license（有链接必须有出处）")
+        issues += _candidate_issues(c)
     return issues
 
 

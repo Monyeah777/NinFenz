@@ -101,21 +101,27 @@ def _collect(root: str, registry: Dict[str, Any]) -> Dict[str, List[str]]:
     return out
 
 
+def _stability_row(item: dict, root: str, runs: int, workers: int) -> tuple:
+    """单项重复/并发跑 → (id, 结果行)。"""
+    cid = str(item.get("id"))
+    seq = [_digest_check(cid, root) for _ in range(max(1, runs))]
+    with ThreadPoolExecutor(max_workers=max(1, workers)) as pool:
+        par = list(pool.map(lambda _: _digest_check(cid, root), range(max(1, runs))))
+    digests = seq + par
+    mismatches = sum(1 for d in digests if d != digests[0])
+    return cid, {"id": cid, "name": str(item.get("name")),
+                 "digest": digests[0], "runs": len(digests),
+                 "identical": mismatches == 0, "mismatches": mismatches}
+
+
 def build(root: str = ".") -> Dict[str, Any]:
     reg = load_registry(root)
     runs = int(reg.get("runs") or 5)
     workers = int(reg.get("concurrency") or 4)
     results: Dict[str, Dict[str, Any]] = {}
     for item in reg.get("checks") or []:
-        cid = str(item.get("id"))
-        seq = [_digest_check(cid, root) for _ in range(max(1, runs))]
-        with ThreadPoolExecutor(max_workers=max(1, workers)) as pool:
-            par = list(pool.map(lambda _: _digest_check(cid, root), range(max(1, runs))))
-        digests = seq + par
-        mismatches = sum(1 for d in digests if d != digests[0])
-        results[cid] = {"id": cid, "name": str(item.get("name")),
-                        "digest": digests[0], "runs": len(digests),
-                        "identical": mismatches == 0, "mismatches": mismatches}
+        cid, row = _stability_row(item, root, runs, workers)
+        results[cid] = row
     report = {"schema": REPORT_SCHEMA, "runs": runs, "concurrency": workers,
               "checks": [results[k] for k in sorted(results)],
               "summary": {"checks": len(results),
@@ -132,12 +138,19 @@ render = report_module.render
 write = report_module.writer(REPORT_REL, build)
 
 
-def check(root: str = ".") -> List[str]:
-    issues, committed, live = report_module.start(root, REPORT_REL, build, "稳定性报告与实时重算不一致（修复指引：重跑 write）")
+def _item_issues(committed: dict[str, Any]) -> List[str]:
+    """逐项：重复/并发摘要必须一致。"""
+    issues: List[str] = []
     for item in committed.get("checks") or []:
         if not item.get("identical") or int(item.get("mismatches") or 0) != 0:
             issues.append("%s 重复/并发摘要不一致（%s mismatches）"
                           "（修复指引：查非确定性来源）" % (item.get("id"), item.get("mismatches")))
+    return issues
+
+
+def _declaration_issues(committed: dict[str, Any]) -> List[str]:
+    """summary / scope / claims_boundary 声明面（不得冒充长稳 soak）。"""
+    issues: List[str] = []
     if int((committed.get("summary") or {}).get("mismatches") or 0) != 0:
         issues.append("summary.mismatches 非 0")
     scope = committed.get("scope") or {}
@@ -146,4 +159,11 @@ def check(root: str = ".") -> List[str]:
     boundary = " ".join(str(x) for x in committed.get("claims_boundary") or [])
     if "不是长稳 soak" not in boundary:
         issues.append("claims_boundary 必须写明不是长稳 soak")
+    return issues
+
+
+def check(root: str = ".") -> List[str]:
+    issues, committed, live = report_module.start(root, REPORT_REL, build, "稳定性报告与实时重算不一致（修复指引：重跑 write）")
+    issues += _item_issues(committed)
+    issues += _declaration_issues(committed)
     return issues

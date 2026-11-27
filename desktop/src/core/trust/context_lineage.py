@@ -105,18 +105,9 @@ def tmc_schema_digest_ok(value: Any) -> bool:
         ch in "0123456789abcdef" for ch in value)
 
 
-def verify_lineage(lineage: Any, card: dict | None = None, schema: dict | None = None,
-                   card_schema: dict | None = None, root: str = ".") -> dict:
-    """核验血缘链 + 链头 + 模型卡绑定；返回 {ok, issues, head?, lineage_digest?}。"""
+def _segment_issues(segments: list) -> list:
+    """逐段 seq / prev / digest 链式校验。"""
     issues: list = []
-    if schema is None:
-        schema = load_schema(root)
-    problems = json_schema.json_schema_check(lineage, schema)
-    if problems:
-        return {"ok": False,
-                "issues": [{"code": REASON_LINEAGE_INVALID, "message": problems[0],
-                            "fix": "按 nf-context-lineage/1 修血缘件"}]}
-    segments = lineage.get("segments") or []
     expected_prev = ZERO_DIGEST
     for index, seg in enumerate(segments):
         where = f"segments[{index}]"
@@ -134,6 +125,42 @@ def verify_lineage(lineage: Any, card: dict | None = None, schema: dict | None =
                            "message": f"{where} digest 与内容/前向绑定不符",
                            "fix": "内容或前向被改；按原文重建或拒绝该证据"})
         expected_prev = str(seg.get("digest"))
+    return issues
+
+
+def _card_issues(card: dict, card_schema, root: str, lineage: Any) -> list:
+    """模型卡自身 + 身份 digest + prompt_context_digest 绑定校验。"""
+    issues: list = []
+    card_issues = tmc.validate_card(card, card_schema, root)
+    if card_issues:
+        issues.append({"code": REASON_MODEL_CARD_MISMATCH, "message": card_issues[0],
+                       "fix": "先修模型卡"})
+        return issues
+    if tmc.identity_digest(card) != lineage.get("model_card_digest"):
+        issues.append({"code": REASON_MODEL_CARD_MISMATCH,
+                       "message": "血缘绑定的模型身份（model_digest+评测协议）与所给卡不符",
+                       "fix": "上下文属于另一模型/另一评测协议：视为跨会话复用，拒绝"})
+    prompt = card.get("prompt_context_digest")
+    if prompt and prompt != lineage.get("head"):
+        issues.append({"code": REASON_CONTEXT_DIGEST_MISMATCH,
+                       "message": "模型卡 prompt_context_digest 与血缘链头不符",
+                       "fix": "模型卡须绑定同一上下文链头"})
+    return issues
+
+
+def verify_lineage(lineage: Any, card: dict | None = None, schema: dict | None = None,
+                   card_schema: dict | None = None, root: str = ".") -> dict:
+    """核验血缘链 + 链头 + 模型卡绑定；返回 {ok, issues, head?, lineage_digest?}。"""
+    issues: list = []
+    if schema is None:
+        schema = load_schema(root)
+    problems = json_schema.json_schema_check(lineage, schema)
+    if problems:
+        return {"ok": False,
+                "issues": [{"code": REASON_LINEAGE_INVALID, "message": problems[0],
+                            "fix": "按 nf-context-lineage/1 修血缘件"}]}
+    segments = lineage.get("segments") or []
+    issues = _segment_issues(segments)
     if segments and lineage.get("head") != segments[-1].get("digest"):
         issues.append({"code": REASON_LINEAGE_INVALID, "message": "head 不等于末段 digest",
                        "fix": "重算 head"})
@@ -143,20 +170,7 @@ def verify_lineage(lineage: Any, card: dict | None = None, schema: dict | None =
         issues.append({"code": REASON_LINEAGE_INVALID, "message": "lineage_digest 不符",
                        "fix": "重算 lineage_digest（模型卡/链头/段数任一变化都会变）"})
     if card is not None:
-        card_issues = tmc.validate_card(card, card_schema, root)
-        if card_issues:
-            issues.append({"code": REASON_MODEL_CARD_MISMATCH, "message": card_issues[0],
-                           "fix": "先修模型卡"})
-        else:
-            if tmc.identity_digest(card) != lineage.get("model_card_digest"):
-                issues.append({"code": REASON_MODEL_CARD_MISMATCH,
-                               "message": "血缘绑定的模型身份（model_digest+评测协议）与所给卡不符",
-                               "fix": "上下文属于另一模型/另一评测协议：视为跨会话复用，拒绝"})
-            prompt = card.get("prompt_context_digest")
-            if prompt and prompt != lineage.get("head"):
-                issues.append({"code": REASON_CONTEXT_DIGEST_MISMATCH,
-                               "message": "模型卡 prompt_context_digest 与血缘链头不符",
-                               "fix": "模型卡须绑定同一上下文链头"})
+        issues.extend(_card_issues(card, card_schema, root, lineage))
     return {"ok": not issues, "issues": issues, "head": lineage.get("head"),
             "lineage_digest": digest}
 
@@ -174,6 +188,11 @@ class LineageOptions:
     lineage_schema: dict | None = None
     expected_type: str = AI_EVIDENCE_TYPE
     root: str = '.'
+
+
+def _ref_matches(refs: list, digest: str) -> bool:
+    """引用集里是否有 digest 完全一致的条目。"""
+    return any(str(ref.get("digest")) == digest for ref in refs)
 
 
 def check_context_binding(
@@ -199,12 +218,12 @@ def check_context_binding(
     if not card_refs:
         return {"ok": False, "reason": REASON_CARD_REF_MISSING}
     card_sha = tmc.card_digest(card)
-    if not any(str(ref.get("digest")) == card_sha for ref in card_refs):
+    if not _ref_matches(card_refs, card_sha):
         return {"ok": False, "reason": REASON_CARD_REF_MISMATCH}
     context_refs = _refs(entity, "context")
     if not context_refs:
         return {"ok": False, "reason": REASON_CONTEXT_REF_MISSING}
-    if not any(str(ref.get("digest")) == result["lineage_digest"] for ref in context_refs):
+    if not _ref_matches(context_refs, result["lineage_digest"]):
         return {"ok": False, "reason": REASON_CONTEXT_REF_MISMATCH}
     return {"ok": True, "card_digest": card_sha,
             "lineage_digest": result["lineage_digest"], "head": result["head"]}

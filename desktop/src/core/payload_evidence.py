@@ -37,6 +37,23 @@ def _module_docs(root: str = ".") -> List[Path]:
     return out
 
 
+def _publish_candidates(lines: list, i: int) -> dict:
+    """publish 行 + 其后 3 行窗口 → {event: fields}（非 publish 行给空表）。"""
+    ln = lines[i]
+    if not re.search(r"publish\s*[:：]", ln):
+        return {}
+    window = "\n".join(lines[i:i + 4])
+    m = _BRACE.search(window)
+    if not m:
+        return {}
+    fields = [f for f in _FIELD.findall(m.group(1)) if f not in ("payload",)]
+    out = {}
+    for ev in _FIELD.findall(ln.split("publish", 1)[1])[:3]:
+        if fields and ev not in ("publish",):
+            out[ev] = fields[:12]
+    return out
+
+
 def scan(root: str = ".") -> Dict[str, Any]:
     r = Path(root)
     candidates: Dict[str, List[Dict[str, Any]]] = {}
@@ -47,18 +64,8 @@ def scan(root: str = ".") -> Dict[str, Any]:
             continue
         rel = p.relative_to(r).as_posix()
         for i, ln in enumerate(lines):
-            if not re.search(r"publish\s*[:：]", ln):
-                continue
-            window = "\n".join(lines[i:i + 4])
-            m = _BRACE.search(window)
-            if not m:
-                continue
-            for ev in _FIELD.findall(ln.split("publish", 1)[1])[:3]:
-                fields = [f for f in _FIELD.findall(m.group(1))
-                          if f not in ("payload",)]
-                if fields and ev not in ("publish",):
-                    candidates.setdefault(ev, []).append(
-                        {"source": rel, "fields": fields[:12]})
+            for ev, fields in _publish_candidates(lines, i).items():
+                candidates.setdefault(ev, []).append({"source": rel, "fields": fields})
     for ev in candidates:
         candidates[ev] = candidates[ev][:4]
     return candidates

@@ -26,6 +26,26 @@ AUDIT_DOCS = [
 _CMD = re.compile(r"`([^`\n]{1,160})`")
 
 
+def _step_issue(r: Path, rel: str, code: str, nf_subs: set) -> tuple:
+    """一条 code → (是否计步, issue 文案或空串)。"""
+    if code.startswith("nf "):
+        sub = code.split()[1]
+        if sub not in nf_subs:
+            return 1, "%s: 引用未知子命令 nf %s" % (rel, sub)
+        return 1, ""
+    if code.startswith("python scripts/"):
+        fname = code.split()[1].lstrip("./")
+        if not (r / fname).exists():
+            return 1, "%s: 引用脚本不存在 %s" % (rel, fname)
+        return 1, ""
+    if (re.search(r"(?:community|docs|protocol|03_管线库)/", code)
+            and code.endswith((".md", ".json", ".yaml"))):
+        if not (r / code).exists():
+            return 1, "%s: 引用路径不存在 %s" % (rel, code)
+        return 1, ""
+    return 0, ""
+
+
 def scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     r = Path(root)
     issues: List[str] = []
@@ -44,20 +64,8 @@ def scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
             continue
         text = csc.read_text_cached(path)
         for m in _CMD.finditer(text):
-            code = m.group(1).strip()
-            if code.startswith("nf "):
-                steps += 1
-                sub = code.split()[1]
-                if sub not in nf_subs:
-                    issues.append("%s: 引用未知子命令 nf %s" % (rel, sub))
-            elif code.startswith("python scripts/"):
-                steps += 1
-                fname = code.split()[1].lstrip("./")
-                if not (r / fname).exists():
-                    issues.append("%s: 引用脚本不存在 %s" % (rel, fname))
-            elif re.search(r"(?:community|docs|protocol|03_管线库)/", code) and \
-                    code.endswith((".md", ".json", ".yaml")):
-                steps += 1
-                if not (r / code).exists():
-                    issues.append("%s: 引用路径不存在 %s" % (rel, code))
+            steps_delta, issue = _step_issue(r, rel, m.group(1).strip(), nf_subs)
+            steps += steps_delta
+            if issue:
+                issues.append(issue)
     return issues, {"docs": len(AUDIT_DOCS), "steps": steps}

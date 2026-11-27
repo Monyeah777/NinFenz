@@ -222,22 +222,18 @@ def build_index(root: str = ".", rows: Optional[List[Dict[str, Any]]] = None
     return idx
 
 
-def search(query: str, root: str = ".", limit: int = 10) -> List[Dict[str, Any]]:
-    """关键词检索（标题/描述/标签/正文），返回按分排序的结果。
-
-    效率（真缺陷修复，规模回归实测）：原实现用
-    `next(e for e in entries(root) if e["id"] == eid)` 在**每条命中**上再读一遍全量条目，
-    300 件馆藏时 **310 次全量**、**93,000 次读盘 / 24.7 s**——典型 O(n²)。现在全量条目
-    只读一次，按 id 取用。
-    """
-    rows = entries(root)
-    by_id = {e["id"]: e for e in rows}
-    idx = build_index(root, rows=rows)
+def _keyword_scores(idx: dict, query: str) -> Dict[str, int]:
+    """token 索引 → id → 加权和。"""
     scores: Dict[str, int] = {}
-    q_low = query.strip().lower()
     for tok in set(_tokens(query)):
         for eid, w in (idx.get(tok) or {}).items():
             scores[eid] = scores.get(eid, 0) + w
+    return scores
+
+
+def _search_results(scores: Dict[str, int], by_id: Dict[str, Any], rows: List[Any],
+                    q_low: str, limit: int) -> List[Dict[str, Any]]:
+    """裸子串兜底 +2 → 按分排序输出结果行；索引幽灵 id 跳过。"""
     for e in rows:  # 裸子串兜底（"雨天走廊" 这类跨 token 串）
         if q_low and q_low in (e["text"] or "").lower():
             scores[e["id"]] = scores.get(e["id"], 0) + 2
@@ -255,17 +251,24 @@ def search(query: str, root: str = ".", limit: int = 10) -> List[Dict[str, Any]]
     return out[:limit]
 
 
+def search(query: str, root: str = ".", limit: int = 10) -> List[Dict[str, Any]]:
+    """关键词检索（标题/描述/标签/正文），返回按分排序的结果。
+
+    效率（真缺陷修复，规模回归实测）：原实现用
+    `next(e for e in entries(root) if e["id"] == eid)` 在**每条命中**上再读一遍全量条目，
+    300 件馆藏时 **310 次全量**、**93,000 次读盘 / 24.7 s**——典型 O(n²)。现在全量条目
+    只读一次，按 id 取用。
+    """
+    rows = entries(root)
+    by_id = {e["id"]: e for e in rows}
+    idx = build_index(root, rows=rows)
+    scores = _keyword_scores(idx, query)
+    return _search_results(scores, by_id, rows, query.strip().lower(), limit)
+
+
 # ------------------------------------------------------- 生命周期（写面）
-def _rewrite_frontmatter(path: str, updates: Dict[str, Optional[str]]) -> None:
-    """就地改 frontmatter 指定键（值 None = 删除该键）；正文与其余键原样保留。"""
-    with open(path, encoding="utf-8") as fh:
-        lines = fh.read().splitlines()
-    if not lines or lines[0].strip() != "---":
-        raise ValueError("%s 缺 frontmatter，无法流转生命周期" % path)
-    end = next((i for i in range(1, len(lines)) if lines[i].strip() == "---"), None)
-    if end is None:
-        raise ValueError("%s frontmatter 未闭合" % path)
-    head, body = lines[1:end], lines[end:]
+def _updated_head(head: list, updates: Dict[str, Optional[str]]) -> tuple:
+    """头部行按 updates 改写 → (新行, 已处理键集)。"""
     done = set()
     out = []
     for ln in head:
@@ -277,7 +280,25 @@ def _rewrite_frontmatter(path: str, updates: Dict[str, Optional[str]]) -> None:
                 out.append("%s: %s" % (key, val))
             continue
         out.append(ln)
-    for key, val in updates.items():
-        if key not in done and val is not None:
-            out.append("%s: %s" % (key, val))
+    return out, done
+
+
+def _new_keys(updates: Dict[str, Optional[str]], done: set) -> list:
+    """声明里新增但头里没有的键（None = 删除，不补）。"""
+    return ["%s: %s" % (key, val) for key, val in updates.items()
+            if key not in done and val is not None]
+
+
+def _rewrite_frontmatter(path: str, updates: Dict[str, Optional[str]]) -> None:
+    """就地改 frontmatter 指定键（值 None = 删除该键）；正文与其余键原样保留。"""
+    with open(path, encoding="utf-8") as fh:
+        lines = fh.read().splitlines()
+    if not lines or lines[0].strip() != "---":
+        raise ValueError("%s 缺 frontmatter，无法流转生命周期" % path)
+    end = next((i for i in range(1, len(lines)) if lines[i].strip() == "---"), None)
+    if end is None:
+        raise ValueError("%s frontmatter 未闭合" % path)
+    head, body = lines[1:end], lines[end:]
+    out, done = _updated_head(head, updates)
+    out += _new_keys(updates, done)
     atomic_write.write_text(path, "\n".join(["---"] + out + body) + "\n")

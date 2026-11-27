@@ -30,6 +30,21 @@ def _slug(name: str) -> str:
     return s.lower()
 
 
+def _extra_rule_lines(extra_modules):
+    yield "## 附加规则"
+    for m in extra_modules:
+        yield f"### {m.full_id} · {m.name}"
+        yield m.content or "（无正文）"
+
+
+def _asset_ref_lines(asset_refs):
+    yield "## 资产引用"
+    for k, v in asset_refs.items():
+        if v is None:
+            continue
+        yield f"### {k}\n\n{v}"
+
+
 def _agents_parts(ir: IRDocument):
     """project_rules IR → AGENTS.md 片段流（顶层不拼整篇）。"""
     yield "# Agent Operating Rules"
@@ -40,16 +55,9 @@ def _agents_parts(ir: IRDocument):
             yield f"### {m.full_id} · {m.name}"
             yield m.content or "（无正文）"
     if ir.extra_modules:
-        yield "## 附加规则"
-        for m in ir.extra_modules:
-            yield f"### {m.full_id} · {m.name}"
-            yield m.content or "（无正文）"
+        yield from _extra_rule_lines(ir.extra_modules)
     if ir.asset_refs:
-        yield "## 资产引用"
-        for k, v in ir.asset_refs.items():
-            if v is None:
-                continue
-            yield f"### {k}\n\n{v}"
+        yield from _asset_ref_lines(ir.asset_refs)
 
 
 def _append_once(values, value: str) -> None:

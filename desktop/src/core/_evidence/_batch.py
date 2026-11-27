@@ -28,6 +28,19 @@ from ._verify_forms import (
 )
 
 
+def _picked_files(target: str) -> list[str]:
+    """目录下可取验的文件（*.zip / *.json，按名排序，只取常规文件）。"""
+    picked = []
+    for name in sorted(os.listdir(target)):
+        full = os.path.join(target, name)
+        if not os.path.isfile(full):
+            continue
+        low = name.lower()
+        if low.endswith(".zip") or low.endswith(".json"):
+            picked.append(full)
+    return picked
+
+
 def batch_paths(target: str, max_files: int = BATCH_MAX_FILES) -> list[str]:
     """批处理目标 → 待验文件列表（纯函数，便于单测）。
 
@@ -42,14 +55,7 @@ def batch_paths(target: str, max_files: int = BATCH_MAX_FILES) -> list[str]:
     if not os.path.isdir(target):
         raise ValueError(f"批处理目标不存在：{target}（修复指引：确认路径；目录形式只取其中的 "
                          "*.zip 与 *.json）")
-    picked = []
-    for name in sorted(os.listdir(target)):
-        full = os.path.join(target, name)
-        if not os.path.isfile(full):
-            continue
-        low = name.lower()
-        if low.endswith(".zip") or low.endswith(".json"):
-            picked.append(full)
+    picked = _picked_files(target)
     if not picked:
         raise ValueError(f"目录里没有可验件：{target}（修复指引：只取 *.zip 与 *.json；"
                          "先 nf evidence pack 产出证据包）")
@@ -181,6 +187,21 @@ def verify_any(path: str, opts: BatchVerifyOptions | None = None) -> dict[str, A
 
 
 
+def _base_dir(root, path: str) -> str:
+    """显式 root 优先；否则用文件所在目录（再退当前目录）。"""
+    return root or os.path.dirname(os.path.abspath(path)) or "."
+
+
+def _is_receipts(schema: str, kind) -> bool:
+    """schema 与显式 kind 都指向 receipts 形态。"""
+    return schema == RECEIPTS_SCHEMA and (not kind or kind == "receipts")
+
+
+def _is_attest(schema: str, kind) -> bool:
+    """schema 与显式 kind 都指向 attest 形态。"""
+    return schema in (ATTEST_SCHEMA, ATTEST_SET_SCHEMA) and (not kind or kind == "attest")
+
+
 def _verify_single_json(path: str, opts: BatchVerifyOptions) -> dict[str, Any]:
     key = opts.key
     revocations = opts.revocations
@@ -198,11 +219,10 @@ def _verify_single_json(path: str, opts: BatchVerifyOptions) -> dict[str, Any]:
     if not isinstance(doc, dict):
         raise ValueError(f"证据文档不是对象：{path}（{GUIDE}请给带 schema 字段的证据 JSON）")
     schema = str(doc.get("schema") or "")
-    base = root or os.path.dirname(os.path.abspath(path)) or "."
-    read = _dir_read(base)
-    if schema == RECEIPTS_SCHEMA and (not kind or kind == "receipts"):
+    read = _dir_read(_base_dir(root, path))
+    if _is_receipts(schema, kind):
         return _verify_receipts(doc, read, revocations, require_fresh_revocations, at)
-    if schema in (ATTEST_SCHEMA, ATTEST_SET_SCHEMA) and (not kind or kind == "attest"):
+    if _is_attest(schema, kind):
         return _verify_attest(doc, read, key, revocations, at, require_fresh_revocations)
     raise ValueError(f"认不出证据形态：{path}（schema={schema or '缺失'}）"
                      "（修复指引：请对照支持的四种——nf-evidence/1 容器、nf-receipts/1、"

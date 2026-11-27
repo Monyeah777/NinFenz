@@ -32,22 +32,28 @@ def _head_lines(text: str, n: int = 8) -> List[str]:
     return text.splitlines()[:n]
 
 
-def lint_rules(path: str, text: str, root: str = ".") -> List[Dict[str, str]]:
-    """给出该文件**可自动修**的问题（与 doc_hygiene 判据同源，不另造标准）。"""
-    out: List[Dict[str, str]] = []
-    rel = os.path.relpath(os.path.abspath(path),
-                          os.path.abspath(root)).replace("\\", "/")
+def _doc_flags(rel: str) -> tuple:
+    """该文件是否在「必带最后更新」/「必带指令标识」清单里。"""
     try:
         from core import doc_hygiene as dh
-        required = rel in dh.REQUIRED_DOCS
-        instruction = rel in dh.INSTRUCTION_DOCS
+        return rel in dh.REQUIRED_DOCS, rel in dh.INSTRUCTION_DOCS
     except Exception:
-        required = instruction = False
-    head = _head_lines(text)
+        return False, False
+
+
+def _marker_rule_issues(required: bool, instruction: bool, head: list) -> List[Dict[str, str]]:
+    """last_updated / instruction_mark 两条可修规则。"""
+    out: List[Dict[str, str]] = []
     if required and not any(ln.startswith(LAST_UPDATED_PREFIX) for ln in head):
         out.append({"rule": "last_updated", "message": "缺「最后更新」位（头部 8 行内）"})
     if instruction and not any(INSTRUCTION_MARK in ln for ln in head):
         out.append({"rule": "instruction_mark", "message": "指令档缺「⛔ 操作指令」标识"})
+    return out
+
+
+def _text_shape_issues(text: str) -> List[Dict[str, str]]:
+    """行尾空白 / 末尾换行两条可修规则。"""
+    out: List[Dict[str, str]] = []
     if any(ln != ln.rstrip() for ln in text.splitlines()):
         out.append({"rule": "trailing_ws", "message": "存在行尾空白"})
     if text and not text.endswith("\n"):
@@ -55,22 +61,44 @@ def lint_rules(path: str, text: str, root: str = ".") -> List[Dict[str, str]]:
     return out
 
 
-def apply_rules(text: str, rules, today: str = "") -> str:
-    """按规则顺序机械改写文本（纯函数，便于单测）。"""
-    applied = set(rules)
+def lint_rules(path: str, text: str, root: str = ".") -> List[Dict[str, str]]:
+    """给出该文件**可自动修**的问题（与 doc_hygiene 判据同源，不另造标准）。"""
+    out: List[Dict[str, str]] = []
+    rel = os.path.relpath(os.path.abspath(path),
+                          os.path.abspath(root)).replace("\\", "/")
+    required, instruction = _doc_flags(rel)
+    head = _head_lines(text)
+    return (_marker_rule_issues(required, instruction, head)
+            + _text_shape_issues(text))
+
+
+def _normalize_whitespace(text: str, applied: set) -> str:
+    """行尾空白 / 末尾换行两条机械修（先统一换行符）。"""
     out = text.replace("\r\n", "\n").replace("\r", "\n")
     if "trailing_ws" in applied:
         out = "\n".join(ln.rstrip() for ln in out.split("\n"))
     if "final_newline" in applied and out and not out.endswith("\n"):
         out += "\n"
-    lines = out.split("\n")
-    head = lines[:8]
+    return out
+
+
+def _head_insertions(applied: set, head: list, today: str) -> list:
+    """需要插到头部的标识行（指令标识 / 最后更新）。"""
     needs = []
     if "instruction_mark" in applied and not any(INSTRUCTION_MARK in ln for ln in head):
         needs.append(INSTRUCTION_LINE)
     if "last_updated" in applied and not any(ln.startswith(LAST_UPDATED_PREFIX)
                                              for ln in head):
         needs.append(LAST_UPDATED_PREFIX + (today or _date.today().isoformat()))  # noqa: DTZ011 - 本地日历日期是有意语义（UTC 会在跨零点给出错误「今天」）
+    return needs
+
+
+def apply_rules(text: str, rules, today: str = "") -> str:
+    """按规则顺序机械改写文本（纯函数，便于单测）。"""
+    applied = set(rules)
+    out = _normalize_whitespace(text, applied)
+    lines = out.split("\n")
+    needs = _head_insertions(applied, lines[:8], today)
     if needs:
         insert_at = 1 if lines and lines[0].startswith("#") else 0
         lines[insert_at:insert_at] = needs

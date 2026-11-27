@@ -46,6 +46,14 @@ def redact(text: str) -> str:
     return secret_guard.redact(result)
 
 
+def _paths_of(target: Path) -> List[Path]:
+    if target.is_file():
+        return [target]
+    if target.is_dir():
+        return sorted(target.rglob("*"))
+    return []
+
+
 def scan_paths(root: str, rels: Iterable[str]) -> Dict[str, Any]:
     """扫声明面 → {findings: [{path,kind}], skipped: [path...], scanned: n}。
 
@@ -58,7 +66,7 @@ def scan_paths(root: str, rels: Iterable[str]) -> Dict[str, Any]:
     base = Path(root)
     for rel in rels:
         target = base / rel
-        paths = [target] if target.is_file() else sorted(target.rglob("*")) if target.is_dir() else []
+        paths = _paths_of(target)
         if not target.exists():
             skipped.append(str(rel) + "（不在场）")
             continue

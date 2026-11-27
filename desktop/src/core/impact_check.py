@@ -42,6 +42,37 @@ def _pkg_map(registry: Any) -> Dict[str, dict]:
     return out
 
 
+def _dup_module_ids(pid: str, p) -> List[str]:
+    """③ 同包 module_ids 裸号重复（含限定/裸号并存 = 寻址歧义）。"""
+    issues: List[str] = []
+    seen: Dict[str, str] = {}
+    for raw in p.get("module_ids") or []:
+        n = _norm(raw)
+        if n in seen:
+            issues.append(f"③{pid} module_ids 裸号重复（寻址歧义）: "
+                          f"{seen[n]} 与 {raw} 同为 {n}")
+        else:
+            seen[n] = raw
+    return issues
+
+
+def _reference_issues(pid: str, p, pkgs) -> List[str]:
+    """①② references 目标闭合（源包在册 + module_id 在源包在列）。"""
+    issues: List[str] = []
+    for r in p.get("references") or []:
+        sp = r.get("source_package")
+        if sp not in pkgs:
+            issues.append(f"①②{pid} references.source_package 不在 registry "
+                          f"protocols[] 在册: {sp!r}")
+            continue
+        src_mids = {_norm(m) for m in (pkgs[sp].get("module_ids") or [])}
+        mid = _norm(r.get("module_id"))
+        if mid not in src_mids:
+            issues.append(f"②{pid} references.module_id 不在源包 {sp} "
+                          f"module_ids 在列: {r.get('module_id')!r}")
+    return issues
+
+
 def registry_integrity_issues(registry: Any) -> List[str]:
     """registry 引用图闭合断言（A4/check21）：返回问题清单，空 = 自洽 PASS。
 
@@ -53,26 +84,9 @@ def registry_integrity_issues(registry: Any) -> List[str]:
     for p in registry.protocols or []:
         pid = p.get("id") or "<匿名>"
         # ③ 同包 module_ids 裸号重复（含限定/裸号并存 = 寻址歧义）
-        seen: Dict[str, str] = {}
-        for raw in p.get("module_ids") or []:
-            n = _norm(raw)
-            if n in seen:
-                issues.append(f"③{pid} module_ids 裸号重复（寻址歧义）: "
-                              f"{seen[n]} 与 {raw} 同为 {n}")
-            else:
-                seen[n] = raw
+        issues += _dup_module_ids(pid, p)
         # ①② references 目标闭合
-        for r in p.get("references") or []:
-            sp = r.get("source_package")
-            if sp not in pkgs:
-                issues.append(f"①②{pid} references.source_package 不在 registry "
-                              f"protocols[] 在册: {sp!r}")
-                continue
-            src_mids = {_norm(m) for m in (pkgs[sp].get("module_ids") or [])}
-            mid = _norm(r.get("module_id"))
-            if mid not in src_mids:
-                issues.append(f"②{pid} references.module_id 不在源包 {sp} "
-                              f"module_ids 在列: {r.get('module_id')!r}")
+        issues += _reference_issues(pid, p, pkgs)
     # 官方 modules 层：references 可指向官方核心？——registry 语义中 references 源包
     # 均为 community 包（protocols[]），官方核心模块不经 references 装配（P01 官方
     # 空层 optional 自行装载）。故 modules[] 不参与引用闭合；其完整性由 check14/20 承载。
@@ -168,6 +182,15 @@ def check_registry(path: Optional[str] = None) -> List[str]:
     return registry_integrity_issues(reg)
 
 
+def _module_exists(registry: Any, n: str) -> bool:
+    """裸号归一后是否真实存在（官方 core 或某包 module_ids）。"""
+    if any(_norm(m.get("id")) == n for m in (registry.modules or [])):
+        return True
+    return any(
+        n in {_norm(m) for m in (p.get("module_ids") or [])}
+        for p in (registry.protocols or []))
+
+
 def impact_of_change(registry: Any, target: str) -> Dict[str, Any]:
     """统一变更影响面入口：自动判别 target 是 protocol id 还是 module id。
 
@@ -180,11 +203,7 @@ def impact_of_change(registry: Any, target: str) -> Dict[str, Any]:
     if in_protocols:
         return removal_impact_protocol(registry, target)
     # module 判别：裸号归一后须真实存在（官方 core 或某包 module_ids）才往下走
-    n = _norm(target)
-    exists = any(_norm(m.get("id")) == n for m in (registry.modules or [])) or any(
-        n in {_norm(m) for m in (p.get("module_ids") or [])}
-        for p in (registry.protocols or []))
-    if exists:
+    if _module_exists(registry, _norm(target)):
         return removal_impact(registry, target)
     return {"target": target, "error": f"registry 无该目标（protocol/module 均 miss）: {target!r}"}
 

@@ -49,19 +49,28 @@ def is_writer(text: str) -> bool:
     return WRITER_PUSH in text
 
 
+def _missing_concurrency(rel: str, writer: bool) -> tuple:
+    """缺 concurrency 段的单条 issue（写入型记 ? 组名，非写者记空串）。"""
+    hint = ("group: ${ github.workflow }-${ github.ref } + cancel-in-progress: true；"
+            "写入型用固定组 + false")
+    return ([rel + " 缺 concurrency 并发分组（修复指引：push/PR 型用 " + hint + "）"],
+            "?" if writer else "")
+
+
+def _captured(pattern, text: str) -> str:
+    """首个捕获组；无匹配返回空串。"""
+    m = pattern.search(text)
+    return m.group(1) if m else ""
+
+
 def _concurrency_issues(rel: str, text: str) -> tuple:
     """判据 1 → (issues, 写入型并发组名；非写者返回空串)。"""
     writer = is_writer(text)
     if not re.search(r"^concurrency:", text, re.M):
-        hint = ("group: ${ github.workflow }-${ github.ref } + cancel-in-progress: true；"
-                "写入型用固定组 + false")
-        return ([rel + " 缺 concurrency 并发分组（修复指引：push/PR 型用 " + hint + "）"],
-                "?" if writer else "")
+        return _missing_concurrency(rel, writer)
     out: list = []
-    m = CONC_CANCEL_RE.search(text)
-    cancel = m.group(1) if m else ""
-    g = CONC_GROUP_RE.search(text)
-    group = g.group(1).strip() if g else ""
+    cancel = _captured(CONC_CANCEL_RE, text)
+    group = _captured(CONC_GROUP_RE, text).strip()
     if not cancel:
         out.append(f"{rel} 的 concurrency 缺 cancel-in-progress（修复指引：显式 true/false，"
                    f"不要留给默认）")

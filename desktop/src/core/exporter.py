@@ -49,6 +49,15 @@ class ExportResult:
 
 
 # ------------------------------------------------------------------ 适配器
+def _unmapped_narratives(ir: IRDocument, entries) -> List[str]:
+    """叙事层模块里未进 world 条目的 full_id（映射不得静默丢弃不变量）。"""
+    narrative = [m.full_id for l in ir.layers if l.id not in ("P00", "P80")
+                 for m in l.modules]
+    mapped = {k for e in entries for k in (e.get("keys") or [])}
+    return [f for f in narrative if f not in mapped
+            and f not in "".join(mapped)]
+
+
 def _export_ccv3(ir: IRDocument, dest_dir: Path, res: ExportResult) -> None:
     from .ccv3_adapter import map_ir_to_ccv3, world_entries
     chara = map_ir_to_ccv3(ir)
@@ -64,11 +73,7 @@ def _export_ccv3(ir: IRDocument, dest_dir: Path, res: ExportResult) -> None:
     atomic_write.write_text(world_path, json.dumps(world, ensure_ascii=False, indent=2))
     res.files.extend([str(chara_path), str(world_path)])
     # 未映射检查（映射不静默丢弃不变量）：IR 叙事层模块应全部进 world
-    narrative = [m.full_id for l in ir.layers if l.id not in ("P00", "P80")
-                 for m in l.modules]
-    mapped = {k for e in world["entries"] for k in (e.get("keys") or [])}
-    unmapped = [f for f in narrative if f not in mapped
-                and f not in "".join(mapped)]
+    unmapped = _unmapped_narratives(ir, world["entries"])
     if unmapped:
         res.warnings.append("以下叙事模块未入 world 条目（映射缺口）："
                             + "、".join(unmapped))

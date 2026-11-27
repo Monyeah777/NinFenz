@@ -38,6 +38,13 @@ def candidates(root: str = ".") -> List[str]:
                   if SCAN_DEF.search(p.read_text(encoding="utf-8", errors="replace")))
 
 
+def _text_consumes(text: str, call_re, import_re, quoted_re=None) -> bool:
+    """文本是否「真消费」：属性调用 / from core import NAME，必要时认带引号模块名。"""
+    if call_re.search(text) or import_re.search(text):
+        return True
+    return bool(quoted_re.search(text)) if quoted_re else False
+
+
 def consumers_of(name: str, root: str = ".") -> List[str]:
     """该判据模块被谁消费。
 
@@ -60,16 +67,14 @@ def consumers_of(name: str, root: str = ".") -> List[str]:
         if not p.is_file():
             continue
         text = p.read_text(encoding="utf-8", errors="replace")
-        hit = bool(call_re.search(text) or import_re.search(text))
-        if not hit and rel in registry_files:
-            hit = bool(quoted_re.search(text))
-        if hit:
+        quoted = quoted_re if rel in registry_files else None
+        if _text_consumes(text, call_re, import_re, quoted):
             out.append(rel)
     for p in sorted((r / CORE_DIR).glob("*.py")):
         if p.stem == name:
             continue
         text = p.read_text(encoding="utf-8", errors="replace")
-        if call_re.search(text) or import_re.search(text):
+        if _text_consumes(text, call_re, import_re):
             out.append("%s/%s" % (CORE_DIR, p.name))
     return sorted(set(out))
 

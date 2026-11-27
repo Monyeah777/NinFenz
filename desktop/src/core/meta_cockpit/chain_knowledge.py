@@ -125,61 +125,70 @@ def validate_def(name: str, payload: dict) -> bool:
     return not list(jsonschema.Draft202012Validator(sub).iter_errors(payload))
 
 
+def _no_cycle(u: str, adj: dict, color: dict) -> bool:
+    """DFS 三色染色：遇回边返回 False（图有环）。"""
+    color[u] = 1
+    for v in adj[u]:
+        if color[v] == 1 or (color[v] == 0 and not _no_cycle(v, adj, color)):
+            return False
+    color[u] = 2
+    return True
+
+
 def acyclic(nodes: list[str], edges: list[dict]) -> bool:
     adj = {n: [] for n in nodes}
     for e in edges:
         if e["from"] in adj and e["to"] in adj:
             adj[e["from"]].append(e["to"])
     color = dict.fromkeys(nodes, 0)
+    return all(_no_cycle(n, adj, color) for n in nodes if color[n] == 0)
 
-    def dfs(u: str) -> bool:
-        color[u] = 1
-        for v in adj[u]:
-            if color[v] == 1 or (color[v] == 0 and not dfs(v)):
-                return False
-        color[u] = 2
-        return True
 
-    return all(dfs(n) for n in nodes if color[n] == 0)
+def _valid_edges(nodes: list[str], edges: list[dict]) -> list[tuple]:
+    """两跳到两端都在 nodes 里的边。"""
+    return [(e["from"], e["to"]) for e in edges if e["from"] in nodes and e["to"] in nodes]
+
+
+def _collect_reachable(u: str, adj: dict, seen: set) -> None:
+    """收集从 u 可达的节点到 seen（roots 覆盖统计用）。"""
+    if u in seen:
+        return
+    seen.add(u)
+    for v in adj[u]:
+        _collect_reachable(v, adj, seen)
 
 
 def root_coverage(nodes: list[str], edges: list[dict]) -> float:
-    valid = [(e["from"], e["to"]) for e in edges if e["from"] in nodes and e["to"] in nodes]
     incoming = dict.fromkeys(nodes, 0)
     adj = {n: [] for n in nodes}
-    for a, b in valid:
+    for a, b in _valid_edges(nodes, edges):
         incoming[b] += 1
         adj[a].append(b)
     roots = [n for n in nodes if incoming[n] == 0]
     seen: set[str] = set()
-
-    def dfs(u: str) -> None:
-        if u in seen:
-            return
-        seen.add(u)
-        for v in adj[u]:
-            dfs(v)
-
     for r in roots:
-        dfs(r)
+        _collect_reachable(r, adj, seen)
     return round(len(seen) / len(nodes), 3) if nodes else 0.0
 
 
-def evaluate(name: str, clusters: dict, abstractions: dict, system: dict, universe=None):
-    universe = list(universe or ALL_CLAIMS)
-    cl = clusters["clusters"]
-    ab = abstractions["abstractions"]
-    nodes, edges = system["nodes"], system["edges"]
+def _membership_metrics(cl: list, universe: list) -> dict:
+    """簇数 + 成员覆盖/唯一/非空（键顺序与原判定面一致）。"""
     members = [m for c in cl for m in c["members"]]
-    cluster_ids = {c["id"] for c in cl}
-    covered_clusters = {s for a in ab for s in a["scope"]} & cluster_ids
-    m = {
+    return {
         "cluster_count": len(cl),
         "member_coverage": round(len(set(members) & set(universe)) / len(universe), 3)
         if universe
         else 0.0,
         "member_uniqueness": frac(universe, lambda c: members.count(c) == 1),
         "cluster_nonempty": frac(cl, lambda c: len(c["members"]) > 0),
+    }
+
+
+def _abstraction_metrics(cl: list, ab: list, nodes: list) -> dict:
+    """抽象覆盖 / 范围联动 / 下降检查 / 证据 / 节点覆盖。"""
+    cluster_ids = {c["id"] for c in cl}
+    covered_clusters = {s for a in ab for s in a["scope"]} & cluster_ids
+    return {
         "abstraction_coverage": round(len(covered_clusters) / len(cluster_ids), 3)
         if cluster_ids
         else 0.0,
@@ -191,10 +200,27 @@ def evaluate(name: str, clusters: dict, abstractions: dict, system: dict, univer
         )
         if ab
         else 0.0,
+    }
+
+
+def _graph_metrics(nodes: list, edges: list) -> dict:
+    """边联动 / 无环 / 根覆盖。"""
+    return {
         "edge_linkage": frac(edges, lambda e: e["from"] in nodes and e["to"] in nodes),
         "acyclic": acyclic(nodes, edges),
         "root_coverage": root_coverage(nodes, edges),
     }
+
+
+def evaluate(name: str, clusters: dict, abstractions: dict, system: dict, universe=None):
+    universe = list(universe or ALL_CLAIMS)
+    cl = clusters["clusters"]
+    ab = abstractions["abstractions"]
+    nodes, edges = system["nodes"], system["edges"]
+    m = {}
+    m.update(_membership_metrics(cl, universe))
+    m.update(_abstraction_metrics(cl, ab, nodes))
+    m.update(_graph_metrics(nodes, edges))
     ok = all(
         [
             m["cluster_count"] >= 2,

@@ -22,6 +22,17 @@ def validate(profile: Dict[str, Any]) -> List[str]:
     return issues
 
 
+def _budget_check(it, keep, max_items: int, used: int, budget: int):
+    """→ (省略原因 or None, 本条成本)。顺序：max_items 先于 token_budget。"""
+    cost = int(it.get("tokens") or 0)
+    if len(keep) >= max_items:
+        return ("超过 max_items=%d" % max_items), cost
+    if used + cost > budget:
+        return ("超过 token_budget=%d（已用 %d，本条 %d）"
+                % (budget, used, cost)), cost
+    return None, cost
+
+
 def select(profile: Dict[str, Any], items: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
     """→ (选中, 省略记账)。确定性：按 priority_order 序稳定过滤；不因预算重排。"""
     order = list(profile.get("priority_order") or [])
@@ -37,13 +48,9 @@ def select(profile: Dict[str, Any], items: List[Dict[str, Any]]) -> Tuple[List[D
         if it.get("type") in exclude:
             dropped.append({"name": name, "reason": "类型被排除：%s" % it.get("type")})
             continue
-        cost = int(it.get("tokens") or 0)
-        if len(keep) >= max_items:
-            dropped.append({"name": name, "reason": "超过 max_items=%d" % max_items})
-            continue
-        if used + cost > budget:
-            dropped.append({"name": name, "reason": "超过 token_budget=%d（已用 %d，本条 %d）"
-                            % (budget, used, cost)})
+        reason, cost = _budget_check(it, keep, max_items, used, budget)
+        if reason is not None:
+            dropped.append({"name": name, "reason": reason})
             continue
         keep.append(it)
         used += cost

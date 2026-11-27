@@ -178,30 +178,30 @@ _MARKER_CACHE: dict = {}
 _MARKER_CACHE_MAX = 16
 
 
-def check_markers(root: str = ".") -> list:
-    """指令标识 + last-updated 位覆盖校验（目标清单内 100%）。
-
-    口径（2026-09-29 改，实测）：① **只读一次**——把「先 `os.path.exists` 判在、再读」合成
-    「直接读、`OSError` 即缺失」（少了 79 次 stat，且读走常驻层）；② 整个函数的结论按**该批文档的
-    **读到的正文**取键缓存——键只用「本函数自己读到的东西」，因此**不新增任何陈旧通道**（它读到什么、
-    就按什么取键；读层本身的语义与改动前完全一致）。判据：既有变异注入用例（改一件必须被抓到）。
-    """
+def _marker_texts(root: str) -> dict:
+    """按清单一次读齐正文（OSError ⇒ None）。"""
     texts = {}
     for rel in REQUIRED_DOCS + INSTRUCTION_DOCS:
         try:
             texts[rel] = csc.read_text_cached(os.path.join(root, rel))
         except OSError:
             texts[rel] = None
+    return texts
+
+
+def _texts_fingerprint(texts: dict) -> str:
+    """该批正文的指纹（键只来自本函数读到的东西）。"""
     h = hashlib.sha256()
     for rel in sorted(texts):
         h.update(rel.encode("utf-8"))
         h.update(b"\x00")
         h.update(b"\xff" if texts[rel] is None else texts[rel].encode("utf-8"))
         h.update(b"\x01")
-    fp = h.hexdigest()
-    hit = _MARKER_CACHE.get(fp)
-    if hit is not None:
-        return list(hit)
+    return h.hexdigest()
+
+
+def _required_doc_issues(texts: dict) -> list:
+    """REQUIRED_DOCS 的 last-updated 位覆盖。"""
     issues = []
     for rel in REQUIRED_DOCS:
         if texts[rel] is None:
@@ -210,12 +210,35 @@ def check_markers(root: str = ".") -> list:
         head = _head_lines(texts[rel])
         if not any(ln.startswith(LAST_UPDATED_PREFIX) for ln in head):
             issues.append("%s 缺「最后更新」位（头部 %d 行内）" % (rel, len(head)))
+    return issues
+
+
+def _instruction_doc_issues(texts: dict) -> list:
+    """INSTRUCTION_DOCS 的指令标识头覆盖。"""
+    issues = []
     for rel in INSTRUCTION_DOCS:
         if texts[rel] is None:
             continue
         head = _head_lines(texts[rel])
         if not any(INSTRUCTION_MARK in ln for ln in head):
             issues.append("%s 缺「⛔ 操作指令」标识头（指令类文档须全覆盖）" % rel)
+    return issues
+
+
+def check_markers(root: str = ".") -> list:
+    """指令标识 + last-updated 位覆盖校验（目标清单内 100%）。
+
+    口径（2026-09-29 改，实测）：① **只读一次**——把「先 `os.path.exists` 判在、再读」合成
+    「直接读、`OSError` 即缺失」（少了 79 次 stat，且读走常驻层）；② 整个函数的结论按**该批文档的
+    **读到的正文**取键缓存——键只用「本函数自己读到的东西」，因此**不新增任何陈旧通道**（它读到什么、
+    就按什么取键；读层本身的语义与改动前完全一致）。判据：既有变异注入用例（改一件必须被抓到）。
+    """
+    texts = _marker_texts(root)
+    fp = _texts_fingerprint(texts)
+    hit = _MARKER_CACHE.get(fp)
+    if hit is not None:
+        return list(hit)
+    issues = _required_doc_issues(texts) + _instruction_doc_issues(texts)
     if len(_MARKER_CACHE) >= _MARKER_CACHE_MAX:
         _MARKER_CACHE.clear()
     _MARKER_CACHE[fp] = list(issues)
@@ -301,6 +324,34 @@ MOJIBAKE_MARKERS = "锛銆鈥鏄鏂鐨涓鍦閫鎶璁缂鐩鍐鍜欏鏈鐢姝涔
 MOJIBAKE_MIN_HITS = 3
 
 
+def _sanity_files(root: str, globs) -> list:
+    """待扫正文清单（去重排序）。"""
+    return sorted({p for g in (globs or TEXT_SANITY_GLOBS)
+                   for p in glob.glob(os.path.join(root, g), recursive=True)})
+
+
+def _rel_for_report(path_: str, root: str) -> str:
+    """报告用相对路径；Windows 跨盘符（CI：D: 工作区 vs C: 临时树）退回原路径。"""
+    if os.path.splitdrive(path_)[0] != os.path.splitdrive(root)[0]:
+        return path_
+    return os.path.relpath(path_, root)
+
+
+def _sanity_line_issues(rel: str, lines: list) -> list:
+    """围栏配平 + mojibake 特征两条 WARN。"""
+    out = []
+    fences = sum(1 for ln in lines if re.match(r"^\s*(```|~~~)", ln))
+    if fences % 2:
+        out.append("WARN: 围栏未配平 %s（标记 %d 个，须为偶数——未配平的正文渲染与"
+                   "按围栏切段的解析都会走偏）" % (rel, fences))
+    bad = sum(1 for ln in lines
+              if sum(1 for ch in ln if ch in MOJIBAKE_MARKERS) >= MOJIBAKE_MIN_HITS)
+    if bad:
+        out.append("WARN: 正文疑似 mojibake %s（%d 行命中编码特征——疑似 UTF-8/GBK 双重转换）"
+                   % (rel, bad))
+    return out
+
+
 def text_sanity(root: str = ".", globs=None) -> list:
     """正文正规性（**WARN 级，存量挂账不判死**）：围栏配平 + mojibake 特征。
 
@@ -313,25 +364,12 @@ def text_sanity(root: str = ".", globs=None) -> list:
     返回 `"WARN: …"` 字符串列表，由调用方决定是否计入 WARN 计数。
     """
     out: list = []
-    files = sorted({p for g in (globs or TEXT_SANITY_GLOBS)
-                    for p in glob.glob(os.path.join(root, g), recursive=True)})
-    for path_ in files:
-        # 报告相对**调用方 root**；Windows 跨盘符（CI：D: 工作区 vs C: 临时树）relpath 会抛 ⇒ 退回原
-        # 路径
-        rel = os.path.relpath(path_,
- root) if os.path.splitdrive(path_)[0] == os.path.splitdrive(root)[0] else path_
+    for path_ in _sanity_files(root, globs):
+        rel = _rel_for_report(path_, root)
         try:
             text = csc.read_text_cached(path_)
         except (OSError, UnicodeDecodeError) as exc:
             out.append("WARN: 正文不可读 %s（%s）" % (rel, exc))
             continue
-        lines = text.splitlines()
-        fences = sum(1 for ln in lines if re.match(r"^\s*(```|~~~)", ln))
-        if fences % 2:
-            out.append("WARN: 围栏未配平 %s（标记 %d 个，须为偶数——未配平的正文渲染与"
-                       "按围栏切段的解析都会走偏）" % (rel, fences))
-        bad = sum(1 for ln in lines if sum(1 for ch in ln if ch in MOJIBAKE_MARKERS) >= MOJIBAKE_MIN_HITS)
-        if bad:
-            out.append("WARN: 正文疑似 mojibake %s（%d 行命中编码特征——疑似 UTF-8/GBK 双重转换）"
-                       % (rel, bad))
+        out += _sanity_line_issues(rel, text.splitlines())
     return out

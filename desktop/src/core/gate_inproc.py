@@ -67,18 +67,24 @@ class _SysShim:
         raise _Exit(code)
 
 
-def extract_heredoc(text: str, num: int) -> tuple[str, str] | None:
-    """取出 checkN 的 heredoc 源码 → (源码, 日志文件名)；没有则 None。
-
-    切法：从 `<<'PYEOF'` 那行之后，到**顶格**的结束标记那行为止，逐字保留。
-    """
-    lines = text.splitlines()
+def _heredoc_lines(lines: list[str], num: int) -> list[str] | None:
+    """checkN() 体 → 行列表（到顶格 `}` 为止）；找不到函数头返回 None。"""
     head = "check%d(){" % num
     i = next((k for k, ln in enumerate(lines) if ln == head), None)
     if i is None:
         return None
     end = next((k for k in range(i + 1, len(lines)) if lines[k] == "}"), len(lines))
-    body = lines[i:end]
+    return lines[i:end]
+
+
+def extract_heredoc(text: str, num: int) -> tuple[str, str] | None:
+    """取出 checkN 的 heredoc 源码 → (源码, 日志文件名)；没有则 None。
+
+    切法：从 `<<'PYEOF'` 那行之后，到**顶格**的结束标记那行为止，逐字保留。
+    """
+    body = _heredoc_lines(text.splitlines(), num)
+    if body is None:
+        return None
     for k, line in enumerate(body):
         m = _HEREDOC_START.match(line)
         if not m:
@@ -196,6 +202,33 @@ BANNER_MARK = "\x00nf-banner\x00"
 _BANNER_IN_BODY = re.compile(r"^\s*echo\s+'== \[[^']*'\s*$", re.M)
 
 
+def _exec_check_body(text: str, glb: dict, root: Path, name: str, out_lines: list) -> int:
+    """切 cwd → exec check 体 → 还原 cwd；返回退出码（子进程替身语义）。"""
+    code = 0
+    old_cwd = os.getcwd()
+    try:
+        os.chdir(str(root))
+    except OSError as exc:       # 尽力而为：切不进去就按当前 cwd 跑，理由落诊断面
+        _CHDIR_FAILURES.append(str(exc))
+    try:
+        # exec-whitelist: 同上，仅执行本仓 verify.sh heredoc。
+        exec(compile(text, "<verify.sh:{}>".format(name), "exec"), glb)
+    except _Exit as e:
+        code = int(e.code)
+    except SystemExit as e:
+        code = int(e.code or 0)
+    except BaseException:
+        import traceback
+        out_lines.append(traceback.format_exc())
+        code = 1
+    finally:
+        try:
+            os.chdir(old_cwd)
+        except OSError as exc:   # 还原失败只记诊断，不覆盖已得出的判定
+            _CHDIR_FAILURES.append(str(exc))
+    return code
+
+
 def run_check_inproc(body: str, root: Path, name: str) -> tuple[int, list[str], str]:
     """在进程内跑**整个 check 体**（含 bash 分支）→ (退出码, PASS 文案列表, 输出)。
 
@@ -252,26 +285,5 @@ def run_check_inproc(body: str, root: Path, name: str) -> tuple[int, list[str], 
         "NFL_TMP": os.environ.get("NFL_TMP", tempfile.gettempdir()),
         "PY3": sys.executable,
     }
-    code = 0
-    old_cwd = os.getcwd()
-    try:
-        os.chdir(str(root))
-    except OSError as exc:       # 尽力而为：切不进去就按当前 cwd 跑，理由落诊断面
-        _CHDIR_FAILURES.append(str(exc))
-    try:
-        # exec-whitelist: 同上，仅执行本仓 verify.sh heredoc。
-        exec(compile(text, "<verify.sh:{}>".format(name), "exec"), glb)
-    except _Exit as e:
-        code = int(e.code)
-    except SystemExit as e:
-        code = int(e.code or 0)
-    except BaseException:
-        import traceback
-        out_lines.append(traceback.format_exc())
-        code = 1
-    finally:
-        try:
-            os.chdir(old_cwd)
-        except OSError as exc:   # 还原失败只记诊断，不覆盖已得出的判定
-            _CHDIR_FAILURES.append(str(exc))
+    code = _exec_check_body(text, glb, root, name, out_lines)
     return code, passes, "\n".join(out_lines)

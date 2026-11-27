@@ -47,40 +47,50 @@ def write(root: str = ".") -> str:
     return PROJECTION_REL
 
 
+def _data_contract_owners(root: str) -> Dict[str, str]:
+    """protocol/data_contracts.json → {artifact: owner}；缺失/坏件返回空表。"""
+    reg: Dict[str, str] = {}
+    p = Path(root) / "protocol/data_contracts.json"
+    if not p.is_file():
+        return reg
+    try:
+        doc = json_doc.load(p, dict, what="protocol/data_contracts.json")
+        for c in doc.get("contracts") or []:
+            if isinstance(c, dict):
+                reg[str(c.get("artifact"))] = str(c.get("owner") or "")
+    except (OSError, ValueError):
+        return {}
+    return reg
+
+
+def _writer_issues(rel: str, entry, reg: Dict[str, str], root: str) -> List[str]:
+    """单写入口：落点件声明 / 在场 / 契约登记 / owner 点名。"""
+    artifact = str(entry.get("artifact") or "") if isinstance(entry, dict) else ""
+    if not artifact:
+        return ["③ 写入口 %s 未声明落点件（修复指引：roles.write_exceptions 的值写成 "
+                "{why, artifact}——写通道必须有契约）" % rel]
+    if not (Path(root) / artifact).is_file():
+        return ["③ 写入口 %s 的落点件不在场：%s（修复指引：改名/补件）" % (rel, artifact)]
+    owner = reg.get(artifact)
+    if owner is None:
+        return ["③ 写入口 %s 的落点件 %s 未在 protocol/data_contracts.json 登记"
+                "（修复指引：补一条契约，owner 点名该模块）" % (rel, artifact)]
+    if Path(rel).name not in owner:
+        return ["③ 写入口 %s 的落点件 %s 已登记，但 owner 未点名该模块（实为 %r）"
+                "（修复指引：owner 写清维护模块）" % (rel, artifact, owner[:40])]
+    return []
+
+
 def _write_channel_issues(root: str, writers: List[str], exc: Dict[str, Any]) -> List[str]:
     """③b 写通道契约化（D3）：写入口必须声明落点件，且该件已在 data_contracts 登记（owner 点名模块）。
 
     「自带写入口」一直是本仓的**成本中心**（实测 10 个）。只登记「有例外」不够——例外要能回答
     「写到哪个件、谁判它、坏了怎么重建」；答不出来就是没人管的写通道。
     """
-    reg: Dict[str, str] = {}
-    p = Path(root) / "protocol/data_contracts.json"
-    if p.is_file():
-        try:
-            doc = json_doc.load(p, dict, what="protocol/data_contracts.json")
-            for c in doc.get("contracts") or []:
-                if isinstance(c, dict):
-                    reg[str(c.get("artifact"))] = str(c.get("owner") or "")
-        except (OSError, ValueError):
-            reg = {}
+    reg = _data_contract_owners(root)
     issues: List[str] = []
     for rel in writers:
-        entry = exc.get(rel)
-        artifact = str(entry.get("artifact") or "") if isinstance(entry, dict) else ""
-        if not artifact:
-            issues.append("③ 写入口 %s 未声明落点件（修复指引：roles.write_exceptions 的值写成 "
-                          "{why, artifact}——写通道必须有契约）" % rel)
-            continue
-        if not (Path(root) / artifact).is_file():
-            issues.append("③ 写入口 %s 的落点件不在场：%s（修复指引：改名/补件）" % (rel, artifact))
-            continue
-        owner = reg.get(artifact)
-        if owner is None:
-            issues.append("③ 写入口 %s 的落点件 %s 未在 protocol/data_contracts.json 登记"
-                          "（修复指引：补一条契约，owner 点名该模块）" % (rel, artifact))
-        elif Path(rel).name not in owner:
-            issues.append("③ 写入口 %s 的落点件 %s 已登记，但 owner 未点名该模块（实为 %r）"
-                          "（修复指引：owner 写清维护模块）" % (rel, artifact, owner[:40]))
+        issues += _writer_issues(rel, exc.get(rel), reg, root)
     return issues
 
 
@@ -93,10 +103,12 @@ def _vocab_issues(roles: Dict[str, Any]) -> List[str]:
     return []
 
 
-def _coverage_issues(root: str, files: List[str], rules: List[Dict[str, Any]],
-                     overrides: Dict[str, Any]) -> List[str]:
-    """① 全覆盖 + 核内逐件：未归类 / 落兜底 / 核内实现面无自述。"""
-    issues, uncovered, fallback, no_self = [], [], [], []
+def _classify_files(root: str, files: List[str], rules: List[Dict[str, Any]],
+                    overrides: Dict[str, Any]) -> tuple:
+    """逐件坐标 → (未归类, 落兜底, 核内无自述)。"""
+    uncovered: List[str] = []
+    fallback: List[str] = []
+    no_self: List[str] = []
     for rel in files:
         c = coordinate(root, rel, rules, overrides)
         if not c["role"]:
@@ -107,6 +119,19 @@ def _coverage_issues(root: str, files: List[str], rules: List[Dict[str, Any]],
                 fallback.append(rel)
             if not c["function"]:
                 no_self.append(rel)
+    return uncovered, fallback, no_self
+
+
+def _core_missing(no_self: List[str]) -> List[str]:
+    """核内实现面（desktop/src/core 的 .py）无自述件。"""
+    return [x for x in no_self if x.startswith("desktop/src/core/") and x.endswith(".py")]
+
+
+def _coverage_issues(root: str, files: List[str], rules: List[Dict[str, Any]],
+                     overrides: Dict[str, Any]) -> List[str]:
+    """① 全覆盖 + 核内逐件：未归类 / 落兜底 / 核内实现面无自述。"""
+    issues: List[str] = []
+    uncovered, fallback, no_self = _classify_files(root, files, rules, overrides)
     if uncovered:
         issues.append("① 覆盖缺口：%d 件未命中任何坐标（例：%s）（修复指引：补规则或 override）"
                       % (len(uncovered), "、".join(uncovered[:3])))
@@ -115,7 +140,7 @@ def _coverage_issues(root: str, files: List[str], rules: List[Dict[str, Any]],
                       % "、".join(fallback[:3]))
     # 自述要求**按面分档**：核内**实现面**（desktop/src/core）无自述 = FAIL（职能句无处可推）；
     # 测试件与第二实现线（engine/**）无自述 = 计入 stats 的可减缺口（不给测试件灌样板 docstring）。
-    core_missing = [x for x in no_self if x.startswith("desktop/src/core/") and x.endswith(".py")]
+    core_missing = _core_missing(no_self)
     if core_missing:
         issues.append("① 核内实现面 .py 无自述（职能句无处可推）：%s（修复指引：补模块 docstring 首句）"
                       % "、".join(core_missing[:3]))
@@ -148,6 +173,31 @@ def _kernel_issues(root: str, kernel: List[str], rules: List[Dict[str, Any]],
     return issues, writers
 
 
+def _coords_and_kernel(root: str, files: List[str], rules: List[Dict[str, Any]],
+                       overrides: Dict[str, Any]) -> tuple:
+    """逐件坐标 + 核内件清单。"""
+    coords = {rel: coordinate(root, rel, rules, overrides) for rel in files}
+    kernel = [rel for rel in files if coords[rel]["role"] in KERNEL_ROLES]
+    return coords, kernel
+
+
+def _empty_rule_issues(rules: List[Dict[str, Any]]) -> List[str]:
+    """② 规则空转（无命中且非兜底）单条 issue。"""
+    empty = [x["id"] for x in rules if not x["hits"] and x["id"] != "R-catch"]
+    if not empty:
+        return []
+    return ["② 规则空转：%s（修复指引：删规则或改 glob——空规则是腐烂）" % "、".join(empty)]
+
+
+def _scan_stats(files: List[str], rules: List[Dict[str, Any]], coords: Dict[str, Any],
+                kernel: List[str], writers: List[str], exc: Dict[str, Any]) -> Dict[str, Any]:
+    """扫描统计（分母与缺口计数）。"""
+    return {"files": len(files), "kernel": len(kernel), "rules": len(rules),
+            "uncovered": sum(1 for c in coords.values() if not c["role"]),
+            "kernel_no_self": sum(1 for r in kernel if not coords[r]["function"]),
+            "verify_writers": len(writers), "write_exceptions": len(exc)}
+
+
 def _scan_impl(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     roles = load(root)
     if not roles:
@@ -155,22 +205,15 @@ def _scan_impl(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     files = files_of(root)
     rules = _rule_hits(roles, files)
     overrides = roles.get("overrides") or {}
-    coords = {rel: coordinate(root, rel, rules, overrides) for rel in files}
-    kernel = [rel for rel in files if coords[rel]["role"] in KERNEL_ROLES]
+    coords, kernel = _coords_and_kernel(root, files, rules, overrides)
     issues = _vocab_issues(roles) + _coverage_issues(root, files, rules, overrides)
-    empty = [x["id"] for x in rules if not x["hits"] and x["id"] != "R-catch"]
-    if empty:
-        issues.append("② 规则空转：%s（修复指引：删规则或改 glob——空规则是腐烂）" % "、".join(empty))
+    issues += _empty_rule_issues(rules)
     issues += _projection_drift(root)
     exc = dict(roles.get("write_exceptions") or {})
     kernel_issues, writers = _kernel_issues(root, kernel, rules, overrides, exc)
     issues += kernel_issues
     issues += _write_channel_issues(root, writers, exc)
-    stats = {"files": len(files), "kernel": len(kernel), "rules": len(rules),
-             "uncovered": sum(1 for c in coords.values() if not c["role"]),
-             "kernel_no_self": sum(1 for r in kernel if not coords[r]["function"]),
-             "verify_writers": len(writers), "write_exceptions": len(exc)}
-    return issues, stats
+    return issues, _scan_stats(files, rules, coords, kernel, writers, exc)
 
 
 def scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:

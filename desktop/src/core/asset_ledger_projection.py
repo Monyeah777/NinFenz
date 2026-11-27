@@ -40,6 +40,20 @@ def _file_keys(path: Path, text: Optional[str] = None) -> List[str]:
     return sorted(keys)
 
 
+def _first_line_index(lines, keys) -> Dict[str, int]:
+    """键 → 首次出现行号（1 起）；键为空时返回空表。"""
+    first: Dict[str, int] = {}
+    if not keys:
+        return first
+    needle = re.compile(
+        r"\b(?:" + "|".join(re.escape(k) for k in
+                           sorted(keys, key=len, reverse=True)) + r")\b")
+    for idx, ln in enumerate(lines, 1):
+        for match in needle.finditer(ln):
+            first.setdefault(match.group(0), idx)
+    return first
+
+
 def build(root: str = ".") -> List[Dict[str, Any]]:
     r = Path(root)
     rows: List[Dict[str, Any]] = []
@@ -55,14 +69,7 @@ def build(root: str = ".") -> List[Dict[str, Any]]:
             if len(keys) > MAX_KEYS_PER_FILE:
                 raise ValueError("%s 的资产键 %d 个，超过单件上限 %d（修复指引：拆分资产文件）"
                                  % (rel, len(keys), MAX_KEYS_PER_FILE))
-            first_line: Dict[str, int] = {}
-            if keys:
-                needle = re.compile(
-                    r"\b(?:" + "|".join(re.escape(k) for k in
-                                       sorted(keys, key=len, reverse=True)) + r")\b")
-                for idx, ln in enumerate(lines, 1):
-                    for match in needle.finditer(ln):
-                        first_line.setdefault(match.group(0), idx)
+            first_line = _first_line_index(lines, keys)
             for k in keys:
                 rows.append({"key": k, "package": pkg, "file": rel,
                              "line": first_line.get(k, 1)})

@@ -11,6 +11,23 @@ STATES = ("active", "deprecated", "removed")
 DEFAULT_MIN_WINDOW_DAYS = 365
 
 
+def _deprecation_issues(e: dict, name: str, state, as_of: str,
+                        min_window_days: int) -> tuple:
+    """弃用/移除态检查 → (issues, 是否就此跳过本条的后续判定)。"""
+    if state not in ("deprecated", "removed"):
+        return [], False
+    dep = str(e.get("deprecated_at") or "")
+    if not dep:
+        return (["特性 %s 缺 deprecated_at（修复指引：补弃用日期，起算弃用窗）" % name], True)
+    if state != "removed":
+        return [], False
+    gap = _days(dep, as_of)
+    if gap is not None and gap < min_window_days:
+        return (["特性 %s 弃用窗不足：%d 天 < %d 天（修复指引：满窗后再移除）"
+                 % (name, gap, min_window_days)], False)
+    return [], False
+
+
 def check(entries: List[Dict[str, Any]], as_of: str, min_window_days: int = DEFAULT_MIN_WINDOW_DAYS) -> List[str]:
     """entries: {name, state, deprecated_at?, removed_at?, breaking?, new_identifier?}。"""
     issues: List[str] = []
@@ -20,16 +37,10 @@ def check(entries: List[Dict[str, Any]], as_of: str, min_window_days: int = DEFA
         if state not in STATES:
             issues.append("特性 %s 状态越词表：%r（修复指引：取 %s）" % (name, state, "/".join(STATES)))
             continue
-        dep = str(e.get("deprecated_at") or "")
-        if state in ("deprecated", "removed"):
-            if not dep:
-                issues.append("特性 %s 缺 deprecated_at（修复指引：补弃用日期，起算弃用窗）" % name)
-                continue
-            if state == "removed":
-                gap = _days(dep, as_of)
-                if gap is not None and gap < min_window_days:
-                    issues.append("特性 %s 弃用窗不足：%d 天 < %d 天（修复指引：满窗后再移除）"
-                                  % (name, gap, min_window_days))
+        dep_issues, skipped = _deprecation_issues(e, name, state, as_of, min_window_days)
+        issues += dep_issues
+        if skipped:
+            continue
         if e.get("breaking") and not str(e.get("new_identifier") or "").strip():
             issues.append("特性 %s 属破坏性变更却沿用旧标识符（修复指引：换新标识符，禁止原地改义）" % name)
     return issues

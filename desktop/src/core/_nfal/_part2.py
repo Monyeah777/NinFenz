@@ -169,15 +169,20 @@ def _bool3(v: Any) -> Optional[bool]:
     return v if isinstance(v, bool) else None
 
 
+def _unknown_logic(op: str, a: Any, b: Any, ba: Any, bb: Any) -> Any:
+    """含 UNKNOWN 操作数时的短路化简；不能化简则回 UNKNOWN。"""
+    other = bb if a is UNKNOWN else ba
+    if other is False and op == "&&":
+        return False
+    if other is True and op == "||":
+        return True
+    return UNKNOWN
+
+
 def _eval_logic(op: str, a: Any, b: Any, node: Dict[str, Any], diags: List[Dict[str, Any]]) -> Any:
     ba, bb = _bool3(a), _bool3(b)
     if a is UNKNOWN or b is UNKNOWN:
-        other = bb if a is UNKNOWN else ba
-        if other is False and op == "&&":
-            return False
-        if other is True and op == "||":
-            return True
-        return UNKNOWN
+        return _unknown_logic(op, a, b, ba, bb)
     if ba is None or bb is None:
         diags.append(_ed("%s 需要 bool 操作数" % op, node))
         return UNKNOWN
@@ -205,15 +210,8 @@ def _div(a: Any, b: Any, node: Dict[str, Any], diags: List[Dict[str, Any]], true
     return (a / b) if true_div else (a % b)
 
 
-def _eval_arith(op: str, a: Any, b: Any, node: Dict[str, Any], diags: List[Dict[str, Any]]) -> Any:
-    if op == "+" and isinstance(a, str) and isinstance(b, str):
-        return a + b
-    if op == "+" and isinstance(a, list) and isinstance(b, list):
-        return a + b
-    if not (_num(a) and _num(b)):
-        diags.append(_ed("%s 需要数值，实为 %s / %s"
-                         % (op, type(a).__name__, type(b).__name__), node))
-        return UNKNOWN
+def _numeric_op(op: str, a: Any, b: Any, node: Dict[str, Any], diags: List[Dict[str, Any]]) -> Any:
+    """已确认数值后的四则/取模分派；未知运算符记诊断回 UNKNOWN。"""
     if op == "+":
         return a + b
     if op == "-":
@@ -226,6 +224,18 @@ def _eval_arith(op: str, a: Any, b: Any, node: Dict[str, Any], diags: List[Dict[
         return _div(a, b, node, diags, False)
     diags.append(_ed("未知运算符 %s" % op, node))
     return UNKNOWN
+
+
+def _eval_arith(op: str, a: Any, b: Any, node: Dict[str, Any], diags: List[Dict[str, Any]]) -> Any:
+    if op == "+" and isinstance(a, str) and isinstance(b, str):
+        return a + b
+    if op == "+" and isinstance(a, list) and isinstance(b, list):
+        return a + b
+    if not (_num(a) and _num(b)):
+        diags.append(_ed("%s 需要数值，实为 %s / %s"
+                         % (op, type(a).__name__, type(b).__name__), node))
+        return UNKNOWN
+    return _numeric_op(op, a, b, node, diags)
 
 
 def _apply(fn: str, args: List[Any]) -> Any:
@@ -244,6 +254,25 @@ def _apply(fn: str, args: List[Any]) -> Any:
     raise ValueError("未登记函数 %s（修复指引：函数集封闭，见 core.nfal.FUNCS）" % fn)
 
 
+def _eval_map(node: Dict[str, Any], env: Dict[str, Any], diags: List[Dict[str, Any]]) -> dict:
+    """map 字面量 → dict（键值都递归求值）。"""
+    return {evaluate(a, env, diags): evaluate(b, env, diags)
+            for a, b in node.get("entries") or []}
+
+
+def _eval_rest(k, node: Dict[str, Any], env: Dict[str, Any], diags: List[Dict[str, Any]]) -> Any:
+    """un/cond/call/bin 分派；未知 kind 回 UNKNOWN。"""
+    if k == "un":
+        return _eval_un(node, env, diags)
+    if k == "cond":
+        return _eval_cond(node, env, diags)
+    if k == "call":
+        return _eval_call(node, env, diags)
+    if k == "bin":
+        return _eval_bin(node, env, diags)
+    return UNKNOWN
+
+
 def evaluate(node: Any, env: Dict[str, Any], diags: List[Dict[str, Any]]) -> Any:
     """表达式 → 具体值或 UNKNOWN（类型不符记诊断并回 UNKNOWN，绝不静默通过）。"""
     if not isinstance(node, dict):
@@ -256,21 +285,8 @@ def evaluate(node: Any, env: Dict[str, Any], diags: List[Dict[str, Any]]) -> Any
     if k == "list":
         return [evaluate(x, env, diags) for x in node.get("items") or []]
     if k == "map":
-        return {evaluate(a,
- env,
- diags): evaluate(b,
- env,
- diags) for a,
- b in node.get("entries") or []}
-    if k == "un":
-        return _eval_un(node, env, diags)
-    if k == "cond":
-        return _eval_cond(node, env, diags)
-    if k == "call":
-        return _eval_call(node, env, diags)
-    if k == "bin":
-        return _eval_bin(node, env, diags)
-    return UNKNOWN
+        return _eval_map(node, env, diags)
+    return _eval_rest(k, node, env, diags)
 
 
 def _eval_un(node: Dict[str, Any], env: Dict[str, Any], diags: List[Dict[str, Any]]) -> Any:

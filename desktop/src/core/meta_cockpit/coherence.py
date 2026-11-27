@@ -78,6 +78,23 @@ def _criteria_invariant(criteria) -> dict:
     return _invariant("criteria_shape", issues)
 
 
+def _pass_issues(check, audit_issues) -> list:
+    """pass 判定必须 check=true，且审计面不得有违例。"""
+    issues = []
+    if check is not True:
+        issues.append("pass verdict requires check=true")
+    if audit_issues:
+        issues.append("pass verdict conflicts with audit issues")
+    return issues
+
+
+def _fail_issues(check, audit_issues) -> list:
+    """fail 判定必须带审计证据（check=true 且审计干净即自相矛盾）。"""
+    if check is True and not audit_issues:
+        return ["fail verdict lacks audit evidence"]
+    return []
+
+
 def _verdict_invariant(audit, check, verdict) -> dict:
     issues = []
     if isinstance(verdict, dict):
@@ -85,30 +102,29 @@ def _verdict_invariant(audit, check, verdict) -> dict:
         audit_issues = _strings(audit)
         if status not in {"pass", "fail"}:
             issues.append("verdict status must be pass or fail")
-        if status == "pass" and check is not True:
-            issues.append("pass verdict requires check=true")
-        if status == "pass" and audit_issues:
-            issues.append("pass verdict conflicts with audit issues")
-        if status == "fail" and check is True and not audit_issues:
-            issues.append("fail verdict lacks audit evidence")
+        elif status == "pass":
+            issues.extend(_pass_issues(check, audit_issues))
+        elif status == "fail":
+            issues.extend(_fail_issues(check, audit_issues))
     elif verdict is not None:
         issues.append("verdict must be an object")
     return _invariant("verdict_consistent", issues)
 
 
+def _ids_of(items) -> set:
+    """条目表里的非空 id 集合（非 dict / 无 id 的条目跳过）。"""
+    return {
+        item.get("id")
+        for item in items
+        if isinstance(item, dict) and item.get("id") is not None
+    }
+
+
 def _selection_invariant(options, selected) -> dict:
     issues = []
     if isinstance(selected, list) and isinstance(options, list):
-        option_ids = {
-            item.get("id")
-            for item in options
-            if isinstance(item, dict) and item.get("id") is not None
-        }
-        selected_ids = {
-            item.get("id")
-            for item in selected
-            if isinstance(item, dict) and item.get("id") is not None
-        }
+        option_ids = _ids_of(options)
+        selected_ids = _ids_of(selected)
         missing = sorted(str(item) for item in selected_ids - option_ids)
         if missing:
             issues.append("selected ids not in options: " + ",".join(missing))

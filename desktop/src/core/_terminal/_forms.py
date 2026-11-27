@@ -80,6 +80,21 @@ def form_pending(form, answers) -> list:
 
 
 
+def _argv_step(answers: dict, toks: list, i: int) -> tuple:
+    """处理 toks[i..] 一步 → (新增 token 列表, 消费个数)。"""
+    tok = toks[i]
+    if tok.startswith("{") and tok.endswith("}"):
+        val = str(answers.get(tok[1:-1], "")).strip()
+        return (split_args(val) if val else []), 1
+    nxt = toks[i + 1] if i + 1 < len(toks) else None
+    if nxt and nxt.startswith("{") and nxt.endswith("}"):
+        val = str(answers.get(nxt[1:-1], "")).strip()
+        if not val:
+            return [], 2                 # 空值：旗标与值一起丢，不留悬空旗标
+        return [tok] + split_args(val), 2
+    return [tok], 1
+
+
 def build_argv(form, answers) -> list:
     """表单 + 回答 → CLI argv（空值连同其旗标一起丢弃；必填缺失即报并给指引）。"""
     answers = answers or {}
@@ -92,23 +107,9 @@ def build_argv(form, answers) -> list:
     out = []
     i = 0
     while i < len(toks):
-        tok = toks[i]
-        nxt = toks[i + 1] if i + 1 < len(toks) else None
-        if tok.startswith("{") and tok.endswith("}"):
-            val = str(answers.get(tok[1:-1], "")).strip()
-            if val:
-                out.extend(split_args(val))
-            i += 1
-            continue
-        if nxt and nxt.startswith("{") and nxt.endswith("}"):
-            val = str(answers.get(nxt[1:-1], "")).strip()
-            if val:
-                out.append(tok)
-                out.extend(split_args(val))
-            i += 2                    # 空值：旗标与值一起丢，不留悬空旗标
-            continue
-        out.append(tok)
-        i += 1
+        added, used = _argv_step(answers, toks, i)
+        out.extend(added)
+        i += used
     return out
 
 
@@ -132,33 +133,40 @@ def render_forms(filt: str = "", width=None, color: bool = False) -> str:
 
 
 
+def _render_step(st: dict, answers: dict) -> str:
+    """单步渲染行（✔ 已填 / ✱ 必填未填 / · 可选未填）。"""
+    key = st["key"]
+    val = str(answers.get(key, "")).strip()
+    mark = "✔" if val else ("✱" if st.get("required") else "·")
+    shown = ("　%s=%s" % (key, val)) if val else ""
+    hint = ("  提示：%s" % st["hint"]) if st.get("hint") and not val else ""
+    return "  [%s] %s（%s）%s%s" % (mark, key, st["prompt"], shown, hint)
+
+
+def _form_tail(form, answers: dict, missing: list) -> list:
+    """待填下一步 / 必填为空 / 组装命令 三态尾部。"""
+    pending = form_pending(form, answers)
+    if pending:
+        nxt = [st for st in form["steps"] if st["key"] == pending[0]][0]
+        tail = "空行 = 跳过（可选项）" if not nxt.get("required") else "必填"
+        return ["", "  请回答 %s（%s）：直接输入值（%s）；`/cancel` 中止"
+                % (nxt["key"], nxt["prompt"], tail)]
+    if missing:
+        return ["", "  [FAIL] 必填项为空：%s" % "、".join(missing)]
+    try:
+        argv = build_argv(form, answers)
+    except ValueError as exc:
+        return ["", "  [FAIL] %s" % exc]
+    return ["", "  组装命令：nf %s" % " ".join(argv), "  确认执行？(yes/no)"]
+
+
 def render_form(form, answers=None, color: bool = False) -> str:
     """渲染一张表单：已填/待填进度 + 下一个问题。"""
     answers = answers or {}
     lines = [style("== 表单：%s（%s）==" % (form["title"], form["id"]), "head", color),
              "  %s" % form["summary"], ""]
     for st in form.get("steps") or []:
-        key = st["key"]
-        val = str(answers.get(key, "")).strip()
-        mark = "✔" if val else ("✱" if st.get("required") else "·")
-        shown = ("　%s=%s" % (key, val)) if val else ""
-        lines.append("  [%s] %s（%s）%s%s"
-                     % (mark, key, st["prompt"], shown,
-                        ("  提示：%s" % st["hint"]) if st.get("hint") and not val else ""))
+        lines.append(_render_step(st, answers))
     missing = form_missing(form, answers)
-    pending = form_pending(form, answers)
-    if pending:
-        nxt = [st for st in form["steps"] if st["key"] == pending[0]][0]
-        tail = "空行 = 跳过（可选项）" if not nxt.get("required") else "必填"
-        lines += ["", "  请回答 %s（%s）：直接输入值（%s）；`/cancel` 中止"
-                  % (nxt["key"], nxt["prompt"], tail)]
-    elif missing:
-        lines += ["", "  [FAIL] 必填项为空：%s" % "、".join(missing)]
-    else:
-        try:
-            argv = build_argv(form, answers)
-            lines += ["", "  组装命令：nf %s" % " ".join(argv),
-                      "  确认执行？(yes/no)"]
-        except ValueError as exc:
-            lines += ["", "  [FAIL] %s" % exc]
+    lines += _form_tail(form, answers, missing)
     return "\n".join(lines)

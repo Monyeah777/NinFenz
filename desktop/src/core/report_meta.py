@@ -27,6 +27,14 @@ def make_meta(basis: str, inputs: Any, denominator: int,
             "reason": reason}
 
 
+def _reason_missing(meta: Dict[str, Any]) -> bool:
+    """非 confident 态必须写理由；confident 不要求。"""
+    conf = meta.get("confidence")
+    if conf not in ("tentative", "unjudged"):
+        return False
+    return not str(meta.get("reason") or "").strip()
+
+
 def validate(meta: Dict[str, Any]) -> List[str]:
     """校验：字段齐 / 置信在封闭词表 / 非 confident 必带理由 / 空分母只许 unjudged。"""
     issues: List[str] = []
@@ -36,7 +44,7 @@ def validate(meta: Dict[str, Any]) -> List[str]:
     conf = meta.get("confidence")
     if conf not in CONFIDENCE:
         issues.append("confidence 越词表：%r（修复指引：取 %s 之一）" % (conf, "/".join(CONFIDENCE)))
-    if conf in ("tentative", "unjudged") and not str(meta.get("reason") or "").strip():
+    if _reason_missing(meta):
         issues.append("非 confident 缺 reason（修复指引：写明为何不能给 confident）")
     if int(meta.get("denominator") or 0) == 0 and conf == "confident":
         issues.append("空分母不得报 confident（修复指引：改 unjudged 或补齐样本）")

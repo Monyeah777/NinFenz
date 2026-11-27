@@ -63,19 +63,40 @@ def make_query(path: str, out: str = "") -> tuple[str, str]:
     return dest, ""
 
 
+def _tsa_endpoint(url: str) -> tuple:
+    """TSA 地址 + curl 可用性 → (target, curl, 错误文案)。"""
+    target = (url or TSA_DEFAULT).strip()
+    if not (target.startswith("http://") or target.startswith("https://")):
+        return target, "", ("TSA 地址必须是 http(s)（" + GUIDE + "如 http://timestamp.digicert.com）")
+    curl = shutil.which("curl")
+    if not curl:
+        return target, "", ("环境没有 curl（" + GUIDE + "装 curl，或用其它工具把 .tsq 提交给 TSA，"
+                            "再把响应存成 .tsr）")
+    return target, curl, ""
+
+
+def _token_size_error(dest: str) -> str:
+    """落盘 token 体量校验 → 空串表示通过。"""
+    try:
+        size = os.path.getsize(dest)
+    except OSError:
+        return "TSA 没落盘响应（" + GUIDE + "重试或换一个 TSA）"
+    if size == 0:
+        return "TSA 返回空响应（" + GUIDE + "换一个 TSA 或稍后重试）"
+    if size > MAX_TOKEN_BYTES:
+        return f"TSA 响应过大（{size} 字节）（{GUIDE}拒绝可疑响应）"
+    return ""
+
+
 def submit(query_path: str, url: str = "", out: str = "", timeout: int = 30) -> tuple[str, str]:
     """把请求发给 TSA，收下响应（DER）→ (tsr 路径, 空串或错误)。
 
     用 curl 发 POST（Content-Type: application/timestamp-query）；不引入 HTTP 客户端依赖，
     也不接受非 http(s) 的地址——避免「时间戳」变成随便一个内网服务的自说自话。
     """
-    target = (url or TSA_DEFAULT).strip()
-    if not (target.startswith("http://") or target.startswith("https://")):
-        return "", ("TSA 地址必须是 http(s)（" + GUIDE + "如 http://timestamp.digicert.com）")
-    curl = shutil.which("curl")
-    if not curl:
-        return "", ("环境没有 curl（" + GUIDE + "装 curl，或用其它工具把 .tsq 提交给 TSA，"
-                    "再把响应存成 .tsr）")
+    target, curl, endpoint_err = _tsa_endpoint(url)
+    if endpoint_err:
+        return "", endpoint_err
     dest = out or str(query_path) + ".tsr"
     proc = _run([curl, "-sS", "-m", str(max(5, int(timeout))),
                  "-H", "Content-Type: application/timestamp-query",
@@ -83,14 +104,9 @@ def submit(query_path: str, url: str = "", out: str = "", timeout: int = 30) -> 
     if proc.get("code") != 0:
         return "", (f"TSA 请求失败（{proc.get('err') or proc.get('out') or '未知错误'}）"
                     f"（{GUIDE}确认网络可到 {target}；离线环境请把请求交给有网的机器）")
-    try:
-        size = os.path.getsize(dest)
-    except OSError:
-        return "", ("TSA 没落盘响应（" + GUIDE + "重试或换一个 TSA）")
-    if size == 0:
-        return "", ("TSA 返回空响应（" + GUIDE + "换一个 TSA 或稍后重试）")
-    if size > MAX_TOKEN_BYTES:
-        return "", (f"TSA 响应过大（{size} 字节）（{GUIDE}拒绝可疑响应）")
+    size_err = _token_size_error(dest)
+    if size_err:
+        return "", size_err
     return dest, ""
 
 
@@ -126,6 +142,27 @@ def _parse_text(text: str) -> dict[str, Any]:
     return out
 
 
+def _verify_preflight(token_path: str, query_path: str, ca_file: str) -> tuple:
+    """工具 / 信任锚 / 输入件三面预检 → (tool, 错误文案)。"""
+    tool = openssl_path()
+    if not tool:
+        return "", ("环境没有 openssl（" + GUIDE + "装 openssl 后再校验时间戳；"
+                    "没有它就无法验证 TSA 签名，本仓不会假装验过）")
+    if not ca_file or not os.path.isfile(ca_file):
+        return tool, ("缺信任锚 --ca-file（" + GUIDE + "给 TSA 的根/中间证书 PEM；"
+                      "不给信任锚就没法判断这个 token 是谁签的）")
+    if not os.path.isfile(token_path) or not os.path.isfile(query_path):
+        return tool, ("缺 token 或请求文件（" + GUIDE + "两者都要：token 由 TSA 返回、"
+                      "请求是文件原始摘要的来源）")
+    return tool, ""
+
+
+def _parse_token_reply(tool: str, token_path: str) -> dict:
+    """`openssl ts -reply -text` → 解析后的字段。"""
+    reply = _run([tool, "ts", "-reply", "-in", str(token_path), "-text"])
+    return _parse_text((reply.get("out") or "") + (reply.get("err") or ""))
+
+
 def verify(token_path: str, query_path: str, ca_file: str = "",
            untrusted: str = "") -> dict[str, Any]:
     """离线校验时间戳响应 → {ok, verdict, gen_time, serial, tsa, issues, warnings}。
@@ -134,18 +171,9 @@ def verify(token_path: str, query_path: str, ca_file: str = "",
     """
     res: dict[str, Any] = {"ok": False, "verdict": "invalid", "gen_time": "", "serial": "",
                            "tsa": "", "issues": [], "warnings": []}
-    tool = openssl_path()
-    if not tool:
-        res["issues"].append("环境没有 openssl（" + GUIDE + "装 openssl 后再校验时间戳；"
-                             "没有它就无法验证 TSA 签名，本仓不会假装验过）")
-        return res
-    if not ca_file or not os.path.isfile(ca_file):
-        res["issues"].append("缺信任锚 --ca-file（" + GUIDE + "给 TSA 的根/中间证书 PEM；"
-                             "不给信任锚就没法判断这个 token 是谁签的）")
-        return res
-    if not os.path.isfile(token_path) or not os.path.isfile(query_path):
-        res["issues"].append("缺 token 或请求文件（" + GUIDE + "两者都要：token 由 TSA 返回、"
-                             "请求是文件原始摘要的来源）")
+    tool, preflight_err = _verify_preflight(token_path, query_path, ca_file)
+    if preflight_err:
+        res["issues"].append(preflight_err)
         return res
     argv = [tool, "ts", "-verify", "-in", str(token_path), "-queryfile", str(query_path),
             "-CAfile", str(ca_file)]
@@ -158,8 +186,7 @@ def verify(token_path: str, query_path: str, ca_file: str = "",
         res["issues"].append("时间戳校验不过（" + GUIDE + "换正确的 CA 文件、确认 token 与请求"
                              f"是同一对；被改过的 token 也会这样）（{last}）")
         return res
-    reply = _run([tool, "ts", "-reply", "-in", str(token_path), "-text"])
-    parsed = _parse_text((reply.get("out") or "") + (reply.get("err") or ""))
+    parsed = _parse_token_reply(tool, token_path)
     res["gen_time"] = parsed["gen_time"]
     res["serial"] = parsed["serial"]
     res["tsa"] = parsed["tsa"]

@@ -56,26 +56,60 @@ def _field_from_fence(text: str, field: str) -> str:
     return ""
 
 
+def _heading_titles(lines: list[str]) -> list[str]:
+    """标题行（跳过以 # 开头的注释式标题）。"""
+    titles = []
+    for line in lines:
+        match = _HEADING.match(line)
+        if match and not match.group(1).startswith("#"):
+            titles.append(match.group(1).strip())
+    return titles
+
+
+def _schema_names(fences: list[str]) -> list[str]:
+    """围栏块里的 schema 名（排除 yaml/yml/text 三种语言标记）。"""
+    names = []
+    for fence in fences:
+        for match in _BLOCK_KEY.finditer(fence):
+            name = match.group(1)
+            if name not in ("yaml", "yml", "text"):
+                names.append(name)
+    return names
+
+
+_FIELD_PATH_RE = re.compile(r"^([A-Za-z_][\w.-]*):(?:\s+(.*))?$")
+
+
+def _field_line_parts(line: str):
+    """字段行 → (缩进, 键名, 是否列表项)；空行/注释/非字段行返回 None。"""
+    stripped = line.lstrip()
+    if not stripped or stripped.startswith("#"):
+        return None
+    indent = len(line) - len(stripped)
+    is_item = stripped.startswith("- ")
+    item = stripped[2:].strip() if is_item else stripped
+    match = _FIELD_PATH_RE.match(item)
+    if not match:
+        return None
+    return indent, match.group(1), is_item
+
+
 def field_paths(fences: list[str]) -> list[str]:
     """Extract nested field paths from YAML-like fenced blocks."""
     out: list[str] = []
     for fence in fences:
         stack: list[tuple[int, str]] = []
         for line in fence.splitlines():
-            stripped = line.lstrip()
-            if not stripped or stripped.startswith("#"):
+            parts = _field_line_parts(line)
+            if parts is None:
                 continue
-            indent = len(line) - len(stripped)
-            item = stripped[2:].strip() if stripped.startswith("- ") else stripped
-            match = re.match(r"^([A-Za-z_][\w.-]*):(?:\s+(.*))?$", item)
-            if not match:
-                continue
+            indent, name, is_item = parts
             while stack and indent <= stack[-1][0]:
                 stack.pop()
             prefix = stack[-1][1] + "." if stack else ""
-            path = prefix + match.group(1)
-            if stripped.startswith("- "):
-                path = prefix.rstrip(".") + "[]." + match.group(1)
+            path = prefix + name
+            if is_item:
+                path = prefix.rstrip(".") + "[]." + name
             out.append(path)
             stack.append((indent, path))
     return sorted(set(out))
@@ -85,18 +119,9 @@ def build_signature_text(path: str, raw: str) -> dict:
     """Build a deterministic document signature from already-loaded text."""
     text = raw.replace("\r\n", "\n").replace("\r", "\n")
     lines = text.splitlines()
-    headings = []
-    for line in lines:
-        match = _HEADING.match(line)
-        if match and not match.group(1).startswith("#"):
-            headings.append(match.group(1).strip())
+    headings = _heading_titles(lines)
     fences = extract_fences(text)
-    schema_names = []
-    for fence in fences:
-        for match in _BLOCK_KEY.finditer(fence):
-            name = match.group(1)
-            if name not in ("yaml", "yml", "text"):
-                schema_names.append(name)
+    schema_names = _schema_names(fences)
     title = headings[0] if headings else os.path.basename(path)
     version = _VERSION.search(title + "\n" + "\n".join(lines[:8]))
     refs = sorted(set(_REF_M.findall(text) + _REF_P.findall(text)))

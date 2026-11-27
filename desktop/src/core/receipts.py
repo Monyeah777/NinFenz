@@ -87,6 +87,19 @@ def fold_proof(leaf_hex: str, proof: List[Dict[str, str]]) -> str:
     return cur.hex()
 
 
+def _anchor_face(fm: dict):
+    """回执 anchor 面：声明了 anchor_scheme 才出对象，否则 None。"""
+    if not fm.get("anchor_scheme"):
+        return None
+    return {"scheme": str(fm.get("anchor_scheme")),
+            "key_id": str(fm.get("anchor_key_id") or ""),
+            "mac": str(fm.get("anchor_mac") or ""),
+            "ns": str(fm.get("anchor_ns") or ""),
+            "identity": str(fm.get("anchor_identity") or ""),
+            "sig_file": str(fm.get("anchor_sig_file") or ""),
+            "fingerprint": str(fm.get("anchor_fingerprint") or "")}
+
+
 def build(root: str = ".") -> Dict[str, Any]:
     """从馆藏实时算：{schema, root, count, entries:[{id, path, digest, leaf, proof}]}。"""
     from core import library_entries as nflib    # 叶子件：不再 import library（断 receipts ↔ library）
@@ -105,20 +118,27 @@ def build(root: str = ".") -> Dict[str, Any]:
     for i, (e, digest, payload) in enumerate(payloads):
         fm = e["fm"]
         entries.append({"id": e["id"], "path": e["path"], "digest": digest,
-                        "anchor": ({"scheme": str(fm.get("anchor_scheme")),
-                                    "key_id": str(fm.get("anchor_key_id") or ""),
-                                    "mac": str(fm.get("anchor_mac") or ""),
-                                    "ns": str(fm.get("anchor_ns") or ""),
-                                    "identity": str(fm.get("anchor_identity") or ""),
-                                    "sig_file": str(fm.get("anchor_sig_file") or ""),
-                                    "fingerprint": str(fm.get("anchor_fingerprint") or "")}
-                                   if fm.get("anchor_scheme") else None),
+                        "anchor": _anchor_face(fm),
                         "leaf": leaf_hash(payload).hex(),
                         "proof": inclusion_proof(leaves, i)})
     return {"schema": SCHEMA,
             "root": root_hash.hex() if root_hash else "",
             "count": len(rows), "algorithm": "RFC6962-style sha256 domain-separated",
             "entries": entries}
+
+
+def _entry_issues(e: dict, live_by_id: dict, root: str) -> List[str]:
+    """单条回执：存在性 / 内容摘要 / 包含证明。"""
+    issues: List[str] = []
+    eid = e.get("id")
+    if eid not in live_by_id:
+        return ["回执指向不存在的条目：%s" % eid]
+    live_e = live_by_id[eid]
+    if e.get("digest") != live_e["digest"]:
+        issues.append("条目内容已变：%s（修复指引：重签该条并重建回执）" % eid)
+    if fold_proof(str(e.get("leaf")), e.get("proof") or []) != root:
+        issues.append("包含证明不折叠到根：%s" % eid)
+    return issues
 
 
 def verify(doc: Dict[str, Any], root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
@@ -132,16 +152,9 @@ def verify(doc: Dict[str, Any], root: str = ".") -> Tuple[List[str], Dict[str, A
                       "nf library receipts --write）"
                       % (str(doc.get("root"))[:16], str(live["root"])[:16]))
     live_by_id = {e["id"]: e for e in live["entries"]}
+    live_root = str(doc.get("root"))
     for e in doc.get("entries") or []:
-        eid = e.get("id")
-        if eid not in live_by_id:
-            issues.append("回执指向不存在的条目：%s" % eid)
-            continue
-        live_e = live_by_id[eid]
-        if e.get("digest") != live_e["digest"]:
-            issues.append("条目内容已变：%s（修复指引：重签该条并重建回执）" % eid)
-        if fold_proof(str(e.get("leaf")), e.get("proof") or []) != str(doc.get("root")):
-            issues.append("包含证明不折叠到根：%s" % eid)
+        issues += _entry_issues(e, live_by_id, live_root)
     if len(doc.get("entries") or []) != live["count"]:
         issues.append("回执条数 %d ≠ 馆藏条数 %d"
                       % (len(doc.get("entries") or []), live["count"]))
@@ -250,22 +263,35 @@ def build_scope(root: str = ".", subjects: Optional[List[str]] = None,
             "entries": entries}
 
 
+def _scope_live(root: str, doc: Dict[str, Any]) -> Dict[str, Any]:
+    """按回执声明的条目集实时重算协议层回执。"""
+    return build_scope(root, [e["id"] for e in doc.get("entries") or []])
+
+
+def _scope_entry_issues(e: dict, live_by: dict, root: str) -> List[str]:
+    """单条协议回执：文件摘要 / 包含证明。"""
+    issues: List[str] = []
+    if live_by.get(e["id"]) != e.get("digest"):
+        issues.append("文件内容已变：%s" % e["id"])
+    if fold_proof(str(e.get("leaf")), e.get("proof") or []) != root:
+        issues.append("包含证明不折叠到根：%s" % e["id"])
+    return issues
+
+
 def verify_scope(doc: Dict[str, Any], root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     """协议层回执校验：每条折叠到根 + 文件摘要与记录一致 + 根与实时重算一致。"""
     issues: List[str] = []
     if not isinstance(doc, dict) or doc.get("schema") != SCHEMA:
         return ["协议回执 schema 不匹配"], {}
-    live = build_scope(root, [e["id"] for e in doc.get("entries") or []])
+    live = _scope_live(root, doc)
     if doc.get("root") != live["root"]:
         issues.append("协议回执根不一致：记录=%s 实测=%s（修复指引：nf receipts --scope protocol --"
             "write）"
                       % (str(doc.get("root"))[:16], str(live["root"])[:16]))
     live_by = {e["id"]: e["digest"] for e in live["entries"]}
+    live_root = str(doc.get("root"))
     for e in doc.get("entries") or []:
-        if live_by.get(e["id"]) != e.get("digest"):
-            issues.append("文件内容已变：%s" % e["id"])
-        if fold_proof(str(e.get("leaf")), e.get("proof") or []) != str(doc.get("root")):
-            issues.append("包含证明不折叠到根：%s" % e["id"])
+        issues += _scope_entry_issues(e, live_by, live_root)
     return issues, {"entries": len(doc.get("entries") or []), "root": live["root"]}
 
 

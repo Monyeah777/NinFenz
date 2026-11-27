@@ -57,6 +57,26 @@ def _read_head(path: Path, limit: int = 40) -> str:
         return "".join(islice(fh, limit))
 
 
+def _meta_from_head(head: str) -> Optional[tuple[str, str, str]]:
+    """模块头 → (full_id, name, layer)；不识别返回 None。"""
+    title = next((ln for ln in head.splitlines() if ln.startswith("# ")), "")
+    match = _MODULE_HEAD.match(title)
+    if not match:
+        return None
+    prefix = match.group(1) or ""
+    num = "M" + match.group(2).lstrip("M").rjust(2, "0")
+    cat_map = {c.rstrip("类"): c for c in CATEGORIES}
+    cat_raw = _CATEGORY.search(head)
+    if cat_raw:
+        raw = cat_raw.group(1).strip().rstrip("类")
+        category = cat_map.get(raw, raw + "类")
+    else:
+        category = cat_map.get(prefix, "通用类")
+    mount = _MOUNT.search(head) or _YAML_LAYER.search(head)
+    layer = mount.group(1) if mount else "P40"
+    return ("%s:%s" % (category, num), match.group(3).strip(), layer)
+
+
 def light_module_meta(path: Path) -> Optional[tuple[str, str, str]]:
     """模块头 → (full_id, name, layer)；不识别返回 None（调用方回退完整 parse）。"""
     try:
@@ -72,23 +92,7 @@ def light_module_meta(path: Path) -> Optional[tuple[str, str, str]]:
     except OSError:
         # 读不到文件头时不做猜测；完整解析路径会给出可诊断错误。
         return None
-    title = next((ln for ln in head.splitlines() if ln.startswith("# ")), "")
-    match = _MODULE_HEAD.match(title)
-    if not match:
-        result = None
-    else:
-        prefix = match.group(1) or ""
-        num = "M" + match.group(2).lstrip("M").rjust(2, "0")
-        cat_map = {c.rstrip("类"): c for c in CATEGORIES}
-        cat_raw = _CATEGORY.search(head)
-        if cat_raw:
-            raw = cat_raw.group(1).strip().rstrip("类")
-            category = cat_map.get(raw, raw + "类")
-        else:
-            category = cat_map.get(prefix, "通用类")
-        mount = _MOUNT.search(head) or _YAML_LAYER.search(head)
-        layer = mount.group(1) if mount else "P40"
-        result = ("%s:%s" % (category, num), match.group(3).strip(), layer)
+    result = _meta_from_head(head)
     if len(_META_CACHE) >= 4096:
         _META_CACHE.clear()
     _META_CACHE[cache_key] = result
@@ -216,6 +220,53 @@ def load_community_pipeline(pkg: str, pid: str,
 
 
 # ---------------------------------------------------------------- 盘点
+def _module_items(pkg: str, mod_files, installed_mods) -> List[CommunityItem]:
+    """community 模块文件 → 目录条目（非标准头回退完整 parse）。"""
+    from .models import fid_key
+    items: List[CommunityItem] = []
+    for f in mod_files:
+        meta = light_module_meta(f)
+        if meta is None:
+            # 非标准头：回退完整 parse（保持既有兼容面）
+            try:
+                from .parser import parse_module
+                m = parse_module(f.read_text(encoding="utf-8"))
+            except (OSError, ValueError, TypeError, UnicodeError, KeyError):
+                # 坏管线件不进入社区目录；对应门禁会单独报告解析失败。
+                continue
+            full_id, name, layer = m.full_id, m.name, m.layer
+        else:
+            full_id, name, layer = meta
+        installed = fid_key(full_id) in installed_mods
+        items.append(CommunityItem(
+            kind="community_module", pkg=pkg, ref=full_id,
+            name=name, layer=layer, installed=installed))
+    return items
+
+
+def _pipeline_items(pkg: str, pipe_files, installed_pipes) -> List[CommunityItem]:
+    """community 管线文件 → 目录条目（非标准头回退完整性 load）。"""
+    items: List[CommunityItem] = []
+    for f in pipe_files:
+        meta = light_pipeline_meta(f)
+        if meta is None:
+            try:
+                from .pipeline_loader import load_pipeline_file
+                pl = load_pipeline_file(f)
+            except (OSError, ValueError, TypeError, UnicodeError, KeyError):
+                # 坏管线件不进入社区目录；对应门禁会单独报告解析失败。
+                continue
+            if pl is None:
+                continue
+            pid, name = pl.id, pl.name
+        else:
+            pid, name = meta
+        items.append(CommunityItem(
+            kind="community_pipeline", pkg=pkg, ref=pid,
+            name=name, installed=pid in installed_pipes))
+    return items
+
+
 def catalog(store: Store) -> List[CommunityItem]:
     """盘点 community 四包全部模块 + 管线，附已装判定。
 
@@ -232,42 +283,13 @@ def catalog(store: Store) -> List[CommunityItem]:
     for pkg_dir in _package_dirs():
         pkg = pkg_dir.name
         if (pkg_dir / "modules").is_dir():
-            mod_files = _pkg_files("community-modules", pkg, "modules", cache=files_cache)
-            for f in mod_files:
-                meta = light_module_meta(f)
-                if meta is None:
-                    # 非标准头：回退完整 parse（保持既有兼容面）
-                    try:
-                        from .parser import parse_module
-                        m = parse_module(f.read_text(encoding="utf-8"))
-                    except (OSError, ValueError, TypeError, UnicodeError, KeyError):
-                        # 坏管线件不进入社区目录；对应门禁会单独报告解析失败。
-                        continue
-                    full_id, name, layer = m.full_id, m.name, m.layer
-                else:
-                    full_id, name, layer = meta
-                installed = fid_key(full_id) in installed_mods
-                items.append(CommunityItem(
-                    kind="community_module", pkg=pkg, ref=full_id,
-                    name=name, layer=layer, installed=installed))
+            items += _module_items(
+                pkg, _pkg_files("community-modules", pkg, "modules", cache=files_cache),
+                installed_mods)
         if (pkg_dir / "pipelines").is_dir():
-            for f in _pkg_files("community-pipelines", pkg, "pipelines", cache=files_cache):
-                meta = light_pipeline_meta(f)
-                if meta is None:
-                    try:
-                        from .pipeline_loader import load_pipeline_file
-                        pl = load_pipeline_file(f)
-                    except (OSError, ValueError, TypeError, UnicodeError, KeyError):
-                        # 坏管线件不进入社区目录；对应门禁会单独报告解析失败。
-                        continue
-                    if pl is None:
-                        continue
-                    pid, name = pl.id, pl.name
-                else:
-                    pid, name = meta
-                items.append(CommunityItem(
-                    kind="community_pipeline", pkg=pkg, ref=pid,
-                    name=name, installed=pid in installed_pipes))
+            items += _pipeline_items(
+                pkg, _pkg_files("community-pipelines", pkg, "pipelines", cache=files_cache),
+                installed_pipes)
     return items
 
 
