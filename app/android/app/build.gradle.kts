@@ -50,6 +50,13 @@ android {
         getByName("release") {
             if (hasUploadSigning) signingConfig = signingConfigs.getByName("upload")
         }
+        // 性能测量变体：与 release 同源，仅用于 Macrobenchmark；生产 release 行为不变。
+        create("benchmark") {
+            initWith(getByName("release"))
+            signingConfig = signingConfigs.getByName("debug")
+            matchingFallbacks += listOf("release")
+            isDebuggable = false
+        }
     }
 
     buildFeatures {
@@ -150,6 +157,7 @@ dependencies {
         exclude(group = "org.bouncycastle")
     }
     implementation("com.google.mlkit:text-recognition-chinese:16.0.1")
+    implementation("androidx.profileinstaller:profileinstaller:1.4.0")
 
     debugImplementation("androidx.compose.ui:ui-tooling")
 
