@@ -1,0 +1,14 @@
+{
+  "schema": "nf-core-vectors/1",
+  "vectors": [
+    {
+      "id": "canonical-basic",
+      "op": "canonical",
+      "in": { "value": { "b": 1, "a": 2 } },
+      "want": {
+        "canonical": "{\"a\":2,\"b\":1}",
+        "digest": "d3626ac30a87e6f7a6428233b3c68299976865fa5508e4267c5415c76af7a772"
+      }
+    }
+  ]
+}
