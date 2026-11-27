@@ -89,6 +89,16 @@
             </intent-filter>
         </activity>
 
+        <!-- MLKit（仅在 on-demand :feature:ocr 里）的 manifest 组件会被 AGP 合进 base manifest，
+             而 base dex 里没有 MLKit 类 → 真机启动即 ClassNotFoundException: MlKitInitProvider。
+             这里显式从 base 移除；feature 安装时由 Play 下发的 split manifest 自行声明。 -->
+        <service
+            android:name="com.google.mlkit.common.internal.MlKitComponentDiscoveryService"
+            tools:node="remove" />
+        <provider
+            android:name="com.google.mlkit.common.internal.MlKitInitProvider"
+            tools:node="remove" />
+
         <!-- 只读分享 URI：路径限定在 cache/shared 与 files/exports（CONTRACT §6） -->
         <provider
             android:name="androidx.core.content.FileProvider"

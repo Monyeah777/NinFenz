@@ -1,6 +1,6 @@
 NF 0.3.7-preview.1 校验清单（release，upload key 已签名）
 
-commit: 61f9dada8
+commit: 30cce7b05 + 真机修复（base manifest 移除 MLKit 组件 / feature 取消 fusing）
 versionCode: 10
 versionName: 0.3.7-preview.1
 
@@ -8,13 +8,14 @@ versionName: 0.3.7-preview.1
 SHA-256: A4:F4:68:7A:3C:E7:3E:E1:8A:49:E0:54:A6:42:9C:0A:35:4B:45:01:B4:9A:E2:74:53:04:A9:C4:1D:B6:4C:4B
 SHA-1  : 8B:20:2C:E1:D5:AC:13:1F:69:0B:1D:DC:DE:5E:F4:D4:D4:2B:3C:5B
 
-91824b1f266014502ef6cd050aa32645230e9098e5989dbd1b146607b4f8df0c  results/app/0.3.7-preview.1-release-signed.aab
-14d204e0bff504f891c14443b4e483a80acb53de0e53f428f03b75a2997a6ccb  results/app/0.3.7-preview.1-release-signed.apk
+7a0f81618135ba6a80d483919fd5f45f496cd7d2e97c8bb05405e94b1d657580  results/app/0.3.7-preview.1-release-signed.aab（31,567,459 B）
+94ff02394ea76dfda29e5549da69abacda075b983c3cbc42f9dec5e7649be867  results/app/0.3.7-preview.1-release-signed.apk（17,907,192 B）
 199f50afcdec29e3d131f4dbd136c9d354e355304f9ab1f547b2d379b829d947  results/app/0.3.7-preview.1-internal-debugsigned.apk
 
-历史（未签名构建，保留供比对）
+历史（旧构建，保留比对）
 6ab06178350652a6acfc724afd8ac8f759168207a7615d2a10842e2022daf05b  app-release-unsigned.apk
-510cd8a8a72785b550a9451450a7d4369141593b780fba792c469a27657ea04a  app-release.aab
+510cd8a8a72785b550a9451450a7d4369141593b780fba792c469a27657ea04a  app-release.aab（未签名）
+14d204e0bff504f891c14443b4e483a80acb53de0e53f428f03b75a2997a6ccb  release APK（修复前，启动崩 MLKitInitProvider）
 
-备注：AAB 与 APK 同一 upload key 签名；base APK 18MB；AAB 31MB（on-demand OCR feature）；bundletool base 下载 8.9–9.1MB；16KB zipalign -P 16 通过；release 无 INTERNET。
+备注：AAB/APK 同一 upload key 签名；16KB zipalign 通过；release 无 INTERNET；真机结果见 0.3.7_DEVICE.md。
 签名不等于上架：Play Console 上传账号与商店素材仍无输入。
