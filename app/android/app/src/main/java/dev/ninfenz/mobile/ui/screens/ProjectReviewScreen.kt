@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import dev.ninfenz.mobile.data.UriIo
 import dev.ninfenz.mobile.data.DeliveryDraftStore
 import dev.ninfenz.mobile.data.ExtensionStore
 import dev.ninfenz.mobile.data.FeatureGate
@@ -68,9 +69,7 @@ fun ProjectReviewScreen(project: Project, onBack: () -> Unit) {
         if (uri == null) return@rememberLauncherForActivityResult
         runCatching {
             val temp = File(File(context.cacheDir, "handoff-import").apply { mkdirs() }, "handoff.zip")
-            context.contentResolver.openInputStream(uri)?.use { input ->
-                temp.outputStream().use { output -> input.copyTo(output) }
-            }
+            UriIo.copyTo(context, uri, temp)
             imported = HandoffService.inspect(temp)
         }.onFailure {
             imported = HandoffService.Inspect(false, "", emptyList(), it.message ?: it.javaClass.simpleName)

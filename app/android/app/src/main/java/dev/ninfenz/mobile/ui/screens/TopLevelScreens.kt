@@ -88,6 +88,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import dev.ninfenz.mobile.data.UriIo
 import dev.ninfenz.mobile.data.PackEntry
 import dev.ninfenz.mobile.data.PackLockStore
 import dev.ninfenz.mobile.data.PackTrustStore
@@ -1125,7 +1126,7 @@ fun ProjectDetailScreen(
                 diffError = null
                 try {
                     val text = withContext(Dispatchers.IO) {
-                        context.contentResolver.openInputStream(uri)?.bufferedReader(Charsets.UTF_8)?.use { it.readText() }
+                        UriIo.readText(context, uri)
                     }
                     if (text == null) {
                         diffError = context.getString(dev.ninfenz.mobile.R.string.project_diff_read_failed)

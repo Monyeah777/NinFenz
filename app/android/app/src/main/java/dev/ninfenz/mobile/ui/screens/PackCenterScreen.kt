@@ -44,6 +44,7 @@ import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import dev.ninfenz.mobile.data.UriIo
 import dev.ninfenz.mobile.data.PackEntry
 import dev.ninfenz.mobile.data.PackZipInstaller
 import dev.ninfenz.mobile.data.PackTrustStore
@@ -96,9 +97,7 @@ fun PackCenterScreen(
             val result = runCatching {
                 val temp = File(File(context.cacheDir, "pack-install").apply { mkdirs() }, "pack.zip")
                 withContext(Dispatchers.IO) {
-                    context.contentResolver.openInputStream(uri)?.use { input ->
-                        temp.outputStream().use { output -> input.copyTo(output) }
-                    }
+                    UriIo.copyTo(context, uri, temp)
                     PackZipInstaller.install(temp, context.filesDir).also { temp.delete() }
                 }
             }

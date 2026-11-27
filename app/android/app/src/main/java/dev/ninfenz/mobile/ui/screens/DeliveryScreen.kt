@@ -78,6 +78,7 @@ import androidx.compose.ui.window.DialogProperties
 import dev.ninfenz.mobile.core.CoreError
 import dev.ninfenz.mobile.core.CoreResponse
 import dev.ninfenz.mobile.core.J
+import dev.ninfenz.mobile.data.UriIo
 import dev.ninfenz.mobile.data.AuthorArtifacts
 import dev.ninfenz.mobile.data.AuthorArtifactsLoader
 import dev.ninfenz.mobile.data.AssemblyPresetStore
@@ -468,9 +469,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
         scope.launch {
             try {
                 val name = uri.lastPathSegment?.substringAfterLast('/') ?: "import"
-                val raw = withContext(Dispatchers.IO) {
-                    context.contentResolver.openInputStream(uri)?.bufferedReader(Charsets.UTF_8)?.use { it.readText() } ?: ""
-                }
+                val raw = withContext(Dispatchers.IO) { UriIo.readText(context, uri) ?: "" }
                 if (raw.isBlank()) {
                     error = CoreResponse.failure("NF-E-003", context.getString(dev.ninfenz.mobile.R.string.delivery_slot_import_empty), context.getString(dev.ninfenz.mobile.R.string.delivery_slot_import_empty_fix), 2).error
                     slotImportTarget = null
@@ -499,7 +498,9 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
         scope.launch {
             try {
                 val name = uri.lastPathSegment?.substringAfterLast('/') ?: "batch"
-                val raw = withContext(Dispatchers.IO) { readTextLimited(context, uri) }
+                val raw = withContext(Dispatchers.IO) {
+                    UriIo.readTextLimited(context, uri, MAX_IMPORT_CHARS, context.getString(dev.ninfenz.mobile.R.string.delivery_slot_import_too_large))
+                }
                 val chunks = SlotBatchImporter.chunks(raw, name)
                 if (chunks.isEmpty()) {
                     error = CoreResponse.failure("NF-E-003", context.getString(dev.ninfenz.mobile.R.string.delivery_slot_batch_empty), context.getString(dev.ninfenz.mobile.R.string.delivery_slot_batch_empty_fix), 2).error
@@ -3484,24 +3485,6 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
 }
 
 private const val MAX_IMPORT_CHARS = 1_048_576
-
-private fun readTextLimited(context: Context, uri: android.net.Uri): String {
-    val stream = context.contentResolver.openInputStream(uri) ?: return ""
-    stream.use { input ->
-        val reader = java.io.InputStreamReader(input, Charsets.UTF_8)
-        val buffer = CharArray(8192)
-        val out = StringBuilder()
-        while (true) {
-            val n = reader.read(buffer)
-            if (n < 0) break
-            out.append(buffer, 0, n)
-            if (out.length > MAX_IMPORT_CHARS) {
-                throw IllegalArgumentException(context.getString(dev.ninfenz.mobile.R.string.delivery_slot_import_too_large))
-            }
-        }
-        return out.toString()
-    }
-}
 
 private fun statusText(context: Context, status: ProjectStatus): String = when (status) {
     ProjectStatus.DRAFT -> context.getString(dev.ninfenz.mobile.R.string.delivery_status_draft)

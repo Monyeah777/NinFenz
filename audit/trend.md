@@ -16,6 +16,7 @@
 | p2-batch5（truth-drift 收口） | 0.3.7-preview.1 | 166 | **96.94** | 0 | 0 | 1261 | 220 | audit/evidence/p2-batch5/ |
 | p2-batch6（Rust 生产路径口径） | 0.3.7-preview.1 | 166 | **97.34** | 0 | 0 | 1241 | 220 | audit/evidence/p2-batch6/ |
 | p2-batch7（包环收口） | 0.3.7-preview.1 | 166 | **97.64** | 0 | 0 | 1233 | 220 | audit/evidence/p2-batch7/ |
+| p2-batch8（B-004 收口） | 0.3.7-preview.1 | 166 | **97.82** | 0 | 0 | 1017 | 220 | audit/evidence/p2-batch8/ |
 
 ## 维度分变化
 
@@ -89,3 +90,8 @@
 ## 门禁状态（第十轮后）
 
 - 最新证据 p2-batch7：总分 97.64，P0=0/P1=0/error=0/no_targets=0，audit/ci/gate.sh PASS；A 维度 100。
+
+
+## 门禁状态（第十一轮后）
+
+- 最新证据 p2-batch8：总分 97.82，P0=0/P1=0/error=0/no_targets=0，audit/ci/gate.sh PASS；A/B/E 维度 100。

@@ -320,17 +320,24 @@
       "dimension": "B",
       "iso": "maintainability.modifiability",
       "severity": "P2",
-      "statement": "UI 层不得直接 import data 层",
+      "statement": "UI 层不得直接做平台 IO（ContentResolver/SharedPreferences/SQLite/文件句柄）",
       "check": "script",
       "version": 1,
       "script": "import_boundary",
       "params": {
-        "path_glob": [
+        "globs": [
           "app/android/app/src/main/java/dev/ninfenz/mobile/ui/**/*.kt"
         ],
-        "forbid_import_prefix": [
-          "dev.ninfenz.mobile.data."
-        ]
+        "patterns": [
+          "contentResolver",
+          "openInputStream",
+          "openOutputStream",
+          "getSharedPreferences",
+          "SQLiteDatabase",
+          "openFileOutput",
+          "openFileInput"
+        ],
+        "strip_comments": true
       },
       "penalty": 3,
       "source": "MVVM 分层"

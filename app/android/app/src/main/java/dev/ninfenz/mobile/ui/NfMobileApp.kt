@@ -74,6 +74,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import dev.ninfenz.mobile.core.Core
+import dev.ninfenz.mobile.data.UriIo
 import dev.ninfenz.mobile.data.AppPrefs
 import dev.ninfenz.mobile.data.CommandHistoryStore
 import dev.ninfenz.mobile.data.LibraryStore
@@ -247,9 +248,7 @@ fun NfMobileApp(
                 val result = runCatching {
                     val temp = File(File(context.cacheDir, "imports").apply { mkdirs() }, "project.zip")
                     withContext(Dispatchers.IO) {
-                        context.contentResolver.openInputStream(uri)?.use { input ->
-                            temp.outputStream().use { output -> input.copyTo(output) }
-                        }
+                        UriIo.copyTo(context, uri, temp)
                         ProjectPackageImporter.import(context.filesDir, temp).also { temp.delete() }
                     }
                 }

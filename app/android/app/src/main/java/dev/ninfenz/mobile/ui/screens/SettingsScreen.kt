@@ -43,6 +43,7 @@ import dev.ninfenz.mobile.BuildConfig
 import dev.ninfenz.mobile.core.Core
 import dev.ninfenz.mobile.core.CoreBridgeNative
 import dev.ninfenz.mobile.core.ErrorCatalog
+import dev.ninfenz.mobile.data.UriIo
 import dev.ninfenz.mobile.data.AppPrefs
 import dev.ninfenz.mobile.data.Capability
 import dev.ninfenz.mobile.data.CapabilityRegistry
@@ -150,9 +151,7 @@ fun SettingsScreen(
             backupMessage = null
             val file = File(context.cacheDir, "restore.zip")
             withContext(Dispatchers.IO) {
-                context.contentResolver.openInputStream(uri)?.use { input ->
-                    file.outputStream().use { output -> input.copyTo(output) }
-                }
+                UriIo.copyTo(context, uri, file)
             }
             val checked = withContext(Dispatchers.IO) { BackupRestoreService.inspect(file) }
             if (!checked.ok) {

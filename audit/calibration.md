@@ -30,6 +30,7 @@
 | E-008 | Rust 生产路径任何 panic!/todo!/unimplemented! 即命中 | fail-closed 处带 `audit: panic-fail-closed` 说明（同一处前 3 行内）可豁免 | app/core/src/limits.rs 内嵌 limits.json 契约破坏、engine/rust/src/pyrandom.rs 越出已复刻子集 | 两处是刻意的 fail-closed 断言，静默降级会破坏契约/逐位对账；豁免须可搜索 |
 | E-010 | Rust unwrap/expect 统计包含测试模块 | 先用 `strip_rust_test_modules` 剔除 `#[cfg(test)] mod tests` 整块再统计 | asset_contract.rs 39→3、miniyaml/contracts 等同类下降；E-010 命中 7→0 | 规则本意是「生产路径」，测试里的 unwrap 是断言手段，计入属误报 |
 | ARCH-004 | Kotlin 包间任何环都命中 | 跨层环才算；根包 `dev.ninfenz.mobile`（R/BuildConfig/MainActivity）参与的环与 `*.ui` 子树内部环豁免 | 单模块 Android 的 R/Activity 必与子包互引；Compose ui↔ui.components↔ui.screens 天然互引（不是可维护性缺陷） | 规则本意是「跨层不得成环」；豁免范围写死在 rules.json，跨层环（如 data↔share）仍会命中 |
+| B-004 | UI 层不得直接 import data 层（任何 import 都命中） | UI 层不得直接做平台 IO（ContentResolver/SharedPreferences/SQLite/文件句柄）；平台 IO 走 data 层 | ARCHITECTURE.md §4.1：端壳层→控制面→核心，本 app 无独立领域层；data 包即平台集成层，UI 调 Store 是既定设计。真实风险是 UI 自己碰 IO——实扫 7 处 `contentResolver.openInputStream` 已全部收敛到 `UriIo` | 规则本意「UI 不做持久化」保留可机检；UI→data 的 import 改为人工架构评审（0.4 领域层拆分时再收紧） |
 
 ## 校准后的门禁含义
 

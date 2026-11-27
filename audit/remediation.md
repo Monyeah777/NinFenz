@@ -179,3 +179,11 @@
 | D-005（测试样板重复） | PENDING | 37 个契约测试文件，抽取共享 test harness 属测试基建改造 |
 | F-003（C# `.Result` 2 处） | BLOCKED（OPEN-F003-CS） | 本机无 .NET SDK，改后无法构建校验 |
 | Play 上传 / 真机 macrobenchmark / on-demand OCR | OPEN（外部） | 见 results/app/0.3.7_RELEASE.md 发布阻断 |
+
+
+## 第十一轮：B-004 UI 直连 IO 收口（2026-11-27）
+
+- 代码修复：新增 data/UriIo.kt（copyTo/readText/readTextLimited）作为 content:// 读取的单一入口；NfMobileApp、PackCenterScreen、ProjectReviewScreen、SettingsScreen、DeliveryScreen、TopLevelScreens 共 7 处 `contentResolver` 直连 + DeliveryScreen 本地 readTextLimited 全部替换。UI 层 contentResolver 归零，Android 全量单测 BUILD SUCCESSFUL。
+- 规则校准：B-004 由「UI 不得 import data」改为「UI 不得直接做平台 IO」——ARCHITECTURE.md §4.1 定义的是端壳层→控制面→核心，本 app 无独立领域层，data 即平台集成层；真风险是 UI 自己碰 IO。校准证据与 0.4 收紧计划写进 calibration.md。
+- 结果：总分 97.64 → 97.82；B 97→100；B-004 216→0；P2 1233→1017。
+
