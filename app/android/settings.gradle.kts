@@ -23,3 +23,4 @@ dependencyResolutionManagement {
 rootProject.name = "nf-mobile"
 include(":app")
 include(":benchmark")
+include(":feature:ocr")

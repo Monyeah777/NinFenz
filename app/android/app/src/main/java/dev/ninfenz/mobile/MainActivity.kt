@@ -1,7 +1,9 @@
 package dev.ninfenz.mobile
 
+import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
+import com.google.android.play.core.splitcompat.SplitCompat
 import android.os.Bundle
 import android.view.KeyEvent
 import java.util.Locale
@@ -33,6 +35,11 @@ import dev.ninfenz.mobile.ui.theme.NfTheme
 
 /** 主界面：edge-to-edge + 预测返回；主题三态由 AppPrefs 持久化。 */
 class MainActivity : ComponentActivity() {
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(newBase)
+        SplitCompat.install(this)
+    }
+
     private var pendingShortcut by mutableStateOf<String?>(null)
 
     override fun onNewIntent(intent: Intent) {

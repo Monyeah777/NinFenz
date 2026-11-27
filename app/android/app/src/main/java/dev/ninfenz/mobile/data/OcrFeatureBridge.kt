@@ -1,0 +1,28 @@
+package dev.ninfenz.mobile.data
+
+import android.content.Context
+import com.google.android.play.core.splitinstall.SplitInstallManagerFactory
+import com.google.android.play.core.splitinstall.SplitInstallRequest
+import java.io.File
+import java.lang.reflect.InvocationTargetException
+
+/** 基础包不直接依赖 MLKit；OCR 实现在 :feature:ocr 动态模块中。 */
+internal object OcrFeatureBridge {
+    private const val CLASS = "dev.ninfenz.mobile.ocr.OcrFeature"
+
+    fun call(method: String, context: Context, file: File): Any? {
+        try {
+            val clazz = Class.forName(CLASS)
+            val target = clazz.getMethod(method, Context::class.java, File::class.java)
+            return target.invoke(null, context, file)
+        } catch (t: Throwable) {
+            val cause = (t as? InvocationTargetException)?.targetException ?: t
+            runCatching {
+                SplitInstallManagerFactory.create(context).startInstall(
+                    SplitInstallRequest.newBuilder().addModule("ocr").build()
+                )
+            }
+            throw IllegalStateException("OCR 扩展未安装，已请求按需下载；请稍后重试", cause)
+        }
+    }
+}
