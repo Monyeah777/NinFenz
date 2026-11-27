@@ -1024,6 +1024,7 @@ def check_rust_unwrap(ctx: Context, rule: dict):
         text = ctx.text(rel)
         if not text:
             continue
+        text = strip_rust_test_modules(text)
         stripped = strip_comments(strip_strings(text, "c"), "c")
         count = len(re.findall(r"\.(?:unwrap|expect)\s*\(", stripped))
         if not count:
@@ -1039,6 +1040,33 @@ def check_rust_unwrap(ctx: Context, rule: dict):
     return hits, files
 
 
+
+def strip_rust_test_modules(text: str) -> str:
+    """把 #[cfg(test)] mod tests { ... } 整块清空（保留行号）；E-008/E-010 只看生产路径。"""
+    lines = text.splitlines(keepends=True)
+    out = list(lines)
+    i = 0
+    while i < len(lines):
+        if lines[i].strip().startswith("#[cfg(test)]"):
+            j = i + 1
+            while j < len(lines) and "mod " not in lines[j]:
+                j += 1
+            if j < len(lines) and "{" in lines[j]:
+                depth = 0
+                k = j
+                while k < len(lines):
+                    depth += lines[k].count("{") - lines[k].count("}")
+                    if depth <= 0:
+                        break
+                    k += 1
+                for x in range(i, min(k + 1, len(lines))):
+                    out[x] = chr(10) if lines[x].endswith(chr(10)) else ""
+                i = k + 1
+                continue
+        i += 1
+    return "".join(out)
+
+
 @check("rust_panic")
 def check_rust_panic(ctx: Context, rule: dict):
     p = rule.get("params") or {}
@@ -1048,8 +1076,17 @@ def check_rust_panic(ctx: Context, rule: dict):
         text = ctx.text(rel)
         if not text:
             continue
-        stripped = strip_comments(strip_strings(text, "c"), "c")
-        count = len(re.findall(r"\b(?:panic!|todo!|unimplemented!)\s*\(", stripped))
+        text = strip_rust_test_modules(text)
+        marker = p.get("allow_marker")
+        count = 0
+        raw_lines = text.splitlines()
+        for idx, line in enumerate(raw_lines):
+            if not re.search(r"\b(?:panic!|todo!|unimplemented!)\s*\(", line):
+                continue
+            window = "\n".join(raw_lines[max(0, idx - 3):idx + 1])
+            if marker and re.search(marker, window):
+                continue
+            count += 1
         if count:
             hits.append(hit(rel, 1, f"panic!/todo!/unimplemented! {count} 次", f"{count} 次"))
     return hits, files

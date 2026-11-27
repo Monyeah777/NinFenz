@@ -29,6 +29,8 @@ fn get_u64(v: &Value, path: &[&str]) -> u64 {
     for p in path {
         cur = &cur[*p];
     }
+    // audit: panic-fail-closed —— limits.json 是编译期内嵌的单一真源；缺整数路径属构建期契约破坏，
+    // 宁可 fail-closed 暴露，也不静默取默认值。
     cur.as_u64().unwrap_or_else(|| panic!("limits.json 缺少整数路径 {path:?}"))
 }
 

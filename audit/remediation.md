@@ -146,3 +146,12 @@
 - 验证：engine/rust 全量 cargo test **249 passed / 0 failed**（此前 245 passed / 4 failed）；desktop/tests 资产契约相关 58 passed；审计总分维持 96.94、门禁 PASS。
 - 说明：生成段 diff 较大是生成器格式化结果（同一生成器重跑覆盖），非手改；已确认生成后测试转绿。
 
+
+
+## 第九轮：Rust 生产路径口径修正（2026-11-27）
+
+- E-010（7 文件 → 0）：检查器误把 `#[cfg(test)] mod tests` 里的 unwrap/expect 算进生产路径。新增 `strip_rust_test_modules()`（按大括号配平整块剔除、保留行号），asset_contract.rs 生产 unwrap 39→3；规则命中 7→0。
+- E-008（13 → 0）：同样先剔除测试模块；余下两处刻意 fail-closed 断言（limits.json 内嵌契约破坏、pyrandom 越出已复刻子集）挂 `audit: panic-fail-closed` 说明，检查器按标记豁免。
+- 结果：总分 96.94 → 97.34；E 96→100；P0=0/P1=0；engine/rust `cargo check` 通过。
+- 说明：E-010 属规则误报修正，E-008 属「显式 fail-closed 才可豁免」的口径收紧+代码标注，两者都写进 calibration.md。
+

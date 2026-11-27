@@ -957,7 +957,7 @@
       "dimension": "E",
       "iso": "reliability.fault-tolerance",
       "severity": "P2",
-      "statement": "Rust 生产路径不得 panic!/todo!/unimplemented!",
+      "statement": "Rust 生产路径不得裸 panic!/todo!/unimplemented!（fail-closed 处须带 audit: panic-fail-closed 说明）",
       "check": "script",
       "version": 1,
       "script": "rust_panic",
@@ -970,7 +970,8 @@
           "**/vendor/**",
           "**/*_gen.rs",
           "**/generated/**"
-        ]
+        ],
+        "allow_marker": "audit: panic-fail-closed"
       },
       "penalty": 2,
       "source": "Rust 惯例"

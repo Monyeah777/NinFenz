@@ -14,6 +14,7 @@
 | p2-batch3（报告样板 + UI 路径） | 0.3.7-preview.1 | 166 | **96.82** | 0 | 0 | 1264 | 229 | audit/evidence/p2-batch3/ |
 | p2-batch4（Rust/Kotlin 重复块） | 0.3.7-preview.1 | 166 | **96.94** | 0 | 0 | 1261 | 221 | audit/evidence/p2-batch4/ |
 | p2-batch5（truth-drift 收口） | 0.3.7-preview.1 | 166 | **96.94** | 0 | 0 | 1261 | 220 | audit/evidence/p2-batch5/ |
+| p2-batch6（Rust 生产路径口径） | 0.3.7-preview.1 | 166 | **97.34** | 0 | 0 | 1241 | 220 | audit/evidence/p2-batch6/ |
 
 ## 维度分变化
 
@@ -77,3 +78,8 @@
 
 - 最新证据 p2-batch5：总分 96.94，P0=0/P1=0/error=0/no_targets=0，audit/ci/gate.sh PASS。
 - engine/rust 全量测试 249 passed / 0 failed（OPEN-TRUTH-DRIFT 关闭）；Python 资产契约测试 58 passed。
+
+
+## 门禁状态（第九轮后）
+
+- 最新证据 p2-batch6：总分 97.34，P0=0/P1=0/error=0/no_targets=0，audit/ci/gate.sh PASS；E 维度 100。

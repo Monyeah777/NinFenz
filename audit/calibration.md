@@ -27,6 +27,8 @@
 | E-006 | C# 空 catch 一律命中 | 体为空且无 best-effort 说明才命中 | engine/dotnet 6 处空 catch 全部补 best-effort 注释 | 与 E-002 同口径：显式忽略需可搜索声明 |
 | E-007 | Python 兜底 except 静默吞掉一律命中 | 体为空且无 best-effort 说明才命中 | 47 处补 best-effort 说明（不可读/不可用属预期，由上层门禁另报） | 与 E-002/E-006 同口径 |
 | F-005 | Python 所有 subprocess 调用必须 timeout | 仅生产代码 subprocess.run/call/check_* 必须 timeout；Popen 与 app/scripts 一次性脚本除外 | Popen 由调用方 wait/timeout 管理（daemon/rust_engine）；bench/一次性脚本非生产运行路径 | 收窄到规则本意「生产代码不挂死」 |
+| E-008 | Rust 生产路径任何 panic!/todo!/unimplemented! 即命中 | fail-closed 处带 `audit: panic-fail-closed` 说明（同一处前 3 行内）可豁免 | app/core/src/limits.rs 内嵌 limits.json 契约破坏、engine/rust/src/pyrandom.rs 越出已复刻子集 | 两处是刻意的 fail-closed 断言，静默降级会破坏契约/逐位对账；豁免须可搜索 |
+| E-010 | Rust unwrap/expect 统计包含测试模块 | 先用 `strip_rust_test_modules` 剔除 `#[cfg(test)] mod tests` 整块再统计 | asset_contract.rs 39→3、miniyaml/contracts 等同类下降；E-010 命中 7→0 | 规则本意是「生产路径」，测试里的 unwrap 是断言手段，计入属误报 |
 
 ## 校准后的门禁含义
 

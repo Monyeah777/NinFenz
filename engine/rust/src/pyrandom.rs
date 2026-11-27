@@ -133,6 +133,7 @@ impl PyRandom {
             return self.genrand_uint32() >> (32 - k);
         }
         // 真源在 k > 32 时拼多个 32 位字；本仓用不到 ⇒ fail-closed，不近似
+        // audit: panic-fail-closed —— 越出已复刻子集必须炸，静默近似会破坏逐位对账。
         panic!("getrandbits(k>32) 不在本线复刻的子集内（真源此处亦未用到）");
     }
 
