@@ -118,3 +118,12 @@
 - F-005：口径收窄到生产代码 subprocess.run/call/check_*，Popen 与 app/scripts 一次性脚本除外；3 处 desktop/core git 调用补 timeout=60，命中归零。
 - 结果：总分 95.88 → 96.52；P0=0/P1=0；D 94→96、E 92→96、F 95→100。
 - 仍开：D-002 剩 1 处（TopLevelScreens 与 WorkflowHub/Import 的函数参数表重复，需改 composable 签名，另案）；D-003/D-004/D-005 结构性重复；C 维度大文件/复杂度未动。
+
+
+## 第六轮：报告样板与 UI 路径收口（2026-11-27）
+
+- D-003（Python 重复块 4 文件 → 0）：抽出 desktop/src/core/report_module.py 公共骨架——crosscheck/docs_claims/self_scan/stability 四个报告模块此前各自复制 render/write/check 前半段与 _json 读取；现统一为 report_module.render / writer(REPORT_REL, build) / start(root, rel, build, msg)，模块只保留业务判据。四模块契约测试 + sealed crosscheck 共 44 用例全绿。
+- B-001（UI 直写文件 25 处 → 0）：新增 data/ProjectPaths.kt 作为项目/作者/草稿路径的单一构造点（projectsDir/projectDir/authoringDir/specOverride/templateMd/zeroSlice/projectJson/draftsDir/deliveryDraft/packSpec/templateExportCache），NfMobileApp/AuthorScreen/DeliveryScreen/ImportScreen/TopLevelScreens 共 24 处替换，UI 层不再直接 new java.io.File。
+- 结果：总分 96.52 → 96.82；B 94→97、D 96→98；P0=0/P1=0；Android 全量单测 BUILD SUCCESSFUL。
+- 仍开：D-002 剩 1（TopLevelScreens 参数表重复）、D-004 Rust 重复、D-005 测试重复；C 维度大文件/复杂度未动。
+

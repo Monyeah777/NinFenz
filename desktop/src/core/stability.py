@@ -9,6 +9,8 @@
 """
 from __future__ import annotations
 
+from core import report_module
+
 import hashlib
 import json
 from concurrent.futures import ThreadPoolExecutor
@@ -126,29 +128,12 @@ def build(root: str = ".") -> Dict[str, Any]:
     return report
 
 
-def render(report: Dict[str, Any]) -> str:
-    return json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
-
-
-def write(root: str = ".") -> Path:
-    from core import atomic_write
-    path = Path(root) / REPORT_REL
-    atomic_write.write_text(path, render(build(root)))
-    return path
+render = report_module.render
+write = report_module.writer(REPORT_REL, build)
 
 
 def check(root: str = ".") -> List[str]:
-    issues: List[str] = []
-    path = Path(root) / REPORT_REL
-    if not path.is_file():
-        issues.append("缺 %s（修复指引：跑 write() 生成）" % REPORT_REL)
-    try:
-        committed = json.loads((Path(root) / REPORT_REL).read_text(encoding="utf-8"))
-    except (OSError, ValueError) as exc:
-        return ["%s 不可解析：%s（修复指引：重生成）" % (REPORT_REL, exc)]
-    live = build(root)
-    if render(committed) != render(live):
-        issues.append("稳定性报告与实时重算不一致（修复指引：重跑 write）")
+    issues, committed, live = report_module.start(root, REPORT_REL, build, "稳定性报告与实时重算不一致（修复指引：重跑 write）")
     for item in committed.get("checks") or []:
         if not item.get("identical") or int(item.get("mismatches") or 0) != 0:
             issues.append("%s 重复/并发摘要不一致（%s mismatches）"

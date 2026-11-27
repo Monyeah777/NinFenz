@@ -838,8 +838,8 @@ is Detail.Inbox -> InboxScreen(
                                         val pack = packs.packs.firstOrNull {
                                             it.id == entry.project.refs.basePackId && it.version == entry.project.refs.basePackVersion
                                         }
-                                        val specFile = pack?.let { java.io.File(it.dir, "spec/main.nfspec.json") }
-                                        val override = java.io.File(java.io.File(java.io.File(context.filesDir, "projects"), entry.project.id), "authoring/spec-override.json")
+                                        val specFile = pack?.let { dev.ninfenz.mobile.data.ProjectPaths.packSpec(it.dir) }
+                                        val override = dev.ninfenz.mobile.data.ProjectPaths.specOverride(context.filesDir, entry.project.id)
                                         val source = if (override.isFile) override else specFile
                                         val raw = source?.takeIf { it.isFile }?.readText(Charsets.UTF_8)
                                         if (raw == null) {
@@ -870,8 +870,8 @@ is Detail.Inbox -> InboxScreen(
                                         val pack = packs.packs.firstOrNull {
                                             it.id == entry.project.refs.basePackId && it.version == entry.project.refs.basePackVersion
                                         }
-                                        val override = java.io.File(java.io.File(java.io.File(context.filesDir, "projects"), entry.project.id), "authoring/spec-override.json")
-                                        val specFile = pack?.let { java.io.File(it.dir, "spec/main.nfspec.json") }
+                                        val override = dev.ninfenz.mobile.data.ProjectPaths.specOverride(context.filesDir, entry.project.id)
+                                        val specFile = pack?.let { dev.ninfenz.mobile.data.ProjectPaths.packSpec(it.dir) }
                                         val source = if (override.isFile) override else specFile
                                         val spec = source?.takeIf { it.isFile }?.let { file ->
                                             runCatching { kotlinx.serialization.json.Json.parseToJsonElement(file.readText(Charsets.UTF_8)).jsonObject }.orNullLogged("NfMobileApp")
@@ -880,7 +880,7 @@ is Detail.Inbox -> InboxScreen(
                                             android.widget.Toast.makeText(context, context.getString(dev.ninfenz.mobile.R.string.project_export_template), android.widget.Toast.LENGTH_LONG).show()
                                             return@launch
                                         }
-                                        val templateMd = java.io.File(java.io.File(java.io.File(context.filesDir, "projects"), entry.project.id), "authoring/template.md")
+                                        val templateMd = dev.ninfenz.mobile.data.ProjectPaths.templateMd(context.filesDir, entry.project.id)
                                             .takeIf { it.isFile }?.readText(Charsets.UTF_8)
                                         val prepared = dev.ninfenz.mobile.data.TemplatePackageBuilder.prepare(context.cacheDir, pack, spec, entry.project.title, templateMd)
                                         try {
@@ -891,7 +891,7 @@ is Detail.Inbox -> InboxScreen(
                                             if (!hash.ok || tree == null || count == null) {
                                                 android.widget.Toast.makeText(context, hash.error?.message ?: context.getString(dev.ninfenz.mobile.R.string.project_export_template), android.widget.Toast.LENGTH_LONG).show()
                                             } else {
-                                                val zip = dev.ninfenz.mobile.data.TemplatePackageBuilder.finalize(prepared, tree, count, java.io.File(context.cacheDir, "template-export"))
+                                                val zip = dev.ninfenz.mobile.data.TemplatePackageBuilder.finalize(prepared, tree, count, dev.ninfenz.mobile.data.ProjectPaths.templateExportCache(context.cacheDir))
                                                 val intent = ShareExporter.shareFileIntent(context, zip, "application/zip", entry.project.title)
                                                 ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.project_export_template))
                                             }
@@ -943,15 +943,15 @@ is Detail.Inbox -> InboxScreen(
                                         when (result) {
                                             is CreateProjectResult.Success -> {
                                                 withContext(Dispatchers.IO) {
-                                                    val oldDir = java.io.File(java.io.File(context.filesDir, "projects"), entry.project.id)
-                                                    val newDir = java.io.File(java.io.File(context.filesDir, "projects"), result.project.id)
+                                                    val oldDir = dev.ninfenz.mobile.data.ProjectPaths.projectDir(context.filesDir, entry.project.id)
+                                                    val newDir = dev.ninfenz.mobile.data.ProjectPaths.projectDir(context.filesDir, result.project.id)
                                                     oldDir.listFiles()?.filter { it.name != ".nfproject.json" }?.forEach { child ->
-                                                        child.copyRecursively(java.io.File(newDir, child.name), overwrite = false)
+                                                        child.copyRecursively(newDir.resolve(child.name), overwrite = false)
                                                     }
-                                                    val oldDraft = java.io.File(java.io.File(context.filesDir, "drafts"), "delivery-" + entry.project.id + ".json")
+                                                    val oldDraft = dev.ninfenz.mobile.data.ProjectPaths.deliveryDraft(context.filesDir, entry.project.id)
                                                     if (oldDraft.isFile) {
                                                         oldDraft.copyTo(
-                                                            java.io.File(java.io.File(context.filesDir, "drafts"), "delivery-" + result.project.id + ".json"),
+                                                            dev.ninfenz.mobile.data.ProjectPaths.deliveryDraft(context.filesDir, result.project.id),
                                                             overwrite = true
                                                         )
                                                     }

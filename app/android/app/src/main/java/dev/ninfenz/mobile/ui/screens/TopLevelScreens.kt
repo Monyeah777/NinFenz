@@ -1113,10 +1113,10 @@ fun ProjectDetailScreen(
     var showTemplateReference by remember { mutableStateOf(false) }
     var historyExpanded by rememberSaveable(project.id) { mutableStateOf(false) }
     var hasSpecOverride by remember(project.id) {
-        mutableStateOf(java.io.File(java.io.File(java.io.File(context.filesDir, "projects"), project.id), "authoring/spec-override.json").isFile)
+        mutableStateOf(dev.ninfenz.mobile.data.ProjectPaths.specOverride(context.filesDir, project.id).isFile)
     }
     val templateReference = remember(project.id, hasSpecOverride) {
-        java.io.File(java.io.File(java.io.File(context.filesDir, "projects"), project.id), "authoring/template.md")
+        dev.ninfenz.mobile.data.ProjectPaths.templateMd(context.filesDir, project.id)
             .takeIf { it.isFile }?.readText(Charsets.UTF_8)
     }
     val canApprove = project.status in setOf(ProjectStatus.VALIDATED, ProjectStatus.EXPORTED, ProjectStatus.REVIEWED)
@@ -1125,7 +1125,7 @@ fun ProjectDetailScreen(
         reviewStale = runCatching {
             withContext(Dispatchers.IO) {
                 dev.ninfenz.mobile.data.ProjectReviewStore(context.filesDir).isStale(
-                    java.io.File(java.io.File(context.filesDir, "projects"), project.id + ".nfproject.json")
+                    dev.ninfenz.mobile.data.ProjectPaths.projectJson(context.filesDir, project.id)
                 )
             }
         }.getOrDefault(false)

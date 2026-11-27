@@ -147,9 +147,9 @@ fun AuthorScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpenP
     val authorClipboard = androidx.compose.ui.platform.LocalClipboardManager.current
     var authorReload by remember { mutableIntStateOf(0) }
     var showRemoveOverride by remember { mutableStateOf(false) }
-    val specOverride = java.io.File(java.io.File(java.io.File(authorContext.filesDir, "projects"), project.id), "authoring/spec-override.json")
+    val specOverride = dev.ninfenz.mobile.data.ProjectPaths.specOverride(authorContext.filesDir, project.id)
     val templateReference = remember(project.id, authorReload) {
-        java.io.File(java.io.File(java.io.File(authorContext.filesDir, "projects"), project.id), "authoring/template.md")
+        dev.ninfenz.mobile.data.ProjectPaths.templateMd(authorContext.filesDir, project.id)
             .takeIf { it.isFile }?.readText(Charsets.UTF_8)
     }
     var artifacts by remember { mutableStateOf<AuthorArtifacts?>(null) }
@@ -311,15 +311,15 @@ private fun ProtocolAuthorContent(
     val context = androidx.compose.ui.platform.LocalContext.current
     val importPrefill = remember(project.id) {
         runCatching {
-            val dir = java.io.File(java.io.File(java.io.File(context.filesDir, "projects"), project.id), "authoring")
+            val dir = dev.ninfenz.mobile.data.ProjectPaths.authoringDir(context.filesDir, project.id)
             val file = dir.listFiles()?.firstOrNull { it.isFile && it.name.startsWith("import-") } ?: return@runCatching emptyMap()
             dev.ninfenz.mobile.data.ImportPrefill.fromJson(file.readText(Charsets.UTF_8))
         }.getOrDefault(emptyMap())
     }
     val zeroSlicePrefill = remember(project.id) {
         runCatching {
-            val dir = java.io.File(java.io.File(java.io.File(context.filesDir, "projects"), project.id), "authoring")
-            val file = java.io.File(dir, "zero-slice.json")
+            val dir = dev.ninfenz.mobile.data.ProjectPaths.authoringDir(context.filesDir, project.id)
+            val file = dir.resolve("zero-slice.json")
             dev.ninfenz.mobile.data.ZeroSliceStore(context.filesDir).read(file)?.slotValues ?: emptyMap()
         }.getOrDefault(emptyMap())
     }
@@ -329,7 +329,7 @@ private fun ProtocolAuthorContent(
     }
     val templatePrefill = remember(project.id, artifacts.protocolJson) {
         runCatching {
-            val file = java.io.File(java.io.File(java.io.File(context.filesDir, "projects"), project.id), "authoring/template.md")
+            val file = dev.ninfenz.mobile.data.ProjectPaths.templateMd(context.filesDir, project.id)
             if (!file.isFile) return@runCatching emptyMap<String, String>()
             val byName = dev.ninfenz.mobile.data.TemplateProtocolPrefill.parse(file.readText(Charsets.UTF_8))
             protocol.fields.mapNotNull { field ->

@@ -241,7 +241,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
     var rawPlan by remember { mutableStateOf<JsonObject?>(null) }
     var inputs by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
     val templateReference = remember(project.id) {
-        java.io.File(java.io.File(java.io.File(context.filesDir, "projects"), project.id), "authoring/template.md")
+        dev.ninfenz.mobile.data.ProjectPaths.templateMd(context.filesDir, project.id)
             .takeIf { it.isFile }?.readText(Charsets.UTF_8)
     }
     val parsedTemplateSlots = remember(templateReference) { parseTemplateSlots(templateReference.orEmpty()) }
@@ -420,10 +420,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
     }
     val restoredInputs = remember(project.id) { draftStore.load(project.id) }
     val zeroPrefill = remember(project.id) {
-        val file = java.io.File(
-            java.io.File(java.io.File(context.filesDir, "projects"), project.id),
-            "authoring/zero-slice.json"
-        )
+        val file = dev.ninfenz.mobile.data.ProjectPaths.zeroSlice(context.filesDir, project.id)
         dev.ninfenz.mobile.data.ZeroSliceStore(context.filesDir).read(file)?.slotValues ?: emptyMap()
     }
     val protocolPrefill = remember(project.id, artifacts?.protocol, artifacts?.spec) {
@@ -590,7 +587,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
         }
     }
 
-    val specOverride = java.io.File(java.io.File(java.io.File(context.filesDir, "projects"), project.id), "authoring/spec-override.json")
+    val specOverride = dev.ninfenz.mobile.data.ProjectPaths.specOverride(context.filesDir, project.id)
     LaunchedEffect(pack?.dir?.absolutePath, project.id) {
         loading = true
         loadError = null

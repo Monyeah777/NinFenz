@@ -605,7 +605,7 @@ fun ImportScreen(
             val pack = packs.firstOrNull()
             val spec = pack?.let { entry ->
                 runCatching {
-                    J.parseObject(java.io.File(entry.dir, "spec/main.nfspec.json").readText(Charsets.UTF_8), "nf-md-spec/1")
+                    J.parseObject(dev.ninfenz.mobile.data.ProjectPaths.packSpec(entry.dir).readText(Charsets.UTF_8), "nf-md-spec/1")
                 }.orNullLogged("ImportScreen")
             }
             val response = safeCall("zero-slice", buildJsonObject {

@@ -10,6 +10,8 @@
 """
 from __future__ import annotations
 
+from core import report_module
+
 import json
 import re
 from pathlib import Path
@@ -115,29 +117,12 @@ def build(root: str = ".") -> Dict[str, Any]:
     return report
 
 
-def render(report: Dict[str, Any]) -> str:
-    return json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
-
-
-def write(root: str = ".") -> Path:
-    from core import atomic_write
-    path = Path(root) / REPORT_REL
-    atomic_write.write_text(path, render(build(root)))
-    return path
+render = report_module.render
+write = report_module.writer(REPORT_REL, build)
 
 
 def check(root: str = ".") -> List[str]:
-    issues: List[str] = []
-    path = Path(root) / REPORT_REL
-    if not path.is_file():
-        issues.append("缺 %s（修复指引：跑 write() 生成）" % REPORT_REL)
-    try:
-        committed = json.loads((Path(root) / REPORT_REL).read_text(encoding="utf-8"))
-    except (OSError, ValueError) as exc:
-        return ["%s 不可解析：%s（修复指引：重生成）" % (REPORT_REL, exc)]
-    live = build(root)
-    if render(committed) != render(live):
-        issues.append("文档声明报告与实时重算不一致（修复指引：重跑 write）")
+    issues, committed, live = report_module.start(root, REPORT_REL, build, "文档声明报告与实时重算不一致（修复指引：重跑 write）")
     if live.get("violations"):
         for item in live["violations"][:5]:
             issues.append("%s 第%s行：%s" % (item.get("doc"), item.get("line"), item.get("detail")))
