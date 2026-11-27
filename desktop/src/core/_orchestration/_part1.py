@@ -87,16 +87,49 @@ def _closure(sid: str, needs: Dict[str, List[str]]) -> List[str]:
     return sorted(seen)
 
 
+def _is_strict_int(value: Any) -> bool:
+    """整数声明：布尔不当整数（Python 的 bool ⊂ int）。"""
+    return isinstance(value, int) and not isinstance(value, bool)
+
+
+def _is_strict_number(value: Any) -> bool:
+    """数声明：同上，布尔不当数。"""
+    return isinstance(value, (int, float)) and not isinstance(value, bool)
+
+
 def _type_issue(value: Any, spec: Dict[str, Any]) -> str:
     """值是否满足 `inputSchema` 的类型声明 → 空串 = 合规。布尔不当整数（Python 的 bool ⊂ int）。"""
     want = str((spec or {}).get("type") or "")
     if want == "integer":
-        return "" if (isinstance(value, int) and not isinstance(value, bool)) else "integer"
+        return "" if _is_strict_int(value) else "integer"
     if want == "number":
-        return "" if (isinstance(value, (int, float)) and not isinstance(value, bool)) else "number"
+        return "" if _is_strict_number(value) else "number"
     if want in _TYPES:
         return "" if isinstance(value, _TYPES[want]) else want
     return ""
+
+
+def _ref_issues(sid: str, args: Dict[str, Any], ids: List[str],
+                closure: List[str]) -> List[str]:
+    """一步的引用判据：写法非法 / 指向不存在的步 / 隐式依赖（不在 needs 闭包内）。"""
+    issues: List[str] = []
+    for key, val in args.items():
+        if not (isinstance(val, str) and val.startswith("$")):
+            continue
+        m = _REF.match(val)
+        if not m:
+            issues.append("步 %s 的参数 %s 引用写法非法：%r（修复指引：$<步 id>.<字段>，步 id "
+                          "小写字母起头；以 $ 起头的字符串一律当引用，不静默当字面量）"
+                          % (sid, key, val))
+            continue
+        ref_id = m.group(1)
+        if ref_id not in ids:
+            issues.append("步 %s 的引用 $%s 指向不存在的步（修复指引：改用已声明的步 id）"
+                          % (sid, ref_id))
+        elif ref_id != sid and ref_id not in closure:
+            issues.append("步 %s 的引用 $%s 是**隐式依赖**（修复指引：把 %s 写进本步 needs——"
+                          "顺序必须显式，否则同一份计划两次执行可不同序）" % (sid, ref_id, ref_id))
+    return issues
 
 
 def _args_issues(sid: str, args: Dict[str, Any], spec: Dict[str, Any],
@@ -118,27 +151,12 @@ def _args_issues(sid: str, args: Dict[str, Any], spec: Dict[str, Any],
         if bad:
             issues.append("步 %s 的参数 %s 类型应为 %s（当前 %s）"
                           % (sid, key, bad, type(val).__name__))
-    for key, val in args.items():
-        if not (isinstance(val, str) and val.startswith("$")):
-            continue
-        m = _REF.match(val)
-        if not m:
-            issues.append("步 %s 的参数 %s 引用写法非法：%r（修复指引：$<步 id>.<字段>，步 id "
-                          "小写字母起头；以 $ 起头的字符串一律当引用，不静默当字面量）"
-                          % (sid, key, val))
-            continue
-        ref_id = m.group(1)
-        if ref_id not in ids:
-            issues.append("步 %s 的引用 $%s 指向不存在的步（修复指引：改用已声明的步 id）"
-                          % (sid, ref_id))
-        elif ref_id != sid and ref_id not in closure:
-            issues.append("步 %s 的引用 $%s 是**隐式依赖**（修复指引：把 %s 写进本步 needs——"
-                          "顺序必须显式，否则同一份计划两次执行可不同序）" % (sid, ref_id, ref_id))
+    issues += _ref_issues(sid, args, ids, closure)
     return issues
 
 
-def _topo(ids: List[str], needs: Dict[str, List[str]]) -> List[str]:
-    """确定性拓扑序：就绪集按（声明序, id）决胜——同输入同输出，不看字典哈希。"""
+def _build_indeg(ids: List[str], needs: Dict[str, List[str]]):
+    """建图：声明序索引 / 入度 / 子边；自依赖与未知依赖不计数。"""
     index = {sid: i for i, sid in enumerate(ids)}
     indeg = {sid: 0 for sid in ids}
     kids: Dict[str, List[str]] = {sid: [] for sid in ids}
@@ -148,6 +166,12 @@ def _topo(ids: List[str], needs: Dict[str, List[str]]) -> List[str]:
                 continue
             indeg[sid] += 1
             kids[dep].append(sid)
+    return index, indeg, kids
+
+
+def _topo(ids: List[str], needs: Dict[str, List[str]]) -> List[str]:
+    """确定性拓扑序：就绪集按（声明序, id）决胜——同输入同输出，不看字典哈希。"""
+    index, indeg, kids = _build_indeg(ids, needs)
     ready = [s for s in ids if indeg[s] == 0]
     order: List[str] = []
     while ready:
@@ -175,6 +199,45 @@ def _tool_issues(sid: str, tool: str, cat: Dict[str, Any], wf: str) -> List[str]
     return []
 
 
+def _step_problem(i: int, step: Any, steps: Dict[str, Any]) -> str | None:
+    """一步的结构问题（对象 / id 合法 / id 唯一）；None = 可用。"""
+    if not isinstance(step, dict):
+        return "第 %d 步不是对象（修复指引：id / tool / args 三字段的对象）" % i
+    sid = str(step.get("id") or "")
+    if not _STEP_ID.match(sid):
+        return ("第 %d 步的 id 非法：%r（修复指引：小写字母起头，[a-z0-9_-]，≤64 字符）"
+                % (i, sid))
+    if sid in steps:
+        return "步 id 重复：%s（修复指引：每步唯一——它是依赖与证据的锚）" % sid
+    return None
+
+
+def _step_fields(sid: str, step: Dict[str, Any], cat: Dict[str, Any],
+                 wf: str) -> tuple[List[str], str, Dict[str, Any], List[Any]]:
+    """一步的 tool / args / needs 判据与规范化 → (issues, tool, args, need)。"""
+    issues: List[str] = []
+    tool = str(step.get("tool") or "")
+    issues += _tool_issues(sid, tool, cat, wf)
+    args = step.get("args") or {}
+    if not isinstance(args, dict):
+        issues.append("步 %s 的 args 须为对象" % sid)
+        args = {}
+    need = step.get("needs") or []
+    if not isinstance(need, list):
+        issues.append("步 %s 的 needs 须为列表" % sid)
+        need = []
+    return issues, tool, args, need
+
+
+def _step_expects(sid: str, step: Dict[str, Any]) -> tuple[List[str], List[Any]]:
+    """一步的 expects 判据 → (issues, expects)；非法即清空。"""
+    exp = step.get("expects") or []
+    if not isinstance(exp, list) or any(not str(x).strip() for x in exp):
+        return ["步 %s 的 expects 须为非空字符串列表（修复指引：写清该步必须产出的字段，"
+                "派发时即按此验收）" % sid], []
+    return [], exp
+
+
 def _step_ids_issues(raw: List[Any], cat: Dict[str, Any], wf: str):
     """steps 的结构 + 工具面判据 → (issues, steps, ids, needs)；不可用的步被丢弃并记账。"""
     issues: List[str] = []
@@ -182,32 +245,15 @@ def _step_ids_issues(raw: List[Any], cat: Dict[str, Any], wf: str):
     ids: List[str] = []
     needs: Dict[str, List[str]] = {}
     for i, step in enumerate(raw, 1):
-        if not isinstance(step, dict):
-            issues.append("第 %d 步不是对象（修复指引：id / tool / args 三字段的对象）" % i)
+        problem = _step_problem(i, step, steps)
+        if problem is not None:
+            issues.append(problem)
             continue
         sid = str(step.get("id") or "")
-        if not _STEP_ID.match(sid):
-            issues.append("第 %d 步的 id 非法：%r（修复指引：小写字母起头，[a-z0-9_-]，≤64 字符）"
-                          % (i, sid))
-            continue
-        if sid in steps:
-            issues.append("步 id 重复：%s（修复指引：每步唯一——它是依赖与证据的锚）" % sid)
-            continue
-        tool = str(step.get("tool") or "")
-        issues += _tool_issues(sid, tool, cat, wf)
-        args = step.get("args") or {}
-        if not isinstance(args, dict):
-            issues.append("步 %s 的 args 须为对象" % sid)
-            args = {}
-        need = step.get("needs") or []
-        if not isinstance(need, list):
-            issues.append("步 %s 的 needs 须为列表" % sid)
-            need = []
-        exp = step.get("expects") or []
-        if not isinstance(exp, list) or any(not str(x).strip() for x in exp):
-            issues.append("步 %s 的 expects 须为非空字符串列表（修复指引：写清该步必须产出的字段，"
-                          "派发时即按此验收）" % sid)
-            exp = []
+        f_issues, tool, args, need = _step_fields(sid, step, cat, wf)
+        e_issues, exp = _step_expects(sid, step)
+        issues += f_issues
+        issues += e_issues
         steps[sid] = {"tool": tool, "args": args, "expects": [str(x) for x in exp],
                       "purpose": str(step.get("purpose") or "")}
         needs[sid] = [str(n) for n in need]
@@ -229,6 +275,19 @@ def _needs_issues(ids: List[str], steps: Dict[str, Any],
     return issues
 
 
+def _workflow_issues(doc: Dict[str, Any],
+                     cat: Dict[str, Any]) -> tuple[List[str], str]:
+    """计划 workflow 判据（非空 / 在册）→ (issues, wf)。"""
+    issues: List[str] = []
+    wf = str(doc.get("workflow") or "")
+    if not wf:
+        issues.append("计划缺 workflow（修复指引：填 %s 在册的工作流名）" % DRIVER_REL)
+    elif wf not in cat["workflows"]:
+        issues.append("工作流未在 %s 在册：%s（在册：%s）"
+                      % (DRIVER_REL, wf, "、".join(sorted(cat["workflows"])) or "无"))
+    return issues, wf
+
+
 def compile_plan(root: str = ".", plan: Optional[Dict[str, Any]] = None,
                  tools: Optional[Dict[str, Dict[str, Any]]] = None) -> Dict[str, Any]:
     """校验并编译编排计划 → `{"ok", "order", "issues", "steps", "workflow"}`（只读）。"""
@@ -241,12 +300,8 @@ def compile_plan(root: str = ".", plan: Optional[Dict[str, Any]] = None,
     if str(doc.get("schema") or "") != SCHEMA:
         issues.append("计划 schema 须为 %s（当前 %r）" % (SCHEMA, doc.get("schema")))
     cat = catalog(root, tools)
-    wf = str(doc.get("workflow") or "")
-    if not wf:
-        issues.append("计划缺 workflow（修复指引：填 %s 在册的工作流名）" % DRIVER_REL)
-    elif wf not in cat["workflows"]:
-        issues.append("工作流未在 %s 在册：%s（在册：%s）"
-                      % (DRIVER_REL, wf, "、".join(sorted(cat["workflows"])) or "无"))
+    wf_issues, wf = _workflow_issues(doc, cat)
+    issues += wf_issues
     raw = doc.get("steps")
     if not isinstance(raw, list) or not raw:
         return {"schema": SCHEMA, "ok": False, "workflow": wf, "order": [], "steps": {},

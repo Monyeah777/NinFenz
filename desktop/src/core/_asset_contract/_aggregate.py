@@ -22,25 +22,28 @@ from ._script import _check_chain, _check_index, _check_script
 
 
 # ---------------------------------------------------------------- 聚合 / 入口
-def _registry_issues(root: str, doc: Dict[str, Any]) -> List[str]:
-    """D1 两册合一：本册声明为数据的 `protocol/` 件必须已在 `protocol/data_contracts.json` 登记。
+def _protocol_targets(root: str, doc: Dict[str, Any]) -> List[str]:
+    return [rel for spec in doc.get("data") or [] for rel in resolve(root, spec)
+            if rel.startswith("protocol/") and rel.endswith(".json")]
 
-    为什么：仓库里已有「数据契约登记册」（ODCS 式：谁判 / 谁管 / 坏了怎么重建）。资产册再造一份
-    「谁管」就是第二套词表——同型病。判据只问一句：**同一 artifact 不许只在资产册出现**。
-    """
-    targets = [rel for spec in doc.get("data") or [] for rel in resolve(root, spec)
-               if rel.startswith("protocol/") and rel.endswith(".json")]
-    if not targets:
-        return []                      # 本册没有 protocol 真源件 ⇒ 登记册判据不适用（临时场景常见）
+
+def _registry_arts(root: str) -> Tuple[set, List[str] | None]:
+    """登记册的 artifact 集；不可用（缺件/坏件）时给一条如实的问题。"""
     p = Path(root) / "protocol/data_contracts.json"
     if not p.is_file():
-        return ["缺 protocol/data_contracts.json"
-                "（修复指引：补登记册——本册有 protocol 真源件须登记）"]
+        return set(), ["缺 protocol/data_contracts.json"
+                       "（修复指引：补登记册——本册有 protocol 真源件须登记）"]
     try:
         reg = _strict_json(p.read_text(encoding="utf-8"))
     except (OSError, ValueError) as exc:
-        return ["protocol/data_contracts.json 不可读：%s（修复指引：修好 JSON）" % exc]
+        return set(), ["protocol/data_contracts.json 不可读：%s（修复指引：修好 JSON）" % exc]
     arts = {str(c.get("artifact")) for c in (reg.get("contracts") or []) if isinstance(c, dict)}
+    return arts, None
+
+
+def _pending_registry_issues(root: str, doc: Dict[str, Any],
+                            arts: set) -> List[str]:
+    """登记册未覆盖的 protocol 真源件（按声明序，每件一条）。"""
     issues: List[str] = []
     for spec in doc.get("data") or []:
         for rel in resolve(root, spec):
@@ -50,6 +53,21 @@ def _registry_issues(root: str, doc: Dict[str, Any]) -> List[str]:
                               "同一 artifact 不许只在资产册出现）" % rel)
                 break
     return issues
+
+
+def _registry_issues(root: str, doc: Dict[str, Any]) -> List[str]:
+    """D1 两册合一：本册声明为数据的 `protocol/` 件必须已在 `protocol/data_contracts.json` 登记。
+
+    为什么：仓库里已有「数据契约登记册」（ODCS 式：谁判 / 谁管 / 坏了怎么重建）。资产册再造一份
+    「谁管」就是第二套词表——同型病。判据只问一句：**同一 artifact 不许只在资产册出现**。
+    """
+    targets = _protocol_targets(root, doc)
+    if not targets:
+        return []                      # 本册没有 protocol 真源件 ⇒ 登记册判据不适用（临时场景常见）
+    arts, errs = _registry_arts(root)
+    if errs is not None:
+        return errs
+    return _pending_registry_issues(root, doc, arts)
 
 
 
@@ -71,6 +89,39 @@ _FRIENDLY = {"string": "string", "integer": "integer", "number": "number",
 
 
 
+def _frictionless_fields(sch: Dict[str, Any]) -> List[Dict[str, Any]]:
+    return [{"name": k, "type": _FRIENDLY.get(str(v.get("type") or ""), "any")}
+            for k, v in sorted((sch.get("properties") or {}).items())
+            if isinstance(v, dict)]
+
+
+def _frictionless_schema(root: str, rel: str, sch_rel: str) -> Dict[str, Any]:
+    """schema 映射面：原 schema 逐字段保留 + Frictionless fields 尽力映射。"""
+    sch, err = _schema_doc(root, sch_rel)
+    if err:
+        return {}
+    out: Dict[str, Any] = {}
+    keep = ("type", "required", "properties", "$schema", "title", "description")
+    if sch:
+        out["x-nf-json-schema"] = {k: sch[k] for k in keep if k in sch}
+        out["x-nf-schema-source"] = sch_rel
+    fields = _frictionless_fields(sch)
+    if fields:
+        out["schema"] = {"fields": fields}
+    return out
+
+
+def _frictionless_item(root: str, rel: str, spec: Dict[str, Any]) -> Dict[str, Any]:
+    item: Dict[str, Any] = {"name": rel.replace("/", "--"), "path": rel}
+    fmt = str(spec.get("format") or "")
+    if fmt:
+        item["format"] = fmt
+    sch_rel = _schema_of(root, rel, spec)
+    if sch_rel:
+        item.update(_frictionless_schema(root, rel, sch_rel))
+    return item
+
+
 def frictionless_export(root: str = ".") -> Tuple[Dict[str, Any], List[str]]:
     """S3 导出：把已声明的数据资产映射成 **Frictionless Data Package**（可被别的生态直接消费）。
 
@@ -88,24 +139,7 @@ def frictionless_export(root: str = ".") -> Tuple[Dict[str, Any], List[str]]:
         for rel in resolve(root, spec):
             if rel.startswith("protocol/"):
                 continue
-            item: Dict[str, Any] = {"name": rel.replace("/", "--"), "path": rel}
-            fmt = str(spec.get("format") or "")
-            if fmt:
-                item["format"] = fmt
-            sch_rel = _schema_of(root, rel, spec)
-            if sch_rel:
-                sch, err = _schema_doc(root, sch_rel)
-                if not err:
-                    keep = ("type", "required", "properties", "$schema", "title", "description")
-                    if sch:
-                        item["x-nf-json-schema"] = {k: sch[k] for k in keep if k in sch}
-                        item["x-nf-schema-source"] = sch_rel
-                    fields = [{"name": k, "type": _FRIENDLY.get(str(v.get("type") or ""), "any")}
-                              for k, v in sorted((sch.get("properties") or {}).items())
-                              if isinstance(v, dict)]
-                    if fields:
-                        item["schema"] = {"fields": fields}
-            res.append(item)
+            res.append(_frictionless_item(root, rel, spec))
     return {"profile": "data-package", "name": "ninfenz-asset-contracts",
             "title": "NinFenz 数字资产契约（Frictionless Data Package 导出）",
             "x-nf-generated-by": "nf asset contract --export",
@@ -206,6 +240,55 @@ def scan(root: str = ".", faces: Iterable[str] = ()
 
 
 
+def _check_face(root: str, face: str, spec: Dict[str, Any]
+                ) -> Tuple[List[str], List[str], Dict[str, Any]]:
+    """单条契约按面派发 → (issues, warns, stats)。"""
+    if face == "data":
+        sub, s = _check_data(root, spec)
+        return sub, [], s
+    if face == "code":
+        sub, s = _check_code(root, spec)
+        return sub, _code_warns(root, spec), s   # WARN 级治理面，不进 issues（见 _code_warns）
+    if face == "index":
+        sub, s = _check_index(root, spec)
+        return sub, [], s
+    sub, s = _check_script(root, spec)
+    return sub, [], s
+
+
+def _scan_spec(root: str, face: str, spec: Dict[str, Any], issues: List[str],
+               warns: List[str], stats: Dict[str, Any]) -> None:
+    sub, w, s = _check_face(root, face, spec)
+    issues += sub
+    warns += w
+    stats[face] += 1
+    stats["files"] += s.get("files", 0)
+    stats["no_schema"] = int(stats.get("no_schema") or 0) + int(s.get("no_schema") or 0)
+
+
+def _scan_face(root: str, face: str, doc: Dict[str, Any], issues: List[str],
+               warns: List[str], stats: Dict[str, Any]) -> None:
+    for spec in doc.get(face) or []:
+        if not isinstance(spec, dict):
+            issues.append("契约 %s 面有非对象条目（修复指引：每条须是对象）" % face)
+            continue
+        _scan_spec(root, face, spec, issues, warns, stats)
+
+
+def _scan_chains(doc: Dict[str, Any],
+                 want: Iterable[str]) -> Tuple[List[str], int]:
+    issues: List[str] = []
+    if "script" not in want:
+        return issues, 0
+    specs = {str(s.get("id")): s for s in doc.get("script") or [] if isinstance(s, dict)}
+    chains = 0
+    for chain in doc.get("chains") or []:
+        sub, _ = _check_chain(specs, chain if isinstance(chain, dict) else {})
+        issues += sub
+        chains += 1
+    return issues, chains
+
+
 def _scan_impl(root: str = ".", faces: Iterable[str] = ()
                ) -> Tuple[List[str], List[str], Dict[str, Any]]:
     doc, issues = load(root)
@@ -222,29 +305,10 @@ def _scan_impl(root: str = ".", faces: Iterable[str] = ()
     for face in FACES:
         if face not in want:
             continue
-        for spec in doc.get(face) or []:
-            if not isinstance(spec, dict):
-                issues.append("契约 %s 面有非对象条目（修复指引：每条须是对象）" % face)
-                continue
-            if face == "data":
-                sub, s = _check_data(root, spec)
-            elif face == "code":
-                sub, s = _check_code(root, spec)
-                warns += _code_warns(root, spec)   # WARN 级治理面，不进 issues（见 _code_warns）
-            elif face == "index":
-                sub, s = _check_index(root, spec)
-            else:
-                sub, s = _check_script(root, spec)
-            issues += sub
-            stats[face] += 1
-            stats["files"] += s.get("files", 0)
-            stats["no_schema"] = int(stats.get("no_schema") or 0) + int(s.get("no_schema") or 0)
-    specs = {str(s.get("id")): s for s in doc.get("script") or [] if isinstance(s, dict)}
-    if "script" in want:
-        for chain in doc.get("chains") or []:
-            sub, _ = _check_chain(specs, chain if isinstance(chain, dict) else {})
-            issues += sub
-            stats["chains"] += 1
+        _scan_face(root, face, doc, issues, warns, stats)
+    chain_issues, chains = _scan_chains(doc, want)
+    issues += chain_issues
+    stats["chains"] = chains
     return issues, warns, stats
 
 
@@ -298,6 +362,12 @@ def _run_test_file(path: Path) -> Tuple[List[str], int]:
 
 
 
+def _test_selected(spec: Any, want: set) -> bool:
+    if not isinstance(spec, dict):
+        return False
+    return not want or str(spec.get("id")) in want
+
+
 def run_tests(root: str = ".", ids: Iterable[str] = ()) -> Tuple[List[str], Dict[str, Any]]:
     """跑声明的测试件（nf asset contract --run-tests）→ (issues, stats)。"""
     doc, issues = load(root)
@@ -306,7 +376,7 @@ def run_tests(root: str = ".", ids: Iterable[str] = ()) -> Tuple[List[str], Dict
         return issues, out
     want = {str(x) for x in ids}
     for spec in doc.get("code") or []:
-        if not isinstance(spec, dict) or (want and str(spec.get("id")) not in want):
+        if not _test_selected(spec, want):
             continue
         for t in spec.get("tests") or []:
             p = Path(root) / str(t)

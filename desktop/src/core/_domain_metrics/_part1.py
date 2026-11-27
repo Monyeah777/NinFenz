@@ -51,29 +51,36 @@ def _flag(row: Dict[str, str], key: str) -> int:
     raise ValueError("列 %s 非 0/1：%r" % (key, row.get(key)))
 
 
+def _pair_wins(pos: Sequence[float], neg: Sequence[float]) -> float:
+    """逐对胜负（并列 0.5）：ROC-AUC 的 Mann-Whitney 分子。"""
+    wins = 0.0
+    for s in pos:
+        for t in neg:
+            wins += 1.0 if s > t else (0.5 if s == t else 0.0)
+    return wins
+
+
 def _auc(pairs: Sequence[Tuple[float, int]]) -> float:
     """ROC-AUC（Mann-Whitney 口径，并列取平均秩）。"""
     pos = [s for s, y in pairs if y == 1]
     neg = [s for s, y in pairs if y == 0]
     if not pos or not neg:
         return 0.0
-    wins = 0.0
-    for s in pos:
-        for t in neg:
-            wins += 1.0 if s > t else (0.5 if s == t else 0.0)
-    return wins / (len(pos) * len(neg))
+    return _pair_wins(pos, neg) / (len(pos) * len(neg))
 
 
 # ------------------------------------------------------------------ 度量族
 
-def classification(rows: Sequence[Dict[str, str]], **_kwargs) -> Dict[str, Any]:
-    """分类口径：accuracy / macro P-R-F1 / 混淆矩阵（混淆键 = 出现过的 gold 标签，字典序）。"""
-    labels = sorted({str(r["gold"]) for r in rows} | {str(r["pred"]) for r in rows})
+def _confusion(rows: Sequence[Dict[str, str]],
+               labels: List[str]) -> Dict[str, Dict[str, int]]:
     cm = {g: {p: 0 for p in labels} for g in labels}
     for r in rows:
         cm[str(r["gold"])][str(r["pred"])] += 1
-    n = len(rows)
-    correct = sum(cm[l][l] for l in labels)
+    return cm
+
+
+def _per_label(cm: Dict[str, Dict[str, int]],
+               labels: List[str]) -> Dict[str, Dict[str, float]]:
     per: Dict[str, Dict[str, float]] = {}
     for l in labels:
         tp = cm[l][l]
@@ -84,8 +91,26 @@ def classification(rows: Sequence[Dict[str, str]], **_kwargs) -> Dict[str, Any]:
         f1 = _safe_div(2 * p * rc, p + rc)
         per[l] = {"precision": _r(p), "recall": _r(rc), "f1": _r(f1),
                   "support": tp + fn}
-    macro = {k: _r(sum(per[l][k] for l in labels) / len(labels))
-             for k in ("precision", "recall", "f1")}
+    return per
+
+
+def _macro(per: Dict[str, Dict[str, float]], labels: List[str]) -> Dict[str, float]:
+    return {k: _r(sum(per[l][k] for l in labels) / len(labels))
+            for k in ("precision", "recall", "f1")}
+
+
+def _roc_auc(rows: Sequence[Dict[str, str]]) -> float:
+    return _r(_auc([(float(r["score"]), _flag(r, "gold")) for r in rows]))
+
+
+def classification(rows: Sequence[Dict[str, str]], **_kwargs) -> Dict[str, Any]:
+    """分类口径：accuracy / macro P-R-F1 / 混淆矩阵（混淆键 = 出现过的 gold 标签，字典序）。"""
+    labels = sorted({str(r["gold"]) for r in rows} | {str(r["pred"]) for r in rows})
+    cm = _confusion(rows, labels)
+    n = len(rows)
+    correct = sum(cm[l][l] for l in labels)
+    per = _per_label(cm, labels)
+    macro = _macro(per, labels)
     out: Dict[str, Any] = {
         "family": "classification",
         "n": n,
@@ -95,8 +120,32 @@ def classification(rows: Sequence[Dict[str, str]], **_kwargs) -> Dict[str, Any]:
         "per_label": per,
     }
     if all(str(r["gold"]) in ("0", "1") for r in rows) and all("score" in r for r in rows):
-        out["roc_auc"] = _r(_auc([(float(r["score"]), _flag(r, "gold")) for r in rows]))
+        out["roc_auc"] = _roc_auc(rows)
     return out
+
+
+def _query_metrics(items: List[Tuple[int, int]], k: int) -> Tuple[float, float, float,
+                                                                        float, float]:
+    """单查询的 recall@k / precision@k / RR / NDCG@k / AP。"""
+    rel = [y for _rk, y in sorted(items)]
+    topk = rel[:k]
+    total_rel = sum(rel)
+    recall = _safe_div(sum(topk), total_rel)
+    precision = _safe_div(sum(topk), k)
+    rr = 0.0
+    for i, y in enumerate(rel, 1):
+        if y:
+            rr = 1.0 / i
+            break
+    dcg = sum(y / math.log2(i + 1) for i, y in enumerate(rel[:k], 1))
+    ideal = sum(1.0 / math.log2(i + 1) for i in range(1, min(total_rel, k) + 1))
+    ndcg = _safe_div(dcg, ideal)
+    hits, ap = 0, 0.0
+    for i, y in enumerate(rel, 1):
+        if y:
+            hits += 1
+            ap += hits / i
+    return recall, precision, rr, ndcg, _safe_div(ap, total_rel)
 
 
 def retrieval(rows: Sequence[Dict[str, str]], k: int = 5, **_kwargs) -> Dict[str, Any]:
@@ -107,27 +156,12 @@ def retrieval(rows: Sequence[Dict[str, str]], k: int = 5, **_kwargs) -> Dict[str
             (int(_num(r, "rank")), _flag(r, "relevant")))
     recalls, precisions, rrs, ndcgs, aps = [], [], [], [], []
     for _q, items in sorted(groups.items()):
-        items = sorted(items)
-        rel = [y for _rk, y in items]
-        topk = rel[:k]
-        total_rel = sum(rel)
-        recalls.append(_safe_div(sum(topk), total_rel))
-        precisions.append(_safe_div(sum(topk), k))
-        rr = 0.0
-        for i, y in enumerate(rel, 1):
-            if y:
-                rr = 1.0 / i
-                break
+        recall, precision, rr, ndcg, ap = _query_metrics(items, k)
+        recalls.append(recall)
+        precisions.append(precision)
         rrs.append(rr)
-        dcg = sum(y / math.log2(i + 1) for i, y in enumerate(rel[:k], 1))
-        ideal = sum(1.0 / math.log2(i + 1) for i in range(1, min(total_rel, k) + 1))
-        ndcgs.append(_safe_div(dcg, ideal))
-        hits, ap = 0, 0.0
-        for i, y in enumerate(rel, 1):
-            if y:
-                hits += 1
-                ap += hits / i
-        aps.append(_safe_div(ap, total_rel))
+        ndcgs.append(ndcg)
+        aps.append(ap)
     return {
         "family": "retrieval", "k": k, "queries": len(groups), "n": len(rows),
         "recall_at_k": _r(sum(recalls) / len(recalls) if recalls else 0.0),
@@ -175,16 +209,20 @@ def generation(rows: Sequence[Dict[str, str]], **_kwargs) -> Dict[str, Any]:
             "char_f1": _r(sum(char_f1) / n), "token_set_f1": _r(sum(set_f1) / n)}
 
 
+def _squared_errors(g: Sequence[float], p: Sequence[float]) -> List[float]:
+    return [(a - b) ** 2 for a, b in zip(g, p, strict=True)]
+
+
 def regression(rows: Sequence[Dict[str, str]], **_kwargs) -> Dict[str, Any]:
     """回归口径：MAE / RMSE / R² / MAPE（MAPE 仅在 gold≠0 的样本上计算，样本数显式给出）。"""
     g = [_num(r, "gold") for r in rows]
     p = [_num(r, "pred") for r in rows]
     n = len(rows)
     mae = sum(abs(a - b) for a, b in zip(g, p, strict=True)) / n
-    rmse = math.sqrt(sum((a - b) ** 2 for a, b in zip(g, p, strict=True)) / n)
+    rmse = math.sqrt(sum(_squared_errors(g, p)) / n)
     mg = sum(g) / n
     ss_tot = sum((a - mg) ** 2 for a in g)
-    ss_res = sum((a - b) ** 2 for a, b in zip(g, p, strict=True))
+    ss_res = sum(_squared_errors(g, p))
     nz = [(a, b) for a, b in zip(g, p, strict=True) if a != 0]
     mape = (sum(abs((a - b) / a) for a, b in nz) / len(nz)) if nz else 0.0
     return {"family": "regression", "n": n, "mae": _r(mae), "rmse": _r(rmse),
@@ -192,13 +230,9 @@ def regression(rows: Sequence[Dict[str, str]], **_kwargs) -> Dict[str, Any]:
             "mape_samples": len(nz)}
 
 
-def calibration(rows: Sequence[Dict[str, str]], bins: int = 10, **_kwargs) -> Dict[str, Any]:
-    """校准口径：ECE（等宽分箱，空箱跳过并给出非空箱数）/ Brier / 可靠性桶明细。"""
-    pairs = [(_num(r, "prob"), _flag(r, "gold")) for r in rows]
-    if any(not (0.0 <= p <= 1.0) for p, _ in pairs):
-        raise ValueError("prob 必须在 [0,1]")
-    n = len(pairs)
-    brier = sum((p - y) ** 2 for p, y in pairs) / n
+def _calibration_buckets(pairs: Sequence[Tuple[float, int]], n: int,
+                        bins: int) -> Tuple[List[Dict[str, Any]], float]:
+    """等宽分箱（空箱跳过）→ (可靠性桶明细, ECE)。"""
     buckets: List[Dict[str, Any]] = []
     ece = 0.0
     for b in range(bins):
@@ -212,6 +246,17 @@ def calibration(rows: Sequence[Dict[str, str]], bins: int = 10, **_kwargs) -> Di
         buckets.append({"range": "[%.1f,%.1f]" % (lo, hi), "n": len(sel),
                         "confidence": _r(conf), "accuracy": _r(acc),
                         "gap": _r(abs(conf - acc))})
+    return buckets, ece
+
+
+def calibration(rows: Sequence[Dict[str, str]], bins: int = 10, **_kwargs) -> Dict[str, Any]:
+    """校准口径：ECE（等宽分箱，空箱跳过并给出非空箱数）/ Brier / 可靠性桶明细。"""
+    pairs = [(_num(r, "prob"), _flag(r, "gold")) for r in rows]
+    if any(not (0.0 <= p <= 1.0) for p, _ in pairs):
+        raise ValueError("prob 必须在 [0,1]")
+    n = len(pairs)
+    brier = sum((p - y) ** 2 for p, y in pairs) / n
+    buckets, ece = _calibration_buckets(pairs, n, bins)
     return {"family": "calibration", "n": n, "bins": bins,
             "nonempty_bins": len(buckets), "ece": _r(ece), "brier": _r(brier),
             "buckets": buckets}

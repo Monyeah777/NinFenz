@@ -41,6 +41,21 @@ def _reachable_first(ids: List[str], catalog: Dict[str, Dict[str, Any]]) -> List
 
 
 
+def _keyword_standard_binding(
+        name: str, catalog: Dict[str, Dict[str, Any]]
+) -> Tuple[Tuple[str, str], Tuple[str, str]]:
+    """关键词命中：返回 (可达命中, 不可达兜底)；无命中时首项为 ("", "")。"""
+    fallback: Tuple[str, str] = ("", "")
+    for pat, sid in _STD_KEYWORD:
+        if re.search(pat, name) and sid in catalog:
+            why = "关键词「%s」命中" % pat
+            if _std_reachable(catalog, sid):
+                return (sid, why), fallback
+            if not fallback[0]:
+                fallback = (sid, why + "（本机实测不可达，如实记录）")
+    return ("", ""), fallback
+
+
 def bind_standard(spec: Dict[str, Any], sub: Dict[str, Any],
                   catalog: Dict[str, Dict[str, Any]],
                   index: int = 0) -> Tuple[str, str]:
@@ -52,19 +67,13 @@ def bind_standard(spec: Dict[str, Any], sub: Dict[str, Any],
     可达优先：同一命中位若有**本机实测可达**的候选，先取可达者（数据真实性口径）。
     """
     name = str(sub.get("name") or "")
-    fallback: Tuple[str, str] = ("", "")
-    for pat, sid in _STD_KEYWORD:
-        if re.search(pat, name) and sid in catalog:
-            why = "关键词「%s」命中" % pat
-            if _std_reachable(catalog, sid):
-                return sid, why
-            if not fallback[0]:
-                fallback = (sid, why + "（本机实测不可达，如实记录）")
-    for sid in _STD_BY_CODE.get(spec["code"], []):
-        if sid in catalog:
-            pool = _reachable_first([x for x in _STD_BY_CODE[spec["code"]] if x in catalog],
- catalog)
-            return pool[index % len(pool)], "域码 %s 专属绑定（轮换 %d）" % (spec["code"],
+    hit, fallback = _keyword_standard_binding(name, catalog)
+    if hit[0]:
+        return hit
+    code_pool = [x for x in _STD_BY_CODE.get(spec["code"], []) if x in catalog]
+    if code_pool:
+        pool = _reachable_first(code_pool, catalog)
+        return pool[index % len(pool)], "域码 %s 专属绑定（轮换 %d）" % (spec["code"],
                                                                        index % len(pool))
     sec = str(spec.get("section", "")).split(" · ")[0]
     pool = _reachable_first([x for x in _STD_SECTION_DEFAULT.get(sec, []) if x in catalog], catalog)
@@ -73,6 +82,22 @@ def bind_standard(spec: Dict[str, Any], sub: Dict[str, Any],
     return fallback
 
 
+
+
+def _support_keyword_hit(name: str, catalog: Dict[str, Dict[str, Any]],
+                         primary: str) -> Tuple[str, str]:
+    """产出形态关键词命中（要求「在目录内 + ≠ 主锚」）；无命中返回 ("", "")。"""
+    for pat, sid in _STD_SUPPORT_KEYWORD:
+        if sid in catalog and sid != primary and re.search(pat, name):
+            return sid, "载体锚：产出形态「%s」的承载标准" % pat.split("|")[0]
+    return "", ""
+
+
+def _support_pool(sec: str, catalog: Dict[str, Dict[str, Any]],
+                  primary: str) -> List[str]:
+    """段载体池：在目录内且 ≠ 主锚的标准 id（保持目录顺序）。"""
+    return [x for x in _STD_SUPPORT_SECTION.get(sec, [])
+            if x in catalog and x != primary]
 
 
 def bind_support(spec: Dict[str, Any], sub: Dict[str, Any],
@@ -84,12 +109,11 @@ def bind_support(spec: Dict[str, Any], sub: Dict[str, Any],
     可达优先，并优先取与本条主锚**不同层**的标准（口径锚与承载锚分属不同层才有信息量）。
     """
     name = str(sub.get("name") or "")
-    for pat, sid in _STD_SUPPORT_KEYWORD:
-        if sid in catalog and sid != primary and re.search(pat, name):
-            return sid, "载体锚：产出形态「%s」的承载标准" % pat.split("|")[0]
+    hit = _support_keyword_hit(name, catalog, primary)
+    if hit[0]:
+        return hit
     sec = str(spec.get("section", "")).split(" · ")[0]
-    pool = [x for x in _STD_SUPPORT_SECTION.get(sec, [])
-            if x in catalog and x != primary]
+    pool = _support_pool(sec, catalog, primary)
     if not pool:
         return "", ""
     pool = _reachable_first(pool, catalog)
@@ -127,7 +151,7 @@ def concept_index(spec: Dict[str, Any], catalog: Dict[str, Dict[str, Any]]) -> D
     bd = bindings_full(spec, catalog)
     prim = {k: v["primary"][0] for k, v in bd.items()}
     supp = {k: v["support"][0] for k, v in bd.items()}
-    stds = {x for x in list(prim.values()) + list(supp.values()) if x}
+    stds = set(filter(None, list(prim.values()) + list(supp.values())))
     dep_edges: List[Tuple[str, str]] = []
     for sid in sorted(stds):
         for dep in (catalog.get(sid) or {}).get("depends_on") or []:
@@ -135,8 +159,8 @@ def concept_index(spec: Dict[str, Any], catalog: Dict[str, Dict[str, Any]]) -> D
                 dep_edges.append((dep, sid))
                 stds.add(dep)
     nodes = len(spec["subdivisions"]) + len(stds)
-    edges = (len(spec["edges"]) + len([1 for v in prim.values() if v])
-             + len([1 for v in supp.values() if v]) + len(dep_edges))
+    edges = (len(spec["edges"]) + len(list(filter(None, prim.values())))
+             + len(list(filter(None, supp.values()))) + len(dep_edges))
     return {"primary": prim, "support": supp, "std_ids": sorted(stds),
             "dep_edges": sorted(dep_edges), "nodes": nodes, "edges": edges,
             "density": round(edges / max(1, nodes), 4), "bindings": bd}
@@ -156,6 +180,22 @@ def _std_cell(catalog: Dict[str, Dict[str, Any]], sid: str) -> str:
 
 
 
+def _bound_refs(bd: Dict[str, Dict[str, Tuple[str, str]]]) -> List[str]:
+    """双锚引用清单（主锚/辅锚，非空者按条目顺序）。"""
+    refs: List[str] = []
+    for v in bd.values():
+        for role in ("primary", "support"):
+            if v[role][0]:
+                refs.append(v[role][0])
+    return refs
+
+
+def _probe_evidence_ok(catalog: Dict[str, Dict[str, Any]], sid: str) -> bool:
+    """实测记录齐备：探针日期 + 取样指纹都在。"""
+    return bool(_std_probe_date(catalog, sid)
+                and str(((catalog[sid].get("evidence") or {}).get("sha256_sample") or "")))
+
+
 def authenticity(spec: Dict[str, Any], catalog: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
     """数据真实性（单源口径，落 DOMAIN_SPEC.json 与名录，check32 硬判）。
 
@@ -167,19 +207,13 @@ def authenticity(spec: Dict[str, Any], catalog: Dict[str, Dict[str, Any]]) -> Di
     不用加权和掩盖缺口），门槛见 AUTHENTICITY_THRESHOLD。
     """
     bd = bindings_full(spec, catalog)
-    refs: List[str] = []
-    for v in bd.values():
-        for role in ("primary", "support"):
-            if v[role][0]:
-                refs.append(v[role][0])
+    refs = _bound_refs(bd)
     total = len(refs)
     in_cat = [r for r in refs if r in catalog]
     reach = [r for r in in_cat if _std_reachable(catalog, r)]
-    ev_ok = [r for r in in_cat
-             if _std_probe_date(catalog, r)
-             and str(((catalog[r].get("evidence") or {}).get("sha256_sample") or ""))]
+    ev_ok = [r for r in in_cat if _probe_evidence_ok(catalog, r)]
     anchors = [s.get("anchor_status") for s in spec["subdivisions"]]
-    probed = [a for a in anchors if a]
+    probed = list(filter(None, anchors))
     r_in = round(len(in_cat) / max(1, total), 4)
     r_reach = round(len(reach) / max(1, total), 4)
     r_ev = round(len(ev_ok) / max(1, total), 4)
@@ -195,6 +229,18 @@ def authenticity(spec: Dict[str, Any], catalog: Dict[str, Dict[str, Any]]) -> Di
 
 
 
+def _distinct_primaries(out: Dict[str, Tuple[str, str]]) -> int:
+    return len({v[0] for v in out.values() if v[0]})
+
+
+def _diversity_pool(spec: Dict[str, Any], sec: str,
+                    catalog: Dict[str, Dict[str, Any]]) -> List[str]:
+    """多样性补位候选池：域码专属 + 段默认，去重保序。"""
+    pool = [x for x in (_STD_BY_CODE.get(spec["code"], []) +
+                        _STD_SECTION_DEFAULT.get(sec, [])) if x in catalog]
+    return list(dict.fromkeys(pool))
+
+
 def bindings_for(spec: Dict[str, Any],
                  catalog: Dict[str, Dict[str, Any]]) -> Dict[str, Tuple[str, str]]:
     """整包绑定（**单一入口**）：关键词 → 专属/段默认轮换，并保证**至少 3 条不同标准**。
@@ -206,14 +252,12 @@ def bindings_for(spec: Dict[str, Any],
     for i, s in enumerate(spec["subdivisions"]):
         out[s["id"]] = bind_standard(spec, s, catalog, i)
     sec = str(spec.get("section", "")).split(" · ")[0]
-    pool = [x for x in (_STD_BY_CODE.get(spec["code"], []) +
-                        _STD_SECTION_DEFAULT.get(sec, [])) if x in catalog]
-    pool = list(dict.fromkeys(pool))
-    if len({v[0] for v in out.values() if v[0]}) >= 3 or not pool:
+    pool = _diversity_pool(spec, sec, catalog)
+    if _distinct_primaries(out) >= 3 or not pool:
         return out
     k = 0
     for sid in list(out):
-        if len({v[0] for v in out.values() if v[0]}) >= 3:
+        if _distinct_primaries(out) >= 3:
             break
         cand = pool[k % len(pool)]
         k += 1
@@ -224,25 +268,43 @@ def bindings_for(spec: Dict[str, Any],
 
 
 
-def spec_issues(spec: Dict[str, Any]) -> List[str]:
-    """域规格结构自检（内容质量由作者负责，结构由这里判）。"""
+def _meta_field_issues(spec: Dict[str, Any]) -> List[str]:
     issues: List[str] = []
     for k in ("code", "section", "name", "pack_name", "category", "metric_family",
               "module_titles", "subdivisions"):
         if not spec.get(k):
             issues.append("缺字段 %s" % k)
+    return issues
+
+
+def _code_issues(spec: Dict[str, Any]) -> List[str]:
     code = str(spec.get("code") or "")
     if not re.fullmatch(r"[A-F]\d{2}", code):
-        issues.append("code 形态应为 <A-F><两位数>，实为 %r" % code)
+        return ["code 形态应为 <A-F><两位数>，实为 %r" % code]
+    return []
+
+
+def _pack_name_issues(spec: Dict[str, Any]) -> List[str]:
     # `pack_name` 直接拼进 `community/<pack_name>/…` 的**全部写盘路径**——形状必须先定死
     # （实测形态：写成 `../x` 即写到仓库外；与 `pack_combo` 的组合包名同一条判据）。
     pack = str(spec.get("pack_name") or "")
     if pack and not re.fullmatch(r"[\u4e00-\u9fffA-Za-z0-9_-]{2,40}", pack):
-        issues.append("pack_name 写法定形失败：%r（须 2–40 位中英文/数字/-/_，不含路径分隔符）"
-                      % pack)
-    subs = spec.get("subdivisions") or []
-    if len(subs) != SUB_COUNT:
-        issues.append("细分条目须 %d 条，实为 %d" % (SUB_COUNT, len(subs)))
+        return ["pack_name 写法定形失败：%r（须 2–40 位中英文/数字/-/_，不含路径分隔符）"
+                % pack]
+    return []
+
+
+def _missing_subdivision_fields(s: Dict[str, Any], sub_id: Any) -> List[str]:
+    issues: List[str] = []
+    for k in ("name", "definition", "anchor", "check", "pitfall"):
+        if not str(s.get(k) or "").strip():
+            issues.append("%s 缺 %s" % (sub_id, k))
+    return issues
+
+
+def _subdivision_issues(spec: Dict[str, Any], subs: List[Dict[str, Any]],
+                        code: str) -> List[str]:
+    issues: List[str] = []
     seen = set()
     for i, s in enumerate(subs, 1):
         want = "%s-%02d" % (code, i)
@@ -251,15 +313,16 @@ def spec_issues(spec: Dict[str, Any]) -> List[str]:
         if s.get("id") in seen:
             issues.append("细分 id 重复：%s" % s.get("id"))
         seen.add(s.get("id"))
-        for k in ("name", "definition", "anchor", "check", "pitfall"):
-            if not str(s.get(k) or "").strip():
-                issues.append("%s 缺 %s" % (s.get("id"), k))
+        issues.extend(_missing_subdivision_fields(s, s.get("id")))
         if not str(s.get("anchor") or "").startswith(("http://", "https://")):
             issues.append("%s anchor 须为绝对 URL" % s.get("id"))
         if len(str(s.get("check") or "")) < 10:
             issues.append("%s 可机验判据过短（<10 字）" % s.get("id"))
-    if len(spec.get("module_titles") or []) != 2:
-        issues.append("module_titles 须 2 条（P40 口径层 / P60 收口层）")
+    return issues
+
+
+def _edge_issues(spec: Dict[str, Any], subs: List[Dict[str, Any]]) -> List[str]:
+    issues: List[str] = []
     edges = spec.get("edges") or []
     ids = {s.get("id") for s in subs}
     node_ids = {str(x) for x in (spec.get("node_ids") or ids)}
@@ -268,5 +331,22 @@ def spec_issues(spec: Dict[str, Any]) -> List[str]:
             issues.append("边 %r 端点不在节点表" % (e,))
     if not edges:
         issues.append("须至少声明一条前置边（概念图非空偏序）")
+    return issues
+
+
+def spec_issues(spec: Dict[str, Any]) -> List[str]:
+    """域规格结构自检（内容质量由作者负责，结构由这里判）。"""
+    issues: List[str] = []
+    issues.extend(_meta_field_issues(spec))
+    issues.extend(_code_issues(spec))
+    issues.extend(_pack_name_issues(spec))
+    code = str(spec.get("code") or "")
+    subs = spec.get("subdivisions") or []
+    if len(subs) != SUB_COUNT:
+        issues.append("细分条目须 %d 条，实为 %d" % (SUB_COUNT, len(subs)))
+    issues.extend(_subdivision_issues(spec, subs, code))
+    if len(spec.get("module_titles") or []) != 2:
+        issues.append("module_titles 须 2 条（P40 口径层 / P60 收口层）")
+    issues.extend(_edge_issues(spec, subs))
     return issues
 # ruff: noqa: UP035 — 拆分产物按需重复 typing 注解 import（债未新增）

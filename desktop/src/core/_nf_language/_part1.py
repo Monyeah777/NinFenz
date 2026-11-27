@@ -81,8 +81,7 @@ def module_meta(path: Path) -> Tuple[str, str]:
     for ln in text.splitlines():
         s = ln.strip()
         if not inblk:
-            if s.startswith("machine_contract:"):
-                inblk = True
+            inblk = s.startswith("machine_contract:")
             continue
         if s.startswith("```"):
             break
@@ -90,8 +89,6 @@ def module_meta(path: Path) -> Tuple[str, str]:
             mid = s.split(":", 1)[1].strip().strip("\"'")
         elif s.startswith("name:") and not name:
             name = s.split(":", 1)[1].strip().strip("\"'")
-        if mid and name:
-            break
     return mid, name
 
 
@@ -212,20 +209,39 @@ class SymbolIndex:
 
 
 # --------------------------------------------------------------- 各类符号构造
+def _layer_default(mp: Dict[str, Any]) -> str:
+    return ", ".join(str(x) for x in (mp.get("default") or [])) or "无"
+
+
+def _layer_available(mp: Dict[str, Any]) -> str:
+    return ", ".join(str(x) for x in (mp.get("available") or [])) or "无"
+
+
+def _layer_symbol(lid: str, mp: Dict[str, Any]) -> Dict[str, Any]:
+    name = str(mp.get("name") or "")
+    detail = '%s（%s）' % (name, 'optional' if mp.get('optional') else 'required')
+    doc = '挂载层 %s · 默认模块：%s · 可用：%s' % (
+        name or lid, _layer_default(mp), _layer_available(mp))
+    return _symbol('layer', str(lid), detail, doc, '02_联动注册表.md',
+                   opts=SymbolOptions(aliases=[name]))
+
+
 def _layers(reg: Dict[str, Any], out: List[Dict[str, Any]]) -> None:
     for lid, mp in sorted((reg.get("mount_points") or {}).items()):
         if not isinstance(mp, dict):
             continue
-        default = ", ".join(str(x) for x in (mp.get("default") or [])) or "无"
-        alias = [str(mp.get("name") or "")]
-        out.append(_symbol(
-            'layer',
-            str(lid),
-            '%s（%s）' % (mp.get('name') or '', 'optional' if mp.get('optional') else 'required'),
-            '挂载层 %s · 默认模块：%s · 可用：%s' % (mp.get('name') or lid, default, ', '.join((str(x) for x in mp.get('available') or [])) or '无'),
-            '02_联动注册表.md',
-            opts=SymbolOptions(aliases=alias),
-        ))
+        out.append(_layer_symbol(str(lid), mp))
+
+
+def _event_doc(name: str, s: Dict[str, Any], payload: Dict[str, Any]) -> str:
+    note = str(s.get("note") or "")
+    fields = ", ".join(sorted((payload.get("fields") or {}))) if isinstance(payload,
+ dict) else ""
+    return "事件 %s · 发布方：%s · 订阅方：%s%s%s" % (
+        name, s.get("publisher") or "未登记",
+        ", ".join(str(x) for x in (s.get("subscribers") or [])) or "无",
+        (" · 载荷字段：" + fields) if fields else "",
+        (" · 备注：" + note) if note else "")
 
 
 def _events(reg: Dict[str, Any], root: Path, out: List[Dict[str, Any]]) -> None:
@@ -233,15 +249,8 @@ def _events(reg: Dict[str, Any], root: Path, out: List[Dict[str, Any]]) -> None:
     extra = (_read_json(root / EVENT_REGISTRY_REL) or {}).get("events") or {}
     for name in sorted(set(subs) | set(extra)):
         s = subs.get(name) or {}
-        note = str(s.get("note") or "")
         payload = extra.get(name) or {}
-        fields = ", ".join(sorted((payload.get("fields") or {}))) if isinstance(payload,
- dict) else ""
-        doc = "事件 %s · 发布方：%s · 订阅方：%s%s%s" % (
-            name, s.get("publisher") or "未登记",
-            ", ".join(str(x) for x in (s.get("subscribers") or [])) or "无",
-            (" · 载荷字段：" + fields) if fields else "",
-            (" · 备注：" + note) if note else "")
+        doc = _event_doc(str(name), s, payload)
         out.append(_symbol(
             "event", str(name),
             "事件（发布方：%s）" % (s.get("publisher") or "未登记"), doc,
@@ -266,6 +275,10 @@ def _event_relations(reg: Dict[str, Any], rel: Dict[str, List[Dict[str, str]]]) 
             _edge(rel, str(ev), "订阅方", str(sub), "module")
 
 
+def _mount_layer(mt: Any) -> str:
+    return str((mt or {}).get("layer") or "") if isinstance(mt, dict) else ""
+
+
 def _mount_relations(reg: Dict[str, Any], rel: Dict[str, List[Dict[str, str]]]) -> None:
     """模块 ↔ 挂载层（registry.modules[].mounts，双向登记）。"""
     for m in reg.get("modules") or []:
@@ -273,10 +286,16 @@ def _mount_relations(reg: Dict[str, Any], rel: Dict[str, List[Dict[str, str]]]) 
             continue
         mid = str(m.get("id") or "")
         for mt in m.get("mounts") or []:
-            layer = str((mt or {}).get("layer") or "") if isinstance(mt, dict) else ""
+            layer = _mount_layer(mt)
             if mid and layer:
                 _edge(rel, mid, "挂载于 %s" % layer, layer, "layer")
                 _edge(rel, layer, "在此层挂载", mid, "module")
+
+
+def _pipeline_loc(p: Dict[str, Any]) -> str:
+    pkg = str(p.get("id") or "")
+    readme = str((p.get("assets") or {}).get("readme") or "")
+    return "community/%s/%s" % (pkg, readme) if (pkg and readme) else ""
 
 
 def _pipeline_relations(reg: Dict[str, Any], root: Path,
@@ -286,7 +305,6 @@ def _pipeline_relations(reg: Dict[str, Any], root: Path,
         if not isinstance(p, dict):
             continue
         pkg, pipe = str(p.get("id") or ""), str(p.get("pipeline") or "")
-        readme = str((p.get("assets") or {}).get("readme") or "")
-        loc = "community/%s/%s" % (pkg, readme) if (pkg and readme) else ""
+        loc = _pipeline_loc(p)
         if pipe and loc and (root / loc).is_file():
             _edge(rel, pipe, "被域包 %s 采用" % pkg, loc, "file")

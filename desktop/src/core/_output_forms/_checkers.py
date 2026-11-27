@@ -140,6 +140,23 @@ def _check_yaml(root: str, rel: str) -> List[str]:
 
 
 
+def _vega_encoding_issues(enc) -> List[str]:
+    """encoding 通道校验：对象 → 逐通道；缺省 → 无；非对象 → 一条。"""
+    if isinstance(enc, dict):
+        issues: List[str] = []
+        for ch, spec in enc.items():
+            if not isinstance(spec, dict):
+                issues.append("encoding.%s 非对象" % ch)
+                continue
+            if not any(k in spec for k in ("field", "aggregate", "value", "datum",
+                                           "timeUnit", "bin")):
+                issues.append("encoding.%s 无 field/aggregate/value（通道未绑定）" % ch)
+        return issues
+    if enc is not None and not isinstance(enc, dict):
+        return ["encoding 非对象"]
+    return []
+
+
 def _check_vega_lite(root: str, rel: str) -> List[str]:
     data, err = _read_json(_rel(root, rel))
     if err:
@@ -152,17 +169,7 @@ def _check_vega_lite(root: str, rel: str) -> List[str]:
         issues.append("缺 mark/layer 等绘图主体")
     if "data" not in data:
         issues.append("缺 data（图不能没有数据源）")
-    enc = data.get("encoding")
-    if isinstance(enc, dict):
-        for ch, spec in enc.items():
-            if not isinstance(spec, dict):
-                issues.append("encoding.%s 非对象" % ch)
-                continue
-            if not any(k in spec for k in ("field", "aggregate", "value", "datum",
-                                           "timeUnit", "bin")):
-                issues.append("encoding.%s 无 field/aggregate/value（通道未绑定）" % ch)
-    elif enc is not None and not isinstance(enc, dict):
-        issues.append("encoding 非对象")
+    issues.extend(_vega_encoding_issues(data.get("encoding")))
     return issues
 
 
@@ -191,6 +198,17 @@ def _check_dot(root: str, rel: str) -> List[str]:
 
 
 
+def _graphml_dangling(graphs, nodes) -> List[str]:
+    """边端点悬空：source/target 必须落在节点表。"""
+    issues: List[str] = []
+    for g in graphs:
+        for e in g.findall("{*}edge"):
+            for end in ("source", "target"):
+                if e.get(end) not in nodes:
+                    issues.append("边端点悬空：%s=%s" % (end, e.get(end)))
+    return issues
+
+
 def _check_graphml(root: str, rel: str) -> List[str]:
     path = _rel(root, rel)
     guard = _xml_guard(_read_text_cached(path))
@@ -210,13 +228,44 @@ def _check_graphml(root: str, rel: str) -> List[str]:
     if not graphs:
         issues.append("缺 <graph> 元素")
     nodes = {n.get("id") for g in graphs for n in g.findall("{*}node")}
-    for g in graphs:
-        for e in g.findall("{*}edge"):
-            for end in ("source", "target"):
-                if e.get(end) not in nodes:
-                    issues.append("边端点悬空：%s=%s" % (end, e.get(end)))
+    issues.extend(_graphml_dangling(graphs, nodes))
     return issues
 
+
+
+def _quant_engine_issues(mid: str, eng: str, qm) -> List[str]:
+    """宣称 engine 必须指向 core/quant_metrics 的真实实现。"""
+    if not eng:
+        return []
+    mod, _, fn = eng.partition(":")
+    if mod != "quant_metrics" or not hasattr(qm, fn):
+        return ["%s: 宣称 engine=%s，但 core/quant_metrics 无该实现（宣称≠实现）"
+                % (mid, eng)]
+    return []
+
+
+def _quant_metric_issues(m, qm) -> List[str]:
+    if not isinstance(m, dict):
+        return ["条目非对象：%r" % (m,)]
+    issues: List[str] = []
+    mid = m.get("id") or "?"
+    eng = str(m.get("engine") or "")
+    issues.extend(_quant_engine_issues(mid, eng, qm))
+    if m.get("verifiable") == "T4" and not eng:
+        issues.append("%s: 标 T4（可复算）却无 engine" % mid)
+    params = m.get("required_params") or []
+    if m.get("annual_factor_required") and "annual_factor" not in params:
+        issues.append("%s: 需年化因子却未列入 required_params（口径四要素不全）" % mid)
+    return issues
+
+
+def _quant_name_issues(data: dict, issues: List[str]) -> None:
+    names = {str(m.get("id")) for m in (data.get("metrics") or [])}
+    expected = {k for k in data.get("annual_factors", {})}
+    if expected != {"daily", "weekly", "monthly"}:
+        issues.append("annual_factors 键集应为 daily/weekly/monthly，实为 %s" % sorted(expected))
+    if len(names) != len(data.get("metrics") or []):
+        issues.append("metrics 存在重复 id")
 
 
 def _check_quant_metrics(root: str, rel: str) -> List[str]:
@@ -228,41 +277,15 @@ def _check_quant_metrics(root: str, rel: str) -> List[str]:
     from core import quant_metrics as qm
 
     for m in list(data.get("metrics") or []) + list(data.get("declared_only") or []):
-        if not isinstance(m, dict):
-            issues.append("条目非对象：%r" % (m,))
-            continue
-        mid = m.get("id") or "?"
-        eng = str(m.get("engine") or "")
-        if eng:
-            mod, _, fn = eng.partition(":")
-            if mod != "quant_metrics" or not hasattr(qm, fn):
-                issues.append("%s: 宣称 engine=%s，但 core/quant_metrics 无该实现（宣称≠实现）"
-                              % (mid, eng))
-        if m.get("verifiable") == "T4" and not eng:
-            issues.append("%s: 标 T4（可复算）却无 engine" % mid)
-        params = m.get("required_params") or []
-        if m.get("annual_factor_required") and "annual_factor" not in params:
-            issues.append("%s: 需年化因子却未列入 required_params（口径四要素不全）" % mid)
-    names = {str(m.get("id")) for m in (data.get("metrics") or [])}
-    expected = {k for k in data.get("annual_factors", {})}
-    if expected != {"daily", "weekly", "monthly"}:
-        issues.append("annual_factors 键集应为 daily/weekly/monthly，实为 %s" % sorted(expected))
-    if len(names) != len(data.get("metrics") or []):
-        issues.append("metrics 存在重复 id")
+        issues.extend(_quant_metric_issues(m, qm))
+    _quant_name_issues(data, issues)
     return issues
 
 
 
-def _check_domain_spec(root: str, rel: str) -> List[str]:
-    """域口径表机读投影：条数口径 + id 序 + 判据/锚齐备（语义面，不只形状）。"""
-    issues = _check_json(root, rel)
-    data, err = _read_json(_rel(root, rel))
-    if err or not isinstance(data, dict):
-        return issues + ([err] if err else [])
-    code = str(data.get("code") or "")
-    subs = data.get("subdivisions") or []
-    if len(subs) != 12:
-        issues.append("细分条目应为 12 条，实为 %d" % len(subs))
+def _domain_subdivision_issues(subs: list, code: str) -> List[str]:
+    """逐细分：id 序 / 锚绝对 URL / 锚可达性实测值。"""
+    issues: List[str] = []
     for i, s in enumerate(subs, 1):
         want = "%s-%02d" % (code, i)
         if s.get("id") != want:
@@ -275,6 +298,34 @@ def _check_domain_spec(root: str, rel: str) -> List[str]:
     return issues
 
 
+def _check_domain_spec(root: str, rel: str) -> List[str]:
+    """域口径表机读投影：条数口径 + id 序 + 判据/锚齐备（语义面，不只形状）。"""
+    issues = _check_json(root, rel)
+    data, err = _read_json(_rel(root, rel))
+    if err or not isinstance(data, dict):
+        return issues + ([err] if err else [])
+    code = str(data.get("code") or "")
+    subs = data.get("subdivisions") or []
+    if len(subs) != 12:
+        issues.append("细分条目应为 12 条，实为 %d" % len(subs))
+    issues.extend(_domain_subdivision_issues(subs, code))
+    return issues
+
+
+
+def _report_family_issues(data: dict, dm) -> List[str]:
+    """口径族在册 + metrics.family 一致 + 样例规模非零。"""
+    issues: List[str] = []
+    fam = str(data.get("family") or "")
+    if fam not in dm.FAMILIES:
+        issues.append("度量族未在本仓引擎登记：%r（不得宣称可复算）" % fam)
+    metrics = data.get("metrics") or {}
+    if str(metrics.get("family") or "") != fam:
+        issues.append("metrics.family 与报告 family 不一致")
+    if int(data.get("sample_rows") or 0) < 1:
+        issues.append("样例规模为 0（无样例即无口径值）")
+    return issues
+
 
 def _check_domain_report(root: str, rel: str) -> List[str]:
     """域报告：形状 + 口径族在册 + 样例规模自洽（复算一致由 recompute 面判）。"""
@@ -284,12 +335,5 @@ def _check_domain_report(root: str, rel: str) -> List[str]:
     data, err = _read_json(_rel(root, rel))
     if err or not isinstance(data, dict):
         return issues + ([err] if err else [])
-    fam = str(data.get("family") or "")
-    if fam not in dm.FAMILIES:
-        issues.append("度量族未在本仓引擎登记：%r（不得宣称可复算）" % fam)
-    metrics = data.get("metrics") or {}
-    if str(metrics.get("family") or "") != fam:
-        issues.append("metrics.family 与报告 family 不一致")
-    if int(data.get("sample_rows") or 0) < 1:
-        issues.append("样例规模为 0（无样例即无口径值）")
+    issues.extend(_report_family_issues(data, dm))
     return issues

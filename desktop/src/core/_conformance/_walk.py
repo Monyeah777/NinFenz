@@ -85,6 +85,32 @@ def _compiled_parts(pattern: str):
 
 
 
+def _memo_hit(key: str):
+    """常驻层 → 本次调用目录记忆，首个命中的目录清单；未命中 None（零 IO 快路径）。"""
+    if _rs._RESIDENT is not None:
+        hit = _rs._RESIDENT["dirs"].get(key)
+        if hit is not None:
+            return hit
+    dir_memo = _memo._DIR_MEMO
+    if dir_memo is not None:
+        hit = dir_memo.get(("entries", key))
+        if hit is not None:
+            return hit
+    return None
+
+
+def _pack_entries(entries) -> list:
+    """把 scandir 条目压成只读快照（取值期间消失的条目当不存在）。"""
+    packed = []
+    for entry in entries:
+        try:
+            packed.append(_Entry(entry.name, entry.path, entry.is_dir(),
+                                 entry.is_file(), entry.is_symlink()))
+        except OSError:                     # 枚举与取值之间消失的条目 → 当作不存在
+            continue
+    return packed
+
+
 def _scandir_list(path: str):
     """列目录（绝不抛）：目录不可读/已消失时返回空——枚举面按「不存在」处理。
 
@@ -94,32 +120,20 @@ def _scandir_list(path: str):
     ~306 ms：宽面各枚举一遍时，这笔重复是纯浪费。
     """
     key = _resident_key(path)
-    if _rs._RESIDENT is not None:
-        hit = _rs._RESIDENT["dirs"].get(key)
-        if hit is not None:
-            return hit
-    dir_memo = _memo._DIR_MEMO
-    memo = ("entries", key) if dir_memo is not None else None
-    if memo is not None and dir_memo is not None:
-        hit = dir_memo.get(memo)
-        if hit is not None:
-            return hit
+    hit = _memo_hit(key)
+    if hit is not None:
+        return hit
     try:
         with os.scandir(path) as it:
             entries = list(it)
     except OSError:  # 目录列不到 ⇒ 空清单（IO/权限问题；该类缺口由对应门禁另行报出，见 AUD-0016）
         return []
-    if memo is not None and dir_memo is not None:
-        dir_memo[memo] = entries
+    dir_memo = _memo._DIR_MEMO
+    if dir_memo is not None:
+        dir_memo[("entries", key)] = entries
     if _rs._RESIDENT is not None and _resident_under(key)\
             and len(_rs._RESIDENT["dirs"]) < _RESIDENT_DIR_MAX:
-        packed = []
-        for entry in entries:
-            try:
-                packed.append(_Entry(entry.name, entry.path, entry.is_dir(),
-                                     entry.is_file(), entry.is_symlink()))
-            except OSError:                     # 枚举与取值之间消失的条目 → 当作不存在
-                continue
+        packed = _pack_entries(entries)
         _rs._RESIDENT["dirs"][key] = packed
         return packed
     return entries
@@ -135,6 +149,44 @@ NON_REPO_DIRS = frozenset({".git", ".rivet", ".venv", "node_modules", "__pycache
 
 
 
+def _walk_match(dir_abs: str, rel: str, i: int, parts, out: List[str]) -> None:
+    if i >= len(parts):
+        return
+    rx = parts[i]
+    if rx is None:
+        _walk_star(dir_abs, rel, i, parts, out)
+    else:
+        _walk_step(dir_abs, rel, i, parts, out, rx)
+
+
+def _walk_star(dir_abs: str, rel: str, i: int, parts, out: List[str]) -> None:
+    """`**`：零层直接续匹配 + 逐层下行（不进符号链接目录 / 非仓库目录）。"""
+    _walk_match(dir_abs, rel, i + 1, parts, out)          # 零层：当前目录直接续匹配
+    for entry in _scandir_list(dir_abs):
+        try:
+            if entry.is_dir() and not entry.is_symlink()\
+                    and entry.name not in NON_REPO_DIRS:
+                _walk_match(entry.path, rel + entry.name + "/", i, parts, out)
+        except OSError:
+            continue
+
+
+def _walk_step(dir_abs: str, rel: str, i: int, parts, out: List[str], rx) -> None:
+    """单段：匹配名 → 末段收真实文件；非末段只向目录下行。"""
+    last = (i == len(parts) - 1)
+    for entry in _scandir_list(dir_abs):
+        if not rx.match(entry.name):
+            continue
+        try:
+            if last:
+                if entry.is_file() and not entry.is_symlink():
+                    out.append(rel + entry.name)
+            elif entry.is_dir():
+                _walk_match(entry.path, rel + entry.name + "/", i + 1, parts, out)
+        except OSError:  # 尽力而为：跳过不可读/不可解析项；该类缺口由对应门禁另行报出（见 AUD-0016）
+            continue
+
+
 def _enumerate_rel(root_abs: str, pattern: str) -> List[str]:
     """`os.scandir` **单遍**枚举（相对 root 的 posix 路径）。语义对齐 `Path.glob`：
 
@@ -147,37 +199,25 @@ def _enumerate_rel(root_abs: str, pattern: str) -> List[str]:
     """
     parts = _compiled_parts(pattern)
     out: List[str] = []
-
-    def match(dir_abs: str, rel: str, i: int) -> None:
-        if i >= len(parts):
-            return
-        rx = parts[i]
-        if rx is None:                                        # `**`
-            match(dir_abs, rel, i + 1)                       # 零层：当前目录直接续匹配
-            for entry in _scandir_list(dir_abs):
-                try:
-                    if entry.is_dir() and not entry.is_symlink()\
-                            and entry.name not in NON_REPO_DIRS:
-                        match(entry.path, rel + entry.name + "/", i)
-                except OSError:
-                    continue
-            return
-        last = (i == len(parts) - 1)
-        for entry in _scandir_list(dir_abs):
-            if not rx.match(entry.name):
-                continue
-            try:
-                if last:
-                    if entry.is_file() and not entry.is_symlink():
-                        out.append(rel + entry.name)
-                elif entry.is_dir():
-                    match(entry.path, rel + entry.name + "/", i + 1)
-            except OSError:  # 尽力而为：跳过不可读/不可解析项；该类缺口由对应门禁另行报出（见 AUD-0016）
-                continue
-
-    match(root_abs, "", 0)
+    _walk_match(root_abs, "", 0, parts, out)
     return sorted(out)
 
+
+
+def _path_matches(root_abs: str, root, pattern: str) -> tuple:
+    """三档取件：作用域子树内存筛 → 快速枚举器 → pathlib.glob 兜底。"""
+    prefix = _fixed_prefix(str(pattern))
+    tree = _tree_hit(root_abs, prefix)          # 子树清单已在作用域里 ⇒ 内存里筛，零 IO
+    if tree is not None:
+        parts = _compiled_parts(str(pattern))
+        return tuple(rel for rel in tree
+                     if _match_parts(rel.split("/"), parts))
+    if _fast_glob_supported(pattern):
+        return tuple(_enumerate_rel(root_abs, str(pattern)))
+    base = Path(root)
+    return tuple(sorted(p.relative_to(base).as_posix()
+                        for p in base.glob(str(pattern))
+                        if p.is_file() and not p.is_symlink()))
 
 
 def iter_files(root, pattern: str) -> List[str]:
@@ -192,19 +232,7 @@ def iter_files(root, pattern: str) -> List[str]:
         hit = _memo._PAT_MEMO.get(key)
         if hit is not None:
             return list(hit)
-    prefix = _fixed_prefix(str(pattern))
-    tree = _tree_hit(root_abs, prefix)          # 子树清单已在作用域里 ⇒ 内存里筛，零 IO
-    if tree is not None:
-        parts = _compiled_parts(str(pattern))
-        got = tuple(rel for rel in tree
-                    if _match_parts(rel.split("/"), parts))
-    elif _fast_glob_supported(pattern):
-        got = tuple(_enumerate_rel(root_abs, str(pattern)))
-    else:
-        base = Path(root)
-        got = tuple(sorted(p.relative_to(base).as_posix()
-                           for p in base.glob(str(pattern))
-                           if p.is_file() and not p.is_symlink()))
+    got = _path_matches(root_abs, root, pattern)
     if _memo._PAT_MEMO is not None:
         _memo._PAT_MEMO[key] = got
     return list(got)
@@ -251,6 +279,18 @@ def _match_parts(segments, parts) -> bool:
 
 
 
+def _walk_tree(dir_abs: str, rel: str, out: List[str]) -> None:
+    for entry in _scandir_list(dir_abs):
+        try:
+            if entry.is_dir():
+                if not entry.is_symlink():
+                    _walk_tree(entry.path, rel + entry.name + "/", out)
+            elif entry.is_file() and not entry.is_symlink():
+                out.append(rel + entry.name)
+        except OSError:  # 尽力而为：跳过不可读/不可解析项；该类缺口由对应门禁另行报出（见 AUD-0016）
+            continue
+
+
 def tree_files(root, rel_dir: str = "") -> List[str]:
     """`rel_dir` 子树内**全部文件**（仓库相对 posix 路径，已排序）。作用域内按目录记忆。
 
@@ -264,20 +304,8 @@ def tree_files(root, rel_dir: str = "") -> List[str]:
         if hit is not None:
             return list(hit)
     out: List[str] = []
-
-    def walk(dir_abs: str, rel: str) -> None:
-        for entry in _scandir_list(dir_abs):
-            try:
-                if entry.is_dir():
-                    if not entry.is_symlink():
-                        walk(entry.path, rel + entry.name + "/")
-                elif entry.is_file() and not entry.is_symlink():
-                    out.append(rel + entry.name)
-            except OSError:  # 尽力而为：跳过不可读/不可解析项；该类缺口由对应门禁另行报出（见 AUD-0016）
-                continue
-
     start_rel = "" if not rel_dir else str(rel_dir).strip("/") + "/"
-    walk(key, start_rel)
+    _walk_tree(key, start_rel, out)
     got = tuple(sorted(out))
     if _memo._TREE_MEMO is not None:
         _memo._TREE_MEMO[key] = got

@@ -97,6 +97,28 @@ def systemone_decide(req: Dict[str, Any], endpoint: str,
                      "usage": (raw or {}).get("_meta", {}).get("usage")}}
 
 
+def _choice_answer(q: dict, probs: list[float]) -> dict:
+    opts = [str(o) for o in q.get("options") or []]
+    return {"type": "choice", "options": opts, "probs": probs,
+            "argmax": opts[probs.index(max(probs))]}
+
+
+def _score_answer(q: dict, probs: list[float]) -> dict:
+    levels = [str(l) for l in q.get("levels") or []]
+    return {"type": "score", "levels": levels, "probs": probs,
+            "value": sum((i + 1) * p for i, p in enumerate(probs))}
+
+
+def _answer_for(q: dict, probs: list[float]) -> dict:
+    """问题类型 → 应答条目（choice / score / noul 三型封闭集）。"""
+    ptype = q.get("type")
+    if ptype == "choice":
+        return _choice_answer(q, probs)
+    if ptype == "score":
+        return _score_answer(q, probs)
+    return {"type": "noul", "p": probs[-1]}
+
+
 def openai_json_decide(req: Dict[str, Any], endpoint: str, model: str,
                        api_key: str = "", timeout: float = 60.0) -> Dict[str, Any]:
     """任一聊天模型 + 受限 JSON 作答（calibrated=false：自报概率不可当校准概率）。"""
@@ -119,21 +141,26 @@ def openai_json_decide(req: Dict[str, Any], endpoint: str, model: str,
     raw = json_doc.loads(text, dict, what="决策模型 JSON 文本")
     answers: Dict[str, Any] = {}
     for name, q in (req.get("questions") or {}).items():
-        probs = [float(p) for p in raw[name]["probs"]]
-        ptype = q.get("type")
-        if ptype == "choice":
-            opts = [str(o) for o in q.get("options") or []]
-            answers[name] = {"type": "choice", "options": opts, "probs": probs,
-                             "argmax": opts[probs.index(max(probs))]}
-        elif ptype == "score":
-            levels = [str(l) for l in q.get("levels") or []]
-            answers[name] = {"type": "score", "levels": levels, "probs": probs,
-                             "value": sum((i + 1) * p for i, p in enumerate(probs))}
-        else:
-            answers[name] = {"type": "noul", "p": probs[-1]}
+        answers[name] = _answer_for(q, [float(p) for p in raw[name]["probs"]])
     return {"schema": RESPONSE_SCHEMA, "status": "ok", "answers": answers,
             "meta": {"adapter": "openai-json", "calibrated": False, "non_gate": True,
                      "model": model}}
+
+
+def _run_adapter(adapter: str, req: dict, endpoint: str, model: str,
+                 api_key: str, timeout: float) -> dict:
+    """按适配器名路由；未实现/缺参 → ValueError（由 decide 统一 fail-closed）。"""
+    if adapter == "stub":
+        return stub_decide(req)
+    if adapter == "systemone-http":
+        if not endpoint:
+            raise ValueError("systemone-http 需 --endpoint（本地 typed-decision 服务地址）")
+        return systemone_decide(req, endpoint, timeout)
+    if adapter == "openai-json":
+        if not endpoint or not model:
+            raise ValueError("openai-json 需 --endpoint 与 --model")
+        return openai_json_decide(req, endpoint, model, api_key, timeout)
+    raise ValueError("适配器 %s 未实现（登记面已声明：%s）" % (adapter, DECL_REL))
 
 
 def decide(req: Dict[str, Any], opts: DecideOptions | None = None) -> Dict[str, Any]:
@@ -158,18 +185,7 @@ def decide(req: Dict[str, Any], opts: DecideOptions | None = None) -> Dict[str, 
                 "meta": {"adapter": adapter, "calibrated": False, "non_gate": True}}
     started = time.monotonic()
     try:
-        if adapter == "stub":
-            out = stub_decide(req)
-        elif adapter == "systemone-http":
-            if not endpoint:
-                raise ValueError("systemone-http 需 --endpoint（本地 typed-decision 服务地址）")
-            out = systemone_decide(req, endpoint, timeout)
-        elif adapter == "openai-json":
-            if not endpoint or not model:
-                raise ValueError("openai-json 需 --endpoint 与 --model")
-            out = openai_json_decide(req, endpoint, model, api_key, timeout)
-        else:
-            raise ValueError("适配器 %s 未实现（登记面已声明：%s）" % (adapter, DECL_REL))
+        out = _run_adapter(adapter, req, endpoint, model, api_key, timeout)
     except Exception as exc:  # 网络/解析/服务异常一律 fail-closed
         return {"schema": RESPONSE_SCHEMA, "status": "abstained", "answers": {},
                 "reason": "adapter %s 不可用：%s: %s" % (adapter, type(exc).__name__,

@@ -42,40 +42,36 @@ PENDING = "pending"
 POSITIVE_CONTROLS_REL = "desktop/tests/fixtures/execution/positive_controls/p03_injections.json"
 
 
-def _exec_sets(root: Path) -> list[dict[str, Any]]:
+def _case_good(hits: list[str], expect: set) -> bool:
+    return (not expect and not hits) or expect <= set(hits)
+
+
+def _exec_set_file(f: Path) -> dict[str, Any]:
+    """单执行样本集：逐例回放 + 期望命中判据 → 计数行。"""
     from core import execution_drill as ed
 
-    out: list[dict[str, Any]] = []
-    for f in sorted(root.glob(EXEC_GLOB)):
-        try:
-            data = json_doc.load(f, dict, what=f.name)
-        except ValueError as exc:
-            out.append({"set": f.name, "cases": 0, "passed": 0,
-                        "error": f"JSON 不可解析：{exc}"})
-            continue
-        real, sem, src = data.get("real_ids") or [], data.get("semantics") or {}, data.get("source_"
-            "text", "")
-        other, keys = data.get("other_ids") or [], data.get("asset_keys") or []
-        lexicon = data.get("lexicon") or {}
-        n = ok = 0
-        for case in data.get("cases", []):
-            hits = ed.run_case(
-                case,
-                real,
-                opts=ed.CaseOptions(
-                    semantics=sem,
-                    source_text=src,
-                    other_ids=other,
-                    asset_keys=keys,
-                    lexicon=lexicon,
-                ),
-            )
-            expect = set(case.get("expect_captured") or [])
-            good = (not expect and not hits) or expect <= set(hits)
-            n += 1
-            ok += 1 if good else 0
-        out.append({"set": f.name, "cases": n, "passed": ok})
-    return out
+    try:
+        data = json_doc.load(f, dict, what=f.name)
+    except ValueError as exc:
+        return {"set": f.name, "cases": 0, "passed": 0,
+                "error": f"JSON 不可解析：{exc}"}
+    opts = ed.CaseOptions(
+        semantics=data.get("semantics") or {},
+        source_text=data.get("source_text", ""),
+        other_ids=data.get("other_ids") or [],
+        asset_keys=data.get("asset_keys") or [],
+        lexicon=data.get("lexicon") or {})
+    real: list[str] = data.get("real_ids") or []
+    n = ok = 0
+    for case in data.get("cases", []):
+        hits = ed.run_case(case, real, opts=opts)
+        n += 1
+        ok += 1 if _case_good(hits, set(case.get("expect_captured") or [])) else 0
+    return {"set": f.name, "cases": n, "passed": ok}
+
+
+def _exec_sets(root: Path) -> list[dict[str, Any]]:
+    return [_exec_set_file(f) for f in sorted(root.glob(EXEC_GLOB))]
 
 
 def _round_adjudications(doc: dict[str, Any], hits: list[str]) -> list[dict[str, Any]]:
@@ -88,6 +84,18 @@ def _round_adjudications(doc: dict[str, Any], hits: list[str]) -> list[dict[str,
                     "verdict": str(item.get("verdict") or "").upper(),
                     "basis": str(item.get("basis") or "")})
     return out
+
+
+def _round_verdict_fields(d: dict[str, Any], live: str) -> dict[str, Any]:
+    """声明侧判定：pending / declared / matched / label_status。"""
+    raw_verdict = str(d.get("verdict") or "")
+    pending = (str(d.get("label_status") or "").lower() == PENDING
+               or raw_verdict.lower() == PENDING)
+    declared = PENDING if pending else VERDICT_MAP.get(raw_verdict.lower(), raw_verdict)
+    return {"declared": declared,
+            "matched": (None if pending else declared == live),
+            "label_status": PENDING if pending else "adjudicated",
+            "pending": pending}
 
 
 def _round_sample(f: Path) -> dict[str, Any]:
@@ -104,17 +112,14 @@ def _round_sample(f: Path) -> dict[str, Any]:
     transcript = str(d.get("transcript") or "")
     issues, stats = rd.scan(transcript, list(d.get("allowed") or []))
     live = "non-conformant" if issues else "conformant"
-    raw_verdict = str(d.get("verdict") or "")
-    pending = (str(d.get("label_status") or "").lower() == PENDING
-               or raw_verdict.lower() == PENDING)
     turns = int(stats.get("turns") or 0)
-    declared = PENDING if pending else VERDICT_MAP.get(raw_verdict.lower(), raw_verdict)
+    fields = _round_verdict_fields(d, live)
     return {"sample": name,
-            "declared": declared,
+            "declared": fields["declared"],
             "live": live,
-            "matched": (None if pending else declared == live),
-            "label_status": PENDING if pending else "adjudicated",
-            "pending": pending,
+            "matched": fields["matched"],
+            "label_status": fields["label_status"],
+            "pending": fields["pending"],
             "turns": turns,
             "parse_ok": turns > 0,
             "hits": list(issues),
@@ -221,6 +226,22 @@ def _pc_source(r: Path) -> dict[str, Any]:
     return out
 
 
+def _pc_expected_hits(hits: list[tuple[int, str]],
+                       line_no: int) -> tuple[list[str], list[tuple[int, str]]]:
+    """注入行的命中集与附带命中（行外命中）。"""
+    got = sorted({rule for n, rule in hits if n == line_no})
+    extra = [(n, rule) for n, rule in hits if n != line_no]
+    return got, extra
+
+
+def _pc_problems(cid: str, expect: list[str], got: list[str],
+                 extra: list[tuple[int, str]], line_no: int) -> list[str]:
+    if extra or not set(expect) <= set(got):
+        return [f"正例对照 {cid} 未按预期命中：期望 {expect}，实得行 {line_no}={got}，"
+                f"附带命中={extra}（修复指引：判据不得被改弱到什么都不报）"]
+    return []
+
+
 def _pc_case(r: Path, folder: str, item: dict[str, Any], base: str, source_lines: int,
              real_ids: list[str]) -> tuple[dict[str, Any], list[str]]:
     """单个注入变体：校验「变体 == 语料+注入」并回放 → (控制项记录, problems)。"""
@@ -235,17 +256,38 @@ def _pc_case(r: Path, folder: str, item: dict[str, Any], base: str, source_lines
     if variant_p.read_text(encoding="utf-8") != want_text:
         return {}, [f"正例对照 {cid} 的变体不是「语料+注入」（须重生成夹具）"]
     line_no = source_lines + 1
-    hits = _text_hits(want_text, real_ids)
-    got = sorted({rule for n, rule in hits if n == line_no})
-    extra = [(n, rule) for n, rule in hits if n != line_no]
-    problems: list[str] = []
-    if extra or not set(expect) <= set(got):
-        problems.append(f"正例对照 {cid} 未按预期命中：期望 {expect}，实得行 {line_no}={got}，"
-                        f"附带命中={extra}（修复指引：判据不得被改弱到什么都不报）")
+    got, extra = _pc_expected_hits(_text_hits(want_text, real_ids), line_no)
+    problems = _pc_problems(cid, expect, got, extra, line_no)
     entry = {"id": cid, "kind": str(item.get("kind") or ""), "injection": injection,
              "expect": expect, "line": line_no, "hits": got, "extra_hits": extra,
              "passed": not problems}
     return entry, problems
+
+
+def _pc_original_block(source_text: str,
+                       real_ids: list[str]) -> tuple[list[tuple[int, str]], list[str]]:
+    """原版真实语料必须 0 命中（命中即判据/语料之一有问题）。"""
+    if not source_text:
+        return [], []
+    original_hits = _text_hits(source_text, real_ids)
+    if original_hits:
+        return original_hits, [f"原版真实语料必须 0 命中，实测 {original_hits}"]
+    return [], []
+
+
+def _pc_controls(r: Path, manifest: dict[str, Any], base: str, source_lines: int,
+                 real_ids: list[str]) -> tuple[list[dict[str, Any]], list[str]]:
+    folder = POSITIVE_CONTROLS_REL.rsplit("/", 1)[0]
+    controls: list[dict[str, Any]] = []
+    problems: list[str] = []
+    for item in manifest.get("controls") or []:
+        if not isinstance(item, dict):
+            continue
+        entry, case_problems = _pc_case(r, folder, item, base, source_lines, real_ids)
+        problems += case_problems
+        if entry:
+            controls.append(entry)
+    return controls, problems
 
 
 def positive_controls(root: str = ".") -> dict[str, Any]:
@@ -267,21 +309,10 @@ def positive_controls(root: str = ".") -> dict[str, Any]:
     base = source_text if source_text.endswith("\n") else source_text + "\n"
     source_lines = len(source_text.splitlines())
     real_ids = src["real_ids"]
-    if source_text:
-        original_hits = _text_hits(source_text, real_ids)
-        if original_hits:
-            problems.append(f"原版真实语料必须 0 命中，实测 {original_hits}")
-    else:
-        original_hits = []
-    folder = POSITIVE_CONTROLS_REL.rsplit("/", 1)[0]
-    controls: list[dict[str, Any]] = []
-    for item in manifest.get("controls") or []:
-        if not isinstance(item, dict):
-            continue
-        entry, case_problems = _pc_case(r, folder, item, base, source_lines, real_ids)
-        problems += case_problems
-        if entry:
-            controls.append(entry)
+    original_hits, orig_problems = _pc_original_block(source_text, real_ids)
+    problems += orig_problems
+    controls, ctl_problems = _pc_controls(r, manifest, base, source_lines, real_ids)
+    problems += ctl_problems
     return {"source": src["source_rel"],
             "sha256": src["sha"],
             "source_lines": source_lines,

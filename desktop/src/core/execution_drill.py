@@ -117,6 +117,22 @@ def _is_contextual_mention(before: str, after: str) -> bool:
     return any(c in before or c in after for c in cues)
 
 
+def _single_word_hit(output: str, word: str, glue) -> bool:
+    """单字词命中：跳过构词粘连（反应/对应/应用…）后的第一个独立出现。"""
+    start = 0
+    while True:
+        i = output.find(word, start)
+        if i < 0:
+            return False
+        prev = output[i - 1] if i > 0 else ""
+        nxt = output[i + 1] if i + 1 < len(output) else ""
+        glued = bool(glue) and ((bool(prev) and prev in glue[0])
+                                or (bool(nxt) and nxt in glue[1]))
+        if not glued:
+            return True
+        start = i + 1
+
+
 def _has_decision(output: str, decision) -> bool:
     """判定词命中（**带边界**）：多字词按子串；单字词排除构词粘连（反应/对应/应用…）。"""
     for word in decision:
@@ -124,19 +140,8 @@ def _has_decision(output: str, decision) -> bool:
             if word in output:
                 return True
             continue
-        glue = _DECISION_GLUE.get(word)
-        start = 0
-        while True:
-            i = output.find(word, start)
-            if i < 0:
-                break
-            prev = output[i - 1] if i > 0 else ""
-            nxt = output[i + 1] if i + 1 < len(output) else ""
-            glued = bool(glue) and ((bool(prev) and prev in glue[0])
-                                    or (bool(nxt) and nxt in glue[1]))
-            if not glued:
-                return True
-            start = i + 1
+        if _single_word_hit(output, word, _DECISION_GLUE.get(word)):
+            return True
     return False
 
 
@@ -147,6 +152,29 @@ def _clauses(output: str) -> list[str]:
 def _tail(tok: str) -> str:
     """编号尾段：`通用:M10` → `M10`（无冒号即整串）。"""
     return tok.split(":", 1)[-1]
+
+
+def _id_sets(real_ids: list[str], other_ids: list[str]):
+    """真实/其它管线编号集及其尾段集（冒号后尾段命中即放行，见函数自述）。"""
+    real_set = set(real_ids or [])
+    other_set = set(other_ids or [])
+    real_tails = {_tail(r) for r in real_set}
+    other_tails = {_tail(r) for r in other_set}
+    return real_set, real_tails, other_set, other_tails
+
+
+def _classify_id(output: str, real_set: set, real_tails: set,
+                 other_set: set, other_tails: set) -> str:
+    for tok, start, end in _id_token_spans(output):
+        if tok in real_set or _tail(tok) in real_tails:
+            continue
+        before, after = _assertion_context(output, start, end)
+        if _is_contextual_mention(before, after):
+            continue
+        if tok in other_set or _tail(tok) in other_tails:
+            return "cross_pipeline_id"
+        return "fabricated_id"
+    return ""
 
 
 def _check_fabricated_id(output: str, real_ids: list[str], other_ids: list[str]) -> str:
@@ -161,20 +189,8 @@ def _check_fabricated_id(output: str, real_ids: list[str], other_ids: list[str])
     （`曾`/`旧版`/`残留`…）作用于该提及时，它不是在断言「本回合由它执行」——详见
     `_is_contextual_mention`；只认显式谓词，不按「句内有『不』」豁免。
     """
-    real_set = set(real_ids or [])
-    real_tails = {_tail(r) for r in real_set}
-    other_set = set(other_ids or [])
-    other_tails = {_tail(r) for r in other_set}
-    for tok, start, end in _id_token_spans(output):
-        if tok in real_set or _tail(tok) in real_tails:
-            continue
-        before, after = _assertion_context(output, start, end)
-        if _is_contextual_mention(before, after):
-            continue
-        if tok in other_set or _tail(tok) in other_tails:
-            return "cross_pipeline_id"
-        return "fabricated_id"
-    return ""
+    real_set, real_tails, other_set, other_tails = _id_sets(real_ids, other_ids)
+    return _classify_id(output, real_set, real_tails, other_set, other_tails)
 
 
 def _check_fabricated_asset_key(output: str, asset_keys: list[str]) -> str:
@@ -206,19 +222,31 @@ def _check_no_citation(output: str, decision, citation) -> str:
     return ""
 
 
+def _other_words(tok: str, semantics: dict[str, list]) -> list:
+    """除 `tok` 外其它语义条目声明的全部用词。"""
+    return [w for m, ws in semantics.items() if m != tok for w in ws]
+
+
+def _clause_misaligned(clause: str, semantics: dict[str, list]) -> bool:
+    """同句里出现了「别名的词」却没出现「本名的词」⇒ 语义错配。"""
+    for tok in _mention_tokens(clause):
+        own = semantics.get(tok) or []
+        if not own:
+            continue
+        others = _other_words(tok, semantics)
+        has_own = any(w in clause for w in own)
+        has_other = any(w in clause for w in others)
+        if has_other and not has_own:
+            return True
+    return False
+
+
 def _check_semantic_misalignment(output: str, semantics: dict[str, list]) -> str:
     if not semantics:
         return ""
     for clause in _clauses(output):
-        for tok in _mention_tokens(clause):
-            own = semantics.get(tok) or []
-            if not own:
-                continue
-            others = [w for m, ws in semantics.items() if m != tok for w in ws]
-            has_own = any(w in clause for w in own)
-            has_other = any(w in clause for w in others)
-            if has_other and not has_own:
-                return "semantic_misalignment"
+        if _clause_misaligned(clause, semantics):
+            return "semantic_misalignment"
     return ""
 
 
@@ -232,6 +260,20 @@ class CaseOptions:
     lexicon: dict[str, list] | None = None
 
 
+def _append_hit(hits: list[str], hit: str) -> None:
+    if hit:
+        hits.append(hit)
+
+
+def _lexicon_face(lexicon: dict[str, list] | None) -> tuple[tuple, tuple, object]:
+    """词表面 → (判定词, 进展词, 引用 regex)；缺省沿用中文内置词表。"""
+    lex = lexicon or {}
+    decision = tuple(lex.get("decision") or _DECISION_WORDS)
+    progress = tuple(lex.get("progress") or _PROGRESS)
+    citation = _compile_citation(lex.get("citation"))
+    return decision, progress, citation
+
+
 def run_case(case: dict, real_ids: list[str], opts: CaseOptions | None = None) -> list[str]:
     """对单样本输出跑全部硬断言 → 返回命中的失范规则名列表。
 
@@ -242,32 +284,15 @@ def run_case(case: dict, real_ids: list[str], opts: CaseOptions | None = None) -
     """
 
     opts = opts if opts is not None else CaseOptions()
-    semantics = opts.semantics
-    source_text = opts.source_text
-    other_ids = opts.other_ids
-    asset_keys = opts.asset_keys
-    lexicon = opts.lexicon
-    lex = lexicon or {}
-    decision = tuple(lex.get("decision") or _DECISION_WORDS)
-    progress = tuple(lex.get("progress") or _PROGRESS)
-    citation = _compile_citation(lex.get("citation"))
+    decision, progress, citation = _lexicon_face(opts.lexicon)
     output = case.get("output") or ""
-    hits = []
-    hit = _check_fabricated_id(output, real_ids, other_ids or [])
-    if hit:
-        hits.append(hit)
-    hit = _check_fabricated_asset_key(output, asset_keys or [])
-    if hit:
-        hits.append(hit)
-    hit = _check_browse_repeat(output, source_text or case.get("source_text", ""), progress)
-    if hit:
-        hits.append(hit)
-    hit = _check_no_citation(output, decision, citation)
-    if hit:
-        hits.append(hit)
-    hit = _check_semantic_misalignment(output, semantics or {})
-    if hit:
-        hits.append(hit)
+    hits: list[str] = []
+    _append_hit(hits, _check_fabricated_id(output, real_ids, opts.other_ids or []))
+    _append_hit(hits, _check_fabricated_asset_key(output, opts.asset_keys or []))
+    _append_hit(hits, _check_browse_repeat(
+        output, opts.source_text or case.get("source_text", ""), progress))
+    _append_hit(hits, _check_no_citation(output, decision, citation))
+    _append_hit(hits, _check_semantic_misalignment(output, opts.semantics or {}))
     return hits
 
 
@@ -303,6 +328,26 @@ def run_file(path: str) -> dict:
     return {"total": len(results), "results": results}
 
 
+def _case_opts(data: dict) -> CaseOptions:
+    """样本集级的 CaseOptions（run_file / main 共用同一份装配）。"""
+    return CaseOptions(
+        semantics=data.get("semantics") or {},
+        source_text=data.get("source_text", ""),
+        other_ids=list(data.get("other_ids") or []),
+        asset_keys=list(data.get("asset_keys") or []),
+        lexicon=data.get("lexicon") or {},
+    )
+
+
+def _case_result(case: dict, real_ids: list[str],
+                 opts: CaseOptions) -> tuple[list[str], set, bool]:
+    """单例 → (命中, 期望命中, 是否达标)。"""
+    hits = run_case(case, real_ids, opts=opts)
+    expected = set(case.get("expect_captured") or [])
+    ok = (not expected and not hits) or expected <= set(hits)
+    return hits, expected, ok
+
+
 def main(argv: list[str] | None = None) -> int:
     args = list(argv) if argv is not None else sys.argv[1:]
     if not args:
@@ -310,27 +355,11 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     data = json_doc.load(Path(args[0]), dict, what=str(args[0]))
     real_ids = data.get("real_ids") or []
-    semantics = data.get("semantics") or {}
-    source_text = data.get("source_text", "")
-    other_ids = data.get("other_ids") or []
-    asset_keys = data.get("asset_keys") or []
-    lexicon = data.get("lexicon") or {}
+    opts = _case_opts(data)
     bad = 0
     print("== execution_drill（%s · %s）==" % (data.get("schema"), data.get("pipeline")))
     for case in data.get("cases", []):
-        hits = run_case(
-            case,
-            real_ids,
-            opts=CaseOptions(
-                semantics=semantics,
-                source_text=source_text,
-                other_ids=other_ids,
-                asset_keys=asset_keys,
-                lexicon=lexicon,
-            ),
-        )
-        expected = set(case.get("expect_captured") or [])
-        ok = (not expected and not hits) or expected <= set(hits)
+        hits, expected, ok = _case_result(case, real_ids, opts)
         bad += 0 if ok else 1
         print("  [%s] %-28s 命中=%s 期望=%s" %
               ("PASS" if ok else "FAIL", case.get("id"),

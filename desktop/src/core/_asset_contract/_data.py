@@ -13,80 +13,81 @@ from ._base import _dig, _read, _schema_doc, _strict_json, digest_of, resolve
 from ._const import FORMATS, _MISSING, _MMD_KINDS
 
 
-
 # ---------------------------------------------------------------- 数据面
 def _data_json(root: str, rel: str, text: str, spec: Dict[str, Any]
                ) -> Tuple[List[str], Dict[str, Any]]:
-    issues: List[str] = []
     stats: Dict[str, Any] = {}
     try:
         obj = _strict_json(text)
     except ValueError as exc:
         return ["数据件 %s 不是合法 JSON：%s（修复指引：修好语法或换 format）" % (rel, exc)], {}
-    sch_rel = str(spec.get("schema") or "")
-    if not sch_rel:
-        # schema 兄弟候选（D2）：按 {stem} 约定在同目录找，先命中先用；全不命中则记 no_schema
-        # 并**只**跳过 schema 面（必填字段仍判）——不许把「没 schema」当成「没问题」。
-        for tmpl in spec.get("schema_siblings") or []:
-            cand = (Path(rel).parent / str(tmpl).replace("{stem}", Path(rel).stem)).as_posix()
-            if (Path(root) / cand).is_file():
-                sch_rel = cand
-                break
+    # schema 兄弟候选（D2）：按 {stem} 约定在同目录找，先命中先用；全不命中则记 no_schema
+    # 并**只**跳过 schema 面（必填字段仍判）——不许把「没 schema」当成「没问题」。
+    sch_rel = _schema_of(root, rel, spec)
+    issues: List[str] = []
     if sch_rel:
-        sch, err = _schema_doc(root, sch_rel)
-        if err:
-            issues.append("数据件 %s 的 schema 读不到：%s" % (rel, err))
-        else:
-            from core import json_schema as js
-            try:
-                errs = js.json_schema_check(obj, sch or {})
-            except ValueError as exc:
-                errs = ["schema 本身不是合法 JSON：%s" % exc]
-            issues += ["数据件 %s 不符 schema %s：%s" % (rel, sch_rel, e) for e in errs[:5]]
-    for field in spec.get("required_fields") or []:
-        if _dig(obj, field) is _MISSING:
-            issues.append("数据件 %s 缺必填字段 %s（修复指引：补字段或从声明里删掉——声明即契约）"
-                          % (rel, field))
+        issues += _schema_issues(root, rel, obj, sch_rel)
+    issues += _fields_issues(rel, obj, spec)
     if spec.get("schema_siblings") and not sch_rel:
         stats["no_schema"] = 1          # 可见缺口：有 schema 兄弟约定但该件没有 schema
     stats["fields"] = len(spec.get("required_fields") or [])
     return issues, stats
 
 
-
 def _csv_rows(text: str) -> List[List[str]]:
     return [row for row in csv.reader(io.StringIO(text))]
 
 
+def _csv_header_issues(rel: str, header: List[str]) -> List[str]:
+    if any(not c for c in header):
+        return ["数据件 %s 表头有空列名（修复指引：每列都要有名字）" % rel]
+    return []
+
+
+def _csv_width_issues(rel: str, data: List[List[str]], width: int) -> List[str]:
+    bad = [i for i, r in enumerate(data, 2) if len(r) != width]
+    if bad:
+        return ["数据件 %s 第 %s 行列数 != 表头 %d（修复指引：补齐/删除多余的分隔符）"
+                % (rel, ",".join(str(b) for b in bad[:3]), width)]
+    return []
+
+
+def _csv_required_issues(rel: str, header: List[str],
+                         spec: Dict[str, Any]) -> List[str]:
+    missing = [c for c in spec.get("required_columns") or [] if c not in header]
+    if missing:
+        return ["数据件 %s 缺必需列 %s（修复指引：加列或改声明）"
+                % (rel, ",".join(missing))]
+    any_cols = [str(c) for c in spec.get("required_any_columns") or []]
+    if any_cols and not any(c in header for c in any_cols):
+        # 表头**族**各不相同（实测 CASES.csv 有 11 种表头），故只判「至少含一个」而非全等。
+        return ["数据件 %s 表头不含任一必需列 %s（实为 %s）（修复指引：改用族内表头或改声明）"
+                % (rel, "|".join(any_cols), ",".join(header[:6]))]
+    return []
+
+
+def _csv_min_rows_issues(rel: str, data: List[List[str]],
+                         spec: Dict[str, Any]) -> List[str]:
+    low = int(spec.get("min_rows") or 0)
+    if len(data) < low:
+        return ["数据件 %s 数据行 %d < min_rows %d（修复指引：补样例或下调声明）"
+                % (rel, len(data), low)]
+    return []
+
 
 def _data_csv(rel: str, text: str, spec: Dict[str, Any]) -> Tuple[List[str], Dict[str, Any]]:
-    issues: List[str] = []
     rows = _csv_rows(text)
     if not rows:
         return ["数据件 %s 是空 CSV（修复指引：至少要有表头行）" % rel], {"rows": 0}
     header = [c.strip() for c in rows[0]]
-    if any(not c for c in header):
-        issues.append("数据件 %s 表头有空列名（修复指引：每列都要有名字）" % rel)
     width = len(header)
     data = [r for r in rows[1:] if r != [""]]
-    bad = [i for i, r in enumerate(data, 2) if len(r) != width]
-    if bad:
-        issues.append("数据件 %s 第 %s 行列数 != 表头 %d（修复指引：补齐/删除多余的分隔符）"
-                      % (rel, ",".join(str(b) for b in bad[:3]), width))
-    missing = [c for c in spec.get("required_columns") or [] if c not in header]
-    if missing:
-        issues.append("数据件 %s 缺必需列 %s（修复指引：加列或改声明）" % (rel, ",".join(missing)))
-    any_cols = [str(c) for c in spec.get("required_any_columns") or []]
-    if any_cols and not any(c in header for c in any_cols):
-        # 表头**族**各不相同（实测 CASES.csv 有 11 种表头），故只判「至少含一个」而非全等。
-        issues.append("数据件 %s 表头不含任一必需列 %s（实为 %s）（修复指引：改用族内表头或改声明）"
-                      % (rel, "|".join(any_cols), ",".join(header[:6])))
-    low = int(spec.get("min_rows") or 0)
-    if len(data) < low:
-        issues.append("数据件 %s 数据行 %d < min_rows %d（修复指引：补样例或下调声明）"
-                      % (rel, len(data), low))
+    issues: List[str] = []
+    issues += _csv_header_issues(rel, header)
+    issues += _csv_width_issues(rel, data, width)
+    issues += _csv_required_issues(rel, header, spec)
+    issues += _csv_min_rows_issues(rel, data, spec)
     return issues, {"rows": len(data), "columns": width}
-
 
 
 def _md_tables(text: str) -> List[List[List[str]]]:
@@ -105,6 +106,11 @@ def _md_tables(text: str) -> List[List[List[str]]]:
     return tables
 
 
+def _md_ragged(table: List[List[str]], header: List[str]) -> List[List[str]]:
+    """数据行里与表头列数不齐的行（分隔行按「每格只含 -/:」剔除）。"""
+    body = [r for r in table[1:] if not all(set(c) <= set("-:") for c in r)]
+    return [r for r in body if len(r) != len(header)]
+
 
 def _data_markdown(rel: str, text: str, spec: Dict[str, Any]) -> Tuple[List[str], Dict[str, Any]]:
     issues: List[str] = []
@@ -115,8 +121,7 @@ def _data_markdown(rel: str, text: str, spec: Dict[str, Any]) -> Tuple[List[str]
         if len(table) < 2:
             continue
         header = table[0]
-        body = [r for r in table[1:] if not all(set(c) <= set("-:") for c in r)]
-        ragged = [r for r in body if len(r) != len(header)]
+        ragged = _md_ragged(table, header)
         if ragged:
             issues.append("数据件 %s 有一张表列数不齐：表头 %d 列 vs 数据 %d 列（修复指引：对齐竖线"
                 "）"
@@ -124,6 +129,16 @@ def _data_markdown(rel: str, text: str, spec: Dict[str, Any]) -> Tuple[List[str]
         n += 1
     return issues, {"tables": n}
 
+
+def _linked_path(root: str, rel: str, link: Dict[str, Any], target: str) -> Optional[Path]:
+    """按 link.base（缺省：本件目录 + 上级目录）找在场的目标件。"""
+    rel_dir = Path(rel).parent
+    bases = [str(link.get("base"))] if link.get("base") else [str(rel_dir), str(rel_dir.parent)]
+    for base in bases:
+        cand = Path(root) / base / target
+        if cand.is_file():
+            return cand
+    return None
 
 
 def _data_link(root: str, rel: str, spec: Dict[str, Any], obj: Any) -> List[str]:
@@ -134,14 +149,7 @@ def _data_link(root: str, rel: str, spec: Dict[str, Any], obj: Any) -> List[str]
     if not isinstance(target, str) or not target:
         return ["数据件 %s 的 link.path_field=%s 取不到字符串路径（修复指引：核对字段名）"
                 % (rel, link.get("path_field"))]
-    rel_dir = Path(rel).parent
-    bases = [str(link.get("base"))] if link.get("base") else [str(rel_dir), str(rel_dir.parent)]
-    found = None
-    for base in bases:
-        cand = Path(root) / base / target
-        if cand.is_file():
-            found = cand
-            break
+    found = _linked_path(root, rel, link, target)
     if found is None:
         return ["数据件 %s 指向的 %s 不在场（修复指引：补件或修正 link.base）" % (rel, target)]
     rows_field = str(link.get("rows_field") or "")
@@ -154,7 +162,6 @@ def _data_link(root: str, rel: str, spec: Dict[str, Any], obj: Any) -> List[str]
     return issues
 
 
-
 def _schema_of(root: str, rel: str, spec: Dict[str, Any]) -> str:
     """声明的 schema 路径：显式 `schema` 优先，其次 `schema_siblings` 里第一个在场的兄弟候选。"""
     sch = str(spec.get("schema") or "")
@@ -165,7 +172,6 @@ def _schema_of(root: str, rel: str, spec: Dict[str, Any]) -> str:
         if (Path(root) / cand).is_file():
             return cand
     return ""
-
 
 
 def _schema_issues(root: str, rel: str, obj: Any, sch_rel: str) -> List[str]:
@@ -181,11 +187,9 @@ def _schema_issues(root: str, rel: str, obj: Any, sch_rel: str) -> List[str]:
     return ["数据件 %s 不符 schema %s：%s" % (rel, sch_rel, e) for e in errs[:5]]
 
 
-
 def _fields_issues(rel: str, obj: Any, spec: Dict[str, Any]) -> List[str]:
     return ["数据件 %s 缺必填字段 %s（修复指引：补字段或从声明里删掉——声明即契约）" % (rel, f)
             for f in spec.get("required_fields") or [] if _dig(obj, f) is _MISSING]
-
 
 
 def _data_yaml(root: str, rel: str, text: str,
@@ -212,7 +216,6 @@ def _data_yaml(root: str, rel: str, text: str,
     return issues, {"fields": len(spec.get("required_fields") or [])}
 
 
-
 def _data_toml(root: str, rel: str, text: str,
                spec: Dict[str, Any]) -> Tuple[List[str], Dict[str, Any]]:
     """TOML 数据件：stdlib `tomllib`（3.11+）；解析后同 JSON 判据。"""
@@ -227,7 +230,6 @@ def _data_toml(root: str, rel: str, text: str,
         issues += _schema_issues(root, rel, obj, sch)
     issues += _fields_issues(rel, obj, spec)
     return issues, {"fields": len(spec.get("required_fields") or [])}
-
 
 
 def _data_jsonl(rel: str, text: str, spec: Dict[str, Any]) -> Tuple[List[str], Dict[str, Any]]:
@@ -252,7 +254,6 @@ def _data_jsonl(rel: str, text: str, spec: Dict[str, Any]) -> Tuple[List[str], D
         issues.append("数据件 %s 行数 %d < min_rows %s（修复指引：补样例或下调声明）"
                       % (rel, rows, spec["min_rows"]))
     return issues, {"rows": rows}
-
 
 
 def _data_graphml(rel: str, text: str, spec: Dict[str, Any]) -> Tuple[List[str], Dict[str, Any]]:
@@ -280,7 +281,6 @@ def _data_graphml(rel: str, text: str, spec: Dict[str, Any]) -> Tuple[List[str],
     return issues, {"nodes": nodes, "edges": edges}
 
 
-
 def _data_mmd(rel: str, text: str, spec: Dict[str, Any]) -> Tuple[List[str], Dict[str, Any]]:
     """Mermaid：首关键词须是合法图型（结构判据，不解析图内容）。"""
     first = ""
@@ -299,8 +299,6 @@ def _data_mmd(rel: str, text: str, spec: Dict[str, Any]) -> Tuple[List[str], Dic
     return [], {"kind": first}
 
 
-
-
 #: 数据面格式 → 判据函数（统一签名；原 if/elif 派发链改为查表，嵌套 ≤8 且新格式只加一行）
 _DATA_FMT = {
     "json": lambda root, rel, text, spec: _data_json(root, rel, text, spec),
@@ -314,50 +312,82 @@ _DATA_FMT = {
 }
 
 
-def _check_data(root: str, spec: Dict[str, Any]) -> Tuple[List[str], Dict[str, Any]]:
-    sid = str(spec.get("id") or spec.get("path") or spec.get("glob") or "?")
-    rels = resolve(root, spec)
+def _data_precheck(sid: str, rels: List[str], spec: Dict[str, Any],
+                   fmt: str) -> Tuple[List[str], Dict[str, Any]] | None:
+    """入口三条前置判据（命中为空 / format 在词表 / sha256 单件）；None = 通过。"""
     if not rels:
         return (["数据契约 %s 未命中任何文件（修复指引：修正 path/glob —— 空气不是契约）" % sid],
                 {"files": 0})
-    fmt = str(spec.get("format") or "").lower()
     if fmt not in FORMATS:
         return (["数据契约 %s 的 format=%r 不在词表 %s（修复指引：改用词表内格式）"
                  % (sid, fmt, "/".join(FORMATS))], {"files": len(rels)})
     if spec.get("sha256") and len(rels) != 1:
         return (["数据契约 %s 声明了 sha256 却命中 %d 件（修复指引：sha256 只用于 path 单件）"
                  % (sid, len(rels))], {"files": len(rels)})
+    return None
+
+
+def _json_obj_of(fmt: str, text: str) -> Any:
+    """json 格式给已解析对象（link 面用）；其它格式 / 解析失败为 None。"""
+    if fmt == "json":
+        try:
+            return _strict_json(text)
+        except ValueError:
+            return None
+    return None
+
+
+def _data_fmt_run(fmt: str, root: str, rel: str, text: str,
+                  spec: Dict[str, Any]) -> Tuple[List[str], Dict[str, Any]]:
+    handler = _DATA_FMT.get(fmt)
+    if handler is not None:
+        return handler(root, rel, text, spec)
+    return [], {"lines": len(text.splitlines())}
+
+
+def _merge_stats(stats: Dict[str, Any], s: Dict[str, Any]) -> None:
+    for _k in ("no_schema", "yaml_unavailable"):
+        if s.get(_k):
+            stats[_k] = int(stats.get(_k) or 0) + 1
+            s = {k: v for k, v in s.items() if k != _k}
+    stats.update(s)
+
+
+def _digest_issue(root: str, rel: str, spec: Dict[str, Any],
+                  issues: List[str]) -> None:
+    got = digest_of(Path(root) / rel)
+    if got != str(spec["sha256"]):
+        issues.append("数据件 %s 摘要不符（记录 %s / 实测 %s）（修复指引：核对改动，"
+                      "确认后用 nf asset contract --freeze 重冻）"
+                      % (rel, str(spec["sha256"])[:12], got[:12]))
+
+
+def _check_one_data_file(root: str, rel: str, spec: Dict[str, Any], fmt: str,
+                         issues: List[str], stats: Dict[str, Any]) -> None:
+    text, err = _read(root, rel)
+    if err:
+        issues.append(err)
+        return
+    text = text or ""
+    obj = _json_obj_of(fmt, text)
+    sub, s = _data_fmt_run(fmt, root, rel, text, spec)
+    issues += sub
+    _merge_stats(stats, s)
+    if spec.get("sha256"):
+        _digest_issue(root, rel, spec, issues)
+    if spec.get("link") and obj is not None:
+        issues += _data_link(root, rel, spec, obj)
+
+
+def _check_data(root: str, spec: Dict[str, Any]) -> Tuple[List[str], Dict[str, Any]]:
+    sid = str(spec.get("id") or spec.get("path") or spec.get("glob") or "?")
+    rels = resolve(root, spec)
+    fmt = str(spec.get("format") or "").lower()
+    pre = _data_precheck(sid, rels, spec, fmt)
+    if pre is not None:
+        return pre
     issues: List[str] = []
     stats: Dict[str, Any] = {"files": len(rels), "format": fmt}
     for rel in rels:
-        text, err = _read(root, rel)
-        if err:
-            issues.append(err)
-            continue
-        text = text or ""
-        obj: Any = None
-        if fmt == "json":
-            try:
-                obj = _strict_json(text)
-            except ValueError:
-                obj = None
-        handler = _DATA_FMT.get(fmt)
-        if handler is not None:
-            sub, s = handler(root, rel, text, spec)
-        else:
-            sub, s = [], {"lines": len(text.splitlines())}
-        issues += sub
-        for _k in ("no_schema", "yaml_unavailable"):
-            if s.get(_k):
-                stats[_k] = int(stats.get(_k) or 0) + 1
-                s = {k: v for k, v in s.items() if k != _k}
-        stats.update(s)
-        if spec.get("sha256"):
-            got = digest_of(Path(root) / rel)
-            if got != str(spec["sha256"]):
-                issues.append("数据件 %s 摘要不符（记录 %s / 实测 %s）（修复指引：核对改动，"
-                              "确认后用 nf asset contract --freeze 重冻）"
-                              % (rel, str(spec["sha256"])[:12], got[:12]))
-        if spec.get("link") and obj is not None:
-            issues += _data_link(root, rel, spec, obj)
+        _check_one_data_file(root, rel, spec, fmt, issues, stats)
     return issues, stats

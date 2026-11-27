@@ -38,20 +38,58 @@ from ._json_faces import (
 
 # ---------------------------------------------------------------- 名录（公开结果面）
 
+def _tier_faces(idx: Dict[str, Any], tiers: Tuple[str, ...]) -> List[Dict[str, Any]]:
+    return [e for e in idx["outputs"] if e.get("tier") in tiers]
+
+
+def _std_ids(values: Any) -> set:
+    return set(filter(None, values))
+
+
+def _other_packs(doc: Dict[str, Any], entry: Dict[str, Any]) -> List[Dict[str, Any]]:
+    return [p for p in doc["packs"] if p.get("code") != entry["code"]]
+
+
+def _pack_min(packs: List[Dict[str, Any]], key: str, coerce: Any) -> Any:
+    return min((coerce(p.get(key) or 0) for p in packs), default=coerce(0))
+
+
+def _std_set(rows: List[Dict[str, Any]], key: str) -> set:
+    return {r[key] for r in rows if r[key]}
+
+
+def _support_rows(p: Dict[str, Any]) -> List[Dict[str, Any]]:
+    return [r for r in p["bindings"] if r.get("support_standard")]
+
+
+def _binding_attr(cat: Dict[str, Any], sid: str, why: str, key: str) -> Dict[str, Any]:
+    std = cat.get(sid) or {}
+    ev = std.get("evidence") or {}
+    return {
+        key: sid,
+        key + "_rationale": why,
+        key + "_layer": std.get("layer", ""),
+        key + "_body": std.get("body", ""),
+        key + "_url": std.get("url", ""),
+        key + "_reachable": bool(ev.get("reachable")),
+        key + "_probe_date": str(ev.get("probe_date") or ""),
+    }
+
+
 def manifest_entry(root: str, spec: Dict[str, Any]) -> Dict[str, Any]:
     alloc = allocate(root, spec)
     idx = json_doc.loads(output_index(spec), dict, what="output index")
-    mv = [e for e in idx["outputs"] if e.get("tier") in ("T2", "T3", "T4")]
-    t4 = [e for e in idx["outputs"] if e.get("tier") == "T4"]
+    mv = _tier_faces(idx, ("T2", "T3", "T4"))
+    t4 = _tier_faces(idx, ("T4",))
     ratio = round(len(mv) / max(1, len(idx["outputs"])), 4)
     spec_blob = json.dumps(spec, ensure_ascii=False, sort_keys=True).encode("utf-8")
     cat = standards_catalog(root)
     ci = concept_index(spec, cat)
     auth = authenticity(spec, cat)
     n_sub = max(1, len(spec["subdivisions"]))
-    bound_std = {x for x in list(ci["primary"].values()) + list(ci["support"].values()) if x}
-    prim_std = {x for x in ci["primary"].values() if x}
-    sup_std = {x for x in ci["support"].values() if x}
+    bound_std = _std_ids(list(ci["primary"].values()) + list(ci["support"].values()))
+    prim_std = _std_ids(ci["primary"].values())
+    sup_std = _std_ids(ci["support"].values())
     return {
         "code": spec["code"],
         "section": spec["section"],
@@ -72,10 +110,8 @@ def manifest_entry(root: str, spec: Dict[str, Any]) -> Dict[str, Any]:
         "standards_bound": len(bound_std),
         "standards_bound_primary": len(prim_std),
         "standards_bound_support": len(sup_std),
-        "standards_binding_coverage": round(
-            len([1 for v in ci["primary"].values() if v]) / n_sub, 4),
-        "support_binding_coverage": round(
-            len([1 for v in ci["support"].values() if v]) / n_sub, 4),
+        "standards_binding_coverage": round(len(prim_std) / n_sub, 4),
+        "support_binding_coverage": round(len(sup_std) / n_sub, 4),
         "standards_dep_edges": len(ci["dep_edges"]),
         "standards_reachable_ratio": auth["reachable_ratio"],
         "data_authenticity": auth["score"],
@@ -101,25 +137,22 @@ def update_manifest(root: str, spec: Dict[str, Any], write: bool = False) -> Dic
         "packs": [],
     }
     entry = manifest_entry(root, spec)
-    packs = [p for p in doc["packs"] if p.get("code") != entry["code"]]
+    packs = _other_packs(doc, entry)
     packs.append(entry)
     doc["packs"] = sorted(packs, key=lambda p: p["code"])
     doc["count"] = len(doc["packs"])
     doc["subdivisions_total"] = sum(int(p.get("subdivisions") or 0) for p in doc["packs"])
     doc["standards_catalog"] = STANDARDS_REL
     doc["concept_density_threshold"] = DENSITY_THRESHOLD
-    doc["concept_density_min"] = min((float(p.get("concept_density") or 0)
-                                      for p in doc["packs"]), default=0.0)
-    doc["binding_coverage_min"] = min((float(p.get("standards_binding_coverage") or 0)
-                                       for p in doc["packs"]), default=0.0)
-    doc["support_binding_coverage_min"] = min((float(p.get("support_binding_coverage") or 0)
-                                               for p in doc["packs"]), default=0.0)
+    doc["concept_density_min"] = _pack_min(doc["packs"], "concept_density", float)
+    doc["binding_coverage_min"] = _pack_min(
+        doc["packs"], "standards_binding_coverage", float)
+    doc["support_binding_coverage_min"] = _pack_min(
+        doc["packs"], "support_binding_coverage", float)
     doc["data_authenticity_threshold"] = AUTHENTICITY_THRESHOLD
-    doc["data_authenticity_min"] = min((float(p.get("data_authenticity") or 0)
-                                        for p in doc["packs"]), default=0.0)
+    doc["data_authenticity_min"] = _pack_min(doc["packs"], "data_authenticity", float)
     doc["reachable_ratio_threshold"] = REACHABLE_RATIO_THRESHOLD
-    doc["standards_dep_edges_min"] = min((int(p.get("standards_dep_edges") or 0)
-                                          for p in doc["packs"]), default=0)
+    doc["standards_dep_edges_min"] = _pack_min(doc["packs"], "standards_dep_edges", int)
     if write:
         path.parent.mkdir(parents=True, exist_ok=True)
         _write_text_retry(path, json.dumps(doc, ensure_ascii=False, indent=2) + "\n")
@@ -150,36 +183,25 @@ def _write_binding_table(root: str, spec: Dict[str, Any]) -> None:
         rec = {"subdivision": s["id"], "name": s["name"]}
         for role, key in (("primary", "standard"), ("support", "support_standard")):
             sid, why = _bd[s["id"]][role]
-            std = cat.get(sid) or {}
-            ev = std.get("evidence") or {}
-            rec[key] = sid
-            rec[key + "_rationale"] = why
-            rec[key + "_layer"] = std.get("layer", "")
-            rec[key + "_body"] = std.get("body", "")
-            rec[key + "_url"] = std.get("url", "")
-            rec[key + "_reachable"] = bool(ev.get("reachable"))
-            rec[key + "_probe_date"] = str(ev.get("probe_date") or "")
+            rec.update(_binding_attr(cat, sid, why, key))
         rows.append(rec)
     auth = authenticity(spec, cat)
     entry = {"code": spec["code"], "package": spec["pack_name"],
              "category": spec["category"], "subdivisions": len(rows),
-             "distinct_standards": len({r["standard"] for r in rows if r["standard"]}),
+             "distinct_standards": len(_std_set(rows, "standard")),
              "distinct_standards_with_support": len(
-                 {r["standard"] for r in rows if r["standard"]}
-                 | {r["support_standard"] for r in rows if r["support_standard"]}),
+                 _std_set(rows, "standard") | _std_set(rows, "support_standard")),
              "data_authenticity": auth["score"],
              "reachable_ratio": auth["reachable_ratio"],
              "probe_evidence_ratio": auth["probe_evidence_ratio"],
              "bindings": rows}
-    packs = [p for p in doc["packs"] if p.get("code") != entry["code"]]
+    packs = _other_packs(doc, entry)
     packs.append(entry)
     doc["packs"] = sorted(packs, key=lambda p: p["code"])
     doc["count"] = len(doc["packs"])
     doc["bindings_total"] = sum(len(p["bindings"]) for p in doc["packs"])
-    doc["support_bindings_total"] = sum(
-        len([r for r in p["bindings"] if r.get("support_standard")]) for p in doc["packs"])
-    doc["data_authenticity_min"] = min(
-        (float(p.get("data_authenticity") or 0) for p in doc["packs"]), default=0.0)
+    doc["support_bindings_total"] = sum(len(_support_rows(p)) for p in doc["packs"])
+    doc["data_authenticity_min"] = _pack_min(doc["packs"], "data_authenticity", float)
     doc["data_authenticity_threshold"] = AUTHENTICITY_THRESHOLD
     _write_text_retry(path, json.dumps(doc, ensure_ascii=False, indent=2) + "\n")
 

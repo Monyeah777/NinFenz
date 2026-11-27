@@ -49,6 +49,23 @@ def _mounts_doc(reg: Dict[str, Any]) -> Dict[str, str]:
     return out
 
 
+def _module_fallback(path: Path) -> Tuple[str, str]:
+    """无契约块 → 按文件名回退（`<id>_<name>.md`；无下划线即整名）。"""
+    stem = path.stem
+    if "_" in stem:
+        return stem.split("_", 1)[0], stem.split("_", 1)[1]
+    return stem, stem
+
+
+def _module_detail(pkg: str, mid: str,
+                   mount_doc: Dict[str, str]) -> Tuple[str, str]:
+    """模块 detail 文本与（官方核心的）挂载后缀。"""
+    if pkg == "官方核心":
+        return ("官方核心 · %s" % mount_doc.get(mid, "未登记挂载").split("：")[-1],
+                (" · " + mount_doc[mid]) if mid in mount_doc else "")
+    return "社区包 %s" % pkg, ""
+
+
 def _modules(root: Path, reg: Dict[str, Any], out: List[Dict[str, Any]]) -> None:
     """模块符号：文件面读 `machine_contract.id/name`（域包文件名与编号不对应时仍解析正确）。"""
     mount_doc = _mounts_doc(reg)
@@ -58,20 +75,14 @@ def _modules(root: Path, reg: Dict[str, Any], out: List[Dict[str, Any]]) -> None
             rel = path.relative_to(root).as_posix()
             mid, name = module_meta(path)
             if not mid:                                # 无契约块 → 按文件名回退（尽力而为）
-                mid = path.stem.split("_", 1)[0]
-                name = path.stem.split("_", 1)[1] if "_" in path.stem else path.stem
+                mid, name = _module_fallback(path)
             pkg = "官方核心" if official else rel.split("/")[1]
             scanned.append((mid, name, rel, pkg))
     for mid, name, rel, pkg in scanned:
         if not mid:
             continue
-        if pkg == "官方核心":
-            detail = "官方核心 · %s" % mount_doc.get(mid, "未登记挂载").split("：")[-1]
-        else:
-            detail = "社区包 %s" % pkg
-        doc = "模块 %s · %s · 归属：%s%s" % (
-            mid, name, pkg,
-            (" · " + mount_doc[mid]) if pkg == "官方核心" and mid in mount_doc else "")
+        detail, suffix = _module_detail(pkg, mid, mount_doc)
+        doc = "模块 %s · %s · 归属：%s%s" % (mid, name, pkg, suffix)
         out.append(_symbol('module', mid, detail, doc, rel, opts=SymbolOptions(aliases=_bare_alias(mid))))
 
 
@@ -96,18 +107,27 @@ def _assets(root: Path, out: List[Dict[str, Any]]) -> None:
                                "资产键 %s · 包 %s" % (key, pkg), rel))
 
 
-def _pipelines(root: Path, reg: Dict[str, Any], out: List[Dict[str, Any]]) -> None:
-    seen_pipe: Dict[str, str] = {}
+def _pipe_ids_from_files(root: Path) -> Dict[str, str]:
+    seen: Dict[str, str] = {}
     for path in sorted(root.glob("03_管线库/*.md")):
         pid = _pipe_id_of(path)
         if pid:
-            seen_pipe[pid] = path.relative_to(root).as_posix()
+            seen[pid] = path.relative_to(root).as_posix()
+    return seen
+
+
+def _pipe_ids_from_packs(root: Path, reg: Dict[str, Any], seen: Dict[str, str]) -> None:
     for p in reg.get("protocols") or []:
         pkg, pid = str(p.get("id") or ""), str(p.get("pipeline") or "")
         if not pkg or not pid:
             continue
         for path in sorted((root / "community" / pkg / "pipelines").glob("*.md")):
-            seen_pipe.setdefault(pid, path.relative_to(root).as_posix())
+            seen.setdefault(pid, path.relative_to(root).as_posix())
+
+
+def _pipelines(root: Path, reg: Dict[str, Any], out: List[Dict[str, Any]]) -> None:
+    seen_pipe = _pipe_ids_from_files(root)
+    _pipe_ids_from_packs(root, reg, seen_pipe)
     for pid in sorted(seen_pipe):
         out.append(_symbol("pipeline", pid, "管线", "管线 %s" % pid, seen_pipe[pid]))
 

@@ -40,23 +40,30 @@ def _validate_facts(doc: dict[str, Any], out: list[str]) -> None:
             out.append("facts[%d] 含变量：事实必须是基原子" % i)
 
 
+def _guard_bad(g: Any) -> bool:
+    return not isinstance(g, list) or len(g) != 3 or g[1] not in GUARD_OPS
+
+
+def _validate_body(r: dict[str, Any], i: int, out: list[str]) -> None:
+    body = r.get("body")
+    if not isinstance(body, list) or not body:
+        out.append("rules[%d] body 须为非空数组" % i)
+        return
+    for j, b in enumerate(body):
+        if isinstance(b, dict) and "guard" in b:
+            if _guard_bad(b["guard"]):
+                out.append("rules[%d].body[%d] guard 须为 [左, 算子, 右]，算子 ∈ %s"
+                           % (i, j, list(GUARD_OPS)))
+        elif not _atom_ok(b):
+            out.append("rules[%d].body[%d] 既非原子也非 guard" % (i, j))
+
+
 def _validate_rules(doc: dict[str, Any], out: list[str]) -> None:
     for i, r in enumerate(doc.get("rules") or []):
         if not isinstance(r, dict) or not _atom_ok(r.get("head")):
             out.append("rules[%d] 缺 head 或形状不合法" % i)
             continue
-        body = r.get("body")
-        if not isinstance(body, list) or not body:
-            out.append("rules[%d] body 须为非空数组" % i)
-            continue
-        for j, b in enumerate(body):
-            if isinstance(b, dict) and "guard" in b:
-                g = b["guard"]
-                if not isinstance(g, list) or len(g) != 3 or g[1] not in GUARD_OPS:
-                    out.append("rules[%d].body[%d] guard 须为 [左, 算子, 右]，算子 ∈ %s"
-                               % (i, j, list(GUARD_OPS)))
-            elif not _atom_ok(b):
-                out.append("rules[%d].body[%d] 既非原子也非 guard" % (i, j))
+        _validate_body(r, i, out)
 
 
 def validate(doc: Any) -> list[str]:
@@ -100,6 +107,19 @@ def _index(facts: Set[tuple[str, tuple[Any, ...]]]
     return by_pred
 
 
+def _match_atom(first: dict[str, Any], fact: tuple[Any, ...],
+               s: dict[str, Any]) -> bool:
+    """单条体原子与事实的绑定（常量化变量）；冲突即失败。"""
+    for pat, val in zip(first["args"], fact):
+        if is_var(pat):
+            if pat in s and s[pat] != val:
+                return False
+            s[pat] = val
+        elif pat != val:
+            return False
+    return True
+
+
 def _bind(body: list[dict[str, Any]], by_pred: dict[str, list[tuple[Any, ...]]],
           subst: dict[str, Any], on_solution, delta: dict[int, Any] | None = None,
           idx: int = 0) -> None:
@@ -120,18 +140,27 @@ def _bind(body: list[dict[str, Any]], by_pred: dict[str, list[tuple[Any, ...]]],
         facts = by_pred.get(first["pred"], ())
     for fact in facts:
         s = dict(subst)
-        ok = True
-        for pat, val in zip(first["args"], fact):
-            if is_var(pat):
-                if pat in s and s[pat] != val:
-                    ok = False
-                    break
-                s[pat] = val
-            elif pat != val:
-                ok = False
-                break
-        if ok:
+        if _match_atom(first, fact, s):
             _bind(rest, by_pred, s, on_solution, delta, idx + 1)
+
+
+def _fuel_total(doc: dict[str, Any], fuel: int | None) -> int:
+    return int(fuel if fuel is not None else (doc.get("fuel") or DEFAULT_FUEL))
+
+
+def _fuel_on(head: dict[str, Any], new: Set[tuple[str, tuple[Any, ...]]],
+             counter: list[Any]):
+    """朴素后端回调：已耗尽即不再计数；超限标耗尽（口径 = 规则实例化次数）。"""
+    def _on(subst: dict[str, Any]) -> None:
+        if counter[2]:
+            return
+        counter[0] += 1
+        if counter[0] > counter[1]:
+            counter[2] = True
+            return
+        new.add((head["pred"],
+                 tuple(subst.get(a, a) if is_var(a) else a for a in head["args"])))
+    return _on
 
 
 def evaluate(doc: dict[str, Any], fuel: int | None = None) -> dict[str, Any]:
@@ -143,44 +172,29 @@ def evaluate(doc: dict[str, Any], fuel: int | None = None) -> dict[str, Any]:
     if issues:
         return {"status": "INVALID", "issues": issues, "facts": [],
                 "fuel_used": 0, "fuel_total": 0, "rounds": 0}
-    total = int(fuel if fuel is not None else (doc.get("fuel") or DEFAULT_FUEL))
+    total = _fuel_total(doc, fuel)
     facts: Set[tuple[str, tuple[Any, ...]]] = set()
     for f in doc["facts"]:
         facts.add((f["pred"], tuple(f["args"])))
     rules = doc["rules"]
-    used = 0
-    exhausted = False
+    counter: list[Any] = [0, total, False]
     rounds = 0
-    while not exhausted:
+    while not counter[2]:
         rounds += 1
         by_pred = _index(facts)
         new: Set[tuple[str, tuple[Any, ...]]] = set()
         for r in rules:
-            head = r["head"]
-
-            def _on_solution(subst: dict[str, Any], head=head) -> None:
-                nonlocal used, exhausted
-                if exhausted:
-                    return
-                used += 1
-                if used > total:
-                    exhausted = True
-                    return
-                new.add((head["pred"],
-                         tuple(subst.get(a, a) if is_var(a) else a for a in head["args"])))
-
-            _bind(r["body"], by_pred, {}, _on_solution)
-            if exhausted:
+            _bind(r["body"], by_pred, {}, _fuel_on(r["head"], new, counter))
+            if counter[2]:
                 break
         added = new - facts
         facts |= added
-        if exhausted:
-            return {"status": "FUEL_EXHAUSTED",
-                    "facts": sorted("%s(%s)" % (p, ",".join(str(x) for x in a)) for p, a in facts),
-                    "fuel_used": used, "fuel_total": total, "rounds": rounds}
+        if counter[2]:
+            return {"status": "FUEL_EXHAUSTED", "facts": _fmt(facts),
+                    "fuel_used": counter[0], "fuel_total": total, "rounds": rounds}
         if not added:
             break
-    return {"status": "OK", "facts": _fmt(facts), "fuel_used": used,
+    return {"status": "OK", "facts": _fmt(facts), "fuel_used": counter[0],
             "fuel_total": total, "rounds": rounds}
 
 
@@ -195,54 +209,48 @@ def _body_facts(body: list[dict[str, Any]],
     return tuple(out)
 
 
-def evaluate_dag(doc: dict[str, Any], fuel: int | None = None) -> dict[str, Any]:
-    """**第三后端**（gate-DAG 风格）：显式记录「谁推出谁」，再按依赖深度分层。
+def _dag_solution(head: dict[str, Any], body: list[dict[str, Any]],
+                  new: Set[tuple[str, tuple[Any, ...]]],
+                  edges: dict[Any, Set[Any]], counter: list[Any]):
+    """DAG 后端回调：解 → 头部节点 + 入边（guard 与自环不计）。"""
+    def _on(subst: dict[str, Any]) -> None:
+        if counter[2]:
+            return
+        counter[0] += 1
+        if counter[0] > counter[1]:
+            counter[2] = True
+            return
+        node = (head["pred"],
+                tuple(subst.get(a, a) if is_var(a) else a for a in head["args"]))
+        new.add(node)
+        deps = edges.setdefault(node, set())
+        for bf in _body_facts(body, subst):
+            if bf != node:
+                deps.add(bf)
+    return _on
 
-    与朴素/半朴素后端的差别只在**是否物化推导图**：事实集三者必须逐条相同（差分自检）。
-    返回额外给出 graph 统计（节点/边/最大深度）——它是「规则 → 可调度 DAG」的桥。
-    """
-    issues = validate(doc)
-    if issues:
-        return {"status": "INVALID", "issues": issues, "facts": [],
-                "fuel_used": 0, "fuel_total": 0, "rounds": 0,
-                "graph": {"nodes": 0, "edges": 0, "depth": 0}}
-    total = int(fuel if fuel is not None else (doc.get("fuel") or DEFAULT_FUEL))
-    base: Set[tuple[str, tuple[Any, ...]]] = {
-        (f["pred"], tuple(f["args"])) for f in doc["facts"]}
-    facts = set(base)
-    edges: dict[tuple[str, tuple[Any, ...]], Set[Any]] = {}
-    counter: list[Any] = [0, total, False]
+
+def _dag_fixpoint(doc: dict[str, Any], facts: Set[tuple[str, tuple[Any, ...]]],
+                  edges: dict[Any, Set[Any]], counter: list[Any]) -> int:
     rounds = 0
     while True:
         rounds += 1
         by_pred = _index(facts)
         new: Set[tuple[str, tuple[Any, ...]]] = set()
         for r in doc["rules"]:
-            head = r["head"]
-
-            def _on(subst: dict[str, Any], head=head) -> None:
-                if counter[2]:
-                    return
-                counter[0] += 1
-                if counter[0] > counter[1]:
-                    counter[2] = True
-                    return
-                node = (head["pred"],
-                        tuple(subst.get(a, a) if is_var(a) else a for a in head["args"]))
-                new.add(node)
-                deps = edges.setdefault(node, set())
-                for bf in _body_facts(r["body"], subst):
-                    if bf != node:
-                        deps.add(bf)
-
-            _bind(r["body"], by_pred, {}, _on)
+            _bind(r["body"], by_pred, {},
+                  _dag_solution(r["head"], r["body"], new, edges, counter))
             if counter[2]:
                 break
         added = new - facts
         facts |= added
         if counter[2] or not added:
             break
-    depth = 0
+    return rounds
+
+
+def _dag_depth(facts: Set[tuple[str, tuple[Any, ...]]], base: Set[Any],
+               edges: dict[Any, Set[Any]]) -> int:
     memo: dict[Any, int] = {f: 0 for f in base}
     for _ in range(len(facts) + 1):
         changed = False
@@ -255,8 +263,33 @@ def evaluate_dag(doc: dict[str, Any], fuel: int | None = None) -> dict[str, Any]
                 changed = True
         if not changed:
             break
-    depth = max(memo.values(), default=0)
-    derived_edges = sum(len([d for d in deps if d in facts]) for deps in edges.values())
+    return max(memo.values(), default=0)
+
+
+def _derived_edges(edges: dict[Any, Set[Any]], facts: Set[Any]) -> int:
+    return sum(len([d for d in deps if d in facts]) for deps in edges.values())
+
+
+def evaluate_dag(doc: dict[str, Any], fuel: int | None = None) -> dict[str, Any]:
+    """**第三后端**（gate-DAG 风格）：显式记录「谁推出谁」，再按依赖深度分层。
+
+    与朴素/半朴素后端的差别只在**是否物化推导图**：事实集三者必须逐条相同（差分自检）。
+    返回额外给出 graph 统计（节点/边/最大深度）——它是「规则 → 可调度 DAG」的桥。
+    """
+    issues = validate(doc)
+    if issues:
+        return {"status": "INVALID", "issues": issues, "facts": [],
+                "fuel_used": 0, "fuel_total": 0, "rounds": 0,
+                "graph": {"nodes": 0, "edges": 0, "depth": 0}}
+    total = _fuel_total(doc, fuel)
+    base: Set[tuple[str, tuple[Any, ...]]] = {
+        (f["pred"], tuple(f["args"])) for f in doc["facts"]}
+    facts = set(base)
+    edges: dict[tuple[str, tuple[Any, ...]], Set[Any]] = {}
+    counter: list[Any] = [0, total, False]
+    rounds = _dag_fixpoint(doc, facts, edges, counter)
+    depth = _dag_depth(facts, base, edges)
+    derived_edges = _derived_edges(edges, facts)
     return {"status": "FUEL_EXHAUSTED" if counter[2] else "OK", "facts": _fmt(facts),
             "fuel_used": counter[0], "fuel_total": total, "rounds": rounds,
             "graph": {"nodes": len(facts), "edges": derived_edges, "depth": depth}}
@@ -279,6 +312,26 @@ def _mk(head: dict[str, Any], new: Set[tuple[str, tuple[Any, ...]]],
     return _on
 
 
+def _seminaive_rule(r: dict[str, Any], by_pred: dict[str, list[tuple[Any, ...]]],
+                    delta_idx: dict[str, list[tuple[Any, ...]]],
+                    new: Set[tuple[str, tuple[Any, ...]]], counter: list[Any],
+                    guard_only_done: bool) -> bool:
+    """半朴素单规则：每个非 guard 体位置各跑一次（delta 限定）；True = 应停外层。"""
+    head = r["head"]
+    positions = [i for i, b in enumerate(r["body"]) if "guard" not in b]
+    if not positions:                      # 只有 guard 的规则：首轮按全量跑一次
+        if not guard_only_done:
+            _bind(r["body"], by_pred, {}, _mk(head, new, counter))
+        return False
+    for i in positions:
+        pat = r["body"][i]
+        _bind(r["body"], by_pred, {}, _mk(head, new, counter),
+              delta={i: delta_idx.get(pat["pred"], [])})
+        if counter[2]:
+            break
+    return bool(counter[2])
+
+
 def evaluate_seminaive(doc: dict[str, Any], fuel: int | None = None) -> dict[str, Any]:
     """**第二后端**（半朴素 delta 迭代）：语义等价、实例化更省。
 
@@ -290,7 +343,7 @@ def evaluate_seminaive(doc: dict[str, Any], fuel: int | None = None) -> dict[str
     if issues:
         return {"status": "INVALID", "issues": issues, "facts": [],
                 "fuel_used": 0, "fuel_total": 0, "rounds": 0}
-    total = int(fuel if fuel is not None else (doc.get("fuel") or DEFAULT_FUEL))
+    total = _fuel_total(doc, fuel)
     facts: Set[tuple[str, tuple[Any, ...]]] = {
         (f["pred"], tuple(f["args"])) for f in doc["facts"]}
     rules = doc["rules"]
@@ -304,19 +357,7 @@ def evaluate_seminaive(doc: dict[str, Any], fuel: int | None = None) -> dict[str
         delta_idx = _index(delta)
         new: Set[tuple[str, tuple[Any, ...]]] = set()
         for r in rules:
-            head = r["head"]
-            positions = [i for i, b in enumerate(r["body"]) if "guard" not in b]
-            if not positions:                      # 只有 guard 的规则：首轮按全量跑一次
-                if not guard_only_done:
-                    _bind(r["body"], by_pred, {}, _mk(head, new, counter))
-                continue
-            for i in positions:
-                pat = r["body"][i]
-                _bind(r["body"], by_pred, {}, _mk(head, new, counter),
-                      delta={i: delta_idx.get(pat["pred"], [])})
-                if counter[2]:
-                    break
-            if counter[2]:
+            if _seminaive_rule(r, by_pred, delta_idx, new, counter, guard_only_done):
                 break
         guard_only_done = True
         added = new - facts

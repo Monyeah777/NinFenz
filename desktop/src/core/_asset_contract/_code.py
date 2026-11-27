@@ -62,6 +62,33 @@ def _check_tests(root: str, rel: str, spec: Dict[str, Any]) -> List[str]:
 
 
 
+def _forbid_rule_issues(sid: str, rule: dict, texts: list,
+                        stats: Dict[str, Any]) -> List[str]:
+    """单条 `forbid_regex` 规则：命中行号 + 计数入 stats。"""
+    rx = re.compile(str(rule.get("pattern") or ""))
+    hits = ["%s:%d" % (rel, text.count(chr(10), 0, m.start()) + 1)
+            for rel, text in texts for m in rx.finditer(text)]
+    stats["forbid:%s" % rule.get("name")] = len(hits)
+    if hits:
+        return ["代码契约 %s 命中禁用式 %s（%d 处，例 %s）（修复指引：%s）"
+                % (sid, rule.get("name"), len(hits), "、".join(hits[:3]),
+                   rule.get("why") or "换成不越界的等价实现")]
+    return []
+
+
+def _limit_rule_issues(sid: str, rule: dict, texts: list,
+                       stats: Dict[str, Any]) -> List[str]:
+    """单条 `regex_limits` 规则：计数入 stats，超上限判 FAIL（棘轮只减不增）。"""
+    rx = re.compile(str(rule.get("pattern") or ""))
+    n = sum(len(rx.findall(text)) for _rel, text in texts)
+    cap = int(rule.get("max") or 0)
+    stats["limit:%s" % rule.get("name")] = n
+    if n > cap:
+        return ["代码契约 %s 的 %s 计数 %d > 上限 %d（棘轮只减不增）"
+                "（修复指引：先降后改声明）" % (sid, rule.get("name"), n, cap)]
+    return []
+
+
 def _code_structural(root: str, spec: Dict[str, Any]) -> Tuple[List[str], Dict[str, Any]]:
     """第二实现线的**结构契约**（E2）：不做完整 AST，只判可证的正则面（禁用式 / 计数上限）。
 
@@ -82,23 +109,9 @@ def _code_structural(root: str, spec: Dict[str, Any]) -> Tuple[List[str], Dict[s
     issues: List[str] = []
     stats: Dict[str, Any] = {"files": len(rels)}
     for rule in spec.get("forbid_regex") or []:
-        rx = re.compile(str(rule.get("pattern") or ""))
-        hits = ["%s:%d" % (rel, text.count(chr(10), 0, m.start()) + 1)
-                for rel, text in texts for m in rx.finditer(text)]
-        stats["forbid:%s" % rule.get("name")] = len(hits)
-        if hits:
-            issues.append("代码契约 %s 命中禁用式 %s（%d 处，例 %s）（修复指引：%s）"
-                          % (sid, rule.get("name"), len(hits), "、".join(hits[:3]),
-                             rule.get("why") or "换成不越界的等价实现"))
+        issues += _forbid_rule_issues(sid, rule, texts, stats)
     for rule in spec.get("regex_limits") or []:
-        rx = re.compile(str(rule.get("pattern") or ""))
-        n = sum(len(rx.findall(text)) for _rel, text in texts)
-        cap = int(rule.get("max") or 0)
-        stats["limit:%s" % rule.get("name")] = n
-        if n > cap:
-            issues.append("代码契约 %s 的 %s 计数 %d > 上限 %d（棘轮只减不增）"
-                          "（修复指引：先降后改声明）"
-                          % (sid, rule.get("name"), n, cap))
+        issues += _limit_rule_issues(sid, rule, texts, stats)
     return issues, stats
 
 
@@ -177,6 +190,23 @@ def _warn_null_guard(sid: str, rel: str, text: str, rule: dict) -> list[str]:
 
 
 
+def _export_span_hits(sid: str, rel: str, lines: list, text: str, span: tuple,
+                      forbid: list) -> list[str]:
+    """一个导出面区块内的禁用词命中（只看代码行）。"""
+    span_start, span_end = span
+    ln = _line_no(text, span_start)
+    out: list[str] = []
+    for offset, line in enumerate(lines[ln - 1:_line_no(text, max(span_end - 1, span_start))]):
+        if not _is_code_line(line):
+            continue
+        for bad in forbid:
+            if bad in line:
+                out.append(f"代码契约 {sid} 告警：{rel}:{ln + offset} 起的导出面含 "
+                           f"{bad!r}（修复指引：C ABI 出口以错误码返回，"
+                           f"不 panic/unwrap/expect/assert——越过 ABI 边界 panic 是未定义行为）")
+    return out
+
+
 def _warn_export_no_panic(sid: str, rel: str, text: str, rule: dict) -> list[str]:
     """规则③：导出面（`#[no_mangle]` 起的区块）不得 panic/unwrap/expect/assert。
 
@@ -191,15 +221,7 @@ def _warn_export_no_panic(sid: str, rel: str, text: str, rule: dict) -> list[str
     out: list[str] = []
     for i, pos in enumerate(starts):
         end = starts[i + 1] if i + 1 < len(starts) else cut
-        ln = _line_no(text, pos)
-        for offset, line in enumerate(lines[ln - 1:_line_no(text, max(end - 1, pos))]):
-            if not _is_code_line(line):
-                continue
-            for bad in forbid:
-                if bad in line:
-                    out.append(f"代码契约 {sid} 告警：{rel}:{ln + offset} 起的导出面含 "
-                               f"{bad!r}（修复指引：C ABI 出口以错误码返回，"
-                               f"不 panic/unwrap/expect/assert——越过 ABI 边界 panic 是未定义行为）")
+        out += _export_span_hits(sid, rel, lines, text, (pos, end), forbid)
     return out
 
 
@@ -210,6 +232,17 @@ _WARN_RULES = {
     "export_no_panic": _warn_export_no_panic,
 }
 
+
+
+def _rule_warns(sid: str, rel: str, text: str, rules: dict) -> list[str]:
+    """单件文本按声明的 warn_rules 逐条判定（未登记规则名 / 非对象规则跳过）。"""
+    out: list[str] = []
+    for name, rule in rules.items():
+        fn = _WARN_RULES.get(str(name))
+        if fn is None or not isinstance(rule, dict):
+            continue
+        out += fn(sid, rel, text, rule)
+    return out
 
 
 def _code_warns(root: str, spec: dict) -> list[str]:
@@ -227,34 +260,34 @@ def _code_warns(root: str, spec: dict) -> list[str]:
     if not rels:
         return []                     # 未命中面的事由 `_check_code` 的 issues 报，不重复告警
     warns: list[str] = []
+    sid = str(spec.get("id") or "?")
     for rel in rels:
         text, err = _read(root, rel)
         if err:
             continue                  # 读件失败同样由 issues 面报
-        for name, rule in rules.items():
-            fn = _WARN_RULES.get(str(name))
-            if fn is None or not isinstance(rule, dict):
-                continue
-            warns += fn(str(spec.get("id") or "?"), rel, text or "", rule)
+        warns += _rule_warns(sid, rel, text or "", rules)
     return warns
 
 
 
-def _check_code(root: str, spec: Dict[str, Any]) -> Tuple[List[str], Dict[str, Any]]:
-    if spec.get("forbid_regex") or spec.get("regex_limits") or spec.get("warn_rules"):
-        return _code_structural(root, spec)
-    rel = str(spec.get("path") or "")
-    if str(spec.get("lang") or "python") != "python":
-        return (["代码契约 %s 的 lang=%s 不在支持面（仅 python 走 AST；Bash/VBA 走脚本面声明式契约"
-            "）"
-                 % (spec.get("id"), spec.get("lang"))], {})
-    rels = resolve(root, spec)
-    if not rels:
-        return (["代码契约 %s 未命中任何文件（修复指引：修正 path/glob）" % spec.get("id")],
- {"files": 0})
+def _lang_issue(spec: Dict[str, Any]) -> Tuple[List[str], Dict[str, Any]]:
+    return (["代码契约 %s 的 lang=%s 不在支持面（仅 python 走 AST；Bash/VBA 走脚本面声明式契约"
+        "）"
+             % (spec.get("id"), spec.get("lang"))], {})
+
+
+def _nohit_issue(spec: Dict[str, Any]) -> Tuple[List[str], Dict[str, Any]]:
+    return (["代码契约 %s 未命中任何文件（修复指引：修正 path/glob）" % spec.get("id")],
+            {"files": 0})
+
+
+def _deny_set(spec: Dict[str, Any]) -> set:
+    return {str(x) for x in spec.get("deny_calls") or []}
+
+
+def _python_contract_issues(root: str, rels: List[str], deny: set) -> List[str]:
+    """逐件 AST 判据：禁用调用 + None 解引用（语法坏件如实记一条）。"""
     issues: List[str] = []
-    stats: Dict[str, Any] = {"files": len(rels)}
-    deny = {str(x) for x in spec.get("deny_calls") or []}
     for one in rels:
         text, err = _read(root, one)
         if err:
@@ -269,6 +302,19 @@ def _check_code(root: str, spec: Dict[str, Any]) -> Tuple[List[str], Dict[str, A
             continue
         issues += _denied_calls(tree, one, deny)
         issues += _none_deref(tree, one)
+    return issues
+
+
+def _check_code(root: str, spec: Dict[str, Any]) -> Tuple[List[str], Dict[str, Any]]:
+    if spec.get("forbid_regex") or spec.get("regex_limits") or spec.get("warn_rules"):
+        return _code_structural(root, spec)
+    rel = str(spec.get("path") or "")
+    if str(spec.get("lang") or "python") != "python":
+        return _lang_issue(spec)
+    rels = resolve(root, spec)
+    if not rels:
+        return _nohit_issue(spec)
+    issues = _python_contract_issues(root, rels, _deny_set(spec))
     if rel:
         issues += _check_tests(root, rel, spec)
-    return issues, stats
+    return issues, {"files": len(rels)}

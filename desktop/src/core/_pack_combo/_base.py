@@ -18,12 +18,10 @@ from core import import_graph as _ig
 from ._const import CORE13, CORE_CONTRACT_PATTERNS, INPUT_PATTERNS, MODULE_CONTRACT_PATTERNS, PROFILE_PATTERNS, _CACHE, _CACHE_MAX, _CONTENT_CACHE, _CONTENT_CACHE_MAX, _CONTRACTS_CACHE, _CONTRACTS_CACHE_MAX
 
 
-
 def _root_cache(key: str) -> Dict[str, Any]:
     if key not in _CACHE and len(_CACHE) >= _CACHE_MAX:
         _CACHE.clear()
     return _CACHE.setdefault(key, {})
-
 
 
 def _cache_key(root: str) -> str:
@@ -38,17 +36,14 @@ def _cache_key(root: str) -> str:
     return os.path.abspath(str(root))
 
 
-
 def cache_clear() -> None:
     _CACHE.clear()
-
 
 
 def _content_store(key: Any, value: Any) -> None:
     if key not in _CONTENT_CACHE and len(_CONTENT_CACHE) >= _CONTENT_CACHE_MAX:
         _CONTENT_CACHE.clear()
     _CONTENT_CACHE[key] = copy.deepcopy(value)
-
 
 
 def _inputs_fingerprint(root: str = ".") -> str:
@@ -64,7 +59,6 @@ def _inputs_fingerprint(root: str = ".") -> str:
     return csc.face_fingerprint(root, INPUT_PATTERNS)
 
 
-
 def _read_json(path: Path) -> Any:
     try:
         return json_doc.loads(csc.read_text_cached(path), None, what=str(path))
@@ -72,13 +66,11 @@ def _read_json(path: Path) -> Any:
         return None
 
 
-
 def _core_ids() -> Set[str]:
     out = set(CORE13)
     for x in CORE13:
         out.add(x.split(":")[-1])
     return out
-
 
 
 def _pack_dirs(root: str = ".") -> List[Path]:
@@ -96,6 +88,35 @@ def _pack_dirs(root: str = ".") -> List[Path]:
                     for rel in _csc.iter_files(root, "community/*/protocol.yaml")})]
 
 
+def _protocol_ids(text: str) -> List[str]:
+    """模块 id 清单：行式（全限定 / 裸号，并集去重）→ 无则 flow 写法。"""
+    ids = re.findall(r'(?m)^\s*-\s*"([^"]+:M\d{2,3})"\s*(?:#.*)?$', text)
+    ids += re.findall(r'(?m)^\s*-\s*"?(M\d{2,3})"?\s*(?:#.*)?$', text)
+    ids = list(dict.fromkeys(ids))          # 两种写法并集（旧包混用行式裸号与全限定）
+    if ids:
+        return ids
+    m = re.search(r"(?m)^\s*module_id_range\s*:\s*\[([^\]]*)\]", text)
+    if m:
+        return [x.strip().strip("'\"") for x in m.group(1).split(",") if x.strip()]
+    return []
+
+
+def _protocol_layers(text: str) -> Dict[str, List[str]]:
+    layers: Dict[str, List[str]] = {}
+    for lm in re.finditer(r"(?m)^\s*(P\d{2})\s*[^:]*:\s*\{default:\s*\[([^\]]*)\]", text):
+        mods = [x.strip().strip("'\"") for x in lm.group(2).split(",") if x.strip()]
+        if mods:
+            layers[lm.group(1)] = mods
+    return layers
+
+
+def _protocol_refs(text: str) -> List[Dict[str, str]]:
+    refs = []
+    for rm in re.finditer(r"(?ms)^\s*-\s*source_package:\s*(\S+)\s*\n\s*module_id:\s*(\S+)", text):
+        refs.append({"source_package": rm.group(1).strip("'\""),
+                     "module_id": rm.group(2).strip("'\"")})
+    return refs
+
 
 def _parse_protocol(path: Path) -> Dict[str, Any]:
     """极小读取：只取组合需要的键（id / pipeline / module_id_range / mount_layers）。"""
@@ -106,27 +127,10 @@ def _parse_protocol(path: Path) -> Dict[str, Any]:
     m = re.search(r"(?m)^\s*pipeline:\s*(P\d{2,3})\s*$", text)
     out["pipeline"] = m.group(1) if m else ""
     # 行式清单：`    - "情感:M22"   # 注释` / `    - "M40"    # 注释`（注释须容忍）
-    ids = re.findall(r'(?m)^\s*-\s*"([^"]+:M\d{2,3})"\s*(?:#.*)?$', text)
-    ids += re.findall(r'(?m)^\s*-\s*"?(M\d{2,3})"?\s*(?:#.*)?$', text)
-    ids = list(dict.fromkeys(ids))          # 两种写法并集（旧包混用行式裸号与全限定）
-    if not ids:                       # flow 写法：`module_id_range: [M40, 情感:M22]`
-        m = re.search(r"(?m)^\s*module_id_range\s*:\s*\[([^\]]*)\]", text)
-        if m:
-            ids = [x.strip().strip("'\"") for x in m.group(1).split(",") if x.strip()]
-    out["module_ids"] = ids
-    layers: Dict[str, List[str]] = {}
-    for lm in re.finditer(r"(?m)^\s*(P\d{2})\s*[^:]*:\s*\{default:\s*\[([^\]]*)\]", text):
-        mods = [x.strip().strip("'\"") for x in lm.group(2).split(",") if x.strip()]
-        if mods:
-            layers[lm.group(1)] = mods
-    out["mount_layers"] = layers
-    refs = []
-    for rm in re.finditer(r"(?ms)^\s*-\s*source_package:\s*(\S+)\s*\n\s*module_id:\s*(\S+)", text):
-        refs.append({"source_package": rm.group(1).strip("'\""),
-                     "module_id": rm.group(2).strip("'\"")})
-    out["references"] = refs
+    out["module_ids"] = _protocol_ids(text)
+    out["mount_layers"] = _protocol_layers(text)
+    out["references"] = _protocol_refs(text)
     return out
-
 
 
 def _face_paths(root: str, pattern: str) -> List[Path]:
@@ -140,6 +144,38 @@ def _face_paths(root: str, pattern: str) -> List[Path]:
     base = Path(root)
     return [base.joinpath(*rel.split("/")) for rel in csc.iter_files(root, pattern)]
 
+
+def _event_names(mc: Dict[str, Any], key: str) -> List[str]:
+    return [str(x) for x in ((mc.get("events") or {}).get(key) or [])]
+
+
+def _fence_mc(text: str) -> Dict[str, Any] | None:
+    """`machine_contract` 围栏块 → dict；缺块/非对象/空块返回 None。"""
+    mc = (csc._fence_yaml(text, "machine_contract") or {}).get("machine_contract") or {}
+    if not isinstance(mc, dict) or not mc:
+        return None
+    return mc
+
+
+def _module_rec(p: Path, mc: Dict[str, Any]) -> Dict[str, Any]:
+    return {
+        "id": str(mc.get("id") or p.stem.split("_")[0]),
+        "stem": p.stem.split("_")[0],
+        "pack": p.parents[1].name,
+        "layer": str(mc.get("layer") or ""),
+        "inputs": [str(x) for x in (mc.get("inputs") or [])],
+        "outputs": [str(x) for x in (mc.get("outputs") or [])],
+        "publish": _event_names(mc, "publish"),
+        "subscribe": _event_names(mc, "subscribe"),
+        "path": p.as_posix(),
+    }
+
+
+def _module_rec_from_text(p: Path, text: str) -> Dict[str, Any] | None:
+    mc = _fence_mc(text)
+    if mc is None:
+        return None
+    return _module_rec(p, mc)
 
 
 def _module_contracts(root: str = ".") -> Dict[str, Dict[str, Any]]:
@@ -160,21 +196,9 @@ def _module_contracts(root: str = ".") -> Dict[str, Dict[str, Any]]:
             text = csc.read_text_cached(p)
         except OSError:  # 尽力而为：跳过不可读/不可解析项；该类缺口由对应门禁另行报出（见 AUD-0016）
             continue
-        parsed = csc._fence_yaml(text, "machine_contract")
-        mc = (parsed or {}).get("machine_contract") or {}
-        if not isinstance(mc, dict) or not mc:
+        rec = _module_rec_from_text(p, text)
+        if rec is None:
             continue
-        rec: Dict[str, Any] = {
-            "id": str(mc.get("id") or p.stem.split("_")[0]),
-            "stem": p.stem.split("_")[0],
-            "pack": p.parents[1].name,
-            "layer": str(mc.get("layer") or ""),
-            "inputs": [str(x) for x in (mc.get("inputs") or [])],
-            "outputs": [str(x) for x in (mc.get("outputs") or [])],
-            "publish": [str(x) for x in ((mc.get("events") or {}).get("publish") or [])],
-            "subscribe": [str(x) for x in ((mc.get("events") or {}).get("subscribe") or [])],
-            "path": p.as_posix(),
-        }
         out[rec["id"]] = rec
         out.setdefault(rec["stem"], rec)
         out.setdefault(rec["id"].split(":")[-1], rec)
@@ -185,6 +209,20 @@ def _module_contracts(root: str = ".") -> Dict[str, Dict[str, Any]]:
     _CACHE[key] = cached
     return out
 
+
+def _core_rec(p: Path, mc: Dict[str, Any]) -> Dict[str, Any]:
+    return {"id": str(mc.get("id") or p.stem.split("_")[0]),
+            "stem": p.stem.split("_")[0],
+            "publish": _event_names(mc, "publish"),
+            "subscribe": _event_names(mc, "subscribe"),
+            "path": p.as_posix()}
+
+
+def _core_rec_from_text(p: Path, text: str) -> Dict[str, Any] | None:
+    mc = _fence_mc(text)
+    if mc is None:
+        return None
+    return _core_rec(p, mc)
 
 
 def _core_contracts(root: str = ".") -> Dict[str, Dict[str, Any]]:
@@ -204,21 +242,15 @@ def _core_contracts(root: str = ".") -> Dict[str, Dict[str, Any]]:
             text = csc.read_text_cached(p)
         except OSError:  # 尽力而为：跳过不可读/不可解析项；该类缺口由对应门禁另行报出（见 AUD-0016）
             continue
-        mc = (csc._fence_yaml(text, "machine_contract") or {}).get("machine_contract") or {}
-        if not isinstance(mc, dict) or not mc:
+        rec = _core_rec_from_text(p, text)
+        if rec is None:
             continue
-        rec: Dict[str, Any] = {"id": str(mc.get("id") or p.stem.split("_")[0]),
-               "stem": p.stem.split("_")[0],
-               "publish": [str(x) for x in ((mc.get("events") or {}).get("publish") or [])],
-               "subscribe": [str(x) for x in ((mc.get("events") or {}).get("subscribe") or [])],
-               "path": p.as_posix()}
         out[rec["id"]] = rec
         out.setdefault(rec["stem"], rec)
     if len(_CONTRACTS_CACHE) >= _CONTRACTS_CACHE_MAX:
         _CONTRACTS_CACHE.clear()
     _CONTRACTS_CACHE["core:" + fp] = out
     return out
-
 
 
 def indexes(root: str = ".") -> Tuple[Dict[str, Dict[str, Any]], Dict[str, List[Dict[str, Any]]],
@@ -246,13 +278,11 @@ def indexes(root: str = ".") -> Tuple[Dict[str, Dict[str, Any]], Dict[str, List[
     return by_id, pub_index, core_pub
 
 
-
 def _pack_assets(root: str, pkg_dir: str) -> List[Dict[str, str]]:
     doc = _read_json(Path(root) / "community" / pkg_dir / "assets" / "provenance.json") or {}
     return [{"key": str(a.get("key") or ""), "file": str(a.get("file") or ""),
              "module": str(a.get("module") or ""), "source_package": pkg_dir}
             for a in (doc.get("assets") or [])]
-
 
 
 def _asset_index(root: str = ".") -> Dict[Tuple[str, str], Dict[str, Any]]:
@@ -271,6 +301,41 @@ def _asset_index(root: str = ".") -> Dict[Tuple[str, str], Dict[str, Any]]:
     _CACHE[key] = cached
     return out
 
+
+def _own_modules(proto: Dict[str, Any],
+                 contracts: Dict[str, Dict[str, Any]]) -> List[Dict[str, Any]]:
+    own = []
+    for mid in proto["module_ids"]:
+        rec = contracts.get(str(mid)) or contracts.get(str(mid).split(":")[-1])
+        own.append(rec or {"id": str(mid), "layer": "", "inputs": [], "publish": [],
+                           "subscribe": [], "pack": proto["id"]})
+    return own
+
+
+def _layers_of(own: List[Dict[str, Any]]) -> Dict[str, List[str]]:
+    layers: Dict[str, List[str]] = {}
+    for rec in own:
+        lay = str(rec.get("layer") or "")
+        if lay:
+            layers.setdefault(lay, [])
+            if rec["id"] not in layers[lay]:
+                layers[lay].append(rec["id"])
+    return layers
+
+
+def _pack_profile(root: str, d: Path, proto: Dict[str, Any],
+                  contracts: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
+    own = _own_modules(proto, contracts)
+    layers = _layers_of(own)
+    return {
+        "package": proto["id"], "pipeline": proto.get("pipeline", ""),
+        "modules": [r["id"] for r in own], "module_recs": own,
+        "references": proto.get("references") or [],
+        "layers": {k: sorted(set(v)) for k, v in sorted(layers.items())},
+        "assets": _pack_assets(root, d.name),
+        "publishes": sorted({e for r in own for e in r.get("publish", [])}),
+        "subscribes": sorted({e for r in own for e in r.get("subscribe", [])}),
+    }
 
 
 def profiles(root: str = ".") -> Dict[str, Dict[str, Any]]:
@@ -303,34 +368,13 @@ def profiles(root: str = ".") -> Dict[str, Dict[str, Any]]:
     out: Dict[str, Dict[str, Any]] = {}
     for d in _pack_dirs(root):
         proto = _parse_protocol(d / "protocol.yaml")
-        own = []
-        for mid in proto["module_ids"]:
-            rec = contracts.get(str(mid)) or contracts.get(str(mid).split(":")[-1])
-            own.append(rec or {"id": str(mid), "layer": "", "inputs": [], "publish": [],
-                               "subscribe": [], "pack": proto["id"]})
-        layers: Dict[str, List[str]] = {}
-        for rec in own:
-            lay = str(rec.get("layer") or "")
-            if lay:
-                layers.setdefault(lay, [])
-                if rec["id"] not in layers[lay]:
-                    layers[lay].append(rec["id"])
-        out[proto["id"]] = {
-            "package": proto["id"], "pipeline": proto.get("pipeline", ""),
-            "modules": [r["id"] for r in own], "module_recs": own,
-            "references": proto.get("references") or [],
-            "layers": {k: sorted(set(v)) for k, v in sorted(layers.items())},
-            "assets": _pack_assets(root, d.name),
-            "publishes": sorted({e for r in own for e in r.get("publish", [])}),
-            "subscribes": sorted({e for r in own for e in r.get("subscribe", [])}),
-        }
+        out[proto["id"]] = _pack_profile(root, d, proto, contracts)
     cached.update({"prof": out, "contracts": contracts})
     _CACHE[key] = cached
     _content_store(("prof", fp), out)
     if dkey is not None:
         disk_cache.store("pack-prof", dkey, out)
     return out
-
 
 
 def _digest(obj: Dict[str, Any]) -> str:
