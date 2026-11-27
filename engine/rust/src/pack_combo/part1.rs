@@ -66,18 +66,61 @@ pub(crate) fn parse_protocol(path: &Path) -> Proto {
         .captures(&text)
         .map(|c| c[1].to_string())
         .unwrap_or_default();
-    // 行式清单：全限定与裸号两种写法并集（保持出现序、去重）
+    out.module_ids = proto_module_ids(&text);
+    out.mount_layers = proto_mount_layers(&text);
+    out.references = proto_references(&text);
+    out
+}
+
+/// 分层声明：Pxx ...: {default: [M01, M02]}。
+fn proto_mount_layers(text: &str) -> BTreeMap<String, Vec<String>> {
+    let mut layers: BTreeMap<String, Vec<String>> = BTreeMap::new();
+    let re_layer = regex::Regex::new(LAYER_DECL_PAT).expect("固定合法");
+    for c in re_layer.captures_iter(text) {
+        let mods: Vec<String> = c[2]
+            .split(',')
+            .map(|x| {
+                x.trim()
+                    .trim_matches(|ch| ch == '\'' || ch == '"')
+                    .to_string()
+            })
+            .filter(|x| !x.is_empty())
+            .collect();
+        if !mods.is_empty() {
+            layers.insert(c[1].to_string(), mods);
+        }
+    }
+    layers
+}
+
+/// 跨包引用：source_package / module_id 对。
+fn proto_references(text: &str) -> Vec<(String, String)> {
+    let mut refs: Vec<(String, String)> = Vec::new();
+    let re_ref =
+        regex::Regex::new(r"(?ms)^\s*-\s*source_package:\s*(\S+)\s*\n\s*module_id:\s*(\S+)")
+            .expect("固定合法");
+    for c in re_ref.captures_iter(text) {
+        refs.push((
+            c[1].trim_matches(|ch| ch == '\'' || ch == '"').to_string(),
+            c[2].trim_matches(|ch| ch == '\'' || ch == '"').to_string(),
+        ));
+    }
+    refs
+}
+
+/// 行式清单：全限定与裸号两种写法并集（保持出现序、去重）；空则回落到 module_id_range。
+fn proto_module_ids(text: &str) -> Vec<String> {
     let mut ids: Vec<String> = Vec::new();
     let re_full =
         regex::Regex::new(r#"(?m)^\s*-\s*"([^"]+:M\d{2,3})"\s*(?:#.*)?$"#).expect("固定合法");
-    for c in re_full.captures_iter(&text) {
+    for c in re_full.captures_iter(text) {
         let v = c[1].to_string();
         if !ids.contains(&v) {
             ids.push(v);
         }
     }
     let re_bare = regex::Regex::new(r#"(?m)^\s*-\s*"?(M\d{2,3})"?\s*(?:#.*)?$"#).expect("固定合法");
-    for c in re_bare.captures_iter(&text) {
+    for c in re_bare.captures_iter(text) {
         let v = c[1].to_string();
         if !ids.contains(&v) {
             ids.push(v);
@@ -86,7 +129,7 @@ pub(crate) fn parse_protocol(path: &Path) -> Proto {
     if ids.is_empty() {
         let re_flow =
             regex::Regex::new(r"(?m)^\s*module_id_range\s*:\s*\[([^\]]*)\]").expect("固定合法");
-        if let Some(c) = re_flow.captures(&text) {
+        if let Some(c) = re_flow.captures(text) {
             for x in c[1].split(',') {
                 let v = x
                     .trim()
@@ -98,32 +141,7 @@ pub(crate) fn parse_protocol(path: &Path) -> Proto {
             }
         }
     }
-    out.module_ids = ids;
-    let re_layer = regex::Regex::new(LAYER_DECL_PAT).expect("固定合法");
-    for c in re_layer.captures_iter(&text) {
-        let mods: Vec<String> = c[2]
-            .split(',')
-            .map(|x| {
-                x.trim()
-                    .trim_matches(|ch| ch == '\'' || ch == '"')
-                    .to_string()
-            })
-            .filter(|x| !x.is_empty())
-            .collect();
-        if !mods.is_empty() {
-            out.mount_layers.insert(c[1].to_string(), mods);
-        }
-    }
-    let re_ref =
-        regex::Regex::new(r"(?ms)^\s*-\s*source_package:\s*(\S+)\s*\n\s*module_id:\s*(\S+)")
-            .expect("固定合法");
-    for c in re_ref.captures_iter(&text) {
-        out.references.push((
-            c[1].trim_matches(|ch| ch == '\'' || ch == '"').to_string(),
-            c[2].trim_matches(|ch| ch == '\'' || ch == '"').to_string(),
-        ));
-    }
-    out
+    ids
 }
 
 /// 真源 `_face_paths`：按模式枚举（**有序**）。
@@ -150,11 +168,23 @@ pub(crate) fn module_contracts(root: &Path) -> Vec<(String, Json)> {
             Some(p) => p,
             None => continue,
         };
-        let mc = obj_get(&parsed, "machine_contract")
+        let Some((id, stem, rec)) = module_contract_record(&rel, &parsed) else {
+            continue;
+        };
+        module_record_insert(&mut out, &id, &stem, &rec);
+    }
+    out
+}
+
+/// 单份模块文档 → (可查 id, stem, 契约记录摘要)。
+fn module_contract_record(rel: &str, parsed: &Json) -> Option<(String, String, Json)> {
+    let rel = rel.to_string();
+    {
+        let mc = obj_get(parsed, "machine_contract")
             .cloned()
             .unwrap_or(Json::Object(vec![]));
         if !matches!(mc, Json::Object(_)) || matches!(&mc, Json::Object(o) if o.is_empty()) {
-            continue;
+            return None;
         }
         let stem = rel
             .rsplit('/')
@@ -206,19 +236,23 @@ pub(crate) fn module_contracts(root: &Path) -> Vec<(String, Json)> {
         // 那份记录（`id: AI人力资源与招聘:M01`）已先把**末段键** `M01` setdefault 掉了
         // ⇒ 真源里裸记录**覆盖**它（`M01 → M01`），本线却保留了 AI 记录
         // ⇒ `profiles` 里 111 个包的 `module_recs` 连带错位，组合证书整张对不上。
-        match out.iter_mut().find(|(k, _)| *k == id) {
-            Some(slot) => slot.1 = rec.clone(),
-            None => out.push((id.clone(), rec.clone())),
-        }
-        if !out.iter().any(|(k, _)| *k == stem) {
-            out.push((stem.clone(), rec.clone()));
-        }
-        let tail = id.rsplit(':').next().unwrap_or(&id).to_string();
-        if !out.iter().any(|(k, _)| *k == tail) {
-            out.push((tail, rec));
-        }
+        Some((id, stem, rec))
     }
-    out
+}
+
+/// 契约记录三键：id 键覆盖；stem / id 末段 首次胜（真源 setdefault 语义）。
+fn module_record_insert(out: &mut Vec<(String, Json)>, id: &str, stem: &str, rec: &Json) {
+    match out.iter_mut().find(|(k, _)| *k == id) {
+        Some(slot) => slot.1 = rec.clone(),
+        None => out.push((id.to_string(), rec.clone())),
+    }
+    if !out.iter().any(|(k, _)| *k == stem) {
+        out.push((stem.to_string(), rec.clone()));
+    }
+    let tail = id.rsplit(':').next().unwrap_or(id).to_string();
+    if !out.iter().any(|(k, _)| *k == tail) {
+        out.push((tail, rec.clone()));
+    }
 }
 
 /// 真源 `_core_contracts`。

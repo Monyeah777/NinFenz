@@ -20,19 +20,7 @@ pub(crate) fn problems(graph: &Json) -> Vec<String> {
     check_nodes(graph, &legend, &mut issues);
     let mut sorted_prereqs = prereqs.clone();
     sorted_prereqs.sort_by(|a, b| a.0.cmp(&b.0));
-    for (nid, ps) in &sorted_prereqs {
-        for p in ps {
-            if !declared.contains(p) {
-                issues.push(format!(
-                    "悬空前置：{} ← {}（前置不在节点表 / 外部前置族中）",
-                    nid, p
-                ));
-            }
-            if p == nid {
-                issues.push(format!("自环：{} ← {}", nid, p));
-            }
-        }
-    }
+    issues.extend(prereq_edges_issues(&sorted_prereqs, &declared));
     let bids = node_branch(graph);
     let mut unbranched: Vec<String> = prereqs
         .iter()
@@ -74,6 +62,25 @@ pub(crate) fn problems(graph: &Json) -> Vec<String> {
     issues
 }
 
+/// 前置边核对：悬空前置 / 自环（按 (nid, 前置) 升序产出，保持真源报错次序）。
+fn prereq_edges_issues(prereqs: &[(String, Vec<String>)], declared: &[String]) -> Vec<String> {
+    let mut issues: Vec<String> = Vec::new();
+    for (nid, ps) in prereqs {
+        for p in ps {
+            if !declared.contains(p) {
+                issues.push(format!(
+                    "悬空前置：{} ← {}（前置不在节点表 / 外部前置族中）",
+                    nid, p
+                ));
+            }
+            if p == nid {
+                issues.push(format!("自环：{} ← {}", nid, p));
+            }
+        }
+    }
+    issues
+}
+
 /// provenance_strength 声明与外部覆盖率的自洽核对。
 pub(crate) fn check_provenance_strength(graph: &Json, strength: &str, issues: &mut Vec<String>) {
     if strength.is_empty() {
@@ -88,29 +95,40 @@ pub(crate) fn check_provenance_strength(graph: &Json, strength: &str, issues: &m
             PROVENANCE_STRENGTHS.join(" / ")
         ));
     } else {
-        let (covered, total) = external_coverage(graph);
-        let ratio = if total != 0 {
-            covered as f64 / total as f64
-        } else {
-            0.0
-        };
-        if strength == "external" && ratio < 1.0 {
-            issues.push(format!(
-                "provenance_strength=external 但外部覆盖仅 {}/{}（修复指引：补齐每节点的外部来源锚，或按实况降为 mixed / domain-logic）",
-                covered, total
-            ));
-        } else if strength == "mixed" && !(ratio > 0.0 && ratio < 1.0) {
-            issues.push(format!(
-                "provenance_strength=mixed 但外部覆盖 = {}/{}（修复指引：全覆盖用 external；无外部锚用 domain-logic / inferred）",
-                covered, total
-            ));
-        } else if (strength == "domain-logic" || strength == "inferred") && ratio > 0.0 {
-            issues.push(format!(
-                "provenance_strength={} 但已有 {}/{} 节点挂外部来源键（修复指引：按实况升为 mixed / external）",
-                strength, covered, total
-            ));
-        }
+        coverage_strength_issues(graph, strength, issues);
     }
+}
+
+/// 外部覆盖率与声明强度的自洽判据（external / mixed / domain-logic|inferred 三档）。
+fn coverage_strength_issues(graph: &Json, strength: &str, issues: &mut Vec<String>) {
+    let (covered, total, ratio) = coverage_ratio(graph);
+    if strength == "external" && ratio < 1.0 {
+        issues.push(format!(
+            "provenance_strength=external 但外部覆盖仅 {}/{}（修复指引：补齐每节点的外部来源锚，或按实况降为 mixed / domain-logic）",
+            covered, total
+        ));
+    } else if strength == "mixed" && !(ratio > 0.0 && ratio < 1.0) {
+        issues.push(format!(
+            "provenance_strength=mixed 但外部覆盖 = {}/{}（修复指引：全覆盖用 external；无外部锚用 domain-logic / inferred）",
+            covered, total
+        ));
+    } else if (strength == "domain-logic" || strength == "inferred") && ratio > 0.0 {
+        issues.push(format!(
+            "provenance_strength={} 但已有 {}/{} 节点挂外部来源键（修复指引：按实况升为 mixed / external）",
+            strength, covered, total
+        ));
+    }
+}
+
+/// 外部覆盖率 → (有外部来源锚的节点数, 包内节点总数, 比值)；总数为 0 时比值取 0.0。
+fn coverage_ratio(graph: &Json) -> (i64, i64, f64) {
+    let (covered, total) = external_coverage(graph);
+    let ratio = if total != 0 {
+        covered as f64 / total as f64
+    } else {
+        0.0
+    };
+    (covered, total, ratio)
 }
 
 /// 节点面的 id / name / provenance / layer 核对。
@@ -135,20 +153,7 @@ pub(crate) fn check_nodes(graph: &Json, legend: &[String], issues: &mut Vec<Stri
                 nid
             ));
         }
-        let prov = arr_of(obj_get(&node, "provenance"));
-        if prov.is_empty() {
-            issues.push(format!("节点 {} 缺 provenance（边无溯源即不可复核）", nid));
-        } else {
-            for key in &prov {
-                if !legend.contains(&s(key)) {
-                    issues.push(format!(
-                        "节点 {} 的 provenance 键 {} 不在 provenance_legend 中（修复指引：补图例键，防图例漂移静默）",
-                        nid,
-                        pyval::py_repr(key)
-                    ));
-                }
-            }
-        }
+        node_provenance_issues(&nid, &node, legend, issues);
         let layer = match obj_get(&node, "layer") {
             Some(Json::Null) | None => String::new(),
             Some(v) => s(v),
@@ -160,6 +165,24 @@ pub(crate) fn check_nodes(graph: &Json, legend: &[String], issues: &mut Vec<Stri
                 layer,
                 LAYERS.join("/")
             ));
+        }
+    }
+}
+
+/// 单节点 provenance 面：非空 + 每个键都在图例中。
+fn node_provenance_issues(nid: &str, node: &Json, legend: &[String], issues: &mut Vec<String>) {
+    let prov = arr_of(obj_get(node, "provenance"));
+    if prov.is_empty() {
+        issues.push(format!("节点 {} 缺 provenance（边无溯源即不可复核）", nid));
+    } else {
+        for key in &prov {
+            if !legend.contains(&s(key)) {
+                issues.push(format!(
+                    "节点 {} 的 provenance 键 {} 不在 provenance_legend 中（修复指引：补图例键，防图例漂移静默）",
+                    nid,
+                    pyval::py_repr(key)
+                ));
+            }
         }
     }
 }
@@ -200,37 +223,30 @@ pub(crate) const DEFAULT_ASSET: &str = "community/AI系统域包/assets/CONCEPT_
 /// 真源 `node_meta`：`{概念 id: 节点元信息}`（含包外前置，标 `external=True`）。
 pub(crate) fn node_meta(graph: &Json) -> Vec<(String, Json)> {
     let mut out: Vec<(String, Json)> = Vec::new();
-    if let Json::Object(o) = graph {
-        if let Some(Json::Array(nodes)) = o.iter().find(|(k, _)| k == "nodes").map(|(_, v)| v) {
-            for n in nodes {
-                if let Json::Object(no) = n {
-                    if let Some(Json::Str(id)) = no.iter().find(|(k, _)| k == "id").map(|(_, v)| v)
-                    {
-                        let mut rec = no.clone();
-                        rec.push(("external".to_string(), Json::Bool(false)));
-                        out.push((id.clone(), Json::Object(rec)));
-                    }
-                }
+    if let Some(Json::Array(nodes)) = obj_get(graph, "nodes") {
+        out.extend(meta_rows(nodes, false));
+    }
+    if let Some(Json::Array(ext)) = obj_get(graph, "external_prereqs") {
+        for row in meta_rows(ext, true) {
+            if !out.iter().any(|(k, _)| *k == row.0) {
+                out.push(row);
             }
         }
-        if let Some(Json::Array(ext)) = o
-            .iter()
-            .find(|(k, _)| k == "external_prereqs")
-            .map(|(_, v)| v)
-        {
-            for n in ext {
-                if let Json::Object(no) = n {
-                    if let Some(Json::Str(id)) = no.iter().find(|(k, _)| k == "id").map(|(_, v)| v)
-                    {
-                        if !out.iter().any(|(k, _)| k == id) {
-                            let mut rec = no.clone();
-                            rec.push(("external".to_string(), Json::Bool(true)));
-                            out.push((id.clone(), Json::Object(rec)));
-                        }
-                    }
-                }
-            }
-        }
+    }
+    out
+}
+
+/// 一组节点声明 → (概念 id, 记录)；external 标记由调用方给定。
+fn meta_rows(nodes: &[Json], external: bool) -> Vec<(String, Json)> {
+    let mut out: Vec<(String, Json)> = Vec::new();
+    for n in nodes {
+        let Json::Object(no) = n else { continue };
+        let Some(Json::Str(id)) = no.iter().find(|(k, _)| k == "id").map(|(_, v)| v) else {
+            continue;
+        };
+        let mut rec = no.clone();
+        rec.push(("external".to_string(), Json::Bool(external)));
+        out.push((id.clone(), Json::Object(rec)));
     }
     out
 }

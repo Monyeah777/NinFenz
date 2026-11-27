@@ -37,59 +37,107 @@ pub fn strip_comments_and_strings(src: &str) -> String {
     let mut state: Option<(char, bool, bool)> = None;
 
     while i < n {
-        let c = chars[i];
-        match state {
-            Some((q, triple, raw)) => {
-                if !raw && c == '\\' {
-                    out.push(' ');
-                    if i + 1 < n {
-                        out.push(if chars[i + 1] == '\n' { '\n' } else { ' ' });
-                    }
-                    i += 2;
-                    continue;
-                }
-                if raw && c == q && odd_backslashes(&chars, i) {
-                    out.push(' ');
-                    i += 1;
-                    continue;
-                }
-                if triple && c == q && i + 2 < n && chars[i + 1] == q && chars[i + 2] == q {
-                    out.push_str("   ");
-                    i += 3;
-                    state = None;
-                    continue;
-                }
-                if !triple && c == q {
-                    out.push(' ');
-                    i += 1;
-                    state = None;
-                    continue;
-                }
-                out.push(if c == '\n' { '\n' } else { ' ' });
-                i += 1;
-            }
-            None => {
-                if c == '#' {
-                    while i < n && chars[i] != '\n' {
-                        out.push(' ');
-                        i += 1;
-                    }
-                    continue;
-                }
-                if c == '\'' || c == '"' {
-                    let triple = i + 2 < n && chars[i + 1] == c && chars[i + 2] == c;
-                    let raw = is_raw_prefix(&chars, i);
-                    out.push_str(if triple { "   " } else { " " });
-                    i += if triple { 3 } else { 1 };
-                    state = Some((c, triple, raw));
-                    continue;
-                }
-                out.push(c);
-                i += 1;
-            }
+        if state.is_some() {
+            i = strip_in_string(&chars, i, &mut state, &mut out);
+        } else {
+            i = strip_outside_string(&chars, i, &mut state, &mut out);
         }
     }
     out
+}
+
+/// 字符串内一步：吞掉一个字符（注释/引号语义由两个子 helper 承担）。
+fn strip_in_string(
+    chars: &[char],
+    i: usize,
+    state: &mut Option<(char, bool, bool)>,
+    out: &mut String,
+) -> usize {
+    let Some((q, triple, raw)) = *state else {
+        return i;
+    };
+    if let Some(next) = string_escape_step(chars, i, q, raw, out) {
+        return next;
+    }
+    if let Some(next) = string_close_step(chars, i, q, triple, state, out) {
+        return next;
+    }
+    out.push(if chars[i] == '\n' { '\n' } else { ' ' });
+    i + 1
+}
+
+/// 反斜杠转义与 raw 字符串的引号转义。
+fn string_escape_step(
+    chars: &[char],
+    i: usize,
+    q: char,
+    raw: bool,
+    out: &mut String,
+) -> Option<usize> {
+    let c = chars[i];
+    if !raw && c == '\\' {
+        out.push(' ');
+        if i + 1 < chars.len() {
+            out.push(if chars[i + 1] == '\n' { '\n' } else { ' ' });
+        }
+        return Some(i + 2);
+    }
+    if raw && c == q && odd_backslashes(chars, i) {
+        out.push(' ');
+        return Some(i + 1);
+    }
+    None
+}
+
+/// 三引号 / 单引号的闭合判定。
+fn string_close_step(
+    chars: &[char],
+    i: usize,
+    q: char,
+    triple: bool,
+    state: &mut Option<(char, bool, bool)>,
+    out: &mut String,
+) -> Option<usize> {
+    let c = chars[i];
+    if triple && c == q && i + 2 < chars.len() && chars[i + 1] == q && chars[i + 2] == q {
+        out.push_str("   ");
+        *state = None;
+        return Some(i + 3);
+    }
+    if !triple && c == q {
+        out.push(' ');
+        *state = None;
+        return Some(i + 1);
+    }
+    None
+}
+
+/// 字符串外一步：注释整行吞掉 / 开串 / 原样拷贝。
+fn strip_outside_string(
+    chars: &[char],
+    i: usize,
+    state: &mut Option<(char, bool, bool)>,
+    out: &mut String,
+) -> usize {
+    let n = chars.len();
+    let c = chars[i];
+    if c == '#' {
+        let mut j = i;
+        while j < n && chars[j] != '\n' {
+            out.push(' ');
+            j += 1;
+        }
+        return j;
+    }
+    if c == '\'' || c == '"' {
+        let triple = i + 2 < n && chars[i + 1] == c && chars[i + 2] == c;
+        let raw = is_raw_prefix(chars, i);
+        out.push_str(if triple { "   " } else { " " });
+        *state = Some((c, triple, raw));
+        return i + if triple { 3 } else { 1 };
+    }
+    out.push(c);
+    i + 1
 }
 
 /// raw 字符串仍允许用反斜杠转义引号；只有奇数个前置反斜杠才阻止闭合。

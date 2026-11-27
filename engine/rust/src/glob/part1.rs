@@ -225,18 +225,42 @@ impl Cache {
             return;
         };
         if is_literal_seg(head) {
-            let next = dir.join(head);
-            if tail.is_empty() {
-                if next.is_file() {
-                    if let Ok(rel) = next.strip_prefix(root) {
-                        out.push(to_posix(rel));
-                    }
-                }
-            } else if next.is_dir() {
-                self.walk_segments(root, &next, tail, out);
-            }
+            self.walk_literal_seg(root, dir, head, tail, out);
             return;
         }
+        self.walk_pattern_seg(root, dir, head, tail, out);
+    }
+
+    /// 字面段：末段落文件 / 中间段落目录。
+    fn walk_literal_seg(
+        &mut self,
+        root: &Path,
+        dir: &Path,
+        head: &str,
+        tail: &[String],
+        out: &mut Vec<String>,
+    ) {
+        let next = dir.join(head);
+        if tail.is_empty() {
+            if next.is_file() {
+                if let Ok(rel) = next.strip_prefix(root) {
+                    out.push(to_posix(rel));
+                }
+            }
+        } else if next.is_dir() {
+            self.walk_segments(root, &next, tail, out);
+        }
+    }
+
+    /// 通配段：按目录项逐个匹配。
+    fn walk_pattern_seg(
+        &mut self,
+        root: &Path,
+        dir: &Path,
+        head: &str,
+        tail: &[String],
+        out: &mut Vec<String>,
+    ) {
         let re = to_regex(head);
         for (name, is_dir) in self.entries(dir) {
             if !re.is_match(&name) {

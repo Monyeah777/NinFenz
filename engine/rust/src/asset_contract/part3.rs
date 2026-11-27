@@ -131,26 +131,20 @@ pub(crate) fn data_mmd(rel: &str, text: &str) -> (Vec<String>, Json) {
     )
 }
 
+/// 契约自述 id（真源取 id → path → glob 的第一个非空值；全空为 "?"）。
+pub(crate) fn contract_sid(spec: &Json) -> String {
+    for k in ["id", "path", "glob"] {
+        let s = sg_str(spec, k);
+        if !s.is_empty() {
+            return s;
+        }
+    }
+    "?".to_string()
+}
+
 /// 真源 `_check_data`。
 pub fn check_data(root: &Path, spec: &Json) -> (Vec<String>, Json) {
-    let sid = {
-        let s = sg_str(spec, "id");
-        if !s.is_empty() {
-            s
-        } else {
-            let p = sg_str(spec, "path");
-            if !p.is_empty() {
-                p
-            } else {
-                let g = sg_str(spec, "glob");
-                if !g.is_empty() {
-                    g
-                } else {
-                    "?".to_string()
-                }
-            }
-        }
-    };
+    let sid = contract_sid(spec);
     let rels = resolve(root, spec);
     if rels.is_empty() {
         return (

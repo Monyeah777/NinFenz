@@ -3,14 +3,7 @@ use super::*;
 /// 真源 `_dual_source_check`：数据面 vs 散文面（键集必须互为子集）。
 pub(crate) fn dual_source_check(root: &Path, pkg: &str, path: &str, ds: &Json) -> Vec<String> {
     let md_rel = s_of(obj_get(ds, "markdown"));
-    let key_text = {
-        let v = s_of(obj_get(ds, "key_pattern"));
-        if v.is_empty() {
-            r"`([A-Z][A-Z0-9_]{2,})`".to_string()
-        } else {
-            v
-        }
-    };
+    let key_text = dual_key_pattern(ds);
     let why =
         crate::json_schema::pattern_issue(&Json::Str(key_text.clone()), "dual_source.key_pattern");
     if !why.is_empty() {
@@ -42,14 +35,7 @@ pub(crate) fn dual_source_check(root: &Path, pkg: &str, path: &str, ds: &Json) -
     if !err.is_empty() {
         return vec![err];
     }
-    let field = {
-        let f = s_of(obj_get(ds, "field"));
-        if f.is_empty() {
-            "id".to_string()
-        } else {
-            f
-        }
-    };
+    let field = dual_data_field(ds);
     let data_keys = collect_data_keys(&data, &field);
     let mut only_md: Vec<String> = md_keys
         .iter()
@@ -89,6 +75,26 @@ pub(crate) fn dual_source_check(root: &Path, pkg: &str, path: &str, ds: &Json) -
         ));
     }
     out
+}
+
+/// 双源 key_pattern：缺省 `[A-Z][A-Z0-9_]{2,}` 形态。
+fn dual_key_pattern(ds: &Json) -> String {
+    let v = s_of(obj_get(ds, "key_pattern"));
+    if v.is_empty() {
+        r"`([A-Z][A-Z0-9_]{2,})`".to_string()
+    } else {
+        v
+    }
+}
+
+/// 数据面取键字段：缺省 id。
+fn dual_data_field(ds: &Json) -> String {
+    let f = s_of(obj_get(ds, "field"));
+    if f.is_empty() {
+        "id".to_string()
+    } else {
+        f
+    }
 }
 
 /// 数据面键集（每条 output 的 field 值，去重保序）。
@@ -170,37 +176,73 @@ pub(crate) fn verify_pack(root: &Path, pkg: &str) -> (Vec<String>, Vec<Json>) {
         ));
     }
     for entry in arr_of(obj_get(&idx, "outputs")) {
-        let Some(f) = entry_facts(root, pkg, &rel, &entry, &mut issues) else {
-            continue;
-        };
-        verify_entry_schema(root, pkg, &f, &entry, &mut issues);
-        if let Some(ds) = obj_get(&entry, "dual_source") {
-            if matches!(ds, Json::Object(_)) {
-                for m in dual_source_check(root, pkg, &f.out_rel, ds) {
-                    issues.push(format!("{}: {} {}", rel, f.path, m));
-                }
-            }
-        }
-        if let Some(rc) = obj_get(&entry, "recompute") {
-            if matches!(rc, Json::Object(_)) {
-                let mut e2 = entry.clone();
-                if let Json::Object(o) = &mut e2 {
-                    o.push(("_pkg".to_string(), Json::Str(pkg.to_string())));
-                }
-                let (sub, _st) = recompute_entry(root, &e2);
-                for s in sub {
-                    issues.push(format!("{}: {}", rel, s));
-                }
-            }
-        } else if f.tier == "T4" {
-            issues.push(format!(
-                "{}: {} 声明 T4（可复算）却无 recompute 声明",
-                rel, f.path
-            ));
-        }
-        push_output_row(pkg, &f, &entry, &mut rows);
+        verify_output_entry(root, pkg, &rel, &entry, &mut issues, &mut rows);
     }
     (issues, rows)
+}
+
+/// 单条 outputs：前置事实 / schema / 双源 / recompute / 行记录。
+fn verify_output_entry(
+    root: &Path,
+    pkg: &str,
+    rel: &str,
+    entry: &Json,
+    issues: &mut Vec<String>,
+    rows: &mut Vec<Json>,
+) {
+    let Some(f) = entry_facts(root, pkg, rel, entry, issues) else {
+        return;
+    };
+    verify_entry_schema(root, pkg, &f, entry, issues);
+    verify_entry_dual_source(root, pkg, rel, entry, &f, issues);
+    verify_entry_recompute(root, pkg, rel, entry, &f, issues);
+    push_output_row(pkg, &f, entry, rows);
+}
+
+/// 双源对照面。
+fn verify_entry_dual_source(
+    root: &Path,
+    pkg: &str,
+    rel: &str,
+    entry: &Json,
+    f: &EntryFacts,
+    issues: &mut Vec<String>,
+) {
+    if let Some(ds) = obj_get(entry, "dual_source") {
+        if matches!(ds, Json::Object(_)) {
+            for m in dual_source_check(root, pkg, &f.out_rel, ds) {
+                issues.push(format!("{}: {} {}", rel, f.path, m));
+            }
+        }
+    }
+}
+
+/// recompute 面：有声明即复算；T4 档免复算声明即报。
+fn verify_entry_recompute(
+    root: &Path,
+    pkg: &str,
+    rel: &str,
+    entry: &Json,
+    f: &EntryFacts,
+    issues: &mut Vec<String>,
+) {
+    if let Some(rc) = obj_get(entry, "recompute") {
+        if matches!(rc, Json::Object(_)) {
+            let mut e2 = entry.clone();
+            if let Json::Object(o) = &mut e2 {
+                o.push(("_pkg".to_string(), Json::Str(pkg.to_string())));
+            }
+            let (sub, _st) = recompute_entry(root, &e2);
+            for s in sub {
+                issues.push(format!("{}: {}", rel, s));
+            }
+        }
+    } else if f.tier == "T4" {
+        issues.push(format!(
+            "{}: {} 声明 T4（可复算）却无 recompute 声明",
+            rel, f.path
+        ));
+    }
 }
 
 /// outputs 条目的前置核对结论（schema / recompute / 行记录复用）。
@@ -211,6 +253,55 @@ pub(crate) struct EntryFacts {
     pub(crate) tier: String,
     pub(crate) out_rel: String,
     pub(crate) got_form: String,
+}
+
+/// 声明形态 / 档位 与实测的漂移判据。
+#[allow(clippy::too_many_arguments)]
+fn entry_form_tier_issues(
+    rel: &str,
+    path: &str,
+    form: &str,
+    tier: &str,
+    got_form: &str,
+    got_tier: &str,
+    issues: &mut Vec<String>,
+) {
+    if !form.is_empty() && form != got_form {
+        issues.push(format!(
+            "{}: {} 声明形态 {}，实测 {}",
+            rel, path, form, got_form
+        ));
+    }
+    let ti = of::TIERS.iter().position(|t| *t == tier).unwrap_or(0);
+    let gi = of::TIERS.iter().position(|t| *t == got_tier).unwrap_or(0);
+    if ti > gi {
+        issues.push(format!(
+            "{}: {} 声明档位 {} 超出本仓可判上限 {}",
+            rel, path, tier, got_tier
+        ));
+    }
+}
+
+/// 形态检查器附加判据（form 缺省按实测形态）。
+fn entry_form_check_issues(
+    root: &Path,
+    rel: &str,
+    path: &str,
+    out_rel: &str,
+    form: &str,
+    got_form: &str,
+    issues: &mut Vec<String>,
+) {
+    let form_key = if form.is_empty() {
+        got_form.to_string()
+    } else {
+        form.to_string()
+    };
+    if let Some(sub) = oc::form_check(&form_key, root, out_rel) {
+        for s in sub {
+            issues.push(format!("{}: {} {}", rel, path, s));
+        }
+    }
 }
 
 /// outputs 条目前置核对：path / tier / 产出面在场性 / 形态 / 档位。
@@ -249,30 +340,8 @@ pub(crate) fn entry_facts(
         return None;
     }
     let (got_form, got_tier) = of::detect(root, &out_rel);
-    if !form.is_empty() && form != got_form {
-        issues.push(format!(
-            "{}: {} 声明形态 {}，实测 {}",
-            rel, path, form, got_form
-        ));
-    }
-    let ti = of::TIERS.iter().position(|t| *t == tier).unwrap_or(0);
-    let gi = of::TIERS.iter().position(|t| *t == got_tier).unwrap_or(0);
-    if ti > gi {
-        issues.push(format!(
-            "{}: {} 声明档位 {} 超出本仓可判上限 {}",
-            rel, path, tier, got_tier
-        ));
-    }
-    let form_key = if form.is_empty() {
-        got_form.clone()
-    } else {
-        form.clone()
-    };
-    if let Some(sub) = oc::form_check(&form_key, root, &out_rel) {
-        for s in sub {
-            issues.push(format!("{}: {} {}", rel, path, s));
-        }
-    }
+    entry_form_tier_issues(rel, &path, &form, &tier, &got_form, &got_tier, issues);
+    entry_form_check_issues(root, rel, &path, &out_rel, &form, &got_form, issues);
     Some(EntryFacts {
         rel: rel.to_string(),
         path,

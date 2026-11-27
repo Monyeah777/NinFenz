@@ -49,14 +49,7 @@ pub(crate) fn parse_io_types(text: &str) -> Option<Json> {
         }
         if let Some(sm) = sub_re().captures(ln) {
             let name = sm[2].to_string();
-            if sm.get(3).is_some() {
-                // `outputs: {}` / `inputs: {}` —— 显式空段
-                match name.as_str() {
-                    "outputs" => outputs.clear(),
-                    _ => inputs.clear(),
-                }
-            }
-            sub = Some(name);
+            sub = io_sub_section(name, sm.get(3).is_some(), &mut outputs, &mut inputs);
             continue;
         }
         if let Some(pm) = pair_re().captures(ln) {
@@ -65,29 +58,53 @@ pub(crate) fn parse_io_types(text: &str) -> Option<Json> {
                 .trim_matches(|c| c == '\'' || c == '"')
                 .to_string();
             let val = Json::Str(pm[3].to_string());
-            match sub.as_deref() {
-                Some("outputs") => {
-                    if let Some(slot) = outputs.iter_mut().find(|(k, _)| *k == key) {
-                        slot.1 = val;
-                    } else {
-                        outputs.push((key, val));
-                    }
-                }
-                Some("inputs") => {
-                    if let Some(slot) = inputs.iter_mut().find(|(k, _)| *k == key) {
-                        slot.1 = val;
-                    } else {
-                        inputs.push((key, val));
-                    }
-                }
-                _ => {}
-            }
+            io_pair_apply(sub.as_deref(), key, val, &mut outputs, &mut inputs);
         }
     }
     Some(Json::Object(vec![
         ("outputs".to_string(), Json::Object(outputs)),
         ("inputs".to_string(), Json::Object(inputs)),
     ]))
+}
+
+/// 键值行按当前子段落到 outputs / inputs（同键覆盖，真源 dict 语义）。
+fn io_pair_apply(
+    sub: Option<&str>,
+    key: String,
+    val: Json,
+    outputs: &mut Vec<(String, Json)>,
+    inputs: &mut Vec<(String, Json)>,
+) {
+    match sub {
+        Some("outputs") => io_upsert(outputs, key, val),
+        Some("inputs") => io_upsert(inputs, key, val),
+        _ => {}
+    }
+}
+
+/// 同键覆盖；新键追加。
+fn io_upsert(pairs: &mut Vec<(String, Json)>, key: String, val: Json) {
+    if let Some(slot) = pairs.iter_mut().find(|(k, _)| *k == key) {
+        slot.1 = val;
+    } else {
+        pairs.push((key, val));
+    }
+}
+
+/// 子段声明：显式空段（outputs: {} / inputs: {}）清表后仍记录当前子段。
+fn io_sub_section(
+    name: String,
+    explicit_empty: bool,
+    outputs: &mut Vec<(String, Json)>,
+    inputs: &mut Vec<(String, Json)>,
+) -> Option<String> {
+    if explicit_empty {
+        match name.as_str() {
+            "outputs" => outputs.clear(),
+            _ => inputs.clear(),
+        }
+    }
+    Some(name)
 }
 
 pub(crate) fn str_list(j: Option<&Json>) -> Vec<String> {

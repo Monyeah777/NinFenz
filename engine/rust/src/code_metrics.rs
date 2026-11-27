@@ -145,52 +145,7 @@ pub fn scan(root: &Path) -> (Vec<String>, Vec<String>, Json) {
     let mut sorted: Vec<&(String, Metrics)> = cur.iter().collect();
     sorted.sort_by(|a, b| a.0.cmp(&b.0));
     for (rel, m) in &sorted {
-        if let Some(se) = &m.syntax_error {
-            issues.push(format!("{} {}", rel, se));
-            continue;
-        }
-        match base.iter().find(|(r, _)| r == rel) {
-            Some((_, kv)) => {
-                for (key, label) in KEYS {
-                    let cap = kv
-                        .iter()
-                        .find(|(k, _)| *k == key)
-                        .map(|(_, v)| *v)
-                        .unwrap_or(0);
-                    let val = match key {
-                        "lines" => m.lines,
-                        "max_fn_lines" => m.max_fn_lines,
-                        _ => m.max_fn_cc,
-                    };
-                    if cap != 0 && val > cap {
-                        issues.push(format!(
-                            "{} {} {} > 冻结值 {}（修复指引：拆分该模块/函数；确需上调须评审后重冻基线 python scripts/code_metrics.py --write）",
-                            rel, label, val, cap
-                        ));
-                    }
-                }
-            }
-            None => {
-                for (key, label) in KEYS {
-                    let lim = LIMITS
-                        .iter()
-                        .find(|(k, _)| *k == key)
-                        .map(|(_, v)| *v)
-                        .unwrap_or(0);
-                    let val = match key {
-                        "lines" => m.lines,
-                        "max_fn_lines" => m.max_fn_lines,
-                        _ => m.max_fn_cc,
-                    };
-                    if val > lim {
-                        issues.push(format!(
-                            "{} 新文件 {} {} > 限值 {}（修复指引：拆分后再入库；确需放宽须评审后冻结基线）",
-                            rel, label, val, lim
-                        ));
-                    }
-                }
-            }
-        }
+        metric_row_issues(rel, m, &base, &mut issues);
     }
     let max_of =
         |f: fn(&Metrics) -> i64| -> i64 { cur.iter().map(|(_, m)| f(m)).max().unwrap_or(0) };
@@ -211,6 +166,56 @@ pub fn scan(root: &Path) -> (Vec<String>, Vec<String>, Json) {
         ("max_fn_cc".to_string(), Json::Int(max_of(|m| m.max_fn_cc))),
     ]);
     (issues, warns, stats)
+}
+
+/// 单模块指标：语法错 / 对基线冻结值 / 新文件限值。
+fn metric_row_issues(rel: &str, m: &Metrics, base: &[(String, Vec<(String, i64)>)], issues: &mut Vec<String>) {
+    if let Some(se) = &m.syntax_error {
+        issues.push(format!("{} {}", rel, se));
+        return;
+    }
+    match base.iter().find(|(r, _)| r == rel) {
+        Some((_, kv)) => {
+            for (key, label) in KEYS {
+                let cap = kv
+                    .iter()
+                    .find(|(k, _)| *k == key)
+                    .map(|(_, v)| *v)
+                    .unwrap_or(0);
+                let val = match key {
+                    "lines" => m.lines,
+                    "max_fn_lines" => m.max_fn_lines,
+                    _ => m.max_fn_cc,
+                };
+                if cap != 0 && val > cap {
+                    issues.push(format!(
+                        "{} {} {} > 冻结值 {}（修复指引：拆分该模块/函数；确需上调须评审后重冻基线 python scripts/code_metrics.py --write）",
+                        rel, label, val, cap
+                    ));
+                }
+            }
+        }
+        None => {
+            for (key, label) in KEYS {
+                let lim = LIMITS
+                    .iter()
+                    .find(|(k, _)| *k == key)
+                    .map(|(_, v)| *v)
+                    .unwrap_or(0);
+                let val = match key {
+                    "lines" => m.lines,
+                    "max_fn_lines" => m.max_fn_lines,
+                    _ => m.max_fn_cc,
+                };
+                if val > lim {
+                    issues.push(format!(
+                        "{} 新文件 {} {} > 限值 {}（修复指引：拆分后再入库；确需放宽须评审后冻结基线）",
+                        rel, label, val, lim
+                    ));
+                }
+            }
+        }
+    }
 }
 
 #[cfg(test)]

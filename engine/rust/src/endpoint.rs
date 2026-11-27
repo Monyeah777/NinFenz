@@ -220,52 +220,62 @@ fn check_endpoint_deprecation(
 let eid = py_str(get(ep, "id"));
     // 弃用/日落语义（OpenAPI deprecated + RFC 8594 Sunset）：有标志就必须有出口
     let dep = get(ep, "deprecated");
-    if let Some(d) = dep {
-        if !is_bool(d) {
-            issues.push(format!("{} 的 deprecated 应为布尔：{}", eid, py_repr(d)));
-        }
-    }
+    deprecation_flag_issues(ep, &eid, issues);
     if py_truthy(dep.unwrap_or(&Json::Null)) {
-        if status != "implemented" {
-            issues.push(format!(
-                "{} 声明 deprecated 但契约 status={}——未实装的能力没有可弃用的东西（修复指引：先落 implemented 再谈弃用）",
-                eid, status
-            ));
-        }
-        if !py_truthy(get(&conv, "deprecation").unwrap_or(&Json::Null)) {
-            issues.push(format!(
-                "{} 声明 deprecated 但 conventions 未定义弃用约定",
-                eid
-            ));
-        }
-        let sunset = py_str(get(ep, "sunset"));
-        if !dated_re().is_match(&sunset) {
-            issues.push(format!(
-                "{} 声明 deprecated 但缺合规 sunset（YYYY-MM-DD）：{}（修复指引：按 RFC 8594 给出日落日期）",
-                eid,
-                py_repr(get(ep, "sunset").unwrap_or(&Json::Null))
-            ));
-        }
-        if get(ep, "replacement").is_none() {
-            issues.push(format!(
-                "{} 声明 deprecated 但缺 replacement（无替代写 null，不许省略）",
-                eid
-            ));
-        } else {
-            let rep = get(ep, "replacement").cloned().unwrap_or(Json::Null);
-            if !matches!(rep, Json::Null) && !all_ids.contains(&crate::pyval::plain_str(&rep)) {
-                issues.push(format!(
-                    "{} 的 replacement 指向契约内不存在的端点：{}（修复指引：改为契约内端点 id，或写 null 表示无替代）",
-                    eid,
-                    py_repr(&rep)
-                ));
-            }
-        }
+        deprecated_requirements_issues(ep, &eid, all_ids, conv, status, issues);
     } else if get(ep, "sunset").is_some() || get(ep, "replacement").is_some() {
         issues.push(format!(
             "{} 未声明 deprecated 却带 sunset/replacement（悬空弃用字段）",
             eid
         ));
+    }
+}
+
+fn deprecation_flag_issues(ep: &Json, eid: &str, issues: &mut Vec<String>) {
+    if let Some(d) = get(ep, "deprecated") { if !is_bool(&d) { issues.push(format!("{} 的 deprecated 应为布尔：{}", eid, py_repr(&d))); } }
+}
+fn deprecated_requirements_issues(
+    ep: &Json,
+    eid: &str,
+    all_ids: &[String],
+    conv: &Json,
+    status: &str,
+    issues: &mut Vec<String>,
+) {
+    if status != "implemented" {
+        issues.push(format!(
+            "{} 声明 deprecated 但契约 status={}——未实装的能力没有可弃用的东西（修复指引：先落 implemented 再谈弃用）",
+            eid, status
+        ));
+    }
+    if !py_truthy(get(conv, "deprecation").unwrap_or(&Json::Null)) {
+        issues.push(format!(
+            "{} 声明 deprecated 但 conventions 未定义弃用约定",
+            eid
+        ));
+    }
+    let sunset = py_str(get(ep, "sunset"));
+    if !dated_re().is_match(&sunset) {
+        issues.push(format!(
+            "{} 声明 deprecated 但缺合规 sunset（YYYY-MM-DD）：{}（修复指引：按 RFC 8594 给出日落日期）",
+            eid,
+            py_repr(get(ep, "sunset").unwrap_or(&Json::Null))
+        ));
+    }
+    if get(ep, "replacement").is_none() {
+        issues.push(format!(
+            "{} 声明 deprecated 但缺 replacement（无替代写 null，不许省略）",
+            eid
+        ));
+    } else {
+        let rep = get(ep, "replacement").cloned().unwrap_or(Json::Null);
+        if !matches!(rep, Json::Null) && !all_ids.contains(&crate::pyval::plain_str(&rep)) {
+            issues.push(format!(
+                "{} 的 replacement 指向契约内不存在的端点：{}（修复指引：改为契约内端点 id，或写 null 表示无替代）",
+                eid,
+                py_repr(&rep)
+            ));
+        }
     }
 }
 

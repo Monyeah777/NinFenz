@@ -56,17 +56,11 @@ pub(crate) fn self_check(root: &Path, scope: &str) -> Vec<String> {
 /// 本函数核对**在盘文档**（entries 顺序即 live 重建顺序）与实时重算是否一致。
 pub(crate) fn verify_scope(doc: &Json, root: &Path) -> (Vec<String>, Json) {
     let Json::Object(pairs) = doc else {
-        return (
-            vec!["协议回执 schema 不匹配".to_string()],
-            Json::Object(vec![]),
-        );
+        return invalid_scope_result();
     };
     let g = |k: &str| pairs.iter().find(|(n, _)| n == k).map(|(_, v)| v);
     if !matches!(g("schema"), Some(Json::Str(s)) if s == SCHEMA) {
-        return (
-            vec!["协议回执 schema 不匹配".to_string()],
-            Json::Object(vec![]),
-        );
+        return invalid_scope_result();
     }
     let committed_root = match g("root") {
         Some(Json::Str(s)) => s.clone(),
@@ -76,17 +70,10 @@ pub(crate) fn verify_scope(doc: &Json, root: &Path) -> (Vec<String>, Json) {
         Some(Json::Array(a)) => a.as_slice(),
         _ => &[],
     };
-    // 真源 `build_scope(root, [e["id"] ...])`：按在盘 entries 的顺序/子集重建。
-    let mut ids: Vec<String> = Vec::with_capacity(entries.len());
-    for e in entries {
-        let Json::Object(ep) = e else {
-            return (vec!["回执条目不是对象".to_string()], Json::Object(vec![]));
-        };
-        match ep.iter().find(|(n, _)| n == "id").map(|(_, v)| v) {
-            Some(Json::Str(id)) => ids.push(id.clone()),
-            _ => return (vec!["回执条目缺 id".to_string()], Json::Object(vec![])),
-        }
-    }
+    let ids = match scope_ids(entries) {
+        Ok(ids) => ids,
+        Err(msg) => return (vec![msg], Json::Object(vec![])),
+    };
     let live = build_scope_for(root, &ids, "protocol");
     let Json::Object(lp) = &live else {
         return (
@@ -109,47 +96,80 @@ pub(crate) fn verify_scope(doc: &Json, root: &Path) -> (Vec<String>, Json) {
     }
     let live_by = live_entries_by(lp);
     for e in entries {
-        let Json::Object(ep) = e else { continue };
-        let eg = |k: &str| ep.iter().find(|(n, _)| n == k).map(|(_, v)| v);
-        let id = match eg("id") {
-            Some(Json::Str(s)) => s.clone(),
-            _ => continue,
-        };
-        let committed_digest = match eg("digest") {
-            Some(Json::Str(s)) => s.as_str(),
-            _ => "",
-        };
-        let live_digest = live_by
-            .iter()
-            .find(|(i, _)| *i == id)
-            .map(|(_, d)| *d)
-            .unwrap_or("");
-        if live_digest != committed_digest {
-            issues.push(format!("文件内容已变：{}", id));
-        }
-        let leaf_hex = match eg("leaf") {
-            Some(Json::Str(s)) => s.as_str(),
-            _ => "",
-        };
-        let mut leaf = [0u8; 32];
-        if !unhex_into(leaf_hex, &mut leaf) {
-            issues.push(format!("回执 leaf 非法：{}", id));
-            continue;
-        }
-        let proof: &[Json] = match eg("proof") {
-            Some(Json::Array(a)) => a.as_slice(),
-            _ => &[],
-        };
-        let steps = proof_steps(proof);
-        if merkle::hex(&merkle::fold_proof(&leaf, &steps)) != committed_root {
-            issues.push(format!("包含证明不折叠到根：{}", id));
-        }
+        scope_entry_issues(e, &live_by, &committed_root, &mut issues);
     }
     let stats = Json::Object(vec![
         ("entries".to_string(), Json::Int(entries.len() as i64)),
         ("root".to_string(), Json::Str(live_root)),
     ]);
     (issues, stats)
+}
+
+/// schema 不匹配时统一的空结论。
+fn invalid_scope_result() -> (Vec<String>, Json) {
+    (
+        vec!["协议回执 schema 不匹配".to_string()],
+        Json::Object(vec![]),
+    )
+}
+
+/// 在盘 entries 的 id 序列（真源 build_scope 的重建顺序）。
+fn scope_ids(entries: &[Json]) -> Result<Vec<String>, String> {
+    let mut ids: Vec<String> = Vec::with_capacity(entries.len());
+    for e in entries {
+        let Json::Object(ep) = e else {
+            return Err("回执条目不是对象".to_string());
+        };
+        match ep.iter().find(|(n, _)| n == "id").map(|(_, v)| v) {
+            Some(Json::Str(id)) => ids.push(id.clone()),
+            _ => return Err("回执条目缺 id".to_string()),
+        }
+    }
+    Ok(ids)
+}
+
+/// 单条在盘回执：id 摘要一致 / leaf 合法 / 包含证明折叠到根。
+fn scope_entry_issues(
+    e: &Json,
+    live_by: &[(&str, &str)],
+    committed_root: &str,
+    issues: &mut Vec<String>,
+) {
+    let Json::Object(ep) = e else { return };
+    let eg = |k: &str| ep.iter().find(|(n, _)| n == k).map(|(_, v)| v);
+    let id = match eg("id") {
+        Some(Json::Str(s)) => s.clone(),
+        _ => return,
+    };
+    let committed_digest = match eg("digest") {
+        Some(Json::Str(s)) => s.as_str(),
+        _ => "",
+    };
+    let live_digest = live_by
+        .iter()
+        .find(|(i, _)| *i == id)
+        .map(|(_, d)| *d)
+        .unwrap_or("");
+    if live_digest != committed_digest {
+        issues.push(format!("文件内容已变：{}", id));
+    }
+    let leaf_hex = match eg("leaf") {
+        Some(Json::Str(s)) => s.as_str(),
+        _ => "",
+    };
+    let mut leaf = [0u8; 32];
+    if !unhex_into(leaf_hex, &mut leaf) {
+        issues.push(format!("回执 leaf 非法：{}", id));
+        return;
+    }
+    let proof: &[Json] = match eg("proof") {
+        Some(Json::Array(a)) => a.as_slice(),
+        _ => &[],
+    };
+    let steps = proof_steps(proof);
+    if merkle::hex(&merkle::fold_proof(&leaf, &steps)) != committed_root {
+        issues.push(format!("包含证明不折叠到根：{}", id));
+    }
 }
 
 /// 回执条目按 id → digest 建索引（真源 live 重建的 entries 顺序）。

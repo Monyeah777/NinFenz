@@ -17,17 +17,25 @@ pub fn parse_frontmatter(text: &str) -> (Json, String) {
         return (Json::Object(Vec::new()), text.to_string());
     }
     let lines: Vec<&str> = text.lines().collect();
-    let mut end: Option<usize> = None;
-    for (i, ln) in lines.iter().enumerate().skip(1) {
-        if ln.trim() == "---" {
-            end = Some(i);
-            break;
-        }
-    }
-    let Some(end) = end else {
+    let Some(end) = frontmatter_end(&lines) else {
         return (Json::Object(Vec::new()), text.to_string());
     };
+    let body = lines[end + 1..].join("\n");
+    (Json::Object(frontmatter_pairs(&lines, end)), body)
+}
 
+/// 前导块结束分隔行的行号（从第 2 行起找）。
+fn frontmatter_end(lines: &[&str]) -> Option<usize> {
+    for (i, ln) in lines.iter().enumerate().skip(1) {
+        if ln.trim() == "---" {
+            return Some(i);
+        }
+    }
+    None
+}
+
+/// 前导块键值对：缩进续行归上一个键（`- ` 前缀剥掉），其余按首个冒号切键值。
+fn frontmatter_pairs(lines: &[&str], end: usize) -> Vec<(String, Json)> {
     let mut pairs: Vec<(String, Json)> = Vec::new();
     let mut key: Option<String> = None;
     for ln in &lines[1..end] {
@@ -36,59 +44,72 @@ pub fn parse_frontmatter(text: &str) -> (Json, String) {
         }
         if (ln.starts_with("  ") || ln.starts_with('\t')) && key.is_some() {
             let k = key.clone().unwrap_or_default();
-            let mut item = ln.trim().to_string();
-            if let Some(rest) = item.strip_prefix("- ") {
-                item = rest.trim().to_string();
-            }
-            let item = item.trim_matches(|c| c == '\'' || c == '"').to_string();
-            let cur = pairs.iter().position(|(n, _)| *n == k);
-            match cur {
-                Some(idx) => match &mut pairs[idx].1 {
-                    Json::Array(a) => a.push(Json::Str(item)),
-                    other => {
-                        let prev = other.clone();
-                        // 真源：非列表时，空值 → []，否则 → [旧值]
-                        let mut a = Vec::new();
-                        if !matches!(prev, Json::Null) {
-                            a.push(prev);
-                        }
-                        a.push(Json::Str(item));
-                        pairs[idx].1 = Json::Array(a);
-                    }
-                },
-                None => {
-                    pairs.push((k, Json::Array(vec![Json::Str(item)])));
-                }
-            }
+            fm_indented_item(&mut pairs, &k, ln);
             continue;
         }
-        if let Some(pos) = ln.find(':') {
-            let k = ln[..pos].trim().to_string();
-            let v = ln[pos + 1..].trim().to_string();
-            key = Some(k.clone());
-            let value = if v.is_empty() {
-                Json::Array(Vec::new())
-            } else if v.starts_with('[') && v.ends_with(']') {
-                let inner = &v[1..v.len() - 1];
-                Json::Array(
-                    inner
-                        .split(',')
-                        .map(|x| x.trim())
-                        .filter(|x| !x.is_empty())
-                        .map(|x| Json::Str(x.trim_matches(|c| c == '\'' || c == '"').to_string()))
-                        .collect(),
-                )
-            } else {
-                Json::Str(v.trim_matches(|c| c == '\'' || c == '"').to_string())
-            };
-            match pairs.iter_mut().find(|(n, _)| *n == k) {
-                Some(slot) => slot.1 = value,
-                None => pairs.push((k, value)),
+        fm_key_value(&mut pairs, &mut key, ln);
+    }
+    pairs
+}
+
+/// 缩进续行：并入上一个键的列表（非列表时空值 → []，否则 → [旧值]）。
+fn fm_indented_item(pairs: &mut Vec<(String, Json)>, k: &str, ln: &str) {
+    let mut item = ln.trim().to_string();
+    if let Some(rest) = item.strip_prefix("- ") {
+        item = rest.trim().to_string();
+    }
+    let item = item.trim_matches(|c| c == '\'' || c == '"').to_string();
+    let cur = pairs.iter().position(|(n, _)| *n == k);
+    match cur {
+        Some(idx) => match &mut pairs[idx].1 {
+            Json::Array(a) => a.push(Json::Str(item)),
+            other => {
+                let prev = other.clone();
+                let mut a = Vec::new();
+                if !matches!(prev, Json::Null) {
+                    a.push(prev);
+                }
+                a.push(Json::Str(item));
+                pairs[idx].1 = Json::Array(a);
             }
+        },
+        None => {
+            pairs.push((k.to_string(), Json::Array(vec![Json::Str(item)])));
         }
     }
-    let body = lines[end + 1..].join("\n");
-    (Json::Object(pairs), body)
+}
+
+/// 单行键值：首个冒号切分；值支持 `[a, b]` 与引号剥除。
+fn fm_key_value(pairs: &mut Vec<(String, Json)>, key: &mut Option<String>, ln: &str) {
+    if let Some(pos) = ln.find(':') {
+        let k = ln[..pos].trim().to_string();
+        let v = ln[pos + 1..].trim().to_string();
+        *key = Some(k.clone());
+        let value = fm_inline_list(&v);
+        match pairs.iter_mut().find(|(n, _)| *n == k) {
+            Some(slot) => slot.1 = value,
+            None => pairs.push((k, value)),
+        }
+    }
+}
+
+/// 行内值：空串 → []；`[a, b]` → 数组；其余按引号剥除的标量。
+fn fm_inline_list(v: &str) -> Json {
+    if v.is_empty() {
+        Json::Array(Vec::new())
+    } else if v.starts_with('[') && v.ends_with(']') {
+        let inner = &v[1..v.len() - 1];
+        Json::Array(
+            inner
+                .split(',')
+                .map(|x| x.trim())
+                .filter(|x| !x.is_empty())
+                .map(|x| Json::Str(x.trim_matches(|c| c == '\'' || c == '"').to_string()))
+                .collect(),
+        )
+    } else {
+        Json::Str(v.trim_matches(|c| c == '\'' || c == '"').to_string())
+    }
 }
 
 /// 真源 `md_blocks.bullet_blocks`：一条 bullet 含其后的缩进续行。

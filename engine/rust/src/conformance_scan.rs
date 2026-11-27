@@ -130,49 +130,76 @@ fn export_manifest_issues(root: &Path, verify_txt: &str, manifest: &Json) -> (Ve
             issues.push("export manifest item 非对象".to_string());
             continue;
         }
-        let iid = py_str(get(item, "id"));
-        if py_str(get(item, "conformance")) != "L3" {
-            issues.push(format!(
-                "导出面 {}: conformance 应为 L3（导出门禁锁定面）",
-                iid
-            ));
-        }
-        for ev in arr_items(get(item, "evidence")) {
-            let e = py_str(Some(ev));
-            if !root.join(&e).is_file() {
-                issues.push(format!("导出面 {}: 证据文件缺失 {}", iid, e));
-            }
-        }
-        for gate in arr_items(get(item, "gates")) {
-            let gid = py_str(Some(gate));
-            let num: &str = match gid.strip_prefix("check") {
-                Some(rest) if !rest.is_empty() && rest.bytes().all(|b| b.is_ascii_digit()) => rest,
-                _ => "",
-            };
-            if num.is_empty() || !defs.contains_key(num) {
-                issues.push(format!(
-                    "导出面 {}: 证据门禁 {} 在 verify.sh 无 check 定义（修复指引：只声明真存在的 checkN）",
-                    iid, gid
-                ));
-                continue;
-            }
-            if !calls.contains(num) {
-                issues.push(format!(
-                    "导出面 {}: 证据门禁 {} 未在主执行体调用（声明了却不跑）",
-                    iid, gid
-                ));
-                continue;
-            }
-            let body = defs.get(num).map(String::as_str).unwrap_or("");
-            if !GATE_FAIL_TOKENS.iter().any(|t| body.contains(t)) {
-                issues.push(format!(
-                    "导出面 {}: 证据门禁 {} 无可失败路径（判据空转：该 check 任何分支都不会红）",
-                    iid, gid
-                ));
-            }
-        }
+        export_item_issues(root, item, &defs, &calls, &mut issues);
     }
     (issues, items.len() as i64)
+}
+
+/// 单条导出面：conformance=L3 / 证据件存在 / 证据门禁真定义且被调用且可失败。
+fn export_item_issues(
+    root: &Path,
+    item: &Json,
+    defs: &std::collections::HashMap<String, String>,
+    calls: &std::collections::HashSet<String>,
+    issues: &mut Vec<String>,
+) {
+    let iid = py_str(get(item, "id"));
+    if py_str(get(item, "conformance")) != "L3" {
+        issues.push(format!(
+            "导出面 {}: conformance 应为 L3（导出门禁锁定面）",
+            iid
+        ));
+    }
+    export_evidence_issues(root, &iid, item, issues);
+    export_gate_issues(&iid, item, defs, calls, issues);
+}
+
+/// 证据件在场性。
+fn export_evidence_issues(root: &Path, iid: &str, item: &Json, issues: &mut Vec<String>) {
+    for ev in arr_items(get(item, "evidence")) {
+        let e = py_str(Some(ev));
+        if !root.join(&e).is_file() {
+            issues.push(format!("导出面 {}: 证据文件缺失 {}", iid, e));
+        }
+    }
+}
+
+/// 证据门禁：checkN 定义 / 主执行体调用 / 可失败路径三面。
+fn export_gate_issues(
+    iid: &str,
+    item: &Json,
+    defs: &std::collections::HashMap<String, String>,
+    calls: &std::collections::HashSet<String>,
+    issues: &mut Vec<String>,
+) {
+    for gate in arr_items(get(item, "gates")) {
+        let gid = py_str(Some(gate));
+        let num: &str = match gid.strip_prefix("check") {
+            Some(rest) if !rest.is_empty() && rest.bytes().all(|b| b.is_ascii_digit()) => rest,
+            _ => "",
+        };
+        if num.is_empty() || !defs.contains_key(num) {
+            issues.push(format!(
+                "导出面 {}: 证据门禁 {} 在 verify.sh 无 check 定义（修复指引：只声明真存在的 checkN）",
+                iid, gid
+            ));
+            continue;
+        }
+        if !calls.contains(num) {
+            issues.push(format!(
+                "导出面 {}: 证据门禁 {} 未在主执行体调用（声明了却不跑）",
+                iid, gid
+            ));
+            continue;
+        }
+        let body = defs.get(num).map(String::as_str).unwrap_or("");
+        if !GATE_FAIL_TOKENS.iter().any(|t| body.contains(t)) {
+            issues.push(format!(
+                "导出面 {}: 证据门禁 {} 无可失败路径（判据空转：该 check 任何分支都不会红）",
+                iid, gid
+            ));
+        }
+    }
 }
 
 pub struct ScanResult {

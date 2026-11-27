@@ -49,7 +49,16 @@ pub(crate) fn l7_issues(doc: &Json, tiers: &[&Json], issues: &mut Vec<String>) {
 
 /// L8：judged_by 须解析为现存 check 或已登记 assertion。
 pub(crate) fn l8_issues(root: &Path, doc: &Json, tiers: &[&Json], issues: &mut Vec<String>) {
-    let checks: HashSet<String> = if root.join(VERIFY_REL).exists() {
+    let checks = verify_checks(root);
+    let assertion_ids = assertion_id_set(root);
+    for (owner, reference) in judge_refs(doc, tiers) {
+        judge_ref_issues(&owner, &reference, &checks, &assertion_ids, issues);
+    }
+}
+
+/// verify.sh 里的 check 定义编号集合（缺件 → 空集）。
+fn verify_checks(root: &Path) -> HashSet<String> {
+    if root.join(VERIFY_REL).exists() {
         std::fs::read_to_string(root.join(VERIFY_REL))
             .map(|t| {
                 check_def_re()
@@ -60,8 +69,12 @@ pub(crate) fn l8_issues(root: &Path, doc: &Json, tiers: &[&Json], issues: &mut V
             .unwrap_or_default()
     } else {
         HashSet::new()
-    };
-    let assertion_ids: HashSet<String> = if root.join(ASSERTIONS_REL).is_file() {
+    }
+}
+
+/// 断言表登记的 assertion id 集合（缺件 → 空集）。
+fn assertion_id_set(root: &Path) -> HashSet<String> {
+    if root.join(ASSERTIONS_REL).is_file() {
         jsonread::read_file(root, ASSERTIONS_REL)
             .map(|d| {
                 arr_items(get(&d, "assertions"))
@@ -72,7 +85,11 @@ pub(crate) fn l8_issues(root: &Path, doc: &Json, tiers: &[&Json], issues: &mut V
             .unwrap_or_default()
     } else {
         HashSet::new()
-    };
+    }
+}
+
+/// 三处 judged_by 引用：阶 / 资产子级 / 纵切件。
+fn judge_refs(doc: &Json, tiers: &[&Json]) -> Vec<(String, String)> {
     let mut refs: Vec<(String, String)> = Vec::new();
     for tier in tiers {
         for r in arr_items(get(tier, "judged_by")) {
@@ -89,27 +106,36 @@ pub(crate) fn l8_issues(root: &Path, doc: &Json, tiers: &[&Json], issues: &mut V
             refs.push((plain_str_opt(get(comp, "id")), plain_str(r)));
         }
     }
-    for (owner, reference) in refs {
-        if let Some(c) = judge_check_re().captures(&reference) {
-            if !checks.contains(&c[1]) {
-                issues.push(format!(
-                    "L8 {} 的判据 {} 在 {} 中不存在（修复指引：改指向真实 check）",
-                    owner, reference, VERIFY_REL
-                ));
-            }
-        } else if let Some(rest) = reference.strip_prefix("assertion:") {
-            if !assertion_ids.contains(rest) {
-                issues.push(format!(
-                    "L8 {} 的判据 {} 未登记（修复指引：在 {} 补该断言）",
-                    owner, reference, ASSERTIONS_REL
-                ));
-            }
-        } else {
+    refs
+}
+
+/// 单条 judged_by：checkN 须在 verify.sh 内 / assertion:<id> 须已登记 / 其余形式非法。
+fn judge_ref_issues(
+    owner: &str,
+    reference: &str,
+    checks: &HashSet<String>,
+    assertion_ids: &HashSet<String>,
+    issues: &mut Vec<String>,
+) {
+    if let Some(c) = judge_check_re().captures(reference) {
+        if !checks.contains(&c[1]) {
             issues.push(format!(
-                "L8 {} 的判据形式不合法：{}（修复指引：写成 checkN 或 assertion:<id>）",
-                owner, reference
+                "L8 {} 的判据 {} 在 {} 中不存在（修复指引：改指向真实 check）",
+                owner, reference, VERIFY_REL
             ));
         }
+    } else if let Some(rest) = reference.strip_prefix("assertion:") {
+        if !assertion_ids.contains(rest) {
+            issues.push(format!(
+                "L8 {} 的判据 {} 未登记（修复指引：在 {} 补该断言）",
+                owner, reference, ASSERTIONS_REL
+            ));
+        }
+    } else {
+        issues.push(format!(
+            "L8 {} 的判据形式不合法：{}（修复指引：写成 checkN 或 assertion:<id>）",
+            owner, reference
+        ));
     }
 }
 

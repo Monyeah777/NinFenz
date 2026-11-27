@@ -241,43 +241,61 @@ pub fn parse_io_header(text: &str) -> Option<(Vec<String>, Vec<String>)> {
 pub fn observed_paths(text: &str, lang: &str) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
     match lang {
-        "python" => {
-            let Some(tree) = crate::pyast::parse_module(text) else {
-                return out;
-            };
-            let ls = crate::pyast::LineStarts::new(text);
-            for (_, _, _, name, args) in crate::asset_code::calls_with_args(&tree, &ls) {
-                if name != "open" && name != "Path" && name != "pathlib.Path" {
-                    continue;
-                }
-                for a in args {
-                    if let Some(s) = a {
-                        out.push(s);
-                    }
-                }
+        "python" => python_observed_paths(text),
+        "bash" => bash_observed_paths(text),
+        "vba" => vba_observed_paths(text),
+        _ => Vec::new(),
+    };
+    out.into_iter().filter(|p| is_observed_path(p)).collect()
+}
+
+/// python 面：open(...) / Path(...) 调用里的字面量路径。
+fn python_observed_paths(text: &str) -> Vec<String> {
+    let mut out: Vec<String> = Vec::new();
+    let Some(tree) = crate::pyast::parse_module(text) else {
+        return out;
+    };
+    let ls = crate::pyast::LineStarts::new(text);
+    for (_, _, _, name, args) in crate::asset_code::calls_with_args(&tree, &ls) {
+        if name != "open" && name != "Path" && name != "pathlib.Path" {
+            continue;
+        }
+        for a in args {
+            if let Some(s) = a {
+                out.push(s);
             }
         }
-        "bash" => {
-            let re = regex::Regex::new(r">>?[ \t]*([^\s;|&()]+)|<[ \t]*([^\s;|&()]+)").unwrap();
-            for c in re.captures_iter(text) {
-                out.push(
-                    c.get(1)
-                        .or_else(|| c.get(2))
-                        .map(|m| m.as_str().to_string())
-                        .unwrap_or_default(),
-                );
-            }
-        }
-        "vba" => {
-            let re = regex::Regex::new(r#"(?i)\bOpen\s+"([^"]+)""#).unwrap();
-            for c in re.captures_iter(text) {
-                out.push(c[1].to_string());
-            }
-        }
-        _ => {}
     }
+    out
+}
+
+/// bash 面：重定向 / 输入重定向的目标路径。
+fn bash_observed_paths(text: &str) -> Vec<String> {
+    let mut out: Vec<String> = Vec::new();
+    let re = regex::Regex::new(r">>?[ \t]*([^\s;|&()]+)|<[ \t]*([^\s;|&()]+)").unwrap();
+    for c in re.captures_iter(text) {
+        out.push(
+            c.get(1)
+                .or_else(|| c.get(2))
+                .map(|m| m.as_str().to_string())
+                .unwrap_or_default(),
+        );
+    }
+    out
+}
+
+/// vba 面：Open "..." 语句里的路径字面量。
+fn vba_observed_paths(text: &str) -> Vec<String> {
+    let mut out: Vec<String> = Vec::new();
+    let re = regex::Regex::new(r#"(?i)\bOpen\s+"([^"]+)""#).unwrap();
+    for c in re.captures_iter(text) {
+        out.push(c[1].to_string());
+    }
+    out
+}
+
+/// 真源 skip 表：设备文件 / 空串 / 环境变量占位不算"字面量路径"。
+fn is_observed_path(p: &str) -> bool {
     let skip = ["/dev/null", "/dev/stdin", "/dev/stdout", "-"];
-    out.into_iter()
-        .filter(|p| !p.is_empty() && !skip.contains(&p.as_str()) && !p.starts_with('$'))
-        .collect()
+    !p.is_empty() && !skip.contains(&p) && !p.starts_with('$')
 }

@@ -171,65 +171,7 @@ pub(crate) fn verify_transform(root: &Path) -> PairIssues {
     let mut issues: Vec<String> = Vec::new();
     for (i, e) in entries.iter().enumerate() {
         let tag = format!("记录 #{}", i + 1);
-        if !matches!(e, Json::Object(_)) {
-            issues.push(format!("{} 非对象", tag));
-            continue;
-        }
-        for k in REQUIRED_ENTRY {
-            if get(e, k).is_none() {
-                issues.push(format!("{} 缺必填字段：{}", tag, k));
-            }
-        }
-        let src = py_str(get(e, "from"));
-        if !src.is_empty() && !refs.contains(&src) {
-            issues.push(format!("{} 的 from 不是已声明的参考级源：{}", tag, src));
-        }
-        let to = py_str(get(e, "to"));
-        if !to.is_empty() {
-            let p = root.join(&to);
-            if !p.is_file() {
-                issues.push(format!("{} 的产物不存在：{}", tag, to));
-            } else {
-                let live = std::fs::read(&p)
-                    .map(|b| crate::merkle::hex(&crate::merkle::sha256(&b)))
-                    .unwrap_or_default();
-                if py_str(get(e, "digest")) != live {
-                    issues.push(format!(
-                        "{} 的产物摘要与记录不一致：{}（产物已改，记录失效；修复指引：重新消化并更新 digest）",
-                        tag, to
-                    ));
-                }
-            }
-        }
-        let ev: Vec<String> = arr_items(get(e, "evidence"))
-            .iter()
-            .map(|v| py_str(Some(v)))
-            .collect();
-        if py_truthy(get(e, "promoted").unwrap_or(&Json::Null)) {
-            let missing: Vec<&str> = TIERS
-                .iter()
-                .copied()
-                .filter(|t| !ev.contains(&t.to_string()))
-                .collect();
-            if !missing.is_empty() {
-                issues.push(format!("{} 声明转正但缺证据档：{}", tag, missing.join("/")));
-            }
-            if py_str(get(e, "reviewed_by")).trim().is_empty() {
-                issues.push(format!("{} 声明转正但无复核人（消化审核未双签）", tag));
-            }
-        }
-        if let Some(rc) = get(e, "reuse_count") {
-            if !is_nonneg_int(rc) {
-                issues.push(format!(
-                    "{} 的 reuse_count 非非负整数（频次判据不可复算）",
-                    tag
-                ));
-            }
-        }
-        let ra = py_str(get(e, "reviewed_at"));
-        if !ra.is_empty() && !is_dated(&ra) {
-            issues.push(format!("{} 的 reviewed_at 非 YYYY-MM-DD", tag));
-        }
+        transform_entry_issues(root, e, &tag, &refs, &mut issues);
     }
     let promoted = entries
         .iter()
@@ -244,7 +186,91 @@ pub(crate) fn verify_transform(root: &Path) -> PairIssues {
     PairIssues { issues, stats }
 }
 
-/// 真源 `verify_usage` → `(issues, stats)`。
+/// 单条消化记录：路径面 + 转正面。
+fn transform_entry_issues(
+    root: &Path,
+    e: &Json,
+    tag: &str,
+    refs: &BTreeSet<String>,
+    issues: &mut Vec<String>,
+) {
+    transform_paths_issues(root, e, tag, refs, issues);
+    transform_promote_issues(e, tag, issues);
+}
+
+/// 路径面：对象形态 / 必填 / from 在册 / 产物存在且摘要一致。
+fn transform_paths_issues(
+    root: &Path,
+    e: &Json,
+    tag: &str,
+    refs: &BTreeSet<String>,
+    issues: &mut Vec<String>,
+) {
+    if !matches!(e, Json::Object(_)) {
+        issues.push(format!("{} 非对象", tag));
+        return;
+    }
+    for k in REQUIRED_ENTRY {
+        if get(e, k).is_none() {
+            issues.push(format!("{} 缺必填字段：{}", tag, k));
+        }
+    }
+    let src = py_str(get(e, "from"));
+    if !src.is_empty() && !refs.contains(&src) {
+        issues.push(format!("{} 的 from 不是已声明的参考级源：{}", tag, src));
+    }
+    let to = py_str(get(e, "to"));
+    if !to.is_empty() {
+        let p = root.join(&to);
+        if !p.is_file() {
+            issues.push(format!("{} 的产物不存在：{}", tag, to));
+        } else {
+            let live = std::fs::read(&p)
+                .map(|b| crate::merkle::hex(&crate::merkle::sha256(&b)))
+                .unwrap_or_default();
+            if py_str(get(e, "digest")) != live {
+                issues.push(format!(
+                    "{} 的产物摘要与记录不一致：{}（产物已改，记录失效；修复指引：重新消化并更新 digest）",
+                    tag, to
+                ));
+            }
+        }
+    }
+}
+
+/// 转正面：证据档齐 / 复核人 / reuse_count / reviewed_at。
+fn transform_promote_issues(e: &Json, tag: &str, issues: &mut Vec<String>) {
+    let ev: Vec<String> = arr_items(get(e, "evidence"))
+        .iter()
+        .map(|v| py_str(Some(v)))
+        .collect();
+    if py_truthy(get(e, "promoted").unwrap_or(&Json::Null)) {
+        let missing: Vec<&str> = TIERS
+            .iter()
+            .copied()
+            .filter(|t| !ev.contains(&t.to_string()))
+            .collect();
+        if !missing.is_empty() {
+            issues.push(format!("{} 声明转正但缺证据档：{}", tag, missing.join("/")));
+        }
+        if py_str(get(e, "reviewed_by")).trim().is_empty() {
+            issues.push(format!("{} 声明转正但无复核人（消化审核未双签）", tag));
+        }
+    }
+    if let Some(rc) = get(e, "reuse_count") {
+        if !is_nonneg_int(rc) {
+            issues.push(format!(
+                "{} 的 reuse_count 非非负整数（频次判据不可复算）",
+                tag
+            ));
+        }
+    }
+    let ra = py_str(get(e, "reviewed_at"));
+    if !ra.is_empty() && !is_dated(&ra) {
+        issues.push(format!("{} 的 reviewed_at 非 YYYY-MM-DD", tag));
+    }
+}
+
 pub(crate) fn verify_usage(root: &Path) -> PairIssues {
     let doc = match read_json(root, USAGE_REL) {
         Ok(Some(d)) => d,
@@ -269,7 +295,35 @@ pub(crate) fn verify_usage(root: &Path) -> PairIssues {
     if py_str(get(&doc, "schema")) != USAGE_SCHEMA {
         issues.push(format!("频率台账 schema 不匹配（期望 {}）", USAGE_SCHEMA));
     }
-    let counts: Json = match get(&doc, "counts") {
+    let counts = usage_counts(&doc, &mut issues);
+    let decl = read_json(root, DECL_REL).ok().flatten();
+    let ids: BTreeSet<String> = decl
+        .as_ref()
+        .map(|d| sources(d).iter().map(|s| py_str(get(s, "id"))).collect())
+        .unwrap_or_default();
+    let int_sum = usage_count_issues(&counts, &ids, &mut issues);
+    if let Some(Json::Int(total)) = get(&doc, "total") {
+        if *total != int_sum {
+            issues.push("频率台账 total 与 counts 求和不一致（手改痕迹）".to_string());
+        }
+    }
+    usage_replay_issues(root, &counts, &mut issues);
+    let stats = Json::Object(vec![
+        (
+            "sources_with_usage".to_string(),
+            Json::Int(match &counts {
+                Json::Object(p) => p.len() as i64,
+                _ => 0,
+            }),
+        ),
+        ("events".to_string(), Json::Int(int_sum)),
+    ]);
+    PairIssues { issues, stats }
+}
+
+/// counts 段：非对象即报并按空对象（真源 dict 口径）。
+fn usage_counts(doc: &Json, issues: &mut Vec<String>) -> Json {
+    match get(doc, "counts") {
         Some(c @ Json::Object(_)) => c.clone(),
         Some(_) => {
             issues.push("频率台账 counts 非对象".to_string());
@@ -279,14 +333,13 @@ pub(crate) fn verify_usage(root: &Path) -> PairIssues {
             issues.push("频率台账 counts 非对象".to_string());
             Json::Object(Vec::new())
         }
-    };
-    let decl = read_json(root, DECL_REL).ok().flatten();
-    let ids: BTreeSet<String> = decl
-        .as_ref()
-        .map(|d| sources(d).iter().map(|s| py_str(get(s, "id"))).collect())
-        .unwrap_or_default();
+    }
+}
+
+/// counts 逐键：源须已声明、计数须非负整数；返回计数和。
+fn usage_count_issues(counts: &Json, ids: &BTreeSet<String>, issues: &mut Vec<String>) -> i64 {
     let mut int_sum = 0i64;
-    if let Json::Object(pairs) = &counts {
+    if let Json::Object(pairs) = counts {
         for (k, v) in pairs {
             if !ids.contains(k) {
                 issues.push(format!("频率台账含未声明的源：{}（防幽灵频次）", k));
@@ -299,18 +352,18 @@ pub(crate) fn verify_usage(root: &Path) -> PairIssues {
             }
         }
     }
-    if let Some(Json::Int(total)) = get(&doc, "total") {
-        if *total != int_sum {
-            issues.push("频率台账 total 与 counts 求和不一致（手改痕迹）".to_string());
-        }
-    }
+    int_sum
+}
+
+/// 消化记录里的 reuse_count 必须与该源在台账里的计数一致（防手写频次）。
+fn usage_replay_issues(root: &Path, counts: &Json, issues: &mut Vec<String>) {
     if let Ok(Some(log)) = read_json(root, LOG_REL) {
         for e in arr_items(get(&log, "entries")) {
             if !matches!(e, Json::Object(_)) || get(e, "reuse_count").is_none() {
                 continue;
             }
             let from = py_str(get(e, "from"));
-            let got = match &counts {
+            let got = match counts {
                 Json::Object(p) => p.iter().find(|(k, _)| *k == from).map(|(_, v)| v.clone()),
                 _ => None,
             };
@@ -325,15 +378,4 @@ pub(crate) fn verify_usage(root: &Path) -> PairIssues {
             }
         }
     }
-    let stats = Json::Object(vec![
-        (
-            "sources_with_usage".to_string(),
-            Json::Int(match &counts {
-                Json::Object(p) => p.len() as i64,
-                _ => 0,
-            }),
-        ),
-        ("events".to_string(), Json::Int(int_sum)),
-    ]);
-    PairIssues { issues, stats }
 }

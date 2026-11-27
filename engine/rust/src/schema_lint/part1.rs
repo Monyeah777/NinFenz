@@ -120,16 +120,7 @@ pub(crate) fn subset_validate(instance: &Json, schema: &Json, path: &str) -> Vec
     };
     // enum 是**类型无关**的约束：先判一次，后面各类型分支的 return 都会带上它
     // （2026-10-10 审计 Y4：真源此前只在 string 分支里判 ⇒ boolean/number 的 enum 静默放行）。
-    if let Some(Json::Array(en)) = get(schema, "enum") {
-        if !en.iter().any(|e| json_equal(e, instance)) {
-            out.push(format!(
-                "{}: 值 {} 不在枚举 {}",
-                path,
-                py_repr(instance),
-                py_repr(&Json::Array(en.clone()))
-            ));
-        }
-    }
+    enum_issue(instance, schema, path, &mut out);
     let stype = get(schema, "type");
     match stype {
         None => return out,
@@ -141,46 +132,68 @@ pub(crate) fn subset_validate(instance: &Json, schema: &Json, path: &str) -> Vec
         "object" => validate_object(instance, schema, path, out),
         "array" => validate_array(instance, schema, path, out),
         "string" => validate_string(instance, schema, path, out),
-        "integer" => {
-            let ok = matches!(instance, Json::Int(_));
-            if !ok {
-                return vec![format!(
-                    "{}: 应为 integer，实为 {}",
-                    path,
-                    py_type_name(instance)
-                )];
-            }
-            if let Some(m) = get(schema, "minimum") {
-                if let (Some(v), Some(n)) = (as_f64(instance), as_f64(m)) {
-                    if v < n {
-                        out.push(format!(
-                            "{}: 值 {} < minimum {}",
-                            path,
-                            plain_str(instance),
-                            plain_str(m)
-                        ));
-                    }
-                }
-            }
-            out
-        }
+        "integer" => validate_integer(instance, schema, path, out),
         "number" => validate_number(instance, schema, path, out),
-        "boolean" => {
-            if !matches!(instance, Json::Bool(_)) {
-                return vec![format!(
-                    "{}: 应为 boolean，实为 {}",
-                    path,
-                    py_type_name(instance)
-                )];
-            }
-            out
-        }
+        "boolean" => validate_boolean(instance, path, out),
         _ => vec![format!(
             "{}: 校验器不支持的 type {}",
             path,
             py_repr(stype.unwrap())
         )],
     }
+}
+
+/// enum 约束（类型无关，先判一次）。
+fn enum_issue(instance: &Json, schema: &Json, path: &str, out: &mut Vec<String>) {
+    if let Some(Json::Array(en)) = get(schema, "enum") {
+        if !en.iter().any(|e| json_equal(e, instance)) {
+            out.push(format!(
+                "{}: 值 {} 不在枚举 {}",
+                path,
+                py_repr(instance),
+                py_repr(&Json::Array(en.clone()))
+            ));
+        }
+    }
+}
+
+/// integer 分支：类型 + minimum 下界。
+fn validate_integer(instance: &Json, schema: &Json, path: &str, out: Vec<String>) -> Vec<String> {
+    let mut out = out;
+    let ok = matches!(instance, Json::Int(_));
+    if !ok {
+        return vec![format!(
+            "{}: 应为 integer，实为 {}",
+            path,
+            py_type_name(instance)
+        )];
+    }
+    if let Some(m) = get(schema, "minimum") {
+        if let (Some(v), Some(n)) = (as_f64(instance), as_f64(m)) {
+            if v < n {
+                out.push(format!(
+                    "{}: 值 {} < minimum {}",
+                    path,
+                    plain_str(instance),
+                    plain_str(m)
+                ));
+            }
+        }
+    }
+    out
+}
+
+/// boolean 分支：类型判别。
+fn validate_boolean(instance: &Json, path: &str, out: Vec<String>) -> Vec<String> {
+    let out = out;
+    if !matches!(instance, Json::Bool(_)) {
+        return vec![format!(
+            "{}: 应为 boolean，实为 {}",
+            path,
+            py_type_name(instance)
+        )];
+    }
+    out
 }
 
 /// subset_validate 的 number 分支（枚举消息由调用方以 out 传入）。
@@ -231,28 +244,35 @@ pub(crate) fn validate_object(
         Some(Json::Object(p)) => p.clone(),
         _ => Vec::new(),
     };
-    for req in crate::pyval::arr_items(get(schema, "required")) {
-        let key = plain_str(req);
-        if !inst.iter().any(|(k, _)| *k == key) {
-            out.push(format!("{}: 缺必填字段 {}", path, key));
-        }
-    }
-    if let Some(pn) = get(schema, "propertyNames") {
-        if matches!(pn, Json::Object(_)) {
-            for (key, _) in inst {
-                out.extend(subset_validate(
-                    &Json::Str(key.clone()),
-                    pn,
-                    &format!("{}/{}（键名）", path, key),
-                ));
-            }
-        }
-    }
-    for (key, sub) in &props {
+    required_field_issues(inst, schema, path, &mut out);
+    property_names_issues(inst, schema, path, &mut out);
+    property_issues(inst, &props, path, &mut out);
+    extra_property_issues(inst, &props, schema, path, &mut out);
+    out
+}
+
+/// properties 面：逐键递归。
+fn property_issues(
+    inst: &[(String, Json)],
+    props: &[(String, Json)],
+    path: &str,
+    out: &mut Vec<String>,
+) {
+    for (key, sub) in props {
         if let Some((_, v)) = inst.iter().find(|(k, _)| k == key) {
             out.extend(subset_validate(v, sub, &format!("{}/{}", path, key)));
         }
     }
+}
+
+/// additionalProperties 面：禁止 / 带 schema 递归 / 放行。
+fn extra_property_issues(
+    inst: &[(String, Json)],
+    props: &[(String, Json)],
+    schema: &Json,
+    path: &str,
+    out: &mut Vec<String>,
+) {
     let extra = get(schema, "additionalProperties");
     for (key, v) in inst {
         if props.iter().any(|(k, _)| k == key) {
@@ -269,7 +289,6 @@ pub(crate) fn validate_object(
             _ => {}
         }
     }
-    out
 }
 
 /// subset_validate 的 array 分支（枚举消息由调用方以 out 传入）。

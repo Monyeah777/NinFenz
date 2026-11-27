@@ -53,45 +53,7 @@ pub fn parse(text: &str) -> Result<XNode, String> {
             continue;
         }
         // 开始标签
-        let mut j = i + 1;
-        let mut quote: Option<char> = None;
-        while j < chars.len() {
-            let c = chars[j];
-            match quote {
-                Some(q) => {
-                    if c == q {
-                        quote = None;
-                    }
-                }
-                None => {
-                    if c == '"' || c == '\'' {
-                        quote = Some(c);
-                    } else if c == '>' {
-                        break;
-                    }
-                }
-            }
-            j += 1;
-        }
-        if j >= chars.len() {
-            return Err("开始标签未闭合".to_string());
-        }
-        let raw: String = chars[i + 1..j].iter().collect();
-        let raw = raw.trim().to_string();
-        let self_closing = raw.ends_with('/');
-        let raw = if self_closing {
-            raw[..raw.len() - 1].trim().to_string()
-        } else {
-            raw
-        };
-        let (tag, attr_str) = match raw.find(char::is_whitespace) {
-            Some(k) => (raw[..k].to_string(), raw[k..].to_string()),
-            None => (raw.clone(), String::new()),
-        };
-        if tag.is_empty() {
-            return Err("空标签名".to_string());
-        }
-        let attrs = parse_attrs(&attr_str)?;
+        let (tag, attrs, self_closing, j) = parse_start_tag(&chars, i)?;
         started = true;
         let node = XNode {
             tag,
@@ -99,17 +61,7 @@ pub fn parse(text: &str) -> Result<XNode, String> {
             children: Vec::new(),
         };
         if self_closing {
-            match stack.last_mut() {
-                Some(parent) => parent.children.push(node),
-                None => {
-                    if root.is_some() {
-                        return Err("多个根元素".to_string());
-                    }
-                    started = true;
-                    root = Some(node);
-                    root_closed = true;
-                }
-            }
+            attach_self_closing(&mut stack, &mut root, &mut root_closed, node)?;
         } else {
             stack.push(node);
         }
@@ -119,6 +71,81 @@ pub fn parse(text: &str) -> Result<XNode, String> {
         return Err(format!("标签未闭合：<{}>", stack.last().unwrap().tag));
     }
     root.ok_or_else(|| "空文档".to_string())
+}
+
+/// 扫到开始标签的 `>`（引号内的 `>` 不算）；未闭合返回 None。
+fn find_tag_end(chars: &[char], start: usize) -> Option<usize> {
+    let mut j = start + 1;
+    let mut quote: Option<char> = None;
+    while j < chars.len() {
+        let c = chars[j];
+        match quote {
+            Some(q) => {
+                if c == q {
+                    quote = None;
+                }
+            }
+            None => {
+                if c == '"' || c == '\'' {
+                    quote = Some(c);
+                } else if c == '>' {
+                    break;
+                }
+            }
+        }
+        j += 1;
+    }
+    if j >= chars.len() {
+        return None;
+    }
+    Some(j)
+}
+
+/// 开始标签 → (标签名, 属性表, 是否自闭合, 结束位置)。
+fn parse_start_tag(
+    chars: &[char],
+    i: usize,
+) -> Result<(String, Vec<(String, String)>, bool, usize), String> {
+    let Some(j) = find_tag_end(chars, i) else {
+        return Err("开始标签未闭合".to_string());
+    };
+    let raw: String = chars[i + 1..j].iter().collect();
+    let raw = raw.trim().to_string();
+    let self_closing = raw.ends_with('/');
+    let raw = if self_closing {
+        raw[..raw.len() - 1].trim().to_string()
+    } else {
+        raw
+    };
+    let (tag, attr_str) = match raw.find(char::is_whitespace) {
+        Some(k) => (raw[..k].to_string(), raw[k..].to_string()),
+        None => (raw.clone(), String::new()),
+    };
+    if tag.is_empty() {
+        return Err("空标签名".to_string());
+    }
+    let attrs = parse_attrs(&attr_str)?;
+    Ok((tag, attrs, self_closing, j))
+}
+
+/// 自闭合元素：挂父节点；无父则立根（已有根即报"多个根元素"）。
+fn attach_self_closing(
+    stack: &mut Vec<XNode>,
+    root: &mut Option<XNode>,
+    root_closed: &mut bool,
+    node: XNode,
+) -> Result<(), String> {
+    match stack.last_mut() {
+        Some(parent) => parent.children.push(node),
+        None => {
+            if root.is_some() {
+                return Err("多个根元素".to_string());
+            }
+            *root = Some(node);
+            *root_closed = true;
+        }
+    }
+    Ok(())
 }
 
 /// 纯文本段：判「根之前 / 之后有内容」，并把游标前移到下一个标记。
@@ -141,40 +168,37 @@ pub(crate) fn text_segment(chars: &[char], i: &mut usize, started: bool, root_cl
 
 /// 跳过注释 / 处理指令 / CDATA 段；返回 true 表示已跳过一段。
 pub(crate) fn skip_meta(chars: &[char], i: &mut usize) -> Result<bool, String> {
-        if chars[*i..].starts_with(&['<', '!', '-', '-']) {
-            let mut j = *i + 4;
-            while j + 2 < chars.len() && !chars[j..].starts_with(&['-', '-', '>']) {
-                j += 1;
-            }
-            if j + 2 >= chars.len() {
-                return Err("注释未闭合".to_string());
-            }
-            *i = j + 3;
-            return Ok(true);
-        }
-        if chars[*i..].starts_with(&['<', '?']) {
-            let mut j = *i + 2;
-            while j + 1 < chars.len() && !chars[j..].starts_with(&['?', '>']) {
-                j += 1;
-            }
-            if j + 1 >= chars.len() {
-                return Err("处理指令未闭合".to_string());
-            }
-            *i = j + 2;
-            return Ok(true);
-        }
-        if chars[*i..].starts_with(&['<', '!', '[', 'C', 'D']) {
-            let mut j = *i + 9;
-            while j + 2 < chars.len() && !chars[j..].starts_with(&[']', ']', '>']) {
-                j += 1;
-            }
-            if j + 2 >= chars.len() {
-                return Err("CDATA 未闭合".to_string());
-            }
-            *i = j + 3;
-            return Ok(true);
-        }
+    if chars[*i..].starts_with(&['<', '!', '-', '-']) {
+        skip_until(chars, i, *i + 4, &['-', '-', '>'], "注释未闭合")?;
+        return Ok(true);
+    }
+    if chars[*i..].starts_with(&['<', '?']) {
+        skip_until(chars, i, *i + 2, &['?', '>'], "处理指令未闭合")?;
+        return Ok(true);
+    }
+    if chars[*i..].starts_with(&['<', '!', '[', 'C', 'D']) {
+        skip_until(chars, i, *i + 9, &[']', ']', '>'], "CDATA 未闭合")?;
+        return Ok(true);
+    }
     Ok(false)
+}
+
+/// 从 j 扫到闭合标记之后；未闭合报 err。
+fn skip_until(
+    chars: &[char],
+    i: &mut usize,
+    mut j: usize,
+    close: &[char],
+    err: &str,
+) -> Result<(), String> {
+    while j + close.len() - 1 < chars.len() && !chars[j..].starts_with(close) {
+        j += 1;
+    }
+    if j + close.len() - 1 >= chars.len() {
+        return Err(err.to_string());
+    }
+    *i = j + close.len();
+    Ok(())
 }
 
 /// 解析结束标签：标签匹配、挂到父节点或收根；游标前移。
@@ -265,50 +289,64 @@ pub(crate) fn parse_attrs(s: &str) -> Result<Vec<(String, String)>, String> {
     let mut out: Vec<(String, String)> = Vec::new();
     let mut i = 0usize;
     while i < chars.len() {
-        while i < chars.len() && chars[i].is_whitespace() {
-            i += 1;
-        }
+        i = skip_attr_ws(&chars, i);
         if i >= chars.len() {
             break;
         }
-        let start = i;
-        while i < chars.len() && chars[i] != '=' && !chars[i].is_whitespace() {
-            i += 1;
-        }
-        let name: String = chars[start..i].iter().collect();
-        if name.is_empty() {
-            return Err("属性名缺失".to_string());
-        }
-        while i < chars.len() && chars[i].is_whitespace() {
-            i += 1;
-        }
-        if i >= chars.len() || chars[i] != '=' {
-            return Err(format!("属性 {} 缺 =", name));
-        }
-        i += 1;
-        while i < chars.len() && chars[i].is_whitespace() {
-            i += 1;
-        }
-        if i >= chars.len() || (chars[i] != '"' && chars[i] != '\'') {
-            return Err(format!("属性 {} 的值未加引号", name));
-        }
-        let q = chars[i];
-        i += 1;
-        let vstart = i;
-        while i < chars.len() && chars[i] != q {
-            i += 1;
-        }
-        if i >= chars.len() {
-            return Err(format!("属性 {} 的值未闭合", name));
-        }
-        // 实体解码（审计 Z1）：与真源 ElementTree 同语义，不能再把 a&amp;b 原样当值。
-        let raw_value: String = chars[vstart..i].iter().collect();
-        let value = decode_entities(&raw_value)?;
-        i += 1;
+        let (name, next) = attr_name(&chars, i)?;
+        let (value, next) = attr_value(&chars, next, &name)?;
+        i = next;
         if out.iter().any(|(n, _)| *n == name) {
             return Err(format!("属性重复：{}", name));
         }
         out.push((name, value));
     }
     Ok(out)
+}
+
+/// 跳过属性表里的空白。
+fn skip_attr_ws(chars: &[char], mut i: usize) -> usize {
+    while i < chars.len() && chars[i].is_whitespace() {
+        i += 1;
+    }
+    i
+}
+
+/// 读属性名（到 `=` 或空白为止）；空名即报错。
+fn attr_name(chars: &[char], mut i: usize) -> Result<(String, usize), String> {
+    let start = i;
+    while i < chars.len() && chars[i] != '=' && !chars[i].is_whitespace() {
+        i += 1;
+    }
+    let name: String = chars[start..i].iter().collect();
+    if name.is_empty() {
+        return Err("属性名缺失".to_string());
+    }
+    Ok((name, i))
+}
+
+/// 读 `= "值"` 段并解码实体；返回 (值, 游标)。
+fn attr_value(chars: &[char], mut i: usize, name: &str) -> Result<(String, usize), String> {
+    i = skip_attr_ws(chars, i);
+    if i >= chars.len() || chars[i] != '=' {
+        return Err(format!("属性 {} 缺 =", name));
+    }
+    i += 1;
+    i = skip_attr_ws(chars, i);
+    if i >= chars.len() || (chars[i] != '"' && chars[i] != '\'') {
+        return Err(format!("属性 {} 的值未加引号", name));
+    }
+    let q = chars[i];
+    i += 1;
+    let vstart = i;
+    while i < chars.len() && chars[i] != q {
+        i += 1;
+    }
+    if i >= chars.len() {
+        return Err(format!("属性 {} 的值未闭合", name));
+    }
+    // 实体解码（审计 Z1）：与真源 ElementTree 同语义，不能再把 a&amp;b 原样当值。
+    let raw_value: String = chars[vstart..i].iter().collect();
+    let value = decode_entities(&raw_value)?;
+    Ok((value, i + 1))
 }

@@ -10,56 +10,77 @@ pub(crate) fn parse_inline(s: &str) -> Result<Json, String> {
         return Ok(Json::Array(Vec::new()));
     }
     if t.starts_with('{') {
-        // 流式映射 `{k: v, k: v}`（真源 `protocol.yaml` 的 `mount_layers` 就是这种）。
-        // ⚠️ 早先这里对非空流式映射 fail-closed——结果 **111 份 protocol.yaml 全部解析失败**。
-        // 教训同变量那条：fail-closed 的粒度要准，拒得越宽，被整件连坐的越多。
-        if !t.ends_with('}') {
-            return Err(format!("越出子集：花括号不闭合：{}", t));
-        }
-        let inner = &t[1..t.len() - 1];
-        if inner.trim().is_empty() {
-            return Ok(Json::Object(Vec::new()));
-        }
-        let mut pairs: Vec<(String, Json)> = Vec::new();
-        for part in split_inline_items(inner) {
-            let part = part.trim();
-            if part.is_empty() {
-                continue;
-            }
-            let Some((k, v)) = split_inline_pair(part) else {
-                return Err(format!("越出子集：流式映射项不是键值对：{}", part));
-            };
-            let key = plain_or_quoted(k.trim())?;
-            let value = if v.trim().is_empty() {
-                Json::Null
-            } else {
-                parse_inline(v.trim())?
-            };
-            match pairs.iter_mut().find(|(n, _)| *n == key) {
-                Some(slot) => slot.1 = value,
-                None => pairs.push((key, value)),
-            }
-        }
-        return Ok(Json::Object(pairs));
+        return parse_flow_map(t);
     }
     if t.starts_with('[') {
-        if !t.ends_with(']') {
-            return Err(format!("越出子集：方括号不闭合：{}", t));
-        }
-        let inner = &t[1..t.len() - 1];
-        if inner.trim().is_empty() {
-            return Ok(Json::Array(Vec::new()));
-        }
-        let mut items = Vec::new();
-        for part in split_inline_items(inner) {
-            items.push(parse_inline(part.trim())?);
-        }
-        return Ok(Json::Array(items));
+        return parse_flow_seq(t);
     }
     if t.starts_with('"') || t.starts_with('\'') {
         return Ok(Json::Str(unquote(t)?));
     }
     plain_scalar(t)
+}
+
+/// 流式映射 `{k: v, k: v}`。
+fn parse_flow_map(t: &str) -> Result<Json, String> {
+    // 流式映射 {k: v, k: v}（真源 protocol.yaml 的 mount_layers 就是这种）。
+    // ⚠️ 早先这里对非空流式映射 fail-closed——结果 **111 份 protocol.yaml 全部解析失败**。
+    // 教训同变量那条：fail-closed 的粒度要准，拒得越宽，被整件连坐的越多。
+    if !t.ends_with('}') {
+        return Err(format!("越出子集：花括号不闭合：{}", t));
+    }
+    let inner = &t[1..t.len() - 1];
+    parse_flow_map_inner(inner)
+}
+
+/// 流式映射内层：空表 / 逐项键值对。
+fn parse_flow_map_inner(inner: &str) -> Result<Json, String> {
+    if inner.trim().is_empty() {
+        return Ok(Json::Object(Vec::new()));
+    }
+    let mut pairs: Vec<(String, Json)> = Vec::new();
+    for part in split_inline_items(inner) {
+        let part = part.trim();
+        if part.is_empty() {
+            continue;
+        }
+        parse_flow_pair(part, &mut pairs)?;
+    }
+    Ok(Json::Object(pairs))
+}
+
+/// 流式映射单项：键值解析 + 同键覆盖（真源 dict 语义）。
+fn parse_flow_pair(part: &str, pairs: &mut Vec<(String, Json)>) -> Result<(), String> {
+    let Some((k, v)) = split_inline_pair(part) else {
+        return Err(format!("越出子集：流式映射项不是键值对：{}", part));
+    };
+    let key = plain_or_quoted(k.trim())?;
+    let value = if v.trim().is_empty() {
+        Json::Null
+    } else {
+        parse_inline(v.trim())?
+    };
+    match pairs.iter_mut().find(|(n, _)| *n == key) {
+        Some(slot) => slot.1 = value,
+        None => pairs.push((key, value)),
+    }
+    Ok(())
+}
+
+/// 流式列表 `[a, b, [c]]`。
+fn parse_flow_seq(t: &str) -> Result<Json, String> {
+    if !t.ends_with(']') {
+        return Err(format!("越出子集：方括号不闭合：{}", t));
+    }
+    let inner = &t[1..t.len() - 1];
+    if inner.trim().is_empty() {
+        return Ok(Json::Array(Vec::new()));
+    }
+    let mut items = Vec::new();
+    for part in split_inline_items(inner) {
+        items.push(parse_inline(part.trim())?);
+    }
+    Ok(Json::Array(items))
 }
 
 /// 行内列表切分：只在**引号外**的逗号处切。
@@ -71,41 +92,61 @@ pub(crate) fn split_inline_items(inner: &str) -> Vec<String> {
     let chars: Vec<char> = inner.chars().collect();
     let mut k = 0;
     while k < chars.len() {
-        let c = chars[k];
-        match quote {
-            Some(q) => {
-                cur.push(c);
-                if c == '\\' && q == '"' && k + 1 < chars.len() {
-                    cur.push(chars[k + 1]);
-                    k += 2;
-                    continue;
-                }
-                if c == q {
-                    quote = None;
-                }
-            }
-            None => {
-                if c == '"' || c == '\'' {
-                    quote = Some(c);
-                    cur.push(c);
-                } else if c == '[' || c == '{' {
-                    depth += 1;
-                    cur.push(c);
-                } else if c == ']' || c == '}' {
-                    depth -= 1;
-                    cur.push(c);
-                } else if c == ',' && depth == 0 {
-                    out.push(cur.clone());
-                    cur.clear();
-                } else {
-                    cur.push(c);
-                }
-            }
+        if quote.is_some() {
+            k = split_quoted_step(&chars, k, &mut quote, &mut cur);
+        } else {
+            k = split_plain_step(&chars, k, &mut quote, &mut depth, &mut cur, &mut out);
         }
-        k += 1;
     }
     out.push(cur);
     out
+}
+
+/// 引号内一步：原样拷贝；反斜杠转义 / 闭合引号各占一步。
+fn split_quoted_step(
+    chars: &[char],
+    k: usize,
+    quote: &mut Option<char>,
+    cur: &mut String,
+) -> usize {
+    let c = chars[k];
+    cur.push(c);
+    if c == '\\' && *quote == Some('"') && k + 1 < chars.len() {
+        cur.push(chars[k + 1]);
+        return k + 2;
+    }
+    if Some(c) == *quote {
+        *quote = None;
+    }
+    k + 1
+}
+
+/// 引号外一步：括号深度 / 顶层逗号切分 / 原样拷贝。
+fn split_plain_step(
+    chars: &[char],
+    k: usize,
+    quote: &mut Option<char>,
+    depth: &mut i32,
+    cur: &mut String,
+    out: &mut Vec<String>,
+) -> usize {
+    let c = chars[k];
+    if c == '"' || c == '\'' {
+        *quote = Some(c);
+        cur.push(c);
+    } else if c == '[' || c == '{' {
+        *depth += 1;
+        cur.push(c);
+    } else if c == ']' || c == '}' {
+        *depth -= 1;
+        cur.push(c);
+    } else if c == ',' && *depth == 0 {
+        out.push(cur.clone());
+        cur.clear();
+    } else {
+        cur.push(c);
+    }
+    k + 1
 }
 
 /// 剥引号。**首字符必须是引号**——否则 fail-closed。
@@ -201,44 +242,61 @@ pub(crate) fn resolve_bool(t: &str) -> Option<bool> {
 }
 
 pub(crate) fn resolve_int(t: &str) -> Option<i64> {
-    let (sign, body) = match t.strip_prefix('-') {
-        Some(r) => (-1i64, r),
-        None => match t.strip_prefix('+') {
-            Some(r) => (1i64, r),
-            None => (1i64, t),
-        },
-    };
+    let (sign, body) = int_sign_body(t);
     if body.is_empty() {
         return None;
     }
     let clean = body.replace('_', "");
-    let radix_prefixed = |p: &str, radix: u32| -> Option<i64> {
-        clean.strip_prefix(p).and_then(|h| {
-            if h.is_empty() {
-                None
-            } else {
-                i64::from_str_radix(h, radix).ok().map(|v| v * sign)
-            }
-        })
-    };
-    if clean.starts_with("0x") || clean.starts_with("0X") {
-        return radix_prefixed(&clean[..2], 16);
-    }
-    if clean.starts_with("0o") || clean.starts_with("0O") {
-        return radix_prefixed(&clean[..2], 8);
-    }
-    if clean.starts_with("0b") || clean.starts_with("0B") {
-        return radix_prefixed(&clean[..2], 2);
+    if let Some(v) = radix_int(&clean, sign) {
+        return Some(v);
     }
     // YAML 1.1：前导 0 且全为 0-7 ⇒ 八进制
-    if clean.len() > 1 && clean.starts_with('0') && clean.chars().all(|c| ('0'..='7').contains(&c))
-    {
+    if is_legacy_octal(&clean) {
         return i64::from_str_radix(&clean, 8).ok().map(|v| v * sign);
     }
     if !clean.is_empty() && clean.chars().all(|c| c.is_ascii_digit()) {
         return clean.parse::<i64>().ok().map(|v| v * sign);
     }
     None
+}
+
+/// 符号与裸体：前导 - / + 各剥一个。
+fn int_sign_body(t: &str) -> (i64, &str) {
+    match t.strip_prefix('-') {
+        Some(r) => (-1i64, r),
+        None => match t.strip_prefix('+') {
+            Some(r) => (1i64, r),
+            None => (1i64, t),
+        },
+    }
+}
+
+/// 0x / 0o / 0b 前缀整数。
+fn radix_int(clean: &str, sign: i64) -> Option<i64> {
+    if clean.starts_with("0x") || clean.starts_with("0X") {
+        return radix_prefixed(clean, 16, sign);
+    }
+    if clean.starts_with("0o") || clean.starts_with("0O") {
+        return radix_prefixed(clean, 8, sign);
+    }
+    if clean.starts_with("0b") || clean.starts_with("0B") {
+        return radix_prefixed(clean, 2, sign);
+    }
+    None
+}
+
+/// 剥两位前缀后按 radix 解析；空体返回 None。
+fn radix_prefixed(clean: &str, radix: u32, sign: i64) -> Option<i64> {
+    let h = &clean[2..];
+    if h.is_empty() {
+        return None;
+    }
+    i64::from_str_radix(h, radix).ok().map(|v| v * sign)
+}
+
+/// YAML 1.1 旧式八进制：前导 0 且全为 0-7。
+fn is_legacy_octal(clean: &str) -> bool {
+    clean.len() > 1 && clean.starts_with('0') && clean.chars().all(|c| ('0'..='7').contains(&c))
 }
 
 pub(crate) fn resolve_float(t: &str) -> Option<f64> {

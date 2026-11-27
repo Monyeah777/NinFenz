@@ -65,6 +65,38 @@ struct DocCheck {
     subjects: i64,
 }
 
+/// 必填字段表：声明缺省时落 DEFAULT_FIELDS。
+fn required_fields(d: Option<&Json>) -> Vec<String> {
+    let f: Vec<String> = arr_items(d.and_then(|x| get(x, "required_fields")))
+        .iter()
+        .map(|v| plain_str(v))
+        .collect();
+    if f.is_empty() {
+        DEFAULT_FIELDS.iter().map(|s| (*s).to_string()).collect()
+    } else {
+        f
+    }
+}
+
+/// verdict 词表：声明缺省时落 DEFAULT_VERDICTS。
+fn verdict_vocabulary(d: Option<&Json>) -> Vec<String> {
+    let v: Vec<String> = arr_items(d.and_then(|x| get(x, "verdict_vocabulary")))
+        .iter()
+        .map(|x| plain_str(x))
+        .collect();
+    if v.is_empty() {
+        DEFAULT_VERDICTS.iter().map(|s| (*s).to_string()).collect()
+    } else {
+        v
+    }
+}
+
+/// 签收双要素：出现 accepted_by 就必须有合法 accepted_at。
+fn accepted_without_at(fm: &Json) -> bool {
+    py_truthy(get(fm, "accepted_by").unwrap_or(&Json::Null))
+        && !is_date(&py_str(get(fm, "accepted_at")))
+}
+
 /// 真源 `check_doc`。
 fn check_doc(root: &Path, rel: &str) -> (Vec<String>, DocCheck) {
     let p = root.join(rel);
@@ -90,33 +122,13 @@ fn check_doc(root: &Path, rel: &str) -> (Vec<String>, DocCheck) {
         );
     }
     let mut issues: Vec<String> = Vec::new();
-    let fields: Vec<String> = {
-        let f: Vec<String> = arr_items(d.as_ref().and_then(|x| get(x, "required_fields")))
-            .iter()
-            .map(|v| plain_str(v))
-            .collect();
-        if f.is_empty() {
-            DEFAULT_FIELDS.iter().map(|s| (*s).to_string()).collect()
-        } else {
-            f
-        }
-    };
+    let fields = required_fields(d.as_ref());
     for k in fields {
         if !py_truthy(get(&fm, &k).unwrap_or(&Json::Null)) {
             issues.push(format!("缺必填字段：{}", k));
         }
     }
-    let vocab: Vec<String> = {
-        let v: Vec<String> = arr_items(d.as_ref().and_then(|x| get(x, "verdict_vocabulary")))
-            .iter()
-            .map(|x| plain_str(x))
-            .collect();
-        if v.is_empty() {
-            DEFAULT_VERDICTS.iter().map(|s| (*s).to_string()).collect()
-        } else {
-            v
-        }
-    };
+    let vocab = verdict_vocabulary(d.as_ref());
     if !vocab.contains(&py_str(get(&fm, "verdict"))) {
         issues.push(format!(
             "verdict 越词表：{}",
@@ -131,9 +143,7 @@ fn check_doc(root: &Path, rel: &str) -> (Vec<String>, DocCheck) {
     }
 
     let ok_subs = check_subjects(root, &fm, &mut issues);
-    if py_truthy(get(&fm, "accepted_by").unwrap_or(&Json::Null))
-        && !is_date(&py_str(get(&fm, "accepted_at")))
-    {
+    if accepted_without_at(&fm) {
         issues.push("有 accepted_by 但 accepted_at 缺失或格式非法（签收须双要素）".to_string());
     }
     (

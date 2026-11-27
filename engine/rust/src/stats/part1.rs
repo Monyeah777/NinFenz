@@ -209,35 +209,44 @@ pub(crate) fn parse_version(text: &str) -> String {
             continue;
         };
         let mut it = rest.chars().peekable();
-        while it.peek().map(|c| c.is_whitespace()).unwrap_or(false) {
-            it.next();
-        }
+        skip_ws(&mut it);
         if it.next() != Some(':') {
             continue;
         }
-        while it.peek().map(|c| c.is_whitespace()).unwrap_or(false) {
-            it.next();
-        }
+        skip_ws(&mut it);
         if it.next() != Some('v') {
             continue;
         }
-        let mut v = String::new();
-        while let Some(&c) = it.peek() {
-            if c.is_ascii_digit() {
-                v.push(c);
-                it.next();
-            } else if c == '.' && !v.is_empty() {
-                v.push(c);
-                it.next();
-            } else {
-                break;
-            }
-        }
+        let v = version_digits(&mut it);
         if !v.is_empty() {
             return v;
         }
     }
     String::new()
+}
+
+/// 跳过一个字符迭代器当前位置起的所有空白。
+fn skip_ws(it: &mut std::iter::Peekable<std::str::Chars<'_>>) {
+    while it.peek().map(|c| c.is_whitespace()).unwrap_or(false) {
+        it.next();
+    }
+}
+
+/// 版本号正文：数字段 + 点号（点号不得打头）。
+fn version_digits(it: &mut std::iter::Peekable<std::str::Chars<'_>>) -> String {
+    let mut v = String::new();
+    while let Some(&c) = it.peek() {
+        if c.is_ascii_digit() {
+            v.push(c);
+            it.next();
+        } else if c == '.' && !v.is_empty() {
+            v.push(c);
+            it.next();
+        } else {
+            break;
+        }
+    }
+    v
 }
 
 /// 读 Python 模块级整数常量（真源 `getattr(qb, "EXPECTED_*", …)`）。

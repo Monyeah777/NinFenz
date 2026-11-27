@@ -33,11 +33,7 @@ pub fn repr(x: f64) -> String {
         };
     }
     if x == 0.0 {
-        return if x.is_sign_negative() {
-            "-0.0".to_string()
-        } else {
-            "0.0".to_string()
-        };
+        return zero_form(x);
     }
 
     let neg = x.is_sign_negative();
@@ -45,33 +41,12 @@ pub fn repr(x: f64) -> String {
     let decpt: i32 = e + 1;
 
     let body = if decpt <= -4 || decpt > 16 {
-        // 指数形
-        let mut m = String::new();
-        m.push_str(&digits[..1]);
-        if digits.len() > 1 {
-            m.push('.');
-            m.push_str(&digits[1..]);
-        }
-        let (sign, mag) = if e < 0 { ('-', -e) } else { ('+', e) };
-        format!("{}e{}{:02}", m, sign, mag)
+        exponent_form(&digits, e)
     } else if decpt <= 0 {
-        // 0.000ddd
-        let mut out = String::from("0.");
-        for _ in 0..(-decpt) {
-            out.push('0');
-        }
-        out.push_str(&digits);
-        out
+        zero_pad_form(&digits, decpt)
     } else if decpt as usize >= digits.len() {
-        // ddd000.0
-        let mut out = digits.clone();
-        for _ in 0..(decpt as usize - digits.len()) {
-            out.push('0');
-        }
-        out.push_str(".0");
-        out
+        trailing_zero_form(&digits, decpt)
     } else {
-        // dd.ddd
         let (i, f) = digits.split_at(decpt as usize);
         format!("{}.{}", i, f)
     };
@@ -81,6 +56,47 @@ pub fn repr(x: f64) -> String {
     } else {
         body
     }
+}
+
+/// 零值形态（区分 -0.0）。
+fn zero_form(x: f64) -> String {
+    if x.is_sign_negative() {
+        "-0.0".to_string()
+    } else {
+        "0.0".to_string()
+    }
+}
+
+/// 指数形：`d.ddde±xx`。
+fn exponent_form(digits: &str, e: i32) -> String {
+    let mut m = String::new();
+    m.push_str(&digits[..1]);
+    if digits.len() > 1 {
+        m.push('.');
+        m.push_str(&digits[1..]);
+    }
+    let (sign, mag) = if e < 0 { ('-', -e) } else { ('+', e) };
+    format!("{}e{}{:02}", m, sign, mag)
+}
+
+/// 前导零形：`0.000ddd`。
+fn zero_pad_form(digits: &str, decpt: i32) -> String {
+    let mut out = String::from("0.");
+    for _ in 0..(-decpt) {
+        out.push('0');
+    }
+    out.push_str(digits);
+    out
+}
+
+/// 尾零形：`ddd000.0`。
+fn trailing_zero_form(digits: &str, decpt: i32) -> String {
+    let mut out = digits.to_string();
+    for _ in 0..(decpt as usize - digits.len()) {
+        out.push('0');
+    }
+    out.push_str(".0");
+    out
 }
 
 /// 最短往返十进制 → `(数字串, 指数E)`，值 = `d.ddd × 10^E`。

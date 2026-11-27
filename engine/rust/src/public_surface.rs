@@ -34,12 +34,7 @@ pub fn scan(root: &Path) -> (Vec<String>, String) {
             if !seen.insert(rel.clone()) {
                 continue;
             }
-            if !rel.ends_with(".md")
-                && !rel.ends_with(".json")
-                && !rel.ends_with(".yaml")
-                && !rel.ends_with(".yml")
-                && !rel.ends_with(".txt")
-            {
+            if !export_file_ok(&rel) {
                 continue;
             }
             // 尽力而为：跳过不可读/非 UTF-8 项（该类缺口由对应门禁另行报出，见真源 AUD-0016）
@@ -58,6 +53,15 @@ pub fn scan(root: &Path) -> (Vec<String>, String) {
         bad.iter().take(2).cloned().collect::<Vec<_>>().join("; ")
     };
     (bad, detail)
+}
+
+/// 导出面只看文本类件（md / json / yaml / yml / txt）。
+fn export_file_ok(rel: &str) -> bool {
+    rel.ends_with(".md")
+        || rel.ends_with(".json")
+        || rel.ends_with(".yaml")
+        || rel.ends_with(".yml")
+        || rel.ends_with(".txt")
 }
 
 /// 供契约表复用的 `(ok, detail)`。

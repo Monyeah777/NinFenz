@@ -183,6 +183,13 @@ pub(crate) fn step_stmt(
     out: &mut Vec<(String, u32, String)>,
 ) {
     match st {
+        past::Stmt::If(i) => step_if(i, st, cur, rel, ls, out),
+        past::Stmt::For(f) => step_loop_block(&f.body, st, cur, rel, ls, out),
+        past::Stmt::AsyncFor(f) => step_loop_block(&f.body, st, cur, rel, ls, out),
+        past::Stmt::While(w) => step_loop_block(&w.body, st, cur, rel, ls, out),
+        past::Stmt::With(w) => step_loop_block(&w.body, st, cur, rel, ls, out),
+        past::Stmt::AsyncWith(w) => step_loop_block(&w.body, st, cur, rel, ls, out),
+        past::Stmt::Try(t) => step_try(t, st, cur, rel, ls, out),
         past::Stmt::Assign(_) | past::Stmt::AnnAssign(_) | past::Stmt::AugAssign(_) => {
             for name in assigned_names(st) {
                 if assigns_none(st, &name) {
@@ -199,77 +206,80 @@ pub(crate) fn step_stmt(
                 }
             }
         }
-        past::Stmt::If(i) => {
-            let g = guard(st);
-            match &g {
-                Some((n, "is-not-none")) => {
-                    let mut sub = cur.clone();
-                    sub.remove(n);
-                    scan_block(&i.body, &sub, rel, ls, out);
-                    scan_block(&i.orelse, &cur, rel, ls, out);
-                }
-                Some((n, "is-none")) => {
-                    scan_block(&i.body, &cur, rel, ls, out);
-                    let mut sub = cur.clone();
-                    sub.remove(n);
-                    scan_block(&i.orelse, &sub, rel, ls, out);
-                }
-                _ => {
-                    scan_block(&i.body, &cur, rel, ls, out);
-                    scan_block(&i.orelse, &cur, rel, ls, out);
-                }
-            }
-            if let Some((n, "is-none")) = &g {
-                if always_exits(&i.body) {
-                    cur.remove(n);
-                }
-            }
-            for name in assigned_names(st) {
-                cur.remove(&name);
-            }
-        }
-        past::Stmt::For(f) => {
-            scan_block(&f.body, &cur, rel, ls, out);
-            for name in assigned_names(st) {
-                cur.remove(&name);
-            }
-        }
-        past::Stmt::AsyncFor(f) => {
-            scan_block(&f.body, &cur, rel, ls, out);
-            for name in assigned_names(st) {
-                cur.remove(&name);
-            }
-        }
-        past::Stmt::While(w) => {
-            scan_block(&w.body, &cur, rel, ls, out);
-            for name in assigned_names(st) {
-                cur.remove(&name);
-            }
-        }
-        past::Stmt::With(w) => {
-            scan_block(&w.body, &cur, rel, ls, out);
-            for name in assigned_names(st) {
-                cur.remove(&name);
-            }
-        }
-        past::Stmt::AsyncWith(w) => {
-            scan_block(&w.body, &cur, rel, ls, out);
-            for name in assigned_names(st) {
-                cur.remove(&name);
-            }
-        }
-        past::Stmt::Try(t) => {
-            scan_block(&t.body, &cur, rel, ls, out);
-            for h in &t.handlers {
-                let past::ExceptHandler::ExceptHandler(h) = h;
-                scan_block(&h.body, &cur, rel, ls, out);
-            }
-            scan_block(&t.orelse, &cur, rel, ls, out);
-            scan_block(&t.finalbody, &cur, rel, ls, out);
-            for name in assigned_names(st) {
-                cur.remove(&name);
-            }
-        }
         _ => {}
+    }
+}
+
+/// If 语句：按 guard 分支决定子块可能为 None 的变量集。
+fn step_if(
+    i: &past::StmtIf,
+    st: &past::Stmt,
+    cur: &mut BTreeSet<String>,
+    rel: &str,
+    ls: &crate::pyast::LineStarts,
+    out: &mut Vec<(String, u32, String)>,
+) {
+    let g = guard(st);
+    match &g {
+        Some((n, "is-not-none")) => {
+            let mut sub = cur.clone();
+            sub.remove(n);
+            scan_block(&i.body, &sub, rel, ls, out);
+            scan_block(&i.orelse, &cur, rel, ls, out);
+        }
+        Some((n, "is-none")) => {
+            scan_block(&i.body, &cur, rel, ls, out);
+            let mut sub = cur.clone();
+            sub.remove(n);
+            scan_block(&i.orelse, &sub, rel, ls, out);
+        }
+        _ => {
+            scan_block(&i.body, &cur, rel, ls, out);
+            scan_block(&i.orelse, &cur, rel, ls, out);
+        }
+    }
+    if let Some((n, "is-none")) = &g {
+        if always_exits(&i.body) {
+            cur.remove(n);
+        }
+    }
+    for name in assigned_names(st) {
+        cur.remove(&name);
+    }
+}
+
+/// 循环 / with 语句：只扫 body，随后清掉绑定名。
+fn step_loop_block(
+    body: &[past::Stmt],
+    st: &past::Stmt,
+    cur: &mut BTreeSet<String>,
+    rel: &str,
+    ls: &crate::pyast::LineStarts,
+    out: &mut Vec<(String, u32, String)>,
+) {
+    scan_block(body, &*cur, rel, ls, out);
+    for name in assigned_names(st) {
+        cur.remove(&name);
+    }
+}
+
+/// Try 语句：扫 body / handlers / orelse / finalbody，随后清掉绑定名。
+fn step_try(
+    t: &past::StmtTry,
+    st: &past::Stmt,
+    cur: &mut BTreeSet<String>,
+    rel: &str,
+    ls: &crate::pyast::LineStarts,
+    out: &mut Vec<(String, u32, String)>,
+) {
+    scan_block(&t.body, &*cur, rel, ls, out);
+    for h in &t.handlers {
+        let past::ExceptHandler::ExceptHandler(h) = h;
+        scan_block(&h.body, &*cur, rel, ls, out);
+    }
+    scan_block(&t.orelse, &*cur, rel, ls, out);
+    scan_block(&t.finalbody, &*cur, rel, ls, out);
+    for name in assigned_names(st) {
+        cur.remove(&name);
     }
 }

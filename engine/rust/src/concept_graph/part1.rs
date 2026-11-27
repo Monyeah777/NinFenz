@@ -223,15 +223,13 @@ pub(crate) fn provenance_strength(graph: &Json) -> String {
     }
 }
 
-/// 真源 `toposort`（Kahn；并列按 id 升序）。有环 → `Err`。
-pub(crate) fn toposort(graph: &Json) -> Result<Vec<String>, String> {
-    let prereqs = prereqs_of(graph);
-    let mut ids: Vec<String> = prereqs.iter().map(|(k, _)| k.clone()).collect();
-    ids.sort();
-    let mut indeg: Vec<(String, i64)> = ids.iter().map(|i| (i.clone(), 0)).collect();
-    let mut children: Vec<(String, Vec<String>)> =
-        ids.iter().map(|i| (i.clone(), Vec::new())).collect();
-    for (i, ps) in &prereqs {
+/// 建入度表与子边表（悬空前置不计入，与真源一致）。
+fn topology_tables(
+    prereqs: &[(String, Vec<String>)],
+    indeg: &mut [(String, i64)],
+    children: &mut [(String, Vec<String>)],
+) {
+    for (i, ps) in prereqs {
         for p in ps {
             if indeg.iter().any(|(k, _)| k == p) {
                 if let Some(e) = indeg.iter_mut().find(|(k, _)| k == i) {
@@ -244,6 +242,40 @@ pub(crate) fn toposort(graph: &Json) -> Result<Vec<String>, String> {
             }
         }
     }
+}
+
+/// 子边入度减一，降为 0 的子节点入就绪表。
+fn release_children(
+    cur: &str,
+    children: &[(String, Vec<String>)],
+    indeg: &mut [(String, i64)],
+    ready: &mut Vec<String>,
+) {
+    let mut nxts: Vec<String> = children
+        .iter()
+        .find(|(k, _)| *k == cur)
+        .map(|(_, v)| v.clone())
+        .unwrap_or_default();
+    nxts.sort();
+    for nxt in nxts {
+        if let Some(e) = indeg.iter_mut().find(|(k, _)| *k == nxt) {
+            e.1 -= 1;
+            if e.1 == 0 {
+                ready.push(nxt);
+            }
+        }
+    }
+}
+
+/// 真源 `toposort`（Kahn；并列按 id 升序）。有环 → `Err`。
+pub(crate) fn toposort(graph: &Json) -> Result<Vec<String>, String> {
+    let prereqs = prereqs_of(graph);
+    let mut ids: Vec<String> = prereqs.iter().map(|(k, _)| k.clone()).collect();
+    ids.sort();
+    let mut indeg: Vec<(String, i64)> = ids.iter().map(|i| (i.clone(), 0)).collect();
+    let mut children: Vec<(String, Vec<String>)> =
+        ids.iter().map(|i| (i.clone(), Vec::new())).collect();
+    topology_tables(&prereqs, &mut indeg, &mut children);
     let mut ready: Vec<String> = indeg
         .iter()
         .filter(|(_, d)| *d == 0)
@@ -254,20 +286,7 @@ pub(crate) fn toposort(graph: &Json) -> Result<Vec<String>, String> {
     while !ready.is_empty() {
         let cur = ready.remove(0);
         out.push(cur.clone());
-        let mut nxts: Vec<String> = children
-            .iter()
-            .find(|(k, _)| *k == cur)
-            .map(|(_, v)| v.clone())
-            .unwrap_or_default();
-        nxts.sort();
-        for nxt in nxts {
-            if let Some(e) = indeg.iter_mut().find(|(k, _)| *k == nxt) {
-                e.1 -= 1;
-                if e.1 == 0 {
-                    ready.push(nxt);
-                }
-            }
-        }
+        release_children(&cur, &children, &mut indeg, &mut ready);
         ready.sort();
     }
     if out.len() != ids.len() {

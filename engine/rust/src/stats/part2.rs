@@ -8,12 +8,7 @@ pub(crate) fn compute(root: &Path) -> (Stats, Vec<String>) {
     let mut s = Stats::default();
 
     let reg = jsonread::read_file(root, "desktop/src/core/registry.json");
-    match &reg {
-        Some(v) if matches!(v, Json::Object(_)) => {}
-        _ => {
-            issues.push("取不到 registry.json（官方核心模块/登记包口径缺失）".into());
-        }
-    }
+    issues.extend(registry_face_issues(&reg));
     let reg = match reg {
         Some(v) if matches!(v, Json::Object(_)) => v,
         _ => Json::Object(Vec::new()),
@@ -67,13 +62,35 @@ pub(crate) fn compute(root: &Path) -> (Stats, Vec<String>) {
     };
     s.verify_checks = count_checks(&vtext);
     s.verify_version = parse_version(&vtext);
+    issues.extend(verify_face_issues(&s));
+    issues.extend(baseline_face_issues(root, &mut s));
+
+    (s, issues)
+}
+
+/// registry.json 缺件/非对象：一条 issue。
+fn registry_face_issues(reg: &Option<Json>) -> Vec<String> {
+    match reg {
+        Some(v) if matches!(v, Json::Object(_)) => Vec::new(),
+        _ => vec!["取不到 registry.json（官方核心模块/登记包口径缺失）".into()],
+    }
+}
+
+/// verify.sh 面：版本行 / check 数。
+fn verify_face_issues(s: &Stats) -> Vec<String> {
+    let mut issues: Vec<String> = Vec::new();
     if s.verify_version.is_empty() {
         issues.push("verify.sh 头部缺「# 版本 : vX」版本行".into());
     }
     if s.verify_checks < 1 {
         issues.push("verify.sh 未扫到任何 checkN() 定义".into());
     }
+    issues
+}
 
+/// quality_baseline 面：取常量并核对 check 数一致。
+fn baseline_face_issues(root: &Path, s: &mut Stats) -> Vec<String> {
+    let mut issues: Vec<String> = Vec::new();
     match std::fs::read_to_string(root.join("desktop/src/core/quality_baseline.py")) {
         Ok(qb) => {
             s.baseline_checks = py_int_const(&qb, "EXPECTED_CHECKS").unwrap_or(s.verify_checks);
@@ -94,8 +111,7 @@ pub(crate) fn compute(root: &Path) -> (Stats, Vec<String>) {
             s.baseline_checks, s.verify_checks
         ));
     }
-
-    (s, issues)
+    issues
 }
 
 /// 标准目录 coverage 的齐全性检查与计数（缺键即报）。

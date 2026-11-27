@@ -15,6 +15,7 @@ use crate::pyjson::Json;
 use crate::pyval::py_str;
 use std::path::Path;
 
+
 pub const INDEX_REL: &str = "library/INDEX.md";
 pub const UNDECLARED: &str = "未声明";
 pub const ALLOWED: [&str; 10] = [
@@ -54,12 +55,8 @@ pub fn expression_issue(expr: &str) -> String {
         .find_iter(&text)
         .map(|m| m.as_str().to_string())
         .collect();
-    if tokens.join("") != ws_re().replace_all(&text, "") {
-        return "含非法字符（修复指引：SPDX id / AND / OR / WITH / 括号 / `+` 之外不得出现）"
-            .to_string();
-    }
-    if text.matches('(').count() != text.matches(')').count() {
-        return "括号不配平".to_string();
+    if let Some(msg) = license_syntax_issue(&text, &tokens) {
+        return msg;
     }
     let atoms: Vec<String> = tokens
         .iter()
@@ -69,46 +66,25 @@ pub fn expression_issue(expr: &str) -> String {
     if atoms.is_empty() {
         return "表达式无许可 id".to_string();
     }
-    for a in &atoms {
-        if OPERATORS.contains(&a.as_str()) {
-            continue;
-        }
-        let base = a.strip_suffix('+').unwrap_or(a);
-        if ALLOWED.contains(&base) || base.starts_with("LicenseRef-") {
-            continue;
-        }
-        let mut allowed: Vec<&str> = ALLOWED
-            .iter()
-            .copied()
-            .filter(|x| *x != UNDECLARED)
-            .collect();
-        allowed.sort();
-        return format!(
-            "许可 id 不在词表：{}（允许：{}；或用 `LicenseRef-<自定义>` 显式自造）",
-            a,
-            allowed.join("、")
-        );
+    if let Some(msg) = first_atom_issue(&atoms) {
+        return msg;
     }
     for (i, tok) in tokens.iter().enumerate() {
-        if !OPERATORS.contains(&tok.as_str()) {
-            continue;
-        }
-        if i == 0 || i == tokens.len() - 1 {
-            return format!("运算符 {} 出现在表达式首/尾（缺操作数）", tok);
-        }
-        if OPERATORS.contains(&tokens[i - 1].as_str()) || tokens[i - 1] == "(" {
-            return format!("运算符 {} 前缺少操作数", tok);
-        }
-        if tokens[i + 1] == ")" {
-            return format!("运算符 {} 后缺少操作数", tok);
+        if let Some(msg) = license_operator_issue(&tokens, i, tok) {
+            return msg;
         }
     }
     String::new()
 }
 
-pub struct IndexRow {
-    pub id: String,
-    pub license: String,
+/// 首个不合法许可 id 的报错（全部合法 → None）。
+fn first_atom_issue(atoms: &[String]) -> Option<String> {
+    for a in atoms {
+        if let Some(msg) = license_atom_issue(a) {
+            return Some(msg);
+        }
+    }
+    None
 }
 
 /// 真源 `parse_index`。
@@ -374,4 +350,50 @@ mod tests {
             .unwrap()
         ));
     }
+}
+
+/// 词法面：字符全合法且括号配平。
+pub(crate) fn license_syntax_issue(text: &str, tokens: &[String]) -> Option<String> {
+    if tokens.join("") != ws_re().replace_all(text, "") {
+        return Some("含非法字符（修复指引：SPDX id / AND / OR / WITH / 括号 / `+` 之外不得出现）".to_string());
+    }
+    if text.matches('(').count() != text.matches(')').count() {
+        return Some("括号不配平".to_string());
+    }
+    None
+}
+
+/// 单个许可 id：运算符跳过；词表命中或 LicenseRef- 自造；否则给出允许表。
+pub(crate) fn license_atom_issue(a: &str) -> Option<String> {
+    if OPERATORS.contains(&a) {
+        return None;
+    }
+    let base = a.strip_suffix('+').unwrap_or(a);
+    if ALLOWED.contains(&base) || base.starts_with("LicenseRef-") {
+        return None;
+    }
+    let mut allowed: Vec<&str> = ALLOWED.iter().copied().filter(|x| *x != UNDECLARED).collect();
+    allowed.sort();
+    Some(format!("许可 id 不在词表：{}（允许：{}；或用 `LicenseRef-<自定义>` 显式自造）", a, allowed.join("、")))
+}
+
+pub(crate) fn license_operator_issue(tokens: &[String], i: usize, tok: &str) -> Option<String> {
+    if !OPERATORS.contains(&tok) {
+        return None;
+    }
+    if i == 0 || i == tokens.len() - 1 {
+        return Some(format!("运算符 {} 出现在表达式首/尾（缺操作数）", tok));
+    }
+    if OPERATORS.contains(&tokens[i - 1].as_str()) || tokens[i - 1] == "(" {
+        return Some(format!("运算符 {} 前缺少操作数", tok));
+    }
+    if tokens[i + 1] == ")" {
+        return Some(format!("运算符 {} 后缺少操作数", tok));
+    }
+    None
+}
+
+pub struct IndexRow {
+    pub id: String,
+    pub license: String,
 }

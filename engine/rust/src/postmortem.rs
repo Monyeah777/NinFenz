@@ -61,12 +61,27 @@ fn check_doc(
     let body = &e.body;
 
     issues.extend(subject_docs::check_frontmatter(d, e, &DEFAULT_FIELDS, &SECTIONS));
+    blame_token_issues(d, body, &mut issues);
+    root_cause_issues(d, body, &mut issues);
+    let acts = action_item_issues(body, &mut issues);
+    issues.extend(refs_ok(root, get(fm, "trigger"), checks));
+    issues.extend(refs_ok(root, get(fm, "refs"), checks));
+    closed_receipt_issues(fm, e, receipts, &mut issues);
+    (issues, acts)
+}
+
+/// 指责性归因词扫描（复盘对事不对人）。
+fn blame_token_issues(d: &Json, body: &str, issues: &mut Vec<String>) {
     for tok in arr_items(get(d, "blame_tokens")) {
         let t = plain_str(tok);
         if !t.is_empty() && body.contains(&t) {
             issues.push(format!("命中指责性归因词「{}」——复盘对事不对人", t));
         }
     }
+}
+
+/// 根因段须指向机制（命中 root_cause_tokens 之一）。
+fn root_cause_issues(d: &Json, body: &str, issues: &mut Vec<String>) {
     let root_sec = if body.contains("## 根因") {
         body.splitn(2, "## 根因")
             .nth(1)
@@ -89,6 +104,10 @@ fn check_doc(
             head.join("/")
         ));
     }
+}
+
+/// 行动项面：非空 + 每条带负责人与判据；返回条数。
+fn action_item_issues(body: &str, issues: &mut Vec<String>) -> usize {
     let acts = if body.contains("## 行动项") {
         mdblocks::bullet_blocks(body.splitn(2, "## 行动项").nth(1).unwrap_or(""))
     } else {
@@ -105,8 +124,16 @@ fn check_doc(
             issues.push(format!("行动项缺判据：{}", &a[..a.len().min(40)]));
         }
     }
-    issues.extend(refs_ok(root, get(fm, "trigger"), checks));
-    issues.extend(refs_ok(root, get(fm, "refs"), checks));
+    acts.len()
+}
+
+/// closed 复盘须被协议回执锚定。
+fn closed_receipt_issues(
+    fm: &Json,
+    e: &Entry,
+    receipts: &Option<BTreeSet<String>>,
+    issues: &mut Vec<String>,
+) {
     if plain_str_opt(get(fm, "status")) == "closed" {
         if let Some(ids) = receipts {
             if !ids.contains(&e.path) {
@@ -117,7 +144,6 @@ fn check_doc(
             }
         }
     }
-    (issues, acts.len())
 }
 
 /// 真源 `scan`。

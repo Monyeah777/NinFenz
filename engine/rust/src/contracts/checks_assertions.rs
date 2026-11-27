@@ -137,38 +137,43 @@ pub(super) fn assertions_scan(root: &Path) -> (Vec<String>, usize) {
     let items = arr_items(get(&doc, "assertions"));
     let mut seen: Vec<String> = Vec::new();
     for a in &items {
-        let aid = py_str(get(a, "id"));
-        for k in REQUIRED {
-            let v = get(a, k);
-            // 真源 `if not a.get(k) and a.get(k) != {}` —— 空对象不算缺
-            let falsy = !v.map(py_truthy).unwrap_or(false);
-            let empty_obj = matches!(v, Some(Json::Object(p)) if p.is_empty());
-            if falsy && !empty_obj {
-                let tag = if aid.is_empty() {
-                    "(无名)"
-                } else {
-                    aid.as_str()
-                };
-                issues.push(format!("断言 {} 缺必填字段：{}", tag, k));
-            }
-        }
-        if seen.contains(&aid) {
-            issues.push(format!("断言 id 重复：{}", aid));
-        }
-        seen.push(aid.clone());
-        let sev = plain_str_opt(get(a, "severity"));
-        if !SEVERITIES.contains(&sev.as_str()) {
-            issues.push(format!("断言 {} severity 越词表：{}", aid, sev));
-        }
-        let kind = plain_str_opt(get(a, "kind"));
-        if !KINDS.contains(&kind.as_str()) {
-            issues.push(format!("断言 {} kind 不在封闭集：{}", aid, kind));
-        }
-        if py_str(get(a, "fix")).trim().is_empty() {
-            issues.push(format!("断言 {} 缺 fix（无修复指引不许入表）", aid));
-        }
+        assertion_item_issues(a, &mut seen, &mut issues);
     }
     (issues, items.len())
+}
+
+/// 单条断言：必填字段 / id 唯一 / severity / kind / fix。
+fn assertion_item_issues(a: &Json, seen: &mut Vec<String>, issues: &mut Vec<String>) {
+    let aid = py_str(get(a, "id"));
+    for k in REQUIRED {
+        let v = get(a, k);
+        // 真源 if not a.get(k) and a.get(k) != {} —— 空对象不算缺
+        let falsy = !v.map(py_truthy).unwrap_or(false);
+        let empty_obj = matches!(v, Some(Json::Object(p)) if p.is_empty());
+        if falsy && !empty_obj {
+            let tag = if aid.is_empty() {
+                "(无名)"
+            } else {
+                aid.as_str()
+            };
+            issues.push(format!("断言 {} 缺必填字段：{}", tag, k));
+        }
+    }
+    if seen.contains(&aid) {
+        issues.push(format!("断言 id 重复：{}", aid));
+    }
+    seen.push(aid.clone());
+    let sev = plain_str_opt(get(a, "severity"));
+    if !SEVERITIES.contains(&sev.as_str()) {
+        issues.push(format!("断言 {} severity 越词表：{}", aid, sev));
+    }
+    let kind = plain_str_opt(get(a, "kind"));
+    if !KINDS.contains(&kind.as_str()) {
+        issues.push(format!("断言 {} kind 不在封闭集：{}", aid, kind));
+    }
+    if py_str(get(a, "fix")).trim().is_empty() {
+        issues.push(format!("断言 {} 缺 fix（无修复指引不许入表）", aid));
+    }
 }
 
 /// 真源 `assertions._glob`：结果形如 `str(Path(root)/p)`（含 root 前缀、平台分隔符）。

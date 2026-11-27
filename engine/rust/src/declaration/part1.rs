@@ -60,15 +60,32 @@ pub(crate) struct Decl {
 }
 
 pub(crate) fn parse(root: &Path) -> Decl {
+    let text = decl_text(root);
+    let versions = parse_versions(&text);
+    let scope = parse_scope(&text);
+    let excluded = parse_excluded(&text);
+
+    Decl {
+        versions,
+        scope,
+        excluded,
+    }
+}
+
+/// 声明件正文；缺件按空串（真源同口径）。
+fn decl_text(root: &Path) -> String {
     let p = root.join(DECL_REL);
-    let text = if p.is_file() {
+    if p.is_file() {
         std::fs::read_to_string(&p).unwrap_or_default()
     } else {
         String::new()
-    };
+    }
+}
 
+/// 声明段版本表：同键覆盖（真源是 dict）。
+fn parse_versions(text: &str) -> Vec<(String, String, String)> {
     let mut versions: Vec<(String, String, String)> = Vec::new();
-    for ln in section(&text, "声明") {
+    for ln in section(text, "声明") {
         let Some(c) = re_row().captures(ln.trim()) else {
             continue;
         };
@@ -86,16 +103,24 @@ pub(crate) fn parse(root: &Path) -> Decl {
             None => versions.push(rec),
         }
     }
+    versions
+}
 
+/// 范围段白名单。
+fn parse_scope(text: &str) -> Vec<String> {
     let mut scope: Vec<String> = Vec::new();
-    for ln in section(&text, "范围") {
+    for ln in section(text, "范围") {
         if let Some(c) = re_bullet().captures(&ln) {
             scope.push(c[1].trim().to_string());
         }
     }
+    scope
+}
 
+/// 排除段清单（表头 / 分隔行跳过）。
+fn parse_excluded(text: &str) -> Vec<(String, String)> {
     let mut excluded: Vec<(String, String)> = Vec::new();
-    for ln in section(&text, "排除") {
+    for ln in section(text, "排除") {
         let m = re_row2().captures(ln.trim());
         let cell = m
             .as_ref()
@@ -107,12 +132,7 @@ pub(crate) fn parse(root: &Path) -> Decl {
             }
         }
     }
-
-    Decl {
-        versions,
-        scope,
-        excluded,
-    }
+    excluded
 }
 
 /// 真源 `live_versions`：版本真源（声明必须与这里一致）。
@@ -209,7 +229,26 @@ pub(crate) fn scan(root: &Path) -> DeclScan {
             DECL_REL
         ));
     }
-    for (name, want) in &live {
+    decl_live_mismatch_issues(&decl, &live, &mut issues);
+    decl_unverifiable_issues(&decl, &live, &mut issues);
+    decl_scope_issues(root, &decl, &mut issues);
+    if decl.excluded.is_empty() {
+        issues.push("声明文件缺 `## 排除` 清单（显式排除是声明的核心价值）".to_string());
+    }
+    decl_excluded_issues(root, &decl, &mut issues);
+    decl_overlap_issues(&decl, &mut issues);
+
+    DeclScan {
+        issues,
+        versions: decl.versions.len(),
+        scope: decl.scope.len(),
+        excluded: decl.excluded.len(),
+    }
+}
+
+/// 声明值必须与真源一致（缺行报 "(缺)"）。
+fn decl_live_mismatch_issues(decl: &Decl, live: &[(String, String)], issues: &mut Vec<String>) {
+    for (name, want) in live {
         let got = decl
             .versions
             .iter()
@@ -220,15 +259,15 @@ pub(crate) fn scan(root: &Path) -> DeclScan {
             issues.push(format!(
                 "声明与真源不一致：{} 声明={} 真源={}（修复指引：改声明对齐真源）",
                 name,
-                if got.is_empty() {
-                    "(缺)"
-                } else {
-                    got.as_str()
-                },
+                if got.is_empty() { "(缺)" } else { got.as_str() },
                 want
             ));
         }
     }
+}
+
+/// 声明的规范项必须都有真源可核。
+fn decl_unverifiable_issues(decl: &Decl, live: &[(String, String)], issues: &mut Vec<String>) {
     for (name, _, _) in &decl.versions {
         if !live.iter().any(|(n, _)| n == name) {
             issues.push(format!(
@@ -237,6 +276,10 @@ pub(crate) fn scan(root: &Path) -> DeclScan {
             ));
         }
     }
+}
+
+/// 范围白名单：非空且路径存在。
+fn decl_scope_issues(root: &Path, decl: &Decl, issues: &mut Vec<String>) {
     if decl.scope.is_empty() {
         issues.push("声明文件缺 `## 范围` 白名单".to_string());
     }
@@ -248,9 +291,10 @@ pub(crate) fn scan(root: &Path) -> DeclScan {
             ));
         }
     }
-    if decl.excluded.is_empty() {
-        issues.push("声明文件缺 `## 排除` 清单（显式排除是声明的核心价值）".to_string());
-    }
+}
+
+/// 排除清单：glob 须有匹配 / 路径须存在（"允许不存在" 标记者跳过）。
+fn decl_excluded_issues(root: &Path, decl: &Decl, issues: &mut Vec<String>) {
     for (rel, reason) in &decl.excluded {
         if rel.is_empty() {
             continue;
@@ -267,6 +311,10 @@ pub(crate) fn scan(root: &Path) -> DeclScan {
             ));
         }
     }
+}
+
+/// scope 与排除清单不得重叠（前缀 / 包含两个方向）。
+fn decl_overlap_issues(decl: &Decl, issues: &mut Vec<String>) {
     let scope_set: Vec<String> = decl
         .scope
         .iter()
@@ -285,12 +333,5 @@ pub(crate) fn scan(root: &Path) -> DeclScan {
                 ));
             }
         }
-    }
-
-    DeclScan {
-        issues,
-        versions: decl.versions.len(),
-        scope: decl.scope.len(),
-        excluded: decl.excluded.len(),
     }
 }

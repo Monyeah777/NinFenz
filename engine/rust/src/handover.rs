@@ -39,6 +39,13 @@ fn check_doc(
     let body = &e.body;
 
     issues.extend(subject_docs::check_frontmatter(d, e, &DEFAULT_FIELDS, &SECTIONS));
+    let pending = handover_pending_issues(body, &mut issues);
+    handover_refs_issues(root, fm, checks, &mut issues);
+    (issues, pending)
+}
+
+/// 未决项面：非空 + 每条须带判据；返回未决项条数。
+fn handover_pending_issues(body: &str, issues: &mut Vec<String>) -> usize {
     let pending_text = if body.contains("## 未决项") {
         body.splitn(2, "## 未决项").nth(1).unwrap_or("").to_string()
     } else {
@@ -56,18 +63,23 @@ fn check_doc(
             ));
         }
     }
+    items.len()
+}
 
-    let refs_raw = get(fm, "refs");
-    let refs: Vec<String> = match refs_raw {
+/// refs 面：checkN / ADR-N / 真实件路径 三选一。
+fn handover_refs_issues(
+    root: &Path,
+    fm: &Json,
+    checks: &std::collections::BTreeSet<String>,
+    issues: &mut Vec<String>,
+) {
+    let refs: Vec<String> = match get(fm, "refs") {
         Some(Json::Str(s)) => vec![s.clone()],
         Some(Json::Array(a)) => a.iter().map(plain_str).collect(),
         _ => Vec::new(),
     };
     for r in refs {
-        let mut s = r.trim().to_string();
-        if s.starts_with('[') && s.ends_with(']') {
-            s = s.trim_matches(|c| c == '[' || c == ']').trim().to_string();
-        }
+        let s = clean_ref(&r);
         if let Some(n) = subject_docs::is_check(&s) {
             if !checks.contains(&n) {
                 issues.push(format!("refs 指向不存在的 check：{}", s));
@@ -81,7 +93,15 @@ fn check_doc(
             issues.push(format!("refs 无法解析：{}", s));
         }
     }
-    (issues, items.len())
+}
+
+/// refs 值清洗：去掉一层方括号包裹。
+fn clean_ref(r: &str) -> String {
+    let mut s = r.trim().to_string();
+    if s.starts_with('[') && s.ends_with(']') {
+        s = s.trim_matches(|c| c == '[' || c == ']').trim().to_string();
+    }
+    s
 }
 
 /// 真源 `scan`。

@@ -257,23 +257,47 @@ pub(crate) fn round_scan(transcript: &str, allowed: &[String]) -> (Vec<String>, 
     let allowed_tails: BTreeSet<String> = allowed.iter().map(|a| tail_after_colon(a)).collect();
     let mut gaps: Vec<(i64, i64)> = Vec::new();
     for (i, (num, body)) in turns.iter().enumerate() {
-        if !round_cite_re().is_match(body) {
-            issues.push(format!("第 {} 回合缺引用（R-R1）", num));
-        }
-        if !ROUND_PROGRESS.iter().any(|k| body.contains(k)) {
-            issues.push(format!("第 {} 回合无推进/状态留痕（R-R2）", num));
-        }
-        for tok in module_token_re()
-            .find_iter(body)
-            .map(|m| m.as_str().to_string())
-        {
-            if !allowed_set.contains(&tok) && !allowed_tails.contains(&tail_after_colon(&tok)) {
-                issues.push(format!("第 {} 回合出现允许集外编号 {}（R-R3）", num, tok));
-            }
-        }
-        if i > 0 && *num != turns[i - 1].0 + 1 {
-            gaps.push((turns[i - 1].0, *num));
-        }
+        turn_issues(
+            i,
+            num,
+            body,
+            &allowed_set,
+            &allowed_tails,
+            &turns,
+            &mut gaps,
+            &mut issues,
+        );
     }
     (issues, turns.len() as i64, gaps)
+}
+
+/// 单回合判据：引用 / 推进 / 模块令牌越界 / 编号跳号。
+#[allow(clippy::too_many_arguments)]
+fn turn_issues(
+    i: usize,
+    num: &i64,
+    body: &str,
+    allowed_set: &BTreeSet<String>,
+    allowed_tails: &BTreeSet<String>,
+    turns: &[(i64, String)],
+    gaps: &mut Vec<(i64, i64)>,
+    issues: &mut Vec<String>,
+) {
+    if !round_cite_re().is_match(body) {
+        issues.push(format!("第 {} 回合缺引用（R-R1）", num));
+    }
+    if !ROUND_PROGRESS.iter().any(|k| body.contains(k)) {
+        issues.push(format!("第 {} 回合无推进/状态留痕（R-R2）", num));
+    }
+    for tok in module_token_re()
+        .find_iter(body)
+        .map(|m| m.as_str().to_string())
+    {
+        if !allowed_set.contains(&tok) && !allowed_tails.contains(&tail_after_colon(&tok)) {
+            issues.push(format!("第 {} 回合出现允许集外编号 {}（R-R3）", num, tok));
+        }
+    }
+    if i > 0 && *num != turns[i - 1].0 + 1 {
+        gaps.push((turns[i - 1].0, *num));
+    }
 }

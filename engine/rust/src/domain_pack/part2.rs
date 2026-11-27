@@ -98,29 +98,89 @@ if !spec_path.is_file() {
             .join("DOMAIN_SPEC.json");
         let payload = read_json_opt(&payload).unwrap_or(Json::Object(vec![]));
         let subs = arr_of(obj_get(&payload, "subdivisions"));
-        let bad_ref: Vec<String> = subs
+        bad_ref_issues(&subs, cat, pkg, issues);
+        pack_metric_issues(p, pkg, dens_min, auth_min, reach_min, issues);
+
+true
+}
+
+/// 名录单包：绑定表须带在册证明与实测日期。
+pub(crate) fn check_pack_bindings(pkg: &str, bp: &Json, cat: &[String], issues: &mut Vec<String>) {
+        let bindings = arr_of(obj_get(&bp, "bindings"));
+        let bad_binding: Vec<Json> = bindings
             .iter()
-            .filter(|s| {
-                let r = match obj_get(s, "standard_ref") {
-                    Some(Json::Null) | None => String::new(),
-                    Some(v) => pyval::plain_str(v),
-                };
-                !cat.contains(&r)
+            .filter(|r| {
+                let st = obj_get(r, "standard")
+                    .map(pyval::plain_str)
+                    .unwrap_or_default();
+                let sup = obj_get(r, "support_standard")
+                    .map(pyval::plain_str)
+                    .unwrap_or_default();
+                let d1 = obj_get(r, "standard_probe_date")
+                    .map(pyval::plain_str)
+                    .unwrap_or_default();
+                let d2 = obj_get(r, "support_standard_probe_date")
+                    .map(pyval::plain_str)
+                    .unwrap_or_default();
+                !cat.contains(&st) || !cat.contains(&sup) || d1.is_empty() || d2.is_empty()
             })
-            .map(|s| pyval::py_str(obj_get(s, "id")))
+            .cloned()
             .collect();
-        if !bad_ref.is_empty() {
-            let head: Vec<Json> = bad_ref
+        if !bad_binding.is_empty() {
+            let head: Vec<Json> = bad_binding
                 .iter()
                 .take(4)
-                .map(|s| Json::Str(s.clone()))
+                .map(|r| obj_get(r, "subdivision").cloned().unwrap_or(Json::Null))
                 .collect();
             issues.push(format!(
-                "{}：细分未绑可扩展标准或引用不在册：{}",
+                "{}：绑定表缺在册证明或实测记录：{}",
                 pkg,
                 pyval::py_repr_list(&head)
             ));
         }
+}
+
+/// 真源 `scan` → `(issues, stats)`（缓存层不移植：纯函数优化，不改结论）。
+pub(crate) fn scan(root: &Path) -> (Vec<String>, Json) {
+    manifest_verify(root)
+}
+
+/// 细分项 standard_ref 必须在类目词表内（真源报前 4 个 id）。
+fn bad_ref_issues(subs: &[Json], cat: &[String], pkg: &str, issues: &mut Vec<String>) {
+    let bad_ref: Vec<String> = subs
+        .iter()
+        .filter(|s| {
+            let r = match obj_get(s, "standard_ref") {
+                Some(Json::Null) | None => String::new(),
+                Some(v) => pyval::plain_str(v),
+            };
+            !cat.contains(&r)
+        })
+        .map(|s| pyval::py_str(obj_get(s, "id")))
+        .collect();
+    if !bad_ref.is_empty() {
+        let head: Vec<Json> = bad_ref
+            .iter()
+            .take(4)
+            .map(|s| Json::Str(s.clone()))
+            .collect();
+        issues.push(format!(
+            "{}：细分未绑可扩展标准或引用不在册：{}",
+            pkg,
+            pyval::py_repr_list(&head)
+        ));
+    }
+}
+
+/// 标准绑定 / 概念密度 / 真实性 / 可达性 阈值面。
+fn pack_metric_issues(
+    p: &Json,
+    pkg: &str,
+    dens_min: f64,
+    auth_min: f64,
+    reach_min: f64,
+    issues: &mut Vec<String>,
+) {
         let cov = py_float_or(obj_get(&p, "standards_binding_coverage"), 0.0);
         if cov < 1.0 {
             issues.push(format!(
@@ -171,46 +231,4 @@ if !spec_path.is_file() {
                 pkg, rr, reach_min
             ));
         }
-true
-}
-
-/// 名录单包：绑定表须带在册证明与实测日期。
-pub(crate) fn check_pack_bindings(pkg: &str, bp: &Json, cat: &[String], issues: &mut Vec<String>) {
-        let bindings = arr_of(obj_get(&bp, "bindings"));
-        let bad_binding: Vec<Json> = bindings
-            .iter()
-            .filter(|r| {
-                let st = obj_get(r, "standard")
-                    .map(pyval::plain_str)
-                    .unwrap_or_default();
-                let sup = obj_get(r, "support_standard")
-                    .map(pyval::plain_str)
-                    .unwrap_or_default();
-                let d1 = obj_get(r, "standard_probe_date")
-                    .map(pyval::plain_str)
-                    .unwrap_or_default();
-                let d2 = obj_get(r, "support_standard_probe_date")
-                    .map(pyval::plain_str)
-                    .unwrap_or_default();
-                !cat.contains(&st) || !cat.contains(&sup) || d1.is_empty() || d2.is_empty()
-            })
-            .cloned()
-            .collect();
-        if !bad_binding.is_empty() {
-            let head: Vec<Json> = bad_binding
-                .iter()
-                .take(4)
-                .map(|r| obj_get(r, "subdivision").cloned().unwrap_or(Json::Null))
-                .collect();
-            issues.push(format!(
-                "{}：绑定表缺在册证明或实测记录：{}",
-                pkg,
-                pyval::py_repr_list(&head)
-            ));
-        }
-}
-
-/// 真源 `scan` → `(issues, stats)`（缓存层不移植：纯函数优化，不改结论）。
-pub(crate) fn scan(root: &Path) -> (Vec<String>, Json) {
-    manifest_verify(root)
 }

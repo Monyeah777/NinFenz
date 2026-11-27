@@ -162,60 +162,73 @@ pub(crate) fn handle(mut stream: TcpStream, token: &str, allowed_root: &Path) ->
                 break;
             }
         };
-        let proto = req.get("proto").and_then(|v| v.as_u64()).unwrap_or(0);
-        if proto != PROTO {
-            respond(&mut stream, 2, b"", "proto 不符".as_bytes())?;
+        if !process_request(&mut stream, &req, token, allowed_root)? {
             break;
         }
-        let got_token = req.get("token").and_then(|v| v.as_str()).unwrap_or("");
-        if !constant_time_eq(got_token.as_bytes(), token.as_bytes()) {
-            respond(&mut stream, 2, b"", "token 不符".as_bytes())?;
-            break;
-        }
-        // 只读观测面：请求/字节计数（RSS 由宿主侧取）。
-        if req.get("op").and_then(|v| v.as_str()) == Some("stats") {
-            let payload = json!({
-                "pid": std::process::id(),
-                "proto": PROTO,
-                "requests": REQUESTS.load(Ordering::Relaxed),
-                "bytes_in": BYTES_IN.load(Ordering::Relaxed),
-                "bytes_out": BYTES_OUT.load(Ordering::Relaxed),
-            })
-            .to_string();
-            BYTES_OUT.fetch_add(payload.len() as u64, Ordering::Relaxed);
-            respond(&mut stream, 0, payload.as_bytes(), b"")?;
-            continue;
-        }
-        let argv = match parse_argv(&req) {
-            Ok(argv) => argv,
-            Err(msg) => {
-                respond(&mut stream, 2, b"", msg.as_bytes())?;
-                break;
-            }
-        };
-        if argv.is_empty() {
-            respond(&mut stream, 2, b"", "argv 为空".as_bytes())?;
-            break;
-        }
-        if !argv_size_ok(&argv) {
-            respond(&mut stream, 2, b"", "argv 超上限".as_bytes())?;
-            break;
-        }
-        if let Err(msg) = validate_argv(&argv, allowed_root) {
-            respond(&mut stream, 2, b"", msg.as_bytes())?;
-            break;
-        }
-        let (out, code) = crate::run_capture(&argv);
-        if out.len() > MAX_RESPONSE_BYTES {
-            respond(&mut stream, 2, b"", "响应超上限".as_bytes())?;
-            crate::recycle_capture_buf(out);
-            break;
-        }
-        BYTES_OUT.fetch_add(out.len() as u64, Ordering::Relaxed);
-        respond(&mut stream, code, &out, b"")?;
-        crate::recycle_capture_buf(out);
     }
     Ok(())
+}
+
+/// 单请求：协议/令牌/统计面/参数闸门/执行出口；返回 false 表示关连接。
+fn process_request(
+    stream: &mut TcpStream,
+    req: &Value,
+    token: &str,
+    allowed_root: &Path,
+) -> std::io::Result<bool> {
+    let proto = req.get("proto").and_then(|v| v.as_u64()).unwrap_or(0);
+    if proto != PROTO {
+        respond(stream, 2, b"", "proto 不符".as_bytes())?;
+        return Ok(false);
+    }
+    let got_token = req.get("token").and_then(|v| v.as_str()).unwrap_or("");
+    if !constant_time_eq(got_token.as_bytes(), token.as_bytes()) {
+        respond(stream, 2, b"", "token 不符".as_bytes())?;
+        return Ok(false);
+    }
+    // 只读观测面：请求/字节计数（RSS 由宿主侧取）。
+    if req.get("op").and_then(|v| v.as_str()) == Some("stats") {
+        let payload = json!({
+            "pid": std::process::id(),
+            "proto": PROTO,
+            "requests": REQUESTS.load(Ordering::Relaxed),
+            "bytes_in": BYTES_IN.load(Ordering::Relaxed),
+            "bytes_out": BYTES_OUT.load(Ordering::Relaxed),
+        })
+        .to_string();
+        BYTES_OUT.fetch_add(payload.len() as u64, Ordering::Relaxed);
+        respond(stream, 0, payload.as_bytes(), b"")?;
+        return Ok(true);
+    }
+    let argv = match parse_argv(req) {
+        Ok(argv) => argv,
+        Err(msg) => {
+            respond(stream, 2, b"", msg.as_bytes())?;
+            return Ok(false);
+        }
+    };
+    if argv.is_empty() {
+        respond(stream, 2, b"", "argv 为空".as_bytes())?;
+        return Ok(false);
+    }
+    if !argv_size_ok(&argv) {
+        respond(stream, 2, b"", "argv 超上限".as_bytes())?;
+        return Ok(false);
+    }
+    if let Err(msg) = validate_argv(&argv, allowed_root) {
+        respond(stream, 2, b"", msg.as_bytes())?;
+        return Ok(false);
+    }
+    let (out, code) = crate::run_capture(&argv);
+    if out.len() > MAX_RESPONSE_BYTES {
+        respond(stream, 2, b"", "响应超上限".as_bytes())?;
+        crate::recycle_capture_buf(out);
+        return Ok(false);
+    }
+    BYTES_OUT.fetch_add(out.len() as u64, Ordering::Relaxed);
+    respond(stream, code, &out, b"")?;
+    crate::recycle_capture_buf(out);
+    Ok(true)
 }
 
 pub(crate) fn read_request_line<R: BufRead>(reader: &mut R) -> std::io::Result<String> {

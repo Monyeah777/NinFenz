@@ -4,70 +4,7 @@ impl past::Visitor for Collector<'_> {
     fn visit_stmt(&mut self, node: past::Stmt) {
         let ln = self.ls.line_of(u32::from(node.range().start()));
         let d = self.depth;
-        match &node {
-            past::Stmt::Raise(r) => {
-                if let Some(exc) = &r.exc {
-                    if let past::Expr::Call(c) = exc.as_ref() {
-                        if let Some(a0) = c.args.first() {
-                            match a0 {
-                                past::Expr::Constant(k) => {
-                                    if let past::Constant::Str(s) = &k.value {
-                                        self.push(d, Ev::Raise(ln, s.to_string()));
-                                    }
-                                }
-                                past::Expr::JoinedStr(js) => {
-                                    let parts: String = js
-                                        .values
-                                        .iter()
-                                        .filter_map(|v| match v {
-                                            past::Expr::Constant(k) => match &k.value {
-                                                past::Constant::Str(s) => Some(s.to_string()),
-                                                _ => None,
-                                            },
-                                            _ => None,
-                                        })
-                                        .collect();
-                                    self.push(d, Ev::Raise(ln, parts));
-                                }
-                                _ => {}
-                            }
-                        }
-                    }
-                }
-            }
-            past::Stmt::Import(i) => {
-                let mut v = Vec::new();
-                for a in &i.names {
-                    let head = a.name.split('.').next().unwrap_or("").to_string();
-                    v.push((head, ln));
-                }
-                self.push(d, Ev::Import(v));
-            }
-            past::Stmt::ImportFrom(f) => {
-                let level = f.level.map(|l| l.to_u32()).unwrap_or(0);
-                if level == 0 {
-                    if let Some(m) = &f.module {
-                        let head = m.as_str().split('.').next().unwrap_or("").to_string();
-                        self.push(d, Ev::ImportFrom(head, ln));
-                    }
-                }
-            }
-            past::Stmt::Try(t) => {
-                if try_guards_import(t) {
-                    for sub in &t.body {
-                        let mut c = ImportLinenos {
-                            ls: self.ls,
-                            out: Vec::new(),
-                        };
-                        c.visit_stmt(sub.clone());
-                        for l in c.out {
-                            self.guarded.insert(l);
-                        }
-                    }
-                }
-            }
-            _ => {}
-        }
+        self.collect_stmt(&node, ln, d);
         let d2 = self.enter();
         debug_assert_eq!(d, d2);
         self.generic_visit_stmt(node);
@@ -258,5 +195,91 @@ impl past::Visitor for MetricCollector<'_> {
         self.enter();
         self.generic_visit_type_param(node);
         self.exit();
+    }
+}
+
+
+/// JoinedStr 的常量片段拼接（非常量片段忽略）。
+fn joined_str_parts(js: &past::ExprJoinedStr) -> String {
+    js.values
+        .iter()
+        .filter_map(|v| match v {
+            past::Expr::Constant(k) => match &k.value {
+                past::Constant::Str(s) => Some(s.to_string()),
+                _ => None,
+            },
+            _ => None,
+        })
+        .collect()
+}
+
+impl Collector<'_> {
+    /// 按语句类型收集事件（raise / import / import-from / try 守卫）。
+    fn collect_stmt(&mut self, node: &past::Stmt, ln: u32, d: usize) {
+        match node {
+            past::Stmt::Raise(r) => self.collect_raise(r, ln, d),
+            past::Stmt::Import(i) => self.collect_import(i, ln, d),
+            past::Stmt::ImportFrom(f) => self.collect_import_from(f, ln, d),
+            past::Stmt::Try(t) => self.collect_try(t),
+            _ => {}
+        }
+    }
+
+    /// raise：首个实参为常量 / 拼接串时记 Raise 事件。
+    fn collect_raise(&mut self, r: &past::StmtRaise, ln: u32, d: usize) {
+        let Some(exc) = &r.exc else { return };
+        let past::Expr::Call(c) = exc.as_ref() else {
+            return;
+        };
+        let Some(a0) = c.args.first() else { return };
+        match a0 {
+            past::Expr::Constant(k) => {
+                if let past::Constant::Str(s) = &k.value {
+                    self.push(d, Ev::Raise(ln, s.to_string()));
+                }
+            }
+            past::Expr::JoinedStr(js) => {
+                let parts = joined_str_parts(js);
+                self.push(d, Ev::Raise(ln, parts));
+            }
+            _ => {}
+        }
+    }
+
+    /// import：逐个别名取头部名。
+    fn collect_import(&mut self, i: &past::StmtImport, ln: u32, d: usize) {
+        let mut v = Vec::new();
+        for a in &i.names {
+            let head = a.name.split('.').next().unwrap_or("").to_string();
+            v.push((head, ln));
+        }
+        self.push(d, Ev::Import(v));
+    }
+
+    /// from-import：绝对导入（level=0）且模块名在场。
+    fn collect_import_from(&mut self, f: &past::StmtImportFrom, ln: u32, d: usize) {
+        let level = f.level.map(|l| l.to_u32()).unwrap_or(0);
+        if level == 0 {
+            if let Some(m) = &f.module {
+                let head = m.as_str().split('.').next().unwrap_or("").to_string();
+                self.push(d, Ev::ImportFrom(head, ln));
+            }
+        }
+    }
+
+    /// try 守卫导入：body 里受守卫的 import 行号登记进 guarded。
+    fn collect_try(&mut self, t: &past::StmtTry) {
+        if try_guards_import(t) {
+            for sub in &t.body {
+                let mut c = ImportLinenos {
+                    ls: self.ls,
+                    out: Vec::new(),
+                };
+                c.visit_stmt(sub.clone());
+                for l in c.out {
+                    self.guarded.insert(l);
+                }
+            }
+        }
     }
 }

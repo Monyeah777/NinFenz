@@ -137,10 +137,49 @@ pub struct WfScan {
 /// 真源 `scan` → `(issues, warns, stats)`。
 pub fn scan(root: &Path) -> WfScan {
     let mut issues: Vec<String> = Vec::new();
-    let mut warns: Vec<String> = Vec::new();
+    let warns: Vec<String> = Vec::new();
     let files = workflows(root);
+    let (pinned, mut warns) = pinned_uses_scan(root, &files, warns, &mut issues);
+    let with_explicit = explicit_permissions_count(root, &files);
+    let reqs = requirement_files(root);
+    req_pin_issues(root, &reqs, &mut issues);
+
+    let stats = Json::Object(vec![
+        ("workflows".to_string(), Json::Int(files.len() as i64)),
+        ("pinned_uses".to_string(), Json::Int(pinned)),
+        (
+            "with_explicit_permissions".to_string(),
+            Json::Int(with_explicit as i64),
+        ),
+        (
+            "requirements_files".to_string(),
+            Json::Int(reqs.len() as i64),
+        ),
+    ]);
+    WfScan {
+        issues,
+        warns,
+        stats,
+    }
+}
+
+/// 权限行正则（静态初始化）。
+fn perm_re() -> &'static regex::Regex {
+    static PERM: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
+    PERM.get_or_init(|| {
+        regex::Regex::new(r"(?m)^permissions:\s*|^\s+permissions:\s*").expect("权限行正则固定合法")
+    })
+}
+
+/// uses 面：钉 SHA 计数 + 缺版本注释 warns；返回 (钉数, warns)。
+fn pinned_uses_scan(
+    root: &Path,
+    files: &[String],
+    mut warns: Vec<String>,
+    issues: &mut Vec<String>,
+) -> (i64, Vec<String>) {
     let mut pinned = 0i64;
-    for rel in &files {
+    for rel in files {
         let text = std::fs::read_to_string(root.join(rel)).unwrap_or_default();
         issues.extend(pin_issues(rel, &text));
         issues.extend(perm_issues(rel, &text));
@@ -165,27 +204,35 @@ pub fn scan(root: &Path) -> WfScan {
             }
         }
     }
-    static PERM: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
-    let perm = PERM.get_or_init(|| {
-        regex::Regex::new(r"(?m)^permissions:\s*|^\s+permissions:\s*").expect("权限行正则固定合法")
-    });
-    let with_explicit = files
+    (pinned, warns)
+}
+
+/// 显式声明 permissions 的 workflow 数。
+fn explicit_permissions_count(root: &Path, files: &[String]) -> usize {
+    files
         .iter()
         .filter(|rel| {
             std::fs::read_to_string(root.join(rel))
-                .map(|t| perm.is_match(&t))
+                .map(|t| perm_re().is_match(&t))
                 .unwrap_or(false)
         })
-        .count();
+        .count()
+}
 
-    let reqs: Vec<String> = if root.join(".github").is_dir() {
+/// .github/requirements-*.txt（无 .github 目录 → 空表）。
+fn requirement_files(root: &Path) -> Vec<String> {
+    if root.join(".github").is_dir() {
         let mut v = crate::glob::expand(root, ".github/requirements-*.txt");
         v.sort();
         v
     } else {
         Vec::new()
-    };
-    for rel in &reqs {
+    }
+}
+
+/// 依赖未钉版本判据（须 包==版本）。
+fn req_pin_issues(root: &Path, reqs: &[String], issues: &mut Vec<String>) {
+    for rel in reqs {
         let name = rel.rsplit('/').next().unwrap_or(rel);
         let text = std::fs::read_to_string(root.join(rel)).unwrap_or_default();
         for (i, line) in text.lines().enumerate() {
@@ -202,24 +249,6 @@ pub fn scan(root: &Path) -> WfScan {
                 ));
             }
         }
-    }
-
-    let stats = Json::Object(vec![
-        ("workflows".to_string(), Json::Int(files.len() as i64)),
-        ("pinned_uses".to_string(), Json::Int(pinned)),
-        (
-            "with_explicit_permissions".to_string(),
-            Json::Int(with_explicit as i64),
-        ),
-        (
-            "requirements_files".to_string(),
-            Json::Int(reqs.len() as i64),
-        ),
-    ]);
-    WfScan {
-        issues,
-        warns,
-        stats,
     }
 }
 

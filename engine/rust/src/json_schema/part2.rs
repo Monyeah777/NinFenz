@@ -37,66 +37,19 @@ pub(crate) fn check_array(
     depth: usize,
 ) -> Vec<String> {
     let mut errors: Vec<String> = Vec::new();
-    if let Json::Array(items) = instance {
-        if let Some(v) = obj_get(schema, "minItems") {
-            if (items.len() as i64) < pyval::py_int_or(Some(v), 0) {
-                errors.push(format!("{}: 元素数 < {}", path, pyval::plain_str(v)));
-            }
-        }
-        if let Some(v) = obj_get(schema, "maxItems") {
-            if (items.len() as i64) > pyval::py_int_or(Some(v), 0) {
-                errors.push(format!("{}: 元素数 > {}", path, pyval::plain_str(v)));
-            }
-        }
-        if pyval::py_truthy(
-            &obj_get(schema, "uniqueItems")
-                .cloned()
-                .unwrap_or(Json::Bool(false)),
-        ) {
-            let seen: Vec<String> = items.iter().map(|x| x.dumps()).collect();
-            let mut uniq: Vec<&String> = seen.iter().collect();
-            uniq.sort();
-            uniq.dedup();
-            if uniq.len() != seen.len() {
-                errors.push(format!("{}: uniqueItems 被违反", path));
-            }
-        }
-        let prefix = obj_get(schema, "prefixItems");
-        if let Some(Json::Array(prefix)) = prefix {
-            for (i, sub) in prefix.iter().enumerate() {
-                if i < items.len() {
-                    errors.extend(check(
-                        &items[i],
-                        sub,
-                        &format!("{}[{}]", path, i),
-                        Some(root),
-                        unsupported,
-                        depth + 1,
-                    ));
-                }
-            }
-        }
-        if let Some(items_schema) = obj_get(schema, "items") {
-            if matches!(items_schema, Json::Object(_)) {
-                let start = match prefix {
-                    Some(Json::Array(p)) => p.len(),
-                    _ => 0,
-                };
-                for i in start..items.len() {
-                    errors.extend(check(
-                        &items[i],
-                        items_schema,
-                        &format!("{}[{}]", path, i),
-                        Some(root),
-                        unsupported,
-                        depth + 1,
-                    ));
-                }
-            }
-        }
-    }
+    let Json::Array(items) = instance else {
+        return errors;
+    };
+    array_count_errors(items, schema, path, &mut errors);
+    array_unique_errors(items, schema, path, &mut errors);
+    let prefix = obj_get(schema, "prefixItems");
+    array_prefix_errors(items, prefix, path, root, unsupported, depth, &mut errors);
+    array_items_errors(
+        items, schema, prefix, path, root, unsupported, depth, &mut errors,
+    );
     errors
 }
+
 
 /// 对象面属性：properties / patternProperties / additionalProperties / propertyNames。
 pub(crate) fn check_object_props(
@@ -114,78 +67,38 @@ pub(crate) fn check_object_props(
     let pats = obj_get(schema, "patternProperties")
         .cloned()
         .unwrap_or(Json::Object(vec![]));
-    if let Json::Object(map) = instance {
-        for (key, value) in map {
-            let mut matched = false;
-            if let Some(sub) = obj_get(&props, key) {
-                matched = true;
-                errors.extend(check(
-                    value,
-                    sub,
-                    &format!("{}.{}", path, key),
-                    Some(root),
-                    unsupported,
-                    depth + 1,
-                ));
-            }
-            if let Json::Object(pats) = &pats {
-                for (pat, sub) in pats {
-                    let why = pattern_issue(&Json::Str(pat.clone()), path);
-                    if !why.is_empty() {
-                        errors.push(why); // 形态闸门：不拿投稿者的表达式去跑匹配
-                        continue;
-                    }
-                    if re_search(pat, key) {
-                        matched = true;
-                        errors.extend(check(
-                            value,
-                            sub,
-                            &format!("{}.{}", path, key),
-                            Some(root),
-                            unsupported,
-                            depth + 1,
-                        ));
-                    }
-                }
-            }
-            if !matched {
-                let ap = obj_get(schema, "additionalProperties")
-                    .cloned()
-                    .unwrap_or(Json::Bool(true));
-                match ap {
-                    Json::Bool(false) => errors.push(format!(
-                        "{}: 多余字段 {}（additionalProperties=false）",
-                        path, key
-                    )),
-                    Json::Object(_) => errors.extend(check(
-                        value,
-                        &ap,
-                        &format!("{}.{}", path, key),
-                        Some(root),
-                        unsupported,
-                        depth + 1,
-                    )),
-                    _ => {}
-                }
-            }
-        }
-        if let Some(pn) = obj_get(schema, "propertyNames") {
-            if matches!(pn, Json::Object(_)) {
-                for (key, _) in map.iter() {
-                    errors.extend(check(
-                        &Json::Str(key.clone()),
-                        pn,
-                        &format!("{}<键:{}>", path, key),
-                        Some(root),
-                        unsupported,
-                        depth + 1,
-                    ));
-                }
-            }
+    let Json::Object(map) = instance else {
+        return errors;
+    };
+    for (key, value) in map {
+        let matched = object_prop_errors(
+            key,
+            value,
+            &props,
+            &pats,
+            path,
+            root,
+            unsupported,
+            depth,
+            &mut errors,
+        );
+        if !matched {
+            object_additional_errors(
+                key,
+                value,
+                schema,
+                path,
+                root,
+                unsupported,
+                depth,
+                &mut errors,
+            );
         }
     }
+    object_property_names_errors(map, schema, path, root, unsupported, depth, &mut errors);
     errors
 }
+
 
 /// allOf / anyOf / oneOf 组合子式。
 pub(crate) fn check_compound(
@@ -247,34 +160,45 @@ pub(crate) fn check_not(
 /// 字符串面：minLength / maxLength / pattern / format。
 pub(crate) fn check_string(instance: &Json, schema: &Json, path: &str) -> Vec<String> {
     let mut errors: Vec<String> = Vec::new();
-    if let Json::Str(s) = instance {
-        let len = s.chars().count() as i64;
-        if let Some(v) = obj_get(schema, "minLength") {
-            if len < pyval::py_int_or(Some(v), 0) {
-                errors.push(format!("{}: 长度 < {}", path, pyval::plain_str(v)));
-            }
-        }
-        if let Some(v) = obj_get(schema, "maxLength") {
-            if len > pyval::py_int_or(Some(v), 0) {
-                errors.push(format!("{}: 长度 > {}", path, pyval::plain_str(v)));
-            }
-        }
-        if let Some(p) = obj_get(schema, "pattern") {
-            let why = pattern_issue(p, path);
-            if !why.is_empty() {
-                errors.push(why);
-            } else if !re_search(&pyval::plain_str(p), s) {
-                errors.push(format!("{}: 不匹配 pattern {}", path, pyval::plain_str(p)));
-            }
-        }
-        if let Some(f) = obj_get(schema, "format") {
-            let fmt = pyval::plain_str(f);
-            if !fmt.is_empty() {
-                errors.extend(format_errors(s, &fmt, path));
-            }
+    let Json::Str(s) = instance else {
+        return errors;
+    };
+    let len = s.chars().count() as i64;
+    string_length_errors(len, schema, path, &mut errors);
+    string_pattern_errors(s, schema, path, &mut errors);
+    if let Some(f) = obj_get(schema, "format") {
+        let fmt = pyval::plain_str(f);
+        if !fmt.is_empty() {
+            errors.extend(format_errors(s, &fmt, path));
         }
     }
     errors
+}
+
+/// 字符串长度面：minLength / maxLength。
+fn string_length_errors(len: i64, schema: &Json, path: &str, errors: &mut Vec<String>) {
+    if let Some(v) = obj_get(schema, "minLength") {
+        if len < pyval::py_int_or(Some(v), 0) {
+            errors.push(format!("{}: 长度 < {}", path, pyval::plain_str(v)));
+        }
+    }
+    if let Some(v) = obj_get(schema, "maxLength") {
+        if len > pyval::py_int_or(Some(v), 0) {
+            errors.push(format!("{}: 长度 > {}", path, pyval::plain_str(v)));
+        }
+    }
+}
+
+/// 字符串 pattern 面：先过形态闸门，再跑匹配。
+fn string_pattern_errors(s: &str, schema: &Json, path: &str, errors: &mut Vec<String>) {
+    if let Some(p) = obj_get(schema, "pattern") {
+        let why = pattern_issue(p, path);
+        if !why.is_empty() {
+            errors.push(why);
+        } else if !re_search(&pyval::plain_str(p), s) {
+            errors.push(format!("{}: 不匹配 pattern {}", path, pyval::plain_str(p)));
+        }
+    }
 }
 
 /// 数值面：minimum / maximum / 排他边界 / multipleOf。

@@ -218,68 +218,88 @@ let auth = py_str(get(s, "authority"));
 
 /// 知识源 authority 级差与时效策略核对。
 pub(crate) fn check_source_authority(s: &Json, sid: &str, issues: &mut Vec<String>) {
-let auth = py_str(get(s, "authority"));
-let kind = py_str(get(s, "kind"));
-let fresh = get(s, "freshness")
-    .filter(|f| matches!(f, Json::Object(_)))
-    .cloned()
-    .unwrap_or_else(empty_stats);
-let pol = py_str(get(&fresh, "policy"));
-let labelled = py_truthy(get(s, "requires_source_label").unwrap_or(&Json::Null));
+    let auth = py_str(get(s, "authority"));
+    let kind = py_str(get(s, "kind"));
+    let fresh = get(s, "freshness")
+        .filter(|f| matches!(f, Json::Object(_)))
+        .cloned()
+        .unwrap_or_else(empty_stats);
+    let pol = py_str(get(&fresh, "policy"));
+    let labelled = py_truthy(get(s, "requires_source_label").unwrap_or(&Json::Null));
     if auth == "reference" {
-        if kind != "external-retrieval" {
-            issues.push(format!(
-                "源 {} 为 reference 级但 kind 非 external-retrieval",
-                sid
-            ));
-        }
-        if !labelled {
-            issues.push(format!(
-                "源 {} 为 reference 级但未要求标注来源（外部数据不得写死；修复指引：requires_source_label: true）",
-                sid
-            ));
-        }
-        if !FRESH_REFERENCE.contains(&pol.as_str()) {
-            issues.push(format!(
-                "源 {} 为 reference 级但时效策略非法：{}（需 {}）",
-                sid,
-                if pol.is_empty() {
-                    "(缺)".to_string()
-                } else {
-                    pol.clone()
-                },
-                FRESH_REFERENCE.join(" / ")
-            ));
-        } else if pol == "ttl" {
-            let ok = matches!(get(&fresh, "ttl_days"), Some(Json::Int(n)) if *n > 0);
-            if !ok {
-                issues.push(format!("源 {} 声明 ttl 但 ttl_days 非正整数", sid));
-            }
-        }
+        reference_source_issues(s, sid, &kind, &pol, labelled, &fresh, issues);
     } else if auth == "contract" {
-        if kind != "local-compiled" {
-            issues.push(format!(
-                "源 {} 为 contract 级但 kind 非 local-compiled",
-                sid
-            ));
+        contract_source_issues(sid, &kind, &pol, labelled, issues);
+    }
+}
+
+/// reference 级源：kind / 来源标注 / 时效策略 / ttl_days。
+#[allow(clippy::too_many_arguments)]
+fn reference_source_issues(
+    s: &Json,
+    sid: &str,
+    kind: &str,
+    pol: &str,
+    labelled: bool,
+    fresh: &Json,
+    issues: &mut Vec<String>,
+) {
+    if kind != "external-retrieval" {
+        issues.push(format!(
+            "源 {} 为 reference 级但 kind 非 external-retrieval",
+            sid
+        ));
+    }
+    if !labelled {
+        issues.push(format!(
+            "源 {} 为 reference 级但未要求标注来源（外部数据不得写死；修复指引：requires_source_label: true）",
+            sid
+        ));
+    }
+    if !FRESH_REFERENCE.contains(&pol) {
+        issues.push(format!(
+            "源 {} 为 reference 级但时效策略非法：{}（需 {}）",
+            sid,
+            if pol.is_empty() {
+                "(缺)".to_string()
+            } else {
+                pol.to_string()
+            },
+            FRESH_REFERENCE.join(" / ")
+        ));
+    } else if pol == "ttl" {
+        let ok = matches!(get(s, "freshness"), Some(Json::Object(_)))
+            && matches!(get(fresh, "ttl_days"), Some(Json::Int(n)) if *n > 0);
+        if !ok {
+            issues.push(format!("源 {} 声明 ttl 但 ttl_days 非正整数", sid));
         }
-        if labelled {
-            issues.push(format!(
-                "源 {} 为 contract 级却要求外部来源标注（合同级即本地真源）",
-                sid
-            ));
-        }
-        if !FRESH_CONTRACT.contains(&pol.as_str()) {
-            issues.push(format!(
-                "源 {} 为 contract 级但时效策略非法：{}（需 stale_after）",
-                sid,
-                if pol.is_empty() {
-                    "(缺)".to_string()
-                } else {
-                    pol.clone()
-                }
-            ));
-        }
+    }
+}
+
+/// contract 级源：kind / 不要求外部标注 / 时效策略。
+fn contract_source_issues(sid: &str, kind: &str, pol: &str, labelled: bool, issues: &mut Vec<String>) {
+    if kind != "local-compiled" {
+        issues.push(format!(
+            "源 {} 为 contract 级但 kind 非 local-compiled",
+            sid
+        ));
+    }
+    if labelled {
+        issues.push(format!(
+            "源 {} 为 contract 级却要求外部来源标注（合同级即本地真源）",
+            sid
+        ));
+    }
+    if !FRESH_CONTRACT.contains(&pol) {
+        issues.push(format!(
+            "源 {} 为 contract 级但时效策略非法：{}（需 stale_after）",
+            sid,
+            if pol.is_empty() {
+                "(缺)".to_string()
+            } else {
+                pol.to_string()
+            }
+        ));
     }
 }
 

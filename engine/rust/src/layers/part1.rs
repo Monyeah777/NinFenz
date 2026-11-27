@@ -163,57 +163,77 @@ pub(crate) fn l1_issues(
     issues: &mut Vec<String>,
 ) {
     for tier in tiers {
-        let src = get(tier, "source");
-        let globs = src.and_then(|s| get(s, "globs"));
-        let face = ctx.many(globs);
-        if arr_items(globs).is_empty() {
-            issues.push(format!(
-                "L1 阶 {} 未声明真源面（修复指引：在 source.globs 写明真源落点）",
-                plain_str_opt(get(tier, "id"))
-            ));
-        } else if face.is_empty() {
-            issues.push(format!(
-                "L1 阶 {} 的真源面展开为空：{}（修复指引：核对 globs 与实况）",
-                plain_str_opt(get(tier, "id")),
-                plain_str_opt(globs)
-            ));
-        }
+        l1_tier_issues(tier, ctx, issues);
     }
     for lv in arr_items(get(doc, "asset_levels")) {
-        if ctx.many(get(lv, "globs")).is_empty() {
-            issues.push(format!(
-                "L1 资产子级 {} 的真源面为空：{}（修复指引：核对 globs）",
-                plain_str_opt(get(lv, "id")),
-                plain_str_opt(get(lv, "globs"))
-            ));
-        }
-        if !tier_ids.contains(&py_str(get(lv, "tier"))) {
-            issues.push(format!(
-                "L1 资产子级 {} 的 tier 不在阶名单：{}（修复指引：改成真实阶 id）",
-                plain_str_opt(get(lv, "id")),
-                plain_str_opt(get(lv, "tier"))
-            ));
-        }
+        l1_asset_level_issues(lv, tier_ids, ctx, issues);
     }
     for sf in arr_items(get(doc, "surfaces")) {
-        for rel in arr_items(get(sf, "entries")) {
-            if !exists(root, Some(rel)) {
-                issues.push(format!(
-                    "L1 入口面 {} 的入口件不存在：{}（修复指引：补件或改成真实路径）",
-                    plain_str_opt(get(sf, "id")),
-                    plain_str(rel)
-                ));
-            }
-        }
+        l1_surface_issues(root, sf, issues);
     }
     for comp in arr_items(get(doc, "crosscut").and_then(|c| get(c, "components"))) {
-        if !exists(root, get(comp, "artifact")) {
+        l1_crosscut_issues(root, comp, issues);
+    }
+}
+
+/// L1 阶：真源面声明与展开非空。
+fn l1_tier_issues(tier: &Json, ctx: &mut GlobCtx, issues: &mut Vec<String>) {
+    let src = get(tier, "source");
+    let globs = src.and_then(|s| get(s, "globs"));
+    let face = ctx.many(globs);
+    if arr_items(globs).is_empty() {
+        issues.push(format!(
+            "L1 阶 {} 未声明真源面（修复指引：在 source.globs 写明真源落点）",
+            plain_str_opt(get(tier, "id"))
+        ));
+    } else if face.is_empty() {
+        issues.push(format!(
+            "L1 阶 {} 的真源面展开为空：{}（修复指引：核对 globs 与实况）",
+            plain_str_opt(get(tier, "id")),
+            plain_str_opt(globs)
+        ));
+    }
+}
+
+/// L1 资产子级：真源面非空 + tier 在阶名单。
+fn l1_asset_level_issues(lv: &Json, tier_ids: &[String], ctx: &mut GlobCtx, issues: &mut Vec<String>) {
+    if ctx.many(get(lv, "globs")).is_empty() {
+        issues.push(format!(
+            "L1 资产子级 {} 的真源面为空：{}（修复指引：核对 globs）",
+            plain_str_opt(get(lv, "id")),
+            plain_str_opt(get(lv, "globs"))
+        ));
+    }
+    if !tier_ids.contains(&py_str(get(lv, "tier"))) {
+        issues.push(format!(
+            "L1 资产子级 {} 的 tier 不在阶名单：{}（修复指引：改成真实阶 id）",
+            plain_str_opt(get(lv, "id")),
+            plain_str_opt(get(lv, "tier"))
+        ));
+    }
+}
+
+/// L1 入口面：入口件须存在。
+fn l1_surface_issues(root: &Path, sf: &Json, issues: &mut Vec<String>) {
+    for rel in arr_items(get(sf, "entries")) {
+        if !exists(root, Some(rel)) {
             issues.push(format!(
-                "L1 纵切件 {} 不存在：{}（修复指引：补件或改成真实路径）",
-                plain_str_opt(get(comp, "id")),
-                plain_str_opt(get(comp, "artifact"))
+                "L1 入口面 {} 的入口件不存在：{}（修复指引：补件或改成真实路径）",
+                plain_str_opt(get(sf, "id")),
+                plain_str(rel)
             ));
         }
+    }
+}
+
+/// L1 纵切件：artifact 须存在。
+fn l1_crosscut_issues(root: &Path, comp: &Json, issues: &mut Vec<String>) {
+    if !exists(root, get(comp, "artifact")) {
+        issues.push(format!(
+            "L1 纵切件 {} 不存在：{}（修复指引：补件或改成真实路径）",
+            plain_str_opt(get(comp, "id")),
+            plain_str_opt(get(comp, "artifact"))
+        ));
     }
 }
 

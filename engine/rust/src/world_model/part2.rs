@@ -7,59 +7,80 @@ pub(crate) fn check_initial(
     valid_vars: &[Json],
     issues: &mut Vec<String>,
 ) {
-    if let Some(init @ Json::Object(_)) = initial {
-        let declared: Vec<String> = valid_vars
-            .iter()
-            .filter_map(|v| match get(v, "name") {
-                Some(Json::Str(s)) => Some(s),
-                _ => None,
-            })
-            .collect();
-        let mut keys: Vec<String> = match init {
-            Json::Object(o) => o.iter().map(|(k, _)| k.clone()).collect(),
-            _ => Vec::new(),
-        };
-        keys.sort();
-        for key in keys {
-            if !declared.contains(&key) {
-                issues.push(format!(
-                    "{}.abstract_state.initial: 未声明变量 {}",
-                    label,
-                    pyval::py_repr(&Json::Str(key))
-                ));
-            }
+    let Some(init @ Json::Object(_)) = initial else {
+        return;
+    };
+    let declared: Vec<String> = valid_vars
+        .iter()
+        .filter_map(|v| match get(v, "name") {
+            Some(Json::Str(s)) => Some(s),
+            _ => None,
+        })
+        .collect();
+    initial_undeclared_issues(label, init, &declared, issues);
+    initial_value_issues(label, init, valid_vars, issues);
+}
+
+/// initial 段里出现但变量表未声明的键。
+fn initial_undeclared_issues(
+    label: &str,
+    init: &Json,
+    declared: &[String],
+    issues: &mut Vec<String>,
+) {
+    let mut keys: Vec<String> = match init {
+        Json::Object(o) => o.iter().map(|(k, _)| k.clone()).collect(),
+        _ => Vec::new(),
+    };
+    keys.sort();
+    for key in keys {
+        if !declared.contains(&key) {
+            issues.push(format!(
+                "{}.abstract_state.initial: 未声明变量 {}",
+                label,
+                pyval::py_repr(&Json::Str(key))
+            ));
         }
-        for var in valid_vars {
-            let name = match get(var, "name") {
-                Some(Json::Str(s)) => s,
-                _ => continue,
-            };
-            if !has(init, &name) {
-                issues.push(format!(
-                    "{}.abstract_state.initial: 缺变量 {} 的初始值",
-                    label,
-                    pyval::py_repr(&Json::Str(name))
-                ));
-                continue;
-            }
-            let kind = match get(var, "kind") {
-                Some(Json::Str(s)) => s,
-                _ => String::new(),
-            };
-            let item_kind = match get(var, "item_kind") {
-                Some(Json::Str(s)) => Some(s),
-                _ => None,
-            };
-            let value = obj_get(init, &name).cloned().unwrap_or(Json::Null);
-            if KINDS.contains(&kind.as_str()) && !matches(&value, &kind, item_kind.as_deref()) {
-                issues.push(format!(
-                    "{}.abstract_state.initial.{}: 值 {} 不匹配 kind={}",
-                    label,
-                    name,
-                    pyval::py_repr(&value),
-                    pyval::py_repr(&Json::Str(kind))
-                ));
-            }
+    }
+}
+
+/// 已声明变量的初始值缺件 / 类型适配。
+fn initial_value_issues(
+    label: &str,
+    init: &Json,
+    valid_vars: &[Json],
+    issues: &mut Vec<String>,
+) {
+    for var in valid_vars {
+        let name = match get(var, "name") {
+            Some(Json::Str(s)) => s,
+            _ => continue,
+        };
+        if !has(init, &name) {
+            issues.push(format!(
+                "{}.abstract_state.initial: 缺变量 {} 的初始值",
+                label,
+                pyval::py_repr(&Json::Str(name))
+            ));
+            continue;
+        }
+        let kind = match get(var, "kind") {
+            Some(Json::Str(s)) => s,
+            _ => String::new(),
+        };
+        let item_kind = match get(var, "item_kind") {
+            Some(Json::Str(s)) => Some(s),
+            _ => None,
+        };
+        let value = obj_get(init, &name).cloned().unwrap_or(Json::Null);
+        if KINDS.contains(&kind.as_str()) && !matches(&value, &kind, item_kind.as_deref()) {
+            issues.push(format!(
+                "{}.abstract_state.initial.{}: 值 {} 不匹配 kind={}",
+                label,
+                name,
+                pyval::py_repr(&value),
+                pyval::py_repr(&Json::Str(kind))
+            ));
         }
     }
 }
@@ -127,38 +148,55 @@ pub(crate) fn check_phases(
             ));
         }
         phase_names.push(pname.clone());
-        let nxt_ok = matches!(&nxt_v, Some(Json::Str(s)) if !s.trim().is_empty());
-        if !nxt_ok {
+        if !is_nonempty_str(&nxt_v) {
             issues.push(format!("{}.next: 非空字符串", at));
         }
-        let guard_ok = matches!(&guard_v, Some(Json::Str(s)) if !s.trim().is_empty());
-        if !guard_ok {
+        if !is_nonempty_str(&guard_v) {
             issues.push(format!("{}.guard: 非空守卫说明", at));
         }
-        let writes_ok = match &writes_v {
-            Some(Json::Array(w)) => w
-                .iter()
-                .all(|x| matches!(x, Json::Str(s) if !s.trim().is_empty())),
-            _ => false,
-        };
-        if !writes_ok {
+        if !phase_writes_ok(&writes_v) {
             issues.push(format!("{}.writes: 字符串数组（可为空）", at));
         }
-        if let (Json::Str(p), Json::Str(n)) = (
-            &pname_v.clone().unwrap_or(Json::Null),
-            &nxt_v.clone().unwrap_or(Json::Null),
-        ) {
-            // ⚠️ 真源 `edges` 是 **dict**（`edges[pname] = nxt`）⇒ **后者覆盖前者**，且**保留首次
-            // 插入的位置**。用 Vec 追加会同时改变两处结论：①「next 无对应相位」会报出已被覆盖
-            // 的旧值；② `all(n in phase_set ...)` 会因旧值悬空而**整段跳过**，漏报不可达相位。
-            // 实测（2026-10-04，合成夹具 M92）：`begin→ghost` 被 `begin→begin` 覆盖，两处结论相反。
-            match edges.iter_mut().find(|(k, _)| *k == *p) {
-                Some(slot) => slot.1 = n.clone(),
-                None => edges.push((p.clone(), n.clone())),
-            }
-        }
+        record_phase_edge(&mut edges, &pname_v, &nxt_v);
     }
     (phase_names, edges)
+}
+
+/// 非空字符串判据（缺键 / null / 空白都算不成立）。
+fn is_nonempty_str(v: &Option<Json>) -> bool {
+    matches!(v, Some(Json::Str(s)) if !s.trim().is_empty())
+}
+
+/// writes 面：字符串数组（可为空数组）。
+fn phase_writes_ok(writes_v: &Option<Json>) -> bool {
+    match writes_v {
+        Some(Json::Array(w)) => w
+            .iter()
+            .all(|x| matches!(x, Json::Str(s) if !s.trim().is_empty())),
+        _ => false,
+    }
+}
+
+/// 记一条 phase→next 边。
+///
+/// ⚠️ 真源 `edges` 是 **dict**（`edges[pname] = nxt`）⇒ **后者覆盖前者**，且**保留首次
+/// 插入的位置**。用 Vec 追加会同时改变两处结论：①「next 无对应相位」会报出已被覆盖
+/// 的旧值；② `all(n in phase_set ...)` 会因旧值悬空而**整段跳过**，漏报不可达相位。
+/// 实测（2026-10-04，合成夹具 M92）：`begin→ghost` 被 `begin→begin` 覆盖，两处结论相反。
+fn record_phase_edge(
+    edges: &mut Vec<(String, String)>,
+    pname_v: &Option<Json>,
+    nxt_v: &Option<Json>,
+) {
+    if let (Json::Str(p), Json::Str(n)) = (
+        &pname_v.clone().unwrap_or(Json::Null),
+        &nxt_v.clone().unwrap_or(Json::Null),
+    ) {
+        match edges.iter_mut().find(|(k, _)| *k == *p) {
+            Some(slot) => slot.1 = n.clone(),
+            None => edges.push((p.clone(), n.clone())),
+        }
+    }
 }
 
 /// initial_phase 在位 + next 指向存在 + 从初始相位可达性。
@@ -167,6 +205,44 @@ pub(crate) fn check_reachability(
     initial_phase: Option<&str>,
     phase_names: &[String],
     edges: &[(String, String)],
+    issues: &mut Vec<String>,
+) {
+    check_initial_phase_declared(label, initial_phase, phase_names, issues);
+    check_next_targets_declared(label, phase_names, edges, issues);
+
+    let all_next_ok = edges.iter().all(|(_, n)| phase_names.contains(n));
+    let Some(ip0) = initial_phase else {
+        return;
+    };
+    if phase_names.iter().any(|p| p == ip0) && all_next_ok {
+        let seen = reachable_phases(ip0, edges);
+        let mut unreachable: Vec<String> = phase_names
+            .iter()
+            .filter(|n| !seen.contains(n))
+            .cloned()
+            .collect();
+        unreachable.sort();
+        unreachable.dedup();
+        if !unreachable.is_empty() {
+            issues.push(format!(
+                "{}.transition: 从 initial_phase 不可达的相位 {}",
+                label,
+                pyval::py_repr_list(
+                    &unreachable
+                        .iter()
+                        .map(|s| Json::Str(s.clone()))
+                        .collect::<Vec<_>>()
+                )
+            ));
+        }
+    }
+}
+
+/// initial_phase 必须在 phases 内。
+fn check_initial_phase_declared(
+    label: &str,
+    initial_phase: Option<&str>,
+    phase_names: &[String],
     issues: &mut Vec<String>,
 ) {
     if let Some(ip) = initial_phase {
@@ -178,6 +254,15 @@ pub(crate) fn check_reachability(
             ));
         }
     }
+}
+
+/// 每条边的 next 必须指向已声明相位。
+fn check_next_targets_declared(
+    label: &str,
+    phase_names: &[String],
+    edges: &[(String, String)],
+    issues: &mut Vec<String>,
+) {
     for (pname, nxt) in edges {
         if !phase_names.contains(nxt) {
             issues.push(format!(
@@ -188,42 +273,22 @@ pub(crate) fn check_reachability(
             ));
         }
     }
+}
 
-    let all_next_ok = edges.iter().all(|(_, n)| phase_names.contains(n));
-    if let Some(ip0) = initial_phase {
-        if phase_names.iter().any(|p| p == ip0) && all_next_ok {
-            let mut seen: Vec<String> = vec![ip0.to_string()];
-            let mut frontier: Vec<String> = vec![ip0.to_string()];
-            while !frontier.is_empty() {
-                let current = frontier.remove(0);
-                if let Some((_, nxt)) = edges.iter().find(|(p, _)| *p == current) {
-                    if !seen.contains(nxt) {
-                        seen.push(nxt.clone());
-                        frontier.push(nxt.clone());
-                    }
-                }
-            }
-            let mut unreachable: Vec<String> = phase_names
-                .iter()
-                .filter(|n| !seen.contains(n))
-                .cloned()
-                .collect();
-            unreachable.sort();
-            unreachable.dedup();
-            if !unreachable.is_empty() {
-                issues.push(format!(
-                    "{}.transition: 从 initial_phase 不可达的相位 {}",
-                    label,
-                    pyval::py_repr_list(
-                        &unreachable
-                            .iter()
-                            .map(|s| Json::Str(s.clone()))
-                            .collect::<Vec<_>>()
-                    )
-                ));
+/// 沿 next 边做 BFS，返回从初始相位可达的相位集合（首元素为初始相位本身）。
+fn reachable_phases(ip0: &str, edges: &[(String, String)]) -> Vec<String> {
+    let mut seen: Vec<String> = vec![ip0.to_string()];
+    let mut frontier: Vec<String> = vec![ip0.to_string()];
+    while !frontier.is_empty() {
+        let current = frontier.remove(0);
+        if let Some((_, nxt)) = edges.iter().find(|(p, _)| *p == current) {
+            if !seen.contains(nxt) {
+                seen.push(nxt.clone());
+                frontier.push(nxt.clone());
             }
         }
     }
+    seen
 }
 
 /// invariants 面：非空字符串数组。

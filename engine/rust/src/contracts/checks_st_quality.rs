@@ -77,13 +77,36 @@ pub(super) fn st_quality_scan(root: &Path) -> Result<(Vec<String>, Vec<String>, 
         return Ok((vec![format!("缺 ST 制卡质量规范 {}", ST_REL)], warns, stats));
     }
 
-    if py_str(get(&d, "schema")) != ST_SCHEMA {
-        issues.push(format!("规范 schema 不匹配（期望 {}）", ST_SCHEMA));
-    }
-
     let levels = str_list(get(&d, "level_vocabulary"));
     let scopes = str_list(get(&d, "scope_vocabulary"));
     let checks = str_list(get(&d, "check_vocabulary"));
+    st_vocab_issues(&d, &levels, &scopes, &checks, &mut issues);
+
+    let mut seen: Vec<String> = Vec::new();
+    st_level_slots(&levels, &mut stats);
+    let mut arts: Vec<String> = Vec::new();
+    st_rules_scan(
+        &d, &levels, &scopes, &mut seen, &mut arts, &mut stats, &mut issues,
+    );
+    st_art_checks(root, &arts, &mut issues);
+    issues.extend(check_checklist(root, &d));
+    st_pending_warns(&d, &mut warns);
+    stats.rules = seen.len();
+    stats.artifact_checked = arts.len();
+    Ok((issues, warns, stats))
+}
+
+/// 规范顶层：schema 号 + 三张词表 + draft 待补清单。
+fn st_vocab_issues(
+    d: &Json,
+    levels: &[String],
+    scopes: &[String],
+    checks: &[String],
+    issues: &mut Vec<String>,
+) {
+    if py_str(get(d, "schema")) != ST_SCHEMA {
+        issues.push(format!("规范 schema 不匹配（期望 {}）", ST_SCHEMA));
+    }
     if levels != ["M", "S", "R"] {
         issues.push("level 词表必须为 M/S/R".into());
     }
@@ -93,60 +116,103 @@ pub(super) fn st_quality_scan(root: &Path) -> Result<(Vec<String>, Vec<String>, 
     if checks != ["declaration", "artifact"] {
         issues.push("check 词表必须为 declaration/artifact".into());
     }
-    if py_str(get(&d, "status")) == "draft" && arr_is_empty(get(&d, "pending")) {
+    if py_str(get(d, "status")) == "draft" && arr_is_empty(get(d, "pending")) {
         issues.push("status=draft 但 pending 为空——草案必须写明还差什么".into());
     }
+}
 
-    let mut seen: Vec<String> = Vec::new();
-    for k in &levels {
+/// 按 level 词表初始化分布计数槽。
+fn st_level_slots(levels: &[String], stats: &mut StStats) {
+    for k in levels {
         if !stats.by_level.iter().any(|(n, _)| n == k) {
             stats.by_level.push((k.clone(), 0));
         }
     }
-    let mut arts: Vec<String> = Vec::new();
-    for r in arr_items(get(&d, "rules")) {
-        let rid = py_str(get(r, "id"));
-        let tag = if rid.is_empty() {
-            "(无名)".to_string()
-        } else {
-            rid.clone()
-        };
-        if seen.contains(&rid) {
-            issues.push(format!("规则 id 重复：{}", rid));
-        }
-        seen.push(rid.clone());
-        let scope = py_str(get(r, "scope"));
-        if !scopes.contains(&scope) {
-            issues.push(format!("{} scope 越词表：{}", tag, scope));
-        } else if !rid.is_empty() && !rid.starts_with(&scope) {
-            issues.push(format!(
-                "{} 的 id 前缀与 scope 不一致（应 {} 开头）",
-                tag, scope
-            ));
-        }
-        let lv = py_str(get(r, "level"));
-        if !levels.contains(&lv) {
-            issues.push(format!("{} level 越词表：{}", tag, lv));
-        } else if let Some(slot) = stats.by_level.iter_mut().find(|(n, _)| *n == lv) {
-            slot.1 += 1;
-        }
-        for k in ["rule", "basis", "check"] {
-            if py_str(get(r, k)).trim().is_empty() {
-                issues.push(format!("{} 缺必填字段：{}", tag, k));
-            }
-        }
-        if py_str(get(r, "check")) == "artifact" {
+}
+
+/// 规则面：id 唯一 + scope/level 词表与前缀 + 必填字段 + artifact 规则收集。
+fn st_rules_scan(
+    d: &Json,
+    levels: &[String],
+    scopes: &[String],
+    seen: &mut Vec<String>,
+    arts: &mut Vec<String>,
+    stats: &mut StStats,
+    issues: &mut Vec<String>,
+) {
+    for r in arr_items(get(d, "rules")) {
+        let (rid, tag) = st_rule_identity(&r, seen, issues);
+        st_rule_fields_issues(&r, &tag, &rid, levels, scopes, stats, issues);
+        if py_str(get(&r, "check")) == "artifact" {
             arts.push(rid);
         }
     }
-    for rid in &arts {
+}
+
+/// 规则 id 面：返回 (id, 报错用标签)，并登记去重。
+fn st_rule_identity(
+    r: &Json,
+    seen: &mut Vec<String>,
+    issues: &mut Vec<String>,
+) -> (String, String) {
+    let rid = py_str(get(r, "id"));
+    let tag = if rid.is_empty() {
+        "(无名)".to_string()
+    } else {
+        rid.clone()
+    };
+    if seen.contains(&rid) {
+        issues.push(format!("规则 id 重复：{}", rid));
+    }
+    seen.push(rid.clone());
+    (rid, tag)
+}
+
+/// 规则字段面：scope / level / rule-basis-check。
+fn st_rule_fields_issues(
+    r: &Json,
+    tag: &str,
+    rid: &str,
+    levels: &[String],
+    scopes: &[String],
+    stats: &mut StStats,
+    issues: &mut Vec<String>,
+) {
+    let scope = py_str(get(r, "scope"));
+    if !scopes.contains(&scope) {
+        issues.push(format!("{} scope 越词表：{}", tag, scope));
+    } else if !rid.is_empty() && !rid.starts_with(&scope) {
+        issues.push(format!(
+            "{} 的 id 前缀与 scope 不一致（应 {} 开头）",
+            tag, scope
+        ));
+    }
+    let lv = py_str(get(r, "level"));
+    if !levels.contains(&lv) {
+        issues.push(format!("{} level 越词表：{}", tag, lv));
+    } else if let Some(slot) = stats.by_level.iter_mut().find(|(n, _)| *n == lv) {
+        slot.1 += 1;
+    }
+    for k in ["rule", "basis", "check"] {
+        if py_str(get(r, k)).trim().is_empty() {
+            issues.push(format!("{} 缺必填字段：{}", tag, k));
+        }
+    }
+}
+
+/// artifact 类规则的附加核对（V2 走样本件检查）。
+fn st_art_checks(root: &Path, arts: &[String], issues: &mut Vec<String>) {
+    for rid in arts {
         if rid == "V2" {
             issues.extend(check_v2(root));
         }
     }
-    issues.extend(check_checklist(root, &d));
-    if !arr_is_empty(get(&d, "pending")) {
-        let p = arr_items(get(&d, "pending"));
+}
+
+/// 草案待补项的 warns。
+fn st_pending_warns(d: &Json, warns: &mut Vec<String>) {
+    if !arr_is_empty(get(d, "pending")) {
+        let p = arr_items(get(d, "pending"));
         let head: Vec<String> = p.iter().take(2).map(|v| py_str(Some(v))).collect();
         warns.push(format!(
             "规范为草案：{} 项待补（{}）",
@@ -154,9 +220,6 @@ pub(super) fn st_quality_scan(root: &Path) -> Result<(Vec<String>, Vec<String>, 
             head.join("；")
         ));
     }
-    stats.rules = seen.len();
-    stats.artifact_checked = arts.len();
-    Ok((issues, warns, stats))
 }
 
 /// 真源 `_check_v2`：`initial` 键集合必须 ⊆ 变量名集合。

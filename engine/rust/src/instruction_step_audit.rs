@@ -46,22 +46,10 @@ pub fn scan(root: &Path) -> (Vec<String>, Option<StepStats>) {
         );
     }
     let nf_text = std::fs::read_to_string(root.join("scripts/nf.py")).unwrap_or_default();
-    static SUBS: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
-    let subs_re = SUBS.get_or_init(|| {
-        regex::Regex::new(r#"add_parser\(\s*"([^"]+)""#).expect("子命令正则固定合法")
-    });
-    let nf_subs: std::collections::BTreeSet<String> = subs_re
+    let nf_subs: std::collections::BTreeSet<String> = subs_re()
         .captures_iter(&nf_text)
         .map(|c| c[1].to_string())
         .collect();
-
-    static CMD: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
-    let cmd_re =
-        CMD.get_or_init(|| regex::Regex::new(r"`([^`\n]{1,160})`").expect("内联命令正则固定合法"));
-    static REPO_PATH: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
-    let repo_re = REPO_PATH.get_or_init(|| {
-        regex::Regex::new(r"(?:community|docs|protocol|03_管线库)/").expect("仓库路径正则固定合法")
-    });
 
     let mut steps = 0usize;
     for rel in AUDIT_DOCS {
@@ -71,32 +59,9 @@ pub fn scan(root: &Path) -> (Vec<String>, Option<StepStats>) {
             continue;
         }
         let text = std::fs::read_to_string(&path).unwrap_or_default();
-        for c in cmd_re.captures_iter(&text) {
+        for c in cmd_re().captures_iter(&text) {
             let code = c[1].trim().to_string();
-            if let Some(rest) = code.strip_prefix("nf ") {
-                steps += 1;
-                let sub = rest.split_whitespace().next().unwrap_or("");
-                if !nf_subs.contains(sub) {
-                    issues.push(format!("{}: 引用未知子命令 nf {}", rel, sub));
-                }
-            } else if let Some(rest) = code.strip_prefix("python scripts/") {
-                steps += 1;
-                let fname = rest
-                    .split_whitespace()
-                    .next()
-                    .unwrap_or("")
-                    .trim_start_matches("./");
-                if !root.join(fname).exists() {
-                    issues.push(format!("{}: 引用脚本不存在 {}", rel, fname));
-                }
-            } else if repo_re.is_match(&code)
-                && (code.ends_with(".md") || code.ends_with(".json") || code.ends_with(".yaml"))
-            {
-                steps += 1;
-                if !root.join(&code).exists() {
-                    issues.push(format!("{}: 引用路径不存在 {}", rel, code));
-                }
-            }
+            steps += audit_step(root, rel, &code, &nf_subs, &mut issues);
         }
     }
     (
@@ -106,4 +71,63 @@ pub fn scan(root: &Path) -> (Vec<String>, Option<StepStats>) {
             steps,
         }),
     )
+}
+
+/// 子命令正则（静态初始化）。
+fn subs_re() -> &'static regex::Regex {
+    static SUBS: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
+    SUBS.get_or_init(|| {
+        regex::Regex::new(r#"add_parser\(\s*"([^"]+)""#).expect("子命令正则固定合法")
+    })
+}
+
+/// 内联命令正则（静态初始化）。
+fn cmd_re() -> &'static regex::Regex {
+    static CMD: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
+    CMD.get_or_init(|| regex::Regex::new(r"`([^`\n]{1,160})`").expect("内联命令正则固定合法"))
+}
+
+/// 仓库路径正则（静态初始化）。
+fn repo_re() -> &'static regex::Regex {
+    static REPO_PATH: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
+    REPO_PATH.get_or_init(|| {
+        regex::Regex::new(r"(?:community|docs|protocol|03_管线库)/").expect("仓库路径正则固定合法")
+    })
+}
+
+/// 单条内联命令分类核对；返回计入的步骤数（0 或 1）。
+fn audit_step(
+    root: &Path,
+    rel: &str,
+    code: &str,
+    nf_subs: &std::collections::BTreeSet<String>,
+    issues: &mut Vec<String>,
+) -> usize {
+    if let Some(rest) = code.strip_prefix("nf ") {
+        let sub = rest.split_whitespace().next().unwrap_or("");
+        if !nf_subs.contains(sub) {
+            issues.push(format!("{}: 引用未知子命令 nf {}", rel, sub));
+        }
+        return 1;
+    }
+    if let Some(rest) = code.strip_prefix("python scripts/") {
+        let fname = rest
+            .split_whitespace()
+            .next()
+            .unwrap_or("")
+            .trim_start_matches("./");
+        if !root.join(fname).exists() {
+            issues.push(format!("{}: 引用脚本不存在 {}", rel, fname));
+        }
+        return 1;
+    }
+    if repo_re().is_match(code)
+        && (code.ends_with(".md") || code.ends_with(".json") || code.ends_with(".yaml"))
+    {
+        if !root.join(code).exists() {
+            issues.push(format!("{}: 引用路径不存在 {}", rel, code));
+        }
+        return 1;
+    }
+    0
 }

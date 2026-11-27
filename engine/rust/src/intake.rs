@@ -58,24 +58,56 @@ pub fn scan(root: &Path) -> IntakeScan {
             ]),
         };
     };
-    if py_str(get(&doc, "schema")) != SCHEMA {
+    intake_doc_issues(&doc, &mut issues);
+    let channels = intake_channels(&doc, &mut issues);
+    let index_text = index_text_or_issue(root, &mut issues);
+    let mut sorted = channels.clone();
+    sorted.sort_by(|a, b| a.0.cmp(&b.0));
+    for (name, ch) in &sorted {
+        channel_issues(name, ch, &index_text, &mut issues);
+    }
+    bot_ref_issues(root, &mut issues);
+
+    let mut modes: BTreeSet<String> = BTreeSet::new();
+    for (_, c) in &channels {
+        modes.insert(py_str(get(c, "mode")));
+    }
+    let _ = py_truthy(&Json::Null);
+    IntakeScan {
+        issues,
+        stats: Json::Object(vec![
+            ("channels".to_string(), Json::Int(channels.len() as i64)),
+            (
+                "modes".to_string(),
+                Json::Array(modes.into_iter().map(Json::Str).collect()),
+            ),
+        ]),
+    }
+}
+
+/// 声明顶层：schema / updated / after_action。
+fn intake_doc_issues(doc: &Json, issues: &mut Vec<String>) {
+    if py_str(get(doc, "schema")) != SCHEMA {
         issues.push(format!("{} schema 不匹配（期望 {}）", INTAKE_REL, SCHEMA));
     }
-    if !is_dated(&py_str(get(&doc, "updated"))) {
+    if !is_dated(&py_str(get(doc, "updated"))) {
         issues.push(format!(
             "{} updated 非 YYYY-MM-DD：{}",
             INTAKE_REL,
-            crate::pyval::py_repr(get(&doc, "updated").unwrap_or(&Json::Null))
+            crate::pyval::py_repr(get(doc, "updated").unwrap_or(&Json::Null))
         ));
     }
-    if py_str(get(&doc, "after_action")).trim().is_empty() {
+    if py_str(get(doc, "after_action")).trim().is_empty() {
         issues.push(format!(
             "{} 缺 after_action（事后处置口径须成文：违规内容怎么下架）",
             INTAKE_REL
         ));
     }
+}
 
-    let channels: Vec<(String, Json)> = match get(&doc, "channels") {
+/// 接收通道表：必须非空。
+fn intake_channels(doc: &Json, issues: &mut Vec<String>) -> Vec<(String, Json)> {
+    let channels: Vec<(String, Json)> = match get(doc, "channels") {
         Some(Json::Object(p)) if !p.is_empty() => p.clone(),
         _ => Vec::new(),
     };
@@ -85,21 +117,22 @@ pub fn scan(root: &Path) -> IntakeScan {
             INTAKE_REL
         ));
     }
+    channels
+}
 
+/// 入库索引正文：缺件报一条并返回空串。
+fn index_text_or_issue(root: &Path, issues: &mut Vec<String>) -> String {
     let idx = root.join(INDEX_REL);
-    let index_text = if idx.is_file() {
+    if idx.is_file() {
         std::fs::read_to_string(&idx).unwrap_or_default()
     } else {
         issues.push(format!("缺 {}（闸门措辞无处可查）", INDEX_REL));
         String::new()
-    };
-
-    let mut sorted = channels.clone();
-    sorted.sort_by(|a, b| a.0.cmp(&b.0));
-    for (name, ch) in &sorted {
-        channel_issues(name, ch, &index_text, &mut issues);
     }
+}
 
+/// 入库机器人脚本须在场且引用闸门声明。
+fn bot_ref_issues(root: &Path, issues: &mut Vec<String>) {
     for rel in BOTS {
         let p = root.join(rel);
         if !p.is_file() {
@@ -116,22 +149,6 @@ pub fn scan(root: &Path) -> IntakeScan {
                 rel, INTAKE_REL
             ));
         }
-    }
-
-    let mut modes: BTreeSet<String> = BTreeSet::new();
-    for (_, c) in &channels {
-        modes.insert(py_str(get(c, "mode")));
-    }
-    let _ = py_truthy(&Json::Null);
-    IntakeScan {
-        issues,
-        stats: Json::Object(vec![
-            ("channels".to_string(), Json::Int(channels.len() as i64)),
-            (
-                "modes".to_string(),
-                Json::Array(modes.into_iter().map(Json::Str).collect()),
-            ),
-        ]),
     }
 }
 

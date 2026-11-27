@@ -80,18 +80,7 @@ pub(crate) fn index_verify(root: &Path) -> (Vec<String>, Json) {
 pub(crate) fn meter(root: &Path) -> (Vec<String>, Json) {
     let mut packages: Vec<(String, Json)> = Vec::new();
     // 资产档面一次枚举（真源走共享枚举器；本线直接按模式枚举）
-    let mut prose_by_pkg: BTreeMap<String, Vec<String>> = BTreeMap::new();
-    let mut rels = crate::glob::expand(root, "community/*/assets/*.md");
-    rels.sort();
-    for rel in rels {
-        let parts: Vec<&str> = rel.split('/').collect();
-        if parts.len() == 4 && parts[3] != "README.md" {
-            prose_by_pkg
-                .entry(parts[1].to_string())
-                .or_default()
-                .push(parts[3].to_string());
-        }
-    }
+    let prose_by_pkg = meter_prose_map(root);
     let mut total_mv = 0i64;
     let mut total_fn = 0i64;
     let mut total_prose = 0i64;
@@ -171,6 +160,23 @@ pub(crate) fn meter(root: &Path) -> (Vec<String>, Json) {
             ("totals".to_string(), totals),
         ]),
     )
+}
+
+/// 资产档面枚举：包名 → 资产 md 文件名（README 不算）。
+fn meter_prose_map(root: &Path) -> BTreeMap<String, Vec<String>> {
+    let mut prose_by_pkg: BTreeMap<String, Vec<String>> = BTreeMap::new();
+    let mut rels = crate::glob::expand(root, "community/*/assets/*.md");
+    rels.sort();
+    for rel in rels {
+        let parts: Vec<&str> = rel.split('/').collect();
+        if parts.len() == 4 && parts[3] != "README.md" {
+            prose_by_pkg
+                .entry(parts[1].to_string())
+                .or_default()
+                .push(parts[3].to_string());
+        }
+    }
+    prose_by_pkg
 }
 
 /// 真源 `baseline_verify` → `(issues, stats)`。

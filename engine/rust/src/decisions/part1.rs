@@ -125,40 +125,8 @@ pub(crate) fn scan(root: &Path) -> (Vec<String>, usize, usize, usize) {
         );
     }
 
-    for (did, target) in &supby {
-        if !ids.iter().any(|(i, _)| i == target) {
-            issues.push(format!(
-                "{} 的 superseded_by 指向不在册编号：{}",
-                did, target
-            ));
-            continue;
-        }
-        let mut cur = target.clone();
-        let mut hops = 0usize;
-        while let Some((_, next)) = supby.iter().find(|(i, _)| *i == cur) {
-            if hops >= supby.len() + 1 {
-                break;
-            }
-            cur = next.clone();
-            hops += 1;
-            if cur == *did {
-                issues.push(format!("取代链成环：{} → … → {}", did, did));
-                break;
-            }
-        }
-    }
-
-    for (did, _) in &ids {
-        for other in &rows {
-            if &py_str(get(&other.fm, "id")) != did {
-                continue;
-            }
-            let sup = py_str(get(&other.fm, "supersedes")).trim().to_string();
-            if !DASHES.contains(&sup.as_str()) && !ids.iter().any(|(i, _)| *i == sup) {
-                issues.push(format!("{} 的 supersedes 指向不在册编号：{}", did, sup));
-            }
-        }
-    }
+    supersede_cycle_issues(&supby, &ids, &mut issues);
+    supersedes_target_issues(&ids, &rows, &mut issues);
 
     let accepted = rows
         .iter()
@@ -193,18 +161,86 @@ pub(crate) fn decision_entry_issue(
     if !re_id().is_match(&did) {
         issues.push(format!("{} 的 id 不合法（须 ADR-四位数字）：{}", name, did));
     }
+    entry_file_id_issues(name, &did, issues);
+    entry_register_id(&did, name, ids, issues);
+    let st = entry_field_issues(&tag, fm, issues);
+    entry_section_issues(&tag, &e.body, issues);
+    entry_evidence_issues(&tag, fm, root, checks, issues);
+    entry_acceptance_issues(&tag, &st, has_receipts, &e.path, receipts, issues);
+    entry_supersede_issues(&tag, &st, &did, fm, supby, issues);
+}
+
+/// 取代链核对：指向不在册 + 成环（hops 上限防死循环）。
+fn supersede_cycle_issues(
+    supby: &[(String, String)],
+    ids: &[(String, String)],
+    issues: &mut Vec<String>,
+) {
+    for (did, target) in supby {
+        if !ids.iter().any(|(i, _)| i == target) {
+            issues.push(format!(
+                "{} 的 superseded_by 指向不在册编号：{}",
+                did, target
+            ));
+            continue;
+        }
+        let mut cur = target.clone();
+        let mut hops = 0usize;
+        while let Some((_, next)) = supby.iter().find(|(i, _)| *i == cur) {
+            if hops >= supby.len() + 1 {
+                break;
+            }
+            cur = next.clone();
+            hops += 1;
+            if cur == *did {
+                issues.push(format!("取代链成环：{} → … → {}", did, did));
+                break;
+            }
+        }
+    }
+}
+
+/// 每条 ADR 的 supersedes 指向必须在册（DASHES 占位不算目标）。
+fn supersedes_target_issues(
+    ids: &[(String, String)],
+    rows: &[Entry],
+    issues: &mut Vec<String>,
+) {
+    for (did, _) in ids {
+        for other in rows {
+            if &py_str(get(&other.fm, "id")) != did {
+                continue;
+            }
+            let sup = py_str(get(&other.fm, "supersedes")).trim().to_string();
+            if !DASHES.contains(&sup.as_str()) && !ids.iter().any(|(i, _)| *i == sup) {
+                issues.push(format!("{} 的 supersedes 指向不在册编号：{}", did, sup));
+            }
+        }
+    }
+}
+
+/// id 与文件名一致性。
+fn entry_file_id_issues(name: &str, did: &str, issues: &mut Vec<String>) {
     match re_file_id().captures(name) {
         Some(c) if format!("ADR-{}", &c[1]) == did => {}
         _ => issues.push(format!("{} 的 id 与文件名不一致：{}", name, did)),
     }
+}
+
+/// id 登记（同 id → 后者覆盖文件，与真源 dict 语义一致）。
+fn entry_register_id(did: &str, name: &str, ids: &mut Vec<(String, String)>, issues: &mut Vec<String>) {
     if let Some((_, prev)) = ids.iter().find(|(i, _)| *i == did) {
         issues.push(format!("ADR 编号重复：{}（{} 与 {}）", did, prev, name));
         if let Some(slot) = ids.iter_mut().find(|(i, _)| *i == did) {
-            slot.1 = name.clone();
+            slot.1 = name.to_string();
         }
     } else {
-        ids.push((did.clone(), name.clone()));
+        ids.push((did.to_string(), name.to_string()));
     }
+}
+
+/// 必填字段 / status 词表 / date 格式；返回 status。
+fn entry_field_issues(tag: &str, fm: &Json, issues: &mut Vec<String>) -> String {
     for k in ["title", "status", "date", "evidence"] {
         if !py_truthy(get(fm, k).unwrap_or(&Json::Null)) {
             issues.push(format!("{} 缺必填字段：{}", tag, k));
@@ -223,51 +259,18 @@ pub(crate) fn decision_entry_issue(
     if !date.is_empty() && !re_dated().is_match(&date) {
         issues.push(format!("{} 的 date 非 YYYY-MM-DD：{}", tag, date));
     }
+    st
+}
+
+/// 正文必备段落。
+fn entry_section_issues(tag: &str, body: &str, issues: &mut Vec<String>) {
     for sec in SECTIONS {
-        if !e.body.contains(sec) {
+        if !body.contains(sec) {
             issues.push(format!("{} 正文缺段落：{}", tag, sec));
         }
     }
-    for ev in arr_items(get(fm, "evidence")) {
-        let s = plain_str(ev).trim().to_string();
-        if s.is_empty() {
-            issues.push(format!("{} 的 evidence 有空项", tag));
-            continue;
-        }
-        if let Some(c) = re_check().captures(&s) {
-            if !checks.contains(&c[1]) {
-                issues.push(format!("{} 的 evidence 指向不存在的 check：{}", tag, s));
-            }
-            continue;
-        }
-        if re_adr().is_match(&s) {
-            continue;
-        }
-        if !root.join(s.replace('\\', "/")).exists() {
-            issues.push(format!(
-                "{} 的 evidence 无法解析：{}（修复指引：改为真实件路径，或 checkN，或 ADR-N）",
-                tag, s
-            ));
-        }
-    }
-    if st == "accepted" && has_receipts && !receipts.contains(&e.path) {
-        issues.push(format!(
-            "{} 已 accepted 但未被协议回执锚定（修复指引：nf receipts --write）——未锚定的 accepted 等于可被偷改",
-            tag
-        ));
-    }
-    let sb = py_str(get(fm, "superseded_by")).trim().to_string();
-    if st == "superseded" && DASHES.contains(&sb.as_str()) {
-        issues.push(format!("{} 标 superseded 但缺 superseded_by", tag));
-    }
-    if !DASHES.contains(&sb.as_str()) {
-        if let Some(slot) = supby.iter_mut().find(|(i, _)| *i == did) {
-            slot.1 = sb;
-        } else {
-            supby.push((did.clone(), sb));
-        }
-    }
 }
+
 
 /// 真源 `render_index`：投影表。
 pub(crate) fn render_index(root: &Path) -> String {

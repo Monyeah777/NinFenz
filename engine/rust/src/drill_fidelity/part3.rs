@@ -224,7 +224,24 @@ pub(crate) fn scan(root: &Path) -> (Vec<String>, Vec<String>, Json) {
             ROUND_GLOB
         ));
     }
-    for s in &sets {
+    exec_set_issues(&sets, &mut issues);
+    round_sample_issues(&samples, &mut issues);
+
+    // 真源 `stats = m["overall"]` 再 update 两个键 ⇒ 键序为 cases/passed/fidelity/exec_sets/round_samples
+    let stats = Json::Object(vec![
+        ("cases".to_string(), Json::Int(total)),
+        ("passed".to_string(), Json::Int(passed)),
+        ("fidelity".to_string(), Json::Float(fidelity(passed, total))),
+        ("exec_sets".to_string(), Json::Int(sets.len() as i64)),
+        // 真源 `stats["round_samples"]` = 样本文件总数（含待裁定样本）；`cases` 只计已裁定样本。
+        ("round_samples".to_string(), Json::Int(samples.len() as i64)),
+    ]);
+    (issues, Vec::new(), stats)
+}
+
+/// 执行演练集：读取错误 / 通过数不足。
+fn exec_set_issues(sets: &[ExecSet], issues: &mut Vec<String>) {
+    for s in sets {
         if let Some(e) = &s.error {
             issues.push(format!("{} {}", s.set, e));
         } else if s.passed != s.cases {
@@ -234,7 +251,11 @@ pub(crate) fn scan(root: &Path) -> (Vec<String>, Vec<String>, Json) {
             ));
         }
     }
-    for s in &samples {
+}
+
+/// 回合级样本：错误 / 待裁定 / 未复现声明。
+fn round_sample_issues(samples: &[RoundSample], issues: &mut Vec<String>) {
+    for s in samples {
         if let Some(err) = &s.error {
             issues.push(format!("{} {}", s.sample, err));
             continue;
@@ -256,15 +277,4 @@ pub(crate) fn scan(root: &Path) -> (Vec<String>, Vec<String>, Json) {
             ));
         }
     }
-
-    // 真源 `stats = m["overall"]` 再 update 两个键 ⇒ 键序为 cases/passed/fidelity/exec_sets/round_samples
-    let stats = Json::Object(vec![
-        ("cases".to_string(), Json::Int(total)),
-        ("passed".to_string(), Json::Int(passed)),
-        ("fidelity".to_string(), Json::Float(fidelity(passed, total))),
-        ("exec_sets".to_string(), Json::Int(sets.len() as i64)),
-        // 真源 `stats["round_samples"]` = 样本文件总数（含待裁定样本）；`cases` 只计已裁定样本。
-        ("round_samples".to_string(), Json::Int(samples.len() as i64)),
-    ]);
-    (issues, Vec::new(), stats)
 }

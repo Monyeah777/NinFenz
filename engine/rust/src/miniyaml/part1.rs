@@ -73,33 +73,51 @@ pub(crate) fn strip_comment(line: &str) -> String {
     let mut quote: Option<char> = None;
     let mut i = 0usize;
     while i < chars.len() {
-        let c = chars[i];
-        match quote {
-            Some(q) => {
-                out.push(c);
-                if c == '\\' && q == '"' && i + 1 < chars.len() {
-                    out.push(chars[i + 1]);
-                    i += 2;
-                    continue;
-                }
-                if c == q {
-                    quote = None;
-                }
-            }
-            None => {
-                if c == '"' || c == '\'' {
-                    quote = Some(c);
-                    out.push(c);
-                } else if c == '#' && (i == 0 || chars[i - 1].is_whitespace()) {
-                    break;
-                } else {
-                    out.push(c);
-                }
-            }
+        if quote.is_some() {
+            i = strip_quoted_char(&chars, i, &mut quote, &mut out);
+        } else {
+            i = strip_plain_char(&chars, i, &mut quote, &mut out);
         }
-        i += 1;
     }
     out
+}
+
+/// 引号内：原样拷贝；反斜杠转义 / 闭合引号各占一步。
+fn strip_quoted_char(
+    chars: &[char],
+    i: usize,
+    quote: &mut Option<char>,
+    out: &mut String,
+) -> usize {
+    let c = chars[i];
+    out.push(c);
+    if c == '\\' && *quote == Some('"') && i + 1 < chars.len() {
+        out.push(chars[i + 1]);
+        return i + 2;
+    }
+    if Some(c) == *quote {
+        *quote = None;
+    }
+    i + 1
+}
+
+/// 引号外：开引号 / 行尾注释 / 原样拷贝。
+fn strip_plain_char(
+    chars: &[char],
+    i: usize,
+    quote: &mut Option<char>,
+    out: &mut String,
+) -> usize {
+    let c = chars[i];
+    if c == '"' || c == '\'' {
+        *quote = Some(c);
+        out.push(c);
+    } else if c == '#' && (i == 0 || chars[i - 1].is_whitespace()) {
+        return chars.len();
+    } else {
+        out.push(c);
+    }
+    i + 1
 }
 
 pub(crate) fn parse_block(lines: &[(usize, String)], i: &mut usize, indent: usize) -> Result<Json, String> {
@@ -118,33 +136,39 @@ pub(crate) fn parse_seq(lines: &[(usize, String)], i: &mut usize, indent: usize)
         }
         let rest = text[1..].trim().to_string();
         *i += 1;
-        if rest.is_empty() {
-            if *i < lines.len() && lines[*i].0 > indent {
-                let child = lines[*i].0;
-                items.push(parse_block(lines, i, child)?);
-            } else {
-                items.push(Json::Null);
-            }
-            continue;
-        }
-        if rest.starts_with(FLOW_MAP_OPEN) || rest.starts_with('[') {
-            // ⚠️ **流式**项必须直接走 `parse_inline`：否则 `split_key` 会把 `{id: C01, ...}`
-            // 当成"块式映射项"（键 `id`、值 `C01, branch: compute, ...`），整条节点被压成一个字符串。
-            // 实测（2026-10-04）：概念图资产里节点就写成 `- {id: C01, branch: compute, …}`，
-            // 102 份图里有 2 份（AI系统域包 / 量化金融域包）踩到这里 ⇒ 它们解析出的节点**全部**缺 id。
-            items.push(parse_inline(&rest)?);
-            continue;
-        }
-        if let Some((k, v)) = split_key(&rest) {
-            // **列表项本身是映射**（真源 `tool_face:` 就是这个形态）。`- ` 占两列，
-            // 故该项内后续键的内容列 = 列表缩进 + 2。
-            let child_indent = indent + 2;
-            items.push(parse_map_with(lines, i, child_indent, Some((k, v)))?);
-            continue;
-        }
-        items.push(parse_inline(&rest)?);
+        items.push(parse_seq_item(lines, i, indent, &rest)?);
     }
     Ok(Json::Array(items))
+}
+
+/// 单个列表项：空项挂子块 / 流式项 / 列表内映射 / 标量。
+fn parse_seq_item(
+    lines: &[(usize, String)],
+    i: &mut usize,
+    indent: usize,
+    rest: &str,
+) -> Result<Json, String> {
+    if rest.is_empty() {
+        if *i < lines.len() && lines[*i].0 > indent {
+            let child = lines[*i].0;
+            return parse_block(lines, i, child);
+        }
+        return Ok(Json::Null);
+    }
+    if rest.starts_with(FLOW_MAP_OPEN) || rest.starts_with('[') {
+        // ⚠️ **流式**项必须直接走 parse_inline：否则 split_key 会把 {id: C01, ...}
+        // 当成"块式映射项"（键 id、值 C01, branch: compute, ...），整条节点被压成一个字符串。
+        // 实测（2026-10-04）：概念图资产里节点就写成 - {id: C01, branch: compute, …}，
+        // 102 份图里有 2 份（AI系统域包 / 量化金融域包）踩到这里 ⇒ 它们解析出的节点**全部**缺 id。
+        return parse_inline(rest);
+    }
+    if let Some((k, v)) = split_key(rest) {
+        // **列表项本身是映射**（真源 tool_face: 就是这个形态）。`- ` 占两列，
+        // 故该项内后续键的内容列 = 列表缩进 + 2。
+        let child_indent = indent + 2;
+        return parse_map_with(lines, i, child_indent, Some((k, v)));
+    }
+    parse_inline(rest)
 }
 
 pub(crate) fn parse_map(lines: &[(usize, String)], i: &mut usize, indent: usize) -> Result<Json, String> {

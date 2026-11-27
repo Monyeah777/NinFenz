@@ -83,28 +83,33 @@ pub fn parse_pipeline_md(text: &str) -> Option<Pipeline> {
     let mut layers: Vec<PipelineLayer> = Vec::new();
     if let Some(Json::Array(lys)) = get(&pnode, "layers") {
         for ly in lys {
-            if !matches!(ly, Json::Object(_)) {
-                continue;
+            if let Some(layer) = parse_pipeline_layer(&ly) {
+                layers.push(layer);
             }
-            let lv = |k: &str| match get(ly, k) {
-                Some(v) => py_str(Some(v)).trim().to_string(),
-                None => String::new(),
-            };
-            let mods = |k: &str| -> Vec<String> {
-                match get(ly, k) {
-                    Some(Json::Array(a)) if !a.is_empty() => {
-                        a.iter().map(norm_module_ref).collect()
-                    }
-                    _ => Vec::new(),
-                }
-            };
-            layers.push(PipelineLayer {
-                id: lv("id"),
-                default_modules: mods("default_modules"),
-            });
         }
     }
     Some(Pipeline { id: pid, layers })
+}
+
+/// 单层声明：id + default_modules（非对象 → None）。
+fn parse_pipeline_layer(ly: &Json) -> Option<PipelineLayer> {
+    if !matches!(ly, Json::Object(_)) {
+        return None;
+    }
+    let lv = |k: &str| match get(ly, k) {
+        Some(v) => py_str(Some(v)).trim().to_string(),
+        None => String::new(),
+    };
+    let mods = |k: &str| -> Vec<String> {
+        match get(ly, k) {
+            Some(Json::Array(a)) if !a.is_empty() => a.iter().map(norm_module_ref).collect(),
+            _ => Vec::new(),
+        }
+    };
+    Some(PipelineLayer {
+        id: lv("id"),
+        default_modules: mods("default_modules"),
+    })
 }
 
 /// 真源 `load_pipeline_file`。

@@ -212,14 +212,7 @@ pub(crate) fn walk_files(dir: &Path, base: &Path, out: &mut Vec<String>) {
 /// 为什么归到「资产契约」：包清单（`nf-output-index/1`）本就是**包自带**的产出面契约，
 /// NF 侧再拿 glob 猜一遍就是两套词表；本判据让**声明**与**实况**互相对齐。
 pub fn check_index(root: &Path, spec: &Json) -> (Vec<String>, Json) {
-    let sid = {
-        let s = sg_str(spec, "id");
-        if s.is_empty() {
-            "?".to_string()
-        } else {
-            s
-        }
-    };
+    let sid = id_or_question(spec);
     let rels = resolve(root, spec);
     if rels.is_empty() {
         return (
@@ -238,59 +231,18 @@ pub fn check_index(root: &Path, spec: &Json) -> (Vec<String>, Json) {
             issues.push(e);
             continue;
         }
-        let doc = match strict_json(&text.unwrap_or_default()) {
-            Ok(v) => v,
-            Err(e) => {
-                issues.push(format!(
-                    "包清单 {} 不是合法 JSON：{}（修复指引：重跑 nf domain build）",
-                    rel, e
-                ));
-                continue;
-            }
+        let Some(doc) = index_doc_or_issue(rel, &text.unwrap_or_default(), &mut issues) else {
+            continue;
+        };
+        let Some(outs) = index_outputs_or_issue(rel, &doc, &mut issues) else {
+            continue;
         };
         let base = path_parent(&path_parent(rel)); // <包>/outputs/INDEX.json → <包>
-        let outs: Vec<Json> = match obj_get(&doc, "outputs") {
-            Some(Json::Array(a)) if !a.is_empty() => a.clone(),
-            _ => {
-                issues.push(format!(
-                    "包清单 {} 的 outputs 为空（修复指引：重跑 nf domain build）",
-                    rel
-                ));
-                continue;
-            }
-        };
         let mut declared: std::collections::BTreeSet<String> = std::collections::BTreeSet::new();
         for item in &outs {
             declared_total += check_index_item(root, &base, rel, item, &mut declared, &mut issues);
         }
-        let mut on_disk: Vec<String> = Vec::new();
-        walk_files(
-            &root.join(&base).join("outputs"),
-            &root.join(&base),
-            &mut on_disk,
-        );
-        // 真源 `self_rel = Path(rel).relative_to(base).as_posix()`：清单自身不是产出面（它是清单）。
-        let self_rel: String = if let Some(rest) = rel.strip_prefix(&base) {
-            rest.trim_start_matches('/').to_string()
-        } else {
-            rel.clone()
-        };
-        let mut missing: Vec<String> = on_disk
-            .into_iter()
-            .filter(|x| {
-                !declared.contains(x) && *x != self_rel && !x.starts_with("outputs/samples/")
-            })
-            .collect();
-        missing.sort();
-        if !missing.is_empty() {
-            let sample: Vec<String> = missing.iter().take(3).cloned().collect();
-            issues.push(format!(
-                "包清单 {} 未声明 {} 件实况（例 {}）（修复指引：重跑 nf domain build 让清单与实况同步）",
-                rel,
-                missing.len(),
-                sample.join("、")
-            ));
-        }
+        check_index_disk(root, rel, &base, &declared, &mut issues);
     }
     (
         issues,
@@ -299,4 +251,68 @@ pub fn check_index(root: &Path, spec: &Json) -> (Vec<String>, Json) {
             ("declared".to_string(), Json::Int(declared_total)),
         ]),
     )
+}
+
+/// 读包清单 JSON；坏 JSON 即报一条并返回 None（真源抛错 → 本线记 issue）。
+fn index_doc_or_issue(rel: &str, text: &str, issues: &mut Vec<String>) -> Option<Json> {
+    match strict_json(text) {
+        Ok(v) => Some(v),
+        Err(e) => {
+            issues.push(format!(
+                "包清单 {} 不是合法 JSON：{}（修复指引：重跑 nf domain build）",
+                rel, e
+            ));
+            None
+        }
+    }
+}
+
+/// 清单 outputs 段；为空即报一条并返回 None。
+fn index_outputs_or_issue(rel: &str, doc: &Json, issues: &mut Vec<String>) -> Option<Vec<Json>> {
+    match obj_get(doc, "outputs") {
+        Some(Json::Array(a)) if !a.is_empty() => Some(a.clone()),
+        _ => {
+            issues.push(format!(
+                "包清单 {} 的 outputs 为空（修复指引：重跑 nf domain build）",
+                rel
+            ));
+            None
+        }
+    }
+}
+
+/// 磁盘实况与清单声明的单向核对（实况未声明即报，样例目录与清单自身不算产出面）。
+fn check_index_disk(
+    root: &Path,
+    rel: &str,
+    base: &str,
+    declared: &std::collections::BTreeSet<String>,
+    issues: &mut Vec<String>,
+) {
+    let mut on_disk: Vec<String> = Vec::new();
+    walk_files(
+        &root.join(base).join("outputs"),
+        &root.join(base),
+        &mut on_disk,
+    );
+    // 真源 self_rel = Path(rel).relative_to(base).as_posix()：清单自身不是产出面（它是清单）。
+    let self_rel: String = if let Some(rest) = rel.strip_prefix(base) {
+        rest.trim_start_matches('/').to_string()
+    } else {
+        rel.to_string()
+    };
+    let mut missing: Vec<String> = on_disk
+        .into_iter()
+        .filter(|x| !declared.contains(x) && *x != self_rel && !x.starts_with("outputs/samples/"))
+        .collect();
+    missing.sort();
+    if !missing.is_empty() {
+        let sample: Vec<String> = missing.iter().take(3).cloned().collect();
+        issues.push(format!(
+            "包清单 {} 未声明 {} 件实况（例 {}）（修复指引：重跑 nf domain build 让清单与实况同步）",
+            rel,
+            missing.len(),
+            sample.join("、")
+        ));
+    }
 }

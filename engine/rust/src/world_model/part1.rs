@@ -144,6 +144,96 @@ pub(crate) fn parse_abstract(wm: &Json, label: &str, issues: &mut Vec<String>) -
     (variables, initial)
 }
 
+/// 变量 name：非空 + 不重名（重名仍登记）。
+fn var_name_issues(at: &str, var: &Json, names: &mut Vec<String>, issues: &mut Vec<String>) {
+    let name = match get(var, "name") {
+        Some(Json::Str(s)) if !s.trim().is_empty() => Some(s),
+        _ => {
+            issues.push(format!("{}.name: 非空字符串", at));
+            None
+        }
+    };
+    if let Some(n) = &name {
+        if names.contains(n) {
+            issues.push(format!(
+                "{}.name: 变量重名 {}",
+                at,
+                pyval::py_repr(&Json::Str(n.clone()))
+            ));
+        }
+        names.push(n.clone());
+    }
+}
+
+/// 变量 kind / item_kind：词表 + array 专属。
+fn var_kind_issues(at: &str, var: &Json, issues: &mut Vec<String>) {
+    let kind_v = get(var, "kind");
+    let item_kind_v = get(var, "item_kind");
+    let kind = match &kind_v {
+        Some(Json::Str(s)) => s.clone(),
+        _ => String::new(),
+    };
+    if !KINDS.contains(&kind.as_str()) {
+        issues.push(format!(
+            "{}.kind: 非法类型 {}",
+            at,
+            pyval::py_repr(&kind_v.clone().unwrap_or(Json::Null))
+        ));
+    }
+    let item_kind_str = match &item_kind_v {
+        Some(Json::Str(s)) => Some(s.clone()),
+        _ => None,
+    };
+    if kind == "array" {
+        if let Some(ik) = &item_kind_str {
+            if !ITEM_KINDS.contains(&ik.as_str()) {
+                issues.push(format!(
+                    "{}.item_kind: 非法元素类型 {}",
+                    at,
+                    pyval::py_repr(&item_kind_v.clone().unwrap_or(Json::Null))
+                ));
+            }
+        }
+    } else if !matches!(item_kind_v, None | Some(Json::Null)) {
+        issues.push(format!("{}.item_kind: 仅 kind=array 可用", at));
+    }
+}
+
+/// 变量 source：非空字符串。
+fn var_source_issues(at: &str, var: &Json, issues: &mut Vec<String>) {
+    let source_v = get(var, "source");
+    let source_ok = matches!(&source_v, Some(Json::Str(s)) if !s.trim().is_empty());
+    if !source_ok {
+        issues.push(format!("{}.source: 非空字符串", at));
+    }
+}
+
+/// 变量 slot：可选；非空且不重复。
+fn var_slot_issues(at: &str, var: &Json, slots: &mut Vec<String>, issues: &mut Vec<String>) {
+    let slot_v = get(var, "slot");
+    if !matches!(slot_v, None | Some(Json::Null)) {
+        let slot_str = match &slot_v {
+            Some(Json::Str(s)) => Some(s.clone()),
+            _ => None,
+        };
+        match slot_str {
+            None => issues.push(format!("{}.slot: 非空字符串", at)),
+            Some(s) if s.trim().is_empty() => issues.push(format!("{}.slot: 非空字符串", at)),
+            Some(s) => {
+                if slots.contains(&s) {
+                    issues.push(format!(
+                        "{}.slot: 槽位重复 {}",
+                        at,
+                        pyval::py_repr(&Json::Str(s))
+                    ));
+                } else {
+                    slots.push(s);
+                }
+            }
+        }
+    }
+}
+
 /// 变量面的 name / kind / item_kind / source / slot 核对；返回通过筛的变量。
 pub(crate) fn check_variables(label: &str, variables: &[Json], issues: &mut Vec<String>) -> Vec<Json> {
     let mut names: Vec<String> = Vec::new();
@@ -155,81 +245,10 @@ pub(crate) fn check_variables(label: &str, variables: &[Json], issues: &mut Vec<
             issues.push(format!("{}: 非对象", at));
             continue;
         }
-        let name_v = get(var, "name");
-        let kind_v = get(var, "kind");
-        let source_v = get(var, "source");
-        let slot_v = get(var, "slot");
-        let item_kind_v = get(var, "item_kind");
-        let name = match &name_v {
-            Some(Json::Str(s)) if !s.trim().is_empty() => Some(s.clone()),
-            _ => {
-                issues.push(format!("{}.name: 非空字符串", at));
-                None
-            }
-        };
-        if let Some(n) = &name {
-            if names.contains(n) {
-                issues.push(format!(
-                    "{}.name: 变量重名 {}",
-                    at,
-                    pyval::py_repr(&Json::Str(n.clone()))
-                ));
-            }
-            names.push(n.clone());
-        }
-        let kind = match &kind_v {
-            Some(Json::Str(s)) => s.clone(),
-            _ => String::new(),
-        };
-        if !KINDS.contains(&kind.as_str()) {
-            issues.push(format!(
-                "{}.kind: 非法类型 {}",
-                at,
-                pyval::py_repr(&kind_v.clone().unwrap_or(Json::Null))
-            ));
-        }
-        let item_kind_str = match &item_kind_v {
-            Some(Json::Str(s)) => Some(s.clone()),
-            _ => None,
-        };
-        if kind == "array" {
-            if let Some(ik) = &item_kind_str {
-                if !ITEM_KINDS.contains(&ik.as_str()) {
-                    issues.push(format!(
-                        "{}.item_kind: 非法元素类型 {}",
-                        at,
-                        pyval::py_repr(&item_kind_v.clone().unwrap_or(Json::Null))
-                    ));
-                }
-            }
-        } else if !matches!(item_kind_v, None | Some(Json::Null)) {
-            issues.push(format!("{}.item_kind: 仅 kind=array 可用", at));
-        }
-        let source_ok = matches!(&source_v, Some(Json::Str(s)) if !s.trim().is_empty());
-        if !source_ok {
-            issues.push(format!("{}.source: 非空字符串", at));
-        }
-        if !matches!(slot_v, None | Some(Json::Null)) {
-            let slot_str = match &slot_v {
-                Some(Json::Str(s)) => Some(s.clone()),
-                _ => None,
-            };
-            match slot_str {
-                None => issues.push(format!("{}.slot: 非空字符串", at)),
-                Some(s) if s.trim().is_empty() => issues.push(format!("{}.slot: 非空字符串", at)),
-                Some(s) => {
-                    if slots.contains(&s) {
-                        issues.push(format!(
-                            "{}.slot: 槽位重复 {}",
-                            at,
-                            pyval::py_repr(&Json::Str(s))
-                        ));
-                    } else {
-                        slots.push(s);
-                    }
-                }
-            }
-        }
+        var_name_issues(&at, var, &mut names, issues);
+        var_kind_issues(&at, var, issues);
+        var_source_issues(&at, var, issues);
+        var_slot_issues(&at, var, &mut slots, issues);
         valid_vars.push(var.clone());
     }
     valid_vars

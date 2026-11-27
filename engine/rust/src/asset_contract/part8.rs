@@ -65,24 +65,30 @@ pub(crate) fn scan_inner(root: &Path) -> (Vec<String>, Vec<String>, Json) {
     let (doc, mut issues) = load(root);
     let mut warns: Vec<String> = Vec::new();
     let mut counts: Vec<(String, i64)> = FACES.iter().map(|f| ((*f).to_string(), 0i64)).collect();
-    let mut files = 0i64;
-    let mut chains = 0i64;
-    let mut no_schema = 0i64;
     if !issues.is_empty() {
-        let mut kv: Vec<(String, Json)> = counts
-            .iter()
-            .map(|(k, v)| (k.clone(), Json::Int(*v)))
-            .collect();
-        kv.push(("files".to_string(), Json::Int(0)));
-        kv.push(("chains".to_string(), Json::Int(0)));
-        return (issues, warns, Json::Object(kv));
+        return (issues, warns, scan_stats(&counts, 0, 0, None));
     }
     // 真源同序：load → 登记册（D1，四面都判）→ 导出漂移（④）/ 声明自检（⑤，声明面整体判据）。
     issues.extend(registry_issues(root, &doc));
     issues.extend(export_drift(root));
     issues.extend(schema_self_check(root));
+    let (files, no_schema) = scan_faces(root, &doc, &mut counts, &mut issues, &mut warns);
+    let chains = scan_chains(&doc, &mut issues);
+    (issues, warns, scan_stats(&counts, files, chains, Some(no_schema)))
+}
+
+/// 四面契约循环：逐面判据、计数面次与统计累加；返回 (files, no_schema)。
+fn scan_faces(
+    root: &Path,
+    doc: &Json,
+    counts: &mut [(String, i64)],
+    issues: &mut Vec<String>,
+    warns: &mut Vec<String>,
+) -> (i64, i64) {
+    let mut files = 0i64;
+    let mut no_schema = 0i64;
     for face in FACES {
-        let specs = match obj_get(&doc, face) {
+        let specs = match obj_get(doc, face) {
             Some(Json::Array(a)) => a.clone(),
             _ => Vec::new(),
         };
@@ -97,7 +103,7 @@ pub(crate) fn scan_inner(root: &Path) -> (Vec<String>, Vec<String>, Json) {
             let (sub, s) = match face {
                 "data" => check_data(root, &spec),
                 "code" => {
-                    // WARN 级治理面：由声明里 `warn_rules` 驱动，不进 issues（见 code_warns）。
+                    // WARN 级治理面：由声明里 warn_rules 驱动，不进 issues（见 code_warns）。
                     warns.extend(code_warns(root, &spec));
                     check_code(root, &spec)
                 }
@@ -109,15 +115,21 @@ pub(crate) fn scan_inner(root: &Path) -> (Vec<String>, Vec<String>, Json) {
                 e.1 += 1;
             }
             files += pyval::py_int_or(obj_get(&s, "files"), 0);
-            // 真源：`stats["no_schema"] = int(stats.get("no_schema") or 0) + int(s.get(...) or 0)`
+            // 真源：stats["no_schema"] = int(stats.get("no_schema") or 0) + int(s.get(...) or 0)
             no_schema += pyval::py_int_or(obj_get(&s, "no_schema"), 0);
         }
     }
-    let specs: Vec<(String, Json)> = match obj_get(&doc, "script") {
+    (files, no_schema)
+}
+
+/// chains 面：逐条核对；返回链数。
+fn scan_chains(doc: &Json, issues: &mut Vec<String>) -> i64 {
+    let mut chains = 0i64;
+    let specs: Vec<(String, Json)> = match obj_get(doc, "script") {
         Some(Json::Array(a)) => a.iter().map(|s| (sg_str(s, "id"), s.clone())).collect(),
         _ => Vec::new(),
     };
-    if let Some(Json::Array(cs)) = obj_get(&doc, "chains") {
+    if let Some(Json::Array(cs)) = obj_get(doc, "chains") {
         for c in cs {
             let empty = Json::Object(vec![]);
             let chain = if matches!(c, Json::Object(_)) {
@@ -130,12 +142,24 @@ pub(crate) fn scan_inner(root: &Path) -> (Vec<String>, Vec<String>, Json) {
             chains += 1;
         }
     }
+    chains
+}
+
+/// 汇总 stats：面次 + files/chains（+ 非早退时的 no_schema）。
+fn scan_stats(
+    counts: &[(String, i64)],
+    files: i64,
+    chains: i64,
+    no_schema: Option<i64>,
+) -> Json {
     let mut kv: Vec<(String, Json)> = counts
         .iter()
         .map(|(k, v)| (k.clone(), Json::Int(*v)))
         .collect();
     kv.push(("files".to_string(), Json::Int(files)));
     kv.push(("chains".to_string(), Json::Int(chains)));
-    kv.push(("no_schema".to_string(), Json::Int(no_schema)));
-    (issues, warns, Json::Object(kv))
+    if let Some(ns) = no_schema {
+        kv.push(("no_schema".to_string(), Json::Int(ns)));
+    }
+    Json::Object(kv)
 }

@@ -34,34 +34,9 @@ pub fn scan(root: &Path) -> McpScan {
             stats: Json::Object(Vec::new()),
         };
     };
-    if py_str(get(&d, "schema")) != SCHEMA {
-        issues.push(format!("包装声明 schema 不匹配（期望 {}）", SCHEMA));
-    }
-    if str_list(get(&d, "category_vocabulary")) != CATEGORIES.to_vec() {
-        issues.push(format!(
-            "类目词表与判据不一致（期望 {}）",
-            CATEGORIES.join("/")
-        ));
-    }
-    if crate::pyval::arr_is_empty(get(&d, "red_lines")) {
-        issues.push("红线不得为空（上架包的纪律必须成文）".to_string());
-    }
-    if py_str(get(&d, "status")) == "draft" && crate::pyval::arr_is_empty(get(&d, "pending")) {
-        issues.push("status=draft 但 pending 为空——草案必须写明还差什么".to_string());
-    }
-    let pkg = get(&d, "package")
-        .filter(|p| matches!(p, Json::Object(_)))
-        .cloned()
-        .unwrap_or_else(|| Json::Object(Vec::new()));
-    if crate::pyval::arr_is_empty(get(&pkg, "name_candidates")) {
-        issues.push("缺命名候选（B-S1 须给候选）".to_string());
-    }
-    if crate::pyval::arr_is_empty(get(&pkg, "one_liner_candidates")) {
-        issues.push("缺一句话候选（B-S1 须给候选）".to_string());
-    }
-    if !CATEGORIES.contains(&py_str(get(&pkg, "category")).as_str()) {
-        issues.push(format!("类目越词表：{}", py_str(get(&pkg, "category"))));
-    }
+    mcp_decl_issues(&d, &mut issues);
+    let pkg = mcp_package_obj(&d);
+    mcp_pkg_issues(&pkg, &mut issues);
 
     // 红线「只读面不变」：与运行时逐名一致（名字表见 `mcp_tables`）
     let live_tools: Vec<String> = crate::mcp_tables::TOOL_NAMES
@@ -75,40 +50,8 @@ pub fn scan(root: &Path) -> McpScan {
     let got_tools: Vec<String> = str_list(get(&pkg, "tools"));
     let got_prompts: Vec<String> = str_list(get(&pkg, "prompts"));
 
-    let mut a = got_tools.clone();
-    let mut b = live_tools.clone();
-    a.sort();
-    b.sort();
-    if a != b {
-        let extra = minus(&got_tools, &live_tools);
-        let missing = minus(&live_tools, &got_tools);
-        issues.push(format!(
-            "工具面与运行时不一致（上架材料会漂移）：声明 {} 个 / 运行时 {} 个（多：{}；少：{}）",
-            got_tools.len(),
-            live_tools.len(),
-            if extra.is_empty() {
-                "无".to_string()
-            } else {
-                py_repr_list(&extra)
-            },
-            if missing.is_empty() {
-                "无".to_string()
-            } else {
-                py_repr_list(&missing)
-            }
-        ));
-    }
-    let mut c = got_prompts.clone();
-    let mut e = live_prompts.clone();
-    c.sort();
-    e.sort();
-    if c != e {
-        issues.push(format!(
-            "提示面与运行时不一致：声明 {} / 运行时 {}",
-            py_repr_list(&got_prompts),
-            py_repr_list(&live_prompts)
-        ));
-    }
+    mcp_tools_issues(&got_tools, &live_tools, &mut issues);
+    mcp_prompts_issues(&got_prompts, &live_prompts, &mut issues);
 
     let stats = Json::Object(vec![
         ("tools".to_string(), Json::Int(got_tools.len() as i64)),
@@ -123,6 +66,88 @@ pub fn scan(root: &Path) -> McpScan {
         ),
     ]);
     McpScan { issues, stats }
+}
+
+/// 包装声明顶层：schema / 类目词表 / 红线 / draft 待补。
+fn mcp_decl_issues(d: &Json, issues: &mut Vec<String>) {
+    if py_str(get(d, "schema")) != SCHEMA {
+        issues.push(format!("包装声明 schema 不匹配（期望 {}）", SCHEMA));
+    }
+    if str_list(get(d, "category_vocabulary")) != CATEGORIES.to_vec() {
+        issues.push(format!(
+            "类目词表与判据不一致（期望 {}）",
+            CATEGORIES.join("/")
+        ));
+    }
+    if crate::pyval::arr_is_empty(get(d, "red_lines")) {
+        issues.push("红线不得为空（上架包的纪律必须成文）".to_string());
+    }
+    if py_str(get(d, "status")) == "draft" && crate::pyval::arr_is_empty(get(d, "pending")) {
+        issues.push("status=draft 但 pending 为空——草案必须写明还差什么".to_string());
+    }
+}
+
+/// package 段（非对象 / 缺键按空对象）。
+fn mcp_package_obj(d: &Json) -> Json {
+    get(d, "package")
+        .filter(|p| matches!(p, Json::Object(_)))
+        .cloned()
+        .unwrap_or_else(|| Json::Object(Vec::new()))
+}
+
+/// package 段：命名候选 / 一句话候选 / 类目词表。
+fn mcp_pkg_issues(pkg: &Json, issues: &mut Vec<String>) {
+    if crate::pyval::arr_is_empty(get(pkg, "name_candidates")) {
+        issues.push("缺命名候选（B-S1 须给候选）".to_string());
+    }
+    if crate::pyval::arr_is_empty(get(pkg, "one_liner_candidates")) {
+        issues.push("缺一句话候选（B-S1 须给候选）".to_string());
+    }
+    if !CATEGORIES.contains(&py_str(get(pkg, "category")).as_str()) {
+        issues.push(format!("类目越词表：{}", py_str(get(pkg, "category"))));
+    }
+}
+
+/// 工具面：声明与运行时逐名一致（多/少都报）。
+fn mcp_tools_issues(got: &[String], live: &[String], issues: &mut Vec<String>) {
+    let mut a = got.to_vec();
+    let mut b = live.to_vec();
+    a.sort();
+    b.sort();
+    if a != b {
+        let extra = minus(got, live);
+        let missing = minus(live, got);
+        issues.push(format!(
+            "工具面与运行时不一致（上架材料会漂移）：声明 {} 个 / 运行时 {} 个（多：{}；少：{}）",
+            got.len(),
+            live.len(),
+            if extra.is_empty() {
+                "无".to_string()
+            } else {
+                py_repr_list(&extra)
+            },
+            if missing.is_empty() {
+                "无".to_string()
+            } else {
+                py_repr_list(&missing)
+            }
+        ));
+    }
+}
+
+/// 提示面：声明与运行时不一致即报。
+fn mcp_prompts_issues(got: &[String], live: &[String], issues: &mut Vec<String>) {
+    let mut c = got.to_vec();
+    let mut e = live.to_vec();
+    c.sort();
+    e.sort();
+    if c != e {
+        issues.push(format!(
+            "提示面与运行时不一致：声明 {} / 运行时 {}",
+            py_repr_list(got),
+            py_repr_list(live)
+        ));
+    }
 }
 
 fn minus(a: &[String], b: &[String]) -> Vec<String> {

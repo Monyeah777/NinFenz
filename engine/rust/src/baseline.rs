@@ -47,23 +47,8 @@ pub fn scan(root: &Path) -> (Vec<String>, Option<BaselineStats>) {
     let expected_pass = expected(root, "EXPECTED_PASS");
 
     let verify_text = std::fs::read_to_string(root.join("verify.sh")).unwrap_or_default();
-    static VRE: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
-    let vre =
-        VRE.get_or_init(|| regex::Regex::new(r"# 版本 : (v\d+\.\d+)").expect("版本行正则固定合法"));
-    let ver = vre
-        .captures(&verify_text)
-        .map(|c| c[1].to_string())
-        .unwrap_or_default();
-
-    static CRE: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
-    let cre =
-        CRE.get_or_init(|| regex::Regex::new(CHECK_DEF_PAT).expect("check 定义正则固定合法"));
-    let mut nums: Vec<i64> = cre
-        .captures_iter(&verify_text)
-        .filter_map(|c| c[1].parse::<i64>().ok())
-        .collect();
-    nums.sort_unstable();
-    nums.dedup();
+    let ver = verify_version(&verify_text);
+    let nums = check_numbers(&verify_text);
     let n_checks = nums.len() as i64;
 
     if ver.is_empty() {
@@ -78,12 +63,52 @@ pub fn scan(root: &Path) -> (Vec<String>, Option<BaselineStats>) {
     }
 
     // 三处声明：README 要求三串**同时**在场；CHANGELOG / VERSION-MATRIX 数 PASS= 出现次数
+    issues.extend(declaration_issues(root, &ver, expected_checks, expected_pass));
+
+    (
+        issues,
+        Some(BaselineStats {
+            verify_version: ver,
+            checks: n_checks,
+        }),
+    )
+}
+
+/// verify.sh 版本头 → vX.Y（缺则空串）。
+fn verify_version(verify_text: &str) -> String {
+    static VRE: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
+    let vre =
+        VRE.get_or_init(|| regex::Regex::new(r"# 版本 : (v\d+\.\d+)").expect("版本行正则固定合法"));
+    vre.captures(verify_text)
+        .map(|c| c[1].to_string())
+        .unwrap_or_default()
+}
+
+/// verify.sh 里所有 checkNN() 定义的编号（升序去重）。
+fn check_numbers(verify_text: &str) -> Vec<i64> {
+    static CRE: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
+    let cre =
+        CRE.get_or_init(|| regex::Regex::new(CHECK_DEF_PAT).expect("check 定义正则固定合法"));
+    let mut nums: Vec<i64> = cre
+        .captures_iter(verify_text)
+        .filter_map(|c| c[1].parse::<i64>().ok())
+        .collect();
+    nums.sort_unstable();
+    nums.dedup();
+    nums
+}
+
+/// README / CHANGELOG / VERSION-MATRIX 三处 PASS= 声明核对。
+fn declaration_issues(
+    root: &Path,
+    ver: &str,
+    expected_checks: i64,
+    expected_pass: i64,
+) -> Vec<String> {
+    let mut issues: Vec<String> = Vec::new();
     let pass_tok = format!("PASS={}", expected_pass);
     let readme = std::fs::read_to_string(root.join("README.md")).unwrap_or_default();
-    let readme_ok = !ver.is_empty()
-        && readme.contains(&ver)
-        && readme.contains(&format!("check1-{}", expected_checks))
-        && readme.contains(&pass_tok);
+    let readme_ok = readme_declares(&readme, ver, expected_checks, &pass_tok);
     let changelog = std::fs::read_to_string(root.join("CHANGELOG.md")).unwrap_or_default();
     let head = changelog
         .split("\n## [2.8.0]")
@@ -114,14 +139,15 @@ pub fn scan(root: &Path) -> (Vec<String>, Option<BaselineStats>) {
             ));
         }
     }
+    issues
+}
 
-    (
-        issues,
-        Some(BaselineStats {
-            verify_version: ver,
-            checks: n_checks,
-        }),
-    )
+/// README 三串同时在场才算声明齐全。
+fn readme_declares(readme: &str, ver: &str, expected_checks: i64, pass_tok: &str) -> bool {
+    !ver.is_empty()
+        && readme.contains(ver)
+        && readme.contains(&format!("check1-{}", expected_checks))
+        && readme.contains(pass_tok)
 }
 
 /// Python `str(list[int])`：`[1, 2, 3]`。

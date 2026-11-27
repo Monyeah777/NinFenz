@@ -20,6 +20,9 @@
 use crate::pyjson::Json;
 
 /// 解析结果：值 + **逐层收集到的重复键**（出现序，可能重复）。
+const LBRACE: char = '{';
+const RBRACE: char = '}';
+
 pub struct Parsed {
     pub value: Json,
     pub dups: Vec<String>,
@@ -73,33 +76,35 @@ impl P<'_> {
                 self.line(),
                 self.col()
             )),
-            Some('{') => self.object(),
+            Some(LBRACE) => self.object(),
             Some('[') => self.array(),
             Some('"') => Ok(Json::Str(self.string()?)),
             Some('t') => self.literal("true", Json::Bool(true)),
             Some('f') => self.literal("false", Json::Bool(false)),
-            Some('n') => {
-                // null 或 NaN
-                if self.c[self.i..].starts_with(&['n', 'u', 'l', 'l']) {
-                    self.literal("null", Json::Null)
-                } else if self.c[self.i..].starts_with(&['n', 'a', 'n']) {
-                    self.i += 3;
-                    Ok(Json::Float(f64::NAN))
-                } else {
-                    Err(self.err_value())
-                }
-            }
+            Some('n') => self.literal_or_nan(),
             Some('N') => self.literal("NaN", Json::Float(f64::NAN)),
             Some('I') => self.literal("Infinity", Json::Float(f64::INFINITY)),
-            Some('-') => {
-                if self.c[self.i..].starts_with(&['-', 'I', 'n', 'f']) {
-                    self.i += 9;
-                    return Ok(Json::Float(f64::NEG_INFINITY));
-                }
-                self.number()
-            }
-            Some(c) if c == '-' || c.is_ascii_digit() => self.number(),
+            Some('-') => self.minus_value(),
+            Some(c) if c.is_ascii_digit() => self.number(),
             _ => Err(self.err_value()),
+        }
+    }
+    fn minus_value(&mut self) -> Result<Json, String> {
+        if self.c[self.i..].starts_with(&['-', 'I', 'n', 'f']) {
+            self.i += 9;
+            return Ok(Json::Float(f64::NEG_INFINITY));
+        }
+        self.number()
+    }
+
+    fn literal_or_nan(&mut self) -> Result<Json, String> {
+        if self.c[self.i..].starts_with(&['n', 'u', 'l', 'l']) {
+            self.literal("null", Json::Null)
+        } else if self.c[self.i..].starts_with(&['n', 'a', 'n']) {
+            self.i += 3;
+            Ok(Json::Float(f64::NAN))
+        } else {
+            Err(self.err_value())
         }
     }
 
@@ -124,12 +129,11 @@ impl P<'_> {
     }
 
     fn object(&mut self) -> Result<Json, String> {
-        self.expect('{')?;
+        self.expect(LBRACE)?;
         let mut out: Vec<(String, Json)> = Vec::new();
         let mut keys: Vec<String> = Vec::new();
         self.ws();
-        if self.peek() == Some('}') {
-            self.i += 1;
+        if self.at_object_end() {
             return Ok(Json::Object(out));
         }
         loop {
@@ -142,27 +146,36 @@ impl P<'_> {
             self.ws();
             self.expect(':')?;
             let val = self.value()?;
-            match out.iter_mut().find(|(k, _)| *k == key) {
-                Some(slot) => slot.1 = val,
-                None => out.push((key, val)),
-            }
+            upsert_json_field(&mut out, key, val);
             self.ws();
-            match self.peek() {
-                Some(',') => {
-                    self.i += 1;
-                }
-                Some('}') => {
-                    self.i += 1;
-                    return Ok(Json::Object(out));
-                }
-                _ => {
-                    return Err(format!(
-                        "Expecting ',' delimiter: line {} column {}",
-                        self.line(),
-                        self.col()
-                    ))
-                }
+            if self.finish_object_entry()? {
+                return Ok(Json::Object(out));
             }
+        }
+    }
+    fn at_object_end(&mut self) -> bool {
+        if self.peek() == Some(RBRACE) {
+            self.i += 1;
+            return true;
+        }
+        false
+    }
+
+    fn finish_object_entry(&mut self) -> Result<bool, String> {
+        match self.peek() {
+            Some(',') => {
+                self.i += 1;
+                Ok(false)
+            }
+            Some(RBRACE) => {
+                self.i += 1;
+                Ok(true)
+            }
+            _ => Err(format!(
+                "Expecting ',' delimiter: line {} column {}",
+                self.line(),
+                self.col()
+            )),
         }
     }
 
@@ -218,59 +231,7 @@ impl P<'_> {
             match c {
                 '"' => return Ok(s),
                 '\\' => {
-                    let Some(e) = self.peek() else {
-                        return Err("Unterminated string".to_string());
-                    };
-                    self.i += 1;
-                    match e {
-                        '"' => s.push('"'),
-                        '\\' => s.push('\\'),
-                        '/' => s.push('/'),
-                        'b' => s.push('\u{8}'),
-                        'f' => s.push('\u{c}'),
-                        'n' => s.push('\n'),
-                        'r' => s.push('\r'),
-                        't' => s.push('\t'),
-                        'u' => {
-                            let hex: String = self
-                                .c
-                                .get(self.i..self.i + 4)
-                                .map(|v| v.iter().collect())
-                                .unwrap_or_default();
-                            if hex.len() != 4 {
-                                return Err("Invalid \\uXXXX escape".to_string());
-                            }
-                            self.i += 4;
-                            let cp = u32::from_str_radix(&hex, 16)
-                                .map_err(|_| "Invalid \\uXXXX escape".to_string())?;
-                            // 代理对：高代理后紧跟 \uDC00-\uDFFF 则合成
-                            if (0xD800..0xDC00).contains(&cp)
-                                && self.c.get(self.i) == Some(&'\\')
-                                && self.c.get(self.i + 1) == Some(&'u')
-                            {
-                                let hex2: String = self
-                                    .c
-                                    .get(self.i + 2..self.i + 6)
-                                    .map(|v| v.iter().collect())
-                                    .unwrap_or_default();
-                                if let Ok(lo) = u32::from_str_radix(&hex2, 16) {
-                                    if (0xDC00..0xE000).contains(&lo) {
-                                        self.i += 6;
-                                        let combined =
-                                            0x10000 + ((cp - 0xD800) << 10) + (lo - 0xDC00);
-                                        if let Some(ch) = char::from_u32(combined) {
-                                            s.push(ch);
-                                        }
-                                        continue;
-                                    }
-                                }
-                            }
-                            if let Some(ch) = char::from_u32(cp) {
-                                s.push(ch);
-                            }
-                        }
-                        _ => return Err(format!("Invalid \\escape: {}", e)),
-                    }
+                    self.read_escape(&mut s)?;
                 }
                 c if (c as u32) < 0x20 => {
                     return Err(format!(
@@ -285,8 +246,60 @@ impl P<'_> {
         }
     }
 
-    fn number(&mut self) -> Result<Json, String> {
-        let start = self.i;
+    fn read_escape(&mut self, s: &mut String) -> Result<(), String> {
+        let Some(e) = self.peek() else {
+            return Err("Unterminated string".to_string());
+        };
+        self.i += 1;
+        match e {
+            'u' => self.read_unicode_escape(s),
+            _ => {
+                if let Some(ch) = simple_escape(e) {
+                    s.push(ch);
+                    Ok(())
+                } else {
+                    Err(format!("Invalid \\escape: {}", e))
+                }
+            }
+        }
+    }
+
+    fn read_unicode_escape(&mut self, s: &mut String) -> Result<(), String> {
+            let hex: String = self
+                .c
+                .get(self.i..self.i + 4)
+                .map(|v| v.iter().collect())
+                .unwrap_or_default();
+            if hex.len() != 4 {
+                return Err("Invalid \\uXXXX escape".to_string());
+            }
+            self.i += 4;
+            let cp = u32::from_str_radix(&hex, 16)
+                .map_err(|_| "Invalid \\uXXXX escape".to_string())?;
+            if hex_is_high_surrogate(self, cp) {
+                if let Ok(lo) = self.read_low_surrogate() {
+                    if (0xDC00..0xE000).contains(&lo) {
+                        self.i += 6;
+                        let combined = 0x10000 + ((cp - 0xD800) << 10) + (lo - 0xDC00);
+                        if let Some(ch) = char::from_u32(combined) {
+                            s.push(ch);
+                        }
+                        return Ok(());
+                    }
+                }
+            }
+            if let Some(ch) = char::from_u32(cp) {
+                s.push(ch);
+            }
+            Ok(())
+    }
+
+        fn read_low_surrogate(&self) -> Result<u32, ()> {
+        let hex2: String = self.c.get(self.i + 2..self.i + 6).map(|v| v.iter().collect()).unwrap_or_default();
+        u32::from_str_radix(&hex2, 16).map_err(|_| ())
+    }
+
+        fn consume_number_chars(&mut self) -> bool {
         let mut is_float = false;
         if self.peek() == Some('-') {
             self.i += 1;
@@ -294,8 +307,8 @@ impl P<'_> {
         while let Some(c) = self.peek() {
             if c.is_ascii_digit() {
                 self.i += 1;
-            } else if c == '.' || c == 'e' || c == 'E' || c == '+' || c == '-' {
-                if c == '.' || c == 'e' || c == 'E' {
+            } else if is_number_char(c) {
+                if is_float_char(c) {
                     is_float = true;
                 }
                 self.i += 1;
@@ -303,6 +316,12 @@ impl P<'_> {
                 break;
             }
         }
+        is_float
+    }
+
+    fn number(&mut self) -> Result<Json, String> {
+        let start = self.i;
+        let is_float = self.consume_number_chars();
         let text: String = self.c[start..self.i].iter().collect();
         if text.is_empty() || text == "-" {
             return Err(self.err_value());
@@ -320,6 +339,38 @@ impl P<'_> {
                 self.col()
             )),
         }
+    }
+}
+fn simple_escape(e: char) -> Option<char> {
+    match e {
+        '"' => Some('"'),
+        '\\' => Some('\\'),
+        '/' => Some('/'),
+        'b' => Some('\u{8}'),
+        'f' => Some('\u{c}'),
+        'n' => Some('\n'),
+        'r' => Some('\r'),
+        't' => Some('\t'),
+        _ => None,
+    }
+}
+
+fn hex_is_high_surrogate(p: &P, cp: u32) -> bool {
+    (0xD800..0xDC00).contains(&cp) && p.c.get(p.i) == Some(&'\\') && p.c.get(p.i + 1) == Some(&'u')
+}
+
+fn is_number_char(c: char) -> bool {
+    c.is_ascii_digit() || c == '.' || c == 'e' || c == 'E' || c == '+' || c == '-'
+}
+
+fn is_float_char(c: char) -> bool {
+    c == '.' || c == 'e' || c == 'E'
+}
+
+fn upsert_json_field(out: &mut Vec<(String, Json)>, key: String, val: Json) {
+    match out.iter_mut().find(|(k, _)| *k == key) {
+        Some(slot) => slot.1 = val,
+        None => out.push((key, val)),
     }
 }
 

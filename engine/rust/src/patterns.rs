@@ -10,6 +10,7 @@ use crate::pyjson::Json;
 use crate::pyval::{get, obj_is_empty, plain_str, py_str, py_truthy};
 use std::path::Path;
 
+
 pub const GLOB: &str = "patterns/*/PATTERN.md";
 pub const INDEX_REL: &str = "patterns/INDEX.md";
 pub const BEGIN: &str = "<!-- BEGIN GENERATED: patterns-index -->";
@@ -81,67 +82,60 @@ pub fn scan_issues(root: &Path) -> (Vec<String>, usize) {
             ));
             continue;
         }
-        for k in REQUIRED {
-            let v = get(fm, k);
-            // 真源 `fm.get(k) or fm.get(k) == []` —— **空列表算"已填"**
-            let present = v.map(py_truthy).unwrap_or(false)
-                || matches!(v, Some(Json::Array(a)) if a.is_empty());
-            if !present {
-                issues.push(format!("{} 缺必填字段：{}", d, k));
-            }
-        }
-        let pid = py_str(get(fm, "id"));
-        if !pid.is_empty() && pid != *d {
-            issues.push(format!("{} 的 id 与目录名不一致：{} vs {}", d, pid, d));
-        }
-        if !pid.is_empty() {
-            if let Some((_, prev)) = seen.iter().find(|(p, _)| *p == pid) {
-                issues.push(format!("pattern id 重复：{}（{} / {}）", pid, prev, d));
-            }
-            seen.push((pid, d.clone()));
-        }
-        let st = py_str(get(fm, "status"));
-        if !st.is_empty() && !STATUSES.contains(&st.as_str()) {
-            issues.push(format!(
-                "{} status 越词表：{}（{}）",
-                d,
-                st,
-                STATUSES.join("/")
-            ));
-        }
-        if as_list(get(fm, "rules")).is_empty() {
-            issues.push(format!("{} 的 rules 为空（pattern 必须有可执行规则）", d));
-        }
-        for pat in as_list(get(fm, "applies_to")) {
-            let pat_clean = pat.trim().to_string();
-            if split_glob_ok(&pat_clean) {
-                if crate::glob::expand_any(root, &pat_clean).is_empty() {
-                    issues.push(format!(
-                        "{} 的 applies_to 通配无匹配：{}（修复指引：指向仓库内真实文件）",
-                        d, pat_clean
-                    ));
-                }
-            } else if !root.join(&pat_clean).exists() {
-                issues.push(format!("{} 的 applies_to 路径不存在：{}", d, pat_clean));
-            }
-        }
-        for item in as_list(get(fm, "evidence")) {
-            let s = item.trim().to_string();
-            let looks_path = s.starts_with("docs/")
-                || s.starts_with("desktop/")
-                || s.starts_with("protocol/")
-                || s.starts_with("library/");
-            if is_check(&s) {
-                continue;
-            }
-            if looks_path && !root.join(&s).exists() {
-                // warns（本契约只看 issues）——此处不算 issues
-            } else if s.is_empty() {
-                // warns
-            }
-        }
+        pattern_required_issues(d, fm, &mut issues);
+        pattern_id_issues(d, fm, &mut seen, &mut issues);
+        pattern_status_rules_issues(d, fm, &mut issues);
+        pattern_applies_issues(root, d, fm, &mut issues);
+        pattern_evidence_probe(root, fm);
     }
     (issues, rows.len())
+}
+
+/// 必填字段：空列表算"已填"（真源 `fm.get(k) or fm.get(k) == []`）。
+fn pattern_required_issues(d: &str, fm: &Json, issues: &mut Vec<String>) {
+    for k in REQUIRED {
+        let v = get(fm, k);
+        let present = v.map(py_truthy).unwrap_or(false)
+            || matches!(v, Some(Json::Array(a)) if a.is_empty());
+        if !present {
+            issues.push(format!("{} 缺必填字段：{}", d, k));
+        }
+    }
+}
+
+/// id 面：与目录名一致 + 在册去重。
+fn pattern_id_issues(
+    d: &str,
+    fm: &Json,
+    seen: &mut Vec<(String, String)>,
+    issues: &mut Vec<String>,
+) {
+    let pid = py_str(get(fm, "id"));
+    if !pid.is_empty() && pid != *d {
+        issues.push(format!("{} 的 id 与目录名不一致：{} vs {}", d, pid, d));
+    }
+    if !pid.is_empty() {
+        if let Some((_, prev)) = seen.iter().find(|(p, _)| *p == pid) {
+            issues.push(format!("pattern id 重复：{}（{} / {}）", pid, prev, d));
+        }
+        seen.push((pid, d.to_string()));
+    }
+}
+
+/// status 词表 + rules 非空。
+fn pattern_status_rules_issues(d: &str, fm: &Json, issues: &mut Vec<String>) {
+    let st = py_str(get(fm, "status"));
+    if !st.is_empty() && !STATUSES.contains(&st.as_str()) {
+        issues.push(format!(
+            "{} status 越词表：{}（{}）",
+            d,
+            st,
+            STATUSES.join("/")
+        ));
+    }
+    if as_list(get(fm, "rules")).is_empty() {
+        issues.push(format!("{} 的 rules 为空（pattern 必须有可执行规则）", d));
+    }
 }
 
 /// 真源 `render_index`：投影表（`check_projection` 与它逐字比对）。
@@ -378,4 +372,28 @@ evidence:
         }
     }
     // <<< GENERATED
+}
+
+pub(crate) fn pattern_applies_issues(root: &Path, d: &str, fm: &Json, issues: &mut Vec<String>) {
+    for pat in as_list(get(fm, "applies_to")) {
+        let pat_clean = pat.trim().to_string();
+        if split_glob_ok(&pat_clean) {
+            if crate::glob::expand_any(root, &pat_clean).is_empty() {
+                issues.push(format!("{} 的 applies_to 通配无匹配：{}（修复指引：指向仓库内真实文件）", d, pat_clean));
+            }
+        } else if !root.join(&pat_clean).exists() {
+            issues.push(format!("{} 的 applies_to 路径不存在：{}", d, pat_clean));
+        }
+    }
+}
+
+pub(crate) fn pattern_evidence_probe(root: &Path, fm: &Json) {
+    for item in as_list(get(fm, "evidence")) {
+        let s = item.trim().to_string();
+        let looks_path = s.starts_with("docs/") || s.starts_with("desktop/") || s.starts_with("protocol/") || s.starts_with("library/");
+        if is_check(&s) {
+            continue;
+        }
+        let _ = looks_path && root.join(&s).exists();
+    }
 }

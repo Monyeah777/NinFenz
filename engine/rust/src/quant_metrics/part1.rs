@@ -42,47 +42,9 @@ pub(crate) fn load_equity_curve(path: &Path) -> Result<Json, String> {
         .map(|c| c.trim().to_lowercase())
         .collect();
     cols.sort();
-    for need in ["date", "equity"] {
-        if !cols.iter().any(|c| c == need) {
-            // 真源是 `sorted(cols)` 的 **Python 列表 repr**（单引号）：`['date', 'value']`
-            let shown = crate::pyval::py_repr_list(
-                &cols
-                    .iter()
-                    .map(|c| Json::Str(c.clone()))
-                    .collect::<Vec<_>>(),
-            );
-            return Err(format!("缺列 {}（实际列：{}）", need, shown));
-        }
-    }
+    required_curve_cols(&cols)?;
     let has_bench = cols.iter().any(|c| c == "benchmark");
-    let find = |row: &[String], lower: &str| -> Option<String> {
-        header
-            .iter()
-            .position(|h| h.trim().to_lowercase() == lower)
-            .and_then(|i| row.get(i).cloned())
-    };
-    let (mut dates, mut equity, mut bench) = (Vec::new(), Vec::new(), Vec::new());
-    for (idx, row) in table.iter().skip(1).enumerate() {
-        if row.len() == 1 && row[0].is_empty() {
-            continue;
-        }
-        let line_no = idx + 2;
-        // 真源 `row.get("date") or row.get("Date")`：**原样键**优先，其次大小写变体
-        let d = find(row, "date").unwrap_or_default();
-        dates.push(d.trim().to_string());
-        let ev = find(row, "equity").unwrap_or_default();
-        match ev.trim().parse::<f64>() {
-            Ok(v) => equity.push(v),
-            Err(_) => return Err(format!("第 {} 行数值不可解析", line_no)),
-        }
-        if has_bench {
-            let bv = find(row, "benchmark").unwrap_or_default();
-            match bv.trim().parse::<f64>() {
-                Ok(v) => bench.push(v),
-                Err(_) => return Err(format!("第 {} 行数值不可解析", line_no)),
-            }
-        }
-    }
+    let (dates, equity, bench) = collect_curve_rows(&table, &header, has_bench)?;
     if equity.len() < 3 {
         return Err("样本过短（< 3 个净值点）".to_string());
     }
@@ -107,6 +69,60 @@ pub(crate) fn load_equity_curve(path: &Path) -> Result<Json, String> {
             },
         ),
     ]))
+}
+
+/// 必需列：date / equity（缺失时报 Python 列表 repr 的实际列）。
+fn required_curve_cols(cols: &[String]) -> Result<(), String> {
+    for need in ["date", "equity"] {
+        if !cols.iter().any(|c| c == need) {
+            // 真源是 sorted(cols) 的 Python 列表 repr（单引号）
+            let shown = crate::pyval::py_repr_list(
+                &cols
+                    .iter()
+                    .map(|c| Json::Str(c.clone()))
+                    .collect::<Vec<_>>(),
+            );
+            return Err(format!("缺列 {}（实际列：{}）", need, shown));
+        }
+    }
+    Ok(())
+}
+
+/// 逐行取值：dates / equity / benchmark（数值不可解析即报行号）。
+fn collect_curve_rows(
+    table: &[Vec<String>],
+    header: &[String],
+    has_bench: bool,
+) -> Result<(Vec<String>, Vec<f64>, Vec<f64>), String> {
+    let find = |row: &[String], lower: &str| -> Option<String> {
+        header
+            .iter()
+            .position(|h| h.trim().to_lowercase() == lower)
+            .and_then(|i| row.get(i).cloned())
+    };
+    let (mut dates, mut equity, mut bench) = (Vec::new(), Vec::new(), Vec::new());
+    for (idx, row) in table.iter().skip(1).enumerate() {
+        if row.len() == 1 && row[0].is_empty() {
+            continue;
+        }
+        let line_no = idx + 2;
+        // 真源 row.get("date") or row.get("Date")：原样键优先，其次大小写变体
+        let d = find(row, "date").unwrap_or_default();
+        dates.push(d.trim().to_string());
+        let ev = find(row, "equity").unwrap_or_default();
+        match ev.trim().parse::<f64>() {
+            Ok(v) => equity.push(v),
+            Err(_) => return Err(format!("第 {} 行数值不可解析", line_no)),
+        }
+        if has_bench {
+            let bv = find(row, "benchmark").unwrap_or_default();
+            match bv.trim().parse::<f64>() {
+                Ok(v) => bench.push(v),
+                Err(_) => return Err(format!("第 {} 行数值不可解析", line_no)),
+            }
+        }
+    }
+    Ok((dates, equity, bench))
 }
 
 pub(crate) fn nums(series: &Json, key: &str) -> Vec<f64> {

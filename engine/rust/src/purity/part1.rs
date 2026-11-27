@@ -271,8 +271,19 @@ pub(crate) fn file_findings(rel: &str, text: &str, root: &Path) -> Option<FileFi
         residue: Vec::new(),
     };
 
+    raise_findings(&facts, fname, &mut out, &mut delta.raises);
+    check_imports(rel, &facts, root, residue, &mut out, &mut delta.imports);
+    for s in &facts.sinks {
+        sink_findings(s, rel, fname, &mut out, &mut delta.sinks);
+    }
+    delta.issues = out;
+    Some(delta)
+}
+
+/// raise 面：消息必须带修复指引。
+fn raise_findings(facts: &pyast::PurityFacts, fname: &str, out: &mut Vec<String>, raises: &mut i64) {
     for r in &facts.raises {
-        delta.raises += 1;
+        *raises += 1;
         if !r.msg.is_empty() && !action_re().is_match(&r.msg) {
             out.push(format!(
                 "{}:{} raise 消息缺修复指引：{}",
@@ -282,8 +293,11 @@ pub(crate) fn file_findings(rel: &str, text: &str, root: &Path) -> Option<FileFi
             ));
         }
     }
-    check_imports(rel, &facts, root, residue, &mut out, &mut delta.imports);
-    for s in &facts.sinks {
+}
+
+/// 单条 sink：危险调用 / 方法 sink / shell=True；白名单登记可豁免。
+fn sink_findings(s: &pyast::SinkFact, rel: &str, fname: &str, out: &mut Vec<String>, sinks: &mut i64) {
+    {
         let mut flags: Vec<(String, String)> = Vec::new();
         if DANGEROUS_CALLS.iter().any(|(c, _)| *c == s.call) {
             flags.push((s.call.clone(), s.call.clone()));
@@ -299,7 +313,7 @@ pub(crate) fn file_findings(rel: &str, text: &str, root: &Path) -> Option<FileFi
             ));
         }
         for (name, key_name) in flags {
-            delta.sinks += 1;
+            *sinks += 1;
             if SINK_ALLOW
                 .iter()
                 .any(|(k, _)| *k == format!("{}:{}", fname, key_name))
@@ -323,6 +337,4 @@ pub(crate) fn file_findings(rel: &str, text: &str, root: &Path) -> Option<FileFi
             ));
         }
     }
-    delta.issues = out;
-    Some(delta)
 }

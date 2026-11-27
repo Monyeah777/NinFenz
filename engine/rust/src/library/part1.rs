@@ -130,6 +130,20 @@ pub(crate) fn check_entry_basics(
 ) -> bool {
     let fm = &e.fm;
     let eid = &e.id;
+    if !entry_identity_issues(e, fm, eid, issues) {
+        return false;
+    }
+    let st = entry_license_status_issues(eid, fm, issues);
+    entry_supersede_issues(eid, fm, ids, &st, issues);
+    if !crate::pyval::py_truthy(get(fm, "sources").unwrap_or(&Json::Null)) {
+        warns.push(format!("{} 缺 sources（provenance 未声明）", eid));
+    }
+    entry_date_issues(eid, fm, issues);
+    true
+}
+
+/// 编码 / frontmatter 存在性 / 必填键 / id 一致；frontmatter 缺失返回 false。
+fn entry_identity_issues(e: &Entry, fm: &Json, eid: &str, issues: &mut Vec<String>) -> bool {
     if !e.decode_issue.is_empty() {
         issues.push(format!("编码：{}（{}）", eid, e.decode_issue));
     }
@@ -152,6 +166,11 @@ pub(crate) fn check_entry_basics(
             plain_str(get(fm, "id").unwrap_or(&Json::Null))
         ));
     }
+    true
+}
+
+/// license 词表 + status（缺省 active）；返回 status。
+fn entry_license_status_issues(eid: &str, fm: &Json, issues: &mut Vec<String>) -> String {
     let lic = py_str(get(fm, "license"));
     if !lic.is_empty() && !ALLOWED.contains(&lic.as_str()) {
         issues.push(format!("{} license 不在词表：{}", eid, lic));
@@ -172,6 +191,11 @@ pub(crate) fn check_entry_basics(
             STATUSES.join("/")
         ));
     }
+    st
+}
+
+/// 取代关系：superseded 须带 superseded_by；目标须在册且不得自指。
+fn entry_supersede_issues(eid: &str, fm: &Json, ids: &[String], st: &str, issues: &mut Vec<String>) {
     if st == "superseded" && py_str(get(fm, "superseded_by")).trim().is_empty() {
         issues.push(format!("{} status=superseded 但缺 superseded_by", eid));
     }
@@ -182,16 +206,16 @@ pub(crate) fn check_entry_basics(
     if sb == *eid {
         issues.push(format!("{} superseded_by 指向自身（取代链成环）", eid));
     }
-    if !crate::pyval::py_truthy(get(fm, "sources").unwrap_or(&Json::Null)) {
-        warns.push(format!("{} 缺 sources（provenance 未声明）", eid));
-    }
+}
+
+/// 日期键格式。
+fn entry_date_issues(eid: &str, fm: &Json, issues: &mut Vec<String>) {
     for date_key in ["generated", "verified", "stale_after"] {
         let v = py_str(get(fm, date_key)).trim().to_string();
         if !v.is_empty() && !is_date(&v) {
             issues.push(format!("{} {} 非 YYYY-MM-DD：{}", eid, date_key, v));
         }
     }
-    true
 }
 
 /// 条目 attestation 面核对（摘要 / 内容漂移 / 签名锚未移植）+ 推荐键提示。

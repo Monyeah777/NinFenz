@@ -34,38 +34,46 @@ pub(crate) fn check_schema_files(root: &Path) -> (Vec<String>, Vec<Json>) {
             ));
             continue;
         };
+        schema_file_issues(&name, &data, &mut issues);
         if !matches!(data, Json::Object(_)) {
-            issues.push(format!("{}: schema 顶层非对象", name));
             continue;
         }
-        for key in ["$id", "title", "type"] {
-            if get(&data, key).is_none() {
-                issues.push(format!("{}: schema 缺 {}", name, key));
-            }
-        }
-        if py_str(get(&data, "$schema")) != DIALECT {
-            issues.push(format!(
-                "{}: $schema={} 与校验器实现的方言不一致（预期 {}；修复指引：改声明或先扩展校验器再改声明）",
-                name,
-                py_repr(get(&data, "$schema").unwrap_or(&Json::Null)),
-                DIALECT
-            ));
-        }
-        if py_str(get(&data, "type")) != "object" {
-            issues.push(format!("{}: schema.type 应为 object", name));
-        }
-        if !matches!(get(&data, "properties"), Some(Json::Object(_))) {
-            issues.push(format!("{}: schema.properties 缺失/非对象", name));
-        }
-        if let Some(req) = get(&data, "required") {
-            if !matches!(req, Json::Array(_)) {
-                issues.push(format!("{}: schema.required 非数组", name));
-            }
-        }
-        issues.extend(subset_key_violations(&data, &name));
         schemas.push(data);
     }
     (issues, schemas)
+}
+
+/// 单张 schema 文件：顶层对象 / 必填键 / 方言 / type / properties / required / 子集键。
+fn schema_file_issues(name: &str, data: &Json, issues: &mut Vec<String>) {
+    if !matches!(data, Json::Object(_)) {
+        issues.push(format!("{}: schema 顶层非对象", name));
+        return;
+    }
+    for key in ["$id", "title", "type"] {
+        if get(data, key).is_none() {
+            issues.push(format!("{}: schema 缺 {}", name, key));
+        }
+    }
+    if py_str(get(data, "$schema")) != DIALECT {
+        issues.push(format!(
+            "{}: $schema={} 与校验器实现的方言不一致（预期 {}；修复指引：改声明或先扩展校验器再改声明）",
+            name,
+            py_repr(get(data, "$schema").unwrap_or(&Json::Null)),
+            DIALECT
+        ));
+    }
+    if py_str(get(data, "type")) != "object" {
+        issues.push(format!("{}: schema.type 应为 object", name));
+    }
+    if !matches!(get(data, "properties"), Some(Json::Object(_))) {
+        issues.push(format!("{}: schema.properties 缺失/非对象", name));
+    }
+    if let Some(req) = get(data, "required") {
+        if !matches!(req, Json::Array(_)) {
+            issues.push(format!("{}: schema.required 非数组", name));
+        }
+    }
+    issues.extend(subset_key_violations(data, name));
 }
 
 /// 一张面的展开（共用子树清单缓存——见 [`discover`] 的性能注记）。
@@ -348,4 +356,39 @@ pub(crate) fn issue_count(root: &Path) -> usize {
 #[allow(dead_code)]
 pub(crate) fn round2(x: f64) -> f64 {
     pyfloat::round_to(x, 2)
+}
+
+/// required 面：缺必填字段。
+pub(crate) fn required_field_issues(
+    inst: &[(String, Json)],
+    schema: &Json,
+    path: &str,
+    out: &mut Vec<String>,
+) {
+    for req in crate::pyval::arr_items(get(schema, "required")) {
+        let key = plain_str(req);
+        if !inst.iter().any(|(k, _)| *k == key) {
+            out.push(format!("{}: 缺必填字段 {}", path, key));
+        }
+    }
+}
+
+/// propertyNames 面：键名本身按 schema 校验。
+pub(crate) fn property_names_issues(
+    inst: &[(String, Json)],
+    schema: &Json,
+    path: &str,
+    out: &mut Vec<String>,
+) {
+    if let Some(pn) = get(schema, "propertyNames") {
+        if matches!(pn, Json::Object(_)) {
+            for (key, _) in inst {
+                out.extend(subset_validate(
+                    &Json::Str(key.clone()),
+                    pn,
+                    &format!("{}/{}（键名）", path, key),
+                ));
+            }
+        }
+    }
 }

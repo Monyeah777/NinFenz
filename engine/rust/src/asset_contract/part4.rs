@@ -122,14 +122,7 @@ pub(crate) fn sg_array(spec: &Json, k: &str) -> Vec<Json> {
 /// 禁用式（必须 0 处）与计数上限（棘轮只减不增）。真源明说这是「范围与只减不增的计数」，
 /// 比「装作 AST 判过」诚实；本线用 `regex` crate 承担同一条语义（模式均来自真源声明）。
 pub(crate) fn check_code_structural(root: &Path, spec: &Json) -> (Vec<String>, Json) {
-    let sid = {
-        let s = sg_str(spec, "id");
-        if s.is_empty() {
-            "?".to_string()
-        } else {
-            s
-        }
-    };
+    let sid = id_or_question(spec);
     let rels = resolve(root, spec);
     if rels.is_empty() {
         return (
@@ -154,59 +147,94 @@ pub(crate) fn check_code_structural(root: &Path, spec: &Json) -> (Vec<String>, J
     let mut issues: Vec<String> = Vec::new();
     let mut stats: Vec<(String, Json)> = vec![("files".to_string(), Json::Int(rels.len() as i64))];
     for rule in sg_array(spec, "forbid_regex") {
-        let name = sg_str(&rule, "name");
-        let pat = sg_str(&rule, "pattern");
-        let Ok(rx) = regex::Regex::new(&pat) else {
-            continue;
-        };
-        let mut hits: Vec<String> = Vec::new();
-        for (rel, text) in &texts {
-            for m in rx.find_iter(text) {
-                let line = text[..m.start()].matches('\n').count() + 1;
-                hits.push(format!("{}:{}", rel, line));
-            }
-        }
-        stats.push((format!("forbid:{}", name), Json::Int(hits.len() as i64)));
-        if !hits.is_empty() {
-            let why = {
-                let w = sg_str(&rule, "why");
-                if w.is_empty() {
-                    "换成不越界的等价实现".to_string()
-                } else {
-                    w
-                }
-            };
-            let sample: Vec<String> = hits.iter().take(3).cloned().collect();
-            issues.push(format!(
-                "代码契约 {} 命中禁用式 {}（{} 处，例 {}）（修复指引：{}）",
-                sid,
-                name,
-                hits.len(),
-                sample.join("、"),
-                why
-            ));
-        }
+        forbid_rule_stats(&rule, &sid, &texts, &mut stats, &mut issues);
     }
     for rule in sg_array(spec, "regex_limits") {
-        let name = sg_str(&rule, "name");
-        let pat = sg_str(&rule, "pattern");
-        let Ok(rx) = regex::Regex::new(&pat) else {
-            continue;
-        };
-        let n: i64 = texts
-            .iter()
-            .map(|(_, t)| rx.find_iter(t).count() as i64)
-            .sum();
-        let cap = pyval::py_int_or(obj_get(&rule, "max"), 0);
-        stats.push((format!("limit:{}", name), Json::Int(n)));
-        if n > cap {
-            issues.push(format!(
-                "代码契约 {} 的 {} 计数 {} > 上限 {}（棘轮只减不增）（修复指引：先降后改声明）",
-                sid, name, n, cap
-            ));
-        }
+        limit_rule_stats(&rule, &sid, &texts, &mut stats, &mut issues);
     }
     (issues, Json::Object(stats))
+}
+
+/// 契约自述 id；缺失时统一记 "?"（真源同口径）。
+pub(crate) fn id_or_question(spec: &Json) -> String {
+    let s = sg_str(spec, "id");
+    if s.is_empty() {
+        "?".to_string()
+    } else {
+        s
+    }
+}
+
+/// forbid_regex 面：统计命中数并逐条报出（同一禁用式只报一条）。
+fn forbid_rule_stats(
+    rule: &Json,
+    sid: &str,
+    texts: &[(String, String)],
+    stats: &mut Vec<(String, Json)>,
+    issues: &mut Vec<String>,
+) {
+    let name = sg_str(rule, "name");
+    let pat = sg_str(rule, "pattern");
+    let Ok(rx) = regex::Regex::new(&pat) else {
+        return;
+    };
+    let mut hits: Vec<String> = Vec::new();
+    for (rel, text) in texts {
+        for m in rx.find_iter(text) {
+            let line = text[..m.start()].matches('\n').count() + 1;
+            hits.push(format!("{}:{}", rel, line));
+        }
+    }
+    stats.push((format!("forbid:{}", name), Json::Int(hits.len() as i64)));
+    if !hits.is_empty() {
+        let why = rule_why(rule);
+        let sample: Vec<String> = hits.iter().take(3).cloned().collect();
+        issues.push(format!(
+            "代码契约 {} 命中禁用式 {}（{} 处，例 {}）（修复指引：{}）",
+            sid,
+            name,
+            hits.len(),
+            sample.join("、"),
+            why
+        ));
+    }
+}
+
+/// 禁用式的修复指引；缺省给通用话术。
+fn rule_why(rule: &Json) -> String {
+    let w = sg_str(rule, "why");
+    if w.is_empty() {
+        "换成不越界的等价实现".to_string()
+    } else {
+        w
+    }
+}
+
+/// regex_limits 面：计数棘轮（只减不增）。
+fn limit_rule_stats(
+    rule: &Json,
+    sid: &str,
+    texts: &[(String, String)],
+    stats: &mut Vec<(String, Json)>,
+    issues: &mut Vec<String>,
+) {
+    let name = sg_str(rule, "name");
+    let pat = sg_str(rule, "pattern");
+    let Ok(rx) = regex::Regex::new(&pat) else {
+        return;
+    };
+    let n: i64 = texts
+        .iter()
+        .map(|(_, t)| rx.find_iter(t).count() as i64)
+        .sum();
+    let cap = pyval::py_int_or(obj_get(rule, "max"), 0);
+    stats.push((format!("limit:{}", name), Json::Int(n)));
+    if n > cap {
+        issues.push(format!(
+            "代码契约 {} 的 {} 计数 {} > 上限 {}（棘轮只减不增）（修复指引：先降后改声明）",
+            sid, name, n, cap
+        ));
+    }
 }
 
 // ---------------------------------------------------------------- 代码面·告警面（WARN）

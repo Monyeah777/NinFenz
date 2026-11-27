@@ -239,12 +239,7 @@ pub(crate) fn collect_assets(
     extra_assets: &[String],
 ) -> (Vec<Json>, Vec<String>) {
     // 资产：借阅面
-    let mut asset_index: Vec<((String, String), Json)> = Vec::new();
-    for (pn, pr) in &ctx.prof {
-        for a in arr_of(obj_get(pr, "assets")) {
-            asset_index.push(((pn.clone(), s_of(obj_get(&a, "key"))), a.clone()));
-        }
-    }
+    let asset_index = profile_asset_index(ctx);
     let mut borrow: Vec<Json> = Vec::new();
     let mut unresolved: Vec<String> = Vec::new();
     for pr in chosen {
@@ -277,6 +272,17 @@ pub(crate) fn collect_assets(
         }
     }
     (borrow, unresolved)
+}
+
+/// 各 profile 声明的资产表：((包名, 资产 key), 资产声明)。
+fn profile_asset_index(ctx: &Ctx) -> Vec<((String, String), Json)> {
+    let mut asset_index: Vec<((String, String), Json)> = Vec::new();
+    for (pn, pr) in &ctx.prof {
+        for a in arr_of(obj_get(pr, "assets")) {
+            asset_index.push(((pn.clone(), s_of(obj_get(&a, "key"))), a.clone()));
+        }
+    }
+    asset_index
 }
 
 /// 各输出列表的排序与派生（借阅表 / 引用 / 未知包 / 依赖与模块 id）。

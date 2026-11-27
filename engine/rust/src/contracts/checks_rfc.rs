@@ -185,52 +185,69 @@ fn check_rfc_docs(
             ));
             continue;
         };
-        if head.rfc != rfc {
-            issues.push(format!(
-                "{} 头部 RFC 与索引不一致：头={} 索引={}",
-                rel, head.rfc, rfc
-            ));
-        }
-        if !RFC_CATEGORIES.contains(&head.cat.as_str()) {
-            issues.push(format!(
-                "{} Category 越词表：{}（{}）",
-                rel,
-                head.cat,
-                RFC_CATEGORIES.join("/")
-            ));
-        }
-        if !vocab.contains(&head.status) {
-            issues.push(format!(
-                "{} Status 越词表：{}（{}）",
-                rel,
-                head.status,
-                vocab.join("/")
-            ));
-        }
-        if !head.last_updated.is_empty() && head.date != head.last_updated {
-            issues.push(format!(
-                "{} Date 与「最后更新」不一致：RFC={} 最后更新={}",
-                rel, head.date, head.last_updated
-            ));
-        }
         let cat_idx = py_str(get(item, "category"));
-        if !cat_idx.is_empty() && cat_idx != head.cat {
-            issues.push(format!(
-                "{} Category 索引与头部不一致：索引={} 头={}",
-                rel, cat_idx, head.cat
-            ));
-        }
+        rfc_head_issues(&rel, &head, &rfc, &cat_idx, vocab, issues);
         let is_blank = DASHES.contains(&head.supby.as_str()) || head.supby.is_empty();
         if head.status == "Superseded" && is_blank {
             issues.push(format!("{} 标记 Superseded 但缺 Superseded by", rel));
         }
         if !is_blank {
-            if let Some(slot) = supby.iter_mut().find(|(r, _)| *r == rfc) {
-                slot.1 = head.supby.clone();
-            } else {
-                supby.push((rfc.clone(), head.supby.clone()));
-            }
+            record_rfc_supersede(supby, &rfc, &head.supby);
         }
+    }
+}
+
+/// 文档头面：RFC 编号 / Category / Status / Date / 索引 Category 与头部一致。
+fn rfc_head_issues(
+    rel: &str,
+    head: &RfcHead,
+    rfc: &str,
+    cat_idx: &str,
+    vocab: &[String],
+    issues: &mut Vec<String>,
+) {
+    if head.rfc != rfc {
+        issues.push(format!(
+            "{} 头部 RFC 与索引不一致：头={} 索引={}",
+            rel, head.rfc, rfc
+        ));
+    }
+    if !RFC_CATEGORIES.contains(&head.cat.as_str()) {
+        issues.push(format!(
+            "{} Category 越词表：{}（{}）",
+            rel,
+            head.cat,
+            RFC_CATEGORIES.join("/")
+        ));
+    }
+    if !vocab.contains(&head.status) {
+        issues.push(format!(
+            "{} Status 越词表：{}（{}）",
+            rel,
+            head.status,
+            vocab.join("/")
+        ));
+    }
+    if !head.last_updated.is_empty() && head.date != head.last_updated {
+        issues.push(format!(
+            "{} Date 与「最后更新」不一致：RFC={} 最后更新={}",
+            rel, head.date, head.last_updated
+        ));
+    }
+    if !cat_idx.is_empty() && cat_idx != head.cat {
+        issues.push(format!(
+            "{} Category 索引与头部不一致：索引={} 头={}",
+            rel, cat_idx, head.cat
+        ));
+    }
+}
+
+/// 取代链记录：同编号后者覆盖（真源 dict 语义）。
+fn record_rfc_supersede(supby: &mut Vec<(String, String)>, rfc: &str, next: &str) {
+    if let Some(slot) = supby.iter_mut().find(|(r, _)| *r == rfc) {
+        slot.1 = next.to_string();
+    } else {
+        supby.push((rfc.to_string(), next.to_string()));
     }
 }
 

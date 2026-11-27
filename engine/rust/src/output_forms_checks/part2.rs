@@ -63,14 +63,7 @@ pub fn check_quant_metrics(root: &Path, rel: &str) -> Vec<String> {
         }
         return issues;
     }
-    let entries: Vec<Json> = match obj_get(&data, "metrics") {
-        Some(Json::Array(a)) => a.clone(),
-        _ => Vec::new(),
-    };
-    let declared: Vec<Json> = match obj_get(&data, "declared_only") {
-        Some(Json::Array(a)) => a.clone(),
-        _ => Vec::new(),
-    };
+    let (entries, declared) = quant_entries(&data);
     for m in entries.iter().chain(declared.iter()) {
         if !matches!(m, Json::Object(_)) {
             issues.push(format!("条目非对象：{}", pyval::py_repr(m)));
@@ -80,48 +73,36 @@ pub fn check_quant_metrics(root: &Path, rel: &str) -> Vec<String> {
             Some(v) if pyval::py_truthy(v) => pyval::plain_str(v),
             _ => "?".to_string(),
         };
-        let eng = as_str(obj_get(m, "engine"));
-        if !eng.is_empty() {
-            let (modname, fnname) = match eng.split_once(':') {
-                Some((a, b)) => (a.to_string(), b.to_string()),
-                None => (eng.clone(), String::new()),
-            };
-            if modname != "quant_metrics"
-                || !crate::output_tables::QUANT_METRICS_NAMES.contains(&fnname.as_str())
-            {
-                issues.push(format!(
-                    "{}: 宣称 engine={}，但 core/quant_metrics 无该实现（宣称≠实现）",
-                    mid, eng
-                ));
-            }
-        }
-        if as_str(obj_get(m, "verifiable")) == "T4" && eng.is_empty() {
-            issues.push(format!("{}: 标 T4（可复算）却无 engine", mid));
-        }
-        let params: Vec<String> = match obj_get(m, "required_params") {
-            Some(Json::Array(a)) => a.iter().map(pyval::plain_str).collect(),
-            _ => Vec::new(),
-        };
-        if pyval::py_truthy(
-            &obj_get(m, "annual_factor_required")
-                .cloned()
-                .unwrap_or(Json::Null),
-        ) && !params.iter().any(|p| p == "annual_factor")
-        {
-            issues.push(format!(
-                "{}: 需年化因子却未列入 required_params（口径四要素不全）",
-                mid
-            ));
-        }
+        quant_engine_issues(m, &mid, &mut issues);
+        quant_params_issues(m, &mid, &mut issues);
     }
-    let names: Vec<String> = entries
-        .iter()
-        .map(|m| match obj_get(m, "id") {
-            Some(v) => pyval::plain_str(v),
-            None => pyval::py_str(None),
-        })
-        .collect();
-    let mut expected: Vec<String> = match obj_get(&data, "annual_factors") {
+    let names = metric_ids(&entries);
+    annual_factor_issues(&data, &mut issues);
+    let mut uniq = names.clone();
+    uniq.sort();
+    uniq.dedup();
+    if uniq.len() != entries.len() {
+        issues.push("metrics 存在重复 id".to_string());
+    }
+    issues
+}
+
+/// metrics / declared_only 两个列表。
+fn quant_entries(data: &Json) -> (Vec<Json>, Vec<Json>) {
+    let entries: Vec<Json> = match obj_get(data, "metrics") {
+        Some(Json::Array(a)) => a.clone(),
+        _ => Vec::new(),
+    };
+    let declared: Vec<Json> = match obj_get(data, "declared_only") {
+        Some(Json::Array(a)) => a.clone(),
+        _ => Vec::new(),
+    };
+    (entries, declared)
+}
+
+/// annual_factors 键集必须是 daily/weekly/monthly。
+fn annual_factor_issues(data: &Json, issues: &mut Vec<String>) {
+    let mut expected: Vec<String> = match obj_get(data, "annual_factors") {
         Some(Json::Object(o)) => o.iter().map(|(k, _)| k.clone()).collect(),
         _ => Vec::new(),
     };
@@ -143,13 +124,58 @@ pub fn check_quant_metrics(root: &Path, rel: &str) -> Vec<String> {
             )
         ));
     }
-    let mut uniq = names.clone();
-    uniq.sort();
-    uniq.dedup();
-    if uniq.len() != entries.len() {
-        issues.push("metrics 存在重复 id".to_string());
+}
+
+/// 条目的 engine 宣称面：模块/函数须真实存在；T4 必须有 engine。
+fn quant_engine_issues(m: &Json, mid: &str, issues: &mut Vec<String>) {
+    let eng = as_str(obj_get(m, "engine"));
+    if !eng.is_empty() {
+        let (modname, fnname) = match eng.split_once(':') {
+            Some((a, b)) => (a.to_string(), b.to_string()),
+            None => (eng.clone(), String::new()),
+        };
+        if modname != "quant_metrics"
+            || !crate::output_tables::QUANT_METRICS_NAMES.contains(&fnname.as_str())
+        {
+            issues.push(format!(
+                "{}: 宣称 engine={}，但 core/quant_metrics 无该实现（宣称≠实现）",
+                mid, eng
+            ));
+        }
     }
-    issues
+    if as_str(obj_get(m, "verifiable")) == "T4" && eng.is_empty() {
+        issues.push(format!("{}: 标 T4（可复算）却无 engine", mid));
+    }
+}
+
+/// 年化因子口径：声明必需则 required_params 必须含 annual_factor。
+fn quant_params_issues(m: &Json, mid: &str, issues: &mut Vec<String>) {
+    let params: Vec<String> = match obj_get(m, "required_params") {
+        Some(Json::Array(a)) => a.iter().map(pyval::plain_str).collect(),
+        _ => Vec::new(),
+    };
+    if pyval::py_truthy(
+        &obj_get(m, "annual_factor_required")
+            .cloned()
+            .unwrap_or(Json::Null),
+    ) && !params.iter().any(|p| p == "annual_factor")
+    {
+        issues.push(format!(
+            "{}: 需年化因子却未列入 required_params（口径四要素不全）",
+            mid
+        ));
+    }
+}
+
+/// metrics 条目 id 表（缺 id → Python None 形态）。
+fn metric_ids(entries: &[Json]) -> Vec<String> {
+    entries
+        .iter()
+        .map(|m| match obj_get(m, "id") {
+            Some(v) => pyval::plain_str(v),
+            None => pyval::py_str(None),
+        })
+        .collect()
 }
 
 /// 真源 `_check_domain_spec`。
@@ -171,32 +197,37 @@ pub fn check_domain_spec(root: &Path, rel: &str) -> Vec<String> {
         issues.push(format!("细分条目应为 12 条，实为 {}", subs.len()));
     }
     for (i, s) in subs.iter().enumerate() {
-        let want = format!("{}-{:02}", code, i + 1);
-        let got = obj_get(s, "id").cloned().unwrap_or(Json::Null);
-        if !pyval::py_eq(&got, &Json::Str(want.clone())) {
-            issues.push(format!(
-                "第 {} 条 id 应为 {}，实为 {}",
-                i + 1,
-                want,
-                pyval::py_repr(&got)
-            ));
-        }
-        let anchor = as_str(obj_get(s, "anchor"));
-        if !anchor.starts_with("http://") && !anchor.starts_with("https://") {
-            issues.push(format!("{} 锚非绝对 URL", pyval::py_str(obj_get(s, "id"))));
-        }
-        let status = match obj_get(s, "anchor_status") {
-            Some(Json::Null) | None => 0,
-            Some(v) => pyval::py_int_or(Some(v), 0),
-        };
-        if status == 0 {
-            issues.push(format!(
-                "{} 锚缺可达性实测值（不得假装可达：探不到记 0 并在锚表注明）",
-                pyval::py_str(obj_get(s, "id"))
-            ));
-        }
+        domain_sub_issues(s, i, &code, &mut issues);
     }
     issues
+}
+
+/// 单条细分：id 形态 / 锚绝对 URL / 锚可达性实测值。
+fn domain_sub_issues(s: &Json, i: usize, code: &str, issues: &mut Vec<String>) {
+    let want = format!("{}-{:02}", code, i + 1);
+    let got = obj_get(s, "id").cloned().unwrap_or(Json::Null);
+    if !pyval::py_eq(&got, &Json::Str(want.clone())) {
+        issues.push(format!(
+            "第 {} 条 id 应为 {}，实为 {}",
+            i + 1,
+            want,
+            pyval::py_repr(&got)
+        ));
+    }
+    let anchor = as_str(obj_get(s, "anchor"));
+    if !anchor.starts_with("http://") && !anchor.starts_with("https://") {
+        issues.push(format!("{} 锚非绝对 URL", pyval::py_str(obj_get(s, "id"))));
+    }
+    let status = match obj_get(s, "anchor_status") {
+        Some(Json::Null) | None => 0,
+        Some(v) => pyval::py_int_or(Some(v), 0),
+    };
+    if status == 0 {
+        issues.push(format!(
+            "{} 锚缺可达性实测值（不得假装可达：探不到记 0 并在锚表注明）",
+            pyval::py_str(obj_get(s, "id"))
+        ));
+    }
 }
 
 /// 真源 `_check_domain_report`。

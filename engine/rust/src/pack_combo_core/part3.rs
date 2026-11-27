@@ -83,49 +83,12 @@ pub(crate) fn breadth(
     let (pairs, pairs_legal) = count_pairs(&names, &verdict, &mut failures);
     let _ = root;
     let mut rnd = crate::pyrandom::PyRandom::new(seed);
-    let (mut triples, mut triples_legal) = (0i64, 0i64);
-    for t in draw_samples(&mut rnd, &names, 3, triple_sample) {
-        let (legal, _, _) = verdict(&t);
-        triples += 1;
-        if legal {
-            triples_legal += 1;
-        }
-    }
-    let (mut quads, mut quads_legal) = (0i64, 0i64);
-    for q in draw_samples(&mut rnd, &names, 4, quad_sample) {
-        let (legal, _, _) = verdict(&q);
-        quads += 1;
-        if legal {
-            quads_legal += 1;
-        }
-    }
-    let (mut quints, mut quints_legal) = (0i64, 0i64);
-    for p in draw_samples(&mut rnd, &names, 5, quint_sample) {
-        let (legal, _, _) = verdict(&p);
-        quints += 1;
-        if legal {
-            quints_legal += 1;
-        }
-    }
-    let (mut sexts, mut sexts_legal) = (0i64, 0i64);
-    for p in draw_samples(&mut rnd, &names, 6, sext_sample) {
-        let (legal, dangling, unbridged) = verdict(&p);
-        sexts += 1;
-        if legal {
-            sexts_legal += 1;
-        } else if failures.len() < 10 {
-            failures.push(Json::Object(vec![
-                ("combo".to_string(), str_json(&p)),
-                ("dangling".to_string(), Json::Array(dangling)),
-                ("unbridged".to_string(), Json::Array(unbridged)),
-            ]));
-        }
-    }
-    let all_legal = pairs == pairs_legal
-        && triples == triples_legal
-        && quads == quads_legal
-        && quints == quints_legal
-        && sexts == sexts_legal;
+    let (triples, triples_legal) = sample_legal_count(&mut rnd, &names, 3, triple_sample, &verdict);
+    let (quads, quads_legal) = sample_legal_count(&mut rnd, &names, 4, quad_sample, &verdict);
+    let (quints, quints_legal) = sample_legal_count(&mut rnd, &names, 5, quint_sample, &verdict);
+    let (sexts, sexts_legal) =
+        sample_sext_count(&mut rnd, &names, sext_sample, &verdict, &mut failures);
+    let all_legal = all_levels_legal(pairs, pairs_legal, triples, triples_legal, quads, quads_legal, quints, quints_legal, sexts, sexts_legal);
     Json::Object(vec![
         ("packs".to_string(), Json::Int(names.len() as i64)),
         ("pairs".to_string(), Json::Int(pairs)),
@@ -141,6 +104,71 @@ pub(crate) fn breadth(
         ("failures".to_string(), Json::Array(failures)),
         ("all_legal".to_string(), Json::Bool(all_legal)),
     ])
+}
+
+/// 单档抽样：返回 (抽样数, 合法数)。
+fn sample_legal_count(
+    rnd: &mut crate::pyrandom::PyRandom,
+    names: &[String],
+    size: usize,
+    sample: usize,
+    verdict: &dyn Fn(&[String]) -> (bool, Vec<Json>, Vec<Json>),
+) -> (i64, i64) {
+    let (mut total, mut legal_n) = (0i64, 0i64);
+    for t in draw_samples(rnd, names, size, sample) {
+        let (legal, _, _) = verdict(&t);
+        total += 1;
+        if legal {
+            legal_n += 1;
+        }
+    }
+    (total, legal_n)
+}
+
+/// 六元抽样：失败样本最多记 10 条。
+fn sample_sext_count(
+    rnd: &mut crate::pyrandom::PyRandom,
+    names: &[String],
+    sample: usize,
+    verdict: &dyn Fn(&[String]) -> (bool, Vec<Json>, Vec<Json>),
+    failures: &mut Vec<Json>,
+) -> (i64, i64) {
+    let (mut total, mut legal_n) = (0i64, 0i64);
+    for p in draw_samples(rnd, names, 6, sample) {
+        let (legal, dangling, unbridged) = verdict(&p);
+        total += 1;
+        if legal {
+            legal_n += 1;
+        } else if failures.len() < 10 {
+            failures.push(Json::Object(vec![
+                ("combo".to_string(), str_json(&p)),
+                ("dangling".to_string(), Json::Array(dangling)),
+                ("unbridged".to_string(), Json::Array(unbridged)),
+            ]));
+        }
+    }
+    (total, legal_n)
+}
+
+/// 各档全合法判定。
+#[allow(clippy::too_many_arguments)]
+fn all_levels_legal(
+    pairs: i64,
+    pairs_legal: i64,
+    triples: i64,
+    triples_legal: i64,
+    quads: i64,
+    quads_legal: i64,
+    quints: i64,
+    quints_legal: i64,
+    sexts: i64,
+    sexts_legal: i64,
+) -> bool {
+    pairs == pairs_legal
+        && triples == triples_legal
+        && quads == quads_legal
+        && quints == quints_legal
+        && sexts == sexts_legal
 }
 
 /// 两两组合的合法性计数（失败样本最多记 10 条）。

@@ -43,6 +43,32 @@ pub(crate) fn run_pyval(args: &[String]) -> Result<ExitCode, String> {
 /// `--results` 喂入**未移植**判据的 `(issues, warns, stats)`；本线自算 `schema` / `doc_markers` /
 /// `baseline` / `self_stats` 四条。写面（`--write`）不实现。
 pub(crate) fn run_verify_report(args: &[String]) -> Result<ExitCode, String> {
+    let (root, results, out, check_mode) = parse_verify_report_args(args)?;
+    require_dir(&root)?;
+    let supplied = load_supplied(&results)?;
+
+    let report = if check_mode {
+        let (issues, live) = verify_report::check(&root, &supplied);
+        eprintln!("  {}", verify_report::summary_line(&live));
+        for x in &issues {
+            eprintln!("  ✗ {}", x);
+        }
+        if !issues.is_empty() {
+            emit(&verify_report::render(&live), &out)?;
+            return Ok(ExitCode::from(1));
+        }
+        live
+    } else {
+        verify_report::build(&root, &supplied)
+    };
+    emit(&verify_report::render(&report), &out)?;
+    Ok(ExitCode::SUCCESS)
+}
+
+/// 参数面：--root / --results / --out / --check|--fresh。
+fn parse_verify_report_args(
+    args: &[String],
+) -> Result<(PathBuf, Option<PathBuf>, Option<PathBuf>, bool), String> {
     let mut root: Option<PathBuf> = None;
     let mut results: Option<PathBuf> = None;
     let mut out: Option<PathBuf> = None;
@@ -72,11 +98,16 @@ pub(crate) fn run_verify_report(args: &[String]) -> Result<ExitCode, String> {
         i += 1;
     }
     let root = root.ok_or("缺 --root（修复指引：传仓库根目录）")?;
-    require_dir(&root)?;
+    Ok((root, results, out, check_mode))
+}
 
+/// 喂入的未移植判据结果（--results）。
+fn load_supplied(
+    results: &Option<PathBuf>,
+) -> Result<std::collections::HashMap<String, verify_report::Supplied>, String> {
     let mut supplied: std::collections::HashMap<String, verify_report::Supplied> =
         std::collections::HashMap::new();
-    if let Some(p) = &results {
+    if let Some(p) = results {
         let text =
             std::fs::read_to_string(p).map_err(|e| format!("读 {} 失败：{}", p.display(), e))?;
         let v: serde_json::Value = serde_json::from_str(&text)
@@ -114,23 +145,7 @@ pub(crate) fn run_verify_report(args: &[String]) -> Result<ExitCode, String> {
             }
         }
     }
-
-    let report = if check_mode {
-        let (issues, live) = verify_report::check(&root, &supplied);
-        eprintln!("  {}", verify_report::summary_line(&live));
-        for x in &issues {
-            eprintln!("  ✗ {}", x);
-        }
-        if !issues.is_empty() {
-            emit(&verify_report::render(&live), &out)?;
-            return Ok(ExitCode::from(1));
-        }
-        live
-    } else {
-        verify_report::build(&root, &supplied)
-    };
-    emit(&verify_report::render(&report), &out)?;
-    Ok(ExitCode::SUCCESS)
+    Ok(supplied)
 }
 
 // ---------------------------------------------------------------- schema 面

@@ -48,19 +48,7 @@ pub(crate) fn dump(value: &GenOut) -> String {
 pub(crate) fn deep_diff(a: &Json, b: &Json, path: &str, out: &mut Vec<String>) {
     match (a, b) {
         (Json::Object(x), Json::Object(y)) => {
-            let mut keys: Vec<String> = Vec::new();
-            for (k, _) in x {
-                if !keys.contains(k) {
-                    keys.push(k.clone());
-                }
-            }
-            for (k, _) in y {
-                if !keys.contains(k) {
-                    keys.push(k.clone());
-                }
-            }
-            keys.sort();
-            for k in keys {
+            for k in merged_keys(x, y) {
                 let av = x.iter().find(|(kk, _)| *kk == k).map(|(_, v)| v);
                 let bv = y.iter().find(|(kk, _)| *kk == k).map(|(_, v)| v);
                 match (av, bv) {
@@ -120,6 +108,23 @@ pub(crate) fn deep_diff(a: &Json, b: &Json, path: &str, out: &mut Vec<String>) {
             }
         }
     }
+}
+
+/// 对象键并集（x 序 + y 补充，升序）。
+fn merged_keys(x: &[(String, Json)], y: &[(String, Json)]) -> Vec<String> {
+    let mut keys: Vec<String> = Vec::new();
+    for (k, _) in x {
+        if !keys.contains(k) {
+            keys.push(k.clone());
+        }
+    }
+    for (k, _) in y {
+        if !keys.contains(k) {
+            keys.push(k.clone());
+        }
+    }
+    keys.sort();
+    keys
 }
 
 /// 真源 `_recompute_entry` → `(issues, stats)`。

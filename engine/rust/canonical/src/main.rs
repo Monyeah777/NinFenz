@@ -12,6 +12,9 @@ use std::fmt::Write as _;
 use std::fs;
 use std::process::ExitCode;
 
+mod jcs;
+use jcs::*;
+
 #[derive(Debug)]
 enum Json {
     Null,
@@ -124,36 +127,7 @@ impl<'a> Parser<'a> {
                 Some(b'"') => { self.i += 1; return Ok(out); }
                 Some(b'\\') => {
                     self.i += 1;
-                    match self.byte() {
-                        Some(b'"') => { out.push('"'); self.i += 1; }
-                        Some(b'\\') => { out.push('\\'); self.i += 1; }
-                        Some(b'/') => { out.push('/'); self.i += 1; }
-                        Some(b'b') => { out.push('\u{0008}'); self.i += 1; }
-                        Some(b'f') => { out.push('\u{000C}'); self.i += 1; }
-                        Some(b'n') => { out.push('\n'); self.i += 1; }
-                        Some(b'r') => { out.push('\r'); self.i += 1; }
-                        Some(b't') => { out.push('\t'); self.i += 1; }
-                        Some(b'u') => {
-                            self.i += 1;
-                            let hi = self.hex4()?;
-                            let cp = if (0xD800..0xDC00).contains(&hi) {
-                                if self.byte() != Some(b'\\') || self.b.get(self.i + 1) != Some(&b'u') {
-                                    return err("高代理未配对", self.i);
-                                }
-                                self.i += 2;
-                                let lo = self.hex4()?;
-                                if !(0xDC00..0xE000).contains(&lo) { return err("低代理不合法", self.i); }
-                                0x10000 + ((hi - 0xD800) << 10) + (lo - 0xDC00)
-                            } else if (0xDC00..0xE000).contains(&hi) {
-                                return err("孤立低代理", self.i);
-                            } else { hi };
-                            match char::from_u32(cp) {
-                                Some(ch) => out.push(ch),
-                                None => return err("码点不合法", self.i),
-                            }
-                        }
-                        _ => return err("转义字符不合法", self.i),
-                    }
+                    self.read_escape(&mut out)?;
                 }
                 Some(c) if c < 0x20 => return err("控制字符必须转义", self.i),
                 Some(_) => {
@@ -166,83 +140,88 @@ impl<'a> Parser<'a> {
         }
     }
 
+    fn read_escape(&mut self, out: &mut String) -> Result<(), String> {
+        match self.byte() {
+            Some(b'"') => { out.push('"'); self.i += 1; }
+            Some(b'\\') => { out.push('\\'); self.i += 1; }
+            Some(b'/') => { out.push('/'); self.i += 1; }
+            Some(b'b') => { out.push('\u{0008}'); self.i += 1; }
+            Some(b'f') => { out.push('\u{000C}'); self.i += 1; }
+            Some(b'n') => { out.push('\n'); self.i += 1; }
+            Some(b'r') => { out.push('\r'); self.i += 1; }
+            Some(b't') => { out.push('\t'); self.i += 1; }
+            Some(b'u') => { self.i += 1; self.read_unicode(out)?; }
+            _ => return err("转义字符不合法", self.i),
+        }
+        Ok(())
+    }
+
+    fn read_unicode(&mut self, out: &mut String) -> Result<(), String> {
+        let hi = self.hex4()?;
+        let cp = if (0xD800..0xDC00).contains(&hi) {
+            if self.byte() != Some(b'\\') || self.b.get(self.i + 1) != Some(&b'u') {
+                return err("高代理未配对", self.i);
+            }
+            self.i += 2;
+            let lo = self.hex4()?;
+            if !(0xDC00..0xE000).contains(&lo) { return err("低代理不合法", self.i); }
+            0x10000 + ((hi - 0xD800) << 10) + (lo - 0xDC00)
+        } else if (0xDC00..0xE000).contains(&hi) {
+            return err("孤立低代理", self.i);
+        } else { hi };
+        match char::from_u32(cp) {
+            Some(ch) => out.push(ch),
+            None => return err("码点不合法", self.i),
+        }
+        Ok(())
+    }
+
     fn number(&mut self) -> Result<Json, String> {
         let start = self.i;
         if self.byte() == Some(b'-') { self.i += 1; }
-        if self.byte() == Some(b'0') {
-            self.i += 1;
-        } else if matches!(self.byte(), Some(c) if c.is_ascii_digit()) {
-            while matches!(self.byte(), Some(c) if c.is_ascii_digit()) { self.i += 1; }
-        } else {
-            return err("数字缺整数部分", self.i);
-        }
-        if self.byte() == Some(b'.') {
-            self.i += 1;
-            if !matches!(self.byte(), Some(c) if c.is_ascii_digit()) { return err("小数点后缺数字", self.i); }
-            while matches!(self.byte(), Some(c) if c.is_ascii_digit()) { self.i += 1; }
-        }
-        if matches!(self.byte(), Some(b'e') | Some(b'E')) {
-            self.i += 1;
-            if matches!(self.byte(), Some(b'+') | Some(b'-')) { self.i += 1; }
-            if !matches!(self.byte(), Some(c) if c.is_ascii_digit()) { return err("指数缺数字", self.i); }
-            while matches!(self.byte(), Some(c) if c.is_ascii_digit()) { self.i += 1; }
-        }
+        self.number_int()?;
+        self.number_frac()?;
+        self.number_exp()?;
         let txt = std::str::from_utf8(&self.b[start..self.i]).map_err(|_| "数字非 ASCII".to_string())?;
         let v: f64 = txt.parse().map_err(|_| format!("数字越界（偏移 {start}）"))?;
         if !v.is_finite() { return err("数字非有限", start); }
         Ok(Json::Num(v))
     }
-}
 
-fn escape(s: &str, out: &mut String) {
-    out.push('"');
-    for ch in s.chars() {
-        match ch {
-            '"' => out.push_str("\\\""),
-            '\\' => out.push_str("\\\\"),
-            '\u{0008}' => out.push_str("\\b"),
-            '\u{000C}' => out.push_str("\\f"),
-            '\n' => out.push_str("\\n"),
-            '\r' => out.push_str("\\r"),
-            '\t' => out.push_str("\\t"),
-            c if (c as u32) < 0x20 => { let _ = write!(out, "\\u{:04x}", c as u32); }
-            c => out.push(c),
+    fn number_int(&mut self) -> Result<(), String> {
+        if self.byte() == Some(b'0') {
+            self.i += 1;
+        } else if matches!(self.byte(), Some(c) if c.is_ascii_digit()) {
+            self.skip_digits();
+        } else {
+            return err("数字缺整数部分", self.i);
         }
+        Ok(())
     }
-    out.push('"');
-}
 
-/// ECMAScript Number::toString(x)（RFC 8785 指定的数字口径）。
-fn number(v: f64, out: &mut String) {
-    if v == 0.0 { out.push('0'); return; }
-    let sci = format!("{:e}", v);
-    let (mant, exp) = sci.split_once('e').expect("科学计数法必含 e");
-    let neg = mant.starts_with('-');
-    let mant = mant.trim_start_matches('-');
-    let digits: String = mant.chars().filter(|c| *c != '.').collect();
-    let digits = digits.trim_end_matches('0');
-    let digits = if digits.is_empty() { "0" } else { digits };
-    let k = digits.len() as i64;
-    let e: i64 = exp.parse().expect("指数必为整数");
-    let n = e + 1;
-    if neg { out.push('-'); }
-    if k <= n && n <= 21 {
-        out.push_str(digits);
-        for _ in 0..(n - k) { out.push('0'); }
-    } else if 0 < n && n <= 21 {
-        out.push_str(&digits[..n as usize]);
-        out.push('.');
-        out.push_str(&digits[n as usize..]);
-    } else if -6 < n && n <= 0 {
-        out.push_str("0.");
-        for _ in 0..(-n) { out.push('0'); }
-        out.push_str(digits);
-    } else {
-        out.push_str(&digits[..1]);
-        if k > 1 { out.push('.'); out.push_str(&digits[1..]); }
-        let _ = write!(out, "e{}", if n - 1 >= 0 { "+" } else { "-" });
-        let _ = write!(out, "{}", (n - 1).abs());
+    fn skip_digits(&mut self) {
+        while matches!(self.byte(), Some(c) if c.is_ascii_digit()) { self.i += 1; }
     }
+
+    fn number_frac(&mut self) -> Result<(), String> {
+        if self.byte() == Some(b'.') {
+            self.i += 1;
+            if !matches!(self.byte(), Some(c) if c.is_ascii_digit()) { return err("小数点后缺数字", self.i); }
+            self.skip_digits();
+        }
+        Ok(())
+    }
+
+    fn number_exp(&mut self) -> Result<(), String> {
+        if matches!(self.byte(), Some(b'e') | Some(b'E')) {
+            self.i += 1;
+            if matches!(self.byte(), Some(b'+') | Some(b'-')) { self.i += 1; }
+            if !matches!(self.byte(), Some(c) if c.is_ascii_digit()) { return err("指数缺数字", self.i); }
+            self.skip_digits();
+        }
+        Ok(())
+    }
+
 }
 
 fn emit(v: &Json, out: &mut String) {

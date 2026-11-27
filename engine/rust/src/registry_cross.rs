@@ -60,7 +60,44 @@ fn allowlist(root: &Path) -> BTreeSet<String> {
 
 /// 真源 `scan`。
 pub fn scan(root: &Path) -> CrossScan {
-    // (module, pkg)
+    let (publishers, subscribers) = collect_event_maps(root);
+    let allow = allowlist(root);
+
+    let mut issues = Vec::new();
+    let mut cross_pkg = 0usize;
+    let mut allowlisted = 0usize;
+    for (ev, subs) in subscribers.iter() {
+        let empty = Vec::new();
+        let pubs = publishers.get(ev).unwrap_or(&empty);
+        if pubs.is_empty() {
+            if allow.contains(ev) {
+                allowlisted += 1;
+            } else {
+                issues.push(missing_publisher_issue(ev, subs));
+            }
+            continue;
+        }
+        if is_cross_pkg(subs, pubs) {
+            cross_pkg += 1;
+        }
+    }
+
+    let events: BTreeSet<&String> = publishers.keys().chain(subscribers.keys()).collect();
+    CrossScan {
+        issues,
+        events: events.len(),
+        cross_pkg,
+        allowlisted,
+    }
+}
+
+/// 收集全仓 machine 段的发布/订阅表：(事件 → [(模块 id, 包名)])。
+fn collect_event_maps(
+    root: &Path,
+) -> (
+    BTreeMap<String, Vec<(String, String)>>,
+    BTreeMap<String, Vec<(String, String)>>,
+) {
     let mut publishers: BTreeMap<String, Vec<(String, String)>> = BTreeMap::new();
     let mut subscribers: BTreeMap<String, Vec<(String, String)>> = BTreeMap::new();
     for (rel, mc) in modules(root) {
@@ -86,48 +123,31 @@ pub fn scan(root: &Path) -> CrossScan {
                 .push((mid.clone(), pkg.clone()));
         }
     }
-    let allow = allowlist(root);
+    (publishers, subscribers)
+}
 
-    let mut issues = Vec::new();
-    let mut cross_pkg = 0usize;
-    let mut allowlisted = 0usize;
-    for (ev, subs) in subscribers.iter() {
-        let empty = Vec::new();
-        let pubs = publishers.get(ev).unwrap_or(&empty);
-        if pubs.is_empty() {
-            if allow.contains(ev) {
-                allowlisted += 1;
-            } else {
-                let mods: Vec<String> = subs
-                    .iter()
-                    .map(|(m, _)| m.clone())
-                    .collect::<BTreeSet<_>>()
-                    .into_iter()
-                    .take(3)
-                    .collect();
-                issues.push(format!(
-                    "事件背书缺口：{} 被 {} 订阅，但全仓无发布方（修复指引：补发布模块，或登记进 {} 作为外部通道）",
-                    ev,
-                    mods.join("、"),
-                    ALLOWLIST_REL
-                ));
-            }
-            continue;
-        }
-        let sub_pkgs: BTreeSet<&String> = subs.iter().map(|(_, p)| p).collect();
-        let pub_pkgs: BTreeSet<&String> = pubs.iter().map(|(_, p)| p).collect();
-        if !sub_pkgs.is_empty() && !pub_pkgs.is_empty() && sub_pkgs.is_disjoint(&pub_pkgs) {
-            cross_pkg += 1;
-        }
-    }
+/// 无发布方的事件：订阅模块名清单（前 3 个）。
+fn missing_publisher_issue(ev: &str, subs: &[(String, String)]) -> String {
+    let mods: Vec<String> = subs
+        .iter()
+        .map(|(m, _)| m.clone())
+        .collect::<BTreeSet<_>>()
+        .into_iter()
+        .take(3)
+        .collect();
+    format!(
+        "事件背书缺口：{} 被 {} 订阅，但全仓无发布方（修复指引：补发布模块，或登记进 {} 作为外部通道）",
+        ev,
+        mods.join("、"),
+        ALLOWLIST_REL
+    )
+}
 
-    let events: BTreeSet<&String> = publishers.keys().chain(subscribers.keys()).collect();
-    CrossScan {
-        issues,
-        events: events.len(),
-        cross_pkg,
-        allowlisted,
-    }
+/// 订阅方与发布方是否落在不相交的包集合（跨包事件）。
+fn is_cross_pkg(subs: &[(String, String)], pubs: &[(String, String)]) -> bool {
+    let sub_pkgs: BTreeSet<&String> = subs.iter().map(|(_, p)| p).collect();
+    let pub_pkgs: BTreeSet<&String> = pubs.iter().map(|(_, p)| p).collect();
+    !sub_pkgs.is_empty() && !pub_pkgs.is_empty() && sub_pkgs.is_disjoint(&pub_pkgs)
 }
 
 #[cfg(test)]

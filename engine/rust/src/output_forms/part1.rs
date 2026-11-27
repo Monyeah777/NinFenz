@@ -76,24 +76,11 @@ pub fn registry_verify(root: &Path) -> (Vec<String>, Json) {
         ));
     }
     let cats = arr_of(obj_get(&reg, "categories"));
-    let mut cat_ids: Vec<String> = Vec::new();
-    for c in &cats {
-        if let Some(Json::Str(id)) = obj_get(c, "id") {
-            if !cat_ids.contains(id) {
-                cat_ids.push(id.clone());
-            }
-        }
-    }
+    let cat_ids = form_category_ids(&cats);
     if cat_ids.is_empty() {
         issues.push("categories 为空（形态必须有类别归属）".to_string());
     }
-    for c in &cats {
-        let ok = matches!(obj_get(c, "id"), Some(v) if pyval::py_truthy(v))
-            && matches!(obj_get(c, "name"), Some(v) if pyval::py_truthy(v));
-        if !matches!(c, Json::Object(_)) || !ok {
-            issues.push(format!("categories 条目缺 id/name：{}", pyval::py_repr(c)));
-        }
-    }
+    category_entry_issues(&cats, &mut issues);
     let forms = arr_of(obj_get(&reg, "forms"));
     let mut seen: Vec<String> = Vec::new();
     let mut per_cat: Vec<(String, i64)> = Vec::new();
@@ -173,48 +160,113 @@ pub(crate) fn verify_forms(
             continue;
         }
         let fid = pyval::plain_str(&fid_v);
-        if seen.contains(&fid) {
-            issues.push(format!("形态 id 重复：{}", fid));
+        form_entry_issues(
+            f, &fid, cat_ids, seen, per_cat, per_tier, per_status, unreachable, issues,
+        );
+    }
+}
+
+/// categories 去重 id 表（保持出现序）。
+fn form_category_ids(cats: &[Json]) -> Vec<String> {
+    let mut cat_ids: Vec<String> = Vec::new();
+    for c in cats {
+        if let Some(Json::Str(id)) = obj_get(c, "id") {
+            if !cat_ids.contains(id) {
+                cat_ids.push(id.clone());
+            }
         }
-        seen.push(fid.clone());
-        let cat = obj_get(f, "category").cloned().unwrap_or(Json::Null);
-        if !matches!(&cat, Json::Str(s) if cat_ids.contains(s)) {
-            issues.push(format!("{} 类别未在册：{}", fid, pyval::py_repr(&cat)));
+    }
+    cat_ids
+}
+
+/// categories 条目：对象形态 + id/name 真值。
+fn category_entry_issues(cats: &[Json], issues: &mut Vec<String>) {
+    for c in cats {
+        let ok = matches!(obj_get(c, "id"), Some(v) if pyval::py_truthy(v))
+            && matches!(obj_get(c, "name"), Some(v) if pyval::py_truthy(v));
+        if !matches!(c, Json::Object(_)) || !ok {
+            issues.push(format!("categories 条目缺 id/name：{}", pyval::py_repr(c)));
         }
-        let tier = obj_get(f, "tier").cloned().unwrap_or(Json::Null);
-        if !matches!(&tier, Json::Str(s) if TIERS.contains(&s.as_str())) {
-            issues.push(format!(
-                "{} 档位非法：{}（预期 {}）",
-                fid,
-                pyval::py_repr(&tier),
-                TIERS.join("/")
-            ));
-        }
-        let status = obj_get(f, "status").cloned().unwrap_or(Json::Null);
-        if !matches!(&status, Json::Str(s) if STATUSES.contains(&s.as_str())) {
-            issues.push(format!("{} 状态非法：{}", fid, pyval::py_repr(&status)));
-        }
-        let spec = obj_get(f, "spec").cloned().unwrap_or(Json::Object(vec![]));
-        let status_is_unfit = matches!(&status, Json::Str(s) if s == "unfit");
-        if !status_is_unfit
-            && !pyval::py_truthy(&obj_get(&spec, "uri").cloned().unwrap_or(Json::Null))
-        {
-            issues.push(format!("{} 缺规范入口 spec.uri（不适面才可空）", fid));
-        }
-        let ev = obj_get(f, "evidence")
-            .cloned()
-            .unwrap_or(Json::Object(vec![]));
-        if obj_get(&ev, "reachable").is_none() {
-            issues.push(format!(
-                "{} 缺可达性实证 evidence.reachable（不伪造：查不到也要记 false）",
-                fid
-            ));
-        } else if matches!(obj_get(&ev, "reachable"), Some(Json::Bool(false))) {
-            *unreachable += 1;
-        }
-        let cat_key = pyval::plain_str(&cat);
-        bump(per_cat, cat_key);
-        bump(per_tier, format!("{}", pyval::py_str(Some(&tier))));
-        bump(per_status, format!("{}", pyval::py_str(Some(&status))));
+    }
+}
+
+/// 单条形态：id 唯一 / 类别 / 档位 / 状态 / spec.uri / 可达性实证 + 分面计数。
+#[allow(clippy::too_many_arguments)]
+fn form_entry_issues(
+    f: &Json,
+    fid: &str,
+    cat_ids: &[String],
+    seen: &mut Vec<String>,
+    per_cat: &mut Vec<(String, i64)>,
+    per_tier: &mut Vec<(String, i64)>,
+    per_status: &mut Vec<(String, i64)>,
+    unreachable: &mut i64,
+    issues: &mut Vec<String>,
+) {
+    if seen.contains(&fid.to_string()) {
+        issues.push(format!("形态 id 重复：{}", fid));
+    }
+    seen.push(fid.to_string());
+    let (cat, tier, status) = form_vocab_issues(f, fid, cat_ids, issues);
+    let spec = obj_get(f, "spec").cloned().unwrap_or(Json::Object(vec![]));
+    let status_is_unfit = matches!(&status, Json::Str(s) if s == "unfit");
+    if !status_is_unfit
+        && !pyval::py_truthy(&obj_get(&spec, "uri").cloned().unwrap_or(Json::Null))
+    {
+        issues.push(format!("{} 缺规范入口 spec.uri（不适面才可空）", fid));
+    }
+    form_evidence_issues(f, fid, unreachable, issues);
+    bump_count(per_cat, pyval::plain_str(&cat));
+    bump_count(per_tier, format!("{}", pyval::py_str(Some(&tier))));
+    bump_count(per_status, format!("{}", pyval::py_str(Some(&status))));
+}
+
+/// 类别 / 档位 / 状态 三张词表核对；返回原值供后续判据。
+fn form_vocab_issues(
+    f: &Json,
+    fid: &str,
+    cat_ids: &[String],
+    issues: &mut Vec<String>,
+) -> (Json, Json, Json) {
+    let cat = obj_get(f, "category").cloned().unwrap_or(Json::Null);
+    if !matches!(&cat, Json::Str(s) if cat_ids.contains(s)) {
+        issues.push(format!("{} 类别未在册：{}", fid, pyval::py_repr(&cat)));
+    }
+    let tier = obj_get(f, "tier").cloned().unwrap_or(Json::Null);
+    if !matches!(&tier, Json::Str(s) if TIERS.contains(&s.as_str())) {
+        issues.push(format!(
+            "{} 档位非法：{}（预期 {}）",
+            fid,
+            pyval::py_repr(&tier),
+            TIERS.join("/")
+        ));
+    }
+    let status = obj_get(f, "status").cloned().unwrap_or(Json::Null);
+    if !matches!(&status, Json::Str(s) if STATUSES.contains(&s.as_str())) {
+        issues.push(format!("{} 状态非法：{}", fid, pyval::py_repr(&status)));
+    }
+    (cat, tier, status)
+}
+
+/// 可达性实证：缺键必报；显式 false 计入 unreachable。
+fn form_evidence_issues(f: &Json, fid: &str, unreachable: &mut i64, issues: &mut Vec<String>) {
+    let ev = obj_get(f, "evidence")
+        .cloned()
+        .unwrap_or(Json::Object(vec![]));
+    if obj_get(&ev, "reachable").is_none() {
+        issues.push(format!(
+            "{} 缺可达性实证 evidence.reachable（不伪造：查不到也要记 false）",
+            fid
+        ));
+    } else if matches!(obj_get(&ev, "reachable"), Some(Json::Bool(false))) {
+        *unreachable += 1;
+    }
+}
+
+/// 分面计数 +1。
+fn bump_count(v: &mut Vec<(String, i64)>, k: String) {
+    match v.iter_mut().find(|(n, _)| *n == k) {
+        Some(e) => e.1 += 1,
+        None => v.push((k, 1)),
     }
 }

@@ -16,66 +16,90 @@ pub(crate) fn verify_normative(root: &Path) -> (Vec<String>, usize, usize) {
     let receipts = receipt_ids(root);
     let mut norm_paths: Vec<String> = Vec::new();
     for item in arr_items(get(&doc, "normative")) {
-        let entry = if matches!(item, Json::Object(_)) {
-            item.clone()
-        } else {
-            Json::Object(vec![("path".to_string(), Json::Str(plain_str(item)))])
-        };
-        let rel = py_str(get(&entry, "path"));
-        norm_paths.push(rel.clone());
-        if rel.is_empty() {
-            issues.push("规范件条目缺 path".to_string());
-            continue;
-        }
-        if !root.join(&rel).is_file() {
-            issues.push(format!("规范件不存在：{}", rel));
-            continue;
-        }
-        if receipts.contains(&rel) {
-            continue;
-        }
-        let covered: Vec<String> = arr_items(get(&entry, "covered_by"))
-            .iter()
-            .map(|c| plain_str(c))
-            .collect();
-        if covered.is_empty() {
-            issues.push(format!(
-                "规范件既未被回执锚定也无 covered_by：{}（修复指引：跑 nf receipts --write，或显式声明 covered_by）",
-                rel
-            ));
-            continue;
-        }
-        for c in covered {
-            if let Some(cap) = judge_check_re().captures(&c) {
-                if !checks.contains(&cap[1]) {
-                    issues.push(format!(
-                        "规范件 {} 的 covered_by 指向不存在的 check：{}",
-                        rel, c
-                    ));
-                }
+        normative_item_issues(root, &item, &checks, &receipts, &mut norm_paths, &mut issues);
+    }
+    let info_hits = informative_hits(root, &doc);
+    informative_issues(&info_hits, &norm_paths, &receipts, &mut issues);
+    (issues, norm_paths.len(), info_hits.len())
+}
+
+/// 单条规范件：path / 在场 / 回执锚定 / covered_by 的 check 存在性。
+fn normative_item_issues(
+    root: &Path,
+    item: &Json,
+    checks: &BTreeSet<String>,
+    receipts: &BTreeSet<String>,
+    norm_paths: &mut Vec<String>,
+    issues: &mut Vec<String>,
+) {
+    let entry = if matches!(item, Json::Object(_)) {
+        item.clone()
+    } else {
+        Json::Object(vec![("path".to_string(), Json::Str(plain_str(item)))])
+    };
+    let rel = py_str(get(&entry, "path"));
+    norm_paths.push(rel.clone());
+    if rel.is_empty() {
+        issues.push("规范件条目缺 path".to_string());
+        return;
+    }
+    if !root.join(&rel).is_file() {
+        issues.push(format!("规范件不存在：{}", rel));
+        return;
+    }
+    if receipts.contains(&rel) {
+        return;
+    }
+    let covered: Vec<String> = arr_items(get(&entry, "covered_by"))
+        .iter()
+        .map(|c| plain_str(c))
+        .collect();
+    if covered.is_empty() {
+        issues.push(format!(
+            "规范件既未被回执锚定也无 covered_by：{}（修复指引：跑 nf receipts --write，或显式声明 covered_by）",
+            rel
+        ));
+        return;
+    }
+    for c in covered {
+        if let Some(cap) = judge_check_re().captures(&c) {
+            if !checks.contains(&cap[1]) {
+                issues.push(format!(
+                    "规范件 {} 的 covered_by 指向不存在的 check：{}",
+                    rel, c
+                ));
             }
         }
     }
+}
 
+/// 说明件展开：`docs/**` → `docs/**/*`（在 g 后追加，不是替换）。
+fn informative_hits(root: &Path, doc: &Json) -> BTreeSet<String> {
     let mut info_hits: BTreeSet<String> = BTreeSet::new();
-    for g in arr_items(get(&doc, "informative"))
+    for g in arr_items(get(doc, "informative"))
         .iter()
         .map(|v| plain_str(v))
     {
-        // 真源 `pat = g + "/*" if g.endswith("/**") else g` —— 是**在 g 后面追加** `/*`，
-        // 不是把 `/**` 换成 `/*`（`docs/**` → `docs/**/*`）。抄成后者会丢掉 `**`，
-        // 说明件数从 2352 掉到 75，且**不会**被 ok/not-ok 察觉（只错一个计数）。
         let pat = if g.ends_with("/**") {
             format!("{}/*", g)
         } else {
             g.clone()
         };
-        let hits = crate::glob::expand(root, &pat);
-        for h in hits {
+        for h in crate::glob::expand(root, &pat) {
             info_hits.insert(h);
         }
     }
-    for rel in &info_hits {
+    info_hits
+}
+
+/// 说明件被回执锚定 / 同一件既规范又说明。
+fn informative_issues(
+    info_hits: &BTreeSet<String>,
+    norm_paths: &[String],
+    receipts: &BTreeSet<String>,
+    issues: &mut Vec<String>,
+) {
+    for rel in info_hits {
         if receipts.contains(rel) {
             issues.push(format!("说明件被回执锚定（等于把解释当规范）：{}", rel));
         }
@@ -86,7 +110,6 @@ pub(crate) fn verify_normative(root: &Path) -> (Vec<String>, usize, usize) {
     for rel in overlap {
         issues.push(format!("同一件既列规范又列说明：{}", rel));
     }
-    (issues, norm_paths.len(), info_hits.len())
 }
 
 /// 真源 `verify_contracts` → `(issues, contracts_count)`。
@@ -118,64 +141,84 @@ pub(crate) fn verify_contracts(root: &Path) -> (Vec<String>, usize) {
 
     let mut seen: BTreeSet<String> = BTreeSet::new();
     for c in arr_items(get(&doc, "contracts")) {
-        let cid = py_str(get(c, "id"));
-        if seen.contains(&cid) {
-            issues.push(format!("契约 id 重复：{}", cid));
-        }
-        seen.insert(cid.clone());
-        let art = py_str(get(c, "artifact"));
-        if art.is_empty() || !root.join(&art).is_file() {
-            issues.push(format!(
-                "契约 {} 的 artifact 不存在：{}",
-                cid,
-                if art.is_empty() {
-                    "(缺)"
-                } else {
-                    art.as_str()
-                }
-            ));
-        }
-        if !statuses.contains(&plain_str_opt(get(c, "status"))) {
-            issues.push(format!(
-                "契约 {} status 越词表：{}",
-                cid,
-                plain_str_opt(get(c, "status"))
-            ));
-        }
-        if py_str(get(c, "owner")).trim().is_empty() {
-            issues.push(format!("契约 {} 缺 owner（无人认领的契约不许登记）", cid));
-        }
-        if py_str(get(c, "freshness")).trim().is_empty() {
-            issues.push(format!("契约 {} 缺 freshness（重建动作必须写明）", cid));
-        }
-        let rule = py_str(get(c, "quality_rule"));
-        if let Some(rest) = rule.strip_prefix("check") {
-            if !checks.contains(rest) {
-                issues.push(format!(
-                    "契约 {} 的 quality_rule 指向不存在的 check：{}",
-                    cid, rule
-                ));
-            }
-        } else if let Some(rest) = rule.strip_prefix("assertion:") {
-            if !assertion_ids.contains(rest) {
-                issues.push(format!(
-                    "契约 {} 的 quality_rule 指向不存在的断言：{}",
-                    cid, rule
-                ));
-            }
-        } else {
-            issues.push(format!(
-                "契约 {} 的 quality_rule 无法解析（须 checkN 或 assertion:<id>）：{}",
-                cid,
-                if rule.is_empty() {
-                    "(缺)"
-                } else {
-                    rule.as_str()
-                }
-            ));
-        }
+        contract_item_issues(root, &c, &statuses, &checks, &assertion_ids, &mut seen, &mut issues);
     }
     (issues, seen.len())
+}
+
+/// 单条契约：id 唯一 / artifact 在场 / status / owner / freshness / quality_rule 可解析。
+fn contract_item_issues(
+    root: &Path,
+    c: &Json,
+    statuses: &[String],
+    checks: &BTreeSet<String>,
+    assertion_ids: &BTreeSet<String>,
+    seen: &mut BTreeSet<String>,
+    issues: &mut Vec<String>,
+) {
+    let cid = py_str(get(c, "id"));
+    if seen.contains(&cid) {
+        issues.push(format!("契约 id 重复：{}", cid));
+    }
+    seen.insert(cid.clone());
+    let art = py_str(get(c, "artifact"));
+    if art.is_empty() || !root.join(&art).is_file() {
+        issues.push(format!(
+            "契约 {} 的 artifact 不存在：{}",
+            cid,
+            if art.is_empty() {
+                "(缺)"
+            } else {
+                art.as_str()
+            }
+        ));
+    }
+    if !statuses.contains(&plain_str_opt(get(c, "status"))) {
+        issues.push(format!(
+            "契约 {} status 越词表：{}",
+            cid,
+            plain_str_opt(get(c, "status"))
+        ));
+    }
+    if py_str(get(c, "owner")).trim().is_empty() {
+        issues.push(format!("契约 {} 缺 owner（无人认领的契约不许登记）", cid));
+    }
+    if py_str(get(c, "freshness")).trim().is_empty() {
+        issues.push(format!("契约 {} 缺 freshness（重建动作必须写明）", cid));
+    }
+    let rule = py_str(get(c, "quality_rule"));
+    contract_rule_issues(&cid, &rule, checks, assertion_ids, issues);
+}
+
+/// quality_rule：checkN / assertion:<id> / 其余无法解析。
+fn contract_rule_issues(
+    cid: &str,
+    rule: &str,
+    checks: &BTreeSet<String>,
+    assertion_ids: &BTreeSet<String>,
+    issues: &mut Vec<String>,
+) {
+    if let Some(rest) = rule.strip_prefix("check") {
+        if !checks.contains(rest) {
+            issues.push(format!(
+                "契约 {} 的 quality_rule 指向不存在的 check：{}",
+                cid, rule
+            ));
+        }
+    } else if let Some(rest) = rule.strip_prefix("assertion:") {
+        if !assertion_ids.contains(rest) {
+            issues.push(format!(
+                "契约 {} 的 quality_rule 指向不存在的断言：{}",
+                cid, rule
+            ));
+        }
+    } else {
+        issues.push(format!(
+            "契约 {} 的 quality_rule 无法解析（须 checkN 或 assertion:<id>）：{}",
+            cid,
+            if rule.is_empty() { "(缺)" } else { rule }
+        ));
+    }
 }
 
 // check 定义行正则。模式串含裸花括号，提为常量以免被朴素括号计数误判。

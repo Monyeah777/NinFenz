@@ -67,56 +67,13 @@ pub fn scan(root: &Path) -> (Vec<String>, Option<PayloadStats>) {
     };
     let mut issues = crate::schema_lint::subset_validate(&registry, &schema, "event_registry");
 
-    let mut used: BTreeSet<String> = BTreeSet::new();
-    for rel in crate::module_signature::module_docs(root) {
-        let Ok(txt) = std::fs::read_to_string(root.join(&rel)) else {
-            continue;
-        };
-        let Some(parsed) = miniyaml::fence_yaml(&txt, "machine_contract") else {
-            continue;
-        };
-        let mc = get(&parsed, "machine_contract")
-            .cloned()
-            .unwrap_or_else(|| Json::Object(Vec::new()));
-        let ev = get(&mc, "events")
-            .cloned()
-            .unwrap_or_else(|| Json::Object(Vec::new()));
-        for k in ["publish", "subscribe"] {
-            for v in crate::pyval::arr_items(get(&ev, k)) {
-                used.insert(plain_str(v));
-            }
-        }
-    }
-    if let Some(reg) = jsonread::read_file(root, "desktop/src/core/registry.json") {
-        if let Some(Json::Object(subs)) = get(&reg, "subscriptions") {
-            for (k, _) in subs {
-                used.insert(k.clone());
-            }
-        }
-    }
-
+    let used = used_events(root);
     let registered_pairs: Vec<(String, Json)> = match get(&registry, "events") {
         Some(Json::Object(p)) => p.clone(),
         _ => Vec::new(),
     };
     let registered: BTreeSet<String> = registered_pairs.iter().map(|(k, _)| k.clone()).collect();
-
-    let mut dead: Vec<String> = registered.difference(&used).cloned().collect();
-    dead.sort();
-    if !dead.is_empty() {
-        issues.push(format!(
-            "已登记事件无 machine 引用（死注册）：{}",
-            dead.join(", ")
-        ));
-    }
-    let mut unregistered: Vec<String> = used.difference(&registered).cloned().collect();
-    unregistered.sort();
-    if !unregistered.is_empty() {
-        issues.push(format!(
-            "机器事件未登记载荷（漏登）：{}",
-            unregistered.join(", ")
-        ));
-    }
+    registry_cross_issues(&registered, &used, &mut issues);
 
     let declared = registered_pairs
         .iter()
@@ -131,6 +88,62 @@ pub fn scan(root: &Path) -> (Vec<String>, Option<PayloadStats>) {
             pending: registered.len() - declared,
         }),
     )
+}
+
+/// 全仓 machine 段声明的事件（publish / subscribe）+ 旧注册表 subscriptions。
+fn used_events(root: &Path) -> BTreeSet<String> {
+    let mut used: BTreeSet<String> = BTreeSet::new();
+    for rel in crate::module_signature::module_docs(root) {
+        let Ok(txt) = std::fs::read_to_string(root.join(&rel)) else {
+            continue;
+        };
+        let Some(parsed) = miniyaml::fence_yaml(&txt, "machine_contract") else {
+            continue;
+        };
+        let mc = obj_or_empty(get(&parsed, "machine_contract"));
+        let ev = obj_or_empty(get(&mc, "events"));
+        for k in ["publish", "subscribe"] {
+            for v in crate::pyval::arr_items(get(&ev, k)) {
+                used.insert(plain_str(v));
+            }
+        }
+    }
+    if let Some(reg) = jsonread::read_file(root, "desktop/src/core/registry.json") {
+        if let Some(Json::Object(subs)) = get(&reg, "subscriptions") {
+            for (k, _) in subs {
+                used.insert(k.clone());
+            }
+        }
+    }
+    used
+}
+
+/// 非对象值按空对象（真源 dict 缺省口径）。
+fn obj_or_empty(v: Option<&Json>) -> Json {
+    match v {
+        Some(Json::Object(o)) => Json::Object(o.clone()),
+        _ => Json::Object(Vec::new()),
+    }
+}
+
+/// 死注册 / 漏登 双向核对。
+fn registry_cross_issues(registered: &BTreeSet<String>, used: &BTreeSet<String>, issues: &mut Vec<String>) {
+    let mut dead: Vec<String> = registered.difference(used).cloned().collect();
+    dead.sort();
+    if !dead.is_empty() {
+        issues.push(format!(
+            "已登记事件无 machine 引用（死注册）：{}",
+            dead.join(", ")
+        ));
+    }
+    let mut unregistered: Vec<String> = used.difference(registered).cloned().collect();
+    unregistered.sort();
+    if !unregistered.is_empty() {
+        issues.push(format!(
+            "机器事件未登记载荷（漏登）：{}",
+            unregistered.join(", ")
+        ));
+    }
 }
 
 #[cfg(test)]

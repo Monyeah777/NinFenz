@@ -132,29 +132,33 @@ pub fn validate_entry(entry: &Json) -> Vec<String> {
     }
     if let Some(Json::Array(cands)) = obj_get(entry, "candidates") {
         for c in cands {
-            if !matches!(c, Json::Object(_)) {
-                issues.push("candidate 非对象".to_string());
-                continue;
-            }
-            let repo = match obj_get(c, "repo") {
-                Some(Json::Str(s)) => s.clone(),
-                Some(Json::Null) | None => String::new(),
-                Some(v) => pyval::plain_str(v),
-            };
-            if !repo.starts_with("http://") && !repo.starts_with("https://") {
-                issues.push("candidate 缺合法 https 链接".to_string());
-            }
-            let lic = match obj_get(c, "license") {
-                Some(Json::Str(s)) => s.clone(),
-                Some(Json::Null) | None => String::new(),
-                Some(v) => pyval::plain_str(v),
-            };
-            if lic.trim().is_empty() {
-                issues.push("candidate 缺 license（有链接必须有出处）".to_string());
-            }
+            validate_candidate(c, &mut issues);
         }
     }
     issues
+}
+
+fn validate_candidate(c: &Json, issues: &mut Vec<String>) {
+    if !matches!(c, Json::Object(_)) {
+        issues.push("candidate 非对象".to_string());
+        return;
+    }
+    let repo = match obj_get(c, "repo") {
+        Some(Json::Str(s)) => s.clone(),
+        Some(Json::Null) | None => String::new(),
+        Some(v) => pyval::plain_str(v),
+    };
+    if !repo.starts_with("http://") && !repo.starts_with("https://") {
+        issues.push("candidate 缺合法 https 链接".to_string());
+    }
+    let lic = match obj_get(c, "license") {
+        Some(Json::Str(s)) => s.clone(),
+        Some(Json::Null) | None => String::new(),
+        Some(v) => pyval::plain_str(v),
+    };
+    if lic.trim().is_empty() {
+        issues.push("candidate 缺 license（有链接必须有出处）".to_string());
+    }
 }
 
 /// 真源 `tool_face.scan`。
@@ -244,39 +248,43 @@ pub fn validate_registry(data: &Json, label: &str) -> Vec<String> {
             issues.push(format!("{}: 槽位定义非对象", at));
             continue;
         };
-        let kind = obj_get(spec, "kind").cloned().unwrap_or(Json::Null);
-        let owner = obj_get(spec, "owner").cloned().unwrap_or(Json::Null);
-        let item_kind = obj_get(spec, "item_kind").cloned().unwrap_or(Json::Null);
-        let kind_str = match &kind {
-            Json::Str(s) => s.clone(),
-            _ => String::new(),
-        };
-        if !SLOT_KINDS.contains(&kind_str.as_str()) {
-            issues.push(format!("{}.kind: 非法类型 {}", at, pyval::py_repr(&kind)));
-        }
-        let owner_ok = matches!(&owner, Json::Str(s) if !s.trim().is_empty());
-        if !owner_ok {
-            issues.push(format!("{}.owner: 非空字符串", at));
-        }
-        if kind_str == "array" {
-            if !matches!(item_kind, Json::Null) {
-                let ik = match &item_kind {
-                    Json::Str(s) => s.clone(),
-                    _ => String::new(),
-                };
-                if !ITEM_KINDS.contains(&ik.as_str()) {
-                    issues.push(format!(
-                        "{}.item_kind: 非法元素类型 {}",
-                        at,
-                        pyval::py_repr(&item_kind)
-                    ));
-                }
-            }
-        } else if !matches!(item_kind, Json::Null) {
-            issues.push(format!("{}.item_kind: 仅 kind=array 可用", at));
-        }
+        slot_spec_issues(&at, spec, &mut issues);
     }
     issues
+}
+
+fn slot_spec_issues(at: &str, spec: &Json, issues: &mut Vec<String>) {
+    let kind = obj_get(spec, "kind").cloned().unwrap_or(Json::Null);
+    let owner = obj_get(spec, "owner").cloned().unwrap_or(Json::Null);
+    let item_kind = obj_get(spec, "item_kind").cloned().unwrap_or(Json::Null);
+    let kind_str = match &kind {
+        Json::Str(s) => s.clone(),
+        _ => String::new(),
+    };
+    if !SLOT_KINDS.contains(&kind_str.as_str()) {
+        issues.push(format!("{}.kind: 非法类型 {}", at, pyval::py_repr(&kind)));
+    }
+    let owner_ok = matches!(&owner, Json::Str(s) if !s.trim().is_empty());
+    if !owner_ok {
+        issues.push(format!("{}.owner: 非空字符串", at));
+    }
+    if kind_str == "array" {
+        if !matches!(item_kind, Json::Null) {
+            let ik = match &item_kind {
+                Json::Str(s) => s.clone(),
+                _ => String::new(),
+            };
+            if !ITEM_KINDS.contains(&ik.as_str()) {
+                issues.push(format!(
+                    "{}.item_kind: 非法元素类型 {}",
+                    at,
+                    pyval::py_repr(&item_kind)
+                ));
+            }
+        }
+    } else if !matches!(item_kind, Json::Null) {
+        issues.push(format!("{}.item_kind: 仅 kind=array 可用", at));
+    }
 }
 
 /// 真源 `world_slots.scan`。
@@ -299,26 +307,35 @@ pub fn world_slots_scan(root: &Path) -> (Vec<String>, Json) {
         }
     };
     let mut issues = validate_registry(&data, "world_slots");
+    m00_anchor_issues(root, &data, &mut issues);
+    let (n, arrays) = slot_counts(&data);
+    (issues, json_slots(n, arrays))
+}
+
+fn m00_anchor_issues(root: &Path, data: &Json, issues: &mut Vec<String>) {
     let m00 = "04_模块库/通用类/M00_数据槽总线.md";
-    if root.join(m00).is_file() {
-        let m00_text = read(root, m00);
-        if let Some(Json::Object(slots)) = obj_get(&data, "slots") {
-            for (slot, _) in slots.iter() {
-                for part in slot.split('.') {
-                    if !part.is_empty() && !m00_text.contains(part) {
-                        issues.push(format!(
-                            "world_slots slot 路径段未在 M00 文档锚定：{}（{}）",
-                            pyval::py_repr(&Json::Str(part.to_string())),
-                            slot
-                        ));
-                    }
+    if !root.join(m00).is_file() {
+        issues.push("04_模块库/通用类/M00_数据槽总线.md 缺失".to_string());
+        return;
+    }
+    let m00_text = read(root, m00);
+    if let Some(Json::Object(slots)) = obj_get(data, "slots") {
+        for (slot, _) in slots.iter() {
+            for part in slot.split('.') {
+                if !part.is_empty() && !m00_text.contains(part) {
+                    issues.push(format!(
+                        "world_slots slot 路径段未在 M00 文档锚定：{}（{}）",
+                        pyval::py_repr(&Json::Str(part.to_string())),
+                        slot
+                    ));
                 }
             }
         }
-    } else {
-        issues.push("04_模块库/通用类/M00_数据槽总线.md 缺失".to_string());
     }
-    let (n, arrays) = match obj_get(&data, "slots") {
+}
+
+fn slot_counts(data: &Json) -> (i64, i64) {
+    match obj_get(data, "slots") {
         Some(Json::Object(o)) => (
             o.len() as i64,
             o.iter()
@@ -326,8 +343,7 @@ pub fn world_slots_scan(root: &Path) -> (Vec<String>, Json) {
                 .count() as i64,
         ),
         _ => (0, 0),
-    };
-    (issues, json_slots(n, arrays))
+    }
 }
 
 fn json_slots(n: i64, arrays: i64) -> Json {

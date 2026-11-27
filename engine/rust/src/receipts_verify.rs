@@ -92,20 +92,7 @@ pub fn verify(root: &Path) -> (Vec<String>, Json) {
         if !matches!(e, Json::Object(_)) {
             continue; // 真源在此抛异常（整条记 ERROR）；本线跳过，见模块头
         }
-        let eid = py_str(get(e, "id"));
-        let Some((_, live_digest)) = live_by_id.iter().find(|(i, _)| *i == eid) else {
-            issues.push(format!("回执指向不存在的条目：{}", eid));
-            continue;
-        };
-        if py_str(get(e, "digest")) != *live_digest {
-            issues.push(format!(
-                "条目内容已变：{}（修复指引：重签该条并重建回执）",
-                eid
-            ));
-        }
-        if fold_of(e) != live_root {
-            issues.push(format!("包含证明不折叠到根：{}", eid));
-        }
+        receipt_entry_issues(e, &live_by_id, &live_root, &mut issues);
     }
     if entries.len() != rows.len() {
         issues.push(format!(
@@ -120,6 +107,32 @@ pub fn verify(root: &Path) -> (Vec<String>, Json) {
         ("root".to_string(), Json::Str(live_root)),
     ]);
     (issues, stats)
+}
+
+/// 单条回执：条目在册 / 摘要一致 / 包含证明折叠到根。
+fn receipt_entry_issues(
+    e: &Json,
+    live_by_id: &[(String, String)],
+    live_root: &str,
+    issues: &mut Vec<String>,
+) {
+    if !matches!(e, Json::Object(_)) {
+        return; // 真源在此抛异常（整条记 ERROR）；本线跳过，见模块头
+    }
+    let eid = py_str(get(e, "id"));
+    let Some((_, live_digest)) = live_by_id.iter().find(|(i, _)| *i == eid) else {
+        issues.push(format!("回执指向不存在的条目：{}", eid));
+        return;
+    };
+    if py_str(get(e, "digest")) != *live_digest {
+        issues.push(format!(
+            "条目内容已变：{}（修复指引：重签该条并重建回执）",
+            eid
+        ));
+    }
+    if fold_of(e) != live_root {
+        issues.push(format!("包含证明不折叠到根：{}", eid));
+    }
 }
 
 /// 从回执条目里取 `leaf`/`proof` 并折叠；形状非法即返回空（必不相等 → 判「不折叠到根」）。

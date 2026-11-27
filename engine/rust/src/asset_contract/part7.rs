@@ -64,49 +64,68 @@ pub(crate) fn check_index_item(
 /// 为什么：仓库里已有「数据契约登记册」（ODCS 式：谁判 / 谁管 / 坏了怎么重建）。资产册再造一份
 /// 「谁管」就是第二套词表——同型病。判据只问一句：**同一 artifact 不许只在资产册出现**。
 pub fn registry_issues(root: &Path, doc: &Json) -> Vec<String> {
-    // `targets` 为空 ⇒ 本册没有 protocol 真源件 ⇒ 登记册判据不适用（临时场景常见）。
+    // targets 为空 ⇒ 本册没有 protocol 真源件 ⇒ 登记册判据不适用（临时场景常见）。
     if protocol_data_targets(root, doc).is_empty() {
         return Vec::new();
     }
+    let reg = match load_data_contracts(root) {
+        Ok(v) => v,
+        Err(e) => return e,
+    };
+    let arts = registered_artifacts(&reg);
+    unregistered_spec_issues(root, doc, &arts)
+}
+
+/// 读协议登记册：缺件 / 不可读 / 坏 JSON 都收敛成一条 issue（真源抛错 → 本线记 issue）。
+fn load_data_contracts(root: &Path) -> Result<Json, Vec<String>> {
     let p = root.join("protocol/data_contracts.json");
     if !p.is_file() {
-        return vec!["缺 protocol/data_contracts.json\
-                     （修复指引：补登记册——本册有 protocol 真源件须登记）"
-            .to_string()];
+        return Err(vec!["缺 protocol/data_contracts.json（修复指引：补登记册——本册有 protocol 真源件须登记）".to_string()]);
     }
-    let reg = match std::fs::read_to_string(&p) {
+    let text = match std::fs::read_to_string(&p) {
+        Ok(t) => t,
         Err(e) => {
-            return vec![format!(
+            return Err(vec![format!(
                 "protocol/data_contracts.json 不可读：{}（修复指引：修好 JSON）",
                 e
-            )]
+            )])
         }
-        Ok(t) => match strict_json(&t) {
-            Err(e) => {
-                return vec![format!(
-                    "protocol/data_contracts.json 不可读：{}（修复指引：修好 JSON）",
-                    e
-                )]
-            }
-            Ok(v) => v,
-        },
     };
+    match strict_json(&text) {
+        Ok(v) => Ok(v),
+        Err(e) => Err(vec![format!(
+            "protocol/data_contracts.json 不可读：{}（修复指引：修好 JSON）",
+            e
+        )]),
+    }
+}
+
+/// 登记册里已登记的 artifact 集合。
+fn registered_artifacts(reg: &Json) -> std::collections::BTreeSet<String> {
     let mut arts: std::collections::BTreeSet<String> = std::collections::BTreeSet::new();
-    if let Some(Json::Array(cs)) = obj_get(&reg, "contracts") {
+    if let Some(Json::Array(cs)) = obj_get(reg, "contracts") {
         for c in cs {
             if matches!(c, Json::Object(_)) {
                 arts.insert(sg_str(c, "artifact"));
             }
         }
     }
+    arts
+}
+
+/// 本册 data 面命中、却未在协议登记册登记的 protocol 真源件。
+fn unregistered_spec_issues(
+    root: &Path,
+    doc: &Json,
+    arts: &std::collections::BTreeSet<String>,
+) -> Vec<String> {
     let mut issues: Vec<String> = Vec::new();
     if let Some(Json::Array(specs)) = obj_get(doc, "data") {
         for spec in specs {
             for rel in resolve(root, spec) {
                 if rel.starts_with("protocol/") && rel.ends_with(".json") && !arts.contains(&rel) {
                     issues.push(format!(
-                        "资产 {} 未在 protocol/data_contracts.json 登记\
-                         （修复指引：补一条契约——同一 artifact 不许只在资产册出现）",
+                        "资产 {} 未在 protocol/data_contracts.json 登记（修复指引：补一条契约——同一 artifact 不许只在资产册出现）",
                         rel
                     ));
                     break;
@@ -208,61 +227,84 @@ pub(crate) fn frictionless_item(root: &Path, rel: &str, spec: &Json) -> Json {
     if !fmt.is_empty() {
         item.push(("format".to_string(), Json::Str(fmt)));
     }
-    let sch_rel = schema_of(root, &rel, spec);
-    if !sch_rel.is_empty() {
-        let (stext, err) = sread(root, &sch_rel);
-        if err.is_none() {
-            let sch = strict_json(&stext.unwrap_or_default())
-                .unwrap_or_else(|_| Json::Object(vec![]));
-            let keep = [
-                "type",
-                "required",
-                "properties",
-                "$schema",
-                "title",
-                "description",
-            ];
-            let mut sub: Vec<(String, Json)> = Vec::new();
-            if let Json::Object(kv) = &sch {
-                for k in keep.iter() {
-                    if let Some((kk, vv)) = kv.iter().find(|(kk, _)| kk == k) {
-                        sub.push((kk.clone(), vv.clone()));
-                    }
-                }
-            }
-            let sch_nonempty = matches!(&sch, Json::Object(kv) if !kv.is_empty());
-            if sch_nonempty {
-                item.push(("x-nf-json-schema".to_string(), Json::Object(sub)));
-                item.push((
-                    "x-nf-schema-source".to_string(),
-                    Json::Str(sch_rel.clone()),
-                ));
-            }
-            let mut props: Vec<(String, Json)> = match obj_get(&sch, "properties") {
-                Some(Json::Object(o)) => o.clone(),
-                _ => Vec::new(),
-            };
-            props.sort_by(|a, b| a.0.cmp(&b.0));
-            let mut fields: Vec<Json> = Vec::new();
-            for (k, v) in props {
-                if !matches!(v, Json::Object(_)) {
-                    continue;
-                }
-                let t = sg_str(&v, "type");
-                fields.push(Json::Object(vec![
-                    ("name".to_string(), Json::Str(k)),
-                    ("type".to_string(), Json::Str(friendly_type(&t).to_string())),
-                ]));
-            }
-            if !fields.is_empty() {
-                item.push((
-                    "schema".to_string(),
-                    Json::Object(vec![("fields".to_string(), Json::Array(fields))]),
-                ));
+    frictionless_schema_attrs(root, rel, spec, &mut item);
+    Json::Object(item)
+}
+
+/// 关联 JSON Schema 的尽力映射：保留关键字 + fields 表。
+fn frictionless_schema_attrs(
+    root: &Path,
+    rel: &str,
+    spec: &Json,
+    item: &mut Vec<(String, Json)>,
+) {
+    let sch_rel = schema_of(root, rel, spec);
+    if sch_rel.is_empty() {
+        return;
+    }
+    let (stext, err) = sread(root, &sch_rel);
+    if err.is_some() {
+        return;
+    }
+    let sch = strict_json(&stext.unwrap_or_default()).unwrap_or_else(|_| Json::Object(vec![]));
+    let sub = schema_kept_entries(&sch);
+    let sch_nonempty = matches!(&sch, Json::Object(kv) if !kv.is_empty());
+    if sch_nonempty {
+        item.push(("x-nf-json-schema".to_string(), Json::Object(sub)));
+        item.push((
+            "x-nf-schema-source".to_string(),
+            Json::Str(sch_rel.clone()),
+        ));
+    }
+    let fields = schema_field_rows(&sch);
+    if !fields.is_empty() {
+        item.push((
+            "schema".to_string(),
+            Json::Object(vec![("fields".to_string(), Json::Array(fields))]),
+        ));
+    }
+}
+
+/// schema 顶层关键字里本线保留的六项（真源同序）。
+fn schema_kept_entries(sch: &Json) -> Vec<(String, Json)> {
+    let keep = [
+        "type",
+        "required",
+        "properties",
+        "$schema",
+        "title",
+        "description",
+    ];
+    let mut sub: Vec<(String, Json)> = Vec::new();
+    if let Json::Object(kv) = sch {
+        for k in keep.iter() {
+            if let Some((kk, vv)) = kv.iter().find(|(kk, _)| kk == k) {
+                sub.push((kk.clone(), vv.clone()));
             }
         }
     }
-    Json::Object(item)
+    sub
+}
+
+/// properties 段 → Frictionless fields 行（键升序，非对象条目跳过）。
+fn schema_field_rows(sch: &Json) -> Vec<Json> {
+    let mut props: Vec<(String, Json)> = match obj_get(sch, "properties") {
+        Some(Json::Object(o)) => o.clone(),
+        _ => Vec::new(),
+    };
+    props.sort_by(|a, b| a.0.cmp(&b.0));
+    let mut fields: Vec<Json> = Vec::new();
+    for (k, v) in props {
+        if !matches!(v, Json::Object(_)) {
+            continue;
+        }
+        let t = sg_str(&v, "type");
+        fields.push(Json::Object(vec![
+            ("name".to_string(), Json::Str(k)),
+            ("type".to_string(), Json::Str(friendly_type(&t).to_string())),
+        ]));
+    }
+    fields
 }
 
 pub fn export_drift(root: &Path) -> Vec<String> {

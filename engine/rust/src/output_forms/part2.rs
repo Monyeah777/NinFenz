@@ -17,53 +17,8 @@ pub fn detect(root: &Path, rel: &str) -> (String, String) {
         .map(|(_, f)| (*f).to_string())
         .unwrap_or_else(|| "text".to_string());
     if ext == ".json" {
-        let (data, _) = {
-            let text = std::fs::read(&p)
-                .map(|b| String::from_utf8_lossy(&b).into_owned())
-                .unwrap_or_default();
-            match serde_json::from_str::<serde_json::Value>(&text) {
-                Ok(v) => (
-                    crate::jsonread::convert(&v).unwrap_or(Json::Null),
-                    String::new(),
-                ),
-                Err(e) => (Json::Null, e.to_string()),
-            }
-        };
-        if matches!(data, Json::Object(_)) {
-            let sch = match obj_get(&data, "$schema") {
-                Some(Json::Null) | None => String::new(),
-                Some(v) => pyval::plain_str(v),
-            };
-            if sch.contains("json-schema.org") {
-                form = "json-schema".to_string();
-            }
-            let kind = match obj_get(&data, "kind") {
-                Some(Json::Null) | None => String::new(),
-                Some(v) => pyval::plain_str(v),
-            };
-            let schema_f = match obj_get(&data, "schema") {
-                Some(Json::Null) | None => String::new(),
-                Some(v) => pyval::plain_str(v),
-            };
-            if kind.starts_with("nf-domain-spec") {
-                form = "domain-spec".to_string();
-            } else if schema_f.starts_with("nf-combo/1") {
-                form = "combo-cert".to_string();
-            } else if kind.starts_with("nf-domain-report") {
-                form = "domain-report".to_string();
-            } else if kind.starts_with("nf-system-card") {
-                form = "system-card".to_string();
-            } else if sch.contains("vega-lite") {
-                form = "vega-lite".to_string();
-            } else if sch.contains("vega") {
-                form = "vega".to_string();
-            } else if kind.starts_with("nf-performance") {
-                form = "performance-report".to_string();
-            } else if kind.starts_with("nf-quant-metrics") {
-                form = "quant-metrics".to_string();
-            } else if kind.starts_with("nf-concept-closure") {
-                form = "concept-closure".to_string();
-            }
+        if let Some(f) = detect_json_form(&p) {
+            form = f;
         }
     }
     let tier = FORM_MAX_TIER
@@ -72,6 +27,75 @@ pub fn detect(root: &Path, rel: &str) -> (String, String) {
         .map(|(_, t)| (*t).to_string())
         .unwrap_or_else(|| "T1".to_string());
     (form, tier)
+}
+
+/// JSON 形态识别：读文件 → 归类（读不了 / 非对象 → None，保留扩展名形态）。
+fn detect_json_form(p: &Path) -> Option<String> {
+    let text = std::fs::read(p)
+        .map(|b| String::from_utf8_lossy(&b).into_owned())
+        .unwrap_or_default();
+    let data = match serde_json::from_str::<serde_json::Value>(&text) {
+        Ok(v) => crate::jsonread::convert(&v).unwrap_or(Json::Null),
+        Err(_) => Json::Null,
+    };
+    json_form(&data)
+}
+
+/// 对象 → 形态 id：kind / schema / $schema 三处特征（真源 else-if 顺序）。
+fn json_form(data: &Json) -> Option<String> {
+    if !matches!(data, Json::Object(_)) {
+        return None;
+    }
+    let sch = json_field_str(data, "$schema");
+    if let Some(f) = json_kind_form(data, &sch) {
+        return Some(f);
+    }
+    if sch.contains("json-schema.org") {
+        return Some("json-schema".to_string());
+    }
+    None
+}
+
+/// 取对象字段的字符串值（缺键 / null → 空串）。
+fn json_field_str(data: &Json, key: &str) -> String {
+    match obj_get(data, key) {
+        Some(Json::Null) | None => String::new(),
+        Some(v) => pyval::plain_str(v),
+    }
+}
+
+/// 特征链：domain / combo / report / card / vega / performance / quant / closure。
+fn json_kind_form(data: &Json, sch: &str) -> Option<String> {
+    let kind = json_field_str(data, "kind");
+    let schema_f = json_field_str(data, "schema");
+    if kind.starts_with("nf-domain-spec") {
+        return Some("domain-spec".to_string());
+    }
+    if schema_f.starts_with("nf-combo/1") {
+        return Some("combo-cert".to_string());
+    }
+    if kind.starts_with("nf-domain-report") {
+        return Some("domain-report".to_string());
+    }
+    if kind.starts_with("nf-system-card") {
+        return Some("system-card".to_string());
+    }
+    if sch.contains("vega-lite") {
+        return Some("vega-lite".to_string());
+    }
+    if sch.contains("vega") {
+        return Some("vega".to_string());
+    }
+    if kind.starts_with("nf-performance") {
+        return Some("performance-report".to_string());
+    }
+    if kind.starts_with("nf-quant-metrics") {
+        return Some("quant-metrics".to_string());
+    }
+    if kind.starts_with("nf-concept-closure") {
+        return Some("concept-closure".to_string());
+    }
+    None
 }
 
 // ---------------------------------------------------------------- 声明产出路径
@@ -180,15 +204,31 @@ pub fn check_graphml(root: &Path, rel: &str) -> Vec<String> {
     if graphs.is_empty() {
         issues.push("缺 <graph> 元素".to_string());
     }
+    let nodes = graphml_node_ids(&graphs);
+    graphml_edge_issues(&graphs, &nodes, &mut issues);
+    issues
+}
+
+/// GraphML 全部 node id。
+fn graphml_node_ids(graphs: &[&crate::xmlmini::XNode]) -> Vec<String> {
     let mut nodes: Vec<String> = Vec::new();
-    for g in &graphs {
+    for g in graphs {
         for n in g.children_named("node") {
             if let Some(id) = n.attr("id") {
                 nodes.push(id.to_string());
             }
         }
     }
-    for g in &graphs {
+    nodes
+}
+
+/// 边端点必须落在已声明节点集内。
+fn graphml_edge_issues(
+    graphs: &[&crate::xmlmini::XNode],
+    nodes: &[String],
+    issues: &mut Vec<String>,
+) {
+    for g in graphs {
         for e in g.children_named("edge") {
             for end in ["source", "target"] {
                 let v = e.attr(end).unwrap_or("");
@@ -198,6 +238,5 @@ pub fn check_graphml(root: &Path, rel: &str) -> Vec<String> {
             }
         }
     }
-    issues
 }
 

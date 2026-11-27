@@ -101,68 +101,89 @@ pub(crate) fn verify_vocabularies(root: &Path) -> (Vec<String>, usize, usize) {
     let mut seen: BTreeSet<String> = BTreeSet::new();
     let mut literal = 0usize;
     for s in arr_items(get(&doc, "schemes")) {
-        let sid = py_str(get(s, "id"));
-        if seen.contains(&sid) {
-            issues.push(format!("词表 id 重复：{}", sid));
-        }
-        seen.insert(sid.clone());
-        if !statuses.contains(&plain_str_opt(get(s, "status"))) {
-            issues.push(format!(
-                "词表 {} status 越词表：{}",
-                sid,
-                plain_str_opt(get(s, "status"))
-            ));
-        }
-        let vals: Vec<String> = arr_items(get(s, "values"))
-            .iter()
-            .map(|v| plain_str(v))
-            .collect();
-        if vals.len() < 2 {
-            issues.push(format!("词表 {} 少于两个值（不成词表）", sid));
-        }
-        let uniq: BTreeSet<&String> = vals.iter().collect();
-        if uniq.len() != vals.len() {
-            issues.push(format!("词表 {} 值重复", sid));
-        }
-        for a in arr_items(get(s, "aliases")) {
-            if vals.contains(&plain_str(a)) {
-                issues.push(format!("词表 {} 的 alias 与值撞车：{}", sid, plain_str(a)));
-            }
-        }
-        let pr = get(s, "probe")
-            .filter(|v| matches!(v, Json::Object(_)))
-            .cloned()
-            .unwrap_or(Json::Object(Vec::new()));
-        if !kinds.contains(&py_str(get(&pr, "kind"))) {
-            issues.push(format!(
-                "词表 {} 的 probe.kind 不在册：{}",
-                sid,
-                plain_str_opt(get(&pr, "kind"))
-            ));
-            continue;
-        }
-        let (live, note) = probe(root, &pr);
-        let is_literal = py_str(get(&pr, "kind")) == "literal";
-        if is_literal {
-            literal += 1;
-            continue;
-        }
-        if live.is_empty() {
-            issues.push(format!("词表 {} 的真源取不到（{}）", sid, note));
-            continue;
-        }
-        let mut a = live.clone();
-        let mut b = vals.clone();
-        a.sort();
-        b.sort();
-        if a != b {
-            issues.push(format!(
-                "词表 {} 与真源漂移：册={} 真源={}",
-                sid,
-                b.join("/"),
-                a.join("/")
-            ));
-        }
+        literal += vocab_scheme_issues(root, &s, &statuses, &kinds, &mut seen, &mut issues);
     }
     (issues, seen.len(), literal)
+}
+
+/// 单条词表：id 唯一 / status / 值集 / alias 撞车 / probe 与真源一致；返回是否 literal 计数（0 或 1）。
+fn vocab_scheme_issues(
+    root: &Path,
+    s: &Json,
+    statuses: &[String],
+    kinds: &[String],
+    seen: &mut BTreeSet<String>,
+    issues: &mut Vec<String>,
+) -> usize {
+    let sid = py_str(get(s, "id"));
+    if seen.contains(&sid) {
+        issues.push(format!("词表 id 重复：{}", sid));
+    }
+    seen.insert(sid.clone());
+    if !statuses.contains(&plain_str_opt(get(s, "status"))) {
+        issues.push(format!(
+            "词表 {} status 越词表：{}",
+            sid,
+            plain_str_opt(get(s, "status"))
+        ));
+    }
+    let vals: Vec<String> = arr_items(get(s, "values"))
+        .iter()
+        .map(|v| plain_str(v))
+        .collect();
+    vocab_value_issues(&sid, &vals, s, issues);
+    let pr = get(s, "probe")
+        .filter(|v| matches!(v, Json::Object(_)))
+        .cloned()
+        .unwrap_or(Json::Object(Vec::new()));
+    if !kinds.contains(&py_str(get(&pr, "kind"))) {
+        issues.push(format!(
+            "词表 {} 的 probe.kind 不在册：{}",
+            sid,
+            plain_str_opt(get(&pr, "kind"))
+        ));
+        return 0;
+    }
+    let (live, note) = probe(root, &pr);
+    if py_str(get(&pr, "kind")) == "literal" {
+        return 1;
+    }
+    if live.is_empty() {
+        issues.push(format!("词表 {} 的真源取不到（{}）", sid, note));
+        return 0;
+    }
+    vocab_drift_issue(&sid, &vals, &live, issues);
+    0
+}
+
+/// 值集面：至少两个值、无重复、alias 不得与值撞车。
+fn vocab_value_issues(sid: &str, vals: &[String], s: &Json, issues: &mut Vec<String>) {
+    if vals.len() < 2 {
+        issues.push(format!("词表 {} 少于两个值（不成词表）", sid));
+    }
+    let uniq: BTreeSet<&String> = vals.iter().collect();
+    if uniq.len() != vals.len() {
+        issues.push(format!("词表 {} 值重复", sid));
+    }
+    for a in arr_items(get(s, "aliases")) {
+        if vals.contains(&plain_str(a)) {
+            issues.push(format!("词表 {} 的 alias 与值撞车：{}", sid, plain_str(a)));
+        }
+    }
+}
+
+/// 册值与真源值集漂移。
+fn vocab_drift_issue(sid: &str, vals: &[String], live: &[String], issues: &mut Vec<String>) {
+    let mut a = live.to_vec();
+    let mut b = vals.to_vec();
+    a.sort();
+    b.sort();
+    if a != b {
+        issues.push(format!(
+            "词表 {} 与真源漂移：册={} 真源={}",
+            sid,
+            b.join("/"),
+            a.join("/")
+        ));
+    }
 }

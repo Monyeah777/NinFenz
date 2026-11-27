@@ -87,49 +87,76 @@ pub(super) fn verify_glossary(root: &Path) -> (Vec<String>, Vec<String>, Glossar
     let mut seen: Vec<String> = Vec::new();
     let mut uses = 0usize;
     for t in arr_items(get(&doc, "terms")) {
-        let term = py_str(get(t, "term"));
-        if term.is_empty() {
-            issues.push("存在无 term 的条目".into());
-            continue;
-        }
-        if seen.contains(&term) {
-            issues.push(format!("术语重复：{}", term));
-        }
-        seen.push(term.clone());
-        if py_str(get(t, "definition")).trim().is_empty() {
-            issues.push(format!("术语 {} 缺 definition", term));
-        }
-        let src = py_str(get(t, "source"));
-        if !root.join(&src).is_file() {
-            issues.push(format!("术语 {} 的 source 不存在：{}", term, src));
-        } else if !read_text(root, &src).contains(&term) {
-            issues.push(format!(
-                "术语 {} 未在其 source 中逐字出现：{}（定义必须落在真源里）",
-                term, src
-            ));
-        }
-        // 真源 `ui = t.get("used_in") or []` → 空串按假值落空表（不是「一项空路径」）
-        let ui: Vec<String> = match get(t, "used_in") {
-            Some(Json::Str(s)) if !s.is_empty() => vec![s.clone()],
-            Some(Json::Array(a)) => a.iter().map(|v| plain_str(v)).collect(),
-            _ => Vec::new(),
-        };
-        for rel in ui {
-            if !root.join(&rel).is_file() {
-                issues.push(format!("术语 {} 的 used_in 不存在：{}", term, rel));
-            } else if !read_text(root, &rel).contains(&term) {
-                issues.push(format!(
-                    "术语 {} 的 used_in 未逐字出现该术语：{}（防登记没人用的行话）",
-                    term, rel
-                ));
-            } else {
-                uses += 1;
-            }
-        }
+        glossary_term_issues(root, &t, &mut seen, &mut uses, &mut issues);
     }
     stats.terms = seen.len();
     stats.uses = uses;
     (issues, Vec::new(), stats)
+}
+
+/// 单条术语：非空 / 唯一 / 有定义 / source 逐字落地；used_in 逐件核对。
+fn glossary_term_issues(
+    root: &Path,
+    t: &Json,
+    seen: &mut Vec<String>,
+    uses: &mut usize,
+    issues: &mut Vec<String>,
+) {
+    let term = py_str(get(t, "term"));
+    if term.is_empty() {
+        issues.push("存在无 term 的条目".into());
+        return;
+    }
+    if seen.contains(&term) {
+        issues.push(format!("术语重复：{}", term));
+    }
+    seen.push(term.clone());
+    if py_str(get(t, "definition")).trim().is_empty() {
+        issues.push(format!("术语 {} 缺 definition", term));
+    }
+    glossary_source_issues(root, t, &term, issues);
+    glossary_usage_issues(root, t, &term, uses, issues);
+}
+
+/// term 的定义 source：存在且逐字包含该术语。
+fn glossary_source_issues(root: &Path, t: &Json, term: &str, issues: &mut Vec<String>) {
+    let src = py_str(get(t, "source"));
+    if !root.join(&src).is_file() {
+        issues.push(format!("术语 {} 的 source 不存在：{}", term, src));
+    } else if !read_text(root, &src).contains(term) {
+        issues.push(format!(
+            "术语 {} 未在其 source 中逐字出现：{}（定义必须落在真源里）",
+            term, src
+        ));
+    }
+}
+
+/// used_in 面：每件须存在且逐字出现该术语；命中计入 uses。
+fn glossary_usage_issues(
+    root: &Path,
+    t: &Json,
+    term: &str,
+    uses: &mut usize,
+    issues: &mut Vec<String>,
+) {
+    // 真源 ui = t.get("used_in") or [] → 空串按假值落空表（不是「一项空路径」）
+    let ui: Vec<String> = match get(t, "used_in") {
+        Some(Json::Str(s)) if !s.is_empty() => vec![s.clone()],
+        Some(Json::Array(a)) => a.iter().map(|v| plain_str(v)).collect(),
+        _ => Vec::new(),
+    };
+    for rel in ui {
+        if !root.join(&rel).is_file() {
+            issues.push(format!("术语 {} 的 used_in 不存在：{}", term, rel));
+        } else if !read_text(root, &rel).contains(term) {
+            issues.push(format!(
+                "术语 {} 的 used_in 未逐字出现该术语：{}（防登记没人用的行话）",
+                term, rel
+            ));
+        } else {
+            *uses += 1;
+        }
+    }
 }
 
 /// 真源 `verify_modes`。
@@ -278,52 +305,67 @@ pub(super) fn state_front_scan(root: &Path) -> (Vec<String>, StateFrontStats) {
 
     let mut hits: Vec<String> = Vec::new();
     for r in &rules {
-        let g = py_str(get(r, "glob"));
-        if g.is_empty() {
-            issues.push("族规则缺 glob".into());
-            continue;
-        }
-        let matched = crate::glob::expand(root, &g);
-        let low = py_int_or(get(r, "min_members"), 1).max(0) as usize;
-        if matched.len() < low {
-            issues.push(format!(
-                "族 {} 成员不足：{} < {}（修复指引：按 sources 重新生成）",
-                g,
-                matched.len(),
-                low
-            ));
-        }
-        hits.extend(matched);
+        hits.extend(family_rule_issues(root, r, &mut issues));
     }
     for rel in &hits {
-        let bad = check_order(&read_text(root, rel));
-        if !bad.is_empty() {
-            issues.push(format!(
-                "族内件未通过 condition-first：{}（{}）",
-                rel, bad[0]
-            ));
-        }
+        family_member_issues(root, rel, &mut issues);
     }
     for r in &rows {
-        let rp = py_str(get(r, "path"));
-        if rp.is_empty() {
-            issues.push("声明条目缺 path".into());
-            continue;
-        }
-        if !root.join(&rp).is_file() {
-            issues.push(format!("登记件不存在：{}", rp));
-            continue;
-        }
-        let bad = check_order(&read_text(root, &rp));
-        if !bad.is_empty() {
-            issues.push(format!(
-                "登记为 condition-first 但未通过：{}（{}）",
-                rp, bad[0]
-            ));
-        }
+        declared_row_issues(root, r, &mut issues);
     }
     stats.declared = rows.len();
     stats.family_rules = rules.len();
     stats.family_members = hits.len();
     (issues, stats)
+}
+
+/// 族规则：glob 非空 + 成员数达标；返回命中件供后续 condition-first 核对。
+fn family_rule_issues(root: &Path, r: &Json, issues: &mut Vec<String>) -> Vec<String> {
+    let g = py_str(get(r, "glob"));
+    if g.is_empty() {
+        issues.push("族规则缺 glob".into());
+        return Vec::new();
+    }
+    let matched = crate::glob::expand(root, &g);
+    let low = py_int_or(get(r, "min_members"), 1).max(0) as usize;
+    if matched.len() < low {
+        issues.push(format!(
+            "族 {} 成员不足：{} < {}（修复指引：按 sources 重新生成）",
+            g,
+            matched.len(),
+            low
+        ));
+    }
+    matched
+}
+
+/// 族内件：condition-first 顺序核对。
+fn family_member_issues(root: &Path, rel: &str, issues: &mut Vec<String>) {
+    let bad = check_order(&read_text(root, rel));
+    if !bad.is_empty() {
+        issues.push(format!(
+            "族内件未通过 condition-first：{}（{}）",
+            rel, bad[0]
+        ));
+    }
+}
+
+/// 显式登记条目：path 非空 / 存在 / condition-first 顺序核对。
+fn declared_row_issues(root: &Path, r: &Json, issues: &mut Vec<String>) {
+    let rp = py_str(get(r, "path"));
+    if rp.is_empty() {
+        issues.push("声明条目缺 path".into());
+        return;
+    }
+    if !root.join(&rp).is_file() {
+        issues.push(format!("登记件不存在：{}", rp));
+        return;
+    }
+    let bad = check_order(&read_text(root, &rp));
+    if !bad.is_empty() {
+        issues.push(format!(
+            "登记为 condition-first 但未通过：{}（{}）",
+            rp, bad[0]
+        ));
+    }
 }

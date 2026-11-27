@@ -22,50 +22,57 @@ pub(crate) fn module_deps(src: &str, stem: &str, known: &BTreeSet<String>) -> BT
             }
         } else if let Some(rest) = t.strip_prefix("from ") {
             // 括号多行：`from core import (\n a,\n b,\n)` —— 拼到右括号为止
-            let mut stmt = rest.to_string();
-            if stmt.contains('(') && !stmt.contains(')') {
-                i += 1;
-                while i < lines.len() {
-                    stmt.push(' ');
-                    stmt.push_str(lines[i]);
-                    if lines[i].contains(')') {
-                        break;
-                    }
-                    i += 1;
-                }
-            }
-            let stmt = stmt.replace(['(', ')'], " ");
-            let stmt = stmt.trim();
+            let stmt = join_from_stmt(&lines, &mut i, rest);
             let Some((module_part, names_part)) = stmt.split_once(" import") else {
                 i += 1;
                 continue;
             };
-            let module_part = module_part.trim();
-            let level = module_part.chars().take_while(|c| *c == '.').count();
-            let module = &module_part[level..];
-            let names: Vec<String> = names_part
-                .split(',')
-                .map(|n| n.trim().split_whitespace().next().unwrap_or("").to_string())
-                .filter(|n| !n.is_empty() && n != "*")
-                .collect();
-            if module == "core" {
-                for n in &names {
-                    out.insert(n.split('.').next().unwrap_or("").to_string());
-                }
-            } else if module.starts_with("core.") {
-                out.insert(module.split('.').nth(1).unwrap_or("").to_string());
-            } else if level > 0 && !module.is_empty() {
-                out.insert(module.split('.').next().unwrap_or("").to_string());
-            } else if level > 0 && module.is_empty() {
-                for n in &names {
-                    out.insert(n.split('.').next().unwrap_or("").to_string());
-                }
-            }
+            from_names_deps(module_part, names_part, &mut out);
         }
         i += 1;
     }
     out.retain(|d| known.contains(d) && d != stem);
     out
+}
+
+fn join_from_stmt(lines: &[&str], i: &mut usize, rest: &str) -> String {
+    let mut stmt = rest.to_string();
+    if stmt.contains('(') && !stmt.contains(')') {
+        *i += 1;
+        while *i < lines.len() {
+            stmt.push(' ');
+            stmt.push_str(lines[*i]);
+            if lines[*i].contains(')') {
+                break;
+            }
+            *i += 1;
+        }
+    }
+    stmt.replace(['(', ')'], " ").trim().to_string()
+}
+
+fn from_names_deps(module_part: &str, names_part: &str, out: &mut BTreeSet<String>) {
+    let module_part = module_part.trim();
+    let level = module_part.chars().take_while(|c| *c == '.').count();
+    let module = &module_part[level..];
+    let names: Vec<String> = names_part
+        .split(',')
+        .map(|n| n.trim().split_whitespace().next().unwrap_or("").to_string())
+        .filter(|n| !n.is_empty() && n != "*")
+        .collect();
+    if module == "core" {
+        for n in &names {
+            out.insert(n.split('.').next().unwrap_or("").to_string());
+        }
+    } else if module.starts_with("core.") {
+        out.insert(module.split('.').nth(1).unwrap_or("").to_string());
+    } else if level > 0 && !module.is_empty() {
+        out.insert(module.split('.').next().unwrap_or("").to_string());
+    } else if level > 0 && module.is_empty() {
+        for n in &names {
+            out.insert(n.split('.').next().unwrap_or("").to_string());
+        }
+    }
 }
 
 pub(crate) struct Graph {
@@ -206,24 +213,12 @@ pub(crate) fn metrics_face(base: &Option<Json>, g: &Graph) -> (Vec<String>, i64,
     };
     let mut drift = 0i64;
     for (m, mv) in &pairs {
-        let int_of = |k: &str| match get(mv, k) {
-            Some(Json::Int(n)) => Some(*n),
-            _ => None,
-        };
-        let i_of = match get(mv, "i") {
-            Some(Json::Float(f)) => Some(*f),
-            Some(Json::Int(n)) => Some(*n as f64),
-            _ => None,
-        };
-        let (Some(ca), Some(ce), Some(i)) = (int_of("ca"), int_of("ce"), i_of) else {
+        let (int_of_ca, int_of_ce, int_of_i) = metric_triplet(mv);
+        let (Some(ca), Some(ce), Some(i)) = (int_of_ca, int_of_ce, int_of_i) else {
             issues.push(format!("基线 metrics[{}] 含非数值（ca/ce/i）", m));
             continue;
         };
-        if ca < 0 || ce < 0 || !(0.0..=1.0).contains(&i) {
-            issues.push(format!(
-                "基线 metrics[{}] 越界（ca={} ce={} i={}）",
-                m, ca, ce, i
-            ));
+        if !metric_bounds_ok(m, ca, ce, i, &mut issues) {
             continue;
         }
         let want = if ca + ce != 0 {
@@ -249,6 +244,30 @@ pub(crate) fn metrics_face(base: &Option<Json>, g: &Graph) -> (Vec<String>, i64,
         .filter(|m| !pairs.iter().any(|(k, _)| k == *m))
         .count() as i64;
     (issues, pairs.len() as i64, drift, missing)
+}
+
+fn metric_bounds_ok(m: &str, ca: i64, ce: i64, i: f64, issues: &mut Vec<String>) -> bool {
+    if ca < 0 || ce < 0 || !(0.0..=1.0).contains(&i) {
+        issues.push(format!(
+            "基线 metrics[{}] 越界（ca={} ce={} i={}）",
+            m, ca, ce, i
+        ));
+        return false;
+    }
+    true
+}
+
+fn metric_triplet(mv: &Json) -> (Option<i64>, Option<i64>, Option<f64>) {
+    let int_of = |k: &str| match get(mv, k) {
+        Some(Json::Int(n)) => Some(*n),
+        _ => None,
+    };
+    let i_of = match get(mv, "i") {
+        Some(Json::Float(f)) => Some(*f),
+        Some(Json::Int(n)) => Some(*n as f64),
+        _ => None,
+    };
+    (int_of("ca"), int_of("ce"), i_of)
 }
 
 pub(crate) fn load_baseline(root: &Path) -> Option<Json> {

@@ -235,6 +235,28 @@ pub(crate) fn check(
 
     errors.extend(check_ref(instance, schema, path, root, unsupported, depth));
 
+    errors.extend(schema_assertion_errors(instance, schema, path));
+
+    errors.extend(check_string(instance, schema, path));
+
+    errors.extend(check_number(instance, schema, path));
+
+    errors.extend(check_array(instance, schema, path, root, unsupported, depth));
+
+    if let Json::Object(_) = instance {
+        errors.extend(check_object_required(instance, schema, path));
+        errors.extend(check_object_props(instance, schema, path, root, unsupported, depth));
+    }
+
+    errors.extend(check_compound(instance, schema, path, root, unsupported, depth));
+
+    errors.extend(check_not(instance, schema, path, root, unsupported, depth));
+    errors
+}
+
+/// type / const / enum 断言面（Python 类型名口径由 py_type_name 承担）。
+fn schema_assertion_errors(instance: &Json, schema: &Json, path: &str) -> Vec<String> {
+    let mut errors: Vec<String> = Vec::new();
     if let Some(types) = obj_get(schema, "type") {
         if !matches!(types, Json::Null) {
             let cand: Vec<Json> = match types {
@@ -266,21 +288,6 @@ pub(crate) fn check(
             ));
         }
     }
-
-    errors.extend(check_string(instance, schema, path));
-
-    errors.extend(check_number(instance, schema, path));
-
-    errors.extend(check_array(instance, schema, path, root, unsupported, depth));
-
-    if let Json::Object(_) = instance {
-        errors.extend(check_object_required(instance, schema, path));
-        errors.extend(check_object_props(instance, schema, path, root, unsupported, depth));
-    }
-
-    errors.extend(check_compound(instance, schema, path, root, unsupported, depth));
-
-    errors.extend(check_not(instance, schema, path, root, unsupported, depth));
     errors
 }
 
