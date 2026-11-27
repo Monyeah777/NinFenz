@@ -11,13 +11,17 @@ publish_results 被关掉、upload-sarif 与 codeql 版本错位、摘要丢掉 
 import re
 import unittest
 from pathlib import Path
+import pathlib as _pathlib
+import sys as _sys
+_sys.path.insert(0, str(_pathlib.Path(__file__).resolve().parent))
+from workflow_helpers import on as _on, steps as _steps, runs as _runs  # noqa: E402
+
 
 ROOT = Path(__file__).resolve().parents[2]
 WORKFLOW = ROOT / ".github" / "workflows" / "scorecard.yml"
 CODEQL = ROOT / ".github" / "workflows" / "codeql.yml"
 PIN_RE = re.compile(r"^[^@/\s]+/[^@\s]+@[0-9a-f]{40}$")
 CODEQL_SHA_RE = re.compile(r"github/codeql-action/(?:init|analyze|upload-sarif)@([0-9a-f]{40})")
-
 
 def load_workflow(path: Path = WORKFLOW) -> dict:
     """读 workflow YAML（缺失 / 非法 / 非映射 → ValueError）。"""
@@ -33,27 +37,10 @@ def load_workflow(path: Path = WORKFLOW) -> dict:
         raise ValueError("scorecard.yml 根节点必须是映射")
     return doc
 
-
-def _on(doc: dict) -> dict:
-    value = doc.get("on")
-    if value is None:
-        value = doc.get(True)
-    return value if isinstance(value, dict) else {}
-
-
-def _steps(job: dict) -> list:
-    return [s for s in (job.get("steps") or []) if isinstance(s, dict)]
-
-
-def _runs(job: dict) -> str:
-    return "\n".join(str(s.get("run") or "") for s in _steps(job))
-
-
 def codeql_sha_of(path: Path) -> str:
     """从 workflow 文本抽 codeql-action 的 SHA（用于跨工作流一致性）。"""
     m = CODEQL_SHA_RE.search(path.read_text(encoding="utf-8"))
     return m.group(1) if m else ""
-
 
 def workflow_issues(doc: dict, codeql_sha: str = "") -> list:
     """scorecard 契约问题列表（纯函数，便于变异自证）。"""
@@ -142,7 +129,6 @@ def workflow_issues(doc: dict, codeql_sha: str = "") -> list:
             issues.append(f"摘要缺可追溯字段：{needle}")
     return issues
 
-
 class ScorecardWorkflowContractTest(unittest.TestCase):
     def setUp(self):
         self.doc = load_workflow()
@@ -209,7 +195,6 @@ class ScorecardWorkflowContractTest(unittest.TestCase):
                         "无保留期必须报")
         with self.assertRaises(ValueError):
             load_workflow(ROOT / ".github" / "no_such_scorecard.yml")
-
 
 if __name__ == "__main__":
     unittest.main()

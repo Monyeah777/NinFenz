@@ -13,6 +13,11 @@ import unittest
 from pathlib import Path
 
 import yaml
+import pathlib as _pathlib
+import sys as _sys
+_sys.path.insert(0, str(_pathlib.Path(__file__).resolve().parent))
+from workflow_helpers import on as _on, steps as _steps, runs as _runs  # noqa: E402
+
 
 ROOT = Path(__file__).resolve().parents[2]
 WORKFLOW = ROOT / ".github" / "workflows" / "e2e-desktop.yml"
@@ -23,7 +28,6 @@ SWALLOW = "|| true"
 #: 无 GUI 不变量：出现这些即说明它开始依赖显示栈
 GUI_MARKERS = ("PySide6", "QT_QPA_PLATFORM", "pyside6", "xvfb")
 
-
 def load_workflow(path: Path = WORKFLOW) -> dict:
     """读 workflow YAML（缺失 / 非法 / 非映射 → ValueError）。"""
     try:
@@ -33,22 +37,6 @@ def load_workflow(path: Path = WORKFLOW) -> dict:
     if not isinstance(doc, dict):
         raise ValueError("e2e-desktop.yml 根节点必须是映射")
     return doc
-
-
-def _on(doc: dict) -> dict:
-    value = doc.get("on")
-    if value is None:
-        value = doc.get(True)
-    return value if isinstance(value, dict) else {}
-
-
-def _steps(job: dict) -> list:
-    return [s for s in (job.get("steps") or []) if isinstance(s, dict)]
-
-
-def _runs(job: dict) -> str:
-    return "\n".join(str(s.get("run") or "") for s in _steps(job))
-
 
 def workflow_issues(doc: dict, text: str = "", release_text: str = "") -> list:
     """桌面 e2e 契约问题列表（纯函数，便于变异自证）。"""
@@ -107,7 +95,6 @@ def workflow_issues(doc: dict, text: str = "", release_text: str = "") -> list:
         issues.append("release-gate 未跑同一 e2e 脚本（两处口径不一致）")
     return issues
 
-
 class E2eDesktopWorkflowContractTest(unittest.TestCase):
     def setUp(self):
         self.text = WORKFLOW.read_text(encoding="utf-8")
@@ -161,7 +148,6 @@ class E2eDesktopWorkflowContractTest(unittest.TestCase):
                         "无保留期必须报")
         with self.assertRaises(ValueError):
             load_workflow(ROOT / ".github" / "no_such_e2e.yml")
-
 
 if __name__ == "__main__":
     unittest.main()

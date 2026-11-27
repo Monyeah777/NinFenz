@@ -11,6 +11,11 @@ test_ci_supply_chain（action 固定面）。
 import re
 import unittest
 from pathlib import Path
+import pathlib as _pathlib
+import sys as _sys
+_sys.path.insert(0, str(_pathlib.Path(__file__).resolve().parent))
+from workflow_helpers import on as _on, steps as _steps  # noqa: E402
+
 
 ROOT = Path(__file__).resolve().parents[2]
 WORKFLOW = ROOT / ".github" / "workflows" / "codeql.yml"
@@ -21,7 +26,6 @@ REQUIRED_PATHS = ("desktop/**", "scripts/**", "tui/**", "site/**",
 #: 允许的扫描语言（与矩阵一致）
 LANGUAGES = ("python", "javascript-typescript")
 USES_RE = re.compile(r"^github/codeql-action/(init|analyze)@[0-9a-f]{40}$")
-
 
 def load_workflow(path: Path = WORKFLOW) -> dict:
     """读 workflow YAML（缺失 / 非法 / 非映射 → ValueError）。"""
@@ -37,18 +41,6 @@ def load_workflow(path: Path = WORKFLOW) -> dict:
         raise ValueError("codeql.yml 根节点必须是映射")
     return doc
 
-
-def _on(doc: dict) -> dict:
-    value = doc.get("on")
-    if value is None:
-        value = doc.get(True)
-    return value if isinstance(value, dict) else {}
-
-
-def _steps(job: dict) -> list:
-    return [s for s in (job.get("steps") or []) if isinstance(s, dict)]
-
-
 def codeql_actions() -> dict:
     """→ {"init": uses, "analyze": uses}（取 workflow 里实际的两处 action）。"""
     doc = load_workflow()
@@ -60,7 +52,6 @@ def codeql_actions() -> dict:
             if m:
                 out[m.group(1)] = uses
     return out
-
 
 def workflow_issues(doc: dict) -> list:
     """codeql 契约问题列表（纯函数，便于变异自证）。"""
@@ -123,7 +114,6 @@ def workflow_issues(doc: dict) -> list:
         issues.append("analyze 缺 category（两语言 SARIF 会互相覆盖）")
     return issues
 
-
 class CodeqlWorkflowContractTest(unittest.TestCase):
     def setUp(self):
         self.doc = load_workflow()
@@ -183,7 +173,6 @@ class CodeqlWorkflowContractTest(unittest.TestCase):
                         "pull_request_target 必须报")
         with self.assertRaises(ValueError):
             load_workflow(ROOT / ".github" / "no_such_codeql.yml")
-
 
 if __name__ == "__main__":
     unittest.main()

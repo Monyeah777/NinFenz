@@ -11,6 +11,11 @@
 import json
 import unittest
 from pathlib import Path
+import pathlib as _pathlib
+import sys as _sys
+_sys.path.insert(0, str(_pathlib.Path(__file__).resolve().parent))
+from workflow_helpers import on as _on, steps as _steps, runs as _runs  # noqa: E402
+
 
 ROOT = Path(__file__).resolve().parents[2]
 WORKFLOW = ROOT / ".github" / "workflows" / "npm-publish.yml"
@@ -19,7 +24,6 @@ STAGE = ROOT / "packaging" / "npm" / "tools" / "stage-payload.mjs"
 TARBALL = ROOT / "packaging" / "npm" / "tools" / "verify-tarball.mjs"
 SMOKE = ROOT / "packaging" / "npm" / "test" / "smoke.test.mjs"
 MAX_RETENTION = 30
-
 
 def load_workflow(path: Path = WORKFLOW) -> dict:
     """读 workflow YAML（缺失 / 非法 / 非映射 → ValueError）。"""
@@ -34,22 +38,6 @@ def load_workflow(path: Path = WORKFLOW) -> dict:
     if not isinstance(doc, dict):
         raise ValueError("npm-publish.yml 根节点必须是映射")
     return doc
-
-
-def _on(doc: dict) -> dict:
-    value = doc.get("on")
-    if value is None:
-        value = doc.get(True)
-    return value if isinstance(value, dict) else {}
-
-
-def _steps(job: dict) -> list:
-    return [s for s in (job.get("steps") or []) if isinstance(s, dict)]
-
-
-def _runs(job: dict) -> str:
-    return "\n".join(str(s.get("run") or "") for s in _steps(job))
-
 
 def workflow_issues(doc: dict) -> list:
     """npm-publish 契约问题列表（纯函数，便于变异自证）。"""
@@ -113,7 +101,6 @@ def workflow_issues(doc: dict) -> list:
             issues.append(f"{job_id} 证据 retention-days 必须 1..{MAX_RETENTION}：{days!r}")
     return issues
 
-
 class NpmPublishWorkflowContractTest(unittest.TestCase):
     def setUp(self):
         self.doc = load_workflow()
@@ -175,7 +162,6 @@ class NpmPublishWorkflowContractTest(unittest.TestCase):
                         "证据无保留期必须报")
         with self.assertRaises(ValueError):
             load_workflow(ROOT / ".github" / "no_such_npm_publish.yml")
-
 
 if __name__ == "__main__":
     unittest.main()

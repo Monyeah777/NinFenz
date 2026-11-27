@@ -13,6 +13,11 @@ import unittest
 from pathlib import Path
 
 import yaml
+import pathlib as _pathlib
+import sys as _sys
+_sys.path.insert(0, str(_pathlib.Path(__file__).resolve().parent))
+from workflow_helpers import on as _on, steps as _steps, runs as _runs  # noqa: E402
+
 
 ROOT = Path(__file__).resolve().parents[2]
 WORKFLOW = ROOT / ".github" / "workflows" / "ci-health.yml"
@@ -20,7 +25,6 @@ OWN_PATH = ".github/workflows/ci-health.yml"
 #: 看门狗只读：不得 checkout / 写仓库 / 开 issue
 READONLY_MARKERS = ("actions/checkout", "git commit", "git push", "git add ")
 ENDPOINTS = ("code-scanning", "secret-scanning", "dependabot")
-
 
 def load_workflow(path: Path = WORKFLOW) -> dict:
     """读 workflow YAML（缺失 / 非法 / 非映射 → ValueError）。"""
@@ -31,22 +35,6 @@ def load_workflow(path: Path = WORKFLOW) -> dict:
     if not isinstance(doc, dict):
         raise ValueError("ci-health.yml 根节点必须是映射")
     return doc
-
-
-def _on(doc: dict) -> dict:
-    value = doc.get("on")
-    if value is None:
-        value = doc.get(True)
-    return value if isinstance(value, dict) else {}
-
-
-def _steps(job: dict) -> list:
-    return [s for s in (job.get("steps") or []) if isinstance(s, dict)]
-
-
-def _runs(job: dict) -> str:
-    return "\n".join(str(s.get("run") or "") for s in _steps(job))
-
 
 def _has_enough_schedule_slots(crons: list) -> bool:
     """cron 可以是 4 条，也可以是 1 条带 4 个钟点的（如 0 5,11,17,23 * * *）。"""
@@ -61,7 +49,6 @@ def _has_enough_schedule_slots(crons: list) -> bool:
             if h.strip().isdigit():
                 hours.add(h.strip())
     return len(hours) >= 4
-
 
 def workflow_issues(doc: dict, text: str = "") -> list:
     """看门狗契约问题列表（纯函数，便于变异自证）。"""
@@ -121,7 +108,6 @@ def workflow_issues(doc: dict, text: str = "") -> list:
     if "NA" not in snap_runs:
         issues.append("快照必须对权限不足打印 NA 而不是判红")
     return issues
-
 
 class CiHealthWorkflowContractTest(unittest.TestCase):
     def setUp(self):
@@ -187,7 +173,6 @@ class CiHealthWorkflowContractTest(unittest.TestCase):
                         "去 push 触发必须报")
         with self.assertRaises(ValueError):
             load_workflow(ROOT / ".github" / "no_such_health.yml")
-
 
 if __name__ == "__main__":
     unittest.main()

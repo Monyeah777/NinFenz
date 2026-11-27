@@ -13,6 +13,11 @@ import unittest
 from pathlib import Path
 
 import yaml
+import pathlib as _pathlib
+import sys as _sys
+_sys.path.insert(0, str(_pathlib.Path(__file__).resolve().parent))
+from workflow_helpers import on as _on, steps as _steps  # noqa: E402
+
 
 ROOT = Path(__file__).resolve().parents[2]
 WORKFLOW = ROOT / ".github" / "workflows" / "cross-platform.yml"
@@ -20,7 +25,6 @@ OSES = ("ubuntu-latest", "macos-latest", "windows-latest")
 MAX_RETENTION = 7
 COLD_START = (".gitee/ISSUE_TEMPLATE", "engine/dotnet/dist", "engine/rust/canonical/target")
 MATRIX_OS_EXPR = "${{ matrix.os }}"
-
 
 def load_workflow(path: Path = WORKFLOW) -> dict:
     """读 workflow YAML（缺失 / 非法 / 非映射 → ValueError）。"""
@@ -32,21 +36,8 @@ def load_workflow(path: Path = WORKFLOW) -> dict:
         raise ValueError("cross-platform.yml 根节点必须是映射")
     return doc
 
-
-def _on(doc: dict) -> dict:
-    value = doc.get("on")
-    if value is None:
-        value = doc.get(True)
-    return value if isinstance(value, dict) else {}
-
-
-def _steps(job: dict) -> list:
-    return [s for s in (job.get("steps") or []) if isinstance(s, dict)]
-
-
 def job_text(job: dict) -> str:
     return "\n".join(str(s.get("run") or "") for s in _steps(job))
-
 
 def workflow_issues(doc: dict) -> list:
     """三平台门禁契约问题列表（纯函数，便于变异自证）。"""
@@ -130,7 +121,6 @@ def workflow_issues(doc: dict) -> list:
             issues.append(f"工件 retention-days 必须 1..{MAX_RETENTION}：{days!r}")
     return issues
 
-
 class CrossPlatformWorkflowContractTest(unittest.TestCase):
     def setUp(self):
         self.doc = load_workflow()
@@ -200,7 +190,6 @@ class CrossPlatformWorkflowContractTest(unittest.TestCase):
                         "缺 lint/sast 固定集必须报")
         with self.assertRaises(ValueError):
             load_workflow(ROOT / ".github" / "no_such_cross_platform.yml")
-
 
 if __name__ == "__main__":
     unittest.main()

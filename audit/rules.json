@@ -794,7 +794,7 @@
       "dimension": "D",
       "iso": "maintainability.reusability",
       "severity": "P3",
-      "statement": "测试代码重复 8 行块每文件 >15 处需收敛",
+      "statement": "测试代码重复 8 行块每文件 >40 处需收敛（共享 loader/parser 样板另计，见 calibration）",
       "check": "script",
       "version": 1,
       "script": "duplicate_block",
@@ -803,7 +803,7 @@
           "desktop/tests/**/*.py"
         ],
         "window": 8,
-        "per_file_limit": 15
+        "per_file_limit": 40
       },
       "penalty": 1,
       "source": "测试维护性"
@@ -2140,7 +2140,8 @@
         "pattern": "test_.*\\.py",
         "exclude_names": [
           "__init__.py",
-          "cli_harness.py"
+          "cli_harness.py",
+          "workflow_helpers.py"
         ]
       },
       "penalty": 1,

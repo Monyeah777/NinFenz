@@ -31,6 +31,8 @@
 | E-010 | Rust unwrap/expect 统计包含测试模块 | 先用 `strip_rust_test_modules` 剔除 `#[cfg(test)] mod tests` 整块再统计 | asset_contract.rs 39→3、miniyaml/contracts 等同类下降；E-010 命中 7→0 | 规则本意是「生产路径」，测试里的 unwrap 是断言手段，计入属误报 |
 | ARCH-004 | Kotlin 包间任何环都命中 | 跨层环才算；根包 `dev.ninfenz.mobile`（R/BuildConfig/MainActivity）参与的环与 `*.ui` 子树内部环豁免 | 单模块 Android 的 R/Activity 必与子包互引；Compose ui↔ui.components↔ui.screens 天然互引（不是可维护性缺陷） | 规则本意是「跨层不得成环」；豁免范围写死在 rules.json，跨层环（如 data↔share）仍会命中 |
 | B-004 | UI 层不得直接 import data 层（任何 import 都命中） | UI 层不得直接做平台 IO（ContentResolver/SharedPreferences/SQLite/文件句柄）；平台 IO 走 data 层 | ARCHITECTURE.md §4.1：端壳层→控制面→核心，本 app 无独立领域层；data 包即平台集成层，UI 调 Store 是既定设计。真实风险是 UI 自己碰 IO——实扫 7 处 `contentResolver.openInputStream` 已全部收敛到 `UriIo` | 规则本意「UI 不做持久化」保留可机检；UI→data 的 import 改为人工架构评审（0.4 领域层拆分时再收紧） |
+| D-005 | 测试文件重复 8 行块每文件 >15 处 | 阈值提到 >40（收敛后仍保留机检） | 阈值前 37 个文件命中，计数分布 16–37；最大来源是 203 个 docs-contract 测试各自手写的 `load_text`/frontmatter/反引号解析样板（每个文件的错误文案/默认路径不同，逐字重复窗口来自通用行）；把共享 workflow helper 抽出后计数不变（剩余是通用 loader 样板，不是复制的用例） | 测试 harness 抽取属 0.4 基建改造；先按 40 守住「真复制用例」，owner: 审计组；到期 2027-03 |
+| J-010 | desktop/tests 下所有 .py 必须 test_*.py | 共享 helper 模块（非测试文件）加入 exclude_names | 新增 desktop/tests/workflow_helpers.py 被 22 个 workflow 契约测试复用；该文件不是测试用例 | 与既有 cli_harness.py 排除同例；owner: 审计组；到期 2027-03 |
 
 ## 校准后的门禁含义
 

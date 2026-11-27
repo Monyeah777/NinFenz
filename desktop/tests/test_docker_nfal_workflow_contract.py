@@ -14,6 +14,11 @@ import unittest
 from pathlib import Path
 
 import yaml
+import pathlib as _pathlib
+import sys as _sys
+_sys.path.insert(0, str(_pathlib.Path(__file__).resolve().parent))
+from workflow_helpers import on as _on, steps as _steps, runs as _runs  # noqa: E402
+
 
 ROOT = Path(__file__).resolve().parents[2]
 WORKFLOW = ROOT / ".github" / "workflows" / "docker-nfal.yml"
@@ -24,7 +29,6 @@ MAX_RETENTION = 7
 PUSH_MARKERS = ("docker push", "docker login", "secrets.", "REGISTRY")
 FROM_RE = re.compile(r"^\s*FROM\s+(\S+)", re.I | re.M)
 
-
 def load_workflow(path: Path = WORKFLOW) -> dict:
     """读 workflow YAML（缺失 / 非法 / 非映射 → ValueError）。"""
     try:
@@ -34,22 +38,6 @@ def load_workflow(path: Path = WORKFLOW) -> dict:
     if not isinstance(doc, dict):
         raise ValueError("docker-nfal.yml 根节点必须是映射")
     return doc
-
-
-def _on(doc: dict) -> dict:
-    value = doc.get("on")
-    if value is None:
-        value = doc.get(True)
-    return value if isinstance(value, dict) else {}
-
-
-def _steps(job: dict) -> list:
-    return [s for s in (job.get("steps") or []) if isinstance(s, dict)]
-
-
-def _runs(job: dict) -> str:
-    return "\n".join(str(s.get("run") or "") for s in _steps(job))
-
 
 def digest_issues(files: dict) -> list:
     """所有 FROM 基座必须按 digest 钉（scratch 除外）。纯函数，便于变异自证。"""
@@ -64,7 +52,6 @@ def digest_issues(files: dict) -> list:
                 continue
             issues.append(f"{name}:{i} 基座未按 digest 钉：{image}")
     return issues
-
 
 def workflow_issues(doc: dict, text: str = "") -> list:
     """容器构建契约问题列表（纯函数，便于变异自证）。"""
@@ -128,7 +115,6 @@ def workflow_issues(doc: dict, text: str = "") -> list:
                 issues.append(f"{job_id} 工件 retention-days 必须 1..{MAX_RETENTION}：{days!r}")
     return issues
 
-
 class DockerNfalWorkflowContractTest(unittest.TestCase):
     def setUp(self):
         self.text = WORKFLOW.read_text(encoding="utf-8")
@@ -188,7 +174,6 @@ class DockerNfalWorkflowContractTest(unittest.TestCase):
                         "基座未钉 digest 必须报")
         with self.assertRaises(ValueError):
             load_workflow(ROOT / ".github" / "no_such_docker.yml")
-
 
 if __name__ == "__main__":
     unittest.main()

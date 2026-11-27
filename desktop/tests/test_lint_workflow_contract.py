@@ -13,6 +13,11 @@ import re
 import tomllib
 import unittest
 from pathlib import Path
+import pathlib as _pathlib
+import sys as _sys
+_sys.path.insert(0, str(_pathlib.Path(__file__).resolve().parent))
+from workflow_helpers import on as _on, steps as _steps, runs as _runs  # noqa: E402
+
 
 ROOT = Path(__file__).resolve().parents[2]
 WORKFLOW = ROOT / ".github" / "workflows" / "lint.yml"
@@ -22,7 +27,6 @@ BASELINE = ROOT / "protocol" / "style_baseline.json"
 #: 分支保护依赖的 required check 名（改名 = 保护静默失效）
 REQUIRED_NAMES = {"ruff-syntax": "ruff-check-e9-f63-f7-f82", "style-ratchet": "ruff-style-ratchet"}
 MAX_RETENTION = 14
-
 
 def load_workflow(path: Path = WORKFLOW) -> dict:
     """读 workflow YAML（缺失 / 非法 / 非映射 → ValueError）。"""
@@ -38,22 +42,6 @@ def load_workflow(path: Path = WORKFLOW) -> dict:
         raise ValueError("lint.yml 根节点必须是映射")
     return doc
 
-
-def _on(doc: dict) -> dict:
-    value = doc.get("on")
-    if value is None:
-        value = doc.get(True)
-    return value if isinstance(value, dict) else {}
-
-
-def _steps(job: dict) -> list:
-    return [s for s in (job.get("steps") or []) if isinstance(s, dict)]
-
-
-def _runs(job: dict) -> str:
-    return "\n".join(str(s.get("run") or "") for s in _steps(job))
-
-
 def ratchet_command(run_text: str) -> str:
     """取实际棘轮命令（排除只输出 JSON 的快照行）。"""
     for line in run_text.splitlines():
@@ -61,7 +49,6 @@ def ratchet_command(run_text: str) -> str:
         if "scripts/style_check.py" in line and "--json" not in line:
             return line
     return ""
-
 
 def workflow_issues(doc: dict, ruff_select: list = None) -> list:
     """lint 契约问题列表（纯函数，便于变异自证）。"""
@@ -125,12 +112,10 @@ def workflow_issues(doc: dict, ruff_select: list = None) -> list:
         issues.append(f"required check 名与 ruff.toml select 漂移：{got!r} ≠ {want_name!r}")
     return issues
 
-
 def _ruff_select() -> list:
     doc = tomllib.loads(RUFF_TOML.read_text(encoding="utf-8"))
     select = ((doc.get("lint") or {}).get("select") or [])
     return [str(x) for x in select]
-
 
 def style_scan_targets() -> tuple:
     """style_check.py 的扫描面（真源）。"""
@@ -140,7 +125,6 @@ def style_scan_targets() -> tuple:
         raise ValueError("style_check.py 缺 SCAN_TARGETS")
     return tuple(x.strip().strip('\"') for x in m.group(1).split(",") if x.strip())
 
-
 def scope_issues(scan_targets: tuple) -> list:
     """ruff-syntax 的检查面必须是 style_check 扫描面的子集（不自造第二份面）。"""
     issues = []
@@ -148,7 +132,6 @@ def scope_issues(scan_targets: tuple) -> list:
         if scope not in scan_targets:
             issues.append(f"ruff-syntax 检查面 {scope} 不在 style_check.SCAN_TARGETS 内")
     return issues
-
 
 class LintWorkflowContractTest(unittest.TestCase):
     def setUp(self):
@@ -205,7 +188,6 @@ class LintWorkflowContractTest(unittest.TestCase):
         self.assertTrue(baseline.get("schema"), "风格基线缺 schema")
         with self.assertRaises(ValueError):
             load_workflow(ROOT / ".github" / "no_such_lint.yml")
-
 
 if __name__ == "__main__":
     unittest.main()

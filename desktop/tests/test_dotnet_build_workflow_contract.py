@@ -13,6 +13,11 @@ import unittest
 from pathlib import Path
 
 import yaml
+import pathlib as _pathlib
+import sys as _sys
+_sys.path.insert(0, str(_pathlib.Path(__file__).resolve().parent))
+from workflow_helpers import on as _on, steps as _steps, runs as _runs  # noqa: E402
+
 
 ROOT = Path(__file__).resolve().parents[2]
 WORKFLOW = ROOT / ".github" / "workflows" / "dotnet-build.yml"
@@ -21,7 +26,6 @@ CSPROJS = ("engine/dotnet/src/Nf.Engine/Nf.Engine.csproj",
            "engine/dotnet/tools/nfparity/nfparity.csproj")
 OSES = ("ubuntu-latest", "windows-latest")
 MAX_RETENTION = 7
-
 
 def load_workflow(path: Path = WORKFLOW) -> dict:
     """读 workflow YAML（缺失 / 非法 / 非映射 → ValueError）。"""
@@ -32,22 +36,6 @@ def load_workflow(path: Path = WORKFLOW) -> dict:
     if not isinstance(doc, dict):
         raise ValueError("dotnet-build.yml 根节点必须是映射")
     return doc
-
-
-def _on(doc: dict) -> dict:
-    value = doc.get("on")
-    if value is None:
-        value = doc.get(True)
-    return value if isinstance(value, dict) else {}
-
-
-def _steps(job: dict) -> list:
-    return [s for s in (job.get("steps") or []) if isinstance(s, dict)]
-
-
-def _runs(job: dict) -> str:
-    return "\n".join(str(s.get("run") or "") for s in _steps(job))
-
 
 def workflow_issues(doc: dict) -> list:
     """C# 构建契约问题列表（纯函数，便于变异自证）。"""
@@ -121,7 +109,6 @@ def workflow_issues(doc: dict) -> list:
             issues.append(f"工件 retention-days 必须 1..{MAX_RETENTION}：{days!r}")
     return issues
 
-
 class DotnetBuildWorkflowContractTest(unittest.TestCase):
     def setUp(self):
         self.doc = load_workflow()
@@ -179,7 +166,6 @@ class DotnetBuildWorkflowContractTest(unittest.TestCase):
                         "无保留期必须报")
         with self.assertRaises(ValueError):
             load_workflow(ROOT / ".github" / "no_such_dotnet.yml")
-
 
 if __name__ == "__main__":
     unittest.main()

@@ -13,6 +13,11 @@ import unittest
 from pathlib import Path
 
 import yaml
+import pathlib as _pathlib
+import sys as _sys
+_sys.path.insert(0, str(_pathlib.Path(__file__).resolve().parent))
+from workflow_helpers import on as _on, steps as _steps, runs as _runs  # noqa: E402
+
 
 ROOT = Path(__file__).resolve().parents[2]
 WORKFLOW = ROOT / ".github" / "workflows" / "cross-lang.yml"
@@ -24,7 +29,6 @@ MAX_RETENTION = 7
 WRITE_MARKERS = ("git commit", "git push", "git add ", " --write", "nf.py ")
 BASELINE_MARKERS = ("bash verify.sh", "verify.sh --")
 
-
 def load_workflow(path: Path = WORKFLOW) -> dict:
     """读 workflow YAML（缺失 / 非法 / 非映射 → ValueError）。"""
     try:
@@ -35,26 +39,9 @@ def load_workflow(path: Path = WORKFLOW) -> dict:
         raise ValueError("cross-lang.yml 根节点必须是映射")
     return doc
 
-
-def _on(doc: dict) -> dict:
-    value = doc.get("on")
-    if value is None:
-        value = doc.get(True)
-    return value if isinstance(value, dict) else {}
-
-
-def _steps(job: dict) -> list:
-    return [s for s in (job.get("steps") or []) if isinstance(s, dict)]
-
-
-def _runs(job: dict) -> str:
-    return "\n".join(str(s.get("run") or "") for s in _steps(job))
-
-
 def _effective(text: str) -> str:
     """去掉整行注释（注释里写「刻意不调 verify.sh」不算违规）。"""
     return "\n".join(ln for ln in text.splitlines() if not ln.strip().startswith("#"))
-
 
 def workflow_issues(doc: dict, text: str = "") -> list:
     """跨语言对拍契约问题列表（纯函数，便于变异自证）。"""
@@ -119,7 +106,6 @@ def workflow_issues(doc: dict, text: str = "") -> list:
         if not isinstance(days, int) or not 1 <= days <= MAX_RETENTION:
             issues.append(f"工件 retention-days 必须 1..{MAX_RETENTION}：{days!r}")
     return issues
-
 
 class CrossLangWorkflowContractTest(unittest.TestCase):
     def setUp(self):
@@ -187,7 +173,6 @@ class CrossLangWorkflowContractTest(unittest.TestCase):
         self.assertTrue(SCRIPT.is_file())
         with self.assertRaises(ValueError):
             load_workflow(ROOT / ".github" / "no_such_cross_lang.yml")
-
 
 if __name__ == "__main__":
     unittest.main()

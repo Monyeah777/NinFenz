@@ -10,6 +10,11 @@ requirements-ci.txt）。同族判据：test_ci_verify_contract、test_lint_work
 """
 import unittest
 from pathlib import Path
+import pathlib as _pathlib
+import sys as _sys
+_sys.path.insert(0, str(_pathlib.Path(__file__).resolve().parent))
+from workflow_helpers import on as _on, steps as _steps, runs as _runs  # noqa: E402
+
 
 ROOT = Path(__file__).resolve().parents[2]
 WORKFLOW = ROOT / ".github" / "workflows" / "release-gate.yml"
@@ -18,7 +23,6 @@ E2E = ROOT / "scripts" / "e2e_desktop_headless.py"
 REQ_CI = ROOT / ".github" / "requirements-ci.txt"
 #: 发布证据保留期上限（发布证据可比普通排障工件更久，但仍须有上限）
 MAX_RETENTION = 30
-
 
 def load_workflow(path: Path = WORKFLOW) -> dict:
     """读 workflow YAML（缺失 / 非法 / 非映射 → ValueError）。"""
@@ -33,22 +37,6 @@ def load_workflow(path: Path = WORKFLOW) -> dict:
     if not isinstance(doc, dict):
         raise ValueError("release-gate.yml 根节点必须是映射")
     return doc
-
-
-def _on(doc: dict) -> dict:
-    value = doc.get("on")
-    if value is None:
-        value = doc.get(True)
-    return value if isinstance(value, dict) else {}
-
-
-def _steps(job: dict) -> list:
-    return [s for s in (job.get("steps") or []) if isinstance(s, dict)]
-
-
-def _runs(job: dict) -> str:
-    return "\n".join(str(s.get("run") or "") for s in _steps(job))
-
 
 def workflow_issues(doc: dict) -> list:
     """发布闸门契约问题列表（纯函数，便于变异自证）。"""
@@ -111,7 +99,6 @@ def workflow_issues(doc: dict) -> list:
             issues.append(f"发布证据 retention-days 必须在 1..{MAX_RETENTION}：{days!r}")
     return issues
 
-
 class ReleaseGateWorkflowContractTest(unittest.TestCase):
     def setUp(self):
         self.doc = load_workflow()
@@ -168,7 +155,6 @@ class ReleaseGateWorkflowContractTest(unittest.TestCase):
                         "去掉 pipefail 必须报")
         with self.assertRaises(ValueError):
             load_workflow(ROOT / ".github" / "no_such_release.yml")
-
 
 if __name__ == "__main__":
     unittest.main()

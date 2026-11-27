@@ -13,13 +13,17 @@ import unittest
 from pathlib import Path
 
 import yaml
+import pathlib as _pathlib
+import sys as _sys
+_sys.path.insert(0, str(_pathlib.Path(__file__).resolve().parent))
+from workflow_helpers import on as _on, steps as _steps, runs as _runs  # noqa: E402
+
 
 ROOT = Path(__file__).resolve().parents[2]
 WORKFLOW = ROOT / ".github" / "workflows" / "external-links.yml"
 SCRIPT = ROOT / "scripts" / "check_external_links.py"
 MAX_BUDGET = 600
 MAX_RETENTION = 7
-
 
 def load_workflow(path: Path = WORKFLOW) -> dict:
     """读 workflow YAML（缺失 / 非法 / 非映射 → ValueError）。"""
@@ -30,22 +34,6 @@ def load_workflow(path: Path = WORKFLOW) -> dict:
     if not isinstance(doc, dict):
         raise ValueError("external-links.yml 根节点必须是映射")
     return doc
-
-
-def _on(doc: dict) -> dict:
-    value = doc.get("on")
-    if value is None:
-        value = doc.get(True)
-    return value if isinstance(value, dict) else {}
-
-
-def _steps(job: dict) -> list:
-    return [s for s in (job.get("steps") or []) if isinstance(s, dict)]
-
-
-def _runs(job: dict) -> str:
-    return "\n".join(str(s.get("run") or "") for s in _steps(job))
-
 
 def workflow_issues(doc: dict, text: str = "") -> list:
     """外网巡检契约问题列表（纯函数，便于变异自证）。"""
@@ -119,7 +107,6 @@ def workflow_issues(doc: dict, text: str = "") -> list:
         issues.append("外链巡检不进 verify 基线（不得调用 verify.sh）")
     return issues
 
-
 class ExternalLinksWorkflowContractTest(unittest.TestCase):
     def setUp(self):
         self.text = WORKFLOW.read_text(encoding="utf-8")
@@ -181,7 +168,6 @@ class ExternalLinksWorkflowContractTest(unittest.TestCase):
         self.assertTrue(SCRIPT.is_file())
         with self.assertRaises(ValueError):
             load_workflow(ROOT / ".github" / "no_such_links.yml")
-
 
 if __name__ == "__main__":
     unittest.main()

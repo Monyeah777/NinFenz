@@ -1,13 +1,13 @@
 # NF 审计报告（汇总）
 
 > 本文件由 audit/ci/consolidate_report.py 生成，勿手改；明细见证据包与 remediation/calibration/trend。
-> 证据：audit/evidence/p2-batch8；commit：p2-batch8；扫描根：D:/NinFenz
+> 证据：audit/evidence/p2-batch9；commit：p2-batch9；扫描根：D:/NinFenz
 
 ## 结论
 
-- 总分 **97.82**（满分 100，口径 = 14 维加权）
-- 问题：P0=0 / P1=0 / P2=1017 / P3=220
-- 规则：166 条（script 134 / tool 14 / manual 18）；pass=122 fail=12 error=0 no_targets=0 not-run=32
+- 总分 **97.88**（满分 100，口径 = 14 维加权）
+- 问题：P0=0 / P1=0 / P2=1017 / P3=183
+- 规则：166 条（script 134 / tool 14 / manual 18）；pass=123 fail=11 error=0 no_targets=0 not-run=32
 
 ## 维度分
 
@@ -16,7 +16,7 @@
 | A | 架构与依赖方向 | 0.1 | 100 | 0 | 0 |
 | B | 模块边界与内聚 | 0.06 | 100 | 0 | 0 |
 | C | 规模与复杂度 | 0.1 | 80 | 20 | 1198 |
-| D | 重复与抽象 | 0.06 | 99 | 1 | 37 |
+| D | 重复与抽象 | 0.06 | 100 | 0 | 0 |
 | E | 错误处理与失败语义 | 0.1 | 100 | 0 | 0 |
 | F | 并发与资源 | 0.06 | 98 | 2 | 2 |
 | G | 状态与恢复 | 0.06 | 100 | 0 | 0 |
@@ -30,7 +30,7 @@
 
 ## 门禁
 
-- 命令：bash audit/ci/gate.sh --evidence audit/evidence/p2-batch8
+- 命令：bash audit/ci/gate.sh --evidence audit/evidence/p2-batch9
 - 阈值：audit/ci/thresholds.json（总分 / 单维 / P0 / error / no_targets）
 
 ## 交付物索引

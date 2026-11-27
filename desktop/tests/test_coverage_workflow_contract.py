@@ -12,6 +12,11 @@ import unittest
 from pathlib import Path
 
 import yaml
+import pathlib as _pathlib
+import sys as _sys
+_sys.path.insert(0, str(_pathlib.Path(__file__).resolve().parent))
+from workflow_helpers import on as _on, steps as _steps, runs as _runs  # noqa: E402
+
 
 ROOT = Path(__file__).resolve().parents[2]
 WORKFLOW = ROOT / ".github" / "workflows" / "coverage.yml"
@@ -19,7 +24,6 @@ RELEASE = ROOT / ".github" / "workflows" / "release-gate.yml"
 MAX_RETENTION = 7
 THRESHOLD = "--fail-under=80"
 CORE_SCOPE = "desktop/src/core"
-
 
 def load_workflow(path: Path = WORKFLOW) -> dict:
     """读 workflow YAML（缺失 / 非法 / 非映射 → ValueError）。"""
@@ -31,28 +35,11 @@ def load_workflow(path: Path = WORKFLOW) -> dict:
         raise ValueError("coverage.yml 根节点必须是映射")
     return doc
 
-
-def _on(doc: dict) -> dict:
-    value = doc.get("on")
-    if value is None:
-        value = doc.get(True)
-    return value if isinstance(value, dict) else {}
-
-
-def _steps(job: dict) -> list:
-    return [s for s in (job.get("steps") or []) if isinstance(s, dict)]
-
-
-def _runs(job: dict) -> str:
-    return "\n".join(str(s.get("run") or "") for s in _steps(job))
-
-
 def _env_text(job: dict) -> str:
     """job + 各步骤的 env 声明（NF_COVERAGE 这类开关不在 run 文本里）。"""
     parts = [str(dict(job.get("env") or {}))]
     parts.extend(str(dict(s.get("env") or {})) for s in _steps(job))
     return "\n".join(parts)
-
 
 def workflow_issues(doc: dict, release_text: str = "") -> list:
     """覆盖率契约问题列表（纯函数，便于变异自证）。"""
@@ -130,7 +117,6 @@ def workflow_issues(doc: dict, release_text: str = "") -> list:
             issues.append("release-gate 的覆盖率口径与本件不一致")
     return issues
 
-
 class CoverageWorkflowContractTest(unittest.TestCase):
     def setUp(self):
         self.doc = load_workflow()
@@ -191,7 +177,6 @@ class CoverageWorkflowContractTest(unittest.TestCase):
                         "加 PR 触发必须报")
         with self.assertRaises(ValueError):
             load_workflow(ROOT / ".github" / "no_such_coverage.yml")
-
 
 if __name__ == "__main__":
     unittest.main()

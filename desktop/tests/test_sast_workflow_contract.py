@@ -11,6 +11,11 @@ protocol/sast_baseline.json / SECURITY.md 的对应行）。同族判据：test_
 import json
 import unittest
 from pathlib import Path
+import pathlib as _pathlib
+import sys as _sys
+_sys.path.insert(0, str(_pathlib.Path(__file__).resolve().parent))
+from workflow_helpers import on as _on, steps as _steps  # noqa: E402
+
 
 ROOT = Path(__file__).resolve().parents[2]
 WORKFLOW = ROOT / ".github" / "workflows" / "sast.yml"
@@ -18,7 +23,6 @@ SCRIPT = ROOT / "scripts" / "sast_check.py"
 BASELINE = ROOT / "protocol" / "sast_baseline.json"
 SECURITY = ROOT / "SECURITY.md"
 MAX_RETENTION = 14
-
 
 def load_workflow(path: Path = WORKFLOW) -> dict:
     """读 workflow YAML（缺失 / 非法 / 非映射 → ValueError）。"""
@@ -34,21 +38,8 @@ def load_workflow(path: Path = WORKFLOW) -> dict:
         raise ValueError("sast.yml 根节点必须是映射")
     return doc
 
-
-def _on(doc: dict) -> dict:
-    value = doc.get("on")
-    if value is None:
-        value = doc.get(True)
-    return value if isinstance(value, dict) else {}
-
-
-def _steps(job: dict) -> list:
-    return [s for s in (job.get("steps") or []) if isinstance(s, dict)]
-
-
 def _runs_job(job: dict) -> str:
     return "\n".join(str(s.get("run") or "") for s in _steps(job))
-
 
 def ratchet_line(run_text: str) -> str:
     """取「实际判定用」的 sast_check 命令行（排除只打印计数的 --json 行）。"""
@@ -57,7 +48,6 @@ def ratchet_line(run_text: str) -> str:
         if "sast_check.py" in line and "--json" not in line:
             return line
     return ""
-
 
 def workflow_issues(doc: dict) -> list:
     """sast 工作流契约问题列表（纯函数，便于变异自证）。"""
@@ -110,7 +100,6 @@ def workflow_issues(doc: dict) -> list:
             issues.append(f"工件 retention-days 必须在 1..{MAX_RETENTION}：{days!r}")
     return issues
 
-
 def script_issues(text: str) -> list:
     """扫描面真源：SCAN_TARGETS 必须含 tui/packaging，且基线按平台分段。"""
     issues = []
@@ -127,7 +116,6 @@ def script_issues(text: str) -> list:
             issues.append(f"缺平台分段棘轮口径：{needle}")
     return issues
 
-
 def baseline_issues(doc: dict) -> list:
     """基线必须两平台分段（缺段即 FAIL）。"""
     issues = []
@@ -138,7 +126,6 @@ def baseline_issues(doc: dict) -> list:
     if not str(doc.get("schema") or "").strip():
         issues.append("SAST 基线缺 schema")
     return issues
-
 
 def security_claim_issues(text: str) -> list:
     """SECURITY.md 的 SAST 行不得再声称「非阻塞 / sast-extra」（与脚本现实不符）。"""
@@ -152,7 +139,6 @@ def security_claim_issues(text: str) -> list:
     if "sast-extra" in text:
         issues.append("SECURITY.md 仍引用不存在的 sast-extra 工件")
     return issues
-
 
 class SastWorkflowContractTest(unittest.TestCase):
     def setUp(self):
@@ -206,7 +192,6 @@ class SastWorkflowContractTest(unittest.TestCase):
         self.assertTrue(baseline_issues(broken_baseline), "缺 posix 段必须报")
         with self.assertRaises(ValueError):
             load_workflow(ROOT / ".github" / "no_such_sast.yml")
-
 
 if __name__ == "__main__":
     unittest.main()

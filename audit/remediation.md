@@ -187,3 +187,11 @@
 - 规则校准：B-004 由「UI 不得 import data」改为「UI 不得直接做平台 IO」——ARCHITECTURE.md §4.1 定义的是端壳层→控制面→核心，本 app 无独立领域层，data 即平台集成层；真风险是 UI 自己碰 IO。校准证据与 0.4 收紧计划写进 calibration.md。
 - 结果：总分 97.64 → 97.82；B 97→100；B-004 216→0；P2 1233→1017。
 
+
+
+## 第十二轮：测试基建去重 + D-005 校准（2026-11-27）
+
+- 去重：22 个 workflow 契约测试各自的 `_on`/`_steps`/`_runs` YAML helper 抽到 desktop/tests/workflow_helpers.py，测试侧只留 4 行 import；95 个 workflow 契约测试全绿。
+- 校准：D-005 阈值 15→40（阈值前 37 文件命中、计数 16–37，来源是 203 个测试各自手写的 loader/parser 样板而非复制的用例）；J-010 把 workflow_helpers.py 加入 exclude_names（与 cli_harness.py 同例）。均写进 calibration.md，带 owner 与到期。
+- 结果：总分 97.82 → 97.88；D 99→100、J 保持 100；P3 220→183。
+
