@@ -131,3 +131,9 @@
 - 最新证据：audit/evidence/1908068f1（同 commit 连跑两次 issues/report 逐字节一致、meta 全等）；总分 99.10，P0=0/P1=0/error=0/no_targets=0，audit/ci/gate.sh PASS。
 - 维度：A100 B100 C91 D100 E100 F100 G–N 全 100。
 - C 维度规则清零进度：C-002 / C-003 / C-007 / C-008 / C-010 / C-013 已清零；剩 C-001（5）/ C-005（802）/ C-009（1）/ C-012（5）。
+
+## 门禁状态（第十八轮后）
+
+- 最新证据：audit/evidence/fc93c097a（同 commit 连跑两次 issues/report 逐字节一致、meta 全等）；总分 99.70，P0=0/P1=0/P3=0，audit/ci/gate.sh PASS。
+- 维度：A100 B100 C97 D100 E100 F100 G–N 全 100；唯一 fail = C-005（718）。
+- C 维度规则清零进度：C-001/C-002/C-003/C-007/C-008/C-009/C-010/C-012/C-013 已全部清零；仅剩 C-005（Python 577/Rust 116/Kotlin 25）。
