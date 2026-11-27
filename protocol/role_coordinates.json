@@ -3,10 +3,10 @@
     "app": 1512,
     "entry": 26,
     "floor": 5,
-    "prod": 1071,
-    "projection": 542,
-    "support": 2027,
-    "verify": 1556
+    "prod": 1079,
+    "projection": 540,
+    "support": 2170,
+    "verify": 1559
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -6055,7 +6055,7 @@
     {
       "function": "决策层端口（机制借鉴一句式：非自回归 typed-decision 模型用 choice / noul / score 三原语",
       "path": "desktop/src/core/decision_layer.py",
-      "role": "verify",
+      "role": "prod",
       "rule": "auto:R-core"
     },
     {
@@ -6127,7 +6127,7 @@
     {
       "function": "演练保真度**量化**（动态可执行面 · 顶层化：drill 全绿 / 回合级回放 / 保真度量化）。",
       "path": "desktop/src/core/drill_fidelity.py",
-      "role": "verify",
+      "role": "prod",
       "rule": "auto:R-core"
     },
     {
@@ -6176,6 +6176,12 @@
       "function": "评测口径折叠 + 防静默回归（机制借鉴 stashbase evals/README.md:31-36）。",
       "path": "desktop/src/core/eval_collapse.py",
       "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "证据包（evidence bundle）——cc_verify 的自包含证据容器。",
+      "path": "desktop/src/core/evidence.py",
+      "role": "verify",
       "rule": "auto:R-core"
     },
     {
@@ -6505,7 +6511,7 @@
     {
       "function": "抽象阶梯（protocol/LAYERS.json）—— 真源唯一 + 生成投影 + 语义判据。",
       "path": "desktop/src/core/layer_model.py",
-      "role": "verify",
+      "role": "prod",
       "rule": "auto:R-core"
     },
     {
@@ -6685,7 +6691,7 @@
     {
       "function": "智能体工具编排（agent tool orchestration）：工作流 → **可机检的编排计划** → 确定性序 → fail-closed 派发。",
       "path": "desktop/src/core/orchestration.py",
-      "role": "verify",
+      "role": "prod",
       "rule": "auto:R-core"
     },
     {
@@ -6715,7 +6721,7 @@
     {
       "function": "域包自由组合引擎（任意 n 元 × 任意组件）。",
       "path": "desktop/src/core/pack_combo.py",
-      "role": "verify",
+      "role": "prod",
       "rule": "auto:R-core"
     },
     {
@@ -7009,7 +7015,7 @@
     {
       "function": "职能坐标（ADR-0006）—— 与抽象阶梯轴**正交**的第二轴：核内逐件、核外按规则。",
       "path": "desktop/src/core/role_model.py",
-      "role": "verify",
+      "role": "prod",
       "rule": "auto:R-core"
     },
     {
@@ -7241,6 +7247,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "LLMWiki 编译器（WP-10，`nf wiki build/check/get/search/related/context`）。",
+      "path": "desktop/src/core/wiki_compiler.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "工作流工业级加固判据（Python-only 面 · 2026-10-13 补）。",
       "path": "desktop/src/core/workflow_hardening.py",
       "role": "verify",
@@ -7261,7 +7273,7 @@
     {
       "function": "world_model 契约扫描器（machine_contract.world_model 可选确定性抽象状态层）。",
       "path": "desktop/src/core/world_model.py",
-      "role": "verify",
+      "role": "prod",
       "rule": "auto:R-core"
     },
     {
@@ -13919,6 +13931,54 @@
       "rule": "R-verify"
     },
     {
+      "function": "[test]",
+      "path": "engine/rust/src/generated/asset_contract_gen.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "[test]",
+      "path": "engine/rust/src/generated/domain_metrics_gen.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "[test]",
+      "path": "engine/rust/src/generated/json_schema_gen.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "[test]",
+      "path": "engine/rust/src/generated/output_forms_checks_gen.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "[test]",
+      "path": "engine/rust/src/generated/output_forms_gen.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "[test]",
+      "path": "engine/rust/src/generated/output_forms_gen_gen.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "[test]",
+      "path": "engine/rust/src/generated/pyrandom_gen.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "[test]",
+      "path": "engine/rust/src/generated/xmlmini_gen.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "[cfg(test)]",
       "path": "engine/rust/src/glob.rs",
       "role": "verify",
@@ -14587,6 +14647,12 @@
     {
       "function": "`engine/rust/tools/` —— 判据期望值的**可再生来源**",
       "path": "engine/rust/tools/README.md",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "生成块落盘助手：把 `// >>> GENERATED` 段写进独立文件 `src/generated/<module>_gen.rs`。",
+      "path": "engine/rust/tools/_gen_target.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -15804,16 +15870,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "405097686b1b88d897c1f326fe4643670d7a8723d0e31299f867fceec3ac9f2b",
+  "root_digest": "58fc28db1f33ceaca21544f97f455077de893ac73fd862cd2686db8855d687ed",
   "rule_counts": {
     "R-app": 1512,
-    "R-catch": 1865,
+    "R-catch": 2008,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 513,
     "R-support": 130,
-    "R-verify": 1422,
+    "R-verify": 1431,
     "auto:R-core": 322
   },
   "schema": "nf-role-coordinates/1"

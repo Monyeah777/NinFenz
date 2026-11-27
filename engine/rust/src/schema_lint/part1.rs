@@ -105,18 +105,9 @@ pub(crate) fn cached_regex(pat: &str) -> Option<regex::Regex> {
 
 /// 真源 `json_schema.json_equal`：JSON 值相等（**严格**，布尔与数字不互相冒充）。
 ///
-/// 2026-10-10 全仓审计 Y4（P1）：enum/const 是**值相等**，而 Python 的 == 把 False == 0 /
-/// True == 1 当同一件。两侧校验器共用这一条相等口径；数字之间仍按数学相等（1 == 1.0）。
-pub(crate) fn json_equal(a: &Json, b: &Json) -> bool {
-    match (a, b) {
-        (Json::Bool(x), Json::Bool(y)) => x == y,
-        (Json::Bool(_), _) | (_, Json::Bool(_)) => false,
-        // 数字之间按**数学相等**（真源 Python 的 1 == 1.0 为真；Rust 派生 Eq 会把它判不等）
-        (Json::Int(x), Json::Float(y)) => (*x as f64) == *y,
-        (Json::Float(x), Json::Int(y)) => *x == (*y as f64),
-        _ => a == b,
-    }
-}
+/// 唯一实现在 [`crate::pyval::json_equal`]（`json_schema` 的 const/enum 与这里的 enum 共用）；
+/// 2026-10-10 全仓审计 Y4（P1）：Python 的 == 把 False == 0 / True == 1 当同一件，故不能直接用。
+pub(crate) use crate::pyval::json_equal;
 
 /// 真源 `subset_validate`：JSON-schema 子集校验（空 = 通过）。
 pub(crate) fn subset_validate(instance: &Json, schema: &Json, path: &str) -> Vec<String> {

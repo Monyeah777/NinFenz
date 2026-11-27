@@ -369,6 +369,22 @@ python desktop/tests/test_rust_fastlane.py                           # 同行独
     // <<< GENERATED
 ```
 
+**生成块落在独立文件**（2026-11 迁移，解审计 C-001/C-009/C-012/C-005 的生成面误计）：
+判据块不再内联进 `src/<module>.rs`，而是 `src/generated/<module>_gen.rs`，主文件只留挂载：
+
+```rust
+#[cfg(test)]
+#[path = "generated/output_forms_gen.rs"]
+mod output_forms_gen;
+```
+
+- 放 `generated/` 子目录的硬理由：`src/output_forms_gen.rs` 已被同名手写模块占用，
+  顶层 `<module>_gen.rs` 会撞名；且审计把 `generated/**` 与 `*_gen.rs` 都视为生成面；
+  挂载声明必须放主文件**模块顶层**（`#[path]` 在 inline mod 里会按 inline 模块名解析到子目录）。
+- 生成器尾统一走 `tools/_gen_target.py::write_gen_block`：先做 **token 归一比较**
+  （忽略空白与列表尾随逗号），内容没变就**保留在盘块**——重跑不抖排版、不依赖 rustfmt 版本；
+  真源变了才整块替换。新增生成器时用 `ensure_mount` + `write_gen_block`，不要再直接改主文件。
+
 ### 已知偏差（无法逐字比对，单列说明）
 
 `modeling` 的词表若声明了一个**未登记的 `python_attr` 探针**（如 `core.nope.X`），

@@ -697,7 +697,12 @@
         "globs": [
           "engine/rust/**/src/**/*.rs"
         ],
-        "limit": 100
+        "limit": 100,
+        "exclude": [
+          "**/vendor/**",
+          "**/*_gen.rs",
+          "**/generated/**"
+        ]
       },
       "penalty": 2,
       "source": "CISQ"

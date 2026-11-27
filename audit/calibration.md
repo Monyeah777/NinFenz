@@ -28,6 +28,7 @@
 | E-007 | Python 兜底 except 静默吞掉一律命中 | 体为空且无 best-effort 说明才命中 | 47 处补 best-effort 说明（不可读/不可用属预期，由上层门禁另报） | 与 E-002/E-006 同口径 |
 | F-005 | Python 所有 subprocess 调用必须 timeout | 仅生产代码 subprocess.run/call/check_* 必须 timeout；Popen 与 app/scripts 一次性脚本除外 | Popen 由调用方 wait/timeout 管理（daemon/rust_engine）；bench/一次性脚本非生产运行路径 | 收窄到规则本意「生产代码不挂死」 |
 | F-003 | 禁止 sync-over-async：正则 `\.Result\b` 一律命中 | 检查器精度收紧：`.Result` 后接「空白 + 标识符 + ( ; , ) = {」或 `>` 视为嵌套类型名，不计属性访问；真实 `.Result` 取值仍命中 | engine/dotnet 全量实扫仅 2 处命中，均为嵌套 record 类型名（`CoreRegistry.Result`、`ExtensionPolicy.Result`），0 处真实 `.Result` 属性访问；修正后用正/负样本回归（`task.Result;`、`await x.Result`、`.Result.ToString()` 命中；类型限定名不命中） | 规则本意是禁 sync-over-async；原正则把类型限定名当属性访问，属检测器误报，不是放宽阈值 |
+| C-012 | Rust 函数 ≤100 行（不区分生成物） | 排除生成物 `**/*_gen.rs` / `**/generated/**`，与 C-001/C-009/C-005 同族口径 | 2026-11-28 实测 16 条命中中 11 条在迁出的 GENERATED 测试块（单函数数百上千行，由生成器生成、不可手改）；手写生产函数仍全量受 ≤100 约束 | 生成物不参与手写代码判据；与 C-001/C-009 的既有 exclude 对齐 |
 | E-008 | Rust 生产路径任何 panic!/todo!/unimplemented! 即命中 | fail-closed 处带 `audit: panic-fail-closed` 说明（同一处前 3 行内）可豁免 | app/core/src/limits.rs 内嵌 limits.json 契约破坏、engine/rust/src/pyrandom.rs 越出已复刻子集 | 两处是刻意的 fail-closed 断言，静默降级会破坏契约/逐位对账；豁免须可搜索 |
 | E-010 | Rust unwrap/expect 统计包含测试模块 | 剔除 `#[cfg(test)] mod tests` 内联整块，并识别 `#[cfg(test)] mod foo;` 声明的**外部测试模块文件**（整文件按测试面跳过） | asset_contract.rs 39→3、miniyaml/contracts 等同类下降；E-010 命中 7→0；2026-11-28 拆分后 `contracts/tests_extra.rs` 被误计 34 次，加文件级识别后恢复 0 | 规则本意是「生产路径」，测试里的 unwrap 是断言手段，计入属误报 |
 | ARCH-004 | Kotlin 包间任何环都命中 | 跨层环才算；根包 `dev.ninfenz.mobile`（R/BuildConfig/MainActivity）参与的环与 `*.ui` 子树内部环豁免 | 单模块 Android 的 R/Activity 必与子包互引；Compose ui↔ui.components↔ui.screens 天然互引（不是可维护性缺陷） | 规则本意是「跨层不得成环」；豁免范围写死在 rules.json，跨层环（如 data↔share）仍会命中 |
@@ -43,6 +44,7 @@
 - **阈值余量收紧（零余量棘轮）**：C-006 350→315、E-004 700→226（剔除测试模块后的真实生产数；旧证据 624 含测试模块，属 E-010 同类误报）、J-008 150→140、I-006 4MB→3.2MB。四项都收到当前实测值，任何新增立即命中。
 - **暂不收紧**：B-002（400）/ B-003（800）为目录文件数棘轮；C-001 的 Python/Rust 大文件拆分会在同目录新增文件，先保留现有上限，待 0.4 拆分完成、按子包收敛后再收紧。
 - **新增检测器精度修正**：F-003（见上表）排除嵌套类型名误报；E-004/E-010（见上表）识别外部测试模块文件（`#[cfg(test)] mod foo;`），避免把拆出的测试代码当生产路径。规则意图不变，正/负样本与复跑已验证。
+- **C-012 检查面对齐**（见上表）：排除生成物，与 C-001/C-009/C-005 同族口径；手写函数仍全量受约束。
 - **C-010 已回归原判据**：原「10 个真源模块 allow_files 豁免」在本轮拆分 4+6 个模块后全部删除，Python 单文件 ≤800 无豁免仍 0 命中（2026-11-28）。
 - **J-006 复评**：本机已有 .NET SDK 8.0.428（`C:/Users/mon_7/.dotnet`），F-003 的构建校验已使用；独立 .NET 测试工程可以实施，留作 0.4 批次（届时删除本条校准、恢复原判据）。
 

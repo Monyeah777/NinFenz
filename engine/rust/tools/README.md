@@ -48,6 +48,20 @@ cargo test --release --manifest-path engine/rust/Cargo.toml
 **纪律**：`gen_*` 写出的期望值**一律标"从真源生成，勿手改"**。真源改了措辞 → 判据红 →
 重跑生成器 → 期望值跟上。手改期望值等于把判据降级成"记录我上次写的字"。
 
+**落点与幂等（2026-11 迁移）**：生成段落 `src/generated/<module>_gen.rs`（主文件只留
+`#[cfg(test)] #[path = "generated/<module>_gen.rs"] mod <module>_gen;` 挂载，避免主文件被
+生成数据撑大、把行数/复杂度门禁打成误报）。生成器尾统一调 `_gen_target.py`：
+
+```python
+from _gen_target import ensure_mount, write_gen_block
+ensure_mount(ROOT, '<module>')
+write_gen_block(ROOT, '<module>', BEGIN, END, block)   # 标记区间替换
+```
+
+`write_gen_block` 先做 **token 归一比较**（忽略空白与列表尾随逗号）：内容没变就保留在盘块，
+变化才整块替换——所以生成器可反复重跑而输出逐字节一致，`cargo fmt` 之后再跑也不会翻回旧排版。
+**不要再直接把生成段写回 `src/<module>.rs`**。
+
 **夹具落点**（2026-10-20 收口）：生成器算期望值用的合成夹具写**临时目录**
 （`tempfile.mkdtemp`），不落 `engine/rust/target/`；判据侧需要夹具的，一律由判据
 **运行期自建**——`testutil::fixture`（带进程号 + 序号，天然并发隔离）建唯一目录 + 内联内容表，

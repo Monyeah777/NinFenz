@@ -19,6 +19,7 @@ ROOT = pathlib.Path('.').resolve()
 sys.path.insert(0, str(ROOT / 'desktop' / 'src'))
 sys.path.insert(0, str(ROOT / 'engine' / 'rust' / 'tools'))
 from _rustlit import raw as rr  # noqa: E402
+from _gen_target import ANCHOR, ensure_mount, gen_text, norm, save_gen, write_gen_block  # noqa: E402
 from core import asset_contract as ac  # noqa: E402
 
 # ---- ① 真实声明的四条（在真仓库根上跑）
@@ -239,23 +240,24 @@ LEGACY = re.compile(
     r"\n    /// 合成夹具的内容（与 `tools/gen_asset_data_cases\.py` 里 Python 侧那份\*\*逐字同源\*\*）。"
     r".*?\n    \}\n", re.S)
 
-path = ROOT / 'engine' / 'rust' / 'src' / 'asset_contract.rs'
-t = path.read_text(encoding='utf-8')
-if BEGIN in t:
-    a = t.index(BEGIN)
-    b = t.index(END, a) + len(END)
-    t = t[:a] + block + t[b:]
-else:
-    t = t.rstrip() + '\n\n#[cfg(test)]\nmod tests {\n    use super::*;\n}\n'
-    t = t.rstrip()[:-1].rstrip() + '\n' + block + '}\n'
-# 助手块幂等化：① 删带标记的；② 删历史无标记的（可能有 N 份）；③ 插一份。
-while HB in t:
+ensure_mount(ROOT, 'asset_contract')
+write_gen_block(ROOT, 'asset_contract', BEGIN, END, block)
+# 助手块幂等化：内容 token 归一后一致就**原样保留**（不抖排版）；否则删旧插新一份。
+t = gen_text(ROOT, 'asset_contract')
+kept = False
+if HB in t:
     a = t.index(HB)
     b = t.index(HE, a) + len(HE)
-    t = t[:a] + t[b:]
-t = LEGACY.sub('', t)
-anchor = '#[cfg(test)]\nmod tests {\n    use super::*;\n'
-assert anchor in t, 'tests 模块锚点未命中'
-t = t.replace(anchor, anchor + helper, 1)
-path.write_text(t, encoding='utf-8', newline='')
+    if norm(t[a:b]) == norm(helper):
+        kept = True
+if not kept:
+    while HB in t:
+        a = t.index(HB)
+        b = t.index(HE, a) + len(HE)
+        t = t[:a] + t[b:]
+    t = LEGACY.sub('', t)
+    anchor = ANCHOR
+    assert anchor in t, '生成文件头部锚点未命中'
+    t = t.replace(anchor, anchor + helper, 1)
+    save_gen(ROOT, 'asset_contract', t)
 print('# 已写入 asset_contract 的数据面判据（真实 %d 条 / 合成 %d 条）' % (len(real), len(synth)))

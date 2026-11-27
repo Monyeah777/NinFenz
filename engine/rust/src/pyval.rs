@@ -121,6 +121,22 @@ pub fn py_eq(a: &Json, b: &Json) -> bool {
     }
 }
 
+/// 真源 `json_schema.json_equal`：JSON 值相等（**严格**，布尔与数字不互相冒充）。
+///
+/// 2026-10-10 全仓审计 Y4（P1）：enum/const 是**值相等**，而 Python 的 `==` 把 False == 0 /
+/// True == 1 当同一件。两侧校验器（`json_schema` 的 const/enum、`schema_lint` 的 enum）共用
+/// 这一条相等口径；数字之间仍按数学相等（1 == 1.0）。
+pub fn json_equal(a: &Json, b: &Json) -> bool {
+    match (a, b) {
+        (Json::Bool(x), Json::Bool(y)) => x == y,
+        (Json::Bool(_), _) | (_, Json::Bool(_)) => false,
+        // 数字之间按**数学相等**（真源 Python 的 1 == 1.0 为真；Rust 派生 Eq 会把它判不等）
+        (Json::Int(x), Json::Float(y)) => (*x as f64) == *y,
+        (Json::Float(x), Json::Int(y)) => *x == (*y as f64),
+        _ => a == b,
+    }
+}
+
 /// Python `int(x or default)`：**0 是假值**，会落到 default。
 pub fn py_int_or(j: Option<&Json>, default: i64) -> i64 {
     match j {

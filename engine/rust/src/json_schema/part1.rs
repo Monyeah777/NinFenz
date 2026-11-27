@@ -253,12 +253,12 @@ pub(crate) fn check(
         }
     }
     if let Some(c) = obj_get(schema, "const") {
-        if !pyval::py_eq(instance, c) {
+        if !pyval::json_equal(instance, c) {
             errors.push(format!("{}: 应为常量 {}", path, pyval::py_repr(c)));
         }
     }
     if let Some(Json::Array(en)) = obj_get(schema, "enum") {
-        if !en.iter().any(|e| pyval::py_eq(instance, e)) {
+        if !en.iter().any(|e| pyval::json_equal(instance, e)) {
             errors.push(format!(
                 "{}: 取值 {} 不在枚举内",
                 path,

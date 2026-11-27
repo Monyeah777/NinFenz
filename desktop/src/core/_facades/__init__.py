@@ -34,6 +34,19 @@ class LiveFacade(types.ModuleType):
             return
         super().__setattr__(name, value)
 
+    def __delattr__(self, name):
+        # unittest.mock.patch.object 收尾走 delattr（属性不在门面 __dict__ 时）：
+        # 活状态名转发删到持有模块，mock 随后的 hasattr 复查会失败并回填原值——
+        # 语义与「在真实模块上打桩→还原」一致。
+        owner = self._owners().get(name)
+        if owner is not None:
+            try:
+                delattr(owner, name)
+            except AttributeError:
+                pass
+            return
+        super().__delattr__(name)
+
     def __dir__(self):
         return sorted(set(object.__dir__(self)) | set(self._owners()))
 
